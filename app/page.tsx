@@ -40,16 +40,20 @@ export default function HomePage() {
   }, [selectedGroup, searchText]);
 
   return (
-    <div className="flex min-h-screen flex-col">
-      {/* ── Top Bar: Logo + Add VTuber ── */}
-      <header
-        className="flex items-center justify-between px-4 py-4 sm:px-6 border-b backdrop-blur-sm"
+    <div className="flex min-h-screen">
+      {/* ── Left Sidebar (lg+) ── */}
+      <aside
+        className="hidden lg:flex w-[260px] flex-shrink-0 flex-col backdrop-blur-md border-r"
         style={{
           background: 'var(--bg-surface-glass)',
           borderColor: 'var(--border-glass)',
         }}
       >
-        <div className="flex items-center gap-3">
+        {/* Logo */}
+        <div
+          className="flex items-center gap-3 px-5 py-5 border-b"
+          style={{ borderColor: 'var(--border-glass)' }}
+        >
           <div
             className="flex h-9 w-9 items-center justify-center rounded-radius-lg"
             style={{
@@ -66,54 +70,40 @@ export default function HomePage() {
             Prism
           </span>
         </div>
-        <a
-          href="https://nova.oshi.tw"
-          target="_blank"
-          rel="noopener noreferrer"
-          className="inline-flex items-center gap-2 rounded-radius-lg px-3 py-2 sm:px-4 text-token-sm font-semibold text-white transition-opacity hover:opacity-90"
-          style={{
-            background:
-              'linear-gradient(135deg, var(--accent-pink), var(--accent-blue))',
-          }}
-        >
-          <Plus className="h-4 w-4" />
-          <span className="hidden sm:inline">提議新 VTuber</span>
-        </a>
-      </header>
 
-      {/* ── Search + Group Chips ── */}
-      <div className="px-4 pt-4 sm:px-6 space-y-3">
         {/* Search */}
-        <div
-          className="flex items-center gap-2 rounded-radius-lg px-3 py-2"
-          style={{
-            background: 'var(--bg-surface-frosted)',
-            border: '1px solid var(--border-glass)',
-          }}
-        >
-          <Search
-            className="h-4 w-4 flex-shrink-0"
-            style={{ color: 'var(--text-tertiary)' }}
-          />
-          <input
-            type="text"
-            placeholder="搜尋 VTuber…"
-            value={searchText}
-            onChange={(e) => setSearchText(e.target.value)}
-            className="w-full bg-transparent text-token-sm outline-none placeholder:text-token-tertiary"
-            style={{ color: 'var(--text-primary)' }}
-          />
+        <div className="px-4 py-3">
+          <div
+            className="flex items-center gap-2 rounded-radius-lg px-3 py-2"
+            style={{
+              background: 'var(--bg-surface-frosted)',
+              border: '1px solid var(--border-glass)',
+            }}
+          >
+            <Search
+              className="h-4 w-4 flex-shrink-0"
+              style={{ color: 'var(--text-tertiary)' }}
+            />
+            <input
+              type="text"
+              placeholder="搜尋 VTuber…"
+              value={searchText}
+              onChange={(e) => setSearchText(e.target.value)}
+              className="w-full bg-transparent text-token-sm outline-none placeholder:text-token-tertiary"
+              style={{ color: 'var(--text-primary)' }}
+            />
+          </div>
         </div>
 
-        {/* Group chips */}
-        <div className="flex gap-2 overflow-x-auto pb-1">
+        {/* Groups */}
+        <nav className="flex flex-col gap-1 px-4">
           {groups.map((group) => {
             const isActive = selectedGroup === group;
             return (
               <button
                 key={group}
                 onClick={() => setSelectedGroup(group)}
-                className="flex-shrink-0 rounded-radius-pill px-4 py-1.5 text-token-sm font-medium whitespace-nowrap transition-colors"
+                className="rounded-radius-lg px-3 py-2 text-left text-token-sm font-medium transition-colors"
                 style={
                   isActive
                     ? {
@@ -121,24 +111,129 @@ export default function HomePage() {
                           'linear-gradient(135deg, var(--accent-pink), var(--accent-blue))',
                         color: 'white',
                       }
-                    : {
-                        background: 'var(--bg-surface-frosted)',
-                        border: '1px solid var(--border-glass)',
-                        color: 'var(--text-secondary)',
-                      }
+                    : { color: 'var(--text-secondary)' }
                 }
               >
                 {group}
               </button>
             );
           })}
-        </div>
-      </div>
+        </nav>
 
-      {/* ── Streamer Cards ── */}
-      <section className="px-4 py-6 sm:px-6">
-          {/* Card grid: 1-col on mobile, horizontal scroll on md+ */}
-          <div className="grid grid-cols-1 gap-5 sm:flex sm:overflow-x-auto sm:pb-4 sm:snap-x sm:snap-mandatory sm:scrollbar-none">
+        {/* Add VTuber — pinned to bottom */}
+        <div className="mt-auto px-4 py-4">
+          <a
+            href="https://nova.oshi.tw"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="flex items-center justify-center gap-2 rounded-radius-lg px-4 py-2.5 text-token-sm font-semibold text-white transition-opacity hover:opacity-90"
+            style={{
+              background:
+                'linear-gradient(135deg, var(--accent-pink), var(--accent-blue))',
+            }}
+          >
+            <Plus className="h-4 w-4" />
+            提議新 VTuber
+          </a>
+        </div>
+      </aside>
+
+      {/* ── Main Content ── */}
+      <main className="flex-1 min-w-0 flex flex-col">
+        {/* Mobile header (below lg) */}
+        <header
+          className="lg:hidden flex items-center justify-between px-4 py-4 border-b backdrop-blur-sm"
+          style={{
+            background: 'var(--bg-surface-glass)',
+            borderColor: 'var(--border-glass)',
+          }}
+        >
+          <div className="flex items-center gap-3">
+            <div
+              className="flex h-9 w-9 items-center justify-center rounded-radius-lg"
+              style={{
+                background:
+                  'linear-gradient(135deg, var(--accent-pink-light), var(--accent-blue-light))',
+              }}
+            >
+              <Disc3 className="h-5 w-5 text-white" />
+            </div>
+            <span
+              className="text-token-xl font-bold tracking-tight"
+              style={{ color: 'var(--text-primary)' }}
+            >
+              Prism
+            </span>
+          </div>
+          <a
+            href="https://nova.oshi.tw"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="inline-flex items-center gap-2 rounded-radius-lg px-3 py-2 text-token-sm font-semibold text-white transition-opacity hover:opacity-90"
+            style={{
+              background:
+                'linear-gradient(135deg, var(--accent-pink), var(--accent-blue))',
+            }}
+          >
+            <Plus className="h-4 w-4" />
+            <span className="hidden sm:inline">提議新 VTuber</span>
+          </a>
+        </header>
+
+        {/* Mobile search + group chips (below lg) */}
+        <div className="lg:hidden px-4 pt-4 space-y-3">
+          <div
+            className="flex items-center gap-2 rounded-radius-lg px-3 py-2"
+            style={{
+              background: 'var(--bg-surface-frosted)',
+              border: '1px solid var(--border-glass)',
+            }}
+          >
+            <Search
+              className="h-4 w-4 flex-shrink-0"
+              style={{ color: 'var(--text-tertiary)' }}
+            />
+            <input
+              type="text"
+              placeholder="搜尋 VTuber…"
+              value={searchText}
+              onChange={(e) => setSearchText(e.target.value)}
+              className="w-full bg-transparent text-token-sm outline-none placeholder:text-token-tertiary"
+              style={{ color: 'var(--text-primary)' }}
+            />
+          </div>
+          <div className="flex gap-2 overflow-x-auto pb-1">
+            {groups.map((group) => {
+              const isActive = selectedGroup === group;
+              return (
+                <button
+                  key={group}
+                  onClick={() => setSelectedGroup(group)}
+                  className="flex-shrink-0 rounded-radius-pill px-4 py-1.5 text-token-sm font-medium whitespace-nowrap transition-colors"
+                  style={
+                    isActive
+                      ? {
+                          background:
+                            'linear-gradient(135deg, var(--accent-pink), var(--accent-blue))',
+                          color: 'white',
+                        }
+                      : {
+                          background: 'var(--bg-surface-frosted)',
+                          border: '1px solid var(--border-glass)',
+                          color: 'var(--text-secondary)',
+                        }
+                  }
+                >
+                  {group}
+                </button>
+              );
+            })}
+          </div>
+        </div>
+
+        {/* Streamer Cards */}
+        <section className="px-4 py-6 sm:px-6 lg:px-8">
+          <div className="grid grid-cols-1 gap-5 sm:flex sm:overflow-x-auto sm:pb-4 sm:snap-x sm:snap-mandatory sm:scrollbar-none lg:grid lg:grid-cols-2 lg:overflow-visible xl:grid-cols-3">
             {filtered.map((streamer) => (
               <StreamerCard key={streamer.slug} streamer={streamer} />
             ))}
@@ -152,6 +247,7 @@ export default function HomePage() {
             )}
           </div>
         </section>
+      </main>
     </div>
   );
 }
