@@ -35,7 +35,7 @@ export interface SubmitBody {
   youtube_channel_url: string;
   slug: string;
   display_name: string;
-  brand_name?: string;
+  group?: string;
   description?: string;
   avatar_url?: string;
   subscriber_count?: string;

@@ -64,11 +64,11 @@ export function renderPage(siteKey: string) {
           <p class="text-xs text-gray-400 mt-1">自動從顯示名稱生成，可自行修改</p>
         </div>
 
-        <!-- Brand Name -->
+        <!-- Group -->
         <div>
-          <label class="block text-sm font-medium text-gray-700 mb-1">品牌／企劃名稱</label>
-          <input type="text" name="brand_name"
-            placeholder="例：Prism Project"
+          <label class="block text-sm font-medium text-gray-700 mb-1">箱 / 所屬公司 / 個人勢</label>
+          <input type="text" name="group"
+            placeholder="例：個人勢、hololive"
             class="w-full px-4 py-2.5 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-pink-300 focus:border-transparent transition" />
         </div>
 
@@ -203,7 +203,7 @@ export function renderPage(siteKey: string) {
           youtube_channel_url: fd.get('youtube_channel_url'),
           display_name: fd.get('display_name'),
           slug: fd.get('slug'),
-          brand_name: fd.get('brand_name') || '',
+          group: fd.get('group') || '',
           description: fd.get('description') || '',
           avatar_url: fd.get('avatar_url') || '',
           subscriber_count: fd.get('subscriber_count') || '',
