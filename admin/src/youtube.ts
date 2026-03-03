@@ -90,7 +90,7 @@ export interface CandidateComment {
 /** Wrap fetch with Referer header to satisfy API key HTTP referrer restrictions. */
 function ytFetch(url: string): Promise<Response> {
   return fetch(url, {
-    headers: { Referer: 'https://mizukiprism-admin.mizuki.tw/' },
+    headers: { Referer: 'https://prism-admin.oshi.tw/' },
   });
 }
 
