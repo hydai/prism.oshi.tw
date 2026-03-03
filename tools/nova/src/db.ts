@@ -25,6 +25,58 @@ export async function findByChannelUrl(
 }
 
 /**
+ * Reset a rejected submission back to pending with updated data.
+ * Clears reviewer fields so it goes through a fresh review cycle.
+ */
+export async function resetRejectedSubmission(
+  db: D1Database,
+  id: string,
+  data: {
+    youtube_channel_url: string;
+    display_name: string;
+    group: string;
+    description: string;
+    avatar_url: string;
+    subscriber_count: string;
+    link_youtube: string;
+    link_twitter: string;
+    link_facebook: string;
+    link_instagram: string;
+    link_twitch: string;
+  },
+): Promise<void> {
+  await db
+    .prepare(
+      `UPDATE submissions SET
+        youtube_channel_url = ?,
+        display_name = ?, "group" = ?, description = ?,
+        avatar_url = ?, subscriber_count = ?,
+        link_youtube = ?, link_twitter = ?, link_facebook = ?,
+        link_instagram = ?, link_twitch = ?,
+        status = 'pending',
+        submitted_at = datetime('now'),
+        reviewed_at = NULL,
+        reviewer_note = NULL
+      WHERE id = ? AND status = 'rejected'`,
+    )
+    .bind(
+      data.youtube_channel_url,
+      data.display_name,
+      data.group,
+      data.description,
+      data.avatar_url,
+      data.subscriber_count,
+      data.link_youtube,
+      data.link_twitter,
+      data.link_facebook,
+      data.link_instagram,
+      data.link_twitch,
+      id,
+    )
+    .run();
+}
+
+/**
  * Insert a new submission into D1.
  */
 export async function insertSubmission(

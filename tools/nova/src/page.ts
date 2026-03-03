@@ -259,7 +259,10 @@ export function renderPage(siteKey: string) {
           .then(r => r.json())
           .then(data => {
             urlCheck.style.display = 'block';
-            if (data.exists) {
+            if (data.exists && data.canResubmit) {
+              urlCheck.style.color = '#2563EB';
+              urlCheck.textContent = '此頻道先前的提交被拒絕，你可以重新提交';
+            } else if (data.exists) {
               urlCheck.style.color = '#D97706';
               urlCheck.textContent = '此頻道已於 ' + data.submittedAt + ' 提交（狀態：' + data.status + '）';
             } else {
@@ -331,9 +334,11 @@ export function renderPage(siteKey: string) {
           if (res.ok) {
             resultDiv.style.background = '#F0FDF4';
             resultDiv.style.color = '#15803D';
-            resultDiv.textContent = '提交成功！ID: ' + data.id + '。感謝你的推薦！';
+            resultDiv.textContent = data.resubmitted
+              ? '重新提交成功！ID: ' + data.id + '。將再次進入審核流程。'
+              : '提交成功！ID: ' + data.id + '。感謝你的推薦！';
             form.reset();
-            slugManuallyEdited = false;
+            nameManuallyEdited = false;
             if (window.turnstile) turnstile.reset();
           } else if (res.status === 409) {
             resultDiv.style.background = '#FFFBEB';

@@ -2,7 +2,7 @@ import { Hono } from 'hono';
 import type { Bindings, SubmitBody } from './types';
 import { normalizeYoutubeChannelUrl, validateRequired } from './validate';
 import { verifyTurnstile } from './turnstile';
-import { generateId, findByChannelUrl, insertSubmission } from './db';
+import { generateId, findByChannelUrl, insertSubmission, resetRejectedSubmission } from './db';
 import { renderPage } from './page';
 
 const app = new Hono<{ Bindings: Bindings }>();
@@ -30,6 +30,7 @@ app.get('/api/check', async (c) => {
       exists: true,
       status: existing.status,
       submittedAt: existing.submitted_at,
+      canResubmit: existing.status === 'rejected',
     });
   }
 
@@ -124,7 +125,28 @@ app.post('/api/submit', async (c) => {
 
   // Duplicate check (against lowercased normalized URL)
   const existing = await findByChannelUrl(c.env.DB, result.normalized);
+
+  const submissionData = {
+    youtube_channel_url: result.canonical,
+    display_name: body.display_name.trim(),
+    group: body.group?.trim() ?? '',
+    description: body.description?.trim() ?? '',
+    avatar_url: body.avatar_url?.trim() ?? '',
+    subscriber_count: body.subscriber_count?.trim() ?? '',
+    link_youtube: body.link_youtube?.trim() ?? '',
+    link_twitter: body.link_twitter?.trim() ?? '',
+    link_facebook: body.link_facebook?.trim() ?? '',
+    link_instagram: body.link_instagram?.trim() ?? '',
+    link_twitch: body.link_twitch?.trim() ?? '',
+  };
+
   if (existing) {
+    // Allow resubmission of rejected entries
+    if (existing.status === 'rejected') {
+      await resetRejectedSubmission(c.env.DB, existing.id, submissionData);
+      return c.json({ id: existing.id, resubmitted: true }, 200);
+    }
+
     return c.json(
       {
         error: 'duplicate',
@@ -135,23 +157,13 @@ app.post('/api/submit', async (c) => {
     );
   }
 
-  // Insert (store original-case URL + lowered normalized for dedup)
+  // Insert new submission (store original-case URL + lowered normalized for dedup)
   const id = generateId();
   await insertSubmission(c.env.DB, id, {
-    youtube_channel_url: result.canonical,
+    ...submissionData,
     youtube_channel_url_normalized: result.normalized,
     slug: '', // curator sets slug via admin UI
-    display_name: body.display_name.trim(),
     brand_name: '',
-    group: body.group?.trim() ?? '',
-    description: body.description?.trim() ?? '',
-    avatar_url: body.avatar_url?.trim() ?? '',
-    subscriber_count: body.subscriber_count?.trim() ?? '',
-    link_youtube: body.link_youtube?.trim() ?? '',
-    link_twitter: body.link_twitter?.trim() ?? '',
-    link_facebook: body.link_facebook?.trim() ?? '',
-    link_instagram: body.link_instagram?.trim() ?? '',
-    link_twitch: body.link_twitch?.trim() ?? '',
   });
 
   return c.json({ id }, 201);
