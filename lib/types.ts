@@ -79,7 +79,6 @@ export interface StreamerTheme {
 export interface StreamerConfig {
   slug: string;
   displayName: string;
-  subTitle: string;
   description: string;
   avatarUrl: string;
   brandName: string;

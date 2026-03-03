@@ -823,7 +823,7 @@ app.put('/api/nova/submissions/:id', requireCurator, async (c) => {
     'youtube_channel_url', 'slug', 'brand_name', 'display_name', 'description',
     'avatar_url', 'subscriber_count', 'link_youtube', 'link_twitter',
     'link_facebook', 'link_instagram', 'link_twitch', 'reviewer_note',
-    'group', 'sub_title', 'theme_json', 'enabled',
+    'group', 'theme_json', 'enabled',
   ] as const;
 
   for (const key of editable) {

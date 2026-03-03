@@ -12,7 +12,7 @@ export async function generateMetadata({ params }: { params: Promise<{ streamer:
   if (!config) return {};
 
   return {
-    title: `${config.brandName} - ${config.subTitle}`,
+    title: `${config.brandName} - Official Song Archive`,
     description: config.description,
   };
 }

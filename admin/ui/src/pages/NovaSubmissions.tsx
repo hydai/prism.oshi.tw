@@ -7,7 +7,7 @@ type EditableKey =
   | 'display_name' | 'slug' | 'brand_name' | 'youtube_channel_url'
   | 'description' | 'avatar_url' | 'subscriber_count'
   | 'link_youtube' | 'link_twitter' | 'link_facebook' | 'link_instagram' | 'link_twitch'
-  | 'group' | 'sub_title';
+  | 'group';
 
 /** Fields curators can edit on a submission. */
 const EDITABLE_FIELDS: ReadonlyArray<{ key: EditableKey; label: string; multiline?: boolean }> = [
@@ -15,7 +15,6 @@ const EDITABLE_FIELDS: ReadonlyArray<{ key: EditableKey; label: string; multilin
   { key: 'slug', label: 'Slug' },
   { key: 'brand_name', label: 'Brand Name' },
   { key: 'group', label: 'Group' },
-  { key: 'sub_title', label: 'Sub Title' },
   { key: 'youtube_channel_url', label: 'YouTube Channel URL' },
   { key: 'description', label: 'Description', multiline: true },
   { key: 'avatar_url', label: 'Avatar URL' },
@@ -413,7 +412,6 @@ function SubmissionRow({
                   <>
                     <DetailField label="Brand Name" value={sub.brand_name} />
                     <DetailField label="Group" value={sub.group} />
-                    <DetailField label="Sub Title" value={sub.sub_title} />
                     <DetailField label="Enabled" value={sub.enabled === 1 ? 'Yes' : 'No'} />
                     <DetailField label="YouTube Channel URL">
                       <a

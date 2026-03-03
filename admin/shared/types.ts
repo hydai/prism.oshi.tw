@@ -323,7 +323,6 @@ export interface NovaSubmission {
   link_instagram: string;
   link_twitch: string;
   group: string;
-  sub_title: string;
   enabled: number;
   theme_json: string;
   status: NovaStatus;

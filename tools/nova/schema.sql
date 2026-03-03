@@ -13,7 +13,6 @@ CREATE TABLE IF NOT EXISTS submissions (
   link_instagram TEXT DEFAULT '',
   link_twitch TEXT DEFAULT '',
   "group" TEXT DEFAULT '',
-  sub_title TEXT DEFAULT 'Official Song Archive',
   enabled INTEGER DEFAULT 1,
   theme_json TEXT DEFAULT '',
   status TEXT DEFAULT 'pending' CHECK(status IN ('pending', 'approved', 'rejected')),

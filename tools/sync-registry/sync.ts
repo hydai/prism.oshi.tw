@@ -32,7 +32,6 @@ interface SubmissionRow {
   brand_name: string;
   subscriber_count: string;
   group: string;
-  sub_title: string;
   enabled: number;
   theme_json: string;
   link_youtube: string;
@@ -70,7 +69,6 @@ interface ThemeColors {
 interface StreamerConfig {
   slug: string;
   displayName: string;
-  subTitle: string;
   description: string;
   avatarUrl: string;
   brandName: string;
@@ -86,7 +84,7 @@ interface StreamerConfig {
 function queryNovaDb(): SubmissionRow[] {
   const sql = [
     'SELECT slug, display_name, description, avatar_url, brand_name,',
-    'subscriber_count, "group", sub_title, enabled, theme_json,',
+    'subscriber_count, "group", enabled, theme_json,',
     'link_youtube, link_twitter, link_facebook, link_instagram, link_twitch',
     "FROM submissions WHERE status = 'approved' AND enabled = 1 ORDER BY slug",
   ].join(' ');
@@ -130,7 +128,6 @@ function rowToConfig(row: SubmissionRow): StreamerConfig {
   return {
     slug: row.slug,
     displayName: row.display_name,
-    subTitle: row.sub_title || 'Official Song Archive',
     description: row.description,
     avatarUrl: row.avatar_url,
     brandName: row.brand_name,
