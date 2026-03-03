@@ -11,10 +11,13 @@
 import { execFileSync } from 'node:child_process';
 import * as fs from 'node:fs';
 import * as path from 'node:path';
+import { fileURLToPath } from 'node:url';
 
 // --- Paths ---
 
-const ROOT = path.resolve(import.meta.dirname, '../..');
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
+const ROOT = path.resolve(__dirname, '../..');
 const NOVA_DIR = path.resolve(ROOT, 'tools/nova');
 const REGISTRY_PATH = path.resolve(ROOT, 'data/registry.json');
 const SLUGS_PATH = path.resolve(ROOT, 'lib/streamer-slugs.ts');
