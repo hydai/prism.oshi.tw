@@ -7,129 +7,234 @@ export function renderPage(siteKey: string) {
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Prism Nova — VTuber 提交</title>
-  <script src="https://cdn.tailwindcss.com"></script>
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,400;0,9..40,500;0,9..40,700;1,9..40,400&display=swap" rel="stylesheet" />
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700;1,9..40,400&display=swap" rel="stylesheet" />
   <script src="https://challenges.cloudflare.com/turnstile/v0/api.js" async defer></script>
   <style>
-    body { font-family: 'DM Sans', sans-serif; }
+    :root {
+      --accent-pink: #EC4899;
+      --accent-pink-dark: #DB2777;
+      --accent-pink-light: #F472B6;
+      --accent-blue: #3B82F6;
+      --accent-blue-light: #60A5FA;
+      --bg-page-start: #FFF0F5;
+      --bg-page-mid: #F0F8FF;
+      --bg-page-end: #E6E6FA;
+      --bg-surface-glass: #FFFFFF66;
+      --bg-surface-frosted: #FFFFFF99;
+      --text-primary: #1E293B;
+      --text-secondary: #64748B;
+      --text-tertiary: #94A3B8;
+      --border-default: #E2E8F0;
+      --border-glass: #FFFFFF66;
+      --border-accent-pink: #FBCFE8;
+      --radius-lg: 12px;
+      --radius-xl: 16px;
+      --radius-2xl: 20px;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: 'DM Sans', sans-serif;
+      background: linear-gradient(135deg, var(--bg-page-start) 0%, var(--bg-page-mid) 50%, var(--bg-page-end) 100%);
+      background-attachment: fixed;
+      min-height: 100vh;
+      color: var(--text-primary);
+    }
+
+    .form-input {
+      width: 100%;
+      padding: 10px 16px;
+      background: var(--bg-surface-frosted);
+      border: 1px solid var(--border-glass);
+      border-radius: var(--radius-lg);
+      font-family: inherit;
+      font-size: 14px;
+      color: var(--text-primary);
+      outline: none;
+      transition: border-color 0.2s, box-shadow 0.2s;
+    }
+    .form-input::placeholder { color: var(--text-tertiary); }
+    .form-input:focus {
+      border-color: var(--border-accent-pink);
+      box-shadow: 0 0 0 3px rgba(236, 72, 153, 0.1);
+    }
+
+    textarea.form-input { resize: none; }
+
+    .form-label {
+      display: block;
+      font-size: 13px;
+      font-weight: 500;
+      color: var(--text-secondary);
+      margin-bottom: 6px;
+    }
+    .form-label .required { color: var(--accent-pink); }
+
+    .form-hint {
+      font-size: 11px;
+      color: var(--text-tertiary);
+      margin-top: 4px;
+    }
+
+    .section-label {
+      font-size: 13px;
+      font-weight: 600;
+      color: var(--text-secondary);
+      margin-bottom: 12px;
+    }
+
+    .btn-submit {
+      width: 100%;
+      padding: 12px 24px;
+      border: none;
+      border-radius: var(--radius-lg);
+      background: linear-gradient(135deg, var(--accent-pink), var(--accent-blue));
+      color: white;
+      font-family: inherit;
+      font-size: 15px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: opacity 0.2s, box-shadow 0.2s;
+      box-shadow: 0 4px 14px rgba(236, 72, 153, 0.25);
+    }
+    .btn-submit:hover { opacity: 0.92; box-shadow: 0 6px 20px rgba(236, 72, 153, 0.3); }
+    .btn-submit:disabled { opacity: 0.5; cursor: not-allowed; }
   </style>
 </head>
-<body class="min-h-screen" style="background: linear-gradient(135deg, #FFF0F5 0%, #F0F8FF 50%, #E6E6FA 100%);">
+<body>
 
-  <div class="max-w-2xl mx-auto px-4 py-12">
+  <div style="max-width: 640px; margin: 0 auto; padding: 48px 16px;">
     <!-- Header -->
-    <div class="text-center mb-8">
-      <h1 class="text-3xl font-bold bg-gradient-to-r from-pink-500 to-blue-500 bg-clip-text text-transparent">
-        Prism Nova
-      </h1>
-      <p class="text-gray-600 mt-2">提交你喜愛的 VTuber，讓我們為 TA 建立 Prism 頁面</p>
+    <div style="text-align: center; margin-bottom: 32px;">
+      <div style="display: inline-flex; align-items: center; gap: 12px; margin-bottom: 8px;">
+        <div style="
+          width: 40px; height: 40px; border-radius: var(--radius-lg);
+          background: linear-gradient(135deg, var(--accent-pink-light), var(--accent-blue-light));
+          display: flex; align-items: center; justify-content: center;
+        ">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="3"/>
+            <path d="M12 2a14.5 14.5 0 0 0 0 20 14.5 14.5 0 0 0 0-20"/>
+          </svg>
+        </div>
+        <span style="
+          font-size: 28px; font-weight: 700; letter-spacing: -0.5px;
+          background: linear-gradient(135deg, var(--accent-pink), var(--accent-blue));
+          -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+          background-clip: text;
+        ">Prism Nova</span>
+      </div>
+      <p style="color: var(--text-secondary); font-size: 14px;">
+        提交你喜愛的 VTuber，讓我們為 TA 建立 Prism 頁面
+      </p>
     </div>
 
     <!-- Form Card -->
-    <div class="bg-white/80 backdrop-blur-sm rounded-2xl shadow-lg p-6 md:p-8">
-      <form id="nova-form" class="space-y-5">
+    <div style="
+      background: var(--bg-surface-glass);
+      backdrop-filter: blur(16px); -webkit-backdrop-filter: blur(16px);
+      border: 1px solid var(--border-glass);
+      border-radius: var(--radius-2xl);
+      padding: 32px;
+      box-shadow: 0 8px 32px rgba(0,0,0,0.06);
+    ">
+      <form id="nova-form" style="display: flex; flex-direction: column; gap: 20px;">
 
         <!-- YouTube Channel URL -->
         <div>
-          <label class="block text-sm font-medium text-gray-700 mb-1">
-            YouTube 頻道網址 <span class="text-pink-500">*</span>
+          <label class="form-label">
+            YouTube 頻道網址 <span class="required">*</span>
           </label>
           <input type="url" name="youtube_channel_url" required
             placeholder="https://www.youtube.com/@ChannelName"
-            class="w-full px-4 py-2.5 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-pink-300 focus:border-transparent transition" />
-          <div id="url-check" class="mt-1 text-sm hidden"></div>
+            class="form-input" />
+          <div id="url-check" style="margin-top: 4px; font-size: 13px; display: none;"></div>
         </div>
 
         <!-- Display Name -->
         <div>
-          <label class="block text-sm font-medium text-gray-700 mb-1">
-            顯示名稱 <span class="text-pink-500">*</span>
+          <label class="form-label">
+            顯示名稱 <span class="required">*</span>
           </label>
           <input type="text" name="display_name" required
-            placeholder="例：水月稜鏡"
-            class="w-full px-4 py-2.5 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-pink-300 focus:border-transparent transition" />
+            placeholder="例：浠Mizuki"
+            class="form-input" />
         </div>
 
         <!-- Slug -->
         <div>
-          <label class="block text-sm font-medium text-gray-700 mb-1">
-            Slug（網址用，小寫英數加連字號）<span class="text-pink-500">*</span>
+          <label class="form-label">
+            Slug（網址用，小寫英數加連字號）<span class="required">*</span>
           </label>
           <input type="text" name="slug" required
-            placeholder="例：mizuki-prism"
+            placeholder="例：mizuki"
             pattern="[a-z0-9][a-z0-9-]*[a-z0-9]"
-            class="w-full px-4 py-2.5 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-pink-300 focus:border-transparent transition" />
-          <p class="text-xs text-gray-400 mt-1">自動從顯示名稱生成，可自行修改</p>
+            class="form-input" />
+          <p class="form-hint">自動從顯示名稱生成，可自行修改</p>
         </div>
 
         <!-- Group -->
         <div>
-          <label class="block text-sm font-medium text-gray-700 mb-1">箱 / 所屬公司 / 個人勢</label>
+          <label class="form-label">箱 / 所屬公司 / 個人勢</label>
           <input type="text" name="group"
             placeholder="例：個人勢、hololive"
-            class="w-full px-4 py-2.5 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-pink-300 focus:border-transparent transition" />
+            class="form-input" />
         </div>
 
         <!-- Description -->
         <div>
-          <label class="block text-sm font-medium text-gray-700 mb-1">簡介</label>
+          <label class="form-label">簡介</label>
           <textarea name="description" rows="3"
             placeholder="關於這位 VTuber 的簡短介紹…"
-            class="w-full px-4 py-2.5 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-pink-300 focus:border-transparent transition resize-none"></textarea>
+            class="form-input"></textarea>
         </div>
 
         <!-- Avatar URL -->
         <div>
-          <label class="block text-sm font-medium text-gray-700 mb-1">頭像圖片網址</label>
+          <label class="form-label">頭像圖片網址</label>
           <input type="url" name="avatar_url"
             placeholder="https://..."
-            class="w-full px-4 py-2.5 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-pink-300 focus:border-transparent transition" />
+            class="form-input" />
         </div>
 
         <!-- Subscriber Count -->
         <div>
-          <label class="block text-sm font-medium text-gray-700 mb-1">訂閱數</label>
+          <label class="form-label">訂閱數</label>
           <input type="text" name="subscriber_count"
             placeholder="例：21.8萬"
-            class="w-full px-4 py-2.5 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-pink-300 focus:border-transparent transition" />
+            class="form-input" />
         </div>
 
         <!-- Social Links -->
-        <div class="border-t border-gray-100 pt-5">
-          <h3 class="text-sm font-medium text-gray-700 mb-3">社群連結（選填）</h3>
-          <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
-            <input type="url" name="link_youtube" placeholder="YouTube 連結"
-              class="px-4 py-2.5 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-pink-300 focus:border-transparent transition" />
-            <input type="url" name="link_twitter" placeholder="Twitter / X 連結"
-              class="px-4 py-2.5 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-pink-300 focus:border-transparent transition" />
-            <input type="url" name="link_facebook" placeholder="Facebook 連結"
-              class="px-4 py-2.5 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-pink-300 focus:border-transparent transition" />
-            <input type="url" name="link_instagram" placeholder="Instagram 連結"
-              class="px-4 py-2.5 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-pink-300 focus:border-transparent transition" />
-            <input type="url" name="link_twitch" placeholder="Twitch 連結"
-              class="px-4 py-2.5 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-pink-300 focus:border-transparent transition" />
+        <div style="border-top: 1px solid var(--border-glass); padding-top: 20px;">
+          <p class="section-label">社群連結（選填）</p>
+          <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px;">
+            <input type="url" name="link_youtube" placeholder="YouTube" class="form-input" />
+            <input type="url" name="link_twitter" placeholder="Twitter / X" class="form-input" />
+            <input type="url" name="link_facebook" placeholder="Facebook" class="form-input" />
+            <input type="url" name="link_instagram" placeholder="Instagram" class="form-input" />
+            <input type="url" name="link_twitch" placeholder="Twitch" class="form-input" />
           </div>
         </div>
 
         <!-- Turnstile -->
-        <div class="flex justify-center">
+        <div style="display: flex; justify-content: center;">
           <div class="cf-turnstile" data-sitekey="${siteKey}" data-theme="light"></div>
         </div>
 
         <!-- Submit -->
-        <button type="submit" id="submit-btn"
-          class="w-full py-3 px-6 text-white font-medium rounded-xl bg-gradient-to-r from-pink-500 to-blue-500 hover:from-pink-600 hover:to-blue-600 transition shadow-md hover:shadow-lg disabled:opacity-50 disabled:cursor-not-allowed">
+        <button type="submit" id="submit-btn" class="btn-submit">
           提交
         </button>
 
         <!-- Result message -->
-        <div id="result" class="hidden text-center text-sm py-3 px-4 rounded-xl"></div>
+        <div id="result" style="display: none; text-align: center; font-size: 13px; padding: 12px 16px; border-radius: var(--radius-lg);"></div>
       </form>
     </div>
 
-    <p class="text-center text-xs text-gray-400 mt-6">
+    <p style="text-align: center; font-size: 11px; color: var(--text-tertiary); margin-top: 24px;">
       Prism &mdash; 為你喜愛的 VTuber 打造歌單頁面
     </p>
   </div>
@@ -166,7 +271,7 @@ export function renderPage(siteKey: string) {
       urlInput.addEventListener('blur', function() {
         const url = this.value.trim();
         if (!url) {
-          urlCheck.classList.add('hidden');
+          urlCheck.style.display = 'none';
           return;
         }
         clearTimeout(checkTimeout);
@@ -174,16 +279,16 @@ export function renderPage(siteKey: string) {
           try {
             const res = await fetch('/api/check?url=' + encodeURIComponent(url));
             const data = await res.json();
-            urlCheck.classList.remove('hidden');
+            urlCheck.style.display = 'block';
             if (data.exists) {
-              urlCheck.className = 'mt-1 text-sm text-amber-600';
+              urlCheck.style.color = '#D97706';
               urlCheck.textContent = '此頻道已於 ' + data.submittedAt + ' 提交（狀態：' + data.status + '）';
             } else {
-              urlCheck.className = 'mt-1 text-sm text-green-600';
+              urlCheck.style.color = '#059669';
               urlCheck.textContent = '此頻道尚未被提交';
             }
           } catch {
-            urlCheck.classList.add('hidden');
+            urlCheck.style.display = 'none';
           }
         }, 300);
       });
@@ -193,7 +298,7 @@ export function renderPage(siteKey: string) {
         e.preventDefault();
         submitBtn.disabled = true;
         submitBtn.textContent = '提交中…';
-        resultDiv.classList.add('hidden');
+        resultDiv.style.display = 'none';
 
         const fd = new FormData(form);
         const turnstileInput = form.querySelector('[name="cf-turnstile-response"]');
@@ -223,23 +328,27 @@ export function renderPage(siteKey: string) {
           });
           const data = await res.json();
 
-          resultDiv.classList.remove('hidden');
+          resultDiv.style.display = 'block';
           if (res.ok) {
-            resultDiv.className = 'text-center text-sm py-3 px-4 rounded-xl bg-green-50 text-green-700';
+            resultDiv.style.background = '#F0FDF4';
+            resultDiv.style.color = '#15803D';
             resultDiv.textContent = '提交成功！ID: ' + data.id + '。感謝你的推薦！';
             form.reset();
             slugManuallyEdited = false;
             if (window.turnstile) turnstile.reset();
           } else if (res.status === 409) {
-            resultDiv.className = 'text-center text-sm py-3 px-4 rounded-xl bg-amber-50 text-amber-700';
+            resultDiv.style.background = '#FFFBEB';
+            resultDiv.style.color = '#B45309';
             resultDiv.textContent = '此頻道已於 ' + data.submittedAt + ' 提交過（狀態：' + data.status + '）';
           } else {
-            resultDiv.className = 'text-center text-sm py-3 px-4 rounded-xl bg-red-50 text-red-600';
+            resultDiv.style.background = '#FEF2F2';
+            resultDiv.style.color = '#DC2626';
             resultDiv.textContent = data.error || '提交失敗，請稍後再試';
           }
         } catch {
-          resultDiv.classList.remove('hidden');
-          resultDiv.className = 'text-center text-sm py-3 px-4 rounded-xl bg-red-50 text-red-600';
+          resultDiv.style.display = 'block';
+          resultDiv.style.background = '#FEF2F2';
+          resultDiv.style.color = '#DC2626';
           resultDiv.textContent = '網路錯誤，請檢查連線後再試';
         } finally {
           submitBtn.disabled = false;
