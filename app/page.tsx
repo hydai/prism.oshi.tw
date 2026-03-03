@@ -233,7 +233,7 @@ export default function HomePage() {
 
         {/* Streamer Cards */}
         <section className="px-4 py-6 sm:px-6 lg:px-8">
-          <div className="grid grid-cols-1 gap-5 sm:flex sm:overflow-x-auto sm:pb-4 sm:snap-x sm:snap-mandatory sm:scrollbar-none lg:grid lg:grid-cols-2 lg:overflow-visible xl:grid-cols-3">
+          <div className="grid grid-cols-1 gap-5 sm:flex sm:overflow-x-auto sm:pb-4 sm:snap-x sm:snap-mandatory sm:scrollbar-none lg:grid lg:grid-cols-3 lg:overflow-visible xl:grid-cols-4 2xl:grid-cols-5">
             {filtered.map((streamer) => (
               <StreamerCard key={streamer.slug} streamer={streamer} />
             ))}
@@ -270,7 +270,7 @@ function StreamerCard({ streamer }: { streamer: StreamerConfig }) {
       <img
         src={streamer.avatarUrl}
         alt={streamer.displayName}
-        className="aspect-square w-full object-cover"
+        className="aspect-square w-full object-cover sm:max-h-[240px]"
       />
 
       {/* Info row */}
