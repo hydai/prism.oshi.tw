@@ -30,6 +30,33 @@
         "borderAccentSecondary": "#BFDBFE"
       },
       "enabled": true
+    },
+    {
+      "slug": "gabu",
+      "displayName": "Gabu ch. 加百利 珈咘",
+      "subTitle": "Official Song Archive",
+      "description": "Gabu💙左邊日本人右邊台灣人的假的日本人！",
+      "avatarUrl": "https://yt3.ggpht.com/EiXx2rZ6H0vP5277BDSgfPbLCfT24tpVpjR75SnlHuCcwmE_REEDYozWjtN6jr_F5IyF_32G6W4=s240-c-k-c0x00ffffff-no-rj",
+      "brandName": "GabuPrism",
+      "socialLinks": {
+        "youtube": "https://www.youtube.com/channel/UCCHsCWNTcGJ8Jml_oZ6nG2Q",
+        "twitter": "https://x.com/gabu_vt"
+      },
+      "theme": {
+        "accentPrimary": "#4A6999",
+        "accentPrimaryDark": "#3B598A",
+        "accentPrimaryLight": "#6B8AB8",
+        "accentSecondary": "#E5C558",
+        "accentSecondaryLight": "#F0D87C",
+        "bgPageStart": "#F5F6F8",
+        "bgPageMid": "#EEF1F7",
+        "bgPageEnd": "#E8ECF5",
+        "bgAccentPrimary": "#EDF1F7",
+        "bgAccentPrimaryMuted": "#DDE4F0",
+        "borderAccentPrimary": "#C5D0E3",
+        "borderAccentSecondary": "#F0D87C"
+      },
+      "enabled": true
     }
   ]
 }
