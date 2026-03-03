@@ -14,7 +14,7 @@ CREATE TABLE IF NOT EXISTS submissions (
   link_twitch TEXT DEFAULT '',
   "group" TEXT DEFAULT '',
   enabled INTEGER DEFAULT 1,
-  display_order INTEGER DEFAULT 0,
+  display_order INTEGER DEFAULT 999,
   theme_json TEXT DEFAULT '',
   status TEXT DEFAULT 'pending' CHECK(status IN ('pending', 'approved', 'rejected')),
   submitted_at TEXT DEFAULT (datetime('now')),
