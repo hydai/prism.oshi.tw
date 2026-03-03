@@ -19,12 +19,12 @@ app.get('/api/check', async (c) => {
     return c.json({ error: 'url query parameter is required' }, 400);
   }
 
-  const normalized = normalizeYoutubeChannelUrl(rawUrl);
-  if (!normalized) {
+  const result = normalizeYoutubeChannelUrl(rawUrl);
+  if (!result) {
     return c.json({ exists: false });
   }
 
-  const existing = await findByChannelUrl(c.env.DB, normalized);
+  const existing = await findByChannelUrl(c.env.DB, result.normalized);
   if (existing) {
     return c.json({
       exists: true,
@@ -75,13 +75,13 @@ app.post('/api/submit', async (c) => {
   }
 
   // Normalize YouTube channel URL
-  const normalized = normalizeYoutubeChannelUrl(body.youtube_channel_url);
-  if (!normalized) {
+  const result = normalizeYoutubeChannelUrl(body.youtube_channel_url);
+  if (!result) {
     return c.json({ error: '無效的 YouTube 頻道網址' }, 400);
   }
 
-  // Duplicate check
-  const existing = await findByChannelUrl(c.env.DB, normalized);
+  // Duplicate check (against lowercased normalized URL)
+  const existing = await findByChannelUrl(c.env.DB, result.normalized);
   if (existing) {
     return c.json(
       {
@@ -93,10 +93,11 @@ app.post('/api/submit', async (c) => {
     );
   }
 
-  // Insert
+  // Insert (store original-case URL + lowered normalized for dedup)
   const id = generateId();
   await insertSubmission(c.env.DB, id, {
-    youtube_channel_url: normalized,
+    youtube_channel_url: result.canonical,
+    youtube_channel_url_normalized: result.normalized,
     slug: body.slug.trim(),
     display_name: body.display_name.trim(),
     brand_name: body.brand_name?.trim() ?? '',

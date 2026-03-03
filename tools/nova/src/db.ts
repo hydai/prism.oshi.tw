@@ -18,7 +18,7 @@ export async function findByChannelUrl(
   channelUrl: string,
 ): Promise<Pick<SubmissionRow, 'id' | 'status' | 'submitted_at'> | null> {
   const row = await db
-    .prepare('SELECT id, status, submitted_at FROM submissions WHERE youtube_channel_url = ?')
+    .prepare('SELECT id, status, submitted_at FROM submissions WHERE youtube_channel_url_normalized = ?')
     .bind(channelUrl)
     .first<Pick<SubmissionRow, 'id' | 'status' | 'submitted_at'>>();
   return row ?? null;
@@ -32,6 +32,7 @@ export async function insertSubmission(
   id: string,
   data: {
     youtube_channel_url: string;
+    youtube_channel_url_normalized: string;
     slug: string;
     display_name: string;
     brand_name: string;
@@ -48,14 +49,15 @@ export async function insertSubmission(
   await db
     .prepare(
       `INSERT INTO submissions (
-        id, youtube_channel_url, slug, brand_name, display_name,
+        id, youtube_channel_url, youtube_channel_url_normalized, slug, brand_name, display_name,
         description, avatar_url, subscriber_count,
         link_youtube, link_twitter, link_facebook, link_instagram, link_twitch
-      ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+      ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
     )
     .bind(
       id,
       data.youtube_channel_url,
+      data.youtube_channel_url_normalized,
       data.slug,
       data.brand_name,
       data.display_name,

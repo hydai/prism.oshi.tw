@@ -1,9 +1,11 @@
 /**
- * Normalize a YouTube channel URL to a canonical form for dedup.
+ * Normalize a YouTube channel URL for dedup while preserving the original.
  * Accepts /@handle, /channel/UCxxx, /c/custom patterns.
- * Returns normalized URL or null if invalid.
+ * Returns { canonical, normalized } or null if invalid.
+ *   - canonical: clean URL with original casing (for display/linking)
+ *   - normalized: lowercased URL (for dedup lookups)
  */
-export function normalizeYoutubeChannelUrl(raw: string): string | null {
+export function normalizeYoutubeChannelUrl(raw: string): { canonical: string; normalized: string } | null {
   let url: URL;
   try {
     // Handle bare handles like @MizukiPrism
@@ -20,16 +22,23 @@ export function normalizeYoutubeChannelUrl(raw: string): string | null {
     return null;
   }
 
-  // Remove trailing slashes and lowercase the path
-  const path = url.pathname.replace(/\/+$/, '').toLowerCase();
+  // Remove trailing slashes, keep original case
+  const pathOriginal = url.pathname.replace(/\/+$/, '');
+  const pathLower = pathOriginal.toLowerCase();
 
-  // Match valid channel path patterns
-  const match = path.match(/^\/(channel\/[^/]+|c\/[^/]+|@[^/]+)$/);
+  // Match valid channel path patterns (on lowered for validation)
+  const match = pathLower.match(/^\/(channel\/[^/]+|c\/[^/]+|@[^/]+)$/);
   if (!match) {
     return null;
   }
 
-  return `https://www.youtube.com/${match[1]}`;
+  // Extract same segment from original-case path
+  const matchOriginal = pathOriginal.match(/^\/(channel\/[^/]+|c\/[^/]+|@[^/]+)$/i);
+
+  return {
+    canonical: `https://www.youtube.com/${matchOriginal![1]}`,
+    normalized: `https://www.youtube.com/${match[1]}`,
+  };
 }
 
 /**

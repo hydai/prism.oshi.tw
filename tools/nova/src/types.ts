@@ -9,6 +9,7 @@ export type SubmissionStatus = 'pending' | 'approved' | 'rejected';
 export interface SubmissionRow {
   id: string;
   youtube_channel_url: string;
+  youtube_channel_url_normalized: string;
   slug: string;
   brand_name: string;
   display_name: string;

@@ -834,6 +834,12 @@ app.put('/api/nova/submissions/:id', requireCurator, async (c) => {
     }
   }
 
+  // Keep normalized URL in sync when youtube_channel_url changes
+  if (body.youtube_channel_url) {
+    fields.push('"youtube_channel_url_normalized" = ?');
+    values.push(body.youtube_channel_url.trim().toLowerCase());
+  }
+
   if (fields.length === 0) {
     return c.json({ error: 'No fields to update' }, 400);
   }

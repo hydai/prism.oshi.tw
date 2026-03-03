@@ -1,6 +1,7 @@
 CREATE TABLE IF NOT EXISTS submissions (
   id TEXT PRIMARY KEY,
   youtube_channel_url TEXT NOT NULL,
+  youtube_channel_url_normalized TEXT DEFAULT '',
   slug TEXT NOT NULL,
   brand_name TEXT DEFAULT '',
   display_name TEXT NOT NULL,
@@ -22,7 +23,7 @@ CREATE TABLE IF NOT EXISTS submissions (
   reviewer_note TEXT DEFAULT ''
 );
 
-CREATE UNIQUE INDEX IF NOT EXISTS idx_submissions_channel_url
-  ON submissions(youtube_channel_url);
+CREATE UNIQUE INDEX IF NOT EXISTS idx_submissions_channel_url_normalized
+  ON submissions(youtube_channel_url_normalized);
 CREATE INDEX IF NOT EXISTS idx_submissions_status
   ON submissions(status);
