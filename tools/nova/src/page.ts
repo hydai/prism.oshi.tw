@@ -163,18 +163,6 @@ export function renderPage(siteKey: string) {
             class="form-input" />
         </div>
 
-        <!-- Slug -->
-        <div>
-          <label class="form-label">
-            Slug（網址用，小寫英數加連字號）<span class="required">*</span>
-          </label>
-          <input type="text" name="slug" required
-            placeholder="例：mizuki"
-            pattern="[a-z0-9][a-z0-9-]*[a-z0-9]"
-            class="form-input" />
-          <p class="form-hint">自動從顯示名稱生成，可自行修改</p>
-        </div>
-
         <!-- Group -->
         <div>
           <label class="form-label">箱 / 所屬公司 / 個人勢</label>
@@ -244,41 +232,16 @@ export function renderPage(siteKey: string) {
       const form = document.getElementById('nova-form');
       const urlInput = form.querySelector('[name="youtube_channel_url"]');
       const nameInput = form.querySelector('[name="display_name"]');
-      const slugInput = form.querySelector('[name="slug"]');
       const avatarInput = form.querySelector('[name="avatar_url"]');
       const linkYtInput = form.querySelector('[name="link_youtube"]');
       const urlCheck = document.getElementById('url-check');
       const submitBtn = document.getElementById('submit-btn');
       const resultDiv = document.getElementById('result');
-      let slugManuallyEdited = false;
       let nameManuallyEdited = false;
-
-      // Track manual edits
-      slugInput.addEventListener('input', function() {
-        slugManuallyEdited = true;
-      });
 
       nameInput.addEventListener('input', function() {
         nameManuallyEdited = true;
-        if (!slugManuallyEdited) {
-          slugInput.value = this.value
-            .toLowerCase()
-            .replace(/[^a-z0-9\\s-]/g, '')
-            .replace(/\\s+/g, '-')
-            .replace(/-+/g, '-')
-            .replace(/^-|-$/g, '');
-        }
       });
-
-      // Auto-generate slug from a given name string
-      function generateSlug(name) {
-        return name
-          .toLowerCase()
-          .replace(/[^a-z0-9\\s-]/g, '')
-          .replace(/\\s+/g, '-')
-          .replace(/-+/g, '-')
-          .replace(/^-|-$/g, '');
-      }
 
       // On URL blur: dedup check + auto-fetch channel info
       let lastFetchedUrl = '';
@@ -319,9 +282,6 @@ export function renderPage(siteKey: string) {
           .then(info => {
             if (info.displayName && !nameManuallyEdited) {
               nameInput.value = info.displayName;
-              if (!slugManuallyEdited) {
-                slugInput.value = generateSlug(info.displayName);
-              }
             }
             if (info.avatarUrl && !avatarInput.value) {
               avatarInput.value = info.avatarUrl;
@@ -347,7 +307,6 @@ export function renderPage(siteKey: string) {
         const body = {
           youtube_channel_url: fd.get('youtube_channel_url'),
           display_name: fd.get('display_name'),
-          slug: fd.get('slug'),
           group: fd.get('group') || '',
           description: fd.get('description') || '',
           avatar_url: fd.get('avatar_url') || '',

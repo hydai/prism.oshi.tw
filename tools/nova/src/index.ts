@@ -1,6 +1,6 @@
 import { Hono } from 'hono';
 import type { Bindings, SubmitBody } from './types';
-import { normalizeYoutubeChannelUrl, validateSlug, validateRequired } from './validate';
+import { normalizeYoutubeChannelUrl, validateRequired } from './validate';
 import { verifyTurnstile } from './turnstile';
 import { generateId, findByChannelUrl, insertSubmission } from './db';
 import { renderPage } from './page';
@@ -97,15 +97,9 @@ app.post('/api/submit', async (c) => {
   const errors = validateRequired({
     youtube_channel_url: body.youtube_channel_url,
     display_name: body.display_name,
-    slug: body.slug,
   });
   if (errors.length > 0) {
     return c.json({ error: errors.join(', ') }, 400);
-  }
-
-  // Validate slug format
-  if (!validateSlug(body.slug)) {
-    return c.json({ error: 'Slug must be lowercase alphanumeric with hyphens (2-50 chars)' }, 400);
   }
 
   // Verify Turnstile token
@@ -146,7 +140,7 @@ app.post('/api/submit', async (c) => {
   await insertSubmission(c.env.DB, id, {
     youtube_channel_url: result.canonical,
     youtube_channel_url_normalized: result.normalized,
-    slug: body.slug.trim(),
+    slug: '', // curator sets slug via admin UI
     display_name: body.display_name.trim(),
     brand_name: '',
     group: body.group?.trim() ?? '',

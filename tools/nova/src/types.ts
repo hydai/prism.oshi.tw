@@ -33,7 +33,6 @@ export interface SubmissionRow {
 
 export interface SubmitBody {
   youtube_channel_url: string;
-  slug: string;
   display_name: string;
   group?: string;
   description?: string;
