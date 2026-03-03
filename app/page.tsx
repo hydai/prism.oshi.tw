@@ -267,7 +267,7 @@ function StreamerCard({ streamer }: { streamer: StreamerConfig }) {
       <img
         src={streamer.avatarUrl}
         alt={streamer.displayName}
-        className="h-[240px] w-full object-cover"
+        className="aspect-square w-full object-cover"
       />
 
       {/* Info row */}
