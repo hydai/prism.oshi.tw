@@ -658,7 +658,7 @@ export default function Home() {
               <span style={{ fontWeight: 600 }}>{flattenedSongs.length} 首歌曲</span>
             </p>
 
-            {/* Stats row: followerCount Followers · Rank #rank (rank in accent-pink), centered */}
+            {/* Stats row: subscriberCount */}
             <p
               style={{
                 fontSize: '13px',
@@ -668,12 +668,7 @@ export default function Home() {
                 margin: 0,
               }}
             >
-              21.8萬位訂閱者
-              {' '}
-              <span style={{ color: 'var(--text-tertiary)' }}>·</span>
-              {' '}
-              Rank{' '}
-              <span style={{ color: 'var(--accent-pink)', fontWeight: 700 }}>#1</span>
+              {streamerData.subscriberCount}位訂閱者
             </p>
           </header>
 
@@ -775,7 +770,7 @@ export default function Home() {
                 <span style={{ fontWeight: 600 }}>{flattenedSongs.length} 首歌曲</span>
               </p>
 
-              {/* Statistics Row: Followers + Rank */}
+              {/* Statistics Row: Followers */}
               <div
                 className="flex items-center gap-6"
                 style={{ fontSize: 'var(--font-size-base)', marginTop: '4px' }}
@@ -784,27 +779,10 @@ export default function Home() {
                   <span
                     style={{ fontWeight: 700, color: 'var(--text-primary)', fontSize: 'var(--font-size-xl)' }}
                   >
-                    21.8萬
+                    {streamerData.subscriberCount}
                   </span>
                   <span style={{ color: 'var(--text-secondary)', fontSize: 'var(--font-size-sm)' }}>
                     訂閱者
-                  </span>
-                </div>
-                <div
-                  style={{
-                    width: '1px',
-                    height: '16px',
-                    background: 'var(--border-default)',
-                  }}
-                />
-                <div className="flex items-center gap-1.5">
-                  <span
-                    style={{ fontWeight: 700, color: 'var(--accent-pink)', fontSize: 'var(--font-size-xl)' }}
-                  >
-                    #1
-                  </span>
-                  <span style={{ color: 'var(--text-secondary)', fontSize: 'var(--font-size-sm)' }}>
-                    排名
                   </span>
                 </div>
               </div>
