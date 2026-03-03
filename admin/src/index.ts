@@ -59,6 +59,8 @@ import type {
   ExtractResponse,
   ExtractImportBody,
   ExtractImportResponse,
+  NovaSubmission,
+  NovaStatus,
 } from '../shared/types';
 
 type StreamerChannelConfig = {
@@ -67,6 +69,7 @@ type StreamerChannelConfig = {
 
 type Bindings = {
   DB: D1Database;
+  NOVA_DB: D1Database;
   CURATOR_EMAILS: string;
   STREAMER_CONFIG: string; // JSON: Record<slug, StreamerChannelConfig>
   YOUTUBE_API_KEY: string;
@@ -771,6 +774,66 @@ app.post('/api/pipeline/extract-import', requireCurator, async (c) => {
   );
 
   return c.json<ExtractImportResponse>({ ok: true, created });
+});
+
+// --- Nova submissions (separate D1: NOVA_DB) ---
+
+app.get('/api/nova/submissions', requireCurator, async (c) => {
+  const status = c.req.query('status');
+  let query = 'SELECT * FROM submissions';
+  const binds: string[] = [];
+  if (status) {
+    query += ' WHERE status = ?';
+    binds.push(status);
+  }
+  query += ' ORDER BY submitted_at DESC';
+
+  const result = await c.env.NOVA_DB
+    .prepare(query)
+    .bind(...binds)
+    .all<NovaSubmission>();
+
+  return c.json({ data: result.results, total: result.results.length });
+});
+
+app.get('/api/nova/submissions/:id', requireCurator, async (c) => {
+  const id = c.req.param('id');
+  const result = await c.env.NOVA_DB
+    .prepare('SELECT * FROM submissions WHERE id = ?')
+    .bind(id)
+    .first<NovaSubmission>();
+
+  if (!result) return c.json({ error: 'Submission not found' }, 404);
+  return c.json(result);
+});
+
+app.patch('/api/nova/submissions/:id/status', requireCurator, async (c) => {
+  const id = c.req.param('id');
+  const body = await c.req.json<{ status: NovaStatus; reviewer_note?: string }>();
+
+  const validStatuses = new Set<string>(['approved', 'rejected']);
+  if (!validStatuses.has(body.status)) {
+    return c.json({ error: `Invalid status: ${body.status}. Must be 'approved' or 'rejected'` }, 400);
+  }
+
+  const existing = await c.env.NOVA_DB
+    .prepare('SELECT id, status FROM submissions WHERE id = ?')
+    .bind(id)
+    .first<{ id: string; status: string }>();
+
+  if (!existing) return c.json({ error: 'Submission not found' }, 404);
+
+  await c.env.NOVA_DB
+    .prepare('UPDATE submissions SET status = ?, reviewed_at = ?, reviewer_note = ? WHERE id = ?')
+    .bind(body.status, new Date().toISOString(), body.reviewer_note ?? '', id)
+    .run();
+
+  const updated = await c.env.NOVA_DB
+    .prepare('SELECT * FROM submissions WHERE id = ?')
+    .bind(id)
+    .first<NovaSubmission>();
+
+  return c.json(updated);
 });
 
 // --- Stats ---

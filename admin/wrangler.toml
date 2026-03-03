@@ -26,3 +26,8 @@ invocation_logs = true
 binding = "DB"
 database_name = "mizukiprism-staging"
 database_id = "02f829c1-b66a-44e3-b475-2a10720b7edb"
+
+[[d1_databases]]
+binding = "NOVA_DB"
+database_name = "oshi-prism-nova"
+database_id = "ebf4d5ff-68f9-4e2e-b95c-9afefd0cbc0c"

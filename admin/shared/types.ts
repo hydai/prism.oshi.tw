@@ -303,3 +303,27 @@ export interface ExtractImportResponse {
   ok: boolean;
   created: number;
 }
+
+// --- Nova submission types ---
+
+export type NovaStatus = 'pending' | 'approved' | 'rejected';
+
+export interface NovaSubmission {
+  id: string;
+  youtube_channel_url: string;
+  slug: string;
+  brand_name: string;
+  display_name: string;
+  description: string;
+  avatar_url: string;
+  subscriber_count: string;
+  link_youtube: string;
+  link_twitter: string;
+  link_facebook: string;
+  link_instagram: string;
+  link_twitch: string;
+  status: NovaStatus;
+  submitted_at: string;
+  reviewed_at: string | null;
+  reviewer_note: string;
+}

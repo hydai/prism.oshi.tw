@@ -24,6 +24,8 @@ import type {
   ExtractResponse,
   ExtractImportBody,
   ExtractImportResponse,
+  NovaSubmission,
+  NovaStatus,
 } from '../../../shared/types';
 
 // --- Streamer selection (module-level) ---
@@ -232,6 +234,20 @@ export const api = {
   extractImport: (body: ExtractImportBody) =>
     request<ExtractImportResponse>('/api/pipeline/extract-import', {
       method: 'POST',
+      body: JSON.stringify(body),
+    }),
+
+  // Nova submissions
+  listNovaSubmissions: (params?: { status?: string }) => {
+    const sp = new URLSearchParams();
+    if (params?.status) sp.set('status', params.status);
+    const qs = sp.toString();
+    return request<ListResponse<NovaSubmission>>(`/api/nova/submissions${qs ? `?${qs}` : ''}`);
+  },
+
+  updateNovaStatus: (id: string, body: { status: NovaStatus; reviewer_note?: string }) =>
+    request<NovaSubmission>(`/api/nova/submissions/${id}/status`, {
+      method: 'PATCH',
       body: JSON.stringify(body),
     }),
 };
