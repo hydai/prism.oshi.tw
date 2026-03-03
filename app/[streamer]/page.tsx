@@ -1030,8 +1030,8 @@ export default function Home() {
                 fontSize: 'var(--font-size-sm)',
                 ...(selectedYears.size === 0
                   ? {
-                      background: '#FDF2F8',
-                      border: '1px solid #FBCFE8',
+                      background: 'var(--bg-accent-pink)',
+                      border: '1px solid var(--border-accent-pink)',
                       color: 'var(--accent-pink)',
                     }
                   : {
@@ -1057,8 +1057,8 @@ export default function Home() {
                   whiteSpace: 'nowrap',
                   ...(selectedYears.has(year)
                     ? {
-                        background: '#FDF2F8',
-                        border: '1px solid #FBCFE8',
+                        background: 'var(--bg-accent-pink)',
+                        border: '1px solid var(--border-accent-pink)',
                         color: 'var(--accent-pink)',
                       }
                     : {
@@ -1155,7 +1155,7 @@ export default function Home() {
                   onClick={() => setViewMode('timeline')}
                   className={`flex items-center gap-1.5 font-semibold transition-all ${
                     viewMode === 'timeline'
-                      ? 'bg-gradient-to-r from-pink-400 to-blue-400 text-white shadow-md'
+                      ? 'bg-gradient-to-r from-accent-pink-light to-accent-blue-light text-white shadow-md'
                       : ''
                   }`}
                   style={{
@@ -1173,7 +1173,7 @@ export default function Home() {
                   onClick={() => setViewMode('grouped')}
                   className={`flex items-center gap-1.5 font-semibold transition-all ${
                     viewMode === 'grouped'
-                      ? 'bg-gradient-to-r from-pink-400 to-blue-400 text-white shadow-md'
+                      ? 'bg-gradient-to-r from-accent-pink-light to-accent-blue-light text-white shadow-md'
                       : ''
                   }`}
                   style={{
