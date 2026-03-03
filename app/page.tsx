@@ -229,8 +229,8 @@ export default function HomePage() {
 
         {/* Streamer section */}
         <section className="px-6 py-6 lg:px-8">
-          {/* Horizontal scroll card row */}
-          <div className="flex gap-5 overflow-x-auto pb-4 snap-x snap-mandatory scrollbar-none">
+          {/* Card grid: 1-col on mobile, horizontal scroll on md+ */}
+          <div className="grid grid-cols-1 gap-5 sm:flex sm:overflow-x-auto sm:pb-4 sm:snap-x sm:snap-mandatory sm:scrollbar-none">
             {filtered.map((streamer) => (
               <StreamerCard key={streamer.slug} streamer={streamer} />
             ))}
@@ -253,9 +253,9 @@ function StreamerCard({ streamer }: { streamer: StreamerConfig }) {
   return (
     <Link
       href={`/${streamer.slug}`}
-      className="group flex-shrink-0 snap-start rounded-radius-xl overflow-hidden transition-all duration-200 hover:scale-[1.03] hover:shadow-xl"
+      className="group sm:flex-shrink-0 snap-start rounded-radius-xl overflow-hidden transition-all duration-200 hover:scale-[1.03] hover:shadow-xl"
       style={{
-        width: '240px',
+        minWidth: '240px',
         background: 'var(--bg-surface-frosted)',
         border: '1px solid var(--border-glass)',
         textDecoration: 'none',
