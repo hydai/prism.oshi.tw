@@ -1,0 +1,160 @@
+@import url('https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700;900&display=swap');
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  /* === Safe Area Insets === */
+  --safe-area-top: env(safe-area-inset-top, 0px);
+  --safe-area-bottom: env(safe-area-inset-bottom, 0px);
+
+  /* === Colors: Accent === */
+  --accent-pink: #EC4899;
+  --accent-pink-dark: #DB2777;
+  --accent-pink-light: #F472B6;
+  --accent-blue: #3B82F6;
+  --accent-blue-light: #60A5FA;
+  --accent-purple: #A855F7;
+
+  /* === Colors: Page Background === */
+  --bg-page-start: #FFF0F5;
+  --bg-page-mid: #F0F8FF;
+  --bg-page-end: #E6E6FA;
+
+  /* === Colors: Surface === */
+  --bg-surface: #FFFFFF;
+  --bg-surface-frosted: #FFFFFF99;
+  --bg-surface-glass: #FFFFFF66;
+  --bg-surface-muted: #FFFFFF80;
+
+  /* === Colors: Overlay === */
+  --bg-overlay: #FFFFFFCC;
+
+  /* === Colors: Accent Background === */
+  --bg-accent-pink: #FDF2F8;
+  --bg-accent-pink-muted: #FCE7F3;
+  --bg-accent-blue: #EFF6FF;
+  --bg-accent-blue-muted: #DBEAFE;
+
+  /* === Colors: Text === */
+  --text-primary: #1E293B;
+  --text-secondary: #64748B;
+  --text-tertiary: #94A3B8;
+  --text-muted: #CBD5E1;
+  --text-on-accent: #FFFFFF;
+
+  /* === Colors: Border === */
+  --border-default: #E2E8F0;
+  --border-glass: #FFFFFF66;
+  --border-table: #E2E8F040;
+  --border-accent-pink: #FBCFE8;
+  --border-accent-blue: #BFDBFE;
+
+  /* === Typography === */
+  --font-primary: 'DM Sans', sans-serif;
+  --font-size-xs: 10px;
+  --font-size-sm: 11px;
+  --font-size-base: 13px;
+  --font-size-md: 14px;
+  --font-size-lg: 15px;
+  --font-size-xl: 20px;
+  --font-size-2xl: 32px;
+  --font-size-3xl: 48px;
+  --font-size-display: 64px;
+
+  /* === Spacing === */
+  --space-1: 2px;
+  --space-2: 4px;
+  --space-3: 8px;
+  --space-4: 12px;
+  --space-5: 16px;
+  --space-6: 24px;
+  --space-7: 32px;
+  --space-8: 40px;
+
+  /* === Border Radii === */
+  --radius-xs: 6px;
+  --radius-sm: 8px;
+  --radius-md: 10px;
+  --radius-lg: 12px;
+  --radius-xl: 16px;
+  --radius-2xl: 20px;
+  --radius-3xl: 24px;
+  --radius-pill: 28px;
+  --radius-circle: 9999px;
+
+  /* === Icon Sizes === */
+  --icon-sm: 14px;
+  --icon-md: 16px;
+  --icon-lg: 20px;
+  --icon-xl: 28px;
+}
+
+/* ===== Page Background: diagonal gradient ===== */
+body {
+  background: linear-gradient(
+    135deg,
+    var(--bg-page-start) 0%,
+    var(--bg-page-mid) 50%,
+    var(--bg-page-end) 100%
+  );
+  min-height: 100vh;
+  background-attachment: fixed;
+}
+
+.custom-scrollbar::-webkit-scrollbar {
+  width: 8px;
+}
+
+.custom-scrollbar::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.custom-scrollbar::-webkit-scrollbar-thumb {
+  background: rgba(0, 0, 0, 0.2);
+  border-radius: 4px;
+}
+
+.custom-scrollbar::-webkit-scrollbar-thumb:hover {
+  background: rgba(0, 0, 0, 0.3);
+}
+
+/* Mini player positioning with safe area support */
+.mini-player-bottom {
+  bottom: calc(64px + var(--safe-area-bottom));
+}
+@media (min-width: 1024px) {
+  .mini-player-bottom {
+    bottom: 0;
+  }
+}
+
+/* Hover-safe row highlight — only on devices that support hover */
+@media (hover: hover) {
+  .hover-row:hover {
+    background: var(--bg-accent-pink);
+  }
+  .hover-text-primary:hover {
+    color: var(--text-primary) !important;
+  }
+}
+
+/* Touch device: always show scrubber dot */
+@media (pointer: coarse) {
+  .coarse-pointer\:opacity-100 {
+    opacity: 1 !important;
+  }
+}
+
+/* YouTube Player is always hidden - we show a placeholder in the modal */
+#youtube-player {
+  position: fixed !important;
+  top: 0 !important;
+  left: 0 !important;
+  width: 0 !important;
+  height: 0 !important;
+  opacity: 0 !important;
+  pointer-events: none !important;
+  overflow: hidden !important;
+}
