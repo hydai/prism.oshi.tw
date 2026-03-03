@@ -7,9 +7,6 @@ import { StreamerConfig } from '../lib/types';
 import {
   Disc3,
   Search,
-  Users,
-  Building2,
-  User,
   Plus,
   Play,
 } from 'lucide-react';
@@ -24,12 +21,6 @@ const groups = [
   ALL_GROUP,
   ...Array.from(new Set(streamers.map((s) => s.group))),
 ];
-
-function groupIcon(group: string) {
-  if (group === ALL_GROUP) return Users;
-  if (group === '個人勢') return User;
-  return Building2;
-}
 
 export default function HomePage() {
   const [selectedGroup, setSelectedGroup] = useState(ALL_GROUP);
@@ -49,20 +40,16 @@ export default function HomePage() {
   }, [selectedGroup, searchText]);
 
   return (
-    <div className="flex min-h-screen">
-      {/* ── Sidebar ── */}
-      <aside
-        className="hidden lg:flex w-[260px] flex-shrink-0 flex-col backdrop-blur-md border-r"
+    <div className="flex min-h-screen flex-col">
+      {/* ── Top Bar: Logo + Add VTuber ── */}
+      <header
+        className="flex items-center justify-between px-4 py-4 sm:px-6 border-b backdrop-blur-sm"
         style={{
           background: 'var(--bg-surface-glass)',
           borderColor: 'var(--border-glass)',
         }}
       >
-        {/* Logo */}
-        <div
-          className="flex items-center gap-3 px-5 py-5 border-b"
-          style={{ borderColor: 'var(--border-glass)' }}
-        >
+        <div className="flex items-center gap-3">
           <div
             className="flex h-9 w-9 items-center justify-center rounded-radius-lg"
             style={{
@@ -79,121 +66,47 @@ export default function HomePage() {
             Prism
           </span>
         </div>
-
-        {/* Search */}
-        <div className="px-4 py-3">
-          <div
-            className="flex items-center gap-2 rounded-radius-lg px-3 py-2"
-            style={{
-              background: 'var(--bg-surface-frosted)',
-              border: '1px solid var(--border-glass)',
-            }}
-          >
-            <Search
-              className="h-4 w-4 flex-shrink-0"
-              style={{ color: 'var(--text-tertiary)' }}
-            />
-            <input
-              type="text"
-              placeholder="搜尋 VTuber…"
-              value={searchText}
-              onChange={(e) => setSearchText(e.target.value)}
-              className="w-full bg-transparent text-token-sm outline-none placeholder:text-token-tertiary"
-              style={{ color: 'var(--text-primary)' }}
-            />
-          </div>
-        </div>
-
-        {/* Groups */}
-        <div className="px-4 pt-2">
-          <p
-            className="mb-2 px-2 text-[10px] font-semibold uppercase tracking-widest"
-            style={{ color: 'var(--text-tertiary)' }}
-          >
-            Groups
-          </p>
-          <nav className="flex flex-col gap-1">
-            {groups.map((group) => {
-              const Icon = groupIcon(group);
-              const isActive = selectedGroup === group;
-              return (
-                <button
-                  key={group}
-                  onClick={() => setSelectedGroup(group)}
-                  className="flex items-center gap-3 rounded-radius-lg px-3 py-2 text-left text-token-sm font-medium transition-colors"
-                  style={
-                    isActive
-                      ? {
-                          background:
-                            'linear-gradient(135deg, var(--accent-pink), var(--accent-blue))',
-                          color: 'white',
-                        }
-                      : {
-                          color: 'var(--text-secondary)',
-                        }
-                  }
-                >
-                  <Icon className="h-4 w-4 flex-shrink-0" />
-                  {group}
-                </button>
-              );
-            })}
-          </nav>
-        </div>
-
-      </aside>
-
-      {/* ── Main Content ── */}
-      <main className="flex-1 min-w-0 flex flex-col">
-        {/* Header Bar */}
-        <header
-          className="flex items-center justify-between px-6 py-5 lg:px-8 border-b backdrop-blur-sm"
+        <a
+          href="https://nova.oshi.tw"
+          target="_blank"
+          rel="noopener noreferrer"
+          className="inline-flex items-center gap-2 rounded-radius-lg px-3 py-2 sm:px-4 text-token-sm font-semibold text-white transition-opacity hover:opacity-90"
           style={{
-            background: 'var(--bg-surface-glass)',
-            borderColor: 'var(--border-glass)',
+            background:
+              'linear-gradient(135deg, var(--accent-pink), var(--accent-blue))',
           }}
         >
-          <a
-            href="https://nova.oshi.tw"
-            target="_blank"
-            rel="noopener noreferrer"
-            className="hidden sm:inline-flex items-center gap-2 rounded-radius-lg px-4 py-2 text-token-sm font-semibold text-white transition-opacity hover:opacity-90"
-            style={{
-              background:
-                'linear-gradient(135deg, var(--accent-pink), var(--accent-blue))',
-            }}
-          >
-            <Plus className="h-4 w-4" />
-            提議新 VTuber
-          </a>
-        </header>
+          <Plus className="h-4 w-4" />
+          <span className="hidden sm:inline">提議新 VTuber</span>
+        </a>
+      </header>
 
-        {/* Mobile search (visible below lg) */}
-        <div className="lg:hidden px-4 pt-4">
-          <div
-            className="flex items-center gap-2 rounded-radius-lg px-3 py-2"
-            style={{
-              background: 'var(--bg-surface-frosted)',
-              border: '1px solid var(--border-glass)',
-            }}
-          >
-            <Search
-              className="h-4 w-4 flex-shrink-0"
-              style={{ color: 'var(--text-tertiary)' }}
-            />
-            <input
-              type="text"
-              placeholder="搜尋 VTuber…"
-              value={searchText}
-              onChange={(e) => setSearchText(e.target.value)}
-              className="w-full bg-transparent text-token-sm outline-none placeholder:text-token-tertiary"
-              style={{ color: 'var(--text-primary)' }}
-            />
-          </div>
+      {/* ── Search + Group Chips ── */}
+      <div className="px-4 pt-4 sm:px-6 space-y-3">
+        {/* Search */}
+        <div
+          className="flex items-center gap-2 rounded-radius-lg px-3 py-2"
+          style={{
+            background: 'var(--bg-surface-frosted)',
+            border: '1px solid var(--border-glass)',
+          }}
+        >
+          <Search
+            className="h-4 w-4 flex-shrink-0"
+            style={{ color: 'var(--text-tertiary)' }}
+          />
+          <input
+            type="text"
+            placeholder="搜尋 VTuber…"
+            value={searchText}
+            onChange={(e) => setSearchText(e.target.value)}
+            className="w-full bg-transparent text-token-sm outline-none placeholder:text-token-tertiary"
+            style={{ color: 'var(--text-primary)' }}
+          />
         </div>
 
-        {/* Mobile group chips (visible below lg) */}
-        <div className="lg:hidden flex gap-2 overflow-x-auto px-4 pt-3 pb-1">
+        {/* Group chips */}
+        <div className="flex gap-2 overflow-x-auto pb-1">
           {groups.map((group) => {
             const isActive = selectedGroup === group;
             return (
@@ -220,9 +133,10 @@ export default function HomePage() {
             );
           })}
         </div>
+      </div>
 
-        {/* Streamer section */}
-        <section className="px-6 py-6 lg:px-8">
+      {/* ── Streamer Cards ── */}
+      <section className="px-4 py-6 sm:px-6">
           {/* Card grid: 1-col on mobile, horizontal scroll on md+ */}
           <div className="grid grid-cols-1 gap-5 sm:flex sm:overflow-x-auto sm:pb-4 sm:snap-x sm:snap-mandatory sm:scrollbar-none">
             {filtered.map((streamer) => (
@@ -238,7 +152,6 @@ export default function HomePage() {
             )}
           </div>
         </section>
-      </main>
     </div>
   );
 }
