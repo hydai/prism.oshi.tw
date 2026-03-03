@@ -8,7 +8,8 @@
     "build": "next build",
     "start": "next start",
     "lint": "next lint",
-    "sync:registry": "npx tsx tools/sync-registry/sync.ts"
+    "sync:registry": "npx tsx tools/sync-registry/sync.ts",
+    "sync:data": "npx tsx tools/sync-data/sync.ts"
   },
   "keywords": [],
   "author": "",
