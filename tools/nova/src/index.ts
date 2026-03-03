@@ -36,6 +36,54 @@ app.get('/api/check', async (c) => {
   return c.json({ exists: false });
 });
 
+// GET /api/channel-info — Fetch channel name + avatar from YouTube
+// Protected: only same-origin requests from the form page (Sec-Fetch-Site or Referer)
+app.get('/api/channel-info', async (c) => {
+  const secFetchSite = c.req.header('Sec-Fetch-Site');
+  const referer = c.req.header('Referer') ?? '';
+  const host = c.req.header('Host') ?? '';
+
+  // Allow same-origin browser fetches; block external/curl requests
+  const isSameOrigin = secFetchSite === 'same-origin'
+    || referer.includes(host);
+  if (!isSameOrigin) {
+    return c.json({ error: 'Forbidden' }, 403);
+  }
+
+  const rawUrl = c.req.query('url');
+  if (!rawUrl) {
+    return c.json({ error: 'url query parameter is required' }, 400);
+  }
+
+  const result = normalizeYoutubeChannelUrl(rawUrl);
+  if (!result) {
+    return c.json({ error: 'Invalid YouTube channel URL' }, 400);
+  }
+
+  try {
+    const res = await fetch(result.canonical, {
+      headers: { 'Accept-Language': 'zh-TW,zh;q=0.9,en;q=0.8' },
+    });
+    if (!res.ok) {
+      return c.json({ error: 'Failed to fetch channel page' }, 502);
+    }
+    const pageHtml = await res.text();
+
+    // Extract og:title and og:image from meta tags
+    const titleMatch = pageHtml.match(/<meta\s+property="og:title"\s+content="([^"]*)"/i)
+      ?? pageHtml.match(/<meta\s+content="([^"]*)"\s+property="og:title"/i);
+    const imageMatch = pageHtml.match(/<meta\s+property="og:image"\s+content="([^"]*)"/i)
+      ?? pageHtml.match(/<meta\s+content="([^"]*)"\s+property="og:image"/i);
+
+    const displayName = titleMatch?.[1] ?? '';
+    const avatarUrl = imageMatch?.[1] ?? '';
+
+    return c.json({ displayName, avatarUrl });
+  } catch {
+    return c.json({ error: 'Failed to fetch channel info' }, 502);
+  }
+});
+
 // POST /api/submit — Process a new submission
 app.post('/api/submit', async (c) => {
   let body: SubmitBody;

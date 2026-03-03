@@ -245,17 +245,21 @@ export function renderPage(siteKey: string) {
       const urlInput = form.querySelector('[name="youtube_channel_url"]');
       const nameInput = form.querySelector('[name="display_name"]');
       const slugInput = form.querySelector('[name="slug"]');
+      const avatarInput = form.querySelector('[name="avatar_url"]');
+      const linkYtInput = form.querySelector('[name="link_youtube"]');
       const urlCheck = document.getElementById('url-check');
       const submitBtn = document.getElementById('submit-btn');
       const resultDiv = document.getElementById('result');
       let slugManuallyEdited = false;
+      let nameManuallyEdited = false;
 
-      // Auto-generate slug from display name
+      // Track manual edits
       slugInput.addEventListener('input', function() {
         slugManuallyEdited = true;
       });
 
       nameInput.addEventListener('input', function() {
+        nameManuallyEdited = true;
         if (!slugManuallyEdited) {
           slugInput.value = this.value
             .toLowerCase()
@@ -266,19 +270,31 @@ export function renderPage(siteKey: string) {
         }
       });
 
-      // Real-time dedup check on URL blur
-      let checkTimeout;
+      // Auto-generate slug from a given name string
+      function generateSlug(name) {
+        return name
+          .toLowerCase()
+          .replace(/[^a-z0-9\\s-]/g, '')
+          .replace(/\\s+/g, '-')
+          .replace(/-+/g, '-')
+          .replace(/^-|-$/g, '');
+      }
+
+      // On URL blur: dedup check + auto-fetch channel info
+      let lastFetchedUrl = '';
       urlInput.addEventListener('blur', function() {
         const url = this.value.trim();
         if (!url) {
           urlCheck.style.display = 'none';
           return;
         }
-        clearTimeout(checkTimeout);
-        checkTimeout = setTimeout(async () => {
-          try {
-            const res = await fetch('/api/check?url=' + encodeURIComponent(url));
-            const data = await res.json();
+
+        const encoded = encodeURIComponent(url);
+
+        // Dedup check
+        fetch('/api/check?url=' + encoded)
+          .then(r => r.json())
+          .then(data => {
             urlCheck.style.display = 'block';
             if (data.exists) {
               urlCheck.style.color = '#D97706';
@@ -287,10 +303,34 @@ export function renderPage(siteKey: string) {
               urlCheck.style.color = '#059669';
               urlCheck.textContent = '此頻道尚未被提交';
             }
-          } catch {
-            urlCheck.style.display = 'none';
-          }
-        }, 300);
+          })
+          .catch(() => { urlCheck.style.display = 'none'; });
+
+        // Auto-fetch channel info (only once per URL)
+        if (url === lastFetchedUrl) return;
+        lastFetchedUrl = url;
+
+        urlCheck.style.display = 'block';
+        urlCheck.style.color = 'var(--text-tertiary)';
+        urlCheck.textContent = '正在取得頻道資訊…';
+
+        fetch('/api/channel-info?url=' + encoded)
+          .then(r => r.json())
+          .then(info => {
+            if (info.displayName && !nameManuallyEdited) {
+              nameInput.value = info.displayName;
+              if (!slugManuallyEdited) {
+                slugInput.value = generateSlug(info.displayName);
+              }
+            }
+            if (info.avatarUrl && !avatarInput.value) {
+              avatarInput.value = info.avatarUrl;
+            }
+            if (!linkYtInput.value) {
+              linkYtInput.value = url;
+            }
+          })
+          .catch(() => {});
       });
 
       // Form submission
