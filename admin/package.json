@@ -5,9 +5,9 @@
   "scripts": {
     "dev": "wrangler dev",
     "deploy": "wrangler deploy",
-    "db:create": "wrangler d1 create mizukiprism-staging",
-    "db:migrate": "wrangler d1 execute mizukiprism-staging --file=schema.sql",
-    "db:migrate:local": "wrangler d1 execute mizukiprism-staging --local --file=schema.sql",
+    "db:create": "wrangler d1 create oshi-prism-db",
+    "db:migrate": "wrangler d1 execute oshi-prism-db --remote --file=schema.sql",
+    "db:migrate:local": "wrangler d1 execute oshi-prism-db --local --file=schema.sql",
     "db:seed:local": "npx tsx seed.ts --local",
     "typecheck": "tsc --noEmit"
   },
