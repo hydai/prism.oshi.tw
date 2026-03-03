@@ -138,20 +138,21 @@ export default function Home() {
   const { likedCount } = useLikedSongs();
   const { recentCount } = useRecentlyPlayed();
 
-  const handleAddToQueue = useCallback((track: { id: string; songId: string; title: string; originalArtist: string; videoId: string; timestamp: number; endTimestamp?: number; albumArtUrl?: string }) => {
+  const handleAddToQueue = useCallback((track: { id: string; songId: string; title: string; originalArtist: string; videoId: string; timestamp: number; endTimestamp?: number; albumArtUrl?: string; streamerSlug: string }) => {
     addToQueue(track);
     setToastMessage('已加入播放佇列');
     setShowToast(true);
   }, [addToQueue]);
 
   const handlePlayAll = () => {
-    type TrackInfo = { id: string; songId: string; title: string; originalArtist: string; videoId: string; timestamp: number; endTimestamp?: number; albumArtUrl?: string };
+    type TrackInfo = { id: string; songId: string; title: string; originalArtist: string; videoId: string; timestamp: number; endTimestamp?: number; albumArtUrl?: string; streamerSlug: string };
     let tracks: TrackInfo[];
     if (viewMode === 'timeline') {
       tracks = flattenedSongs.map(s => ({
         id: s.performanceId, songId: s.id, title: s.title,
         originalArtist: s.originalArtist, videoId: s.videoId,
         timestamp: s.timestamp, endTimestamp: s.endTimestamp, albumArtUrl: s.albumArtUrl,
+        streamerSlug: slug,
       }));
     } else {
       tracks = groupedSongs.flatMap(song => {
@@ -160,6 +161,7 @@ export default function Home() {
         return [{ id: latest.id, songId: song.id, title: song.title,
           originalArtist: song.originalArtist, videoId: latest.videoId,
           timestamp: latest.timestamp, endTimestamp: latest.endTimestamp ?? undefined, albumArtUrl: song.albumArtUrl,
+          streamerSlug: slug,
         }];
       });
     }
@@ -1379,6 +1381,7 @@ export default function Home() {
                               isCurrentlyPlaying={currentTrackId === song.performanceId}
                               isUnavailable={unavailableVideoIds.has(song.videoId)}
                               onPlay={playTrack}
+                              streamerSlug={slug}
                               onAddToQueue={handleAddToQueue}
                               onAddToPlaylistSuccess={handleAddToPlaylistSuccess}
                             />
@@ -1446,6 +1449,7 @@ export default function Home() {
                             onAddToQueue={handleAddToQueue}
                             onAddToPlaylistSuccess={handleAddToPlaylistSuccess}
                             unavailableVideoIds={unavailableVideoIds}
+                            streamerSlug={slug}
                           />
                         </div>
                       );
@@ -1546,6 +1550,7 @@ export default function Home() {
                             isCurrentlyPlaying={currentTrackId === song.performanceId}
                             isUnavailable={unavailableVideoIds.has(song.videoId)}
                             onPlay={playTrack}
+                            streamerSlug={slug}
                           />
                         </div>
                       );

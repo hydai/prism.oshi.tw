@@ -3,6 +3,7 @@
 import { Heart, Play, ListPlus } from 'lucide-react';
 import { useLikedSongs } from '../contexts/LikedSongsContext';
 import { usePlayer, type Track } from '../contexts/PlayerContext';
+import { useStreamer } from '../contexts/StreamerContext';
 import AlbumArt from './AlbumArt';
 import BottomSheet from './BottomSheet';
 
@@ -15,6 +16,7 @@ interface LikedSongsPanelProps {
 export default function LikedSongsPanel({ show, onClose, onToast }: LikedSongsPanelProps) {
   const { likedSongs, toggleLike } = useLikedSongs();
   const { playTrack, addToQueue } = usePlayer();
+  const { slug } = useStreamer();
 
   const handlePlayAll = () => {
     if (likedSongs.length === 0) return;
@@ -27,6 +29,7 @@ export default function LikedSongsPanel({ show, onClose, onToast }: LikedSongsPa
       timestamp: v.timestamp,
       endTimestamp: v.endTimestamp,
       albumArtUrl: v.albumArtUrl,
+      streamerSlug: slug,
     }));
     playTrack(tracks[0]);
     tracks.slice(1).forEach(t => addToQueue(t));
@@ -42,6 +45,7 @@ export default function LikedSongsPanel({ show, onClose, onToast }: LikedSongsPa
       timestamp: v.timestamp,
       endTimestamp: v.endTimestamp,
       albumArtUrl: v.albumArtUrl,
+      streamerSlug: slug,
     });
   };
 
@@ -55,6 +59,7 @@ export default function LikedSongsPanel({ show, onClose, onToast }: LikedSongsPa
       timestamp: v.timestamp,
       endTimestamp: v.endTimestamp,
       albumArtUrl: v.albumArtUrl,
+      streamerSlug: slug,
     });
     onToast?.('已加入待播清單');
   };

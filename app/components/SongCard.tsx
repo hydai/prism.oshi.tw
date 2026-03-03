@@ -28,10 +28,11 @@ interface SongCardProps {
   song: Song;
   isExpanded: boolean;
   onToggleExpand: (songId: string) => void;
-  onPlay: (track: { id: string; songId: string; title: string; originalArtist: string; videoId: string; timestamp: number; endTimestamp?: number; albumArtUrl?: string }) => void;
-  onAddToQueue: (track: { id: string; songId: string; title: string; originalArtist: string; videoId: string; timestamp: number; endTimestamp?: number; albumArtUrl?: string }) => void;
+  onPlay: (track: { id: string; songId: string; title: string; originalArtist: string; videoId: string; timestamp: number; endTimestamp?: number; albumArtUrl?: string; streamerSlug: string }) => void;
+  onAddToQueue: (track: { id: string; songId: string; title: string; originalArtist: string; videoId: string; timestamp: number; endTimestamp?: number; albumArtUrl?: string; streamerSlug: string }) => void;
   onAddToPlaylistSuccess: () => void;
   unavailableVideoIds: Set<string>;
+  streamerSlug: string;
 }
 
 const formatTime = (seconds: number): string => {
@@ -40,7 +41,7 @@ const formatTime = (seconds: number): string => {
   return `${m}:${s.toString().padStart(2, '0')}`;
 };
 
-function SongCardInner({ song, isExpanded, onToggleExpand, onPlay, onAddToQueue, onAddToPlaylistSuccess, unavailableVideoIds }: SongCardProps) {
+function SongCardInner({ song, isExpanded, onToggleExpand, onPlay, onAddToQueue, onAddToPlaylistSuccess, unavailableVideoIds, streamerSlug }: SongCardProps) {
   const sortedPerformances = isExpanded
     ? [...song.performances].sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime())
     : [];
@@ -157,6 +158,7 @@ function SongCardInner({ song, isExpanded, onToggleExpand, onPlay, onAddToQueue,
                         timestamp: perf.timestamp,
                         endTimestamp: perf.endTimestamp ?? undefined,
                         albumArtUrl: song.albumArtUrl,
+                        streamerSlug,
                       });
                     }
                   }}
@@ -193,6 +195,7 @@ function SongCardInner({ song, isExpanded, onToggleExpand, onPlay, onAddToQueue,
                         timestamp: perf.timestamp,
                         endTimestamp: perf.endTimestamp ?? undefined,
                         albumArtUrl: song.albumArtUrl,
+                        streamerSlug,
                       });
                     }
                   }}
@@ -262,6 +265,7 @@ function SongCardInner({ song, isExpanded, onToggleExpand, onPlay, onAddToQueue,
                     timestamp: perf.timestamp,
                     endTimestamp: perf.endTimestamp ?? undefined,
                     albumArtUrl: song.albumArtUrl,
+                    streamerSlug,
                   })}
                   className="opacity-0 group-hover/version:opacity-100 transition-all transform hover:scale-110"
                   style={{
@@ -295,6 +299,7 @@ function SongCardInner({ song, isExpanded, onToggleExpand, onPlay, onAddToQueue,
                       originalArtist: song.originalArtist,
                       videoId: perf.videoId,
                       timestamp: perf.timestamp,
+                      streamerSlug,
                     }}
                     onSuccess={onAddToPlaylistSuccess}
                   />

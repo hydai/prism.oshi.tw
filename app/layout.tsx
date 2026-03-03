@@ -1,5 +1,6 @@
 import type { Metadata, Viewport } from "next";
 import "./globals.css";
+import GlobalProviders from "./components/GlobalProviders";
 
 export const metadata: Metadata = {
   title: "Prism - Multi-Streamer Song Archive",
@@ -18,7 +19,9 @@ export default function RootLayout({
   return (
     <html lang="zh-TW">
       <body className="font-sans">
-        {children}
+        <GlobalProviders>
+          {children}
+        </GlobalProviders>
       </body>
     </html>
   );

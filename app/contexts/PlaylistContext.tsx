@@ -1,6 +1,7 @@
 'use client';
 
 import { createContext, useContext, useState, useEffect, ReactNode } from 'react';
+import { ALL_STREAMER_SLUGS } from '../../lib/streamer-slugs';
 
 export interface PlaylistVersion {
   performanceId: string;
@@ -9,6 +10,7 @@ export interface PlaylistVersion {
   videoId: string;
   timestamp: number;
   endTimestamp?: number;
+  streamerSlug: string;
 }
 
 export interface Playlist {
@@ -20,7 +22,7 @@ export interface Playlist {
 }
 
 export interface PlaylistExportEnvelope {
-  version: 1;
+  version: 1 | 2;
   exportedAt: string;
   source: 'Prism';
   playlists: Playlist[];
@@ -85,7 +87,7 @@ function downloadJson(data: PlaylistExportEnvelope, filename: string) {
 
 function buildEnvelope(playlists: Playlist[]): PlaylistExportEnvelope {
   return {
-    version: 1,
+    version: 2,
     exportedAt: new Date().toISOString(),
     source: 'Prism',
     playlists,
@@ -103,9 +105,11 @@ function validateImport(data: unknown): { valid: true; playlists: Playlist[] } |
     return { valid: false, error: '非 Prism 匯出檔案' };
   }
 
-  if (envelope.version !== 1) {
+  if (envelope.version !== 1 && envelope.version !== 2) {
     return { valid: false, error: '檔案版本不支援' };
   }
+
+  const importVersion = envelope.version as 1 | 2;
 
   if (!Array.isArray(envelope.playlists) || envelope.playlists.length === 0) {
     return { valid: false, error: '檔案不含播放清單' };
@@ -120,10 +124,14 @@ function validateImport(data: unknown): { valid: true; playlists: Playlist[] } |
       typeof p.createdAt === 'number' &&
       typeof p.updatedAt === 'number'
     ) {
+      // For v1 imports, inject default streamerSlug into versions
+      const versions = importVersion === 1
+        ? p.versions.map((v: any) => ({ ...v, streamerSlug: v.streamerSlug || 'mizuki' }))
+        : p.versions;
       validPlaylists.push({
         id: p.id,
         name: p.name,
-        versions: p.versions,
+        versions,
         createdAt: p.createdAt,
         updatedAt: p.updatedAt,
       });
@@ -137,22 +145,53 @@ function validateImport(data: unknown): { valid: true; playlists: Playlist[] } |
   return { valid: true, playlists: validPlaylists };
 }
 
-export const PlaylistProvider = ({ streamerSlug, children }: { streamerSlug: string; children: ReactNode }) => {
-  const STORAGE_KEY = `prism_${streamerSlug}_playlists`;
+export const PlaylistProvider = ({ children }: { children: ReactNode }) => {
+  const STORAGE_KEY = 'prism_playlists';
   const [playlists, setPlaylists] = useState<Playlist[]>([]);
   const [storageError, setStorageError] = useState<string | null>(null);
   const [localStorageSupported] = useState(() =>
     typeof window !== 'undefined' ? isLocalStorageAvailable() : true
   );
 
-  // Migrate legacy localStorage key for Mizuki users
+  // Migrate legacy per-streamer playlists to global storage
   useEffect(() => {
-    if (streamerSlug !== 'mizuki') return;
     try {
-      const legacy = localStorage.getItem(LEGACY_STORAGE_KEY);
-      if (legacy && !localStorage.getItem(STORAGE_KEY)) {
-        localStorage.setItem(STORAGE_KEY, legacy);
-        localStorage.removeItem(LEGACY_STORAGE_KEY);
+      if (localStorage.getItem(STORAGE_KEY) !== null) return; // already migrated
+      const merged: Playlist[] = [];
+      // Try legacy Mizuki key first
+      const legacyMizuki = localStorage.getItem(LEGACY_STORAGE_KEY);
+      if (legacyMizuki) {
+        try {
+          const parsed = JSON.parse(legacyMizuki) as Playlist[];
+          for (const p of parsed) {
+            merged.push({
+              ...p,
+              versions: p.versions.map(v => ({ ...v, streamerSlug: (v as any).streamerSlug || 'mizuki' })),
+              updatedAt: p.updatedAt || p.createdAt || Date.now(),
+            });
+          }
+        } catch {}
+      }
+      // Then check all per-streamer keys
+      for (const slug of ALL_STREAMER_SLUGS) {
+        const key = `prism_${slug}_playlists`;
+        const data = localStorage.getItem(key);
+        if (!data) continue;
+        try {
+          const parsed = JSON.parse(data) as Playlist[];
+          for (const p of parsed) {
+            // Avoid duplicates by ID
+            if (merged.some(m => m.id === p.id)) continue;
+            merged.push({
+              ...p,
+              versions: p.versions.map(v => ({ ...v, streamerSlug: (v as any).streamerSlug || slug })),
+              updatedAt: p.updatedAt || p.createdAt || Date.now(),
+            });
+          }
+        } catch {}
+      }
+      if (merged.length > 0) {
+        localStorage.setItem(STORAGE_KEY, JSON.stringify(merged));
       }
     } catch {}
   // eslint-disable-next-line react-hooks/exhaustive-deps

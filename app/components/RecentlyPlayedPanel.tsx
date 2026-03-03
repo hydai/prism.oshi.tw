@@ -3,6 +3,7 @@
 import { Clock, Play, ListPlus, Trash2 } from 'lucide-react';
 import { useRecentlyPlayed } from '../contexts/RecentlyPlayedContext';
 import { usePlayer, type Track } from '../contexts/PlayerContext';
+import { useStreamer } from '../contexts/StreamerContext';
 import AlbumArt from './AlbumArt';
 import BottomSheet from './BottomSheet';
 
@@ -27,6 +28,7 @@ function formatRelativeTime(playedAt: number): string {
 export default function RecentlyPlayedPanel({ show, onClose, onToast }: RecentlyPlayedPanelProps) {
   const { recentPlays, clearHistory } = useRecentlyPlayed();
   const { playTrack, addToQueue } = usePlayer();
+  const { slug } = useStreamer();
 
   const handlePlayAll = () => {
     if (recentPlays.length === 0) return;
@@ -39,6 +41,7 @@ export default function RecentlyPlayedPanel({ show, onClose, onToast }: Recently
       timestamp: r.timestamp,
       endTimestamp: r.endTimestamp,
       albumArtUrl: r.albumArtUrl,
+      streamerSlug: slug,
     }));
     playTrack(tracks[0]);
     tracks.slice(1).forEach(t => addToQueue(t));
@@ -54,6 +57,7 @@ export default function RecentlyPlayedPanel({ show, onClose, onToast }: Recently
       timestamp: r.timestamp,
       endTimestamp: r.endTimestamp,
       albumArtUrl: r.albumArtUrl,
+      streamerSlug: slug,
     });
   };
 
@@ -67,6 +71,7 @@ export default function RecentlyPlayedPanel({ show, onClose, onToast }: Recently
       timestamp: r.timestamp,
       endTimestamp: r.endTimestamp,
       albumArtUrl: r.albumArtUrl,
+      streamerSlug: slug,
     });
     onToast?.('已加入待播清單');
   };

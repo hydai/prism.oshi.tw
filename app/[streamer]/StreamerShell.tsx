@@ -1,9 +1,9 @@
 'use client';
 
-import { ReactNode } from 'react';
+import { ReactNode, useEffect } from 'react';
 import { StreamerConfig, StreamerTheme } from '../../lib/types';
 import { StreamerProvider } from '../contexts/StreamerContext';
-import PlayerWrapper from '../components/PlayerWrapper';
+import PerStreamerProviders from '../components/PerStreamerProviders';
 
 function themeToCSS(theme: StreamerTheme): Record<string, string> {
   return {
@@ -31,12 +31,26 @@ export default function StreamerShell({
 }) {
   const cssVars = themeToCSS(config.theme);
 
+  // Broadcast theme CSS vars to document.body so fixed-position elements
+  // (MiniPlayer, QueuePanel, NowPlayingModal) inherit the current page's theme
+  useEffect(() => {
+    const vars = themeToCSS(config.theme);
+    for (const [key, value] of Object.entries(vars)) {
+      document.body.style.setProperty(key, value);
+    }
+    return () => {
+      for (const key of Object.keys(vars)) {
+        document.body.style.removeProperty(key);
+      }
+    };
+  }, [config.theme]);
+
   return (
     <div style={cssVars as React.CSSProperties}>
       <StreamerProvider config={config}>
-        <PlayerWrapper streamerSlug={config.slug}>
+        <PerStreamerProviders streamerSlug={config.slug}>
           {children}
-        </PlayerWrapper>
+        </PerStreamerProviders>
       </StreamerProvider>
     </div>
   );

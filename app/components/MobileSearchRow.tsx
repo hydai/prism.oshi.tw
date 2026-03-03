@@ -16,7 +16,8 @@ interface MobileSearchRowProps {
   };
   isCurrentlyPlaying: boolean;
   isUnavailable: boolean;
-  onPlay: (track: { id: string; songId: string; title: string; originalArtist: string; videoId: string; timestamp: number; endTimestamp?: number; albumArtUrl?: string }) => void;
+  onPlay: (track: { id: string; songId: string; title: string; originalArtist: string; videoId: string; timestamp: number; endTimestamp?: number; albumArtUrl?: string; streamerSlug: string }) => void;
+  streamerSlug: string;
 }
 
 const formatTime = (seconds: number): string => {
@@ -25,7 +26,7 @@ const formatTime = (seconds: number): string => {
   return `${m}:${s.toString().padStart(2, '0')}`;
 };
 
-function MobileSearchRowInner({ song, isCurrentlyPlaying, isUnavailable, onPlay }: MobileSearchRowProps) {
+function MobileSearchRowInner({ song, isCurrentlyPlaying, isUnavailable, onPlay, streamerSlug }: MobileSearchRowProps) {
   return (
     <div
       data-testid="performance-row"
@@ -48,6 +49,7 @@ function MobileSearchRowInner({ song, isCurrentlyPlaying, isUnavailable, onPlay 
               timestamp: song.timestamp,
               endTimestamp: song.endTimestamp,
               albumArtUrl: song.albumArtUrl,
+              streamerSlug,
             });
           }
         }}

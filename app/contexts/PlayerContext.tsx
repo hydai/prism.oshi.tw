@@ -12,6 +12,7 @@ export interface Track {
   endTimestamp?: number;
   deleted?: boolean;
   albumArtUrl?: string;
+  streamerSlug: string;
 }
 
 export type RepeatMode = 'off' | 'all' | 'one';
@@ -80,9 +81,9 @@ declare global {
   }
 }
 
-export const PlayerProvider = ({ streamerSlug, children }: { streamerSlug: string; children: ReactNode }) => {
-  const volumeKey = `prism_${streamerSlug}_volume`;
-  const mutedKey = `prism_${streamerSlug}_muted`;
+export const PlayerProvider = ({ children }: { children: ReactNode }) => {
+  const volumeKey = 'prism_volume';
+  const mutedKey = 'prism_muted';
   const [currentTrack, setCurrentTrack] = useState<Track | null>(null);
   const [isPlaying, setIsPlaying] = useState(false);
   const [isPlayerReady, setIsPlayerReady] = useState(false);
@@ -137,19 +138,26 @@ export const PlayerProvider = ({ streamerSlug, children }: { streamerSlug: strin
   useEffect(() => { volumeRef.current = volume; }, [volume]);
   useEffect(() => { isMutedRef.current = isMuted; }, [isMuted]);
 
-  // Migrate legacy localStorage keys for Mizuki
+  // Migrate legacy per-streamer volume/muted keys to global keys
   useEffect(() => {
-    if (streamerSlug !== 'mizuki') return;
     try {
-      const legacyVolume = localStorage.getItem('mizuki-volume');
-      const legacyMuted = localStorage.getItem('mizuki-muted');
-      if (legacyVolume !== null && localStorage.getItem(volumeKey) === null) {
-        localStorage.setItem(volumeKey, legacyVolume);
-        localStorage.removeItem('mizuki-volume');
+      if (localStorage.getItem(volumeKey) !== null) return; // already migrated
+      // Try legacy Mizuki key first, then per-streamer keys
+      const candidates = ['mizuki-volume', 'prism_mizuki_volume'];
+      for (const key of candidates) {
+        const val = localStorage.getItem(key);
+        if (val !== null) {
+          localStorage.setItem(volumeKey, val);
+          break;
+        }
       }
-      if (legacyMuted !== null && localStorage.getItem(mutedKey) === null) {
-        localStorage.setItem(mutedKey, legacyMuted);
-        localStorage.removeItem('mizuki-muted');
+      const mutedCandidates = ['mizuki-muted', 'prism_mizuki_muted'];
+      for (const key of mutedCandidates) {
+        const val = localStorage.getItem(key);
+        if (val !== null) {
+          localStorage.setItem(mutedKey, val);
+          break;
+        }
       }
     } catch {}
   // eslint-disable-next-line react-hooks/exhaustive-deps

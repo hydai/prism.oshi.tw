@@ -29,9 +29,10 @@ interface TimelineRowProps {
   index: number;
   isCurrentlyPlaying: boolean;
   isUnavailable: boolean;
-  onPlay: (track: { id: string; songId: string; title: string; originalArtist: string; videoId: string; timestamp: number; endTimestamp?: number; albumArtUrl?: string }) => void;
-  onAddToQueue: (track: { id: string; songId: string; title: string; originalArtist: string; videoId: string; timestamp: number; endTimestamp?: number; albumArtUrl?: string }) => void;
+  onPlay: (track: { id: string; songId: string; title: string; originalArtist: string; videoId: string; timestamp: number; endTimestamp?: number; albumArtUrl?: string; streamerSlug: string }) => void;
+  onAddToQueue: (track: { id: string; songId: string; title: string; originalArtist: string; videoId: string; timestamp: number; endTimestamp?: number; albumArtUrl?: string; streamerSlug: string }) => void;
   onAddToPlaylistSuccess: () => void;
+  streamerSlug: string;
 }
 
 const formatTime = (seconds: number): string => {
@@ -40,7 +41,7 @@ const formatTime = (seconds: number): string => {
   return `${m}:${s.toString().padStart(2, '0')}`;
 };
 
-function TimelineRowInner({ song, index, isCurrentlyPlaying, isUnavailable, onPlay, onAddToQueue, onAddToPlaylistSuccess }: TimelineRowProps) {
+function TimelineRowInner({ song, index, isCurrentlyPlaying, isUnavailable, onPlay, onAddToQueue, onAddToPlaylistSuccess, streamerSlug }: TimelineRowProps) {
   const track = {
     id: song.performanceId,
     songId: song.id,
@@ -50,6 +51,7 @@ function TimelineRowInner({ song, index, isCurrentlyPlaying, isUnavailable, onPl
     timestamp: song.timestamp,
     endTimestamp: song.endTimestamp,
     albumArtUrl: song.albumArtUrl,
+    streamerSlug,
   };
 
   return (
@@ -233,6 +235,7 @@ function TimelineRowInner({ song, index, isCurrentlyPlaying, isUnavailable, onPl
               originalArtist: song.originalArtist,
               videoId: song.videoId,
               timestamp: song.timestamp,
+              streamerSlug,
             }}
             onSuccess={onAddToPlaylistSuccess}
           />

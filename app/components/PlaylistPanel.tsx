@@ -68,6 +68,7 @@ export default function PlaylistPanel({ show, onClose, songsData, onToast }: Pla
       timestamp: v.timestamp,
       endTimestamp: v.endTimestamp,
       deleted: !checkVersionExists(v.performanceId),
+      streamerSlug: v.streamerSlug,
     }));
 
     const firstPlayable = tracks.find(t => !t.deleted);

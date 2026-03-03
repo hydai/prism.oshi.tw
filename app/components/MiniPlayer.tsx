@@ -1,18 +1,15 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useEffect } from 'react';
 import { usePathname } from 'next/navigation';
 import Link from 'next/link';
-import { Play, Pause, SkipBack, SkipForward, ListMusic, AlertCircle, Shuffle, Repeat, Repeat1, Heart, Maximize2 } from 'lucide-react';
-import { useStreamer } from '../contexts/StreamerContext';
+import { Play, Pause, SkipBack, SkipForward, ListMusic, AlertCircle, Shuffle, Repeat, Repeat1, Maximize2 } from 'lucide-react';
 import { usePlayer } from '../contexts/PlayerContext';
-import { useLikedSongs } from '../contexts/LikedSongsContext';
 import AlbumArt from './AlbumArt';
 import VolumeControl from './VolumeControl';
 import ProgressBar from './ProgressBar';
 
 export default function MiniPlayer() {
-  const { slug } = useStreamer();
   const {
     currentTrack,
     isPlaying,
@@ -33,11 +30,8 @@ export default function MiniPlayer() {
   } = usePlayer();
 
   const pathname = usePathname();
-  const isNowPlayingPage = pathname === `/${slug}/now-playing`;
-
-  const { isLiked: checkIsLiked, toggleLike } = useLikedSongs();
-
-  const trackIsLiked = currentTrack ? checkIsLiked(currentTrack.id) : false;
+  const pageSlug = pathname?.split('/')[1] || '';
+  const isNowPlayingPage = pathname?.endsWith('/now-playing');
 
   // Keyboard navigation: Space for play/pause when player is active
   useEffect(() => {
@@ -100,7 +94,7 @@ export default function MiniPlayer() {
         {/* Progress bar at top — 3px height, gradient fill */}
         <ProgressBar progress={clampedProgress} onSeek={handleSeek} height={3} variant="mini" />
 
-        {/* Content row: cover + song info + heart + play/pause */}
+        {/* Content row: cover + song info + queue + play/pause */}
         <div
           className="flex items-center"
           style={{ padding: '10px 16px', gap: '12px', cursor: 'pointer' }}
@@ -131,35 +125,6 @@ export default function MiniPlayer() {
               {currentTrack.originalArtist}
             </div>
           </div>
-
-          {/* Heart icon — 20px, accent-pink */}
-          <button
-            onClick={(e) => {
-              e.stopPropagation();
-              if (currentTrack) {
-                toggleLike({
-                  performanceId: currentTrack.id,
-                  songTitle: currentTrack.title,
-                  originalArtist: currentTrack.originalArtist,
-                  videoId: currentTrack.videoId,
-                  timestamp: currentTrack.timestamp,
-                  endTimestamp: currentTrack.endTimestamp,
-                  albumArtUrl: currentTrack.albumArtUrl,
-                });
-              }
-            }}
-            className="flex-shrink-0"
-            aria-label="Mobile Like"
-            style={{ color: 'var(--accent-pink)', padding: '4px' }}
-          >
-            <Heart
-              style={{
-                width: '20px',
-                height: '20px',
-                fill: trackIsLiked ? 'var(--accent-pink)' : 'none',
-              }}
-            />
-          </button>
 
           {/* Queue button — mobile */}
           <button
@@ -231,7 +196,7 @@ export default function MiniPlayer() {
           }}
           style={{ cursor: 'pointer' }}
         >
-          {/* LEFT COLUMN: 280px — album art, track info, like */}
+          {/* LEFT COLUMN: 280px — album art, track info */}
           <div
             className="flex items-center gap-3 flex-shrink-0"
             style={{ width: '280px' }}
@@ -270,35 +235,6 @@ export default function MiniPlayer() {
                 </div>
               )}
             </div>
-
-            {/* Heart/like button */}
-            <button
-              onClick={(e) => {
-                e.stopPropagation();
-                if (currentTrack) {
-                  toggleLike({
-                    performanceId: currentTrack.id,
-                    songTitle: currentTrack.title,
-                    originalArtist: currentTrack.originalArtist,
-                    videoId: currentTrack.videoId,
-                    timestamp: currentTrack.timestamp,
-                    endTimestamp: currentTrack.endTimestamp,
-                    albumArtUrl: currentTrack.albumArtUrl,
-                  });
-                }
-              }}
-              className="flex-shrink-0 transition-colors"
-              aria-label="Like"
-              style={{ color: trackIsLiked ? 'var(--accent-pink)' : 'var(--text-tertiary)' }}
-            >
-              <Heart
-                style={{
-                  width: '16px',
-                  height: '16px',
-                  fill: trackIsLiked ? 'var(--accent-pink)' : 'none',
-                }}
-              />
-            </button>
           </div>
 
           {/* CENTER COLUMN: fill — transport controls + progress bar */}
@@ -404,7 +340,7 @@ export default function MiniPlayer() {
             </div>
           </div>
 
-          {/* RIGHT COLUMN: 200px — queue, speaker, volume */}
+          {/* RIGHT COLUMN: 200px — expand, queue, volume */}
           <div
             className="flex items-center gap-3 flex-shrink-0 justify-end"
             style={{ width: '200px' }}
@@ -412,7 +348,7 @@ export default function MiniPlayer() {
           >
             {/* Expand to full Now Playing page */}
             <Link
-              href={`/${slug}/now-playing`}
+              href={pageSlug ? `/${pageSlug}/now-playing` : '#'}
               onClick={(e) => e.stopPropagation()}
               className="transition-colors hover-text-primary"
               aria-label="Expand to full page"
