@@ -139,7 +139,7 @@ function SubmissionRow({
     { label: 'Facebook', url: sub.link_facebook },
     { label: 'Instagram', url: sub.link_instagram },
     { label: 'Twitch', url: sub.link_twitch },
-  ].filter((l) => l.url);
+  ];
 
   return (
     <>
@@ -157,10 +157,10 @@ function SubmissionRow({
             className="text-blue-600 hover:underline"
             onClick={(e) => e.stopPropagation()}
           >
-            {sub.brand_name}
+            {sub.brand_name || sub.youtube_channel_url}
           </a>
         </td>
-        <td className="px-4 py-3 text-slate-600">{sub.subscriber_count}</td>
+        <td className="px-4 py-3 text-slate-600">{sub.subscriber_count || '—'}</td>
         <td className="px-4 py-3">
           <StatusBadge status={sub.status} />
         </td>
@@ -192,53 +192,59 @@ function SubmissionRow({
         <tr className="bg-slate-50">
           <td colSpan={isCurator ? 7 : 6} className="px-6 py-4">
             <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
-              {/* Left: info */}
+              {/* Left: all submission info */}
               <div className="space-y-3">
-                {sub.avatar_url && (
-                  <div>
+                <DetailField label="Avatar">
+                  {sub.avatar_url ? (
                     <img
                       src={sub.avatar_url}
                       alt={sub.display_name}
                       className="h-16 w-16 rounded-full border border-slate-200"
                     />
+                  ) : (
+                    <span className="text-sm text-slate-400">—</span>
+                  )}
+                </DetailField>
+                <DetailField label="Brand Name" value={sub.brand_name} />
+                <DetailField label="YouTube Channel URL">
+                  <a
+                    href={sub.youtube_channel_url}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="text-sm text-blue-600 hover:underline break-all"
+                  >
+                    {sub.youtube_channel_url}
+                  </a>
+                </DetailField>
+                <DetailField label="Description" value={sub.description} />
+                <DetailField label="Subscriber Count" value={sub.subscriber_count} />
+
+                <div>
+                  <p className="text-xs font-medium uppercase text-slate-400">Social Links</p>
+                  <div className="mt-1 flex flex-wrap gap-2">
+                    {socialLinks.map((l) => (
+                      <span key={l.label}>
+                        {l.url ? (
+                          <a
+                            href={l.url}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="rounded-md bg-slate-200 px-2 py-1 text-xs text-slate-700 hover:bg-slate-300"
+                          >
+                            {l.label}
+                          </a>
+                        ) : (
+                          <span className="rounded-md bg-slate-100 px-2 py-1 text-xs text-slate-400 line-through">
+                            {l.label}
+                          </span>
+                        )}
+                      </span>
+                    ))}
                   </div>
-                )}
-                {sub.description && (
-                  <div>
-                    <p className="text-xs font-medium uppercase text-slate-400">Description</p>
-                    <p className="mt-0.5 text-sm text-slate-700 whitespace-pre-line">{sub.description}</p>
-                  </div>
-                )}
-                {socialLinks.length > 0 && (
-                  <div>
-                    <p className="text-xs font-medium uppercase text-slate-400">Social Links</p>
-                    <div className="mt-1 flex flex-wrap gap-2">
-                      {socialLinks.map((l) => (
-                        <a
-                          key={l.label}
-                          href={l.url}
-                          target="_blank"
-                          rel="noopener noreferrer"
-                          className="rounded-md bg-slate-200 px-2 py-1 text-xs text-slate-700 hover:bg-slate-300"
-                        >
-                          {l.label}
-                        </a>
-                      ))}
-                    </div>
-                  </div>
-                )}
-                {sub.reviewed_at && (
-                  <div>
-                    <p className="text-xs font-medium uppercase text-slate-400">Reviewed At</p>
-                    <p className="mt-0.5 text-sm text-slate-600">{sub.reviewed_at}</p>
-                  </div>
-                )}
-                {sub.reviewer_note && (
-                  <div>
-                    <p className="text-xs font-medium uppercase text-slate-400">Reviewer Note</p>
-                    <p className="mt-0.5 text-sm text-slate-600">{sub.reviewer_note}</p>
-                  </div>
-                )}
+                </div>
+
+                <DetailField label="Reviewed At" value={sub.reviewed_at ?? ''} />
+                <DetailField label="Reviewer Note" value={sub.reviewer_note} />
               </div>
               {/* Right: reject note input (curators only, pending only) */}
               {isCurator && sub.status === 'pending' && (
@@ -260,5 +266,18 @@ function SubmissionRow({
         </tr>
       )}
     </>
+  );
+}
+
+function DetailField({ label, value, children }: { label: string; value?: string; children?: React.ReactNode }) {
+  return (
+    <div>
+      <p className="text-xs font-medium uppercase text-slate-400">{label}</p>
+      {children ?? (
+        <p className={`mt-0.5 text-sm whitespace-pre-line ${value ? 'text-slate-700' : 'text-slate-400'}`}>
+          {value || '—'}
+        </p>
+      )}
+    </div>
   );
 }
