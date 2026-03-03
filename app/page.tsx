@@ -1,231 +1,372 @@
+'use client';
+
+import { useState, useMemo } from 'react';
 import Link from 'next/link';
-import { getRegistry } from '../lib/registry';
-import fs from 'fs';
-import path from 'path';
-import { Song } from '../lib/types';
+import registryData from '../data/registry.json';
+import { StreamerConfig } from '../lib/types';
 import {
   Disc3,
-  Sparkles,
+  Search,
+  Users,
+  Building2,
+  User,
   Heart,
+  Clock,
+  Plus,
+  Play,
   Youtube,
   Twitter,
-  Facebook,
-  Instagram,
-  Twitch,
-  Users,
-  Music,
+  Globe,
 } from 'lucide-react';
 
-function countSongs(slug: string): number {
-  try {
-    const songsPath = path.join(process.cwd(), 'data', slug, 'songs.json');
-    const raw = fs.readFileSync(songsPath, 'utf-8');
-    const songs: Song[] = JSON.parse(raw);
-    return songs.length;
-  } catch {
-    return 0;
-  }
+const streamers = (registryData.streamers as StreamerConfig[]).filter(
+  (s) => s.enabled
+);
+
+const ALL_GROUP = '全部';
+
+const groups = [
+  ALL_GROUP,
+  ...Array.from(new Set(streamers.map((s) => s.group))),
+];
+
+function groupIcon(group: string) {
+  if (group === ALL_GROUP) return Users;
+  if (group === '個人勢') return User;
+  return Building2;
 }
 
-const socialIcons: Record<string, typeof Youtube> = {
-  youtube: Youtube,
-  twitter: Twitter,
-  facebook: Facebook,
-  instagram: Instagram,
-  twitch: Twitch,
-};
+export default function HomePage() {
+  const [selectedGroup, setSelectedGroup] = useState(ALL_GROUP);
+  const [searchText, setSearchText] = useState('');
 
-const socialColors: Record<string, string> = {
-  youtube: '#FF0000',
-  twitter: '#1DA1F2',
-  facebook: '#1877F2',
-  instagram: '#E4405F',
-  twitch: '#9146FF',
-};
-
-export default function LandingPage() {
-  const registry = getRegistry();
-  const streamers = registry.streamers.filter(s => s.enabled);
+  const filtered = useMemo(() => {
+    return streamers.filter((s) => {
+      const matchGroup =
+        selectedGroup === ALL_GROUP || s.group === selectedGroup;
+      const q = searchText.toLowerCase();
+      const matchSearch =
+        !q ||
+        s.displayName.toLowerCase().includes(q) ||
+        s.brandName.toLowerCase().includes(q);
+      return matchGroup && matchSearch;
+    });
+  }, [selectedGroup, searchText]);
 
   return (
-    <div className="relative min-h-screen overflow-hidden">
-      {/* Decorative glow orbs */}
-      <div
-        className="pointer-events-none absolute -top-32 -left-32 h-96 w-96 rounded-full opacity-30 blur-3xl"
-        style={{ background: 'var(--accent-pink)' }}
-      />
-      <div
-        className="pointer-events-none absolute top-1/3 -right-48 h-[500px] w-[500px] rounded-full opacity-20 blur-3xl"
-        style={{ background: 'var(--accent-blue)' }}
-      />
-      <div
-        className="pointer-events-none absolute bottom-0 left-1/3 h-80 w-80 rounded-full opacity-20 blur-3xl"
-        style={{ background: 'var(--accent-purple)' }}
-      />
-
-      {/* Content */}
-      <div className="relative z-10 mx-auto max-w-[960px] px-6 py-12 sm:py-16">
-        {/* ── Header ── */}
-        <header className="mb-12 flex flex-col items-center text-center sm:mb-16">
-          {/* Logo icon */}
+    <div className="flex min-h-screen">
+      {/* ── Sidebar ── */}
+      <aside
+        className="hidden lg:flex w-[260px] flex-shrink-0 flex-col backdrop-blur-md border-r"
+        style={{
+          background: 'var(--bg-surface-glass)',
+          borderColor: 'var(--border-glass)',
+        }}
+      >
+        {/* Logo */}
+        <div
+          className="flex items-center gap-3 px-5 py-5 border-b"
+          style={{ borderColor: 'var(--border-glass)' }}
+        >
           <div
-            className="mb-5 flex h-14 w-14 items-center justify-center rounded-radius-xl shadow-lg"
+            className="flex h-9 w-9 items-center justify-center rounded-radius-lg"
             style={{
-              background: 'linear-gradient(135deg, var(--accent-pink-light), var(--accent-blue-light))',
+              background:
+                'linear-gradient(135deg, var(--accent-pink-light), var(--accent-blue-light))',
             }}
           >
-            <Disc3 className="h-7 w-7 text-white" />
+            <Disc3 className="h-5 w-5 text-white" />
           </div>
-
-          {/* Title */}
-          <h1
-            className="text-token-3xl font-black tracking-tight sm:text-token-display"
-            style={{
-              background: 'linear-gradient(135deg, var(--accent-pink), var(--accent-blue), var(--accent-purple))',
-              WebkitBackgroundClip: 'text',
-              WebkitTextFillColor: 'transparent',
-            }}
+          <span
+            className="text-token-xl font-bold tracking-tight"
+            style={{ color: 'var(--text-primary)' }}
           >
             Prism
-          </h1>
+          </span>
+        </div>
 
-          {/* Tagline badge */}
+        {/* Search */}
+        <div className="px-4 py-3">
           <div
-            className="mt-4 inline-flex items-center gap-2 rounded-radius-pill px-4 py-1.5 text-token-sm font-medium backdrop-blur-md"
+            className="flex items-center gap-2 rounded-radius-lg px-3 py-2"
             style={{
               background: 'var(--bg-surface-frosted)',
               border: '1px solid var(--border-glass)',
-              color: 'var(--text-secondary)',
             }}
           >
-            <Sparkles className="h-3.5 w-3.5" style={{ color: 'var(--accent-pink)' }} />
-            VTuber Song Archive
+            <Search
+              className="h-4 w-4 flex-shrink-0"
+              style={{ color: 'var(--text-tertiary)' }}
+            />
+            <input
+              type="text"
+              placeholder="搜尋 VTuber…"
+              value={searchText}
+              onChange={(e) => setSearchText(e.target.value)}
+              className="w-full bg-transparent text-token-sm outline-none placeholder:text-token-tertiary"
+              style={{ color: 'var(--text-primary)' }}
+            />
           </div>
+        </div>
 
-          {/* Subtitle */}
-          <p className="mt-4 max-w-md text-token-lg" style={{ color: 'var(--text-secondary)' }}>
-            Discover and explore karaoke archives from your favorite VTubers.
+        {/* Groups */}
+        <div className="px-4 pt-2">
+          <p
+            className="mb-2 px-2 text-[10px] font-semibold uppercase tracking-widest"
+            style={{ color: 'var(--text-tertiary)' }}
+          >
+            Groups
           </p>
+          <nav className="flex flex-col gap-1">
+            {groups.map((group) => {
+              const Icon = groupIcon(group);
+              const isActive = selectedGroup === group;
+              return (
+                <button
+                  key={group}
+                  onClick={() => setSelectedGroup(group)}
+                  className="flex items-center gap-3 rounded-radius-lg px-3 py-2 text-left text-token-sm font-medium transition-colors"
+                  style={
+                    isActive
+                      ? {
+                          background:
+                            'linear-gradient(135deg, var(--accent-pink), var(--accent-blue))',
+                          color: 'white',
+                        }
+                      : {
+                          color: 'var(--text-secondary)',
+                        }
+                  }
+                >
+                  <Icon className="h-4 w-4 flex-shrink-0" />
+                  {group}
+                </button>
+              );
+            })}
+          </nav>
+        </div>
+
+        {/* Spacer */}
+        <div className="flex-1" />
+
+        {/* Playlists (placeholders) */}
+        <div className="px-4 pb-2">
+          <p
+            className="mb-2 px-2 text-[10px] font-semibold uppercase tracking-widest"
+            style={{ color: 'var(--text-tertiary)' }}
+          >
+            Playlists
+          </p>
+          <nav className="flex flex-col gap-1">
+            <div
+              className="flex items-center gap-3 rounded-radius-lg px-3 py-2 text-token-sm font-medium"
+              style={{ color: 'var(--text-secondary)' }}
+            >
+              <Heart className="h-4 w-4 flex-shrink-0" />
+              Favorites
+            </div>
+            <div
+              className="flex items-center gap-3 rounded-radius-lg px-3 py-2 text-token-sm font-medium"
+              style={{ color: 'var(--text-secondary)' }}
+            >
+              <Clock className="h-4 w-4 flex-shrink-0" />
+              Recently Played
+            </div>
+          </nav>
+        </div>
+
+        {/* Footer social row */}
+        <div
+          className="flex items-center gap-2 border-t px-5 py-4"
+          style={{ borderColor: 'var(--border-glass)' }}
+        >
+          {[
+            { icon: Youtube, href: '#', color: '#FF0000' },
+            { icon: Twitter, href: '#', color: '#1DA1F2' },
+            { icon: Globe, href: '#', color: 'var(--text-tertiary)' },
+          ].map(({ icon: Icon, href, color }, i) => (
+            <a
+              key={i}
+              href={href}
+              className="flex h-8 w-8 items-center justify-center rounded-full transition-all hover:scale-110"
+              style={{
+                background: 'var(--bg-surface-frosted)',
+                border: '1px solid var(--border-glass)',
+              }}
+            >
+              <Icon className="h-3.5 w-3.5" style={{ color }} />
+            </a>
+          ))}
+        </div>
+      </aside>
+
+      {/* ── Main Content ── */}
+      <main className="flex-1 min-w-0 flex flex-col">
+        {/* Header Bar */}
+        <header
+          className="flex items-center justify-between px-6 py-5 lg:px-8 border-b backdrop-blur-sm"
+          style={{
+            background: 'var(--bg-surface-glass)',
+            borderColor: 'var(--border-glass)',
+          }}
+        >
+          <h1
+            className="text-[28px] font-extrabold tracking-tight"
+            style={{ color: 'var(--text-primary)' }}
+          >
+            Discover VTubers
+          </h1>
+          <a
+            href="https://nova.oshi.tw"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="hidden sm:inline-flex items-center gap-2 rounded-radius-lg px-4 py-2 text-token-sm font-semibold text-white transition-opacity hover:opacity-90"
+            style={{
+              background:
+                'linear-gradient(135deg, var(--accent-pink), var(--accent-blue))',
+            }}
+          >
+            <Plus className="h-4 w-4" />
+            Propose a new streamer
+          </a>
         </header>
 
-        {/* ── Streamer Grid ── */}
-        <div className="grid gap-6" style={{ gridTemplateColumns: 'repeat(auto-fill, minmax(320px, 1fr))' }}>
-          {streamers.map(streamer => {
-            const songCount = countSongs(streamer.slug);
-            const { accentPrimary, accentSecondary } = streamer.theme;
-            const socials = Object.entries(streamer.socialLinks || {});
+        {/* Mobile search (visible below lg) */}
+        <div className="lg:hidden px-4 pt-4">
+          <div
+            className="flex items-center gap-2 rounded-radius-lg px-3 py-2"
+            style={{
+              background: 'var(--bg-surface-frosted)',
+              border: '1px solid var(--border-glass)',
+            }}
+          >
+            <Search
+              className="h-4 w-4 flex-shrink-0"
+              style={{ color: 'var(--text-tertiary)' }}
+            />
+            <input
+              type="text"
+              placeholder="搜尋 VTuber…"
+              value={searchText}
+              onChange={(e) => setSearchText(e.target.value)}
+              className="w-full bg-transparent text-token-sm outline-none placeholder:text-token-tertiary"
+              style={{ color: 'var(--text-primary)' }}
+            />
+          </div>
+        </div>
 
+        {/* Mobile group chips (visible below lg) */}
+        <div className="lg:hidden flex gap-2 overflow-x-auto px-4 pt-3 pb-1">
+          {groups.map((group) => {
+            const isActive = selectedGroup === group;
             return (
-              <div
-                key={streamer.slug}
-                className="group relative overflow-hidden rounded-radius-2xl backdrop-blur-md transition-all duration-200 hover:scale-[1.02] hover:shadow-xl"
-                style={{
-                  background: 'var(--bg-surface-frosted)',
-                  border: '1px solid var(--border-glass)',
-                }}
+              <button
+                key={group}
+                onClick={() => setSelectedGroup(group)}
+                className="flex-shrink-0 rounded-radius-pill px-4 py-1.5 text-token-sm font-medium whitespace-nowrap transition-colors"
+                style={
+                  isActive
+                    ? {
+                        background:
+                          'linear-gradient(135deg, var(--accent-pink), var(--accent-blue))',
+                        color: 'white',
+                      }
+                    : {
+                        background: 'var(--bg-surface-frosted)',
+                        border: '1px solid var(--border-glass)',
+                        color: 'var(--text-secondary)',
+                      }
+                }
               >
-                {/* Per-card accent glow */}
-                <div
-                  className="pointer-events-none absolute -right-8 -top-8 h-32 w-32 rounded-full opacity-20 blur-2xl transition-opacity group-hover:opacity-40"
-                  style={{ background: accentPrimary }}
-                />
-
-                {/* Clickable card body */}
-                <Link
-                  href={`/${streamer.slug}`}
-                  className="block p-6"
-                  style={{ textDecoration: 'none', color: 'inherit' }}
-                >
-                  {/* Avatar + Name */}
-                  <div className="mb-3 flex items-center gap-4">
-                    <div
-                      className="flex-shrink-0 rounded-full p-[3px]"
-                      style={{
-                        background: `linear-gradient(135deg, ${accentPrimary}, ${accentSecondary})`,
-                      }}
-                    >
-                      {/* eslint-disable-next-line @next/next/no-img-element */}
-                      <img
-                        src={streamer.avatarUrl}
-                        alt={streamer.displayName}
-                        className="rounded-full bg-white object-cover"
-                        style={{ width: '72px', height: '72px' }}
-                      />
-                    </div>
-                    <div className="min-w-0">
-                      <h2 className="truncate text-token-xl font-bold" style={{ color: 'var(--text-primary)' }}>
-                        {streamer.displayName}
-                      </h2>
-                      <p className="text-token-sm" style={{ color: 'var(--text-tertiary)' }}>
-                        {streamer.brandName}
-                      </p>
-                    </div>
-                  </div>
-
-                  {/* Description */}
-                  <p
-                    className="mb-4 line-clamp-2 text-token-base leading-relaxed"
-                    style={{ color: 'var(--text-secondary)' }}
-                  >
-                    {streamer.description}
-                  </p>
-
-                  {/* Stats row */}
-                  <div className="flex items-center gap-4 text-token-sm font-semibold">
-                    {streamer.subscriberCount && (
-                      <span className="flex items-center gap-1.5" style={{ color: accentPrimary }}>
-                        <Users className="h-3.5 w-3.5" />
-                        {streamer.subscriberCount}
-                      </span>
-                    )}
-                    {songCount > 0 && (
-                      <span className="flex items-center gap-1.5" style={{ color: accentSecondary }}>
-                        <Music className="h-3.5 w-3.5" />
-                        {songCount} songs
-                      </span>
-                    )}
-                  </div>
-                </Link>
-
-                {/* Social links — outside <Link> to avoid nested <a> */}
-                {socials.length > 0 && (
-                  <div
-                    className="flex items-center gap-2 border-t px-6 py-3"
-                    style={{ borderColor: 'var(--border-glass)' }}
-                  >
-                    {socials.map(([platform, url]) => {
-                      const Icon = socialIcons[platform];
-                      if (!Icon) return null;
-                      return (
-                        <a
-                          key={platform}
-                          href={url}
-                          target="_blank"
-                          rel="noopener noreferrer"
-                          className="flex h-8 w-8 items-center justify-center rounded-full backdrop-blur-sm transition-all hover:scale-110"
-                          style={{
-                            background: 'var(--bg-surface-glass)',
-                            border: '1px solid var(--border-glass)',
-                          }}
-                          title={platform}
-                        >
-                          <Icon className="h-3.5 w-3.5" style={{ color: socialColors[platform] }} />
-                        </a>
-                      );
-                    })}
-                  </div>
-                )}
-              </div>
+                {group}
+              </button>
             );
           })}
         </div>
 
-        {/* ── Footer ── */}
-        <footer className="mt-16 pb-8 text-center text-token-sm" style={{ color: 'var(--text-tertiary)' }}>
-          Made with <Heart className="mx-1 inline h-3.5 w-3.5" style={{ color: 'var(--accent-pink)' }} /> for VTuber
-          fans
-        </footer>
-      </div>
+        {/* Streamer section */}
+        <section className="px-6 py-6 lg:px-8">
+          {/* Section header */}
+          <div className="mb-4 flex items-center gap-2">
+            <Users
+              className="h-4 w-4"
+              style={{ color: 'var(--text-tertiary)' }}
+            />
+            <h2
+              className="text-[10px] font-semibold uppercase tracking-widest"
+              style={{ color: 'var(--text-tertiary)' }}
+            >
+              全部 VTuber
+            </h2>
+          </div>
+
+          {/* Horizontal scroll card row */}
+          <div className="flex gap-5 overflow-x-auto pb-4 snap-x snap-mandatory scrollbar-none">
+            {filtered.map((streamer) => (
+              <StreamerCard key={streamer.slug} streamer={streamer} />
+            ))}
+            {filtered.length === 0 && (
+              <p
+                className="text-token-sm py-8"
+                style={{ color: 'var(--text-tertiary)' }}
+              >
+                找不到符合條件的 VTuber
+              </p>
+            )}
+          </div>
+        </section>
+      </main>
     </div>
+  );
+}
+
+function StreamerCard({ streamer }: { streamer: StreamerConfig }) {
+  return (
+    <Link
+      href={`/${streamer.slug}`}
+      className="group flex-shrink-0 snap-start rounded-radius-xl overflow-hidden transition-all duration-200 hover:scale-[1.03] hover:shadow-xl"
+      style={{
+        width: '240px',
+        background: 'var(--bg-surface-frosted)',
+        border: '1px solid var(--border-glass)',
+        textDecoration: 'none',
+        color: 'inherit',
+      }}
+    >
+      {/* Avatar image */}
+      {/* eslint-disable-next-line @next/next/no-img-element */}
+      <img
+        src={streamer.avatarUrl}
+        alt={streamer.displayName}
+        className="h-[240px] w-full object-cover"
+      />
+
+      {/* Info row */}
+      <div className="flex items-center justify-between px-4 py-3">
+        <div className="min-w-0 flex-1">
+          <p
+            className="truncate text-[15px] font-semibold"
+            style={{ color: 'var(--text-primary)' }}
+          >
+            {streamer.displayName}
+          </p>
+          <p
+            className="truncate text-[12px]"
+            style={{ color: 'var(--text-secondary)' }}
+          >
+            {streamer.group}
+          </p>
+        </div>
+        <div
+          className="flex h-8 w-8 flex-shrink-0 items-center justify-center rounded-full opacity-0 transition-opacity group-hover:opacity-100"
+          style={{
+            background:
+              'linear-gradient(135deg, var(--accent-pink), var(--accent-blue))',
+          }}
+        >
+          <Play className="h-3.5 w-3.5 text-white ml-0.5" />
+        </div>
+      </div>
+    </Link>
   );
 }

@@ -103,6 +103,15 @@ body {
   background-attachment: fixed;
 }
 
+/* Hide scrollbar for horizontal scroll sections */
+.scrollbar-none::-webkit-scrollbar {
+  display: none;
+}
+.scrollbar-none {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+
 .custom-scrollbar::-webkit-scrollbar {
   width: 8px;
 }

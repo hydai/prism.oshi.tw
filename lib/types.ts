@@ -84,6 +84,7 @@ export interface StreamerConfig {
   avatarUrl: string;
   brandName: string;
   subscriberCount: string;
+  group: string;
   socialLinks: Record<string, string>;
   theme: StreamerTheme;
   enabled: boolean;
