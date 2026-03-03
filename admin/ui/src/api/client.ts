@@ -245,7 +245,7 @@ export const api = {
     return request<ListResponse<NovaSubmission>>(`/api/nova/submissions${qs ? `?${qs}` : ''}`);
   },
 
-  updateNovaSubmission: (id: string, body: Partial<NovaSubmission>) =>
+  updateNovaSubmission: (id: string, body: Record<string, string | number>) =>
     request<NovaSubmission>(`/api/nova/submissions/${id}`, {
       method: 'PUT',
       body: JSON.stringify(body),

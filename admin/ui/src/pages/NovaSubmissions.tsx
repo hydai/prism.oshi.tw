@@ -6,13 +6,16 @@ import StatusBadge from '../components/StatusBadge';
 type EditableKey =
   | 'display_name' | 'slug' | 'brand_name' | 'youtube_channel_url'
   | 'description' | 'avatar_url' | 'subscriber_count'
-  | 'link_youtube' | 'link_twitter' | 'link_facebook' | 'link_instagram' | 'link_twitch';
+  | 'link_youtube' | 'link_twitter' | 'link_facebook' | 'link_instagram' | 'link_twitch'
+  | 'group' | 'sub_title';
 
 /** Fields curators can edit on a submission. */
 const EDITABLE_FIELDS: ReadonlyArray<{ key: EditableKey; label: string; multiline?: boolean }> = [
   { key: 'display_name', label: 'Display Name' },
   { key: 'slug', label: 'Slug' },
   { key: 'brand_name', label: 'Brand Name' },
+  { key: 'group', label: 'Group' },
+  { key: 'sub_title', label: 'Sub Title' },
   { key: 'youtube_channel_url', label: 'YouTube Channel URL' },
   { key: 'description', label: 'Description', multiline: true },
   { key: 'avatar_url', label: 'Avatar URL' },
@@ -23,6 +26,28 @@ const EDITABLE_FIELDS: ReadonlyArray<{ key: EditableKey; label: string; multilin
   { key: 'link_instagram', label: 'Link: Instagram' },
   { key: 'link_twitch', label: 'Link: Twitch' },
 ];
+
+/** The 12 theme color tokens used in registry.json. */
+const THEME_KEYS = [
+  'accentPrimary', 'accentPrimaryDark', 'accentPrimaryLight',
+  'accentSecondary', 'accentSecondaryLight',
+  'bgPageStart', 'bgPageMid', 'bgPageEnd',
+  'bgAccentPrimary', 'bgAccentPrimaryMuted',
+  'borderAccentPrimary', 'borderAccentSecondary',
+] as const;
+
+type ThemeColors = Record<(typeof THEME_KEYS)[number], string>;
+
+function parseThemeJson(json: string): ThemeColors {
+  const empty: ThemeColors = Object.fromEntries(THEME_KEYS.map((k) => [k, '#000000'])) as ThemeColors;
+  if (!json) return empty;
+  try {
+    const parsed = JSON.parse(json);
+    return { ...empty, ...parsed };
+  } catch {
+    return empty;
+  }
+}
 
 export default function NovaSubmissions({ user }: { user: AuthUser }) {
   const [submissions, setSubmissions] = useState<NovaSubmission[]>([]);
@@ -163,12 +188,16 @@ function SubmissionRow({
 }) {
   const [editing, setEditing] = useState(false);
   const [draft, setDraft] = useState<Record<EditableKey, string>>(() => buildDraft(sub));
+  const [themeDraft, setThemeDraft] = useState<ThemeColors>(() => parseThemeJson(sub.theme_json));
+  const [enabledDraft, setEnabledDraft] = useState(sub.enabled === 1);
   const [saving, setSaving] = useState(false);
   const [saveError, setSaveError] = useState<string | null>(null);
 
   // Reset draft when submission changes (e.g. after save or status change)
   useEffect(() => {
     setDraft(buildDraft(sub));
+    setThemeDraft(parseThemeJson(sub.theme_json));
+    setEnabledDraft(sub.enabled === 1);
   }, [sub]);
 
   const handleSave = async () => {
@@ -176,11 +205,21 @@ function SubmissionRow({
     setSaveError(null);
     try {
       // Only send fields that actually changed
-      const changes: Record<string, string> = {};
+      const changes: Record<string, string | number> = {};
       for (const { key } of EDITABLE_FIELDS) {
         if (draft[key] !== (sub[key] ?? '')) {
           changes[key] = draft[key];
         }
+      }
+      // Theme JSON
+      const newThemeJson = JSON.stringify(themeDraft);
+      if (newThemeJson !== (sub.theme_json || '')) {
+        changes.theme_json = newThemeJson;
+      }
+      // Enabled
+      const newEnabled = enabledDraft ? 1 : 0;
+      if (newEnabled !== sub.enabled) {
+        changes.enabled = newEnabled;
       }
       if (Object.keys(changes).length === 0) {
         setEditing(false);
@@ -198,6 +237,8 @@ function SubmissionRow({
 
   const handleCancel = () => {
     setDraft(buildDraft(sub));
+    setThemeDraft(parseThemeJson(sub.theme_json));
+    setEnabledDraft(sub.enabled === 1);
     setSaveError(null);
     setEditing(false);
   };
@@ -308,30 +349,72 @@ function SubmissionRow({
 
                 {editing ? (
                   // Edit mode: render all editable fields as inputs
-                  EDITABLE_FIELDS.map(({ key, label, multiline }) => (
-                    <div key={key}>
-                      <label className="text-xs font-medium uppercase text-slate-400">{label}</label>
-                      {multiline ? (
-                        <textarea
-                          value={draft[key]}
-                          onChange={(e) => setDraft((d) => ({ ...d, [key]: e.target.value }))}
-                          rows={3}
-                          className="mt-1 w-full rounded-md border border-slate-300 px-3 py-1.5 text-sm focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500"
-                        />
-                      ) : (
-                        <input
-                          type="text"
-                          value={draft[key]}
-                          onChange={(e) => setDraft((d) => ({ ...d, [key]: e.target.value }))}
-                          className="mt-1 w-full rounded-md border border-slate-300 px-3 py-1.5 text-sm focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500"
-                        />
-                      )}
+                  <>
+                    {EDITABLE_FIELDS.map(({ key, label, multiline }) => (
+                      <div key={key}>
+                        <label className="text-xs font-medium uppercase text-slate-400">{label}</label>
+                        {multiline ? (
+                          <textarea
+                            value={draft[key]}
+                            onChange={(e) => setDraft((d) => ({ ...d, [key]: e.target.value }))}
+                            rows={3}
+                            className="mt-1 w-full rounded-md border border-slate-300 px-3 py-1.5 text-sm focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500"
+                          />
+                        ) : (
+                          <input
+                            type="text"
+                            value={draft[key]}
+                            onChange={(e) => setDraft((d) => ({ ...d, [key]: e.target.value }))}
+                            className="mt-1 w-full rounded-md border border-slate-300 px-3 py-1.5 text-sm focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500"
+                          />
+                        )}
+                      </div>
+                    ))}
+
+                    {/* Enabled toggle */}
+                    <div className="flex items-center gap-2">
+                      <label className="text-xs font-medium uppercase text-slate-400">Enabled</label>
+                      <input
+                        type="checkbox"
+                        checked={enabledDraft}
+                        onChange={(e) => setEnabledDraft(e.target.checked)}
+                        className="h-4 w-4 rounded border-slate-300 text-blue-600 focus:ring-blue-500"
+                      />
+                      <span className="text-xs text-slate-500">
+                        {enabledDraft ? 'Visible on site' : 'Hidden from site'}
+                      </span>
                     </div>
-                  ))
+
+                    {/* Theme color editor */}
+                    <div>
+                      <label className="text-xs font-medium uppercase text-slate-400">Theme Colors</label>
+                      <div className="mt-1 grid grid-cols-2 gap-2">
+                        {THEME_KEYS.map((key) => (
+                          <div key={key} className="flex items-center gap-2">
+                            <input
+                              type="color"
+                              value={themeDraft[key]}
+                              onChange={(e) =>
+                                setThemeDraft((d) => ({ ...d, [key]: e.target.value.toUpperCase() }))
+                              }
+                              className="h-7 w-7 cursor-pointer rounded border border-slate-300 p-0"
+                            />
+                            <div className="min-w-0 flex-1">
+                              <span className="block truncate text-xs text-slate-600">{key}</span>
+                              <span className="block font-mono text-[10px] text-slate-400">{themeDraft[key]}</span>
+                            </div>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  </>
                 ) : (
                   // View mode: render all fields as read-only
                   <>
                     <DetailField label="Brand Name" value={sub.brand_name} />
+                    <DetailField label="Group" value={sub.group} />
+                    <DetailField label="Sub Title" value={sub.sub_title} />
+                    <DetailField label="Enabled" value={sub.enabled === 1 ? 'Yes' : 'No'} />
                     <DetailField label="YouTube Channel URL">
                       <a
                         href={sub.youtube_channel_url}
@@ -368,6 +451,23 @@ function SubmissionRow({
                         ))}
                       </div>
                     </div>
+
+                    {/* Theme color preview */}
+                    {sub.theme_json && (
+                      <div>
+                        <p className="text-xs font-medium uppercase text-slate-400">Theme Colors</p>
+                        <div className="mt-1 flex flex-wrap gap-1">
+                          {Object.entries(parseThemeJson(sub.theme_json)).map(([key, color]) => (
+                            <div
+                              key={key}
+                              title={`${key}: ${color}`}
+                              className="h-5 w-5 rounded border border-slate-200"
+                              style={{ backgroundColor: color }}
+                            />
+                          ))}
+                        </div>
+                      </div>
+                    )}
 
                     <DetailField label="Reviewed At" value={sub.reviewed_at ?? ''} />
                     <DetailField label="Reviewer Note" value={sub.reviewer_note} />
