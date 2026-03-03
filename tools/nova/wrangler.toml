@@ -1,0 +1,16 @@
+name = "oshi-prism-nova"
+main = "src/index.ts"
+compatibility_date = "2024-12-01"
+
+[vars]
+TURNSTILE_SITE_KEY = "0x4AAAAAAClisXs99lkojH74"
+
+[observability]
+[observability.logs]
+enabled = true
+invocation_logs = true
+
+[[d1_databases]]
+binding = "DB"
+database_name = "oshi-prism-nova"
+database_id = "ebf4d5ff-68f9-4e2e-b95c-9afefd0cbc0c"
