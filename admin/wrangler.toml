@@ -1,0 +1,28 @@
+name = "prism-admin"
+main = "src/index.ts"
+compatibility_date = "2024-12-01"
+
+[build]
+command = "cd .. && npm install"
+
+# Serve the admin UI as static assets from the Worker
+[assets]
+directory = "./ui/dist"
+not_found_handling = "single-page-application"
+binding = "ASSETS"
+
+[vars]
+# Comma-separated list of curator emails
+CURATOR_EMAILS = "z54981220@gmail.com"
+# Per-streamer YouTube channel config (JSON map: slug → { channelId })
+STREAMER_CONFIG = '{"mizuki":{"channelId":"UCjv4bfP_67WLuPheS-Z8Ekg"}}'
+
+[observability]
+[observability.logs]
+enabled = true
+invocation_logs = true
+
+[[d1_databases]]
+binding = "DB"
+database_name = "mizukiprism-staging"
+database_id = "02f829c1-b66a-44e3-b475-2a10720b7edb"

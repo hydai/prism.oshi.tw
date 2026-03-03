@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>MizukiLens EndStamp Editor</title>
+  <link rel="stylesheet" href="/static/stamp.css">
+</head>
+<body>
+  <header>
+    <h1>MizukiLens EndStamp Editor</h1>
+    <div id="stats" class="stats"></div>
+  </header>
+
+  <main>
+    <aside id="stream-list" class="stream-list">
+      <h2>Streams</h2>
+      <div id="status-filter" class="status-filter">
+        <button class="status-btn active" data-status="approved">Approved</button>
+        <button class="status-btn active" data-status="exported">Exported</button>
+        <button class="status-btn active" data-status="imported">Imported</button>
+      </div>
+      <ul id="streams"></ul>
+    </aside>
+
+    <section class="content">
+      <div id="player-container" class="player-container">
+        <div id="player"></div>
+        <p class="placeholder-text" id="player-placeholder">Select a stream to load the YouTube player</p>
+      </div>
+
+      <div id="song-panel" class="song-panel">
+        <h2>Songs <span id="song-count" class="badge"></span></h2>
+        <ul id="songs"></ul>
+
+        <div class="controls">
+          <button id="btn-mark" class="btn btn-mark" disabled title="Mark end timestamp (m)">Mark End</button>
+          <button id="btn-mark-start" class="btn btn-mark-start" disabled title="Set start timestamp (t)">Set Start</button>
+          <button id="btn-seek" class="btn btn-seek" disabled title="Seek to start (s)">Seek to Start</button>
+          <button id="btn-seek-end" class="btn btn-seek-end" disabled title="Seek to end −10s (e)">Seek to End</button>
+          <button id="btn-fetch" class="btn btn-fetch" disabled title="Fetch duration from iTunes (f)">Fetch Duration</button>
+          <button id="btn-fetch-all" class="btn btn-fetch" disabled title="Fetch all missing durations (F)">Fetch All</button>
+          <button id="btn-clear-all" class="btn btn-clear-all" disabled title="Clear all end timestamps">Clear All Ends</button>
+          <button id="btn-refetch" class="btn btn-refetch" disabled title="Re-extract timestamps (r)">Refetch</button>
+          <button id="btn-copy-id" class="btn btn-copy-id" disabled title="Copy video ID (c)">Copy ID</button>
+          <div class="nav-hint">
+            <kbd>m</kbd> mark end &nbsp; <kbd>t</kbd> set start &nbsp; <kbd>s</kbd> seek start &nbsp; <kbd>e</kbd> seek end &nbsp; <kbd>f</kbd> fetch duration &nbsp; <kbd>F</kbd> fetch all &nbsp; <kbd>d</kbd> delete &nbsp; <kbd>r</kbd> refetch &nbsp; <kbd>c</kbd> copy ID &nbsp; <kbd>n</kbd>/<kbd>p</kbd> next/prev &nbsp; <kbd>←</kbd>/<kbd>→</kbd> seek ±5s
+          </div>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <script src="https://www.youtube.com/iframe_api"></script>
+  <script src="/static/stamp.js"></script>
+</body>
+</html>

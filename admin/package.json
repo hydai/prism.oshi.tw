@@ -1,0 +1,23 @@
+{
+  "name": "mizukiprism-admin",
+  "version": "0.1.0",
+  "private": true,
+  "scripts": {
+    "dev": "wrangler dev",
+    "deploy": "wrangler deploy",
+    "db:create": "wrangler d1 create mizukiprism-staging",
+    "db:migrate": "wrangler d1 execute mizukiprism-staging --file=schema.sql",
+    "db:migrate:local": "wrangler d1 execute mizukiprism-staging --local --file=schema.sql",
+    "db:seed:local": "npx tsx seed.ts --local",
+    "typecheck": "tsc --noEmit"
+  },
+  "dependencies": {
+    "hono": "^4.7.0"
+  },
+  "devDependencies": {
+    "@cloudflare/workers-types": "^4.20250214.0",
+    "tsx": "^4.21.0",
+    "typescript": "^5.9.3",
+    "wrangler": "^4.0.0"
+  }
+}
