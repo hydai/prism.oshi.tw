@@ -1,12 +1,7 @@
 import { NavLink } from 'react-router-dom';
 import { useEffect, useState, type ReactNode } from 'react';
-import type { AuthUser } from '../../../shared/types';
-import { getCurrentStreamer, setCurrentStreamer, onStreamerChange } from '../api/client';
-
-/** Known streamers — extend this list when adding new streamers. */
-const STREAMERS = [
-  { slug: 'mizuki', label: '浠Mizuki' },
-];
+import type { AuthUser, StreamerInfo } from '../../../shared/types';
+import { api, getCurrentStreamer, setCurrentStreamer, onStreamerChange } from '../api/client';
 
 const navItems = [
   { to: '/', label: 'Dashboard' },
@@ -21,8 +16,25 @@ const navItems = [
 
 export default function Layout({ user, children }: { user: AuthUser; children: ReactNode }) {
   const [streamer, setStreamer] = useState(getCurrentStreamer);
+  const [streamers, setStreamers] = useState<StreamerInfo[]>([]);
 
   useEffect(() => onStreamerChange(setStreamer), []);
+
+  useEffect(() => {
+    api.listStreamers()
+      .then((res) => {
+        setStreamers(res.data);
+        // Auto-correct if stored streamer is not in the approved list
+        const first = res.data[0];
+        if (first && !res.data.some((s) => s.slug === getCurrentStreamer())) {
+          setCurrentStreamer(first.slug);
+          window.location.reload();
+        }
+      })
+      .catch(() => {
+        // Fallback: keep current localStorage value
+      });
+  }, []);
 
   return (
     <div className="flex h-screen">
@@ -47,11 +59,15 @@ export default function Layout({ user, children }: { user: AuthUser; children: R
             }}
             className="w-full rounded-md border border-slate-600 bg-slate-800 px-2 py-1.5 text-sm text-white focus:border-blue-500 focus:outline-none"
           >
-            {STREAMERS.map((s) => (
-              <option key={s.slug} value={s.slug}>
-                {s.label}
-              </option>
-            ))}
+            {streamers.length > 0 ? (
+              streamers.map((s) => (
+                <option key={s.slug} value={s.slug}>
+                  {s.displayName}
+                </option>
+              ))
+            ) : (
+              <option value={streamer}>{streamer}</option>
+            )}
           </select>
         </div>
 

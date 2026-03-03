@@ -61,17 +61,13 @@ import type {
   ExtractImportResponse,
   NovaSubmission,
   NovaStatus,
+  StreamerInfo,
 } from '../shared/types';
-
-type StreamerChannelConfig = {
-  channelId: string;
-};
 
 type Bindings = {
   DB: D1Database;
   NOVA_DB: D1Database;
   CURATOR_EMAILS: string;
-  STREAMER_CONFIG: string; // JSON: Record<slug, StreamerChannelConfig>
   YOUTUBE_API_KEY: string;
 };
 
@@ -84,16 +80,6 @@ const app = new Hono<{ Bindings: Bindings; Variables: Variables }>();
 /** Extract streamer slug from ?streamer= query param, default 'mizuki'. */
 function getStreamerId(c: { req: { query: (key: string) => string | undefined } }): string {
   return c.req.query('streamer') || 'mizuki';
-}
-
-/** Look up a streamer's YouTube channel ID from STREAMER_CONFIG env var. */
-function getChannelId(configJson: string, streamerId: string): string | null {
-  try {
-    const config: Record<string, StreamerChannelConfig> = JSON.parse(configJson);
-    return config[streamerId]?.channelId ?? null;
-  } catch {
-    return null;
-  }
 }
 
 // --- Status transition rules ---
@@ -119,6 +105,22 @@ app.use('/api/*', requireAuth);
 
 app.get('/api/me', async (c) => {
   return c.json(c.get('user'));
+});
+
+// --- Streamers (from NOVA DB) ---
+
+app.get('/api/streamers', async (c) => {
+  const result = await c.env.NOVA_DB
+    .prepare('SELECT slug, display_name FROM submissions WHERE status = ? AND enabled = 1 ORDER BY display_order ASC')
+    .bind('approved')
+    .all<{ slug: string; display_name: string }>();
+
+  const data: StreamerInfo[] = result.results.map((r) => ({
+    slug: r.slug,
+    displayName: r.display_name,
+  }));
+
+  return c.json({ data });
 });
 
 // --- Songs ---
@@ -553,7 +555,11 @@ app.post('/api/pipeline/discover', requireCurator, async (c) => {
     return c.json({ error: 'YOUTUBE_API_KEY not configured. Add it to .dev.vars for local dev or use wrangler secret put for production.' }, 500);
   }
 
-  const channelId = getChannelId(c.env.STREAMER_CONFIG, streamerId);
+  const row = await c.env.NOVA_DB
+    .prepare('SELECT youtube_channel_id FROM submissions WHERE slug = ? AND status = ?')
+    .bind(streamerId, 'approved')
+    .first<{ youtube_channel_id: string }>();
+  const channelId = row?.youtube_channel_id;
   if (!channelId) {
     return c.json({ error: `No channel configured for streamer: ${streamerId}` }, 400);
   }
@@ -820,7 +826,7 @@ app.put('/api/nova/submissions/:id', requireCurator, async (c) => {
   const fields: string[] = [];
   const values: string[] = [];
   const editable = [
-    'youtube_channel_url', 'slug', 'brand_name', 'display_name', 'description',
+    'youtube_channel_url', 'youtube_channel_id', 'slug', 'brand_name', 'display_name', 'description',
     'avatar_url', 'subscriber_count', 'link_youtube', 'link_twitter',
     'link_facebook', 'link_instagram', 'link_twitch', 'reviewer_note',
     'group', 'theme_json', 'enabled', 'display_order',

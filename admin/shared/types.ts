@@ -311,6 +311,7 @@ export type NovaStatus = 'pending' | 'approved' | 'rejected';
 export interface NovaSubmission {
   id: string;
   youtube_channel_url: string;
+  youtube_channel_id: string;
   slug: string;
   brand_name: string;
   display_name: string;
@@ -330,4 +331,9 @@ export interface NovaSubmission {
   submitted_at: string;
   reviewed_at: string | null;
   reviewer_note: string;
+}
+
+export interface StreamerInfo {
+  slug: string;
+  displayName: string;
 }

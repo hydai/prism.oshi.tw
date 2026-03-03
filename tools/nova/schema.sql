@@ -2,6 +2,7 @@ CREATE TABLE IF NOT EXISTS submissions (
   id TEXT PRIMARY KEY,
   youtube_channel_url TEXT NOT NULL,
   youtube_channel_url_normalized TEXT DEFAULT '',
+  youtube_channel_id TEXT DEFAULT '',
   slug TEXT NOT NULL,
   brand_name TEXT DEFAULT '',
   display_name TEXT NOT NULL,

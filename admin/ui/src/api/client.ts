@@ -26,6 +26,7 @@ import type {
   ExtractImportResponse,
   NovaSubmission,
   NovaStatus,
+  StreamerInfo,
 } from '../../../shared/types';
 
 // --- Streamer selection (module-level) ---
@@ -98,6 +99,9 @@ async function request<T>(path: string, init?: RequestInit): Promise<T> {
 export const api = {
   // Auth
   me: () => request<AuthUser>('/api/me'),
+
+  // Streamers
+  listStreamers: () => request<{ data: StreamerInfo[] }>('/api/streamers'),
 
   // Dashboard
   stats: () => request<DashboardStats>('/api/stats'),

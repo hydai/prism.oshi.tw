@@ -4,7 +4,7 @@ import { api } from '../api/client';
 import StatusBadge from '../components/StatusBadge';
 
 type EditableKey =
-  | 'display_name' | 'slug' | 'brand_name' | 'youtube_channel_url'
+  | 'display_name' | 'slug' | 'brand_name' | 'youtube_channel_url' | 'youtube_channel_id'
   | 'description' | 'avatar_url' | 'subscriber_count'
   | 'link_youtube' | 'link_twitter' | 'link_facebook' | 'link_instagram' | 'link_twitch'
   | 'group';
@@ -16,6 +16,7 @@ const EDITABLE_FIELDS: ReadonlyArray<{ key: EditableKey; label: string; multilin
   { key: 'brand_name', label: 'Brand Name' },
   { key: 'group', label: 'Group' },
   { key: 'youtube_channel_url', label: 'YouTube Channel URL' },
+  { key: 'youtube_channel_id', label: 'YouTube Channel ID' },
   { key: 'description', label: 'Description', multiline: true },
   { key: 'avatar_url', label: 'Avatar URL' },
   { key: 'subscriber_count', label: 'Subscriber Count' },
@@ -443,6 +444,7 @@ function SubmissionRow({
                         {sub.youtube_channel_url}
                       </a>
                     </DetailField>
+                    <DetailField label="YouTube Channel ID" value={sub.youtube_channel_id} />
                     <DetailField label="Description" value={sub.description} />
                     <DetailField label="Subscriber Count" value={sub.subscriber_count} />
 
