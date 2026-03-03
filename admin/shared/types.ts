@@ -322,6 +322,10 @@ export interface NovaSubmission {
   link_facebook: string;
   link_instagram: string;
   link_twitch: string;
+  group: string;
+  sub_title: string;
+  enabled: number;
+  theme_json: string;
   status: NovaStatus;
   submitted_at: string;
   reviewed_at: string | null;

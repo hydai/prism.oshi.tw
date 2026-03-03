@@ -20,6 +20,10 @@ export interface SubmissionRow {
   link_facebook: string;
   link_instagram: string;
   link_twitch: string;
+  group: string;
+  sub_title: string;
+  enabled: number;
+  theme_json: string;
   status: SubmissionStatus;
   submitted_at: string;
   reviewed_at: string | null;
