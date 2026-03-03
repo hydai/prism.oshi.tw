@@ -10,13 +10,8 @@ import {
   Users,
   Building2,
   User,
-  Heart,
-  Clock,
   Plus,
   Play,
-  Youtube,
-  Twitter,
-  Globe,
 } from 'lucide-react';
 
 const streamers = (registryData.streamers as StreamerConfig[]).filter(
@@ -146,58 +141,6 @@ export default function HomePage() {
           </nav>
         </div>
 
-        {/* Spacer */}
-        <div className="flex-1" />
-
-        {/* Playlists (placeholders) */}
-        <div className="px-4 pb-2">
-          <p
-            className="mb-2 px-2 text-[10px] font-semibold uppercase tracking-widest"
-            style={{ color: 'var(--text-tertiary)' }}
-          >
-            Playlists
-          </p>
-          <nav className="flex flex-col gap-1">
-            <div
-              className="flex items-center gap-3 rounded-radius-lg px-3 py-2 text-token-sm font-medium"
-              style={{ color: 'var(--text-secondary)' }}
-            >
-              <Heart className="h-4 w-4 flex-shrink-0" />
-              Favorites
-            </div>
-            <div
-              className="flex items-center gap-3 rounded-radius-lg px-3 py-2 text-token-sm font-medium"
-              style={{ color: 'var(--text-secondary)' }}
-            >
-              <Clock className="h-4 w-4 flex-shrink-0" />
-              Recently Played
-            </div>
-          </nav>
-        </div>
-
-        {/* Footer social row */}
-        <div
-          className="flex items-center gap-2 border-t px-5 py-4"
-          style={{ borderColor: 'var(--border-glass)' }}
-        >
-          {[
-            { icon: Youtube, href: '#', color: '#FF0000' },
-            { icon: Twitter, href: '#', color: '#1DA1F2' },
-            { icon: Globe, href: '#', color: 'var(--text-tertiary)' },
-          ].map(({ icon: Icon, href, color }, i) => (
-            <a
-              key={i}
-              href={href}
-              className="flex h-8 w-8 items-center justify-center rounded-full transition-all hover:scale-110"
-              style={{
-                background: 'var(--bg-surface-frosted)',
-                border: '1px solid var(--border-glass)',
-              }}
-            >
-              <Icon className="h-3.5 w-3.5" style={{ color }} />
-            </a>
-          ))}
-        </div>
       </aside>
 
       {/* ── Main Content ── */}
@@ -227,7 +170,7 @@ export default function HomePage() {
             }}
           >
             <Plus className="h-4 w-4" />
-            Propose a new streamer
+            提議新 VTuber
           </a>
         </header>
 
@@ -286,20 +229,6 @@ export default function HomePage() {
 
         {/* Streamer section */}
         <section className="px-6 py-6 lg:px-8">
-          {/* Section header */}
-          <div className="mb-4 flex items-center gap-2">
-            <Users
-              className="h-4 w-4"
-              style={{ color: 'var(--text-tertiary)' }}
-            />
-            <h2
-              className="text-[10px] font-semibold uppercase tracking-widest"
-              style={{ color: 'var(--text-tertiary)' }}
-            >
-              全部 VTuber
-            </h2>
-          </div>
-
           {/* Horizontal scroll card row */}
           <div className="flex gap-5 overflow-x-auto pb-4 snap-x snap-mandatory scrollbar-none">
             {filtered.map((streamer) => (
