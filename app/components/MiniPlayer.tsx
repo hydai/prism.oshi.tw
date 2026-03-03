@@ -4,6 +4,7 @@ import { useEffect, useState } from 'react';
 import { usePathname } from 'next/navigation';
 import Link from 'next/link';
 import { Play, Pause, SkipBack, SkipForward, ListMusic, AlertCircle, Shuffle, Repeat, Repeat1, Heart, Maximize2 } from 'lucide-react';
+import { useStreamer } from '../contexts/StreamerContext';
 import { usePlayer } from '../contexts/PlayerContext';
 import { useLikedSongs } from '../contexts/LikedSongsContext';
 import AlbumArt from './AlbumArt';
@@ -11,6 +12,7 @@ import VolumeControl from './VolumeControl';
 import ProgressBar from './ProgressBar';
 
 export default function MiniPlayer() {
+  const { slug } = useStreamer();
   const {
     currentTrack,
     isPlaying,
@@ -31,7 +33,7 @@ export default function MiniPlayer() {
   } = usePlayer();
 
   const pathname = usePathname();
-  const isNowPlayingPage = pathname === '/now-playing';
+  const isNowPlayingPage = pathname === `/${slug}/now-playing`;
 
   const { isLiked: checkIsLiked, toggleLike } = useLikedSongs();
 
@@ -410,7 +412,7 @@ export default function MiniPlayer() {
           >
             {/* Expand to full Now Playing page */}
             <Link
-              href="/now-playing"
+              href={`/${slug}/now-playing`}
               onClick={(e) => e.stopPropagation()}
               className="transition-colors hover-text-primary"
               aria-label="Expand to full page"

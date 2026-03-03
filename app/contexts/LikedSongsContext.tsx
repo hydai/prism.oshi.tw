@@ -30,11 +30,11 @@ export const useLikedSongs = () => {
   return context;
 };
 
-const STORAGE_KEY = 'mizukiprism_liked_songs';
+const LEGACY_STORAGE_KEY = 'mizukiprism_liked_songs';
 
 function isLocalStorageAvailable(): boolean {
   try {
-    const testKey = '__mizukiprism_ls_test__';
+    const testKey = '__prism_ls_test__';
     localStorage.setItem(testKey, '1');
     localStorage.removeItem(testKey);
     return true;
@@ -43,11 +43,25 @@ function isLocalStorageAvailable(): boolean {
   }
 }
 
-export const LikedSongsProvider = ({ children }: { children: ReactNode }) => {
+export const LikedSongsProvider = ({ streamerSlug, children }: { streamerSlug: string; children: ReactNode }) => {
+  const STORAGE_KEY = `prism_${streamerSlug}_liked_songs`;
   const [likedSongs, setLikedSongs] = useState<LikedVersion[]>([]);
   const [localStorageSupported] = useState(() =>
     typeof window !== 'undefined' ? isLocalStorageAvailable() : true
   );
+
+  // Migrate legacy key for Mizuki users
+  useEffect(() => {
+    if (streamerSlug !== 'mizuki') return;
+    try {
+      const legacy = localStorage.getItem(LEGACY_STORAGE_KEY);
+      if (legacy && !localStorage.getItem(STORAGE_KEY)) {
+        localStorage.setItem(STORAGE_KEY, legacy);
+        localStorage.removeItem(LEGACY_STORAGE_KEY);
+      }
+    } catch {}
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   // Load from localStorage on mount
   useEffect(() => {
@@ -59,6 +73,7 @@ export const LikedSongsProvider = ({ children }: { children: ReactNode }) => {
     } catch (error) {
       console.error('Failed to load liked songs from localStorage:', error);
     }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   const saveToLocalStorage = (songs: LikedVersion[]): boolean => {

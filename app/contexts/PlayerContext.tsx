@@ -80,7 +80,9 @@ declare global {
   }
 }
 
-export const PlayerProvider = ({ children }: { children: ReactNode }) => {
+export const PlayerProvider = ({ streamerSlug, children }: { streamerSlug: string; children: ReactNode }) => {
+  const volumeKey = `prism_${streamerSlug}_volume`;
+  const mutedKey = `prism_${streamerSlug}_muted`;
   const [currentTrack, setCurrentTrack] = useState<Track | null>(null);
   const [isPlaying, setIsPlaying] = useState(false);
   const [isPlayerReady, setIsPlayerReady] = useState(false);
@@ -135,11 +137,29 @@ export const PlayerProvider = ({ children }: { children: ReactNode }) => {
   useEffect(() => { volumeRef.current = volume; }, [volume]);
   useEffect(() => { isMutedRef.current = isMuted; }, [isMuted]);
 
+  // Migrate legacy localStorage keys for Mizuki
+  useEffect(() => {
+    if (streamerSlug !== 'mizuki') return;
+    try {
+      const legacyVolume = localStorage.getItem('mizuki-volume');
+      const legacyMuted = localStorage.getItem('mizuki-muted');
+      if (legacyVolume !== null && localStorage.getItem(volumeKey) === null) {
+        localStorage.setItem(volumeKey, legacyVolume);
+        localStorage.removeItem('mizuki-volume');
+      }
+      if (legacyMuted !== null && localStorage.getItem(mutedKey) === null) {
+        localStorage.setItem(mutedKey, legacyMuted);
+        localStorage.removeItem('mizuki-muted');
+      }
+    } catch {}
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
   // Load volume/mute from localStorage on mount (SSR-safe)
   useEffect(() => {
     try {
-      const savedVolume = localStorage.getItem('mizuki-volume');
-      const savedMuted = localStorage.getItem('mizuki-muted');
+      const savedVolume = localStorage.getItem(volumeKey);
+      const savedMuted = localStorage.getItem(mutedKey);
       if (savedVolume !== null) {
         const v = Number(savedVolume);
         if (!isNaN(v) && v >= 0 && v <= 100) {
@@ -155,6 +175,7 @@ export const PlayerProvider = ({ children }: { children: ReactNode }) => {
     } catch {
       // localStorage unavailable — use session defaults
     }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   const setVolume = (n: number) => {
@@ -169,9 +190,9 @@ export const PlayerProvider = ({ children }: { children: ReactNode }) => {
       if (playerRef.current && playerRef.current.unMute) {
         playerRef.current.unMute();
       }
-      try { localStorage.setItem('mizuki-muted', 'false'); } catch {}
+      try { localStorage.setItem(mutedKey, 'false'); } catch {}
     }
-    try { localStorage.setItem('mizuki-volume', String(clamped)); } catch {}
+    try { localStorage.setItem(volumeKey, String(clamped)); } catch {}
   };
 
   const toggleMute = () => {
@@ -184,7 +205,7 @@ export const PlayerProvider = ({ children }: { children: ReactNode }) => {
         playerRef.current.unMute?.();
       }
     }
-    try { localStorage.setItem('mizuki-muted', String(newMuted)); } catch {}
+    try { localStorage.setItem(mutedKey, String(newMuted)); } catch {}
   };
 
   // Advance to next non-deleted track in queue, skipping deleted ones.

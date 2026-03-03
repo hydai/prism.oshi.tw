@@ -12,13 +12,13 @@ import QueuePanel from './QueuePanel';
 import RecentlyPlayedTracker from './RecentlyPlayedTracker';
 import { ReactNode } from 'react';
 
-export default function PlayerWrapper({ children }: { children: ReactNode }) {
+export default function PlayerWrapper({ streamerSlug, children }: { streamerSlug: string; children: ReactNode }) {
   return (
     <FanAuthProvider>
-      <PlayerProvider>
-        <PlaylistProvider>
-          <LikedSongsProvider>
-            <RecentlyPlayedProvider>
+      <PlayerProvider streamerSlug={streamerSlug}>
+        <PlaylistProvider streamerSlug={streamerSlug}>
+          <LikedSongsProvider streamerSlug={streamerSlug}>
+            <RecentlyPlayedProvider streamerSlug={streamerSlug}>
               {children}
               <MiniPlayer />
               <NowPlayingModal />

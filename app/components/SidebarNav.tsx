@@ -13,6 +13,7 @@ import {
   Plus,
   ListMusic,
 } from 'lucide-react';
+import { useStreamer } from '../contexts/StreamerContext';
 
 interface SidebarNavProps {
   activePage: 'home' | 'now-playing';
@@ -47,6 +48,7 @@ export default function SidebarNav({
   searchSlot,
   children,
 }: SidebarNavProps) {
+  const { slug, brandName, displayName } = useStreamer();
   const homeActive = isHomeActive ?? activePage === 'home';
   const nowPlayingActive = activePage === 'now-playing';
 
@@ -85,7 +87,7 @@ export default function SidebarNav({
           className="font-bold text-xl tracking-tight bg-clip-text text-transparent"
           style={{ backgroundImage: 'linear-gradient(135deg, var(--accent-pink), var(--accent-blue))' }}
         >
-          MizukiPrism
+          {brandName}
         </span>
       </div>
 
@@ -115,7 +117,7 @@ export default function SidebarNav({
             </button>
           ) : (
             <Link
-              href="/"
+              href={`/${slug}`}
               className={homeActive ? navItemClass : inactiveNavItemClass}
               style={homeActive ? activeStyle : inactiveStyle}
             >
@@ -126,7 +128,7 @@ export default function SidebarNav({
 
           {/* Now Playing */}
           <Link
-            href="/now-playing"
+            href={`/${slug}/now-playing`}
             className={nowPlayingActive ? navItemClass : inactiveNavItemClass}
             style={nowPlayingActive ? activeStyle : inactiveStyle}
           >
@@ -253,7 +255,7 @@ export default function SidebarNav({
         style={{ borderTop: '1px solid var(--border-glass)' }}
       >
         <p className="text-xs mt-2 text-center" style={{ color: 'var(--text-muted)' }}>
-          Made with <Heart className="w-3 h-3 inline text-pink-400 fill-current" /> for 浠Mizuki
+          Made with <Heart className="w-3 h-3 inline text-pink-400 fill-current" /> for {displayName}
         </p>
       </div>
     </aside>

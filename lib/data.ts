@@ -1,6 +1,6 @@
 import fs from 'fs';
 import path from 'path';
-import { Song, Stream } from './types';
+import { Song, Stream, SongMetadata, ArtistInfo } from './types';
 export {
   validateYoutubeUrl,
   validateTimestamp,
@@ -9,25 +9,44 @@ export {
   extractVideoId,
 } from './utils';
 
-const songsPath = path.join(process.cwd(), 'data', 'songs.json');
-const streamsPath = path.join(process.cwd(), 'data', 'streams.json');
+function dataPath(slug: string, ...segments: string[]): string {
+  return path.join(process.cwd(), 'data', slug, ...segments);
+}
 
-export function readSongs(): Song[] {
-  const raw = fs.readFileSync(songsPath, 'utf-8');
+export function readSongs(slug: string): Song[] {
+  const raw = fs.readFileSync(dataPath(slug, 'songs.json'), 'utf-8');
   return JSON.parse(raw) as Song[];
 }
 
-export function writeSongs(songs: Song[]): void {
-  fs.writeFileSync(songsPath, JSON.stringify(songs, null, 2), 'utf-8');
+export function writeSongs(slug: string, songs: Song[]): void {
+  fs.writeFileSync(dataPath(slug, 'songs.json'), JSON.stringify(songs, null, 2), 'utf-8');
 }
 
-export function readStreams(): Stream[] {
-  const raw = fs.readFileSync(streamsPath, 'utf-8');
+export function readStreams(slug: string): Stream[] {
+  const raw = fs.readFileSync(dataPath(slug, 'streams.json'), 'utf-8');
   return JSON.parse(raw) as Stream[];
 }
 
-export function writeStreams(streams: Stream[]): void {
-  fs.writeFileSync(streamsPath, JSON.stringify(streams, null, 2), 'utf-8');
+export function writeStreams(slug: string, streams: Stream[]): void {
+  fs.writeFileSync(dataPath(slug, 'streams.json'), JSON.stringify(streams, null, 2), 'utf-8');
+}
+
+export function readSongMetadata(slug: string): SongMetadata[] {
+  try {
+    const raw = fs.readFileSync(dataPath(slug, 'metadata', 'song-metadata.json'), 'utf-8');
+    return JSON.parse(raw) as SongMetadata[];
+  } catch {
+    return [];
+  }
+}
+
+export function readArtistInfo(slug: string): ArtistInfo[] {
+  try {
+    const raw = fs.readFileSync(dataPath(slug, 'metadata', 'artist-info.json'), 'utf-8');
+    return JSON.parse(raw) as ArtistInfo[];
+  } catch {
+    return [];
+  }
 }
 
 export function generateId(prefix: string): string {

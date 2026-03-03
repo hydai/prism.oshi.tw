@@ -22,7 +22,7 @@ export interface Playlist {
 export interface PlaylistExportEnvelope {
   version: 1;
   exportedAt: string;
-  source: 'MizukiPrism';
+  source: 'Prism';
   playlists: Playlist[];
 }
 
@@ -51,13 +51,13 @@ export const usePlaylist = () => {
   return context;
 };
 
-const STORAGE_KEY = 'mizukiprism_playlists';
+const LEGACY_STORAGE_KEY = 'mizukiprism_playlists';
 const STORAGE_QUOTA_ERROR = '本機儲存空間不足';
 const STORAGE_UNSUPPORTED_ERROR = '您的瀏覽器不支援本機儲存，播放清單功能無法使用';
 
 function isLocalStorageAvailable(): boolean {
   try {
-    const testKey = '__mizukiprism_ls_test__';
+    const testKey = '__prism_ls_test__';
     localStorage.setItem(testKey, '1');
     localStorage.removeItem(testKey);
     return true;
@@ -87,7 +87,7 @@ function buildEnvelope(playlists: Playlist[]): PlaylistExportEnvelope {
   return {
     version: 1,
     exportedAt: new Date().toISOString(),
-    source: 'MizukiPrism',
+    source: 'Prism',
     playlists,
   };
 }
@@ -99,8 +99,8 @@ function validateImport(data: unknown): { valid: true; playlists: Playlist[] } |
 
   const envelope = data as Record<string, unknown>;
 
-  if (envelope.source !== 'MizukiPrism') {
-    return { valid: false, error: '非 MizukiPrism 匯出檔案' };
+  if (envelope.source !== 'Prism' && envelope.source !== 'MizukiPrism') {
+    return { valid: false, error: '非 Prism 匯出檔案' };
   }
 
   if (envelope.version !== 1) {
@@ -137,12 +137,26 @@ function validateImport(data: unknown): { valid: true; playlists: Playlist[] } |
   return { valid: true, playlists: validPlaylists };
 }
 
-export const PlaylistProvider = ({ children }: { children: ReactNode }) => {
+export const PlaylistProvider = ({ streamerSlug, children }: { streamerSlug: string; children: ReactNode }) => {
+  const STORAGE_KEY = `prism_${streamerSlug}_playlists`;
   const [playlists, setPlaylists] = useState<Playlist[]>([]);
   const [storageError, setStorageError] = useState<string | null>(null);
   const [localStorageSupported] = useState(() =>
     typeof window !== 'undefined' ? isLocalStorageAvailable() : true
   );
+
+  // Migrate legacy localStorage key for Mizuki users
+  useEffect(() => {
+    if (streamerSlug !== 'mizuki') return;
+    try {
+      const legacy = localStorage.getItem(LEGACY_STORAGE_KEY);
+      if (legacy && !localStorage.getItem(STORAGE_KEY)) {
+        localStorage.setItem(STORAGE_KEY, legacy);
+        localStorage.removeItem(LEGACY_STORAGE_KEY);
+      }
+    } catch {}
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   // Load playlists from localStorage on mount
   useEffect(() => {
@@ -159,6 +173,7 @@ export const PlaylistProvider = ({ children }: { children: ReactNode }) => {
     } catch (error) {
       console.error('Failed to load playlists from localStorage:', error);
     }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   const saveToLocalStorage = (newPlaylists: Playlist[]): boolean => {
@@ -289,13 +304,13 @@ export const PlaylistProvider = ({ children }: { children: ReactNode }) => {
 
   const exportAll = () => {
     if (playlists.length === 0) return;
-    downloadJson(buildEnvelope(playlists), `mizukiprism-playlists-${formatDate()}.json`);
+    downloadJson(buildEnvelope(playlists), `prism-playlists-${formatDate()}.json`);
   };
 
   const exportSingle = (playlistId: string) => {
     const playlist = playlists.find(p => p.id === playlistId);
     if (!playlist) return;
-    downloadJson(buildEnvelope([playlist]), `mizukiprism-${playlist.name}-${formatDate()}.json`);
+    downloadJson(buildEnvelope([playlist]), `prism-${playlist.name}-${formatDate()}.json`);
   };
 
   const importPlaylists = async (file: File): Promise<{ success: boolean; count?: number; error?: string }> => {
