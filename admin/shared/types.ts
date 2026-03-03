@@ -324,6 +324,7 @@ export interface NovaSubmission {
   link_twitch: string;
   group: string;
   enabled: number;
+  display_order: number;
   theme_json: string;
   status: NovaStatus;
   submitted_at: string;

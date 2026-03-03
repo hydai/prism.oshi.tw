@@ -189,6 +189,7 @@ function SubmissionRow({
   const [draft, setDraft] = useState<Record<EditableKey, string>>(() => buildDraft(sub));
   const [themeDraft, setThemeDraft] = useState<ThemeColors>(() => parseThemeJson(sub.theme_json));
   const [enabledDraft, setEnabledDraft] = useState(sub.enabled === 1);
+  const [orderDraft, setOrderDraft] = useState(sub.display_order ?? 0);
   const [saving, setSaving] = useState(false);
   const [saveError, setSaveError] = useState<string | null>(null);
 
@@ -197,6 +198,7 @@ function SubmissionRow({
     setDraft(buildDraft(sub));
     setThemeDraft(parseThemeJson(sub.theme_json));
     setEnabledDraft(sub.enabled === 1);
+    setOrderDraft(sub.display_order ?? 0);
   }, [sub]);
 
   const handleSave = async () => {
@@ -220,6 +222,10 @@ function SubmissionRow({
       if (newEnabled !== sub.enabled) {
         changes.enabled = newEnabled;
       }
+      // Display order
+      if (orderDraft !== (sub.display_order ?? 0)) {
+        changes.display_order = orderDraft;
+      }
       if (Object.keys(changes).length === 0) {
         setEditing(false);
         return;
@@ -238,6 +244,7 @@ function SubmissionRow({
     setDraft(buildDraft(sub));
     setThemeDraft(parseThemeJson(sub.theme_json));
     setEnabledDraft(sub.enabled === 1);
+    setOrderDraft(sub.display_order ?? 0);
     setSaveError(null);
     setEditing(false);
   };
@@ -370,18 +377,30 @@ function SubmissionRow({
                       </div>
                     ))}
 
-                    {/* Enabled toggle */}
-                    <div className="flex items-center gap-2">
-                      <label className="text-xs font-medium uppercase text-slate-400">Enabled</label>
-                      <input
-                        type="checkbox"
-                        checked={enabledDraft}
-                        onChange={(e) => setEnabledDraft(e.target.checked)}
-                        className="h-4 w-4 rounded border-slate-300 text-blue-600 focus:ring-blue-500"
-                      />
-                      <span className="text-xs text-slate-500">
-                        {enabledDraft ? 'Visible on site' : 'Hidden from site'}
-                      </span>
+                    {/* Enabled toggle + Display order */}
+                    <div className="flex items-center gap-4">
+                      <div className="flex items-center gap-2">
+                        <label className="text-xs font-medium uppercase text-slate-400">Enabled</label>
+                        <input
+                          type="checkbox"
+                          checked={enabledDraft}
+                          onChange={(e) => setEnabledDraft(e.target.checked)}
+                          className="h-4 w-4 rounded border-slate-300 text-blue-600 focus:ring-blue-500"
+                        />
+                        <span className="text-xs text-slate-500">
+                          {enabledDraft ? 'Visible on site' : 'Hidden from site'}
+                        </span>
+                      </div>
+                      <div className="flex items-center gap-2">
+                        <label className="text-xs font-medium uppercase text-slate-400">Order</label>
+                        <input
+                          type="number"
+                          value={orderDraft}
+                          onChange={(e) => setOrderDraft(Number(e.target.value))}
+                          className="w-20 rounded-md border border-slate-300 px-2 py-1 text-sm focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500"
+                        />
+                        <span className="text-xs text-slate-500">Lower = first</span>
+                      </div>
                     </div>
 
                     {/* Theme color editor */}
@@ -413,6 +432,7 @@ function SubmissionRow({
                     <DetailField label="Brand Name" value={sub.brand_name} />
                     <DetailField label="Group" value={sub.group} />
                     <DetailField label="Enabled" value={sub.enabled === 1 ? 'Yes' : 'No'} />
+                    <DetailField label="Display Order" value={String(sub.display_order ?? 0)} />
                     <DetailField label="YouTube Channel URL">
                       <a
                         href={sub.youtube_channel_url}

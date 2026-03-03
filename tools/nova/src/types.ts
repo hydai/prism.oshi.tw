@@ -22,6 +22,7 @@ export interface SubmissionRow {
   link_twitch: string;
   group: string;
   enabled: number;
+  display_order: number;
   theme_json: string;
   status: SubmissionStatus;
   submitted_at: string;

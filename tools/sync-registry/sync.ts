@@ -33,6 +33,7 @@ interface SubmissionRow {
   subscriber_count: string;
   group: string;
   enabled: number;
+  display_order: number;
   theme_json: string;
   link_youtube: string;
   link_twitter: string;
@@ -84,9 +85,9 @@ interface StreamerConfig {
 function queryNovaDb(): SubmissionRow[] {
   const sql = [
     'SELECT slug, display_name, description, avatar_url, brand_name,',
-    'subscriber_count, "group", enabled, theme_json,',
+    'subscriber_count, "group", enabled, display_order, theme_json,',
     'link_youtube, link_twitter, link_facebook, link_instagram, link_twitch',
-    "FROM submissions WHERE status = 'approved' AND enabled = 1 ORDER BY slug",
+    "FROM submissions WHERE status = 'approved' AND enabled = 1 ORDER BY display_order, slug",
   ].join(' ');
 
   const raw = execFileSync(
