@@ -153,12 +153,6 @@ export default function HomePage() {
             borderColor: 'var(--border-glass)',
           }}
         >
-          <h1
-            className="text-[28px] font-extrabold tracking-tight"
-            style={{ color: 'var(--text-primary)' }}
-          >
-            Discover VTubers
-          </h1>
           <a
             href="https://nova.oshi.tw"
             target="_blank"
