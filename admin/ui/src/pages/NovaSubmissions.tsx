@@ -3,6 +3,27 @@ import type { AuthUser, NovaSubmission, NovaStatus } from '../../../shared/types
 import { api } from '../api/client';
 import StatusBadge from '../components/StatusBadge';
 
+type EditableKey =
+  | 'display_name' | 'slug' | 'brand_name' | 'youtube_channel_url'
+  | 'description' | 'avatar_url' | 'subscriber_count'
+  | 'link_youtube' | 'link_twitter' | 'link_facebook' | 'link_instagram' | 'link_twitch';
+
+/** Fields curators can edit on a submission. */
+const EDITABLE_FIELDS: ReadonlyArray<{ key: EditableKey; label: string; multiline?: boolean }> = [
+  { key: 'display_name', label: 'Display Name' },
+  { key: 'slug', label: 'Slug' },
+  { key: 'brand_name', label: 'Brand Name' },
+  { key: 'youtube_channel_url', label: 'YouTube Channel URL' },
+  { key: 'description', label: 'Description', multiline: true },
+  { key: 'avatar_url', label: 'Avatar URL' },
+  { key: 'subscriber_count', label: 'Subscriber Count' },
+  { key: 'link_youtube', label: 'Link: YouTube' },
+  { key: 'link_twitter', label: 'Link: Twitter' },
+  { key: 'link_facebook', label: 'Link: Facebook' },
+  { key: 'link_instagram', label: 'Link: Instagram' },
+  { key: 'link_twitch', label: 'Link: Twitch' },
+];
+
 export default function NovaSubmissions({ user }: { user: AuthUser }) {
   const [submissions, setSubmissions] = useState<NovaSubmission[]>([]);
   const [loading, setLoading] = useState(true);
@@ -44,6 +65,10 @@ export default function NovaSubmissions({ user }: { user: AuthUser }) {
     } finally {
       setActionLoading(null);
     }
+  };
+
+  const handleSave = (updated: NovaSubmission) => {
+    setSubmissions((prev) => prev.map((s) => (s.id === updated.id ? updated : s)));
   };
 
   const isCurator = user.role === 'curator';
@@ -96,6 +121,7 @@ export default function NovaSubmissions({ user }: { user: AuthUser }) {
                   rejectNote={rejectNote[sub.id] ?? ''}
                   onRejectNoteChange={(val) => setRejectNote((prev) => ({ ...prev, [sub.id]: val }))}
                   onAction={handleAction}
+                  onSave={handleSave}
                   actionLoading={actionLoading === sub.id}
                 />
               ))}
@@ -122,6 +148,7 @@ function SubmissionRow({
   rejectNote,
   onRejectNoteChange,
   onAction,
+  onSave,
   actionLoading,
 }: {
   sub: NovaSubmission;
@@ -131,8 +158,50 @@ function SubmissionRow({
   rejectNote: string;
   onRejectNoteChange: (val: string) => void;
   onAction: (id: string, status: NovaStatus) => void;
+  onSave: (updated: NovaSubmission) => void;
   actionLoading: boolean;
 }) {
+  const [editing, setEditing] = useState(false);
+  const [draft, setDraft] = useState<Record<EditableKey, string>>(() => buildDraft(sub));
+  const [saving, setSaving] = useState(false);
+  const [saveError, setSaveError] = useState<string | null>(null);
+
+  // Reset draft when submission changes (e.g. after save or status change)
+  useEffect(() => {
+    setDraft(buildDraft(sub));
+  }, [sub]);
+
+  const handleSave = async () => {
+    setSaving(true);
+    setSaveError(null);
+    try {
+      // Only send fields that actually changed
+      const changes: Record<string, string> = {};
+      for (const { key } of EDITABLE_FIELDS) {
+        if (draft[key] !== (sub[key] ?? '')) {
+          changes[key] = draft[key];
+        }
+      }
+      if (Object.keys(changes).length === 0) {
+        setEditing(false);
+        return;
+      }
+      const updated = await api.updateNovaSubmission(sub.id, changes);
+      onSave(updated);
+      setEditing(false);
+    } catch (err) {
+      setSaveError(err instanceof Error ? err.message : 'Save failed');
+    } finally {
+      setSaving(false);
+    }
+  };
+
+  const handleCancel = () => {
+    setDraft(buildDraft(sub));
+    setSaveError(null);
+    setEditing(false);
+  };
+
   const socialLinks = [
     { label: 'YouTube', url: sub.link_youtube },
     { label: 'Twitter', url: sub.link_twitter },
@@ -191,63 +260,123 @@ function SubmissionRow({
       {expanded && (
         <tr className="bg-slate-50">
           <td colSpan={isCurator ? 7 : 6} className="px-6 py-4">
+            {/* Edit / View toggle button */}
+            {isCurator && (
+              <div className="mb-3 flex items-center gap-2">
+                {!editing ? (
+                  <button
+                    onClick={() => setEditing(true)}
+                    className="rounded bg-slate-700 px-3 py-1 text-xs font-medium text-white hover:bg-slate-800"
+                  >
+                    Edit
+                  </button>
+                ) : (
+                  <>
+                    <button
+                      disabled={saving}
+                      onClick={handleSave}
+                      className="rounded bg-blue-600 px-3 py-1 text-xs font-medium text-white hover:bg-blue-700 disabled:opacity-50"
+                    >
+                      {saving ? 'Saving...' : 'Save'}
+                    </button>
+                    <button
+                      disabled={saving}
+                      onClick={handleCancel}
+                      className="rounded bg-slate-200 px-3 py-1 text-xs font-medium text-slate-700 hover:bg-slate-300 disabled:opacity-50"
+                    >
+                      Cancel
+                    </button>
+                  </>
+                )}
+                {saveError && <span className="text-xs text-red-600">{saveError}</span>}
+              </div>
+            )}
+
             <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
-              {/* Left: all submission info */}
+              {/* Left column: submission fields */}
               <div className="space-y-3">
-                <DetailField label="Avatar">
-                  {sub.avatar_url ? (
+                {/* Avatar preview (not editable inline, but URL is) */}
+                {sub.avatar_url && !editing && (
+                  <div>
                     <img
                       src={sub.avatar_url}
                       alt={sub.display_name}
                       className="h-16 w-16 rounded-full border border-slate-200"
                     />
-                  ) : (
-                    <span className="text-sm text-slate-400">—</span>
-                  )}
-                </DetailField>
-                <DetailField label="Brand Name" value={sub.brand_name} />
-                <DetailField label="YouTube Channel URL">
-                  <a
-                    href={sub.youtube_channel_url}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="text-sm text-blue-600 hover:underline break-all"
-                  >
-                    {sub.youtube_channel_url}
-                  </a>
-                </DetailField>
-                <DetailField label="Description" value={sub.description} />
-                <DetailField label="Subscriber Count" value={sub.subscriber_count} />
-
-                <div>
-                  <p className="text-xs font-medium uppercase text-slate-400">Social Links</p>
-                  <div className="mt-1 flex flex-wrap gap-2">
-                    {socialLinks.map((l) => (
-                      <span key={l.label}>
-                        {l.url ? (
-                          <a
-                            href={l.url}
-                            target="_blank"
-                            rel="noopener noreferrer"
-                            className="rounded-md bg-slate-200 px-2 py-1 text-xs text-slate-700 hover:bg-slate-300"
-                          >
-                            {l.label}
-                          </a>
-                        ) : (
-                          <span className="rounded-md bg-slate-100 px-2 py-1 text-xs text-slate-400 line-through">
-                            {l.label}
-                          </span>
-                        )}
-                      </span>
-                    ))}
                   </div>
-                </div>
+                )}
 
-                <DetailField label="Reviewed At" value={sub.reviewed_at ?? ''} />
-                <DetailField label="Reviewer Note" value={sub.reviewer_note} />
+                {editing ? (
+                  // Edit mode: render all editable fields as inputs
+                  EDITABLE_FIELDS.map(({ key, label, multiline }) => (
+                    <div key={key}>
+                      <label className="text-xs font-medium uppercase text-slate-400">{label}</label>
+                      {multiline ? (
+                        <textarea
+                          value={draft[key]}
+                          onChange={(e) => setDraft((d) => ({ ...d, [key]: e.target.value }))}
+                          rows={3}
+                          className="mt-1 w-full rounded-md border border-slate-300 px-3 py-1.5 text-sm focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500"
+                        />
+                      ) : (
+                        <input
+                          type="text"
+                          value={draft[key]}
+                          onChange={(e) => setDraft((d) => ({ ...d, [key]: e.target.value }))}
+                          className="mt-1 w-full rounded-md border border-slate-300 px-3 py-1.5 text-sm focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500"
+                        />
+                      )}
+                    </div>
+                  ))
+                ) : (
+                  // View mode: render all fields as read-only
+                  <>
+                    <DetailField label="Brand Name" value={sub.brand_name} />
+                    <DetailField label="YouTube Channel URL">
+                      <a
+                        href={sub.youtube_channel_url}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="text-sm text-blue-600 hover:underline break-all"
+                      >
+                        {sub.youtube_channel_url}
+                      </a>
+                    </DetailField>
+                    <DetailField label="Description" value={sub.description} />
+                    <DetailField label="Subscriber Count" value={sub.subscriber_count} />
+
+                    <div>
+                      <p className="text-xs font-medium uppercase text-slate-400">Social Links</p>
+                      <div className="mt-1 flex flex-wrap gap-2">
+                        {socialLinks.map((l) => (
+                          <span key={l.label}>
+                            {l.url ? (
+                              <a
+                                href={l.url}
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                className="rounded-md bg-slate-200 px-2 py-1 text-xs text-slate-700 hover:bg-slate-300"
+                              >
+                                {l.label}
+                              </a>
+                            ) : (
+                              <span className="rounded-md bg-slate-100 px-2 py-1 text-xs text-slate-400 line-through">
+                                {l.label}
+                              </span>
+                            )}
+                          </span>
+                        ))}
+                      </div>
+                    </div>
+
+                    <DetailField label="Reviewed At" value={sub.reviewed_at ?? ''} />
+                    <DetailField label="Reviewer Note" value={sub.reviewer_note} />
+                  </>
+                )}
               </div>
-              {/* Right: reject note input (curators only, pending only) */}
-              {isCurator && sub.status === 'pending' && (
+
+              {/* Right column: reject note (curators only, pending only, view mode only) */}
+              {isCurator && sub.status === 'pending' && !editing && (
                 <div>
                   <label className="text-xs font-medium uppercase text-slate-400">
                     Reviewer Note (optional, shown on reject)
@@ -267,6 +396,14 @@ function SubmissionRow({
       )}
     </>
   );
+}
+
+function buildDraft(sub: NovaSubmission): Record<EditableKey, string> {
+  const draft = {} as Record<EditableKey, string>;
+  for (const { key } of EDITABLE_FIELDS) {
+    draft[key] = sub[key] ?? '';
+  }
+  return draft;
 }
 
 function DetailField({ label, value, children }: { label: string; value?: string; children?: React.ReactNode }) {

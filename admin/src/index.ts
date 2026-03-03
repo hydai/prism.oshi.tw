@@ -807,6 +807,49 @@ app.get('/api/nova/submissions/:id', requireCurator, async (c) => {
   return c.json(result);
 });
 
+app.put('/api/nova/submissions/:id', requireCurator, async (c) => {
+  const id = c.req.param('id');
+  const existing = await c.env.NOVA_DB
+    .prepare('SELECT id FROM submissions WHERE id = ?')
+    .bind(id)
+    .first();
+  if (!existing) return c.json({ error: 'Submission not found' }, 404);
+
+  const body = await c.req.json<Partial<Omit<NovaSubmission, 'id' | 'status' | 'submitted_at' | 'reviewed_at'>>>();
+
+  const fields: string[] = [];
+  const values: string[] = [];
+  const editable = [
+    'youtube_channel_url', 'slug', 'brand_name', 'display_name', 'description',
+    'avatar_url', 'subscriber_count', 'link_youtube', 'link_twitter',
+    'link_facebook', 'link_instagram', 'link_twitch', 'reviewer_note',
+  ] as const;
+
+  for (const key of editable) {
+    if (body[key] !== undefined) {
+      fields.push(`${key} = ?`);
+      values.push(body[key] as string);
+    }
+  }
+
+  if (fields.length === 0) {
+    return c.json({ error: 'No fields to update' }, 400);
+  }
+
+  values.push(id);
+  await c.env.NOVA_DB
+    .prepare(`UPDATE submissions SET ${fields.join(', ')} WHERE id = ?`)
+    .bind(...values)
+    .run();
+
+  const updated = await c.env.NOVA_DB
+    .prepare('SELECT * FROM submissions WHERE id = ?')
+    .bind(id)
+    .first<NovaSubmission>();
+
+  return c.json(updated);
+});
+
 app.patch('/api/nova/submissions/:id/status', requireCurator, async (c) => {
   const id = c.req.param('id');
   const body = await c.req.json<{ status: NovaStatus; reviewer_note?: string }>();
