@@ -304,6 +304,12 @@ export interface ExtractImportResponse {
   created: number;
 }
 
+export interface BulkApproveResponse {
+  ok: boolean;
+  songs: number;
+  performances: number;
+}
+
 // --- Nova submission types ---
 
 export type NovaStatus = 'pending' | 'approved' | 'rejected';

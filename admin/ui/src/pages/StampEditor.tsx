@@ -322,7 +322,7 @@ interface EditingField {
   field: 'title' | 'artist';
 }
 
-export default function StampEditor({ user: _user }: { user: AuthUser }) {
+export default function StampEditor({ user }: { user: AuthUser }) {
   // Stream state
   const [streams, setStreams] = useState<StreamWithPending[]>([]);
   const [streamSearch, setStreamSearch] = useState('');
@@ -611,6 +611,27 @@ export default function StampEditor({ user: _user }: { user: AuthUser }) {
       showToast(err instanceof Error ? err.message : 'Failed to clear', true);
     }
   }, [selectedStreamId, showToast, loadStats, loadStreams]);
+
+  // --- Bulk approve all pending for this stream ---
+  const approveAllAction = useCallback(async () => {
+    if (!selectedStreamId) return;
+    const pendingCount = performances.filter((p) => p.status === 'pending').length;
+    if (pendingCount === 0) {
+      showToast('No pending performances to approve');
+      return;
+    }
+    if (!confirm(`Approve all ${pendingCount} pending songs & performances for this stream?`)) return;
+
+    try {
+      const { songs, performances: perfs } = await api.approveAllForStream(selectedStreamId);
+      showToast(`Approved ${songs} songs, ${perfs} performances`);
+      loadPerformances(selectedStreamId);
+      loadStats();
+      loadStreams();
+    } catch (err: unknown) {
+      showToast(err instanceof Error ? err.message : 'Failed to approve', true);
+    }
+  }, [selectedStreamId, performances, showToast, loadPerformances, loadStats, loadStreams]);
 
   // --- Fetch duration from iTunes (Step 5) ---
   const fetchDuration = useCallback(async () => {
@@ -908,6 +929,14 @@ export default function StampEditor({ user: _user }: { user: AuthUser }) {
                 )}
               </div>
               <div className="flex items-center gap-2">
+                {user.role === 'curator' && performances.some((p) => p.status === 'pending') && (
+                  <button
+                    onClick={approveAllAction}
+                    className="rounded-md border border-green-300 bg-green-50 px-3 py-1 text-sm font-medium text-green-700 hover:bg-green-100"
+                  >
+                    Approve All
+                  </button>
+                )}
                 <button
                   onClick={clearAllEndTimestampsAction}
                   className="rounded-md border border-slate-300 px-3 py-1 text-sm font-medium text-slate-600 hover:bg-slate-100"

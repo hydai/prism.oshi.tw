@@ -24,6 +24,7 @@ import type {
   ExtractResponse,
   ExtractImportBody,
   ExtractImportResponse,
+  BulkApproveResponse,
   NovaSubmission,
   NovaStatus,
   StreamerInfo,
@@ -197,6 +198,12 @@ export const api = {
   deletePerformance: (id: string) =>
     request<{ ok: boolean }>(`/api/performances/${id}`, {
       method: 'DELETE',
+    }),
+
+  // Bulk approve
+  approveAllForStream: (streamId: string) =>
+    request<BulkApproveResponse>(`/api/streams/${streamId}/approve-all`, {
+      method: 'POST',
     }),
 
   // Paste import

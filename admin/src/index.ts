@@ -33,6 +33,7 @@ import {
   clearAllEndTimestamps,
   getPerformanceWithSong,
   bulkCreatePerformances,
+  bulkApproveStream,
   getStreamDetail,
   updatePerformanceNote,
 } from './db';
@@ -59,6 +60,7 @@ import type {
   ExtractResponse,
   ExtractImportBody,
   ExtractImportResponse,
+  BulkApproveResponse,
   NovaSubmission,
   NovaStatus,
   StreamerInfo,
@@ -375,6 +377,17 @@ app.post('/api/streams/:streamId/performances', async (c) => {
   );
 
   return c.json(result, 201);
+});
+
+// Bulk approve all pending songs + performances for a stream
+app.post('/api/streams/:streamId/approve-all', requireCurator, async (c) => {
+  const streamId = c.req.param('streamId');
+  const stream = await getStreamById(c.env.DB, streamId);
+  if (!stream) return c.json({ error: 'Stream not found' }, 404);
+
+  const user = c.get('user');
+  const { songs, performances } = await bulkApproveStream(c.env.DB, streamId, user.email);
+  return c.json({ ok: true, songs, performances } satisfies BulkApproveResponse);
 });
 
 app.patch('/api/performances/:id/timestamps', async (c) => {

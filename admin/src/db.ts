@@ -556,6 +556,37 @@ export async function bulkCreatePerformances(
   return { created: songs.length };
 }
 
+// --- Bulk approve all pending songs + performances for a stream ---
+
+export async function bulkApproveStream(
+  db: D1Database,
+  streamId: string,
+  reviewedBy: string,
+): Promise<{ songs: number; performances: number }> {
+  const results = await db.batch([
+    db
+      .prepare(
+        `UPDATE songs SET status = 'approved', reviewed_by = ?, updated_at = datetime('now')
+         WHERE id IN (
+           SELECT p.song_id FROM performances p
+           WHERE p.stream_id = ? AND p.status = 'pending'
+         ) AND status = 'pending'`,
+      )
+      .bind(reviewedBy, streamId),
+    db
+      .prepare(
+        `UPDATE performances SET status = 'approved'
+         WHERE stream_id = ? AND status = 'pending'`,
+      )
+      .bind(streamId),
+  ]);
+
+  return {
+    songs: results[0].meta.changes,
+    performances: results[1].meta.changes,
+  };
+}
+
 // --- Stamp: streams with pending counts ---
 
 interface StreamWithPendingRow extends StreamRow {
