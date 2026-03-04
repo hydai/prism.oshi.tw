@@ -1,4 +1,4 @@
-import { html } from 'hono/html';
+import { html, raw } from 'hono/html';
 import type { TicketRow } from './types';
 
 const TYPE_LABELS: Record<string, string> = {
@@ -232,17 +232,17 @@ export function renderQaPage(tickets: TicketRow[], total: number, page: number, 
     <!-- Tickets -->
     <div style="display: flex; flex-direction: column; gap: 16px;">
       ${tickets.length === 0
-        ? '<div style="text-align: center; padding: 48px 16px; color: var(--text-tertiary); font-size: 14px;">目前還沒有已回覆的問題</div>'
-        : ticketCards
+        ? raw('<div style="text-align: center; padding: 48px 16px; color: var(--text-tertiary); font-size: 14px;">目前還沒有已回覆的問題</div>')
+        : raw(ticketCards)
       }
     </div>
 
     <!-- Pagination -->
-    ${totalPages > 1 ? `
+    ${totalPages > 1 ? raw(`
       <div style="display: flex; justify-content: center; gap: 6px; margin-top: 24px;">
         ${paginationLinks.join('')}
       </div>
-    ` : ''}
+    `) : ''}
 
     <div class="cross-links">
       <a href="/">提交新回報</a>
