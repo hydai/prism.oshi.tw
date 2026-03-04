@@ -240,30 +240,45 @@ app.get('/vod/api/video-info', async (c) => {
   }
 
   try {
-    const res = await fetch(parsed.canonical, {
-      headers: { 'Accept-Language': 'zh-TW,zh;q=0.9,en;q=0.8' },
-    });
-    if (!res.ok) {
-      return c.json({ error: 'Failed to fetch video page' }, 502);
+    // Use oEmbed API first — reliable and not blocked by YouTube bot detection
+    const oEmbedUrl = `https://www.youtube.com/oembed?url=${encodeURIComponent(parsed.canonical)}&format=json`;
+    const oEmbedRes = await fetch(oEmbedUrl);
+    let title = '';
+    let thumbnail = '';
+    if (oEmbedRes.ok) {
+      const oEmbed = await oEmbedRes.json() as { title?: string; thumbnail_url?: string };
+      title = oEmbed.title ?? '';
+      thumbnail = oEmbed.thumbnail_url ?? '';
     }
-    const pageHtml = await res.text();
 
-    const titleMatch =
-      pageHtml.match(/<meta\s+property="og:title"\s+content="([^"]*)"/i) ??
-      pageHtml.match(/<meta\s+content="([^"]*)"\s+property="og:title"/i);
-    const imageMatch =
-      pageHtml.match(/<meta\s+property="og:image"\s+content="([^"]*)"/i) ??
-      pageHtml.match(/<meta\s+content="([^"]*)"\s+property="og:image"/i);
-
-    // Try to extract upload/publish date
-    const dateMatch =
-      pageHtml.match(/<meta\s+itemprop="datePublished"\s+content="([^"]*)"/i) ??
-      pageHtml.match(/<meta\s+itemprop="uploadDate"\s+content="([^"]*)"/i);
-
-    const title = titleMatch?.[1] ?? '';
-    const thumbnail = imageMatch?.[1] ?? '';
-    const rawDate = dateMatch?.[1] ?? '';
-    const date = rawDate ? rawDate.slice(0, 10) : ''; // YYYY-MM-DD
+    // Fetch the video page for publish date (oEmbed doesn't provide it)
+    let date = '';
+    try {
+      const res = await fetch(parsed.canonical, {
+        headers: { 'Accept-Language': 'zh-TW,zh;q=0.9,en;q=0.8' },
+      });
+      if (res.ok) {
+        const pageHtml = await res.text();
+        // Fall back to page scraping for title/thumbnail if oEmbed failed
+        if (!title) {
+          const titleMatch =
+            pageHtml.match(/<meta\s+property="og:title"\s+content="([^"]*)"/i) ??
+            pageHtml.match(/<meta\s+content="([^"]*)"\s+property="og:title"/i);
+          title = titleMatch?.[1] ?? '';
+        }
+        if (!thumbnail) {
+          const imageMatch =
+            pageHtml.match(/<meta\s+property="og:image"\s+content="([^"]*)"/i) ??
+            pageHtml.match(/<meta\s+content="([^"]*)"\s+property="og:image"/i);
+          thumbnail = imageMatch?.[1] ?? '';
+        }
+        const dateMatch =
+          pageHtml.match(/<meta\s+itemprop="datePublished"\s+content="([^"]*)"/i) ??
+          pageHtml.match(/<meta\s+itemprop="uploadDate"\s+content="([^"]*)"/i);
+        const rawDate = dateMatch?.[1] ?? '';
+        date = rawDate ? rawDate.slice(0, 10) : '';
+      }
+    } catch { /* page fetch is best-effort */ }
 
     return c.json({ title, thumbnail, date });
   } catch {
