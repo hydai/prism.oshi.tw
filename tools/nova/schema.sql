@@ -18,6 +18,7 @@ CREATE TABLE IF NOT EXISTS submissions (
   enabled INTEGER DEFAULT 1,
   display_order INTEGER DEFAULT 999,
   theme_json TEXT DEFAULT '',
+  external_url TEXT DEFAULT '',
   status TEXT DEFAULT 'pending' CHECK(status IN ('pending', 'approved', 'rejected')),
   submitted_at TEXT DEFAULT (datetime('now')),
   reviewed_at TEXT,

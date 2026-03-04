@@ -7,7 +7,7 @@ type EditableKey =
   | 'display_name' | 'slug' | 'brand_name' | 'youtube_channel_url' | 'youtube_channel_id'
   | 'description' | 'avatar_url' | 'subscriber_count'
   | 'link_youtube' | 'link_twitter' | 'link_facebook' | 'link_instagram' | 'link_twitch'
-  | 'group';
+  | 'group' | 'external_url';
 
 /** Fields curators can edit on a submission. */
 const EDITABLE_FIELDS: ReadonlyArray<{ key: EditableKey; label: string; multiline?: boolean }> = [
@@ -25,6 +25,7 @@ const EDITABLE_FIELDS: ReadonlyArray<{ key: EditableKey; label: string; multilin
   { key: 'link_facebook', label: 'Link: Facebook' },
   { key: 'link_instagram', label: 'Link: Instagram' },
   { key: 'link_twitch', label: 'Link: Twitch' },
+  { key: 'external_url', label: 'External URL' },
 ];
 
 /** The 12 theme color tokens used in registry.json. */

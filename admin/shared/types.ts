@@ -364,6 +364,7 @@ export interface NovaSubmission {
   enabled: number;
   display_order: number;
   theme_json: string;
+  external_url: string;
   status: NovaStatus;
   submitted_at: string;
   reviewed_at: string | null;

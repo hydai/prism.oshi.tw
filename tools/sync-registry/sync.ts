@@ -40,6 +40,7 @@ interface SubmissionRow {
   link_facebook: string;
   link_instagram: string;
   link_twitch: string;
+  external_url: string;
 }
 
 // --- Registry types (match data/registry.json) ---
@@ -77,6 +78,7 @@ interface StreamerConfig {
   group: string;
   socialLinks: SocialLinks;
   theme: ThemeColors;
+  externalUrl?: string;
   enabled: boolean;
 }
 
@@ -86,7 +88,7 @@ function queryNovaDb(): SubmissionRow[] {
   const sql = [
     'SELECT slug, display_name, description, avatar_url, brand_name,',
     'subscriber_count, "group", enabled, display_order, theme_json,',
-    'link_youtube, link_twitter, link_facebook, link_instagram, link_twitch',
+    'link_youtube, link_twitter, link_facebook, link_instagram, link_twitch, external_url',
     "FROM submissions WHERE status = 'approved' AND enabled = 1 ORDER BY display_order, slug",
   ].join(' ');
 
@@ -130,7 +132,7 @@ function parseTheme(row: SubmissionRow): ThemeColors {
 }
 
 function rowToConfig(row: SubmissionRow): StreamerConfig {
-  return {
+  const config: StreamerConfig = {
     slug: row.slug,
     displayName: row.display_name,
     description: row.description,
@@ -142,6 +144,10 @@ function rowToConfig(row: SubmissionRow): StreamerConfig {
     theme: parseTheme(row),
     enabled: true, // only enabled rows are queried
   };
+  if (row.external_url) {
+    config.externalUrl = row.external_url;
+  }
+  return config;
 }
 
 // --- Write output files ---
