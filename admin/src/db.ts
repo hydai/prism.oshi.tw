@@ -556,6 +556,80 @@ export async function bulkCreatePerformances(
   return { created: songs.length };
 }
 
+// --- Import VOD submission into admin DB ---
+
+export async function importVodToAdminDb(
+  db: D1Database,
+  vod: {
+    streamer_slug: string;
+    video_id: string;
+    video_url: string;
+    stream_title: string;
+    stream_date: string;
+  },
+  vodSongs: Array<{
+    song_title: string;
+    original_artist: string;
+    start_timestamp: number;
+    end_timestamp: number | null;
+  }>,
+  submittedBy: string,
+): Promise<{ streamId: string; created: number }> {
+  const streamerId = vod.streamer_slug;
+
+  // Check if a stream already exists for this video_id
+  const existingStream = await db
+    .prepare('SELECT id FROM streams WHERE video_id = ?')
+    .bind(vod.video_id)
+    .first<{ id: string }>();
+
+  let streamId: string;
+
+  const stmts: D1PreparedStatement[] = [];
+
+  if (existingStream) {
+    streamId = existingStream.id;
+  } else {
+    streamId = vod.stream_date
+      ? generateStreamId(vod.stream_date)
+      : generateStreamIdFallback();
+
+    // Ensure stream ID is unique
+    if (await streamIdExists(db, streamId)) {
+      streamId = generateStreamIdFallback();
+    }
+
+    stmts.push(
+      db.prepare(
+        'INSERT INTO streams (id, streamer_id, title, date, video_id, youtube_url, credit, status, submitted_by) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)',
+      ).bind(streamId, streamerId, vod.stream_title, vod.stream_date, vod.video_id, vod.video_url, '{}', 'pending', submittedBy),
+    );
+  }
+
+  for (const song of vodSongs) {
+    const songId = generateSongId();
+    const perfId = generatePerformanceId();
+
+    stmts.push(
+      db.prepare(
+        'INSERT INTO songs (id, streamer_id, title, original_artist, tags, status, submitted_by) VALUES (?, ?, ?, ?, ?, ?, ?)',
+      ).bind(songId, streamerId, song.song_title, song.original_artist || 'Unknown', '[]', 'pending', submittedBy),
+    );
+    stmts.push(
+      db.prepare(
+        `INSERT INTO performances (id, streamer_id, song_id, stream_id, date, stream_title, video_id, timestamp, end_timestamp, note, status, submitted_by)
+         VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+      ).bind(perfId, streamerId, songId, streamId, vod.stream_date, vod.stream_title, vod.video_id, song.start_timestamp, song.end_timestamp, '', 'pending', submittedBy),
+    );
+  }
+
+  if (stmts.length > 0) {
+    await db.batch(stmts);
+  }
+
+  return { streamId, created: vodSongs.length };
+}
+
 // --- Bulk approve all pending songs + performances for a stream ---
 
 export async function bulkApproveStream(

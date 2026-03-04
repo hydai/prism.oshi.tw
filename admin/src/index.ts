@@ -36,6 +36,7 @@ import {
   bulkApproveStream,
   getStreamDetail,
   updatePerformanceNote,
+  importVodToAdminDb,
 } from './db';
 import { fetchItunesDuration } from './itunes';
 import { parseTextToSongs } from '../shared/parse';
@@ -980,6 +981,23 @@ app.patch('/api/nova/vods/:id/status', requireCurator, async (c) => {
     .prepare('UPDATE vod_submissions SET status = ?, reviewed_at = ?, reviewer_note = ? WHERE id = ?')
     .bind(body.status, new Date().toISOString(), body.reviewer_note ?? '', id)
     .run();
+
+  // When approved, import VOD songs into admin DB as pending records
+  if (body.status === 'approved') {
+    const vod = await c.env.NOVA_DB
+      .prepare('SELECT * FROM vod_submissions WHERE id = ?')
+      .bind(id)
+      .first<NovaVodSubmission>();
+    const { results: vodSongs } = await c.env.NOVA_DB
+      .prepare('SELECT * FROM vod_songs WHERE vod_submission_id = ? ORDER BY sort_order')
+      .bind(id)
+      .all<NovaVodSong>();
+
+    if (vod && vodSongs.length > 0) {
+      const user = c.get('user');
+      await importVodToAdminDb(c.env.DB, vod, vodSongs, user.email);
+    }
+  }
 
   const updated = await c.env.NOVA_DB
     .prepare('SELECT * FROM vod_submissions WHERE id = ?')
