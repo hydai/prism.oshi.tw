@@ -105,7 +105,7 @@ export async function insertSubmission(
         id, youtube_channel_url, youtube_channel_url_normalized, slug, brand_name, "group", display_name,
         description, avatar_url, subscriber_count,
         link_youtube, link_twitter, link_facebook, link_instagram, link_twitch
-      ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+      ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
     )
     .bind(
       id,
