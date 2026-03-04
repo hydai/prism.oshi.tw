@@ -13,7 +13,7 @@ const app = new Hono<{ Bindings: Bindings }>();
 // CORS for VOD API routes (allow Aurora cross-origin)
 app.use(
   '/vod/api/*',
-  cors({ origin: ['https://aurora.oshi.tw'], allowMethods: ['GET', 'POST', 'OPTIONS'] }),
+  cors({ origin: ['https://aurora.oshi.tw', 'https://oshi-prism-aurora.pages.dev'], allowMethods: ['GET', 'POST', 'OPTIONS'] }),
 );
 
 // GET / — Serve the submission form
