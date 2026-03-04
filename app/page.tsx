@@ -253,9 +253,16 @@ export default function HomePage() {
 }
 
 function StreamerCard({ streamer }: { streamer: StreamerConfig }) {
+  const href = streamer.externalUrl || `/${streamer.slug}`;
+  const isExternal = !!streamer.externalUrl;
+  const Wrapper = isExternal ? 'a' : Link;
+  const linkProps = isExternal
+    ? { href, target: '_blank' as const, rel: 'noopener noreferrer' }
+    : { href };
+
   return (
-    <Link
-      href={`/${streamer.slug}`}
+    <Wrapper
+      {...linkProps}
       className="group sm:flex-shrink-0 snap-start rounded-radius-xl overflow-hidden transition-all duration-200 hover:scale-[1.03] hover:shadow-xl"
       style={{
         minWidth: '240px',
@@ -299,6 +306,6 @@ function StreamerCard({ streamer }: { streamer: StreamerConfig }) {
           <Play className="h-3.5 w-3.5 text-white ml-0.5" />
         </div>
       </div>
-    </Link>
+    </Wrapper>
   );
 }
