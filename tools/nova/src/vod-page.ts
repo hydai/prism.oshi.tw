@@ -298,6 +298,8 @@ export function renderVodPage(siteKey: string, streamers: ApprovedStreamer[]) {
       <a href="/">推薦新的 VTuber</a>
       <span style="color: var(--text-tertiary);">|</span>
       <a href="https://aurora.oshi.tw" target="_blank">使用完整時間戳編輯器</a>
+      <span style="color: var(--text-tertiary);">|</span>
+      <a href="https://prism.oshi.tw" target="_blank">前往 Prism 歌單</a>
     </div>
 
     <p style="text-align: center; font-size: 11px; color: var(--text-tertiary); margin-top: 16px;">

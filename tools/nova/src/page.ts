@@ -101,6 +101,20 @@ export function renderPage(siteKey: string) {
     }
     .btn-submit:hover { opacity: 0.92; box-shadow: 0 6px 20px rgba(236, 72, 153, 0.3); }
     .btn-submit:disabled { opacity: 0.5; cursor: not-allowed; }
+
+    .cross-links {
+      display: flex;
+      justify-content: center;
+      gap: 16px;
+      margin-top: 16px;
+      font-size: 13px;
+    }
+    .cross-links a {
+      color: #8B5CF6;
+      text-decoration: none;
+      transition: opacity 0.2s;
+    }
+    .cross-links a:hover { opacity: 0.7; }
   </style>
 </head>
 <body>
@@ -222,11 +236,13 @@ export function renderPage(siteKey: string) {
       </form>
     </div>
 
-    <div style="text-align: center; margin-top: 16px; font-size: 13px;">
-      <a href="/vod" style="color: #8B5CF6; text-decoration: none;">提交歌回 VOD</a>
+    <div class="cross-links">
+      <a href="/vod">提交歌回 VOD</a>
+      <span style="color: var(--text-tertiary);">|</span>
+      <a href="https://prism.oshi.tw" target="_blank">前往 Prism 歌單</a>
     </div>
 
-    <p style="text-align: center; font-size: 11px; color: var(--text-tertiary); margin-top: 12px;">
+    <p style="text-align: center; font-size: 11px; color: var(--text-tertiary); margin-top: 16px;">
       Prism &mdash; 為你喜愛的 VTuber 打造歌單頁面
     </p>
   </div>
