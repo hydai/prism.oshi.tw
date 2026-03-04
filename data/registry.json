@@ -16,7 +16,6 @@
         "instagram": "https://www.instagram.com/mizukivtubertw/",
         "twitch": "https://www.twitch.tv/mizukimilk723"
       },
-      "externalUrl": "https://prism.mizuki.tw",
       "theme": {
         "accentPrimary": "#EC4899",
         "accentPrimaryDark": "#DB2777",
@@ -58,6 +57,37 @@
         "bgAccentPrimaryMuted": "#DDE4F0",
         "borderAccentPrimary": "#C5D0E3",
         "borderAccentSecondary": "#F0D87C"
+      },
+      "enabled": true
+    },
+    {
+      "slug": "kirali",
+      "displayName": "煌Kirali Channel",
+      "description": "歌勢Vtuber，就讀烈焰魔法學系的粉紅豹，主要在Youtube上進行直播。\n平時的嗓音活力滿滿，歌聲卻十分渾厚，也喜歡透過寫詞作曲表達內心想法。小心，調皮的她說不定正準備偷偷燒掉你的外套！",
+      "avatarUrl": "https://yt3.googleusercontent.com/cY2aEf1NOwF0zcGd-Ka0DcA5CUQEdEgmJnEhljPBcvyJ02AcJecUlXC6MSatn0QXFlzW5b507g=s900-c-k-c0x00ffffff-no-rj",
+      "brandName": "KiraliPrism",
+      "subscriberCount": "9.66萬",
+      "group": "子午計畫",
+      "socialLinks": {
+        "youtube": "https://www.youtube.com/@%E7%85%8CKirali",
+        "twitter": "https://x.com/Kirali_Neon",
+        "facebook": "https://www.facebook.com/NeonMeridianPRJ/",
+        "instagram": "https://www.instagram.com/Kirali_Neon/",
+        "twitch": "https://www.twitch.tv/kirali_neon"
+      },
+      "theme": {
+        "accentPrimary": "#000000",
+        "accentPrimaryDark": "#000000",
+        "accentPrimaryLight": "#000000",
+        "accentSecondary": "#000000",
+        "accentSecondaryLight": "#000000",
+        "bgPageStart": "#000000",
+        "bgPageMid": "#000000",
+        "bgPageEnd": "#000000",
+        "bgAccentPrimary": "#000000",
+        "bgAccentPrimaryMuted": "#000000",
+        "borderAccentPrimary": "#000000",
+        "borderAccentSecondary": "#000000"
       },
       "enabled": true
     }
