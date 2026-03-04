@@ -314,6 +314,31 @@ export interface BulkApproveResponse {
 
 export type NovaStatus = 'pending' | 'approved' | 'rejected';
 
+export interface NovaVodSubmission {
+  id: string;
+  streamer_slug: string;
+  video_id: string;
+  video_url: string;
+  stream_title: string;
+  stream_date: string;
+  thumbnail_url: string;
+  submitter_note: string;
+  status: NovaStatus;
+  submitted_at: string;
+  reviewed_at: string | null;
+  reviewer_note: string;
+}
+
+export interface NovaVodSong {
+  id: string;
+  vod_submission_id: string;
+  song_title: string;
+  original_artist: string;
+  start_timestamp: number;
+  end_timestamp: number | null;
+  sort_order: number;
+}
+
 export interface NovaSubmission {
   id: string;
   youtube_channel_url: string;

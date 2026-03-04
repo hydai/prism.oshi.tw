@@ -63,6 +63,8 @@ import type {
   BulkApproveResponse,
   NovaSubmission,
   NovaStatus,
+  NovaVodSubmission,
+  NovaVodSong,
   StreamerInfo,
 } from '../shared/types';
 
@@ -902,6 +904,123 @@ app.patch('/api/nova/submissions/:id/status', requireCurator, async (c) => {
     .prepare('SELECT * FROM submissions WHERE id = ?')
     .bind(id)
     .first<NovaSubmission>();
+
+  return c.json(updated);
+});
+
+// --- Nova VOD submissions (NOVA_DB) ---
+
+app.get('/api/nova/vods', requireCurator, async (c) => {
+  const status = c.req.query('status');
+  const streamer = c.req.query('streamer');
+
+  let query = 'SELECT * FROM vod_submissions';
+  const conditions: string[] = [];
+  const binds: string[] = [];
+
+  if (status) {
+    conditions.push('status = ?');
+    binds.push(status);
+  }
+  if (streamer) {
+    conditions.push('streamer_slug = ?');
+    binds.push(streamer);
+  }
+
+  if (conditions.length > 0) {
+    query += ' WHERE ' + conditions.join(' AND ');
+  }
+  query += ' ORDER BY submitted_at DESC';
+
+  const result = await c.env.NOVA_DB
+    .prepare(query)
+    .bind(...binds)
+    .all<NovaVodSubmission>();
+
+  return c.json({ data: result.results, total: result.results.length });
+});
+
+app.get('/api/nova/vods/:id', requireCurator, async (c) => {
+  const id = c.req.param('id');
+  const vod = await c.env.NOVA_DB
+    .prepare('SELECT * FROM vod_submissions WHERE id = ?')
+    .bind(id)
+    .first<NovaVodSubmission>();
+
+  if (!vod) return c.json({ error: 'VOD submission not found' }, 404);
+
+  const { results: songs } = await c.env.NOVA_DB
+    .prepare('SELECT * FROM vod_songs WHERE vod_submission_id = ? ORDER BY sort_order ASC')
+    .bind(id)
+    .all<NovaVodSong>();
+
+  return c.json({ ...vod, songs: songs ?? [] });
+});
+
+app.patch('/api/nova/vods/:id/status', requireCurator, async (c) => {
+  const id = c.req.param('id');
+  const body = await c.req.json<{ status: NovaStatus; reviewer_note?: string }>();
+
+  const validStatuses = new Set<string>(['approved', 'rejected']);
+  if (!validStatuses.has(body.status)) {
+    return c.json({ error: `Invalid status: ${body.status}. Must be 'approved' or 'rejected'` }, 400);
+  }
+
+  const existing = await c.env.NOVA_DB
+    .prepare('SELECT id FROM vod_submissions WHERE id = ?')
+    .bind(id)
+    .first();
+
+  if (!existing) return c.json({ error: 'VOD submission not found' }, 404);
+
+  await c.env.NOVA_DB
+    .prepare('UPDATE vod_submissions SET status = ?, reviewed_at = ?, reviewer_note = ? WHERE id = ?')
+    .bind(body.status, new Date().toISOString(), body.reviewer_note ?? '', id)
+    .run();
+
+  const updated = await c.env.NOVA_DB
+    .prepare('SELECT * FROM vod_submissions WHERE id = ?')
+    .bind(id)
+    .first<NovaVodSubmission>();
+
+  return c.json(updated);
+});
+
+app.put('/api/nova/vods/:id', requireCurator, async (c) => {
+  const id = c.req.param('id');
+  const existing = await c.env.NOVA_DB
+    .prepare('SELECT id FROM vod_submissions WHERE id = ?')
+    .bind(id)
+    .first();
+  if (!existing) return c.json({ error: 'VOD submission not found' }, 404);
+
+  const body = await c.req.json<Partial<Pick<NovaVodSubmission, 'stream_title' | 'stream_date' | 'submitter_note' | 'reviewer_note'>>>();
+
+  const fields: string[] = [];
+  const values: string[] = [];
+  const editable = ['stream_title', 'stream_date', 'submitter_note', 'reviewer_note'] as const;
+
+  for (const key of editable) {
+    if (body[key] !== undefined) {
+      fields.push(`${key} = ?`);
+      values.push(body[key] as string);
+    }
+  }
+
+  if (fields.length === 0) {
+    return c.json({ error: 'No fields to update' }, 400);
+  }
+
+  values.push(id);
+  await c.env.NOVA_DB
+    .prepare(`UPDATE vod_submissions SET ${fields.join(', ')} WHERE id = ?`)
+    .bind(...values)
+    .run();
+
+  const updated = await c.env.NOVA_DB
+    .prepare('SELECT * FROM vod_submissions WHERE id = ?')
+    .bind(id)
+    .first<NovaVodSubmission>();
 
   return c.json(updated);
 });

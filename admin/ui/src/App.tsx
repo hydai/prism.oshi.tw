@@ -13,6 +13,7 @@ import StampEditor from './pages/StampEditor';
 import StreamDetailPage from './pages/StreamDetail';
 import Pipeline from './pages/Pipeline';
 import NovaSubmissions from './pages/NovaSubmissions';
+import NovaVodSubmissions from './pages/NovaVodSubmissions';
 
 export default function App() {
   const [user, setUser] = useState<AuthUser | null>(null);
@@ -61,6 +62,7 @@ export default function App() {
         <Route path="/stamp" element={<StampEditor user={user} />} />
         <Route path="/pipeline" element={<Pipeline user={user} />} />
         <Route path="/nova" element={<NovaSubmissions user={user} />} />
+        <Route path="/nova/vods" element={<NovaVodSubmissions user={user} />} />
         <Route path="*" element={<Navigate to="/" replace />} />
       </Routes>
     </Layout>

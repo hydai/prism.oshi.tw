@@ -27,6 +27,8 @@ import type {
   BulkApproveResponse,
   NovaSubmission,
   NovaStatus,
+  NovaVodSubmission,
+  NovaVodSong,
   StreamerInfo,
 } from '../../../shared/types';
 
@@ -265,6 +267,30 @@ export const api = {
   updateNovaStatus: (id: string, body: { status: NovaStatus; reviewer_note?: string }) =>
     request<NovaSubmission>(`/api/nova/submissions/${id}/status`, {
       method: 'PATCH',
+      body: JSON.stringify(body),
+    }),
+
+  // Nova VOD submissions
+  listNovaVods: (params?: { status?: string; streamer?: string }) => {
+    const sp = new URLSearchParams();
+    if (params?.status) sp.set('status', params.status);
+    if (params?.streamer) sp.set('streamer', params.streamer);
+    const qs = sp.toString();
+    return request<ListResponse<NovaVodSubmission>>(`/api/nova/vods${qs ? `?${qs}` : ''}`);
+  },
+
+  getNovaVod: (id: string) =>
+    request<NovaVodSubmission & { songs: NovaVodSong[] }>(`/api/nova/vods/${id}`),
+
+  updateNovaVodStatus: (id: string, body: { status: NovaStatus; reviewer_note?: string }) =>
+    request<NovaVodSubmission>(`/api/nova/vods/${id}/status`, {
+      method: 'PATCH',
+      body: JSON.stringify(body),
+    }),
+
+  updateNovaVod: (id: string, body: Record<string, string>) =>
+    request<NovaVodSubmission>(`/api/nova/vods/${id}`, {
+      method: 'PUT',
       body: JSON.stringify(body),
     }),
 };
