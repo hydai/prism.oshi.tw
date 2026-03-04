@@ -35,18 +35,44 @@ export async function listApprovedStreamers(db: D1Database): Promise<ApprovedStr
 }
 
 /**
- * Find an existing VOD submission by streamer slug + video ID (dedup check).
+ * Find an approved VOD submission by streamer slug + video ID.
+ * Only returns a row when status = 'approved' (curator-verified data doesn't need re-submission).
  */
-export async function findVodByVideoId(
+export async function findApprovedVodByVideoId(
   db: D1Database,
   slug: string,
   videoId: string,
 ): Promise<Pick<VodSubmissionRow, 'id' | 'status' | 'submitted_at'> | null> {
   const row = await db
-    .prepare('SELECT id, status, submitted_at FROM vod_submissions WHERE streamer_slug = ? AND video_id = ?')
+    .prepare("SELECT id, status, submitted_at FROM vod_submissions WHERE streamer_slug = ? AND video_id = ? AND status = 'approved'")
     .bind(slug, videoId)
     .first<Pick<VodSubmissionRow, 'id' | 'status' | 'submitted_at'>>();
   return row ?? null;
+}
+
+/**
+ * Count existing VOD submissions for a streamer + video ID, plus the latest status.
+ * Used by the check endpoint to provide informational messages.
+ */
+export async function countVodsByVideoId(
+  db: D1Database,
+  slug: string,
+  videoId: string,
+): Promise<{ count: number; hasApproved: boolean; latestStatus: string | null }> {
+  const row = await db
+    .prepare(
+      `SELECT COUNT(*) as count,
+              SUM(CASE WHEN status = 'approved' THEN 1 ELSE 0 END) as approved_count,
+              (SELECT status FROM vod_submissions WHERE streamer_slug = ? AND video_id = ? ORDER BY submitted_at DESC LIMIT 1) as latest_status
+       FROM vod_submissions WHERE streamer_slug = ? AND video_id = ?`,
+    )
+    .bind(slug, videoId, slug, videoId)
+    .first<{ count: number; approved_count: number; latest_status: string | null }>();
+  return {
+    count: row?.count ?? 0,
+    hasApproved: (row?.approved_count ?? 0) > 0,
+    latestStatus: row?.latest_status ?? null,
+  };
 }
 
 /**
@@ -83,58 +109,6 @@ export async function insertVodSubmission(
       )
       .bind(id, data.streamer_slug, data.video_id, data.video_url, data.stream_title, data.stream_date, data.thumbnail_url, data.submitter_note),
   );
-
-  for (const song of songs) {
-    stmts.push(
-      db
-        .prepare(
-          `INSERT INTO vod_songs (id, vod_submission_id, song_title, original_artist, start_timestamp, end_timestamp, sort_order)
-           VALUES (?, ?, ?, ?, ?, ?, ?)`,
-        )
-        .bind(song.id, id, song.song_title, song.original_artist, song.start_timestamp, song.end_timestamp, song.sort_order),
-    );
-  }
-
-  await db.batch(stmts);
-}
-
-/**
- * Reset a rejected VOD submission back to pending with new data + songs.
- */
-export async function resetRejectedVod(
-  db: D1Database,
-  id: string,
-  data: {
-    video_url: string;
-    stream_title: string;
-    stream_date: string;
-    thumbnail_url: string;
-    submitter_note: string;
-  },
-  songs: Array<{
-    id: string;
-    song_title: string;
-    original_artist: string;
-    start_timestamp: number;
-    end_timestamp: number | null;
-    sort_order: number;
-  }>,
-): Promise<void> {
-  const stmts: D1PreparedStatement[] = [];
-
-  stmts.push(
-    db
-      .prepare(
-        `UPDATE vod_submissions SET
-          video_url = ?, stream_title = ?, stream_date = ?, thumbnail_url = ?, submitter_note = ?,
-          status = 'pending', submitted_at = datetime('now'), reviewed_at = NULL, reviewer_note = ''
-         WHERE id = ? AND status = 'rejected'`,
-      )
-      .bind(data.video_url, data.stream_title, data.stream_date, data.thumbnail_url, data.submitter_note, id),
-  );
-
-  // Delete old songs and insert new ones
-  stmts.push(db.prepare('DELETE FROM vod_songs WHERE vod_submission_id = ?').bind(id));
 
   for (const song of songs) {
     stmts.push(

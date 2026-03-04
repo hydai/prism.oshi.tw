@@ -155,12 +155,12 @@ const VOD_SCRIPT = String.raw`
             .then(function(r) { return r.json(); })
             .then(function(data) {
               urlCheck.style.display = 'block';
-              if (data.exists && data.canResubmit) {
-                urlCheck.style.color = '#2563EB';
-                urlCheck.textContent = '此 VOD 先前的提交被拒絕，你可以重新提交';
-              } else if (data.exists) {
+              if (data.exists && data.hasApproved) {
                 urlCheck.style.color = '#D97706';
-                urlCheck.textContent = '此 VOD 已於 ' + data.submittedAt + ' 提交（狀態：' + data.status + '）';
+                urlCheck.textContent = '此 VOD 已通過審核，無需重複提交';
+              } else if (data.exists) {
+                urlCheck.style.color = '#2563EB';
+                urlCheck.textContent = '此 VOD 已有 ' + data.count + ' 筆提交（審核中），你仍可提交新版本';
               } else {
                 urlCheck.style.color = '#059669';
                 urlCheck.textContent = '此 VOD 尚未被提交';
@@ -252,9 +252,7 @@ const VOD_SCRIPT = String.raw`
           if (res.ok) {
             resultDiv.style.background = '#F0FDF4';
             resultDiv.style.color = '#15803D';
-            resultDiv.textContent = data.resubmitted
-              ? '重新提交成功！ID: ' + data.id + '。將再次進入審核流程。'
-              : '提交成功！ID: ' + data.id + '。感謝你的幫助！';
+            resultDiv.textContent = '提交成功！ID: ' + data.id + '。感謝你的幫助！';
             form.reset();
             songsTextarea.value = '';
             songsPreview.textContent = '';
@@ -263,7 +261,7 @@ const VOD_SCRIPT = String.raw`
           } else if (res.status === 409) {
             resultDiv.style.background = '#FFFBEB';
             resultDiv.style.color = '#B45309';
-            resultDiv.textContent = '此 VOD 已於 ' + data.submittedAt + ' 提交過（狀態：' + data.status + '）';
+            resultDiv.textContent = '此 VOD 已通過審核，無需重複提交';
           } else {
             resultDiv.style.background = '#FEF2F2';
             resultDiv.style.color = '#DC2626';

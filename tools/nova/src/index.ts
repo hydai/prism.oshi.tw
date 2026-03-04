@@ -4,7 +4,7 @@ import type { Bindings, SubmitBody, VodSubmitBody } from './types';
 import { normalizeYoutubeChannelUrl, validateRequired, parseYoutubeVideoUrl, parseTimestamp } from './validate';
 import { verifyTurnstile } from './turnstile';
 import { generateId, findByChannelUrl, insertSubmission, resetRejectedSubmission } from './db';
-import { generateVodId, generateVodSongId, listApprovedStreamers, findVodByVideoId, insertVodSubmission, resetRejectedVod } from './vod-db';
+import { generateVodId, generateVodSongId, listApprovedStreamers, findApprovedVodByVideoId, countVodsByVideoId, insertVodSubmission } from './vod-db';
 import { renderPage } from './page';
 import { renderVodPage } from './vod-page';
 
@@ -252,13 +252,13 @@ app.get('/vod/api/check', async (c) => {
     return c.json({ exists: false });
   }
 
-  const existing = await findVodByVideoId(c.env.DB, slug, parsed.videoId);
-  if (existing) {
+  const info = await countVodsByVideoId(c.env.DB, slug, parsed.videoId);
+  if (info.count > 0) {
     return c.json({
       exists: true,
-      status: existing.status,
-      submittedAt: existing.submitted_at,
-      canResubmit: existing.status === 'rejected',
+      count: info.count,
+      hasApproved: info.hasApproved,
+      latestStatus: info.latestStatus,
     });
   }
 
@@ -374,8 +374,18 @@ app.post('/vod/api/submit', async (c) => {
     }
   }
 
-  // Duplicate check
-  const existing = await findVodByVideoId(c.env.DB, body.streamer_slug, parsed.videoId);
+  // Only block if an approved submission already exists (curator-verified)
+  const approved = await findApprovedVodByVideoId(c.env.DB, body.streamer_slug, parsed.videoId);
+  if (approved) {
+    return c.json(
+      {
+        error: 'duplicate',
+        status: approved.status,
+        submittedAt: approved.submitted_at,
+      },
+      409,
+    );
+  }
 
   // Auto-fill missing title/date/thumbnail from YouTube
   let streamTitle = body.stream_title?.trim() ?? '';
@@ -390,7 +400,8 @@ app.post('/vod/api/submit', async (c) => {
     } catch { /* auto-fill is best-effort */ }
   }
 
-  const vodData = {
+  const id = generateVodId();
+  await insertVodSubmission(c.env.DB, id, {
     streamer_slug: body.streamer_slug,
     video_id: parsed.videoId,
     video_url: parsed.canonical,
@@ -398,26 +409,7 @@ app.post('/vod/api/submit', async (c) => {
     stream_date: streamDate,
     thumbnail_url: thumbnailUrl,
     submitter_note: body.submitter_note?.trim() ?? '',
-  };
-
-  if (existing) {
-    if (existing.status === 'rejected') {
-      await resetRejectedVod(c.env.DB, existing.id, vodData, parsedSongs);
-      return c.json({ id: existing.id, resubmitted: true }, 200);
-    }
-
-    return c.json(
-      {
-        error: 'duplicate',
-        status: existing.status,
-        submittedAt: existing.submitted_at,
-      },
-      409,
-    );
-  }
-
-  const id = generateVodId();
-  await insertVodSubmission(c.env.DB, id, vodData, parsedSongs);
+  }, parsedSongs);
 
   return c.json({ id }, 201);
 });
