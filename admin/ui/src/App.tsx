@@ -14,6 +14,7 @@ import StreamDetailPage from './pages/StreamDetail';
 import Pipeline from './pages/Pipeline';
 import NovaSubmissions from './pages/NovaSubmissions';
 import NovaVodSubmissions from './pages/NovaVodSubmissions';
+import CrystalTickets from './pages/CrystalTickets';
 
 export default function App() {
   const [user, setUser] = useState<AuthUser | null>(null);
@@ -63,6 +64,7 @@ export default function App() {
         <Route path="/pipeline" element={<Pipeline user={user} />} />
         <Route path="/nova" element={<NovaSubmissions user={user} />} />
         <Route path="/nova/vods" element={<NovaVodSubmissions user={user} />} />
+        <Route path="/crystal" element={<CrystalTickets user={user} />} />
         <Route path="*" element={<Navigate to="/" replace />} />
       </Routes>
     </Layout>

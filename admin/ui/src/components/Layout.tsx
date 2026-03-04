@@ -13,6 +13,7 @@ const navItems = [
   { to: '/pipeline', label: 'Pipeline' },
   { to: '/nova', label: 'Nova' },
   { to: '/nova/vods', label: 'Nova VODs' },
+  { to: '/crystal', label: 'Crystal' },
 ];
 
 export default function Layout({ user, children }: { user: AuthUser; children: ReactNode }) {

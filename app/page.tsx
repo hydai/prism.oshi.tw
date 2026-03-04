@@ -9,6 +9,7 @@ import {
   Search,
   Plus,
   Play,
+  MessageSquare,
 } from 'lucide-react';
 
 const streamers = (registryData.streamers as StreamerConfig[]).filter(
@@ -120,8 +121,8 @@ export default function HomePage() {
           })}
         </nav>
 
-        {/* Add VTuber — pinned to bottom */}
-        <div className="mt-auto px-4 py-4">
+        {/* Action buttons — pinned to bottom */}
+        <div className="mt-auto px-4 py-4 space-y-2">
           <a
             href="https://nova.oshi.tw"
             target="_blank"
@@ -134,6 +135,19 @@ export default function HomePage() {
           >
             <Plus className="h-4 w-4" />
             提議新 VTuber
+          </a>
+          <a
+            href="https://crystal.oshi.tw"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="flex items-center justify-center gap-2 rounded-radius-lg px-4 py-2 text-token-sm font-semibold transition-opacity hover:opacity-90"
+            style={{
+              border: '1px solid var(--border-accent)',
+              color: 'var(--text-secondary)',
+            }}
+          >
+            <MessageSquare className="h-4 w-4" />
+            回報 / 建議
           </a>
         </div>
       </aside>
@@ -165,19 +179,33 @@ export default function HomePage() {
               Prism
             </span>
           </div>
-          <a
-            href="https://nova.oshi.tw"
-            target="_blank"
-            rel="noopener noreferrer"
-            className="inline-flex items-center gap-2 rounded-radius-lg px-3 py-2 text-token-sm font-semibold text-white transition-opacity hover:opacity-90"
-            style={{
-              background:
-                'linear-gradient(135deg, var(--accent-pink), var(--accent-blue))',
-            }}
-          >
-            <Plus className="h-4 w-4" />
-            <span className="hidden sm:inline">提議新 VTuber</span>
-          </a>
+          <div className="flex items-center gap-2">
+            <a
+              href="https://crystal.oshi.tw"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="inline-flex items-center gap-1 rounded-radius-lg px-2.5 py-2 text-token-sm font-semibold transition-opacity hover:opacity-90"
+              style={{
+                border: '1px solid var(--border-accent)',
+                color: 'var(--text-secondary)',
+              }}
+            >
+              <MessageSquare className="h-4 w-4" />
+            </a>
+            <a
+              href="https://nova.oshi.tw"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="inline-flex items-center gap-2 rounded-radius-lg px-3 py-2 text-token-sm font-semibold text-white transition-opacity hover:opacity-90"
+              style={{
+                background:
+                  'linear-gradient(135deg, var(--accent-pink), var(--accent-blue))',
+              }}
+            >
+              <Plus className="h-4 w-4" />
+              <span className="hidden sm:inline">提議新 VTuber</span>
+            </a>
+          </div>
         </header>
 
         {/* Mobile search + group chips (below lg) */}

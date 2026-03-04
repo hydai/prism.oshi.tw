@@ -30,6 +30,8 @@ import type {
   NovaVodSubmission,
   NovaVodSong,
   StreamerInfo,
+  CrystalTicket,
+  CrystalTicketStatus,
 } from '../../../shared/types';
 
 // --- Streamer selection (module-level) ---
@@ -292,6 +294,30 @@ export const api = {
     request<NovaVodSubmission>(`/api/nova/vods/${id}`, {
       method: 'PUT',
       body: JSON.stringify(body),
+    }),
+
+  // Crystal tickets
+  listCrystalTickets: (params?: { status?: string; type?: string }) => {
+    const sp = new URLSearchParams();
+    if (params?.status) sp.set('status', params.status);
+    if (params?.type) sp.set('type', params.type);
+    const qs = sp.toString();
+    return request<ListResponse<CrystalTicket>>(`/api/crystal/tickets${qs ? `?${qs}` : ''}`);
+  },
+
+  getCrystalTicket: (id: string) =>
+    request<CrystalTicket>(`/api/crystal/tickets/${id}`),
+
+  replyCrystalTicket: (id: string, admin_reply: string) =>
+    request<CrystalTicket>(`/api/crystal/tickets/${id}/reply`, {
+      method: 'POST',
+      body: JSON.stringify({ admin_reply }),
+    }),
+
+  updateCrystalTicketStatus: (id: string, status: CrystalTicketStatus) =>
+    request<CrystalTicket>(`/api/crystal/tickets/${id}/status`, {
+      method: 'PATCH',
+      body: JSON.stringify({ status }),
     }),
 };
 

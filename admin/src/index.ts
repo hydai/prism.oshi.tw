@@ -66,11 +66,14 @@ import type {
   NovaVodSubmission,
   NovaVodSong,
   StreamerInfo,
+  CrystalTicket,
+  CrystalTicketStatus,
 } from '../shared/types';
 
 type Bindings = {
   DB: D1Database;
   NOVA_DB: D1Database;
+  CRYSTAL_DB: D1Database;
   CURATOR_EMAILS: string;
   YOUTUBE_API_KEY: string;
 };
@@ -1021,6 +1024,115 @@ app.put('/api/nova/vods/:id', requireCurator, async (c) => {
     .prepare('SELECT * FROM vod_submissions WHERE id = ?')
     .bind(id)
     .first<NovaVodSubmission>();
+
+  return c.json(updated);
+});
+
+// --- Crystal tickets (separate D1: CRYSTAL_DB) ---
+
+app.get('/api/crystal/tickets', requireCurator, async (c) => {
+  const status = c.req.query('status');
+  const type = c.req.query('type');
+
+  let query = 'SELECT * FROM tickets';
+  const conditions: string[] = [];
+  const binds: string[] = [];
+
+  if (status) {
+    conditions.push('status = ?');
+    binds.push(status);
+  }
+  if (type) {
+    conditions.push('type = ?');
+    binds.push(type);
+  }
+
+  if (conditions.length > 0) {
+    query += ' WHERE ' + conditions.join(' AND ');
+  }
+  query += ' ORDER BY submitted_at DESC';
+
+  const result = await c.env.CRYSTAL_DB
+    .prepare(query)
+    .bind(...binds)
+    .all<CrystalTicket>();
+
+  return c.json({ data: result.results, total: result.results.length });
+});
+
+app.get('/api/crystal/tickets/:id', requireCurator, async (c) => {
+  const id = c.req.param('id');
+  const result = await c.env.CRYSTAL_DB
+    .prepare('SELECT * FROM tickets WHERE id = ?')
+    .bind(id)
+    .first<CrystalTicket>();
+
+  if (!result) return c.json({ error: 'Ticket not found' }, 404);
+  return c.json(result);
+});
+
+app.post('/api/crystal/tickets/:id/reply', requireCurator, async (c) => {
+  const id = c.req.param('id');
+  const body = await c.req.json<{ admin_reply: string }>();
+
+  if (!body.admin_reply || !body.admin_reply.trim()) {
+    return c.json({ error: 'admin_reply is required' }, 400);
+  }
+
+  const existing = await c.env.CRYSTAL_DB
+    .prepare('SELECT id FROM tickets WHERE id = ?')
+    .bind(id)
+    .first();
+
+  if (!existing) return c.json({ error: 'Ticket not found' }, 404);
+
+  await c.env.CRYSTAL_DB
+    .prepare('UPDATE tickets SET admin_reply = ?, status = ?, replied_at = ? WHERE id = ?')
+    .bind(body.admin_reply.trim(), 'replied', new Date().toISOString(), id)
+    .run();
+
+  const updated = await c.env.CRYSTAL_DB
+    .prepare('SELECT * FROM tickets WHERE id = ?')
+    .bind(id)
+    .first<CrystalTicket>();
+
+  return c.json(updated);
+});
+
+app.patch('/api/crystal/tickets/:id/status', requireCurator, async (c) => {
+  const id = c.req.param('id');
+  const body = await c.req.json<{ status: CrystalTicketStatus }>();
+
+  const validStatuses = new Set<string>(['pending', 'replied', 'closed']);
+  if (!validStatuses.has(body.status)) {
+    return c.json({ error: `Invalid status: ${body.status}` }, 400);
+  }
+
+  const existing = await c.env.CRYSTAL_DB
+    .prepare('SELECT id FROM tickets WHERE id = ?')
+    .bind(id)
+    .first();
+
+  if (!existing) return c.json({ error: 'Ticket not found' }, 404);
+
+  const updates: string[] = ['status = ?'];
+  const values: string[] = [body.status];
+
+  if (body.status === 'closed') {
+    updates.push('closed_at = ?');
+    values.push(new Date().toISOString());
+  }
+
+  values.push(id);
+  await c.env.CRYSTAL_DB
+    .prepare(`UPDATE tickets SET ${updates.join(', ')} WHERE id = ?`)
+    .bind(...values)
+    .run();
+
+  const updated = await c.env.CRYSTAL_DB
+    .prepare('SELECT * FROM tickets WHERE id = ?')
+    .bind(id)
+    .first<CrystalTicket>();
 
   return c.json(updated);
 });

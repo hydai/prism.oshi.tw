@@ -1,0 +1,16 @@
+name = "oshi-prism-crystal"
+main = "src/index.ts"
+compatibility_date = "2024-12-01"
+
+[vars]
+TURNSTILE_SITE_KEY = "0x4AAAAAACmDSEN7JoFFopg-"
+
+[observability]
+[observability.logs]
+enabled = true
+invocation_logs = true
+
+[[d1_databases]]
+binding = "DB"
+database_name = "oshi-crystal"
+database_id = "2d3e6cc0-a54a-483e-a819-0c552347265b"

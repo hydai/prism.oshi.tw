@@ -1,0 +1,21 @@
+{
+  "name": "oshi-prism-crystal",
+  "version": "0.1.0",
+  "private": true,
+  "scripts": {
+    "dev": "wrangler dev",
+    "deploy": "wrangler deploy",
+    "db:create": "wrangler d1 create oshi-crystal",
+    "db:migrate": "wrangler d1 execute oshi-crystal --file=schema.sql",
+    "db:migrate:local": "wrangler d1 execute oshi-crystal --local --file=schema.sql",
+    "typecheck": "tsc --noEmit"
+  },
+  "dependencies": {
+    "hono": "^4.7.0"
+  },
+  "devDependencies": {
+    "@cloudflare/workers-types": "^4.20250214.0",
+    "typescript": "^5.9.3",
+    "wrangler": "^4.0.0"
+  }
+}

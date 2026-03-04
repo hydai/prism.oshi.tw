@@ -368,3 +368,24 @@ export interface StreamerInfo {
   slug: string;
   displayName: string;
 }
+
+// --- Crystal ticket types ---
+
+export type CrystalTicketType = 'bug' | 'feat' | 'ui' | 'other';
+export type CrystalTicketStatus = 'pending' | 'replied' | 'closed';
+
+export interface CrystalTicket {
+  id: string;
+  type: CrystalTicketType;
+  title: string;
+  body: string;
+  nickname: string;
+  contact: string;
+  is_public_reply_allowed: number;
+  context_url: string;
+  status: CrystalTicketStatus;
+  admin_reply: string;
+  replied_at: string | null;
+  submitted_at: string;
+  closed_at: string | null;
+}

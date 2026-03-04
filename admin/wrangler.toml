@@ -29,3 +29,8 @@ database_id = "92d81cb5-d307-4fc3-b55c-49b5a29ed729"
 binding = "NOVA_DB"
 database_name = "oshi-prism-nova"
 database_id = "ebf4d5ff-68f9-4e2e-b95c-9afefd0cbc0c"
+
+[[d1_databases]]
+binding = "CRYSTAL_DB"
+database_name = "oshi-crystal"
+database_id = "2d3e6cc0-a54a-483e-a819-0c552347265b"
