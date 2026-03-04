@@ -391,10 +391,6 @@ export function App() {
       {/* Header */}
       <header className="sticky top-0 z-30 border-b border-[var(--border-default)]" style={{ background: 'var(--bg-surface-frosted)', backdropFilter: 'blur(16px)' }}>
         <div className="max-w-7xl mx-auto px-4 py-3 flex items-center gap-3">
-          <a href="https://nova.oshi.tw/vod" className="flex items-center gap-1.5 text-[var(--text-secondary)] hover:text-[var(--text-primary)] transition-colors">
-            <ArrowLeft size={16} />
-            <span className="text-[13px]">Nova VOD</span>
-          </a>
           <div className="flex items-center gap-2">
             <Sparkles size={18} className="text-[var(--accent-purple)]" />
             <h1 className="text-[17px] font-bold bg-gradient-to-r from-purple-500 to-teal-400 bg-clip-text text-transparent">
