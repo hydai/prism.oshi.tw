@@ -96,3 +96,4 @@ Node 22 → `npm ci` → `npm run build` → deploy `out/` to GitHub Pages
 
 Workers & Pages are deployed manually via slash commands (`/deploy-nova`, `/deploy-crystal`, `/deploy-admin`, `/deploy-aurora`).
 **IMPORTANT**: Aurora is a Cloudflare Pages project — must deploy with `--branch main` (not `production` or `master`).
+**IMPORTANT**: After modifying code in `tools/nova/`, `tools/crystal/`, `admin/`, or Aurora, always deploy the affected service before finishing. These are Cloudflare Workers/Pages — code changes only take effect after deployment.
