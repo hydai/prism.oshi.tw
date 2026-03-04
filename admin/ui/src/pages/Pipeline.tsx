@@ -190,10 +190,10 @@ function ExtractTab() {
   const [showCandidates, setShowCandidates] = useState(false);
   const [credit, setCredit] = useState<StreamCredit | null>(null);
 
-  // Fetch streams needing extraction (status = extracted, or any with few performances)
+  // Fetch streams needing extraction (status = pending)
   useEffect(() => {
     api
-      .listStreams({ status: 'extracted' })
+      .listStreams({ status: 'pending' })
       .then((res) => {
         setStreams(res.data);
         if (res.data.length > 0) setSelectedStreamId(res.data[0]!.id);
