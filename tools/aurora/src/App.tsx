@@ -428,49 +428,8 @@ export function App() {
             </a>
           )}
 
-          <button
-            onClick={() => setShowShortcuts((v) => !v)}
-            className="p-2 rounded-lg hover:bg-black/5 text-[var(--text-tertiary)]"
-            title="鍵盤快捷鍵"
-          >
-            <Keyboard size={16} />
-          </button>
         </div>
       </header>
-
-      {/* Shortcuts help overlay */}
-      {showShortcuts && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/30 backdrop-blur-sm" onClick={() => setShowShortcuts(false)}>
-          <div
-            className="w-full max-w-sm mx-4 rounded-2xl shadow-xl border border-[var(--border-default)] p-5"
-            style={{ background: 'var(--bg-surface)' }}
-            onClick={(e) => e.stopPropagation()}
-          >
-            <h3 className="text-[15px] font-semibold mb-3 text-[var(--text-primary)]">鍵盤快捷鍵</h3>
-            <p className="text-[11px] text-[var(--text-tertiary)] mb-3">在沒有輸入框聚焦時生效</p>
-            <div className="space-y-2 text-[13px]">
-              {[
-                ['T', '設定選取歌曲的開始時間'],
-                ['M', '設定選取歌曲的結束時間'],
-                ['S', '跳轉到選取歌曲的開始'],
-                ['E', '跳轉到選取歌曲的結束'],
-                ['N', '選取下一首歌'],
-                ['P', '選取上一首歌'],
-                ['A', '在當前播放時間新增歌曲'],
-                ['F', '從 iTunes 填入選取歌曲的時長'],
-                ['Space', '播放 / 暫停'],
-                ['←', '倒退 5 秒'],
-                ['→', '快進 5 秒'],
-              ].map(([key, desc]) => (
-                <div key={key} className="flex items-center gap-3">
-                  <kbd className="w-7 text-center px-1.5 py-0.5 rounded bg-white/60 border border-[var(--border-default)] text-[12px] font-mono font-medium">{key}</kbd>
-                  <span className="text-[var(--text-secondary)]">{desc}</span>
-                </div>
-              ))}
-            </div>
-          </div>
-        </div>
-      )}
 
       {/* Main content */}
       <main className="flex-1 max-w-7xl mx-auto w-full px-4 py-6">
@@ -521,6 +480,37 @@ export function App() {
                 onSeekBackward={handleSeekBackward}
                 onSeekForward={handleSeekForward}
               />
+              <button
+                onClick={() => setShowShortcuts((v) => !v)}
+                className="flex items-center gap-1.5 text-[12px] text-[var(--text-tertiary)] hover:text-[var(--text-secondary)] transition-colors self-start"
+              >
+                <Keyboard size={14} />
+                <span>快捷鍵</span>
+              </button>
+              {showShortcuts && (
+                <div className="rounded-lg border border-[var(--border-default)] bg-white/40 px-4 py-3">
+                  <p className="text-[11px] text-[var(--text-tertiary)] mb-2">在沒有輸入框聚焦時生效</p>
+                  <div className="grid grid-cols-2 gap-x-6 gap-y-1.5 text-[12px]">
+                    {[
+                      ['T', '設定開始時間'],
+                      ['M', '設定結束時間'],
+                      ['S', '跳轉到開始'],
+                      ['E', '跳轉到結束'],
+                      ['N', '下一首歌'],
+                      ['P', '上一首歌'],
+                      ['A', '新增歌曲'],
+                      ['F', '填入時長'],
+                      ['Space', '播放 / 暫停'],
+                      ['← →', '倒退 / 快進 5 秒'],
+                    ].map(([key, desc]) => (
+                      <div key={key} className="flex items-center gap-2">
+                        <kbd className="min-w-[28px] text-center px-1 py-0.5 rounded bg-white/60 border border-[var(--border-default)] text-[11px] font-mono font-medium">{key}</kbd>
+                        <span className="text-[var(--text-secondary)]">{desc}</span>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
               <p className="text-[12px] text-[var(--text-tertiary)] font-mono truncate">
                 {vodUrl || `https://youtube.com/watch?v=${videoId}`}
               </p>
