@@ -30,8 +30,8 @@
         "borderAccentPrimary": "#FBCFE8",
         "borderAccentSecondary": "#BFDBFE"
       },
-      "externalUrl": "https://prism.mizuki.tw",
-      "enabled": true
+      "enabled": true,
+      "externalUrl": "https://prism.mizuki.tw"
     },
     {
       "slug": "gabu",
@@ -62,8 +62,39 @@
       "enabled": true
     },
     {
+      "slug": "itsuki",
+      "displayName": "玥Itsuki",
+      "description": "王月女士是個有絕美歌聲、多才多藝的惡魔，擅長唱歌、會作詞會模仿，還會畫畫；外表艷麗、散發性感高冷氣質，但是其實在動些奇奇怪怪的歪腦筋，這樣的反差萌，怎麼能不愛呢？",
+      "avatarUrl": "https://yt3.googleusercontent.com/_Wy5sZXGlpZCV8drnTZukN5JWZZZDntJ4Dp822m77RdBE1fq74wIVF8AOyU4MuasUxLqNj7C6w=s900-c-k-c0x00ffffff-no-rj",
+      "brandName": "ItsukiPrism",
+      "subscriberCount": "7.15萬",
+      "group": "子午計畫",
+      "socialLinks": {
+        "youtube": "https://www.youtube.com/@ItsukiIanvs",
+        "twitter": "https://x.com/itsuki_ianvs",
+        "facebook": "https://www.facebook.com/itsukiianvs",
+        "instagram": "https://www.instagram.com/itsuki_ianvs",
+        "twitch": "https://www.twitch.tv/itsuki_ianvs"
+      },
+      "theme": {
+        "accentPrimary": "#EC4899",
+        "accentPrimaryDark": "#DB2777",
+        "accentPrimaryLight": "#F472B6",
+        "accentSecondary": "#3B82F6",
+        "accentSecondaryLight": "#60A5FA",
+        "bgPageStart": "#FFF0F5",
+        "bgPageMid": "#F0F8FF",
+        "bgPageEnd": "#E6E6FA",
+        "bgAccentPrimary": "#FDF2F8",
+        "bgAccentPrimaryMuted": "#FCE7F3",
+        "borderAccentPrimary": "#FBCFE8",
+        "borderAccentSecondary": "#BFDBFE"
+      },
+      "enabled": true
+    },
+    {
       "slug": "kirali",
-      "displayName": "煌Kirali Channel",
+      "displayName": "煌Kirali",
       "description": "歌勢Vtuber，就讀烈焰魔法學系的粉紅豹，主要在Youtube上進行直播。\n平時的嗓音活力滿滿，歌聲卻十分渾厚，也喜歡透過寫詞作曲表達內心想法。小心，調皮的她說不定正準備偷偷燒掉你的外套！",
       "avatarUrl": "https://yt3.googleusercontent.com/cY2aEf1NOwF0zcGd-Ka0DcA5CUQEdEgmJnEhljPBcvyJ02AcJecUlXC6MSatn0QXFlzW5b507g=s900-c-k-c0x00ffffff-no-rj",
       "brandName": "KiraliPrism",
