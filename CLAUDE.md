@@ -93,3 +93,6 @@ Hidden `<iframe>` controlled via YouTube IFrame API. Songs reference specific vi
 
 Push to `master` triggers GitHub Actions (`.github/workflows/deploy.yml`):
 Node 22 → `npm ci` → `npm run build` → deploy `out/` to GitHub Pages
+
+Workers & Pages are deployed manually via slash commands (`/deploy-nova`, `/deploy-crystal`, `/deploy-admin`, `/deploy-aurora`).
+**IMPORTANT**: Aurora is a Cloudflare Pages project — must deploy with `--branch main` (not `production` or `master`).
