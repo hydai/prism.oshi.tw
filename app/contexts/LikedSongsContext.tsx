@@ -1,6 +1,6 @@
 'use client';
 
-import { createContext, useContext, useState, useEffect, ReactNode } from 'react';
+import { createContext, useContext, useState, useEffect, useCallback, ReactNode } from 'react';
 
 export interface LikedVersion {
   performanceId: string;
@@ -76,36 +76,22 @@ export const LikedSongsProvider = ({ streamerSlug, children }: { streamerSlug: s
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  const saveToLocalStorage = (songs: LikedVersion[]): boolean => {
-    try {
-      localStorage.setItem(STORAGE_KEY, JSON.stringify(songs));
-      return true;
-    } catch {
-      return false;
-    }
-  };
-
   const isLiked = (performanceId: string): boolean => {
     return likedSongs.some(s => s.performanceId === performanceId);
   };
 
-  const toggleLike = (version: Omit<LikedVersion, 'likedAt'>) => {
+  const toggleLike = useCallback((version: Omit<LikedVersion, 'likedAt'>) => {
     if (!localStorageSupported) return;
 
-    const exists = likedSongs.some(s => s.performanceId === version.performanceId);
-    let newSongs: LikedVersion[];
-
-    if (exists) {
-      newSongs = likedSongs.filter(s => s.performanceId !== version.performanceId);
-    } else {
-      newSongs = [{ ...version, likedAt: Date.now() }, ...likedSongs];
-    }
-
-    const saved = saveToLocalStorage(newSongs);
-    if (saved) {
-      setLikedSongs(newSongs);
-    }
-  };
+    setLikedSongs(prev => {
+      const exists = prev.some(s => s.performanceId === version.performanceId);
+      const newSongs = exists
+        ? prev.filter(s => s.performanceId !== version.performanceId)
+        : [{ ...version, likedAt: Date.now() }, ...prev];
+      try { localStorage.setItem(STORAGE_KEY, JSON.stringify(newSongs)); } catch {}
+      return newSongs;
+    });
+  }, [STORAGE_KEY, localStorageSupported]);
 
   return (
     <LikedSongsContext.Provider
