@@ -10,6 +10,7 @@ import {
   Plus,
   Play,
   MessageSquare,
+  Video,
 } from 'lucide-react';
 
 const streamers = (registryData.streamers as StreamerConfig[]).filter(
@@ -137,6 +138,19 @@ export default function HomePage() {
             提議新 VTuber
           </a>
           <a
+            href="https://nova.oshi.tw/vod"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="flex items-center justify-center gap-2 rounded-radius-lg px-4 py-2 text-token-sm font-semibold transition-opacity hover:opacity-90"
+            style={{
+              border: '1px solid var(--border-accent)',
+              color: 'var(--text-secondary)',
+            }}
+          >
+            <Video className="h-4 w-4" />
+            新增 VOD
+          </a>
+          <a
             href="https://crystal.oshi.tw"
             target="_blank"
             rel="noopener noreferrer"
@@ -191,6 +205,18 @@ export default function HomePage() {
               }}
             >
               <MessageSquare className="h-4 w-4" />
+            </a>
+            <a
+              href="https://nova.oshi.tw/vod"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="inline-flex items-center gap-1 rounded-radius-lg px-2.5 py-2 text-token-sm font-semibold transition-opacity hover:opacity-90"
+              style={{
+                border: '1px solid var(--border-accent)',
+                color: 'var(--text-secondary)',
+              }}
+            >
+              <Video className="h-4 w-4" />
             </a>
             <a
               href="https://nova.oshi.tw"
