@@ -2,9 +2,9 @@ import { html } from 'hono/html';
 import type { ApprovedStreamer } from './types';
 
 export function renderVodPage(siteKey: string, streamers: ApprovedStreamer[]) {
-  const streamerOptions = streamers
-    .map((s) => `<option value="${s.slug}">${s.display_name}</option>`)
-    .join('');
+  const streamerOptions = streamers.length > 0
+    ? streamers.map((s) => `<option value="${s.slug}">${s.display_name}</option>`).join('')
+    : '<option value="" disabled>暫無可選 VTuber（請聯繫管理員）</option>';
 
   return html`<!doctype html>
 <html lang="zh-Hant">
