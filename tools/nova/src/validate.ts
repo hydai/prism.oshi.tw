@@ -60,3 +60,60 @@ export function validateRequired(fields: Record<string, string>): string[] {
   }
   return errors;
 }
+
+/**
+ * Parse a YouTube video URL (watch?v=, youtu.be/, /live/) into { videoId, canonical }.
+ * Returns null if invalid.
+ */
+export function parseYoutubeVideoUrl(raw: string): { videoId: string; canonical: string } | null {
+  const trimmed = raw.trim();
+
+  // youtube.com/watch?v=VIDEO_ID
+  const watchMatch = trimmed.match(/(?:https?:\/\/)?(?:www\.)?youtube\.com\/watch\?.*v=([a-zA-Z0-9_-]+)/);
+  if (watchMatch) {
+    return { videoId: watchMatch[1], canonical: `https://www.youtube.com/watch?v=${watchMatch[1]}` };
+  }
+
+  // youtube.com/live/VIDEO_ID
+  const liveMatch = trimmed.match(/(?:https?:\/\/)?(?:www\.)?youtube\.com\/live\/([a-zA-Z0-9_-]+)/);
+  if (liveMatch) {
+    return { videoId: liveMatch[1], canonical: `https://www.youtube.com/watch?v=${liveMatch[1]}` };
+  }
+
+  // youtu.be/VIDEO_ID
+  const shortMatch = trimmed.match(/(?:https?:\/\/)?youtu\.be\/([a-zA-Z0-9_-]+)/);
+  if (shortMatch) {
+    return { videoId: shortMatch[1], canonical: `https://www.youtube.com/watch?v=${shortMatch[1]}` };
+  }
+
+  return null;
+}
+
+/**
+ * Parse a timestamp string (H:MM:SS or MM:SS) to seconds.
+ * Also accepts raw integer seconds. Returns null if invalid.
+ */
+export function parseTimestamp(raw: string | number): number | null {
+  if (typeof raw === 'number') {
+    return raw >= 0 ? Math.floor(raw) : null;
+  }
+
+  const trimmed = raw.trim();
+
+  // Try plain integer
+  if (/^\d+$/.test(trimmed)) {
+    return parseInt(trimmed, 10);
+  }
+
+  // H:MM:SS or MM:SS
+  const match = trimmed.match(/^(?:(\d{1,2}):)?(\d{1,2}):(\d{2})$/);
+  if (!match) return null;
+
+  const hours = match[1] ? parseInt(match[1], 10) : 0;
+  const minutes = parseInt(match[2], 10);
+  const seconds = parseInt(match[3], 10);
+
+  if (minutes >= 60 || seconds >= 60) return null;
+
+  return hours * 3600 + minutes * 60 + seconds;
+}

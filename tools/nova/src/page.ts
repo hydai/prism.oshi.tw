@@ -222,7 +222,11 @@ export function renderPage(siteKey: string) {
       </form>
     </div>
 
-    <p style="text-align: center; font-size: 11px; color: var(--text-tertiary); margin-top: 24px;">
+    <div style="text-align: center; margin-top: 16px; font-size: 13px;">
+      <a href="/vod" style="color: #8B5CF6; text-decoration: none;">提交歌回 VOD</a>
+    </div>
+
+    <p style="text-align: center; font-size: 11px; color: var(--text-tertiary); margin-top: 12px;">
       Prism &mdash; 為你喜愛的 VTuber 打造歌單頁面
     </p>
   </div>

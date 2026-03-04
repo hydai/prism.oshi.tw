@@ -45,3 +45,53 @@ export interface SubmitBody {
   link_twitch?: string;
   turnstile_token: string;
 }
+
+// --- VOD Submission types ---
+
+export interface VodSubmissionRow {
+  id: string;
+  streamer_slug: string;
+  video_id: string;
+  video_url: string;
+  stream_title: string;
+  stream_date: string;
+  thumbnail_url: string;
+  submitter_note: string;
+  status: SubmissionStatus;
+  submitted_at: string;
+  reviewed_at: string | null;
+  reviewer_note: string;
+}
+
+export interface VodSongRow {
+  id: string;
+  vod_submission_id: string;
+  song_title: string;
+  original_artist: string;
+  start_timestamp: number;
+  end_timestamp: number | null;
+  sort_order: number;
+}
+
+export interface VodSongInput {
+  song_title: string;
+  original_artist?: string;
+  start_timestamp: string | number; // accepts "H:MM:SS" or seconds
+  end_timestamp?: string | number | null;
+}
+
+export interface VodSubmitBody {
+  streamer_slug: string;
+  video_url: string;
+  stream_title?: string;
+  stream_date?: string;
+  submitter_note?: string;
+  songs?: VodSongInput[];
+  turnstile_token: string;
+}
+
+export interface ApprovedStreamer {
+  slug: string;
+  display_name: string;
+  avatar_url: string;
+}
