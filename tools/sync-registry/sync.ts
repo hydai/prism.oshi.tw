@@ -114,6 +114,10 @@ function buildSocialLinks(row: SubmissionRow): SocialLinks {
   return links;
 }
 
+function isAllBlackTheme(theme: ThemeColors): boolean {
+  return Object.values(theme).every((v) => v === '#000000');
+}
+
 function parseTheme(row: SubmissionRow): ThemeColors {
   if (!row.theme_json) {
     throw new Error(`Streamer "${row.slug}" has empty theme_json — curator must set theme colors before sync.`);
@@ -188,6 +192,17 @@ function main(): void {
   console.log(`  found ${rows.length} approved streamer(s): ${rows.map((r) => r.slug).join(', ')}`);
 
   const streamers = rows.map(rowToConfig);
+
+  // Fall back to mizuki's theme for streamers with all-#000000 placeholder themes
+  const mizuki = streamers.find((s) => s.slug === 'mizuki');
+  if (mizuki) {
+    for (const s of streamers) {
+      if (s.slug !== 'mizuki' && isAllBlackTheme(s.theme)) {
+        console.log(`  ⚠ ${s.slug} has placeholder theme (all #000000), using mizuki theme as default`);
+        s.theme = { ...mizuki.theme };
+      }
+    }
+  }
 
   writeRegistry(streamers);
   writeSlugs(streamers);

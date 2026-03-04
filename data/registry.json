@@ -76,18 +76,18 @@
         "twitch": "https://www.twitch.tv/kirali_neon"
       },
       "theme": {
-        "accentPrimary": "#000000",
-        "accentPrimaryDark": "#000000",
-        "accentPrimaryLight": "#000000",
-        "accentSecondary": "#000000",
-        "accentSecondaryLight": "#000000",
-        "bgPageStart": "#000000",
-        "bgPageMid": "#000000",
-        "bgPageEnd": "#000000",
-        "bgAccentPrimary": "#000000",
-        "bgAccentPrimaryMuted": "#000000",
-        "borderAccentPrimary": "#000000",
-        "borderAccentSecondary": "#000000"
+        "accentPrimary": "#EC4899",
+        "accentPrimaryDark": "#DB2777",
+        "accentPrimaryLight": "#F472B6",
+        "accentSecondary": "#3B82F6",
+        "accentSecondaryLight": "#60A5FA",
+        "bgPageStart": "#FFF0F5",
+        "bgPageMid": "#F0F8FF",
+        "bgPageEnd": "#E6E6FA",
+        "bgAccentPrimary": "#FDF2F8",
+        "bgAccentPrimaryMuted": "#FCE7F3",
+        "borderAccentPrimary": "#FBCFE8",
+        "borderAccentSecondary": "#BFDBFE"
       },
       "enabled": true
     }
