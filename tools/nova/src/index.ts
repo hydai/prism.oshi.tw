@@ -8,6 +8,53 @@ import { generateVodId, generateVodSongId, listApprovedStreamers, findVodByVideo
 import { renderPage } from './page';
 import { renderVodPage } from './vod-page';
 
+/** Fetch video title, thumbnail, and publish date from YouTube via oEmbed + page scraping. */
+async function fetchYoutubeVideoInfo(canonicalUrl: string): Promise<{ title: string; thumbnail: string; date: string }> {
+  let title = '';
+  let thumbnail = '';
+  let date = '';
+
+  // Use oEmbed API first — reliable and not blocked by YouTube bot detection
+  try {
+    const oEmbedUrl = `https://www.youtube.com/oembed?url=${encodeURIComponent(canonicalUrl)}&format=json`;
+    const oEmbedRes = await fetch(oEmbedUrl);
+    if (oEmbedRes.ok) {
+      const oEmbed = (await oEmbedRes.json()) as { title?: string; thumbnail_url?: string };
+      title = oEmbed.title ?? '';
+      thumbnail = oEmbed.thumbnail_url ?? '';
+    }
+  } catch { /* oEmbed is best-effort */ }
+
+  // Fetch the video page for publish date (oEmbed doesn't provide it)
+  try {
+    const res = await fetch(canonicalUrl, {
+      headers: { 'Accept-Language': 'zh-TW,zh;q=0.9,en;q=0.8' },
+    });
+    if (res.ok) {
+      const pageHtml = await res.text();
+      if (!title) {
+        const titleMatch =
+          pageHtml.match(/<meta\s+property="og:title"\s+content="([^"]*)"/i) ??
+          pageHtml.match(/<meta\s+content="([^"]*)"\s+property="og:title"/i);
+        title = titleMatch?.[1] ?? '';
+      }
+      if (!thumbnail) {
+        const imageMatch =
+          pageHtml.match(/<meta\s+property="og:image"\s+content="([^"]*)"/i) ??
+          pageHtml.match(/<meta\s+content="([^"]*)"\s+property="og:image"/i);
+        thumbnail = imageMatch?.[1] ?? '';
+      }
+      const dateMatch =
+        pageHtml.match(/<meta\s+itemprop="datePublished"\s+content="([^"]*)"/i) ??
+        pageHtml.match(/<meta\s+itemprop="uploadDate"\s+content="([^"]*)"/i);
+      const rawDate = dateMatch?.[1] ?? '';
+      date = rawDate ? rawDate.slice(0, 10) : '';
+    }
+  } catch { /* page fetch is best-effort */ }
+
+  return { title, thumbnail, date };
+}
+
 const app = new Hono<{ Bindings: Bindings }>();
 
 // CORS for VOD API routes (allow Aurora cross-origin)
@@ -240,47 +287,8 @@ app.get('/vod/api/video-info', async (c) => {
   }
 
   try {
-    // Use oEmbed API first — reliable and not blocked by YouTube bot detection
-    const oEmbedUrl = `https://www.youtube.com/oembed?url=${encodeURIComponent(parsed.canonical)}&format=json`;
-    const oEmbedRes = await fetch(oEmbedUrl);
-    let title = '';
-    let thumbnail = '';
-    if (oEmbedRes.ok) {
-      const oEmbed = await oEmbedRes.json() as { title?: string; thumbnail_url?: string };
-      title = oEmbed.title ?? '';
-      thumbnail = oEmbed.thumbnail_url ?? '';
-    }
-
-    // Fetch the video page for publish date (oEmbed doesn't provide it)
-    let date = '';
-    try {
-      const res = await fetch(parsed.canonical, {
-        headers: { 'Accept-Language': 'zh-TW,zh;q=0.9,en;q=0.8' },
-      });
-      if (res.ok) {
-        const pageHtml = await res.text();
-        // Fall back to page scraping for title/thumbnail if oEmbed failed
-        if (!title) {
-          const titleMatch =
-            pageHtml.match(/<meta\s+property="og:title"\s+content="([^"]*)"/i) ??
-            pageHtml.match(/<meta\s+content="([^"]*)"\s+property="og:title"/i);
-          title = titleMatch?.[1] ?? '';
-        }
-        if (!thumbnail) {
-          const imageMatch =
-            pageHtml.match(/<meta\s+property="og:image"\s+content="([^"]*)"/i) ??
-            pageHtml.match(/<meta\s+content="([^"]*)"\s+property="og:image"/i);
-          thumbnail = imageMatch?.[1] ?? '';
-        }
-        const dateMatch =
-          pageHtml.match(/<meta\s+itemprop="datePublished"\s+content="([^"]*)"/i) ??
-          pageHtml.match(/<meta\s+itemprop="uploadDate"\s+content="([^"]*)"/i);
-        const rawDate = dateMatch?.[1] ?? '';
-        date = rawDate ? rawDate.slice(0, 10) : '';
-      }
-    } catch { /* page fetch is best-effort */ }
-
-    return c.json({ title, thumbnail, date });
+    const info = await fetchYoutubeVideoInfo(parsed.canonical);
+    return c.json(info);
   } catch {
     return c.json({ error: 'Failed to fetch video info' }, 502);
   }
@@ -369,13 +377,26 @@ app.post('/vod/api/submit', async (c) => {
   // Duplicate check
   const existing = await findVodByVideoId(c.env.DB, body.streamer_slug, parsed.videoId);
 
+  // Auto-fill missing title/date/thumbnail from YouTube
+  let streamTitle = body.stream_title?.trim() ?? '';
+  let streamDate = body.stream_date?.trim() ?? '';
+  let thumbnailUrl = body.thumbnail_url?.trim() ?? '';
+  if (!streamTitle || !streamDate || !thumbnailUrl) {
+    try {
+      const info = await fetchYoutubeVideoInfo(parsed.canonical);
+      if (!streamTitle) streamTitle = info.title;
+      if (!streamDate) streamDate = info.date;
+      if (!thumbnailUrl) thumbnailUrl = info.thumbnail;
+    } catch { /* auto-fill is best-effort */ }
+  }
+
   const vodData = {
     streamer_slug: body.streamer_slug,
     video_id: parsed.videoId,
     video_url: parsed.canonical,
-    stream_title: body.stream_title?.trim() ?? '',
-    stream_date: body.stream_date?.trim() ?? '',
-    thumbnail_url: body.thumbnail_url?.trim() ?? '',
+    stream_title: streamTitle,
+    stream_date: streamDate,
+    thumbnail_url: thumbnailUrl,
     submitter_note: body.submitter_note?.trim() ?? '',
   };
 
