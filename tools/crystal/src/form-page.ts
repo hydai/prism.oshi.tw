@@ -278,8 +278,10 @@ export function renderFormPage(siteKey: string) {
 
     <div class="cross-links">
       <a href="/qa">查看 Q&A</a>
-      <a href="https://nova.oshi.tw">提議新 VTuber →</a>
-      <a href="https://prism.oshi.tw">← 返回 Prism</a>
+      <span style="color: var(--text-tertiary);">|</span>
+      <a href="https://nova.oshi.tw" target="_blank">提議新 VTuber</a>
+      <span style="color: var(--text-tertiary);">|</span>
+      <a href="https://prism.oshi.tw" target="_blank">前往 Prism 歌單</a>
     </div>
   </div>
 

@@ -246,7 +246,8 @@ export function renderQaPage(tickets: TicketRow[], total: number, page: number, 
 
     <div class="cross-links">
       <a href="/">提交新回報</a>
-      <a href="https://prism.oshi.tw">← 返回 Prism</a>
+      <span style="color: var(--text-tertiary);">|</span>
+      <a href="https://prism.oshi.tw" target="_blank">前往 Prism 歌單</a>
     </div>
   </div>
 
