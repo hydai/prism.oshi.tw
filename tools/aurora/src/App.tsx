@@ -508,11 +508,6 @@ export function App() {
                 <p className="text-red-500 text-[12px] mt-2" data-testid="url-error">{urlError}</p>
               )}
             </div>
-            <div className="flex items-center gap-4 text-[12px] text-[var(--text-tertiary)]">
-              <a href="https://nova.oshi.tw/vod" className="hover:text-[var(--accent-purple)] transition-colors">Nova VOD</a>
-              <span>|</span>
-              <a href="https://prism.oshi.tw" className="hover:text-[var(--accent-purple)] transition-colors">Prism</a>
-            </div>
           </div>
         ) : (
           /* Workspace */
@@ -637,6 +632,18 @@ export function App() {
           </div>
         )}
       </main>
+
+      {/* Footer */}
+      <footer className="py-4 text-center">
+        <div className="flex items-center justify-center gap-4 text-[13px]">
+          <a href="https://nova.oshi.tw/vod" className="text-[var(--accent-purple)] hover:opacity-70 transition-opacity">Nova VOD</a>
+          <span className="text-[var(--text-tertiary)]">|</span>
+          <a href="https://prism.oshi.tw" className="text-[var(--accent-purple)] hover:opacity-70 transition-opacity">前往 Prism 歌單</a>
+        </div>
+        <p className="text-[11px] text-[var(--text-tertiary)] mt-4">
+          Prism &mdash; 為你喜愛的 VTuber 打造歌單頁面
+        </p>
+      </footer>
 
       {/* Modals */}
       <PasteImportModal

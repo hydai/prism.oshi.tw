@@ -283,6 +283,9 @@ export function renderFormPage(siteKey: string) {
       <span style="color: var(--text-tertiary);">|</span>
       <a href="https://prism.oshi.tw" target="_blank">前往 Prism 歌單</a>
     </div>
+    <p style="text-align: center; font-size: 11px; color: var(--text-tertiary); margin-top: 16px;">
+      Prism &mdash; 為你喜愛的 VTuber 打造歌單頁面
+    </p>
   </div>
 
   <script>
