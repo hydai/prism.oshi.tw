@@ -8,6 +8,7 @@ import type {
   CreateSongBody,
   UpdateSongBody,
   CreateStreamBody,
+  Status,
   StatusUpdateBody,
   StampPerformance,
   StreamWithPending,
@@ -197,6 +198,12 @@ export const api = {
     request<{ songId: string; performanceId: string }>(`/api/streams/${streamId}/performances`, {
       method: 'POST',
       body: JSON.stringify(body),
+    }),
+
+  updatePerformanceStatus: (id: string, status: Status) =>
+    request<{ ok: boolean }>(`/api/performances/${id}/status`, {
+      method: 'PATCH',
+      body: JSON.stringify({ status }),
     }),
 
   updatePerformanceTimestamps: (id: string, body: UpdateTimestampsBody) =>

@@ -240,6 +240,31 @@ export default function StreamDetail({ user }: { user: AuthUser }) {
     }
   }, [loadDetail, showToast]);
 
+  // --- Performance status ---
+  const handlePerformanceStatus = useCallback(async (perfId: string, status: Status) => {
+    try {
+      await api.updatePerformanceStatus(perfId, status);
+      await loadDetail();
+      showToast(`Performance ${status}`);
+    } catch (err: unknown) {
+      showToast(err instanceof Error ? err.message : 'Failed to update status', true);
+    }
+  }, [loadDetail, showToast]);
+
+  // --- Bulk approve all ---
+  const handleApproveAll = useCallback(async () => {
+    if (!streamId || !detail) return;
+    const pendingCount = detail.performances.filter((p) => p.status !== 'approved').length;
+    if (!confirm(`Approve all ${pendingCount} pending performances?`)) return;
+    try {
+      const result = await api.approveAllForStream(streamId);
+      await loadDetail();
+      showToast(`Approved ${result.songs} songs, ${result.performances} performances`);
+    } catch (err: unknown) {
+      showToast(err instanceof Error ? err.message : 'Failed to approve all', true);
+    }
+  }, [streamId, detail, loadDetail, showToast]);
+
   // --- Paste import done ---
   const handlePasteImportDone = useCallback(async (result: { created: number; replaced: boolean }) => {
     setShowPasteImport(false);
@@ -333,6 +358,12 @@ export default function StreamDetail({ user }: { user: AuthUser }) {
           Performances ({detail.performances.length})
         </h3>
         <div className="flex gap-2">
+          {isCurator && detail.performances.some((p) => p.status !== 'approved') && (
+            <button onClick={handleApproveAll}
+              className="rounded-md bg-green-600 px-3 py-1 text-sm font-medium text-white hover:bg-green-700">
+              Approve All
+            </button>
+          )}
           <button onClick={exportSongList}
             disabled={detail.performances.length === 0}
             className="rounded-md border border-slate-300 px-3 py-1 text-sm font-medium text-slate-600 hover:bg-slate-100 disabled:opacity-50">
@@ -425,10 +456,24 @@ export default function StreamDetail({ user }: { user: AuthUser }) {
 
                   {/* Actions */}
                   <td className="px-4 py-3">
-                    <button onClick={() => handleDelete(perf)}
-                      className="rounded p-1 text-slate-400 hover:bg-red-100 hover:text-red-600" title="Delete">
-                      &times;
-                    </button>
+                    <div className="flex items-center gap-1">
+                      {isCurator && perf.status !== 'approved' && (
+                        <button onClick={() => handlePerformanceStatus(perf.id, 'approved')}
+                          className="rounded px-1.5 py-0.5 text-xs text-green-600 hover:bg-green-100" title="Approve">
+                          ✓
+                        </button>
+                      )}
+                      {isCurator && perf.status === 'approved' && (
+                        <button onClick={() => handlePerformanceStatus(perf.id, 'pending')}
+                          className="rounded px-1.5 py-0.5 text-xs text-yellow-600 hover:bg-yellow-100" title="Unapprove">
+                          ↩
+                        </button>
+                      )}
+                      <button onClick={() => handleDelete(perf)}
+                        className="rounded p-1 text-slate-400 hover:bg-red-100 hover:text-red-600" title="Delete">
+                        &times;
+                      </button>
+                    </div>
                   </td>
                 </tr>
               ))}
