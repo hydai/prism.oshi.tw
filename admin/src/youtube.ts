@@ -120,39 +120,46 @@ function toDateStr(iso: string): string {
 }
 
 /**
- * Discover recent karaoke streams from the channel.
- * Uses playlistItems.list (1 unit) + videos.list (1 unit per 50) = ~2 units.
+ * Discover all karaoke streams from the channel's full upload history.
+ * Paginates through playlistItems.list (1 unit/page, 50 items each)
+ * then fetches video details in batches of 50.
  */
 export async function discoverStreams(
   apiKey: string,
   channelId: string,
-  opts?: { maxResults?: number },
 ): Promise<DiscoveredVideo[]> {
   const playlistId = uploadsPlaylistId(channelId);
-  const maxResults = opts?.maxResults ?? 50;
+  const allVideoIds: string[] = [];
+  let pageToken: string | undefined;
 
-  // Fetch recent uploads (1 quota unit)
-  const url = new URL(`${YT_API}/playlistItems`);
-  url.searchParams.set('part', 'snippet');
-  url.searchParams.set('playlistId', playlistId);
-  url.searchParams.set('maxResults', String(maxResults));
-  url.searchParams.set('key', apiKey);
+  // Paginate through all uploads (1 quota unit per page, 50 items each)
+  do {
+    const url = new URL(`${YT_API}/playlistItems`);
+    url.searchParams.set('part', 'snippet');
+    url.searchParams.set('playlistId', playlistId);
+    url.searchParams.set('maxResults', '50');
+    url.searchParams.set('key', apiKey);
+    if (pageToken) url.searchParams.set('pageToken', pageToken);
 
-  const res = await ytFetch(url.toString());
-  if (!res.ok) {
-    const body = await res.text();
-    throw new Error(`YouTube playlistItems.list failed (${res.status}): ${body}`);
-  }
+    const res = await ytFetch(url.toString());
+    if (!res.ok) {
+      const body = await res.text();
+      throw new Error(`YouTube playlistItems.list failed (${res.status}): ${body}`);
+    }
 
-  const data = (await res.json()) as PlaylistItemsResponse;
-  const videoIds = data.items
-    .filter((item) => matchesKaraoke(item.snippet.title))
-    .map((item) => item.snippet.resourceId.videoId);
+    const data = (await res.json()) as PlaylistItemsResponse;
+    const ids = data.items
+      .filter((item) => matchesKaraoke(item.snippet.title))
+      .map((item) => item.snippet.resourceId.videoId);
+    allVideoIds.push(...ids);
 
-  if (videoIds.length === 0) return [];
+    pageToken = data.nextPageToken;
+  } while (pageToken);
+
+  if (allVideoIds.length === 0) return [];
 
   // Fetch video details for duration/live info (1 unit per 50 IDs)
-  return getVideoDetails(apiKey, videoIds);
+  return getVideoDetails(apiKey, allVideoIds);
 }
 
 /**
