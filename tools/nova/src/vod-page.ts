@@ -510,7 +510,7 @@ export function renderVodPage(siteKey: string, streamers: ApprovedStreamer[]) {
           </label>
           <select name="streamer_slug" required class="form-select">
             <option value="">選擇 VTuber…</option>
-            ${streamerOptions}
+            ${raw(streamerOptions)}
           </select>
         </div>
 
