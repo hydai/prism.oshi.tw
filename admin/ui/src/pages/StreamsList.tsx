@@ -82,6 +82,19 @@ export default function StreamsList({ user }: { user: AuthUser }) {
     }
   };
 
+  const handleApprove = async (id: string) => {
+    try {
+      const updated = await api.updateStreamStatus(id, { status: 'approved' });
+      setStreams((prev) => prev.map((s) => (s.id === id ? updated : s)));
+      const { songs, performances } = await api.approveAllForStream(id);
+      if (songs > 0 || performances > 0) {
+        window.alert(`Approved stream + ${songs} song(s) and ${performances} performance(s)`);
+      }
+    } catch {
+      // unchanged state is visible
+    }
+  };
+
   const isCurator = user.role === 'curator';
 
   const SortHeader = ({ label, field }: { label: string; field: SortKey }) => (
@@ -196,7 +209,7 @@ export default function StreamsList({ user }: { user: AuthUser }) {
                         {(stream.status === 'pending' || stream.status === 'extracted') && (
                           <>
                             <button
-                              onClick={() => handleStatus(stream.id, 'approved')}
+                              onClick={() => handleApprove(stream.id)}
                               className="rounded bg-green-600 px-2 py-1 text-xs text-white hover:bg-green-700"
                             >
                               Approve
