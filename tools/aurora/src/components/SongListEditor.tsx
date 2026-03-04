@@ -172,7 +172,7 @@ export default function SongListEditor({ songs, selectedIndex, onSelect, onUpdat
             {onFillDuration && (
               <button
                 onClick={(e) => { e.stopPropagation(); onFillDuration(i); }}
-                disabled={song.endSeconds !== null || fillingIndex !== undefined && fillingIndex !== null}
+                disabled={fillingIndex !== null}
                 className="p-1 rounded hover:bg-purple-100 text-purple-400 hover:text-purple-600 disabled:opacity-30"
                 title="從 iTunes 自動填入結束時間"
                 data-testid="fill-duration-button"
