@@ -1,7 +1,6 @@
 'use client';
 
 import { createContext, useContext, useState, useEffect, ReactNode } from 'react';
-import { ALL_STREAMER_SLUGS } from '../../lib/streamer-slugs';
 
 export interface PlaylistVersion {
   performanceId: string;
@@ -145,53 +144,42 @@ function validateImport(data: unknown): { valid: true; playlists: Playlist[] } |
   return { valid: true, playlists: validPlaylists };
 }
 
-export const PlaylistProvider = ({ children }: { children: ReactNode }) => {
-  const STORAGE_KEY = 'prism_playlists';
+export const PlaylistProvider = ({ streamerSlug, children }: { streamerSlug: string; children: ReactNode }) => {
+  const STORAGE_KEY = `prism_${streamerSlug}_playlists`;
   const [playlists, setPlaylists] = useState<Playlist[]>([]);
   const [storageError, setStorageError] = useState<string | null>(null);
   const [localStorageSupported] = useState(() =>
     typeof window !== 'undefined' ? isLocalStorageAvailable() : true
   );
 
-  // Migrate legacy per-streamer playlists to global storage
+  // Migrate from global key back to per-streamer key
   useEffect(() => {
     try {
-      if (localStorage.getItem(STORAGE_KEY) !== null) return; // already migrated
-      const merged: Playlist[] = [];
-      // Try legacy Mizuki key first
-      const legacyMizuki = localStorage.getItem(LEGACY_STORAGE_KEY);
-      if (legacyMizuki) {
-        try {
-          const parsed = JSON.parse(legacyMizuki) as Playlist[];
-          for (const p of parsed) {
-            merged.push({
-              ...p,
-              versions: p.versions.map(v => ({ ...v, streamerSlug: (v as any).streamerSlug || 'mizuki' })),
-              updatedAt: p.updatedAt || p.createdAt || Date.now(),
-            });
+      if (localStorage.getItem(STORAGE_KEY) !== null) return; // already has per-streamer data
+      const GLOBAL_KEY = 'prism_playlists';
+      const globalData = localStorage.getItem(GLOBAL_KEY);
+      if (!globalData) {
+        // Also try legacy Mizuki key
+        if (streamerSlug === 'mizuki') {
+          const legacy = localStorage.getItem(LEGACY_STORAGE_KEY);
+          if (legacy) {
+            localStorage.setItem(STORAGE_KEY, legacy);
           }
-        } catch {}
+        }
+        return;
       }
-      // Then check all per-streamer keys
-      for (const slug of ALL_STREAMER_SLUGS) {
-        const key = `prism_${slug}_playlists`;
-        const data = localStorage.getItem(key);
-        if (!data) continue;
-        try {
-          const parsed = JSON.parse(data) as Playlist[];
-          for (const p of parsed) {
-            // Avoid duplicates by ID
-            if (merged.some(m => m.id === p.id)) continue;
-            merged.push({
-              ...p,
-              versions: p.versions.map(v => ({ ...v, streamerSlug: (v as any).streamerSlug || slug })),
-              updatedAt: p.updatedAt || p.createdAt || Date.now(),
-            });
-          }
-        } catch {}
-      }
-      if (merged.length > 0) {
-        localStorage.setItem(STORAGE_KEY, JSON.stringify(merged));
+      // Filter global playlists: keep playlists that have at least one version for this streamer,
+      // or playlists with no versions (empty playlists are kept for all streamers)
+      const parsed = JSON.parse(globalData) as Playlist[];
+      const filtered = parsed
+        .map(p => ({
+          ...p,
+          versions: p.versions.filter(v => v.streamerSlug === streamerSlug),
+          updatedAt: p.updatedAt || p.createdAt || Date.now(),
+        }))
+        .filter(p => p.versions.length > 0);
+      if (filtered.length > 0) {
+        localStorage.setItem(STORAGE_KEY, JSON.stringify(filtered));
       }
     } catch {}
   // eslint-disable-next-line react-hooks/exhaustive-deps

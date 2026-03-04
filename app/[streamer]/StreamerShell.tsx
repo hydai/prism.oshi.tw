@@ -3,7 +3,13 @@
 import { ReactNode, useEffect } from 'react';
 import { StreamerConfig, StreamerTheme } from '../../lib/types';
 import { StreamerProvider } from '../contexts/StreamerContext';
+import { PlayerProvider } from '../contexts/PlayerContext';
 import PerStreamerProviders from '../components/PerStreamerProviders';
+import MiniPlayer from '../components/MiniPlayer';
+import NowPlayingModal from '../components/NowPlayingModal';
+import YouTubePlayerContainer from '../components/YouTubePlayerContainer';
+import QueuePanel from '../components/QueuePanel';
+import RecentlyPlayedTracker from '../components/RecentlyPlayedTracker';
 
 function themeToCSS(theme: StreamerTheme): Record<string, string> {
   return {
@@ -48,9 +54,16 @@ export default function StreamerShell({
   return (
     <div style={cssVars as React.CSSProperties}>
       <StreamerProvider config={config}>
-        <PerStreamerProviders streamerSlug={config.slug}>
-          {children}
-        </PerStreamerProviders>
+        <PlayerProvider>
+          <PerStreamerProviders streamerSlug={config.slug}>
+            {children}
+            <MiniPlayer />
+            <NowPlayingModal />
+            <YouTubePlayerContainer />
+            <QueuePanel />
+            <RecentlyPlayedTracker />
+          </PerStreamerProviders>
+        </PlayerProvider>
       </StreamerProvider>
     </div>
   );

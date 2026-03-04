@@ -1,7 +1,7 @@
 'use client';
 
 import { memo } from 'react';
-import { Disc3, ChevronDown, ChevronRight, Play, Plus, ExternalLink } from 'lucide-react';
+import { Disc3, ChevronDown, ChevronRight, Play, Plus, ExternalLink, Heart } from 'lucide-react';
 import AddToPlaylistDropdown from './AddToPlaylistDropdown';
 
 interface Performance {
@@ -31,6 +31,8 @@ interface SongCardProps {
   onPlay: (track: { id: string; songId: string; title: string; originalArtist: string; videoId: string; timestamp: number; endTimestamp?: number; albumArtUrl?: string; streamerSlug: string }) => void;
   onAddToQueue: (track: { id: string; songId: string; title: string; originalArtist: string; videoId: string; timestamp: number; endTimestamp?: number; albumArtUrl?: string; streamerSlug: string }) => void;
   onAddToPlaylistSuccess: () => void;
+  isLiked: (performanceId: string) => boolean;
+  onToggleLike: (perf: Performance, song: Song) => void;
   unavailableVideoIds: Set<string>;
   streamerSlug: string;
 }
@@ -41,7 +43,7 @@ const formatTime = (seconds: number): string => {
   return `${m}:${s.toString().padStart(2, '0')}`;
 };
 
-function SongCardInner({ song, isExpanded, onToggleExpand, onPlay, onAddToQueue, onAddToPlaylistSuccess, unavailableVideoIds, streamerSlug }: SongCardProps) {
+function SongCardInner({ song, isExpanded, onToggleExpand, onPlay, onAddToQueue, onAddToPlaylistSuccess, isLiked, onToggleLike, unavailableVideoIds, streamerSlug }: SongCardProps) {
   const sortedPerformances = isExpanded
     ? [...song.performances].sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime())
     : [];
@@ -255,6 +257,21 @@ function SongCardInner({ song, isExpanded, onToggleExpand, onPlay, onAddToQueue,
                 className="flex items-center justify-end gap-1.5"
                 style={{ color: 'var(--text-secondary)' }}
               >
+                <button
+                  onClick={() => onToggleLike(perf, song)}
+                  className={`transition-all transform hover:scale-110 ${isLiked(perf.id) ? '' : 'opacity-0 group-hover/version:opacity-100'}`}
+                  style={{
+                    background: 'var(--bg-surface)',
+                    padding: 'var(--space-2)',
+                    borderRadius: 'var(--radius-circle)',
+                    boxShadow: '0 1px 4px rgba(0,0,0,0.1)',
+                    color: isLiked(perf.id) ? 'var(--accent-pink)' : 'var(--text-secondary)',
+                  }}
+                  title={isLiked(perf.id) ? '取消喜愛' : '喜愛'}
+                  data-testid="like-button"
+                >
+                  <Heart className={`w-4 h-4 ${isLiked(perf.id) ? 'fill-current' : ''}`} />
+                </button>
                 <button
                   onClick={() => onAddToQueue({
                     id: perf.id,

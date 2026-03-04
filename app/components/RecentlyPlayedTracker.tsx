@@ -2,18 +2,15 @@
 
 import { useEffect, useRef } from 'react';
 import { usePlayer } from '../contexts/PlayerContext';
-import type { RecentPlay } from '../contexts/RecentlyPlayedContext';
-
-const MAX_ENTRIES = 50;
+import { useRecentlyPlayed } from '../contexts/RecentlyPlayedContext';
 
 /**
- * Renders nothing. Bridges PlayerContext → localStorage
- * by recording track changes to the correct per-streamer recently played key.
- * Lives in GlobalProviders (above per-streamer providers), so it writes
- * directly to localStorage using track.streamerSlug.
+ * Renders nothing. Bridges PlayerContext → RecentlyPlayedContext
+ * by recording track changes via the context hook.
  */
 export default function RecentlyPlayedTracker() {
   const { currentTrack } = usePlayer();
+  const { addRecentPlay } = useRecentlyPlayed();
   const lastRecordedId = useRef<string | null>(null);
 
   useEffect(() => {
@@ -22,27 +19,16 @@ export default function RecentlyPlayedTracker() {
 
     lastRecordedId.current = currentTrack.id;
 
-    const key = `prism_${currentTrack.streamerSlug}_recently_played`;
-    try {
-      const stored = localStorage.getItem(key);
-      const existing: RecentPlay[] = stored ? JSON.parse(stored) : [];
-      const filtered = existing.filter(r => r.performanceId !== currentTrack.id);
-      const newEntry: RecentPlay = {
-        performanceId: currentTrack.id,
-        songTitle: currentTrack.title,
-        originalArtist: currentTrack.originalArtist,
-        videoId: currentTrack.videoId,
-        timestamp: currentTrack.timestamp,
-        endTimestamp: currentTrack.endTimestamp,
-        albumArtUrl: currentTrack.albumArtUrl,
-        playedAt: Date.now(),
-      };
-      const updated = [newEntry, ...filtered].slice(0, MAX_ENTRIES);
-      localStorage.setItem(key, JSON.stringify(updated));
-    } catch {
-      // localStorage unavailable — silently skip
-    }
-  }, [currentTrack]);
+    addRecentPlay({
+      performanceId: currentTrack.id,
+      songTitle: currentTrack.title,
+      originalArtist: currentTrack.originalArtist,
+      videoId: currentTrack.videoId,
+      timestamp: currentTrack.timestamp,
+      endTimestamp: currentTrack.endTimestamp,
+      albumArtUrl: currentTrack.albumArtUrl,
+    });
+  }, [currentTrack, addRecentPlay]);
 
   return null;
 }

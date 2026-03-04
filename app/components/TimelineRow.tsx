@@ -1,7 +1,7 @@
 'use client';
 
 import { memo } from 'react';
-import { Play, Disc3, Plus, ExternalLink } from 'lucide-react';
+import { Play, Disc3, Plus, ExternalLink, Heart } from 'lucide-react';
 import AlbumArt from './AlbumArt';
 import AddToPlaylistDropdown from './AddToPlaylistDropdown';
 
@@ -29,6 +29,8 @@ interface TimelineRowProps {
   index: number;
   isCurrentlyPlaying: boolean;
   isUnavailable: boolean;
+  isLiked: boolean;
+  onToggleLike: () => void;
   onPlay: (track: { id: string; songId: string; title: string; originalArtist: string; videoId: string; timestamp: number; endTimestamp?: number; albumArtUrl?: string; streamerSlug: string }) => void;
   onAddToQueue: (track: { id: string; songId: string; title: string; originalArtist: string; videoId: string; timestamp: number; endTimestamp?: number; albumArtUrl?: string; streamerSlug: string }) => void;
   onAddToPlaylistSuccess: () => void;
@@ -41,7 +43,7 @@ const formatTime = (seconds: number): string => {
   return `${m}:${s.toString().padStart(2, '0')}`;
 };
 
-function TimelineRowInner({ song, index, isCurrentlyPlaying, isUnavailable, onPlay, onAddToQueue, onAddToPlaylistSuccess, streamerSlug }: TimelineRowProps) {
+function TimelineRowInner({ song, index, isCurrentlyPlaying, isUnavailable, isLiked, onToggleLike, onPlay, onAddToQueue, onAddToPlaylistSuccess, streamerSlug }: TimelineRowProps) {
   const track = {
     id: song.performanceId,
     songId: song.id,
@@ -202,6 +204,21 @@ function TimelineRowInner({ song, index, isCurrentlyPlaying, isUnavailable, onPl
         style={{ color: 'var(--text-secondary)' }}
       >
         <button
+          onClick={onToggleLike}
+          className={`transition-all transform hover:scale-110 ${isLiked ? '' : 'lg:opacity-0 lg:group-hover:opacity-100'}`}
+          style={{
+            background: 'var(--bg-surface)',
+            padding: 'var(--space-2)',
+            borderRadius: 'var(--radius-circle)',
+            boxShadow: '0 1px 4px rgba(0,0,0,0.1)',
+            color: isLiked ? 'var(--accent-pink)' : 'var(--text-secondary)',
+          }}
+          title={isLiked ? '取消喜愛' : '喜愛'}
+          data-testid="like-button"
+        >
+          <Heart className={`w-4 h-4 ${isLiked ? 'fill-current' : ''}`} />
+        </button>
+        <button
           onClick={() => onAddToQueue(track)}
           className="lg:opacity-0 lg:group-hover:opacity-100 transition-all transform hover:scale-110"
           style={{
@@ -280,7 +297,8 @@ const TimelineRow = memo(TimelineRowInner, (prev, next) => {
     prev.song.performanceId === next.song.performanceId &&
     prev.index === next.index &&
     prev.isCurrentlyPlaying === next.isCurrentlyPlaying &&
-    prev.isUnavailable === next.isUnavailable
+    prev.isUnavailable === next.isUnavailable &&
+    prev.isLiked === next.isLiked
   );
 });
 

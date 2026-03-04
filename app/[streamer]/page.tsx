@@ -135,7 +135,7 @@ export default function Home() {
   const { currentTrack, playTrack, addToQueue, apiLoadError, unavailableVideoIds, timestampWarning, clearTimestampWarning, skipNotification, clearSkipNotification, shuffleOn, toggleShuffle } = usePlayer();
   const currentTrackId = currentTrack?.id ?? null;
   const { playlists, storageError, clearStorageError } = usePlaylist();
-  const { likedCount } = useLikedSongs();
+  const { likedCount, isLiked, toggleLike } = useLikedSongs();
   const { recentCount } = useRecentlyPlayed();
 
   const handleAddToQueue = useCallback((track: { id: string; songId: string; title: string; originalArtist: string; videoId: string; timestamp: number; endTimestamp?: number; albumArtUrl?: string; streamerSlug: string }) => {
@@ -1363,6 +1363,16 @@ export default function Home() {
                               index={virtualItem.index}
                               isCurrentlyPlaying={currentTrackId === song.performanceId}
                               isUnavailable={unavailableVideoIds.has(song.videoId)}
+                              isLiked={isLiked(song.performanceId)}
+                              onToggleLike={() => toggleLike({
+                                performanceId: song.performanceId,
+                                songTitle: song.title,
+                                originalArtist: song.originalArtist,
+                                videoId: song.videoId,
+                                timestamp: song.timestamp,
+                                endTimestamp: song.endTimestamp,
+                                albumArtUrl: song.albumArtUrl,
+                              })}
                               onPlay={playTrack}
                               streamerSlug={slug}
                               onAddToQueue={handleAddToQueue}
@@ -1431,6 +1441,16 @@ export default function Home() {
                             onPlay={playTrack}
                             onAddToQueue={handleAddToQueue}
                             onAddToPlaylistSuccess={handleAddToPlaylistSuccess}
+                            isLiked={isLiked}
+                            onToggleLike={(perf, s) => toggleLike({
+                              performanceId: perf.id,
+                              songTitle: s.title,
+                              originalArtist: s.originalArtist,
+                              videoId: perf.videoId,
+                              timestamp: perf.timestamp,
+                              endTimestamp: perf.endTimestamp ?? undefined,
+                              albumArtUrl: s.albumArtUrl,
+                            })}
                             unavailableVideoIds={unavailableVideoIds}
                             streamerSlug={slug}
                           />

@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { ChevronDown, Music2, Share2 } from 'lucide-react';
+import { ChevronDown, Music2, Share2, Heart } from 'lucide-react';
 import { useStreamer } from '../../contexts/StreamerContext';
 import { usePlayer } from '../../contexts/PlayerContext';
 import { useLikedSongs } from '../../contexts/LikedSongsContext';
@@ -38,8 +38,22 @@ export default function NowPlayingPage() {
   const [showRecentlyPlayedPanel, setShowRecentlyPlayedPanel] = useState(false);
   const [showToast, setShowToast] = useState(false);
   const [toastMessage, setToastMessage] = useState('');
-  const { likedCount } = useLikedSongs();
+  const { likedCount, isLiked, toggleLike } = useLikedSongs();
   const { recentCount } = useRecentlyPlayed();
+
+  const liked = currentTrack ? isLiked(currentTrack.id) : false;
+  const handleToggleLike = () => {
+    if (!currentTrack) return;
+    toggleLike({
+      performanceId: currentTrack.id,
+      songTitle: currentTrack.title,
+      originalArtist: currentTrack.originalArtist,
+      videoId: currentTrack.videoId,
+      timestamp: currentTrack.timestamp,
+      endTimestamp: currentTrack.endTimestamp,
+      albumArtUrl: currentTrack.albumArtUrl,
+    });
+  };
 
   const hasKnownDuration = trackDuration != null && trackDuration > 0;
   const progress = hasKnownDuration
@@ -182,6 +196,15 @@ export default function NowPlayingPage() {
               <span style={{ fontSize: '16px', color: '#64748B' }}>
                 {currentTrack.originalArtist}
               </span>
+              <button
+                onClick={handleToggleLike}
+                className="transition-all transform hover:scale-110"
+                aria-label={liked ? '取消喜愛' : '喜愛'}
+                data-testid="np-like-button"
+                style={{ color: liked ? 'var(--accent-pink)' : 'var(--text-tertiary)', padding: '4px' }}
+              >
+                <Heart style={{ width: '22px', height: '22px' }} className={liked ? 'fill-current' : ''} />
+              </button>
             </div>
           </div>
 
@@ -245,6 +268,15 @@ export default function NowPlayingPage() {
             <span style={{ fontSize: '16px', color: '#64748B' }}>
               {currentTrack.originalArtist}
             </span>
+            <button
+              onClick={handleToggleLike}
+              className="transition-all transform hover:scale-110"
+              aria-label={liked ? '取消喜愛' : '喜愛'}
+              data-testid="np-like-button-desktop"
+              style={{ color: liked ? 'var(--accent-pink)' : 'var(--text-tertiary)', padding: '4px' }}
+            >
+              <Heart style={{ width: '24px', height: '24px' }} className={liked ? 'fill-current' : ''} />
+            </button>
           </div>
         </div>
 

@@ -3,8 +3,9 @@
 import { useEffect } from 'react';
 import { usePathname } from 'next/navigation';
 import Link from 'next/link';
-import { Play, Pause, SkipBack, SkipForward, ListMusic, AlertCircle, Shuffle, Repeat, Repeat1, Maximize2 } from 'lucide-react';
+import { Play, Pause, SkipBack, SkipForward, ListMusic, AlertCircle, Shuffle, Repeat, Repeat1, Maximize2, Heart } from 'lucide-react';
 import { usePlayer } from '../contexts/PlayerContext';
+import { useLikedSongs } from '../contexts/LikedSongsContext';
 import AlbumArt from './AlbumArt';
 import VolumeControl from './VolumeControl';
 import ProgressBar from './ProgressBar';
@@ -29,9 +30,25 @@ export default function MiniPlayer() {
     toggleShuffle,
   } = usePlayer();
 
+  const { isLiked, toggleLike } = useLikedSongs();
+
   const pathname = usePathname();
   const pageSlug = pathname?.split('/')[1] || '';
   const isNowPlayingPage = pathname?.endsWith('/now-playing');
+
+  const liked = currentTrack ? isLiked(currentTrack.id) : false;
+  const handleToggleLike = () => {
+    if (!currentTrack) return;
+    toggleLike({
+      performanceId: currentTrack.id,
+      songTitle: currentTrack.title,
+      originalArtist: currentTrack.originalArtist,
+      videoId: currentTrack.videoId,
+      timestamp: currentTrack.timestamp,
+      endTimestamp: currentTrack.endTimestamp,
+      albumArtUrl: currentTrack.albumArtUrl,
+    });
+  };
 
   // Keyboard navigation: Space for play/pause when player is active
   useEffect(() => {
@@ -125,6 +142,20 @@ export default function MiniPlayer() {
               {currentTrack.originalArtist}
             </div>
           </div>
+
+          {/* Like button — mobile */}
+          <button
+            onClick={(e) => {
+              e.stopPropagation();
+              handleToggleLike();
+            }}
+            className="flex-shrink-0"
+            aria-label={liked ? '取消喜愛' : '喜愛'}
+            data-testid="mini-player-like-button-mobile"
+            style={{ color: liked ? 'var(--accent-pink)' : 'var(--text-secondary)', padding: '4px' }}
+          >
+            <Heart style={{ width: '20px', height: '20px' }} className={liked ? 'fill-current' : ''} />
+          </button>
 
           {/* Queue button — mobile */}
           <button
@@ -357,6 +388,20 @@ export default function MiniPlayer() {
             >
               <Maximize2 style={{ width: '18px', height: '18px' }} />
             </Link>
+
+            {/* Like button — desktop */}
+            <button
+              onClick={(e) => {
+                e.stopPropagation();
+                handleToggleLike();
+              }}
+              className="transition-colors hover-text-primary"
+              aria-label={liked ? '取消喜愛' : '喜愛'}
+              data-testid="mini-player-like-button"
+              style={{ color: liked ? 'var(--accent-pink)' : 'var(--text-tertiary)' }}
+            >
+              <Heart style={{ width: '18px', height: '18px' }} className={liked ? 'fill-current' : ''} />
+            </button>
 
             {/* Queue button */}
             <button

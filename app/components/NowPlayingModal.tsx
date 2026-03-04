@@ -2,8 +2,9 @@
 
 import { useEffect, useState } from 'react';
 import { createPortal } from 'react-dom';
-import { X, Play, Pause, SkipBack, SkipForward, ChevronDown, Shuffle, Repeat, Repeat1, ListMusic } from 'lucide-react';
+import { X, Play, Pause, SkipBack, SkipForward, ChevronDown, Shuffle, Repeat, Repeat1, ListMusic, Heart } from 'lucide-react';
 import { usePlayer } from '../contexts/PlayerContext';
+import { useLikedSongs } from '../contexts/LikedSongsContext';
 import AlbumArt from './AlbumArt';
 import VolumeControl from './VolumeControl';
 import ProgressBar from './ProgressBar';
@@ -33,6 +34,22 @@ export default function NowPlayingModal() {
     queue,
     setShowQueue,
   } = usePlayer();
+
+  const { isLiked, toggleLike } = useLikedSongs();
+
+  const liked = currentTrack ? isLiked(currentTrack.id) : false;
+  const handleToggleLike = () => {
+    if (!currentTrack) return;
+    toggleLike({
+      performanceId: currentTrack.id,
+      songTitle: currentTrack.title,
+      originalArtist: currentTrack.originalArtist,
+      videoId: currentTrack.videoId,
+      timestamp: currentTrack.timestamp,
+      endTimestamp: currentTrack.endTimestamp,
+      albumArtUrl: currentTrack.albumArtUrl,
+    });
+  };
 
   // Keyboard navigation: Escape to close modal
   useEffect(() => {
@@ -103,6 +120,15 @@ export default function NowPlayingModal() {
           <div className="mb-6 text-center">
             <h3 className="text-2xl font-bold text-slate-800 mb-2">{currentTrack.title}</h3>
             <p className="text-lg text-slate-500">{currentTrack.originalArtist}</p>
+            <button
+              onClick={handleToggleLike}
+              className="mt-3 transition-all transform hover:scale-110"
+              aria-label={liked ? '取消喜愛' : '喜愛'}
+              data-testid="modal-like-button"
+              style={{ color: liked ? 'var(--accent-pink)' : 'var(--text-tertiary)' }}
+            >
+              <Heart className={`w-6 h-6 ${liked ? 'fill-current' : ''}`} />
+            </button>
           </div>
 
           {/* Progress Bar */}
