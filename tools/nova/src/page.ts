@@ -141,7 +141,7 @@ export function renderPage(siteKey: string) {
         ">Prism Nova</span>
       </div>
       <p style="color: var(--text-secondary); font-size: 14px;">
-        提交你喜愛的 VTuber，讓我們為 TA 建立 Prism 頁面
+        提交你喜愛的 VTuber，讓我們為他／她建立 Prism 頁面
       </p>
     </div>
 
