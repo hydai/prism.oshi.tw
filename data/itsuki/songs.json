@@ -1,1 +1,290 @@
-[]
+[
+  {
+    "id": "song-c0847d66",
+    "title": "After LIKE",
+    "originalArtist": "IVE",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-09123458",
+        "streamId": "stream-2026-02-24",
+        "date": "2026-02-24",
+        "streamTitle": "【深情歌回】對你唱情歌 ( 唱到分手的那種 )",
+        "videoId": "5tc5NgwrZdE",
+        "timestamp": 2371,
+        "endTimestamp": 2562,
+        "note": ""
+      }
+    ]
+  },
+  {
+    "id": "song-cecc7060",
+    "title": "Afterthought",
+    "originalArtist": "Joji & BENEE",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-9e83fcbb",
+        "streamId": "stream-2026-02-24",
+        "date": "2026-02-24",
+        "streamTitle": "【深情歌回】對你唱情歌 ( 唱到分手的那種 )",
+        "videoId": "5tc5NgwrZdE",
+        "timestamp": 4718,
+        "endTimestamp": 4861,
+        "note": ""
+      }
+    ]
+  },
+  {
+    "id": "song-9c7e6187",
+    "title": "Coffee",
+    "originalArtist": "a!ka",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-0581ca24",
+        "streamId": "stream-2026-02-24",
+        "date": "2026-02-24",
+        "streamTitle": "【深情歌回】對你唱情歌 ( 唱到分手的那種 )",
+        "videoId": "5tc5NgwrZdE",
+        "timestamp": 1321,
+        "endTimestamp": 1505,
+        "note": ""
+      }
+    ]
+  },
+  {
+    "id": "song-cd685a2f",
+    "title": "Free",
+    "originalArtist": "KPop Demon Hunters",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-c4952ec3",
+        "streamId": "stream-2026-02-24",
+        "date": "2026-02-24",
+        "streamTitle": "【深情歌回】對你唱情歌 ( 唱到分手的那種 )",
+        "videoId": "5tc5NgwrZdE",
+        "timestamp": 3027,
+        "endTimestamp": 3239,
+        "note": ""
+      }
+    ]
+  },
+  {
+    "id": "song-171397e5",
+    "title": "Keep Me Warm",
+    "originalArtist": "Chace",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-4361c11c",
+        "streamId": "stream-2026-02-24",
+        "date": "2026-02-24",
+        "streamTitle": "【深情歌回】對你唱情歌 ( 唱到分手的那種 )",
+        "videoId": "5tc5NgwrZdE",
+        "timestamp": 3614,
+        "endTimestamp": 3826,
+        "note": ""
+      }
+    ]
+  },
+  {
+    "id": "song-b7bc9014",
+    "title": "Love Me Like You Do",
+    "originalArtist": "Ellie Goulding",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-5c078e7b",
+        "streamId": "stream-2026-02-24",
+        "date": "2026-02-24",
+        "streamTitle": "【深情歌回】對你唱情歌 ( 唱到分手的那種 )",
+        "videoId": "5tc5NgwrZdE",
+        "timestamp": 3945,
+        "endTimestamp": 4149,
+        "note": ""
+      }
+    ]
+  },
+  {
+    "id": "song-0d92721b",
+    "title": "Paper Hearts",
+    "originalArtist": "Tori Kelly",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-c60c71ab",
+        "streamId": "stream-2026-02-24",
+        "date": "2026-02-24",
+        "streamTitle": "【深情歌回】對你唱情歌 ( 唱到分手的那種 )",
+        "videoId": "5tc5NgwrZdE",
+        "timestamp": 5316,
+        "endTimestamp": 5514,
+        "note": ""
+      }
+    ]
+  },
+  {
+    "id": "song-a610c710",
+    "title": "So Easy",
+    "originalArtist": "Olivia Dean",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-cadff1da",
+        "streamId": "stream-2026-02-24",
+        "date": "2026-02-24",
+        "streamTitle": "【深情歌回】對你唱情歌 ( 唱到分手的那種 )",
+        "videoId": "5tc5NgwrZdE",
+        "timestamp": 1924,
+        "endTimestamp": 2092,
+        "note": ""
+      }
+    ]
+  },
+  {
+    "id": "song-e999e777",
+    "title": "VERTIGO",
+    "originalArtist": "CITIZEN",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-a785156c",
+        "streamId": "stream-2026-02-24",
+        "date": "2026-02-24",
+        "streamTitle": "【深情歌回】對你唱情歌 ( 唱到分手的那種 )",
+        "videoId": "5tc5NgwrZdE",
+        "timestamp": 2698,
+        "endTimestamp": 2860,
+        "note": ""
+      }
+    ]
+  },
+  {
+    "id": "song-367c1cac",
+    "title": "bad enough",
+    "originalArtist": "Madison Beer",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-877976c7",
+        "streamId": "stream-2026-02-24",
+        "date": "2026-02-24",
+        "streamTitle": "【深情歌回】對你唱情歌 ( 唱到分手的那種 )",
+        "videoId": "5tc5NgwrZdE",
+        "timestamp": 4334,
+        "endTimestamp": 4556,
+        "note": ""
+      }
+    ]
+  },
+  {
+    "id": "song-d81a8f81",
+    "title": "不在一起就不會分開",
+    "originalArtist": "洪佩瑜",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-1063d588",
+        "streamId": "stream-2026-02-24",
+        "date": "2026-02-24",
+        "streamTitle": "【深情歌回】對你唱情歌 ( 唱到分手的那種 )",
+        "videoId": "5tc5NgwrZdE",
+        "timestamp": 6807,
+        "endTimestamp": 7093,
+        "note": ""
+      }
+    ]
+  },
+  {
+    "id": "song-b8a7b19e",
+    "title": "失戀無罪",
+    "originalArtist": "A-Lin",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-a340a28e",
+        "streamId": "stream-2026-02-24",
+        "date": "2026-02-24",
+        "streamTitle": "【深情歌回】對你唱情歌 ( 唱到分手的那種 )",
+        "videoId": "5tc5NgwrZdE",
+        "timestamp": 5651,
+        "endTimestamp": 5930,
+        "note": ""
+      }
+    ]
+  },
+  {
+    "id": "song-daefa172",
+    "title": "無慣例的早晨",
+    "originalArtist": "洪佩瑜",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-64829314",
+        "streamId": "stream-2026-02-24",
+        "date": "2026-02-24",
+        "streamTitle": "【深情歌回】對你唱情歌 ( 唱到分手的那種 )",
+        "videoId": "5tc5NgwrZdE",
+        "timestamp": 7191,
+        "endTimestamp": 7409,
+        "note": ""
+      }
+    ]
+  },
+  {
+    "id": "song-46244f0a",
+    "title": "煙幕",
+    "originalArtist": "陳忻玥 Vicky Chen",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-5baa00b9",
+        "streamId": "stream-2026-02-24",
+        "date": "2026-02-24",
+        "streamTitle": "【深情歌回】對你唱情歌 ( 唱到分手的那種 )",
+        "videoId": "5tc5NgwrZdE",
+        "timestamp": 4948,
+        "endTimestamp": 5192,
+        "note": ""
+      }
+    ]
+  },
+  {
+    "id": "song-23c7e0e9",
+    "title": "踮起腳尖愛",
+    "originalArtist": "洪佩瑜",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-1259d58a",
+        "streamId": "stream-2026-02-24",
+        "date": "2026-02-24",
+        "streamTitle": "【深情歌回】對你唱情歌 ( 唱到分手的那種 )",
+        "videoId": "5tc5NgwrZdE",
+        "timestamp": 6225,
+        "endTimestamp": 6565,
+        "note": ""
+      }
+    ]
+  },
+  {
+    "id": "song-2317f19e",
+    "title": "遇見",
+    "originalArtist": "燕姿",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-99078f2e",
+        "streamId": "stream-2026-02-24",
+        "date": "2026-02-24",
+        "streamTitle": "【深情歌回】對你唱情歌 ( 唱到分手的那種 )",
+        "videoId": "5tc5NgwrZdE",
+        "timestamp": 821,
+        "endTimestamp": 1028,
+        "note": ""
+      }
+    ]
+  }
+]
