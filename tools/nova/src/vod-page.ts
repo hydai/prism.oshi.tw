@@ -120,39 +120,52 @@ export function renderVodPage(siteKey: string, streamers: ApprovedStreamer[]) {
     }
     .btn-secondary:hover { background: #fff; border-color: var(--accent-pink-light); }
 
-    .btn-danger {
-      padding: 4px 8px;
-      border: none;
-      border-radius: 6px;
-      background: transparent;
-      color: var(--text-tertiary);
-      font-size: 16px;
-      cursor: pointer;
-      transition: color 0.2s, background 0.2s;
+    .songs-textarea {
+      width: 100%;
+      min-height: 120px;
+      padding: 12px 16px;
+      background: var(--bg-surface-frosted);
+      border: 1px solid var(--border-glass);
+      border-radius: var(--radius-lg);
+      font-family: 'DM Sans', monospace;
+      font-size: 13px;
+      color: var(--text-primary);
+      outline: none;
+      resize: vertical;
+      transition: border-color 0.2s, box-shadow 0.2s;
+      line-height: 1.6;
     }
-    .btn-danger:hover { color: #EF4444; background: #FEF2F2; }
+    .songs-textarea::placeholder { color: var(--text-tertiary); }
+    .songs-textarea:focus {
+      border-color: var(--border-accent-pink);
+      box-shadow: 0 0 0 3px rgba(236, 72, 153, 0.1);
+    }
 
-    .song-entry {
-      display: grid;
-      grid-template-columns: 1fr 1fr 100px 100px auto;
-      gap: 8px;
-      align-items: center;
-      padding: 8px 0;
+    .songs-table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 13px;
+      margin-top: 12px;
+    }
+    .songs-table th {
+      text-align: left;
+      font-weight: 600;
+      color: var(--text-secondary);
+      padding: 6px 10px;
+      border-bottom: 1px solid var(--border-default);
+      font-size: 12px;
+    }
+    .songs-table td {
+      padding: 6px 10px;
       border-bottom: 1px solid var(--border-glass);
+      color: var(--text-primary);
     }
-    .song-entry:last-child { border-bottom: none; }
-
-    @media (max-width: 640px) {
-      .song-entry {
-        grid-template-columns: 1fr 1fr;
-        gap: 6px;
-      }
-      .song-ts-row {
-        grid-column: 1 / -1;
-        display: grid;
-        grid-template-columns: 1fr 1fr auto;
-        gap: 6px;
-      }
+    .songs-table tr:last-child td { border-bottom: none; }
+    .songs-table .ts-col {
+      font-family: monospace;
+      font-size: 12px;
+      color: var(--text-secondary);
+      white-space: nowrap;
     }
 
     .cross-links {
@@ -255,16 +268,14 @@ export function renderVodPage(siteKey: string, streamers: ApprovedStreamer[]) {
 
         <!-- Song Timestamps Section -->
         <div style="border-top: 1px solid var(--border-glass); padding-top: 20px;">
-          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px;">
-            <p class="section-label" style="margin-bottom: 0;">歌曲時間戳（選填）</p>
-            <button type="button" id="add-song-btn" class="btn-secondary">+ 新增歌曲</button>
-          </div>
+          <p class="section-label">歌曲時間戳（選填）</p>
           <p class="form-hint" style="margin-bottom: 12px;">
-            如果你知道每首歌的時間戳，可以在這裡填寫。也可以之後用
-            <a href="https://aurora.oshi.tw" target="_blank" style="color: var(--accent-purple);">Aurora 編輯器</a>
-            來編輯。
+            貼上
+            <a href="https://aurora.oshi.tw" target="_blank" style="color: var(--accent-purple);">Aurora</a>
+            匯出的時間戳格式，或手動輸入。
           </p>
-          <div id="songs-container"></div>
+          <textarea id="songs-textarea" class="songs-textarea" placeholder="01. 0:00:30 ~ 0:05:30 歌名 / 原唱&#10;02. 0:05:30 ~ 0:10:00 另一首歌 / 歌手"></textarea>
+          <div id="songs-preview"></div>
         </div>
 
         <!-- Turnstile -->
@@ -304,46 +315,131 @@ export function renderVodPage(siteKey: string, streamers: ApprovedStreamer[]) {
       var urlCheck = document.getElementById('url-check');
       var submitBtn = document.getElementById('submit-btn');
       var resultDiv = document.getElementById('result');
-      var songsContainer = document.getElementById('songs-container');
-      var addSongBtn = document.getElementById('add-song-btn');
-      var songCount = 0;
+      var songsTextarea = document.getElementById('songs-textarea');
+      var songsPreview = document.getElementById('songs-preview');
       var thumbnailUrl = '';
 
-      function createInput(name, placeholder, value) {
-        var input = document.createElement('input');
-        input.type = 'text';
-        input.name = name;
-        input.placeholder = placeholder;
-        input.className = 'form-input';
-        if (value) input.value = value;
-        return input;
+      // --- Inline parser (ported from lib/parse.ts) ---
+      var LINE_TS_RE = /^(?:(\d{1,2}):)?(\d{1,2}):(\d{2})/;
+      var RANGE_END_RE = /^(?:~|-|\u2013|\u2014)\s*(?:(\d{1,2}):)?(\d{1,2}):(\d{2})/;
+
+      function secondsToTimestamp(sec) {
+        var h = Math.floor(sec / 3600);
+        var rem = sec % 3600;
+        var m = Math.floor(rem / 60);
+        var s = rem % 60;
+        var mm = String(m).padStart(2, '0');
+        var ss = String(s).padStart(2, '0');
+        return h ? h + ':' + mm + ':' + ss : m + ':' + ss;
       }
 
-      function addSongEntry(data) {
-        songCount++;
-        var entry = document.createElement('div');
-        entry.className = 'song-entry';
-
-        entry.appendChild(createInput('song_title_' + songCount, '歌名', data ? data.title : ''));
-        entry.appendChild(createInput('song_artist_' + songCount, '原唱', data ? data.artist : ''));
-
-        var tsRow = document.createElement('div');
-        tsRow.className = 'song-ts-row';
-        tsRow.appendChild(createInput('song_start_' + songCount, '開始 0:00:00', data ? data.start : ''));
-        tsRow.appendChild(createInput('song_end_' + songCount, '結束（選填）', data ? data.end : ''));
-
-        var delBtn = document.createElement('button');
-        delBtn.type = 'button';
-        delBtn.className = 'btn-danger';
-        delBtn.textContent = '\u00D7';
-        delBtn.addEventListener('click', function() { entry.remove(); });
-        tsRow.appendChild(delBtn);
-
-        entry.appendChild(tsRow);
-        songsContainer.appendChild(entry);
+      function splitArtist(info) {
+        var slashM = info.match(/\s*\/\s+|\s+\/\s*/);
+        if (slashM) return [info.slice(0, slashM.index).trim(), info.slice(slashM.index + slashM[0].length).trim()];
+        var dashM = info.match(/\s+-\s+/);
+        if (dashM) return [info.slice(0, dashM.index).trim(), info.slice(dashM.index + dashM[0].length).trim()];
+        var bare = info.indexOf('/');
+        if (bare !== -1) {
+          var n = info.slice(0, bare).trim(), a = info.slice(bare + 1).trim();
+          if (n && a) return [n, a];
+        }
+        return [info.trim(), ''];
       }
 
-      addSongBtn.addEventListener('click', function() { addSongEntry(); });
+      function parseSongLine(line) {
+        line = line.trim();
+        if (!line) return null;
+        line = line.replace(/^[\u2500-\u257F\s]+/, '');
+        if (!line) return null;
+        line = line.replace(/^(?:\d+\.\s*|\d+\)\s+|#\d+\s+)/, '');
+        line = line.replace(/^[-*+]\s+/, '');
+        var tsM = line.match(LINE_TS_RE);
+        if (!tsM) return null;
+        var h = tsM[1] ? parseInt(tsM[1], 10) : 0;
+        var startSec = h * 3600 + parseInt(tsM[2], 10) * 60 + parseInt(tsM[3], 10);
+        var rest = line.slice(tsM[0].length).trim();
+        var endSec = null;
+        var rangeM = rest.match(RANGE_END_RE);
+        if (rangeM) {
+          var rh = rangeM[1] ? parseInt(rangeM[1], 10) : 0;
+          endSec = rh * 3600 + parseInt(rangeM[2], 10) * 60 + parseInt(rangeM[3], 10);
+          rest = rest.slice(rangeM[0].length).trim();
+        }
+        var sepM = rest.match(/^(?:-\s+|\u2013\s+|\u2014\s+)/);
+        if (sepM) rest = rest.slice(sepM[0].length).trim();
+        if (!rest) return null;
+        var parts = splitArtist(rest);
+        return { startSeconds: startSec, endSeconds: endSec, songName: parts[0], artist: parts[1] };
+      }
+
+      function parseTextToSongs(text) {
+        var raw = [];
+        var lines = text.split('\n');
+        for (var i = 0; i < lines.length; i++) {
+          var p = parseSongLine(lines[i]);
+          if (p) raw.push(p);
+        }
+        var result = [];
+        for (var i = 0; i < raw.length; i++) {
+          var s = raw[i];
+          var end = s.endSeconds;
+          if (end === null && i + 1 < raw.length) end = raw[i + 1].startSeconds;
+          result.push({
+            songName: s.songName,
+            artist: s.artist,
+            startSeconds: s.startSeconds,
+            endSeconds: end,
+            startTimestamp: secondsToTimestamp(s.startSeconds),
+            endTimestamp: end !== null ? secondsToTimestamp(end) : null,
+          });
+        }
+        return result;
+      }
+
+      function renderPreview(songs) {
+        if (!songs.length) { songsPreview.textContent = ''; return; }
+        var tbl = document.createElement('table');
+        tbl.className = 'songs-table';
+        var thead = document.createElement('thead');
+        var headRow = document.createElement('tr');
+        ['#', '歌名', '原唱', '開始', '結束'].forEach(function(t) {
+          var th = document.createElement('th');
+          th.textContent = t;
+          headRow.appendChild(th);
+        });
+        thead.appendChild(headRow);
+        tbl.appendChild(thead);
+        var tbody = document.createElement('tbody');
+        for (var i = 0; i < songs.length; i++) {
+          var s = songs[i];
+          var row = document.createElement('tr');
+          var tdNum = document.createElement('td');
+          tdNum.textContent = String(i + 1);
+          row.appendChild(tdNum);
+          var tdName = document.createElement('td');
+          tdName.textContent = s.songName;
+          row.appendChild(tdName);
+          var tdArtist = document.createElement('td');
+          tdArtist.textContent = s.artist;
+          row.appendChild(tdArtist);
+          var tdStart = document.createElement('td');
+          tdStart.className = 'ts-col';
+          tdStart.textContent = s.startTimestamp;
+          row.appendChild(tdStart);
+          var tdEnd = document.createElement('td');
+          tdEnd.className = 'ts-col';
+          tdEnd.textContent = s.endTimestamp || '';
+          row.appendChild(tdEnd);
+          tbody.appendChild(row);
+        }
+        tbl.appendChild(tbody);
+        songsPreview.textContent = '';
+        songsPreview.appendChild(tbl);
+      }
+
+      songsTextarea.addEventListener('input', function() {
+        renderPreview(parseTextToSongs(this.value));
+      });
 
       // On URL blur: duplicate check + auto-fetch video info
       var lastFetchedUrl = '';
@@ -401,25 +497,27 @@ export function renderVodPage(siteKey: string, streamers: ApprovedStreamer[]) {
           .catch(function() {});
       });
 
-      // Collect songs from form
+      // Collect songs from textarea
       function collectSongs() {
-        var songs = [];
-        var entries = songsContainer.querySelectorAll('.song-entry');
-        for (var i = 0; i < entries.length; i++) {
-          var title = entries[i].querySelector('[name^="song_title_"]');
-          var artist = entries[i].querySelector('[name^="song_artist_"]');
-          var start = entries[i].querySelector('[name^="song_start_"]');
-          var end = entries[i].querySelector('[name^="song_end_"]');
-          if (title && title.value.trim() && start && start.value.trim()) {
-            songs.push({
-              song_title: title.value.trim(),
-              original_artist: artist ? artist.value.trim() : '',
-              start_timestamp: start.value.trim(),
-              end_timestamp: end && end.value.trim() ? end.value.trim() : null,
-            });
-          }
-        }
-        return songs;
+        var parsed = parseTextToSongs(songsTextarea.value);
+        return parsed.map(function(s) {
+          // Format as H:MM:SS for backend parseTimestamp()
+          var fmtStart = secondsToHMS(s.startSeconds);
+          var fmtEnd = s.endSeconds !== null ? secondsToHMS(s.endSeconds) : null;
+          return {
+            song_title: s.songName,
+            original_artist: s.artist,
+            start_timestamp: fmtStart,
+            end_timestamp: fmtEnd,
+          };
+        });
+      }
+
+      function secondsToHMS(sec) {
+        var h = Math.floor(sec / 3600);
+        var m = Math.floor((sec % 3600) / 60);
+        var s = sec % 60;
+        return h + ':' + String(m).padStart(2, '0') + ':' + String(s).padStart(2, '0');
       }
 
       // Form submission
@@ -462,8 +560,8 @@ export function renderVodPage(siteKey: string, streamers: ApprovedStreamer[]) {
               ? '重新提交成功！ID: ' + data.id + '。將再次進入審核流程。'
               : '提交成功！ID: ' + data.id + '。感謝你的幫助！';
             form.reset();
-            while (songsContainer.firstChild) songsContainer.removeChild(songsContainer.firstChild);
-            songCount = 0;
+            songsTextarea.value = '';
+            songsPreview.textContent = '';
             thumbnailUrl = '';
             if (window.turnstile) turnstile.reset();
           } else if (res.status === 409) {
