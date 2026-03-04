@@ -789,7 +789,7 @@ export default function Home() {
 
               {/* Social Links Row */}
               <div className="flex items-center gap-2" style={{ marginTop: '4px' }}>
-                {/* YouTube SocialButton */}
+                {streamerData.socialLinks.youtube && (
                 <a
                   href={streamerData.socialLinks.youtube}
                   target="_blank"
@@ -810,7 +810,8 @@ export default function Home() {
                   <Youtube className="w-4 h-4" style={{ color: '#FF0000' }} />
                   YouTube
                 </a>
-                {/* Twitter SocialButton */}
+                )}
+                {streamerData.socialLinks.twitter && (
                 <a
                   href={streamerData.socialLinks.twitter}
                   target="_blank"
@@ -831,7 +832,8 @@ export default function Home() {
                   <Twitter className="w-4 h-4" style={{ color: '#1DA1F2' }} />
                   X
                 </a>
-                {/* Facebook SocialButton */}
+                )}
+                {streamerData.socialLinks.facebook && (
                 <a
                   href={streamerData.socialLinks.facebook}
                   target="_blank"
@@ -852,7 +854,8 @@ export default function Home() {
                   <Facebook className="w-4 h-4" style={{ color: '#1877F2' }} />
                   Facebook
                 </a>
-                {/* Instagram SocialButton */}
+                )}
+                {streamerData.socialLinks.instagram && (
                 <a
                   href={streamerData.socialLinks.instagram}
                   target="_blank"
@@ -873,7 +876,8 @@ export default function Home() {
                   <Instagram className="w-4 h-4" style={{ color: '#E4405F' }} />
                   Instagram
                 </a>
-                {/* Twitch SocialButton */}
+                )}
+                {streamerData.socialLinks.twitch && (
                 <a
                   href={streamerData.socialLinks.twitch}
                   target="_blank"
@@ -894,6 +898,7 @@ export default function Home() {
                   <Twitch className="w-4 h-4" style={{ color: '#9146FF' }} />
                   Twitch
                 </a>
+                )}
               </div>
             </div>
 
