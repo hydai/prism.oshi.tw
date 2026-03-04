@@ -1,0 +1,19 @@
+:root {
+  --border-default: #E2E8F0;
+  --bg-surface: #FFFFFF;
+  --bg-surface-frosted: rgba(255,255,255,0.6);
+  --accent-purple: #8B5CF6;
+  --text-primary: #1E293B;
+  --text-secondary: #64748B;
+  --text-tertiary: #94A3B8;
+}
+
+* { box-sizing: border-box; margin: 0; padding: 0; }
+
+body {
+  font-family: 'DM Sans', system-ui, sans-serif;
+  background: linear-gradient(135deg, #faf5ff 0%, #f0f9ff 50%, #f5f3ff 100%);
+  background-attachment: fixed;
+  min-height: 100vh;
+  color: var(--text-primary);
+}
