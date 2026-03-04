@@ -148,6 +148,12 @@ export interface ListResponse<T> {
   total: number;
 }
 
+export interface PaginatedResponse<T> extends ListResponse<T> {
+  page: number;
+  pageSize: number;
+  totalPages: number;
+}
+
 // --- Stamp editor types ---
 
 export interface StampPerformance {

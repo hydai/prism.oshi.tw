@@ -3,6 +3,7 @@ import type {
   Song,
   Stream,
   ListResponse,
+  PaginatedResponse,
   DashboardStats,
   CreateSongBody,
   UpdateSongBody,
@@ -112,12 +113,23 @@ export const api = {
   stats: () => request<DashboardStats>('/api/stats'),
 
   // Songs
-  listSongs: (params?: { status?: string; search?: string }) => {
+  listSongs: (params?: {
+    status?: string;
+    search?: string;
+    page?: number;
+    pageSize?: number;
+    sortBy?: string;
+    sortDir?: 'asc' | 'desc';
+  }) => {
     const sp = new URLSearchParams();
     if (params?.status) sp.set('status', params.status);
     if (params?.search) sp.set('search', params.search);
+    if (params?.page) sp.set('page', String(params.page));
+    if (params?.pageSize) sp.set('pageSize', String(params.pageSize));
+    if (params?.sortBy) sp.set('sortBy', params.sortBy);
+    if (params?.sortDir) sp.set('sortDir', params.sortDir);
     const qs = sp.toString();
-    return request<ListResponse<Song>>(`/api/songs${qs ? `?${qs}` : ''}`);
+    return request<PaginatedResponse<Song>>(`/api/songs${qs ? `?${qs}` : ''}`);
   },
 
   getSong: (id: string) => request<Song>(`/api/songs/${id}`),

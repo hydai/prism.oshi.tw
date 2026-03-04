@@ -93,6 +93,65 @@ export async function listSongs(
   return results.map(songFromRow);
 }
 
+// --- Paginated song listing ---
+
+const SORT_COLUMN_MAP: Record<string, string> = {
+  title: 'title',
+  originalArtist: 'original_artist',
+  status: 'status',
+  createdAt: 'created_at',
+};
+
+export async function listSongsPaginated(
+  db: D1Database,
+  streamerId: string,
+  opts: {
+    status?: string;
+    search?: string;
+    page?: number;
+    pageSize?: number;
+    sortBy?: string;
+    sortDir?: 'asc' | 'desc';
+  } = {},
+): Promise<{ songs: Song[]; total: number }> {
+  const page = Math.max(1, opts.page ?? 1);
+  const pageSize = Math.min(100, Math.max(1, opts.pageSize ?? 50));
+  const offset = (page - 1) * pageSize;
+  const sortCol = SORT_COLUMN_MAP[opts.sortBy ?? ''] ?? 'created_at';
+  const sortDir = opts.sortDir === 'asc' ? 'ASC' : 'DESC';
+
+  const conditions: string[] = ['streamer_id = ?'];
+  const binds: (string | number)[] = [streamerId];
+
+  if (opts.status) {
+    conditions.push('status = ?');
+    binds.push(opts.status);
+  }
+  if (opts.search) {
+    conditions.push('(title LIKE ? OR original_artist LIKE ?)');
+    const like = `%${opts.search}%`;
+    binds.push(like, like);
+  }
+
+  const where = conditions.join(' AND ');
+
+  const countStmt = db
+    .prepare(`SELECT COUNT(*) AS cnt FROM songs WHERE ${where}`)
+    .bind(...binds);
+  const dataStmt = db
+    .prepare(
+      `SELECT * FROM songs WHERE ${where} ORDER BY ${sortCol} ${sortDir} LIMIT ? OFFSET ?`,
+    )
+    .bind(...binds, pageSize, offset);
+
+  const [countResult, dataResult] = await db.batch([countStmt, dataStmt]);
+
+  const total = (countResult.results[0] as { cnt: number }).cnt;
+  const songs = (dataResult.results as SongRow[]).map(songFromRow);
+
+  return { songs, total };
+}
+
 export async function getSongById(
   db: D1Database,
   id: string,

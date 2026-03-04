@@ -2,6 +2,7 @@ import { Hono } from 'hono';
 import { requireAuth, requireCurator } from './auth';
 import {
   listSongs,
+  listSongsPaginated,
   getSongById,
   insertSong,
   updateSong,
@@ -136,8 +137,23 @@ app.get('/api/streamers', async (c) => {
 app.get('/api/songs', async (c) => {
   const streamerId = getStreamerId(c);
   const status = c.req.query('status');
-  const songs = await listSongs(c.env.DB, streamerId, status);
-  return c.json({ data: songs, total: songs.length });
+  const search = c.req.query('search');
+  const page = parseInt(c.req.query('page') || '1', 10);
+  const pageSize = parseInt(c.req.query('pageSize') || '50', 10);
+  const sortBy = c.req.query('sortBy');
+  const sortDir = c.req.query('sortDir') as 'asc' | 'desc' | undefined;
+
+  const { songs, total } = await listSongsPaginated(c.env.DB, streamerId, {
+    status,
+    search,
+    page,
+    pageSize,
+    sortBy,
+    sortDir,
+  });
+
+  const totalPages = Math.ceil(total / pageSize);
+  return c.json({ data: songs, total, page, pageSize, totalPages });
 });
 
 app.get('/api/songs/:id', async (c) => {
