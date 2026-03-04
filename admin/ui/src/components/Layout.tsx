@@ -1,4 +1,4 @@
-import { NavLink } from 'react-router-dom';
+import { NavLink, useNavigate } from 'react-router-dom';
 import { useEffect, useState, type ReactNode } from 'react';
 import type { AuthUser, StreamerInfo } from '../../../shared/types';
 import { api, getCurrentStreamer, setCurrentStreamer, onStreamerChange } from '../api/client';
@@ -17,6 +17,7 @@ const navItems = [
 ];
 
 export default function Layout({ user, children }: { user: AuthUser; children: ReactNode }) {
+  const navigate = useNavigate();
   const [streamer, setStreamer] = useState(getCurrentStreamer);
   const [streamers, setStreamers] = useState<StreamerInfo[]>([]);
 
@@ -30,7 +31,7 @@ export default function Layout({ user, children }: { user: AuthUser; children: R
         const first = res.data[0];
         if (first && !res.data.some((s) => s.slug === getCurrentStreamer())) {
           setCurrentStreamer(first.slug);
-          window.location.reload();
+          navigate('/');
         }
       })
       .catch(() => {
@@ -57,7 +58,7 @@ export default function Layout({ user, children }: { user: AuthUser; children: R
             value={streamer}
             onChange={(e) => {
               setCurrentStreamer(e.target.value);
-              window.location.reload();
+              navigate('/');
             }}
             className="w-full rounded-md border border-slate-600 bg-slate-800 px-2 py-1.5 text-sm text-white focus:border-blue-500 focus:outline-none"
           >
