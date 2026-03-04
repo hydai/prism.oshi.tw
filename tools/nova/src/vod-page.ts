@@ -1,5 +1,286 @@
-import { html } from 'hono/html';
+import { html, raw } from 'hono/html';
 import type { ApprovedStreamer } from './types';
+
+const VOD_SCRIPT = String.raw`
+    (function() {
+      var form = document.getElementById('vod-form');
+      var urlInput = form.querySelector('[name="video_url"]');
+      var titleInput = form.querySelector('[name="stream_title"]');
+      var dateInput = form.querySelector('[name="stream_date"]');
+      var streamerSelect = form.querySelector('[name="streamer_slug"]');
+      var urlCheck = document.getElementById('url-check');
+      var submitBtn = document.getElementById('submit-btn');
+      var resultDiv = document.getElementById('result');
+      var songsTextarea = document.getElementById('songs-textarea');
+      var songsPreview = document.getElementById('songs-preview');
+      var thumbnailUrl = '';
+
+      // --- Inline parser (ported from lib/parse.ts) ---
+      var LINE_TS_RE = /^(?:(\d{1,2}):)?(\d{1,2}):(\d{2})/;
+      var RANGE_END_RE = /^(?:~|-|\u2013|\u2014)\s*(?:(\d{1,2}):)?(\d{1,2}):(\d{2})/;
+
+      function secondsToTimestamp(sec) {
+        var h = Math.floor(sec / 3600);
+        var rem = sec % 3600;
+        var m = Math.floor(rem / 60);
+        var s = rem % 60;
+        var mm = String(m).padStart(2, '0');
+        var ss = String(s).padStart(2, '0');
+        return h ? h + ':' + mm + ':' + ss : m + ':' + ss;
+      }
+
+      function splitArtist(info) {
+        var slashM = info.match(/\s*\/\s+|\s+\/\s*/);
+        if (slashM) return [info.slice(0, slashM.index).trim(), info.slice(slashM.index + slashM[0].length).trim()];
+        var dashM = info.match(/\s+-\s+/);
+        if (dashM) return [info.slice(0, dashM.index).trim(), info.slice(dashM.index + dashM[0].length).trim()];
+        var bare = info.indexOf('/');
+        if (bare !== -1) {
+          var n = info.slice(0, bare).trim(), a = info.slice(bare + 1).trim();
+          if (n && a) return [n, a];
+        }
+        return [info.trim(), ''];
+      }
+
+      function parseSongLine(line) {
+        line = line.trim();
+        if (!line) return null;
+        line = line.replace(/^[\u2500-\u257F\s]+/, '');
+        if (!line) return null;
+        line = line.replace(/^(?:\d+\.\s*|\d+\)\s+|#\d+\s+)/, '');
+        line = line.replace(/^[-*+]\s+/, '');
+        var tsM = line.match(LINE_TS_RE);
+        if (!tsM) return null;
+        var h = tsM[1] ? parseInt(tsM[1], 10) : 0;
+        var startSec = h * 3600 + parseInt(tsM[2], 10) * 60 + parseInt(tsM[3], 10);
+        var rest = line.slice(tsM[0].length).trim();
+        var endSec = null;
+        var rangeM = rest.match(RANGE_END_RE);
+        if (rangeM) {
+          var rh = rangeM[1] ? parseInt(rangeM[1], 10) : 0;
+          endSec = rh * 3600 + parseInt(rangeM[2], 10) * 60 + parseInt(rangeM[3], 10);
+          rest = rest.slice(rangeM[0].length).trim();
+        }
+        var sepM = rest.match(/^(?:-\s+|\u2013\s+|\u2014\s+)/);
+        if (sepM) rest = rest.slice(sepM[0].length).trim();
+        if (!rest) return null;
+        var parts = splitArtist(rest);
+        return { startSeconds: startSec, endSeconds: endSec, songName: parts[0], artist: parts[1] };
+      }
+
+      function parseTextToSongs(text) {
+        var raw = [];
+        var lines = text.split('\n');
+        for (var i = 0; i < lines.length; i++) {
+          var p = parseSongLine(lines[i]);
+          if (p) raw.push(p);
+        }
+        var result = [];
+        for (var i = 0; i < raw.length; i++) {
+          var s = raw[i];
+          var end = s.endSeconds;
+          if (end === null && i + 1 < raw.length) end = raw[i + 1].startSeconds;
+          result.push({
+            songName: s.songName,
+            artist: s.artist,
+            startSeconds: s.startSeconds,
+            endSeconds: end,
+            startTimestamp: secondsToTimestamp(s.startSeconds),
+            endTimestamp: end !== null ? secondsToTimestamp(end) : null,
+          });
+        }
+        return result;
+      }
+
+      function renderPreview(songs) {
+        if (!songs.length) { songsPreview.textContent = ''; return; }
+        var tbl = document.createElement('table');
+        tbl.className = 'songs-table';
+        var thead = document.createElement('thead');
+        var headRow = document.createElement('tr');
+        ['#', '歌名', '原唱', '開始', '結束'].forEach(function(t) {
+          var th = document.createElement('th');
+          th.textContent = t;
+          headRow.appendChild(th);
+        });
+        thead.appendChild(headRow);
+        tbl.appendChild(thead);
+        var tbody = document.createElement('tbody');
+        for (var i = 0; i < songs.length; i++) {
+          var s = songs[i];
+          var row = document.createElement('tr');
+          var tdNum = document.createElement('td');
+          tdNum.textContent = String(i + 1);
+          row.appendChild(tdNum);
+          var tdName = document.createElement('td');
+          tdName.textContent = s.songName;
+          row.appendChild(tdName);
+          var tdArtist = document.createElement('td');
+          tdArtist.textContent = s.artist;
+          row.appendChild(tdArtist);
+          var tdStart = document.createElement('td');
+          tdStart.className = 'ts-col';
+          tdStart.textContent = s.startTimestamp;
+          row.appendChild(tdStart);
+          var tdEnd = document.createElement('td');
+          tdEnd.className = 'ts-col';
+          tdEnd.textContent = s.endTimestamp || '';
+          row.appendChild(tdEnd);
+          tbody.appendChild(row);
+        }
+        tbl.appendChild(tbody);
+        songsPreview.textContent = '';
+        songsPreview.appendChild(tbl);
+      }
+
+      songsTextarea.addEventListener('input', function() {
+        renderPreview(parseTextToSongs(this.value));
+      });
+
+      // On URL blur: duplicate check + auto-fetch video info
+      var lastFetchedUrl = '';
+      urlInput.addEventListener('blur', function() {
+        var url = this.value.trim();
+        var slug = streamerSelect.value;
+        if (!url) {
+          urlCheck.style.display = 'none';
+          return;
+        }
+
+        var encoded = encodeURIComponent(url);
+
+        // Duplicate check
+        if (slug) {
+          fetch('/vod/api/check?streamer_slug=' + encodeURIComponent(slug) + '&url=' + encoded)
+            .then(function(r) { return r.json(); })
+            .then(function(data) {
+              urlCheck.style.display = 'block';
+              if (data.exists && data.canResubmit) {
+                urlCheck.style.color = '#2563EB';
+                urlCheck.textContent = '此 VOD 先前的提交被拒絕，你可以重新提交';
+              } else if (data.exists) {
+                urlCheck.style.color = '#D97706';
+                urlCheck.textContent = '此 VOD 已於 ' + data.submittedAt + ' 提交（狀態：' + data.status + '）';
+              } else {
+                urlCheck.style.color = '#059669';
+                urlCheck.textContent = '此 VOD 尚未被提交';
+              }
+            })
+            .catch(function() { urlCheck.style.display = 'none'; });
+        }
+
+        // Auto-fetch video info (only once per URL)
+        if (url === lastFetchedUrl) return;
+        lastFetchedUrl = url;
+
+        urlCheck.style.display = 'block';
+        urlCheck.style.color = 'var(--text-tertiary)';
+        urlCheck.textContent = '正在取得影片資訊…';
+
+        fetch('/vod/api/video-info?url=' + encoded)
+          .then(function(r) { return r.json(); })
+          .then(function(info) {
+            if (info.title && !titleInput.value) {
+              titleInput.value = info.title;
+            }
+            if (info.date && !dateInput.value) {
+              dateInput.value = info.date;
+            }
+            if (info.thumbnail) {
+              thumbnailUrl = info.thumbnail;
+            }
+          })
+          .catch(function() {});
+      });
+
+      // Collect songs from textarea
+      function collectSongs() {
+        var parsed = parseTextToSongs(songsTextarea.value);
+        return parsed.map(function(s) {
+          // Format as H:MM:SS for backend parseTimestamp()
+          var fmtStart = secondsToHMS(s.startSeconds);
+          var fmtEnd = s.endSeconds !== null ? secondsToHMS(s.endSeconds) : null;
+          return {
+            song_title: s.songName,
+            original_artist: s.artist,
+            start_timestamp: fmtStart,
+            end_timestamp: fmtEnd,
+          };
+        });
+      }
+
+      function secondsToHMS(sec) {
+        var h = Math.floor(sec / 3600);
+        var m = Math.floor((sec % 3600) / 60);
+        var s = sec % 60;
+        return h + ':' + String(m).padStart(2, '0') + ':' + String(s).padStart(2, '0');
+      }
+
+      // Form submission
+      form.addEventListener('submit', async function(e) {
+        e.preventDefault();
+        submitBtn.disabled = true;
+        submitBtn.textContent = '提交中…';
+        resultDiv.style.display = 'none';
+
+        var turnstileInput = form.querySelector('[name="cf-turnstile-response"]');
+        var token = turnstileInput ? turnstileInput.value : '';
+
+        var body = {
+          streamer_slug: streamerSelect.value,
+          video_url: urlInput.value.trim(),
+          stream_title: titleInput.value.trim(),
+          stream_date: dateInput.value,
+          submitter_note: form.querySelector('[name="submitter_note"]').value.trim(),
+          songs: collectSongs(),
+          turnstile_token: token,
+        };
+
+        if (thumbnailUrl) {
+          body.thumbnail_url = thumbnailUrl;
+        }
+
+        try {
+          var res = await fetch('/vod/api/submit', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(body),
+          });
+          var data = await res.json();
+
+          resultDiv.style.display = 'block';
+          if (res.ok) {
+            resultDiv.style.background = '#F0FDF4';
+            resultDiv.style.color = '#15803D';
+            resultDiv.textContent = data.resubmitted
+              ? '重新提交成功！ID: ' + data.id + '。將再次進入審核流程。'
+              : '提交成功！ID: ' + data.id + '。感謝你的幫助！';
+            form.reset();
+            songsTextarea.value = '';
+            songsPreview.textContent = '';
+            thumbnailUrl = '';
+            if (window.turnstile) turnstile.reset();
+          } else if (res.status === 409) {
+            resultDiv.style.background = '#FFFBEB';
+            resultDiv.style.color = '#B45309';
+            resultDiv.textContent = '此 VOD 已於 ' + data.submittedAt + ' 提交過（狀態：' + data.status + '）';
+          } else {
+            resultDiv.style.background = '#FEF2F2';
+            resultDiv.style.color = '#DC2626';
+            resultDiv.textContent = data.error || '提交失敗，請稍後再試';
+          }
+        } catch(err) {
+          resultDiv.style.display = 'block';
+          resultDiv.style.background = '#FEF2F2';
+          resultDiv.style.color = '#DC2626';
+          resultDiv.textContent = '網路錯誤，請檢查連線後再試';
+        } finally {
+          submitBtn.disabled = false;
+          submitBtn.textContent = '提交 VOD';
+        }
+      });
+    })();
+`;
 
 export function renderVodPage(siteKey: string, streamers: ApprovedStreamer[]) {
   const streamerOptions = streamers.length > 0
@@ -307,286 +588,7 @@ export function renderVodPage(siteKey: string, streamers: ApprovedStreamer[]) {
     </p>
   </div>
 
-  <script>
-    (function() {
-      var form = document.getElementById('vod-form');
-      var urlInput = form.querySelector('[name="video_url"]');
-      var titleInput = form.querySelector('[name="stream_title"]');
-      var dateInput = form.querySelector('[name="stream_date"]');
-      var streamerSelect = form.querySelector('[name="streamer_slug"]');
-      var urlCheck = document.getElementById('url-check');
-      var submitBtn = document.getElementById('submit-btn');
-      var resultDiv = document.getElementById('result');
-      var songsTextarea = document.getElementById('songs-textarea');
-      var songsPreview = document.getElementById('songs-preview');
-      var thumbnailUrl = '';
-
-      // --- Inline parser (ported from lib/parse.ts) ---
-      var LINE_TS_RE = /^(?:(\d{1,2}):)?(\d{1,2}):(\d{2})/;
-      var RANGE_END_RE = /^(?:~|-|\u2013|\u2014)\s*(?:(\d{1,2}):)?(\d{1,2}):(\d{2})/;
-
-      function secondsToTimestamp(sec) {
-        var h = Math.floor(sec / 3600);
-        var rem = sec % 3600;
-        var m = Math.floor(rem / 60);
-        var s = rem % 60;
-        var mm = String(m).padStart(2, '0');
-        var ss = String(s).padStart(2, '0');
-        return h ? h + ':' + mm + ':' + ss : m + ':' + ss;
-      }
-
-      function splitArtist(info) {
-        var slashM = info.match(/\s*\/\s+|\s+\/\s*/);
-        if (slashM) return [info.slice(0, slashM.index).trim(), info.slice(slashM.index + slashM[0].length).trim()];
-        var dashM = info.match(/\s+-\s+/);
-        if (dashM) return [info.slice(0, dashM.index).trim(), info.slice(dashM.index + dashM[0].length).trim()];
-        var bare = info.indexOf('/');
-        if (bare !== -1) {
-          var n = info.slice(0, bare).trim(), a = info.slice(bare + 1).trim();
-          if (n && a) return [n, a];
-        }
-        return [info.trim(), ''];
-      }
-
-      function parseSongLine(line) {
-        line = line.trim();
-        if (!line) return null;
-        line = line.replace(/^[\u2500-\u257F\s]+/, '');
-        if (!line) return null;
-        line = line.replace(/^(?:\d+\.\s*|\d+\)\s+|#\d+\s+)/, '');
-        line = line.replace(/^[-*+]\s+/, '');
-        var tsM = line.match(LINE_TS_RE);
-        if (!tsM) return null;
-        var h = tsM[1] ? parseInt(tsM[1], 10) : 0;
-        var startSec = h * 3600 + parseInt(tsM[2], 10) * 60 + parseInt(tsM[3], 10);
-        var rest = line.slice(tsM[0].length).trim();
-        var endSec = null;
-        var rangeM = rest.match(RANGE_END_RE);
-        if (rangeM) {
-          var rh = rangeM[1] ? parseInt(rangeM[1], 10) : 0;
-          endSec = rh * 3600 + parseInt(rangeM[2], 10) * 60 + parseInt(rangeM[3], 10);
-          rest = rest.slice(rangeM[0].length).trim();
-        }
-        var sepM = rest.match(/^(?:-\s+|\u2013\s+|\u2014\s+)/);
-        if (sepM) rest = rest.slice(sepM[0].length).trim();
-        if (!rest) return null;
-        var parts = splitArtist(rest);
-        return { startSeconds: startSec, endSeconds: endSec, songName: parts[0], artist: parts[1] };
-      }
-
-      function parseTextToSongs(text) {
-        var raw = [];
-        var lines = text.split('\n');
-        for (var i = 0; i < lines.length; i++) {
-          var p = parseSongLine(lines[i]);
-          if (p) raw.push(p);
-        }
-        var result = [];
-        for (var i = 0; i < raw.length; i++) {
-          var s = raw[i];
-          var end = s.endSeconds;
-          if (end === null && i + 1 < raw.length) end = raw[i + 1].startSeconds;
-          result.push({
-            songName: s.songName,
-            artist: s.artist,
-            startSeconds: s.startSeconds,
-            endSeconds: end,
-            startTimestamp: secondsToTimestamp(s.startSeconds),
-            endTimestamp: end !== null ? secondsToTimestamp(end) : null,
-          });
-        }
-        return result;
-      }
-
-      function renderPreview(songs) {
-        if (!songs.length) { songsPreview.textContent = ''; return; }
-        var tbl = document.createElement('table');
-        tbl.className = 'songs-table';
-        var thead = document.createElement('thead');
-        var headRow = document.createElement('tr');
-        ['#', '歌名', '原唱', '開始', '結束'].forEach(function(t) {
-          var th = document.createElement('th');
-          th.textContent = t;
-          headRow.appendChild(th);
-        });
-        thead.appendChild(headRow);
-        tbl.appendChild(thead);
-        var tbody = document.createElement('tbody');
-        for (var i = 0; i < songs.length; i++) {
-          var s = songs[i];
-          var row = document.createElement('tr');
-          var tdNum = document.createElement('td');
-          tdNum.textContent = String(i + 1);
-          row.appendChild(tdNum);
-          var tdName = document.createElement('td');
-          tdName.textContent = s.songName;
-          row.appendChild(tdName);
-          var tdArtist = document.createElement('td');
-          tdArtist.textContent = s.artist;
-          row.appendChild(tdArtist);
-          var tdStart = document.createElement('td');
-          tdStart.className = 'ts-col';
-          tdStart.textContent = s.startTimestamp;
-          row.appendChild(tdStart);
-          var tdEnd = document.createElement('td');
-          tdEnd.className = 'ts-col';
-          tdEnd.textContent = s.endTimestamp || '';
-          row.appendChild(tdEnd);
-          tbody.appendChild(row);
-        }
-        tbl.appendChild(tbody);
-        songsPreview.textContent = '';
-        songsPreview.appendChild(tbl);
-      }
-
-      songsTextarea.addEventListener('input', function() {
-        renderPreview(parseTextToSongs(this.value));
-      });
-
-      // On URL blur: duplicate check + auto-fetch video info
-      var lastFetchedUrl = '';
-      urlInput.addEventListener('blur', function() {
-        var url = this.value.trim();
-        var slug = streamerSelect.value;
-        if (!url) {
-          urlCheck.style.display = 'none';
-          return;
-        }
-
-        var encoded = encodeURIComponent(url);
-
-        // Duplicate check
-        if (slug) {
-          fetch('/vod/api/check?streamer_slug=' + encodeURIComponent(slug) + '&url=' + encoded)
-            .then(function(r) { return r.json(); })
-            .then(function(data) {
-              urlCheck.style.display = 'block';
-              if (data.exists && data.canResubmit) {
-                urlCheck.style.color = '#2563EB';
-                urlCheck.textContent = '此 VOD 先前的提交被拒絕，你可以重新提交';
-              } else if (data.exists) {
-                urlCheck.style.color = '#D97706';
-                urlCheck.textContent = '此 VOD 已於 ' + data.submittedAt + ' 提交（狀態：' + data.status + '）';
-              } else {
-                urlCheck.style.color = '#059669';
-                urlCheck.textContent = '此 VOD 尚未被提交';
-              }
-            })
-            .catch(function() { urlCheck.style.display = 'none'; });
-        }
-
-        // Auto-fetch video info (only once per URL)
-        if (url === lastFetchedUrl) return;
-        lastFetchedUrl = url;
-
-        urlCheck.style.display = 'block';
-        urlCheck.style.color = 'var(--text-tertiary)';
-        urlCheck.textContent = '正在取得影片資訊…';
-
-        fetch('/vod/api/video-info?url=' + encoded)
-          .then(function(r) { return r.json(); })
-          .then(function(info) {
-            if (info.title && !titleInput.value) {
-              titleInput.value = info.title;
-            }
-            if (info.date && !dateInput.value) {
-              dateInput.value = info.date;
-            }
-            if (info.thumbnail) {
-              thumbnailUrl = info.thumbnail;
-            }
-          })
-          .catch(function() {});
-      });
-
-      // Collect songs from textarea
-      function collectSongs() {
-        var parsed = parseTextToSongs(songsTextarea.value);
-        return parsed.map(function(s) {
-          // Format as H:MM:SS for backend parseTimestamp()
-          var fmtStart = secondsToHMS(s.startSeconds);
-          var fmtEnd = s.endSeconds !== null ? secondsToHMS(s.endSeconds) : null;
-          return {
-            song_title: s.songName,
-            original_artist: s.artist,
-            start_timestamp: fmtStart,
-            end_timestamp: fmtEnd,
-          };
-        });
-      }
-
-      function secondsToHMS(sec) {
-        var h = Math.floor(sec / 3600);
-        var m = Math.floor((sec % 3600) / 60);
-        var s = sec % 60;
-        return h + ':' + String(m).padStart(2, '0') + ':' + String(s).padStart(2, '0');
-      }
-
-      // Form submission
-      form.addEventListener('submit', async function(e) {
-        e.preventDefault();
-        submitBtn.disabled = true;
-        submitBtn.textContent = '提交中…';
-        resultDiv.style.display = 'none';
-
-        var turnstileInput = form.querySelector('[name="cf-turnstile-response"]');
-        var token = turnstileInput ? turnstileInput.value : '';
-
-        var body = {
-          streamer_slug: streamerSelect.value,
-          video_url: urlInput.value.trim(),
-          stream_title: titleInput.value.trim(),
-          stream_date: dateInput.value,
-          submitter_note: form.querySelector('[name="submitter_note"]').value.trim(),
-          songs: collectSongs(),
-          turnstile_token: token,
-        };
-
-        if (thumbnailUrl) {
-          body.thumbnail_url = thumbnailUrl;
-        }
-
-        try {
-          var res = await fetch('/vod/api/submit', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify(body),
-          });
-          var data = await res.json();
-
-          resultDiv.style.display = 'block';
-          if (res.ok) {
-            resultDiv.style.background = '#F0FDF4';
-            resultDiv.style.color = '#15803D';
-            resultDiv.textContent = data.resubmitted
-              ? '重新提交成功！ID: ' + data.id + '。將再次進入審核流程。'
-              : '提交成功！ID: ' + data.id + '。感謝你的幫助！';
-            form.reset();
-            songsTextarea.value = '';
-            songsPreview.textContent = '';
-            thumbnailUrl = '';
-            if (window.turnstile) turnstile.reset();
-          } else if (res.status === 409) {
-            resultDiv.style.background = '#FFFBEB';
-            resultDiv.style.color = '#B45309';
-            resultDiv.textContent = '此 VOD 已於 ' + data.submittedAt + ' 提交過（狀態：' + data.status + '）';
-          } else {
-            resultDiv.style.background = '#FEF2F2';
-            resultDiv.style.color = '#DC2626';
-            resultDiv.textContent = data.error || '提交失敗，請稍後再試';
-          }
-        } catch(err) {
-          resultDiv.style.display = 'block';
-          resultDiv.style.background = '#FEF2F2';
-          resultDiv.style.color = '#DC2626';
-          resultDiv.textContent = '網路錯誤，請檢查連線後再試';
-        } finally {
-          submitBtn.disabled = false;
-          submitBtn.textContent = '提交 VOD';
-        }
-      });
-    })();
-  </script>
+  <script>${raw(VOD_SCRIPT)}</script>
 </body>
 </html>`;
 }
