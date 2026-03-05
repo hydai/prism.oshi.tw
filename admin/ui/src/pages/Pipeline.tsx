@@ -8,7 +8,7 @@ import type {
   StreamCredit,
 } from '../../../shared/types';
 import { parseTextToSongs } from '../../../shared/parse';
-import { api } from '../api/client';
+import { api, ApiError } from '../api/client';
 
 // --- Helpers ---
 
@@ -250,7 +250,7 @@ function ExtractTab() {
     setEditedSongs((prev) => prev.filter((_, i) => i !== index));
   };
 
-  const handleImport = async () => {
+  const handleImport = async (replace = false) => {
     if (!selectedStreamId || editedSongs.length === 0) return;
     setImporting(true);
     setError(null);
@@ -264,13 +264,21 @@ function ExtractTab() {
           endSeconds: s.endSeconds,
         })),
         credit: credit ?? undefined,
-        replace: false,
+        replace,
       });
       setImportStatus(`Imported ${res.created} song(s)`);
       setExtractResult(null);
       setEditedSongs([]);
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Failed to import');
+      if (err instanceof ApiError && err.status === 409) {
+        const ok = window.confirm(`${err.message}\n\nDo you want to replace the existing songs?`);
+        if (ok) {
+          setImporting(false);
+          return handleImport(true);
+        }
+      } else {
+        setError(err instanceof Error ? err.message : 'Failed to import');
+      }
     } finally {
       setImporting(false);
     }
@@ -392,7 +400,7 @@ function ExtractTab() {
                   Parsed Songs ({editedSongs.length})
                 </h4>
                 <button
-                  onClick={handleImport}
+                  onClick={() => handleImport()}
                   disabled={importing || editedSongs.length === 0}
                   className="rounded-md bg-green-600 px-4 py-2 text-sm font-medium text-white hover:bg-green-700 disabled:opacity-50"
                 >

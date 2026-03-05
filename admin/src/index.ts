@@ -792,6 +792,14 @@ app.post('/api/pipeline/extract-import', requireCurator, async (c) => {
   const stream = await getStreamById(c.env.DB, body.streamId);
   if (!stream) return c.json({ error: 'Stream not found' }, 404);
 
+  const existingPerfs = await listPerformancesForStream(c.env.DB, body.streamId);
+  if (existingPerfs.length > 0 && !body.replace) {
+    return c.json({
+      error: `This stream already has ${existingPerfs.length} song(s) imported. Use replace mode to overwrite.`,
+      existingCount: existingPerfs.length,
+    }, 409);
+  }
+
   const user = c.get('user');
 
   // Update stream credit if provided
