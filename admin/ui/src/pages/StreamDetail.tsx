@@ -1,6 +1,6 @@
-import { useState, useEffect, useRef, useCallback } from 'react';
+import { useState, useEffect, useRef, useCallback, useMemo } from 'react';
 import { useParams, Link } from 'react-router-dom';
-import type { AuthUser, StreamDetail as StreamDetailType, StampPerformance, Status } from '../../../shared/types';
+import type { AuthUser, StreamDetail as StreamDetailType, StampPerformance, Status, Stream } from '../../../shared/types';
 import { api } from '../api/client';
 import StatusBadge from '../components/StatusBadge';
 import { YouTubePlayer } from '../components/YouTubePlayer';
@@ -73,7 +73,49 @@ function InlineEdit({ value, placeholder, onSave, onCancel }: {
   );
 }
 
-// --- Paste Import Modal (reuse from StampEditor pattern) ---
+// --- Add Song Modal ---
+
+function AddSongModal({ onSubmit, onCancel }: {
+  onSubmit: (title: string, artist: string) => void;
+  onCancel: () => void;
+}) {
+  const [title, setTitle] = useState('');
+  const [artist, setArtist] = useState('');
+  const inputRef = useRef<HTMLInputElement>(null);
+
+  useEffect(() => { inputRef.current?.focus(); }, []);
+
+  const handleSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!title.trim()) return;
+    onSubmit(title.trim(), artist.trim());
+  };
+
+  return (
+    <div className="fixed inset-0 z-40 flex items-center justify-center bg-black/40">
+      <form onSubmit={handleSubmit} className="w-full max-w-sm rounded-lg bg-white p-6 shadow-xl">
+        <h3 className="text-lg font-semibold text-slate-800">Add Song</h3>
+        <div className="mt-4 space-y-3">
+          <input ref={inputRef} type="text" placeholder="Song title *" value={title}
+            onChange={(e) => setTitle(e.target.value)}
+            className="w-full rounded-md border border-slate-300 px-3 py-2 text-sm focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500"
+            required />
+          <input type="text" placeholder="Original artist" value={artist}
+            onChange={(e) => setArtist(e.target.value)}
+            className="w-full rounded-md border border-slate-300 px-3 py-2 text-sm focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500" />
+        </div>
+        <div className="mt-5 flex justify-end gap-2">
+          <button type="button" onClick={onCancel}
+            className="rounded-md px-3 py-1.5 text-sm text-slate-600 hover:bg-slate-100">Cancel</button>
+          <button type="submit"
+            className="rounded-md bg-blue-600 px-4 py-1.5 text-sm font-medium text-white hover:bg-blue-700">Add</button>
+        </div>
+      </form>
+    </div>
+  );
+}
+
+// --- Paste Import Modal ---
 
 function PasteImportModal({ streamId, hasExisting, onDone, onCancel }: {
   streamId: string; hasExisting: boolean;
@@ -176,6 +218,12 @@ export default function StreamDetail({ user }: { user: AuthUser }) {
   const toastKeyRef = useRef(0);
   const playerRef = useRef<YouTubePlayerHandle>(null);
 
+  // --- New state for navigation & stamp features ---
+  const [allStreams, setAllStreams] = useState<Stream[]>([]);
+  const [selectedIndex, setSelectedIndex] = useState(-1);
+  const [showAddModal, setShowAddModal] = useState(false);
+  const [isFetchingAll, setIsFetchingAll] = useState(false);
+
   const isCurator = user.role === 'curator';
 
   const showToast = useCallback((message: string, isError = false) => {
@@ -183,12 +231,45 @@ export default function StreamDetail({ user }: { user: AuthUser }) {
     setToast({ message, isError, key: toastKeyRef.current });
   }, []);
 
+  // --- Fetch all streams for prev/next navigation ---
+  useEffect(() => {
+    api.listStreams().then(({ data }) => {
+      const sorted = [...data].sort((a, b) => b.date.localeCompare(a.date));
+      setAllStreams(sorted);
+    }).catch(() => {});
+  }, []);
+
+  // --- Derive prev/next streams ---
+  const { prevStream, nextStream } = useMemo(() => {
+    if (!streamId || allStreams.length === 0) return { prevStream: null, nextStream: null };
+    const idx = allStreams.findIndex(s => s.id === streamId);
+    if (idx < 0) return { prevStream: null, nextStream: null };
+    return {
+      prevStream: idx > 0 ? allStreams[idx - 1] : null,
+      nextStream: idx < allStreams.length - 1 ? allStreams[idx + 1] : null,
+    };
+  }, [streamId, allStreams]);
+
+  // --- Reset UI state on stream change ---
+  useEffect(() => {
+    setSelectedIndex(-1);
+    setShowAddModal(false);
+    setShowPasteImport(false);
+    setEditingField(null);
+    setError(null);
+  }, [streamId]);
+
   const loadDetail = useCallback(async () => {
     if (!streamId) return;
     setLoading(true);
     try {
       const d = await api.getStreamDetail(streamId);
       setDetail(d);
+      setSelectedIndex(prev => {
+        if (d.performances.length === 0) return -1;
+        if (prev < 0) return 0;
+        return Math.min(prev, d.performances.length - 1);
+      });
     } catch (err: unknown) {
       setError(err instanceof Error ? err.message : 'Failed to load stream');
     } finally {
@@ -197,6 +278,14 @@ export default function StreamDetail({ user }: { user: AuthUser }) {
   }, [streamId]);
 
   useEffect(() => { loadDetail(); }, [loadDetail]);
+
+  // --- Optimistic update helper ---
+  const updatePerformance = useCallback((index: number, updates: Partial<StampPerformance>) => {
+    setDetail(prev => prev ? {
+      ...prev,
+      performances: prev.performances.map((p, i) => i === index ? { ...p, ...updates } : p),
+    } : prev);
+  }, []);
 
   // --- Status action ---
   const handleStreamStatus = useCallback(async (status: Status) => {
@@ -220,7 +309,6 @@ export default function StreamDetail({ user }: { user: AuthUser }) {
         const body = field === 'title' ? { title: value } : { originalArtist: value };
         await api.updatePerformanceDetails(perfId, body);
       }
-      // Reload to get fresh data
       await loadDetail();
       showToast(`Updated ${field}`);
     } catch (err: unknown) {
@@ -292,16 +380,240 @@ export default function StreamDetail({ user }: { user: AuthUser }) {
     );
   }, [detail, showToast]);
 
+  // --- Stamp editor actions ---
+
+  const markEndTimestamp = useCallback(async () => {
+    if (selectedIndex < 0 || !detail || !playerRef.current) return;
+    const perf = detail.performances[selectedIndex];
+    if (!perf) return;
+    const currentTime = Math.floor(playerRef.current.getCurrentTime());
+
+    try {
+      await api.updatePerformanceTimestamps(perf.id, { endTimestamp: currentTime });
+      updatePerformance(selectedIndex, { endTimestamp: currentTime });
+      showToast(`Marked ${perf.title} \u2192 ${formatTimestamp(currentTime)}`);
+
+      // Auto-advance to next unstamped
+      const nextIdx = detail.performances.findIndex(
+        (p, i) => i > selectedIndex && p.endTimestamp === null,
+      );
+      if (nextIdx >= 0) setSelectedIndex(nextIdx);
+    } catch (err: unknown) {
+      showToast(err instanceof Error ? err.message : 'Failed to mark timestamp', true);
+    }
+  }, [detail, selectedIndex, showToast, updatePerformance]);
+
+  const markStartTimestamp = useCallback(async () => {
+    if (selectedIndex < 0 || !detail || !playerRef.current) return;
+    const perf = detail.performances[selectedIndex];
+    if (!perf) return;
+    const currentTime = Math.floor(playerRef.current.getCurrentTime());
+
+    try {
+      await api.updatePerformanceTimestamps(perf.id, { timestamp: currentTime });
+      updatePerformance(selectedIndex, { timestamp: currentTime });
+      showToast(`Start ${perf.title} \u2192 ${formatTimestamp(currentTime)}`);
+    } catch (err: unknown) {
+      showToast(err instanceof Error ? err.message : 'Failed to mark start', true);
+    }
+  }, [detail, selectedIndex, showToast, updatePerformance]);
+
+  const seekToStart = useCallback(() => {
+    if (selectedIndex < 0 || !detail || !playerRef.current) return;
+    const perf = detail.performances[selectedIndex];
+    if (perf) playerRef.current.seekTo(perf.timestamp);
+  }, [detail, selectedIndex]);
+
+  const seekToEnd = useCallback(() => {
+    if (selectedIndex < 0 || !detail || !playerRef.current) return;
+    const perf = detail.performances[selectedIndex];
+    if (perf?.endTimestamp) playerRef.current.seekTo(Math.max(0, perf.endTimestamp - 10));
+  }, [detail, selectedIndex]);
+
+  const selectNext = useCallback(() => {
+    if (!detail || detail.performances.length === 0) return;
+    setSelectedIndex(i => Math.min(i + 1, detail.performances.length - 1));
+  }, [detail]);
+
+  const selectPrev = useCallback(() => {
+    setSelectedIndex(i => Math.max(i - 1, 0));
+  }, []);
+
+  const clearEndTimestamp = useCallback(async (perfId: string, idx: number) => {
+    try {
+      await api.updatePerformanceTimestamps(perfId, { endTimestamp: null });
+      updatePerformance(idx, { endTimestamp: null });
+      showToast('Cleared end timestamp');
+    } catch (err: unknown) {
+      showToast(err instanceof Error ? err.message : 'Failed to clear', true);
+    }
+  }, [showToast, updatePerformance]);
+
+  const clearAllEndTimestamps = useCallback(async () => {
+    if (!streamId) return;
+    if (!confirm('Clear ALL end timestamps for this stream?')) return;
+    try {
+      const { cleared } = await api.clearAllEndTimestamps(streamId);
+      setDetail(prev => prev ? {
+        ...prev,
+        performances: prev.performances.map(p => ({ ...p, endTimestamp: null })),
+      } : prev);
+      showToast(`Cleared ${cleared} end timestamps`);
+    } catch (err: unknown) {
+      showToast(err instanceof Error ? err.message : 'Failed to clear', true);
+    }
+  }, [streamId, showToast]);
+
+  const fetchDuration = useCallback(async () => {
+    if (selectedIndex < 0 || !detail) return;
+    const perf = detail.performances[selectedIndex];
+    if (!perf) return;
+
+    showToast(`Fetching duration for ${perf.title}...`);
+    try {
+      const result = await api.fetchPerformanceDuration(perf.id);
+      if (result.endTimestamp !== null) {
+        updatePerformance(selectedIndex, { endTimestamp: result.endTimestamp });
+        showToast(`${perf.title}: ${result.durationSec}s (${result.matchConfidence})`);
+      } else if (result.durationSec) {
+        showToast(`${perf.title}: ${result.durationSec}s (already has end timestamp)`);
+      } else {
+        showToast(`${perf.title}: no match on iTunes`, true);
+      }
+    } catch (err: unknown) {
+      showToast(err instanceof Error ? err.message : 'Fetch failed', true);
+    }
+  }, [detail, selectedIndex, showToast, updatePerformance]);
+
+  const fetchAllDurations = useCallback(async () => {
+    if (isFetchingAll || !detail) return;
+    const missing = detail.performances
+      .map((p, i) => ({ perf: p, index: i }))
+      .filter(({ perf }) => perf.endTimestamp === null);
+    if (missing.length === 0) {
+      showToast('All songs already have end timestamps');
+      return;
+    }
+
+    setIsFetchingAll(true);
+    let fetched = 0;
+    let noMatch = 0;
+    let errors = 0;
+
+    for (let i = 0; i < missing.length; i++) {
+      const { perf, index } = missing[i]!;
+      showToast(`Fetching ${i + 1}/${missing.length}: ${perf.title}...`);
+
+      try {
+        const result = await api.fetchPerformanceDuration(perf.id);
+        if (result.endTimestamp !== null) {
+          fetched++;
+          updatePerformance(index, { endTimestamp: result.endTimestamp });
+        } else {
+          noMatch++;
+        }
+      } catch {
+        errors++;
+      }
+
+      if (i < missing.length - 1) {
+        await new Promise(r => setTimeout(r, 1000));
+      }
+    }
+
+    setIsFetchingAll(false);
+    showToast(`Fetched ${fetched}/${missing.length}, ${noMatch} no match, ${errors} errors`);
+  }, [detail, isFetchingAll, showToast, updatePerformance]);
+
+  const handleAddSong = useCallback(async (title: string, artist: string) => {
+    if (!streamId || !playerRef.current) return;
+    const timestamp = Math.floor(playerRef.current.getCurrentTime());
+
+    try {
+      await api.createStampPerformance(streamId, {
+        title,
+        originalArtist: artist || 'Unknown',
+        timestamp,
+      });
+      setShowAddModal(false);
+      await loadDetail();
+      showToast(`Added ${title} at ${formatTimestamp(timestamp)}`);
+    } catch (err: unknown) {
+      showToast(err instanceof Error ? err.message : 'Failed to add song', true);
+    }
+  }, [streamId, loadDetail, showToast]);
+
+  // --- Keyboard shortcuts ---
+  useEffect(() => {
+    const handler = (e: KeyboardEvent) => {
+      const target = e.target as HTMLElement;
+      if (target.tagName === 'INPUT' || target.tagName === 'TEXTAREA') return;
+      if (showAddModal || showPasteImport) return;
+
+      switch (e.key) {
+        case 'm': markEndTimestamp(); break;
+        case 't': markStartTimestamp(); break;
+        case 's': seekToStart(); break;
+        case 'e': seekToEnd(); break;
+        case 'n': selectNext(); break;
+        case 'p': selectPrev(); break;
+        case 'c': copyVodUrl(); break;
+        case 'f': fetchDuration(); break;
+        case 'F': fetchAllDurations(); break;
+        case 'x': exportSongList(); break;
+        case 'i': if (streamId) setShowPasteImport(true); break;
+        case 'ArrowLeft':
+          if (playerRef.current) {
+            e.preventDefault();
+            playerRef.current.seekTo(playerRef.current.getCurrentTime() - 5);
+          }
+          break;
+        case 'ArrowRight':
+          if (playerRef.current) {
+            e.preventDefault();
+            playerRef.current.seekTo(playerRef.current.getCurrentTime() + 5);
+          }
+          break;
+      }
+    };
+
+    document.addEventListener('keydown', handler);
+    return () => document.removeEventListener('keydown', handler);
+  }, [markEndTimestamp, markStartTimestamp, seekToStart, seekToEnd, selectNext, selectPrev, copyVodUrl, exportSongList, fetchDuration, fetchAllDurations, showAddModal, showPasteImport, streamId]);
+
+  // --- Derived values ---
+  const unstampedCount = detail ? detail.performances.filter(p => p.endTimestamp === null).length : 0;
+
   if (loading) return <div className="text-slate-500">Loading...</div>;
   if (error || !detail) return <div className="text-red-600">{error ?? 'Stream not found'}</div>;
 
   return (
     <div>
-      {/* Breadcrumb */}
-      <div className="mb-4 text-sm text-slate-500">
-        <Link to="/streams" className="text-blue-600 hover:underline">Streams</Link>
-        <span className="mx-2">/</span>
-        <span className="text-slate-700">{detail.title || detail.videoId}</span>
+      {/* Breadcrumb with prev/next navigation */}
+      <div className="mb-4 flex items-center justify-between text-sm">
+        <div className="w-40">
+          {prevStream && (
+            <Link to={`/streams/${prevStream.id}`}
+              className="inline-flex items-center gap-1 rounded-md px-2 py-1 text-slate-500 hover:bg-slate-100 hover:text-slate-700">
+              <span>&larr;</span>
+              <span>{prevStream.date}</span>
+            </Link>
+          )}
+        </div>
+        <div className="text-slate-500">
+          <Link to="/streams" className="text-blue-600 hover:underline">Streams</Link>
+          <span className="mx-2">/</span>
+          <span className="text-slate-700">{detail.title || detail.videoId}</span>
+        </div>
+        <div className="flex w-40 justify-end">
+          {nextStream && (
+            <Link to={`/streams/${nextStream.id}`}
+              className="inline-flex items-center gap-1 rounded-md px-2 py-1 text-slate-500 hover:bg-slate-100 hover:text-slate-700">
+              <span>{nextStream.date}</span>
+              <span>&rarr;</span>
+            </Link>
+          )}
+        </div>
       </div>
 
       {/* Stream header */}
@@ -352,11 +664,53 @@ export default function StreamDetail({ user }: { user: AuthUser }) {
         <YouTubePlayer ref={playerRef} videoId={detail.videoId} />
       </div>
 
+      {/* Keyboard shortcut hints */}
+      <div className="mt-3 flex flex-wrap gap-x-4 gap-y-1 text-xs text-slate-400">
+        <span>
+          <kbd className="rounded border border-slate-300 bg-slate-100 px-1 font-mono">m</kbd>{' '}Mark end
+        </span>
+        <span>
+          <kbd className="rounded border border-slate-300 bg-slate-100 px-1 font-mono">t</kbd>{' '}Set start
+        </span>
+        <span>
+          <kbd className="rounded border border-slate-300 bg-slate-100 px-1 font-mono">s</kbd>/
+          <kbd className="rounded border border-slate-300 bg-slate-100 px-1 font-mono">e</kbd>{' '}Seek start/end
+        </span>
+        <span>
+          <kbd className="rounded border border-slate-300 bg-slate-100 px-1 font-mono">n</kbd>/
+          <kbd className="rounded border border-slate-300 bg-slate-100 px-1 font-mono">p</kbd>{' '}Next/prev
+        </span>
+        <span>
+          <kbd className="rounded border border-slate-300 bg-slate-100 px-1 font-mono">c</kbd>{' '}Copy URL
+        </span>
+        <span>
+          <kbd className="rounded border border-slate-300 bg-slate-100 px-1 font-mono">f</kbd>/
+          <kbd className="rounded border border-slate-300 bg-slate-100 px-1 font-mono">F</kbd>{' '}Fetch/all durations
+        </span>
+        <span>
+          <kbd className="rounded border border-slate-300 bg-slate-100 px-1 font-mono">x</kbd>{' '}Export
+        </span>
+        <span>
+          <kbd className="rounded border border-slate-300 bg-slate-100 px-1 font-mono">i</kbd>{' '}Paste import
+        </span>
+        <span>
+          <kbd className="rounded border border-slate-300 bg-slate-100 px-1 font-mono">&larr;</kbd>/
+          <kbd className="rounded border border-slate-300 bg-slate-100 px-1 font-mono">&rarr;</kbd>{' '}Seek &plusmn;5s
+        </span>
+      </div>
+
       {/* Performances header */}
       <div className="mt-6 flex items-center justify-between">
-        <h3 className="text-lg font-semibold text-slate-800">
-          Performances ({detail.performances.length})
-        </h3>
+        <div className="flex items-center gap-2">
+          <h3 className="text-lg font-semibold text-slate-800">
+            Performances ({detail.performances.length})
+          </h3>
+          {unstampedCount > 0 && (
+            <span className="rounded-full bg-amber-100 px-2 py-0.5 text-xs font-semibold text-amber-700">
+              {unstampedCount} unstamped
+            </span>
+          )}
+        </div>
         <div className="flex gap-2">
           {isCurator && detail.performances.some((p) => p.status !== 'approved') && (
             <button onClick={handleApproveAll}
@@ -364,6 +718,14 @@ export default function StreamDetail({ user }: { user: AuthUser }) {
               Approve All
             </button>
           )}
+          <button onClick={() => setShowAddModal(true)}
+            className="rounded-md bg-blue-600 px-3 py-1 text-sm font-medium text-white hover:bg-blue-700">
+            + Add Song
+          </button>
+          <button onClick={clearAllEndTimestamps}
+            className="rounded-md border border-slate-300 px-3 py-1 text-sm font-medium text-slate-600 hover:bg-slate-100">
+            Clear All
+          </button>
           <button onClick={exportSongList}
             disabled={detail.performances.length === 0}
             className="rounded-md border border-slate-300 px-3 py-1 text-sm font-medium text-slate-600 hover:bg-slate-100 disabled:opacity-50">
@@ -399,7 +761,11 @@ export default function StreamDetail({ user }: { user: AuthUser }) {
             </thead>
             <tbody className="divide-y divide-slate-100">
               {detail.performances.map((perf, i) => (
-                <tr key={perf.id} className="hover:bg-slate-50">
+                <tr key={perf.id}
+                  onClick={() => { setSelectedIndex(i); setEditingField(null); }}
+                  className={`cursor-pointer transition-colors hover:bg-slate-50 ${
+                    i === selectedIndex ? 'border-l-2 border-l-blue-500 bg-blue-50' : ''
+                  }`}>
                   <td className="px-4 py-3 text-slate-400">{i + 1}</td>
 
                   {/* Title */}
@@ -407,7 +773,7 @@ export default function StreamDetail({ user }: { user: AuthUser }) {
                     {editingField?.perfId === perf.id && editingField.field === 'title' ? (
                       <InlineEdit value={perf.title} onSave={(v) => handleSave(perf.id, 'title', v)} onCancel={() => setEditingField(null)} />
                     ) : (
-                      <span className="cursor-text font-medium text-slate-800" onDoubleClick={() => setEditingField({ perfId: perf.id, field: 'title' })} title="Double-click to edit">
+                      <span className="cursor-text font-medium text-slate-800" onDoubleClick={(e) => { e.stopPropagation(); setEditingField({ perfId: perf.id, field: 'title' }); }} title="Double-click to edit">
                         {perf.title}
                       </span>
                     )}
@@ -419,7 +785,7 @@ export default function StreamDetail({ user }: { user: AuthUser }) {
                       <InlineEdit value={perf.originalArtist} placeholder="add artist" onSave={(v) => handleSave(perf.id, 'artist', v)} onCancel={() => setEditingField(null)} />
                     ) : (
                       <span className={`cursor-text ${perf.originalArtist ? 'text-slate-600' : 'italic text-slate-400'}`}
-                        onDoubleClick={() => setEditingField({ perfId: perf.id, field: 'artist' })} title="Double-click to edit">
+                        onDoubleClick={(e) => { e.stopPropagation(); setEditingField({ perfId: perf.id, field: 'artist' }); }} title="Double-click to edit">
                         {perf.originalArtist || 'add artist'}
                       </span>
                     )}
@@ -427,16 +793,24 @@ export default function StreamDetail({ user }: { user: AuthUser }) {
 
                   {/* Timestamps */}
                   <td className="px-4 py-3 font-mono text-xs">
-                    <button onClick={() => playerRef.current?.seekTo(perf.timestamp)} className="text-blue-600 hover:underline" title="Seek to start">
+                    <button onClick={(e) => { e.stopPropagation(); playerRef.current?.seekTo(perf.timestamp); }} className="text-blue-600 hover:underline" title="Seek to start">
                       {formatTimestamp(perf.timestamp)}
                     </button>
                   </td>
                   <td className={`px-4 py-3 font-mono text-xs ${perf.endTimestamp !== null ? 'text-green-600' : 'text-slate-300'}`}>
-                    {perf.endTimestamp !== null ? (
-                      <button onClick={() => playerRef.current?.seekTo(Math.max(0, perf.endTimestamp! - 10))} className="hover:underline" title="Seek near end">
-                        {formatTimestamp(perf.endTimestamp)}
-                      </button>
-                    ) : '—'}
+                    <span className="inline-flex items-center gap-1">
+                      {perf.endTimestamp !== null ? (
+                        <>
+                          <button onClick={(e) => { e.stopPropagation(); playerRef.current?.seekTo(Math.max(0, perf.endTimestamp! - 10)); }} className="hover:underline" title="Seek near end">
+                            {formatTimestamp(perf.endTimestamp)}
+                          </button>
+                          <button onClick={(e) => { e.stopPropagation(); clearEndTimestamp(perf.id, i); }}
+                            className="rounded p-0.5 text-slate-400 hover:bg-slate-200 hover:text-slate-600" title="Clear end timestamp">
+                            &#x21BA;
+                          </button>
+                        </>
+                      ) : '—'}
+                    </span>
                   </td>
 
                   {/* Note */}
@@ -445,7 +819,7 @@ export default function StreamDetail({ user }: { user: AuthUser }) {
                       <InlineEdit value={perf.note} placeholder="add note" onSave={(v) => handleSave(perf.id, 'note', v)} onCancel={() => setEditingField(null)} />
                     ) : (
                       <span className={`cursor-text truncate text-xs ${perf.note ? 'text-slate-600' : 'italic text-slate-400'}`}
-                        onDoubleClick={() => setEditingField({ perfId: perf.id, field: 'note' })} title="Double-click to edit note">
+                        onDoubleClick={(e) => { e.stopPropagation(); setEditingField({ perfId: perf.id, field: 'note' }); }} title="Double-click to edit note">
                         {perf.note || 'add note'}
                       </span>
                     )}
@@ -458,18 +832,18 @@ export default function StreamDetail({ user }: { user: AuthUser }) {
                   <td className="px-4 py-3">
                     <div className="flex items-center gap-1">
                       {isCurator && perf.status !== 'approved' && (
-                        <button onClick={() => handlePerformanceStatus(perf.id, 'approved')}
+                        <button onClick={(e) => { e.stopPropagation(); handlePerformanceStatus(perf.id, 'approved'); }}
                           className="rounded px-1.5 py-0.5 text-xs text-green-600 hover:bg-green-100" title="Approve">
-                          ✓
+                          &#x2713;
                         </button>
                       )}
                       {isCurator && perf.status === 'approved' && (
-                        <button onClick={() => handlePerformanceStatus(perf.id, 'pending')}
+                        <button onClick={(e) => { e.stopPropagation(); handlePerformanceStatus(perf.id, 'pending'); }}
                           className="rounded px-1.5 py-0.5 text-xs text-yellow-600 hover:bg-yellow-100" title="Unapprove">
-                          ↩
+                          &#x21A9;
                         </button>
                       )}
-                      <button onClick={() => handleDelete(perf)}
+                      <button onClick={(e) => { e.stopPropagation(); handleDelete(perf); }}
                         className="rounded p-1 text-slate-400 hover:bg-red-100 hover:text-red-600" title="Delete">
                         &times;
                       </button>
@@ -481,6 +855,11 @@ export default function StreamDetail({ user }: { user: AuthUser }) {
           </table>
         )}
       </div>
+
+      {/* Add Song Modal */}
+      {showAddModal && (
+        <AddSongModal onSubmit={handleAddSong} onCancel={() => setShowAddModal(false)} />
+      )}
 
       {/* Paste Import Modal */}
       {showPasteImport && streamId && (
