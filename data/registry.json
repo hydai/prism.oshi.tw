@@ -124,6 +124,37 @@
       "enabled": true
     },
     {
+      "slug": "rei",
+      "displayName": "澪Rei",
+      "description": "我是子午計畫【霓NEO(n)】所屬的VTuber！\n歌勢Vtuber，就讀冰霜魔法學系的小狸貓，能夠變身成不同事物，主要在Youtube上進行直播。\n聲音有著療癒人心的能力，空靈的歌聲會讓人暫時忘記煩惱；有些笨拙的個性更為大家帶來許多意想不到的歡笑。",
+      "avatarUrl": "https://yt3.googleusercontent.com/wiN-x6KgaJatPrVn2Acg1afi6atNxYF99DX9Yzftr8Nlo0d02zKfegb2wVFbF9J6p_v8_oY-PA=s900-c-k-c0x00ffffff-no-rj",
+      "brandName": "ReiPrism",
+      "subscriberCount": "9.41萬",
+      "group": "子午計畫",
+      "socialLinks": {
+        "youtube": "https://www.youtube.com/@%E6%BE%AARei",
+        "twitter": "https://www.youtube.com/redirect?event=channel_description&redir_token=QUFFLUhqbllZeExteGhndmdRTklEZkgwWTNkUTVkTnlNd3xBQ3Jtc0trajdjZ0tFR2FrTE1wcm95dzhrbzRGeS1hTDVSWWxVRVJOZ2ZoQVhlOFBLeS1WTDNXTlB2Q2JEWVk5WHhJeHE5dmRfOW9OWVc5TU5XM3NMVG1MUDI4djBNLVdEdFB5eEVTOHIzTjRrZVVlN1ZRcEgySQ&q=https%3A%2F%2Ftwitter.com%2FReirei_Neon",
+        "facebook": "https://www.youtube.com/redirect?event=channel_description&redir_token=QUFFLUhqbjZRVFV3SkU3NjBrY1hNS0s1aXhybUpncEthd3xBQ3Jtc0ttWWRKVEk0STl2eWhvaVhNbEV2cUh6dkYtYzZ4QkJ1M3pNSEdGRnFyQUt2Nk9aYUxmV0stTXVEMEdwZEJzLXlUUDVoNk4ySk0tTGcyTFBfQUx6UVN2VmliRVc5RzdiOUVjU2UxOTNaT3loS29mX1IzVQ&q=https%3A%2F%2Fwww.facebook.com%2FReireiNeon%2F",
+        "instagram": "https://www.youtube.com/redirect?event=channel_description&redir_token=QUFFLUhqbXhRZk1KS2hnOEtfZHEtdGQzSThJb2dieVBsd3xBQ3Jtc0ttV0QzV3R0TTBXVDd2Qmk4NURTUVR6MnFETlZXZkViNDZKTzloejE5R3BtZ2Z3VTllcHVHRjZ4SjFGM2lRQ1lqTWZYV0U2bDVBWFZkMXFLaFhoeG10eVZ3TEtBbHVsWXRoSmQwU3dFZ0haRXItWFVZdw&q=https%3A%2F%2Fwww.instagram.com%2Freirei_neon%2F",
+        "twitch": "https://www.youtube.com/redirect?event=channel_description&redir_token=QUFFLUhqbVVXWDdYSkVLb0E1TDdvOUx6RF9PbURKSV9LQXxBQ3Jtc0tsZDItSm9uWFJaZnB5UGFFM0hlU1Y2Sl84bTk0bmNUaEFMZDdNMU92V3BwUkI5eXU4Z0dORnExdVU0dXlHWmc1RjM2RHlKVmgwVW5CWVdyUXVzQVYwQ3VGSmF3WjNYWl9nMG1WZkdtSTZqV3JNU2FUdw&q=https%3A%2F%2Fwww.twitch.tv%2Freirei_neon"
+      },
+      "theme": {
+        "accentPrimary": "#EC4899",
+        "accentPrimaryDark": "#DB2777",
+        "accentPrimaryLight": "#F472B6",
+        "accentSecondary": "#3B82F6",
+        "accentSecondaryLight": "#60A5FA",
+        "bgPageStart": "#FFF0F5",
+        "bgPageMid": "#F0F8FF",
+        "bgPageEnd": "#E6E6FA",
+        "bgAccentPrimary": "#FDF2F8",
+        "bgAccentPrimaryMuted": "#FCE7F3",
+        "borderAccentPrimary": "#FBCFE8",
+        "borderAccentSecondary": "#BFDBFE"
+      },
+      "enabled": true
+    },
+    {
       "slug": "seki",
       "displayName": "汐Seki",
       "description": "歌勢Vtuber，成熟的狐狸姊姊，2022.9.25-2025.3.30(畢業)。\n不管是歌唱時性感慵懶的嗓音、玩遊戲時的反差萌、還是與觀眾互動時風趣的回應，多樣的面孔都是她所擁有的真實樣貌！",
