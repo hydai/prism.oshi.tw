@@ -56,7 +56,7 @@
   {
     "id": "song-505001f5",
     "title": "(프리지아) 小蒼蘭",
-    "originalArtist": "볼빨간사춘기 (臉紅的思春期)",
+    "originalArtist": "볼빨간사춘기",
     "tags": [],
     "performances": [
       {
@@ -74,7 +74,7 @@
   {
     "id": "song-9b661a3f",
     "title": "1, 2, 3, 4",
-    "originalArtist": "LEE HI (李夏怡)",
+    "originalArtist": "LEE HI",
     "tags": [],
     "performances": [
       {
@@ -328,7 +328,7 @@
   {
     "id": "song-201595a6",
     "title": "88BARS",
-    "originalArtist": "熊仔 (Kumachan)",
+    "originalArtist": "熊仔",
     "tags": [],
     "performances": [
       {
@@ -382,7 +382,7 @@
   {
     "id": "song-3673fd85",
     "title": "99次我愛他",
-    "originalArtist": "元若藍",
+    "originalArtist": "元若藍 (Shorty Yuan)",
     "tags": [],
     "performances": [
       {
@@ -624,6 +624,24 @@
     ]
   },
   {
+    "id": "song-951dfe17",
+    "title": "Apologize",
+    "originalArtist": "Timbaland-OneRepublic",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-70309767",
+        "streamId": "stream-2022-10-16",
+        "date": "2022-10-16",
+        "streamTitle": "【歌回】秋天傷感歌回｜汐Seki",
+        "videoId": "mG1nZByWYQk",
+        "timestamp": 3150,
+        "endTimestamp": 3305,
+        "note": ""
+      }
+    ]
+  },
+  {
     "id": "song-1223d90c",
     "title": "Armageddon",
     "originalArtist": "aespa",
@@ -655,6 +673,24 @@
         "videoId": "c2W5eNd9qaw",
         "timestamp": 595,
         "endTimestamp": 769,
+        "note": ""
+      }
+    ]
+  },
+  {
+    "id": "song-fccc0a74",
+    "title": "Autumn Leaves",
+    "originalArtist": "Laura Fygi",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-daab58ec",
+        "streamId": "stream-2022-10-16",
+        "date": "2022-10-16",
+        "streamTitle": "【歌回】秋天傷感歌回｜汐Seki",
+        "videoId": "mG1nZByWYQk",
+        "timestamp": 578,
+        "endTimestamp": 811,
         "note": ""
       }
     ]
@@ -701,6 +737,24 @@
         "videoId": "bIS_x6Vc3Xc",
         "timestamp": 5001,
         "endTimestamp": 5236,
+        "note": ""
+      }
+    ]
+  },
+  {
+    "id": "song-99b745ca",
+    "title": "B.O.(BLACK OUT)",
+    "originalArtist": "ØZI ft. 9m88",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-12b5dcb7",
+        "streamId": "stream-2023-01-29",
+        "date": "2023-01-29",
+        "streamTitle": "【嘻哈歌回】Rapper大汐哈時代｜汐Seki",
+        "videoId": "WtxaDMaS3sk",
+        "timestamp": 2047,
+        "endTimestamp": 2282,
         "note": ""
       }
     ]
@@ -888,6 +942,24 @@
     ]
   },
   {
+    "id": "song-29bbfdd5",
+    "title": "Best Part",
+    "originalArtist": "Daniel Caesar",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-5e81c061",
+        "streamId": "stream-2022-10-09",
+        "date": "2022-10-09",
+        "streamTitle": "【歌回】英文歌回 English Karaoke｜汐Seki",
+        "videoId": "1j_QnZVOqok",
+        "timestamp": 1168,
+        "endTimestamp": 1378,
+        "note": ""
+      }
+    ]
+  },
+  {
     "id": "song-fddd3333",
     "title": "Best friend",
     "originalArtist": "Saweetie",
@@ -1042,6 +1114,24 @@
     ]
   },
   {
+    "id": "song-d0d9756b",
+    "title": "CH4NGE",
+    "originalArtist": "Giga",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-5801648e",
+        "streamId": "stream-2023-02-12",
+        "date": "2023-02-12",
+        "streamTitle": "【歌回】談場轟轟烈烈的戀愛｜汐Seki",
+        "videoId": "Gbk1nW3Irhw",
+        "timestamp": 8015,
+        "endTimestamp": 8148,
+        "note": ""
+      }
+    ]
+  },
+  {
     "id": "song-78c09261",
     "title": "CH4NGE ft. 白湯",
     "originalArtist": "Giga",
@@ -1098,11 +1188,39 @@
     ]
   },
   {
+    "id": "song-9ccf815c",
+    "title": "Can't Help Falling In Love",
+    "originalArtist": "Elvis Presley",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-03956ad2",
+        "streamId": "stream-2022-10-23",
+        "date": "2022-10-23",
+        "streamTitle": "【歌回】哄睡歌回ZZZ｜汐Seki",
+        "videoId": "5ivAkDyACl8",
+        "timestamp": 408,
+        "endTimestamp": 587,
+        "note": ""
+      }
+    ]
+  },
+  {
     "id": "song-d861d6d8",
     "title": "Can't Take My Eyes off You",
     "originalArtist": "Frankie Valli",
     "tags": [],
     "performances": [
+      {
+        "id": "p-7fc68096",
+        "streamId": "stream-2023-02-12",
+        "date": "2023-02-12",
+        "streamTitle": "【歌回】談場轟轟烈烈的戀愛｜汐Seki",
+        "videoId": "Gbk1nW3Irhw",
+        "timestamp": 5915,
+        "endTimestamp": 6138,
+        "note": ""
+      },
       {
         "id": "p-8c503236",
         "streamId": "stream-2023-05-12",
@@ -1131,6 +1249,24 @@
         "videoId": "1A65rkK96bU",
         "timestamp": 6037,
         "endTimestamp": 6236,
+        "note": ""
+      }
+    ]
+  },
+  {
+    "id": "song-f870caef",
+    "title": "Chandelier",
+    "originalArtist": "Sia",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-2a011ae2",
+        "streamId": "stream-2022-10-09",
+        "date": "2022-10-09",
+        "streamTitle": "【歌回】英文歌回 English Karaoke｜汐Seki",
+        "videoId": "1j_QnZVOqok",
+        "timestamp": 1566,
+        "endTimestamp": 1779,
         "note": ""
       }
     ]
@@ -1246,6 +1382,24 @@
     ]
   },
   {
+    "id": "song-7503b18a",
+    "title": "Creep",
+    "originalArtist": "Radiohead",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-ed6e4b21",
+        "streamId": "stream-2022-10-23",
+        "date": "2022-10-23",
+        "streamTitle": "【歌回】哄睡歌回ZZZ｜汐Seki",
+        "videoId": "5ivAkDyACl8",
+        "timestamp": 3016,
+        "endTimestamp": 3252,
+        "note": ""
+      }
+    ]
+  },
+  {
     "id": "song-083b4c6c",
     "title": "Cupid",
     "originalArtist": "FIFTY FIFTY",
@@ -1284,7 +1438,7 @@
   {
     "id": "song-0869e0c2",
     "title": "D (Half Moon) (不知道在唱什麼)",
-    "originalArtist": "Dean",
+    "originalArtist": "DEAN",
     "tags": [],
     "performances": [
       {
@@ -1341,6 +1495,24 @@
         "videoId": "vp29WNIb0f0",
         "timestamp": 2367,
         "endTimestamp": 2537,
+        "note": ""
+      }
+    ]
+  },
+  {
+    "id": "song-ae175dc8",
+    "title": "Dance Monkey",
+    "originalArtist": "TONES AND I",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-50a8656e",
+        "streamId": "stream-2022-10-09",
+        "date": "2022-10-09",
+        "streamTitle": "【歌回】英文歌回 English Karaoke｜汐Seki",
+        "videoId": "1j_QnZVOqok",
+        "timestamp": 4402,
+        "endTimestamp": 4611,
         "note": ""
       }
     ]
@@ -1574,7 +1746,7 @@
   {
     "id": "song-e18190a9",
     "title": "Ditto",
-    "originalArtist": "NewJeans (뉴진스)",
+    "originalArtist": "NewJeans",
     "tags": [],
     "performances": [
       {
@@ -1764,7 +1936,7 @@
   {
     "id": "song-68af7eed",
     "title": "ELEVEN",
-    "originalArtist": "IVE (아이브)",
+    "originalArtist": "IVE",
     "tags": [],
     "performances": [
       {
@@ -2265,6 +2437,24 @@
         "videoId": "6_8SSfq-cy0",
         "timestamp": 10108,
         "endTimestamp": 10342,
+        "note": ""
+      }
+    ]
+  },
+  {
+    "id": "song-4dd7f42c",
+    "title": "Glimpse of Us",
+    "originalArtist": "Joji",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-b5ddccc1",
+        "streamId": "stream-2022-10-16",
+        "date": "2022-10-16",
+        "streamTitle": "【歌回】秋天傷感歌回｜汐Seki",
+        "videoId": "mG1nZByWYQk",
+        "timestamp": 1101,
+        "endTimestamp": 1334,
         "note": ""
       }
     ]
@@ -2954,6 +3144,24 @@
     ]
   },
   {
+    "id": "song-e0a9736b",
+    "title": "I Wish You Love",
+    "originalArtist": "Rachael Yamagata",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-2d375a25",
+        "streamId": "stream-2022-10-09",
+        "date": "2022-10-09",
+        "streamTitle": "【歌回】英文歌回 English Karaoke｜汐Seki",
+        "videoId": "1j_QnZVOqok",
+        "timestamp": 2849,
+        "endTimestamp": 3067,
+        "note": ""
+      }
+    ]
+  },
+  {
     "id": "song-cf9fd579",
     "title": "I believe《我的野蠻女友》",
     "originalArtist": "신승훈",
@@ -3056,7 +3264,7 @@
   {
     "id": "song-bbf43725",
     "title": "INVU",
-    "originalArtist": "태연 (太妍)",
+    "originalArtist": "태연",
     "tags": [],
     "performances": [
       {
@@ -3110,7 +3318,7 @@
   {
     "id": "song-1d56ccf0",
     "title": "Instagram",
-    "originalArtist": "Dean",
+    "originalArtist": "DEAN",
     "tags": [],
     "performances": [
       {
@@ -3164,7 +3372,7 @@
   {
     "id": "song-fa9b8a8e",
     "title": "Just the Two of Us",
-    "originalArtist": "Grover Washington",
+    "originalArtist": "Grover Washington Jr.",
     "tags": [],
     "performances": [
       {
@@ -3198,9 +3406,27 @@
     ]
   },
   {
+    "id": "song-8a4b3459",
+    "title": "Just the Two of Us",
+    "originalArtist": "Bill Withers",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-7e3cab89",
+        "streamId": "stream-2022-10-09",
+        "date": "2022-10-09",
+        "streamTitle": "【歌回】英文歌回 English Karaoke｜汐Seki",
+        "videoId": "1j_QnZVOqok",
+        "timestamp": 407,
+        "endTimestamp": 640,
+        "note": ""
+      }
+    ]
+  },
+  {
     "id": "song-9db340dd",
     "title": "Just the two of us",
-    "originalArtist": "Grover washington Jr",
+    "originalArtist": "Grover Washington Jr.",
     "tags": [],
     "performances": [
       {
@@ -3211,6 +3437,24 @@
         "videoId": "NtWn6SUJ458",
         "timestamp": 4052,
         "endTimestamp": 4264,
+        "note": ""
+      }
+    ]
+  },
+  {
+    "id": "song-91361737",
+    "title": "Just the way you are",
+    "originalArtist": "Bruno Mars",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-35cbd724",
+        "streamId": "stream-2023-02-12",
+        "date": "2023-02-12",
+        "streamTitle": "【歌回】談場轟轟烈烈的戀愛｜汐Seki",
+        "videoId": "Gbk1nW3Irhw",
+        "timestamp": 7271,
+        "endTimestamp": 7488,
         "note": ""
       }
     ]
@@ -3576,7 +3820,7 @@
   {
     "id": "song-e322795c",
     "title": "LOVE DIVE",
-    "originalArtist": "IVE (아이브)",
+    "originalArtist": "IVE",
     "tags": [],
     "performances": [
       {
@@ -3684,9 +3928,19 @@
   {
     "id": "song-0ae34992",
     "title": "Leave The Door Open",
-    "originalArtist": "Bruno Mars & Anderson .Paak & Silk Sonic",
+    "originalArtist": "Bruno Mars, Anderson .Paak, Silk Sonic",
     "tags": [],
     "performances": [
+      {
+        "id": "p-8055bf1f",
+        "streamId": "stream-2023-02-05",
+        "date": "2023-02-05",
+        "streamTitle": "【歌回】八萬訂閱感謝歌回｜汐Seki",
+        "videoId": "CLvFQOS7ntQ",
+        "timestamp": 4816,
+        "endTimestamp": 4972,
+        "note": ""
+      },
       {
         "id": "p-53c806b9",
         "streamId": "stream-2023-09-24",
@@ -3748,7 +4002,7 @@
   {
     "id": "song-3b1a26ea",
     "title": "Letting Go",
-    "originalArtist": "蔡健雅 (Tanya Chua)",
+    "originalArtist": "蔡健雅",
     "tags": [],
     "performances": [
       {
@@ -3833,6 +4087,24 @@
         "videoId": "7jd30WndP4c",
         "timestamp": 1318,
         "endTimestamp": 1542,
+        "note": ""
+      }
+    ]
+  },
+  {
+    "id": "song-9f79b5f0",
+    "title": "Little Star",
+    "originalArtist": "Standing EGG",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-96eabe60",
+        "streamId": "stream-2022-10-23",
+        "date": "2022-10-23",
+        "streamTitle": "【歌回】哄睡歌回ZZZ｜汐Seki",
+        "videoId": "5ivAkDyACl8",
+        "timestamp": 4314,
+        "endTimestamp": 4524,
         "note": ""
       }
     ]
@@ -4056,7 +4328,7 @@
   {
     "id": "song-e689e317",
     "title": "Lydia 2004《鬥魚》",
-    "originalArtist": "F.I.R.飛兒樂團",
+    "originalArtist": "F.I.R. 飛兒樂團",
     "tags": [],
     "performances": [
       {
@@ -4410,7 +4682,7 @@
   {
     "id": "song-652a8e11",
     "title": "Mr. Q",
-    "originalArtist": "蔡依林 (Jolin Tsai)",
+    "originalArtist": "蔡依林",
     "tags": [],
     "performances": [
       {
@@ -4518,7 +4790,7 @@
   {
     "id": "song-601c6a8b",
     "title": "New Jeans",
-    "originalArtist": "New Jeans",
+    "originalArtist": "NewJeans",
     "tags": [],
     "performances": [
       {
@@ -4624,6 +4896,24 @@
     ]
   },
   {
+    "id": "song-d4c3b09c",
+    "title": "Nothing",
+    "originalArtist": "Bruno Major",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-c8922b4b",
+        "streamId": "stream-2022-10-23",
+        "date": "2022-10-23",
+        "streamTitle": "【歌回】哄睡歌回ZZZ｜汐Seki",
+        "videoId": "5ivAkDyACl8",
+        "timestamp": 4759,
+        "endTimestamp": 4992,
+        "note": ""
+      }
+    ]
+  },
+  {
     "id": "song-9f83430e",
     "title": "OMG",
     "originalArtist": "NewJeans",
@@ -4644,7 +4934,7 @@
   {
     "id": "song-42bf7137",
     "title": "OMG",
-    "originalArtist": "NewJeans (뉴진스)",
+    "originalArtist": "NewJeans",
     "tags": [],
     "performances": [
       {
@@ -4752,7 +5042,7 @@
   {
     "id": "song-967f149f",
     "title": "Only",
-    "originalArtist": "이하이 (LeeHi))",
+    "originalArtist": "이하이",
     "tags": [],
     "performances": [
       {
@@ -4763,6 +5053,24 @@
         "videoId": "ZLo1MoeiX6o",
         "timestamp": 11170,
         "endTimestamp": 11408,
+        "note": ""
+      }
+    ]
+  },
+  {
+    "id": "song-e18138ee",
+    "title": "Only",
+    "originalArtist": "이하이",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-5c4fe5d3",
+        "streamId": "stream-2022-10-23",
+        "date": "2022-10-23",
+        "streamTitle": "【歌回】哄睡歌回ZZZ｜汐Seki",
+        "videoId": "5ivAkDyACl8",
+        "timestamp": 885,
+        "endTimestamp": 1126,
         "note": ""
       }
     ]
@@ -5020,6 +5328,24 @@
     ]
   },
   {
+    "id": "song-b49f2f21",
+    "title": "Payphone",
+    "originalArtist": "Maroon 5 ft. Wiz Khalifa",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-1c06f4c6",
+        "streamId": "stream-2023-02-05",
+        "date": "2023-02-05",
+        "streamTitle": "【歌回】八萬訂閱感謝歌回｜汐Seki",
+        "videoId": "CLvFQOS7ntQ",
+        "timestamp": 6089,
+        "endTimestamp": 6269,
+        "note": ""
+      }
+    ]
+  },
+  {
     "id": "song-6dc0058e",
     "title": "Peaches (Acoustic ver.)",
     "originalArtist": "Justin Bieber",
@@ -5104,7 +5430,7 @@
   {
     "id": "song-8cd844ca",
     "title": "Plastic Love",
-    "originalArtist": "Mariya Takeuchi (推薦收聽 : https://www.youtube.com/watch?v=HpN4bdyqHeI)",
+    "originalArtist": "Mariya Takeuchi",
     "tags": [],
     "performances": [
       {
@@ -5158,7 +5484,7 @@
   {
     "id": "song-6341512c",
     "title": "Play我呸",
-    "originalArtist": "蔡依林 (Jolin Tsai)",
+    "originalArtist": "蔡依林",
     "tags": [],
     "performances": [
       {
@@ -5348,6 +5674,24 @@
     ]
   },
   {
+    "id": "song-d5d83eb4",
+    "title": "Ride",
+    "originalArtist": "HYBS",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-ff618faf",
+        "streamId": "stream-2022-10-09",
+        "date": "2022-10-09",
+        "streamTitle": "【歌回】英文歌回 English Karaoke｜汐Seki",
+        "videoId": "1j_QnZVOqok",
+        "timestamp": 3700,
+        "endTimestamp": 3880,
+        "note": ""
+      }
+    ]
+  },
+  {
     "id": "song-b6661dbb",
     "title": "Ride on Time",
     "originalArtist": "山下達郎",
@@ -5415,6 +5759,24 @@
         "videoId": "g4Z9kgQvKAQ",
         "timestamp": 8950,
         "endTimestamp": 9141,
+        "note": ""
+      }
+    ]
+  },
+  {
+    "id": "song-6311b33c",
+    "title": "Roses",
+    "originalArtist": "The Chainsmokers",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-f9e6664e",
+        "streamId": "stream-2023-02-05",
+        "date": "2023-02-05",
+        "streamTitle": "【歌回】八萬訂閱感謝歌回｜汐Seki",
+        "videoId": "CLvFQOS7ntQ",
+        "timestamp": 8936,
+        "endTimestamp": 9161,
         "note": ""
       }
     ]
@@ -5664,6 +6026,24 @@
     ]
   },
   {
+    "id": "song-795b4d19",
+    "title": "SWAG午覺",
+    "originalArtist": "異鄉人 (Outlander) ft. 9m88",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-39b951a9",
+        "streamId": "stream-2023-01-29",
+        "date": "2023-01-29",
+        "streamTitle": "【嘻哈歌回】Rapper大汐哈時代｜汐Seki",
+        "videoId": "WtxaDMaS3sk",
+        "timestamp": 7087,
+        "endTimestamp": 7385,
+        "note": ""
+      }
+    ]
+  },
+  {
     "id": "song-6e314b54",
     "title": "Say Yes - 步步驚心：麗",
     "originalArtist": "Loco & Punch",
@@ -5756,7 +6136,7 @@
   {
     "id": "song-ec90607c",
     "title": "Seven (Acoustic ver.)",
-    "originalArtist": "정국 (Jung Kook)",
+    "originalArtist": "정국",
     "tags": [],
     "performances": [
       {
@@ -6036,6 +6416,24 @@
     ]
   },
   {
+    "id": "song-d546af8c",
+    "title": "Someone You Loved",
+    "originalArtist": "Lewis Capaldi",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-0a530f77",
+        "streamId": "stream-2022-10-16",
+        "date": "2022-10-16",
+        "streamTitle": "【歌回】秋天傷感歌回｜汐Seki",
+        "videoId": "mG1nZByWYQk",
+        "timestamp": 3980,
+        "endTimestamp": 4168,
+        "note": ""
+      }
+    ]
+  },
+  {
     "id": "song-97ffbc27",
     "title": "Someone like you",
     "originalArtist": "EXO-CBX",
@@ -6246,7 +6644,7 @@
   {
     "id": "song-dd13ce5a",
     "title": "Supernova",
-    "originalArtist": "Aespa",
+    "originalArtist": "aespa",
     "tags": [],
     "performances": [
       {
@@ -6352,6 +6750,24 @@
     ]
   },
   {
+    "id": "song-e18ed849",
+    "title": "Take Me To Church",
+    "originalArtist": "Hozier",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-1c80dc0a",
+        "streamId": "stream-2022-10-09",
+        "date": "2022-10-09",
+        "streamTitle": "【歌回】英文歌回 English Karaoke｜汐Seki",
+        "videoId": "1j_QnZVOqok",
+        "timestamp": 3303,
+        "endTimestamp": 3541,
+        "note": ""
+      }
+    ]
+  },
+  {
     "id": "song-76677357",
     "title": "Talking to the Moon",
     "originalArtist": "Bruno Mars",
@@ -6365,6 +6781,24 @@
         "videoId": "c7HCZqW7Ogk",
         "timestamp": 4887,
         "endTimestamp": 5125,
+        "note": ""
+      }
+    ]
+  },
+  {
+    "id": "song-89cac95f",
+    "title": "Talking to the Moon",
+    "originalArtist": "Bruno Mars",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-ce8f956e",
+        "streamId": "stream-2022-10-09",
+        "date": "2022-10-09",
+        "streamTitle": "【歌回】英文歌回 English Karaoke｜汐Seki",
+        "videoId": "1j_QnZVOqok",
+        "timestamp": 4015,
+        "endTimestamp": 4232,
         "note": ""
       }
     ]
@@ -6564,7 +6998,7 @@
   {
     "id": "song-cb975322",
     "title": "To. X",
-    "originalArtist": "Taeyeon",
+    "originalArtist": "TAEYEON",
     "tags": [],
     "performances": [
       {
@@ -6582,7 +7016,7 @@
   {
     "id": "song-41e00822",
     "title": "Tonight pt. II",
-    "originalArtist": "demxntia",
+    "originalArtist": "Demxntia",
     "tags": [],
     "performances": [
       {
@@ -6990,6 +7424,24 @@
     ]
   },
   {
+    "id": "song-570f44a1",
+    "title": "Walk Away",
+    "originalArtist": "Mina Okabe",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-7f61ead1",
+        "streamId": "stream-2022-10-09",
+        "date": "2022-10-09",
+        "streamTitle": "【歌回】英文歌回 English Karaoke｜汐Seki",
+        "videoId": "1j_QnZVOqok",
+        "timestamp": 2573,
+        "endTimestamp": 2745,
+        "note": ""
+      }
+    ]
+  },
+  {
     "id": "song-3689ccfd",
     "title": "Watch Me Woo!",
     "originalArtist": "PLAVE",
@@ -7092,7 +7544,7 @@
   {
     "id": "song-1ca48f1d",
     "title": "What Do I Call You",
-    "originalArtist": "Taeyeon",
+    "originalArtist": "TAEYEON",
     "tags": [],
     "performances": [
       {
@@ -7110,7 +7562,7 @@
   {
     "id": "song-63563b95",
     "title": "What Do I Call You",
-    "originalArtist": "太妍 (TAEYEON)",
+    "originalArtist": "太妍",
     "tags": [],
     "performances": [
       {
@@ -7218,7 +7670,7 @@
   {
     "id": "song-474775ec",
     "title": "Without You",
-    "originalArtist": "高爾宣 (OSN)",
+    "originalArtist": "高爾宣",
     "tags": [],
     "performances": [
       {
@@ -7454,6 +7906,24 @@
     ]
   },
   {
+    "id": "song-d6fc3b4c",
+    "title": "golden hour",
+    "originalArtist": "JVKE",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-742c3fe9",
+        "streamId": "stream-2022-10-09",
+        "date": "2022-10-09",
+        "streamTitle": "【歌回】英文歌回 English Karaoke｜汐Seki",
+        "videoId": "1j_QnZVOqok",
+        "timestamp": 786,
+        "endTimestamp": 954,
+        "note": ""
+      }
+    ]
+  },
+  {
     "id": "song-d4f25f68",
     "title": "hair tie",
     "originalArtist": "ØZI",
@@ -7682,7 +8152,7 @@
   {
     "id": "song-888f87d2",
     "title": "ほろよい",
-    "originalArtist": "さんひ",
+    "originalArtist": "さんひ (Sunhe)",
     "tags": [],
     "performances": [
       {
@@ -7700,7 +8170,7 @@
   {
     "id": "song-e4d50801",
     "title": "ほろよい",
-    "originalArtist": "さんひ (復仇)",
+    "originalArtist": "さんひ (Sunhe)",
     "tags": [],
     "performances": [
       {
@@ -7862,7 +8332,7 @@
   {
     "id": "song-47e7ff59",
     "title": "一個人",
-    "originalArtist": "蔡依林 (Jolin Tsai )",
+    "originalArtist": "蔡依林",
     "tags": [],
     "performances": [
       {
@@ -7944,7 +8414,7 @@
   {
     "id": "song-7741d412",
     "title": "一半",
-    "originalArtist": "薛之謙 (Joker Xue)",
+    "originalArtist": "薛之謙",
     "tags": [],
     "performances": [
       {
@@ -7962,7 +8432,7 @@
   {
     "id": "song-9a548118",
     "title": "一半",
-    "originalArtist": "丁噹 (Della)",
+    "originalArtist": "丁噹",
     "tags": [],
     "performances": [
       {
@@ -7973,6 +8443,24 @@
         "videoId": "ZqjmzB2iKak",
         "timestamp": 5450,
         "endTimestamp": 5714,
+        "note": ""
+      }
+    ]
+  },
+  {
+    "id": "song-7cdc8f02",
+    "title": "一半",
+    "originalArtist": "丁噹",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-05101aac",
+        "streamId": "stream-2023-02-12",
+        "date": "2023-02-12",
+        "streamTitle": "【歌回】談場轟轟烈烈的戀愛｜汐Seki",
+        "videoId": "Gbk1nW3Irhw",
+        "timestamp": 1082,
+        "endTimestamp": 1349,
         "note": ""
       }
     ]
@@ -8074,6 +8562,16 @@
     "tags": [],
     "performances": [
       {
+        "id": "p-5bc942ab",
+        "streamId": "stream-2023-02-12",
+        "date": "2023-02-12",
+        "streamTitle": "【歌回】談場轟轟烈烈的戀愛｜汐Seki",
+        "videoId": "Gbk1nW3Irhw",
+        "timestamp": 2446,
+        "endTimestamp": 2714,
+        "note": ""
+      },
+      {
         "id": "p-b782c6fc",
         "streamId": "stream-2023-10-29",
         "date": "2023-10-29",
@@ -8101,6 +8599,16 @@
     "originalArtist": "周杰倫 (Jay Chou)",
     "tags": [],
     "performances": [
+      {
+        "id": "p-f97a9f89",
+        "streamId": "stream-2023-02-05",
+        "date": "2023-02-05",
+        "streamTitle": "【歌回】八萬訂閱感謝歌回｜汐Seki",
+        "videoId": "CLvFQOS7ntQ",
+        "timestamp": 7791,
+        "endTimestamp": 8083,
+        "note": ""
+      },
       {
         "id": "p-7febf287",
         "streamId": "stream-2023-07-02",
@@ -8170,7 +8678,7 @@
   {
     "id": "song-56acd3d4",
     "title": "下一站．與你",
-    "originalArtist": "KSP + 薛南",
+    "originalArtist": "KSP & 薛南",
     "tags": [],
     "performances": [
       {
@@ -8253,6 +8761,24 @@
         "videoId": "OWcxGmUCmuM",
         "timestamp": 2397,
         "endTimestamp": 2643,
+        "note": ""
+      }
+    ]
+  },
+  {
+    "id": "song-18dcd5fc",
+    "title": "不吃早餐才是一件很嘻哈的事",
+    "originalArtist": "MC HotDog (熱狗) ft. 蛋堡 (Soft Lipa)",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-120e5994",
+        "streamId": "stream-2023-01-29",
+        "date": "2023-01-29",
+        "streamTitle": "【嘻哈歌回】Rapper大汐哈時代｜汐Seki",
+        "videoId": "WtxaDMaS3sk",
+        "timestamp": 6523,
+        "endTimestamp": 6797,
         "note": ""
       }
     ]
@@ -8360,7 +8886,7 @@
   {
     "id": "song-7729bcb4",
     "title": "不為誰而作的歌",
-    "originalArtist": "林俊傑 (JJ Lin)",
+    "originalArtist": "林俊傑",
     "tags": [],
     "performances": [
       {
@@ -8414,7 +8940,7 @@
   {
     "id": "song-db7c9dad",
     "title": "不要說話",
-    "originalArtist": "陳奕迅 (Eason)",
+    "originalArtist": "陳奕迅",
     "tags": [],
     "performances": [
       {
@@ -8432,7 +8958,7 @@
   {
     "id": "song-12c7efa6",
     "title": "不該",
-    "originalArtist": "周杰倫",
+    "originalArtist": "周杰倫 (Jay Chou)",
     "tags": [],
     "performances": [
       {
@@ -8460,7 +8986,7 @@
   {
     "id": "song-68455697",
     "title": "不醉不會",
-    "originalArtist": "田馥甄 (Hebe)",
+    "originalArtist": "田馥甄",
     "tags": [],
     "performances": [
       {
@@ -8632,7 +9158,7 @@
   {
     "id": "song-2a50422a",
     "title": "你啊你啊",
-    "originalArtist": "魏如萱 (waa wei)",
+    "originalArtist": "魏如萱",
     "tags": [],
     "performances": [
       {
@@ -8676,6 +9202,24 @@
     ]
   },
   {
+    "id": "song-270c85d6",
+    "title": "你快樂所以我快樂",
+    "originalArtist": "王菲",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-1e3e9deb",
+        "streamId": "stream-2022-10-23",
+        "date": "2022-10-23",
+        "streamTitle": "【歌回】哄睡歌回ZZZ｜汐Seki",
+        "videoId": "5ivAkDyACl8",
+        "timestamp": 3350,
+        "endTimestamp": 3609,
+        "note": ""
+      }
+    ]
+  },
+  {
     "id": "song-83a5ff5a",
     "title": "你怎麼捨得我難過",
     "originalArtist": "黃品源",
@@ -8696,7 +9240,7 @@
   {
     "id": "song-d468477e",
     "title": "你敢不敢",
-    "originalArtist": "徐佳瑩 (LaLa)",
+    "originalArtist": "徐佳瑩",
     "tags": [],
     "performances": [
       {
@@ -8814,7 +9358,7 @@
   {
     "id": "song-3ad66057",
     "title": "你給我聽好",
-    "originalArtist": "陳奕迅 (Eason Chan)",
+    "originalArtist": "陳奕迅",
     "tags": [],
     "performances": [
       {
@@ -8942,7 +9486,7 @@
   {
     "id": "song-d255a6b5",
     "title": "倒帶",
-    "originalArtist": "蔡依林 (Jolin Tsai)",
+    "originalArtist": "蔡依林",
     "tags": [],
     "performances": [
       {
@@ -8996,7 +9540,7 @@
   {
     "id": "song-df3db837",
     "title": "倫敦的愛情",
-    "originalArtist": "藍又時 (Shadya Lan)",
+    "originalArtist": "藍又時",
     "tags": [],
     "performances": [
       {
@@ -9060,7 +9604,7 @@
   {
     "id": "song-b038d9f4",
     "title": "像天堂的懸崖",
-    "originalArtist": "李佳薇 (Jess Lee)",
+    "originalArtist": "李佳薇",
     "tags": [],
     "performances": [
       {
@@ -9188,7 +9732,7 @@
   {
     "id": "song-b12e499c",
     "title": "兜圈",
-    "originalArtist": "林宥嘉",
+    "originalArtist": "林宥嘉 (Yoga Lin)",
     "tags": [],
     "performances": [
       {
@@ -9324,7 +9868,7 @@
   {
     "id": "song-bf9efcee",
     "title": "冷火",
-    "originalArtist": "信 (Shin)",
+    "originalArtist": "信",
     "tags": [],
     "performances": [
       {
@@ -9378,7 +9922,7 @@
   {
     "id": "song-e5763e95",
     "title": "出賣",
-    "originalArtist": "那英 (Na Ying)",
+    "originalArtist": "那英",
     "tags": [],
     "performances": [
       {
@@ -9417,6 +9961,24 @@
         "videoId": "jR8TppsaxQk",
         "timestamp": 5345,
         "endTimestamp": 5547,
+        "note": ""
+      }
+    ]
+  },
+  {
+    "id": "song-33c0c7da",
+    "title": "分手快樂",
+    "originalArtist": "梁靜茹",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-6729b883",
+        "streamId": "stream-2023-02-12",
+        "date": "2023-02-12",
+        "streamTitle": "【歌回】談場轟轟烈烈的戀愛｜汐Seki",
+        "videoId": "Gbk1nW3Irhw",
+        "timestamp": 8834,
+        "endTimestamp": 9106,
         "note": ""
       }
     ]
@@ -9478,7 +10040,7 @@
   {
     "id": "song-f83ec8fa",
     "title": "到不了",
-    "originalArtist": "范瑋琪",
+    "originalArtist": "范瑋琪 (Christine Fan)",
     "tags": [],
     "performances": [
       {
@@ -9578,7 +10140,7 @@
   {
     "id": "song-dd705a36",
     "title": "十萬毫升淚水",
-    "originalArtist": "蔡健雅 (Tanya Chua)",
+    "originalArtist": "蔡健雅",
     "tags": [],
     "performances": [
       {
@@ -9614,7 +10176,7 @@
   {
     "id": "song-ae3df333",
     "title": "半句再見",
-    "originalArtist": "孫燕姿 (Sun Yan Zi)",
+    "originalArtist": "孫燕姿",
     "tags": [],
     "performances": [
       {
@@ -9722,7 +10284,7 @@
   {
     "id": "song-96cc3fbb",
     "title": "可惜不是你",
-    "originalArtist": "梁靜茹 (Fish Leong",
+    "originalArtist": "梁靜茹 Fish Leong",
     "tags": [],
     "performances": [
       {
@@ -9876,7 +10438,7 @@
   {
     "id": "song-b79ff29b",
     "title": "台北夜空下",
-    "originalArtist": "吳卓源 (Julia Wu)",
+    "originalArtist": "吳卓源",
     "tags": [],
     "performances": [
       {
@@ -9905,6 +10467,42 @@
         "videoId": "7jd30WndP4c",
         "timestamp": 5262,
         "endTimestamp": 5515,
+        "note": ""
+      }
+    ]
+  },
+  {
+    "id": "song-274f713b",
+    "title": "史詩",
+    "originalArtist": "蛋堡",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-9947bc08",
+        "streamId": "stream-2023-01-29",
+        "date": "2023-01-29",
+        "streamTitle": "【嘻哈歌回】Rapper大汐哈時代｜汐Seki",
+        "videoId": "WtxaDMaS3sk",
+        "timestamp": 3059,
+        "endTimestamp": 3263,
+        "note": ""
+      }
+    ]
+  },
+  {
+    "id": "song-77345527",
+    "title": "各自安好",
+    "originalArtist": "René劉若英",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-147ae475",
+        "streamId": "stream-2022-10-23",
+        "date": "2022-10-23",
+        "streamTitle": "【歌回】哄睡歌回ZZZ｜汐Seki",
+        "videoId": "5ivAkDyACl8",
+        "timestamp": 1435,
+        "endTimestamp": 1695,
         "note": ""
       }
     ]
@@ -9958,7 +10556,7 @@
   {
     "id": "song-71e69bb1",
     "title": "味道",
-    "originalArtist": "辛曉琪 (Winnie Hsin)",
+    "originalArtist": "辛曉琪",
     "tags": [],
     "performances": [
       {
@@ -10005,6 +10603,24 @@
         "videoId": "q271zTEX5s0",
         "timestamp": 5771,
         "endTimestamp": 5983,
+        "note": ""
+      }
+    ]
+  },
+  {
+    "id": "song-6e9a9458",
+    "title": "啵啦",
+    "originalArtist": "J.Sheon ft. 呂士軒 (Trout Fresh)",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-19f61be3",
+        "streamId": "stream-2023-01-29",
+        "date": "2023-01-29",
+        "streamTitle": "【嘻哈歌回】Rapper大汐哈時代｜汐Seki",
+        "videoId": "WtxaDMaS3sk",
+        "timestamp": 1404,
+        "endTimestamp": 1652,
         "note": ""
       }
     ]
@@ -10059,6 +10675,24 @@
         "videoId": "85nwWN5Z5Q4",
         "timestamp": 9469,
         "endTimestamp": 9724,
+        "note": ""
+      }
+    ]
+  },
+  {
+    "id": "song-afe9c528",
+    "title": "喜歡",
+    "originalArtist": "張懸",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-6cd6aa38",
+        "streamId": "stream-2023-02-12",
+        "date": "2023-02-12",
+        "streamTitle": "【歌回】談場轟轟烈烈的戀愛｜汐Seki",
+        "videoId": "Gbk1nW3Irhw",
+        "timestamp": 5210,
+        "endTimestamp": 5488,
         "note": ""
       }
     ]
@@ -10480,6 +11114,16 @@
     "tags": [],
     "performances": [
       {
+        "id": "p-b55ce97f",
+        "streamId": "stream-2023-02-05",
+        "date": "2023-02-05",
+        "streamTitle": "【歌回】八萬訂閱感謝歌回｜汐Seki",
+        "videoId": "CLvFQOS7ntQ",
+        "timestamp": 9276,
+        "endTimestamp": 9520,
+        "note": ""
+      },
+      {
         "id": "p-fea24610",
         "streamId": "stream-52fe0c37",
         "date": "2023-07-16",
@@ -10512,7 +11156,7 @@
   {
     "id": "song-94de80ee",
     "title": "夜空中最亮的星",
-    "originalArtist": "G.E.M. 鄧紫棋",
+    "originalArtist": "G.E.M.鄧紫棋",
     "tags": [],
     "performances": [
       {
@@ -10584,7 +11228,7 @@
   {
     "id": "song-423bdd61",
     "title": "夢一場",
-    "originalArtist": "那英 (Na Ying)",
+    "originalArtist": "那英",
     "tags": [],
     "performances": [
       {
@@ -10838,7 +11482,7 @@
   {
     "id": "song-921c3e6a",
     "title": "天真有邪",
-    "originalArtist": "林宥嘉",
+    "originalArtist": "林宥嘉 (Yoga Lin)",
     "tags": [],
     "performances": [
       {
@@ -10892,7 +11536,7 @@
   {
     "id": "song-6e4058a8",
     "title": "天黑黑",
-    "originalArtist": "孫燕姿 (Sun Yan-Zi)",
+    "originalArtist": "孫燕姿",
     "tags": [],
     "performances": [
       {
@@ -11020,7 +11664,7 @@
   {
     "id": "song-dcac3ab9",
     "title": "女孩",
-    "originalArtist": "韋禮安 (WeiBird)",
+    "originalArtist": "韋禮安",
     "tags": [],
     "performances": [
       {
@@ -11038,7 +11682,7 @@
   {
     "id": "song-7301e678",
     "title": "她說",
-    "originalArtist": "林俊傑 (JJ Lin)",
+    "originalArtist": "林俊傑",
     "tags": [],
     "performances": [
       {
@@ -11272,7 +11916,7 @@
   {
     "id": "song-57caa213",
     "title": "孤勇者",
-    "originalArtist": "陳奕迅 (Eason Chan)",
+    "originalArtist": "陳奕迅",
     "tags": [],
     "performances": [
       {
@@ -11290,7 +11934,7 @@
   {
     "id": "song-c706b32a",
     "title": "孤勇者(再一次)",
-    "originalArtist": "陳奕迅 (Eason Chan)",
+    "originalArtist": "陳奕迅",
     "tags": [],
     "performances": [
       {
@@ -11308,7 +11952,7 @@
   {
     "id": "song-43e7f35b",
     "title": "孤單北半球",
-    "originalArtist": "林依晨 (Ariel Lin)",
+    "originalArtist": "林依晨",
     "tags": [],
     "performances": [
       {
@@ -11354,7 +11998,7 @@
   {
     "id": "song-705b3866",
     "title": "孤獨患者",
-    "originalArtist": "陳奕迅 (Eason Chan)",
+    "originalArtist": "陳奕迅",
     "tags": [],
     "performances": [
       {
@@ -11558,7 +12202,7 @@
   {
     "id": "song-77f56705",
     "title": "寂寞先生",
-    "originalArtist": "曹格 (Gary Chaw)",
+    "originalArtist": "曹格",
     "tags": [],
     "performances": [
       {
@@ -11594,7 +12238,7 @@
   {
     "id": "song-f5122ab3",
     "title": "寂寞寂寞就好",
-    "originalArtist": "田馥甄 (Hebe Tien)",
+    "originalArtist": "田馥甄",
     "tags": [],
     "performances": [
       {
@@ -11722,7 +12366,7 @@
   {
     "id": "song-703859fd",
     "title": "寫一首歌",
-    "originalArtist": "順子 (Shunza)",
+    "originalArtist": "順子",
     "tags": [],
     "performances": [
       {
@@ -11814,7 +12458,7 @@
   {
     "id": "song-908ad53e",
     "title": "尋人啟事",
-    "originalArtist": "徐佳瑩 (LaLa)",
+    "originalArtist": "徐佳瑩",
     "tags": [],
     "performances": [
       {
@@ -11924,7 +12568,7 @@
   {
     "id": "song-d99c2a62",
     "title": "小幸運",
-    "originalArtist": "田馥甄 (Hebe Tien)",
+    "originalArtist": "田馥甄",
     "tags": [],
     "performances": [
       {
@@ -12024,7 +12668,7 @@
   {
     "id": "song-36fee323",
     "title": "少一點天分",
-    "originalArtist": "孫盛希 (Shi Shi)",
+    "originalArtist": "孫盛希",
     "tags": [],
     "performances": [
       {
@@ -12042,7 +12686,7 @@
   {
     "id": "song-b39c4263",
     "title": "少女",
-    "originalArtist": "林宥嘉",
+    "originalArtist": "林宥嘉 (Yoga Lin)",
     "tags": [],
     "performances": [
       {
@@ -12106,7 +12750,7 @@
   {
     "id": "song-c219a223",
     "title": "屋頂",
-    "originalArtist": "周杰倫",
+    "originalArtist": "周杰倫 (Jay Chou)",
     "tags": [],
     "performances": [
       {
@@ -12214,7 +12858,7 @@
   {
     "id": "song-1f33977c",
     "title": "年輪說",
-    "originalArtist": "楊丞琳 (Rainie Yang)",
+    "originalArtist": "楊丞琳",
     "tags": [],
     "performances": [
       {
@@ -12422,7 +13066,7 @@
   {
     "id": "song-c4328e63",
     "title": "心理學",
-    "originalArtist": "徐佳瑩 (LaLa)",
+    "originalArtist": "徐佳瑩",
     "tags": [],
     "performances": [
       {
@@ -12632,7 +13276,7 @@
   {
     "id": "song-83df352d",
     "title": "恆溫",
-    "originalArtist": "孫盛希 (Shi Shi)",
+    "originalArtist": "孫盛希",
     "tags": [],
     "performances": [
       {
@@ -12888,7 +13532,7 @@
   {
     "id": "song-5c858413",
     "title": "想你的夜",
-    "originalArtist": "關喆 (Grady)",
+    "originalArtist": "關喆",
     "tags": [],
     "performances": [
       {
@@ -12934,7 +13578,7 @@
   {
     "id": "song-126fd765",
     "title": "想和你看五月的晚霞",
-    "originalArtist": "陳華 (Hua Chen)",
+    "originalArtist": "陳華 (HuaChen)",
     "tags": [],
     "performances": [
       {
@@ -13150,7 +13794,7 @@
   {
     "id": "song-b0028495",
     "title": "愛你",
-    "originalArtist": "王心凌 (Cyndi Wang)",
+    "originalArtist": "王心凌",
     "tags": [],
     "performances": [
       {
@@ -13161,6 +13805,24 @@
         "videoId": "oLsGrLCwpIs",
         "timestamp": 7758,
         "endTimestamp": 7972,
+        "note": ""
+      }
+    ]
+  },
+  {
+    "id": "song-48f943ac",
+    "title": "愛你",
+    "originalArtist": "陳芳語 ( Kimberley Chen )",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-074ad8d2",
+        "streamId": "stream-2023-02-12",
+        "date": "2023-02-12",
+        "streamTitle": "【歌回】談場轟轟烈烈的戀愛｜汐Seki",
+        "videoId": "Gbk1nW3Irhw",
+        "timestamp": 6756,
+        "endTimestamp": 6961,
         "note": ""
       }
     ]
@@ -13566,7 +14228,7 @@
   {
     "id": "song-acd8a648",
     "title": "慢冷",
-    "originalArtist": "梁靜茹 (Fish Leong)",
+    "originalArtist": "梁靜茹",
     "tags": [],
     "performances": [
       {
@@ -13582,9 +14244,45 @@
     ]
   },
   {
+    "id": "song-10757b87",
+    "title": "慢冷",
+    "originalArtist": "梁靜茹",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-b060018d",
+        "streamId": "stream-2023-02-12",
+        "date": "2023-02-12",
+        "streamTitle": "【歌回】談場轟轟烈烈的戀愛｜汐Seki",
+        "videoId": "Gbk1nW3Irhw",
+        "timestamp": 8321,
+        "endTimestamp": 8611,
+        "note": ""
+      }
+    ]
+  },
+  {
+    "id": "song-b20f7cae",
+    "title": "慢冷",
+    "originalArtist": "梁靜茹",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-a1b69aa4",
+        "streamId": "stream-2022-10-16",
+        "date": "2022-10-16",
+        "streamTitle": "【歌回】秋天傷感歌回｜汐Seki",
+        "videoId": "mG1nZByWYQk",
+        "timestamp": 2151,
+        "endTimestamp": 2441,
+        "note": ""
+      }
+    ]
+  },
+  {
     "id": "song-2f2e58ac",
     "title": "慢慢喜歡你",
-    "originalArtist": "莫文蔚 (Karen Mok)",
+    "originalArtist": "莫文蔚",
     "tags": [],
     "performances": [
       {
@@ -13612,7 +14310,7 @@
   {
     "id": "song-b33b7632",
     "title": "慢慢等",
-    "originalArtist": "韋禮安 (WeiBird)",
+    "originalArtist": "韋禮安",
     "tags": [],
     "performances": [
       {
@@ -13784,7 +14482,7 @@
   {
     "id": "song-231a0afb",
     "title": "我們",
-    "originalArtist": "陳奕迅 (Eason Chan)",
+    "originalArtist": "陳奕迅",
     "tags": [],
     "performances": [
       {
@@ -13936,6 +14634,24 @@
     ]
   },
   {
+    "id": "song-f4d5794d",
+    "title": "我好想你",
+    "originalArtist": "蘇打綠 sodagreen",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-0b5dc2fc",
+        "streamId": "stream-2022-10-16",
+        "date": "2022-10-16",
+        "streamTitle": "【歌回】秋天傷感歌回｜汐Seki",
+        "videoId": "mG1nZByWYQk",
+        "timestamp": 1520,
+        "endTimestamp": 1844,
+        "note": ""
+      }
+    ]
+  },
+  {
     "id": "song-4a883af7",
     "title": "我很好騙",
     "originalArtist": "動力火車 (Power Station)",
@@ -14028,7 +14744,7 @@
   {
     "id": "song-80c57599",
     "title": "我懷念的",
-    "originalArtist": "孫燕姿 (Yanzi Sun)",
+    "originalArtist": "孫燕姿",
     "tags": [],
     "performances": [
       {
@@ -14118,6 +14834,24 @@
     ]
   },
   {
+    "id": "song-5aed0d4a",
+    "title": "我的新衣",
+    "originalArtist": "Vava ft. Ty. & Nina Wang",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-76a68f82",
+        "streamId": "stream-2023-01-29",
+        "date": "2023-01-29",
+        "streamTitle": "【嘻哈歌回】Rapper大汐哈時代｜汐Seki",
+        "videoId": "WtxaDMaS3sk",
+        "timestamp": 5103,
+        "endTimestamp": 5346,
+        "note": ""
+      }
+    ]
+  },
+  {
     "id": "song-384cd2e4",
     "title": "我的歌聲裡",
     "originalArtist": "曲婉婷",
@@ -14174,7 +14908,7 @@
   {
     "id": "song-dad1df71",
     "title": "我總是一個人在練習一個人",
-    "originalArtist": "林宥嘉",
+    "originalArtist": "林宥嘉 (Yoga Lin)",
     "tags": [],
     "performances": [
       {
@@ -14210,7 +14944,7 @@
   {
     "id": "song-13181239",
     "title": "我要飛",
-    "originalArtist": "F.I.R.飛兒樂團",
+    "originalArtist": "F.I.R. 飛兒樂團",
     "tags": [],
     "performances": [
       {
@@ -14274,7 +15008,7 @@
   {
     "id": "song-42c9e585",
     "title": "戒菸",
-    "originalArtist": "李榮浩 (Ronghao Li)",
+    "originalArtist": "李榮浩",
     "tags": [],
     "performances": [
       {
@@ -14310,7 +15044,7 @@
   {
     "id": "song-85d1a616",
     "title": "手心的薔薇",
-    "originalArtist": "林俊傑 (JJ Lin)",
+    "originalArtist": "林俊傑",
     "tags": [],
     "performances": [
       {
@@ -14364,7 +15098,7 @@
   {
     "id": "song-642491b2",
     "title": "拋物線",
-    "originalArtist": "蔡健雅 (Tanya Chua)",
+    "originalArtist": "蔡健雅",
     "tags": [],
     "performances": [
       {
@@ -14400,7 +15134,7 @@
   {
     "id": "song-dd7e6372",
     "title": "捲菸",
-    "originalArtist": "美秀集團 (Amazing Show)",
+    "originalArtist": "美秀集團",
     "tags": [],
     "performances": [
       {
@@ -14504,6 +15238,16 @@
     "tags": [],
     "performances": [
       {
+        "id": "p-76791594",
+        "streamId": "stream-2023-02-05",
+        "date": "2023-02-05",
+        "streamTitle": "【歌回】八萬訂閱感謝歌回｜汐Seki",
+        "videoId": "CLvFQOS7ntQ",
+        "timestamp": 6621,
+        "endTimestamp": 6872,
+        "note": ""
+      },
+      {
         "id": "p-96ff6fa6",
         "streamId": "stream-2023-07-02",
         "date": "2023-07-02",
@@ -14547,6 +15291,24 @@
         "videoId": "BTE7RtGTXK4",
         "timestamp": 10609,
         "endTimestamp": 10860,
+        "note": ""
+      }
+    ]
+  },
+  {
+    "id": "song-753c615b",
+    "title": "斑馬斑馬",
+    "originalArtist": "宋冬野",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-a61ebb7c",
+        "streamId": "stream-2022-10-23",
+        "date": "2022-10-23",
+        "streamTitle": "【歌回】哄睡歌回ZZZ｜汐Seki",
+        "videoId": "5ivAkDyACl8",
+        "timestamp": 2123,
+        "endTimestamp": 2378,
         "note": ""
       }
     ]
@@ -14618,7 +15380,7 @@
   {
     "id": "song-7f3fdd56",
     "title": "旅行的意義",
-    "originalArtist": "陳綺貞 (Cheer Chen)",
+    "originalArtist": "陳綺貞",
     "tags": [],
     "performances": [
       {
@@ -14770,9 +15532,27 @@
     ]
   },
   {
+    "id": "song-32d50756",
+    "title": "晚安晚安",
+    "originalArtist": "魏如萱 Waa Wei",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-4ff4cb77",
+        "streamId": "stream-2022-10-23",
+        "date": "2022-10-23",
+        "streamTitle": "【歌回】哄睡歌回ZZZ｜汐Seki",
+        "videoId": "5ivAkDyACl8",
+        "timestamp": 5167,
+        "endTimestamp": 5406,
+        "note": ""
+      }
+    ]
+  },
+  {
     "id": "song-0b9307e5",
     "title": "普通朋友",
-    "originalArtist": "陶喆 (David Tao)",
+    "originalArtist": "陶喆",
     "tags": [],
     "performances": [
       {
@@ -14891,6 +15671,24 @@
         "videoId": "NtWn6SUJ458",
         "timestamp": 4766,
         "endTimestamp": 4980,
+        "note": ""
+      }
+    ]
+  },
+  {
+    "id": "song-3620fe6d",
+    "title": "曖昧",
+    "originalArtist": "楊丞琳",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-e49ae393",
+        "streamId": "stream-2023-02-12",
+        "date": "2023-02-12",
+        "streamTitle": "【歌回】談場轟轟烈烈的戀愛｜汐Seki",
+        "videoId": "Gbk1nW3Irhw",
+        "timestamp": 3197,
+        "endTimestamp": 3447,
         "note": ""
       }
     ]
@@ -15024,7 +15822,7 @@
   {
     "id": "song-cd990188",
     "title": "月光",
-    "originalArtist": "王心凌 (Cyndi Wang)",
+    "originalArtist": "王心凌",
     "tags": [],
     "performances": [
       {
@@ -15063,6 +15861,24 @@
         "videoId": "c7HCZqW7Ogk",
         "timestamp": 4350,
         "endTimestamp": 4653,
+        "note": ""
+      }
+    ]
+  },
+  {
+    "id": "song-453b491a",
+    "title": "有一種悲傷",
+    "originalArtist": "A-Lin",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-8e3621d1",
+        "streamId": "stream-2022-10-16",
+        "date": "2022-10-16",
+        "streamTitle": "【歌回】秋天傷感歌回｜汐Seki",
+        "videoId": "mG1nZByWYQk",
+        "timestamp": 4350,
+        "endTimestamp": 4585,
         "note": ""
       }
     ]
@@ -15178,7 +15994,7 @@
   {
     "id": "song-9e5cbfa5",
     "title": "楓",
-    "originalArtist": "周杰倫",
+    "originalArtist": "周杰倫 (Jay Chou)",
     "tags": [],
     "performances": [
       {
@@ -15325,6 +16141,16 @@
     "originalArtist": "郭頂",
     "tags": [],
     "performances": [
+      {
+        "id": "p-9bad6acf",
+        "streamId": "stream-2023-02-05",
+        "date": "2023-02-05",
+        "streamTitle": "【歌回】八萬訂閱感謝歌回｜汐Seki",
+        "videoId": "CLvFQOS7ntQ",
+        "timestamp": 3490,
+        "endTimestamp": 3807,
+        "note": ""
+      },
       {
         "id": "p-3a24644f",
         "streamId": "stream-2023-10-29",
@@ -15504,7 +16330,7 @@
   {
     "id": "song-95fdae9d",
     "title": "洋蔥",
-    "originalArtist": "楊宗緯 (Aska Yang)",
+    "originalArtist": "楊宗緯",
     "tags": [],
     "performances": [
       {
@@ -15522,7 +16348,7 @@
   {
     "id": "song-6e9a6695",
     "title": "派對動物",
-    "originalArtist": "MAYDAY五月天",
+    "originalArtist": "MAYDAY 五月天",
     "tags": [],
     "performances": [
       {
@@ -15576,7 +16402,7 @@
   {
     "id": "song-d9b6744d",
     "title": "浪流連 (Waves Wandering)",
-    "originalArtist": "茄子蛋 (EggPlantEgg)",
+    "originalArtist": "茄子蛋",
     "tags": [],
     "performances": [
       {
@@ -15715,6 +16541,24 @@
         "videoId": "tDAH34PO4Gg",
         "timestamp": 839,
         "endTimestamp": 1074,
+        "note": ""
+      }
+    ]
+  },
+  {
+    "id": "song-70b898c9",
+    "title": "深昏睡",
+    "originalArtist": "Haruno (春野)",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-c5035883",
+        "streamId": "stream-2022-10-23",
+        "date": "2022-10-23",
+        "streamTitle": "【歌回】哄睡歌回ZZZ｜汐Seki",
+        "videoId": "5ivAkDyACl8",
+        "timestamp": 2552,
+        "endTimestamp": 2794,
         "note": ""
       }
     ]
@@ -15878,7 +16722,7 @@
   {
     "id": "song-b9743497",
     "title": "為你的寂寞唱歌",
-    "originalArtist": "家家 (JiaJia)",
+    "originalArtist": "家家",
     "tags": [],
     "performances": [
       {
@@ -15914,7 +16758,7 @@
   {
     "id": "song-57058568",
     "title": "烏梅子醬",
-    "originalArtist": "李榮浩 (Ronghao Li)",
+    "originalArtist": "李榮浩",
     "tags": [],
     "performances": [
       {
@@ -15953,6 +16797,24 @@
         "videoId": "zp4g7JwgFSo",
         "timestamp": 15773,
         "endTimestamp": 16055,
+        "note": ""
+      }
+    ]
+  },
+  {
+    "id": "song-4b765c90",
+    "title": "無人之島",
+    "originalArtist": "任然",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-ab4f211f",
+        "streamId": "stream-2022-10-16",
+        "date": "2022-10-16",
+        "streamTitle": "【歌回】秋天傷感歌回｜汐Seki",
+        "videoId": "mG1nZByWYQk",
+        "timestamp": 2693,
+        "endTimestamp": 2975,
         "note": ""
       }
     ]
@@ -16060,7 +16922,7 @@
   {
     "id": "song-c211e681",
     "title": "煙花易冷",
-    "originalArtist": "周杰倫",
+    "originalArtist": "周杰倫 (Jay Chou)",
     "tags": [],
     "performances": [
       {
@@ -16150,7 +17012,7 @@
   {
     "id": "song-b19adb74",
     "title": "燕尾蝶",
-    "originalArtist": "梁靜茹 (Fish Leong)",
+    "originalArtist": "梁靜茹",
     "tags": [],
     "performances": [
       {
@@ -16330,7 +17192,7 @@
   {
     "id": "song-33a97171",
     "title": "珊瑚海",
-    "originalArtist": "周杰倫",
+    "originalArtist": "周杰倫 (Jay Chou)",
     "tags": [],
     "performances": [
       {
@@ -16564,7 +17426,7 @@
   {
     "id": "song-e491443f",
     "title": "皮囊",
-    "originalArtist": "蕭敬騰 (Jam Hsiao)",
+    "originalArtist": "蕭敬騰",
     "tags": [],
     "performances": [
       {
@@ -16618,7 +17480,7 @@
   {
     "id": "song-f4330e8b",
     "title": "直到我遇見了你",
-    "originalArtist": "李友廷",
+    "originalArtist": "李友廷 (Yo Lee)",
     "tags": [],
     "performances": [
       {
@@ -16700,7 +17562,7 @@
   {
     "id": "song-9ec641f5",
     "title": "相愛後動物感傷",
-    "originalArtist": "張惠妹 (A-MIT)",
+    "originalArtist": "張惠妹",
     "tags": [],
     "performances": [
       {
@@ -16898,7 +17760,7 @@
   {
     "id": "song-8333a127",
     "title": "祝我生日快樂",
-    "originalArtist": "溫嵐 (Landy Wen)",
+    "originalArtist": "溫嵐",
     "tags": [],
     "performances": [
       {
@@ -16950,6 +17812,24 @@
     ]
   },
   {
+    "id": "song-99dfe1c0",
+    "title": "禁愛令",
+    "originalArtist": "熊仔 (Kumachan) & 豹子膽 (BOWZ)",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-6f190092",
+        "streamId": "stream-2023-01-29",
+        "date": "2023-01-29",
+        "streamTitle": "【嘻哈歌回】Rapper大汐哈時代｜汐Seki",
+        "videoId": "WtxaDMaS3sk",
+        "timestamp": 5976,
+        "endTimestamp": 6262,
+        "note": ""
+      }
+    ]
+  },
+  {
     "id": "song-2b8507e1",
     "title": "私奔到月球",
     "originalArtist": "五月天 ft. 陳綺貞",
@@ -16963,6 +17843,24 @@
         "videoId": "QbHFRW4UE90",
         "timestamp": 8378,
         "endTimestamp": 8604,
+        "note": ""
+      }
+    ]
+  },
+  {
+    "id": "song-256b49f3",
+    "title": "秋意濃",
+    "originalArtist": "張學友",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-31d5e8d6",
+        "streamId": "stream-2022-10-16",
+        "date": "2022-10-16",
+        "streamTitle": "【歌回】秋天傷感歌回｜汐Seki",
+        "videoId": "mG1nZByWYQk",
+        "timestamp": 4945,
+        "endTimestamp": 5307,
         "note": ""
       }
     ]
@@ -17206,7 +18104,7 @@
   {
     "id": "song-764b701b",
     "title": "第九夜",
-    "originalArtist": "李玟 (CoCo Lee)",
+    "originalArtist": "李玟",
     "tags": [],
     "performances": [
       {
@@ -17296,7 +18194,7 @@
   {
     "id": "song-2e376c69",
     "title": "約定",
-    "originalArtist": "周蕙 (Where Chou)",
+    "originalArtist": "周蕙",
     "tags": [],
     "performances": [
       {
@@ -17314,7 +18212,7 @@
   {
     "id": "song-3e1ca483",
     "title": "紅塵客棧",
-    "originalArtist": "周杰倫",
+    "originalArtist": "周杰倫 (Jay Chou)",
     "tags": [],
     "performances": [
       {
@@ -17448,6 +18346,24 @@
     ]
   },
   {
+    "id": "song-b84c6a51",
+    "title": "給愛麗絲",
+    "originalArtist": "熊仔 (Kumachan) & 豹子膽 (BOWZ)",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-bdfe7bfc",
+        "streamId": "stream-2023-01-29",
+        "date": "2023-01-29",
+        "streamTitle": "【嘻哈歌回】Rapper大汐哈時代｜汐Seki",
+        "videoId": "WtxaDMaS3sk",
+        "timestamp": 2502,
+        "endTimestamp": 2776,
+        "note": ""
+      }
+    ]
+  },
+  {
     "id": "song-34ee1862",
     "title": "給我一個理由忘記",
     "originalArtist": "A-Lin",
@@ -17514,7 +18430,7 @@
   {
     "id": "song-9222ef73",
     "title": "網望茫 (Just Falling In Love)",
-    "originalArtist": "曹雅雯 (Olivia Tsao)",
+    "originalArtist": "曹雅雯",
     "tags": [],
     "performances": [
       {
@@ -17906,7 +18822,7 @@
   {
     "id": "song-1627845f",
     "title": "花海",
-    "originalArtist": "周杰倫",
+    "originalArtist": "周杰倫 (Jay Chou)",
     "tags": [],
     "performances": [
       {
@@ -18124,7 +19040,7 @@
   {
     "id": "song-bcf118ac",
     "title": "蘭亭序",
-    "originalArtist": "周杰倫",
+    "originalArtist": "周杰倫 (Jay Chou)",
     "tags": [],
     "performances": [
       {
@@ -18204,6 +19120,24 @@
     ]
   },
   {
+    "id": "song-c5bfcdfa",
+    "title": "袖手旁觀",
+    "originalArtist": "齊秦",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-4b1ca751",
+        "streamId": "stream-2022-10-16",
+        "date": "2022-10-16",
+        "streamTitle": "【歌回】秋天傷感歌回｜汐Seki",
+        "videoId": "mG1nZByWYQk",
+        "timestamp": 3530,
+        "endTimestamp": 3820,
+        "note": ""
+      }
+    ]
+  },
+  {
     "id": "song-52aa63d7",
     "title": "討厭",
     "originalArtist": "瑞恩",
@@ -18252,7 +19186,7 @@
   {
     "id": "song-ba2b901f",
     "title": "記得",
-    "originalArtist": "張惠妹 (A-Mei)",
+    "originalArtist": "張惠妹",
     "tags": [],
     "performances": [
       {
@@ -18352,7 +19286,7 @@
   {
     "id": "song-bd53dc3a",
     "title": "誰",
-    "originalArtist": "李友廷",
+    "originalArtist": "李友廷 (Yo Lee)",
     "tags": [],
     "performances": [
       {
@@ -18432,6 +19366,24 @@
     ]
   },
   {
+    "id": "song-f32a4f48",
+    "title": "讓我留在你身邊",
+    "originalArtist": "陳奕迅",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-0451c997",
+        "streamId": "stream-2023-02-05",
+        "date": "2023-02-05",
+        "streamTitle": "【歌回】八萬訂閱感謝歌回｜汐Seki",
+        "videoId": "CLvFQOS7ntQ",
+        "timestamp": 7141,
+        "endTimestamp": 7328,
+        "note": ""
+      }
+    ]
+  },
+  {
     "id": "song-077e91b8",
     "title": "買你",
     "originalArtist": "魏如萱",
@@ -18452,7 +19404,7 @@
   {
     "id": "song-8dcccba5",
     "title": "買你",
-    "originalArtist": "魏如萱 (Waa Wei)",
+    "originalArtist": "魏如萱",
     "tags": [],
     "performances": [
       {
@@ -18652,7 +19604,7 @@
   {
     "id": "song-2fd42710",
     "title": "路過人間",
-    "originalArtist": "郁可唯 (Yisa Yu)",
+    "originalArtist": "郁可唯",
     "tags": [],
     "performances": [
       {
@@ -18706,7 +19658,7 @@
   {
     "id": "song-aa7d3514",
     "title": "跳進來",
-    "originalArtist": "張惠妹 (aMEI)",
+    "originalArtist": "張惠妹",
     "tags": [],
     "performances": [
       {
@@ -18778,7 +19730,7 @@
   {
     "id": "song-80a740b1",
     "title": "踮起腳尖愛",
-    "originalArtist": "洪佩瑜 (Peiyu Hung)",
+    "originalArtist": "洪佩瑜",
     "tags": [],
     "performances": [
       {
@@ -18832,7 +19784,7 @@
   {
     "id": "song-a2a39e92",
     "title": "軌跡",
-    "originalArtist": "周杰倫",
+    "originalArtist": "周杰倫 (Jay Chou)",
     "tags": [],
     "performances": [
       {
@@ -18889,6 +19841,16 @@
     "originalArtist": "頑童MJ116",
     "tags": [],
     "performances": [
+      {
+        "id": "p-2008d376",
+        "streamId": "stream-2023-01-29",
+        "date": "2023-01-29",
+        "streamTitle": "【嘻哈歌回】Rapper大汐哈時代｜汐Seki",
+        "videoId": "WtxaDMaS3sk",
+        "timestamp": 7657,
+        "endTimestamp": 7918,
+        "note": ""
+      },
       {
         "id": "p-403e07a4",
         "streamId": "stream-2024-01-07",
@@ -19046,6 +20008,24 @@
     ]
   },
   {
+    "id": "song-a075d00a",
+    "title": "追光者",
+    "originalArtist": "岑寧兒 (Yoyo Sham)",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-48df0a1d",
+        "streamId": "stream-2023-02-05",
+        "date": "2023-02-05",
+        "streamTitle": "【歌回】八萬訂閱感謝歌回｜汐Seki",
+        "videoId": "CLvFQOS7ntQ",
+        "timestamp": 2750,
+        "endTimestamp": 2976,
+        "note": ""
+      }
+    ]
+  },
+  {
     "id": "song-03a9c297",
     "title": "這條小魚在乎",
     "originalArtist": "洪佩瑜",
@@ -19066,7 +20046,7 @@
   {
     "id": "song-d6093d15",
     "title": "連名帶姓",
-    "originalArtist": "aMEI 張惠妹",
+    "originalArtist": "aMEI張惠妹",
     "tags": [],
     "performances": [
       {
@@ -19088,6 +20068,16 @@
     "tags": [],
     "performances": [
       {
+        "id": "p-82b19a11",
+        "streamId": "stream-2023-02-12",
+        "date": "2023-02-12",
+        "streamTitle": "【歌回】談場轟轟烈烈的戀愛｜汐Seki",
+        "videoId": "Gbk1nW3Irhw",
+        "timestamp": 1783,
+        "endTimestamp": 1991,
+        "note": ""
+      },
+      {
         "id": "p-d151b6dd",
         "streamId": "stream-2023-12-03",
         "date": "2023-12-03",
@@ -19102,7 +20092,7 @@
   {
     "id": "song-4f93d409",
     "title": "遇見",
-    "originalArtist": "孫燕姿 (Sun Yan-Zi)",
+    "originalArtist": "孫燕姿",
     "tags": [],
     "performances": [
       {
@@ -19248,7 +20238,7 @@
   {
     "id": "song-22a17b4c",
     "title": "那些你很冒險的夢",
-    "originalArtist": "林俊傑 (JJ Lin)",
+    "originalArtist": "林俊傑",
     "tags": [],
     "performances": [
       {
@@ -19484,7 +20474,7 @@
   {
     "id": "song-5cd95e3d",
     "title": "閣愛妳一擺 (Love You One More Time)",
-    "originalArtist": "茄子蛋 (EggPlantEgg)",
+    "originalArtist": "茄子蛋",
     "tags": [],
     "performances": [
       {
@@ -19541,6 +20531,42 @@
         "videoId": "zp4g7JwgFSo",
         "timestamp": 16210,
         "endTimestamp": 16425,
+        "note": ""
+      }
+    ]
+  },
+  {
+    "id": "song-62c55485",
+    "title": "關你屁事啊",
+    "originalArtist": "彭佳慧 (Julia Peng) ft. 熊仔 (Kumachan)",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-5300f850",
+        "streamId": "stream-2023-01-29",
+        "date": "2023-01-29",
+        "streamTitle": "【嘻哈歌回】Rapper大汐哈時代｜汐Seki",
+        "videoId": "WtxaDMaS3sk",
+        "timestamp": 3639,
+        "endTimestamp": 3853,
+        "note": ""
+      }
+    ]
+  },
+  {
+    "id": "song-341ad597",
+    "title": "關於小熊",
+    "originalArtist": "蛋堡",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-82a11c98",
+        "streamId": "stream-2023-01-29",
+        "date": "2023-01-29",
+        "streamTitle": "【嘻哈歌回】Rapper大汐哈時代｜汐Seki",
+        "videoId": "WtxaDMaS3sk",
+        "timestamp": 697,
+        "endTimestamp": 1009,
         "note": ""
       }
     ]
@@ -19636,6 +20662,16 @@
     "tags": [],
     "performances": [
       {
+        "id": "p-8fbae1ed",
+        "streamId": "stream-2023-01-29",
+        "date": "2023-01-29",
+        "streamTitle": "【嘻哈歌回】Rapper大汐哈時代｜汐Seki",
+        "videoId": "WtxaDMaS3sk",
+        "timestamp": 5570,
+        "endTimestamp": 5767,
+        "note": ""
+      },
+      {
         "id": "p-f005ee25",
         "streamId": "stream-79a4250a",
         "date": "2023-08-20",
@@ -19686,7 +20722,7 @@
   {
     "id": "song-11d13cee",
     "title": "雨下一整晚",
-    "originalArtist": "周杰倫",
+    "originalArtist": "周杰倫 (Jay Chou)",
     "tags": [],
     "performances": [
       {
@@ -19886,7 +20922,7 @@
   {
     "id": "song-c04b3521",
     "title": "音浪 (Sound Wave)",
-    "originalArtist": "黃立行 (Stanley Huang)",
+    "originalArtist": "黃立行",
     "tags": [],
     "performances": [
       {
@@ -20004,7 +21040,7 @@
   {
     "id": "song-04626ddf",
     "title": "餘波盪漾",
-    "originalArtist": "田馥甄 (Hebe)",
+    "originalArtist": "田馥甄",
     "tags": [],
     "performances": [
       {
@@ -20112,7 +21148,7 @@
   {
     "id": "song-14702476",
     "title": "高嶺の花子さん",
-    "originalArtist": "back number",
+    "originalArtist": "Back Number",
     "tags": [],
     "performances": [
       {
@@ -20214,7 +21250,7 @@
   {
     "id": "song-a6fdf2c1",
     "title": "魚",
-    "originalArtist": "陳綺貞 (Cheer Chen)",
+    "originalArtist": "陳綺貞",
     "tags": [],
     "performances": [
       {
@@ -20250,7 +21286,7 @@
   {
     "id": "song-f391f4fc",
     "title": "魚仔",
-    "originalArtist": "盧廣仲 (Crowd Lu)",
+    "originalArtist": "盧廣仲",
     "tags": [],
     "performances": [
       {
@@ -20358,7 +21394,7 @@
   {
     "id": "song-85db8f50",
     "title": "麻克與林送夫",
-    "originalArtist": "艾蜜莉 (AMILI)",
+    "originalArtist": "艾蜜莉",
     "tags": [],
     "performances": [
       {
@@ -20394,7 +21430,7 @@
   {
     "id": "song-ba1b5adf",
     "title": "黃昏",
-    "originalArtist": "周傳雄 (Steve Chou)",
+    "originalArtist": "周傳雄",
     "tags": [],
     "performances": [
       {
@@ -20477,6 +21513,24 @@
         "videoId": "OT35_LZ5gug",
         "timestamp": 8212,
         "endTimestamp": 8462,
+        "note": ""
+      }
+    ]
+  },
+  {
+    "id": "song-afb2ad71",
+    "title": "默",
+    "originalArtist": "那英",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-83b30318",
+        "streamId": "stream-2023-02-05",
+        "date": "2023-02-05",
+        "streamTitle": "【歌回】八萬訂閱感謝歌回｜汐Seki",
+        "videoId": "CLvFQOS7ntQ",
+        "timestamp": 5331,
+        "endTimestamp": 5642,
         "note": ""
       }
     ]
@@ -20880,7 +21934,7 @@
   {
     "id": "song-ec43d34c",
     "title": "금요일에 만나요 (Friday)",
-    "originalArtist": "아이유 (IU)",
+    "originalArtist": "아이유",
     "tags": [],
     "performances": [
       {
@@ -20898,7 +21952,7 @@
   {
     "id": "song-4f25e68a",
     "title": "금요일에만나요 (Friday)",
-    "originalArtist": "IU(아이유)",
+    "originalArtist": "IU",
     "tags": [],
     "performances": [
       {
@@ -20962,7 +22016,7 @@
   {
     "id": "song-655063ec",
     "title": "나의 사춘기에게 (致我的思春期)",
-    "originalArtist": "볼빨간 사춘기",
+    "originalArtist": "볼빨간사춘기",
     "tags": [],
     "performances": [
       {
@@ -21218,7 +22272,7 @@
   {
     "id": "song-4ed9bc73",
     "title": "다시 만난 세계 (Into the new world)",
-    "originalArtist": "Girls' Generation (소녀시대)",
+    "originalArtist": "Girls' Generation",
     "tags": [],
     "performances": [
       {
@@ -21380,9 +22434,27 @@
     ]
   },
   {
+    "id": "song-59c1d2df",
+    "title": "밤편지 (夜信)",
+    "originalArtist": "IU",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-c813e08a",
+        "streamId": "stream-2023-02-05",
+        "date": "2023-02-05",
+        "streamTitle": "【歌回】八萬訂閱感謝歌回｜汐Seki",
+        "videoId": "CLvFQOS7ntQ",
+        "timestamp": 9740,
+        "endTimestamp": 9992,
+        "note": ""
+      }
+    ]
+  },
+  {
     "id": "song-40c1db60",
     "title": "밤편지( 夜信)",
-    "originalArtist": "IU (아이유)",
+    "originalArtist": "IU",
     "tags": [],
     "performances": [
       {
@@ -21490,7 +22562,7 @@
   {
     "id": "song-13fe10be",
     "title": "보여줄게 (I will show you)",
-    "originalArtist": "에일리 (Ailee)",
+    "originalArtist": "에일리",
     "tags": [],
     "performances": [
       {
@@ -21699,6 +22771,24 @@
         "videoId": "b2mqP4MkKU8",
         "timestamp": 5083,
         "endTimestamp": 5297,
+        "note": ""
+      }
+    ]
+  },
+  {
+    "id": "song-2b8bada0",
+    "title": "썸 탈꺼야 ( Some )",
+    "originalArtist": "볼빨간사춘기",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-b92d35af",
+        "streamId": "stream-2023-02-12",
+        "date": "2023-02-12",
+        "streamTitle": "【歌回】談場轟轟烈烈的戀愛｜汐Seki",
+        "videoId": "Gbk1nW3Irhw",
+        "timestamp": 4493,
+        "endTimestamp": 4676,
         "note": ""
       }
     ]
@@ -22042,7 +23132,7 @@
   {
     "id": "song-43159b44",
     "title": "창귀 (倀鬼)",
-    "originalArtist": "안예은 (安藝恩)",
+    "originalArtist": "안예은",
     "tags": [],
     "performances": [
       {
@@ -22232,8 +23322,26 @@
     ]
   },
   {
+    "id": "song-9cfef5bc",
+    "title": "한숨 (Breathe)",
+    "originalArtist": "LEE HI",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-407bf1d7",
+        "streamId": "stream-2023-06-18",
+        "date": "2023-06-18",
+        "streamTitle": "【歌回】哭出來也可以 傷心胃痛流淚回｜汐Seki",
+        "videoId": "66H2sA_Vn7Y",
+        "timestamp": 7428,
+        "endTimestamp": 7706,
+        "note": ""
+      }
+    ]
+  },
+  {
     "id": "song-b5a57c72",
-    "title": "한숨 (BREATHE)",
+    "title": "한숨 (Breathe)",
     "originalArtist": "LEE HI",
     "tags": [],
     "performances": [
@@ -22245,24 +23353,6 @@
         "videoId": "B2Td3nrZSCc",
         "timestamp": 3775,
         "endTimestamp": 4059,
-        "note": ""
-      }
-    ]
-  },
-  {
-    "id": "song-9cfef5bc",
-    "title": "한숨 (Breathe)",
-    "originalArtist": "LEE HI (李遐怡)",
-    "tags": [],
-    "performances": [
-      {
-        "id": "p-407bf1d7",
-        "streamId": "stream-2023-06-18",
-        "date": "2023-06-18",
-        "streamTitle": "【歌回】哭出來也可以 傷心胃痛流淚回｜汐Seki",
-        "videoId": "66H2sA_Vn7Y",
-        "timestamp": 7428,
-        "endTimestamp": 7706,
         "note": ""
       }
     ]
