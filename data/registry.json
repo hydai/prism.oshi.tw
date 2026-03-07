@@ -186,6 +186,37 @@
       "enabled": true
     },
     {
+      "slug": "sakuro",
+      "displayName": "朔Sakuro",
+      "description": "個性自由不羈、八面玲瓏，某些時刻卻又不那麼坦率的赤腹黑蛇，主要在Youtube上進行直播。歌聲中散發出若有似無的致命魅力，慵懶的眼神就如蛇尾般勾人。以吉他彈唱展現與眾不同才能的他，興趣之一便是透過音樂創作將高潮迭起的故事訴說給觀眾。",
+      "avatarUrl": "https://yt3.googleusercontent.com/S4kfXpdsBQOeTQnDgAAYAZRmE0d1hiiYvZabM4hnmlHXOjL7eA5CRNfor22xZ8ujJRgNnwm5zf8=s900-c-k-c0x00ffffff-no-rj",
+      "brandName": "SakuroPrism",
+      "subscriberCount": "5.71萬",
+      "group": "子午計畫",
+      "socialLinks": {
+        "youtube": "https://www.youtube.com/@SakuroMoonlit",
+        "twitter": "https://twitter.com/Sakuro_Moonlit",
+        "facebook": "https://www.facebook.com/SakuroMoonlit",
+        "instagram": "https://www.instagram.com/sakuro_moonlit/",
+        "twitch": "https://www.twitch.tv/sakuro_moonlit"
+      },
+      "theme": {
+        "accentPrimary": "#EC4899",
+        "accentPrimaryDark": "#DB2777",
+        "accentPrimaryLight": "#F472B6",
+        "accentSecondary": "#3B82F6",
+        "accentSecondaryLight": "#60A5FA",
+        "bgPageStart": "#FFF0F5",
+        "bgPageMid": "#F0F8FF",
+        "bgPageEnd": "#E6E6FA",
+        "bgAccentPrimary": "#FDF2F8",
+        "bgAccentPrimaryMuted": "#FCE7F3",
+        "borderAccentPrimary": "#FBCFE8",
+        "borderAccentSecondary": "#BFDBFE"
+      },
+      "enabled": true
+    },
+    {
       "slug": "seki",
       "displayName": "汐Seki",
       "description": "歌勢Vtuber，成熟的狐狸姊姊，2022.9.25-2025.3.30(畢業)。\n不管是歌唱時性感慵懶的嗓音、玩遊戲時的反差萌、還是與觀眾互動時風趣的回應，多樣的面孔都是她所擁有的真實樣貌！",
