@@ -124,6 +124,37 @@
       "enabled": true
     },
     {
+      "slug": "koyuki",
+      "displayName": "雪Koyuki",
+      "description": "你好！我是子午計畫【序境TeRaź】的小雪貂\n喜歡打遊戲但更喜歡你⸜♡⸝ 來陪陪我好嗎 🍀",
+      "avatarUrl": "https://yt3.googleusercontent.com/XHWipXKsoxLd8pLkyS-wUkAWroa_idNEI20EWiHQPTanVKbB6fyh7mfQn3lhlDlg-1qDMDvZAAg=s900-c-k-c0x00ffffff-no-rj",
+      "brandName": "KoyukiPirsm",
+      "subscriberCount": "4.64萬",
+      "group": "子午計畫",
+      "socialLinks": {
+        "youtube": "https://www.youtube.com/@%E9%9B%AAKoyuki",
+        "twitter": "https://x.com/Koyuki_TeRaz",
+        "facebook": "https://www.facebook.com/KoyukiTeRaz/",
+        "instagram": "https://www.instagram.com/koyuki_teraz/",
+        "twitch": "https://www.twitch.tv/koyuki_teraz"
+      },
+      "theme": {
+        "accentPrimary": "#EC4899",
+        "accentPrimaryDark": "#DB2777",
+        "accentPrimaryLight": "#F472B6",
+        "accentSecondary": "#3B82F6",
+        "accentSecondaryLight": "#60A5FA",
+        "bgPageStart": "#FFF0F5",
+        "bgPageMid": "#F0F8FF",
+        "bgPageEnd": "#E6E6FA",
+        "bgAccentPrimary": "#FDF2F8",
+        "bgAccentPrimaryMuted": "#FCE7F3",
+        "borderAccentPrimary": "#FBCFE8",
+        "borderAccentSecondary": "#BFDBFE"
+      },
+      "enabled": true
+    },
+    {
       "slug": "rei",
       "displayName": "澪Rei",
       "description": "我是子午計畫【霓NEO(n)】所屬的VTuber！\n歌勢Vtuber，就讀冰霜魔法學系的小狸貓，能夠變身成不同事物，主要在Youtube上進行直播。\n聲音有著療癒人心的能力，空靈的歌聲會讓人暫時忘記煩惱；有些笨拙的個性更為大家帶來許多意想不到的歡笑。",
