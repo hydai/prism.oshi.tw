@@ -184,6 +184,34 @@
         "borderAccentSecondary": "#BFDBFE"
       },
       "enabled": true
+    },
+    {
+      "slug": "thirteennn013",
+      "displayName": "拾參 Thirteen【調酒師 Vsinger】",
+      "description": "早安你好平安喜樂、我是箱形水母拾參，你各位的教官",
+      "avatarUrl": "https://yt3.googleusercontent.com/Lc6ZzpR4Lf_jmOeRnyNMMjr2EOc3h6OiobPfXjtqzMEhIR3hLhrNncoUbIkCYmmT4yNG-0e7cZw=s900-c-k-c0x00ffffff-no-rj",
+      "brandName": "ThirteennPrism",
+      "subscriberCount": "7.46萬",
+      "group": "個人勢",
+      "socialLinks": {
+        "youtube": "https://www.youtube.com/@thirteennn013",
+        "twitter": "https://x.com/Thirteennn013"
+      },
+      "theme": {
+        "accentPrimary": "#EC4899",
+        "accentPrimaryDark": "#DB2777",
+        "accentPrimaryLight": "#F472B6",
+        "accentSecondary": "#3B82F6",
+        "accentSecondaryLight": "#60A5FA",
+        "bgPageStart": "#FFF0F5",
+        "bgPageMid": "#F0F8FF",
+        "bgPageEnd": "#E6E6FA",
+        "bgAccentPrimary": "#FDF2F8",
+        "bgAccentPrimaryMuted": "#FCE7F3",
+        "borderAccentPrimary": "#FBCFE8",
+        "borderAccentSecondary": "#BFDBFE"
+      },
+      "enabled": true
     }
   ]
 }
