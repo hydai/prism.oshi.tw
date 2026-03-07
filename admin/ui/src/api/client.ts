@@ -76,8 +76,12 @@ function withStreamer(path: string): string {
   return `${path}${sep}streamer=${encodeURIComponent(_currentStreamer)}`;
 }
 
-async function request<T>(path: string, init?: RequestInit): Promise<T> {
-  const url = path.startsWith('/api/') ? withStreamer(path) : path;
+async function request<T>(
+  path: string,
+  init?: RequestInit,
+  options?: { skipStreamer?: boolean },
+): Promise<T> {
+  const url = path.startsWith('/api/') && !options?.skipStreamer ? withStreamer(path) : path;
   const res = await fetch(url, {
     ...init,
     credentials: 'same-origin',
@@ -276,7 +280,11 @@ export const api = {
     const sp = new URLSearchParams();
     if (params?.status) sp.set('status', params.status);
     const qs = sp.toString();
-    return request<ListResponse<NovaSubmission>>(`/api/nova/submissions${qs ? `?${qs}` : ''}`);
+    return request<ListResponse<NovaSubmission>>(
+      `/api/nova/submissions${qs ? `?${qs}` : ''}`,
+      undefined,
+      { skipStreamer: true },
+    );
   },
 
   updateNovaSubmission: (id: string, body: Record<string, string | number>) =>
@@ -297,7 +305,11 @@ export const api = {
     if (params?.status) sp.set('status', params.status);
     if (params?.streamer) sp.set('streamer', params.streamer);
     const qs = sp.toString();
-    return request<ListResponse<NovaVodSubmission>>(`/api/nova/vods${qs ? `?${qs}` : ''}`);
+    return request<ListResponse<NovaVodSubmission>>(
+      `/api/nova/vods${qs ? `?${qs}` : ''}`,
+      undefined,
+      { skipStreamer: true },
+    );
   },
 
   getNovaVod: (id: string) =>
@@ -321,7 +333,11 @@ export const api = {
     if (params?.status) sp.set('status', params.status);
     if (params?.type) sp.set('type', params.type);
     const qs = sp.toString();
-    return request<ListResponse<CrystalTicket>>(`/api/crystal/tickets${qs ? `?${qs}` : ''}`);
+    return request<ListResponse<CrystalTicket>>(
+      `/api/crystal/tickets${qs ? `?${qs}` : ''}`,
+      undefined,
+      { skipStreamer: true },
+    );
   },
 
   getCrystalTicket: (id: string) =>
