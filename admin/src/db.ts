@@ -816,7 +816,8 @@ export async function getPerformanceWithSong(
 
 // --- Stats ---
 
-import type { StatusCounts } from '../shared/types';
+import type { StatusCounts, HarmonizeSongEntry, HarmonizeArtistEntry, SimilarityGroup, HarmonizeMatchType } from '../shared/types';
+import { normalizeForMatching, normalizeAggressive, similarityScore } from '../shared/normalize';
 
 async function countByStatus(
   db: D1Database,
@@ -918,4 +919,251 @@ export async function exportStreams(db: D1Database, streamerId: string) {
     }
     return stream;
   });
+}
+
+// --- Harmonizer helpers ---
+
+interface SongWithPerfCount {
+  id: string;
+  title: string;
+  original_artist: string;
+  status: Status;
+  created_at: string;
+  perf_count: number;
+}
+
+export async function getSongSimilarityGroups(
+  db: D1Database,
+  streamerId: string,
+  mode: HarmonizeMatchType,
+  threshold: number,
+): Promise<SimilarityGroup<HarmonizeSongEntry>[]> {
+  const { results } = await db
+    .prepare(
+      `SELECT s.id, s.title, s.original_artist, s.status, s.created_at,
+              (SELECT COUNT(*) FROM performances p WHERE p.song_id = s.id) AS perf_count
+       FROM songs s WHERE s.streamer_id = ?`,
+    )
+    .bind(streamerId)
+    .all<SongWithPerfCount>();
+
+  const entries: HarmonizeSongEntry[] = results.map((r) => ({
+    id: r.id,
+    title: r.title,
+    originalArtist: r.original_artist,
+    status: r.status,
+    createdAt: r.created_at,
+    performanceCount: r.perf_count,
+  }));
+
+  // Pass 1: exact normalization grouping
+  const exactGroups = new Map<string, HarmonizeSongEntry[]>();
+  for (const entry of entries) {
+    const key = normalizeForMatching(entry.title);
+    const group = exactGroups.get(key);
+    if (group) group.push(entry);
+    else exactGroups.set(key, [entry]);
+  }
+
+  const result: SimilarityGroup<HarmonizeSongEntry>[] = [];
+  const grouped = new Set<string>();
+
+  for (const [key, items] of exactGroups) {
+    if (items.length >= 2) {
+      result.push({ normalizedKey: key, matchType: 'exact', items });
+      for (const item of items) grouped.add(item.id);
+    }
+  }
+
+  // Pass 2: fuzzy matching on ungrouped singletons (only if mode is fuzzy)
+  if (mode === 'fuzzy') {
+    const singletons = entries.filter((e) => !grouped.has(e.id));
+    const aggressiveKeys = singletons.map((e) => ({
+      entry: e,
+      normalized: normalizeAggressive(e.title),
+    }));
+
+    // Union-find for merging fuzzy pairs
+    const parent = new Map<number, number>();
+    function find(i: number): number {
+      if (!parent.has(i)) parent.set(i, i);
+      if (parent.get(i) !== i) parent.set(i, find(parent.get(i)!));
+      return parent.get(i)!;
+    }
+    function union(i: number, j: number) {
+      parent.set(find(i), find(j));
+    }
+
+    for (let i = 0; i < aggressiveKeys.length; i++) {
+      for (let j = i + 1; j < aggressiveKeys.length; j++) {
+        const score = similarityScore(aggressiveKeys[i].normalized, aggressiveKeys[j].normalized);
+        if (score >= threshold) {
+          union(i, j);
+        }
+      }
+    }
+
+    const fuzzyGroups = new Map<number, HarmonizeSongEntry[]>();
+    for (let i = 0; i < aggressiveKeys.length; i++) {
+      const root = find(i);
+      const group = fuzzyGroups.get(root);
+      if (group) group.push(aggressiveKeys[i].entry);
+      else fuzzyGroups.set(root, [aggressiveKeys[i].entry]);
+    }
+
+    for (const items of fuzzyGroups.values()) {
+      if (items.length >= 2) {
+        const key = normalizeAggressive(items[0].title);
+        result.push({ normalizedKey: key, matchType: 'fuzzy', items });
+      }
+    }
+  }
+
+  // Sort by group size descending
+  result.sort((a, b) => b.items.length - a.items.length);
+  return result;
+}
+
+export async function getArtistSimilarityGroups(
+  db: D1Database,
+  streamerId: string,
+  mode: HarmonizeMatchType,
+  threshold: number,
+): Promise<SimilarityGroup<HarmonizeArtistEntry>[]> {
+  const { results } = await db
+    .prepare(
+      `SELECT s.id, s.original_artist FROM songs s WHERE s.streamer_id = ?`,
+    )
+    .bind(streamerId)
+    .all<{ id: string; original_artist: string }>();
+
+  // Group songs by exact artist name first
+  const byArtist = new Map<string, { songIds: string[] }>();
+  for (const r of results) {
+    const existing = byArtist.get(r.original_artist);
+    if (existing) existing.songIds.push(r.id);
+    else byArtist.set(r.original_artist, { songIds: [r.id] });
+  }
+
+  const entries: HarmonizeArtistEntry[] = [];
+  for (const [artist, data] of byArtist) {
+    entries.push({
+      originalArtist: artist,
+      songCount: data.songIds.length,
+      songIds: data.songIds,
+    });
+  }
+
+  // Pass 1: exact normalization grouping
+  const exactGroups = new Map<string, HarmonizeArtistEntry[]>();
+  for (const entry of entries) {
+    const key = normalizeForMatching(entry.originalArtist);
+    const group = exactGroups.get(key);
+    if (group) group.push(entry);
+    else exactGroups.set(key, [entry]);
+  }
+
+  const result: SimilarityGroup<HarmonizeArtistEntry>[] = [];
+  const grouped = new Set<string>();
+
+  for (const [key, items] of exactGroups) {
+    if (items.length >= 2) {
+      result.push({ normalizedKey: key, matchType: 'exact', items });
+      for (const item of items) grouped.add(item.originalArtist);
+    }
+  }
+
+  // Pass 2: fuzzy matching
+  if (mode === 'fuzzy') {
+    const singletons = entries.filter((e) => !grouped.has(e.originalArtist));
+    const aggressiveKeys = singletons.map((e) => ({
+      entry: e,
+      normalized: normalizeAggressive(e.originalArtist),
+    }));
+
+    const parent = new Map<number, number>();
+    function find(i: number): number {
+      if (!parent.has(i)) parent.set(i, i);
+      if (parent.get(i) !== i) parent.set(i, find(parent.get(i)!));
+      return parent.get(i)!;
+    }
+    function union(i: number, j: number) {
+      parent.set(find(i), find(j));
+    }
+
+    for (let i = 0; i < aggressiveKeys.length; i++) {
+      for (let j = i + 1; j < aggressiveKeys.length; j++) {
+        const score = similarityScore(aggressiveKeys[i].normalized, aggressiveKeys[j].normalized);
+        if (score >= threshold) {
+          union(i, j);
+        }
+      }
+    }
+
+    const fuzzyGroups = new Map<number, HarmonizeArtistEntry[]>();
+    for (let i = 0; i < aggressiveKeys.length; i++) {
+      const root = find(i);
+      const group = fuzzyGroups.get(root);
+      if (group) group.push(aggressiveKeys[i].entry);
+      else fuzzyGroups.set(root, [aggressiveKeys[i].entry]);
+    }
+
+    for (const items of fuzzyGroups.values()) {
+      if (items.length >= 2) {
+        const key = normalizeAggressive(items[0].originalArtist);
+        result.push({ normalizedKey: key, matchType: 'fuzzy', items });
+      }
+    }
+  }
+
+  result.sort((a, b) => b.items.length - a.items.length);
+  return result;
+}
+
+export async function batchUpdateSongs(
+  db: D1Database,
+  updates: Array<{ songId: string; title?: string; originalArtist?: string }>,
+): Promise<number> {
+  if (updates.length === 0) return 0;
+
+  // Chunk by 50 for D1 batch limits
+  const CHUNK_SIZE = 50;
+  let totalUpdated = 0;
+
+  for (let i = 0; i < updates.length; i += CHUNK_SIZE) {
+    const chunk = updates.slice(i, i + CHUNK_SIZE);
+    const stmts: D1PreparedStatement[] = [];
+
+    for (const u of chunk) {
+      const sets: string[] = [];
+      const values: (string | number)[] = [];
+
+      if (u.title !== undefined) {
+        sets.push('title = ?');
+        values.push(u.title);
+      }
+      if (u.originalArtist !== undefined) {
+        sets.push('original_artist = ?');
+        values.push(u.originalArtist);
+      }
+
+      if (sets.length === 0) continue;
+
+      sets.push("updated_at = datetime('now')");
+      values.push(u.songId);
+
+      stmts.push(
+        db.prepare(`UPDATE songs SET ${sets.join(', ')} WHERE id = ?`).bind(...values),
+      );
+    }
+
+    if (stmts.length > 0) {
+      const results = await db.batch(stmts);
+      for (const r of results) {
+        totalUpdated += r.meta.changes;
+      }
+    }
+  }
+
+  return totalUpdated;
 }

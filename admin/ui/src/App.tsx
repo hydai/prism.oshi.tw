@@ -12,6 +12,7 @@ import SubmitStream from './pages/SubmitStream';
 import StampEditor from './pages/StampEditor';
 import StreamDetailPage from './pages/StreamDetail';
 import Pipeline from './pages/Pipeline';
+import Harmonizer from './pages/Harmonizer';
 import NovaSubmissions from './pages/NovaSubmissions';
 import NovaVodSubmissions from './pages/NovaVodSubmissions';
 import CrystalTickets from './pages/CrystalTickets';
@@ -62,6 +63,7 @@ export default function App() {
         <Route path="/submit/stream" element={<SubmitStream />} />
         <Route path="/stamp" element={<StampEditor user={user} />} />
         <Route path="/pipeline" element={<Pipeline user={user} />} />
+        <Route path="/harmonizer" element={<Harmonizer user={user} />} />
         <Route path="/nova" element={<NovaSubmissions user={user} />} />
         <Route path="/nova/vods" element={<NovaVodSubmissions user={user} />} />
         <Route path="/crystal" element={<CrystalTickets user={user} />} />

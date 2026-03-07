@@ -11,6 +11,7 @@ const navItems = [
   { to: '/submit/stream', label: 'Submit Stream' },
   { to: '/stamp', label: 'Stamp Editor' },
   { to: '/pipeline', label: 'Pipeline' },
+  { to: '/harmonizer', label: 'Harmonizer' },
   { to: '/nova', label: 'Nova' },
   { to: '/nova/vods', label: 'Nova VODs' },
   { to: '/crystal', label: 'Crystal' },

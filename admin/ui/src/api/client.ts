@@ -34,6 +34,10 @@ import type {
   StreamerInfo,
   CrystalTicket,
   CrystalTicketStatus,
+  HarmonizeSongsResponse,
+  HarmonizeArtistsResponse,
+  HarmonizeApplyBody,
+  HarmonizeMatchType,
 } from '../../../shared/types';
 
 // --- Streamer selection (module-level) ---
@@ -353,6 +357,29 @@ export const api = {
     request<CrystalTicket>(`/api/crystal/tickets/${id}/status`, {
       method: 'PATCH',
       body: JSON.stringify({ status }),
+    }),
+
+  // Harmonizer
+  harmonizeSongs: (params?: { mode?: HarmonizeMatchType; threshold?: number }) => {
+    const sp = new URLSearchParams();
+    if (params?.mode) sp.set('mode', params.mode);
+    if (params?.threshold) sp.set('threshold', String(params.threshold));
+    const qs = sp.toString();
+    return request<HarmonizeSongsResponse>(`/api/harmonize/songs${qs ? `?${qs}` : ''}`);
+  },
+
+  harmonizeArtists: (params?: { mode?: HarmonizeMatchType; threshold?: number }) => {
+    const sp = new URLSearchParams();
+    if (params?.mode) sp.set('mode', params.mode);
+    if (params?.threshold) sp.set('threshold', String(params.threshold));
+    const qs = sp.toString();
+    return request<HarmonizeArtistsResponse>(`/api/harmonize/artists${qs ? `?${qs}` : ''}`);
+  },
+
+  harmonizeApply: (body: HarmonizeApplyBody) =>
+    request<{ ok: boolean; updated: number }>('/api/harmonize/apply', {
+      method: 'POST',
+      body: JSON.stringify(body),
     }),
 };
 

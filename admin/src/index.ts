@@ -38,6 +38,9 @@ import {
   getStreamDetail,
   updatePerformanceNote,
   importVodToAdminDb,
+  getSongSimilarityGroups,
+  getArtistSimilarityGroups,
+  batchUpdateSongs,
 } from './db';
 import { fetchItunesDuration } from './itunes';
 import { parseTextToSongs } from '../shared/parse';
@@ -63,6 +66,10 @@ import type {
   ExtractImportBody,
   ExtractImportResponse,
   BulkApproveResponse,
+  HarmonizeSongsResponse,
+  HarmonizeArtistsResponse,
+  HarmonizeApplyBody,
+  HarmonizeMatchType,
   NovaSubmission,
   NovaStatus,
   NovaVodSubmission,
@@ -823,6 +830,54 @@ app.post('/api/pipeline/extract-import', requireCurator, async (c) => {
   );
 
   return c.json<ExtractImportResponse>({ ok: true, created });
+});
+
+// --- Harmonizer ---
+
+app.get('/api/harmonize/songs', requireCurator, async (c) => {
+  const streamerId = getStreamerId(c);
+  const mode = (c.req.query('mode') || 'exact') as HarmonizeMatchType;
+  const threshold = parseFloat(c.req.query('threshold') || '0.85');
+
+  const groups = await getSongSimilarityGroups(c.env.DB, streamerId, mode, threshold);
+  const affectedSongs = groups.reduce((sum, g) => sum + g.items.length, 0);
+
+  return c.json<HarmonizeSongsResponse>({
+    groups,
+    stats: {
+      totalSongs: affectedSongs,
+      groupCount: groups.length,
+      affectedSongs,
+    },
+  });
+});
+
+app.get('/api/harmonize/artists', requireCurator, async (c) => {
+  const streamerId = getStreamerId(c);
+  const mode = (c.req.query('mode') || 'exact') as HarmonizeMatchType;
+  const threshold = parseFloat(c.req.query('threshold') || '0.85');
+
+  const groups = await getArtistSimilarityGroups(c.env.DB, streamerId, mode, threshold);
+  const affectedEntries = groups.reduce((sum, g) => sum + g.items.length, 0);
+
+  return c.json<HarmonizeArtistsResponse>({
+    groups,
+    stats: {
+      totalArtists: affectedEntries,
+      groupCount: groups.length,
+      affectedEntries,
+    },
+  });
+});
+
+app.post('/api/harmonize/apply', requireCurator, async (c) => {
+  const body = await c.req.json<HarmonizeApplyBody>();
+  if (!body.updates || body.updates.length === 0) {
+    return c.json({ error: 'updates array is required' }, 400);
+  }
+
+  const updated = await batchUpdateSongs(c.env.DB, body.updates);
+  return c.json({ ok: true, updated });
 });
 
 // --- Nova submissions (separate D1: NOVA_DB) ---

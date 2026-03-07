@@ -396,3 +396,42 @@ export interface CrystalTicket {
   submitted_at: string;
   closed_at: string | null;
 }
+
+// --- Harmonizer types ---
+
+export interface HarmonizeSongEntry {
+  id: string;
+  title: string;
+  originalArtist: string;
+  status: Status;
+  createdAt: string;
+  performanceCount: number;
+}
+
+export interface HarmonizeArtistEntry {
+  originalArtist: string;
+  songCount: number;
+  songIds: string[];
+}
+
+export type HarmonizeMatchType = 'exact' | 'fuzzy';
+
+export interface SimilarityGroup<T> {
+  normalizedKey: string;
+  matchType: HarmonizeMatchType;
+  items: T[];
+}
+
+export interface HarmonizeSongsResponse {
+  groups: SimilarityGroup<HarmonizeSongEntry>[];
+  stats: { totalSongs: number; groupCount: number; affectedSongs: number };
+}
+
+export interface HarmonizeArtistsResponse {
+  groups: SimilarityGroup<HarmonizeArtistEntry>[];
+  stats: { totalArtists: number; groupCount: number; affectedEntries: number };
+}
+
+export interface HarmonizeApplyBody {
+  updates: Array<{ songId: string; title?: string; originalArtist?: string }>;
+}
