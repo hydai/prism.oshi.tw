@@ -1,5 +1,23 @@
 [
   {
+    "id": "song-c281c91c",
+    "title": "I Love You 3000",
+    "originalArtist": "Stephanie Poetri",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-247c3e12",
+        "streamId": "stream-e0f35849",
+        "date": "",
+        "streamTitle": "【情人節歌回】情人節特別的歌及驚喜！【朔Sakuro】",
+        "videoId": "0xT5uHGGMC0",
+        "timestamp": 8181,
+        "endTimestamp": 8500,
+        "note": ""
+      }
+    ]
+  },
+  {
     "id": "song-64a5cef0",
     "title": "Love Yourself",
     "originalArtist": "Justin Bieber",
@@ -72,6 +90,60 @@
     ]
   },
   {
+    "id": "song-da63eedd",
+    "title": "不是因為天氣晴朗才愛你",
+    "originalArtist": "理想混蛋 (Bestards)",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-ca3577af",
+        "streamId": "stream-e0f35849",
+        "date": "",
+        "streamTitle": "【情人節歌回】情人節特別的歌及驚喜！【朔Sakuro】",
+        "videoId": "0xT5uHGGMC0",
+        "timestamp": 245,
+        "endTimestamp": 500,
+        "note": ""
+      }
+    ]
+  },
+  {
+    "id": "song-d24c3b2c",
+    "title": "像晴天像雨天",
+    "originalArtist": "汪蘇瀧",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-55bb1866",
+        "streamId": "stream-e0f35849",
+        "date": "",
+        "streamTitle": "【情人節歌回】情人節特別的歌及驚喜！【朔Sakuro】",
+        "videoId": "0xT5uHGGMC0",
+        "timestamp": 655,
+        "endTimestamp": 905,
+        "note": ""
+      }
+    ]
+  },
+  {
+    "id": "song-6f15bcab",
+    "title": "告白",
+    "originalArtist": "蔡黃汝 (Flo)",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-d299dff8",
+        "streamId": "stream-e0f35849",
+        "date": "",
+        "streamTitle": "【情人節歌回】情人節特別的歌及驚喜！【朔Sakuro】",
+        "videoId": "0xT5uHGGMC0",
+        "timestamp": 4188,
+        "endTimestamp": 4390,
+        "note": ""
+      }
+    ]
+  },
+  {
     "id": "song-2b93fb06",
     "title": "好想你",
     "originalArtist": "朱主愛 (Joyce Chu)",
@@ -85,6 +157,24 @@
         "videoId": "ybC0KHGXjaA",
         "timestamp": 3177,
         "endTimestamp": 3335,
+        "note": ""
+      }
+    ]
+  },
+  {
+    "id": "song-2e43ea15",
+    "title": "惡作劇",
+    "originalArtist": "王藍茵",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-6d372619",
+        "streamId": "stream-e0f35849",
+        "date": "",
+        "streamTitle": "【情人節歌回】情人節特別的歌及驚喜！【朔Sakuro】",
+        "videoId": "0xT5uHGGMC0",
+        "timestamp": 6274,
+        "endTimestamp": 6507,
         "note": ""
       }
     ]
@@ -108,6 +198,60 @@
     ]
   },
   {
+    "id": "song-4cb8de1d",
+    "title": "我喜歡你",
+    "originalArtist": "洪安妮",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-3decb071",
+        "streamId": "stream-e0f35849",
+        "date": "",
+        "streamTitle": "【情人節歌回】情人節特別的歌及驚喜！【朔Sakuro】",
+        "videoId": "0xT5uHGGMC0",
+        "timestamp": 905,
+        "endTimestamp": 1230,
+        "note": ""
+      }
+    ]
+  },
+  {
+    "id": "song-e7af3336",
+    "title": "我當你空氣",
+    "originalArtist": "旺福 (Wonfu)",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-ec7cf293",
+        "streamId": "stream-e0f35849",
+        "date": "",
+        "streamTitle": "【情人節歌回】情人節特別的歌及驚喜！【朔Sakuro】",
+        "videoId": "0xT5uHGGMC0",
+        "timestamp": 4657,
+        "endTimestamp": 4892,
+        "note": ""
+      }
+    ]
+  },
+  {
+    "id": "song-f9996600",
+    "title": "手語",
+    "originalArtist": "周杰倫 (Jay Chou)",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-d2b2d89b",
+        "streamId": "stream-e0f35849",
+        "date": "",
+        "streamTitle": "【情人節歌回】情人節特別的歌及驚喜！【朔Sakuro】",
+        "videoId": "0xT5uHGGMC0",
+        "timestamp": 9476,
+        "endTimestamp": 9760,
+        "note": ""
+      }
+    ]
+  },
+  {
     "id": "song-576bd07a",
     "title": "求救訊號",
     "originalArtist": "VH (Vast & Hazy)",
@@ -121,6 +265,24 @@
         "videoId": "ybC0KHGXjaA",
         "timestamp": 1581,
         "endTimestamp": 1839,
+        "note": ""
+      }
+    ]
+  },
+  {
+    "id": "song-15cba9ac",
+    "title": "買你",
+    "originalArtist": "魏如萱 (waa wei)",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-96f0ee61",
+        "streamId": "stream-e0f35849",
+        "date": "",
+        "streamTitle": "【情人節歌回】情人節特別的歌及驚喜！【朔Sakuro】",
+        "videoId": "0xT5uHGGMC0",
+        "timestamp": 8974,
+        "endTimestamp": 9157,
         "note": ""
       }
     ]
@@ -157,6 +319,24 @@
         "videoId": "ybC0KHGXjaA",
         "timestamp": 4765,
         "endTimestamp": 5025,
+        "note": ""
+      }
+    ]
+  },
+  {
+    "id": "song-9361056c",
+    "title": "靠近(清唱)",
+    "originalArtist": "袁婭維TIA RAY",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-9c491328",
+        "streamId": "stream-e0f35849",
+        "date": "",
+        "streamTitle": "【情人節歌回】情人節特別的歌及驚喜！【朔Sakuro】",
+        "videoId": "0xT5uHGGMC0",
+        "timestamp": 10124,
+        "endTimestamp": 10243,
         "note": ""
       }
     ]
