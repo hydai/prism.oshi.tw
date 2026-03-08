@@ -197,7 +197,9 @@ function VodRow({
             {vod.video_id}
           </a>
         </td>
-        <td className="px-4 py-3 text-slate-500">{vod.stream_date || '\u2014'}</td>
+        <td className={`px-4 py-3 ${vod.stream_date ? 'text-slate-500' : 'text-amber-600 font-medium'}`}>
+          {vod.stream_date || 'No date'}
+        </td>
         <td className="px-4 py-3">
           <StatusBadge status={vod.status} />
         </td>
@@ -251,7 +253,12 @@ function VodRow({
                   </a>
                 </DetailField>
                 <DetailField label="Stream Title" value={vod.stream_title} />
-                <DetailField label="Stream Date" value={vod.stream_date} />
+                <div>
+                  <p className="text-xs font-medium uppercase text-slate-400">Stream Date</p>
+                  <p className={`mt-0.5 text-sm ${vod.stream_date ? 'text-slate-700' : 'text-amber-600 font-medium'}`}>
+                    {vod.stream_date || 'No date provided'}
+                  </p>
+                </div>
                 <DetailField label="Submitter Note" value={vod.submitter_note} />
                 <DetailField label="Reviewer Note" value={vod.reviewer_note} />
                 <DetailField label="Reviewed At" value={vod.reviewed_at ?? ''} />
