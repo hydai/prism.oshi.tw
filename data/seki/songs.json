@@ -660,6 +660,24 @@
     ]
   },
   {
+    "id": "song-7269e2ae",
+    "title": "At My Worst",
+    "originalArtist": "Pink Sweat$",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-386dc5bc",
+        "streamId": "stream-2022-11-06",
+        "date": "2022-11-06",
+        "streamTitle": "【歌回】甜甜粉紅戀愛歌回｜汐Seki",
+        "videoId": "dry-Rkwc4OQ",
+        "timestamp": 4330,
+        "endTimestamp": 4505,
+        "note": ""
+      }
+    ]
+  },
+  {
     "id": "song-a27433f0",
     "title": "Autumn Breeze",
     "originalArtist": "거미",
@@ -1201,6 +1219,24 @@
         "videoId": "5ivAkDyACl8",
         "timestamp": 408,
         "endTimestamp": 587,
+        "note": ""
+      }
+    ]
+  },
+  {
+    "id": "song-18446715",
+    "title": "Can't Take My Eyes Off You",
+    "originalArtist": "Frankie Valli",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-983c9820",
+        "streamId": "stream-2022-11-06",
+        "date": "2022-11-06",
+        "streamTitle": "【歌回】甜甜粉紅戀愛歌回｜汐Seki",
+        "videoId": "dry-Rkwc4OQ",
+        "timestamp": 721,
+        "endTimestamp": 906,
         "note": ""
       }
     ]
@@ -2155,6 +2191,24 @@
         "videoId": "nmZ1KE3QsCs",
         "timestamp": 2974,
         "endTimestamp": 3202,
+        "note": ""
+      }
+    ]
+  },
+  {
+    "id": "song-d54a0fd0",
+    "title": "Feeling good",
+    "originalArtist": "Michael Bublé",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-b47c40d1",
+        "streamId": "stream-2022-10-30",
+        "date": "2022-10-30",
+        "streamTitle": "【歌回】六萬訂閱感謝歌回｜汐Seki",
+        "videoId": "1H5J3aJWQFA",
+        "timestamp": 1028,
+        "endTimestamp": 1258,
         "note": ""
       }
     ]
@@ -3244,6 +3298,24 @@
     ]
   },
   {
+    "id": "song-4a4069ea",
+    "title": "I.F.L.Y.",
+    "originalArtist": "Bazzi",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-2b3dee37",
+        "streamId": "stream-2022-11-06",
+        "date": "2022-11-06",
+        "streamTitle": "【歌回】甜甜粉紅戀愛歌回｜汐Seki",
+        "videoId": "dry-Rkwc4OQ",
+        "timestamp": 3101,
+        "endTimestamp": 3270,
+        "note": ""
+      }
+    ]
+  },
+  {
     "id": "song-9849689f",
     "title": "INVU",
     "originalArtist": "TAEYEON",
@@ -4254,6 +4326,24 @@
     ]
   },
   {
+    "id": "song-25e9ce33",
+    "title": "Lover Boy",
+    "originalArtist": "Phum Viphurit",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-330bac10",
+        "streamId": "stream-2023-01-22",
+        "date": "2023-01-22",
+        "streamTitle": "【歌回】開春迎新歌回｜汐Seki",
+        "videoId": "cLCwxVXEjB0",
+        "timestamp": 3323,
+        "endTimestamp": 3556,
+        "note": ""
+      }
+    ]
+  },
+  {
     "id": "song-54cc60f3",
     "title": "Lovin On Me",
     "originalArtist": "Jack Harlow",
@@ -4385,6 +4475,16 @@
     "originalArtist": "ØZI",
     "tags": [],
     "performances": [
+      {
+        "id": "p-e52d8d1d",
+        "streamId": "stream-2023-01-15",
+        "date": "2023-01-15",
+        "streamTitle": "【兒童不宜歌回】夜深了...可以來點壞的🔞｜汐Seki",
+        "videoId": "TsKxQc5qzdY",
+        "timestamp": 2570,
+        "endTimestamp": 2691,
+        "note": ""
+      },
       {
         "id": "p-4bbd9196",
         "streamId": "stream-2024-02-18",
@@ -6008,6 +6108,24 @@
     ]
   },
   {
+    "id": "song-5cc24aa8",
+    "title": "SUMMERTIME",
+    "originalArtist": "cinnamons × evening cinema",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-51562655",
+        "streamId": "stream-2022-11-06",
+        "date": "2022-11-06",
+        "streamTitle": "【歌回】甜甜粉紅戀愛歌回｜汐Seki",
+        "videoId": "dry-Rkwc4OQ",
+        "timestamp": 1334,
+        "endTimestamp": 1583,
+        "note": ""
+      }
+    ]
+  },
+  {
     "id": "song-51e7d997",
     "title": "SUPERPOWER",
     "originalArtist": "KISS OF LIFE & Mark Tuan",
@@ -6152,6 +6270,24 @@
     ]
   },
   {
+    "id": "song-105ea145",
+    "title": "SexyBack",
+    "originalArtist": "Justin Timberlake ( 賈斯汀 )",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-a7771345",
+        "streamId": "stream-2023-01-15",
+        "date": "2023-01-15",
+        "streamTitle": "【兒童不宜歌回】夜深了...可以來點壞的🔞｜汐Seki",
+        "videoId": "TsKxQc5qzdY",
+        "timestamp": 6620,
+        "endTimestamp": 6778,
+        "note": ""
+      }
+    ]
+  },
+  {
     "id": "song-0b7e62b4",
     "title": "Shallow",
     "originalArtist": "Lady Gaga & Bradley Cooper",
@@ -6283,6 +6419,24 @@
         "videoId": "JYE63RgdH00",
         "timestamp": 6556,
         "endTimestamp": 6840,
+        "note": ""
+      }
+    ]
+  },
+  {
+    "id": "song-1928808c",
+    "title": "Skyfall",
+    "originalArtist": "Adele",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-571c0412",
+        "streamId": "stream-2022-10-30",
+        "date": "2022-10-30",
+        "streamTitle": "【歌回】六萬訂閱感謝歌回｜汐Seki",
+        "videoId": "1H5J3aJWQFA",
+        "timestamp": 3216,
+        "endTimestamp": 3501,
         "note": ""
       }
     ]
@@ -6940,6 +7094,24 @@
     ]
   },
   {
+    "id": "song-b3e18307",
+    "title": "This Love",
+    "originalArtist": "魔力紅 ( Maroon 5 )",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-d5825b86",
+        "streamId": "stream-2023-01-15",
+        "date": "2023-01-15",
+        "streamTitle": "【兒童不宜歌回】夜深了...可以來點壞的🔞｜汐Seki",
+        "videoId": "TsKxQc5qzdY",
+        "timestamp": 865,
+        "endTimestamp": 1069,
+        "note": ""
+      }
+    ]
+  },
+  {
     "id": "song-b53a17b8",
     "title": "Tip Toe",
     "originalArtist": "HYBS",
@@ -7045,6 +7217,24 @@
         "videoId": "fWwK-qOf8Sg",
         "timestamp": 1685,
         "endTimestamp": 1930,
+        "note": ""
+      }
+    ]
+  },
+  {
+    "id": "song-323accf3",
+    "title": "Toxic",
+    "originalArtist": "Britney Spears",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-0128bd3a",
+        "streamId": "stream-2023-01-15",
+        "date": "2023-01-15",
+        "streamTitle": "【兒童不宜歌回】夜深了...可以來點壞的🔞｜汐Seki",
+        "videoId": "TsKxQc5qzdY",
+        "timestamp": 6180,
+        "endTimestamp": 6379,
         "note": ""
       }
     ]
@@ -7178,6 +7368,24 @@
     ]
   },
   {
+    "id": "song-fb340b78",
+    "title": "Unholy",
+    "originalArtist": "Sam Smith ft. Kim Petras",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-ea0c181a",
+        "streamId": "stream-2023-01-15",
+        "date": "2023-01-15",
+        "streamTitle": "【兒童不宜歌回】夜深了...可以來點壞的🔞｜汐Seki",
+        "videoId": "TsKxQc5qzdY",
+        "timestamp": 7618,
+        "endTimestamp": 7775,
+        "note": ""
+      }
+    ]
+  },
+  {
     "id": "song-63660da3",
     "title": "Until I Found You",
     "originalArtist": "Stephen Sanchez",
@@ -7273,6 +7481,24 @@
         "videoId": "M-f887X57QQ",
         "timestamp": 3615,
         "endTimestamp": 3795,
+        "note": ""
+      }
+    ]
+  },
+  {
+    "id": "song-488c4926",
+    "title": "WAP",
+    "originalArtist": "Cardi B",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-33d71e18",
+        "streamId": "stream-2023-01-15",
+        "date": "2023-01-15",
+        "streamTitle": "【兒童不宜歌回】夜深了...可以來點壞的🔞｜汐Seki",
+        "videoId": "TsKxQc5qzdY",
+        "timestamp": 7385,
+        "endTimestamp": 7510,
         "note": ""
       }
     ]
@@ -8114,6 +8340,24 @@
     ]
   },
   {
+    "id": "song-03ee8703",
+    "title": "ぎゅっと。",
+    "originalArtist": "もさを。",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-4e73db33",
+        "streamId": "stream-2022-11-06",
+        "date": "2022-11-06",
+        "streamTitle": "【歌回】甜甜粉紅戀愛歌回｜汐Seki",
+        "videoId": "dry-Rkwc4OQ",
+        "timestamp": 5770,
+        "endTimestamp": 6043,
+        "note": ""
+      }
+    ]
+  },
+  {
     "id": "song-74b50405",
     "title": "たぶん",
     "originalArtist": "YOASOBI",
@@ -8312,6 +8556,24 @@
     ]
   },
   {
+    "id": "song-ad774b40",
+    "title": "ド屑",
+    "originalArtist": "歌愛ユキ",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-58c9b96d",
+        "streamId": "stream-2022-10-30",
+        "date": "2022-10-30",
+        "streamTitle": "【歌回】六萬訂閱感謝歌回｜汐Seki",
+        "videoId": "1H5J3aJWQFA",
+        "timestamp": 5604,
+        "endTimestamp": 5722,
+        "note": ""
+      }
+    ]
+  },
+  {
     "id": "song-bf170567",
     "title": "モラトリアム",
     "originalArtist": "Omoinotake",
@@ -8479,6 +8741,24 @@
         "videoId": "mE1YoiOuhpo",
         "timestamp": 5184,
         "endTimestamp": 5431,
+        "note": ""
+      }
+    ]
+  },
+  {
+    "id": "song-0fb2d7ea",
+    "title": "一夜情",
+    "originalArtist": "張惠妹",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-d70e7607",
+        "streamId": "stream-2023-01-15",
+        "date": "2023-01-15",
+        "streamTitle": "【兒童不宜歌回】夜深了...可以來點壞的🔞｜汐Seki",
+        "videoId": "TsKxQc5qzdY",
+        "timestamp": 5680,
+        "endTimestamp": 5991,
         "note": ""
       }
     ]
@@ -10098,6 +10378,16 @@
     "tags": [],
     "performances": [
       {
+        "id": "p-a101f54c",
+        "streamId": "stream-2023-01-22",
+        "date": "2023-01-22",
+        "streamTitle": "【歌回】開春迎新歌回｜汐Seki",
+        "videoId": "cLCwxVXEjB0",
+        "timestamp": 6455,
+        "endTimestamp": 6630,
+        "note": ""
+      },
+      {
         "id": "p-72196ea9",
         "streamId": "stream-2023-02-21",
         "date": "2023-02-21",
@@ -10768,6 +11058,16 @@
     "tags": [],
     "performances": [
       {
+        "id": "p-97bef51c",
+        "streamId": "stream-2023-01-22",
+        "date": "2023-01-22",
+        "streamTitle": "【歌回】開春迎新歌回｜汐Seki",
+        "videoId": "cLCwxVXEjB0",
+        "timestamp": 4930,
+        "endTimestamp": 5260,
+        "note": ""
+      },
+      {
         "id": "p-be851245",
         "streamId": "stream-2024-12-22",
         "date": "2024-12-22",
@@ -10775,6 +11075,24 @@
         "videoId": "kS_h6kRMRVc",
         "timestamp": 6527,
         "endTimestamp": 6858,
+        "note": ""
+      }
+    ]
+  },
+  {
+    "id": "song-2771b649",
+    "title": "嘉賓",
+    "originalArtist": "張遠",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-b1afa4e4",
+        "streamId": "stream-2023-01-22",
+        "date": "2023-01-22",
+        "streamTitle": "【歌回】開春迎新歌回｜汐Seki",
+        "videoId": "cLCwxVXEjB0",
+        "timestamp": 9020,
+        "endTimestamp": 9349,
         "note": ""
       }
     ]
@@ -11085,6 +11403,24 @@
         "videoId": "l5E8fiOEMLo",
         "timestamp": 11771,
         "endTimestamp": 12028,
+        "note": ""
+      }
+    ]
+  },
+  {
+    "id": "song-4b0bb977",
+    "title": "夏天的風",
+    "originalArtist": "温嵐",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-f0bd3807",
+        "streamId": "stream-2022-11-06",
+        "date": "2022-11-06",
+        "streamTitle": "【歌回】甜甜粉紅戀愛歌回｜汐Seki",
+        "videoId": "dry-Rkwc4OQ",
+        "timestamp": 2005,
+        "endTimestamp": 2234,
         "note": ""
       }
     ]
@@ -11680,6 +12016,24 @@
     ]
   },
   {
+    "id": "song-4ce2c5e1",
+    "title": "女孩",
+    "originalArtist": "韋禮安",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-5fa3b3f3",
+        "streamId": "stream-2022-11-06",
+        "date": "2022-11-06",
+        "streamTitle": "【歌回】甜甜粉紅戀愛歌回｜汐Seki",
+        "videoId": "dry-Rkwc4OQ",
+        "timestamp": 6239,
+        "endTimestamp": 6540,
+        "note": ""
+      }
+    ]
+  },
+  {
     "id": "song-7301e678",
     "title": "她說",
     "originalArtist": "林俊傑",
@@ -11711,6 +12065,24 @@
         "videoId": "wlE8ncGNjcM",
         "timestamp": 1807,
         "endTimestamp": 1985,
+        "note": ""
+      }
+    ]
+  },
+  {
+    "id": "song-177fbf68",
+    "title": "好像掉進愛情海裡",
+    "originalArtist": "趙露思",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-73e6fa6d",
+        "streamId": "stream-2022-11-06",
+        "date": "2022-11-06",
+        "streamTitle": "【歌回】甜甜粉紅戀愛歌回｜汐Seki",
+        "videoId": "dry-Rkwc4OQ",
+        "timestamp": 5279,
+        "endTimestamp": 5459,
         "note": ""
       }
     ]
@@ -11909,6 +12281,42 @@
         "videoId": "7sZcMm1rUfE",
         "timestamp": 6782,
         "endTimestamp": 6981,
+        "note": ""
+      }
+    ]
+  },
+  {
+    "id": "song-f387a531",
+    "title": "威風堂々",
+    "originalArtist": "梅とら",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-5631fe4d",
+        "streamId": "stream-2023-01-15",
+        "date": "2023-01-15",
+        "streamTitle": "【兒童不宜歌回】夜深了...可以來點壞的🔞｜汐Seki",
+        "videoId": "TsKxQc5qzdY",
+        "timestamp": 3059,
+        "endTimestamp": 3134,
+        "note": ""
+      }
+    ]
+  },
+  {
+    "id": "song-e25217f8",
+    "title": "威風堂々",
+    "originalArtist": "梅とら",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-96ab2673",
+        "streamId": "stream-2023-01-15",
+        "date": "2023-01-15",
+        "streamTitle": "【兒童不宜歌回】夜深了...可以來點壞的🔞｜汐Seki",
+        "videoId": "TsKxQc5qzdY",
+        "timestamp": 3837,
+        "endTimestamp": 3907,
         "note": ""
       }
     ]
@@ -12305,6 +12713,24 @@
         "videoId": "l5E8fiOEMLo",
         "timestamp": 2156,
         "endTimestamp": 2375,
+        "note": ""
+      }
+    ]
+  },
+  {
+    "id": "song-f87ecfbe",
+    "title": "寄り酔い",
+    "originalArtist": "和ぬか",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-dcf5e67c",
+        "streamId": "stream-2023-01-15",
+        "date": "2023-01-15",
+        "streamTitle": "【兒童不宜歌回】夜深了...可以來點壞的🔞｜汐Seki",
+        "videoId": "TsKxQc5qzdY",
+        "timestamp": 1619,
+        "endTimestamp": 1838,
         "note": ""
       }
     ]
@@ -12874,6 +13300,24 @@
     ]
   },
   {
+    "id": "song-1469cb01",
+    "title": "年輪說",
+    "originalArtist": "楊丞琳Rainie Yang",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-2b8ac660",
+        "streamId": "stream-2023-01-22",
+        "date": "2023-01-22",
+        "streamTitle": "【歌回】開春迎新歌回｜汐Seki",
+        "videoId": "cLCwxVXEjB0",
+        "timestamp": 1628,
+        "endTimestamp": 1894,
+        "note": ""
+      }
+    ]
+  },
+  {
     "id": "song-130d7034",
     "title": "幾分之幾",
     "originalArtist": "盧廣仲",
@@ -13202,6 +13646,24 @@
     ]
   },
   {
+    "id": "song-6706a507",
+    "title": "快樂崇拜",
+    "originalArtist": "張韶涵-潘瑋柏",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-2efab143",
+        "streamId": "stream-2023-01-22",
+        "date": "2023-01-22",
+        "streamTitle": "【歌回】開春迎新歌回｜汐Seki",
+        "videoId": "cLCwxVXEjB0",
+        "timestamp": 2523,
+        "endTimestamp": 2728,
+        "note": ""
+      }
+    ]
+  },
+  {
     "id": "song-3defc6e4",
     "title": "怪天氣",
     "originalArtist": "黃宣",
@@ -13305,6 +13767,24 @@
         "videoId": "JYE63RgdH00",
         "timestamp": 4497,
         "endTimestamp": 4781,
+        "note": ""
+      }
+    ]
+  },
+  {
+    "id": "song-0e67dffa",
+    "title": "悲しみの向こうへ",
+    "originalArtist": "いとうかなこ",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-aa6cd04b",
+        "streamId": "stream-2022-10-30",
+        "date": "2022-10-30",
+        "streamTitle": "【歌回】六萬訂閱感謝歌回｜汐Seki",
+        "videoId": "1H5J3aJWQFA",
+        "timestamp": 6030,
+        "endTimestamp": 6285,
         "note": ""
       }
     ]
@@ -13423,6 +13903,24 @@
         "videoId": "X1DC2-jb1K8",
         "timestamp": 6213,
         "endTimestamp": 6444,
+        "note": ""
+      }
+    ]
+  },
+  {
+    "id": "song-500b4797",
+    "title": "想了你6次",
+    "originalArtist": "王ADEN",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-7329e1b2",
+        "streamId": "stream-2022-11-06",
+        "date": "2022-11-06",
+        "streamTitle": "【歌回】甜甜粉紅戀愛歌回｜汐Seki",
+        "videoId": "dry-Rkwc4OQ",
+        "timestamp": 3625,
+        "endTimestamp": 3852,
         "note": ""
       }
     ]
@@ -15114,6 +15612,24 @@
     ]
   },
   {
+    "id": "song-f3d004fe",
+    "title": "拿走了什麼",
+    "originalArtist": "A-Lin",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-fececc76",
+        "streamId": "stream-2023-01-22",
+        "date": "2023-01-22",
+        "streamTitle": "【歌回】開春迎新歌回｜汐Seki",
+        "videoId": "cLCwxVXEjB0",
+        "timestamp": 7384,
+        "endTimestamp": 7679,
+        "note": ""
+      }
+    ]
+  },
+  {
     "id": "song-23172fc8",
     "title": "挪威的森林",
     "originalArtist": "伍佰",
@@ -15327,6 +15843,24 @@
         "videoId": "Y4sdMVY4bMA",
         "timestamp": 6806,
         "endTimestamp": 7070,
+        "note": ""
+      }
+    ]
+  },
+  {
+    "id": "song-9660c106",
+    "title": "新時代",
+    "originalArtist": "Ado",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-4a7d6e8d",
+        "streamId": "stream-2023-01-22",
+        "date": "2023-01-22",
+        "streamTitle": "【歌回】開春迎新歌回｜汐Seki",
+        "videoId": "cLCwxVXEjB0",
+        "timestamp": 1021,
+        "endTimestamp": 1242,
         "note": ""
       }
     ]
@@ -16643,6 +17177,24 @@
         "videoId": "CpBlnM8rtUo",
         "timestamp": 2781,
         "endTimestamp": 3050,
+        "note": ""
+      }
+    ]
+  },
+  {
+    "id": "song-df48e4fc",
+    "title": "濕了分寸",
+    "originalArtist": "謝震廷 Eli Hsieh",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-1c0f382c",
+        "streamId": "stream-2022-10-30",
+        "date": "2022-10-30",
+        "streamTitle": "【歌回】六萬訂閱感謝歌回｜汐Seki",
+        "videoId": "1H5J3aJWQFA",
+        "timestamp": 2225,
+        "endTimestamp": 2501,
         "note": ""
       }
     ]
@@ -18282,6 +18834,24 @@
     ]
   },
   {
+    "id": "song-bff03496",
+    "title": "紅蓮華",
+    "originalArtist": "LiSA",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-3d60fae4",
+        "streamId": "stream-2023-01-22",
+        "date": "2023-01-22",
+        "streamTitle": "【歌回】開春迎新歌回｜汐Seki",
+        "videoId": "cLCwxVXEjB0",
+        "timestamp": 5732,
+        "endTimestamp": 5965,
+        "note": ""
+      }
+    ]
+  },
+  {
     "id": "song-d7ade534",
     "title": "紅豆",
     "originalArtist": "王菲",
@@ -18930,6 +19500,24 @@
     ]
   },
   {
+    "id": "song-1355be6d",
+    "title": "萬千花蕊慈母悲哀",
+    "originalArtist": "珂拉琪 Collage",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-0e71ceb8",
+        "streamId": "stream-2022-10-30",
+        "date": "2022-10-30",
+        "streamTitle": "【歌回】六萬訂閱感謝歌回｜汐Seki",
+        "videoId": "1H5J3aJWQFA",
+        "timestamp": 4313,
+        "endTimestamp": 4548,
+        "note": ""
+      }
+    ]
+  },
+  {
     "id": "song-b21ceebc",
     "title": "落雨聲",
     "originalArtist": "江蕙",
@@ -19069,6 +19657,24 @@
         "videoId": "m-xzCBcZWG4",
         "timestamp": 2389,
         "endTimestamp": 2649,
+        "note": ""
+      }
+    ]
+  },
+  {
+    "id": "song-c164198e",
+    "title": "血腥愛情故事",
+    "originalArtist": "AMIT (張惠妹)",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-49bbb41d",
+        "streamId": "stream-2022-10-30",
+        "date": "2022-10-30",
+        "streamTitle": "【歌回】六萬訂閱感謝歌回｜汐Seki",
+        "videoId": "1H5J3aJWQFA",
+        "timestamp": 3747,
+        "endTimestamp": 4009,
         "note": ""
       }
     ]
@@ -19864,6 +20470,24 @@
     ]
   },
   {
+    "id": "song-fd36cb37",
+    "title": "迴迴奇譚",
+    "originalArtist": "Eve",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-1cf97bb9",
+        "streamId": "stream-2022-10-30",
+        "date": "2022-10-30",
+        "streamTitle": "【歌回】六萬訂閱感謝歌回｜汐Seki",
+        "videoId": "1H5J3aJWQFA",
+        "timestamp": 1672,
+        "endTimestamp": 1890,
+        "note": ""
+      }
+    ]
+  },
+  {
     "id": "song-5b1a4b74",
     "title": "迷惘美",
     "originalArtist": "李優 (URIKO) ft. 熊仔",
@@ -20585,6 +21209,24 @@
         "videoId": "__H2pFjl8so",
         "timestamp": 9985,
         "endTimestamp": 10185,
+        "note": ""
+      }
+    ]
+  },
+  {
+    "id": "song-3a3d707e",
+    "title": "防火線",
+    "originalArtist": "Jony J",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-a747f08a",
+        "streamId": "stream-2023-01-15",
+        "date": "2023-01-15",
+        "streamTitle": "【兒童不宜歌回】夜深了...可以來點壞的🔞｜汐Seki",
+        "videoId": "TsKxQc5qzdY",
+        "timestamp": 4128,
+        "endTimestamp": 4371,
         "note": ""
       }
     ]
@@ -22722,6 +23364,42 @@
     ]
   },
   {
+    "id": "song-5ce0af1e",
+    "title": "소녀시대 '다시 만난 세계 (Into The New World)",
+    "originalArtist": "Girls' Generation",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-ce1ac822",
+        "streamId": "stream-2023-01-22",
+        "date": "2023-01-22",
+        "streamTitle": "【歌回】開春迎新歌回｜汐Seki",
+        "videoId": "cLCwxVXEjB0",
+        "timestamp": 4030,
+        "endTimestamp": 4296,
+        "note": ""
+      }
+    ]
+  },
+  {
+    "id": "song-8bcbc2c4",
+    "title": "쉬가릿 ( Cigarette and condom )",
+    "originalArtist": "BIBI",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-c9a42106",
+        "streamId": "stream-2023-01-15",
+        "date": "2023-01-15",
+        "streamTitle": "【兒童不宜歌回】夜深了...可以來點壞的🔞｜汐Seki",
+        "videoId": "TsKxQc5qzdY",
+        "timestamp": 4788,
+        "endTimestamp": 4989,
+        "note": ""
+      }
+    ]
+  },
+  {
     "id": "song-238b1888",
     "title": "스물 다섯, 스물 하나 (25,21)",
     "originalArtist": "紫雨林(자우림)",
@@ -22817,6 +23495,24 @@
         "videoId": "aiZeNT4f6ZY",
         "timestamp": 2989,
         "endTimestamp": 3171,
+        "note": ""
+      }
+    ]
+  },
+  {
+    "id": "song-737435b7",
+    "title": "썸 탈꺼야 (Some)",
+    "originalArtist": "볼빨간사춘기 (BOL4)",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-99a3f2fb",
+        "streamId": "stream-2022-11-06",
+        "date": "2022-11-06",
+        "streamTitle": "【歌回】甜甜粉紅戀愛歌回｜汐Seki",
+        "videoId": "dry-Rkwc4OQ",
+        "timestamp": 2653,
+        "endTimestamp": 2833,
         "note": ""
       }
     ]
@@ -23125,6 +23821,24 @@
         "videoId": "DVi_TrO6N8E",
         "timestamp": 8761,
         "endTimestamp": 8945,
+        "note": ""
+      }
+    ]
+  },
+  {
+    "id": "song-bd75922e",
+    "title": "창귀",
+    "originalArtist": "안예은 AHN YEEUN (安藝恩)",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-d6286604",
+        "streamId": "stream-2022-10-30",
+        "date": "2022-10-30",
+        "streamTitle": "【歌回】六萬訂閱感謝歌回｜汐Seki",
+        "videoId": "1H5J3aJWQFA",
+        "timestamp": 4968,
+        "endTimestamp": 5171,
         "note": ""
       }
     ]
