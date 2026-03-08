@@ -36,6 +36,24 @@
     ]
   },
   {
+    "id": "song-21d7acdf",
+    "title": "Paradise Island",
+    "originalArtist": "ØZI",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-536bbd8e",
+        "streamId": "stream-c46886e2",
+        "date": "2026-02-08",
+        "streamTitle": "【彈唱歌回】用彈唱來療癒你的週末！【朔Sakuro】",
+        "videoId": "Ck-5ls8cwTQ",
+        "timestamp": 4068,
+        "endTimestamp": 4305,
+        "note": ""
+      }
+    ]
+  },
+  {
     "id": "song-08b95712",
     "title": "So Sick",
     "originalArtist": "Ne-Yo (尼歐)",
@@ -49,6 +67,78 @@
         "videoId": "ybC0KHGXjaA",
         "timestamp": 6286,
         "endTimestamp": 6493,
+        "note": ""
+      }
+    ]
+  },
+  {
+    "id": "song-d08574b1",
+    "title": "Someone Like You",
+    "originalArtist": "Adele (愛黛兒)",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-721a6b6b",
+        "streamId": "stream-c46886e2",
+        "date": "2026-02-08",
+        "streamTitle": "【彈唱歌回】用彈唱來療癒你的週末！【朔Sakuro】",
+        "videoId": "Ck-5ls8cwTQ",
+        "timestamp": 5887,
+        "endTimestamp": 6171,
+        "note": ""
+      }
+    ]
+  },
+  {
+    "id": "song-73515f2c",
+    "title": "What About Me",
+    "originalArtist": "Emily Osment",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-92e9a375",
+        "streamId": "stream-c46886e2",
+        "date": "2026-02-08",
+        "streamTitle": "【彈唱歌回】用彈唱來療癒你的週末！【朔Sakuro】",
+        "videoId": "Ck-5ls8cwTQ",
+        "timestamp": 6680,
+        "endTimestamp": 6923,
+        "note": ""
+      }
+    ]
+  },
+  {
+    "id": "song-d479cdc8",
+    "title": "beside you(找不到key版)",
+    "originalArtist": "keshi",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-8cf9f989",
+        "streamId": "stream-c46886e2",
+        "date": "2026-02-08",
+        "streamTitle": "【彈唱歌回】用彈唱來療癒你的週末！【朔Sakuro】",
+        "videoId": "Ck-5ls8cwTQ",
+        "timestamp": 7120,
+        "endTimestamp": 7390,
+        "note": ""
+      }
+    ]
+  },
+  {
+    "id": "song-e1caa96e",
+    "title": "beside you(補唱忘記的)",
+    "originalArtist": "keshi",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-89c41eda",
+        "streamId": "stream-c46886e2",
+        "date": "2026-02-08",
+        "streamTitle": "【彈唱歌回】用彈唱來療癒你的週末！【朔Sakuro】",
+        "videoId": "Ck-5ls8cwTQ",
+        "timestamp": 7693,
+        "endTimestamp": 7781,
         "note": ""
       }
     ]
@@ -126,6 +216,24 @@
     ]
   },
   {
+    "id": "song-89bd956b",
+    "title": "光年之外",
+    "originalArtist": "G.E.M. 鄧紫棋",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-e8f61ec7",
+        "streamId": "stream-c46886e2",
+        "date": "2026-02-08",
+        "streamTitle": "【彈唱歌回】用彈唱來療癒你的週末！【朔Sakuro】",
+        "videoId": "Ck-5ls8cwTQ",
+        "timestamp": 2279,
+        "endTimestamp": 2519,
+        "note": ""
+      }
+    ]
+  },
+  {
     "id": "song-6f15bcab",
     "title": "告白",
     "originalArtist": "蔡黃汝 (Flo)",
@@ -157,6 +265,24 @@
         "videoId": "ybC0KHGXjaA",
         "timestamp": 3177,
         "endTimestamp": 3335,
+        "note": ""
+      }
+    ]
+  },
+  {
+    "id": "song-ef6fbd41",
+    "title": "安全感",
+    "originalArtist": "王力宏 (Wang Leehom)",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-f4c15e70",
+        "streamId": "stream-c46886e2",
+        "date": "2026-02-08",
+        "streamTitle": "【彈唱歌回】用彈唱來療癒你的週末！【朔Sakuro】",
+        "videoId": "Ck-5ls8cwTQ",
+        "timestamp": 3240,
+        "endTimestamp": 3485,
         "note": ""
       }
     ]
@@ -252,6 +378,24 @@
     ]
   },
   {
+    "id": "song-8ff6d1ae",
+    "title": "正想著你呢",
+    "originalArtist": "持修",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-f339db6a",
+        "streamId": "stream-c46886e2",
+        "date": "2026-02-08",
+        "streamTitle": "【彈唱歌回】用彈唱來療癒你的週末！【朔Sakuro】",
+        "videoId": "Ck-5ls8cwTQ",
+        "timestamp": 546,
+        "endTimestamp": 763,
+        "note": ""
+      }
+    ]
+  },
+  {
     "id": "song-576bd07a",
     "title": "求救訊號",
     "originalArtist": "VH (Vast & Hazy)",
@@ -265,6 +409,24 @@
         "videoId": "ybC0KHGXjaA",
         "timestamp": 1581,
         "endTimestamp": 1839,
+        "note": ""
+      }
+    ]
+  },
+  {
+    "id": "song-9187a408",
+    "title": "美麗",
+    "originalArtist": "王大文",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-ce615248",
+        "streamId": "stream-c46886e2",
+        "date": "2026-02-08",
+        "streamTitle": "【彈唱歌回】用彈唱來療癒你的週末！【朔Sakuro】",
+        "videoId": "Ck-5ls8cwTQ",
+        "timestamp": 5277,
+        "endTimestamp": 5497,
         "note": ""
       }
     ]
@@ -301,6 +463,24 @@
         "videoId": "ybC0KHGXjaA",
         "timestamp": 2133,
         "endTimestamp": 2381,
+        "note": ""
+      }
+    ]
+  },
+  {
+    "id": "song-c00a619b",
+    "title": "連名帶姓",
+    "originalArtist": "aMEI (張惠妹)",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-bbe0ea32",
+        "streamId": "stream-c46886e2",
+        "date": "2026-02-08",
+        "streamTitle": "【彈唱歌回】用彈唱來療癒你的週末！【朔Sakuro】",
+        "videoId": "Ck-5ls8cwTQ",
+        "timestamp": 1562,
+        "endTimestamp": 1854,
         "note": ""
       }
     ]
