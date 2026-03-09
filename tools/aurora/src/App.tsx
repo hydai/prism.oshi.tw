@@ -267,6 +267,8 @@ export function App() {
   const [submitStatus, setSubmitStatus] = useState<{ type: 'success' | 'error'; message: string } | null>(null);
   const [submitting, setSubmitting] = useState(false);
   const [showSubmitModal, setShowSubmitModal] = useState(false);
+  const [submitStreamDate, setSubmitStreamDate] = useState('');
+  const [submitNote, setSubmitNote] = useState('');
   const [turnstileToken, setTurnstileToken] = useState('');
   const turnstileContainerRef = useRef<HTMLDivElement>(null);
   const turnstileWidgetIdRef = useRef<string | null>(null);
@@ -296,6 +298,8 @@ export function App() {
       }
       turnstileWidgetIdRef.current = null;
       setTurnstileToken('');
+      setSubmitStreamDate('');
+      setSubmitNote('');
     };
   }, [showSubmitModal]);
 
@@ -317,6 +321,8 @@ export function App() {
           end_timestamp: s.endSeconds,
         })),
         turnstile_token: turnstileToken,
+        stream_date: submitStreamDate || undefined,
+        submitter_note: submitNote || undefined,
       };
 
       const res = await fetch('https://nova.oshi.tw/vod/api/submit', {
@@ -334,6 +340,8 @@ export function App() {
             : `提交成功！ID: ${data.id}`,
         });
         setShowSubmitModal(false);
+        setSubmitStreamDate('');
+        setSubmitNote('');
       } else if (res.status === 409) {
         setSubmitStatus({
           type: 'error',
@@ -355,7 +363,7 @@ export function App() {
       setTurnstileToken('');
       setTimeout(() => setSubmitStatus(null), 8000);
     }
-  }, [selectedStreamer, songs, videoId, vodUrl, turnstileToken]);
+  }, [selectedStreamer, songs, videoId, vodUrl, turnstileToken, submitStreamDate, submitNote]);
 
   // Keyboard shortcuts
   useEffect(() => {
@@ -664,13 +672,35 @@ export function App() {
               {songs.filter((s) => s.name.trim() !== '').length} 首歌曲的時間戳
             </p>
 
+            <div className="flex flex-col gap-3 mb-4">
+              <div>
+                <label className="block text-[13px] text-[var(--text-secondary)] mb-1">直播日期</label>
+                <input
+                  type="date"
+                  value={submitStreamDate}
+                  onChange={(e) => setSubmitStreamDate(e.target.value)}
+                  className="w-full rounded-lg border border-[var(--border-default)] bg-white/60 px-3 py-1.5 text-[13px] outline-none focus:border-[var(--accent-purple)]"
+                />
+              </div>
+              <div>
+                <label className="block text-[13px] text-[var(--text-secondary)] mb-1">備註（選填）</label>
+                <input
+                  type="text"
+                  value={submitNote}
+                  onChange={(e) => setSubmitNote(e.target.value)}
+                  placeholder="任何補充說明（選填）"
+                  className="w-full rounded-lg border border-[var(--border-default)] bg-white/60 px-3 py-1.5 text-[13px] outline-none focus:border-[var(--accent-purple)] placeholder:text-[var(--text-tertiary)]"
+                />
+              </div>
+            </div>
+
             <div className="flex justify-center mb-4">
               <div ref={turnstileContainerRef} />
             </div>
 
             <div className="flex gap-2">
               <button
-                onClick={() => setShowSubmitModal(false)}
+                onClick={() => { setShowSubmitModal(false); setSubmitStreamDate(''); setSubmitNote(''); }}
                 className="flex-1 px-4 py-2 rounded-lg bg-white/60 border border-[var(--border-default)] text-[var(--text-secondary)] text-[13px] font-medium hover:bg-white/80"
               >
                 取消
