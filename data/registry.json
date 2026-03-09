@@ -155,6 +155,37 @@
       "enabled": true
     },
     {
+      "slug": "oboro",
+      "displayName": "朧Oboro",
+      "description": "來自子午計畫的少爺【黑暗的使者】朧Oboro，擅長日文，愛吃甜點，是一位具有陽光可愛的少年！粉絲名：馬卡朧",
+      "avatarUrl": "https://yt3.googleusercontent.com/SDNyyIpWGoSi83-oybsx8oa35_DuZoBfhmi2_0zQK82WgoS5pW9t-9b7Dw-9wtprBV8IjNx8wg=s900-c-k-c0x00ffffff-no-rj",
+      "brandName": "OboroPrism",
+      "subscriberCount": "4.34萬",
+      "group": "子午計畫",
+      "socialLinks": {
+        "youtube": "https://youtube.com/@oboromoonlit",
+        "twitter": "https://x.com/Oboro_Moonlit_",
+        "facebook": "https://www.facebook.com/share/1CDqydjPgf/",
+        "instagram": "https://www.instagram.com/oboro_moonlit_",
+        "twitch": "https://www.twitch.tv/oboro_moonlit"
+      },
+      "theme": {
+        "accentPrimary": "#EC4899",
+        "accentPrimaryDark": "#DB2777",
+        "accentPrimaryLight": "#F472B6",
+        "accentSecondary": "#3B82F6",
+        "accentSecondaryLight": "#60A5FA",
+        "bgPageStart": "#FFF0F5",
+        "bgPageMid": "#F0F8FF",
+        "bgPageEnd": "#E6E6FA",
+        "bgAccentPrimary": "#FDF2F8",
+        "bgAccentPrimaryMuted": "#FCE7F3",
+        "borderAccentPrimary": "#FBCFE8",
+        "borderAccentSecondary": "#BFDBFE"
+      },
+      "enabled": true
+    },
+    {
       "slug": "rei",
       "displayName": "澪Rei",
       "description": "我是子午計畫【霓NEO(n)】所屬的VTuber！\n歌勢Vtuber，就讀冰霜魔法學系的小狸貓，能夠變身成不同事物，主要在Youtube上進行直播。\n聲音有著療癒人心的能力，空靈的歌聲會讓人暫時忘記煩惱；有些笨拙的個性更為大家帶來許多意想不到的歡笑。",
