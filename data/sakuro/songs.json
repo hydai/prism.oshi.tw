@@ -1,5 +1,77 @@
 [
   {
+    "id": "song-8c997f3e",
+    "title": "Easy On Me",
+    "originalArtist": "Adele",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-58f6f82f",
+        "streamId": "stream-0b82931e",
+        "date": "2026-02-01",
+        "streamTitle": "【縱型歌回】貼臉唱歌給你們聽！【朔Sakuro】",
+        "videoId": "Hmeugi8WS9k",
+        "timestamp": 6149,
+        "endTimestamp": 6383,
+        "note": ""
+      }
+    ]
+  },
+  {
+    "id": "song-e4a3251f",
+    "title": "Give It to Me",
+    "originalArtist": "孫盛希 (Shi Shi)",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-402aef16",
+        "streamId": "stream-2026-01-18",
+        "date": "2026-01-18",
+        "streamTitle": "【低音歌回】老師說我要唱低一點的歌所以來了【朔Sakuro】",
+        "videoId": "SVEtS6mQFPY",
+        "timestamp": 3099,
+        "endTimestamp": 3270,
+        "note": ""
+      }
+    ]
+  },
+  {
+    "id": "song-3922bd1b",
+    "title": "Heavenly Days",
+    "originalArtist": "新垣結衣",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-7f181e4a",
+        "streamId": "stream-0b82931e",
+        "date": "2026-02-01",
+        "streamTitle": "【縱型歌回】貼臉唱歌給你們聽！【朔Sakuro】",
+        "videoId": "Hmeugi8WS9k",
+        "timestamp": 1126,
+        "endTimestamp": 1395,
+        "note": ""
+      }
+    ]
+  },
+  {
+    "id": "song-4b278a33",
+    "title": "Heavenly days",
+    "originalArtist": "新垣結衣",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-a2f15068",
+        "streamId": "stream-2026-01-25",
+        "date": "2026-01-25",
+        "streamTitle": "【冬日歌回】冬天冷冷的適合聽歌！【朔Sakuro】",
+        "videoId": "OrwsCyMKewY",
+        "timestamp": 4648,
+        "endTimestamp": 4919,
+        "note": ""
+      }
+    ]
+  },
+  {
     "id": "song-c281c91c",
     "title": "I Love You 3000",
     "originalArtist": "Stephanie Poetri",
@@ -13,6 +85,60 @@
         "videoId": "0xT5uHGGMC0",
         "timestamp": 8181,
         "endTimestamp": 8500,
+        "note": ""
+      }
+    ]
+  },
+  {
+    "id": "song-69c96a4e",
+    "title": "I love you 3000",
+    "originalArtist": "Stephanie Poetri",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-d050977c",
+        "streamId": "stream-2026-01-18",
+        "date": "2026-01-18",
+        "streamTitle": "【低音歌回】老師說我要唱低一點的歌所以來了【朔Sakuro】",
+        "videoId": "SVEtS6mQFPY",
+        "timestamp": 4829,
+        "endTimestamp": 5038,
+        "note": ""
+      }
+    ]
+  },
+  {
+    "id": "song-2b8fbda3",
+    "title": "I love you 3000",
+    "originalArtist": "Stephanie Poetri",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-43b7fca3",
+        "streamId": "stream-2026-01-25",
+        "date": "2026-01-25",
+        "streamTitle": "【冬日歌回】冬天冷冷的適合聽歌！【朔Sakuro】",
+        "videoId": "OrwsCyMKewY",
+        "timestamp": 2805,
+        "endTimestamp": 3045,
+        "note": ""
+      }
+    ]
+  },
+  {
+    "id": "song-47f1b3e3",
+    "title": "Letting Go",
+    "originalArtist": "蔡健雅 (Tanya Chua)",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-fbca6813",
+        "streamId": "stream-2026-01-25",
+        "date": "2026-01-25",
+        "streamTitle": "【冬日歌回】冬天冷冷的適合聽歌！【朔Sakuro】",
+        "videoId": "OrwsCyMKewY",
+        "timestamp": 6816,
+        "endTimestamp": 7042,
         "note": ""
       }
     ]
@@ -108,6 +234,24 @@
     ]
   },
   {
+    "id": "song-c6f03241",
+    "title": "Wide Awake",
+    "originalArtist": "Katy Perry",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-d62b386a",
+        "streamId": "stream-0b82931e",
+        "date": "2026-02-01",
+        "streamTitle": "【縱型歌回】貼臉唱歌給你們聽！【朔Sakuro】",
+        "videoId": "Hmeugi8WS9k",
+        "timestamp": 5643,
+        "endTimestamp": 5860,
+        "note": ""
+      }
+    ]
+  },
+  {
     "id": "song-d479cdc8",
     "title": "beside you(找不到key版)",
     "originalArtist": "keshi",
@@ -144,6 +288,24 @@
     ]
   },
   {
+    "id": "song-f69ebff4",
+    "title": "goodbye",
+    "originalArtist": "清水翔太",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-93eece9e",
+        "streamId": "stream-0b82931e",
+        "date": "2026-02-01",
+        "streamTitle": "【縱型歌回】貼臉唱歌給你們聽！【朔Sakuro】",
+        "videoId": "Hmeugi8WS9k",
+        "timestamp": 4031,
+        "endTimestamp": 4382,
+        "note": ""
+      }
+    ]
+  },
+  {
     "id": "song-3693e66b",
     "title": "thank u, next",
     "originalArtist": "Ariana Grande",
@@ -157,6 +319,78 @@
         "videoId": "ybC0KHGXjaA",
         "timestamp": 6869,
         "endTimestamp": 7051,
+        "note": ""
+      }
+    ]
+  },
+  {
+    "id": "song-e79d22fe",
+    "title": "ハレンチ",
+    "originalArtist": "ちゃんみな",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-c11f8832",
+        "streamId": "stream-2026-01-18",
+        "date": "2026-01-18",
+        "streamTitle": "【低音歌回】老師說我要唱低一點的歌所以來了【朔Sakuro】",
+        "videoId": "SVEtS6mQFPY",
+        "timestamp": 7367,
+        "endTimestamp": 7391,
+        "note": ""
+      }
+    ]
+  },
+  {
+    "id": "song-9c15881f",
+    "title": "ハレンチ",
+    "originalArtist": "ちゃんみな",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-ad52c99b",
+        "streamId": "stream-2026-01-18",
+        "date": "2026-01-18",
+        "streamTitle": "【低音歌回】老師說我要唱低一點的歌所以來了【朔Sakuro】",
+        "videoId": "SVEtS6mQFPY",
+        "timestamp": 7541,
+        "endTimestamp": 7578,
+        "note": ""
+      }
+    ]
+  },
+  {
+    "id": "song-da6c7911",
+    "title": "ハレンチ",
+    "originalArtist": "ちゃんみな",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-848e4c6e",
+        "streamId": "stream-2026-01-18",
+        "date": "2026-01-18",
+        "streamTitle": "【低音歌回】老師說我要唱低一點的歌所以來了【朔Sakuro】",
+        "videoId": "SVEtS6mQFPY",
+        "timestamp": 7731,
+        "endTimestamp": 7771,
+        "note": ""
+      }
+    ]
+  },
+  {
+    "id": "song-58150868",
+    "title": "ユキコイ",
+    "originalArtist": "當山みれい",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-003f966f",
+        "streamId": "stream-2026-01-25",
+        "date": "2026-01-25",
+        "streamTitle": "【冬日歌回】冬天冷冷的適合聽歌！【朔Sakuro】",
+        "videoId": "OrwsCyMKewY",
+        "timestamp": 3615,
+        "endTimestamp": 3860,
         "note": ""
       }
     ]
@@ -180,6 +414,24 @@
     ]
   },
   {
+    "id": "song-e39f9cc7",
+    "title": "不在一起就不會分開",
+    "originalArtist": "洪佩瑜",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-c0617506",
+        "streamId": "stream-2026-01-25",
+        "date": "2026-01-25",
+        "streamTitle": "【冬日歌回】冬天冷冷的適合聽歌！【朔Sakuro】",
+        "videoId": "OrwsCyMKewY",
+        "timestamp": 5221,
+        "endTimestamp": 5485,
+        "note": ""
+      }
+    ]
+  },
+  {
     "id": "song-da63eedd",
     "title": "不是因為天氣晴朗才愛你",
     "originalArtist": "理想混蛋 (Bestards)",
@@ -193,6 +445,42 @@
         "videoId": "0xT5uHGGMC0",
         "timestamp": 245,
         "endTimestamp": 500,
+        "note": ""
+      }
+    ]
+  },
+  {
+    "id": "song-f551ea18",
+    "title": "你是不是有點動心",
+    "originalArtist": "吳卓源",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-eeb958be",
+        "streamId": "stream-0b82931e",
+        "date": "2026-02-01",
+        "streamTitle": "【縱型歌回】貼臉唱歌給你們聽！【朔Sakuro】",
+        "videoId": "Hmeugi8WS9k",
+        "timestamp": 5028,
+        "endTimestamp": 5295,
+        "note": ""
+      }
+    ]
+  },
+  {
+    "id": "song-12a6f114",
+    "title": "信號 Signal",
+    "originalArtist": "汐Seki",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-2bdb75ef",
+        "streamId": "stream-2026-01-18",
+        "date": "2026-01-18",
+        "streamTitle": "【低音歌回】老師說我要唱低一點的歌所以來了【朔Sakuro】",
+        "videoId": "SVEtS6mQFPY",
+        "timestamp": 2104,
+        "endTimestamp": 2322,
         "note": ""
       }
     ]
@@ -216,6 +504,24 @@
     ]
   },
   {
+    "id": "song-a7c1c8db",
+    "title": "像晴天像雨天",
+    "originalArtist": "汪蘇瀧",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-9a88a933",
+        "streamId": "stream-0b82931e",
+        "date": "2026-02-01",
+        "streamTitle": "【縱型歌回】貼臉唱歌給你們聽！【朔Sakuro】",
+        "videoId": "Hmeugi8WS9k",
+        "timestamp": 3012,
+        "endTimestamp": 3252,
+        "note": ""
+      }
+    ]
+  },
+  {
     "id": "song-89bd956b",
     "title": "光年之外",
     "originalArtist": "G.E.M. 鄧紫棋",
@@ -234,6 +540,42 @@
     ]
   },
   {
+    "id": "song-0c85e008",
+    "title": "只有副歌的新歌",
+    "originalArtist": "朔Sakuro",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-845b7e89",
+        "streamId": "stream-2026-01-18",
+        "date": "2026-01-18",
+        "streamTitle": "【低音歌回】老師說我要唱低一點的歌所以來了【朔Sakuro】",
+        "videoId": "SVEtS6mQFPY",
+        "timestamp": 1512,
+        "endTimestamp": 1561,
+        "note": ""
+      }
+    ]
+  },
+  {
+    "id": "song-fe284a1b",
+    "title": "只有副歌的新歌",
+    "originalArtist": "朔Sakuro",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-f553e74c",
+        "streamId": "stream-2026-01-18",
+        "date": "2026-01-18",
+        "streamTitle": "【低音歌回】老師說我要唱低一點的歌所以來了【朔Sakuro】",
+        "videoId": "SVEtS6mQFPY",
+        "timestamp": 1632,
+        "endTimestamp": 1752,
+        "note": ""
+      }
+    ]
+  },
+  {
     "id": "song-6f15bcab",
     "title": "告白",
     "originalArtist": "蔡黃汝 (Flo)",
@@ -247,6 +589,24 @@
         "videoId": "0xT5uHGGMC0",
         "timestamp": 4188,
         "endTimestamp": 4390,
+        "note": ""
+      }
+    ]
+  },
+  {
+    "id": "song-02cf3ebd",
+    "title": "夏夢",
+    "originalArtist": "汐Seki",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-082af233",
+        "streamId": "stream-0b82931e",
+        "date": "2026-02-01",
+        "streamTitle": "【縱型歌回】貼臉唱歌給你們聽！【朔Sakuro】",
+        "videoId": "Hmeugi8WS9k",
+        "timestamp": 2002,
+        "endTimestamp": 2273,
         "note": ""
       }
     ]
@@ -306,6 +666,24 @@
     ]
   },
   {
+    "id": "song-57dbf3ae",
+    "title": "愛♡スクリーム！",
+    "originalArtist": "AiScReam",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-04da797f",
+        "streamId": "stream-2026-01-18",
+        "date": "2026-01-18",
+        "streamTitle": "【低音歌回】老師說我要唱低一點的歌所以來了【朔Sakuro】",
+        "videoId": "SVEtS6mQFPY",
+        "timestamp": 3681,
+        "endTimestamp": 3937,
+        "note": ""
+      }
+    ]
+  },
+  {
     "id": "song-d72afbe5",
     "title": "我喜歡你",
     "originalArtist": "洪安妮",
@@ -342,6 +720,24 @@
     ]
   },
   {
+    "id": "song-f878026e",
+    "title": "我好想你",
+    "originalArtist": "蘇打綠 (sodagreen)",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-5788cb2c",
+        "streamId": "stream-2026-01-25",
+        "date": "2026-01-25",
+        "streamTitle": "【冬日歌回】冬天冷冷的適合聽歌！【朔Sakuro】",
+        "videoId": "OrwsCyMKewY",
+        "timestamp": 2132,
+        "endTimestamp": 2438,
+        "note": ""
+      }
+    ]
+  },
+  {
     "id": "song-e7af3336",
     "title": "我當你空氣",
     "originalArtist": "旺福 (Wonfu)",
@@ -360,6 +756,24 @@
     ]
   },
   {
+    "id": "song-a2d9268d",
+    "title": "我的女人",
+    "originalArtist": "小賤",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-1fe0e848",
+        "streamId": "stream-0b82931e",
+        "date": "2026-02-01",
+        "streamTitle": "【縱型歌回】貼臉唱歌給你們聽！【朔Sakuro】",
+        "videoId": "Hmeugi8WS9k",
+        "timestamp": 536,
+        "endTimestamp": 798,
+        "note": ""
+      }
+    ]
+  },
+  {
     "id": "song-f9996600",
     "title": "手語",
     "originalArtist": "周杰倫 (Jay Chou)",
@@ -373,6 +787,24 @@
         "videoId": "0xT5uHGGMC0",
         "timestamp": 9476,
         "endTimestamp": 9760,
+        "note": ""
+      }
+    ]
+  },
+  {
+    "id": "song-e710f6a5",
+    "title": "李白",
+    "originalArtist": "李榮浩",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-2e87ce0f",
+        "streamId": "stream-2026-01-18",
+        "date": "2026-01-18",
+        "streamTitle": "【低音歌回】老師說我要唱低一點的歌所以來了【朔Sakuro】",
+        "videoId": "SVEtS6mQFPY",
+        "timestamp": 276,
+        "endTimestamp": 541,
         "note": ""
       }
     ]
@@ -409,6 +841,24 @@
         "videoId": "ybC0KHGXjaA",
         "timestamp": 1581,
         "endTimestamp": 1839,
+        "note": ""
+      }
+    ]
+  },
+  {
+    "id": "song-841cc60e",
+    "title": "等你下課",
+    "originalArtist": "周杰倫 (Jay Chou)",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-81ae9e6d",
+        "streamId": "stream-2026-01-18",
+        "date": "2026-01-18",
+        "streamTitle": "【低音歌回】老師說我要唱低一點的歌所以來了【朔Sakuro】",
+        "videoId": "SVEtS6mQFPY",
+        "timestamp": 907,
+        "endTimestamp": 1187,
         "note": ""
       }
     ]
@@ -468,6 +918,42 @@
     ]
   },
   {
+    "id": "song-155c023b",
+    "title": "踮起腳尖愛",
+    "originalArtist": "洪佩瑜",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-a23eedb8",
+        "streamId": "stream-2026-01-25",
+        "date": "2026-01-25",
+        "streamTitle": "【冬日歌回】冬天冷冷的適合聽歌！【朔Sakuro】",
+        "videoId": "OrwsCyMKewY",
+        "timestamp": 1025,
+        "endTimestamp": 1290,
+        "note": ""
+      }
+    ]
+  },
+  {
+    "id": "song-6a08ace9",
+    "title": "迷醉 Sangria",
+    "originalArtist": "朔Sakuro",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-378b4ed5",
+        "streamId": "stream-2026-01-18",
+        "date": "2026-01-18",
+        "streamTitle": "【低音歌回】老師說我要唱低一點的歌所以來了【朔Sakuro】",
+        "videoId": "SVEtS6mQFPY",
+        "timestamp": 6822,
+        "endTimestamp": 7016,
+        "note": ""
+      }
+    ]
+  },
+  {
     "id": "song-c00a619b",
     "title": "連名帶姓",
     "originalArtist": "aMEI (張惠妹)",
@@ -486,6 +972,24 @@
     ]
   },
   {
+    "id": "song-0eda6e2c",
+    "title": "阿拉斯加海灣",
+    "originalArtist": "菲道爾 (Firdhaus)",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-221183ef",
+        "streamId": "stream-2026-01-18",
+        "date": "2026-01-18",
+        "streamTitle": "【低音歌回】老師說我要唱低一點的歌所以來了【朔Sakuro】",
+        "videoId": "SVEtS6mQFPY",
+        "timestamp": 6223,
+        "endTimestamp": 6456,
+        "note": ""
+      }
+    ]
+  },
+  {
     "id": "song-7e26647f",
     "title": "雨愛",
     "originalArtist": "楊丞琳 (Rainie Yang)",
@@ -499,6 +1003,24 @@
         "videoId": "ybC0KHGXjaA",
         "timestamp": 4765,
         "endTimestamp": 5025,
+        "note": ""
+      }
+    ]
+  },
+  {
+    "id": "song-198004ea",
+    "title": "靠近",
+    "originalArtist": "袁婭維",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-aa7af1ea",
+        "streamId": "stream-2026-01-18",
+        "date": "2026-01-18",
+        "streamTitle": "【低音歌回】老師說我要唱低一點的歌所以來了【朔Sakuro】",
+        "videoId": "SVEtS6mQFPY",
+        "timestamp": 8272,
+        "endTimestamp": 8478,
         "note": ""
       }
     ]
