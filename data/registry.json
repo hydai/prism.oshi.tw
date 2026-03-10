@@ -62,6 +62,37 @@
       "enabled": true
     },
     {
+      "slug": "seki",
+      "displayName": "汐Seki",
+      "description": "歌勢Vtuber，成熟的狐狸姊姊，2022.9.25-2025.3.30(畢業)。\n不管是歌唱時性感慵懶的嗓音、玩遊戲時的反差萌、還是與觀眾互動時風趣的回應，多樣的面孔都是她所擁有的真實樣貌！",
+      "avatarUrl": "https://yt3.googleusercontent.com/drSubB4WP6okiy6-zvzNg_uT6mxiEN639p-sXIO8twygu7Iw-CqUvCmfXLGKOuTMpilkDlHEfw=s900-c-k-c0x00ffffff-no-rj",
+      "brandName": "SekiPrism",
+      "subscriberCount": "13.8萬",
+      "group": "子午計畫",
+      "socialLinks": {
+        "youtube": "https://www.youtube.com/channel/UC_aaEh6TaE5VpA_zQTUCcNQ",
+        "twitter": "https://x.com/SekiVtuberTW",
+        "facebook": "https://www.facebook.com/SekiChannel",
+        "instagram": "https://www.instagram.com/seki_meridian",
+        "twitch": "https://www.twitch.tv/seki_meridian"
+      },
+      "theme": {
+        "accentPrimary": "#EC4899",
+        "accentPrimaryDark": "#DB2777",
+        "accentPrimaryLight": "#F472B6",
+        "accentSecondary": "#3B82F6",
+        "accentSecondaryLight": "#60A5FA",
+        "bgPageStart": "#FFF0F5",
+        "bgPageMid": "#F0F8FF",
+        "bgPageEnd": "#E6E6FA",
+        "bgAccentPrimary": "#FDF2F8",
+        "bgAccentPrimaryMuted": "#FCE7F3",
+        "borderAccentPrimary": "#FBCFE8",
+        "borderAccentSecondary": "#BFDBFE"
+      },
+      "enabled": true
+    },
+    {
       "slug": "itsuki",
       "displayName": "玥Itsuki",
       "description": "王月女士是個有絕美歌聲、多才多藝的惡魔，擅長唱歌、會作詞會模仿，還會畫畫；外表艷麗、散發性感高冷氣質，但是其實在動些奇奇怪怪的歪腦筋，這樣的反差萌，怎麼能不愛呢？",
@@ -230,37 +261,6 @@
         "facebook": "https://www.facebook.com/SakuroMoonlit",
         "instagram": "https://www.instagram.com/sakuro_moonlit/",
         "twitch": "https://www.twitch.tv/sakuro_moonlit"
-      },
-      "theme": {
-        "accentPrimary": "#EC4899",
-        "accentPrimaryDark": "#DB2777",
-        "accentPrimaryLight": "#F472B6",
-        "accentSecondary": "#3B82F6",
-        "accentSecondaryLight": "#60A5FA",
-        "bgPageStart": "#FFF0F5",
-        "bgPageMid": "#F0F8FF",
-        "bgPageEnd": "#E6E6FA",
-        "bgAccentPrimary": "#FDF2F8",
-        "bgAccentPrimaryMuted": "#FCE7F3",
-        "borderAccentPrimary": "#FBCFE8",
-        "borderAccentSecondary": "#BFDBFE"
-      },
-      "enabled": true
-    },
-    {
-      "slug": "seki",
-      "displayName": "汐Seki",
-      "description": "歌勢Vtuber，成熟的狐狸姊姊，2022.9.25-2025.3.30(畢業)。\n不管是歌唱時性感慵懶的嗓音、玩遊戲時的反差萌、還是與觀眾互動時風趣的回應，多樣的面孔都是她所擁有的真實樣貌！",
-      "avatarUrl": "https://yt3.googleusercontent.com/drSubB4WP6okiy6-zvzNg_uT6mxiEN639p-sXIO8twygu7Iw-CqUvCmfXLGKOuTMpilkDlHEfw=s900-c-k-c0x00ffffff-no-rj",
-      "brandName": "SekiPrism",
-      "subscriberCount": "13.8萬",
-      "group": "子午計畫",
-      "socialLinks": {
-        "youtube": "https://www.youtube.com/channel/UC_aaEh6TaE5VpA_zQTUCcNQ",
-        "twitter": "https://x.com/SekiVtuberTW",
-        "facebook": "https://www.facebook.com/SekiChannel",
-        "instagram": "https://www.instagram.com/seki_meridian",
-        "twitch": "https://www.twitch.tv/seki_meridian"
       },
       "theme": {
         "accentPrimary": "#EC4899",
