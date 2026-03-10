@@ -970,6 +970,8 @@ export async function getSongSimilarityGroups(
 
   for (const [key, items] of exactGroups) {
     if (items.length >= 2) {
+      const allSame = items.every((i) => i.title === items[0].title);
+      if (allSame) continue;
       result.push({ normalizedKey: key, matchType: 'exact', items });
       for (const item of items) grouped.add(item.id);
     }
@@ -1013,6 +1015,8 @@ export async function getSongSimilarityGroups(
 
     for (const items of fuzzyGroups.values()) {
       if (items.length >= 2) {
+        const allSame = items.every((i) => i.title === items[0].title);
+        if (allSame) continue;
         const key = normalizeAggressive(items[0].title);
         result.push({ normalizedKey: key, matchType: 'fuzzy', items });
       }
