@@ -109,7 +109,12 @@ export default function StreamsList({ user }: { user: AuthUser }) {
   return (
     <div>
       <div className="flex items-center justify-between">
-        <h2 className="text-xl font-semibold text-slate-800">Streams</h2>
+        <h2 className="text-xl font-semibold text-slate-800">
+          Streams
+          <span className="ml-2 text-base font-normal text-slate-500">
+            ({sorted.length === streams.length ? sorted.length : `${sorted.length} / ${streams.length}`})
+          </span>
+        </h2>
         <Link
           to="/submit/stream"
           className="rounded-md bg-blue-600 px-4 py-2 text-sm font-medium text-white hover:bg-blue-700"
