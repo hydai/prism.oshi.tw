@@ -97,7 +97,7 @@ function queryD1<T>(sql: string): T[] {
 
 function buildSongs(streamerId: string): FanSiteSong[] {
   const songRows = queryD1<SongRow>(
-    `SELECT id, title, original_artist, tags FROM songs WHERE streamer_id = '${streamerId}' AND status = 'approved' ORDER BY title`,
+    `SELECT id, title, original_artist, tags FROM songs WHERE streamer_id = '${streamerId}' AND status = 'approved' ORDER BY id`,
   );
   const perfRows = queryD1<PerformanceRow>(
     `SELECT id, song_id, stream_id, date, stream_title, video_id, timestamp, end_timestamp, note FROM performances WHERE streamer_id = '${streamerId}' AND status = 'approved' ORDER BY date`,

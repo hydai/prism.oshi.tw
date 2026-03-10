@@ -1,810 +1,18 @@
 [
   {
-    "id": "song-1824acc1",
-    "title": "-ERROR",
-    "originalArtist": "Lily",
+    "id": "song-02cf3ebd",
+    "title": "夏夢",
+    "originalArtist": "汐Seki",
     "tags": [],
     "performances": [
       {
-        "id": "p-16c480ed",
-        "streamId": "stream-2025-11-30",
-        "date": "2025-11-30",
-        "streamTitle": "【月底歌回】11月的最後一天來聽歌吧！【朔Sakuro】",
-        "videoId": "Mi9lEynnVbE",
-        "timestamp": 1266,
-        "endTimestamp": 1501,
-        "note": ""
-      }
-    ]
-  },
-  {
-    "id": "song-9a9799e3",
-    "title": "Back To December",
-    "originalArtist": "Taylor Swift",
-    "tags": [],
-    "performances": [
-      {
-        "id": "p-8644d439",
-        "streamId": "stream-2025-11-30",
-        "date": "2025-11-30",
-        "streamTitle": "【月底歌回】11月的最後一天來聽歌吧！【朔Sakuro】",
-        "videoId": "Mi9lEynnVbE",
-        "timestamp": 6472,
-        "endTimestamp": 6743,
-        "note": ""
-      }
-    ]
-  },
-  {
-    "id": "song-4688818f",
-    "title": "Boyfriend",
-    "originalArtist": "Justin Bieber (小賈斯汀)",
-    "tags": [],
-    "performances": [
-      {
-        "id": "p-501c5376",
-        "streamId": "stream-2025-12-14",
-        "date": "2025-12-14",
-        "streamTitle": "【站立歌回】站著唱完整個直播！【朔Sakuro】",
-        "videoId": "U6oVkXmfrgI",
-        "timestamp": 3078,
-        "endTimestamp": 3251,
-        "note": ""
-      }
-    ]
-  },
-  {
-    "id": "song-c8baf23b",
-    "title": "Close To You",
-    "originalArtist": "Carpenters (木匠兄妹合唱團)",
-    "tags": [],
-    "performances": [
-      {
-        "id": "p-461c75e8",
-        "streamId": "stream-08669a76",
-        "date": "2025-11-23",
-        "streamTitle": "【哄睡歌回】 伴隨輕聲吟唱入睡吧！ 【朔Sakuro】",
-        "videoId": "t18t-chE1wM",
-        "timestamp": 7314,
-        "endTimestamp": 7539,
-        "note": ""
-      }
-    ]
-  },
-  {
-    "id": "song-8c997f3e",
-    "title": "Easy On Me",
-    "originalArtist": "Adele",
-    "tags": [],
-    "performances": [
-      {
-        "id": "p-58f6f82f",
+        "id": "p-082af233",
         "streamId": "stream-0b82931e",
         "date": "2026-02-01",
         "streamTitle": "【縱型歌回】貼臉唱歌給你們聽！【朔Sakuro】",
         "videoId": "Hmeugi8WS9k",
-        "timestamp": 6149,
-        "endTimestamp": 6383,
-        "note": ""
-      }
-    ]
-  },
-  {
-    "id": "song-59508475",
-    "title": "Eenie Meenie",
-    "originalArtist": "Sean Kingston & Justin Bieber",
-    "tags": [],
-    "performances": [
-      {
-        "id": "p-cc3506bf",
-        "streamId": "stream-2025-12-14",
-        "date": "2025-12-14",
-        "streamTitle": "【站立歌回】站著唱完整個直播！【朔Sakuro】",
-        "videoId": "U6oVkXmfrgI",
-        "timestamp": 2021,
-        "endTimestamp": 2184,
-        "note": ""
-      }
-    ]
-  },
-  {
-    "id": "song-26927912",
-    "title": "Everything Goes On",
-    "originalArtist": "Porter Robinson",
-    "tags": [],
-    "performances": [
-      {
-        "id": "p-059a1a99",
-        "streamId": "stream-08669a76",
-        "date": "2025-11-23",
-        "streamTitle": "【哄睡歌回】 伴隨輕聲吟唱入睡吧！ 【朔Sakuro】",
-        "videoId": "t18t-chE1wM",
-        "timestamp": 4311,
-        "endTimestamp": 4510,
-        "note": ""
-      }
-    ]
-  },
-  {
-    "id": "song-33e598a2",
-    "title": "Feliz Navidad",
-    "originalArtist": "José Feliciano (荷西費里西安諾)",
-    "tags": [],
-    "performances": [
-      {
-        "id": "p-da1f0bb4",
-        "streamId": "stream-2025-12-21",
-        "date": "2025-12-21",
-        "streamTitle": "【聖誕歌回】來唱些聖誕節的歌曲吧！【朔Sakuro】",
-        "videoId": "CizYyIizGug",
-        "timestamp": 7118,
-        "endTimestamp": 7300,
-        "note": ""
-      }
-    ]
-  },
-  {
-    "id": "song-e837174d",
-    "title": "Fly Me To The Moon",
-    "originalArtist": "Frank Sinatra",
-    "tags": [],
-    "performances": [
-      {
-        "id": "p-8c535078",
-        "streamId": "stream-2026-03-08",
-        "date": "2026-03-08",
-        "streamTitle": "【英文歌回】I Sing You Sing【朔Sakuro】",
-        "videoId": "2wxID-o2_kU",
-        "timestamp": 6513,
-        "endTimestamp": 6628,
-        "note": ""
-      }
-    ]
-  },
-  {
-    "id": "song-e4a3251f",
-    "title": "Give It to Me",
-    "originalArtist": "孫盛希 (Shi Shi)",
-    "tags": [],
-    "performances": [
-      {
-        "id": "p-402aef16",
-        "streamId": "stream-2026-01-18",
-        "date": "2026-01-18",
-        "streamTitle": "【低音歌回】老師說我要唱低一點的歌所以來了【朔Sakuro】",
-        "videoId": "SVEtS6mQFPY",
-        "timestamp": 3099,
-        "endTimestamp": 3270,
-        "note": ""
-      }
-    ]
-  },
-  {
-    "id": "song-b3a441af",
-    "title": "Good-bye Days",
-    "originalArtist": "Yui",
-    "tags": [],
-    "performances": [
-      {
-        "id": "p-6742caf0",
-        "streamId": "stream-2025-12-07",
-        "date": "2025-12-07",
-        "streamTitle": "【悲情歌回】來把傷心難過都唱出來！【朔Sakuro】",
-        "videoId": "aKuD3fvW3fY",
-        "timestamp": 7375,
-        "endTimestamp": 7558,
-        "note": ""
-      }
-    ]
-  },
-  {
-    "id": "song-e8e72e10",
-    "title": "Gotten",
-    "originalArtist": "Slash",
-    "tags": [],
-    "performances": [
-      {
-        "id": "p-0cc62e84",
-        "streamId": "stream-2025-11-30",
-        "date": "2025-11-30",
-        "streamTitle": "【月底歌回】11月的最後一天來聽歌吧！【朔Sakuro】",
-        "videoId": "Mi9lEynnVbE",
-        "timestamp": 7476,
-        "endTimestamp": 7735,
-        "note": ""
-      }
-    ]
-  },
-  {
-    "id": "song-dd3aef43",
-    "title": "HEAVEN",
-    "originalArtist": "Ailee (에일리)",
-    "tags": [],
-    "performances": [
-      {
-        "id": "p-0d772a4c",
-        "streamId": "stream-2025-11-30",
-        "date": "2025-11-30",
-        "streamTitle": "【月底歌回】11月的最後一天來聽歌吧！【朔Sakuro】",
-        "videoId": "Mi9lEynnVbE",
-        "timestamp": 5757,
-        "endTimestamp": 5992,
-        "note": ""
-      }
-    ]
-  },
-  {
-    "id": "song-9db407c7",
-    "title": "Havana",
-    "originalArtist": "Camila Cabello (哈瓦那情人 卡蜜拉)",
-    "tags": [],
-    "performances": [
-      {
-        "id": "p-746dc708",
-        "streamId": "stream-2026-01-11",
-        "date": "2026-01-11",
-        "streamTitle": "【彈唱歌回】 阿吉新年第一場表演！ 【朔Sakuro】",
-        "videoId": "IK44-KOhau0",
-        "timestamp": 6922,
-        "endTimestamp": 7170,
-        "note": ""
-      }
-    ]
-  },
-  {
-    "id": "song-3922bd1b",
-    "title": "Heavenly Days",
-    "originalArtist": "新垣結衣",
-    "tags": [],
-    "performances": [
-      {
-        "id": "p-7f181e4a",
-        "streamId": "stream-0b82931e",
-        "date": "2026-02-01",
-        "streamTitle": "【縱型歌回】貼臉唱歌給你們聽！【朔Sakuro】",
-        "videoId": "Hmeugi8WS9k",
-        "timestamp": 1126,
-        "endTimestamp": 1395,
-        "note": ""
-      }
-    ]
-  },
-  {
-    "id": "song-4b278a33",
-    "title": "Heavenly days",
-    "originalArtist": "新垣結衣",
-    "tags": [],
-    "performances": [
-      {
-        "id": "p-a2f15068",
-        "streamId": "stream-2026-01-25",
-        "date": "2026-01-25",
-        "streamTitle": "【冬日歌回】冬天冷冷的適合聽歌！【朔Sakuro】",
-        "videoId": "OrwsCyMKewY",
-        "timestamp": 4648,
-        "endTimestamp": 4919,
-        "note": ""
-      }
-    ]
-  },
-  {
-    "id": "song-a091dc84",
-    "title": "Hotline Bling",
-    "originalArtist": "Drake",
-    "tags": [],
-    "performances": [
-      {
-        "id": "p-04988e74",
-        "streamId": "stream-2026-03-08",
-        "date": "2026-03-08",
-        "streamTitle": "【英文歌回】I Sing You Sing【朔Sakuro】",
-        "videoId": "2wxID-o2_kU",
-        "timestamp": 1580,
-        "endTimestamp": 1775,
-        "note": ""
-      }
-    ]
-  },
-  {
-    "id": "song-c281c91c",
-    "title": "I Love You 3000",
-    "originalArtist": "Stephanie Poetri",
-    "tags": [],
-    "performances": [
-      {
-        "id": "p-247c3e12",
-        "streamId": "stream-e0f35849",
-        "date": "",
-        "streamTitle": "【情人節歌回】情人節特別的歌及驚喜！【朔Sakuro】",
-        "videoId": "0xT5uHGGMC0",
-        "timestamp": 8181,
-        "endTimestamp": 8500,
-        "note": ""
-      }
-    ]
-  },
-  {
-    "id": "song-23799cdc",
-    "title": "I Love You 3000",
-    "originalArtist": "Stephanie Poetri",
-    "tags": [],
-    "performances": [
-      {
-        "id": "p-4d821b9d",
-        "streamId": "stream-08669a76",
-        "date": "2025-11-23",
-        "streamTitle": "【哄睡歌回】 伴隨輕聲吟唱入睡吧！ 【朔Sakuro】",
-        "videoId": "t18t-chE1wM",
-        "timestamp": 3746,
-        "endTimestamp": 4000,
-        "note": ""
-      }
-    ]
-  },
-  {
-    "id": "song-69c96a4e",
-    "title": "I love you 3000",
-    "originalArtist": "Stephanie Poetri",
-    "tags": [],
-    "performances": [
-      {
-        "id": "p-d050977c",
-        "streamId": "stream-2026-01-18",
-        "date": "2026-01-18",
-        "streamTitle": "【低音歌回】老師說我要唱低一點的歌所以來了【朔Sakuro】",
-        "videoId": "SVEtS6mQFPY",
-        "timestamp": 4829,
-        "endTimestamp": 5038,
-        "note": ""
-      }
-    ]
-  },
-  {
-    "id": "song-2b8fbda3",
-    "title": "I love you 3000",
-    "originalArtist": "Stephanie Poetri",
-    "tags": [],
-    "performances": [
-      {
-        "id": "p-43b7fca3",
-        "streamId": "stream-2026-01-25",
-        "date": "2026-01-25",
-        "streamTitle": "【冬日歌回】冬天冷冷的適合聽歌！【朔Sakuro】",
-        "videoId": "OrwsCyMKewY",
-        "timestamp": 2805,
-        "endTimestamp": 3045,
-        "note": ""
-      }
-    ]
-  },
-  {
-    "id": "song-cbcd377e",
-    "title": "Into You",
-    "originalArtist": "Ariana Grande",
-    "tags": [],
-    "performances": [
-      {
-        "id": "p-534d0d13",
-        "streamId": "stream-2026-03-08",
-        "date": "2026-03-08",
-        "streamTitle": "【英文歌回】I Sing You Sing【朔Sakuro】",
-        "videoId": "2wxID-o2_kU",
-        "timestamp": 541,
-        "endTimestamp": 768,
-        "note": ""
-      }
-    ]
-  },
-  {
-    "id": "song-47f1b3e3",
-    "title": "Letting Go",
-    "originalArtist": "蔡健雅 (Tanya Chua)",
-    "tags": [],
-    "performances": [
-      {
-        "id": "p-fbca6813",
-        "streamId": "stream-2026-01-25",
-        "date": "2026-01-25",
-        "streamTitle": "【冬日歌回】冬天冷冷的適合聽歌！【朔Sakuro】",
-        "videoId": "OrwsCyMKewY",
-        "timestamp": 6816,
-        "endTimestamp": 7042,
-        "note": ""
-      }
-    ]
-  },
-  {
-    "id": "song-5eebbc1a",
-    "title": "Love Me Like You Do",
-    "originalArtist": "Ellie Goulding",
-    "tags": [],
-    "performances": [
-      {
-        "id": "p-21e6a3fc",
-        "streamId": "stream-2026-03-08",
-        "date": "2026-03-08",
-        "streamTitle": "【英文歌回】I Sing You Sing【朔Sakuro】",
-        "videoId": "2wxID-o2_kU",
-        "timestamp": 2669,
-        "endTimestamp": 2869,
-        "note": ""
-      }
-    ]
-  },
-  {
-    "id": "song-71777b0f",
-    "title": "Love Story",
-    "originalArtist": "Taylor Swift (泰勒絲)",
-    "tags": [],
-    "performances": [
-      {
-        "id": "p-0a7c40d1",
-        "streamId": "stream-2025-11-30",
-        "date": "2025-11-30",
-        "streamTitle": "【月底歌回】11月的最後一天來聽歌吧！【朔Sakuro】",
-        "videoId": "Mi9lEynnVbE",
-        "timestamp": 3169,
-        "endTimestamp": 3390,
-        "note": ""
-      }
-    ]
-  },
-  {
-    "id": "song-64a5cef0",
-    "title": "Love Yourself",
-    "originalArtist": "Justin Bieber",
-    "tags": [],
-    "performances": [
-      {
-        "id": "p-a8c351b8",
-        "streamId": "stream-d0080c2a",
-        "date": "2026-03-01",
-        "streamTitle": "【哄睡歌回】睡不著的這邊請！【朔Sakuro】",
-        "videoId": "ybC0KHGXjaA",
-        "timestamp": 5444,
-        "endTimestamp": 5678,
-        "note": ""
-      }
-    ]
-  },
-  {
-    "id": "song-76c0298c",
-    "title": "Marry Me",
-    "originalArtist": "Jason Derulo",
-    "tags": [],
-    "performances": [
-      {
-        "id": "p-3d4b0cff",
-        "streamId": "stream-2026-03-08",
-        "date": "2026-03-08",
-        "streamTitle": "【英文歌回】I Sing You Sing【朔Sakuro】",
-        "videoId": "2wxID-o2_kU",
-        "timestamp": 3271,
-        "endTimestamp": 3512,
-        "note": ""
-      }
-    ]
-  },
-  {
-    "id": "song-a271993d",
-    "title": "Mistletoe",
-    "originalArtist": "Justin Bieber",
-    "tags": [],
-    "performances": [
-      {
-        "id": "p-b46c75d3",
-        "streamId": "stream-2025-12-21",
-        "date": "2025-12-21",
-        "streamTitle": "【聖誕歌回】來唱些聖誕節的歌曲吧！【朔Sakuro】",
-        "videoId": "CizYyIizGug",
-        "timestamp": 2065,
-        "endTimestamp": 2247,
-        "note": ""
-      }
-    ]
-  },
-  {
-    "id": "song-21d7acdf",
-    "title": "Paradise Island",
-    "originalArtist": "ØZI",
-    "tags": [],
-    "performances": [
-      {
-        "id": "p-536bbd8e",
-        "streamId": "stream-c46886e2",
-        "date": "2026-02-08",
-        "streamTitle": "【彈唱歌回】用彈唱來療癒你的週末！【朔Sakuro】",
-        "videoId": "Ck-5ls8cwTQ",
-        "timestamp": 4068,
-        "endTimestamp": 4305,
-        "note": ""
-      }
-    ]
-  },
-  {
-    "id": "song-fd99128d",
-    "title": "Paradise Island",
-    "originalArtist": "ØZI",
-    "tags": [],
-    "performances": [
-      {
-        "id": "p-beba6e5f",
-        "streamId": "stream-08669a76",
-        "date": "2025-11-23",
-        "streamTitle": "【哄睡歌回】 伴隨輕聲吟唱入睡吧！ 【朔Sakuro】",
-        "videoId": "t18t-chE1wM",
-        "timestamp": 5455,
-        "endTimestamp": 5661,
-        "note": ""
-      }
-    ]
-  },
-  {
-    "id": "song-f5803ab8",
-    "title": "STAY",
-    "originalArtist": "The Kid LAROI, Justin Bieber",
-    "tags": [],
-    "performances": [
-      {
-        "id": "p-a48fe460",
-        "streamId": "stream-2026-03-08",
-        "date": "2026-03-08",
-        "streamTitle": "【英文歌回】I Sing You Sing【朔Sakuro】",
-        "videoId": "2wxID-o2_kU",
-        "timestamp": 4403,
-        "endTimestamp": 4560,
-        "note": ""
-      }
-    ]
-  },
-  {
-    "id": "song-4dc8fe0e",
-    "title": "Santa Claus Is Coming to Town",
-    "originalArtist": "Michael Bublé",
-    "tags": [],
-    "performances": [
-      {
-        "id": "p-66cc809a",
-        "streamId": "stream-2025-12-21",
-        "date": "2025-12-21",
-        "streamTitle": "【聖誕歌回】來唱些聖誕節的歌曲吧！【朔Sakuro】",
-        "videoId": "CizYyIizGug",
-        "timestamp": 660,
-        "endTimestamp": 832,
-        "note": ""
-      }
-    ]
-  },
-  {
-    "id": "song-3f56c00b",
-    "title": "Skyscraper",
-    "originalArtist": "Demi Lovato (黛咪洛瓦特)",
-    "tags": [],
-    "performances": [
-      {
-        "id": "p-26d3978e",
-        "streamId": "stream-2025-12-07",
-        "date": "2025-12-07",
-        "streamTitle": "【悲情歌回】來把傷心難過都唱出來！【朔Sakuro】",
-        "videoId": "aKuD3fvW3fY",
-        "timestamp": 4164,
-        "endTimestamp": 4382,
-        "note": ""
-      }
-    ]
-  },
-  {
-    "id": "song-08b95712",
-    "title": "So Sick",
-    "originalArtist": "Ne-Yo (尼歐)",
-    "tags": [],
-    "performances": [
-      {
-        "id": "p-26b2d9df",
-        "streamId": "stream-d0080c2a",
-        "date": "2026-03-01",
-        "streamTitle": "【哄睡歌回】睡不著的這邊請！【朔Sakuro】",
-        "videoId": "ybC0KHGXjaA",
-        "timestamp": 6286,
-        "endTimestamp": 6493,
-        "note": ""
-      }
-    ]
-  },
-  {
-    "id": "song-0fafd4a8",
-    "title": "Somebody That I Used To Know",
-    "originalArtist": "Gotye",
-    "tags": [],
-    "performances": [
-      {
-        "id": "p-3f81e285",
-        "streamId": "stream-2026-03-08",
-        "date": "2026-03-08",
-        "streamTitle": "【英文歌回】I Sing You Sing【朔Sakuro】",
-        "videoId": "2wxID-o2_kU",
-        "timestamp": 5847,
-        "endTimestamp": 6090,
-        "note": ""
-      }
-    ]
-  },
-  {
-    "id": "song-d08574b1",
-    "title": "Someone Like You",
-    "originalArtist": "Adele (愛黛兒)",
-    "tags": [],
-    "performances": [
-      {
-        "id": "p-721a6b6b",
-        "streamId": "stream-c46886e2",
-        "date": "2026-02-08",
-        "streamTitle": "【彈唱歌回】用彈唱來療癒你的週末！【朔Sakuro】",
-        "videoId": "Ck-5ls8cwTQ",
-        "timestamp": 5887,
-        "endTimestamp": 6171,
-        "note": ""
-      }
-    ]
-  },
-  {
-    "id": "song-8b36cb5f",
-    "title": "Stay",
-    "originalArtist": "Zedd, Alessia Cara",
-    "tags": [],
-    "performances": [
-      {
-        "id": "p-7e622f16",
-        "streamId": "stream-2026-03-08",
-        "date": "2026-03-08",
-        "streamTitle": "【英文歌回】I Sing You Sing【朔Sakuro】",
-        "videoId": "2wxID-o2_kU",
-        "timestamp": 5417,
-        "endTimestamp": 4560,
-        "note": ""
-      }
-    ]
-  },
-  {
-    "id": "song-60ad905b",
-    "title": "WANTCHU",
-    "originalArtist": "keshi",
-    "tags": [],
-    "performances": [
-      {
-        "id": "p-81486936",
-        "streamId": "stream-2025-12-14",
-        "date": "2025-12-14",
-        "streamTitle": "【站立歌回】站著唱完整個直播！【朔Sakuro】",
-        "videoId": "U6oVkXmfrgI",
-        "timestamp": 622,
-        "endTimestamp": 821,
-        "note": ""
-      }
-    ]
-  },
-  {
-    "id": "song-73515f2c",
-    "title": "What About Me",
-    "originalArtist": "Emily Osment",
-    "tags": [],
-    "performances": [
-      {
-        "id": "p-92e9a375",
-        "streamId": "stream-c46886e2",
-        "date": "2026-02-08",
-        "streamTitle": "【彈唱歌回】用彈唱來療癒你的週末！【朔Sakuro】",
-        "videoId": "Ck-5ls8cwTQ",
-        "timestamp": 6680,
-        "endTimestamp": 6923,
-        "note": ""
-      }
-    ]
-  },
-  {
-    "id": "song-88effa0b",
-    "title": "When You're Gone",
-    "originalArtist": "Avril Lavigne",
-    "tags": [],
-    "performances": [
-      {
-        "id": "p-5abd964b",
-        "streamId": "stream-2025-11-30",
-        "date": "2025-11-30",
-        "streamTitle": "【月底歌回】11月的最後一天來聽歌吧！【朔Sakuro】",
-        "videoId": "Mi9lEynnVbE",
-        "timestamp": 166,
-        "endTimestamp": 401,
-        "note": ""
-      }
-    ]
-  },
-  {
-    "id": "song-c6f03241",
-    "title": "Wide Awake",
-    "originalArtist": "Katy Perry",
-    "tags": [],
-    "performances": [
-      {
-        "id": "p-d62b386a",
-        "streamId": "stream-0b82931e",
-        "date": "2026-02-01",
-        "streamTitle": "【縱型歌回】貼臉唱歌給你們聽！【朔Sakuro】",
-        "videoId": "Hmeugi8WS9k",
-        "timestamp": 5643,
-        "endTimestamp": 5860,
-        "note": ""
-      }
-    ]
-  },
-  {
-    "id": "song-155ba1b7",
-    "title": "You And Me",
-    "originalArtist": "Lifehouse",
-    "tags": [],
-    "performances": [
-      {
-        "id": "p-159f1df2",
-        "streamId": "stream-2025-12-07",
-        "date": "2025-12-07",
-        "streamTitle": "【悲情歌回】來把傷心難過都唱出來！【朔Sakuro】",
-        "videoId": "aKuD3fvW3fY",
-        "timestamp": 3296,
-        "endTimestamp": 3491,
-        "note": ""
-      }
-    ]
-  },
-  {
-    "id": "song-d479cdc8",
-    "title": "beside you(找不到key版)",
-    "originalArtist": "keshi",
-    "tags": [],
-    "performances": [
-      {
-        "id": "p-8cf9f989",
-        "streamId": "stream-c46886e2",
-        "date": "2026-02-08",
-        "streamTitle": "【彈唱歌回】用彈唱來療癒你的週末！【朔Sakuro】",
-        "videoId": "Ck-5ls8cwTQ",
-        "timestamp": 7120,
-        "endTimestamp": 7390,
-        "note": ""
-      }
-    ]
-  },
-  {
-    "id": "song-e1caa96e",
-    "title": "beside you(補唱忘記的)",
-    "originalArtist": "keshi",
-    "tags": [],
-    "performances": [
-      {
-        "id": "p-89c41eda",
-        "streamId": "stream-c46886e2",
-        "date": "2026-02-08",
-        "streamTitle": "【彈唱歌回】用彈唱來療癒你的週末！【朔Sakuro】",
-        "videoId": "Ck-5ls8cwTQ",
-        "timestamp": 7693,
-        "endTimestamp": 7781,
-        "note": ""
-      }
-    ]
-  },
-  {
-    "id": "song-f69ebff4",
-    "title": "goodbye",
-    "originalArtist": "清水翔太",
-    "tags": [],
-    "performances": [
-      {
-        "id": "p-93eece9e",
-        "streamId": "stream-0b82931e",
-        "date": "2026-02-01",
-        "streamTitle": "【縱型歌回】貼臉唱歌給你們聽！【朔Sakuro】",
-        "videoId": "Hmeugi8WS9k",
-        "timestamp": 4031,
-        "endTimestamp": 4382,
+        "timestamp": 2002,
+        "endTimestamp": 2273,
         "note": ""
       }
     ]
@@ -828,235 +36,73 @@
     ]
   },
   {
-    "id": "song-3693e66b",
-    "title": "thank u, next",
-    "originalArtist": "Ariana Grande",
+    "id": "song-08b95712",
+    "title": "So Sick",
+    "originalArtist": "Ne-Yo (尼歐)",
     "tags": [],
     "performances": [
       {
-        "id": "p-dadf27f1",
+        "id": "p-26b2d9df",
         "streamId": "stream-d0080c2a",
         "date": "2026-03-01",
         "streamTitle": "【哄睡歌回】睡不著的這邊請！【朔Sakuro】",
         "videoId": "ybC0KHGXjaA",
-        "timestamp": 6869,
-        "endTimestamp": 7051,
+        "timestamp": 6286,
+        "endTimestamp": 6493,
         "note": ""
       }
     ]
   },
   {
-    "id": "song-825b534c",
-    "title": "ドライフラワー",
-    "originalArtist": "優里",
+    "id": "song-0c85e008",
+    "title": "只有副歌的新歌",
+    "originalArtist": "朔Sakuro",
     "tags": [],
     "performances": [
       {
-        "id": "p-d3e99dc4",
-        "streamId": "stream-2026-01-11",
-        "date": "2026-01-11",
-        "streamTitle": "【彈唱歌回】 阿吉新年第一場表演！ 【朔Sakuro】",
-        "videoId": "IK44-KOhau0",
-        "timestamp": 5420,
-        "endTimestamp": 5829,
-        "note": ""
-      }
-    ]
-  },
-  {
-    "id": "song-9ca9bfde",
-    "title": "ドライフラワー",
-    "originalArtist": "優里",
-    "tags": [],
-    "performances": [
-      {
-        "id": "p-e30f7f34",
-        "streamId": "stream-2025-12-07",
-        "date": "2025-12-07",
-        "streamTitle": "【悲情歌回】來把傷心難過都唱出來！【朔Sakuro】",
-        "videoId": "aKuD3fvW3fY",
-        "timestamp": 6751,
-        "endTimestamp": 7015,
-        "note": ""
-      }
-    ]
-  },
-  {
-    "id": "song-e79d22fe",
-    "title": "ハレンチ",
-    "originalArtist": "ちゃんみな",
-    "tags": [],
-    "performances": [
-      {
-        "id": "p-c11f8832",
+        "id": "p-845b7e89",
         "streamId": "stream-2026-01-18",
         "date": "2026-01-18",
         "streamTitle": "【低音歌回】老師說我要唱低一點的歌所以來了【朔Sakuro】",
         "videoId": "SVEtS6mQFPY",
-        "timestamp": 7367,
-        "endTimestamp": 7391,
+        "timestamp": 1512,
+        "endTimestamp": 1561,
         "note": ""
       }
     ]
   },
   {
-    "id": "song-9c15881f",
-    "title": "ハレンチ",
-    "originalArtist": "ちゃんみな",
+    "id": "song-0eda6e2c",
+    "title": "阿拉斯加海灣",
+    "originalArtist": "菲道爾 (Firdhaus)",
     "tags": [],
     "performances": [
       {
-        "id": "p-ad52c99b",
+        "id": "p-221183ef",
         "streamId": "stream-2026-01-18",
         "date": "2026-01-18",
         "streamTitle": "【低音歌回】老師說我要唱低一點的歌所以來了【朔Sakuro】",
         "videoId": "SVEtS6mQFPY",
-        "timestamp": 7541,
-        "endTimestamp": 7578,
+        "timestamp": 6223,
+        "endTimestamp": 6456,
         "note": ""
       }
     ]
   },
   {
-    "id": "song-da6c7911",
-    "title": "ハレンチ",
-    "originalArtist": "ちゃんみな",
+    "id": "song-0fafd4a8",
+    "title": "Somebody That I Used To Know",
+    "originalArtist": "Gotye",
     "tags": [],
     "performances": [
       {
-        "id": "p-848e4c6e",
-        "streamId": "stream-2026-01-18",
-        "date": "2026-01-18",
-        "streamTitle": "【低音歌回】老師說我要唱低一點的歌所以來了【朔Sakuro】",
-        "videoId": "SVEtS6mQFPY",
-        "timestamp": 7731,
-        "endTimestamp": 7771,
-        "note": ""
-      }
-    ]
-  },
-  {
-    "id": "song-159cea8b",
-    "title": "ベテルギウス",
-    "originalArtist": "優里",
-    "tags": [],
-    "performances": [
-      {
-        "id": "p-f625a05c",
-        "streamId": "stream-2025-11-30",
-        "date": "2025-11-30",
-        "streamTitle": "【月底歌回】11月的最後一天來聽歌吧！【朔Sakuro】",
-        "videoId": "Mi9lEynnVbE",
-        "timestamp": 2015,
-        "endTimestamp": 2244,
-        "note": ""
-      }
-    ]
-  },
-  {
-    "id": "song-58150868",
-    "title": "ユキコイ",
-    "originalArtist": "當山みれい",
-    "tags": [],
-    "performances": [
-      {
-        "id": "p-003f966f",
-        "streamId": "stream-2026-01-25",
-        "date": "2026-01-25",
-        "streamTitle": "【冬日歌回】冬天冷冷的適合聽歌！【朔Sakuro】",
-        "videoId": "OrwsCyMKewY",
-        "timestamp": 3615,
-        "endTimestamp": 3860,
-        "note": ""
-      }
-    ]
-  },
-  {
-    "id": "song-77a7f7ef",
-    "title": "一點點",
-    "originalArtist": "周杰倫 (Jay Chou)",
-    "tags": [],
-    "performances": [
-      {
-        "id": "p-8a7e7c6b",
-        "streamId": "stream-d0080c2a",
-        "date": "2026-03-01",
-        "streamTitle": "【哄睡歌回】睡不著的這邊請！【朔Sakuro】",
-        "videoId": "ybC0KHGXjaA",
-        "timestamp": 3764,
-        "endTimestamp": 3986,
-        "note": ""
-      }
-    ]
-  },
-  {
-    "id": "song-e39f9cc7",
-    "title": "不在一起就不會分開",
-    "originalArtist": "洪佩瑜",
-    "tags": [],
-    "performances": [
-      {
-        "id": "p-c0617506",
-        "streamId": "stream-2026-01-25",
-        "date": "2026-01-25",
-        "streamTitle": "【冬日歌回】冬天冷冷的適合聽歌！【朔Sakuro】",
-        "videoId": "OrwsCyMKewY",
-        "timestamp": 5221,
-        "endTimestamp": 5485,
-        "note": ""
-      }
-    ]
-  },
-  {
-    "id": "song-da63eedd",
-    "title": "不是因為天氣晴朗才愛你",
-    "originalArtist": "理想混蛋 (Bestards)",
-    "tags": [],
-    "performances": [
-      {
-        "id": "p-ca3577af",
-        "streamId": "stream-e0f35849",
-        "date": "",
-        "streamTitle": "【情人節歌回】情人節特別的歌及驚喜！【朔Sakuro】",
-        "videoId": "0xT5uHGGMC0",
-        "timestamp": 245,
-        "endTimestamp": 500,
-        "note": ""
-      }
-    ]
-  },
-  {
-    "id": "song-9792b1ec",
-    "title": "不是因為天氣晴朗才愛你",
-    "originalArtist": "理想混蛋 (Bestards)",
-    "tags": [],
-    "performances": [
-      {
-        "id": "p-fb02d438",
-        "streamId": "stream-08669a76",
-        "date": "2025-11-23",
-        "streamTitle": "【哄睡歌回】 伴隨輕聲吟唱入睡吧！ 【朔Sakuro】",
-        "videoId": "t18t-chE1wM",
-        "timestamp": 2732,
-        "endTimestamp": 2962,
-        "note": ""
-      }
-    ]
-  },
-  {
-    "id": "song-f551ea18",
-    "title": "你是不是有點動心",
-    "originalArtist": "吳卓源",
-    "tags": [],
-    "performances": [
-      {
-        "id": "p-eeb958be",
-        "streamId": "stream-0b82931e",
-        "date": "2026-02-01",
-        "streamTitle": "【縱型歌回】貼臉唱歌給你們聽！【朔Sakuro】",
-        "videoId": "Hmeugi8WS9k",
-        "timestamp": 5028,
-        "endTimestamp": 5295,
+        "id": "p-3f81e285",
+        "streamId": "stream-2026-03-08",
+        "date": "2026-03-08",
+        "streamTitle": "【英文歌回】I Sing You Sing【朔Sakuro】",
+        "videoId": "2wxID-o2_kU",
+        "timestamp": 5847,
+        "endTimestamp": 6090,
         "note": ""
       }
     ]
@@ -1098,757 +144,19 @@
     ]
   },
   {
-    "id": "song-d24c3b2c",
-    "title": "像晴天像雨天",
-    "originalArtist": "汪蘇瀧",
+    "id": "song-155ba1b7",
+    "title": "You And Me",
+    "originalArtist": "Lifehouse",
     "tags": [],
     "performances": [
       {
-        "id": "p-55bb1866",
-        "streamId": "stream-e0f35849",
-        "date": "",
-        "streamTitle": "【情人節歌回】情人節特別的歌及驚喜！【朔Sakuro】",
-        "videoId": "0xT5uHGGMC0",
-        "timestamp": 655,
-        "endTimestamp": 905,
-        "note": ""
-      }
-    ]
-  },
-  {
-    "id": "song-a7c1c8db",
-    "title": "像晴天像雨天",
-    "originalArtist": "汪蘇瀧",
-    "tags": [],
-    "performances": [
-      {
-        "id": "p-9a88a933",
-        "streamId": "stream-0b82931e",
-        "date": "2026-02-01",
-        "streamTitle": "【縱型歌回】貼臉唱歌給你們聽！【朔Sakuro】",
-        "videoId": "Hmeugi8WS9k",
-        "timestamp": 3012,
-        "endTimestamp": 3252,
-        "note": ""
-      }
-    ]
-  },
-  {
-    "id": "song-9da73da4",
-    "title": "像晴天像雨天(半)",
-    "originalArtist": "汪蘇瀧 (Silence Wang)",
-    "tags": [],
-    "performances": [
-      {
-        "id": "p-ec3b3de9",
-        "streamId": "stream-2026-01-11",
-        "date": "2026-01-11",
-        "streamTitle": "【彈唱歌回】 阿吉新年第一場表演！ 【朔Sakuro】",
-        "videoId": "IK44-KOhau0",
-        "timestamp": 2459,
-        "endTimestamp": 2645,
-        "note": ""
-      }
-    ]
-  },
-  {
-    "id": "song-89bd956b",
-    "title": "光年之外",
-    "originalArtist": "G.E.M. 鄧紫棋",
-    "tags": [],
-    "performances": [
-      {
-        "id": "p-e8f61ec7",
-        "streamId": "stream-c46886e2",
-        "date": "2026-02-08",
-        "streamTitle": "【彈唱歌回】用彈唱來療癒你的週末！【朔Sakuro】",
-        "videoId": "Ck-5ls8cwTQ",
-        "timestamp": 2279,
-        "endTimestamp": 2519,
-        "note": ""
-      }
-    ]
-  },
-  {
-    "id": "song-65ce72ee",
-    "title": "刻在我心底的名字",
-    "originalArtist": "盧廣仲 (Crowd Lu)",
-    "tags": [],
-    "performances": [
-      {
-        "id": "p-8e5ea0dd",
-        "streamId": "stream-2026-01-11",
-        "date": "2026-01-11",
-        "streamTitle": "【彈唱歌回】 阿吉新年第一場表演！ 【朔Sakuro】",
-        "videoId": "IK44-KOhau0",
-        "timestamp": 6150,
-        "endTimestamp": 6455,
-        "note": ""
-      }
-    ]
-  },
-  {
-    "id": "song-0c85e008",
-    "title": "只有副歌的新歌",
-    "originalArtist": "朔Sakuro",
-    "tags": [],
-    "performances": [
-      {
-        "id": "p-845b7e89",
-        "streamId": "stream-2026-01-18",
-        "date": "2026-01-18",
-        "streamTitle": "【低音歌回】老師說我要唱低一點的歌所以來了【朔Sakuro】",
-        "videoId": "SVEtS6mQFPY",
-        "timestamp": 1512,
-        "endTimestamp": 1561,
-        "note": ""
-      }
-    ]
-  },
-  {
-    "id": "song-fe284a1b",
-    "title": "只有副歌的新歌",
-    "originalArtist": "朔Sakuro",
-    "tags": [],
-    "performances": [
-      {
-        "id": "p-f553e74c",
-        "streamId": "stream-2026-01-18",
-        "date": "2026-01-18",
-        "streamTitle": "【低音歌回】老師說我要唱低一點的歌所以來了【朔Sakuro】",
-        "videoId": "SVEtS6mQFPY",
-        "timestamp": 1632,
-        "endTimestamp": 1752,
-        "note": ""
-      }
-    ]
-  },
-  {
-    "id": "song-7c26681e",
-    "title": "叮叮噹 最喜歡你啦",
-    "originalArtist": "朔Sakuro",
-    "tags": [],
-    "performances": [
-      {
-        "id": "p-cb705198",
-        "streamId": "stream-2025-12-21",
-        "date": "2025-12-21",
-        "streamTitle": "【聖誕歌回】來唱些聖誕節的歌曲吧！【朔Sakuro】",
-        "videoId": "CizYyIizGug",
-        "timestamp": 5728,
-        "endTimestamp": 5942,
-        "note": ""
-      }
-    ]
-  },
-  {
-    "id": "song-6f15bcab",
-    "title": "告白",
-    "originalArtist": "蔡黃汝 (Flo)",
-    "tags": [],
-    "performances": [
-      {
-        "id": "p-d299dff8",
-        "streamId": "stream-e0f35849",
-        "date": "",
-        "streamTitle": "【情人節歌回】情人節特別的歌及驚喜！【朔Sakuro】",
-        "videoId": "0xT5uHGGMC0",
-        "timestamp": 4188,
-        "endTimestamp": 4390,
-        "note": ""
-      }
-    ]
-  },
-  {
-    "id": "song-1c5908cc",
-    "title": "在夜裡跳舞",
-    "originalArtist": "單依純",
-    "tags": [],
-    "performances": [
-      {
-        "id": "p-ca569242",
-        "streamId": "stream-2026-01-11",
-        "date": "2026-01-11",
-        "streamTitle": "【彈唱歌回】 阿吉新年第一場表演！ 【朔Sakuro】",
-        "videoId": "IK44-KOhau0",
-        "timestamp": 1668,
-        "endTimestamp": 1925,
-        "note": ""
-      }
-    ]
-  },
-  {
-    "id": "song-02cf3ebd",
-    "title": "夏夢",
-    "originalArtist": "汐Seki",
-    "tags": [],
-    "performances": [
-      {
-        "id": "p-082af233",
-        "streamId": "stream-0b82931e",
-        "date": "2026-02-01",
-        "streamTitle": "【縱型歌回】貼臉唱歌給你們聽！【朔Sakuro】",
-        "videoId": "Hmeugi8WS9k",
-        "timestamp": 2002,
-        "endTimestamp": 2273,
-        "note": ""
-      }
-    ]
-  },
-  {
-    "id": "song-2b93fb06",
-    "title": "好想你",
-    "originalArtist": "朱主愛 (Joyce Chu)",
-    "tags": [],
-    "performances": [
-      {
-        "id": "p-dbc20918",
-        "streamId": "stream-d0080c2a",
-        "date": "2026-03-01",
-        "streamTitle": "【哄睡歌回】睡不著的這邊請！【朔Sakuro】",
-        "videoId": "ybC0KHGXjaA",
-        "timestamp": 3177,
-        "endTimestamp": 3335,
-        "note": ""
-      }
-    ]
-  },
-  {
-    "id": "song-89e706f8",
-    "title": "子午聖誕禮物",
-    "originalArtist": "#子午聖誕接力",
-    "tags": [],
-    "performances": [
-      {
-        "id": "p-1e639689",
-        "streamId": "stream-2025-12-21",
-        "date": "2025-12-21",
-        "streamTitle": "【聖誕歌回】來唱些聖誕節的歌曲吧！【朔Sakuro】",
-        "videoId": "CizYyIizGug",
-        "timestamp": 2408,
-        "endTimestamp": 2502,
-        "note": ""
-      }
-    ]
-  },
-  {
-    "id": "song-20a94e77",
-    "title": "子午聖誕禮物(日文版)",
-    "originalArtist": "#子午聖誕接力",
-    "tags": [],
-    "performances": [
-      {
-        "id": "p-80dd858e",
-        "streamId": "stream-2025-12-21",
-        "date": "2025-12-21",
-        "streamTitle": "【聖誕歌回】來唱些聖誕節的歌曲吧！【朔Sakuro】",
-        "videoId": "CizYyIizGug",
-        "timestamp": 8629,
-        "endTimestamp": 8724,
-        "note": ""
-      }
-    ]
-  },
-  {
-    "id": "song-32773037",
-    "title": "子午聖誕禮物(英文版)",
-    "originalArtist": "#子午聖誕接力",
-    "tags": [],
-    "performances": [
-      {
-        "id": "p-56c1964f",
-        "streamId": "stream-2025-12-21",
-        "date": "2025-12-21",
-        "streamTitle": "【聖誕歌回】來唱些聖誕節的歌曲吧！【朔Sakuro】",
-        "videoId": "CizYyIizGug",
-        "timestamp": 8781,
-        "endTimestamp": 8875,
-        "note": ""
-      }
-    ]
-  },
-  {
-    "id": "song-9ae00703",
-    "title": "子午聖誕禮物(韓文版)",
-    "originalArtist": "#子午聖誕接力",
-    "tags": [],
-    "performances": [
-      {
-        "id": "p-b68cb62a",
-        "streamId": "stream-2025-12-21",
-        "date": "2025-12-21",
-        "streamTitle": "【聖誕歌回】來唱些聖誕節的歌曲吧！【朔Sakuro】",
-        "videoId": "CizYyIizGug",
-        "timestamp": 8468,
-        "endTimestamp": 8566,
-        "note": ""
-      }
-    ]
-  },
-  {
-    "id": "song-ef6fbd41",
-    "title": "安全感",
-    "originalArtist": "王力宏 (Wang Leehom)",
-    "tags": [],
-    "performances": [
-      {
-        "id": "p-f4c15e70",
-        "streamId": "stream-c46886e2",
-        "date": "2026-02-08",
-        "streamTitle": "【彈唱歌回】用彈唱來療癒你的週末！【朔Sakuro】",
-        "videoId": "Ck-5ls8cwTQ",
-        "timestamp": 3240,
-        "endTimestamp": 3485,
-        "note": ""
-      }
-    ]
-  },
-  {
-    "id": "song-956c80a3",
-    "title": "左邊的人",
-    "originalArtist": "陳華",
-    "tags": [],
-    "performances": [
-      {
-        "id": "p-561e867c",
-        "streamId": "stream-08669a76",
-        "date": "2025-11-23",
-        "streamTitle": "【哄睡歌回】 伴隨輕聲吟唱入睡吧！ 【朔Sakuro】",
-        "videoId": "t18t-chE1wM",
-        "timestamp": 856,
-        "endTimestamp": 1066,
-        "note": ""
-      }
-    ]
-  },
-  {
-    "id": "song-3cbb79f1",
-    "title": "希望你回來",
-    "originalArtist": "TRASH",
-    "tags": [],
-    "performances": [
-      {
-        "id": "p-bf513370",
+        "id": "p-159f1df2",
         "streamId": "stream-2025-12-07",
         "date": "2025-12-07",
         "streamTitle": "【悲情歌回】來把傷心難過都唱出來！【朔Sakuro】",
         "videoId": "aKuD3fvW3fY",
-        "timestamp": 7898,
-        "endTimestamp": 8279,
-        "note": ""
-      }
-    ]
-  },
-  {
-    "id": "song-3a85213c",
-    "title": "恆溫",
-    "originalArtist": "孫盛希 (Shi Shi)",
-    "tags": [],
-    "performances": [
-      {
-        "id": "p-2ff9450f",
-        "streamId": "stream-08669a76",
-        "date": "2025-11-23",
-        "streamTitle": "【哄睡歌回】 伴隨輕聲吟唱入睡吧！ 【朔Sakuro】",
-        "videoId": "t18t-chE1wM",
-        "timestamp": 1843,
-        "endTimestamp": 2125,
-        "note": ""
-      }
-    ]
-  },
-  {
-    "id": "song-2e43ea15",
-    "title": "惡作劇",
-    "originalArtist": "王藍茵",
-    "tags": [],
-    "performances": [
-      {
-        "id": "p-6d372619",
-        "streamId": "stream-e0f35849",
-        "date": "",
-        "streamTitle": "【情人節歌回】情人節特別的歌及驚喜！【朔Sakuro】",
-        "videoId": "0xT5uHGGMC0",
-        "timestamp": 6274,
-        "endTimestamp": 6507,
-        "note": ""
-      }
-    ]
-  },
-  {
-    "id": "song-d2e82402",
-    "title": "想和你看五月的晚霞",
-    "originalArtist": "陳華",
-    "tags": [],
-    "performances": [
-      {
-        "id": "p-f3bd50d4",
-        "streamId": "stream-2026-01-11",
-        "date": "2026-01-11",
-        "streamTitle": "【彈唱歌回】 阿吉新年第一場表演！ 【朔Sakuro】",
-        "videoId": "IK44-KOhau0",
-        "timestamp": 1138,
-        "endTimestamp": 1348,
-        "note": ""
-      }
-    ]
-  },
-  {
-    "id": "song-57dbf3ae",
-    "title": "愛♡スクリーム！",
-    "originalArtist": "AiScReam",
-    "tags": [],
-    "performances": [
-      {
-        "id": "p-04da797f",
-        "streamId": "stream-2026-01-18",
-        "date": "2026-01-18",
-        "streamTitle": "【低音歌回】老師說我要唱低一點的歌所以來了【朔Sakuro】",
-        "videoId": "SVEtS6mQFPY",
-        "timestamp": 3681,
-        "endTimestamp": 3937,
-        "note": ""
-      }
-    ]
-  },
-  {
-    "id": "song-d72afbe5",
-    "title": "我喜歡你",
-    "originalArtist": "洪安妮",
-    "tags": [],
-    "performances": [
-      {
-        "id": "p-824ea389",
-        "streamId": "stream-d0080c2a",
-        "date": "2026-03-01",
-        "streamTitle": "【哄睡歌回】睡不著的這邊請！【朔Sakuro】",
-        "videoId": "ybC0KHGXjaA",
-        "timestamp": 8170,
-        "endTimestamp": 8417,
-        "note": ""
-      }
-    ]
-  },
-  {
-    "id": "song-4cb8de1d",
-    "title": "我喜歡你",
-    "originalArtist": "洪安妮",
-    "tags": [],
-    "performances": [
-      {
-        "id": "p-3decb071",
-        "streamId": "stream-e0f35849",
-        "date": "",
-        "streamTitle": "【情人節歌回】情人節特別的歌及驚喜！【朔Sakuro】",
-        "videoId": "0xT5uHGGMC0",
-        "timestamp": 905,
-        "endTimestamp": 1230,
-        "note": ""
-      }
-    ]
-  },
-  {
-    "id": "song-367274bb",
-    "title": "我喜歡你",
-    "originalArtist": "洪安妮",
-    "tags": [],
-    "performances": [
-      {
-        "id": "p-4b42afed",
-        "streamId": "stream-2026-01-11",
-        "date": "2026-01-11",
-        "streamTitle": "【彈唱歌回】 阿吉新年第一場表演！ 【朔Sakuro】",
-        "videoId": "IK44-KOhau0",
-        "timestamp": 4311,
-        "endTimestamp": 4558,
-        "note": ""
-      }
-    ]
-  },
-  {
-    "id": "song-f878026e",
-    "title": "我好想你",
-    "originalArtist": "蘇打綠 (sodagreen)",
-    "tags": [],
-    "performances": [
-      {
-        "id": "p-5788cb2c",
-        "streamId": "stream-2026-01-25",
-        "date": "2026-01-25",
-        "streamTitle": "【冬日歌回】冬天冷冷的適合聽歌！【朔Sakuro】",
-        "videoId": "OrwsCyMKewY",
-        "timestamp": 2132,
-        "endTimestamp": 2438,
-        "note": ""
-      }
-    ]
-  },
-  {
-    "id": "song-e7af3336",
-    "title": "我當你空氣",
-    "originalArtist": "旺福 (Wonfu)",
-    "tags": [],
-    "performances": [
-      {
-        "id": "p-ec7cf293",
-        "streamId": "stream-e0f35849",
-        "date": "",
-        "streamTitle": "【情人節歌回】情人節特別的歌及驚喜！【朔Sakuro】",
-        "videoId": "0xT5uHGGMC0",
-        "timestamp": 4657,
-        "endTimestamp": 4892,
-        "note": ""
-      }
-    ]
-  },
-  {
-    "id": "song-a2d9268d",
-    "title": "我的女人",
-    "originalArtist": "小賤",
-    "tags": [],
-    "performances": [
-      {
-        "id": "p-1fe0e848",
-        "streamId": "stream-0b82931e",
-        "date": "2026-02-01",
-        "streamTitle": "【縱型歌回】貼臉唱歌給你們聽！【朔Sakuro】",
-        "videoId": "Hmeugi8WS9k",
-        "timestamp": 536,
-        "endTimestamp": 798,
-        "note": ""
-      }
-    ]
-  },
-  {
-    "id": "song-f9996600",
-    "title": "手語",
-    "originalArtist": "周杰倫 (Jay Chou)",
-    "tags": [],
-    "performances": [
-      {
-        "id": "p-d2b2d89b",
-        "streamId": "stream-e0f35849",
-        "date": "",
-        "streamTitle": "【情人節歌回】情人節特別的歌及驚喜！【朔Sakuro】",
-        "videoId": "0xT5uHGGMC0",
-        "timestamp": 9476,
-        "endTimestamp": 9760,
-        "note": ""
-      }
-    ]
-  },
-  {
-    "id": "song-80ef44af",
-    "title": "星屑ビーナス",
-    "originalArtist": "Aimer",
-    "tags": [],
-    "performances": [
-      {
-        "id": "p-75d7e5a8",
-        "streamId": "stream-2025-12-07",
-        "date": "2025-12-07",
-        "streamTitle": "【悲情歌回】來把傷心難過都唱出來！【朔Sakuro】",
-        "videoId": "aKuD3fvW3fY",
-        "timestamp": 1897,
-        "endTimestamp": 2152,
-        "note": ""
-      }
-    ]
-  },
-  {
-    "id": "song-5011cdee",
-    "title": "晚餐歌",
-    "originalArtist": "tuki.",
-    "tags": [],
-    "performances": [
-      {
-        "id": "p-40758575",
-        "streamId": "stream-2025-12-14",
-        "date": "2025-12-14",
-        "streamTitle": "【站立歌回】站著唱完整個直播！【朔Sakuro】",
-        "videoId": "U6oVkXmfrgI",
-        "timestamp": 3670,
-        "endTimestamp": 3885,
-        "note": ""
-      }
-    ]
-  },
-  {
-    "id": "song-e710f6a5",
-    "title": "李白",
-    "originalArtist": "李榮浩",
-    "tags": [],
-    "performances": [
-      {
-        "id": "p-2e87ce0f",
-        "streamId": "stream-2026-01-18",
-        "date": "2026-01-18",
-        "streamTitle": "【低音歌回】老師說我要唱低一點的歌所以來了【朔Sakuro】",
-        "videoId": "SVEtS6mQFPY",
-        "timestamp": 276,
-        "endTimestamp": 541,
-        "note": ""
-      }
-    ]
-  },
-  {
-    "id": "song-8ff6d1ae",
-    "title": "正想著你呢",
-    "originalArtist": "持修",
-    "tags": [],
-    "performances": [
-      {
-        "id": "p-f339db6a",
-        "streamId": "stream-c46886e2",
-        "date": "2026-02-08",
-        "streamTitle": "【彈唱歌回】用彈唱來療癒你的週末！【朔Sakuro】",
-        "videoId": "Ck-5ls8cwTQ",
-        "timestamp": 546,
-        "endTimestamp": 763,
-        "note": ""
-      }
-    ]
-  },
-  {
-    "id": "song-576bd07a",
-    "title": "求救訊號",
-    "originalArtist": "VH (Vast & Hazy)",
-    "tags": [],
-    "performances": [
-      {
-        "id": "p-b6032c94",
-        "streamId": "stream-d0080c2a",
-        "date": "2026-03-01",
-        "streamTitle": "【哄睡歌回】睡不著的這邊請！【朔Sakuro】",
-        "videoId": "ybC0KHGXjaA",
-        "timestamp": 1581,
-        "endTimestamp": 1839,
-        "note": ""
-      }
-    ]
-  },
-  {
-    "id": "song-5ce38389",
-    "title": "空心",
-    "originalArtist": "光泽",
-    "tags": [],
-    "performances": [
-      {
-        "id": "p-e2b940ad",
-        "streamId": "stream-2025-12-07",
-        "date": "2025-12-07",
-        "streamTitle": "【悲情歌回】來把傷心難過都唱出來！【朔Sakuro】",
-        "videoId": "aKuD3fvW3fY",
-        "timestamp": 2609,
-        "endTimestamp": 2888,
-        "note": ""
-      }
-    ]
-  },
-  {
-    "id": "song-7cf5b6d2",
-    "title": "第一個清晨",
-    "originalArtist": "王力宏 (Wang Leehom)",
-    "tags": [],
-    "performances": [
-      {
-        "id": "p-66ec1437",
-        "streamId": "stream-2025-12-14",
-        "date": "2025-12-14",
-        "streamTitle": "【站立歌回】站著唱完整個直播！【朔Sakuro】",
-        "videoId": "U6oVkXmfrgI",
-        "timestamp": 5935,
-        "endTimestamp": 6213,
-        "note": ""
-      }
-    ]
-  },
-  {
-    "id": "song-841cc60e",
-    "title": "等你下課",
-    "originalArtist": "周杰倫 (Jay Chou)",
-    "tags": [],
-    "performances": [
-      {
-        "id": "p-81ae9e6d",
-        "streamId": "stream-2026-01-18",
-        "date": "2026-01-18",
-        "streamTitle": "【低音歌回】老師說我要唱低一點的歌所以來了【朔Sakuro】",
-        "videoId": "SVEtS6mQFPY",
-        "timestamp": 907,
-        "endTimestamp": 1187,
-        "note": ""
-      }
-    ]
-  },
-  {
-    "id": "song-9187a408",
-    "title": "美麗",
-    "originalArtist": "王大文",
-    "tags": [],
-    "performances": [
-      {
-        "id": "p-ce615248",
-        "streamId": "stream-c46886e2",
-        "date": "2026-02-08",
-        "streamTitle": "【彈唱歌回】用彈唱來療癒你的週末！【朔Sakuro】",
-        "videoId": "Ck-5ls8cwTQ",
-        "timestamp": 5277,
-        "endTimestamp": 5497,
-        "note": ""
-      }
-    ]
-  },
-  {
-    "id": "song-15cba9ac",
-    "title": "買你",
-    "originalArtist": "魏如萱 (waa wei)",
-    "tags": [],
-    "performances": [
-      {
-        "id": "p-96f0ee61",
-        "streamId": "stream-e0f35849",
-        "date": "",
-        "streamTitle": "【情人節歌回】情人節特別的歌及驚喜！【朔Sakuro】",
-        "videoId": "0xT5uHGGMC0",
-        "timestamp": 8974,
-        "endTimestamp": 9157,
-        "note": ""
-      }
-    ]
-  },
-  {
-    "id": "song-f0c1603e",
-    "title": "走了嗎",
-    "originalArtist": "袁惟仁",
-    "tags": [],
-    "performances": [
-      {
-        "id": "p-37c6db30",
-        "streamId": "stream-d0080c2a",
-        "date": "2026-03-01",
-        "streamTitle": "【哄睡歌回】睡不著的這邊請！【朔Sakuro】",
-        "videoId": "ybC0KHGXjaA",
-        "timestamp": 2133,
-        "endTimestamp": 2381,
-        "note": ""
-      }
-    ]
-  },
-  {
-    "id": "song-41bacfbb",
-    "title": "跟你住",
-    "originalArtist": "孫盛希 (Shi Shi)",
-    "tags": [],
-    "performances": [
-      {
-        "id": "p-d9652a66",
-        "streamId": "stream-08669a76",
-        "date": "2025-11-23",
-        "streamTitle": "【哄睡歌回】 伴隨輕聲吟唱入睡吧！ 【朔Sakuro】",
-        "videoId": "t18t-chE1wM",
-        "timestamp": 8114,
-        "endTimestamp": 8373,
+        "timestamp": 3296,
+        "endTimestamp": 3491,
         "note": ""
       }
     ]
@@ -1872,163 +180,55 @@
     ]
   },
   {
-    "id": "song-6a08ace9",
-    "title": "迷醉 Sangria",
-    "originalArtist": "朔Sakuro",
+    "id": "song-159cea8b",
+    "title": "ベテルギウス",
+    "originalArtist": "優里",
     "tags": [],
     "performances": [
       {
-        "id": "p-378b4ed5",
-        "streamId": "stream-2026-01-18",
-        "date": "2026-01-18",
-        "streamTitle": "【低音歌回】老師說我要唱低一點的歌所以來了【朔Sakuro】",
-        "videoId": "SVEtS6mQFPY",
-        "timestamp": 6822,
-        "endTimestamp": 7016,
+        "id": "p-f625a05c",
+        "streamId": "stream-2025-11-30",
+        "date": "2025-11-30",
+        "streamTitle": "【月底歌回】11月的最後一天來聽歌吧！【朔Sakuro】",
+        "videoId": "Mi9lEynnVbE",
+        "timestamp": 2015,
+        "endTimestamp": 2244,
         "note": ""
       }
     ]
   },
   {
-    "id": "song-c00a619b",
-    "title": "連名帶姓",
-    "originalArtist": "aMEI (張惠妹)",
+    "id": "song-15cba9ac",
+    "title": "買你",
+    "originalArtist": "魏如萱 (waa wei)",
     "tags": [],
     "performances": [
       {
-        "id": "p-bbe0ea32",
-        "streamId": "stream-c46886e2",
-        "date": "2026-02-08",
-        "streamTitle": "【彈唱歌回】用彈唱來療癒你的週末！【朔Sakuro】",
-        "videoId": "Ck-5ls8cwTQ",
-        "timestamp": 1562,
-        "endTimestamp": 1854,
+        "id": "p-96f0ee61",
+        "streamId": "stream-e0f35849",
+        "date": "",
+        "streamTitle": "【情人節歌回】情人節特別的歌及驚喜！【朔Sakuro】",
+        "videoId": "0xT5uHGGMC0",
+        "timestamp": 8974,
+        "endTimestamp": 9157,
         "note": ""
       }
     ]
   },
   {
-    "id": "song-4af9c15f",
-    "title": "連名帶姓",
-    "originalArtist": "aMEI (張惠妹)",
+    "id": "song-1824acc1",
+    "title": "-ERROR",
+    "originalArtist": "Lily",
     "tags": [],
     "performances": [
       {
-        "id": "p-e8930f0f",
-        "streamId": "stream-2026-01-11",
-        "date": "2026-01-11",
-        "streamTitle": "【彈唱歌回】 阿吉新年第一場表演！ 【朔Sakuro】",
-        "videoId": "IK44-KOhau0",
-        "timestamp": 3524,
-        "endTimestamp": 3813,
-        "note": ""
-      }
-    ]
-  },
-  {
-    "id": "song-4da4a721",
-    "title": "闖空門",
-    "originalArtist": "孫盛希 (Shi Shi)",
-    "tags": [],
-    "performances": [
-      {
-        "id": "p-423f64c1",
-        "streamId": "stream-08669a76",
-        "date": "2025-11-23",
-        "streamTitle": "【哄睡歌回】 伴隨輕聲吟唱入睡吧！ 【朔Sakuro】",
-        "videoId": "t18t-chE1wM",
-        "timestamp": 6131,
-        "endTimestamp": 6348,
-        "note": ""
-      }
-    ]
-  },
-  {
-    "id": "song-0eda6e2c",
-    "title": "阿拉斯加海灣",
-    "originalArtist": "菲道爾 (Firdhaus)",
-    "tags": [],
-    "performances": [
-      {
-        "id": "p-221183ef",
-        "streamId": "stream-2026-01-18",
-        "date": "2026-01-18",
-        "streamTitle": "【低音歌回】老師說我要唱低一點的歌所以來了【朔Sakuro】",
-        "videoId": "SVEtS6mQFPY",
-        "timestamp": 6223,
-        "endTimestamp": 6456,
-        "note": ""
-      }
-    ]
-  },
-  {
-    "id": "song-96471ecf",
-    "title": "陪你 Stay with you",
-    "originalArtist": "朔Sakuro",
-    "tags": [],
-    "performances": [
-      {
-        "id": "p-80c46ccd",
-        "streamId": "stream-2025-12-14",
-        "date": "2025-12-14",
-        "streamTitle": "【站立歌回】站著唱完整個直播！【朔Sakuro】",
-        "videoId": "U6oVkXmfrgI",
-        "timestamp": 5428,
-        "endTimestamp": 5637,
-        "note": ""
-      }
-    ]
-  },
-  {
-    "id": "song-7e26647f",
-    "title": "雨愛",
-    "originalArtist": "楊丞琳 (Rainie Yang)",
-    "tags": [],
-    "performances": [
-      {
-        "id": "p-59d1eab5",
-        "streamId": "stream-d0080c2a",
-        "date": "2026-03-01",
-        "streamTitle": "【哄睡歌回】睡不著的這邊請！【朔Sakuro】",
-        "videoId": "ybC0KHGXjaA",
-        "timestamp": 4765,
-        "endTimestamp": 5025,
-        "note": ""
-      }
-    ]
-  },
-  {
-    "id": "song-7995a462",
-    "title": "雨愛",
-    "originalArtist": "楊丞琳 (Rainie Yang)",
-    "tags": [],
-    "performances": [
-      {
-        "id": "p-17680137",
-        "streamId": "stream-2025-12-07",
-        "date": "2025-12-07",
-        "streamTitle": "【悲情歌回】來把傷心難過都唱出來！【朔Sakuro】",
-        "videoId": "aKuD3fvW3fY",
-        "timestamp": 6221,
-        "endTimestamp": 6484,
-        "note": ""
-      }
-    ]
-  },
-  {
-    "id": "song-1a23ef12",
-    "title": "靈感菇(各種版本)",
-    "originalArtist": "Unknown",
-    "tags": [],
-    "performances": [
-      {
-        "id": "p-e7a8098a",
-        "streamId": "stream-08669a76",
-        "date": "2025-11-23",
-        "streamTitle": "【哄睡歌回】 伴隨輕聲吟唱入睡吧！ 【朔Sakuro】",
-        "videoId": "t18t-chE1wM",
-        "timestamp": 6773,
-        "endTimestamp": 7099,
+        "id": "p-16c480ed",
+        "streamId": "stream-2025-11-30",
+        "date": "2025-11-30",
+        "streamTitle": "【月底歌回】11月的最後一天來聽歌吧！【朔Sakuro】",
+        "videoId": "Mi9lEynnVbE",
+        "timestamp": 1266,
+        "endTimestamp": 1501,
         "note": ""
       }
     ]
@@ -2052,19 +252,775 @@
     ]
   },
   {
-    "id": "song-9361056c",
-    "title": "靠近(清唱)",
-    "originalArtist": "袁婭維TIA RAY",
+    "id": "song-1a23ef12",
+    "title": "靈感菇(各種版本)",
+    "originalArtist": "Unknown",
     "tags": [],
     "performances": [
       {
-        "id": "p-9c491328",
+        "id": "p-e7a8098a",
+        "streamId": "stream-08669a76",
+        "date": "2025-11-23",
+        "streamTitle": "【哄睡歌回】 伴隨輕聲吟唱入睡吧！ 【朔Sakuro】",
+        "videoId": "t18t-chE1wM",
+        "timestamp": 6773,
+        "endTimestamp": 7099,
+        "note": ""
+      }
+    ]
+  },
+  {
+    "id": "song-1c5908cc",
+    "title": "在夜裡跳舞",
+    "originalArtist": "單依純",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-ca569242",
+        "streamId": "stream-2026-01-11",
+        "date": "2026-01-11",
+        "streamTitle": "【彈唱歌回】 阿吉新年第一場表演！ 【朔Sakuro】",
+        "videoId": "IK44-KOhau0",
+        "timestamp": 1668,
+        "endTimestamp": 1925,
+        "note": ""
+      }
+    ]
+  },
+  {
+    "id": "song-20a94e77",
+    "title": "子午聖誕禮物(日文版)",
+    "originalArtist": "#子午聖誕接力",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-80dd858e",
+        "streamId": "stream-2025-12-21",
+        "date": "2025-12-21",
+        "streamTitle": "【聖誕歌回】來唱些聖誕節的歌曲吧！【朔Sakuro】",
+        "videoId": "CizYyIizGug",
+        "timestamp": 8629,
+        "endTimestamp": 8724,
+        "note": ""
+      }
+    ]
+  },
+  {
+    "id": "song-21d7acdf",
+    "title": "Paradise Island",
+    "originalArtist": "ØZI",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-536bbd8e",
+        "streamId": "stream-c46886e2",
+        "date": "2026-02-08",
+        "streamTitle": "【彈唱歌回】用彈唱來療癒你的週末！【朔Sakuro】",
+        "videoId": "Ck-5ls8cwTQ",
+        "timestamp": 4068,
+        "endTimestamp": 4305,
+        "note": ""
+      }
+    ]
+  },
+  {
+    "id": "song-23799cdc",
+    "title": "I Love You 3000",
+    "originalArtist": "Stephanie Poetri",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-4d821b9d",
+        "streamId": "stream-08669a76",
+        "date": "2025-11-23",
+        "streamTitle": "【哄睡歌回】 伴隨輕聲吟唱入睡吧！ 【朔Sakuro】",
+        "videoId": "t18t-chE1wM",
+        "timestamp": 3746,
+        "endTimestamp": 4000,
+        "note": ""
+      }
+    ]
+  },
+  {
+    "id": "song-26927912",
+    "title": "Everything Goes On",
+    "originalArtist": "Porter Robinson",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-059a1a99",
+        "streamId": "stream-08669a76",
+        "date": "2025-11-23",
+        "streamTitle": "【哄睡歌回】 伴隨輕聲吟唱入睡吧！ 【朔Sakuro】",
+        "videoId": "t18t-chE1wM",
+        "timestamp": 4311,
+        "endTimestamp": 4510,
+        "note": ""
+      }
+    ]
+  },
+  {
+    "id": "song-2b8fbda3",
+    "title": "I love you 3000",
+    "originalArtist": "Stephanie Poetri",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-43b7fca3",
+        "streamId": "stream-2026-01-25",
+        "date": "2026-01-25",
+        "streamTitle": "【冬日歌回】冬天冷冷的適合聽歌！【朔Sakuro】",
+        "videoId": "OrwsCyMKewY",
+        "timestamp": 2805,
+        "endTimestamp": 3045,
+        "note": ""
+      }
+    ]
+  },
+  {
+    "id": "song-2b93fb06",
+    "title": "好想你",
+    "originalArtist": "朱主愛 (Joyce Chu)",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-dbc20918",
+        "streamId": "stream-d0080c2a",
+        "date": "2026-03-01",
+        "streamTitle": "【哄睡歌回】睡不著的這邊請！【朔Sakuro】",
+        "videoId": "ybC0KHGXjaA",
+        "timestamp": 3177,
+        "endTimestamp": 3335,
+        "note": ""
+      }
+    ]
+  },
+  {
+    "id": "song-2e43ea15",
+    "title": "惡作劇",
+    "originalArtist": "王藍茵",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-6d372619",
         "streamId": "stream-e0f35849",
         "date": "",
         "streamTitle": "【情人節歌回】情人節特別的歌及驚喜！【朔Sakuro】",
         "videoId": "0xT5uHGGMC0",
-        "timestamp": 10124,
-        "endTimestamp": 10243,
+        "timestamp": 6274,
+        "endTimestamp": 6507,
+        "note": ""
+      }
+    ]
+  },
+  {
+    "id": "song-32773037",
+    "title": "子午聖誕禮物(英文版)",
+    "originalArtist": "#子午聖誕接力",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-56c1964f",
+        "streamId": "stream-2025-12-21",
+        "date": "2025-12-21",
+        "streamTitle": "【聖誕歌回】來唱些聖誕節的歌曲吧！【朔Sakuro】",
+        "videoId": "CizYyIizGug",
+        "timestamp": 8781,
+        "endTimestamp": 8875,
+        "note": ""
+      }
+    ]
+  },
+  {
+    "id": "song-33e598a2",
+    "title": "Feliz Navidad",
+    "originalArtist": "José Feliciano (荷西費里西安諾)",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-da1f0bb4",
+        "streamId": "stream-2025-12-21",
+        "date": "2025-12-21",
+        "streamTitle": "【聖誕歌回】來唱些聖誕節的歌曲吧！【朔Sakuro】",
+        "videoId": "CizYyIizGug",
+        "timestamp": 7118,
+        "endTimestamp": 7300,
+        "note": ""
+      }
+    ]
+  },
+  {
+    "id": "song-367274bb",
+    "title": "我喜歡你",
+    "originalArtist": "洪安妮",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-4b42afed",
+        "streamId": "stream-2026-01-11",
+        "date": "2026-01-11",
+        "streamTitle": "【彈唱歌回】 阿吉新年第一場表演！ 【朔Sakuro】",
+        "videoId": "IK44-KOhau0",
+        "timestamp": 4311,
+        "endTimestamp": 4558,
+        "note": ""
+      }
+    ]
+  },
+  {
+    "id": "song-3693e66b",
+    "title": "thank u, next",
+    "originalArtist": "Ariana Grande",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-dadf27f1",
+        "streamId": "stream-d0080c2a",
+        "date": "2026-03-01",
+        "streamTitle": "【哄睡歌回】睡不著的這邊請！【朔Sakuro】",
+        "videoId": "ybC0KHGXjaA",
+        "timestamp": 6869,
+        "endTimestamp": 7051,
+        "note": ""
+      }
+    ]
+  },
+  {
+    "id": "song-3922bd1b",
+    "title": "Heavenly Days",
+    "originalArtist": "新垣結衣",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-7f181e4a",
+        "streamId": "stream-0b82931e",
+        "date": "2026-02-01",
+        "streamTitle": "【縱型歌回】貼臉唱歌給你們聽！【朔Sakuro】",
+        "videoId": "Hmeugi8WS9k",
+        "timestamp": 1126,
+        "endTimestamp": 1395,
+        "note": ""
+      }
+    ]
+  },
+  {
+    "id": "song-3a85213c",
+    "title": "恆溫",
+    "originalArtist": "孫盛希 (Shi Shi)",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-2ff9450f",
+        "streamId": "stream-08669a76",
+        "date": "2025-11-23",
+        "streamTitle": "【哄睡歌回】 伴隨輕聲吟唱入睡吧！ 【朔Sakuro】",
+        "videoId": "t18t-chE1wM",
+        "timestamp": 1843,
+        "endTimestamp": 2125,
+        "note": ""
+      }
+    ]
+  },
+  {
+    "id": "song-3cbb79f1",
+    "title": "希望你回來",
+    "originalArtist": "TRASH",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-bf513370",
+        "streamId": "stream-2025-12-07",
+        "date": "2025-12-07",
+        "streamTitle": "【悲情歌回】來把傷心難過都唱出來！【朔Sakuro】",
+        "videoId": "aKuD3fvW3fY",
+        "timestamp": 7898,
+        "endTimestamp": 8279,
+        "note": ""
+      }
+    ]
+  },
+  {
+    "id": "song-3f56c00b",
+    "title": "Skyscraper",
+    "originalArtist": "Demi Lovato (黛咪洛瓦特)",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-26d3978e",
+        "streamId": "stream-2025-12-07",
+        "date": "2025-12-07",
+        "streamTitle": "【悲情歌回】來把傷心難過都唱出來！【朔Sakuro】",
+        "videoId": "aKuD3fvW3fY",
+        "timestamp": 4164,
+        "endTimestamp": 4382,
+        "note": ""
+      }
+    ]
+  },
+  {
+    "id": "song-41bacfbb",
+    "title": "跟你住",
+    "originalArtist": "孫盛希 (Shi Shi)",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-d9652a66",
+        "streamId": "stream-08669a76",
+        "date": "2025-11-23",
+        "streamTitle": "【哄睡歌回】 伴隨輕聲吟唱入睡吧！ 【朔Sakuro】",
+        "videoId": "t18t-chE1wM",
+        "timestamp": 8114,
+        "endTimestamp": 8373,
+        "note": ""
+      }
+    ]
+  },
+  {
+    "id": "song-4688818f",
+    "title": "Boyfriend",
+    "originalArtist": "Justin Bieber (小賈斯汀)",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-501c5376",
+        "streamId": "stream-2025-12-14",
+        "date": "2025-12-14",
+        "streamTitle": "【站立歌回】站著唱完整個直播！【朔Sakuro】",
+        "videoId": "U6oVkXmfrgI",
+        "timestamp": 3078,
+        "endTimestamp": 3251,
+        "note": ""
+      }
+    ]
+  },
+  {
+    "id": "song-47f1b3e3",
+    "title": "Letting Go",
+    "originalArtist": "蔡健雅 (Tanya Chua)",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-fbca6813",
+        "streamId": "stream-2026-01-25",
+        "date": "2026-01-25",
+        "streamTitle": "【冬日歌回】冬天冷冷的適合聽歌！【朔Sakuro】",
+        "videoId": "OrwsCyMKewY",
+        "timestamp": 6816,
+        "endTimestamp": 7042,
+        "note": ""
+      }
+    ]
+  },
+  {
+    "id": "song-4af9c15f",
+    "title": "連名帶姓",
+    "originalArtist": "aMEI (張惠妹)",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-e8930f0f",
+        "streamId": "stream-2026-01-11",
+        "date": "2026-01-11",
+        "streamTitle": "【彈唱歌回】 阿吉新年第一場表演！ 【朔Sakuro】",
+        "videoId": "IK44-KOhau0",
+        "timestamp": 3524,
+        "endTimestamp": 3813,
+        "note": ""
+      }
+    ]
+  },
+  {
+    "id": "song-4b278a33",
+    "title": "Heavenly days",
+    "originalArtist": "新垣結衣",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-a2f15068",
+        "streamId": "stream-2026-01-25",
+        "date": "2026-01-25",
+        "streamTitle": "【冬日歌回】冬天冷冷的適合聽歌！【朔Sakuro】",
+        "videoId": "OrwsCyMKewY",
+        "timestamp": 4648,
+        "endTimestamp": 4919,
+        "note": ""
+      }
+    ]
+  },
+  {
+    "id": "song-4cb8de1d",
+    "title": "我喜歡你",
+    "originalArtist": "洪安妮",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-3decb071",
+        "streamId": "stream-e0f35849",
+        "date": "",
+        "streamTitle": "【情人節歌回】情人節特別的歌及驚喜！【朔Sakuro】",
+        "videoId": "0xT5uHGGMC0",
+        "timestamp": 905,
+        "endTimestamp": 1230,
+        "note": ""
+      }
+    ]
+  },
+  {
+    "id": "song-4da4a721",
+    "title": "闖空門",
+    "originalArtist": "孫盛希 (Shi Shi)",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-423f64c1",
+        "streamId": "stream-08669a76",
+        "date": "2025-11-23",
+        "streamTitle": "【哄睡歌回】 伴隨輕聲吟唱入睡吧！ 【朔Sakuro】",
+        "videoId": "t18t-chE1wM",
+        "timestamp": 6131,
+        "endTimestamp": 6348,
+        "note": ""
+      }
+    ]
+  },
+  {
+    "id": "song-4dc8fe0e",
+    "title": "Santa Claus Is Coming to Town",
+    "originalArtist": "Michael Bublé",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-66cc809a",
+        "streamId": "stream-2025-12-21",
+        "date": "2025-12-21",
+        "streamTitle": "【聖誕歌回】來唱些聖誕節的歌曲吧！【朔Sakuro】",
+        "videoId": "CizYyIizGug",
+        "timestamp": 660,
+        "endTimestamp": 832,
+        "note": ""
+      }
+    ]
+  },
+  {
+    "id": "song-5011cdee",
+    "title": "晚餐歌",
+    "originalArtist": "tuki.",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-40758575",
+        "streamId": "stream-2025-12-14",
+        "date": "2025-12-14",
+        "streamTitle": "【站立歌回】站著唱完整個直播！【朔Sakuro】",
+        "videoId": "U6oVkXmfrgI",
+        "timestamp": 3670,
+        "endTimestamp": 3885,
+        "note": ""
+      }
+    ]
+  },
+  {
+    "id": "song-576bd07a",
+    "title": "求救訊號",
+    "originalArtist": "VH (Vast & Hazy)",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-b6032c94",
+        "streamId": "stream-d0080c2a",
+        "date": "2026-03-01",
+        "streamTitle": "【哄睡歌回】睡不著的這邊請！【朔Sakuro】",
+        "videoId": "ybC0KHGXjaA",
+        "timestamp": 1581,
+        "endTimestamp": 1839,
+        "note": ""
+      }
+    ]
+  },
+  {
+    "id": "song-57dbf3ae",
+    "title": "愛♡スクリーム！",
+    "originalArtist": "AiScReam",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-04da797f",
+        "streamId": "stream-2026-01-18",
+        "date": "2026-01-18",
+        "streamTitle": "【低音歌回】老師說我要唱低一點的歌所以來了【朔Sakuro】",
+        "videoId": "SVEtS6mQFPY",
+        "timestamp": 3681,
+        "endTimestamp": 3937,
+        "note": ""
+      }
+    ]
+  },
+  {
+    "id": "song-58150868",
+    "title": "ユキコイ",
+    "originalArtist": "當山みれい",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-003f966f",
+        "streamId": "stream-2026-01-25",
+        "date": "2026-01-25",
+        "streamTitle": "【冬日歌回】冬天冷冷的適合聽歌！【朔Sakuro】",
+        "videoId": "OrwsCyMKewY",
+        "timestamp": 3615,
+        "endTimestamp": 3860,
+        "note": ""
+      }
+    ]
+  },
+  {
+    "id": "song-59508475",
+    "title": "Eenie Meenie",
+    "originalArtist": "Sean Kingston & Justin Bieber",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-cc3506bf",
+        "streamId": "stream-2025-12-14",
+        "date": "2025-12-14",
+        "streamTitle": "【站立歌回】站著唱完整個直播！【朔Sakuro】",
+        "videoId": "U6oVkXmfrgI",
+        "timestamp": 2021,
+        "endTimestamp": 2184,
+        "note": ""
+      }
+    ]
+  },
+  {
+    "id": "song-5ce38389",
+    "title": "空心",
+    "originalArtist": "光泽",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-e2b940ad",
+        "streamId": "stream-2025-12-07",
+        "date": "2025-12-07",
+        "streamTitle": "【悲情歌回】來把傷心難過都唱出來！【朔Sakuro】",
+        "videoId": "aKuD3fvW3fY",
+        "timestamp": 2609,
+        "endTimestamp": 2888,
+        "note": ""
+      }
+    ]
+  },
+  {
+    "id": "song-5eebbc1a",
+    "title": "Love Me Like You Do",
+    "originalArtist": "Ellie Goulding",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-21e6a3fc",
+        "streamId": "stream-2026-03-08",
+        "date": "2026-03-08",
+        "streamTitle": "【英文歌回】I Sing You Sing【朔Sakuro】",
+        "videoId": "2wxID-o2_kU",
+        "timestamp": 2669,
+        "endTimestamp": 2869,
+        "note": ""
+      }
+    ]
+  },
+  {
+    "id": "song-60ad905b",
+    "title": "WANTCHU",
+    "originalArtist": "keshi",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-81486936",
+        "streamId": "stream-2025-12-14",
+        "date": "2025-12-14",
+        "streamTitle": "【站立歌回】站著唱完整個直播！【朔Sakuro】",
+        "videoId": "U6oVkXmfrgI",
+        "timestamp": 622,
+        "endTimestamp": 821,
+        "note": ""
+      }
+    ]
+  },
+  {
+    "id": "song-64a5cef0",
+    "title": "Love Yourself",
+    "originalArtist": "Justin Bieber",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-a8c351b8",
+        "streamId": "stream-d0080c2a",
+        "date": "2026-03-01",
+        "streamTitle": "【哄睡歌回】睡不著的這邊請！【朔Sakuro】",
+        "videoId": "ybC0KHGXjaA",
+        "timestamp": 5444,
+        "endTimestamp": 5678,
+        "note": ""
+      }
+    ]
+  },
+  {
+    "id": "song-65ce72ee",
+    "title": "刻在我心底的名字",
+    "originalArtist": "盧廣仲 (Crowd Lu)",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-8e5ea0dd",
+        "streamId": "stream-2026-01-11",
+        "date": "2026-01-11",
+        "streamTitle": "【彈唱歌回】 阿吉新年第一場表演！ 【朔Sakuro】",
+        "videoId": "IK44-KOhau0",
+        "timestamp": 6150,
+        "endTimestamp": 6455,
+        "note": ""
+      }
+    ]
+  },
+  {
+    "id": "song-69c96a4e",
+    "title": "I love you 3000",
+    "originalArtist": "Stephanie Poetri",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-d050977c",
+        "streamId": "stream-2026-01-18",
+        "date": "2026-01-18",
+        "streamTitle": "【低音歌回】老師說我要唱低一點的歌所以來了【朔Sakuro】",
+        "videoId": "SVEtS6mQFPY",
+        "timestamp": 4829,
+        "endTimestamp": 5038,
+        "note": ""
+      }
+    ]
+  },
+  {
+    "id": "song-6a08ace9",
+    "title": "迷醉 Sangria",
+    "originalArtist": "朔Sakuro",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-378b4ed5",
+        "streamId": "stream-2026-01-18",
+        "date": "2026-01-18",
+        "streamTitle": "【低音歌回】老師說我要唱低一點的歌所以來了【朔Sakuro】",
+        "videoId": "SVEtS6mQFPY",
+        "timestamp": 6822,
+        "endTimestamp": 7016,
+        "note": ""
+      }
+    ]
+  },
+  {
+    "id": "song-6f15bcab",
+    "title": "告白",
+    "originalArtist": "蔡黃汝 (Flo)",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-d299dff8",
+        "streamId": "stream-e0f35849",
+        "date": "",
+        "streamTitle": "【情人節歌回】情人節特別的歌及驚喜！【朔Sakuro】",
+        "videoId": "0xT5uHGGMC0",
+        "timestamp": 4188,
+        "endTimestamp": 4390,
+        "note": ""
+      }
+    ]
+  },
+  {
+    "id": "song-71777b0f",
+    "title": "Love Story",
+    "originalArtist": "Taylor Swift (泰勒絲)",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-0a7c40d1",
+        "streamId": "stream-2025-11-30",
+        "date": "2025-11-30",
+        "streamTitle": "【月底歌回】11月的最後一天來聽歌吧！【朔Sakuro】",
+        "videoId": "Mi9lEynnVbE",
+        "timestamp": 3169,
+        "endTimestamp": 3390,
+        "note": ""
+      }
+    ]
+  },
+  {
+    "id": "song-73515f2c",
+    "title": "What About Me",
+    "originalArtist": "Emily Osment",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-92e9a375",
+        "streamId": "stream-c46886e2",
+        "date": "2026-02-08",
+        "streamTitle": "【彈唱歌回】用彈唱來療癒你的週末！【朔Sakuro】",
+        "videoId": "Ck-5ls8cwTQ",
+        "timestamp": 6680,
+        "endTimestamp": 6923,
+        "note": ""
+      }
+    ]
+  },
+  {
+    "id": "song-76c0298c",
+    "title": "Marry Me",
+    "originalArtist": "Jason Derulo",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-3d4b0cff",
+        "streamId": "stream-2026-03-08",
+        "date": "2026-03-08",
+        "streamTitle": "【英文歌回】I Sing You Sing【朔Sakuro】",
+        "videoId": "2wxID-o2_kU",
+        "timestamp": 3271,
+        "endTimestamp": 3512,
+        "note": ""
+      }
+    ]
+  },
+  {
+    "id": "song-77a7f7ef",
+    "title": "一點點",
+    "originalArtist": "周杰倫 (Jay Chou)",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-8a7e7c6b",
+        "streamId": "stream-d0080c2a",
+        "date": "2026-03-01",
+        "streamTitle": "【哄睡歌回】睡不著的這邊請！【朔Sakuro】",
+        "videoId": "ybC0KHGXjaA",
+        "timestamp": 3764,
+        "endTimestamp": 3986,
+        "note": ""
+      }
+    ]
+  },
+  {
+    "id": "song-7995a462",
+    "title": "雨愛",
+    "originalArtist": "楊丞琳 (Rainie Yang)",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-17680137",
+        "streamId": "stream-2025-12-07",
+        "date": "2025-12-07",
+        "streamTitle": "【悲情歌回】來把傷心難過都唱出來！【朔Sakuro】",
+        "videoId": "aKuD3fvW3fY",
+        "timestamp": 6221,
+        "endTimestamp": 6484,
         "note": ""
       }
     ]
@@ -2083,6 +1039,1050 @@
         "videoId": "aKuD3fvW3fY",
         "timestamp": 1098,
         "endTimestamp": 1350,
+        "note": ""
+      }
+    ]
+  },
+  {
+    "id": "song-7c26681e",
+    "title": "叮叮噹 最喜歡你啦",
+    "originalArtist": "朔Sakuro",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-cb705198",
+        "streamId": "stream-2025-12-21",
+        "date": "2025-12-21",
+        "streamTitle": "【聖誕歌回】來唱些聖誕節的歌曲吧！【朔Sakuro】",
+        "videoId": "CizYyIizGug",
+        "timestamp": 5728,
+        "endTimestamp": 5942,
+        "note": ""
+      }
+    ]
+  },
+  {
+    "id": "song-7cf5b6d2",
+    "title": "第一個清晨",
+    "originalArtist": "王力宏 (Wang Leehom)",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-66ec1437",
+        "streamId": "stream-2025-12-14",
+        "date": "2025-12-14",
+        "streamTitle": "【站立歌回】站著唱完整個直播！【朔Sakuro】",
+        "videoId": "U6oVkXmfrgI",
+        "timestamp": 5935,
+        "endTimestamp": 6213,
+        "note": ""
+      }
+    ]
+  },
+  {
+    "id": "song-7e26647f",
+    "title": "雨愛",
+    "originalArtist": "楊丞琳 (Rainie Yang)",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-59d1eab5",
+        "streamId": "stream-d0080c2a",
+        "date": "2026-03-01",
+        "streamTitle": "【哄睡歌回】睡不著的這邊請！【朔Sakuro】",
+        "videoId": "ybC0KHGXjaA",
+        "timestamp": 4765,
+        "endTimestamp": 5025,
+        "note": ""
+      }
+    ]
+  },
+  {
+    "id": "song-80ef44af",
+    "title": "星屑ビーナス",
+    "originalArtist": "Aimer",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-75d7e5a8",
+        "streamId": "stream-2025-12-07",
+        "date": "2025-12-07",
+        "streamTitle": "【悲情歌回】來把傷心難過都唱出來！【朔Sakuro】",
+        "videoId": "aKuD3fvW3fY",
+        "timestamp": 1897,
+        "endTimestamp": 2152,
+        "note": ""
+      }
+    ]
+  },
+  {
+    "id": "song-825b534c",
+    "title": "ドライフラワー",
+    "originalArtist": "優里",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-d3e99dc4",
+        "streamId": "stream-2026-01-11",
+        "date": "2026-01-11",
+        "streamTitle": "【彈唱歌回】 阿吉新年第一場表演！ 【朔Sakuro】",
+        "videoId": "IK44-KOhau0",
+        "timestamp": 5420,
+        "endTimestamp": 5829,
+        "note": ""
+      }
+    ]
+  },
+  {
+    "id": "song-841cc60e",
+    "title": "等你下課",
+    "originalArtist": "周杰倫 (Jay Chou)",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-81ae9e6d",
+        "streamId": "stream-2026-01-18",
+        "date": "2026-01-18",
+        "streamTitle": "【低音歌回】老師說我要唱低一點的歌所以來了【朔Sakuro】",
+        "videoId": "SVEtS6mQFPY",
+        "timestamp": 907,
+        "endTimestamp": 1187,
+        "note": ""
+      }
+    ]
+  },
+  {
+    "id": "song-88effa0b",
+    "title": "When You're Gone",
+    "originalArtist": "Avril Lavigne",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-5abd964b",
+        "streamId": "stream-2025-11-30",
+        "date": "2025-11-30",
+        "streamTitle": "【月底歌回】11月的最後一天來聽歌吧！【朔Sakuro】",
+        "videoId": "Mi9lEynnVbE",
+        "timestamp": 166,
+        "endTimestamp": 401,
+        "note": ""
+      }
+    ]
+  },
+  {
+    "id": "song-89bd956b",
+    "title": "光年之外",
+    "originalArtist": "G.E.M. 鄧紫棋",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-e8f61ec7",
+        "streamId": "stream-c46886e2",
+        "date": "2026-02-08",
+        "streamTitle": "【彈唱歌回】用彈唱來療癒你的週末！【朔Sakuro】",
+        "videoId": "Ck-5ls8cwTQ",
+        "timestamp": 2279,
+        "endTimestamp": 2519,
+        "note": ""
+      }
+    ]
+  },
+  {
+    "id": "song-89e706f8",
+    "title": "子午聖誕禮物",
+    "originalArtist": "#子午聖誕接力",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-1e639689",
+        "streamId": "stream-2025-12-21",
+        "date": "2025-12-21",
+        "streamTitle": "【聖誕歌回】來唱些聖誕節的歌曲吧！【朔Sakuro】",
+        "videoId": "CizYyIizGug",
+        "timestamp": 2408,
+        "endTimestamp": 2502,
+        "note": ""
+      }
+    ]
+  },
+  {
+    "id": "song-8b36cb5f",
+    "title": "Stay",
+    "originalArtist": "Zedd, Alessia Cara",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-7e622f16",
+        "streamId": "stream-2026-03-08",
+        "date": "2026-03-08",
+        "streamTitle": "【英文歌回】I Sing You Sing【朔Sakuro】",
+        "videoId": "2wxID-o2_kU",
+        "timestamp": 5417,
+        "endTimestamp": 4560,
+        "note": ""
+      }
+    ]
+  },
+  {
+    "id": "song-8c997f3e",
+    "title": "Easy On Me",
+    "originalArtist": "Adele",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-58f6f82f",
+        "streamId": "stream-0b82931e",
+        "date": "2026-02-01",
+        "streamTitle": "【縱型歌回】貼臉唱歌給你們聽！【朔Sakuro】",
+        "videoId": "Hmeugi8WS9k",
+        "timestamp": 6149,
+        "endTimestamp": 6383,
+        "note": ""
+      }
+    ]
+  },
+  {
+    "id": "song-8ff6d1ae",
+    "title": "正想著你呢",
+    "originalArtist": "持修",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-f339db6a",
+        "streamId": "stream-c46886e2",
+        "date": "2026-02-08",
+        "streamTitle": "【彈唱歌回】用彈唱來療癒你的週末！【朔Sakuro】",
+        "videoId": "Ck-5ls8cwTQ",
+        "timestamp": 546,
+        "endTimestamp": 763,
+        "note": ""
+      }
+    ]
+  },
+  {
+    "id": "song-9187a408",
+    "title": "美麗",
+    "originalArtist": "王大文",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-ce615248",
+        "streamId": "stream-c46886e2",
+        "date": "2026-02-08",
+        "streamTitle": "【彈唱歌回】用彈唱來療癒你的週末！【朔Sakuro】",
+        "videoId": "Ck-5ls8cwTQ",
+        "timestamp": 5277,
+        "endTimestamp": 5497,
+        "note": ""
+      }
+    ]
+  },
+  {
+    "id": "song-9361056c",
+    "title": "靠近(清唱)",
+    "originalArtist": "袁婭維TIA RAY",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-9c491328",
+        "streamId": "stream-e0f35849",
+        "date": "",
+        "streamTitle": "【情人節歌回】情人節特別的歌及驚喜！【朔Sakuro】",
+        "videoId": "0xT5uHGGMC0",
+        "timestamp": 10124,
+        "endTimestamp": 10243,
+        "note": ""
+      }
+    ]
+  },
+  {
+    "id": "song-956c80a3",
+    "title": "左邊的人",
+    "originalArtist": "陳華",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-561e867c",
+        "streamId": "stream-08669a76",
+        "date": "2025-11-23",
+        "streamTitle": "【哄睡歌回】 伴隨輕聲吟唱入睡吧！ 【朔Sakuro】",
+        "videoId": "t18t-chE1wM",
+        "timestamp": 856,
+        "endTimestamp": 1066,
+        "note": ""
+      }
+    ]
+  },
+  {
+    "id": "song-96471ecf",
+    "title": "陪你 Stay with you",
+    "originalArtist": "朔Sakuro",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-80c46ccd",
+        "streamId": "stream-2025-12-14",
+        "date": "2025-12-14",
+        "streamTitle": "【站立歌回】站著唱完整個直播！【朔Sakuro】",
+        "videoId": "U6oVkXmfrgI",
+        "timestamp": 5428,
+        "endTimestamp": 5637,
+        "note": ""
+      }
+    ]
+  },
+  {
+    "id": "song-9792b1ec",
+    "title": "不是因為天氣晴朗才愛你",
+    "originalArtist": "理想混蛋 (Bestards)",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-fb02d438",
+        "streamId": "stream-08669a76",
+        "date": "2025-11-23",
+        "streamTitle": "【哄睡歌回】 伴隨輕聲吟唱入睡吧！ 【朔Sakuro】",
+        "videoId": "t18t-chE1wM",
+        "timestamp": 2732,
+        "endTimestamp": 2962,
+        "note": ""
+      }
+    ]
+  },
+  {
+    "id": "song-9a9799e3",
+    "title": "Back To December",
+    "originalArtist": "Taylor Swift",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-8644d439",
+        "streamId": "stream-2025-11-30",
+        "date": "2025-11-30",
+        "streamTitle": "【月底歌回】11月的最後一天來聽歌吧！【朔Sakuro】",
+        "videoId": "Mi9lEynnVbE",
+        "timestamp": 6472,
+        "endTimestamp": 6743,
+        "note": ""
+      }
+    ]
+  },
+  {
+    "id": "song-9ae00703",
+    "title": "子午聖誕禮物(韓文版)",
+    "originalArtist": "#子午聖誕接力",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-b68cb62a",
+        "streamId": "stream-2025-12-21",
+        "date": "2025-12-21",
+        "streamTitle": "【聖誕歌回】來唱些聖誕節的歌曲吧！【朔Sakuro】",
+        "videoId": "CizYyIizGug",
+        "timestamp": 8468,
+        "endTimestamp": 8566,
+        "note": ""
+      }
+    ]
+  },
+  {
+    "id": "song-9c15881f",
+    "title": "ハレンチ",
+    "originalArtist": "ちゃんみな",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-ad52c99b",
+        "streamId": "stream-2026-01-18",
+        "date": "2026-01-18",
+        "streamTitle": "【低音歌回】老師說我要唱低一點的歌所以來了【朔Sakuro】",
+        "videoId": "SVEtS6mQFPY",
+        "timestamp": 7541,
+        "endTimestamp": 7578,
+        "note": ""
+      }
+    ]
+  },
+  {
+    "id": "song-9ca9bfde",
+    "title": "ドライフラワー",
+    "originalArtist": "優里",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-e30f7f34",
+        "streamId": "stream-2025-12-07",
+        "date": "2025-12-07",
+        "streamTitle": "【悲情歌回】來把傷心難過都唱出來！【朔Sakuro】",
+        "videoId": "aKuD3fvW3fY",
+        "timestamp": 6751,
+        "endTimestamp": 7015,
+        "note": ""
+      }
+    ]
+  },
+  {
+    "id": "song-9da73da4",
+    "title": "像晴天像雨天(半)",
+    "originalArtist": "汪蘇瀧 (Silence Wang)",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-ec3b3de9",
+        "streamId": "stream-2026-01-11",
+        "date": "2026-01-11",
+        "streamTitle": "【彈唱歌回】 阿吉新年第一場表演！ 【朔Sakuro】",
+        "videoId": "IK44-KOhau0",
+        "timestamp": 2459,
+        "endTimestamp": 2645,
+        "note": ""
+      }
+    ]
+  },
+  {
+    "id": "song-9db407c7",
+    "title": "Havana",
+    "originalArtist": "Camila Cabello (哈瓦那情人 卡蜜拉)",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-746dc708",
+        "streamId": "stream-2026-01-11",
+        "date": "2026-01-11",
+        "streamTitle": "【彈唱歌回】 阿吉新年第一場表演！ 【朔Sakuro】",
+        "videoId": "IK44-KOhau0",
+        "timestamp": 6922,
+        "endTimestamp": 7170,
+        "note": ""
+      }
+    ]
+  },
+  {
+    "id": "song-a091dc84",
+    "title": "Hotline Bling",
+    "originalArtist": "Drake",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-04988e74",
+        "streamId": "stream-2026-03-08",
+        "date": "2026-03-08",
+        "streamTitle": "【英文歌回】I Sing You Sing【朔Sakuro】",
+        "videoId": "2wxID-o2_kU",
+        "timestamp": 1580,
+        "endTimestamp": 1775,
+        "note": ""
+      }
+    ]
+  },
+  {
+    "id": "song-a271993d",
+    "title": "Mistletoe",
+    "originalArtist": "Justin Bieber",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-b46c75d3",
+        "streamId": "stream-2025-12-21",
+        "date": "2025-12-21",
+        "streamTitle": "【聖誕歌回】來唱些聖誕節的歌曲吧！【朔Sakuro】",
+        "videoId": "CizYyIizGug",
+        "timestamp": 2065,
+        "endTimestamp": 2247,
+        "note": ""
+      }
+    ]
+  },
+  {
+    "id": "song-a2d9268d",
+    "title": "我的女人",
+    "originalArtist": "小賤",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-1fe0e848",
+        "streamId": "stream-0b82931e",
+        "date": "2026-02-01",
+        "streamTitle": "【縱型歌回】貼臉唱歌給你們聽！【朔Sakuro】",
+        "videoId": "Hmeugi8WS9k",
+        "timestamp": 536,
+        "endTimestamp": 798,
+        "note": ""
+      }
+    ]
+  },
+  {
+    "id": "song-a7c1c8db",
+    "title": "像晴天像雨天",
+    "originalArtist": "汪蘇瀧",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-9a88a933",
+        "streamId": "stream-0b82931e",
+        "date": "2026-02-01",
+        "streamTitle": "【縱型歌回】貼臉唱歌給你們聽！【朔Sakuro】",
+        "videoId": "Hmeugi8WS9k",
+        "timestamp": 3012,
+        "endTimestamp": 3252,
+        "note": ""
+      }
+    ]
+  },
+  {
+    "id": "song-b3a441af",
+    "title": "Good-bye Days",
+    "originalArtist": "Yui",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-6742caf0",
+        "streamId": "stream-2025-12-07",
+        "date": "2025-12-07",
+        "streamTitle": "【悲情歌回】來把傷心難過都唱出來！【朔Sakuro】",
+        "videoId": "aKuD3fvW3fY",
+        "timestamp": 7375,
+        "endTimestamp": 7558,
+        "note": ""
+      }
+    ]
+  },
+  {
+    "id": "song-c00a619b",
+    "title": "連名帶姓",
+    "originalArtist": "aMEI (張惠妹)",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-bbe0ea32",
+        "streamId": "stream-c46886e2",
+        "date": "2026-02-08",
+        "streamTitle": "【彈唱歌回】用彈唱來療癒你的週末！【朔Sakuro】",
+        "videoId": "Ck-5ls8cwTQ",
+        "timestamp": 1562,
+        "endTimestamp": 1854,
+        "note": ""
+      }
+    ]
+  },
+  {
+    "id": "song-c281c91c",
+    "title": "I Love You 3000",
+    "originalArtist": "Stephanie Poetri",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-247c3e12",
+        "streamId": "stream-e0f35849",
+        "date": "",
+        "streamTitle": "【情人節歌回】情人節特別的歌及驚喜！【朔Sakuro】",
+        "videoId": "0xT5uHGGMC0",
+        "timestamp": 8181,
+        "endTimestamp": 8500,
+        "note": ""
+      }
+    ]
+  },
+  {
+    "id": "song-c6f03241",
+    "title": "Wide Awake",
+    "originalArtist": "Katy Perry",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-d62b386a",
+        "streamId": "stream-0b82931e",
+        "date": "2026-02-01",
+        "streamTitle": "【縱型歌回】貼臉唱歌給你們聽！【朔Sakuro】",
+        "videoId": "Hmeugi8WS9k",
+        "timestamp": 5643,
+        "endTimestamp": 5860,
+        "note": ""
+      }
+    ]
+  },
+  {
+    "id": "song-c8baf23b",
+    "title": "Close To You",
+    "originalArtist": "Carpenters (木匠兄妹合唱團)",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-461c75e8",
+        "streamId": "stream-08669a76",
+        "date": "2025-11-23",
+        "streamTitle": "【哄睡歌回】 伴隨輕聲吟唱入睡吧！ 【朔Sakuro】",
+        "videoId": "t18t-chE1wM",
+        "timestamp": 7314,
+        "endTimestamp": 7539,
+        "note": ""
+      }
+    ]
+  },
+  {
+    "id": "song-cbcd377e",
+    "title": "Into You",
+    "originalArtist": "Ariana Grande",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-534d0d13",
+        "streamId": "stream-2026-03-08",
+        "date": "2026-03-08",
+        "streamTitle": "【英文歌回】I Sing You Sing【朔Sakuro】",
+        "videoId": "2wxID-o2_kU",
+        "timestamp": 541,
+        "endTimestamp": 768,
+        "note": ""
+      }
+    ]
+  },
+  {
+    "id": "song-d08574b1",
+    "title": "Someone Like You",
+    "originalArtist": "Adele (愛黛兒)",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-721a6b6b",
+        "streamId": "stream-c46886e2",
+        "date": "2026-02-08",
+        "streamTitle": "【彈唱歌回】用彈唱來療癒你的週末！【朔Sakuro】",
+        "videoId": "Ck-5ls8cwTQ",
+        "timestamp": 5887,
+        "endTimestamp": 6171,
+        "note": ""
+      }
+    ]
+  },
+  {
+    "id": "song-d24c3b2c",
+    "title": "像晴天像雨天",
+    "originalArtist": "汪蘇瀧",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-55bb1866",
+        "streamId": "stream-e0f35849",
+        "date": "",
+        "streamTitle": "【情人節歌回】情人節特別的歌及驚喜！【朔Sakuro】",
+        "videoId": "0xT5uHGGMC0",
+        "timestamp": 655,
+        "endTimestamp": 905,
+        "note": ""
+      }
+    ]
+  },
+  {
+    "id": "song-d2e82402",
+    "title": "想和你看五月的晚霞",
+    "originalArtist": "陳華",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-f3bd50d4",
+        "streamId": "stream-2026-01-11",
+        "date": "2026-01-11",
+        "streamTitle": "【彈唱歌回】 阿吉新年第一場表演！ 【朔Sakuro】",
+        "videoId": "IK44-KOhau0",
+        "timestamp": 1138,
+        "endTimestamp": 1348,
+        "note": ""
+      }
+    ]
+  },
+  {
+    "id": "song-d479cdc8",
+    "title": "beside you(找不到key版)",
+    "originalArtist": "keshi",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-8cf9f989",
+        "streamId": "stream-c46886e2",
+        "date": "2026-02-08",
+        "streamTitle": "【彈唱歌回】用彈唱來療癒你的週末！【朔Sakuro】",
+        "videoId": "Ck-5ls8cwTQ",
+        "timestamp": 7120,
+        "endTimestamp": 7390,
+        "note": ""
+      }
+    ]
+  },
+  {
+    "id": "song-d72afbe5",
+    "title": "我喜歡你",
+    "originalArtist": "洪安妮",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-824ea389",
+        "streamId": "stream-d0080c2a",
+        "date": "2026-03-01",
+        "streamTitle": "【哄睡歌回】睡不著的這邊請！【朔Sakuro】",
+        "videoId": "ybC0KHGXjaA",
+        "timestamp": 8170,
+        "endTimestamp": 8417,
+        "note": ""
+      }
+    ]
+  },
+  {
+    "id": "song-da63eedd",
+    "title": "不是因為天氣晴朗才愛你",
+    "originalArtist": "理想混蛋 (Bestards)",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-ca3577af",
+        "streamId": "stream-e0f35849",
+        "date": "",
+        "streamTitle": "【情人節歌回】情人節特別的歌及驚喜！【朔Sakuro】",
+        "videoId": "0xT5uHGGMC0",
+        "timestamp": 245,
+        "endTimestamp": 500,
+        "note": ""
+      }
+    ]
+  },
+  {
+    "id": "song-da6c7911",
+    "title": "ハレンチ",
+    "originalArtist": "ちゃんみな",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-848e4c6e",
+        "streamId": "stream-2026-01-18",
+        "date": "2026-01-18",
+        "streamTitle": "【低音歌回】老師說我要唱低一點的歌所以來了【朔Sakuro】",
+        "videoId": "SVEtS6mQFPY",
+        "timestamp": 7731,
+        "endTimestamp": 7771,
+        "note": ""
+      }
+    ]
+  },
+  {
+    "id": "song-dd3aef43",
+    "title": "HEAVEN",
+    "originalArtist": "Ailee (에일리)",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-0d772a4c",
+        "streamId": "stream-2025-11-30",
+        "date": "2025-11-30",
+        "streamTitle": "【月底歌回】11月的最後一天來聽歌吧！【朔Sakuro】",
+        "videoId": "Mi9lEynnVbE",
+        "timestamp": 5757,
+        "endTimestamp": 5992,
+        "note": ""
+      }
+    ]
+  },
+  {
+    "id": "song-e1caa96e",
+    "title": "beside you(補唱忘記的)",
+    "originalArtist": "keshi",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-89c41eda",
+        "streamId": "stream-c46886e2",
+        "date": "2026-02-08",
+        "streamTitle": "【彈唱歌回】用彈唱來療癒你的週末！【朔Sakuro】",
+        "videoId": "Ck-5ls8cwTQ",
+        "timestamp": 7693,
+        "endTimestamp": 7781,
+        "note": ""
+      }
+    ]
+  },
+  {
+    "id": "song-e39f9cc7",
+    "title": "不在一起就不會分開",
+    "originalArtist": "洪佩瑜",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-c0617506",
+        "streamId": "stream-2026-01-25",
+        "date": "2026-01-25",
+        "streamTitle": "【冬日歌回】冬天冷冷的適合聽歌！【朔Sakuro】",
+        "videoId": "OrwsCyMKewY",
+        "timestamp": 5221,
+        "endTimestamp": 5485,
+        "note": ""
+      }
+    ]
+  },
+  {
+    "id": "song-e4a3251f",
+    "title": "Give It to Me",
+    "originalArtist": "孫盛希 (Shi Shi)",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-402aef16",
+        "streamId": "stream-2026-01-18",
+        "date": "2026-01-18",
+        "streamTitle": "【低音歌回】老師說我要唱低一點的歌所以來了【朔Sakuro】",
+        "videoId": "SVEtS6mQFPY",
+        "timestamp": 3099,
+        "endTimestamp": 3270,
+        "note": ""
+      }
+    ]
+  },
+  {
+    "id": "song-e710f6a5",
+    "title": "李白",
+    "originalArtist": "李榮浩",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-2e87ce0f",
+        "streamId": "stream-2026-01-18",
+        "date": "2026-01-18",
+        "streamTitle": "【低音歌回】老師說我要唱低一點的歌所以來了【朔Sakuro】",
+        "videoId": "SVEtS6mQFPY",
+        "timestamp": 276,
+        "endTimestamp": 541,
+        "note": ""
+      }
+    ]
+  },
+  {
+    "id": "song-e79d22fe",
+    "title": "ハレンチ",
+    "originalArtist": "ちゃんみな",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-c11f8832",
+        "streamId": "stream-2026-01-18",
+        "date": "2026-01-18",
+        "streamTitle": "【低音歌回】老師說我要唱低一點的歌所以來了【朔Sakuro】",
+        "videoId": "SVEtS6mQFPY",
+        "timestamp": 7367,
+        "endTimestamp": 7391,
+        "note": ""
+      }
+    ]
+  },
+  {
+    "id": "song-e7af3336",
+    "title": "我當你空氣",
+    "originalArtist": "旺福 (Wonfu)",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-ec7cf293",
+        "streamId": "stream-e0f35849",
+        "date": "",
+        "streamTitle": "【情人節歌回】情人節特別的歌及驚喜！【朔Sakuro】",
+        "videoId": "0xT5uHGGMC0",
+        "timestamp": 4657,
+        "endTimestamp": 4892,
+        "note": ""
+      }
+    ]
+  },
+  {
+    "id": "song-e837174d",
+    "title": "Fly Me To The Moon",
+    "originalArtist": "Frank Sinatra",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-8c535078",
+        "streamId": "stream-2026-03-08",
+        "date": "2026-03-08",
+        "streamTitle": "【英文歌回】I Sing You Sing【朔Sakuro】",
+        "videoId": "2wxID-o2_kU",
+        "timestamp": 6513,
+        "endTimestamp": 6628,
+        "note": ""
+      }
+    ]
+  },
+  {
+    "id": "song-e8e72e10",
+    "title": "Gotten",
+    "originalArtist": "Slash",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-0cc62e84",
+        "streamId": "stream-2025-11-30",
+        "date": "2025-11-30",
+        "streamTitle": "【月底歌回】11月的最後一天來聽歌吧！【朔Sakuro】",
+        "videoId": "Mi9lEynnVbE",
+        "timestamp": 7476,
+        "endTimestamp": 7735,
+        "note": ""
+      }
+    ]
+  },
+  {
+    "id": "song-ef6fbd41",
+    "title": "安全感",
+    "originalArtist": "王力宏 (Wang Leehom)",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-f4c15e70",
+        "streamId": "stream-c46886e2",
+        "date": "2026-02-08",
+        "streamTitle": "【彈唱歌回】用彈唱來療癒你的週末！【朔Sakuro】",
+        "videoId": "Ck-5ls8cwTQ",
+        "timestamp": 3240,
+        "endTimestamp": 3485,
+        "note": ""
+      }
+    ]
+  },
+  {
+    "id": "song-f0c1603e",
+    "title": "走了嗎",
+    "originalArtist": "袁惟仁",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-37c6db30",
+        "streamId": "stream-d0080c2a",
+        "date": "2026-03-01",
+        "streamTitle": "【哄睡歌回】睡不著的這邊請！【朔Sakuro】",
+        "videoId": "ybC0KHGXjaA",
+        "timestamp": 2133,
+        "endTimestamp": 2381,
+        "note": ""
+      }
+    ]
+  },
+  {
+    "id": "song-f551ea18",
+    "title": "你是不是有點動心",
+    "originalArtist": "吳卓源",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-eeb958be",
+        "streamId": "stream-0b82931e",
+        "date": "2026-02-01",
+        "streamTitle": "【縱型歌回】貼臉唱歌給你們聽！【朔Sakuro】",
+        "videoId": "Hmeugi8WS9k",
+        "timestamp": 5028,
+        "endTimestamp": 5295,
+        "note": ""
+      }
+    ]
+  },
+  {
+    "id": "song-f5803ab8",
+    "title": "STAY",
+    "originalArtist": "The Kid LAROI, Justin Bieber",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-a48fe460",
+        "streamId": "stream-2026-03-08",
+        "date": "2026-03-08",
+        "streamTitle": "【英文歌回】I Sing You Sing【朔Sakuro】",
+        "videoId": "2wxID-o2_kU",
+        "timestamp": 4403,
+        "endTimestamp": 4560,
+        "note": ""
+      }
+    ]
+  },
+  {
+    "id": "song-f69ebff4",
+    "title": "goodbye",
+    "originalArtist": "清水翔太",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-93eece9e",
+        "streamId": "stream-0b82931e",
+        "date": "2026-02-01",
+        "streamTitle": "【縱型歌回】貼臉唱歌給你們聽！【朔Sakuro】",
+        "videoId": "Hmeugi8WS9k",
+        "timestamp": 4031,
+        "endTimestamp": 4382,
+        "note": ""
+      }
+    ]
+  },
+  {
+    "id": "song-f878026e",
+    "title": "我好想你",
+    "originalArtist": "蘇打綠 (sodagreen)",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-5788cb2c",
+        "streamId": "stream-2026-01-25",
+        "date": "2026-01-25",
+        "streamTitle": "【冬日歌回】冬天冷冷的適合聽歌！【朔Sakuro】",
+        "videoId": "OrwsCyMKewY",
+        "timestamp": 2132,
+        "endTimestamp": 2438,
+        "note": ""
+      }
+    ]
+  },
+  {
+    "id": "song-f9996600",
+    "title": "手語",
+    "originalArtist": "周杰倫 (Jay Chou)",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-d2b2d89b",
+        "streamId": "stream-e0f35849",
+        "date": "",
+        "streamTitle": "【情人節歌回】情人節特別的歌及驚喜！【朔Sakuro】",
+        "videoId": "0xT5uHGGMC0",
+        "timestamp": 9476,
+        "endTimestamp": 9760,
+        "note": ""
+      }
+    ]
+  },
+  {
+    "id": "song-fd99128d",
+    "title": "Paradise Island",
+    "originalArtist": "ØZI",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-beba6e5f",
+        "streamId": "stream-08669a76",
+        "date": "2025-11-23",
+        "streamTitle": "【哄睡歌回】 伴隨輕聲吟唱入睡吧！ 【朔Sakuro】",
+        "videoId": "t18t-chE1wM",
+        "timestamp": 5455,
+        "endTimestamp": 5661,
+        "note": ""
+      }
+    ]
+  },
+  {
+    "id": "song-fe284a1b",
+    "title": "只有副歌的新歌",
+    "originalArtist": "朔Sakuro",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-f553e74c",
+        "streamId": "stream-2026-01-18",
+        "date": "2026-01-18",
+        "streamTitle": "【低音歌回】老師說我要唱低一點的歌所以來了【朔Sakuro】",
+        "videoId": "SVEtS6mQFPY",
+        "timestamp": 1632,
+        "endTimestamp": 1752,
         "note": ""
       }
     ]
