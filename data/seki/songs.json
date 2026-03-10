@@ -226,6 +226,24 @@
     ]
   },
   {
+    "id": "song-a652c93b",
+    "title": "2 soon",
+    "originalArtist": "keshi",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-2eb6d517",
+        "streamId": "stream-2022-12-05",
+        "date": "2022-12-05",
+        "streamTitle": "【迷你歌回】嗨 我 回 來 了 ！｜汐Seki",
+        "videoId": "ubYgR0KzkRc",
+        "timestamp": 5409,
+        "endTimestamp": 5611,
+        "note": ""
+      }
+    ]
+  },
+  {
     "id": "song-8d2b8650",
     "title": "25歲",
     "originalArtist": "黃玠",
@@ -440,6 +458,16 @@
     "tags": [],
     "performances": [
       {
+        "id": "p-e1e5ee35",
+        "streamId": "stream-2022-12-27",
+        "date": "2022-12-27",
+        "streamTitle": "【歌回】今年最後一次為你唱歌｜汐Seki",
+        "videoId": "XPfdgfGnMWU",
+        "timestamp": 1945,
+        "endTimestamp": 2229,
+        "note": ""
+      },
+      {
         "id": "p-4c540475",
         "streamId": "stream-2024-02-25",
         "date": "2024-02-25",
@@ -601,6 +629,24 @@
         "videoId": "GGMRlrXBdV8",
         "timestamp": 6213,
         "endTimestamp": 6423,
+        "note": ""
+      }
+    ]
+  },
+  {
+    "id": "song-2a6e18c5",
+    "title": "Angel 2 Me",
+    "originalArtist": "맥케이 (McKay)",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-fb96c5a8",
+        "streamId": "stream-2022-12-18",
+        "date": "2022-12-18",
+        "streamTitle": "【歌回】唱唱小汐喜歡的歌｜汐Seki",
+        "videoId": "u2Yp9tSqlxg",
+        "timestamp": 3475,
+        "endTimestamp": 3687,
         "note": ""
       }
     ]
@@ -1168,6 +1214,24 @@
     ]
   },
   {
+    "id": "song-975e3eab",
+    "title": "COLORFUL",
+    "originalArtist": "婁峻碩SHOU",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-2fa84539",
+        "streamId": "stream-2022-12-11",
+        "date": "2022-12-11",
+        "streamTitle": "【歌回】中文限定歌回｜汐Seki",
+        "videoId": "67ZCx6iKmXA",
+        "timestamp": 4754,
+        "endTimestamp": 4974,
+        "note": ""
+      }
+    ]
+  },
+  {
     "id": "song-3cb85c30",
     "title": "Can't Help Falling In Love",
     "originalArtist": "Elvis Presley",
@@ -1326,6 +1390,24 @@
     ]
   },
   {
+    "id": "song-92ecd272",
+    "title": "Close to you",
+    "originalArtist": "Carpenters",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-d9baaa9c",
+        "streamId": "stream-2022-12-18",
+        "date": "2022-12-18",
+        "streamTitle": "【歌回】唱唱小汐喜歡的歌｜汐Seki",
+        "videoId": "u2Yp9tSqlxg",
+        "timestamp": 1504,
+        "endTimestamp": 1671,
+        "note": ""
+      }
+    ]
+  },
+  {
     "id": "song-a2fbe922",
     "title": "Colorful",
     "originalArtist": "婁峻碩 (SHOU)",
@@ -1395,6 +1477,24 @@
         "videoId": "aiZeNT4f6ZY",
         "timestamp": 6380,
         "endTimestamp": 6636,
+        "note": ""
+      }
+    ]
+  },
+  {
+    "id": "song-7481c6f9",
+    "title": "Counting Stars",
+    "originalArtist": "OneRepublic",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-1767db75",
+        "streamId": "stream-2022-12-18",
+        "date": "2022-12-18",
+        "streamTitle": "【歌回】唱唱小汐喜歡的歌｜汐Seki",
+        "videoId": "u2Yp9tSqlxg",
+        "timestamp": 8537,
+        "endTimestamp": 8795,
         "note": ""
       }
     ]
@@ -2001,6 +2101,24 @@
         "videoId": "M-f887X57QQ",
         "timestamp": 5920,
         "endTimestamp": 6127,
+        "note": ""
+      }
+    ]
+  },
+  {
+    "id": "song-990b1fde",
+    "title": "ERROR!《 語意錯誤 》",
+    "originalArtist": "BehindtheMoon (feat.The Hills,Plo6)",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-d63016a4",
+        "streamId": "stream-2022-11-20",
+        "date": "2022-11-20",
+        "streamTitle": "【歌回】充滿愛的BL歌回｜汐Seki",
+        "videoId": "FciuqMKM_70",
+        "timestamp": 4894,
+        "endTimestamp": 5097,
         "note": ""
       }
     ]
@@ -2950,6 +3068,24 @@
     ]
   },
   {
+    "id": "song-7a62971f",
+    "title": "Hype Boy",
+    "originalArtist": "NewJeans",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-f9f82b0f",
+        "streamId": "stream-2022-12-27",
+        "date": "2022-12-27",
+        "streamTitle": "【歌回】今年最後一次為你唱歌｜汐Seki",
+        "videoId": "XPfdgfGnMWU",
+        "timestamp": 2802,
+        "endTimestamp": 2976,
+        "note": ""
+      }
+    ]
+  },
+  {
     "id": "song-347d8bf4",
     "title": "Hype Boy (City Pop remix)",
     "originalArtist": "뉴진스",
@@ -3394,6 +3530,16 @@
     "tags": [],
     "performances": [
       {
+        "id": "p-7a992db8",
+        "streamId": "stream-2022-11-13",
+        "date": "2022-11-13",
+        "streamTitle": "【歌回】最Chill的那種歌回｜汐Seki",
+        "videoId": "STaVVcSVDEA",
+        "timestamp": 2746,
+        "endTimestamp": 3004,
+        "note": ""
+      },
+      {
         "id": "p-69d2cecc",
         "streamId": "stream-2024-08-04",
         "date": "2024-08-04",
@@ -3683,6 +3829,24 @@
         "videoId": "l5E8fiOEMLo",
         "timestamp": 9810,
         "endTimestamp": 10001,
+        "note": ""
+      }
+    ]
+  },
+  {
+    "id": "song-07914286",
+    "title": "Killing Me Softly",
+    "originalArtist": "Lori Lieberman",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-1cc151ff",
+        "streamId": "stream-2022-12-27",
+        "date": "2022-12-27",
+        "streamTitle": "【歌回】今年最後一次為你唱歌｜汐Seki",
+        "videoId": "XPfdgfGnMWU",
+        "timestamp": 747,
+        "endTimestamp": 920,
         "note": ""
       }
     ]
@@ -4072,6 +4236,24 @@
     ]
   },
   {
+    "id": "song-14e9b361",
+    "title": "Let's Fall in Love for the Night",
+    "originalArtist": "FINNEAS",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-67564e39",
+        "streamId": "stream-2022-12-18",
+        "date": "2022-12-18",
+        "streamTitle": "【歌回】唱唱小汐喜歡的歌｜汐Seki",
+        "videoId": "u2Yp9tSqlxg",
+        "timestamp": 4913,
+        "endTimestamp": 5102,
+        "note": ""
+      }
+    ]
+  },
+  {
     "id": "song-3b1a26ea",
     "title": "Letting Go",
     "originalArtist": "蔡健雅",
@@ -4095,6 +4277,24 @@
         "videoId": "BTE7RtGTXK4",
         "timestamp": 4866,
         "endTimestamp": 5120,
+        "note": ""
+      }
+    ]
+  },
+  {
+    "id": "song-5ffe9e32",
+    "title": "Letting go",
+    "originalArtist": "蔡健雅",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-8e51f1df",
+        "streamId": "stream-2022-12-27",
+        "date": "2022-12-27",
+        "streamTitle": "【歌回】今年最後一次為你唱歌｜汐Seki",
+        "videoId": "XPfdgfGnMWU",
+        "timestamp": 4124,
+        "endTimestamp": 4384,
         "note": ""
       }
     ]
@@ -4313,6 +4513,16 @@
     "originalArtist": "Justin Bieber",
     "tags": [],
     "performances": [
+      {
+        "id": "p-3b322702",
+        "streamId": "stream-2023-01-08",
+        "date": "2023-01-08",
+        "streamTitle": "【清唱歌回】用最簡單的聲音迎新年｜汐Seki",
+        "videoId": "gZEM2qEaI_g",
+        "timestamp": 1189,
+        "endTimestamp": 1419,
+        "note": ""
+      },
       {
         "id": "p-73193cac",
         "streamId": "stream-2023-03-12",
@@ -5086,6 +5296,24 @@
     ]
   },
   {
+    "id": "song-95e8b5dd",
+    "title": "Officially Missing You",
+    "originalArtist": "Tamia",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-05171d9f",
+        "streamId": "stream-2022-11-13",
+        "date": "2022-11-13",
+        "streamTitle": "【歌回】最Chill的那種歌回｜汐Seki",
+        "videoId": "STaVVcSVDEA",
+        "timestamp": 3952,
+        "endTimestamp": 4180,
+        "note": ""
+      }
+    ]
+  },
+  {
     "id": "song-73a83db1",
     "title": "Oh!",
     "originalArtist": "소녀시대",
@@ -5099,6 +5327,24 @@
         "videoId": "__H2pFjl8so",
         "timestamp": 2265,
         "endTimestamp": 2456,
+        "note": ""
+      }
+    ]
+  },
+  {
+    "id": "song-29478373",
+    "title": "On your mind",
+    "originalArtist": "Emi Choi",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-35201deb",
+        "streamId": "stream-2022-12-25",
+        "date": "2022-12-25",
+        "streamTitle": "【聖誕歌回】陪你們溫暖過節🎄｜汐Seki",
+        "videoId": "aEaZPSjfSLM",
+        "timestamp": 6384,
+        "endTimestamp": 6549,
         "note": ""
       }
     ]
@@ -5398,6 +5644,16 @@
     "tags": [],
     "performances": [
       {
+        "id": "p-cbca16b4",
+        "streamId": "stream-2022-12-27",
+        "date": "2022-12-27",
+        "streamTitle": "【歌回】今年最後一次為你唱歌｜汐Seki",
+        "videoId": "XPfdgfGnMWU",
+        "timestamp": 5149,
+        "endTimestamp": 5346,
+        "note": ""
+      },
+      {
         "id": "p-8058f53a",
         "streamId": "stream-7f0f847b",
         "date": "2024-08-25",
@@ -5623,6 +5879,24 @@
         "videoId": "RKJSbVMVWRw",
         "timestamp": 4700,
         "endTimestamp": 4902,
+        "note": ""
+      }
+    ]
+  },
+  {
+    "id": "song-7f392636",
+    "title": "Polaroid Love",
+    "originalArtist": "ENHYPEN",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-704a90d1",
+        "streamId": "stream-2022-12-18",
+        "date": "2022-12-18",
+        "streamTitle": "【歌回】唱唱小汐喜歡的歌｜汐Seki",
+        "videoId": "u2Yp9tSqlxg",
+        "timestamp": 7977,
+        "endTimestamp": 8132,
         "note": ""
       }
     ]
@@ -5859,6 +6133,24 @@
         "videoId": "g4Z9kgQvKAQ",
         "timestamp": 8950,
         "endTimestamp": 9141,
+        "note": ""
+      }
+    ]
+  },
+  {
+    "id": "song-7d25686d",
+    "title": "Rose",
+    "originalArtist": "Lee Hi (李夏怡)",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-68f49578",
+        "streamId": "stream-2022-12-18",
+        "date": "2022-12-18",
+        "streamTitle": "【歌回】唱唱小汐喜歡的歌｜汐Seki",
+        "videoId": "u2Yp9tSqlxg",
+        "timestamp": 5778,
+        "endTimestamp": 5969,
         "note": ""
       }
     ]
@@ -6470,6 +6762,24 @@
     ]
   },
   {
+    "id": "song-3db17cae",
+    "title": "Snowman",
+    "originalArtist": "Sia",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-e2092e3c",
+        "streamId": "stream-2022-12-25",
+        "date": "2022-12-25",
+        "streamTitle": "【聖誕歌回】陪你們溫暖過節🎄｜汐Seki",
+        "videoId": "aEaZPSjfSLM",
+        "timestamp": 2043,
+        "endTimestamp": 2206,
+        "note": ""
+      }
+    ]
+  },
+  {
     "id": "song-8e79eca7",
     "title": "So sick",
     "originalArtist": "Ne-Yo",
@@ -7048,6 +7358,42 @@
     ]
   },
   {
+    "id": "song-d9c76775",
+    "title": "That's What I Like",
+    "originalArtist": "Bruno Mars",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-35aa052a",
+        "streamId": "stream-2022-12-18",
+        "date": "2022-12-18",
+        "streamTitle": "【歌回】唱唱小汐喜歡的歌｜汐Seki",
+        "videoId": "u2Yp9tSqlxg",
+        "timestamp": 7531,
+        "endTimestamp": 7739,
+        "note": ""
+      }
+    ]
+  },
+  {
+    "id": "song-7ea6f495",
+    "title": "The Reason",
+    "originalArtist": "Hoobastank",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-edf856da",
+        "streamId": "stream-2022-12-18",
+        "date": "2022-12-18",
+        "streamTitle": "【歌回】唱唱小汐喜歡的歌｜汐Seki",
+        "videoId": "u2Yp9tSqlxg",
+        "timestamp": 7106,
+        "endTimestamp": 7354,
+        "note": ""
+      }
+    ]
+  },
+  {
     "id": "song-7522568c",
     "title": "The Show",
     "originalArtist": "Lenka",
@@ -7107,6 +7453,24 @@
         "videoId": "TsKxQc5qzdY",
         "timestamp": 865,
         "endTimestamp": 1069,
+        "note": ""
+      }
+    ]
+  },
+  {
+    "id": "song-1c6ebaf7",
+    "title": "This Love",
+    "originalArtist": "Maroon 5",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-dd5d7e66",
+        "streamId": "stream-2022-12-27",
+        "date": "2022-12-27",
+        "streamTitle": "【歌回】今年最後一次為你唱歌｜汐Seki",
+        "videoId": "XPfdgfGnMWU",
+        "timestamp": 6013,
+        "endTimestamp": 6220,
         "note": ""
       }
     ]
@@ -7374,6 +7738,16 @@
     "tags": [],
     "performances": [
       {
+        "id": "p-27446c2a",
+        "streamId": "stream-2022-12-25",
+        "date": "2022-12-25",
+        "streamTitle": "【聖誕歌回】陪你們溫暖過節🎄｜汐Seki",
+        "videoId": "aEaZPSjfSLM",
+        "timestamp": 5013,
+        "endTimestamp": 5168,
+        "note": ""
+      },
+      {
         "id": "p-ea0c181a",
         "streamId": "stream-2023-01-15",
         "date": "2023-01-15",
@@ -7381,6 +7755,24 @@
         "videoId": "TsKxQc5qzdY",
         "timestamp": 7618,
         "endTimestamp": 7775,
+        "note": ""
+      }
+    ]
+  },
+  {
+    "id": "song-0acea3f7",
+    "title": "Unholy",
+    "originalArtist": "Sam Smith ft. Kim Petras",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-baf32494",
+        "streamId": "stream-2022-12-25",
+        "date": "2022-12-25",
+        "streamTitle": "【聖誕歌回】陪你們溫暖過節🎄｜汐Seki",
+        "videoId": "aEaZPSjfSLM",
+        "timestamp": 4703,
+        "endTimestamp": 4860,
         "note": ""
       }
     ]
@@ -7455,6 +7847,16 @@
     "originalArtist": "Bruno Mars",
     "tags": [],
     "performances": [
+      {
+        "id": "p-8a73801d",
+        "streamId": "stream-2022-11-13",
+        "date": "2022-11-13",
+        "streamTitle": "【歌回】最Chill的那種歌回｜汐Seki",
+        "videoId": "STaVVcSVDEA",
+        "timestamp": 5030,
+        "endTimestamp": 5288,
+        "note": ""
+      },
       {
         "id": "p-f13ac403",
         "streamId": "stream-2024-08-16",
@@ -8058,6 +8460,24 @@
     ]
   },
   {
+    "id": "song-f1c3350e",
+    "title": "bad guy",
+    "originalArtist": "Billie Eilish",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-8ceee4b5",
+        "streamId": "stream-2022-12-05",
+        "date": "2022-12-05",
+        "streamTitle": "【迷你歌回】嗨 我 回 來 了 ！｜汐Seki",
+        "videoId": "ubYgR0KzkRc",
+        "timestamp": 3970,
+        "endTimestamp": 4162,
+        "note": ""
+      }
+    ]
+  },
+  {
     "id": "song-bde2a9ee",
     "title": "blue",
     "originalArtist": "yung kai",
@@ -8268,6 +8688,42 @@
     ]
   },
   {
+    "id": "song-d78a4ed9",
+    "title": "sway",
+    "originalArtist": "michael buble",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-360672b6",
+        "streamId": "stream-2022-11-13",
+        "date": "2022-11-13",
+        "streamTitle": "【歌回】最Chill的那種歌回｜汐Seki",
+        "videoId": "STaVVcSVDEA",
+        "timestamp": 911,
+        "endTimestamp": 1100,
+        "note": ""
+      }
+    ]
+  },
+  {
+    "id": "song-aa525e9d",
+    "title": "telepatia",
+    "originalArtist": "Kali Uchis",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-2e374437",
+        "streamId": "stream-2022-11-13",
+        "date": "2022-11-13",
+        "streamTitle": "【歌回】最Chill的那種歌回｜汐Seki",
+        "videoId": "STaVVcSVDEA",
+        "timestamp": 2212,
+        "endTimestamp": 2373,
+        "note": ""
+      }
+    ]
+  },
+  {
     "id": "song-482cde22",
     "title": "this is what falling in love feels like",
     "originalArtist": "JVKE",
@@ -8299,6 +8755,24 @@
         "videoId": "OWcxGmUCmuM",
         "timestamp": 9350,
         "endTimestamp": 9513,
+        "note": ""
+      }
+    ]
+  },
+  {
+    "id": "song-9cb239af",
+    "title": "unravel",
+    "originalArtist": "TK from 凛として時雨",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-845f3416",
+        "streamId": "stream-2023-01-08",
+        "date": "2023-01-08",
+        "streamTitle": "【清唱歌回】用最簡單的聲音迎新年｜汐Seki",
+        "videoId": "gZEM2qEaI_g",
+        "timestamp": 2821,
+        "endTimestamp": 3046,
         "note": ""
       }
     ]
@@ -8430,6 +8904,24 @@
     ]
   },
   {
+    "id": "song-f1c5e488",
+    "title": "ほろよい (horoyoi)",
+    "originalArtist": "さんひ (Sunhe)",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-991d805d",
+        "streamId": "stream-2022-12-25",
+        "date": "2022-12-25",
+        "streamTitle": "【聖誕歌回】陪你們溫暖過節🎄｜汐Seki",
+        "videoId": "aEaZPSjfSLM",
+        "timestamp": 5358,
+        "endTimestamp": 5560,
+        "note": ""
+      }
+    ]
+  },
+  {
     "id": "song-51720512",
     "title": "ほろよい ft. 油粥咪",
     "originalArtist": "さんひ (Sunhe)",
@@ -8489,6 +8981,16 @@
     "originalArtist": "aiko",
     "tags": [],
     "performances": [
+      {
+        "id": "p-229d215d",
+        "streamId": "stream-2023-01-08",
+        "date": "2023-01-08",
+        "streamTitle": "【清唱歌回】用最簡單的聲音迎新年｜汐Seki",
+        "videoId": "gZEM2qEaI_g",
+        "timestamp": 4378,
+        "endTimestamp": 4510,
+        "note": ""
+      },
       {
         "id": "p-4ee38273",
         "streamId": "stream-2024-07-21",
@@ -8587,6 +9089,24 @@
         "videoId": "M-f887X57QQ",
         "timestamp": 1858,
         "endTimestamp": 2147,
+        "note": ""
+      }
+    ]
+  },
+  {
+    "id": "song-8fca2360",
+    "title": "モラトリアム《 鳴鳥不飛 : 烏雲密布 》",
+    "originalArtist": "Omoinotake",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-3dcec9ce",
+        "streamId": "stream-2022-11-20",
+        "date": "2022-11-20",
+        "streamTitle": "【歌回】充滿愛的BL歌回｜汐Seki",
+        "videoId": "FciuqMKM_70",
+        "timestamp": 3645,
+        "endTimestamp": 3933,
         "note": ""
       }
     ]
@@ -8902,6 +9422,24 @@
     ]
   },
   {
+    "id": "song-aa57f1fc",
+    "title": "七十億分之一加一",
+    "originalArtist": "Julia Wu吳卓源-婁峻碩 SHOU",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-ad3dbbdd",
+        "streamId": "stream-2022-12-11",
+        "date": "2022-12-11",
+        "streamTitle": "【歌回】中文限定歌回｜汐Seki",
+        "videoId": "67ZCx6iKmXA",
+        "timestamp": 4110,
+        "endTimestamp": 4332,
+        "note": ""
+      }
+    ]
+  },
+  {
     "id": "song-e5bfbb7c",
     "title": "七里香",
     "originalArtist": "周杰倫 (Jay Chou)",
@@ -8951,6 +9489,24 @@
         "videoId": "05tmVK9ahfI",
         "timestamp": 1426,
         "endTimestamp": 1711,
+        "note": ""
+      }
+    ]
+  },
+  {
+    "id": "song-52f58bdf",
+    "title": "下一站,與你",
+    "originalArtist": "KSP,3R2,茶米",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-e904247a",
+        "streamId": "stream-2022-12-05",
+        "date": "2022-12-05",
+        "streamTitle": "【迷你歌回】嗨 我 回 來 了 ！｜汐Seki",
+        "videoId": "ubYgR0KzkRc",
+        "timestamp": 2725,
+        "endTimestamp": 2931,
         "note": ""
       }
     ]
@@ -9318,6 +9874,24 @@
     ]
   },
   {
+    "id": "song-874c2faf",
+    "title": "人質",
+    "originalArtist": "張惠妹",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-57d86c4b",
+        "streamId": "stream-2023-01-08",
+        "date": "2023-01-08",
+        "streamTitle": "【清唱歌回】用最簡單的聲音迎新年｜汐Seki",
+        "videoId": "gZEM2qEaI_g",
+        "timestamp": 4811,
+        "endTimestamp": 4987,
+        "note": ""
+      }
+    ]
+  },
+  {
     "id": "song-edc8980c",
     "title": "人間不值得",
     "originalArtist": "黃詩扶",
@@ -9382,6 +9956,24 @@
     ]
   },
   {
+    "id": "song-481d4eba",
+    "title": "他們說我是沒有用的年輕人",
+    "originalArtist": "好樂團",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-0ed94df5",
+        "streamId": "stream-2022-12-18",
+        "date": "2022-12-18",
+        "streamTitle": "【歌回】唱唱小汐喜歡的歌｜汐Seki",
+        "videoId": "u2Yp9tSqlxg",
+        "timestamp": 3889,
+        "endTimestamp": 4148,
+        "note": ""
+      }
+    ]
+  },
+  {
     "id": "song-2ebfe289",
     "title": "以後別做朋友",
     "originalArtist": "Eric周興哲",
@@ -9413,6 +10005,24 @@
         "videoId": "dhHVSmCh2p8",
         "timestamp": 929,
         "endTimestamp": 1192,
+        "note": ""
+      }
+    ]
+  },
+  {
+    "id": "song-bbcf4de3",
+    "title": "会いたい (Aitai)",
+    "originalArtist": "もさを",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-da3df4ac",
+        "streamId": "stream-2022-12-25",
+        "date": "2022-12-25",
+        "streamTitle": "【聖誕歌回】陪你們溫暖過節🎄｜汐Seki",
+        "videoId": "aEaZPSjfSLM",
+        "timestamp": 3009,
+        "endTimestamp": 3254,
         "note": ""
       }
     ]
@@ -9531,6 +10141,24 @@
         "videoId": "08xQSaDSZe0",
         "timestamp": 5348,
         "endTimestamp": 5577,
+        "note": ""
+      }
+    ]
+  },
+  {
+    "id": "song-9192f4dc",
+    "title": "你是不是有點動心",
+    "originalArtist": "Julia Wu吳卓源",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-122cd024",
+        "streamId": "stream-2022-12-11",
+        "date": "2022-12-11",
+        "streamTitle": "【歌回】中文限定歌回｜汐Seki",
+        "videoId": "67ZCx6iKmXA",
+        "timestamp": 7719,
+        "endTimestamp": 7995,
         "note": ""
       }
     ]
@@ -9685,6 +10313,24 @@
         "videoId": "Y4sdMVY4bMA",
         "timestamp": 1608,
         "endTimestamp": 1891,
+        "note": ""
+      }
+    ]
+  },
+  {
+    "id": "song-64c983d8",
+    "title": "你，好不好",
+    "originalArtist": "Eric周興哲",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-2c7a211c",
+        "streamId": "stream-2023-01-08",
+        "date": "2023-01-08",
+        "streamTitle": "【清唱歌回】用最簡單的聲音迎新年｜汐Seki",
+        "videoId": "gZEM2qEaI_g",
+        "timestamp": 1721,
+        "endTimestamp": 1958,
         "note": ""
       }
     ]
@@ -9910,6 +10556,24 @@
     ]
   },
   {
+    "id": "song-4e5bc79b",
+    "title": "像瘋了一樣",
+    "originalArtist": "齊秦",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-4c763986",
+        "streamId": "stream-2022-12-11",
+        "date": "2022-12-11",
+        "streamTitle": "【歌回】中文限定歌回｜汐Seki",
+        "videoId": "67ZCx6iKmXA",
+        "timestamp": 6522,
+        "endTimestamp": 6793,
+        "note": ""
+      }
+    ]
+  },
+  {
     "id": "song-ce862f29",
     "title": "像風一樣",
     "originalArtist": "薛之謙",
@@ -10028,6 +10692,24 @@
     ]
   },
   {
+    "id": "song-0887a107",
+    "title": "兜圈",
+    "originalArtist": "林宥嘉 Yoga Lin",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-4f646657",
+        "streamId": "stream-2022-12-11",
+        "date": "2022-12-11",
+        "streamTitle": "【歌回】中文限定歌回｜汐Seki",
+        "videoId": "67ZCx6iKmXA",
+        "timestamp": 5125,
+        "endTimestamp": 5359,
+        "note": ""
+      }
+    ]
+  },
+  {
     "id": "song-ff3e3295",
     "title": "全世界我最喜歡你",
     "originalArtist": "來吧！焙焙！",
@@ -10141,6 +10823,24 @@
         "videoId": "7tmxS-HJE08",
         "timestamp": 10965,
         "endTimestamp": 11172,
+        "note": ""
+      }
+    ]
+  },
+  {
+    "id": "song-d3612dee",
+    "title": "冬のはなし《 GIVEN 被贈與的未來 》",
+    "originalArtist": "佐藤真冬（CV：矢野獎吾）",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-8a04c3a1",
+        "streamId": "stream-2022-11-20",
+        "date": "2022-11-20",
+        "streamTitle": "【歌回】充滿愛的BL歌回｜汐Seki",
+        "videoId": "FciuqMKM_70",
+        "timestamp": 2787,
+        "endTimestamp": 2994,
         "note": ""
       }
     ]
@@ -10288,6 +10988,16 @@
     "tags": [],
     "performances": [
       {
+        "id": "p-03d209db",
+        "streamId": "stream-2022-12-11",
+        "date": "2022-12-11",
+        "streamTitle": "【歌回】中文限定歌回｜汐Seki",
+        "videoId": "67ZCx6iKmXA",
+        "timestamp": 5524,
+        "endTimestamp": 5764,
+        "note": ""
+      },
+      {
         "id": "p-cbb49fcf",
         "streamId": "stream-2024-08-04",
         "date": "2024-08-04",
@@ -10331,6 +11041,24 @@
         "videoId": "PBfFbyd3MAE",
         "timestamp": 4106,
         "endTimestamp": 4413,
+        "note": ""
+      }
+    ]
+  },
+  {
+    "id": "song-3563c44c",
+    "title": "刻在我心底的名字《 刻在你心底的名字 》",
+    "originalArtist": "盧廣仲",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-4b702fcb",
+        "streamId": "stream-2022-11-20",
+        "date": "2022-11-20",
+        "streamTitle": "【歌回】充滿愛的BL歌回｜汐Seki",
+        "videoId": "FciuqMKM_70",
+        "timestamp": 2141,
+        "endTimestamp": 2446,
         "note": ""
       }
     ]
@@ -10585,6 +11313,24 @@
         "videoId": "CoLvynBaH1Q",
         "timestamp": 5808,
         "endTimestamp": 6088,
+        "note": ""
+      }
+    ]
+  },
+  {
+    "id": "song-7796aa09",
+    "title": "可惜不是你",
+    "originalArtist": "梁靜茹 Fish Leong",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-beeda9c2",
+        "streamId": "stream-2023-01-08",
+        "date": "2023-01-08",
+        "streamTitle": "【清唱歌回】用最簡單的聲音迎新年｜汐Seki",
+        "videoId": "gZEM2qEaI_g",
+        "timestamp": 2228,
+        "endTimestamp": 2483,
         "note": ""
       }
     ]
@@ -11158,6 +11904,16 @@
     "tags": [],
     "performances": [
       {
+        "id": "p-8b17dcb9",
+        "streamId": "stream-2022-12-25",
+        "date": "2022-12-25",
+        "streamTitle": "【聖誕歌回】陪你們溫暖過節🎄｜汐Seki",
+        "videoId": "aEaZPSjfSLM",
+        "timestamp": 2539,
+        "endTimestamp": 2795,
+        "note": ""
+      },
+      {
         "id": "p-07374748",
         "streamId": "stream-2024-07-07",
         "date": "2024-07-07",
@@ -11472,6 +12228,24 @@
     ]
   },
   {
+    "id": "song-b79aee43",
+    "title": "夜夜夜夜",
+    "originalArtist": "齊秦",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-1d0f70c2",
+        "streamId": "stream-2023-01-08",
+        "date": "2023-01-08",
+        "streamTitle": "【清唱歌回】用最簡單的聲音迎新年｜汐Seki",
+        "videoId": "gZEM2qEaI_g",
+        "timestamp": 5416,
+        "endTimestamp": 5660,
+        "note": ""
+      }
+    ]
+  },
+  {
     "id": "song-4fb8e5a8",
     "title": "夜曲",
     "originalArtist": "周杰倫 (Jay Chou)",
@@ -11549,6 +12323,16 @@
     "originalArtist": "那英",
     "tags": [],
     "performances": [
+      {
+        "id": "p-70eec44c",
+        "streamId": "stream-2022-12-27",
+        "date": "2022-12-27",
+        "streamTitle": "【歌回】今年最後一次為你唱歌｜汐Seki",
+        "videoId": "XPfdgfGnMWU",
+        "timestamp": 6663,
+        "endTimestamp": 6885,
+        "note": ""
+      },
       {
         "id": "p-16f0797e",
         "streamId": "stream-2025-03-16",
@@ -11631,6 +12415,16 @@
     "originalArtist": "李佳薇",
     "tags": [],
     "performances": [
+      {
+        "id": "p-643e7051",
+        "streamId": "stream-2022-12-11",
+        "date": "2022-12-11",
+        "streamTitle": "【歌回】中文限定歌回｜汐Seki",
+        "videoId": "67ZCx6iKmXA",
+        "timestamp": 1906,
+        "endTimestamp": 2226,
+        "note": ""
+      },
       {
         "id": "p-e1abc187",
         "streamId": "stream-2023-10-17",
@@ -11998,6 +12792,24 @@
     ]
   },
   {
+    "id": "song-f0222499",
+    "title": "失落沙洲",
+    "originalArtist": "徐佳瑩 LaLa",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-d6e6289f",
+        "streamId": "stream-2022-12-11",
+        "date": "2022-12-11",
+        "streamTitle": "【歌回】中文限定歌回｜汐Seki",
+        "videoId": "67ZCx6iKmXA",
+        "timestamp": 1240,
+        "endTimestamp": 1546,
+        "note": ""
+      }
+    ]
+  },
+  {
     "id": "song-dcac3ab9",
     "title": "女孩",
     "originalArtist": "韋禮安",
@@ -12119,6 +12931,24 @@
         "videoId": "JYE63RgdH00",
         "timestamp": 2761,
         "endTimestamp": 2969,
+        "note": ""
+      }
+    ]
+  },
+  {
+    "id": "song-73c1da8e",
+    "title": "如果可以",
+    "originalArtist": "韋禮安",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-60a74985",
+        "streamId": "stream-2022-12-11",
+        "date": "2022-12-11",
+        "streamTitle": "【歌回】中文限定歌回｜汐Seki",
+        "videoId": "67ZCx6iKmXA",
+        "timestamp": 2987,
+        "endTimestamp": 3259,
         "note": ""
       }
     ]
@@ -12814,6 +13644,16 @@
     "tags": [],
     "performances": [
       {
+        "id": "p-9fe1585f",
+        "streamId": "stream-2023-01-08",
+        "date": "2023-01-08",
+        "streamTitle": "【清唱歌回】用最簡單的聲音迎新年｜汐Seki",
+        "videoId": "gZEM2qEaI_g",
+        "timestamp": 6560,
+        "endTimestamp": 6671,
+        "note": ""
+      },
+      {
         "id": "p-ad7aa1bf",
         "streamId": "stream-2023-04-09",
         "date": "2023-04-09",
@@ -12895,6 +13735,24 @@
         "videoId": "LeTfPRKHghk",
         "timestamp": 5198,
         "endTimestamp": 5470,
+        "note": ""
+      }
+    ]
+  },
+  {
+    "id": "song-e4c3c7e6",
+    "title": "對不起我愛你",
+    "originalArtist": "蔡淳佳",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-02680bb6",
+        "streamId": "stream-2022-12-25",
+        "date": "2022-12-25",
+        "streamTitle": "【聖誕歌回】陪你們溫暖過節🎄｜汐Seki",
+        "videoId": "aEaZPSjfSLM",
+        "timestamp": 4150,
+        "endTimestamp": 4464,
         "note": ""
       }
     ]
@@ -13508,6 +14366,24 @@
     ]
   },
   {
+    "id": "song-492038e0",
+    "title": "心牆",
+    "originalArtist": "郭靜",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-51ac90fa",
+        "streamId": "stream-2023-01-08",
+        "date": "2023-01-08",
+        "streamTitle": "【清唱歌回】用最簡單的聲音迎新年｜汐Seki",
+        "videoId": "gZEM2qEaI_g",
+        "timestamp": 611,
+        "endTimestamp": 819,
+        "note": ""
+      }
+    ]
+  },
+  {
     "id": "song-c4328e63",
     "title": "心理學",
     "originalArtist": "徐佳瑩",
@@ -13521,6 +14397,42 @@
         "videoId": "LeTfPRKHghk",
         "timestamp": 8884,
         "endTimestamp": 9181,
+        "note": ""
+      }
+    ]
+  },
+  {
+    "id": "song-15e36592",
+    "title": "心理學",
+    "originalArtist": "徐佳瑩",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-5aabffd3",
+        "streamId": "stream-2022-12-25",
+        "date": "2022-12-25",
+        "streamTitle": "【聖誕歌回】陪你們溫暖過節🎄｜汐Seki",
+        "videoId": "aEaZPSjfSLM",
+        "timestamp": 5848,
+        "endTimestamp": 6146,
+        "note": ""
+      }
+    ]
+  },
+  {
+    "id": "song-21d606fe",
+    "title": "心臓デモクラシー",
+    "originalArtist": "みきとP",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-425fb4c6",
+        "streamId": "stream-2022-12-27",
+        "date": "2022-12-27",
+        "streamTitle": "【歌回】今年最後一次為你唱歌｜汐Seki",
+        "videoId": "XPfdgfGnMWU",
+        "timestamp": 5600,
+        "endTimestamp": 5825,
         "note": ""
       }
     ]
@@ -13677,6 +14589,24 @@
         "videoId": "52n_Vn84J6c",
         "timestamp": 934,
         "endTimestamp": 1189,
+        "note": ""
+      }
+    ]
+  },
+  {
+    "id": "song-1573db06",
+    "title": "怪天氣",
+    "originalArtist": "YELLOW黃宣&9m88",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-094fc310",
+        "streamId": "stream-2022-11-13",
+        "date": "2022-11-13",
+        "streamTitle": "【歌回】最Chill的那種歌回｜汐Seki",
+        "videoId": "STaVVcSVDEA",
+        "timestamp": 1461,
+        "endTimestamp": 1715,
         "note": ""
       }
     ]
@@ -14128,6 +15058,24 @@
     ]
   },
   {
+    "id": "song-80ce19fd",
+    "title": "想自由",
+    "originalArtist": "林宥嘉 Yoga Lin",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-7872dd1b",
+        "streamId": "stream-2022-12-05",
+        "date": "2022-12-05",
+        "streamTitle": "【迷你歌回】嗨 我 回 來 了 ！｜汐Seki",
+        "videoId": "ubYgR0KzkRc",
+        "timestamp": 6798,
+        "endTimestamp": 7042,
+        "note": ""
+      }
+    ]
+  },
+  {
     "id": "song-4ad74919",
     "title": "愛",
     "originalArtist": "莫文蔚",
@@ -14267,6 +15215,24 @@
         "videoId": "q271zTEX5s0",
         "timestamp": 5176,
         "endTimestamp": 5433,
+        "note": ""
+      }
+    ]
+  },
+  {
+    "id": "song-0f83d9ea",
+    "title": "愛人錯過",
+    "originalArtist": "告五人",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-c5084aef",
+        "streamId": "stream-2022-12-27",
+        "date": "2022-12-27",
+        "streamTitle": "【歌回】今年最後一次為你唱歌｜汐Seki",
+        "videoId": "XPfdgfGnMWU",
+        "timestamp": 4688,
+        "endTimestamp": 4979,
         "note": ""
       }
     ]
@@ -15268,6 +16234,24 @@
     ]
   },
   {
+    "id": "song-d180613f",
+    "title": "我把我的青春給你",
+    "originalArtist": "好樂團 GoodBand",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-3987477f",
+        "streamId": "stream-2023-01-08",
+        "date": "2023-01-08",
+        "streamTitle": "【清唱歌回】用最簡單的聲音迎新年｜汐Seki",
+        "videoId": "gZEM2qEaI_g",
+        "timestamp": 3272,
+        "endTimestamp": 3511,
+        "note": ""
+      }
+    ]
+  },
+  {
     "id": "song-32e96096",
     "title": "我是你的誰",
     "originalArtist": "黃立行",
@@ -15373,6 +16357,16 @@
     "originalArtist": "張學友",
     "tags": [],
     "performances": [
+      {
+        "id": "p-2d725c71",
+        "streamId": "stream-2023-01-08",
+        "date": "2023-01-08",
+        "streamTitle": "【清唱歌回】用最簡單的聲音迎新年｜汐Seki",
+        "videoId": "gZEM2qEaI_g",
+        "timestamp": 6059,
+        "endTimestamp": 6241,
+        "note": ""
+      },
       {
         "id": "p-5efce52f",
         "streamId": "stream-087ff116",
@@ -15748,6 +16742,24 @@
     ]
   },
   {
+    "id": "song-0fc7467c",
+    "title": "撥接",
+    "originalArtist": "Julia Wu吳卓源",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-faa45043",
+        "streamId": "stream-2022-12-05",
+        "date": "2022-12-05",
+        "streamTitle": "【迷你歌回】嗨 我 回 來 了 ！｜汐Seki",
+        "videoId": "ubYgR0KzkRc",
+        "timestamp": 4560,
+        "endTimestamp": 4752,
+        "note": ""
+      }
+    ]
+  },
+  {
     "id": "song-b22fbe24",
     "title": "擱淺",
     "originalArtist": "周杰倫 (Jay Chou)",
@@ -15930,6 +16942,24 @@
     ]
   },
   {
+    "id": "song-d16b4cb0",
+    "title": "明日、僕は君に会いに行く《 世界一初戀 》",
+    "originalArtist": "WAKABA",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-2ff0187d",
+        "streamId": "stream-2022-11-20",
+        "date": "2022-11-20",
+        "streamTitle": "【歌回】充滿愛的BL歌回｜汐Seki",
+        "videoId": "FciuqMKM_70",
+        "timestamp": 798,
+        "endTimestamp": 1042,
+        "note": ""
+      }
+    ]
+  },
+  {
     "id": "song-ef4b749f",
     "title": "明明就",
     "originalArtist": "周杰倫 (Jay Chou)",
@@ -16102,6 +17132,24 @@
     ]
   },
   {
+    "id": "song-74227975",
+    "title": "普通朋友",
+    "originalArtist": "陶喆David Tao",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-ce08caf6",
+        "streamId": "stream-2023-01-08",
+        "date": "2023-01-08",
+        "streamTitle": "【清唱歌回】用最簡單的聲音迎新年｜汐Seki",
+        "videoId": "gZEM2qEaI_g",
+        "timestamp": 6915,
+        "endTimestamp": 7141,
+        "note": ""
+      }
+    ]
+  },
+  {
     "id": "song-b59b60c6",
     "title": "晴天",
     "originalArtist": "周杰倫 (Jay Chou)",
@@ -16210,6 +17258,24 @@
     ]
   },
   {
+    "id": "song-c421a230",
+    "title": "曖",
+    "originalArtist": "孫盛希 Shi Shi-ØZI",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-28db0743",
+        "streamId": "stream-2022-12-11",
+        "date": "2022-12-11",
+        "streamTitle": "【歌回】中文限定歌回｜汐Seki",
+        "videoId": "67ZCx6iKmXA",
+        "timestamp": 6026,
+        "endTimestamp": 6234,
+        "note": ""
+      }
+    ]
+  },
+  {
     "id": "song-3620fe6d",
     "title": "曖昧",
     "originalArtist": "楊丞琳",
@@ -16313,6 +17379,24 @@
         "videoId": "OT35_LZ5gug",
         "timestamp": 12994,
         "endTimestamp": 13228,
+        "note": ""
+      }
+    ]
+  },
+  {
+    "id": "song-bec0358f",
+    "title": "最長的電影",
+    "originalArtist": "周杰倫 Jay Chou",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-6e685ec2",
+        "streamId": "stream-2022-12-11",
+        "date": "2022-12-11",
+        "streamTitle": "【歌回】中文限定歌回｜汐Seki",
+        "videoId": "67ZCx6iKmXA",
+        "timestamp": 7199,
+        "endTimestamp": 7434,
         "note": ""
       }
     ]
@@ -16454,6 +17538,24 @@
     ]
   },
   {
+    "id": "song-9506086f",
+    "title": "有你的快樂",
+    "originalArtist": "王若琳 Joanna Wang",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-d9c615ef",
+        "streamId": "stream-2022-11-13",
+        "date": "2022-11-13",
+        "streamTitle": "【歌回】最Chill的那種歌回｜汐Seki",
+        "videoId": "STaVVcSVDEA",
+        "timestamp": 4467,
+        "endTimestamp": 4658,
+        "note": ""
+      }
+    ]
+  },
+  {
     "id": "song-60f55638",
     "title": "末班車",
     "originalArtist": "蕭煌奇",
@@ -16485,6 +17587,24 @@
         "videoId": "QvylzGG_e0g",
         "timestamp": 3929,
         "endTimestamp": 4199,
+        "note": ""
+      }
+    ]
+  },
+  {
+    "id": "song-82c55836",
+    "title": "李白",
+    "originalArtist": "李榮浩",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-6469b082",
+        "streamId": "stream-2022-12-18",
+        "date": "2022-12-18",
+        "streamTitle": "【歌回】唱唱小汐喜歡的歌｜汐Seki",
+        "videoId": "u2Yp9tSqlxg",
+        "timestamp": 9515,
+        "endTimestamp": 9785,
         "note": ""
       }
     ]
@@ -16729,6 +17849,24 @@
         "videoId": "kS_h6kRMRVc",
         "timestamp": 8757,
         "endTimestamp": 9070,
+        "note": ""
+      }
+    ]
+  },
+  {
+    "id": "song-385337fa",
+    "title": "水藍色情人《 永遠的第一名 》",
+    "originalArtist": "楊宇騰YU",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-36941cfd",
+        "streamId": "stream-2022-11-20",
+        "date": "2022-11-20",
+        "streamTitle": "【歌回】充滿愛的BL歌回｜汐Seki",
+        "videoId": "FciuqMKM_70",
+        "timestamp": 4222,
+        "endTimestamp": 4501,
         "note": ""
       }
     ]
@@ -17206,6 +18344,16 @@
     "tags": [],
     "performances": [
       {
+        "id": "p-95d07a08",
+        "streamId": "stream-2022-12-11",
+        "date": "2022-12-11",
+        "streamTitle": "【歌回】中文限定歌回｜汐Seki",
+        "videoId": "67ZCx6iKmXA",
+        "timestamp": 2516,
+        "endTimestamp": 2790,
+        "note": ""
+      },
+      {
         "id": "p-dbd7af58",
         "streamId": "stream-2023-11-12",
         "date": "2023-11-12",
@@ -17390,6 +18538,24 @@
     ]
   },
   {
+    "id": "song-1a31e602",
+    "title": "無底洞",
+    "originalArtist": "蔡健雅 Tanya Chua",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-d949a351",
+        "streamId": "stream-2022-12-05",
+        "date": "2022-12-05",
+        "streamTitle": "【迷你歌回】嗨 我 回 來 了 ！｜汐Seki",
+        "videoId": "ubYgR0KzkRc",
+        "timestamp": 1958,
+        "endTimestamp": 2185,
+        "note": ""
+      }
+    ]
+  },
+  {
     "id": "song-bc551a97",
     "title": "無法度按捺",
     "originalArtist": "WHY NOT",
@@ -17557,6 +18723,24 @@
         "videoId": "Ql41bRLk0ZQ",
         "timestamp": 7450,
         "endTimestamp": 7717,
+        "note": ""
+      }
+    ]
+  },
+  {
+    "id": "song-ca82e0db",
+    "title": "燈光",
+    "originalArtist": "謝震廷",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-78162d6d",
+        "streamId": "stream-2022-12-18",
+        "date": "2022-12-18",
+        "streamTitle": "【歌回】唱唱小汐喜歡的歌｜汐Seki",
+        "videoId": "u2Yp9tSqlxg",
+        "timestamp": 2942,
+        "endTimestamp": 3207,
         "note": ""
       }
     ]
@@ -18220,6 +19404,24 @@
     ]
   },
   {
+    "id": "song-3537b7f0",
+    "title": "真夜中のドア〜stay with me",
+    "originalArtist": "松原みき",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-e3de40c1",
+        "streamId": "stream-2022-12-18",
+        "date": "2022-12-18",
+        "streamTitle": "【歌回】唱唱小汐喜歡的歌｜汐Seki",
+        "videoId": "u2Yp9tSqlxg",
+        "timestamp": 6236,
+        "endTimestamp": 6423,
+        "note": ""
+      }
+    ]
+  },
+  {
     "id": "song-1749e585",
     "title": "眼色 (Color of Your Eyes)",
     "originalArtist": "林宥嘉 (Yoga Lin)",
@@ -18269,6 +19471,24 @@
         "videoId": "mebw4ey9G50",
         "timestamp": 6298,
         "endTimestamp": 6635,
+        "note": ""
+      }
+    ]
+  },
+  {
+    "id": "song-7aeb7450",
+    "title": "矜持",
+    "originalArtist": "王菲",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-23ceb5d2",
+        "streamId": "stream-2023-01-08",
+        "date": "2023-01-08",
+        "streamTitle": "【清唱歌回】用最簡單的聲音迎新年｜汐Seki",
+        "videoId": "gZEM2qEaI_g",
+        "timestamp": 3740,
+        "endTimestamp": 3962,
         "note": ""
       }
     ]
@@ -18834,6 +20054,42 @@
     ]
   },
   {
+    "id": "song-a4968913",
+    "title": "紅絕《 天官賜福 》",
+    "originalArtist": "胡夏",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-f1975575",
+        "streamId": "stream-2022-11-20",
+        "date": "2022-11-20",
+        "streamTitle": "【歌回】充滿愛的BL歌回｜汐Seki",
+        "videoId": "FciuqMKM_70",
+        "timestamp": 1575,
+        "endTimestamp": 1833,
+        "note": ""
+      }
+    ]
+  },
+  {
+    "id": "song-cfdae9df",
+    "title": "紅色高跟鞋",
+    "originalArtist": "蔡健雅",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-362407a0",
+        "streamId": "stream-2022-12-25",
+        "date": "2022-12-25",
+        "streamTitle": "【聖誕歌回】陪你們溫暖過節🎄｜汐Seki",
+        "videoId": "aEaZPSjfSLM",
+        "timestamp": 3509,
+        "endTimestamp": 3714,
+        "note": ""
+      }
+    ]
+  },
+  {
     "id": "song-bff03496",
     "title": "紅蓮華",
     "originalArtist": "LiSA",
@@ -18875,6 +20131,24 @@
         "videoId": "tDAH34PO4Gg",
         "timestamp": 9380,
         "endTimestamp": 9635,
+        "note": ""
+      }
+    ]
+  },
+  {
+    "id": "song-a0437388",
+    "title": "純白之誓",
+    "originalArtist": "浠mizuki&夏語遙",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-e603cdd3",
+        "streamId": "stream-2022-12-11",
+        "date": "2022-12-11",
+        "streamTitle": "【歌回】中文限定歌回｜汐Seki",
+        "videoId": "67ZCx6iKmXA",
+        "timestamp": 673,
+        "endTimestamp": 900,
         "note": ""
       }
     ]
@@ -19158,6 +20432,16 @@
     "tags": [],
     "performances": [
       {
+        "id": "p-65cdc446",
+        "streamId": "stream-2022-12-25",
+        "date": "2022-12-25",
+        "streamTitle": "【聖誕歌回】陪你們溫暖過節🎄｜汐Seki",
+        "videoId": "aEaZPSjfSLM",
+        "timestamp": 1439,
+        "endTimestamp": 1716,
+        "note": ""
+      },
+      {
         "id": "p-f5aaaed6",
         "streamId": "stream-caebe02e",
         "date": "2023-12-23",
@@ -19265,6 +20549,24 @@
         "videoId": "AKuqcjA8paE",
         "timestamp": 7768,
         "endTimestamp": 8013,
+        "note": ""
+      }
+    ]
+  },
+  {
+    "id": "song-06ff3ffd",
+    "title": "致姍姍來遲的你",
+    "originalArtist": "阿肆 & 林宥嘉",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-d87bdc06",
+        "streamId": "stream-2022-12-27",
+        "date": "2022-12-27",
+        "streamTitle": "【歌回】今年最後一次為你唱歌｜汐Seki",
+        "videoId": "XPfdgfGnMWU",
+        "timestamp": 2387,
+        "endTimestamp": 2630,
         "note": ""
       }
     ]
@@ -20352,6 +21654,24 @@
     ]
   },
   {
+    "id": "song-eb8a3cd9",
+    "title": "踮起腳尖愛",
+    "originalArtist": "洪佩瑜",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-44f49873",
+        "streamId": "stream-2022-12-18",
+        "date": "2022-12-18",
+        "streamTitle": "【歌回】唱唱小汐喜歡的歌｜汐Seki",
+        "videoId": "u2Yp9tSqlxg",
+        "timestamp": 5244,
+        "endTimestamp": 5524,
+        "note": ""
+      }
+    ]
+  },
+  {
     "id": "song-80683680",
     "title": "身後",
     "originalArtist": "aMEI張惠妹",
@@ -20370,6 +21690,24 @@
     ]
   },
   {
+    "id": "song-d244b705",
+    "title": "身後",
+    "originalArtist": "張惠妹",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-3253816c",
+        "streamId": "stream-2022-12-27",
+        "date": "2022-12-27",
+        "streamTitle": "【歌回】今年最後一次為你唱歌｜汐Seki",
+        "videoId": "XPfdgfGnMWU",
+        "timestamp": 1251,
+        "endTimestamp": 1510,
+        "note": ""
+      }
+    ]
+  },
+  {
     "id": "song-7bbfd1ba",
     "title": "身騎白馬",
     "originalArtist": "徐佳瑩",
@@ -20383,6 +21721,24 @@
         "videoId": "a9_l--bZOes",
         "timestamp": 3358,
         "endTimestamp": 3667,
+        "note": ""
+      }
+    ]
+  },
+  {
+    "id": "song-7f628695",
+    "title": "身騎白馬",
+    "originalArtist": "徐佳瑩",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-cd79282f",
+        "streamId": "stream-2022-12-18",
+        "date": "2022-12-18",
+        "streamTitle": "【歌回】唱唱小汐喜歡的歌｜汐Seki",
+        "videoId": "u2Yp9tSqlxg",
+        "timestamp": 2030,
+        "endTimestamp": 2333,
         "note": ""
       }
     ]
@@ -20437,6 +21793,24 @@
         "videoId": "mE1YoiOuhpo",
         "timestamp": 3528,
         "endTimestamp": 3792,
+        "note": ""
+      }
+    ]
+  },
+  {
+    "id": "song-b669fabb",
+    "title": "輸情歌",
+    "originalArtist": "J.Sheon",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-8a53fc55",
+        "streamId": "stream-2022-11-13",
+        "date": "2022-11-13",
+        "streamTitle": "【歌回】最Chill的那種歌回｜汐Seki",
+        "videoId": "STaVVcSVDEA",
+        "timestamp": 6495,
+        "endTimestamp": 6715,
         "note": ""
       }
     ]
@@ -20537,6 +21911,24 @@
         "videoId": "OT35_LZ5gug",
         "timestamp": 9525,
         "endTimestamp": 9777,
+        "note": ""
+      }
+    ]
+  },
+  {
+    "id": "song-1cfd0e50",
+    "title": "迷迭香",
+    "originalArtist": "周杰倫 Jay Chou",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-0ed9657d",
+        "streamId": "stream-2022-11-13",
+        "date": "2022-11-13",
+        "streamTitle": "【歌回】最Chill的那種歌回｜汐Seki",
+        "videoId": "STaVVcSVDEA",
+        "timestamp": 3342,
+        "endTimestamp": 3593,
         "note": ""
       }
     ]
@@ -20681,6 +22073,24 @@
         "videoId": "RssaxoSPWGw",
         "timestamp": 3803,
         "endTimestamp": 4132,
+        "note": ""
+      }
+    ]
+  },
+  {
+    "id": "song-d0b9f2af",
+    "title": "連名帶姓",
+    "originalArtist": "張惠妹aMEI",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-2f35984c",
+        "streamId": "stream-2022-12-11",
+        "date": "2022-12-11",
+        "streamTitle": "【歌回】中文限定歌回｜汐Seki",
+        "videoId": "67ZCx6iKmXA",
+        "timestamp": 3425,
+        "endTimestamp": 3756,
         "note": ""
       }
     ]
@@ -21326,6 +22736,24 @@
     ]
   },
   {
+    "id": "song-aa94939e",
+    "title": "陪你過假日",
+    "originalArtist": "Leo王-9m88",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-b68a7583",
+        "streamId": "stream-2022-12-05",
+        "date": "2022-12-05",
+        "streamTitle": "【迷你歌回】嗨 我 回 來 了 ！｜汐Seki",
+        "videoId": "ubYgR0KzkRc",
+        "timestamp": 1355,
+        "endTimestamp": 1549,
+        "note": ""
+      }
+    ]
+  },
+  {
     "id": "song-6b1dd96a",
     "title": "陽光宅男",
     "originalArtist": "周杰倫 (Jay Chou)",
@@ -21939,6 +23367,24 @@
         "videoId": "qUDoR0hlvwU",
         "timestamp": 3232,
         "endTimestamp": 3513,
+        "note": ""
+      }
+    ]
+  },
+  {
+    "id": "song-5a2a07f5",
+    "title": "魚仔",
+    "originalArtist": "盧廣仲",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-670e96a5",
+        "streamId": "stream-2022-12-18",
+        "date": "2022-12-18",
+        "streamTitle": "【歌回】唱唱小汐喜歡的歌｜汐Seki",
+        "videoId": "u2Yp9tSqlxg",
+        "timestamp": 6555,
+        "endTimestamp": 6834,
         "note": ""
       }
     ]
@@ -22651,6 +24097,24 @@
         "videoId": "GOWeVVQeDX8",
         "timestamp": 8298,
         "endTimestamp": 8533,
+        "note": ""
+      }
+    ]
+  },
+  {
+    "id": "song-e73bfde2",
+    "title": "꿀차(HONEY TEA)",
+    "originalArtist": "우효",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-36bba1c3",
+        "streamId": "stream-2022-11-13",
+        "date": "2022-11-13",
+        "streamTitle": "【歌回】最Chill的那種歌回｜汐Seki",
+        "videoId": "STaVVcSVDEA",
+        "timestamp": 5994,
+        "endTimestamp": 6233,
         "note": ""
       }
     ]
@@ -23559,6 +25023,24 @@
         "videoId": "jR8TppsaxQk",
         "timestamp": 9613,
         "endTimestamp": 9880,
+        "note": ""
+      }
+    ]
+  },
+  {
+    "id": "song-3ae26f48",
+    "title": "야화 ( 夜花 )《 夜畫帳 》",
+    "originalArtist": "安藝恩",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-82786db2",
+        "streamId": "stream-2022-11-20",
+        "date": "2022-11-20",
+        "streamTitle": "【歌回】充滿愛的BL歌回｜汐Seki",
+        "videoId": "FciuqMKM_70",
+        "timestamp": 5453,
+        "endTimestamp": 5719,
         "note": ""
       }
     ]
