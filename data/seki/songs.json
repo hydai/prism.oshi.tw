@@ -636,7 +636,7 @@
   {
     "id": "song-2a6e18c5",
     "title": "Angel 2 Me",
-    "originalArtist": "맥케이 (McKay)",
+    "originalArtist": "맥케이",
     "tags": [],
     "performances": [
       {
@@ -1288,24 +1288,6 @@
     ]
   },
   {
-    "id": "song-18446715",
-    "title": "Can't Take My Eyes Off You",
-    "originalArtist": "Frankie Valli",
-    "tags": [],
-    "performances": [
-      {
-        "id": "p-983c9820",
-        "streamId": "stream-2022-11-06",
-        "date": "2022-11-06",
-        "streamTitle": "【歌回】甜甜粉紅戀愛歌回｜汐Seki",
-        "videoId": "dry-Rkwc4OQ",
-        "timestamp": 721,
-        "endTimestamp": 906,
-        "note": ""
-      }
-    ]
-  },
-  {
     "id": "song-d861d6d8",
     "title": "Can't Take My Eyes off You",
     "originalArtist": "Frankie Valli",
@@ -1349,6 +1331,24 @@
         "videoId": "1A65rkK96bU",
         "timestamp": 6037,
         "endTimestamp": 6236,
+        "note": ""
+      }
+    ]
+  },
+  {
+    "id": "song-18446715",
+    "title": "Can't Take My Eyes off You",
+    "originalArtist": "Frankie Valli",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-983c9820",
+        "streamId": "stream-2022-11-06",
+        "date": "2022-11-06",
+        "streamTitle": "【歌回】甜甜粉紅戀愛歌回｜汐Seki",
+        "videoId": "dry-Rkwc4OQ",
+        "timestamp": 721,
+        "endTimestamp": 906,
         "note": ""
       }
     ]
@@ -2108,7 +2108,7 @@
   {
     "id": "song-990b1fde",
     "title": "ERROR!《 語意錯誤 》",
-    "originalArtist": "BehindtheMoon (feat.The Hills,Plo6)",
+    "originalArtist": "BehindtheMoon",
     "tags": [],
     "performances": [
       {
@@ -4283,7 +4283,7 @@
   },
   {
     "id": "song-5ffe9e32",
-    "title": "Letting go",
+    "title": "Letting Go",
     "originalArtist": "蔡健雅",
     "tags": [],
     "performances": [
@@ -6140,7 +6140,7 @@
   {
     "id": "song-7d25686d",
     "title": "Rose",
-    "originalArtist": "Lee Hi (李夏怡)",
+    "originalArtist": "LEE HI",
     "tags": [],
     "performances": [
       {
@@ -6302,7 +6302,7 @@
   {
     "id": "song-da638f23",
     "title": "SHINKIRO",
-    "originalArtist": "宝鐘マリン &  Gawr Gura",
+    "originalArtist": "宝鐘マリン ft. Gawr Gura",
     "tags": [],
     "performances": [
       {
@@ -6400,24 +6400,6 @@
     ]
   },
   {
-    "id": "song-5cc24aa8",
-    "title": "SUMMERTIME",
-    "originalArtist": "cinnamons × evening cinema",
-    "tags": [],
-    "performances": [
-      {
-        "id": "p-51562655",
-        "streamId": "stream-2022-11-06",
-        "date": "2022-11-06",
-        "streamTitle": "【歌回】甜甜粉紅戀愛歌回｜汐Seki",
-        "videoId": "dry-Rkwc4OQ",
-        "timestamp": 1334,
-        "endTimestamp": 1583,
-        "note": ""
-      }
-    ]
-  },
-  {
     "id": "song-51e7d997",
     "title": "SUPERPOWER",
     "originalArtist": "KISS OF LIFE & Mark Tuan",
@@ -6438,7 +6420,7 @@
   {
     "id": "song-795b4d19",
     "title": "SWAG午覺",
-    "originalArtist": "異鄉人 (Outlander) ft. 9m88",
+    "originalArtist": "ØZI ft. 9m88",
     "tags": [],
     "performances": [
       {
@@ -7078,6 +7060,24 @@
     ]
   },
   {
+    "id": "song-5cc24aa8",
+    "title": "Summertime",
+    "originalArtist": "cinnamons & evening cinema",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-51562655",
+        "streamId": "stream-2022-11-06",
+        "date": "2022-11-06",
+        "streamTitle": "【歌回】甜甜粉紅戀愛歌回｜汐Seki",
+        "videoId": "dry-Rkwc4OQ",
+        "timestamp": 1334,
+        "endTimestamp": 1583,
+        "note": ""
+      }
+    ]
+  },
+  {
     "id": "song-583d8551",
     "title": "Supernatural",
     "originalArtist": "NewJeans",
@@ -7376,24 +7376,6 @@
     ]
   },
   {
-    "id": "song-7ea6f495",
-    "title": "The Reason",
-    "originalArtist": "Hoobastank",
-    "tags": [],
-    "performances": [
-      {
-        "id": "p-edf856da",
-        "streamId": "stream-2022-12-18",
-        "date": "2022-12-18",
-        "streamTitle": "【歌回】唱唱小汐喜歡的歌｜汐Seki",
-        "videoId": "u2Yp9tSqlxg",
-        "timestamp": 7106,
-        "endTimestamp": 7354,
-        "note": ""
-      }
-    ]
-  },
-  {
     "id": "song-7522568c",
     "title": "The Show",
     "originalArtist": "Lenka",
@@ -7435,6 +7417,24 @@
         "videoId": "M-f887X57QQ",
         "timestamp": 5429,
         "endTimestamp": 5670,
+        "note": ""
+      }
+    ]
+  },
+  {
+    "id": "song-7ea6f495",
+    "title": "The reason",
+    "originalArtist": "Hoobastank",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-edf856da",
+        "streamId": "stream-2022-12-18",
+        "date": "2022-12-18",
+        "streamTitle": "【歌回】唱唱小汐喜歡的歌｜汐Seki",
+        "videoId": "u2Yp9tSqlxg",
+        "timestamp": 7106,
+        "endTimestamp": 7354,
         "note": ""
       }
     ]
@@ -7660,7 +7660,7 @@
   {
     "id": "song-78b27c02",
     "title": "Twinkle",
-    "originalArtist": "Girls' Generation-TTS",
+    "originalArtist": "Girls' Generation",
     "tags": [],
     "performances": [
       {
@@ -7716,7 +7716,7 @@
   {
     "id": "song-fd591116",
     "title": "Unholy",
-    "originalArtist": "Sam Smith & Kim Petras",
+    "originalArtist": "Sam Smith ft. Kim Petras",
     "tags": [],
     "performances": [
       {
@@ -8690,7 +8690,7 @@
   {
     "id": "song-d78a4ed9",
     "title": "sway",
-    "originalArtist": "michael buble",
+    "originalArtist": "Michael Bublé",
     "tags": [],
     "performances": [
       {
@@ -8816,7 +8816,7 @@
   {
     "id": "song-03ee8703",
     "title": "ぎゅっと。",
-    "originalArtist": "もさを。",
+    "originalArtist": "もさを",
     "tags": [],
     "performances": [
       {
@@ -9958,7 +9958,7 @@
   {
     "id": "song-481d4eba",
     "title": "他們說我是沒有用的年輕人",
-    "originalArtist": "好樂團",
+    "originalArtist": "好樂團 (GoodBand)",
     "tags": [],
     "performances": [
       {
@@ -24966,7 +24966,7 @@
   {
     "id": "song-737435b7",
     "title": "썸 탈꺼야 (Some)",
-    "originalArtist": "볼빨간사춘기 (BOL4)",
+    "originalArtist": "볼빨간사춘기",
     "tags": [],
     "performances": [
       {
