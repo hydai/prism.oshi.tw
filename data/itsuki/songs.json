@@ -144,6 +144,24 @@
     ]
   },
   {
+    "id": "song-0e879506",
+    "title": "yes, and?",
+    "originalArtist": "Ariana Grande",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-c80e3cce",
+        "streamId": "stream-2026-02-17",
+        "date": "2026-02-17",
+        "streamTitle": "【歌回】YT好久不見．今天唱時尚感滿滿的歌！",
+        "videoId": "f46nqn6MlyE",
+        "timestamp": 4441,
+        "endTimestamp": 4655,
+        "note": ""
+      }
+    ]
+  },
+  {
     "id": "song-10d02929",
     "title": "晴る",
     "originalArtist": "ヨルシカ",
@@ -175,6 +193,24 @@
         "videoId": "yfWcdOXraqw",
         "timestamp": 8861,
         "endTimestamp": 9010,
+        "note": ""
+      }
+    ]
+  },
+  {
+    "id": "song-15b9d7de",
+    "title": "年輪說",
+    "originalArtist": "楊丞琳",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-efa1f44a",
+        "streamId": "stream-2026-01-27",
+        "date": "2026-01-27",
+        "streamTitle": "【懷舊歌回】十年前的2016大家在聽什麼呢？",
+        "videoId": "v7FnF1POu0s",
+        "timestamp": 1617,
+        "endTimestamp": 1882,
         "note": ""
       }
     ]
@@ -252,6 +288,24 @@
     ]
   },
   {
+    "id": "song-20eb8332",
+    "title": "bad guy",
+    "originalArtist": "Billie Eilish",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-cb1dba0e",
+        "streamId": "stream-2026-02-17",
+        "date": "2026-02-17",
+        "streamTitle": "【歌回】YT好久不見．今天唱時尚感滿滿的歌！",
+        "videoId": "f46nqn6MlyE",
+        "timestamp": 6842,
+        "endTimestamp": 7063,
+        "note": ""
+      }
+    ]
+  },
+  {
     "id": "song-22a98e2f",
     "title": "我要我們在一起",
     "originalArtist": "范曉萱",
@@ -265,6 +319,24 @@
         "videoId": "yfWcdOXraqw",
         "timestamp": 14546,
         "endTimestamp": 14806,
+        "note": ""
+      }
+    ]
+  },
+  {
+    "id": "song-22daa100",
+    "title": "Please Please Please",
+    "originalArtist": "Sabrina Carpenter",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-0b6e2ea6",
+        "streamId": "stream-2026-02-17",
+        "date": "2026-02-17",
+        "streamTitle": "【歌回】YT好久不見．今天唱時尚感滿滿的歌！",
+        "videoId": "f46nqn6MlyE",
+        "timestamp": 6525,
+        "endTimestamp": 6773,
         "note": ""
       }
     ]
@@ -306,6 +378,42 @@
     ]
   },
   {
+    "id": "song-2411e410",
+    "title": "SHOOTING STAR",
+    "originalArtist": "XG",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-0789a422",
+        "streamId": "stream-2026-02-17",
+        "date": "2026-02-17",
+        "streamTitle": "【歌回】YT好久不見．今天唱時尚感滿滿的歌！",
+        "videoId": "f46nqn6MlyE",
+        "timestamp": 2697,
+        "endTimestamp": 2900,
+        "note": ""
+      }
+    ]
+  },
+  {
+    "id": "song-24970a26",
+    "title": "極楽浄土",
+    "originalArtist": "GARNiDELiA",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-2cc24ba0",
+        "streamId": "stream-2026-01-27",
+        "date": "2026-01-27",
+        "streamTitle": "【懷舊歌回】十年前的2016大家在聽什麼呢？",
+        "videoId": "v7FnF1POu0s",
+        "timestamp": 7384,
+        "endTimestamp": 7599,
+        "note": ""
+      }
+    ]
+  },
+  {
     "id": "song-258c689e",
     "title": "到底你是要不要我啦",
     "originalArtist": "持修",
@@ -319,6 +427,24 @@
         "videoId": "yfWcdOXraqw",
         "timestamp": 15604,
         "endTimestamp": 15780,
+        "note": ""
+      }
+    ]
+  },
+  {
+    "id": "song-268949e6",
+    "title": "Ninelie",
+    "originalArtist": "Aimer",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-22072ed5",
+        "streamId": "stream-2026-01-27",
+        "date": "2026-01-27",
+        "streamTitle": "【懷舊歌回】十年前的2016大家在聽什麼呢？",
+        "videoId": "v7FnF1POu0s",
+        "timestamp": 6466,
+        "endTimestamp": 6724,
         "note": ""
       }
     ]
@@ -360,6 +486,24 @@
     ]
   },
   {
+    "id": "song-2f931595",
+    "title": "Supernova",
+    "originalArtist": "aespa",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-5d33f372",
+        "streamId": "stream-2026-02-17",
+        "date": "2026-02-17",
+        "streamTitle": "【歌回】YT好久不見．今天唱時尚感滿滿的歌！",
+        "videoId": "f46nqn6MlyE",
+        "timestamp": 5496,
+        "endTimestamp": 5673,
+        "note": ""
+      }
+    ]
+  },
+  {
     "id": "song-31e43d12",
     "title": "浪漫體質",
     "originalArtist": "王彙筑",
@@ -373,6 +517,24 @@
         "videoId": "SkboY-_a5Sw",
         "timestamp": 4471,
         "endTimestamp": 4565,
+        "note": ""
+      }
+    ]
+  },
+  {
+    "id": "song-332aac39",
+    "title": "Décalcomanie",
+    "originalArtist": "MAMAMOO",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-0504bd92",
+        "streamId": "stream-2026-01-27",
+        "date": "2026-01-27",
+        "streamTitle": "【懷舊歌回】十年前的2016大家在聽什麼呢？",
+        "videoId": "v7FnF1POu0s",
+        "timestamp": 2898,
+        "endTimestamp": 3111,
         "note": ""
       }
     ]
@@ -504,6 +666,24 @@
     ]
   },
   {
+    "id": "song-49c2ee75",
+    "title": "Treat You Better",
+    "originalArtist": "Shawn Mendes",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-14a16117",
+        "streamId": "stream-2026-01-27",
+        "date": "2026-01-27",
+        "streamTitle": "【懷舊歌回】十年前的2016大家在聽什麼呢？",
+        "videoId": "v7FnF1POu0s",
+        "timestamp": 5303,
+        "endTimestamp": 5491,
+        "note": ""
+      }
+    ]
+  },
+  {
     "id": "song-4c1507bb",
     "title": "給我一個理由忘記",
     "originalArtist": "A-Lin",
@@ -630,6 +810,24 @@
     ]
   },
   {
+    "id": "song-64401784",
+    "title": "母系社會",
+    "originalArtist": "AMIT",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-c359c7e4",
+        "streamId": "stream-2026-01-27",
+        "date": "2026-01-27",
+        "streamTitle": "【懷舊歌回】十年前的2016大家在聽什麼呢？",
+        "videoId": "v7FnF1POu0s",
+        "timestamp": 5822,
+        "endTimestamp": 6053,
+        "note": ""
+      }
+    ]
+  },
+  {
     "id": "song-644c3a9f",
     "title": "火星人",
     "originalArtist": "ヨルシカ",
@@ -661,6 +859,24 @@
         "videoId": "7mSLMi2CrJM",
         "timestamp": 1095,
         "endTimestamp": 1301,
+        "note": ""
+      }
+    ]
+  },
+  {
+    "id": "song-70bb310c",
+    "title": "Tears",
+    "originalArtist": "Sabrina Carpenter",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-7fe36c0d",
+        "streamId": "stream-2026-02-17",
+        "date": "2026-02-17",
+        "streamTitle": "【歌回】YT好久不見．今天唱時尚感滿滿的歌！",
+        "videoId": "f46nqn6MlyE",
+        "timestamp": 3162,
+        "endTimestamp": 3319,
         "note": ""
       }
     ]
@@ -720,6 +936,24 @@
     ]
   },
   {
+    "id": "song-746f58a7",
+    "title": "Just Like Fire",
+    "originalArtist": "P!nk",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-3b924ac3",
+        "streamId": "stream-2026-01-27",
+        "date": "2026-01-27",
+        "streamTitle": "【懷舊歌回】十年前的2016大家在聽什麼呢？",
+        "videoId": "v7FnF1POu0s",
+        "timestamp": 6912,
+        "endTimestamp": 7128,
+        "note": ""
+      }
+    ]
+  },
+  {
     "id": "song-761e35a0",
     "title": "TOMBOY",
     "originalArtist": "(G)I-DLE",
@@ -751,6 +985,24 @@
         "videoId": "yfWcdOXraqw",
         "timestamp": 3254,
         "endTimestamp": 3472,
+        "note": ""
+      }
+    ]
+  },
+  {
+    "id": "song-788abe0d",
+    "title": "STRESS",
+    "originalArtist": "CHUNG HA",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-671cb3d5",
+        "streamId": "stream-2026-02-17",
+        "date": "2026-02-17",
+        "streamTitle": "【歌回】YT好久不見．今天唱時尚感滿滿的歌！",
+        "videoId": "f46nqn6MlyE",
+        "timestamp": 1342,
+        "endTimestamp": 1546,
         "note": ""
       }
     ]
@@ -792,6 +1044,24 @@
     ]
   },
   {
+    "id": "song-7a79e377",
+    "title": "Re：Re：",
+    "originalArtist": "ASIAN KUNG-FU GENERATION",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-5b13a1ed",
+        "streamId": "stream-2026-01-27",
+        "date": "2026-01-27",
+        "streamTitle": "【懷舊歌回】十年前的2016大家在聽什麼呢？",
+        "videoId": "v7FnF1POu0s",
+        "timestamp": 1062,
+        "endTimestamp": 1388,
+        "note": ""
+      }
+    ]
+  },
+  {
     "id": "song-7aa8e8c6",
     "title": "Splinter Wolf",
     "originalArtist": "KOHTA YAMAMOTO",
@@ -823,6 +1093,24 @@
         "videoId": "yfWcdOXraqw",
         "timestamp": 12954,
         "endTimestamp": 13166,
+        "note": ""
+      }
+    ]
+  },
+  {
+    "id": "song-7f49af13",
+    "title": "Don't Let Me Down",
+    "originalArtist": "The Chainsmokers, Daya",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-c625a630",
+        "streamId": "stream-2026-01-27",
+        "date": "2026-01-27",
+        "streamTitle": "【懷舊歌回】十年前的2016大家在聽什麼呢？",
+        "videoId": "v7FnF1POu0s",
+        "timestamp": 3948,
+        "endTimestamp": 4152,
         "note": ""
       }
     ]
@@ -913,6 +1201,24 @@
         "videoId": "7mSLMi2CrJM",
         "timestamp": 1569,
         "endTimestamp": 1832,
+        "note": ""
+      }
+    ]
+  },
+  {
+    "id": "song-98d864fc",
+    "title": "CLOSER",
+    "originalArtist": "JEON SOMI",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-8486ea64",
+        "streamId": "stream-2026-02-17",
+        "date": "2026-02-17",
+        "streamTitle": "【歌回】YT好久不見．今天唱時尚感滿滿的歌！",
+        "videoId": "f46nqn6MlyE",
+        "timestamp": 2427,
+        "endTimestamp": 2583,
         "note": ""
       }
     ]
@@ -1044,6 +1350,24 @@
     ]
   },
   {
+    "id": "song-af25c1b1",
+    "title": "NEW WOMAN",
+    "originalArtist": "LISA",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-f3e24dd3",
+        "streamId": "stream-2026-02-17",
+        "date": "2026-02-17",
+        "streamTitle": "【歌回】YT好久不見．今天唱時尚感滿滿的歌！",
+        "videoId": "f46nqn6MlyE",
+        "timestamp": 4171,
+        "endTimestamp": 4356,
+        "note": ""
+      }
+    ]
+  },
+  {
     "id": "song-b0d46d2c",
     "title": "斑馬斑馬",
     "originalArtist": "宋冬野",
@@ -1080,6 +1404,24 @@
     ]
   },
   {
+    "id": "song-b4d4bf13",
+    "title": "Mono",
+    "originalArtist": "i-dle",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-69ed18a2",
+        "streamId": "stream-2026-02-17",
+        "date": "2026-02-17",
+        "streamTitle": "【歌回】YT好久不見．今天唱時尚感滿滿的歌！",
+        "videoId": "f46nqn6MlyE",
+        "timestamp": 4941,
+        "endTimestamp": 5111,
+        "note": ""
+      }
+    ]
+  },
+  {
     "id": "song-b550d60e",
     "title": "Bellyache",
     "originalArtist": "Billie Eilish",
@@ -1093,6 +1435,24 @@
         "videoId": "SkboY-_a5Sw",
         "timestamp": 1935,
         "endTimestamp": 2115,
+        "note": ""
+      }
+    ]
+  },
+  {
+    "id": "song-b6e5be49",
+    "title": "we can’t be friends (wait for your love)",
+    "originalArtist": "Ariana Grande",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-748d7672",
+        "streamId": "stream-2026-02-17",
+        "date": "2026-02-17",
+        "streamTitle": "【歌回】YT好久不見．今天唱時尚感滿滿的歌！",
+        "videoId": "f46nqn6MlyE",
+        "timestamp": 7544,
+        "endTimestamp": 7750,
         "note": ""
       }
     ]
@@ -1147,6 +1507,60 @@
         "videoId": "5tc5NgwrZdE",
         "timestamp": 5651,
         "endTimestamp": 5930,
+        "note": ""
+      }
+    ]
+  },
+  {
+    "id": "song-b9813aca",
+    "title": "Oh My God",
+    "originalArtist": "Adele",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-a483cea1",
+        "streamId": "stream-2026-02-17",
+        "date": "2026-02-17",
+        "streamTitle": "【歌回】YT好久不見．今天唱時尚感滿滿的歌！",
+        "videoId": "f46nqn6MlyE",
+        "timestamp": 5820,
+        "endTimestamp": 6042,
+        "note": ""
+      }
+    ]
+  },
+  {
+    "id": "song-bb72a8ba",
+    "title": "You Don't Own Me",
+    "originalArtist": "Grace",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-ca390342",
+        "streamId": "stream-2026-01-27",
+        "date": "2026-01-27",
+        "streamTitle": "【懷舊歌回】十年前的2016大家在聽什麼呢？",
+        "videoId": "v7FnF1POu0s",
+        "timestamp": 4421,
+        "endTimestamp": 4575,
+        "note": ""
+      }
+    ]
+  },
+  {
+    "id": "song-bd31a301",
+    "title": "New Rules",
+    "originalArtist": "Dua Lipa",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-020414fe",
+        "streamId": "stream-2026-02-17",
+        "date": "2026-02-17",
+        "streamTitle": "【歌回】YT好久不見．今天唱時尚感滿滿的歌！",
+        "videoId": "f46nqn6MlyE",
+        "timestamp": 2050,
+        "endTimestamp": 2257,
         "note": ""
       }
     ]
@@ -1224,6 +1638,24 @@
     ]
   },
   {
+    "id": "song-cb1f67c3",
+    "title": "STYX HELIX",
+    "originalArtist": "MYTH&ROID",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-2ded9941",
+        "streamId": "stream-2026-01-27",
+        "date": "2026-01-27",
+        "streamTitle": "【懷舊歌回】十年前的2016大家在聽什麼呢？",
+        "videoId": "v7FnF1POu0s",
+        "timestamp": 2367,
+        "endTimestamp": 2651,
+        "note": ""
+      }
+    ]
+  },
+  {
     "id": "song-cc63372b",
     "title": "革命道中",
     "originalArtist": "アイナ・ジ・エンド",
@@ -1296,6 +1728,24 @@
     ]
   },
   {
+    "id": "song-cfdcc6f3",
+    "title": "HYPNOTIZE",
+    "originalArtist": "XG",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-782e4af5",
+        "streamId": "stream-2026-02-17",
+        "date": "2026-02-17",
+        "streamTitle": "【歌回】YT好久不見．今天唱時尚感滿滿的歌！",
+        "videoId": "f46nqn6MlyE",
+        "timestamp": 3564,
+        "endTimestamp": 3734,
+        "note": ""
+      }
+    ]
+  },
+  {
     "id": "song-d1b5fab6",
     "title": "Physical",
     "originalArtist": "Red Velvet",
@@ -1327,6 +1777,24 @@
         "videoId": "7mSLMi2CrJM",
         "timestamp": 3323,
         "endTimestamp": 3566,
+        "note": ""
+      }
+    ]
+  },
+  {
+    "id": "song-d6d09c95",
+    "title": "Whiplash",
+    "originalArtist": "aespa",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-8f3b915b",
+        "streamId": "stream-2026-02-17",
+        "date": "2026-02-17",
+        "streamTitle": "【歌回】YT好久不見．今天唱時尚感滿滿的歌！",
+        "videoId": "f46nqn6MlyE",
+        "timestamp": 5202,
+        "endTimestamp": 5385,
         "note": ""
       }
     ]
@@ -1386,6 +1854,24 @@
     ]
   },
   {
+    "id": "song-ddbdfd98",
+    "title": "小幸運",
+    "originalArtist": "田馥甄",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-8c2c3f5a",
+        "streamId": "stream-2026-01-27",
+        "date": "2026-01-27",
+        "streamTitle": "【懷舊歌回】十年前的2016大家在聽什麼呢？",
+        "videoId": "v7FnF1POu0s",
+        "timestamp": 3480,
+        "endTimestamp": 3740,
+        "note": ""
+      }
+    ]
+  },
+  {
     "id": "song-df057336",
     "title": "小半",
     "originalArtist": "陳粒",
@@ -1399,6 +1885,24 @@
         "videoId": "SkboY-_a5Sw",
         "timestamp": 3961,
         "endTimestamp": 4250,
+        "note": ""
+      }
+    ]
+  },
+  {
+    "id": "song-e03027c0",
+    "title": "WILDFLOWER",
+    "originalArtist": "Billie Eilish",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-7502b68c",
+        "streamId": "stream-2026-02-17",
+        "date": "2026-02-17",
+        "streamTitle": "【歌回】YT好久不見．今天唱時尚感滿滿的歌！",
+        "videoId": "f46nqn6MlyE",
+        "timestamp": 6150,
+        "endTimestamp": 6386,
         "note": ""
       }
     ]
@@ -1489,6 +1993,42 @@
         "videoId": "b22FzJ7GQI0",
         "timestamp": 2428,
         "endTimestamp": 2640,
+        "note": ""
+      }
+    ]
+  },
+  {
+    "id": "song-eb535364",
+    "title": "Dangerous Woman",
+    "originalArtist": "Ariana Grande",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-952c8d3f",
+        "streamId": "stream-2026-01-27",
+        "date": "2026-01-27",
+        "streamTitle": "【懷舊歌回】十年前的2016大家在聽什麼呢？",
+        "videoId": "v7FnF1POu0s",
+        "timestamp": 4891,
+        "endTimestamp": 5120,
+        "note": ""
+      }
+    ]
+  },
+  {
+    "id": "song-f00ccf01",
+    "title": "BIRDS OF A FEATHER",
+    "originalArtist": "Billie Eilish",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-f9b88f77",
+        "streamId": "stream-2026-02-17",
+        "date": "2026-02-17",
+        "streamTitle": "【歌回】YT好久不見．今天唱時尚感滿滿的歌！",
+        "videoId": "f46nqn6MlyE",
+        "timestamp": 7260,
+        "endTimestamp": 7500,
         "note": ""
       }
     ]
