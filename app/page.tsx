@@ -45,7 +45,7 @@ export default function HomePage() {
     <div className="flex min-h-screen">
       {/* ── Left Sidebar (lg+) ── */}
       <aside
-        className="hidden lg:flex w-[260px] flex-shrink-0 flex-col backdrop-blur-md border-r"
+        className="hidden lg:flex w-[260px] flex-shrink-0 flex-col backdrop-blur-md border-r h-screen sticky top-0"
         style={{
           background: 'var(--bg-surface-glass)',
           borderColor: 'var(--border-glass)',
@@ -98,7 +98,7 @@ export default function HomePage() {
         </div>
 
         {/* Groups */}
-        <nav className="flex flex-col gap-1 px-4">
+        <nav className="flex flex-col gap-1 px-4 flex-1 overflow-y-auto min-h-0">
           {groups.map((group) => {
             const isActive = selectedGroup === group;
             return (
