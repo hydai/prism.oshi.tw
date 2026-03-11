@@ -365,10 +365,11 @@ export async function streamIdExists(
 export async function videoIdExists(
   db: D1Database,
   videoId: string,
+  streamerId: string,
 ): Promise<boolean> {
   const row = await db
-    .prepare('SELECT 1 FROM streams WHERE video_id = ?')
-    .bind(videoId)
+    .prepare('SELECT 1 FROM streams WHERE video_id = ? AND streamer_id = ?')
+    .bind(videoId, streamerId)
     .first();
   return row !== null;
 }
@@ -674,8 +675,8 @@ export async function importVodToAdminDb(
 
   // Check if a stream already exists for this video_id
   const existingStream = await db
-    .prepare('SELECT id FROM streams WHERE video_id = ?')
-    .bind(vod.video_id)
+    .prepare('SELECT id FROM streams WHERE video_id = ? AND streamer_id = ?')
+    .bind(vod.video_id, streamerId)
     .first<{ id: string }>();
 
   let streamId: string;

@@ -39,13 +39,14 @@ CREATE TABLE IF NOT EXISTS streams (
   streamer_id TEXT NOT NULL DEFAULT 'mizuki',
   title TEXT NOT NULL,
   date TEXT NOT NULL,
-  video_id TEXT NOT NULL UNIQUE,
+  video_id TEXT NOT NULL,
   youtube_url TEXT NOT NULL,
   credit TEXT DEFAULT '{}',  -- JSON object {author, authorUrl, commentUrl}
   status TEXT DEFAULT 'pending' CHECK(status IN ('pending', 'approved', 'rejected', 'excluded', 'extracted')),
   submitted_by TEXT,
   reviewed_by TEXT,
-  created_at TEXT DEFAULT (datetime('now'))
+  created_at TEXT DEFAULT (datetime('now')),
+  UNIQUE(streamer_id, video_id)
 );
 
 -- Indexes for common queries

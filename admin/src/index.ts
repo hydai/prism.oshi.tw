@@ -699,7 +699,7 @@ app.post('/api/pipeline/import-streams', requireCurator, async (c) => {
 
   try {
     for (const v of videos) {
-      if (await videoIdExists(c.env.DB, v.videoId)) {
+      if (await videoIdExists(c.env.DB, v.videoId, streamerId)) {
         continue; // already imported, skip
       }
 
