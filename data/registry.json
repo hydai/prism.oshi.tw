@@ -93,6 +93,37 @@
       "enabled": true
     },
     {
+      "slug": "hiyori",
+      "displayName": "煦Hiyori",
+      "description": "子午學院冰之魔法學系的學生，樂觀愛笑的狼少女，平時課餘會四處打工，也會沈浸在書堆(漫畫)與咖啡之中，喜歡蒐集與描述各式各樣故事。並且喜歡音樂、喜歡吉他，希望可以讓自己創作的歌曲傳播遠方。對於咖啡有著異常理解，超級喜歡這種飲料。",
+      "avatarUrl": "https://yt3.googleusercontent.com/ZzGvOU9LjevDzwEfCmj771-1_JZ5f5JWmtqgeYEskYahtDtxbuVXg6djayir2myLRhuaJV6u=s900-c-k-c0x00ffffff-no-rj",
+      "brandName": "HiyoriPrism",
+      "subscriberCount": "4.69萬",
+      "group": "子午計畫",
+      "socialLinks": {
+        "youtube": "https://www.youtube.com/channel/UCyO8Nae_zF-OpxtbL01Dwow",
+        "twitter": "https://x.com/Hiyori_TeRaz",
+        "facebook": "https://www.facebook.com/HiyoriTeRaz/",
+        "instagram": "https://www.instagram.com/hiyori_teraz/",
+        "twitch": "https://www.twitch.tv/hiyori_teraz"
+      },
+      "theme": {
+        "accentPrimary": "#EC4899",
+        "accentPrimaryDark": "#DB2777",
+        "accentPrimaryLight": "#F472B6",
+        "accentSecondary": "#3B82F6",
+        "accentSecondaryLight": "#60A5FA",
+        "bgPageStart": "#FFF0F5",
+        "bgPageMid": "#F0F8FF",
+        "bgPageEnd": "#E6E6FA",
+        "bgAccentPrimary": "#FDF2F8",
+        "bgAccentPrimaryMuted": "#FCE7F3",
+        "borderAccentPrimary": "#FBCFE8",
+        "borderAccentSecondary": "#BFDBFE"
+      },
+      "enabled": true
+    },
+    {
       "slug": "itsuki",
       "displayName": "玥Itsuki",
       "description": "王月女士是個有絕美歌聲、多才多藝的惡魔，擅長唱歌、會作詞會模仿，還會畫畫；外表艷麗、散發性感高冷氣質，但是其實在動些奇奇怪怪的歪腦筋，這樣的反差萌，怎麼能不愛呢？",
