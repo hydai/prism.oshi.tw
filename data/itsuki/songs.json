@@ -54,6 +54,24 @@
     ]
   },
   {
+    "id": "song-03f9f10b",
+    "title": "ELEVEN",
+    "originalArtist": "IVE",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-66a5259b",
+        "streamId": "stream-2025-03-11",
+        "date": "2025-03-11",
+        "streamTitle": "【雙人歌回】與Seki姐姐的超讚kpop歌回！！！！ft.汐seki",
+        "videoId": "GZzsCcNsMBw",
+        "timestamp": 1634,
+        "endTimestamp": 1811,
+        "note": ""
+      }
+    ]
+  },
+  {
     "id": "song-05be6569",
     "title": "99",
     "originalArtist": "LÜCY",
@@ -126,6 +144,24 @@
     ]
   },
   {
+    "id": "song-0a6a397b",
+    "title": "他們說我是沒有用的年輕人",
+    "originalArtist": "好樂團",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-178f2665",
+        "streamId": "stream-2025-08-19",
+        "date": "2025-08-19",
+        "streamTitle": "【雙人歌回】壞屁股組合的歌回 ft.基妳太美",
+        "videoId": "4RVuqtFoCO0",
+        "timestamp": 930,
+        "endTimestamp": 1249,
+        "note": ""
+      }
+    ]
+  },
+  {
     "id": "song-0c7b9a02",
     "title": "いのちの名前",
     "originalArtist": "木村弓",
@@ -144,6 +180,24 @@
     ]
   },
   {
+    "id": "song-0d8b597d",
+    "title": "残酷な天使のテーゼ",
+    "originalArtist": "高橋洋子",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-33463183",
+        "streamId": "stream-2025-12-23",
+        "date": "2025-12-23",
+        "streamTitle": "【歌回】痛苦的感覺，二選一歌回！",
+        "videoId": "A8SFiRFftsA",
+        "timestamp": 8010,
+        "endTimestamp": 8250,
+        "note": ""
+      }
+    ]
+  },
+  {
     "id": "song-0d92721b",
     "title": "Paper Hearts",
     "originalArtist": "Tori Kelly",
@@ -157,6 +211,24 @@
         "videoId": "5tc5NgwrZdE",
         "timestamp": 5316,
         "endTimestamp": 5514,
+        "note": ""
+      }
+    ]
+  },
+  {
+    "id": "song-0dbec16d",
+    "title": "Sticky",
+    "originalArtist": "KISS OF LIFE",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-35236c75",
+        "streamId": "stream-2025-03-11",
+        "date": "2025-03-11",
+        "streamTitle": "【雙人歌回】與Seki姐姐的超讚kpop歌回！！！！ft.汐seki",
+        "videoId": "GZzsCcNsMBw",
+        "timestamp": 940,
+        "endTimestamp": 1096,
         "note": ""
       }
     ]
@@ -216,6 +288,24 @@
     ]
   },
   {
+    "id": "song-0e97f98f",
+    "title": "GOLDEN",
+    "originalArtist": "Huntrix",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-0faab920",
+        "streamId": "stream-2025-08-19",
+        "date": "2025-08-19",
+        "streamTitle": "【雙人歌回】壞屁股組合的歌回 ft.基妳太美",
+        "videoId": "4RVuqtFoCO0",
+        "timestamp": 1783,
+        "endTimestamp": 1972,
+        "note": ""
+      }
+    ]
+  },
+  {
     "id": "song-10d02929",
     "title": "晴る",
     "originalArtist": "ヨルシカ",
@@ -247,6 +337,24 @@
         "videoId": "gl5wEctKomU",
         "timestamp": 1172,
         "endTimestamp": 1319,
+        "note": ""
+      }
+    ]
+  },
+  {
+    "id": "song-145b7854",
+    "title": "情緒廢物",
+    "originalArtist": "玥Itsuki",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-333eed53",
+        "streamId": "stream-2025-03-11",
+        "date": "2025-03-11",
+        "streamTitle": "【雙人歌回】與Seki姐姐的超讚kpop歌回！！！！ft.汐seki",
+        "videoId": "GZzsCcNsMBw",
+        "timestamp": 7314,
+        "endTimestamp": 7499,
         "note": ""
       }
     ]
@@ -360,6 +468,24 @@
     ]
   },
   {
+    "id": "song-1cf181c5",
+    "title": "Fish Love",
+    "originalArtist": "蔡依林",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-954c8b92",
+        "streamId": "stream-2025-12-23",
+        "date": "2025-12-23",
+        "streamTitle": "【歌回】痛苦的感覺，二選一歌回！",
+        "videoId": "A8SFiRFftsA",
+        "timestamp": 3100,
+        "endTimestamp": 3288,
+        "note": ""
+      }
+    ]
+  },
+  {
     "id": "song-1d52eb7c",
     "title": "玫瑰少年",
     "originalArtist": "蔡依林 Jolin Tsai",
@@ -391,6 +517,24 @@
         "videoId": "f46nqn6MlyE",
         "timestamp": 6842,
         "endTimestamp": 7063,
+        "note": ""
+      }
+    ]
+  },
+  {
+    "id": "song-229978c7",
+    "title": "THE BADDEST",
+    "originalArtist": "K/DA",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-fb1ac88e",
+        "streamId": "stream-2025-08-19",
+        "date": "2025-08-19",
+        "streamTitle": "【雙人歌回】壞屁股組合的歌回 ft.基妳太美",
+        "videoId": "4RVuqtFoCO0",
+        "timestamp": 4817,
+        "endTimestamp": 4980,
         "note": ""
       }
     ]
@@ -445,6 +589,42 @@
         "videoId": "5tc5NgwrZdE",
         "timestamp": 821,
         "endTimestamp": 1028,
+        "note": ""
+      }
+    ]
+  },
+  {
+    "id": "song-23297824",
+    "title": "Million Reasons (Piano ver.)",
+    "originalArtist": "Lady Gaga",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-8bf44d06",
+        "streamId": "stream-2025-12-23",
+        "date": "2025-12-23",
+        "streamTitle": "【歌回】痛苦的感覺，二選一歌回！",
+        "videoId": "A8SFiRFftsA",
+        "timestamp": 5334,
+        "endTimestamp": 5555,
+        "note": ""
+      }
+    ]
+  },
+  {
+    "id": "song-2338cdd2",
+    "title": "Hype Boy",
+    "originalArtist": "NewJeans",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-17fd4801",
+        "streamId": "stream-2025-03-11",
+        "date": "2025-03-11",
+        "streamTitle": "【雙人歌回】與Seki姐姐的超讚kpop歌回！！！！ft.汐seki",
+        "videoId": "GZzsCcNsMBw",
+        "timestamp": 2162,
+        "endTimestamp": 2337,
         "note": ""
       }
     ]
@@ -666,6 +846,24 @@
     ]
   },
   {
+    "id": "song-325af048",
+    "title": "怪天氣",
+    "originalArtist": "YELLOW黃宣 & 9m88",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-272a79e4",
+        "streamId": "stream-2025-03-11",
+        "date": "2025-03-11",
+        "streamTitle": "【雙人歌回】與Seki姐姐的超讚kpop歌回！！！！ft.汐seki",
+        "videoId": "GZzsCcNsMBw",
+        "timestamp": 6410,
+        "endTimestamp": 6665,
+        "note": ""
+      }
+    ]
+  },
+  {
     "id": "song-332aac39",
     "title": "Décalcomanie",
     "originalArtist": "MAMAMOO",
@@ -738,6 +936,42 @@
     ]
   },
   {
+    "id": "song-37f753fd",
+    "title": "B.O.",
+    "originalArtist": "ØZI",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-dce01724",
+        "streamId": "stream-2025-03-11",
+        "date": "2025-03-11",
+        "streamTitle": "【雙人歌回】與Seki姐姐的超讚kpop歌回！！！！ft.汐seki",
+        "videoId": "GZzsCcNsMBw",
+        "timestamp": 8310,
+        "endTimestamp": 8543,
+        "note": ""
+      }
+    ]
+  },
+  {
+    "id": "song-39b75c5f",
+    "title": "POP/STARS",
+    "originalArtist": "K/DA",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-fac6275d",
+        "streamId": "stream-2025-03-11",
+        "date": "2025-03-11",
+        "streamTitle": "【雙人歌回】與Seki姐姐的超讚kpop歌回！！！！ft.汐seki",
+        "videoId": "GZzsCcNsMBw",
+        "timestamp": 9756,
+        "endTimestamp": 9945,
+        "note": ""
+      }
+    ]
+  },
+  {
     "id": "song-3dcb2bc4",
     "title": "這該死的拘執佮愛",
     "originalArtist": "珂拉琪 Collage",
@@ -756,6 +990,42 @@
     ]
   },
   {
+    "id": "song-3e1c8a0f",
+    "title": "Alcohol-Free",
+    "originalArtist": "TWICE",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-5c5c258d",
+        "streamId": "stream-2025-03-11",
+        "date": "2025-03-11",
+        "streamTitle": "【雙人歌回】與Seki姐姐的超讚kpop歌回！！！！ft.汐seki",
+        "videoId": "GZzsCcNsMBw",
+        "timestamp": 2549,
+        "endTimestamp": 2758,
+        "note": ""
+      }
+    ]
+  },
+  {
+    "id": "song-3fe6c90a",
+    "title": "Die With A Smile",
+    "originalArtist": "Lady Gaga, Bruno Mars",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-b8c9895a",
+        "streamId": "stream-2025-08-19",
+        "date": "2025-08-19",
+        "streamTitle": "【雙人歌回】壞屁股組合的歌回 ft.基妳太美",
+        "videoId": "4RVuqtFoCO0",
+        "timestamp": 5687,
+        "endTimestamp": 5934,
+        "note": ""
+      }
+    ]
+  },
+  {
     "id": "song-41833775",
     "title": "Taste",
     "originalArtist": "Sabrina Carpenter",
@@ -769,6 +1039,24 @@
         "videoId": "b22FzJ7GQI0",
         "timestamp": 5382,
         "endTimestamp": 5536,
+        "note": ""
+      }
+    ]
+  },
+  {
+    "id": "song-41a32f28",
+    "title": "ハルジオン",
+    "originalArtist": "YOASOBI",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-69022f45",
+        "streamId": "stream-2025-12-23",
+        "date": "2025-12-23",
+        "streamTitle": "【歌回】痛苦的感覺，二選一歌回！",
+        "videoId": "A8SFiRFftsA",
+        "timestamp": 6223,
+        "endTimestamp": 6415,
         "note": ""
       }
     ]
@@ -877,6 +1165,24 @@
         "videoId": "yfWcdOXraqw",
         "timestamp": 1452,
         "endTimestamp": 1731,
+        "note": ""
+      }
+    ]
+  },
+  {
+    "id": "song-4ee7111e",
+    "title": "From the Start",
+    "originalArtist": "Laufey",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-6debe62b",
+        "streamId": "stream-2025-03-11",
+        "date": "2025-03-11",
+        "streamTitle": "【雙人歌回】與Seki姐姐的超讚kpop歌回！！！！ft.汐seki",
+        "videoId": "GZzsCcNsMBw",
+        "timestamp": 8739,
+        "endTimestamp": 8908,
         "note": ""
       }
     ]
@@ -1062,6 +1368,42 @@
     ]
   },
   {
+    "id": "song-61cb242b",
+    "title": "Wake up!",
+    "originalArtist": "煌Kirali",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-f9f9eba5",
+        "streamId": "stream-2025-12-23",
+        "date": "2025-12-23",
+        "streamTitle": "【歌回】痛苦的感覺，二選一歌回！",
+        "videoId": "A8SFiRFftsA",
+        "timestamp": 1741,
+        "endTimestamp": 1837,
+        "note": ""
+      }
+    ]
+  },
+  {
+    "id": "song-62339c56",
+    "title": "LILAC",
+    "originalArtist": "IU",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-c5487ad1",
+        "streamId": "stream-2025-03-11",
+        "date": "2025-03-11",
+        "streamTitle": "【雙人歌回】與Seki姐姐的超讚kpop歌回！！！！ft.汐seki",
+        "videoId": "GZzsCcNsMBw",
+        "timestamp": 6035,
+        "endTimestamp": 6248,
+        "note": ""
+      }
+    ]
+  },
+  {
     "id": "song-64401784",
     "title": "母系社會",
     "originalArtist": "AMIT",
@@ -1152,6 +1494,24 @@
     ]
   },
   {
+    "id": "song-6b482094",
+    "title": "花に亡霊",
+    "originalArtist": "ヨルシカ",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-28e53ee0",
+        "streamId": "stream-2025-12-23",
+        "date": "2025-12-23",
+        "streamTitle": "【歌回】痛苦的感覺，二選一歌回！",
+        "videoId": "A8SFiRFftsA",
+        "timestamp": 6865,
+        "endTimestamp": 7103,
+        "note": ""
+      }
+    ]
+  },
+  {
     "id": "song-70bb310c",
     "title": "Tears",
     "originalArtist": "Sabrina Carpenter",
@@ -1183,6 +1543,24 @@
         "videoId": "7mSLMi2CrJM",
         "timestamp": 4193,
         "endTimestamp": 4420,
+        "note": ""
+      }
+    ]
+  },
+  {
+    "id": "song-72cec674",
+    "title": "暮光 Gloaming Light",
+    "originalArtist": "扉暮IANVS",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-8cdec081",
+        "streamId": "stream-2025-08-19",
+        "date": "2025-08-19",
+        "streamTitle": "【雙人歌回】壞屁股組合的歌回 ft.基妳太美",
+        "videoId": "4RVuqtFoCO0",
+        "timestamp": 2329,
+        "endTimestamp": 2547,
         "note": ""
       }
     ]
@@ -1404,6 +1782,24 @@
     ]
   },
   {
+    "id": "song-7de2139a",
+    "title": "Sticky",
+    "originalArtist": "KISS OF LIFE",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-d0d61df3",
+        "streamId": "stream-2025-03-11",
+        "date": "2025-03-11",
+        "streamTitle": "【雙人歌回】與Seki姐姐的超讚kpop歌回！！！！ft.汐seki",
+        "videoId": "GZzsCcNsMBw",
+        "timestamp": 6987,
+        "endTimestamp": 7141,
+        "note": ""
+      }
+    ]
+  },
+  {
     "id": "song-7f1b0921",
     "title": "小半",
     "originalArtist": "陳粒",
@@ -1476,6 +1872,24 @@
     ]
   },
   {
+    "id": "song-832eeab4",
+    "title": "INVU",
+    "originalArtist": "TAEYEON (태연)",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-ca6906f1",
+        "streamId": "stream-2025-03-11",
+        "date": "2025-03-11",
+        "streamTitle": "【雙人歌回】與Seki姐姐的超讚kpop歌回！！！！ft.汐seki",
+        "videoId": "GZzsCcNsMBw",
+        "timestamp": 7875,
+        "endTimestamp": 8078,
+        "note": ""
+      }
+    ]
+  },
+  {
     "id": "song-83b71027",
     "title": "怪天氣",
     "originalArtist": "YELLOW黃宣 & 9m88",
@@ -1489,6 +1903,24 @@
         "videoId": "iDpZWouxZyY",
         "timestamp": 6630,
         "endTimestamp": 6883,
+        "note": ""
+      }
+    ]
+  },
+  {
+    "id": "song-83c7cc70",
+    "title": "Four Seasons",
+    "originalArtist": "TAEYEON (태연)",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-9834f129",
+        "streamId": "stream-2025-03-11",
+        "date": "2025-03-11",
+        "streamTitle": "【雙人歌回】與Seki姐姐的超讚kpop歌回！！！！ft.汐seki",
+        "videoId": "GZzsCcNsMBw",
+        "timestamp": 5273,
+        "endTimestamp": 5461,
         "note": ""
       }
     ]
@@ -1543,6 +1975,42 @@
         "videoId": "yfWcdOXraqw",
         "timestamp": 10993,
         "endTimestamp": 11188,
+        "note": ""
+      }
+    ]
+  },
+  {
+    "id": "song-92003f59",
+    "title": "アンコール",
+    "originalArtist": "YOASOBI",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-39a93033",
+        "streamId": "stream-2025-12-23",
+        "date": "2025-12-23",
+        "streamTitle": "【歌回】痛苦的感覺，二選一歌回！",
+        "videoId": "A8SFiRFftsA",
+        "timestamp": 10188,
+        "endTimestamp": 10460,
+        "note": ""
+      }
+    ]
+  },
+  {
+    "id": "song-975db65e",
+    "title": "POP/STARS",
+    "originalArtist": "K/DA",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-38ad19a1",
+        "streamId": "stream-2025-08-19",
+        "date": "2025-08-19",
+        "streamTitle": "【雙人歌回】壞屁股組合的歌回 ft.基妳太美",
+        "videoId": "4RVuqtFoCO0",
+        "timestamp": 6677,
+        "endTimestamp": 6863,
         "note": ""
       }
     ]
@@ -1692,6 +2160,24 @@
     ]
   },
   {
+    "id": "song-a05ec410",
+    "title": "SHOOTING STAR",
+    "originalArtist": "XG",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-60625438",
+        "streamId": "stream-2025-03-11",
+        "date": "2025-03-11",
+        "streamTitle": "【雙人歌回】與Seki姐姐的超讚kpop歌回！！！！ft.汐seki",
+        "videoId": "GZzsCcNsMBw",
+        "timestamp": 3371,
+        "endTimestamp": 3573,
+        "note": ""
+      }
+    ]
+  },
+  {
     "id": "song-a22f4745",
     "title": "Dance The Night",
     "originalArtist": "Dua Lipa",
@@ -1723,6 +2209,24 @@
         "videoId": "gl5wEctKomU",
         "timestamp": 2741,
         "endTimestamp": 2971,
+        "note": ""
+      }
+    ]
+  },
+  {
+    "id": "song-a3d92b37",
+    "title": "Wake up!",
+    "originalArtist": "煌Kirali",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-0e6899dd",
+        "streamId": "stream-2025-12-23",
+        "date": "2025-12-23",
+        "streamTitle": "【歌回】痛苦的感覺，二選一歌回！",
+        "videoId": "A8SFiRFftsA",
+        "timestamp": 2063,
+        "endTimestamp": 2158,
         "note": ""
       }
     ]
@@ -1872,6 +2376,42 @@
     ]
   },
   {
+    "id": "song-af87c0e3",
+    "title": "悪魔の子",
+    "originalArtist": "ヒグチアイ",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-9f742085",
+        "streamId": "stream-2025-12-23",
+        "date": "2025-12-23",
+        "streamTitle": "【歌回】痛苦的感覺，二選一歌回！",
+        "videoId": "A8SFiRFftsA",
+        "timestamp": 3719,
+        "endTimestamp": 3939,
+        "note": ""
+      }
+    ]
+  },
+  {
+    "id": "song-b0139d6c",
+    "title": "Talk to Me",
+    "originalArtist": "Damiano David, Tyla, Nile Rodgers",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-8068023e",
+        "streamId": "stream-2025-12-23",
+        "date": "2025-12-23",
+        "streamTitle": "【歌回】痛苦的感覺，二選一歌回！",
+        "videoId": "A8SFiRFftsA",
+        "timestamp": 4358,
+        "endTimestamp": 4550,
+        "note": ""
+      }
+    ]
+  },
+  {
     "id": "song-b0d46d2c",
     "title": "斑馬斑馬",
     "originalArtist": "宋冬野",
@@ -1998,6 +2538,24 @@
     ]
   },
   {
+    "id": "song-b64d229e",
+    "title": "LOVE DIVE",
+    "originalArtist": "IVE",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-f4009642",
+        "streamId": "stream-2025-03-11",
+        "date": "2025-03-11",
+        "streamTitle": "【雙人歌回】與Seki姐姐的超讚kpop歌回！！！！ft.汐seki",
+        "videoId": "GZzsCcNsMBw",
+        "timestamp": 9240,
+        "endTimestamp": 9415,
+        "note": ""
+      }
+    ]
+  },
+  {
     "id": "song-b6e5be49",
     "title": "we can’t be friends (wait for your love)",
     "originalArtist": "Ariana Grande",
@@ -2052,6 +2610,24 @@
     ]
   },
   {
+    "id": "song-b871330d",
+    "title": "send my love",
+    "originalArtist": "adele",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-35688d2a",
+        "streamId": "stream-2025-12-23",
+        "date": "2025-12-23",
+        "streamTitle": "【歌回】痛苦的感覺，二選一歌回！",
+        "videoId": "A8SFiRFftsA",
+        "timestamp": 10949,
+        "endTimestamp": 11170,
+        "note": ""
+      }
+    ]
+  },
+  {
     "id": "song-b8a7b19e",
     "title": "失戀無罪",
     "originalArtist": "A-Lin",
@@ -2083,6 +2659,24 @@
         "videoId": "f46nqn6MlyE",
         "timestamp": 5820,
         "endTimestamp": 6042,
+        "note": ""
+      }
+    ]
+  },
+  {
+    "id": "song-bad08b89",
+    "title": "陰陽怪氣 Holy Moly",
+    "originalArtist": "玥Itsuki",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-3d55e449",
+        "streamId": "stream-2025-12-23",
+        "date": "2025-12-23",
+        "streamTitle": "【歌回】痛苦的感覺，二選一歌回！",
+        "videoId": "A8SFiRFftsA",
+        "timestamp": 982,
+        "endTimestamp": 1141,
         "note": ""
       }
     ]
@@ -2196,6 +2790,24 @@
     ]
   },
   {
+    "id": "song-c76d5dca",
+    "title": "Zombie",
+    "originalArtist": "The Cranberries",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-bdd5964c",
+        "streamId": "stream-2025-08-19",
+        "date": "2025-08-19",
+        "streamTitle": "【雙人歌回】壞屁股組合的歌回 ft.基妳太美",
+        "videoId": "4RVuqtFoCO0",
+        "timestamp": 4175,
+        "endTimestamp": 4428,
+        "note": ""
+      }
+    ]
+  },
+  {
     "id": "song-c7929255",
     "title": "Disease",
     "originalArtist": "Lady Gaga",
@@ -2209,6 +2821,24 @@
         "videoId": "b22FzJ7GQI0",
         "timestamp": 5854,
         "endTimestamp": 6080,
+        "note": ""
+      }
+    ]
+  },
+  {
+    "id": "song-c82400e4",
+    "title": "TOMBOY",
+    "originalArtist": "(G)I-DLE",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-a433d112",
+        "streamId": "stream-2025-03-11",
+        "date": "2025-03-11",
+        "streamTitle": "【雙人歌回】與Seki姐姐的超讚kpop歌回！！！！ft.汐seki",
+        "videoId": "GZzsCcNsMBw",
+        "timestamp": 4812,
+        "endTimestamp": 4985,
         "note": ""
       }
     ]
@@ -2371,6 +3001,60 @@
         "videoId": "7mSLMi2CrJM",
         "timestamp": 3323,
         "endTimestamp": 3566,
+        "note": ""
+      }
+    ]
+  },
+  {
+    "id": "song-d332b8e3",
+    "title": "M2M",
+    "originalArtist": "CODY JON",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-ba3d26ab",
+        "streamId": "stream-2025-12-23",
+        "date": "2025-12-23",
+        "streamTitle": "【歌回】痛苦的感覺，二選一歌回！",
+        "videoId": "A8SFiRFftsA",
+        "timestamp": 4815,
+        "endTimestamp": 4977,
+        "note": ""
+      }
+    ]
+  },
+  {
+    "id": "song-d3c9bf7c",
+    "title": "畫心",
+    "originalArtist": "張靚穎",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-9c6a27f7",
+        "streamId": "stream-2025-12-23",
+        "date": "2025-12-23",
+        "streamTitle": "【歌回】痛苦的感覺，二選一歌回！",
+        "videoId": "A8SFiRFftsA",
+        "timestamp": 9000,
+        "endTimestamp": 9266,
+        "note": ""
+      }
+    ]
+  },
+  {
+    "id": "song-d4e7d378",
+    "title": "身騎白馬",
+    "originalArtist": "徐佳瑩",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-fc1156fe",
+        "streamId": "stream-2025-08-19",
+        "date": "2025-08-19",
+        "streamTitle": "【雙人歌回】壞屁股組合的歌回 ft.基妳太美",
+        "videoId": "4RVuqtFoCO0",
+        "timestamp": 3097,
+        "endTimestamp": 3394,
         "note": ""
       }
     ]
@@ -2610,6 +3294,42 @@
     ]
   },
   {
+    "id": "song-eb0a27aa",
+    "title": "IRIS OUT",
+    "originalArtist": "米津玄師",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-3788926b",
+        "streamId": "stream-2025-12-23",
+        "date": "2025-12-23",
+        "streamTitle": "【歌回】痛苦的感覺，二選一歌回！",
+        "videoId": "A8SFiRFftsA",
+        "timestamp": 8550,
+        "endTimestamp": 8697,
+        "note": ""
+      }
+    ]
+  },
+  {
+    "id": "song-eb40c0bd",
+    "title": "보여줄게",
+    "originalArtist": "에일리",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-31645149",
+        "streamId": "stream-2025-03-11",
+        "date": "2025-03-11",
+        "streamTitle": "【雙人歌回】與Seki姐姐的超讚kpop歌回！！！！ft.汐seki",
+        "videoId": "GZzsCcNsMBw",
+        "timestamp": 4041,
+        "endTimestamp": 4270,
+        "note": ""
+      }
+    ]
+  },
+  {
     "id": "song-eb535364",
     "title": "Dangerous Woman",
     "originalArtist": "Ariana Grande",
@@ -2623,6 +3343,24 @@
         "videoId": "v7FnF1POu0s",
         "timestamp": 4891,
         "endTimestamp": 5120,
+        "note": ""
+      }
+    ]
+  },
+  {
+    "id": "song-ee36f5d1",
+    "title": "Bang Bang",
+    "originalArtist": "Jessie J ft. Ariana Grande, Nicki Minaj",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-e1a34d9a",
+        "streamId": "stream-2025-08-19",
+        "date": "2025-08-19",
+        "streamTitle": "【雙人歌回】壞屁股組合的歌回 ft.基妳太美",
+        "videoId": "4RVuqtFoCO0",
+        "timestamp": 5268,
+        "endTimestamp": 5464,
         "note": ""
       }
     ]
