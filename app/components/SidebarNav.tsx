@@ -76,7 +76,7 @@ export default function SidebarNav({
       }}
     >
       {/* ── 1. Logo Area ── */}
-      <div className="px-5 py-5 flex items-center gap-3 flex-shrink-0">
+      <Link href="/" className="px-5 py-5 flex items-center gap-3 flex-shrink-0">
         <div
           className="w-9 h-9 rounded-radius-lg flex items-center justify-center flex-shrink-0"
           style={{ background: 'linear-gradient(135deg, var(--accent-pink-light), var(--accent-blue-light))' }}
@@ -89,7 +89,7 @@ export default function SidebarNav({
         >
           {brandName}
         </span>
-      </div>
+      </Link>
 
       {/* ── 2. Search Slot ── */}
       {searchSlot}

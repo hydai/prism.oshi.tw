@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useMemo, useEffect, useRef, useCallback } from 'react';
+import Link from 'next/link';
 import { useVirtualizer } from '@tanstack/react-virtual';
 import { Search, Play, Shuffle, ExternalLink, Mic2, Youtube, Twitter, Facebook, Instagram, Twitch, Sparkles, ListMusic, Clock, Heart, Disc3, ChevronDown, ChevronRight, Plus, ListPlus, X, SlidersHorizontal, WifiOff, House, Radio } from 'lucide-react';
 import { useStreamer } from '../contexts/StreamerContext';
@@ -542,11 +543,12 @@ export default function Home() {
           borderBottom: '1px solid var(--border-glass)',
         }}
       >
-        <span
-          style={{ fontSize: '14px', fontWeight: 600, color: 'var(--text-secondary)' }}
+        <Link
+          href="/"
+          style={{ fontSize: '14px', fontWeight: 600, color: 'var(--text-secondary)', textDecoration: 'none' }}
         >
           {streamerData.displayName}
-        </span>
+        </Link>
       </div>
 
       {/* Main Content */}
