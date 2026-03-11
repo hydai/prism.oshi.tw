@@ -72,6 +72,24 @@
     ]
   },
   {
+    "id": "song-06b388bd",
+    "title": "聽見下雨的聲音",
+    "originalArtist": "周杰倫",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-298335f5",
+        "streamId": "stream-2026-03-10",
+        "date": "2026-03-10",
+        "streamTitle": "【影視歌回】好的作品與音樂相輔相成，唱一些影視作品中的音樂 !",
+        "videoId": "KEKRbzfJTAU",
+        "timestamp": 4755,
+        "endTimestamp": 5028,
+        "note": ""
+      }
+    ]
+  },
+  {
     "id": "song-0c7b9a02",
     "title": "いのちの名前",
     "originalArtist": "木村弓",
@@ -720,6 +738,24 @@
     ]
   },
   {
+    "id": "song-527f3af4",
+    "title": "火星人",
+    "originalArtist": "ヨルシカ",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-c16acdb8",
+        "streamId": "stream-2026-03-10",
+        "date": "2026-03-10",
+        "streamTitle": "【影視歌回】好的作品與音樂相輔相成，唱一些影視作品中的音樂 !",
+        "videoId": "KEKRbzfJTAU",
+        "timestamp": 7143,
+        "endTimestamp": 7375,
+        "note": ""
+      }
+    ]
+  },
+  {
     "id": "song-52a39c9e",
     "title": "你攏無咧看",
     "originalArtist": "蕭煌奇 Ricky Hsiao",
@@ -805,6 +841,24 @@
         "videoId": "yfWcdOXraqw",
         "timestamp": 17642,
         "endTimestamp": 17884,
+        "note": ""
+      }
+    ]
+  },
+  {
+    "id": "song-6175199d",
+    "title": "有一種悲傷",
+    "originalArtist": "A-Lin",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-07ea23d4",
+        "streamId": "stream-2026-03-10",
+        "date": "2026-03-10",
+        "streamTitle": "【影視歌回】好的作品與音樂相輔相成，唱一些影視作品中的音樂 !",
+        "videoId": "KEKRbzfJTAU",
+        "timestamp": 7673,
+        "endTimestamp": 7900,
         "note": ""
       }
     ]
@@ -1116,6 +1170,24 @@
     ]
   },
   {
+    "id": "song-7f8b0c64",
+    "title": "小心翻閱",
+    "originalArtist": "孫盛希",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-77ef1fdb",
+        "streamId": "stream-2026-03-10",
+        "date": "2026-03-10",
+        "streamTitle": "【影視歌回】好的作品與音樂相輔相成，唱一些影視作品中的音樂 !",
+        "videoId": "KEKRbzfJTAU",
+        "timestamp": 1126,
+        "endTimestamp": 1370,
+        "note": ""
+      }
+    ]
+  },
+  {
     "id": "song-81dbdce3",
     "title": "怪天氣",
     "originalArtist": "YELLOW黃宣 & 9m88",
@@ -1278,6 +1350,42 @@
     ]
   },
   {
+    "id": "song-9ed58882",
+    "title": "魚仔",
+    "originalArtist": "盧廣仲",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-dfc98167",
+        "streamId": "stream-2026-03-10",
+        "date": "2026-03-10",
+        "streamTitle": "【影視歌回】好的作品與音樂相輔相成，唱一些影視作品中的音樂 !",
+        "videoId": "KEKRbzfJTAU",
+        "timestamp": 5768,
+        "endTimestamp": 6045,
+        "note": ""
+      }
+    ]
+  },
+  {
+    "id": "song-9f149f1f",
+    "title": "Broken World",
+    "originalArtist": "孫盛希",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-33c504e2",
+        "streamId": "stream-2026-03-10",
+        "date": "2026-03-10",
+        "streamTitle": "【影視歌回】好的作品與音樂相輔相成，唱一些影視作品中的音樂 !",
+        "videoId": "KEKRbzfJTAU",
+        "timestamp": 2709,
+        "endTimestamp": 2859,
+        "note": ""
+      }
+    ]
+  },
+  {
     "id": "song-9f895bb4",
     "title": "いのちの名前",
     "originalArtist": "木村弓",
@@ -1291,6 +1399,24 @@
         "videoId": "7mSLMi2CrJM",
         "timestamp": 5168,
         "endTimestamp": 5239,
+        "note": ""
+      }
+    ]
+  },
+  {
+    "id": "song-a22f4745",
+    "title": "Dance The Night",
+    "originalArtist": "Dua Lipa",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-a3995147",
+        "streamId": "stream-2026-03-10",
+        "date": "2026-03-10",
+        "streamTitle": "【影視歌回】好的作品與音樂相輔相成，唱一些影視作品中的音樂 !",
+        "videoId": "KEKRbzfJTAU",
+        "timestamp": 6616,
+        "endTimestamp": 6791,
         "note": ""
       }
     ]
@@ -1327,6 +1453,24 @@
         "videoId": "yfWcdOXraqw",
         "timestamp": 11818,
         "endTimestamp": 12005,
+        "note": ""
+      }
+    ]
+  },
+  {
+    "id": "song-acf5c382",
+    "title": "再見的時候",
+    "originalArtist": "洪佩瑜",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-0fc814c3",
+        "streamId": "stream-2026-03-10",
+        "date": "2026-03-10",
+        "streamTitle": "【影視歌回】好的作品與音樂相輔相成，唱一些影視作品中的音樂 !",
+        "videoId": "KEKRbzfJTAU",
+        "timestamp": 4268,
+        "endTimestamp": 4491,
         "note": ""
       }
     ]
@@ -1818,6 +1962,24 @@
     ]
   },
   {
+    "id": "song-d7c76796",
+    "title": "Ashes",
+    "originalArtist": "Céline Dion",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-864bbacf",
+        "streamId": "stream-2026-03-10",
+        "date": "2026-03-10",
+        "streamTitle": "【影視歌回】好的作品與音樂相輔相成，唱一些影視作品中的音樂 !",
+        "videoId": "KEKRbzfJTAU",
+        "timestamp": 5236,
+        "endTimestamp": 5414,
+        "note": ""
+      }
+    ]
+  },
+  {
     "id": "song-d81a8f81",
     "title": "不在一起就不會分開",
     "originalArtist": "洪佩瑜",
@@ -2047,6 +2209,78 @@
         "videoId": "yfWcdOXraqw",
         "timestamp": 14150,
         "endTimestamp": 14405,
+        "note": ""
+      }
+    ]
+  },
+  {
+    "id": "song-f117147b",
+    "title": "すずめ (feat. 十明)",
+    "originalArtist": "RADWIMPS",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-270c18df",
+        "streamId": "stream-2026-03-10",
+        "date": "2026-03-10",
+        "streamTitle": "【影視歌回】好的作品與音樂相輔相成，唱一些影視作品中的音樂 !",
+        "videoId": "KEKRbzfJTAU",
+        "timestamp": 3037,
+        "endTimestamp": 3273,
+        "note": ""
+      }
+    ]
+  },
+  {
+    "id": "song-f363d6b8",
+    "title": "Always Remember Us This Way",
+    "originalArtist": "Lady Gaga",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-c16dbbb3",
+        "streamId": "stream-2026-03-10",
+        "date": "2026-03-10",
+        "streamTitle": "【影視歌回】好的作品與音樂相輔相成，唱一些影視作品中的音樂 !",
+        "videoId": "KEKRbzfJTAU",
+        "timestamp": 3639,
+        "endTimestamp": 3856,
+        "note": ""
+      }
+    ]
+  },
+  {
+    "id": "song-f609fd5a",
+    "title": "雨不停。流",
+    "originalArtist": "孫盛希",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-2182ff1b",
+        "streamId": "stream-2026-03-10",
+        "date": "2026-03-10",
+        "streamTitle": "【影視歌回】好的作品與音樂相輔相成，唱一些影視作品中的音樂 !",
+        "videoId": "KEKRbzfJTAU",
+        "timestamp": 2130,
+        "endTimestamp": 2393,
+        "note": ""
+      }
+    ]
+  },
+  {
+    "id": "song-fdde0894",
+    "title": "Skyfall",
+    "originalArtist": "Adele",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-b4acea0f",
+        "streamId": "stream-2026-03-10",
+        "date": "2026-03-10",
+        "streamTitle": "【影視歌回】好的作品與音樂相輔相成，唱一些影視作品中的音樂 !",
+        "videoId": "KEKRbzfJTAU",
+        "timestamp": 8291,
+        "endTimestamp": 8575,
         "note": ""
       }
     ]
