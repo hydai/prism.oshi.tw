@@ -128,6 +128,13 @@ export interface CreateStreamBody {
   credit?: StreamCredit;
 }
 
+export interface UpdateStreamBody {
+  title?: string;
+  date?: string;
+  videoId?: string;
+  youtubeUrl?: string;
+}
+
 export interface StatusUpdateBody {
   status: Status;
 }

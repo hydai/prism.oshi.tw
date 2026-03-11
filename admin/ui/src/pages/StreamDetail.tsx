@@ -73,6 +73,36 @@ function InlineEdit({ value, placeholder, onSave, onCancel }: {
   );
 }
 
+// --- Inline Date Edit ---
+
+function InlineDateEdit({ value, onSave, onCancel }: {
+  value: string;
+  onSave: (val: string) => void; onCancel: () => void;
+}) {
+  const [date, setDate] = useState(value);
+  const inputRef = useRef<HTMLInputElement>(null);
+
+  useEffect(() => { inputRef.current?.focus(); }, []);
+
+  const commit = () => {
+    if (date && date !== value) onSave(date);
+    else onCancel();
+  };
+
+  return (
+    <input
+      ref={inputRef} type="date" value={date}
+      onChange={(e) => setDate(e.target.value)}
+      onKeyDown={(e) => {
+        if (e.key === 'Enter') { e.preventDefault(); commit(); }
+        if (e.key === 'Escape') { e.preventDefault(); onCancel(); }
+      }}
+      onBlur={commit}
+      className="rounded border border-blue-400 px-1.5 py-0.5 text-sm focus:outline-none focus:ring-1 focus:ring-blue-500"
+    />
+  );
+}
+
 // --- Add Song Modal ---
 
 function AddSongModal({ onSubmit, onCancel }: {
@@ -205,7 +235,9 @@ function PasteImportModal({ streamId, hasExisting, onDone, onCancel }: {
 
 // --- Main component ---
 
-interface EditingField { perfId: string; field: 'title' | 'artist' | 'note' }
+type EditingField =
+  | { type: 'perf'; perfId: string; field: 'title' | 'artist' | 'note' }
+  | { type: 'stream'; field: 'title' | 'date' };
 
 export default function StreamDetail({ user }: { user: AuthUser }) {
   const { id: streamId } = useParams<{ id: string }>();
@@ -298,6 +330,19 @@ export default function StreamDetail({ user }: { user: AuthUser }) {
       showToast(err instanceof Error ? err.message : 'Failed to update status', true);
     }
   }, [streamId, detail, showToast]);
+
+  // --- Stream metadata inline edit save ---
+  const handleStreamSave = useCallback(async (field: 'title' | 'date', value: string) => {
+    if (!streamId) return;
+    setEditingField(null);
+    try {
+      await api.updateStream(streamId, { [field]: value });
+      await loadDetail();
+      showToast(`Updated stream ${field}`);
+    } catch (err: unknown) {
+      showToast(err instanceof Error ? err.message : 'Failed to update', true);
+    }
+  }, [streamId, loadDetail, showToast]);
 
   // --- Inline edit save ---
   const handleSave = useCallback(async (perfId: string, field: 'title' | 'artist' | 'note', value: string) => {
@@ -620,9 +665,23 @@ export default function StreamDetail({ user }: { user: AuthUser }) {
       <div className="rounded-lg border border-slate-200 bg-white p-5">
         <div className="flex items-start justify-between">
           <div>
-            <h2 className="text-xl font-semibold text-slate-800">{detail.title}</h2>
+            <h2 className="text-xl font-semibold text-slate-800">
+              {editingField?.type === 'stream' && editingField.field === 'title' ? (
+                <InlineEdit value={detail.title} onSave={(v) => handleStreamSave('title', v)} onCancel={() => setEditingField(null)} />
+              ) : (
+                <span className={isCurator ? 'cursor-text' : ''} onDoubleClick={() => { if (isCurator) setEditingField({ type: 'stream', field: 'title' }); }} title={isCurator ? 'Double-click to edit' : undefined}>
+                  {detail.title}
+                </span>
+              )}
+            </h2>
             <div className="mt-1 flex flex-wrap items-center gap-3 text-sm text-slate-500">
-              <span>{detail.date}</span>
+              {editingField?.type === 'stream' && editingField.field === 'date' ? (
+                <InlineDateEdit value={detail.date} onSave={(v) => handleStreamSave('date', v)} onCancel={() => setEditingField(null)} />
+              ) : (
+                <span className={isCurator ? 'cursor-text' : ''} onDoubleClick={() => { if (isCurator) setEditingField({ type: 'stream', field: 'date' }); }} title={isCurator ? 'Double-click to edit' : undefined}>
+                  {detail.date}
+                </span>
+              )}
               <a href={`https://www.youtube.com/watch?v=${detail.videoId}`} target="_blank" rel="noopener noreferrer" className="text-blue-600 hover:underline">
                 {detail.videoId}
               </a>
@@ -770,10 +829,10 @@ export default function StreamDetail({ user }: { user: AuthUser }) {
 
                   {/* Title */}
                   <td className="px-4 py-3">
-                    {editingField?.perfId === perf.id && editingField.field === 'title' ? (
+                    {editingField?.type === 'perf' && editingField.perfId === perf.id && editingField.field === 'title' ? (
                       <InlineEdit value={perf.title} onSave={(v) => handleSave(perf.id, 'title', v)} onCancel={() => setEditingField(null)} />
                     ) : (
-                      <span className="cursor-text font-medium text-slate-800" onDoubleClick={(e) => { e.stopPropagation(); setEditingField({ perfId: perf.id, field: 'title' }); }} title="Double-click to edit">
+                      <span className="cursor-text font-medium text-slate-800" onDoubleClick={(e) => { e.stopPropagation(); setEditingField({ type: 'perf', perfId: perf.id, field: 'title' }); }} title="Double-click to edit">
                         {perf.title}
                       </span>
                     )}
@@ -781,11 +840,11 @@ export default function StreamDetail({ user }: { user: AuthUser }) {
 
                   {/* Artist */}
                   <td className="px-4 py-3">
-                    {editingField?.perfId === perf.id && editingField.field === 'artist' ? (
+                    {editingField?.type === 'perf' && editingField.perfId === perf.id && editingField.field === 'artist' ? (
                       <InlineEdit value={perf.originalArtist} placeholder="add artist" onSave={(v) => handleSave(perf.id, 'artist', v)} onCancel={() => setEditingField(null)} />
                     ) : (
                       <span className={`cursor-text ${perf.originalArtist ? 'text-slate-600' : 'italic text-slate-400'}`}
-                        onDoubleClick={(e) => { e.stopPropagation(); setEditingField({ perfId: perf.id, field: 'artist' }); }} title="Double-click to edit">
+                        onDoubleClick={(e) => { e.stopPropagation(); setEditingField({ type: 'perf', perfId: perf.id, field: 'artist' }); }} title="Double-click to edit">
                         {perf.originalArtist || 'add artist'}
                       </span>
                     )}
@@ -815,11 +874,11 @@ export default function StreamDetail({ user }: { user: AuthUser }) {
 
                   {/* Note */}
                   <td className="max-w-48 px-4 py-3">
-                    {editingField?.perfId === perf.id && editingField.field === 'note' ? (
+                    {editingField?.type === 'perf' && editingField.perfId === perf.id && editingField.field === 'note' ? (
                       <InlineEdit value={perf.note} placeholder="add note" onSave={(v) => handleSave(perf.id, 'note', v)} onCancel={() => setEditingField(null)} />
                     ) : (
                       <span className={`cursor-text truncate text-xs ${perf.note ? 'text-slate-600' : 'italic text-slate-400'}`}
-                        onDoubleClick={(e) => { e.stopPropagation(); setEditingField({ perfId: perf.id, field: 'note' }); }} title="Double-click to edit note">
+                        onDoubleClick={(e) => { e.stopPropagation(); setEditingField({ type: 'perf', perfId: perf.id, field: 'note' }); }} title="Double-click to edit note">
                         {perf.note || 'add note'}
                       </span>
                     )}

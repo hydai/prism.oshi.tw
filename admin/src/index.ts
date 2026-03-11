@@ -16,6 +16,7 @@ import {
   listStreams,
   getStreamById,
   insertStream,
+  updateStream,
   updateStreamStatus,
   generateStreamId,
   generateStreamIdFallback,
@@ -54,6 +55,7 @@ import type {
   StatusUpdateBody,
   CreateStampPerformanceBody,
   UpdateTimestampsBody,
+  UpdateStreamBody,
   UpdateSongDetailsBody,
   FetchDurationResponse,
   PasteImportBody,
@@ -368,6 +370,31 @@ app.patch('/api/streams/:id/status', requireCurator, async (c) => {
   const user = c.get('user');
   await updateStreamStatus(c.env.DB, id, body.status, user.email);
   return c.json({ id, status: body.status });
+});
+
+app.patch('/api/streams/:id', requireCurator, async (c) => {
+  const id = c.req.param('id');
+  const body = await c.req.json<UpdateStreamBody>();
+
+  if (!body.title && !body.date && !body.videoId && !body.youtubeUrl) {
+    return c.json({ error: 'At least one field (title, date, videoId, youtubeUrl) is required' }, 400);
+  }
+
+  if (body.date && !/^\d{4}-\d{2}-\d{2}$/.test(body.date)) {
+    return c.json({ error: 'Invalid date format, expected YYYY-MM-DD' }, 400);
+  }
+
+  const existing = await getStreamById(c.env.DB, id);
+  if (!existing) return c.json({ error: 'Stream not found' }, 404);
+
+  const updated = await updateStream(c.env.DB, id, {
+    title: body.title,
+    date: body.date,
+    videoId: body.videoId,
+    youtubeUrl: body.youtubeUrl,
+  });
+
+  return c.json(updated);
 });
 
 // --- Stamp editor ---

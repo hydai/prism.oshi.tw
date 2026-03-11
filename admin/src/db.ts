@@ -373,6 +373,42 @@ export async function videoIdExists(
   return row !== null;
 }
 
+export async function updateStream(
+  db: D1Database,
+  id: string,
+  fields: { title?: string; date?: string; videoId?: string; youtubeUrl?: string },
+): Promise<Stream | null> {
+  const sets: string[] = [];
+  const values: (string | number)[] = [];
+
+  if (fields.title !== undefined) {
+    sets.push('title = ?');
+    values.push(fields.title);
+  }
+  if (fields.date !== undefined) {
+    sets.push('date = ?');
+    values.push(fields.date);
+  }
+  if (fields.videoId !== undefined) {
+    sets.push('video_id = ?');
+    values.push(fields.videoId);
+  }
+  if (fields.youtubeUrl !== undefined) {
+    sets.push('youtube_url = ?');
+    values.push(fields.youtubeUrl);
+  }
+
+  if (sets.length === 0) return getStreamById(db, id);
+
+  values.push(id);
+  await db
+    .prepare(`UPDATE streams SET ${sets.join(', ')} WHERE id = ?`)
+    .bind(...values)
+    .run();
+
+  return getStreamById(db, id);
+}
+
 export async function updateStreamStatus(
   db: D1Database,
   id: string,
@@ -648,6 +684,28 @@ export async function importVodToAdminDb(
 
   if (existingStream) {
     streamId = existingStream.id;
+
+    // Overwrite stream metadata from VOD submission
+    stmts.push(
+      db.prepare('UPDATE streams SET title = ?, date = ? WHERE id = ?')
+        .bind(vod.stream_title, vod.stream_date, streamId),
+    );
+
+    // Orphan-safe delete: remove songs whose only performances are in this stream
+    stmts.push(
+      db.prepare(
+        `DELETE FROM songs WHERE id IN (
+           SELECT p.song_id FROM performances p
+           WHERE p.stream_id = ?
+           AND (SELECT COUNT(*) FROM performances p2 WHERE p2.song_id = p.song_id) = 1
+         )`,
+      ).bind(streamId),
+    );
+
+    // Delete all existing performances for this stream
+    stmts.push(
+      db.prepare('DELETE FROM performances WHERE stream_id = ?').bind(streamId),
+    );
   } else {
     streamId = vod.stream_date
       ? generateStreamId(vod.stream_date)

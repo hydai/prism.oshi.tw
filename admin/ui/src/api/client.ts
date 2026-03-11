@@ -16,6 +16,7 @@ import type {
   FetchDurationResponse,
   CreateStampPerformanceBody,
   UpdateTimestampsBody,
+  UpdateStreamBody,
   UpdateSongDetailsBody,
   PasteImportBody,
   PasteImportResponse,
@@ -178,6 +179,12 @@ export const api = {
 
   updateStreamStatus: (id: string, body: StatusUpdateBody) =>
     request<Stream>(`/api/streams/${id}/status`, {
+      method: 'PATCH',
+      body: JSON.stringify(body),
+    }),
+
+  updateStream: (id: string, body: UpdateStreamBody) =>
+    request<Stream>(`/api/streams/${id}`, {
       method: 'PATCH',
       body: JSON.stringify(body),
     }),
