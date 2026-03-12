@@ -54,6 +54,24 @@
     ]
   },
   {
+    "id": "song-03a93493",
+    "title": "Hey Girl",
+    "originalArtist": "小男孩樂團",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-cd748716",
+        "streamId": "stream-2024-12-14",
+        "date": "2024-12-14",
+        "streamTitle": "【歌回】復丑時間，我讓你們PON然心動...",
+        "videoId": "wRZSj5cHzqI",
+        "timestamp": 6717,
+        "endTimestamp": 6947,
+        "note": ""
+      }
+    ]
+  },
+  {
     "id": "song-03f9f10b",
     "title": "ELEVEN",
     "originalArtist": "IVE",
@@ -67,6 +85,24 @@
         "videoId": "GZzsCcNsMBw",
         "timestamp": 1634,
         "endTimestamp": 1811,
+        "note": ""
+      }
+    ]
+  },
+  {
+    "id": "song-05752dc2",
+    "title": "與浪之間",
+    "originalArtist": "Vast & Hazy",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-5473c2b6",
+        "streamId": "stream-b5a5a3d7",
+        "date": "2024-12-24",
+        "streamTitle": "【歌回】我是滿玥寶寶，出道一個玥啦！左手指月，會被月亮割耳朵",
+        "videoId": "gyuM1a8FV24",
+        "timestamp": 4879,
+        "endTimestamp": 5160,
         "note": ""
       }
     ]
@@ -198,6 +234,24 @@
     ]
   },
   {
+    "id": "song-0d4b639d",
+    "title": "Die With A Smile",
+    "originalArtist": "Lady Gaga, Bruno Mars",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-40d87062",
+        "streamId": "stream-2024-12-14",
+        "date": "2024-12-14",
+        "streamTitle": "【歌回】復丑時間，我讓你們PON然心動...",
+        "videoId": "wRZSj5cHzqI",
+        "timestamp": 5559,
+        "endTimestamp": 5806,
+        "note": ""
+      }
+    ]
+  },
+  {
     "id": "song-0d8b597d",
     "title": "残酷な天使のテーゼ",
     "originalArtist": "高橋洋子",
@@ -324,6 +378,24 @@
     ]
   },
   {
+    "id": "song-0f4d0182",
+    "title": "Always Remember Us This Way",
+    "originalArtist": "Lady Gaga",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-e4edbb1c",
+        "streamId": "stream-b5a5a3d7",
+        "date": "2024-12-24",
+        "streamTitle": "【歌回】我是滿玥寶寶，出道一個玥啦！左手指月，會被月亮割耳朵",
+        "videoId": "gyuM1a8FV24",
+        "timestamp": 6602,
+        "endTimestamp": 6801,
+        "note": ""
+      }
+    ]
+  },
+  {
     "id": "song-10d02929",
     "title": "晴る",
     "originalArtist": "ヨルシカ",
@@ -414,6 +486,24 @@
     ]
   },
   {
+    "id": "song-15084c9d",
+    "title": "ドライフラワー (Ure ver)",
+    "originalArtist": "優里",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-c366964e",
+        "streamId": "stream-2024-12-14",
+        "date": "2024-12-14",
+        "streamTitle": "【歌回】復丑時間，我讓你們PON然心動...",
+        "videoId": "wRZSj5cHzqI",
+        "timestamp": 3787,
+        "endTimestamp": 4067,
+        "note": ""
+      }
+    ]
+  },
+  {
     "id": "song-15b9d7de",
     "title": "年輪說",
     "originalArtist": "楊丞琳",
@@ -445,6 +535,24 @@
         "videoId": "5tc5NgwrZdE",
         "timestamp": 3614,
         "endTimestamp": 3826,
+        "note": ""
+      }
+    ]
+  },
+  {
+    "id": "song-173054da",
+    "title": "eight(에잇) 鋼琴ver",
+    "originalArtist": "IU",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-69fd130d",
+        "streamId": "stream-92119d38",
+        "date": "2024-12-05",
+        "streamTitle": "【純琴歌回】跟隨琴音漫遊夜晚，送給努力了一天的你",
+        "videoId": "PQ3RfVknd0k",
+        "timestamp": 1835,
+        "endTimestamp": 1998,
         "note": ""
       }
     ]
@@ -522,6 +630,24 @@
     ]
   },
   {
+    "id": "song-1d4d2769",
+    "title": "Titanium 鋼琴ver",
+    "originalArtist": "David Guetta",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-4cd219cf",
+        "streamId": "stream-92119d38",
+        "date": "2024-12-05",
+        "streamTitle": "【純琴歌回】跟隨琴音漫遊夜晚，送給努力了一天的你",
+        "videoId": "PQ3RfVknd0k",
+        "timestamp": 5702,
+        "endTimestamp": 5926,
+        "note": ""
+      }
+    ]
+  },
+  {
     "id": "song-1d52eb7c",
     "title": "玫瑰少年",
     "originalArtist": "蔡依林 Jolin Tsai",
@@ -553,6 +679,24 @@
         "videoId": "f46nqn6MlyE",
         "timestamp": 6842,
         "endTimestamp": 7063,
+        "note": ""
+      }
+    ]
+  },
+  {
+    "id": "song-21093bc9",
+    "title": "死ぬのがいいわ 鋼琴ver",
+    "originalArtist": "Fujii Kaze",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-d28a3356",
+        "streamId": "stream-92119d38",
+        "date": "2024-12-05",
+        "streamTitle": "【純琴歌回】跟隨琴音漫遊夜晚，送給努力了一天的你",
+        "videoId": "PQ3RfVknd0k",
+        "timestamp": 5120,
+        "endTimestamp": 5291,
         "note": ""
       }
     ]
@@ -1026,6 +1170,24 @@
     ]
   },
   {
+    "id": "song-385f94b2",
+    "title": "How Sweet",
+    "originalArtist": "NewJeans",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-d46049f9",
+        "streamId": "stream-2024-12-20",
+        "date": "2024-12-20",
+        "streamTitle": "【歌回】晚安，New Jeans，我最喜歡！",
+        "videoId": "_pyphlrZ_JQ",
+        "timestamp": 5183,
+        "endTimestamp": 5400,
+        "note": ""
+      }
+    ]
+  },
+  {
     "id": "song-39b75c5f",
     "title": "POP/STARS",
     "originalArtist": "K/DA",
@@ -1075,6 +1237,24 @@
         "videoId": "GZzsCcNsMBw",
         "timestamp": 2549,
         "endTimestamp": 2758,
+        "note": ""
+      }
+    ]
+  },
+  {
+    "id": "song-3f56ef53",
+    "title": "Supernatural",
+    "originalArtist": "NewJeans",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-933f26ef",
+        "streamId": "stream-2024-12-20",
+        "date": "2024-12-20",
+        "streamTitle": "【歌回】晚安，New Jeans，我最喜歡！",
+        "videoId": "_pyphlrZ_JQ",
+        "timestamp": 6365,
+        "endTimestamp": 6554,
         "note": ""
       }
     ]
@@ -1242,6 +1422,24 @@
     ]
   },
   {
+    "id": "song-4e69f788",
+    "title": "How Sweet",
+    "originalArtist": "NewJeans",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-a9b25da3",
+        "streamId": "stream-2024-12-20",
+        "date": "2024-12-20",
+        "streamTitle": "【歌回】晚安，New Jeans，我最喜歡！",
+        "videoId": "_pyphlrZ_JQ",
+        "timestamp": 4681,
+        "endTimestamp": 4898,
+        "note": ""
+      }
+    ]
+  },
+  {
     "id": "song-4ec7244e",
     "title": "Ditto",
     "originalArtist": "NewJeans",
@@ -1386,6 +1584,24 @@
     ]
   },
   {
+    "id": "song-538309b9",
+    "title": "Live Forever",
+    "originalArtist": "Kotomi & Ryan Elder",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-c3150d36",
+        "streamId": "stream-2024-12-16",
+        "date": "2024-12-16",
+        "streamTitle": "【歌回】星期一晚上，該睡覺了（今天好多中文歌）",
+        "videoId": "lfcg7qaEfbI",
+        "timestamp": 4953,
+        "endTimestamp": 5115,
+        "note": ""
+      }
+    ]
+  },
+  {
     "id": "song-53950200",
     "title": "VILLAIN",
     "originalArtist": "K/DA",
@@ -1435,6 +1651,24 @@
         "videoId": "b22FzJ7GQI0",
         "timestamp": 4729,
         "endTimestamp": 4867,
+        "note": ""
+      }
+    ]
+  },
+  {
+    "id": "song-5d1013e4",
+    "title": "One Last Time 鋼琴ver",
+    "originalArtist": "Ariana Grande",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-a1746ce0",
+        "streamId": "stream-92119d38",
+        "date": "2024-12-05",
+        "streamTitle": "【純琴歌回】跟隨琴音漫遊夜晚，送給努力了一天的你",
+        "videoId": "PQ3RfVknd0k",
+        "timestamp": 7017,
+        "endTimestamp": 7223,
         "note": ""
       }
     ]
@@ -1584,6 +1818,24 @@
     ]
   },
   {
+    "id": "song-6424e5c9",
+    "title": "Pity Party",
+    "originalArtist": "Melanie Martinez",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-c6297f31",
+        "streamId": "stream-2024-12-14",
+        "date": "2024-12-14",
+        "streamTitle": "【歌回】復丑時間，我讓你們PON然心動...",
+        "videoId": "wRZSj5cHzqI",
+        "timestamp": 4432,
+        "endTimestamp": 4630,
+        "note": ""
+      }
+    ]
+  },
+  {
     "id": "song-64401784",
     "title": "母系社會",
     "originalArtist": "AMIT",
@@ -1656,6 +1908,24 @@
     ]
   },
   {
+    "id": "song-6a0615f9",
+    "title": "月亮代表我的心",
+    "originalArtist": "鄧麗君",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-35b9399a",
+        "streamId": "stream-b5a5a3d7",
+        "date": "2024-12-24",
+        "streamTitle": "【歌回】我是滿玥寶寶，出道一個玥啦！左手指月，會被月亮割耳朵",
+        "videoId": "gyuM1a8FV24",
+        "timestamp": 1364,
+        "endTimestamp": 1570,
+        "note": ""
+      }
+    ]
+  },
+  {
     "id": "song-6a39fe7b",
     "title": "透明的",
     "originalArtist": "持修ChihSiou",
@@ -1687,6 +1957,60 @@
         "videoId": "A8SFiRFftsA",
         "timestamp": 6865,
         "endTimestamp": 7103,
+        "note": ""
+      }
+    ]
+  },
+  {
+    "id": "song-6d3e8efc",
+    "title": "Young And Beautiful 鋼琴ver",
+    "originalArtist": "Lana Del Rey",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-35695b30",
+        "streamId": "stream-92119d38",
+        "date": "2024-12-05",
+        "streamTitle": "【純琴歌回】跟隨琴音漫遊夜晚，送給努力了一天的你",
+        "videoId": "PQ3RfVknd0k",
+        "timestamp": 3882,
+        "endTimestamp": 4105,
+        "note": ""
+      }
+    ]
+  },
+  {
+    "id": "song-6dbe20fd",
+    "title": "INTO THE UNKNOWN",
+    "originalArtist": "AURORA Ver.",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-f5533291",
+        "streamId": "stream-2024-12-16",
+        "date": "2024-12-16",
+        "streamTitle": "【歌回】星期一晚上，該睡覺了（今天好多中文歌）",
+        "videoId": "lfcg7qaEfbI",
+        "timestamp": 2610,
+        "endTimestamp": 2802,
+        "note": ""
+      }
+    ]
+  },
+  {
+    "id": "song-6dc83491",
+    "title": "OMG",
+    "originalArtist": "NewJeans",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-e49aa711",
+        "streamId": "stream-2024-12-20",
+        "date": "2024-12-20",
+        "streamTitle": "【歌回】晚安，New Jeans，我最喜歡！",
+        "videoId": "_pyphlrZ_JQ",
+        "timestamp": 2476,
+        "endTimestamp": 2690,
         "note": ""
       }
     ]
@@ -2124,6 +2448,24 @@
     ]
   },
   {
+    "id": "song-8375b82a",
+    "title": "ETA",
+    "originalArtist": "NewJeans",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-d678a10c",
+        "streamId": "stream-2024-12-20",
+        "date": "2024-12-20",
+        "streamTitle": "【歌回】晚安，New Jeans，我最喜歡！",
+        "videoId": "_pyphlrZ_JQ",
+        "timestamp": 4054,
+        "endTimestamp": 4203,
+        "note": ""
+      }
+    ]
+  },
+  {
     "id": "song-83b71027",
     "title": "怪天氣",
     "originalArtist": "YELLOW黃宣 & 9m88",
@@ -2209,6 +2551,114 @@
         "videoId": "yfWcdOXraqw",
         "timestamp": 10993,
         "endTimestamp": 11188,
+        "note": ""
+      }
+    ]
+  },
+  {
+    "id": "song-8c329cc2",
+    "title": "The Loneliest Girl",
+    "originalArtist": "Carole & Tuesday",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-217781a4",
+        "streamId": "stream-2024-12-16",
+        "date": "2024-12-16",
+        "streamTitle": "【歌回】星期一晚上，該睡覺了（今天好多中文歌）",
+        "videoId": "lfcg7qaEfbI",
+        "timestamp": 1145,
+        "endTimestamp": 1327,
+        "note": ""
+      }
+    ]
+  },
+  {
+    "id": "song-8c459bd4",
+    "title": "怪天氣",
+    "originalArtist": "黃宣",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-b069bd71",
+        "streamId": "stream-2024-12-16",
+        "date": "2024-12-16",
+        "streamTitle": "【歌回】星期一晚上，該睡覺了（今天好多中文歌）",
+        "videoId": "lfcg7qaEfbI",
+        "timestamp": 4580,
+        "endTimestamp": 4833,
+        "note": ""
+      }
+    ]
+  },
+  {
+    "id": "song-8dbf27b3",
+    "title": "From The Start 鋼琴ver",
+    "originalArtist": "Laufey",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-0dc3cb31",
+        "streamId": "stream-92119d38",
+        "date": "2024-12-05",
+        "streamTitle": "【純琴歌回】跟隨琴音漫遊夜晚，送給努力了一天的你",
+        "videoId": "PQ3RfVknd0k",
+        "timestamp": 1100,
+        "endTimestamp": 1270,
+        "note": ""
+      }
+    ]
+  },
+  {
+    "id": "song-8ee4037f",
+    "title": "GODS",
+    "originalArtist": "NewJeans",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-b966bc36",
+        "streamId": "stream-2024-12-20",
+        "date": "2024-12-20",
+        "streamTitle": "【歌回】晚安，New Jeans，我最喜歡！",
+        "videoId": "_pyphlrZ_JQ",
+        "timestamp": 1876,
+        "endTimestamp": 2092,
+        "note": ""
+      }
+    ]
+  },
+  {
+    "id": "song-907f6931",
+    "title": "新時代",
+    "originalArtist": "Ado",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-b0961bfd",
+        "streamId": "stream-b5a5a3d7",
+        "date": "2024-12-24",
+        "streamTitle": "【歌回】我是滿玥寶寶，出道一個玥啦！左手指月，會被月亮割耳朵",
+        "videoId": "gyuM1a8FV24",
+        "timestamp": 7584,
+        "endTimestamp": 7805,
+        "note": ""
+      }
+    ]
+  },
+  {
+    "id": "song-91e8035e",
+    "title": "Talking to the Moon",
+    "originalArtist": "Bruno Mars",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-e3440a56",
+        "streamId": "stream-b5a5a3d7",
+        "date": "2024-12-24",
+        "streamTitle": "【歌回】我是滿玥寶寶，出道一個玥啦！左手指月，會被月亮割耳朵",
+        "videoId": "gyuM1a8FV24",
+        "timestamp": 2091,
+        "endTimestamp": 2307,
         "note": ""
       }
     ]
@@ -2358,6 +2808,24 @@
     ]
   },
   {
+    "id": "song-9b9d3415",
+    "title": "If I Ain't Got You 鋼琴ver",
+    "originalArtist": "Alicia Keys",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-aa946bfb",
+        "streamId": "stream-92119d38",
+        "date": "2024-12-05",
+        "streamTitle": "【純琴歌回】跟隨琴音漫遊夜晚，送給努力了一天的你",
+        "videoId": "PQ3RfVknd0k",
+        "timestamp": 2990,
+        "endTimestamp": 3216,
+        "note": ""
+      }
+    ]
+  },
+  {
     "id": "song-9c7e6187",
     "title": "Coffee",
     "originalArtist": "a!ka",
@@ -2376,6 +2844,24 @@
     ]
   },
   {
+    "id": "song-9cff9d7a",
+    "title": "情緒廢物",
+    "originalArtist": "玥Itsuki",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-d36243d0",
+        "streamId": "stream-2024-12-14",
+        "date": "2024-12-14",
+        "streamTitle": "【歌回】復丑時間，我讓你們PON然心動...",
+        "videoId": "wRZSj5cHzqI",
+        "timestamp": 1511,
+        "endTimestamp": 1697,
+        "note": ""
+      }
+    ]
+  },
+  {
     "id": "song-9d69094b",
     "title": "失戀無罪",
     "originalArtist": "A-Lin",
@@ -2389,6 +2875,24 @@
         "videoId": "yfWcdOXraqw",
         "timestamp": 752,
         "endTimestamp": 995,
+        "note": ""
+      }
+    ]
+  },
+  {
+    "id": "song-9ebb0f88",
+    "title": "管它什麼",
+    "originalArtist": "劉戀",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-155e30b4",
+        "streamId": "stream-2024-12-16",
+        "date": "2024-12-16",
+        "streamTitle": "【歌回】星期一晚上，該睡覺了（今天好多中文歌）",
+        "videoId": "lfcg7qaEfbI",
+        "timestamp": 3192,
+        "endTimestamp": 3496,
         "note": ""
       }
     ]
@@ -2592,6 +3096,24 @@
     ]
   },
   {
+    "id": "song-a71efec7",
+    "title": "Bubble Gum",
+    "originalArtist": "NewJeans",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-e942957e",
+        "streamId": "stream-2024-12-20",
+        "date": "2024-12-20",
+        "streamTitle": "【歌回】晚安，New Jeans，我最喜歡！",
+        "videoId": "_pyphlrZ_JQ",
+        "timestamp": 5785,
+        "endTimestamp": 5983,
+        "note": ""
+      }
+    ]
+  },
+  {
     "id": "song-acf5c382",
     "title": "再見的時候",
     "originalArtist": "洪佩瑜",
@@ -2659,6 +3181,24 @@
         "videoId": "iDpZWouxZyY",
         "timestamp": 5137,
         "endTimestamp": 5336,
+        "note": ""
+      }
+    ]
+  },
+  {
+    "id": "song-aee429a9",
+    "title": "Super Shy",
+    "originalArtist": "NewJeans",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-ea902f01",
+        "streamId": "stream-2024-12-20",
+        "date": "2024-12-20",
+        "streamTitle": "【歌回】晚安，New Jeans，我最喜歡！",
+        "videoId": "_pyphlrZ_JQ",
+        "timestamp": 1049,
+        "endTimestamp": 1204,
         "note": ""
       }
     ]
@@ -2988,6 +3528,24 @@
     ]
   },
   {
+    "id": "song-b8f573c5",
+    "title": "左手指月",
+    "originalArtist": "薩頂頂",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-f3ad7431",
+        "streamId": "stream-b5a5a3d7",
+        "date": "2024-12-24",
+        "streamTitle": "【歌回】我是滿玥寶寶，出道一個玥啦！左手指月，會被月亮割耳朵",
+        "videoId": "gyuM1a8FV24",
+        "timestamp": 3773,
+        "endTimestamp": 3950,
+        "note": ""
+      }
+    ]
+  },
+  {
     "id": "song-b9813aca",
     "title": "Oh My God",
     "originalArtist": "Adele",
@@ -3096,6 +3654,24 @@
     ]
   },
   {
+    "id": "song-bd3e96ff",
+    "title": "jagi",
+    "originalArtist": "孫盛希 feat. KIRE",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-45e3803c",
+        "streamId": "stream-b5a5a3d7",
+        "date": "2024-12-24",
+        "streamTitle": "【歌回】我是滿玥寶寶，出道一個玥啦！左手指月，會被月亮割耳朵",
+        "videoId": "gyuM1a8FV24",
+        "timestamp": 5678,
+        "endTimestamp": 5896,
+        "note": ""
+      }
+    ]
+  },
+  {
     "id": "song-bf627c2f",
     "title": "電線桿上的鳥",
     "originalArtist": "LÜCY",
@@ -3132,6 +3708,24 @@
     ]
   },
   {
+    "id": "song-c1095ecc",
+    "title": "像無數的星星",
+    "originalArtist": "Limi",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-9ca43b67",
+        "streamId": "stream-2024-12-16",
+        "date": "2024-12-16",
+        "streamTitle": "【歌回】星期一晚上，該睡覺了（今天好多中文歌）",
+        "videoId": "lfcg7qaEfbI",
+        "timestamp": 5443,
+        "endTimestamp": 5705,
+        "note": ""
+      }
+    ]
+  },
+  {
     "id": "song-c14230bb",
     "title": "身騎白馬",
     "originalArtist": "徐佳瑩",
@@ -3163,6 +3757,24 @@
         "videoId": "gl5wEctKomU",
         "timestamp": 9128,
         "endTimestamp": 9330,
+        "note": ""
+      }
+    ]
+  },
+  {
+    "id": "song-c6583c73",
+    "title": "Before Spring Ends",
+    "originalArtist": "WANG OK",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-a8371eab",
+        "streamId": "stream-2024-12-16",
+        "date": "2024-12-16",
+        "streamTitle": "【歌回】星期一晚上，該睡覺了（今天好多中文歌）",
+        "videoId": "lfcg7qaEfbI",
+        "timestamp": 4050,
+        "endTimestamp": 4177,
         "note": ""
       }
     ]
@@ -3474,6 +4086,24 @@
     ]
   },
   {
+    "id": "song-d42f056c",
+    "title": "Cool With You",
+    "originalArtist": "NewJeans",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-41dc300e",
+        "streamId": "stream-2024-12-20",
+        "date": "2024-12-20",
+        "streamTitle": "【歌回】晚安，New Jeans，我最喜歡！",
+        "videoId": "_pyphlrZ_JQ",
+        "timestamp": 6882,
+        "endTimestamp": 7025,
+        "note": ""
+      }
+    ]
+  },
+  {
     "id": "song-d4682c9a",
     "title": "TT",
     "originalArtist": "TWICE",
@@ -3528,6 +4158,24 @@
     ]
   },
   {
+    "id": "song-d64847c8",
+    "title": "Ditto",
+    "originalArtist": "NewJeans",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-89e076d3",
+        "streamId": "stream-2024-12-20",
+        "date": "2024-12-20",
+        "streamTitle": "【歌回】晚安，New Jeans，我最喜歡！",
+        "videoId": "_pyphlrZ_JQ",
+        "timestamp": 7175,
+        "endTimestamp": 7359,
+        "note": ""
+      }
+    ]
+  },
+  {
     "id": "song-d6d09c95",
     "title": "Whiplash",
     "originalArtist": "aespa",
@@ -3564,6 +4212,42 @@
     ]
   },
   {
+    "id": "song-d799c9f5",
+    "title": "Flowers 鋼琴ver",
+    "originalArtist": "Miley Cyrus",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-a05bc9bb",
+        "streamId": "stream-92119d38",
+        "date": "2024-12-05",
+        "streamTitle": "【純琴歌回】跟隨琴音漫遊夜晚，送給努力了一天的你",
+        "videoId": "PQ3RfVknd0k",
+        "timestamp": 4436,
+        "endTimestamp": 4652,
+        "note": ""
+      }
+    ]
+  },
+  {
+    "id": "song-d7aae9a1",
+    "title": "暮光 Gloaming Light",
+    "originalArtist": "扉暮IANVS",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-1e3e55d9",
+        "streamId": "stream-2024-12-14",
+        "date": "2024-12-14",
+        "streamTitle": "【歌回】復丑時間，我讓你們PON然心動...",
+        "videoId": "wRZSj5cHzqI",
+        "timestamp": 6276,
+        "endTimestamp": 6493,
+        "note": ""
+      }
+    ]
+  },
+  {
     "id": "song-d7c76796",
     "title": "Ashes",
     "originalArtist": "Céline Dion",
@@ -3595,6 +4279,24 @@
         "videoId": "5tc5NgwrZdE",
         "timestamp": 6807,
         "endTimestamp": 7093,
+        "note": ""
+      }
+    ]
+  },
+  {
+    "id": "song-d973fcad",
+    "title": "無慣例的早晨",
+    "originalArtist": "洪佩瑜",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-076176c2",
+        "streamId": "stream-2024-12-16",
+        "date": "2024-12-16",
+        "streamTitle": "【歌回】星期一晚上，該睡覺了（今天好多中文歌）",
+        "videoId": "lfcg7qaEfbI",
+        "timestamp": 1862,
+        "endTimestamp": 2074,
         "note": ""
       }
     ]
@@ -3672,6 +4374,24 @@
     ]
   },
   {
+    "id": "song-e16a1817",
+    "title": "Imaginary Friend",
+    "originalArtist": "ITZY",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-3f8b4024",
+        "streamId": "stream-2024-12-20",
+        "date": "2024-12-20",
+        "streamTitle": "【歌回】晚安，New Jeans，我最喜歡！",
+        "videoId": "_pyphlrZ_JQ",
+        "timestamp": 7578,
+        "endTimestamp": 7779,
+        "note": ""
+      }
+    ]
+  },
+  {
     "id": "song-e35723d4",
     "title": "又三郎",
     "originalArtist": "ヨルシカ",
@@ -3685,6 +4405,24 @@
         "videoId": "b22FzJ7GQI0",
         "timestamp": 7195,
         "endTimestamp": 7422,
+        "note": ""
+      }
+    ]
+  },
+  {
+    "id": "song-e512e030",
+    "title": "Stand Up",
+    "originalArtist": "Cynthia Erivo",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-09d9ed6f",
+        "streamId": "stream-b5a5a3d7",
+        "date": "2024-12-24",
+        "streamTitle": "【歌回】我是滿玥寶寶，出道一個玥啦！左手指月，會被月亮割耳朵",
+        "videoId": "gyuM1a8FV24",
+        "timestamp": 7003,
+        "endTimestamp": 7300,
         "note": ""
       }
     ]
@@ -3834,6 +4572,42 @@
     ]
   },
   {
+    "id": "song-eb81c22d",
+    "title": "Maniac 鋼琴ver",
+    "originalArtist": "Conan Gray",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-96b0470b",
+        "streamId": "stream-92119d38",
+        "date": "2024-12-05",
+        "streamTitle": "【純琴歌回】跟隨琴音漫遊夜晚，送給努力了一天的你",
+        "videoId": "PQ3RfVknd0k",
+        "timestamp": 6415,
+        "endTimestamp": 6590,
+        "note": ""
+      }
+    ]
+  },
+  {
+    "id": "song-eb8f240c",
+    "title": "Style",
+    "originalArtist": "Taylor Swift",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-bacc254c",
+        "streamId": "stream-2024-12-14",
+        "date": "2024-12-14",
+        "streamTitle": "【歌回】復丑時間，我讓你們PON然心動...",
+        "videoId": "wRZSj5cHzqI",
+        "timestamp": 3031,
+        "endTimestamp": 3256,
+        "note": ""
+      }
+    ]
+  },
+  {
     "id": "song-ee36f5d1",
     "title": "Bang Bang",
     "originalArtist": "Jessie J ft. Ariana Grande, Nicki Minaj",
@@ -3865,6 +4639,24 @@
         "videoId": "f46nqn6MlyE",
         "timestamp": 7260,
         "endTimestamp": 7500,
+        "note": ""
+      }
+    ]
+  },
+  {
+    "id": "song-f0317f5f",
+    "title": "Hype Boy",
+    "originalArtist": "NewJeans",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-9a1e4bab",
+        "streamId": "stream-2024-12-20",
+        "date": "2024-12-20",
+        "streamTitle": "【歌回】晚安，New Jeans，我最喜歡！",
+        "videoId": "_pyphlrZ_JQ",
+        "timestamp": 3363,
+        "endTimestamp": 3537,
         "note": ""
       }
     ]
@@ -3991,6 +4783,42 @@
         "videoId": "TKo_wrQ49hY",
         "timestamp": 4337,
         "endTimestamp": 4564,
+        "note": ""
+      }
+    ]
+  },
+  {
+    "id": "song-fcbd67d0",
+    "title": "Espresso 鋼琴ver",
+    "originalArtist": "Sabrina Carpenter",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-26614cff",
+        "streamId": "stream-92119d38",
+        "date": "2024-12-05",
+        "streamTitle": "【純琴歌回】跟隨琴音漫遊夜晚，送給努力了一天的你",
+        "videoId": "PQ3RfVknd0k",
+        "timestamp": 2401,
+        "endTimestamp": 2576,
+        "note": ""
+      }
+    ]
+  },
+  {
+    "id": "song-fcd9ed82",
+    "title": "月牙灣",
+    "originalArtist": "F.I.R.",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-1d51659c",
+        "streamId": "stream-b5a5a3d7",
+        "date": "2024-12-24",
+        "streamTitle": "【歌回】我是滿玥寶寶，出道一個玥啦！左手指月，會被月亮割耳朵",
+        "videoId": "gyuM1a8FV24",
+        "timestamp": 2793,
+        "endTimestamp": 3092,
         "note": ""
       }
     ]
