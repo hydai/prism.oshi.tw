@@ -121,6 +121,63 @@
       "enabled": true
     },
     {
+      "slug": "earendel",
+      "displayName": "Earendel ch. 厄倫蒂兒",
+      "description": "✧極深空計畫 Xtreme Deep Field Project✧\n\n日安，這裡是喜歡吃飯睡覺唱歌的厄倫蒂兒🌙\n希望用歌聲笑聲可以跟人類們有更多互動和連結✨",
+      "avatarUrl": "https://yt3.googleusercontent.com/uj2J1CyizTJx7Q0gH3_gw5BtmivVMY4n7rF0nsVe85XPGJLzyqr46MsyrRoJXPHemkseyb636w=s900-c-k-c0x00ffffff-no-rj",
+      "brandName": "EarendelPrism",
+      "subscriberCount": "17.9萬",
+      "group": "春魚創意",
+      "socialLinks": {
+        "youtube": "https://www.youtube.com/@EarendelXDFP",
+        "twitter": "https://www.youtube.com/redirect?event=channel_description&redir_token=QUFFLUhqa2R3Wm5uWEZXSURqdlFIYVVTSF9hanRUMlk5d3xBQ3Jtc0tsX0lnTUNISVJyc3ZVcVM3aXpHUzF0R1Y5aHVhc01PSE9qdVdoZzctUmZVMjJLbTlBQS15RDhWQlZ0Mk5HNUgzdjczMjJyUll5cklrWXp3UFpZQkU3bFp2TDVlTkc5XzZsRmxFa2kzZ1JVOU5mY1BiTQ&q=https%3A%2F%2Ftwitter.com%2FEarendelXdfp",
+        "instagram": "https://www.instagram.com/earendel_xdfp/",
+        "twitch": "https://www.youtube.com/redirect?event=channel_description&redir_token=QUFFLUhqa0RhcEpXejlXbXZPeEQ4cHNSQ29rZXZVNy1mUXxBQ3Jtc0trNEVJM0ZidzZCUEtJdmNXeVRla0pFMXFDTlZ2bllicW9HUnpJYllRU3ZyQ29TaWFhRnRsNW9QQXNKZ2wtTVpXdlRsdTRiNUtuVnlmTDAwektpRjJ0UHdpeUdnMXdpcUdicVBKVldqQzNpWlBzOVF6aw&q=https%3A%2F%2Fwww.twitch.tv%2Fearendelxdfp"
+      },
+      "theme": {
+        "accentPrimary": "#EC4899",
+        "accentPrimaryDark": "#DB2777",
+        "accentPrimaryLight": "#F472B6",
+        "accentSecondary": "#3B82F6",
+        "accentSecondaryLight": "#60A5FA",
+        "bgPageStart": "#FFF0F5",
+        "bgPageMid": "#F0F8FF",
+        "bgPageEnd": "#E6E6FA",
+        "bgAccentPrimary": "#FDF2F8",
+        "bgAccentPrimaryMuted": "#FCE7F3",
+        "borderAccentPrimary": "#FBCFE8",
+        "borderAccentSecondary": "#BFDBFE"
+      },
+      "enabled": true
+    },
+    {
+      "slug": "hibiki",
+      "displayName": "響Hibiki",
+      "description": "",
+      "avatarUrl": "https://yt3.googleusercontent.com/N8cR2HsE_wAY7Eb4Z-HX5olDC1VuAXpRa5EYujpcbs24bt7ee8NaG_sY2qrTDlz5UHlPdci9WvQ=s900-c-k-c0x00ffffff-no-rj",
+      "brandName": "HibikiPrism",
+      "subscriberCount": "6.71萬",
+      "group": "子午計畫",
+      "socialLinks": {
+        "youtube": "https://youtube.com/@hibikivtuber?si=pYgs4KJX5XZnTr_v"
+      },
+      "theme": {
+        "accentPrimary": "#EC4899",
+        "accentPrimaryDark": "#DB2777",
+        "accentPrimaryLight": "#F472B6",
+        "accentSecondary": "#3B82F6",
+        "accentSecondaryLight": "#60A5FA",
+        "bgPageStart": "#FFF0F5",
+        "bgPageMid": "#F0F8FF",
+        "bgPageEnd": "#E6E6FA",
+        "bgAccentPrimary": "#FDF2F8",
+        "bgAccentPrimaryMuted": "#FCE7F3",
+        "borderAccentPrimary": "#FBCFE8",
+        "borderAccentSecondary": "#BFDBFE"
+      },
+      "enabled": true
+    },
+    {
       "slug": "hiyori",
       "displayName": "煦Hiyori",
       "description": "子午學院冰之魔法學系的學生，樂觀愛笑的狼少女，平時課餘會四處打工，也會沈浸在書堆(漫畫)與咖啡之中，喜歡蒐集與描述各式各樣故事。並且喜歡音樂、喜歡吉他，希望可以讓自己創作的歌曲傳播遠方。對於咖啡有著異常理解，超級喜歡這種飲料。",
