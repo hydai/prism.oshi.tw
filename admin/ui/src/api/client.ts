@@ -244,6 +244,12 @@ export const api = {
       method: 'POST',
     }),
 
+  // Bulk unapprove
+  unapproveAllForStream: (streamId: string) =>
+    request<BulkApproveResponse>(`/api/streams/${streamId}/unapprove-all`, {
+      method: 'POST',
+    }),
+
   // Paste import
   pasteImport: (streamId: string, body: PasteImportBody) =>
     request<PasteImportResponse>(`/api/streams/${streamId}/paste-import`, {

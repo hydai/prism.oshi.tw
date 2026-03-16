@@ -36,6 +36,7 @@ import {
   getPerformanceWithSong,
   bulkCreatePerformances,
   bulkApproveStream,
+  bulkUnapproveStream,
   getStreamDetail,
   updatePerformanceNote,
   importVodToAdminDb,
@@ -443,6 +444,16 @@ app.post('/api/streams/:streamId/approve-all', requireCurator, async (c) => {
 
   const user = c.get('user');
   const { songs, performances } = await bulkApproveStream(c.env.DB, streamId, user.email);
+  return c.json({ ok: true, songs, performances } satisfies BulkApproveResponse);
+});
+
+// Bulk unapprove all approved songs + performances for a stream
+app.post('/api/streams/:streamId/unapprove-all', requireCurator, async (c) => {
+  const streamId = c.req.param('streamId');
+  const stream = await getStreamById(c.env.DB, streamId);
+  if (!stream) return c.json({ error: 'Stream not found' }, 404);
+
+  const { songs, performances } = await bulkUnapproveStream(c.env.DB, streamId);
   return c.json({ ok: true, songs, performances } satisfies BulkApproveResponse);
 });
 

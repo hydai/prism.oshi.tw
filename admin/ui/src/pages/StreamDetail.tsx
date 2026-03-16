@@ -398,6 +398,20 @@ export default function StreamDetail({ user }: { user: AuthUser }) {
     }
   }, [streamId, detail, loadDetail, showToast]);
 
+  // --- Bulk unapprove all ---
+  const handleUnapproveAll = useCallback(async () => {
+    if (!streamId || !detail) return;
+    const approvedCount = detail.performances.filter((p) => p.status === 'approved').length;
+    if (!confirm(`Unapprove all ${approvedCount} approved performances?`)) return;
+    try {
+      const result = await api.unapproveAllForStream(streamId);
+      await loadDetail();
+      showToast(`Unapproved ${result.songs} songs, ${result.performances} performances`);
+    } catch (err: unknown) {
+      showToast(err instanceof Error ? err.message : 'Failed to unapprove all', true);
+    }
+  }, [streamId, detail, loadDetail, showToast]);
+
   // --- Paste import done ---
   const handlePasteImportDone = useCallback(async (result: { created: number; replaced: boolean }) => {
     setShowPasteImport(false);
@@ -775,6 +789,12 @@ export default function StreamDetail({ user }: { user: AuthUser }) {
             <button onClick={handleApproveAll}
               className="rounded-md bg-green-600 px-3 py-1 text-sm font-medium text-white hover:bg-green-700">
               Approve All
+            </button>
+          )}
+          {isCurator && detail.performances.some((p) => p.status === 'approved') && (
+            <button onClick={handleUnapproveAll}
+              className="rounded-md bg-amber-500 px-3 py-1 text-sm font-medium text-white hover:bg-amber-600">
+              Unapprove All
             </button>
           )}
           <button onClick={() => setShowAddModal(true)}
