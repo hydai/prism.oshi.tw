@@ -187,7 +187,6 @@ function ExtractTab() {
   const [editedSongs, setEditedSongs] = useState<PasteImportParsedSong[]>([]);
   const [importStatus, setImportStatus] = useState<string | null>(null);
   const [importing, setImporting] = useState(false);
-  const [showCandidates, setShowCandidates] = useState(false);
   const [credit, setCredit] = useState<StreamCredit | null>(null);
 
   // Fetch streams needing extraction (status = pending)
@@ -288,198 +287,55 @@ function ExtractTab() {
 
   return (
     <div>
-      {/* Stream selector table */}
-      {loadingStreams ? (
-        <span className="text-sm text-slate-500">Loading streams...</span>
-      ) : streams.length === 0 ? (
-        <p className="text-sm text-slate-500">No streams ready</p>
-      ) : (
-        <div className="overflow-x-auto rounded-lg border border-slate-200 bg-white">
-          <table className="w-full text-left text-sm">
-            <thead className="border-b border-slate-200 bg-slate-50 text-xs uppercase text-slate-500">
-              <tr>
-                <th className="px-4 py-3 w-8">#</th>
-                <th className="px-4 py-3">Date</th>
-                <th className="px-4 py-3">Title</th>
-                <th className="px-4 py-3">Video ID</th>
-                <th className="px-4 py-3 w-28">Action</th>
-              </tr>
-            </thead>
-            <tbody className="divide-y divide-slate-100">
-              {streams.map((s, i) => (
-                <tr
-                  key={s.id}
-                  className={selectedStreamId === s.id && (loading || extractResult) ? 'bg-blue-50' : 'hover:bg-slate-50'}
-                >
-                  <td className="px-4 py-3 text-slate-400">{i + 1}</td>
-                  <td className="px-4 py-3 text-slate-600">{s.date}</td>
-                  <td className="px-4 py-3 font-medium">{s.title}</td>
-                  <td className="px-4 py-3">
-                    <a
-                      href={`https://www.youtube.com/watch?v=${s.videoId}`}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="text-blue-600 hover:underline"
-                    >
-                      {s.videoId}
-                    </a>
-                  </td>
-                  <td className="px-4 py-3">
-                    <button
-                      onClick={() => {
-                        setExtractResult(null);
-                        setEditedSongs([]);
-                        setImportStatus(null);
-                        handleExtract(s.id);
-                      }}
-                      disabled={loading}
-                      className="rounded-md bg-blue-600 px-3 py-1.5 text-xs font-medium text-white hover:bg-blue-700 disabled:opacity-50"
-                    >
-                      {loading && selectedStreamId === s.id ? 'Extracting...' : 'Extract'}
-                    </button>
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
-      )}
-
-      {error && <p className="mt-3 text-sm text-red-600">{error}</p>}
-      {importStatus && <p className="mt-3 text-sm text-green-600">{importStatus}</p>}
-
-      {/* Extract results */}
-      {extractResult && (
-        <div className="mt-4 space-y-4">
-          {/* Source indicator */}
-          <div className="rounded-lg border border-slate-200 bg-white p-4">
-            <h4 className="text-sm font-medium text-slate-700">Source</h4>
-            {extractResult.source === 'comment' && extractResult.candidateComment && (
-              <div className="mt-1 text-sm text-slate-600">
-                <span className="font-medium">Comment</span> by{' '}
-                <span className="font-medium">{extractResult.candidateComment.author}</span>
-                {' — '}
-                {extractResult.candidateComment.likes} likes,{' '}
-                {extractResult.candidateComment.timestampCount} timestamps
-                {extractResult.candidateComment.isPinned && (
-                  <span className="ml-2 inline-flex rounded-full bg-amber-100 px-2 py-0.5 text-xs font-medium text-amber-700">
-                    PINNED
-                  </span>
-                )}
-              </div>
-            )}
-            {extractResult.source === 'description' && (
-              <p className="mt-1 text-sm text-slate-600">
-                From video description (no suitable comment found)
-              </p>
-            )}
-            {extractResult.source === null && (
-              <p className="mt-1 text-sm text-amber-600">
-                No timestamps found in comments or description. Use the Stamp Editor paste import instead.
-              </p>
-            )}
-          </div>
-
-          {/* Alternate candidates */}
-          {extractResult.allCandidates.length > 1 && (
-            <div className="rounded-lg border border-slate-200 bg-white">
-              <button
-                onClick={() => setShowCandidates(!showCandidates)}
-                className="flex w-full items-center justify-between px-4 py-3 text-left text-sm font-medium text-slate-700 hover:bg-slate-50"
-              >
-                <span>
-                  Other candidates ({extractResult.allCandidates.length - 1})
-                </span>
-                <span>{showCandidates ? '▲' : '▼'}</span>
-              </button>
-              {showCandidates && (
-                <div className="border-t border-slate-200 divide-y divide-slate-100">
-                  {extractResult.allCandidates
-                    .filter((c) => c.commentId !== extractResult.candidateComment?.commentId)
-                    .map((c) => (
-                      <div key={c.commentId} className="px-4 py-3">
-                        <div className="flex items-center justify-between">
-                          <span className="text-sm text-slate-600">
-                            <span className="font-medium">{c.author}</span> — {c.likes} likes, {c.timestampCount} timestamps
-                          </span>
-                          <button
-                            onClick={() => handleUseCandidate(c.text, c.author, c.commentId)}
-                            className="rounded bg-blue-100 px-2 py-1 text-xs font-medium text-blue-700 hover:bg-blue-200"
-                          >
-                            Use This
-                          </button>
-                        </div>
-                        <pre className="mt-1 max-h-32 overflow-y-auto whitespace-pre-wrap text-xs text-slate-500">
-                          {c.text.slice(0, 500)}{c.text.length > 500 ? '...' : ''}
-                        </pre>
-                      </div>
-                    ))}
-                </div>
-              )}
-            </div>
-          )}
-
-          {/* Song preview table */}
-          {editedSongs.length > 0 && (
-            <div className="rounded-lg border border-slate-200 bg-white">
-              <div className="flex items-center justify-between border-b border-slate-200 px-4 py-3">
-                <h4 className="text-sm font-medium text-slate-700">
-                  Parsed Songs ({editedSongs.length})
-                </h4>
-                <button
-                  onClick={() => handleImport()}
-                  disabled={importing || editedSongs.length === 0}
-                  className="rounded-md bg-green-600 px-4 py-2 text-sm font-medium text-white hover:bg-green-700 disabled:opacity-50"
-                >
-                  {importing ? 'Importing...' : `Import ${editedSongs.length} Songs`}
-                </button>
-              </div>
+      {/* Two-column layout: stream table (left) + candidates panel (right) */}
+      <div className="flex gap-4">
+        {/* Left column: Stream selector table */}
+        <div className="flex-1 min-w-0">
+          {loadingStreams ? (
+            <span className="text-sm text-slate-500">Loading streams...</span>
+          ) : streams.length === 0 ? (
+            <p className="text-sm text-slate-500">No streams ready</p>
+          ) : (
+            <div className="overflow-x-auto rounded-lg border border-slate-200 bg-white">
               <table className="w-full text-left text-sm">
                 <thead className="border-b border-slate-200 bg-slate-50 text-xs uppercase text-slate-500">
                   <tr>
-                    <th className="px-4 py-2 w-8">#</th>
-                    <th className="px-4 py-2">Start</th>
-                    <th className="px-4 py-2">End</th>
-                    <th className="px-4 py-2">Title</th>
-                    <th className="px-4 py-2">Artist</th>
-                    <th className="px-4 py-2 w-8"></th>
+                    <th className="px-4 py-3 w-8">#</th>
+                    <th className="px-4 py-3">Date</th>
+                    <th className="px-4 py-3">Title</th>
+                    <th className="px-4 py-3 w-28">Action</th>
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-slate-100">
-                  {editedSongs.map((song, i) => (
-                    <tr key={i} className="hover:bg-slate-50">
-                      <td className="px-4 py-2 text-slate-400">{i + 1}</td>
-                      <td className="px-4 py-2 text-slate-600 font-mono text-xs">
-                        {formatTimestamp(song.startSeconds)}
-                      </td>
-                      <td className="px-4 py-2 text-slate-600 font-mono text-xs">
-                        {song.endSeconds !== null
-                          ? formatTimestamp(song.endSeconds)
-                          : '—'}
-                      </td>
-                      <td className="px-4 py-2">
-                        <input
-                          type="text"
-                          value={song.songName}
-                          onChange={(e) => updateSong(i, 'songName', e.target.value)}
-                          className="w-full rounded border border-slate-200 px-2 py-1 text-sm focus:border-blue-500 focus:outline-none"
-                        />
-                      </td>
-                      <td className="px-4 py-2">
-                        <input
-                          type="text"
-                          value={song.artist}
-                          onChange={(e) => updateSong(i, 'artist', e.target.value)}
-                          className="w-full rounded border border-slate-200 px-2 py-1 text-sm focus:border-blue-500 focus:outline-none"
-                        />
-                      </td>
-                      <td className="px-4 py-2">
-                        <button
-                          onClick={() => removeSong(i)}
-                          className="text-red-400 hover:text-red-600"
-                          title="Remove"
+                  {streams.map((s, i) => (
+                    <tr
+                      key={s.id}
+                      className={selectedStreamId === s.id && (loading || extractResult) ? 'bg-blue-50' : 'hover:bg-slate-50'}
+                    >
+                      <td className="px-4 py-3 text-slate-400">{i + 1}</td>
+                      <td className="px-4 py-3 text-slate-600">{s.date}</td>
+                      <td className="px-4 py-3 font-medium">
+                        <a
+                          href={`https://www.youtube.com/watch?v=${s.videoId}`}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="text-blue-600 hover:underline"
                         >
-                          ×
+                          {s.title}
+                        </a>
+                      </td>
+                      <td className="px-4 py-3">
+                        <button
+                          onClick={() => {
+                            setExtractResult(null);
+                            setEditedSongs([]);
+                            setImportStatus(null);
+                            handleExtract(s.id);
+                          }}
+                          disabled={loading}
+                          className="rounded-md bg-blue-600 px-3 py-1.5 text-xs font-medium text-white hover:bg-blue-700 disabled:opacity-50"
+                        >
+                          {loading && selectedStreamId === s.id ? 'Extracting...' : 'Extract'}
                         </button>
                       </td>
                     </tr>
@@ -488,6 +344,167 @@ function ExtractTab() {
               </table>
             </div>
           )}
+        </div>
+
+        {/* Right column: Candidates panel */}
+        <div className="w-80 shrink-0">
+          {!extractResult && !loading ? (
+            <div className="rounded-lg border border-dashed border-slate-300 bg-slate-50 p-6 text-center text-sm text-slate-400">
+              Select a stream and click Extract
+            </div>
+          ) : loading ? (
+            <div className="rounded-lg border border-slate-200 bg-white p-6 text-center text-sm text-slate-500">
+              Extracting...
+            </div>
+          ) : extractResult && (
+            <div className="space-y-3">
+              {/* Source indicator */}
+              <div className="rounded-lg border border-slate-200 bg-white p-3">
+                <h4 className="text-xs font-medium uppercase text-slate-500">Source</h4>
+                {extractResult.source === 'comment' && extractResult.candidateComment && (
+                  <p className="mt-1 text-sm text-slate-600">
+                    <span className="font-medium">Comment</span> by{' '}
+                    <span className="font-medium">{extractResult.candidateComment.author}</span>
+                  </p>
+                )}
+                {extractResult.source === 'description' && (
+                  <p className="mt-1 text-sm text-slate-600">Video description</p>
+                )}
+                {extractResult.source === null && (
+                  <p className="mt-1 text-sm text-amber-600">No timestamps found</p>
+                )}
+              </div>
+
+              {error && <p className="text-sm text-red-600">{error}</p>}
+              {importStatus && <p className="text-sm text-green-600">{importStatus}</p>}
+
+              {/* All candidates */}
+              {extractResult.allCandidates.length > 0 && (
+                <div className="space-y-2">
+                  <h4 className="text-xs font-medium uppercase text-slate-500">
+                    Candidates ({extractResult.allCandidates.length})
+                  </h4>
+                  {extractResult.allCandidates.map((c) => {
+                    const isActive = c.commentId === extractResult.candidateComment?.commentId;
+                    return (
+                      <div
+                        key={c.commentId}
+                        className={`rounded-lg border p-3 ${
+                          isActive
+                            ? 'border-blue-500 bg-blue-50'
+                            : 'border-slate-200 bg-white'
+                        }`}
+                      >
+                        <div className="flex items-start justify-between gap-2">
+                          <div className="min-w-0">
+                            <span className="text-sm font-medium text-slate-700">{c.author}</span>
+                            <div className="mt-0.5 flex items-center gap-2 text-xs text-slate-500">
+                              <span>{c.likes} likes</span>
+                              <span>{c.timestampCount} ts</span>
+                              {c.isPinned && (
+                                <span className="inline-flex rounded-full bg-amber-100 px-1.5 py-0.5 text-xs font-medium text-amber-700">
+                                  PIN
+                                </span>
+                              )}
+                            </div>
+                          </div>
+                          {isActive ? (
+                            <span className="shrink-0 rounded bg-blue-100 px-2 py-1 text-xs font-medium text-blue-700">
+                              Active
+                            </span>
+                          ) : (
+                            <button
+                              onClick={() => handleUseCandidate(c.text, c.author, c.commentId)}
+                              className="shrink-0 rounded bg-blue-100 px-2 py-1 text-xs font-medium text-blue-700 hover:bg-blue-200"
+                            >
+                              Use This
+                            </button>
+                          )}
+                        </div>
+                        <pre className="mt-2 max-h-28 overflow-y-auto whitespace-pre-wrap text-xs text-slate-500">
+                          {c.text.slice(0, 300)}{c.text.length > 300 ? '...' : ''}
+                        </pre>
+                      </div>
+                    );
+                  })}
+                </div>
+              )}
+            </div>
+          )}
+        </div>
+      </div>
+
+      {/* Error/status outside two-column when no extractResult (e.g. extraction error) */}
+      {!extractResult && error && <p className="mt-3 text-sm text-red-600">{error}</p>}
+      {!extractResult && importStatus && <p className="mt-3 text-sm text-green-600">{importStatus}</p>}
+
+      {/* Parsed songs table — full width below */}
+      {editedSongs.length > 0 && (
+        <div className="mt-4 rounded-lg border border-slate-200 bg-white">
+          <div className="flex items-center justify-between border-b border-slate-200 px-4 py-3">
+            <h4 className="text-sm font-medium text-slate-700">
+              Parsed Songs ({editedSongs.length})
+            </h4>
+            <button
+              onClick={() => handleImport()}
+              disabled={importing || editedSongs.length === 0}
+              className="rounded-md bg-green-600 px-4 py-2 text-sm font-medium text-white hover:bg-green-700 disabled:opacity-50"
+            >
+              {importing ? 'Importing...' : `Import ${editedSongs.length} Songs`}
+            </button>
+          </div>
+          <table className="w-full text-left text-sm">
+            <thead className="border-b border-slate-200 bg-slate-50 text-xs uppercase text-slate-500">
+              <tr>
+                <th className="px-4 py-2 w-8">#</th>
+                <th className="px-4 py-2">Start</th>
+                <th className="px-4 py-2">End</th>
+                <th className="px-4 py-2">Title</th>
+                <th className="px-4 py-2">Artist</th>
+                <th className="px-4 py-2 w-8"></th>
+              </tr>
+            </thead>
+            <tbody className="divide-y divide-slate-100">
+              {editedSongs.map((song, i) => (
+                <tr key={i} className="hover:bg-slate-50">
+                  <td className="px-4 py-2 text-slate-400">{i + 1}</td>
+                  <td className="px-4 py-2 text-slate-600 font-mono text-xs">
+                    {formatTimestamp(song.startSeconds)}
+                  </td>
+                  <td className="px-4 py-2 text-slate-600 font-mono text-xs">
+                    {song.endSeconds !== null
+                      ? formatTimestamp(song.endSeconds)
+                      : '—'}
+                  </td>
+                  <td className="px-4 py-2">
+                    <input
+                      type="text"
+                      value={song.songName}
+                      onChange={(e) => updateSong(i, 'songName', e.target.value)}
+                      className="w-full rounded border border-slate-200 px-2 py-1 text-sm focus:border-blue-500 focus:outline-none"
+                    />
+                  </td>
+                  <td className="px-4 py-2">
+                    <input
+                      type="text"
+                      value={song.artist}
+                      onChange={(e) => updateSong(i, 'artist', e.target.value)}
+                      className="w-full rounded border border-slate-200 px-2 py-1 text-sm focus:border-blue-500 focus:outline-none"
+                    />
+                  </td>
+                  <td className="px-4 py-2">
+                    <button
+                      onClick={() => removeSong(i)}
+                      className="text-red-400 hover:text-red-600"
+                      title="Remove"
+                    >
+                      ×
+                    </button>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
         </div>
       )}
     </div>
