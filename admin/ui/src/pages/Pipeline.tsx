@@ -202,14 +202,16 @@ function ExtractTab() {
       .finally(() => setLoadingStreams(false));
   }, []);
 
-  const handleExtract = async () => {
-    if (!selectedStreamId) return;
+  const handleExtract = async (streamId?: string) => {
+    const id = streamId ?? selectedStreamId;
+    if (!id) return;
+    setSelectedStreamId(id);
     setLoading(true);
     setError(null);
     setExtractResult(null);
     setImportStatus(null);
     try {
-      const res = await api.extractTimestamps(selectedStreamId);
+      const res = await api.extractTimestamps(id);
       setExtractResult(res);
       setEditedSongs([...res.parsedSongs]);
       setCredit(res.credit);
@@ -286,37 +288,62 @@ function ExtractTab() {
 
   return (
     <div>
-      {/* Stream selector */}
-      <div className="flex items-center gap-3">
-        {loadingStreams ? (
-          <span className="text-sm text-slate-500">Loading streams...</span>
-        ) : (
-          <select
-            value={selectedStreamId}
-            onChange={(e) => {
-              setSelectedStreamId(e.target.value);
-              setExtractResult(null);
-              setEditedSongs([]);
-              setImportStatus(null);
-            }}
-            className="rounded-md border border-slate-300 px-3 py-2 text-sm focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500"
-          >
-            {streams.length === 0 && <option value="">No streams ready</option>}
-            {streams.map((s) => (
-              <option key={s.id} value={s.id}>
-                {s.date} — {s.title}
-              </option>
-            ))}
-          </select>
-        )}
-        <button
-          onClick={handleExtract}
-          disabled={loading || !selectedStreamId}
-          className="rounded-md bg-blue-600 px-4 py-2 text-sm font-medium text-white hover:bg-blue-700 disabled:opacity-50"
-        >
-          {loading ? 'Extracting...' : 'Extract Timestamps'}
-        </button>
-      </div>
+      {/* Stream selector table */}
+      {loadingStreams ? (
+        <span className="text-sm text-slate-500">Loading streams...</span>
+      ) : streams.length === 0 ? (
+        <p className="text-sm text-slate-500">No streams ready</p>
+      ) : (
+        <div className="overflow-x-auto rounded-lg border border-slate-200 bg-white">
+          <table className="w-full text-left text-sm">
+            <thead className="border-b border-slate-200 bg-slate-50 text-xs uppercase text-slate-500">
+              <tr>
+                <th className="px-4 py-3 w-8">#</th>
+                <th className="px-4 py-3">Date</th>
+                <th className="px-4 py-3">Title</th>
+                <th className="px-4 py-3">Video ID</th>
+                <th className="px-4 py-3 w-28">Action</th>
+              </tr>
+            </thead>
+            <tbody className="divide-y divide-slate-100">
+              {streams.map((s, i) => (
+                <tr
+                  key={s.id}
+                  className={selectedStreamId === s.id && (loading || extractResult) ? 'bg-blue-50' : 'hover:bg-slate-50'}
+                >
+                  <td className="px-4 py-3 text-slate-400">{i + 1}</td>
+                  <td className="px-4 py-3 text-slate-600">{s.date}</td>
+                  <td className="px-4 py-3 font-medium">{s.title}</td>
+                  <td className="px-4 py-3">
+                    <a
+                      href={`https://www.youtube.com/watch?v=${s.videoId}`}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="text-blue-600 hover:underline"
+                    >
+                      {s.videoId}
+                    </a>
+                  </td>
+                  <td className="px-4 py-3">
+                    <button
+                      onClick={() => {
+                        setExtractResult(null);
+                        setEditedSongs([]);
+                        setImportStatus(null);
+                        handleExtract(s.id);
+                      }}
+                      disabled={loading}
+                      className="rounded-md bg-blue-600 px-3 py-1.5 text-xs font-medium text-white hover:bg-blue-700 disabled:opacity-50"
+                    >
+                      {loading && selectedStreamId === s.id ? 'Extracting...' : 'Extract'}
+                    </button>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      )}
 
       {error && <p className="mt-3 text-sm text-red-600">{error}</p>}
       {importStatus && <p className="mt-3 text-sm text-green-600">{importStatus}</p>}
