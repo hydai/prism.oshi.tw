@@ -285,7 +285,7 @@ function SubmissionRow({
         <td className="px-4 py-3 text-slate-500">{sub.submitted_at}</td>
         {isCurator && (
           <td className="px-4 py-3" onClick={(e) => e.stopPropagation()}>
-            {sub.status === 'pending' && (
+            {sub.status === 'pending' ? (
               <div className="flex gap-1">
                 <button
                   disabled={actionLoading}
@@ -302,6 +302,14 @@ function SubmissionRow({
                   Reject
                 </button>
               </div>
+            ) : (
+              <button
+                disabled={actionLoading}
+                onClick={() => onAction(sub.id, 'pending')}
+                className="rounded bg-amber-500 px-2 py-1 text-xs text-white hover:bg-amber-600 disabled:opacity-50"
+              >
+                Revert to Pending
+              </button>
             )}
           </td>
         )}
