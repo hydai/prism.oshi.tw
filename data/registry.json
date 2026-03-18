@@ -452,6 +452,37 @@
       "enabled": true
     },
     {
+      "slug": "sachi",
+      "displayName": "幸Sachi",
+      "description": "精明能幹，其實私底下有著反差(溫柔、腹黑)的一面。\n\n對聲音方面的創作相當有興趣，喜歡配音與唱歌，琢磨不一樣的聲音，希望可以讓更多人聽見，擅長使用自己性感低沉的聲音來演唱與製作作品，讓你陶醉於她的聲音像是一杯陳年的紅酒一般。\n\n在因緣際會下而加入了子午學院，希望可以透過進修與學習讓更多的人知道他。\n\n「遇見了你，那些被遺忘的塵封過往，將不再需要執著。」「你，願意跟我一起寫下……屬於我們的歷史嗎？」",
+      "avatarUrl": "https://yt3.googleusercontent.com/vU7AicsdSgVP1u-WK3eBlSukvEin0Ec4H6RM0PYkFHDdJLREaEbfNrZ9PDZn0SgDqSZjDWV3Gg=s900-c-k-c0x00ffffff-no-rj",
+      "brandName": "SachiPrism",
+      "subscriberCount": "4.74萬",
+      "group": "子午計畫",
+      "socialLinks": {
+        "youtube": "https://www.youtube.com/@SachiTeRaz",
+        "twitter": "https://twitter.com/Sachi_TeRaz",
+        "facebook": "https://www.facebook.com/SachiTeRaz/",
+        "instagram": "https://www.instagram.com/sachi_teraz/",
+        "twitch": "https://www.twitch.tv/sachi_teraz"
+      },
+      "theme": {
+        "accentPrimary": "#EC4899",
+        "accentPrimaryDark": "#DB2777",
+        "accentPrimaryLight": "#F472B6",
+        "accentSecondary": "#3B82F6",
+        "accentSecondaryLight": "#60A5FA",
+        "bgPageStart": "#FFF0F5",
+        "bgPageMid": "#F0F8FF",
+        "bgPageEnd": "#E6E6FA",
+        "bgAccentPrimary": "#FDF2F8",
+        "bgAccentPrimaryMuted": "#FCE7F3",
+        "borderAccentPrimary": "#FBCFE8",
+        "borderAccentSecondary": "#BFDBFE"
+      },
+      "enabled": true
+    },
+    {
       "slug": "sakuro",
       "displayName": "朔Sakuro",
       "description": "個性自由不羈、八面玲瓏，某些時刻卻又不那麼坦率的赤腹黑蛇，主要在Youtube上進行直播。歌聲中散發出若有似無的致命魅力，慵懶的眼神就如蛇尾般勾人。以吉他彈唱展現與眾不同才能的他，興趣之一便是透過音樂創作將高潮迭起的故事訴說給觀眾。",
