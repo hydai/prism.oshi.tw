@@ -151,6 +151,36 @@
       "enabled": true
     },
     {
+      "slug": "galaxyvt",
+      "displayName": "銀河 Galaxy",
+      "description": "歌系個人勢💙",
+      "avatarUrl": "https://yt3.googleusercontent.com/z9MbdPg_P7iTYm-8dF_urjl1D8-TksD39XnQCgJcI6T7raliesIk2xwUV0_rwIPm6mWhVJofS2U=s900-c-k-c0x00ffffff-no-rj",
+      "brandName": "GalaxyPrism",
+      "subscriberCount": "6.58萬",
+      "group": "個人勢",
+      "socialLinks": {
+        "youtube": "https://youtube.com/channel/UCoNKCsX9tSxiuh9jznYxXfw?si=P8p4hrj7ICeL1178",
+        "twitter": "https://x.com/Galaxy_gingavt",
+        "instagram": "https://www.instagram.com/galaxy_gingavt/",
+        "twitch": "https://www.twitch.tv/galaxy_gingavt"
+      },
+      "theme": {
+        "accentPrimary": "#EC4899",
+        "accentPrimaryDark": "#DB2777",
+        "accentPrimaryLight": "#F472B6",
+        "accentSecondary": "#3B82F6",
+        "accentSecondaryLight": "#60A5FA",
+        "bgPageStart": "#FFF0F5",
+        "bgPageMid": "#F0F8FF",
+        "bgPageEnd": "#E6E6FA",
+        "bgAccentPrimary": "#FDF2F8",
+        "bgAccentPrimaryMuted": "#FCE7F3",
+        "borderAccentPrimary": "#FBCFE8",
+        "borderAccentSecondary": "#BFDBFE"
+      },
+      "enabled": true
+    },
+    {
       "slug": "hibiki",
       "displayName": "響Hibiki",
       "description": "",
