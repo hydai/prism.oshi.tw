@@ -316,6 +316,11 @@ export const api = {
       body: JSON.stringify(body),
     }),
 
+  deleteNovaSubmission: (id: string) =>
+    request<{ ok: boolean }>(`/api/nova/submissions/${id}`, {
+      method: 'DELETE',
+    }),
+
   // Nova VOD submissions
   listNovaVods: (params?: { status?: string; streamer?: string }) => {
     const sp = new URLSearchParams();
@@ -342,6 +347,11 @@ export const api = {
     request<NovaVodSubmission>(`/api/nova/vods/${id}`, {
       method: 'PUT',
       body: JSON.stringify(body),
+    }),
+
+  deleteNovaVod: (id: string) =>
+    request<{ ok: boolean }>(`/api/nova/vods/${id}`, {
+      method: 'DELETE',
     }),
 
   // Crystal tickets

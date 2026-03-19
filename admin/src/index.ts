@@ -1032,6 +1032,23 @@ app.patch('/api/nova/submissions/:id/status', requireCurator, async (c) => {
   return c.json(updated);
 });
 
+// DELETE /api/nova/submissions/:id — permanently delete a streamer submission
+app.delete('/api/nova/submissions/:id', requireCurator, async (c) => {
+  const id = c.req.param('id');
+  const existing = await c.env.NOVA_DB
+    .prepare('SELECT id FROM submissions WHERE id = ?')
+    .bind(id)
+    .first();
+  if (!existing) return c.json({ error: 'Submission not found' }, 404);
+
+  await c.env.NOVA_DB
+    .prepare('DELETE FROM submissions WHERE id = ?')
+    .bind(id)
+    .run();
+
+  return c.json({ ok: true });
+});
+
 // --- Nova VOD submissions (NOVA_DB) ---
 
 app.get('/api/nova/vods', requireCurator, async (c) => {
@@ -1167,6 +1184,23 @@ app.put('/api/nova/vods/:id', requireCurator, async (c) => {
     .first<NovaVodSubmission>();
 
   return c.json(updated);
+});
+
+// DELETE /api/nova/vods/:id — permanently delete a VOD submission (cascades to vod_songs)
+app.delete('/api/nova/vods/:id', requireCurator, async (c) => {
+  const id = c.req.param('id');
+  const existing = await c.env.NOVA_DB
+    .prepare('SELECT id FROM vod_submissions WHERE id = ?')
+    .bind(id)
+    .first();
+  if (!existing) return c.json({ error: 'VOD submission not found' }, 404);
+
+  await c.env.NOVA_DB
+    .prepare('DELETE FROM vod_submissions WHERE id = ?')
+    .bind(id)
+    .run();
+
+  return c.json({ ok: true });
 });
 
 // --- Crystal tickets (separate D1: CRYSTAL_DB) ---

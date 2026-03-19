@@ -93,6 +93,19 @@ export default function NovaSubmissions({ user }: { user: AuthUser }) {
     }
   };
 
+  const handleDelete = async (sub: NovaSubmission) => {
+    if (!window.confirm(`Permanently delete submission "${sub.id}" (${sub.display_name})? This cannot be undone.`)) return;
+    setActionLoading(sub.id);
+    try {
+      await api.deleteNovaSubmission(sub.id);
+      setSubmissions((prev) => prev.filter((s) => s.id !== sub.id));
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Delete failed');
+    } finally {
+      setActionLoading(null);
+    }
+  };
+
   const handleSave = (updated: NovaSubmission) => {
     setSubmissions((prev) => prev.map((s) => (s.id === updated.id ? updated : s)));
   };
@@ -147,6 +160,7 @@ export default function NovaSubmissions({ user }: { user: AuthUser }) {
                   rejectNote={rejectNote[sub.id] ?? ''}
                   onRejectNoteChange={(val) => setRejectNote((prev) => ({ ...prev, [sub.id]: val }))}
                   onAction={handleAction}
+                  onDelete={handleDelete}
                   onSave={handleSave}
                   actionLoading={actionLoading === sub.id}
                 />
@@ -174,6 +188,7 @@ function SubmissionRow({
   rejectNote,
   onRejectNoteChange,
   onAction,
+  onDelete,
   onSave,
   actionLoading,
 }: {
@@ -184,6 +199,7 @@ function SubmissionRow({
   rejectNote: string;
   onRejectNoteChange: (val: string) => void;
   onAction: (id: string, status: NovaStatus) => void;
+  onDelete: (sub: NovaSubmission) => void;
   onSave: (updated: NovaSubmission) => void;
   actionLoading: boolean;
 }) {
@@ -285,32 +301,41 @@ function SubmissionRow({
         <td className="px-4 py-3 text-slate-500">{sub.submitted_at}</td>
         {isCurator && (
           <td className="px-4 py-3" onClick={(e) => e.stopPropagation()}>
-            {sub.status === 'pending' ? (
-              <div className="flex gap-1">
+            <div className="flex gap-1">
+              {sub.status === 'pending' ? (
+                <>
+                  <button
+                    disabled={actionLoading}
+                    onClick={() => onAction(sub.id, 'approved')}
+                    className="rounded bg-green-600 px-2 py-1 text-xs text-white hover:bg-green-700 disabled:opacity-50"
+                  >
+                    Approve
+                  </button>
+                  <button
+                    disabled={actionLoading}
+                    onClick={() => onAction(sub.id, 'rejected')}
+                    className="rounded bg-red-600 px-2 py-1 text-xs text-white hover:bg-red-700 disabled:opacity-50"
+                  >
+                    Reject
+                  </button>
+                </>
+              ) : (
                 <button
                   disabled={actionLoading}
-                  onClick={() => onAction(sub.id, 'approved')}
-                  className="rounded bg-green-600 px-2 py-1 text-xs text-white hover:bg-green-700 disabled:opacity-50"
+                  onClick={() => onAction(sub.id, 'pending')}
+                  className="rounded bg-amber-500 px-2 py-1 text-xs text-white hover:bg-amber-600 disabled:opacity-50"
                 >
-                  Approve
+                  Revert to Pending
                 </button>
-                <button
-                  disabled={actionLoading}
-                  onClick={() => onAction(sub.id, 'rejected')}
-                  className="rounded bg-red-600 px-2 py-1 text-xs text-white hover:bg-red-700 disabled:opacity-50"
-                >
-                  Reject
-                </button>
-              </div>
-            ) : (
+              )}
               <button
                 disabled={actionLoading}
-                onClick={() => onAction(sub.id, 'pending')}
-                className="rounded bg-amber-500 px-2 py-1 text-xs text-white hover:bg-amber-600 disabled:opacity-50"
+                onClick={() => onDelete(sub)}
+                className="ml-2 rounded bg-red-800 px-2 py-1 text-xs text-white hover:bg-red-900 disabled:opacity-50"
               >
-                Revert to Pending
+                Delete
               </button>
-            )}
+            </div>
           </td>
         )}
       </tr>

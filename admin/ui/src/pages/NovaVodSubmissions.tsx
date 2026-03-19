@@ -75,6 +75,19 @@ export default function NovaVodSubmissions({ user }: { user: AuthUser }) {
     }
   };
 
+  const handleDelete = async (vod: NovaVodSubmission) => {
+    if (!window.confirm(`Permanently delete VOD submission "${vod.id}" (${vod.stream_title || vod.video_id})? This cannot be undone.`)) return;
+    setActionLoading(vod.id);
+    try {
+      await api.deleteNovaVod(vod.id);
+      setVods((prev) => prev.filter((v) => v.id !== vod.id));
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Delete failed');
+    } finally {
+      setActionLoading(null);
+    }
+  };
+
   const isCurator = user.role === 'curator';
 
   // Collect unique streamers for filter dropdown
@@ -139,6 +152,7 @@ export default function NovaVodSubmissions({ user }: { user: AuthUser }) {
                   rejectNote={rejectNote[vod.id] ?? ''}
                   onRejectNoteChange={(val) => setRejectNote((prev) => ({ ...prev, [vod.id]: val }))}
                   onAction={handleAction}
+                  onDelete={handleDelete}
                   actionLoading={actionLoading === vod.id}
                 />
               ))}
@@ -166,6 +180,7 @@ function VodRow({
   rejectNote,
   onRejectNoteChange,
   onAction,
+  onDelete,
   actionLoading,
 }: {
   vod: NovaVodSubmission;
@@ -176,6 +191,7 @@ function VodRow({
   rejectNote: string;
   onRejectNoteChange: (val: string) => void;
   onAction: (id: string, status: NovaStatus) => void;
+  onDelete: (vod: NovaVodSubmission) => void;
   actionLoading: boolean;
 }) {
   return (
@@ -206,32 +222,41 @@ function VodRow({
         <td className="px-4 py-3 text-slate-500">{vod.submitted_at}</td>
         {isCurator && (
           <td className="px-4 py-3" onClick={(e) => e.stopPropagation()}>
-            {vod.status === 'pending' ? (
-              <div className="flex gap-1">
+            <div className="flex gap-1">
+              {vod.status === 'pending' ? (
+                <>
+                  <button
+                    disabled={actionLoading}
+                    onClick={() => onAction(vod.id, 'approved')}
+                    className="rounded bg-green-600 px-2 py-1 text-xs text-white hover:bg-green-700 disabled:opacity-50"
+                  >
+                    Approve
+                  </button>
+                  <button
+                    disabled={actionLoading}
+                    onClick={() => onAction(vod.id, 'rejected')}
+                    className="rounded bg-red-600 px-2 py-1 text-xs text-white hover:bg-red-700 disabled:opacity-50"
+                  >
+                    Reject
+                  </button>
+                </>
+              ) : (
                 <button
                   disabled={actionLoading}
-                  onClick={() => onAction(vod.id, 'approved')}
-                  className="rounded bg-green-600 px-2 py-1 text-xs text-white hover:bg-green-700 disabled:opacity-50"
+                  onClick={() => onAction(vod.id, 'pending')}
+                  className="rounded bg-amber-500 px-2 py-1 text-xs text-white hover:bg-amber-600 disabled:opacity-50"
                 >
-                  Approve
+                  Revert to Pending
                 </button>
-                <button
-                  disabled={actionLoading}
-                  onClick={() => onAction(vod.id, 'rejected')}
-                  className="rounded bg-red-600 px-2 py-1 text-xs text-white hover:bg-red-700 disabled:opacity-50"
-                >
-                  Reject
-                </button>
-              </div>
-            ) : (
+              )}
               <button
                 disabled={actionLoading}
-                onClick={() => onAction(vod.id, 'pending')}
-                className="rounded bg-amber-500 px-2 py-1 text-xs text-white hover:bg-amber-600 disabled:opacity-50"
+                onClick={() => onDelete(vod)}
+                className="ml-2 rounded bg-red-800 px-2 py-1 text-xs text-white hover:bg-red-900 disabled:opacity-50"
               >
-                Revert to Pending
+                Delete
               </button>
-            )}
+            </div>
           </td>
         )}
       </tr>
