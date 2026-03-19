@@ -80,19 +80,23 @@ export async function countVodsByVideoId(
   db: D1Database,
   slug: string,
   videoId: string,
-): Promise<{ count: number; hasApproved: boolean; latestStatus: string | null }> {
+): Promise<{ count: number; hasApproved: boolean; pendingCount: number; rejectedCount: number; latestStatus: string | null }> {
   const row = await db
     .prepare(
       `SELECT COUNT(*) as count,
               SUM(CASE WHEN status = 'approved' THEN 1 ELSE 0 END) as approved_count,
+              SUM(CASE WHEN status = 'pending' THEN 1 ELSE 0 END) as pending_count,
+              SUM(CASE WHEN status = 'rejected' THEN 1 ELSE 0 END) as rejected_count,
               (SELECT status FROM vod_submissions WHERE streamer_slug = ? AND video_id = ? ORDER BY submitted_at DESC LIMIT 1) as latest_status
        FROM vod_submissions WHERE streamer_slug = ? AND video_id = ?`,
     )
     .bind(slug, videoId, slug, videoId)
-    .first<{ count: number; approved_count: number; latest_status: string | null }>();
+    .first<{ count: number; approved_count: number; pending_count: number; rejected_count: number; latest_status: string | null }>();
   return {
     count: row?.count ?? 0,
     hasApproved: (row?.approved_count ?? 0) > 0,
+    pendingCount: row?.pending_count ?? 0,
+    rejectedCount: row?.rejected_count ?? 0,
     latestStatus: row?.latest_status ?? null,
   };
 }

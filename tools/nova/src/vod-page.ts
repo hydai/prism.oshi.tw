@@ -158,9 +158,12 @@ const VOD_SCRIPT = String.raw`
               if (data.exists && data.hasApproved) {
                 urlCheck.style.color = '#D97706';
                 urlCheck.textContent = '此 VOD 已通過審核，無需重複提交';
-              } else if (data.exists) {
+              } else if (data.exists && data.pendingCount > 0) {
                 urlCheck.style.color = '#2563EB';
-                urlCheck.textContent = '此 VOD 已有 ' + data.count + ' 筆提交（審核中），你仍可提交新版本';
+                urlCheck.textContent = '此 VOD 已有 ' + data.pendingCount + ' 筆提交（審核中），你仍可提交新版本';
+              } else if (data.exists && data.rejectedCount > 0) {
+                urlCheck.style.color = '#DC2626';
+                urlCheck.textContent = '此 VOD 先前的提交已被拒絕，歡迎重新提交修正版本';
               } else {
                 urlCheck.style.color = '#059669';
                 urlCheck.textContent = '此 VOD 尚未被提交';

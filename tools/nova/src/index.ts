@@ -259,6 +259,8 @@ app.get('/vod/api/check', async (c) => {
       exists: true,
       count: info.count,
       hasApproved: info.hasApproved,
+      pendingCount: info.pendingCount,
+      rejectedCount: info.rejectedCount,
       latestStatus: info.latestStatus,
     });
   }
