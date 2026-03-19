@@ -1,4 +1,4 @@
-import type { SubmissionRow } from './types';
+import type { SubmissionRow, SubmissionSummary } from './types';
 
 /**
  * Generate a submission ID: sub-XXXXXXXX (8 random hex chars).
@@ -74,6 +74,22 @@ export async function resetRejectedSubmission(
       id,
     )
     .run();
+}
+
+/**
+ * List all submissions with narrow projection for the public status page.
+ */
+export async function listAllSubmissions(db: D1Database): Promise<SubmissionSummary[]> {
+  const { results } = await db
+    .prepare(
+      `SELECT id, slug, display_name, avatar_url, status, submitted_at, reviewed_at
+       FROM submissions
+       ORDER BY
+         CASE status WHEN 'pending' THEN 0 WHEN 'approved' THEN 1 WHEN 'rejected' THEN 2 END,
+         submitted_at DESC`,
+    )
+    .all<SubmissionSummary>();
+  return results ?? [];
 }
 
 /**

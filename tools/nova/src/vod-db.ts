@@ -1,4 +1,4 @@
-import type { VodSubmissionRow, ApprovedStreamer } from './types';
+import type { VodSubmissionRow, VodSubmissionSummary, ApprovedStreamer } from './types';
 
 /**
  * Generate a VOD submission ID: vod-XXXXXXXX (8 random hex chars).
@@ -31,6 +31,28 @@ export async function listApprovedStreamers(db: D1Database): Promise<ApprovedStr
        ORDER BY display_order ASC, display_name ASC`,
     )
     .all<ApprovedStreamer>();
+  return results ?? [];
+}
+
+/**
+ * List all VOD submissions with song counts for the public status page.
+ */
+export async function listAllVodSubmissions(db: D1Database): Promise<VodSubmissionSummary[]> {
+  const { results } = await db
+    .prepare(
+      `SELECT
+         v.id, v.streamer_slug, v.video_id, v.stream_title, v.stream_date,
+         v.status, v.submitted_at, v.reviewed_at,
+         COUNT(s.id) AS song_count
+       FROM vod_submissions v
+       LEFT JOIN vod_songs s ON s.vod_submission_id = v.id
+       GROUP BY v.id
+       ORDER BY
+         v.streamer_slug ASC,
+         CASE v.status WHEN 'pending' THEN 0 WHEN 'approved' THEN 1 WHEN 'rejected' THEN 2 END,
+         v.submitted_at DESC`,
+    )
+    .all<VodSubmissionSummary>();
   return results ?? [];
 }
 

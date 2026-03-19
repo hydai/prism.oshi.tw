@@ -3,10 +3,11 @@ import { cors } from 'hono/cors';
 import type { Bindings, SubmitBody, VodSubmitBody } from './types';
 import { normalizeYoutubeChannelUrl, validateRequired, parseYoutubeVideoUrl, parseTimestamp } from './validate';
 import { verifyTurnstile } from './turnstile';
-import { generateId, findByChannelUrl, insertSubmission, resetRejectedSubmission } from './db';
-import { generateVodId, generateVodSongId, listApprovedStreamers, findApprovedVodByVideoId, countVodsByVideoId, insertVodSubmission } from './vod-db';
+import { generateId, findByChannelUrl, insertSubmission, resetRejectedSubmission, listAllSubmissions } from './db';
+import { generateVodId, generateVodSongId, listApprovedStreamers, findApprovedVodByVideoId, countVodsByVideoId, insertVodSubmission, listAllVodSubmissions } from './vod-db';
 import { renderPage } from './page';
 import { renderVodPage } from './vod-page';
+import { renderStatusPage } from './status-page';
 
 /** Fetch video title, thumbnail, and publish date from YouTube via oEmbed + page scraping. */
 async function fetchYoutubeVideoInfo(canonicalUrl: string): Promise<{ title: string; thumbnail: string; date: string }> {
@@ -412,6 +413,15 @@ app.post('/vod/api/submit', async (c) => {
   }, parsedSongs);
 
   return c.json({ id }, 201);
+});
+
+// GET /status — Public submission status overview
+app.get('/status', async (c) => {
+  const [submissions, vodSubmissions] = await Promise.all([
+    listAllSubmissions(c.env.DB),
+    listAllVodSubmissions(c.env.DB),
+  ]);
+  return c.html(renderStatusPage(submissions, vodSubmissions));
 });
 
 export default app;

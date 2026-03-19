@@ -96,3 +96,25 @@ export interface ApprovedStreamer {
   display_name: string;
   avatar_url: string;
 }
+
+export interface SubmissionSummary {
+  id: string;
+  slug: string;
+  display_name: string;
+  avatar_url: string;
+  status: SubmissionStatus;
+  submitted_at: string;
+  reviewed_at: string | null;
+}
+
+export interface VodSubmissionSummary {
+  id: string;
+  streamer_slug: string;
+  video_id: string;
+  stream_title: string;
+  stream_date: string;
+  status: SubmissionStatus;
+  submitted_at: string;
+  reviewed_at: string | null;
+  song_count: number;
+}

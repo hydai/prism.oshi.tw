@@ -239,6 +239,8 @@ export function renderPage(siteKey: string) {
     <div class="cross-links">
       <a href="/vod">提交歌回 VOD</a>
       <span style="color: var(--text-tertiary);">|</span>
+      <a href="/status">提交狀態</a>
+      <span style="color: var(--text-tertiary);">|</span>
       <a href="https://prism.oshi.tw" target="_blank">前往 Prism 歌單</a>
     </div>
 
