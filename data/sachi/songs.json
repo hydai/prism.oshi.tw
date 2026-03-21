@@ -1,1 +1,362 @@
-[]
+[
+  {
+    "id": "song-00335630",
+    "title": "離島の歌",
+    "originalArtist": "不知火 (東山奈央)",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-c10f0869",
+        "streamId": "stream-2025-12-15",
+        "date": "2025-12-15",
+        "streamTitle": "【歌雜】唱一些自己喜歡的歌給你們聽",
+        "videoId": "Kb2xALB6P7A",
+        "timestamp": 1614,
+        "endTimestamp": 1834,
+        "note": ""
+      }
+    ]
+  },
+  {
+    "id": "song-1461c1b3",
+    "title": "嘉賓",
+    "originalArtist": "張遠",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-dd43eea0",
+        "streamId": "stream-d8da6c3d",
+        "date": "2026-03-16",
+        "streamTitle": "【歌雜】白情已經過了但還是想唱情歌",
+        "videoId": "HjdbVH6GVAg",
+        "timestamp": 1030,
+        "endTimestamp": 1301,
+        "note": ""
+      }
+    ]
+  },
+  {
+    "id": "song-19e65c75",
+    "title": "はじまりの風",
+    "originalArtist": "平原綾香",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-8e136213",
+        "streamId": "stream-2025-12-15",
+        "date": "2025-12-15",
+        "streamTitle": "【歌雜】唱一些自己喜歡的歌給你們聽",
+        "videoId": "Kb2xALB6P7A",
+        "timestamp": 839,
+        "endTimestamp": 1121,
+        "note": ""
+      }
+    ]
+  },
+  {
+    "id": "song-1ce01ad9",
+    "title": "星辰大海",
+    "originalArtist": "黃霄雲",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-5cdd5336",
+        "streamId": "stream-2026-01-05",
+        "date": "2026-01-05",
+        "streamTitle": "【歌雜】這次都是中文歌！應該啦",
+        "videoId": "e4M8gRKkvIw",
+        "timestamp": 626,
+        "endTimestamp": 834,
+        "note": ""
+      }
+    ]
+  },
+  {
+    "id": "song-2ae06379",
+    "title": "會呼吸的痛",
+    "originalArtist": "梁靜茹",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-6f3a653d",
+        "streamId": "stream-2026-01-05",
+        "date": "2026-01-05",
+        "streamTitle": "【歌雜】這次都是中文歌！應該啦",
+        "videoId": "e4M8gRKkvIw",
+        "timestamp": 2687,
+        "endTimestamp": 3003,
+        "note": ""
+      }
+    ]
+  },
+  {
+    "id": "song-4edd3601",
+    "title": "訣愛",
+    "originalArtist": "詹雯婷",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-31979ea9",
+        "streamId": "stream-2026-01-05",
+        "date": "2026-01-05",
+        "streamTitle": "【歌雜】這次都是中文歌！應該啦",
+        "videoId": "e4M8gRKkvIw",
+        "timestamp": 4158,
+        "endTimestamp": 4347,
+        "note": ""
+      }
+    ]
+  },
+  {
+    "id": "song-50afc100",
+    "title": "五天幾年",
+    "originalArtist": "林凡",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-602a69a2",
+        "streamId": "stream-d8da6c3d",
+        "date": "2026-03-16",
+        "streamTitle": "【歌雜】白情已經過了但還是想唱情歌",
+        "videoId": "HjdbVH6GVAg",
+        "timestamp": 516,
+        "endTimestamp": 748,
+        "note": ""
+      }
+    ]
+  },
+  {
+    "id": "song-6bae41e2",
+    "title": "心訊 Heart Signal",
+    "originalArtist": "煦Hiyori",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-e28f69b6",
+        "streamId": "stream-2025-12-15",
+        "date": "2025-12-15",
+        "streamTitle": "【歌雜】唱一些自己喜歡的歌給你們聽",
+        "videoId": "Kb2xALB6P7A",
+        "timestamp": 4442,
+        "endTimestamp": 4679,
+        "note": ""
+      }
+    ]
+  },
+  {
+    "id": "song-747ee7b3",
+    "title": "她說",
+    "originalArtist": "林俊傑",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-f3233beb",
+        "streamId": "stream-2025-10-23",
+        "date": "2025-10-23",
+        "streamTitle": "【突發歌回】快四萬了！想跟大家一起慶祝",
+        "videoId": "mkrEPCX49ek",
+        "timestamp": 1029,
+        "endTimestamp": 1347,
+        "note": ""
+      }
+    ]
+  },
+  {
+    "id": "song-7a4d7e8e",
+    "title": "炎",
+    "originalArtist": "LiSA",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-5f30f9bb",
+        "streamId": "stream-2025-12-15",
+        "date": "2025-12-15",
+        "streamTitle": "【歌雜】唱一些自己喜歡的歌給你們聽",
+        "videoId": "Kb2xALB6P7A",
+        "timestamp": 2847,
+        "endTimestamp": 3116,
+        "note": ""
+      }
+    ]
+  },
+  {
+    "id": "song-82640606",
+    "title": "失落沙洲",
+    "originalArtist": "徐佳瑩",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-e0eff02b",
+        "streamId": "stream-2025-10-23",
+        "date": "2025-10-23",
+        "streamTitle": "【突發歌回】快四萬了！想跟大家一起慶祝",
+        "videoId": "mkrEPCX49ek",
+        "timestamp": 2030,
+        "endTimestamp": 2329,
+        "note": ""
+      }
+    ]
+  },
+  {
+    "id": "song-a101cb49",
+    "title": "指望",
+    "originalArtist": "郁可唯",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-573154a3",
+        "streamId": "stream-d8da6c3d",
+        "date": "2026-03-16",
+        "streamTitle": "【歌雜】白情已經過了但還是想唱情歌",
+        "videoId": "HjdbVH6GVAg",
+        "timestamp": 3793,
+        "endTimestamp": 4032,
+        "note": ""
+      }
+    ]
+  },
+  {
+    "id": "song-a133b5de",
+    "title": "寶貝",
+    "originalArtist": "張懸",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-9bc08792",
+        "streamId": "stream-d8da6c3d",
+        "date": "2026-03-16",
+        "streamTitle": "【歌雜】白情已經過了但還是想唱情歌",
+        "videoId": "HjdbVH6GVAg",
+        "timestamp": 2033,
+        "endTimestamp": 2177,
+        "note": ""
+      }
+    ]
+  },
+  {
+    "id": "song-aaafd07e",
+    "title": "時間煮雨",
+    "originalArtist": "郁可唯",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-03b10643",
+        "streamId": "stream-2026-01-05",
+        "date": "2026-01-05",
+        "streamTitle": "【歌雜】這次都是中文歌！應該啦",
+        "videoId": "e4M8gRKkvIw",
+        "timestamp": 1680,
+        "endTimestamp": 1919,
+        "note": ""
+      }
+    ]
+  },
+  {
+    "id": "song-c6c7138a",
+    "title": "永不失聯的愛",
+    "originalArtist": "周興哲",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-4c33070a",
+        "streamId": "stream-2026-01-05",
+        "date": "2026-01-05",
+        "streamTitle": "【歌雜】這次都是中文歌！應該啦",
+        "videoId": "e4M8gRKkvIw",
+        "timestamp": 4507,
+        "endTimestamp": 4768,
+        "note": ""
+      }
+    ]
+  },
+  {
+    "id": "song-c9a61844",
+    "title": "人質",
+    "originalArtist": "張惠妹",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-b9ec30bb",
+        "streamId": "stream-d8da6c3d",
+        "date": "2026-03-16",
+        "streamTitle": "【歌雜】白情已經過了但還是想唱情歌",
+        "videoId": "HjdbVH6GVAg",
+        "timestamp": 2847,
+        "endTimestamp": 3074,
+        "note": ""
+      }
+    ]
+  },
+  {
+    "id": "song-d8bdc29d",
+    "title": "年輪",
+    "originalArtist": "張碧晨",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-bc576c92",
+        "streamId": "stream-d8da6c3d",
+        "date": "2026-03-16",
+        "streamTitle": "【歌雜】白情已經過了但還是想唱情歌",
+        "videoId": "HjdbVH6GVAg",
+        "timestamp": 4672,
+        "endTimestamp": 4943,
+        "note": ""
+      }
+    ]
+  },
+  {
+    "id": "song-dd0dc534",
+    "title": "雨愛",
+    "originalArtist": "楊丞琳",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-8daca7f6",
+        "streamId": "stream-d8da6c3d",
+        "date": "2026-03-16",
+        "streamTitle": "【歌雜】白情已經過了但還是想唱情歌",
+        "videoId": "HjdbVH6GVAg",
+        "timestamp": 4256,
+        "endTimestamp": 4515,
+        "note": ""
+      }
+    ]
+  },
+  {
+    "id": "song-f1629572",
+    "title": "馬德里不思議",
+    "originalArtist": "蔡依林",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-5f8e7030",
+        "streamId": "stream-2025-10-23",
+        "date": "2025-10-23",
+        "streamTitle": "【突發歌回】快四萬了！想跟大家一起慶祝",
+        "videoId": "mkrEPCX49ek",
+        "timestamp": 264,
+        "endTimestamp": 475,
+        "note": ""
+      }
+    ]
+  },
+  {
+    "id": "song-fa308963",
+    "title": "独りんぼエンヴィー",
+    "originalArtist": "電ポルP",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-23af92f2",
+        "streamId": "stream-2025-12-15",
+        "date": "2025-12-15",
+        "streamTitle": "【歌雜】唱一些自己喜歡的歌給你們聽",
+        "videoId": "Kb2xALB6P7A",
+        "timestamp": 3895,
+        "endTimestamp": 4097,
+        "note": ""
+      }
+    ]
+  }
+]
