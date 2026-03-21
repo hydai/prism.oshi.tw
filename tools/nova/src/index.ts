@@ -9,13 +9,15 @@ import { renderPage } from './page';
 import { renderVodPage } from './vod-page';
 import { renderStatusPage } from './status-page';
 
-/** Fetch video title, thumbnail, and publish date from YouTube via oEmbed + page scraping. */
-async function fetchYoutubeVideoInfo(canonicalUrl: string): Promise<{ title: string; thumbnail: string; date: string }> {
+/** Fetch video title, thumbnail, and publish date from YouTube via oEmbed + Data API v3. */
+async function fetchYoutubeVideoInfo(videoId: string, apiKey: string): Promise<{ title: string; thumbnail: string; date: string }> {
   let title = '';
   let thumbnail = '';
   let date = '';
 
-  // Use oEmbed API first — reliable and not blocked by YouTube bot detection
+  const canonicalUrl = `https://www.youtube.com/watch?v=${videoId}`;
+
+  // Use oEmbed API for title + thumbnail (still reliable)
   try {
     const oEmbedUrl = `https://www.youtube.com/oembed?url=${encodeURIComponent(canonicalUrl)}&format=json`;
     const oEmbedRes = await fetch(oEmbedUrl);
@@ -26,32 +28,31 @@ async function fetchYoutubeVideoInfo(canonicalUrl: string): Promise<{ title: str
     }
   } catch { /* oEmbed is best-effort */ }
 
-  // Fetch the video page for publish date (oEmbed doesn't provide it)
-  try {
-    const res = await fetch(canonicalUrl, {
-      headers: { 'Accept-Language': 'zh-TW,zh;q=0.9,en;q=0.8' },
-    });
-    if (res.ok) {
-      const pageHtml = await res.text();
-      if (!title) {
-        const titleMatch =
-          pageHtml.match(/<meta\s+property="og:title"\s+content="([^"]*)"/i) ??
-          pageHtml.match(/<meta\s+content="([^"]*)"\s+property="og:title"/i);
-        title = titleMatch?.[1] ?? '';
+  // Use YouTube Data API v3 for date (HTML scraping no longer reliable from Workers)
+  if (apiKey) {
+    try {
+      const apiUrl = `https://www.googleapis.com/youtube/v3/videos?part=snippet,liveStreamingDetails&id=${videoId}&key=${apiKey}`;
+      const res = await fetch(apiUrl, {
+        headers: { Referer: 'https://nova.oshi.tw/' },
+      });
+      if (res.ok) {
+        const data = (await res.json()) as {
+          items?: Array<{
+            snippet?: { title?: string; publishedAt?: string };
+            liveStreamingDetails?: { actualStartTime?: string };
+          }>;
+        };
+        const item = data.items?.[0];
+        if (item) {
+          // Prefer actualStartTime (real broadcast date) over publishedAt (upload/schedule date)
+          const rawDate = item.liveStreamingDetails?.actualStartTime ?? item.snippet?.publishedAt ?? '';
+          date = rawDate ? rawDate.slice(0, 10) : '';
+          // Fill title from API if oEmbed failed
+          if (!title) title = item.snippet?.title ?? '';
+        }
       }
-      if (!thumbnail) {
-        const imageMatch =
-          pageHtml.match(/<meta\s+property="og:image"\s+content="([^"]*)"/i) ??
-          pageHtml.match(/<meta\s+content="([^"]*)"\s+property="og:image"/i);
-        thumbnail = imageMatch?.[1] ?? '';
-      }
-      const dateMatch =
-        pageHtml.match(/<meta\s+itemprop="datePublished"\s+content="([^"]*)"/i) ??
-        pageHtml.match(/<meta\s+itemprop="uploadDate"\s+content="([^"]*)"/i);
-      const rawDate = dateMatch?.[1] ?? '';
-      date = rawDate ? rawDate.slice(0, 10) : '';
-    }
-  } catch { /* page fetch is best-effort */ }
+    } catch { /* API call is best-effort */ }
+  }
 
   return { title, thumbnail, date };
 }
@@ -308,7 +309,7 @@ app.get('/vod/api/video-info', async (c) => {
   }
 
   try {
-    const info = await fetchYoutubeVideoInfo(parsed.canonical);
+    const info = await fetchYoutubeVideoInfo(parsed.videoId, c.env.YOUTUBE_API_KEY);
     return c.json(info);
   } catch {
     return c.json({ error: 'Failed to fetch video info' }, 502);
@@ -429,7 +430,7 @@ app.post('/vod/api/submit', async (c) => {
   let thumbnailUrl = body.thumbnail_url?.trim() ?? '';
   if (!streamTitle || !streamDate || !thumbnailUrl) {
     try {
-      const info = await fetchYoutubeVideoInfo(parsed.canonical);
+      const info = await fetchYoutubeVideoInfo(parsed.videoId, c.env.YOUTUBE_API_KEY);
       if (!streamTitle) streamTitle = info.title;
       if (!streamDate) streamDate = info.date;
       if (!thumbnailUrl) thumbnailUrl = info.thumbnail;

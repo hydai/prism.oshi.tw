@@ -3,6 +3,7 @@ export type Bindings = {
   ADMIN_DB: D1Database;
   TURNSTILE_SITE_KEY: string;
   TURNSTILE_SECRET_KEY: string;
+  YOUTUBE_API_KEY: string;
 };
 
 export type SubmissionStatus = 'pending' | 'approved' | 'rejected';
