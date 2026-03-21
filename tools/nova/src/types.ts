@@ -1,5 +1,6 @@
 export type Bindings = {
   DB: D1Database;
+  ADMIN_DB: D1Database;
   TURNSTILE_SITE_KEY: string;
   TURNSTILE_SECRET_KEY: string;
 };
@@ -116,5 +117,20 @@ export interface VodSubmissionSummary {
   status: SubmissionStatus;
   submitted_at: string;
   reviewed_at: string | null;
+  song_count: number;
+}
+
+// --- Admin DB types ---
+
+export type AdminStreamStatus = 'pending' | 'approved' | 'rejected' | 'excluded' | 'extracted';
+
+export interface AdminStreamSummary {
+  id: string;
+  streamer_id: string;
+  video_id: string;
+  title: string;
+  date: string;
+  status: AdminStreamStatus;
+  created_at: string;
   song_count: number;
 }

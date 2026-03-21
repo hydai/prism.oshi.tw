@@ -155,7 +155,13 @@ const VOD_SCRIPT = String.raw`
             .then(function(r) { return r.json(); })
             .then(function(data) {
               urlCheck.style.display = 'block';
-              if (data.exists && data.hasApproved) {
+              if (data.inAdmin && data.adminStatus === 'approved') {
+                urlCheck.style.color = '#059669';
+                urlCheck.textContent = '此 VOD 已收錄於歌單中，無需再提交';
+              } else if (data.inAdmin && (data.adminStatus === 'pending' || data.adminStatus === 'extracted')) {
+                urlCheck.style.color = '#2563EB';
+                urlCheck.textContent = '此 VOD 正在處理中，請耐心等候';
+              } else if (data.exists && data.hasApproved) {
                 urlCheck.style.color = '#D97706';
                 urlCheck.textContent = '此 VOD 已通過審核，無需重複提交';
               } else if (data.exists && data.pendingCount > 0) {
@@ -264,7 +270,9 @@ const VOD_SCRIPT = String.raw`
           } else if (res.status === 409) {
             resultDiv.style.background = '#FFFBEB';
             resultDiv.style.color = '#B45309';
-            resultDiv.textContent = '此 VOD 已通過審核，無需重複提交';
+            resultDiv.textContent = data.inAdmin
+              ? (data.adminStatus === 'approved' ? '此 VOD 已收錄於歌單中，無需再提交' : '此 VOD 正在處理中，請耐心等候')
+              : '此 VOD 已通過審核，無需重複提交';
           } else {
             resultDiv.style.background = '#FEF2F2';
             resultDiv.style.color = '#DC2626';

@@ -4,7 +4,7 @@ import type { Bindings, SubmitBody, VodSubmitBody } from './types';
 import { normalizeYoutubeChannelUrl, validateRequired, parseYoutubeVideoUrl, parseTimestamp } from './validate';
 import { verifyTurnstile } from './turnstile';
 import { generateId, findByChannelUrl, insertSubmission, resetRejectedSubmission, listAllSubmissions } from './db';
-import { generateVodId, generateVodSongId, listApprovedStreamers, findApprovedVodByVideoId, countVodsByVideoId, insertVodSubmission, listAllVodSubmissions } from './vod-db';
+import { generateVodId, generateVodSongId, listApprovedStreamers, findApprovedVodByVideoId, countVodsByVideoId, insertVodSubmission, listAllVodSubmissions, listAdminStreams, checkAdminStreamExists } from './vod-db';
 import { renderPage } from './page';
 import { renderVodPage } from './vod-page';
 import { renderStatusPage } from './status-page';
@@ -253,10 +253,16 @@ app.get('/vod/api/check', async (c) => {
     return c.json({ exists: false });
   }
 
-  const info = await countVodsByVideoId(c.env.DB, slug, parsed.videoId);
-  if (info.count > 0) {
+  const [info, adminStream] = await Promise.all([
+    countVodsByVideoId(c.env.DB, slug, parsed.videoId),
+    checkAdminStreamExists(c.env.ADMIN_DB, slug, parsed.videoId),
+  ]);
+
+  if (adminStream) {
     return c.json({
       exists: true,
+      inAdmin: true,
+      adminStatus: adminStream.status,
       count: info.count,
       hasApproved: info.hasApproved,
       pendingCount: info.pendingCount,
@@ -265,7 +271,19 @@ app.get('/vod/api/check', async (c) => {
     });
   }
 
-  return c.json({ exists: false });
+  if (info.count > 0) {
+    return c.json({
+      exists: true,
+      inAdmin: false,
+      count: info.count,
+      hasApproved: info.hasApproved,
+      pendingCount: info.pendingCount,
+      rejectedCount: info.rejectedCount,
+      latestStatus: info.latestStatus,
+    });
+  }
+
+  return c.json({ exists: false, inAdmin: false });
 });
 
 // GET /vod/api/video-info — Fetch video title/date from YouTube
@@ -377,8 +395,23 @@ app.post('/vod/api/submit', async (c) => {
     }
   }
 
-  // Only block if an approved submission already exists (curator-verified)
-  const approved = await findApprovedVodByVideoId(c.env.DB, body.streamer_slug, parsed.videoId);
+  // Block if already in admin DB (approved/extracted/pending — not rejected/excluded)
+  const [approved, adminStream] = await Promise.all([
+    findApprovedVodByVideoId(c.env.DB, body.streamer_slug, parsed.videoId),
+    checkAdminStreamExists(c.env.ADMIN_DB, body.streamer_slug, parsed.videoId),
+  ]);
+
+  if (adminStream && adminStream.status !== 'rejected' && adminStream.status !== 'excluded') {
+    return c.json(
+      {
+        error: 'duplicate',
+        inAdmin: true,
+        adminStatus: adminStream.status,
+      },
+      409,
+    );
+  }
+
   if (approved) {
     return c.json(
       {
@@ -419,11 +452,12 @@ app.post('/vod/api/submit', async (c) => {
 
 // GET /status — Public submission status overview
 app.get('/status', async (c) => {
-  const [submissions, vodSubmissions] = await Promise.all([
+  const [submissions, vodSubmissions, adminStreams] = await Promise.all([
     listAllSubmissions(c.env.DB),
     listAllVodSubmissions(c.env.DB),
+    listAdminStreams(c.env.ADMIN_DB),
   ]);
-  return c.html(renderStatusPage(submissions, vodSubmissions));
+  return c.html(renderStatusPage(submissions, vodSubmissions, adminStreams));
 });
 
 export default app;

@@ -1,5 +1,5 @@
 import { html, raw } from 'hono/html';
-import type { SubmissionSummary, VodSubmissionSummary } from './types';
+import type { SubmissionSummary, VodSubmissionSummary, AdminStreamSummary } from './types';
 
 /** Escape HTML special characters in user-provided strings. */
 function esc(s: string): string {
@@ -13,9 +13,11 @@ function esc(s: string): string {
 
 function statusBadge(status: string): string {
   const map: Record<string, { bg: string; fg: string; label: string }> = {
-    pending:  { bg: '#FEF3C7', fg: '#92400E', label: '審核中' },
-    approved: { bg: '#D1FAE5', fg: '#065F46', label: '已通過' },
-    rejected: { bg: '#FEE2E2', fg: '#991B1B', label: '已拒絕' },
+    pending:     { bg: '#FEF3C7', fg: '#92400E', label: '審核中' },
+    approved:    { bg: '#D1FAE5', fg: '#065F46', label: '已通過' },
+    rejected:    { bg: '#FEE2E2', fg: '#991B1B', label: '已拒絕' },
+    admin_done:  { bg: '#DBEAFE', fg: '#1E40AF', label: '已收錄' },
+    admin_wip:   { bg: '#FEF3C7', fg: '#92400E', label: '處理中' },
   };
   const s = map[status] ?? map.pending;
   return `<span style="display:inline-block;padding:2px 10px;border-radius:9999px;font-size:12px;font-weight:600;background:${s.bg};color:${s.fg};">${s.label}</span>`;
@@ -39,6 +41,7 @@ function countByStatus(items: Array<{ status: string }>): { pending: number; app
 export function renderStatusPage(
   submissions: SubmissionSummary[],
   vodSubmissions: VodSubmissionSummary[],
+  adminStreams: AdminStreamSummary[],
 ): ReturnType<typeof html> {
   // Build VTuber submissions table rows
   const subStats = countByStatus(submissions);
@@ -53,12 +56,34 @@ export function renderStatusPage(
     </tr>
   `).join('');
 
+  // Build admin stream lookup by (streamer_id, video_id)
+  const adminKey = (slug: string, videoId: string) => `${slug}::${videoId}`;
+  const adminMap = new Map<string, AdminStreamSummary>();
+  for (const a of adminStreams) {
+    adminMap.set(adminKey(a.streamer_id, a.video_id), a);
+  }
+
   // Group VOD submissions by streamer_slug
   const vodGroups = new Map<string, VodSubmissionSummary[]>();
   for (const v of vodSubmissions) {
     const group = vodGroups.get(v.streamer_slug) ?? [];
     group.push(v);
     vodGroups.set(v.streamer_slug, group);
+  }
+
+  // Group remaining admin-only streams by streamer_id
+  const adminOnlyGroups = new Map<string, AdminStreamSummary[]>();
+  for (const a of adminStreams) {
+    const key = adminKey(a.streamer_id, a.video_id);
+    // Check if any NOVA submission references this video
+    const hasNovaMatch = vodSubmissions.some(
+      (v) => v.streamer_slug === a.streamer_id && v.video_id === a.video_id,
+    );
+    if (!hasNovaMatch) {
+      const group = adminOnlyGroups.get(a.streamer_id) ?? [];
+      group.push(a);
+      adminOnlyGroups.set(a.streamer_id, group);
+    }
   }
 
   // Resolve display names from submissions array
@@ -69,7 +94,27 @@ export function renderStatusPage(
     }
   }
 
+  // Map admin status to badge key
+  function adminBadgeStatus(status: string): string {
+    return status === 'approved' ? 'admin_done' : 'admin_wip';
+  }
+
+  // Count totals: NOVA submissions + admin-only streams
+  const totalVodCount = vodSubmissions.length + Array.from(adminOnlyGroups.values()).reduce((s, g) => s + g.length, 0);
   const vodStats = countByStatus(vodSubmissions);
+  // Count admin-only streams that are "approved" (已收錄)
+  let adminDoneCount = 0;
+  let adminWipCount = 0;
+  for (const a of adminStreams) {
+    const hasNovaMatch = vodSubmissions.some(
+      (v) => v.streamer_slug === a.streamer_id && v.video_id === a.video_id,
+    );
+    if (!hasNovaMatch) {
+      if (a.status === 'approved') adminDoneCount++;
+      else adminWipCount++;
+    }
+  }
+
   let vodSections = '';
   for (const [slug, vods] of vodGroups) {
     const displayName = slugToName.get(slug) ?? slug;
@@ -77,14 +122,42 @@ export function renderStatusPage(
       <tr><td colspan="6" style="padding:16px 10px 8px;font-weight:600;font-size:14px;color:#1E293B;border-bottom:1px solid #E2E8F0;">${esc(displayName)}<span style="font-weight:400;font-size:12px;color:#94A3B8;margin-left:8px;">${esc(slug)}</span></td></tr>
     `;
     for (const v of vods) {
+      // Check if this VOD has an admin override
+      const aKey = adminKey(v.streamer_slug, v.video_id);
+      const adminMatch = adminMap.get(aKey);
+      const badge = adminMatch ? statusBadge(adminBadgeStatus(adminMatch.status)) : statusBadge(v.status);
+
       vodSections += `
         <tr>
           <td style="max-width:280px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${esc(v.stream_title || '—')}</td>
           <td style="font-size:12px;color:#64748B;white-space:nowrap;">${esc(v.stream_date || '—')}</td>
-          <td style="text-align:center;font-size:13px;">${v.song_count}</td>
-          <td>${statusBadge(v.status)}</td>
+          <td style="text-align:center;font-size:13px;">${adminMatch ? adminMatch.song_count : v.song_count}</td>
+          <td>${badge}</td>
           <td style="font-size:12px;color:#64748B;white-space:nowrap;">${formatDate(v.submitted_at)}</td>
           <td style="font-size:12px;color:#64748B;white-space:nowrap;">${formatDate(v.reviewed_at)}</td>
+        </tr>
+      `;
+    }
+  }
+
+  // Render admin-only streams (not submitted via NOVA)
+  for (const [slug, streams] of adminOnlyGroups) {
+    // Only add group header if NOVA didn't already have a section for this slug
+    if (!vodGroups.has(slug)) {
+      const displayName = slugToName.get(slug) ?? slug;
+      vodSections += `
+        <tr><td colspan="6" style="padding:16px 10px 8px;font-weight:600;font-size:14px;color:#1E293B;border-bottom:1px solid #E2E8F0;">${esc(displayName)}<span style="font-weight:400;font-size:12px;color:#94A3B8;margin-left:8px;">${esc(slug)}</span></td></tr>
+      `;
+    }
+    for (const a of streams) {
+      vodSections += `
+        <tr>
+          <td style="max-width:280px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${esc(a.title || '—')}</td>
+          <td style="font-size:12px;color:#64748B;white-space:nowrap;">${esc(a.date || '—')}</td>
+          <td style="text-align:center;font-size:13px;">${a.song_count}</td>
+          <td>${statusBadge(adminBadgeStatus(a.status))}</td>
+          <td style="font-size:12px;color:#64748B;white-space:nowrap;">${formatDate(a.created_at)}</td>
+          <td style="font-size:12px;color:#64748B;white-space:nowrap;">—</td>
         </tr>
       `;
     }
@@ -260,13 +333,15 @@ export function renderStatusPage(
     <!-- VOD Submissions -->
     <h2 class="section-title">VOD 提交</h2>
     <div class="summary-bar">
-      共 <strong>${vodSubmissions.length}</strong> 筆：
+      共 <strong>${totalVodCount}</strong> 筆：
       <span>${vodStats.pending} 審核中</span>
       <span>${vodStats.approved} 已通過</span>
       <span>${vodStats.rejected} 已拒絕</span>
+      ${adminDoneCount > 0 ? raw(`<span>${adminDoneCount} 已收錄</span>`) : raw('')}
+      ${adminWipCount > 0 ? raw(`<span>${adminWipCount} 處理中</span>`) : raw('')}
     </div>
     <div class="card">
-      ${vodSubmissions.length > 0
+      ${totalVodCount > 0
         ? raw(`<table>
             <thead><tr>
               <th>直播標題</th>

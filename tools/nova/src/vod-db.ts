@@ -1,4 +1,4 @@
-import type { VodSubmissionRow, VodSubmissionSummary, ApprovedStreamer } from './types';
+import type { VodSubmissionRow, VodSubmissionSummary, ApprovedStreamer, AdminStreamSummary, AdminStreamStatus } from './types';
 
 /**
  * Generate a VOD submission ID: vod-XXXXXXXX (8 random hex chars).
@@ -148,4 +148,41 @@ export async function insertVodSubmission(
   }
 
   await db.batch(stmts);
+}
+
+/**
+ * List streams from admin DB with status in (approved, extracted, pending) for the status page.
+ * Joins with performances to get song count per stream.
+ */
+export async function listAdminStreams(adminDb: D1Database): Promise<AdminStreamSummary[]> {
+  const { results } = await adminDb
+    .prepare(
+      `SELECT
+         s.id, s.streamer_id, s.video_id, s.title, s.date,
+         s.status, s.created_at,
+         COUNT(p.id) AS song_count
+       FROM streams s
+       LEFT JOIN performances p ON p.stream_id = s.id AND p.streamer_id = s.streamer_id
+       WHERE s.status IN ('approved', 'extracted', 'pending')
+       GROUP BY s.id
+       ORDER BY s.streamer_id ASC, s.date DESC`,
+    )
+    .all<AdminStreamSummary>();
+  return results ?? [];
+}
+
+/**
+ * Check if a stream exists in the admin DB for a given streamer + video ID.
+ * Returns status if found, null otherwise.
+ */
+export async function checkAdminStreamExists(
+  adminDb: D1Database,
+  slug: string,
+  videoId: string,
+): Promise<{ status: AdminStreamStatus } | null> {
+  const row = await adminDb
+    .prepare('SELECT status FROM streams WHERE streamer_id = ? AND video_id = ?')
+    .bind(slug, videoId)
+    .first<{ status: AdminStreamStatus }>();
+  return row ?? null;
 }
