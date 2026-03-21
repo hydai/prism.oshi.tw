@@ -121,6 +121,24 @@ export function renderStatusPage(
         </tr>
       `;
     }
+
+    // Render admin-only streams for this streamer inline, under the same header
+    const adminOnly = adminOnlyGroups.get(slug);
+    if (adminOnly) {
+      for (const a of adminOnly) {
+        vodSections += `
+        <tr>
+          <td style="max-width:280px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${esc(a.title || '—')}</td>
+          <td style="font-size:12px;color:#64748B;white-space:nowrap;">${esc(a.date || '—')}</td>
+          <td style="text-align:center;font-size:13px;">${a.song_count}</td>
+          <td>${a.status === 'approved' ? statusBadge('admin_done') : statusBadge(a.status)}</td>
+          <td style="font-size:12px;color:#64748B;white-space:nowrap;">${formatDate(a.created_at)}</td>
+          <td style="font-size:12px;color:#64748B;white-space:nowrap;">—</td>
+        </tr>
+        `;
+      }
+      adminOnlyGroups.delete(slug);
+    }
   }
 
   // Render admin-only streams (not submitted via NOVA)
