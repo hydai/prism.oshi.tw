@@ -291,10 +291,13 @@ app.get('/vod/api/check', async (c) => {
 app.get('/vod/api/video-info', async (c) => {
   const secFetchSite = c.req.header('Sec-Fetch-Site');
   const referer = c.req.header('Referer') ?? '';
+  const origin = c.req.header('Origin') ?? '';
   const host = c.req.header('Host') ?? '';
 
+  const allowedOrigins = ['https://aurora.oshi.tw', 'https://oshi-prism-aurora.pages.dev'];
   const isSameOrigin = secFetchSite === 'same-origin' || referer.includes(host);
-  if (!isSameOrigin) {
+  const isAllowedCrossOrigin = allowedOrigins.some((o) => origin === o || referer.startsWith(o));
+  if (!isSameOrigin && !isAllowedCrossOrigin) {
     return c.json({ error: 'Forbidden' }, 403);
   }
 
