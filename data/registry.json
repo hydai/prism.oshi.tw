@@ -208,6 +208,37 @@
       "enabled": true
     },
     {
+      "slug": "hitomi",
+      "displayName": "実Hitomi",
+      "description": "神秘企業的大小姐，在學大學生，討厭被束縛於既定的規則與期待。表面上自由散漫，實則敏銳聰穎，對遊戲情有獨鍾，在因緣際會下而加入了子午學院，雖然平時都說著要帥跟厲害，但總是會出錯(pon)，關鍵時候都會發生很多好笑的事情\n\n接觸到電腦遊戲後對於fps非常感興趣，我要在戰場上擊敗全部的人!! 成為新世界的王",
+      "avatarUrl": "https://yt3.googleusercontent.com/eliPbYNsaF-msdif5klvF8XXT63uD1TiZO1gOtSbG_0himBaB55zRRsQA_6gaDbEuP-OKIwfikk=s900-c-k-c0x00ffffff-no-rj",
+      "brandName": "HitomiPrism",
+      "subscriberCount": "4.29萬",
+      "group": "子午計畫",
+      "socialLinks": {
+        "youtube": "https://www.youtube.com/@%E5%AE%9FHitomi",
+        "twitter": "https://x.com/Hitomi_TeRaz",
+        "facebook": "https://www.facebook.com/HitomiTeRaz",
+        "instagram": "https://www.instagram.com/hitomi_teraz",
+        "twitch": "https://www.twitch.tv/hitomi_teraz"
+      },
+      "theme": {
+        "accentPrimary": "#EC4899",
+        "accentPrimaryDark": "#DB2777",
+        "accentPrimaryLight": "#F472B6",
+        "accentSecondary": "#3B82F6",
+        "accentSecondaryLight": "#60A5FA",
+        "bgPageStart": "#FFF0F5",
+        "bgPageMid": "#F0F8FF",
+        "bgPageEnd": "#E6E6FA",
+        "bgAccentPrimary": "#FDF2F8",
+        "bgAccentPrimaryMuted": "#FCE7F3",
+        "borderAccentPrimary": "#FBCFE8",
+        "borderAccentSecondary": "#BFDBFE"
+      },
+      "enabled": true
+    },
+    {
       "slug": "hiyori",
       "displayName": "煦Hiyori",
       "description": "子午學院冰之魔法學系的學生，樂觀愛笑的狼少女，平時課餘會四處打工，也會沈浸在書堆(漫畫)與咖啡之中，喜歡蒐集與描述各式各樣故事。並且喜歡音樂、喜歡吉他，希望可以讓自己創作的歌曲傳播遠方。對於咖啡有著異常理解，超級喜歡這種飲料。",
