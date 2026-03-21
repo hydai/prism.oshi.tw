@@ -347,6 +347,7 @@ export default function StampEditor({ user }: { user: AuthUser }) {
   const [isFetchingAll, setIsFetchingAll] = useState(false);
 
   const playerRef = useRef<YouTubePlayerHandle>(null);
+  const [currentTime, setCurrentTime] = useState(0);
   const toastKeyRef = useRef(0);
 
   const selectedStream = streams.find((s) => s.id === selectedStreamId);
@@ -355,6 +356,15 @@ export default function StampEditor({ user }: { user: AuthUser }) {
   const showToast = useCallback((message: string, isError = false) => {
     toastKeyRef.current += 1;
     setToast({ message, isError, key: toastKeyRef.current });
+  }, []);
+
+  // --- Poll current playback time ---
+  useEffect(() => {
+    const interval = setInterval(() => {
+      const t = playerRef.current?.getCurrentTime() ?? 0;
+      setCurrentTime(t);
+    }, 500);
+    return () => clearInterval(interval);
   }, []);
 
   // --- Load streams + stats ---
@@ -863,6 +873,14 @@ export default function StampEditor({ user }: { user: AuthUser }) {
           <>
             {/* YouTube Player */}
             <YouTubePlayer ref={playerRef} videoId={selectedStream?.videoId} />
+
+            {/* Current playback time */}
+            <div className="flex items-center gap-2 text-sm">
+              <span className="font-mono text-lg font-semibold text-slate-800">
+                {formatTimestamp(currentTime)}
+              </span>
+              <span className="text-slate-400">current</span>
+            </div>
 
             {/* Keyboard shortcuts hint */}
             <div className="flex flex-wrap gap-x-4 gap-y-1 text-xs text-slate-400">

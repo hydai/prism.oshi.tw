@@ -249,6 +249,7 @@ export default function StreamDetail({ user }: { user: AuthUser }) {
   const [showPasteImport, setShowPasteImport] = useState(false);
   const toastKeyRef = useRef(0);
   const playerRef = useRef<YouTubePlayerHandle>(null);
+  const [currentTime, setCurrentTime] = useState(0);
 
   // --- New state for navigation & stamp features ---
   const [allStreams, setAllStreams] = useState<Stream[]>([]);
@@ -261,6 +262,15 @@ export default function StreamDetail({ user }: { user: AuthUser }) {
   const showToast = useCallback((message: string, isError = false) => {
     toastKeyRef.current += 1;
     setToast({ message, isError, key: toastKeyRef.current });
+  }, []);
+
+  // --- Poll current playback time ---
+  useEffect(() => {
+    const interval = setInterval(() => {
+      const t = playerRef.current?.getCurrentTime() ?? 0;
+      setCurrentTime(t);
+    }, 500);
+    return () => clearInterval(interval);
   }, []);
 
   // --- Fetch all streams for prev/next navigation ---
@@ -735,6 +745,14 @@ export default function StreamDetail({ user }: { user: AuthUser }) {
       {/* YouTube Player */}
       <div className="mt-4">
         <YouTubePlayer ref={playerRef} videoId={detail.videoId} />
+
+        {/* Current playback time */}
+        <div className="mt-2 flex items-center gap-2 text-sm">
+          <span className="font-mono text-lg font-semibold text-slate-800">
+            {formatTimestamp(currentTime)}
+          </span>
+          <span className="text-slate-400">current</span>
+        </div>
       </div>
 
       {/* Keyboard shortcut hints */}
