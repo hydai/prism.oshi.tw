@@ -108,7 +108,7 @@ export function renderStatusPage(
       // Check if this VOD has an admin override
       const aKey = adminKey(v.streamer_slug, v.video_id);
       const adminMatch = adminMap.get(aKey);
-      const badge = adminMatch ? statusBadge('admin_done') : statusBadge(v.status);
+      const badge = (adminMatch && adminMatch.status === 'approved') ? statusBadge('admin_done') : statusBadge(v.status);
 
       vodSections += `
         <tr>
@@ -138,7 +138,7 @@ export function renderStatusPage(
           <td style="max-width:280px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${esc(a.title || '—')}</td>
           <td style="font-size:12px;color:#64748B;white-space:nowrap;">${esc(a.date || '—')}</td>
           <td style="text-align:center;font-size:13px;">${a.song_count}</td>
-          <td>${statusBadge('admin_done')}</td>
+          <td>${a.status === 'approved' ? statusBadge('admin_done') : statusBadge(a.status)}</td>
           <td style="font-size:12px;color:#64748B;white-space:nowrap;">${formatDate(a.created_at)}</td>
           <td style="font-size:12px;color:#64748B;white-space:nowrap;">—</td>
         </tr>

@@ -168,7 +168,8 @@ export async function listAdminStreams(adminDb: D1Database): Promise<AdminStream
        ORDER BY s.streamer_id ASC, s.date DESC`,
     )
     .all<AdminStreamSummary>();
-  return results ?? [];
+  // Defensive: filter again in application code in case D1 returns unexpected rows
+  return (results ?? []).filter((s) => s.status === 'approved');
 }
 
 /**
