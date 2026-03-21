@@ -101,6 +101,17 @@ export function App() {
     setSelectedIndex(saved.length > 0 ? 0 : null);
   };
 
+  // Auto-fetch stream date from Nova when video loads
+  useEffect(() => {
+    if (!videoId) return;
+    setSubmitStreamDate('');
+    const url = vodUrl || `https://youtube.com/watch?v=${videoId}`;
+    fetch(`https://nova.oshi.tw/vod/api/video-info?url=${encodeURIComponent(url)}`)
+      .then((r) => r.ok ? r.json() : Promise.reject())
+      .then((info: { date?: string }) => { if (info.date) setSubmitStreamDate(info.date); })
+      .catch(() => {});
+  }, [videoId]);
+
   // Song CRUD
   const addSong = useCallback(() => {
     const currentTime = playerRef.current?.getCurrentTime() ?? 0;
@@ -298,7 +309,6 @@ export function App() {
       }
       turnstileWidgetIdRef.current = null;
       setTurnstileToken('');
-      setSubmitStreamDate('');
       setSubmitNote('');
     };
   }, [showSubmitModal]);
@@ -700,7 +710,7 @@ export function App() {
 
             <div className="flex gap-2">
               <button
-                onClick={() => { setShowSubmitModal(false); setSubmitStreamDate(''); setSubmitNote(''); }}
+                onClick={() => { setShowSubmitModal(false); setSubmitNote(''); }}
                 className="flex-1 px-4 py-2 rounded-lg bg-white/60 border border-[var(--border-default)] text-[var(--text-secondary)] text-[13px] font-medium hover:bg-white/80"
               >
                 取消
