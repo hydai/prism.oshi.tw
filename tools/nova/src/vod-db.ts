@@ -163,7 +163,7 @@ export async function listAdminStreams(adminDb: D1Database): Promise<AdminStream
          COUNT(p.id) AS song_count
        FROM streams s
        LEFT JOIN performances p ON p.stream_id = s.id AND p.streamer_id = s.streamer_id
-       WHERE s.status IN ('approved', 'extracted', 'pending')
+       WHERE s.status = 'approved'
        GROUP BY s.id
        ORDER BY s.streamer_id ASC, s.date DESC`,
     )

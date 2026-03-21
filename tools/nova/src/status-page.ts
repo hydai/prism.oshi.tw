@@ -17,7 +17,6 @@ function statusBadge(status: string): string {
     approved:    { bg: '#D1FAE5', fg: '#065F46', label: '已通過' },
     rejected:    { bg: '#FEE2E2', fg: '#991B1B', label: '已拒絕' },
     admin_done:  { bg: '#DBEAFE', fg: '#1E40AF', label: '已收錄' },
-    admin_wip:   { bg: '#FEF3C7', fg: '#92400E', label: '處理中' },
   };
   const s = map[status] ?? map.pending;
   return `<span style="display:inline-block;padding:2px 10px;border-radius:9999px;font-size:12px;font-weight:600;background:${s.bg};color:${s.fg};">${s.label}</span>`;
@@ -94,26 +93,10 @@ export function renderStatusPage(
     }
   }
 
-  // Map admin status to badge key
-  function adminBadgeStatus(status: string): string {
-    return status === 'approved' ? 'admin_done' : 'admin_wip';
-  }
-
   // Count totals: NOVA submissions + admin-only streams
   const totalVodCount = vodSubmissions.length + Array.from(adminOnlyGroups.values()).reduce((s, g) => s + g.length, 0);
   const vodStats = countByStatus(vodSubmissions);
-  // Count admin-only streams that are "approved" (已收錄)
-  let adminDoneCount = 0;
-  let adminWipCount = 0;
-  for (const a of adminStreams) {
-    const hasNovaMatch = vodSubmissions.some(
-      (v) => v.streamer_slug === a.streamer_id && v.video_id === a.video_id,
-    );
-    if (!hasNovaMatch) {
-      if (a.status === 'approved') adminDoneCount++;
-      else adminWipCount++;
-    }
-  }
+  const adminDoneCount = Array.from(adminOnlyGroups.values()).reduce((s, g) => s + g.length, 0);
 
   let vodSections = '';
   for (const [slug, vods] of vodGroups) {
@@ -125,7 +108,7 @@ export function renderStatusPage(
       // Check if this VOD has an admin override
       const aKey = adminKey(v.streamer_slug, v.video_id);
       const adminMatch = adminMap.get(aKey);
-      const badge = adminMatch ? statusBadge(adminBadgeStatus(adminMatch.status)) : statusBadge(v.status);
+      const badge = adminMatch ? statusBadge('admin_done') : statusBadge(v.status);
 
       vodSections += `
         <tr>
@@ -338,7 +321,6 @@ export function renderStatusPage(
       <span>${vodStats.approved} 已通過</span>
       <span>${vodStats.rejected} 已拒絕</span>
       ${adminDoneCount > 0 ? raw(`<span>${adminDoneCount} 已收錄</span>`) : raw('')}
-      ${adminWipCount > 0 ? raw(`<span>${adminWipCount} 處理中</span>`) : raw('')}
     </div>
     <div class="card">
       ${totalVodCount > 0
