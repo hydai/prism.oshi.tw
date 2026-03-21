@@ -54,6 +54,24 @@
     ]
   },
   {
+    "id": "song-11784c12",
+    "title": "Knock Knock",
+    "originalArtist": "TWICE",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-ec715a0f",
+        "streamId": "stream-2026-01-08",
+        "date": "2026-01-08",
+        "streamTitle": "【歌回】唱快樂的歌！因為我很快樂！｜煦Hiyori",
+        "videoId": "fsZQmluUmMI",
+        "timestamp": 8233,
+        "endTimestamp": 8429,
+        "note": ""
+      }
+    ]
+  },
+  {
     "id": "song-2721e410",
     "title": "來自天堂的魔鬼 (鄧tsuki&煦美環ver)",
     "originalArtist": "​​鄧紫棋",
@@ -180,6 +198,24 @@
     ]
   },
   {
+    "id": "song-7a35e156",
+    "title": "淋雨一直走",
+    "originalArtist": "張韶涵",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-d92c3812",
+        "streamId": "stream-2026-01-08",
+        "date": "2026-01-08",
+        "streamTitle": "【歌回】唱快樂的歌！因為我很快樂！｜煦Hiyori",
+        "videoId": "fsZQmluUmMI",
+        "timestamp": 4203,
+        "endTimestamp": 4404,
+        "note": ""
+      }
+    ]
+  },
+  {
     "id": "song-7b221900",
     "title": "Wish You Hell",
     "originalArtist": "WENDY",
@@ -234,6 +270,24 @@
     ]
   },
   {
+    "id": "song-9ee42c20",
+    "title": "Good Time",
+    "originalArtist": "Owl City & Carly Rae Jepsen",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-9ce3b96b",
+        "streamId": "stream-2026-01-08",
+        "date": "2026-01-08",
+        "streamTitle": "【歌回】唱快樂的歌！因為我很快樂！｜煦Hiyori",
+        "videoId": "fsZQmluUmMI",
+        "timestamp": 4898,
+        "endTimestamp": 5097,
+        "note": ""
+      }
+    ]
+  },
+  {
     "id": "song-9f31dcc6",
     "title": "Some(썸 탈꺼야)",
     "originalArtist": "BOL4(볼빨간사춘기)",
@@ -247,6 +301,24 @@
         "videoId": "vsdY8ku2Gm0",
         "timestamp": 5886,
         "endTimestamp": 6067,
+        "note": ""
+      }
+    ]
+  },
+  {
+    "id": "song-b045fd48",
+    "title": "惡作劇",
+    "originalArtist": "王藍茵",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-cbe4bdb3",
+        "streamId": "stream-2026-01-08",
+        "date": "2026-01-08",
+        "streamTitle": "【歌回】唱快樂的歌！因為我很快樂！｜煦Hiyori",
+        "videoId": "fsZQmluUmMI",
+        "timestamp": 3351,
+        "endTimestamp": 3581,
         "note": ""
       }
     ]
@@ -270,6 +342,24 @@
     ]
   },
   {
+    "id": "song-c2b6954f",
+    "title": "說愛你",
+    "originalArtist": "蔡依林",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-026ea45e",
+        "streamId": "stream-2026-01-08",
+        "date": "2026-01-08",
+        "streamTitle": "【歌回】唱快樂的歌！因為我很快樂！｜煦Hiyori",
+        "videoId": "fsZQmluUmMI",
+        "timestamp": 2396,
+        "endTimestamp": 2623,
+        "note": ""
+      }
+    ]
+  },
+  {
     "id": "song-ca4e5d7a",
     "title": "TT (可愛玥&煦ver)",
     "originalArtist": "TWICE",
@@ -283,6 +373,42 @@
         "videoId": "OwNrtFg5Y1Q",
         "timestamp": 6620,
         "endTimestamp": 6830,
+        "note": ""
+      }
+    ]
+  },
+  {
+    "id": "song-cf7ec132",
+    "title": "I Really Like You",
+    "originalArtist": "Carly Rae Jepsen",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-12ad124d",
+        "streamId": "stream-2026-01-08",
+        "date": "2026-01-08",
+        "streamTitle": "【歌回】唱快樂的歌！因為我很快樂！｜煦Hiyori",
+        "videoId": "fsZQmluUmMI",
+        "timestamp": 5631,
+        "endTimestamp": 5840,
+        "note": ""
+      }
+    ]
+  },
+  {
+    "id": "song-d0c9e1e1",
+    "title": "第一天",
+    "originalArtist": "孫燕姿",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-34413123",
+        "streamId": "stream-2026-01-08",
+        "date": "2026-01-08",
+        "streamTitle": "【歌回】唱快樂的歌！因為我很快樂！｜煦Hiyori",
+        "videoId": "fsZQmluUmMI",
+        "timestamp": 1661,
+        "endTimestamp": 1912,
         "note": ""
       }
     ]
@@ -337,6 +463,24 @@
         "videoId": "vsdY8ku2Gm0",
         "timestamp": 3864,
         "endTimestamp": 4124,
+        "note": ""
+      }
+    ]
+  },
+  {
+    "id": "song-fdc50feb",
+    "title": "Travel(여행)",
+    "originalArtist": "BOL4(볼빨간사춘기)",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-971d3eaa",
+        "streamId": "stream-2026-01-08",
+        "date": "2026-01-08",
+        "streamTitle": "【歌回】唱快樂的歌！因為我很快樂！｜煦Hiyori",
+        "videoId": "fsZQmluUmMI",
+        "timestamp": 6551,
+        "endTimestamp": 6772,
         "note": ""
       }
     ]
