@@ -138,7 +138,7 @@ export function renderStatusPage(
           <td style="max-width:280px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${esc(a.title || '—')}</td>
           <td style="font-size:12px;color:#64748B;white-space:nowrap;">${esc(a.date || '—')}</td>
           <td style="text-align:center;font-size:13px;">${a.song_count}</td>
-          <td>${statusBadge(adminBadgeStatus(a.status))}</td>
+          <td>${statusBadge('admin_done')}</td>
           <td style="font-size:12px;color:#64748B;white-space:nowrap;">${formatDate(a.created_at)}</td>
           <td style="font-size:12px;color:#64748B;white-space:nowrap;">—</td>
         </tr>
