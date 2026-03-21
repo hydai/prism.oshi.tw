@@ -53,6 +53,7 @@ export function App() {
   const [showExport, setShowExport] = useState(false);
   const [showShortcuts, setShowShortcuts] = useState(false);
   const [isPlaying, setIsPlaying] = useState(false);
+  const [currentTime, setCurrentTime] = useState(0);
   const [fillingIndex, setFillingIndex] = useState<number | null>(null);
   const [bulkFillStatus, setBulkFillStatus] = useState<string | null>(null);
   const playerRef = useRef<YouTubeEmbedHandle>(null);
@@ -248,7 +249,7 @@ export function App() {
   const handleFillAllDurations = useCallback(async () => {
     const targets = songs
       .map((s, i) => ({ song: s, index: i }))
-      .filter(({ song }) => song.endSeconds === null && song.name.trim() !== '');
+      .filter(({ song }) => song.name.trim() !== '');
     if (targets.length === 0) return;
 
     let filled = 0;
@@ -404,6 +405,16 @@ export function App() {
     return () => window.removeEventListener('keydown', handler);
   }, [videoId, addSong, handleTogglePlay, handleSeekBackward, handleSeekForward, handleSelectPrev, handleSelectNext, handleSetStart, handleSetEnd, handleSeekToStart, handleSeekToEnd, handleFillDuration, selectedIndex, fillingIndex]);
 
+  // Poll current playback time while playing
+  useEffect(() => {
+    if (!isPlaying) return;
+    const id = setInterval(() => {
+      const t = playerRef.current?.getCurrentTime();
+      if (t !== undefined) setCurrentTime(t);
+    }, 250);
+    return () => clearInterval(id);
+  }, [isPlaying]);
+
   return (
     <div className="min-h-screen flex flex-col">
       {/* Header */}
@@ -494,6 +505,7 @@ export function App() {
               <YouTubeEmbed ref={playerRef} videoId={videoId} onStateChange={setIsPlaying} />
               <AuroraPlayerControls
                 isPlaying={isPlaying}
+                currentTime={currentTime}
                 onTogglePlay={handleTogglePlay}
                 onSeekBackward={handleSeekBackward}
                 onSeekForward={handleSeekForward}
@@ -565,7 +577,7 @@ export function App() {
                 </button>
                 <button
                   onClick={handleFillAllDurations}
-                  disabled={fillingIndex !== null || !songs.some((s) => s.endSeconds === null && s.name.trim() !== '')}
+                  disabled={fillingIndex !== null || !songs.some((s) => s.name.trim() !== '')}
                   className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-white/60 border border-[var(--border-default)] text-[var(--text-secondary)] text-[13px] font-medium hover:bg-white/80 disabled:opacity-40"
                   data-testid="fill-all-durations-button"
                 >

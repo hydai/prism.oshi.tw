@@ -1,7 +1,9 @@
 import { Play, Pause, Rewind, FastForward } from 'lucide-react';
+import { secondsToTimestamp } from '../lib/parse';
 
 interface Props {
   isPlaying: boolean;
+  currentTime: number;
   onTogglePlay: () => void;
   onSeekBackward: () => void;
   onSeekForward: () => void;
@@ -9,15 +11,17 @@ interface Props {
 
 export default function AuroraPlayerControls({
   isPlaying,
+  currentTime,
   onTogglePlay,
   onSeekBackward,
   onSeekForward,
 }: Props) {
   return (
     <div
-      className="flex items-center justify-center gap-3"
+      className="flex flex-col items-center gap-1"
       data-testid="aurora-player-controls"
     >
+    <div className="flex items-center justify-center gap-3">
       <button
         onClick={onSeekBackward}
         className="flex items-center justify-center w-10 h-10 rounded-full bg-white/60 border border-[var(--border-default)] text-[var(--text-secondary)] hover:bg-white/80 focus:outline-none focus:ring-2 focus:ring-[var(--accent-purple)]"
@@ -45,6 +49,10 @@ export default function AuroraPlayerControls({
       >
         <FastForward size={16} />
       </button>
+    </div>
+      <span className="font-mono text-xs text-[var(--text-tertiary)]" data-testid="playback-timer">
+        {secondsToTimestamp(Math.floor(currentTime))}
+      </span>
     </div>
   );
 }
