@@ -36,6 +36,24 @@
     ]
   },
   {
+    "id": "song-0a72420e",
+    "title": "Love More",
+    "originalArtist": "畢書盡 Bii",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-72e04408",
+        "streamId": "stream-ff86ebf5",
+        "date": "2026-02-12",
+        "streamTitle": "【甜蜜歌回】情人節要甜甜蜜蜜！｜煦Hiyori",
+        "videoId": "vsdY8ku2Gm0",
+        "timestamp": 2282,
+        "endTimestamp": 2529,
+        "note": ""
+      }
+    ]
+  },
+  {
     "id": "song-2721e410",
     "title": "來自天堂的魔鬼 (鄧tsuki&煦美環ver)",
     "originalArtist": "​​鄧紫棋",
@@ -49,6 +67,42 @@
         "videoId": "OwNrtFg5Y1Q",
         "timestamp": 6122,
         "endTimestamp": 6367,
+        "note": ""
+      }
+    ]
+  },
+  {
+    "id": "song-27a53171",
+    "title": "普通朋友",
+    "originalArtist": "陶喆 David Tao",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-b153ef74",
+        "streamId": "stream-ff86ebf5",
+        "date": "2026-02-12",
+        "streamTitle": "【甜蜜歌回】情人節要甜甜蜜蜜！｜煦Hiyori",
+        "videoId": "vsdY8ku2Gm0",
+        "timestamp": 5339,
+        "endTimestamp": 5678,
+        "note": ""
+      }
+    ]
+  },
+  {
+    "id": "song-3784c866",
+    "title": "基因決定我愛你",
+    "originalArtist": "陳彥允 Ian Chen",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-ec9b36a4",
+        "streamId": "stream-ff86ebf5",
+        "date": "2026-02-12",
+        "streamTitle": "【甜蜜歌回】情人節要甜甜蜜蜜！｜煦Hiyori",
+        "videoId": "vsdY8ku2Gm0",
+        "timestamp": 4367,
+        "endTimestamp": 4594,
         "note": ""
       }
     ]
@@ -90,6 +144,42 @@
     ]
   },
   {
+    "id": "song-6d4b73f8",
+    "title": "小酒窩",
+    "originalArtist": "林俊傑",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-5259e0d9",
+        "streamId": "stream-ff86ebf5",
+        "date": "2026-02-12",
+        "streamTitle": "【甜蜜歌回】情人節要甜甜蜜蜜！｜煦Hiyori",
+        "videoId": "vsdY8ku2Gm0",
+        "timestamp": 1735,
+        "endTimestamp": 1958,
+        "note": ""
+      }
+    ]
+  },
+  {
+    "id": "song-7321184c",
+    "title": "overdrive challenge",
+    "originalArtist": "ザ・チェインスモーカーズ",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-fbd80483",
+        "streamId": "stream-ff86ebf5",
+        "date": "2026-02-12",
+        "streamTitle": "【甜蜜歌回】情人節要甜甜蜜蜜！｜煦Hiyori",
+        "videoId": "vsdY8ku2Gm0",
+        "timestamp": 2740,
+        "endTimestamp": 2760,
+        "note": ""
+      }
+    ]
+  },
+  {
     "id": "song-7b221900",
     "title": "Wish You Hell",
     "originalArtist": "WENDY",
@@ -121,6 +211,42 @@
         "videoId": "OwNrtFg5Y1Q",
         "timestamp": 3567,
         "endTimestamp": 3766,
+        "note": ""
+      }
+    ]
+  },
+  {
+    "id": "song-9d3e2dda",
+    "title": "梁山伯與茱麗葉",
+    "originalArtist": "卓文萱 Genie Chuo&曹格 Gary Chaw",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-b23a793a",
+        "streamId": "stream-ff86ebf5",
+        "date": "2026-02-12",
+        "streamTitle": "【甜蜜歌回】情人節要甜甜蜜蜜！｜煦Hiyori",
+        "videoId": "vsdY8ku2Gm0",
+        "timestamp": 3182,
+        "endTimestamp": 3413,
+        "note": ""
+      }
+    ]
+  },
+  {
+    "id": "song-9f31dcc6",
+    "title": "Some(썸 탈꺼야)",
+    "originalArtist": "BOL4(볼빨간사춘기)",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-e007b6ac",
+        "streamId": "stream-ff86ebf5",
+        "date": "2026-02-12",
+        "streamTitle": "【甜蜜歌回】情人節要甜甜蜜蜜！｜煦Hiyori",
+        "videoId": "vsdY8ku2Gm0",
+        "timestamp": 5886,
+        "endTimestamp": 6067,
         "note": ""
       }
     ]
@@ -175,6 +301,42 @@
         "videoId": "OwNrtFg5Y1Q",
         "timestamp": 488,
         "endTimestamp": 699,
+        "note": ""
+      }
+    ]
+  },
+  {
+    "id": "song-d7b170c3",
+    "title": "Love Story",
+    "originalArtist": "Taylor Swift",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-54625ecc",
+        "streamId": "stream-ff86ebf5",
+        "date": "2026-02-12",
+        "streamTitle": "【甜蜜歌回】情人節要甜甜蜜蜜！｜煦Hiyori",
+        "videoId": "vsdY8ku2Gm0",
+        "timestamp": 6421,
+        "endTimestamp": 6656,
+        "note": ""
+      }
+    ]
+  },
+  {
+    "id": "song-fa3426e2",
+    "title": "情歌",
+    "originalArtist": "梁靜茹",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-f9976331",
+        "streamId": "stream-ff86ebf5",
+        "date": "2026-02-12",
+        "streamTitle": "【甜蜜歌回】情人節要甜甜蜜蜜！｜煦Hiyori",
+        "videoId": "vsdY8ku2Gm0",
+        "timestamp": 3864,
+        "endTimestamp": 4124,
         "note": ""
       }
     ]
