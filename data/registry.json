@@ -363,6 +363,35 @@
       "enabled": true
     },
     {
+      "slug": "koe",
+      "displayName": "心咲 KOE",
+      "description": "『 心の花を咲かせる声 』\n\n 在夢的宇宙中旅行的異星VSinger。\n 願這歌聲成為綻放在你心中的花。\n\n 𝖠 𝖽𝗋𝖾𝖺𝗆-𝗍𝗋𝖺𝗏𝖾𝗅𝗂𝗇𝗀 𝖺𝗅𝗂𝖾𝗇 𝖵𝖲𝗂𝗇𝗀𝖾𝗋 𝖿𝗋𝗈𝗆 𝖺 𝖿𝖺𝗋𝖺𝗐𝖺𝗒 𝗎𝗇𝗂𝗏𝖾𝗋𝗌𝖾.\n 𝖬𝖺𝗒 𝗆𝗒 𝗏𝗈𝗂𝖼𝖾 𝖻𝗅𝗈𝗈𝗆 𝖺𝗌 𝖺 𝖿𝗅𝗈𝗐𝖾𝗋 𝗂𝗇 𝗒𝗈𝗎𝗋 𝗁𝖾𝖺𝗋𝗍.",
+      "avatarUrl": "https://yt3.googleusercontent.com/-JNi2LUqbck7y1HtQ4Nu0OJxqppPB-rujOK5Sr0S-9hrZf-DUlGEHZ4U2B0R5iXVaKK391nmKpI=s900-c-k-c0x00ffffff-no-rj",
+      "brandName": "KOEPrism",
+      "subscriberCount": "2.42萬",
+      "group": "𝖶𝖤𝖱𝖧𝖠𝖴𝖲 𝖬𝖴𝖲𝖨𝖢",
+      "socialLinks": {
+        "youtube": "https://www.youtube.com/@%E5%BF%83%E5%92%B2KOE",
+        "twitter": "https://x.com/koe__zzz",
+        "instagram": "https://www.instagram.com/koe__zzz"
+      },
+      "theme": {
+        "accentPrimary": "#EC4899",
+        "accentPrimaryDark": "#DB2777",
+        "accentPrimaryLight": "#F472B6",
+        "accentSecondary": "#3B82F6",
+        "accentSecondaryLight": "#60A5FA",
+        "bgPageStart": "#FFF0F5",
+        "bgPageMid": "#F0F8FF",
+        "bgPageEnd": "#E6E6FA",
+        "bgAccentPrimary": "#FDF2F8",
+        "bgAccentPrimaryMuted": "#FCE7F3",
+        "borderAccentPrimary": "#FBCFE8",
+        "borderAccentSecondary": "#BFDBFE"
+      },
+      "enabled": true
+    },
+    {
       "slug": "koyuki",
       "displayName": "雪Koyuki",
       "description": "你好！我是子午計畫【序境TeRaź】的小雪貂\n喜歡打遊戲但更喜歡你⸜♡⸝ 來陪陪我好嗎 🍀",
@@ -424,6 +453,37 @@
       "enabled": true
     },
     {
+      "slug": "nemesis",
+      "displayName": "Nemesis 涅默",
+      "description": "💫 因為有你才能存在的太陽伴星。",
+      "avatarUrl": "https://yt3.googleusercontent.com/X1f4q-q9h8Low_82zKoIPGiaTtPeaDM_MBwP2qj9952hKaNpez7YrZGQbEtDELaMgkzrA1Rz=s900-c-k-c0x00ffffff-no-rj",
+      "brandName": "NemesisPrism",
+      "subscriberCount": "14.5萬",
+      "group": "春魚創意",
+      "socialLinks": {
+        "youtube": "https://www.youtube.com/@NemesisXDFP",
+        "twitter": "https://twitter.com/NemesisXdfp",
+        "facebook": "https://www.facebook.com/Xtreme.Deep.Field.Project",
+        "instagram": "https://www.instagram.com/nemomoisgood/",
+        "twitch": "https://www.twitch.tv/nemesisxdfp"
+      },
+      "theme": {
+        "accentPrimary": "#EC4899",
+        "accentPrimaryDark": "#DB2777",
+        "accentPrimaryLight": "#F472B6",
+        "accentSecondary": "#3B82F6",
+        "accentSecondaryLight": "#60A5FA",
+        "bgPageStart": "#FFF0F5",
+        "bgPageMid": "#F0F8FF",
+        "bgPageEnd": "#E6E6FA",
+        "bgAccentPrimary": "#FDF2F8",
+        "bgAccentPrimaryMuted": "#FCE7F3",
+        "borderAccentPrimary": "#FBCFE8",
+        "borderAccentSecondary": "#BFDBFE"
+      },
+      "enabled": true
+    },
+    {
       "slug": "oboro",
       "displayName": "朧Oboro",
       "description": "來自子午計畫的少爺【黑暗的使者】朧Oboro，擅長日文，愛吃甜點，是一位具有陽光可愛的少年！粉絲名：馬卡朧",
@@ -464,6 +524,36 @@
       "group": "春魚創意",
       "socialLinks": {
         "youtube": "https://youtube.com/@oumuaxdfp?si=C_tCQlLRecKDQKjG"
+      },
+      "theme": {
+        "accentPrimary": "#EC4899",
+        "accentPrimaryDark": "#DB2777",
+        "accentPrimaryLight": "#F472B6",
+        "accentSecondary": "#3B82F6",
+        "accentSecondaryLight": "#60A5FA",
+        "bgPageStart": "#FFF0F5",
+        "bgPageMid": "#F0F8FF",
+        "bgPageEnd": "#E6E6FA",
+        "bgAccentPrimary": "#FDF2F8",
+        "bgAccentPrimaryMuted": "#FCE7F3",
+        "borderAccentPrimary": "#FBCFE8",
+        "borderAccentSecondary": "#BFDBFE"
+      },
+      "enabled": true
+    },
+    {
+      "slug": "paitan",
+      "displayName": "麵音白湯 Paitan",
+      "description": "嗚呼！！大家好我是拉麵精靈──白湯！！\n每天督促自己不要亂ㄘ毒的個人勢VTUBER",
+      "avatarUrl": "https://yt3.googleusercontent.com/b-HXLxKfSHBKUSwzIpzEcSw98HUbuapLvjH0nMnAUriZotemhe6DiqB0i9QOuGNuQZdbKRF1=s900-c-k-c0x00ffffff-no-rj",
+      "brandName": "PaitanPrism",
+      "subscriberCount": "6.07萬",
+      "group": "個人勢",
+      "socialLinks": {
+        "youtube": "https://www.youtube.com/@PaitanOfficial",
+        "twitter": "https://x.com/paitan6111",
+        "facebook": "https://www.facebook.com/PaitanOfficial",
+        "twitch": "https://www.twitch.tv/menonpaitan"
       },
       "theme": {
         "accentPrimary": "#EC4899",
