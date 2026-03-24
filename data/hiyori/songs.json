@@ -126,6 +126,24 @@
     ]
   },
   {
+    "id": "song-44681e7b",
+    "title": "倒帶",
+    "originalArtist": "蔡依林",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-0141bfbf",
+        "streamId": "stream-2025-11-17",
+        "date": "2025-11-17",
+        "streamTitle": "【深夜歌回】不能睡！起來嗨！！！｜煦Hiyori",
+        "videoId": "VnHAACcjZ10",
+        "timestamp": 1449,
+        "endTimestamp": 1710,
+        "note": ""
+      }
+    ]
+  },
+  {
     "id": "song-4550a977",
     "title": "路過人間",
     "originalArtist": "郁可唯",
@@ -198,6 +216,24 @@
     ]
   },
   {
+    "id": "song-628c1f46",
+    "title": "愛你",
+    "originalArtist": "王心凌",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-4d429dc5",
+        "streamId": "stream-2025-11-17",
+        "date": "2025-11-17",
+        "streamTitle": "【深夜歌回】不能睡！起來嗨！！！｜煦Hiyori",
+        "videoId": "VnHAACcjZ10",
+        "timestamp": 3232,
+        "endTimestamp": 3447,
+        "note": ""
+      }
+    ]
+  },
+  {
     "id": "song-65d378b3",
     "title": "Defying Gravity",
     "originalArtist": "Wicked The Soundtrack",
@@ -229,6 +265,24 @@
         "videoId": "vsdY8ku2Gm0",
         "timestamp": 1735,
         "endTimestamp": 1958,
+        "note": ""
+      }
+    ]
+  },
+  {
+    "id": "song-6d6bc543",
+    "title": "500天",
+    "originalArtist": "九九",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-2a85f222",
+        "streamId": "stream-2025-11-17",
+        "date": "2025-11-17",
+        "streamTitle": "【深夜歌回】不能睡！起來嗨！！！｜煦Hiyori",
+        "videoId": "VnHAACcjZ10",
+        "timestamp": 4205,
+        "endTimestamp": 4450,
         "note": ""
       }
     ]
@@ -324,6 +378,60 @@
     ]
   },
   {
+    "id": "song-85692b2b",
+    "title": "離開的一路上",
+    "originalArtist": "理想混蛋",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-2954bf51",
+        "streamId": "stream-2025-11-17",
+        "date": "2025-11-17",
+        "streamTitle": "【深夜歌回】不能睡！起來嗨！！！｜煦Hiyori",
+        "videoId": "VnHAACcjZ10",
+        "timestamp": 5790,
+        "endTimestamp": 6043,
+        "note": ""
+      }
+    ]
+  },
+  {
+    "id": "song-86ae2feb",
+    "title": "Perfect",
+    "originalArtist": "Ed Sheeran",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-19376d69",
+        "streamId": "stream-2025-11-17",
+        "date": "2025-11-17",
+        "streamTitle": "【深夜歌回】不能睡！起來嗨！！！｜煦Hiyori",
+        "videoId": "VnHAACcjZ10",
+        "timestamp": 4779,
+        "endTimestamp": 5042,
+        "note": ""
+      }
+    ]
+  },
+  {
+    "id": "song-876e85ad",
+    "title": "道聽塗說",
+    "originalArtist": "林芯儀",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-2e21064e",
+        "streamId": "stream-2025-11-17",
+        "date": "2025-11-17",
+        "streamTitle": "【深夜歌回】不能睡！起來嗨！！！｜煦Hiyori",
+        "videoId": "VnHAACcjZ10",
+        "timestamp": 6277,
+        "endTimestamp": 6575,
+        "note": ""
+      }
+    ]
+  },
+  {
     "id": "song-91ef1576",
     "title": "心訊 Heart Signal",
     "originalArtist": "煦Hiyori",
@@ -355,6 +463,42 @@
         "videoId": "OwNrtFg5Y1Q",
         "timestamp": 3567,
         "endTimestamp": 3766,
+        "note": ""
+      }
+    ]
+  },
+  {
+    "id": "song-996d1983",
+    "title": "Stuck with U",
+    "originalArtist": "Ariana Grande & Justin Bieber",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-31dbcc90",
+        "streamId": "stream-2025-11-17",
+        "date": "2025-11-17",
+        "streamTitle": "【深夜歌回】不能睡！起來嗨！！！｜煦Hiyori",
+        "videoId": "VnHAACcjZ10",
+        "timestamp": 636,
+        "endTimestamp": 867,
+        "note": ""
+      }
+    ]
+  },
+  {
+    "id": "song-99dcd77c",
+    "title": "倫敦的愛情",
+    "originalArtist": "藍又時",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-ac333fbb",
+        "streamId": "stream-2025-11-17",
+        "date": "2025-11-17",
+        "streamTitle": "【深夜歌回】不能睡！起來嗨！！！｜煦Hiyori",
+        "videoId": "VnHAACcjZ10",
+        "timestamp": 5279,
+        "endTimestamp": 5540,
         "note": ""
       }
     ]
@@ -409,6 +553,24 @@
         "videoId": "vsdY8ku2Gm0",
         "timestamp": 5886,
         "endTimestamp": 6067,
+        "note": ""
+      }
+    ]
+  },
+  {
+    "id": "song-aae80d63",
+    "title": "填空",
+    "originalArtist": "家家",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-c04e7175",
+        "streamId": "stream-2025-11-17",
+        "date": "2025-11-17",
+        "streamTitle": "【深夜歌回】不能睡！起來嗨！！！｜煦Hiyori",
+        "videoId": "VnHAACcjZ10",
+        "timestamp": 2721,
+        "endTimestamp": 2991,
         "note": ""
       }
     ]
@@ -486,6 +648,24 @@
     ]
   },
   {
+    "id": "song-cef73260",
+    "title": "Always Remember Us This Way",
+    "originalArtist": "Lady Gaga",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-7ad2187e",
+        "streamId": "stream-2025-11-17",
+        "date": "2025-11-17",
+        "streamTitle": "【深夜歌回】不能睡！起來嗨！！！｜煦Hiyori",
+        "videoId": "VnHAACcjZ10",
+        "timestamp": 6974,
+        "endTimestamp": 7174,
+        "note": ""
+      }
+    ]
+  },
+  {
     "id": "song-cf7ec132",
     "title": "I Really Like You",
     "originalArtist": "Carly Rae Jepsen",
@@ -558,6 +738,24 @@
     ]
   },
   {
+    "id": "song-d66fa2f2",
+    "title": "心訊 Heart Signal",
+    "originalArtist": "煦Hiyori (煦清唱)",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-ac46fbf2",
+        "streamId": "stream-2025-11-17",
+        "date": "2025-11-17",
+        "streamTitle": "【深夜歌回】不能睡！起來嗨！！！｜煦Hiyori",
+        "videoId": "VnHAACcjZ10",
+        "timestamp": 8307,
+        "endTimestamp": 8349,
+        "note": ""
+      }
+    ]
+  },
+  {
     "id": "song-d7b170c3",
     "title": "Love Story",
     "originalArtist": "Taylor Swift",
@@ -589,6 +787,24 @@
         "videoId": "b6m1VSTGQq0",
         "timestamp": 1083,
         "endTimestamp": 1336,
+        "note": ""
+      }
+    ]
+  },
+  {
+    "id": "song-e73813e1",
+    "title": "我的歌聲裡",
+    "originalArtist": "曲婉婷",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-a58fb408",
+        "streamId": "stream-2025-11-17",
+        "date": "2025-11-17",
+        "streamTitle": "【深夜歌回】不能睡！起來嗨！！！｜煦Hiyori",
+        "videoId": "VnHAACcjZ10",
+        "timestamp": 3770,
+        "endTimestamp": 3976,
         "note": ""
       }
     ]
