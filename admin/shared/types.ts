@@ -383,6 +383,19 @@ export interface StreamerInfo {
   displayName: string;
 }
 
+export interface BulkFetchSubscribersResult {
+  id: string;
+  display_name: string;
+  subscriber_count: string | null;
+  error?: string;
+}
+
+export interface BulkFetchSubscribersResponse {
+  updated: number;
+  failed: number;
+  results: BulkFetchSubscribersResult[];
+}
+
 // --- Crystal ticket types ---
 
 export type CrystalTicketType = 'bug' | 'feat' | 'ui' | 'other';

@@ -80,6 +80,8 @@ import type {
   StreamerInfo,
   CrystalTicket,
   CrystalTicketStatus,
+  BulkFetchSubscribersResult,
+  BulkFetchSubscribersResponse,
 } from '../shared/types';
 
 type Bindings = {
@@ -949,6 +951,47 @@ app.get('/api/nova/submissions', requireCurator, async (c) => {
     .all<NovaSubmission>();
 
   return c.json({ data: result.results, total: result.results.length });
+});
+
+// POST /api/nova/submissions/fetch-all-subscribers — bulk fetch for all approved streamers
+// Must be registered before /:id routes to avoid Hono matching "fetch-all-subscribers" as :id
+app.post('/api/nova/submissions/fetch-all-subscribers', requireCurator, async (c) => {
+  const apiKey = c.env.YOUTUBE_API_KEY;
+  if (!apiKey) {
+    return c.json({ error: 'YOUTUBE_API_KEY not configured' }, 500);
+  }
+
+  const { results: subs } = await c.env.NOVA_DB
+    .prepare("SELECT id, display_name, youtube_channel_id FROM submissions WHERE status = 'approved' AND youtube_channel_id != ''")
+    .all<{ id: string; display_name: string; youtube_channel_id: string }>();
+
+  const results: BulkFetchSubscribersResult[] = [];
+  let updated = 0;
+  let failed = 0;
+
+  for (const sub of subs) {
+    try {
+      const rawCount = await fetchChannelSubscribers(apiKey, sub.youtube_channel_id);
+      if (rawCount === null) {
+        results.push({ id: sub.id, display_name: sub.display_name, subscriber_count: null, error: 'Hidden or not found' });
+        failed++;
+        continue;
+      }
+      const formatted = formatSubscriberCount(rawCount);
+      await c.env.NOVA_DB
+        .prepare('UPDATE submissions SET subscriber_count = ? WHERE id = ?')
+        .bind(formatted, sub.id)
+        .run();
+      results.push({ id: sub.id, display_name: sub.display_name, subscriber_count: formatted });
+      updated++;
+    } catch (err) {
+      const msg = err instanceof Error ? err.message : 'Unknown error';
+      results.push({ id: sub.id, display_name: sub.display_name, subscriber_count: null, error: msg });
+      failed++;
+    }
+  }
+
+  return c.json<BulkFetchSubscribersResponse>({ updated, failed, results });
 });
 
 app.get('/api/nova/submissions/:id', requireCurator, async (c) => {

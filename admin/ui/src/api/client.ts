@@ -39,6 +39,7 @@ import type {
   HarmonizeArtistsResponse,
   HarmonizeApplyBody,
   HarmonizeMatchType,
+  BulkFetchSubscribersResponse,
 } from '../../../shared/types';
 
 // --- Streamer selection (module-level) ---
@@ -323,6 +324,11 @@ export const api = {
 
   fetchNovaSubscribers: (id: string) =>
     request<NovaSubmission>(`/api/nova/submissions/${id}/fetch-subscribers`, {
+      method: 'POST',
+    }),
+
+  fetchAllNovaSubscribers: () =>
+    request<BulkFetchSubscribersResponse>('/api/nova/submissions/fetch-all-subscribers', {
       method: 'POST',
     }),
 

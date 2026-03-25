@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import type { AuthUser, NovaSubmission, NovaStatus } from '../../../shared/types';
+import type { AuthUser, NovaSubmission, NovaStatus, BulkFetchSubscribersResponse } from '../../../shared/types';
 import { api } from '../api/client';
 import StatusBadge from '../components/StatusBadge';
 
@@ -58,6 +58,8 @@ export default function NovaSubmissions({ user }: { user: AuthUser }) {
   const [expandedId, setExpandedId] = useState<string | null>(null);
   const [rejectNote, setRejectNote] = useState<Record<string, string>>({});
   const [actionLoading, setActionLoading] = useState<string | null>(null);
+  const [fetchingAll, setFetchingAll] = useState(false);
+  const [fetchAllResult, setFetchAllResult] = useState<BulkFetchSubscribersResponse | null>(null);
 
   const fetchSubmissions = () => {
     setLoading(true);
@@ -110,6 +112,20 @@ export default function NovaSubmissions({ user }: { user: AuthUser }) {
     setSubmissions((prev) => prev.map((s) => (s.id === updated.id ? updated : s)));
   };
 
+  const handleFetchAll = async () => {
+    setFetchingAll(true);
+    setFetchAllResult(null);
+    try {
+      const result = await api.fetchAllNovaSubscribers();
+      setFetchAllResult(result);
+      fetchSubmissions();
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Bulk fetch failed');
+    } finally {
+      setFetchingAll(false);
+    }
+  };
+
   const isCurator = user.role === 'curator';
 
   return (
@@ -117,8 +133,8 @@ export default function NovaSubmissions({ user }: { user: AuthUser }) {
       <h2 className="text-xl font-semibold text-slate-800">Nova Submissions</h2>
       <p className="mt-1 text-sm text-slate-500">Review VTuber submissions from the public Nova form.</p>
 
-      {/* Status filter */}
-      <div className="mt-4">
+      {/* Status filter + bulk actions */}
+      <div className="mt-4 flex items-center gap-3">
         <select
           value={statusFilter}
           onChange={(e) => setStatusFilter(e.target.value as '' | NovaStatus)}
@@ -129,7 +145,39 @@ export default function NovaSubmissions({ user }: { user: AuthUser }) {
           <option value="approved">Approved</option>
           <option value="rejected">Rejected</option>
         </select>
+        {isCurator && (
+          <button
+            disabled={fetchingAll || loading}
+            onClick={handleFetchAll}
+            className="rounded bg-indigo-600 px-3 py-1.5 text-xs font-medium text-white hover:bg-indigo-700 disabled:opacity-50 disabled:cursor-not-allowed"
+          >
+            {fetchingAll ? 'Fetching...' : 'Fetch All Subscribers'}
+          </button>
+        )}
       </div>
+
+      {/* Bulk fetch result summary */}
+      {fetchAllResult && (
+        <div className="mt-3 rounded-md border border-slate-200 bg-slate-50 p-3 text-sm">
+          <p className="font-medium text-slate-700">
+            Updated {fetchAllResult.updated}, Failed {fetchAllResult.failed}
+          </p>
+          {fetchAllResult.results.length > 0 && (
+            <details className="mt-2">
+              <summary className="cursor-pointer text-xs text-slate-500 hover:text-slate-700">
+                Show details ({fetchAllResult.results.length} streamers)
+              </summary>
+              <ul className="mt-1 space-y-1 text-xs">
+                {fetchAllResult.results.map((r) => (
+                  <li key={r.id} className={r.error ? 'text-red-600' : 'text-slate-600'}>
+                    {r.display_name}: {r.error ? r.error : r.subscriber_count}
+                  </li>
+                ))}
+              </ul>
+            </details>
+          )}
+        </div>
+      )}
 
       {error && <p className="mt-4 text-sm text-red-600">{error}</p>}
 
