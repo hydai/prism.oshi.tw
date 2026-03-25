@@ -210,6 +210,8 @@ function SubmissionRow({
   const [orderDraft, setOrderDraft] = useState(sub.display_order ?? 0);
   const [saving, setSaving] = useState(false);
   const [saveError, setSaveError] = useState<string | null>(null);
+  const [fetchingSubs, setFetchingSubs] = useState(false);
+  const [fetchSubsError, setFetchSubsError] = useState<string | null>(null);
 
   // Reset draft when submission changes (e.g. after save or status change)
   useEffect(() => {
@@ -265,6 +267,22 @@ function SubmissionRow({
     setOrderDraft(sub.display_order ?? 0);
     setSaveError(null);
     setEditing(false);
+  };
+
+  const handleFetchSubscribers = async () => {
+    setFetchingSubs(true);
+    setFetchSubsError(null);
+    try {
+      const updated = await api.fetchNovaSubscribers(sub.id);
+      onSave(updated);
+      if (editing) {
+        setDraft((d) => ({ ...d, subscriber_count: updated.subscriber_count ?? '' }));
+      }
+    } catch (err) {
+      setFetchSubsError(err instanceof Error ? err.message : 'Failed to fetch subscribers');
+    } finally {
+      setFetchingSubs(false);
+    }
   };
 
   const socialLinks = [
@@ -402,12 +420,28 @@ function SubmissionRow({
                             className="mt-1 w-full rounded-md border border-slate-300 px-3 py-1.5 text-sm focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500"
                           />
                         ) : (
-                          <input
-                            type="text"
-                            value={draft[key]}
-                            onChange={(e) => setDraft((d) => ({ ...d, [key]: e.target.value }))}
-                            className="mt-1 w-full rounded-md border border-slate-300 px-3 py-1.5 text-sm focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500"
-                          />
+                          <div className={key === 'subscriber_count' ? 'mt-1 flex gap-2' : 'mt-1'}>
+                            <input
+                              type="text"
+                              value={draft[key]}
+                              onChange={(e) => setDraft((d) => ({ ...d, [key]: e.target.value }))}
+                              className="w-full rounded-md border border-slate-300 px-3 py-1.5 text-sm focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500"
+                            />
+                            {key === 'subscriber_count' && (
+                              <button
+                                type="button"
+                                disabled={fetchingSubs || !sub.youtube_channel_id}
+                                onClick={handleFetchSubscribers}
+                                title={!sub.youtube_channel_id ? 'Set YouTube Channel ID first' : 'Fetch subscriber count from YouTube'}
+                                className="shrink-0 rounded bg-indigo-600 px-3 py-1.5 text-xs font-medium text-white hover:bg-indigo-700 disabled:opacity-50 disabled:cursor-not-allowed"
+                              >
+                                {fetchingSubs ? 'Fetching...' : 'Fetch'}
+                              </button>
+                            )}
+                          </div>
+                        )}
+                        {key === 'subscriber_count' && fetchSubsError && (
+                          <p className="mt-1 text-xs text-red-600">{fetchSubsError}</p>
                         )}
                       </div>
                     ))}

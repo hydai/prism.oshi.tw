@@ -46,6 +46,16 @@ interface VideosResponse {
   items: VideoDetails[];
 }
 
+interface ChannelStatisticsResponse {
+  items: Array<{
+    id: string;
+    statistics: {
+      subscriberCount: string;
+      hiddenSubscriberCount: boolean;
+    };
+  }>;
+}
+
 interface CommentThread {
   id: string;
   snippet: {
@@ -270,4 +280,33 @@ export function findCandidateComment(
   });
 
   return candidates[0]!;
+}
+
+/**
+ * Fetch subscriber count for a YouTube channel.
+ * Uses channels.list with part=statistics (1 quota unit).
+ * Returns the raw subscriber count as a number, or null if hidden/not found.
+ */
+export async function fetchChannelSubscribers(
+  apiKey: string,
+  channelId: string,
+): Promise<number | null> {
+  const url = new URL(`${YT_API}/channels`);
+  url.searchParams.set('part', 'statistics');
+  url.searchParams.set('id', channelId);
+  url.searchParams.set('key', apiKey);
+
+  const res = await ytFetch(url.toString());
+  if (!res.ok) {
+    const body = await res.text();
+    throw new Error(`YouTube channels.list failed (${res.status}): ${body}`);
+  }
+
+  const data = (await res.json()) as ChannelStatisticsResponse;
+  if (!data.items || data.items.length === 0) return null;
+
+  const stats = data.items[0]!.statistics;
+  if (stats.hiddenSubscriberCount) return null;
+
+  return parseInt(stats.subscriberCount, 10);
 }

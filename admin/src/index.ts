@@ -46,7 +46,7 @@ import {
 } from './db';
 import { fetchItunesDuration } from './itunes';
 import { parseTextToSongs } from '../shared/parse';
-import { discoverStreams, getVideoDetails, fetchComments, findCandidateComment, countTimestamps } from './youtube';
+import { discoverStreams, getVideoDetails, fetchComments, findCandidateComment, countTimestamps, fetchChannelSubscribers } from './youtube';
 import type {
   AuthUser,
   CreateSongBody,
@@ -112,6 +112,19 @@ const ALLOWED_TRANSITIONS: Record<string, Set<string>> = {
   rejected:  new Set(['pending', 'excluded']),
   excluded:  new Set(['pending']),               // restore from excluded
 };
+
+/** Format raw subscriber count into Traditional Chinese notation (萬 = 10,000). */
+function formatSubscriberCount(count: number): string {
+  if (count < 10000) {
+    return count.toLocaleString();
+  }
+  const wan = count / 10000;
+  if (Number.isInteger(wan)) {
+    return `${wan}萬`;
+  }
+  const formatted = wan.toFixed(2).replace(/\.?0+$/, '');
+  return `${formatted}萬`;
+}
 
 function isValidTransition(from: string, to: string): boolean {
   return ALLOWED_TRANSITIONS[from]?.has(to) ?? false;
@@ -1047,6 +1060,51 @@ app.delete('/api/nova/submissions/:id', requireCurator, async (c) => {
     .run();
 
   return c.json({ ok: true });
+});
+
+// POST /api/nova/submissions/:id/fetch-subscribers — fetch subscriber count from YouTube
+app.post('/api/nova/submissions/:id/fetch-subscribers', requireCurator, async (c) => {
+  const id = c.req.param('id');
+
+  const sub = await c.env.NOVA_DB
+    .prepare('SELECT id, youtube_channel_id FROM submissions WHERE id = ?')
+    .bind(id)
+    .first<{ id: string; youtube_channel_id: string }>();
+  if (!sub) return c.json({ error: 'Submission not found' }, 404);
+  if (!sub.youtube_channel_id) {
+    return c.json({ error: 'No youtube_channel_id set for this submission. Please add a channel ID first.' }, 400);
+  }
+
+  const apiKey = c.env.YOUTUBE_API_KEY;
+  if (!apiKey) {
+    return c.json({ error: 'YOUTUBE_API_KEY not configured' }, 500);
+  }
+
+  let rawCount: number | null;
+  try {
+    rawCount = await fetchChannelSubscribers(apiKey, sub.youtube_channel_id);
+  } catch (err) {
+    const msg = err instanceof Error ? err.message : 'Unknown YouTube API error';
+    return c.json({ error: msg }, 502);
+  }
+
+  if (rawCount === null) {
+    return c.json({ error: 'Subscriber count is hidden or channel not found' }, 404);
+  }
+
+  const formatted = formatSubscriberCount(rawCount);
+
+  await c.env.NOVA_DB
+    .prepare('UPDATE submissions SET subscriber_count = ? WHERE id = ?')
+    .bind(formatted, id)
+    .run();
+
+  const updated = await c.env.NOVA_DB
+    .prepare('SELECT * FROM submissions WHERE id = ?')
+    .bind(id)
+    .first<NovaSubmission>();
+
+  return c.json(updated);
 });
 
 // --- Nova VOD submissions (NOVA_DB) ---

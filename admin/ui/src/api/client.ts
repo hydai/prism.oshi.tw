@@ -321,6 +321,11 @@ export const api = {
       method: 'DELETE',
     }),
 
+  fetchNovaSubscribers: (id: string) =>
+    request<NovaSubmission>(`/api/nova/submissions/${id}/fetch-subscribers`, {
+      method: 'POST',
+    }),
+
   // Nova VOD submissions
   listNovaVods: (params?: { status?: string; streamer?: string }) => {
     const sp = new URLSearchParams();
