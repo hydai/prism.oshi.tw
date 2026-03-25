@@ -691,6 +691,34 @@
         "borderAccentSecondary": "#BFDBFE"
       },
       "enabled": true
+    },
+    {
+      "slug": "xxhacucoxx",
+      "displayName": "xxhacucoxx ch. 白白虹",
+      "description": "天災少女白白虹ch.へようこそ\n瑟拉斯蒂歐 CELESTIAL\n你心中最特別的那道虹🌈",
+      "avatarUrl": "https://yt3.googleusercontent.com/xVMVa_f62_Om75UFIT2GSrm5aDg7hQND3upWXYmhYk5LNa3VU9iK30CdfMGFjbFRoz-sReaV7w8=s900-c-k-c0x00ffffff-no-rj",
+      "brandName": "xxhacucoxxPrism",
+      "subscriberCount": "4.85萬",
+      "group": "春魚創意",
+      "socialLinks": {
+        "youtube": "https://youtube.com/@xxhacucoxx_celestial",
+        "twitter": "https://x.com/xxhacucoxx?s=21"
+      },
+      "theme": {
+        "accentPrimary": "#EC4899",
+        "accentPrimaryDark": "#DB2777",
+        "accentPrimaryLight": "#F472B6",
+        "accentSecondary": "#3B82F6",
+        "accentSecondaryLight": "#60A5FA",
+        "bgPageStart": "#FFF0F5",
+        "bgPageMid": "#F0F8FF",
+        "bgPageEnd": "#E6E6FA",
+        "bgAccentPrimary": "#FDF2F8",
+        "bgAccentPrimaryMuted": "#FCE7F3",
+        "borderAccentPrimary": "#FBCFE8",
+        "borderAccentSecondary": "#BFDBFE"
+      },
+      "enabled": true
     }
   ]
 }
