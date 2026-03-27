@@ -270,6 +270,35 @@
       "enabled": true
     },
     {
+      "slug": "inori",
+      "displayName": "Inori Ch.秋月祁",
+      "description": "馬來西亞多語言雜談系Vtuber\n頻道主要活動在於雜談和歌回",
+      "avatarUrl": "https://yt3.googleusercontent.com/06XyMJG17_s_wpu0y5dniUzBy2f-S2j-7frFNtUvtt2QCn9jfGuKWqajTzzys-jpcxBc-maf4A=s900-c-k-c0x00ffffff-no-rj",
+      "brandName": "InoriPrism",
+      "subscriberCount": "5.19萬",
+      "group": "個人勢",
+      "socialLinks": {
+        "youtube": "https://www.youtube.com/@AkitsukiInori",
+        "twitter": "https://x.com/Akitsuki_Inori",
+        "facebook": "https://www.facebook.com/AkitsukiInoriChannel/"
+      },
+      "theme": {
+        "accentPrimary": "#EC4899",
+        "accentPrimaryDark": "#DB2777",
+        "accentPrimaryLight": "#F472B6",
+        "accentSecondary": "#3B82F6",
+        "accentSecondaryLight": "#60A5FA",
+        "bgPageStart": "#FFF0F5",
+        "bgPageMid": "#F0F8FF",
+        "bgPageEnd": "#E6E6FA",
+        "bgAccentPrimary": "#FDF2F8",
+        "bgAccentPrimaryMuted": "#FCE7F3",
+        "borderAccentPrimary": "#FBCFE8",
+        "borderAccentSecondary": "#BFDBFE"
+      },
+      "enabled": true
+    },
+    {
       "slug": "iruni",
       "displayName": "祈Iruni",
       "description": "我是子午計畫【扉暮IANVS】的天使，願意和我牽上羈絆嗎 ✨",
