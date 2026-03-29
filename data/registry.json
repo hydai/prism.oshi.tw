@@ -748,6 +748,33 @@
         "borderAccentSecondary": "#BFDBFE"
       },
       "enabled": true
+    },
+    {
+      "slug": "yuzumi",
+      "displayName": "橙Yuzumi",
+      "description": "是鼯鼠不是老鼠\n高攻高防高海拔",
+      "avatarUrl": "https://yt3.googleusercontent.com/mCQaVnGfbv9OxIYIv92s39xSTliYCai6S_P90hI8xRl9_GYD6tq4IgGv0OLVXviPU2VpLcQyKA=s900-c-k-c0x00ffffff-no-rj",
+      "brandName": "YuzumiPrism",
+      "subscriberCount": "7.67萬",
+      "group": "子午計畫",
+      "socialLinks": {
+        "youtube": "https://youtube.com/channel/UCxI5FyblWfEVBJDbSwRPzyw"
+      },
+      "theme": {
+        "accentPrimary": "#EC4899",
+        "accentPrimaryDark": "#DB2777",
+        "accentPrimaryLight": "#F472B6",
+        "accentSecondary": "#3B82F6",
+        "accentSecondaryLight": "#60A5FA",
+        "bgPageStart": "#FFF0F5",
+        "bgPageMid": "#F0F8FF",
+        "bgPageEnd": "#E6E6FA",
+        "bgAccentPrimary": "#FDF2F8",
+        "bgAccentPrimaryMuted": "#FCE7F3",
+        "borderAccentPrimary": "#FBCFE8",
+        "borderAccentSecondary": "#BFDBFE"
+      },
+      "enabled": true
     }
   ]
 }
