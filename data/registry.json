@@ -39,7 +39,7 @@
       "description": "Gabu💙左邊日本人右邊台灣人的假的日本人！",
       "avatarUrl": "https://yt3.ggpht.com/EiXx2rZ6H0vP5277BDSgfPbLCfT24tpVpjR75SnlHuCcwmE_REEDYozWjtN6jr_F5IyF_32G6W4=s240-c-k-c0x00ffffff-no-rj",
       "brandName": "GabuPrism",
-      "subscriberCount": "7.89萬",
+      "subscriberCount": "7.88萬",
       "group": "個人勢",
       "socialLinks": {
         "youtube": "https://www.youtube.com/channel/UCCHsCWNTcGJ8Jml_oZ6nG2Q",
@@ -208,12 +208,40 @@
       "enabled": true
     },
     {
+      "slug": "hibikuotodama",
+      "displayName": "音魂ヒビクHibiku Otodama",
+      "description": "超越自己的可能性與極限，\n為了成為最強、最帥氣的自己，\n降臨於電子之海！\n\n一步一步努力成長，\n希望能把滿滿的音樂傳遞給你\n\n主要以自彈自唱的直播歌回為主♪",
+      "avatarUrl": "https://yt3.googleusercontent.com/9A3LngDHNyLFw-_wJXpSuZlTy_VoXvD8TYK-FxEo4ikldS3FjGhJLq9wK6m_i779UzHgdqKfbA=s900-c-k-c0x00ffffff-no-rj",
+      "brandName": "HibikuPrism",
+      "subscriberCount": "9.9萬",
+      "group": "個人勢",
+      "socialLinks": {
+        "youtube": "https://www.youtube.com/@otodama_hibiku",
+        "twitter": "https://x.com/Otodama_Hibiku"
+      },
+      "theme": {
+        "accentPrimary": "#EC4899",
+        "accentPrimaryDark": "#DB2777",
+        "accentPrimaryLight": "#F472B6",
+        "accentSecondary": "#3B82F6",
+        "accentSecondaryLight": "#60A5FA",
+        "bgPageStart": "#FFF0F5",
+        "bgPageMid": "#F0F8FF",
+        "bgPageEnd": "#E6E6FA",
+        "bgAccentPrimary": "#FDF2F8",
+        "bgAccentPrimaryMuted": "#FCE7F3",
+        "borderAccentPrimary": "#FBCFE8",
+        "borderAccentSecondary": "#BFDBFE"
+      },
+      "enabled": true
+    },
+    {
       "slug": "hitomi",
       "displayName": "実Hitomi",
       "description": "神秘企業的大小姐，在學大學生，討厭被束縛於既定的規則與期待。表面上自由散漫，實則敏銳聰穎，對遊戲情有獨鍾，在因緣際會下而加入了子午學院，雖然平時都說著要帥跟厲害，但總是會出錯(pon)，關鍵時候都會發生很多好笑的事情\n\n接觸到電腦遊戲後對於fps非常感興趣，我要在戰場上擊敗全部的人!! 成為新世界的王",
       "avatarUrl": "https://yt3.googleusercontent.com/eliPbYNsaF-msdif5klvF8XXT63uD1TiZO1gOtSbG_0himBaB55zRRsQA_6gaDbEuP-OKIwfikk=s900-c-k-c0x00ffffff-no-rj",
       "brandName": "HitomiPrism",
-      "subscriberCount": "4.35萬",
+      "subscriberCount": "4.38萬",
       "group": "子午計畫",
       "socialLinks": {
         "youtube": "https://www.youtube.com/@%E5%AE%9FHitomi",
@@ -244,7 +272,7 @@
       "description": "子午學院冰之魔法學系的學生，樂觀愛笑的狼少女，平時課餘會四處打工，也會沈浸在書堆(漫畫)與咖啡之中，喜歡蒐集與描述各式各樣故事。並且喜歡音樂、喜歡吉他，希望可以讓自己創作的歌曲傳播遠方。對於咖啡有著異常理解，超級喜歡這種飲料。",
       "avatarUrl": "https://yt3.googleusercontent.com/ZzGvOU9LjevDzwEfCmj771-1_JZ5f5JWmtqgeYEskYahtDtxbuVXg6djayir2myLRhuaJV6u=s900-c-k-c0x00ffffff-no-rj",
       "brandName": "HiyoriPrism",
-      "subscriberCount": "4.79萬",
+      "subscriberCount": "4.8萬",
       "group": "子午計畫",
       "socialLinks": {
         "youtube": "https://www.youtube.com/channel/UCyO8Nae_zF-OpxtbL01Dwow",
@@ -304,7 +332,7 @@
       "description": "我是子午計畫【扉暮IANVS】的天使，願意和我牽上羈絆嗎 ✨",
       "avatarUrl": "https://yt3.googleusercontent.com/1iicdeViYmIDpfz1oMgWwDmXhb5D3RKnwS0U_ZafNGSdiv1abfuOEMI6Lw3EMSDIk21mc3p-=s160-c-k-c0x00ffffff-no-rj",
       "brandName": "IruniPrism",
-      "subscriberCount": "6.66萬",
+      "subscriberCount": "6.68萬",
       "group": "子午計畫",
       "socialLinks": {
         "youtube": "https://x.com/minatoaqua",
@@ -335,7 +363,7 @@
       "description": "王月女士是個有絕美歌聲、多才多藝的惡魔，擅長唱歌、會作詞會模仿，還會畫畫；外表艷麗、散發性感高冷氣質，但是其實在動些奇奇怪怪的歪腦筋，這樣的反差萌，怎麼能不愛呢？",
       "avatarUrl": "https://yt3.googleusercontent.com/_Wy5sZXGlpZCV8drnTZukN5JWZZZDntJ4Dp822m77RdBE1fq74wIVF8AOyU4MuasUxLqNj7C6w=s900-c-k-c0x00ffffff-no-rj",
       "brandName": "ItsukiPrism",
-      "subscriberCount": "7.23萬",
+      "subscriberCount": "7.25萬",
       "group": "子午計畫",
       "socialLinks": {
         "youtube": "https://www.youtube.com/@ItsukiIanvs",
@@ -366,7 +394,7 @@
       "description": "歌勢Vtuber，就讀烈焰魔法學系的粉紅豹，主要在Youtube上進行直播。\n平時的嗓音活力滿滿，歌聲卻十分渾厚，也喜歡透過寫詞作曲表達內心想法。小心，調皮的她說不定正準備偷偷燒掉你的外套！",
       "avatarUrl": "https://yt3.googleusercontent.com/cY2aEf1NOwF0zcGd-Ka0DcA5CUQEdEgmJnEhljPBcvyJ02AcJecUlXC6MSatn0QXFlzW5b507g=s900-c-k-c0x00ffffff-no-rj",
       "brandName": "KiraliPrism",
-      "subscriberCount": "9.73萬",
+      "subscriberCount": "9.75萬",
       "group": "子午計畫",
       "socialLinks": {
         "youtube": "https://www.youtube.com/@%E7%85%8CKirali",
@@ -426,7 +454,7 @@
       "description": "你好！我是子午計畫【序境TeRaź】的小雪貂\n喜歡打遊戲但更喜歡你⸜♡⸝ 來陪陪我好嗎 🍀",
       "avatarUrl": "https://yt3.googleusercontent.com/XHWipXKsoxLd8pLkyS-wUkAWroa_idNEI20EWiHQPTanVKbB6fyh7mfQn3lhlDlg-1qDMDvZAAg=s900-c-k-c0x00ffffff-no-rj",
       "brandName": "KoyukiPirsm",
-      "subscriberCount": "4.74萬",
+      "subscriberCount": "4.75萬",
       "group": "子午計畫",
       "socialLinks": {
         "youtube": "https://www.youtube.com/@%E9%9B%AAKoyuki",
@@ -487,7 +515,7 @@
       "description": "來自遙遠星球的宇宙歌姫",
       "avatarUrl": "https://yt3.googleusercontent.com/g7MGeu07Hq-IunOADzGI1tgdK6bfknwyENV6nmww5krjsDj7HWs_uj94oEQlyy3jEfhqDOueTQ=s900-c-k-c0x00ffffff-no-rj",
       "brandName": "NAGiPrism",
-      "subscriberCount": "1.12萬",
+      "subscriberCount": "1.13萬",
       "group": "個人勢",
       "socialLinks": {
         "youtube": "https://www.youtube.com/@NAGich",
@@ -604,7 +632,7 @@
       "description": "嗚呼！！大家好我是拉麵精靈──白湯！！\n每天督促自己不要亂ㄘ毒的個人勢VTUBER",
       "avatarUrl": "https://yt3.googleusercontent.com/b-HXLxKfSHBKUSwzIpzEcSw98HUbuapLvjH0nMnAUriZotemhe6DiqB0i9QOuGNuQZdbKRF1=s900-c-k-c0x00ffffff-no-rj",
       "brandName": "PaitanPrism",
-      "subscriberCount": "6.07萬",
+      "subscriberCount": "6.08萬",
       "group": "個人勢",
       "socialLinks": {
         "youtube": "https://www.youtube.com/@PaitanOfficial",
@@ -634,7 +662,7 @@
       "description": "我是子午計畫【霓NEO(n)】所屬的VTuber！\n歌勢Vtuber，就讀冰霜魔法學系的小狸貓，能夠變身成不同事物，主要在Youtube上進行直播。\n聲音有著療癒人心的能力，空靈的歌聲會讓人暫時忘記煩惱；有些笨拙的個性更為大家帶來許多意想不到的歡笑。",
       "avatarUrl": "https://yt3.googleusercontent.com/wiN-x6KgaJatPrVn2Acg1afi6atNxYF99DX9Yzftr8Nlo0d02zKfegb2wVFbF9J6p_v8_oY-PA=s900-c-k-c0x00ffffff-no-rj",
       "brandName": "ReiPrism",
-      "subscriberCount": "9.47萬",
+      "subscriberCount": "9.48萬",
       "group": "子午計畫",
       "socialLinks": {
         "youtube": "https://www.youtube.com/@%E6%BE%AARei",
@@ -665,7 +693,7 @@
       "description": "精明能幹，其實私底下有著反差(溫柔、腹黑)的一面。\n\n對聲音方面的創作相當有興趣，喜歡配音與唱歌，琢磨不一樣的聲音，希望可以讓更多人聽見，擅長使用自己性感低沉的聲音來演唱與製作作品，讓你陶醉於她的聲音像是一杯陳年的紅酒一般。\n\n在因緣際會下而加入了子午學院，希望可以透過進修與學習讓更多的人知道他。\n\n「遇見了你，那些被遺忘的塵封過往，將不再需要執著。」「你，願意跟我一起寫下……屬於我們的歷史嗎？」",
       "avatarUrl": "https://yt3.googleusercontent.com/vU7AicsdSgVP1u-WK3eBlSukvEin0Ec4H6RM0PYkFHDdJLREaEbfNrZ9PDZn0SgDqSZjDWV3Gg=s900-c-k-c0x00ffffff-no-rj",
       "brandName": "SachiPrism",
-      "subscriberCount": "4.79萬",
+      "subscriberCount": "4.81萬",
       "group": "子午計畫",
       "socialLinks": {
         "youtube": "https://www.youtube.com/@SachiTeRaz",
@@ -696,7 +724,7 @@
       "description": "個性自由不羈、八面玲瓏，某些時刻卻又不那麼坦率的赤腹黑蛇，主要在Youtube上進行直播。歌聲中散發出若有似無的致命魅力，慵懶的眼神就如蛇尾般勾人。以吉他彈唱展現與眾不同才能的他，興趣之一便是透過音樂創作將高潮迭起的故事訴說給觀眾。",
       "avatarUrl": "https://yt3.googleusercontent.com/S4kfXpdsBQOeTQnDgAAYAZRmE0d1hiiYvZabM4hnmlHXOjL7eA5CRNfor22xZ8ujJRgNnwm5zf8=s900-c-k-c0x00ffffff-no-rj",
       "brandName": "SakuroPrism",
-      "subscriberCount": "5.75萬",
+      "subscriberCount": "5.76萬",
       "group": "子午計畫",
       "socialLinks": {
         "youtube": "https://www.youtube.com/@SakuroMoonlit",
@@ -783,7 +811,7 @@
       "description": "是鼯鼠不是老鼠\n高攻高防高海拔",
       "avatarUrl": "https://yt3.googleusercontent.com/mCQaVnGfbv9OxIYIv92s39xSTliYCai6S_P90hI8xRl9_GYD6tq4IgGv0OLVXviPU2VpLcQyKA=s900-c-k-c0x00ffffff-no-rj",
       "brandName": "YuzumiPrism",
-      "subscriberCount": "7.67萬",
+      "subscriberCount": "7.68萬",
       "group": "子午計畫",
       "socialLinks": {
         "youtube": "https://youtube.com/channel/UCxI5FyblWfEVBJDbSwRPzyw"
