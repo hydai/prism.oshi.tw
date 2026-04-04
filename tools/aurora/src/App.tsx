@@ -7,6 +7,7 @@ import PasteImportModal from './components/PasteImportModal';
 import ExportModal from './components/ExportModal';
 import AuroraPlayerControls from './components/AuroraPlayerControls';
 import AuroraStampControls from './components/AuroraStampControls';
+import ThemeToggle from './components/ThemeToggle';
 import type { ParsedSong } from './lib/parse';
 import { fetchItunesDuration } from './lib/itunes';
 
@@ -299,7 +300,7 @@ export function App() {
 
     const widgetId = w.turnstile.render(turnstileContainerRef.current, {
       sitekey: '0x4AAAAAAClisXs99lkojH74',
-      theme: 'light',
+      theme: document.documentElement.classList.contains('dark') ? 'dark' : 'light',
       callback: (token: string) => setTurnstileToken(token),
     });
     turnstileWidgetIdRef.current = widgetId;
@@ -434,7 +435,7 @@ export function App() {
             <select
               value={selectedStreamer}
               onChange={(e) => setSelectedStreamer(e.target.value)}
-              className="text-[13px] px-2 py-1.5 rounded-lg border border-[var(--border-default)] bg-white/60 text-[var(--text-secondary)] outline-none focus:border-[var(--accent-purple)]"
+              className="text-[13px] px-2 py-1.5 rounded-lg border border-[var(--border-default)] bg-white/60 dark:bg-white/[0.06] text-[var(--text-secondary)] outline-none focus:border-[var(--accent-purple)]"
             >
               <option value="">選擇 VTuber...</option>
               {streamers.map((s) => (
@@ -457,6 +458,7 @@ export function App() {
             </a>
           )}
 
+          <ThemeToggle />
         </div>
       </header>
 
@@ -477,7 +479,7 @@ export function App() {
             <div className="w-full max-w-lg">
               <div className="flex gap-2">
                 <input
-                  className="flex-1 rounded-xl border border-[var(--border-default)] bg-white/60 px-4 py-3 text-base outline-none focus:border-[var(--accent-purple)] placeholder:text-[var(--text-tertiary)]"
+                  className="flex-1 rounded-xl border border-[var(--border-default)] bg-white/60 dark:bg-white/[0.06] px-4 py-3 text-base outline-none focus:border-[var(--accent-purple)] placeholder:text-[var(--text-tertiary)]"
                   placeholder="貼上 YouTube 歌枠網址..."
                   value={vodUrl}
                   onChange={(e) => { setVodUrl(e.target.value); setUrlError(''); }}
@@ -493,7 +495,7 @@ export function App() {
                 </button>
               </div>
               {urlError && (
-                <p className="text-red-500 text-[12px] mt-2" data-testid="url-error">{urlError}</p>
+                <p className="text-red-500 dark:text-red-400 text-[12px] mt-2" data-testid="url-error">{urlError}</p>
               )}
             </div>
           </div>
@@ -518,7 +520,7 @@ export function App() {
                 <span>快捷鍵</span>
               </button>
               {showShortcuts && (
-                <div className="rounded-lg border border-[var(--border-default)] bg-white/40 px-4 py-3">
+                <div className="rounded-lg border border-[var(--border-default)] bg-white/40 dark:bg-white/[0.04] px-4 py-3">
                   <p className="text-[11px] text-[var(--text-tertiary)] mb-2">在沒有輸入框聚焦時生效</p>
                   <div className="grid grid-cols-2 gap-x-6 gap-y-1.5 text-[12px]">
                     {[
@@ -534,7 +536,7 @@ export function App() {
                       ['← →', '倒退 / 快進 5 秒'],
                     ].map(([key, desc]) => (
                       <div key={key} className="flex items-center gap-2">
-                        <kbd className="min-w-[28px] text-center px-1 py-0.5 rounded bg-white/60 border border-[var(--border-default)] text-[11px] font-mono font-medium">{key}</kbd>
+                        <kbd className="min-w-[28px] text-center px-1 py-0.5 rounded bg-white/60 dark:bg-white/[0.06] border border-[var(--border-default)] text-[11px] font-mono font-medium">{key}</kbd>
                         <span className="text-[var(--text-secondary)]">{desc}</span>
                       </div>
                     ))}
@@ -560,7 +562,7 @@ export function App() {
                 </button>
                 <button
                   onClick={() => setShowImport(true)}
-                  className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-white/60 border border-[var(--border-default)] text-[var(--text-secondary)] text-[13px] font-medium hover:bg-white/80"
+                  className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-white/60 dark:bg-white/[0.06] border border-[var(--border-default)] text-[var(--text-secondary)] text-[13px] font-medium hover:bg-white/80 dark:hover:bg-white/[0.10]"
                   data-testid="import-button"
                 >
                   <FileText size={14} />
@@ -569,7 +571,7 @@ export function App() {
                 <button
                   onClick={() => setShowExport(true)}
                   disabled={songs.length === 0}
-                  className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-white/60 border border-[var(--border-default)] text-[var(--text-secondary)] text-[13px] font-medium hover:bg-white/80 disabled:opacity-40"
+                  className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-white/60 dark:bg-white/[0.06] border border-[var(--border-default)] text-[var(--text-secondary)] text-[13px] font-medium hover:bg-white/80 dark:hover:bg-white/[0.10] disabled:opacity-40"
                   data-testid="export-button"
                 >
                   <Download size={14} />
@@ -578,7 +580,7 @@ export function App() {
                 <button
                   onClick={handleFillAllDurations}
                   disabled={fillingIndex !== null || !songs.some((s) => s.name.trim() !== '')}
-                  className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-white/60 border border-[var(--border-default)] text-[var(--text-secondary)] text-[13px] font-medium hover:bg-white/80 disabled:opacity-40"
+                  className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-white/60 dark:bg-white/[0.06] border border-[var(--border-default)] text-[var(--text-secondary)] text-[13px] font-medium hover:bg-white/80 dark:hover:bg-white/[0.10] disabled:opacity-40"
                   data-testid="fill-all-durations-button"
                 >
                   <Clock size={14} className={fillingIndex !== null ? 'animate-spin' : ''} />
@@ -587,7 +589,7 @@ export function App() {
                 <button
                   onClick={() => setShowSubmitModal(true)}
                   disabled={songs.length === 0 || !selectedStreamer || submitting}
-                  className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-emerald-500 text-white text-[13px] font-medium hover:opacity-90 disabled:opacity-40"
+                  className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-emerald-500 dark:bg-emerald-600 text-white text-[13px] font-medium hover:opacity-90 disabled:opacity-40"
                   title={!selectedStreamer ? '請先選擇 VTuber' : '提交到 Nova'}
                   data-testid="submit-to-nova-button"
                 >
@@ -598,7 +600,7 @@ export function App() {
                 {songs.length > 0 && (
                   <button
                     onClick={handleClear}
-                    className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-red-400 hover:text-red-600 hover:bg-red-50 text-[13px] font-medium"
+                    className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-red-400 hover:text-red-600 hover:bg-red-50 dark:hover:bg-red-500/10 text-[13px] font-medium"
                   >
                     <Trash2 size={14} />
                     <span className="hidden sm:inline">清除</span>
@@ -610,7 +612,7 @@ export function App() {
               {submitStatus && (
                 <div
                   className={`text-[13px] px-3 py-2 rounded-lg ${
-                    submitStatus.type === 'success' ? 'bg-emerald-50 text-emerald-700' : 'bg-red-50 text-red-700'
+                    submitStatus.type === 'success' ? 'bg-emerald-50 text-emerald-700 dark:bg-emerald-500/10 dark:text-emerald-400' : 'bg-red-50 text-red-700 dark:bg-red-500/10 dark:text-red-400'
                   }`}
                 >
                   {submitStatus.message}
@@ -701,7 +703,7 @@ export function App() {
                   type="date"
                   value={submitStreamDate}
                   onChange={(e) => setSubmitStreamDate(e.target.value)}
-                  className="w-full rounded-lg border border-[var(--border-default)] bg-white/60 px-3 py-1.5 text-[13px] outline-none focus:border-[var(--accent-purple)]"
+                  className="w-full rounded-lg border border-[var(--border-default)] bg-white/60 dark:bg-white/[0.06] px-3 py-1.5 text-[13px] outline-none focus:border-[var(--accent-purple)]"
                 />
               </div>
               <div>
@@ -711,7 +713,7 @@ export function App() {
                   value={submitNote}
                   onChange={(e) => setSubmitNote(e.target.value)}
                   placeholder="任何補充說明（選填）"
-                  className="w-full rounded-lg border border-[var(--border-default)] bg-white/60 px-3 py-1.5 text-[13px] outline-none focus:border-[var(--accent-purple)] placeholder:text-[var(--text-tertiary)]"
+                  className="w-full rounded-lg border border-[var(--border-default)] bg-white/60 dark:bg-white/[0.06] px-3 py-1.5 text-[13px] outline-none focus:border-[var(--accent-purple)] placeholder:text-[var(--text-tertiary)]"
                 />
               </div>
             </div>
@@ -723,14 +725,14 @@ export function App() {
             <div className="flex gap-2">
               <button
                 onClick={() => { setShowSubmitModal(false); setSubmitNote(''); }}
-                className="flex-1 px-4 py-2 rounded-lg bg-white/60 border border-[var(--border-default)] text-[var(--text-secondary)] text-[13px] font-medium hover:bg-white/80"
+                className="flex-1 px-4 py-2 rounded-lg bg-white/60 dark:bg-white/[0.06] border border-[var(--border-default)] text-[var(--text-secondary)] text-[13px] font-medium hover:bg-white/80 dark:hover:bg-white/[0.10]"
               >
                 取消
               </button>
               <button
                 onClick={handleSubmitToNova}
                 disabled={!turnstileToken || submitting}
-                className="flex-1 px-4 py-2 rounded-lg bg-emerald-500 text-white text-[13px] font-medium hover:opacity-90 disabled:opacity-40"
+                className="flex-1 px-4 py-2 rounded-lg bg-emerald-500 dark:bg-emerald-600 text-white text-[13px] font-medium hover:opacity-90 disabled:opacity-40"
               >
                 {submitting ? '提交中...' : '確認提交'}
               </button>

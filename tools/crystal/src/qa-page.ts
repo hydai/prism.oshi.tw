@@ -1,18 +1,12 @@
 import { html, raw } from 'hono/html';
 import type { TicketRow } from './types';
+import { DARK_MODE_CSS, DARK_MODE_DETECT_SCRIPT, themeToggleHTML } from './theme';
 
 const TYPE_LABELS: Record<string, string> = {
   bug: 'Bug',
   feat: '功能建議',
   ui: 'UI',
   other: '其他',
-};
-
-const TYPE_COLORS: Record<string, string> = {
-  bug: '#EF4444',
-  feat: '#8B5CF6',
-  ui: '#3B82F6',
-  other: '#64748B',
 };
 
 function formatDate(iso: string): string {
@@ -37,11 +31,11 @@ export function renderQaPage(tickets: TicketRow[], total: number, page: number, 
   const totalPages = Math.ceil(total / limit);
 
   const ticketCards = tickets.map((t) => {
-    const typeColor = TYPE_COLORS[t.type] || TYPE_COLORS.other;
     const typeLabel = TYPE_LABELS[t.type] || t.type;
+    const typeClass = ['bug', 'feat', 'ui', 'other'].includes(t.type) ? t.type : 'other';
     const nickname = t.nickname || '匿名';
     const statusLabel = t.status === 'replied' ? '已回覆' : '已關閉';
-    const statusColor = t.status === 'replied' ? '#059669' : '#64748B';
+    const statusClass = t.status === 'replied' ? 'replied' : 'closed';
 
     return `
       <div style="
@@ -53,16 +47,8 @@ export function renderQaPage(tickets: TicketRow[], total: number, page: number, 
         box-shadow: 0 4px 16px rgba(0,0,0,0.04);
       ">
         <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 12px; flex-wrap: wrap;">
-          <span style="
-            display: inline-block; padding: 2px 10px; border-radius: 20px;
-            font-size: 12px; font-weight: 600; color: white;
-            background: ${typeColor};
-          ">${typeLabel}</span>
-          <span style="
-            display: inline-block; padding: 2px 10px; border-radius: 20px;
-            font-size: 12px; font-weight: 500; color: ${statusColor};
-            border: 1px solid ${statusColor}33;
-          ">${statusLabel}</span>
+          <span class="type-badge type-${typeClass}">${typeLabel}</span>
+          <span class="status-badge status-${statusClass}">${statusLabel}</span>
           <span style="font-size: 12px; color: var(--text-tertiary); margin-left: auto;">
             ${nickname} · ${formatDate(t.submitted_at)}
           </span>
@@ -75,12 +61,7 @@ export function renderQaPage(tickets: TicketRow[], total: number, page: number, 
           ${escapeHtml(t.body)}
         </p>
 
-        <div style="
-          padding: 16px;
-          background: rgba(139, 92, 246, 0.06);
-          border-radius: var(--radius-lg);
-          border-left: 3px solid var(--accent-purple);
-        ">
+        <div class="admin-reply">
           <div style="font-size: 12px; font-weight: 600; color: var(--accent-purple); margin-bottom: 6px;">
             官方回覆 · ${t.replied_at ? formatDate(t.replied_at) : ''}
           </div>
@@ -118,6 +99,7 @@ export function renderQaPage(tickets: TicketRow[], total: number, page: number, 
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Prism Crystal — Q&A</title>
+  <script>${DARK_MODE_DETECT_SCRIPT}</script>
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700;1,9..40,400&display=swap" rel="stylesheet" />
@@ -140,6 +122,8 @@ export function renderQaPage(tickets: TicketRow[], total: number, page: number, 
       --radius-xl: 16px;
       --radius-2xl: 20px;
     }
+
+    ${DARK_MODE_CSS}
 
     * { box-sizing: border-box; margin: 0; padding: 0; }
     body {
@@ -196,7 +180,7 @@ export function renderQaPage(tickets: TicketRow[], total: number, page: number, 
   <div style="max-width: 720px; margin: 0 auto; padding: 48px 16px;">
     <!-- Header -->
     <div style="text-align: center; margin-bottom: 32px;">
-      <div style="display: inline-flex; align-items: center; gap: 12px; margin-bottom: 8px;">
+      <div style="display: flex; align-items: center; justify-content: center; gap: 12px; margin-bottom: 8px; position: relative;">
         <div style="
           width: 40px; height: 40px; border-radius: var(--radius-lg);
           background: linear-gradient(135deg, var(--accent-purple-light), var(--accent-blue-light));
@@ -214,6 +198,9 @@ export function renderQaPage(tickets: TicketRow[], total: number, page: number, 
           -webkit-background-clip: text; -webkit-text-fill-color: transparent;
           background-clip: text;
         ">Crystal Q&A</span>
+        <div style="position: absolute; right: 0; top: 50%; transform: translateY(-50%);">
+          ${themeToggleHTML()}
+        </div>
       </div>
       <p style="color: var(--text-secondary); font-size: 14px;">
         已回覆的問題與建議

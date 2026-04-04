@@ -1,5 +1,7 @@
 @import 'tailwindcss';
 
+@custom-variant dark (&:where(.dark, .dark *));
+
 @layer base {
   :root {
     --border-default: #E2E8F0;
@@ -11,11 +13,26 @@
     --text-tertiary: #94A3B8;
   }
 
+  html.dark {
+    color-scheme: dark;
+    --border-default: rgba(255,255,255,0.10);
+    --bg-surface: #1A1B2E;
+    --bg-surface-frosted: rgba(26,27,46,0.85);
+    --accent-purple: #C084FC;
+    --text-primary: #E8EAF0;
+    --text-secondary: #9CA3AF;
+    --text-tertiary: #6B7280;
+  }
+
   body {
     font-family: 'DM Sans', system-ui, sans-serif;
     background: linear-gradient(135deg, #faf5ff 0%, #f0f9ff 50%, #f5f3ff 100%);
     background-attachment: fixed;
     min-height: 100vh;
     color: var(--text-primary);
+  }
+
+  html.dark body {
+    background: linear-gradient(135deg, #0F0A1A 0%, #0D1117 50%, #0A0E1A 100%);
   }
 }

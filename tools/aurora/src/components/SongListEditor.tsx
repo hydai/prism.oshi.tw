@@ -43,7 +43,7 @@ function InlineCell({ value, onCommit, className = '', onClick, placeholder }: I
     return (
       <input
         ref={inputRef}
-        className={`bg-white/80 border border-[var(--border-default)] rounded px-1 py-0.5 text-base w-full outline-none focus:border-[var(--accent-purple)] ${className}`}
+        className={`bg-white/80 dark:bg-white/[0.10] border border-[var(--border-default)] rounded px-1 py-0.5 text-base w-full outline-none focus:border-[var(--accent-purple)] ${className}`}
         value={draft}
         onChange={(e) => setDraft(e.target.value)}
         onBlur={() => { onCommit(draft); setEditing(false); }}
@@ -57,7 +57,7 @@ function InlineCell({ value, onCommit, className = '', onClick, placeholder }: I
 
   return (
     <span
-      className={`cursor-text hover:bg-white/60 rounded px-1 py-0.5 min-h-[24px] inline-block ${className}`}
+      className={`cursor-text hover:bg-white/60 dark:hover:bg-white/[0.06] rounded px-1 py-0.5 min-h-[24px] inline-block ${className}`}
       onClick={(e) => { onClick?.(); if (!onClick) setEditing(true); e.stopPropagation(); }}
       onDoubleClick={() => setEditing(true)}
       title={onClick ? '點擊跳轉 / 雙擊編輯' : '點擊編輯'}
@@ -85,7 +85,7 @@ export default function SongListEditor({ songs, selectedIndex, onSelect, onUpdat
       {songs.length === 0 && (
         <div className="text-center py-12 text-[var(--text-tertiary)]">
           <p className="text-[15px] mb-1">尚未添加歌曲</p>
-          <p className="text-[12px]">按 <kbd className="px-1 py-0.5 rounded bg-white/60 border border-[var(--border-default)] text-[11px] font-mono">A</kbd> 在當前時間添加，或使用匯入功能</p>
+          <p className="text-[12px]">按 <kbd className="px-1 py-0.5 rounded bg-white/60 dark:bg-white/[0.06] border border-[var(--border-default)] text-[11px] font-mono">A</kbd> 在當前時間添加，或使用匯入功能</p>
         </div>
       )}
       {songs.map((song, i) => (
@@ -94,7 +94,7 @@ export default function SongListEditor({ songs, selectedIndex, onSelect, onUpdat
           className={`group flex items-center gap-2 px-3 py-2 rounded-lg transition-colors cursor-pointer ${
             selectedIndex === i
               ? 'bg-[var(--accent-purple)]/10 border border-[var(--accent-purple)]/30'
-              : 'hover:bg-white/40 border border-transparent'
+              : 'hover:bg-white/40 dark:hover:bg-white/[0.04] border border-transparent'
           }`}
           onClick={() => onSelect(i)}
           data-testid="song-row"
@@ -133,7 +133,7 @@ export default function SongListEditor({ songs, selectedIndex, onSelect, onUpdat
                 const sec = parseHMS(v);
                 if (sec !== null) onUpdate(i, { startSeconds: sec });
               }}
-              className="text-emerald-600 cursor-pointer hover:underline"
+              className="text-emerald-600 dark:text-emerald-400 cursor-pointer hover:underline"
             />
             <span className="text-[var(--text-tertiary)]">~</span>
             <InlineCell
@@ -147,7 +147,7 @@ export default function SongListEditor({ songs, selectedIndex, onSelect, onUpdat
                   if (sec !== null) onUpdate(i, { endSeconds: sec });
                 }
               }}
-              className="text-orange-500 cursor-pointer hover:underline"
+              className="text-orange-500 dark:text-orange-400 cursor-pointer hover:underline"
             />
           </div>
 
@@ -156,7 +156,7 @@ export default function SongListEditor({ songs, selectedIndex, onSelect, onUpdat
             <button
               onClick={(e) => { e.stopPropagation(); onMove(i, 'up'); }}
               disabled={i === 0}
-              className="p-1 rounded hover:bg-white/60 disabled:opacity-30"
+              className="p-1 rounded hover:bg-white/60 dark:hover:bg-white/[0.06] disabled:opacity-30"
               title="上移"
             >
               <ChevronUp size={14} />
@@ -164,7 +164,7 @@ export default function SongListEditor({ songs, selectedIndex, onSelect, onUpdat
             <button
               onClick={(e) => { e.stopPropagation(); onMove(i, 'down'); }}
               disabled={i === songs.length - 1}
-              className="p-1 rounded hover:bg-white/60 disabled:opacity-30"
+              className="p-1 rounded hover:bg-white/60 dark:hover:bg-white/[0.06] disabled:opacity-30"
               title="下移"
             >
               <ChevronDown size={14} />
@@ -173,7 +173,7 @@ export default function SongListEditor({ songs, selectedIndex, onSelect, onUpdat
               <button
                 onClick={(e) => { e.stopPropagation(); onFillDuration(i); }}
                 disabled={fillingIndex !== null}
-                className="p-1 rounded hover:bg-purple-100 text-purple-400 hover:text-purple-600 disabled:opacity-30"
+                className="p-1 rounded hover:bg-purple-100 dark:hover:bg-purple-500/15 text-purple-400 hover:text-purple-600 disabled:opacity-30"
                 title="從 iTunes 自動填入結束時間"
                 data-testid="fill-duration-button"
               >
@@ -182,7 +182,7 @@ export default function SongListEditor({ songs, selectedIndex, onSelect, onUpdat
             )}
             <button
               onClick={(e) => { e.stopPropagation(); onDelete(i); }}
-              className="p-1 rounded hover:bg-red-100 text-red-400 hover:text-red-600"
+              className="p-1 rounded hover:bg-red-100 dark:hover:bg-red-500/15 text-red-400 hover:text-red-600 dark:hover:text-red-400"
               title="刪除"
             >
               <Trash2 size={14} />

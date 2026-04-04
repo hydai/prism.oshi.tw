@@ -1,5 +1,6 @@
 import { html, raw } from 'hono/html';
 import type { SubmissionSummary, VodSubmissionSummary, AdminStreamSummary } from './types';
+import { DARK_MODE_CSS, DARK_MODE_DETECT_SCRIPT, themeToggleHTML } from './theme';
 
 /** Escape HTML special characters in user-provided strings. */
 function esc(s: string): string {
@@ -12,14 +13,9 @@ function esc(s: string): string {
 }
 
 function statusBadge(status: string): string {
-  const map: Record<string, { bg: string; fg: string; label: string }> = {
-    pending:     { bg: '#FEF3C7', fg: '#92400E', label: '審核中' },
-    approved:    { bg: '#D1FAE5', fg: '#065F46', label: '已通過' },
-    rejected:    { bg: '#FEE2E2', fg: '#991B1B', label: '已拒絕' },
-    admin_done:  { bg: '#DBEAFE', fg: '#1E40AF', label: '已收錄' },
-  };
-  const s = map[status] ?? map.pending;
-  return `<span style="display:inline-block;padding:2px 10px;border-radius:9999px;font-size:12px;font-weight:600;background:${s.bg};color:${s.fg};">${s.label}</span>`;
+  const labels: Record<string, string> = { pending: '審核中', approved: '已通過', rejected: '已拒絕', admin_done: '已收錄' };
+  const s = labels[status] ? status : 'pending';
+  return `<span class="badge badge-${s}">${labels[s] ?? labels.pending}</span>`;
 }
 
 function formatDate(iso: string | null): string {
@@ -46,12 +42,12 @@ export function renderStatusPage(
   const subStats = countByStatus(submissions);
   const subRows = submissions.map((s) => `
     <tr>
-      <td><img src="${esc(s.avatar_url)}" alt="" style="width:28px;height:28px;border-radius:50%;vertical-align:middle;background:#f1f5f9;" onerror="this.style.display='none'"></td>
+      <td><img src="${esc(s.avatar_url)}" alt="" style="width:28px;height:28px;border-radius:50%;vertical-align:middle;background:var(--bg-surface-frosted);" onerror="this.style.display='none'"></td>
       <td>${esc(s.display_name)}</td>
-      <td style="font-family:monospace;font-size:12px;color:#64748B;">${esc(s.slug || '—')}</td>
+      <td style="font-family:monospace;font-size:12px;color:var(--text-secondary);">${esc(s.slug || '—')}</td>
       <td>${statusBadge(s.status)}</td>
-      <td style="font-size:12px;color:#64748B;white-space:nowrap;">${formatDate(s.submitted_at)}</td>
-      <td style="font-size:12px;color:#64748B;white-space:nowrap;">${formatDate(s.reviewed_at)}</td>
+      <td style="font-size:12px;color:var(--text-secondary);white-space:nowrap;">${formatDate(s.submitted_at)}</td>
+      <td style="font-size:12px;color:var(--text-secondary);white-space:nowrap;">${formatDate(s.reviewed_at)}</td>
     </tr>
   `).join('');
 
@@ -102,7 +98,7 @@ export function renderStatusPage(
   for (const [slug, vods] of vodGroups) {
     const displayName = slugToName.get(slug) ?? slug;
     vodSections += `
-      <tr><td colspan="6" style="padding:16px 10px 8px;font-weight:600;font-size:14px;color:#1E293B;border-bottom:1px solid #E2E8F0;">${esc(displayName)}<span style="font-weight:400;font-size:12px;color:#94A3B8;margin-left:8px;">${esc(slug)}</span></td></tr>
+      <tr><td colspan="6" style="padding:16px 10px 8px;font-weight:600;font-size:14px;color:var(--text-primary);border-bottom:1px solid var(--border-default);">${esc(displayName)}<span style="font-weight:400;font-size:12px;color:var(--text-tertiary);margin-left:8px;">${esc(slug)}</span></td></tr>
     `;
     for (const v of vods) {
       // Check if this VOD has an admin override
@@ -113,11 +109,11 @@ export function renderStatusPage(
       vodSections += `
         <tr>
           <td style="max-width:280px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${esc(v.stream_title || '—')}</td>
-          <td style="font-size:12px;color:#64748B;white-space:nowrap;">${esc(v.stream_date || '—')}</td>
+          <td style="font-size:12px;color:var(--text-secondary);white-space:nowrap;">${esc(v.stream_date || '—')}</td>
           <td style="text-align:center;font-size:13px;">${adminMatch ? adminMatch.song_count : v.song_count}</td>
           <td>${badge}</td>
-          <td style="font-size:12px;color:#64748B;white-space:nowrap;">${formatDate(v.submitted_at)}</td>
-          <td style="font-size:12px;color:#64748B;white-space:nowrap;">${formatDate(v.reviewed_at)}</td>
+          <td style="font-size:12px;color:var(--text-secondary);white-space:nowrap;">${formatDate(v.submitted_at)}</td>
+          <td style="font-size:12px;color:var(--text-secondary);white-space:nowrap;">${formatDate(v.reviewed_at)}</td>
         </tr>
       `;
     }
@@ -129,11 +125,11 @@ export function renderStatusPage(
         vodSections += `
         <tr>
           <td style="max-width:280px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${esc(a.title || '—')}</td>
-          <td style="font-size:12px;color:#64748B;white-space:nowrap;">${esc(a.date || '—')}</td>
+          <td style="font-size:12px;color:var(--text-secondary);white-space:nowrap;">${esc(a.date || '—')}</td>
           <td style="text-align:center;font-size:13px;">${a.song_count}</td>
           <td>${a.status === 'approved' ? statusBadge('admin_done') : statusBadge(a.status)}</td>
-          <td style="font-size:12px;color:#64748B;white-space:nowrap;">${formatDate(a.created_at)}</td>
-          <td style="font-size:12px;color:#64748B;white-space:nowrap;">—</td>
+          <td style="font-size:12px;color:var(--text-secondary);white-space:nowrap;">${formatDate(a.created_at)}</td>
+          <td style="font-size:12px;color:var(--text-secondary);white-space:nowrap;">—</td>
         </tr>
         `;
       }
@@ -147,18 +143,18 @@ export function renderStatusPage(
     if (!vodGroups.has(slug)) {
       const displayName = slugToName.get(slug) ?? slug;
       vodSections += `
-        <tr><td colspan="6" style="padding:16px 10px 8px;font-weight:600;font-size:14px;color:#1E293B;border-bottom:1px solid #E2E8F0;">${esc(displayName)}<span style="font-weight:400;font-size:12px;color:#94A3B8;margin-left:8px;">${esc(slug)}</span></td></tr>
+        <tr><td colspan="6" style="padding:16px 10px 8px;font-weight:600;font-size:14px;color:var(--text-primary);border-bottom:1px solid var(--border-default);">${esc(displayName)}<span style="font-weight:400;font-size:12px;color:var(--text-tertiary);margin-left:8px;">${esc(slug)}</span></td></tr>
       `;
     }
     for (const a of streams) {
       vodSections += `
         <tr>
           <td style="max-width:280px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${esc(a.title || '—')}</td>
-          <td style="font-size:12px;color:#64748B;white-space:nowrap;">${esc(a.date || '—')}</td>
+          <td style="font-size:12px;color:var(--text-secondary);white-space:nowrap;">${esc(a.date || '—')}</td>
           <td style="text-align:center;font-size:13px;">${a.song_count}</td>
           <td>${a.status === 'approved' ? statusBadge('admin_done') : statusBadge(a.status)}</td>
-          <td style="font-size:12px;color:#64748B;white-space:nowrap;">${formatDate(a.created_at)}</td>
-          <td style="font-size:12px;color:#64748B;white-space:nowrap;">—</td>
+          <td style="font-size:12px;color:var(--text-secondary);white-space:nowrap;">${formatDate(a.created_at)}</td>
+          <td style="font-size:12px;color:var(--text-secondary);white-space:nowrap;">—</td>
         </tr>
       `;
     }
@@ -184,6 +180,7 @@ export function renderStatusPage(
       --bg-page-mid: #F0F8FF;
       --bg-page-end: #E6E6FA;
       --bg-surface-glass: #FFFFFF66;
+      --bg-surface-frosted: #FFFFFF99;
       --text-primary: #1E293B;
       --text-secondary: #64748B;
       --text-tertiary: #94A3B8;
@@ -193,6 +190,8 @@ export function renderStatusPage(
       --radius-xl: 16px;
       --radius-2xl: 20px;
     }
+
+    ${DARK_MODE_CSS}
 
     * { box-sizing: border-box; margin: 0; padding: 0; }
     body {
@@ -278,28 +277,34 @@ export function renderStatusPage(
       font-size: 14px;
     }
   </style>
+  <script>${DARK_MODE_DETECT_SCRIPT}</script>
 </head>
 <body>
   <div style="max-width: 960px; margin: 0 auto; padding: 48px 16px;">
     <!-- Header -->
-    <div style="text-align: center; margin-bottom: 32px;">
-      <div style="display: inline-flex; align-items: center; gap: 12px; margin-bottom: 8px;">
-        <div style="
-          width: 40px; height: 40px; border-radius: var(--radius-lg);
-          background: linear-gradient(135deg, var(--accent-pink-light), var(--accent-blue-light));
-          display: flex; align-items: center; justify-content: center;
-        ">
-          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-            <circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="3"/>
-            <path d="M12 2a14.5 14.5 0 0 0 0 20 14.5 14.5 0 0 0 0-20"/>
-          </svg>
+    <div style="text-align: center; margin-bottom: 32px; position: relative;">
+      <div style="display: flex; justify-content: center; align-items: center; margin-bottom: 8px;">
+        <div style="display: inline-flex; align-items: center; gap: 12px;">
+          <div style="
+            width: 40px; height: 40px; border-radius: var(--radius-lg);
+            background: linear-gradient(135deg, var(--accent-pink-light), var(--accent-blue-light));
+            display: flex; align-items: center; justify-content: center;
+          ">
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="3"/>
+              <path d="M12 2a14.5 14.5 0 0 0 0 20 14.5 14.5 0 0 0 0-20"/>
+            </svg>
+          </div>
+          <span style="
+            font-size: 28px; font-weight: 700; letter-spacing: -0.5px;
+            background: linear-gradient(135deg, var(--accent-pink), var(--accent-blue));
+            -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+            background-clip: text;
+          ">Prism Nova</span>
         </div>
-        <span style="
-          font-size: 28px; font-weight: 700; letter-spacing: -0.5px;
-          background: linear-gradient(135deg, var(--accent-pink), var(--accent-blue));
-          -webkit-background-clip: text; -webkit-text-fill-color: transparent;
-          background-clip: text;
-        ">Prism Nova</span>
+        <div style="position: absolute; right: 0; top: 4px;">
+          ${themeToggleHTML()}
+        </div>
       </div>
       <p style="color: var(--text-secondary); font-size: 14px;">
         提交狀態總覽

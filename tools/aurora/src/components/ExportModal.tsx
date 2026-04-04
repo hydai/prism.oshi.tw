@@ -45,7 +45,7 @@ export default function ExportModal({ open, onClose, songs, vodUrl }: Props) {
             <Download size={18} className="text-[var(--accent-purple)]" />
             <h2 className="text-[15px] font-semibold text-[var(--text-primary)]">匯出時間戳</h2>
           </div>
-          <button onClick={onClose} className="p-1 rounded-lg hover:bg-black/5">
+          <button onClick={onClose} className="p-1 rounded-lg hover:bg-black/5 dark:hover:bg-white/[0.06]">
             <X size={18} />
           </button>
         </div>
@@ -54,7 +54,7 @@ export default function ExportModal({ open, onClose, songs, vodUrl }: Props) {
         <div className="px-5 py-4">
           <textarea
             readOnly
-            className="w-full h-64 rounded-lg border border-[var(--border-default)] bg-white/60 px-3 py-2 text-base font-mono outline-none resize-none"
+            className="w-full h-64 rounded-lg border border-[var(--border-default)] bg-white/60 dark:bg-white/[0.06] px-3 py-2 text-base font-mono outline-none resize-none"
             value={output}
             data-testid="export-textarea"
           />
@@ -67,7 +67,7 @@ export default function ExportModal({ open, onClose, songs, vodUrl }: Props) {
         <div className="flex items-center justify-end gap-2 px-5 py-3 border-t border-[var(--border-default)]">
           <button
             onClick={onClose}
-            className="px-4 py-2 rounded-lg text-[13px] font-medium text-[var(--text-secondary)] hover:bg-black/5"
+            className="px-4 py-2 rounded-lg text-[13px] font-medium text-[var(--text-secondary)] hover:bg-black/5 dark:hover:bg-white/[0.06]"
           >
             關閉
           </button>

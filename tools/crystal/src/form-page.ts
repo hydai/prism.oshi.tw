@@ -1,4 +1,5 @@
 import { html } from 'hono/html';
+import { DARK_MODE_CSS, DARK_MODE_DETECT_SCRIPT, themeToggleHTML } from './theme';
 
 export function renderFormPage(siteKey: string) {
   return html`<!doctype html>
@@ -10,6 +11,7 @@ export function renderFormPage(siteKey: string) {
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700;1,9..40,400&display=swap" rel="stylesheet" />
+  <script>${DARK_MODE_DETECT_SCRIPT}</script>
   <script src="https://challenges.cloudflare.com/turnstile/v0/api.js" async defer></script>
   <style>
     :root {
@@ -34,6 +36,8 @@ export function renderFormPage(siteKey: string) {
       --radius-xl: 16px;
       --radius-2xl: 20px;
     }
+
+    ${DARK_MODE_CSS}
 
     * { box-sizing: border-box; margin: 0; padding: 0; }
     body {
@@ -184,7 +188,7 @@ export function renderFormPage(siteKey: string) {
   <div style="max-width: 640px; margin: 0 auto; padding: 48px 16px;">
     <!-- Header -->
     <div style="text-align: center; margin-bottom: 32px;">
-      <div style="display: inline-flex; align-items: center; gap: 12px; margin-bottom: 8px;">
+      <div style="display: flex; align-items: center; justify-content: center; gap: 12px; margin-bottom: 8px; position: relative;">
         <div style="
           width: 40px; height: 40px; border-radius: var(--radius-lg);
           background: linear-gradient(135deg, var(--accent-purple-light), var(--accent-blue-light));
@@ -202,6 +206,9 @@ export function renderFormPage(siteKey: string) {
           -webkit-background-clip: text; -webkit-text-fill-color: transparent;
           background-clip: text;
         ">Prism Crystal</span>
+        <div style="position: absolute; right: 0; top: 50%; transform: translateY(-50%);">
+          ${themeToggleHTML()}
+        </div>
       </div>
       <p style="color: var(--text-secondary); font-size: 14px;">
         回報問題或建議新功能，幫助我們讓 Prism 更好
@@ -267,7 +274,7 @@ export function renderFormPage(siteKey: string) {
         </div>
 
         <!-- Turnstile -->
-        <div class="cf-turnstile" data-sitekey="${siteKey}" data-theme="light"></div>
+        <div class="cf-turnstile" data-sitekey="${siteKey}" data-theme="auto"></div>
 
         <!-- Submit -->
         <button type="submit" class="btn-submit" id="submit-btn">送出回報</button>

@@ -1,4 +1,5 @@
 import { html } from 'hono/html';
+import { DARK_MODE_CSS, DARK_MODE_DETECT_SCRIPT, themeToggleHTML } from './theme';
 
 export function renderPage(siteKey: string) {
   return html`<!doctype html>
@@ -18,6 +19,7 @@ export function renderPage(siteKey: string) {
       --accent-pink-light: #F472B6;
       --accent-blue: #3B82F6;
       --accent-blue-light: #60A5FA;
+      --accent-purple: #8B5CF6;
       --bg-page-start: #FFF0F5;
       --bg-page-mid: #F0F8FF;
       --bg-page-end: #E6E6FA;
@@ -33,6 +35,8 @@ export function renderPage(siteKey: string) {
       --radius-xl: 16px;
       --radius-2xl: 20px;
     }
+
+    ${DARK_MODE_CSS}
 
     * { box-sizing: border-box; margin: 0; padding: 0; }
     body {
@@ -110,35 +114,41 @@ export function renderPage(siteKey: string) {
       font-size: 13px;
     }
     .cross-links a {
-      color: #8B5CF6;
+      color: var(--accent-purple);
       text-decoration: none;
       transition: opacity 0.2s;
     }
     .cross-links a:hover { opacity: 0.7; }
   </style>
+  <script>${DARK_MODE_DETECT_SCRIPT}</script>
 </head>
 <body>
 
   <div style="max-width: 640px; margin: 0 auto; padding: 48px 16px;">
     <!-- Header -->
-    <div style="text-align: center; margin-bottom: 32px;">
-      <div style="display: inline-flex; align-items: center; gap: 12px; margin-bottom: 8px;">
-        <div style="
-          width: 40px; height: 40px; border-radius: var(--radius-lg);
-          background: linear-gradient(135deg, var(--accent-pink-light), var(--accent-blue-light));
-          display: flex; align-items: center; justify-content: center;
-        ">
-          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-            <circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="3"/>
-            <path d="M12 2a14.5 14.5 0 0 0 0 20 14.5 14.5 0 0 0 0-20"/>
-          </svg>
+    <div style="text-align: center; margin-bottom: 32px; position: relative;">
+      <div style="display: flex; justify-content: center; align-items: center; margin-bottom: 8px;">
+        <div style="display: inline-flex; align-items: center; gap: 12px;">
+          <div style="
+            width: 40px; height: 40px; border-radius: var(--radius-lg);
+            background: linear-gradient(135deg, var(--accent-pink-light), var(--accent-blue-light));
+            display: flex; align-items: center; justify-content: center;
+          ">
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="3"/>
+              <path d="M12 2a14.5 14.5 0 0 0 0 20 14.5 14.5 0 0 0 0-20"/>
+            </svg>
+          </div>
+          <span style="
+            font-size: 28px; font-weight: 700; letter-spacing: -0.5px;
+            background: linear-gradient(135deg, var(--accent-pink), var(--accent-blue));
+            -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+            background-clip: text;
+          ">Prism Nova</span>
         </div>
-        <span style="
-          font-size: 28px; font-weight: 700; letter-spacing: -0.5px;
-          background: linear-gradient(135deg, var(--accent-pink), var(--accent-blue));
-          -webkit-background-clip: text; -webkit-text-fill-color: transparent;
-          background-clip: text;
-        ">Prism Nova</span>
+        <div style="position: absolute; right: 0; top: 4px;">
+          ${themeToggleHTML()}
+        </div>
       </div>
       <p style="color: var(--text-secondary); font-size: 14px;">
         提交你喜愛的 VTuber，讓我們為他／她建立 Prism 頁面
@@ -223,7 +233,7 @@ export function renderPage(siteKey: string) {
 
         <!-- Turnstile -->
         <div style="display: flex; justify-content: center;">
-          <div class="cf-turnstile" data-sitekey="${siteKey}" data-theme="light"></div>
+          <div class="cf-turnstile" data-sitekey="${siteKey}" data-theme="auto"></div>
         </div>
 
         <!-- Submit -->
@@ -282,13 +292,13 @@ export function renderPage(siteKey: string) {
           .then(data => {
             urlCheck.style.display = 'block';
             if (data.exists && data.canResubmit) {
-              urlCheck.style.color = '#2563EB';
+              urlCheck.className = 'check-resubmit';
               urlCheck.textContent = '此頻道先前的提交被拒絕，你可以重新提交';
             } else if (data.exists) {
-              urlCheck.style.color = '#D97706';
+              urlCheck.className = 'check-exists';
               urlCheck.textContent = '此頻道已於 ' + data.submittedAt + ' 提交（狀態：' + data.status + '）';
             } else {
-              urlCheck.style.color = '#059669';
+              urlCheck.className = 'check-ok';
               urlCheck.textContent = '此頻道尚未被提交';
             }
           })
@@ -299,7 +309,7 @@ export function renderPage(siteKey: string) {
         lastFetchedUrl = url;
 
         urlCheck.style.display = 'block';
-        urlCheck.style.color = 'var(--text-tertiary)';
+        urlCheck.className = 'check-loading';
         urlCheck.textContent = '正在取得頻道資訊…';
 
         fetch('/api/channel-info?url=' + encoded)
@@ -324,6 +334,7 @@ export function renderPage(siteKey: string) {
         submitBtn.disabled = true;
         submitBtn.textContent = '提交中…';
         resultDiv.style.display = 'none';
+        resultDiv.className = '';
 
         const fd = new FormData(form);
         const turnstileInput = form.querySelector('[name="cf-turnstile-response"]');
@@ -352,10 +363,8 @@ export function renderPage(siteKey: string) {
           });
           const data = await res.json();
 
-          resultDiv.style.display = 'block';
           if (res.ok) {
-            resultDiv.style.background = '#F0FDF4';
-            resultDiv.style.color = '#15803D';
+            resultDiv.className = 'result-msg result-success';
             resultDiv.textContent = data.resubmitted
               ? '重新提交成功！ID: ' + data.id + '。將再次進入審核流程。'
               : '提交成功！ID: ' + data.id + '。感謝你的推薦！';
@@ -363,18 +372,14 @@ export function renderPage(siteKey: string) {
             nameManuallyEdited = false;
             if (window.turnstile) turnstile.reset();
           } else if (res.status === 409) {
-            resultDiv.style.background = '#FFFBEB';
-            resultDiv.style.color = '#B45309';
+            resultDiv.className = 'result-msg result-warning';
             resultDiv.textContent = '此頻道已於 ' + data.submittedAt + ' 提交過（狀態：' + data.status + '）';
           } else {
-            resultDiv.style.background = '#FEF2F2';
-            resultDiv.style.color = '#DC2626';
+            resultDiv.className = 'result-msg result-error';
             resultDiv.textContent = data.error || '提交失敗，請稍後再試';
           }
         } catch {
-          resultDiv.style.display = 'block';
-          resultDiv.style.background = '#FEF2F2';
-          resultDiv.style.color = '#DC2626';
+          resultDiv.className = 'result-msg result-error';
           resultDiv.textContent = '網路錯誤，請檢查連線後再試';
         } finally {
           submitBtn.disabled = false;

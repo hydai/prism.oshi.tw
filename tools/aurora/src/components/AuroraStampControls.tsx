@@ -13,7 +13,7 @@ interface Props {
 const btnBase =
   'flex items-center gap-1.5 px-3 py-2 rounded-lg text-[13px] font-medium focus:outline-none focus:ring-2 focus:ring-[var(--accent-purple)] min-h-[44px]';
 const btnSecondary =
-  'bg-white/60 border border-[var(--border-default)] text-[var(--text-secondary)] hover:bg-white/80';
+  'bg-white/60 dark:bg-white/[0.06] border border-[var(--border-default)] text-[var(--text-secondary)] hover:bg-white/80 dark:hover:bg-white/[0.10]';
 const btnDisabled = 'opacity-40 cursor-not-allowed';
 
 export default function AuroraStampControls({

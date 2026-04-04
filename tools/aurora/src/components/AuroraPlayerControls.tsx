@@ -24,7 +24,7 @@ export default function AuroraPlayerControls({
     <div className="flex items-center justify-center gap-3">
       <button
         onClick={onSeekBackward}
-        className="flex items-center justify-center w-10 h-10 rounded-full bg-white/60 border border-[var(--border-default)] text-[var(--text-secondary)] hover:bg-white/80 focus:outline-none focus:ring-2 focus:ring-[var(--accent-purple)]"
+        className="flex items-center justify-center w-10 h-10 rounded-full bg-white/60 dark:bg-white/[0.06] border border-[var(--border-default)] text-[var(--text-secondary)] hover:bg-white/80 dark:hover:bg-white/[0.10] focus:outline-none focus:ring-2 focus:ring-[var(--accent-purple)]"
         style={{ touchAction: 'manipulation' }}
         title="倒退 5 秒 (←)"
         data-testid="seek-backward-button"
@@ -42,7 +42,7 @@ export default function AuroraPlayerControls({
       </button>
       <button
         onClick={onSeekForward}
-        className="flex items-center justify-center w-10 h-10 rounded-full bg-white/60 border border-[var(--border-default)] text-[var(--text-secondary)] hover:bg-white/80 focus:outline-none focus:ring-2 focus:ring-[var(--accent-purple)]"
+        className="flex items-center justify-center w-10 h-10 rounded-full bg-white/60 dark:bg-white/[0.06] border border-[var(--border-default)] text-[var(--text-secondary)] hover:bg-white/80 dark:hover:bg-white/[0.10] focus:outline-none focus:ring-2 focus:ring-[var(--accent-purple)]"
         style={{ touchAction: 'manipulation' }}
         title="快進 5 秒 (→)"
         data-testid="seek-forward-button"
