@@ -12,6 +12,7 @@ import {
   MessageSquare,
   Video,
 } from 'lucide-react';
+import ThemeToggle from './components/ThemeToggle';
 
 const streamers = (registryData.streamers as StreamerConfig[]).filter(
   (s) => s.enabled
@@ -71,6 +72,9 @@ export default function HomePage() {
           >
             Prism
           </span>
+          <div className="ml-auto">
+            <ThemeToggle />
+          </div>
         </div>
 
         {/* Search */}
@@ -194,6 +198,7 @@ export default function HomePage() {
             </span>
           </div>
           <div className="flex items-center gap-2">
+            <ThemeToggle />
             <a
               href="https://crystal.oshi.tw"
               target="_blank"

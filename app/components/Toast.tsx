@@ -32,11 +32,14 @@ export default function Toast({ message, show, onHide }: ToastProps) {
         isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 -translate-y-4'
       }`}
     >
-      <div className="bg-white/95 backdrop-blur-xl border border-white/60 shadow-2xl shadow-pink-500/20 rounded-full px-6 py-3 flex items-center gap-3">
-        <div className="w-6 h-6 rounded-full bg-gradient-to-r from-pink-400 to-blue-400 flex items-center justify-center flex-shrink-0">
+      <div
+        className="backdrop-blur-xl shadow-2xl rounded-full px-6 py-3 flex items-center gap-3"
+        style={{ background: 'var(--bg-surface-frosted)', border: '1px solid var(--border-glass)' }}
+      >
+        <div className="w-6 h-6 rounded-full flex items-center justify-center flex-shrink-0" style={{ background: 'linear-gradient(135deg, var(--accent-pink-light), var(--accent-blue-light))' }}>
           <CheckCircle className="w-4 h-4 text-white" />
         </div>
-        <span className="text-slate-800 font-bold text-sm">{message}</span>
+        <span className="font-bold text-sm" style={{ color: 'var(--text-primary)' }}>{message}</span>
       </div>
     </div>
   );

@@ -1,7 +1,8 @@
 'use client';
 
-import { ReactNode, useEffect } from 'react';
+import { ReactNode, useEffect, useState } from 'react';
 import { StreamerConfig, StreamerTheme } from '../../lib/types';
+import { deriveDarkTheme } from '../../lib/theme-utils';
 import { StreamerProvider } from '../contexts/StreamerContext';
 import { PlayerProvider } from '../contexts/PlayerContext';
 import PerStreamerProviders from '../components/PerStreamerProviders';
@@ -28,6 +29,10 @@ function themeToCSS(theme: StreamerTheme): Record<string, string> {
   };
 }
 
+function getThemeVars(theme: StreamerTheme, isDark: boolean): Record<string, string> {
+  return isDark ? deriveDarkTheme(theme) : themeToCSS(theme);
+}
+
 export default function StreamerShell({
   config,
   children,
@@ -35,12 +40,26 @@ export default function StreamerShell({
   config: StreamerConfig;
   children: ReactNode;
 }) {
-  const cssVars = themeToCSS(config.theme);
+  const [isDark, setIsDark] = useState(false);
+
+  // Watch for dark mode changes on <html> element
+  useEffect(() => {
+    const html = document.documentElement;
+    setIsDark(html.classList.contains('dark'));
+
+    const observer = new MutationObserver(() => {
+      setIsDark(html.classList.contains('dark'));
+    });
+    observer.observe(html, { attributes: true, attributeFilter: ['class'] });
+    return () => observer.disconnect();
+  }, []);
+
+  const cssVars = getThemeVars(config.theme, isDark);
 
   // Broadcast theme CSS vars to document.body so fixed-position elements
   // (MiniPlayer, QueuePanel, NowPlayingModal) inherit the current page's theme
   useEffect(() => {
-    const vars = themeToCSS(config.theme);
+    const vars = getThemeVars(config.theme, isDark);
     for (const [key, value] of Object.entries(vars)) {
       document.body.style.setProperty(key, value);
     }
@@ -49,7 +68,7 @@ export default function StreamerShell({
         document.body.style.removeProperty(key);
       }
     };
-  }, [config.theme]);
+  }, [config.theme, isDark]);
 
   return (
     <div style={cssVars as React.CSSProperties}>

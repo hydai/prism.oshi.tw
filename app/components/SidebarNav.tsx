@@ -14,6 +14,7 @@ import {
   ListMusic,
 } from 'lucide-react';
 import { useStreamer } from '../contexts/StreamerContext';
+import ThemeToggle from './ThemeToggle';
 
 interface SidebarNavProps {
   activePage: 'home' | 'now-playing';
@@ -63,7 +64,7 @@ export default function SidebarNav({
 
   const navItemClass =
     'w-full flex items-center gap-3 px-3 py-2.5 rounded-radius-lg font-medium text-sm transition-all';
-  const inactiveNavItemClass = `${navItemClass} hover:bg-white/40`;
+  const inactiveNavItemClass = `${navItemClass} hover:bg-surface-muted`;
 
   return (
     <aside
@@ -76,20 +77,23 @@ export default function SidebarNav({
       }}
     >
       {/* ── 1. Logo Area ── */}
-      <Link href="/" className="px-5 py-5 flex items-center gap-3 flex-shrink-0">
-        <div
-          className="w-9 h-9 rounded-radius-lg flex items-center justify-center flex-shrink-0"
-          style={{ background: 'linear-gradient(135deg, var(--accent-pink-light), var(--accent-blue-light))' }}
-        >
-          <Disc3 className="w-5 h-5 text-white" />
-        </div>
-        <span
-          className="font-bold text-xl tracking-tight bg-clip-text text-transparent"
-          style={{ backgroundImage: 'linear-gradient(135deg, var(--accent-pink), var(--accent-blue))' }}
-        >
-          {brandName}
-        </span>
-      </Link>
+      <div className="px-5 py-5 flex items-center gap-3 flex-shrink-0">
+        <Link href="/" className="flex items-center gap-3 flex-1 min-w-0">
+          <div
+            className="w-9 h-9 rounded-radius-lg flex items-center justify-center flex-shrink-0"
+            style={{ background: 'linear-gradient(135deg, var(--accent-pink-light), var(--accent-blue-light))' }}
+          >
+            <Disc3 className="w-5 h-5 text-white" />
+          </div>
+          <span
+            className="font-bold text-xl tracking-tight bg-clip-text text-transparent"
+            style={{ backgroundImage: 'linear-gradient(135deg, var(--accent-pink), var(--accent-blue))' }}
+          >
+            {brandName}
+          </span>
+        </Link>
+        <ThemeToggle />
+      </div>
 
       {/* ── 2. Search Slot ── */}
       {searchSlot}
@@ -168,7 +172,7 @@ export default function SidebarNav({
           <button
             onClick={onViewLikedSongs}
             className={likedSongsCount > 0
-              ? "w-full flex items-center justify-between px-3 py-2.5 rounded-radius-lg font-medium text-sm transition-all hover:bg-white/40"
+              ? "w-full flex items-center justify-between px-3 py-2.5 rounded-radius-lg font-medium text-sm transition-all hover:bg-surface-muted"
               : inactiveNavItemClass}
             style={inactiveStyle}
             data-testid="view-liked-songs-button"
@@ -191,7 +195,7 @@ export default function SidebarNav({
           <button
             onClick={onViewRecentlyPlayed}
             className={recentlyPlayedCount > 0
-              ? "w-full flex items-center justify-between px-3 py-2.5 rounded-radius-lg font-medium text-sm transition-all hover:bg-white/40"
+              ? "w-full flex items-center justify-between px-3 py-2.5 rounded-radius-lg font-medium text-sm transition-all hover:bg-surface-muted"
               : inactiveNavItemClass}
             style={inactiveStyle}
             data-testid="view-recently-played-button"
@@ -227,7 +231,7 @@ export default function SidebarNav({
           {onViewPlaylists && playlistCount > 0 && (
             <button
               onClick={onViewPlaylists}
-              className="w-full flex items-center justify-between px-3 py-2.5 rounded-radius-lg font-medium text-sm transition-all hover:bg-white/40"
+              className="w-full flex items-center justify-between px-3 py-2.5 rounded-radius-lg font-medium text-sm transition-all hover:bg-surface-muted"
               style={inactiveStyle}
               data-testid="view-playlists-button"
             >

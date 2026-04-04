@@ -91,6 +91,53 @@
   --icon-xl: 28px;
 }
 
+/* ===== Dark Mode Overrides ===== */
+html.dark {
+  color-scheme: dark;
+
+  /* === Colors: Accent (brighter to pop on dark) === */
+  --accent-pink: #F472B6;
+  --accent-pink-dark: #EC4899;
+  --accent-pink-light: #F9A8D4;
+  --accent-blue: #60A5FA;
+  --accent-blue-light: #93C5FD;
+  --accent-purple: #C084FC;
+
+  /* === Colors: Page Background (deep gradient) === */
+  --bg-page-start: #0F0A1A;
+  --bg-page-mid: #0D1117;
+  --bg-page-end: #0A0E1A;
+
+  /* === Colors: Surface === */
+  --bg-surface: #1A1B2E;
+  --bg-surface-frosted: rgba(26, 27, 46, 0.85);
+  --bg-surface-glass: rgba(30, 31, 52, 0.60);
+  --bg-surface-muted: rgba(45, 46, 72, 0.50);
+
+  /* === Colors: Overlay === */
+  --bg-overlay: rgba(15, 10, 26, 0.85);
+
+  /* === Colors: Accent Background === */
+  --bg-accent-pink: rgba(244, 114, 182, 0.10);
+  --bg-accent-pink-muted: rgba(244, 114, 182, 0.15);
+  --bg-accent-blue: rgba(96, 165, 250, 0.10);
+  --bg-accent-blue-muted: rgba(96, 165, 250, 0.15);
+
+  /* === Colors: Text === */
+  --text-primary: #E8EAF0;
+  --text-secondary: #9CA3AF;
+  --text-tertiary: #6B7280;
+  --text-muted: #4B5563;
+  --text-on-accent: #FFFFFF;
+
+  /* === Colors: Border === */
+  --border-default: rgba(255, 255, 255, 0.10);
+  --border-glass: rgba(255, 255, 255, 0.08);
+  --border-table: rgba(255, 255, 255, 0.05);
+  --border-accent-pink: rgba(244, 114, 182, 0.25);
+  --border-accent-blue: rgba(147, 197, 253, 0.25);
+}
+
 /* ===== Page Background: diagonal gradient ===== */
 body {
   background: linear-gradient(
@@ -127,6 +174,13 @@ body {
 
 .custom-scrollbar::-webkit-scrollbar-thumb:hover {
   background: rgba(0, 0, 0, 0.3);
+}
+
+html.dark .custom-scrollbar::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.15);
+}
+html.dark .custom-scrollbar::-webkit-scrollbar-thumb:hover {
+  background: rgba(255, 255, 255, 0.25);
 }
 
 /* Mini player positioning with safe area support */

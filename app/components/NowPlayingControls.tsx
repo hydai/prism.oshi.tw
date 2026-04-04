@@ -40,7 +40,7 @@ export default function NowPlayingControls({ size }: NowPlayingControlsProps) {
         className="transition-all hover:scale-110"
         aria-label="Shuffle"
         data-testid="np-shuffle-button"
-        style={{ color: shuffleOn ? 'var(--accent-pink)' : '#94A3B8' }}
+        style={{ color: shuffleOn ? 'var(--accent-pink)' : 'var(--text-tertiary)' }}
       >
         <Shuffle style={{ width: `${shuffleSize}px`, height: `${shuffleSize}px` }} />
       </button>
@@ -93,7 +93,7 @@ export default function NowPlayingControls({ size }: NowPlayingControlsProps) {
         className="transition-all hover:scale-110"
         aria-label="Repeat"
         data-testid="np-repeat-button"
-        style={{ color: repeatMode !== 'off' ? 'var(--accent-pink)' : '#94A3B8' }}
+        style={{ color: repeatMode !== 'off' ? 'var(--accent-pink)' : 'var(--text-tertiary)' }}
       >
         {repeatMode === 'one' ? (
           <Repeat1 style={{ width: `${shuffleSize}px`, height: `${shuffleSize}px` }} />

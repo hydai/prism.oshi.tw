@@ -98,7 +98,7 @@ export default function NowPlayingPage() {
         data-testid="now-playing-page"
         className="min-h-screen flex items-center justify-center"
         style={{
-          background: 'linear-gradient(180deg, var(--bg-page-start), #F0F8FF, var(--bg-page-end))',
+          background: 'linear-gradient(180deg, var(--bg-page-start), var(--bg-page-mid), var(--bg-page-end))',
         }}
       >
         <div className="text-center" style={{ padding: '32px' }}>
@@ -140,7 +140,7 @@ export default function NowPlayingPage() {
       data-testid="now-playing-page"
       className="flex min-h-screen"
       style={{
-        background: 'linear-gradient(180deg, var(--bg-page-start), #F0F8FF, var(--bg-page-end))',
+        background: 'linear-gradient(180deg, var(--bg-page-start), var(--bg-page-mid), var(--bg-page-end))',
       }}
     >
       {/* Desktop sidebar */}
@@ -193,7 +193,7 @@ export default function NowPlayingPage() {
               {currentTrack.title}
             </h1>
             <div className="flex items-center justify-center" style={{ gap: '6px', marginTop: '4px' }}>
-              <span style={{ fontSize: '16px', color: '#64748B' }}>
+              <span style={{ fontSize: '16px', color: 'var(--text-secondary)' }}>
                 {currentTrack.originalArtist}
               </span>
               <button
@@ -265,7 +265,7 @@ export default function NowPlayingPage() {
             {currentTrack.title}
           </h1>
           <div className="flex items-center justify-center" style={{ gap: '6px', marginTop: '6px' }}>
-            <span style={{ fontSize: '16px', color: '#64748B' }}>
+            <span style={{ fontSize: '16px', color: 'var(--text-secondary)' }}>
               {currentTrack.originalArtist}
             </span>
             <button

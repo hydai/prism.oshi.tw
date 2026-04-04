@@ -26,7 +26,7 @@ export default function UpNextSection() {
         style={{
           fontSize: '13px',
           fontWeight: 700,
-          color: '#94A3B8',
+          color: 'var(--text-tertiary)',
           letterSpacing: '0.05em',
           textTransform: 'uppercase',
           marginBottom: '12px',
@@ -42,7 +42,7 @@ export default function UpNextSection() {
             className="flex items-center"
             style={{
               borderRadius: '12px',
-              background: '#FFFFFF66',
+              background: 'var(--bg-surface-glass)',
               backdropFilter: 'blur(8px)',
               padding: '12px 16px',
               gap: '12px',
@@ -55,7 +55,7 @@ export default function UpNextSection() {
                 flexShrink: 0,
                 fontSize: '14px',
                 fontWeight: 500,
-                color: '#94A3B8',
+                color: 'var(--text-tertiary)',
                 textAlign: 'center',
               }}
             >
@@ -72,7 +72,7 @@ export default function UpNextSection() {
               </div>
               <div
                 className="truncate"
-                style={{ fontSize: '13px', color: '#64748B' }}
+                style={{ fontSize: '13px', color: 'var(--text-secondary)' }}
               >
                 {track.originalArtist}
               </div>
@@ -85,7 +85,7 @@ export default function UpNextSection() {
                 flexShrink: 0,
                 textAlign: 'right',
                 fontSize: '13px',
-                color: '#64748B',
+                color: 'var(--text-secondary)',
                 fontFamily: 'monospace',
               }}
             >
@@ -101,7 +101,7 @@ export default function UpNextSection() {
             textAlign: 'center',
             marginTop: '8px',
             fontSize: '13px',
-            color: '#94A3B8',
+            color: 'var(--text-tertiary)',
           }}
         >
           +{queue.length - 5} more

@@ -241,9 +241,8 @@ export default function MiniPlayer() {
 
             {/* Track info */}
             <div className="min-w-0 flex-1">
-              {/* Song title — keep .font-bold.text-slate-800 for test compatibility */}
               <div
-                className="font-bold text-slate-800 truncate"
+                className="font-bold truncate"
                 style={{ fontSize: 'var(--font-size-sm)', fontWeight: 500, color: 'var(--text-primary)' }}
               >
                 {currentTrack.title}

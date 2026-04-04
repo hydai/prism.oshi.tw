@@ -19,6 +19,7 @@ import SidebarNav from '../components/SidebarNav';
 import TimelineRow from '../components/TimelineRow';
 import SongCard from '../components/SongCard';
 import MobileSearchRow from '../components/MobileSearchRow';
+import ThemeToggle from '../components/ThemeToggle';
 
 interface Performance {
   id: string;
@@ -516,7 +517,7 @@ export default function Home() {
               key={stream.id}
               data-testid="stream-filter-button"
               onClick={() => setSelectedStreamId(stream.id === selectedStreamId ? null : stream.id)}
-              className="w-full text-left px-3 py-2 rounded-radius-lg text-sm font-medium transition-all hover:bg-white/40"
+              className="w-full text-left px-3 py-2 rounded-radius-lg text-sm font-medium transition-all hover:bg-surface-muted"
               style={
                 selectedStreamId === stream.id
                   ? { color: 'var(--accent-pink)', background: 'var(--bg-accent-pink)' }
@@ -533,7 +534,7 @@ export default function Home() {
       {/* Mobile TopBar — 56px + safe area, fixed top, mobile only */}
       <div
         data-testid="mobile-topbar"
-        className="lg:hidden fixed top-0 left-0 right-0 z-50 flex items-center justify-center"
+        className="lg:hidden fixed top-0 left-0 right-0 z-50 flex items-center justify-between"
         style={{
           height: '56px',
           padding: 'var(--safe-area-top) 20px 0 20px',
@@ -549,6 +550,7 @@ export default function Home() {
         >
           {streamerData.displayName}
         </Link>
+        <ThemeToggle />
       </div>
 
       {/* Main Content */}
@@ -614,7 +616,7 @@ export default function Home() {
             <div
               className="flex items-center gap-1.5"
               style={{
-                background: '#FDF2F8',
+                background: 'var(--bg-accent-pink)',
                 borderRadius: 'var(--radius-pill)',
                 padding: '4px 12px 4px 8px',
                 color: 'var(--accent-pink)',
@@ -904,12 +906,12 @@ export default function Home() {
               </div>
             </div>
 
-            {/* Bottom gradient overlay: white fading to transparent from bottom up */}
+            {/* Bottom gradient overlay: fading to transparent from bottom up */}
             <div
               className="absolute bottom-0 left-0 right-0 pointer-events-none"
               style={{
                 height: '60px',
-                background: 'linear-gradient(to top, rgba(255,255,255,0.6) 0%, transparent 100%)',
+                background: 'linear-gradient(to top, var(--bg-surface-glass) 0%, transparent 100%)',
               }}
             />
           </header>
@@ -976,7 +978,7 @@ export default function Home() {
               data-testid="mobile-follow-button"
               className="flex items-center justify-center flex-shrink-0 font-semibold transition-all hover:opacity-80"
               style={{
-                border: '1px solid #E2E8F0',
+                border: '1px solid var(--border-default)',
                 borderRadius: '20px',
                 padding: '8px 24px',
                 color: 'var(--text-secondary)',

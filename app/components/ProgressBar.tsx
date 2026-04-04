@@ -48,7 +48,7 @@ export default function ProgressBar({
         ref={barRef}
         style={{
           height: `${height}px`,
-          background: '#E2E8F0',
+          background: 'var(--bg-surface-muted)',
           borderRadius: '16px 16px 0 0',
           overflow: 'hidden',
           touchAction: 'none',
@@ -102,7 +102,7 @@ export default function ProgressBar({
           width: `${height * 3}px`,
           height: `${height * 3}px`,
           borderRadius: '50%',
-          background: 'white',
+          background: 'var(--bg-surface)',
           border: '2px solid var(--accent-pink-light)',
         }}
       />

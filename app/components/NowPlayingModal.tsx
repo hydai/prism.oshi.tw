@@ -90,15 +90,20 @@ export default function NowPlayingModal() {
       onClick={() => setShowModal(false)}
     >
       <div
-        className="bg-white/95 backdrop-blur-xl rounded-3xl shadow-2xl max-w-4xl w-full max-h-[90vh] overflow-auto"
+        className="backdrop-blur-xl rounded-3xl shadow-2xl max-w-4xl w-full max-h-[90vh] overflow-auto"
+        style={{ background: 'var(--bg-surface-frosted)' }}
         onClick={(e) => e.stopPropagation()}
       >
         {/* Header */}
-        <div className="sticky top-0 z-10 bg-white/95 backdrop-blur-xl border-b border-slate-200/60 px-6 py-4 flex items-center justify-between">
-          <h2 className="text-lg font-bold text-slate-800">正在播放</h2>
+        <div
+          className="sticky top-0 z-10 backdrop-blur-xl px-6 py-4 flex items-center justify-between"
+          style={{ background: 'var(--bg-surface-frosted)', borderBottom: '1px solid var(--border-default)' }}
+        >
+          <h2 className="text-lg font-bold" style={{ color: 'var(--text-primary)' }}>正在播放</h2>
           <button
             onClick={() => setShowModal(false)}
-            className="text-slate-500 hover:text-slate-800 transition-colors p-2 hover:bg-slate-100 rounded-full"
+            className="transition-colors p-2 rounded-full"
+            style={{ color: 'var(--text-tertiary)' }}
             aria-label="Minimize"
           >
             <ChevronDown className="w-6 h-6" />
@@ -118,8 +123,8 @@ export default function NowPlayingModal() {
 
           {/* Track Info */}
           <div className="mb-6 text-center">
-            <h3 className="text-2xl font-bold text-slate-800 mb-2">{currentTrack.title}</h3>
-            <p className="text-lg text-slate-500">{currentTrack.originalArtist}</p>
+            <h3 className="text-2xl font-bold mb-2" style={{ color: 'var(--text-primary)' }}>{currentTrack.title}</h3>
+            <p className="text-lg" style={{ color: 'var(--text-secondary)' }}>{currentTrack.originalArtist}</p>
             <button
               onClick={handleToggleLike}
               className="mt-3 transition-all transform hover:scale-110"
@@ -138,7 +143,7 @@ export default function NowPlayingModal() {
               onSeek={handleSeek}
               height={8}
             />
-            <div className="flex justify-between text-xs text-slate-500 mt-2 font-mono">
+            <div className="flex justify-between text-xs mt-2 font-mono" style={{ color: 'var(--text-tertiary)' }}>
               <span>{formatTime(trackCurrentTime)}</span>
               <span>{hasKnownDuration ? formatTime(trackDuration) : '--:--'}</span>
             </div>
@@ -153,12 +158,13 @@ export default function NowPlayingModal() {
               data-testid="modal-shuffle-button"
               style={{ color: shuffleOn ? 'var(--accent-pink)' : undefined }}
             >
-              <Shuffle className={`w-6 h-6 ${shuffleOn ? '' : 'text-slate-600 hover:text-slate-800'}`} />
+              <Shuffle className="w-6 h-6" style={shuffleOn ? undefined : { color: 'var(--text-tertiary)' }} />
             </button>
 
             <button
               onClick={previous}
-              className="text-slate-600 hover:text-slate-800 transition-all transform hover:scale-110"
+              className="transition-all transform hover:scale-110"
+              style={{ color: 'var(--text-tertiary)' }}
               aria-label="Previous"
             >
               <SkipBack className="w-8 h-8" />
@@ -178,7 +184,8 @@ export default function NowPlayingModal() {
 
             <button
               onClick={next}
-              className="text-slate-600 hover:text-slate-800 transition-all transform hover:scale-110"
+              className="transition-all transform hover:scale-110"
+              style={{ color: 'var(--text-tertiary)' }}
               aria-label="Next"
             >
               <SkipForward className="w-8 h-8" />
@@ -193,7 +200,7 @@ export default function NowPlayingModal() {
             >
               {repeatMode === 'one'
                 ? <Repeat1 className="w-6 h-6" />
-                : <Repeat className={`w-6 h-6 ${repeatMode === 'off' ? 'text-slate-600 hover:text-slate-800' : ''}`} />
+                : <Repeat className="w-6 h-6" style={repeatMode === 'off' ? { color: 'var(--text-tertiary)' } : undefined} />
               }
             </button>
           </div>
@@ -204,9 +211,9 @@ export default function NowPlayingModal() {
           </div>
 
           {/* Next Up — queue preview */}
-          <div className="mt-8 border-t border-slate-200/60 pt-6">
+          <div className="mt-8 pt-6" style={{ borderTop: '1px solid var(--border-default)' }}>
             <div className="flex items-center justify-between mb-4">
-              <h4 className="text-sm font-semibold text-slate-600 uppercase tracking-wider">Next Up</h4>
+              <h4 className="text-sm font-semibold uppercase tracking-wider" style={{ color: 'var(--text-secondary)' }}>Next Up</h4>
               {queue.length > 0 && (
                 <button
                   onClick={() => {
@@ -221,14 +228,14 @@ export default function NowPlayingModal() {
               )}
             </div>
             {queue.length === 0 ? (
-              <p className="text-sm text-slate-400 text-center py-4">佇列中沒有歌曲</p>
+              <p className="text-sm text-center py-4" style={{ color: 'var(--text-tertiary)' }}>佇列中沒有歌曲</p>
             ) : (
               <div className="flex flex-col">
                 {queue.slice(0, 5).map((track, index) => (
                   <div
                     key={track.id}
                     className="flex items-center gap-3 py-2"
-                    style={{ borderBottom: index < Math.min(queue.length, 5) - 1 ? '1px solid rgba(0,0,0,0.06)' : undefined }}
+                    style={{ borderBottom: index < Math.min(queue.length, 5) - 1 ? '1px solid var(--border-default)' : undefined }}
                   >
                     <AlbumArt
                       src={track.albumArtUrl}
@@ -236,8 +243,8 @@ export default function NowPlayingModal() {
                       size={40}
                     />
                     <div className="min-w-0 flex-1">
-                      <div className="text-sm font-medium text-slate-800 truncate">{track.title}</div>
-                      <div className="text-xs text-slate-500 truncate">{track.originalArtist}</div>
+                      <div className="text-sm font-medium truncate" style={{ color: 'var(--text-primary)' }}>{track.title}</div>
+                      <div className="text-xs truncate" style={{ color: 'var(--text-secondary)' }}>{track.originalArtist}</div>
                     </div>
                   </div>
                 ))}

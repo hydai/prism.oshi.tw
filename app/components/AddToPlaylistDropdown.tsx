@@ -63,7 +63,8 @@ export default function AddToPlaylistDropdown({ version, onSuccess }: AddToPlayl
 
       {showDropdown && (
         <div
-          className="absolute right-0 mt-2 w-56 bg-white backdrop-blur-md border border-[--border-default] rounded-lg shadow-xl z-30 overflow-hidden"
+          className="absolute right-0 mt-2 w-56 backdrop-blur-md border border-[--border-default] rounded-lg shadow-xl z-30 overflow-hidden"
+          style={{ background: 'var(--bg-surface)' }}
           data-testid="playlist-dropdown"
           onClick={(e) => e.stopPropagation()}
         >
