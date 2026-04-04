@@ -191,7 +191,7 @@ export function renderStatusPage(
       --radius-2xl: 20px;
     }
 
-    ${DARK_MODE_CSS}
+    ${raw(DARK_MODE_CSS)}
 
     * { box-sizing: border-box; margin: 0; padding: 0; }
     body {
@@ -277,7 +277,7 @@ export function renderStatusPage(
       font-size: 14px;
     }
   </style>
-  <script>${DARK_MODE_DETECT_SCRIPT}</script>
+  <script>${raw(DARK_MODE_DETECT_SCRIPT)}</script>
 </head>
 <body>
   <div style="max-width: 960px; margin: 0 auto; padding: 48px 16px;">
@@ -303,7 +303,7 @@ export function renderStatusPage(
           ">Prism Nova</span>
         </div>
         <div style="position: absolute; right: 0; top: 4px;">
-          ${themeToggleHTML()}
+          ${raw(themeToggleHTML())}
         </div>
       </div>
       <p style="color: var(--text-secondary); font-size: 14px;">

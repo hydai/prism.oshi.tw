@@ -326,7 +326,7 @@ export function renderVodPage(siteKey: string, streamers: ApprovedStreamer[]) {
       --radius-2xl: 20px;
     }
 
-    ${DARK_MODE_CSS}
+    ${raw(DARK_MODE_CSS)}
 
     * { box-sizing: border-box; margin: 0; padding: 0; }
     body {
@@ -468,7 +468,7 @@ export function renderVodPage(siteKey: string, streamers: ApprovedStreamer[]) {
     }
     .cross-links a:hover { opacity: 0.7; }
   </style>
-  <script>${DARK_MODE_DETECT_SCRIPT}</script>
+  <script>${raw(DARK_MODE_DETECT_SCRIPT)}</script>
 </head>
 <body>
 
@@ -495,7 +495,7 @@ export function renderVodPage(siteKey: string, streamers: ApprovedStreamer[]) {
           ">Prism Nova</span>
         </div>
         <div style="position: absolute; right: 0; top: 4px;">
-          ${themeToggleHTML()}
+          ${raw(themeToggleHTML())}
         </div>
       </div>
       <p style="color: var(--text-secondary); font-size: 14px;">

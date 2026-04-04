@@ -1,4 +1,4 @@
-import { html } from 'hono/html';
+import { html, raw } from 'hono/html';
 import { DARK_MODE_CSS, DARK_MODE_DETECT_SCRIPT, themeToggleHTML } from './theme';
 
 export function renderFormPage(siteKey: string) {
@@ -11,7 +11,7 @@ export function renderFormPage(siteKey: string) {
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700;1,9..40,400&display=swap" rel="stylesheet" />
-  <script>${DARK_MODE_DETECT_SCRIPT}</script>
+  <script>${raw(DARK_MODE_DETECT_SCRIPT)}</script>
   <script src="https://challenges.cloudflare.com/turnstile/v0/api.js" async defer></script>
   <style>
     :root {
@@ -37,7 +37,7 @@ export function renderFormPage(siteKey: string) {
       --radius-2xl: 20px;
     }
 
-    ${DARK_MODE_CSS}
+    ${raw(DARK_MODE_CSS)}
 
     * { box-sizing: border-box; margin: 0; padding: 0; }
     body {
@@ -207,7 +207,7 @@ export function renderFormPage(siteKey: string) {
           background-clip: text;
         ">Prism Crystal</span>
         <div style="position: absolute; right: 0; top: 50%; transform: translateY(-50%);">
-          ${themeToggleHTML()}
+          ${raw(themeToggleHTML())}
         </div>
       </div>
       <p style="color: var(--text-secondary); font-size: 14px;">
