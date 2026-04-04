@@ -1,5 +1,41 @@
 [
   {
+    "id": "song-0747ef0f",
+    "title": "天ノ弱",
+    "originalArtist": "164 feat.GUMI",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-c569aea0",
+        "streamId": "stream-2026-03-30",
+        "date": "2026-03-30",
+        "streamTitle": "【伴睡歌回】當世界開始讓你懷疑自己的時候，是不是又在想，為什麼明明努力了卻好像只有自己跟不上。頑張ってるのに、自分だけ追いつけないって思うとき。░ 睡眠導入歌枠｜Singing Stream",
+        "videoId": "2iZkLT5vemI",
+        "timestamp": 6688,
+        "endTimestamp": 6878,
+        "note": ""
+      }
+    ]
+  },
+  {
+    "id": "song-08806a0a",
+    "title": "昔漣",
+    "originalArtist": "張韶涵",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-56e26f7d",
+        "streamId": "stream-2026-03-30",
+        "date": "2026-03-30",
+        "streamTitle": "【伴睡歌回】當世界開始讓你懷疑自己的時候，是不是又在想，為什麼明明努力了卻好像只有自己跟不上。頑張ってるのに、自分だけ追いつけないって思うとき。░ 睡眠導入歌枠｜Singing Stream",
+        "videoId": "2iZkLT5vemI",
+        "timestamp": 9525,
+        "endTimestamp": 9712,
+        "note": ""
+      }
+    ]
+  },
+  {
     "id": "song-0992e0ff",
     "title": "God knows...",
     "originalArtist": "涼宮ハルヒ(CV：平野綾)",
@@ -31,6 +67,24 @@
         "videoId": "dJ4z3FliynU",
         "timestamp": 1659,
         "endTimestamp": 1843,
+        "note": ""
+      }
+    ]
+  },
+  {
+    "id": "song-114c348c",
+    "title": "逢いたくていま",
+    "originalArtist": "MISIA",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-09e68953",
+        "streamId": "stream-2026-03-30",
+        "date": "2026-03-30",
+        "streamTitle": "【伴睡歌回】當世界開始讓你懷疑自己的時候，是不是又在想，為什麼明明努力了卻好像只有自己跟不上。頑張ってるのに、自分だけ追いつけないって思うとき。░ 睡眠導入歌枠｜Singing Stream",
+        "videoId": "2iZkLT5vemI",
+        "timestamp": 3205,
+        "endTimestamp": 3567,
         "note": ""
       }
     ]
@@ -108,6 +162,24 @@
     ]
   },
   {
+    "id": "song-204fbbb4",
+    "title": "11",
+    "originalArtist": "隊長 & 黃禮格",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-27f38c9c",
+        "streamId": "stream-2026-03-30",
+        "date": "2026-03-30",
+        "streamTitle": "【伴睡歌回】當世界開始讓你懷疑自己的時候，是不是又在想，為什麼明明努力了卻好像只有自己跟不上。頑張ってるのに、自分だけ追いつけないって思うとき。░ 睡眠導入歌枠｜Singing Stream",
+        "videoId": "2iZkLT5vemI",
+        "timestamp": 2692,
+        "endTimestamp": 2927,
+        "note": ""
+      }
+    ]
+  },
+  {
     "id": "song-2362239e",
     "title": "求救訊號",
     "originalArtist": "Vast & Hazy",
@@ -144,6 +216,24 @@
     ]
   },
   {
+    "id": "song-2795e570",
+    "title": "歌に形はないけれど",
+    "originalArtist": "doriko feat. 初音ミク",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-12048e04",
+        "streamId": "stream-2026-03-30",
+        "date": "2026-03-30",
+        "streamTitle": "【伴睡歌回】當世界開始讓你懷疑自己的時候，是不是又在想，為什麼明明努力了卻好像只有自己跟不上。頑張ってるのに、自分だけ追いつけないって思うとき。░ 睡眠導入歌枠｜Singing Stream",
+        "videoId": "2iZkLT5vemI",
+        "timestamp": 9854,
+        "endTimestamp": 10184,
+        "note": ""
+      }
+    ]
+  },
+  {
     "id": "song-2bba2dc9",
     "title": "星降る海",
     "originalArtist": "月見ヤチヨ",
@@ -157,6 +247,24 @@
         "videoId": "dJ4z3FliynU",
         "timestamp": 4610,
         "endTimestamp": 4862,
+        "note": ""
+      }
+    ]
+  },
+  {
+    "id": "song-303001d3",
+    "title": "孤獨的總和",
+    "originalArtist": "吳汶芳",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-801a0519",
+        "streamId": "stream-2026-04-03",
+        "date": "2026-04-03",
+        "streamTitle": "【倫家想唱歌】練習唱唱歌！想把開心帶給你們！辛苦惹你這次連假要做甚麼呢  ░ 歌枠｜Singing Stream",
+        "videoId": "KzjBXLsjzU4",
+        "timestamp": 3325,
+        "endTimestamp": 3574,
         "note": ""
       }
     ]
@@ -270,6 +378,24 @@
     ]
   },
   {
+    "id": "song-446ee41f",
+    "title": "僕が死のうと思ったのは",
+    "originalArtist": "中島美嘉",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-e605d62d",
+        "streamId": "stream-2026-03-30",
+        "date": "2026-03-30",
+        "streamTitle": "【伴睡歌回】當世界開始讓你懷疑自己的時候，是不是又在想，為什麼明明努力了卻好像只有自己跟不上。頑張ってるのに、自分だけ追いつけないって思うとき。░ 睡眠導入歌枠｜Singing Stream",
+        "videoId": "2iZkLT5vemI",
+        "timestamp": 4660,
+        "endTimestamp": 5002,
+        "note": ""
+      }
+    ]
+  },
+  {
     "id": "song-45801340",
     "title": "太陽與地球",
     "originalArtist": "黃俊榮",
@@ -283,6 +409,60 @@
         "videoId": "IVfl4IDi0co",
         "timestamp": 1278,
         "endTimestamp": 1540,
+        "note": ""
+      }
+    ]
+  },
+  {
+    "id": "song-46e9d5e8",
+    "title": "僕が死のうと思ったのは",
+    "originalArtist": "中島美嘉",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-ef9175c7",
+        "streamId": "stream-2026-04-03",
+        "date": "2026-04-03",
+        "streamTitle": "【倫家想唱歌】練習唱唱歌！想把開心帶給你們！辛苦惹你這次連假要做甚麼呢  ░ 歌枠｜Singing Stream",
+        "videoId": "KzjBXLsjzU4",
+        "timestamp": 1621,
+        "endTimestamp": 1963,
+        "note": ""
+      }
+    ]
+  },
+  {
+    "id": "song-4859ac9c",
+    "title": "願溫柔的你被世界溫柔以待",
+    "originalArtist": "綠繡眼",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-5a8bd845",
+        "streamId": "stream-2026-04-03",
+        "date": "2026-04-03",
+        "streamTitle": "【倫家想唱歌】練習唱唱歌！想把開心帶給你們！辛苦惹你這次連假要做甚麼呢  ░ 歌枠｜Singing Stream",
+        "videoId": "KzjBXLsjzU4",
+        "timestamp": 1002,
+        "endTimestamp": 1232,
+        "note": ""
+      }
+    ]
+  },
+  {
+    "id": "song-4b85f34f",
+    "title": "ドライフラワー",
+    "originalArtist": "優里",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-d384b112",
+        "streamId": "stream-2026-04-03",
+        "date": "2026-04-03",
+        "streamTitle": "【倫家想唱歌】練習唱唱歌！想把開心帶給你們！辛苦惹你這次連假要做甚麼呢  ░ 歌枠｜Singing Stream",
+        "videoId": "KzjBXLsjzU4",
+        "timestamp": 4642,
+        "endTimestamp": 4928,
         "note": ""
       }
     ]
@@ -319,6 +499,24 @@
         "videoId": "IVfl4IDi0co",
         "timestamp": 10156,
         "endTimestamp": 10427,
+        "note": ""
+      }
+    ]
+  },
+  {
+    "id": "song-52b17ad4",
+    "title": "這是你期盼的長大嗎",
+    "originalArtist": "張齊山",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-dffdb4bb",
+        "streamId": "stream-2026-03-30",
+        "date": "2026-03-30",
+        "streamTitle": "【伴睡歌回】當世界開始讓你懷疑自己的時候，是不是又在想，為什麼明明努力了卻好像只有自己跟不上。頑張ってるのに、自分だけ追いつけないって思うとき。░ 睡眠導入歌枠｜Singing Stream",
+        "videoId": "2iZkLT5vemI",
+        "timestamp": 5545,
+        "endTimestamp": 5828,
         "note": ""
       }
     ]
@@ -486,6 +684,24 @@
     ]
   },
   {
+    "id": "song-74c83ff1",
+    "title": "我喜歡你",
+    "originalArtist": "洪安妮",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-4ac32df6",
+        "streamId": "stream-2026-04-03",
+        "date": "2026-04-03",
+        "streamTitle": "【倫家想唱歌】練習唱唱歌！想把開心帶給你們！辛苦惹你這次連假要做甚麼呢  ░ 歌枠｜Singing Stream",
+        "videoId": "KzjBXLsjzU4",
+        "timestamp": 4105,
+        "endTimestamp": 4352,
+        "note": ""
+      }
+    ]
+  },
+  {
     "id": "song-7747efcc",
     "title": "我想要佔據你",
     "originalArtist": "告五人",
@@ -499,6 +715,24 @@
         "videoId": "dJ4z3FliynU",
         "timestamp": 578,
         "endTimestamp": 833,
+        "note": ""
+      }
+    ]
+  },
+  {
+    "id": "song-7999db17",
+    "title": "花開花落",
+    "originalArtist": "熙歌",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-0dd4c03b",
+        "streamId": "stream-2026-03-30",
+        "date": "2026-03-30",
+        "streamTitle": "【伴睡歌回】當世界開始讓你懷疑自己的時候，是不是又在想，為什麼明明努力了卻好像只有自己跟不上。頑張ってるのに、自分だけ追いつけないって思うとき。░ 睡眠導入歌枠｜Singing Stream",
+        "videoId": "2iZkLT5vemI",
+        "timestamp": 1866,
+        "endTimestamp": 2059,
         "note": ""
       }
     ]
@@ -522,6 +756,24 @@
     ]
   },
   {
+    "id": "song-814d9cf7",
+    "title": "暮色迴響",
+    "originalArtist": "吉星出租",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-e9c9a77a",
+        "streamId": "stream-2026-04-03",
+        "date": "2026-04-03",
+        "streamTitle": "【倫家想唱歌】練習唱唱歌！想把開心帶給你們！辛苦惹你這次連假要做甚麼呢  ░ 歌枠｜Singing Stream",
+        "videoId": "KzjBXLsjzU4",
+        "timestamp": 3736,
+        "endTimestamp": 3914,
+        "note": ""
+      }
+    ]
+  },
+  {
     "id": "song-82c13024",
     "title": "Over Soul",
     "originalArtist": "林原めぐみ",
@@ -535,6 +787,24 @@
         "videoId": "xQ5TCl3JnXs",
         "timestamp": 3678,
         "endTimestamp": 3912,
+        "note": ""
+      }
+    ]
+  },
+  {
+    "id": "song-83dc2fe6",
+    "title": "拾光者",
+    "originalArtist": "厄倫蒂兒",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-15c120e8",
+        "streamId": "stream-2026-03-30",
+        "date": "2026-03-30",
+        "streamTitle": "【伴睡歌回】當世界開始讓你懷疑自己的時候，是不是又在想，為什麼明明努力了卻好像只有自己跟不上。頑張ってるのに、自分だけ追いつけないって思うとき。░ 睡眠導入歌枠｜Singing Stream",
+        "videoId": "2iZkLT5vemI",
+        "timestamp": 7136,
+        "endTimestamp": 7384,
         "note": ""
       }
     ]
@@ -702,6 +972,24 @@
     ]
   },
   {
+    "id": "song-9b69f324",
+    "title": "魚",
+    "originalArtist": "陳綺貞",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-27ba61b7",
+        "streamId": "stream-2026-03-30",
+        "date": "2026-03-30",
+        "streamTitle": "【伴睡歌回】當世界開始讓你懷疑自己的時候，是不是又在想，為什麼明明努力了卻好像只有自己跟不上。頑張ってるのに、自分だけ追いつけないって思うとき。░ 睡眠導入歌枠｜Singing Stream",
+        "videoId": "2iZkLT5vemI",
+        "timestamp": 807,
+        "endTimestamp": 1107,
+        "note": ""
+      }
+    ]
+  },
+  {
     "id": "song-9e88a6a2",
     "title": "革命道中",
     "originalArtist": "アイナ・ジ・エンド",
@@ -774,6 +1062,24 @@
     ]
   },
   {
+    "id": "song-9f3b61df",
+    "title": "夏霞",
+    "originalArtist": "あたらよ",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-5c54f20c",
+        "streamId": "stream-2026-03-30",
+        "date": "2026-03-30",
+        "streamTitle": "【伴睡歌回】當世界開始讓你懷疑自己的時候，是不是又在想，為什麼明明努力了卻好像只有自己跟不上。頑張ってるのに、自分だけ追いつけないって思うとき。░ 睡眠導入歌枠｜Singing Stream",
+        "videoId": "2iZkLT5vemI",
+        "timestamp": 1403,
+        "endTimestamp": 1632,
+        "note": ""
+      }
+    ]
+  },
+  {
     "id": "song-9f6bbcb7",
     "title": "下雨的晚上",
     "originalArtist": "黃玠",
@@ -792,6 +1098,42 @@
     ]
   },
   {
+    "id": "song-a24ee1b1",
+    "title": "ワールドイズマイン",
+    "originalArtist": "ryo feat. 初音ミク",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-12f4026c",
+        "streamId": "stream-2026-04-03",
+        "date": "2026-04-03",
+        "streamTitle": "【倫家想唱歌】練習唱唱歌！想把開心帶給你們！辛苦惹你這次連假要做甚麼呢  ░ 歌枠｜Singing Stream",
+        "videoId": "KzjBXLsjzU4",
+        "timestamp": 6338,
+        "endTimestamp": 6516,
+        "note": ""
+      }
+    ]
+  },
+  {
+    "id": "song-a9a4ba26",
+    "title": "小幸運",
+    "originalArtist": "田馥甄",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-63763da8",
+        "streamId": "stream-2026-03-30",
+        "date": "2026-03-30",
+        "streamTitle": "【伴睡歌回】當世界開始讓你懷疑自己的時候，是不是又在想，為什麼明明努力了卻好像只有自己跟不上。頑張ってるのに、自分だけ追いつけないって思うとき。░ 睡眠導入歌枠｜Singing Stream",
+        "videoId": "2iZkLT5vemI",
+        "timestamp": 8204,
+        "endTimestamp": 8470,
+        "note": ""
+      }
+    ]
+  },
+  {
     "id": "song-ae6f4dc4",
     "title": "心裡的孩子",
     "originalArtist": "梁文音",
@@ -805,6 +1147,24 @@
         "videoId": "IVfl4IDi0co",
         "timestamp": 5163,
         "endTimestamp": 5345,
+        "note": ""
+      }
+    ]
+  },
+  {
+    "id": "song-b43a8cc8",
+    "title": "ちゃんとあるよ",
+    "originalArtist": "傘村トータ feat. 可不",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-f79e327a",
+        "streamId": "stream-2026-03-30",
+        "date": "2026-03-30",
+        "streamTitle": "【伴睡歌回】當世界開始讓你懷疑自己的時候，是不是又在想，為什麼明明努力了卻好像只有自己跟不上。頑張ってるのに、自分だけ追いつけないって思うとき。░ 睡眠導入歌枠｜Singing Stream",
+        "videoId": "2iZkLT5vemI",
+        "timestamp": 6089,
+        "endTimestamp": 6384,
         "note": ""
       }
     ]
@@ -859,6 +1219,24 @@
         "videoId": "IVfl4IDi0co",
         "timestamp": 1689,
         "endTimestamp": 1886,
+        "note": ""
+      }
+    ]
+  },
+  {
+    "id": "song-be5fcf6c",
+    "title": "你知道星星多重嗎",
+    "originalArtist": "鄭興",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-d50a6045",
+        "streamId": "stream-2026-03-30",
+        "date": "2026-03-30",
+        "streamTitle": "【伴睡歌回】當世界開始讓你懷疑自己的時候，是不是又在想，為什麼明明努力了卻好像只有自己跟不上。頑張ってるのに、自分だけ追いつけないって思うとき。░ 睡眠導入歌枠｜Singing Stream",
+        "videoId": "2iZkLT5vemI",
+        "timestamp": 9063,
+        "endTimestamp": 9360,
         "note": ""
       }
     ]
@@ -972,6 +1350,24 @@
     ]
   },
   {
+    "id": "song-cc9cf0b9",
+    "title": "星屑の夜空",
+    "originalArtist": "厄倫蒂兒",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-def578d1",
+        "streamId": "stream-2026-03-30",
+        "date": "2026-03-30",
+        "streamTitle": "【伴睡歌回】當世界開始讓你懷疑自己的時候，是不是又在想，為什麼明明努力了卻好像只有自己跟不上。頑張ってるのに、自分だけ追いつけないって思うとき。░ 睡眠導入歌枠｜Singing Stream",
+        "videoId": "2iZkLT5vemI",
+        "timestamp": 7801,
+        "endTimestamp": 8043,
+        "note": ""
+      }
+    ]
+  },
+  {
     "id": "song-ce7669cc",
     "title": "(清唱) 沿海地帶",
     "originalArtist": "弦子",
@@ -1075,6 +1471,42 @@
         "videoId": "xQ5TCl3JnXs",
         "timestamp": 6194,
         "endTimestamp": 6443,
+        "note": ""
+      }
+    ]
+  },
+  {
+    "id": "song-da3780c9",
+    "title": "プラチナ",
+    "originalArtist": "坂本真綾",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-6571da9e",
+        "streamId": "stream-2026-03-30",
+        "date": "2026-03-30",
+        "streamTitle": "【伴睡歌回】當世界開始讓你懷疑自己的時候，是不是又在想，為什麼明明努力了卻好像只有自己跟不上。頑張ってるのに、自分だけ追いつけないって思うとき。░ 睡眠導入歌枠｜Singing Stream",
+        "videoId": "2iZkLT5vemI",
+        "timestamp": 8600,
+        "endTimestamp": 8850,
+        "note": ""
+      }
+    ]
+  },
+  {
+    "id": "song-da6fbf74",
+    "title": "Remember",
+    "originalArtist": "月見乜于彐（CV.早見沙織)",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-86e9c8b3",
+        "streamId": "stream-2026-04-03",
+        "date": "2026-04-03",
+        "streamTitle": "【倫家想唱歌】練習唱唱歌！想把開心帶給你們！辛苦惹你這次連假要做甚麼呢  ░ 歌枠｜Singing Stream",
+        "videoId": "KzjBXLsjzU4",
+        "timestamp": 5095,
+        "endTimestamp": 5328,
         "note": ""
       }
     ]
@@ -1188,6 +1620,24 @@
     ]
   },
   {
+    "id": "song-ea132f8c",
+    "title": "Butter-Fly",
+    "originalArtist": "和田光司",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-d8937288",
+        "streamId": "stream-2026-04-03",
+        "date": "2026-04-03",
+        "streamTitle": "【倫家想唱歌】練習唱唱歌！想把開心帶給你們！辛苦惹你這次連假要做甚麼呢  ░ 歌枠｜Singing Stream",
+        "videoId": "KzjBXLsjzU4",
+        "timestamp": 5873,
+        "endTimestamp": 6121,
+        "note": ""
+      }
+    ]
+  },
+  {
     "id": "song-eb753e6f",
     "title": "匿名的好友",
     "originalArtist": "楊丞琳",
@@ -1201,6 +1651,24 @@
         "videoId": "IVfl4IDi0co",
         "timestamp": 4004,
         "endTimestamp": 4266,
+        "note": ""
+      }
+    ]
+  },
+  {
+    "id": "song-ed6d9251",
+    "title": "残酷な夜に輝け",
+    "originalArtist": "LiSA",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-e07a6a27",
+        "streamId": "stream-2026-04-03",
+        "date": "2026-04-03",
+        "streamTitle": "【倫家想唱歌】練習唱唱歌！想把開心帶給你們！辛苦惹你這次連假要做甚麼呢  ░ 歌枠｜Singing Stream",
+        "videoId": "KzjBXLsjzU4",
+        "timestamp": 7638,
+        "endTimestamp": 8021,
         "note": ""
       }
     ]
@@ -1332,6 +1800,24 @@
     ]
   },
   {
+    "id": "song-fb8e2b2e",
+    "title": "幸福在歌唱",
+    "originalArtist": "A-Lin",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-95f349e6",
+        "streamId": "stream-2026-03-30",
+        "date": "2026-03-30",
+        "streamTitle": "【伴睡歌回】當世界開始讓你懷疑自己的時候，是不是又在想，為什麼明明努力了卻好像只有自己跟不上。頑張ってるのに、自分だけ追いつけないって思うとき。░ 睡眠導入歌枠｜Singing Stream",
+        "videoId": "2iZkLT5vemI",
+        "timestamp": 3915,
+        "endTimestamp": 4195,
+        "note": ""
+      }
+    ]
+  },
+  {
     "id": "song-fc4851d6",
     "title": "雨愛",
     "originalArtist": "楊丞琳",
@@ -1381,6 +1867,24 @@
         "videoId": "xQ5TCl3JnXs",
         "timestamp": 589,
         "endTimestamp": 822,
+        "note": ""
+      }
+    ]
+  },
+  {
+    "id": "song-ff400788",
+    "title": "肅聖！！ ロリ神レクイエム★",
+    "originalArtist": "しぐれうい（9さい）",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-bc27e2a2",
+        "streamId": "stream-2026-04-03",
+        "date": "2026-04-03",
+        "streamTitle": "【倫家想唱歌】練習唱唱歌！想把開心帶給你們！辛苦惹你這次連假要做甚麼呢  ░ 歌枠｜Singing Stream",
+        "videoId": "KzjBXLsjzU4",
+        "timestamp": 5415,
+        "endTimestamp": 5689,
         "note": ""
       }
     ]
