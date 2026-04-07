@@ -107,6 +107,7 @@ export interface SubmissionSummary {
   status: SubmissionStatus;
   submitted_at: string;
   reviewed_at: string | null;
+  reviewer_note: string;
 }
 
 export interface VodSubmissionSummary {
@@ -118,6 +119,7 @@ export interface VodSubmissionSummary {
   status: SubmissionStatus;
   submitted_at: string;
   reviewed_at: string | null;
+  reviewer_note: string;
   song_count: number;
 }
 

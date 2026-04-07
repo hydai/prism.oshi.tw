@@ -82,7 +82,7 @@ export async function resetRejectedSubmission(
 export async function listAllSubmissions(db: D1Database): Promise<SubmissionSummary[]> {
   const { results } = await db
     .prepare(
-      `SELECT id, slug, display_name, avatar_url, status, submitted_at, reviewed_at
+      `SELECT id, slug, display_name, avatar_url, status, submitted_at, reviewed_at, reviewer_note
        FROM submissions
        ORDER BY
          CASE status WHEN 'pending' THEN 0 WHEN 'approved' THEN 1 WHEN 'rejected' THEN 2 END,

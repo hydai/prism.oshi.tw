@@ -42,7 +42,7 @@ export async function listAllVodSubmissions(db: D1Database): Promise<VodSubmissi
     .prepare(
       `SELECT
          v.id, v.streamer_slug, v.video_id, v.stream_title, v.stream_date,
-         v.status, v.submitted_at, v.reviewed_at,
+         v.status, v.submitted_at, v.reviewed_at, v.reviewer_note,
          COUNT(s.id) AS song_count
        FROM vod_submissions v
        LEFT JOIN vod_songs s ON s.vod_submission_id = v.id

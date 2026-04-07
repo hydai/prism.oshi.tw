@@ -45,7 +45,7 @@ export function renderStatusPage(
       <td><img src="${esc(s.avatar_url)}" alt="" style="width:28px;height:28px;border-radius:50%;vertical-align:middle;background:var(--bg-surface-frosted);" onerror="this.style.display='none'"></td>
       <td>${esc(s.display_name)}</td>
       <td style="font-family:monospace;font-size:12px;color:var(--text-secondary);">${esc(s.slug || '—')}</td>
-      <td>${statusBadge(s.status)}</td>
+      <td>${statusBadge(s.status)}${s.status === 'rejected' && s.reviewer_note ? `<div style="font-size:11px;font-style:italic;color:var(--text-secondary);margin-top:4px;">原因：${esc(s.reviewer_note)}</div>` : ''}</td>
       <td style="font-size:12px;color:var(--text-secondary);white-space:nowrap;">${formatDate(s.submitted_at)}</td>
       <td style="font-size:12px;color:var(--text-secondary);white-space:nowrap;">${formatDate(s.reviewed_at)}</td>
     </tr>
@@ -94,69 +94,75 @@ export function renderStatusPage(
   const vodStats = countByStatus(vodSubmissions);
   const adminDoneCount = Array.from(adminOnlyGroups.values()).reduce((s, g) => s + g.length, 0);
 
+  // Column width definitions shared between header and group tables
+  const vodColWidths = `<col style="width:35%"><col style="width:12%"><col style="width:8%"><col style="width:15%"><col style="width:15%"><col style="width:15%">`;
+
+  // Helper to render a VOD row
+  const vodRow = (title: string, date: string, songCount: number, badge: string, submittedAt: string, reviewedAt: string | null) => `
+        <tr>
+          <td style="overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${esc(title || '—')}</td>
+          <td style="font-size:12px;color:var(--text-secondary);white-space:nowrap;">${esc(date || '—')}</td>
+          <td style="text-align:center;font-size:13px;">${songCount}</td>
+          <td>${badge}</td>
+          <td style="font-size:12px;color:var(--text-secondary);white-space:nowrap;">${submittedAt}</td>
+          <td style="font-size:12px;color:var(--text-secondary);white-space:nowrap;">${reviewedAt}</td>
+        </tr>`;
+
   let vodSections = '';
   for (const [slug, vods] of vodGroups) {
     const displayName = slugToName.get(slug) ?? slug;
+    const adminOnly = adminOnlyGroups.get(slug);
+    const totalItems = vods.length + (adminOnly?.length ?? 0);
+    const hasPending = vods.some((v) => v.status === 'pending');
+    const openAttr = hasPending ? ' open' : '';
+
     vodSections += `
-      <tr><td colspan="6" style="padding:16px 10px 8px;font-weight:600;font-size:14px;color:var(--text-primary);border-bottom:1px solid var(--border-default);">${esc(displayName)}<span style="font-weight:400;font-size:12px;color:var(--text-tertiary);margin-left:8px;">${esc(slug)}</span></td></tr>
-    `;
+    <details class="vod-group"${openAttr}>
+      <summary style="padding:12px 10px 8px;font-weight:600;font-size:14px;color:var(--text-primary);display:flex;align-items:center;gap:8px;">
+        <span class="vod-group-arrow">&#9654;</span>
+        ${esc(displayName)}<span style="font-weight:400;font-size:12px;color:var(--text-tertiary);margin-left:4px;">${esc(slug)}</span>
+        <span style="font-weight:400;font-size:12px;color:var(--text-tertiary);margin-left:auto;">${totalItems} 筆</span>
+      </summary>
+      <table>${vodColWidths}<tbody>`;
+
     for (const v of vods) {
-      // Check if this VOD has an admin override
       const aKey = adminKey(v.streamer_slug, v.video_id);
       const adminMatch = adminMap.get(aKey);
       const badge = (adminMatch && adminMatch.status === 'approved') ? statusBadge('admin_done') : statusBadge(v.status);
-
-      vodSections += `
-        <tr>
-          <td style="max-width:280px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${esc(v.stream_title || '—')}</td>
-          <td style="font-size:12px;color:var(--text-secondary);white-space:nowrap;">${esc(v.stream_date || '—')}</td>
-          <td style="text-align:center;font-size:13px;">${adminMatch ? adminMatch.song_count : v.song_count}</td>
-          <td>${badge}</td>
-          <td style="font-size:12px;color:var(--text-secondary);white-space:nowrap;">${formatDate(v.submitted_at)}</td>
-          <td style="font-size:12px;color:var(--text-secondary);white-space:nowrap;">${formatDate(v.reviewed_at)}</td>
-        </tr>
-      `;
+      const rejectionNote = v.status === 'rejected' && v.reviewer_note
+        ? `<div style="font-size:11px;font-style:italic;color:var(--text-secondary);margin-top:4px;">原因：${esc(v.reviewer_note)}</div>`
+        : '';
+      vodSections += vodRow(v.stream_title, v.stream_date, adminMatch ? adminMatch.song_count : v.song_count, badge + rejectionNote, formatDate(v.submitted_at), formatDate(v.reviewed_at));
     }
 
-    // Render admin-only streams for this streamer inline, under the same header
-    const adminOnly = adminOnlyGroups.get(slug);
     if (adminOnly) {
       for (const a of adminOnly) {
-        vodSections += `
-        <tr>
-          <td style="max-width:280px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${esc(a.title || '—')}</td>
-          <td style="font-size:12px;color:var(--text-secondary);white-space:nowrap;">${esc(a.date || '—')}</td>
-          <td style="text-align:center;font-size:13px;">${a.song_count}</td>
-          <td>${a.status === 'approved' ? statusBadge('admin_done') : statusBadge(a.status)}</td>
-          <td style="font-size:12px;color:var(--text-secondary);white-space:nowrap;">${formatDate(a.created_at)}</td>
-          <td style="font-size:12px;color:var(--text-secondary);white-space:nowrap;">—</td>
-        </tr>
-        `;
+        const badge = a.status === 'approved' ? statusBadge('admin_done') : statusBadge(a.status);
+        vodSections += vodRow(a.title, a.date, a.song_count, badge, formatDate(a.created_at), '—');
       }
       adminOnlyGroups.delete(slug);
     }
+
+    vodSections += `</tbody></table></details>`;
   }
 
   // Render admin-only streams (not submitted via NOVA)
   for (const [slug, streams] of adminOnlyGroups) {
-    // Only add group header if NOVA didn't already have a section for this slug
     if (!vodGroups.has(slug)) {
       const displayName = slugToName.get(slug) ?? slug;
       vodSections += `
-        <tr><td colspan="6" style="padding:16px 10px 8px;font-weight:600;font-size:14px;color:var(--text-primary);border-bottom:1px solid var(--border-default);">${esc(displayName)}<span style="font-weight:400;font-size:12px;color:var(--text-tertiary);margin-left:8px;">${esc(slug)}</span></td></tr>
-      `;
-    }
-    for (const a of streams) {
-      vodSections += `
-        <tr>
-          <td style="max-width:280px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${esc(a.title || '—')}</td>
-          <td style="font-size:12px;color:var(--text-secondary);white-space:nowrap;">${esc(a.date || '—')}</td>
-          <td style="text-align:center;font-size:13px;">${a.song_count}</td>
-          <td>${a.status === 'approved' ? statusBadge('admin_done') : statusBadge(a.status)}</td>
-          <td style="font-size:12px;color:var(--text-secondary);white-space:nowrap;">${formatDate(a.created_at)}</td>
-          <td style="font-size:12px;color:var(--text-secondary);white-space:nowrap;">—</td>
-        </tr>
-      `;
+    <details class="vod-group">
+      <summary style="padding:12px 10px 8px;font-weight:600;font-size:14px;color:var(--text-primary);display:flex;align-items:center;gap:8px;">
+        <span class="vod-group-arrow">&#9654;</span>
+        ${esc(displayName)}<span style="font-weight:400;font-size:12px;color:var(--text-tertiary);margin-left:4px;">${esc(slug)}</span>
+        <span style="font-weight:400;font-size:12px;color:var(--text-tertiary);margin-left:auto;">${streams.length} 筆</span>
+      </summary>
+      <table>${vodColWidths}<tbody>`;
+      for (const a of streams) {
+        const badge = a.status === 'approved' ? statusBadge('admin_done') : statusBadge(a.status);
+        vodSections += vodRow(a.title, a.date, a.song_count, badge, formatDate(a.created_at), '—');
+      }
+      vodSections += `</tbody></table></details>`;
     }
   }
 
@@ -276,6 +282,19 @@ export function renderStatusPage(
       color: var(--text-tertiary);
       font-size: 14px;
     }
+
+    .vod-group { border-bottom: 1px solid var(--border-default); }
+    .vod-group:last-child { border-bottom: none; }
+    .vod-group summary { list-style: none; cursor: pointer; }
+    .vod-group summary::-webkit-details-marker { display: none; }
+    .vod-group summary::marker { display: none; }
+    .vod-group summary:hover { background: var(--bg-surface-frosted); border-radius: 8px; }
+    .vod-group[open] > summary .vod-group-arrow { transform: rotate(90deg); }
+    .vod-group-arrow { display: inline-block; transition: transform 0.2s; font-size: 10px; color: var(--text-tertiary); }
+    .vod-header-table, .vod-group table { width: 100%; border-collapse: collapse; font-size: 13px; table-layout: fixed; }
+    .vod-header-table th { text-align: left; font-weight: 600; font-size: 12px; color: var(--text-secondary); padding: 8px 10px; border-bottom: 2px solid var(--border-default); white-space: nowrap; }
+    .vod-group table td { padding: 8px 10px; border-bottom: 1px solid var(--border-glass); vertical-align: middle; }
+    .vod-group table tr:last-child td { border-bottom: none; }
   </style>
   <script>${raw(DARK_MODE_DETECT_SCRIPT)}</script>
 </head>
@@ -347,7 +366,8 @@ export function renderStatusPage(
     </div>
     <div class="card">
       ${totalVodCount > 0
-        ? raw(`<table>
+        ? raw(`<table class="vod-header-table">
+            ${vodColWidths}
             <thead><tr>
               <th>直播標題</th>
               <th>日期</th>
@@ -356,8 +376,8 @@ export function renderStatusPage(
               <th>提交時間</th>
               <th>審核時間</th>
             </tr></thead>
-            <tbody>${vodSections}</tbody>
-          </table>`)
+          </table>
+          ${vodSections}`)
         : raw('<div class="empty-msg">尚無 VOD 提交紀錄</div>')
       }
     </div>
