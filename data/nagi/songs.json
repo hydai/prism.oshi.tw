@@ -162,6 +162,24 @@
     ]
   },
   {
+    "id": "song-8496d46c",
+    "title": "刑者",
+    "originalArtist": "何瑞康",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-5f253112",
+        "streamId": "stream-6cfd5c31",
+        "date": "2026-04-03",
+        "streamTitle": "【練習新歌】繼續練習！🍥｜七星ナギ・馬來西亞VTuber #雜談 #馬來西亞vtuber #马来西亚vtuber",
+        "videoId": "YSzo-y2DVPs",
+        "timestamp": 10387,
+        "endTimestamp": 10690,
+        "note": ""
+      }
+    ]
+  },
+  {
     "id": "song-b2687f13",
     "title": "It’s My Life",
     "originalArtist": "Bon Jovi",
@@ -301,6 +319,24 @@
         "videoId": "eluS2DmhMfY",
         "timestamp": 1050,
         "endTimestamp": 1287,
+        "note": ""
+      }
+    ]
+  },
+  {
+    "id": "song-f82706dc",
+    "title": "怪獣",
+    "originalArtist": "サカナクション",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-70f9bfc1",
+        "streamId": "stream-6cfd5c31",
+        "date": "2026-04-03",
+        "streamTitle": "【練習新歌】繼續練習！🍥｜七星ナギ・馬來西亞VTuber #雜談 #馬來西亞vtuber #马来西亚vtuber",
+        "videoId": "YSzo-y2DVPs",
+        "timestamp": 15000,
+        "endTimestamp": 15254,
         "note": ""
       }
     ]
