@@ -93,34 +93,6 @@
       "enabled": true
     },
     {
-      "slug": "minatoaqua",
-      "displayName": "湊あくあ MinatoAqua",
-      "description": "一位笨笨的電競女僕，玩起FPS起來簡直像是一隻瘋狗，尤其是Apex，唱歌也好聽",
-      "avatarUrl": "https://yt3.googleusercontent.com/ytc/AIdro_kaZLtKaya9TSJr3M4lpzV95R2rWdQtGk67fwedroUfSnE=s900-c-k-c0x00ffffff-no-rj",
-      "brandName": "AquaPrism",
-      "subscriberCount": "220萬",
-      "group": "hololive",
-      "socialLinks": {
-        "youtube": "https://youtube.com/@minatoaqua?si=oaVOMzTmXbShylfb",
-        "twitter": "https://x.com/minatoaqua?s=20"
-      },
-      "theme": {
-        "accentPrimary": "#EC4899",
-        "accentPrimaryDark": "#DB2777",
-        "accentPrimaryLight": "#F472B6",
-        "accentSecondary": "#3B82F6",
-        "accentSecondaryLight": "#60A5FA",
-        "bgPageStart": "#FFF0F5",
-        "bgPageMid": "#F0F8FF",
-        "bgPageEnd": "#E6E6FA",
-        "bgAccentPrimary": "#FDF2F8",
-        "bgAccentPrimaryMuted": "#FCE7F3",
-        "borderAccentPrimary": "#FBCFE8",
-        "borderAccentSecondary": "#BFDBFE"
-      },
-      "enabled": true
-    },
-    {
       "slug": "earendel",
       "displayName": "Earendel ch. 厄倫蒂兒",
       "description": "✧極深空計畫 Xtreme Deep Field Project✧\n\n日安，這裡是喜歡吃飯睡覺唱歌的厄倫蒂兒🌙\n希望用歌聲笑聲可以跟人類們有更多互動和連結✨",
@@ -492,6 +464,34 @@
         "twitter": "https://x.com/linglanthebox",
         "instagram": "https://www.instagram.com/linglan_lily",
         "twitch": "https://twitch.tv/theboxlily"
+      },
+      "theme": {
+        "accentPrimary": "#EC4899",
+        "accentPrimaryDark": "#DB2777",
+        "accentPrimaryLight": "#F472B6",
+        "accentSecondary": "#3B82F6",
+        "accentSecondaryLight": "#60A5FA",
+        "bgPageStart": "#FFF0F5",
+        "bgPageMid": "#F0F8FF",
+        "bgPageEnd": "#E6E6FA",
+        "bgAccentPrimary": "#FDF2F8",
+        "bgAccentPrimaryMuted": "#FCE7F3",
+        "borderAccentPrimary": "#FBCFE8",
+        "borderAccentSecondary": "#BFDBFE"
+      },
+      "enabled": true
+    },
+    {
+      "slug": "minatoaqua",
+      "displayName": "湊あくあ MinatoAqua",
+      "description": "一位笨笨的電競女僕，玩起FPS起來簡直像是一隻瘋狗，尤其是Apex，唱歌也好聽",
+      "avatarUrl": "https://yt3.googleusercontent.com/ytc/AIdro_kaZLtKaya9TSJr3M4lpzV95R2rWdQtGk67fwedroUfSnE=s900-c-k-c0x00ffffff-no-rj",
+      "brandName": "AquaPrism",
+      "subscriberCount": "220萬",
+      "group": "hololive",
+      "socialLinks": {
+        "youtube": "https://youtube.com/@minatoaqua?si=oaVOMzTmXbShylfb",
+        "twitter": "https://x.com/minatoaqua?s=20"
       },
       "theme": {
         "accentPrimary": "#EC4899",
