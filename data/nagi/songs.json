@@ -1,5 +1,23 @@
 [
   {
+    "id": "song-02b960f0",
+    "title": "Cry Out",
+    "originalArtist": "ONE OK ROCK",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-8dae1787",
+        "streamId": "stream-f0a46d63",
+        "date": "2026-04-06",
+        "streamTitle": "【突發】國王唱歌 🍥｜七星ナギ・馬來西亞VTuber #雜談 #馬來西亞vtuber #马来西亚vtuber",
+        "videoId": "cSoSm46DxN0",
+        "timestamp": 3125,
+        "endTimestamp": 3348,
+        "note": ""
+      }
+    ]
+  },
+  {
     "id": "song-08550056",
     "title": "Price Tag",
     "originalArtist": "Jessie J",
@@ -36,6 +54,24 @@
     ]
   },
   {
+    "id": "song-220a0637",
+    "title": "うっせわ",
+    "originalArtist": "Ado",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-feb4acae",
+        "streamId": "stream-f0a46d63",
+        "date": "2026-04-06",
+        "streamTitle": "【突發】國王唱歌 🍥｜七星ナギ・馬來西亞VTuber #雜談 #馬來西亞vtuber #马来西亚vtuber",
+        "videoId": "cSoSm46DxN0",
+        "timestamp": 2041,
+        "endTimestamp": 2241,
+        "note": ""
+      }
+    ]
+  },
+  {
     "id": "song-2cba5602",
     "title": "Rewrite the Stars",
     "originalArtist": "Zac Efron & Zendaya",
@@ -49,6 +85,24 @@
         "videoId": "eluS2DmhMfY",
         "timestamp": 3386,
         "endTimestamp": 3598,
+        "note": ""
+      }
+    ]
+  },
+  {
+    "id": "song-30ff26a6",
+    "title": "oath sign",
+    "originalArtist": "LiSA",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-aec2cbb9",
+        "streamId": "stream-f0a46d63",
+        "date": "2026-04-06",
+        "streamTitle": "【突發】國王唱歌 🍥｜七星ナギ・馬來西亞VTuber #雜談 #馬來西亞vtuber #马来西亚vtuber",
+        "videoId": "cSoSm46DxN0",
+        "timestamp": 1469,
+        "endTimestamp": 1711,
         "note": ""
       }
     ]
@@ -90,6 +144,24 @@
     ]
   },
   {
+    "id": "song-3b7cf7d9",
+    "title": "ポッカデラベリタ",
+    "originalArtist": "柊キライ feat. v flower",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-aec75d50",
+        "streamId": "stream-f0a46d63",
+        "date": "2026-04-06",
+        "streamTitle": "【突發】國王唱歌 🍥｜七星ナギ・馬來西亞VTuber #雜談 #馬來西亞vtuber #马来西亚vtuber",
+        "videoId": "cSoSm46DxN0",
+        "timestamp": 3776,
+        "endTimestamp": 3973,
+        "note": ""
+      }
+    ]
+  },
+  {
     "id": "song-3f94bbd7",
     "title": "狂乱Key Kids!!",
     "originalArtist": "THE ORAL CIGARETTES",
@@ -103,6 +175,60 @@
         "videoId": "eluS2DmhMfY",
         "timestamp": 2416,
         "endTimestamp": 2662,
+        "note": ""
+      }
+    ]
+  },
+  {
+    "id": "song-4ea59a6b",
+    "title": "フォニイ",
+    "originalArtist": "ツミキ feat. 可不",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-aa3f05a1",
+        "streamId": "stream-f0a46d63",
+        "date": "2026-04-06",
+        "streamTitle": "【突發】國王唱歌 🍥｜七星ナギ・馬來西亞VTuber #雜談 #馬來西亞vtuber #马来西亚vtuber",
+        "videoId": "cSoSm46DxN0",
+        "timestamp": 4601,
+        "endTimestamp": 4787,
+        "note": ""
+      }
+    ]
+  },
+  {
+    "id": "song-5611694d",
+    "title": "グッバイ宣言",
+    "originalArtist": "Chinozo",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-21699d49",
+        "streamId": "stream-f0a46d63",
+        "date": "2026-04-06",
+        "streamTitle": "【突發】國王唱歌 🍥｜七星ナギ・馬來西亞VTuber #雜談 #馬來西亞vtuber #马来西亚vtuber",
+        "videoId": "cSoSm46DxN0",
+        "timestamp": 4217,
+        "endTimestamp": 4387,
+        "note": ""
+      }
+    ]
+  },
+  {
+    "id": "song-574c5bc2",
+    "title": "怪物",
+    "originalArtist": "サカナクション",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-5fd7dfac",
+        "streamId": "stream-f0a46d63",
+        "date": "2026-04-06",
+        "streamTitle": "【突發】國王唱歌 🍥｜七星ナギ・馬來西亞VTuber #雜談 #馬來西亞vtuber #马来西亚vtuber",
+        "videoId": "cSoSm46DxN0",
+        "timestamp": 718,
+        "endTimestamp": 972,
         "note": ""
       }
     ]
@@ -175,6 +301,42 @@
         "videoId": "YSzo-y2DVPs",
         "timestamp": 10387,
         "endTimestamp": 10690,
+        "note": ""
+      }
+    ]
+  },
+  {
+    "id": "song-9ac272c6",
+    "title": "Mighty Long Fall",
+    "originalArtist": "ONE OK ROCK",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-68f2d760",
+        "streamId": "stream-f0a46d63",
+        "date": "2026-04-06",
+        "streamTitle": "【突發】國王唱歌 🍥｜七星ナギ・馬來西亞VTuber #雜談 #馬來西亞vtuber #马来西亚vtuber",
+        "videoId": "cSoSm46DxN0",
+        "timestamp": 2773,
+        "endTimestamp": 3009,
+        "note": ""
+      }
+    ]
+  },
+  {
+    "id": "song-aa79f3f3",
+    "title": "メルト",
+    "originalArtist": "ryo (supercell) feat. 初音ミク",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-14e09dbf",
+        "streamId": "stream-f0a46d63",
+        "date": "2026-04-06",
+        "streamTitle": "【突發】國王唱歌 🍥｜七星ナギ・馬來西亞VTuber #雜談 #馬來西亞vtuber #马来西亚vtuber",
+        "videoId": "cSoSm46DxN0",
+        "timestamp": 3405,
+        "endTimestamp": 3657,
         "note": ""
       }
     ]
@@ -288,6 +450,24 @@
     ]
   },
   {
+    "id": "song-dddf6724",
+    "title": "メフィスト",
+    "originalArtist": "女王蜂",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-280fcc5d",
+        "streamId": "stream-f0a46d63",
+        "date": "2026-04-06",
+        "streamTitle": "【突發】國王唱歌 🍥｜七星ナギ・馬來西亞VTuber #雜談 #馬來西亞vtuber #马来西亚vtuber",
+        "videoId": "cSoSm46DxN0",
+        "timestamp": 1050,
+        "endTimestamp": 1276,
+        "note": ""
+      }
+    ]
+  },
+  {
     "id": "song-dfde8735",
     "title": "愛して愛して愛して",
     "originalArtist": "きくお",
@@ -301,6 +481,24 @@
         "videoId": "eluS2DmhMfY",
         "timestamp": 1669,
         "endTimestamp": 1917,
+        "note": ""
+      }
+    ]
+  },
+  {
+    "id": "song-efc2b737",
+    "title": "天樂",
+    "originalArtist": "ゆうゆ feat. 鏡音リン",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-647680a6",
+        "streamId": "stream-f0a46d63",
+        "date": "2026-04-06",
+        "streamTitle": "【突發】國王唱歌 🍥｜七星ナギ・馬來西亞VTuber #雜談 #馬來西亞vtuber #马来西亚vtuber",
+        "videoId": "cSoSm46DxN0",
+        "timestamp": 2374,
+        "endTimestamp": 2640,
         "note": ""
       }
     ]
