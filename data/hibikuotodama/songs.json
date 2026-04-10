@@ -1,1 +1,1388 @@
-[]
+[
+  {
+    "id": "song-1162145a",
+    "title": "arenae（オリ曲）",
+    "originalArtist": "Unknown",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-3782dfab",
+        "streamId": "stream-2026-04-04",
+        "date": "2026-04-04",
+        "streamTitle": "【#歌枠】10万人耐久弾き語り！【#vtuber #vsinger #shorts 】",
+        "videoId": "p3m0WLBFJ3A",
+        "timestamp": 241,
+        "endTimestamp": 311,
+        "note": ""
+      }
+    ]
+  },
+  {
+    "id": "song-12e3eb66",
+    "title": "修羅（DOES）",
+    "originalArtist": "Unknown",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-d0c13170",
+        "streamId": "stream-2026-04-02",
+        "date": "2026-04-02",
+        "streamTitle": "【#歌枠】まったりちるな弾き語り【#vtuber #vsinger #shorts 】",
+        "videoId": "7X63ym0BCrU",
+        "timestamp": 5366,
+        "endTimestamp": 5518,
+        "note": ""
+      }
+    ]
+  },
+  {
+    "id": "song-13f70dfe",
+    "title": "時には昔の話を（加藤登紀子）",
+    "originalArtist": "Unknown",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-86557f0c",
+        "streamId": "stream-6e7e56ff",
+        "date": "2026-03-31",
+        "streamTitle": "【お披露目】新髪形＆ギターlive2D実装！差分盛り沢山！【 #ヒビクデンパ共鳴中 】",
+        "videoId": "0YprWVzmXBM",
+        "timestamp": 465,
+        "endTimestamp": 703,
+        "note": ""
+      }
+    ]
+  },
+  {
+    "id": "song-144e6c10",
+    "title": "ギターと孤独と蒼い惑星（結束バンド）",
+    "originalArtist": "Unknown",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-fb555441",
+        "streamId": "stream-2026-04-04",
+        "date": "2026-04-04",
+        "streamTitle": "【#歌枠】10万人耐久弾き語り！【#vtuber #vsinger #shorts 】",
+        "videoId": "p3m0WLBFJ3A",
+        "timestamp": 3408,
+        "endTimestamp": 3637,
+        "note": ""
+      }
+    ]
+  },
+  {
+    "id": "song-145e683b",
+    "title": "フクロウ（KOKIA）",
+    "originalArtist": "Unknown",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-fb14ccfc",
+        "streamId": "stream-2026-03-29",
+        "date": "2026-03-29",
+        "streamTitle": "【#歌枠】同接１０００人耐久弾き語り！【#vtuber #vsinger #shorts 】",
+        "videoId": "mPjbRLKM5-k",
+        "timestamp": 2857,
+        "endTimestamp": 3145,
+        "note": ""
+      }
+    ]
+  },
+  {
+    "id": "song-1b47aafa",
+    "title": "からくりピエロ（40mP）",
+    "originalArtist": "Unknown",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-50b6b7a5",
+        "streamId": "stream-2026-03-29",
+        "date": "2026-03-29",
+        "streamTitle": "【#歌枠】同接１０００人耐久弾き語り！【#vtuber #vsinger #shorts 】",
+        "videoId": "mPjbRLKM5-k",
+        "timestamp": 5613,
+        "endTimestamp": 5863,
+        "note": ""
+      }
+    ]
+  },
+  {
+    "id": "song-1ce845c7",
+    "title": "ノーダウト（Official髭男dism）",
+    "originalArtist": "Unknown",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-e2eee52e",
+        "streamId": "stream-2026-04-04",
+        "date": "2026-04-04",
+        "streamTitle": "【#歌枠】10万人耐久弾き語り！【#vtuber #vsinger #shorts 】",
+        "videoId": "p3m0WLBFJ3A",
+        "timestamp": 6133,
+        "endTimestamp": 6335,
+        "note": ""
+      }
+    ]
+  },
+  {
+    "id": "song-1d2ccfcd",
+    "title": "なごり雪（イルカ）",
+    "originalArtist": "Unknown",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-37d7e906",
+        "streamId": "stream-2026-04-04",
+        "date": "2026-04-04",
+        "streamTitle": "【#歌枠】10万人耐久弾き語り！【#vtuber #vsinger #shorts 】",
+        "videoId": "p3m0WLBFJ3A",
+        "timestamp": 5366,
+        "endTimestamp": 5581,
+        "note": ""
+      }
+    ]
+  },
+  {
+    "id": "song-20c0a64c",
+    "title": "ヒカリヘ（Miwa）",
+    "originalArtist": "Unknown",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-080ae6b0",
+        "streamId": "stream-2026-04-04",
+        "date": "2026-04-04",
+        "streamTitle": "【#歌枠】10万人耐久弾き語り！【#vtuber #vsinger #shorts 】",
+        "videoId": "p3m0WLBFJ3A",
+        "timestamp": 485,
+        "endTimestamp": 804,
+        "note": ""
+      }
+    ]
+  },
+  {
+    "id": "song-22362d18",
+    "title": "弱虫モンブラン（DECO*27）",
+    "originalArtist": "Unknown",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-5d50ff6a",
+        "streamId": "stream-d17a91c7",
+        "date": "2026-04-03",
+        "streamTitle": "【#歌枠】眠れぬ夜の弾き語り【#vtuber #vsinger #shorts 】",
+        "videoId": "bkjJmblHYHU",
+        "timestamp": 4141,
+        "endTimestamp": 4380,
+        "note": ""
+      }
+    ]
+  },
+  {
+    "id": "song-2f85ae16",
+    "title": "3月9日（レミオロメン）",
+    "originalArtist": "Unknown",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-c3c3a2cd",
+        "streamId": "stream-7a581d1c",
+        "date": "2026-03-27",
+        "streamTitle": "【#歌枠】お昼のチルな弾き語り【#vtuber #vsinger #shorts 】",
+        "videoId": "C7DZATD1H0I",
+        "timestamp": 1148,
+        "endTimestamp": 1403,
+        "note": ""
+      }
+    ]
+  },
+  {
+    "id": "song-2ff26c66",
+    "title": "怪獣の花唄（Vaundy）",
+    "originalArtist": "Unknown",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-a035ea2e",
+        "streamId": "stream-2026-03-29",
+        "date": "2026-03-29",
+        "streamTitle": "【#歌枠】同接１０００人耐久弾き語り！【#vtuber #vsinger #shorts 】",
+        "videoId": "mPjbRLKM5-k",
+        "timestamp": 9781,
+        "endTimestamp": 10006,
+        "note": ""
+      }
+    ]
+  },
+  {
+    "id": "song-332c8fd4",
+    "title": "arenae（オリ曲）",
+    "originalArtist": "Unknown",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-bf932e17",
+        "streamId": "stream-2026-04-04",
+        "date": "2026-04-04",
+        "streamTitle": "【#歌枠】10万人耐久弾き語り！【#vtuber #vsinger #shorts 】",
+        "videoId": "p3m0WLBFJ3A",
+        "timestamp": 6706,
+        "endTimestamp": 6840,
+        "note": ""
+      }
+    ]
+  },
+  {
+    "id": "song-339dcf09",
+    "title": "崖の上のポニョ（藤岡藤巻と大橋のぞみ）",
+    "originalArtist": "Unknown",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-d66d0517",
+        "streamId": "stream-d17a91c7",
+        "date": "2026-04-03",
+        "streamTitle": "【#歌枠】眠れぬ夜の弾き語り【#vtuber #vsinger #shorts 】",
+        "videoId": "bkjJmblHYHU",
+        "timestamp": 567,
+        "endTimestamp": 735,
+        "note": ""
+      }
+    ]
+  },
+  {
+    "id": "song-354ca38b",
+    "title": "踊り子（Vaundy）",
+    "originalArtist": "Unknown",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-6b70d700",
+        "streamId": "stream-2026-03-29",
+        "date": "2026-03-29",
+        "streamTitle": "【#歌枠】同接１０００人耐久弾き語り！【#vtuber #vsinger #shorts 】",
+        "videoId": "mPjbRLKM5-k",
+        "timestamp": 5137,
+        "endTimestamp": 5414,
+        "note": ""
+      }
+    ]
+  },
+  {
+    "id": "song-3590ea5e",
+    "title": "もののけ姫（米良美一）",
+    "originalArtist": "Unknown",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-637a33c8",
+        "streamId": "stream-d17a91c7",
+        "date": "2026-04-03",
+        "streamTitle": "【#歌枠】眠れぬ夜の弾き語り【#vtuber #vsinger #shorts 】",
+        "videoId": "bkjJmblHYHU",
+        "timestamp": 6211,
+        "endTimestamp": 6423,
+        "note": ""
+      }
+    ]
+  },
+  {
+    "id": "song-35b5457c",
+    "title": "何度明日が来ようとも（オリ曲）",
+    "originalArtist": "Unknown",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-9a1db23f",
+        "streamId": "stream-2026-03-29",
+        "date": "2026-03-29",
+        "streamTitle": "【#歌枠】同接１０００人耐久弾き語り！【#vtuber #vsinger #shorts 】",
+        "videoId": "mPjbRLKM5-k",
+        "timestamp": 11102,
+        "endTimestamp": 11350,
+        "note": ""
+      }
+    ]
+  },
+  {
+    "id": "song-361c6fba",
+    "title": "めぐる季節（井上あずみ）",
+    "originalArtist": "Unknown",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-7bb8b78e",
+        "streamId": "stream-2026-04-04",
+        "date": "2026-04-04",
+        "streamTitle": "【#歌枠】10万人耐久弾き語り！【#vtuber #vsinger #shorts 】",
+        "videoId": "p3m0WLBFJ3A",
+        "timestamp": 1924,
+        "endTimestamp": 2199,
+        "note": ""
+      }
+    ]
+  },
+  {
+    "id": "song-39a2a5e4",
+    "title": "arenae（オリ曲）",
+    "originalArtist": "Unknown",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-d22ea98c",
+        "streamId": "stream-2026-03-29",
+        "date": "2026-03-29",
+        "streamTitle": "【#歌枠】同接１０００人耐久弾き語り！【#vtuber #vsinger #shorts 】",
+        "videoId": "mPjbRLKM5-k",
+        "timestamp": 10648,
+        "endTimestamp": 10785,
+        "note": ""
+      }
+    ]
+  },
+  {
+    "id": "song-3b2242cd",
+    "title": "時には昔の話を（加藤登紀子）",
+    "originalArtist": "Unknown",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-0fc7e3fe",
+        "streamId": "stream-2026-04-04",
+        "date": "2026-04-04",
+        "streamTitle": "【#歌枠】10万人耐久弾き語り！【#vtuber #vsinger #shorts 】",
+        "videoId": "p3m0WLBFJ3A",
+        "timestamp": 976,
+        "endTimestamp": 1214,
+        "note": ""
+      }
+    ]
+  },
+  {
+    "id": "song-3bf612c6",
+    "title": "残酷な天使のテーゼ（高橋洋子）",
+    "originalArtist": "Unknown",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-448521f2",
+        "streamId": "stream-7a581d1c",
+        "date": "2026-03-27",
+        "streamTitle": "【#歌枠】お昼のチルな弾き語り【#vtuber #vsinger #shorts 】",
+        "videoId": "C7DZATD1H0I",
+        "timestamp": 1941,
+        "endTimestamp": 2189,
+        "note": ""
+      }
+    ]
+  },
+  {
+    "id": "song-3c19644d",
+    "title": "FLY ME TO THE MOON（クレア）",
+    "originalArtist": "Unknown",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-e5cdf1d3",
+        "streamId": "stream-7a581d1c",
+        "date": "2026-03-27",
+        "streamTitle": "【#歌枠】お昼のチルな弾き語り【#vtuber #vsinger #shorts 】",
+        "videoId": "C7DZATD1H0I",
+        "timestamp": 2959,
+        "endTimestamp": 3171,
+        "note": ""
+      }
+    ]
+  },
+  {
+    "id": "song-40419569",
+    "title": "へび（ヨルシカ）",
+    "originalArtist": "Unknown",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-4f6f1fc1",
+        "streamId": "stream-2026-03-29",
+        "date": "2026-03-29",
+        "streamTitle": "【#歌枠】同接１０００人耐久弾き語り！【#vtuber #vsinger #shorts 】",
+        "videoId": "mPjbRLKM5-k",
+        "timestamp": 1674,
+        "endTimestamp": 1930,
+        "note": ""
+      }
+    ]
+  },
+  {
+    "id": "song-40fba02d",
+    "title": "東京フラッシュ（Vaundy）",
+    "originalArtist": "Unknown",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-2b00aa2f",
+        "streamId": "stream-2026-03-29",
+        "date": "2026-03-29",
+        "streamTitle": "【#歌枠】同接１０００人耐久弾き語り！【#vtuber #vsinger #shorts 】",
+        "videoId": "mPjbRLKM5-k",
+        "timestamp": 9376,
+        "endTimestamp": 9635,
+        "note": ""
+      }
+    ]
+  },
+  {
+    "id": "song-435baab2",
+    "title": "なごり雪（イルカ）",
+    "originalArtist": "Unknown",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-33323863",
+        "streamId": "stream-6e7e56ff",
+        "date": "2026-03-31",
+        "streamTitle": "【お披露目】新髪形＆ギターlive2D実装！差分盛り沢山！【 #ヒビクデンパ共鳴中 】",
+        "videoId": "0YprWVzmXBM",
+        "timestamp": 1040,
+        "endTimestamp": 1255,
+        "note": ""
+      }
+    ]
+  },
+  {
+    "id": "song-49742b42",
+    "title": "閃光少女（東京事変）",
+    "originalArtist": "Unknown",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-c9e9fa0d",
+        "streamId": "stream-2026-04-04",
+        "date": "2026-04-04",
+        "streamTitle": "【#歌枠】10万人耐久弾き語り！【#vtuber #vsinger #shorts 】",
+        "videoId": "p3m0WLBFJ3A",
+        "timestamp": 4621,
+        "endTimestamp": 4801,
+        "note": ""
+      }
+    ]
+  },
+  {
+    "id": "song-4d59391e",
+    "title": "アイネクライネ（米津玄師）",
+    "originalArtist": "Unknown",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-aa164101",
+        "streamId": "stream-7a581d1c",
+        "date": "2026-03-27",
+        "streamTitle": "【#歌枠】お昼のチルな弾き語り【#vtuber #vsinger #shorts 】",
+        "videoId": "C7DZATD1H0I",
+        "timestamp": 3455,
+        "endTimestamp": 3743,
+        "note": ""
+      }
+    ]
+  },
+  {
+    "id": "song-4e75660f",
+    "title": "ルージュの伝言（荒井由実）",
+    "originalArtist": "Unknown",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-9a6f1c0b",
+        "streamId": "stream-f69b28ed",
+        "date": "2026-03-30",
+        "streamTitle": "【#歌枠】告知アリ!まったりチルな弾き語り【#vtuber #vsinger #shorts 】",
+        "videoId": "c1jjYf0JpEw",
+        "timestamp": 361,
+        "endTimestamp": 544,
+        "note": ""
+      }
+    ]
+  },
+  {
+    "id": "song-4f76fbba",
+    "title": "対象a（anNina）",
+    "originalArtist": "Unknown",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-81bb296c",
+        "streamId": "stream-2026-04-02",
+        "date": "2026-04-02",
+        "streamTitle": "【#歌枠】まったりちるな弾き語り【#vtuber #vsinger #shorts 】",
+        "videoId": "7X63ym0BCrU",
+        "timestamp": 4584,
+        "endTimestamp": 4840,
+        "note": ""
+      }
+    ]
+  },
+  {
+    "id": "song-566d9d2f",
+    "title": "花に亡霊（ヨルシカ）",
+    "originalArtist": "Unknown",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-376a45fd",
+        "streamId": "stream-2026-03-29",
+        "date": "2026-03-29",
+        "streamTitle": "【#歌枠】同接１０００人耐久弾き語り！【#vtuber #vsinger #shorts 】",
+        "videoId": "mPjbRLKM5-k",
+        "timestamp": 939,
+        "endTimestamp": 1179,
+        "note": ""
+      }
+    ]
+  },
+  {
+    "id": "song-590b80da",
+    "title": "シリョクケンサ（40mP）",
+    "originalArtist": "Unknown",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-83aee117",
+        "streamId": "stream-2026-03-29",
+        "date": "2026-03-29",
+        "streamTitle": "【#歌枠】同接１０００人耐久弾き語り！【#vtuber #vsinger #shorts 】",
+        "videoId": "mPjbRLKM5-k",
+        "timestamp": 6100,
+        "endTimestamp": 6372,
+        "note": ""
+      }
+    ]
+  },
+  {
+    "id": "song-60d2f4b3",
+    "title": "あのバンド（結束バンド）",
+    "originalArtist": "Unknown",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-cc62e37b",
+        "streamId": "stream-2026-04-04",
+        "date": "2026-04-04",
+        "streamTitle": "【#歌枠】10万人耐久弾き語り！【#vtuber #vsinger #shorts 】",
+        "videoId": "p3m0WLBFJ3A",
+        "timestamp": 2422,
+        "endTimestamp": 2636,
+        "note": ""
+      }
+    ]
+  },
+  {
+    "id": "song-61ab1bfe",
+    "title": "Jupiter（平原綾香）",
+    "originalArtist": "Unknown",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-36eb0964",
+        "streamId": "stream-d17a91c7",
+        "date": "2026-04-03",
+        "streamTitle": "【#歌枠】眠れぬ夜の弾き語り【#vtuber #vsinger #shorts 】",
+        "videoId": "bkjJmblHYHU",
+        "timestamp": 2074,
+        "endTimestamp": 2435,
+        "note": ""
+      }
+    ]
+  },
+  {
+    "id": "song-6d2fbdcb",
+    "title": "ひまわりの約束（秦基博）",
+    "originalArtist": "Unknown",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-a28ac99b",
+        "streamId": "stream-2026-04-02",
+        "date": "2026-04-02",
+        "streamTitle": "【#歌枠】まったりちるな弾き語り【#vtuber #vsinger #shorts 】",
+        "videoId": "7X63ym0BCrU",
+        "timestamp": 3294,
+        "endTimestamp": 3609,
+        "note": ""
+      }
+    ]
+  },
+  {
+    "id": "song-7d50d417",
+    "title": "ミカヅキ（さユり）",
+    "originalArtist": "Unknown",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-2d0492e4",
+        "streamId": "stream-2026-03-29",
+        "date": "2026-03-29",
+        "streamTitle": "【#歌枠】同接１０００人耐久弾き語り！【#vtuber #vsinger #shorts 】",
+        "videoId": "mPjbRLKM5-k",
+        "timestamp": 4644,
+        "endTimestamp": 4905,
+        "note": ""
+      }
+    ]
+  },
+  {
+    "id": "song-7eb9f44f",
+    "title": "時には昔の話を（加藤登紀子）",
+    "originalArtist": "Unknown",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-00386211",
+        "streamId": "stream-7a581d1c",
+        "date": "2026-03-27",
+        "streamTitle": "【#歌枠】お昼のチルな弾き語り【#vtuber #vsinger #shorts 】",
+        "videoId": "C7DZATD1H0I",
+        "timestamp": 4140,
+        "endTimestamp": 4378,
+        "note": ""
+      }
+    ]
+  },
+  {
+    "id": "song-7ec012b1",
+    "title": "ニャースのうた（ニャース[犬山犬子]）",
+    "originalArtist": "Unknown",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-7cf52418",
+        "streamId": "stream-2026-04-04",
+        "date": "2026-04-04",
+        "streamTitle": "【#歌枠】10万人耐久弾き語り！【#vtuber #vsinger #shorts 】",
+        "videoId": "p3m0WLBFJ3A",
+        "timestamp": 5010,
+        "endTimestamp": 5258,
+        "note": ""
+      }
+    ]
+  },
+  {
+    "id": "song-86c980e7",
+    "title": "若者のすべて（フジファブリック）",
+    "originalArtist": "Unknown",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-7b30493c",
+        "streamId": "stream-6e7e56ff",
+        "date": "2026-03-31",
+        "streamTitle": "【お披露目】新髪形＆ギターlive2D実装！差分盛り沢山！【 #ヒビクデンパ共鳴中 】",
+        "videoId": "0YprWVzmXBM",
+        "timestamp": 1511,
+        "endTimestamp": 1808,
+        "note": ""
+      }
+    ]
+  },
+  {
+    "id": "song-8ac356a4",
+    "title": "春を告げる（yama）",
+    "originalArtist": "Unknown",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-dffd6807",
+        "streamId": "stream-7a581d1c",
+        "date": "2026-03-27",
+        "streamTitle": "【#歌枠】お昼のチルな弾き語り【#vtuber #vsinger #shorts 】",
+        "videoId": "C7DZATD1H0I",
+        "timestamp": 744,
+        "endTimestamp": 940,
+        "note": ""
+      }
+    ]
+  },
+  {
+    "id": "song-90eb0af0",
+    "title": "恋愛サーキュレーション（千石撫子[花澤香菜]）",
+    "originalArtist": "Unknown",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-34167e2b",
+        "streamId": "stream-2026-03-29",
+        "date": "2026-03-29",
+        "streamTitle": "【#歌枠】同接１０００人耐久弾き語り！【#vtuber #vsinger #shorts 】",
+        "videoId": "mPjbRLKM5-k",
+        "timestamp": 8468,
+        "endTimestamp": 8728,
+        "note": ""
+      }
+    ]
+  },
+  {
+    "id": "song-92e3eb5e",
+    "title": "風を食む（ヨルシカ）",
+    "originalArtist": "Unknown",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-01058a13",
+        "streamId": "stream-2026-03-29",
+        "date": "2026-03-29",
+        "streamTitle": "【#歌枠】同接１０００人耐久弾き語り！【#vtuber #vsinger #shorts 】",
+        "videoId": "mPjbRLKM5-k",
+        "timestamp": 2267,
+        "endTimestamp": 2536,
+        "note": ""
+      }
+    ]
+  },
+  {
+    "id": "song-93e0705f",
+    "title": "月光浴（柴田淳）",
+    "originalArtist": "Unknown",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-a9be7593",
+        "streamId": "stream-d17a91c7",
+        "date": "2026-04-03",
+        "streamTitle": "【#歌枠】眠れぬ夜の弾き語り【#vtuber #vsinger #shorts 】",
+        "videoId": "bkjJmblHYHU",
+        "timestamp": 1477,
+        "endTimestamp": 1786,
+        "note": ""
+      }
+    ]
+  },
+  {
+    "id": "song-942e124b",
+    "title": "ヒカリヘ（Miwa）",
+    "originalArtist": "Unknown",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-af55c77c",
+        "streamId": "stream-2026-03-29",
+        "date": "2026-03-29",
+        "streamTitle": "【#歌枠】同接１０００人耐久弾き語り！【#vtuber #vsinger #shorts 】",
+        "videoId": "mPjbRLKM5-k",
+        "timestamp": 7711,
+        "endTimestamp": 8030,
+        "note": ""
+      }
+    ]
+  },
+  {
+    "id": "song-9923179b",
+    "title": "プロポーズ（なとり）",
+    "originalArtist": "Unknown",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-14858b21",
+        "streamId": "stream-2026-03-29",
+        "date": "2026-03-29",
+        "streamTitle": "【#歌枠】同接１０００人耐久弾き語り！【#vtuber #vsinger #shorts 】",
+        "videoId": "mPjbRLKM5-k",
+        "timestamp": 8989,
+        "endTimestamp": 9167,
+        "note": ""
+      }
+    ]
+  },
+  {
+    "id": "song-9943a30b",
+    "title": "わたしの恋はホッチキス（放課後ティータイム）",
+    "originalArtist": "Unknown",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-fc0f16a3",
+        "streamId": "stream-2026-04-04",
+        "date": "2026-04-04",
+        "streamTitle": "【#歌枠】10万人耐久弾き語り！【#vtuber #vsinger #shorts 】",
+        "videoId": "p3m0WLBFJ3A",
+        "timestamp": 3762,
+        "endTimestamp": 4026,
+        "note": ""
+      }
+    ]
+  },
+  {
+    "id": "song-99b3ca08",
+    "title": "雨とカプチーノ（ヨルシカ）",
+    "originalArtist": "Unknown",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-6dee2702",
+        "streamId": "stream-2026-03-29",
+        "date": "2026-03-29",
+        "streamTitle": "【#歌枠】同接１０００人耐久弾き語り！【#vtuber #vsinger #shorts 】",
+        "videoId": "mPjbRLKM5-k",
+        "timestamp": 394,
+        "endTimestamp": 664,
+        "note": ""
+      }
+    ]
+  },
+  {
+    "id": "song-9ee20c06",
+    "title": "君をのせて（井上あずみ）",
+    "originalArtist": "Unknown",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-712c0ae6",
+        "streamId": "stream-2026-04-02",
+        "date": "2026-04-02",
+        "streamTitle": "【#歌枠】まったりちるな弾き語り【#vtuber #vsinger #shorts 】",
+        "videoId": "7X63ym0BCrU",
+        "timestamp": 273,
+        "endTimestamp": 474,
+        "note": ""
+      }
+    ]
+  },
+  {
+    "id": "song-a3cd7e9a",
+    "title": "いつも何度でも（木村弓）",
+    "originalArtist": "Unknown",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-71fbb3b4",
+        "streamId": "stream-f69b28ed",
+        "date": "2026-03-30",
+        "streamTitle": "【#歌枠】告知アリ!まったりチルな弾き語り【#vtuber #vsinger #shorts 】",
+        "videoId": "c1jjYf0JpEw",
+        "timestamp": 807,
+        "endTimestamp": 1025,
+        "note": ""
+      }
+    ]
+  },
+  {
+    "id": "song-b237c03d",
+    "title": "強風オールバック（ゆこぴ）",
+    "originalArtist": "Unknown",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-d594f232",
+        "streamId": "stream-7a581d1c",
+        "date": "2026-03-27",
+        "streamTitle": "【#歌枠】お昼のチルな弾き語り【#vtuber #vsinger #shorts 】",
+        "videoId": "C7DZATD1H0I",
+        "timestamp": 5441,
+        "endTimestamp": 5578,
+        "note": ""
+      }
+    ]
+  },
+  {
+    "id": "song-b49b4e1e",
+    "title": "魂のルフラン（高橋洋子）",
+    "originalArtist": "Unknown",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-0e095b99",
+        "streamId": "stream-7a581d1c",
+        "date": "2026-03-27",
+        "streamTitle": "【#歌枠】お昼のチルな弾き語り【#vtuber #vsinger #shorts 】",
+        "videoId": "C7DZATD1H0I",
+        "timestamp": 2315,
+        "endTimestamp": 2630,
+        "note": ""
+      }
+    ]
+  },
+  {
+    "id": "song-ba9c0f6f",
+    "title": "カントリーロード（本名陽子）",
+    "originalArtist": "Unknown",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-aa1a2bfe",
+        "streamId": "stream-7a581d1c",
+        "date": "2026-03-27",
+        "streamTitle": "【#歌枠】お昼のチルな弾き語り【#vtuber #vsinger #shorts 】",
+        "videoId": "C7DZATD1H0I",
+        "timestamp": 324,
+        "endTimestamp": 588,
+        "note": ""
+      }
+    ]
+  },
+  {
+    "id": "song-bdc6427a",
+    "title": "踊り子（Vaundy）",
+    "originalArtist": "Unknown",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-8b5fa8b8",
+        "streamId": "stream-d17a91c7",
+        "date": "2026-04-03",
+        "streamTitle": "【#歌枠】眠れぬ夜の弾き語り【#vtuber #vsinger #shorts 】",
+        "videoId": "bkjJmblHYHU",
+        "timestamp": 3243,
+        "endTimestamp": 3520,
+        "note": ""
+      }
+    ]
+  },
+  {
+    "id": "song-be5d0535",
+    "title": "いのちの名前",
+    "originalArtist": "Unknown",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-a615b44e",
+        "streamId": "stream-2026-03-29",
+        "date": "2026-03-29",
+        "streamTitle": "【#歌枠】同接１０００人耐久弾き語り！【#vtuber #vsinger #shorts 】",
+        "videoId": "mPjbRLKM5-k",
+        "timestamp": 3559,
+        "endTimestamp": 4011,
+        "note": ""
+      }
+    ]
+  },
+  {
+    "id": "song-c0d5afed",
+    "title": "ウィーアー!（きただにひろし）",
+    "originalArtist": "Unknown",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-f8f7b753",
+        "streamId": "stream-2026-04-02",
+        "date": "2026-04-02",
+        "streamTitle": "【#歌枠】まったりちるな弾き語り【#vtuber #vsinger #shorts 】",
+        "videoId": "7X63ym0BCrU",
+        "timestamp": 1013,
+        "endTimestamp": 1255,
+        "note": ""
+      }
+    ]
+  },
+  {
+    "id": "song-c435d1ff",
+    "title": "風になる（つじあやの）",
+    "originalArtist": "Unknown",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-8c5a6201",
+        "streamId": "stream-2026-03-29",
+        "date": "2026-03-29",
+        "streamTitle": "【#歌枠】同接１０００人耐久弾き語り！【#vtuber #vsinger #shorts 】",
+        "videoId": "mPjbRLKM5-k",
+        "timestamp": 10145,
+        "endTimestamp": 10422,
+        "note": ""
+      }
+    ]
+  },
+  {
+    "id": "song-c5ab3d01",
+    "title": "深海少女（ゆうゆ）",
+    "originalArtist": "Unknown",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-653028f0",
+        "streamId": "stream-2026-03-29",
+        "date": "2026-03-29",
+        "streamTitle": "【#歌枠】同接１０００人耐久弾き語り！【#vtuber #vsinger #shorts 】",
+        "videoId": "mPjbRLKM5-k",
+        "timestamp": 7034,
+        "endTimestamp": 7250,
+        "note": ""
+      }
+    ]
+  },
+  {
+    "id": "song-c648b3c5",
+    "title": "ルージュの伝言（荒井由実）",
+    "originalArtist": "Unknown",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-e06589e5",
+        "streamId": "stream-d17a91c7",
+        "date": "2026-04-03",
+        "streamTitle": "【#歌枠】眠れぬ夜の弾き語り【#vtuber #vsinger #shorts 】",
+        "videoId": "bkjJmblHYHU",
+        "timestamp": 836,
+        "endTimestamp": 1019,
+        "note": ""
+      }
+    ]
+  },
+  {
+    "id": "song-c8f30fa0",
+    "title": "時には昔の話を（加藤登紀子）",
+    "originalArtist": "Unknown",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-cfdab7ef",
+        "streamId": "stream-2026-03-29",
+        "date": "2026-03-29",
+        "streamTitle": "【#歌枠】同接１０００人耐久弾き語り！【#vtuber #vsinger #shorts 】",
+        "videoId": "mPjbRLKM5-k",
+        "timestamp": 8635,
+        "endTimestamp": 8873,
+        "note": ""
+      }
+    ]
+  },
+  {
+    "id": "song-cafe239b",
+    "title": "So Far Away（Carole King）",
+    "originalArtist": "Unknown",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-460367fc",
+        "streamId": "stream-2026-04-02",
+        "date": "2026-04-02",
+        "streamTitle": "【#歌枠】まったりちるな弾き語り【#vtuber #vsinger #shorts 】",
+        "videoId": "7X63ym0BCrU",
+        "timestamp": 1546,
+        "endTimestamp": 1851,
+        "note": ""
+      }
+    ]
+  },
+  {
+    "id": "song-cc1f2418",
+    "title": "One Last Kiss（宇多田ヒカル）",
+    "originalArtist": "Unknown",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-e7b55085",
+        "streamId": "stream-2026-04-02",
+        "date": "2026-04-02",
+        "streamTitle": "【#歌枠】まったりちるな弾き語り【#vtuber #vsinger #shorts 】",
+        "videoId": "7X63ym0BCrU",
+        "timestamp": 2131,
+        "endTimestamp": 2381,
+        "note": ""
+      }
+    ]
+  },
+  {
+    "id": "song-cc397301",
+    "title": "夜明けと蛍（n-buna）",
+    "originalArtist": "Unknown",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-a5ad418a",
+        "streamId": "stream-2026-04-02",
+        "date": "2026-04-02",
+        "streamTitle": "【#歌枠】まったりちるな弾き語り【#vtuber #vsinger #shorts 】",
+        "videoId": "7X63ym0BCrU",
+        "timestamp": 4021,
+        "endTimestamp": 4330,
+        "note": ""
+      }
+    ]
+  },
+  {
+    "id": "song-cf16ed1c",
+    "title": "プロポーズ（なと",
+    "originalArtist": "Unknown",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-d06c40b9",
+        "streamId": "stream-6e7e56ff",
+        "date": "2026-03-31",
+        "streamTitle": "【お披露目】新髪形＆ギターlive2D実装！差分盛り沢山！【 #ヒビクデンパ共鳴中 】",
+        "videoId": "0YprWVzmXBM",
+        "timestamp": 3505,
+        "endTimestamp": 3837,
+        "note": ""
+      }
+    ]
+  },
+  {
+    "id": "song-d09a37ca",
+    "title": "JANE DOE（米津玄師,宇多田ヒカル）",
+    "originalArtist": "Unknown",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-6184394b",
+        "streamId": "stream-7a581d1c",
+        "date": "2026-03-27",
+        "streamTitle": "【#歌枠】お昼のチルな弾き語り【#vtuber #vsinger #shorts 】",
+        "videoId": "C7DZATD1H0I",
+        "timestamp": 3870,
+        "endTimestamp": 4106,
+        "note": ""
+      }
+    ]
+  },
+  {
+    "id": "song-d11216b3",
+    "title": "cigar kiss（オリ曲）",
+    "originalArtist": "Unknown",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-008f37ee",
+        "streamId": "stream-2026-04-04",
+        "date": "2026-04-04",
+        "streamTitle": "【#歌枠】10万人耐久弾き語り！【#vtuber #vsinger #shorts 】",
+        "videoId": "p3m0WLBFJ3A",
+        "timestamp": 6302,
+        "endTimestamp": 6417,
+        "note": ""
+      }
+    ]
+  },
+  {
+    "id": "song-d18fe139",
+    "title": "you（癒月ひぐらし）",
+    "originalArtist": "Unknown",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-a61fd485",
+        "streamId": "stream-2026-04-02",
+        "date": "2026-04-02",
+        "streamTitle": "【#歌枠】まったりちるな弾き語り【#vtuber #vsinger #shorts 】",
+        "videoId": "7X63ym0BCrU",
+        "timestamp": 4208,
+        "endTimestamp": 4451,
+        "note": ""
+      }
+    ]
+  },
+  {
+    "id": "song-d377f45f",
+    "title": "Just Be Friends（Dixie Flatline）",
+    "originalArtist": "Unknown",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-fa3e7d33",
+        "streamId": "stream-2026-04-04",
+        "date": "2026-04-04",
+        "streamTitle": "【#歌枠】10万人耐久弾き語り！【#vtuber #vsinger #shorts 】",
+        "videoId": "p3m0WLBFJ3A",
+        "timestamp": 5692,
+        "endTimestamp": 5862,
+        "note": ""
+      }
+    ]
+  },
+  {
+    "id": "song-d46e5f95",
+    "title": "星座になれたら（結束バンド）",
+    "originalArtist": "Unknown",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-dcc62eb1",
+        "streamId": "stream-2026-04-04",
+        "date": "2026-04-04",
+        "streamTitle": "【#歌枠】10万人耐久弾き語り！【#vtuber #vsinger #shorts 】",
+        "videoId": "p3m0WLBFJ3A",
+        "timestamp": 2903,
+        "endTimestamp": 3161,
+        "note": ""
+      }
+    ]
+  },
+  {
+    "id": "song-d5f9c0c2",
+    "title": "Arrietty's Song（セシル・コルベル）",
+    "originalArtist": "Unknown",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-e46a2bbb",
+        "streamId": "stream-2026-04-04",
+        "date": "2026-04-04",
+        "streamTitle": "【#歌枠】10万人耐久弾き語り！【#vtuber #vsinger #shorts 】",
+        "videoId": "p3m0WLBFJ3A",
+        "timestamp": 1410,
+        "endTimestamp": 1617,
+        "note": ""
+      }
+    ]
+  },
+  {
+    "id": "song-dcd775c6",
+    "title": "I Want You Back（The Jackson 5）",
+    "originalArtist": "Unknown",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-bc0d485b",
+        "streamId": "stream-2026-04-02",
+        "date": "2026-04-02",
+        "streamTitle": "【#歌枠】まったりちるな弾き語り【#vtuber #vsinger #shorts 】",
+        "videoId": "7X63ym0BCrU",
+        "timestamp": 1346,
+        "endTimestamp": 1502,
+        "note": ""
+      }
+    ]
+  },
+  {
+    "id": "song-e5afd04b",
+    "title": "糸（中島みゆき）",
+    "originalArtist": "Unknown",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-2b5b43f6",
+        "streamId": "stream-2026-03-29",
+        "date": "2026-03-29",
+        "streamTitle": "【#歌枠】同接１０００人耐久弾き語り！【#vtuber #vsinger #shorts 】",
+        "videoId": "mPjbRLKM5-k",
+        "timestamp": 4124,
+        "endTimestamp": 4431,
+        "note": ""
+      }
+    ]
+  },
+  {
+    "id": "song-e8cf212e",
+    "title": "私は最強（Ado）",
+    "originalArtist": "Unknown",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-8047c64a",
+        "streamId": "stream-2026-04-04",
+        "date": "2026-04-04",
+        "streamTitle": "【#歌枠】10万人耐久弾き語り！【#vtuber #vsinger #shorts 】",
+        "videoId": "p3m0WLBFJ3A",
+        "timestamp": 6518,
+        "endTimestamp": 6794,
+        "note": ""
+      }
+    ]
+  },
+  {
+    "id": "song-ea8b9a89",
+    "title": "鳥の詩（Lia）",
+    "originalArtist": "Unknown",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-a7b575ba",
+        "streamId": "stream-f69b28ed",
+        "date": "2026-03-30",
+        "streamTitle": "【#歌枠】告知アリ!まったりチルな弾き語り【#vtuber #vsinger #shorts 】",
+        "videoId": "c1jjYf0JpEw",
+        "timestamp": 1493,
+        "endTimestamp": 1894,
+        "note": ""
+      }
+    ]
+  },
+  {
+    "id": "song-eb33dfaa",
+    "title": "ムーンライト伝説（DALI）",
+    "originalArtist": "Unknown",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-9233c7fa",
+        "streamId": "stream-d17a91c7",
+        "date": "2026-04-03",
+        "streamTitle": "【#歌枠】眠れぬ夜の弾き語り【#vtuber #vsinger #shorts 】",
+        "videoId": "bkjJmblHYHU",
+        "timestamp": 2650,
+        "endTimestamp": 2826,
+        "note": ""
+      }
+    ]
+  },
+  {
+    "id": "song-f00391d8",
+    "title": "旅立ちの日に（合唱）",
+    "originalArtist": "Unknown",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-00b55b23",
+        "streamId": "stream-7a581d1c",
+        "date": "2026-03-27",
+        "streamTitle": "【#歌枠】お昼のチルな弾き語り【#vtuber #vsinger #shorts 】",
+        "videoId": "C7DZATD1H0I",
+        "timestamp": 1469,
+        "endTimestamp": 1675,
+        "note": ""
+      }
+    ]
+  },
+  {
+    "id": "song-f59226f9",
+    "title": "アンインストール（石川智晶）",
+    "originalArtist": "Unknown",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-a4e2c407",
+        "streamId": "stream-f69b28ed",
+        "date": "2026-03-30",
+        "streamTitle": "【#歌枠】告知アリ!まったりチルな弾き語り【#vtuber #vsinger #shorts 】",
+        "videoId": "c1jjYf0JpEw",
+        "timestamp": 2051,
+        "endTimestamp": 2332,
+        "note": ""
+      }
+    ]
+  },
+  {
+    "id": "song-f6115bd0",
+    "title": "春よ、来い（松任谷由実）",
+    "originalArtist": "Unknown",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-2fc6e2f2",
+        "streamId": "stream-2026-04-02",
+        "date": "2026-04-02",
+        "streamTitle": "【#歌枠】まったりちるな弾き語り【#vtuber #vsinger #shorts 】",
+        "videoId": "7X63ym0BCrU",
+        "timestamp": 2460,
+        "endTimestamp": 2749,
+        "note": ""
+      }
+    ]
+  },
+  {
+    "id": "song-f76d8af1",
+    "title": "ふでペン ～ボールペン～（放課後ティータイム）",
+    "originalArtist": "Unknown",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-6744bc98",
+        "streamId": "stream-2026-04-04",
+        "date": "2026-04-04",
+        "streamTitle": "【#歌枠】10万人耐久弾き語り！【#vtuber #vsinger #shorts 】",
+        "videoId": "p3m0WLBFJ3A",
+        "timestamp": 4265,
+        "endTimestamp": 4502,
+        "note": ""
+      }
+    ]
+  }
+]
