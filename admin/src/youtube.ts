@@ -46,14 +46,26 @@ interface VideosResponse {
   items: VideoDetails[];
 }
 
-interface ChannelStatisticsResponse {
+interface ChannelResponse {
   items: Array<{
     id: string;
+    snippet?: {
+      thumbnails?: {
+        default?: { url: string };
+        medium?: { url: string };
+        high?: { url: string };
+      };
+    };
     statistics: {
       subscriberCount: string;
       hiddenSubscriberCount: boolean;
     };
   }>;
+}
+
+export interface ChannelInfo {
+  subscriberCount: number;
+  avatarUrl: string;
 }
 
 interface CommentThread {
@@ -283,16 +295,16 @@ export function findCandidateComment(
 }
 
 /**
- * Fetch subscriber count for a YouTube channel.
- * Uses channels.list with part=statistics (1 quota unit).
- * Returns the raw subscriber count as a number, or null if hidden/not found.
+ * Fetch channel info (subscriber count + avatar) for a YouTube channel.
+ * Uses channels.list with part=statistics,snippet (1 quota unit).
+ * Returns subscriber count and avatar URL, or null if hidden/not found.
  */
-export async function fetchChannelSubscribers(
+export async function fetchChannelInfo(
   apiKey: string,
   channelId: string,
-): Promise<number | null> {
+): Promise<ChannelInfo | null> {
   const url = new URL(`${YT_API}/channels`);
-  url.searchParams.set('part', 'statistics');
+  url.searchParams.set('part', 'statistics,snippet');
   url.searchParams.set('id', channelId);
   url.searchParams.set('key', apiKey);
 
@@ -302,11 +314,17 @@ export async function fetchChannelSubscribers(
     throw new Error(`YouTube channels.list failed (${res.status}): ${body}`);
   }
 
-  const data = (await res.json()) as ChannelStatisticsResponse;
+  const data = (await res.json()) as ChannelResponse;
   if (!data.items || data.items.length === 0) return null;
 
-  const stats = data.items[0]!.statistics;
-  if (stats.hiddenSubscriberCount) return null;
+  const item = data.items[0]!;
+  if (item.statistics.hiddenSubscriberCount) return null;
 
-  return parseInt(stats.subscriberCount, 10);
+  const thumbs = item.snippet?.thumbnails;
+  const avatarUrl = thumbs?.medium?.url ?? thumbs?.default?.url ?? '';
+
+  return {
+    subscriberCount: parseInt(item.statistics.subscriberCount, 10),
+    avatarUrl,
+  };
 }

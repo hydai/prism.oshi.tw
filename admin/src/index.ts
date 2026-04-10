@@ -46,7 +46,7 @@ import {
 } from './db';
 import { fetchItunesDuration } from './itunes';
 import { parseTextToSongs } from '../shared/parse';
-import { discoverStreams, getVideoDetails, fetchComments, findCandidateComment, countTimestamps, fetchChannelSubscribers } from './youtube';
+import { discoverStreams, getVideoDetails, fetchComments, findCandidateComment, countTimestamps, fetchChannelInfo } from './youtube';
 import type {
   AuthUser,
   CreateSongBody,
@@ -971,22 +971,22 @@ app.post('/api/nova/submissions/fetch-all-subscribers', requireCurator, async (c
 
   for (const sub of subs) {
     try {
-      const rawCount = await fetchChannelSubscribers(apiKey, sub.youtube_channel_id);
-      if (rawCount === null) {
-        results.push({ id: sub.id, display_name: sub.display_name, subscriber_count: null, error: 'Hidden or not found' });
+      const info = await fetchChannelInfo(apiKey, sub.youtube_channel_id);
+      if (info === null) {
+        results.push({ id: sub.id, display_name: sub.display_name, subscriber_count: null, avatar_url: null, error: 'Hidden or not found' });
         failed++;
         continue;
       }
-      const formatted = formatSubscriberCount(rawCount);
+      const formatted = formatSubscriberCount(info.subscriberCount);
       await c.env.NOVA_DB
-        .prepare('UPDATE submissions SET subscriber_count = ? WHERE id = ?')
-        .bind(formatted, sub.id)
+        .prepare('UPDATE submissions SET subscriber_count = ?, avatar_url = ? WHERE id = ?')
+        .bind(formatted, info.avatarUrl, sub.id)
         .run();
-      results.push({ id: sub.id, display_name: sub.display_name, subscriber_count: formatted });
+      results.push({ id: sub.id, display_name: sub.display_name, subscriber_count: formatted, avatar_url: info.avatarUrl });
       updated++;
     } catch (err) {
       const msg = err instanceof Error ? err.message : 'Unknown error';
-      results.push({ id: sub.id, display_name: sub.display_name, subscriber_count: null, error: msg });
+      results.push({ id: sub.id, display_name: sub.display_name, subscriber_count: null, avatar_url: null, error: msg });
       failed++;
     }
   }
@@ -1123,23 +1123,23 @@ app.post('/api/nova/submissions/:id/fetch-subscribers', requireCurator, async (c
     return c.json({ error: 'YOUTUBE_API_KEY not configured' }, 500);
   }
 
-  let rawCount: number | null;
+  let info: Awaited<ReturnType<typeof fetchChannelInfo>>;
   try {
-    rawCount = await fetchChannelSubscribers(apiKey, sub.youtube_channel_id);
+    info = await fetchChannelInfo(apiKey, sub.youtube_channel_id);
   } catch (err) {
     const msg = err instanceof Error ? err.message : 'Unknown YouTube API error';
     return c.json({ error: msg }, 502);
   }
 
-  if (rawCount === null) {
+  if (info === null) {
     return c.json({ error: 'Subscriber count is hidden or channel not found' }, 404);
   }
 
-  const formatted = formatSubscriberCount(rawCount);
+  const formatted = formatSubscriberCount(info.subscriberCount);
 
   await c.env.NOVA_DB
-    .prepare('UPDATE submissions SET subscriber_count = ? WHERE id = ?')
-    .bind(formatted, id)
+    .prepare('UPDATE submissions SET subscriber_count = ?, avatar_url = ? WHERE id = ?')
+    .bind(formatted, info.avatarUrl, id)
     .run();
 
   const updated = await c.env.NOVA_DB

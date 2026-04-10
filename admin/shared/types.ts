@@ -387,6 +387,7 @@ export interface BulkFetchSubscribersResult {
   id: string;
   display_name: string;
   subscriber_count: string | null;
+  avatar_url: string | null;
   error?: string;
 }
 

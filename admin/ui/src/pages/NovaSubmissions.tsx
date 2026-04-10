@@ -151,7 +151,7 @@ export default function NovaSubmissions({ user }: { user: AuthUser }) {
             onClick={handleFetchAll}
             className="rounded bg-indigo-600 px-3 py-1.5 text-xs font-medium text-white hover:bg-indigo-700 disabled:opacity-50 disabled:cursor-not-allowed"
           >
-            {fetchingAll ? 'Fetching...' : 'Fetch All Subscribers'}
+            {fetchingAll ? 'Fetching...' : 'Fetch All Channel Info'}
           </button>
         )}
       </div>
@@ -170,7 +170,7 @@ export default function NovaSubmissions({ user }: { user: AuthUser }) {
               <ul className="mt-1 space-y-1 text-xs">
                 {fetchAllResult.results.map((r) => (
                   <li key={r.id} className={r.error ? 'text-red-600' : 'text-slate-600'}>
-                    {r.display_name}: {r.error ? r.error : r.subscriber_count}
+                    {r.display_name}: {r.error ? r.error : `${r.subscriber_count}${r.avatar_url ? ' (avatar updated)' : ''}`}
                   </li>
                 ))}
               </ul>
@@ -324,7 +324,7 @@ function SubmissionRow({
       const updated = await api.fetchNovaSubscribers(sub.id);
       onSave(updated);
       if (editing) {
-        setDraft((d) => ({ ...d, subscriber_count: updated.subscriber_count ?? '' }));
+        setDraft((d) => ({ ...d, subscriber_count: updated.subscriber_count ?? '', avatar_url: updated.avatar_url ?? '' }));
       }
     } catch (err) {
       setFetchSubsError(err instanceof Error ? err.message : 'Failed to fetch subscribers');
@@ -480,7 +480,7 @@ function SubmissionRow({
                                 type="button"
                                 disabled={fetchingSubs || !sub.youtube_channel_id}
                                 onClick={handleFetchSubscribers}
-                                title={!sub.youtube_channel_id ? 'Set YouTube Channel ID first' : 'Fetch subscriber count from YouTube'}
+                                title={!sub.youtube_channel_id ? 'Set YouTube Channel ID first' : 'Fetch subscriber count & avatar from YouTube'}
                                 className="shrink-0 rounded bg-indigo-600 px-3 py-1.5 text-xs font-medium text-white hover:bg-indigo-700 disabled:opacity-50 disabled:cursor-not-allowed"
                               >
                                 {fetchingSubs ? 'Fetching...' : 'Fetch'}
