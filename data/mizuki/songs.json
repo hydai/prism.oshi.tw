@@ -25,6 +25,24 @@
     ]
   },
   {
+    "id": "song-038c4410",
+    "title": "好想愛這個世界啊",
+    "originalArtist": "華晨宇",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-4188452e",
+        "streamId": "stream-2026-04-10",
+        "date": "2026-04-10",
+        "streamTitle": "【歌枠】我回來啦✨來唱唱一路上陪著我們的歌❤ただいま！大切な曲たち歌うよ🎤初見さん大歓迎🎵【浠Mizuki Karaoke】",
+        "videoId": "w_K64_VD7qo",
+        "timestamp": 4477,
+        "endTimestamp": 4749,
+        "note": ""
+      }
+    ]
+  },
+  {
     "id": "song-05639d5c",
     "title": "Polaroid",
     "originalArtist": "JU!iE",
@@ -57,6 +75,42 @@
     "performances": []
   },
   {
+    "id": "song-07ecb6f8",
+    "title": "ウルフ",
+    "originalArtist": "CHiCO with HoneyWorks",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-4728175a",
+        "streamId": "stream-2026-04-10",
+        "date": "2026-04-10",
+        "streamTitle": "【歌枠】我回來啦✨來唱唱一路上陪著我們的歌❤ただいま！大切な曲たち歌うよ🎤初見さん大歓迎🎵【浠Mizuki Karaoke】",
+        "videoId": "w_K64_VD7qo",
+        "timestamp": 912,
+        "endTimestamp": 1143,
+        "note": ""
+      }
+    ]
+  },
+  {
+    "id": "song-09e3d8c6",
+    "title": "在這座城市遺失了你",
+    "originalArtist": "告五人",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-efd87b35",
+        "streamId": "stream-2026-04-10",
+        "date": "2026-04-10",
+        "streamTitle": "【歌枠】我回來啦✨來唱唱一路上陪著我們的歌❤ただいま！大切な曲たち歌うよ🎤初見さん大歓迎🎵【浠Mizuki Karaoke】",
+        "videoId": "w_K64_VD7qo",
+        "timestamp": 2770,
+        "endTimestamp": 2940,
+        "note": ""
+      }
+    ]
+  },
+  {
     "id": "song-0ca3c23c",
     "title": "想見你想見你想見你",
     "originalArtist": "八三夭",
@@ -64,9 +118,45 @@
     "performances": []
   },
   {
+    "id": "song-0d2a363c",
+    "title": "Keep Cold",
+    "originalArtist": "Numcha",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-af87d33e",
+        "streamId": "stream-2026-04-10",
+        "date": "2026-04-10",
+        "streamTitle": "【歌枠】我回來啦✨來唱唱一路上陪著我們的歌❤ただいま！大切な曲たち歌うよ🎤初見さん大歓迎🎵【浠Mizuki Karaoke】",
+        "videoId": "w_K64_VD7qo",
+        "timestamp": 2478,
+        "endTimestamp": 2712,
+        "note": ""
+      }
+    ]
+  },
+  {
+    "id": "song-0d9f97ee",
+    "title": "ラブカ?",
+    "originalArtist": "柊キライ",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-9a5ebc09",
+        "streamId": "stream-2026-04-10",
+        "date": "2026-04-10",
+        "streamTitle": "【歌枠】我回來啦✨來唱唱一路上陪著我們的歌❤ただいま！大切な曲たち歌うよ🎤初見さん大歓迎🎵【浠Mizuki Karaoke】",
+        "videoId": "w_K64_VD7qo",
+        "timestamp": 1160,
+        "endTimestamp": 1345,
+        "note": ""
+      }
+    ]
+  },
+  {
     "id": "song-0ea302bc",
     "title": "勿忘",
-    "originalArtist": "Awesome City Club.",
+    "originalArtist": "Awesome City Club",
     "tags": [],
     "performances": []
   },
@@ -649,7 +739,7 @@
   {
     "id": "song-1018",
     "title": "覚醒",
-    "originalArtist": "Sperfly",
+    "originalArtist": "Superfly",
     "tags": [],
     "performances": [
       {
@@ -1467,7 +1557,7 @@
   {
     "id": "song-1046",
     "title": "トリノコシティ",
-    "originalArtist": "40mp",
+    "originalArtist": "40mP",
     "tags": [],
     "performances": [
       {
@@ -3162,7 +3252,7 @@
   },
   {
     "id": "song-1101",
-    "title": "I’ll be home",
+    "title": "I'll Be Home",
     "originalArtist": "",
     "tags": [],
     "performances": [
@@ -8017,7 +8107,7 @@
   {
     "id": "song-1262",
     "title": "Mamma Mia",
-    "originalArtist": "Abba",
+    "originalArtist": "ABBA",
     "tags": [],
     "performances": [
       {
@@ -8257,7 +8347,7 @@
   {
     "id": "song-1271",
     "title": "戀愛ING",
-    "originalArtist": "五月天 Mayday",
+    "originalArtist": "五月天Mayday",
     "tags": [],
     "performances": [
       {
@@ -9188,6 +9278,24 @@
         "videoId": "CA6Lg5JYs18",
         "timestamp": 6668,
         "endTimestamp": 6850,
+        "note": ""
+      }
+    ]
+  },
+  {
+    "id": "song-12a9c19b",
+    "title": "能遇見，就很不錯了",
+    "originalArtist": "菲道爾",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-a124a6e9",
+        "streamId": "stream-2026-04-10",
+        "date": "2026-04-10",
+        "streamTitle": "【歌枠】我回來啦✨來唱唱一路上陪著我們的歌❤ただいま！大切な曲たち歌うよ🎤初見さん大歓迎🎵【浠Mizuki Karaoke】",
+        "videoId": "w_K64_VD7qo",
+        "timestamp": 6013,
+        "endTimestamp": 6242,
         "note": ""
       }
     ]
@@ -11138,8 +11246,8 @@
   },
   {
     "id": "song-137",
-    "title": "好きだから",
-    "originalArtist": "ユイカ",
+    "title": "好きだから。",
+    "originalArtist": "『ユイカ』",
     "tags": [],
     "performances": [
       {
@@ -11166,7 +11274,7 @@
   },
   {
     "id": "song-1370",
-    "title": "Waka Waka (This Time for Africa)",
+    "title": "Waka Waka",
     "originalArtist": "Shakira",
     "tags": [],
     "performances": [
@@ -11882,7 +11990,7 @@
   },
   {
     "id": "song-13e34746",
-    "title": "妄想感傷代償聯盟",
+    "title": "妄想感傷代償連盟",
     "originalArtist": "DECO*27",
     "tags": [],
     "performances": []
@@ -13123,7 +13231,7 @@
   },
   {
     "id": "song-1447",
-    "title": "可愛くてごめん (feat. かぴ)",
+    "title": "可愛くてごめん",
     "originalArtist": "HoneyWorks",
     "tags": [],
     "performances": [
@@ -13466,7 +13574,7 @@
   {
     "id": "song-146",
     "title": "My Dearest",
-    "originalArtist": "Supercell",
+    "originalArtist": "supercell",
     "tags": [],
     "performances": [
       {
@@ -14159,7 +14267,7 @@
   },
   {
     "id": "song-1485",
-    "title": "下一站·與你",
+    "title": "下一站,與你",
     "originalArtist": "小穹",
     "tags": [],
     "performances": [
@@ -14346,7 +14454,7 @@
   {
     "id": "song-1491",
     "title": "Mamma Mia",
-    "originalArtist": "Abba",
+    "originalArtist": "ABBA",
     "tags": [],
     "performances": [
       {
@@ -15587,7 +15695,7 @@
   },
   {
     "id": "song-1533",
-    "title": "こちら、幸福安心委員会です 。",
+    "title": "こちら、幸福安心委員会です。",
     "originalArtist": "うたたP",
     "tags": [],
     "performances": [
@@ -17274,7 +17382,7 @@
   {
     "id": "song-1599",
     "title": "My Dearest",
-    "originalArtist": "Supercell",
+    "originalArtist": "supercell",
     "tags": [],
     "performances": [
       {
@@ -17382,7 +17490,7 @@
   {
     "id": "song-1603",
     "title": "月牙灣",
-    "originalArtist": "F.I.R. 飛兒樂團",
+    "originalArtist": "F.I.R.飛兒樂團",
     "tags": [],
     "performances": [
       {
@@ -17427,7 +17535,7 @@
   },
   {
     "id": "song-1605",
-    "title": "碎吧睡吧",
+    "title": "碎吧，睡吧",
     "originalArtist": "",
     "tags": [],
     "performances": [
@@ -17635,7 +17743,7 @@
   },
   {
     "id": "song-1615",
-    "title": "うらたねこ",
+    "title": "うらたねこ♀",
     "originalArtist": "",
     "tags": [],
     "performances": [
@@ -17811,7 +17919,7 @@
   },
   {
     "id": "song-1621",
-    "title": "花ざかりWeekend✿",
+    "title": "花ざかりWeekend",
     "originalArtist": "",
     "tags": [],
     "performances": [
@@ -18075,7 +18183,7 @@
   },
   {
     "id": "song-1633",
-    "title": "恋爱サーキュレーション",
+    "title": "恋愛サーキュレーション",
     "originalArtist": "",
     "tags": [],
     "performances": [
@@ -19419,7 +19527,7 @@
   },
   {
     "id": "song-1690",
-    "title": "火炎(Fire)",
+    "title": "火炎",
     "originalArtist": "QUEEN BEE",
     "tags": [],
     "performances": [
@@ -20196,7 +20304,7 @@
   {
     "id": "song-1719",
     "title": "乾杯 Cheers",
-    "originalArtist": "MAYDAY 五月天",
+    "originalArtist": "Mayday五月天",
     "tags": [],
     "performances": [
       {
@@ -21157,7 +21265,7 @@
   },
   {
     "id": "song-1763",
-    "title": "丸の内サデスティック",
+    "title": "丸の内サディスティック",
     "originalArtist": "",
     "tags": [],
     "performances": [
@@ -21375,7 +21483,7 @@
   },
   {
     "id": "song-1773",
-    "title": "メフィスト",
+    "title": "メフィスト(Mephisto)",
     "originalArtist": "",
     "tags": [],
     "performances": [
@@ -21411,8 +21519,8 @@
   },
   {
     "id": "song-1775",
-    "title": "GETCHA",
-    "originalArtist": "Giga&KIRA",
+    "title": "GETCHA!",
+    "originalArtist": "Giga & KIRA",
     "tags": [],
     "performances": [
       {
@@ -21559,7 +21667,7 @@
   },
   {
     "id": "song-1780",
-    "title": "Awlays remember us this way",
+    "title": "Always Remember Us This Way",
     "originalArtist": "",
     "tags": [],
     "performances": [
@@ -23513,7 +23621,7 @@
   },
   {
     "id": "song-1855",
-    "title": "Fairytale, [reunion]",
+    "title": "Fairytale,",
     "originalArtist": "buzzG",
     "tags": [],
     "performances": [
@@ -24078,7 +24186,7 @@
   {
     "id": "song-1876",
     "title": "月牙灣",
-    "originalArtist": "F.I.R. 飛兒樂團",
+    "originalArtist": "F.I.R.飛兒樂團",
     "tags": [],
     "performances": [
       {
@@ -24997,7 +25105,7 @@
   },
   {
     "id": "song-1916",
-    "title": "Wellerman",
+    "title": "Wellerman (Sea Shanty)",
     "originalArtist": "Nathan Evans",
     "tags": [],
     "performances": [
@@ -26253,8 +26361,8 @@
   },
   {
     "id": "song-1963",
-    "title": "能不能和我留在台北",
-    "originalArtist": "Icyball冰球樂團",
+    "title": "能不能和我留在台北（陪我幾天）",
+    "originalArtist": "icyball 冰球樂團",
     "tags": [],
     "performances": [
       {
@@ -26356,7 +26464,7 @@
   {
     "id": "song-1967",
     "title": "Viator (ウィアートル)",
-    "originalArtist": "rionos (さよならの朝に約束の花をかざろう)",
+    "originalArtist": "rionos",
     "tags": [],
     "performances": [
       {
@@ -27190,6 +27298,24 @@
     ]
   },
   {
+    "id": "song-1bfbf656",
+    "title": "Henceforth",
+    "originalArtist": "Orangestar",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-8485f098",
+        "streamId": "stream-2026-04-10",
+        "date": "2026-04-10",
+        "streamTitle": "【歌枠】我回來啦✨來唱唱一路上陪著我們的歌❤ただいま！大切な曲たち歌うよ🎤初見さん大歓迎🎵【浠Mizuki Karaoke】",
+        "videoId": "w_K64_VD7qo",
+        "timestamp": 451,
+        "endTimestamp": 686,
+        "note": ""
+      }
+    ]
+  },
+  {
     "id": "song-2",
     "title": "僕が死のうと思ったのは",
     "originalArtist": "中島美嘉",
@@ -27603,7 +27729,7 @@
   },
   {
     "id": "song-2010",
-    "title": "OAOA",
+    "title": "OAOA(現在就是永遠)",
     "originalArtist": "五月天",
     "tags": [],
     "performances": [
@@ -29563,7 +29689,7 @@
   },
   {
     "id": "song-2078",
-    "title": "霓光 Neon Light",
+    "title": "霓光Neon Light",
     "originalArtist": "",
     "tags": [],
     "performances": [
@@ -29989,7 +30115,7 @@
   },
   {
     "id": "song-2093",
-    "title": "Magnet",
+    "title": "magnet",
     "originalArtist": "初音ミク・巡音ルカ",
     "tags": [],
     "performances": [
@@ -30513,7 +30639,7 @@
   },
   {
     "id": "song-2112",
-    "title": "Wherev er  you are",
+    "title": "Wherever you are",
     "originalArtist": "",
     "tags": [],
     "performances": [
@@ -30531,7 +30657,7 @@
   },
   {
     "id": "song-2113",
-    "title": "フクロウ フクロウが知らせる客が来たと",
+    "title": "フクロウ～フクロウが知らせる客が来たと～",
     "originalArtist": "",
     "tags": [],
     "performances": [
@@ -31656,7 +31782,7 @@
   {
     "id": "song-2152",
     "title": "DREAMER",
-    "originalArtist": "EIKO starring 96猫",
+    "originalArtist": "EIKO Starring 96猫",
     "tags": [],
     "performances": [
       {
@@ -33461,7 +33587,7 @@
   {
     "id": "song-2220",
     "title": "運命の人",
-    "originalArtist": "ユイカ",
+    "originalArtist": "『ユイカ』",
     "tags": [],
     "performances": [
       {
@@ -33634,7 +33760,7 @@
   },
   {
     "id": "song-2228",
-    "title": "secret base ~ 君がくれたもの ~",
+    "title": "secret base ～君がくれたもの~",
     "originalArtist": "",
     "tags": [],
     "performances": [
@@ -35695,7 +35821,7 @@
   {
     "id": "song-2309",
     "title": "我們的愛",
-    "originalArtist": "F.I.R. 飛兒樂團",
+    "originalArtist": "F.I.R.飛兒樂團",
     "tags": [],
     "performances": [
       {
@@ -35768,7 +35894,7 @@
   },
   {
     "id": "song-2311",
-    "title": "星期三與禮拜三",
+    "title": "星期三或禮拜三",
     "originalArtist": "魏如萱 & 馬頔",
     "tags": [],
     "performances": [
@@ -36389,7 +36515,7 @@
   {
     "id": "song-233",
     "title": "Mr.シャーデンフロイデ",
-    "originalArtist": "ひとしずく×やま△",
+    "originalArtist": "ひとしずくP・やま△",
     "tags": [],
     "performances": [
       {
@@ -37784,7 +37910,7 @@
   },
   {
     "id": "song-2390",
-    "title": "ぎゅっと",
+    "title": "ぎゅっと。",
     "originalArtist": "",
     "tags": [],
     "performances": [
@@ -37830,7 +37956,7 @@
   },
   {
     "id": "song-2392",
-    "title": "你被寫在我歌裡",
+    "title": "你被寫在我的歌裡",
     "originalArtist": "",
     "tags": [],
     "performances": [
@@ -38812,7 +38938,7 @@
   },
   {
     "id": "song-2427",
-    "title": "星の唄 [recollection]",
+    "title": "星の唄",
     "originalArtist": "buzzG",
     "tags": [],
     "performances": [
@@ -38830,7 +38956,7 @@
   },
   {
     "id": "song-2428",
-    "title": "Fairytale, [reunion]",
+    "title": "Fairytale,",
     "originalArtist": "buzzG",
     "tags": [],
     "performances": [
@@ -39838,8 +39964,8 @@
   },
   {
     "id": "song-2465",
-    "title": "Raindrops Keep Fallin' On My Head",
-    "originalArtist": "B.J.Thomas",
+    "title": "Raindrops Keep Falling on my Head",
+    "originalArtist": "B.J. Thomas",
     "tags": [],
     "performances": [
       {
@@ -40593,7 +40719,7 @@
   {
     "id": "song-24c7df3a",
     "title": "好想永遠永遠都這樣",
-    "originalArtist": "王OK",
+    "originalArtist": "王ok",
     "tags": [],
     "performances": [
       {
@@ -41029,7 +41155,7 @@
   {
     "id": "song-2513",
     "title": "Mr.シャーデンフロイデ",
-    "originalArtist": "ひとしずく×やま△",
+    "originalArtist": "ひとしずくP・やま△",
     "tags": [],
     "performances": [
       {
@@ -41466,7 +41592,7 @@
   },
   {
     "id": "song-2532",
-    "title": "Alice",
+    "title": "ALICE",
     "originalArtist": "古川本舗",
     "tags": [],
     "performances": [
@@ -42246,7 +42372,7 @@
   },
   {
     "id": "song-2564",
-    "title": "APT",
+    "title": "APT.",
     "originalArtist": "Bruno Mars & Rośe",
     "tags": [],
     "performances": [
@@ -42558,7 +42684,7 @@
   },
   {
     "id": "song-2577",
-    "title": "Santa, Can’t You Hear Me",
+    "title": "Santa, Can't You Hear Me",
     "originalArtist": "Ariana Grande",
     "tags": [],
     "performances": [
@@ -42859,7 +42985,7 @@
   {
     "id": "song-2590",
     "title": "四角い地球を丸くする",
-    "originalArtist": "TOKOTOKO（西沢さんP）",
+    "originalArtist": "TOKOTOKO(西沢さんP)",
     "tags": [],
     "performances": [
       {
@@ -43042,6 +43168,24 @@
         "videoId": "qTIlS4KLhyc",
         "timestamp": 543,
         "endTimestamp": 723,
+        "note": ""
+      }
+    ]
+  },
+  {
+    "id": "song-25cb2389",
+    "title": "クイーンオブハート",
+    "originalArtist": "奏音69",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-de24262e",
+        "streamId": "stream-2026-04-10",
+        "date": "2026-04-10",
+        "streamTitle": "【歌枠】我回來啦✨來唱唱一路上陪著我們的歌❤ただいま！大切な曲たち歌うよ🎤初見さん大歓迎🎵【浠Mizuki Karaoke】",
+        "videoId": "w_K64_VD7qo",
+        "timestamp": 3804,
+        "endTimestamp": 4032,
         "note": ""
       }
     ]
@@ -43835,7 +43979,7 @@
   {
     "id": "song-2637",
     "title": "My Dearest",
-    "originalArtist": "Supercell",
+    "originalArtist": "supercell",
     "tags": [],
     "performances": [
       {
@@ -45702,7 +45846,7 @@
   },
   {
     "id": "song-2718",
-    "title": "言って",
+    "title": "言って。",
     "originalArtist": "ヨルシカ",
     "tags": [],
     "performances": [
@@ -46132,8 +46276,8 @@
   },
   {
     "id": "song-2736",
-    "title": "迷醉 Sangria",
-    "originalArtist": "朔 Sakuro",
+    "title": "迷醉Sangria",
+    "originalArtist": "朔Sakuro",
     "tags": [],
     "performances": [
       {
@@ -46168,7 +46312,7 @@
   },
   {
     "id": "song-2738",
-    "title": "からくりビエロ",
+    "title": "からくりピエロ",
     "originalArtist": "40㍍ ft. 初音ミク",
     "tags": [],
     "performances": [
@@ -46358,7 +46502,7 @@
   },
   {
     "id": "song-2747",
-    "title": "ハロ／ハワユ",
+    "title": "ハロ/ハワユ",
     "originalArtist": "初音ミク",
     "tags": [],
     "performances": [
@@ -46394,7 +46538,7 @@
   },
   {
     "id": "song-2749",
-    "title": "下一站．與你",
+    "title": "下一站,與你",
     "originalArtist": "KSP &  薛南",
     "tags": [],
     "performances": [
@@ -46810,7 +46954,7 @@
   },
   {
     "id": "song-2769",
-    "title": "Fairytale, [reunion]",
+    "title": "Fairytale,",
     "originalArtist": "buzzG",
     "tags": [],
     "performances": [
@@ -47002,8 +47146,8 @@
   },
   {
     "id": "song-2777",
-    "title": "響念Missing",
-    "originalArtist": "響 Hibiki",
+    "title": "響念 Missing",
+    "originalArtist": "響Hibiki",
     "tags": [],
     "performances": [
       {
@@ -48052,8 +48196,8 @@
   },
   {
     "id": "song-2826",
-    "title": "響念Missing  (pinao ver.)",
-    "originalArtist": "響 Hibiki",
+    "title": "響念 Missing",
+    "originalArtist": "響Hibiki",
     "tags": [],
     "performances": [
       {
@@ -48088,7 +48232,7 @@
   },
   {
     "id": "song-2828",
-    "title": "煦日Apricity",
+    "title": "煦日 Apricity",
     "originalArtist": "澪 Rei",
     "tags": [],
     "performances": [
@@ -48463,7 +48607,7 @@
   {
     "id": "song-2844",
     "title": "Moonlit Floor",
-    "originalArtist": "LISA",
+    "originalArtist": "LiSA",
     "tags": [],
     "performances": [
       {
@@ -48629,7 +48773,7 @@
   {
     "id": "song-2850",
     "title": "Miss Nothing",
-    "originalArtist": "The Pretty Reckles",
+    "originalArtist": "The Pretty Reckless",
     "tags": [],
     "performances": [
       {
@@ -48701,7 +48845,7 @@
   {
     "id": "song-2854",
     "title": "未完成 START",
-    "originalArtist": "KSP & 薛南",
+    "originalArtist": "KSP &  薛南",
     "tags": [],
     "performances": [
       {
@@ -48808,8 +48952,8 @@
   },
   {
     "id": "song-286",
-    "title": "響念Missing",
-    "originalArtist": "響 Hibiki",
+    "title": "響念 Missing",
+    "originalArtist": "響Hibiki",
     "tags": [],
     "performances": [
       {
@@ -49377,7 +49521,7 @@
   {
     "id": "song-2888",
     "title": "い～やい～やい～や",
-    "originalArtist": "Neru & z'5",
+    "originalArtist": "Neru・z'5",
     "tags": [],
     "performances": [
       {
@@ -49394,7 +49538,7 @@
   },
   {
     "id": "song-2889",
-    "title": "キミペディア",
+    "title": "キミペディア (Youpedia)",
     "originalArtist": "Junky",
     "tags": [],
     "performances": [
@@ -50630,8 +50774,8 @@
   },
   {
     "id": "song-2949",
-    "title": "DADDY ! DADDY ! DO !",
-    "originalArtist": "鈴木雅之 feat.鈴木愛理",
+    "title": "DADDY! DADDY! DO!",
+    "originalArtist": "鈴木雅之 ft.鈴木愛理",
     "tags": [],
     "performances": [
       {
@@ -51014,7 +51158,7 @@
   },
   {
     "id": "song-2964",
-    "title": "top of the word",
+    "title": "Top of the world",
     "originalArtist": "",
     "tags": [],
     "performances": [
@@ -51654,7 +51798,7 @@
   },
   {
     "id": "song-2996",
-    "title": "Reiny proof(Rainy proof)",
+    "title": "Rainy proof",
     "originalArtist": "HACHI",
     "tags": [],
     "performances": [
@@ -52349,7 +52493,7 @@
   },
   {
     "id": "song-3020",
-    "title": "今天你要嫁給我",
+    "title": "今天妳要嫁給我",
     "originalArtist": "",
     "tags": [],
     "performances": [
@@ -53447,7 +53591,7 @@
   },
   {
     "id": "song-3067",
-    "title": "Star Jawel",
+    "title": "Star Jewel",
     "originalArtist": "洞院莉娜",
     "tags": [],
     "performances": [
@@ -53803,7 +53947,7 @@
   },
   {
     "id": "song-3082",
-    "title": "City of Starts",
+    "title": "City of stars",
     "originalArtist": "",
     "tags": [],
     "performances": [
@@ -55957,7 +56101,7 @@
   },
   {
     "id": "song-319",
-    "title": "Say So (Japanese ver.)",
+    "title": "Say So",
     "originalArtist": "Doja Cat",
     "tags": [],
     "performances": [
@@ -56434,7 +56578,7 @@
   {
     "id": "song-333",
     "title": "能不能和我留在台北（陪我幾天）",
-    "originalArtist": "Icyball冰球樂團",
+    "originalArtist": "icyball 冰球樂團",
     "tags": [],
     "performances": [
       {
@@ -56462,7 +56606,7 @@
   {
     "id": "song-334",
     "title": "スノードーム",
-    "originalArtist": "ユイカ",
+    "originalArtist": "『ユイカ』",
     "tags": [],
     "performances": [
       {
@@ -57345,7 +57489,7 @@
   },
   {
     "id": "song-35fcef88",
-    "title": "フクロウ ～フクロウが知らせる客が来たと～",
+    "title": "フクロウ～フクロウが知らせる客が来たと～",
     "originalArtist": "KOKIA",
     "tags": [],
     "performances": [
@@ -58564,6 +58708,24 @@
     ]
   },
   {
+    "id": "song-39b672e3",
+    "title": "The Winner Takes It All",
+    "originalArtist": "ABBA",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-4816e55f",
+        "streamId": "stream-2026-04-10",
+        "date": "2026-04-10",
+        "streamTitle": "【歌枠】我回來啦✨來唱唱一路上陪著我們的歌❤ただいま！大切な曲たち歌うよ🎤初見さん大歓迎🎵【浠Mizuki Karaoke】",
+        "videoId": "w_K64_VD7qo",
+        "timestamp": 6404,
+        "endTimestamp": 6707,
+        "note": ""
+      }
+    ]
+  },
+  {
     "id": "song-39e7292d",
     "title": "Tightrope",
     "originalArtist": "Michelle Williams",
@@ -59296,8 +59458,8 @@
   },
   {
     "id": "song-419",
-    "title": "GETCHA",
-    "originalArtist": "Giga&KIRA",
+    "title": "GETCHA!",
+    "originalArtist": "Giga & KIRA",
     "tags": [],
     "performances": [
       {
@@ -59840,7 +60002,7 @@
   },
   {
     "id": "song-435",
-    "title": "XX.歌よ",
+    "title": "歌よ",
     "originalArtist": "Belle/中村佳穂",
     "tags": [],
     "performances": [
@@ -60188,7 +60350,7 @@
   },
   {
     "id": "song-445",
-    "title": "I See The Light",
+    "title": "I See the Light",
     "originalArtist": "魔髮奇緣",
     "tags": [],
     "performances": [
@@ -60332,6 +60494,24 @@
         "videoId": "8pCadOAdMzY",
         "timestamp": 7790,
         "endTimestamp": 7998,
+        "note": ""
+      }
+    ]
+  },
+  {
+    "id": "song-44dbf94f",
+    "title": "誰",
+    "originalArtist": "李友廷",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-917c5e9e",
+        "streamId": "stream-2026-04-10",
+        "date": "2026-04-10",
+        "streamTitle": "【歌枠】我回來啦✨來唱唱一路上陪著我們的歌❤ただいま！大切な曲たち歌うよ🎤初見さん大歓迎🎵【浠Mizuki Karaoke】",
+        "videoId": "w_K64_VD7qo",
+        "timestamp": 4763,
+        "endTimestamp": 5022,
         "note": ""
       }
     ]
@@ -60968,7 +61148,7 @@
   },
   {
     "id": "song-472",
-    "title": "モザイクロール(Reloaded)",
+    "title": "モザイクロール",
     "originalArtist": "DECO*27",
     "tags": [],
     "performances": [
@@ -61918,7 +62098,7 @@
   },
   {
     "id": "song-4f84e600",
-    "title": "心拍数#0822",
+    "title": "心拍数♯0822",
     "originalArtist": "蝶々P",
     "tags": [],
     "performances": [
@@ -62532,7 +62712,7 @@
   },
   {
     "id": "song-514",
-    "title": "Theme of King JJ.",
+    "title": "Theme of King J.J.",
     "originalArtist": "梅林太郎&Sugar Me",
     "tags": [],
     "performances": [
@@ -63701,6 +63881,24 @@
     ]
   },
   {
+    "id": "song-54c7a706",
+    "title": "起風了",
+    "originalArtist": "吳青峰",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-46155541",
+        "streamId": "stream-2026-04-10",
+        "date": "2026-04-10",
+        "streamTitle": "【歌枠】我回來啦✨來唱唱一路上陪著我們的歌❤ただいま！大切な曲たち歌うよ🎤初見さん大歓迎🎵【浠Mizuki Karaoke】",
+        "videoId": "w_K64_VD7qo",
+        "timestamp": 6732,
+        "endTimestamp": 7046,
+        "note": ""
+      }
+    ]
+  },
+  {
     "id": "song-55",
     "title": "幸せ。",
     "originalArtist": "CHiCO with HoneyWorks",
@@ -63836,8 +64034,8 @@
   },
   {
     "id": "song-552",
-    "title": "Sweet Child O'Mine",
-    "originalArtist": "Guns N'Roses",
+    "title": "Sweet Child O' Mine",
+    "originalArtist": "Guns N' Roses",
     "tags": [],
     "performances": [
       {
@@ -64094,7 +64292,7 @@
   },
   {
     "id": "song-562",
-    "title": "Can You Feel The Love Tonight",
+    "title": "Can You Feel the Love Tonight",
     "originalArtist": "Sir Elton Hercules John",
     "tags": [],
     "performances": [
@@ -65034,7 +65232,7 @@
   },
   {
     "id": "song-58a29a69",
-    "title": "All Is Found",
+    "title": "All I Found",
     "originalArtist": "Evan Rachel Wood",
     "tags": [],
     "performances": [
@@ -65339,7 +65537,7 @@
   {
     "id": "song-601",
     "title": "遇見",
-    "originalArtist": "孫燕姿Sun Yan/Zi",
+    "originalArtist": "孫燕姿 Sun Yan-Zi",
     "tags": [],
     "performances": [
       {
@@ -65824,7 +66022,7 @@
   },
   {
     "id": "song-617",
-    "title": "だんだん高くなる",
+    "title": "だんだん早くなる",
     "originalArtist": "40mP",
     "tags": [],
     "performances": [
@@ -67684,7 +67882,7 @@
   {
     "id": "song-671",
     "title": "身後",
-    "originalArtist": "A-Mei張惠妹",
+    "originalArtist": "aMEI張惠妹",
     "tags": [],
     "performances": [
       {
@@ -67702,7 +67900,7 @@
   {
     "id": "song-672",
     "title": "人質",
-    "originalArtist": "A-Mei張惠妹",
+    "originalArtist": "aMEI張惠妹",
     "tags": [],
     "performances": [
       {
@@ -68206,7 +68404,7 @@
   {
     "id": "song-689",
     "title": "我又初戀了 (Another First Love)",
-    "originalArtist": "五月天MayDay",
+    "originalArtist": "五月天Mayday",
     "tags": [],
     "performances": [
       {
@@ -68261,7 +68459,7 @@
   },
   {
     "id": "song-690",
-    "title": "小情歌 (Little Love Song)",
+    "title": "小情歌",
     "originalArtist": "蘇打綠 sodagreen",
     "tags": [],
     "performances": [
@@ -68279,7 +68477,7 @@
   },
   {
     "id": "song-691",
-    "title": "アイシテ (Love Me)",
+    "title": "アイシテ",
     "originalArtist": "Toa",
     "tags": [],
     "performances": [
@@ -68315,7 +68513,7 @@
   },
   {
     "id": "song-693",
-    "title": "ハートアラモード (Heart a la mode)",
+    "title": "ハートアラモード",
     "originalArtist": "DECO*27",
     "tags": [],
     "performances": [
@@ -68352,7 +68550,7 @@
   {
     "id": "song-695",
     "title": "メルト (Melt)",
-    "originalArtist": "Ryo",
+    "originalArtist": "ryo",
     "tags": [],
     "performances": [
       {
@@ -68480,6 +68678,24 @@
         "videoId": "qu1STMF5dCA",
         "timestamp": 1797,
         "endTimestamp": 2068,
+        "note": ""
+      }
+    ]
+  },
+  {
+    "id": "song-6fcb6339",
+    "title": "六等星の夜",
+    "originalArtist": "Aimer",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-8c27436b",
+        "streamId": "stream-2026-04-10",
+        "date": "2026-04-10",
+        "streamTitle": "【歌枠】我回來啦✨來唱唱一路上陪著我們的歌❤ただいま！大切な曲たち歌うよ🎤初見さん大歓迎🎵【浠Mizuki Karaoke】",
+        "videoId": "w_K64_VD7qo",
+        "timestamp": 5661,
+        "endTimestamp": 5999,
         "note": ""
       }
     ]
@@ -68996,6 +69212,24 @@
         "videoId": "_UbcTq_fN84",
         "timestamp": 3108,
         "endTimestamp": 3258,
+        "note": ""
+      }
+    ]
+  },
+  {
+    "id": "song-71799ba9",
+    "title": "平凡的一天",
+    "originalArtist": "毛不易",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-3a93860b",
+        "streamId": "stream-2026-04-10",
+        "date": "2026-04-10",
+        "streamTitle": "【歌枠】我回來啦✨來唱唱一路上陪著我們的歌❤ただいま！大切な曲たち歌うよ🎤初見さん大歓迎🎵【浠Mizuki Karaoke】",
+        "videoId": "w_K64_VD7qo",
+        "timestamp": 7442,
+        "endTimestamp": 7697,
         "note": ""
       }
     ]
@@ -69713,6 +69947,24 @@
         "videoId": "INPkn_yTziI",
         "timestamp": 1024,
         "endTimestamp": 1263,
+        "note": ""
+      }
+    ]
+  },
+  {
+    "id": "song-7428455b",
+    "title": "8月31日",
+    "originalArtist": "DECO*27",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-c4c6da04",
+        "streamId": "stream-2026-04-10",
+        "date": "2026-04-10",
+        "streamTitle": "【歌枠】我回來啦✨來唱唱一路上陪著我們的歌❤ただいま！大切な曲たち歌うよ🎤初見さん大歓迎🎵【浠Mizuki Karaoke】",
+        "videoId": "w_K64_VD7qo",
+        "timestamp": 7706,
+        "endTimestamp": 7919,
         "note": ""
       }
     ]
@@ -70512,7 +70764,7 @@
   },
   {
     "id": "song-772",
-    "title": "グラーヴェ(Grave)",
+    "title": "グラーヴェ",
     "originalArtist": "niki",
     "tags": [],
     "performances": [
@@ -70833,7 +71085,7 @@
   {
     "id": "song-781",
     "title": "My Dearest",
-    "originalArtist": "Supercell",
+    "originalArtist": "supercell",
     "tags": [],
     "performances": [
       {
@@ -71670,7 +71922,7 @@
   {
     "id": "song-808",
     "title": "Elegy Dedicated With Love",
-    "originalArtist": "オフィーリア",
+    "originalArtist": "オフィーリア(acane_madder)",
     "tags": [],
     "performances": [
       {
@@ -73667,7 +73919,7 @@
   },
   {
     "id": "song-877",
-    "title": "The Fox",
+    "title": "The Fox(What Does The Fox Say?)",
     "originalArtist": "Ylvis",
     "tags": [],
     "performances": [
@@ -74241,6 +74493,24 @@
     "performances": []
   },
   {
+    "id": "song-8fe5818f",
+    "title": "從前慢",
+    "originalArtist": "葉炫清",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-5d2feb4b",
+        "streamId": "stream-2026-04-10",
+        "date": "2026-04-10",
+        "streamTitle": "【歌枠】我回來啦✨來唱唱一路上陪著我們的歌❤ただいま！大切な曲たち歌うよ🎤初見さん大歓迎🎵【浠Mizuki Karaoke】",
+        "videoId": "w_K64_VD7qo",
+        "timestamp": 7080,
+        "endTimestamp": 7296,
+        "note": ""
+      }
+    ]
+  },
+  {
     "id": "song-9",
     "title": "はいよろこんで",
     "originalArtist": "こっちのけんと",
@@ -74377,7 +74647,7 @@
   {
     "id": "song-901",
     "title": "カゲロウデイズ",
-    "originalArtist": "じん（自然の敵P）",
+    "originalArtist": "じん(自然の敵P)",
     "tags": [],
     "performances": [
       {
@@ -75027,7 +75297,7 @@
   {
     "id": "song-921",
     "title": "月牙灣",
-    "originalArtist": "F.I.R. 飛兒樂團",
+    "originalArtist": "F.I.R.飛兒樂團",
     "tags": [],
     "performances": [
       {
@@ -77472,6 +77742,24 @@
     ]
   },
   {
+    "id": "song-a2e44abb",
+    "title": "濕了分寸",
+    "originalArtist": "謝震廷",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-41774aa0",
+        "streamId": "stream-2026-04-10",
+        "date": "2026-04-10",
+        "streamTitle": "【歌枠】我回來啦✨來唱唱一路上陪著我們的歌❤ただいま！大切な曲たち歌うよ🎤初見さん大歓迎🎵【浠Mizuki Karaoke】",
+        "videoId": "w_K64_VD7qo",
+        "timestamp": 4041,
+        "endTimestamp": 4319,
+        "note": ""
+      }
+    ]
+  },
+  {
     "id": "song-a698ff62",
     "title": "Marry You",
     "originalArtist": "Bruno Mars",
@@ -77665,6 +77953,24 @@
     ]
   },
   {
+    "id": "song-c166d373",
+    "title": "悪魔の子",
+    "originalArtist": "ヒグチアイ",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-535f949a",
+        "streamId": "stream-2026-04-10",
+        "date": "2026-04-10",
+        "streamTitle": "【歌枠】我回來啦✨來唱唱一路上陪著我們的歌❤ただいま！大切な曲たち歌うよ🎤初見さん大歓迎🎵【浠Mizuki Karaoke】",
+        "videoId": "w_K64_VD7qo",
+        "timestamp": 1597,
+        "endTimestamp": 1825,
+        "note": ""
+      }
+    ]
+  },
+  {
     "id": "song-c24f80e7",
     "title": "Flashlight",
     "originalArtist": "Jessie J",
@@ -77753,7 +78059,7 @@
   {
     "id": "song-cdc1f76d",
     "title": "失眠飛行",
-    "originalArtist": "接個吻， 開一槍、沈以誠 、薛明媛",
+    "originalArtist": "接個吻，開一槍 & 沈以誠 & 薛明媛",
     "tags": [],
     "performances": [
       {
@@ -77783,8 +78089,26 @@
     "performances": []
   },
   {
+    "id": "song-d061ad46",
+    "title": "殺死那個石家莊人",
+    "originalArtist": "萬能青年旅店",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-56475110",
+        "streamId": "stream-2026-04-10",
+        "date": "2026-04-10",
+        "streamTitle": "【歌枠】我回來啦✨來唱唱一路上陪著我們的歌❤ただいま！大切な曲たち歌うよ🎤初見さん大歓迎🎵【浠Mizuki Karaoke】",
+        "videoId": "w_K64_VD7qo",
+        "timestamp": 2958,
+        "endTimestamp": 3302,
+        "note": ""
+      }
+    ]
+  },
+  {
     "id": "song-d48f4f25",
-    "title": "double take",
+    "title": "Double Take",
     "originalArtist": "Dhruv",
     "tags": [],
     "performances": [
@@ -77820,7 +78144,7 @@
   },
   {
     "id": "song-d8aa689d",
-    "title": "See Tình",
+    "title": "see tinh",
     "originalArtist": "Hoàng Thuỳ Linh",
     "tags": [],
     "performances": [
