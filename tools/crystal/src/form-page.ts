@@ -178,6 +178,63 @@ export function renderFormPage(siteKey: string) {
     }
     .cross-links a:hover { opacity: 0.7; }
 
+    .similar-panel {
+      margin-top: 10px;
+      padding: 12px;
+      background: var(--bg-surface-frosted);
+      border: 1px solid var(--border-glass);
+      border-radius: var(--radius-lg);
+    }
+    .similar-header {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 12px;
+      color: var(--text-secondary);
+      margin-bottom: 8px;
+    }
+    .similar-header .similar-count { color: var(--text-tertiary); }
+    .similar-dismiss {
+      margin-left: auto;
+      background: none;
+      border: none;
+      color: var(--text-tertiary);
+      cursor: pointer;
+      font-size: 11px;
+      font-family: inherit;
+      padding: 2px 6px;
+      border-radius: 4px;
+    }
+    .similar-dismiss:hover { color: var(--text-secondary); background: rgba(0, 0, 0, 0.04); }
+    html.dark .similar-dismiss:hover { background: rgba(255, 255, 255, 0.06); }
+    .similar-list {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+    .similar-item {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: 8px 10px;
+      background: var(--bg-surface-glass);
+      border: 1px solid var(--border-glass);
+      border-radius: var(--radius-lg);
+      font-size: 13px;
+      color: var(--text-primary);
+      transition: border-color 0.15s;
+    }
+    .similar-link { text-decoration: none; color: inherit; display: block; }
+    .similar-link:hover .similar-item { border-color: var(--accent-purple); }
+    .similar-title {
+      flex: 1;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+    .status-pending { color: #D97706; border: 1px solid rgba(217, 119, 6, 0.25); }
+    html.dark .status-pending { color: #FBBF24; border-color: rgba(251, 191, 36, 0.25); }
+
     @media (max-width: 480px) {
       .type-selector { grid-template-columns: repeat(2, 1fr); }
     }
@@ -241,6 +298,14 @@ export function renderFormPage(siteKey: string) {
         <div>
           <label class="form-label" for="title">標題 <span class="required">*</span></label>
           <input type="text" id="title" class="form-input" placeholder="簡短描述問題或建議" maxlength="200" required />
+          <div id="similar-panel" class="similar-panel" style="display: none;">
+            <div class="similar-header">
+              <span>類似的既有回報</span>
+              <span id="similar-count" class="similar-count"></span>
+              <button type="button" id="similar-dismiss" class="similar-dismiss" aria-label="隱藏類似回報">隱藏</button>
+            </div>
+            <div id="similar-list" class="similar-list"></div>
+          </div>
         </div>
 
         <!-- Body -->
@@ -302,6 +367,105 @@ export function renderFormPage(siteKey: string) {
     const publicToggle = document.getElementById('public-toggle');
     const contactWrapper = document.getElementById('contact-wrapper');
     let selectedType = 'bug';
+
+    // --- Duplicate detection: fetch similar tickets as the user types the title ---
+    const titleInput = document.getElementById('title');
+    const similarPanel = document.getElementById('similar-panel');
+    const similarList = document.getElementById('similar-list');
+    const similarCount = document.getElementById('similar-count');
+    const similarDismissBtn = document.getElementById('similar-dismiss');
+    const SIMILAR_DEBOUNCE_MS = 250;
+    const CJK_RE = /[\u3400-\u9fff\uf900-\ufaff]/;
+    const VALID_TYPES = { bug: 'Bug', feat: '功能建議', ui: 'UI', other: '其他' };
+    const VALID_STATUSES = { pending: '處理中', replied: '已回覆', closed: '已關閉' };
+    let similarTimer = null;
+    let similarAbort = null;
+    let similarDismissed = false;
+
+    similarDismissBtn.addEventListener('click', () => {
+      similarDismissed = true;
+      similarPanel.style.display = 'none';
+    });
+
+    titleInput.addEventListener('input', () => {
+      similarDismissed = false;
+      if (similarTimer) clearTimeout(similarTimer);
+      const q = titleInput.value.trim();
+      // 2-char minimum if query contains any CJK char, else 3 chars.
+      const minChars = CJK_RE.test(q) ? 2 : 3;
+      if (q.length < minChars) {
+        similarPanel.style.display = 'none';
+        return;
+      }
+      similarTimer = setTimeout(async () => {
+        if (similarAbort) similarAbort.abort();
+        similarAbort = new AbortController();
+        try {
+          const res = await fetch('/api/similar?q=' + encodeURIComponent(q) + '&limit=5', {
+            signal: similarAbort.signal,
+          });
+          if (!res.ok) return;
+          const json = await res.json();
+          renderSimilar(Array.isArray(json.data) ? json.data : []);
+        } catch (e) {
+          if (e && e.name !== 'AbortError') {
+            // Silently swallow — the dedupe hint is a nicety, not a blocker.
+          }
+        }
+      }, SIMILAR_DEBOUNCE_MS);
+    });
+
+    function buildSimilarItem(it) {
+      // Validate server-side values against known enums before interpolating into class names.
+      const typeKey = VALID_TYPES[it.type] ? it.type : 'other';
+      const statusKey = VALID_STATUSES[it.status] ? it.status : 'pending';
+
+      const row = document.createElement('div');
+      row.className = 'similar-item';
+
+      const typeBadge = document.createElement('span');
+      typeBadge.className = 'type-badge type-' + typeKey;
+      typeBadge.textContent = VALID_TYPES[typeKey];
+      row.appendChild(typeBadge);
+
+      const statusBadge = document.createElement('span');
+      statusBadge.className = 'status-badge status-' + statusKey;
+      statusBadge.textContent = VALID_STATUSES[statusKey];
+      row.appendChild(statusBadge);
+
+      const titleSpan = document.createElement('span');
+      titleSpan.className = 'similar-title';
+      titleSpan.textContent = String(it.title ?? '');
+      row.appendChild(titleSpan);
+
+      return { row, statusKey, title: titleSpan.textContent };
+    }
+
+    function renderSimilar(items) {
+      if (similarDismissed) return;
+      if (!items.length) {
+        similarPanel.style.display = 'none';
+        return;
+      }
+      similarCount.textContent = '(' + items.length + ')';
+      similarList.replaceChildren();
+      for (const it of items) {
+        const { row, statusKey, title } = buildSimilarItem(it);
+        // Replied/closed tickets link to the Q&A page; pending tickets surface as non-interactive signals.
+        if (statusKey === 'replied' || statusKey === 'closed') {
+          const a = document.createElement('a');
+          a.className = 'similar-link';
+          a.href = '/qa?q=' + encodeURIComponent(title);
+          a.target = '_blank';
+          a.rel = 'noopener';
+          a.appendChild(row);
+          similarList.appendChild(a);
+        } else {
+          similarList.appendChild(row);
+        }
+      }
+      similarPanel.style.display = 'block';
+    }
 
     // Type selector
     document.querySelectorAll('.type-btn').forEach(btn => {

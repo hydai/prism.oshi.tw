@@ -27,8 +27,17 @@ function escapeHtml(s: string): string {
     .replace(/\n/g, '<br/>');
 }
 
-export function renderQaPage(tickets: TicketRow[], total: number, page: number, limit: number, typeFilter: string) {
+export function renderQaPage(tickets: TicketRow[], total: number, page: number, limit: number, typeFilter: string, q: string) {
   const totalPages = Math.ceil(total / limit);
+
+  const buildHref = (opts: { type?: string; page?: number; includeQ?: boolean }) => {
+    const params = new URLSearchParams();
+    if (opts.includeQ !== false && q) params.set('q', q);
+    if (opts.type) params.set('type', opts.type);
+    if (opts.page && opts.page > 1) params.set('page', String(opts.page));
+    const qs = params.toString();
+    return qs ? `/qa?${qs}` : '/qa';
+  };
 
   const ticketCards = tickets.map((t) => {
     const typeLabel = TYPE_LABELS[t.type] || t.type;
@@ -76,11 +85,8 @@ export function renderQaPage(tickets: TicketRow[], total: number, page: number, 
   const paginationLinks: string[] = [];
   for (let p = 1; p <= totalPages; p++) {
     const active = p === page;
-    const params = new URLSearchParams();
-    if (typeFilter) params.set('type', typeFilter);
-    params.set('page', String(p));
     paginationLinks.push(`
-      <a href="/qa?${params.toString()}" style="
+      <a href="${buildHref({ type: typeFilter || undefined, page: p })}" style="
         display: inline-flex; align-items: center; justify-content: center;
         width: 36px; height: 36px; border-radius: var(--radius-lg);
         font-size: 14px; font-weight: 500; text-decoration: none;
@@ -132,6 +138,24 @@ export function renderQaPage(tickets: TicketRow[], total: number, page: number, 
       background-attachment: fixed;
       min-height: 100vh;
       color: var(--text-primary);
+    }
+
+    .qa-search-input {
+      width: 100%;
+      padding: 10px 16px 10px 40px;
+      background: var(--bg-surface-frosted);
+      border: 1px solid var(--border-glass);
+      border-radius: 999px;
+      font-family: inherit;
+      font-size: 14px;
+      color: var(--text-primary);
+      outline: none;
+      transition: border-color 0.2s, box-shadow 0.2s;
+    }
+    .qa-search-input::placeholder { color: var(--text-tertiary); }
+    .qa-search-input:focus {
+      border-color: var(--accent-purple);
+      box-shadow: 0 0 0 3px rgba(139, 92, 246, 0.1);
     }
 
     .filter-bar {
@@ -207,19 +231,46 @@ export function renderQaPage(tickets: TicketRow[], total: number, page: number, 
       </p>
     </div>
 
+    <!-- Search form (press Enter to submit) -->
+    <form method="get" action="/qa" style="margin-bottom: 16px;">
+      ${typeFilter ? raw(`<input type="hidden" name="type" value="${escapeHtml(typeFilter)}" />`) : ''}
+      <div style="position: relative;">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="position: absolute; left: 14px; top: 50%; transform: translateY(-50%); color: var(--text-tertiary); pointer-events: none;">
+          <circle cx="11" cy="11" r="8"/>
+          <path d="m21 21-4.3-4.3"/>
+        </svg>
+        <input
+          type="text"
+          name="q"
+          value="${escapeHtml(q)}"
+          placeholder="搜尋問題…（按 Enter 搜尋）"
+          maxlength="100"
+          autocomplete="off"
+          class="qa-search-input"
+        />
+      </div>
+    </form>
+
     <!-- Filter bar -->
     <div class="filter-bar" style="margin-bottom: 24px;">
-      <a href="/qa" class="filter-btn ${!typeFilter ? 'active' : ''}">全部</a>
-      <a href="/qa?type=bug" class="filter-btn ${typeFilter === 'bug' ? 'active' : ''}">Bug</a>
-      <a href="/qa?type=feat" class="filter-btn ${typeFilter === 'feat' ? 'active' : ''}">功能建議</a>
-      <a href="/qa?type=ui" class="filter-btn ${typeFilter === 'ui' ? 'active' : ''}">UI</a>
-      <a href="/qa?type=other" class="filter-btn ${typeFilter === 'other' ? 'active' : ''}">其他</a>
+      <a href="${buildHref({})}" class="filter-btn ${!typeFilter ? 'active' : ''}">全部</a>
+      <a href="${buildHref({ type: 'bug' })}" class="filter-btn ${typeFilter === 'bug' ? 'active' : ''}">Bug</a>
+      <a href="${buildHref({ type: 'feat' })}" class="filter-btn ${typeFilter === 'feat' ? 'active' : ''}">功能建議</a>
+      <a href="${buildHref({ type: 'ui' })}" class="filter-btn ${typeFilter === 'ui' ? 'active' : ''}">UI</a>
+      <a href="${buildHref({ type: 'other' })}" class="filter-btn ${typeFilter === 'other' ? 'active' : ''}">其他</a>
     </div>
 
     <!-- Tickets -->
     <div style="display: flex; flex-direction: column; gap: 16px;">
       ${tickets.length === 0
-        ? raw('<div style="text-align: center; padding: 48px 16px; color: var(--text-tertiary); font-size: 14px;">目前還沒有已回覆的問題</div>')
+        ? raw(q
+            ? `<div style="text-align: center; padding: 48px 16px; color: var(--text-tertiary); font-size: 14px;">
+                 找不到符合「${escapeHtml(q)}」的結果
+                 <div style="margin-top: 12px;">
+                   <a href="${buildHref({ type: typeFilter || undefined, includeQ: false })}" style="color: var(--accent-purple); text-decoration: none; font-size: 13px;">清除搜尋</a>
+                 </div>
+               </div>`
+            : `<div style="text-align: center; padding: 48px 16px; color: var(--text-tertiary); font-size: 14px;">目前還沒有已回覆的問題</div>`)
         : raw(ticketCards)
       }
     </div>
