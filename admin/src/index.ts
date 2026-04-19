@@ -865,7 +865,7 @@ app.post('/api/pipeline/extract-import', requireCurator, async (c) => {
   // Update stream credit if provided
   if (body.credit) {
     await c.env.DB
-      .prepare('UPDATE streams SET credit = ? WHERE id = ?')
+      .prepare("UPDATE streams SET credit = ?, updated_at = datetime('now') WHERE id = ?")
       .bind(JSON.stringify(body.credit), body.streamId)
       .run();
   }

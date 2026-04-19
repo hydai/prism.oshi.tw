@@ -301,7 +301,7 @@ export async function updatePerformanceStatus(
   status: string,
 ): Promise<boolean> {
   const result = await db
-    .prepare('UPDATE performances SET status = ? WHERE id = ?')
+    .prepare("UPDATE performances SET status = ?, updated_at = datetime('now') WHERE id = ?")
     .bind(status, id)
     .run();
   return result.meta.changes > 0;
@@ -403,7 +403,7 @@ export async function updateStream(
 
   values.push(id);
   await db
-    .prepare(`UPDATE streams SET ${sets.join(', ')} WHERE id = ?`)
+    .prepare(`UPDATE streams SET ${sets.join(', ')}, updated_at = datetime('now') WHERE id = ?`)
     .bind(...values)
     .run();
 
@@ -417,7 +417,7 @@ export async function updateStreamStatus(
   reviewedBy: string,
 ): Promise<boolean> {
   const result = await db
-    .prepare("UPDATE streams SET status = ?, reviewed_by = ? WHERE id = ?")
+    .prepare("UPDATE streams SET status = ?, reviewed_by = ?, updated_at = datetime('now') WHERE id = ?")
     .bind(status, reviewedBy, id)
     .run();
   return result.meta.changes > 0;
@@ -521,7 +521,7 @@ export async function updatePerformanceTimestamps(
   values.push(id);
 
   const result = await db
-    .prepare(`UPDATE performances SET ${sets.join(', ')} WHERE id = ?`)
+    .prepare(`UPDATE performances SET ${sets.join(', ')}, updated_at = datetime('now') WHERE id = ?`)
     .bind(...values)
     .run();
   return result.meta.changes > 0;
@@ -590,7 +590,7 @@ export async function updatePerformanceNote(
   note: string,
 ): Promise<boolean> {
   const result = await db
-    .prepare('UPDATE performances SET note = ? WHERE id = ?')
+    .prepare("UPDATE performances SET note = ?, updated_at = datetime('now') WHERE id = ?")
     .bind(note, perfId)
     .run();
   return result.meta.changes > 0;
@@ -688,7 +688,7 @@ export async function importVodToAdminDb(
 
     // Overwrite stream metadata from VOD submission
     stmts.push(
-      db.prepare('UPDATE streams SET title = ?, date = ? WHERE id = ?')
+      db.prepare("UPDATE streams SET title = ?, date = ?, updated_at = datetime('now') WHERE id = ?")
         .bind(vod.stream_title, vod.stream_date, streamId),
     );
 
@@ -767,7 +767,7 @@ export async function bulkApproveStream(
       .bind(reviewedBy, streamId),
     db
       .prepare(
-        `UPDATE performances SET status = 'approved'
+        `UPDATE performances SET status = 'approved', updated_at = datetime('now')
          WHERE stream_id = ? AND status = 'pending'`,
       )
       .bind(streamId),
@@ -797,7 +797,7 @@ export async function bulkUnapproveStream(
       .bind(streamId),
     db
       .prepare(
-        `UPDATE performances SET status = 'pending'
+        `UPDATE performances SET status = 'pending', updated_at = datetime('now')
          WHERE stream_id = ? AND status = 'approved'`,
       )
       .bind(streamId),
@@ -857,7 +857,7 @@ export async function clearAllEndTimestamps(
 ): Promise<number> {
   const result = await db
     .prepare(
-      'UPDATE performances SET end_timestamp = NULL WHERE stream_id = ? AND end_timestamp IS NOT NULL',
+      "UPDATE performances SET end_timestamp = NULL, updated_at = datetime('now') WHERE stream_id = ? AND end_timestamp IS NOT NULL",
     )
     .bind(streamId)
     .run();

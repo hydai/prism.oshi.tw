@@ -30,7 +30,8 @@ CREATE TABLE IF NOT EXISTS performances (
   note TEXT DEFAULT '',
   status TEXT DEFAULT 'pending' CHECK(status IN ('pending', 'approved', 'rejected', 'excluded', 'extracted')),
   submitted_by TEXT,
-  created_at TEXT DEFAULT (datetime('now'))
+  created_at TEXT DEFAULT (datetime('now')),
+  updated_at TEXT DEFAULT (datetime('now'))
 );
 
 -- Streams staging table
@@ -46,6 +47,7 @@ CREATE TABLE IF NOT EXISTS streams (
   submitted_by TEXT,
   reviewed_by TEXT,
   created_at TEXT DEFAULT (datetime('now')),
+  updated_at TEXT DEFAULT (datetime('now')),
   UNIQUE(streamer_id, video_id)
 );
 
