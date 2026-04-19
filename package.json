@@ -10,7 +10,8 @@
     "lint": "next lint",
     "sync:registry": "npx tsx tools/sync-registry/sync.ts",
     "sync:data": "npx tsx tools/sync-data/sync.ts",
-    "sync:status": "npx tsx tools/sync-status/sync.ts"
+    "sync:status": "npx tsx tools/sync-status/sync.ts",
+    "sync:stale": "npx tsx tools/sync-stale/sync.ts"
   },
   "keywords": [],
   "author": "",
