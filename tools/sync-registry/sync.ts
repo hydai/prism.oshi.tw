@@ -13,6 +13,8 @@ import * as fs from 'node:fs';
 import * as path from 'node:path';
 import { fileURLToPath } from 'node:url';
 
+import { seedIfMissing } from '../shared/sync-state.ts';
+
 // --- Paths ---
 
 const __filename = fileURLToPath(import.meta.url);
@@ -174,13 +176,16 @@ function writeSlugs(streamers: StreamerConfig[]): void {
 function scaffoldDataDirs(streamers: StreamerConfig[]): void {
   for (const s of streamers) {
     const dir = path.resolve(ROOT, 'data', s.slug);
-    if (fs.existsSync(dir)) continue;
-
-    console.log(`  scaffolding data/${s.slug}/`);
-    fs.mkdirSync(dir, { recursive: true });
-    fs.writeFileSync(path.join(dir, 'songs.json'), '[]\n', 'utf-8');
-    fs.writeFileSync(path.join(dir, 'streams.json'), '[]\n', 'utf-8');
-    fs.mkdirSync(path.join(dir, 'metadata'), { recursive: true });
+    if (!fs.existsSync(dir)) {
+      console.log(`  scaffolding data/${s.slug}/`);
+      fs.mkdirSync(dir, { recursive: true });
+      fs.writeFileSync(path.join(dir, 'songs.json'), '[]\n', 'utf-8');
+      fs.writeFileSync(path.join(dir, 'streams.json'), '[]\n', 'utf-8');
+      fs.mkdirSync(path.join(dir, 'metadata'), { recursive: true });
+    }
+    if (seedIfMissing(ROOT, s.slug)) {
+      console.log(`  seeded sync-state entry for ${s.slug}`);
+    }
   }
 }
 

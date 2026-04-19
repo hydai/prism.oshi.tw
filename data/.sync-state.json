@@ -1,0 +1,284 @@
+{
+  "version": 1,
+  "streamers": {
+    "earendel": {
+      "lastSyncedAt": "2026-04-19T11:27:18.662Z",
+      "maxSongUpdatedAt": "2026-04-07 12:12:28",
+      "maxPerfUpdatedAt": "2026-04-07 01:04:37",
+      "maxStreamUpdatedAt": "2026-04-07 01:04:37",
+      "songsCount": 123,
+      "performancesCount": 123,
+      "streamsCount": 7
+    },
+    "gabu": {
+      "lastSyncedAt": "2026-04-19T11:27:08.462Z",
+      "maxSongUpdatedAt": "2026-03-04 15:43:36",
+      "maxPerfUpdatedAt": "2026-03-04 15:43:04",
+      "maxStreamUpdatedAt": "2026-03-04 15:43:04",
+      "songsCount": 31,
+      "performancesCount": 31,
+      "streamsCount": 2
+    },
+    "galaxyvt": {
+      "lastSyncedAt": "2026-04-19T11:27:23.552Z",
+      "maxSongUpdatedAt": null,
+      "maxPerfUpdatedAt": null,
+      "maxStreamUpdatedAt": null,
+      "songsCount": 0,
+      "performancesCount": 0,
+      "streamsCount": 0
+    },
+    "hibiki": {
+      "lastSyncedAt": "2026-04-19T11:27:28.456Z",
+      "maxSongUpdatedAt": null,
+      "maxPerfUpdatedAt": null,
+      "maxStreamUpdatedAt": null,
+      "songsCount": 0,
+      "performancesCount": 0,
+      "streamsCount": 0
+    },
+    "hibikuotodama": {
+      "lastSyncedAt": "2026-04-19T11:27:33.393Z",
+      "maxSongUpdatedAt": "2026-04-10 11:53:27",
+      "maxPerfUpdatedAt": "2026-04-10 11:43:56",
+      "maxStreamUpdatedAt": "2026-04-10 11:43:56",
+      "songsCount": 77,
+      "performancesCount": 77,
+      "streamsCount": 7
+    },
+    "hitomi": {
+      "lastSyncedAt": "2026-04-19T11:27:38.245Z",
+      "maxSongUpdatedAt": "2026-03-21 18:30:09",
+      "maxPerfUpdatedAt": "2026-03-21 18:25:59",
+      "maxStreamUpdatedAt": "2026-03-21 18:25:59",
+      "songsCount": 39,
+      "performancesCount": 39,
+      "streamsCount": 4
+    },
+    "hiyori": {
+      "lastSyncedAt": "2026-04-19T11:27:43.143Z",
+      "maxSongUpdatedAt": "2026-03-24 14:06:22",
+      "maxPerfUpdatedAt": "2026-03-24 14:05:54",
+      "maxStreamUpdatedAt": "2026-03-24 14:05:54",
+      "songsCount": 47,
+      "performancesCount": 47,
+      "streamsCount": 5
+    },
+    "inori": {
+      "lastSyncedAt": "2026-04-19T11:27:48.037Z",
+      "maxSongUpdatedAt": "2026-03-29 15:25:02",
+      "maxPerfUpdatedAt": "2026-03-29 15:21:55",
+      "maxStreamUpdatedAt": "2026-03-29 15:21:55",
+      "songsCount": 40,
+      "performancesCount": 40,
+      "streamsCount": 1
+    },
+    "iruni": {
+      "lastSyncedAt": "2026-04-19T11:27:52.877Z",
+      "maxSongUpdatedAt": null,
+      "maxPerfUpdatedAt": null,
+      "maxStreamUpdatedAt": null,
+      "songsCount": 0,
+      "performancesCount": 0,
+      "streamsCount": 0
+    },
+    "itsuki": {
+      "lastSyncedAt": "2026-04-19T11:27:57.741Z",
+      "maxSongUpdatedAt": "2026-03-24 14:07:30",
+      "maxPerfUpdatedAt": "2026-03-24 14:06:01",
+      "maxStreamUpdatedAt": "2026-03-24 14:06:01",
+      "songsCount": 284,
+      "performancesCount": 284,
+      "streamsCount": 23
+    },
+    "kirali": {
+      "lastSyncedAt": "2026-04-19T11:28:02.639Z",
+      "maxSongUpdatedAt": "2026-03-26 14:37:31",
+      "maxPerfUpdatedAt": "2026-03-26 14:36:05",
+      "maxStreamUpdatedAt": "2026-03-26 14:36:05",
+      "songsCount": 34,
+      "performancesCount": 34,
+      "streamsCount": 3
+    },
+    "koe": {
+      "lastSyncedAt": "2026-04-19T11:28:07.475Z",
+      "maxSongUpdatedAt": "2026-03-25 12:36:55",
+      "maxPerfUpdatedAt": "2026-03-25 12:36:33",
+      "maxStreamUpdatedAt": "2026-03-25 12:36:33",
+      "songsCount": 7,
+      "performancesCount": 7,
+      "streamsCount": 1
+    },
+    "koyuki": {
+      "lastSyncedAt": "2026-04-19T11:28:12.274Z",
+      "maxSongUpdatedAt": "2026-03-19 12:15:58",
+      "maxPerfUpdatedAt": "2026-03-19 12:15:13",
+      "maxStreamUpdatedAt": "2026-03-19 12:15:13",
+      "songsCount": 9,
+      "performancesCount": 9,
+      "streamsCount": 1
+    },
+    "lilylinglan": {
+      "lastSyncedAt": "2026-04-19T11:28:17.060Z",
+      "maxSongUpdatedAt": null,
+      "maxPerfUpdatedAt": null,
+      "maxStreamUpdatedAt": null,
+      "songsCount": 0,
+      "performancesCount": 0,
+      "streamsCount": 0
+    },
+    "mendy": {
+      "lastSyncedAt": "2026-04-19T11:28:21.890Z",
+      "maxSongUpdatedAt": null,
+      "maxPerfUpdatedAt": null,
+      "maxStreamUpdatedAt": null,
+      "songsCount": 0,
+      "performancesCount": 0,
+      "streamsCount": 0
+    },
+    "minatoaqua": {
+      "lastSyncedAt": "2026-04-19T11:28:26.709Z",
+      "maxSongUpdatedAt": null,
+      "maxPerfUpdatedAt": null,
+      "maxStreamUpdatedAt": null,
+      "songsCount": 0,
+      "performancesCount": 0,
+      "streamsCount": 0
+    },
+    "mizuki": {
+      "lastSyncedAt": "2026-04-19T11:24:04.787Z",
+      "maxSongUpdatedAt": "2026-04-19 10:46:20",
+      "maxPerfUpdatedAt": "2026-04-19 10:46:11",
+      "maxStreamUpdatedAt": "2026-04-19 10:46:11",
+      "songsCount": 3343,
+      "performancesCount": 5242,
+      "streamsCount": 297
+    },
+    "nagi": {
+      "lastSyncedAt": "2026-04-19T11:28:31.538Z",
+      "maxSongUpdatedAt": "2026-04-08 19:13:57",
+      "maxPerfUpdatedAt": "2026-04-08 19:13:48",
+      "maxStreamUpdatedAt": "2026-04-08 19:13:48",
+      "songsCount": 30,
+      "performancesCount": 30,
+      "streamsCount": 3
+    },
+    "nemesis": {
+      "lastSyncedAt": "2026-04-19T11:28:36.381Z",
+      "maxSongUpdatedAt": "2026-03-25 12:36:07",
+      "maxPerfUpdatedAt": "2026-03-25 12:34:23",
+      "maxStreamUpdatedAt": "2026-03-25 12:34:23",
+      "songsCount": 9,
+      "performancesCount": 9,
+      "streamsCount": 1
+    },
+    "oboro": {
+      "lastSyncedAt": "2026-04-19T11:28:41.666Z",
+      "maxSongUpdatedAt": null,
+      "maxPerfUpdatedAt": null,
+      "maxStreamUpdatedAt": null,
+      "songsCount": 0,
+      "performancesCount": 0,
+      "streamsCount": 0
+    },
+    "otowamina": {
+      "lastSyncedAt": "2026-04-19T11:28:46.426Z",
+      "maxSongUpdatedAt": null,
+      "maxPerfUpdatedAt": null,
+      "maxStreamUpdatedAt": null,
+      "songsCount": 0,
+      "performancesCount": 0,
+      "streamsCount": 0
+    },
+    "oumua": {
+      "lastSyncedAt": "2026-04-19T11:28:51.222Z",
+      "maxSongUpdatedAt": "2026-03-21 15:51:44",
+      "maxPerfUpdatedAt": "2026-03-21 15:50:09",
+      "maxStreamUpdatedAt": "2026-03-21 15:50:09",
+      "songsCount": 22,
+      "performancesCount": 22,
+      "streamsCount": 2
+    },
+    "paitan": {
+      "lastSyncedAt": "2026-04-19T11:28:56.172Z",
+      "maxSongUpdatedAt": "2026-03-25 12:37:52",
+      "maxPerfUpdatedAt": "2026-03-25 12:37:21",
+      "maxStreamUpdatedAt": "2026-03-25 12:37:21",
+      "songsCount": 3,
+      "performancesCount": 3,
+      "streamsCount": 1
+    },
+    "rei": {
+      "lastSyncedAt": "2026-04-19T11:29:00.977Z",
+      "maxSongUpdatedAt": "2026-03-21 14:54:47",
+      "maxPerfUpdatedAt": "2026-03-21 14:43:38",
+      "maxStreamUpdatedAt": "2026-03-21 14:05:04",
+      "songsCount": 32,
+      "performancesCount": 32,
+      "streamsCount": 3
+    },
+    "sachi": {
+      "lastSyncedAt": "2026-04-19T11:29:06.140Z",
+      "maxSongUpdatedAt": "2026-03-21 17:38:16",
+      "maxPerfUpdatedAt": "2026-03-21 17:38:02",
+      "maxStreamUpdatedAt": "2026-03-21 17:38:02",
+      "songsCount": 20,
+      "performancesCount": 20,
+      "streamsCount": 4
+    },
+    "sakuro": {
+      "lastSyncedAt": "2026-04-19T11:29:10.942Z",
+      "maxSongUpdatedAt": "2026-03-09 23:31:06",
+      "maxPerfUpdatedAt": "2026-03-09 23:28:54",
+      "maxStreamUpdatedAt": "2026-03-09 23:28:54",
+      "songsCount": 116,
+      "performancesCount": 116,
+      "streamsCount": 13
+    },
+    "seki": {
+      "lastSyncedAt": "2026-04-19T11:27:13.790Z",
+      "maxSongUpdatedAt": "2026-03-14 15:59:44",
+      "maxPerfUpdatedAt": "2026-03-10 13:11:16",
+      "maxStreamUpdatedAt": "2026-03-10 13:11:16",
+      "songsCount": 1334,
+      "performancesCount": 1544,
+      "streamsCount": 125
+    },
+    "shumulumeifei": {
+      "lastSyncedAt": "2026-04-19T11:29:15.734Z",
+      "maxSongUpdatedAt": null,
+      "maxPerfUpdatedAt": null,
+      "maxStreamUpdatedAt": null,
+      "songsCount": 0,
+      "performancesCount": 0,
+      "streamsCount": 0
+    },
+    "thirteennn013": {
+      "lastSyncedAt": "2026-04-19T11:29:20.541Z",
+      "maxSongUpdatedAt": "2026-03-07 05:59:08",
+      "maxPerfUpdatedAt": "2026-03-07 05:27:04",
+      "maxStreamUpdatedAt": "2026-03-07 05:21:44",
+      "songsCount": 11,
+      "performancesCount": 11,
+      "streamsCount": 1
+    },
+    "xxhacucoxx": {
+      "lastSyncedAt": "2026-04-19T11:29:25.300Z",
+      "maxSongUpdatedAt": "2026-04-01 11:56:35",
+      "maxPerfUpdatedAt": "2026-04-01 11:56:27",
+      "maxStreamUpdatedAt": "2026-04-01 11:56:27",
+      "songsCount": 14,
+      "performancesCount": 14,
+      "streamsCount": 1
+    },
+    "yuzumi": {
+      "lastSyncedAt": "2026-04-19T11:29:30.375Z",
+      "maxSongUpdatedAt": null,
+      "maxPerfUpdatedAt": null,
+      "maxStreamUpdatedAt": null,
+      "songsCount": 0,
+      "performancesCount": 0,
+      "streamsCount": 0
+    }
+  }
+}

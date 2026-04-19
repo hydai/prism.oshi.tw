@@ -13,6 +13,8 @@ import * as fs from 'node:fs';
 import * as path from 'node:path';
 import { fileURLToPath } from 'node:url';
 
+import { syncStatePath, upsertEntry, type SyncStateEntry } from '../shared/sync-state.ts';
+
 // --- Paths ---
 
 const __filename = fileURLToPath(import.meta.url);
@@ -151,6 +153,19 @@ function buildStreams(streamerId: string): FanSiteStream[] {
   });
 }
 
+// --- Query max updated_at per table ---
+
+interface MaxRow {
+  max_ts: string | null;
+}
+
+function queryMaxUpdatedAt(table: 'songs' | 'performances' | 'streams', streamerId: string): string | null {
+  const rows = queryD1<MaxRow>(
+    `SELECT MAX(updated_at) AS max_ts FROM ${table} WHERE streamer_id = '${streamerId}' AND status = 'approved'`,
+  );
+  return rows[0]?.max_ts ?? null;
+}
+
 // --- Main ---
 
 function main(): void {
@@ -182,6 +197,19 @@ function main(): void {
 
   const totalPerfs = songs.reduce((sum, s) => sum + s.performances.length, 0);
   console.log(`  total: ${songs.length} songs, ${totalPerfs} performances, ${streams.length} streams`);
+
+  const entry: SyncStateEntry = {
+    lastSyncedAt: new Date().toISOString(),
+    maxSongUpdatedAt: queryMaxUpdatedAt('songs', slug),
+    maxPerfUpdatedAt: queryMaxUpdatedAt('performances', slug),
+    maxStreamUpdatedAt: queryMaxUpdatedAt('streams', slug),
+    songsCount: songs.length,
+    performancesCount: totalPerfs,
+    streamsCount: streams.length,
+  };
+  upsertEntry(ROOT, slug, entry);
+  console.log(`  stamped ${syncStatePath(ROOT)}`);
+
   console.log('sync-data: done.');
 }
 
