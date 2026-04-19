@@ -153,17 +153,23 @@ function buildStreams(streamerId: string): FanSiteStream[] {
   });
 }
 
-// --- Query max updated_at per table ---
+// --- Query snapshot per table (max updated_at + count of approved rows) ---
+//
+// Counts come from the DB directly, not from the in-memory buildSongs/buildStreams
+// output, so they always match what sync-status compares against. Orphan rows
+// (approved performance pointing at a non-approved song) are counted in the DB
+// but dropped by buildSongs — storing the DB count keeps detection consistent.
 
-interface MaxRow {
+interface SnapshotRow {
   max_ts: string | null;
+  cnt: number;
 }
 
-function queryMaxUpdatedAt(table: 'songs' | 'performances' | 'streams', streamerId: string): string | null {
-  const rows = queryD1<MaxRow>(
-    `SELECT MAX(updated_at) AS max_ts FROM ${table} WHERE streamer_id = '${streamerId}' AND status = 'approved'`,
+function querySnapshot(table: 'songs' | 'performances' | 'streams', streamerId: string): SnapshotRow {
+  const rows = queryD1<SnapshotRow>(
+    `SELECT MAX(updated_at) AS max_ts, COUNT(*) AS cnt FROM ${table} WHERE streamer_id = '${streamerId}' AND status = 'approved'`,
   );
-  return rows[0]?.max_ts ?? null;
+  return rows[0] ?? { max_ts: null, cnt: 0 };
 }
 
 // --- Main ---
@@ -198,14 +204,24 @@ function main(): void {
   const totalPerfs = songs.reduce((sum, s) => sum + s.performances.length, 0);
   console.log(`  total: ${songs.length} songs, ${totalPerfs} performances, ${streams.length} streams`);
 
+  const songsSnap = querySnapshot('songs', slug);
+  const perfsSnap = querySnapshot('performances', slug);
+  const streamsSnap = querySnapshot('streams', slug);
+
+  if (perfsSnap.cnt !== totalPerfs) {
+    console.log(
+      `  ⚠ ${perfsSnap.cnt - totalPerfs} approved performance(s) reference a non-approved song (orphan); excluded from songs.json`,
+    );
+  }
+
   const entry: SyncStateEntry = {
     lastSyncedAt: new Date().toISOString(),
-    maxSongUpdatedAt: queryMaxUpdatedAt('songs', slug),
-    maxPerfUpdatedAt: queryMaxUpdatedAt('performances', slug),
-    maxStreamUpdatedAt: queryMaxUpdatedAt('streams', slug),
-    songsCount: songs.length,
-    performancesCount: totalPerfs,
-    streamsCount: streams.length,
+    maxSongUpdatedAt: songsSnap.max_ts,
+    maxPerfUpdatedAt: perfsSnap.max_ts,
+    maxStreamUpdatedAt: streamsSnap.max_ts,
+    songsCount: songsSnap.cnt,
+    performancesCount: perfsSnap.cnt,
+    streamsCount: streamsSnap.cnt,
   };
   upsertEntry(ROOT, slug, entry);
   console.log(`  stamped ${syncStatePath(ROOT)}`);
