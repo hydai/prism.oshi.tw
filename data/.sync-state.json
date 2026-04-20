@@ -173,13 +173,13 @@
       "streamsCount": 1
     },
     "oboro": {
-      "lastSyncedAt": "2026-04-19T11:28:41.666Z",
-      "maxSongUpdatedAt": null,
-      "maxPerfUpdatedAt": null,
-      "maxStreamUpdatedAt": null,
-      "songsCount": 0,
-      "performancesCount": 0,
-      "streamsCount": 0
+      "lastSyncedAt": "2026-04-20T12:35:48.746Z",
+      "maxSongUpdatedAt": "2026-04-20 12:34:23",
+      "maxPerfUpdatedAt": "2026-04-20 12:34:23",
+      "maxStreamUpdatedAt": "2026-04-20 12:34:23",
+      "songsCount": 20,
+      "performancesCount": 20,
+      "streamsCount": 1
     },
     "otowamina": {
       "lastSyncedAt": "2026-04-19T11:28:46.426Z",
