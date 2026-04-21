@@ -36,6 +36,78 @@
     ]
   },
   {
+    "id": "song-14242dbb",
+    "title": "如果雨之後",
+    "originalArtist": "周興哲",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-bc0453a3",
+        "streamId": "stream-591c50e8",
+        "date": "2026-04-04",
+        "streamTitle": "【歌回】哇拉拉拉拉拉拉歌回｜朧Oboro",
+        "videoId": "zjFwAVFay8Y",
+        "timestamp": 6207,
+        "endTimestamp": 6471,
+        "note": ""
+      }
+    ]
+  },
+  {
+    "id": "song-1b1770d6",
+    "title": "夜のピエロ",
+    "originalArtist": "Ado",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-5fea5dfc",
+        "streamId": "stream-591c50e8",
+        "date": "2026-04-04",
+        "streamTitle": "【歌回】哇拉拉拉拉拉拉歌回｜朧Oboro",
+        "videoId": "zjFwAVFay8Y",
+        "timestamp": 1205,
+        "endTimestamp": 1404,
+        "note": ""
+      }
+    ]
+  },
+  {
+    "id": "song-45adfe21",
+    "title": "小悪魔だってかまわない！",
+    "originalArtist": "HoneyWorks feat. 初音ミク",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-dcfb7c15",
+        "streamId": "stream-591c50e8",
+        "date": "2026-04-04",
+        "streamTitle": "【歌回】哇拉拉拉拉拉拉歌回｜朧Oboro",
+        "videoId": "zjFwAVFay8Y",
+        "timestamp": 5119,
+        "endTimestamp": 5325,
+        "note": ""
+      }
+    ]
+  },
+  {
+    "id": "song-4ad21f46",
+    "title": "孤勇者",
+    "originalArtist": "陳奕迅",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-0b1082a2",
+        "streamId": "stream-591c50e8",
+        "date": "2026-04-04",
+        "streamTitle": "【歌回】哇拉拉拉拉拉拉歌回｜朧Oboro",
+        "videoId": "zjFwAVFay8Y",
+        "timestamp": 5404,
+        "endTimestamp": 5659,
+        "note": ""
+      }
+    ]
+  },
+  {
     "id": "song-511d4f3f",
     "title": "泡沫の夜",
     "originalArtist": "nqrse",
@@ -54,6 +126,42 @@
     ]
   },
   {
+    "id": "song-53a8a024",
+    "title": "IRIS OUT",
+    "originalArtist": "米津玄師",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-a3d2fc2e",
+        "streamId": "stream-591c50e8",
+        "date": "2026-04-04",
+        "streamTitle": "【歌回】哇拉拉拉拉拉拉歌回｜朧Oboro",
+        "videoId": "zjFwAVFay8Y",
+        "timestamp": 7693,
+        "endTimestamp": 7840,
+        "note": ""
+      }
+    ]
+  },
+  {
+    "id": "song-562ecb16",
+    "title": "115万キロのフィルム",
+    "originalArtist": "髭男",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-9eeaf37f",
+        "streamId": "stream-591c50e8",
+        "date": "2026-04-04",
+        "streamTitle": "【歌回】哇拉拉拉拉拉拉歌回｜朧Oboro",
+        "videoId": "zjFwAVFay8Y",
+        "timestamp": 2933,
+        "endTimestamp": 3254,
+        "note": ""
+      }
+    ]
+  },
+  {
     "id": "song-5ff734da",
     "title": "真生活",
     "originalArtist": "案山子 feat. 初音ミク",
@@ -67,6 +175,24 @@
         "videoId": "NjGAsumGDdQ",
         "timestamp": 465,
         "endTimestamp": 709,
+        "note": ""
+      }
+    ]
+  },
+  {
+    "id": "song-65fe6deb",
+    "title": "青春修煉手冊",
+    "originalArtist": "TFBOYS",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-c02c87ff",
+        "streamId": "stream-591c50e8",
+        "date": "2026-04-04",
+        "streamTitle": "【歌回】哇拉拉拉拉拉拉歌回｜朧Oboro",
+        "videoId": "zjFwAVFay8Y",
+        "timestamp": 4478,
+        "endTimestamp": 4741,
         "note": ""
       }
     ]
@@ -103,6 +229,24 @@
         "videoId": "NjGAsumGDdQ",
         "timestamp": 5605,
         "endTimestamp": 5855,
+        "note": ""
+      }
+    ]
+  },
+  {
+    "id": "song-8d59c545",
+    "title": "My Dearest",
+    "originalArtist": "supercell",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-90eccc52",
+        "streamId": "stream-591c50e8",
+        "date": "2026-04-04",
+        "streamTitle": "【歌回】哇拉拉拉拉拉拉歌回｜朧Oboro",
+        "videoId": "zjFwAVFay8Y",
+        "timestamp": 2523,
+        "endTimestamp": 2857,
         "note": ""
       }
     ]
@@ -162,6 +306,42 @@
     ]
   },
   {
+    "id": "song-a11a4aef",
+    "title": "怪獣の花唄",
+    "originalArtist": "Vaundy",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-6c6ad6a4",
+        "streamId": "stream-591c50e8",
+        "date": "2026-04-04",
+        "streamTitle": "【歌回】哇拉拉拉拉拉拉歌回｜朧Oboro",
+        "videoId": "zjFwAVFay8Y",
+        "timestamp": 5890,
+        "endTimestamp": 6113,
+        "note": ""
+      }
+    ]
+  },
+  {
+    "id": "song-a1c1bc91",
+    "title": "fake face dance music",
+    "originalArtist": "音田雅則",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-f221a8d9",
+        "streamId": "stream-591c50e8",
+        "date": "2026-04-04",
+        "streamTitle": "【歌回】哇拉拉拉拉拉拉歌回｜朧Oboro",
+        "videoId": "zjFwAVFay8Y",
+        "timestamp": 2132,
+        "endTimestamp": 2282,
+        "note": ""
+      }
+    ]
+  },
+  {
     "id": "song-a4292374",
     "title": "アイネクライネ",
     "originalArtist": "米津玄師",
@@ -193,6 +373,24 @@
         "videoId": "NjGAsumGDdQ",
         "timestamp": 758,
         "endTimestamp": 979,
+        "note": ""
+      }
+    ]
+  },
+  {
+    "id": "song-ad031d58",
+    "title": "刻在我心底的名字",
+    "originalArtist": "盧廣仲",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-c49cd143",
+        "streamId": "stream-591c50e8",
+        "date": "2026-04-04",
+        "streamTitle": "【歌回】哇拉拉拉拉拉拉歌回｜朧Oboro",
+        "videoId": "zjFwAVFay8Y",
+        "timestamp": 3333,
+        "endTimestamp": 3640,
         "note": ""
       }
     ]
@@ -234,6 +432,42 @@
     ]
   },
   {
+    "id": "song-cec27eb2",
+    "title": "你，好不好？",
+    "originalArtist": "周興哲",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-452c5789",
+        "streamId": "stream-591c50e8",
+        "date": "2026-04-04",
+        "streamTitle": "【歌回】哇拉拉拉拉拉拉歌回｜朧Oboro",
+        "videoId": "zjFwAVFay8Y",
+        "timestamp": 6589,
+        "endTimestamp": 6872,
+        "note": ""
+      }
+    ]
+  },
+  {
+    "id": "song-d93258c0",
+    "title": "東京サマーセッション",
+    "originalArtist": "HoneyWorks",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-3c8bca3e",
+        "streamId": "stream-591c50e8",
+        "date": "2026-04-04",
+        "streamTitle": "【歌回】哇拉拉拉拉拉拉歌回｜朧Oboro",
+        "videoId": "zjFwAVFay8Y",
+        "timestamp": 3850,
+        "endTimestamp": 4075,
+        "note": ""
+      }
+    ]
+  },
+  {
     "id": "song-dd2838de",
     "title": "Someone You Loved",
     "originalArtist": "Lewis Capaldi",
@@ -247,6 +481,24 @@
         "videoId": "NjGAsumGDdQ",
         "timestamp": 6818,
         "endTimestamp": 6996,
+        "note": ""
+      }
+    ]
+  },
+  {
+    "id": "song-de9a3d6d",
+    "title": "花に亡霊",
+    "originalArtist": "ヨルシカ",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-0b1d3407",
+        "streamId": "stream-591c50e8",
+        "date": "2026-04-04",
+        "streamTitle": "【歌回】哇拉拉拉拉拉拉歌回｜朧Oboro",
+        "videoId": "zjFwAVFay8Y",
+        "timestamp": 1634,
+        "endTimestamp": 1873,
         "note": ""
       }
     ]
@@ -355,6 +607,42 @@
         "videoId": "NjGAsumGDdQ",
         "timestamp": 4651,
         "endTimestamp": 4819,
+        "note": ""
+      }
+    ]
+  },
+  {
+    "id": "song-fc807347",
+    "title": "晚餐歌",
+    "originalArtist": "tuki.",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-1bf5ab3e",
+        "streamId": "stream-591c50e8",
+        "date": "2026-04-04",
+        "streamTitle": "【歌回】哇拉拉拉拉拉拉歌回｜朧Oboro",
+        "videoId": "zjFwAVFay8Y",
+        "timestamp": 532,
+        "endTimestamp": 748,
+        "note": ""
+      }
+    ]
+  },
+  {
+    "id": "song-fd8d7d0a",
+    "title": "以後別做朋友",
+    "originalArtist": "周興哲",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-a3403ce1",
+        "streamId": "stream-591c50e8",
+        "date": "2026-04-04",
+        "streamTitle": "【歌回】哇拉拉拉拉拉拉歌回｜朧Oboro",
+        "videoId": "zjFwAVFay8Y",
+        "timestamp": 6968,
+        "endTimestamp": 7203,
         "note": ""
       }
     ]
