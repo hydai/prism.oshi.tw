@@ -7,7 +7,13 @@ import { generateId, findByChannelUrl, insertSubmission, resetRejectedSubmission
 import { generateVodId, generateVodSongId, listApprovedStreamers, findApprovedVodByVideoId, countVodsByVideoId, insertVodSubmission, listAllVodSubmissions, listAdminStreams, checkAdminStreamExists } from './vod-db';
 import { renderPage } from './page';
 import { renderVodPage } from './vod-page';
-import { renderStatusPage } from './status-page';
+import {
+  renderStatusPage,
+  VTUBER_FILTERS,
+  VOD_FILTERS,
+  type VtuberFilter,
+  type VodFilter,
+} from './status-page';
 
 /** Fetch video title, thumbnail, and publish date from YouTube via oEmbed + Data API v3. */
 async function fetchYoutubeVideoInfo(videoId: string, apiKey: string): Promise<{ title: string; thumbnail: string; date: string }> {
@@ -456,12 +462,26 @@ app.post('/vod/api/submit', async (c) => {
 
 // GET /status — Public submission status overview
 app.get('/status', async (c) => {
+  const rawV = c.req.query('vtuber') ?? 'all';
+  const rawD = c.req.query('vod') ?? 'all';
+  const vtuberFilter: VtuberFilter = (VTUBER_FILTERS as readonly string[]).includes(rawV)
+    ? (rawV as VtuberFilter)
+    : 'all';
+  const vodFilter: VodFilter = (VOD_FILTERS as readonly string[]).includes(rawD)
+    ? (rawD as VodFilter)
+    : 'all';
+
+  const vtuberSqlStatus = vtuberFilter === 'all' ? undefined : vtuberFilter;
+
   const [submissions, vodSubmissions, adminStreams] = await Promise.all([
-    listAllSubmissions(c.env.DB),
+    listAllSubmissions(c.env.DB, vtuberSqlStatus),
     listAllVodSubmissions(c.env.DB),
     listAdminStreams(c.env.ADMIN_DB),
   ]);
-  return c.html(renderStatusPage(submissions, vodSubmissions, adminStreams));
+  return c.html(renderStatusPage(submissions, vodSubmissions, adminStreams, {
+    vtuber: vtuberFilter,
+    vod: vodFilter,
+  }));
 });
 
 export default app;

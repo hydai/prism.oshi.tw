@@ -79,16 +79,21 @@ export async function resetRejectedSubmission(
 /**
  * List all submissions with narrow projection for the public status page.
  */
-export async function listAllSubmissions(db: D1Database): Promise<SubmissionSummary[]> {
-  const { results } = await db
-    .prepare(
-      `SELECT id, slug, display_name, avatar_url, status, submitted_at, reviewed_at, reviewer_note
-       FROM submissions
-       ORDER BY
-         CASE status WHEN 'pending' THEN 0 WHEN 'approved' THEN 1 WHEN 'rejected' THEN 2 END,
-         submitted_at DESC`,
-    )
-    .all<SubmissionSummary>();
+export async function listAllSubmissions(
+  db: D1Database,
+  status?: 'pending' | 'approved' | 'rejected',
+): Promise<SubmissionSummary[]> {
+  const where = status ? 'WHERE status = ?' : '';
+  const stmt = db.prepare(
+    `SELECT id, slug, display_name, avatar_url, status, submitted_at, reviewed_at, reviewer_note
+     FROM submissions
+     ${where}
+     ORDER BY
+       CASE status WHEN 'pending' THEN 0 WHEN 'approved' THEN 1 WHEN 'rejected' THEN 2 END,
+       submitted_at DESC`,
+  );
+  const bound = status ? stmt.bind(status) : stmt;
+  const { results } = await bound.all<SubmissionSummary>();
   return results ?? [];
 }
 

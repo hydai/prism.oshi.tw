@@ -33,11 +33,43 @@ function countByStatus(items: Array<{ status: string }>): { pending: number; app
   return { pending, approved, rejected };
 }
 
+export const VTUBER_FILTERS = ['all', 'pending', 'approved', 'rejected'] as const;
+export const VOD_FILTERS = ['all', 'pending', 'approved', 'rejected', 'admin_done'] as const;
+export type VtuberFilter = typeof VTUBER_FILTERS[number];
+export type VodFilter = typeof VOD_FILTERS[number];
+
+const STATUS_LABELS: Record<string, string> = {
+  pending: '審核中',
+  approved: '已通過',
+  rejected: '已拒絕',
+  admin_done: '已收錄',
+};
+
 export function renderStatusPage(
   submissions: SubmissionSummary[],
   vodSubmissions: VodSubmissionSummary[],
   adminStreams: AdminStreamSummary[],
+  filters: { vtuber: VtuberFilter; vod: VodFilter },
 ): ReturnType<typeof html> {
+  // URL builder: preserves the other section's filter when one axis changes.
+  const buildHref = (opts: { vtuber?: VtuberFilter; vod?: VodFilter }): string => {
+    const v = opts.vtuber ?? filters.vtuber;
+    const d = opts.vod ?? filters.vod;
+    const params = new URLSearchParams();
+    if (v !== 'all') params.set('vtuber', v);
+    if (d !== 'all') params.set('vod', d);
+    const qs = params.toString();
+    return qs ? `/status?${qs}` : '/status';
+  };
+
+  const renderFilterPill = (
+    param: 'vtuber' | 'vod',
+    value: string,
+    label: string,
+    active: boolean,
+  ): string =>
+    `<a href="${buildHref({ [param]: value } as { vtuber?: VtuberFilter; vod?: VodFilter })}" class="filter-btn${active ? ' active' : ''}"${active ? ' aria-current="page"' : ''}>${label}</a>`;
+
   // Build VTuber submissions table rows
   const subStats = countByStatus(submissions);
   const subRows = submissions.map((s) => `
@@ -57,6 +89,15 @@ export function renderStatusPage(
   for (const a of adminStreams) {
     adminMap.set(adminKey(a.streamer_id, a.video_id), a);
   }
+
+  // A VOD row's *effective* status merges admin_done: an approved admin match promotes
+  // the display to 已收錄 regardless of the nova submission's own status.
+  const effectiveStatusOfVod = (v: VodSubmissionSummary): string => {
+    const am = adminMap.get(adminKey(v.streamer_slug, v.video_id));
+    return am && am.status === 'approved' ? 'admin_done' : v.status;
+  };
+  const matchesVodFilter = (eff: string): boolean =>
+    filters.vod === 'all' || eff === filters.vod;
 
   // Group VOD submissions by streamer_slug
   const vodGroups = new Map<string, VodSubmissionSummary[]>();
@@ -109,12 +150,20 @@ export function renderStatusPage(
         </tr>`;
 
   let vodSections = '';
+  let vodVisibleCount = 0;
   for (const [slug, vods] of vodGroups) {
     const displayName = slugToName.get(slug) ?? slug;
     const adminOnly = adminOnlyGroups.get(slug);
-    const totalItems = vods.length + (adminOnly?.length ?? 0);
-    const hasPending = vods.some((v) => v.status === 'pending');
-    const openAttr = hasPending ? ' open' : '';
+
+    const visibleVods = vods.filter((v) => matchesVodFilter(effectiveStatusOfVod(v)));
+    const visibleAdmin = (adminOnly ?? []).filter(() => matchesVodFilter('admin_done'));
+    const totalItems = visibleVods.length + visibleAdmin.length;
+    adminOnlyGroups.delete(slug);
+    if (totalItems === 0) continue;
+    vodVisibleCount += totalItems;
+
+    const hasPending = visibleVods.some((v) => v.status === 'pending');
+    const openAttr = (filters.vod !== 'all' || hasPending) ? ' open' : '';
 
     vodSections += `
     <details class="vod-group"${openAttr}>
@@ -125,7 +174,7 @@ export function renderStatusPage(
       </summary>
       <table>${vodColWidths}<tbody>`;
 
-    for (const v of vods) {
+    for (const v of visibleVods) {
       const aKey = adminKey(v.streamer_slug, v.video_id);
       const adminMatch = adminMap.get(aKey);
       const badge = (adminMatch && adminMatch.status === 'approved') ? statusBadge('admin_done') : statusBadge(v.status);
@@ -135,12 +184,9 @@ export function renderStatusPage(
       vodSections += vodRow(v.stream_title, v.stream_date, adminMatch ? adminMatch.song_count : v.song_count, badge + rejectionNote, formatDate(v.submitted_at), formatDate(v.reviewed_at));
     }
 
-    if (adminOnly) {
-      for (const a of adminOnly) {
-        const badge = a.status === 'approved' ? statusBadge('admin_done') : statusBadge(a.status);
-        vodSections += vodRow(a.title, a.date, a.song_count, badge, formatDate(a.created_at), '—');
-      }
-      adminOnlyGroups.delete(slug);
+    for (const a of visibleAdmin) {
+      const badge = a.status === 'approved' ? statusBadge('admin_done') : statusBadge(a.status);
+      vodSections += vodRow(a.title, a.date, a.song_count, badge, formatDate(a.created_at), '—');
     }
 
     vodSections += `</tbody></table></details>`;
@@ -148,22 +194,26 @@ export function renderStatusPage(
 
   // Render admin-only streams (not submitted via NOVA)
   for (const [slug, streams] of adminOnlyGroups) {
-    if (!vodGroups.has(slug)) {
-      const displayName = slugToName.get(slug) ?? slug;
-      vodSections += `
-    <details class="vod-group">
+    if (vodGroups.has(slug)) continue;
+    const visible = streams.filter(() => matchesVodFilter('admin_done'));
+    if (visible.length === 0) continue;
+    vodVisibleCount += visible.length;
+
+    const displayName = slugToName.get(slug) ?? slug;
+    const openAttr = filters.vod !== 'all' ? ' open' : '';
+    vodSections += `
+    <details class="vod-group"${openAttr}>
       <summary style="padding:12px 10px 8px;font-weight:600;font-size:14px;color:var(--text-primary);display:flex;align-items:center;gap:8px;">
         <span class="vod-group-arrow">&#9654;</span>
         ${esc(displayName)}<span style="font-weight:400;font-size:12px;color:var(--text-tertiary);margin-left:4px;">${esc(slug)}</span>
-        <span style="font-weight:400;font-size:12px;color:var(--text-tertiary);margin-left:auto;">${streams.length} 筆</span>
+        <span style="font-weight:400;font-size:12px;color:var(--text-tertiary);margin-left:auto;">${visible.length} 筆</span>
       </summary>
       <table>${vodColWidths}<tbody>`;
-      for (const a of streams) {
-        const badge = a.status === 'approved' ? statusBadge('admin_done') : statusBadge(a.status);
-        vodSections += vodRow(a.title, a.date, a.song_count, badge, formatDate(a.created_at), '—');
-      }
-      vodSections += `</tbody></table></details>`;
+    for (const a of visible) {
+      const badge = a.status === 'approved' ? statusBadge('admin_done') : statusBadge(a.status);
+      vodSections += vodRow(a.title, a.date, a.song_count, badge, formatDate(a.created_at), '—');
     }
+    vodSections += `</tbody></table></details>`;
   }
 
   return html`<!doctype html>
@@ -223,6 +273,34 @@ export function renderStatusPage(
       color: var(--text-secondary);
     }
     .summary-bar strong { color: var(--text-primary); }
+
+    .filter-bar {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+      justify-content: center;
+      margin-bottom: 12px;
+    }
+    .filter-btn {
+      padding: 6px 16px;
+      border: 1px solid var(--border-glass);
+      border-radius: 20px;
+      background: var(--bg-surface-frosted);
+      font-family: inherit;
+      font-size: 13px;
+      font-weight: 500;
+      color: var(--text-secondary);
+      cursor: pointer;
+      text-decoration: none;
+      transition: all 0.2s;
+    }
+    .filter-btn:hover { border-color: var(--accent-pink); color: var(--accent-pink); }
+    .filter-btn:focus-visible { outline: 2px solid var(--accent-pink); outline-offset: 2px; }
+    .filter-btn.active {
+      background: linear-gradient(135deg, var(--accent-pink), var(--accent-blue));
+      color: white;
+      border-color: transparent;
+    }
 
     .card {
       background: var(--bg-surface-glass);
@@ -332,6 +410,12 @@ export function renderStatusPage(
 
     <!-- VTuber Submissions -->
     <h2 class="section-title">VTuber 提交</h2>
+    ${raw(`<nav class="filter-bar" aria-label="VTuber 提交狀態篩選">
+      ${renderFilterPill('vtuber', 'all', '全部', filters.vtuber === 'all')}
+      ${renderFilterPill('vtuber', 'pending', '審核中', filters.vtuber === 'pending')}
+      ${renderFilterPill('vtuber', 'approved', '已通過', filters.vtuber === 'approved')}
+      ${renderFilterPill('vtuber', 'rejected', '已拒絕', filters.vtuber === 'rejected')}
+    </nav>`)}
     <div class="summary-bar">
       共 <strong>${submissions.length}</strong> 筆：
       <span>${subStats.pending} 審核中</span>
@@ -351,12 +435,21 @@ export function renderStatusPage(
             </tr></thead>
             <tbody>${subRows}</tbody>
           </table>`)
-        : raw('<div class="empty-msg">尚無 VTuber 提交紀錄</div>')
+        : raw(filters.vtuber === 'all'
+            ? '<div class="empty-msg">尚無 VTuber 提交紀錄</div>'
+            : `<div class="empty-msg">沒有符合「${STATUS_LABELS[filters.vtuber]}」的 VTuber 提交<div style="margin-top:12px;"><a href="${buildHref({ vtuber: 'all' })}" style="color:var(--accent-pink);text-decoration:none;font-size:13px;">清除篩選</a></div></div>`)
       }
     </div>
 
     <!-- VOD Submissions -->
     <h2 class="section-title">VOD 提交</h2>
+    ${raw(`<nav class="filter-bar" aria-label="VOD 提交狀態篩選">
+      ${renderFilterPill('vod', 'all', '全部', filters.vod === 'all')}
+      ${renderFilterPill('vod', 'pending', '審核中', filters.vod === 'pending')}
+      ${renderFilterPill('vod', 'approved', '已通過', filters.vod === 'approved')}
+      ${renderFilterPill('vod', 'rejected', '已拒絕', filters.vod === 'rejected')}
+      ${renderFilterPill('vod', 'admin_done', '已收錄', filters.vod === 'admin_done')}
+    </nav>`)}
     <div class="summary-bar">
       共 <strong>${totalVodCount}</strong> 筆：
       <span>${vodStats.pending} 審核中</span>
@@ -365,7 +458,7 @@ export function renderStatusPage(
       ${adminDoneCount > 0 ? raw(`<span>${adminDoneCount} 已收錄</span>`) : raw('')}
     </div>
     <div class="card">
-      ${totalVodCount > 0
+      ${vodVisibleCount > 0
         ? raw(`<table class="vod-header-table">
             ${vodColWidths}
             <thead><tr>
@@ -378,7 +471,9 @@ export function renderStatusPage(
             </tr></thead>
           </table>
           ${vodSections}`)
-        : raw('<div class="empty-msg">尚無 VOD 提交紀錄</div>')
+        : raw(filters.vod === 'all'
+            ? '<div class="empty-msg">尚無 VOD 提交紀錄</div>'
+            : `<div class="empty-msg">沒有符合「${STATUS_LABELS[filters.vod]}」的 VOD 提交<div style="margin-top:12px;"><a href="${buildHref({ vod: 'all' })}" style="color:var(--accent-pink);text-decoration:none;font-size:13px;">清除篩選</a></div></div>`)
       }
     </div>
 
