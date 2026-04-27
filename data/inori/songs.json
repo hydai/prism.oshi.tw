@@ -1,5 +1,23 @@
 [
   {
+    "id": "song-00345323",
+    "title": "千本桜",
+    "originalArtist": "黒うさP",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-2be52027",
+        "streamId": "stream-2026-04-26",
+        "date": "2026-04-26",
+        "streamTitle": "【#歌回 】130同接耐久點歌歌回 SC可點歌!!!",
+        "videoId": "QuPB5nDhK5o",
+        "timestamp": 3277,
+        "endTimestamp": 3517,
+        "note": ""
+      }
+    ]
+  },
+  {
     "id": "song-0305c679",
     "title": "哥布檸檬",
     "originalArtist": "計畫通行",
@@ -85,6 +103,24 @@
         "videoId": "d1NGgYgGuoY",
         "timestamp": 693,
         "endTimestamp": 998,
+        "note": ""
+      }
+    ]
+  },
+  {
+    "id": "song-1ead5d24",
+    "title": "glow",
+    "originalArtist": "keeno",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-e49ccd34",
+        "streamId": "stream-2026-04-26",
+        "date": "2026-04-26",
+        "streamTitle": "【#歌回 】130同接耐久點歌歌回 SC可點歌!!!",
+        "videoId": "QuPB5nDhK5o",
+        "timestamp": 7706,
+        "endTimestamp": 7985,
         "note": ""
       }
     ]
@@ -180,6 +216,42 @@
     ]
   },
   {
+    "id": "song-309f3146",
+    "title": "WAVE",
+    "originalArtist": "niki",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-a46d806c",
+        "streamId": "stream-2026-04-26",
+        "date": "2026-04-26",
+        "streamTitle": "【#歌回 】130同接耐久點歌歌回 SC可點歌!!!",
+        "videoId": "QuPB5nDhK5o",
+        "timestamp": 7446,
+        "endTimestamp": 7638,
+        "note": ""
+      }
+    ]
+  },
+  {
+    "id": "song-33c059fe",
+    "title": "愛言葉Ⅲ",
+    "originalArtist": "DECO*27",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-43337414",
+        "streamId": "stream-2026-04-26",
+        "date": "2026-04-26",
+        "streamTitle": "【#歌回 】130同接耐久點歌歌回 SC可點歌!!!",
+        "videoId": "QuPB5nDhK5o",
+        "timestamp": 7097,
+        "endTimestamp": 7341,
+        "note": ""
+      }
+    ]
+  },
+  {
     "id": "song-37031257",
     "title": "[A]ddiction",
     "originalArtist": "EVO+",
@@ -193,6 +265,24 @@
         "videoId": "d1NGgYgGuoY",
         "timestamp": 13950,
         "endTimestamp": 14141,
+        "note": ""
+      }
+    ]
+  },
+  {
+    "id": "song-390f0183",
+    "title": "妄想税",
+    "originalArtist": "DECO*27",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-b06a286e",
+        "streamId": "stream-2026-04-26",
+        "date": "2026-04-26",
+        "streamTitle": "【#歌回 】130同接耐久點歌歌回 SC可點歌!!!",
+        "videoId": "QuPB5nDhK5o",
+        "timestamp": 6656,
+        "endTimestamp": 6869,
         "note": ""
       }
     ]
@@ -234,6 +324,42 @@
     ]
   },
   {
+    "id": "song-4a5cdfa8",
+    "title": "ロストワンの号哭",
+    "originalArtist": "Neru",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-3c3a2bb9",
+        "streamId": "stream-2026-04-26",
+        "date": "2026-04-26",
+        "streamTitle": "【#歌回 】130同接耐久點歌歌回 SC可點歌!!!",
+        "videoId": "QuPB5nDhK5o",
+        "timestamp": 9010,
+        "endTimestamp": 9222,
+        "note": ""
+      }
+    ]
+  },
+  {
+    "id": "song-4ffd7997",
+    "title": "雑魚",
+    "originalArtist": "柊マグネタイト",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-5c73776f",
+        "streamId": "stream-2026-04-26",
+        "date": "2026-04-26",
+        "streamTitle": "【#歌回 】130同接耐久點歌歌回 SC可點歌!!!",
+        "videoId": "QuPB5nDhK5o",
+        "timestamp": 8520,
+        "endTimestamp": 8727,
+        "note": ""
+      }
+    ]
+  },
+  {
     "id": "song-534e1cba",
     "title": "レオ",
     "originalArtist": "優里",
@@ -247,6 +373,24 @@
         "videoId": "d1NGgYgGuoY",
         "timestamp": 1891,
         "endTimestamp": 2126,
+        "note": ""
+      }
+    ]
+  },
+  {
+    "id": "song-55951594",
+    "title": "右肩の蝶",
+    "originalArtist": "のりぴー",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-acdbf6c8",
+        "streamId": "stream-2026-04-26",
+        "date": "2026-04-26",
+        "streamTitle": "【#歌回 】130同接耐久點歌歌回 SC可點歌!!!",
+        "videoId": "QuPB5nDhK5o",
+        "timestamp": 820,
+        "endTimestamp": 1082,
         "note": ""
       }
     ]
@@ -288,6 +432,24 @@
     ]
   },
   {
+    "id": "song-68eb1a83",
+    "title": "少女レイ",
+    "originalArtist": "みきとP",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-9e705498",
+        "streamId": "stream-2026-04-26",
+        "date": "2026-04-26",
+        "streamTitle": "【#歌回 】130同接耐久點歌歌回 SC可點歌!!!",
+        "videoId": "QuPB5nDhK5o",
+        "timestamp": 8100,
+        "endTimestamp": 8373,
+        "note": ""
+      }
+    ]
+  },
+  {
     "id": "song-6d96717d",
     "title": "ビビデバ (1.5 倍速)",
     "originalArtist": "星街すいせい",
@@ -301,6 +463,24 @@
         "videoId": "d1NGgYgGuoY",
         "timestamp": 7025,
         "endTimestamp": 7136,
+        "note": ""
+      }
+    ]
+  },
+  {
+    "id": "song-70fbba06",
+    "title": "Ch4nge",
+    "originalArtist": "Giga-P",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-6e8e4146",
+        "streamId": "stream-2026-04-26",
+        "date": "2026-04-26",
+        "streamTitle": "【#歌回 】130同接耐久點歌歌回 SC可點歌!!!",
+        "videoId": "QuPB5nDhK5o",
+        "timestamp": 9574,
+        "endTimestamp": 9707,
         "note": ""
       }
     ]
@@ -324,6 +504,60 @@
     ]
   },
   {
+    "id": "song-7f487c03",
+    "title": "心做し",
+    "originalArtist": "蝶々P",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-e1fe22a9",
+        "streamId": "stream-2026-04-26",
+        "date": "2026-04-26",
+        "streamTitle": "【#歌回 】130同接耐久點歌歌回 SC可點歌!!!",
+        "videoId": "QuPB5nDhK5o",
+        "timestamp": 4730,
+        "endTimestamp": 4995,
+        "note": ""
+      }
+    ]
+  },
+  {
+    "id": "song-87ac241c",
+    "title": "妄想感傷代償連盟",
+    "originalArtist": "DECO*27",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-286709b5",
+        "streamId": "stream-2026-04-26",
+        "date": "2026-04-26",
+        "streamTitle": "【#歌回 】130同接耐久點歌歌回 SC可點歌!!!",
+        "videoId": "QuPB5nDhK5o",
+        "timestamp": 3685,
+        "endTimestamp": 3947,
+        "note": ""
+      }
+    ]
+  },
+  {
+    "id": "song-89a5ca2d",
+    "title": "CRASH THE PARTY (練唱)",
+    "originalArtist": "Vivid BAD SQUAD",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-791db288",
+        "streamId": "stream-2026-04-26",
+        "date": "2026-04-26",
+        "streamTitle": "【#歌回 】130同接耐久點歌歌回 SC可點歌!!!",
+        "videoId": "QuPB5nDhK5o",
+        "timestamp": 10247,
+        "endTimestamp": 10439,
+        "note": ""
+      }
+    ]
+  },
+  {
     "id": "song-8c616b65",
     "title": "六等星の夜",
     "originalArtist": "Aimer",
@@ -337,6 +571,24 @@
         "videoId": "d1NGgYgGuoY",
         "timestamp": 3190,
         "endTimestamp": 3522,
+        "note": ""
+      }
+    ]
+  },
+  {
+    "id": "song-92ee8e7d",
+    "title": "からくりピエロ",
+    "originalArtist": "40mP",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-e87bf202",
+        "streamId": "stream-2026-04-26",
+        "date": "2026-04-26",
+        "streamTitle": "【#歌回 】130同接耐久點歌歌回 SC可點歌!!!",
+        "videoId": "QuPB5nDhK5o",
+        "timestamp": 4233,
+        "endTimestamp": 4515,
         "note": ""
       }
     ]
@@ -360,6 +612,24 @@
     ]
   },
   {
+    "id": "song-9c0a9b5c",
+    "title": "歌に形はないけれど",
+    "originalArtist": "doriko",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-445d15bb",
+        "streamId": "stream-2026-04-26",
+        "date": "2026-04-26",
+        "streamTitle": "【#歌回 】130同接耐久點歌歌回 SC可點歌!!!",
+        "videoId": "QuPB5nDhK5o",
+        "timestamp": 1405,
+        "endTimestamp": 1732,
+        "note": ""
+      }
+    ]
+  },
+  {
     "id": "song-9d86fc6a",
     "title": "忘れじの言の葉",
     "originalArtist": "安次嶺希和子",
@@ -378,6 +648,24 @@
     ]
   },
   {
+    "id": "song-a61a442b",
+    "title": "快晴",
+    "originalArtist": "Orangestar",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-2c137501",
+        "streamId": "stream-2026-04-26",
+        "date": "2026-04-26",
+        "streamTitle": "【#歌回 】130同接耐久點歌歌回 SC可點歌!!!",
+        "videoId": "QuPB5nDhK5o",
+        "timestamp": 5605,
+        "endTimestamp": 5862,
+        "note": ""
+      }
+    ]
+  },
+  {
     "id": "song-a8d2416a",
     "title": "創聖のアクエリオン",
     "originalArtist": "AKINO",
@@ -391,6 +679,24 @@
         "videoId": "d1NGgYgGuoY",
         "timestamp": 7872,
         "endTimestamp": 8150,
+        "note": ""
+      }
+    ]
+  },
+  {
+    "id": "song-a8ef4da0",
+    "title": "六兆年と一夜物語",
+    "originalArtist": "Kemu",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-d3922176",
+        "streamId": "stream-2026-04-26",
+        "date": "2026-04-26",
+        "streamTitle": "【#歌回 】130同接耐久點歌歌回 SC可點歌!!!",
+        "videoId": "QuPB5nDhK5o",
+        "timestamp": 2034,
+        "endTimestamp": 2247,
         "note": ""
       }
     ]
@@ -522,6 +828,24 @@
     ]
   },
   {
+    "id": "song-c3b32ae5",
+    "title": "ロンリーユニバース",
+    "originalArtist": "Aqu3ra",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-ae31412f",
+        "streamId": "stream-2026-04-26",
+        "date": "2026-04-26",
+        "streamTitle": "【#歌回 】130同接耐久點歌歌回 SC可點歌!!!",
+        "videoId": "QuPB5nDhK5o",
+        "timestamp": 6174,
+        "endTimestamp": 6390,
+        "note": ""
+      }
+    ]
+  },
+  {
     "id": "song-c62fd626",
     "title": "愛言葉",
     "originalArtist": "DECO*27",
@@ -648,6 +972,24 @@
     ]
   },
   {
+    "id": "song-db397cc9",
+    "title": "テトリス",
+    "originalArtist": "柊マグネタイト",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-b28f77fb",
+        "streamId": "stream-2026-04-26",
+        "date": "2026-04-26",
+        "streamTitle": "【#歌回 】130同接耐久點歌歌回 SC可點歌!!!",
+        "videoId": "QuPB5nDhK5o",
+        "timestamp": 9336,
+        "endTimestamp": 9477,
+        "note": ""
+      }
+    ]
+  },
+  {
     "id": "song-de01abd3",
     "title": "愛言葉Ⅲ",
     "originalArtist": "DECO*27",
@@ -684,6 +1026,24 @@
     ]
   },
   {
+    "id": "song-e52ee89c",
+    "title": "Electric Angel",
+    "originalArtist": "ヤスオ",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-ccab5c5d",
+        "streamId": "stream-2026-04-26",
+        "date": "2026-04-26",
+        "streamTitle": "【#歌回 】130同接耐久點歌歌回 SC可點歌!!!",
+        "videoId": "QuPB5nDhK5o",
+        "timestamp": 5307,
+        "endTimestamp": 5503,
+        "note": ""
+      }
+    ]
+  },
+  {
     "id": "song-e58dbf13",
     "title": "Odds & Ends",
     "originalArtist": "ryo(supercell)",
@@ -702,6 +1062,24 @@
     ]
   },
   {
+    "id": "song-e7bdc090",
+    "title": "FOCUS",
+    "originalArtist": "KIRA",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-5ccca337",
+        "streamId": "stream-2026-04-26",
+        "date": "2026-04-26",
+        "streamTitle": "【#歌回 】130同接耐久點歌歌回 SC可點歌!!!",
+        "videoId": "QuPB5nDhK5o",
+        "timestamp": 9779,
+        "endTimestamp": 9978,
+        "note": ""
+      }
+    ]
+  },
+  {
     "id": "song-f3d07931",
     "title": "愛言葉Ⅳ",
     "originalArtist": "DECO*27",
@@ -715,6 +1093,42 @@
         "videoId": "d1NGgYgGuoY",
         "timestamp": 9621,
         "endTimestamp": 9839,
+        "note": ""
+      }
+    ]
+  },
+  {
+    "id": "song-f802d4e5",
+    "title": "Odds & Ends",
+    "originalArtist": "ryo(supercell)",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-5d2411b5",
+        "streamId": "stream-2026-04-26",
+        "date": "2026-04-26",
+        "streamTitle": "【#歌回 】130同接耐久點歌歌回 SC可點歌!!!",
+        "videoId": "QuPB5nDhK5o",
+        "timestamp": 2411,
+        "endTimestamp": 2740,
+        "note": ""
+      }
+    ]
+  },
+  {
+    "id": "song-fa8cebb6",
+    "title": "深海少女",
+    "originalArtist": "ゆうゆ",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-2e33664d",
+        "streamId": "stream-2026-04-26",
+        "date": "2026-04-26",
+        "streamTitle": "【#歌回 】130同接耐久點歌歌回 SC可點歌!!!",
+        "videoId": "QuPB5nDhK5o",
+        "timestamp": 2903,
+        "endTimestamp": 3113,
         "note": ""
       }
     ]
