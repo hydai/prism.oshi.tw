@@ -72,6 +72,42 @@
     ]
   },
   {
+    "id": "song-193abdba",
+    "title": "フクロウ ～フクロウが知らせる客が来たと～",
+    "originalArtist": "KOKIA",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-63e5604c",
+        "streamId": "stream-2026-04-27",
+        "date": "2026-04-27",
+        "streamTitle": "【歌雜】聽我唱歌🍥｜七星ナギ・馬來西亞VTuber #雜談",
+        "videoId": "ELxjiBbpB_E",
+        "timestamp": 7282,
+        "endTimestamp": 7565,
+        "note": ""
+      }
+    ]
+  },
+  {
+    "id": "song-198a56e0",
+    "title": "Avid (清唱)",
+    "originalArtist": "SawanoHiroyuki[nZk]:mizuki",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-917f7380",
+        "streamId": "stream-2026-04-27",
+        "date": "2026-04-27",
+        "streamTitle": "【歌雜】聽我唱歌🍥｜七星ナギ・馬來西亞VTuber #雜談",
+        "videoId": "ELxjiBbpB_E",
+        "timestamp": 8233,
+        "endTimestamp": 8447,
+        "note": ""
+      }
+    ]
+  },
+  {
     "id": "song-19eb06c5",
     "title": "ファンサ",
     "originalArtist": "mona (CV.夏川椎菜)",
@@ -103,6 +139,24 @@
         "videoId": "qLadgrUQFWA",
         "timestamp": 5777,
         "endTimestamp": 6006,
+        "note": ""
+      }
+    ]
+  },
+  {
+    "id": "song-1c7ecb4d",
+    "title": "からくりピエロ",
+    "originalArtist": "40mP feat. 初音ミク",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-539c19fa",
+        "streamId": "stream-2026-04-27",
+        "date": "2026-04-27",
+        "streamTitle": "【歌雜】聽我唱歌🍥｜七星ナギ・馬來西亞VTuber #雜談",
+        "videoId": "ELxjiBbpB_E",
+        "timestamp": 10148,
+        "endTimestamp": 10402,
         "note": ""
       }
     ]
@@ -175,6 +229,24 @@
         "videoId": "N90ZTiqxTIw",
         "timestamp": 1914,
         "endTimestamp": 2104,
+        "note": ""
+      }
+    ]
+  },
+  {
+    "id": "song-287310cd",
+    "title": "Fallin'",
+    "originalArtist": "ZHIEND",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-2ccdf61f",
+        "streamId": "stream-2026-04-27",
+        "date": "2026-04-27",
+        "streamTitle": "【歌雜】聽我唱歌🍥｜七星ナギ・馬來西亞VTuber #雜談",
+        "videoId": "ELxjiBbpB_E",
+        "timestamp": 8626,
+        "endTimestamp": 8928,
         "note": ""
       }
     ]
@@ -288,6 +360,24 @@
     ]
   },
   {
+    "id": "song-3aa01f3d",
+    "title": "ライオン",
+    "originalArtist": "May'n / 中島愛",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-7438df43",
+        "streamId": "stream-2026-04-28",
+        "date": "2026-04-28",
+        "streamTitle": "【歌雜】我想唱歌🍥｜七星ナギ・馬來西亞VTuber #雜談",
+        "videoId": "za32QvQAIsA",
+        "timestamp": 1078,
+        "endTimestamp": 1376,
+        "note": ""
+      }
+    ]
+  },
+  {
     "id": "song-3b7cf7d9",
     "title": "ポッカデラベリタ",
     "originalArtist": "柊キライ feat. v flower",
@@ -319,6 +409,24 @@
         "videoId": "eluS2DmhMfY",
         "timestamp": 2416,
         "endTimestamp": 2662,
+        "note": ""
+      }
+    ]
+  },
+  {
+    "id": "song-409a2f5b",
+    "title": "心做し",
+    "originalArtist": "蝶々P feat. GUMI",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-9b204e50",
+        "streamId": "stream-2026-04-28",
+        "date": "2026-04-28",
+        "streamTitle": "【歌雜】我想唱歌🍥｜七星ナギ・馬來西亞VTuber #雜談",
+        "videoId": "za32QvQAIsA",
+        "timestamp": 2831,
+        "endTimestamp": 3101,
         "note": ""
       }
     ]
@@ -373,6 +481,24 @@
         "videoId": "qLadgrUQFWA",
         "timestamp": 5373,
         "endTimestamp": 5622,
+        "note": ""
+      }
+    ]
+  },
+  {
+    "id": "song-47653d06",
+    "title": "涙そうそう",
+    "originalArtist": "夏川りみ",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-26d527fe",
+        "streamId": "stream-2026-04-27",
+        "date": "2026-04-27",
+        "streamTitle": "【歌雜】聽我唱歌🍥｜七星ナギ・馬來西亞VTuber #雜談",
+        "videoId": "ELxjiBbpB_E",
+        "timestamp": 9823,
+        "endTimestamp": 10083,
         "note": ""
       }
     ]
@@ -481,6 +607,60 @@
         "videoId": "cSoSm46DxN0",
         "timestamp": 718,
         "endTimestamp": 972,
+        "note": ""
+      }
+    ]
+  },
+  {
+    "id": "song-5d9d00d4",
+    "title": "Salamander",
+    "originalArtist": "ELLEGARDEN",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-c2ec1099",
+        "streamId": "stream-2026-04-28",
+        "date": "2026-04-28",
+        "streamTitle": "【歌雜】我想唱歌🍥｜七星ナギ・馬來西亞VTuber #雜談",
+        "videoId": "za32QvQAIsA",
+        "timestamp": 3787,
+        "endTimestamp": 3940,
+        "note": ""
+      }
+    ]
+  },
+  {
+    "id": "song-61ee6c24",
+    "title": "残響散歌",
+    "originalArtist": "Aimer",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-8c1028b4",
+        "streamId": "stream-2026-04-28",
+        "date": "2026-04-28",
+        "streamTitle": "【歌雜】我想唱歌🍥｜七星ナギ・馬來西亞VTuber #雜談",
+        "videoId": "za32QvQAIsA",
+        "timestamp": 3240,
+        "endTimestamp": 3421,
+        "note": ""
+      }
+    ]
+  },
+  {
+    "id": "song-61f73aa3",
+    "title": "鬼ノ宴",
+    "originalArtist": "友成空",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-4cef6f99",
+        "streamId": "stream-2026-04-28",
+        "date": "2026-04-28",
+        "streamTitle": "【歌雜】我想唱歌🍥｜七星ナギ・馬來西亞VTuber #雜談",
+        "videoId": "za32QvQAIsA",
+        "timestamp": 789,
+        "endTimestamp": 962,
         "note": ""
       }
     ]
@@ -792,6 +972,24 @@
     ]
   },
   {
+    "id": "song-923f5cf1",
+    "title": "COLORS",
+    "originalArtist": "FLOW",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-c87922e2",
+        "streamId": "stream-2026-04-28",
+        "date": "2026-04-28",
+        "streamTitle": "【歌雜】我想唱歌🍥｜七星ナギ・馬來西亞VTuber #雜談",
+        "videoId": "za32QvQAIsA",
+        "timestamp": 3958,
+        "endTimestamp": 4171,
+        "note": ""
+      }
+    ]
+  },
+  {
     "id": "song-960cb803",
     "title": "lovely",
     "originalArtist": "Billie Eilish & Khalid",
@@ -841,6 +1039,24 @@
         "videoId": "cSoSm46DxN0",
         "timestamp": 2773,
         "endTimestamp": 3009,
+        "note": ""
+      }
+    ]
+  },
+  {
+    "id": "song-9d87795d",
+    "title": "少女レイ",
+    "originalArtist": "みきとP",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-c9cc59bf",
+        "streamId": "stream-2026-04-27",
+        "date": "2026-04-27",
+        "streamTitle": "【歌雜】聽我唱歌🍥｜七星ナギ・馬來西亞VTuber #雜談",
+        "videoId": "ELxjiBbpB_E",
+        "timestamp": 7679,
+        "endTimestamp": 7963,
         "note": ""
       }
     ]
@@ -1044,6 +1260,24 @@
     ]
   },
   {
+    "id": "song-bebc49eb",
+    "title": "炉心融解",
+    "originalArtist": "iroha(sasaki) feat. 鏡音リン",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-b0cb3e87",
+        "streamId": "stream-2026-04-28",
+        "date": "2026-04-28",
+        "streamTitle": "【歌雜】我想唱歌🍥｜七星ナギ・馬來西亞VTuber #雜談",
+        "videoId": "za32QvQAIsA",
+        "timestamp": 2354,
+        "endTimestamp": 2588,
+        "note": ""
+      }
+    ]
+  },
+  {
     "id": "song-c04bf3d2",
     "title": "おやすみ泣き声、さよなら歌姫",
     "originalArtist": "クリープハイプ",
@@ -1062,6 +1296,24 @@
     ]
   },
   {
+    "id": "song-c826a108",
+    "title": "狂乱 Hey Kids!!",
+    "originalArtist": "THE ORAL CIGARETTES",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-9519bfbf",
+        "streamId": "stream-2026-04-27",
+        "date": "2026-04-27",
+        "streamTitle": "【歌雜】聽我唱歌🍥｜七星ナギ・馬來西亞VTuber #雜談",
+        "videoId": "ELxjiBbpB_E",
+        "timestamp": 9051,
+        "endTimestamp": 9297,
+        "note": ""
+      }
+    ]
+  },
+  {
     "id": "song-c9ccad9d",
     "title": "IRIS OUT",
     "originalArtist": "米津玄師",
@@ -1075,6 +1327,42 @@
         "videoId": "eluS2DmhMfY",
         "timestamp": 2691,
         "endTimestamp": 2836,
+        "note": ""
+      }
+    ]
+  },
+  {
+    "id": "song-cd1119ea",
+    "title": "聞こえますか",
+    "originalArtist": "HoneyWorks",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-5d09bd93",
+        "streamId": "stream-2026-04-27",
+        "date": "2026-04-27",
+        "streamTitle": "【歌雜】聽我唱歌🍥｜七星ナギ・馬來西亞VTuber #雜談",
+        "videoId": "ELxjiBbpB_E",
+        "timestamp": 5291,
+        "endTimestamp": 5463,
+        "note": ""
+      }
+    ]
+  },
+  {
+    "id": "song-cf09fba4",
+    "title": "ジッタードール",
+    "originalArtist": "niki feat. Lily",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-245a9812",
+        "streamId": "stream-2026-04-27",
+        "date": "2026-04-27",
+        "streamTitle": "【歌雜】聽我唱歌🍥｜七星ナギ・馬來西亞VTuber #雜談",
+        "videoId": "ELxjiBbpB_E",
+        "timestamp": 9502,
+        "endTimestamp": 9734,
         "note": ""
       }
     ]
@@ -1147,6 +1435,42 @@
         "videoId": "N90ZTiqxTIw",
         "timestamp": 3147,
         "endTimestamp": 3375,
+        "note": ""
+      }
+    ]
+  },
+  {
+    "id": "song-da282683",
+    "title": "アイのシナリオ",
+    "originalArtist": "CHiCO with HoneyWorks",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-155e72a7",
+        "streamId": "stream-2026-04-28",
+        "date": "2026-04-28",
+        "streamTitle": "【歌雜】我想唱歌🍥｜七星ナギ・馬來西亞VTuber #雜談",
+        "videoId": "za32QvQAIsA",
+        "timestamp": 419,
+        "endTimestamp": 680,
+        "note": ""
+      }
+    ]
+  },
+  {
+    "id": "song-dd6972dd",
+    "title": "ゴーストルール",
+    "originalArtist": "DECO*27 feat. 初音ミク",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-8b8c70e1",
+        "streamId": "stream-2026-04-28",
+        "date": "2026-04-28",
+        "streamTitle": "【歌雜】我想唱歌🍥｜七星ナギ・馬來西亞VTuber #雜談",
+        "videoId": "za32QvQAIsA",
+        "timestamp": 3500,
+        "endTimestamp": 3706,
         "note": ""
       }
     ]
@@ -1278,6 +1602,24 @@
     ]
   },
   {
+    "id": "song-f8bb484d",
+    "title": "回る空うさぎ",
+    "originalArtist": "Orangestar feat. 初音ミク",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-4265ee69",
+        "streamId": "stream-2026-04-28",
+        "date": "2026-04-28",
+        "streamTitle": "【歌雜】我想唱歌🍥｜七星ナギ・馬來西亞VTuber #雜談",
+        "videoId": "za32QvQAIsA",
+        "timestamp": 1588,
+        "endTimestamp": 1794,
+        "note": ""
+      }
+    ]
+  },
+  {
     "id": "song-f9b97c91",
     "title": "We Are",
     "originalArtist": "ONE OK ROCK",
@@ -1309,6 +1651,42 @@
         "videoId": "qLadgrUQFWA",
         "timestamp": 3681,
         "endTimestamp": 3888,
+        "note": ""
+      }
+    ]
+  },
+  {
+    "id": "song-fb8d380c",
+    "title": "忘れじの言の葉",
+    "originalArtist": "安次嶺希和子",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-ccae09ea",
+        "streamId": "stream-2026-04-27",
+        "date": "2026-04-27",
+        "streamTitle": "【歌雜】聽我唱歌🍥｜七星ナギ・馬來西亞VTuber #雜談",
+        "videoId": "ELxjiBbpB_E",
+        "timestamp": 6983,
+        "endTimestamp": 7216,
+        "note": ""
+      }
+    ]
+  },
+  {
+    "id": "song-fd7c618d",
+    "title": "Sincerely",
+    "originalArtist": "TRUE",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-06f7e40f",
+        "streamId": "stream-2026-04-27",
+        "date": "2026-04-27",
+        "streamTitle": "【歌雜】聽我唱歌🍥｜七星ナギ・馬來西亞VTuber #雜談",
+        "videoId": "ELxjiBbpB_E",
+        "timestamp": 6604,
+        "endTimestamp": 6874,
         "note": ""
       }
     ]
