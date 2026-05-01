@@ -72,6 +72,24 @@
     ]
   },
   {
+    "id": "song-29176ab5",
+    "title": "水星記",
+    "originalArtist": "郭頂",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-f7b7bc92",
+        "streamId": "stream-2026-04-30",
+        "date": "2026-04-30",
+        "streamTitle": "【哄睡歌回】嘿嘿 在我的歌聲中睡去吧！｜朧Oboro",
+        "videoId": "KfadSsRBCi8",
+        "timestamp": 1302,
+        "endTimestamp": 1617,
+        "note": ""
+      }
+    ]
+  },
+  {
     "id": "song-45adfe21",
     "title": "小悪魔だってかまわない！",
     "originalArtist": "HoneyWorks feat. 初音ミク",
@@ -144,6 +162,24 @@
     ]
   },
   {
+    "id": "song-557bf660",
+    "title": "深昏睡",
+    "originalArtist": "春野 feat. 初音ミク",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-05f38894",
+        "streamId": "stream-2026-04-30",
+        "date": "2026-04-30",
+        "streamTitle": "【哄睡歌回】嘿嘿 在我的歌聲中睡去吧！｜朧Oboro",
+        "videoId": "KfadSsRBCi8",
+        "timestamp": 4153,
+        "endTimestamp": 4393,
+        "note": ""
+      }
+    ]
+  },
+  {
     "id": "song-562ecb16",
     "title": "115万キロのフィルム",
     "originalArtist": "髭男",
@@ -193,6 +229,42 @@
         "videoId": "zjFwAVFay8Y",
         "timestamp": 4478,
         "endTimestamp": 4741,
+        "note": ""
+      }
+    ]
+  },
+  {
+    "id": "song-74baa9d8",
+    "title": "flos",
+    "originalArtist": "R Sound Design feat. 初音ミク",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-cb2e5dfd",
+        "streamId": "stream-2026-04-30",
+        "date": "2026-04-30",
+        "streamTitle": "【哄睡歌回】嘿嘿 在我的歌聲中睡去吧！｜朧Oboro",
+        "videoId": "KfadSsRBCi8",
+        "timestamp": 2885,
+        "endTimestamp": 3157,
+        "note": ""
+      }
+    ]
+  },
+  {
+    "id": "song-752b5d39",
+    "title": "Love Yourself",
+    "originalArtist": "Justin Bieber",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-26666bbd",
+        "streamId": "stream-2026-04-30",
+        "date": "2026-04-30",
+        "streamTitle": "【哄睡歌回】嘿嘿 在我的歌聲中睡去吧！｜朧Oboro",
+        "videoId": "KfadSsRBCi8",
+        "timestamp": 982,
+        "endTimestamp": 1236,
         "note": ""
       }
     ]
@@ -396,6 +468,24 @@
     ]
   },
   {
+    "id": "song-b0a69152",
+    "title": "聽見下雨的聲音",
+    "originalArtist": "魏如昀",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-baa6eba1",
+        "streamId": "stream-2026-04-30",
+        "date": "2026-04-30",
+        "streamTitle": "【哄睡歌回】嘿嘿 在我的歌聲中睡去吧！｜朧Oboro",
+        "videoId": "KfadSsRBCi8",
+        "timestamp": 3777,
+        "endTimestamp": 4057,
+        "note": ""
+      }
+    ]
+  },
+  {
     "id": "song-b3f6614d",
     "title": "希望你回來",
     "originalArtist": "TRASH",
@@ -432,6 +522,60 @@
     ]
   },
   {
+    "id": "song-b58f95de",
+    "title": "ぎゅっと。",
+    "originalArtist": "もさを。",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-b73f1a22",
+        "streamId": "stream-2026-04-30",
+        "date": "2026-04-30",
+        "streamTitle": "【哄睡歌回】嘿嘿 在我的歌聲中睡去吧！｜朧Oboro",
+        "videoId": "KfadSsRBCi8",
+        "timestamp": 131,
+        "endTimestamp": 396,
+        "note": ""
+      }
+    ]
+  },
+  {
+    "id": "song-bd3e71e9",
+    "title": "Beauty and a Beat",
+    "originalArtist": "Justin Bieber",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-765c079b",
+        "streamId": "stream-2026-04-30",
+        "date": "2026-04-30",
+        "streamTitle": "【哄睡歌回】嘿嘿 在我的歌聲中睡去吧！｜朧Oboro",
+        "videoId": "KfadSsRBCi8",
+        "timestamp": 2146,
+        "endTimestamp": 2331,
+        "note": ""
+      }
+    ]
+  },
+  {
+    "id": "song-c8d97e10",
+    "title": "Glimpse of Us",
+    "originalArtist": "Joji",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-ae6a1d6d",
+        "streamId": "stream-2026-04-30",
+        "date": "2026-04-30",
+        "streamTitle": "【哄睡歌回】嘿嘿 在我的歌聲中睡去吧！｜朧Oboro",
+        "videoId": "KfadSsRBCi8",
+        "timestamp": 3283,
+        "endTimestamp": 3462,
+        "note": ""
+      }
+    ]
+  },
+  {
     "id": "song-cec27eb2",
     "title": "你，好不好？",
     "originalArtist": "周興哲",
@@ -450,6 +594,24 @@
     ]
   },
   {
+    "id": "song-cec56992",
+    "title": "如果雨之後",
+    "originalArtist": "周興哲",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-e92b5391",
+        "streamId": "stream-2026-04-30",
+        "date": "2026-04-30",
+        "streamTitle": "【哄睡歌回】嘿嘿 在我的歌聲中睡去吧！｜朧Oboro",
+        "videoId": "KfadSsRBCi8",
+        "timestamp": 2497,
+        "endTimestamp": 2768,
+        "note": ""
+      }
+    ]
+  },
+  {
     "id": "song-d93258c0",
     "title": "東京サマーセッション",
     "originalArtist": "HoneyWorks",
@@ -463,6 +625,24 @@
         "videoId": "zjFwAVFay8Y",
         "timestamp": 3850,
         "endTimestamp": 4075,
+        "note": ""
+      }
+    ]
+  },
+  {
+    "id": "song-dbca74ad",
+    "title": "紅豆",
+    "originalArtist": "王菲",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-0c558270",
+        "streamId": "stream-2026-04-30",
+        "date": "2026-04-30",
+        "streamTitle": "【哄睡歌回】嘿嘿 在我的歌聲中睡去吧！｜朧Oboro",
+        "videoId": "KfadSsRBCi8",
+        "timestamp": 5013,
+        "endTimestamp": 5248,
         "note": ""
       }
     ]
@@ -504,6 +684,24 @@
     ]
   },
   {
+    "id": "song-e1e30f8f",
+    "title": "Love Me Like You Do",
+    "originalArtist": "Ellie Goulding",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-0b0758af",
+        "streamId": "stream-2026-04-30",
+        "date": "2026-04-30",
+        "streamTitle": "【哄睡歌回】嘿嘿 在我的歌聲中睡去吧！｜朧Oboro",
+        "videoId": "KfadSsRBCi8",
+        "timestamp": 4656,
+        "endTimestamp": 4905,
+        "note": ""
+      }
+    ]
+  },
+  {
     "id": "song-e38febd1",
     "title": "鬼ノ宴",
     "originalArtist": "友成空",
@@ -535,6 +733,24 @@
         "videoId": "NjGAsumGDdQ",
         "timestamp": 264,
         "endTimestamp": 426,
+        "note": ""
+      }
+    ]
+  },
+  {
+    "id": "song-ee688b03",
+    "title": "Ref:rain",
+    "originalArtist": "Aimer",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-e2611b1a",
+        "streamId": "stream-2026-04-30",
+        "date": "2026-04-30",
+        "streamTitle": "【哄睡歌回】嘿嘿 在我的歌聲中睡去吧！｜朧Oboro",
+        "videoId": "KfadSsRBCi8",
+        "timestamp": 1712,
+        "endTimestamp": 1999,
         "note": ""
       }
     ]
