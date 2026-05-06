@@ -1,5 +1,6 @@
 'use client';
 
+import { useEffect, useRef } from 'react';
 import { Volume2, Volume1, VolumeX } from 'lucide-react';
 import { usePlayer } from '../contexts/PlayerContext';
 
@@ -21,8 +22,32 @@ export default function VolumeControl({ size = 'compact' }: VolumeControlProps) 
       ? Volume1
       : Volume2;
 
+  const wrapperRef = useRef<HTMLDivElement>(null);
+  const volumeRef = useRef(volume);
+  const setVolumeRef = useRef(setVolume);
+  const lastWheelTimeRef = useRef(0);
+
+  useEffect(() => { volumeRef.current = volume; }, [volume]);
+  useEffect(() => { setVolumeRef.current = setVolume; }, [setVolume]);
+
+  useEffect(() => {
+    const node = wrapperRef.current;
+    if (!node) return;
+    const onWheel = (e: WheelEvent) => {
+      e.preventDefault();
+      const now = performance.now();
+      if (now - lastWheelTimeRef.current < 100) return;
+      if (e.deltaY === 0) return;
+      lastWheelTimeRef.current = now;
+      const step = e.deltaY < 0 ? 5 : -5;
+      setVolumeRef.current(volumeRef.current + step);
+    };
+    node.addEventListener('wheel', onWheel, { passive: false });
+    return () => node.removeEventListener('wheel', onWheel);
+  }, []);
+
   return (
-    <div className="flex items-center" style={{ gap: '8px' }}>
+    <div ref={wrapperRef} data-testid="volume-control" className="flex items-center" style={{ gap: '8px' }}>
       <button
         onClick={toggleMute}
         className="transition-colors flex-shrink-0"
