@@ -25,7 +25,9 @@ export default function VolumeControl({ size = 'compact' }: VolumeControlProps) 
   const wrapperRef = useRef<HTMLDivElement>(null);
   const volumeRef = useRef(volume);
   const setVolumeRef = useRef(setVolume);
-  const lastWheelTimeRef = useRef(0);
+  // -Infinity (not 0) so the first wheel event always passes the throttle gate,
+  // even if it fires before performance.now() reaches the throttle window.
+  const lastWheelTimeRef = useRef(Number.NEGATIVE_INFINITY);
 
   // Sync refs during render so the DOM wheel listener always sees the latest
   // committed values; useEffect-based sync would lag by one paint.
