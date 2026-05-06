@@ -1,5 +1,6 @@
 'use client';
 
+import { useEffect, useRef } from 'react';
 import { Volume2, Volume1, VolumeX } from 'lucide-react';
 import { usePlayer } from '../contexts/PlayerContext';
 
@@ -21,8 +22,39 @@ export default function VolumeControl({ size = 'compact' }: VolumeControlProps) 
       ? Volume1
       : Volume2;
 
+  const wrapperRef = useRef<HTMLDivElement>(null);
+  const volumeRef = useRef(volume);
+  const setVolumeRef = useRef(setVolume);
+  // -Infinity (not 0) so the first wheel event always passes the throttle gate,
+  // even if it fires before performance.now() reaches the throttle window.
+  const lastWheelTimeRef = useRef(Number.NEGATIVE_INFINITY);
+
+  // Sync refs during render so the DOM wheel listener always sees the latest
+  // committed values; useEffect-based sync would lag by one paint.
+  volumeRef.current = volume;
+  setVolumeRef.current = setVolume;
+
+  useEffect(() => {
+    const node = wrapperRef.current;
+    if (!node) return;
+    const onWheel = (e: WheelEvent) => {
+      // Bail out of events we don't handle BEFORE preventDefault, so
+      // browser zoom (Ctrl/Cmd+wheel) and horizontal scrolls pass through.
+      if (e.ctrlKey || e.metaKey) return;
+      if (e.deltaY === 0) return;
+      e.preventDefault();
+      const now = performance.now();
+      if (now - lastWheelTimeRef.current < 100) return;
+      lastWheelTimeRef.current = now;
+      const step = e.deltaY < 0 ? 5 : -5;
+      setVolumeRef.current(volumeRef.current + step);
+    };
+    node.addEventListener('wheel', onWheel, { passive: false });
+    return () => node.removeEventListener('wheel', onWheel);
+  }, []);
+
   return (
-    <div className="flex items-center" style={{ gap: '8px' }}>
+    <div ref={wrapperRef} data-testid="volume-control" className="flex items-center" style={{ gap: '8px' }}>
       <button
         onClick={toggleMute}
         className="transition-colors flex-shrink-0"
