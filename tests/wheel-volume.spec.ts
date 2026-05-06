@@ -106,4 +106,44 @@ test.describe('Mouse wheel volume control', () => {
 
     await expect.poll(() => readVol(page)).toBe(55);
   });
+
+  test('horizontal-only wheel passes through unprevented', async ({ page }) => {
+    await seedStorage(page, 50);
+    await startTrack(page);
+
+    const ctrl = page.getByTestId('volume-control').first();
+    const wasPrevented = await ctrl.evaluate((node) => {
+      const e = new WheelEvent('wheel', {
+        deltaX: 100,
+        deltaY: 0,
+        bubbles: true,
+        cancelable: true,
+      });
+      node.dispatchEvent(e);
+      return e.defaultPrevented;
+    });
+
+    expect(wasPrevented).toBe(false);
+    expect(await readVol(page)).toBe(50);
+  });
+
+  test('Ctrl+wheel passes through unprevented for browser zoom', async ({ page }) => {
+    await seedStorage(page, 50);
+    await startTrack(page);
+
+    const ctrl = page.getByTestId('volume-control').first();
+    const wasPrevented = await ctrl.evaluate((node) => {
+      const e = new WheelEvent('wheel', {
+        deltaY: -100,
+        ctrlKey: true,
+        bubbles: true,
+        cancelable: true,
+      });
+      node.dispatchEvent(e);
+      return e.defaultPrevented;
+    });
+
+    expect(wasPrevented).toBe(false);
+    expect(await readVol(page)).toBe(50);
+  });
 });

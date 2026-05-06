@@ -36,13 +36,13 @@ export default function VolumeControl({ size = 'compact' }: VolumeControlProps) 
     const node = wrapperRef.current;
     if (!node) return;
     const onWheel = (e: WheelEvent) => {
-      // Pass through modifier-wheel gestures (Ctrl/Cmd+wheel = browser zoom)
-      // so the user's intentional modified input still works over this control.
+      // Bail out of events we don't handle BEFORE preventDefault, so
+      // browser zoom (Ctrl/Cmd+wheel) and horizontal scrolls pass through.
       if (e.ctrlKey || e.metaKey) return;
+      if (e.deltaY === 0) return;
       e.preventDefault();
       const now = performance.now();
       if (now - lastWheelTimeRef.current < 100) return;
-      if (e.deltaY === 0) return;
       lastWheelTimeRef.current = now;
       const step = e.deltaY < 0 ? 5 : -5;
       setVolumeRef.current(volumeRef.current + step);
