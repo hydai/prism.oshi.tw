@@ -27,13 +27,18 @@ export default function VolumeControl({ size = 'compact' }: VolumeControlProps) 
   const setVolumeRef = useRef(setVolume);
   const lastWheelTimeRef = useRef(0);
 
-  useEffect(() => { volumeRef.current = volume; }, [volume]);
-  useEffect(() => { setVolumeRef.current = setVolume; }, [setVolume]);
+  // Sync refs during render so the DOM wheel listener always sees the latest
+  // committed values; useEffect-based sync would lag by one paint.
+  volumeRef.current = volume;
+  setVolumeRef.current = setVolume;
 
   useEffect(() => {
     const node = wrapperRef.current;
     if (!node) return;
     const onWheel = (e: WheelEvent) => {
+      // Pass through modifier-wheel gestures (Ctrl/Cmd+wheel = browser zoom)
+      // so the user's intentional modified input still works over this control.
+      if (e.ctrlKey || e.metaKey) return;
       e.preventDefault();
       const now = performance.now();
       if (now - lastWheelTimeRef.current < 100) return;

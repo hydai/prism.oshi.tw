@@ -31,9 +31,8 @@ test.describe('Mouse wheel volume control', () => {
     const ctrl = page.getByTestId('volume-control').first();
     await ctrl.hover();
     await page.mouse.wheel(0, -100);
-    await page.waitForTimeout(150);
 
-    expect(await readVol(page)).toBe(55);
+    await expect.poll(() => readVol(page)).toBe(55);
   });
 
   test('scroll down decreases volume by 5%', async ({ page }) => {
@@ -43,9 +42,8 @@ test.describe('Mouse wheel volume control', () => {
     const ctrl = page.getByTestId('volume-control').first();
     await ctrl.hover();
     await page.mouse.wheel(0, 100);
-    await page.waitForTimeout(150);
 
-    expect(await readVol(page)).toBe(45);
+    await expect.poll(() => readVol(page)).toBe(45);
   });
 
   test('clamps at 100', async ({ page }) => {
@@ -56,10 +54,10 @@ test.describe('Mouse wheel volume control', () => {
     await ctrl.hover();
     for (let i = 0; i < 3; i++) {
       await page.mouse.wheel(0, -100);
-      await page.waitForTimeout(150);
+      await page.waitForTimeout(150); // span the 100 ms throttle gate between events
     }
 
-    expect(await readVol(page)).toBe(100);
+    await expect.poll(() => readVol(page)).toBe(100);
   });
 
   test('clamps at 0', async ({ page }) => {
@@ -70,10 +68,10 @@ test.describe('Mouse wheel volume control', () => {
     await ctrl.hover();
     for (let i = 0; i < 3; i++) {
       await page.mouse.wheel(0, 100);
-      await page.waitForTimeout(150);
+      await page.waitForTimeout(150); // span the 100 ms throttle gate between events
     }
 
-    expect(await readVol(page)).toBe(0);
+    await expect.poll(() => readVol(page)).toBe(0);
   });
 
   test('auto-unmutes when scrolling up while muted', async ({ page }) => {
@@ -83,10 +81,9 @@ test.describe('Mouse wheel volume control', () => {
     const ctrl = page.getByTestId('volume-control').first();
     await ctrl.hover();
     await page.mouse.wheel(0, -100);
-    await page.waitForTimeout(150);
 
+    await expect.poll(() => readVol(page)).toBe(55);
     expect(await readMuted(page)).toBe('false');
-    expect(await readVol(page)).toBe(55);
   });
 
   test('100ms throttle bounds rapid wheel bursts', async ({ page }) => {
@@ -106,8 +103,7 @@ test.describe('Mouse wheel volume control', () => {
         }));
       }
     });
-    await page.waitForTimeout(150);
 
-    expect(await readVol(page)).toBe(55);
+    await expect.poll(() => readVol(page)).toBe(55);
   });
 });
