@@ -65,13 +65,13 @@
       "streamsCount": 5
     },
     "inori": {
-      "lastSyncedAt": "2026-04-27T15:54:42.765Z",
-      "maxSongUpdatedAt": "2026-04-27 15:53:51",
-      "maxPerfUpdatedAt": "2026-04-27 15:53:51",
-      "maxStreamUpdatedAt": "2026-04-27 15:53:51",
-      "songsCount": 63,
-      "performancesCount": 63,
-      "streamsCount": 2
+      "lastSyncedAt": "2026-05-13T03:16:31.783Z",
+      "maxSongUpdatedAt": "2026-05-13 03:12:33",
+      "maxPerfUpdatedAt": "2026-05-13 03:12:33",
+      "maxStreamUpdatedAt": "2026-05-13 03:12:33",
+      "songsCount": 95,
+      "performancesCount": 95,
+      "streamsCount": 3
     },
     "iruni": {
       "lastSyncedAt": "2026-04-19T11:27:52.877Z",
@@ -155,13 +155,13 @@
       "streamsCount": 297
     },
     "nagi": {
-      "lastSyncedAt": "2026-05-06T12:11:17.935Z",
-      "maxSongUpdatedAt": "2026-05-06 12:03:59",
-      "maxPerfUpdatedAt": "2026-05-06 12:03:59",
-      "maxStreamUpdatedAt": "2026-05-06 12:03:58",
-      "songsCount": 129,
-      "performancesCount": 129,
-      "streamsCount": 11
+      "lastSyncedAt": "2026-05-13T03:16:35.737Z",
+      "maxSongUpdatedAt": "2026-05-13 03:11:59",
+      "maxPerfUpdatedAt": "2026-05-13 03:11:59",
+      "maxStreamUpdatedAt": "2026-05-13 03:11:58",
+      "songsCount": 161,
+      "performancesCount": 161,
+      "streamsCount": 13
     },
     "nemesis": {
       "lastSyncedAt": "2026-04-19T11:28:36.381Z",
