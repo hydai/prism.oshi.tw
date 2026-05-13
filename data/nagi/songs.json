@@ -36,6 +36,42 @@
     ]
   },
   {
+    "id": "song-05078c7a",
+    "title": "You Raise Me Up",
+    "originalArtist": "Josh Groban",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-c3878f7c",
+        "streamId": "stream-2026-05-12",
+        "date": "2026-05-12",
+        "streamTitle": "【歌雜】下午開心唱歌聊天耶比！🍥｜七星ナギ・馬來西亞VTuber #雜談",
+        "videoId": "wqPu1pSz314",
+        "timestamp": 4469,
+        "endTimestamp": 4732,
+        "note": ""
+      }
+    ]
+  },
+  {
+    "id": "song-073c43ae",
+    "title": "優しさの理由",
+    "originalArtist": "ChouCho",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-16e209b4",
+        "streamId": "stream-2026-05-12",
+        "date": "2026-05-12",
+        "streamTitle": "【歌雜】下午開心唱歌聊天耶比！🍥｜七星ナギ・馬來西亞VTuber #雜談",
+        "videoId": "wqPu1pSz314",
+        "timestamp": 4156,
+        "endTimestamp": 4403,
+        "note": ""
+      }
+    ]
+  },
+  {
     "id": "song-08550056",
     "title": "Price Tag",
     "originalArtist": "Jessie J",
@@ -72,6 +108,24 @@
     ]
   },
   {
+    "id": "song-0d8dd7d7",
+    "title": "My Heart Will Go On",
+    "originalArtist": "Céline Dion",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-3acf89ac",
+        "streamId": "stream-2026-05-12",
+        "date": "2026-05-12",
+        "streamTitle": "【歌雜】下午開心唱歌聊天耶比！🍥｜七星ナギ・馬來西亞VTuber #雜談",
+        "videoId": "wqPu1pSz314",
+        "timestamp": 4811,
+        "endTimestamp": 5109,
+        "note": ""
+      }
+    ]
+  },
+  {
     "id": "song-107365c4",
     "title": "新時代",
     "originalArtist": "Ado",
@@ -103,6 +157,42 @@
         "videoId": "NY5AH0gZhSg",
         "timestamp": 3624,
         "endTimestamp": 3933,
+        "note": ""
+      }
+    ]
+  },
+  {
+    "id": "song-1469d771",
+    "title": "可愛くてごめん",
+    "originalArtist": "HoneyWorks",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-580d1d53",
+        "streamId": "stream-2026-05-10",
+        "date": "2026-05-10",
+        "streamTitle": "【歌雜】很多雜談一點唱歌，可能也會有很多唱歌，可能也會有那個🍥｜七星ナギ・馬來西亞VTuber #雜談",
+        "videoId": "MTaylTGjbuc",
+        "timestamp": 6558,
+        "endTimestamp": 6773,
+        "note": ""
+      }
+    ]
+  },
+  {
+    "id": "song-18955afe",
+    "title": "東京テディベア",
+    "originalArtist": "Neru feat. 鏡音リン",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-2ff5468f",
+        "streamId": "stream-2026-05-10",
+        "date": "2026-05-10",
+        "streamTitle": "【歌雜】很多雜談一點唱歌，可能也會有很多唱歌，可能也會有那個🍥｜七星ナギ・馬來西亞VTuber #雜談",
+        "videoId": "MTaylTGjbuc",
+        "timestamp": 7506,
+        "endTimestamp": 7699,
         "note": ""
       }
     ]
@@ -252,6 +342,24 @@
     ]
   },
   {
+    "id": "song-2546fedb",
+    "title": "アイのシナリオ",
+    "originalArtist": "CHiCO with HoneyWorks",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-9b3576a1",
+        "streamId": "stream-2026-05-12",
+        "date": "2026-05-12",
+        "streamTitle": "【歌雜】下午開心唱歌聊天耶比！🍥｜七星ナギ・馬來西亞VTuber #雜談",
+        "videoId": "wqPu1pSz314",
+        "timestamp": 12455,
+        "endTimestamp": 12710,
+        "note": ""
+      }
+    ]
+  },
+  {
     "id": "song-25639ca5",
     "title": "真夜中のドア〜Stay With Me",
     "originalArtist": "松原みき",
@@ -265,6 +373,24 @@
         "videoId": "9eZ_9iarPl0",
         "timestamp": 2101,
         "endTimestamp": 2381,
+        "note": ""
+      }
+    ]
+  },
+  {
+    "id": "song-2579fc8d",
+    "title": "顔 (Alter Ego)",
+    "originalArtist": "Ave Mujica",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-bf554277",
+        "streamId": "stream-2026-05-12",
+        "date": "2026-05-12",
+        "streamTitle": "【歌雜】下午開心唱歌聊天耶比！🍥｜七星ナギ・馬來西亞VTuber #雜談",
+        "videoId": "wqPu1pSz314",
+        "timestamp": 12905,
+        "endTimestamp": 13143,
         "note": ""
       }
     ]
@@ -319,6 +445,24 @@
         "videoId": "eluS2DmhMfY",
         "timestamp": 3386,
         "endTimestamp": 3598,
+        "note": ""
+      }
+    ]
+  },
+  {
+    "id": "song-2ccade11",
+    "title": "踊",
+    "originalArtist": "Ado",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-75c51804",
+        "streamId": "stream-2026-05-12",
+        "date": "2026-05-12",
+        "streamTitle": "【歌雜】下午開心唱歌聊天耶比！🍥｜七星ナギ・馬來西亞VTuber #雜談",
+        "videoId": "wqPu1pSz314",
+        "timestamp": 9347,
+        "endTimestamp": 9560,
         "note": ""
       }
     ]
@@ -486,6 +630,24 @@
     ]
   },
   {
+    "id": "song-3db8fe5c",
+    "title": "Butter-Fly",
+    "originalArtist": "和田光司",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-23d38435",
+        "streamId": "stream-2026-05-12",
+        "date": "2026-05-12",
+        "streamTitle": "【歌雜】下午開心唱歌聊天耶比！🍥｜七星ナギ・馬來西亞VTuber #雜談",
+        "videoId": "wqPu1pSz314",
+        "timestamp": 11082,
+        "endTimestamp": 11336,
+        "note": ""
+      }
+    ]
+  },
+  {
     "id": "song-3e93926c",
     "title": "打上花火",
     "originalArtist": "DAOKO × 米津玄師",
@@ -648,6 +810,42 @@
     ]
   },
   {
+    "id": "song-4977b70e",
+    "title": "Close to you",
+    "originalArtist": "niki feat. Lily",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-bc7f0720",
+        "streamId": "stream-2026-05-12",
+        "date": "2026-05-12",
+        "streamTitle": "【歌雜】下午開心唱歌聊天耶比！🍥｜七星ナギ・馬來西亞VTuber #雜談",
+        "videoId": "wqPu1pSz314",
+        "timestamp": 13661,
+        "endTimestamp": 13944,
+        "note": ""
+      }
+    ]
+  },
+  {
+    "id": "song-4a061715",
+    "title": "Speechless",
+    "originalArtist": "Naomi Scott",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-a2d9606d",
+        "streamId": "stream-2026-05-12",
+        "date": "2026-05-12",
+        "streamTitle": "【歌雜】下午開心唱歌聊天耶比！🍥｜七星ナギ・馬來西亞VTuber #雜談",
+        "videoId": "wqPu1pSz314",
+        "timestamp": 5245,
+        "endTimestamp": 5448,
+        "note": ""
+      }
+    ]
+  },
+  {
     "id": "song-4b0c1495",
     "title": "A Whole New World",
     "originalArtist": "Lea Salonga & Brad Kane",
@@ -666,6 +864,42 @@
     ]
   },
   {
+    "id": "song-4c4a22f5",
+    "title": "再会 (produced by Ayase)",
+    "originalArtist": "LiSA × Uru",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-753adaaf",
+        "streamId": "stream-2026-05-12",
+        "date": "2026-05-12",
+        "streamTitle": "【歌雜】下午開心唱歌聊天耶比！🍥｜七星ナギ・馬來西亞VTuber #雜談",
+        "videoId": "wqPu1pSz314",
+        "timestamp": 3731,
+        "endTimestamp": 3969,
+        "note": ""
+      }
+    ]
+  },
+  {
+    "id": "song-4cae5d3e",
+    "title": "絶頂讃歌",
+    "originalArtist": "WANUKA",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-4a8320a2",
+        "streamId": "stream-2026-05-12",
+        "date": "2026-05-12",
+        "streamTitle": "【歌雜】下午開心唱歌聊天耶比！🍥｜七星ナギ・馬來西亞VTuber #雜談",
+        "videoId": "wqPu1pSz314",
+        "timestamp": 11692,
+        "endTimestamp": 11869,
+        "note": ""
+      }
+    ]
+  },
+  {
     "id": "song-4dd0b05f",
     "title": "You Raise Me Up",
     "originalArtist": "Josh Groban",
@@ -679,6 +913,24 @@
         "videoId": "N90ZTiqxTIw",
         "timestamp": 785,
         "endTimestamp": 995,
+        "note": ""
+      }
+    ]
+  },
+  {
+    "id": "song-4e209107",
+    "title": "煎熬",
+    "originalArtist": "李佳薇",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-80a9c703",
+        "streamId": "stream-2026-05-12",
+        "date": "2026-05-12",
+        "streamTitle": "【歌雜】下午開心唱歌聊天耶比！🍥｜七星ナギ・馬來西亞VTuber #雜談",
+        "videoId": "wqPu1pSz314",
+        "timestamp": 10434,
+        "endTimestamp": 10687,
         "note": ""
       }
     ]
@@ -918,6 +1170,42 @@
     ]
   },
   {
+    "id": "song-698581fe",
+    "title": "The Final Countdown",
+    "originalArtist": "Europe",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-6e9912a2",
+        "streamId": "stream-2026-05-12",
+        "date": "2026-05-12",
+        "streamTitle": "【歌雜】下午開心唱歌聊天耶比！🍥｜七星ナギ・馬來西亞VTuber #雜談",
+        "videoId": "wqPu1pSz314",
+        "timestamp": 9654,
+        "endTimestamp": 9924,
+        "note": ""
+      }
+    ]
+  },
+  {
+    "id": "song-6d4c768f",
+    "title": "-ERROR",
+    "originalArtist": "niki",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-ef84d2a7",
+        "streamId": "stream-2026-05-10",
+        "date": "2026-05-10",
+        "streamTitle": "【歌雜】很多雜談一點唱歌，可能也會有很多唱歌，可能也會有那個🍥｜七星ナギ・馬來西亞VTuber #雜談",
+        "videoId": "MTaylTGjbuc",
+        "timestamp": 8903,
+        "endTimestamp": 9136,
+        "note": ""
+      }
+    ]
+  },
+  {
     "id": "song-6e564a86",
     "title": "God knows...",
     "originalArtist": "涼宮ハルヒ (CV: 平野綾)",
@@ -985,6 +1273,24 @@
         "videoId": "Q3qcyO9t3TQ",
         "timestamp": 8911,
         "endTimestamp": 9222,
+        "note": ""
+      }
+    ]
+  },
+  {
+    "id": "song-70f5f5a7",
+    "title": "アイドル (Metal ver.)",
+    "originalArtist": "YOASOBI",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-bb3304d8",
+        "streamId": "stream-2026-05-10",
+        "date": "2026-05-10",
+        "streamTitle": "【歌雜】很多雜談一點唱歌，可能也會有很多唱歌，可能也會有那個🍥｜七星ナギ・馬來西亞VTuber #雜談",
+        "videoId": "MTaylTGjbuc",
+        "timestamp": 7187,
+        "endTimestamp": 7398,
         "note": ""
       }
     ]
@@ -1116,6 +1422,24 @@
     ]
   },
   {
+    "id": "song-78b5de95",
+    "title": "Lay All Your Love on Me",
+    "originalArtist": "ABBA",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-3418c02b",
+        "streamId": "stream-2026-05-12",
+        "date": "2026-05-12",
+        "streamTitle": "【歌雜】下午開心唱歌聊天耶比！🍥｜七星ナギ・馬來西亞VTuber #雜談",
+        "videoId": "wqPu1pSz314",
+        "timestamp": 6413,
+        "endTimestamp": 6693,
+        "note": ""
+      }
+    ]
+  },
+  {
     "id": "song-7a2561fe",
     "title": "The Final Countdown",
     "originalArtist": "Europe",
@@ -1219,6 +1543,42 @@
         "videoId": "qLadgrUQFWA",
         "timestamp": 3317,
         "endTimestamp": 3552,
+        "note": ""
+      }
+    ]
+  },
+  {
+    "id": "song-87d5b605",
+    "title": "私、アイドル宣言",
+    "originalArtist": "CHiCO with HoneyWorks",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-47e3ba80",
+        "streamId": "stream-2026-05-10",
+        "date": "2026-05-10",
+        "streamTitle": "【歌雜】很多雜談一點唱歌，可能也會有很多唱歌，可能也會有那個🍥｜七星ナギ・馬來西亞VTuber #雜談",
+        "videoId": "MTaylTGjbuc",
+        "timestamp": 5964,
+        "endTimestamp": 6227,
+        "note": ""
+      }
+    ]
+  },
+  {
+    "id": "song-890d328d",
+    "title": "ファンサ",
+    "originalArtist": "mona (CV.夏川椎菜)",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-7b5941f8",
+        "streamId": "stream-2026-05-10",
+        "date": "2026-05-10",
+        "streamTitle": "【歌雜】很多雜談一點唱歌，可能也會有很多唱歌，可能也會有那個🍥｜七星ナギ・馬來西亞VTuber #雜談",
+        "videoId": "MTaylTGjbuc",
+        "timestamp": 6270,
+        "endTimestamp": 6514,
         "note": ""
       }
     ]
@@ -1350,6 +1710,24 @@
     ]
   },
   {
+    "id": "song-9d6d2bfb",
+    "title": "Top of the World",
+    "originalArtist": "The Carpenters",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-33987abc",
+        "streamId": "stream-2026-05-12",
+        "date": "2026-05-12",
+        "streamTitle": "【歌雜】下午開心唱歌聊天耶比！🍥｜七星ナギ・馬來西亞VTuber #雜談",
+        "videoId": "wqPu1pSz314",
+        "timestamp": 6096,
+        "endTimestamp": 6271,
+        "note": ""
+      }
+    ]
+  },
+  {
     "id": "song-9d87795d",
     "title": "少女レイ",
     "originalArtist": "みきとP",
@@ -1386,6 +1764,24 @@
     ]
   },
   {
+    "id": "song-a01b6db3",
+    "title": "Last Night, Good Night",
+    "originalArtist": "livetune feat. 初音ミク",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-43ad0cee",
+        "streamId": "stream-2026-05-10",
+        "date": "2026-05-10",
+        "streamTitle": "【歌雜】很多雜談一點唱歌，可能也會有很多唱歌，可能也會有那個🍥｜七星ナギ・馬來西亞VTuber #雜談",
+        "videoId": "MTaylTGjbuc",
+        "timestamp": 8025,
+        "endTimestamp": 8404,
+        "note": ""
+      }
+    ]
+  },
+  {
     "id": "song-a10e464f",
     "title": "NOT CUTE ANYMORE",
     "originalArtist": "ILLIT",
@@ -1399,6 +1795,24 @@
         "videoId": "9eZ_9iarPl0",
         "timestamp": 5878,
         "endTimestamp": 6007,
+        "note": ""
+      }
+    ]
+  },
+  {
+    "id": "song-a44e03ba",
+    "title": "Dancing Queen",
+    "originalArtist": "ABBA",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-fcc17f7c",
+        "streamId": "stream-2026-05-12",
+        "date": "2026-05-12",
+        "streamTitle": "【歌雜】下午開心唱歌聊天耶比！🍥｜七星ナギ・馬來西亞VTuber #雜談",
+        "videoId": "wqPu1pSz314",
+        "timestamp": 7142,
+        "endTimestamp": 7377,
         "note": ""
       }
     ]
@@ -1435,6 +1849,24 @@
         "videoId": "Q3qcyO9t3TQ",
         "timestamp": 8520,
         "endTimestamp": 8852,
+        "note": ""
+      }
+    ]
+  },
+  {
+    "id": "song-a8c0f510",
+    "title": "アイドル (Metal ver.)",
+    "originalArtist": "YOASOBI",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-691f0381",
+        "streamId": "stream-2026-05-10",
+        "date": "2026-05-10",
+        "streamTitle": "【歌雜】很多雜談一點唱歌，可能也會有很多唱歌，可能也會有那個🍥｜七星ナギ・馬來西亞VTuber #雜談",
+        "videoId": "MTaylTGjbuc",
+        "timestamp": 6910,
+        "endTimestamp": 7121,
         "note": ""
       }
     ]
@@ -1489,6 +1921,42 @@
         "videoId": "N90ZTiqxTIw",
         "timestamp": 5141,
         "endTimestamp": 5377,
+        "note": ""
+      }
+    ]
+  },
+  {
+    "id": "song-b0d06520",
+    "title": "Palette",
+    "originalArtist": "ゆよゆっぺ feat. 巡音ルカ",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-5881acac",
+        "streamId": "stream-2026-05-10",
+        "date": "2026-05-10",
+        "streamTitle": "【歌雜】很多雜談一點唱歌，可能也會有很多唱歌，可能也會有那個🍥｜七星ナギ・馬來西亞VTuber #雜談",
+        "videoId": "MTaylTGjbuc",
+        "timestamp": 7757,
+        "endTimestamp": 7981,
+        "note": ""
+      }
+    ]
+  },
+  {
+    "id": "song-b1b2f7a4",
+    "title": "Let It Go",
+    "originalArtist": "Idina Menzel",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-c6a187ad",
+        "streamId": "stream-2026-05-12",
+        "date": "2026-05-12",
+        "streamTitle": "【歌雜】下午開心唱歌聊天耶比！🍥｜七星ナギ・馬來西亞VTuber #雜談",
+        "videoId": "wqPu1pSz314",
+        "timestamp": 5528,
+        "endTimestamp": 5746,
         "note": ""
       }
     ]
@@ -1615,6 +2083,24 @@
         "videoId": "eluS2DmhMfY",
         "timestamp": 3629,
         "endTimestamp": 3860,
+        "note": ""
+      }
+    ]
+  },
+  {
+    "id": "song-bcfdfa03",
+    "title": "Golden",
+    "originalArtist": "HUNTR/X",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-09b30870",
+        "streamId": "stream-2026-05-12",
+        "date": "2026-05-12",
+        "streamTitle": "【歌雜】下午開心唱歌聊天耶比！🍥｜七星ナギ・馬來西亞VTuber #雜談",
+        "videoId": "wqPu1pSz314",
+        "timestamp": 5821,
+        "endTimestamp": 6013,
         "note": ""
       }
     ]
@@ -1800,6 +2286,24 @@
     ]
   },
   {
+    "id": "song-cdb7fd6e",
+    "title": "愛して愛して愛して",
+    "originalArtist": "Ado",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-4be672ac",
+        "streamId": "stream-2026-05-10",
+        "date": "2026-05-10",
+        "streamTitle": "【歌雜】很多雜談一點唱歌，可能也會有很多唱歌，可能也會有那個🍥｜七星ナギ・馬來西亞VTuber #雜談",
+        "videoId": "MTaylTGjbuc",
+        "timestamp": 8633,
+        "endTimestamp": 8880,
+        "note": ""
+      }
+    ]
+  },
+  {
     "id": "song-cf09fba4",
     "title": "ジッタードール",
     "originalArtist": "niki feat. Lily",
@@ -1831,6 +2335,60 @@
         "videoId": "Q3qcyO9t3TQ",
         "timestamp": 4907,
         "endTimestamp": 5235,
+        "note": ""
+      }
+    ]
+  },
+  {
+    "id": "song-d17491f8",
+    "title": "Can't Take My Eyes Off You",
+    "originalArtist": "Frankie Valli",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-08647b41",
+        "streamId": "stream-2026-05-12",
+        "date": "2026-05-12",
+        "streamTitle": "【歌雜】下午開心唱歌聊天耶比！🍥｜七星ナギ・馬來西亞VTuber #雜談",
+        "videoId": "wqPu1pSz314",
+        "timestamp": 11936,
+        "endTimestamp": 12140,
+        "note": ""
+      }
+    ]
+  },
+  {
+    "id": "song-d1949956",
+    "title": "月牙灣",
+    "originalArtist": "飛兒樂團",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-751a3431",
+        "streamId": "stream-2026-05-12",
+        "date": "2026-05-12",
+        "streamTitle": "【歌雜】下午開心唱歌聊天耶比！🍥｜七星ナギ・馬來西亞VTuber #雜談",
+        "videoId": "wqPu1pSz314",
+        "timestamp": 10708,
+        "endTimestamp": 11010,
+        "note": ""
+      }
+    ]
+  },
+  {
+    "id": "song-d3cd5169",
+    "title": "It's My Life",
+    "originalArtist": "Bon Jovi",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-e473cdd3",
+        "streamId": "stream-2026-05-12",
+        "date": "2026-05-12",
+        "streamTitle": "【歌雜】下午開心唱歌聊天耶比！🍥｜七星ナギ・馬來西亞VTuber #雜談",
+        "videoId": "wqPu1pSz314",
+        "timestamp": 9953,
+        "endTimestamp": 10178,
         "note": ""
       }
     ]
@@ -2101,6 +2659,24 @@
         "videoId": "NY5AH0gZhSg",
         "timestamp": 5865,
         "endTimestamp": 6080,
+        "note": ""
+      }
+    ]
+  },
+  {
+    "id": "song-edd17b30",
+    "title": "GODS",
+    "originalArtist": "League of Legends & NewJeans",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-e3ce7d15",
+        "streamId": "stream-2026-05-12",
+        "date": "2026-05-12",
+        "streamTitle": "【歌雜】下午開心唱歌聊天耶比！🍥｜七星ナギ・馬來西亞VTuber #雜談",
+        "videoId": "wqPu1pSz314",
+        "timestamp": 8395,
+        "endTimestamp": 8611,
         "note": ""
       }
     ]
