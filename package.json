@@ -8,6 +8,8 @@
     "build": "next build",
     "start": "next start",
     "lint": "next lint",
+    "inbox:status": "npx tsx tools/inbox-status/status.ts",
+    "inbox:status:test": "npx tsx tools/inbox-status/status.test.ts",
     "sync:registry": "npx tsx tools/sync-registry/sync.ts",
     "sync:data": "npx tsx tools/sync-data/sync.ts",
     "sync:status": "npx tsx tools/sync-status/sync.ts",
