@@ -1,4 +1,5 @@
 import { Hono } from 'hono';
+import { HTTPException } from 'hono/http-exception';
 import { requireAuth, requireCurator } from './auth';
 import {
   listSongs,
@@ -109,7 +110,12 @@ function getRouteParam(
 ): string {
   const value = c.req.param(key);
   if (value === undefined) {
-    throw new Error(`Missing route param: ${key}`);
+    throw new HTTPException(400, {
+      res: new Response(JSON.stringify({ error: `Missing route param: ${key}` }), {
+        status: 400,
+        headers: { 'Content-Type': 'application/json' },
+      }),
+    });
   }
   return value;
 }
