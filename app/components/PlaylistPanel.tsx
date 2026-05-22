@@ -4,12 +4,13 @@ import { useState, useMemo, useRef } from 'react';
 import { ListMusic, GripVertical, Trash2, Play, Edit2, Download, Upload, ChevronUp, ChevronDown } from 'lucide-react';
 import { usePlaylist, type Playlist } from '../contexts/PlaylistContext';
 import { usePlayer, type Track } from '../contexts/PlayerContext';
+import type { ArchiveSong } from '../types/archive';
 import BottomSheet from './BottomSheet';
 
 interface PlaylistPanelProps {
   show: boolean;
   onClose: () => void;
-  songsData: any[];
+  songsData: ArchiveSong[];
   onToast?: (message: string) => void;
 }
 
@@ -100,7 +101,7 @@ export default function PlaylistPanel({ show, onClose, songsData, onToast }: Pla
 
   const checkVersionExists = (performanceId: string): boolean => {
     return songsData.some(song =>
-      song.performances.some((p: any) => p.id === performanceId)
+      song.performances.some(p => p.id === performanceId)
     );
   };
 
