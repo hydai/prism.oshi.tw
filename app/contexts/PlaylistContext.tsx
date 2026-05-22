@@ -115,7 +115,8 @@ function validateImport(data: unknown): { valid: true; playlists: Playlist[] } |
   }
 
   const validPlaylists: Playlist[] = [];
-  for (const p of envelope.playlists) {
+  for (const item of envelope.playlists as unknown[]) {
+    const p = item as Partial<Playlist>;
     if (
       typeof p.id === 'string' &&
       typeof p.name === 'string' &&
@@ -125,7 +126,7 @@ function validateImport(data: unknown): { valid: true; playlists: Playlist[] } |
     ) {
       // For v1 imports, inject default streamerSlug into versions
       const versions = importVersion === 1
-        ? p.versions.map((v: any) => ({ ...v, streamerSlug: v.streamerSlug || 'mizuki' }))
+        ? p.versions.map((version) => ({ ...version, streamerSlug: version.streamerSlug || 'mizuki' }))
         : p.versions;
       validPlaylists.push({
         id: p.id,
@@ -190,11 +191,11 @@ export const PlaylistProvider = ({ streamerSlug, children }: { streamerSlug: str
     try {
       const stored = localStorage.getItem(STORAGE_KEY);
       if (stored) {
-        const parsed = JSON.parse(stored);
-        const normalized = parsed.map((p: any) => ({
+        const parsed = JSON.parse(stored) as Partial<Playlist>[];
+        const normalized = parsed.map((p) => ({
           ...p,
           updatedAt: p.updatedAt || p.createdAt || Date.now(),
-        }));
+        })) as Playlist[];
         setPlaylists(normalized);
       }
     } catch (error) {
@@ -208,8 +209,9 @@ export const PlaylistProvider = ({ streamerSlug, children }: { streamerSlug: str
       localStorage.setItem(STORAGE_KEY, JSON.stringify(newPlaylists));
       setStorageError(null);
       return true;
-    } catch (error: any) {
-      const isQuotaError = error?.name === 'QuotaExceededError' || error?.code === 22;
+    } catch (error) {
+      const storageError = error as { name?: string; code?: number };
+      const isQuotaError = storageError.name === 'QuotaExceededError' || storageError.code === 22;
       setStorageError(isQuotaError ? STORAGE_QUOTA_ERROR : STORAGE_QUOTA_ERROR);
       return false;
     }

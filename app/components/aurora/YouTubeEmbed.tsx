@@ -4,8 +4,7 @@
 // Checks window.YT?.Player before loading script to avoid conflicts with the main app's player.
 
 import { useEffect, useRef, useImperativeHandle, forwardRef, useCallback } from 'react';
-
-// Window.YT global type is declared in PlayerContext.tsx
+import type { YouTubePlayer, YouTubePlayerEvent } from '@/lib/youtube-iframe';
 
 export interface YouTubeEmbedHandle {
   getCurrentTime: () => number;
@@ -54,7 +53,7 @@ function loadYouTubeAPI(): Promise<void> {
 export const YouTubeEmbed = forwardRef<YouTubeEmbedHandle, Props>(
   function YouTubeEmbed({ videoId, onReady, onStateChange }, ref) {
     const containerRef = useRef<HTMLDivElement>(null);
-    const playerRef = useRef<any>(null);
+    const playerRef = useRef<YouTubePlayer | null>(null);
     const readyRef = useRef(false);
     const onReadyRef = useRef(onReady);
     onReadyRef.current = onReady;
@@ -74,7 +73,7 @@ export const YouTubeEmbed = forwardRef<YouTubeEmbedHandle, Props>(
       const el = document.createElement('div');
       containerRef.current.appendChild(el);
 
-      playerRef.current = new window.YT.Player(el, {
+      playerRef.current = new window.YT!.Player(el, {
         height: '100%',
         width: '100%',
         videoId: vid,
@@ -84,7 +83,7 @@ export const YouTubeEmbed = forwardRef<YouTubeEmbedHandle, Props>(
             readyRef.current = true;
             onReadyRef.current?.();
           },
-          onStateChange: (event: any) => {
+          onStateChange: (event: YouTubePlayerEvent<number>) => {
             onStateChangeRef.current?.(event.data === 1);
           },
         },

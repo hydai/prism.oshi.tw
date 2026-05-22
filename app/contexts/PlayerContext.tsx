@@ -1,6 +1,7 @@
 'use client';
 
 import { createContext, useContext, useState, useEffect, useRef, ReactNode } from 'react';
+import type { YouTubeNamespace, YouTubePlayer, YouTubePlayerEvent } from '../../lib/youtube-iframe';
 
 export interface Track {
   id: string;
@@ -76,8 +77,8 @@ export const usePlayer = () => {
 
 declare global {
   interface Window {
-    YT: any;
-    onYouTubeIframeAPIReady: () => void;
+    YT?: YouTubeNamespace;
+    onYouTubeIframeAPIReady?: () => void;
   }
 }
 
@@ -112,7 +113,7 @@ export const PlayerProvider = ({ children }: { children: ReactNode }) => {
     ? currentTrack.endTimestamp - currentTrack.timestamp
     : null;
 
-  const playerRef = useRef<any>(null);
+  const playerRef = useRef<YouTubePlayer | null>(null);
   const playerDivId = 'youtube-player';
   const timeUpdateIntervalRef = useRef<NodeJS.Timeout | null>(null);
   const loadedVideoIdRef = useRef<string | null>(null);
@@ -160,7 +161,6 @@ export const PlayerProvider = ({ children }: { children: ReactNode }) => {
         }
       }
     } catch {}
-  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   // Load volume/mute from localStorage on mount (SSR-safe)
@@ -183,7 +183,6 @@ export const PlayerProvider = ({ children }: { children: ReactNode }) => {
     } catch {
       // localStorage unavailable — use session defaults
     }
-  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   const setVolume = (n: number) => {
@@ -413,7 +412,7 @@ export const PlayerProvider = ({ children }: { children: ReactNode }) => {
     }
 
     loadedVideoIdRef.current = currentTrack.videoId;
-    playerRef.current = new window.YT.Player(playerDivId, {
+    playerRef.current = new window.YT!.Player(playerDivId, {
       height: '360',
       width: '640',
       videoId: currentTrack.videoId,
@@ -425,7 +424,7 @@ export const PlayerProvider = ({ children }: { children: ReactNode }) => {
         origin: typeof window !== 'undefined' ? window.location.origin : undefined,
       },
       events: {
-        onReady: (event: any) => {
+        onReady: (event: YouTubePlayerEvent) => {
           const videoDuration = event.target.getDuration();
           setDuration(videoDuration);
 
@@ -449,20 +448,20 @@ export const PlayerProvider = ({ children }: { children: ReactNode }) => {
           setIsPlaying(true);
           startTimeUpdateInterval();
         },
-        onStateChange: (event: any) => {
+        onStateChange: (event: YouTubePlayerEvent<number>) => {
           // YT.PlayerState: PLAYING=1, PAUSED=2, ENDED=0
           if (event.data === 1) {
             setIsPlaying(true);
             // Update duration (needed after loadVideoById since onReady doesn't re-fire)
-            const d = event.target.getDuration?.();
+            const d = event.target.getDuration();
             if (d > 0) setDuration(d);
           } else if (event.data === 2) {
             setIsPlaying(false);
           } else if (event.data === 0) {
             // Video ended — repeat-one: seek back and replay
             if (repeatModeRef.current === 'one' && currentTrackRef.current) {
-              playerRef.current.seekTo(currentTrackRef.current.timestamp, true);
-              playerRef.current.playVideo();
+              playerRef.current?.seekTo(currentTrackRef.current.timestamp, true);
+              playerRef.current?.playVideo();
               return;
             }
             // Auto-play next in queue, skipping deleted versions
@@ -474,7 +473,7 @@ export const PlayerProvider = ({ children }: { children: ReactNode }) => {
             }
           }
         },
-        onError: (event: any) => {
+        onError: (event: YouTubePlayerEvent<number>) => {
           // YouTube error codes:
           // 2: Invalid parameter
           // 5: HTML5 player error
@@ -489,6 +488,8 @@ export const PlayerProvider = ({ children }: { children: ReactNode }) => {
         },
       },
     });
+  // startTimeUpdateInterval reads latest playback state from refs.
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [isPlayerReady, currentTrack]);
 
   const toggleRepeat = () => {

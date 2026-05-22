@@ -1,9 +1,11 @@
 /// <reference types="vite/client" />
 
+import type { YouTubeNamespace } from "../../../lib/youtube-iframe";
+
 declare global {
   interface Window {
-    YT: any;
-    onYouTubeIframeAPIReady: () => void;
+    YT?: YouTubeNamespace;
+    onYouTubeIframeAPIReady?: () => void;
   }
 }
 
