@@ -9,6 +9,7 @@
     "start": "next start",
     "lint": "eslint .",
     "test:parse": "npx tsx lib/parse.test.ts",
+    "test:archive": "npx tsx app/lib/archive.test.ts",
     "inbox:status": "npx tsx tools/inbox-status/status.ts",
     "inbox:status:test": "npx tsx tools/inbox-status/status.test.ts",
     "sync:registry": "npx tsx tools/sync-registry/sync.ts",
