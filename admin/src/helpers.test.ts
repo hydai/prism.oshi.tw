@@ -2,6 +2,8 @@ import { HTTPException } from 'hono/http-exception';
 import { getRouteParam, getStreamerId } from './http';
 import { isValidTransition, VALID_STATUSES } from './status';
 
+declare const process: { exitCode?: number };
+
 function assertEqual<T>(actual: T, expected: T, message: string): void {
   if (actual !== expected) {
     throw new Error(`${message}: expected ${String(expected)}, got ${String(actual)}`);
@@ -108,4 +110,7 @@ async function main(): Promise<void> {
   console.log('✓ admin route helpers');
 }
 
-void main();
+main().catch((error: unknown) => {
+  console.error(error);
+  process.exitCode = 1;
+});
