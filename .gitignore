@@ -41,3 +41,6 @@ next-env.d.ts
 
 # Autonoe
 .autonoe-note.md
+
+# Claude Code local state
+/.claude/
