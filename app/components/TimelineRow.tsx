@@ -4,25 +4,7 @@ import { memo } from 'react';
 import { Play, Disc3, Plus, ExternalLink, Heart } from 'lucide-react';
 import AlbumArt from './AlbumArt';
 import AddToPlaylistDropdown from './AddToPlaylistDropdown';
-
-interface FlattenedSong {
-  id: string;
-  performanceId: string;
-  title: string;
-  originalArtist: string;
-  videoId: string;
-  timestamp: number;
-  endTimestamp?: number;
-  note: string;
-  streamTitle: string;
-  date: string;
-  albumArtUrl?: string;
-  tags: string[];
-  performances: unknown[];
-  streamId?: string;
-  searchString: string;
-  year?: number;
-}
+import type { ArchiveTrack, FlattenedSong } from '../types/archive';
 
 interface TimelineRowProps {
   song: FlattenedSong;
@@ -31,8 +13,8 @@ interface TimelineRowProps {
   isUnavailable: boolean;
   isLiked: boolean;
   onToggleLike: () => void;
-  onPlay: (track: { id: string; songId: string; title: string; originalArtist: string; videoId: string; timestamp: number; endTimestamp?: number; albumArtUrl?: string; streamerSlug: string }) => void;
-  onAddToQueue: (track: { id: string; songId: string; title: string; originalArtist: string; videoId: string; timestamp: number; endTimestamp?: number; albumArtUrl?: string; streamerSlug: string }) => void;
+  onPlay: (track: ArchiveTrack) => void;
+  onAddToQueue: (track: ArchiveTrack) => void;
   onAddToPlaylistSuccess: () => void;
   streamerSlug: string;
 }

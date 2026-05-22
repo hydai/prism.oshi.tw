@@ -3,36 +3,17 @@
 import { memo } from 'react';
 import { Disc3, ChevronDown, ChevronRight, Play, Plus, ExternalLink, Heart } from 'lucide-react';
 import AddToPlaylistDropdown from './AddToPlaylistDropdown';
-
-interface Performance {
-  id: string;
-  streamId?: string;
-  date: string;
-  streamTitle: string;
-  videoId: string;
-  timestamp: number;
-  endTimestamp?: number | null;
-  note: string;
-}
-
-interface Song {
-  id: string;
-  title: string;
-  originalArtist: string;
-  tags: string[];
-  performances: Performance[];
-  albumArtUrl?: string;
-}
+import type { ArchivePerformance, ArchiveSong, ArchiveTrack } from '../types/archive';
 
 interface SongCardProps {
-  song: Song;
+  song: ArchiveSong;
   isExpanded: boolean;
   onToggleExpand: (songId: string) => void;
-  onPlay: (track: { id: string; songId: string; title: string; originalArtist: string; videoId: string; timestamp: number; endTimestamp?: number; albumArtUrl?: string; streamerSlug: string }) => void;
-  onAddToQueue: (track: { id: string; songId: string; title: string; originalArtist: string; videoId: string; timestamp: number; endTimestamp?: number; albumArtUrl?: string; streamerSlug: string }) => void;
+  onPlay: (track: ArchiveTrack) => void;
+  onAddToQueue: (track: ArchiveTrack) => void;
   onAddToPlaylistSuccess: () => void;
   isLiked: (performanceId: string) => boolean;
-  onToggleLike: (perf: Performance, song: Song) => void;
+  onToggleLike: (perf: ArchivePerformance, song: ArchiveSong) => void;
   unavailableVideoIds: Set<string>;
   streamerSlug: string;
 }

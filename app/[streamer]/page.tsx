@@ -20,53 +20,38 @@ import TimelineRow from '../components/TimelineRow';
 import SongCard from '../components/SongCard';
 import MobileSearchRow from '../components/MobileSearchRow';
 import ThemeToggle from '../components/ThemeToggle';
-
-interface Performance {
-  id: string;
-  streamId?: string;
-  date: string;
-  streamTitle: string;
-  videoId: string;
-  timestamp: number;
-  endTimestamp?: number | null;
-  note: string;
-}
-
-interface Song {
-  id: string;
-  title: string;
-  originalArtist: string;
-  tags: string[];
-  performances: Performance[];
-  albumArtUrl?: string;
-}
-
-interface FlattenedSong extends Song {
-  performanceId: string;
-  streamId?: string;
-  date: string;
-  streamTitle: string;
-  videoId: string;
-  timestamp: number;
-  endTimestamp?: number;
-  note: string;
-  searchString: string;
-  albumArtUrl?: string;
-  year?: number;
-}
-
-type ViewMode = 'timeline' | 'grouped';
+import {
+  filterFlattenedSongs,
+  filterGroupedSongs,
+  filterStreamsByYears,
+  flattenSongs,
+  getAllArtists,
+  getAvailableYears,
+  mergeAlbumArt,
+  sortGroupedSongs,
+  sortStreamsByNewest,
+  trackFromFlattenedSong,
+  trackFromPerformance,
+} from '../lib/archive';
+import type {
+  ArchiveSong,
+  ArchiveTrack,
+  ArchiveViewMode,
+  FlattenedSong,
+  MobileArchiveTab,
+  StreamSummary,
+} from '../types/archive';
 
 export default function Home() {
   const streamerData = useStreamer();
   const slug = streamerData.slug;
   const [searchInput, setSearchInput] = useState('');
   const [debouncedSearch, setDebouncedSearch] = useState('');
-  const [streams, setStreams] = useState<{id:string;title:string;date:string;videoId:string}[]>([]);
+  const [streams, setStreams] = useState<StreamSummary[]>([]);
   const [selectedStreamId, setSelectedStreamId] = useState<string | null>(null);
   const [selectedArtist, setSelectedArtist] = useState<string | null>(null);
   const [selectedYears, setSelectedYears] = useState<Set<number>>(new Set());
-  const [viewMode, setViewMode] = useState<ViewMode>('timeline');
+  const [viewMode, setViewMode] = useState<ArchiveViewMode>('timeline');
   const [expandedSongs, setExpandedSongs] = useState<Set<string>>(new Set());
   const [showToast, setShowToast] = useState(false);
   const [toastMessage, setToastMessage] = useState('');
@@ -74,8 +59,8 @@ export default function Home() {
   const [showLikedSongsPanel, setShowLikedSongsPanel] = useState(false);
   const [showRecentlyPlayedPanel, setShowRecentlyPlayedPanel] = useState(false);
   const [showCreateDialog, setShowCreateDialog] = useState(false);
-  const [mobileTab, setMobileTab] = useState<'home' | 'search' | 'library' | 'streams'>('home');
-  const [songs, setSongs] = useState<Song[]>([]);
+  const [mobileTab, setMobileTab] = useState<MobileArchiveTab>('home');
+  const [songs, setSongs] = useState<ArchiveSong[]>([]);
   const [loadError, setLoadError] = useState(false);
   // Map from songId to albumArtUrl — populated from /api/metadata
   const albumArtMapRef = useRef<Map<string, string>>(new Map());
@@ -87,13 +72,8 @@ export default function Home() {
         if (!res.ok) throw new Error('API error');
         return res.json();
       })
-      .then((data: Song[]) => {
-        // Merge albumArtUrl from metadata map into songs
-        const merged = data.map(song => ({
-          ...song,
-          albumArtUrl: albumArtMapRef.current.get(song.id),
-        }));
-        setSongs(merged);
+      .then((data: ArchiveSong[]) => {
+        setSongs(mergeAlbumArt(data, albumArtMapRef.current));
         setLoadError(false);
       })
       .catch(() => {
@@ -124,9 +104,8 @@ export default function Home() {
 
     fetch(`/api/${slug}/streams`)
       .then(res => res.ok ? res.json() : [])
-      .then((data: {id:string;title:string;date:string;videoId:string}[]) => {
-        data.sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime());
-        setStreams(data);
+      .then((data: StreamSummary[]) => {
+        setStreams(sortStreamsByNewest(data));
       })
       .catch(() => {
         // streams fetch failed — continue without stream list
@@ -140,31 +119,21 @@ export default function Home() {
   const { likedCount, isLiked, toggleLike } = useLikedSongs();
   const { recentCount } = useRecentlyPlayed();
 
-  const handleAddToQueue = useCallback((track: { id: string; songId: string; title: string; originalArtist: string; videoId: string; timestamp: number; endTimestamp?: number; albumArtUrl?: string; streamerSlug: string }) => {
+  const handleAddToQueue = useCallback((track: ArchiveTrack) => {
     addToQueue(track);
     setToastMessage('已加入播放佇列');
     setShowToast(true);
   }, [addToQueue]);
 
   const handlePlayAll = () => {
-    type TrackInfo = { id: string; songId: string; title: string; originalArtist: string; videoId: string; timestamp: number; endTimestamp?: number; albumArtUrl?: string; streamerSlug: string };
-    let tracks: TrackInfo[];
+    let tracks: ArchiveTrack[];
     if (viewMode === 'timeline') {
-      tracks = flattenedSongs.map(s => ({
-        id: s.performanceId, songId: s.id, title: s.title,
-        originalArtist: s.originalArtist, videoId: s.videoId,
-        timestamp: s.timestamp, endTimestamp: s.endTimestamp, albumArtUrl: s.albumArtUrl,
-        streamerSlug: slug,
-      }));
+      tracks = flattenedSongs.map(song => trackFromFlattenedSong(song, slug));
     } else {
       tracks = groupedSongs.flatMap(song => {
         if (!song.performances.length) return [];
         const latest = [...song.performances].sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime())[0];
-        return [{ id: latest.id, songId: song.id, title: song.title,
-          originalArtist: song.originalArtist, videoId: latest.videoId,
-          timestamp: latest.timestamp, endTimestamp: latest.endTimestamp ?? undefined, albumArtUrl: song.albumArtUrl,
-          streamerSlug: slug,
-        }];
+        return [trackFromPerformance(song, latest, slug)];
       });
     }
     const available = tracks.filter(t => !unavailableVideoIds.has(t.videoId));
@@ -240,22 +209,12 @@ export default function Home() {
     });
   }, []);
 
-  const allArtists = useMemo(() => {
-    const artists = new Set<string>();
-    songs.forEach(song => artists.add(song.originalArtist));
-    return Array.from(artists).sort((a, b) => a.localeCompare(b, 'zh-TW'));
-  }, [songs]);
-
-  const availableYears = useMemo(() => {
-    const years = new Set<number>();
-    streams.forEach(s => years.add(new Date(s.date).getFullYear()));
-    return Array.from(years).sort((a, b) => b - a);
-  }, [streams]);
-
-  const filteredStreams = useMemo(() => {
-    if (selectedYears.size === 0) return streams;
-    return streams.filter(s => selectedYears.has(new Date(s.date).getFullYear()));
-  }, [streams, selectedYears]);
+  const allArtists = useMemo(() => getAllArtists(songs), [songs]);
+  const availableYears = useMemo(() => getAvailableYears(streams), [streams]);
+  const filteredStreams = useMemo(
+    () => filterStreamsByYears(streams, selectedYears),
+    [streams, selectedYears],
+  );
 
   const toggleYear = (year: number) => {
     setSelectedYears(prev => {
@@ -281,61 +240,23 @@ export default function Home() {
     setSelectedYears(new Set());
   };
 
-  // Flatten + sort: expensive, only recomputes when song data changes
-  const allFlattenedSongs: FlattenedSong[] = useMemo(() => {
-    const result: FlattenedSong[] = [];
-    songs.forEach(song => {
-      song.performances.forEach(perf => {
-        result.push({
-          ...song,
-          performanceId: perf.id,
-          streamId: perf.streamId,
-          date: perf.date,
-          streamTitle: perf.streamTitle,
-          videoId: perf.videoId,
-          timestamp: perf.timestamp,
-          endTimestamp: perf.endTimestamp ?? undefined,
-          note: perf.note,
-          searchString: `${song.title} ${song.originalArtist} ${perf.streamTitle}`.toLowerCase(),
-          year: new Date(perf.date).getFullYear(),
-        });
-      });
-    });
-    result.sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime());
-    return result;
-  }, [songs]);
+  const archiveFilters = useMemo(() => ({
+    search: debouncedSearch,
+    selectedStreamId,
+    selectedArtist,
+    selectedYears,
+  }), [debouncedSearch, selectedStreamId, selectedArtist, selectedYears]);
 
-  // Filter: cheap, runs against pre-flattened array
-  const flattenedSongs: FlattenedSong[] = useMemo(() => {
-    const lowerTerm = debouncedSearch.toLowerCase();
-    return allFlattenedSongs.filter(song => {
-      const matchesSearch = !lowerTerm || song.searchString.includes(lowerTerm);
-      const matchesStream = selectedStreamId ? song.streamId === selectedStreamId : true;
-      const matchesArtist = selectedArtist ? song.originalArtist === selectedArtist : true;
-      const matchesYear = selectedYears.size > 0 ? selectedYears.has(song.year!) : true;
-      return matchesSearch && matchesStream && matchesArtist && matchesYear;
-    });
-  }, [allFlattenedSongs, debouncedSearch, selectedStreamId, selectedArtist, selectedYears]);
-
-  // Grouped songs: separate sort (expensive) from filter (cheap)
-  const allGroupedSongs: Song[] = useMemo(() => {
-    return [...songs].sort((a, b) => a.title.localeCompare(b.title, 'zh-TW'));
-  }, [songs]);
-
-  const groupedSongs: Song[] = useMemo(() => {
-    const lowerTerm = debouncedSearch.toLowerCase();
-    return allGroupedSongs.filter(song => {
-      const matchesSearch = !lowerTerm || `${song.title} ${song.originalArtist}`.toLowerCase().includes(lowerTerm);
-      const matchesStream = selectedStreamId
-        ? song.performances.some(p => p.streamId === selectedStreamId)
-        : true;
-      const matchesArtist = selectedArtist ? song.originalArtist === selectedArtist : true;
-      const matchesYear = selectedYears.size > 0
-        ? song.performances.some(perf => selectedYears.has(new Date(perf.date).getFullYear()))
-        : true;
-      return matchesSearch && matchesStream && matchesArtist && matchesYear;
-    });
-  }, [allGroupedSongs, debouncedSearch, selectedStreamId, selectedArtist, selectedYears]);
+  const allFlattenedSongs: FlattenedSong[] = useMemo(() => flattenSongs(songs), [songs]);
+  const flattenedSongs: FlattenedSong[] = useMemo(
+    () => filterFlattenedSongs(allFlattenedSongs, archiveFilters),
+    [allFlattenedSongs, archiveFilters],
+  );
+  const allGroupedSongs: ArchiveSong[] = useMemo(() => sortGroupedSongs(songs), [songs]);
+  const groupedSongs: ArchiveSong[] = useMemo(
+    () => filterGroupedSongs(allGroupedSongs, archiveFilters),
+    [allGroupedSongs, archiveFilters],
+  );
 
   // Virtual scrolling refs and virtualizers
   const scrollContainerRef = useRef<HTMLDivElement>(null);
