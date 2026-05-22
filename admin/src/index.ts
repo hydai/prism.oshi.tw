@@ -1,6 +1,7 @@
 import { Hono } from 'hono';
-import { HTTPException } from 'hono/http-exception';
 import { requireAuth, requireCurator } from './auth';
+import { getRouteParam, getStreamerId } from './http';
+import { isValidTransition, VALID_STATUSES } from './status';
 import {
   listSongs,
   listSongsPaginated,
@@ -99,39 +100,6 @@ type Variables = {
 
 const app = new Hono<{ Bindings: Bindings; Variables: Variables }>();
 
-/** Extract streamer slug from ?streamer= query param, default 'mizuki'. */
-function getStreamerId(c: { req: { query: (key: string) => string | undefined } }): string {
-  return c.req.query('streamer') || 'mizuki';
-}
-
-function getRouteParam(
-  c: { req: { param: (key: string) => string | undefined } },
-  key: string,
-): string {
-  const value = c.req.param(key);
-  if (value === undefined) {
-    throw new HTTPException(400, {
-      res: new Response(JSON.stringify({ error: `Missing route param: ${key}` }), {
-        status: 400,
-        headers: { 'Content-Type': 'application/json' },
-      }),
-    });
-  }
-  return value;
-}
-
-// --- Status transition rules ---
-
-const VALID_STATUSES = new Set(['pending', 'approved', 'rejected', 'excluded', 'extracted']);
-
-const ALLOWED_TRANSITIONS: Record<string, Set<string>> = {
-  pending:   new Set(['approved', 'rejected', 'excluded', 'extracted']),
-  extracted: new Set(['approved', 'rejected', 'excluded', 'pending']),
-  approved:  new Set(['extracted', 'pending']),  // unapprove
-  rejected:  new Set(['pending', 'excluded']),
-  excluded:  new Set(['pending']),               // restore from excluded
-};
-
 /** Format raw subscriber count into Traditional Chinese notation (萬 = 10,000). */
 function formatSubscriberCount(count: number): string {
   if (count < 10000) {
@@ -143,10 +111,6 @@ function formatSubscriberCount(count: number): string {
   }
   const formatted = wan.toFixed(2).replace(/\.?0+$/, '');
   return `${formatted}萬`;
-}
-
-function isValidTransition(from: string, to: string): boolean {
-  return ALLOWED_TRANSITIONS[from]?.has(to) ?? false;
 }
 
 // All routes require authentication
