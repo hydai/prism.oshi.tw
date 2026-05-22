@@ -70,6 +70,11 @@ assertDeepEqual(
   'valid statuses should include every supported workflow state',
 );
 
+if (false) {
+  // @ts-expect-error VALID_STATUSES should be read-only to consumers.
+  VALID_STATUSES.add('archived');
+}
+
 const validTransitions: Array<[string, string]> = [
   ['pending', 'approved'],
   ['pending', 'rejected'],
