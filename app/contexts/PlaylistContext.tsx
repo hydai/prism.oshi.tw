@@ -1,6 +1,10 @@
 'use client';
 
 import { createContext, useContext, useState, useEffect, ReactNode } from 'react';
+import {
+  saveJsonToStorage,
+  type StorageSaveResult,
+} from '../lib/playlist-storage';
 
 export interface PlaylistVersion {
   performanceId: string;
@@ -53,7 +57,6 @@ export const usePlaylist = () => {
 };
 
 const LEGACY_STORAGE_KEY = 'mizukiprism_playlists';
-const STORAGE_QUOTA_ERROR = '本機儲存空間不足';
 const STORAGE_UNSUPPORTED_ERROR = '您的瀏覽器不支援本機儲存，播放清單功能無法使用';
 
 function isLocalStorageAvailable(): boolean {
@@ -115,7 +118,8 @@ function validateImport(data: unknown): { valid: true; playlists: Playlist[] } |
   }
 
   const validPlaylists: Playlist[] = [];
-  for (const p of envelope.playlists) {
+  for (const item of envelope.playlists as unknown[]) {
+    const p = item as Partial<Playlist>;
     if (
       typeof p.id === 'string' &&
       typeof p.name === 'string' &&
@@ -125,7 +129,7 @@ function validateImport(data: unknown): { valid: true; playlists: Playlist[] } |
     ) {
       // For v1 imports, inject default streamerSlug into versions
       const versions = importVersion === 1
-        ? p.versions.map((v: any) => ({ ...v, streamerSlug: v.streamerSlug || 'mizuki' }))
+        ? p.versions.map((version) => ({ ...version, streamerSlug: version.streamerSlug || 'mizuki' }))
         : p.versions;
       validPlaylists.push({
         id: p.id,
@@ -190,11 +194,11 @@ export const PlaylistProvider = ({ streamerSlug, children }: { streamerSlug: str
     try {
       const stored = localStorage.getItem(STORAGE_KEY);
       if (stored) {
-        const parsed = JSON.parse(stored);
-        const normalized = parsed.map((p: any) => ({
+        const parsed = JSON.parse(stored) as Partial<Playlist>[];
+        const normalized = parsed.map((p) => ({
           ...p,
           updatedAt: p.updatedAt || p.createdAt || Date.now(),
-        }));
+        })) as Playlist[];
         setPlaylists(normalized);
       }
     } catch (error) {
@@ -203,16 +207,14 @@ export const PlaylistProvider = ({ streamerSlug, children }: { streamerSlug: str
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  const saveToLocalStorage = (newPlaylists: Playlist[]): boolean => {
-    try {
-      localStorage.setItem(STORAGE_KEY, JSON.stringify(newPlaylists));
+  const saveToLocalStorage = (newPlaylists: Playlist[]): StorageSaveResult => {
+    const result = saveJsonToStorage(localStorage, STORAGE_KEY, newPlaylists);
+    if (result.success) {
       setStorageError(null);
-      return true;
-    } catch (error: any) {
-      const isQuotaError = error?.name === 'QuotaExceededError' || error?.code === 22;
-      setStorageError(isQuotaError ? STORAGE_QUOTA_ERROR : STORAGE_QUOTA_ERROR);
-      return false;
+    } else {
+      setStorageError(result.error);
     }
+    return result;
   };
 
   const createPlaylist = (name: string): { success: boolean; error?: string } => {
@@ -238,11 +240,11 @@ export const PlaylistProvider = ({ streamerSlug, children }: { streamerSlug: str
     const newPlaylists = [...playlists, newPlaylist];
     const saved = saveToLocalStorage(newPlaylists);
 
-    if (saved) {
+    if (saved.success) {
       setPlaylists(newPlaylists);
       return { success: true };
     }
-    return { success: false, error: STORAGE_QUOTA_ERROR };
+    return saved;
   };
 
   const deletePlaylist = (id: string) => {
@@ -263,11 +265,11 @@ export const PlaylistProvider = ({ streamerSlug, children }: { streamerSlug: str
     );
 
     const saved = saveToLocalStorage(newPlaylists);
-    if (saved) {
+    if (saved.success) {
       setPlaylists(newPlaylists);
       return { success: true };
     }
-    return { success: false, error: STORAGE_QUOTA_ERROR };
+    return saved;
   };
 
   const addVersionToPlaylist = (playlistId: string, version: PlaylistVersion): { success: boolean; error?: string } => {
@@ -294,11 +296,11 @@ export const PlaylistProvider = ({ streamerSlug, children }: { streamerSlug: str
     );
 
     const saved = saveToLocalStorage(newPlaylists);
-    if (saved) {
+    if (saved.success) {
       setPlaylists(newPlaylists);
       return { success: true };
     }
-    return { success: false, error: STORAGE_QUOTA_ERROR };
+    return saved;
   };
 
   const removeVersionFromPlaylist = (playlistId: string, performanceId: string) => {
@@ -384,8 +386,8 @@ export const PlaylistProvider = ({ streamerSlug, children }: { streamerSlug: str
       }
 
       const saved = saveToLocalStorage(merged);
-      if (!saved) {
-        return { success: false, error: '本機儲存空間不足' };
+      if (!saved.success) {
+        return saved;
       }
 
       setPlaylists(merged);
