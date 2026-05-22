@@ -4,7 +4,7 @@
 // Checks window.YT?.Player before loading script to avoid conflicts with the main app's player.
 
 import { useEffect, useRef, useImperativeHandle, forwardRef, useCallback } from 'react';
-import type { YouTubePlayer, YouTubePlayerEvent } from '@/lib/youtube-iframe';
+import type { YouTubePlayer, YouTubePlayerEventWithData } from '@/lib/youtube-iframe';
 
 export interface YouTubeEmbedHandle {
   getCurrentTime: () => number;
@@ -83,7 +83,7 @@ export const YouTubeEmbed = forwardRef<YouTubeEmbedHandle, Props>(
             readyRef.current = true;
             onReadyRef.current?.();
           },
-          onStateChange: (event: YouTubePlayerEvent<number>) => {
+          onStateChange: (event: YouTubePlayerEventWithData<number>) => {
             onStateChangeRef.current?.(event.data === 1);
           },
         },

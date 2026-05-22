@@ -1,7 +1,12 @@
 'use client';
 
 import { createContext, useContext, useState, useEffect, useRef, ReactNode } from 'react';
-import type { YouTubeNamespace, YouTubePlayer, YouTubePlayerEvent } from '../../lib/youtube-iframe';
+import type {
+  YouTubeNamespace,
+  YouTubePlayer,
+  YouTubePlayerEventWithData,
+  YouTubeReadyEvent,
+} from '../../lib/youtube-iframe';
 
 export interface Track {
   id: string;
@@ -424,7 +429,7 @@ export const PlayerProvider = ({ children }: { children: ReactNode }) => {
         origin: typeof window !== 'undefined' ? window.location.origin : undefined,
       },
       events: {
-        onReady: (event: YouTubePlayerEvent) => {
+        onReady: (event: YouTubeReadyEvent) => {
           const videoDuration = event.target.getDuration();
           setDuration(videoDuration);
 
@@ -448,7 +453,7 @@ export const PlayerProvider = ({ children }: { children: ReactNode }) => {
           setIsPlaying(true);
           startTimeUpdateInterval();
         },
-        onStateChange: (event: YouTubePlayerEvent<number>) => {
+        onStateChange: (event: YouTubePlayerEventWithData<number>) => {
           // YT.PlayerState: PLAYING=1, PAUSED=2, ENDED=0
           if (event.data === 1) {
             setIsPlaying(true);
@@ -473,7 +478,7 @@ export const PlayerProvider = ({ children }: { children: ReactNode }) => {
             }
           }
         },
-        onError: (event: YouTubePlayerEvent<number>) => {
+        onError: (event: YouTubePlayerEventWithData<number>) => {
           // YouTube error codes:
           // 2: Invalid parameter
           // 5: HTML5 player error

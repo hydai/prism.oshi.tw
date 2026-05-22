@@ -12,7 +12,11 @@ export interface YouTubePlayer {
   unMute: () => void;
 }
 
-export interface YouTubePlayerEvent<TData = number> {
+export interface YouTubeReadyEvent {
+  target: YouTubePlayer;
+}
+
+export interface YouTubePlayerEventWithData<TData = number> {
   target: YouTubePlayer;
   data: TData;
 }
@@ -23,9 +27,9 @@ export interface YouTubePlayerOptions {
   videoId?: string;
   playerVars?: Record<string, string | number | undefined>;
   events?: {
-    onReady?: (event: YouTubePlayerEvent) => void;
-    onStateChange?: (event: YouTubePlayerEvent<number>) => void;
-    onError?: (event: YouTubePlayerEvent<number>) => void;
+    onReady?: (event: YouTubeReadyEvent) => void;
+    onStateChange?: (event: YouTubePlayerEventWithData<number>) => void;
+    onError?: (event: YouTubePlayerEventWithData<number>) => void;
   };
 }
 

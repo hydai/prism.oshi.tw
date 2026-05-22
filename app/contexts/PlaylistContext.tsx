@@ -54,6 +54,7 @@ export const usePlaylist = () => {
 
 const LEGACY_STORAGE_KEY = 'mizukiprism_playlists';
 const STORAGE_QUOTA_ERROR = '本機儲存空間不足';
+const STORAGE_SAVE_ERROR = '無法儲存播放清單，請確認瀏覽器允許本機儲存';
 const STORAGE_UNSUPPORTED_ERROR = '您的瀏覽器不支援本機儲存，播放清單功能無法使用';
 
 function isLocalStorageAvailable(): boolean {
@@ -204,16 +205,17 @@ export const PlaylistProvider = ({ streamerSlug, children }: { streamerSlug: str
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  const saveToLocalStorage = (newPlaylists: Playlist[]): boolean => {
+  const saveToLocalStorage = (newPlaylists: Playlist[]): { success: true } | { success: false; error: string } => {
     try {
       localStorage.setItem(STORAGE_KEY, JSON.stringify(newPlaylists));
       setStorageError(null);
-      return true;
+      return { success: true };
     } catch (error) {
       const storageError = error as { name?: string; code?: number };
       const isQuotaError = storageError.name === 'QuotaExceededError' || storageError.code === 22;
-      setStorageError(isQuotaError ? STORAGE_QUOTA_ERROR : STORAGE_QUOTA_ERROR);
-      return false;
+      const message = isQuotaError ? STORAGE_QUOTA_ERROR : STORAGE_SAVE_ERROR;
+      setStorageError(message);
+      return { success: false, error: message };
     }
   };
 
@@ -240,11 +242,11 @@ export const PlaylistProvider = ({ streamerSlug, children }: { streamerSlug: str
     const newPlaylists = [...playlists, newPlaylist];
     const saved = saveToLocalStorage(newPlaylists);
 
-    if (saved) {
+    if (saved.success) {
       setPlaylists(newPlaylists);
       return { success: true };
     }
-    return { success: false, error: STORAGE_QUOTA_ERROR };
+    return saved;
   };
 
   const deletePlaylist = (id: string) => {
@@ -265,11 +267,11 @@ export const PlaylistProvider = ({ streamerSlug, children }: { streamerSlug: str
     );
 
     const saved = saveToLocalStorage(newPlaylists);
-    if (saved) {
+    if (saved.success) {
       setPlaylists(newPlaylists);
       return { success: true };
     }
-    return { success: false, error: STORAGE_QUOTA_ERROR };
+    return saved;
   };
 
   const addVersionToPlaylist = (playlistId: string, version: PlaylistVersion): { success: boolean; error?: string } => {
@@ -296,11 +298,11 @@ export const PlaylistProvider = ({ streamerSlug, children }: { streamerSlug: str
     );
 
     const saved = saveToLocalStorage(newPlaylists);
-    if (saved) {
+    if (saved.success) {
       setPlaylists(newPlaylists);
       return { success: true };
     }
-    return { success: false, error: STORAGE_QUOTA_ERROR };
+    return saved;
   };
 
   const removeVersionFromPlaylist = (playlistId: string, performanceId: string) => {
@@ -386,8 +388,8 @@ export const PlaylistProvider = ({ streamerSlug, children }: { streamerSlug: str
       }
 
       const saved = saveToLocalStorage(merged);
-      if (!saved) {
-        return { success: false, error: '本機儲存空間不足' };
+      if (!saved.success) {
+        return saved;
       }
 
       setPlaylists(merged);
