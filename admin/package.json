@@ -9,7 +9,9 @@
     "db:migrate": "wrangler d1 execute oshi-prism-db --remote --file=schema.sql",
     "db:migrate:local": "wrangler d1 execute oshi-prism-db --local --file=schema.sql",
     "db:seed:local": "npx tsx seed.ts --local",
-    "typecheck": "tsc --noEmit"
+    "typecheck": "tsc --noEmit",
+    "test:helpers": "npx tsx src/helpers.test.ts",
+    "check": "npm run typecheck && npm run test:helpers"
   },
   "dependencies": {
     "hono": "^4.12.22"

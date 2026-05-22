@@ -45,9 +45,9 @@ jobs:
       fail-fast: false
       matrix:
         include:
-          - name: Admin worker typecheck
+          - name: Admin worker check
             path: admin
-            command: npm run typecheck
+            command: npm run check
           - name: Admin UI build
             path: admin/ui
             command: npm run build
