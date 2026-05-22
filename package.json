@@ -7,7 +7,7 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "next lint",
+    "lint": "eslint .",
     "inbox:status": "npx tsx tools/inbox-status/status.ts",
     "inbox:status:test": "npx tsx tools/inbox-status/status.test.ts",
     "sync:registry": "npx tsx tools/sync-registry/sync.ts",
