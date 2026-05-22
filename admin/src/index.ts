@@ -103,6 +103,17 @@ function getStreamerId(c: { req: { query: (key: string) => string | undefined } 
   return c.req.query('streamer') || 'mizuki';
 }
 
+function getRouteParam(
+  c: { req: { param: (key: string) => string | undefined } },
+  key: string,
+): string {
+  const value = c.req.param(key);
+  if (value === undefined) {
+    throw new Error(`Missing route param: ${key}`);
+  }
+  return value;
+}
+
 // --- Status transition rules ---
 
 const VALID_STATUSES = new Set(['pending', 'approved', 'rejected', 'excluded', 'extracted']);
@@ -182,7 +193,7 @@ app.get('/api/songs', async (c) => {
 });
 
 app.get('/api/songs/:id', async (c) => {
-  const song = await getSongById(c.env.DB, c.req.param('id'));
+  const song = await getSongById(c.env.DB, getRouteParam(c, 'id'));
   if (!song) return c.json({ error: 'Song not found' }, 404);
   return c.json(song);
 });
@@ -224,7 +235,7 @@ app.post('/api/songs', async (c) => {
 });
 
 app.put('/api/songs/:id', async (c) => {
-  const id = c.req.param('id');
+  const id = getRouteParam(c, 'id');
   const user = c.get('user');
 
   const existing = await getSongById(c.env.DB, id);
@@ -252,7 +263,7 @@ app.put('/api/songs/:id', async (c) => {
 });
 
 app.patch('/api/songs/:id/status', requireCurator, async (c) => {
-  const id = c.req.param('id');
+  const id = getRouteParam(c, 'id');
   const body = await c.req.json<StatusUpdateBody>();
 
   if (!VALID_STATUSES.has(body.status)) {
@@ -310,7 +321,7 @@ app.post('/api/performances', async (c) => {
 });
 
 app.patch('/api/performances/:id/status', requireCurator, async (c) => {
-  const id = c.req.param('id');
+  const id = getRouteParam(c, 'id');
   const body = await c.req.json<StatusUpdateBody>();
 
   if (!VALID_STATUSES.has(body.status)) {
@@ -369,7 +380,7 @@ app.post('/api/streams', async (c) => {
 });
 
 app.patch('/api/streams/:id/status', requireCurator, async (c) => {
-  const id = c.req.param('id');
+  const id = getRouteParam(c, 'id');
   const body = await c.req.json<StatusUpdateBody>();
 
   if (!VALID_STATUSES.has(body.status)) {
@@ -389,7 +400,7 @@ app.patch('/api/streams/:id/status', requireCurator, async (c) => {
 });
 
 app.patch('/api/streams/:id', requireCurator, async (c) => {
-  const id = c.req.param('id');
+  const id = getRouteParam(c, 'id');
   const body = await c.req.json<UpdateStreamBody>();
 
   if (!body.title && !body.date && !body.videoId && !body.youtubeUrl) {
@@ -416,14 +427,14 @@ app.patch('/api/streams/:id', requireCurator, async (c) => {
 // --- Stamp editor ---
 
 app.get('/api/streams/:streamId/performances', async (c) => {
-  const streamId = c.req.param('streamId');
+  const streamId = getRouteParam(c, 'streamId');
   const performances = await listPerformancesForStream(c.env.DB, streamId);
   return c.json({ data: performances, total: performances.length });
 });
 
 app.post('/api/streams/:streamId/performances', async (c) => {
   const streamerId = getStreamerId(c);
-  const streamId = c.req.param('streamId');
+  const streamId = getRouteParam(c, 'streamId');
   const body = await c.req.json<CreateStampPerformanceBody>();
   if (!body.title || !body.originalArtist || body.timestamp === undefined) {
     return c.json({ error: 'title, originalArtist, and timestamp are required' }, 400);
@@ -453,7 +464,7 @@ app.post('/api/streams/:streamId/performances', async (c) => {
 
 // Bulk approve all pending songs + performances for a stream
 app.post('/api/streams/:streamId/approve-all', requireCurator, async (c) => {
-  const streamId = c.req.param('streamId');
+  const streamId = getRouteParam(c, 'streamId');
   const stream = await getStreamById(c.env.DB, streamId);
   if (!stream) return c.json({ error: 'Stream not found' }, 404);
 
@@ -464,7 +475,7 @@ app.post('/api/streams/:streamId/approve-all', requireCurator, async (c) => {
 
 // Bulk unapprove all approved songs + performances for a stream
 app.post('/api/streams/:streamId/unapprove-all', requireCurator, async (c) => {
-  const streamId = c.req.param('streamId');
+  const streamId = getRouteParam(c, 'streamId');
   const stream = await getStreamById(c.env.DB, streamId);
   if (!stream) return c.json({ error: 'Stream not found' }, 404);
 
@@ -473,7 +484,7 @@ app.post('/api/streams/:streamId/unapprove-all', requireCurator, async (c) => {
 });
 
 app.patch('/api/performances/:id/timestamps', async (c) => {
-  const id = c.req.param('id');
+  const id = getRouteParam(c, 'id');
   const body = await c.req.json<UpdateTimestampsBody>();
   const updated = await updatePerformanceTimestamps(c.env.DB, id, {
     timestamp: body.timestamp,
@@ -484,7 +495,7 @@ app.patch('/api/performances/:id/timestamps', async (c) => {
 });
 
 app.patch('/api/performances/:id/details', async (c) => {
-  const id = c.req.param('id');
+  const id = getRouteParam(c, 'id');
   const body = await c.req.json<UpdateSongDetailsBody>();
   const updated = await updatePerformanceSongDetails(c.env.DB, id, {
     title: body.title,
@@ -495,7 +506,7 @@ app.patch('/api/performances/:id/details', async (c) => {
 });
 
 app.delete('/api/performances/:id', async (c) => {
-  const id = c.req.param('id');
+  const id = getRouteParam(c, 'id');
   const deleted = await deletePerformanceAndOrphanSong(c.env.DB, id);
   if (!deleted) return c.json({ error: 'Performance not found' }, 404);
   return c.json({ ok: true });
@@ -520,7 +531,7 @@ app.get('/api/stamp/stats', async (c) => {
 // --- Stream detail ---
 
 app.get('/api/streams/:streamId/detail', async (c) => {
-  const streamId = c.req.param('streamId');
+  const streamId = getRouteParam(c, 'streamId');
   const detail = await getStreamDetail(c.env.DB, streamId);
   if (!detail) return c.json({ error: 'Stream not found' }, 404);
   return c.json(detail);
@@ -529,7 +540,7 @@ app.get('/api/streams/:streamId/detail', async (c) => {
 // --- Performance note update ---
 
 app.patch('/api/performances/:id/note', async (c) => {
-  const id = c.req.param('id');
+  const id = getRouteParam(c, 'id');
   const body = await c.req.json<{ note: string }>();
   if (body.note === undefined) {
     return c.json({ error: 'note is required' }, 400);
@@ -543,7 +554,7 @@ app.patch('/api/performances/:id/note', async (c) => {
 
 app.post('/api/streams/:streamId/paste-import', async (c) => {
   const streamerId = getStreamerId(c);
-  const streamId = c.req.param('streamId');
+  const streamId = getRouteParam(c, 'streamId');
   const body = await c.req.json<PasteImportBody>();
   if (!body.text || !body.text.trim()) {
     return c.json({ error: 'text is required' }, 400);
@@ -595,7 +606,7 @@ app.post('/api/streams/:streamId/paste-import', async (c) => {
 // --- Stamp: clear all end timestamps ---
 
 app.delete('/api/streams/:streamId/end-timestamps', async (c) => {
-  const streamId = c.req.param('streamId');
+  const streamId = getRouteParam(c, 'streamId');
   const cleared = await clearAllEndTimestamps(c.env.DB, streamId);
   return c.json({ ok: true, cleared });
 });
@@ -603,7 +614,7 @@ app.delete('/api/streams/:streamId/end-timestamps', async (c) => {
 // --- Stamp: fetch duration from iTunes ---
 
 app.post('/api/performances/:id/fetch-duration', async (c) => {
-  const id = c.req.param('id');
+  const id = getRouteParam(c, 'id');
   const perf = await getPerformanceWithSong(c.env.DB, id);
   if (!perf) return c.json({ error: 'Performance not found' }, 404);
 
@@ -995,7 +1006,7 @@ app.post('/api/nova/submissions/fetch-all-subscribers', requireCurator, async (c
 });
 
 app.get('/api/nova/submissions/:id', requireCurator, async (c) => {
-  const id = c.req.param('id');
+  const id = getRouteParam(c, 'id');
   const result = await c.env.NOVA_DB
     .prepare('SELECT * FROM submissions WHERE id = ?')
     .bind(id)
@@ -1006,7 +1017,7 @@ app.get('/api/nova/submissions/:id', requireCurator, async (c) => {
 });
 
 app.put('/api/nova/submissions/:id', requireCurator, async (c) => {
-  const id = c.req.param('id');
+  const id = getRouteParam(c, 'id');
   const existing = await c.env.NOVA_DB
     .prepare('SELECT id FROM submissions WHERE id = ?')
     .bind(id)
@@ -1057,7 +1068,7 @@ app.put('/api/nova/submissions/:id', requireCurator, async (c) => {
 });
 
 app.patch('/api/nova/submissions/:id/status', requireCurator, async (c) => {
-  const id = c.req.param('id');
+  const id = getRouteParam(c, 'id');
   const body = await c.req.json<{ status: NovaStatus; reviewer_note?: string }>();
 
   const validStatuses = new Set<string>(['approved', 'rejected', 'pending']);
@@ -1090,7 +1101,7 @@ app.patch('/api/nova/submissions/:id/status', requireCurator, async (c) => {
 
 // DELETE /api/nova/submissions/:id — permanently delete a streamer submission
 app.delete('/api/nova/submissions/:id', requireCurator, async (c) => {
-  const id = c.req.param('id');
+  const id = getRouteParam(c, 'id');
   const existing = await c.env.NOVA_DB
     .prepare('SELECT id FROM submissions WHERE id = ?')
     .bind(id)
@@ -1107,7 +1118,7 @@ app.delete('/api/nova/submissions/:id', requireCurator, async (c) => {
 
 // POST /api/nova/submissions/:id/fetch-subscribers — fetch subscriber count from YouTube
 app.post('/api/nova/submissions/:id/fetch-subscribers', requireCurator, async (c) => {
-  const id = c.req.param('id');
+  const id = getRouteParam(c, 'id');
 
   const sub = await c.env.NOVA_DB
     .prepare('SELECT id, youtube_channel_id FROM submissions WHERE id = ?')
@@ -1183,7 +1194,7 @@ app.get('/api/nova/vods', requireCurator, async (c) => {
 });
 
 app.get('/api/nova/vods/:id', requireCurator, async (c) => {
-  const id = c.req.param('id');
+  const id = getRouteParam(c, 'id');
   const vod = await c.env.NOVA_DB
     .prepare('SELECT * FROM vod_submissions WHERE id = ?')
     .bind(id)
@@ -1200,7 +1211,7 @@ app.get('/api/nova/vods/:id', requireCurator, async (c) => {
 });
 
 app.patch('/api/nova/vods/:id/status', requireCurator, async (c) => {
-  const id = c.req.param('id');
+  const id = getRouteParam(c, 'id');
   const body = await c.req.json<{ status: NovaStatus; reviewer_note?: string }>();
 
   const validStatuses = new Set<string>(['approved', 'rejected', 'pending']);
@@ -1249,7 +1260,7 @@ app.patch('/api/nova/vods/:id/status', requireCurator, async (c) => {
 });
 
 app.put('/api/nova/vods/:id', requireCurator, async (c) => {
-  const id = c.req.param('id');
+  const id = getRouteParam(c, 'id');
   const existing = await c.env.NOVA_DB
     .prepare('SELECT id FROM vod_submissions WHERE id = ?')
     .bind(id)
@@ -1289,7 +1300,7 @@ app.put('/api/nova/vods/:id', requireCurator, async (c) => {
 
 // DELETE /api/nova/vods/:id — permanently delete a VOD submission (cascades to vod_songs)
 app.delete('/api/nova/vods/:id', requireCurator, async (c) => {
-  const id = c.req.param('id');
+  const id = getRouteParam(c, 'id');
   const existing = await c.env.NOVA_DB
     .prepare('SELECT id FROM vod_submissions WHERE id = ?')
     .bind(id)
@@ -1337,7 +1348,7 @@ app.get('/api/crystal/tickets', requireCurator, async (c) => {
 });
 
 app.get('/api/crystal/tickets/:id', requireCurator, async (c) => {
-  const id = c.req.param('id');
+  const id = getRouteParam(c, 'id');
   const result = await c.env.CRYSTAL_DB
     .prepare('SELECT * FROM tickets WHERE id = ?')
     .bind(id)
@@ -1348,7 +1359,7 @@ app.get('/api/crystal/tickets/:id', requireCurator, async (c) => {
 });
 
 app.post('/api/crystal/tickets/:id/reply', requireCurator, async (c) => {
-  const id = c.req.param('id');
+  const id = getRouteParam(c, 'id');
   const body = await c.req.json<{ admin_reply: string }>();
 
   if (!body.admin_reply || !body.admin_reply.trim()) {
@@ -1376,7 +1387,7 @@ app.post('/api/crystal/tickets/:id/reply', requireCurator, async (c) => {
 });
 
 app.patch('/api/crystal/tickets/:id/status', requireCurator, async (c) => {
-  const id = c.req.param('id');
+  const id = getRouteParam(c, 'id');
   const body = await c.req.json<{ status: CrystalTicketStatus }>();
 
   const validStatuses = new Set<string>(['pending', 'replied', 'closed']);
