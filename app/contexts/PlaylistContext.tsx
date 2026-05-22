@@ -3,7 +3,6 @@
 import { createContext, useContext, useState, useEffect, ReactNode } from 'react';
 import {
   saveJsonToStorage,
-  STORAGE_QUOTA_ERROR,
   type StorageSaveResult,
 } from '../lib/playlist-storage';
 
