@@ -1,0 +1,74 @@
+name: CI
+
+on:
+  pull_request:
+    branches: [master]
+  push:
+    branches: [master]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ci-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  root:
+    name: Root lint, build, and tests
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+          cache-dependency-path: package-lock.json
+
+      - run: npm ci
+      - run: npm run lint
+      - run: npm run test:parse
+      - run: npm run test:archive
+      - run: npm run inbox:status:test
+      - run: npm run build
+
+  package-checks:
+    name: ${{ matrix.name }}
+    runs-on: ubuntu-latest
+
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - name: Admin worker typecheck
+            path: admin
+            command: npm run typecheck
+          - name: Admin UI build
+            path: admin/ui
+            command: npm run build
+          - name: Aurora build
+            path: tools/aurora
+            command: npm run build
+          - name: Crystal worker typecheck
+            path: tools/crystal
+            command: npm run typecheck
+          - name: Nova worker typecheck
+            path: tools/nova
+            command: npm run typecheck
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+          cache-dependency-path: ${{ matrix.path }}/package-lock.json
+
+      - run: npm ci
+        working-directory: ${{ matrix.path }}
+      - run: ${{ matrix.command }}
+        working-directory: ${{ matrix.path }}
