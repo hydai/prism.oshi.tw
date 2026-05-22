@@ -24,7 +24,10 @@ export function mergeAlbumArt(
 }
 
 export function sortStreamsByNewest(streams: StreamSummary[]): StreamSummary[] {
-  return [...streams].sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime());
+  return streams
+    .map((stream) => ({ stream, sortTime: new Date(stream.date).getTime() }))
+    .sort((a, b) => b.sortTime - a.sortTime)
+    .map(({ stream }) => stream);
 }
 
 export function getAllArtists(songs: ArchiveSong[]): string[] {
@@ -48,11 +51,15 @@ export function filterStreamsByYears(
 }
 
 export function flattenSongs(songs: ArchiveSong[]): FlattenedSong[] {
-  const result: FlattenedSong[] = [];
+  const result: Array<FlattenedSong & { sortTime: number }> = [];
   songs.forEach((song) => {
     song.performances.forEach((performance) => {
+      const performanceDate = new Date(performance.date);
       result.push({
-        ...song,
+        id: song.id,
+        title: song.title,
+        originalArtist: song.originalArtist,
+        albumArtUrl: song.albumArtUrl,
         performanceId: performance.id,
         streamId: performance.streamId,
         date: performance.date,
@@ -62,11 +69,14 @@ export function flattenSongs(songs: ArchiveSong[]): FlattenedSong[] {
         endTimestamp: performance.endTimestamp ?? undefined,
         note: performance.note,
         searchString: `${song.title} ${song.originalArtist} ${performance.streamTitle}`.toLowerCase(),
-        year: new Date(performance.date).getFullYear(),
+        year: performanceDate.getFullYear(),
+        sortTime: performanceDate.getTime(),
       });
     });
   });
-  return result.sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime());
+  return result
+    .sort((a, b) => b.sortTime - a.sortTime)
+    .map(({ sortTime: _sortTime, ...song }) => song);
 }
 
 export function filterFlattenedSongs(

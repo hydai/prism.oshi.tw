@@ -18,7 +18,10 @@ export interface ArchiveSong {
   albumArtUrl?: string;
 }
 
-export interface FlattenedSong extends ArchiveSong {
+export interface FlattenedSong {
+  id: string;
+  title: string;
+  originalArtist: string;
   performanceId: string;
   streamId?: string;
   date: string;
@@ -29,6 +32,7 @@ export interface FlattenedSong extends ArchiveSong {
   note: string;
   searchString: string;
   year: number;
+  albumArtUrl?: string;
 }
 
 export interface StreamSummary {

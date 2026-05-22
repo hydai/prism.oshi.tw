@@ -110,6 +110,8 @@ assert.equal(flattened[0]?.year, 2025);
 assert.equal(flattened[0]?.endTimestamp, 50);
 assert.equal(flattened[1]?.streamId, undefined);
 assert.equal(flattened[2]?.endTimestamp, undefined);
+assert.equal("performances" in flattened[0]!, false);
+assert.equal("tags" in flattened[0]!, false);
 
 assert.deepEqual(
   filterFlattenedSongs(flattened, {
