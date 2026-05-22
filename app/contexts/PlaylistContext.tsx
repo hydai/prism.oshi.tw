@@ -1,6 +1,11 @@
 'use client';
 
 import { createContext, useContext, useState, useEffect, ReactNode } from 'react';
+import {
+  saveJsonToStorage,
+  STORAGE_QUOTA_ERROR,
+  type StorageSaveResult,
+} from '../lib/playlist-storage';
 
 export interface PlaylistVersion {
   performanceId: string;
@@ -53,8 +58,6 @@ export const usePlaylist = () => {
 };
 
 const LEGACY_STORAGE_KEY = 'mizukiprism_playlists';
-const STORAGE_QUOTA_ERROR = '本機儲存空間不足';
-const STORAGE_SAVE_ERROR = '無法儲存播放清單，請確認瀏覽器允許本機儲存';
 const STORAGE_UNSUPPORTED_ERROR = '您的瀏覽器不支援本機儲存，播放清單功能無法使用';
 
 function isLocalStorageAvailable(): boolean {
@@ -205,18 +208,14 @@ export const PlaylistProvider = ({ streamerSlug, children }: { streamerSlug: str
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  const saveToLocalStorage = (newPlaylists: Playlist[]): { success: true } | { success: false; error: string } => {
-    try {
-      localStorage.setItem(STORAGE_KEY, JSON.stringify(newPlaylists));
+  const saveToLocalStorage = (newPlaylists: Playlist[]): StorageSaveResult => {
+    const result = saveJsonToStorage(localStorage, STORAGE_KEY, newPlaylists);
+    if (result.success) {
       setStorageError(null);
-      return { success: true };
-    } catch (error) {
-      const storageError = error as { name?: string; code?: number };
-      const isQuotaError = storageError.name === 'QuotaExceededError' || storageError.code === 22;
-      const message = isQuotaError ? STORAGE_QUOTA_ERROR : STORAGE_SAVE_ERROR;
-      setStorageError(message);
-      return { success: false, error: message };
+    } else {
+      setStorageError(result.error);
     }
+    return result;
   };
 
   const createPlaylist = (name: string): { success: boolean; error?: string } => {
