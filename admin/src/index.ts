@@ -48,6 +48,7 @@ import {
 } from './db';
 import { fetchItunesDuration } from './itunes';
 import { parseTextToSongs } from '../shared/parse';
+import { formatSubscriberCount } from '../shared/format';
 import { discoverStreams, getVideoDetails, fetchComments, findCandidateComment, countTimestamps, fetchChannelInfo } from './youtube';
 import type {
   AuthUser,
@@ -99,19 +100,6 @@ type Variables = {
 };
 
 const app = new Hono<{ Bindings: Bindings; Variables: Variables }>();
-
-/** Format raw subscriber count into Traditional Chinese notation (萬 = 10,000). */
-function formatSubscriberCount(count: number): string {
-  if (count < 10000) {
-    return count.toLocaleString();
-  }
-  const wan = count / 10000;
-  if (Number.isInteger(wan)) {
-    return `${wan}萬`;
-  }
-  const formatted = wan.toFixed(2).replace(/\.?0+$/, '');
-  return `${formatted}萬`;
-}
 
 // All routes require authentication
 app.use('/api/*', requireAuth);

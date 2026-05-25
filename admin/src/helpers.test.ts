@@ -1,6 +1,7 @@
 import { HTTPException } from 'hono/http-exception';
 import { getRouteParam, getStreamerId } from './http';
 import { isValidTransition, VALID_STATUSES } from './status';
+import { formatSubscriberCount } from '../shared/format';
 
 declare const process: { exitCode?: number };
 
@@ -109,6 +110,17 @@ const invalidTransitions: Array<[string, string]> = [
 for (const [from, to] of invalidTransitions) {
   assertEqual(isValidTransition(from, to), false, `${from} -> ${to} should be invalid`);
 }
+
+// formatSubscriberCount: Traditional Chinese 萬 (10,000) notation
+assertEqual(formatSubscriberCount(500), '500', 'below 10k uses plain locale string');
+assertEqual(formatSubscriberCount(10000), '1萬', '10k formats as 1萬');
+assertEqual(formatSubscriberCount(120000), '12萬', 'integer 萬 drops decimals');
+assertEqual(formatSubscriberCount(15000), '1.5萬', 'half 萬 keeps one decimal');
+assertEqual(formatSubscriberCount(125000), '12.5萬', 'trailing zero trimmed to one decimal');
+assertEqual(formatSubscriberCount(123456), '12.35萬', 'rounds to two decimals');
+assertEqual(formatSubscriberCount(10001), '1萬', 'rounds down and strips the .00');
+assertEqual(formatSubscriberCount(1000000), '100萬', '1M formats as 100萬');
+console.log('✓ formatSubscriberCount');
 
 async function main(): Promise<void> {
   await testMissingRouteParam();
