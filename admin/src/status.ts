@@ -20,3 +20,8 @@ export function isValidTransition(from: string, to: string): boolean {
   if (!isValidStatus(from) || !isValidStatus(to)) return false;
   return ALLOWED_TRANSITIONS[from].has(to);
 }
+
+// Hard delete is blocked for approved (live) streams — unapprove first.
+export function canHardDeleteStream(status: Status): boolean {
+  return status !== 'approved';
+}

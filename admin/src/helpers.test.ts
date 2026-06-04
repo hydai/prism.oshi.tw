@@ -1,6 +1,6 @@
 import { HTTPException } from 'hono/http-exception';
 import { getRouteParam, getStreamerId } from './http';
-import { isValidTransition, VALID_STATUSES } from './status';
+import { canHardDeleteStream, isValidTransition, VALID_STATUSES } from './status';
 import { formatSubscriberCount } from '../shared/format';
 
 declare const process: { exitCode?: number };
@@ -110,6 +110,13 @@ const invalidTransitions: Array<[string, string]> = [
 for (const [from, to] of invalidTransitions) {
   assertEqual(isValidTransition(from, to), false, `${from} -> ${to} should be invalid`);
 }
+
+// canHardDeleteStream: approved streams must be unapproved before hard delete
+assertEqual(canHardDeleteStream('approved'), false, 'approved streams cannot be hard-deleted');
+assertEqual(canHardDeleteStream('pending'), true, 'pending streams can be hard-deleted');
+assertEqual(canHardDeleteStream('extracted'), true, 'extracted streams can be hard-deleted');
+assertEqual(canHardDeleteStream('rejected'), true, 'rejected streams can be hard-deleted');
+assertEqual(canHardDeleteStream('excluded'), true, 'excluded streams can be hard-deleted');
 
 // formatSubscriberCount: Traditional Chinese 萬 (10,000) notation
 assertEqual(formatSubscriberCount(500), '500', 'below 10k uses plain locale string');

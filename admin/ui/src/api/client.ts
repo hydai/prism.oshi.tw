@@ -28,6 +28,7 @@ import type {
   ExtractImportBody,
   ExtractImportResponse,
   BulkApproveResponse,
+  DeleteStreamResponse,
   NovaSubmission,
   NovaStatus,
   NovaVodSubmission,
@@ -188,6 +189,11 @@ export const api = {
     request<Stream>(`/api/streams/${id}`, {
       method: 'PATCH',
       body: JSON.stringify(body),
+    }),
+
+  deleteStream: (id: string) =>
+    request<DeleteStreamResponse>(`/api/streams/${id}`, {
+      method: 'DELETE',
     }),
 
   // Stamp editor — extended

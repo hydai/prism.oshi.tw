@@ -809,6 +809,40 @@ export async function bulkUnapproveStream(
   };
 }
 
+// --- Hard-delete a stream with its performances and orphaned songs ---
+
+export async function deleteStreamCascade(
+  db: D1Database,
+  streamId: string,
+): Promise<{ songs: number; performances: number }> {
+  // Count up front: deleting orphan songs cascades to their performances,
+  // so meta.changes on the performance delete alone would under-report.
+  const perfCount = await db
+    .prepare('SELECT COUNT(*) AS cnt FROM performances WHERE stream_id = ?')
+    .bind(streamId)
+    .first<{ cnt: number }>();
+
+  const results = await db.batch([
+    // Songs whose only performances are in this stream
+    // (their performances go too via ON DELETE CASCADE)
+    db.prepare(
+      `DELETE FROM songs WHERE id IN (
+         SELECT p.song_id FROM performances p
+         WHERE p.stream_id = ?
+         AND (SELECT COUNT(*) FROM performances p2 WHERE p2.song_id = p.song_id) = 1
+       )`,
+    ).bind(streamId),
+    // Defensive: performances whose songs also appear in other streams
+    db.prepare('DELETE FROM performances WHERE stream_id = ?').bind(streamId),
+    db.prepare('DELETE FROM streams WHERE id = ?').bind(streamId),
+  ]);
+
+  return {
+    songs: results[0].meta.changes,
+    performances: perfCount?.cnt ?? 0,
+  };
+}
+
 // --- Stamp: streams with pending counts ---
 
 interface StreamWithPendingRow extends StreamRow {

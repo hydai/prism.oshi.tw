@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef, useCallback, useMemo } from 'react';
-import { useParams, Link } from 'react-router-dom';
+import { useParams, useNavigate, Link } from 'react-router-dom';
 import type { AuthUser, StreamDetail as StreamDetailType, StampPerformance, Status, Stream } from '../../../shared/types';
 import { api } from '../api/client';
 import StatusBadge from '../components/StatusBadge';
@@ -241,6 +241,7 @@ type EditingField =
 
 export default function StreamDetail({ user }: { user: AuthUser }) {
   const { id: streamId } = useParams<{ id: string }>();
+  const navigate = useNavigate();
   const [detail, setDetail] = useState<StreamDetailType | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -421,6 +422,20 @@ export default function StreamDetail({ user }: { user: AuthUser }) {
       showToast(err instanceof Error ? err.message : 'Failed to unapprove all', true);
     }
   }, [streamId, detail, loadDetail, showToast]);
+
+  // --- Hard-delete stream (blocked server-side for approved streams) ---
+  const handleDeleteStream = useCallback(async () => {
+    if (!streamId || !detail) return;
+    const perfCount = detail.performances.length;
+    if (!confirm(`Delete stream "${detail.title}" with ${perfCount} performances and their orphaned songs? This cannot be undone.`)) return;
+    try {
+      const result = await api.deleteStream(streamId);
+      showToast(`Deleted stream (${result.songs} songs, ${result.performances} performances)`);
+      navigate('/streams');
+    } catch (err: unknown) {
+      showToast(err instanceof Error ? err.message : 'Failed to delete stream', true);
+    }
+  }, [streamId, detail, navigate, showToast]);
 
   // --- Paste import done ---
   const handlePasteImportDone = useCallback(async (result: { created: number; replaced: boolean }) => {
@@ -736,6 +751,10 @@ export default function StreamDetail({ user }: { user: AuthUser }) {
               )}
               {detail.status === 'excluded' && (
                 <button onClick={() => handleStreamStatus('pending')} className="rounded bg-blue-500 px-3 py-1.5 text-sm text-white hover:bg-blue-600">Restore</button>
+              )}
+              {/* Hard delete is blocked for approved streams — unapprove first */}
+              {detail.status !== 'approved' && (
+                <button onClick={handleDeleteStream} className="rounded bg-red-800 px-3 py-1.5 text-sm text-white hover:bg-red-900">Delete stream</button>
               )}
             </div>
           )}

@@ -1,7 +1,7 @@
 import { Hono } from 'hono';
 import { requireAuth, requireCurator } from './auth';
 import { getRouteParam, getStreamerId } from './http';
-import { isValidTransition, VALID_STATUSES } from './status';
+import { canHardDeleteStream, isValidTransition, VALID_STATUSES } from './status';
 import {
   listSongs,
   listSongsPaginated,
@@ -39,6 +39,7 @@ import {
   bulkCreatePerformances,
   bulkApproveStream,
   bulkUnapproveStream,
+  deleteStreamCascade,
   getStreamDetail,
   updatePerformanceNote,
   importVodToAdminDb,
@@ -72,6 +73,7 @@ import type {
   ExtractImportBody,
   ExtractImportResponse,
   BulkApproveResponse,
+  DeleteStreamResponse,
   HarmonizeSongsResponse,
   HarmonizeArtistsResponse,
   HarmonizeApplyBody,
@@ -439,6 +441,21 @@ app.post('/api/streams/:streamId/unapprove-all', requireCurator, async (c) => {
 
   const { songs, performances } = await bulkUnapproveStream(c.env.DB, streamId);
   return c.json({ ok: true, songs, performances } satisfies BulkApproveResponse);
+});
+
+// Hard-delete a stream with all its performances and orphaned songs.
+// Approved (live) streams are blocked — unapprove first.
+app.delete('/api/streams/:id', requireCurator, async (c) => {
+  const id = getRouteParam(c, 'id');
+  const stream = await getStreamById(c.env.DB, id);
+  if (!stream) return c.json({ error: 'Stream not found' }, 404);
+
+  if (!canHardDeleteStream(stream.status)) {
+    return c.json({ error: 'Cannot delete an approved stream — unapprove it first' }, 409);
+  }
+
+  const { songs, performances } = await deleteStreamCascade(c.env.DB, id);
+  return c.json({ ok: true, songs, performances } satisfies DeleteStreamResponse);
 });
 
 app.patch('/api/performances/:id/timestamps', async (c) => {

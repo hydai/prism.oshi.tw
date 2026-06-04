@@ -323,6 +323,12 @@ export interface BulkApproveResponse {
   performances: number;
 }
 
+export interface DeleteStreamResponse {
+  ok: boolean;
+  songs: number;
+  performances: number;
+}
+
 // --- Nova submission types ---
 
 export type NovaStatus = 'pending' | 'approved' | 'rejected';
