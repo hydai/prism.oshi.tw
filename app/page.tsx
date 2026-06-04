@@ -13,6 +13,7 @@ import {
   Video,
 } from 'lucide-react';
 import ThemeToggle from './components/ThemeToggle';
+import DiscordIcon from './components/DiscordIcon';
 
 const streamers = (registryData.streamers as StreamerConfig[]).filter(
   (s) => s.enabled
@@ -167,6 +168,19 @@ export default function HomePage() {
             <MessageSquare className="h-4 w-4" />
             回報 / 建議
           </a>
+          <a
+            href="https://discord.gg/bUYva8q7Jr"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="flex items-center justify-center gap-2 rounded-radius-lg px-4 py-2 text-token-sm font-semibold transition-opacity hover:opacity-90"
+            style={{
+              border: '1px solid var(--border-accent)',
+              color: 'var(--text-secondary)',
+            }}
+          >
+            <DiscordIcon className="h-4 w-4" />
+            官方 Discord 伺服器
+          </a>
         </div>
       </aside>
 
@@ -210,6 +224,18 @@ export default function HomePage() {
               }}
             >
               <MessageSquare className="h-4 w-4" />
+            </a>
+            <a
+              href="https://discord.gg/bUYva8q7Jr"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="inline-flex items-center gap-1 rounded-radius-lg px-2.5 py-2 text-token-sm font-semibold transition-opacity hover:opacity-90"
+              style={{
+                border: '1px solid var(--border-accent)',
+                color: 'var(--text-secondary)',
+              }}
+            >
+              <DiscordIcon className="h-4 w-4" />
             </a>
             <a
               href="https://nova.oshi.tw/vod"
