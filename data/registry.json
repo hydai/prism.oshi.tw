@@ -30,8 +30,7 @@
         "borderAccentPrimary": "#FBCFE8",
         "borderAccentSecondary": "#BFDBFE"
       },
-      "enabled": true,
-      "externalUrl": "https://prism.mizuki.tw"
+      "enabled": true
     },
     {
       "slug": "gabu",
