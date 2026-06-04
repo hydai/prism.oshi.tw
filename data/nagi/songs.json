@@ -18,24 +18,6 @@
     ]
   },
   {
-    "id": "song-026744ca",
-    "title": "炉心融解",
-    "originalArtist": "iroha(sasaki) feat. 鏡音リン",
-    "tags": [],
-    "performances": [
-      {
-        "id": "p-d575d91c",
-        "streamId": "stream-2026-05-17",
-        "date": "2026-05-17",
-        "streamTitle": "【#歌回 】300贊耐久感冒歌回！！ | #MalaysiaVtuber #馬來西亞Vtuber【秋月イノリ | 秋月祁】",
-        "videoId": "ODikksIsYEc",
-        "timestamp": 5119,
-        "endTimestamp": 5437,
-        "note": ""
-      }
-    ]
-  },
-  {
     "id": "song-02b960f0",
     "title": "Cry Out",
     "originalArtist": "ONE OK ROCK",
@@ -103,24 +85,6 @@
         "videoId": "wqPu1pSz314",
         "timestamp": 4156,
         "endTimestamp": 4403,
-        "note": ""
-      }
-    ]
-  },
-  {
-    "id": "song-07abc901",
-    "title": "Massachusetts",
-    "originalArtist": "Bee Gees",
-    "tags": [],
-    "performances": [
-      {
-        "id": "p-71ba3b44",
-        "streamId": "stream-2026-05-17",
-        "date": "2026-05-17",
-        "streamTitle": "【#歌回 】300贊耐久感冒歌回！！ | #MalaysiaVtuber #馬來西亞Vtuber【秋月イノリ | 秋月祁】",
-        "videoId": "ODikksIsYEc",
-        "timestamp": 10572,
-        "endTimestamp": 10726,
         "note": ""
       }
     ]
@@ -216,24 +180,6 @@
     ]
   },
   {
-    "id": "song-0ee7bbd0",
-    "title": "More Than a Woman",
-    "originalArtist": "Bee Gees",
-    "tags": [],
-    "performances": [
-      {
-        "id": "p-a36d0e13",
-        "streamId": "stream-2026-05-17",
-        "date": "2026-05-17",
-        "streamTitle": "【#歌回 】300贊耐久感冒歌回！！ | #MalaysiaVtuber #馬來西亞Vtuber【秋月イノリ | 秋月祁】",
-        "videoId": "ODikksIsYEc",
-        "timestamp": 11191,
-        "endTimestamp": 11385,
-        "note": ""
-      }
-    ]
-  },
-  {
     "id": "song-107365c4",
     "title": "新時代",
     "originalArtist": "Ado",
@@ -301,24 +247,6 @@
         "videoId": "MTaylTGjbuc",
         "timestamp": 7506,
         "endTimestamp": 7699,
-        "note": ""
-      }
-    ]
-  },
-  {
-    "id": "song-18f885d8",
-    "title": "Bohemian Rhapsody",
-    "originalArtist": "Queen",
-    "tags": [],
-    "performances": [
-      {
-        "id": "p-93f66db9",
-        "streamId": "stream-2026-05-17",
-        "date": "2026-05-17",
-        "streamTitle": "【#歌回 】300贊耐久感冒歌回！！ | #MalaysiaVtuber #馬來西亞Vtuber【秋月イノリ | 秋月祁】",
-        "videoId": "ODikksIsYEc",
-        "timestamp": 6610,
-        "endTimestamp": 6965,
         "note": ""
       }
     ]
@@ -517,24 +445,6 @@
         "videoId": "9eZ_9iarPl0",
         "timestamp": 2101,
         "endTimestamp": 2381,
-        "note": ""
-      }
-    ]
-  },
-  {
-    "id": "song-25765188",
-    "title": "Amazing Grace",
-    "originalArtist": "Chris Tomlin",
-    "tags": [],
-    "performances": [
-      {
-        "id": "p-ef1efe16",
-        "streamId": "stream-2026-05-17",
-        "date": "2026-05-17",
-        "streamTitle": "【#歌回 】300贊耐久感冒歌回！！ | #MalaysiaVtuber #馬來西亞Vtuber【秋月イノリ | 秋月祁】",
-        "videoId": "ODikksIsYEc",
-        "timestamp": 9797,
-        "endTimestamp": 10052,
         "note": ""
       }
     ]
@@ -774,42 +684,6 @@
     ]
   },
   {
-    "id": "song-38a7fda9",
-    "title": "Rising Hope",
-    "originalArtist": "LiSA",
-    "tags": [],
-    "performances": [
-      {
-        "id": "p-50c6d494",
-        "streamId": "stream-2026-05-17",
-        "date": "2026-05-17",
-        "streamTitle": "【#歌回 】300贊耐久感冒歌回！！ | #MalaysiaVtuber #馬來西亞Vtuber【秋月イノリ | 秋月祁】",
-        "videoId": "ODikksIsYEc",
-        "timestamp": 4222,
-        "endTimestamp": 4468,
-        "note": ""
-      }
-    ]
-  },
-  {
-    "id": "song-39524dfe",
-    "title": "You Are My Sunshine",
-    "originalArtist": "Jimmie Davis",
-    "tags": [],
-    "performances": [
-      {
-        "id": "p-dfd27e6d",
-        "streamId": "stream-2026-05-17",
-        "date": "2026-05-17",
-        "streamTitle": "【#歌回 】300贊耐久感冒歌回！！ | #MalaysiaVtuber #馬來西亞Vtuber【秋月イノリ | 秋月祁】",
-        "videoId": "ODikksIsYEc",
-        "timestamp": 9483,
-        "endTimestamp": 9693,
-        "note": ""
-      }
-    ]
-  },
-  {
     "id": "song-3a09e40f",
     "title": "Over the Rainbow",
     "originalArtist": "Judy Garland",
@@ -841,24 +715,6 @@
         "videoId": "za32QvQAIsA",
         "timestamp": 1078,
         "endTimestamp": 1376,
-        "note": ""
-      }
-    ]
-  },
-  {
-    "id": "song-3af6f630",
-    "title": "Scarborough Fair",
-    "originalArtist": "Simon & Garfunkel",
-    "tags": [],
-    "performances": [
-      {
-        "id": "p-93d0959e",
-        "streamId": "stream-2026-05-17",
-        "date": "2026-05-17",
-        "streamTitle": "【#歌回 】300贊耐久感冒歌回！！ | #MalaysiaVtuber #馬來西亞Vtuber【秋月イノリ | 秋月祁】",
-        "videoId": "ODikksIsYEc",
-        "timestamp": 7678,
-        "endTimestamp": 7860,
         "note": ""
       }
     ]
@@ -1260,24 +1116,6 @@
     ]
   },
   {
-    "id": "song-4df5b7cb",
-    "title": "Edelweiss",
-    "originalArtist": "Theodore Bikel and cast",
-    "tags": [],
-    "performances": [
-      {
-        "id": "p-08f3bea0",
-        "streamId": "stream-2026-05-17",
-        "date": "2026-05-17",
-        "streamTitle": "【#歌回 】300贊耐久感冒歌回！！ | #MalaysiaVtuber #馬來西亞Vtuber【秋月イノリ | 秋月祁】",
-        "videoId": "ODikksIsYEc",
-        "timestamp": 8590,
-        "endTimestamp": 8725,
-        "note": ""
-      }
-    ]
-  },
-  {
     "id": "song-4e209107",
     "title": "煎熬",
     "originalArtist": "李佳薇",
@@ -1332,24 +1170,6 @@
     ]
   },
   {
-    "id": "song-52e55e07",
-    "title": "ゴーストルール",
-    "originalArtist": "DECO*27 feat. 初音ミク",
-    "tags": [],
-    "performances": [
-      {
-        "id": "p-2ec9fde6",
-        "streamId": "stream-2026-05-17",
-        "date": "2026-05-17",
-        "streamTitle": "【#歌回 】300贊耐久感冒歌回！！ | #MalaysiaVtuber #馬來西亞Vtuber【秋月イノリ | 秋月祁】",
-        "videoId": "ODikksIsYEc",
-        "timestamp": 3439,
-        "endTimestamp": 3645,
-        "note": ""
-      }
-    ]
-  },
-  {
     "id": "song-5611694d",
     "title": "グッバイ宣言",
     "originalArtist": "Chinozo",
@@ -1386,24 +1206,6 @@
     ]
   },
   {
-    "id": "song-57d91f78",
-    "title": "天樂",
-    "originalArtist": "ゆうゆ feat. 鏡音リン",
-    "tags": [],
-    "performances": [
-      {
-        "id": "p-728323aa",
-        "streamId": "stream-2026-05-17",
-        "date": "2026-05-17",
-        "streamTitle": "【#歌回 】300贊耐久感冒歌回！！ | #MalaysiaVtuber #馬來西亞Vtuber【秋月イノリ | 秋月祁】",
-        "videoId": "ODikksIsYEc",
-        "timestamp": 3067,
-        "endTimestamp": 3336,
-        "note": ""
-      }
-    ]
-  },
-  {
     "id": "song-59373bf5",
     "title": "Take Me Home, Country Roads",
     "originalArtist": "John Denver",
@@ -1415,24 +1217,6 @@
         "date": "2026-05-17",
         "streamTitle": "【歌雜】充電充電嗶嗶啵啵——🍥｜七星ナギ・馬來西亞VTuber #雜談",
         "videoId": "hRWW0XQnDAk",
-        "timestamp": 9271,
-        "endTimestamp": 9457,
-        "note": ""
-      }
-    ]
-  },
-  {
-    "id": "song-5a1eeb77",
-    "title": "Take Me Home, Country Roads",
-    "originalArtist": "John Denver",
-    "tags": [],
-    "performances": [
-      {
-        "id": "p-c9fb20c5",
-        "streamId": "stream-2026-05-17",
-        "date": "2026-05-17",
-        "streamTitle": "【#歌回 】300贊耐久感冒歌回！！ | #MalaysiaVtuber #馬來西亞Vtuber【秋月イノリ | 秋月祁】",
-        "videoId": "ODikksIsYEc",
         "timestamp": 9271,
         "endTimestamp": 9457,
         "note": ""
@@ -1543,24 +1327,6 @@
         "videoId": "qLadgrUQFWA",
         "timestamp": 353,
         "endTimestamp": 548,
-        "note": ""
-      }
-    ]
-  },
-  {
-    "id": "song-646cce5d",
-    "title": "ローリンガール",
-    "originalArtist": "wowaka",
-    "tags": [],
-    "performances": [
-      {
-        "id": "p-71a32196",
-        "streamId": "stream-2026-05-17",
-        "date": "2026-05-17",
-        "streamTitle": "【#歌回 】300贊耐久感冒歌回！！ | #MalaysiaVtuber #馬來西亞Vtuber【秋月イノリ | 秋月祁】",
-        "videoId": "ODikksIsYEc",
-        "timestamp": 4834,
-        "endTimestamp": 5022,
         "note": ""
       }
     ]
@@ -1836,24 +1602,6 @@
     ]
   },
   {
-    "id": "song-72b04ad3",
-    "title": "The Sound of Music",
-    "originalArtist": "Julie Andrews",
-    "tags": [],
-    "performances": [
-      {
-        "id": "p-c6ecb442",
-        "streamId": "stream-2026-05-17",
-        "date": "2026-05-17",
-        "streamTitle": "【#歌回 】300贊耐久感冒歌回！！ | #MalaysiaVtuber #馬來西亞Vtuber【秋月イノリ | 秋月祁】",
-        "videoId": "ODikksIsYEc",
-        "timestamp": 8402,
-        "endTimestamp": 8553,
-        "note": ""
-      }
-    ]
-  },
-  {
     "id": "song-72c226b9",
     "title": "エメラルドシティ",
     "originalArtist": "TOKOTOKO(西沢さんP) feat. MAYU",
@@ -1993,24 +1741,6 @@
         "videoId": "eluS2DmhMfY",
         "timestamp": 5133,
         "endTimestamp": 5431,
-        "note": ""
-      }
-    ]
-  },
-  {
-    "id": "song-7b89531b",
-    "title": "The Phantom of the Opera",
-    "originalArtist": "Sarah Brightman & Michael Crawford",
-    "tags": [],
-    "performances": [
-      {
-        "id": "p-141a5296",
-        "streamId": "stream-2026-05-17",
-        "date": "2026-05-17",
-        "streamTitle": "【#歌回 】300贊耐久感冒歌回！！ | #MalaysiaVtuber #馬來西亞Vtuber【秋月イノリ | 秋月祁】",
-        "videoId": "ODikksIsYEc",
-        "timestamp": 5474,
-        "endTimestamp": 5733,
         "note": ""
       }
     ]
@@ -2862,24 +2592,6 @@
     ]
   },
   {
-    "id": "song-bd9e33fb",
-    "title": "First of May",
-    "originalArtist": "Bee Gees",
-    "tags": [],
-    "performances": [
-      {
-        "id": "p-0340208a",
-        "streamId": "stream-2026-05-17",
-        "date": "2026-05-17",
-        "streamTitle": "【#歌回 】300贊耐久感冒歌回！！ | #MalaysiaVtuber #馬來西亞Vtuber【秋月イノリ | 秋月祁】",
-        "videoId": "ODikksIsYEc",
-        "timestamp": 10238,
-        "endTimestamp": 10414,
-        "note": ""
-      }
-    ]
-  },
-  {
     "id": "song-bdf1203c",
     "title": "シルシ",
     "originalArtist": "LiSA",
@@ -3114,24 +2826,6 @@
     ]
   },
   {
-    "id": "song-ce00849a",
-    "title": "Countach",
-    "originalArtist": "轟はじめ",
-    "tags": [],
-    "performances": [
-      {
-        "id": "p-edc23c0c",
-        "streamId": "stream-2026-05-17",
-        "date": "2026-05-17",
-        "streamTitle": "【#歌回 】300贊耐久感冒歌回！！ | #MalaysiaVtuber #馬來西亞Vtuber【秋月イノリ | 秋月祁】",
-        "videoId": "ODikksIsYEc",
-        "timestamp": 2795,
-        "endTimestamp": 2988,
-        "note": ""
-      }
-    ]
-  },
-  {
     "id": "song-cf09fba4",
     "title": "ジッタードール",
     "originalArtist": "niki feat. Lily",
@@ -3145,24 +2839,6 @@
         "videoId": "ELxjiBbpB_E",
         "timestamp": 9502,
         "endTimestamp": 9734,
-        "note": ""
-      }
-    ]
-  },
-  {
-    "id": "song-cfdcc75c",
-    "title": "wish you were gay",
-    "originalArtist": "Billie Eilish",
-    "tags": [],
-    "performances": [
-      {
-        "id": "p-cf3d25c0",
-        "streamId": "stream-2026-05-17",
-        "date": "2026-05-17",
-        "streamTitle": "【#歌回 】300贊耐久感冒歌回！！ | #MalaysiaVtuber #馬來西亞Vtuber【秋月イノリ | 秋月祁】",
-        "videoId": "ODikksIsYEc",
-        "timestamp": 6315,
-        "endTimestamp": 6535,
         "note": ""
       }
     ]
@@ -3253,24 +2929,6 @@
         "videoId": "hRWW0XQnDAk",
         "timestamp": 9797,
         "endTimestamp": 10052,
-        "note": ""
-      }
-    ]
-  },
-  {
-    "id": "song-d4cd823a",
-    "title": "If I Can Stop One Heart From Breaking",
-    "originalArtist": "Chevy",
-    "tags": [],
-    "performances": [
-      {
-        "id": "p-4c9b10b8",
-        "streamId": "stream-2026-05-17",
-        "date": "2026-05-17",
-        "streamTitle": "【#歌回 】300贊耐久感冒歌回！！ | #MalaysiaVtuber #馬來西亞Vtuber【秋月イノリ | 秋月祁】",
-        "videoId": "ODikksIsYEc",
-        "timestamp": 8879,
-        "endTimestamp": 9078,
         "note": ""
       }
     ]
@@ -3523,24 +3181,6 @@
         "videoId": "Q3qcyO9t3TQ",
         "timestamp": 8093,
         "endTimestamp": 8367,
-        "note": ""
-      }
-    ]
-  },
-  {
-    "id": "song-e7bde2d7",
-    "title": "Too Much Heaven",
-    "originalArtist": "Bee Gees",
-    "tags": [],
-    "performances": [
-      {
-        "id": "p-5c32a362",
-        "streamId": "stream-2026-05-17",
-        "date": "2026-05-17",
-        "streamTitle": "【#歌回 】300贊耐久感冒歌回！！ | #MalaysiaVtuber #馬來西亞Vtuber【秋月イノリ | 秋月祁】",
-        "videoId": "ODikksIsYEc",
-        "timestamp": 10868,
-        "endTimestamp": 11159,
         "note": ""
       }
     ]
