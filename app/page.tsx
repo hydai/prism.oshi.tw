@@ -179,7 +179,7 @@ export default function HomePage() {
             }}
           >
             <DiscordIcon className="h-4 w-4" />
-            官方 Discord 伺服器
+            Discord 伺服器
           </a>
         </div>
       </aside>
