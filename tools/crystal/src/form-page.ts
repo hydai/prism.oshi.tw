@@ -154,6 +154,27 @@ export function renderFormPage(siteKey: string) {
     .contact-field.visible { max-height: 120px; opacity: 1; }
     .contact-field.hidden { max-height: 0; opacity: 0; }
 
+    .discord-tip {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      justify-content: space-between;
+      gap: 8px 10px;
+      padding: 12px 16px;
+      background: var(--bg-surface-frosted);
+      border: 1px solid var(--border-glass);
+      border-radius: var(--radius-lg);
+      font-size: 12px;
+      color: var(--text-secondary);
+    }
+    .discord-tip a {
+      flex-shrink: 0;
+      color: var(--accent-purple);
+      font-weight: 600;
+      text-decoration: none;
+    }
+    .discord-tip a:hover { text-decoration: underline; }
+
     #result {
       margin-top: 16px;
       padding: 12px 16px;
@@ -336,6 +357,12 @@ export function renderFormPage(siteKey: string) {
           <label class="form-label" for="contact">聯絡方式 <span class="required">*</span></label>
           <input type="text" id="contact" class="form-input" placeholder="Email / Discord / Twitter 等，讓我們能回覆你" />
           <p class="form-hint">不公開回覆時必須提供聯絡方式</p>
+        </div>
+
+        <!-- Discord tip (always visible) -->
+        <div class="discord-tip">
+          <span>也可以加入我們的 Discord 伺服器，直接在伺服器裡討論與回覆。</span>
+          <a href="https://discord.gg/bUYva8q7Jr" target="_blank" rel="noopener noreferrer">加入 Discord ↗</a>
         </div>
 
         <!-- Turnstile -->
