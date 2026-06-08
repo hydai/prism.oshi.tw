@@ -127,6 +127,15 @@
       "performancesCount": 0,
       "streamsCount": 0
     },
+    "margaretnorth": {
+      "lastSyncedAt": null,
+      "maxSongUpdatedAt": null,
+      "maxPerfUpdatedAt": null,
+      "maxStreamUpdatedAt": null,
+      "songsCount": 0,
+      "performancesCount": 0,
+      "streamsCount": 0
+    },
     "mendy": {
       "lastSyncedAt": "2026-04-19T11:28:21.890Z",
       "maxSongUpdatedAt": null,
@@ -261,6 +270,15 @@
       "songsCount": 11,
       "performancesCount": 11,
       "streamsCount": 1
+    },
+    "vaswawa": {
+      "lastSyncedAt": null,
+      "maxSongUpdatedAt": null,
+      "maxPerfUpdatedAt": null,
+      "maxStreamUpdatedAt": null,
+      "songsCount": 0,
+      "performancesCount": 0,
+      "streamsCount": 0
     },
     "xxhacucoxx": {
       "lastSyncedAt": "2026-04-19T11:29:25.300Z",
