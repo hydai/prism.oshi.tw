@@ -481,6 +481,34 @@
       "enabled": true
     },
     {
+      "slug": "margaretnorth",
+      "displayName": "瑪格麗特 · 諾爾絲",
+      "description": "來自西方的魔女\n瑪格麗特．諾爾絲／Margaret North【箱箱The Box📦所屬】\n🌼 期待 能與你共進下午茶的日子 🌼\n歡迎來到，瑪麗的世界。♡ ♡ ♡",
+      "avatarUrl": "https://yt3.ggpht.com/xD6X8JKHvfY0bRgEcIb5opUaYpH7Ij4p6_yt_yjjsycqC_sToYwKMXPngxIQZgJCoNnCcLLO=s240-c-k-c0x00ffffff-no-rj",
+      "brandName": "MargaretPrism",
+      "subscriberCount": "11.1萬",
+      "group": "箱箱The box",
+      "socialLinks": {
+        "youtube": "https://www.youtube.com/@%E7%91%AA%E6%A0%BC%E9%BA%97%E7%89%B9margaretnorth",
+        "twitter": "https://x.com/margaretthebox"
+      },
+      "theme": {
+        "accentPrimary": "#EC4899",
+        "accentPrimaryDark": "#DB2777",
+        "accentPrimaryLight": "#F472B6",
+        "accentSecondary": "#3B82F6",
+        "accentSecondaryLight": "#60A5FA",
+        "bgPageStart": "#FFF0F5",
+        "bgPageMid": "#F0F8FF",
+        "bgPageEnd": "#E6E6FA",
+        "bgAccentPrimary": "#FDF2F8",
+        "bgAccentPrimaryMuted": "#FCE7F3",
+        "borderAccentPrimary": "#FBCFE8",
+        "borderAccentSecondary": "#BFDBFE"
+      },
+      "enabled": true
+    },
+    {
       "slug": "mendy",
       "displayName": "眠比Mendy",
       "description": "擁有蓬鬆大尾巴的個兔勢Vtuber，喜歡唱唱老歌跟玩遊戲，夢想是收集很多眠花糖！",
@@ -849,6 +877,34 @@
       "socialLinks": {
         "youtube": "https://www.youtube.com/@thirteennn013",
         "twitter": "https://x.com/Thirteennn013"
+      },
+      "theme": {
+        "accentPrimary": "#EC4899",
+        "accentPrimaryDark": "#DB2777",
+        "accentPrimaryLight": "#F472B6",
+        "accentSecondary": "#3B82F6",
+        "accentSecondaryLight": "#60A5FA",
+        "bgPageStart": "#FFF0F5",
+        "bgPageMid": "#F0F8FF",
+        "bgPageEnd": "#E6E6FA",
+        "bgAccentPrimary": "#FDF2F8",
+        "bgAccentPrimaryMuted": "#FCE7F3",
+        "borderAccentPrimary": "#FBCFE8",
+        "borderAccentSecondary": "#BFDBFE"
+      },
+      "enabled": true
+    },
+    {
+      "slug": "vaswawa",
+      "displayName": "瓦西瓦瓦 Vaswawa",
+      "description": "初めまして！瓦瓦です～～～～～\n可愛迷人混亂小惡魔天使\n歡迎加入吉瓦瓦後花園行列",
+      "avatarUrl": "https://yt3.ggpht.com/QnBE2O0Kdd7RMgHtdzS5bCPpWkLJLyRYOytn0CmhZFdwkhd6-m4-i_OXI7V3fDqPdKH1KwWkHQ=s240-c-k-c0x00ffffff-no-rj",
+      "brandName": "VaswawaPrism",
+      "subscriberCount": "8.5萬",
+      "group": "預見娛樂",
+      "socialLinks": {
+        "youtube": "https://www.youtube.com/@Vaswawa",
+        "twitter": "https://x.com/Vaswawa"
       },
       "theme": {
         "accentPrimary": "#EC4899",
