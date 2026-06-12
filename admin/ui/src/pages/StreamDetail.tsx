@@ -516,14 +516,23 @@ export default function StreamDetail({ user }: { user: AuthUser }) {
   const seekToStart = useCallback(() => {
     if (selectedIndex < 0 || !detail || !playerRef.current) return;
     const perf = detail.performances[selectedIndex];
-    if (perf) playerRef.current.seekTo(perf.timestamp);
-  }, [detail, selectedIndex]);
+    if (!perf) return;
+    playerRef.current.seekTo(perf.timestamp);
+    showToast(`Seek start → ${formatTimestamp(perf.timestamp)}`);
+  }, [detail, selectedIndex, showToast]);
 
-  const seekToEnd = useCallback(() => {
+  const seekToEnd = useCallback((offsetSeconds: number) => {
     if (selectedIndex < 0 || !detail || !playerRef.current) return;
     const perf = detail.performances[selectedIndex];
-    if (perf?.endTimestamp) playerRef.current.seekTo(Math.max(0, perf.endTimestamp - 10));
-  }, [detail, selectedIndex]);
+    if (!perf?.endTimestamp) return;
+    const target = Math.max(0, perf.endTimestamp - offsetSeconds);
+    playerRef.current.seekTo(target);
+    showToast(
+      offsetSeconds > 0
+        ? `Seek end -${offsetSeconds}s → ${formatTimestamp(target)} (end ${formatTimestamp(perf.endTimestamp)})`
+        : `Seek end → ${formatTimestamp(perf.endTimestamp)}`
+    );
+  }, [detail, selectedIndex, showToast]);
 
   const selectNext = useCallback(() => {
     if (!detail || detail.performances.length === 0) return;
@@ -689,7 +698,8 @@ export default function StreamDetail({ user }: { user: AuthUser }) {
         case 'm': markEndTimestamp(); break;
         case 't': markStartTimestamp(); break;
         case 's': seekToStart(); break;
-        case 'e': seekToEnd(); break;
+        case 'e': seekToEnd(5); break;
+        case 'E': seekToEnd(0); break;
         case 'n': selectNext(); break;
         case 'p': selectPrev(); break;
         case 'c': copyVodUrl(); break;
@@ -834,8 +844,11 @@ export default function StreamDetail({ user }: { user: AuthUser }) {
           <kbd className="rounded border border-slate-300 bg-slate-100 px-1 font-mono">t</kbd>{' '}Set start
         </span>
         <span>
-          <kbd className="rounded border border-slate-300 bg-slate-100 px-1 font-mono">s</kbd>/
-          <kbd className="rounded border border-slate-300 bg-slate-100 px-1 font-mono">e</kbd>{' '}Seek start/end
+          <kbd className="rounded border border-slate-300 bg-slate-100 px-1 font-mono">s</kbd>{' '}Seek start
+        </span>
+        <span>
+          <kbd className="rounded border border-slate-300 bg-slate-100 px-1 font-mono">e</kbd>/
+          <kbd className="rounded border border-slate-300 bg-slate-100 px-1 font-mono">E</kbd>{' '}Seek end &minus;5s/exact
         </span>
         <span>
           <kbd className="rounded border border-slate-300 bg-slate-100 px-1 font-mono">n</kbd>/
@@ -971,7 +984,7 @@ export default function StreamDetail({ user }: { user: AuthUser }) {
                     <span className="inline-flex items-center gap-1">
                       {perf.endTimestamp !== null ? (
                         <>
-                          <button onClick={(e) => { e.stopPropagation(); playerRef.current?.seekTo(Math.max(0, perf.endTimestamp! - 10)); }} className="hover:underline" title="Seek near end">
+                          <button onClick={(e) => { e.stopPropagation(); playerRef.current?.seekTo(Math.max(0, perf.endTimestamp! - (e.shiftKey ? 0 : 5))); }} className="hover:underline" title="Seek end -5s (Shift+click: exact end)">
                             {formatTimestamp(perf.endTimestamp)}
                           </button>
                           <button onClick={(e) => { e.stopPropagation(); clearEndTimestamp(perf.id, i); }}

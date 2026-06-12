@@ -468,13 +468,20 @@ export default function StampEditor({ user }: { user: AuthUser }) {
     const perf = performances[selectedIndex];
     if (!perf || !playerRef.current) return;
     playerRef.current.seekTo(perf.timestamp);
-  }, [performances, selectedIndex]);
+    showToast(`Seek start → ${formatTimestamp(perf.timestamp)}`);
+  }, [performances, selectedIndex, showToast]);
 
-  const seekToEnd = useCallback(() => {
+  const seekToEnd = useCallback((offsetSeconds: number) => {
     const perf = performances[selectedIndex];
     if (!perf?.endTimestamp || !playerRef.current) return;
-    playerRef.current.seekTo(Math.max(0, perf.endTimestamp - 10));
-  }, [performances, selectedIndex]);
+    const target = Math.max(0, perf.endTimestamp - offsetSeconds);
+    playerRef.current.seekTo(target);
+    showToast(
+      offsetSeconds > 0
+        ? `Seek end -${offsetSeconds}s → ${formatTimestamp(target)} (end ${formatTimestamp(perf.endTimestamp)})`
+        : `Seek end → ${formatTimestamp(perf.endTimestamp)}`
+    );
+  }, [performances, selectedIndex, showToast]);
 
   const selectNext = useCallback(() => {
     if (performances.length === 0) return;
@@ -787,7 +794,10 @@ export default function StampEditor({ user }: { user: AuthUser }) {
           seekToStart();
           break;
         case 'e':
-          seekToEnd();
+          seekToEnd(5);
+          break;
+        case 'E':
+          seekToEnd(0);
           break;
         case 'n':
           selectNext();
@@ -943,9 +953,13 @@ export default function StampEditor({ user }: { user: AuthUser }) {
                 Set start
               </span>
               <span>
-                <kbd className="rounded border border-slate-300 bg-slate-100 px-1 font-mono">s</kbd>/
-                <kbd className="rounded border border-slate-300 bg-slate-100 px-1 font-mono">e</kbd>{' '}
-                Seek start/end
+                <kbd className="rounded border border-slate-300 bg-slate-100 px-1 font-mono">s</kbd>{' '}
+                Seek start
+              </span>
+              <span>
+                <kbd className="rounded border border-slate-300 bg-slate-100 px-1 font-mono">e</kbd>/
+                <kbd className="rounded border border-slate-300 bg-slate-100 px-1 font-mono">E</kbd>{' '}
+                Seek end &minus;5s/exact
               </span>
               <span>
                 <kbd className="rounded border border-slate-300 bg-slate-100 px-1 font-mono">n</kbd>/
