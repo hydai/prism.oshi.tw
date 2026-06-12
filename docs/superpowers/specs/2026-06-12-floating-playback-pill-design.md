@@ -2,6 +2,9 @@
 
 Date: 2026-06-12
 Status: Approved
+Updated: 2026-06-12 — pill is now always visible (originally it only
+appeared when the player scrolled out of view; the IntersectionObserver
+toggle was removed at the user's request).
 
 ## Problem
 
@@ -17,7 +20,7 @@ internally scrolling table, so the player and time stay pinned.
 ## Decision
 
 Add a floating pill, fixed to the bottom-right corner of the
-viewport, that appears only when the player is scrolled out of view.
+viewport, always visible while a stream is loaded.
 
 Content (top to bottom):
 
@@ -37,10 +40,9 @@ Clicking the pill scrolls back to the player (`scrollIntoView`).
     `onClick: () => void`
   - Styling: `fixed bottom-4 right-4 z-30`, white card, shadow
 - StreamDetail integration:
-  - `playerBoxRef` on the player wrapper div
-  - `IntersectionObserver` (viewport root) toggles a
-    `playerVisible` state
-  - Pill renders only when `!playerVisible`
+  - `playerBoxRef` on the player wrapper div (scroll target for the
+    pill's click action)
+  - Pill renders unconditionally once the stream detail is loaded
   - Data reuses the existing 500 ms `currentTime` polling and
     `detail.performances[selectedIndex]` — no new polling, no new API
 

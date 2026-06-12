@@ -257,7 +257,6 @@ export default function StreamDetail({ user }: { user: AuthUser }) {
   const playerRef = useRef<YouTubePlayerHandle>(null);
   const playerBoxRef = useRef<HTMLDivElement>(null);
   const [currentTime, setCurrentTime] = useState(0);
-  const [playerVisible, setPlayerVisible] = useState(true);
 
   // --- New state for navigation & stamp features ---
   const [allStreams, setAllStreams] = useState<Stream[]>([]);
@@ -287,19 +286,6 @@ export default function StreamDetail({ user }: { user: AuthUser }) {
     }, 500);
     return () => clearInterval(interval);
   }, []);
-
-  // --- Show floating pill when the player scrolls out of view ---
-  // Depends on `detail`: the player box only mounts after the stream loads.
-  useEffect(() => {
-    const el = playerBoxRef.current;
-    if (!el) return;
-    const observer = new IntersectionObserver((entries) => {
-      const entry = entries[0];
-      if (entry) setPlayerVisible(entry.isIntersecting);
-    });
-    observer.observe(el);
-    return () => observer.disconnect();
-  }, [detail]);
 
   // --- Fetch all streams for prev/next navigation ---
   useEffect(() => {
@@ -851,14 +837,12 @@ export default function StreamDetail({ user }: { user: AuthUser }) {
         </div>
       </div>
 
-      {/* Floating playback time while the player is scrolled away */}
-      {!playerVisible && (
-        <FloatingPlaybackPill
-          currentTime={currentTime}
-          perf={selectedIndex >= 0 ? detail.performances[selectedIndex] ?? null : null}
-          onClick={() => playerBoxRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' })}
-        />
-      )}
+      {/* Floating playback time pill (always visible; click scrolls back to the player) */}
+      <FloatingPlaybackPill
+        currentTime={currentTime}
+        perf={selectedIndex >= 0 ? detail.performances[selectedIndex] ?? null : null}
+        onClick={() => playerBoxRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' })}
+      />
 
       {/* Keyboard shortcut hints */}
       <div className="mt-3 flex flex-wrap gap-x-4 gap-y-1 text-xs text-slate-400">
