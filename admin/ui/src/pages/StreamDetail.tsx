@@ -6,6 +6,10 @@ import StatusBadge from '../components/StatusBadge';
 import { YouTubePlayer } from '../components/YouTubePlayer';
 import type { YouTubePlayerHandle } from '../components/YouTubePlayer';
 import { parseTextToSongs, formatSongList } from '../../../shared/parse';
+import { fetchItunesDuration, summarizeDurationOutcome } from '../lib/itunes';
+import type { OutcomeTone } from '../lib/itunes';
+import { FetchLogPanel } from '../components/FetchLogPanel';
+import type { FetchLogEntry } from '../components/FetchLogPanel';
 
 // --- Helpers ---
 
@@ -257,12 +261,19 @@ export default function StreamDetail({ user }: { user: AuthUser }) {
   const [selectedIndex, setSelectedIndex] = useState(-1);
   const [showAddModal, setShowAddModal] = useState(false);
   const [isFetchingAll, setIsFetchingAll] = useState(false);
+  const [fetchLog, setFetchLog] = useState<FetchLogEntry[]>([]);
+  const fetchLogKeyRef = useRef(0);
 
   const isCurator = user.role === 'curator';
 
   const showToast = useCallback((message: string, isError = false) => {
     toastKeyRef.current += 1;
     setToast({ message, isError, key: toastKeyRef.current });
+  }, []);
+
+  const appendFetchLog = useCallback((title: string, tone: OutcomeTone, text: string) => {
+    fetchLogKeyRef.current += 1;
+    setFetchLog((prev) => [{ key: fetchLogKeyRef.current, title, tone, text }, ...prev]);
   }, []);
 
   // --- Poll current playback time ---
@@ -550,24 +561,38 @@ export default function StreamDetail({ user }: { user: AuthUser }) {
 
   const fetchDuration = useCallback(async () => {
     if (selectedIndex < 0 || !detail) return;
+    if (isFetchingAll) {
+      showToast('Batch fetch in progress — wait for it to finish', true);
+      return;
+    }
     const perf = detail.performances[selectedIndex];
     if (!perf) return;
+    if (perf.endTimestamp !== null) {
+      showToast(`${perf.title}: already has end timestamp`);
+      return;
+    }
 
     showToast(`Fetching duration for ${perf.title}...`);
-    try {
-      const result = await api.fetchPerformanceDuration(perf.id);
-      if (result.endTimestamp !== null) {
-        updatePerformance(selectedIndex, { endTimestamp: result.endTimestamp });
-        showToast(`${perf.title}: ${result.durationSec}s (${result.matchConfidence})`);
-      } else if (result.durationSec) {
-        showToast(`${perf.title}: ${result.durationSec}s (already has end timestamp)`);
-      } else {
-        showToast(`${perf.title}: no match on iTunes`, true);
-      }
-    } catch (err: unknown) {
-      showToast(err instanceof Error ? err.message : 'Fetch failed', true);
+    const outcome = await fetchItunesDuration(perf.originalArtist, perf.title);
+    const summary = summarizeDurationOutcome(outcome);
+    appendFetchLog(perf.title, summary.tone, summary.text);
+
+    if (outcome.status !== 'found') {
+      showToast(`${perf.title}: ${summary.text}`, true);
+      return;
     }
-  }, [detail, selectedIndex, showToast, updatePerformance]);
+
+    const endTimestamp = perf.timestamp + outcome.durationSec;
+    try {
+      await api.updatePerformanceTimestamps(perf.id, { endTimestamp });
+      updatePerformance(selectedIndex, { endTimestamp });
+      showToast(`${perf.title}: ${outcome.durationSec}s (${outcome.matchConfidence})`);
+    } catch (err: unknown) {
+      const msg = err instanceof Error ? err.message : 'Failed to save end timestamp';
+      appendFetchLog(perf.title, 'error', `Found ${outcome.durationSec}s but saving failed: ${msg}`);
+      showToast(msg, true);
+    }
+  }, [detail, selectedIndex, isFetchingAll, showToast, updatePerformance, appendFetchLog]);
 
   const fetchAllDurations = useCallback(async () => {
     if (isFetchingAll || !detail) return;
@@ -583,31 +608,57 @@ export default function StreamDetail({ user }: { user: AuthUser }) {
     let fetched = 0;
     let noMatch = 0;
     let errors = 0;
+    let consecutiveErrors = 0;
+    let aborted = false;
 
     for (let i = 0; i < missing.length; i++) {
       const { perf, index } = missing[i]!;
       showToast(`Fetching ${i + 1}/${missing.length}: ${perf.title}...`);
 
-      try {
-        const result = await api.fetchPerformanceDuration(perf.id);
-        if (result.endTimestamp !== null) {
-          fetched++;
-          updatePerformance(index, { endTimestamp: result.endTimestamp });
-        } else {
-          noMatch++;
-        }
-      } catch {
-        errors++;
-      }
+      const outcome = await fetchItunesDuration(perf.originalArtist, perf.title);
+      const summary = summarizeDurationOutcome(outcome);
+      appendFetchLog(perf.title, summary.tone, summary.text);
 
-      if (i < missing.length - 1) {
-        await new Promise(r => setTimeout(r, 1000));
+      if (outcome.status === 'found') {
+        consecutiveErrors = 0;
+        const endTimestamp = perf.timestamp + outcome.durationSec;
+        try {
+          await api.updatePerformanceTimestamps(perf.id, { endTimestamp });
+          updatePerformance(index, { endTimestamp });
+          fetched++;
+        } catch (err: unknown) {
+          errors++;
+          const msg = err instanceof Error ? err.message : 'unknown error';
+          appendFetchLog(perf.title, 'error', `Found ${outcome.durationSec}s but saving failed: ${msg}`);
+        }
+      } else if (outcome.status === 'no-match') {
+        consecutiveErrors = 0;
+        noMatch++;
+      } else if (outcome.status === 'rate-limited') {
+        aborted = true;
+        appendFetchLog(perf.title, 'error',
+          `Batch stopped at ${i + 1}/${missing.length} — wait ${outcome.retryAfterSec ?? '~60'}s, then press F to fetch the remaining songs.`);
+        break;
+      } else {
+        errors++;
+        consecutiveErrors++;
+        if (consecutiveErrors >= 3) {
+          aborted = true;
+          appendFetchLog(perf.title, 'error',
+            `Batch stopped at ${i + 1}/${missing.length} after 3 consecutive request failures — likely a network issue or Apple rate limiting this IP. Wait ~1 min, then press F to fetch the remaining songs.`);
+          break;
+        }
       }
     }
 
     setIsFetchingAll(false);
-    showToast(`Fetched ${fetched}/${missing.length}, ${noMatch} no match, ${errors} errors`);
-  }, [detail, isFetchingAll, showToast, updatePerformance]);
+    showToast(
+      aborted
+        ? `Stopped by iTunes errors — ${fetched} saved before stopping, see fetch log`
+        : `Fetched ${fetched}/${missing.length}, ${noMatch} no match, ${errors} errors — see fetch log`,
+      aborted,
+    );
+  }, [detail, isFetchingAll, showToast, updatePerformance, appendFetchLog]);
 
   const handleAddSong = useCallback(async (title: string, artist: string) => {
     if (!streamId || !playerRef.current) return;
@@ -808,6 +859,9 @@ export default function StreamDetail({ user }: { user: AuthUser }) {
           <kbd className="rounded border border-slate-300 bg-slate-100 px-1 font-mono">&rarr;</kbd>{' '}Seek &plusmn;5s
         </span>
       </div>
+
+      {/* iTunes duration fetch log */}
+      <FetchLogPanel entries={fetchLog} onClear={() => setFetchLog([])} />
 
       {/* Performances header */}
       <div className="mt-6 flex items-center justify-between">

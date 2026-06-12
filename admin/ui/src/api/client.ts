@@ -13,7 +13,6 @@ import type {
   StampPerformance,
   StreamWithPending,
   StampStats,
-  FetchDurationResponse,
   CreateStampPerformanceBody,
   UpdateTimestampsBody,
   UpdateStreamBody,
@@ -205,11 +204,6 @@ export const api = {
   clearAllEndTimestamps: (streamId: string) =>
     request<{ ok: boolean; cleared: number }>(`/api/streams/${streamId}/end-timestamps`, {
       method: 'DELETE',
-    }),
-
-  fetchPerformanceDuration: (perfId: string) =>
-    request<FetchDurationResponse>(`/api/performances/${perfId}/fetch-duration`, {
-      method: 'POST',
     }),
 
   // Stamp editor

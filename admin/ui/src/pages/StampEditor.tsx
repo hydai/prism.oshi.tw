@@ -4,6 +4,10 @@ import { api } from '../api/client';
 import { YouTubePlayer } from '../components/YouTubePlayer';
 import type { YouTubePlayerHandle } from '../components/YouTubePlayer';
 import { parseTextToSongs, formatSongList } from '../../../shared/parse';
+import { fetchItunesDuration, summarizeDurationOutcome } from '../lib/itunes';
+import type { OutcomeTone } from '../lib/itunes';
+import { FetchLogPanel } from '../components/FetchLogPanel';
+import type { FetchLogEntry } from '../components/FetchLogPanel';
 
 // --- Helpers ---
 
@@ -345,6 +349,8 @@ export default function StampEditor({ user }: { user: AuthUser }) {
 
   // Fetch-all state
   const [isFetchingAll, setIsFetchingAll] = useState(false);
+  const [fetchLog, setFetchLog] = useState<FetchLogEntry[]>([]);
+  const fetchLogKeyRef = useRef(0);
 
   const playerRef = useRef<YouTubePlayerHandle>(null);
   const [currentTime, setCurrentTime] = useState(0);
@@ -356,6 +362,11 @@ export default function StampEditor({ user }: { user: AuthUser }) {
   const showToast = useCallback((message: string, isError = false) => {
     toastKeyRef.current += 1;
     setToast({ message, isError, key: toastKeyRef.current });
+  }, []);
+
+  const appendFetchLog = useCallback((title: string, tone: OutcomeTone, text: string) => {
+    fetchLogKeyRef.current += 1;
+    setFetchLog((prev) => [{ key: fetchLogKeyRef.current, title, tone, text }, ...prev]);
   }, []);
 
   // --- Poll current playback time ---
@@ -646,30 +657,44 @@ export default function StampEditor({ user }: { user: AuthUser }) {
   // --- Fetch duration from iTunes (Step 5) ---
   const fetchDuration = useCallback(async () => {
     if (selectedIndex < 0) return;
+    if (isFetchingAll) {
+      showToast('Batch fetch in progress — wait for it to finish', true);
+      return;
+    }
     const perf = performances[selectedIndex];
     if (!perf) return;
+    if (perf.endTimestamp !== null) {
+      showToast(`${perf.title}: already has end timestamp`);
+      return;
+    }
 
     showToast(`Fetching duration for ${perf.title}...`);
-    try {
-      const result = await api.fetchPerformanceDuration(perf.id);
-      if (result.endTimestamp !== null) {
-        setPerformances((prev) =>
-          prev.map((p, i) =>
-            i === selectedIndex ? { ...p, endTimestamp: result.endTimestamp } : p,
-          ),
-        );
-        showToast(`${perf.title}: ${result.durationSec}s (${result.matchConfidence})`);
-        loadStats();
-        loadStreams();
-      } else if (result.durationSec) {
-        showToast(`${perf.title}: ${result.durationSec}s (already has end timestamp)`);
-      } else {
-        showToast(`${perf.title}: no match on iTunes`, true);
-      }
-    } catch (err: unknown) {
-      showToast(err instanceof Error ? err.message : 'Fetch failed', true);
+    const outcome = await fetchItunesDuration(perf.originalArtist, perf.title);
+    const summary = summarizeDurationOutcome(outcome);
+    appendFetchLog(perf.title, summary.tone, summary.text);
+
+    if (outcome.status !== 'found') {
+      showToast(`${perf.title}: ${summary.text}`, true);
+      return;
     }
-  }, [performances, selectedIndex, showToast, loadStats, loadStreams]);
+
+    const endTimestamp = perf.timestamp + outcome.durationSec;
+    try {
+      await api.updatePerformanceTimestamps(perf.id, { endTimestamp });
+      setPerformances((prev) =>
+        prev.map((p, i) =>
+          i === selectedIndex ? { ...p, endTimestamp } : p,
+        ),
+      );
+      showToast(`${perf.title}: ${outcome.durationSec}s (${outcome.matchConfidence})`);
+      loadStats();
+      loadStreams();
+    } catch (err: unknown) {
+      const msg = err instanceof Error ? err.message : 'Failed to save end timestamp';
+      appendFetchLog(perf.title, 'error', `Found ${outcome.durationSec}s but saving failed: ${msg}`);
+      showToast(msg, true);
+    }
+  }, [performances, selectedIndex, isFetchingAll, showToast, loadStats, loadStreams, appendFetchLog]);
 
   // --- Fetch all missing durations (Step 6) ---
   const fetchAllDurations = useCallback(async () => {
@@ -686,38 +711,63 @@ export default function StampEditor({ user }: { user: AuthUser }) {
     let fetched = 0;
     let noMatch = 0;
     let errors = 0;
+    let consecutiveErrors = 0;
+    let aborted = false;
 
     for (let i = 0; i < missing.length; i++) {
       const { perf, index } = missing[i]!;
       showToast(`Fetching ${i + 1}/${missing.length}: ${perf.title}...`);
 
-      try {
-        const result = await api.fetchPerformanceDuration(perf.id);
-        if (result.endTimestamp !== null) {
-          fetched++;
+      const outcome = await fetchItunesDuration(perf.originalArtist, perf.title);
+      const summary = summarizeDurationOutcome(outcome);
+      appendFetchLog(perf.title, summary.tone, summary.text);
+
+      if (outcome.status === 'found') {
+        consecutiveErrors = 0;
+        const endTimestamp = perf.timestamp + outcome.durationSec;
+        try {
+          await api.updatePerformanceTimestamps(perf.id, { endTimestamp });
           setPerformances((prev) =>
             prev.map((p, j) =>
-              j === index ? { ...p, endTimestamp: result.endTimestamp } : p,
+              j === index ? { ...p, endTimestamp } : p,
             ),
           );
-        } else {
-          noMatch++;
+          fetched++;
+        } catch (err: unknown) {
+          errors++;
+          const msg = err instanceof Error ? err.message : 'unknown error';
+          appendFetchLog(perf.title, 'error', `Found ${outcome.durationSec}s but saving failed: ${msg}`);
         }
-      } catch {
+      } else if (outcome.status === 'no-match') {
+        consecutiveErrors = 0;
+        noMatch++;
+      } else if (outcome.status === 'rate-limited') {
+        aborted = true;
+        appendFetchLog(perf.title, 'error',
+          `Batch stopped at ${i + 1}/${missing.length} — wait ${outcome.retryAfterSec ?? '~60'}s, then press F to fetch the remaining songs.`);
+        break;
+      } else {
         errors++;
-      }
-
-      // 1s delay between calls to respect iTunes rate limits
-      if (i < missing.length - 1) {
-        await new Promise((r) => setTimeout(r, 1000));
+        consecutiveErrors++;
+        if (consecutiveErrors >= 3) {
+          aborted = true;
+          appendFetchLog(perf.title, 'error',
+            `Batch stopped at ${i + 1}/${missing.length} after 3 consecutive request failures — likely a network issue or Apple rate limiting this IP. Wait ~1 min, then press F to fetch the remaining songs.`);
+          break;
+        }
       }
     }
 
     setIsFetchingAll(false);
     loadStats();
     loadStreams();
-    showToast(`Fetched ${fetched}/${missing.length}, ${noMatch} no match, ${errors} errors`);
-  }, [performances, isFetchingAll, showToast, loadStats, loadStreams]);
+    showToast(
+      aborted
+        ? `Stopped by iTunes errors — ${fetched} saved before stopping, see fetch log`
+        : `Fetched ${fetched}/${missing.length}, ${noMatch} no match, ${errors} errors — see fetch log`,
+      aborted,
+    );
+  }, [performances, isFetchingAll, showToast, loadStats, loadStreams, appendFetchLog]);
 
   // --- Keyboard shortcuts ---
 
@@ -925,6 +975,9 @@ export default function StampEditor({ user }: { user: AuthUser }) {
                 Seek &plusmn;5s
               </span>
             </div>
+
+            {/* iTunes duration fetch log */}
+            <FetchLogPanel entries={fetchLog} onClear={() => setFetchLog([])} />
 
             {/* Stamp stats */}
             {stampStats && (
