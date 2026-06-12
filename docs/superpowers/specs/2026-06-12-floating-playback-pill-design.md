@@ -4,7 +4,9 @@ Date: 2026-06-12
 Status: Approved
 Updated: 2026-06-12 — pill is now always visible (originally it only
 appeared when the player scrolled out of view; the IntersectionObserver
-toggle was removed at the user's request).
+toggle was removed at the user's request). Also added to StampEditor as
+a non-clickable variant (`onClick` is now optional; without it the pill
+renders as a plain div, since StampEditor's player is always pinned).
 
 ## Problem
 
@@ -51,7 +53,9 @@ Clicking the pill scrolls back to the player (`scrollIntoView`).
 - No row selected → pill shows the time line only
 - Modals (`z-40`) cover the pill (`z-30`) — intended
 - Toast is bottom-center `z-50` — no spatial overlap
-- StampEditor: not included; its player never scrolls out of view
+- StampEditor: included as a non-clickable pill (player is always
+  pinned, so there is nothing to scroll back to); renders only when a
+  stream is selected
 
 ## Verification
 

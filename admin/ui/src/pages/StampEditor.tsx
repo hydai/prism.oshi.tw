@@ -8,6 +8,7 @@ import { fetchItunesDuration, summarizeDurationOutcome } from '../lib/itunes';
 import type { OutcomeTone } from '../lib/itunes';
 import { FetchLogPanel } from '../components/FetchLogPanel';
 import type { FetchLogEntry } from '../components/FetchLogPanel';
+import { FloatingPlaybackPill } from '../components/FloatingPlaybackPill';
 
 // --- Helpers ---
 
@@ -941,6 +942,12 @@ export default function StampEditor({ user }: { user: AuthUser }) {
               </span>
               <span className="text-slate-400">current</span>
             </div>
+
+            {/* Floating playback time pill (non-clickable: the player is always pinned here) */}
+            <FloatingPlaybackPill
+              currentTime={currentTime}
+              perf={selectedIndex >= 0 ? performances[selectedIndex] ?? null : null}
+            />
 
             {/* Keyboard shortcuts hint */}
             <div className="flex flex-wrap gap-x-4 gap-y-1 text-xs text-slate-400">

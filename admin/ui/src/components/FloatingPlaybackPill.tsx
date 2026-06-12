@@ -7,7 +7,8 @@ interface PillPerformance {
 interface Props {
   currentTime: number;
   perf: PillPerformance | null;
-  onClick: () => void;
+  /** When provided, the pill is a button (e.g. scroll back to the player). */
+  onClick?: () => void;
 }
 
 function formatTimestamp(sec: number): string {
@@ -19,13 +20,12 @@ function formatTimestamp(sec: number): string {
   return `${m}:${String(s).padStart(2, '0')}`;
 }
 
+const baseClass =
+  'fixed bottom-4 right-4 z-30 rounded-lg border border-slate-200 bg-white px-4 py-3 text-left shadow-lg';
+
 export function FloatingPlaybackPill({ currentTime, perf, onClick }: Props) {
-  return (
-    <button
-      onClick={onClick}
-      title="Back to player"
-      className="fixed bottom-4 right-4 z-30 rounded-lg border border-slate-200 bg-white px-4 py-3 text-left shadow-lg transition-shadow hover:shadow-xl"
-    >
+  const content = (
+    <>
       <div className="flex items-center gap-2">
         <span className="text-xs text-slate-400">&#9654;</span>
         <span className="font-mono text-lg font-semibold text-slate-800">
@@ -43,6 +43,19 @@ export function FloatingPlaybackPill({ currentTime, perf, onClick }: Props) {
           </div>
         </>
       )}
-    </button>
+    </>
   );
+
+  if (onClick) {
+    return (
+      <button
+        onClick={onClick}
+        title="Back to player"
+        className={`${baseClass} transition-shadow hover:shadow-xl`}
+      >
+        {content}
+      </button>
+    );
+  }
+  return <div className={baseClass}>{content}</div>;
 }
