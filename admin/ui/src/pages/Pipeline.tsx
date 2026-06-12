@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import type {
   AuthUser,
+  CandidateComment,
   DiscoveredStream,
   ExtractResponse,
   PasteImportParsedSong,
@@ -170,6 +171,81 @@ function DiscoverTab() {
             </tbody>
           </table>
         </div>
+      )}
+    </div>
+  );
+}
+
+// --- Candidate Card ---
+
+function CandidateCard({
+  candidate: c,
+  isActive,
+  onUse,
+}: {
+  candidate: CandidateComment;
+  isActive: boolean;
+  onUse: () => void;
+}) {
+  const [expanded, setExpanded] = useState(false);
+  const lineCount = c.text.split('\n').length;
+  const isLong = lineCount > 6 || c.text.length > 300;
+
+  return (
+    <div
+      className={`rounded-lg border p-3 ${
+        isActive ? 'border-blue-500 bg-blue-50' : 'border-slate-200 bg-white'
+      }`}
+    >
+      <div className="flex items-start justify-between gap-2">
+        <div className="min-w-0">
+          <span className="text-sm font-medium text-slate-700">{c.author}</span>
+          <div className="mt-0.5 flex items-center gap-2 text-xs text-slate-500">
+            <span>{c.likes} likes</span>
+            <span>{c.timestampCount} ts</span>
+            {c.isPinned && (
+              <span className="inline-flex rounded-full bg-amber-100 px-1.5 py-0.5 text-xs font-medium text-amber-700">
+                PIN
+              </span>
+            )}
+          </div>
+        </div>
+        {isActive ? (
+          <span className="shrink-0 rounded bg-blue-100 px-2 py-1 text-xs font-medium text-blue-700">
+            Active
+          </span>
+        ) : (
+          <button
+            onClick={onUse}
+            className="shrink-0 rounded bg-blue-100 px-2 py-1 text-xs font-medium text-blue-700 hover:bg-blue-200"
+          >
+            Use This
+          </button>
+        )}
+      </div>
+      <div className="relative">
+        <pre
+          className={`mt-2 whitespace-pre-wrap text-xs text-slate-500 ${
+            expanded ? 'max-h-[60vh] overflow-y-auto' : 'max-h-28 overflow-hidden'
+          }`}
+        >
+          {c.text}
+        </pre>
+        {!expanded && isLong && (
+          <div
+            className={`pointer-events-none absolute inset-x-0 bottom-0 h-8 bg-gradient-to-t to-transparent ${
+              isActive ? 'from-blue-50' : 'from-white'
+            }`}
+          />
+        )}
+      </div>
+      {isLong && (
+        <button
+          onClick={() => setExpanded((v) => !v)}
+          className="mt-1 text-xs font-medium text-blue-600 hover:underline"
+        >
+          {expanded ? '▲ Collapse' : `▼ Show all ${lineCount} lines`}
+        </button>
       )}
     </div>
   );
@@ -347,7 +423,7 @@ function ExtractTab() {
         </div>
 
         {/* Right column: Candidates panel */}
-        <div className="w-80 shrink-0">
+        <div className="w-96 shrink-0">
           {!extractResult && !loading ? (
             <div className="rounded-lg border border-dashed border-slate-300 bg-slate-50 p-6 text-center text-sm text-slate-400">
               Select a stream and click Extract
@@ -384,49 +460,14 @@ function ExtractTab() {
                   <h4 className="text-xs font-medium uppercase text-slate-500">
                     Candidates ({extractResult.allCandidates.length})
                   </h4>
-                  {extractResult.allCandidates.map((c) => {
-                    const isActive = c.commentId === extractResult.candidateComment?.commentId;
-                    return (
-                      <div
-                        key={c.commentId}
-                        className={`rounded-lg border p-3 ${
-                          isActive
-                            ? 'border-blue-500 bg-blue-50'
-                            : 'border-slate-200 bg-white'
-                        }`}
-                      >
-                        <div className="flex items-start justify-between gap-2">
-                          <div className="min-w-0">
-                            <span className="text-sm font-medium text-slate-700">{c.author}</span>
-                            <div className="mt-0.5 flex items-center gap-2 text-xs text-slate-500">
-                              <span>{c.likes} likes</span>
-                              <span>{c.timestampCount} ts</span>
-                              {c.isPinned && (
-                                <span className="inline-flex rounded-full bg-amber-100 px-1.5 py-0.5 text-xs font-medium text-amber-700">
-                                  PIN
-                                </span>
-                              )}
-                            </div>
-                          </div>
-                          {isActive ? (
-                            <span className="shrink-0 rounded bg-blue-100 px-2 py-1 text-xs font-medium text-blue-700">
-                              Active
-                            </span>
-                          ) : (
-                            <button
-                              onClick={() => handleUseCandidate(c.text, c.author, c.commentId)}
-                              className="shrink-0 rounded bg-blue-100 px-2 py-1 text-xs font-medium text-blue-700 hover:bg-blue-200"
-                            >
-                              Use This
-                            </button>
-                          )}
-                        </div>
-                        <pre className="mt-2 max-h-28 overflow-y-auto whitespace-pre-wrap text-xs text-slate-500">
-                          {c.text.slice(0, 300)}{c.text.length > 300 ? '...' : ''}
-                        </pre>
-                      </div>
-                    );
-                  })}
+                  {extractResult.allCandidates.map((c) => (
+                    <CandidateCard
+                      key={c.commentId}
+                      candidate={c}
+                      isActive={c.commentId === extractResult.candidateComment?.commentId}
+                      onUse={() => handleUseCandidate(c.text, c.author, c.commentId)}
+                    />
+                  ))}
                 </div>
               )}
             </div>
