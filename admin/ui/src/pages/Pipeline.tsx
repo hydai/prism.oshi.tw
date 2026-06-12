@@ -422,8 +422,9 @@ function ExtractTab() {
           )}
         </div>
 
-        {/* Right column: Candidates panel */}
-        <div className="w-96 shrink-0">
+        {/* Right column: Candidates panel — sticky so it follows scroll; self-start
+            un-stretches the flex item, otherwise sticky has no room to slide */}
+        <div className="sticky top-4 max-h-[calc(100vh-2rem)] w-96 shrink-0 self-start overflow-y-auto">
           {!extractResult && !loading ? (
             <div className="rounded-lg border border-dashed border-slate-300 bg-slate-50 p-6 text-center text-sm text-slate-400">
               Select a stream and click Extract
