@@ -10,6 +10,7 @@ import { fetchItunesDuration, summarizeDurationOutcome } from '../lib/itunes';
 import type { OutcomeTone } from '../lib/itunes';
 import { FetchLogPanel } from '../components/FetchLogPanel';
 import type { FetchLogEntry } from '../components/FetchLogPanel';
+import { FloatingPlaybackPill } from '../components/FloatingPlaybackPill';
 
 // --- Helpers ---
 
@@ -254,7 +255,9 @@ export default function StreamDetail({ user }: { user: AuthUser }) {
   const [showPasteImport, setShowPasteImport] = useState(false);
   const toastKeyRef = useRef(0);
   const playerRef = useRef<YouTubePlayerHandle>(null);
+  const playerBoxRef = useRef<HTMLDivElement>(null);
   const [currentTime, setCurrentTime] = useState(0);
+  const [playerVisible, setPlayerVisible] = useState(true);
 
   // --- New state for navigation & stamp features ---
   const [allStreams, setAllStreams] = useState<Stream[]>([]);
@@ -284,6 +287,19 @@ export default function StreamDetail({ user }: { user: AuthUser }) {
     }, 500);
     return () => clearInterval(interval);
   }, []);
+
+  // --- Show floating pill when the player scrolls out of view ---
+  // Depends on `detail`: the player box only mounts after the stream loads.
+  useEffect(() => {
+    const el = playerBoxRef.current;
+    if (!el) return;
+    const observer = new IntersectionObserver((entries) => {
+      const entry = entries[0];
+      if (entry) setPlayerVisible(entry.isIntersecting);
+    });
+    observer.observe(el);
+    return () => observer.disconnect();
+  }, [detail]);
 
   // --- Fetch all streams for prev/next navigation ---
   useEffect(() => {
@@ -823,7 +839,7 @@ export default function StreamDetail({ user }: { user: AuthUser }) {
       </div>
 
       {/* YouTube Player */}
-      <div className="mt-4">
+      <div className="mt-4" ref={playerBoxRef}>
         <YouTubePlayer ref={playerRef} videoId={detail.videoId} />
 
         {/* Current playback time */}
@@ -834,6 +850,15 @@ export default function StreamDetail({ user }: { user: AuthUser }) {
           <span className="text-slate-400">current</span>
         </div>
       </div>
+
+      {/* Floating playback time while the player is scrolled away */}
+      {!playerVisible && (
+        <FloatingPlaybackPill
+          currentTime={currentTime}
+          perf={selectedIndex >= 0 ? detail.performances[selectedIndex] ?? null : null}
+          onClick={() => playerBoxRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' })}
+        />
+      )}
 
       {/* Keyboard shortcut hints */}
       <div className="mt-3 flex flex-wrap gap-x-4 gap-y-1 text-xs text-slate-400">
