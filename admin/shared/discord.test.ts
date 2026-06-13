@@ -95,9 +95,11 @@ void (async () => {
   const g = globalThis as unknown as { fetch: typeof fetch };
   const originalFetch = g.fetch;
   const chunkSizes: number[] = [];
+  let lastAllowedMentions = '';
   g.fetch = ((_url: string | URL, init?: { body?: string }) => {
-    const parsed = JSON.parse(String(init?.body ?? '{"embeds":[]}')) as { embeds: unknown[] };
+    const parsed = JSON.parse(String(init?.body ?? '{"embeds":[]}')) as { embeds: unknown[]; allowed_mentions?: unknown };
     chunkSizes.push(parsed.embeds.length);
+    lastAllowedMentions = JSON.stringify(parsed.allowed_mentions);
     return Promise.resolve({ ok: true, status: 200 });
   }) as unknown as typeof fetch;
   await postDiscord('https://example.test/webhook', Array.from({ length: 23 }, () => newStream));
@@ -106,6 +108,7 @@ void (async () => {
     chunkSizes.length === 3 && chunkSizes[0] === 10 && chunkSizes[1] === 10 && chunkSizes[2] === 3,
     'postDiscord sends all embeds in chunks of 10',
   );
+  check(lastAllowedMentions === '{"parse":[]}', 'postDiscord disables mention parsing (allowed_mentions)');
 
   console.log(`discord.test: ${passed} passed, ${failed} failed`);
   if (failed > 0) process.exitCode = 1;

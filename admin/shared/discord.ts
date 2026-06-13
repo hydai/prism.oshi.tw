@@ -171,7 +171,9 @@ export async function postDiscord(webhookUrl: string | undefined, embeds: Discor
     const res = await fetch(webhookUrl, {
       method: 'POST',
       headers: { 'content-type': 'application/json' },
-      body: JSON.stringify({ embeds: embeds.slice(i, i + EMBEDS_PER_MESSAGE) }),
+      // allowed_mentions disables all pings: embed text carries user-submitted
+      // names/titles, so a crafted "@everyone" must never trigger a notification.
+      body: JSON.stringify({ embeds: embeds.slice(i, i + EMBEDS_PER_MESSAGE), allowed_mentions: { parse: [] } }),
     });
     if (!res.ok) {
       throw new Error(`Discord webhook returned ${res.status}`);
