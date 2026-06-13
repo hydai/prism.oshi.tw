@@ -1220,6 +1220,13 @@ app.patch('/api/nova/vods/:id/status', requireCurator, async (c) => {
     .bind(body.status, reviewedAt, reviewerNote, id)
     .run();
 
+  // Fetch the full updated row once and reuse it for the import gate, the Discord embed,
+  // and the response — avoids a second identical SELECT * on vod_submissions.
+  const updated = await c.env.NOVA_DB
+    .prepare('SELECT * FROM vod_submissions WHERE id = ?')
+    .bind(id)
+    .first<NovaVodSubmission>();
+
   // Import VOD songs into the admin DB as pending records when approved. The gate is
   // shouldImportVod, keyed on whether the video already exists in the admin DB
   // (videoIdExists) rather than the Nova status transition: that keeps a failed import
@@ -1228,13 +1235,8 @@ app.patch('/api/nova/vods/:id/status', requireCurator, async (c) => {
   // via an atomic db.batch(), so a failed import leaves no admin rows and the next retry
   // re-imports cleanly. vod_songs is fetched only once we know we're importing, so a
   // re-approval (common under this existence gate) costs no extra NOVA_DB read.
-  if (body.status === 'approved') {
-    const vod = await c.env.NOVA_DB
-      .prepare('SELECT * FROM vod_submissions WHERE id = ?')
-      .bind(id)
-      .first<NovaVodSubmission>();
-
-    if (vod && shouldImportVod(body.status, await videoIdExists(c.env.DB, vod.video_id, vod.streamer_slug))) {
+  if (body.status === 'approved' && updated) {
+    if (shouldImportVod(body.status, await videoIdExists(c.env.DB, updated.video_id, updated.streamer_slug))) {
       const { results: vodSongs } = await c.env.NOVA_DB
         .prepare('SELECT * FROM vod_songs WHERE vod_submission_id = ? ORDER BY sort_order')
         .bind(id)
@@ -1242,15 +1244,10 @@ app.patch('/api/nova/vods/:id/status', requireCurator, async (c) => {
 
       if (vodSongs.length > 0) {
         const user = c.get('user');
-        await importVodToAdminDb(c.env.DB, vod, vodSongs, user.email);
+        await importVodToAdminDb(c.env.DB, updated, vodSongs, user.email);
       }
     }
   }
-
-  const updated = await c.env.NOVA_DB
-    .prepare('SELECT * FROM vod_submissions WHERE id = ?')
-    .bind(id)
-    .first<NovaVodSubmission>();
 
   const feedbackEmbed = updated ? feedbackEmbedForVod(existing.status, body.status, updated) : null;
   if (feedbackEmbed) {
