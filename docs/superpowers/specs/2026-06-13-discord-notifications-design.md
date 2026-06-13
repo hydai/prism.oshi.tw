@@ -42,12 +42,12 @@
 
 ```
 📝 回饋頻道 (contributor)              📢 公告頻道 (fans)
-   ▲ 審核當下 (review time)              ▲ 上站時 (publish time)
+   ▲ 審核當下 (review time)              ▲ 上站後 (after git push)
    │                                    │
-admin worker                         sync 腳本 (tsx, 本地執行)
-  PATCH /api/nova/submissions/:id/status   tools/sync-registry/sync.ts → diff registry.json
-  PATCH /api/nova/vods/:id/status          tools/sync-data/sync.ts     → diff streams.json
-   │                                    │
+admin worker（即時 post）             sync 腳本 enqueue → 佇列 → announce:flush（push 後 post）
+  PATCH /api/nova/submissions/:id/status   sync-registry.ts → diff registry.json
+  PATCH /api/nova/vods/:id/status          sync-data.ts     → diff streams.json
+   │                                    │     佇列：data/.pending-announce.json（gitignored）
    └─ DISCORD_WEBHOOK_FEEDBACK          └─ DISCORD_WEBHOOK_ANNOUNCE
       (wrangler secret)                    (admin/.dev.vars，本地)
 ```
@@ -58,7 +58,13 @@ admin worker                         sync 腳本 (tsx, 本地執行)
   「退回 + 理由」一定得即時從 worker 發 — 與「審核當下」時點天然吻合。
 - **公告的去重由 git 免費提供**：公告的 diff = 「本次新建的資料」−「磁碟上現有的
   committed JSON」。重跑 sync 而 DB 沒變 → 空 diff → 不會重複公告。**不需要 cursor
-  或 snapshot 表**，version-controlled 的 JSON 本身就是「上次已通知」的狀態快照。
+  或 snapshot 表**：version-controlled 的 JSON 是「**已 commit／已上站**」的狀態快照
+  （**不是**「已通知」——通知是 best-effort，見下一點）。
+- **公告在 push 之後才送出**：sync 期間只把 embeds **enqueue** 到 gitignored 的
+  `data/.pending-announce.json`；資料 commit + push 後，`npm run announce:flush` 才真正
+  POST 到 Discord（已接進 `/sync-data`、`/sync-registry`、`/sync-stale` 的最後一步）。
+  如此粉絲只會收到「真的上站」的資料通知；**flush 失敗則 embeds 留在佇列等下次重送，
+  不會遺失**（這也是為何快照語意是「已上站」而非「已通知」）。
 - **訂閱數放公告／上站時點最乾淨**：訂閱數存在 `registry.json`，它的「上站時刻」就是
   `sync-registry`。同一個腳本可同時發「新 Streamer 上架」與「訂閱數變動」。
 
@@ -68,11 +74,11 @@ admin worker                         sync 腳本 (tsx, 本地執行)
 |---|---|---|---|---|
 | Streamer 投稿**通過** | worker `submissions/:id/status`，`old≠new` 且 `new=approved` | 審核當下 | 📝 回饋 | ✅ streamer X 投稿通過 |
 | Streamer 投稿**退回** | 同上，`new=rejected` | 審核當下 | 📝 回饋 | ❌ X 未通過 · **理由：note** |
-| **新 Streamer 上架** | sync-registry diff（registry.json 出現新 slug） | 上站時 | 📢 公告 | 🎉 新 Streamer 上架：X |
-| **訂閱數變動** | sync-registry diff（slug 的 `subscriber_count` 字串變了） | 上站時 | 📢 公告 | 📈 digest：X 21.8萬→21.9萬 |
+| **新 Streamer 上架** | sync-registry diff（registry.json 出現新 slug） | 上站後 | 📢 公告 | 🎉 新 Streamer 上架：X |
+| **訂閱數變動** | sync-registry diff（slug 的 `subscriber_count` 字串變了） | 上站後 | 📢 公告 | 📈 digest：X 21.8萬→21.9萬 |
 | VOD 投稿**通過** | worker `vods/:id/status`，`old≠new` 且 `new=approved` | 審核當下 | 📝 回饋 | ✅ VOD「title」已收錄 |
 | VOD 投稿**退回** | 同上，`new=rejected` | 審核當下 | 📝 回饋 | ❌「title」未通過 · **理由：note** |
-| **新歌回收錄** | sync-data diff（streams.json 出現新 stream） | 上站時 | 📢 公告 | 🎵 新收錄：X「title」(N 首) |
+| **新歌回收錄** | sync-data：某 stream 首次「已在 streams.json 且 ≥1 首歌」（涵蓋 stream 先核可或歌先核可兩種順序） | 上站後 | 📢 公告 | 🎵 新收錄：X「title」(N 首) |
 
 **核可一筆 VOD 會在兩個時點各發一次**：審核當下發 📝 回饋（給投稿者即時回覆），
 上站時發 📢 公告（給粉絲）。語意各自正確，非重複。
