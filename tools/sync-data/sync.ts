@@ -179,26 +179,45 @@ function querySnapshot(table: 'songs' | 'performances' | 'streams', streamerId: 
 
 const ANNOUNCE_FLOOD_CAP = 10;
 
-/** New streams = streams whose id was not in the previously-published file. */
-export function diffStreams(oldStreams: FanSiteStream[], newStreams: FanSiteStream[]): FanSiteStream[] {
-  const oldIds = new Set(oldStreams.map((s) => s.id));
-  return newStreams.filter((s) => !oldIds.has(s.id));
-}
-
 /** Count distinct songs performed in a given stream. */
 export function songCountForStream(songs: FanSiteSong[], streamId: string): number {
   return songs.filter((song) => song.performances.some((p) => p.streamId === streamId)).length;
 }
 
-function readExistingStreams(streamsPath: string): FanSiteStream[] {
+/** Map of stream id → number of distinct songs published in that stream. */
+export function songCountsByStream(songs: FanSiteSong[]): Map<string, number> {
+  const counts = new Map<string, number>();
+  for (const song of songs) {
+    for (const streamId of new Set(song.performances.map((p) => p.streamId))) {
+      counts.set(streamId, (counts.get(streamId) ?? 0) + 1);
+    }
+  }
+  return counts;
+}
+
+/**
+ * Streams to announce: those whose published song count crossed 0 → ≥1 this sync.
+ * A stream approved before its performances is published with 0 songs, so keying
+ * the announcement on song count (not on a new stream id) defers it until the
+ * songs actually land — and still fires once they do.
+ */
+export function streamsToAnnounce(
+  newStreams: FanSiteStream[],
+  oldSongCounts: Map<string, number>,
+  newSongCounts: Map<string, number>,
+): FanSiteStream[] {
+  return newStreams.filter((s) => (newSongCounts.get(s.id) ?? 0) >= 1 && (oldSongCounts.get(s.id) ?? 0) === 0);
+}
+
+function readExistingSongs(songsPath: string): FanSiteSong[] {
   let raw: string;
   try {
-    raw = fs.readFileSync(streamsPath, 'utf-8');
+    raw = fs.readFileSync(songsPath, 'utf-8');
   } catch (err) {
     if ((err as { code?: string }).code === 'ENOENT') return [];
-    throw err; // corrupt/unreadable streams.json is an operator problem — fail loud rather than announce every stream as new
+    throw err; // corrupt/unreadable songs.json is an operator problem — fail loud rather than announce from a bogus baseline
   }
-  return JSON.parse(raw) as FanSiteStream[];
+  return JSON.parse(raw) as FanSiteSong[];
 }
 
 function streamerDisplayName(slug: string): string {
@@ -263,8 +282,9 @@ async function main(): Promise<void> {
   const songsPath = path.join(dataDir, 'songs.json');
   const streamsPath = path.join(dataDir, 'streams.json');
 
-  // Read the previously-published streams before overwriting, for the announce diff.
-  const oldStreams = readExistingStreams(streamsPath);
+  // Read the previously-published songs before overwriting, to detect streams whose
+  // published song count crosses 0 → ≥1 (the announce trigger).
+  const oldSongs = readExistingSongs(songsPath);
 
   fs.writeFileSync(songsPath, JSON.stringify(songs, null, 2) + '\n', 'utf-8');
   fs.writeFileSync(streamsPath, JSON.stringify(streams, null, 2) + '\n', 'utf-8');
@@ -297,7 +317,7 @@ async function main(): Promise<void> {
   upsertEntry(ROOT, slug, entry);
   console.log(`  stamped ${syncStatePath(ROOT)}`);
 
-  await announceData(slug, diffStreams(oldStreams, streams), songs);
+  await announceData(slug, streamsToAnnounce(streams, songCountsByStream(oldSongs), songCountsByStream(songs)), songs);
 
   console.log('sync-data: done.');
 }
