@@ -15,6 +15,9 @@ import { fileURLToPath } from 'node:url';
 
 import { seedIfMissing } from '../shared/sync-state.ts';
 
+import { newStreamerEmbed, subscriberDigestEmbed, postDiscord, type DiscordEmbed } from '../../admin/shared/discord.ts';
+import { loadAnnounceWebhook } from '../shared/announce.ts';
+
 // --- Paths ---
 
 const __filename = fileURLToPath(import.meta.url);
@@ -152,6 +155,64 @@ function rowToConfig(row: SubmissionRow): StreamerConfig {
   return config;
 }
 
+// --- Announce diff (publish-time, fan channel) ---
+
+interface SubscriberChange {
+  displayName: string;
+  from: string;
+  to: string;
+}
+
+export interface StreamerDiff {
+  newStreamers: StreamerConfig[];
+  subscriberChanges: SubscriberChange[];
+}
+
+/** Diff previously-published streamers vs the freshly-built list. */
+export function diffStreamers(oldStreamers: StreamerConfig[], newStreamers: StreamerConfig[]): StreamerDiff {
+  const oldBySlug = new Map(oldStreamers.map((s) => [s.slug, s]));
+  const result: StreamerDiff = { newStreamers: [], subscriberChanges: [] };
+  for (const s of newStreamers) {
+    const prev = oldBySlug.get(s.slug);
+    if (!prev) {
+      result.newStreamers.push(s);
+    } else if (s.subscriberCount && prev.subscriberCount && s.subscriberCount !== prev.subscriberCount) {
+      result.subscriberChanges.push({ displayName: s.displayName, from: prev.subscriberCount, to: s.subscriberCount });
+    }
+  }
+  return result;
+}
+
+function readExistingStreamers(): StreamerConfig[] {
+  try {
+    const parsed = JSON.parse(fs.readFileSync(REGISTRY_PATH, 'utf-8')) as { streamers?: StreamerConfig[] };
+    return parsed.streamers ?? [];
+  } catch {
+    return [];
+  }
+}
+
+async function announceRegistry(diff: StreamerDiff): Promise<void> {
+  const webhook = loadAnnounceWebhook();
+  if (!webhook) return;
+
+  const embeds: DiscordEmbed[] = [];
+  for (const s of diff.newStreamers) {
+    embeds.push(newStreamerEmbed({ displayName: s.displayName, group: s.group, link: s.socialLinks.youtube ?? s.externalUrl ?? '' }));
+  }
+  if (diff.subscriberChanges.length > 0) {
+    embeds.push(subscriberDigestEmbed(diff.subscriberChanges));
+  }
+  if (embeds.length === 0) return;
+
+  try {
+    await postDiscord(webhook, embeds);
+    console.log(`  📢 announced ${diff.newStreamers.length} new streamer(s), ${diff.subscriberChanges.length} subscriber change(s)`);
+  } catch (err) {
+    console.warn(`  ⚠ Discord announce failed: ${(err as Error).message}`);
+  }
+}
+
 // --- Write output files ---
 
 function writeRegistry(streamers: StreamerConfig[]): void {
@@ -191,7 +252,7 @@ function scaffoldDataDirs(streamers: StreamerConfig[]): void {
 
 // --- Main ---
 
-function main(): void {
+async function main(): Promise<void> {
   console.log('sync-registry: querying Nova DB for approved submissions...');
   const rows = queryNovaDb();
 
@@ -202,6 +263,8 @@ function main(): void {
 
   console.log(`  found ${rows.length} approved streamer(s): ${rows.map((r) => r.slug).join(', ')}`);
 
+  // Read the previously-published registry before writeRegistry overwrites it.
+  const oldStreamers = readExistingStreamers();
   const streamers = rows.map(rowToConfig);
 
   // Fall back to mizuki's theme for streamers with all-#000000 placeholder themes
@@ -219,7 +282,19 @@ function main(): void {
   writeSlugs(streamers);
   scaffoldDataDirs(streamers);
 
+  await announceRegistry(diffStreamers(oldStreamers, streamers));
+
   console.log('sync-registry: done.');
 }
 
-main();
+function isMainScript(): boolean {
+  const entry = process.argv[1] ?? '';
+  return entry.endsWith('tools/sync-registry/sync.ts') || entry.endsWith('tools/sync-registry/sync.js');
+}
+
+if (isMainScript()) {
+  main().catch((err: unknown) => {
+    console.error(err);
+    process.exit(1);
+  });
+}
