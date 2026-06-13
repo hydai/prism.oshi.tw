@@ -11,3 +11,4 @@ Export approved data from admin D1 to the fan-site static JSON:
 5. Run `git diff data/<slug>/songs.json data/<slug>/streams.json` to show what changed
 6. If there are changes, commit with message `data: sync <slug> songs and streams from DB (N songs, M performances, L streams)` using the counts from the sync output, and push
 7. If no changes, say "Data already up to date for <slug>"
+8. After the push (or the no-change message), run `npm run announce:flush` to post any queued fan-channel Discord announcements. This runs *after* push on purpose, so fans are only notified about data that actually went live. It is a no-op when nothing is queued or `DISCORD_WEBHOOK_ANNOUNCE` is unset; on a post failure the items stay queued for the next flush.

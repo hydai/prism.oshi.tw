@@ -15,6 +15,9 @@ import { fileURLToPath } from 'node:url';
 
 import { syncStatePath, upsertEntry, type SyncStateEntry } from '../shared/sync-state.ts';
 
+import { newStreamEmbed, newStreamsSummaryEmbed, type DiscordEmbed } from '../../admin/shared/discord.ts';
+import { enqueueAnnouncements, loadAnnounceWebhook } from '../shared/announce.ts';
+
 // --- Paths ---
 
 const __filename = fileURLToPath(import.meta.url);
@@ -172,9 +175,102 @@ function querySnapshot(table: 'songs' | 'performances' | 'streams', streamerId: 
   return rows[0] ?? { max_ts: null, cnt: 0 };
 }
 
+// --- Announce diff (publish-time, fan channel) ---
+
+const ANNOUNCE_FLOOD_CAP = 10;
+
+/** Map of stream id → number of distinct songs published in that stream. */
+export function songCountsByStream(songs: FanSiteSong[]): Map<string, number> {
+  const counts = new Map<string, number>();
+  for (const song of songs) {
+    for (const streamId of new Set(song.performances.map((p) => p.streamId))) {
+      counts.set(streamId, (counts.get(streamId) ?? 0) + 1);
+    }
+  }
+  return counts;
+}
+
+/**
+ * Streams to announce: those becoming "published with songs" for the first time —
+ * present in streams.json AND having ≥1 song — that were not already published with
+ * songs last sync. Firing on this combined transition handles both approval orders:
+ *   • stream approved before its songs → deferred until the songs land;
+ *   • songs approved before the stream → fires when the stream is finally published
+ *     (its songs were already in songs.json, but the stream wasn't yet in streams.json).
+ */
+export function streamsToAnnounce(
+  newStreams: FanSiteStream[],
+  oldStreamIds: Set<string>,
+  oldSongCounts: Map<string, number>,
+  newSongCounts: Map<string, number>,
+): FanSiteStream[] {
+  return newStreams.filter((s) => {
+    const hasSongsNow = (newSongCounts.get(s.id) ?? 0) >= 1;
+    const wasPublishedWithSongs = oldStreamIds.has(s.id) && (oldSongCounts.get(s.id) ?? 0) >= 1;
+    return hasSongsNow && !wasPublishedWithSongs;
+  });
+}
+
+function readExistingSongs(songsPath: string): FanSiteSong[] {
+  let raw: string;
+  try {
+    raw = fs.readFileSync(songsPath, 'utf-8');
+  } catch (err) {
+    if ((err as { code?: string }).code === 'ENOENT') return [];
+    throw err; // corrupt/unreadable songs.json is an operator problem — fail loud rather than announce from a bogus baseline
+  }
+  return JSON.parse(raw) as FanSiteSong[];
+}
+
+function readExistingStreams(streamsPath: string): FanSiteStream[] {
+  let raw: string;
+  try {
+    raw = fs.readFileSync(streamsPath, 'utf-8');
+  } catch (err) {
+    if ((err as { code?: string }).code === 'ENOENT') return [];
+    throw err; // corrupt/unreadable streams.json is an operator problem — fail loud rather than announce from a bogus baseline
+  }
+  return JSON.parse(raw) as FanSiteStream[];
+}
+
+function streamerDisplayName(slug: string): string {
+  try {
+    const parsed = JSON.parse(fs.readFileSync(path.resolve(ROOT, 'data/registry.json'), 'utf-8')) as {
+      streamers?: Array<{ slug: string; displayName: string }>;
+    };
+    return parsed.streamers?.find((s) => s.slug === slug)?.displayName ?? slug;
+  } catch {
+    return slug;
+  }
+}
+
+// Queue fan announcements for posting after the data is committed + pushed (via
+// `npm run announce:flush`), so fans never get a ping for data that never went live.
+// Gated on the webhook being configured so the feature stays dormant when unset.
+function announceData(slug: string, newStreams: FanSiteStream[], songCounts: Map<string, number>): void {
+  if (newStreams.length === 0 || !loadAnnounceWebhook()) return;
+
+  const displayName = streamerDisplayName(slug);
+  const embeds: DiscordEmbed[] =
+    newStreams.length > ANNOUNCE_FLOOD_CAP
+      ? [newStreamsSummaryEmbed(displayName, newStreams.length)]
+      : newStreams.map((s) =>
+          newStreamEmbed({
+            displayName,
+            streamTitle: s.title,
+            videoId: s.videoId,
+            songCount: songCounts.get(s.id) ?? 0,
+            thumbnailUrl: `https://i.ytimg.com/vi/${s.videoId}/mqdefault.jpg`,
+          }),
+        );
+
+  enqueueAnnouncements(embeds);
+  console.log(`  📥 queued ${newStreams.length} new-stream announcement(s) — posted after push (npm run announce:flush)`);
+}
+
 // --- Main ---
 
-function main(): void {
+async function main(): Promise<void> {
   const slug = process.argv[2];
   if (!slug) {
     console.error('Usage: npx tsx tools/sync-data/sync.ts <streamer-slug>');
@@ -194,6 +290,11 @@ function main(): void {
 
   const songsPath = path.join(dataDir, 'songs.json');
   const streamsPath = path.join(dataDir, 'streams.json');
+
+  // Read the previously-published songs + streams before overwriting, to detect
+  // streams becoming "published with songs" for the first time (the announce trigger).
+  const oldSongs = readExistingSongs(songsPath);
+  const oldStreams = readExistingStreams(streamsPath);
 
   fs.writeFileSync(songsPath, JSON.stringify(songs, null, 2) + '\n', 'utf-8');
   fs.writeFileSync(streamsPath, JSON.stringify(streams, null, 2) + '\n', 'utf-8');
@@ -226,7 +327,21 @@ function main(): void {
   upsertEntry(ROOT, slug, entry);
   console.log(`  stamped ${syncStatePath(ROOT)}`);
 
+  const newSongCounts = songCountsByStream(songs);
+  const toAnnounce = streamsToAnnounce(streams, new Set(oldStreams.map((s) => s.id)), songCountsByStream(oldSongs), newSongCounts);
+  announceData(slug, toAnnounce, newSongCounts);
+
   console.log('sync-data: done.');
 }
 
-main();
+function isMainScript(): boolean {
+  const entry = process.argv[1] ?? '';
+  return entry.endsWith('tools/sync-data/sync.ts') || entry.endsWith('tools/sync-data/sync.js');
+}
+
+if (isMainScript()) {
+  main().catch((err: unknown) => {
+    console.error(err);
+    process.exit(1);
+  });
+}

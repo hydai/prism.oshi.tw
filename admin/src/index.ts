@@ -50,6 +50,7 @@ import {
 import { fetchItunesDuration } from './itunes';
 import { parseTextToSongs } from '../shared/parse';
 import { formatSubscriberCount } from '../shared/format';
+import { feedbackEmbedForSubmission, feedbackEmbedForVod, postDiscord } from '../shared/discord';
 import { discoverStreams, getVideoDetails, fetchComments, findCandidateComment, countTimestamps, fetchChannelInfo } from './youtube';
 import type {
   AuthUser,
@@ -95,6 +96,7 @@ type Bindings = {
   CRYSTAL_DB: D1Database;
   CURATOR_EMAILS: string;
   YOUTUBE_API_KEY: string;
+  DISCORD_WEBHOOK_FEEDBACK?: string; // optional: feature no-ops when the secret is unset
 };
 
 type Variables = {
@@ -1071,6 +1073,15 @@ app.patch('/api/nova/submissions/:id/status', requireCurator, async (c) => {
     .bind(id)
     .first<NovaSubmission>();
 
+  const feedbackEmbed = updated ? feedbackEmbedForSubmission(existing.status, body.status, updated) : null;
+  if (feedbackEmbed) {
+    c.executionCtx.waitUntil(
+      postDiscord(c.env.DISCORD_WEBHOOK_FEEDBACK, [feedbackEmbed]).catch((err) =>
+        console.error('discord feedback notify failed', err),
+      ),
+    );
+  }
+
   return c.json(updated);
 });
 
@@ -1195,9 +1206,9 @@ app.patch('/api/nova/vods/:id/status', requireCurator, async (c) => {
   }
 
   const existing = await c.env.NOVA_DB
-    .prepare('SELECT id FROM vod_submissions WHERE id = ?')
+    .prepare('SELECT id, status FROM vod_submissions WHERE id = ?')
     .bind(id)
-    .first();
+    .first<{ id: string; status: string }>();
 
   if (!existing) return c.json({ error: 'VOD submission not found' }, 404);
 
@@ -1209,8 +1220,10 @@ app.patch('/api/nova/vods/:id/status', requireCurator, async (c) => {
     .bind(body.status, reviewedAt, reviewerNote, id)
     .run();
 
-  // When approved, import VOD songs into admin DB as pending records
-  if (body.status === 'approved') {
+  // On a real transition to approved, import VOD songs into admin DB as pending
+  // records. Gating on the transition (not just body.status) prevents a re-approve
+  // from deleting/recreating already-curated performances via importVodToAdminDb.
+  if (body.status === 'approved' && existing.status !== 'approved') {
     const vod = await c.env.NOVA_DB
       .prepare('SELECT * FROM vod_submissions WHERE id = ?')
       .bind(id)
@@ -1230,6 +1243,15 @@ app.patch('/api/nova/vods/:id/status', requireCurator, async (c) => {
     .prepare('SELECT * FROM vod_submissions WHERE id = ?')
     .bind(id)
     .first<NovaVodSubmission>();
+
+  const feedbackEmbed = updated ? feedbackEmbedForVod(existing.status, body.status, updated) : null;
+  if (feedbackEmbed) {
+    c.executionCtx.waitUntil(
+      postDiscord(c.env.DISCORD_WEBHOOK_FEEDBACK, [feedbackEmbed]).catch((err) =>
+        console.error('discord feedback notify failed', err),
+      ),
+    );
+  }
 
   return c.json(updated);
 });
