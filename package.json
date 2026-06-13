@@ -21,7 +21,8 @@
     "fetch:channel-info": "npx tsx tools/fetch-channel-info/fetch.ts",
     "fetch:channel-info:test": "npx tsx tools/fetch-channel-info/fetch.test.ts",
     "test:announce": "npx tsx tools/shared/announce.test.ts",
-    "sync:registry:test": "npx tsx tools/sync-registry/sync.test.ts"
+    "sync:registry:test": "npx tsx tools/sync-registry/sync.test.ts",
+    "sync:data:test": "npx tsx tools/sync-data/sync.test.ts"
   },
   "keywords": [],
   "author": "",

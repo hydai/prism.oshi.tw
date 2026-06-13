@@ -15,6 +15,9 @@ import { fileURLToPath } from 'node:url';
 
 import { syncStatePath, upsertEntry, type SyncStateEntry } from '../shared/sync-state.ts';
 
+import { newStreamEmbed, newStreamsSummaryEmbed, postDiscord, type DiscordEmbed } from '../../admin/shared/discord.ts';
+import { loadAnnounceWebhook } from '../shared/announce.ts';
+
 // --- Paths ---
 
 const __filename = fileURLToPath(import.meta.url);
@@ -172,9 +175,71 @@ function querySnapshot(table: 'songs' | 'performances' | 'streams', streamerId: 
   return rows[0] ?? { max_ts: null, cnt: 0 };
 }
 
+// --- Announce diff (publish-time, fan channel) ---
+
+const ANNOUNCE_FLOOD_CAP = 10;
+
+/** New streams = streams whose id was not in the previously-published file. */
+export function diffStreams(oldStreams: FanSiteStream[], newStreams: FanSiteStream[]): FanSiteStream[] {
+  const oldIds = new Set(oldStreams.map((s) => s.id));
+  return newStreams.filter((s) => !oldIds.has(s.id));
+}
+
+/** Count distinct songs performed in a given stream. */
+export function songCountForStream(songs: FanSiteSong[], streamId: string): number {
+  return songs.filter((song) => song.performances.some((p) => p.streamId === streamId)).length;
+}
+
+function readExistingStreams(streamsPath: string): FanSiteStream[] {
+  try {
+    return JSON.parse(fs.readFileSync(streamsPath, 'utf-8')) as FanSiteStream[];
+  } catch {
+    return [];
+  }
+}
+
+function streamerDisplayName(slug: string): string {
+  try {
+    const parsed = JSON.parse(fs.readFileSync(path.resolve(ROOT, 'data/registry.json'), 'utf-8')) as {
+      streamers?: Array<{ slug: string; displayName: string }>;
+    };
+    return parsed.streamers?.find((s) => s.slug === slug)?.displayName ?? slug;
+  } catch {
+    return slug;
+  }
+}
+
+async function announceData(slug: string, newStreams: FanSiteStream[], songs: FanSiteSong[]): Promise<void> {
+  const webhook = loadAnnounceWebhook();
+  if (!webhook || newStreams.length === 0) return;
+
+  const displayName = streamerDisplayName(slug);
+  let embeds: DiscordEmbed[];
+  if (newStreams.length > ANNOUNCE_FLOOD_CAP) {
+    embeds = [newStreamsSummaryEmbed(displayName, newStreams.length)];
+  } else {
+    embeds = newStreams.map((s) =>
+      newStreamEmbed({
+        displayName,
+        streamTitle: s.title,
+        videoId: s.videoId,
+        songCount: songCountForStream(songs, s.id),
+        thumbnailUrl: `https://i.ytimg.com/vi/${s.videoId}/mqdefault.jpg`,
+      }),
+    );
+  }
+
+  try {
+    await postDiscord(webhook, embeds);
+    console.log(`  📢 announced ${newStreams.length} new stream(s)`);
+  } catch (err) {
+    console.warn(`  ⚠ Discord announce failed: ${(err as Error).message}`);
+  }
+}
+
 // --- Main ---
 
-function main(): void {
+async function main(): Promise<void> {
   const slug = process.argv[2];
   if (!slug) {
     console.error('Usage: npx tsx tools/sync-data/sync.ts <streamer-slug>');
@@ -194,6 +259,9 @@ function main(): void {
 
   const songsPath = path.join(dataDir, 'songs.json');
   const streamsPath = path.join(dataDir, 'streams.json');
+
+  // Read the previously-published streams before overwriting, for the announce diff.
+  const oldStreams = readExistingStreams(streamsPath);
 
   fs.writeFileSync(songsPath, JSON.stringify(songs, null, 2) + '\n', 'utf-8');
   fs.writeFileSync(streamsPath, JSON.stringify(streams, null, 2) + '\n', 'utf-8');
@@ -226,7 +294,19 @@ function main(): void {
   upsertEntry(ROOT, slug, entry);
   console.log(`  stamped ${syncStatePath(ROOT)}`);
 
+  await announceData(slug, diffStreams(oldStreams, streams), songs);
+
   console.log('sync-data: done.');
 }
 
-main();
+function isMainScript(): boolean {
+  const entry = process.argv[1] ?? '';
+  return entry.endsWith('tools/sync-data/sync.ts') || entry.endsWith('tools/sync-data/sync.js');
+}
+
+if (isMainScript()) {
+  main().catch((err: unknown) => {
+    console.error(err);
+    process.exit(1);
+  });
+}
