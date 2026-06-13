@@ -3,7 +3,7 @@ import * as fs from 'node:fs';
 import * as os from 'node:os';
 import * as path from 'node:path';
 
-import { clearPendingAnnouncements, enqueueAnnouncements, parseDevVar, readPendingAnnouncements } from './announce.ts';
+import { clearPendingAnnouncements, enqueueAnnouncements, parseDevVar, readPendingAnnouncements, setPendingAnnouncements } from './announce.ts';
 
 function test(name: string, fn: () => void): void {
   try {
@@ -50,6 +50,16 @@ test('pending queue: enqueue of an empty list is a no-op (no file created)', () 
   const tmp = path.join(os.tmpdir(), `pending-announce-empty-${process.pid}.json`);
   fs.rmSync(tmp, { force: true });
   enqueueAnnouncements([], tmp);
+  assert.equal(fs.existsSync(tmp), false);
+});
+
+test('pending queue: setPendingAnnouncements overwrites, and removes the file when empty', () => {
+  const tmp = path.join(os.tmpdir(), `pending-announce-set-${process.pid}.json`);
+  fs.rmSync(tmp, { force: true });
+  enqueueAnnouncements([{ title: 'a' }, { title: 'b' }, { title: 'c' }], tmp);
+  setPendingAnnouncements([{ title: 'b' }, { title: 'c' }], tmp); // checkpoint: drop the already-posted 'a'
+  assert.deepEqual(readPendingAnnouncements(tmp), [{ title: 'b' }, { title: 'c' }]);
+  setPendingAnnouncements([], tmp); // empty → remove file
   assert.equal(fs.existsSync(tmp), false);
 });
 

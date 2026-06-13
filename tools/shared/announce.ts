@@ -64,10 +64,18 @@ export function readPendingAnnouncements(pendingPath: string = PENDING_PATH): Di
   }
 }
 
+/** Overwrite the queue with exactly these embeds (removes the file when empty). */
+export function setPendingAnnouncements(embeds: DiscordEmbed[], pendingPath: string = PENDING_PATH): void {
+  if (embeds.length === 0) {
+    fs.rmSync(pendingPath, { force: true });
+    return;
+  }
+  fs.writeFileSync(pendingPath, JSON.stringify({ embeds }, null, 2) + '\n', 'utf-8');
+}
+
 export function enqueueAnnouncements(embeds: DiscordEmbed[], pendingPath: string = PENDING_PATH): void {
   if (embeds.length === 0) return;
-  const merged = [...readPendingAnnouncements(pendingPath), ...embeds];
-  fs.writeFileSync(pendingPath, JSON.stringify({ embeds: merged }, null, 2) + '\n', 'utf-8');
+  setPendingAnnouncements([...readPendingAnnouncements(pendingPath), ...embeds], pendingPath);
 }
 
 export function clearPendingAnnouncements(pendingPath: string = PENDING_PATH): void {

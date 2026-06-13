@@ -10,8 +10,8 @@
  * Usage: npx tsx tools/announce-flush/flush.ts
  */
 
-import { postDiscord } from '../../admin/shared/discord.ts';
-import { clearPendingAnnouncements, loadAnnounceWebhook, readPendingAnnouncements } from '../shared/announce.ts';
+import { batchEmbeds, postDiscord } from '../../admin/shared/discord.ts';
+import { clearPendingAnnouncements, loadAnnounceWebhook, readPendingAnnouncements, setPendingAnnouncements } from '../shared/announce.ts';
 
 async function main(): Promise<void> {
   const embeds = readPendingAnnouncements();
@@ -26,14 +26,26 @@ async function main(): Promise<void> {
     return;
   }
 
-  try {
-    await postDiscord(webhook, embeds);
-    clearPendingAnnouncements();
-    console.log(`announce-flush: posted ${embeds.length} announcement embed(s) to the fan channel.`);
-  } catch (err) {
-    console.warn(`announce-flush: post FAILED (${(err as Error).message}); ${embeds.length} embed(s) remain queued for the next flush.`);
-    process.exitCode = 1;
+  // Post one message-batch at a time and checkpoint the queue after each success, so a
+  // failure on a later batch never re-sends (and duplicates) batches already delivered.
+  const batches = batchEmbeds(embeds);
+  let posted = 0;
+  for (let i = 0; i < batches.length; i++) {
+    try {
+      await postDiscord(webhook, batches[i]);
+    } catch (err) {
+      const remaining = batches.slice(i).flat();
+      setPendingAnnouncements(remaining);
+      console.warn(
+        `announce-flush: posted ${posted} embed(s), then batch ${i + 1}/${batches.length} FAILED (${(err as Error).message}); ${remaining.length} embed(s) remain queued for the next flush.`,
+      );
+      process.exitCode = 1;
+      return;
+    }
+    posted += batches[i].length;
   }
+  clearPendingAnnouncements();
+  console.log(`announce-flush: posted ${posted} announcement embed(s) to the fan channel.`);
 }
 
 function isMainScript(): boolean {
