@@ -96,7 +96,7 @@ type Bindings = {
   CRYSTAL_DB: D1Database;
   CURATOR_EMAILS: string;
   YOUTUBE_API_KEY: string;
-  DISCORD_WEBHOOK_FEEDBACK: string;
+  DISCORD_WEBHOOK_FEEDBACK?: string; // optional: feature no-ops when the secret is unset
 };
 
 type Variables = {
@@ -1220,8 +1220,10 @@ app.patch('/api/nova/vods/:id/status', requireCurator, async (c) => {
     .bind(body.status, reviewedAt, reviewerNote, id)
     .run();
 
-  // When approved, import VOD songs into admin DB as pending records
-  if (body.status === 'approved') {
+  // On a real transition to approved, import VOD songs into admin DB as pending
+  // records. Gating on the transition (not just body.status) prevents a re-approve
+  // from deleting/recreating already-curated performances via importVodToAdminDb.
+  if (body.status === 'approved' && existing.status !== 'approved') {
     const vod = await c.env.NOVA_DB
       .prepare('SELECT * FROM vod_submissions WHERE id = ?')
       .bind(id)
