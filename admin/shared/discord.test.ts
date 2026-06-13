@@ -90,6 +90,23 @@ void (async () => {
   const noop = await postDiscord(undefined, [newStream]);
   check(noop === undefined, 'postDiscord is a no-op when the webhook URL is missing');
 
+  // postDiscord chunks embeds into batches of 10 so a large announcement is never
+  // silently dropped (Discord caps a single message at 10 embeds).
+  const g = globalThis as unknown as { fetch: typeof fetch };
+  const originalFetch = g.fetch;
+  const chunkSizes: number[] = [];
+  g.fetch = ((_url: string | URL, init?: { body?: string }) => {
+    const parsed = JSON.parse(String(init?.body ?? '{"embeds":[]}')) as { embeds: unknown[] };
+    chunkSizes.push(parsed.embeds.length);
+    return Promise.resolve({ ok: true, status: 200 });
+  }) as unknown as typeof fetch;
+  await postDiscord('https://example.test/webhook', Array.from({ length: 23 }, () => newStream));
+  g.fetch = originalFetch;
+  check(
+    chunkSizes.length === 3 && chunkSizes[0] === 10 && chunkSizes[1] === 10 && chunkSizes[2] === 3,
+    'postDiscord sends all embeds in chunks of 10',
+  );
+
   console.log(`discord.test: ${passed} passed, ${failed} failed`);
   if (failed > 0) process.exitCode = 1;
 })();

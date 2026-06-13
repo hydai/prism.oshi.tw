@@ -159,18 +159,22 @@ export function newStreamsSummaryEmbed(displayName: string, count: number): Disc
 // --- Network ---
 
 /**
- * POST embeds to a Discord webhook. No-op when the URL is empty or there are no
- * embeds. Throws on a non-2xx response so callers can log; callers must treat
- * notification as best-effort and never let a failure break their main action.
+ * POST embeds to a Discord webhook, chunked into batches of 10 (Discord's
+ * per-message embed cap) so a large announcement is never silently dropped.
+ * No-op when the URL is empty or there are no embeds. Throws on a non-2xx
+ * response so callers can log; callers must treat notification as best-effort
+ * and never let a failure break their main action.
  */
 export async function postDiscord(webhookUrl: string | undefined, embeds: DiscordEmbed[]): Promise<void> {
   if (!webhookUrl || embeds.length === 0) return;
-  const res = await fetch(webhookUrl, {
-    method: 'POST',
-    headers: { 'content-type': 'application/json' },
-    body: JSON.stringify({ embeds: embeds.slice(0, EMBEDS_PER_MESSAGE) }),
-  });
-  if (!res.ok) {
-    throw new Error(`Discord webhook returned ${res.status}`);
+  for (let i = 0; i < embeds.length; i += EMBEDS_PER_MESSAGE) {
+    const res = await fetch(webhookUrl, {
+      method: 'POST',
+      headers: { 'content-type': 'application/json' },
+      body: JSON.stringify({ embeds: embeds.slice(i, i + EMBEDS_PER_MESSAGE) }),
+    });
+    if (!res.ok) {
+      throw new Error(`Discord webhook returned ${res.status}`);
+    }
   }
 }
