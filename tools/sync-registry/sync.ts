@@ -15,8 +15,8 @@ import { fileURLToPath } from 'node:url';
 
 import { seedIfMissing } from '../shared/sync-state.ts';
 
-import { newStreamerEmbed, subscriberDigestEmbed, postDiscord, type DiscordEmbed } from '../../admin/shared/discord.ts';
-import { loadAnnounceWebhook } from '../shared/announce.ts';
+import { newStreamerEmbed, subscriberDigestEmbed, type DiscordEmbed } from '../../admin/shared/discord.ts';
+import { enqueueAnnouncements, loadAnnounceWebhook } from '../shared/announce.ts';
 
 // --- Paths ---
 
@@ -195,9 +195,11 @@ function readExistingStreamers(): StreamerConfig[] {
   return parsed.streamers ?? [];
 }
 
-async function announceRegistry(diff: StreamerDiff): Promise<void> {
-  const webhook = loadAnnounceWebhook();
-  if (!webhook) return;
+// Queue fan announcements for posting after registry.json is committed + pushed
+// (via `npm run announce:flush`). Gated on the webhook so the feature is dormant
+// when unset.
+function announceRegistry(diff: StreamerDiff): void {
+  if (!loadAnnounceWebhook()) return;
 
   const embeds: DiscordEmbed[] = [];
   for (const s of diff.newStreamers) {
@@ -208,18 +210,8 @@ async function announceRegistry(diff: StreamerDiff): Promise<void> {
   }
   if (embeds.length === 0) return;
 
-  try {
-    await postDiscord(webhook, embeds);
-    console.log(`  📢 announced ${diff.newStreamers.length} new streamer(s), ${diff.subscriberChanges.length} subscriber change(s)`);
-  } catch (err) {
-    const what = [
-      ...diff.newStreamers.map((s) => s.displayName),
-      diff.subscriberChanges.length ? `${diff.subscriberChanges.length} subscriber change(s)` : '',
-    ]
-      .filter(Boolean)
-      .join(', ');
-    console.warn(`  ⚠ Discord announce FAILED after retries (${(err as Error).message}); NOT announced: ${what}`);
-  }
+  enqueueAnnouncements(embeds);
+  console.log(`  📥 queued ${diff.newStreamers.length} new streamer(s) + ${diff.subscriberChanges.length} subscriber change(s) — posted after push (npm run announce:flush)`);
 }
 
 // --- Write output files ---
@@ -291,7 +283,7 @@ async function main(): Promise<void> {
   writeSlugs(streamers);
   scaffoldDataDirs(streamers);
 
-  await announceRegistry(diffStreamers(oldStreamers, streamers));
+  announceRegistry(diffStreamers(oldStreamers, streamers));
 
   console.log('sync-registry: done.');
 }

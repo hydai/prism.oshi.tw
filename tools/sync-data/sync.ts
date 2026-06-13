@@ -15,8 +15,8 @@ import { fileURLToPath } from 'node:url';
 
 import { syncStatePath, upsertEntry, type SyncStateEntry } from '../shared/sync-state.ts';
 
-import { newStreamEmbed, newStreamsSummaryEmbed, postDiscord, type DiscordEmbed } from '../../admin/shared/discord.ts';
-import { loadAnnounceWebhook } from '../shared/announce.ts';
+import { newStreamEmbed, newStreamsSummaryEmbed, type DiscordEmbed } from '../../admin/shared/discord.ts';
+import { enqueueAnnouncements, loadAnnounceWebhook } from '../shared/announce.ts';
 
 // --- Paths ---
 
@@ -179,11 +179,6 @@ function querySnapshot(table: 'songs' | 'performances' | 'streams', streamerId: 
 
 const ANNOUNCE_FLOOD_CAP = 10;
 
-/** Count distinct songs performed in a given stream. */
-export function songCountForStream(songs: FanSiteSong[], streamId: string): number {
-  return songs.filter((song) => song.performances.some((p) => p.streamId === streamId)).length;
-}
-
 /** Map of stream id → number of distinct songs published in that stream. */
 export function songCountsByStream(songs: FanSiteSong[]): Map<string, number> {
   const counts = new Map<string, number>();
@@ -249,33 +244,28 @@ function streamerDisplayName(slug: string): string {
   }
 }
 
-async function announceData(slug: string, newStreams: FanSiteStream[], songs: FanSiteSong[]): Promise<void> {
-  const webhook = loadAnnounceWebhook();
-  if (!webhook || newStreams.length === 0) return;
+// Queue fan announcements for posting after the data is committed + pushed (via
+// `npm run announce:flush`), so fans never get a ping for data that never went live.
+// Gated on the webhook being configured so the feature stays dormant when unset.
+function announceData(slug: string, newStreams: FanSiteStream[], songCounts: Map<string, number>): void {
+  if (newStreams.length === 0 || !loadAnnounceWebhook()) return;
 
   const displayName = streamerDisplayName(slug);
-  let embeds: DiscordEmbed[];
-  if (newStreams.length > ANNOUNCE_FLOOD_CAP) {
-    embeds = [newStreamsSummaryEmbed(displayName, newStreams.length)];
-  } else {
-    embeds = newStreams.map((s) =>
-      newStreamEmbed({
-        displayName,
-        streamTitle: s.title,
-        videoId: s.videoId,
-        songCount: songCountForStream(songs, s.id),
-        thumbnailUrl: `https://i.ytimg.com/vi/${s.videoId}/mqdefault.jpg`,
-      }),
-    );
-  }
+  const embeds: DiscordEmbed[] =
+    newStreams.length > ANNOUNCE_FLOOD_CAP
+      ? [newStreamsSummaryEmbed(displayName, newStreams.length)]
+      : newStreams.map((s) =>
+          newStreamEmbed({
+            displayName,
+            streamTitle: s.title,
+            videoId: s.videoId,
+            songCount: songCounts.get(s.id) ?? 0,
+            thumbnailUrl: `https://i.ytimg.com/vi/${s.videoId}/mqdefault.jpg`,
+          }),
+        );
 
-  try {
-    await postDiscord(webhook, embeds);
-    console.log(`  📢 announced ${newStreams.length} new stream(s)`);
-  } catch (err) {
-    const titles = newStreams.map((s) => s.title).join(', ');
-    console.warn(`  ⚠ Discord announce FAILED after retries (${(err as Error).message}); NOT announced: ${titles}`);
-  }
+  enqueueAnnouncements(embeds);
+  console.log(`  📥 queued ${newStreams.length} new-stream announcement(s) — posted after push (npm run announce:flush)`);
 }
 
 // --- Main ---
@@ -337,11 +327,9 @@ async function main(): Promise<void> {
   upsertEntry(ROOT, slug, entry);
   console.log(`  stamped ${syncStatePath(ROOT)}`);
 
-  await announceData(
-    slug,
-    streamsToAnnounce(streams, new Set(oldStreams.map((s) => s.id)), songCountsByStream(oldSongs), songCountsByStream(songs)),
-    songs,
-  );
+  const newSongCounts = songCountsByStream(songs);
+  const toAnnounce = streamsToAnnounce(streams, new Set(oldStreams.map((s) => s.id)), songCountsByStream(oldSongs), newSongCounts);
+  announceData(slug, toAnnounce, newSongCounts);
 
   console.log('sync-data: done.');
 }

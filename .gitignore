@@ -44,3 +44,6 @@ next-env.d.ts
 
 # Claude Code local state
 /.claude/
+
+# Pending fan-announcement queue (posted after push by announce-flush)
+data/.pending-announce.json

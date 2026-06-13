@@ -14,7 +14,8 @@ Sync all streamers whose local data has drifted from admin D1:
    - Commit message: `data: sync <slug> songs and streams from DB (N songs, M performances, L streams)` using the slug's own counts.
 7. After all per-streamer commits are done, stage and commit the state file: `git add data/.sync-state.json` and commit with `chore: update sync-state for <slug1>, <slug2>, ...`.
 8. Push all commits in one `git push`.
-9. Run `npm run sync:status` one more time to confirm everything is fresh.
+9. After the push, run `npm run announce:flush` to post any queued fan-channel Discord announcements (accumulated across all synced slugs). It runs after push on purpose, is a no-op when nothing is queued or `DISCORD_WEBHOOK_ANNOUNCE` is unset, and leaves items queued on a post failure.
+10. Run `npm run sync:status` one more time to confirm everything is fresh.
 
 Notes:
 - If a streamer's `songs.json`/`streams.json` didn't actually change (e.g. only counts in state drifted from a prior tool bug), skip its data commit and include it only in the state-file commit.

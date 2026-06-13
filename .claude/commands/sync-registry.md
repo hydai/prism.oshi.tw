@@ -10,3 +10,4 @@ Sync approved streamer data from Nova D1 to the codebase:
 4. Run `git diff data/registry.json lib/streamer-slugs.ts` to show what changed
 5. If there are changes, commit with message `chore: sync registry from Nova DB` and push
 6. If no changes, say "Registry already up to date"
+7. After the push (or the no-change message), run `npm run announce:flush` to post any queued fan-channel Discord announcements. This runs *after* push on purpose, so fans are only notified about data that actually went live. No-op when nothing is queued or `DISCORD_WEBHOOK_ANNOUNCE` is unset.

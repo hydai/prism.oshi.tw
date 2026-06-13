@@ -1,6 +1,6 @@
 import * as assert from 'node:assert/strict';
 
-import { songCountForStream, songCountsByStream, streamsToAnnounce } from './sync.ts';
+import { songCountsByStream, streamsToAnnounce } from './sync.ts';
 
 function test(name: string, fn: () => void): void {
   try {
@@ -30,12 +30,6 @@ const song = (id: string, performances: ReturnType<typeof perf>[]) => ({
   originalArtist: '',
   tags: [] as string[],
   performances,
-});
-
-test('songCountForStream counts distinct songs performed in the stream', () => {
-  const songs = [song('song1', [perf('p1', 's1')]), song('song2', [perf('p2', 's2')]), song('song3', [perf('p3', 's1')])];
-  assert.equal(songCountForStream(songs, 's1'), 2);
-  assert.equal(songCountForStream(songs, 's2'), 1);
 });
 
 test('songCountsByStream counts distinct songs per stream (two performances of one song in a stream count once)', () => {

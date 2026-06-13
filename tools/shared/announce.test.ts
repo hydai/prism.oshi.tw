@@ -1,6 +1,9 @@
 import * as assert from 'node:assert/strict';
+import * as fs from 'node:fs';
+import * as os from 'node:os';
+import * as path from 'node:path';
 
-import { parseDevVar } from './announce.ts';
+import { clearPendingAnnouncements, enqueueAnnouncements, parseDevVar, readPendingAnnouncements } from './announce.ts';
 
 function test(name: string, fn: () => void): void {
   try {
@@ -30,6 +33,24 @@ test('parseDevVar strips surrounding quotes', () => {
 
 test('parseDevVar treats an empty value as null', () => {
   assert.equal(parseDevVar('DISCORD_WEBHOOK_ANNOUNCE=\n', 'DISCORD_WEBHOOK_ANNOUNCE'), null);
+});
+
+test('pending queue: missing file reads as empty, enqueue accumulates, clear removes', () => {
+  const tmp = path.join(os.tmpdir(), `pending-announce-${process.pid}.json`);
+  fs.rmSync(tmp, { force: true });
+  assert.deepEqual(readPendingAnnouncements(tmp), []); // ENOENT → []
+  enqueueAnnouncements([{ title: 'a' }], tmp);
+  enqueueAnnouncements([{ title: 'b' }, { title: 'c' }], tmp);
+  assert.deepEqual(readPendingAnnouncements(tmp), [{ title: 'a' }, { title: 'b' }, { title: 'c' }]);
+  clearPendingAnnouncements(tmp);
+  assert.deepEqual(readPendingAnnouncements(tmp), []);
+});
+
+test('pending queue: enqueue of an empty list is a no-op (no file created)', () => {
+  const tmp = path.join(os.tmpdir(), `pending-announce-empty-${process.pid}.json`);
+  fs.rmSync(tmp, { force: true });
+  enqueueAnnouncements([], tmp);
+  assert.equal(fs.existsSync(tmp), false);
 });
 
 console.log('announce.test: all passed');

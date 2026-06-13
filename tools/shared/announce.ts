@@ -10,9 +10,12 @@ import * as fs from 'node:fs';
 import * as path from 'node:path';
 import { fileURLToPath } from 'node:url';
 
+import type { DiscordEmbed } from '../../admin/shared/discord.ts';
+
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 const DEV_VARS_PATH = path.resolve(__dirname, '../../admin/.dev.vars');
+const PENDING_PATH = path.resolve(__dirname, '../../data/.pending-announce.json');
 
 /** Extract a KEY=value entry from .dev.vars content; null if absent or empty. */
 export function parseDevVar(content: string, key: string): string | null {
@@ -41,4 +44,32 @@ export function loadAnnounceWebhook(): string | undefined {
   } catch {
     return undefined;
   }
+}
+
+// --- Pending fan-announcement queue ---
+//
+// Announcements are computed during sync (before files are overwritten) but only
+// POSTED after the data is committed + pushed (via `npm run announce:flush`), so
+// fans never get a "new stream" ping for data that never went live. The queue is a
+// gitignored sidecar; a failed flush leaves entries queued for the next attempt.
+// The path is injectable so it can be unit-tested against a temp file.
+
+export function readPendingAnnouncements(pendingPath: string = PENDING_PATH): DiscordEmbed[] {
+  try {
+    const parsed = JSON.parse(fs.readFileSync(pendingPath, 'utf-8')) as { embeds?: DiscordEmbed[] };
+    return parsed.embeds ?? [];
+  } catch (err) {
+    if ((err as { code?: string }).code === 'ENOENT') return [];
+    throw err;
+  }
+}
+
+export function enqueueAnnouncements(embeds: DiscordEmbed[], pendingPath: string = PENDING_PATH): void {
+  if (embeds.length === 0) return;
+  const merged = [...readPendingAnnouncements(pendingPath), ...embeds];
+  fs.writeFileSync(pendingPath, JSON.stringify({ embeds: merged }, null, 2) + '\n', 'utf-8');
+}
+
+export function clearPendingAnnouncements(pendingPath: string = PENDING_PATH): void {
+  fs.rmSync(pendingPath, { force: true });
 }
