@@ -61,6 +61,9 @@ check(newStreamer.color === COLOR.PINK, 'new streamer embed is pink');
 check(newStreamer.url === 'https://youtube.com/@gabu', 'new streamer embed links the channel');
 check(newStreamer.fields?.[0]?.value === '個人勢', 'new streamer embed shows the group');
 
+const newStreamerBadLink = newStreamerEmbed({ displayName: 'X', group: '', link: 'not a url' });
+check(newStreamerBadLink.url === undefined, 'new streamer embed omits an invalid link (no embed.url)');
+
 // subscriberDigestEmbed
 const digest = subscriberDigestEmbed([
   { displayName: 'A', from: '1萬', to: '2萬' },

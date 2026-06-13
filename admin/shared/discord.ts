@@ -43,6 +43,16 @@ function truncate(s: string, max: number): string {
   return s.length <= max ? s : `${s.slice(0, max - 1)}…`;
 }
 
+/** Discord rejects an embed whose `url` is not http(s); validate before setting it. */
+function isValidHttpUrl(s: string): boolean {
+  try {
+    const u = new URL(s);
+    return u.protocol === 'http:' || u.protocol === 'https:';
+  } catch {
+    return false;
+  }
+}
+
 // --- Contributor-feedback embeds (review-time, from worker) ---
 
 export function streamerApprovedEmbed(sub: { display_name: string }): DiscordEmbed {
@@ -113,7 +123,7 @@ export function newStreamerEmbed(s: { displayName: string; group: string; link: 
     description: truncate(`「${s.displayName}」已加入收錄！`, DESC_MAX),
     color: COLOR.PINK,
   };
-  if (s.link) embed.url = s.link;
+  if (s.link && isValidHttpUrl(s.link)) embed.url = s.link; // omit invalid links so Discord doesn't 400 the whole batch
   if (s.group) embed.fields = [{ name: '分類', value: truncate(s.group, FIELD_VALUE_MAX), inline: true }];
   return embed;
 }
