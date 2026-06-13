@@ -10,41 +10,71 @@
  * Usage: npx tsx tools/announce-flush/flush.ts
  */
 
+import { execFileSync } from 'node:child_process';
+import * as path from 'node:path';
+import { fileURLToPath } from 'node:url';
+
 import { batchEmbeds, postDiscord } from '../../admin/shared/discord.ts';
-import { loadAnnounceWebhook, readPendingAnnouncements, setPendingAnnouncements } from '../shared/announce.ts';
+import { loadAnnounceWebhook, partitionByLiveHash, readPendingBatches, writePendingBatches } from '../shared/announce.ts';
+
+const REPO_ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '../..');
+
+/** Read a file as it exists on origin/master (post-push). Throws when absent ⇒ treated as not-live.
+ *  stderr is silenced: a missing path is an expected, handled case (the throw is the signal). */
+function readLiveFromOriginMaster(source: string): string {
+  return execFileSync('git', ['show', `origin/master:${source}`], {
+    cwd: REPO_ROOT,
+    encoding: 'utf-8',
+    stdio: ['ignore', 'pipe', 'ignore'],
+  });
+}
 
 async function main(): Promise<void> {
-  const embeds = readPendingAnnouncements();
-  if (embeds.length === 0) {
+  const batches = readPendingBatches();
+  if (batches.length === 0) {
     console.log('announce-flush: nothing queued.');
+    return;
+  }
+
+  // Verify each batch against the data actually live on origin/master; drop the rest.
+  const { verified, stale } = partitionByLiveHash(batches, readLiveFromOriginMaster);
+  if (stale.length > 0) {
+    const dropped = stale.flatMap((b) => b.sources ?? ['(no sources)']);
+    console.warn(`announce-flush: dropped ${stale.length} stale batch(es) whose data is not live on origin/master: ${dropped.join(', ')}`);
+  }
+  writePendingBatches(verified); // persist the drop immediately
+
+  const embeds = verified.flatMap((b) => b.embeds);
+  if (embeds.length === 0) {
+    console.log('announce-flush: nothing to post after revision check.');
     return;
   }
 
   const webhook = loadAnnounceWebhook();
   if (!webhook) {
-    console.log(`announce-flush: ${embeds.length} embed(s) queued but DISCORD_WEBHOOK_ANNOUNCE is unset; leaving them queued.`);
+    console.log(`announce-flush: ${embeds.length} verified embed(s) queued but DISCORD_WEBHOOK_ANNOUNCE is unset; leaving them queued.`);
     return;
   }
 
-  // Post one message-batch at a time, and AFTER each success rewrite the queue with only
-  // the remaining embeds. A failure OR crash mid-flush therefore never re-sends (and
-  // duplicates) the batches already delivered. The catch needs no rewrite: at the moment
-  // batch i is attempted, the file already holds batches[i..] from the previous checkpoint.
-  const batches = batchEmbeds(embeds);
+  // Post one message-batch at a time; after each success rewrite the queue with only the
+  // remaining (already-verified) embeds as one unconditional batch, so a failure OR crash
+  // mid-flush never re-sends a delivered batch.
+  const messageBatches = batchEmbeds(embeds);
   let posted = 0;
-  for (let i = 0; i < batches.length; i++) {
+  for (let i = 0; i < messageBatches.length; i++) {
     try {
-      await postDiscord(webhook, batches[i]);
+      await postDiscord(webhook, messageBatches[i]);
     } catch (err) {
-      const remaining = batches.slice(i).flat().length;
+      const remaining = messageBatches.slice(i).flat();
+      writePendingBatches([{ embeds: remaining }]);
       console.warn(
-        `announce-flush: posted ${posted} embed(s), then batch ${i + 1}/${batches.length} FAILED (${(err as Error).message}); ${remaining} embed(s) remain queued for the next flush.`,
+        `announce-flush: posted ${posted} embed(s), then batch ${i + 1}/${messageBatches.length} FAILED (${(err as Error).message}); ${remaining.length} embed(s) remain queued for the next flush.`,
       );
       process.exitCode = 1;
       return;
     }
-    posted += batches[i].length;
-    setPendingAnnouncements(batches.slice(i + 1).flat()); // checkpoint after each success: persist only what's left
+    posted += messageBatches[i].length;
+    writePendingBatches([{ embeds: messageBatches.slice(i + 1).flat() }]); // checkpoint after each success
   }
   console.log(`announce-flush: posted ${posted} announcement embed(s) to the fan channel.`);
 }
