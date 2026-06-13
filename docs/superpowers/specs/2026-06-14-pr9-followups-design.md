@@ -73,13 +73,13 @@ PR #9（Discord 後台變動推播）合併時，Codex review 切出兩個與通
 
 ### 2.4 測試
 
-`admin/src/status.test.ts` 測 `shouldImportVod` 三情境（純函式，符合現有 harness：無 D1 mock，以假 context／純函式為主），併入 `npm run check`。
+在現有的 `admin/src/helpers.test.ts`（已單元測 `status.ts` 的 `isValidTransition`／`canHardDeleteStream`）追加 `shouldImportVod` 三情境的 `assertEqual`。沿用現有 harness（無 D1 mock、純函式 top-level assert），自動納入 `npm run check`，不需新測試檔或 `package.json` 改動。
 
 ### 2.5 影響檔案與部署
 
 - `admin/src/index.ts`（VOD status endpoint 改 gate）
 - `admin/src/status.ts`（新增 `shouldImportVod`）
-- `admin/src/status.test.ts`（新測試）、`admin/package.json`（check 串入）
+- `admin/src/helpers.test.ts`（追加 `shouldImportVod` 測試，沿用現有 harness）
 - **改完必須 `/deploy-admin`**（Cloudflare Worker，不部署不生效）。
 
 ---
