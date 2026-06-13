@@ -36,6 +36,7 @@ export const COLOR = {
 const DESC_MAX = 4096;
 const FIELD_VALUE_MAX = 1024;
 const EMBEDS_PER_MESSAGE = 10;
+const MESSAGE_CHAR_LIMIT = 5500; // Discord rejects a message whose embeds exceed 6000 chars total; leave margin
 const DIGEST_MAX_LINES = 30;
 
 function truncate(s: string, max: number): string {
@@ -177,6 +178,7 @@ async function postChunk(webhookUrl: string, embeds: DiscordEmbed[], maxAttempts
   for (let attempt = 1; attempt <= maxAttempts; attempt++) {
     let networkError = false;
     let status = 0;
+    let retryAfterMs = 0;
     try {
       const res = await fetch(webhookUrl, {
         method: 'POST',
@@ -187,6 +189,12 @@ async function postChunk(webhookUrl: string, embeds: DiscordEmbed[], maxAttempts
       });
       if (res.ok) return;
       status = res.status;
+      if (status === 429) {
+        // Honor Discord's advertised cool-off instead of guessing with fixed backoff.
+        const retryAfter = res.headers.get('retry-after');
+        const seconds = retryAfter ? Number.parseFloat(retryAfter) : NaN;
+        if (Number.isFinite(seconds) && seconds >= 0) retryAfterMs = Math.ceil(seconds * 1000);
+      }
     } catch (err) {
       networkError = true;
       lastError = err instanceof Error ? err : new Error(String(err));
@@ -197,18 +205,45 @@ async function postChunk(webhookUrl: string, embeds: DiscordEmbed[], maxAttempts
       }
       lastError = new Error(`Discord webhook returned ${status}`); // 429 / 5xx — retryable
     }
-    if (attempt < maxAttempts) await sleep(baseDelayMs * attempt);
+    if (attempt < maxAttempts) await sleep(retryAfterMs > 0 ? retryAfterMs : baseDelayMs * attempt);
   }
   throw lastError;
 }
 
+/** Approximate character weight Discord counts toward its 6000-per-message limit. */
+function embedCharCount(e: DiscordEmbed): number {
+  let n = (e.title?.length ?? 0) + (e.description?.length ?? 0);
+  for (const f of e.fields ?? []) n += f.name.length + f.value.length;
+  return n;
+}
+
+/** Split embeds into messages bounded by both the 10-embed and ~6000-char limits. */
+export function batchEmbeds(embeds: DiscordEmbed[]): DiscordEmbed[][] {
+  const batches: DiscordEmbed[][] = [];
+  let current: DiscordEmbed[] = [];
+  let currentChars = 0;
+  for (const e of embeds) {
+    const chars = embedCharCount(e);
+    if (current.length > 0 && (current.length >= EMBEDS_PER_MESSAGE || currentChars + chars > MESSAGE_CHAR_LIMIT)) {
+      batches.push(current);
+      current = [];
+      currentChars = 0;
+    }
+    current.push(e);
+    currentChars += chars;
+  }
+  if (current.length > 0) batches.push(current);
+  return batches;
+}
+
 /**
- * POST embeds to a Discord webhook, chunked into batches of 10 (Discord's
- * per-message embed cap) so a large announcement is never silently dropped, and
- * retrying transient failures per chunk. No-op when the URL is empty or there
- * are no embeds. Throws after exhausting retries (or on a non-retryable 4xx) so
- * callers can log; callers must treat notification as best-effort and never let
- * a failure break their main action. opts is for tests (tighten attempts/delay).
+ * POST embeds to a Discord webhook, split into messages bounded by both Discord's
+ * 10-embed and 6000-char per-message limits so a large announcement is never
+ * silently dropped, and retrying transient failures (network / 429 / 5xx, honoring
+ * Retry-After) per message. No-op when the URL is empty or there are no embeds.
+ * Throws after exhausting retries (or on a non-retryable 4xx) so callers can log;
+ * callers must treat notification as best-effort and never let a failure break
+ * their main action. opts is for tests (tighten attempts/delay).
  */
 export async function postDiscord(
   webhookUrl: string | undefined,
@@ -218,7 +253,7 @@ export async function postDiscord(
   if (!webhookUrl || embeds.length === 0) return;
   const maxAttempts = opts.maxAttempts ?? POST_MAX_ATTEMPTS;
   const baseDelayMs = opts.baseDelayMs ?? POST_RETRY_BASE_MS;
-  for (let i = 0; i < embeds.length; i += EMBEDS_PER_MESSAGE) {
-    await postChunk(webhookUrl, embeds.slice(i, i + EMBEDS_PER_MESSAGE), maxAttempts, baseDelayMs);
+  for (const batch of batchEmbeds(embeds)) {
+    await postChunk(webhookUrl, batch, maxAttempts, baseDelayMs);
   }
 }

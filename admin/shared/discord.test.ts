@@ -90,49 +90,103 @@ void (async () => {
   const noop = await postDiscord(undefined, [newStream]);
   check(noop === undefined, 'postDiscord is a no-op when the webhook URL is missing');
 
-  // postDiscord chunks embeds into batches of 10 so a large announcement is never
-  // silently dropped (Discord caps a single message at 10 embeds).
+  // fetch is mocked via withMockedFetch so it is ALWAYS restored — even if an
+  // assertion or postDiscord throws — via try/finally (no leaked mock between tests).
   const g = globalThis as unknown as { fetch: typeof fetch };
   const originalFetch = g.fetch;
+  async function withMockedFetch(mock: typeof fetch, fn: () => Promise<void>): Promise<void> {
+    g.fetch = mock;
+    try {
+      await fn();
+    } finally {
+      g.fetch = originalFetch;
+    }
+  }
+
+  // Split into messages of 10 embeds when each embed is small.
   const chunkSizes: number[] = [];
   let lastAllowedMentions = '';
-  g.fetch = ((_url: string | URL, init?: { body?: string }) => {
-    const parsed = JSON.parse(String(init?.body ?? '{"embeds":[]}')) as { embeds: unknown[]; allowed_mentions?: unknown };
-    chunkSizes.push(parsed.embeds.length);
-    lastAllowedMentions = JSON.stringify(parsed.allowed_mentions);
-    return Promise.resolve({ ok: true, status: 200 });
-  }) as unknown as typeof fetch;
-  await postDiscord('https://example.test/webhook', Array.from({ length: 23 }, () => newStream));
-  g.fetch = originalFetch;
+  await withMockedFetch(
+    ((_url: string | URL, init?: { body?: string }) => {
+      const parsed = JSON.parse(String(init?.body ?? '{"embeds":[]}')) as { embeds: unknown[]; allowed_mentions?: unknown };
+      chunkSizes.push(parsed.embeds.length);
+      lastAllowedMentions = JSON.stringify(parsed.allowed_mentions);
+      return Promise.resolve({ ok: true, status: 200 });
+    }) as unknown as typeof fetch,
+    () => postDiscord('https://example.test/webhook', Array.from({ length: 23 }, () => newStream)),
+  );
   check(
     chunkSizes.length === 3 && chunkSizes[0] === 10 && chunkSizes[1] === 10 && chunkSizes[2] === 3,
-    'postDiscord sends all embeds in chunks of 10',
+    'postDiscord splits small embeds into messages of 10',
   );
   check(lastAllowedMentions === '{"parse":[]}', 'postDiscord disables mention parsing (allowed_mentions)');
 
-  // postDiscord retries transient failures (network error / 429 / 5xx) until success.
+  // Cap a message by total embed characters: three ~3000-char embeds → one per message
+  // even though the count is under 10 (Discord rejects >6000 chars per message).
+  const bigEmbed = { title: 'x', description: 'd'.repeat(3000), color: 1 };
+  const charBatchSizes: number[] = [];
+  await withMockedFetch(
+    ((_url: string | URL, init?: { body?: string }) => {
+      const parsed = JSON.parse(String(init?.body ?? '{"embeds":[]}')) as { embeds: unknown[] };
+      charBatchSizes.push(parsed.embeds.length);
+      return Promise.resolve({ ok: true, status: 200 });
+    }) as unknown as typeof fetch,
+    () => postDiscord('https://example.test/webhook', [bigEmbed, bigEmbed, bigEmbed]),
+  );
+  check(
+    charBatchSizes.length === 3 && charBatchSizes.every((n) => n === 1),
+    'postDiscord caps a message by total embed character count',
+  );
+
+  // Retry transient 5xx until success.
   let attempts = 0;
-  g.fetch = (() => {
-    attempts++;
-    return Promise.resolve(attempts < 3 ? { ok: false, status: 500 } : { ok: true, status: 200 });
-  }) as unknown as typeof fetch;
-  await postDiscord('https://example.test/webhook', [newStream], { baseDelayMs: 0 });
-  g.fetch = originalFetch;
+  await withMockedFetch(
+    (() => {
+      attempts++;
+      return Promise.resolve(attempts < 3 ? { ok: false, status: 500 } : { ok: true, status: 200 });
+    }) as unknown as typeof fetch,
+    () => postDiscord('https://example.test/webhook', [newStream], { baseDelayMs: 0 }),
+  );
   check(attempts === 3, 'postDiscord retries transient 5xx until success');
 
-  // postDiscord fails fast on a non-retryable 4xx without consuming retries.
+  // Read Discord's Retry-After header on a 429 and retry.
+  let attempts429 = 0;
+  let sawRetryAfter = false;
+  await withMockedFetch(
+    (() => {
+      attempts429++;
+      return Promise.resolve({
+        ok: attempts429 >= 2,
+        status: attempts429 >= 2 ? 200 : 429,
+        headers: {
+          get: (k: string) => {
+            if (k.toLowerCase() !== 'retry-after') return null;
+            sawRetryAfter = true;
+            return '0';
+          },
+        },
+      });
+    }) as unknown as typeof fetch,
+    () => postDiscord('https://example.test/webhook', [newStream], { baseDelayMs: 0 }),
+  );
+  check(attempts429 === 2 && sawRetryAfter, 'postDiscord reads Retry-After and retries on 429');
+
+  // Fail fast on a non-retryable 4xx without consuming retries.
   let attempts4xx = 0;
-  g.fetch = (() => {
-    attempts4xx++;
-    return Promise.resolve({ ok: false, status: 404 });
-  }) as unknown as typeof fetch;
   let threw4xx = false;
-  try {
-    await postDiscord('https://example.test/webhook', [newStream], { baseDelayMs: 0, maxAttempts: 3 });
-  } catch {
-    threw4xx = true;
-  }
-  g.fetch = originalFetch;
+  await withMockedFetch(
+    (() => {
+      attempts4xx++;
+      return Promise.resolve({ ok: false, status: 404 });
+    }) as unknown as typeof fetch,
+    async () => {
+      try {
+        await postDiscord('https://example.test/webhook', [newStream], { baseDelayMs: 0, maxAttempts: 3 });
+      } catch {
+        threw4xx = true;
+      }
+    },
+  );
   check(attempts4xx === 1 && threw4xx, 'postDiscord fails fast on a non-retryable 4xx');
 
   console.log(`discord.test: ${passed} passed, ${failed} failed`);
