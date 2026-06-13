@@ -196,17 +196,24 @@ export function songCountsByStream(songs: FanSiteSong[]): Map<string, number> {
 }
 
 /**
- * Streams to announce: those whose published song count crossed 0 → ≥1 this sync.
- * A stream approved before its performances is published with 0 songs, so keying
- * the announcement on song count (not on a new stream id) defers it until the
- * songs actually land — and still fires once they do.
+ * Streams to announce: those becoming "published with songs" for the first time —
+ * present in streams.json AND having ≥1 song — that were not already published with
+ * songs last sync. Firing on this combined transition handles both approval orders:
+ *   • stream approved before its songs → deferred until the songs land;
+ *   • songs approved before the stream → fires when the stream is finally published
+ *     (its songs were already in songs.json, but the stream wasn't yet in streams.json).
  */
 export function streamsToAnnounce(
   newStreams: FanSiteStream[],
+  oldStreamIds: Set<string>,
   oldSongCounts: Map<string, number>,
   newSongCounts: Map<string, number>,
 ): FanSiteStream[] {
-  return newStreams.filter((s) => (newSongCounts.get(s.id) ?? 0) >= 1 && (oldSongCounts.get(s.id) ?? 0) === 0);
+  return newStreams.filter((s) => {
+    const hasSongsNow = (newSongCounts.get(s.id) ?? 0) >= 1;
+    const wasPublishedWithSongs = oldStreamIds.has(s.id) && (oldSongCounts.get(s.id) ?? 0) >= 1;
+    return hasSongsNow && !wasPublishedWithSongs;
+  });
 }
 
 function readExistingSongs(songsPath: string): FanSiteSong[] {
@@ -218,6 +225,17 @@ function readExistingSongs(songsPath: string): FanSiteSong[] {
     throw err; // corrupt/unreadable songs.json is an operator problem — fail loud rather than announce from a bogus baseline
   }
   return JSON.parse(raw) as FanSiteSong[];
+}
+
+function readExistingStreams(streamsPath: string): FanSiteStream[] {
+  let raw: string;
+  try {
+    raw = fs.readFileSync(streamsPath, 'utf-8');
+  } catch (err) {
+    if ((err as { code?: string }).code === 'ENOENT') return [];
+    throw err; // corrupt/unreadable streams.json is an operator problem — fail loud rather than announce from a bogus baseline
+  }
+  return JSON.parse(raw) as FanSiteStream[];
 }
 
 function streamerDisplayName(slug: string): string {
@@ -283,9 +301,10 @@ async function main(): Promise<void> {
   const songsPath = path.join(dataDir, 'songs.json');
   const streamsPath = path.join(dataDir, 'streams.json');
 
-  // Read the previously-published songs before overwriting, to detect streams whose
-  // published song count crosses 0 → ≥1 (the announce trigger).
+  // Read the previously-published songs + streams before overwriting, to detect
+  // streams becoming "published with songs" for the first time (the announce trigger).
   const oldSongs = readExistingSongs(songsPath);
+  const oldStreams = readExistingStreams(streamsPath);
 
   fs.writeFileSync(songsPath, JSON.stringify(songs, null, 2) + '\n', 'utf-8');
   fs.writeFileSync(streamsPath, JSON.stringify(streams, null, 2) + '\n', 'utf-8');
@@ -318,7 +337,11 @@ async function main(): Promise<void> {
   upsertEntry(ROOT, slug, entry);
   console.log(`  stamped ${syncStatePath(ROOT)}`);
 
-  await announceData(slug, streamsToAnnounce(streams, songCountsByStream(oldSongs), songCountsByStream(songs)), songs);
+  await announceData(
+    slug,
+    streamsToAnnounce(streams, new Set(oldStreams.map((s) => s.id)), songCountsByStream(oldSongs), songCountsByStream(songs)),
+    songs,
+  );
 
   console.log('sync-data: done.');
 }

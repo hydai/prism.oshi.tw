@@ -45,16 +45,41 @@ test('songCountsByStream counts distinct songs per stream (two performances of o
   assert.equal(counts.get('s2'), 1);
 });
 
-test('streamsToAnnounce fires when a stream crosses 0 → ≥1 songs', () => {
-  assert.deepEqual(streamsToAnnounce([streamA], new Map<string, number>(), new Map<string, number>([['s1', 3]])), [streamA]);
+test('streamsToAnnounce fires for a brand-new stream published with songs', () => {
+  // not in old streams, no old songs; now in streams.json with 3 songs
+  assert.deepEqual(
+    streamsToAnnounce([streamA], new Set<string>(), new Map<string, number>(), new Map<string, number>([['s1', 3]])),
+    [streamA],
+  );
 });
 
-test('streamsToAnnounce defers a stream that still has 0 songs', () => {
-  assert.deepEqual(streamsToAnnounce([streamA], new Map<string, number>(), new Map<string, number>()), []);
+test('streamsToAnnounce defers a stream published before its songs, then fires when they land', () => {
+  // stream already in streams.json but still 0 songs → not yet
+  assert.deepEqual(
+    streamsToAnnounce([streamA], new Set<string>(['s1']), new Map<string, number>(), new Map<string, number>()),
+    [],
+  );
+  // songs land: old had the stream but 0 songs, now ≥1 → fires
+  assert.deepEqual(
+    streamsToAnnounce([streamA], new Set<string>(['s1']), new Map<string, number>(), new Map<string, number>([['s1', 2]])),
+    [streamA],
+  );
 });
 
-test('streamsToAnnounce does not re-announce a stream that already had songs', () => {
-  assert.deepEqual(streamsToAnnounce([streamA], new Map<string, number>([['s1', 2]]), new Map<string, number>([['s1', 5]])), []);
+test('streamsToAnnounce fires when songs were approved before the stream', () => {
+  // old: s1's songs already in songs.json (count 1) but s1 NOT yet in streams.json;
+  // now s1 is published → must still announce
+  assert.deepEqual(
+    streamsToAnnounce([streamA], new Set<string>(), new Map<string, number>([['s1', 1]]), new Map<string, number>([['s1', 1]])),
+    [streamA],
+  );
+});
+
+test('streamsToAnnounce does not re-announce a stream already published with songs', () => {
+  assert.deepEqual(
+    streamsToAnnounce([streamA], new Set<string>(['s1']), new Map<string, number>([['s1', 2]]), new Map<string, number>([['s1', 5]])),
+    [],
+  );
 });
 
 console.log('sync-data.test: all passed');
