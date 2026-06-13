@@ -12,7 +12,8 @@
     "typecheck": "tsc --noEmit",
     "test:helpers": "npx tsx src/helpers.test.ts",
     "test:itunes": "npx tsx src/itunes.test.ts",
-    "check": "npm run typecheck && npm run test:helpers && npm run test:itunes"
+    "test:discord": "npx tsx shared/discord.test.ts",
+    "check": "npm run typecheck && npm run test:helpers && npm run test:itunes && npm run test:discord"
   },
   "dependencies": {
     "hono": "^4.12.22"
