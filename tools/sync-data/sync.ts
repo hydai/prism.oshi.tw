@@ -191,11 +191,14 @@ export function songCountForStream(songs: FanSiteSong[], streamId: string): numb
 }
 
 function readExistingStreams(streamsPath: string): FanSiteStream[] {
+  let raw: string;
   try {
-    return JSON.parse(fs.readFileSync(streamsPath, 'utf-8')) as FanSiteStream[];
-  } catch {
-    return [];
+    raw = fs.readFileSync(streamsPath, 'utf-8');
+  } catch (err) {
+    if ((err as { code?: string }).code === 'ENOENT') return [];
+    throw err; // corrupt/unreadable streams.json is an operator problem — fail loud rather than announce every stream as new
   }
+  return JSON.parse(raw) as FanSiteStream[];
 }
 
 function streamerDisplayName(slug: string): string {

@@ -184,12 +184,15 @@ export function diffStreamers(oldStreamers: StreamerConfig[], newStreamers: Stre
 }
 
 function readExistingStreamers(): StreamerConfig[] {
+  let raw: string;
   try {
-    const parsed = JSON.parse(fs.readFileSync(REGISTRY_PATH, 'utf-8')) as { streamers?: StreamerConfig[] };
-    return parsed.streamers ?? [];
-  } catch {
-    return [];
+    raw = fs.readFileSync(REGISTRY_PATH, 'utf-8');
+  } catch (err) {
+    if ((err as { code?: string }).code === 'ENOENT') return [];
+    throw err; // a present-but-unreadable registry is an operator problem — fail loud, don't announce from a bogus baseline
   }
+  const parsed = JSON.parse(raw) as { streamers?: StreamerConfig[] };
+  return parsed.streamers ?? [];
 }
 
 async function announceRegistry(diff: StreamerDiff): Promise<void> {
