@@ -1,7 +1,7 @@
 import { Hono } from 'hono';
 import { requireAuth, requireCurator } from './auth';
 import { getRouteParam, getStreamerId } from './http';
-import { canHardDeleteStream, isValidTransition, VALID_STATUSES } from './status';
+import { canHardDeleteStream, isValidTransition, shouldImportVod, VALID_STATUSES } from './status';
 import {
   listSongs,
   listSongsPaginated,
@@ -1220,10 +1220,14 @@ app.patch('/api/nova/vods/:id/status', requireCurator, async (c) => {
     .bind(body.status, reviewedAt, reviewerNote, id)
     .run();
 
-  // On a real transition to approved, import VOD songs into admin DB as pending
-  // records. Gating on the transition (not just body.status) prevents a re-approve
-  // from deleting/recreating already-curated performances via importVodToAdminDb.
-  if (body.status === 'approved' && existing.status !== 'approved') {
+  // Import VOD songs into the admin DB as pending records when approved. The outer
+  // `approved` guard is a fast path (only an approval can import — fetch the VOD lazily);
+  // the authoritative gate is shouldImportVod, keyed on whether the video already exists
+  // in the admin DB. That keeps a failed import retryable (absent → import) while a
+  // re-approve of an already-imported VOD won't delete/recreate its curated performances
+  // (present → skip). importVodToAdminDb writes via an atomic db.batch(), so a failed
+  // import leaves no admin rows and the next retry re-imports cleanly.
+  if (body.status === 'approved') {
     const vod = await c.env.NOVA_DB
       .prepare('SELECT * FROM vod_submissions WHERE id = ?')
       .bind(id)
@@ -1234,8 +1238,11 @@ app.patch('/api/nova/vods/:id/status', requireCurator, async (c) => {
       .all<NovaVodSong>();
 
     if (vod && vodSongs.length > 0) {
-      const user = c.get('user');
-      await importVodToAdminDb(c.env.DB, vod, vodSongs, user.email);
+      const alreadyImported = await videoIdExists(c.env.DB, vod.video_id, vod.streamer_slug);
+      if (shouldImportVod(body.status, alreadyImported)) {
+        const user = c.get('user');
+        await importVodToAdminDb(c.env.DB, vod, vodSongs, user.email);
+      }
     }
   }
 
