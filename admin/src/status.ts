@@ -1,4 +1,4 @@
-import type { Status } from '../shared/types';
+import type { NovaStatus, Status } from '../shared/types';
 
 const STATUS_VALUES = ['pending', 'approved', 'rejected', 'excluded', 'extracted'] as const satisfies readonly Status[];
 
@@ -24,4 +24,13 @@ export function isValidTransition(from: string, to: string): boolean {
 // Hard delete is blocked for approved (live) streams — unapprove first.
 export function canHardDeleteStream(status: Status): boolean {
   return status !== 'approved';
+}
+
+// VOD import is gated on whether the video already exists in the admin DB, not on the
+// Nova submission status. This keeps an approval whose import previously failed
+// retryable (absent → import), while a re-approve of an already-imported VOD won't
+// delete/recreate its curated performances (present → skip). Relies on importVodToAdminDb
+// writing atomically via db.batch(), so a failed import leaves nothing behind to detect.
+export function shouldImportVod(targetStatus: NovaStatus, alreadyImported: boolean): boolean {
+  return targetStatus === 'approved' && !alreadyImported;
 }
