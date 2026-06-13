@@ -255,7 +255,8 @@ async function announceData(slug: string, newStreams: FanSiteStream[], songs: Fa
     await postDiscord(webhook, embeds);
     console.log(`  📢 announced ${newStreams.length} new stream(s)`);
   } catch (err) {
-    console.warn(`  ⚠ Discord announce failed: ${(err as Error).message}`);
+    const titles = newStreams.map((s) => s.title).join(', ');
+    console.warn(`  ⚠ Discord announce FAILED after retries (${(err as Error).message}); NOT announced: ${titles}`);
   }
 }
 

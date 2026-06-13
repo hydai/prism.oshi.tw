@@ -158,25 +158,67 @@ export function newStreamsSummaryEmbed(displayName: string, count: number): Disc
 
 // --- Network ---
 
+const POST_MAX_ATTEMPTS = 3;
+const POST_RETRY_BASE_MS = 500;
+
+function sleep(ms: number): Promise<void> {
+  return new Promise<void>((resolve) => setTimeout(() => resolve(), ms));
+}
+
+/**
+ * POST one batch of embeds, retrying transient failures (network error, 429,
+ * 5xx) with linear backoff. A non-retryable 4xx throws immediately so we don't
+ * waste retries on a permanent error. Throws the last error after exhausting
+ * attempts — so a transient outage advancing the published baseline at least
+ * surfaces loudly to the caller instead of silently dropping the announcement.
+ */
+async function postChunk(webhookUrl: string, embeds: DiscordEmbed[], maxAttempts: number, baseDelayMs: number): Promise<void> {
+  let lastError: Error = new Error('Discord webhook failed');
+  for (let attempt = 1; attempt <= maxAttempts; attempt++) {
+    let networkError = false;
+    let status = 0;
+    try {
+      const res = await fetch(webhookUrl, {
+        method: 'POST',
+        headers: { 'content-type': 'application/json' },
+        // allowed_mentions disables all pings: embed text carries user-submitted
+        // names/titles, so a crafted "@everyone" must never trigger a notification.
+        body: JSON.stringify({ embeds, allowed_mentions: { parse: [] } }),
+      });
+      if (res.ok) return;
+      status = res.status;
+    } catch (err) {
+      networkError = true;
+      lastError = err instanceof Error ? err : new Error(String(err));
+    }
+    if (!networkError) {
+      if (status !== 429 && status < 500) {
+        throw new Error(`Discord webhook returned ${status}`); // client error — retrying won't help
+      }
+      lastError = new Error(`Discord webhook returned ${status}`); // 429 / 5xx — retryable
+    }
+    if (attempt < maxAttempts) await sleep(baseDelayMs * attempt);
+  }
+  throw lastError;
+}
+
 /**
  * POST embeds to a Discord webhook, chunked into batches of 10 (Discord's
- * per-message embed cap) so a large announcement is never silently dropped.
- * No-op when the URL is empty or there are no embeds. Throws on a non-2xx
- * response so callers can log; callers must treat notification as best-effort
- * and never let a failure break their main action.
+ * per-message embed cap) so a large announcement is never silently dropped, and
+ * retrying transient failures per chunk. No-op when the URL is empty or there
+ * are no embeds. Throws after exhausting retries (or on a non-retryable 4xx) so
+ * callers can log; callers must treat notification as best-effort and never let
+ * a failure break their main action. opts is for tests (tighten attempts/delay).
  */
-export async function postDiscord(webhookUrl: string | undefined, embeds: DiscordEmbed[]): Promise<void> {
+export async function postDiscord(
+  webhookUrl: string | undefined,
+  embeds: DiscordEmbed[],
+  opts: { maxAttempts?: number; baseDelayMs?: number } = {},
+): Promise<void> {
   if (!webhookUrl || embeds.length === 0) return;
+  const maxAttempts = opts.maxAttempts ?? POST_MAX_ATTEMPTS;
+  const baseDelayMs = opts.baseDelayMs ?? POST_RETRY_BASE_MS;
   for (let i = 0; i < embeds.length; i += EMBEDS_PER_MESSAGE) {
-    const res = await fetch(webhookUrl, {
-      method: 'POST',
-      headers: { 'content-type': 'application/json' },
-      // allowed_mentions disables all pings: embed text carries user-submitted
-      // names/titles, so a crafted "@everyone" must never trigger a notification.
-      body: JSON.stringify({ embeds: embeds.slice(i, i + EMBEDS_PER_MESSAGE), allowed_mentions: { parse: [] } }),
-    });
-    if (!res.ok) {
-      throw new Error(`Discord webhook returned ${res.status}`);
-    }
+    await postChunk(webhookUrl, embeds.slice(i, i + EMBEDS_PER_MESSAGE), maxAttempts, baseDelayMs);
   }
 }

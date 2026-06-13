@@ -212,7 +212,13 @@ async function announceRegistry(diff: StreamerDiff): Promise<void> {
     await postDiscord(webhook, embeds);
     console.log(`  📢 announced ${diff.newStreamers.length} new streamer(s), ${diff.subscriberChanges.length} subscriber change(s)`);
   } catch (err) {
-    console.warn(`  ⚠ Discord announce failed: ${(err as Error).message}`);
+    const what = [
+      ...diff.newStreamers.map((s) => s.displayName),
+      diff.subscriberChanges.length ? `${diff.subscriberChanges.length} subscriber change(s)` : '',
+    ]
+      .filter(Boolean)
+      .join(', ');
+    console.warn(`  ⚠ Discord announce FAILED after retries (${(err as Error).message}); NOT announced: ${what}`);
   }
 }
 

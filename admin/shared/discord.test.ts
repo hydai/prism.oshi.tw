@@ -110,6 +110,31 @@ void (async () => {
   );
   check(lastAllowedMentions === '{"parse":[]}', 'postDiscord disables mention parsing (allowed_mentions)');
 
+  // postDiscord retries transient failures (network error / 429 / 5xx) until success.
+  let attempts = 0;
+  g.fetch = (() => {
+    attempts++;
+    return Promise.resolve(attempts < 3 ? { ok: false, status: 500 } : { ok: true, status: 200 });
+  }) as unknown as typeof fetch;
+  await postDiscord('https://example.test/webhook', [newStream], { baseDelayMs: 0 });
+  g.fetch = originalFetch;
+  check(attempts === 3, 'postDiscord retries transient 5xx until success');
+
+  // postDiscord fails fast on a non-retryable 4xx without consuming retries.
+  let attempts4xx = 0;
+  g.fetch = (() => {
+    attempts4xx++;
+    return Promise.resolve({ ok: false, status: 404 });
+  }) as unknown as typeof fetch;
+  let threw4xx = false;
+  try {
+    await postDiscord('https://example.test/webhook', [newStream], { baseDelayMs: 0, maxAttempts: 3 });
+  } catch {
+    threw4xx = true;
+  }
+  g.fetch = originalFetch;
+  check(attempts4xx === 1 && threw4xx, 'postDiscord fails fast on a non-retryable 4xx');
+
   console.log(`discord.test: ${passed} passed, ${failed} failed`);
   if (failed > 0) process.exitCode = 1;
 })();
