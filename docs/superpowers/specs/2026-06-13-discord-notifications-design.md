@@ -1,7 +1,7 @@
 # Discord 後台變動推播通知 — 設計
 
 - **日期**：2026-06-13
-- **狀態**：設計確認，待寫實作計畫
+- **狀態**：已完成 —— 設計 → 實作計畫（`docs/superpowers/plans/2026-06-13-discord-notifications.md`）→ 實作（見本 PR）
 - **作者**：hydai（與 Claude 共同 brainstorm）
 
 ## 1. 背景與目標
