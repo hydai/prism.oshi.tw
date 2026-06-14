@@ -13,6 +13,7 @@ import * as fs from 'node:fs';
 import * as path from 'node:path';
 
 import { readSyncState, EMPTY_ENTRY, type SyncStateEntry } from '../shared/sync-state.ts';
+import { assertValidSlug } from '../shared/slug.ts';
 
 export interface StreamerRegistryEntry {
   slug: string;
@@ -74,10 +75,19 @@ function queryAdminD1(root: string): AggRow[] {
   return (parsed[0]?.results ?? []) as AggRow[];
 }
 
-function readRegistry(root: string): StreamerRegistryEntry[] {
+export function readRegistry(root: string): StreamerRegistryEntry[] {
   const p = path.resolve(root, 'data/registry.json');
   const raw = JSON.parse(fs.readFileSync(p, 'utf-8')) as RegistryFile;
-  return raw.streamers.filter((s) => s.enabled !== false);
+  const enabled = raw.streamers.filter((s) => s.enabled !== false);
+  // Fail closed: every enabled slug here flows downstream into sync-data's D1 SQL
+  // and filesystem-path sinks. A slug that fails validation can't have come from
+  // Nova (which validates on submit), so its presence signals tampering — reject
+  // it loudly instead of syncing it. Only enabled rows are checked: disabled ones
+  // are never synced, so junk there shouldn't block the legitimate streamers.
+  for (const s of enabled) {
+    assertValidSlug(s.slug, 'data/registry.json');
+  }
+  return enabled;
 }
 
 function emptySnapshot(): DbSnapshot {
