@@ -53,7 +53,7 @@ Six contexts in `app/contexts/`, wired in two layers:
 
 ### Theme System
 
-- Global CSS variables defined in `app/globals.css` (~53 custom properties)
+- Global CSS variables defined in `app/globals.css` (~61 custom properties)
 - Per-streamer overrides from `registry.json` theme object (12 color tokens)
 - Tailwind config extends with `token-*`, `accent-*`, `surface-*` utilities that reference CSS vars
 - `StreamerShell.tsx` applies streamer theme vars to `document.body` so fixed-position elements (MiniPlayer, modals) inherit correctly
