@@ -260,6 +260,21 @@ function safeField(value: string | number | null | undefined, fallback = '-'): s
   return sanitized || fallback;
 }
 
+// Real YouTube video IDs are exactly 11 chars of [A-Za-z0-9_-]. The ingestion
+// parser only enforces the charset (any length), so re-check the shape here:
+// a malformed id is attacker-controlled text, not a lookup key, and is dropped.
+function safeVideoId(value: string | null | undefined): string {
+  return value && /^[A-Za-z0-9_-]{11}$/.test(value) ? value : '(invalid)';
+}
+
+// stream_date is stored verbatim from public submissions when non-empty, so it
+// may carry arbitrary text. Print only a canonical YYYY-MM-DD date; otherwise a
+// placeholder (empty -> no-date, present but malformed -> invalid).
+function safeDate(value: string | null | undefined): string {
+  if (!value) return 'no-date';
+  return /^\d{4}-\d{2}-\d{2}$/.test(value) ? value : '(invalid)';
+}
+
 function formatTs(ts: string | null | undefined): string {
   if (!ts) return '-';
   return safeField(ts.replace('T', ' ').slice(0, 16));
@@ -306,7 +321,7 @@ function streamerLine(row: StreamerSubmissionRow, fallbackStatus = 'pending'): s
 }
 
 function vodLine(row: VodSubmissionRow, fallbackStatus = 'pending'): string {
-  return `- id=${safeField(row.id)} status=${safeField(row.status ?? fallbackStatus)} vod=${safeField(row.streamer_slug)}/${safeField(row.video_id)} songs=${safeField(row.song_count)} date=${safeField(row.stream_date, 'no-date')} submitted=${formatTs(row.submitted_at)}`;
+  return `- id=${safeField(row.id)} status=${safeField(row.status ?? fallbackStatus)} vod=${safeField(row.streamer_slug)}/${safeVideoId(row.video_id)} songs=${safeField(row.song_count)} date=${safeDate(row.stream_date)} submitted=${formatTs(row.submitted_at)}`;
 }
 
 function crystalLine(row: CrystalTicketRow, fallbackStatus = 'pending'): string {

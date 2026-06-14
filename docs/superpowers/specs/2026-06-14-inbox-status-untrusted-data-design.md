@@ -40,7 +40,9 @@
 
 選擇最強的「結構性防禦」——讓攻擊者文字**根本不進入 agent 情境**，而非「進入後貼標籤請 agent 不要照做」（機率性防禦）。
 
-存活欄位的判準：只印 (a) 系統產生的不透明 ID、(b) 受限列舉（`status`/`type`/`visibility`）、(c) 受控識別碼（`streamer_slug` 受核准清單約束、`video_id` 由 URL 解析成 YouTube 11 字元集）、(d) 清洗後的低熵欄位（日期、時間戳）。**丟棄**所有自由文字。
+存活欄位的判準：只印 (a) 系統產生的不透明 ID、(b) 受限列舉（`status`/`type`/`visibility`）、(c) 受核准清單約束的識別碼（`streamer_slug`）、(d) **在 sink 端重新驗證形狀**的識別碼（`video_id` 須恰為 11 字元 YouTube ID、`stream_date` 須為 `YYYY-MM-DD`）、(e) 清洗後的低熵欄位（時間戳）。**丟棄**所有自由文字。
+
+> 為何 (d) 要在 sink 端再驗一次（Codex review 發現）：投稿端**不保證**這些「lookup key」的形狀——`parseYoutubeVideoUrl` 只限制字元集 `[a-zA-Z0-9_-]+`（不限長度），`stream_date` 非空時原樣存入（只在空時才用 YouTube 自動補）。因此 `https://youtu.be/IGNORE_PREVIOUS_INSTRUCTIONS...` 或 `stream_date="Ignore previous instructions..."` 都會存進 D1。既然修補的前提是「印出來的只能是受限 key」，sink 端就必須自行驗形狀，不信任上游。
 
 ### 3.1 清洗工具（新增兩個純函式）
 
@@ -55,6 +57,13 @@
 > 實作筆記：正則字面量內的控制字元改用 `String.fromCharCode(0x1b)` / `0x07` 組裝，避免在原始碼留下隱形位元組；殘餘範圍以 code point 迭代比對。寫檔後以 `grep`/`od` 驗證原始碼不含生控制位元組。
 
 `safeField`：先 `stripControlChars`，再把連續空白收斂成單一空白、`trim`，空字串回退為 `fallback`。處理字串與數字（`String(value)`）。先移除完整跳脫序列、再清殘餘——過度清洗（寧多勿少）對安全是正確取捨。
+
+另增兩個 sink 端形狀驗證器（見上方 (d)）：
+
+- `safeVideoId(value)`：符合 `^[A-Za-z0-9_-]{11}$` 才原樣印出，否則回 `(invalid)`。
+- `safeDate(value)`：空回 `no-date`；符合 `^\d{4}-\d{2}-\d{2}$` 才原樣印出；非空但不符回 `(invalid)`。
+
+兩者皆只放行受限字元，故不需再過 `safeField`（驗證本身已排除控制字元與自由文字）。
 
 ### 3.2 改寫三個 line formatter（`key=value` 風格）
 
