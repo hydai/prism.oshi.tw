@@ -55,8 +55,11 @@ export function loadAnnounceWebhook(): string | undefined {
 // live origin/master content — a stream/streamer embed posts iff its liveKey (videoId / link, see
 // `deriveLiveKey`) is present there, so an unrelated same-file change neither blesses a removed embed
 // nor drops a live one. Tokenless aggregate embeds (flood summary, subscriber digest) fall back to
-// the recorded whole-file `hash` (taken after the new files are written). A batch with empty/absent
-// `sources` posts unconditionally — old-format migration / already-verified partial-flush remainder.
+// the recorded whole-file `hash` (taken after the new files are written). A batch may also list
+// `presenceSources` — files that must exist on origin/master but are excluded from the hash/liveKey
+// search, gating a tokenless embed on its scaffolded data dir being live without that volatile content
+// perturbing its stable hash. A batch with empty/absent `sources` (and no missing presence source)
+// posts unconditionally — old-format migration / already-verified partial-flush remainder.
 // Enqueue is a plain append; flush dedupes by liveKey. The path is injectable for unit tests.
 
 const REPO_ROOT = path.resolve(__dirname, '../..');
@@ -64,6 +67,12 @@ const REPO_ROOT = path.resolve(__dirname, '../..');
 export interface PendingBatch {
   embeds: DiscordEmbed[];
   sources?: string[];
+  /**
+   * Files that must EXIST on origin/master for the batch to be live, but whose content is excluded
+   * from `liveContentOf`/hash/liveKey search. Use for files whose mere presence proves liveness (a new
+   * streamer's scaffolded data dir) without their volatile content perturbing a tokenless embed's hash.
+   */
+  presenceSources?: string[];
   hash?: string;
 }
 
@@ -132,9 +141,20 @@ function liveContentOf(sources: string[], readLive: (source: string) => string):
   }
 }
 
+/** True iff every source is readable on origin/master (existence check only; content is ignored). */
+function allPresent(sources: string[], readLive: (source: string) => string): boolean {
+  try {
+    for (const source of sources) readLive(source);
+    return true;
+  } catch {
+    return false; // a presence-only source missing from origin/master ⇒ the batch's data isn't fully live
+  }
+}
+
 /**
  * Decide which queued embeds to post by PER-EMBED liveness against the live content from `readLive`
- * (origin/master). For each batch, in queue order, each embed is kept iff:
+ * (origin/master). A batch whose `presenceSources` are not all live on origin/master is dropped whole;
+ * otherwise, for each batch in queue order, each embed is kept iff:
  *  - sourceless batch → unconditional (old-format migration / already-verified remainder);
  *  - token-bearing embed (`deriveLiveKey != null`) → its token is present in the batch's live source
  *    content, so an unrelated same-file change never blesses a removed embed nor drops a live one;
@@ -154,7 +174,14 @@ export function partitionByLiveness(
   for (const batch of batches) {
     const sourceless = !batch.sources || batch.sources.length === 0;
     const sourcesKey = JSON.stringify(batch.sources ?? []);
-    const content = sourceless ? '' : liveContentOf(batch.sources!, readLive);
+    // Presence-only sources must exist on origin/master but never enter `content`/hash/liveKey search,
+    // so a tokenless embed stays gated on its scaffolded files being live without their volatile
+    // content breaking its stable hash. A missing presence source drops the whole batch — checked
+    // first so a failed gate skips the (potentially costly `git show`) read of the content sources.
+    const presenceOk =
+      !batch.presenceSources || batch.presenceSources.length === 0 || allPresent(batch.presenceSources, readLive);
+    let content: string | null = null;
+    if (presenceOk) content = sourceless ? '' : liveContentOf(batch.sources!, readLive);
     const liveEmbeds: DiscordEmbed[] = [];
     for (const embed of batch.embeds) {
       const key = deriveLiveKey(embed);
@@ -162,7 +189,8 @@ export function partitionByLiveness(
       // under two streamers (different `sources`) keeps both legitimate announcements.
       const dedupeKey = `${sourcesKey}\0${key ?? JSON.stringify(embed)}`;
       let live: boolean;
-      if (sourceless) live = true;
+      if (!presenceOk) live = false;
+      else if (sourceless) live = true;
       else if (content === null) live = false;
       else if (key !== null) live = content.includes(key);
       else live = sha256(content) === batch.hash;
@@ -181,8 +209,8 @@ export function partitionByLiveness(
 
 /**
  * The batches still to post after `postedInCurrent` embeds of `verified[currentIndex]` have been
- * sent: the current batch's unposted remainder (retaining its `sources`+`hash` so a retry
- * re-verifies it against origin/master) followed by every later batch untouched. Returns [] once
+ * sent: the current batch's unposted remainder (retaining its `sources`/`presenceSources`/`hash` so a
+ * retry re-verifies it against origin/master) followed by every later batch untouched. Returns [] once
  * the final batch is fully posted. announce-flush checkpoints with this after each Discord message
  * so a mid-flush failure never strips the revision metadata off the unposted remainder.
  */
@@ -193,8 +221,7 @@ export function remainingBatchesAfter(
 ): PendingBatch[] {
   const current = verified[currentIndex];
   const remainingEmbeds = current ? current.embeds.slice(postedInCurrent) : [];
-  const head: PendingBatch[] =
-    remainingEmbeds.length > 0 ? [{ embeds: remainingEmbeds, sources: current.sources, hash: current.hash }] : [];
+  const head: PendingBatch[] = remainingEmbeds.length > 0 ? [{ ...current, embeds: remainingEmbeds }] : [];
   return [...head, ...verified.slice(currentIndex + 1)];
 }
 
