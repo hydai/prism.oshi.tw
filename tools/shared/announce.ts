@@ -80,6 +80,19 @@ export function hashSources(sources: string[], read: (source: string) => string 
   return sha256(sources.map(read).join('\0'));
 }
 
+const YOUTU_BE = 'https://youtu.be/';
+
+/**
+ * The token whose presence in the live source content proves this embed's data went live: the
+ * videoId for a stream embed (`youtu.be/<id>`), else the embed's url for a streamer embed, else
+ * null for an aggregate embed (flood summary / subscriber digest) that has no single live subject.
+ */
+export function deriveLiveKey(embed: DiscordEmbed): string | null {
+  if (!embed.url) return null;
+  if (embed.url.startsWith(YOUTU_BE)) return embed.url.slice(YOUTU_BE.length);
+  return embed.url;
+}
+
 export function readPendingBatches(pendingPath: string = PENDING_PATH): PendingBatch[] {
   let parsed: { batches?: PendingBatch[]; embeds?: DiscordEmbed[] };
   try {

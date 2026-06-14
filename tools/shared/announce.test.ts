@@ -3,7 +3,7 @@ import * as fs from 'node:fs';
 import * as os from 'node:os';
 import * as path from 'node:path';
 
-import { clearPendingAnnouncements, enqueueAnnouncements, hashSources, parseDevVar, partitionByLiveHash, readPendingBatches, remainingBatchesAfter, writePendingBatches } from './announce.ts';
+import { clearPendingAnnouncements, deriveLiveKey, enqueueAnnouncements, hashSources, parseDevVar, partitionByLiveHash, readPendingBatches, remainingBatchesAfter, writePendingBatches } from './announce.ts';
 
 function test(name: string, fn: () => void): void {
   try {
@@ -33,6 +33,12 @@ test('parseDevVar strips surrounding quotes', () => {
 
 test('parseDevVar treats an empty value as null', () => {
   assert.equal(parseDevVar('DISCORD_WEBHOOK_ANNOUNCE=\n', 'DISCORD_WEBHOOK_ANNOUNCE'), null);
+});
+
+test('deriveLiveKey: stream embed → videoId; streamer embed → link; aggregate → null', () => {
+  assert.equal(deriveLiveKey({ title: 's', url: 'https://youtu.be/KfadSsRBCi8' }), 'KfadSsRBCi8');
+  assert.equal(deriveLiveKey({ title: 'r', url: 'https://www.youtube.com/c/Foo' }), 'https://www.youtube.com/c/Foo');
+  assert.equal(deriveLiveKey({ title: '📈 訂閱數更新' }), null);
 });
 
 test('pending queue: missing file reads as empty; enqueue accumulates batches; clear removes', () => {
