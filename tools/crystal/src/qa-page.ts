@@ -9,13 +9,13 @@ const TYPE_LABELS: Record<string, string> = {
   other: '其他',
 };
 
-function formatDate(iso: string): string {
-  try {
-    const d = new Date(iso);
-    return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
-  } catch {
-    return iso;
-  }
+// new Date(str) never throws — invalid input yields an Invalid Date whose
+// getters return NaN. Guard explicitly and return a fixed, safe placeholder so
+// we never echo raw input or emit "NaN-NaN-NaN". (Exported for unit testing.)
+export function formatDate(iso: string): string {
+  const d = new Date(iso);
+  if (Number.isNaN(d.getTime())) return '';
+  return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
 }
 
 function escapeHtml(s: string): string {
