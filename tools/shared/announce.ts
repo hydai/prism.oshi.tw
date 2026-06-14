@@ -174,12 +174,14 @@ export function partitionByLiveness(
   for (const batch of batches) {
     const sourceless = !batch.sources || batch.sources.length === 0;
     const sourcesKey = JSON.stringify(batch.sources ?? []);
-    const content = sourceless ? '' : liveContentOf(batch.sources!, readLive);
     // Presence-only sources must exist on origin/master but never enter `content`/hash/liveKey search,
     // so a tokenless embed stays gated on its scaffolded files being live without their volatile
-    // content breaking its stable hash. A missing presence source drops the whole batch.
+    // content breaking its stable hash. A missing presence source drops the whole batch — checked
+    // first so a failed gate skips the (potentially costly `git show`) read of the content sources.
     const presenceOk =
       !batch.presenceSources || batch.presenceSources.length === 0 || allPresent(batch.presenceSources, readLive);
+    let content: string | null = null;
+    if (presenceOk) content = sourceless ? '' : liveContentOf(batch.sources!, readLive);
     const liveEmbeds: DiscordEmbed[] = [];
     for (const embed of batch.embeds) {
       const key = deriveLiveKey(embed);

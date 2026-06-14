@@ -210,6 +210,7 @@ export function registryAnnouncementBatches(
   diff: StreamerDiff,
   computeHash: (sources: string[]) => string = hashSources,
 ): PendingBatch[] {
+  if (diff.newStreamers.length === 0 && diff.subscriberChanges.length === 0) return []; // nothing to hash
   // Every registry announcement is hashed over registry.json (streamer links, slugs, and subscriber
   // counts all live there); a new streamer's scaffolded data files ride along as presence-only.
   const sources = ['data/registry.json'];

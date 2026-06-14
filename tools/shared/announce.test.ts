@@ -236,6 +236,21 @@ test('partitionByLiveness: presence-only sources also guard token-bearing embeds
   assert.deepEqual(verified, []);
 });
 
+test('partitionByLiveness: a missing presence source short-circuits before reading content sources', () => {
+  // Presence is checked first; a missing presence source drops the batch without the wasted `git show`
+  // of the content sources.
+  const reads: string[] = [];
+  const readLive = (s: string): string => {
+    reads.push(s);
+    if (s === 'data/x/songs.json') throw new Error('gone'); // missing presence source
+    return 'CONTENT';
+  };
+  const batch = { embeds: [{ title: 't' }], sources: ['data/registry.json'], presenceSources: ['data/x/songs.json'], hash: 'h' };
+  const { verified } = partitionByLiveness([batch], readLive);
+  assert.deepEqual(verified, []);
+  assert.equal(reads.includes('data/registry.json'), false); // content source never read — presence gate failed first
+});
+
 test('remainingBatchesAfter preserves presenceSources on the unposted remainder', () => {
   const verified = [
     { embeds: [{ title: 'e1' }, { title: 'e2' }], sources: ['data/registry.json'], presenceSources: ['data/x/songs.json'], hash: 'h' },

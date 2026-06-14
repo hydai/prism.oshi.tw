@@ -92,8 +92,12 @@ test('registryAnnouncementBatches: new streamers first, then the digest; presenc
   assert.equal(batches[2].presenceSources, undefined); // digest batch: no presence sources
 });
 
-test('registryAnnouncementBatches: nothing to announce → no batches', () => {
-  assert.deepEqual(registryAnnouncementBatches({ newStreamers: [], subscriberChanges: [] }, joinHash), []);
+test('registryAnnouncementBatches: nothing to announce → no batches, and no hash/disk read', () => {
+  // An empty diff must not hash registry.json (a disk read in production) — return [] before hashing.
+  const throwingHash = (): string => {
+    throw new Error('computeHash must not run on an empty diff');
+  };
+  assert.deepEqual(registryAnnouncementBatches({ newStreamers: [], subscriberChanges: [] }, throwingHash), []);
 });
 
 console.log('sync-registry.test: all passed');
