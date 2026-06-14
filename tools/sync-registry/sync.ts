@@ -15,8 +15,8 @@ import { fileURLToPath } from 'node:url';
 
 import { seedIfMissing } from '../shared/sync-state.ts';
 
-import { newStreamerEmbed, subscriberDigestEmbed, type DiscordEmbed } from '../../admin/shared/discord.ts';
-import { enqueueAnnouncements, hashSources, loadAnnounceWebhook } from '../shared/announce.ts';
+import { newStreamerEmbed, subscriberDigestEmbed } from '../../admin/shared/discord.ts';
+import { enqueueAnnouncements, hashSources, loadAnnounceWebhook, type PendingBatch } from '../shared/announce.ts';
 
 // --- Paths ---
 
@@ -195,23 +195,40 @@ function readExistingStreamers(): StreamerConfig[] {
   return parsed.streamers ?? [];
 }
 
+/**
+ * Build the fan-announcement batches for a registry diff (pure; `computeHash` is injectable for tests).
+ * Each new streamer gets its OWN batch whose sources include the data files scaffolded for it in the
+ * same run, so a partial push (registry.json without the streamer's data dir) leaves `liveContentOf`
+ * unable to read a source → the 🎉 auto-drops at flush until the streamer's page is actually live.
+ * The subscriber digest stays in a registry.json-only batch — its data lives entirely in registry.json.
+ */
+export function registryAnnouncementBatches(
+  diff: StreamerDiff,
+  computeHash: (sources: string[]) => string = hashSources,
+): PendingBatch[] {
+  const batches: PendingBatch[] = [];
+  for (const s of diff.newStreamers) {
+    const sources = ['data/registry.json', `data/${s.slug}/songs.json`, `data/${s.slug}/streams.json`];
+    const embed = newStreamerEmbed({ displayName: s.displayName, group: s.group, link: s.socialLinks.youtube ?? s.externalUrl ?? '' });
+    batches.push({ embeds: [embed], sources, hash: computeHash(sources) });
+  }
+  if (diff.subscriberChanges.length > 0) {
+    const sources = ['data/registry.json'];
+    batches.push({ embeds: [subscriberDigestEmbed(diff.subscriberChanges)], sources, hash: computeHash(sources) });
+  }
+  return batches;
+}
+
 // Queue fan announcements for posting after registry.json is committed + pushed
 // (via `npm run announce:flush`). Gated on the webhook so the feature is dormant
 // when unset.
 function announceRegistry(diff: StreamerDiff): void {
   if (!loadAnnounceWebhook()) return;
 
-  const embeds: DiscordEmbed[] = [];
-  for (const s of diff.newStreamers) {
-    embeds.push(newStreamerEmbed({ displayName: s.displayName, group: s.group, link: s.socialLinks.youtube ?? s.externalUrl ?? '' }));
-  }
-  if (diff.subscriberChanges.length > 0) {
-    embeds.push(subscriberDigestEmbed(diff.subscriberChanges));
-  }
-  if (embeds.length === 0) return;
+  const batches = registryAnnouncementBatches(diff);
+  if (batches.length === 0) return;
 
-  const sources = ['data/registry.json'];
-  enqueueAnnouncements({ embeds, sources, hash: hashSources(sources) });
+  for (const batch of batches) enqueueAnnouncements(batch);
   console.log(`  📥 queued ${diff.newStreamers.length} new streamer(s) + ${diff.subscriberChanges.length} subscriber change(s) — posted after push (npm run announce:flush)`);
 }
 
