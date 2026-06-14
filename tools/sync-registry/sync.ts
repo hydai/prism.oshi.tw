@@ -196,7 +196,9 @@ function readExistingStreamers(): StreamerConfig[] {
 }
 
 /**
- * Build the fan-announcement batches for a registry diff (pure; `computeHash` is injectable for tests).
+ * Build the fan-announcement batches for a registry diff. The embeds + sources are a deterministic
+ * function of `diff`; the only I/O is `computeHash`, which defaults to `hashSources` (reads the source
+ * files) but is injectable so tests run disk-free.
  * Each new streamer gets its OWN batch whose sources include the data files scaffolded for it in the
  * same run. At flush, a source missing from origin/master (e.g. a partial push of registry.json without
  * the streamer's data dir) makes `liveContentOf` return null, so the batch's embed is dropped instead
