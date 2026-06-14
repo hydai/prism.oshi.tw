@@ -67,7 +67,7 @@ Streamers are managed through the Nova admin backend, **not** by hand-editing fi
 
 1. Approve the streamer in the Nova admin (D1-backed)
 2. `npm run sync:registry` — regenerates `data/registry.json` and `lib/streamer-slugs.ts` from the Nova DB
-3. `npm run sync:data` — exports approved songs/streams to `data/{slug}/`
+3. `npm run sync:data -- <slug>` — exports that streamer's approved songs/streams to `data/<slug>/`
 4. Commit & push → GitHub Actions rebuilds and deploys
 
 ## License
