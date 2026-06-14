@@ -1,5 +1,7 @@
 # Announce Revision-Binding (Issue #11) Implementation Plan
 
+> **⚠️ Updated during PR #13 review — read before the body below.** `enqueueAnnouncements` ships as **merge-same-source** (concatenate + dedupe embeds by subject, adopt the latest hash), **not** the "replace-by-sources" this plan originally describes. The change fixes an incremental-sync drop (approve A, then approve B before pushing — replace would discard A's still-pending announcement). The residual gap (a merged batch can "bless" an embed whose data was abandoned before push) is a documented KNOWN LIMITATION in `tools/shared/announce.ts`, tracked for a per-embed-liveness redesign in **#14**. Flush also now runs `git fetch origin master` before verifying and raises `git show`'s `maxBuffer`. Sections below describe the *original plan*; the shipped behavior is authoritative in the code + #14.
+
 > **For agentic workers:** REQUIRED SUB-SKILL: Use superpowers:subagent-driven-development (recommended) or superpowers:executing-plans to implement this plan task-by-task. Steps use checkbox (`- [ ]`) syntax for tracking.
 
 **Goal:** Bind each queued fan announcement to the data it describes so `announce:flush` only posts announcements whose data actually went live on `origin/master`; abandoned/never-pushed syncs are dropped.
