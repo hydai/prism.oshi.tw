@@ -260,4 +260,68 @@ test('remainingBatchesAfter preserves presenceSources on the unposted remainder'
   ]);
 });
 
+test('partitionByLiveness: a tokenless aggregate with liveKeys posts iff ALL liveKeys are in the record', () => {
+  const live: Record<string, string> = { 'data/x/streams.json': '[{"videoId":"Vid_A"},{"videoId":"Vid_B"},{"videoId":"Vid_C"}]' };
+  const readLive = (s: string): string => {
+    if (!(s in live)) throw new Error('gone');
+    return live[s];
+  };
+  // hash is deliberately stale to prove liveKeys (not the hash) decide a tokenless aggregate.
+  const allLive = { embeds: [{ title: '🎵 summary' }], sources: ['data/x/streams.json'], liveKeys: ['Vid_A', 'Vid_B'], hash: 'stale' };
+  const oneGone = { embeds: [{ title: '🎵 summary2' }], sources: ['data/x/streams.json'], liveKeys: ['Vid_A', 'Vid_GONE'], hash: 'stale' };
+  assert.deepEqual(partitionByLiveness([allLive], readLive).verified.flatMap((b) => b.embeds.map((e) => e.title)), ['🎵 summary']); // all present → posts
+  assert.deepEqual(partitionByLiveness([oneGone], readLive).verified, []); // one liveKey missing → dropped (wrong-count summary suppressed)
+});
+
+test('partitionByLiveness: liveKeys match JSON-encoded values (resist substring collision + escaping)', () => {
+  // record is real JSON: 'Mei' must NOT match inside the longer "Meiko" value (collision), and a
+  // displayName containing a quote must match its JSON-escaped form in the record (escaping).
+  const live: Record<string, string> = { 'data/registry.json': '[{"displayName":"Meiko"},{"displayName":"Ai\\"ko"}]' };
+  const readLive = (s: string): string => {
+    if (!(s in live)) throw new Error('gone');
+    return live[s];
+  };
+  const meiGone = { embeds: [{ title: 'mei' }], sources: ['data/registry.json'], liveKeys: ['Mei'] }; // not a JSON value → dropped
+  const aiko = { embeds: [{ title: 'aiko' }], sources: ['data/registry.json'], liveKeys: ['Ai"ko'] }; // escaped form present → posts
+  assert.deepEqual(partitionByLiveness([meiGone], readLive).verified, []); // collision avoided
+  assert.deepEqual(partitionByLiveness([aiko], readLive).verified.flatMap((b) => b.embeds.map((e) => e.title)), ['aiko']); // escaping handled
+});
+
+test('partitionByLiveness: two tokenless aggregates with identical embeds but different liveKeys are both kept', () => {
+  // Two 11-stream flood summaries for the same streamer have identical embed JSON ("11 場") but cover
+  // different videoIds — dedupe by liveKeys must not collapse them into one.
+  const live: Record<string, string> = { 'data/x/streams.json': '[{"videoId":"A1"},{"videoId":"B1"}]' };
+  const readLive = (s: string): string => {
+    if (!(s in live)) throw new Error('gone');
+    return live[s];
+  };
+  const sum1 = { embeds: [{ title: '🎵 summary' }], sources: ['data/x/streams.json'], liveKeys: ['A1'] };
+  const sum2 = { embeds: [{ title: '🎵 summary' }], sources: ['data/x/streams.json'], liveKeys: ['B1'] };
+  const { verified } = partitionByLiveness([sum1, sum2], readLive);
+  assert.equal(verified.flatMap((b) => b.embeds).length, 2); // both kept — distinct subjects
+});
+
+test('partitionByLiveness: a tokenless aggregate WITHOUT liveKeys still uses the hash fallback', () => {
+  const live: Record<string, string> = { 'data/registry.json': 'REG' };
+  const readLive = (s: string): string => {
+    if (!(s in live)) throw new Error('gone');
+    return live[s];
+  };
+  const match = { embeds: [{ title: '📈' }], sources: ['data/registry.json'], hash: hashSources(['data/registry.json'], readLive) };
+  const stale = { embeds: [{ title: '📈 old' }], sources: ['data/registry.json'], hash: 'stale' };
+  assert.deepEqual(partitionByLiveness([match], readLive).verified.flatMap((b) => b.embeds.map((e) => e.title)), ['📈']);
+  assert.deepEqual(partitionByLiveness([stale], readLive).verified, []);
+});
+
+test('partitionByLiveness: a stream token is verified against sources (the record), not presenceSources', () => {
+  // #16 part 1: videoId lingers in songs.json (presence) but was removed from streams.json (record) → dropped.
+  const live: Record<string, string> = { 'data/x/streams.json': 'OtherVid', 'data/x/songs.json': 'RemovedVid appears here' };
+  const readLive = (s: string): string => {
+    if (!(s in live)) throw new Error('gone');
+    return live[s];
+  };
+  const batch = { embeds: [{ title: 'r', url: 'https://youtu.be/RemovedVid' }], sources: ['data/x/streams.json'], presenceSources: ['data/x/songs.json'], hash: 'h' };
+  assert.deepEqual(partitionByLiveness([batch], readLive).verified, []); // not in streams.json content → dropped
+});
+
 console.log('announce.test: all passed');

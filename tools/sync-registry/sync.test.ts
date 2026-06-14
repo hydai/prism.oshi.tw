@@ -100,4 +100,26 @@ test('registryAnnouncementBatches: nothing to announce → no batches, and no ha
   assert.deepEqual(registryAnnouncementBatches({ newStreamers: [], subscriberChanges: [] }, throwingHash), []);
 });
 
+test('registryAnnouncementBatches: each new streamer carries liveKeys=[slug] (unique no-link fallback)', () => {
+  const diff: StreamerDiff = { newStreamers: [cfg('aiko', 'Aiko', '1萬')], subscriberChanges: [] };
+  const batches = registryAnnouncementBatches(diff, joinHash);
+  // slug is the unique registry key (display_name is not), so a no-link streamer verifies by slug.
+  assert.deepEqual(batches[0].liveKeys, ['aiko']);
+});
+
+test('registryAnnouncementBatches: subscriber digest carries liveKeys = the new counts', () => {
+  const diff: StreamerDiff = {
+    newStreamers: [],
+    subscriberChanges: [
+      { displayName: 'Aiko', from: '1萬', to: '1.1萬' },
+      { displayName: 'Mei', from: '2萬', to: '2.2萬' },
+    ],
+  };
+  const batches = registryAnnouncementBatches(diff, joinHash);
+  assert.equal(batches.length, 1);
+  // the digest announces the NEW counts, so it verifies those are live in registry.json (not merely
+  // that the streamer still exists) — a reverted count drops it.
+  assert.deepEqual(batches[0].liveKeys, ['1.1萬', '2.2萬']);
+});
+
 console.log('sync-registry.test: all passed');
