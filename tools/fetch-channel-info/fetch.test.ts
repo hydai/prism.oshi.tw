@@ -1,4 +1,7 @@
 import * as assert from 'node:assert/strict';
+import * as fs from 'node:fs';
+import * as os from 'node:os';
+import * as path from 'node:path';
 
 import {
   APPROVED_WITH_CHANNEL_SQL,
@@ -7,6 +10,7 @@ import {
   parseDevVarYoutubeKey,
   parseWranglerResults,
   toSqlStringLiteral,
+  writeSqlToPrivateTempFile,
 } from './fetch';
 
 function test(name: string, fn: () => void): void {
@@ -121,6 +125,56 @@ test('approved-with-channel query selects approved rows that have a channel id',
   assert.match(APPROVED_WITH_CHANNEL_SQL, /status\s*=\s*'approved'/i);
   assert.match(APPROVED_WITH_CHANNEL_SQL, /youtube_channel_id\s*!=\s*''/i);
   assert.doesNotMatch(APPROVED_WITH_CHANNEL_SQL, /\bLIMIT\b/i);
+});
+
+// --- writeSqlToPrivateTempFile (temp-file race hardening) ---
+//
+// The SQL written here is executed against the production Nova D1 via
+// `wrangler d1 execute --file=<path>`. Writing it to a predictable name under the
+// shared os.tmpdir() let a local attacker pre-plant a symlink or race-replace the
+// file before wrangler read it (TOCTOU). These tests pin the hardened contract:
+// the file must live inside a freshly created, owner-only private directory.
+
+test('writeSqlToPrivateTempFile stores the SQL inside a dedicated subdirectory of os.tmpdir()', () => {
+  const { dir, file } = writeSqlToPrivateTempFile('SELECT 1;');
+  try {
+    assert.equal(path.dirname(file), dir, 'SQL file must live inside its private directory');
+    assert.equal(path.dirname(dir), os.tmpdir(), 'private directory must be a child of os.tmpdir()');
+    assert.notEqual(path.resolve(dir), path.resolve(os.tmpdir()), 'must not write directly into the shared temp dir');
+  } finally {
+    fs.rmSync(dir, { recursive: true, force: true });
+  }
+});
+
+test('writeSqlToPrivateTempFile creates an owner-only directory (no group/other access)', () => {
+  const { dir } = writeSqlToPrivateTempFile('SELECT 1;');
+  try {
+    const mode = fs.statSync(dir).mode & 0o777;
+    assert.equal(mode & 0o077, 0, `temp dir must deny group/other access; got 0${mode.toString(8)}`);
+  } finally {
+    fs.rmSync(dir, { recursive: true, force: true });
+  }
+});
+
+test('writeSqlToPrivateTempFile writes the SQL with a trailing newline', () => {
+  const { dir, file } = writeSqlToPrivateTempFile('UPDATE submissions SET subscriber_count=\'5萬\' WHERE id=\'s1\';');
+  try {
+    assert.equal(fs.readFileSync(file, 'utf-8'), "UPDATE submissions SET subscriber_count='5萬' WHERE id='s1';\n");
+  } finally {
+    fs.rmSync(dir, { recursive: true, force: true });
+  }
+});
+
+test('writeSqlToPrivateTempFile uses an unpredictable, unique path per call', () => {
+  const a = writeSqlToPrivateTempFile('SELECT 1;');
+  const b = writeSqlToPrivateTempFile('SELECT 1;');
+  try {
+    assert.notEqual(a.dir, b.dir, 'each call must create a distinct directory');
+    assert.notEqual(a.file, b.file, 'each call must produce a distinct file path');
+  } finally {
+    fs.rmSync(a.dir, { recursive: true, force: true });
+    fs.rmSync(b.dir, { recursive: true, force: true });
+  }
 });
 
 console.log('✓ fetch-channel-info helpers');
