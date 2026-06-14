@@ -73,4 +73,20 @@ test('assertValidSlug includes the caller-supplied context in the message', () =
   );
 });
 
+// --- Non-string inputs: registry.json is untrusted JSON, so the validator must
+//     fail closed on non-strings instead of letting RegExp.test() coerce them. ---
+
+test('isValidSlug rejects non-string values instead of coercing them via String()', () => {
+  // Without a typeof guard, RegExp.test coerces: 123 -> "123", null -> "null",
+  // true -> "true", ['mizuki'] -> "mizuki" — all of which would sneak past the allowlist.
+  const nonStrings: unknown[] = [123, 0, true, false, null, undefined, ['mizuki'], { slug: 'mizuki' }];
+  for (const v of nonStrings) {
+    assert.equal(isValidSlug(v), false, `expected ${JSON.stringify(v)} to be rejected`);
+  }
+});
+
+test('assertValidSlug throws on a non-string slug (e.g. a number from a tampered registry)', () => {
+  assert.throws(() => assertValidSlug(123 as unknown), /Invalid streamer slug/);
+});
+
 console.log('slug.test: all passed');

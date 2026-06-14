@@ -54,4 +54,11 @@ test('readRegistry ignores a disabled malicious slug (filtered before it can rea
   assert.deepEqual(result.map((s) => s.slug), ['mizuki']);
 });
 
+test('readRegistry throws on a non-string slug in a tampered registry instead of coercing it', () => {
+  // registry.json is untrusted JSON: a numeric slug like 123 must fail closed, not be
+  // coerced to "123" by RegExp.test and accepted (Codex PR #31 finding).
+  const root = tmpRegistry([{ slug: 123 as unknown as string, enabled: true }]);
+  assert.throws(() => readRegistry(root), /Invalid streamer slug/);
+});
+
 console.log('detect.test: all passed');

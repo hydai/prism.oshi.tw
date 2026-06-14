@@ -20,8 +20,12 @@
 const SLUG_RE = /^[a-z0-9][a-z0-9-]{0,48}[a-z0-9]$/;
 const SHORT_SLUG_RE = /^[a-z0-9]{1,2}$/;
 
-export function isValidSlug(slug: string): boolean {
-  return SLUG_RE.test(slug) || SHORT_SLUG_RE.test(slug);
+export function isValidSlug(slug: unknown): slug is string {
+  // typeof guard first: slugs come from JSON.parse(registry.json), so a tampered or
+  // malformed file can supply a non-string. Without this, RegExp.test() coerces via
+  // String() — 123 -> "123", null -> "null", ['mizuki'] -> "mizuki" — and the
+  // allowlist would accept them (fail open). Reject anything that isn't a string.
+  return typeof slug === 'string' && (SLUG_RE.test(slug) || SHORT_SLUG_RE.test(slug));
 }
 
 /**
@@ -29,7 +33,7 @@ export function isValidSlug(slug: string): boolean {
  * or command) is woven into the message so an operator can see where the bad
  * value came from.
  */
-export function assertValidSlug(slug: string, context?: string): void {
+export function assertValidSlug(slug: unknown, context?: string): asserts slug is string {
   if (isValidSlug(slug)) return;
   const where = context ? ` (from ${context})` : '';
   throw new Error(
