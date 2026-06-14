@@ -55,49 +55,15 @@ test('pending queue: missing file reads as empty; enqueue accumulates batches; c
   assert.deepEqual(readPendingBatches(tmp), []);
 });
 
-test('pending queue: same-source enqueue merges so an earlier sync is not dropped', () => {
-  // Codex-P2: a second `sync:data <slug>` before push announces only the new stream, but
-  // must NOT drop the first sync's still-pending announcement for the same files. The merged
-  // batch adopts the latest hash so flush verifies it against the newest revision of the files.
-  const tmp = path.join(os.tmpdir(), `pending-announce-merge-${process.pid}.json`);
+test('pending queue: enqueue appends batches (dedupe deferred to flush by liveKey)', () => {
+  const tmp = path.join(os.tmpdir(), `pending-append-${process.pid}.json`);
   fs.rmSync(tmp, { force: true });
   enqueueAnnouncements({ embeds: [{ url: 'https://youtu.be/A', title: 'A' }], sources: ['data/x/streams.json'], hash: 'hA' }, tmp);
-  enqueueAnnouncements({ embeds: [{ url: 'https://youtu.be/B', title: 'B' }], sources: ['data/x/streams.json'], hash: 'hAB' }, tmp);
+  enqueueAnnouncements({ embeds: [{ url: 'https://youtu.be/A', title: 'A' }], sources: ['data/x/streams.json'], hash: 'hA2' }, tmp);
+  // Both kept on disk; partitionByLiveness dedupes by videoId at flush.
   assert.deepEqual(readPendingBatches(tmp), [
-    {
-      embeds: [{ url: 'https://youtu.be/A', title: 'A' }, { url: 'https://youtu.be/B', title: 'B' }],
-      sources: ['data/x/streams.json'],
-      hash: 'hAB',
-    },
-  ]);
-  clearPendingAnnouncements(tmp);
-});
-
-test('pending queue: same-source enqueue dedupes a re-announced url, keeping the latest', () => {
-  // The revert-then-resync case (announce A, `git checkout` the data, sync again) must collapse
-  // the duplicate A to a single, latest announcement rather than posting it to fans twice.
-  const tmp = path.join(os.tmpdir(), `pending-announce-dedup-${process.pid}.json`);
-  fs.rmSync(tmp, { force: true });
-  enqueueAnnouncements({ embeds: [{ url: 'https://youtu.be/A', title: 'A v1' }], sources: ['data/x/streams.json'], hash: 'h1' }, tmp);
-  enqueueAnnouncements({ embeds: [{ url: 'https://youtu.be/A', title: 'A v2' }], sources: ['data/x/streams.json'], hash: 'h2' }, tmp);
-  assert.deepEqual(readPendingBatches(tmp), [
-    { embeds: [{ url: 'https://youtu.be/A', title: 'A v2' }], sources: ['data/x/streams.json'], hash: 'h2' },
-  ]);
-  clearPendingAnnouncements(tmp);
-});
-
-test('pending queue: merge keeps each subject first-seen position with its latest value', () => {
-  const tmp = path.join(os.tmpdir(), `pending-announce-order-${process.pid}.json`);
-  fs.rmSync(tmp, { force: true });
-  enqueueAnnouncements({ embeds: [{ url: 'https://youtu.be/A', title: 'A v1' }, { url: 'https://youtu.be/B', title: 'B' }], sources: ['data/x/streams.json'], hash: 'h1' }, tmp);
-  enqueueAnnouncements({ embeds: [{ url: 'https://youtu.be/A', title: 'A v2' }], sources: ['data/x/streams.json'], hash: 'h2' }, tmp);
-  // A keeps its first-seen slot (index 0) but takes the latest value (A v2); B stays after it.
-  assert.deepEqual(readPendingBatches(tmp), [
-    {
-      embeds: [{ url: 'https://youtu.be/A', title: 'A v2' }, { url: 'https://youtu.be/B', title: 'B' }],
-      sources: ['data/x/streams.json'],
-      hash: 'h2',
-    },
+    { embeds: [{ url: 'https://youtu.be/A', title: 'A' }], sources: ['data/x/streams.json'], hash: 'hA' },
+    { embeds: [{ url: 'https://youtu.be/A', title: 'A' }], sources: ['data/x/streams.json'], hash: 'hA2' },
   ]);
   clearPendingAnnouncements(tmp);
 });

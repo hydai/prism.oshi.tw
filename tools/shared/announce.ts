@@ -116,41 +116,14 @@ export function writePendingBatches(batches: PendingBatch[], pendingPath: string
   fs.writeFileSync(pendingPath, JSON.stringify({ batches: nonEmpty }, null, 2) + '\n', 'utf-8');
 }
 
-const embedKey = (e: DiscordEmbed): string => e.url ?? JSON.stringify(e);
-
-/** Collapse embeds describing the same subject (same `url`, else identical content): each subject
- *  keeps its FIRST-SEEN position but its LATEST value, so a re-announced item carries its freshest
- *  data and is never posted twice. */
-function dedupeEmbeds(embeds: DiscordEmbed[]): DiscordEmbed[] {
-  const byKey = new Map<string, DiscordEmbed>();
-  for (const e of embeds) byKey.set(embedKey(e), e); // Map keeps an existing key's slot, updates its value
-  return [...byKey.values()];
-}
-
 /**
- * Append a batch. For a non-empty `sources` set, MERGE into any existing same-source batch rather
- * than replacing it: concatenate both embed lists (so an earlier sync's still-pending announcements
- * survive a later same-file sync), dedupe by subject, and adopt the incoming (latest) hash so flush
- * verifies against the newest revision of those files. A sourceless batch is appended as-is (never
- * merged — it is already unconditional). Empty-embed batches are dropped.
- *
- * KNOWN LIMITATION (#14): adopting the latest hash for the merged batch can "bless" a carried-
- * forward embed whose data was abandoned/un-approved before push (approve A → abandon A → approve B
- * for the same slug → A is posted though it never went live). A whole-file hash can't tell "A kept"
- * from "A removed"; the proper fix is per-embed liveness verification at flush, tracked in #14.
+ * Append a batch to the queue. Verification and de-duplication both happen at flush (per-embed
+ * liveness, then dedupe by liveKey), so enqueue stays a simple append: re-running a sync just adds
+ * batches that the flush collapses against the live data. Empty-embed batches are dropped.
  */
 export function enqueueAnnouncements(batch: PendingBatch, pendingPath: string = PENDING_PATH): void {
   if (batch.embeds.length === 0) return;
-  const existing = readPendingBatches(pendingPath);
-  const key = JSON.stringify(batch.sources ?? []);
-  if (key === '[]') {
-    writePendingBatches([...existing, batch], pendingPath);
-    return;
-  }
-  const others = existing.filter((b) => JSON.stringify(b.sources ?? []) !== key);
-  const sameSource = existing.filter((b) => JSON.stringify(b.sources ?? []) === key);
-  const mergedEmbeds = dedupeEmbeds([...sameSource.flatMap((b) => b.embeds), ...batch.embeds]);
-  writePendingBatches([...others, { embeds: mergedEmbeds, sources: batch.sources, hash: batch.hash }], pendingPath);
+  writePendingBatches([...readPendingBatches(pendingPath), batch], pendingPath);
 }
 
 function liveContentOf(sources: string[], readLive: (source: string) => string): string | null {
