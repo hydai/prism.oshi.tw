@@ -196,28 +196,32 @@ function readExistingStreamers(): StreamerConfig[] {
 }
 
 /**
- * Build the fan-announcement batches for a registry diff. The embeds + sources are a deterministic
- * function of `diff`; the only I/O is `computeHash`, which defaults to `hashSources` (reads the source
- * files) but is injectable so tests run disk-free.
- * Each new streamer gets its OWN batch whose sources include the data files scaffolded for it in the
- * same run. At flush, a source missing from origin/master (e.g. a partial push of registry.json without
- * the streamer's data dir) makes `liveContentOf` return null, so the batch's embed is dropped instead
- * of posted — a half-pushed streamer is never announced to a page that 404s. The subscriber digest
- * stays in a registry.json-only batch, since its data lives entirely in registry.json.
+ * Build the fan-announcement batches for a registry diff. The batch shape is a deterministic function
+ * of `diff`; the only I/O is `computeHash`, which defaults to `hashSources` (reads the source files)
+ * but is injectable so tests run disk-free.
+ * Each new streamer gets its OWN batch: registry.json is the hashed `sources` (the streamer's link &
+ * slug live there), while the data files scaffolded for it are `presenceSources` — they must be live
+ * on origin/master, so a partial push that omits the streamer's data dir drops the 🎉 instead of
+ * posting to a page that 404s, yet their volatile content is excluded from the hash so a later
+ * sync:data can't break a no-link (tokenless) streamer's verification. The subscriber digest is a
+ * plain registry.json batch, since its data lives entirely in registry.json.
  */
 export function registryAnnouncementBatches(
   diff: StreamerDiff,
   computeHash: (sources: string[]) => string = hashSources,
 ): PendingBatch[] {
+  // Every registry announcement is hashed over registry.json (streamer links, slugs, and subscriber
+  // counts all live there); a new streamer's scaffolded data files ride along as presence-only.
+  const sources = ['data/registry.json'];
+  const hash = computeHash(sources);
   const batches: PendingBatch[] = [];
   for (const s of diff.newStreamers) {
-    const sources = ['data/registry.json', `data/${s.slug}/songs.json`, `data/${s.slug}/streams.json`];
+    const presenceSources = [`data/${s.slug}/songs.json`, `data/${s.slug}/streams.json`];
     const embed = newStreamerEmbed({ displayName: s.displayName, group: s.group, link: s.socialLinks.youtube ?? s.externalUrl ?? '' });
-    batches.push({ embeds: [embed], sources, hash: computeHash(sources) });
+    batches.push({ embeds: [embed], sources, presenceSources, hash });
   }
   if (diff.subscriberChanges.length > 0) {
-    const sources = ['data/registry.json'];
-    batches.push({ embeds: [subscriberDigestEmbed(diff.subscriberChanges)], sources, hash: computeHash(sources) });
+    batches.push({ embeds: [subscriberDigestEmbed(diff.subscriberChanges)], sources, hash });
   }
   return batches;
 }

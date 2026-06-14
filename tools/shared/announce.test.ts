@@ -179,4 +179,70 @@ test('remainingBatchesAfter returns empty once the final batch is fully posted',
   assert.deepEqual(remainingBatchesAfter(verified, 0, 1), []);
 });
 
+test('partitionByLiveness: presence-only sources gate liveness but are excluded from the tokenless hash', () => {
+  // songs.json was '[]' at enqueue but a later sync:data populated it before flush. Because it is a
+  // presence-only source (not in `sources`/hash), the tokenless embed still posts — only registry.json
+  // (stable) is hashed. This is the #15 no-link-streamer regression fix.
+  const live: Record<string, string> = {
+    'data/registry.json': 'REGISTRY',
+    'data/x/songs.json': 'populated-after-enqueue',
+    'data/x/streams.json': '[]',
+  };
+  const readLive = (s: string): string => {
+    if (!(s in live)) throw new Error('gone');
+    return live[s];
+  };
+  const batch = {
+    embeds: [{ title: '🎉 new streamer' }], // tokenless (no url)
+    sources: ['data/registry.json'],
+    presenceSources: ['data/x/songs.json', 'data/x/streams.json'],
+    hash: hashSources(['data/registry.json'], readLive), // hash over registry.json only
+  };
+  const { verified } = partitionByLiveness([batch], readLive);
+  assert.deepEqual(verified.flatMap((b) => b.embeds.map((e) => e.title)), ['🎉 new streamer']);
+});
+
+test('partitionByLiveness: a missing presence-only source drops the batch', () => {
+  // Partial push: registry.json is live but the streamer's data dir was not pushed → its page 404s.
+  const live: Record<string, string> = { 'data/registry.json': 'REGISTRY' }; // songs/streams absent
+  const readLive = (s: string): string => {
+    if (!(s in live)) throw new Error('gone');
+    return live[s];
+  };
+  const batch = {
+    embeds: [{ title: '🎉 new streamer' }],
+    sources: ['data/registry.json'],
+    presenceSources: ['data/x/songs.json', 'data/x/streams.json'],
+    hash: hashSources(['data/registry.json'], readLive),
+  };
+  const { verified } = partitionByLiveness([batch], readLive);
+  assert.deepEqual(verified, []);
+});
+
+test('partitionByLiveness: presence-only sources also guard token-bearing embeds', () => {
+  // The token IS live in registry content, but a missing presence source still drops the embed.
+  const live: Record<string, string> = { 'data/registry.json': 'REGISTRY https://www.youtube.com/c/Foo' };
+  const readLive = (s: string): string => {
+    if (!(s in live)) throw new Error('gone');
+    return live[s];
+  };
+  const batch = {
+    embeds: [{ title: 'has link', url: 'https://www.youtube.com/c/Foo' }],
+    sources: ['data/registry.json'],
+    presenceSources: ['data/x/songs.json'], // missing
+    hash: 'ignored',
+  };
+  const { verified } = partitionByLiveness([batch], readLive);
+  assert.deepEqual(verified, []);
+});
+
+test('remainingBatchesAfter preserves presenceSources on the unposted remainder', () => {
+  const verified = [
+    { embeds: [{ title: 'e1' }, { title: 'e2' }], sources: ['data/registry.json'], presenceSources: ['data/x/songs.json'], hash: 'h' },
+  ];
+  assert.deepEqual(remainingBatchesAfter(verified, 0, 1), [
+    { embeds: [{ title: 'e2' }], sources: ['data/registry.json'], presenceSources: ['data/x/songs.json'], hash: 'h' },
+  ]);
+});
+
 console.log('announce.test: all passed');

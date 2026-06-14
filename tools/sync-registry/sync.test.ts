@@ -50,22 +50,22 @@ test('diffStreamers ignores changes when a count is empty', () => {
   assert.equal(diff.subscriberChanges.length, 0);
 });
 
-// --- registryAnnouncementBatches: per-streamer batches sourced on the scaffolded data files (#15) ---
+// --- registryAnnouncementBatches: registry.json hashed, scaffolded data files presence-only (#15) ---
 
-// Inject a fake hasher so the test stays disk-free and can assert each batch's hash is taken over
-// THIS batch's own sources (not a shared registry-only hash).
+// Inject a fake hasher so the test stays disk-free and can assert WHICH sources each batch hashes
+// (registry.json only for a streamer batch; the data files are presence-only, not hashed).
 const joinHash = (sources: string[]): string => sources.join('|');
 
-test('registryAnnouncementBatches: one batch per new streamer, sourced on its scaffolded data files', () => {
+test('registryAnnouncementBatches: each new streamer hashes registry.json; its data files are presence-only', () => {
   const diff: StreamerDiff = { newStreamers: [cfg('aiko', 'Aiko', '1萬')], subscriberChanges: [] };
   const batches = registryAnnouncementBatches(diff, joinHash);
   assert.equal(batches.length, 1);
-  assert.deepEqual(batches[0].sources, ['data/registry.json', 'data/aiko/songs.json', 'data/aiko/streams.json']);
+  assert.deepEqual(batches[0].sources, ['data/registry.json']);
+  assert.deepEqual(batches[0].presenceSources, ['data/aiko/songs.json', 'data/aiko/streams.json']);
   assert.equal(batches[0].embeds.length, 1);
-  // A no-link streamer's embed is tokenless, so at flush it's verified by this hash against the live
-  // concatenated sources; the hash must cover all the batch's sources (registry + the slug's data
-  // files), not registry.json alone, or it can't match the live content and the embed is dropped.
-  assert.equal(batches[0].hash, 'data/registry.json|data/aiko/songs.json|data/aiko/streams.json');
+  // Hash is over registry.json ONLY (stable) — the scaffolded data files are presence-only, so a
+  // later sync:data populating them can't break a no-link streamer's tokenless hash at flush.
+  assert.equal(batches[0].hash, 'data/registry.json');
 });
 
 test('registryAnnouncementBatches: subscriber digest is its own registry.json-only batch', () => {
@@ -73,20 +73,23 @@ test('registryAnnouncementBatches: subscriber digest is its own registry.json-on
   const batches = registryAnnouncementBatches(diff, joinHash);
   assert.equal(batches.length, 1);
   assert.deepEqual(batches[0].sources, ['data/registry.json']);
+  assert.equal(batches[0].presenceSources, undefined); // digest data lives in registry.json; no presence files
   assert.equal(batches[0].embeds.length, 1);
   assert.equal(batches[0].hash, 'data/registry.json');
 });
 
-test('registryAnnouncementBatches: new streamers first, then the digest; sources isolate each slug', () => {
+test('registryAnnouncementBatches: new streamers first, then the digest; presenceSources isolate each slug', () => {
   const diff: StreamerDiff = {
     newStreamers: [cfg('aiko', 'Aiko', '1萬'), cfg('mei', 'Mei', '2萬')],
     subscriberChanges: [{ displayName: 'Existing', from: '3萬', to: '3.1萬' }],
   };
   const batches = registryAnnouncementBatches(diff, joinHash);
   assert.equal(batches.length, 3);
-  assert.deepEqual(batches[0].sources, ['data/registry.json', 'data/aiko/songs.json', 'data/aiko/streams.json']);
-  assert.deepEqual(batches[1].sources, ['data/registry.json', 'data/mei/songs.json', 'data/mei/streams.json']);
+  assert.deepEqual(batches[0].presenceSources, ['data/aiko/songs.json', 'data/aiko/streams.json']);
+  assert.deepEqual(batches[1].presenceSources, ['data/mei/songs.json', 'data/mei/streams.json']);
+  assert.deepEqual(batches[0].sources, ['data/registry.json']);
   assert.deepEqual(batches[2].sources, ['data/registry.json']);
+  assert.equal(batches[2].presenceSources, undefined); // digest batch: no presence sources
 });
 
 test('registryAnnouncementBatches: nothing to announce → no batches', () => {
