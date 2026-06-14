@@ -14,6 +14,7 @@ import * as path from 'node:path';
 import { fileURLToPath } from 'node:url';
 
 import { syncStatePath, upsertEntry, type SyncStateEntry } from '../shared/sync-state.ts';
+import { assertValidSlug } from '../shared/slug.ts';
 
 import { newStreamEmbed, newStreamsSummaryEmbed, type DiscordEmbed } from '../../admin/shared/discord.ts';
 import { enqueueAnnouncements, hashSources, loadAnnounceWebhook, type PendingBatch } from '../shared/announce.ts';
@@ -295,6 +296,12 @@ async function main(): Promise<void> {
     console.error('Usage: npx tsx tools/sync-data/sync.ts <streamer-slug>');
     process.exit(1);
   }
+
+  // Trust boundary for the SQL/path sinks below: the slug is interpolated raw into
+  // D1 SQL (wrangler has no bind-param flag) and into path.resolve(ROOT,'data',slug).
+  // Reject anything that isn't a safe slug here, so neither sink can be abused — this
+  // also guards the direct `sync:data <slug>` path, which never passes through readRegistry.
+  assertValidSlug(slug);
 
   const dataDir = path.resolve(ROOT, 'data', slug);
   if (!fs.existsSync(dataDir)) {

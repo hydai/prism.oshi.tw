@@ -1,6 +1,11 @@
 import * as assert from 'node:assert/strict';
+import { execFileSync } from 'node:child_process';
+import * as path from 'node:path';
+import { fileURLToPath } from 'node:url';
 
 import { dataAnnouncementBatch, songCountsByStream, streamsToAnnounce } from './sync.ts';
+
+const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
 function test(name: string, fn: () => void): void {
   try {
@@ -101,6 +106,28 @@ test('dataAnnouncementBatch: flood (> cap) → one summary embed with liveKeys =
     batch.liveKeys,
     streams.map((s) => s.videoId),
   ); // verified against streams.json at flush
+});
+
+// --- CLI guard: a malicious slug must be rejected before any D1/filesystem sink ---
+
+test('sync-data CLI rejects a SQL-injection slug with a clear error (before any D1 query)', () => {
+  // Payload resolves to a non-existent data/ dir, so without the guard the run would
+  // exit on "does not exist" — never on validation. Asserting the message (not just the
+  // exit code) is what makes this a real regression test for the injection barrier.
+  const script = path.join(__dirname, 'sync.ts');
+  let threw = false;
+  try {
+    execFileSync('npx', ['tsx', script, "inject'--"], {
+      encoding: 'utf-8',
+      stdio: ['ignore', 'pipe', 'pipe'],
+    });
+  } catch (err) {
+    threw = true;
+    const e = err as { status?: number | null; stderr?: string };
+    assert.notEqual(e.status, 0);
+    assert.match(e.stderr ?? '', /Invalid streamer slug/);
+  }
+  assert.ok(threw, 'expected sync-data to exit non-zero for a malicious slug');
 });
 
 console.log('sync-data.test: all passed');
