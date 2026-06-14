@@ -64,34 +64,31 @@ app/layout.tsx (RootLayout)
 │
 └─▶ GlobalProviders.tsx
     │
-    ├─▶ FanAuthProvider ─────────────────────── (placeholder, not wired)
-    │
-    ├─▶ PlayerProvider ◀── YouTube IFrame API
-    │   │
-    │   ├─▶ YouTubePlayerContainer  (hidden <iframe>)
-    │   ├─▶ MiniPlayer              (fixed bottom bar)
-    │   ├─▶ NowPlayingModal          (fullscreen overlay)
-    │   ├─▶ QueuePanel               (drag-to-reorder queue)
-    │   └─▶ RecentlyPlayedTracker    (silent, no UI)
-    │
-    └─▶ PlaylistProvider
+    └─▶ FanAuthProvider ────────────────────────── (placeholder, not wired)
         │
         └─▶ app/[streamer]/layout.tsx
             │
             └─▶ StreamerShell.tsx  (injects CSS theme vars on document.body)
                 │
-                ├─▶ StreamerProvider  (read-only streamer config)
-                │
-                └─▶ PerStreamerProviders
+                └─▶ StreamerProvider  (read-only streamer config)
                     │
-                    ├─▶ LikedSongsProvider   (localStorage per streamer)
-                    │
-                    └─▶ RecentlyPlayedProvider (localStorage per streamer)
+                    └─▶ PlayerProvider ◀── YouTube IFrame API
                         │
-                        └─▶ [PAGE CONTENT]
+                        └─▶ PerStreamerProviders
                             │
-                            ├─▶ app/[streamer]/page.tsx (Main Archive)
-                            └─▶ app/[streamer]/now-playing/page.tsx
+                            ├─▶ PlaylistProvider        (localStorage per streamer)
+                            ├─▶ LikedSongsProvider      (localStorage per streamer)
+                            ├─▶ RecentlyPlayedProvider  (localStorage per streamer)
+                            │
+                            ├─▶ [PAGE CONTENT]
+                            │   ├─▶ app/[streamer]/page.tsx (Main Archive)
+                            │   └─▶ app/[streamer]/now-playing/page.tsx
+                            │
+                            ├─▶ YouTubePlayerContainer  (hidden <iframe>)
+                            ├─▶ MiniPlayer              (fixed bottom bar)
+                            ├─▶ NowPlayingModal         (fullscreen overlay)
+                            ├─▶ QueuePanel               (drag-to-reorder queue)
+                            └─▶ RecentlyPlayedTracker    (silent, no UI)
 ```
 
 ## 3. Main Archive Page Component Dependencies
@@ -210,34 +207,33 @@ data/{slug}/songs.json                    data/{slug}/metadata/
 
 ```
 ┌─────────────────────────────────────────────────────────────┐
-│                        GLOBAL STATE                          │
-│                 (shared across all streamers)                │
-│                                                              │
+│                         GLOBAL STATE                        │
+│                (shared across all streamers)                │
+│                                                             │
 │   PlayerContext ─── currentTrack, queue, volume, playback   │
-│   PlaylistContext ─ playlists (keyed by streamer in storage)│
-│   FanAuthContext ── placeholder                              │
-│                                                              │
-│   localStorage:                                              │
-│     prism_volume, prism_muted                                │
+│   FanAuthContext ── placeholder                             │
+│                                                             │
+│   localStorage:                                             │
+│     prism_volume, prism_muted                               │
 └─────────────────────────────────────────────────────────────┘
 
-┌─────────────────────────┐  ┌─────────────────────────┐
-│   /mizuki               │  │   /gabu                  │
-│                          │  │                          │
-│ StreamerShell            │  │ StreamerShell            │
-│ ├─ theme: pink/blue      │  │ ├─ theme: blue/yellow    │
-│ ├─ CSS vars on <body>    │  │ ├─ CSS vars on <body>    │
-│ │                        │  │ │                        │
-│ │ PerStreamerProviders    │  │ │ PerStreamerProviders    │
-│ │ ├─ LikedSongsProvider  │  │ │ ├─ LikedSongsProvider  │
-│ │ └─ RecentlyPlayed...   │  │ │ └─ RecentlyPlayed...   │
-│ │                        │  │ │                        │
-│ │ localStorage:          │  │ │ localStorage:          │
-│ │  prism_mizuki_playlists│  │ │  prism_gabu_playlists  │
-│ │  prism_mizuki_liked    │  │ │  prism_gabu_liked      │
-│ │  prism_mizuki_recent   │  │ │  prism_gabu_recent     │
-│ └────────────────────────┘  │ └────────────────────────┘
-└─────────────────────────┘  └─────────────────────────┘
+┌─────────────────────────────────┐  ┌─────────────────────────────────┐
+│  /mizuki                        │  │  /gabu                          │
+│                                 │  │                                 │
+│  StreamerShell                  │  │  StreamerShell                  │
+│  ├─ theme: pink/blue            │  │  ├─ theme: blue/yellow          │
+│  ├─ CSS vars on <body>          │  │  ├─ CSS vars on <body>          │
+│  │                              │  │  │                              │
+│  PerStreamerProviders           │  │  PerStreamerProviders           │
+│  ├─ PlaylistProvider            │  │  ├─ PlaylistProvider            │
+│  ├─ LikedSongsProvider          │  │  ├─ LikedSongsProvider          │
+│  └─ RecentlyPlayedProvider      │  │  └─ RecentlyPlayedProvider      │
+│                                 │  │                                 │
+│  localStorage:                  │  │  localStorage:                  │
+│   prism_mizuki_playlists        │  │   prism_gabu_playlists          │
+│   prism_mizuki_liked_songs      │  │   prism_gabu_liked_songs        │
+│   prism_mizuki_recently_played  │  │   prism_gabu_recently_played    │
+└─────────────────────────────────┘  └─────────────────────────────────┘
 ```
 
 ## 7. Theme System Flow
@@ -266,7 +262,7 @@ globals.css (default vars)          tailwind.config.ts
 │  :root {                           │  colors: {
 │    --accent-pink: #e91e8c;         │    'accent-pink': 'var(--accent-pink)',
 │    --bg-page-start: ...            │    'surface-default': 'var(--surface-default)',
-│    ...53 custom properties         │    ...
+│    ...61 custom properties         │    ...
 │  }                                 │  }
 │                                    │
 ▼                                    ▼

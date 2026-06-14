@@ -15,13 +15,7 @@ Multi-streamer VTuber song archive platform. Browse archived karaoke performance
 
 ## Supported Streamers
 
-| Streamer | Group |
-|----------|-------|
-| [浠Mizuki](https://www.youtube.com/c/%E6%B5%A0MizukiChannel) | 子午計畫 |
-| [Gabu ch. 加百利 珈咘](https://www.youtube.com/channel/UCCHsCWNTcGJ8Jml_oZ6nG2Q) | 個人勢 |
-| [玥Itsuki](https://www.youtube.com/@ItsukiIanvs) | 子午計畫 |
-| [煌Kirali](https://www.youtube.com/@%E7%85%8CKirali) | 子午計畫 |
-| [汐Seki](https://www.youtube.com/channel/UC_aaEh6TaE5VpA_zQTUCcNQ) | 子午計畫 |
+Prism currently archives **33** VTuber streamers. See [`data/registry.json`](data/registry.json) for the full, up-to-date list.
 
 ## Tech Stack
 
@@ -68,10 +62,13 @@ tools/              # Data extraction and sync tools
 
 ## Adding a New Streamer
 
-1. Add an entry to `data/registry.json` with slug, theme, and social links
-2. Create `data/{slug}/` with `songs.json`, `streams.json`, and `metadata/` directory
-3. Add the slug to `lib/streamer-slugs.ts`
-4. Rebuild
+Streamers are managed through the Nova admin backend, **not** by hand-editing files —
+`data/registry.json` and `lib/streamer-slugs.ts` are auto-generated, so hand edits get overwritten:
+
+1. Approve the streamer in the Nova admin (D1-backed)
+2. `npm run sync:registry` — regenerates `data/registry.json` and `lib/streamer-slugs.ts` from the Nova DB
+3. `npm run sync:data -- <slug>` — exports that streamer's approved songs/streams to `data/<slug>/`
+4. Commit & push → GitHub Actions rebuilds and deploys
 
 ## License
 

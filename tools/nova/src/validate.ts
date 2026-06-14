@@ -42,7 +42,7 @@ export function normalizeYoutubeChannelUrl(raw: string): { canonical: string; no
 }
 
 /**
- * Validate a slug: lowercase alphanumeric + hyphens, 2-50 chars.
+ * Validate a slug: lowercase alphanumeric + hyphens, 1-50 chars.
  */
 export function validateSlug(slug: string): boolean {
   return /^[a-z0-9][a-z0-9-]{0,48}[a-z0-9]$/.test(slug) || /^[a-z0-9]{1,2}$/.test(slug);
