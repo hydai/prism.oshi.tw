@@ -80,6 +80,22 @@ test('pending queue: same-source enqueue dedupes a re-announced url, keeping the
   clearPendingAnnouncements(tmp);
 });
 
+test('pending queue: merge keeps each subject first-seen position with its latest value', () => {
+  const tmp = path.join(os.tmpdir(), `pending-announce-order-${process.pid}.json`);
+  fs.rmSync(tmp, { force: true });
+  enqueueAnnouncements({ embeds: [{ url: 'https://youtu.be/A', title: 'A v1' }, { url: 'https://youtu.be/B', title: 'B' }], sources: ['data/x/streams.json'], hash: 'h1' }, tmp);
+  enqueueAnnouncements({ embeds: [{ url: 'https://youtu.be/A', title: 'A v2' }], sources: ['data/x/streams.json'], hash: 'h2' }, tmp);
+  // A keeps its first-seen slot (index 0) but takes the latest value (A v2); B stays after it.
+  assert.deepEqual(readPendingBatches(tmp), [
+    {
+      embeds: [{ url: 'https://youtu.be/A', title: 'A v2' }, { url: 'https://youtu.be/B', title: 'B' }],
+      sources: ['data/x/streams.json'],
+      hash: 'h2',
+    },
+  ]);
+  clearPendingAnnouncements(tmp);
+});
+
 test('pending queue: enqueue of empty embeds is a no-op (no file created)', () => {
   const tmp = path.join(os.tmpdir(), `pending-announce-empty-${process.pid}.json`);
   fs.rmSync(tmp, { force: true });

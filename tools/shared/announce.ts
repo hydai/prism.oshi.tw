@@ -105,11 +105,12 @@ export function writePendingBatches(batches: PendingBatch[], pendingPath: string
 
 const embedKey = (e: DiscordEmbed): string => e.url ?? JSON.stringify(e);
 
-/** Collapse embeds describing the same subject (same `url`, else identical content), keeping the
- *  LAST occurrence so a re-announced item carries its freshest data and is never posted twice. */
+/** Collapse embeds describing the same subject (same `url`, else identical content): each subject
+ *  keeps its FIRST-SEEN position but its LATEST value, so a re-announced item carries its freshest
+ *  data and is never posted twice. */
 function dedupeEmbeds(embeds: DiscordEmbed[]): DiscordEmbed[] {
   const byKey = new Map<string, DiscordEmbed>();
-  for (const e of embeds) byKey.set(embedKey(e), e); // re-set keeps the first-seen slot, latest value
+  for (const e of embeds) byKey.set(embedKey(e), e); // Map keeps an existing key's slot, updates its value
   return [...byKey.values()];
 }
 
