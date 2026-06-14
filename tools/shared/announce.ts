@@ -101,13 +101,35 @@ export function writePendingBatches(batches: PendingBatch[], pendingPath: string
   fs.writeFileSync(pendingPath, JSON.stringify({ batches: nonEmpty }, null, 2) + '\n', 'utf-8');
 }
 
-/** Append a batch, replacing any existing batch with identical non-empty `sources` (dedups re-runs of the same slug). */
+const embedKey = (e: DiscordEmbed): string => e.url ?? JSON.stringify(e);
+
+/** Collapse embeds describing the same subject (same `url`, else identical content), keeping the
+ *  LAST occurrence so a re-announced item carries its freshest data and is never posted twice. */
+function dedupeEmbeds(embeds: DiscordEmbed[]): DiscordEmbed[] {
+  const byKey = new Map<string, DiscordEmbed>();
+  for (const e of embeds) byKey.set(embedKey(e), e); // re-set keeps the first-seen slot, latest value
+  return [...byKey.values()];
+}
+
+/**
+ * Append a batch. For a non-empty `sources` set, MERGE into any existing same-source batch rather
+ * than replacing it: concatenate both embed lists (so an earlier sync's still-pending announcements
+ * survive a later same-file sync), dedupe by subject, and adopt the incoming (latest) hash so flush
+ * verifies against the newest revision of those files. A sourceless batch is appended as-is (never
+ * merged — it is already unconditional). Empty-embed batches are dropped.
+ */
 export function enqueueAnnouncements(batch: PendingBatch, pendingPath: string = PENDING_PATH): void {
   if (batch.embeds.length === 0) return;
-  const key = JSON.stringify(batch.sources ?? []);
   const existing = readPendingBatches(pendingPath);
-  const kept = key === '[]' ? existing : existing.filter((b) => JSON.stringify(b.sources ?? []) !== key);
-  writePendingBatches([...kept, batch], pendingPath);
+  const key = JSON.stringify(batch.sources ?? []);
+  if (key === '[]') {
+    writePendingBatches([...existing, batch], pendingPath);
+    return;
+  }
+  const others = existing.filter((b) => JSON.stringify(b.sources ?? []) !== key);
+  const sameSource = existing.filter((b) => JSON.stringify(b.sources ?? []) === key);
+  const mergedEmbeds = dedupeEmbeds([...sameSource.flatMap((b) => b.embeds), ...batch.embeds]);
+  writePendingBatches([...others, { embeds: mergedEmbeds, sources: batch.sources, hash: batch.hash }], pendingPath);
 }
 
 /** Split batches by whether their recorded hash still matches the live content from `readLive`. */
@@ -132,6 +154,25 @@ export function partitionByLiveHash(
     (liveHash === batch.hash ? verified : stale).push(batch);
   }
   return { verified, stale };
+}
+
+/**
+ * The batches still to post after `postedInCurrent` embeds of `verified[currentIndex]` have been
+ * sent: the current batch's unposted remainder (retaining its `sources`+`hash` so a retry
+ * re-verifies it against origin/master) followed by every later batch untouched. Returns [] once
+ * the final batch is fully posted. announce-flush checkpoints with this after each Discord message
+ * so a mid-flush failure never strips the revision metadata off the unposted remainder.
+ */
+export function remainingBatchesAfter(
+  verified: PendingBatch[],
+  currentIndex: number,
+  postedInCurrent: number,
+): PendingBatch[] {
+  const current = verified[currentIndex];
+  const remainingEmbeds = current ? current.embeds.slice(postedInCurrent) : [];
+  const head: PendingBatch[] =
+    remainingEmbeds.length > 0 ? [{ embeds: remainingEmbeds, sources: current.sources, hash: current.hash }] : [];
+  return [...head, ...verified.slice(currentIndex + 1)];
 }
 
 export function clearPendingAnnouncements(pendingPath: string = PENDING_PATH): void {

@@ -15,7 +15,7 @@ import * as path from 'node:path';
 import { fileURLToPath } from 'node:url';
 
 import { batchEmbeds, postDiscord } from '../../admin/shared/discord.ts';
-import { loadAnnounceWebhook, partitionByLiveHash, readPendingBatches, writePendingBatches } from '../shared/announce.ts';
+import { loadAnnounceWebhook, partitionByLiveHash, readPendingBatches, remainingBatchesAfter, writePendingBatches } from '../shared/announce.ts';
 
 const REPO_ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '../..');
 
@@ -44,37 +44,41 @@ async function main(): Promise<void> {
   }
   writePendingBatches(verified); // persist the drop immediately
 
-  const embeds = verified.flatMap((b) => b.embeds);
-  if (embeds.length === 0) {
+  const totalEmbeds = verified.reduce((n, b) => n + b.embeds.length, 0);
+  if (totalEmbeds === 0) {
     console.log('announce-flush: nothing to post after revision check.');
     return;
   }
 
   const webhook = loadAnnounceWebhook();
   if (!webhook) {
-    console.log(`announce-flush: ${embeds.length} verified embed(s) queued but DISCORD_WEBHOOK_ANNOUNCE is unset; leaving them queued.`);
+    console.log(`announce-flush: ${totalEmbeds} verified embed(s) queued but DISCORD_WEBHOOK_ANNOUNCE is unset; leaving them queued.`);
     return;
   }
 
-  // Post one message-batch at a time; after each success rewrite the queue with only the
-  // remaining (already-verified) embeds as one unconditional batch, so a failure OR crash
-  // mid-flush never re-sends a delivered batch.
-  const messageBatches = batchEmbeds(embeds);
+  // Post one verified batch at a time, split into Discord-sized messages. After every message
+  // rewrite the queue with the still-unposted remainder — each batch keeping its own sources+hash
+  // (via remainingBatchesAfter) — so a failure OR crash mid-flush neither re-sends a delivered
+  // batch nor lets the remainder post unconditionally if its data is reverted before the retry.
   let posted = 0;
-  for (let i = 0; i < messageBatches.length; i++) {
-    try {
-      await postDiscord(webhook, messageBatches[i]);
-    } catch (err) {
-      const remaining = messageBatches.slice(i).flat();
-      writePendingBatches([{ embeds: remaining }]);
-      console.warn(
-        `announce-flush: posted ${posted} embed(s), then batch ${i + 1}/${messageBatches.length} FAILED (${(err as Error).message}); ${remaining.length} embed(s) remain queued for the next flush.`,
-      );
-      process.exitCode = 1;
-      return;
+  for (let bi = 0; bi < verified.length; bi++) {
+    const messages = batchEmbeds(verified[bi].embeds);
+    let postedInBatch = 0;
+    for (const message of messages) {
+      try {
+        await postDiscord(webhook, message);
+      } catch (err) {
+        writePendingBatches(remainingBatchesAfter(verified, bi, postedInBatch));
+        console.warn(
+          `announce-flush: posted ${posted}/${totalEmbeds} embed(s), then a message FAILED (${(err as Error).message}); ${totalEmbeds - posted} embed(s) remain queued (revision-tagged) for the next flush.`,
+        );
+        process.exitCode = 1;
+        return;
+      }
+      postedInBatch += message.length;
+      posted += message.length;
+      writePendingBatches(remainingBatchesAfter(verified, bi, postedInBatch)); // checkpoint after each success
     }
-    posted += messageBatches[i].length;
-    writePendingBatches([{ embeds: messageBatches.slice(i + 1).flat() }]); // checkpoint after each success
   }
   console.log(`announce-flush: posted ${posted} announcement embed(s) to the fan channel.`);
 }

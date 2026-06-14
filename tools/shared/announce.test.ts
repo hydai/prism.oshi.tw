@@ -3,7 +3,7 @@ import * as fs from 'node:fs';
 import * as os from 'node:os';
 import * as path from 'node:path';
 
-import { clearPendingAnnouncements, enqueueAnnouncements, hashSources, parseDevVar, partitionByLiveHash, readPendingBatches, writePendingBatches } from './announce.ts';
+import { clearPendingAnnouncements, enqueueAnnouncements, hashSources, parseDevVar, partitionByLiveHash, readPendingBatches, remainingBatchesAfter, writePendingBatches } from './announce.ts';
 
 function test(name: string, fn: () => void): void {
   try {
@@ -49,13 +49,33 @@ test('pending queue: missing file reads as empty; enqueue accumulates batches; c
   assert.deepEqual(readPendingBatches(tmp), []);
 });
 
-test('pending queue: enqueue with identical sources replaces the prior batch (re-run dedup)', () => {
+test('pending queue: same-source enqueue merges so an earlier sync is not dropped', () => {
+  // Codex-P2: a second `sync:data <slug>` before push announces only the new stream, but
+  // must NOT drop the first sync's still-pending announcement for the same files. The merged
+  // batch adopts the latest hash so flush verifies it against the newest revision of the files.
+  const tmp = path.join(os.tmpdir(), `pending-announce-merge-${process.pid}.json`);
+  fs.rmSync(tmp, { force: true });
+  enqueueAnnouncements({ embeds: [{ url: 'https://youtu.be/A', title: 'A' }], sources: ['data/x/streams.json'], hash: 'hA' }, tmp);
+  enqueueAnnouncements({ embeds: [{ url: 'https://youtu.be/B', title: 'B' }], sources: ['data/x/streams.json'], hash: 'hAB' }, tmp);
+  assert.deepEqual(readPendingBatches(tmp), [
+    {
+      embeds: [{ url: 'https://youtu.be/A', title: 'A' }, { url: 'https://youtu.be/B', title: 'B' }],
+      sources: ['data/x/streams.json'],
+      hash: 'hAB',
+    },
+  ]);
+  clearPendingAnnouncements(tmp);
+});
+
+test('pending queue: same-source enqueue dedupes a re-announced url, keeping the latest', () => {
+  // The revert-then-resync case (announce A, `git checkout` the data, sync again) must collapse
+  // the duplicate A to a single, latest announcement rather than posting it to fans twice.
   const tmp = path.join(os.tmpdir(), `pending-announce-dedup-${process.pid}.json`);
   fs.rmSync(tmp, { force: true });
-  enqueueAnnouncements({ embeds: [{ title: 'old' }], sources: ['data/x/streams.json'], hash: 'h1' }, tmp);
-  enqueueAnnouncements({ embeds: [{ title: 'new' }], sources: ['data/x/streams.json'], hash: 'h2' }, tmp);
+  enqueueAnnouncements({ embeds: [{ url: 'https://youtu.be/A', title: 'A v1' }], sources: ['data/x/streams.json'], hash: 'h1' }, tmp);
+  enqueueAnnouncements({ embeds: [{ url: 'https://youtu.be/A', title: 'A v2' }], sources: ['data/x/streams.json'], hash: 'h2' }, tmp);
   assert.deepEqual(readPendingBatches(tmp), [
-    { embeds: [{ title: 'new' }], sources: ['data/x/streams.json'], hash: 'h2' },
+    { embeds: [{ url: 'https://youtu.be/A', title: 'A v2' }], sources: ['data/x/streams.json'], hash: 'h2' },
   ]);
   clearPendingAnnouncements(tmp);
 });
@@ -100,6 +120,28 @@ test('partitionByLiveHash: match→verified, reverted/missing→stale, empty sou
   const { verified, stale } = partitionByLiveHash([matching, reverted, missing, unconditional], readLive);
   assert.deepEqual(verified, [matching, unconditional]);
   assert.deepEqual(stale, [reverted, missing]);
+});
+
+test('remainingBatchesAfter keeps each unposted batch sources+hash for retry re-verification', () => {
+  // Codex-P2: a mid-flush failure must NOT strip the revision metadata, or the remainder posts
+  // unconditionally on the next flush even if the pushed data was reverted in the meantime.
+  const verified = [
+    { embeds: [{ title: 'e1' }, { title: 'e2' }, { title: 'e3' }], sources: ['data/x/streams.json'], hash: 'hx' },
+    { embeds: [{ title: 'e4' }], sources: ['data/registry.json'], hash: 'hr' },
+  ];
+  assert.deepEqual(remainingBatchesAfter(verified, 0, 0), verified); // nothing posted → all remain, intact
+  assert.deepEqual(remainingBatchesAfter(verified, 0, 1), [
+    { embeds: [{ title: 'e2' }, { title: 'e3' }], sources: ['data/x/streams.json'], hash: 'hx' },
+    { embeds: [{ title: 'e4' }], sources: ['data/registry.json'], hash: 'hr' },
+  ]);
+  assert.deepEqual(remainingBatchesAfter(verified, 0, 3), [ // first batch fully posted → dropped
+    { embeds: [{ title: 'e4' }], sources: ['data/registry.json'], hash: 'hr' },
+  ]);
+});
+
+test('remainingBatchesAfter returns empty once the final batch is fully posted', () => {
+  const verified = [{ embeds: [{ title: 'only' }], sources: ['data/x/streams.json'], hash: 'h' }];
+  assert.deepEqual(remainingBatchesAfter(verified, 0, 1), []);
 });
 
 console.log('announce.test: all passed');
