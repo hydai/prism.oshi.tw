@@ -67,6 +67,26 @@ async function main(): Promise<void> {
     'POST with the correct header + same-origin Origin/Sec-Fetch passes',
   );
 
+  // Regression (Codex P2): the Vite dev server (:5173) proxies /api to the Worker
+  // (:8787), so the browser sends Sec-Fetch-Site: same-origin but an Origin that
+  // will not equal the Worker's own URL. The browser's same-origin signal wins.
+  assertEqual(
+    await status('POST', {
+      ...VALID,
+      Origin: 'http://localhost:5173',
+      'Sec-Fetch-Site': 'same-origin',
+    }),
+    200,
+    'POST through the dev proxy (same-origin Sec-Fetch-Site, port-mismatched Origin) passes',
+  );
+
+  // same-site is NOT same-origin (e.g. a sibling subdomain) — still rejected.
+  assertEqual(
+    await status('POST', { ...VALID, 'Sec-Fetch-Site': 'same-site' }),
+    403,
+    'POST with same-site Sec-Fetch-Site is rejected',
+  );
+
   console.log('✓ requireApiRequestAuthenticity');
 }
 

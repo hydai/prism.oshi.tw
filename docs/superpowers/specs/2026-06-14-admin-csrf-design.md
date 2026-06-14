@@ -71,11 +71,13 @@ Finding 已指出底層缺陷更廣。實際比對 `admin/ui/src/api/client.ts` 
 
 1. 方法屬 `SAFE_METHODS` → `next()`（讀取不改變狀態，免驗）。
 2. 自訂標頭缺失或值不符 → `403`（**硬性閘門**，跨源不可偽造）。
-3. `Sec-Fetch-Site` 存在且 ≠ `same-origin` → `403`。
-4. `Origin` 存在且 ≠ `new URL(c.req.url).origin` → `403`。
+3. `Sec-Fetch-Site` **存在** → 必須為 `same-origin`，否則 `403`（涵蓋現代瀏覽器，含 dev proxy）。
+4. `Sec-Fetch-Site` **不存在**時，才退而檢查 `Origin`：存在且 ≠ `new URL(c.req.url).origin` → `403`（舊瀏覽器後備）。
 5. 其餘 → `next()`。
 
-第 3、4 步採「**有才驗、缺不擋**」（reject only on present mismatch）：合法同源請求一定帶著相符的 `Origin`／`same-origin` 的 `Sec-Fetch-Site`，故不會誤殺；缺少時則交由第 2 步的硬性閘門把關，避免對舊瀏覽器或被中間層剝除標頭的請求產生 false positive。
+第 3、4 步採「**有才驗、缺不擋**」（reject only on present mismatch）：合法同源請求一定帶著 `same-origin` 的 `Sec-Fetch-Site`（或相符的 `Origin`），故不會誤殺；兩者皆缺時交由第 2 步的硬性閘門把關，避免對舊瀏覽器或被中間層剝除標頭的請求產生 false positive。
+
+> **為何 `Sec-Fetch-Site` 優先於 `Origin`（Codex review P2 修正）**：本機開發時 Vite dev server（:5173）把 `/api` 代理到 wrangler（:8787，且 `vite.config.ts` 未設 `changeOrigin`），瀏覽器送出的同源 POST 會帶 `Origin: http://localhost:5173`，但 Worker 看到自己的 URL 是 `http://localhost:8787`——單純的 `Origin` 等值比較會把這個**合法**的開發請求誤判成跨源而回 403，癱瘓本機所有寫入操作。`Sec-Fetch-Site` 由瀏覽器設定、JS 不可竄改、且不受 proxy 改寫 port 影響，在此情境正確回報 `same-origin`。故以 `Sec-Fetch-Site` 為主、`Origin` 僅在其缺席（舊瀏覽器）時作後備；硬性閘門（自訂標頭）始終存在，跨源攻擊在任何瀏覽器都被擋下。此優於「寫死 dev origin」或「解析 forwarded 標頭」——不把 dev port 帶進 production 程式碼。
 
 回應格式比照既有：`c.json({ error: '…' }, 403)`。
 
@@ -111,8 +113,10 @@ headers: {
 3. `POST` 帶**錯誤**標頭值 → `403`。
 4. `POST` 帶**正確**標頭、無 `Origin`/`Sec-Fetch-Site` → `200`（缺不擋，無 false positive）。
 5. `POST` 帶正確標頭、但 `Sec-Fetch-Site: cross-site` → `403`。
-6. `POST` 帶正確標頭、但 `Origin` 與請求 origin 不符 → `403`。
-7. `POST` 帶正確標頭、且 `Origin` 同源 + `Sec-Fetch-Site: same-origin` → `200`。
+6. `POST` 帶正確標頭、`Origin` 不符且**無** `Sec-Fetch-Site` → `403`（舊瀏覽器後備）。
+7. `POST` 帶正確標頭、`Origin` 同源 + `Sec-Fetch-Site: same-origin` → `200`。
+8. `POST` 帶正確標頭、`Origin: http://localhost:5173`（port 不符）+ `Sec-Fetch-Site: same-origin` → `200`（**dev proxy 回歸測試**，Codex P2）。
+9. `POST` 帶正確標頭、`Sec-Fetch-Site: same-site` → `403`（同站非同源仍擋）。
 
 先寫測試 → 跑 → 看它（在中介層尚未存在時）失敗 → 實作至全綠。最後 `npm run check` 必須全綠（typecheck + 所有測試）。
 

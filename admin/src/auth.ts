@@ -52,17 +52,21 @@ export async function requireApiRequestAuthenticity(c: Context<Env>, next: Next)
     return c.json({ error: 'Forbidden: missing request authenticity header' }, 403);
   }
 
-  // Defense-in-depth: reject only when the browser explicitly tells us the
-  // request is cross-origin. Absent headers fall through to the hard gate above,
-  // so legitimate same-origin requests are never falsely blocked.
+  // Defense-in-depth on top of the header hard gate. Prefer the browser's
+  // Sec-Fetch-Site signal: it is unforgeable (a forbidden header JS cannot set)
+  // and stays correct even when a dev proxy rewrites the port (Vite :5173 ->
+  // wrangler :8787), where an Origin/host equality check would false-positive.
+  // Fall back to Origin equality only when Sec-Fetch-Site is absent (older browsers).
   const secFetchSite = c.req.header('Sec-Fetch-Site');
-  if (secFetchSite && secFetchSite !== 'same-origin') {
-    return c.json({ error: 'Forbidden: cross-site request blocked' }, 403);
-  }
-
-  const origin = c.req.header('Origin');
-  if (origin && origin !== new URL(c.req.url).origin) {
-    return c.json({ error: 'Forbidden: origin mismatch' }, 403);
+  if (secFetchSite) {
+    if (secFetchSite !== 'same-origin') {
+      return c.json({ error: 'Forbidden: cross-site request blocked' }, 403);
+    }
+  } else {
+    const origin = c.req.header('Origin');
+    if (origin && origin !== new URL(c.req.url).origin) {
+      return c.json({ error: 'Forbidden: origin mismatch' }, 403);
+    }
   }
 
   await next();
