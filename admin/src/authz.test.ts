@@ -1,4 +1,5 @@
 import app from './index';
+import { REQUEST_AUTHENTICITY_HEADER, REQUEST_AUTHENTICITY_VALUE } from '../shared/csrf';
 
 declare const process: { exitCode?: number };
 
@@ -78,6 +79,9 @@ function reqInit(route: Route, email: string): RequestInit {
     headers: {
       'CF-Access-Authenticated-User-Email': email,
       'Content-Type': 'application/json',
+      // Pass the CSRF authenticity gate (mounted globally on /api/*) the same way
+      // the real UI does, so this test exercises authorization, not the CSRF gate.
+      [REQUEST_AUTHENTICITY_HEADER]: REQUEST_AUTHENTICITY_VALUE,
     },
   };
   if (route.body !== undefined) {

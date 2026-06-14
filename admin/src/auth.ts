@@ -1,5 +1,9 @@
 import type { Context, Next } from 'hono';
 import type { AuthUser, Role } from '../shared/types';
+import { REQUEST_AUTHENTICITY_HEADER, REQUEST_AUTHENTICITY_VALUE } from '../shared/csrf';
+
+// Reads never change state, so they are exempt from the authenticity check.
+const SAFE_METHODS = new Set(['GET', 'HEAD', 'OPTIONS']);
 
 type Bindings = {
   DB: D1Database;
@@ -31,5 +35,39 @@ export async function requireCurator(c: Context<Env>, next: Next) {
   if (!user || user.role !== 'curator') {
     return c.json({ error: 'Forbidden: curator access required' }, 403);
   }
+  await next();
+}
+
+// CSRF defense for state-changing /api/* requests. See admin/shared/csrf.ts and
+// docs/superpowers/specs/2026-06-14-admin-csrf-design.md.
+export async function requireApiRequestAuthenticity(c: Context<Env>, next: Next) {
+  if (SAFE_METHODS.has(c.req.method.toUpperCase())) {
+    await next();
+    return;
+  }
+
+  // Hard gate: a custom header a cross-origin attacker cannot set without a
+  // CORS preflight (which this Worker never satisfies).
+  if (c.req.header(REQUEST_AUTHENTICITY_HEADER) !== REQUEST_AUTHENTICITY_VALUE) {
+    return c.json({ error: 'Forbidden: missing request authenticity header' }, 403);
+  }
+
+  // Defense-in-depth on top of the header hard gate. Prefer the browser's
+  // Sec-Fetch-Site signal: it is unforgeable (a forbidden header JS cannot set)
+  // and stays correct even when a dev proxy rewrites the port (Vite :5173 ->
+  // wrangler :8787), where an Origin/host equality check would false-positive.
+  // Fall back to Origin equality only when Sec-Fetch-Site is absent (older browsers).
+  const secFetchSite = c.req.header('Sec-Fetch-Site');
+  if (secFetchSite) {
+    if (secFetchSite !== 'same-origin') {
+      return c.json({ error: 'Forbidden: cross-site request blocked' }, 403);
+    }
+  } else {
+    const origin = c.req.header('Origin');
+    if (origin && origin !== new URL(c.req.url).origin) {
+      return c.json({ error: 'Forbidden: origin mismatch' }, 403);
+    }
+  }
+
   await next();
 }
