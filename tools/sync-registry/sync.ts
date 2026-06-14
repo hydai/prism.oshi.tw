@@ -198,9 +198,10 @@ function readExistingStreamers(): StreamerConfig[] {
 /**
  * Build the fan-announcement batches for a registry diff (pure; `computeHash` is injectable for tests).
  * Each new streamer gets its OWN batch whose sources include the data files scaffolded for it in the
- * same run, so a partial push (registry.json without the streamer's data dir) leaves `liveContentOf`
- * unable to read a source → the 🎉 auto-drops at flush until the streamer's page is actually live.
- * The subscriber digest stays in a registry.json-only batch — its data lives entirely in registry.json.
+ * same run. At flush, a source missing from origin/master (e.g. a partial push of registry.json without
+ * the streamer's data dir) makes `liveContentOf` return null, so the batch's embed is dropped instead
+ * of posted — a half-pushed streamer is never announced to a page that 404s. The subscriber digest
+ * stays in a registry.json-only batch, since its data lives entirely in registry.json.
  */
 export function registryAnnouncementBatches(
   diff: StreamerDiff,

@@ -62,8 +62,9 @@ test('registryAnnouncementBatches: one batch per new streamer, sourced on its sc
   assert.equal(batches.length, 1);
   assert.deepEqual(batches[0].sources, ['data/registry.json', 'data/aiko/songs.json', 'data/aiko/streams.json']);
   assert.equal(batches[0].embeds.length, 1);
-  // A no-link streamer verifies by this hash at flush, so it must cover the batch's data files —
-  // not registry.json alone, or the announcement could never re-match and would always drop.
+  // A no-link streamer's embed is tokenless, so at flush it's verified by this hash against the live
+  // concatenated sources; the hash must cover all the batch's sources (registry + the slug's data
+  // files), not registry.json alone, or it can't match the live content and the embed is dropped.
   assert.equal(batches[0].hash, 'data/registry.json|data/aiko/songs.json|data/aiko/streams.json');
 });
 
