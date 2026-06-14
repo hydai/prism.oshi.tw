@@ -16,6 +16,7 @@ import * as path from 'node:path';
 import { fileURLToPath } from 'node:url';
 
 import { detectAll, staleSlugs } from '../sync-status/detect.ts';
+import { assertValidSlug } from '../shared/slug.ts';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -23,6 +24,11 @@ const ROOT = path.resolve(__dirname, '../..');
 const SYNC_DATA = path.resolve(ROOT, 'tools/sync-data/sync.ts');
 
 function runSyncData(slug: string): void {
+  // Defense in depth at the exact call site that hands a slug to sync-data. These
+  // stale slugs already passed readRegistry's validation and sync-data re-checks on
+  // entry, but validating here keeps the guarantee local to the spawn and survives
+  // any future change to how stale slugs are sourced.
+  assertValidSlug(slug);
   console.log(`\n── syncing ${slug} ──`);
   execFileSync('npx', ['tsx', SYNC_DATA, slug], {
     cwd: ROOT,
