@@ -117,6 +117,11 @@ function dedupeEmbeds(embeds: DiscordEmbed[]): DiscordEmbed[] {
  * survive a later same-file sync), dedupe by subject, and adopt the incoming (latest) hash so flush
  * verifies against the newest revision of those files. A sourceless batch is appended as-is (never
  * merged — it is already unconditional). Empty-embed batches are dropped.
+ *
+ * KNOWN LIMITATION (#14): adopting the latest hash for the merged batch can "bless" a carried-
+ * forward embed whose data was abandoned/un-approved before push (approve A → abandon A → approve B
+ * for the same slug → A is posted though it never went live). A whole-file hash can't tell "A kept"
+ * from "A removed"; the proper fix is per-embed liveness verification at flush, tracked in #14.
  */
 export function enqueueAnnouncements(batch: PendingBatch, pendingPath: string = PENDING_PATH): void {
   if (batch.embeds.length === 0) return;
