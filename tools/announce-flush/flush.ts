@@ -26,6 +26,10 @@ function readLiveFromOriginMaster(source: string): string {
     cwd: REPO_ROOT,
     encoding: 'utf-8',
     stdio: ['ignore', 'pipe', 'ignore'],
+    // Raise execFileSync's 1MB default: a large streams.json/songs.json would otherwise overflow the
+    // buffer and throw, which partitionByLiveHash would misread as "not live" — silently dropping a
+    // valid announcement. 64MB is comfortably above any realistic data file.
+    maxBuffer: 64 * 1024 * 1024,
   });
 }
 
