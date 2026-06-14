@@ -1,6 +1,6 @@
 import * as assert from 'node:assert/strict';
 
-import { dataAnnouncementBatch, songCountsByStream, streamsToAnnounce } from './sync.ts';
+import { dataAnnouncementBatch, isValidStreamerSlug, songCountsByStream, streamsToAnnounce, toSqlStringLiteral } from './sync.ts';
 
 function test(name: string, fn: () => void): void {
   try {
@@ -101,6 +101,44 @@ test('dataAnnouncementBatch: flood (> cap) → one summary embed with liveKeys =
     batch.liveKeys,
     streams.map((s) => s.videoId),
   ); // verified against streams.json at flush
+});
+
+// --- Slug validation + SQL escaping: guard the D1 query interpolation sink ---
+
+test('isValidStreamerSlug accepts well-formed slugs (lowercase alnum + hyphens, 1-50 chars)', () => {
+  assert.equal(isValidStreamerSlug('mizuki'), true);
+  assert.equal(isValidStreamerSlug('a-b-c'), true);
+  assert.equal(isValidStreamerSlug('streamer123'), true);
+  assert.equal(isValidStreamerSlug('ab'), true); // 2-char
+  assert.equal(isValidStreamerSlug('a'), true); // 1-char
+});
+
+test('isValidStreamerSlug rejects slugs that could break out of the SQL string literal', () => {
+  assert.equal(isValidStreamerSlug("evil' OR 1=1 --"), false);
+  assert.equal(isValidStreamerSlug("x'; DROP TABLE songs; --"), false);
+  assert.equal(isValidStreamerSlug("x' UNION SELECT secret FROM secrets --"), false);
+  assert.equal(isValidStreamerSlug("a'b"), false); // bare single quote
+});
+
+test('isValidStreamerSlug rejects other malformed slugs', () => {
+  assert.equal(isValidStreamerSlug(''), false); // empty
+  assert.equal(isValidStreamerSlug('Mizuki'), false); // uppercase
+  assert.equal(isValidStreamerSlug('a b'), false); // space
+  assert.equal(isValidStreamerSlug('-abc'), false); // leading hyphen
+  assert.equal(isValidStreamerSlug('abc-'), false); // trailing hyphen
+  assert.equal(isValidStreamerSlug('a'.repeat(51)), false); // too long
+});
+
+test('toSqlStringLiteral wraps plain values in single quotes', () => {
+  assert.equal(toSqlStringLiteral('mizuki'), "'mizuki'");
+});
+
+test('toSqlStringLiteral doubles embedded single quotes so they cannot terminate the literal', () => {
+  assert.equal(toSqlStringLiteral("a'b"), "'a''b'");
+  assert.equal(
+    toSqlStringLiteral("x'; DROP TABLE songs; --"),
+    "'x''; DROP TABLE songs; --'",
+  );
 });
 
 console.log('sync-data.test: all passed');

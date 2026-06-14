@@ -85,6 +85,31 @@ interface FanSiteStream {
   credit?: Record<string, unknown>;
 }
 
+// --- SQL safety ---
+//
+// `wrangler d1 execute --command=<sql>` takes a raw SQL string with no parameter
+// binding, so every value interpolated into a query must be made injection-safe.
+// The slug comes from the CLI (process.argv[2]) and flows into `streamer_id = '...'`
+// across all queries below. We defend in two independent layers:
+//   1. isValidStreamerSlug — reject any slug that isn't lowercase-alnum/hyphen at the
+//      entry point, so a malformed slug never reaches a query in the first place.
+//   2. toSqlStringLiteral — quote + escape at each interpolation site, so even if a
+//      value slips past validation it cannot break out of the string literal.
+
+/** Quote and escape a value as a SQLite/D1 string literal (doubles embedded single quotes). */
+export function toSqlStringLiteral(value: string): string {
+  return `'${value.replace(/'/g, "''")}'`;
+}
+
+/**
+ * Validate a streamer slug: lowercase alphanumeric + hyphens, 1-50 chars, no leading/
+ * trailing hyphen. Mirrors `validateSlug` in tools/nova/src/validate.ts so the sync tool
+ * accepts exactly the slugs Nova can mint.
+ */
+export function isValidStreamerSlug(slug: string): boolean {
+  return /^[a-z0-9][a-z0-9-]{0,48}[a-z0-9]$/.test(slug) || /^[a-z0-9]{1,2}$/.test(slug);
+}
+
 // --- Query D1 ---
 
 function queryD1<T>(sql: string): T[] {
@@ -102,10 +127,10 @@ function queryD1<T>(sql: string): T[] {
 
 function buildSongs(streamerId: string): FanSiteSong[] {
   const songRows = queryD1<SongRow>(
-    `SELECT id, title, original_artist, tags FROM songs WHERE streamer_id = '${streamerId}' AND status = 'approved' ORDER BY id`,
+    `SELECT id, title, original_artist, tags FROM songs WHERE streamer_id = ${toSqlStringLiteral(streamerId)} AND status = 'approved' ORDER BY id`,
   );
   const perfRows = queryD1<PerformanceRow>(
-    `SELECT id, song_id, stream_id, date, stream_title, video_id, timestamp, end_timestamp, note FROM performances WHERE streamer_id = '${streamerId}' AND status = 'approved' ORDER BY date`,
+    `SELECT id, song_id, stream_id, date, stream_title, video_id, timestamp, end_timestamp, note FROM performances WHERE streamer_id = ${toSqlStringLiteral(streamerId)} AND status = 'approved' ORDER BY date`,
   );
 
   const perfsBySong = new Map<string, PerformanceRow[]>();
@@ -137,7 +162,7 @@ function buildSongs(streamerId: string): FanSiteSong[] {
 
 function buildStreams(streamerId: string): FanSiteStream[] {
   const rows = queryD1<StreamRow>(
-    `SELECT id, title, date, video_id, youtube_url, credit FROM streams WHERE streamer_id = '${streamerId}' AND status = 'approved' ORDER BY date DESC`,
+    `SELECT id, title, date, video_id, youtube_url, credit FROM streams WHERE streamer_id = ${toSqlStringLiteral(streamerId)} AND status = 'approved' ORDER BY date DESC`,
   );
 
   return rows.map((row) => {
@@ -170,7 +195,7 @@ interface SnapshotRow {
 
 function querySnapshot(table: 'songs' | 'performances' | 'streams', streamerId: string): SnapshotRow {
   const rows = queryD1<SnapshotRow>(
-    `SELECT MAX(updated_at) AS max_ts, COUNT(*) AS cnt FROM ${table} WHERE streamer_id = '${streamerId}' AND status = 'approved'`,
+    `SELECT MAX(updated_at) AS max_ts, COUNT(*) AS cnt FROM ${table} WHERE streamer_id = ${toSqlStringLiteral(streamerId)} AND status = 'approved'`,
   );
   return rows[0] ?? { max_ts: null, cnt: 0 };
 }
@@ -293,6 +318,13 @@ async function main(): Promise<void> {
   const slug = process.argv[2];
   if (!slug) {
     console.error('Usage: npx tsx tools/sync-data/sync.ts <streamer-slug>');
+    process.exit(1);
+  }
+
+  // Validate before the slug is used anywhere: it is interpolated into raw D1 SQL
+  // below, and a malformed slug (e.g. one containing a quote) must never reach a query.
+  if (!isValidStreamerSlug(slug)) {
+    console.error(`ERROR: invalid slug "${slug}" — expected lowercase alphanumeric and hyphens (1-50 chars).`);
     process.exit(1);
   }
 
