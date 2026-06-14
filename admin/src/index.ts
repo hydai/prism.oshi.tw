@@ -1,5 +1,5 @@
 import { Hono } from 'hono';
-import { requireAuth, requireCurator } from './auth';
+import { requireApiRequestAuthenticity, requireAuth, requireCurator } from './auth';
 import { getRouteParam, getStreamerId } from './http';
 import { canHardDeleteStream, isValidTransition, shouldImportVod, VALID_STATUSES } from './status';
 import {
@@ -105,8 +105,10 @@ type Variables = {
 
 const app = new Hono<{ Bindings: Bindings; Variables: Variables }>();
 
-// All routes require authentication
+// All routes require authentication, and state-changing requests must carry an
+// app-issued authenticity header (CSRF defense). See admin/shared/csrf.ts.
 app.use('/api/*', requireAuth);
+app.use('/api/*', requireApiRequestAuthenticity);
 
 // --- Auth info ---
 

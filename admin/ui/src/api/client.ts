@@ -41,6 +41,7 @@ import type {
   HarmonizeMatchType,
   BulkFetchSubscribersResponse,
 } from '../../../shared/types';
+import { REQUEST_AUTHENTICITY_HEADER, REQUEST_AUTHENTICITY_VALUE } from '../../../shared/csrf';
 
 // --- Streamer selection (module-level) ---
 
@@ -93,6 +94,7 @@ async function request<T>(
     credentials: 'same-origin',
     headers: {
       'Content-Type': 'application/json',
+      [REQUEST_AUTHENTICITY_HEADER]: REQUEST_AUTHENTICITY_VALUE,
       ...init?.headers,
     },
   });
