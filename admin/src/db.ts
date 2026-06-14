@@ -673,40 +673,31 @@ export async function importVodToAdminDb(
 ): Promise<{ streamId: string; created: number }> {
   const streamerId = vod.streamer_slug;
 
-  // Check if a stream already exists for this video_id
+  // Reuse an existing stream only when it belongs to the submitted streamer. VOD
+  // submissions are public input, so a duplicate (or cross-streamer) approval must never
+  // overwrite stream metadata or delete curated performances/songs already in the admin
+  // catalog. The approval call site additionally gates this import on videoIdExists, but
+  // keeping the function non-destructive on its own enforces that invariant locally —
+  // independent of any caller.
   const existingStream = await db
-    .prepare('SELECT id FROM streams WHERE video_id = ? AND streamer_id = ?')
+    .prepare('SELECT id, title, date FROM streams WHERE video_id = ? AND streamer_id = ?')
     .bind(vod.video_id, streamerId)
-    .first<{ id: string }>();
+    .first<{ id: string; title: string; date: string }>();
 
   let streamId: string;
+  // Denormalized performance metadata follows the stream it attaches to: the existing
+  // stream when we reuse one, the submitted values for a freshly created stream.
+  let streamTitle = vod.stream_title;
+  let streamDate = vod.stream_date;
 
   const stmts: D1PreparedStatement[] = [];
 
   if (existingStream) {
+    // Append the submitted songs as pending records against the existing stream; leave
+    // the stream row and its already-curated performances/songs untouched.
     streamId = existingStream.id;
-
-    // Overwrite stream metadata from VOD submission
-    stmts.push(
-      db.prepare("UPDATE streams SET title = ?, date = ?, updated_at = datetime('now') WHERE id = ?")
-        .bind(vod.stream_title, vod.stream_date, streamId),
-    );
-
-    // Orphan-safe delete: remove songs whose only performances are in this stream
-    stmts.push(
-      db.prepare(
-        `DELETE FROM songs WHERE id IN (
-           SELECT p.song_id FROM performances p
-           WHERE p.stream_id = ?
-           AND (SELECT COUNT(*) FROM performances p2 WHERE p2.song_id = p.song_id) = 1
-         )`,
-      ).bind(streamId),
-    );
-
-    // Delete all existing performances for this stream
-    stmts.push(
-      db.prepare('DELETE FROM performances WHERE stream_id = ?').bind(streamId),
-    );
+    streamTitle = existingStream.title;
+    streamDate = existingStream.date;
   } else {
     streamId = vod.stream_date
       ? generateStreamId(vod.stream_date)
@@ -737,7 +728,7 @@ export async function importVodToAdminDb(
       db.prepare(
         `INSERT INTO performances (id, streamer_id, song_id, stream_id, date, stream_title, video_id, timestamp, end_timestamp, note, status, submitted_by)
          VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
-      ).bind(perfId, streamerId, songId, streamId, vod.stream_date, vod.stream_title, vod.video_id, song.start_timestamp, song.end_timestamp, '', 'pending', submittedBy),
+      ).bind(perfId, streamerId, songId, streamId, streamDate, streamTitle, vod.video_id, song.start_timestamp, song.end_timestamp, '', 'pending', submittedBy),
     );
   }
 
