@@ -276,7 +276,7 @@ test('partitionByLiveness: a tokenless aggregate with liveKeys posts iff ALL liv
 test('partitionByLiveness: liveKeys match JSON-encoded values (resist substring collision + escaping)', () => {
   // record is real JSON: 'Mei' must NOT match inside the longer "Meiko" value (collision), and a
   // displayName containing a quote must match its JSON-escaped form in the record (escaping).
-  const live: Record<string, string> = { 'data/registry.json': '{"displayName":"Meiko"},{"displayName":"Ai\\"ko"}' };
+  const live: Record<string, string> = { 'data/registry.json': '[{"displayName":"Meiko"},{"displayName":"Ai\\"ko"}]' };
   const readLive = (s: string): string => {
     if (!(s in live)) throw new Error('gone');
     return live[s];
@@ -285,6 +285,20 @@ test('partitionByLiveness: liveKeys match JSON-encoded values (resist substring 
   const aiko = { embeds: [{ title: 'aiko' }], sources: ['data/registry.json'], liveKeys: ['Ai"ko'] }; // escaped form present → posts
   assert.deepEqual(partitionByLiveness([meiGone], readLive).verified, []); // collision avoided
   assert.deepEqual(partitionByLiveness([aiko], readLive).verified.flatMap((b) => b.embeds.map((e) => e.title)), ['aiko']); // escaping handled
+});
+
+test('partitionByLiveness: two tokenless aggregates with identical embeds but different liveKeys are both kept', () => {
+  // Two 11-stream flood summaries for the same streamer have identical embed JSON ("11 場") but cover
+  // different videoIds — dedupe by liveKeys must not collapse them into one.
+  const live: Record<string, string> = { 'data/x/streams.json': '[{"videoId":"A1"},{"videoId":"B1"}]' };
+  const readLive = (s: string): string => {
+    if (!(s in live)) throw new Error('gone');
+    return live[s];
+  };
+  const sum1 = { embeds: [{ title: '🎵 summary' }], sources: ['data/x/streams.json'], liveKeys: ['A1'] };
+  const sum2 = { embeds: [{ title: '🎵 summary' }], sources: ['data/x/streams.json'], liveKeys: ['B1'] };
+  const { verified } = partitionByLiveness([sum1, sum2], readLive);
+  assert.equal(verified.flatMap((b) => b.embeds).length, 2); // both kept — distinct subjects
 });
 
 test('partitionByLiveness: a tokenless aggregate WITHOUT liveKeys still uses the hash fallback', () => {

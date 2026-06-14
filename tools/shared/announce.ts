@@ -55,8 +55,9 @@ export function loadAnnounceWebhook(): string | undefined {
 // live origin/master content — a stream/streamer embed posts iff its liveKey (videoId / link, see
 // `deriveLiveKey`) is present there, so an unrelated same-file change neither blesses a removed embed
 // nor drops a live one. A tokenless aggregate embed (flood summary, subscriber digest, no-link
-// streamer) is verified by its `liveKeys` — subject tokens (videoIds / displayNames) that must all be
-// present in the record content — else by the recorded whole-file `hash` fallback. A batch may also list
+// streamer) is verified by its `liveKeys` — subject tokens (a flood summary's videoIds, a no-link
+// streamer's slug, a digest's new subscriber-count values) that must all be present (JSON-encoded) in
+// the record content — else by the recorded whole-file `hash` fallback. A batch may also list
 // `presenceSources` — files that must exist on origin/master but are excluded from the hash/liveKey
 // search, gating a tokenless embed on its scaffolded data dir being live without that volatile content
 // perturbing its stable hash. A batch with empty/absent `sources` (and no missing presence source)
@@ -76,7 +77,7 @@ export interface PendingBatch {
   presenceSources?: string[];
   /**
    * Subject tokens for a TOKENLESS aggregate embed (the flood summary's videoIds; a no-link streamer's
-   * or the subscriber digest's displayNames). The aggregate is live iff every liveKey, JSON-encoded,
+   * slug; the subscriber digest's new subscriber-count values). The aggregate is live iff every liveKey, JSON-encoded,
    * appears in the record content (`sources`) — the encoding resists substring collisions and matches
    * the record's own escaping. Absent ⇒ the aggregate keeps the whole-file `hash` fallback.
    */
@@ -194,9 +195,12 @@ export function partitionByLiveness(
     const liveEmbeds: DiscordEmbed[] = [];
     for (const embed of batch.embeds) {
       const key = deriveLiveKey(embed);
-      // Scope dedupe by source: a re-run (same sources + token) collapses, but the same VOD archived
-      // under two streamers (different `sources`) keeps both legitimate announcements.
-      const dedupeKey = `${sourcesKey}\0${key ?? JSON.stringify(embed)}`;
+      // Dedupe identity, scoped by source (so the same VOD under two streamers — different `sources` —
+      // keeps both): a token-bearing embed → its token; a tokenless aggregate → its `liveKeys`, since
+      // two aggregates can share identical embed JSON yet cover different subjects (e.g. two 11-stream
+      // flood summaries); else the embed JSON.
+      const subjectKey = key ?? (batch.liveKeys && batch.liveKeys.length > 0 ? JSON.stringify(batch.liveKeys) : JSON.stringify(embed));
+      const dedupeKey = `${sourcesKey}\0${subjectKey}`;
       let live: boolean;
       if (!presenceOk) live = false;
       else if (sourceless) live = true;
