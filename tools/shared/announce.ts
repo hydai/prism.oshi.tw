@@ -49,10 +49,12 @@ export function loadAnnounceWebhook(): string | undefined {
 
 // --- Pending fan-announcement queue ---
 //
-// Announcements are computed during sync (before files are overwritten) but only
-// POSTED after the data is committed + pushed (via `npm run announce:flush`). Each
-// queued batch records the data file(s) it describes (`sources`) and a content hash
-// of their new contents (`hash`); at flush time we re-hash those files as they exist
+// An announcement's CONTENT is decided during sync from the old-vs-new data diff, but each batch is
+// ENQUEUED after the new files are written (so its `hash` fingerprints the new on-disk contents) and
+// only POSTED after the data is committed + pushed (via `npm run announce:flush`). The
+// write-before-enqueue order is load-bearing: enqueuing before the write would hash the old files and
+// break revision binding. Each queued batch records the data file(s) it describes (`sources`) and
+// that content hash; at flush time we re-hash those files as they exist
 // on origin/master and drop any batch whose data never went live (sync abandoned,
 // diff rejected, or push failed). A batch with empty/absent `sources` is posted
 // unconditionally — used for old-format migration and for the already-verified
