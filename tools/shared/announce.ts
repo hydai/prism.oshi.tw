@@ -153,28 +153,56 @@ export function enqueueAnnouncements(batch: PendingBatch, pendingPath: string = 
   writePendingBatches([...others, { embeds: mergedEmbeds, sources: batch.sources, hash: batch.hash }], pendingPath);
 }
 
-/** Split batches by whether their recorded hash still matches the live content from `readLive`. */
-export function partitionByLiveHash(
+function liveContentOf(sources: string[], readLive: (source: string) => string): string | null {
+  try {
+    return sources.map(readLive).join('\0');
+  } catch {
+    return null; // a source missing from origin/master ⇒ its data never went live
+  }
+}
+
+/**
+ * Decide which queued embeds to post by PER-EMBED liveness against the live content from `readLive`
+ * (origin/master). For each batch, in queue order, each embed is kept iff:
+ *  - sourceless batch → unconditional (old-format migration / already-verified remainder);
+ *  - token-bearing embed (`deriveLiveKey != null`) → its token is present in the batch's live source
+ *    content, so an unrelated same-file change never blesses a removed embed nor drops a live one;
+ *  - aggregate embed (`deriveLiveKey == null`) → the whole-file hash still matches (fallback for the
+ *    flood summary / subscriber digest, which have no single live subject).
+ * Cross-batch duplicates (same token, or identical aggregate) are dropped after the first. Returns
+ * source-grouped verified batches (so flush can checkpoint with `remainingBatchesAfter`) plus the
+ * dropped tokens (for logging).
+ */
+export function partitionByLiveness(
   batches: PendingBatch[],
   readLive: (source: string) => string,
-): { verified: PendingBatch[]; stale: PendingBatch[] } {
+): { verified: PendingBatch[]; droppedKeys: string[] } {
+  const seen = new Set<string>();
   const verified: PendingBatch[] = [];
-  const stale: PendingBatch[] = [];
+  const droppedKeys: string[] = [];
   for (const batch of batches) {
-    if (!batch.sources || batch.sources.length === 0) {
-      verified.push(batch);
-      continue;
+    const sourceless = !batch.sources || batch.sources.length === 0;
+    const content = sourceless ? '' : liveContentOf(batch.sources!, readLive);
+    const liveEmbeds: DiscordEmbed[] = [];
+    for (const embed of batch.embeds) {
+      const key = deriveLiveKey(embed);
+      const dedupeKey = key ?? JSON.stringify(embed);
+      let live: boolean;
+      if (sourceless) live = true;
+      else if (content === null) live = false;
+      else if (key !== null) live = content.includes(key);
+      else live = sha256(content) === batch.hash;
+      if (!live) {
+        if (key) droppedKeys.push(key);
+        continue;
+      }
+      if (seen.has(dedupeKey)) continue;
+      seen.add(dedupeKey);
+      liveEmbeds.push(embed);
     }
-    let liveHash: string;
-    try {
-      liveHash = hashSources(batch.sources, readLive);
-    } catch {
-      stale.push(batch); // a source missing from origin/master ⇒ never went live
-      continue;
-    }
-    (liveHash === batch.hash ? verified : stale).push(batch);
+    if (liveEmbeds.length > 0) verified.push({ ...batch, embeds: liveEmbeds });
   }
-  return { verified, stale };
+  return { verified, droppedKeys };
 }
 
 /**

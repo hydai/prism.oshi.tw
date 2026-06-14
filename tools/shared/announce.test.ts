@@ -3,7 +3,7 @@ import * as fs from 'node:fs';
 import * as os from 'node:os';
 import * as path from 'node:path';
 
-import { clearPendingAnnouncements, deriveLiveKey, enqueueAnnouncements, hashSources, parseDevVar, partitionByLiveHash, readPendingBatches, remainingBatchesAfter, writePendingBatches } from './announce.ts';
+import { clearPendingAnnouncements, deriveLiveKey, enqueueAnnouncements, hashSources, parseDevVar, partitionByLiveness, readPendingBatches, remainingBatchesAfter, writePendingBatches } from './announce.ts';
 
 function test(name: string, fn: () => void): void {
   try {
@@ -129,19 +129,54 @@ test('hashSources is stable and order-sensitive over its sources', () => {
   assert.notEqual(hashSources(['a', 'b'], read), hashSources(['b', 'a'], read));
 });
 
-test('partitionByLiveHash: match→verified, reverted/missing→stale, empty sources→unconditional', () => {
-  const live: Record<string, string> = { 'data/live.json': 'NEW' };
+test('partitionByLiveness: token present→post, absent→drop, dedupe, aggregate hash, sourceless', () => {
+  const live: Record<string, string> = { 'data/x/streams.json': 'KfadSsRBCi8 OtherVid', 'data/registry.json': 'REG' };
   const readLive = (s: string): string => {
-    if (!(s in live)) throw new Error('not on origin/master');
+    if (!(s in live)) throw new Error('gone');
     return live[s];
   };
-  const matching = { embeds: [{ title: 'ok' }], sources: ['data/live.json'], hash: hashSources(['data/live.json'], readLive) };
-  const reverted = { embeds: [{ title: 'reverted' }], sources: ['data/live.json'], hash: 'stale-hash' };
-  const missing = { embeds: [{ title: 'missing' }], sources: ['data/gone.json'], hash: 'whatever' };
+  const streamLive = { embeds: [{ title: 'A', url: 'https://youtu.be/KfadSsRBCi8' }], sources: ['data/x/streams.json'], hash: 'ignored' };
+  const streamDead = { embeds: [{ title: 'Z', url: 'https://youtu.be/ZZZdeadZZZ0' }], sources: ['data/x/streams.json'], hash: 'ignored' };
+  const dupOfA = { embeds: [{ title: 'A again', url: 'https://youtu.be/KfadSsRBCi8' }], sources: ['data/x/streams.json'], hash: 'ignored' };
+  const digestMatch = { embeds: [{ title: '📈' }], sources: ['data/registry.json'], hash: hashSources(['data/registry.json'], readLive) };
+  const digestStale = { embeds: [{ title: '📈 old' }], sources: ['data/registry.json'], hash: 'stale' };
   const unconditional = { embeds: [{ title: 'remainder' }] };
-  const { verified, stale } = partitionByLiveHash([matching, reverted, missing, unconditional], readLive);
-  assert.deepEqual(verified, [matching, unconditional]);
-  assert.deepEqual(stale, [reverted, missing]);
+  const { verified, droppedKeys } = partitionByLiveness(
+    [streamLive, streamDead, dupOfA, digestMatch, digestStale, unconditional],
+    readLive,
+  );
+  assert.deepEqual(verified, [
+    { embeds: [{ title: 'A', url: 'https://youtu.be/KfadSsRBCi8' }], sources: ['data/x/streams.json'], hash: 'ignored' },
+    { embeds: [{ title: '📈' }], sources: ['data/registry.json'], hash: digestMatch.hash },
+    { embeds: [{ title: 'remainder' }] },
+  ]);
+  assert.deepEqual(droppedKeys, ['ZZZdeadZZZ0']); // dead stream logged; dupOfA deduped silently
+});
+
+test('partitionByLiveness #14 false-positive: a removed stream is dropped (not blessed)', () => {
+  const live: Record<string, string> = { 'data/x/streams.json': 'Bvid_live' }; // A removed, only B live
+  const readLive = (s: string): string => {
+    if (!(s in live)) throw new Error('gone');
+    return live[s];
+  };
+  const queued = [
+    { embeds: [{ title: 'A', url: 'https://youtu.be/Avid_gone' }], sources: ['data/x/streams.json'], hash: 'h' },
+    { embeds: [{ title: 'B', url: 'https://youtu.be/Bvid_live' }], sources: ['data/x/streams.json'], hash: 'h' },
+  ];
+  const { verified } = partitionByLiveness(queued, readLive);
+  assert.deepEqual(verified.flatMap((b) => b.embeds.map((e) => e.title)), ['B']);
+});
+
+test('partitionByLiveness #14 false-negative: a live stream still posts after a quiet resync', () => {
+  const live: Record<string, string> = { 'data/x/streams.json': 'Avid_live and a new song that changed the file hash' };
+  const readLive = (s: string): string => {
+    if (!(s in live)) throw new Error('gone');
+    return live[s];
+  };
+  // A's whole-file hash is now stale; per-embed liveness ignores the hash for token-bearing embeds.
+  const queued = [{ embeds: [{ title: 'A', url: 'https://youtu.be/Avid_live' }], sources: ['data/x/streams.json'], hash: 'stale-whole-file-hash' }];
+  const { verified } = partitionByLiveness(queued, readLive);
+  assert.deepEqual(verified.flatMap((b) => b.embeds.map((e) => e.title)), ['A']);
 });
 
 test('remainingBatchesAfter keeps each unposted batch sources+hash for retry re-verification', () => {

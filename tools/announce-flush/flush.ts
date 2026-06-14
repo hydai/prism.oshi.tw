@@ -15,7 +15,7 @@ import * as path from 'node:path';
 import { fileURLToPath } from 'node:url';
 
 import { batchEmbeds, postDiscord } from '../../admin/shared/discord.ts';
-import { loadAnnounceWebhook, partitionByLiveHash, readPendingBatches, remainingBatchesAfter, writePendingBatches } from '../shared/announce.ts';
+import { loadAnnounceWebhook, partitionByLiveness, readPendingBatches, remainingBatchesAfter, writePendingBatches } from '../shared/announce.ts';
 
 const REPO_ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '../..');
 
@@ -27,7 +27,7 @@ function readLiveFromOriginMaster(source: string): string {
     encoding: 'utf-8',
     stdio: ['ignore', 'pipe', 'ignore'],
     // Raise execFileSync's 1MB default: a large streams.json/songs.json would otherwise overflow the
-    // buffer and throw, which partitionByLiveHash would misread as "not live" — silently dropping a
+    // buffer and throw, which partitionByLiveness would misread as "not live" — silently dropping a
     // valid announcement. 64MB is comfortably above any realistic data file.
     maxBuffer: 64 * 1024 * 1024,
   });
@@ -62,11 +62,10 @@ async function main(): Promise<void> {
     return;
   }
 
-  // Verify each batch against the data actually live on origin/master; drop the rest.
-  const { verified, stale } = partitionByLiveHash(batches, readLiveFromOriginMaster);
-  if (stale.length > 0) {
-    const dropped = stale.flatMap((b) => b.sources ?? ['(no sources)']);
-    console.warn(`announce-flush: dropped ${stale.length} stale batch(es) whose data is not live on origin/master: ${dropped.join(', ')}`);
+  // Verify each embed against the data actually live on origin/master (per-embed liveness); drop the rest.
+  const { verified, droppedKeys } = partitionByLiveness(batches, readLiveFromOriginMaster);
+  if (droppedKeys.length > 0) {
+    console.warn(`announce-flush: dropped ${droppedKeys.length} announcement(s) not live on origin/master: ${droppedKeys.join(', ')}`);
   }
   writePendingBatches(verified); // persist the drop immediately
 
