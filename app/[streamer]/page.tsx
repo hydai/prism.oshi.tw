@@ -566,7 +566,7 @@ export default function Home() {
               {streamerData.displayName}
             </h1>
 
-            {/* Description: "Virtual Singer & Streamer · {songCount} Songs", fontSize 13, centered */}
+            {/* Description: streamerData.description · {songCount} 首歌曲, fontSize 13, centered */}
             <p
               style={{
                 fontSize: '13px',
