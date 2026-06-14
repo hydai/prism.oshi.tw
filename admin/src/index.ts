@@ -1,7 +1,7 @@
 import { Hono } from 'hono';
 import { requireAuth, requireCurator } from './auth';
 import { getRouteParam, getStreamerId } from './http';
-import { canHardDeleteStream, isValidTransition, VALID_STATUSES } from './status';
+import { canHardDeleteStream, isValidTransition, shouldImportVod, VALID_STATUSES } from './status';
 import {
   listSongs,
   listSongsPaginated,
@@ -1220,29 +1220,34 @@ app.patch('/api/nova/vods/:id/status', requireCurator, async (c) => {
     .bind(body.status, reviewedAt, reviewerNote, id)
     .run();
 
-  // On a real transition to approved, import VOD songs into admin DB as pending
-  // records. Gating on the transition (not just body.status) prevents a re-approve
-  // from deleting/recreating already-curated performances via importVodToAdminDb.
-  if (body.status === 'approved' && existing.status !== 'approved') {
-    const vod = await c.env.NOVA_DB
-      .prepare('SELECT * FROM vod_submissions WHERE id = ?')
-      .bind(id)
-      .first<NovaVodSubmission>();
-    const { results: vodSongs } = await c.env.NOVA_DB
-      .prepare('SELECT * FROM vod_songs WHERE vod_submission_id = ? ORDER BY sort_order')
-      .bind(id)
-      .all<NovaVodSong>();
-
-    if (vod && vodSongs.length > 0) {
-      const user = c.get('user');
-      await importVodToAdminDb(c.env.DB, vod, vodSongs, user.email);
-    }
-  }
-
+  // Fetch the full updated row once and reuse it for the import gate, the Discord embed,
+  // and the response — avoids a second identical SELECT * on vod_submissions.
   const updated = await c.env.NOVA_DB
     .prepare('SELECT * FROM vod_submissions WHERE id = ?')
     .bind(id)
     .first<NovaVodSubmission>();
+
+  // Import VOD songs into the admin DB as pending records when approved. The gate is
+  // shouldImportVod, keyed on whether the video already exists in the admin DB
+  // (videoIdExists) rather than the Nova status transition: that keeps a failed import
+  // retryable (absent → import) while a re-approve of an already-imported VOD won't
+  // delete/recreate its curated performances (present → skip). importVodToAdminDb writes
+  // via an atomic db.batch(), so a failed import leaves no admin rows and the next retry
+  // re-imports cleanly. vod_songs is fetched only once we know we're importing, so a
+  // re-approval (common under this existence gate) costs no extra NOVA_DB read.
+  if (body.status === 'approved' && updated) {
+    if (shouldImportVod(body.status, await videoIdExists(c.env.DB, updated.video_id, updated.streamer_slug))) {
+      const { results: vodSongs } = await c.env.NOVA_DB
+        .prepare('SELECT * FROM vod_songs WHERE vod_submission_id = ? ORDER BY sort_order')
+        .bind(id)
+        .all<NovaVodSong>();
+
+      if (vodSongs.length > 0) {
+        const user = c.get('user');
+        await importVodToAdminDb(c.env.DB, updated, vodSongs, user.email);
+      }
+    }
+  }
 
   const feedbackEmbed = updated ? feedbackEmbedForVod(existing.status, body.status, updated) : null;
   if (feedbackEmbed) {

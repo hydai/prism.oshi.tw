@@ -1,6 +1,6 @@
 import { HTTPException } from 'hono/http-exception';
 import { getRouteParam, getStreamerId } from './http';
-import { canHardDeleteStream, isValidTransition, VALID_STATUSES } from './status';
+import { canHardDeleteStream, isValidTransition, shouldImportVod, VALID_STATUSES } from './status';
 import { formatSubscriberCount } from '../shared/format';
 
 declare const process: { exitCode?: number };
@@ -117,6 +117,15 @@ assertEqual(canHardDeleteStream('pending'), true, 'pending streams can be hard-d
 assertEqual(canHardDeleteStream('extracted'), true, 'extracted streams can be hard-deleted');
 assertEqual(canHardDeleteStream('rejected'), true, 'rejected streams can be hard-deleted');
 assertEqual(canHardDeleteStream('excluded'), true, 'excluded streams can be hard-deleted');
+
+// shouldImportVod: the VOD import is gated on admin-DB existence, not Nova status,
+// so a failed import stays retryable (absent → import) while a re-approve of an
+// already-imported VOD is skipped (present → no overwrite of curated performances).
+assertEqual(shouldImportVod('approved', false), true, 'first approve (not yet in admin DB) imports');
+assertEqual(shouldImportVod('approved', true), false, 're-approve (already imported) skips');
+assertEqual(shouldImportVod('rejected', false), false, 'rejected target never imports');
+assertEqual(shouldImportVod('pending', false), false, 'pending target never imports');
+console.log('✓ shouldImportVod');
 
 // formatSubscriberCount: Traditional Chinese 萬 (10,000) notation
 assertEqual(formatSubscriberCount(500), '500', 'below 10k uses plain locale string');
