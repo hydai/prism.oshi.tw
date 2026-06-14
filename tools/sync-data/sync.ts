@@ -16,7 +16,7 @@ import { fileURLToPath } from 'node:url';
 import { syncStatePath, upsertEntry, type SyncStateEntry } from '../shared/sync-state.ts';
 
 import { newStreamEmbed, newStreamsSummaryEmbed, type DiscordEmbed } from '../../admin/shared/discord.ts';
-import { enqueueAnnouncements, loadAnnounceWebhook } from '../shared/announce.ts';
+import { enqueueAnnouncements, hashSources, loadAnnounceWebhook } from '../shared/announce.ts';
 
 // --- Paths ---
 
@@ -264,7 +264,8 @@ function announceData(slug: string, newStreams: FanSiteStream[], songCounts: Map
           }),
         );
 
-  enqueueAnnouncements(embeds);
+  const sources = [`data/${slug}/songs.json`, `data/${slug}/streams.json`];
+  enqueueAnnouncements({ embeds, sources, hash: hashSources(sources) });
   console.log(`  📥 queued ${newStreams.length} new-stream announcement(s) — posted after push (npm run announce:flush)`);
 }
 

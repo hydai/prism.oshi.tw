@@ -16,7 +16,7 @@ import { fileURLToPath } from 'node:url';
 import { seedIfMissing } from '../shared/sync-state.ts';
 
 import { newStreamerEmbed, subscriberDigestEmbed, type DiscordEmbed } from '../../admin/shared/discord.ts';
-import { enqueueAnnouncements, loadAnnounceWebhook } from '../shared/announce.ts';
+import { enqueueAnnouncements, hashSources, loadAnnounceWebhook } from '../shared/announce.ts';
 
 // --- Paths ---
 
@@ -210,7 +210,8 @@ function announceRegistry(diff: StreamerDiff): void {
   }
   if (embeds.length === 0) return;
 
-  enqueueAnnouncements(embeds);
+  const sources = ['data/registry.json'];
+  enqueueAnnouncements({ embeds, sources, hash: hashSources(sources) });
   console.log(`  📥 queued ${diff.newStreamers.length} new streamer(s) + ${diff.subscriberChanges.length} subscriber change(s) — posted after push (npm run announce:flush)`);
 }
 
