@@ -261,7 +261,7 @@ test('remainingBatchesAfter preserves presenceSources on the unposted remainder'
 });
 
 test('partitionByLiveness: a tokenless aggregate with liveKeys posts iff ALL liveKeys are in the record', () => {
-  const live: Record<string, string> = { 'data/x/streams.json': 'Vid_A Vid_B Vid_C' };
+  const live: Record<string, string> = { 'data/x/streams.json': '[{"videoId":"Vid_A"},{"videoId":"Vid_B"},{"videoId":"Vid_C"}]' };
   const readLive = (s: string): string => {
     if (!(s in live)) throw new Error('gone');
     return live[s];
@@ -271,6 +271,20 @@ test('partitionByLiveness: a tokenless aggregate with liveKeys posts iff ALL liv
   const oneGone = { embeds: [{ title: '🎵 summary2' }], sources: ['data/x/streams.json'], liveKeys: ['Vid_A', 'Vid_GONE'], hash: 'stale' };
   assert.deepEqual(partitionByLiveness([allLive], readLive).verified.flatMap((b) => b.embeds.map((e) => e.title)), ['🎵 summary']); // all present → posts
   assert.deepEqual(partitionByLiveness([oneGone], readLive).verified, []); // one liveKey missing → dropped (wrong-count summary suppressed)
+});
+
+test('partitionByLiveness: liveKeys match JSON-encoded values (resist substring collision + escaping)', () => {
+  // record is real JSON: 'Mei' must NOT match inside the longer "Meiko" value (collision), and a
+  // displayName containing a quote must match its JSON-escaped form in the record (escaping).
+  const live: Record<string, string> = { 'data/registry.json': '{"displayName":"Meiko"},{"displayName":"Ai\\"ko"}' };
+  const readLive = (s: string): string => {
+    if (!(s in live)) throw new Error('gone');
+    return live[s];
+  };
+  const meiGone = { embeds: [{ title: 'mei' }], sources: ['data/registry.json'], liveKeys: ['Mei'] }; // not a JSON value → dropped
+  const aiko = { embeds: [{ title: 'aiko' }], sources: ['data/registry.json'], liveKeys: ['Ai"ko'] }; // escaped form present → posts
+  assert.deepEqual(partitionByLiveness([meiGone], readLive).verified, []); // collision avoided
+  assert.deepEqual(partitionByLiveness([aiko], readLive).verified.flatMap((b) => b.embeds.map((e) => e.title)), ['aiko']); // escaping handled
 });
 
 test('partitionByLiveness: a tokenless aggregate WITHOUT liveKeys still uses the hash fallback', () => {

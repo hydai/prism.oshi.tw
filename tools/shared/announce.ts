@@ -76,8 +76,9 @@ export interface PendingBatch {
   presenceSources?: string[];
   /**
    * Subject tokens for a TOKENLESS aggregate embed (the flood summary's videoIds; a no-link streamer's
-   * or the subscriber digest's displayNames). The aggregate is live iff every liveKey appears in the
-   * record content (`sources`). Absent ⇒ the aggregate keeps the whole-file `hash` fallback.
+   * or the subscriber digest's displayNames). The aggregate is live iff every liveKey, JSON-encoded,
+   * appears in the record content (`sources`) — the encoding resists substring collisions and matches
+   * the record's own escaping. Absent ⇒ the aggregate keeps the whole-file `hash` fallback.
    */
   liveKeys?: string[];
   hash?: string;
@@ -165,9 +166,9 @@ function allPresent(sources: string[], readLive: (source: string) => string): bo
  *  - sourceless batch → unconditional (old-format migration / already-verified remainder);
  *  - token-bearing embed (`deriveLiveKey != null`) → its token is present in the batch's live source
  *    content, so an unrelated same-file change never blesses a removed embed nor drops a live one;
- *  - aggregate embed (`deriveLiveKey == null`) → if the batch has `liveKeys`, every one is present in
- *    the record content; else the whole-file hash still matches (fallback for the flood summary /
- *    subscriber digest / no-link streamer, which have no single live subject in the embed itself).
+ *  - aggregate embed (`deriveLiveKey == null`) → if the batch has `liveKeys`, every one is present
+ *    (JSON-encoded) in the record content; else the whole-file hash still matches (fallback for the
+ *    flood summary / subscriber digest / no-link streamer, which have no single live subject).
  * Cross-batch duplicates (same token, or identical aggregate) are dropped after the first. Returns
  * source-grouped verified batches (so flush can checkpoint with `remainingBatchesAfter`) plus the
  * dropped tokens (for logging).
@@ -201,7 +202,11 @@ export function partitionByLiveness(
       else if (sourceless) live = true;
       else if (content === null) live = false;
       else if (key !== null) live = content.includes(key);
-      else if (batch.liveKeys && batch.liveKeys.length > 0) live = batch.liveKeys.every((k) => content!.includes(k));
+      // Match the JSON-ENCODED liveKey (`"value"`, escaped) against the record: the surrounding quotes
+      // stop a displayName false-matching inside a longer value ("Mei" vs "Meiko"), and JSON.stringify
+      // reproduces the file's escaping so a name with a quote/newline still matches. (The token path
+      // above stays bare — videoIds/links are the collision/escape-safe #14 heuristic.)
+      else if (batch.liveKeys && batch.liveKeys.length > 0) live = batch.liveKeys.every((k) => content!.includes(JSON.stringify(k)));
       else live = sha256(content) === batch.hash;
       if (!live) {
         if (key) droppedKeys.push(key);
