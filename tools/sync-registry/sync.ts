@@ -202,10 +202,11 @@ function readExistingStreamers(): StreamerConfig[] {
  * Each new streamer gets its OWN batch: registry.json is the hashed `sources` (the streamer's link &
  * slug live there); the data files scaffolded for it are `presenceSources` (must be live on
  * origin/master, so a partial push that omits the streamer's data dir drops the 🎉 instead of posting
- * to a page that 404s, but excluded from the hash/liveKey search); and `liveKeys:[displayName]` lets a
- * no-link (tokenless) streamer verify by displayName presence in registry.json instead of the brittle
- * hash (#16). The subscriber digest is a plain registry.json batch carrying the changed displayNames
- * as `liveKeys`, since its data lives entirely in registry.json.
+ * to a page that 404s, but excluded from the hash/liveKey search); and `liveKeys:[slug]` (the unique
+ * registry key) lets a no-link (tokenless) streamer verify by slug presence in registry.json instead
+ * of the brittle hash (#16). The subscriber digest is a plain registry.json batch carrying the new
+ * count values as `liveKeys`, so it verifies the announced counts are live — not merely that the
+ * streamers still exist.
  */
 export function registryAnnouncementBatches(
   diff: StreamerDiff,
@@ -220,12 +221,14 @@ export function registryAnnouncementBatches(
   for (const s of diff.newStreamers) {
     const presenceSources = [`data/${s.slug}/songs.json`, `data/${s.slug}/streams.json`];
     const embed = newStreamerEmbed({ displayName: s.displayName, group: s.group, link: s.socialLinks.youtube ?? s.externalUrl ?? '' });
-    // liveKeys=[displayName] (present in registry.json) verifies a no-link streamer, whose embed is
-    // tokenless; a token-bearing streamer ignores it (its link wins in partitionByLiveness).
-    batches.push({ embeds: [embed], sources, presenceSources, liveKeys: [s.displayName], hash });
+    // liveKeys=[slug] (the unique registry key — display_name is not unique) verifies a no-link
+    // streamer, whose embed is tokenless; a token-bearing streamer ignores it (its link wins).
+    batches.push({ embeds: [embed], sources, presenceSources, liveKeys: [s.slug], hash });
   }
   if (diff.subscriberChanges.length > 0) {
-    const liveKeys = diff.subscriberChanges.map((c) => c.displayName);
+    // The digest announces the new counts, so it verifies those are live in registry.json (not merely
+    // that the streamer still exists) — a reverted count drops it.
+    const liveKeys = diff.subscriberChanges.map((c) => c.to);
     batches.push({ embeds: [subscriberDigestEmbed(diff.subscriberChanges)], sources, liveKeys, hash });
   }
   return batches;
