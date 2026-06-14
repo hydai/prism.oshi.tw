@@ -1,6 +1,6 @@
 import * as assert from 'node:assert/strict';
 
-import { songCountsByStream, streamsToAnnounce } from './sync.ts';
+import { dataAnnouncementBatch, songCountsByStream, streamsToAnnounce } from './sync.ts';
 
 function test(name: string, fn: () => void): void {
   try {
@@ -74,6 +74,33 @@ test('streamsToAnnounce does not re-announce a stream already published with son
     streamsToAnnounce([streamA], new Set<string>(['s1']), new Map<string, number>([['s1', 2]]), new Map<string, number>([['s1', 5]])),
     [],
   );
+});
+
+// --- dataAnnouncementBatch: streams.json is the record, songs.json presence-only, flood liveKeys (#16) ---
+
+const joinHash = (sources: string[]): string => sources.join('|');
+const mkStream = (id: string, videoId: string) => ({ id, videoId, title: `t-${id}`, date: '', youtubeUrl: '' });
+
+test('dataAnnouncementBatch: per-stream embeds, streams.json is the record, songs.json presence-only', () => {
+  const streams = [mkStream('s1', 'Vid1'), mkStream('s2', 'Vid2')];
+  const batch = dataAnnouncementBatch('mizuki', streams, new Map([['s1', 3]]), 'Mizuki', joinHash);
+  assert.deepEqual(batch.sources, ['data/mizuki/streams.json']);
+  assert.deepEqual(batch.presenceSources, ['data/mizuki/songs.json']);
+  assert.equal(batch.liveKeys, undefined); // per-stream embeds self-verify by their own videoId
+  assert.equal(batch.embeds.length, 2);
+  assert.equal(batch.hash, 'data/mizuki/streams.json'); // hashed over the record only
+});
+
+test('dataAnnouncementBatch: flood (> cap) → one summary embed with liveKeys = all videoIds', () => {
+  const streams = Array.from({ length: 11 }, (_, i) => mkStream(`s${i}`, `Vid${i}`));
+  const batch = dataAnnouncementBatch('mizuki', streams, new Map(), 'Mizuki', joinHash);
+  assert.equal(batch.embeds.length, 1); // summary
+  assert.deepEqual(batch.sources, ['data/mizuki/streams.json']);
+  assert.deepEqual(batch.presenceSources, ['data/mizuki/songs.json']);
+  assert.deepEqual(
+    batch.liveKeys,
+    streams.map((s) => s.videoId),
+  ); // verified against streams.json at flush
 });
 
 console.log('sync-data.test: all passed');

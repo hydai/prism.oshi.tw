@@ -16,7 +16,7 @@ import { fileURLToPath } from 'node:url';
 import { syncStatePath, upsertEntry, type SyncStateEntry } from '../shared/sync-state.ts';
 
 import { newStreamEmbed, newStreamsSummaryEmbed, type DiscordEmbed } from '../../admin/shared/discord.ts';
-import { enqueueAnnouncements, hashSources, loadAnnounceWebhook } from '../shared/announce.ts';
+import { enqueueAnnouncements, hashSources, loadAnnounceWebhook, type PendingBatch } from '../shared/announce.ts';
 
 // --- Paths ---
 
@@ -244,28 +244,46 @@ function streamerDisplayName(slug: string): string {
   }
 }
 
+/**
+ * Build the fan-announcement batch for a streamer's newly-published streams (pure; `computeHash`
+ * injectable for tests). streams.json is the record (`sources`), so a stream's videoId is verified
+ * against the stream record — not its lingering songs.json performances (#16 part 1) — while
+ * songs.json is a presence-only source (must exist, but excluded from the hash/liveKey search). When
+ * the run floods (> ANNOUNCE_FLOOD_CAP), the single summary embed is tokenless, so its subjects'
+ * videoIds ride along as `liveKeys` and verify against streams.json at flush (#16 part 2).
+ */
+export function dataAnnouncementBatch(
+  slug: string,
+  newStreams: FanSiteStream[],
+  songCounts: Map<string, number>,
+  displayName: string,
+  computeHash: (sources: string[]) => string = hashSources,
+): PendingBatch {
+  const sources = [`data/${slug}/streams.json`];
+  const presenceSources = [`data/${slug}/songs.json`];
+  const flood = newStreams.length > ANNOUNCE_FLOOD_CAP;
+  const embeds: DiscordEmbed[] = flood
+    ? [newStreamsSummaryEmbed(displayName, newStreams.length)]
+    : newStreams.map((s) =>
+        newStreamEmbed({
+          displayName,
+          streamTitle: s.title,
+          videoId: s.videoId,
+          songCount: songCounts.get(s.id) ?? 0,
+          thumbnailUrl: `https://i.ytimg.com/vi/${s.videoId}/mqdefault.jpg`,
+        }),
+      );
+  const batch: PendingBatch = { embeds, sources, presenceSources, hash: computeHash(sources) };
+  if (flood) batch.liveKeys = newStreams.map((s) => s.videoId);
+  return batch;
+}
+
 // Queue fan announcements for posting after the data is committed + pushed (via
 // `npm run announce:flush`), so fans never get a ping for data that never went live.
 // Gated on the webhook being configured so the feature stays dormant when unset.
 function announceData(slug: string, newStreams: FanSiteStream[], songCounts: Map<string, number>): void {
   if (newStreams.length === 0 || !loadAnnounceWebhook()) return;
-
-  const displayName = streamerDisplayName(slug);
-  const embeds: DiscordEmbed[] =
-    newStreams.length > ANNOUNCE_FLOOD_CAP
-      ? [newStreamsSummaryEmbed(displayName, newStreams.length)]
-      : newStreams.map((s) =>
-          newStreamEmbed({
-            displayName,
-            streamTitle: s.title,
-            videoId: s.videoId,
-            songCount: songCounts.get(s.id) ?? 0,
-            thumbnailUrl: `https://i.ytimg.com/vi/${s.videoId}/mqdefault.jpg`,
-          }),
-        );
-
-  const sources = [`data/${slug}/songs.json`, `data/${slug}/streams.json`];
-  enqueueAnnouncements({ embeds, sources, hash: hashSources(sources) });
+  enqueueAnnouncements(dataAnnouncementBatch(slug, newStreams, songCounts, streamerDisplayName(slug)));
   console.log(`  📥 queued ${newStreams.length} new-stream announcement(s) — posted after push (npm run announce:flush)`);
 }
 
