@@ -1,5 +1,6 @@
 import { html, raw } from 'hono/html';
 import { DARK_MODE_CSS, DARK_MODE_DETECT_SCRIPT, themeToggleHTML } from './theme';
+import { TICKET_FIELD_LIMITS } from './validate';
 
 export function renderFormPage(siteKey: string) {
   return html`<!doctype html>
@@ -318,7 +319,7 @@ export function renderFormPage(siteKey: string) {
         <!-- Title -->
         <div>
           <label class="form-label" for="title">標題 <span class="required">*</span></label>
-          <input type="text" id="title" class="form-input" placeholder="簡短描述問題或建議" maxlength="200" required />
+          <input type="text" id="title" class="form-input" placeholder="簡短描述問題或建議" maxlength="${TICKET_FIELD_LIMITS.title}" required />
           <div id="similar-panel" class="similar-panel" style="display: none;">
             <div class="similar-header">
               <span>類似的既有回報</span>
@@ -332,13 +333,13 @@ export function renderFormPage(siteKey: string) {
         <!-- Body -->
         <div>
           <label class="form-label" for="body">詳細描述 <span class="required">*</span></label>
-          <textarea id="body" class="form-input" rows="5" placeholder="請描述你遇到的問題或想要的功能…" required></textarea>
+          <textarea id="body" class="form-input" rows="5" placeholder="請描述你遇到的問題或想要的功能…" maxlength="${TICKET_FIELD_LIMITS.body}" required></textarea>
         </div>
 
         <!-- Nickname -->
         <div>
           <label class="form-label" for="nickname">暱稱</label>
-          <input type="text" id="nickname" class="form-input" placeholder="選填，Q&A 公開回覆時顯示" maxlength="50" />
+          <input type="text" id="nickname" class="form-input" placeholder="選填，Q&A 公開回覆時顯示" maxlength="${TICKET_FIELD_LIMITS.nickname}" />
         </div>
 
         <!-- Public reply toggle -->
@@ -355,7 +356,7 @@ export function renderFormPage(siteKey: string) {
         <!-- Contact (shown when public reply is NOT allowed) -->
         <div id="contact-wrapper" class="contact-field hidden">
           <label class="form-label" for="contact">聯絡方式 <span class="required">*</span></label>
-          <input type="text" id="contact" class="form-input" placeholder="Email / Discord / Twitter 等，讓我們能回覆你" />
+          <input type="text" id="contact" class="form-input" placeholder="Email / Discord / Twitter 等，讓我們能回覆你" maxlength="${TICKET_FIELD_LIMITS.contact}" />
           <p class="form-hint">不公開回覆時必須提供聯絡方式</p>
         </div>
 
