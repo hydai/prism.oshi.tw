@@ -15,8 +15,15 @@ import {
   type VodFilter,
 } from './status-page';
 
-/** Fetch video title, thumbnail, and publish date from YouTube via oEmbed + Data API v3. */
-async function fetchYoutubeVideoInfo(videoId: string, apiKey: string): Promise<{ title: string; thumbnail: string; date: string }> {
+/**
+ * Fetch a video's title + thumbnail via oEmbed, and — only when an `apiKey` is
+ * supplied — its broadcast date via the YouTube Data API v3.
+ *
+ * `apiKey` is optional by design: the Data API spends the worker's shared
+ * YOUTUBE_API_KEY quota, so callers must opt in. Pass it only from
+ * Turnstile-protected flows; leave it undefined on unauthenticated paths.
+ */
+export async function fetchYoutubeVideoInfo(videoId: string, apiKey?: string): Promise<{ title: string; thumbnail: string; date: string }> {
   let title = '';
   let thumbnail = '';
   let date = '';
@@ -293,7 +300,8 @@ app.get('/vod/api/check', async (c) => {
   return c.json({ exists: false, inAdmin: false });
 });
 
-// GET /vod/api/video-info — Fetch video title/date from YouTube
+// GET /vod/api/video-info — Public preview: returns video title + thumbnail only.
+// Intentionally does NOT use YOUTUBE_API_KEY (see the fetchYoutubeVideoInfo call below).
 app.get('/vod/api/video-info', async (c) => {
   const secFetchSite = c.req.header('Sec-Fetch-Site');
   const referer = c.req.header('Referer') ?? '';
@@ -318,7 +326,11 @@ app.get('/vod/api/video-info', async (c) => {
   }
 
   try {
-    const info = await fetchYoutubeVideoInfo(parsed.videoId, c.env.YOUTUBE_API_KEY);
+    // No YOUTUBE_API_KEY here: this route is unauthenticated and its Sec-Fetch-Site /
+    // Referer gate is spoofable by non-browser clients, so spending the shared Data API
+    // quota here would let anyone drain it. oEmbed (title + thumbnail) needs no key.
+    // The Turnstile-protected POST /vod/api/submit still fills the date via the Data API.
+    const info = await fetchYoutubeVideoInfo(parsed.videoId);
     return c.json(info);
   } catch {
     return c.json({ error: 'Failed to fetch video info' }, 502);
