@@ -1,6 +1,11 @@
+// Pin the timezone so formatDate()'s local-time getters are deterministic and
+// match the Cloudflare Workers production runtime (UTC). Without this the
+// YYYY-MM-DD assertions below would be flaky on dev machines in other zones.
+process.env.TZ = 'UTC';
+
 import * as assert from 'node:assert/strict';
 
-import { renderQaPage } from './qa-page';
+import { renderQaPage, formatDate } from './qa-page';
 import type { TicketRow } from './types';
 
 function test(name: string, fn: () => void): void {
@@ -77,6 +82,22 @@ test('renderQaPage escapes a reflected search query', () => {
 test('renderQaPage renders a benign nickname and falls back to 匿名', () => {
   assert.ok(render([makeTicket({ nickname: '夜空' })]).includes('夜空'), 'benign nickname is shown');
   assert.ok(render([makeTicket({ nickname: '' })]).includes('匿名'), 'empty nickname falls back to 匿名');
+});
+
+// formatDate: a valid ISO timestamp formats to YYYY-MM-DD (UTC, per the TZ pin
+// above). Refs #26.
+test('formatDate formats a valid ISO timestamp as YYYY-MM-DD', () => {
+  assert.equal(formatDate('2026-06-13T00:00:00Z'), '2026-06-13');
+});
+
+// formatDate: invalid input must return a safe, fixed placeholder — never the
+// raw input and never "NaN-NaN-NaN". new Date(str) does not throw on garbage; it
+// yields an Invalid Date whose getters return NaN, so the old try/catch could
+// never run and the function silently emitted "NaN-NaN-NaN". Refs #26.
+test('formatDate returns a safe placeholder for invalid input', () => {
+  const out = formatDate('not a real date');
+  assert.equal(out, '', 'invalid date must return the empty placeholder');
+  assert.ok(!out.includes('NaN'), 'must never render NaN-NaN-NaN');
 });
 
 console.log('\nAll qa-page tests passed.');
