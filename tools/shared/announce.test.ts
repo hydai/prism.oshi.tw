@@ -119,6 +119,18 @@ test('partitionByLiveness: token present→post, absent→drop, dedupe, aggregat
   assert.deepEqual(droppedKeys, ['ZZZdeadZZZ0']); // dead stream logged; dupOfA deduped silently
 });
 
+test('partitionByLiveness: same videoId under different streamers (collab VOD) is not cross-deduped', () => {
+  const live: Record<string, string> = { 'data/x/streams.json': 'COLLABvid11', 'data/y/streams.json': 'COLLABvid11' };
+  const readLive = (s: string): string => {
+    if (!(s in live)) throw new Error('gone');
+    return live[s];
+  };
+  const onX = { embeds: [{ title: 'X', url: 'https://youtu.be/COLLABvid11' }], sources: ['data/x/streams.json'], hash: 'h' };
+  const onY = { embeds: [{ title: 'Y', url: 'https://youtu.be/COLLABvid11' }], sources: ['data/y/streams.json'], hash: 'h' };
+  const { verified } = partitionByLiveness([onX, onY], readLive);
+  assert.deepEqual(verified.flatMap((b) => b.embeds.map((e) => e.title)), ['X', 'Y']); // both kept — distinct streamers
+});
+
 test('partitionByLiveness #14 false-positive: a removed stream is dropped (not blessed)', () => {
   const live: Record<string, string> = { 'data/x/streams.json': 'Bvid_live' }; // A removed, only B live
   const readLive = (s: string): string => {
