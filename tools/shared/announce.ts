@@ -49,17 +49,15 @@ export function loadAnnounceWebhook(): string | undefined {
 
 // --- Pending fan-announcement queue ---
 //
-// An announcement's CONTENT is decided during sync from the old-vs-new data diff, but each batch is
-// ENQUEUED after the new files are written (so its `hash` fingerprints the new on-disk contents) and
-// only POSTED after the data is committed + pushed (via `npm run announce:flush`). The
-// write-before-enqueue order is load-bearing: enqueuing before the write would hash the old files and
-// break revision binding. Each queued batch records the data file(s) it describes (`sources`) and
-// that content hash; at flush time we re-hash those files as they exist
-// on origin/master and drop any batch whose data never went live (sync abandoned,
-// diff rejected, or push failed). A batch with empty/absent `sources` is posted
-// unconditionally — used for old-format migration and for the already-verified
-// remainder written back after a partial-flush failure. The path is injectable so it
-// can be unit-tested against a temp file.
+// Announcements are computed during sync but only POSTED after the data is committed + pushed (via
+// `npm run announce:flush`), so fans never get a ping for data that never went live. Each queued
+// batch records the data file(s) it describes (`sources`); at flush we verify PER EMBED against the
+// live origin/master content — a stream/streamer embed posts iff its liveKey (videoId / link, see
+// `deriveLiveKey`) is present there, so an unrelated same-file change neither blesses a removed embed
+// nor drops a live one. Tokenless aggregate embeds (flood summary, subscriber digest) fall back to
+// the recorded whole-file `hash` (taken after the new files are written). A batch with empty/absent
+// `sources` posts unconditionally — old-format migration / already-verified partial-flush remainder.
+// Enqueue is a plain append; flush dedupes by liveKey. The path is injectable for unit tests.
 
 const REPO_ROOT = path.resolve(__dirname, '../..');
 
