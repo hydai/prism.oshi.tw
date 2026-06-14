@@ -200,11 +200,12 @@ function readExistingStreamers(): StreamerConfig[] {
  * of `diff`; the only I/O is `computeHash`, which defaults to `hashSources` (reads the source files)
  * but is injectable so tests run disk-free.
  * Each new streamer gets its OWN batch: registry.json is the hashed `sources` (the streamer's link &
- * slug live there), while the data files scaffolded for it are `presenceSources` — they must be live
- * on origin/master, so a partial push that omits the streamer's data dir drops the 🎉 instead of
- * posting to a page that 404s, yet their volatile content is excluded from the hash so a later
- * sync:data can't break a no-link (tokenless) streamer's verification. The subscriber digest is a
- * plain registry.json batch, since its data lives entirely in registry.json.
+ * slug live there); the data files scaffolded for it are `presenceSources` (must be live on
+ * origin/master, so a partial push that omits the streamer's data dir drops the 🎉 instead of posting
+ * to a page that 404s, but excluded from the hash/liveKey search); and `liveKeys:[displayName]` lets a
+ * no-link (tokenless) streamer verify by displayName presence in registry.json instead of the brittle
+ * hash (#16). The subscriber digest is a plain registry.json batch carrying the changed displayNames
+ * as `liveKeys`, since its data lives entirely in registry.json.
  */
 export function registryAnnouncementBatches(
   diff: StreamerDiff,
@@ -219,10 +220,13 @@ export function registryAnnouncementBatches(
   for (const s of diff.newStreamers) {
     const presenceSources = [`data/${s.slug}/songs.json`, `data/${s.slug}/streams.json`];
     const embed = newStreamerEmbed({ displayName: s.displayName, group: s.group, link: s.socialLinks.youtube ?? s.externalUrl ?? '' });
-    batches.push({ embeds: [embed], sources, presenceSources, hash });
+    // liveKeys=[displayName] (present in registry.json) verifies a no-link streamer, whose embed is
+    // tokenless; a token-bearing streamer ignores it (its link wins in partitionByLiveness).
+    batches.push({ embeds: [embed], sources, presenceSources, liveKeys: [s.displayName], hash });
   }
   if (diff.subscriberChanges.length > 0) {
-    batches.push({ embeds: [subscriberDigestEmbed(diff.subscriberChanges)], sources, hash });
+    const liveKeys = diff.subscriberChanges.map((c) => c.displayName);
+    batches.push({ embeds: [subscriberDigestEmbed(diff.subscriberChanges)], sources, liveKeys, hash });
   }
   return batches;
 }

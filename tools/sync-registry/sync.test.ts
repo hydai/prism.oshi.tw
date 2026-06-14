@@ -100,4 +100,24 @@ test('registryAnnouncementBatches: nothing to announce → no batches, and no ha
   assert.deepEqual(registryAnnouncementBatches({ newStreamers: [], subscriberChanges: [] }, throwingHash), []);
 });
 
+test('registryAnnouncementBatches: each new streamer carries liveKeys=[displayName] (no-link fallback)', () => {
+  const diff: StreamerDiff = { newStreamers: [cfg('aiko', 'Aiko', '1萬')], subscriberChanges: [] };
+  const batches = registryAnnouncementBatches(diff, joinHash);
+  // displayName is present in registry.json, so a no-link streamer (tokenless embed) verifies by it.
+  assert.deepEqual(batches[0].liveKeys, ['Aiko']);
+});
+
+test('registryAnnouncementBatches: subscriber digest carries liveKeys = changed displayNames', () => {
+  const diff: StreamerDiff = {
+    newStreamers: [],
+    subscriberChanges: [
+      { displayName: 'Aiko', from: '1萬', to: '1.1萬' },
+      { displayName: 'Mei', from: '2萬', to: '2.2萬' },
+    ],
+  };
+  const batches = registryAnnouncementBatches(diff, joinHash);
+  assert.equal(batches.length, 1);
+  assert.deepEqual(batches[0].liveKeys, ['Aiko', 'Mei']);
+});
+
 console.log('sync-registry.test: all passed');
