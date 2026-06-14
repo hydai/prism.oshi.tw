@@ -76,10 +76,12 @@ export interface PendingBatch {
    */
   presenceSources?: string[];
   /**
-   * Subject tokens for a TOKENLESS aggregate embed (the flood summary's videoIds; a no-link streamer's
-   * slug; the subscriber digest's new subscriber-count values). The aggregate is live iff every liveKey, JSON-encoded,
-   * appears in the record content (`sources`) — the encoding resists substring collisions and matches
-   * the record's own escaping. Absent ⇒ the aggregate keeps the whole-file `hash` fallback.
+   * Subject tokens that verify a TOKENLESS embed — one whose `deriveLiveKey` is null: the flood
+   * summary's videoIds; a no-link streamer's slug; the subscriber digest's new subscriber-count values.
+   * Such an embed is live iff every liveKey, JSON-encoded, appears in the record content (`sources`) —
+   * the encoding resists substring collisions and matches the record's own escaping. `liveKeys` may be
+   * set on a batch that also holds token-bearing embeds (e.g. a streamer with a valid link); those are
+   * verified by their own token and ignore it. Absent ⇒ a tokenless embed keeps the `hash` fallback.
    */
   liveKeys?: string[];
   hash?: string;
