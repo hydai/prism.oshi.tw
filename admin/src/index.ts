@@ -462,7 +462,7 @@ app.delete('/api/streams/:id', requireCurator, async (c) => {
   return c.json({ ok: true, songs, performances } satisfies DeleteStreamResponse);
 });
 
-app.patch('/api/performances/:id/timestamps', async (c) => {
+app.patch('/api/performances/:id/timestamps', requireCurator, async (c) => {
   const id = getRouteParam(c, 'id');
   const body = await c.req.json<UpdateTimestampsBody>();
   const updated = await updatePerformanceTimestamps(c.env.DB, id, {
@@ -473,7 +473,7 @@ app.patch('/api/performances/:id/timestamps', async (c) => {
   return c.json({ ok: true });
 });
 
-app.patch('/api/performances/:id/details', async (c) => {
+app.patch('/api/performances/:id/details', requireCurator, async (c) => {
   const id = getRouteParam(c, 'id');
   const body = await c.req.json<UpdateSongDetailsBody>();
   const updated = await updatePerformanceSongDetails(c.env.DB, id, {
@@ -484,7 +484,7 @@ app.patch('/api/performances/:id/details', async (c) => {
   return c.json({ ok: true });
 });
 
-app.delete('/api/performances/:id', async (c) => {
+app.delete('/api/performances/:id', requireCurator, async (c) => {
   const id = getRouteParam(c, 'id');
   const deleted = await deletePerformanceAndOrphanSong(c.env.DB, id);
   if (!deleted) return c.json({ error: 'Performance not found' }, 404);
@@ -518,7 +518,7 @@ app.get('/api/streams/:streamId/detail', async (c) => {
 
 // --- Performance note update ---
 
-app.patch('/api/performances/:id/note', async (c) => {
+app.patch('/api/performances/:id/note', requireCurator, async (c) => {
   const id = getRouteParam(c, 'id');
   const body = await c.req.json<{ note: string }>();
   if (body.note === undefined) {
@@ -531,7 +531,7 @@ app.patch('/api/performances/:id/note', async (c) => {
 
 // --- Stamp: paste import ---
 
-app.post('/api/streams/:streamId/paste-import', async (c) => {
+app.post('/api/streams/:streamId/paste-import', requireCurator, async (c) => {
   const streamerId = getStreamerId(c);
   const streamId = getRouteParam(c, 'streamId');
   const body = await c.req.json<PasteImportBody>();
@@ -584,7 +584,7 @@ app.post('/api/streams/:streamId/paste-import', async (c) => {
 
 // --- Stamp: clear all end timestamps ---
 
-app.delete('/api/streams/:streamId/end-timestamps', async (c) => {
+app.delete('/api/streams/:streamId/end-timestamps', requireCurator, async (c) => {
   const streamId = getRouteParam(c, 'streamId');
   const cleared = await clearAllEndTimestamps(c.env.DB, streamId);
   return c.json({ ok: true, cleared });
@@ -592,7 +592,7 @@ app.delete('/api/streams/:streamId/end-timestamps', async (c) => {
 
 // --- Stamp: fetch duration from iTunes ---
 
-app.post('/api/performances/:id/fetch-duration', async (c) => {
+app.post('/api/performances/:id/fetch-duration', requireCurator, async (c) => {
   const id = getRouteParam(c, 'id');
   const perf = await getPerformanceWithSong(c.env.DB, id);
   if (!perf) return c.json({ error: 'Performance not found' }, 404);

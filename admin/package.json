@@ -15,7 +15,8 @@
     "test:discord": "npx tsx shared/discord.test.ts",
     "test:db": "npx tsx src/db.test.ts",
     "test:auth": "npx tsx src/auth.test.ts",
-    "check": "npm run typecheck && npm run test:helpers && npm run test:itunes && npm run test:discord && npm run test:db && npm run test:auth"
+    "test:authz": "npx tsx src/authz.test.ts",
+    "check": "npm run typecheck && npm run test:helpers && npm run test:itunes && npm run test:discord && npm run test:db && npm run test:auth && npm run test:authz"
   },
   "dependencies": {
     "hono": "^4.12.22"

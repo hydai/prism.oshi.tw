@@ -117,6 +117,24 @@ function executeD1File(filePath: string): void {
   });
 }
 
+/**
+ * Write `sql` into a freshly created, owner-only temp directory and return both paths.
+ *
+ * The returned file is handed to `wrangler d1 execute --file=` for a privileged write to
+ * the production Nova D1, so it must not be attacker-influenceable. `fs.mkdtempSync`
+ * atomically creates a directory with an unguessable random name and mode 0700, so a local
+ * user has no permission to enter it — they cannot pre-plant a symlink, pre-create the
+ * file, or race-replace its contents the way a predictable `${Date.now()}.sql` name
+ * directly under the shared, world-writable os.tmpdir() allowed (CWE-377/CWE-379). The
+ * `wx` flag + 0600 mode harden the file itself. Callers must remove `dir` recursively.
+ */
+export function writeSqlToPrivateTempFile(sql: string): { dir: string; file: string } {
+  const dir = fs.mkdtempSync(path.join(os.tmpdir(), 'fetch-channel-info-'));
+  const file = path.join(dir, 'updates.sql');
+  fs.writeFileSync(file, `${sql}\n`, { encoding: 'utf-8', mode: 0o600, flag: 'wx' });
+  return { dir, file };
+}
+
 export async function main(): Promise<void> {
   if (!fs.existsSync(DEV_VARS_PATH)) {
     console.error(`ERROR: ${DEV_VARS_PATH} not found. Add a line "YOUTUBE_API_KEY=<your key>".`);
@@ -175,16 +193,15 @@ export async function main(): Promise<void> {
 
   const sql = buildUpdateSql(updates);
   if (sql) {
-    const tmpFile = path.join(os.tmpdir(), `fetch-channel-info-${Date.now()}.sql`);
-    fs.writeFileSync(tmpFile, `${sql}\n`, 'utf-8');
+    const { dir, file } = writeSqlToPrivateTempFile(sql);
     try {
-      executeD1File(tmpFile);
+      executeD1File(file);
     } catch (err) {
       console.error('ERROR: failed to write updates to Nova D1 — not reporting success.');
       console.error(err instanceof Error ? err.message : String(err));
       process.exit(1);
     } finally {
-      fs.rmSync(tmpFile, { force: true });
+      fs.rmSync(dir, { recursive: true, force: true });
     }
   }
 
