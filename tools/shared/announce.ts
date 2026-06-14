@@ -54,8 +54,9 @@ export function loadAnnounceWebhook(): string | undefined {
 // batch records the data file(s) it describes (`sources`); at flush we verify PER EMBED against the
 // live origin/master content — a stream/streamer embed posts iff its liveKey (videoId / link, see
 // `deriveLiveKey`) is present there, so an unrelated same-file change neither blesses a removed embed
-// nor drops a live one. Tokenless aggregate embeds (flood summary, subscriber digest) fall back to
-// the recorded whole-file `hash` (taken after the new files are written). A batch may also list
+// nor drops a live one. A tokenless aggregate embed (flood summary, subscriber digest, no-link
+// streamer) is verified by its `liveKeys` — subject tokens (videoIds / displayNames) that must all be
+// present in the record content — else by the recorded whole-file `hash` fallback. A batch may also list
 // `presenceSources` — files that must exist on origin/master but are excluded from the hash/liveKey
 // search, gating a tokenless embed on its scaffolded data dir being live without that volatile content
 // perturbing its stable hash. A batch with empty/absent `sources` (and no missing presence source)
@@ -73,6 +74,12 @@ export interface PendingBatch {
    * streamer's scaffolded data dir) without their volatile content perturbing a tokenless embed's hash.
    */
   presenceSources?: string[];
+  /**
+   * Subject tokens for a TOKENLESS aggregate embed (the flood summary's videoIds; a no-link streamer's
+   * or the subscriber digest's displayNames). The aggregate is live iff every liveKey appears in the
+   * record content (`sources`). Absent ⇒ the aggregate keeps the whole-file `hash` fallback.
+   */
+  liveKeys?: string[];
   hash?: string;
 }
 
@@ -158,8 +165,9 @@ function allPresent(sources: string[], readLive: (source: string) => string): bo
  *  - sourceless batch → unconditional (old-format migration / already-verified remainder);
  *  - token-bearing embed (`deriveLiveKey != null`) → its token is present in the batch's live source
  *    content, so an unrelated same-file change never blesses a removed embed nor drops a live one;
- *  - aggregate embed (`deriveLiveKey == null`) → the whole-file hash still matches (fallback for the
- *    flood summary / subscriber digest, which have no single live subject).
+ *  - aggregate embed (`deriveLiveKey == null`) → if the batch has `liveKeys`, every one is present in
+ *    the record content; else the whole-file hash still matches (fallback for the flood summary /
+ *    subscriber digest / no-link streamer, which have no single live subject in the embed itself).
  * Cross-batch duplicates (same token, or identical aggregate) are dropped after the first. Returns
  * source-grouped verified batches (so flush can checkpoint with `remainingBatchesAfter`) plus the
  * dropped tokens (for logging).
@@ -193,6 +201,7 @@ export function partitionByLiveness(
       else if (sourceless) live = true;
       else if (content === null) live = false;
       else if (key !== null) live = content.includes(key);
+      else if (batch.liveKeys && batch.liveKeys.length > 0) live = batch.liveKeys.every((k) => content!.includes(k));
       else live = sha256(content) === batch.hash;
       if (!live) {
         if (key) droppedKeys.push(key);

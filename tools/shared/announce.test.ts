@@ -260,4 +260,40 @@ test('remainingBatchesAfter preserves presenceSources on the unposted remainder'
   ]);
 });
 
+test('partitionByLiveness: a tokenless aggregate with liveKeys posts iff ALL liveKeys are in the record', () => {
+  const live: Record<string, string> = { 'data/x/streams.json': 'Vid_A Vid_B Vid_C' };
+  const readLive = (s: string): string => {
+    if (!(s in live)) throw new Error('gone');
+    return live[s];
+  };
+  // hash is deliberately stale to prove liveKeys (not the hash) decide a tokenless aggregate.
+  const allLive = { embeds: [{ title: '🎵 summary' }], sources: ['data/x/streams.json'], liveKeys: ['Vid_A', 'Vid_B'], hash: 'stale' };
+  const oneGone = { embeds: [{ title: '🎵 summary2' }], sources: ['data/x/streams.json'], liveKeys: ['Vid_A', 'Vid_GONE'], hash: 'stale' };
+  assert.deepEqual(partitionByLiveness([allLive], readLive).verified.flatMap((b) => b.embeds.map((e) => e.title)), ['🎵 summary']); // all present → posts
+  assert.deepEqual(partitionByLiveness([oneGone], readLive).verified, []); // one liveKey missing → dropped (wrong-count summary suppressed)
+});
+
+test('partitionByLiveness: a tokenless aggregate WITHOUT liveKeys still uses the hash fallback', () => {
+  const live: Record<string, string> = { 'data/registry.json': 'REG' };
+  const readLive = (s: string): string => {
+    if (!(s in live)) throw new Error('gone');
+    return live[s];
+  };
+  const match = { embeds: [{ title: '📈' }], sources: ['data/registry.json'], hash: hashSources(['data/registry.json'], readLive) };
+  const stale = { embeds: [{ title: '📈 old' }], sources: ['data/registry.json'], hash: 'stale' };
+  assert.deepEqual(partitionByLiveness([match], readLive).verified.flatMap((b) => b.embeds.map((e) => e.title)), ['📈']);
+  assert.deepEqual(partitionByLiveness([stale], readLive).verified, []);
+});
+
+test('partitionByLiveness: a stream token is verified against sources (the record), not presenceSources', () => {
+  // #16 part 1: videoId lingers in songs.json (presence) but was removed from streams.json (record) → dropped.
+  const live: Record<string, string> = { 'data/x/streams.json': 'OtherVid', 'data/x/songs.json': 'RemovedVid appears here' };
+  const readLive = (s: string): string => {
+    if (!(s in live)) throw new Error('gone');
+    return live[s];
+  };
+  const batch = { embeds: [{ title: 'r', url: 'https://youtu.be/RemovedVid' }], sources: ['data/x/streams.json'], presenceSources: ['data/x/songs.json'], hash: 'h' };
+  assert.deepEqual(partitionByLiveness([batch], readLive).verified, []); // not in streams.json content → dropped
+});
+
 console.log('announce.test: all passed');
