@@ -40,9 +40,13 @@ export function renderQaPage(tickets: TicketRow[], total: number, page: number, 
   };
 
   const ticketCards = tickets.map((t) => {
-    const typeLabel = TYPE_LABELS[t.type] || t.type;
+    // Escape every attacker-controlled field: the whole card is emitted via
+    // raw(ticketCards) below, so nothing interpolated here is auto-escaped.
+    // nickname comes from unauthenticated public submissions (no input
+    // sanitization), and typeLabel falls back to the raw stored `type`.
+    const typeLabel = escapeHtml(TYPE_LABELS[t.type] || t.type);
     const typeClass = ['bug', 'feat', 'ui', 'other'].includes(t.type) ? t.type : 'other';
-    const nickname = t.nickname || '匿名';
+    const nickname = escapeHtml(t.nickname || '匿名');
     const statusLabel = t.status === 'replied' ? '已回覆' : '已關閉';
     const statusClass = t.status === 'replied' ? 'replied' : 'closed';
 
