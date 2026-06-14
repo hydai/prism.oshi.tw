@@ -29,10 +29,32 @@ function readLiveFromOriginMaster(source: string): string {
   });
 }
 
+/** Update the local origin/master ref to the remote tip so verification reflects concurrent pushes
+ *  (e.g. another operator reverting our data after our own push). Returns false instead of throwing
+ *  when the fetch fails, so the caller can leave the queue intact and retry on the next flush. */
+function refreshOriginMaster(): boolean {
+  try {
+    execFileSync('git', ['fetch', 'origin', 'master'], { cwd: REPO_ROOT, stdio: ['ignore', 'ignore', 'ignore'] });
+    return true;
+  } catch {
+    return false;
+  }
+}
+
 async function main(): Promise<void> {
   const batches = readPendingBatches();
   if (batches.length === 0) {
     console.log('announce-flush: nothing queued.');
+    return;
+  }
+
+  // Refresh origin/master so verification compares against the remote's CURRENT tip rather than a
+  // stale local cache — a concurrent push could have reverted our data after our own push. If the
+  // refresh fails (e.g. offline), leave the queue intact and bail rather than risk posting against
+  // a stale baseline; the next flush retries.
+  if (!refreshOriginMaster()) {
+    console.warn('announce-flush: could not refresh origin/master; leaving the queue intact for the next flush.');
+    process.exitCode = 1;
     return;
   }
 
