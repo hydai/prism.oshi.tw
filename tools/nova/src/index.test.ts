@@ -132,11 +132,53 @@ async function testGateStillRejectsForeignRequests(): Promise<void> {
   console.log('✓ same-origin gate still rejects foreign requests');
 }
 
+// === VOD submit: a timeline is mandatory =====================================
+async function testSubmitRequiresTimeline(): Promise<void> {
+  installMockFetch();
+  try {
+    const base = {
+      streamer_slug: 'mizuki',
+      video_url: 'https://www.youtube.com/watch?v=AAAAAAAAAAA',
+    };
+    const post = (payload: unknown) =>
+      app.request(
+        '/vod/api/submit',
+        {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(payload),
+        },
+        makeEnv(),
+      );
+
+    // (a) songs omitted entirely → 400, before any subrequest
+    const resNone = await post({ ...base });
+    assertEqual(resNone.status, 400, 'submission with no songs field is rejected (400)');
+    const bodyNone = (await resNone.json()) as { error: string };
+    assert(bodyNone.error.includes('請至少提供一首歌曲的時間戳'), 'error states a timeline is required');
+    assertEqual(fetchCalls.length, 0, 'rejection happens before Turnstile/DB (no outbound fetch)');
+
+    // (b) songs present but every title is blank → 400
+    const resBlank = await post({ ...base, songs: [{ song_title: '   ', start_timestamp: '0:30' }] });
+    assertEqual(resBlank.status, 400, 'submission whose songs are all title-less is rejected (400)');
+
+    // (c) a titled song clears the timeline guard and reaches the Turnstile check
+    const resOk = await post({ ...base, songs: [{ song_title: '歌名', start_timestamp: '0:30' }] });
+    assertEqual(resOk.status, 400, 'titled song passes timeline guard, then fails Turnstile (400)');
+    const bodyOk = (await resOk.json()) as { error: string };
+    assert(bodyOk.error.includes('人機驗證'), 'past the timeline guard the next gate is Turnstile');
+  } finally {
+    restoreFetch();
+  }
+  console.log('✓ /vod/api/submit requires at least one song timestamp');
+}
+
 async function main(): Promise<void> {
   await testHelperWithKeyUsesDataApi();
   await testHelperWithoutKeySkipsDataApi();
   await testPublicRouteDoesNotSpendQuota();
   await testGateStillRejectsForeignRequests();
+  await testSubmitRequiresTimeline();
   console.log('✓ nova video-info quota-drain guards');
 }
 

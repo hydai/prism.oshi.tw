@@ -355,6 +355,12 @@ app.post('/vod/api/submit', async (c) => {
     return c.json({ error: errors.join(', ') }, 400);
   }
 
+  // Block timeline-less submissions: require at least one titled song.
+  const hasSong = Array.isArray(body.songs) && body.songs.some((s) => s?.song_title?.trim());
+  if (!hasSong) {
+    return c.json({ error: '請至少提供一首歌曲的時間戳' }, 400);
+  }
+
   // Verify Turnstile token
   if (!body.turnstile_token) {
     return c.json({ error: '請完成人機驗證' }, 400);
