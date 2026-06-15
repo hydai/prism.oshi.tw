@@ -348,12 +348,22 @@ export default function StreamDetail({ user }: { user: AuthUser }) {
     if (!streamId || !detail) return;
     try {
       await api.updateStreamStatus(streamId, { status });
-      setDetail((prev) => prev ? { ...prev, status } : prev);
-      showToast(`Stream ${status}`);
+      // Approving a stream cascades to its songs/performances, matching the Streams
+      // list page's Approve button so "approve a stream" never silently leaves its
+      // songs pending. The standalone "Approve All" button stays for re-approving
+      // songs added after the stream was already approved.
+      if (status === 'approved') {
+        const result = await api.approveAllForStream(streamId);
+        await loadDetail();
+        showToast(`Stream approved · ${result.songs} song(s), ${result.performances} performance(s)`);
+      } else {
+        setDetail((prev) => prev ? { ...prev, status } : prev);
+        showToast(`Stream ${status}`);
+      }
     } catch (err: unknown) {
       showToast(err instanceof Error ? err.message : 'Failed to update status', true);
     }
-  }, [streamId, detail, showToast]);
+  }, [streamId, detail, loadDetail, showToast]);
 
   // --- Stream metadata inline edit save ---
   const handleStreamSave = useCallback(async (field: 'title' | 'date', value: string) => {
