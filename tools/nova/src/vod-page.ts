@@ -229,6 +229,15 @@ const VOD_SCRIPT = String.raw`
       // Form submission
       form.addEventListener('submit', async function(e) {
         e.preventDefault();
+
+        var songs = collectSongs();
+        if (!songs.length) {
+          resultDiv.style.display = '';
+          resultDiv.className = 'result-msg result-error';
+          resultDiv.textContent = '請至少提供一首歌曲的時間戳再提交';
+          return;
+        }
+
         submitBtn.disabled = true;
         submitBtn.textContent = '提交中…';
         resultDiv.style.display = 'none';
@@ -243,7 +252,7 @@ const VOD_SCRIPT = String.raw`
           stream_title: titleInput.value.trim(),
           stream_date: dateInput.value,
           submitter_note: form.querySelector('[name="submitter_note"]').value.trim(),
-          songs: collectSongs(),
+          songs: songs,
           turnstile_token: token,
         };
 
@@ -280,6 +289,7 @@ const VOD_SCRIPT = String.raw`
           resultDiv.className = 'result-msg result-error';
           resultDiv.textContent = '網路錯誤，請檢查連線後再試';
         } finally {
+          resultDiv.style.display = '';
           submitBtn.disabled = false;
           submitBtn.textContent = '提交 VOD';
         }
@@ -362,7 +372,7 @@ export function renderVodPage(siteKey: string, streamers: ApprovedStreamer[]) {
       color: var(--text-secondary);
       margin-bottom: 6px;
     }
-    .form-label .required { color: var(--accent-pink); }
+    .form-label .required, .section-label .required { color: var(--accent-pink); }
 
     .form-hint {
       font-size: 11px;
@@ -560,7 +570,7 @@ export function renderVodPage(siteKey: string, streamers: ApprovedStreamer[]) {
 
         <!-- Song Timestamps Section -->
         <div style="border-top: 1px solid var(--border-glass); padding-top: 20px;">
-          <p class="section-label">歌曲時間戳（選填）</p>
+          <p class="section-label">歌曲時間戳 <span class="required">*</span></p>
           <p class="form-hint" style="margin-bottom: 12px;">
             貼上
             <a href="https://aurora.oshi.tw" target="_blank" style="color: var(--accent-purple);">Aurora</a>
