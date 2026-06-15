@@ -57,9 +57,9 @@ jobs:
           - name: Crystal worker typecheck
             path: tools/crystal
             command: npm run typecheck
-          - name: Nova worker typecheck
+          - name: Nova worker check
             path: tools/nova
-            command: npm run typecheck
+            command: npm run check
 
     steps:
       - uses: actions/checkout@v6

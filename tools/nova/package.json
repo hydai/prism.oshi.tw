@@ -9,13 +9,15 @@
     "db:migrate": "wrangler d1 execute oshi-prism-nova --file=schema.sql",
     "db:migrate:local": "wrangler d1 execute oshi-prism-nova --local --file=schema.sql",
     "typecheck": "tsc --noEmit",
-    "test:video-info": "npx tsx src/index.test.ts"
+    "test:video-info": "npx tsx src/index.test.ts",
+    "check": "npm run typecheck && npm run test:video-info"
   },
   "dependencies": {
     "hono": "^4.12.22"
   },
   "devDependencies": {
     "@cloudflare/workers-types": "^4.20260522.1",
+    "tsx": "^4.22.3",
     "typescript": "^5.9.3",
     "wrangler": "^4.93.1"
   }
