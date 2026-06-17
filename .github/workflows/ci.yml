@@ -33,6 +33,7 @@ jobs:
       - run: npm run test:parse
       - run: npm run test:archive
       - run: npm run test:playlist-storage
+      - run: npm run test:safe-links
       - run: npm run test:youtube-iframe
       - run: npm run inbox:status:test
       - run: npm run build

@@ -76,6 +76,9 @@ export interface StreamerTheme {
   borderAccentSecondary: string;
 }
 
+export type SocialLinkKey = 'youtube' | 'twitter' | 'facebook' | 'instagram' | 'twitch';
+export type SocialLinks = Partial<Record<SocialLinkKey, string>>;
+
 export interface StreamerConfig {
   slug: string;
   displayName: string;
@@ -84,7 +87,7 @@ export interface StreamerConfig {
   brandName: string;
   subscriberCount: string;
   group: string;
-  socialLinks: Record<string, string>;
+  socialLinks: SocialLinks;
   externalUrl?: string;
   theme: StreamerTheme;
   enabled: boolean;

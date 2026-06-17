@@ -3,7 +3,8 @@
 import { useState, useMemo } from 'react';
 import Link from 'next/link';
 import registryData from '../data/registry.json';
-import { StreamerConfig } from '../lib/types';
+import { sanitizeRegistry } from '../lib/safe-links';
+import type { Registry, StreamerConfig } from '../lib/types';
 import {
   Disc3,
   Search,
@@ -15,7 +16,7 @@ import {
 import ThemeToggle from './components/ThemeToggle';
 import DiscordIcon from './components/DiscordIcon';
 
-const streamers = (registryData.streamers as StreamerConfig[]).filter(
+const streamers = sanitizeRegistry(registryData as Registry).streamers.filter(
   (s) => s.enabled
 );
 
