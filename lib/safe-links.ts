@@ -10,6 +10,10 @@ const allowedSocialHosts: Record<SocialLinkKey, ReadonlySet<string>> = {
   twitch: new Set(['twitch.tv']),
 };
 
+// Hosts whose `/redirect?q=` endpoint must be unwrapped and re-validated
+// against the platform allowlist (covers both the desktop and mobile host).
+const youtubeRedirectHosts = new Set(['youtube.com', 'm.youtube.com']);
+
 const socialLinkKeySet = new Set<string>(socialLinkKeys);
 
 function parseHttpUrl(rawUrl: string | undefined): URL | undefined {
@@ -37,7 +41,7 @@ function isSocialLinkKey(key: string): key is SocialLinkKey {
 }
 
 function isYouTubeRedirect(url: URL): boolean {
-  return normalizeHostname(url.hostname) === 'youtube.com' && url.pathname === '/redirect';
+  return youtubeRedirectHosts.has(normalizeHostname(url.hostname)) && url.pathname === '/redirect';
 }
 
 function getEffectiveSocialUrl(url: URL): URL | undefined {
