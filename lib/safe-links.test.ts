@@ -3,12 +3,13 @@ import { sanitizeExternalUrl, sanitizeSocialLinks } from './safe-links';
 
 const sanitizedLinks = sanitizeSocialLinks({
   youtube: 'https://www.youtube.com/@safe',
-  twitter: 'http://x.com/safe',
+  twitter: 'https://x.com/safe',
   facebook: 'https://www.youtube.com/redirect?q=https%3A%2F%2Fwww.facebook.com%2Fsafe%2F',
   instagram: 'https://www.instagram.com/safe/',
   twitch: 'https://www.youtube.com/redirect?q=https%3A%2F%2Fwww.twitch.tv%2Fsafe',
   javascript: 'javascript:alert(document.domain)',
   data: 'data:text/html,<h1>unsafe</h1>',
+  ftp: 'ftp://twitch.tv/unsafe',
   relative: '/unsafe',
   phishing: 'https://youtube.com.evil.example/@unsafe',
   malformed: 'not a url',
@@ -17,7 +18,7 @@ const sanitizedLinks = sanitizeSocialLinks({
 
 assert.deepEqual(sanitizedLinks, {
   youtube: 'https://www.youtube.com/@safe',
-  twitter: 'http://x.com/safe',
+  twitter: 'https://x.com/safe',
   facebook: 'https://www.facebook.com/safe/',
   instagram: 'https://www.instagram.com/safe/',
   twitch: 'https://www.twitch.tv/safe',
@@ -30,6 +31,17 @@ assert.deepEqual(
     facebook: 'https://www.youtube.com/redirect?q=https%3A%2F%2Ffacebook.com.evil.example%2Fsafe',
     instagram: 'https://www.youtube.com/redirect?q=data%3Atext%2Fhtml%2Cunsafe',
     twitch: 'https://www.youtube.com/redirect',
+  }),
+  {},
+);
+
+// Social links must stay HTTPS-only, including when a YouTube redirect is
+// unwrapped before host validation.
+assert.deepEqual(
+  sanitizeSocialLinks({
+    youtube: 'http://www.youtube.com/@unsafe',
+    twitter: 'http://x.com/unsafe',
+    facebook: 'https://www.youtube.com/redirect?q=http%3A%2F%2Fwww.facebook.com%2Funsafe',
   }),
   {},
 );

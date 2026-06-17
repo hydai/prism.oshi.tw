@@ -16,7 +16,10 @@ const youtubeRedirectHosts = new Set(['youtube.com', 'm.youtube.com']);
 
 const socialLinkKeySet = new Set<string>(socialLinkKeys);
 
-function parseHttpUrl(rawUrl: string | undefined): URL | undefined {
+function parseHttpUrl(
+  rawUrl: string | undefined,
+  options: { requireHttps?: boolean } = {},
+): URL | undefined {
   if (typeof rawUrl !== 'string') return undefined;
 
   const trimmedUrl = rawUrl.trim();
@@ -24,7 +27,11 @@ function parseHttpUrl(rawUrl: string | undefined): URL | undefined {
 
   try {
     const parsedUrl = new URL(trimmedUrl);
-    if (parsedUrl.protocol !== 'http:' && parsedUrl.protocol !== 'https:') return undefined;
+    if (options.requireHttps) {
+      if (parsedUrl.protocol !== 'https:') return undefined;
+    } else if (parsedUrl.protocol !== 'http:' && parsedUrl.protocol !== 'https:') {
+      return undefined;
+    }
     if (parsedUrl.username !== '' || parsedUrl.password !== '') return undefined;
     return parsedUrl;
   } catch {
@@ -46,11 +53,11 @@ function isYouTubeRedirect(url: URL): boolean {
 
 function getEffectiveSocialUrl(url: URL): URL | undefined {
   if (!isYouTubeRedirect(url)) return url;
-  return parseHttpUrl(url.searchParams.get('q') ?? undefined);
+  return parseHttpUrl(url.searchParams.get('q') ?? undefined, { requireHttps: true });
 }
 
 function sanitizeSocialLink(platform: SocialLinkKey, rawUrl: string | undefined): string | undefined {
-  const parsedUrl = parseHttpUrl(rawUrl);
+  const parsedUrl = parseHttpUrl(rawUrl, { requireHttps: true });
   if (!parsedUrl) return undefined;
 
   const effectiveUrl = getEffectiveSocialUrl(parsedUrl);
