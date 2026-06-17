@@ -115,9 +115,9 @@ assertPermissions(
 );
 
 const buildText = build.map((line) => line.text).join('\n');
-assert.doesNotMatch(buildText, /actions\/deploy-pages@v\d+/);
+assert.doesNotMatch(buildText, /actions\/deploy-pages@/);
 
-const checkoutStep = getListItemBlock(getBlock(build, 'steps'), /^- uses: actions\/checkout@v\d+$/);
+const checkoutStep = getListItemBlock(getBlock(build, 'steps'), /^- uses: actions\/checkout@/);
 assert.equal(
   readScalarMap(getBlock(checkoutStep, 'with'))['persist-credentials'],
   'false',
@@ -133,6 +133,6 @@ assertPermissions(deployPermissions, {
 }, 'deploy');
 
 const deployText = deploy.map((line) => line.text).join('\n');
-assert.match(deployText, /actions\/deploy-pages@v\d+/);
+assert.match(deployText, /actions\/deploy-pages@/);
 
 console.log('deploy workflow permissions ok');
