@@ -36,19 +36,19 @@ export interface SubmissionRow {
   slug: string;
   display_name: string;
   description: string;
-  avatar_url: string;
+  avatar_url: unknown;
   brand_name: string;
   subscriber_count: string;
   group: string;
   enabled: number;
   display_order: number;
   theme_json: string;
-  link_youtube: string;
-  link_twitter: string;
-  link_facebook: string;
-  link_instagram: string;
-  link_twitch: string;
-  external_url: string;
+  link_youtube: unknown;
+  link_twitter: unknown;
+  link_facebook: unknown;
+  link_instagram: unknown;
+  link_twitch: unknown;
+  external_url: unknown;
 }
 
 // --- Registry types (match data/registry.json) ---
@@ -141,8 +141,13 @@ const THEME_COLOR_KEYS = [
 
 const THEME_COLOR_RE = /^#[0-9a-fA-F]{6}$/;
 
-function safeNovaUrl(value: string, provider: NovaUrlProvider, context: string): string | undefined {
-  const trimmed = value.trim();
+function requireStringField(value: unknown, context: string): string {
+  if (typeof value === 'string') return value;
+  throw new Error(`Invalid ${context}: expected a string, got ${value === null ? 'null' : typeof value}.`);
+}
+
+function safeNovaUrl(value: unknown, provider: NovaUrlProvider, context: string): string | undefined {
+  const trimmed = requireStringField(value, context).trim();
   if (!trimmed) return undefined;
 
   const safeUrl = sanitizeNovaUrl(trimmed, provider);
@@ -153,8 +158,8 @@ function safeNovaUrl(value: string, provider: NovaUrlProvider, context: string):
   return safeUrl;
 }
 
-function safeExternalUrl(value: string, context: string): string | undefined {
-  const trimmed = value.trim();
+function safeExternalUrl(value: unknown, context: string): string | undefined {
+  const trimmed = requireStringField(value, context).trim();
   if (!trimmed) return undefined;
 
   const safeUrl = sanitizeExternalUrl(trimmed);
@@ -221,8 +226,9 @@ export function rowToConfig(row: SubmissionRow): StreamerConfig {
     theme: parseTheme(row),
     enabled: true, // only enabled rows are queried
   };
-  if (row.external_url) {
-    config.externalUrl = safeExternalUrl(row.external_url, `${row.slug}.external_url`);
+  const externalUrl = safeExternalUrl(row.external_url, `${row.slug}.external_url`);
+  if (externalUrl) {
+    config.externalUrl = externalUrl;
   }
   return config;
 }

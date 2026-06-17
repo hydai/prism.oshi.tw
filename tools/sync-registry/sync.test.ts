@@ -191,6 +191,14 @@ test('rowToConfig rejects unsafe avatar URLs', () => {
   assert.throws(() => rowToConfig(row({ avatar_url: 'data:text/html,<script>alert(1)</script>' })), /Invalid aiko\.avatar_url/);
 });
 
+test('rowToConfig rejects null URL fields with a clear validation error', () => {
+  assert.throws(() => rowToConfig(row({ link_twitch: null })), /Invalid aiko\.link_twitch: expected a string, got null/);
+});
+
+test('rowToConfig rejects non-string URL fields with a clear validation error', () => {
+  assert.throws(() => rowToConfig(row({ external_url: 123 })), /Invalid aiko\.external_url: expected a string, got number/);
+});
+
 test('rowToConfig rejects unsafe external URLs', () => {
   assert.throws(() => rowToConfig(row({ external_url: 'javascript:alert(1)' })), /Invalid aiko\.external_url/);
 });
