@@ -81,7 +81,7 @@ app.get('/api/similar', async (c) => {
 
   const { tickets } = await searchTickets(c.env.DB, {
     q,
-    scope: 'public_all',
+    scope: 'public_replied',
     page: 1,
     limit,
   });
