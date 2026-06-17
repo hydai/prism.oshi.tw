@@ -35,6 +35,7 @@ jobs:
       - run: npm run test:playlist-storage
       - run: npm run test:safe-links
       - run: npm run test:youtube-iframe
+      - run: npm run test:deploy-workflow-permissions
       - run: npm run inbox:status:test
       - run: npm run build
 

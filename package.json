@@ -13,6 +13,7 @@
     "test:playlist-storage": "npx tsx app/lib/playlist-storage.test.ts",
     "test:safe-links": "npx tsx lib/safe-links.test.ts",
     "test:youtube-iframe": "npx tsc --noEmit --pretty false --skipLibCheck --strict --target ES2017 --module esnext --moduleResolution bundler --lib dom,dom.iterable,esnext --types node lib/youtube-iframe.test.ts && npx tsx lib/youtube-iframe.test.ts",
+    "test:deploy-workflow-permissions": "npx tsx tools/deploy-workflow-permissions.test.ts",
     "inbox:status": "npx tsx tools/inbox-status/status.ts",
     "inbox:status:test": "npx tsx tools/inbox-status/status.test.ts",
     "sync:registry": "npx tsx tools/sync-registry/sync.ts",
