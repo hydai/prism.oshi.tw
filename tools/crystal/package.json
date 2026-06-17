@@ -8,6 +8,7 @@
     "db:create": "wrangler d1 create oshi-crystal",
     "db:migrate": "wrangler d1 execute oshi-crystal --file=schema.sql",
     "db:migrate:local": "wrangler d1 execute oshi-crystal --local --file=schema.sql",
+    "test": "tsx src/validate.test.ts && tsx src/qa-page.test.ts && tsx src/similar.test.ts",
     "typecheck": "tsc --noEmit"
   },
   "dependencies": {
@@ -15,6 +16,7 @@
   },
   "devDependencies": {
     "@cloudflare/workers-types": "^4.20260522.1",
+    "tsx": "^4.22.3",
     "typescript": "^5.9.3",
     "wrangler": "^4.93.1"
   }
