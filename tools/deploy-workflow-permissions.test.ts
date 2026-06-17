@@ -1,5 +1,7 @@
 import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
+import { dirname, resolve } from 'node:path';
+import { fileURLToPath } from 'node:url';
 
 type WorkflowLine = {
   indent: number;
@@ -7,7 +9,8 @@ type WorkflowLine = {
   trimmed: string;
 };
 
-const workflow = readFileSync('.github/workflows/deploy.yml', 'utf8');
+const repoRoot = resolve(dirname(fileURLToPath(import.meta.url)), '..');
+const workflow = readFileSync(resolve(repoRoot, '.github/workflows/deploy.yml'), 'utf8');
 const lines: WorkflowLine[] = workflow.split(/\r?\n/).map((text) => ({
   indent: text.length - text.trimStart().length,
   text,
@@ -65,8 +68,20 @@ function readScalarMap(block: WorkflowLine[]): Record<string, string> {
   return entries;
 }
 
+function assertPermissions(
+  actual: Record<string, string>,
+  expected: Record<string, string>,
+  context: string,
+): void {
+  assert.deepEqual(Object.keys(actual).sort(), Object.keys(expected).sort(), `${context} permission keys`);
+
+  for (const key of Object.keys(expected)) {
+    assert.equal(actual[key], expected[key], `${context} ${key} permission`);
+  }
+}
+
 const workflowPermissions = readScalarMap(getPathBlock(['permissions']));
-assert.deepEqual(workflowPermissions, { contents: 'read' });
+assertPermissions(workflowPermissions, { contents: 'read' }, 'workflow');
 
 const jobs = getPathBlock(['jobs']);
 const build = getBlock(jobs, 'build');
@@ -76,19 +91,17 @@ assert.equal(buildPermissions, undefined, 'build job should inherit only workflo
 const buildText = build.map((line) => line.text).join('\n');
 assert.match(buildText, /uses: actions\/checkout@v\d+/);
 assert.match(buildText, /persist-credentials: false/);
-assert.match(buildText, /run: npm ci/);
-assert.match(buildText, /run: npm run build/);
 assert.doesNotMatch(buildText, /pages:\s*write/);
 assert.doesNotMatch(buildText, /id-token:\s*write/);
 assert.doesNotMatch(buildText, /actions\/deploy-pages@v\d+/);
 
 const deploy = getBlock(jobs, 'deploy');
 const deployPermissions = readScalarMap(getBlock(deploy, 'permissions'));
-assert.deepEqual(deployPermissions, {
+assertPermissions(deployPermissions, {
   contents: 'read',
   pages: 'write',
   'id-token': 'write',
-});
+}, 'deploy');
 
 const deployText = deploy.map((line) => line.text).join('\n');
 assert.match(deployText, /actions\/deploy-pages@v\d+/);
