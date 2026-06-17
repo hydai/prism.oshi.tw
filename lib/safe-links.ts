@@ -21,6 +21,7 @@ function parseHttpUrl(rawUrl: string | undefined): URL | undefined {
   try {
     const parsedUrl = new URL(trimmedUrl);
     if (parsedUrl.protocol !== 'http:' && parsedUrl.protocol !== 'https:') return undefined;
+    if (parsedUrl.username !== '' || parsedUrl.password !== '') return undefined;
     return parsedUrl;
   } catch {
     return undefined;
