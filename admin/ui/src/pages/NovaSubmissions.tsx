@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react';
 import type { AuthUser, NovaSubmission, NovaStatus, BulkFetchSubscribersResponse } from '../../../shared/types';
+import { sanitizeNovaUrl } from '../../../shared/nova-url-safety';
 import { api } from '../api/client';
 import StatusBadge from '../components/StatusBadge';
 
@@ -228,7 +229,7 @@ export default function NovaSubmissions({ user }: { user: AuthUser }) {
   );
 }
 
-function SubmissionRow({
+export function SubmissionRow({
   sub,
   isCurator,
   expanded,
@@ -333,12 +334,14 @@ function SubmissionRow({
     }
   };
 
+  const youtubeChannelUrl = sanitizeNovaUrl(sub.youtube_channel_url, 'youtube');
+  const avatarUrl = sanitizeNovaUrl(sub.avatar_url, 'image');
   const socialLinks = [
-    { label: 'YouTube', url: sub.link_youtube },
-    { label: 'Twitter', url: sub.link_twitter },
-    { label: 'Facebook', url: sub.link_facebook },
-    { label: 'Instagram', url: sub.link_instagram },
-    { label: 'Twitch', url: sub.link_twitch },
+    { label: 'YouTube', url: sub.link_youtube, safeUrl: sanitizeNovaUrl(sub.link_youtube, 'youtube') },
+    { label: 'Twitter', url: sub.link_twitter, safeUrl: sanitizeNovaUrl(sub.link_twitter, 'twitter') },
+    { label: 'Facebook', url: sub.link_facebook, safeUrl: sanitizeNovaUrl(sub.link_facebook, 'facebook') },
+    { label: 'Instagram', url: sub.link_instagram, safeUrl: sanitizeNovaUrl(sub.link_instagram, 'instagram') },
+    { label: 'Twitch', url: sub.link_twitch, safeUrl: sanitizeNovaUrl(sub.link_twitch, 'twitch') },
   ];
 
   return (
@@ -350,15 +353,19 @@ function SubmissionRow({
         </td>
         <td className="px-4 py-3 font-mono text-xs text-slate-600">{sub.slug}</td>
         <td className="px-4 py-3">
-          <a
-            href={sub.youtube_channel_url}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="text-blue-600 hover:underline"
-            onClick={(e) => e.stopPropagation()}
-          >
-            {sub.brand_name || sub.youtube_channel_url}
-          </a>
+          {youtubeChannelUrl ? (
+            <a
+              href={youtubeChannelUrl}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="text-blue-600 hover:underline"
+              onClick={(e) => e.stopPropagation()}
+            >
+              {sub.brand_name || sub.youtube_channel_url}
+            </a>
+          ) : (
+            <span className="text-slate-600">{sub.brand_name || sub.youtube_channel_url || '—'}</span>
+          )}
         </td>
         <td className="px-4 py-3 text-slate-600">{sub.subscriber_count || '—'}</td>
         <td className="px-4 py-3">
@@ -446,11 +453,15 @@ function SubmissionRow({
                 {/* Avatar preview (not editable inline, but URL is) */}
                 {sub.avatar_url && !editing && (
                   <div>
-                    <img
-                      src={sub.avatar_url}
-                      alt={sub.display_name}
-                      className="h-16 w-16 rounded-full border border-slate-200"
-                    />
+                    {avatarUrl ? (
+                      <img
+                        src={avatarUrl}
+                        alt={sub.display_name}
+                        className="h-16 w-16 rounded-full border border-slate-200"
+                      />
+                    ) : (
+                      <p className="text-xs text-slate-400 break-all">Invalid avatar URL: {sub.avatar_url}</p>
+                    )}
                   </div>
                 )}
 
@@ -551,14 +562,18 @@ function SubmissionRow({
                     <DetailField label="Enabled" value={sub.enabled === 1 ? 'Yes' : 'No'} />
                     <DetailField label="Display Order" value={String(sub.display_order ?? 0)} />
                     <DetailField label="YouTube Channel URL">
-                      <a
-                        href={sub.youtube_channel_url}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="text-sm text-blue-600 hover:underline break-all"
-                      >
-                        {sub.youtube_channel_url}
-                      </a>
+                      {youtubeChannelUrl ? (
+                        <a
+                          href={youtubeChannelUrl}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="text-sm text-blue-600 hover:underline break-all"
+                        >
+                          {sub.youtube_channel_url}
+                        </a>
+                      ) : (
+                        <span className="text-sm text-slate-600 break-all">{sub.youtube_channel_url || '—'}</span>
+                      )}
                     </DetailField>
                     <DetailField label="YouTube Channel ID" value={sub.youtube_channel_id} />
                     <DetailField label="Description" value={sub.description} />
@@ -569,15 +584,22 @@ function SubmissionRow({
                       <div className="mt-1 flex flex-wrap gap-2">
                         {socialLinks.map((l) => (
                           <span key={l.label}>
-                            {l.url ? (
+                            {l.safeUrl ? (
                               <a
-                                href={l.url}
+                                href={l.safeUrl}
                                 target="_blank"
                                 rel="noopener noreferrer"
                                 className="rounded-md bg-slate-200 px-2 py-1 text-xs text-slate-700 hover:bg-slate-300"
                               >
                                 {l.label}
                               </a>
+                            ) : l.url ? (
+                              <span
+                                title={l.url}
+                                className="rounded-md bg-amber-100 px-2 py-1 text-xs text-amber-700"
+                              >
+                                Invalid {l.label}
+                              </span>
                             ) : (
                               <span className="rounded-md bg-slate-100 px-2 py-1 text-xs text-slate-400 line-through">
                                 {l.label}

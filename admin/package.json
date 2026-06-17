@@ -13,10 +13,12 @@
     "test:helpers": "npx tsx src/helpers.test.ts",
     "test:itunes": "npx tsx src/itunes.test.ts",
     "test:discord": "npx tsx shared/discord.test.ts",
+    "test:nova-url-safety": "npx tsx shared/nova-url-safety.test.ts",
     "test:db": "npx tsx src/db.test.ts",
     "test:auth": "npx tsx src/auth.test.ts",
     "test:authz": "npx tsx src/authz.test.ts",
-    "check": "npm run typecheck && npm run test:helpers && npm run test:itunes && npm run test:discord && npm run test:db && npm run test:auth && npm run test:authz"
+    "test:nova-url-routes": "npx tsx src/nova-url-safety-routes.test.ts",
+    "check": "npm run typecheck && npm run test:helpers && npm run test:itunes && npm run test:discord && npm run test:nova-url-safety && npm run test:db && npm run test:auth && npm run test:authz && npm run test:nova-url-routes"
   },
   "dependencies": {
     "hono": "^4.12.22"

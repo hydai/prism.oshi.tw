@@ -6,6 +6,7 @@
   "scripts": {
     "dev": "vite",
     "build": "tsc -b && vite build",
+    "test:nova-links": "npx tsx tests/nova-submissions-links.test.tsx",
     "preview": "vite preview"
   },
   "dependencies": {
