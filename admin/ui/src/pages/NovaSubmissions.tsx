@@ -335,14 +335,16 @@ export function SubmissionRow({
   };
 
   const youtubeChannelUrl = sanitizeNovaUrl(sub.youtube_channel_url, 'youtube');
-  const avatarUrl = sanitizeNovaUrl(sub.avatar_url, 'image');
-  const socialLinks = [
-    { label: 'YouTube', url: sub.link_youtube, safeUrl: sanitizeNovaUrl(sub.link_youtube, 'youtube') },
-    { label: 'Twitter', url: sub.link_twitter, safeUrl: sanitizeNovaUrl(sub.link_twitter, 'twitter') },
-    { label: 'Facebook', url: sub.link_facebook, safeUrl: sanitizeNovaUrl(sub.link_facebook, 'facebook') },
-    { label: 'Instagram', url: sub.link_instagram, safeUrl: sanitizeNovaUrl(sub.link_instagram, 'instagram') },
-    { label: 'Twitch', url: sub.link_twitch, safeUrl: sanitizeNovaUrl(sub.link_twitch, 'twitch') },
-  ];
+  const avatarUrl = expanded && !editing ? sanitizeNovaUrl(sub.avatar_url, 'image') : null;
+  const socialLinks = expanded && !editing
+    ? [
+        { label: 'YouTube', url: sub.link_youtube, safeUrl: sanitizeNovaUrl(sub.link_youtube, 'youtube') },
+        { label: 'Twitter', url: sub.link_twitter, safeUrl: sanitizeNovaUrl(sub.link_twitter, 'twitter') },
+        { label: 'Facebook', url: sub.link_facebook, safeUrl: sanitizeNovaUrl(sub.link_facebook, 'facebook') },
+        { label: 'Instagram', url: sub.link_instagram, safeUrl: sanitizeNovaUrl(sub.link_instagram, 'instagram') },
+        { label: 'Twitch', url: sub.link_twitch, safeUrl: sanitizeNovaUrl(sub.link_twitch, 'twitch') },
+      ]
+    : [];
 
   return (
     <>
