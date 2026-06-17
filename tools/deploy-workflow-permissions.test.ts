@@ -49,6 +49,24 @@ function getPathBlock(path: string[]): WorkflowLine[] {
   return path.reduce((block, key) => getBlock(block, key), lines);
 }
 
+function getListItemBlock(parent: WorkflowLine[], pattern: RegExp): WorkflowLine[] {
+  const index = parent.findIndex((line) => pattern.test(line.trimmed));
+  assert.notEqual(index, -1, `missing list item matching ${pattern}`);
+
+  const itemIndent = parent[index].indent;
+  let end = parent.length;
+
+  for (let i = index + 1; i < parent.length; i += 1) {
+    const line = parent[i];
+    if (line.trimmed !== '' && line.indent <= itemIndent) {
+      end = i;
+      break;
+    }
+  }
+
+  return parent.slice(index, end);
+}
+
 function readScalarMap(block: WorkflowLine[]): Record<string, string> {
   const entries: Record<string, string> = {};
   const childLines = block.filter((line) => line.trimmed !== '');
@@ -73,7 +91,11 @@ function assertPermissions(
   expected: Record<string, string>,
   context: string,
 ): void {
-  assert.deepEqual(Object.keys(actual).sort(), Object.keys(expected).sort(), `${context} permission keys`);
+  assert.deepEqual(
+    Object.keys(actual).sort(),
+    Object.keys(expected).sort(),
+    `${context} permission keys`,
+  );
 
   for (const key of Object.keys(expected)) {
     assert.equal(actual[key], expected[key], `${context} ${key} permission`);
@@ -86,14 +108,21 @@ assertPermissions(workflowPermissions, { contents: 'read' }, 'workflow');
 const jobs = getPathBlock(['jobs']);
 const build = getBlock(jobs, 'build');
 const buildPermissions = tryGetBlock(build, 'permissions');
-assert.equal(buildPermissions, undefined, 'build job should inherit only workflow-level read permissions');
+assertPermissions(
+  buildPermissions === undefined ? workflowPermissions : readScalarMap(buildPermissions),
+  { contents: 'read' },
+  'build',
+);
 
 const buildText = build.map((line) => line.text).join('\n');
-assert.match(buildText, /uses: actions\/checkout@v\d+/);
-assert.match(buildText, /persist-credentials: false/);
-assert.doesNotMatch(buildText, /pages:\s*write/);
-assert.doesNotMatch(buildText, /id-token:\s*write/);
 assert.doesNotMatch(buildText, /actions\/deploy-pages@v\d+/);
+
+const checkoutStep = getListItemBlock(getBlock(build, 'steps'), /^- uses: actions\/checkout@v\d+$/);
+assert.equal(
+  readScalarMap(getBlock(checkoutStep, 'with'))['persist-credentials'],
+  'false',
+  'build checkout should not persist credentials',
+);
 
 const deploy = getBlock(jobs, 'deploy');
 const deployPermissions = readScalarMap(getBlock(deploy, 'permissions'));
