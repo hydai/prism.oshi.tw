@@ -120,6 +120,13 @@ async function testRejectsUnsafeUrlUpdate(): Promise<void> {
   assert(!db.runs.some((run) => run.sql.startsWith('UPDATE submissions SET')), 'rejected URL update does not write to D1');
 }
 
+async function testRejectsNonObjectUpdateBody(): Promise<void> {
+  const db = new RecordingD1();
+  const res = await putSubmission(null, db);
+  assertEqual(res.status, 400, 'non-object update body is rejected');
+  assert(!db.runs.some((run) => run.sql.startsWith('UPDATE submissions SET')), 'non-object update body does not write to D1');
+}
+
 async function testAllowsSafeUrlUpdate(): Promise<void> {
   const db = new RecordingD1();
   const res = await putSubmission({ link_twitter: 'https://www.twitter.com/safe' }, db);
@@ -132,6 +139,7 @@ async function testAllowsSafeUrlUpdate(): Promise<void> {
 
 void (async () => {
   await testRejectsUnsafeUrlUpdate();
+  await testRejectsNonObjectUpdateBody();
   await testAllowsSafeUrlUpdate();
   console.log('✓ Nova submission URL route validation');
 })().catch((error: unknown) => {

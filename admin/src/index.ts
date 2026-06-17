@@ -141,6 +141,10 @@ function validateNovaUrlUpdates(body: NovaUpdateBody): string | null {
   return null;
 }
 
+function isNovaUpdateBody(value: unknown): value is NovaUpdateBody {
+  return typeof value === 'object' && value !== null && !Array.isArray(value);
+}
+
 const app = new Hono<{ Bindings: Bindings; Variables: Variables }>();
 
 // All routes require authentication, and state-changing requests must carry an
@@ -1041,7 +1045,12 @@ app.put('/api/nova/submissions/:id', requireCurator, async (c) => {
     .first();
   if (!existing) return c.json({ error: 'Submission not found' }, 404);
 
-  const body = await c.req.json<NovaUpdateBody>();
+  const parsedBody = await c.req.json<unknown>();
+  if (!isNovaUpdateBody(parsedBody)) {
+    return c.json({ error: 'Request body must be an object' }, 400);
+  }
+
+  const body = parsedBody;
   const urlError = validateNovaUrlUpdates(body);
   if (urlError) {
     return c.json({ error: urlError }, 400);
