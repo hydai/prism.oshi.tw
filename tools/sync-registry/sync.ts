@@ -13,6 +13,9 @@ import * as fs from 'node:fs';
 import * as path from 'node:path';
 import { fileURLToPath } from 'node:url';
 
+import { sanitizeExternalUrl } from '../../lib/safe-links.ts';
+import { sanitizeNovaUrl, type NovaUrlProvider } from '../../admin/shared/nova-url-safety.ts';
+import { assertValidSlug } from '../shared/slug.ts';
 import { seedIfMissing } from '../shared/sync-state.ts';
 
 import { newStreamerEmbed, subscriberDigestEmbed } from '../../admin/shared/discord.ts';
@@ -29,7 +32,7 @@ const SLUGS_PATH = path.resolve(ROOT, 'lib/streamer-slugs.ts');
 
 // --- DB row type (matches Nova schema) ---
 
-interface SubmissionRow {
+export interface SubmissionRow {
   slug: string;
   display_name: string;
   description: string;
@@ -111,13 +114,63 @@ function queryNovaDb(): SubmissionRow[] {
 
 // --- Transform DB row → registry config ---
 
+type SocialLinkKey = keyof SocialLinks;
+
+const SOCIAL_LINK_FIELDS = [
+  ['youtube', 'link_youtube', 'youtube'],
+  ['twitter', 'link_twitter', 'twitter'],
+  ['facebook', 'link_facebook', 'facebook'],
+  ['instagram', 'link_instagram', 'instagram'],
+  ['twitch', 'link_twitch', 'twitch'],
+] as const satisfies ReadonlyArray<readonly [SocialLinkKey, keyof SubmissionRow, NovaUrlProvider]>;
+
+const THEME_COLOR_KEYS = [
+  'accentPrimary',
+  'accentPrimaryDark',
+  'accentPrimaryLight',
+  'accentSecondary',
+  'accentSecondaryLight',
+  'bgPageStart',
+  'bgPageMid',
+  'bgPageEnd',
+  'bgAccentPrimary',
+  'bgAccentPrimaryMuted',
+  'borderAccentPrimary',
+  'borderAccentSecondary',
+] as const satisfies ReadonlyArray<keyof ThemeColors>;
+
+const THEME_COLOR_RE = /^#[0-9a-fA-F]{6}$/;
+
+function safeNovaUrl(value: string, provider: NovaUrlProvider, context: string): string | undefined {
+  const trimmed = value.trim();
+  if (!trimmed) return undefined;
+
+  const safeUrl = sanitizeNovaUrl(trimmed, provider);
+  if (!safeUrl) {
+    throw new Error(`Invalid ${context}: URL must use HTTPS and an allowed ${provider} host.`);
+  }
+
+  return safeUrl;
+}
+
+function safeExternalUrl(value: string, context: string): string | undefined {
+  const trimmed = value.trim();
+  if (!trimmed) return undefined;
+
+  const safeUrl = sanitizeExternalUrl(trimmed);
+  if (!safeUrl) {
+    throw new Error(`Invalid ${context}: URL must use HTTP(S) and cannot include credentials.`);
+  }
+
+  return safeUrl;
+}
+
 function buildSocialLinks(row: SubmissionRow): SocialLinks {
   const links: SocialLinks = {};
-  if (row.link_youtube) links.youtube = row.link_youtube;
-  if (row.link_twitter) links.twitter = row.link_twitter;
-  if (row.link_facebook) links.facebook = row.link_facebook;
-  if (row.link_instagram) links.instagram = row.link_instagram;
-  if (row.link_twitch) links.twitch = row.link_twitch;
+  for (const [key, field, provider] of SOCIAL_LINK_FIELDS) {
+    const safeUrl = safeNovaUrl(row[field], provider, `${row.slug}.${field}`);
+    if (safeUrl) links[key] = safeUrl;
+  }
   return links;
 }
 
@@ -129,19 +182,38 @@ function parseTheme(row: SubmissionRow): ThemeColors {
   if (!row.theme_json) {
     throw new Error(`Streamer "${row.slug}" has empty theme_json — curator must set theme colors before sync.`);
   }
+  let parsed: unknown;
   try {
-    return JSON.parse(row.theme_json) as ThemeColors;
+    parsed = JSON.parse(row.theme_json);
   } catch {
     throw new Error(`Streamer "${row.slug}" has invalid theme_json: ${row.theme_json}`);
   }
+
+  if (typeof parsed !== 'object' || parsed === null || Array.isArray(parsed)) {
+    throw new Error(`Streamer "${row.slug}" has invalid theme_json: expected an object.`);
+  }
+
+  const theme = parsed as Partial<Record<keyof ThemeColors, unknown>>;
+  const sanitized: Partial<ThemeColors> = {};
+  for (const key of THEME_COLOR_KEYS) {
+    const value = theme[key];
+    if (typeof value !== 'string' || !THEME_COLOR_RE.test(value)) {
+      throw new Error(`Streamer "${row.slug}" has invalid theme color ${key}: ${JSON.stringify(value)}`);
+    }
+    sanitized[key] = value;
+  }
+
+  return sanitized as ThemeColors;
 }
 
-function rowToConfig(row: SubmissionRow): StreamerConfig {
+export function rowToConfig(row: SubmissionRow): StreamerConfig {
+  assertValidSlug(row.slug, 'Nova submissions.slug');
+
   const config: StreamerConfig = {
     slug: row.slug,
     displayName: row.display_name,
     description: row.description,
-    avatarUrl: row.avatar_url,
+    avatarUrl: safeNovaUrl(row.avatar_url, 'image', `${row.slug}.avatar_url`) ?? '',
     brandName: row.brand_name,
     subscriberCount: row.subscriber_count,
     group: row.group,
@@ -150,7 +222,7 @@ function rowToConfig(row: SubmissionRow): StreamerConfig {
     enabled: true, // only enabled rows are queried
   };
   if (row.external_url) {
-    config.externalUrl = row.external_url;
+    config.externalUrl = safeExternalUrl(row.external_url, `${row.slug}.external_url`);
   }
   return config;
 }
@@ -270,6 +342,7 @@ function writeSlugs(streamers: StreamerConfig[]): void {
 
 function scaffoldDataDirs(streamers: StreamerConfig[]): void {
   for (const s of streamers) {
+    assertValidSlug(s.slug, 'registry streamers');
     const dir = path.resolve(ROOT, 'data', s.slug);
     if (!fs.existsSync(dir)) {
       console.log(`  scaffolding data/${s.slug}/`);

@@ -1,6 +1,6 @@
 import * as assert from 'node:assert/strict';
 
-import { diffStreamers, registryAnnouncementBatches, type StreamerDiff } from './sync.ts';
+import { diffStreamers, registryAnnouncementBatches, rowToConfig, type StreamerDiff, type SubmissionRow } from './sync.ts';
 
 function test(name: string, fn: () => void): void {
   try {
@@ -10,6 +10,44 @@ function test(name: string, fn: () => void): void {
     console.error(`✗ ${name}`);
     throw err;
   }
+}
+
+const validTheme = JSON.stringify({
+  accentPrimary: '#111111',
+  accentPrimaryDark: '#222222',
+  accentPrimaryLight: '#333333',
+  accentSecondary: '#444444',
+  accentSecondaryLight: '#555555',
+  bgPageStart: '#666666',
+  bgPageMid: '#777777',
+  bgPageEnd: '#888888',
+  bgAccentPrimary: '#999999',
+  bgAccentPrimaryMuted: '#aaaaaa',
+  borderAccentPrimary: '#bbbbbb',
+  borderAccentSecondary: '#cccccc',
+});
+const validThemeConfig = JSON.parse(validTheme) as ReturnType<typeof rowToConfig>['theme'];
+
+function row(overrides: Partial<SubmissionRow> = {}): SubmissionRow {
+  return {
+    slug: 'aiko',
+    display_name: 'Aiko',
+    description: '',
+    avatar_url: 'https://yt3.ggpht.com/avatar=s240',
+    brand_name: '',
+    subscriber_count: '',
+    group: '',
+    enabled: 1,
+    display_order: 1,
+    theme_json: validTheme,
+    link_youtube: 'https://www.youtube.com/@aiko',
+    link_twitter: 'https://x.com/aiko',
+    link_facebook: 'https://www.facebook.com/aiko',
+    link_instagram: 'https://www.instagram.com/aiko',
+    link_twitch: 'https://www.twitch.tv/aiko',
+    external_url: 'https://example.com/aiko',
+    ...overrides,
+  };
 }
 
 function cfg(slug: string, displayName: string, subscriberCount: string) {
@@ -22,7 +60,7 @@ function cfg(slug: string, displayName: string, subscriberCount: string) {
     subscriberCount,
     group: '',
     socialLinks: {},
-    theme: {} as Record<string, string>,
+    theme: validThemeConfig,
     enabled: true,
   };
 }
@@ -120,6 +158,46 @@ test('registryAnnouncementBatches: subscriber digest carries liveKeys = the new 
   // the digest announces the NEW counts, so it verifies those are live in registry.json (not merely
   // that the streamer still exists) — a reverted count drops it.
   assert.deepEqual(batches[0].liveKeys, ['1.1萬', '2.2萬']);
+});
+
+test('rowToConfig sanitizes valid Nova URL fields before writing registry data', () => {
+  const config = rowToConfig(row({
+    link_twitch: 'https://www.youtube.com/redirect?q=https%3A%2F%2Fwww.twitch.tv%2Faiko',
+  }));
+
+  assert.equal(config.avatarUrl, 'https://yt3.ggpht.com/avatar=s240');
+  assert.deepEqual(config.socialLinks, {
+    youtube: 'https://www.youtube.com/@aiko',
+    twitter: 'https://x.com/aiko',
+    facebook: 'https://www.facebook.com/aiko',
+    instagram: 'https://www.instagram.com/aiko',
+    twitch: 'https://www.twitch.tv/aiko',
+  });
+});
+
+test('rowToConfig rejects path-traversal slugs before writing registry data', () => {
+  assert.throws(() => rowToConfig(row({ slug: '../escape' })), /Invalid streamer slug/);
+});
+
+test('rowToConfig rejects unsafe social URL protocols', () => {
+  assert.throws(() => rowToConfig(row({ link_youtube: 'javascript:alert(1)' })), /Invalid aiko\.link_youtube/);
+});
+
+test('rowToConfig rejects social URLs on unexpected hosts', () => {
+  assert.throws(() => rowToConfig(row({ link_twitter: 'https://evil.example/phish' })), /Invalid aiko\.link_twitter/);
+});
+
+test('rowToConfig rejects unsafe avatar URLs', () => {
+  assert.throws(() => rowToConfig(row({ avatar_url: 'data:text/html,<script>alert(1)</script>' })), /Invalid aiko\.avatar_url/);
+});
+
+test('rowToConfig rejects unsafe external URLs', () => {
+  assert.throws(() => rowToConfig(row({ external_url: 'javascript:alert(1)' })), /Invalid aiko\.external_url/);
+});
+
+test('rowToConfig rejects malformed theme colors', () => {
+  const theme = JSON.stringify({ ...JSON.parse(validTheme), accentPrimary: 'url(javascript:alert(1))' });
+  assert.throws(() => rowToConfig(row({ theme_json: theme })), /invalid theme color accentPrimary/);
 });
 
 console.log('sync-registry.test: all passed');
