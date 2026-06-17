@@ -34,10 +34,21 @@ assert.deepEqual(
   {},
 );
 
+// URLs carrying embedded credentials are rejected even on an allowed host,
+// so secrets never leak into rendered links.
+assert.deepEqual(
+  sanitizeSocialLinks({
+    youtube: 'https://user:pass@youtube.com/@unsafe',
+    twitter: 'https://user@x.com/unsafe',
+  }),
+  {},
+);
+
 assert.equal(sanitizeExternalUrl('https://example.com/path'), 'https://example.com/path');
 assert.equal(sanitizeExternalUrl('http://example.com/path'), 'http://example.com/path');
 assert.equal(sanitizeExternalUrl('data:text/html,<h1>unsafe</h1>'), undefined);
 assert.equal(sanitizeExternalUrl('javascript:alert(document.domain)'), undefined);
 assert.equal(sanitizeExternalUrl('/relative'), undefined);
+assert.equal(sanitizeExternalUrl('https://user:pass@example.com/'), undefined);
 
 console.log('✓ safe link sanitizers');
