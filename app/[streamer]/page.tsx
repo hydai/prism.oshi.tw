@@ -891,24 +891,25 @@ export default function Home() {
             {/* Flexible spacer */}
             <div style={{ flex: 1 }} />
 
-            {/* Follow button: outline style */}
-            <a
-              href={streamerData.socialLinks.youtube}
-              target="_blank"
-              rel="noopener noreferrer"
-              data-testid="mobile-follow-button"
-              className="flex items-center justify-center flex-shrink-0 font-semibold transition-all hover:opacity-80"
-              style={{
-                border: '1px solid var(--border-default)',
-                borderRadius: '20px',
-                padding: '8px 24px',
-                color: 'var(--text-secondary)',
-                fontSize: 'var(--font-size-sm)',
-                background: 'transparent',
-              }}
-            >
-              追蹤
-            </a>
+            {streamerData.socialLinks.youtube && (
+              <a
+                href={streamerData.socialLinks.youtube}
+                target="_blank"
+                rel="noopener noreferrer"
+                data-testid="mobile-follow-button"
+                className="flex items-center justify-center flex-shrink-0 font-semibold transition-all hover:opacity-80"
+                style={{
+                  border: '1px solid var(--border-default)',
+                  borderRadius: '20px',
+                  padding: '8px 24px',
+                  color: 'var(--text-secondary)',
+                  fontSize: 'var(--font-size-sm)',
+                  background: 'transparent',
+                }}
+              >
+                追蹤
+              </a>
+            )}
           </div>
 
           {/* Mobile Year Filter Scroll — horizontal scrolling row, mobile only */}
@@ -1030,23 +1031,24 @@ export default function Home() {
                 播放全部
               </button>
 
-              {/* OutlineButton — "追蹤" follow link (secondary action) */}
-              <a
-                href={streamerData.socialLinks.youtube}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="font-semibold flex items-center gap-1.5 transition-all hover:opacity-80 flex-shrink-0"
-                style={{
-                  background: 'transparent',
-                  border: '1px solid var(--border-default)',
-                  borderRadius: 'var(--radius-pill)',
-                  fontSize: 'var(--font-size-sm)',
-                  padding: 'var(--space-3) var(--space-5)',
-                  color: 'var(--text-secondary)',
-                }}
-              >
-                追蹤
-              </a>
+              {streamerData.socialLinks.youtube && (
+                <a
+                  href={streamerData.socialLinks.youtube}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="font-semibold flex items-center gap-1.5 transition-all hover:opacity-80 flex-shrink-0"
+                  style={{
+                    background: 'transparent',
+                    border: '1px solid var(--border-default)',
+                    borderRadius: 'var(--radius-pill)',
+                    fontSize: 'var(--font-size-sm)',
+                    padding: 'var(--space-3) var(--space-5)',
+                    color: 'var(--text-secondary)',
+                  }}
+                >
+                  追蹤
+                </a>
+              )}
 
               {/* View Mode Toggle — restyled to match design language */}
               <div
