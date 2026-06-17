@@ -49,22 +49,29 @@ function getPathBlock(path: string[]): WorkflowLine[] {
   return path.reduce((block, key) => getBlock(block, key), lines);
 }
 
-function getListItemBlock(parent: WorkflowLine[], pattern: RegExp): WorkflowLine[] {
-  const index = parent.findIndex((line) => pattern.test(line.trimmed));
-  assert.notEqual(index, -1, `missing list item matching ${pattern}`);
+function getStepBlock(parent: WorkflowLine[], usesPattern: RegExp): WorkflowLine[] {
+  const stepStarts = parent
+    .map((line, index) => ({ index, line }))
+    .filter(({ line }) => line.trimmed.startsWith('- '));
 
-  const itemIndent = parent[index].indent;
-  let end = parent.length;
+  for (const { index, line: stepStart } of stepStarts) {
+    let end = parent.length;
 
-  for (let i = index + 1; i < parent.length; i += 1) {
-    const line = parent[i];
-    if (line.trimmed !== '' && line.indent <= itemIndent) {
-      end = i;
-      break;
+    for (let i = index + 1; i < parent.length; i += 1) {
+      const line = parent[i];
+      if (line.trimmed !== '' && line.indent <= stepStart.indent) {
+        end = i;
+        break;
+      }
+    }
+
+    const block = parent.slice(index, end);
+    if (block.some((line) => usesPattern.test(line.trimmed))) {
+      return block;
     }
   }
 
-  return parent.slice(index, end);
+  assert.fail(`missing step using ${usesPattern}`);
 }
 
 function readScalarMap(block: WorkflowLine[]): Record<string, string> {
@@ -117,7 +124,7 @@ assertPermissions(
 const buildText = build.map((line) => line.text).join('\n');
 assert.doesNotMatch(buildText, /actions\/deploy-pages@/);
 
-const checkoutStep = getListItemBlock(getBlock(build, 'steps'), /^- uses: actions\/checkout@/);
+const checkoutStep = getStepBlock(getBlock(build, 'steps'), /^(?:- )?uses: actions\/checkout@/);
 assert.equal(
   readScalarMap(getBlock(checkoutStep, 'with'))['persist-credentials'],
   'false',
