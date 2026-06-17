@@ -187,6 +187,10 @@ test('rowToConfig rejects social URLs on unexpected hosts', () => {
   assert.throws(() => rowToConfig(row({ link_twitter: 'https://evil.example/phish' })), /Invalid aiko\.link_twitter/);
 });
 
+test('rowToConfig rejects social URLs with embedded credentials', () => {
+  assert.throws(() => rowToConfig(row({ link_twitter: 'https://user:pass@x.com/aiko' })), /include no credentials/);
+});
+
 test('rowToConfig rejects unsafe avatar URLs', () => {
   assert.throws(() => rowToConfig(row({ avatar_url: 'data:text/html,<script>alert(1)</script>' })), /Invalid aiko\.avatar_url/);
 });

@@ -152,7 +152,7 @@ function safeNovaUrl(value: unknown, provider: NovaUrlProvider, context: string)
 
   const safeUrl = sanitizeNovaUrl(trimmed, provider);
   if (!safeUrl) {
-    throw new Error(`Invalid ${context}: URL must use HTTPS and an allowed ${provider} host.`);
+    throw new Error(`Invalid ${context}: URL must be parseable, use HTTPS, include no credentials, and use an allowed ${provider} host.`);
   }
 
   return safeUrl;
