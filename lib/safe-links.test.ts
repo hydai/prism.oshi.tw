@@ -44,6 +44,23 @@ assert.deepEqual(
   {},
 );
 
+// Mobile-host YouTube redirects are unwrapped and re-validated just like the
+// desktop host: an allowlisted target survives...
+assert.deepEqual(
+  sanitizeSocialLinks({
+    youtube: 'https://m.youtube.com/redirect?q=https%3A%2F%2Fwww.youtube.com%2F%40safe',
+  }),
+  { youtube: 'https://www.youtube.com/@safe' },
+);
+
+// ...while an off-allowlist target is dropped instead of leaking an open redirect.
+assert.deepEqual(
+  sanitizeSocialLinks({
+    youtube: 'https://m.youtube.com/redirect?q=https%3A%2F%2Fevil.example',
+  }),
+  {},
+);
+
 assert.equal(sanitizeExternalUrl('https://example.com/path'), 'https://example.com/path');
 assert.equal(sanitizeExternalUrl('http://example.com/path'), 'http://example.com/path');
 assert.equal(sanitizeExternalUrl('data:text/html,<h1>unsafe</h1>'), undefined);
