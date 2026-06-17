@@ -34,12 +34,12 @@ const SLUGS_PATH = path.resolve(ROOT, 'lib/streamer-slugs.ts');
 
 export interface SubmissionRow {
   slug: string;
-  display_name: string;
-  description: string;
+  display_name: unknown;
+  description: unknown;
   avatar_url: unknown;
-  brand_name: string;
-  subscriber_count: string;
-  group: string;
+  brand_name: unknown;
+  subscriber_count: unknown;
+  group: unknown;
   enabled: number;
   display_order: number;
   theme_json: string;
@@ -216,12 +216,12 @@ export function rowToConfig(row: SubmissionRow): StreamerConfig {
 
   const config: StreamerConfig = {
     slug: row.slug,
-    displayName: row.display_name,
-    description: row.description,
+    displayName: requireStringField(row.display_name, `${row.slug}.display_name`),
+    description: requireStringField(row.description, `${row.slug}.description`),
     avatarUrl: safeNovaUrl(row.avatar_url, 'image', `${row.slug}.avatar_url`) ?? '',
-    brandName: row.brand_name,
-    subscriberCount: row.subscriber_count,
-    group: row.group,
+    brandName: requireStringField(row.brand_name, `${row.slug}.brand_name`),
+    subscriberCount: requireStringField(row.subscriber_count, `${row.slug}.subscriber_count`),
+    group: requireStringField(row.group, `${row.slug}.group`),
     socialLinks: buildSocialLinks(row),
     theme: parseTheme(row),
     enabled: true, // only enabled rows are queried

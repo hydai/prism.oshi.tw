@@ -203,6 +203,14 @@ test('rowToConfig rejects non-string URL fields with a clear validation error', 
   assert.throws(() => rowToConfig(row({ external_url: 123 })), /Invalid aiko\.external_url: expected a string, got number/);
 });
 
+test('rowToConfig rejects null registry text fields with a clear validation error', () => {
+  assert.throws(() => rowToConfig(row({ brand_name: null })), /Invalid aiko\.brand_name: expected a string, got null/);
+});
+
+test('rowToConfig rejects non-string registry text fields with a clear validation error', () => {
+  assert.throws(() => rowToConfig(row({ subscriber_count: 123 })), /Invalid aiko\.subscriber_count: expected a string, got number/);
+});
+
 test('rowToConfig rejects unsafe external URLs', () => {
   assert.throws(() => rowToConfig(row({ external_url: 'javascript:alert(1)' })), /Invalid aiko\.external_url/);
 });
