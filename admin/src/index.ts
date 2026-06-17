@@ -51,6 +51,7 @@ import { fetchItunesDuration } from './itunes';
 import { parseTextToSongs } from '../shared/parse';
 import { formatSubscriberCount } from '../shared/format';
 import { feedbackEmbedForSubmission, feedbackEmbedForVod, postDiscord } from '../shared/discord';
+import { sanitizeNovaUrl, type NovaUrlProvider } from '../shared/nova-url-safety';
 import { discoverStreams, getVideoDetails, fetchComments, findCandidateComment, countTimestamps, fetchChannelInfo } from './youtube';
 import type {
   AuthUser,
@@ -102,6 +103,47 @@ type Bindings = {
 type Variables = {
   user: AuthUser;
 };
+
+type NovaUpdateBody = Partial<Omit<NovaSubmission, 'id' | 'status' | 'submitted_at' | 'reviewed_at'>>;
+
+const novaUrlFields = [
+  ['youtube_channel_url', 'youtube'],
+  ['avatar_url', 'image'],
+  ['link_youtube', 'youtube'],
+  ['link_twitter', 'twitter'],
+  ['link_facebook', 'facebook'],
+  ['link_instagram', 'instagram'],
+  ['link_twitch', 'twitch'],
+] as const satisfies ReadonlyArray<readonly [keyof NovaUpdateBody, NovaUrlProvider]>;
+
+function validateNovaUrlUpdates(body: NovaUpdateBody): string | null {
+  for (const [field, provider] of novaUrlFields) {
+    const value = body[field];
+    if (value === undefined) continue;
+    if (typeof value !== 'string') {
+      return `Invalid ${field}: expected a URL string`;
+    }
+
+    const trimmed = value.trim();
+    if (!trimmed) {
+      body[field] = '';
+      continue;
+    }
+
+    const safeUrl = sanitizeNovaUrl(trimmed, provider);
+    if (!safeUrl) {
+      return `Invalid ${field}: URL must use HTTPS and an allowed ${provider} host`;
+    }
+
+    body[field] = safeUrl;
+  }
+
+  return null;
+}
+
+function isNovaUpdateBody(value: unknown): value is NovaUpdateBody {
+  return typeof value === 'object' && value !== null && !Array.isArray(value);
+}
 
 const app = new Hono<{ Bindings: Bindings; Variables: Variables }>();
 
@@ -1003,10 +1045,19 @@ app.put('/api/nova/submissions/:id', requireCurator, async (c) => {
     .first();
   if (!existing) return c.json({ error: 'Submission not found' }, 404);
 
-  const body = await c.req.json<Partial<Omit<NovaSubmission, 'id' | 'status' | 'submitted_at' | 'reviewed_at'>>>();
+  const parsedBody = await c.req.json<unknown>();
+  if (!isNovaUpdateBody(parsedBody)) {
+    return c.json({ error: 'Request body must be an object' }, 400);
+  }
+
+  const body = parsedBody;
+  const urlError = validateNovaUrlUpdates(body);
+  if (urlError) {
+    return c.json({ error: urlError }, 400);
+  }
 
   const fields: string[] = [];
-  const values: string[] = [];
+  const values: Array<string | number> = [];
   const editable = [
     'youtube_channel_url', 'youtube_channel_id', 'slug', 'brand_name', 'display_name', 'description',
     'avatar_url', 'subscriber_count', 'link_youtube', 'link_twitter',
@@ -1018,12 +1069,12 @@ app.put('/api/nova/submissions/:id', requireCurator, async (c) => {
     if (body[key] !== undefined) {
       // Quote column name to handle SQL reserved words like "group"
       fields.push(`"${key}" = ?`);
-      values.push(body[key] as string);
+      values.push(body[key] as string | number);
     }
   }
 
   // Keep normalized URL in sync when youtube_channel_url changes
-  if (body.youtube_channel_url) {
+  if (body.youtube_channel_url !== undefined) {
     fields.push('"youtube_channel_url_normalized" = ?');
     values.push(body.youtube_channel_url.trim().toLowerCase());
   }
