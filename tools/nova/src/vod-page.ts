@@ -1,6 +1,17 @@
 import { html, raw } from 'hono/html';
 import type { ApprovedStreamer } from './types';
 import { DARK_MODE_CSS, DARK_MODE_DETECT_SCRIPT, themeToggleHTML } from './theme';
+import { validateSlug } from './validate';
+
+/** Escape HTML special characters before inserting trusted markup with raw(). */
+function escapeHtml(value: string): string {
+  return value
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&#39;');
+}
 
 const VOD_SCRIPT = String.raw`
     (function() {
@@ -298,9 +309,11 @@ const VOD_SCRIPT = String.raw`
 `;
 
 export function renderVodPage(siteKey: string, streamers: ApprovedStreamer[]) {
-  const streamerOptions = streamers.length > 0
-    ? streamers.map((s) => `<option value="${s.slug}">${s.display_name}</option>`).join('')
-    : '<option value="" disabled>暫無可選 VTuber（請聯繫管理員）</option>';
+  const streamerOptions = streamers
+    .filter((s) => validateSlug(s.slug))
+    .map((s) => `<option value="${escapeHtml(s.slug)}">${escapeHtml(s.display_name)}</option>`)
+    .join('');
+  const streamerSelectOptions = streamerOptions || '<option value="" disabled>暫無可選 VTuber（請聯繫管理員）</option>';
 
   return html`<!doctype html>
 <html lang="zh-Hant">
@@ -531,7 +544,7 @@ export function renderVodPage(siteKey: string, streamers: ApprovedStreamer[]) {
           </label>
           <select name="streamer_slug" required class="form-select">
             <option value="">選擇 VTuber…</option>
-            ${raw(streamerOptions)}
+            ${raw(streamerSelectOptions)}
           </select>
         </div>
 
