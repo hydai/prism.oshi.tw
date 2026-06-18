@@ -1,5 +1,5 @@
 import { html, raw } from 'hono/html';
-import type { TicketRow } from './types';
+import type { PublicTicketRow } from './types';
 import { DARK_MODE_CSS, DARK_MODE_DETECT_SCRIPT, themeToggleHTML } from './theme';
 
 const TYPE_LABELS: Record<string, string> = {
@@ -27,7 +27,7 @@ function escapeHtml(s: string): string {
     .replace(/\n/g, '<br/>');
 }
 
-export function renderQaPage(tickets: TicketRow[], total: number, page: number, limit: number, typeFilter: string, q: string) {
+export function renderQaPage(tickets: PublicTicketRow[], total: number, page: number, limit: number, typeFilter: string, q: string) {
   const totalPages = Math.ceil(total / limit);
 
   const buildHref = (opts: { type?: string; page?: number; includeQ?: boolean }) => {
