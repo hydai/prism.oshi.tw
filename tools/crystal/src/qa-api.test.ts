@@ -114,6 +114,7 @@ async function getQa(q = ''): Promise<{ json: { data: Array<Record<string, unkno
 function assertNoPrivateFields(row: Record<string, unknown>): void {
   assert.equal(Object.hasOwn(row, 'contact'), false, 'public Q&A rows must omit contact');
   assert.equal(Object.hasOwn(row, 'context_url'), false, 'public Q&A rows must omit context_url');
+  assert.equal(Object.hasOwn(row, 'score'), false, 'public Q&A rows must omit internal search score');
 }
 
 function assertPublicProjection(queryLog: QueryLog[]): void {

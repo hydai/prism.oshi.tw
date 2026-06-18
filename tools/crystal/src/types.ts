@@ -23,7 +23,20 @@ export interface TicketRow {
   closed_at: string | null;
 }
 
-export type PublicTicketRow = Omit<TicketRow, 'contact' | 'context_url'>;
+export type PublicTicketRow = Pick<
+  TicketRow,
+  | 'id'
+  | 'type'
+  | 'title'
+  | 'body'
+  | 'nickname'
+  | 'is_public_reply_allowed'
+  | 'status'
+  | 'admin_reply'
+  | 'replied_at'
+  | 'submitted_at'
+  | 'closed_at'
+>;
 
 export interface SubmitTicketBody {
   type: TicketType;

@@ -151,7 +151,7 @@ export async function searchTickets(
 
   const [countResult, dataResult] = await db.batch([countStmt, dataStmt]);
   const total = (countResult.results[0] as { cnt: number } | undefined)?.cnt ?? 0;
-  const tickets = dataResult.results as PublicTicketRow[];
+  const tickets = (dataResult.results as (PublicTicketRow & { score: number })[]).map(({ score: _score, ...ticket }) => ticket);
 
   return { tickets, total };
 }
