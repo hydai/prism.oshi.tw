@@ -10,7 +10,8 @@
     "db:migrate:local": "wrangler d1 execute oshi-prism-nova --local --file=schema.sql",
     "typecheck": "tsc --noEmit",
     "test:video-info": "npx tsx src/index.test.ts",
-    "check": "npm run typecheck && npm run test:video-info"
+    "test:vod-page": "npx tsx src/vod-page.test.ts",
+    "check": "npm run typecheck && npm run test:video-info && npm run test:vod-page"
   },
   "dependencies": {
     "hono": "^4.12.22"
