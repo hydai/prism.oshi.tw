@@ -28,7 +28,7 @@ function testEscapesStreamerOptionFields(): void {
   console.log('streamer option text is escaped before raw insertion');
 }
 
-function testEscapesStreamerOptionAttribute(): void {
+function testRendersValidStreamerSlug(): void {
   const html = render([{
     slug: 'safe-slug',
     display_name: 'Safe Name',
@@ -53,7 +53,7 @@ function testRejectsInvalidStreamerSlug(): void {
 
 try {
   testEscapesStreamerOptionFields();
-  testEscapesStreamerOptionAttribute();
+  testRendersValidStreamerSlug();
   testRejectsInvalidStreamerSlug();
   console.log('vod-page.test: all passed');
 } catch (error) {
