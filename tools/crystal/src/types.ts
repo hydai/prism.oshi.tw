@@ -23,6 +23,8 @@ export interface TicketRow {
   closed_at: string | null;
 }
 
+export type PublicTicketRow = Omit<TicketRow, 'contact' | 'context_url'>;
+
 export interface SubmitTicketBody {
   type: TicketType;
   title: string;

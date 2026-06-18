@@ -1,4 +1,4 @@
-import type { TicketRow, SubmitTicketBody } from './types';
+import type { PublicTicketRow, SubmitTicketBody } from './types';
 
 /** Generate a "crys-XXXXXXXX" ID */
 export function generateId(): string {
@@ -33,13 +33,18 @@ export async function insertTicket(
     .run();
 }
 
+const PUBLIC_TICKET_COLUMNS = `
+  id, type, title, body, nickname, is_public_reply_allowed, status,
+  admin_reply, replied_at, submitted_at, closed_at
+`;
+
 /** List publicly replied tickets for Q&A page */
 export async function listPublicReplied(
   db: D1Database,
   typeFilter?: string,
   page = 1,
   limit = 20,
-): Promise<{ tickets: TicketRow[]; total: number }> {
+): Promise<{ tickets: PublicTicketRow[]; total: number }> {
   const conditions = ['is_public_reply_allowed = 1', "status IN ('replied','closed')"];
   const binds: (string | number)[] = [];
 
@@ -58,9 +63,9 @@ export async function listPublicReplied(
 
   const offset = (page - 1) * limit;
   const rows = await db
-    .prepare(`SELECT * FROM tickets WHERE ${where} ORDER BY replied_at DESC LIMIT ? OFFSET ?`)
+    .prepare(`SELECT ${PUBLIC_TICKET_COLUMNS} FROM tickets WHERE ${where} ORDER BY replied_at DESC LIMIT ? OFFSET ?`)
     .bind(...binds, limit, offset)
-    .all<TicketRow>();
+    .all<PublicTicketRow>();
 
   return { tickets: rows.results, total };
 }
@@ -81,7 +86,7 @@ const MAX_Q_LEN = 100;
 export async function searchTickets(
   db: D1Database,
   opts: { q: string; scope: SearchScope; typeFilter?: string; page?: number; limit?: number },
-): Promise<{ tickets: TicketRow[]; total: number }> {
+): Promise<{ tickets: PublicTicketRow[]; total: number }> {
   const qRaw = (opts.q ?? '').trim().slice(0, MAX_Q_LEN);
   if (!qRaw) return { tickets: [], total: 0 };
 
@@ -137,7 +142,7 @@ export async function searchTickets(
 
   const countSql = `SELECT COUNT(*) AS cnt FROM tickets WHERE ${whereSql}`;
   const dataSql =
-    `SELECT *, (${scoreExpr}) AS score FROM tickets WHERE ${whereSql} ` +
+    `SELECT ${PUBLIC_TICKET_COLUMNS}, (${scoreExpr}) AS score FROM tickets WHERE ${whereSql} ` +
     `ORDER BY score DESC, COALESCE(replied_at, submitted_at) DESC ` +
     `LIMIT ? OFFSET ?`;
 
@@ -146,7 +151,7 @@ export async function searchTickets(
 
   const [countResult, dataResult] = await db.batch([countStmt, dataStmt]);
   const total = (countResult.results[0] as { cnt: number } | undefined)?.cnt ?? 0;
-  const tickets = dataResult.results as TicketRow[];
+  const tickets = dataResult.results as PublicTicketRow[];
 
   return { tickets, total };
 }
