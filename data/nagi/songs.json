@@ -1,5 +1,23 @@
 [
   {
+    "id": "song-00bb0fb8",
+    "title": "Stellar Stellar",
+    "originalArtist": "星街すいせい",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-75ad6dea",
+        "streamId": "stream-2026-06-19",
+        "date": "2026-06-19",
+        "streamTitle": "【歌雜】點歌OK！200贊耐久！🍥｜七星ナギ・馬來西亞VTuber #雜談",
+        "videoId": "AMTtoZy_LbM",
+        "timestamp": 8128,
+        "endTimestamp": 8426,
+        "note": ""
+      }
+    ]
+  },
+  {
     "id": "song-0179cd07",
     "title": "unlasting",
     "originalArtist": "LiSA",
@@ -13,6 +31,42 @@
         "videoId": "N90ZTiqxTIw",
         "timestamp": 2668,
         "endTimestamp": 2957,
+        "note": ""
+      }
+    ]
+  },
+  {
+    "id": "song-017fe518",
+    "title": "泡沫",
+    "originalArtist": "G.E.M. 鄧紫棋",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-d1a36716",
+        "streamId": "stream-2026-06-07",
+        "date": "2026-06-07",
+        "streamTitle": "【歌雜】週日唱！還有說很多話🍥｜七星ナギ・馬來西亞VTuber #雜談",
+        "videoId": "v_eExjuwC9Y",
+        "timestamp": 13117,
+        "endTimestamp": 13367,
+        "note": ""
+      }
+    ]
+  },
+  {
+    "id": "song-01dd78b5",
+    "title": "愛♡スクリ～ム！",
+    "originalArtist": "AiScReam",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-30748f14",
+        "streamId": "stream-2026-06-05",
+        "date": "2026-06-05",
+        "streamTitle": "【歌雜】一點點唱歌很多講話🍥｜七星ナギ・馬來西亞VTuber #雜談",
+        "videoId": "ntSusuc5n-g",
+        "timestamp": 4750,
+        "endTimestamp": 5004,
         "note": ""
       }
     ]
@@ -108,6 +162,24 @@
     ]
   },
   {
+    "id": "song-098dbe7a",
+    "title": "You Are My Sunshine",
+    "originalArtist": "Jimmie Davis",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-e97a1871",
+        "streamId": "stream-2026-06-19",
+        "date": "2026-06-19",
+        "streamTitle": "【歌雜】點歌OK！200贊耐久！🍥｜七星ナギ・馬來西亞VTuber #雜談",
+        "videoId": "AMTtoZy_LbM",
+        "timestamp": 5565,
+        "endTimestamp": 5786,
+        "note": ""
+      }
+    ]
+  },
+  {
     "id": "song-09ebdfcb",
     "title": "時の流れに身をまかせ",
     "originalArtist": "鄧麗君",
@@ -121,6 +193,24 @@
         "videoId": "NY5AH0gZhSg",
         "timestamp": 2470,
         "endTimestamp": 2713,
+        "note": ""
+      }
+    ]
+  },
+  {
+    "id": "song-0c430370",
+    "title": "遇見",
+    "originalArtist": "孫燕姿",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-5ac3051d",
+        "streamId": "stream-2026-06-19",
+        "date": "2026-06-19",
+        "streamTitle": "【歌雜】點歌OK！200贊耐久！🍥｜七星ナギ・馬來西亞VTuber #雜談",
+        "videoId": "AMTtoZy_LbM",
+        "timestamp": 9430,
+        "endTimestamp": 9626,
         "note": ""
       }
     ]
@@ -216,6 +306,24 @@
     ]
   },
   {
+    "id": "song-12d905c3",
+    "title": "晴る",
+    "originalArtist": "ヨルシカ",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-fa3366f9",
+        "streamId": "stream-2026-06-05",
+        "date": "2026-06-05",
+        "streamTitle": "【歌雜】一點點唱歌很多講話🍥｜七星ナギ・馬來西亞VTuber #雜談",
+        "videoId": "ntSusuc5n-g",
+        "timestamp": 5598,
+        "endTimestamp": 5869,
+        "note": ""
+      }
+    ]
+  },
+  {
     "id": "song-1469d771",
     "title": "可愛くてごめん",
     "originalArtist": "HoneyWorks",
@@ -229,6 +337,42 @@
         "videoId": "MTaylTGjbuc",
         "timestamp": 6558,
         "endTimestamp": 6773,
+        "note": ""
+      }
+    ]
+  },
+  {
+    "id": "song-16238526",
+    "title": "Countach",
+    "originalArtist": "轟はじめ",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-ec4afd2c",
+        "streamId": "stream-2026-06-19",
+        "date": "2026-06-19",
+        "streamTitle": "【歌雜】點歌OK！200贊耐久！🍥｜七星ナギ・馬來西亞VTuber #雜談",
+        "videoId": "AMTtoZy_LbM",
+        "timestamp": 6903,
+        "endTimestamp": 7096,
+        "note": ""
+      }
+    ]
+  },
+  {
+    "id": "song-174ec6fe",
+    "title": "うっせぇわ",
+    "originalArtist": "Ado",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-ce7bd644",
+        "streamId": "stream-2026-06-05",
+        "date": "2026-06-05",
+        "streamTitle": "【歌雜】一點點唱歌很多講話🍥｜七星ナギ・馬來西亞VTuber #雜談",
+        "videoId": "ntSusuc5n-g",
+        "timestamp": 8053,
+        "endTimestamp": 8259,
         "note": ""
       }
     ]
@@ -360,6 +504,42 @@
     ]
   },
   {
+    "id": "song-1d58fadd",
+    "title": "Sincerely",
+    "originalArtist": "TRUE",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-cd69b96e",
+        "streamId": "stream-2026-06-05",
+        "date": "2026-06-05",
+        "streamTitle": "【歌雜】一點點唱歌很多講話🍥｜七星ナギ・馬來西亞VTuber #雜談",
+        "videoId": "ntSusuc5n-g",
+        "timestamp": 7352,
+        "endTimestamp": 7622,
+        "note": ""
+      }
+    ]
+  },
+  {
+    "id": "song-1e220973",
+    "title": "COLORS",
+    "originalArtist": "FLOW",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-fc43e18d",
+        "streamId": "stream-2026-05-31",
+        "date": "2026-05-31",
+        "streamTitle": "【雜談】鬼轉歌回·我回來了!!!!!!!🍥｜七星ナギ・馬來西亞VTuber #雜談",
+        "videoId": "cNNPqvI-5Ow",
+        "timestamp": 7841,
+        "endTimestamp": 8054,
+        "note": ""
+      }
+    ]
+  },
+  {
     "id": "song-1edb7152",
     "title": "Golden",
     "originalArtist": "HUNTR/X",
@@ -396,6 +576,42 @@
     ]
   },
   {
+    "id": "song-21b2ddee",
+    "title": "慢冷",
+    "originalArtist": "梁靜茹",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-dfc9f83d",
+        "streamId": "stream-2026-06-07",
+        "date": "2026-06-07",
+        "streamTitle": "【歌雜】週日唱！還有說很多話🍥｜七星ナギ・馬來西亞VTuber #雜談",
+        "videoId": "v_eExjuwC9Y",
+        "timestamp": 11560,
+        "endTimestamp": 11846,
+        "note": ""
+      }
+    ]
+  },
+  {
+    "id": "song-21f77095",
+    "title": "Take Me Home, Country Roads",
+    "originalArtist": "John Denver",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-86003e24",
+        "streamId": "stream-2026-06-19",
+        "date": "2026-06-19",
+        "streamTitle": "【歌雜】點歌OK！200贊耐久！🍥｜七星ナギ・馬來西亞VTuber #雜談",
+        "videoId": "AMTtoZy_LbM",
+        "timestamp": 17579,
+        "endTimestamp": 17765,
+        "note": ""
+      }
+    ]
+  },
+  {
     "id": "song-220a0637",
     "title": "うっせわ",
     "originalArtist": "Ado",
@@ -409,6 +625,42 @@
         "videoId": "cSoSm46DxN0",
         "timestamp": 2041,
         "endTimestamp": 2241,
+        "note": ""
+      }
+    ]
+  },
+  {
+    "id": "song-234f4873",
+    "title": "真夜中のドア〜Stay With Me",
+    "originalArtist": "松原みき",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-6422a3e2",
+        "streamId": "stream-2026-06-19",
+        "date": "2026-06-19",
+        "streamTitle": "【歌雜】點歌OK！200贊耐久！🍥｜七星ナギ・馬來西亞VTuber #雜談",
+        "videoId": "AMTtoZy_LbM",
+        "timestamp": 19434,
+        "endTimestamp": 19714,
+        "note": ""
+      }
+    ]
+  },
+  {
+    "id": "song-241de845",
+    "title": "Lydia",
+    "originalArtist": "飛兒樂團",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-a4ab91dd",
+        "streamId": "stream-2026-06-07",
+        "date": "2026-06-07",
+        "streamTitle": "【歌雜】週日唱！還有說很多話🍥｜七星ナギ・馬來西亞VTuber #雜談",
+        "videoId": "v_eExjuwC9Y",
+        "timestamp": 10744,
+        "endTimestamp": 10977,
         "note": ""
       }
     ]
@@ -504,6 +756,24 @@
     ]
   },
   {
+    "id": "song-28534ae4",
+    "title": "ドライフラワー",
+    "originalArtist": "優里",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-bbe95b71",
+        "streamId": "stream-2026-06-05",
+        "date": "2026-06-05",
+        "streamTitle": "【歌雜】一點點唱歌很多講話🍥｜七星ナギ・馬來西亞VTuber #雜談",
+        "videoId": "ntSusuc5n-g",
+        "timestamp": 5130,
+        "endTimestamp": 5411,
+        "note": ""
+      }
+    ]
+  },
+  {
     "id": "song-287310cd",
     "title": "Fallin'",
     "originalArtist": "ZHIEND",
@@ -517,6 +787,24 @@
         "videoId": "ELxjiBbpB_E",
         "timestamp": 8626,
         "endTimestamp": 8928,
+        "note": ""
+      }
+    ]
+  },
+  {
+    "id": "song-287c2dec",
+    "title": "你不要想起我",
+    "originalArtist": "田馥甄",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-e08966ec",
+        "streamId": "stream-2026-06-19",
+        "date": "2026-06-19",
+        "streamTitle": "【歌雜】點歌OK！200贊耐久！🍥｜七星ナギ・馬來西亞VTuber #雜談",
+        "videoId": "AMTtoZy_LbM",
+        "timestamp": 11276,
+        "endTimestamp": 11547,
         "note": ""
       }
     ]
@@ -558,6 +846,24 @@
     ]
   },
   {
+    "id": "song-2d7462b1",
+    "title": "創聖のアクエリオン",
+    "originalArtist": "AKINO",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-2ebc496b",
+        "streamId": "stream-2026-05-31",
+        "date": "2026-05-31",
+        "streamTitle": "【雜談】鬼轉歌回·我回來了!!!!!!!🍥｜七星ナギ・馬來西亞VTuber #雜談",
+        "videoId": "cNNPqvI-5Ow",
+        "timestamp": 10948,
+        "endTimestamp": 11227,
+        "note": ""
+      }
+    ]
+  },
+  {
     "id": "song-2ee675a2",
     "title": "少女レイ",
     "originalArtist": "みきとP",
@@ -589,6 +895,24 @@
         "videoId": "N3UNZ0H34hM",
         "timestamp": 1480,
         "endTimestamp": 1732,
+        "note": ""
+      }
+    ]
+  },
+  {
+    "id": "song-3089c010",
+    "title": "隱形的翅膀",
+    "originalArtist": "張韶涵",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-73ba9d30",
+        "streamId": "stream-2026-06-07",
+        "date": "2026-06-07",
+        "streamTitle": "【歌雜】週日唱！還有說很多話🍥｜七星ナギ・馬來西亞VTuber #雜談",
+        "videoId": "v_eExjuwC9Y",
+        "timestamp": 10047,
+        "endTimestamp": 10264,
         "note": ""
       }
     ]
@@ -630,6 +954,24 @@
     ]
   },
   {
+    "id": "song-326023a2",
+    "title": "白い雪のプリンセスは",
+    "originalArtist": "のぼる↑ feat. 初音ミク",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-f4fc4ab9",
+        "streamId": "stream-2026-05-31",
+        "date": "2026-05-31",
+        "streamTitle": "【雜談】鬼轉歌回·我回來了!!!!!!!🍥｜七星ナギ・馬來西亞VTuber #雜談",
+        "videoId": "cNNPqvI-5Ow",
+        "timestamp": 9906,
+        "endTimestamp": 10165,
+        "note": ""
+      }
+    ]
+  },
+  {
     "id": "song-32ba1b20",
     "title": "Beauty and the Beast",
     "originalArtist": "Ariana Grande & John Legend",
@@ -648,6 +990,24 @@
     ]
   },
   {
+    "id": "song-335ce2f3",
+    "title": "KICKBACK (半清唱)",
+    "originalArtist": "米津玄師",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-46ba0e49",
+        "streamId": "stream-2026-06-07",
+        "date": "2026-06-07",
+        "streamTitle": "【歌雜】週日唱！還有說很多話🍥｜七星ナギ・馬來西亞VTuber #雜談",
+        "videoId": "v_eExjuwC9Y",
+        "timestamp": 6396,
+        "endTimestamp": 6578,
+        "note": ""
+      }
+    ]
+  },
+  {
     "id": "song-35dc1461",
     "title": "革命道中",
     "originalArtist": "AiNA THE END",
@@ -661,6 +1021,42 @@
         "videoId": "eluS2DmhMfY",
         "timestamp": 802,
         "endTimestamp": 994,
+        "note": ""
+      }
+    ]
+  },
+  {
+    "id": "song-366ce934",
+    "title": "ジョジョ ～その血の運命～",
+    "originalArtist": "富永TOMMY弘明",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-bbc19a06",
+        "streamId": "stream-2026-06-19",
+        "date": "2026-06-19",
+        "streamTitle": "【歌雜】點歌OK！200贊耐久！🍥｜七星ナギ・馬來西亞VTuber #雜談",
+        "videoId": "AMTtoZy_LbM",
+        "timestamp": 18221,
+        "endTimestamp": 18480,
+        "note": ""
+      }
+    ]
+  },
+  {
+    "id": "song-36a97ea4",
+    "title": "シャルル",
+    "originalArtist": "バルーン feat. flower",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-ea54627e",
+        "streamId": "stream-2026-06-05",
+        "date": "2026-06-05",
+        "streamTitle": "【歌雜】一點點唱歌很多講話🍥｜七星ナギ・馬來西亞VTuber #雜談",
+        "videoId": "ntSusuc5n-g",
+        "timestamp": 10325,
+        "endTimestamp": 10558,
         "note": ""
       }
     ]
@@ -720,6 +1116,24 @@
     ]
   },
   {
+    "id": "song-3aa2d094",
+    "title": "テオ",
+    "originalArtist": "Omoi feat. 初音ミク",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-89f4aa06",
+        "streamId": "stream-2026-06-05",
+        "date": "2026-06-05",
+        "streamTitle": "【歌雜】一點點唱歌很多講話🍥｜七星ナギ・馬來西亞VTuber #雜談",
+        "videoId": "ntSusuc5n-g",
+        "timestamp": 8903,
+        "endTimestamp": 9107,
+        "note": ""
+      }
+    ]
+  },
+  {
     "id": "song-3b167316",
     "title": "Too Much Heaven",
     "originalArtist": "Bee Gees",
@@ -769,6 +1183,24 @@
         "videoId": "cSoSm46DxN0",
         "timestamp": 3776,
         "endTimestamp": 3973,
+        "note": ""
+      }
+    ]
+  },
+  {
+    "id": "song-3b8051ad",
+    "title": "JANE DOE",
+    "originalArtist": "米津玄師, 宇多田ヒカル",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-26efb1a5",
+        "streamId": "stream-2026-06-19",
+        "date": "2026-06-19",
+        "streamTitle": "【歌雜】點歌OK！200贊耐久！🍥｜七星ナギ・馬來西亞VTuber #雜談",
+        "videoId": "AMTtoZy_LbM",
+        "timestamp": 20064,
+        "endTimestamp": 20293,
         "note": ""
       }
     ]
@@ -846,6 +1278,24 @@
     ]
   },
   {
+    "id": "song-40cda68b",
+    "title": "新時代",
+    "originalArtist": "Ado",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-08a0c494",
+        "streamId": "stream-2026-05-31",
+        "date": "2026-05-31",
+        "streamTitle": "【雜談】鬼轉歌回·我回來了!!!!!!!🍥｜七星ナギ・馬來西亞VTuber #雜談",
+        "videoId": "cNNPqvI-5Ow",
+        "timestamp": 8469,
+        "endTimestamp": 8694,
+        "note": ""
+      }
+    ]
+  },
+  {
     "id": "song-4251afdf",
     "title": "Top of the World",
     "originalArtist": "The Carpenters",
@@ -859,6 +1309,24 @@
         "videoId": "9eZ_9iarPl0",
         "timestamp": 3434,
         "endTimestamp": 3621,
+        "note": ""
+      }
+    ]
+  },
+  {
+    "id": "song-42a55f7c",
+    "title": "いけないボーダーライン",
+    "originalArtist": "ワルキューレ",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-9e480c4c",
+        "streamId": "stream-2026-06-19",
+        "date": "2026-06-19",
+        "streamTitle": "【歌雜】點歌OK！200贊耐久！🍥｜七星ナギ・馬來西亞VTuber #雜談",
+        "videoId": "AMTtoZy_LbM",
+        "timestamp": 5846,
+        "endTimestamp": 6120,
         "note": ""
       }
     ]
@@ -954,6 +1422,24 @@
     ]
   },
   {
+    "id": "song-4751c42d",
+    "title": "你不知道的事",
+    "originalArtist": "王力宏",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-c267c39d",
+        "streamId": "stream-2026-06-07",
+        "date": "2026-06-07",
+        "streamTitle": "【歌雜】週日唱！還有說很多話🍥｜七星ナギ・馬來西亞VTuber #雜談",
+        "videoId": "v_eExjuwC9Y",
+        "timestamp": 12236,
+        "endTimestamp": 12508,
+        "note": ""
+      }
+    ]
+  },
+  {
     "id": "song-47653d06",
     "title": "涙そうそう",
     "originalArtist": "夏川りみ",
@@ -1008,6 +1494,42 @@
     ]
   },
   {
+    "id": "song-48fd1eb4",
+    "title": "泡沫",
+    "originalArtist": "鄧紫棋",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-9e8ccbb1",
+        "streamId": "stream-2026-06-19",
+        "date": "2026-06-19",
+        "streamTitle": "【歌雜】點歌OK！200贊耐久！🍥｜七星ナギ・馬來西亞VTuber #雜談",
+        "videoId": "AMTtoZy_LbM",
+        "timestamp": 10571,
+        "endTimestamp": 10826,
+        "note": ""
+      }
+    ]
+  },
+  {
+    "id": "song-493a2047",
+    "title": "忘れじの言の葉",
+    "originalArtist": "安次嶺希和子",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-b6506645",
+        "streamId": "stream-2026-06-05",
+        "date": "2026-06-05",
+        "streamTitle": "【歌雜】一點點唱歌很多講話🍥｜七星ナギ・馬來西亞VTuber #雜談",
+        "videoId": "ntSusuc5n-g",
+        "timestamp": 7054,
+        "endTimestamp": 7286,
+        "note": ""
+      }
+    ]
+  },
+  {
     "id": "song-4977b70e",
     "title": "Close to you",
     "originalArtist": "niki feat. Lily",
@@ -1039,6 +1561,24 @@
         "videoId": "wqPu1pSz314",
         "timestamp": 5245,
         "endTimestamp": 5448,
+        "note": ""
+      }
+    ]
+  },
+  {
+    "id": "song-4a296762",
+    "title": "泥中に咲く",
+    "originalArtist": "ウォルピスカーター",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-92481ee2",
+        "streamId": "stream-2026-06-19",
+        "date": "2026-06-19",
+        "streamTitle": "【歌雜】點歌OK！200贊耐久！🍥｜七星ナギ・馬來西亞VTuber #雜談",
+        "videoId": "AMTtoZy_LbM",
+        "timestamp": 7180,
+        "endTimestamp": 7460,
         "note": ""
       }
     ]
@@ -1188,6 +1728,24 @@
     ]
   },
   {
+    "id": "song-5746d613",
+    "title": "何者",
+    "originalArtist": "HOYO-MiX",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-495f4f9f",
+        "streamId": "stream-2026-06-19",
+        "date": "2026-06-19",
+        "streamTitle": "【歌雜】點歌OK！200贊耐久！🍥｜七星ナギ・馬來西亞VTuber #雜談",
+        "videoId": "AMTtoZy_LbM",
+        "timestamp": 10351,
+        "endTimestamp": 10496,
+        "note": ""
+      }
+    ]
+  },
+  {
     "id": "song-574c5bc2",
     "title": "怪物",
     "originalArtist": "サカナクション",
@@ -1224,6 +1782,78 @@
     ]
   },
   {
+    "id": "song-5c32609b",
+    "title": "馬と鹿",
+    "originalArtist": "米津玄師",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-c434463d",
+        "streamId": "stream-2026-06-05",
+        "date": "2026-06-05",
+        "streamTitle": "【歌雜】一點點唱歌很多講話🍥｜七星ナギ・馬來西亞VTuber #雜談",
+        "videoId": "ntSusuc5n-g",
+        "timestamp": 4172,
+        "endTimestamp": 4444,
+        "note": ""
+      }
+    ]
+  },
+  {
+    "id": "song-5c6de38a",
+    "title": "ギターと孤独と蒼い惑星",
+    "originalArtist": "結束バンド",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-bb9053b6",
+        "streamId": "stream-2026-06-19",
+        "date": "2026-06-19",
+        "streamTitle": "【歌雜】點歌OK！200贊耐久！🍥｜七星ナギ・馬來西亞VTuber #雜談",
+        "videoId": "AMTtoZy_LbM",
+        "timestamp": 8904,
+        "endTimestamp": 9128,
+        "note": ""
+      }
+    ]
+  },
+  {
+    "id": "song-5d3d5423",
+    "title": "Prototype",
+    "originalArtist": "niki",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-b059f28b",
+        "streamId": "stream-2026-05-31",
+        "date": "2026-05-31",
+        "streamTitle": "【雜談】鬼轉歌回·我回來了!!!!!!!🍥｜七星ナギ・馬來西亞VTuber #雜談",
+        "videoId": "cNNPqvI-5Ow",
+        "timestamp": 10278,
+        "endTimestamp": 10542,
+        "note": ""
+      }
+    ]
+  },
+  {
+    "id": "song-5d80c543",
+    "title": "Avid",
+    "originalArtist": "SawanoHiroyuki[nZk]:mizuki",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-055b4ecc",
+        "streamId": "stream-2026-06-19",
+        "date": "2026-06-19",
+        "streamTitle": "【歌雜】點歌OK！200贊耐久！🍥｜七星ナギ・馬來西亞VTuber #雜談",
+        "videoId": "AMTtoZy_LbM",
+        "timestamp": 19785,
+        "endTimestamp": 20033,
+        "note": ""
+      }
+    ]
+  },
+  {
     "id": "song-5d9d00d4",
     "title": "Salamander",
     "originalArtist": "ELLEGARDEN",
@@ -1255,6 +1885,24 @@
         "videoId": "NY5AH0gZhSg",
         "timestamp": 3366,
         "endTimestamp": 3565,
+        "note": ""
+      }
+    ]
+  },
+  {
+    "id": "song-6151d984",
+    "title": "Everybody Wants To Rule The World",
+    "originalArtist": "Tears for Fears",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-70e0dc51",
+        "streamId": "stream-2026-05-31",
+        "date": "2026-05-31",
+        "streamTitle": "【雜談】鬼轉歌回·我回來了!!!!!!!🍥｜七星ナギ・馬來西亞VTuber #雜談",
+        "videoId": "cNNPqvI-5Ow",
+        "timestamp": 9204,
+        "endTimestamp": 9459,
         "note": ""
       }
     ]
@@ -1332,6 +1980,24 @@
     ]
   },
   {
+    "id": "song-641c1a60",
+    "title": "残響散歌",
+    "originalArtist": "Aimer",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-3168f4e2",
+        "streamId": "stream-2026-06-19",
+        "date": "2026-06-19",
+        "streamTitle": "【歌雜】點歌OK！200贊耐久！🍥｜七星ナギ・馬來西亞VTuber #雜談",
+        "videoId": "AMTtoZy_LbM",
+        "timestamp": 9200,
+        "endTimestamp": 9380,
+        "note": ""
+      }
+    ]
+  },
+  {
     "id": "song-668f3e2f",
     "title": "炎",
     "originalArtist": "LiSA",
@@ -1363,6 +2029,24 @@
         "videoId": "9eZ_9iarPl0",
         "timestamp": 5028,
         "endTimestamp": 5189,
+        "note": ""
+      }
+    ]
+  },
+  {
+    "id": "song-671f2258",
+    "title": "You Raise Me Up",
+    "originalArtist": "Josh Groban",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-44444e70",
+        "streamId": "stream-2026-06-19",
+        "date": "2026-06-19",
+        "streamTitle": "【歌雜】點歌OK！200贊耐久！🍥｜七星ナギ・馬來西亞VTuber #雜談",
+        "videoId": "AMTtoZy_LbM",
+        "timestamp": 17216,
+        "endTimestamp": 17478,
         "note": ""
       }
     ]
@@ -1548,6 +2232,24 @@
     ]
   },
   {
+    "id": "song-7108d845",
+    "title": "菊花台",
+    "originalArtist": "周杰",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-6111a6f6",
+        "streamId": "stream-2026-06-07",
+        "date": "2026-06-07",
+        "streamTitle": "【歌雜】週日唱！還有說很多話🍥｜七星ナギ・馬來西亞VTuber #雜談",
+        "videoId": "v_eExjuwC9Y",
+        "timestamp": 11887,
+        "endTimestamp": 12180,
+        "note": ""
+      }
+    ]
+  },
+  {
     "id": "song-718a5f1b",
     "title": "とても素敵な六月でした",
     "originalArtist": "Eight",
@@ -1620,6 +2322,24 @@
     ]
   },
   {
+    "id": "song-7390ebf3",
+    "title": "強風オールバック",
+    "originalArtist": "Yukopi feat. 歌愛ユキ",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-6a7f9c08",
+        "streamId": "stream-2026-06-05",
+        "date": "2026-06-05",
+        "streamTitle": "【歌雜】一點點唱歌很多講話🍥｜七星ナギ・馬來西亞VTuber #雜談",
+        "videoId": "ntSusuc5n-g",
+        "timestamp": 4562,
+        "endTimestamp": 4698,
+        "note": ""
+      }
+    ]
+  },
+  {
     "id": "song-759d17b8",
     "title": "Can't Help Falling in Love",
     "originalArtist": "Elvis Presley",
@@ -1633,6 +2353,60 @@
         "videoId": "qLadgrUQFWA",
         "timestamp": 1071,
         "endTimestamp": 1249,
+        "note": ""
+      }
+    ]
+  },
+  {
+    "id": "song-75ca36b0",
+    "title": "易燃易爆炸",
+    "originalArtist": "陳粒",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-577d6f36",
+        "streamId": "stream-2026-06-19",
+        "date": "2026-06-19",
+        "streamTitle": "【歌雜】點歌OK！200贊耐久！🍥｜七星ナギ・馬來西亞VTuber #雜談",
+        "videoId": "AMTtoZy_LbM",
+        "timestamp": 10873,
+        "endTimestamp": 11070,
+        "note": ""
+      }
+    ]
+  },
+  {
+    "id": "song-76382757",
+    "title": "KICKBACK",
+    "originalArtist": "米津玄師",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-e3745f1a",
+        "streamId": "stream-2026-05-31",
+        "date": "2026-05-31",
+        "streamTitle": "【雜談】鬼轉歌回·我回來了!!!!!!!🍥｜七星ナギ・馬來西亞VTuber #雜談",
+        "videoId": "cNNPqvI-5Ow",
+        "timestamp": 8180,
+        "endTimestamp": 8371,
+        "note": ""
+      }
+    ]
+  },
+  {
+    "id": "song-767354d2",
+    "title": "體面",
+    "originalArtist": "于文文",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-ee43092a",
+        "streamId": "stream-2026-06-07",
+        "date": "2026-06-07",
+        "streamTitle": "【歌雜】週日唱！還有說很多話🍥｜七星ナギ・馬來西亞VTuber #雜談",
+        "videoId": "v_eExjuwC9Y",
+        "timestamp": 8934,
+        "endTimestamp": 9210,
         "note": ""
       }
     ]
@@ -1746,6 +2520,24 @@
     ]
   },
   {
+    "id": "song-7ac9b28b",
+    "title": "ミカヅキ",
+    "originalArtist": "さユり",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-8f169d60",
+        "streamId": "stream-2026-06-07",
+        "date": "2026-06-07",
+        "streamTitle": "【歌雜】週日唱！還有說很多話🍥｜七星ナギ・馬來西亞VTuber #雜談",
+        "videoId": "v_eExjuwC9Y",
+        "timestamp": 7505,
+        "endTimestamp": 7763,
+        "note": ""
+      }
+    ]
+  },
+  {
     "id": "song-7c425d2f",
     "title": "メフィスト",
     "originalArtist": "女王蜂",
@@ -1759,6 +2551,24 @@
         "videoId": "N90ZTiqxTIw",
         "timestamp": 4425,
         "endTimestamp": 4650,
+        "note": ""
+      }
+    ]
+  },
+  {
+    "id": "song-7ceb67bd",
+    "title": "寂寞寂寞就好",
+    "originalArtist": "田馥甄",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-948dc3e4",
+        "streamId": "stream-2026-06-07",
+        "date": "2026-06-07",
+        "streamTitle": "【歌雜】週日唱！還有說很多話🍥｜七星ナギ・馬來西亞VTuber #雜談",
+        "videoId": "v_eExjuwC9Y",
+        "timestamp": 8324,
+        "endTimestamp": 8586,
         "note": ""
       }
     ]
@@ -1795,6 +2605,24 @@
         "videoId": "hRWW0XQnDAk",
         "timestamp": 11191,
         "endTimestamp": 11385,
+        "note": ""
+      }
+    ]
+  },
+  {
+    "id": "song-7f2e555e",
+    "title": "only my railgun",
+    "originalArtist": "fripSide",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-560a2900",
+        "streamId": "stream-2026-06-07",
+        "date": "2026-06-07",
+        "streamTitle": "【歌雜】週日唱！還有說很多話🍥｜七星ナギ・馬來西亞VTuber #雜談",
+        "videoId": "v_eExjuwC9Y",
+        "timestamp": 6730,
+        "endTimestamp": 6978,
         "note": ""
       }
     ]
@@ -1998,6 +2826,24 @@
     ]
   },
   {
+    "id": "song-8ed22fee",
+    "title": "ただ声一つ",
+    "originalArtist": "ロクデナシ",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-15e4555b",
+        "streamId": "stream-2026-06-07",
+        "date": "2026-06-07",
+        "streamTitle": "【歌雜】週日唱！還有說很多話🍥｜七星ナギ・馬來西亞VTuber #雜談",
+        "videoId": "v_eExjuwC9Y",
+        "timestamp": 7085,
+        "endTimestamp": 7242,
+        "note": ""
+      }
+    ]
+  },
+  {
     "id": "song-8edf3b4f",
     "title": "We Are Xros Heart!",
     "originalArtist": "和田光司",
@@ -2011,6 +2857,24 @@
         "videoId": "qLadgrUQFWA",
         "timestamp": 4563,
         "endTimestamp": 4787,
+        "note": ""
+      }
+    ]
+  },
+  {
+    "id": "song-8fc9d4a3",
+    "title": "可愛くてごめん",
+    "originalArtist": "HoneyWorks",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-d29aa5cd",
+        "streamId": "stream-2026-06-19",
+        "date": "2026-06-19",
+        "streamTitle": "【歌雜】點歌OK！200贊耐久！🍥｜七星ナギ・馬來西亞VTuber #雜談",
+        "videoId": "AMTtoZy_LbM",
+        "timestamp": 20421,
+        "endTimestamp": 20636,
         "note": ""
       }
     ]
@@ -2088,6 +2952,24 @@
     ]
   },
   {
+    "id": "song-97f8df3e",
+    "title": "遇見",
+    "originalArtist": "孫燕姿",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-7999d2bb",
+        "streamId": "stream-2026-06-07",
+        "date": "2026-06-07",
+        "streamTitle": "【歌雜】週日唱！還有說很多話🍥｜七星ナギ・馬來西亞VTuber #雜談",
+        "videoId": "v_eExjuwC9Y",
+        "timestamp": 11334,
+        "endTimestamp": 11529,
+        "note": ""
+      }
+    ]
+  },
+  {
     "id": "song-9ac272c6",
     "title": "Mighty Long Fall",
     "originalArtist": "ONE OK ROCK",
@@ -2160,6 +3042,24 @@
     ]
   },
   {
+    "id": "song-9e3558fd",
+    "title": "晴る",
+    "originalArtist": "ヨルシカ",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-b4b4ee1b",
+        "streamId": "stream-2026-06-19",
+        "date": "2026-06-19",
+        "streamTitle": "【歌雜】點歌OK！200贊耐久！🍥｜七星ナギ・馬來西亞VTuber #雜談",
+        "videoId": "AMTtoZy_LbM",
+        "timestamp": 19120,
+        "endTimestamp": 19389,
+        "note": ""
+      }
+    ]
+  },
+  {
     "id": "song-9f5bf6f5",
     "title": "海の幽霊",
     "originalArtist": "米津玄師",
@@ -2196,6 +3096,24 @@
     ]
   },
   {
+    "id": "song-a0e5c2fa",
+    "title": "テオ",
+    "originalArtist": "Omoi feat. 初音ミク",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-7c5f2d76",
+        "streamId": "stream-2026-06-05",
+        "date": "2026-06-05",
+        "streamTitle": "【歌雜】一點點唱歌很多講話🍥｜七星ナギ・馬來西亞VTuber #雜談",
+        "videoId": "ntSusuc5n-g",
+        "timestamp": 9216,
+        "endTimestamp": 9420,
+        "note": ""
+      }
+    ]
+  },
+  {
     "id": "song-a10e464f",
     "title": "NOT CUTE ANYMORE",
     "originalArtist": "ILLIT",
@@ -2209,6 +3127,42 @@
         "videoId": "9eZ_9iarPl0",
         "timestamp": 5878,
         "endTimestamp": 6007,
+        "note": ""
+      }
+    ]
+  },
+  {
+    "id": "song-a23ff5bf",
+    "title": "難得孤寂",
+    "originalArtist": "A-Lin",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-14b9e9cc",
+        "streamId": "stream-2026-06-07",
+        "date": "2026-06-07",
+        "streamTitle": "【歌雜】週日唱！還有說很多話🍥｜七星ナギ・馬來西亞VTuber #雜談",
+        "videoId": "v_eExjuwC9Y",
+        "timestamp": 11010,
+        "endTimestamp": 11261,
+        "note": ""
+      }
+    ]
+  },
+  {
+    "id": "song-a29c9f75",
+    "title": "沒那麽簡單",
+    "originalArtist": "黃小琥",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-e3e6cb7f",
+        "streamId": "stream-2026-06-19",
+        "date": "2026-06-19",
+        "streamTitle": "【歌雜】點歌OK！200贊耐久！🍥｜七星ナギ・馬來西亞VTuber #雜談",
+        "videoId": "AMTtoZy_LbM",
+        "timestamp": 11569,
+        "endTimestamp": 11872,
         "note": ""
       }
     ]
@@ -2304,6 +3258,24 @@
     ]
   },
   {
+    "id": "song-a7dd4755",
+    "title": "踮起脚尖愛",
+    "originalArtist": "洪佩瑜",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-649a11a2",
+        "streamId": "stream-2026-06-07",
+        "date": "2026-06-07",
+        "streamTitle": "【歌雜】週日唱！還有說很多話🍥｜七星ナギ・馬來西亞VTuber #雜談",
+        "videoId": "v_eExjuwC9Y",
+        "timestamp": 7827,
+        "endTimestamp": 8103,
+        "note": ""
+      }
+    ]
+  },
+  {
     "id": "song-a8c0f510",
     "title": "アイドル (Metal ver.)",
     "originalArtist": "YOASOBI",
@@ -2335,6 +3307,42 @@
         "videoId": "cSoSm46DxN0",
         "timestamp": 3405,
         "endTimestamp": 3657,
+        "note": ""
+      }
+    ]
+  },
+  {
+    "id": "song-aa991e09",
+    "title": "unlasting",
+    "originalArtist": "LiSA",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-677875dd",
+        "streamId": "stream-2026-06-19",
+        "date": "2026-06-19",
+        "streamTitle": "【歌雜】點歌OK！200贊耐久！🍥｜七星ナギ・馬來西亞VTuber #雜談",
+        "videoId": "AMTtoZy_LbM",
+        "timestamp": 7548,
+        "endTimestamp": 7838,
+        "note": ""
+      }
+    ]
+  },
+  {
+    "id": "song-ab51e993",
+    "title": "magnet -recall-",
+    "originalArtist": "湊貴大 feat. 初音ミク, 巡音ルカ",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-f7125241",
+        "streamId": "stream-2026-06-05",
+        "date": "2026-06-05",
+        "streamTitle": "【歌雜】一點點唱歌很多講話🍥｜七星ナギ・馬來西亞VTuber #雜談",
+        "videoId": "ntSusuc5n-g",
+        "timestamp": 9811,
+        "endTimestamp": 10048,
         "note": ""
       }
     ]
@@ -2502,6 +3510,24 @@
     ]
   },
   {
+    "id": "song-b58a9d54",
+    "title": "冬眠",
+    "originalArtist": "司南",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-5ab8dbc8",
+        "streamId": "stream-2026-06-07",
+        "date": "2026-06-07",
+        "streamTitle": "【歌雜】週日唱！還有說很多話🍥｜七星ナギ・馬來西亞VTuber #雜談",
+        "videoId": "v_eExjuwC9Y",
+        "timestamp": 13639,
+        "endTimestamp": 13904,
+        "note": ""
+      }
+    ]
+  },
+  {
     "id": "song-b8037097",
     "title": "東京サマーセッション",
     "originalArtist": "HoneyWorks",
@@ -2515,6 +3541,24 @@
         "videoId": "Q3qcyO9t3TQ",
         "timestamp": 7620,
         "endTimestamp": 7844,
+        "note": ""
+      }
+    ]
+  },
+  {
+    "id": "song-b824713c",
+    "title": "剛好遇見你",
+    "originalArtist": "李玉剛",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-4609a6ee",
+        "streamId": "stream-2026-06-19",
+        "date": "2026-06-19",
+        "streamTitle": "【歌雜】點歌OK！200贊耐久！🍥｜七星ナギ・馬來西亞VTuber #雜談",
+        "videoId": "AMTtoZy_LbM",
+        "timestamp": 6618,
+        "endTimestamp": 6812,
         "note": ""
       }
     ]
@@ -2569,6 +3613,24 @@
         "videoId": "eluS2DmhMfY",
         "timestamp": 3629,
         "endTimestamp": 3860,
+        "note": ""
+      }
+    ]
+  },
+  {
+    "id": "song-bce6eeb8",
+    "title": "DARKHERO",
+    "originalArtist": "Sumia feat. 星界",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-afb78bd7",
+        "streamId": "stream-2026-05-31",
+        "date": "2026-05-31",
+        "streamTitle": "【雜談】鬼轉歌回·我回來了!!!!!!!🍥｜七星ナギ・馬來西亞VTuber #雜談",
+        "videoId": "cNNPqvI-5Ow",
+        "timestamp": 12687,
+        "endTimestamp": 12828,
         "note": ""
       }
     ]
@@ -2664,6 +3726,42 @@
     ]
   },
   {
+    "id": "song-bed04e16",
+    "title": "Lydia",
+    "originalArtist": "飛兒樂團",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-281891c7",
+        "streamId": "stream-2026-06-19",
+        "date": "2026-06-19",
+        "streamTitle": "【歌雜】點歌OK！200贊耐久！🍥｜七星ナギ・馬來西亞VTuber #雜談",
+        "videoId": "AMTtoZy_LbM",
+        "timestamp": 9689,
+        "endTimestamp": 9924,
+        "note": ""
+      }
+    ]
+  },
+  {
+    "id": "song-bf278ff0",
+    "title": "God sees all",
+    "originalArtist": "Ethyria",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-549eded3",
+        "streamId": "stream-2026-05-31",
+        "date": "2026-05-31",
+        "streamTitle": "【雜談】鬼轉歌回·我回來了!!!!!!!🍥｜七星ナギ・馬來西亞VTuber #雜談",
+        "videoId": "cNNPqvI-5Ow",
+        "timestamp": 12304,
+        "endTimestamp": 12497,
+        "note": ""
+      }
+    ]
+  },
+  {
     "id": "song-bf2db26b",
     "title": "Teeth",
     "originalArtist": "5 Seconds of Summer",
@@ -2713,6 +3811,60 @@
         "videoId": "NY5AH0gZhSg",
         "timestamp": 6502,
         "endTimestamp": 6654,
+        "note": ""
+      }
+    ]
+  },
+  {
+    "id": "song-c1cd8fbb",
+    "title": "下一個天亮",
+    "originalArtist": "郭靜",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-dd688835",
+        "streamId": "stream-2026-06-07",
+        "date": "2026-06-07",
+        "streamTitle": "【歌雜】週日唱！還有說很多話🍥｜七星ナギ・馬來西亞VTuber #雜談",
+        "videoId": "v_eExjuwC9Y",
+        "timestamp": 10315,
+        "endTimestamp": 10561,
+        "note": ""
+      }
+    ]
+  },
+  {
+    "id": "song-c3a2335d",
+    "title": "ハッピーラッキーチャッピー",
+    "originalArtist": "ano",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-7caa8d0a",
+        "streamId": "stream-2026-06-07",
+        "date": "2026-06-07",
+        "streamTitle": "【歌雜】週日唱！還有說很多話🍥｜七星ナギ・馬來西亞VTuber #雜談",
+        "videoId": "v_eExjuwC9Y",
+        "timestamp": 6121,
+        "endTimestamp": 6308,
+        "note": ""
+      }
+    ]
+  },
+  {
+    "id": "song-c5698dc1",
+    "title": "ボッカデラベリタ",
+    "originalArtist": "柊キライ",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-916ac9c4",
+        "streamId": "stream-2026-05-31",
+        "date": "2026-05-31",
+        "streamTitle": "【雜談】鬼轉歌回·我回來了!!!!!!!🍥｜七星ナギ・馬來西亞VTuber #雜談",
+        "videoId": "cNNPqvI-5Ow",
+        "timestamp": 11362,
+        "endTimestamp": 11565,
         "note": ""
       }
     ]
@@ -2790,6 +3942,42 @@
     ]
   },
   {
+    "id": "song-ca204e66",
+    "title": "crossing field",
+    "originalArtist": "LiSA",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-bc20c866",
+        "streamId": "stream-2026-06-19",
+        "date": "2026-06-19",
+        "streamTitle": "【歌雜】點歌OK！200贊耐久！🍥｜七星ナギ・馬來西亞VTuber #雜談",
+        "videoId": "AMTtoZy_LbM",
+        "timestamp": 17831,
+        "endTimestamp": 18074,
+        "note": ""
+      }
+    ]
+  },
+  {
+    "id": "song-ca9f655a",
+    "title": "革命道中",
+    "originalArtist": "AiNA THE END",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-2f44ba76",
+        "streamId": "stream-2026-05-31",
+        "date": "2026-05-31",
+        "streamTitle": "【雜談】鬼轉歌回·我回來了!!!!!!!🍥｜七星ナギ・馬來西亞VTuber #雜談",
+        "videoId": "cNNPqvI-5Ow",
+        "timestamp": 11599,
+        "endTimestamp": 11794,
+        "note": ""
+      }
+    ]
+  },
+  {
     "id": "song-cd1119ea",
     "title": "聞こえますか",
     "originalArtist": "HoneyWorks",
@@ -2839,6 +4027,42 @@
         "videoId": "ELxjiBbpB_E",
         "timestamp": 9502,
         "endTimestamp": 9734,
+        "note": ""
+      }
+    ]
+  },
+  {
+    "id": "song-cf1c2f9a",
+    "title": "Bohemian Rhapsody",
+    "originalArtist": "Queen",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-5ab100f6",
+        "streamId": "stream-2026-05-31",
+        "date": "2026-05-31",
+        "streamTitle": "【雜談】鬼轉歌回·我回來了!!!!!!!🍥｜七星ナギ・馬來西亞VTuber #雜談",
+        "videoId": "cNNPqvI-5Ow",
+        "timestamp": 8792,
+        "endTimestamp": 9133,
+        "note": ""
+      }
+    ]
+  },
+  {
+    "id": "song-d04b64c9",
+    "title": "Proi Proi",
+    "originalArtist": "HOYO-MiX & NIDA",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-8b89f409",
+        "streamId": "stream-2026-06-19",
+        "date": "2026-06-19",
+        "streamTitle": "【歌雜】點歌OK！200贊耐久！🍥｜七星ナギ・馬來西亞VTuber #雜談",
+        "videoId": "AMTtoZy_LbM",
+        "timestamp": 10044,
+        "endTimestamp": 10276,
         "note": ""
       }
     ]
@@ -2916,6 +4140,24 @@
     ]
   },
   {
+    "id": "song-d3dbcb0e",
+    "title": "ファンサ",
+    "originalArtist": "mona (CV.夏川椎菜)",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-28369b98",
+        "streamId": "stream-2026-06-19",
+        "date": "2026-06-19",
+        "streamTitle": "【歌雜】點歌OK！200贊耐久！🍥｜七星ナギ・馬來西亞VTuber #雜談",
+        "videoId": "AMTtoZy_LbM",
+        "timestamp": 6223,
+        "endTimestamp": 6471,
+        "note": ""
+      }
+    ]
+  },
+  {
     "id": "song-d4578cb4",
     "title": "Amazing Grace",
     "originalArtist": "Chris Tomlin",
@@ -2947,6 +4189,42 @@
         "videoId": "eluS2DmhMfY",
         "timestamp": 1961,
         "endTimestamp": 2283,
+        "note": ""
+      }
+    ]
+  },
+  {
+    "id": "song-d53ec206",
+    "title": "エルの楽園 [→ side:A →]",
+    "originalArtist": "Sound Horizon",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-40a74f7c",
+        "streamId": "stream-2026-06-19",
+        "date": "2026-06-19",
+        "streamTitle": "【歌雜】點歌OK！200贊耐久！🍥｜七星ナギ・馬來西亞VTuber #雜談",
+        "videoId": "AMTtoZy_LbM",
+        "timestamp": 18621,
+        "endTimestamp": 18915,
+        "note": ""
+      }
+    ]
+  },
+  {
+    "id": "song-d5d3fec6",
+    "title": "心拍数♯0822",
+    "originalArtist": "蝶々P feat. 初音ミク",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-325106a4",
+        "streamId": "stream-2026-06-19",
+        "date": "2026-06-19",
+        "streamTitle": "【歌雜】點歌OK！200贊耐久！🍥｜七星ナギ・馬來西亞VTuber #雜談",
+        "videoId": "AMTtoZy_LbM",
+        "timestamp": 8504,
+        "endTimestamp": 8807,
         "note": ""
       }
     ]
@@ -3060,6 +4338,24 @@
     ]
   },
   {
+    "id": "song-dc329181",
+    "title": "Hearts",
+    "originalArtist": "niki",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-288173e6",
+        "streamId": "stream-2026-05-31",
+        "date": "2026-05-31",
+        "streamTitle": "【雜談】鬼轉歌回·我回來了!!!!!!!🍥｜七星ナギ・馬來西亞VTuber #雜談",
+        "videoId": "cNNPqvI-5Ow",
+        "timestamp": 10586,
+        "endTimestamp": 10805,
+        "note": ""
+      }
+    ]
+  },
+  {
     "id": "song-dd6972dd",
     "title": "ゴーストルール",
     "originalArtist": "DECO*27 feat. 初音ミク",
@@ -3168,6 +4464,42 @@
     ]
   },
   {
+    "id": "song-e4d3009d",
+    "title": "説散就散",
+    "originalArtist": "JC 陳詠桐",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-24784289",
+        "streamId": "stream-2026-06-07",
+        "date": "2026-06-07",
+        "streamTitle": "【歌雜】週日唱！還有說很多話🍥｜七星ナギ・馬來西亞VTuber #雜談",
+        "videoId": "v_eExjuwC9Y",
+        "timestamp": 8683,
+        "endTimestamp": 8901,
+        "note": ""
+      }
+    ]
+  },
+  {
+    "id": "song-e5c2adf3",
+    "title": "花に亡霊",
+    "originalArtist": "ヨルシカ",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-c8743cb8",
+        "streamId": "stream-2026-06-05",
+        "date": "2026-06-05",
+        "streamTitle": "【歌雜】一點點唱歌很多講話🍥｜七星ナギ・馬來西亞VTuber #雜談",
+        "videoId": "ntSusuc5n-g",
+        "timestamp": 5929,
+        "endTimestamp": 6178,
+        "note": ""
+      }
+    ]
+  },
+  {
     "id": "song-e5f1bfc5",
     "title": "とても素敵な六月でした",
     "originalArtist": "Eight",
@@ -3204,6 +4536,24 @@
     ]
   },
   {
+    "id": "song-e8caae3f",
+    "title": "アイドル",
+    "originalArtist": "YOASOBI",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-210b4616",
+        "streamId": "stream-2026-06-05",
+        "date": "2026-06-05",
+        "streamTitle": "【歌雜】一點點唱歌很多講話🍥｜七星ナギ・馬來西亞VTuber #雜談",
+        "videoId": "ntSusuc5n-g",
+        "timestamp": 6402,
+        "endTimestamp": 6615,
+        "note": ""
+      }
+    ]
+  },
+  {
     "id": "song-eb8f2b20",
     "title": "Prototype (清唱)",
     "originalArtist": "niki",
@@ -3235,6 +4585,24 @@
         "videoId": "wqPu1pSz314",
         "timestamp": 8395,
         "endTimestamp": 8611,
+        "note": ""
+      }
+    ]
+  },
+  {
+    "id": "song-ee437058",
+    "title": "青花瓷",
+    "originalArtist": "周杰倫",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-c88a65ca",
+        "streamId": "stream-2026-06-07",
+        "date": "2026-06-07",
+        "streamTitle": "【歌雜】週日唱！還有說很多話🍥｜七星ナギ・馬來西亞VTuber #雜談",
+        "videoId": "v_eExjuwC9Y",
+        "timestamp": 12716,
+        "endTimestamp": 12949,
         "note": ""
       }
     ]
@@ -3505,6 +4873,24 @@
         "videoId": "Q3qcyO9t3TQ",
         "timestamp": 6471,
         "endTimestamp": 6706,
+        "note": ""
+      }
+    ]
+  },
+  {
+    "id": "song-ffce0558",
+    "title": "神っぽいな",
+    "originalArtist": "ピノキオピー feat. 初音ミク",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-770527c6",
+        "streamId": "stream-2026-06-05",
+        "date": "2026-06-05",
+        "streamTitle": "【歌雜】一點點唱歌很多講話🍥｜七星ナギ・馬來西亞VTuber #雜談",
+        "videoId": "ntSusuc5n-g",
+        "timestamp": 8356,
+        "endTimestamp": 8559,
         "note": ""
       }
     ]
