@@ -744,6 +744,33 @@
       "enabled": true
     },
     {
+      "slug": "raimuminto",
+      "displayName": "萊姆薄荷 Raimu Minto Ch",
+      "description": "搭家豪💚這邊是BO荷🌱\n是可愛的金吉拉💖\n喜歡迷因🌝寫字🖊️興趣是畫圖\n很喜歡小番茄🍅跟芭樂汁💚\n希望可以成為你們心中的小太陽☀️\n主要在YT直播雜談、企劃、台詞回、歌回✨\n多種形態任你選擇🥰一頻道多個推\n喜歡蘿莉、姐姐、貓咪、婆婆...都歡迎乃認識窩💚",
+      "avatarUrl": "https://yt3.ggpht.com/2_CpHCrwr8Yw3R5_6R1xNDdwYCejSwtMLTeiK3EtxEK875wS_TnWFavqIchBT46DzwlG5U-dYA=s240-c-k-c0x00ffffff-no-rj",
+      "brandName": "RaimuMintoPrism",
+      "subscriberCount": "4.1萬",
+      "group": "個人勢",
+      "socialLinks": {
+        "youtube": "https://youtube.com/channel/UCwAUQdBH_rg9SYjrydUj-dQ?si=AbDrIBHb-i7jrcIg"
+      },
+      "theme": {
+        "accentPrimary": "#EC4899",
+        "accentPrimaryDark": "#DB2777",
+        "accentPrimaryLight": "#F472B6",
+        "accentSecondary": "#3B82F6",
+        "accentSecondaryLight": "#60A5FA",
+        "bgPageStart": "#FFF0F5",
+        "bgPageMid": "#F0F8FF",
+        "bgPageEnd": "#E6E6FA",
+        "bgAccentPrimary": "#FDF2F8",
+        "bgAccentPrimaryMuted": "#FCE7F3",
+        "borderAccentPrimary": "#FBCFE8",
+        "borderAccentSecondary": "#BFDBFE"
+      },
+      "enabled": true
+    },
+    {
       "slug": "rei",
       "displayName": "澪Rei",
       "description": "我是子午計畫【霓NEO(n)】所屬的VTuber！\n歌勢Vtuber，就讀冰霜魔法學系的小狸貓，能夠變身成不同事物，主要在Youtube上進行直播。\n聲音有著療癒人心的能力，空靈的歌聲會讓人暫時忘記煩惱；有些笨拙的個性更為大家帶來許多意想不到的歡笑。",
