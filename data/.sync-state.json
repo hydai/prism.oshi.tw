@@ -218,13 +218,13 @@
       "streamsCount": 1
     },
     "raimuminto": {
-      "lastSyncedAt": null,
-      "maxSongUpdatedAt": null,
-      "maxPerfUpdatedAt": null,
-      "maxStreamUpdatedAt": null,
-      "songsCount": 0,
-      "performancesCount": 0,
-      "streamsCount": 0
+      "lastSyncedAt": "2026-06-24T04:16:24.399Z",
+      "maxSongUpdatedAt": "2026-06-24 04:14:52",
+      "maxPerfUpdatedAt": "2026-06-24 04:14:52",
+      "maxStreamUpdatedAt": "2026-06-24 04:14:52",
+      "songsCount": 2,
+      "performancesCount": 2,
+      "streamsCount": 2
     },
     "rei": {
       "lastSyncedAt": "2026-04-19T11:29:00.977Z",
