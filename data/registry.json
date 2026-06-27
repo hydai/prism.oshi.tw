@@ -451,6 +451,35 @@
       "enabled": true
     },
     {
+      "slug": "laphria",
+      "displayName": "Laphria ch. 拉斐利婭",
+      "description": "⚛︎ 𝘗𝘢𝘳𝘢≠𝘥𝘰𝘹 ∞ 𝘓𝘢𝘱𝘭𝘢𝘤𝘦ᐟ𝘴 𝘋𝘦𝘮𝘰𝘯 ∞ 𝘚𝘱𝘳𝘪𝘯𝘨𝘧𝘪𝘴𝘩 ⚛︎\n沿著運動軌跡，看見與你們共度的未來♡",
+      "avatarUrl": "https://yt3.ggpht.com/u0r2fWNl-pEGIyNHfFMESKyD50_PtpO8-FMXImOLUggkU_jCPbBJQb2EpVM2x3uyMmyNRNi-=s240-c-k-c0x00ffffff-no-rj",
+      "brandName": "Laphria",
+      "subscriberCount": "6.32萬",
+      "group": "春魚創意",
+      "socialLinks": {
+        "youtube": "https://www.youtube.com/@Laphria.Paradox",
+        "twitter": "https://x.com/Laphria_paradox",
+        "twitch": "https://www.twitch.tv/laphria_paradox"
+      },
+      "theme": {
+        "accentPrimary": "#EC4899",
+        "accentPrimaryDark": "#DB2777",
+        "accentPrimaryLight": "#F472B6",
+        "accentSecondary": "#3B82F6",
+        "accentSecondaryLight": "#60A5FA",
+        "bgPageStart": "#FFF0F5",
+        "bgPageMid": "#F0F8FF",
+        "bgPageEnd": "#E6E6FA",
+        "bgAccentPrimary": "#FDF2F8",
+        "bgAccentPrimaryMuted": "#FCE7F3",
+        "borderAccentPrimary": "#FBCFE8",
+        "borderAccentSecondary": "#BFDBFE"
+      },
+      "enabled": true
+    },
+    {
       "slug": "lilylinglan",
       "displayName": "森森鈴蘭",
       "description": "來自東方的魔女，喜歡唱歌的一隻狼",
