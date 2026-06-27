@@ -118,6 +118,15 @@
       "performancesCount": 9,
       "streamsCount": 1
     },
+    "laphria": {
+      "lastSyncedAt": null,
+      "maxSongUpdatedAt": null,
+      "maxPerfUpdatedAt": null,
+      "maxStreamUpdatedAt": null,
+      "songsCount": 0,
+      "performancesCount": 0,
+      "streamsCount": 0
+    },
     "lilylinglan": {
       "lastSyncedAt": "2026-04-19T11:28:17.060Z",
       "maxSongUpdatedAt": null,
