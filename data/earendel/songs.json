@@ -1,5 +1,23 @@
 [
   {
+    "id": "song-004ca1ca",
+    "title": "Remember",
+    "originalArtist": "月見ヤチヨ(CV.早見沙織)",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-85d0050d",
+        "streamId": "stream-2026-05-29",
+        "date": "2026-05-29",
+        "streamTitle": "【倫家想唱歌】願意來聽一首歌嗎！一起享受周五晚上的時間吧！✨一曲聴きませんか？金曜日の夜を一緒に楽しみましょう！✨   ░ 歌枠｜Singing Stream　#karaoke #shorts",
+        "videoId": "IVlHQ7Xn-pQ",
+        "timestamp": 1585,
+        "endTimestamp": 1815,
+        "note": ""
+      }
+    ]
+  },
+  {
     "id": "song-0113df26",
     "title": "錦鯉抄 雲の泣",
     "originalArtist": "銀臨",
@@ -31,6 +49,24 @@
         "videoId": "zlRzb3iDgn4",
         "timestamp": 6819,
         "endTimestamp": 7081,
+        "note": ""
+      }
+    ]
+  },
+  {
+    "id": "song-03a0f792",
+    "title": "追追追",
+    "originalArtist": "黃妃",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-28de9eab",
+        "streamId": "stream-2026-05-27",
+        "date": "2026-05-27",
+        "streamTitle": "【暖場歌回】竟然有怪怪生化人助陣！挑戰丟掉包袱嗨起來！！！ !   @Cetro.Timaeus 　░ 合唱歌回｜Singing Stream",
+        "videoId": "gYOqDomZj48",
+        "timestamp": 1662,
+        "endTimestamp": 1943,
         "note": ""
       }
     ]
@@ -180,6 +216,24 @@
     ]
   },
   {
+    "id": "song-09aaca44",
+    "title": "晴る",
+    "originalArtist": "ヨルシカ",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-7f61472c",
+        "streamId": "stream-2026-05-29",
+        "date": "2026-05-29",
+        "streamTitle": "【倫家想唱歌】願意來聽一首歌嗎！一起享受周五晚上的時間吧！✨一曲聴きませんか？金曜日の夜を一緒に楽しみましょう！✨   ░ 歌枠｜Singing Stream　#karaoke #shorts",
+        "videoId": "IVlHQ7Xn-pQ",
+        "timestamp": 6270,
+        "endTimestamp": 6541,
+        "note": ""
+      }
+    ]
+  },
+  {
     "id": "song-0bb0b376",
     "title": "小さな祈り",
     "originalArtist": "岡崎律子",
@@ -283,6 +337,24 @@
         "videoId": "Fq2wuNB-E7c",
         "timestamp": 672,
         "endTimestamp": 951,
+        "note": ""
+      }
+    ]
+  },
+  {
+    "id": "song-11f89711",
+    "title": "Wherever You Are",
+    "originalArtist": "ONE OK ROCK",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-4443d3d2",
+        "streamId": "stream-2026-05-27",
+        "date": "2026-05-27",
+        "streamTitle": "【暖場歌回】竟然有怪怪生化人助陣！挑戰丟掉包袱嗨起來！！！ !   @Cetro.Timaeus 　░ 合唱歌回｜Singing Stream",
+        "videoId": "gYOqDomZj48",
+        "timestamp": 4653,
+        "endTimestamp": 4943,
         "note": ""
       }
     ]
@@ -463,6 +535,24 @@
         "videoId": "IVfl4IDi0co",
         "timestamp": 9694,
         "endTimestamp": 9991,
+        "note": ""
+      }
+    ]
+  },
+  {
+    "id": "song-167fbcff",
+    "title": "超跑情人夢",
+    "originalArtist": "卜學亮",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-4ac4bb4a",
+        "streamId": "stream-2026-05-27",
+        "date": "2026-05-27",
+        "streamTitle": "【暖場歌回】竟然有怪怪生化人助陣！挑戰丟掉包袱嗨起來！！！ !   @Cetro.Timaeus 　░ 合唱歌回｜Singing Stream",
+        "videoId": "gYOqDomZj48",
+        "timestamp": 1234,
+        "endTimestamp": 1475,
         "note": ""
       }
     ]
@@ -1044,6 +1134,24 @@
     ]
   },
   {
+    "id": "song-3b3c3b10",
+    "title": "扉をあけて",
+    "originalArtist": "ANZA",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-b4678869",
+        "streamId": "stream-2026-05-29",
+        "date": "2026-05-29",
+        "streamTitle": "【倫家想唱歌】願意來聽一首歌嗎！一起享受周五晚上的時間吧！✨一曲聴きませんか？金曜日の夜を一緒に楽しみましょう！✨   ░ 歌枠｜Singing Stream　#karaoke #shorts",
+        "videoId": "IVlHQ7Xn-pQ",
+        "timestamp": 7171,
+        "endTimestamp": 7452,
+        "note": ""
+      }
+    ]
+  },
+  {
     "id": "song-3b8c1aa4",
     "title": "有一種悲傷",
     "originalArtist": "A-Lin",
@@ -1345,6 +1453,24 @@
         "videoId": "NJ6jZdviv5M",
         "timestamp": 2072,
         "endTimestamp": 2297,
+        "note": ""
+      }
+    ]
+  },
+  {
+    "id": "song-4d005950",
+    "title": "Reply",
+    "originalArtist": "かぐや(CV.夏吉ゆうこ)",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-a756b195",
+        "streamId": "stream-2026-05-29",
+        "date": "2026-05-29",
+        "streamTitle": "【倫家想唱歌】願意來聽一首歌嗎！一起享受周五晚上的時間吧！✨一曲聴きませんか？金曜日の夜を一緒に楽しみましょう！✨   ░ 歌枠｜Singing Stream　#karaoke #shorts",
+        "videoId": "IVlHQ7Xn-pQ",
+        "timestamp": 1908,
+        "endTimestamp": 2175,
         "note": ""
       }
     ]
@@ -1764,6 +1890,42 @@
     ]
   },
   {
+    "id": "song-697fab33",
+    "title": "プラチナ",
+    "originalArtist": "坂本真綾",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-3ffcb8b2",
+        "streamId": "stream-2026-05-29",
+        "date": "2026-05-29",
+        "streamTitle": "【倫家想唱歌】願意來聽一首歌嗎！一起享受周五晚上的時間吧！✨一曲聴きませんか？金曜日の夜を一緒に楽しみましょう！✨   ░ 歌枠｜Singing Stream　#karaoke #shorts",
+        "videoId": "IVlHQ7Xn-pQ",
+        "timestamp": 6821,
+        "endTimestamp": 7070,
+        "note": ""
+      }
+    ]
+  },
+  {
+    "id": "song-69bff3ac",
+    "title": "The Fox",
+    "originalArtist": "Ylvis",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-d660990a",
+        "streamId": "stream-2026-05-27",
+        "date": "2026-05-27",
+        "streamTitle": "【暖場歌回】竟然有怪怪生化人助陣！挑戰丟掉包袱嗨起來！！！ !   @Cetro.Timaeus 　░ 合唱歌回｜Singing Stream",
+        "videoId": "gYOqDomZj48",
+        "timestamp": 5022,
+        "endTimestamp": 5382,
+        "note": ""
+      }
+    ]
+  },
+  {
     "id": "song-69ea6460",
     "title": "你不必那麼堅強",
     "originalArtist": "貝克小姐",
@@ -1962,6 +2124,24 @@
     ]
   },
   {
+    "id": "song-73e6cf1c",
+    "title": "ウィーアー!",
+    "originalArtist": "北谷洋",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-1cc94c8f",
+        "streamId": "stream-2026-05-29",
+        "date": "2026-05-29",
+        "streamTitle": "【倫家想唱歌】願意來聽一首歌嗎！一起享受周五晚上的時間吧！✨一曲聴きませんか？金曜日の夜を一緒に楽しみましょう！✨   ░ 歌枠｜Singing Stream　#karaoke #shorts",
+        "videoId": "IVlHQ7Xn-pQ",
+        "timestamp": 4352,
+        "endTimestamp": 4592,
+        "note": ""
+      }
+    ]
+  },
+  {
     "id": "song-741dca3e",
     "title": "crack",
     "originalArtist": "keeno feat. 初音ミク",
@@ -2070,6 +2250,24 @@
     ]
   },
   {
+    "id": "song-7985b2b2",
+    "title": "めざせポケモンマスター",
+    "originalArtist": "松本梨香",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-0b1ecad7",
+        "streamId": "stream-2026-05-29",
+        "date": "2026-05-29",
+        "streamTitle": "【倫家想唱歌】願意來聽一首歌嗎！一起享受周五晚上的時間吧！✨一曲聴きませんか？金曜日の夜を一緒に楽しみましょう！✨   ░ 歌枠｜Singing Stream　#karaoke #shorts",
+        "videoId": "IVlHQ7Xn-pQ",
+        "timestamp": 3995,
+        "endTimestamp": 4240,
+        "note": ""
+      }
+    ]
+  },
+  {
     "id": "song-7999db17",
     "title": "花開花落",
     "originalArtist": "熙歌",
@@ -2173,6 +2371,24 @@
         "videoId": "KB2cNRbeaKc",
         "timestamp": 2253,
         "endTimestamp": 2574,
+        "note": ""
+      }
+    ]
+  },
+  {
+    "id": "song-80b5a8f3",
+    "title": "致姍姍來遲的你",
+    "originalArtist": "阿肆 feat. 林宥嘉",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-5ac7f278",
+        "streamId": "stream-2026-05-27",
+        "date": "2026-05-27",
+        "streamTitle": "【暖場歌回】竟然有怪怪生化人助陣！挑戰丟掉包袱嗨起來！！！ !   @Cetro.Timaeus 　░ 合唱歌回｜Singing Stream",
+        "videoId": "gYOqDomZj48",
+        "timestamp": 2671,
+        "endTimestamp": 2913,
         "note": ""
       }
     ]
@@ -2574,6 +2790,24 @@
     ]
   },
   {
+    "id": "song-92a64737",
+    "title": "Breaking Free",
+    "originalArtist": "Troy & Gabriella",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-a9a6f7a2",
+        "streamId": "stream-2026-05-27",
+        "date": "2026-05-27",
+        "streamTitle": "【暖場歌回】竟然有怪怪生化人助陣！挑戰丟掉包袱嗨起來！！！ !   @Cetro.Timaeus 　░ 合唱歌回｜Singing Stream",
+        "videoId": "gYOqDomZj48",
+        "timestamp": 3637,
+        "endTimestamp": 3844,
+        "note": ""
+      }
+    ]
+  },
+  {
     "id": "song-9337dc8f",
     "title": "暮色迴響",
     "originalArtist": "吉星出租",
@@ -2682,6 +2916,24 @@
     ]
   },
   {
+    "id": "song-96a6b875",
+    "title": "你朝我的方向走來",
+    "originalArtist": "馬念先 & 9m88",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-7b84df0f",
+        "streamId": "stream-2026-05-27",
+        "date": "2026-05-27",
+        "streamTitle": "【暖場歌回】竟然有怪怪生化人助陣！挑戰丟掉包袱嗨起來！！！ !   @Cetro.Timaeus 　░ 合唱歌回｜Singing Stream",
+        "videoId": "gYOqDomZj48",
+        "timestamp": 2279,
+        "endTimestamp": 2485,
+        "note": ""
+      }
+    ]
+  },
+  {
     "id": "song-9b69f324",
     "title": "魚",
     "originalArtist": "陳綺貞",
@@ -2767,6 +3019,24 @@
         "videoId": "xQ5TCl3JnXs",
         "timestamp": 1881,
         "endTimestamp": 2079,
+        "note": ""
+      }
+    ]
+  },
+  {
+    "id": "song-9e96b135",
+    "title": "你今天開心嗎?",
+    "originalArtist": "煌Kirali",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-353b10d1",
+        "streamId": "stream-2026-05-29",
+        "date": "2026-05-29",
+        "streamTitle": "【倫家想唱歌】願意來聽一首歌嗎！一起享受周五晚上的時間吧！✨一曲聴きませんか？金曜日の夜を一緒に楽しみましょう！✨   ░ 歌枠｜Singing Stream　#karaoke #shorts",
+        "videoId": "IVlHQ7Xn-pQ",
+        "timestamp": 1207,
+        "endTimestamp": 1381,
         "note": ""
       }
     ]
@@ -3006,6 +3276,24 @@
     ]
   },
   {
+    "id": "song-a77bc6da",
+    "title": "Catch You Catch Me",
+    "originalArtist": "日向めぐみ",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-c81687f6",
+        "streamId": "stream-2026-05-29",
+        "date": "2026-05-29",
+        "streamTitle": "【倫家想唱歌】願意來聽一首歌嗎！一起享受周五晚上的時間吧！✨一曲聴きませんか？金曜日の夜を一緒に楽しみましょう！✨   ░ 歌枠｜Singing Stream　#karaoke #shorts",
+        "videoId": "IVlHQ7Xn-pQ",
+        "timestamp": 7461,
+        "endTimestamp": 7684,
+        "note": ""
+      }
+    ]
+  },
+  {
     "id": "song-a9a4ba26",
     "title": "小幸運",
     "originalArtist": "田馥甄",
@@ -3073,6 +3361,24 @@
         "videoId": "ZsObrmIQLGk",
         "timestamp": 4884,
         "endTimestamp": 5166,
+        "note": ""
+      }
+    ]
+  },
+  {
+    "id": "song-adefcb92",
+    "title": "APT.",
+    "originalArtist": "ROSÉ & Bruno Mars",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-06885da7",
+        "streamId": "stream-2026-05-27",
+        "date": "2026-05-27",
+        "streamTitle": "【暖場歌回】竟然有怪怪生化人助陣！挑戰丟掉包袱嗨起來！！！ !   @Cetro.Timaeus 　░ 合唱歌回｜Singing Stream",
+        "videoId": "gYOqDomZj48",
+        "timestamp": 869,
+        "endTimestamp": 1031,
         "note": ""
       }
     ]
@@ -3204,6 +3510,24 @@
     ]
   },
   {
+    "id": "song-b7fcd026",
+    "title": "ココロのちず",
+    "originalArtist": "BOYSTYLE",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-6d7d5158",
+        "streamId": "stream-2026-05-29",
+        "date": "2026-05-29",
+        "streamTitle": "【倫家想唱歌】願意來聽一首歌嗎！一起享受周五晚上的時間吧！✨一曲聴きませんか？金曜日の夜を一緒に楽しみましょう！✨   ░ 歌枠｜Singing Stream　#karaoke #shorts",
+        "videoId": "IVlHQ7Xn-pQ",
+        "timestamp": 4826,
+        "endTimestamp": 5087,
+        "note": ""
+      }
+    ]
+  },
+  {
     "id": "song-b8049b4c",
     "title": "いのちの名前",
     "originalArtist": "木村弓",
@@ -3235,6 +3559,24 @@
         "videoId": "tqLA2FnNO84",
         "timestamp": 2513,
         "endTimestamp": 2809,
+        "note": ""
+      }
+    ]
+  },
+  {
+    "id": "song-b9138d08",
+    "title": "晩餐歌",
+    "originalArtist": "tuki.",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-9c336325",
+        "streamId": "stream-2026-05-27",
+        "date": "2026-05-27",
+        "streamTitle": "【暖場歌回】竟然有怪怪生化人助陣！挑戰丟掉包袱嗨起來！！！ !   @Cetro.Timaeus 　░ 合唱歌回｜Singing Stream",
+        "videoId": "gYOqDomZj48",
+        "timestamp": 3232,
+        "endTimestamp": 3464,
         "note": ""
       }
     ]
@@ -3672,6 +4014,24 @@
     ]
   },
   {
+    "id": "song-ceccfdf1",
+    "title": "AI♡SCREAM",
+    "originalArtist": "AiScReam",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-8614c3e2",
+        "streamId": "stream-2026-05-29",
+        "date": "2026-05-29",
+        "streamTitle": "【倫家想唱歌】願意來聽一首歌嗎！一起享受周五晚上的時間吧！✨一曲聴きませんか？金曜日の夜を一緒に楽しみましょう！✨   ░ 歌枠｜Singing Stream　#karaoke #shorts",
+        "videoId": "IVlHQ7Xn-pQ",
+        "timestamp": 689,
+        "endTimestamp": 977,
+        "note": ""
+      }
+    ]
+  },
+  {
     "id": "song-cf251784",
     "title": "幸福在歌唱",
     "originalArtist": "A-Lin",
@@ -3721,6 +4081,24 @@
         "videoId": "xQ5TCl3JnXs",
         "timestamp": 8081,
         "endTimestamp": 8383,
+        "note": ""
+      }
+    ]
+  },
+  {
+    "id": "song-d318de3f",
+    "title": "Just A Dream",
+    "originalArtist": "Sam Tsui & Christina Grimmie",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-a98a8829",
+        "streamId": "stream-2026-05-27",
+        "date": "2026-05-27",
+        "streamTitle": "【暖場歌回】竟然有怪怪生化人助陣！挑戰丟掉包袱嗨起來！！！ !   @Cetro.Timaeus 　░ 合唱歌回｜Singing Stream",
+        "videoId": "gYOqDomZj48",
+        "timestamp": 4220,
+        "endTimestamp": 4482,
         "note": ""
       }
     ]
@@ -3793,6 +4171,24 @@
         "videoId": "zlRzb3iDgn4",
         "timestamp": 9238,
         "endTimestamp": 9458,
+        "note": ""
+      }
+    ]
+  },
+  {
+    "id": "song-d6da959f",
+    "title": "星降る海",
+    "originalArtist": "月見ヤチヨ(CV.早見沙織)",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-4afc57d3",
+        "streamId": "stream-2026-05-29",
+        "date": "2026-05-29",
+        "streamTitle": "【倫家想唱歌】願意來聽一首歌嗎！一起享受周五晚上的時間吧！✨一曲聴きませんか？金曜日の夜を一緒に楽しみましょう！✨   ░ 歌枠｜Singing Stream　#karaoke #shorts",
+        "videoId": "IVlHQ7Xn-pQ",
+        "timestamp": 2597,
+        "endTimestamp": 2846,
         "note": ""
       }
     ]
@@ -4621,6 +5017,24 @@
         "videoId": "IVfl4IDi0co",
         "timestamp": 3507,
         "endTimestamp": 3767,
+        "note": ""
+      }
+    ]
+  },
+  {
+    "id": "song-fd117e78",
+    "title": "BON VOYAGE!",
+    "originalArtist": "Bon-Bon Blanco",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-5f0026ee",
+        "streamId": "stream-2026-05-29",
+        "date": "2026-05-29",
+        "streamTitle": "【倫家想唱歌】願意來聽一首歌嗎！一起享受周五晚上的時間吧！✨一曲聴きませんか？金曜日の夜を一緒に楽しみましょう！✨   ░ 歌枠｜Singing Stream　#karaoke #shorts",
+        "videoId": "IVlHQ7Xn-pQ",
+        "timestamp": 5326,
+        "endTimestamp": 5597,
         "note": ""
       }
     ]
