@@ -7,6 +7,8 @@
     "dev": "vite",
     "build": "tsc -b && vite build",
     "test:nova-links": "npx tsx tests/nova-submissions-links.test.tsx",
+    "test:streams-filter": "npx tsx tests/streams-filter.test.ts",
+    "test:streams-render": "npx tsx tests/streams-list-render.test.tsx",
     "preview": "vite preview"
   },
   "dependencies": {

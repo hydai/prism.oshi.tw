@@ -3,17 +3,55 @@ import { Link } from 'react-router-dom';
 import type { Stream, AuthUser, Status } from '../../../shared/types';
 import { api } from '../api/client';
 import StatusBadge from '../components/StatusBadge';
+import { loadStreamsFilter, saveStreamsFilter, resolveYear } from '../lib/streamsFilter';
 
 type SortKey = 'title' | 'date' | 'status' | 'createdAt';
 type SortDir = 'asc' | 'desc';
+
+/** Status filter pills — the active pill is filled in that status's own color. */
+const STATUS_FILTERS: { value: '' | Status; label: string; activeClass: string }[] = [
+  { value: '', label: 'All', activeClass: 'border-blue-600 bg-blue-600 text-white' },
+  { value: 'pending', label: 'Pending', activeClass: 'border-yellow-500 bg-yellow-500 text-white' },
+  { value: 'approved', label: 'Approved', activeClass: 'border-green-600 bg-green-600 text-white' },
+  { value: 'rejected', label: 'Rejected', activeClass: 'border-red-600 bg-red-600 text-white' },
+  { value: 'excluded', label: 'Excluded', activeClass: 'border-slate-500 bg-slate-500 text-white' },
+  { value: 'extracted', label: 'Extracted', activeClass: 'border-teal-600 bg-teal-600 text-white' },
+];
+
+const YEAR_ACTIVE_CLASS = 'border-blue-600 bg-blue-600 text-white';
+
+function FilterPill({
+  active,
+  activeClass,
+  onClick,
+  children,
+}: {
+  active: boolean;
+  activeClass: string;
+  onClick: () => void;
+  children: React.ReactNode;
+}) {
+  return (
+    <button
+      type="button"
+      onClick={onClick}
+      aria-pressed={active}
+      className={`rounded-full border px-3 py-1 text-xs font-medium transition-colors ${
+        active ? activeClass : 'border-slate-300 bg-white text-slate-600 hover:bg-slate-50'
+      }`}
+    >
+      {children}
+    </button>
+  );
+}
 
 export default function StreamsList({ user }: { user: AuthUser }) {
   const [streams, setStreams] = useState<Stream[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [search, setSearch] = useState('');
-  const [statusFilter, setStatusFilter] = useState<'' | Status>('');
-  const [yearFilter, setYearFilter] = useState<string>('');
+  const [statusFilter, setStatusFilter] = useState<'' | Status>(() => loadStreamsFilter().status);
+  const [yearFilter, setYearFilter] = useState<string>(() => loadStreamsFilter().year);
   const [sortKey, setSortKey] = useState<SortKey>('date');
   const [sortDir, setSortDir] = useState<SortDir>('desc');
 
@@ -34,6 +72,11 @@ export default function StreamsList({ user }: { user: AuthUser }) {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [statusFilter]);
 
+  // Remember the filter choice across visits (single global key).
+  useEffect(() => {
+    saveStreamsFilter({ status: statusFilter, year: yearFilter });
+  }, [statusFilter, yearFilter]);
+
   const handleSearch = (e: React.FormEvent) => {
     e.preventDefault();
     fetchStreams();
@@ -49,10 +92,14 @@ export default function StreamsList({ user }: { user: AuthUser }) {
     return [...ySet].sort().reverse();
   }, [streams]);
 
+  // The saved year may not exist in the current data (e.g. after switching
+  // streamer); fall back to "All" for display/filtering while keeping the saved value.
+  const effectiveYear = resolveYear(yearFilter, years);
+
   const sorted = useMemo(() => {
     let filtered = streams;
-    if (yearFilter) {
-      filtered = filtered.filter((s) => s.date?.startsWith(yearFilter));
+    if (effectiveYear) {
+      filtered = filtered.filter((s) => s.date?.startsWith(effectiveYear));
     }
     const copy = [...filtered];
     copy.sort((a, b) => {
@@ -62,7 +109,7 @@ export default function StreamsList({ user }: { user: AuthUser }) {
       return sortDir === 'asc' ? cmp : -cmp;
     });
     return copy;
-  }, [streams, yearFilter, sortKey, sortDir]);
+  }, [streams, effectiveYear, sortKey, sortDir]);
 
   const toggleSort = (key: SortKey) => {
     if (sortKey === key) {
@@ -124,7 +171,7 @@ export default function StreamsList({ user }: { user: AuthUser }) {
       </div>
 
       {/* Filters */}
-      <div className="mt-4 flex flex-wrap gap-3">
+      <div className="mt-4 space-y-3">
         <form onSubmit={handleSearch} className="flex gap-2">
           <input
             type="text"
@@ -140,29 +187,48 @@ export default function StreamsList({ user }: { user: AuthUser }) {
             Search
           </button>
         </form>
-        <select
-          value={statusFilter}
-          onChange={(e) => setStatusFilter(e.target.value as '' | Status)}
-          className="rounded-md border border-slate-300 px-3 py-1.5 text-sm"
-        >
-          <option value="">All statuses</option>
-          <option value="pending">Pending</option>
-          <option value="approved">Approved</option>
-          <option value="rejected">Rejected</option>
-          <option value="excluded">Excluded</option>
-          <option value="extracted">Extracted</option>
-        </select>
+
+        {/* Status filter pills */}
+        <div className="flex flex-wrap items-center gap-2">
+          <span className="w-12 shrink-0 text-xs font-semibold uppercase tracking-wider text-slate-400">
+            Status
+          </span>
+          {STATUS_FILTERS.map((f) => (
+            <FilterPill
+              key={f.value || 'all'}
+              active={statusFilter === f.value}
+              activeClass={f.activeClass}
+              onClick={() => setStatusFilter(f.value)}
+            >
+              {f.label}
+            </FilterPill>
+          ))}
+        </div>
+
+        {/* Year filter pills */}
         {years.length > 1 && (
-          <select
-            value={yearFilter}
-            onChange={(e) => setYearFilter(e.target.value)}
-            className="rounded-md border border-slate-300 px-3 py-1.5 text-sm"
-          >
-            <option value="">All years</option>
+          <div className="flex flex-wrap items-center gap-2">
+            <span className="w-12 shrink-0 text-xs font-semibold uppercase tracking-wider text-slate-400">
+              Year
+            </span>
+            <FilterPill
+              active={effectiveYear === ''}
+              activeClass={YEAR_ACTIVE_CLASS}
+              onClick={() => setYearFilter('')}
+            >
+              All
+            </FilterPill>
             {years.map((y) => (
-              <option key={y} value={y}>{y}</option>
+              <FilterPill
+                key={y}
+                active={effectiveYear === y}
+                activeClass={YEAR_ACTIVE_CLASS}
+                onClick={() => setYearFilter(y)}
+              >
+                {y}
+              </FilterPill>
             ))}
-          </select>
+          </div>
         )}
       </div>
 
