@@ -2,13 +2,13 @@
   "version": 1,
   "streamers": {
     "earendel": {
-      "lastSyncedAt": "2026-06-18T04:51:11.211Z",
-      "maxSongUpdatedAt": "2026-06-17 08:43:26",
-      "maxPerfUpdatedAt": "2026-06-17 08:43:26",
-      "maxStreamUpdatedAt": "2026-06-17 08:43:25",
-      "songsCount": 261,
-      "performancesCount": 261,
-      "streamsCount": 18
+      "lastSyncedAt": "2026-06-27T06:33:30.023Z",
+      "maxSongUpdatedAt": "2026-06-27 05:59:17",
+      "maxPerfUpdatedAt": "2026-06-27 05:59:17",
+      "maxStreamUpdatedAt": "2026-06-27 05:59:16",
+      "songsCount": 284,
+      "performancesCount": 284,
+      "streamsCount": 20
     },
     "gabu": {
       "lastSyncedAt": "2026-04-19T11:27:08.462Z",
