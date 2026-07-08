@@ -274,7 +274,7 @@
       "description": "馬來西亞多語言雜談系Vtuber\n頻道主要活動在於雜談和歌回",
       "avatarUrl": "https://yt3.ggpht.com/NPTjBjNcg0wGuUpSbrk8RuWIvHv5k9CYREArYf_vPxEiE46uOp4iqjfmqMHTB9vo_zZdkwtM=s240-c-k-c0x00ffffff-no-rj",
       "brandName": "Inori",
-      "subscriberCount": "5.8萬",
+      "subscriberCount": "5.81萬",
       "group": "個人勢",
       "socialLinks": {
         "youtube": "https://www.youtube.com/@AkitsukiInori",
@@ -425,7 +425,7 @@
       "description": "你好！我是子午計畫【序境TeRaź】的小雪貂\n喜歡打遊戲但更喜歡你⸜♡⸝ 來陪陪我好嗎 🍀",
       "avatarUrl": "https://yt3.ggpht.com/XHWipXKsoxLd8pLkyS-wUkAWroa_idNEI20EWiHQPTanVKbB6fyh7mfQn3lhlDlg-1qDMDvZAAg=s240-c-k-c0x00ffffff-no-rj",
       "brandName": "Koyuki",
-      "subscriberCount": "5.08萬",
+      "subscriberCount": "5.09萬",
       "group": "子午計畫",
       "socialLinks": {
         "youtube": "https://www.youtube.com/@%E9%9B%AAKoyuki",
@@ -867,7 +867,7 @@
       "description": "個性自由不羈、八面玲瓏，某些時刻卻又不那麼坦率的赤腹黑蛇，主要在Youtube上進行直播。歌聲中散發出若有似無的致命魅力，慵懶的眼神就如蛇尾般勾人。以吉他彈唱展現與眾不同才能的他，興趣之一便是透過音樂創作將高潮迭起的故事訴說給觀眾。",
       "avatarUrl": "https://yt3.ggpht.com/S4kfXpdsBQOeTQnDgAAYAZRmE0d1hiiYvZabM4hnmlHXOjL7eA5CRNfor22xZ8ujJRgNnwm5zf8=s240-c-k-c0x00ffffff-no-rj",
       "brandName": "Sakuro",
-      "subscriberCount": "5.99萬",
+      "subscriberCount": "6萬",
       "group": "子午計畫",
       "socialLinks": {
         "youtube": "https://www.youtube.com/@SakuroMoonlit",
@@ -961,6 +961,33 @@
       "socialLinks": {
         "youtube": "https://www.youtube.com/@Vaswawa",
         "twitter": "https://x.com/Vaswawa"
+      },
+      "theme": {
+        "accentPrimary": "#EC4899",
+        "accentPrimaryDark": "#DB2777",
+        "accentPrimaryLight": "#F472B6",
+        "accentSecondary": "#3B82F6",
+        "accentSecondaryLight": "#60A5FA",
+        "bgPageStart": "#FFF0F5",
+        "bgPageMid": "#F0F8FF",
+        "bgPageEnd": "#E6E6FA",
+        "bgAccentPrimary": "#FDF2F8",
+        "bgAccentPrimaryMuted": "#FCE7F3",
+        "borderAccentPrimary": "#FBCFE8",
+        "borderAccentSecondary": "#BFDBFE"
+      },
+      "enabled": true
+    },
+    {
+      "slug": "xiangtsai51121",
+      "displayName": "香菜oiiai",
+      "description": "",
+      "avatarUrl": "https://yt3.ggpht.com/Tm7F209zd4SWHqd8ZdG2No9rxQUnX1ek5TAlNM8Jxnmb5c25CqHzhW_31swrjmLMXdWfQET4nV8=s240-c-k-c0x00ffffff-no-rj",
+      "brandName": "香菜oiiai",
+      "subscriberCount": "1.16萬",
+      "group": "個人勢",
+      "socialLinks": {
+        "youtube": "https://www.youtube.com/@%E9%A6%99%E8%8F%9C-51121"
       },
       "theme": {
         "accentPrimary": "#EC4899",
