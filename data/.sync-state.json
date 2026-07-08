@@ -164,13 +164,13 @@
       "streamsCount": 0
     },
     "mizuki": {
-      "lastSyncedAt": "2026-07-02T04:02:18.053Z",
-      "maxSongUpdatedAt": "2026-07-01 17:08:20",
-      "maxPerfUpdatedAt": "2026-07-01 17:08:20",
-      "maxStreamUpdatedAt": "2026-07-01 17:08:19",
-      "songsCount": 3386,
-      "performancesCount": 5328,
-      "streamsCount": 301
+      "lastSyncedAt": "2026-07-08T04:01:48.905Z",
+      "maxSongUpdatedAt": "2026-07-07 19:33:00",
+      "maxPerfUpdatedAt": "2026-07-07 19:33:00",
+      "maxStreamUpdatedAt": "2026-07-07 19:33:00",
+      "songsCount": 3424,
+      "performancesCount": 5366,
+      "streamsCount": 303
     },
     "nagi": {
       "lastSyncedAt": "2026-06-25T10:55:20.763Z",
@@ -290,6 +290,15 @@
       "streamsCount": 1
     },
     "vaswawa": {
+      "lastSyncedAt": null,
+      "maxSongUpdatedAt": null,
+      "maxPerfUpdatedAt": null,
+      "maxStreamUpdatedAt": null,
+      "songsCount": 0,
+      "performancesCount": 0,
+      "streamsCount": 0
+    },
+    "xiangtsai51121": {
       "lastSyncedAt": null,
       "maxSongUpdatedAt": null,
       "maxPerfUpdatedAt": null,
