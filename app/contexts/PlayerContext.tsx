@@ -48,6 +48,7 @@ interface PlayerContextType {
   trackCurrentTime: number;
   trackDuration: number | null;
   playTrack: (track: Track) => void;
+  playTrackWithQueue: (track: Track, following: Track[]) => void;
   togglePlayPause: () => void;
   seekTo: (seconds: number) => void;
   previous: () => void;
@@ -519,6 +520,31 @@ export const PlayerProvider = ({ children }: { children: ReactNode }) => {
     addToAllTracks(track);
   };
 
+  // Play a track and REPLACE the whole queue with `following` — clicking a song
+  // in any list establishes that list as the new playback context (Spotify-style).
+  // Reads currentTrackRef (not state) so stale closures held by memoized list
+  // rows can still call it safely.
+  const playTrackWithQueue = (track: Track, following: Track[]) => {
+    const prevTrack = currentTrackRef.current;
+    if (prevTrack && prevTrack.id !== track.id) {
+      setPlayHistory((prev) => [...prev, prevTrack]);
+    }
+    setCurrentTrack(track);
+    setCurrentTime(track.timestamp);
+    setQueue(following);
+    setAllTracks((prev) => {
+      const seen = new Set(prev.map((t) => t.id));
+      const merged = [...prev];
+      for (const t of [track, ...following]) {
+        if (!seen.has(t.id)) {
+          seen.add(t.id);
+          merged.push(t);
+        }
+      }
+      return merged.length === prev.length ? prev : merged;
+    });
+  };
+
   const togglePlayPause = () => {
     if (!playerRef.current) return;
 
@@ -605,6 +631,7 @@ export const PlayerProvider = ({ children }: { children: ReactNode }) => {
         trackCurrentTime,
         trackDuration,
         playTrack,
+        playTrackWithQueue,
         togglePlayPause,
         seekTo,
         previous,
