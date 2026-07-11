@@ -4,6 +4,8 @@ import {
   filterGroupedSongs,
   filterStreamsByYears,
   flattenSongs,
+  followingTracksFromFlattened,
+  followingTracksFromGrouped,
   getAllArtists,
   getAvailableYears,
   mergeAlbumArt,
@@ -203,5 +205,45 @@ assert.deepEqual(trackFromPerformance(songs[0]!, songs[0]!.performances[0]!, "mi
   albumArtUrl: "old-art",
   streamerSlug: "mizuki",
 });
+
+// followingTracksFromFlattened: 點擊處之後、依清單順序、排除 unavailable
+assert.deepEqual(
+  followingTracksFromFlattened(flattened, 0, "mizuki", new Set()).map((t) => t.id),
+  ["perf-no-stream", "perf-old"],
+);
+assert.deepEqual(
+  followingTracksFromFlattened(flattened, -1, "mizuki", new Set()).map((t) => t.id),
+  ["perf-new", "perf-no-stream", "perf-old"],
+);
+assert.deepEqual(
+  followingTracksFromFlattened(flattened, 0, "mizuki", new Set(["video-old"])).map((t) => t.id),
+  ["perf-no-stream"],
+);
+assert.deepEqual(
+  followingTracksFromFlattened(flattened, flattened.length - 1, "mizuki", new Set()),
+  [],
+);
+assert.equal(
+  followingTracksFromFlattened(flattened, 0, "mizuki", new Set())[0]?.streamerSlug,
+  "mizuki",
+);
+
+// followingTracksFromGrouped: 後續每首取最新演出；無演出的歌跳過；
+// 最新演出 unavailable → 整首排除（不 fallback 舊版本，與播放全部一致）
+assert.deepEqual(
+  followingTracksFromGrouped(grouped, 0, "mizuki", new Set()).map((t) => t.id),
+  ["perf-new"],
+);
+assert.deepEqual(
+  followingTracksFromGrouped(grouped, -1, "mizuki", new Set()).map((t) => t.id),
+  ["perf-no-stream", "perf-new"],
+);
+assert.deepEqual(followingTracksFromGrouped(grouped, 0, "mizuki", new Set(["video-new"])), []);
+assert.deepEqual(
+  followingTracksFromGrouped(grouped, grouped.length - 1, "mizuki", new Set()),
+  [],
+);
+// 不可變動輸入陣列（內部 sort 必須複製）
+assert.deepEqual(grouped.map((song) => song.id), ["song-b", "song-a", "song-c"]);
 
 console.log("✓ archive helpers");

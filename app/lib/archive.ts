@@ -146,3 +146,40 @@ export function trackFromPerformance(
     streamerSlug,
   };
 }
+
+function latestPerformance(song: ArchiveSong): ArchivePerformance | null {
+  if (song.performances.length === 0) return null;
+  return [...song.performances].sort(
+    (a, b) => new Date(b.date).getTime() - new Date(a.date).getTime(),
+  )[0];
+}
+
+// Tracks that should play after clicking index `clickedIndex` in a flattened
+// list (timeline view / mobile search). Pass -1 to build the full list (play all).
+export function followingTracksFromFlattened(
+  songs: FlattenedSong[],
+  clickedIndex: number,
+  streamerSlug: string,
+  unavailableVideoIds: Set<string>,
+): ArchiveTrack[] {
+  return songs
+    .slice(clickedIndex + 1)
+    .filter((song) => !unavailableVideoIds.has(song.videoId))
+    .map((song) => trackFromFlattenedSong(song, streamerSlug));
+}
+
+// Tracks that should play after clicking song `clickedSongIndex` in the grouped
+// view: each following song contributes its latest performance, skipping songs
+// whose latest performance is unavailable. Pass -1 to build the full list.
+export function followingTracksFromGrouped(
+  songs: ArchiveSong[],
+  clickedSongIndex: number,
+  streamerSlug: string,
+  unavailableVideoIds: Set<string>,
+): ArchiveTrack[] {
+  return songs.slice(clickedSongIndex + 1).flatMap((song) => {
+    const latest = latestPerformance(song);
+    if (!latest || unavailableVideoIds.has(latest.videoId)) return [];
+    return [trackFromPerformance(song, latest, streamerSlug)];
+  });
+}
