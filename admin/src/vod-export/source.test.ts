@@ -1,5 +1,12 @@
 import { VOD_EXPORT_LIMITS } from './constants';
-import { readVodExportSource } from './source';
+import { readVodExportSource, VodExportSourceError } from './source';
+import { buildVodExportSnapshot } from './validation';
+import type {
+  ExportSourcePerformance,
+  ExportSourceSong,
+  ExportSourceStreamer,
+  ExportSourceVod,
+} from './types';
 
 declare const process: { exitCode?: number };
 
@@ -86,12 +93,12 @@ class FakeDatabase {
     } as unknown as D1DatabaseSession;
   }
 
-  sourceStatement(): FakeStatementView {
-    const statement = this.sessions
+  sourceStatements(): FakeStatementView[] {
+    const statements = this.sessions
       .flatMap((session) => session.statements)
-      .find((candidate) => candidate.sql.includes('WITH RECURSIVE'));
-    if (statement === undefined) throw new Error('Admin source query was not prepared');
-    return statement;
+      .filter((candidate) => candidate.sql.includes('WITH RECURSIVE'));
+    if (statements.length === 0) throw new Error('Admin source queries were not prepared');
+    return statements;
   }
 
   private executeBatch(statements: FakeStatement[]): D1Result[] {
@@ -109,8 +116,67 @@ class FakeDatabase {
       if (this.role === 'nova' && statement.sql.includes('id AS submission_id')) {
         return result(this.novaRows.map((row) => ({ ...row })));
       }
-      if (this.role === 'admin' && statement.sql.includes('WITH RECURSIVE')) {
-        return result(this.adminRows.map((row) => ({ ...row })));
+      if (this.role === 'admin' && statement.sql.includes('SELECT\n      source_rows,\n      loaded_source_rows,')) {
+        return result(this.adminRows
+          .filter((row) => row.row_kind === 'stats')
+          .map((row) => ({
+            source_rows: row.source_rows,
+            loaded_source_rows: row.loaded_source_rows,
+            source_text_bytes: row.source_text_bytes,
+            eligible_vod_count: row.eligible_vod_count ?? this.adminRows.filter((item) => item.row_kind === 'vod').length,
+            eligible_performance_count: row.eligible_performance_count
+              ?? this.adminRows.filter((item) => item.row_kind === 'performance').length,
+            relationship_finding_count: row.relationship_finding_count ?? 0,
+          })));
+      }
+      if (
+        this.role === 'admin'
+        && statement.sql.includes('\n      id AS streamId,')
+      ) {
+        return result(this.adminRows
+          .filter((row) => row.row_kind === 'vod')
+          .map((row) => ({
+            streamId: row.entity_id,
+            streamerId: row.streamer_id,
+            title: row.title,
+            date: row.secondary_text,
+            videoId: row.relation_id,
+            status: row.status,
+          })));
+      }
+      if (
+        this.role === 'admin'
+        && statement.sql.includes('\n      id AS songId,')
+      ) {
+        return result(this.adminRows
+          .filter((row) => row.row_kind === 'song')
+          .map((row) => ({
+            rowId: row.row_id,
+            songId: row.entity_id,
+            streamerId: row.streamer_id,
+            title: row.title,
+            originalArtist: row.secondary_text,
+            status: row.status,
+          })));
+      }
+      if (
+        this.role === 'admin'
+        && statement.sql.includes('\n      id AS performanceId,')
+      ) {
+        return result(this.adminRows
+          .filter((row) => row.row_kind === 'performance')
+          .map((row) => ({
+            rowId: row.row_id,
+            performanceId: row.entity_id,
+            streamerId: row.streamer_id,
+            songId: row.relation_id,
+            streamId: row.stream_id,
+            startStorageClass: row.start_storage_class,
+            startDecimalText: row.start_decimal_text,
+            endStorageClass: row.end_storage_class,
+            endDecimalText: row.end_decimal_text,
+            status: row.status,
+          })));
       }
       throw new Error(`Unexpected ${this.role} D1 query: ${statement.sql}`);
     });
@@ -240,6 +306,7 @@ async function testBoundedStreamerScope(): Promise<void> {
   const admin = new FakeDatabase('admin', [], [{
     row_kind: 'stats',
     source_rows: 0,
+    loaded_source_rows: 0,
     source_text_bytes: 0,
     row_id: null,
     entity_id: null,
@@ -263,13 +330,16 @@ async function testBoundedStreamerScope(): Promise<void> {
   }, 'test-build-id');
   equal(source.data.streamers.length, rows.length, 'all scoped streamers are returned');
 
-  const statement = admin.sourceStatement();
+  const sourceStatements = admin.sourceStatements();
+  equal(sourceStatements.length, 4, 'DB source uses stats plus three narrow row queries');
+  const statement = sourceStatements[1];
+  assert(statement !== undefined, 'bounded VOD source query exists');
   assert(statement.sql.includes('WITH RECURSIVE'), 'scope is decoded inside the one transactional source query');
   assert(!statement.sql.includes('json_each'), 'scope no longer uses a single JSON binding');
   assert(statement.sql.includes("COALESCE(id, '')"), 'DB preflight null-coalesces nullable IDs');
   assert(statement.sql.includes("COALESCE(status, '')"), 'DB preflight null-coalesces nullable statuses');
   assert(statement.values.length <= 100, 'scope plus capacity guards stay within D1 parameter limit');
-  const scopeValues = statement.values.slice(0, -6);
+  const scopeValues = statement.values.slice(0, -5);
   const decoded = decodeScopeValues(scopeValues);
   equal(decoded.length, rows.length, 'scope contains each deduplicated streamer once');
   const decodedSet = new Set(decoded);
@@ -281,11 +351,96 @@ async function testBoundedStreamerScope(): Promise<void> {
   }
 }
 
+async function testOversizedStreamerScopeIsFragmented(): Promise<void> {
+  const oversizedSlug = '\ud800\u0800'.repeat(350_001);
+  const rows = [novaRow(1, oversizedSlug)];
+  const nova = new FakeDatabase('nova', rows, [], sourceTextBytes(rows));
+  const admin = new FakeDatabase('admin', [], [{
+    row_kind: 'stats', source_rows: 0, loaded_source_rows: 0, source_text_bytes: 0,
+    row_id: null, entity_id: null, streamer_id: null, title: null, secondary_text: null,
+    relation_id: null, stream_id: null, start_storage_class: null, start_decimal_text: null,
+    end_storage_class: null, end_decimal_text: null, status: null,
+  }]);
+
+  await readVodExportSource({
+    DB: admin.asDatabase(),
+    NOVA_DB: nova.asDatabase(),
+    VOD_EXPORT_DB_ID: 'admin-db-id',
+    VOD_EXPORT_NOVA_DB_ID: 'nova-db-id',
+  }, 'test-build-id');
+
+  const statement = admin.sourceStatements()[0];
+  assert(statement !== undefined, 'fragmented scope statement exists');
+  assert(statement.sql.includes('assembled_fragments'), 'oversized scope is reconstructed inside SQL');
+  const fragments = statement.values.filter((value): value is string => typeof value === 'string');
+  assert(fragments.length > 1, 'oversized scope key is split across multiple bindings');
+  for (const fragment of fragments) {
+    assert(encoder.encode(fragment).byteLength <= 1_900_000, 'each scope fragment stays below its D1 target');
+  }
+  equal(fragments.join(''), oversizedSlug, 'scope fragments preserve the exact invalid slug for relationship checks');
+}
+
+async function testEmptyStreamerScopeHasValidCteShape(): Promise<void> {
+  const nova = new FakeDatabase('nova', [], [], 0);
+  const admin = new FakeDatabase('admin', [], [{
+    row_kind: 'stats', source_rows: 0, loaded_source_rows: 0, source_text_bytes: 0,
+    row_id: null, entity_id: null, streamer_id: null, title: null, secondary_text: null,
+    relation_id: null, stream_id: null, start_storage_class: null, start_decimal_text: null,
+    end_storage_class: null, end_decimal_text: null, status: null,
+  }]);
+  await readVodExportSource({
+    DB: admin.asDatabase(),
+    NOVA_DB: nova.asDatabase(),
+    VOD_EXPORT_DB_ID: 'admin-db-id',
+    VOD_EXPORT_NOVA_DB_ID: 'nova-db-id',
+  }, 'test-build-id');
+  const statement = admin.sourceStatements()[0];
+  assert(statement !== undefined, 'empty scope statement exists');
+  assert(
+    statement.sql.includes('NULL AS fragment_value WHERE 0'),
+    'empty scope source SELECT supplies all six declared CTE columns',
+  );
+}
+
+async function testAdminOutputPreflightLimits(): Promise<void> {
+  const rows = [novaRow(1, 'alpha')];
+  const cases = [
+    { field: 'eligible_vod_count', actual: VOD_EXPORT_LIMITS.vods + 1, resource: 'vods' },
+    { field: 'eligible_performance_count', actual: VOD_EXPORT_LIMITS.performances + 1, resource: 'performances' },
+    { field: 'relationship_finding_count', actual: VOD_EXPORT_LIMITS.findings + 1, resource: 'findings' },
+  ] as const;
+  for (const testCase of cases) {
+    const stats: Record<string, unknown> = {
+      row_kind: 'stats', source_rows: 0, loaded_source_rows: 0, source_text_bytes: 0,
+      eligible_vod_count: 0, eligible_performance_count: 0, relationship_finding_count: 0,
+    };
+    stats[testCase.field] = testCase.actual;
+    const admin = new FakeDatabase('admin', [], [stats]);
+    const nova = new FakeDatabase('nova', rows, [], sourceTextBytes(rows));
+    let rejected: unknown;
+    try {
+      await readVodExportSource({
+        DB: admin.asDatabase(), NOVA_DB: nova.asDatabase(),
+        VOD_EXPORT_DB_ID: 'admin-db-id', VOD_EXPORT_NOVA_DB_ID: 'nova-db-id',
+      }, 'test-build-id');
+    } catch (error) {
+      rejected = error;
+    }
+    assert(
+      rejected instanceof VodExportSourceError
+        && rejected.code === 'EXPORT_LIMIT_EXCEEDED'
+        && rejected.details?.resource === testCase.resource
+        && rejected.details.actual === testCase.actual,
+      `${testCase.resource} is rejected from transactional SQL stats before row inspection`,
+    );
+  }
+}
+
 async function testCombinedAdminSourceMapping(): Promise<void> {
   const rows = [novaRow(1, 'alpha')];
   const nova = new FakeDatabase('nova', rows, [], sourceTextBytes(rows));
   const admin = new FakeDatabase('admin', [], [
-    { row_kind: 'stats', source_rows: 3, source_text_bytes: 100 },
+    { row_kind: 'stats', source_rows: 3, loaded_source_rows: 3, source_text_bytes: 100 },
     {
       row_kind: 'vod', source_rows: null, source_text_bytes: null, row_id: null,
       entity_id: 'stream-1', streamer_id: 'alpha', title: 'VOD', secondary_text: '2026-07-11',
@@ -312,25 +467,30 @@ async function testCombinedAdminSourceMapping(): Promise<void> {
     VOD_EXPORT_NOVA_DB_ID: 'nova-db-id',
   }, 'test-build-id');
 
-  equal(source.sourceRows, 3, 'combined source query preserves preflight row count');
-  equal(source.sourceTextBytes, sourceTextBytes(rows) + 100, 'combined source query preserves byte count');
+  equal(source.sourceRows, 3, 'narrow source queries preserve preflight row count');
+  equal(source.sourceTextBytes, sourceTextBytes(rows) + 100, 'narrow source queries preserve byte count');
+  deepEqual(source.data.preflightCapacity, {
+    sourceRows: 3,
+    sourceTextBytes: sourceTextBytes(rows) + 100,
+  }, 'adapter carries full preflight capacity when unreferenced rows are not loaded');
   deepEqual(source.data.vods[0], {
     streamId: 'stream-1', streamerId: 'alpha', title: 'VOD', date: '2026-07-11',
     videoId: 'AAAAAAAAAAA', status: 'approved',
-  }, 'combined VOD row maps to the adapter model');
+  }, 'narrow VOD row maps to the adapter model');
   deepEqual(source.data.songs[0], {
     rowId: 7, songId: 'song-1', streamerId: 'alpha', title: 'Song',
     originalArtist: 'Artist', status: 'approved',
-  }, 'combined song row maps to the adapter model');
+  }, 'narrow song row maps to the adapter model');
   deepEqual(source.data.performances[0], {
     rowId: 9, performanceId: 'performance-1', streamerId: 'alpha', songId: 'song-1',
-    streamId: 'stream-1', startSeconds: { storageClass: 'integer', decimalText: '10' },
-    endSeconds: { storageClass: 'integer', decimalText: '20' }, status: 'approved',
-  }, 'combined performance row maps without numeric coercion');
-  equal(admin.sessions[0]?.statements.length, 3, 'DB source read remains one transactional batch');
+    streamId: 'stream-1', startStorageClass: 'integer', startDecimalText: '10',
+    endStorageClass: 'integer', endDecimalText: '20', status: 'approved',
+  }, 'narrow performance row maps without numeric coercion');
+  equal(admin.sessions[0]?.statements.length, 6, 'DB source read remains one transactional batch');
 
-  const generated = admin.sourceStatement();
-  const sqliteSql = bindSqlForSqlite(generated.sql, generated.values);
+  const sqliteSql = admin.sourceStatements()
+    .map((statement) => bindSqlForSqlite(statement.sql, statement.values))
+    .join(';\n');
   const schemaAndRows = `
     CREATE TABLE streams (
       id TEXT PRIMARY KEY,
@@ -359,11 +519,16 @@ async function testCombinedAdminSourceMapping(): Promise<void> {
     INSERT INTO streams VALUES
       ('stream-1', 'alpha', 'VOD', '2026-07-11', 'AAAAAAAAAAA', 'approved'),
       (NULL, 'alpha', 'NULL ID VOD', '2026-07-10', 'BBBBBBBBBBB', 'approved'),
-      ('pending-stream', 'alpha', 'Referenced pending', '2026-07-09', 'CCCCCCCCCCC', NULL);
-    INSERT INTO songs VALUES ('song-1', 'alpha', 'Song', 'Artist', 'approved');
+      ('pending-stream', 'alpha', 'Referenced pending', '2026-07-09', 'CCCCCCCCCCC', NULL),
+      ('other-stream', 'beta', 'Mismatched VOD', '2026-07-08', 'DDDDDDDDDDD', 'approved');
+    INSERT INTO songs VALUES
+      ('song-1', 'alpha', 'Song', 'Artist', 'approved'),
+      ('other-song', 'beta', 'Mismatched Song', 'Other Artist', 'approved');
     INSERT INTO performances VALUES
       ('performance-1', 'alpha', 'song-1', 'stream-1', 10, 20, 'approved'),
-      ('performance-2', 'alpha', 'song-1', 'pending-stream', 30, 40, 'approved');
+      ('performance-2', 'alpha', 'song-1', 'pending-stream', 30, 40, 'approved'),
+      ('performance-3', 'alpha', 'song-1', 'missing-stream', 50, 60, 'approved'),
+      ('performance-4', 'alpha', 'other-song', 'other-stream', 70, 80, 'approved');
     ${sqliteSql};
   `;
   // @ts-expect-error The Worker project intentionally omits Node ambient types;
@@ -378,21 +543,93 @@ async function testCombinedAdminSourceMapping(): Promise<void> {
   }
   const firstLine = String(execution.stdout).trim().split('\n')[0] ?? '';
   const statsColumns = firstLine.split('|');
-  equal(statsColumns[0], 'stats', 'generated SQL returns its preflight row first');
-  equal(Number(statsColumns[1]), 6, 'generated SQL scopes streams, song, and performances exactly once');
+  equal(Number(statsColumns[0]), 10, 'generated SQL scopes streams, songs, and performances exactly once');
+  equal(Number(statsColumns[1]), 7, 'generated SQL loads only eligible and relationship-finding rows');
+  equal(Number(statsColumns[3]), 1, 'generated SQL preflights exactly one emitted VOD');
+  equal(Number(statsColumns[4]), 1, 'generated SQL preflights exactly one emitted performance');
+  equal(Number(statsColumns[5]), 3, 'generated SQL preflights missing and mismatched relationships');
   const expectedBytes =
     byteLength('stream-1', 'alpha', 'VOD', '2026-07-11', 'AAAAAAAAAAA', 'approved')
     + byteLength(null, 'alpha', 'NULL ID VOD', '2026-07-10', 'BBBBBBBBBBB', 'approved')
     + byteLength('pending-stream', 'alpha', 'Referenced pending', '2026-07-09', 'CCCCCCCCCCC', null)
     + byteLength('song-1', 'alpha', 'Song', 'Artist', 'approved')
+    + byteLength('other-stream', 'beta', 'Mismatched VOD', '2026-07-08', 'DDDDDDDDDDD', 'approved')
+    + byteLength('other-song', 'beta', 'Mismatched Song', 'Other Artist', 'approved')
     + byteLength('performance-1', 'alpha', 'song-1', 'stream-1', '10', '20', 'approved')
-    + byteLength('performance-2', 'alpha', 'song-1', 'pending-stream', '30', '40', 'approved');
+    + byteLength('performance-2', 'alpha', 'song-1', 'pending-stream', '30', '40', 'approved')
+    + byteLength('performance-3', 'alpha', 'song-1', 'missing-stream', '50', '60', 'approved')
+    + byteLength('performance-4', 'alpha', 'other-song', 'other-stream', '70', '80', 'approved');
   equal(Number(statsColumns[2]), expectedBytes,
     'generated SQL null-coalesces IDs/status without dropping the rest of either row');
+
+  assertSelectiveAdapterMatchesCoreSemantics();
+}
+
+function assertSelectiveAdapterMatchesCoreSemantics(): void {
+  const streamers: ExportSourceStreamer[] = [{
+    submissionId: 'submission-alpha', slug: 'alpha', displayName: 'Alpha',
+    youtubeChannelId: 'channel-alpha', verifiedYoutubeChannelId: 'channel-alpha',
+    youtubeChannelVerifiedAt: '2026-07-11T00:00:00.000Z', avatarUrl: null,
+    group: null, socialLinks: {}, enabled: true, status: 'approved',
+  }];
+  const eligibleVod: ExportSourceVod = {
+    streamId: 'stream-1', streamerId: 'alpha', title: 'VOD', date: '2026-07-11',
+    videoId: 'AAAAAAAAAAA', status: 'approved',
+  };
+  const pendingVod: ExportSourceVod = {
+    streamId: 'pending-stream', streamerId: 'alpha', title: 'Pending', date: '2026-07-10',
+    videoId: 'BBBBBBBBBBB', status: 'pending',
+  };
+  const mismatchedVod: ExportSourceVod = {
+    streamId: 'other-stream', streamerId: 'beta', title: 'Other', date: '2026-07-09',
+    videoId: 'CCCCCCCCCCC', status: 'approved',
+  };
+  const eligibleSong: ExportSourceSong = {
+    rowId: 1, songId: 'song-1', streamerId: 'alpha', title: 'Song',
+    originalArtist: 'Artist', status: 'approved',
+  };
+  const mismatchedSong: ExportSourceSong = {
+    rowId: 2, songId: 'other-song', streamerId: 'beta', title: 'Other Song',
+    originalArtist: 'Other Artist', status: 'approved',
+  };
+  const performance = (
+    rowId: number,
+    performanceId: string,
+    songId: string,
+    streamId: string,
+  ): ExportSourcePerformance => ({
+    rowId, performanceId, streamerId: 'alpha', songId, streamId,
+    startStorageClass: 'integer', startDecimalText: String(rowId * 10),
+    endStorageClass: 'integer', endDecimalText: String(rowId * 10 + 5), status: 'approved',
+  });
+  const eligible = performance(1, 'performance-1', 'song-1', 'stream-1');
+  const pending = performance(2, 'performance-2', 'song-1', 'pending-stream');
+  const missing = performance(3, 'performance-3', 'song-1', 'missing-stream');
+  const mismatched = performance(4, 'performance-4', 'other-song', 'other-stream');
+
+  const complete = buildVodExportSnapshot({
+    streamers,
+    vods: [eligibleVod, pendingVod, mismatchedVod],
+    songs: [eligibleSong, mismatchedSong],
+    performances: [eligible, pending, missing, mismatched],
+  });
+  const sqlSelected = buildVodExportSnapshot({
+    streamers,
+    vods: [eligibleVod, mismatchedVod],
+    songs: [eligibleSong, mismatchedSong],
+    performances: [eligible, missing, mismatched],
+  });
+  deepEqual(sqlSelected.findings, complete.findings,
+    'SQL-selected eligible/broken rows preserve complete core findings semantics');
+  deepEqual(sqlSelected.snapshot, complete.snapshot,
+    'SQL-selected eligible/broken rows preserve complete core snapshot semantics');
 }
 
 async function main(): Promise<void> {
   await testBoundedStreamerScope();
+  await testOversizedStreamerScopeIsFragmented();
+  await testEmptyStreamerScopeHasValidCteShape();
+  await testAdminOutputPreflightLimits();
   await testCombinedAdminSourceMapping();
   console.log('✓ VOD export D1 source scope, limits, and transactional query');
 }

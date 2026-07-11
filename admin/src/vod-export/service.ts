@@ -1,4 +1,4 @@
-import { createSnapshotArtifact } from './canonical-json';
+import { createOrderedSnapshotArtifact } from './canonical-json';
 import { storeCandidate, type VodExportCandidateMetadata } from './candidate';
 import { acquireGenerationControl, releaseGenerationControl } from './control';
 import { ExportLimitExceededError } from './limits';
@@ -9,7 +9,7 @@ import {
   VodExportSourceError,
   type VodExportSourceBindings,
 } from './source';
-import { buildVodExportSnapshot } from './validation';
+import { buildOwnedVodExportSnapshot } from './validation';
 import type { CapacityDiagnostic, VodExportFinding } from './types';
 
 const GENERATION_ATTEMPTS = 3;
@@ -53,10 +53,11 @@ export async function generateVodExportPreview(
   try {
     for (let attempt = 0; attempt < GENERATION_ATTEMPTS; attempt += 1) {
       try {
-        const source = await readVodExportSource(bindings, exporterBuildId);
-        const build = buildVodExportSnapshot(source.data);
+        const { build, fingerprint } = buildStableSource(
+          await readVodExportSource(bindings, exporterBuildId),
+        );
         const endingFingerprint = await readCurrentSourceFingerprint(bindings, exporterBuildId);
-        if (!sourceFingerprintsEqual(source.fingerprint, endingFingerprint)) {
+        if (!sourceFingerprintsEqual(fingerprint, endingFingerprint)) {
           if (attempt + 1 < GENERATION_ATTEMPTS) {
             await waitBeforeRetry(RETRY_DELAYS_MS[attempt] ?? RETRY_DELAYS_MS[1]);
             continue;
@@ -68,25 +69,31 @@ export async function generateVodExportPreview(
           );
         }
 
-        if (!build.canPublish || build.snapshot === null) {
+        const {
+          canPublish,
+          findings,
+          capacity: buildCapacity,
+          snapshot,
+        } = build;
+        if (!canPublish || snapshot === null) {
           return {
             canPublish: false,
-            findings: build.findings,
-            capacity: build.capacity,
+            findings,
+            capacity: buildCapacity,
           };
         }
 
-        const artifact = await createSnapshotArtifact(build.snapshot);
-        artifact.capacity = mergeCapacity(build.capacity, artifact.capacity);
+        const artifact = await createOrderedSnapshotArtifact(snapshot);
+        artifact.capacity = mergeCapacity(buildCapacity, artifact.capacity);
         const candidate = await storeCandidate(
           bindings.VOD_EXPORT_PRIVATE,
           artifact,
-          build.findings,
-          source.fingerprint,
+          findings,
+          fingerprint,
         );
         return {
           canPublish: true,
-          findings: build.findings,
+          findings,
           capacity: artifact.capacity,
           candidate,
         };
@@ -130,6 +137,18 @@ export async function generateVodExportPreview(
       }));
     }
   }
+}
+
+function buildStableSource(
+  source: Awaited<ReturnType<typeof readVodExportSource>>,
+): {
+  build: ReturnType<typeof buildOwnedVodExportSnapshot>;
+  fingerprint: Awaited<ReturnType<typeof readVodExportSource>>['fingerprint'];
+} {
+  return {
+    build: buildOwnedVodExportSnapshot(source.data),
+    fingerprint: source.fingerprint,
+  };
 }
 
 function mergeCapacity(

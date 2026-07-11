@@ -50,14 +50,15 @@ npx wrangler d1 time-travel info oshi-prism-db
 npx wrangler d1 time-travel info oshi-prism-nova
 ```
 
-Then apply only the two new reviewed files:
+Then apply only the three new reviewed files:
 
 ```sh
 npx wrangler d1 execute oshi-prism-db --remote --file=migrations/0002_add_vod_export_state.sql
 npx wrangler d1 execute oshi-prism-nova --remote --file=../tools/nova/migrations/0014_add_vod_export_state.sql
+npx wrangler d1 execute oshi-prism-db --remote --file=migrations/0003_add_vod_export_source_indexes.sql
 ```
 
-Treat each file as a one-time migration. Before running it, inspect the target
+Treat each state-table file as a one-time migration. Before running it, inspect the target
 for its new singleton table, exact triggers, audit/resolution tables, and verification
 columns. Apply the file only when all of that migration's objects are absent;
 if the target is partially migrated, stop and reconcile it from the Time Travel
@@ -66,6 +67,10 @@ manually insert a fake `d1_migrations` baseline during this rollout. A future
 conversion to `wrangler d1 migrations apply` needs a separately reviewed
 baseline procedure for every migration that was previously run with
 `d1 execute`.
+
+The `0003` index migration is intentionally idempotent. Verify that
+`idx_performances_stream_id` exists on `performances(stream_id)` after applying
+it; reapplying this one index-only file is safe.
 
 Verify the singleton state rows, exact trigger names, Admin audit/resolution tables, and the
 two NOVA verification columns before deploying. Existing YouTube channel IDs

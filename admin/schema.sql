@@ -56,6 +56,7 @@ CREATE INDEX IF NOT EXISTS idx_songs_status ON songs(status);
 CREATE INDEX IF NOT EXISTS idx_songs_streamer ON songs(streamer_id);
 CREATE INDEX IF NOT EXISTS idx_songs_streamer_status ON songs(streamer_id, status);
 CREATE INDEX IF NOT EXISTS idx_performances_song_id ON performances(song_id);
+CREATE INDEX IF NOT EXISTS idx_performances_stream_id ON performances(stream_id);
 CREATE INDEX IF NOT EXISTS idx_performances_status ON performances(status);
 CREATE INDEX IF NOT EXISTS idx_performances_streamer ON performances(streamer_id);
 CREATE INDEX IF NOT EXISTS idx_performances_streamer_status ON performances(streamer_id, status);

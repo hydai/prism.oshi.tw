@@ -7,6 +7,7 @@ import {
   canonicalSnapshotByteLength,
   compareUtf8Ordinal,
   countExportRelevantSourceTextBytes,
+  createOrderedSnapshotArtifact,
   createSnapshotArtifact,
   isValidDateOnly,
   jsonStringByteLength,
@@ -24,6 +25,7 @@ import type {
   ExportSourceStreamer,
   ExportSourceVod,
   SqliteIntegerSource,
+  VodExportSnapshot,
   VodExportSourceData,
 } from './types';
 
@@ -116,8 +118,10 @@ function performance(overrides: Partial<ExportSourcePerformance> = {}): ExportSo
     streamerId: 'alpha',
     songId: 'song-1',
     streamId: 'stream-1',
-    startSeconds: integer(10),
-    endSeconds: integer(20),
+    startStorageClass: 'integer',
+    startDecimalText: '10',
+    endStorageClass: 'integer',
+    endDecimalText: '20',
     status: 'approved',
     ...overrides,
   };
@@ -155,15 +159,20 @@ function validSource(): VodExportSourceData {
       song({ rowId: 3, songId: 'song-pending', title: null, originalArtist: null, status: 'pending' }),
     ],
     performances: [
-      performance({ rowId: 2, performanceId: 'performance-2', startSeconds: integer(20), endSeconds: integer(30) }),
+      performance({
+        rowId: 2,
+        performanceId: 'performance-2',
+        startDecimalText: '20',
+        endDecimalText: '30',
+      }),
       performance(),
       performance({
         rowId: 3,
         performanceId: 'performance-3',
         songId: 'song-2',
         streamId: 'stream-2',
-        startSeconds: integer(5),
-        endSeconds: integer(9),
+        startDecimalText: '5',
+        endDecimalText: '9',
       }),
       performance({
         rowId: 4,
@@ -277,9 +286,16 @@ async function testValidBuildAndArtifact(): Promise<void> {
   deepEqual(built.snapshot.streamers[1]?.vods, [], 'approved enabled streamer with no VOD remains present');
 
   const artifact = await createSnapshotArtifact(built.snapshot);
+  const ownedArtifact = await createOrderedSnapshotArtifact(built.snapshot);
   equal(artifact.uncompressedBytes, artifact.bytes.byteLength, 'artifact length uses exact canonical bytes');
   equal(
-    canonicalSnapshotByteLength(artifact.snapshot),
+    decoder.decode(ownedArtifact.bytes),
+    decoder.decode(artifact.bytes),
+    'owned ordered fast path is byte-for-byte identical to strict canonical serialization',
+  );
+  equal(ownedArtifact.sha256, artifact.sha256, 'owned ordered fast path preserves the canonical hash');
+  equal(
+    canonicalSnapshotByteLength(built.snapshot),
     artifact.bytes.byteLength,
     'allocation-free canonical preflight exactly matches emitted bytes',
   );
@@ -291,6 +307,43 @@ async function testValidBuildAndArtifact(): Promise<void> {
   assert(snapshotText.startsWith('{"schemaVersion":"1.0.0","streamers":['), 'snapshot property order is fixed');
   assert(snapshotText.includes('Café'), 'non-ASCII is emitted directly');
   assert(!snapshotText.includes('Cafe\\u0301'), 'decomposed source text is not emitted');
+
+  const edgeSnapshot: VodExportSnapshot = {
+    schemaVersion: '1.0.0',
+    streamers: [{
+      vods: [{
+        performances: [{
+          endSeconds: Number.MAX_SAFE_INTEGER,
+          startSeconds: Number.MAX_SAFE_INTEGER - 1,
+          originalArtist: 'Artist\u2028\u2029',
+          title: 'Control\u0000\n😀',
+          songId: 'song-edge',
+          performanceId: 'performance-edge',
+        }],
+        videoId: 'ZZZZZZZZZZZ',
+        date: '2026-07-11',
+        title: 'VOD\u0001',
+      }],
+      socialLinks: { youtube: 'https://www.youtube.com/@edge' },
+      group: null,
+      avatarUrl: null,
+      youtubeChannelId: 'channel-edge',
+      displayName: 'Edge 😀',
+      slug: 'edge',
+    }],
+  };
+  const strictEdgeArtifact = await createSnapshotArtifact(edgeSnapshot);
+  const ownedEdgeArtifact = await createOrderedSnapshotArtifact(edgeSnapshot);
+  equal(
+    decoder.decode(ownedEdgeArtifact.bytes),
+    decoder.decode(strictEdgeArtifact.bytes),
+    'ordered fast path matches strict canonical bytes for escaping and maximum safe integers',
+  );
+  equal(
+    ownedEdgeArtifact.sha256,
+    strictEdgeArtifact.sha256,
+    'ordered fast path matches strict canonical hash for edge values',
+  );
 
   const manifestText = decoder.decode(serializeCanonicalManifest({
     schemaVersion: VOD_EXPORT_SCHEMA_VERSION,
@@ -329,12 +382,14 @@ function testBlockingValidation(): void {
     songs: base.songs,
     performances: [
       ...base.performances.map((item) => {
-        if (item.performanceId === 'performance-1') return { ...item, endSeconds: missingInteger() };
+        if (item.performanceId === 'performance-1') {
+          return { ...item, endStorageClass: 'null', endDecimalText: null };
+        }
         if (item.performanceId === 'performance-2') {
-          return { ...item, startSeconds: { storageClass: 'text', decimalText: '20' } };
+          return { ...item, startStorageClass: 'text', startDecimalText: '20' };
         }
         if (item.performanceId === 'performance-3') {
-          return { ...item, startSeconds: integer(20), endSeconds: integer(10) };
+          return { ...item, startDecimalText: '20', endDecimalText: '10' };
         }
         return item;
       }),
@@ -457,7 +512,7 @@ function testFindingAndCapacityHelpers(): void {
   const longTimestampSource: VodExportSourceData = {
     ...sourceForTextBytes,
     performances: [
-      { ...firstPerformance, startSeconds: { storageClass: 'text', decimalText: 'x'.repeat(100) } },
+      { ...firstPerformance, startStorageClass: 'text', startDecimalText: 'x'.repeat(100) },
       ...sourceForTextBytes.performances.slice(1),
     ],
   };

@@ -2,6 +2,7 @@ import { SOCIAL_PROVIDERS, VOD_EXPORT_SCHEMA_VERSION } from './constants';
 import { FindingCollector, type FindingInput } from './findings';
 import {
   assertWithinCapacity,
+  measureOwnedSourceCapacity,
   measureSourceCapacity,
 } from './limits';
 import {
@@ -11,17 +12,19 @@ import {
   isValidRfc3339Timestamp,
   isValidStreamerSlug,
   isValidVideoId,
-  normalizeDisplayText,
-  parseSqliteInteger,
+  INVALID_NORMALIZED_DISPLAY_TEXT,
+  normalizeDisplayTextValue,
+  parseSqliteIntegerValue,
   validateOptionalSafeUrl,
 } from './normalization';
-import { orderSnapshot } from './ordering';
+import { orderOwnedSnapshotInPlace } from './ordering';
 import type {
   ExportSourcePerformance,
   ExportSourceSong,
   ExportSourceStreamer,
   ExportSourceVod,
   FindingDetails,
+  OwnedVodExportSourceData,
   PublicFindingField,
   VodExportBuildResult,
   VodExportCounts,
@@ -33,23 +36,20 @@ import type {
   VodExportVod,
 } from './types';
 
-type IdentityResult =
-  | { kind: 'value'; value: string }
-  | { kind: 'missing' }
-  | { kind: 'invalid-unicode' };
+const MISSING_IDENTITY = Symbol('missing-identity');
+const INVALID_IDENTITY = Symbol('invalid-identity');
+type IdentityValue = string | typeof MISSING_IDENTITY | typeof INVALID_IDENTITY;
+const OWNED_SONG_VALIDATION = Symbol('owned-song-validation');
+const SONG_VALID = 1;
+const SONG_ARTIST_MISSING = 2;
+type OwnedSongValidation = 0 | 1 | 2 | 3;
+type OwnedSourceSong = ExportSourceSong & { [OWNED_SONG_VALIDATION]?: OwnedSongValidation };
 
 interface ValidatedStreamerRecord {
-  source: ExportSourceStreamer;
+  source?: ExportSourceStreamer;
   slug?: string;
   verifiedChannelId?: string;
   publicBase?: Omit<VodExportStreamer, 'vods'>;
-}
-
-interface EligibleOccurrence {
-  streamerSlug: string;
-  performance: ExportSourcePerformance;
-  vod: ExportSourceVod;
-  song: ExportSourceSong;
 }
 
 type ValidatedSong = {
@@ -66,20 +66,33 @@ type ValidatedSong = {
   artistMissing: boolean;
 };
 
-type ValidatedPerformance = {
-  valid: true;
-  performanceId: string;
-  startSeconds: number;
-  endSeconds: number;
-} | {
-  valid: false;
-  performanceId?: string;
-  startSeconds?: number;
-  endSeconds?: number;
-};
+interface OccurrenceAssembly {
+  vodsByStreamer: Map<string, VodExportVod[]>;
+  vodCount: number;
+  performanceCount: number;
+}
 
 export function buildVodExportSnapshot(source: VodExportSourceData): VodExportBuildResult {
-  const capacity = measureSourceCapacity(source);
+  return buildVodExportSnapshotInternal(source, false);
+}
+
+/** Consumes adapter-owned source arrays so raw rows can be reclaimed during generation. */
+export function buildOwnedVodExportSnapshot(
+  source: OwnedVodExportSourceData,
+  onCheckpoint?: (label: string) => void,
+): VodExportBuildResult {
+  return buildVodExportSnapshotInternal(source, true, onCheckpoint);
+}
+
+function buildVodExportSnapshotInternal(
+  source: VodExportSourceData | OwnedVodExportSourceData,
+  consumeSource: boolean,
+  onCheckpoint?: (label: string) => void,
+): VodExportBuildResult {
+  const capacity = consumeSource
+    ? measureOwnedSourceCapacity(source as OwnedVodExportSourceData)
+    : measureSourceCapacity(source);
+  onCheckpoint?.('source-capacity');
   const collector = new FindingCollector();
   const selectedStreamers = source.streamers.filter(
     (streamer) => streamer.status === 'approved' && streamer.enabled,
@@ -92,77 +105,70 @@ export function buildVodExportSnapshot(source: VodExportSourceData): VodExportBu
 
   const streamerRecords = selectedStreamers.map((streamer) => validateStreamer(streamer, collector));
   addDuplicateStreamerFindings(streamerRecords, collector);
+  onCheckpoint?.('streamers-validated');
 
   const streamerScope = new Map<string, string | undefined>();
   for (const record of streamerRecords) {
-    const rawSlug = record.source.slug;
+    const rawSlug = record.source?.slug ?? null;
     if (rawSlug !== null && !streamerScope.has(rawSlug)) {
       streamerScope.set(rawSlug, record.slug);
     }
   }
+  for (const record of streamerRecords) record.source = undefined;
+  if (consumeSource) {
+    releaseOwnedRows(selectedStreamers);
+    releaseOwnedRows(source.streamers);
+  }
   const vodByStreamId = indexBy(source.vods, (vod) => vod.streamId);
-  const songBySongId = indexBy(
-    source.songs.filter((song): song is ExportSourceSong & { songId: string } => song.songId !== null),
-    (song) => song.songId,
-  );
-  const eligibleOccurrences = collectEligibleOccurrences(
+  const songBySongId = new Map<string, ExportSourceSong>();
+  for (const song of source.songs) {
+    if (song.songId !== null) songBySongId.set(song.songId, song);
+  }
+  onCheckpoint?.('relations-indexed');
+  const occurrenceAssembly = validateAndAssembleOccurrences(
     source.performances,
     streamerScope,
     vodByStreamId,
     songBySongId,
     collector,
+    consumeSource,
+    onCheckpoint,
   );
-
-  const eligibleVods = new Set(eligibleOccurrences.map((occurrence) => occurrence.vod));
+  onCheckpoint?.('occurrences-assembled');
+  if (consumeSource) {
+    vodByStreamId.clear();
+    songBySongId.clear();
+    releaseOwnedRows(source.vods);
+    releaseOwnedRows(source.songs);
+  }
+  onCheckpoint?.('source-released');
   // The same rule applies to eligible VODs/occurrences: invalid public fields
   // block all bytes instead of shrinking the output. On every successful build
   // these prospective counts equal the assembled canonical snapshot exactly.
   const prospectiveCounts: VodExportCounts = {
     streamers: selectedStreamers.length,
-    vods: eligibleVods.size,
-    performances: eligibleOccurrences.length,
+    vods: occurrenceAssembly.vodCount,
+    performances: occurrenceAssembly.performanceCount,
   };
   capacity.push(
     assertWithinCapacity('vods', prospectiveCounts.vods),
     assertWithinCapacity('performances', prospectiveCounts.performances),
   );
 
-  const validatedVods = new Map<ExportSourceVod, VodExportVod | null>();
-  for (const vod of eligibleVods) {
-    validatedVods.set(vod, validateVod(vod, collector));
-  }
-  addDuplicateVodFindings(eligibleVods, collector);
-
-  const eligibleSongs = new Set(eligibleOccurrences.map((occurrence) => occurrence.song));
-  const validatedSongs = new Map<ExportSourceSong, ValidatedSong>();
-  for (const song of eligibleSongs) {
-    validatedSongs.set(song, validateSong(song, collector));
-  }
-
-  const validatedPerformances = new Map<ExportSourcePerformance, ValidatedPerformance>();
-  for (const occurrence of eligibleOccurrences) {
-    if (!validatedPerformances.has(occurrence.performance)) {
-      validatedPerformances.set(
-        occurrence.performance,
-        validatePerformance(occurrence.performance, occurrence.streamerSlug, collector),
-      );
-    }
-  }
-  addMissingArtistWarnings(eligibleOccurrences, validatedSongs, collector);
-
-  const provisionalSnapshot = assembleSnapshot(
-    streamerRecords,
-    eligibleOccurrences,
-    validatedVods,
-    validatedSongs,
-    validatedPerformances,
-  );
   const validation = collector.complete();
   capacity.push(...collector.capacity());
+  onCheckpoint?.('findings-complete');
+  const snapshot = validation.canPublish
+    ? orderOwnedSnapshotInPlace(assembleSnapshot(
+        streamerRecords,
+        occurrenceAssembly.vodsByStreamer,
+      ))
+    : null;
+  onCheckpoint?.('snapshot-ordered');
 
   return {
     ...validation,
-    snapshot: validation.canPublish ? orderSnapshot(provisionalSnapshot) : null,
+    snapshot,
     counts: prospectiveCounts,
     capacity,
   };
@@ -170,35 +176,35 @@ export function buildVodExportSnapshot(source: VodExportSourceData): VodExportBu
 
 function validateStreamer(source: ExportSourceStreamer, collector: FindingCollector): ValidatedStreamerRecord {
   const slugResult = validateSlugIdentity(source.slug);
-  const slug = slugResult.kind === 'value' ? slugResult.value : undefined;
-  if (slugResult.kind === 'missing') {
+  const slug = typeof slugResult === 'string' ? slugResult : undefined;
+  if (slugResult === MISSING_IDENTITY) {
     addStreamerFinding(collector, source, undefined, 'MISSING_STREAMER_SLUG', 'slug');
-  } else if (slugResult.kind !== 'value') {
+  } else if (slugResult === INVALID_IDENTITY) {
     addStreamerFinding(collector, source, undefined, 'INVALID_STREAMER_SLUG', 'slug');
   }
 
-  const displayName = normalizeDisplayText(source.displayName);
-  if (displayName.kind === 'missing') {
+  const displayName = normalizeDisplayTextValue(source.displayName);
+  if (displayName === null) {
     addStreamerFinding(collector, source, slug, 'MISSING_DISPLAY_NAME', 'displayName');
-  } else if (displayName.kind === 'invalid-unicode') {
+  } else if (displayName === INVALID_NORMALIZED_DISPLAY_TEXT) {
     addStreamerFinding(collector, source, slug, 'INVALID_UNICODE_TEXT', 'displayName');
   }
 
   const channelIdentity = validateOpaqueIdentity(source.youtubeChannelId);
   let verifiedChannelId: string | undefined;
-  if (channelIdentity.kind === 'missing') {
+  if (channelIdentity === MISSING_IDENTITY) {
     addStreamerFinding(collector, source, slug, 'MISSING_YOUTUBE_CHANNEL_ID', 'youtubeChannelId');
-  } else if (channelIdentity.kind === 'invalid-unicode') {
+  } else if (channelIdentity === INVALID_IDENTITY) {
     addStreamerFinding(collector, source, slug, 'INVALID_UNICODE_TEXT', 'youtubeChannelId');
   } else {
     const verificationIsValid =
-      source.verifiedYoutubeChannelId === channelIdentity.value &&
+      source.verifiedYoutubeChannelId === channelIdentity &&
       source.youtubeChannelVerifiedAt !== null &&
       !isBlankText(source.youtubeChannelVerifiedAt) &&
       hasValidUnicodeScalars(source.youtubeChannelVerifiedAt) &&
       isValidRfc3339Timestamp(source.youtubeChannelVerifiedAt);
     if (verificationIsValid) {
-      verifiedChannelId = channelIdentity.value;
+      verifiedChannelId = channelIdentity;
     } else {
       addStreamerFinding(collector, source, slug, 'UNVERIFIED_YOUTUBE_CHANNEL_ID', 'youtubeChannelId');
     }
@@ -209,8 +215,8 @@ function validateStreamer(source: ExportSourceStreamer, collector: FindingCollec
     addStreamerFinding(collector, source, slug, 'UNSAFE_AVATAR_URL', 'avatarUrl');
   }
 
-  const group = normalizeDisplayText(source.group);
-  if (group.kind === 'invalid-unicode') {
+  const group = normalizeDisplayTextValue(source.group);
+  if (group === INVALID_NORMALIZED_DISPLAY_TEXT) {
     addStreamerFinding(collector, source, slug, 'INVALID_UNICODE_TEXT', 'group');
   }
 
@@ -228,16 +234,16 @@ function validateStreamer(source: ExportSourceStreamer, collector: FindingCollec
   let publicBase: Omit<VodExportStreamer, 'vods'> | undefined;
   if (
     slug !== undefined &&
-    displayName.kind === 'value' &&
+    typeof displayName === 'string' &&
     verifiedChannelId !== undefined &&
-    group.kind !== 'invalid-unicode'
+    group !== INVALID_NORMALIZED_DISPLAY_TEXT
   ) {
     publicBase = {
       slug,
-      displayName: displayName.value,
+      displayName,
       youtubeChannelId: verifiedChannelId,
       avatarUrl: avatar.kind === 'safe' ? avatar.url : null,
-      group: group.kind === 'value' ? group.value : null,
+      group: typeof group === 'string' ? group : null,
       socialLinks,
     };
   }
@@ -266,9 +272,13 @@ function addDuplicateStreamerFindings(
   for (const duplicates of byChannel.values()) {
     if (duplicates.length < 2) continue;
     for (const record of duplicates) {
+      const source = record.source;
+      if (source === undefined) {
+        throw new Error('streamer source was released before duplicate validation completed');
+      }
       addStreamerFinding(
         collector,
-        record.source,
+        source,
         record.slug,
         'DUPLICATE_YOUTUBE_CHANNEL_ID',
         'youtubeChannelId',
@@ -278,57 +288,156 @@ function addDuplicateStreamerFindings(
   }
 }
 
-function collectEligibleOccurrences(
+function validateAndAssembleOccurrences(
   performances: readonly ExportSourcePerformance[],
   streamerScope: ReadonlyMap<string, string | undefined>,
   vodByStreamId: ReadonlyMap<string, ExportSourceVod>,
   songBySongId: ReadonlyMap<string, ExportSourceSong>,
   collector: FindingCollector,
-): EligibleOccurrence[] {
-  const eligible: EligibleOccurrence[] = [];
-  for (const performance of performances) {
-    if (performance.status !== 'approved' || !streamerScope.has(performance.streamerId)) continue;
+  consumeSource: boolean,
+  onCheckpoint?: (label: string) => void,
+): OccurrenceAssembly {
+  const validatedVods = new Map<ExportSourceVod, VodExportVod | null>();
+  const eligibleVodIdentities = new Map<string, Map<string, number>>();
+  const validatedSongs = consumeSource ? null : new Map<ExportSourceSong, ValidatedSong>();
+  const missingArtistCounts = new Map<ExportSourceSong, number>();
+  const vodsByStreamer = new Map<string, VodExportVod[]>();
+  let performanceCount = 0;
 
-    const safeStreamerSlug = streamerScope.get(performance.streamerId);
-    const vod = vodByStreamId.get(performance.streamId);
-    const song = songBySongId.get(performance.songId);
-    const context = performanceContext(performance, safeStreamerSlug);
-    if (vod === undefined) collector.add({ ...context, code: 'MISSING_VOD_RELATION' });
-    if (song === undefined) collector.add({ ...context, code: 'MISSING_SONG_RELATION' });
+  for (let index = 0; index < performances.length; index += 1) {
+    const performance = performances[index];
+    if (performance === undefined) continue;
+    try {
+      if (performance.status !== 'approved' || !streamerScope.has(performance.streamerId)) continue;
 
-    const vodMatches = vod === undefined || vod.streamerId === performance.streamerId;
-    const songMatches = song === undefined || song.streamerId === performance.streamerId;
-    if (vod !== undefined && !vodMatches) collector.add({ ...context, code: 'VOD_STREAMER_MISMATCH' });
-    if (song !== undefined && !songMatches) collector.add({ ...context, code: 'SONG_STREAMER_MISMATCH' });
+      const safeStreamerSlug = streamerScope.get(performance.streamerId);
+      const vod = vodByStreamId.get(performance.streamId);
+      const song = songBySongId.get(performance.songId);
+      if (vod === undefined || song === undefined) {
+        const context = performanceContext(performance, safeStreamerSlug);
+        if (vod === undefined) collector.add({ ...context, code: 'MISSING_VOD_RELATION' });
+        if (song === undefined) collector.add({ ...context, code: 'MISSING_SONG_RELATION' });
+      }
 
-    if (
-      vod !== undefined &&
-      song !== undefined &&
-      safeStreamerSlug !== undefined &&
-      vodMatches &&
-      songMatches &&
-      vod.status === 'approved' &&
-      song.status === 'approved'
-    ) {
-      eligible.push({ streamerSlug: safeStreamerSlug, performance, vod, song });
+      const vodMatches = vod === undefined || vod.streamerId === performance.streamerId;
+      const songMatches = song === undefined || song.streamerId === performance.streamerId;
+      if (!vodMatches || !songMatches) {
+        const context = performanceContext(performance, safeStreamerSlug);
+        if (!vodMatches) collector.add({ ...context, code: 'VOD_STREAMER_MISMATCH' });
+        if (!songMatches) collector.add({ ...context, code: 'SONG_STREAMER_MISMATCH' });
+      }
+
+      if (
+        vod !== undefined &&
+        song !== undefined &&
+        safeStreamerSlug !== undefined &&
+        vodMatches &&
+        songMatches &&
+        vod.status === 'approved' &&
+        song.status === 'approved'
+      ) {
+        performanceCount += 1;
+
+        let validatedVod: VodExportVod | null;
+        if (validatedVods.has(vod)) {
+          validatedVod = validatedVods.get(vod) ?? null;
+        } else {
+          validatedVod = validateVod(vod, collector, eligibleVodIdentities);
+          validatedVods.set(vod, validatedVod);
+        }
+        let songId: string | undefined;
+        let songTitle: string | undefined;
+        let originalArtist: string | null = null;
+        let artistMissing: boolean;
+        if (consumeSource) {
+          const state = validateOwnedSong(song, collector);
+          artistMissing = (state & SONG_ARTIST_MISSING) !== 0;
+          if ((state & SONG_VALID) !== 0) {
+            songId = song.songId ?? undefined;
+            songTitle = song.title ?? undefined;
+            originalArtist = song.originalArtist;
+          }
+        } else {
+          let validatedSong = validatedSongs?.get(song);
+          if (validatedSong === undefined) {
+            validatedSong = validateSong(song, collector);
+            validatedSongs?.set(song, validatedSong);
+          }
+          artistMissing = validatedSong.artistMissing;
+          if (validatedSong.valid) {
+            songId = validatedSong.songId;
+            songTitle = validatedSong.title;
+            originalArtist = validatedSong.originalArtist;
+          }
+        }
+        const validatedPerformance = validatePerformance(
+          performance,
+          safeStreamerSlug,
+          songId,
+          songTitle,
+          originalArtist,
+          collector,
+        );
+
+        if (artistMissing) {
+          missingArtistCounts.set(song, (missingArtistCounts.get(song) ?? 0) + 1);
+        }
+        if (validatedVod !== null && validatedPerformance !== null) {
+          if (validatedVod.performances.length === 0) {
+            const vods = vodsByStreamer.get(safeStreamerSlug);
+            if (vods === undefined) vodsByStreamer.set(safeStreamerSlug, [validatedVod]);
+            else vods.push(validatedVod);
+          }
+          validatedVod.performances.push(validatedPerformance);
+        }
+      }
+    } finally {
+      if (consumeSource) releaseOwnedRow(performances, index);
     }
+    if ((index + 1) % 10_000 === 0) onCheckpoint?.(`performance-${index + 1}`);
   }
-  return eligible;
+
+  addDuplicateVodFindings(eligibleVodIdentities, collector);
+  onCheckpoint?.('vod-duplicates-checked');
+  addMissingArtistWarnings(missingArtistCounts, collector);
+  onCheckpoint?.('artist-warnings-added');
+
+  onCheckpoint?.('vods-grouped');
+
+  const vodCount = validatedVods.size;
+  eligibleVodIdentities.clear();
+  validatedVods.clear();
+  validatedSongs?.clear();
+  missingArtistCounts.clear();
+
+  return {
+    vodsByStreamer,
+    vodCount,
+    performanceCount,
+  };
 }
 
-function validateVod(source: ExportSourceVod, collector: FindingCollector): VodExportVod | null {
+function validateVod(
+  source: ExportSourceVod,
+  collector: FindingCollector,
+  eligibleVodIdentities: Map<string, Map<string, number>>,
+): VodExportVod | null {
   const videoIdentity = validateVideoIdentity(source.videoId);
-  const videoId = videoIdentity.kind === 'value' ? videoIdentity.value : undefined;
-  if (videoIdentity.kind === 'missing') {
+  const videoId = typeof videoIdentity === 'string' ? videoIdentity : undefined;
+  if (videoIdentity === MISSING_IDENTITY) {
     addVodFinding(collector, source, undefined, 'MISSING_VIDEO_ID', 'videoId');
-  } else if (videoIdentity.kind !== 'value') {
+  } else if (videoIdentity === INVALID_IDENTITY) {
     addVodFinding(collector, source, undefined, 'INVALID_VIDEO_ID', 'videoId');
+  } else {
+    const byVideo = eligibleVodIdentities.get(source.streamerId) ?? new Map<string, number>();
+    byVideo.set(videoIdentity, (byVideo.get(videoIdentity) ?? 0) + 1);
+    eligibleVodIdentities.set(source.streamerId, byVideo);
   }
 
-  const title = normalizeDisplayText(source.title);
-  if (title.kind === 'missing') {
+  const title = normalizeDisplayTextValue(source.title);
+  if (title === null) {
     addVodFinding(collector, source, videoId, 'MISSING_VOD_TITLE', 'title');
-  } else if (title.kind === 'invalid-unicode') {
+  } else if (title === INVALID_NORMALIZED_DISPLAY_TEXT) {
     addVodFinding(collector, source, videoId, 'INVALID_UNICODE_TEXT', 'title');
   }
 
@@ -343,38 +452,24 @@ function validateVod(source: ExportSourceVod, collector: FindingCollector): VodE
     date = source.date ?? undefined;
   }
 
-  if (videoId === undefined || title.kind !== 'value' || date === undefined) return null;
-  return { title: title.value, date, videoId, performances: [] };
+  if (videoId === undefined || typeof title !== 'string' || date === undefined) return null;
+  return { title, date, videoId, performances: [] };
 }
 
 function addDuplicateVodFindings(
-  vods: ReadonlySet<ExportSourceVod>,
+  identities: ReadonlyMap<string, ReadonlyMap<string, number>>,
   collector: FindingCollector,
 ): void {
-  const byStreamer = new Map<string, Map<string, ExportSourceVod[]>>();
-  for (const vod of vods) {
-    const identity = validateVideoIdentity(vod.videoId);
-    if (identity.kind !== 'value') continue;
-    let byVideo = byStreamer.get(vod.streamerId);
-    if (byVideo === undefined) {
-      byVideo = new Map();
-      byStreamer.set(vod.streamerId, byVideo);
-    }
-    const rows = byVideo.get(identity.value) ?? [];
-    rows.push(vod);
-    byVideo.set(identity.value, rows);
-  }
-
-  for (const [streamerSlug, byVideo] of byStreamer) {
-    for (const [videoId, duplicates] of byVideo) {
-      if (duplicates.length < 2) continue;
+  for (const [streamerSlug, byVideo] of identities) {
+    for (const [videoId, duplicateCount] of byVideo) {
+      if (duplicateCount < 2) continue;
       collector.add({
         code: 'DUPLICATE_VOD_VIDEO_ID',
         streamerSlug,
         entityType: 'vod',
         entityId: videoId,
         field: 'videoId',
-        details: { duplicateCount: duplicates.length },
+        details: { duplicateCount },
       });
     }
   }
@@ -382,70 +477,112 @@ function addDuplicateVodFindings(
 
 function validateSong(source: ExportSourceSong, collector: FindingCollector): ValidatedSong {
   const songIdentity = validateOpaqueIdentity(source.songId);
-  const songId = songIdentity.kind === 'value' ? songIdentity.value : undefined;
-  if (songIdentity.kind === 'missing') {
+  const songId = typeof songIdentity === 'string' ? songIdentity : undefined;
+  if (songIdentity === MISSING_IDENTITY) {
     addSongFinding(collector, source, undefined, 'MISSING_SONG_ID', 'songId');
-  } else if (songIdentity.kind === 'invalid-unicode') {
+  } else if (songIdentity === INVALID_IDENTITY) {
     addSongFinding(collector, source, undefined, 'INVALID_UNICODE_TEXT', 'songId');
   }
 
-  const title = normalizeDisplayText(source.title);
-  if (title.kind === 'missing') {
+  const title = normalizeDisplayTextValue(source.title);
+  if (title === null) {
     addSongFinding(collector, source, songId, 'MISSING_SONG_TITLE', 'title');
-  } else if (title.kind === 'invalid-unicode') {
+  } else if (title === INVALID_NORMALIZED_DISPLAY_TEXT) {
     addSongFinding(collector, source, songId, 'INVALID_UNICODE_TEXT', 'title');
   }
 
-  const artist = normalizeDisplayText(source.originalArtist);
-  if (artist.kind === 'invalid-unicode') {
+  const artist = normalizeDisplayTextValue(source.originalArtist);
+  if (artist === INVALID_NORMALIZED_DISPLAY_TEXT) {
     addSongFinding(collector, source, songId, 'INVALID_UNICODE_TEXT', 'originalArtist');
   }
 
-  const originalArtist = artist.kind === 'value' ? artist.value : null;
-  const artistMissing = artist.kind === 'missing';
-  if (songId !== undefined && title.kind === 'value' && artist.kind !== 'invalid-unicode') {
-    return { valid: true, songId, title: title.value, originalArtist, artistMissing };
+  const originalArtist = typeof artist === 'string' ? artist : null;
+  const artistMissing = artist === null;
+  if (songId !== undefined && typeof title === 'string' && artist !== INVALID_NORMALIZED_DISPLAY_TEXT) {
+    return { valid: true, songId, title, originalArtist, artistMissing };
   }
   return {
     valid: false,
     ...(songId === undefined ? {} : { songId }),
-    ...(title.kind === 'value' ? { title: title.value } : {}),
+    ...(typeof title === 'string' ? { title } : {}),
     originalArtist,
     artistMissing,
   };
 }
 
+function validateOwnedSong(source: ExportSourceSong, collector: FindingCollector): OwnedSongValidation {
+  const ownedSource = source as OwnedSourceSong;
+  const previous = ownedSource[OWNED_SONG_VALIDATION];
+  if (previous !== undefined) return previous;
+
+  const songIdentity = validateOpaqueIdentity(source.songId);
+  const songId = typeof songIdentity === 'string' ? songIdentity : undefined;
+  if (songIdentity === MISSING_IDENTITY) {
+    addSongFinding(collector, source, undefined, 'MISSING_SONG_ID', 'songId');
+  } else if (songIdentity === INVALID_IDENTITY) {
+    addSongFinding(collector, source, undefined, 'INVALID_UNICODE_TEXT', 'songId');
+  }
+
+  const title = normalizeDisplayTextValue(source.title);
+  if (title === null) {
+    addSongFinding(collector, source, songId, 'MISSING_SONG_TITLE', 'title');
+  } else if (title === INVALID_NORMALIZED_DISPLAY_TEXT) {
+    addSongFinding(collector, source, songId, 'INVALID_UNICODE_TEXT', 'title');
+  }
+
+  const artist = normalizeDisplayTextValue(source.originalArtist);
+  if (artist === INVALID_NORMALIZED_DISPLAY_TEXT) {
+    addSongFinding(collector, source, songId, 'INVALID_UNICODE_TEXT', 'originalArtist');
+  }
+
+  const artistMissing = artist === null;
+  const valid = songId !== undefined
+    && typeof title === 'string'
+    && artist !== INVALID_NORMALIZED_DISPLAY_TEXT;
+  const state = ((valid ? SONG_VALID : 0) | (artistMissing ? SONG_ARTIST_MISSING : 0)) as OwnedSongValidation;
+  if (valid) {
+    source.songId = songId;
+    source.title = title;
+    source.originalArtist = typeof artist === 'string' ? artist : null;
+  }
+  ownedSource[OWNED_SONG_VALIDATION] = state;
+  return state;
+}
+
 function validatePerformance(
   source: ExportSourcePerformance,
   streamerSlug: string,
+  songId: string | undefined,
+  songTitle: string | undefined,
+  originalArtist: string | null,
   collector: FindingCollector,
-): ValidatedPerformance {
+): VodExportPerformance | null {
   const identity = validateOpaqueIdentity(source.performanceId);
-  const performanceId = identity.kind === 'value' ? identity.value : undefined;
-  if (identity.kind === 'missing') {
+  const performanceId = typeof identity === 'string' ? identity : undefined;
+  if (identity === MISSING_IDENTITY) {
     addPerformanceFinding(collector, source, streamerSlug, undefined, 'MISSING_PERFORMANCE_ID', 'performanceId');
-  } else if (identity.kind === 'invalid-unicode') {
+  } else if (identity === INVALID_IDENTITY) {
     addPerformanceFinding(collector, source, streamerSlug, undefined, 'INVALID_UNICODE_TEXT', 'performanceId');
   }
 
-  const parsedStart = parseSqliteInteger(source.startSeconds);
+  const parsedStart = parseSqliteIntegerValue(source.startStorageClass, source.startDecimalText);
   let startSeconds: number | undefined;
-  if (parsedStart.kind === 'missing') {
+  if (parsedStart === 'missing') {
     addPerformanceFinding(collector, source, streamerSlug, performanceId, 'MISSING_START_SECONDS', 'startSeconds');
-  } else if (parsedStart.kind === 'invalid' || parsedStart.value < 0) {
+  } else if (parsedStart === 'invalid' || parsedStart < 0) {
     addPerformanceFinding(collector, source, streamerSlug, performanceId, 'INVALID_START_SECONDS', 'startSeconds');
   } else {
-    startSeconds = parsedStart.value;
+    startSeconds = parsedStart;
   }
 
-  const parsedEnd = parseSqliteInteger(source.endSeconds);
+  const parsedEnd = parseSqliteIntegerValue(source.endStorageClass, source.endDecimalText);
   let endSeconds: number | undefined;
-  if (parsedEnd.kind === 'missing') {
+  if (parsedEnd === 'missing') {
     addPerformanceFinding(collector, source, streamerSlug, performanceId, 'MISSING_END_SECONDS', 'endSeconds');
-  } else if (parsedEnd.kind === 'invalid' || parsedEnd.value < 0) {
+  } else if (parsedEnd === 'invalid' || parsedEnd < 0) {
     addPerformanceFinding(collector, source, streamerSlug, performanceId, 'INVALID_END_SECONDS', 'endSeconds');
   } else {
-    endSeconds = parsedEnd.value;
+    endSeconds = parsedEnd;
   }
 
   if (startSeconds !== undefined && endSeconds !== undefined && endSeconds <= startSeconds) {
@@ -462,34 +599,31 @@ function validatePerformance(
 
   if (
     performanceId !== undefined &&
+    songId !== undefined &&
+    songTitle !== undefined &&
     startSeconds !== undefined &&
     endSeconds !== undefined &&
     endSeconds > startSeconds
   ) {
-    return { valid: true, performanceId, startSeconds, endSeconds };
+    return {
+      performanceId,
+      songId,
+      title: songTitle,
+      originalArtist,
+      startSeconds,
+      endSeconds,
+    };
   }
-  return {
-    valid: false,
-    ...(performanceId === undefined ? {} : { performanceId }),
-    ...(startSeconds === undefined ? {} : { startSeconds }),
-    ...(endSeconds === undefined ? {} : { endSeconds }),
-  };
+  return null;
 }
 
 function addMissingArtistWarnings(
-  occurrences: readonly EligibleOccurrence[],
-  validatedSongs: ReadonlyMap<ExportSourceSong, ValidatedSong>,
+  counts: ReadonlyMap<ExportSourceSong, number>,
   collector: FindingCollector,
 ): void {
-  const counts = new Map<ExportSourceSong, number>();
-  for (const occurrence of occurrences) {
-    const validated = validatedSongs.get(occurrence.song);
-    if (validated?.artistMissing) counts.set(occurrence.song, (counts.get(occurrence.song) ?? 0) + 1);
-  }
-
   for (const [song, affectedPerformanceCount] of counts) {
     const identity = validateOpaqueIdentity(song.songId);
-    const songId = identity.kind === 'value' ? identity.value : undefined;
+    const songId = typeof identity === 'string' ? identity : undefined;
     addSongFinding(
       collector,
       song,
@@ -503,45 +637,13 @@ function addMissingArtistWarnings(
 
 function assembleSnapshot(
   streamerRecords: readonly ValidatedStreamerRecord[],
-  occurrences: readonly EligibleOccurrence[],
-  validatedVods: ReadonlyMap<ExportSourceVod, VodExportVod | null>,
-  validatedSongs: ReadonlyMap<ExportSourceSong, ValidatedSong>,
-  validatedPerformances: ReadonlyMap<ExportSourcePerformance, ValidatedPerformance>,
+  vodsByStreamer: ReadonlyMap<string, VodExportVod[]>,
 ): VodExportSnapshot {
-  const occurrencesBySlug = groupBy(occurrences, (occurrence) => occurrence.streamerSlug);
   const streamers: VodExportStreamer[] = [];
 
   for (const record of streamerRecords) {
     if (record.publicBase === undefined || record.slug === undefined) continue;
-    const performancesByVod = new Map<ExportSourceVod, VodExportPerformance[]>();
-
-    for (const occurrence of occurrencesBySlug.get(record.slug) ?? []) {
-      const vod = validatedVods.get(occurrence.vod);
-      const song = validatedSongs.get(occurrence.song);
-      const performance = validatedPerformances.get(occurrence.performance);
-      if (vod === null || vod === undefined || song === undefined || performance === undefined) continue;
-      if (!song.valid || !performance.valid) continue;
-
-      const output: VodExportPerformance = {
-        performanceId: performance.performanceId,
-        songId: song.songId,
-        title: song.title,
-        originalArtist: song.originalArtist,
-        startSeconds: performance.startSeconds,
-        endSeconds: performance.endSeconds,
-      };
-      const list = performancesByVod.get(occurrence.vod) ?? [];
-      list.push(output);
-      performancesByVod.set(occurrence.vod, list);
-    }
-
-    const vods: VodExportVod[] = [];
-    for (const [sourceVod, performances] of performancesByVod) {
-      if (performances.length === 0) continue;
-      const vod = validatedVods.get(sourceVod);
-      if (vod !== null && vod !== undefined) vods.push({ ...vod, performances });
-    }
-    streamers.push({ ...record.publicBase, vods });
+    streamers.push({ ...record.publicBase, vods: vodsByStreamer.get(record.slug) ?? [] });
   }
 
   return { schemaVersion: VOD_EXPORT_SCHEMA_VERSION, streamers };
@@ -627,31 +729,31 @@ function performanceContext(
   streamerSlug: string | undefined,
 ): Omit<FindingInput, 'code'> {
   const identity = validateOpaqueIdentity(source.performanceId);
-  const needsPrivateLocator = identity.kind !== 'value' || streamerSlug === undefined;
+  const needsPrivateLocator = typeof identity !== 'string' || streamerSlug === undefined;
   return {
     ...(streamerSlug === undefined ? {} : { streamerSlug }),
     entityType: 'performance',
-    ...(identity.kind === 'value' ? { entityId: identity.value } : {}),
+    ...(typeof identity === 'string' ? { entityId: identity } : {}),
     ...(needsPrivateLocator ? { details: { rowId: source.rowId } } : {}),
   };
 }
 
-function validateSlugIdentity(value: string | null): IdentityResult {
-  if (isBlankText(value)) return { kind: 'missing' };
-  if (!hasValidUnicodeScalars(value ?? '') || !isValidStreamerSlug(value ?? '')) return { kind: 'invalid-unicode' };
-  return { kind: 'value', value: value ?? '' };
+function validateSlugIdentity(value: string | null): IdentityValue {
+  if (isBlankText(value)) return MISSING_IDENTITY;
+  if (!hasValidUnicodeScalars(value ?? '') || !isValidStreamerSlug(value ?? '')) return INVALID_IDENTITY;
+  return value ?? '';
 }
 
-function validateVideoIdentity(value: string | null): IdentityResult {
-  if (isBlankText(value)) return { kind: 'missing' };
-  if (!hasValidUnicodeScalars(value ?? '') || !isValidVideoId(value ?? '')) return { kind: 'invalid-unicode' };
-  return { kind: 'value', value: value ?? '' };
+function validateVideoIdentity(value: string | null): IdentityValue {
+  if (isBlankText(value)) return MISSING_IDENTITY;
+  if (!hasValidUnicodeScalars(value ?? '') || !isValidVideoId(value ?? '')) return INVALID_IDENTITY;
+  return value ?? '';
 }
 
-function validateOpaqueIdentity(value: string | null): IdentityResult {
-  if (isBlankText(value)) return { kind: 'missing' };
-  if (!hasValidUnicodeScalars(value ?? '')) return { kind: 'invalid-unicode' };
-  return { kind: 'value', value: value ?? '' };
+function validateOpaqueIdentity(value: string | null): IdentityValue {
+  if (isBlankText(value)) return MISSING_IDENTITY;
+  if (!hasValidUnicodeScalars(value ?? '')) return INVALID_IDENTITY;
+  return value ?? '';
 }
 
 function indexBy<T>(values: readonly T[], key: (value: T) => string): Map<string, T> {
@@ -659,17 +761,6 @@ function indexBy<T>(values: readonly T[], key: (value: T) => string): Map<string
   for (const value of values) {
     const entryKey = key(value);
     if (!result.has(entryKey)) result.set(entryKey, value);
-  }
-  return result;
-}
-
-function groupBy<T>(values: readonly T[], key: (value: T) => string): Map<string, T[]> {
-  const result = new Map<string, T[]>();
-  for (const value of values) {
-    const entryKey = key(value);
-    const group = result.get(entryKey) ?? [];
-    group.push(value);
-    result.set(entryKey, group);
   }
   return result;
 }
@@ -707,4 +798,15 @@ function setSocialFlag(details: FindingDetails, provider: (typeof SOCIAL_PROVIDE
       details.twitch = true;
       break;
   }
+}
+
+function releaseOwnedRows<T>(rows: readonly T[]): void {
+  const ownedRows = rows as unknown as Array<T | undefined>;
+  for (let index = 0; index < ownedRows.length; index += 1) {
+    ownedRows[index] = undefined;
+  }
+}
+
+function releaseOwnedRow<T>(rows: readonly T[], index: number): void {
+  (rows as unknown as Array<T | undefined>)[index] = undefined;
 }

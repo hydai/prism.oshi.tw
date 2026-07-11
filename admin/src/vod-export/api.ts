@@ -10,6 +10,7 @@ import { CanonicalJsonError } from './canonical-json';
 import { VodExportControlError } from './control';
 import { capacityDiagnostic, ExportLimitExceededError } from './limits';
 import { VOD_EXPORT_LIMITS } from './constants';
+import { findingJsonByteLength } from './findings';
 import { VodExportMaintenanceError } from './maintenance';
 import {
   readCurrentManifest,
@@ -24,7 +25,8 @@ import {
   sourceFingerprintsEqual,
   VodExportSourceError,
 } from './source';
-import { utf8ByteLength } from './normalization';
+import { jsonStringByteLength, utf8ByteLength } from './normalization';
+import { createCompactJsonStream } from './json-stream';
 import type { CapacityDiagnostic, VodExportFinding } from './types';
 
 export type VodExportCandidateApiState = 'ready' | 'stale' | 'expired' | 'already_published';
@@ -58,6 +60,12 @@ export interface VodExportHttpError {
     code: string;
     diagnostics?: CapacityDiagnostic[];
   };
+}
+
+export function vodExportPreviewApiResponse(result: VodExportPreviewApiResult): Response {
+  return new Response(createCompactJsonStream(result), {
+    headers: { 'Content-Type': 'application/json; charset=UTF-8' },
+  });
 }
 
 export type VodExportRepairRecord =
@@ -142,7 +150,7 @@ export async function generateVodExportPreviewApi(
   const result = await generateVodExportPreview(bindings, exporterBuildId);
   if (result.candidate !== undefined) {
     try {
-      return await getVodExportCandidateApi(bindings, result.candidate.candidateId, exporterBuildId);
+      return await candidateMetadataForApi(bindings, result.candidate, exporterBuildId);
     } catch (error) {
       if (error instanceof ExportLimitExceededError) {
         try {
@@ -174,24 +182,32 @@ export async function getVodExportCandidateApi(
   now = new Date(),
 ): Promise<VodExportPreviewApiResult> {
   const stored = await getCandidate(bindings.VOD_EXPORT_PRIVATE, candidateId, { now });
+  return candidateMetadataForApi(bindings, stored.metadata, exporterBuildId);
+}
+
+async function candidateMetadataForApi(
+  bindings: VodExportPublicationBindings,
+  metadata: VodExportCandidateMetadata,
+  exporterBuildId: string,
+): Promise<VodExportPreviewApiResult> {
   const [fingerprint, current] = await Promise.all([
     readCurrentSourceFingerprint(bindings, exporterBuildId),
     readCurrentManifest(bindings.VOD_EXPORT_PUBLIC, { verifySnapshot: false }),
   ]);
-  const stale = !sourceFingerprintsEqual(stored.metadata.sourceFingerprint, fingerprint);
+  const stale = !sourceFingerprintsEqual(metadata.sourceFingerprint, fingerprint);
   const state: VodExportCandidateApiState = stale
     ? 'stale'
-    : stableCandidateState(current?.manifest ?? null, stored.metadata)
+    : stableCandidateState(current?.manifest ?? null, metadata)
       ? 'already_published'
       : 'ready';
-  const findings = await findingsForApi(bindings, stored.metadata.findings);
-  const capacity = withApiFindingsCapacity(stored.metadata.capacity, state !== 'stale', findings);
+  const findings = await findingsForApi(bindings, metadata.findings);
+  const capacity = withApiFindingsCapacity(metadata.capacity, state !== 'stale', findings);
   return {
     // Stable-identical bytes still require an explicit curator action to move
     // the source-equivalence checkpoint without rewriting public artifacts.
     canPublish: state !== 'stale',
     findings,
-    candidate: candidateForApi(stored.metadata, state),
+    candidate: candidateForApi(metadata, state),
     capacity,
   };
 }
@@ -397,6 +413,9 @@ async function findingsForApi(
   const performanceIds = [...new Set(findings
     .filter((finding) => finding.entityType === 'performance' && finding.entityId !== undefined)
     .map((finding) => finding.entityId!))];
+  const songIds = [...new Set(findings
+    .filter((finding) => finding.entityType === 'song' && finding.entityId !== undefined)
+    .map((finding) => finding.entityId!))];
   const vodIds = [...new Set(findings
     .filter((finding) => finding.entityType === 'vod' && finding.entityId !== undefined)
     .map((finding) => finding.entityId!))];
@@ -406,12 +425,15 @@ async function findingsForApi(
   const submissionIds = [...new Set(findings
     .filter((finding) => finding.entityType === 'streamer' && finding.details?.submissionId !== undefined)
     .map((finding) => finding.details!.submissionId!))];
-  const [performances, streams, submissions] = await Promise.all([
-    lookupPerformanceRepairRows(bindings.DB, performanceIds),
-    lookupVodRepairRows(bindings.DB, vodIds, vodStreamIds),
-    lookupStreamerRepairRows(bindings.NOVA_DB, submissionIds),
-  ]);
+  const lookupWorkspace = createD1LookupWorkspace();
+  const performances = await lookupPerformanceRepairRows(bindings.DB, performanceIds, lookupWorkspace);
+  const songs = await lookupSongRepairRows(bindings.DB, songIds, lookupWorkspace);
+  const streams = await lookupVodRepairRows(bindings.DB, vodIds, vodStreamIds, lookupWorkspace);
+  const submissions = await lookupStreamerRepairRows(bindings.NOVA_DB, submissionIds, lookupWorkspace);
   const performanceById = new Map(performances
+    .filter((row): row is { id: string; row_id: number } => typeof row.id === 'string')
+    .map((row) => [row.id, Number(row.row_id)]));
+  const songById = new Map(songs
     .filter((row): row is { id: string; row_id: number } => typeof row.id === 'string')
     .map((row) => [row.id, Number(row.row_id)]));
   const streamByIdentity = new Map(
@@ -419,153 +441,200 @@ async function findingsForApi(
   );
   const streamById = new Map(streams.map((row) => [row.id, Number(row.row_id)]));
   const submissionById = new Map(submissions.map((row) => [row.id, Number(row.row_id)]));
-  return findings.map((finding) => {
+  const decorated = findings as VodExportFindingApi[];
+  for (const finding of decorated) {
     const repairPath = repairPathForFinding(
       finding,
       performanceById,
+      songById,
       streamByIdentity,
       streamById,
       submissionById,
     );
-    return { ...finding, ...(repairPath === undefined ? {} : { repairPath }) };
-  });
+    if (repairPath !== undefined) finding.repairPath = repairPath;
+  }
+  return decorated;
 }
 
-const D1_JSON_BINDING_TARGET_BYTES = 1_900_000;
+// A smaller reusable frame costs a few more curator-only D1 reads at the
+// diagnostic ceiling, but preserves enough isolate headroom for the response
+// stream and the 10 MiB candidate bytes to coexist safely.
+const D1_LOOKUP_PAYLOAD_TARGET_BYTES = 512_000;
 const D1_MAX_BOUND_VALUE_BYTES = 2_000_000;
+const D1_LOOKUP_LENGTH_PREFIX_BYTES = 8;
+const d1LookupTextEncoder = new TextEncoder();
 
-export interface D1LookupBindingPlan {
-  jsonBindings: string[];
-  directBindings: Array<string | number>;
+export interface D1LookupBindingStats {
+  packedBindings: number;
+  directBindings: number;
   skippedValues: number;
+}
+
+export interface D1LookupWorkspace {
+  buffer: Uint8Array;
+}
+
+export type D1LookupBinding =
+  | { kind: 'packed'; value: Uint8Array }
+  | { kind: 'direct'; value: string | number };
+
+function createD1LookupWorkspace(): D1LookupWorkspace {
+  return {
+    buffer: new Uint8Array(D1_LOOKUP_LENGTH_PREFIX_BYTES + D1_LOOKUP_PAYLOAD_TARGET_BYTES),
+  };
 }
 
 async function lookupPerformanceRepairRows(
   db: D1Database,
   ids: readonly string[],
+  workspace: D1LookupWorkspace,
 ): Promise<Array<{ id: string | null; row_id: number }>> {
-  const statements: D1PreparedStatement[] = [];
-  const idPlan = planD1LookupBindings(ids);
-  for (const binding of idPlan.jsonBindings) {
-    statements.push(db.prepare(`
-      SELECT id, rowid AS row_id
-      FROM performances
-      WHERE id IN (SELECT CAST(value AS TEXT) FROM json_each(?))
-    `).bind(binding));
-  }
-  for (const binding of idPlan.directBindings) {
-    statements.push(db.prepare(`
-      SELECT id, rowid AS row_id
-      FROM performances
-      WHERE id = ?
-    `).bind(binding));
-  }
-  if (statements.length === 0) return [];
-  const results = await db.batch<{ id: string | null; row_id: number }>(statements);
-  return results.flatMap((result) => result.results);
+  return lookupRepairRows<{ id: string | null; row_id: number }>(
+    db, 'performances', 'id', 'id, rowid AS row_id', ids, workspace,
+  );
+}
+
+async function lookupSongRepairRows(
+  db: D1Database,
+  ids: readonly string[],
+  workspace: D1LookupWorkspace,
+): Promise<Array<{ id: string | null; row_id: number }>> {
+  return lookupRepairRows<{ id: string | null; row_id: number }>(
+    db, 'songs', 'id', 'id, rowid AS row_id', ids, workspace,
+  );
 }
 
 async function lookupVodRepairRows(
   db: D1Database,
   videoIds: readonly string[],
   streamIds: readonly string[],
+  workspace: D1LookupWorkspace,
 ): Promise<Array<{ row_id: number; id: string; streamer_id: string; video_id: string }>> {
-  const plan = planD1LookupBindings(videoIds);
-  const statements = plan.jsonBindings.map((binding) => db.prepare(`
-    SELECT rowid AS row_id, id, streamer_id, video_id
-    FROM streams
-    WHERE video_id IN (SELECT CAST(value AS TEXT) FROM json_each(?))
-  `).bind(binding));
-  for (const binding of plan.directBindings) {
-    statements.push(db.prepare(`
-      SELECT rowid AS row_id, id, streamer_id, video_id
-      FROM streams
-      WHERE video_id = ?
-    `).bind(binding));
-  }
-  const streamPlan = planD1LookupBindings(streamIds);
-  for (const binding of streamPlan.jsonBindings) {
-    statements.push(db.prepare(`
-      SELECT rowid AS row_id, id, streamer_id, video_id
-      FROM streams
-      WHERE id IN (SELECT CAST(value AS TEXT) FROM json_each(?))
-    `).bind(binding));
-  }
-  for (const binding of streamPlan.directBindings) {
-    statements.push(db.prepare(`
-      SELECT rowid AS row_id, id, streamer_id, video_id
-      FROM streams
-      WHERE id = ?
-    `).bind(binding));
-  }
-  if (statements.length === 0) return [];
-  const results = await db.batch<{ row_id: number; id: string; streamer_id: string; video_id: string }>(statements);
-  return results.flatMap((result) => result.results);
+  type VodRepairRow = { row_id: number; id: string; streamer_id: string; video_id: string };
+  const columns = 'rowid AS row_id, id, streamer_id, video_id';
+  return [
+    ...await lookupRepairRows<VodRepairRow>(db, 'streams', 'video_id', columns, videoIds, workspace),
+    ...await lookupRepairRows<VodRepairRow>(db, 'streams', 'id', columns, streamIds, workspace),
+  ];
 }
 
 async function lookupStreamerRepairRows(
   db: D1Database,
   submissionIds: readonly string[],
+  workspace: D1LookupWorkspace,
 ): Promise<Array<{ row_id: number; id: string }>> {
-  const plan = planD1LookupBindings(submissionIds);
-  const statements = plan.jsonBindings.map((binding) => db.prepare(`
-    SELECT rowid AS row_id, id
-    FROM submissions
-    WHERE id IN (SELECT CAST(value AS TEXT) FROM json_each(?))
-  `).bind(binding));
-  for (const binding of plan.directBindings) {
-    statements.push(db.prepare(`
-      SELECT rowid AS row_id, id
-      FROM submissions
-      WHERE id = ?
-    `).bind(binding));
-  }
-  if (statements.length === 0) return [];
-  const results = await db.batch<{ row_id: number; id: string }>(statements);
-  return results.flatMap((result) => result.results);
+  return lookupRepairRows<{ row_id: number; id: string }>(
+    db, 'submissions', 'id', 'rowid AS row_id, id', submissionIds, workspace,
+  );
 }
 
-/**
- * Keep lookup bindings below D1's 2,000,000-byte value limit. A value whose
- * JSON escaping is large but raw representation still fits uses direct
- * equality; an impossible-to-bind value simply receives no optional repair
- * link and remains present in the complete findings response.
- */
-export function planD1LookupBindings(values: readonly (string | number)[]): D1LookupBindingPlan {
-  const jsonBindings: string[] = [];
-  const directBindings: Array<string | number> = [];
-  let skippedValues = 0;
-  let entries: string[] = [];
-  let bytes = 2;
+async function lookupRepairRows<T>(
+  db: D1Database,
+  table: 'performances' | 'songs' | 'streams' | 'submissions',
+  column: 'id' | 'video_id',
+  columns: string,
+  values: readonly (string | number)[],
+  workspace: D1LookupWorkspace,
+): Promise<T[]> {
+  const rows: T[] = [];
+  await forEachD1LookupBinding(values, async (binding) => {
+    const sql = binding.kind === 'packed'
+      ? packedLookupSql(table, column, columns)
+      : `SELECT ${columns} FROM ${table} WHERE ${column} = ?`;
+    const result = await db.prepare(sql).bind(binding.value).all<T>();
+    rows.push(...result.results);
+  }, workspace);
+  return rows;
+}
 
-  const flush = (): void => {
-    if (entries.length === 0) return;
-    jsonBindings.push(`[${entries.join(',')}]`);
-    entries = [];
-    bytes = 2;
+export function packedLookupSql(
+  table: string,
+  column: string,
+  columns: string,
+): string {
+  return `
+    WITH RECURSIVE
+    bound(raw) AS (SELECT CAST(? AS BLOB)),
+    packed(payload) AS (
+      SELECT substr(
+        raw,
+        ${D1_LOOKUP_LENGTH_PREFIX_BYTES + 1},
+        CAST(CAST(substr(raw, 1, ${D1_LOOKUP_LENGTH_PREFIX_BYTES}) AS TEXT) AS INTEGER)
+      )
+      FROM bound
+    ),
+    decoded(value, rest) AS (
+      SELECT
+        CAST(substr(payload, ${D1_LOOKUP_LENGTH_PREFIX_BYTES + 1}, CAST(CAST(substr(payload, 1, ${D1_LOOKUP_LENGTH_PREFIX_BYTES}) AS TEXT) AS INTEGER)) AS TEXT),
+        substr(payload, ${D1_LOOKUP_LENGTH_PREFIX_BYTES + 1} + CAST(CAST(substr(payload, 1, ${D1_LOOKUP_LENGTH_PREFIX_BYTES}) AS TEXT) AS INTEGER))
+      FROM packed
+      WHERE length(payload) >= ${D1_LOOKUP_LENGTH_PREFIX_BYTES}
+      UNION ALL
+      SELECT
+        CAST(substr(rest, ${D1_LOOKUP_LENGTH_PREFIX_BYTES + 1}, CAST(CAST(substr(rest, 1, ${D1_LOOKUP_LENGTH_PREFIX_BYTES}) AS TEXT) AS INTEGER)) AS TEXT),
+        substr(rest, ${D1_LOOKUP_LENGTH_PREFIX_BYTES + 1} + CAST(CAST(substr(rest, 1, ${D1_LOOKUP_LENGTH_PREFIX_BYTES}) AS TEXT) AS INTEGER))
+      FROM decoded
+      WHERE length(rest) >= ${D1_LOOKUP_LENGTH_PREFIX_BYTES}
+    )
+    SELECT ${columns}
+    FROM ${table}
+    WHERE ${column} IN (SELECT value FROM decoded)
+  `;
+}
+
+/** Reuses one bounded buffer; consumers must finish reading it before resolving. */
+export async function forEachD1LookupBinding(
+  values: readonly (string | number)[],
+  consume: (binding: D1LookupBinding) => Promise<void>,
+  workspace: D1LookupWorkspace = createD1LookupWorkspace(),
+): Promise<D1LookupBindingStats> {
+  let packedBindings = 0;
+  let directBindings = 0;
+  let skippedValues = 0;
+  let payloadBytes = 0;
+
+  const flush = async (): Promise<void> => {
+    if (payloadBytes === 0) return;
+    const lengthText = String(payloadBytes).padStart(D1_LOOKUP_LENGTH_PREFIX_BYTES, '0');
+    for (let index = 0; index < lengthText.length; index += 1) {
+      workspace.buffer[index] = lengthText.charCodeAt(index);
+    }
+    await consume({ kind: 'packed', value: workspace.buffer });
+    packedBindings += 1;
+    payloadBytes = 0;
   };
 
   for (const value of values) {
-    const encoded = JSON.stringify(value);
-    const entryBytes = utf8ByteLength(encoded);
-    if (entryBytes + 2 > D1_JSON_BINDING_TARGET_BYTES) {
-      flush();
-      const directBytes = typeof value === 'string'
-        ? utf8ByteLength(value)
-        : utf8ByteLength(String(value));
-      if (directBytes <= D1_MAX_BOUND_VALUE_BYTES) directBindings.push(value);
-      else skippedValues += 1;
+    const textValue = String(value);
+    const valueBytes = utf8ByteLength(textValue);
+    const entryBytes = D1_LOOKUP_LENGTH_PREFIX_BYTES + valueBytes;
+    if (entryBytes > D1_LOOKUP_PAYLOAD_TARGET_BYTES) {
+      await flush();
+      if (valueBytes <= D1_MAX_BOUND_VALUE_BYTES) {
+        await consume({ kind: 'direct', value });
+        directBindings += 1;
+      } else {
+        skippedValues += 1;
+      }
       continue;
     }
-    const nextBytes = bytes + entryBytes + (entries.length === 0 ? 0 : 1);
-    if (nextBytes > D1_JSON_BINDING_TARGET_BYTES) {
-      flush();
+    if (payloadBytes + entryBytes > D1_LOOKUP_PAYLOAD_TARGET_BYTES) await flush();
+    const entryOffset = D1_LOOKUP_LENGTH_PREFIX_BYTES + payloadBytes;
+    const entryLength = String(valueBytes).padStart(D1_LOOKUP_LENGTH_PREFIX_BYTES, '0');
+    for (let index = 0; index < entryLength.length; index += 1) {
+      workspace.buffer[entryOffset + index] = entryLength.charCodeAt(index);
     }
-    entries.push(encoded);
-    bytes += entryBytes + (entries.length === 1 ? 0 : 1);
+    const encoded = d1LookupTextEncoder.encodeInto(
+      textValue,
+      workspace.buffer.subarray(entryOffset + D1_LOOKUP_LENGTH_PREFIX_BYTES),
+    );
+    if (encoded.read !== textValue.length || encoded.written !== valueBytes) {
+      throw new TypeError('D1 lookup identity could not be encoded exactly');
+    }
+    payloadBytes += entryBytes;
   }
-  flush();
-  return { jsonBindings, directBindings, skippedValues };
+  await flush();
+  return { packedBindings, directBindings, skippedValues };
 }
 
 function withApiFindingsCapacity(
@@ -589,15 +658,28 @@ export function assertApiFindingsCapacity(
   canPublish: boolean,
   findings: readonly VodExportFindingApi[],
 ): CapacityDiagnostic {
-  const actual = utf8ByteLength(JSON.stringify({ canPublish, findings }));
+  let actual = utf8ByteLength(`{"canPublish":${canPublish ? 'true' : 'false'},"findings":[`);
+  for (let index = 0; index < findings.length; index += 1) {
+    const finding = findings[index];
+    if (finding === undefined) continue;
+    if (index > 0) actual += 1;
+    actual += findingJsonByteLength(finding);
+    if (finding.repairPath !== undefined) {
+      actual += 1 + jsonStringByteLength('repairPath') + 1 + jsonStringByteLength(finding.repairPath);
+    }
+    if (actual + 2 > VOD_EXPORT_LIMITS.findingsBytes) {
+      throw new ExportLimitExceededError(capacityDiagnostic('findingsBytes', actual + 2));
+    }
+  }
+  actual += 2;
   const diagnostic = capacityDiagnostic('findingsBytes', actual);
-  if (actual > VOD_EXPORT_LIMITS.findingsBytes) throw new ExportLimitExceededError(diagnostic);
   return diagnostic;
 }
 
 export function repairPathForFinding(
   finding: VodExportFinding,
   performanceById: ReadonlyMap<string, number>,
+  songById: ReadonlyMap<string, number>,
   streamByIdentity: ReadonlyMap<string, number>,
   streamById: ReadonlyMap<string, number>,
   submissionById: ReadonlyMap<string, number>,
@@ -612,7 +694,8 @@ export function repairPathForFinding(
     return `/nova?status=approved${search === undefined ? '' : `&search=${encodeURIComponent(search)}`}`;
   }
   if (finding.entityType === 'song' && finding.entityId !== undefined) {
-    return `/songs/${encodeURIComponent(finding.entityId)}`;
+    const rowId = songById.get(finding.entityId);
+    return rowId === undefined ? undefined : `/vod-export/repair/song/${rowId}`;
   }
   if (finding.entityType === 'song' && finding.details?.rowId !== undefined) {
     return `/vod-export/repair/song/${finding.details.rowId}`;

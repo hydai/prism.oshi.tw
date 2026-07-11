@@ -55,8 +55,10 @@ export interface ExportSourcePerformance {
   streamerId: string;
   songId: string;
   streamId: string;
-  startSeconds: SqliteIntegerSource;
-  endSeconds: SqliteIntegerSource;
+  startStorageClass: string;
+  startDecimalText: string | null;
+  endStorageClass: string;
+  endDecimalText: string | null;
   status: SourceApprovalStatus;
 }
 
@@ -65,8 +67,12 @@ export interface ExportSourcePerformance {
  *
  * Adapter invariants:
  * - streamers includes every approved+enabled NOVA row (the core still gates it defensively);
- * - performances includes every approved performance for those raw streamer keys;
- * - vods/songs include approved rows plus every parent referenced by those performances;
+ * - SQL classifies every approved performance for those raw streamer keys;
+ *   this JS payload includes the eligible rows plus rows with missing/mismatched
+ *   relationships, while rows skipped solely for an ineligible parent remain
+ *   represented in transactional preflight totals;
+ * - vods/songs includes the parents needed by that JS subset; all other scoped
+ *   approved/referenced parents remain represented in transactional preflight totals;
  * - private stream IDs and SQLite rowids are unique, non-empty source locators;
  * - each DB row appears once and non-empty song/performance primary IDs retain
  *   the database's uniqueness guarantee (there is no v1 duplicate-ID finding);
@@ -77,6 +83,31 @@ export interface VodExportSourceData {
   vods: readonly ExportSourceVod[];
   songs: readonly ExportSourceSong[];
   performances: readonly ExportSourcePerformance[];
+  /**
+   * Transactional preflight totals may include approved VOD/song rows whose
+   * complete contents are unnecessary, plus approved performances omitted
+   * from JS solely because a referenced parent is ineligible. Those rows and
+   * parents still count toward every source capacity limit.
+   */
+  preflightCapacity?: {
+    sourceRows: number;
+    sourceTextBytes: number;
+  };
+}
+
+export declare const OWNED_VOD_EXPORT_SOURCE: unique symbol;
+
+/** Mutable, transactionally preflighted source produced only by the D1 adapter. */
+export interface OwnedVodExportSourceData extends VodExportSourceData {
+  readonly [OWNED_VOD_EXPORT_SOURCE]: true;
+  streamers: ExportSourceStreamer[];
+  vods: ExportSourceVod[];
+  songs: ExportSourceSong[];
+  performances: ExportSourcePerformance[];
+  preflightCapacity: {
+    sourceRows: number;
+    sourceTextBytes: number;
+  };
 }
 
 export type VodExportSocialLinks = Partial<Record<SocialProvider, string>>;
@@ -235,7 +266,6 @@ export interface VodExportBuildResult extends VodExportValidationResult {
 }
 
 export interface VodExportSnapshotArtifact {
-  snapshot: VodExportSnapshot;
   bytes: Uint8Array;
   sha256: string;
   uncompressedBytes: number;

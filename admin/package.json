@@ -21,11 +21,13 @@
     "test:vod-export-schema": "sh migrations/test_vod_export_schema.sh",
     "test:vod-export-core": "npx tsx src/vod-export/core.test.ts",
     "test:vod-export-source": "npx tsx src/vod-export/source.test.ts",
+    "test:vod-export-json-stream": "npx tsx src/vod-export/json-stream.test.ts",
     "test:vod-export-api": "npx tsx src/vod-export/api.test.ts",
     "test:vod-export-publication": "npx tsx src/vod-export/publication.test.ts",
     "test:vod-export-maintenance": "npx tsx src/vod-export/maintenance.test.ts",
+    "test:vod-export-stress": "node --expose-gc --import tsx src/vod-export/stress.test.ts",
     "test:youtube-verification": "npx tsx src/youtube-verification.test.ts",
-    "check": "npm run typecheck && npm run test:helpers && npm run test:itunes && npm run test:discord && npm run test:nova-url-safety && npm run test:db && npm run test:auth && npm run test:authz && npm run test:nova-url-routes && npm run test:youtube-verification && npm run test:vod-export-schema && npm run test:vod-export-core && npm run test:vod-export-source && npm run test:vod-export-api && npm run test:vod-export-publication && npm run test:vod-export-maintenance"
+    "check": "npm run typecheck && npm run test:helpers && npm run test:itunes && npm run test:discord && npm run test:nova-url-safety && npm run test:db && npm run test:auth && npm run test:authz && npm run test:nova-url-routes && npm run test:youtube-verification && npm run test:vod-export-schema && npm run test:vod-export-core && npm run test:vod-export-source && npm run test:vod-export-json-stream && npm run test:vod-export-api && npm run test:vod-export-publication && npm run test:vod-export-maintenance && npm run test:vod-export-stress"
   },
   "dependencies": {
     "hono": "^4.12.29"

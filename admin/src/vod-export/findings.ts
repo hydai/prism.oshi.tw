@@ -125,6 +125,8 @@ const DETAIL_KEY_ORDER: readonly (keyof FindingDetails)[] = [
 ];
 
 const RESPONSE_SUFFIX_BYTES = utf8ByteLength(']}');
+const RESPONSE_TRUE_PREFIX_BYTES = utf8ByteLength('{"canPublish":true,"findings":[');
+const RESPONSE_FALSE_PREFIX_BYTES = utf8ByteLength('{"canPublish":false,"findings":[');
 
 export interface FindingInput {
   code: FindingCode;
@@ -137,14 +139,13 @@ export interface FindingInput {
 
 export class FindingCollector {
   private readonly findings: VodExportFinding[] = [];
-  private readonly dedupeKeys = new Set<string>();
+  private readonly dedupeByIdentity = new Map<string, string | Set<string>>();
   private serializedEntriesBytes = 0;
   private hasError = false;
 
   add(input: FindingInput): void {
     const finding = createFinding(input);
-    const dedupeKey = findingDedupeKey(finding);
-    if (this.dedupeKeys.has(dedupeKey)) return;
+    if (this.isDuplicate(finding)) return;
 
     const nextCount = this.findings.length + 1;
     if (nextCount > VOD_EXPORT_LIMITS.findings) {
@@ -160,7 +161,6 @@ export class FindingCollector {
     }
 
     this.findings.push(finding);
-    this.dedupeKeys.add(dedupeKey);
     this.serializedEntriesBytes = nextEntriesBytes;
     this.hasError = nextHasError;
   }
@@ -168,7 +168,7 @@ export class FindingCollector {
   complete(): VodExportValidationResult {
     return {
       canPublish: !this.hasError,
-      findings: [...this.findings].sort(compareFindings),
+      findings: this.findings.sort(compareFindings),
     };
   }
 
@@ -181,6 +181,24 @@ export class FindingCollector {
 
   responseByteLength(): number {
     return responsePrefixBytes(this.hasError) + this.serializedEntriesBytes + RESPONSE_SUFFIX_BYTES;
+  }
+
+  private isDuplicate(finding: VodExportFinding): boolean {
+    const identity = findingDedupeIdentity(finding);
+    const signature = findingDedupeSignature(finding);
+    const existing = this.dedupeByIdentity.get(identity);
+    if (existing === undefined) {
+      this.dedupeByIdentity.set(identity, signature);
+      return false;
+    }
+    if (typeof existing === 'string') {
+      if (existing === signature) return true;
+      this.dedupeByIdentity.set(identity, new Set([existing, signature]));
+      return false;
+    }
+    if (existing.has(signature)) return true;
+    existing.add(signature);
+    return false;
   }
 }
 
@@ -208,20 +226,21 @@ export function serializeValidationResult(result: VodExportValidationResult): st
 function normalizeAndValidateDetails(input: FindingInput): FindingDetails | undefined {
   const providedDetails = input.details ?? {};
   const actualKeys = Object.keys(providedDetails) as (keyof FindingDetails)[];
-  const allowedKeys = new Set<keyof FindingDetails>(CODE_DETAIL_KEYS[input.code] ?? []);
   const needsFallbackLocator = input.entityId === undefined || input.streamerSlug === undefined;
-  if (needsFallbackLocator) {
-    const fallbackKey = fallbackKeyForEntity(input.entityType);
-    allowedKeys.add(fallbackKey);
-  }
+  const fallbackKey = needsFallbackLocator ? fallbackKeyForEntity(input.entityType) : undefined;
+  const allowedKeys = CODE_DETAIL_KEYS[input.code] ?? [];
   for (const key of actualKeys) {
-      if (!allowedKeys.has(key)) throw new TypeError(`Finding ${input.code} does not allow details.${key}`);
+    if (!allowedKeys.includes(key) && key !== fallbackKey) {
+      throw new TypeError(`Finding ${input.code} does not allow details.${key}`);
+    }
   }
 
-  const requiredKeys = new Set<keyof FindingDetails>(CODE_REQUIRED_DETAIL_KEYS[input.code] ?? []);
-  if (needsFallbackLocator) requiredKeys.add(fallbackKeyForEntity(input.entityType));
+  const requiredKeys = CODE_REQUIRED_DETAIL_KEYS[input.code] ?? [];
   for (const key of requiredKeys) {
     if (providedDetails[key] === undefined) throw new TypeError(`Finding ${input.code} requires details.${key}`);
+  }
+  if (fallbackKey !== undefined && providedDetails[fallbackKey] === undefined) {
+    throw new TypeError(`Finding ${input.code} requires details.${fallbackKey}`);
   }
   if (
     input.code === 'UNSAFE_SOCIAL_LINK' &&
@@ -300,26 +319,35 @@ function fallbackKeyForEntity(entityType: FindingEntityType): 'submissionId' | '
   return 'rowId';
 }
 
-function findingDedupeKey(finding: VodExportFinding): string {
-  const identity = finding.entityId === undefined ? fallbackLocator(finding.details) : finding.entityId;
+function findingDedupeSignature(finding: VodExportFinding): string {
   return [
     finding.code,
     finding.streamerSlug ?? '',
     finding.entityType,
-    identity,
     finding.field ?? '',
+    findingDedupeIdentityKind(finding),
   ].join('\u0000');
 }
 
-function fallbackLocator(details: FindingDetails | undefined): string {
-  if (details?.submissionId !== undefined) return `submission:${details.submissionId}`;
-  if (details?.streamId !== undefined) return `stream:${details.streamId}`;
-  if (details?.rowId !== undefined) return `row:${details.rowId}`;
+function findingDedupeIdentity(finding: VodExportFinding): string {
+  if (finding.entityId !== undefined) return finding.entityId;
+  const details = finding.details;
+  if (details?.submissionId !== undefined) return details.submissionId;
+  if (details?.streamId !== undefined) return details.streamId;
+  if (details?.rowId !== undefined) return String(details.rowId);
   return '';
 }
 
+function findingDedupeIdentityKind(finding: VodExportFinding): string {
+  if (finding.entityId !== undefined) return 'entity';
+  if (finding.details?.submissionId !== undefined) return 'submission';
+  if (finding.details?.streamId !== undefined) return 'stream';
+  if (finding.details?.rowId !== undefined) return 'row';
+  return 'none';
+}
+
 function responsePrefixBytes(hasError: boolean): number {
-  return utf8ByteLength(`{"canPublish":${hasError ? 'false' : 'true'},"findings":[`);
+  return hasError ? RESPONSE_FALSE_PREFIX_BYTES : RESPONSE_TRUE_PREFIX_BYTES;
 }
 
 function validateFindingContext(input: FindingInput): void {
@@ -338,26 +366,35 @@ function validateFindingContext(input: FindingInput): void {
   }
 }
 
-function findingJsonByteLength(finding: VodExportFinding): number {
+export function findingJsonByteLength(finding: VodExportFinding): number {
   let byteLength = 2;
   let propertyCount = 0;
-  const addProperty = (key: string, valueLength: number): void => {
-    if (propertyCount > 0) byteLength += 1;
-    byteLength += jsonStringByteLength(key) + 1 + valueLength;
-    propertyCount += 1;
-  };
 
-  addProperty('code', jsonStringByteLength(finding.code));
-  addProperty('severity', jsonStringByteLength(finding.severity));
-  addProperty('message', jsonStringByteLength(finding.message));
+  byteLength += jsonPropertyByteLength('code', jsonStringByteLength(finding.code), propertyCount++ > 0);
+  byteLength += jsonPropertyByteLength('severity', jsonStringByteLength(finding.severity), propertyCount++ > 0);
+  byteLength += jsonPropertyByteLength('message', jsonStringByteLength(finding.message), propertyCount++ > 0);
   if (finding.streamerSlug !== undefined) {
-    addProperty('streamerSlug', jsonStringByteLength(finding.streamerSlug));
+    byteLength += jsonPropertyByteLength(
+      'streamerSlug',
+      jsonStringByteLength(finding.streamerSlug),
+      propertyCount++ > 0,
+    );
   }
-  addProperty('entityType', jsonStringByteLength(finding.entityType));
-  if (finding.entityId !== undefined) addProperty('entityId', jsonStringByteLength(finding.entityId));
-  if (finding.field !== undefined) addProperty('field', jsonStringByteLength(finding.field));
-  if (finding.details !== undefined) addProperty('details', detailsJsonByteLength(finding.details));
+  byteLength += jsonPropertyByteLength('entityType', jsonStringByteLength(finding.entityType), propertyCount++ > 0);
+  if (finding.entityId !== undefined) {
+    byteLength += jsonPropertyByteLength('entityId', jsonStringByteLength(finding.entityId), propertyCount++ > 0);
+  }
+  if (finding.field !== undefined) {
+    byteLength += jsonPropertyByteLength('field', jsonStringByteLength(finding.field), propertyCount++ > 0);
+  }
+  if (finding.details !== undefined) {
+    byteLength += jsonPropertyByteLength('details', detailsJsonByteLength(finding.details), propertyCount++ > 0);
+  }
   return byteLength;
+}
+
+function jsonPropertyByteLength(key: string, valueLength: number, needsComma: boolean): number {
+  return (needsComma ? 1 : 0) + jsonStringByteLength(key) + 1 + valueLength;
 }
 
 function detailsJsonByteLength(details: FindingDetails): number {

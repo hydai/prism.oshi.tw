@@ -82,7 +82,7 @@ export async function createJsonObject(
   value: unknown,
   customMetadata?: Record<string, string>,
 ): Promise<R2Object | null> {
-  return bucket.put(key, encodePrivateJson(value), {
+  return bucket.put(key, JSON.stringify(value), {
     onlyIf: new Headers({ 'If-None-Match': '*' }),
     httpMetadata: PRIVATE_JSON_HTTP_METADATA,
     customMetadata,
@@ -96,7 +96,7 @@ export async function replaceJsonObject(
   expectedEtag: string,
   customMetadata?: Record<string, string>,
 ): Promise<R2Object | null> {
-  return bucket.put(key, encodePrivateJson(value), {
+  return bucket.put(key, JSON.stringify(value), {
     onlyIf: { etagMatches: expectedEtag },
     httpMetadata: PRIVATE_JSON_HTTP_METADATA,
     customMetadata,

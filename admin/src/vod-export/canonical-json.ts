@@ -33,7 +33,9 @@ export class CanonicalJsonError extends Error {
 export function serializeCanonicalSnapshot(snapshot: VodExportSnapshot): Uint8Array {
   const byteLength = canonicalSnapshotByteLength(snapshot);
   assertWithinCapacity('snapshotBytes', byteLength);
-  return encodeCanonicalTokens(() => snapshotTokens(snapshot), byteLength);
+  const writer = new CanonicalByteWriter(byteLength);
+  countSnapshotTokens(snapshot, writer);
+  return writer.finish();
 }
 
 export function canonicalSnapshotByteLength(snapshot: VodExportSnapshot): number {
@@ -74,14 +76,52 @@ export async function createSnapshotArtifact(
   publicOrigin: string = VOD_EXPORT_PUBLIC_ORIGIN,
 ): Promise<VodExportSnapshotArtifact> {
   const orderedSnapshot = orderSnapshot(snapshot);
+  return createArtifactFromBytes(
+    orderedSnapshot,
+    serializeCanonicalSnapshot(orderedSnapshot),
+    publicOrigin,
+  );
+}
+
+/**
+ * Serializes a snapshot that has already been ordered by the validation
+ * pipeline. Keeping this separate from the general helper avoids a second
+ * full snapshot clone at the peak of candidate generation.
+ */
+export async function createOrderedSnapshotArtifact(
+  orderedSnapshot: VodExportSnapshot,
+  publicOrigin: string = VOD_EXPORT_PUBLIC_ORIGIN,
+): Promise<VodExportSnapshotArtifact> {
+  return createArtifactFromBytes(
+    orderedSnapshot,
+    serializeOwnedCanonicalSnapshot(orderedSnapshot),
+    publicOrigin,
+  );
+}
+
+function serializeOwnedCanonicalSnapshot(snapshot: VodExportSnapshot): Uint8Array {
+  if (snapshot.schemaVersion !== VOD_EXPORT_SCHEMA_VERSION) {
+    throw new CanonicalJsonError(`Unsupported snapshot schemaVersion: ${snapshot.schemaVersion}`);
+  }
+  const counter = new CanonicalByteCounter();
+  writeOwnedSnapshotTokens(snapshot, counter);
+  assertWithinCapacity('snapshotBytes', counter.byteLength);
+  const writer = new CanonicalByteWriter(counter.byteLength);
+  writeOwnedSnapshotTokens(snapshot, writer);
+  return writer.finish();
+}
+
+async function createArtifactFromBytes(
+  orderedSnapshot: VodExportSnapshot,
+  bytes: Uint8Array,
+  publicOrigin: string,
+): Promise<VodExportSnapshotArtifact> {
   const counts = countSnapshot(orderedSnapshot);
   const capacity = measureEmittedCapacity(counts);
-  const bytes = serializeCanonicalSnapshot(orderedSnapshot);
   capacity.push(assertWithinCapacity('snapshotBytes', bytes.byteLength));
   const sha256 = await sha256Hex(bytes);
 
   return {
-    snapshot: orderedSnapshot,
     bytes,
     sha256,
     uncompressedBytes: bytes.byteLength,
@@ -191,7 +231,8 @@ class CanonicalByteCounter {
   }
 
   integer(value: number): void {
-    this.ascii(serializeCanonicalInteger(value));
+    assertCanonicalInteger(value, 'JSON integer', true);
+    this.add(canonicalIntegerDigitLength(value));
   }
 
   private add(bytes: number): void {
@@ -202,7 +243,142 @@ class CanonicalByteCounter {
   }
 }
 
-function countSnapshotTokens(snapshot: VodExportSnapshot, counter: CanonicalByteCounter): void {
+interface CanonicalTokenSink {
+  ascii(value: string): void;
+  string(value: string): void;
+  nullableString(value: string | null): void;
+  integer(value: number): void;
+}
+
+class CanonicalByteWriter implements CanonicalTokenSink {
+  private readonly bytes: Uint8Array;
+  private offset = 0;
+
+  constructor(byteLength: number) {
+    this.bytes = new Uint8Array(byteLength);
+  }
+
+  ascii(value: string): void {
+    for (let index = 0; index < value.length; index += 1) {
+      const codeUnit = value.charCodeAt(index);
+      if (codeUnit > 0x7f) throw new CanonicalJsonError('Canonical ASCII token contains a non-ASCII value');
+      this.writeByte(codeUnit);
+    }
+  }
+
+  string(value: string): void {
+    if (!hasValidUnicodeScalars(value)) {
+      throw new CanonicalJsonError('Canonical JSON strings cannot contain unpaired surrogates');
+    }
+    this.writeByte(0x22);
+    for (let index = 0; index < value.length; index += 1) {
+      const codeUnit = value.charCodeAt(index);
+      switch (codeUnit) {
+        case 0x08:
+          this.writeEscape(0x62);
+          break;
+        case 0x09:
+          this.writeEscape(0x74);
+          break;
+        case 0x0a:
+          this.writeEscape(0x6e);
+          break;
+        case 0x0c:
+          this.writeEscape(0x66);
+          break;
+        case 0x0d:
+          this.writeEscape(0x72);
+          break;
+        case 0x22:
+        case 0x5c:
+          this.writeEscape(codeUnit);
+          break;
+        default:
+          if (codeUnit <= 0x1f) {
+            this.writeByte(0x5c);
+            this.writeByte(0x75);
+            this.writeByte(0x30);
+            this.writeByte(0x30);
+            this.writeByte(hexDigit(codeUnit >>> 4));
+            this.writeByte(hexDigit(codeUnit & 0x0f));
+          } else if (codeUnit <= 0x7f) {
+            this.writeByte(codeUnit);
+          } else if (codeUnit <= 0x7ff) {
+            this.writeByte(0xc0 | (codeUnit >>> 6));
+            this.writeByte(0x80 | (codeUnit & 0x3f));
+          } else if (codeUnit >= 0xd800 && codeUnit <= 0xdbff) {
+            const second = value.charCodeAt(index + 1);
+            const scalar = 0x10000 + ((codeUnit - 0xd800) << 10) + (second - 0xdc00);
+            this.writeByte(0xf0 | (scalar >>> 18));
+            this.writeByte(0x80 | ((scalar >>> 12) & 0x3f));
+            this.writeByte(0x80 | ((scalar >>> 6) & 0x3f));
+            this.writeByte(0x80 | (scalar & 0x3f));
+            index += 1;
+          } else {
+            this.writeByte(0xe0 | (codeUnit >>> 12));
+            this.writeByte(0x80 | ((codeUnit >>> 6) & 0x3f));
+            this.writeByte(0x80 | (codeUnit & 0x3f));
+          }
+      }
+    }
+    this.writeByte(0x22);
+  }
+
+  nullableString(value: string | null): void {
+    if (value === null) this.ascii('null');
+    else this.string(value);
+  }
+
+  integer(value: number): void {
+    assertCanonicalInteger(value, 'JSON integer', true);
+    if (value === 0) {
+      this.writeByte(0x30);
+      return;
+    }
+    let divisor = 1;
+    while (Math.floor(value / divisor) >= 10) divisor *= 10;
+    while (divisor >= 1) {
+      this.writeByte(0x30 + Math.floor(value / divisor) % 10);
+      divisor /= 10;
+    }
+  }
+
+  finish(): Uint8Array {
+    if (this.offset !== this.bytes.byteLength) {
+      throw new CanonicalJsonError('Canonical UTF-8 byte count did not match serialization');
+    }
+    return this.bytes;
+  }
+
+  private writeEscape(codeUnit: number): void {
+    this.writeByte(0x5c);
+    this.writeByte(codeUnit);
+  }
+
+  private writeByte(value: number): void {
+    if (this.offset >= this.bytes.byteLength) {
+      throw new CanonicalJsonError('Canonical UTF-8 buffer was undersized');
+    }
+    this.bytes[this.offset] = value;
+    this.offset += 1;
+  }
+}
+
+function hexDigit(value: number): number {
+  return value < 10 ? 0x30 + value : 0x61 + value - 10;
+}
+
+function canonicalIntegerDigitLength(value: number): number {
+  let digits = 1;
+  let remaining = value;
+  while (remaining >= 10) {
+    remaining = Math.floor(remaining / 10);
+    digits += 1;
+  }
+  return digits;
+}
+
+function countSnapshotTokens(snapshot: VodExportSnapshot, counter: CanonicalTokenSink): void {
   assertExactKeys(snapshot, ['schemaVersion', 'streamers'], 'snapshot');
   if (snapshot.schemaVersion !== VOD_EXPORT_SCHEMA_VERSION) {
     throw new CanonicalJsonError(`Unsupported snapshot schemaVersion: ${snapshot.schemaVersion}`);
@@ -221,7 +397,7 @@ function countSnapshotTokens(snapshot: VodExportSnapshot, counter: CanonicalByte
   counter.ascii(']}');
 }
 
-function countStreamerTokens(streamer: VodExportStreamer, counter: CanonicalByteCounter): void {
+function countStreamerTokens(streamer: VodExportStreamer, counter: CanonicalTokenSink): void {
   assertExactKeys(
     streamer,
     ['slug', 'displayName', 'youtubeChannelId', 'avatarUrl', 'group', 'socialLinks', 'vods'],
@@ -251,7 +427,7 @@ function countStreamerTokens(streamer: VodExportStreamer, counter: CanonicalByte
   counter.ascii(']}');
 }
 
-function countSocialLinksTokens(socialLinks: VodExportSocialLinks, counter: CanonicalByteCounter): void {
+function countSocialLinksTokens(socialLinks: VodExportSocialLinks, counter: CanonicalTokenSink): void {
   assertSocialLinksObject(socialLinks);
   counter.ascii('{');
   let emitted = 0;
@@ -267,7 +443,7 @@ function countSocialLinksTokens(socialLinks: VodExportSocialLinks, counter: Cano
   counter.ascii('}');
 }
 
-function countVodTokens(vod: VodExportVod, counter: CanonicalByteCounter): void {
+function countVodTokens(vod: VodExportVod, counter: CanonicalTokenSink): void {
   assertVodObject(vod);
   counter.ascii('{"title":');
   counter.string(vod.title);
@@ -285,7 +461,7 @@ function countVodTokens(vod: VodExportVod, counter: CanonicalByteCounter): void 
   counter.ascii(']}');
 }
 
-function countPerformanceTokens(performance: VodExportPerformance, counter: CanonicalByteCounter): void {
+function countPerformanceTokens(performance: VodExportPerformance, counter: CanonicalTokenSink): void {
   assertPerformanceObject(performance);
   counter.ascii('{"performanceId":');
   counter.string(performance.performanceId);
@@ -300,6 +476,75 @@ function countPerformanceTokens(performance: VodExportPerformance, counter: Cano
   counter.ascii(',"endSeconds":');
   counter.integer(performance.endSeconds);
   counter.ascii('}');
+}
+
+/** Trusted fast path for the freshly validated, exclusively owned snapshot. */
+function writeOwnedSnapshotTokens(snapshot: VodExportSnapshot, sink: CanonicalTokenSink): void {
+  sink.ascii('{"schemaVersion":');
+  sink.string(snapshot.schemaVersion);
+  sink.ascii(',"streamers":[');
+  for (let streamerIndex = 0; streamerIndex < snapshot.streamers.length; streamerIndex += 1) {
+    if (streamerIndex > 0) sink.ascii(',');
+    const streamer = snapshot.streamers[streamerIndex];
+    if (streamer === undefined) throw new CanonicalJsonError('Owned snapshot contains a missing streamer');
+    sink.ascii('{"slug":');
+    sink.string(streamer.slug);
+    sink.ascii(',"displayName":');
+    sink.string(streamer.displayName);
+    sink.ascii(',"youtubeChannelId":');
+    sink.string(streamer.youtubeChannelId);
+    sink.ascii(',"avatarUrl":');
+    sink.nullableString(streamer.avatarUrl);
+    sink.ascii(',"group":');
+    sink.nullableString(streamer.group);
+    sink.ascii(',"socialLinks":{');
+    let emittedSocialLinks = 0;
+    for (const provider of SOCIAL_PROVIDERS) {
+      const value = streamer.socialLinks[provider];
+      if (value === undefined) continue;
+      if (emittedSocialLinks > 0) sink.ascii(',');
+      sink.string(provider);
+      sink.ascii(':');
+      sink.string(value);
+      emittedSocialLinks += 1;
+    }
+    sink.ascii('},"vods":[');
+    for (let vodIndex = 0; vodIndex < streamer.vods.length; vodIndex += 1) {
+      if (vodIndex > 0) sink.ascii(',');
+      const vod = streamer.vods[vodIndex];
+      if (vod === undefined) throw new CanonicalJsonError('Owned snapshot contains a missing VOD');
+      sink.ascii('{"title":');
+      sink.string(vod.title);
+      sink.ascii(',"date":');
+      sink.string(vod.date);
+      sink.ascii(',"videoId":');
+      sink.string(vod.videoId);
+      sink.ascii(',"performances":[');
+      for (let performanceIndex = 0; performanceIndex < vod.performances.length; performanceIndex += 1) {
+        if (performanceIndex > 0) sink.ascii(',');
+        const performance = vod.performances[performanceIndex];
+        if (performance === undefined) {
+          throw new CanonicalJsonError('Owned snapshot contains a missing performance');
+        }
+        sink.ascii('{"performanceId":');
+        sink.string(performance.performanceId);
+        sink.ascii(',"songId":');
+        sink.string(performance.songId);
+        sink.ascii(',"title":');
+        sink.string(performance.title);
+        sink.ascii(',"originalArtist":');
+        sink.nullableString(performance.originalArtist);
+        sink.ascii(',"startSeconds":');
+        sink.integer(performance.startSeconds);
+        sink.ascii(',"endSeconds":');
+        sink.integer(performance.endSeconds);
+        sink.ascii('}');
+      }
+      sink.ascii(']}');
+    }
+    sink.ascii(']}');
+  }
+  sink.ascii(']}');
 }
 
 function* snapshotTokens(snapshot: VodExportSnapshot): Generator<string> {

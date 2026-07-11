@@ -34,6 +34,9 @@ export type NormalizedDisplayText =
   | { kind: 'missing' }
   | { kind: 'invalid-unicode' };
 
+export const INVALID_NORMALIZED_DISPLAY_TEXT = Symbol('invalid-normalized-display-text');
+export type NormalizedDisplayTextValue = string | null | typeof INVALID_NORMALIZED_DISPLAY_TEXT;
+
 export type OptionalSafeUrl =
   | { kind: 'safe'; url: string }
   | { kind: 'absent' }
@@ -43,6 +46,8 @@ export type ParsedSqliteInteger =
   | { kind: 'value'; value: number }
   | { kind: 'missing' }
   | { kind: 'invalid' };
+
+export type ParsedSqliteIntegerValue = number | 'missing' | 'invalid';
 
 export function trimConfirmedWhitespace(value: string): string {
   return value.replace(LEADING_CONFIRMED_WHITESPACE, '').replace(TRAILING_CONFIRMED_WHITESPACE, '');
@@ -71,11 +76,21 @@ export function hasValidUnicodeScalars(value: string): boolean {
 }
 
 export function normalizeDisplayText(value: string | null | undefined): NormalizedDisplayText {
-  if (value == null) return { kind: 'missing' };
-  if (!hasValidUnicodeScalars(value)) return { kind: 'invalid-unicode' };
+  const normalized = normalizeDisplayTextValue(value);
+  if (normalized === null) return { kind: 'missing' };
+  if (normalized === INVALID_NORMALIZED_DISPLAY_TEXT) return { kind: 'invalid-unicode' };
+  return { kind: 'value', value: normalized };
+}
+
+/** Allocation-free scalar form for the bounded validation hot path. */
+export function normalizeDisplayTextValue(
+  value: string | null | undefined,
+): NormalizedDisplayTextValue {
+  if (value == null) return null;
+  if (!hasValidUnicodeScalars(value)) return INVALID_NORMALIZED_DISPLAY_TEXT;
 
   const normalized = trimConfirmedWhitespace(value.normalize('NFC'));
-  return normalized.length === 0 ? { kind: 'missing' } : { kind: 'value', value: normalized };
+  return normalized.length === 0 ? null : normalized;
 }
 
 export function isValidStreamerSlug(value: string): boolean {
@@ -120,18 +135,26 @@ export function isValidRfc3339Timestamp(value: string): boolean {
 }
 
 export function parseSqliteInteger(source: SqliteIntegerSource): ParsedSqliteInteger {
-  if (source.storageClass === 'null') return { kind: 'missing' };
-  if (source.storageClass !== 'integer' || source.decimalText == null) return { kind: 'invalid' };
-  if (!DECIMAL_INTEGER_PATTERN.test(source.decimalText)) return { kind: 'invalid' };
+  const parsed = parseSqliteIntegerValue(source.storageClass, source.decimalText);
+  return typeof parsed === 'number' ? { kind: 'value', value: parsed } : { kind: parsed };
+}
 
-  const integer = BigInt(source.decimalText);
-  if (integer < BigInt(Number.MIN_SAFE_INTEGER) || integer > BigInt(Number.MAX_SAFE_INTEGER)) {
-    return { kind: 'invalid' };
-  }
+/** Allocation-free scalar form for the bounded validation hot path. */
+export function parseSqliteIntegerValue(
+  storageClass: string,
+  decimalText: string | null,
+): ParsedSqliteIntegerValue {
+  if (storageClass === 'null') return 'missing';
+  if (storageClass !== 'integer' || decimalText == null) return 'invalid';
+  if (!DECIMAL_INTEGER_PATTERN.test(decimalText)) return 'invalid';
 
-  const value = Number(integer);
-  if (!Number.isSafeInteger(value) || Object.is(value, -0)) return { kind: 'invalid' };
-  return { kind: 'value', value };
+  const value = Number(decimalText);
+  if (
+    !Number.isSafeInteger(value)
+    || Object.is(value, -0)
+    || String(value) !== decimalText
+  ) return 'invalid';
+  return value;
 }
 
 export function validateOptionalSafeUrl(
@@ -169,11 +192,25 @@ export function compareUtf8Ordinal(left: string, right: string): number {
   let leftIndex = 0;
   let rightIndex = 0;
   while (leftIndex < left.length && rightIndex < right.length) {
-    const leftScalar = scalarAt(left, leftIndex);
-    const rightScalar = scalarAt(right, rightIndex);
-    if (leftScalar.value !== rightScalar.value) return leftScalar.value - rightScalar.value;
-    leftIndex += leftScalar.width;
-    rightIndex += rightScalar.width;
+    const leftFirst = left.charCodeAt(leftIndex);
+    const leftSecond = left.charCodeAt(leftIndex + 1);
+    const leftIsPair = leftFirst >= 0xd800 && leftFirst <= 0xdbff
+      && leftSecond >= 0xdc00 && leftSecond <= 0xdfff;
+    const leftScalar = leftIsPair
+      ? 0x10000 + ((leftFirst - 0xd800) << 10) + (leftSecond - 0xdc00)
+      : leftFirst >= 0xd800 && leftFirst <= 0xdfff ? 0xfffd : leftFirst;
+
+    const rightFirst = right.charCodeAt(rightIndex);
+    const rightSecond = right.charCodeAt(rightIndex + 1);
+    const rightIsPair = rightFirst >= 0xd800 && rightFirst <= 0xdbff
+      && rightSecond >= 0xdc00 && rightSecond <= 0xdfff;
+    const rightScalar = rightIsPair
+      ? 0x10000 + ((rightFirst - 0xd800) << 10) + (rightSecond - 0xdc00)
+      : rightFirst >= 0xd800 && rightFirst <= 0xdfff ? 0xfffd : rightFirst;
+
+    if (leftScalar !== rightScalar) return leftScalar - rightScalar;
+    leftIndex += leftIsPair ? 2 : 1;
+    rightIndex += rightIsPair ? 2 : 1;
   }
   if (leftIndex === left.length && rightIndex === right.length) return 0;
   return leftIndex === left.length ? -1 : 1;
@@ -255,23 +292,6 @@ function isConfirmedWhitespaceCodeUnit(codeUnit: number): boolean {
     codeUnit === 0x3000 ||
     codeUnit === 0xfeff
   );
-}
-
-/** UTF-8 byte order is scalar-value order; invalid surrogates match TextEncoder's U+FFFD replacement. */
-function scalarAt(value: string, index: number): { value: number; width: number } {
-  const first = value.charCodeAt(index);
-  if (first >= 0xd800 && first <= 0xdbff) {
-    const second = value.charCodeAt(index + 1);
-    if (second >= 0xdc00 && second <= 0xdfff) {
-      return {
-        value: 0x10000 + ((first - 0xd800) << 10) + (second - 0xdc00),
-        width: 2,
-      };
-    }
-    return { value: 0xfffd, width: 1 };
-  }
-  if (first >= 0xdc00 && first <= 0xdfff) return { value: 0xfffd, width: 1 };
-  return { value: first, width: 1 };
 }
 
 /** URL.port hides an explicit default :443, so inspect the original authority. */

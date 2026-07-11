@@ -1,11 +1,11 @@
 import { VOD_EXPORT_LIMITS, VOD_EXPORT_SCHEMA_VERSION } from './constants';
+import { utf8ByteLength } from './normalization';
 import type {
   ExportSourcePerformance,
   ExportSourceSong,
   ExportSourceStreamer,
   ExportSourceVod,
-  SqliteIntegerSource,
-  VodExportSourceData,
+  OwnedVodExportSourceData,
 } from './types';
 
 const TRIGGER_SCHEMA_VERSION = 1;
@@ -18,7 +18,7 @@ const D1_MAX_BOUND_VALUE_BYTES = 2_000_000;
 const STREAMER_SCOPE_BLOB_TARGET_BYTES = 1_900_000;
 const STREAMER_SCOPE_LENGTH_PREFIX_BYTES = 8;
 const D1_MAX_BOUND_PARAMETERS = 100;
-const DB_SOURCE_LIMIT_BOUND_PARAMETERS = 6;
+const DB_SOURCE_LIMIT_BOUND_PARAMETERS = 5;
 const textEncoder = new TextEncoder();
 
 const ADMIN_REVISION_TRIGGERS = [
@@ -56,7 +56,7 @@ export interface VodExportSourceFingerprint {
 }
 
 export interface VodExportSourceRead {
-  data: VodExportSourceData;
+  data: OwnedVodExportSourceData;
   fingerprint: VodExportSourceFingerprint;
   sourceRows: number;
   sourceTextBytes: number;
@@ -109,58 +109,29 @@ interface NovaStreamerRow {
   status: string;
 }
 
-interface VodRow {
-  stream_id: string;
-  streamer_id: string;
-  title: string | null;
-  date: string | null;
-  video_id: string | null;
-  status: string;
-}
+type VodRow = ExportSourceVod;
+type SongRow = Omit<ExportSourceSong, 'rowId'> & { rowId: string | number };
+type PerformanceRow = Omit<ExportSourcePerformance, 'rowId' | 'startDecimalText' | 'endDecimalText'> & {
+  rowId: string | number;
+  startDecimalText: string | number | null;
+  endDecimalText: string | number | null;
+};
 
-interface SongRow {
-  row_id: string | number;
-  song_id: string | null;
-  streamer_id: string;
-  title: string | null;
-  original_artist: string | null;
-  status: string;
-}
-
-interface PerformanceRow {
-  row_id: string | number;
-  performance_id: string | null;
-  streamer_id: string;
-  song_id: string;
-  stream_id: string;
-  start_storage_class: string;
-  start_decimal_text: string | number | null;
-  end_storage_class: string;
-  end_decimal_text: string | number | null;
-  status: string;
-}
-
-interface AdminSourceQueryRow {
-  row_kind: 'stats' | 'vod' | 'song' | 'performance';
+interface AdminStatsRow {
   source_rows: number | string | null;
+  loaded_source_rows: number | string | null;
   source_text_bytes: number | string | null;
-  row_id: string | number | null;
-  entity_id: string | null;
-  streamer_id: string | null;
-  title: string | null;
-  secondary_text: string | null;
-  relation_id: string | null;
-  stream_id: string | null;
-  start_storage_class: string | null;
-  start_decimal_text: string | number | null;
-  end_storage_class: string | null;
-  end_decimal_text: string | number | null;
-  status: string | null;
+  eligible_vod_count: number | string | null;
+  eligible_performance_count: number | string | null;
+  relationship_finding_count: number | string | null;
 }
 
 interface StreamerScopeBinding {
-  kind: 'blob' | 'direct';
+  kind: 'blob' | 'direct' | 'fragment';
   value: Uint8Array | string;
+  fragmentGroup?: number;
+  fragmentPart?: number;
+  fragmentLast?: number;
 }
 
 interface StreamerScope {
@@ -267,9 +238,7 @@ const DB_SCOPED_CTE_SUFFIX = `,
     WHERE (
       s.status = 'approved'
       AND s.streamer_id IN (SELECT streamer_id FROM selected_streamers)
-    ) OR EXISTS (
-      SELECT 1 FROM scoped_performances p WHERE p.stream_id = s.id
-    )
+    ) OR s.id IN (SELECT p.stream_id FROM scoped_performances p)
   ),
   scoped_songs AS (
     SELECT s.rowid AS source_row_id, s.*
@@ -277,9 +246,45 @@ const DB_SCOPED_CTE_SUFFIX = `,
     WHERE (
       s.status = 'approved'
       AND s.streamer_id IN (SELECT streamer_id FROM selected_streamers)
-    ) OR EXISTS (
-      SELECT 1 FROM scoped_performances p WHERE p.song_id = s.id
-    )
+    ) OR s.id IN (SELECT p.song_id FROM scoped_performances p)
+  ),
+  classified_performances AS (
+    SELECT
+      p.*,
+      CASE WHEN v.source_row_id IS NULL THEN 1 ELSE 0 END AS missing_vod,
+      CASE WHEN song.source_row_id IS NULL THEN 1 ELSE 0 END AS missing_song,
+      CASE WHEN v.source_row_id IS NOT NULL AND v.streamer_id <> p.streamer_id THEN 1 ELSE 0 END AS vod_mismatch,
+      CASE WHEN song.source_row_id IS NOT NULL AND song.streamer_id <> p.streamer_id THEN 1 ELSE 0 END AS song_mismatch,
+      CASE WHEN
+        v.source_row_id IS NOT NULL
+        AND song.source_row_id IS NOT NULL
+        AND v.streamer_id = p.streamer_id
+        AND song.streamer_id = p.streamer_id
+        AND v.status = 'approved'
+        AND song.status = 'approved'
+      THEN 1 ELSE 0 END AS is_eligible
+    FROM scoped_performances p
+    LEFT JOIN scoped_streams v ON v.id = p.stream_id
+    LEFT JOIN scoped_songs song ON song.id = p.song_id
+  ),
+  selected_performances AS (
+    SELECT *
+    FROM classified_performances
+    WHERE is_eligible = 1
+      OR missing_vod = 1
+      OR missing_song = 1
+      OR vod_mismatch = 1
+      OR song_mismatch = 1
+  ),
+  selected_streams AS (
+    SELECT s.*
+    FROM scoped_streams s
+    WHERE s.id IN (SELECT p.stream_id FROM selected_performances p)
+  ),
+  selected_songs AS (
+    SELECT s.*
+    FROM scoped_songs s
+    WHERE s.id IN (SELECT p.song_id FROM selected_performances p)
   ),
   stats AS (
     SELECT
@@ -288,6 +293,17 @@ const DB_SCOPED_CTE_SUFFIX = `,
         (SELECT COUNT(*) FROM scoped_songs) +
         (SELECT COUNT(*) FROM scoped_performances)
       ) AS source_rows,
+      (
+        (SELECT COUNT(*) FROM selected_streams) +
+        (SELECT COUNT(*) FROM selected_songs) +
+        (SELECT COUNT(*) FROM selected_performances)
+      ) AS loaded_source_rows,
+      (SELECT COUNT(DISTINCT stream_id) FROM classified_performances WHERE is_eligible = 1)
+        AS eligible_vod_count,
+      (SELECT COUNT(*) FROM classified_performances WHERE is_eligible = 1)
+        AS eligible_performance_count,
+      COALESCE((SELECT SUM(missing_vod + missing_song + vod_mismatch + song_mismatch)
+        FROM classified_performances), 0) AS relationship_finding_count,
       (
         COALESCE((SELECT SUM(
           length(CAST(COALESCE(id, '') AS BLOB)) +
@@ -317,83 +333,125 @@ const DB_SCOPED_CTE_SUFFIX = `,
   )
 `;
 
-function dbSourceSql(scopeCte: string): string {
+function dbStatsSql(scopeCte: string): string {
   return `${scopeCte}${DB_SCOPED_CTE_SUFFIX}
     SELECT
-      'stats' AS row_kind,
       source_rows,
+      loaded_source_rows,
       source_text_bytes,
-      NULL AS row_id,
-      NULL AS entity_id,
-      NULL AS streamer_id,
-      NULL AS title,
-      NULL AS secondary_text,
-      NULL AS relation_id,
-      NULL AS stream_id,
-      NULL AS start_storage_class,
-      NULL AS start_decimal_text,
-      NULL AS end_storage_class,
-      NULL AS end_decimal_text,
-      NULL AS status,
-      0 AS sort_group,
-      '' AS sort_key,
-      '' AS sort_row_id
+      eligible_vod_count,
+      eligible_performance_count,
+      relationship_finding_count
     FROM stats
-    UNION ALL
+  `;
+}
+
+function dbVodRowsSql(scopeCte: string): string {
+  return `${scopeCte}${DB_SCOPED_CTE_SUFFIX}
     SELECT
-      'vod', NULL, NULL, NULL, id, streamer_id, title, date, video_id, NULL,
-      NULL, NULL, NULL, NULL, status,
-      1, COALESCE(id, ''), CAST(source_row_id AS TEXT)
-    FROM scoped_streams
-    WHERE (SELECT source_rows <= ? AND source_text_bytes <= ? FROM stats)
-    UNION ALL
+      id AS streamId,
+      streamer_id AS streamerId,
+      title,
+      date,
+      video_id AS videoId,
+      status
+    FROM selected_streams s
+    WHERE (SELECT
+      source_rows <= ?
+      AND source_text_bytes <= ?
+      AND eligible_vod_count <= ?
+      AND eligible_performance_count <= ?
+      AND relationship_finding_count <= ?
+    FROM stats)
+    ORDER BY COALESCE(id, ''), CAST(source_row_id AS TEXT)
+  `;
+}
+
+function dbSongRowsSql(scopeCte: string): string {
+  return `${scopeCte}${DB_SCOPED_CTE_SUFFIX}
     SELECT
-      'song', NULL, NULL, CAST(source_row_id AS TEXT), id, streamer_id, title,
-      original_artist, NULL, NULL, NULL, NULL, NULL, NULL, status,
-      2, COALESCE(id, ''), CAST(source_row_id AS TEXT)
-    FROM scoped_songs
-    WHERE (SELECT source_rows <= ? AND source_text_bytes <= ? FROM stats)
-    UNION ALL
+      CAST(source_row_id AS TEXT) AS rowId,
+      id AS songId,
+      streamer_id AS streamerId,
+      title,
+      original_artist AS originalArtist,
+      status
+    FROM selected_songs s
+    WHERE (SELECT
+      source_rows <= ?
+      AND source_text_bytes <= ?
+      AND eligible_vod_count <= ?
+      AND eligible_performance_count <= ?
+      AND relationship_finding_count <= ?
+    FROM stats)
+    ORDER BY COALESCE(id, ''), CAST(source_row_id AS TEXT)
+  `;
+}
+
+function dbPerformanceRowsSql(scopeCte: string): string {
+  return `${scopeCte}${DB_SCOPED_CTE_SUFFIX}
     SELECT
-      'performance', NULL, NULL, CAST(source_row_id AS TEXT), id, streamer_id, NULL,
-      NULL, song_id, stream_id, typeof(timestamp), CAST(timestamp AS TEXT),
-      typeof(end_timestamp), CAST(end_timestamp AS TEXT), status,
-      3, COALESCE(id, ''), CAST(source_row_id AS TEXT)
-    FROM scoped_performances
-    WHERE (SELECT source_rows <= ? AND source_text_bytes <= ? FROM stats)
-    ORDER BY sort_group, sort_key, sort_row_id
+      CAST(source_row_id AS TEXT) AS rowId,
+      id AS performanceId,
+      streamer_id AS streamerId,
+      song_id AS songId,
+      stream_id AS streamId,
+      typeof(timestamp) AS startStorageClass,
+      CAST(timestamp AS TEXT) AS startDecimalText,
+      typeof(end_timestamp) AS endStorageClass,
+      CAST(end_timestamp AS TEXT) AS endDecimalText,
+      status
+    FROM selected_performances
+    WHERE (SELECT
+      source_rows <= ?
+      AND source_text_bytes <= ?
+      AND eligible_vod_count <= ?
+      AND eligible_performance_count <= ?
+      AND relationship_finding_count <= ?
+    FROM stats)
+    ORDER BY COALESCE(id, ''), CAST(source_row_id AS TEXT)
   `;
 }
 
 function buildStreamerScope(streamerIds: readonly string[]): StreamerScope {
   const encodedBindings: StreamerScopeBinding[] = [];
-  let pendingEntries: Uint8Array[] = [];
+  let pendingPayload: Uint8Array | null = null;
   let pendingBytes = 0;
+  let fragmentGroup = 0;
 
   const flushBlob = (): void => {
-    if (pendingBytes === 0) return;
-    const payload = new Uint8Array(pendingBytes);
-    let offset = 0;
-    for (const entry of pendingEntries) {
-      payload.set(entry, offset);
-      offset += entry.byteLength;
-    }
+    if (pendingPayload === null || pendingBytes === 0) return;
+    const payload = pendingBytes === pendingPayload.byteLength
+      ? pendingPayload
+      : pendingPayload.slice(0, pendingBytes);
     encodedBindings.push({ kind: 'blob', value: payload });
-    pendingEntries = [];
+    pendingPayload = null;
     pendingBytes = 0;
   };
 
   for (const streamerId of streamerIds) {
-    const valueBytes = textEncoder.encode(streamerId);
-    if (valueBytes.byteLength > D1_MAX_BOUND_VALUE_BYTES) {
-      throw new VodExportSourceError(
-        'EXPORT_SOURCE_GUARD_MISMATCH',
-        'A streamer scope key exceeds the D1 bound-value limit',
-        503,
-      );
+    const valueByteLength = utf8ByteLength(streamerId);
+
+    if (valueByteLength > D1_MAX_BOUND_VALUE_BYTES) {
+      flushBlob();
+      const chunks = splitUtf8Text(streamerId, STREAMER_SCOPE_BLOB_TARGET_BYTES);
+      const lastPart = chunks.length - 1;
+      for (let part = 0; part < chunks.length; part += 1) {
+        const chunk = chunks[part];
+        if (chunk === undefined) continue;
+        encodedBindings.push({
+          kind: 'fragment',
+          value: chunk,
+          fragmentGroup,
+          fragmentPart: part,
+          fragmentLast: lastPart,
+        });
+      }
+      fragmentGroup += 1;
+      continue;
     }
 
-    const lengthText = String(valueBytes.byteLength).padStart(
+    const lengthText = String(valueByteLength).padStart(
       STREAMER_SCOPE_LENGTH_PREFIX_BYTES,
       '0',
     );
@@ -404,21 +462,30 @@ function buildStreamerScope(streamerIds: readonly string[]): StreamerScope {
         503,
       );
     }
-    const prefix = textEncoder.encode(lengthText);
-    const entry = new Uint8Array(prefix.byteLength + valueBytes.byteLength);
-    entry.set(prefix, 0);
-    entry.set(valueBytes, prefix.byteLength);
+    const entryByteLength = STREAMER_SCOPE_LENGTH_PREFIX_BYTES + valueByteLength;
 
     // The framing bytes can push an otherwise legal D1 string over the BLOB
     // limit. Bind that one original string directly instead.
-    if (entry.byteLength > STREAMER_SCOPE_BLOB_TARGET_BYTES) {
+    if (entryByteLength > STREAMER_SCOPE_BLOB_TARGET_BYTES) {
       flushBlob();
       encodedBindings.push({ kind: 'direct', value: streamerId });
       continue;
     }
-    if (pendingBytes + entry.byteLength > STREAMER_SCOPE_BLOB_TARGET_BYTES) flushBlob();
-    pendingEntries.push(entry);
-    pendingBytes += entry.byteLength;
+    if (pendingBytes + entryByteLength > STREAMER_SCOPE_BLOB_TARGET_BYTES) flushBlob();
+    if (pendingPayload === null) pendingPayload = new Uint8Array(STREAMER_SCOPE_BLOB_TARGET_BYTES);
+    for (let index = 0; index < lengthText.length; index += 1) {
+      pendingPayload[pendingBytes + index] = lengthText.charCodeAt(index);
+    }
+    pendingBytes += STREAMER_SCOPE_LENGTH_PREFIX_BYTES;
+    const encoded = textEncoder.encodeInto(streamerId, pendingPayload.subarray(pendingBytes));
+    if (encoded.read !== streamerId.length || encoded.written !== valueByteLength) {
+      throw new VodExportSourceError(
+        'EXPORT_SOURCE_GUARD_MISMATCH',
+        'A streamer scope key could not be encoded exactly',
+        503,
+      );
+    }
+    pendingBytes += encoded.written;
   }
   flushBlob();
 
@@ -431,10 +498,16 @@ function buildStreamerScope(streamerIds: readonly string[]): StreamerScope {
   }
 
   const sourceSelects = encodedBindings.length === 0
-    ? ['SELECT NULL AS payload, NULL AS direct_value WHERE 0']
-    : encodedBindings.map((binding) => binding.kind === 'blob'
-      ? 'SELECT CAST(? AS BLOB) AS payload, NULL AS direct_value'
-      : 'SELECT NULL AS payload, CAST(? AS TEXT) AS direct_value');
+    ? ['SELECT NULL AS payload, NULL AS direct_value, NULL AS fragment_group, NULL AS fragment_part, NULL AS fragment_last, NULL AS fragment_value WHERE 0']
+    : encodedBindings.map((binding) => {
+      if (binding.kind === 'blob') {
+        return 'SELECT CAST(? AS BLOB) AS payload, NULL AS direct_value, NULL AS fragment_group, NULL AS fragment_part, NULL AS fragment_last, NULL AS fragment_value';
+      }
+      if (binding.kind === 'direct') {
+        return 'SELECT NULL AS payload, CAST(? AS TEXT) AS direct_value, NULL AS fragment_group, NULL AS fragment_part, NULL AS fragment_last, NULL AS fragment_value';
+      }
+      return `SELECT NULL AS payload, NULL AS direct_value, ${binding.fragmentGroup ?? 0} AS fragment_group, ${binding.fragmentPart ?? 0} AS fragment_part, ${binding.fragmentLast ?? 0} AS fragment_last, CAST(? AS TEXT) AS fragment_value`;
+    });
   const byteLength = (expression: string): string =>
     `CAST(CAST(substr(${expression}, 1, ${STREAMER_SCOPE_LENGTH_PREFIX_BYTES}) AS TEXT) AS INTEGER)`;
   const firstLength = byteLength('payload');
@@ -443,7 +516,7 @@ function buildStreamerScope(streamerIds: readonly string[]): StreamerScope {
   return {
     cteSql: `
       WITH RECURSIVE
-      scope_sources(payload, direct_value) AS (
+      scope_sources(payload, direct_value, fragment_group, fragment_part, fragment_last, fragment_value) AS (
         ${sourceSelects.join('\n        UNION ALL\n        ')}
       ),
       decoded_scope(streamer_id, rest) AS (
@@ -459,14 +532,64 @@ function buildStreamerScope(streamerIds: readonly string[]): StreamerScope {
         FROM decoded_scope
         WHERE length(rest) >= ${STREAMER_SCOPE_LENGTH_PREFIX_BYTES}
       ),
+      assembled_fragments(fragment_group, fragment_part, fragment_last, streamer_id) AS (
+        SELECT fragment_group, fragment_part, fragment_last, fragment_value
+        FROM scope_sources
+        WHERE fragment_part = 0
+        UNION ALL
+        SELECT
+          assembled.fragment_group,
+          next.fragment_part,
+          assembled.fragment_last,
+          assembled.streamer_id || next.fragment_value
+        FROM assembled_fragments assembled
+        JOIN scope_sources next
+          ON next.fragment_group = assembled.fragment_group
+          AND next.fragment_part = assembled.fragment_part + 1
+        WHERE assembled.fragment_part < assembled.fragment_last
+      ),
       selected_streamers(streamer_id) AS (
         SELECT streamer_id FROM decoded_scope
         UNION ALL
         SELECT direct_value FROM scope_sources WHERE direct_value IS NOT NULL
+        UNION ALL
+        SELECT streamer_id FROM assembled_fragments WHERE fragment_part = fragment_last
       )
     `,
     bindings: encodedBindings.map((binding) => binding.value),
   };
+}
+
+function splitUtf8Text(value: string, maxBytes: number): string[] {
+  const chunks: string[] = [];
+  let chunkStart = 0;
+  let chunkBytes = 0;
+  for (let index = 0; index < value.length; index += 1) {
+    const first = value.charCodeAt(index);
+    let scalarBytes: number;
+    let width = 1;
+    if (first <= 0x7f) scalarBytes = 1;
+    else if (first <= 0x7ff) scalarBytes = 2;
+    else if (first >= 0xd800 && first <= 0xdbff) {
+      const second = value.charCodeAt(index + 1);
+      if (second >= 0xdc00 && second <= 0xdfff) {
+        scalarBytes = 4;
+        width = 2;
+      } else {
+        scalarBytes = 3;
+      }
+    } else scalarBytes = 3;
+
+    if (chunkBytes + scalarBytes > maxBytes) {
+      chunks.push(value.slice(chunkStart, index));
+      chunkStart = index;
+      chunkBytes = 0;
+    }
+    chunkBytes += scalarBytes;
+    if (width === 2) index += 1;
+  }
+  chunks.push(value.slice(chunkStart));
+  return chunks;
 }
 
 function numberFromAggregate(value: number | string | null, field: string): number {
@@ -561,13 +684,6 @@ function parsePrivateRowId(value: string | number, entity: 'song' | 'performance
     );
   }
   return rowId;
-}
-
-function sqliteInteger(storageClass: string, decimalText: string | number | null): SqliteIntegerSource {
-  return {
-    storageClass,
-    decimalText: decimalText === null ? null : String(decimalText),
-  };
 }
 
 function requireFirstRow<T>(result: D1Result<T>, description: string): T {
@@ -673,18 +789,21 @@ async function readAdminSource(
 }> {
   const streamerScope = buildStreamerScope(streamerIds);
   const session = db.withSession('first-primary');
+  const boundedRows = (sql: string): D1PreparedStatement => session.prepare(sql).bind(
+    ...streamerScope.bindings,
+    VOD_EXPORT_LIMITS.sourceRows,
+    remainingTextBytes,
+    VOD_EXPORT_LIMITS.vods,
+    VOD_EXPORT_LIMITS.performances,
+    VOD_EXPORT_LIMITS.findings,
+  );
   const results = await session.batch<unknown>([
     session.prepare(STATE_SQL),
     session.prepare(triggerGuardSql(ADMIN_REVISION_TRIGGERS)),
-    session.prepare(dbSourceSql(streamerScope.cteSql)).bind(
-      ...streamerScope.bindings,
-      VOD_EXPORT_LIMITS.sourceRows,
-      remainingTextBytes,
-      VOD_EXPORT_LIMITS.sourceRows,
-      remainingTextBytes,
-      VOD_EXPORT_LIMITS.sourceRows,
-      remainingTextBytes,
-    ),
+    session.prepare(dbStatsSql(streamerScope.cteSql)).bind(...streamerScope.bindings),
+    boundedRows(dbVodRowsSql(streamerScope.cteSql)),
+    boundedRows(dbSongRowsSql(streamerScope.cteSql)),
+    boundedRows(dbPerformanceRowsSql(streamerScope.cteSql)),
   ]);
 
   const state = requireFirstRow(results[0] as D1Result<StateRow>, 'DB state');
@@ -693,17 +812,19 @@ async function readAdminSource(
     ADMIN_REVISION_TRIGGERS,
     'DB',
   );
-  const sourceQueryRows = (results[2] as D1Result<AdminSourceQueryRow>).results;
-  const stats = sourceQueryRows.find((row) => row.row_kind === 'stats') ?? null;
-  if (stats === null) {
-    throw new VodExportSourceError(
-      'EXPORT_SOURCE_GUARD_MISSING',
-      'DB source stats query returned no row',
-      503,
-    );
-  }
+  const stats = requireFirstRow(results[2] as D1Result<AdminStatsRow>, 'DB source stats');
   const sourceRows = numberFromAggregate(stats.source_rows, 'sourceRows');
+  const loadedSourceRows = numberFromAggregate(stats.loaded_source_rows, 'loadedSourceRows');
   const sourceTextBytes = numberFromAggregate(stats.source_text_bytes, 'sourceTextBytes');
+  const eligibleVodCount = numberFromAggregate(stats.eligible_vod_count, 'eligibleVodCount');
+  const eligiblePerformanceCount = numberFromAggregate(
+    stats.eligible_performance_count,
+    'eligiblePerformanceCount',
+  );
+  const relationshipFindingCount = numberFromAggregate(
+    stats.relationship_finding_count,
+    'relationshipFindingCount',
+  );
 
   if (sourceRows > VOD_EXPORT_LIMITS.sourceRows) {
     throw new VodExportSourceError(
@@ -725,96 +846,63 @@ async function readAdminSource(
       },
     );
   }
-
-  const vodRows: VodRow[] = [];
-  const songRows: SongRow[] = [];
-  const performanceRows: PerformanceRow[] = [];
-  for (const row of sourceQueryRows) {
-    switch (row.row_kind) {
-      case 'stats':
-        break;
-      case 'vod':
-        vodRows.push({
-          stream_id: row.entity_id as string,
-          streamer_id: row.streamer_id as string,
-          title: row.title,
-          date: row.secondary_text,
-          video_id: row.relation_id,
-          status: row.status as string,
-        });
-        break;
-      case 'song':
-        songRows.push({
-          row_id: row.row_id as string | number,
-          song_id: row.entity_id,
-          streamer_id: row.streamer_id as string,
-          title: row.title,
-          original_artist: row.secondary_text,
-          status: row.status as string,
-        });
-        break;
-      case 'performance':
-        performanceRows.push({
-          row_id: row.row_id as string | number,
-          performance_id: row.entity_id,
-          streamer_id: row.streamer_id as string,
-          song_id: row.relation_id as string,
-          stream_id: row.stream_id as string,
-          start_storage_class: row.start_storage_class as string,
-          start_decimal_text: row.start_decimal_text,
-          end_storage_class: row.end_storage_class as string,
-          end_decimal_text: row.end_decimal_text,
-          status: row.status as string,
-        });
-        break;
-      default: {
-        const exhaustive: never = row.row_kind;
-        throw new VodExportSourceError(
-          'EXPORT_SOURCE_GUARD_MISMATCH',
-          `Unexpected DB source row kind: ${String(exhaustive)}`,
-          503,
-        );
-      }
-    }
+  if (eligibleVodCount > VOD_EXPORT_LIMITS.vods) {
+    throw new VodExportSourceError(
+      'EXPORT_LIMIT_EXCEEDED',
+      'Emitted VOD limit exceeded',
+      422,
+      { resource: 'vods', actual: eligibleVodCount, limit: VOD_EXPORT_LIMITS.vods },
+    );
   }
-  if (vodRows.length + songRows.length + performanceRows.length !== sourceRows) {
+  if (eligiblePerformanceCount > VOD_EXPORT_LIMITS.performances) {
+    throw new VodExportSourceError(
+      'EXPORT_LIMIT_EXCEEDED',
+      'Emitted performance limit exceeded',
+      422,
+      {
+        resource: 'performances',
+        actual: eligiblePerformanceCount,
+        limit: VOD_EXPORT_LIMITS.performances,
+      },
+    );
+  }
+  if (relationshipFindingCount > VOD_EXPORT_LIMITS.findings) {
+    throw new VodExportSourceError(
+      'EXPORT_LIMIT_EXCEEDED',
+      'Relationship finding limit exceeded',
+      422,
+      { resource: 'findings', actual: relationshipFindingCount, limit: VOD_EXPORT_LIMITS.findings },
+    );
+  }
+
+  const vodRows = (results[3] as D1Result<VodRow>).results;
+  const songRows = (results[4] as D1Result<SongRow>).results;
+  const performanceRows = (results[5] as D1Result<PerformanceRow>).results;
+  if (vodRows.length + songRows.length + performanceRows.length !== loadedSourceRows) {
     throw new VodExportSourceError(
       'EXPORT_SOURCE_GUARD_MISMATCH',
-      'DB gated source row count does not match its preflight count',
+      'DB loaded source row count does not match its transactional preflight count',
       503,
     );
   }
+
+  for (const row of songRows) row.rowId = parsePrivateRowId(row.rowId, 'song');
+  for (const row of performanceRows) {
+    row.rowId = parsePrivateRowId(row.rowId, 'performance');
+    row.startDecimalText = row.startDecimalText === null ? null : String(row.startDecimalText);
+    row.endDecimalText = row.endDecimalText === null ? null : String(row.endDecimalText);
+  }
+  const vods = vodRows;
+  const songs = songRows as ExportSourceSong[];
+  const performances = performanceRows as ExportSourcePerformance[];
 
   return {
     revision: parseState(state, 'DB'),
     sourceRows,
     sourceTextBytes,
-    vods: vodRows.map((row) => ({
-      streamId: row.stream_id,
-      streamerId: row.streamer_id,
-      title: row.title,
-      date: row.date,
-      videoId: row.video_id,
-      status: row.status,
-    })),
-    songs: songRows.map((row) => ({
-      rowId: parsePrivateRowId(row.row_id, 'song'),
-      songId: row.song_id,
-      streamerId: row.streamer_id,
-      title: row.title,
-      originalArtist: row.original_artist,
-      status: row.status,
-    })),
-    performances: performanceRows.map((row) => ({
-      rowId: parsePrivateRowId(row.row_id, 'performance'),
-      performanceId: row.performance_id,
-      streamerId: row.streamer_id,
-      songId: row.song_id,
-      streamId: row.stream_id,
-      startSeconds: sqliteInteger(row.start_storage_class, row.start_decimal_text),
-      endSeconds: sqliteInteger(row.end_storage_class, row.end_decimal_text),
-      status: row.status,
-    })),
+    vods,
+    songs,
+    performances,
   };
 }
 
@@ -838,7 +926,11 @@ export async function readVodExportSource(
       vods: admin.vods,
       songs: admin.songs,
       performances: admin.performances,
-    },
+      preflightCapacity: {
+        sourceRows: admin.sourceRows,
+        sourceTextBytes: nova.sourceTextBytes + admin.sourceTextBytes,
+      },
+    } as OwnedVodExportSourceData,
     fingerprint: {
       dbId: bindings.VOD_EXPORT_DB_ID,
       dbRevision: admin.revision,

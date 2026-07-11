@@ -59,6 +59,7 @@ import {
   getVodExportCandidateApi,
   getVodExportRepairRecord,
   normalizeVodExportError,
+  vodExportPreviewApiResponse,
 } from './vod-export/api';
 import {
   getVodExportStatus,
@@ -747,7 +748,7 @@ app.get('/api/vod-export/status', requireCurator, async (c) => {
 app.post('/api/vod-export/preview', requireCurator, async (c) => {
   try {
     const buildId = requireExporterBuildId(c.env.CF_VERSION_METADATA);
-    return c.json(await generateVodExportPreviewApi(c.env, buildId));
+    return vodExportPreviewApiResponse(await generateVodExportPreviewApi(c.env, buildId));
   } catch (error) {
     return vodExportErrorResponse(error);
   }
@@ -764,7 +765,9 @@ app.get('/api/vod-export/candidates/:id/download', requireCurator, async (c) => 
 app.get('/api/vod-export/candidates/:id', requireCurator, async (c) => {
   try {
     const buildId = requireExporterBuildId(c.env.CF_VERSION_METADATA);
-    return c.json(await getVodExportCandidateApi(c.env, getRouteParam(c, 'id'), buildId));
+    return vodExportPreviewApiResponse(
+      await getVodExportCandidateApi(c.env, getRouteParam(c, 'id'), buildId),
+    );
   } catch (error) {
     return vodExportErrorResponse(error);
   }

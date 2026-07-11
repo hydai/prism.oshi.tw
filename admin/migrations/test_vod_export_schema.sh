@@ -56,6 +56,7 @@ CREATE TABLE streams (
 );
 SQL
 apply_sql_file "$ADMIN_MIGRATION_DB" "$ROOT_DIR/admin/migrations/0002_add_vod_export_state.sql"
+apply_sql_file "$ADMIN_MIGRATION_DB" "$ROOT_DIR/admin/migrations/0003_add_vod_export_source_indexes.sql"
 assert_query "$ADMIN_MIGRATION_DB" \
   "SELECT revision || '|' || trigger_schema_version FROM vod_export_state WHERE id = 1;" \
   "0|1" \
@@ -72,6 +73,10 @@ assert_query "$ADMIN_MIGRATION_DB" \
   "SELECT count(*) FROM sqlite_schema WHERE type = 'table' AND name = 'vod_export_publication_resolutions';" \
   "1" \
   "Admin migration must create the 30-day publication resolution table"
+assert_query "$ADMIN_MIGRATION_DB" \
+  "SELECT group_concat(name, ',') FROM pragma_index_info('idx_performances_stream_id');" \
+  "stream_id" \
+  "Admin source-index migration must index performances.stream_id"
 sqlite3 -batch -bail "$ADMIN_MIGRATION_DB" \
   "INSERT INTO songs (id, streamer_id, title, original_artist, status) VALUES ('song-1', 'streamer', 'Song', 'Artist', 'approved');"
 assert_query "$ADMIN_MIGRATION_DB" \
@@ -187,6 +192,10 @@ assert_query "$ADMIN_FRESH_DB" \
   "SELECT count(*) FROM sqlite_schema WHERE type = 'table' AND name = 'vod_export_publication_resolutions';" \
   "1" \
   "Fresh Admin bootstrap must include the publication resolution table"
+assert_query "$ADMIN_FRESH_DB" \
+  "SELECT group_concat(name, ',') FROM pragma_index_info('idx_performances_stream_id');" \
+  "stream_id" \
+  "Fresh Admin bootstrap must index performances.stream_id"
 
 NOVA_FRESH_DB="$TMP_DIR/nova-fresh.sqlite"
 apply_sql_file "$NOVA_FRESH_DB" "$ROOT_DIR/tools/nova/schema.sql"

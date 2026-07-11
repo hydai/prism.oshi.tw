@@ -45,6 +45,32 @@ export function orderSnapshot(snapshot: VodExportSnapshot): VodExportSnapshot {
   };
 }
 
+/**
+ * Orders a newly assembled snapshot without cloning its object graph.
+ *
+ * Only callers that exclusively own every nested array may use this helper.
+ * Parsed or otherwise shared snapshots must continue to use `orderSnapshot()`.
+ */
+export function orderOwnedSnapshotInPlace(snapshot: VodExportSnapshot): VodExportSnapshot {
+  for (const streamer of snapshot.streamers) {
+    for (const vod of streamer.vods) sortIfNeeded(vod.performances, comparePerformances);
+    sortIfNeeded(streamer.vods, compareVods);
+  }
+  sortIfNeeded(snapshot.streamers, compareStreamers);
+  return snapshot;
+}
+
+function sortIfNeeded<T>(values: T[], compare: (left: T, right: T) => number): void {
+  for (let index = 1; index < values.length; index += 1) {
+    const previous = values[index - 1];
+    const current = values[index];
+    if (previous !== undefined && current !== undefined && compare(previous, current) > 0) {
+      values.sort(compare);
+      return;
+    }
+  }
+}
+
 export function compareFindings(left: VodExportFinding, right: VodExportFinding): number {
   const severity = severityOrder(left) - severityOrder(right);
   if (severity !== 0) return severity;

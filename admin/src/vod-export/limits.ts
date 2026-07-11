@@ -7,6 +7,7 @@ import { utf8ByteLength } from './normalization';
 import type {
   CapacityDiagnostic,
   CapacityResource,
+  OwnedVodExportSourceData,
   VodExportCounts,
   VodExportSourceData,
 } from './types';
@@ -52,11 +53,34 @@ export function assertWithinCapacity(
 }
 
 export function measureSourceCapacity(source: VodExportSourceData): CapacityDiagnostic[] {
-  const sourceRows = source.vods.length + source.songs.length + source.performances.length;
-  const sourceTextBytes = countExportRelevantSourceTextBytes(source);
+  const loadedRows = source.vods.length + source.songs.length + source.performances.length;
+  const loadedTextBytes = countExportRelevantSourceTextBytes(source);
+  const sourceRows = source.preflightCapacity?.sourceRows ?? loadedRows;
+  const sourceTextBytes = source.preflightCapacity?.sourceTextBytes ?? loadedTextBytes;
+  if (sourceRows < loadedRows || sourceTextBytes < loadedTextBytes) {
+    throw new RangeError('VOD export preflight capacity cannot be smaller than its loaded source');
+  }
   return [
     assertWithinCapacity('sourceRows', sourceRows),
     assertWithinCapacity('sourceTextBytes', sourceTextBytes),
+  ];
+}
+
+/**
+ * Uses the source adapter's transactional SQL preflight without rescanning all
+ * loaded strings. This is only for adapter-owned data whose arrays are consumed
+ * immediately by generation; the pure domain builder continues to verify its
+ * caller-provided data in memory.
+ */
+export function measureOwnedSourceCapacity(source: OwnedVodExportSourceData): CapacityDiagnostic[] {
+  const preflight = source.preflightCapacity;
+  const loadedRows = source.vods.length + source.songs.length + source.performances.length;
+  if (preflight.sourceRows < loadedRows) {
+    throw new RangeError('VOD export preflight row capacity cannot be smaller than its loaded source');
+  }
+  return [
+    assertWithinCapacity('sourceRows', preflight.sourceRows),
+    assertWithinCapacity('sourceTextBytes', preflight.sourceTextBytes),
   ];
 }
 
@@ -109,8 +133,8 @@ export function countExportRelevantSourceTextBytes(source: VodExportSourceData):
     add(performance.streamerId);
     add(performance.songId);
     add(performance.streamId);
-    add(performance.startSeconds.decimalText);
-    add(performance.endSeconds.decimalText);
+    add(performance.startDecimalText);
+    add(performance.endDecimalText);
     add(performance.status);
   }
 
