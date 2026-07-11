@@ -13,10 +13,12 @@ This document is the implementation handoff for a website that consumes and
 renders the public VOD export, including `vods.oshi.tw`.
 
 The normative source of truth remains
-[`vod-export-spec.md`](../vod-export-spec.md). If this guide and the normative
+[`vod-export-spec.md`](https://github.com/hydai/prism.oshi.tw/blob/master/vod-export-spec.md).
+If this guide and the normative
 specification ever disagree, follow the specification and correct this guide.
 The Admin/R2 deployment procedure in
-[`vod-export-rollout.md`](vod-export-rollout.md) is an operator runbook, not a
+[`vod-export-rollout.md`](https://github.com/hydai/prism.oshi.tw/blob/master/docs/vod-export-rollout.md)
+is an operator runbook, not a
 consumer API contract.
 
 Terminology in this guide:
@@ -156,6 +158,17 @@ change the result.
 These types describe the current v1.0.0 fields. They do not replace runtime
 validation. Consumers supporting schema major version 1 must ignore unknown
 properties added by a future compatible minor version.
+
+Machine-readable Draft 2020-12 schemas are published at:
+
+- <https://data.oshi.tw/vod/v1/schemas/1.0.0/manifest.schema.json>
+- <https://data.oshi.tw/vod/v1/schemas/1.0.0/snapshot.schema.json>
+
+The schemas cover JSON structure, required fields, types, nullability, the
+manifest URL and date/time formats, HTTPS prefixes for snapshot profile URLs,
+and per-collection limits. Snapshot avatar/social URL parsing and provider-host
+validation, plus the cross-field, aggregate, uniqueness, ordering, Unicode, and
+trusted-origin checks documented below, remain required semantic checks.
 
 ```ts
 export type VodExportSchemaVersion = `${number}.${number}.${number}`;
@@ -709,8 +722,13 @@ or inferring it from unrelated fields.
 
 ## 16. References
 
-- Normative contract: [`vod-export-spec.md`](../vod-export-spec.md)
+- Normative contract:
+  [`vod-export-spec.md`](https://github.com/hydai/prism.oshi.tw/blob/master/vod-export-spec.md)
 - Producer rollout and operations:
-  [`docs/vod-export-rollout.md`](vod-export-rollout.md)
+  [`docs/vod-export-rollout.md`](https://github.com/hydai/prism.oshi.tw/blob/master/docs/vod-export-rollout.md)
+- Public manifest schema:
+  <https://data.oshi.tw/vod/v1/schemas/1.0.0/manifest.schema.json>
+- Public snapshot schema:
+  <https://data.oshi.tw/vod/v1/schemas/1.0.0/snapshot.schema.json>
 - Stable production manifest:
   <https://data.oshi.tw/vod/v1/manifest.json>

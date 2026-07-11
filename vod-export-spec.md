@@ -2631,6 +2631,11 @@ Decision: store both snapshot and manifest objects with
 resources. The authenticated Admin download response separately sets
 `Content-Disposition: attachment; filename="vod-export-v1-{sha256}.json"`.
 
+The public consumer guide uses
+`Content-Type: text/markdown; charset=utf-8`. Versioned public JSON Schemas use
+`Content-Type: application/schema+json; charset=utf-8`. Neither documentation
+artifact type has stored `Content-Encoding` or `Content-Disposition` metadata.
+
 R2/Cloudflare may emit an HTTP `ETag` for cache validation, but that value is
 transport metadata only. Consumers must not assume it equals the manifest's
 canonical SHA-256.
@@ -2663,7 +2668,11 @@ not a supported version or freshness mechanism.
 Set the following object response metadata:
 
 - immutable snapshot: `Cache-Control: public, max-age=31536000, immutable`;
-- mutable manifest: `Cache-Control: public, max-age=60, stale-if-error=86400`.
+- mutable manifest: `Cache-Control: public, max-age=60, stale-if-error=86400`;
+- mutable consumer guide:
+  `Cache-Control: public, max-age=3600, stale-if-error=86400`;
+- versioned v1 baseline JSON Schemas:
+  `Cache-Control: public, max-age=31536000, immutable`.
 
 Enable Smart Tiered Cache for the R2 custom domain. A successful manifest
 replacement can therefore become publicly visible up to 60 seconds after
@@ -3073,8 +3082,10 @@ Decision: use `https://data.oshi.tw` as the production R2 Custom
 Domain and two separate R2 Standard buckets:
 
 - physical bucket `prism-vod-export-public`, bound to the Admin Worker as
-  `VOD_EXPORT_PUBLIC`, contains `vod/v*/manifest.json` plus sanitized immutable
-  `vod/v*/snapshots/*` objects and is the only bucket attached to the hostname;
+  `VOD_EXPORT_PUBLIC`, contains `vod/v*/manifest.json`, sanitized immutable
+  `vod/v*/snapshots/*` objects, public `vod/v*/guide.md` documents, and
+  versioned major-compatible baseline `vod/v*/schemas/*` JSON Schemas, and is
+  the only bucket attached to the hostname;
 - physical bucket `prism-vod-export-private`, bound as `VOD_EXPORT_PRIVATE`,
   contains unpublished candidate bytes and publication recovery/control records
   and is reachable only through the authenticated Admin Worker binding.
@@ -3090,9 +3101,14 @@ until the manifest commit succeeds. Unvalidated bytes, private candidates,
 findings, audit identities, and recovery state never enter the public bucket.
 
 Disable `r2.dev` for both buckets. Configure no public CORS policy because D-018
-selects server/build consumption. Only the Admin Worker binding can write the
-public bucket; private candidates, findings, audit identities, and recovery
-state must never be placed under the public custom domain.
+selects server/build consumption. Only the Admin Worker binding writes data
+publication paths (`vod/v*/manifest.json` and `vod/v*/snapshots/*`). The
+reviewed source-controlled documentation release tool confirmed in D-017.4 is
+operationally constrained to its fixed `vod/v*/guide.md` and
+`vod/v*/schemas/*` allowlist, but its R2 credential is bucket-scoped because R2
+does not provide key-scoped write credentials. It must never write a manifest
+or snapshot. Private candidates, findings, audit identities, recovery state,
+and other private data must never be placed under the public custom domain.
 
 #### D-017.2 — Snapshot and candidate retention
 
@@ -3146,6 +3162,51 @@ During that period, attach the previous hostname to the same public objects or
 provide an equivalent path-preserving origin. A redirect alone is not the
 availability guarantee because a non-browser consumer may not follow it. Never
 reuse a retired export hostname for incompatible content.
+
+#### D-017.4 — Public consumer guide and schemas
+
+- Status: **Confirmed**
+- Selected: **Source-controlled Markdown guide and v1-compatible Draft 2020-12
+  JSON Schemas under `/vod/v1/`, released independently from VOD data**
+- Confirmed: 2026-07-12
+
+Decision: publish these three consumer artifacts without adding `llms.txt` in
+this release:
+
+```text
+/vod/v1/guide.md
+/vod/v1/schemas/1.0.0/manifest.schema.json
+/vod/v1/schemas/1.0.0/snapshot.schema.json
+```
+
+The repository's `docs/vod-export-consumer-guide.md` is the single source for
+the public guide. The two schemas use JSON Schema Draft 2020-12, identify their
+public URLs with `$id`, require every current v1 field, and deliberately allow
+unknown properties so a consumer following D-012.3 does not reject a safely
+additive v1 minor version. They are versioned v1-compatible baseline schemas,
+not validators restricted to the literal `1.0.0` value in their URL. Their
+versioned object keys are create-only: an indefinite R2 bucket lock on
+`vod/v1/schemas/` prevents deleting or overwriting existing objects, including
+under concurrent release attempts. If published bytes differ, release a new
+schema path rather than removing the lock or overwriting an immutable object.
+
+JSON Schema covers structure, required properties, primitive constraints,
+nullability, manifest URL and date/time formats, HTTPS prefixes for snapshot
+profile URLs, and local collection limits. It does not replace the guide or
+this normative specification. Consumers still perform complete WHATWG URL
+parsing and enforce trusted-origin and provider-host allowlists, adjacent
+URL/hash agreement, decoded byte length and SHA-256, manifest/snapshot version
+and count agreement, aggregate limits, identity uniqueness, deterministic
+ordering, valid Unicode/NFC, canonical bytes, and `endSeconds > startSeconds`.
+
+Documentation release is an explicit maintainer operation using the fixed
+source/key/content-type/cache-control allowlist in the repository. It validates
+locally, publishes immutable schemas first and the mutable guide last, reads
+the exact R2 bytes back, and verifies all three public URLs plus the current
+manifest/snapshot. It is not part of candidate generation or manifest CAS,
+does not create publication audit state, and cannot make Admin edits public.
+Ordinary CI validates these sources but holds no production R2 credential;
+publication remains a manual reviewed command.
 
 ### D-018 — New-website consumption mode
 
@@ -3201,6 +3262,10 @@ audit history.
 A missing or mismatched checkpoint shows `Changes not published`. The page does
 not claim which records changed until a new preview validates them. v1 adds no
 scheduled safety publish or email/webhook reminder.
+
+Publishing or updating D-017.4 consumer documentation is not a VOD data
+publication. It never advances the manifest, changes `publishedAt`, satisfies a
+source-equivalence checkpoint, or changes the Admin page's publication status.
 
 ### D-020 — Worker execution and export resource bounds
 

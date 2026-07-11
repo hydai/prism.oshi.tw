@@ -113,6 +113,14 @@ an environment variable, the Custom Domain command is:
 npx wrangler r2 bucket domain add prism-vod-export-public --domain data.oshi.tw --zone-id YOUR_ZONE_ID --min-tls 1.2
 ```
 
+The public bucket also contains the source-controlled consumer guide and
+versioned v1-compatible baseline JSON Schemas under `vod/v*/guide.md` and
+`vod/v*/schemas/*`. Admin remains the only application writer for
+`manifest.json` and `snapshots/*`; the fixed documentation release command is
+an operationally constrained maintainer tool whose allowlist contains only
+those guide/schema keys. Its Cloudflare credential is bucket-scoped rather
+than key-scoped, so keep that credential out of ordinary push/PR CI.
+
 ## 4. CDN and hostname policy
 
 Create one Cache Rule for hostname `data.oshi.tw` and path prefix `/vod/`:
@@ -129,12 +137,77 @@ Expected object metadata is:
 
 - snapshot: `public, max-age=31536000, immutable`;
 - manifest: `public, max-age=60, stale-if-error=86400`;
-- both: `application/json; charset=utf-8`, no stored `Content-Encoding` or
-  public `Content-Disposition`.
+- guide: `public, max-age=3600, stale-if-error=86400`;
+- versioned v1 baseline schemas: `public, max-age=31536000, immutable`;
+- manifest and snapshot: `application/json; charset=utf-8`;
+- guide: `text/markdown; charset=utf-8`;
+- schemas: `application/schema+json; charset=utf-8`;
+- no public object has stored `Content-Encoding` or `Content-Disposition`.
 
 Before any future hostname migration, keep the old hostname serving identical
 paths for every referencing manifest plus the following 400-day retention
 window.
+
+### 4.1 Public consumer documentation
+
+The reviewed public source mapping is:
+
+```text
+docs/vod-export-consumer-guide.md
+  -> vod/v1/guide.md
+docs/vod-export-schemas/1.0.0/manifest.schema.json
+  -> vod/v1/schemas/1.0.0/manifest.schema.json
+docs/vod-export-schemas/1.0.0/snapshot.schema.json
+  -> vod/v1/schemas/1.0.0/snapshot.schema.json
+```
+
+From `admin/`, validate, publish, and later re-verify with:
+
+```sh
+npm run test:vod-export-docs
+npm run publish:vod-export-docs
+npm run verify:vod-export-docs
+```
+
+Before the first schema release, protect its prefix at the storage layer:
+
+```sh
+npx wrangler r2 bucket lock add prism-vod-export-public \
+  retain-v1-schemas vod/v1/schemas/ --retention-indefinite --force
+```
+
+Confirm `retain-v1-schemas` is enabled with:
+
+```sh
+npx wrangler r2 bucket lock list prism-vod-export-public
+```
+
+The indefinite prefix lock permits new schema keys but prevents deletion or
+overwriting of existing schema objects, including concurrent releases. Removing
+that lock is a separately reviewed recovery operation, never a normal schema
+release step.
+
+The release command uses the locally installed Wrangler, a fixed bucket/key
+allowlist, and the metadata above. It compares existing R2 bytes first, refuses
+to overwrite a different immutable schema, uploads schemas before the guide,
+and always rewrites the mutable guide so its origin metadata is repaired even
+when its bytes have not changed. It reads every written object back, then
+validates the public guide/schemas and current manifest/snapshot. Public
+verification requires the complete `Content-Type` (including UTF-8 charset),
+exact `Cache-Control`, and no `Content-Disposition`. Published schema metadata
+is immutable with its bytes; fix it at a new versioned schema path. The command
+does not publish VOD data or alter the manifest.
+
+If a public guide update still returns earlier cached bytes or metadata, purge
+only `https://data.oshi.tw/vod/v1/guide.md` and rerun the verification command.
+A first upload can also remain behind a previously cached 404 for its short
+error TTL; wait for expiry or purge only the affected new URL. Never purge
+immutable snapshot URLs as part of a documentation release.
+
+Do not overwrite a published schema path. Correct a schema by adding a newly
+reviewed versioned baseline path, update the guide only after that schema is
+public, and retain prior schema URLs for existing consumers. `llms.txt` is
+intentionally outside this initial documentation release.
 
 ## 5. Admin origin and Access
 

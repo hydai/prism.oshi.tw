@@ -26,14 +26,21 @@
     "test:vod-export-publication": "npx tsx src/vod-export/publication.test.ts",
     "test:vod-export-maintenance": "npx tsx src/vod-export/maintenance.test.ts",
     "test:vod-export-stress": "node --expose-gc --import tsx src/vod-export/stress.test.ts",
+    "typecheck:vod-export-docs": "npx tsc --noEmit --pretty false --strict --skipLibCheck --target ES2022 --module esnext --moduleResolution bundler --lib ES2022,DOM --types node scripts/vod-export-docs.ts scripts/vod-export-docs.test.ts",
+    "test:vod-export-docs": "npm run typecheck:vod-export-docs && npx tsx scripts/vod-export-docs.test.ts",
+    "verify:vod-export-docs": "npx tsx scripts/vod-export-docs.ts verify-public",
+    "publish:vod-export-docs": "npx tsx scripts/vod-export-docs.ts publish",
     "test:youtube-verification": "npx tsx src/youtube-verification.test.ts",
-    "check": "npm run typecheck && npm run test:helpers && npm run test:itunes && npm run test:discord && npm run test:nova-url-safety && npm run test:db && npm run test:auth && npm run test:authz && npm run test:nova-url-routes && npm run test:youtube-verification && npm run test:vod-export-schema && npm run test:vod-export-core && npm run test:vod-export-source && npm run test:vod-export-json-stream && npm run test:vod-export-api && npm run test:vod-export-publication && npm run test:vod-export-maintenance && npm run test:vod-export-stress"
+    "check": "npm run typecheck && npm run test:helpers && npm run test:itunes && npm run test:discord && npm run test:nova-url-safety && npm run test:db && npm run test:auth && npm run test:authz && npm run test:nova-url-routes && npm run test:youtube-verification && npm run test:vod-export-schema && npm run test:vod-export-core && npm run test:vod-export-source && npm run test:vod-export-json-stream && npm run test:vod-export-api && npm run test:vod-export-publication && npm run test:vod-export-maintenance && npm run test:vod-export-docs && npm run test:vod-export-stress"
   },
   "dependencies": {
     "hono": "^4.12.29"
   },
   "devDependencies": {
     "@cloudflare/workers-types": "^5.20260711.1",
+    "@types/node": "^26.1.1",
+    "ajv": "^8.20.0",
+    "ajv-formats": "^3.0.1",
     "tsx": "^4.22.3",
     "typescript": "^5.9.3",
     "wrangler": "^4.110.0"

@@ -1,0 +1,189 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://data.oshi.tw/vod/v1/schemas/1.0.0/snapshot.schema.json",
+  "title": "Oshi VOD Export v1-Compatible Snapshot",
+  "description": "Machine-readable v1 baseline contract for a complete public VOD export snapshot. Compatible v1 minor versions may add safely ignorable properties. Identity uniqueness, deterministic ordering, Unicode normalization, URL provider allowlists, global aggregate limits, and endSeconds > startSeconds require the consumer checks documented in the public guide.",
+  "type": "object",
+  "required": [
+    "schemaVersion",
+    "streamers"
+  ],
+  "properties": {
+    "schemaVersion": {
+      "$ref": "#/$defs/v1SchemaVersion"
+    },
+    "streamers": {
+      "type": "array",
+      "maxItems": 500,
+      "description": "Ordered by slug ascending using ordinal UTF-8 comparison.",
+      "items": {
+        "$ref": "#/$defs/streamer"
+      }
+    }
+  },
+  "additionalProperties": true,
+  "$defs": {
+    "v1SchemaVersion": {
+      "type": "string",
+      "pattern": "^1\\.(?:0|[1-9][0-9]*)\\.(?:0|[1-9][0-9]*)$"
+    },
+    "httpsUrl": {
+      "type": "string",
+      "minLength": 1,
+      "pattern": "^[Hh][Tt][Tt][Pp][Ss]://"
+    },
+    "nullableDisplayText": {
+      "type": [
+        "string",
+        "null"
+      ],
+      "minLength": 1
+    },
+    "streamer": {
+      "type": "object",
+      "required": [
+        "slug",
+        "displayName",
+        "youtubeChannelId",
+        "avatarUrl",
+        "group",
+        "socialLinks",
+        "vods"
+      ],
+      "properties": {
+        "slug": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 50,
+          "pattern": "^[a-z0-9]+(?:-[a-z0-9]+)*$"
+        },
+        "displayName": {
+          "type": "string",
+          "minLength": 1
+        },
+        "youtubeChannelId": {
+          "type": "string",
+          "minLength": 1
+        },
+        "avatarUrl": {
+          "oneOf": [
+            {
+              "type": "null"
+            },
+            {
+              "$ref": "#/$defs/httpsUrl"
+            }
+          ]
+        },
+        "group": {
+          "$ref": "#/$defs/nullableDisplayText"
+        },
+        "socialLinks": {
+          "$ref": "#/$defs/socialLinks"
+        },
+        "vods": {
+          "type": "array",
+          "maxItems": 10000,
+          "description": "Ordered by date descending, then videoId ascending using ordinal UTF-8 comparison.",
+          "items": {
+            "$ref": "#/$defs/vod"
+          }
+        }
+      },
+      "additionalProperties": true
+    },
+    "socialLinks": {
+      "type": "object",
+      "properties": {
+        "youtube": {
+          "$ref": "#/$defs/httpsUrl"
+        },
+        "twitter": {
+          "$ref": "#/$defs/httpsUrl"
+        },
+        "facebook": {
+          "$ref": "#/$defs/httpsUrl"
+        },
+        "instagram": {
+          "$ref": "#/$defs/httpsUrl"
+        },
+        "twitch": {
+          "$ref": "#/$defs/httpsUrl"
+        }
+      },
+      "additionalProperties": true
+    },
+    "vod": {
+      "type": "object",
+      "required": [
+        "title",
+        "date",
+        "videoId",
+        "performances"
+      ],
+      "properties": {
+        "title": {
+          "type": "string",
+          "minLength": 1
+        },
+        "date": {
+          "type": "string",
+          "format": "date"
+        },
+        "videoId": {
+          "type": "string",
+          "pattern": "^[A-Za-z0-9_-]{11}$"
+        },
+        "performances": {
+          "type": "array",
+          "minItems": 1,
+          "maxItems": 50000,
+          "description": "Ordered by startSeconds ascending, then performanceId ascending using ordinal UTF-8 comparison.",
+          "items": {
+            "$ref": "#/$defs/performance"
+          }
+        }
+      },
+      "additionalProperties": true
+    },
+    "performance": {
+      "type": "object",
+      "required": [
+        "performanceId",
+        "songId",
+        "title",
+        "originalArtist",
+        "startSeconds",
+        "endSeconds"
+      ],
+      "properties": {
+        "performanceId": {
+          "type": "string",
+          "minLength": 1
+        },
+        "songId": {
+          "type": "string",
+          "minLength": 1
+        },
+        "title": {
+          "type": "string",
+          "minLength": 1
+        },
+        "originalArtist": {
+          "$ref": "#/$defs/nullableDisplayText"
+        },
+        "startSeconds": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 9007199254740991
+        },
+        "endSeconds": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 9007199254740991
+        }
+      },
+      "additionalProperties": true
+    }
+  }
+}
