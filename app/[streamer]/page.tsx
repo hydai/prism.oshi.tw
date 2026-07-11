@@ -25,13 +25,13 @@ import {
   filterGroupedSongs,
   filterStreamsByYears,
   flattenSongs,
+  followingTracksFromFlattened,
+  followingTracksFromGrouped,
   getAllArtists,
   getAvailableYears,
   mergeAlbumArt,
   sortGroupedSongs,
   sortStreamsByNewest,
-  trackFromFlattenedSong,
-  trackFromPerformance,
 } from '../lib/archive';
 import type {
   ArchiveSong,
@@ -113,7 +113,7 @@ export default function Home() {
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  const { currentTrack, playTrack, addToQueue, apiLoadError, unavailableVideoIds, timestampWarning, clearTimestampWarning, skipNotification, clearSkipNotification, shuffleOn, toggleShuffle } = usePlayer();
+  const { currentTrack, playTrackWithQueue, addToQueue, apiLoadError, unavailableVideoIds, timestampWarning, clearTimestampWarning, skipNotification, clearSkipNotification, shuffleOn, toggleShuffle } = usePlayer();
   const currentTrackId = currentTrack?.id ?? null;
   const { playlists, storageError, clearStorageError } = usePlaylist();
   const { likedCount, isLiked, toggleLike } = useLikedSongs();
@@ -126,20 +126,11 @@ export default function Home() {
   }, [addToQueue]);
 
   const handlePlayAll = () => {
-    let tracks: ArchiveTrack[];
-    if (viewMode === 'timeline') {
-      tracks = flattenedSongs.map(song => trackFromFlattenedSong(song, slug));
-    } else {
-      tracks = groupedSongs.flatMap(song => {
-        if (!song.performances.length) return [];
-        const latest = [...song.performances].sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime())[0];
-        return [trackFromPerformance(song, latest, slug)];
-      });
-    }
-    const available = tracks.filter(t => !unavailableVideoIds.has(t.videoId));
-    if (available.length === 0) return;
-    playTrack(available[0]);
-    available.slice(1).forEach(t => addToQueue(t));
+    const tracks = viewMode === 'timeline'
+      ? followingTracksFromFlattened(flattenedSongs, -1, slug, unavailableVideoIds)
+      : followingTracksFromGrouped(groupedSongs, -1, slug, unavailableVideoIds);
+    if (tracks.length === 0) return;
+    playTrackWithQueue(tracks[0], tracks.slice(1));
   };
 
   const handleAddToPlaylistSuccess = useCallback(() => {
@@ -257,6 +248,35 @@ export default function Home() {
     () => filterGroupedSongs(allGroupedSongs, archiveFilters),
     [allGroupedSongs, archiveFilters],
   );
+
+  // Click handlers below are passed to memoized rows whose comparators ignore
+  // onPlay — a row may invoke a stale closure. All mutable data therefore goes
+  // through refs so a stale handler still computes the queue from current data.
+  const flattenedSongsRef = useRef(flattenedSongs);
+  const groupedSongsRef = useRef(groupedSongs);
+  const unavailableVideoIdsRef = useRef(unavailableVideoIds);
+  useEffect(() => { flattenedSongsRef.current = flattenedSongs; }, [flattenedSongs]);
+  useEffect(() => { groupedSongsRef.current = groupedSongs; }, [groupedSongs]);
+  useEffect(() => { unavailableVideoIdsRef.current = unavailableVideoIds; }, [unavailableVideoIds]);
+
+  // Timeline view + mobile search both render flattenedSongs.
+  const handlePlayFromFlattened = useCallback((track: ArchiveTrack) => {
+    const list = flattenedSongsRef.current;
+    const index = list.findIndex((s) => s.performanceId === track.id);
+    const following = index === -1
+      ? [] // clicked row no longer in the current list — play it alone
+      : followingTracksFromFlattened(list, index, slug, unavailableVideoIdsRef.current);
+    playTrackWithQueue(track, following);
+  }, [slug, playTrackWithQueue]);
+
+  const handlePlayFromGrouped = useCallback((track: ArchiveTrack) => {
+    const list = groupedSongsRef.current;
+    const index = list.findIndex((s) => s.id === track.songId);
+    const following = index === -1
+      ? []
+      : followingTracksFromGrouped(list, index, slug, unavailableVideoIdsRef.current);
+    playTrackWithQueue(track, following);
+  }, [slug, playTrackWithQueue]);
 
   // Virtual scrolling refs and virtualizers
   const scrollContainerRef = useRef<HTMLDivElement>(null);
@@ -1300,7 +1320,7 @@ export default function Home() {
                                 endTimestamp: song.endTimestamp,
                                 albumArtUrl: song.albumArtUrl,
                               })}
-                              onPlay={playTrack}
+                              onPlay={handlePlayFromFlattened}
                               streamerSlug={slug}
                               onAddToQueue={handleAddToQueue}
                               onAddToPlaylistSuccess={handleAddToPlaylistSuccess}
@@ -1365,7 +1385,7 @@ export default function Home() {
                             song={song}
                             isExpanded={expandedSongs.has(song.id)}
                             onToggleExpand={toggleSongExpansion}
-                            onPlay={playTrack}
+                            onPlay={handlePlayFromGrouped}
                             onAddToQueue={handleAddToQueue}
                             onAddToPlaylistSuccess={handleAddToPlaylistSuccess}
                             isLiked={isLiked}
@@ -1479,7 +1499,7 @@ export default function Home() {
                             song={song}
                             isCurrentlyPlaying={currentTrackId === song.performanceId}
                             isUnavailable={unavailableVideoIds.has(song.videoId)}
-                            onPlay={playTrack}
+                            onPlay={handlePlayFromFlattened}
                             streamerSlug={slug}
                           />
                         </div>
