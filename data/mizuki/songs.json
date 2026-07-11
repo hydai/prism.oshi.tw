@@ -522,7 +522,7 @@
   {
     "id": "song-1002",
     "title": "Mrs. パンプキンの滑稽な夢",
-    "originalArtist": "",
+    "originalArtist": "ハチ",
     "tags": [],
     "performances": [
       {
@@ -558,7 +558,7 @@
   {
     "id": "song-1004",
     "title": "ゾンビ",
-    "originalArtist": "",
+    "originalArtist": "DECO*27",
     "tags": [],
     "performances": [
       {
@@ -642,7 +642,7 @@
   {
     "id": "song-1007",
     "title": "エビカニクス",
-    "originalArtist": "",
+    "originalArtist": "ケロポンズ",
     "tags": [],
     "performances": [
       {
@@ -2292,7 +2292,7 @@
   {
     "id": "song-1060",
     "title": "Chandelier／Sia",
-    "originalArtist": "",
+    "originalArtist": "Sia",
     "tags": [],
     "performances": [
       {
@@ -2724,7 +2724,7 @@
   {
     "id": "song-1078",
     "title": "SnowMix♪【SNOW MIKU 2023】",
-    "originalArtist": "",
+    "originalArtist": "まらしぃ feat. 初音ミク",
     "tags": [],
     "performances": [
       {
@@ -2742,7 +2742,7 @@
   {
     "id": "song-1079",
     "title": "Snow Song Show",
-    "originalArtist": "",
+    "originalArtist": "DECO*27",
     "tags": [],
     "performances": [
       {
@@ -2938,7 +2938,7 @@
   {
     "id": "song-1085",
     "title": "ぽかぽかの星",
-    "originalArtist": "",
+    "originalArtist": "はるまきごはん feat. 初音ミク",
     "tags": [],
     "performances": [
       {
@@ -2956,7 +2956,7 @@
   {
     "id": "song-1086",
     "title": "ベリーメリークリスマス",
-    "originalArtist": "",
+    "originalArtist": "天月-あまつき-",
     "tags": [],
     "performances": [
       {
@@ -2974,7 +2974,7 @@
   {
     "id": "song-1087",
     "title": "White Snow Falling",
-    "originalArtist": "",
+    "originalArtist": "OSTER project",
     "tags": [],
     "performances": [
       {
@@ -2992,7 +2992,7 @@
   {
     "id": "song-1088",
     "title": "金の聖夜霜雪に朽ちて",
-    "originalArtist": "",
+    "originalArtist": "デッドボールＰ",
     "tags": [],
     "performances": [
       {
@@ -3010,7 +3010,7 @@
   {
     "id": "song-1089",
     "title": "For the First Time in Forever",
-    "originalArtist": "",
+    "originalArtist": "Kristen Bell & Idina Menzel",
     "tags": [],
     "performances": [
       {
@@ -3136,7 +3136,7 @@
   {
     "id": "song-1095",
     "title": "初めての恋が終わる時",
-    "originalArtist": "",
+    "originalArtist": "supercell",
     "tags": [],
     "performances": [
       {
@@ -3470,7 +3470,7 @@
   {
     "id": "song-1101",
     "title": "I'll Be Home",
-    "originalArtist": "",
+    "originalArtist": "Meghan Trainor",
     "tags": [],
     "performances": [
       {
@@ -13964,7 +13964,7 @@
   {
     "id": "song-1468",
     "title": "palatte",
-    "originalArtist": "",
+    "originalArtist": "常闇トワ",
     "tags": [],
     "performances": [
       {
@@ -14777,24 +14777,6 @@
         "videoId": "NbytGDRvuWI",
         "timestamp": 6459,
         "endTimestamp": 6728,
-        "note": ""
-      }
-    ]
-  },
-  {
-    "id": "song-1495",
-    "title": "開門",
-    "originalArtist": "",
-    "tags": [],
-    "performances": [
-      {
-        "id": "p1495-1",
-        "streamId": "stream-2023-02-26-a",
-        "date": "2023-02-26",
-        "streamTitle": "【合唱歌枠】子午家庭嗨起來！小響初配前哨戰🐤初見大歓迎🎤【浠Mizuki Karaoke】",
-        "videoId": "7WG0eq2hgwE",
-        "timestamp": 314,
-        "endTimestamp": 382,
         "note": ""
       }
     ]
@@ -17538,7 +17520,7 @@
   {
     "id": "song-1593",
     "title": "ちちおまげ",
-    "originalArtist": "",
+    "originalArtist": "高橋広樹",
     "tags": [],
     "performances": [
       {
@@ -17574,7 +17556,7 @@
   {
     "id": "song-1595",
     "title": "未来のひとへ",
-    "originalArtist": "",
+    "originalArtist": "TRUE",
     "tags": [],
     "performances": [
       {
@@ -17610,7 +17592,7 @@
   {
     "id": "song-1597",
     "title": "Hero too",
-    "originalArtist": "",
+    "originalArtist": "Chrissy Costanza",
     "tags": [],
     "performances": [
       {
@@ -17700,7 +17682,7 @@
   {
     "id": "song-1600",
     "title": "畫地為牢",
-    "originalArtist": "",
+    "originalArtist": "云の泣 & 葉里",
     "tags": [],
     "performances": [
       {
@@ -17782,7 +17764,7 @@
   {
     "id": "song-1604",
     "title": "ハイエナ",
-    "originalArtist": "",
+    "originalArtist": "MY FIRST STORY",
     "tags": [],
     "performances": [
       {
@@ -17800,7 +17782,7 @@
   {
     "id": "song-1605",
     "title": "碎吧，睡吧",
-    "originalArtist": "",
+    "originalArtist": "許淨淳",
     "tags": [],
     "performances": [
       {
@@ -17972,7 +17954,7 @@
   {
     "id": "song-1613",
     "title": "When You Wish Upon a Star",
-    "originalArtist": "",
+    "originalArtist": "Cliff Edwards",
     "tags": [],
     "performances": [
       {
@@ -18008,7 +17990,7 @@
   {
     "id": "song-1615",
     "title": "うらたねこ♀",
-    "originalArtist": "",
+    "originalArtist": "HoneyWorks feat. うらたぬき",
     "tags": [],
     "performances": [
       {
@@ -18062,7 +18044,7 @@
   {
     "id": "song-1618",
     "title": "極光的風",
-    "originalArtist": "",
+    "originalArtist": "香蓮",
     "tags": [],
     "performances": [
       {
@@ -18184,7 +18166,7 @@
   {
     "id": "song-1621",
     "title": "花ざかりWeekend",
-    "originalArtist": "",
+    "originalArtist": "4Luxury",
     "tags": [],
     "performances": [
       {
@@ -18340,7 +18322,7 @@
   {
     "id": "song-1628",
     "title": "黑暗巴洛克",
-    "originalArtist": "",
+    "originalArtist": "黑美人姊妹花",
     "tags": [],
     "performances": [
       {
@@ -18411,8 +18393,8 @@
   },
   {
     "id": "song-1631",
-    "title": "天之弱",
-    "originalArtist": "",
+    "title": "天ノ弱",
+    "originalArtist": "164",
     "tags": [],
     "performances": [
       {
@@ -18430,7 +18412,7 @@
   {
     "id": "song-1632",
     "title": "時の流れに身をまかせ",
-    "originalArtist": "",
+    "originalArtist": "鄧麗君",
     "tags": [],
     "performances": [
       {
@@ -18448,7 +18430,7 @@
   {
     "id": "song-1633",
     "title": "恋愛サーキュレーション",
-    "originalArtist": "",
+    "originalArtist": "花澤香菜",
     "tags": [],
     "performances": [
       {
@@ -18538,7 +18520,7 @@
   {
     "id": "song-1638",
     "title": "Palette",
-    "originalArtist": "",
+    "originalArtist": "常闇トワ",
     "tags": [],
     "performances": [
       {
@@ -18610,7 +18592,7 @@
   {
     "id": "song-1641",
     "title": "恋におちて -fall in love-",
-    "originalArtist": "",
+    "originalArtist": "小林明子",
     "tags": [],
     "performances": [
       {
@@ -18702,7 +18684,7 @@
   {
     "id": "song-1645",
     "title": "レムの魔法",
-    "originalArtist": "",
+    "originalArtist": "傘村トータ",
     "tags": [],
     "performances": [
       {
@@ -19280,7 +19262,7 @@
   {
     "id": "song-1669",
     "title": "Trick or treat",
-    "originalArtist": "",
+    "originalArtist": "OSTER Project",
     "tags": [],
     "performances": [
       {
@@ -19336,7 +19318,7 @@
   {
     "id": "song-1670",
     "title": "フクロウが知らせる客が来たと",
-    "originalArtist": "",
+    "originalArtist": "KOKIA",
     "tags": [],
     "performances": [
       {
@@ -19382,7 +19364,7 @@
   {
     "id": "song-1672",
     "title": "Hide and Seek",
-    "originalArtist": "",
+    "originalArtist": "Lizz Robinett",
     "tags": [],
     "performances": [
       {
@@ -19400,7 +19382,7 @@
   {
     "id": "song-1673",
     "title": "Enemy",
-    "originalArtist": "",
+    "originalArtist": "Imagine Dragons & JID",
     "tags": [],
     "performances": [
       {
@@ -19418,7 +19400,7 @@
   {
     "id": "song-1674",
     "title": "Come Little Children",
-    "originalArtist": "",
+    "originalArtist": "Erutan",
     "tags": [],
     "performances": [
       {
@@ -19454,7 +19436,7 @@
   {
     "id": "song-1676",
     "title": "Please Don't Make Me Love You",
-    "originalArtist": "",
+    "originalArtist": "Frank Wildhorn",
     "tags": [],
     "performances": [
       {
@@ -19472,7 +19454,7 @@
   {
     "id": "song-1677",
     "title": "Tunak Tunak Tun",
-    "originalArtist": "",
+    "originalArtist": "Daler Mehndi",
     "tags": [],
     "performances": [
       {
@@ -20668,7 +20650,7 @@
   {
     "id": "song-1723",
     "title": "帶我去找夜生活 Night life.Take us to the light -",
-    "originalArtist": "",
+    "originalArtist": "告五人",
     "tags": [],
     "performances": [
       {
@@ -21075,8 +21057,8 @@
   },
   {
     "id": "song-1741",
-    "title": "アブラカタブラ",
-    "originalArtist": "",
+    "title": "アブラカダブラ〜avra K'Davarah〜",
+    "originalArtist": "GARNiDELiA",
     "tags": [],
     "performances": [
       {
@@ -21112,7 +21094,7 @@
   {
     "id": "song-1743",
     "title": "デモーニッシュ",
-    "originalArtist": "",
+    "originalArtist": "TUYU",
     "tags": [],
     "performances": [
       {
@@ -21176,7 +21158,7 @@
   {
     "id": "song-1746",
     "title": "再見王子",
-    "originalArtist": "",
+    "originalArtist": "棉花糖",
     "tags": [],
     "performances": [
       {
@@ -21194,7 +21176,7 @@
   {
     "id": "song-1747",
     "title": "對愛渴望",
-    "originalArtist": "",
+    "originalArtist": "楊宗緯",
     "tags": [],
     "performances": [
       {
@@ -21294,7 +21276,7 @@
   {
     "id": "song-1751",
     "title": "棠梨煎雪",
-    "originalArtist": "",
+    "originalArtist": "銀臨",
     "tags": [],
     "performances": [
       {
@@ -21329,8 +21311,8 @@
   },
   {
     "id": "song-1753",
-    "title": "キャラメル",
-    "originalArtist": "",
+    "title": "Caramel",
+    "originalArtist": "夏代孝明",
     "tags": [],
     "performances": [
       {
@@ -21348,7 +21330,7 @@
   {
     "id": "song-1754",
     "title": "麋途",
-    "originalArtist": "",
+    "originalArtist": "麋先生",
     "tags": [],
     "performances": [
       {
@@ -21366,7 +21348,7 @@
   {
     "id": "song-1755",
     "title": "嗜愛動物",
-    "originalArtist": "",
+    "originalArtist": "麋先生",
     "tags": [],
     "performances": [
       {
@@ -21530,7 +21512,7 @@
   {
     "id": "song-1762",
     "title": "逆光(ado)",
-    "originalArtist": "",
+    "originalArtist": "Ado",
     "tags": [],
     "performances": [
       {
@@ -21548,7 +21530,7 @@
   {
     "id": "song-1763",
     "title": "丸の内サディスティック",
-    "originalArtist": "",
+    "originalArtist": "椎名林檎",
     "tags": [],
     "performances": [
       {
@@ -21584,7 +21566,7 @@
   {
     "id": "song-1765",
     "title": "病名は愛だった",
-    "originalArtist": "",
+    "originalArtist": "Neru・z'5",
     "tags": [],
     "performances": [
       {
@@ -21766,7 +21748,7 @@
   {
     "id": "song-1773",
     "title": "メフィスト(Mephisto)",
-    "originalArtist": "",
+    "originalArtist": "QUEEN BEE",
     "tags": [],
     "performances": [
       {
@@ -21950,7 +21932,7 @@
   {
     "id": "song-1780",
     "title": "Always Remember Us This Way",
-    "originalArtist": "",
+    "originalArtist": "Lady Gaga",
     "tags": [],
     "performances": [
       {
@@ -22040,7 +22022,7 @@
   {
     "id": "song-1785",
     "title": "緣份一道橋",
-    "originalArtist": "",
+    "originalArtist": "王力宏",
     "tags": [],
     "performances": [
       {
@@ -22086,7 +22068,7 @@
   {
     "id": "song-1787",
     "title": "離開地球表面",
-    "originalArtist": "",
+    "originalArtist": "五月天",
     "tags": [],
     "performances": [
       {
@@ -23198,7 +23180,7 @@
   {
     "id": "song-1825",
     "title": "fly me to the moon",
-    "originalArtist": "",
+    "originalArtist": "Frank Sinatra",
     "tags": [],
     "performances": [
       {
@@ -23822,7 +23804,7 @@
   {
     "id": "song-185",
     "title": "MANTA",
-    "originalArtist": "",
+    "originalArtist": "劉柏辛",
     "tags": [],
     "performances": [
       {
@@ -24060,7 +24042,7 @@
   {
     "id": "song-186",
     "title": "アクアリウム",
-    "originalArtist": "",
+    "originalArtist": "喜兵衛",
     "tags": [],
     "performances": [
       {
@@ -24378,7 +24360,7 @@
   {
     "id": "song-187",
     "title": "花咲く海の底",
-    "originalArtist": "",
+    "originalArtist": "なつめ千秋",
     "tags": [],
     "performances": [
       {
@@ -24686,7 +24668,7 @@
   {
     "id": "song-1884",
     "title": "Missing You",
-    "originalArtist": "",
+    "originalArtist": "梁根榮 feat. 汪小敏",
     "tags": [],
     "performances": [
       {
@@ -24722,7 +24704,7 @@
   {
     "id": "song-1886",
     "title": "讓",
-    "originalArtist": "",
+    "originalArtist": "楊宗緯",
     "tags": [],
     "performances": [
       {
@@ -24794,7 +24776,7 @@
   {
     "id": "song-189",
     "title": "空中アクアリウム",
-    "originalArtist": "",
+    "originalArtist": "40mP",
     "tags": [],
     "performances": [
       {
@@ -24848,7 +24830,7 @@
   {
     "id": "song-1892",
     "title": "可以可以",
-    "originalArtist": "",
+    "originalArtist": "西瓜JUN",
     "tags": [],
     "performances": [
       {
@@ -25070,7 +25052,7 @@
   {
     "id": "song-190",
     "title": "マーメイドシアター",
-    "originalArtist": "",
+    "originalArtist": "奏音69",
     "tags": [],
     "performances": [
       {
@@ -27114,7 +27096,7 @@
   {
     "id": "song-198",
     "title": "くらげ",
-    "originalArtist": "",
+    "originalArtist": "くらげP",
     "tags": [],
     "performances": [
       {
@@ -29990,7 +29972,7 @@
   {
     "id": "song-2073",
     "title": "蘑菇濃湯 Remix",
-    "originalArtist": "",
+    "originalArtist": "Play BIG Music",
     "tags": [],
     "performances": [
       {
@@ -30044,7 +30026,7 @@
   {
     "id": "song-2076",
     "title": "The Flame of Fate",
-    "originalArtist": "",
+    "originalArtist": "NARAKA: BLADEPOINT x NieR Main Theme",
     "tags": [],
     "performances": [
       {
@@ -30062,7 +30044,7 @@
   {
     "id": "song-2077",
     "title": "Liar 謊癮",
-    "originalArtist": "",
+    "originalArtist": "煌Kirali",
     "tags": [],
     "performances": [
       {
@@ -30080,7 +30062,7 @@
   {
     "id": "song-2078",
     "title": "霓光Neon Light",
-    "originalArtist": "",
+    "originalArtist": "霓NEO(n)",
     "tags": [],
     "performances": [
       {
@@ -30234,7 +30216,7 @@
   {
     "id": "song-2080",
     "title": "Walks Like Rihanna",
-    "originalArtist": "",
+    "originalArtist": "The Wanted",
     "tags": [],
     "performances": [
       {
@@ -30270,7 +30252,7 @@
   {
     "id": "song-2082",
     "title": "被遺忘的故事",
-    "originalArtist": "",
+    "originalArtist": "Nene鄭乃馨",
     "tags": [],
     "performances": [
       {
@@ -30306,27 +30288,17 @@
   {
     "id": "song-2084",
     "title": "Young And Beautiful",
-    "originalArtist": "",
+    "originalArtist": "Lana Del Rey",
     "tags": [],
     "performances": [
-      {
-        "id": "p2084-1",
-        "streamId": "stream-2024-03-23",
-        "date": "2024-03-23",
-        "streamTitle": "【歌枠】回家自由唱唱喜歡的歌曲🎤好きな曲たくさん歌いたい🎶初見大歓迎❤【浠Mizuki Karaoke】",
-        "videoId": "MiFJYQXksJc",
-        "timestamp": 4982,
-        "endTimestamp": 5218,
-        "note": ""
-      },
       {
         "id": "p2084-2",
         "streamId": "stream-2024-03-23",
         "date": "2024-03-23",
         "streamTitle": "【歌枠】回家自由唱唱喜歡的歌曲🎤好きな曲たくさん歌いたい🎶初見大歓迎❤【浠Mizuki Karaoke】",
         "videoId": "MiFJYQXksJc",
-        "timestamp": 5038,
-        "endTimestamp": 5274,
+        "timestamp": 4852,
+        "endTimestamp": 5086,
         "note": ""
       }
     ]
@@ -31030,7 +31002,7 @@
   {
     "id": "song-2112",
     "title": "Wherever you are",
-    "originalArtist": "",
+    "originalArtist": "ONE OK ROCK",
     "tags": [],
     "performances": [
       {
@@ -31048,7 +31020,7 @@
   {
     "id": "song-2113",
     "title": "フクロウ～フクロウが知らせる客が来たと～",
-    "originalArtist": "",
+    "originalArtist": "KOKIA",
     "tags": [],
     "performances": [
       {
@@ -31102,7 +31074,7 @@
   {
     "id": "song-2116",
     "title": "Just Be Friends",
-    "originalArtist": "",
+    "originalArtist": "Dixie Flatline",
     "tags": [],
     "performances": [
       {
@@ -31120,7 +31092,7 @@
   {
     "id": "song-2117",
     "title": "I’m still alive  today",
-    "originalArtist": "",
+    "originalArtist": "96猫",
     "tags": [],
     "performances": [
       {
@@ -31138,7 +31110,7 @@
   {
     "id": "song-2118",
     "title": "如此",
-    "originalArtist": "",
+    "originalArtist": "單依純",
     "tags": [],
     "performances": [
       {
@@ -31466,7 +31438,7 @@
   {
     "id": "song-2128",
     "title": "嶄新的世界",
-    "originalArtist": "",
+    "originalArtist": "黃卓穎 & 馬玉芬",
     "tags": [],
     "performances": [
       {
@@ -32372,7 +32344,7 @@
   {
     "id": "song-2161",
     "title": "Style",
-    "originalArtist": "",
+    "originalArtist": "Taylor Swift",
     "tags": [],
     "performances": [
       {
@@ -32408,7 +32380,7 @@
   {
     "id": "song-2163",
     "title": "Anti-Hreo",
-    "originalArtist": "",
+    "originalArtist": "Taylor Swift",
     "tags": [],
     "performances": [
       {
@@ -32462,7 +32434,7 @@
   {
     "id": "song-2166",
     "title": "Innocent",
-    "originalArtist": "",
+    "originalArtist": "Taylor Swift",
     "tags": [],
     "performances": [
       {
@@ -32618,7 +32590,7 @@
   {
     "id": "song-2172",
     "title": "The Way I Loved You",
-    "originalArtist": "",
+    "originalArtist": "Taylor Swift",
     "tags": [],
     "performances": [
       {
@@ -32690,7 +32662,7 @@
   {
     "id": "song-2176",
     "title": "I Knew You Were Trouble",
-    "originalArtist": "",
+    "originalArtist": "Taylor Swift",
     "tags": [],
     "performances": [
       {
@@ -32744,7 +32716,7 @@
   {
     "id": "song-2179",
     "title": "Look What You Made Me Do",
-    "originalArtist": "",
+    "originalArtist": "Taylor Swift",
     "tags": [],
     "performances": [
       {
@@ -32808,7 +32780,7 @@
   {
     "id": "song-2181",
     "title": "Everything Has Changed",
-    "originalArtist": "",
+    "originalArtist": "Taylor Swift feat. Ed Sheeran",
     "tags": [],
     "performances": [
       {
@@ -32872,7 +32844,7 @@
   {
     "id": "song-2184",
     "title": "Evermore",
-    "originalArtist": "",
+    "originalArtist": "Taylor Swift feat. Bon Iver",
     "tags": [],
     "performances": [
       {
@@ -34162,7 +34134,7 @@
   {
     "id": "song-2228",
     "title": "secret base ～君がくれたもの~",
-    "originalArtist": "",
+    "originalArtist": "ZONE",
     "tags": [],
     "performances": [
       {
@@ -37580,7 +37552,7 @@
   {
     "id": "song-2359",
     "title": "夜行／ヨルシカ",
-    "originalArtist": "",
+    "originalArtist": "ヨルシカ",
     "tags": [],
     "performances": [
       {
@@ -37976,7 +37948,7 @@
   {
     "id": "song-2374",
     "title": "脳裏上のクラッカー --- ずっと真夜中でいいのに。",
-    "originalArtist": "",
+    "originalArtist": "ずっと真夜中でいいのに。",
     "tags": [],
     "performances": [
       {
@@ -38330,7 +38302,7 @@
   {
     "id": "song-2390",
     "title": "ぎゅっと。",
-    "originalArtist": "",
+    "originalArtist": "もさを。",
     "tags": [],
     "performances": [
       {
@@ -38376,7 +38348,7 @@
   {
     "id": "song-2392",
     "title": "你被寫在我的歌裡",
-    "originalArtist": "",
+    "originalArtist": "蘇打綠",
     "tags": [],
     "performances": [
       {
@@ -43268,7 +43240,7 @@
   {
     "id": "song-2580",
     "title": "Jingle Bells",
-    "originalArtist": "",
+    "originalArtist": "Jingle Bells",
     "tags": [],
     "performances": [
       {
@@ -47728,7 +47700,7 @@
   {
     "id": "song-2780",
     "title": "酔いどれ知らず／Kanaria ft. GUMI",
-    "originalArtist": "",
+    "originalArtist": "Kanaria",
     "tags": [],
     "performances": [
       {
@@ -47816,96 +47788,6 @@
     ]
   },
   {
-    "id": "song-2785",
-    "title": "唐突印度舞",
-    "originalArtist": "",
-    "tags": [],
-    "performances": [
-      {
-        "id": "p2785-1",
-        "streamId": "stream-2025-03-22",
-        "date": "2025-03-22",
-        "streamTitle": "【初次姐妹3D】終於可以一起動起來！跟妲妲一起拍小廢片還有玩耍 ft.歐妲@OldaMonstar 【浠Mizuki Free Talk】",
-        "videoId": "9aGua1HjH14",
-        "timestamp": 562,
-        "endTimestamp": 632,
-        "note": ""
-      }
-    ]
-  },
-  {
-    "id": "song-2786",
-    "title": "印度day by day+修但幾咧",
-    "originalArtist": "",
-    "tags": [],
-    "performances": [
-      {
-        "id": "p2786-1",
-        "streamId": "stream-2025-03-22",
-        "date": "2025-03-22",
-        "streamTitle": "【初次姐妹3D】終於可以一起動起來！跟妲妲一起拍小廢片還有玩耍 ft.歐妲@OldaMonstar 【浠Mizuki Free Talk】",
-        "videoId": "9aGua1HjH14",
-        "timestamp": 632,
-        "endTimestamp": 868,
-        "note": ""
-      }
-    ]
-  },
-  {
-    "id": "song-2787",
-    "title": "テトリス",
-    "originalArtist": "",
-    "tags": [],
-    "performances": [
-      {
-        "id": "p2787-1",
-        "streamId": "stream-2025-03-22",
-        "date": "2025-03-22",
-        "streamTitle": "【初次姐妹3D】終於可以一起動起來！跟妲妲一起拍小廢片還有玩耍 ft.歐妲@OldaMonstar 【浠Mizuki Free Talk】",
-        "videoId": "9aGua1HjH14",
-        "timestamp": 868,
-        "endTimestamp": 1039,
-        "note": ""
-      }
-    ]
-  },
-  {
-    "id": "song-2788",
-    "title": "Lets go bunny bunny boom boom",
-    "originalArtist": "",
-    "tags": [],
-    "performances": [
-      {
-        "id": "p2788-1",
-        "streamId": "stream-2025-03-22",
-        "date": "2025-03-22",
-        "streamTitle": "【初次姐妹3D】終於可以一起動起來！跟妲妲一起拍小廢片還有玩耍 ft.歐妲@OldaMonstar 【浠Mizuki Free Talk】",
-        "videoId": "9aGua1HjH14",
-        "timestamp": 1039,
-        "endTimestamp": 1092,
-        "note": ""
-      }
-    ]
-  },
-  {
-    "id": "song-2789",
-    "title": "中場亂跳",
-    "originalArtist": "",
-    "tags": [],
-    "performances": [
-      {
-        "id": "p2789-1",
-        "streamId": "stream-2025-03-22",
-        "date": "2025-03-22",
-        "streamTitle": "【初次姐妹3D】終於可以一起動起來！跟妲妲一起拍小廢片還有玩耍 ft.歐妲@OldaMonstar 【浠Mizuki Free Talk】",
-        "videoId": "9aGua1HjH14",
-        "timestamp": 1092,
-        "endTimestamp": 1265,
-        "note": ""
-      }
-    ]
-  },
-  {
     "id": "song-279",
     "title": "ホシアイ",
     "originalArtist": "GUMI",
@@ -47919,186 +47801,6 @@
         "videoId": "X0aDZwv-Pw0",
         "timestamp": 5929,
         "endTimestamp": 6207,
-        "note": ""
-      }
-    ]
-  },
-  {
-    "id": "song-2790",
-    "title": "肯掐拿",
-    "originalArtist": "",
-    "tags": [],
-    "performances": [
-      {
-        "id": "p2790-1",
-        "streamId": "stream-2025-03-22",
-        "date": "2025-03-22",
-        "streamTitle": "【初次姐妹3D】終於可以一起動起來！跟妲妲一起拍小廢片還有玩耍 ft.歐妲@OldaMonstar 【浠Mizuki Free Talk】",
-        "videoId": "9aGua1HjH14",
-        "timestamp": 1265,
-        "endTimestamp": 1592,
-        "note": ""
-      }
-    ]
-  },
-  {
-    "id": "song-2791",
-    "title": "叮叮噹噹舞",
-    "originalArtist": "",
-    "tags": [],
-    "performances": [
-      {
-        "id": "p2791-1",
-        "streamId": "stream-2025-03-22",
-        "date": "2025-03-22",
-        "streamTitle": "【初次姐妹3D】終於可以一起動起來！跟妲妲一起拍小廢片還有玩耍 ft.歐妲@OldaMonstar 【浠Mizuki Free Talk】",
-        "videoId": "9aGua1HjH14",
-        "timestamp": 1592,
-        "endTimestamp": 1719,
-        "note": ""
-      }
-    ]
-  },
-  {
-    "id": "song-2792",
-    "title": "即興印度Day By Day",
-    "originalArtist": "",
-    "tags": [],
-    "performances": [
-      {
-        "id": "p2792-1",
-        "streamId": "stream-2025-03-22",
-        "date": "2025-03-22",
-        "streamTitle": "【初次姐妹3D】終於可以一起動起來！跟妲妲一起拍小廢片還有玩耍 ft.歐妲@OldaMonstar 【浠Mizuki Free Talk】",
-        "videoId": "9aGua1HjH14",
-        "timestamp": 1719,
-        "endTimestamp": 1846,
-        "note": ""
-      }
-    ]
-  },
-  {
-    "id": "song-2793",
-    "title": "沒牙",
-    "originalArtist": "",
-    "tags": [],
-    "performances": [
-      {
-        "id": "p2793-1",
-        "streamId": "stream-2025-03-22",
-        "date": "2025-03-22",
-        "streamTitle": "【初次姐妹3D】終於可以一起動起來！跟妲妲一起拍小廢片還有玩耍 ft.歐妲@OldaMonstar 【浠Mizuki Free Talk】",
-        "videoId": "9aGua1HjH14",
-        "timestamp": 1846,
-        "endTimestamp": 2191,
-        "note": ""
-      }
-    ]
-  },
-  {
-    "id": "song-2794",
-    "title": "蘿莉神",
-    "originalArtist": "",
-    "tags": [],
-    "performances": [
-      {
-        "id": "p2794-1",
-        "streamId": "stream-2025-03-22",
-        "date": "2025-03-22",
-        "streamTitle": "【初次姐妹3D】終於可以一起動起來！跟妲妲一起拍小廢片還有玩耍 ft.歐妲@OldaMonstar 【浠Mizuki Free Talk】",
-        "videoId": "9aGua1HjH14",
-        "timestamp": 2191,
-        "endTimestamp": 2623,
-        "note": ""
-      }
-    ]
-  },
-  {
-    "id": "song-2795",
-    "title": "UNDEAD",
-    "originalArtist": "",
-    "tags": [],
-    "performances": [
-      {
-        "id": "p2795-1",
-        "streamId": "stream-2025-03-22",
-        "date": "2025-03-22",
-        "streamTitle": "【初次姐妹3D】終於可以一起動起來！跟妲妲一起拍小廢片還有玩耍 ft.歐妲@OldaMonstar 【浠Mizuki Free Talk】",
-        "videoId": "9aGua1HjH14",
-        "timestamp": 2623,
-        "endTimestamp": 2731,
-        "note": ""
-      }
-    ]
-  },
-  {
-    "id": "song-2796",
-    "title": "強風大背頭",
-    "originalArtist": "",
-    "tags": [],
-    "performances": [
-      {
-        "id": "p2796-1",
-        "streamId": "stream-2025-03-22",
-        "date": "2025-03-22",
-        "streamTitle": "【初次姐妹3D】終於可以一起動起來！跟妲妲一起拍小廢片還有玩耍 ft.歐妲@OldaMonstar 【浠Mizuki Free Talk】",
-        "videoId": "9aGua1HjH14",
-        "timestamp": 2731,
-        "endTimestamp": 3065,
-        "note": ""
-      }
-    ]
-  },
-  {
-    "id": "song-2797",
-    "title": "我推 B小町",
-    "originalArtist": "",
-    "tags": [],
-    "performances": [
-      {
-        "id": "p2797-1",
-        "streamId": "stream-2025-03-22",
-        "date": "2025-03-22",
-        "streamTitle": "【初次姐妹3D】終於可以一起動起來！跟妲妲一起拍小廢片還有玩耍 ft.歐妲@OldaMonstar 【浠Mizuki Free Talk】",
-        "videoId": "9aGua1HjH14",
-        "timestamp": 3065,
-        "endTimestamp": 3120,
-        "note": ""
-      }
-    ]
-  },
-  {
-    "id": "song-2798",
-    "title": "bring bang bang",
-    "originalArtist": "",
-    "tags": [],
-    "performances": [
-      {
-        "id": "p2798-1",
-        "streamId": "stream-2025-03-22",
-        "date": "2025-03-22",
-        "streamTitle": "【初次姐妹3D】終於可以一起動起來！跟妲妲一起拍小廢片還有玩耍 ft.歐妲@OldaMonstar 【浠Mizuki Free Talk】",
-        "videoId": "9aGua1HjH14",
-        "timestamp": 3120,
-        "endTimestamp": 3303,
-        "note": ""
-      }
-    ]
-  },
-  {
-    "id": "song-2799",
-    "title": "瑞克搖?",
-    "originalArtist": "",
-    "tags": [],
-    "performances": [
-      {
-        "id": "p2799-1",
-        "streamId": "stream-2025-03-22",
-        "date": "2025-03-22",
-        "streamTitle": "【初次姐妹3D】終於可以一起動起來！跟妲妲一起拍小廢片還有玩耍 ft.歐妲@OldaMonstar 【浠Mizuki Free Talk】",
-        "videoId": "9aGua1HjH14",
-        "timestamp": 3303,
-        "endTimestamp": 3490,
         "note": ""
       }
     ]
@@ -48163,114 +47865,6 @@
         "videoId": "X0aDZwv-Pw0",
         "timestamp": 6310,
         "endTimestamp": 6560,
-        "note": ""
-      }
-    ]
-  },
-  {
-    "id": "song-2800",
-    "title": "Bunny Girl",
-    "originalArtist": "AKASAKI",
-    "tags": [],
-    "performances": [
-      {
-        "id": "p2800-1",
-        "streamId": "stream-2025-03-22",
-        "date": "2025-03-22",
-        "streamTitle": "【初次姐妹3D】終於可以一起動起來！跟妲妲一起拍小廢片還有玩耍 ft.歐妲@OldaMonstar 【浠Mizuki Free Talk】",
-        "videoId": "9aGua1HjH14",
-        "timestamp": 3490,
-        "endTimestamp": 3624,
-        "note": ""
-      }
-    ]
-  },
-  {
-    "id": "song-2801",
-    "title": "What Does The Fox Say",
-    "originalArtist": "",
-    "tags": [],
-    "performances": [
-      {
-        "id": "p2801-1",
-        "streamId": "stream-2025-03-22",
-        "date": "2025-03-22",
-        "streamTitle": "【初次姐妹3D】終於可以一起動起來！跟妲妲一起拍小廢片還有玩耍 ft.歐妲@OldaMonstar 【浠Mizuki Free Talk】",
-        "videoId": "9aGua1HjH14",
-        "timestamp": 3624,
-        "endTimestamp": 4462,
-        "note": ""
-      }
-    ]
-  },
-  {
-    "id": "song-2802",
-    "title": "明日の私に幸あれ",
-    "originalArtist": "",
-    "tags": [],
-    "performances": [
-      {
-        "id": "p2802-1",
-        "streamId": "stream-2025-03-22",
-        "date": "2025-03-22",
-        "streamTitle": "【初次姐妹3D】終於可以一起動起來！跟妲妲一起拍小廢片還有玩耍 ft.歐妲@OldaMonstar 【浠Mizuki Free Talk】",
-        "videoId": "9aGua1HjH14",
-        "timestamp": 4462,
-        "endTimestamp": 4898,
-        "note": ""
-      }
-    ]
-  },
-  {
-    "id": "song-2803",
-    "title": "不是 哥們 (空氣椅子？)",
-    "originalArtist": "",
-    "tags": [],
-    "performances": [
-      {
-        "id": "p2803-1",
-        "streamId": "stream-2025-03-22",
-        "date": "2025-03-22",
-        "streamTitle": "【初次姐妹3D】終於可以一起動起來！跟妲妲一起拍小廢片還有玩耍 ft.歐妲@OldaMonstar 【浠Mizuki Free Talk】",
-        "videoId": "9aGua1HjH14",
-        "timestamp": 4898,
-        "endTimestamp": 5566,
-        "note": ""
-      }
-    ]
-  },
-  {
-    "id": "song-2804",
-    "title": "晚安大小姐",
-    "originalArtist": "",
-    "tags": [],
-    "performances": [
-      {
-        "id": "p2804-1",
-        "streamId": "stream-2025-03-22",
-        "date": "2025-03-22",
-        "streamTitle": "【初次姐妹3D】終於可以一起動起來！跟妲妲一起拍小廢片還有玩耍 ft.歐妲@OldaMonstar 【浠Mizuki Free Talk】",
-        "videoId": "9aGua1HjH14",
-        "timestamp": 5566,
-        "endTimestamp": 5766,
-        "note": ""
-      }
-    ]
-  },
-  {
-    "id": "song-2805",
-    "title": "一起比大愛心",
-    "originalArtist": "",
-    "tags": [],
-    "performances": [
-      {
-        "id": "p2805-1",
-        "streamId": "stream-2025-03-22",
-        "date": "2025-03-22",
-        "streamTitle": "【初次姐妹3D】終於可以一起動起來！跟妲妲一起拍小廢片還有玩耍 ft.歐妲@OldaMonstar 【浠Mizuki Free Talk】",
-        "videoId": "9aGua1HjH14",
-        "timestamp": 5766,
-        "endTimestamp": 5999,
         "note": ""
       }
     ]
@@ -49552,7 +49146,7 @@
   {
     "id": "song-2863",
     "title": "春に一番近い街／40㍍P ft. GUMI",
-    "originalArtist": "",
+    "originalArtist": "40mP",
     "tags": [],
     "performances": [
       {
@@ -51686,7 +51280,7 @@
   {
     "id": "song-2964",
     "title": "Top of the world",
-    "originalArtist": "",
+    "originalArtist": "Carpenters",
     "tags": [],
     "performances": [
       {
@@ -51722,7 +51316,7 @@
   {
     "id": "song-2966",
     "title": "a whole new world",
-    "originalArtist": "",
+    "originalArtist": "Naomi Scott & Mena Massoud",
     "tags": [],
     "performances": [
       {
@@ -52668,7 +52262,7 @@
   {
     "id": "song-3000",
     "title": "CH4NGE",
-    "originalArtist": "",
+    "originalArtist": "Giga",
     "tags": [],
     "performances": [
       {
@@ -52704,7 +52298,7 @@
   {
     "id": "song-3002",
     "title": "天体觀測",
-    "originalArtist": "",
+    "originalArtist": "BUMP OF CHICKEN",
     "tags": [],
     "performances": [
       {
@@ -52740,7 +52334,7 @@
   {
     "id": "song-3004",
     "title": "I Feel The Earth Move",
-    "originalArtist": "",
+    "originalArtist": "Carole King",
     "tags": [],
     "performances": [
       {
@@ -52794,7 +52388,7 @@
   {
     "id": "song-3007",
     "title": "永不失連的愛",
-    "originalArtist": "",
+    "originalArtist": "周興哲",
     "tags": [],
     "performances": [
       {
@@ -53104,7 +52698,7 @@
   {
     "id": "song-3020",
     "title": "今天妳要嫁給我",
-    "originalArtist": "",
+    "originalArtist": "蔡依林 & 陶喆",
     "tags": [],
     "performances": [
       {
@@ -53140,7 +52734,7 @@
   {
     "id": "song-3022",
     "title": "癢",
-    "originalArtist": "",
+    "originalArtist": "孟楠",
     "tags": [],
     "performances": [
       {
@@ -53176,7 +52770,7 @@
   {
     "id": "song-3024",
     "title": "Summertime",
-    "originalArtist": "",
+    "originalArtist": "cinnamons × evening cinema",
     "tags": [],
     "performances": [
       {
@@ -54310,7 +53904,7 @@
   {
     "id": "song-3072",
     "title": "Colors of the Wind",
-    "originalArtist": "",
+    "originalArtist": "Judy Kuhn",
     "tags": [],
     "performances": [
       {
@@ -54399,8 +53993,8 @@
   },
   {
     "id": "song-3077",
-    "title": "stardsuster",
-    "originalArtist": "",
+    "title": "Starduster",
+    "originalArtist": "ジミーサムP",
     "tags": [],
     "performances": [
       {
@@ -54558,7 +54152,7 @@
   {
     "id": "song-3082",
     "title": "City of stars",
-    "originalArtist": "",
+    "originalArtist": "Ryan Gosling & Emma Stone",
     "tags": [],
     "performances": [
       {
@@ -54576,7 +54170,7 @@
   {
     "id": "song-3083",
     "title": "恋におちて- Fall in love -",
-    "originalArtist": "",
+    "originalArtist": "小林明子",
     "tags": [],
     "performances": [
       {
@@ -56352,7 +55946,7 @@
   {
     "id": "song-3166",
     "title": "暮 Passage",
-    "originalArtist": "",
+    "originalArtist": "CORSAK胡夢週 Ft. 馬吟吟",
     "tags": [],
     "performances": [
       {
@@ -56370,7 +55964,7 @@
   {
     "id": "song-3167",
     "title": "Shining(閃亮)",
-    "originalArtist": "",
+    "originalArtist": "耀嘉音 (Astra Yao), 三Z (Sān-Z) & HOYO-MiX",
     "tags": [],
     "performances": [
       {
@@ -56388,7 +55982,7 @@
   {
     "id": "song-3168",
     "title": "My Favorite Things",
-    "originalArtist": "",
+    "originalArtist": "Julie Andrews",
     "tags": [],
     "performances": [
       {
@@ -56406,7 +56000,7 @@
   {
     "id": "song-3169",
     "title": "Prefect",
-    "originalArtist": "",
+    "originalArtist": "Ed Sheeran",
     "tags": [],
     "performances": [
       {
@@ -56460,7 +56054,7 @@
   {
     "id": "song-3171",
     "title": "365日の紙飛行機",
-    "originalArtist": "",
+    "originalArtist": "AKB48",
     "tags": [],
     "performances": [
       {
@@ -56478,7 +56072,7 @@
   {
     "id": "song-3172",
     "title": "Starry Whispers",
-    "originalArtist": "",
+    "originalArtist": "浠Mizuki & 常闇やみや",
     "tags": [],
     "performances": [
       {
@@ -56532,7 +56126,7 @@
   {
     "id": "song-3175",
     "title": "忽然",
-    "originalArtist": "",
+    "originalArtist": "韋禮安",
     "tags": [],
     "performances": [
       {
@@ -56550,7 +56144,7 @@
   {
     "id": "song-3176",
     "title": "夜明けと蛍",
-    "originalArtist": "",
+    "originalArtist": "ナブナ",
     "tags": [],
     "performances": [
       {
@@ -56604,7 +56198,7 @@
   {
     "id": "song-3179",
     "title": "Dry Flower",
-    "originalArtist": "",
+    "originalArtist": "優里",
     "tags": [],
     "performances": [
       {
@@ -56640,7 +56234,7 @@
   {
     "id": "song-3180",
     "title": "アヤノの幸福理論",
-    "originalArtist": "",
+    "originalArtist": "じん",
     "tags": [],
     "performances": [
       {
@@ -56694,7 +56288,7 @@
   {
     "id": "song-3183",
     "title": "シリウスの心臓",
-    "originalArtist": "",
+    "originalArtist": "ヰ世界情緒",
     "tags": [],
     "performances": [
       {
@@ -61691,24 +61285,6 @@
         "videoId": "oX5aFQQlS1k",
         "timestamp": 1246,
         "endTimestamp": 1358,
-        "note": ""
-      }
-    ]
-  },
-  {
-    "id": "song-454",
-    "title": "打斷腿之歌",
-    "originalArtist": "",
-    "tags": [],
-    "performances": [
-      {
-        "id": "p454-1",
-        "streamId": "stream-2021-10-19",
-        "date": "2021-10-19",
-        "streamTitle": "【練習歌枠】清唱輕鬆練練歌【浠Mizuki Karaoke】",
-        "videoId": "8pCadOAdMzY",
-        "timestamp": 8288,
-        "endTimestamp": 8446,
         "note": ""
       }
     ]
@@ -73701,8 +73277,8 @@
   },
   {
     "id": "song-805",
-    "title": "Ieven Polkka",
-    "originalArtist": "",
+    "title": "Ievan polkka",
+    "originalArtist": "Loituma",
     "tags": [],
     "performances": [
       {
@@ -74974,7 +74550,7 @@
   {
     "id": "song-848",
     "title": "ノスタルジックレインフォール／CHiCO with HoneyWorks",
-    "originalArtist": "",
+    "originalArtist": "CHiCO with HoneyWorks",
     "tags": [],
     "performances": [
       {
@@ -79244,7 +78820,7 @@
   {
     "id": "song-983",
     "title": "ハム太郎とっとこ歌",
-    "originalArtist": "",
+    "originalArtist": "河井リツ子",
     "tags": [],
     "performances": [
       {
@@ -79500,7 +79076,7 @@
   {
     "id": "song-989",
     "title": "選んでくれてありがとう。",
-    "originalArtist": "",
+    "originalArtist": "HoneyWorks",
     "tags": [],
     "performances": [
       {

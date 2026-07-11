@@ -44,9 +44,12 @@ The original 19 blocking findings are resolved:
 | END-RANGE-003 | `p-b14e136c` | End time corrected | 13370–13609 |
 | END-RANGE-004 | `p-a90fe217` | Start and end times corrected | 7002–7114 |
 
-The non-blocking missing-artist scan now contains 143 canonical song rows and
-affects 147 performances. The decrease from 144/148 is the expected result of
-removing `song-621` and `p621-1`.
+The non-blocking missing-artist scan decreased from 144 songs / 148
+performances to 143 / 147 after removing song-621 and p621-1. Class A/B
+filled 53 songs covering 54 performances. The non-song VOD 9aGua1HjH14 was
+removed with 21 songs and 21 performances. Interactive C/D review filled 67 additional songs and deleted song-454 and
+song-1495. The final blank song-2580 was then filled with originalArtist =
+Jingle Bells, so the current backlog is zero.
 
 ## Completed remediation procedure
 
@@ -74,7 +77,11 @@ The original separate non-blocking data-quality scan found 144 canonical song
 rows with an empty `originalArtist`, affecting 148 performances. They produce
 song-level `MISSING_ORIGINAL_ARTIST` warnings and were not part of the 19
 blocking end-time rows counted above. After the intentional deletion, the
-current counts are 143 song rows and 147 performances.
+counts were 143 song rows and 147 performances. After the approved class A/B
+repair, the counts were 90 song rows and 93 performances. After deleting the
+non-song VOD `9aGua1HjH14`, the counts were 70 song rows and 73
+performances. After finalizing song-2580, the current missing-artist counts
+are zero songs and zero performances.
 
 At audit time, no `end_timestamp = timestamp` row was found; all four invalid
 ranges had an end value strictly earlier than their start value.
