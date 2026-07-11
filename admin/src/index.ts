@@ -1198,10 +1198,11 @@ app.post('/api/nova/submissions/fetch-all-subscribers', requireCurator, async (c
           SET subscriber_count = ?, avatar_url = ?,
               youtube_channel_verified_id = ?, youtube_channel_verified_at = ?
           WHERE id = ? AND youtube_channel_id = ?
+          RETURNING id
         `)
         .bind(formatted, info.avatarUrl, info.channelId, verifiedAt, sub.id, sub.youtube_channel_id)
-        .run();
-      if ((update.meta.changes ?? 0) !== 1) {
+        .run<{ id: string }>();
+      if (update.results[0]?.id !== sub.id) {
         results.push({ id: sub.id, display_name: sub.display_name, subscriber_count: null, avatar_url: null, error: 'Channel ID changed during refresh' });
         failed++;
         continue;
@@ -1255,10 +1256,11 @@ app.post('/api/nova/submissions/:id/verify-youtube-channel', requireCurator, asy
       UPDATE submissions
       SET youtube_channel_verified_id = ?, youtube_channel_verified_at = ?
       WHERE id = ? AND youtube_channel_id = ?
+      RETURNING id
     `)
     .bind(verifiedId, verifiedAt, id, sub.youtube_channel_id)
-    .run();
-  if ((result.meta.changes ?? 0) !== 1) {
+    .run<{ id: string }>();
+  if (result.results[0]?.id !== id) {
     return c.json({ error: 'YouTube channel ID changed during verification; retry the operation' }, 409);
   }
   const updated = await c.env.NOVA_DB
@@ -1489,10 +1491,11 @@ app.post('/api/nova/submissions/:id/fetch-subscribers', requireCurator, async (c
       SET subscriber_count = ?, avatar_url = ?,
           youtube_channel_verified_id = ?, youtube_channel_verified_at = ?
       WHERE id = ? AND youtube_channel_id = ?
+      RETURNING id
     `)
     .bind(formatted, info.avatarUrl, info.channelId, verifiedAt, id, sub.youtube_channel_id)
-    .run();
-  if ((update.meta.changes ?? 0) !== 1) {
+    .run<{ id: string }>();
+  if (update.results[0]?.id !== id) {
     return c.json({ error: 'YouTube channel ID changed during refresh; retry the operation' }, 409);
   }
 

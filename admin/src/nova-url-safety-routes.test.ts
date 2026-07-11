@@ -29,9 +29,14 @@ class RecordingStatement {
     return this;
   }
 
-  async run(): Promise<{ meta: { changes: number } }> {
+  async run<T>(): Promise<{ meta: { changes: number }; results: T[] }> {
     this.db.runs.push({ sql: this.sql, params: this.params });
-    return { meta: { changes: 1 } };
+    const returningSubmissionId = this.sql.includes('RETURNING id') && this.db.updateMatches
+      ? [{ id: 'sub-test' } as T]
+      : [];
+    // D1 exposes sqlite3_total_changes(), so the revision trigger makes a
+    // successful submission update report more than one changed row.
+    return { meta: { changes: this.sql.includes('UPDATE submissions') ? 2 : 1 }, results: returningSubmissionId };
   }
 
   async first<T>(): Promise<T | null> {
@@ -45,6 +50,9 @@ class RecordingStatement {
     }
     if (this.sql === 'SELECT id FROM submissions WHERE id = ?') {
       return { id: 'sub-test' } as T;
+    }
+    if (this.sql === 'SELECT id, youtube_channel_id FROM submissions WHERE id = ?') {
+      return { id: 'sub-test', youtube_channel_id: 'UC123' } as T;
     }
     if (this.sql === 'SELECT * FROM submissions WHERE id = ?') {
       return makeSubmission() as T;
@@ -60,6 +68,8 @@ class RecordingStatement {
 class RecordingD1 {
   binds: Array<{ sql: string; params: unknown[] }> = [];
   runs: Array<{ sql: string; params: unknown[] }> = [];
+
+  constructor(readonly updateMatches = true) {}
 
   prepare(sql: string): RecordingStatement {
     return new RecordingStatement(this, sql);
@@ -96,15 +106,42 @@ function makeSubmission(): NovaSubmission {
   };
 }
 
-function envFor(db: RecordingD1) {
+function envFor(db: RecordingD1, youtubeApiKey = '') {
   const d1 = db as unknown as D1Database;
   return {
     DB: d1,
     NOVA_DB: d1,
     CRYSTAL_DB: d1,
     CURATOR_EMAILS: CURATOR,
-    YOUTUBE_API_KEY: '',
+    YOUTUBE_API_KEY: youtubeApiKey,
   };
+}
+
+function verifyYoutubeChannel(db: RecordingD1): Promise<Response> {
+  return Promise.resolve(app.request(
+    '/api/nova/submissions/sub-test/verify-youtube-channel',
+    {
+      method: 'POST',
+      headers: {
+        'CF-Access-Authenticated-User-Email': CURATOR,
+        [REQUEST_AUTHENTICITY_HEADER]: REQUEST_AUTHENTICITY_VALUE,
+      },
+    },
+    envFor(db, 'test-key'),
+  ));
+}
+
+async function withFetch(
+  handler: (input: RequestInfo | URL, init?: RequestInit) => Promise<Response>,
+  test: () => Promise<void>,
+): Promise<void> {
+  const original = globalThis.fetch;
+  Object.defineProperty(globalThis, 'fetch', { configurable: true, writable: true, value: handler });
+  try {
+    await test();
+  } finally {
+    Object.defineProperty(globalThis, 'fetch', { configurable: true, writable: true, value: original });
+  }
 }
 
 function putSubmission(body: unknown, db: RecordingD1): Promise<Response> {
@@ -147,11 +184,31 @@ async function testAllowsSafeUrlUpdate(): Promise<void> {
   assert(update.params.includes('https://www.twitter.com/safe'), 'safe URL is stored in normalized href form');
 }
 
+async function testChannelVerificationIgnoresTriggeredTotalChanges(): Promise<void> {
+  await withFetch(async () => Response.json({ items: [{ id: 'UC123', snippet: {} }] }), async () => {
+    const db = new RecordingD1();
+    const res = await verifyYoutubeChannel(db);
+    assertEqual(res.status, 200, 'successful channel verification is not rejected by trigger changes');
+    const update = db.runs.find((run) => run.sql.includes('youtube_channel_verified_id'));
+    assert(update?.sql.includes('RETURNING id') === true, 'verification uses the matched row identity');
+  });
+}
+
+async function testChannelVerificationDetectsConcurrentIdChange(): Promise<void> {
+  await withFetch(async () => Response.json({ items: [{ id: 'UC123', snippet: {} }] }), async () => {
+    const db = new RecordingD1(false);
+    const res = await verifyYoutubeChannel(db);
+    assertEqual(res.status, 409, 'missing returned row still detects a concurrent channel ID change');
+  });
+}
+
 void (async () => {
   await testRejectsUnsafeUrlUpdate();
   await testRejectsNonObjectUpdateBody();
   await testAllowsSafeUrlUpdate();
-  console.log('✓ Nova submission URL route validation');
+  await testChannelVerificationIgnoresTriggeredTotalChanges();
+  await testChannelVerificationDetectsConcurrentIdChange();
+  console.log('✓ Nova submission URL and YouTube verification routes');
 })().catch((error: unknown) => {
   console.error(error);
   process.exitCode = 1;
