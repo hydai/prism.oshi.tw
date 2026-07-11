@@ -15,52 +15,34 @@ interface LikedSongsPanelProps {
 
 export default function LikedSongsPanel({ show, onClose, onToast }: LikedSongsPanelProps) {
   const { likedSongs, toggleLike } = useLikedSongs();
-  const { playTrack, addToQueue } = usePlayer();
+  const { playTrackWithQueue, addToQueue } = usePlayer();
   const { slug } = useStreamer();
+
+  const toTrack = (v: typeof likedSongs[0]): Track => ({
+    id: v.performanceId,
+    songId: v.performanceId,
+    title: v.songTitle,
+    originalArtist: v.originalArtist,
+    videoId: v.videoId,
+    timestamp: v.timestamp,
+    endTimestamp: v.endTimestamp,
+    albumArtUrl: v.albumArtUrl,
+    streamerSlug: slug,
+  });
 
   const handlePlayAll = () => {
     if (likedSongs.length === 0) return;
-    const tracks: Track[] = likedSongs.map(v => ({
-      id: v.performanceId,
-      songId: v.performanceId,
-      title: v.songTitle,
-      originalArtist: v.originalArtist,
-      videoId: v.videoId,
-      timestamp: v.timestamp,
-      endTimestamp: v.endTimestamp,
-      albumArtUrl: v.albumArtUrl,
-      streamerSlug: slug,
-    }));
-    playTrack(tracks[0]);
-    tracks.slice(1).forEach(t => addToQueue(t));
+    const tracks = likedSongs.map(toTrack);
+    playTrackWithQueue(tracks[0], tracks.slice(1));
   };
 
-  const handlePlay = (v: typeof likedSongs[0]) => {
-    playTrack({
-      id: v.performanceId,
-      songId: v.performanceId,
-      title: v.songTitle,
-      originalArtist: v.originalArtist,
-      videoId: v.videoId,
-      timestamp: v.timestamp,
-      endTimestamp: v.endTimestamp,
-      albumArtUrl: v.albumArtUrl,
-      streamerSlug: slug,
-    });
+  const handlePlay = (index: number) => {
+    const tracks = likedSongs.map(toTrack);
+    playTrackWithQueue(tracks[index], tracks.slice(index + 1));
   };
 
   const handleAddToQueue = (v: typeof likedSongs[0]) => {
-    addToQueue({
-      id: v.performanceId,
-      songId: v.performanceId,
-      title: v.songTitle,
-      originalArtist: v.originalArtist,
-      videoId: v.videoId,
-      timestamp: v.timestamp,
-      endTimestamp: v.endTimestamp,
-      albumArtUrl: v.albumArtUrl,
-      streamerSlug: slug,
-    });
+    addToQueue(toTrack(v));
     onToast?.('已加入待播清單');
   };
 
@@ -82,7 +64,7 @@ export default function LikedSongsPanel({ show, onClose, onToast }: LikedSongsPa
         ) : (
           <>
             <div className="space-y-2" data-testid="liked-songs-list">
-              {likedSongs.map((version) => (
+              {likedSongs.map((version, index) => (
                 <div
                   key={version.performanceId}
                   className="bg-white/5 rounded-lg p-3 flex items-center gap-3 group hover:bg-white/10 transition-colors"
@@ -103,7 +85,7 @@ export default function LikedSongsPanel({ show, onClose, onToast }: LikedSongsPa
                   </div>
                   <div className="flex items-center gap-1 lg:opacity-0 lg:group-hover:opacity-100 transition-opacity">
                     <button
-                      onClick={() => handlePlay(version)}
+                      onClick={() => handlePlay(index)}
                       className="text-pink-400 hover:text-pink-300 p-1.5"
                       title="播放"
                     >

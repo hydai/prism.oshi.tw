@@ -27,52 +27,34 @@ function formatRelativeTime(playedAt: number): string {
 
 export default function RecentlyPlayedPanel({ show, onClose, onToast }: RecentlyPlayedPanelProps) {
   const { recentPlays, clearHistory } = useRecentlyPlayed();
-  const { playTrack, addToQueue } = usePlayer();
+  const { playTrackWithQueue, addToQueue } = usePlayer();
   const { slug } = useStreamer();
+
+  const toTrack = (r: typeof recentPlays[0]): Track => ({
+    id: r.performanceId,
+    songId: r.performanceId,
+    title: r.songTitle,
+    originalArtist: r.originalArtist,
+    videoId: r.videoId,
+    timestamp: r.timestamp,
+    endTimestamp: r.endTimestamp,
+    albumArtUrl: r.albumArtUrl,
+    streamerSlug: slug,
+  });
 
   const handlePlayAll = () => {
     if (recentPlays.length === 0) return;
-    const tracks: Track[] = recentPlays.map(r => ({
-      id: r.performanceId,
-      songId: r.performanceId,
-      title: r.songTitle,
-      originalArtist: r.originalArtist,
-      videoId: r.videoId,
-      timestamp: r.timestamp,
-      endTimestamp: r.endTimestamp,
-      albumArtUrl: r.albumArtUrl,
-      streamerSlug: slug,
-    }));
-    playTrack(tracks[0]);
-    tracks.slice(1).forEach(t => addToQueue(t));
+    const tracks = recentPlays.map(toTrack);
+    playTrackWithQueue(tracks[0], tracks.slice(1));
   };
 
-  const handlePlay = (r: typeof recentPlays[0]) => {
-    playTrack({
-      id: r.performanceId,
-      songId: r.performanceId,
-      title: r.songTitle,
-      originalArtist: r.originalArtist,
-      videoId: r.videoId,
-      timestamp: r.timestamp,
-      endTimestamp: r.endTimestamp,
-      albumArtUrl: r.albumArtUrl,
-      streamerSlug: slug,
-    });
+  const handlePlay = (index: number) => {
+    const tracks = recentPlays.map(toTrack);
+    playTrackWithQueue(tracks[index], tracks.slice(index + 1));
   };
 
   const handleAddToQueue = (r: typeof recentPlays[0]) => {
-    addToQueue({
-      id: r.performanceId,
-      songId: r.performanceId,
-      title: r.songTitle,
-      originalArtist: r.originalArtist,
-      videoId: r.videoId,
-      timestamp: r.timestamp,
-      endTimestamp: r.endTimestamp,
-      albumArtUrl: r.albumArtUrl,
-      streamerSlug: slug,
-    });
+    addToQueue(toTrack(r));
     onToast?.('已加入待播清單');
   };
 
@@ -111,7 +93,7 @@ export default function RecentlyPlayedPanel({ show, onClose, onToast }: Recently
         ) : (
           <>
             <div className="space-y-2" data-testid="recently-played-list">
-              {recentPlays.map((entry) => (
+              {recentPlays.map((entry, index) => (
                 <div
                   key={`${entry.performanceId}-${entry.playedAt}`}
                   className="bg-white/5 rounded-lg p-3 flex items-center gap-3 group hover:bg-white/10 transition-colors"
@@ -135,7 +117,7 @@ export default function RecentlyPlayedPanel({ show, onClose, onToast }: Recently
                   </div>
                   <div className="flex items-center gap-1 lg:opacity-0 lg:group-hover:opacity-100 transition-opacity">
                     <button
-                      onClick={() => handlePlay(entry)}
+                      onClick={() => handlePlay(index)}
                       className="text-pink-400 hover:text-pink-300 p-1.5"
                       title="播放"
                     >
