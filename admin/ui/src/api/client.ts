@@ -42,6 +42,16 @@ import type {
   BulkFetchSubscribersResponse,
 } from '../../../shared/types';
 import { REQUEST_AUTHENTICITY_HEADER, REQUEST_AUTHENTICITY_VALUE } from '../../../shared/csrf';
+import type {
+  VodExportCandidateResponse,
+  VodExportCapacityDiagnostic,
+  VodExportDownload,
+  VodExportPreviewResponse,
+  VodExportPublishResponse,
+  VodExportReconcileResponse,
+  VodExportRepairRecord,
+  VodExportStatusResponse,
+} from './vodExportTypes';
 
 // --- Streamer selection (module-level) ---
 
@@ -71,10 +81,47 @@ class ApiError extends Error {
   constructor(
     public status: number,
     message: string,
+    public code?: string,
+    public diagnostics: VodExportCapacityDiagnostic[] = [],
   ) {
     super(message);
     this.name = 'ApiError';
   }
+}
+
+function isCapacityDiagnostic(value: unknown): value is VodExportCapacityDiagnostic {
+  if (!value || typeof value !== 'object') return false;
+  const item = value as Record<string, unknown>;
+  return (
+    typeof item.resource === 'string' &&
+    typeof item.actual === 'number' &&
+    typeof item.limit === 'number' &&
+    typeof item.ratio === 'number' &&
+    (item.state === 'ok' || item.state === 'warning' || item.state === 'exceeded')
+  );
+}
+
+async function responseError(res: Response): Promise<ApiError> {
+  const body = await res.text().catch(() => '');
+  let message = body || res.statusText;
+  let code: string | undefined;
+  let diagnostics: VodExportCapacityDiagnostic[] = [];
+
+  try {
+    const json = JSON.parse(body) as Record<string, unknown>;
+    if (typeof json.error === 'string') message = json.error;
+    if (typeof json.code === 'string') code = json.code;
+    const rawDiagnostics = Array.isArray(json.diagnostics)
+      ? json.diagnostics
+      : Array.isArray(json.capacity)
+        ? json.capacity
+        : [];
+    diagnostics = rawDiagnostics.filter(isCapacityDiagnostic);
+  } catch {
+    // The existing APIs are also allowed to return a plain-text error.
+  }
+
+  return new ApiError(res.status, message, code, diagnostics);
 }
 
 /** Inject ?streamer= into all /api/ paths */
@@ -100,19 +147,33 @@ async function request<T>(
   });
 
   if (!res.ok) {
-    const body = await res.text().catch(() => '');
-    // Try to extract JSON error message
-    let message = body || res.statusText;
-    try {
-      const json = JSON.parse(body);
-      if (json.error) message = json.error;
-    } catch {
-      // Use raw body
-    }
-    throw new ApiError(res.status, message);
+    throw await responseError(res);
   }
 
   return res.json() as Promise<T>;
+}
+
+async function downloadCandidate(candidateId: string, sha256: string): Promise<VodExportDownload> {
+  const res = await fetch(
+    `/api/vod-export/candidates/${encodeURIComponent(candidateId)}/download`,
+    {
+      credentials: 'same-origin',
+      headers: {
+        [REQUEST_AUTHENTICITY_HEADER]: REQUEST_AUTHENTICITY_VALUE,
+      },
+    },
+  );
+
+  if (!res.ok) throw await responseError(res);
+
+  const fallback = `vod-export-v1-${sha256}.json`;
+  const disposition = res.headers.get('Content-Disposition') ?? '';
+  const headerFilename = disposition.match(/filename="(vod-export-v1-[0-9a-f]{64}\.json)"/i)?.[1];
+
+  return {
+    blob: await res.blob(),
+    filename: headerFilename?.toLowerCase() ?? fallback,
+  };
 }
 
 export const api = {
@@ -296,9 +357,10 @@ export const api = {
     }),
 
   // Nova submissions
-  listNovaSubmissions: (params?: { status?: string }) => {
+  listNovaSubmissions: (params?: { status?: string; search?: string }) => {
     const sp = new URLSearchParams();
     if (params?.status) sp.set('status', params.status);
+    if (params?.search) sp.set('search', params.search);
     const qs = sp.toString();
     return request<ListResponse<NovaSubmission>>(
       `/api/nova/submissions${qs ? `?${qs}` : ''}`,
@@ -326,6 +388,11 @@ export const api = {
 
   fetchNovaSubscribers: (id: string) =>
     request<NovaSubmission>(`/api/nova/submissions/${id}/fetch-subscribers`, {
+      method: 'POST',
+    }),
+
+  verifyNovaYoutubeChannel: (id: string) =>
+    request<NovaSubmission>(`/api/nova/submissions/${id}/verify-youtube-channel`, {
       method: 'POST',
     }),
 
@@ -417,6 +484,50 @@ export const api = {
       method: 'POST',
       body: JSON.stringify(body),
     }),
+
+  // VOD export (curator-only, global rather than per-streamer)
+  vodExportStatus: () =>
+    request<VodExportStatusResponse>('/api/vod-export/status', undefined, {
+      skipStreamer: true,
+    }),
+
+  generateVodExportPreview: () =>
+    request<VodExportPreviewResponse>(
+      '/api/vod-export/preview',
+      { method: 'POST' },
+      { skipStreamer: true },
+    ),
+
+  getVodExportCandidate: (candidateId: string) =>
+    request<VodExportCandidateResponse>(
+      `/api/vod-export/candidates/${encodeURIComponent(candidateId)}`,
+      undefined,
+      { skipStreamer: true },
+    ),
+
+  getVodExportRepairRecord: (entity: 'performance' | 'song' | 'vod' | 'streamer', rowId: number) =>
+    request<VodExportRepairRecord>(
+      `/api/vod-export/repair/${entity}/${rowId}`,
+      undefined,
+      { skipStreamer: true },
+    ),
+
+  downloadVodExportCandidate: (candidateId: string, sha256: string) =>
+    downloadCandidate(candidateId, sha256),
+
+  publishVodExportCandidate: (candidateId: string) =>
+    request<VodExportPublishResponse>(
+      `/api/vod-export/candidates/${encodeURIComponent(candidateId)}/publish`,
+      { method: 'POST' },
+      { skipStreamer: true },
+    ),
+
+  reconcileVodExportPublication: () =>
+    request<VodExportReconcileResponse>(
+      '/api/vod-export/reconcile',
+      { method: 'POST' },
+      { skipStreamer: true },
+    ),
 };
 
 export { ApiError };

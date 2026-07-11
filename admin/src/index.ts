@@ -52,7 +52,23 @@ import { parseTextToSongs } from '../shared/parse';
 import { formatSubscriberCount } from '../shared/format';
 import { feedbackEmbedForSubmission, feedbackEmbedForVod, postDiscord } from '../shared/discord';
 import { sanitizeNovaUrl, type NovaUrlProvider } from '../shared/nova-url-safety';
-import { discoverStreams, getVideoDetails, fetchComments, findCandidateComment, countTimestamps, fetchChannelInfo } from './youtube';
+import { discoverStreams, getVideoDetails, fetchComments, findCandidateComment, countTimestamps, fetchChannelInfo, verifyChannelId } from './youtube';
+import {
+  downloadVodExportCandidate,
+  generateVodExportPreviewApi,
+  getVodExportCandidateApi,
+  getVodExportRepairRecord,
+  normalizeVodExportError,
+} from './vod-export/api';
+import {
+  getVodExportStatus,
+  inspectVodExportControlRecoveryState,
+  manuallyRecoverVodExportControl,
+  publishVodExportCandidate,
+  reconcileVodExportPublication,
+  requireExporterBuildId,
+} from './vod-export/publication';
+import { runVodExportMaintenance } from './vod-export/maintenance';
 import type {
   AuthUser,
   CreateSongBody,
@@ -98,13 +114,26 @@ type Bindings = {
   CURATOR_EMAILS: string;
   YOUTUBE_API_KEY: string;
   DISCORD_WEBHOOK_FEEDBACK?: string; // optional: feature no-ops when the secret is unset
+  VOD_EXPORT_PUBLIC: R2Bucket;
+  VOD_EXPORT_PRIVATE: R2Bucket;
+  VOD_EXPORT_DB_ID: string;
+  VOD_EXPORT_NOVA_DB_ID: string;
+  CF_VERSION_METADATA: WorkerVersionMetadata;
 };
 
 type Variables = {
   user: AuthUser;
 };
 
-type NovaUpdateBody = Partial<Omit<NovaSubmission, 'id' | 'status' | 'submitted_at' | 'reviewed_at'>>;
+type NovaUpdateBody = Partial<Omit<
+  NovaSubmission,
+  | 'id'
+  | 'status'
+  | 'submitted_at'
+  | 'reviewed_at'
+  | 'youtube_channel_verified_id'
+  | 'youtube_channel_verified_at'
+>>;
 
 const novaUrlFields = [
   ['youtube_channel_url', 'youtube'],
@@ -143,6 +172,31 @@ function validateNovaUrlUpdates(body: NovaUpdateBody): string | null {
 
 function isNovaUpdateBody(value: unknown): value is NovaUpdateBody {
   return typeof value === 'object' && value !== null && !Array.isArray(value);
+}
+
+function hasCurrentChannelVerification(value: {
+  youtube_channel_id: string;
+  youtube_channel_verified_id: string | null;
+  youtube_channel_verified_at: string | null;
+}): boolean {
+  if (
+    value.youtube_channel_verified_id !== value.youtube_channel_id
+    || value.youtube_channel_verified_at === null
+    || !/^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}\.\d{3}Z$/.test(value.youtube_channel_verified_at)
+  ) return false;
+  const parsed = Date.parse(value.youtube_channel_verified_at);
+  return Number.isFinite(parsed) && new Date(parsed).toISOString() === value.youtube_channel_verified_at;
+}
+
+function vodExportErrorResponse(error: unknown): Response {
+  const normalized = normalizeVodExportError(error);
+  return new Response(JSON.stringify(normalized.body), {
+    status: normalized.status,
+    headers: {
+      'Content-Type': 'application/json; charset=utf-8',
+      'Cache-Control': 'private, no-store',
+    },
+  });
 }
 
 const app = new Hono<{ Bindings: Bindings; Variables: Variables }>();
@@ -351,7 +405,8 @@ app.patch('/api/performances/:id/status', requireCurator, async (c) => {
 app.get('/api/streams', async (c) => {
   const streamerId = getStreamerId(c);
   const status = c.req.query('status');
-  const streams = await listStreams(c.env.DB, streamerId, status);
+  const search = c.req.query('search');
+  const streams = await listStreams(c.env.DB, streamerId, status, search);
   return c.json({ data: streams, total: streams.length });
 });
 
@@ -673,6 +728,116 @@ app.get('/api/export/streams', requireCurator, async (c) => {
   return c.json(streams);
 });
 
+// --- VOD snapshot publication workflow (all operations remain curator-only) ---
+
+app.use('/api/vod-export/*', async (c, next) => {
+  await next();
+  c.header('Cache-Control', 'private, no-store');
+});
+
+app.get('/api/vod-export/status', requireCurator, async (c) => {
+  try {
+    const buildId = requireExporterBuildId(c.env.CF_VERSION_METADATA);
+    return c.json(await getVodExportStatus(c.env, buildId));
+  } catch (error) {
+    return vodExportErrorResponse(error);
+  }
+});
+
+app.post('/api/vod-export/preview', requireCurator, async (c) => {
+  try {
+    const buildId = requireExporterBuildId(c.env.CF_VERSION_METADATA);
+    return c.json(await generateVodExportPreviewApi(c.env, buildId));
+  } catch (error) {
+    return vodExportErrorResponse(error);
+  }
+});
+
+app.get('/api/vod-export/candidates/:id/download', requireCurator, async (c) => {
+  try {
+    return await downloadVodExportCandidate(c.env, getRouteParam(c, 'id'));
+  } catch (error) {
+    return vodExportErrorResponse(error);
+  }
+});
+
+app.get('/api/vod-export/candidates/:id', requireCurator, async (c) => {
+  try {
+    const buildId = requireExporterBuildId(c.env.CF_VERSION_METADATA);
+    return c.json(await getVodExportCandidateApi(c.env, getRouteParam(c, 'id'), buildId));
+  } catch (error) {
+    return vodExportErrorResponse(error);
+  }
+});
+
+app.get('/api/vod-export/repair/:entity/:rowId', requireCurator, async (c) => {
+  try {
+    const entity = getRouteParam(c, 'entity');
+    if (entity !== 'performance' && entity !== 'song' && entity !== 'vod' && entity !== 'streamer') {
+      return c.json({ error: 'Repair record not found', code: 'VOD_EXPORT_REPAIR_RECORD_NOT_FOUND' }, 404);
+    }
+    const rowIdText = getRouteParam(c, 'rowId');
+    if (!/^[1-9][0-9]*$/.test(rowIdText)) {
+      return c.json({ error: 'Repair record not found', code: 'VOD_EXPORT_REPAIR_RECORD_NOT_FOUND' }, 404);
+    }
+    return c.json(await getVodExportRepairRecord(c.env, entity, Number(rowIdText)));
+  } catch (error) {
+    return vodExportErrorResponse(error);
+  }
+});
+
+app.post('/api/vod-export/candidates/:id/publish', requireCurator, async (c) => {
+  try {
+    const buildId = requireExporterBuildId(c.env.CF_VERSION_METADATA);
+    const result = await publishVodExportCandidate(
+      c.env,
+      getRouteParam(c, 'id'),
+      buildId,
+      c.get('user').email,
+    );
+    return c.json(result);
+  } catch (error) {
+    return vodExportErrorResponse(error);
+  }
+});
+
+app.post('/api/vod-export/reconcile', requireCurator, async (c) => {
+  try {
+    return c.json(await reconcileVodExportPublication(c.env));
+  } catch (error) {
+    return vodExportErrorResponse(error);
+  }
+});
+
+app.get('/api/vod-export/control-recovery', requireCurator, async (c) => {
+  try {
+    return c.json(await inspectVodExportControlRecoveryState(c.env.VOD_EXPORT_PRIVATE));
+  } catch (error) {
+    return vodExportErrorResponse(error);
+  }
+});
+
+app.post('/api/vod-export/control-recovery', requireCurator, async (c) => {
+  try {
+    const body = await c.req.json<unknown>().catch(() => null);
+    return c.json(await manuallyRecoverVodExportControl(
+      c.env,
+      body,
+      c.get('user').email,
+    ));
+  } catch (error) {
+    return vodExportErrorResponse(error);
+  }
+});
+
+app.post('/api/vod-export/maintenance', requireCurator, async (c) => {
+  try {
+    return c.json(await runVodExportMaintenance(c.env));
+  } catch (error) {
+    return vodExportErrorResponse(error);
+  }
+});
+
 // --- Pipeline: Discover streams from YouTube ---
 
 app.post('/api/pipeline/discover', requireCurator, async (c) => {
@@ -969,12 +1134,20 @@ app.post('/api/harmonize/apply', requireCurator, async (c) => {
 
 app.get('/api/nova/submissions', requireCurator, async (c) => {
   const status = c.req.query('status');
+  const search = c.req.query('search');
   let query = 'SELECT * FROM submissions';
+  const conditions: string[] = [];
   const binds: string[] = [];
   if (status) {
-    query += ' WHERE status = ?';
+    conditions.push('status = ?');
     binds.push(status);
   }
+  if (search) {
+    conditions.push('(id LIKE ? OR slug LIKE ? OR display_name LIKE ? OR youtube_channel_id LIKE ?)');
+    const pattern = `%${search}%`;
+    binds.push(pattern, pattern, pattern, pattern);
+  }
+  if (conditions.length > 0) query += ` WHERE ${conditions.join(' AND ')}`;
   query += ' ORDER BY submitted_at DESC';
 
   const result = await c.env.NOVA_DB
@@ -1009,11 +1182,27 @@ app.post('/api/nova/submissions/fetch-all-subscribers', requireCurator, async (c
         failed++;
         continue;
       }
+      if (info.channelId !== sub.youtube_channel_id) {
+        results.push({ id: sub.id, display_name: sub.display_name, subscriber_count: null, avatar_url: null, error: 'Channel identity mismatch' });
+        failed++;
+        continue;
+      }
       const formatted = formatSubscriberCount(info.subscriberCount);
-      await c.env.NOVA_DB
-        .prepare('UPDATE submissions SET subscriber_count = ?, avatar_url = ? WHERE id = ?')
-        .bind(formatted, info.avatarUrl, sub.id)
+      const verifiedAt = new Date().toISOString();
+      const update = await c.env.NOVA_DB
+        .prepare(`
+          UPDATE submissions
+          SET subscriber_count = ?, avatar_url = ?,
+              youtube_channel_verified_id = ?, youtube_channel_verified_at = ?
+          WHERE id = ? AND youtube_channel_id = ?
+        `)
+        .bind(formatted, info.avatarUrl, info.channelId, verifiedAt, sub.id, sub.youtube_channel_id)
         .run();
+      if ((update.meta.changes ?? 0) !== 1) {
+        results.push({ id: sub.id, display_name: sub.display_name, subscriber_count: null, avatar_url: null, error: 'Channel ID changed during refresh' });
+        failed++;
+        continue;
+      }
       results.push({ id: sub.id, display_name: sub.display_name, subscriber_count: formatted, avatar_url: info.avatarUrl });
       updated++;
     } catch (err) {
@@ -1024,6 +1213,56 @@ app.post('/api/nova/submissions/fetch-all-subscribers', requireCurator, async (c
   }
 
   return c.json<BulkFetchSubscribersResponse>({ updated, failed, results });
+});
+
+// POST /api/nova/submissions/:id/verify-youtube-channel — verify an existing
+// migrated ID without requiring a meaningless edit to that opaque value.
+app.post('/api/nova/submissions/:id/verify-youtube-channel', requireCurator, async (c) => {
+  const id = getRouteParam(c, 'id');
+  const sub = await c.env.NOVA_DB
+    .prepare('SELECT id, youtube_channel_id FROM submissions WHERE id = ?')
+    .bind(id)
+    .first<{ id: string; youtube_channel_id: string }>();
+  if (!sub) return c.json({ error: 'Submission not found' }, 404);
+  if (!sub.youtube_channel_id || sub.youtube_channel_id.trim().length === 0) {
+    return c.json({ error: 'Set a YouTube channel ID before verification' }, 400);
+  }
+  if (!c.env.YOUTUBE_API_KEY) {
+    return c.json({ error: 'YOUTUBE_API_KEY not configured for channel verification' }, 503);
+  }
+
+  let verifiedId: string | null;
+  try {
+    verifiedId = await verifyChannelId(c.env.YOUTUBE_API_KEY, sub.youtube_channel_id);
+  } catch (error) {
+    console.error(JSON.stringify({
+      event: 'nova_youtube_channel_verification_failed',
+      submissionId: id,
+      error: error instanceof Error ? error.message : 'Unknown error',
+    }));
+    return c.json({ error: 'YouTube channel verification is temporarily unavailable' }, 502);
+  }
+  if (verifiedId !== sub.youtube_channel_id) {
+    return c.json({ error: 'YouTube did not return the exact requested channel ID' }, 400);
+  }
+
+  const verifiedAt = new Date().toISOString();
+  const result = await c.env.NOVA_DB
+    .prepare(`
+      UPDATE submissions
+      SET youtube_channel_verified_id = ?, youtube_channel_verified_at = ?
+      WHERE id = ? AND youtube_channel_id = ?
+    `)
+    .bind(verifiedId, verifiedAt, id, sub.youtube_channel_id)
+    .run();
+  if ((result.meta.changes ?? 0) !== 1) {
+    return c.json({ error: 'YouTube channel ID changed during verification; retry the operation' }, 409);
+  }
+  const updated = await c.env.NOVA_DB
+    .prepare('SELECT * FROM submissions WHERE id = ?')
+    .bind(id)
+    .first<NovaSubmission>();
+  return c.json(updated);
 });
 
 app.get('/api/nova/submissions/:id', requireCurator, async (c) => {
@@ -1040,9 +1279,19 @@ app.get('/api/nova/submissions/:id', requireCurator, async (c) => {
 app.put('/api/nova/submissions/:id', requireCurator, async (c) => {
   const id = getRouteParam(c, 'id');
   const existing = await c.env.NOVA_DB
-    .prepare('SELECT id FROM submissions WHERE id = ?')
+    .prepare(`
+      SELECT id, youtube_channel_id, youtube_channel_verified_id,
+             youtube_channel_verified_at
+      FROM submissions
+      WHERE id = ?
+    `)
     .bind(id)
-    .first();
+    .first<{
+      id: string;
+      youtube_channel_id: string;
+      youtube_channel_verified_id: string | null;
+      youtube_channel_verified_at: string | null;
+    }>();
   if (!existing) return c.json({ error: 'Submission not found' }, 404);
 
   const parsedBody = await c.req.json<unknown>();
@@ -1056,8 +1305,43 @@ app.put('/api/nova/submissions/:id', requireCurator, async (c) => {
     return c.json({ error: urlError }, 400);
   }
 
+  let verifiedChannelId: string | null | undefined;
+  let channelVerifiedAt: string | null | undefined;
+  if (body.youtube_channel_id !== undefined) {
+    if (typeof body.youtube_channel_id !== 'string') {
+      return c.json({ error: 'youtube_channel_id must be a string' }, 400);
+    }
+    if (body.youtube_channel_id.trim().length === 0) {
+      body.youtube_channel_id = '';
+      verifiedChannelId = null;
+      channelVerifiedAt = null;
+    } else {
+      const verificationIsCurrent = body.youtube_channel_id === existing.youtube_channel_id
+        && hasCurrentChannelVerification(existing);
+      if (!verificationIsCurrent) {
+        if (!c.env.YOUTUBE_API_KEY) {
+          return c.json({ error: 'YOUTUBE_API_KEY not configured for channel verification' }, 503);
+        }
+        try {
+          verifiedChannelId = await verifyChannelId(c.env.YOUTUBE_API_KEY, body.youtube_channel_id);
+        } catch (error) {
+          console.error(JSON.stringify({
+            event: 'nova_youtube_channel_verification_failed',
+            submissionId: id,
+            error: error instanceof Error ? error.message : 'Unknown error',
+          }));
+          return c.json({ error: 'YouTube channel verification is temporarily unavailable' }, 502);
+        }
+        if (verifiedChannelId !== body.youtube_channel_id) {
+          return c.json({ error: 'YouTube did not return the exact requested channel ID' }, 400);
+        }
+        channelVerifiedAt = new Date().toISOString();
+      }
+    }
+  }
+
   const fields: string[] = [];
-  const values: Array<string | number> = [];
+  const values: Array<string | number | null> = [];
   const editable = [
     'youtube_channel_url', 'youtube_channel_id', 'slug', 'brand_name', 'display_name', 'description',
     'avatar_url', 'subscriber_count', 'link_youtube', 'link_twitter',
@@ -1077,6 +1361,11 @@ app.put('/api/nova/submissions/:id', requireCurator, async (c) => {
   if (body.youtube_channel_url !== undefined) {
     fields.push('"youtube_channel_url_normalized" = ?');
     values.push(body.youtube_channel_url.trim().toLowerCase());
+  }
+
+  if (verifiedChannelId !== undefined && channelVerifiedAt !== undefined) {
+    fields.push('"youtube_channel_verified_id" = ?', '"youtube_channel_verified_at" = ?');
+    values.push(verifiedChannelId, channelVerifiedAt);
   }
 
   if (fields.length === 0) {
@@ -1184,13 +1473,25 @@ app.post('/api/nova/submissions/:id/fetch-subscribers', requireCurator, async (c
   if (info === null) {
     return c.json({ error: 'Subscriber count is hidden or channel not found' }, 404);
   }
+  if (info.channelId !== sub.youtube_channel_id) {
+    return c.json({ error: 'YouTube returned a different channel identity' }, 409);
+  }
 
   const formatted = formatSubscriberCount(info.subscriberCount);
+  const verifiedAt = new Date().toISOString();
 
-  await c.env.NOVA_DB
-    .prepare('UPDATE submissions SET subscriber_count = ?, avatar_url = ? WHERE id = ?')
-    .bind(formatted, info.avatarUrl, id)
+  const update = await c.env.NOVA_DB
+    .prepare(`
+      UPDATE submissions
+      SET subscriber_count = ?, avatar_url = ?,
+          youtube_channel_verified_id = ?, youtube_channel_verified_at = ?
+      WHERE id = ? AND youtube_channel_id = ?
+    `)
+    .bind(formatted, info.avatarUrl, info.channelId, verifiedAt, id, sub.youtube_channel_id)
     .run();
+  if ((update.meta.changes ?? 0) !== 1) {
+    return c.json({ error: 'YouTube channel ID changed during refresh; retry the operation' }, 409);
+  }
 
   const updated = await c.env.NOVA_DB
     .prepare('SELECT * FROM submissions WHERE id = ?')

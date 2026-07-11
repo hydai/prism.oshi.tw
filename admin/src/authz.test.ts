@@ -58,12 +58,20 @@ const CONTRIBUTOR = 'attacker@example.com';
 
 function envFor(db: RecordingD1) {
   const d1 = db as unknown as D1Database;
+  const emptyR2 = {
+    get: async () => null,
+    put: async () => null,
+  } as unknown as R2Bucket;
   return {
     DB: d1,
     NOVA_DB: d1,
     CRYSTAL_DB: d1,
     CURATOR_EMAILS: CURATOR,
     YOUTUBE_API_KEY: '',
+    VOD_EXPORT_PUBLIC: emptyR2,
+    VOD_EXPORT_PRIVATE: emptyR2,
+    VOD_EXPORT_DB_ID: 'test-db',
+    VOD_EXPORT_NOVA_DB_ID: 'test-nova-db',
   };
 }
 
@@ -100,6 +108,16 @@ const PROTECTED_ROUTES: Route[] = [
   { method: 'POST', path: '/api/streams/stream-1/paste-import', body: { text: 'Song - Artist 0:10', replace: true } },
   { method: 'DELETE', path: '/api/streams/stream-1/end-timestamps' },
   { method: 'POST', path: '/api/performances/perf-1/fetch-duration' },
+  { method: 'GET', path: '/api/vod-export/status' },
+  { method: 'POST', path: '/api/vod-export/preview' },
+  { method: 'GET', path: '/api/vod-export/candidates/00000000-0000-4000-8000-000000000000' },
+  { method: 'GET', path: '/api/vod-export/candidates/00000000-0000-4000-8000-000000000000/download' },
+  { method: 'GET', path: '/api/vod-export/repair/performance/1' },
+  { method: 'POST', path: '/api/vod-export/candidates/00000000-0000-4000-8000-000000000000/publish' },
+  { method: 'POST', path: '/api/vod-export/reconcile' },
+  { method: 'GET', path: '/api/vod-export/control-recovery' },
+  { method: 'POST', path: '/api/vod-export/control-recovery', body: {} },
+  { method: 'POST', path: '/api/vod-export/maintenance' },
 ];
 
 async function testContributorBlockedFromStampMutations(): Promise<void> {
@@ -162,12 +180,27 @@ async function testContributorRetainsReadOnlyStampAccess(): Promise<void> {
   assert(res.status !== 403, `contributor should keep read-only stamp access, got ${res.status}`);
 }
 
+async function testVodExportMutationRequiresAuthenticityHeader(): Promise<void> {
+  const db = new RecordingD1();
+  const res = await app.request(
+    '/api/vod-export/preview',
+    {
+      method: 'POST',
+      headers: { 'CF-Access-Authenticated-User-Email': CURATOR },
+    },
+    envFor(db),
+  );
+  assertEqual(res.status, 403, 'curator VOD export mutation without the CSRF authenticity header is blocked');
+  assertEqual(db.prepareCalls, 0, 'CSRF-blocked VOD export mutation never reaches D1');
+}
+
 async function main(): Promise<void> {
   await testContributorStillAuthenticates();
   await testContributorRetainsReadOnlyStampAccess();
   await testCuratorPassesAuthorization();
   await testContributorBlockedFromStampMutations();
-  console.log('✓ stamp-editor mutations are curator-only; contributors keep auth + read-only access');
+  await testVodExportMutationRequiresAuthenticityHeader();
+  console.log('✓ curator-only Admin mutations and VOD export CSRF boundaries');
 }
 
 main().catch((error: unknown) => {

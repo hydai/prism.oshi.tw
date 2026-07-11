@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef, useCallback, useMemo } from 'react';
-import { useParams, useNavigate, Link } from 'react-router-dom';
+import { useParams, useNavigate, Link, useSearchParams } from 'react-router-dom';
 import type { AuthUser, StreamDetail as StreamDetailType, StampPerformance, Status, Stream } from '../../../shared/types';
 import { api } from '../api/client';
 import StatusBadge from '../components/StatusBadge';
@@ -246,6 +246,8 @@ type EditingField =
 
 export default function StreamDetail({ user }: { user: AuthUser }) {
   const { id: streamId } = useParams<{ id: string }>();
+  const [initialParams] = useSearchParams();
+  const requestedPerformanceId = initialParams.get('performance');
   const navigate = useNavigate();
   const [detail, setDetail] = useState<StreamDetailType | null>(null);
   const [loading, setLoading] = useState(true);
@@ -323,6 +325,10 @@ export default function StreamDetail({ user }: { user: AuthUser }) {
       setDetail(d);
       setSelectedIndex(prev => {
         if (d.performances.length === 0) return -1;
+        if (requestedPerformanceId) {
+          const requestedIndex = d.performances.findIndex((performance) => performance.id === requestedPerformanceId);
+          if (requestedIndex >= 0) return requestedIndex;
+        }
         if (prev < 0) return 0;
         return Math.min(prev, d.performances.length - 1);
       });
@@ -331,9 +337,19 @@ export default function StreamDetail({ user }: { user: AuthUser }) {
     } finally {
       setLoading(false);
     }
-  }, [streamId]);
+  }, [requestedPerformanceId, streamId]);
 
   useEffect(() => { loadDetail(); }, [loadDetail]);
+
+  useEffect(() => {
+    if (!detail || !requestedPerformanceId) return;
+    const frame = window.requestAnimationFrame(() => {
+      document.getElementById(`performance-row-${requestedPerformanceId}`)?.scrollIntoView({
+        block: 'center',
+      });
+    });
+    return () => window.cancelAnimationFrame(frame);
+  }, [detail, requestedPerformanceId]);
 
   // --- Optimistic update helper ---
   const updatePerformance = useCallback((index: number, updates: Partial<StampPerformance>) => {
@@ -963,7 +979,7 @@ export default function StreamDetail({ user }: { user: AuthUser }) {
             </thead>
             <tbody className="divide-y divide-slate-100">
               {detail.performances.map((perf, i) => (
-                <tr key={perf.id}
+                <tr key={perf.id} id={`performance-row-${perf.id}`}
                   onClick={() => { setSelectedIndex(i); setEditingField(null); }}
                   className={`cursor-pointer transition-colors hover:bg-slate-50 ${
                     i === selectedIndex ? 'border-l-2 border-l-blue-500 bg-blue-50' : ''

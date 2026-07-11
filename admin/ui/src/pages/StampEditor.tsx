@@ -9,6 +9,7 @@ import type { OutcomeTone } from '../lib/itunes';
 import { FetchLogPanel } from '../components/FetchLogPanel';
 import type { FetchLogEntry } from '../components/FetchLogPanel';
 import { FloatingPlaybackPill } from '../components/FloatingPlaybackPill';
+import { useSearchParams } from 'react-router-dom';
 
 // --- Helpers ---
 
@@ -328,6 +329,9 @@ interface EditingField {
 }
 
 export default function StampEditor({ user }: { user: AuthUser }) {
+  const [initialParams] = useSearchParams();
+  const requestedStreamId = initialParams.get('stream');
+  const requestedPerformanceId = initialParams.get('performance');
   // Stream state
   const [streams, setStreams] = useState<StreamWithPending[]>([]);
   const [streamSearch, setStreamSearch] = useState('');
@@ -418,6 +422,18 @@ export default function StampEditor({ user }: { user: AuthUser }) {
     },
     [loadPerformances],
   );
+
+  useEffect(() => {
+    if (!requestedStreamId || selectedStreamId !== null) return;
+    const requested = streams.find((stream) => stream.id === requestedStreamId);
+    if (requested) selectStream(requested);
+  }, [requestedStreamId, selectedStreamId, selectStream, streams]);
+
+  useEffect(() => {
+    if (!requestedPerformanceId || selectedStreamId !== requestedStreamId) return;
+    const index = performances.findIndex((performance) => performance.id === requestedPerformanceId);
+    if (index >= 0) setSelectedIndex(index);
+  }, [performances, requestedPerformanceId, requestedStreamId, selectedStreamId]);
 
   // --- Actions ---
 

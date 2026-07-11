@@ -1,7 +1,7 @@
 import { useEffect, useState, useMemo } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useSearchParams } from 'react-router-dom';
 import type { Stream, AuthUser, Status } from '../../../shared/types';
-import { api } from '../api/client';
+import { api, getCurrentStreamer, setCurrentStreamer } from '../api/client';
 import StatusBadge from '../components/StatusBadge';
 import { loadStreamsFilter, saveStreamsFilter, resolveYear } from '../lib/streamsFilter';
 
@@ -46,11 +46,18 @@ function FilterPill({
 }
 
 export default function StreamsList({ user }: { user: AuthUser }) {
+  const [initialParams] = useSearchParams();
+  const requestedStreamer = initialParams.get('streamer');
   const [streams, setStreams] = useState<Stream[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const [search, setSearch] = useState('');
-  const [statusFilter, setStatusFilter] = useState<'' | Status>(() => loadStreamsFilter().status);
+  const [search, setSearch] = useState(() => initialParams.get('search') ?? '');
+  const [statusFilter, setStatusFilter] = useState<'' | Status>(() => {
+    const requested = initialParams.get('status');
+    return STATUS_FILTERS.some((item) => item.value === requested)
+      ? requested as '' | Status
+      : loadStreamsFilter().status;
+  });
   const [yearFilter, setYearFilter] = useState<string>(() => loadStreamsFilter().year);
   const [sortKey, setSortKey] = useState<SortKey>('date');
   const [sortDir, setSortDir] = useState<SortDir>('desc');
@@ -66,6 +73,12 @@ export default function StreamsList({ user }: { user: AuthUser }) {
       .catch((err: unknown) => setError(err instanceof Error ? err.message : 'Failed to load'))
       .finally(() => setLoading(false));
   };
+
+  useEffect(() => {
+    if (requestedStreamer && requestedStreamer !== getCurrentStreamer()) {
+      setCurrentStreamer(requestedStreamer);
+    }
+  }, [requestedStreamer]);
 
   useEffect(() => {
     fetchStreams();

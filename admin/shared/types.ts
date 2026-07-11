@@ -362,6 +362,8 @@ export interface NovaSubmission {
   id: string;
   youtube_channel_url: string;
   youtube_channel_id: string;
+  youtube_channel_verified_id: string | null;
+  youtube_channel_verified_at: string | null;
   slug: string;
   brand_name: string;
   display_name: string;

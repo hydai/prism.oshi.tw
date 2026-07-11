@@ -3,6 +3,7 @@ import type { AuthUser, NovaSubmission, NovaStatus, BulkFetchSubscribersResponse
 import { sanitizeNovaUrl } from '../../../shared/nova-url-safety';
 import { api } from '../api/client';
 import StatusBadge from '../components/StatusBadge';
+import { useSearchParams } from 'react-router-dom';
 
 type EditableKey =
   | 'display_name' | 'slug' | 'brand_name' | 'youtube_channel_url' | 'youtube_channel_id'
@@ -51,11 +52,24 @@ function parseThemeJson(json: string): ThemeColors {
   }
 }
 
+function isCanonicalUtcTimestamp(value: string | null): value is string {
+  if (value === null || !/^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}\.\d{3}Z$/.test(value)) return false;
+  const timestamp = Date.parse(value);
+  return Number.isFinite(timestamp) && new Date(timestamp).toISOString() === value;
+}
+
 export default function NovaSubmissions({ user }: { user: AuthUser }) {
+  const [initialParams] = useSearchParams();
   const [submissions, setSubmissions] = useState<NovaSubmission[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const [statusFilter, setStatusFilter] = useState<'' | NovaStatus>('pending');
+  const [statusFilter, setStatusFilter] = useState<'' | NovaStatus>(() => {
+    const requested = initialParams.get('status');
+    return requested === 'approved' || requested === 'rejected' || requested === 'pending'
+      ? requested
+      : 'pending';
+  });
+  const [search, setSearch] = useState(() => initialParams.get('search') ?? '');
   const [expandedId, setExpandedId] = useState<string | null>(null);
   const [rejectNote, setRejectNote] = useState<Record<string, string>>({});
   const [actionLoading, setActionLoading] = useState<string | null>(null);
@@ -65,7 +79,7 @@ export default function NovaSubmissions({ user }: { user: AuthUser }) {
   const fetchSubmissions = () => {
     setLoading(true);
     api
-      .listNovaSubmissions({ status: statusFilter || undefined })
+      .listNovaSubmissions({ status: statusFilter || undefined, search: search || undefined })
       .then((res) => setSubmissions(res.data))
       .catch((err: unknown) => setError(err instanceof Error ? err.message : 'Failed to load'))
       .finally(() => setLoading(false));
@@ -146,6 +160,24 @@ export default function NovaSubmissions({ user }: { user: AuthUser }) {
           <option value="approved">Approved</option>
           <option value="rejected">Rejected</option>
         </select>
+        <form
+          className="flex gap-2"
+          onSubmit={(event) => {
+            event.preventDefault();
+            fetchSubmissions();
+          }}
+        >
+          <input
+            type="search"
+            value={search}
+            onChange={(event) => setSearch(event.target.value)}
+            placeholder="Search ID, slug, channel..."
+            className="rounded-md border border-slate-300 px-3 py-1.5 text-sm"
+          />
+          <button type="submit" className="rounded bg-slate-200 px-3 py-1.5 text-xs font-medium text-slate-700">
+            Search
+          </button>
+        </form>
         {isCurator && (
           <button
             disabled={fetchingAll || loading}
@@ -261,6 +293,8 @@ export function SubmissionRow({
   const [saveError, setSaveError] = useState<string | null>(null);
   const [fetchingSubs, setFetchingSubs] = useState(false);
   const [fetchSubsError, setFetchSubsError] = useState<string | null>(null);
+  const [verifyingChannel, setVerifyingChannel] = useState(false);
+  const [verificationError, setVerificationError] = useState<string | null>(null);
 
   // Reset draft when submission changes (e.g. after save or status change)
   useEffect(() => {
@@ -333,6 +367,24 @@ export function SubmissionRow({
       setFetchingSubs(false);
     }
   };
+
+  const handleVerifyChannel = async () => {
+    setVerifyingChannel(true);
+    setVerificationError(null);
+    try {
+      onSave(await api.verifyNovaYoutubeChannel(sub.id));
+    } catch (err) {
+      setVerificationError(err instanceof Error ? err.message : 'Channel verification failed');
+    } finally {
+      setVerifyingChannel(false);
+    }
+  };
+
+  const channelVerified = Boolean(
+    sub.youtube_channel_id
+    && sub.youtube_channel_verified_id === sub.youtube_channel_id
+    && isCanonicalUtcTimestamp(sub.youtube_channel_verified_at),
+  );
 
   const youtubeChannelUrl = sanitizeNovaUrl(sub.youtube_channel_url, 'youtube');
   const avatarUrl = expanded && !editing ? sanitizeNovaUrl(sub.avatar_url, 'image') : null;
@@ -421,12 +473,22 @@ export function SubmissionRow({
             {isCurator && (
               <div className="mb-3 flex items-center gap-2">
                 {!editing ? (
-                  <button
-                    onClick={() => setEditing(true)}
-                    className="rounded bg-slate-700 px-3 py-1 text-xs font-medium text-white hover:bg-slate-800"
-                  >
-                    Edit
-                  </button>
+                  <>
+                    <button
+                      onClick={() => setEditing(true)}
+                      className="rounded bg-slate-700 px-3 py-1 text-xs font-medium text-white hover:bg-slate-800"
+                    >
+                      Edit
+                    </button>
+                    <button
+                      type="button"
+                      disabled={verifyingChannel || !sub.youtube_channel_id || channelVerified}
+                      onClick={handleVerifyChannel}
+                      className="rounded bg-indigo-600 px-3 py-1 text-xs font-medium text-white hover:bg-indigo-700 disabled:cursor-not-allowed disabled:opacity-50"
+                    >
+                      {verifyingChannel ? 'Verifying...' : channelVerified ? 'Channel verified' : 'Verify channel'}
+                    </button>
+                  </>
                 ) : (
                   <>
                     <button
@@ -446,6 +508,7 @@ export function SubmissionRow({
                   </>
                 )}
                 {saveError && <span className="text-xs text-red-600">{saveError}</span>}
+                {verificationError && <span className="text-xs text-red-600">{verificationError}</span>}
               </div>
             )}
 
@@ -578,6 +641,10 @@ export function SubmissionRow({
                       )}
                     </DetailField>
                     <DetailField label="YouTube Channel ID" value={sub.youtube_channel_id} />
+                    <DetailField
+                      label="Channel verification"
+                      value={channelVerified ? `Verified ${sub.youtube_channel_verified_at}` : 'Not verified'}
+                    />
                     <DetailField label="Description" value={sub.description} />
                     <DetailField label="Subscriber Count" value={sub.subscriber_count} />
 

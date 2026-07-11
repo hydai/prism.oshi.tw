@@ -313,10 +313,24 @@ export async function listStreams(
   db: D1Database,
   streamerId: string,
   status?: string,
+  search?: string,
 ): Promise<Stream[]> {
-  const query = status
-    ? db.prepare('SELECT * FROM streams WHERE streamer_id = ? AND status = ? ORDER BY date DESC').bind(streamerId, status)
-    : db.prepare('SELECT * FROM streams WHERE streamer_id = ? ORDER BY date DESC').bind(streamerId);
+  const conditions = ['streamer_id = ?'];
+  const values: string[] = [streamerId];
+  if (status) {
+    conditions.push('status = ?');
+    values.push(status);
+  }
+  if (search) {
+    conditions.push('(id LIKE ? OR video_id LIKE ? OR title LIKE ?)');
+    const pattern = `%${search}%`;
+    values.push(pattern, pattern, pattern);
+  }
+  const query = db.prepare(`
+    SELECT * FROM streams
+    WHERE ${conditions.join(' AND ')}
+    ORDER BY date DESC
+  `).bind(...values);
   const { results } = await query.all<StreamRow>();
   return results.map(streamFromRow);
 }

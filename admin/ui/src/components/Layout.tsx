@@ -3,7 +3,7 @@ import { useEffect, useState, type ReactNode } from 'react';
 import type { AuthUser, StreamerInfo } from '../../../shared/types';
 import { api, getCurrentStreamer, setCurrentStreamer, onStreamerChange } from '../api/client';
 
-const navItems = [
+const navItems: Array<{ to: string; label: string; curatorOnly?: boolean }> = [
   { to: '/', label: 'Dashboard' },
   { to: '/songs', label: 'Songs' },
   { to: '/streams', label: 'Streams' },
@@ -15,7 +15,14 @@ const navItems = [
   { to: '/nova', label: 'Nova' },
   { to: '/nova/vods', label: 'Nova VODs' },
   { to: '/crystal', label: 'Crystal' },
+  { to: '/vod-export', label: 'VOD Export', curatorOnly: true },
 ];
+
+export function getVisibleNavItems(user: AuthUser): Array<{ to: string; label: string }> {
+  return navItems
+    .filter((item) => !item.curatorOnly || user.role === 'curator')
+    .map(({ to, label }) => ({ to, label }));
+}
 
 export default function Layout({ user, children }: { user: AuthUser; children: ReactNode }) {
   const navigate = useNavigate();
@@ -77,7 +84,7 @@ export default function Layout({ user, children }: { user: AuthUser; children: R
 
         {/* Nav */}
         <nav className="flex-1 space-y-1 p-3">
-          {navItems.map(({ to, label }) => (
+          {getVisibleNavItems(user).map(({ to, label }) => (
             <NavLink
               key={to}
               to={to}

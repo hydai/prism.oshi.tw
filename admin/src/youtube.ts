@@ -56,7 +56,7 @@ interface ChannelResponse {
         high?: { url: string };
       };
     };
-    statistics: {
+    statistics?: {
       subscriberCount: string;
       hiddenSubscriberCount: boolean;
     };
@@ -64,6 +64,7 @@ interface ChannelResponse {
 }
 
 export interface ChannelInfo {
+  channelId: string;
   subscriberCount: number;
   avatarUrl: string;
 }
@@ -318,13 +319,39 @@ export async function fetchChannelInfo(
   if (!data.items || data.items.length === 0) return null;
 
   const item = data.items[0]!;
-  if (item.statistics.hiddenSubscriberCount) return null;
+  if (!item.statistics || item.statistics.hiddenSubscriberCount) return null;
 
   const thumbs = item.snippet?.thumbnails;
   const avatarUrl = thumbs?.medium?.url ?? thumbs?.default?.url ?? '';
 
   return {
+    channelId: item.id,
     subscriberCount: parseInt(item.statistics.subscriberCount, 10),
     avatarUrl,
   };
+}
+
+/**
+ * Verify a curator-entered channel identity through channels.list. The caller
+ * persists success atomically with the current ID; export never performs this
+ * network lookup.
+ */
+export async function verifyChannelId(
+  apiKey: string,
+  requestedChannelId: string,
+): Promise<string | null> {
+  const url = new URL(`${YT_API}/channels`);
+  url.searchParams.set('part', 'snippet');
+  url.searchParams.set('id', requestedChannelId);
+  url.searchParams.set('key', apiKey);
+
+  const res = await ytFetch(url.toString());
+  if (!res.ok) {
+    throw new Error(`YouTube channels.list verification failed (${res.status})`);
+  }
+  const data = (await res.json()) as ChannelResponse;
+  const returnedId = data.items?.[0]?.id;
+  return typeof returnedId === 'string' && returnedId === requestedChannelId
+    ? returnedId
+    : null;
 }

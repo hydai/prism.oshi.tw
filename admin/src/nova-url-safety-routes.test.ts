@@ -35,6 +35,14 @@ class RecordingStatement {
   }
 
   async first<T>(): Promise<T | null> {
+    if (this.sql.includes('youtube_channel_verified_id') && this.sql.includes('FROM submissions')) {
+      return {
+        id: 'sub-test',
+        youtube_channel_id: 'UC123',
+        youtube_channel_verified_id: null,
+        youtube_channel_verified_at: null,
+      } as T;
+    }
     if (this.sql === 'SELECT id FROM submissions WHERE id = ?') {
       return { id: 'sub-test' } as T;
     }
@@ -63,6 +71,8 @@ function makeSubmission(): NovaSubmission {
     id: 'sub-test',
     youtube_channel_url: 'https://www.youtube.com/@safe',
     youtube_channel_id: 'UC123',
+    youtube_channel_verified_id: null,
+    youtube_channel_verified_at: null,
     slug: 'safe',
     brand_name: 'Safe Brand',
     display_name: 'Safe Streamer',

@@ -16,6 +16,6 @@
       "@shared/*": ["./shared/*"]
     }
   },
-  "include": ["src/**/*.ts", "shared/**/*.ts"],
+  "include": ["src/**/*.ts", "shared/**/*.ts", "worker-configuration.d.ts"],
   "exclude": ["node_modules", "ui"]
 }

@@ -16,6 +16,8 @@ import Harmonizer from './pages/Harmonizer';
 import NovaSubmissions from './pages/NovaSubmissions';
 import NovaVodSubmissions from './pages/NovaVodSubmissions';
 import CrystalTickets from './pages/CrystalTickets';
+import VodExport from './pages/VodExport';
+import VodExportRepair from './pages/VodExportRepair';
 
 export default function App() {
   const [user, setUser] = useState<AuthUser | null>(null);
@@ -67,6 +69,14 @@ export default function App() {
         <Route path="/nova" element={<NovaSubmissions user={user} />} />
         <Route path="/nova/vods" element={<NovaVodSubmissions user={user} />} />
         <Route path="/crystal" element={<CrystalTickets user={user} />} />
+        <Route
+          path="/vod-export"
+          element={user.role === 'curator' ? <VodExport user={user} /> : <Navigate to="/" replace />}
+        />
+        <Route
+          path="/vod-export/repair/:entity/:rowId"
+          element={user.role === 'curator' ? <VodExportRepair user={user} /> : <Navigate to="/" replace />}
+        />
         <Route path="*" element={<Navigate to="/" replace />} />
       </Routes>
     </Layout>

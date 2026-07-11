@@ -9,6 +9,7 @@
     "test:nova-links": "npx tsx tests/nova-submissions-links.test.tsx",
     "test:streams-filter": "npx tsx tests/streams-filter.test.ts",
     "test:streams-render": "npx tsx tests/streams-list-render.test.tsx",
+    "test:vod-export": "npx tsx tests/vod-export-ui.test.tsx",
     "preview": "vite preview"
   },
   "dependencies": {
@@ -17,6 +18,7 @@
     "react-router-dom": "^7.15.1"
   },
   "devDependencies": {
+    "@babel/core": "^7.29.7",
     "@types/react": "^19.2.15",
     "@types/react-dom": "^19.2.3",
     "@vitejs/plugin-react": "^4.7.0",
@@ -25,6 +27,6 @@
     "tailwindcss": "^3.4.19",
     "tsx": "^4.22.4",
     "typescript": "^5.9.3",
-    "vite": "^6.4.2"
+    "vite": "^6.4.3"
   }
 }

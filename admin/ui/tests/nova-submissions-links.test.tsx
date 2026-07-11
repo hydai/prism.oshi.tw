@@ -17,6 +17,8 @@ function makeSubmission(overrides: Partial<NovaSubmission> = {}): NovaSubmission
     id: 'sub-test',
     youtube_channel_url: 'https://www.youtube.com/@safe',
     youtube_channel_id: 'UC123',
+    youtube_channel_verified_id: null,
+    youtube_channel_verified_at: null,
     slug: 'safe',
     brand_name: 'Safe Brand',
     display_name: 'Safe Streamer',
