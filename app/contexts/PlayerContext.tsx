@@ -47,7 +47,6 @@ interface PlayerContextType {
   duration: number;
   trackCurrentTime: number;
   trackDuration: number | null;
-  playTrack: (track: Track) => void;
   playTrackWithQueue: (track: Track, following: Track[]) => void;
   togglePlayPause: () => void;
   seekTo: (seconds: number) => void;
@@ -510,16 +509,6 @@ export const PlayerProvider = ({ children }: { children: ReactNode }) => {
     setAllTracks(prev => prev.some(t => t.id === track.id) ? prev : [...prev, track]);
   };
 
-  const playTrack = (track: Track) => {
-    // Add current track to history before switching
-    if (currentTrack && currentTrack.id !== track.id) {
-      setPlayHistory((prev) => [...prev, currentTrack]);
-    }
-    setCurrentTrack(track);
-    setCurrentTime(track.timestamp);
-    addToAllTracks(track);
-  };
-
   // Play a track and REPLACE the whole queue with `following` — clicking a song
   // in any list establishes that list as the new playback context (Spotify-style).
   // Reads currentTrackRef (not state) so stale closures held by memoized list
@@ -630,7 +619,6 @@ export const PlayerProvider = ({ children }: { children: ReactNode }) => {
         duration,
         trackCurrentTime,
         trackDuration,
-        playTrack,
         playTrackWithQueue,
         togglePlayPause,
         seekTo,

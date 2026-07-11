@@ -25,7 +25,7 @@ export default function PlaylistPanel({ show, onClose, songsData, onToast }: Pla
   const importInputRef = useRef<HTMLInputElement>(null);
 
   const { playlists, deletePlaylist, renamePlaylist, removeVersionFromPlaylist, reorderVersionsInPlaylist, exportAll, exportSingle, importPlaylists } = usePlaylist();
-  const { playTrack, addToQueue } = usePlayer();
+  const { playTrackWithQueue } = usePlayer();
 
   const selectedPlaylist = useMemo(
     () => playlists.find(p => p.id === selectedPlaylistId) ?? null,
@@ -75,9 +75,8 @@ export default function PlaylistPanel({ show, onClose, songsData, onToast }: Pla
     const firstPlayable = tracks.find(t => !t.deleted);
     if (!firstPlayable) return;
 
-    playTrack(firstPlayable);
     const firstPlayableIndex = tracks.indexOf(firstPlayable);
-    tracks.slice(firstPlayableIndex + 1).forEach(track => addToQueue(track));
+    playTrackWithQueue(firstPlayable, tracks.slice(firstPlayableIndex + 1));
   };
 
   const handleRename = (playlistId: string) => {
