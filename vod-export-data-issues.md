@@ -1,47 +1,89 @@
 # VOD Export Data Issues
 
 - Audit time: 2026-07-10T15:22:49Z
-- Status: Ready for remediation — specification approved; no source rows changed
+- Resolution verified: 2026-07-11T14:59:19Z
+- Status: Resolved — canonical Admin D1 and generated JSON agree
 - Source of truth checked: remote `oshi-prism-db` D1
-- Cross-check: committed `data/{slug}/songs.json`
+- Cross-check: regenerated `data/{mizuki,sakuro,seki}/songs.json`
 - Scope: VOD, performance, and song are all `approved` and belong to the same
   streamer, matching confirmed export rule D-005.1
 
-## Remediation prerequisites
+## Resolution verification
+
+The original 19 blocking findings are resolved:
+
+- 14 missing end times were filled with verified values.
+- `p621-1` and its song `song-621` were intentionally deleted because the
+  performance should not have existed.
+- All four invalid ranges were corrected.
+- The verification query at the end of this document now returns zero rows.
+- A full scan of all 8,533 approved performances found zero missing, invalid,
+  or non-increasing start/end values.
+- `npm run sync:status` reports all streamer snapshots fresh after syncing
+  `mizuki`, `sakuro`, and `seki`.
+
+| Issue | Performance ID | Resolution | Final range |
+|---|---|---|---:|
+| END-MISSING-001 | `p612-1` | End time filled | 292–556 |
+| END-MISSING-002 | `p613-1` | End time filled | 781–1024 |
+| END-MISSING-003 | `p614-1` | End time filled | 1035–1231 |
+| END-MISSING-004 | `p615-1` | End time filled | 1583–1811 |
+| END-MISSING-005 | `p616-1` | End time filled | 2103–2241 |
+| END-MISSING-006 | `p617-1` | End time filled; title corrected to `だんだん高くなる` | 2280–2422 |
+| END-MISSING-007 | `p618-1` | End time filled | 2759–2992 |
+| END-MISSING-008 | `p619-1` | End time filled | 3210–3415 |
+| END-MISSING-009 | `p620-1` | End time filled | 3587–3837 |
+| END-MISSING-010 | `p621-1` | Intentionally deleted with `song-621` | — |
+| END-MISSING-011 | `p622-1` | End time filled | 4159–4335 |
+| END-MISSING-012 | `p623-1` | End time filled | 4543–4805 |
+| END-MISSING-013 | `p624-1` | End time filled | 5119–5372 |
+| END-MISSING-014 | `p625-1` | End time filled | 5576–5899 |
+| END-MISSING-015 | `p626-1` | End time filled; title corrected to `8月31日` | 6139–6350 |
+| END-RANGE-001 | `p-7e622f16` | End time corrected | 5417–5573 |
+| END-RANGE-002 | `p-0ef60c63` | End time corrected | 6423–6637 |
+| END-RANGE-003 | `p-b14e136c` | End time corrected | 13370–13609 |
+| END-RANGE-004 | `p-a90fe217` | Start and end times corrected | 7002–7114 |
+
+The non-blocking missing-artist scan now contains 143 canonical song rows and
+affects 147 performances. The decrease from 144/148 is the expected result of
+removing `song-621` and `p621-1`.
+
+## Completed remediation procedure
 
 `vod-export-spec.md` received final approval on 2026-07-11. These rows are now
-eligible for a separate remediation pass, but no repair is part of this
-documentation change. Do not hand-edit generated files under `data/`.
+repaired in the canonical Admin D1. Generated files under `data/` were updated
+through the normal sync workflow rather than hand-edited.
 
-When remediation is authorized:
+Completed steps:
 
-1. Verify each timestamp against the source YouTube VOD.
-2. Correct the canonical Admin D1 record through the approved admin workflow.
-3. Re-run the audit query in this document.
-4. Run the normal data sync so committed JSON is regenerated from D1.
-5. Mark each issue resolved only after both D1 and generated JSON agree.
+1. Verified each timestamp against the source YouTube VOD.
+2. Corrected the canonical Admin D1 records through the approved Admin workflow.
+3. Re-ran the audit query in this document and received zero rows.
+4. Ran the normal data sync so generated JSON was regenerated from D1.
+5. Confirmed D1 and generated JSON agree before marking the issues resolved.
 
-## Summary
+## Original issue summary
 
-| Category | Count | Admin finding code | Export consequence if unresolved |
+| Category | Original count | Admin finding code | Resolution |
 |---|---:|---|---|
-| Missing end time (`end_timestamp IS NULL`) | 15 | `MISSING_END_SECONDS` | Invalid under revised D-008.1; repair before first publication |
-| Invalid range (`end_timestamp <= timestamp`) | 4 | `INVALID_END_RANGE` | Rejected by the confirmed `endSeconds > startSeconds` invariant |
-| Total affected performances | 19 | — | Blocks complete publication under D-010.1; ready for remediation |
+| Missing end time (`end_timestamp IS NULL`) | 15 | `MISSING_END_SECONDS` | 14 repaired; 1 invalid source row intentionally deleted |
+| Invalid range (`end_timestamp <= timestamp`) | 4 | `INVALID_END_RANGE` | All repaired |
+| Total affected performances | 19 | — | Resolved; no longer blocks publication |
 
-Separate non-blocking data-quality scan: 144 canonical song rows have an empty
-`originalArtist`, affecting 148 performances. They produce song-level
-`MISSING_ORIGINAL_ARTIST` warnings; they are not part of the 19 blocking
-end-time rows counted above.
+The original separate non-blocking data-quality scan found 144 canonical song
+rows with an empty `originalArtist`, affecting 148 performances. They produce
+song-level `MISSING_ORIGINAL_ARTIST` warnings and were not part of the 19
+blocking end-time rows counted above. After the intentional deletion, the
+current counts are 143 song rows and 147 performances.
 
-No `end_timestamp = timestamp` row was found; all four invalid ranges have an
-end value strictly earlier than their start value.
+At audit time, no `end_timestamp = timestamp` row was found; all four invalid
+ranges had an end value strictly earlier than their start value.
 
-## Missing end times
+## Original missing end-time findings
 
-Revised D-008.1 requires a non-null integer `endSeconds` greater than
-`startSeconds`. All rows in this section are therefore invalid for export and
-must be repaired before the first publication.
+This section preserves the pre-remediation values. Revised D-008.1 requires a
+non-null integer `endSeconds` greater than `startSeconds`; the final values are
+recorded in the resolution table above.
 
 All 15 rows belong to the same VOD:
 
@@ -51,31 +93,29 @@ All 15 rows belong to the same VOD:
 - Video ID: `owFUTmhXWCI`
 - VOD: [【歌枠】2022初歌回！充滿浠望的出發吧！【浠Mizuki Karaoke】](https://www.youtube.com/watch?v=owFUTmhXWCI)
 
-| Issue | Performance ID | Song ID | Song | Original artist | Start | Review | Committed source |
-|---|---|---|---|---|---:|---|---|
-| END-MISSING-001 | `p612-1` | `song-612` | 快晴 | Orangestar | 292 (`0:04:52`) | [YouTube](https://www.youtube.com/watch?v=owFUTmhXWCI&t=292s) | [mizuki songs:67361](data/mizuki/songs.json#L67361) |
-| END-MISSING-002 | `p613-1` | `song-613` | Jump Up Super Star! | Super Mario Odyssey | 781 (`0:13:01`) | [YouTube](https://www.youtube.com/watch?v=owFUTmhXWCI&t=781s) | [mizuki songs:67399](data/mizuki/songs.json#L67399) |
-| END-MISSING-003 | `p614-1` | `song-614` | Bang Bang | Jessie J-Ariana Grande-Nicki Minaj | 1035 (`0:17:15`) | [YouTube](https://www.youtube.com/watch?v=owFUTmhXWCI&t=1035s) | [mizuki songs:67417](data/mizuki/songs.json#L67417) |
-| END-MISSING-004 | `p615-1` | `song-615` | 夕景イエスタデイ | じん(自然の敵P) | 1583 (`0:26:23`) | [YouTube](https://www.youtube.com/watch?v=owFUTmhXWCI&t=1583s) | [mizuki songs:67455](data/mizuki/songs.json#L67455) |
-| END-MISSING-005 | `p616-1` | `song-616` | だんだん早くなる | 40mP | 2103 (`0:35:03`) | [YouTube](https://www.youtube.com/watch?v=owFUTmhXWCI&t=2103s) | [mizuki songs:67473](data/mizuki/songs.json#L67473) |
-| END-MISSING-006 | `p617-1` | `song-617` | だんだん早くなる | 40mP | 2280 (`0:38:00`) | [YouTube](https://www.youtube.com/watch?v=owFUTmhXWCI&t=2280s) | [mizuki songs:67491](data/mizuki/songs.json#L67491) |
-| END-MISSING-007 | `p618-1` | `song-618` | ねこみみスイッチ | daniwell | 2759 (`0:45:59`) | [YouTube](https://www.youtube.com/watch?v=owFUTmhXWCI&t=2759s) | [mizuki songs:67509](data/mizuki/songs.json#L67509) |
-| END-MISSING-008 | `p619-1` | `song-619` | C大調 | 張韶涵 | 3210 (`0:53:30`) | [YouTube](https://www.youtube.com/watch?v=owFUTmhXWCI&t=3210s) | [mizuki songs:67527](data/mizuki/songs.json#L67527) |
-| END-MISSING-009 | `p620-1` | `song-620` | 彩虹 | 張惠妹 | 3587 (`0:59:47`) | [YouTube](https://www.youtube.com/watch?v=owFUTmhXWCI&t=3587s) | [mizuki songs:67591](data/mizuki/songs.json#L67591) |
-| END-MISSING-010 | `p621-1` | `song-621` | 0x.The Coconut Song | *(empty)* | 4054 (`1:07:34`) | [YouTube](https://www.youtube.com/watch?v=owFUTmhXWCI&t=4054s) | [mizuki songs:67619](data/mizuki/songs.json#L67619) |
-| END-MISSING-011 | `p622-1` | `song-622` | 野子 | 蘇運瑩 | 4159 (`1:09:19`) | [YouTube](https://www.youtube.com/watch?v=owFUTmhXWCI&t=4159s) | [mizuki songs:67637](data/mizuki/songs.json#L67637) |
-| END-MISSING-012 | `p623-1` | `song-623` | 倔強 | 五月天 | 4543 (`1:15:43`) | [YouTube](https://www.youtube.com/watch?v=owFUTmhXWCI&t=4543s) | [mizuki songs:67665](data/mizuki/songs.json#L67665) |
-| END-MISSING-013 | `p624-1` | `song-624` | 明日も | MUSH&Co. | 5119 (`1:25:19`) | [YouTube](https://www.youtube.com/watch?v=owFUTmhXWCI&t=5119s) | [mizuki songs:67683](data/mizuki/songs.json#L67683) |
-| END-MISSING-014 | `p625-1` | `song-625` | 瞬き | back number | 5576 (`1:32:56`) | [YouTube](https://www.youtube.com/watch?v=owFUTmhXWCI&t=5576s) | [mizuki songs:67721](data/mizuki/songs.json#L67721) |
-| END-MISSING-015 | `p626-1` | `song-626` | 14.8月31日 | DECO*27 | 6139 (`1:42:19`) | [YouTube](https://www.youtube.com/watch?v=owFUTmhXWCI&t=6139s) | [mizuki songs:67749](data/mizuki/songs.json#L67749) |
+| Issue | Performance ID | Song ID | Song at audit time | Original artist | Start | Review |
+|---|---|---|---|---|---:|---|
+| END-MISSING-001 | `p612-1` | `song-612` | 快晴 | Orangestar | 292 (`0:04:52`) | [YouTube](https://www.youtube.com/watch?v=owFUTmhXWCI&t=292s) |
+| END-MISSING-002 | `p613-1` | `song-613` | Jump Up Super Star! | Super Mario Odyssey | 781 (`0:13:01`) | [YouTube](https://www.youtube.com/watch?v=owFUTmhXWCI&t=781s) |
+| END-MISSING-003 | `p614-1` | `song-614` | Bang Bang | Jessie J-Ariana Grande-Nicki Minaj | 1035 (`0:17:15`) | [YouTube](https://www.youtube.com/watch?v=owFUTmhXWCI&t=1035s) |
+| END-MISSING-004 | `p615-1` | `song-615` | 夕景イエスタデイ | じん(自然の敵P) | 1583 (`0:26:23`) | [YouTube](https://www.youtube.com/watch?v=owFUTmhXWCI&t=1583s) |
+| END-MISSING-005 | `p616-1` | `song-616` | だんだん早くなる | 40mP | 2103 (`0:35:03`) | [YouTube](https://www.youtube.com/watch?v=owFUTmhXWCI&t=2103s) |
+| END-MISSING-006 | `p617-1` | `song-617` | だんだん早くなる | 40mP | 2280 (`0:38:00`) | [YouTube](https://www.youtube.com/watch?v=owFUTmhXWCI&t=2280s) |
+| END-MISSING-007 | `p618-1` | `song-618` | ねこみみスイッチ | daniwell | 2759 (`0:45:59`) | [YouTube](https://www.youtube.com/watch?v=owFUTmhXWCI&t=2759s) |
+| END-MISSING-008 | `p619-1` | `song-619` | C大調 | 張韶涵 | 3210 (`0:53:30`) | [YouTube](https://www.youtube.com/watch?v=owFUTmhXWCI&t=3210s) |
+| END-MISSING-009 | `p620-1` | `song-620` | 彩虹 | 張惠妹 | 3587 (`0:59:47`) | [YouTube](https://www.youtube.com/watch?v=owFUTmhXWCI&t=3587s) |
+| END-MISSING-010 | `p621-1` | `song-621` | 0x.The Coconut Song | *(empty)* | 4054 (`1:07:34`) | [YouTube](https://www.youtube.com/watch?v=owFUTmhXWCI&t=4054s) |
+| END-MISSING-011 | `p622-1` | `song-622` | 野子 | 蘇運瑩 | 4159 (`1:09:19`) | [YouTube](https://www.youtube.com/watch?v=owFUTmhXWCI&t=4159s) |
+| END-MISSING-012 | `p623-1` | `song-623` | 倔強 | 五月天 | 4543 (`1:15:43`) | [YouTube](https://www.youtube.com/watch?v=owFUTmhXWCI&t=4543s) |
+| END-MISSING-013 | `p624-1` | `song-624` | 明日も | MUSH&Co. | 5119 (`1:25:19`) | [YouTube](https://www.youtube.com/watch?v=owFUTmhXWCI&t=5119s) |
+| END-MISSING-014 | `p625-1` | `song-625` | 瞬き | back number | 5576 (`1:32:56`) | [YouTube](https://www.youtube.com/watch?v=owFUTmhXWCI&t=5576s) |
+| END-MISSING-015 | `p626-1` | `song-626` | 14.8月31日 | DECO*27 | 6139 (`1:42:19`) | [YouTube](https://www.youtube.com/watch?v=owFUTmhXWCI&t=6139s) |
 
-Additional observation: `p621-1` is one of the 148 affected performances with
-an empty `originalArtist`. That is not counted as an end-time issue. D-008.7
-represents it as `"originalArtist": null` in an export, and D-010.4 emits the
-non-blocking Admin warning `MISSING_ORIGINAL_ARTIST` while this source-data gap
-remains in the later remediation queue.
+Resolution note: `p621-1` had an empty `originalArtist`, but review determined
+that the performance itself should not have existed. It and `song-621` were
+therefore intentionally deleted instead of exported with a null artist.
 
-## Invalid end ranges
+## Original invalid end ranges
 
 ### END-RANGE-001
 
@@ -88,7 +128,7 @@ remains in the later remediation queue.
 - Start: 5417 (`1:30:17`)
 - End: 4560 (`1:16:00`)
 - Invalid difference: `-857` seconds
-- Committed source: [sakuro songs:1215](data/sakuro/songs.json#L1215)
+- Original generated source: `data/sakuro/songs.json` (pre-remediation snapshot)
 
 ### END-RANGE-002
 
@@ -101,7 +141,7 @@ remains in the later remediation queue.
 - Start: 6423 (`1:47:03`)
 - End: 6175 (`1:42:55`)
 - Invalid difference: `-248` seconds
-- Committed source: [seki songs:19285](data/seki/songs.json#L19285)
+- Original generated source: `data/seki/songs.json` (pre-remediation snapshot)
 
 ### END-RANGE-003
 
@@ -114,7 +154,7 @@ remains in the later remediation queue.
 - Start: 13370 (`3:42:50`)
 - End: 10010 (`2:46:50`)
 - Invalid difference: `-3360` seconds
-- Committed source: [seki songs:25045](data/seki/songs.json#L25045)
+- Original generated source: `data/seki/songs.json` (pre-remediation snapshot)
 
 ### END-RANGE-004
 
@@ -127,11 +167,12 @@ remains in the later remediation queue.
 - Start: 7249 (`2:00:49`)
 - End: 7120 (`1:58:40`)
 - Invalid difference: `-129` seconds
-- Committed source: [seki songs:3895](data/seki/songs.json#L3895)
+- Original generated source: `data/seki/songs.json` (pre-remediation snapshot)
 
-## Reproduction query
+## Verification query
 
-The remote D1 audit used this read-only query:
+The remote D1 audit and post-remediation verification used this read-only
+query. The verification run returned zero rows:
 
 ```sql
 SELECT

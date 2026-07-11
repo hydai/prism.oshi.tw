@@ -164,12 +164,12 @@
       "streamsCount": 0
     },
     "mizuki": {
-      "lastSyncedAt": "2026-07-11T04:02:29.006Z",
-      "maxSongUpdatedAt": "2026-07-10 17:57:07",
-      "maxPerfUpdatedAt": "2026-07-08 17:48:55",
+      "lastSyncedAt": "2026-07-11T14:58:37.127Z",
+      "maxSongUpdatedAt": "2026-07-11 14:36:10",
+      "maxPerfUpdatedAt": "2026-07-11 14:36:10",
       "maxStreamUpdatedAt": "2026-07-08 17:48:55",
-      "songsCount": 3465,
-      "performancesCount": 5407,
+      "songsCount": 3464,
+      "performancesCount": 5406,
       "streamsCount": 304
     },
     "nagi": {
@@ -254,18 +254,18 @@
       "streamsCount": 4
     },
     "sakuro": {
-      "lastSyncedAt": "2026-04-19T11:29:10.942Z",
-      "maxSongUpdatedAt": "2026-03-09 23:31:06",
-      "maxPerfUpdatedAt": "2026-03-09 23:28:54",
+      "lastSyncedAt": "2026-07-11T14:58:47.284Z",
+      "maxSongUpdatedAt": "2026-07-11 14:37:50",
+      "maxPerfUpdatedAt": "2026-07-11 14:37:50",
       "maxStreamUpdatedAt": "2026-03-09 23:28:54",
       "songsCount": 116,
       "performancesCount": 116,
       "streamsCount": 13
     },
     "seki": {
-      "lastSyncedAt": "2026-06-15T10:43:39.282Z",
-      "maxSongUpdatedAt": "2026-06-15 10:41:52",
-      "maxPerfUpdatedAt": "2026-06-15 10:41:52",
+      "lastSyncedAt": "2026-07-11T14:58:42.515Z",
+      "maxSongUpdatedAt": "2026-07-11 14:49:50",
+      "maxPerfUpdatedAt": "2026-07-11 14:49:50",
       "maxStreamUpdatedAt": "2026-03-10 13:11:16",
       "songsCount": 1340,
       "performancesCount": 1556,
