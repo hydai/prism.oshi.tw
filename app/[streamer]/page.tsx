@@ -3,7 +3,7 @@
 import { useState, useMemo, useEffect, useRef, useCallback } from 'react';
 import Link from 'next/link';
 import { useVirtualizer } from '@tanstack/react-virtual';
-import { Search, Play, Shuffle, ExternalLink, Mic2, Youtube, Twitter, Facebook, Instagram, Twitch, Sparkles, ListMusic, Clock, Heart, Disc3, ChevronDown, ChevronRight, Plus, ListPlus, X, SlidersHorizontal, WifiOff, House, Radio } from 'lucide-react';
+import { Search, Play, Shuffle, ExternalLink, Mic2, Youtube, Twitter, Facebook, Instagram, Twitch, Sparkles, ListMusic, Clock, Heart, Disc3, ChevronDown, ChevronRight, Plus, ListPlus, X, SlidersHorizontal, WifiOff, House, Radio, Film } from 'lucide-react';
 import { useStreamer } from '../contexts/StreamerContext';
 import { usePlayer } from '../contexts/PlayerContext';
 import { usePlaylist } from '../contexts/PlaylistContext';
@@ -491,7 +491,19 @@ export default function Home() {
         >
           {streamerData.displayName}
         </Link>
-        <ThemeToggle />
+        <div className="flex items-center" style={{ gap: '12px' }}>
+          <a
+            href={`https://vods.oshi.tw/?streamer=${slug}`}
+            target="_blank"
+            rel="noopener noreferrer"
+            aria-label="歌回 VOD 資料庫"
+            className="inline-flex items-center"
+            style={{ color: 'var(--text-secondary)' }}
+          >
+            <Film style={{ width: '20px', height: '20px' }} />
+          </a>
+          <ThemeToggle />
+        </div>
       </div>
 
       {/* Main Content */}

@@ -12,6 +12,8 @@ import {
   Clock,
   Plus,
   ListMusic,
+  Film,
+  ExternalLink,
 } from 'lucide-react';
 import { useStreamer } from '../contexts/StreamerContext';
 import ThemeToggle from './ThemeToggle';
@@ -139,6 +141,19 @@ export default function SidebarNav({
             <Play className="w-4 h-4 flex-shrink-0" style={nowPlayingActive ? { fill: 'currentColor' } : undefined} />
             正在播放
           </Link>
+
+          {/* VOD Archive (external) */}
+          <a
+            href={`https://vods.oshi.tw/?streamer=${slug}`}
+            target="_blank"
+            rel="noopener noreferrer"
+            className={inactiveNavItemClass}
+            style={inactiveStyle}
+          >
+            <Film className="w-4 h-4 flex-shrink-0" />
+            <span className="flex-1">歌回 VOD 資料庫</span>
+            <ExternalLink className="w-3.5 h-3.5 flex-shrink-0 opacity-60" />
+          </a>
 
           {/* Browse */}
           <button
