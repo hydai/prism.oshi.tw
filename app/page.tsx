@@ -12,6 +12,7 @@ import {
   Play,
   MessageSquare,
   Video,
+  Film,
 } from 'lucide-react';
 import ThemeToggle from './components/ThemeToggle';
 import DiscordIcon from './components/DiscordIcon';
@@ -144,6 +145,19 @@ export default function HomePage() {
             提議新 VTuber
           </a>
           <a
+            href="https://vods.oshi.tw"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="flex items-center justify-center gap-2 rounded-radius-lg px-4 py-2 text-token-sm font-semibold transition-opacity hover:opacity-90"
+            style={{
+              border: '1px solid var(--border-accent)',
+              color: 'var(--text-secondary)',
+            }}
+          >
+            <Film className="h-4 w-4" />
+            歌回 VOD 資料庫
+          </a>
+          <a
             href="https://nova.oshi.tw/vod"
             target="_blank"
             rel="noopener noreferrer"
@@ -237,6 +251,19 @@ export default function HomePage() {
               }}
             >
               <DiscordIcon className="h-4 w-4" />
+            </a>
+            <a
+              href="https://vods.oshi.tw"
+              target="_blank"
+              rel="noopener noreferrer"
+              aria-label="歌回 VOD 資料庫"
+              className="inline-flex items-center gap-1 rounded-radius-lg px-2.5 py-2 text-token-sm font-semibold transition-opacity hover:opacity-90"
+              style={{
+                border: '1px solid var(--border-accent)',
+                color: 'var(--text-secondary)',
+              }}
+            >
+              <Film className="h-4 w-4" />
             </a>
             <a
               href="https://nova.oshi.tw/vod"
