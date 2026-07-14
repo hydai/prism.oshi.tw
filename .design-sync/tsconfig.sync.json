@@ -1,0 +1,12 @@
+{
+  "//": "design-sync ONLY — read by the converter's esbuild path-resolver (cfg.tsconfig). Redirects @/* to the repo root and stubs Next router modules so components render standalone. The app's own build uses ../tsconfig.json and is unaffected.",
+  "compilerOptions": {
+    "baseUrl": ".",
+    "jsx": "react-jsx",
+    "paths": {
+      "@/*": ["../*"],
+      "next/link": ["./stubs/next-link.tsx"],
+      "next/navigation": ["./stubs/next-navigation.tsx"]
+    }
+  }
+}
