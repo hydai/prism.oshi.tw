@@ -1,6 +1,7 @@
 [
   {
     "id": "song-00345323",
+    "workId": "work-song-00345323",
     "title": "千本桜",
     "originalArtist": "黒うさP",
     "tags": [],
@@ -19,6 +20,7 @@
   },
   {
     "id": "song-00364f82",
+    "workId": "work-song-00364f82",
     "title": "妄想感傷代償連盟",
     "originalArtist": "DECO*27 feat. 初音ミク",
     "tags": [],
@@ -37,6 +39,7 @@
   },
   {
     "id": "song-0305c679",
+    "workId": "work-song-0305c679",
     "title": "哥布檸檬",
     "originalArtist": "計畫通行",
     "tags": [],
@@ -55,6 +58,7 @@
   },
   {
     "id": "song-0336eae8",
+    "workId": "work-song-0336eae8",
     "title": "銀河與星斗",
     "originalArtist": "Yihuik苡慧",
     "tags": [],
@@ -73,6 +77,7 @@
   },
   {
     "id": "song-0765a179",
+    "workId": "work-song-0765a179",
     "title": "Love it?",
     "originalArtist": "biz × ZERA",
     "tags": [],
@@ -91,6 +96,7 @@
   },
   {
     "id": "song-07f852a6",
+    "workId": "work-song-07f852a6",
     "title": "乙女解剖",
     "originalArtist": "DECO*27",
     "tags": [],
@@ -109,6 +115,7 @@
   },
   {
     "id": "song-083ed044",
+    "workId": "work-song-083ed044",
     "title": "愛言葉Ⅱ",
     "originalArtist": "DECO*27",
     "tags": [],
@@ -127,6 +134,7 @@
   },
   {
     "id": "song-08f21ded",
+    "workId": "work-song-08f21ded",
     "title": "テトリス",
     "originalArtist": "柊マグネタイト feat. 重音テト",
     "tags": [],
@@ -145,6 +153,7 @@
   },
   {
     "id": "song-0b948d3f",
+    "workId": "work-song-0b948d3f",
     "title": "忘れじの言の葉",
     "originalArtist": "安次嶺希和子",
     "tags": [],
@@ -163,6 +172,7 @@
   },
   {
     "id": "song-0c224a90",
+    "workId": "work-song-0c224a90",
     "title": "リードコントロール",
     "originalArtist": "なるみや",
     "tags": [],
@@ -181,6 +191,7 @@
   },
   {
     "id": "song-0c91ab5e",
+    "workId": "work-song-0c91ab5e",
     "title": "魚",
     "originalArtist": "西瓜JUN",
     "tags": [],
@@ -199,6 +210,7 @@
   },
   {
     "id": "song-0e7932c2",
+    "workId": "work-song-0e7932c2",
     "title": "廣寒宮",
     "originalArtist": "丸子呦",
     "tags": [],
@@ -217,6 +229,7 @@
   },
   {
     "id": "song-0fc86dd6",
+    "workId": "work-song-0fc86dd6",
     "title": "手掌心",
     "originalArtist": "Della丁噹",
     "tags": [],
@@ -235,6 +248,7 @@
   },
   {
     "id": "song-139a2f8d",
+    "workId": "work-song-139a2f8d",
     "title": "ふわふわ時間",
     "originalArtist": "放課後ティータイム",
     "tags": [],
@@ -253,6 +267,7 @@
   },
   {
     "id": "song-153b6a87",
+    "workId": "work-song-153b6a87",
     "title": "拜無憂",
     "originalArtist": "蕭憶情",
     "tags": [],
@@ -271,6 +286,7 @@
   },
   {
     "id": "song-16e6f425",
+    "workId": "work-song-16e6f425",
     "title": "夜もすがら君想ふ",
     "originalArtist": "TOKOTOKO (西沢さんP) feat. GUMI",
     "tags": [],
@@ -289,6 +305,7 @@
   },
   {
     "id": "song-1855f8a3",
+    "workId": "work-song-1855f8a3",
     "title": "好きだから",
     "originalArtist": "ユイカ",
     "tags": [],
@@ -307,6 +324,7 @@
   },
   {
     "id": "song-1e8117cf",
+    "workId": "work-song-1005",
     "title": "ヴァンパイア",
     "originalArtist": "DECO*27",
     "tags": [],
@@ -325,6 +343,7 @@
   },
   {
     "id": "song-1ead5d24",
+    "workId": "work-song-003f49b9",
     "title": "glow",
     "originalArtist": "keeno",
     "tags": [],
@@ -343,6 +362,7 @@
   },
   {
     "id": "song-1ebee093",
+    "workId": "work-song-1ebee093",
     "title": "清清如我",
     "originalArtist": "郁可唯",
     "tags": [],
@@ -361,6 +381,7 @@
   },
   {
     "id": "song-22675cd5",
+    "workId": "work-song-22675cd5",
     "title": "修煉愛情 × 跳樓機",
     "originalArtist": "林俊傑, LBI利比",
     "tags": [],
@@ -379,6 +400,7 @@
   },
   {
     "id": "song-22d30f12",
+    "workId": "work-song-22d30f12",
     "title": "一年二ヶ月と二十日",
     "originalArtist": "BRIGHT",
     "tags": [],
@@ -397,6 +419,7 @@
   },
   {
     "id": "song-240a3cfe",
+    "workId": "work-song-240a3cfe",
     "title": "六等星",
     "originalArtist": "ざらめ",
     "tags": [],
@@ -415,6 +438,7 @@
   },
   {
     "id": "song-267effa4",
+    "workId": "work-song-267effa4",
     "title": "私は、わたしの事が好き。",
     "originalArtist": "夏吉ゆうこ",
     "tags": [],
@@ -433,6 +457,7 @@
   },
   {
     "id": "song-27793b6f",
+    "workId": "work-song-1524",
     "title": "春雷",
     "originalArtist": "米津玄師",
     "tags": [],
@@ -451,6 +476,7 @@
   },
   {
     "id": "song-29fc5ced",
+    "workId": "work-song-00bb0fb8",
     "title": "Stellar Stellar",
     "originalArtist": "星街すいせい",
     "tags": [],
@@ -469,6 +495,7 @@
   },
   {
     "id": "song-2f53e01c",
+    "workId": "work-song-2f53e01c",
     "title": "Myra",
     "originalArtist": "Tani Yuuki",
     "tags": [],
@@ -487,6 +514,7 @@
   },
   {
     "id": "song-3095dd3f",
+    "workId": "work-song-3095dd3f",
     "title": "六兆年と一夜物語",
     "originalArtist": "Kemu",
     "tags": [],
@@ -505,6 +533,7 @@
   },
   {
     "id": "song-309f3146",
+    "workId": "work-song-309f3146",
     "title": "WAVE",
     "originalArtist": "niki",
     "tags": [],
@@ -523,6 +552,7 @@
   },
   {
     "id": "song-33c059fe",
+    "workId": "work-song-33c059fe",
     "title": "愛言葉Ⅲ",
     "originalArtist": "DECO*27",
     "tags": [],
@@ -541,6 +571,7 @@
   },
   {
     "id": "song-3635cffd",
+    "workId": "work-song-2361",
     "title": "青花瓷",
     "originalArtist": "周杰倫",
     "tags": [],
@@ -559,6 +590,7 @@
   },
   {
     "id": "song-37031257",
+    "workId": "work-song-37031257",
     "title": "[A]ddiction",
     "originalArtist": "EVO+",
     "tags": [],
@@ -577,6 +609,7 @@
   },
   {
     "id": "song-390f0183",
+    "workId": "work-song-1598",
     "title": "妄想税",
     "originalArtist": "DECO*27",
     "tags": [],
@@ -595,6 +628,7 @@
   },
   {
     "id": "song-3b6dcf08",
+    "workId": "work-song-3b6dcf08",
     "title": "壊レタ世界ノ歌",
     "originalArtist": "河野万里奈",
     "tags": [],
@@ -613,6 +647,7 @@
   },
   {
     "id": "song-41c53f2b",
+    "workId": "work-song-41c53f2b",
     "title": "アイロニ",
     "originalArtist": "scop",
     "tags": [],
@@ -631,6 +666,7 @@
   },
   {
     "id": "song-44a277fe",
+    "workId": "work-song-44a277fe",
     "title": "夜明けと蛍",
     "originalArtist": "n-buna",
     "tags": [],
@@ -649,6 +685,7 @@
   },
   {
     "id": "song-45e6e3ee",
+    "workId": "work-song-45e6e3ee",
     "title": "涼涼",
     "originalArtist": "張碧晨 & 楊宗緯",
     "tags": [],
@@ -667,6 +704,7 @@
   },
   {
     "id": "song-46013a02",
+    "workId": "work-song-46013a02",
     "title": "知否知否",
     "originalArtist": "郁可唯 & 胡夏",
     "tags": [],
@@ -685,6 +723,7 @@
   },
   {
     "id": "song-49337df9",
+    "workId": "work-song-49337df9",
     "title": "花になって",
     "originalArtist": "緑黄色社会",
     "tags": [],
@@ -703,6 +742,7 @@
   },
   {
     "id": "song-4a5cdfa8",
+    "workId": "work-song-1108",
     "title": "ロストワンの号哭",
     "originalArtist": "Neru",
     "tags": [],
@@ -721,6 +761,7 @@
   },
   {
     "id": "song-4b1477dd",
+    "workId": "work-song-4b1477dd",
     "title": "我的一個道姑朋友",
     "originalArtist": "LON",
     "tags": [],
@@ -739,6 +780,7 @@
   },
   {
     "id": "song-4ffd7997",
+    "workId": "work-song-4ffd7997",
     "title": "雑魚",
     "originalArtist": "柊マグネタイト",
     "tags": [],
@@ -757,6 +799,7 @@
   },
   {
     "id": "song-534e1cba",
+    "workId": "work-song-1459",
     "title": "レオ",
     "originalArtist": "優里",
     "tags": [],
@@ -775,6 +818,7 @@
   },
   {
     "id": "song-537cf20a",
+    "workId": "work-song-537cf20a",
     "title": "チェリーポップ",
     "originalArtist": "DECO*27",
     "tags": [],
@@ -793,6 +837,7 @@
   },
   {
     "id": "song-55951594",
+    "workId": "work-song-55951594",
     "title": "右肩の蝶",
     "originalArtist": "のりぴー",
     "tags": [],
@@ -811,6 +856,7 @@
   },
   {
     "id": "song-55fee578",
+    "workId": "work-song-55fee578",
     "title": "ビビデバ (2.0 倍速)",
     "originalArtist": "星街すいせい",
     "tags": [],
@@ -829,6 +875,7 @@
   },
   {
     "id": "song-5650d8e0",
+    "workId": "work-song-5650d8e0",
     "title": "トウキョウ・シャンディ・ランデヴ",
     "originalArtist": "MAISONdes feat. 花譜, ツミキ",
     "tags": [],
@@ -847,6 +894,7 @@
   },
   {
     "id": "song-56688706",
+    "workId": "work-song-56688706",
     "title": "一念",
     "originalArtist": "张紫宁 & 李鑫一",
     "tags": [],
@@ -865,6 +913,7 @@
   },
   {
     "id": "song-5b168961",
+    "workId": "work-song-06c577a0",
     "title": "メリーゴーランド",
     "originalArtist": "優里",
     "tags": [],
@@ -883,6 +932,7 @@
   },
   {
     "id": "song-5e4204d9",
+    "workId": "work-song-5e4204d9",
     "title": "微光碎片",
     "originalArtist": "秋月祁",
     "tags": [],
@@ -901,6 +951,7 @@
   },
   {
     "id": "song-6197d401",
+    "workId": "work-song-1698",
     "title": "チチをもげ",
     "originalArtist": "高橋広樹",
     "tags": [],
@@ -919,6 +970,7 @@
   },
   {
     "id": "song-65402c63",
+    "workId": "work-song-65402c63",
     "title": "すずめ",
     "originalArtist": "RADWIMPS",
     "tags": [],
@@ -937,6 +989,7 @@
   },
   {
     "id": "song-689cd56c",
+    "workId": "work-song-689cd56c",
     "title": "シネマ",
     "originalArtist": "Ayase feat. 初音ミク",
     "tags": [],
@@ -955,6 +1008,7 @@
   },
   {
     "id": "song-68eb1a83",
+    "workId": "work-song-07bab4f3",
     "title": "少女レイ",
     "originalArtist": "みきとP",
     "tags": [],
@@ -973,6 +1027,7 @@
   },
   {
     "id": "song-6cccf79f",
+    "workId": "work-song-1751",
     "title": "棠梨煎雪",
     "originalArtist": "銀臨",
     "tags": [],
@@ -991,6 +1046,7 @@
   },
   {
     "id": "song-6d96717d",
+    "workId": "work-song-6d96717d",
     "title": "ビビデバ (1.5 倍速)",
     "originalArtist": "星街すいせい",
     "tags": [],
@@ -1009,6 +1065,7 @@
   },
   {
     "id": "song-6da32724",
+    "workId": "work-song-6da32724",
     "title": "THERE IS A REASON",
     "originalArtist": "鈴木このみ",
     "tags": [],
@@ -1027,6 +1084,7 @@
   },
   {
     "id": "song-6e329a3f",
+    "workId": "work-song-6e329a3f",
     "title": "夢傾天下",
     "originalArtist": "蘭音 Reine",
     "tags": [],
@@ -1045,6 +1103,7 @@
   },
   {
     "id": "song-6ef32a4a",
+    "workId": "work-song-6ef32a4a",
     "title": "愛殤",
     "originalArtist": "小時姑娘",
     "tags": [],
@@ -1063,6 +1122,7 @@
   },
   {
     "id": "song-70fbba06",
+    "workId": "work-song-70fbba06",
     "title": "Ch4nge",
     "originalArtist": "Giga-P",
     "tags": [],
@@ -1081,6 +1141,7 @@
   },
   {
     "id": "song-73ded5c3",
+    "workId": "work-song-73ded5c3",
     "title": "雪落下的聲音",
     "originalArtist": "陸虎",
     "tags": [],
@@ -1099,6 +1160,7 @@
   },
   {
     "id": "song-757081bb",
+    "workId": "work-song-757081bb",
     "title": "命に嫌われている",
     "originalArtist": "Kanzaki Iori",
     "tags": [],
@@ -1117,6 +1179,7 @@
   },
   {
     "id": "song-7728909c",
+    "workId": "work-song-7728909c",
     "title": "GETCHA!",
     "originalArtist": "Giga, KIRA feat. 初音ミク",
     "tags": [],
@@ -1135,6 +1198,7 @@
   },
   {
     "id": "song-778da96a",
+    "workId": "work-song-1111259a",
     "title": "ドラマツルギー",
     "originalArtist": "Eve",
     "tags": [],
@@ -1153,6 +1217,7 @@
   },
   {
     "id": "song-7b126762",
+    "workId": "work-song-7b126762",
     "title": "Lemon + 哥布林檬 + 檸檬",
     "originalArtist": "米津玄師",
     "tags": [],
@@ -1171,6 +1236,7 @@
   },
   {
     "id": "song-7f487c03",
+    "workId": "work-song-208",
     "title": "心做し",
     "originalArtist": "蝶々P",
     "tags": [],
@@ -1189,6 +1255,7 @@
   },
   {
     "id": "song-87ac241c",
+    "workId": "work-song-1172",
     "title": "妄想感傷代償連盟",
     "originalArtist": "DECO*27",
     "tags": [],
@@ -1207,6 +1274,7 @@
   },
   {
     "id": "song-885c54ab",
+    "workId": "work-song-885c54ab",
     "title": "わたしの一番かわいいところ",
     "originalArtist": "FRUITS ZIPPER",
     "tags": [],
@@ -1225,6 +1293,7 @@
   },
   {
     "id": "song-89a5ca2d",
+    "workId": "work-song-89a5ca2d",
     "title": "CRASH THE PARTY (練唱)",
     "originalArtist": "Vivid BAD SQUAD",
     "tags": [],
@@ -1243,6 +1312,7 @@
   },
   {
     "id": "song-8ac24f25",
+    "workId": "work-song-8ac24f25",
     "title": "草泥馬之歌 (寶寶祁)",
     "originalArtist": "洛天依",
     "tags": [],
@@ -1261,6 +1331,7 @@
   },
   {
     "id": "song-8c616b65",
+    "workId": "work-song-2bb8d010",
     "title": "六等星の夜",
     "originalArtist": "Aimer",
     "tags": [],
@@ -1279,6 +1350,7 @@
   },
   {
     "id": "song-92ee8e7d",
+    "workId": "work-song-492",
     "title": "からくりピエロ",
     "originalArtist": "40mP",
     "tags": [],
@@ -1297,6 +1369,7 @@
   },
   {
     "id": "song-95033708",
+    "workId": "work-song-95033708",
     "title": "盜將行",
     "originalArtist": "花粥",
     "tags": [],
@@ -1315,6 +1388,7 @@
   },
   {
     "id": "song-980caa83",
+    "workId": "work-song-013c53cd",
     "title": "晩餐歌",
     "originalArtist": "tuki.",
     "tags": [],
@@ -1333,6 +1407,7 @@
   },
   {
     "id": "song-9aa2a40a",
+    "workId": "work-song-227",
     "title": "にゃんにゃんにゃん",
     "originalArtist": "コレサワ",
     "tags": [],
@@ -1351,6 +1426,7 @@
   },
   {
     "id": "song-9c0a9b5c",
+    "workId": "work-song-1664",
     "title": "歌に形はないけれど",
     "originalArtist": "doriko",
     "tags": [],
@@ -1369,6 +1445,7 @@
   },
   {
     "id": "song-9d86fc6a",
+    "workId": "work-song-0b948d3f",
     "title": "忘れじの言の葉",
     "originalArtist": "安次嶺希和子",
     "tags": [],
@@ -1387,6 +1464,7 @@
   },
   {
     "id": "song-9e8ca74c",
+    "workId": "work-song-9e8ca74c",
     "title": "みちずれ",
     "originalArtist": "星街すいせい",
     "tags": [],
@@ -1405,6 +1483,7 @@
   },
   {
     "id": "song-a61a442b",
+    "workId": "work-song-612",
     "title": "快晴",
     "originalArtist": "Orangestar",
     "tags": [],
@@ -1423,6 +1502,7 @@
   },
   {
     "id": "song-a8d2416a",
+    "workId": "work-song-2d7462b1",
     "title": "創聖のアクエリオン",
     "originalArtist": "AKINO",
     "tags": [],
@@ -1441,6 +1521,7 @@
   },
   {
     "id": "song-a8ef4da0",
+    "workId": "work-song-3095dd3f",
     "title": "六兆年と一夜物語",
     "originalArtist": "Kemu",
     "tags": [],
@@ -1459,6 +1540,7 @@
   },
   {
     "id": "song-a9491a80",
+    "workId": "work-song-a9491a80",
     "title": "ULTRA C",
     "originalArtist": "Vivid BAD SQUAD",
     "tags": [],
@@ -1477,6 +1559,7 @@
   },
   {
     "id": "song-ac40449b",
+    "workId": "work-song-ac40449b",
     "title": "Endless Tears",
     "originalArtist": "CLIFF EDGE",
     "tags": [],
@@ -1495,6 +1578,7 @@
   },
   {
     "id": "song-ad74e4c8",
+    "workId": "work-song-ad74e4c8",
     "title": "FOCUS",
     "originalArtist": "KIRA",
     "tags": [],
@@ -1513,6 +1597,7 @@
   },
   {
     "id": "song-ae1b9107",
+    "workId": "work-song-ae1b9107",
     "title": "春嵐",
     "originalArtist": "john feat. 初音ミク",
     "tags": [],
@@ -1531,6 +1616,7 @@
   },
   {
     "id": "song-ae7bd215",
+    "workId": "work-song-ae7bd215",
     "title": "我對緣分小心翼翼",
     "originalArtist": "林俊傑 JJ Lin",
     "tags": [],
@@ -1549,6 +1635,7 @@
   },
   {
     "id": "song-b32b3c6d",
+    "workId": "work-song-b32b3c6d",
     "title": "愛言葉Ⅴ",
     "originalArtist": "DECO*27",
     "tags": [],
@@ -1567,6 +1654,7 @@
   },
   {
     "id": "song-b4768f5e",
+    "workId": "work-song-b4768f5e",
     "title": "人間不值得",
     "originalArtist": "黃詩扶",
     "tags": [],
@@ -1585,6 +1673,7 @@
   },
   {
     "id": "song-baaff013",
+    "workId": "work-song-baaff013",
     "title": "明月天涯",
     "originalArtist": "五音Jw",
     "tags": [],
@@ -1603,6 +1692,7 @@
   },
   {
     "id": "song-bc79da23",
+    "workId": "work-song-bc79da23",
     "title": "蛋餅好朋友",
     "originalArtist": "好和弦 feat. 艾可",
     "tags": [],
@@ -1621,6 +1711,7 @@
   },
   {
     "id": "song-bd00931d",
+    "workId": "work-song-bd00931d",
     "title": "Focus",
     "originalArtist": "Ariana Grande",
     "tags": [],
@@ -1639,6 +1730,7 @@
   },
   {
     "id": "song-be20ab87",
+    "workId": "work-song-be20ab87",
     "title": "フィクサー",
     "originalArtist": "ぬゆり",
     "tags": [],
@@ -1657,6 +1749,7 @@
   },
   {
     "id": "song-bf727142",
+    "workId": "work-song-bf727142",
     "title": "不老夢",
     "originalArtist": "銀臨",
     "tags": [],
@@ -1675,6 +1768,7 @@
   },
   {
     "id": "song-c132bbcf",
+    "workId": "work-song-1433",
     "title": "The Beginning",
     "originalArtist": "ONE OK ROCK",
     "tags": [],
@@ -1693,6 +1787,7 @@
   },
   {
     "id": "song-c33f92ec",
+    "workId": "work-song-170",
     "title": "炎",
     "originalArtist": "LiSA",
     "tags": [],
@@ -1711,6 +1806,7 @@
   },
   {
     "id": "song-c3b32ae5",
+    "workId": "work-song-2043",
     "title": "ロンリーユニバース",
     "originalArtist": "Aqu3ra",
     "tags": [],
@@ -1729,6 +1825,7 @@
   },
   {
     "id": "song-c62fd626",
+    "workId": "work-song-1274",
     "title": "愛言葉",
     "originalArtist": "DECO*27",
     "tags": [],
@@ -1747,6 +1844,7 @@
   },
   {
     "id": "song-c78e6498",
+    "workId": "work-song-c78e6498",
     "title": "愛言葉Ⅳ",
     "originalArtist": "DECO*27 feat. 初音ミク",
     "tags": [],
@@ -1765,6 +1863,7 @@
   },
   {
     "id": "song-c791bb66",
+    "workId": "work-song-159",
     "title": "左手指月",
     "originalArtist": "薩頂頂",
     "tags": [],
@@ -1783,6 +1882,7 @@
   },
   {
     "id": "song-c7ce03ea",
+    "workId": "work-song-c7ce03ea",
     "title": "戀愛頻率",
     "originalArtist": "許志安, 許慧欣",
     "tags": [],
@@ -1801,6 +1901,7 @@
   },
   {
     "id": "song-c98fd6f1",
+    "workId": "work-song-2882",
     "title": "牽絲戲",
     "originalArtist": "銀臨 & Aki阿杰",
     "tags": [],
@@ -1819,6 +1920,7 @@
   },
   {
     "id": "song-cb115394",
+    "workId": "work-song-1172",
     "title": "妄想感傷代償連盟",
     "originalArtist": "DECO*27",
     "tags": [],
@@ -1837,6 +1939,7 @@
   },
   {
     "id": "song-cc56c5b7",
+    "workId": "work-song-cc56c5b7",
     "title": "ワールドイズマイン",
     "originalArtist": "ryo(supercell)",
     "tags": [],
@@ -1855,6 +1958,7 @@
   },
   {
     "id": "song-cd6fd91c",
+    "workId": "work-song-cd6fd91c",
     "title": "大喜",
     "originalArtist": "泠鳶yousa",
     "tags": [],
@@ -1873,6 +1977,7 @@
   },
   {
     "id": "song-ce26476b",
+    "workId": "work-song-ce26476b",
     "title": "惑星ループ",
     "originalArtist": "ナユタン星人",
     "tags": [],
@@ -1891,6 +1996,7 @@
   },
   {
     "id": "song-d1506bcf",
+    "workId": "work-song-659",
     "title": "メランコリック",
     "originalArtist": "Junky",
     "tags": [],
@@ -1909,6 +2015,7 @@
   },
   {
     "id": "song-d51657eb",
+    "workId": "work-song-d51657eb",
     "title": "FOCUS",
     "originalArtist": "KIRA feat. GUMI",
     "tags": [],
@@ -1927,6 +2034,7 @@
   },
   {
     "id": "song-d69df5ce",
+    "workId": "work-song-d69df5ce",
     "title": "W/X/Y",
     "originalArtist": "Tani Yuuki",
     "tags": [],
@@ -1945,6 +2053,7 @@
   },
   {
     "id": "song-d70a6494",
+    "workId": "work-song-491",
     "title": "春を告げる",
     "originalArtist": "yama",
     "tags": [],
@@ -1963,6 +2072,7 @@
   },
   {
     "id": "song-d8538fe5",
+    "workId": "work-song-1ebee093",
     "title": "清清如我",
     "originalArtist": "郁可唯",
     "tags": [],
@@ -1981,6 +2091,7 @@
   },
   {
     "id": "song-d86135e5",
+    "workId": "work-song-d86135e5",
     "title": "シネマ",
     "originalArtist": "Ayase",
     "tags": [],
@@ -1999,6 +2110,7 @@
   },
   {
     "id": "song-d900a2f3",
+    "workId": "work-song-263",
     "title": "モエチャッカファイア",
     "originalArtist": "弌誠",
     "tags": [],
@@ -2017,6 +2129,7 @@
   },
   {
     "id": "song-d9138fe2",
+    "workId": "work-song-d9138fe2",
     "title": "39",
     "originalArtist": "sasakure.UK feat. 初音ミク",
     "tags": [],
@@ -2035,6 +2148,7 @@
   },
   {
     "id": "song-da68b13e",
+    "workId": "work-song-da68b13e",
     "title": "是風動",
     "originalArtist": "銀臨 & 河圖",
     "tags": [],
@@ -2053,6 +2167,7 @@
   },
   {
     "id": "song-da80ca2e",
+    "workId": "work-song-da80ca2e",
     "title": "食虫植物",
     "originalArtist": "理芽",
     "tags": [],
@@ -2071,6 +2186,7 @@
   },
   {
     "id": "song-db397cc9",
+    "workId": "work-song-db397cc9",
     "title": "テトリス",
     "originalArtist": "柊マグネタイト",
     "tags": [],
@@ -2089,6 +2205,7 @@
   },
   {
     "id": "song-de01abd3",
+    "workId": "work-song-33c059fe",
     "title": "愛言葉Ⅲ",
     "originalArtist": "DECO*27",
     "tags": [],
@@ -2107,6 +2224,7 @@
   },
   {
     "id": "song-ded184ed",
+    "workId": "work-song-ded184ed",
     "title": "幽霊東京(串燒版)",
     "originalArtist": "Ayase",
     "tags": [],
@@ -2125,6 +2243,7 @@
   },
   {
     "id": "song-df543f0c",
+    "workId": "work-song-24928401",
     "title": "菊花台",
     "originalArtist": "周杰倫",
     "tags": [],
@@ -2143,6 +2262,7 @@
   },
   {
     "id": "song-e18776c4",
+    "workId": "work-song-e18776c4",
     "title": "吃泡麵",
     "originalArtist": "曹寅",
     "tags": [],
@@ -2161,6 +2281,7 @@
   },
   {
     "id": "song-e1a57fe7",
+    "workId": "work-song-e1a57fe7",
     "title": "桃花諾",
     "originalArtist": "鄧紫棋",
     "tags": [],
@@ -2179,6 +2300,7 @@
   },
   {
     "id": "song-e2d2c54e",
+    "workId": "work-song-a0302d99",
     "title": "少女レイ",
     "originalArtist": "みきとP feat. 初音ミク",
     "tags": [],
@@ -2197,6 +2319,7 @@
   },
   {
     "id": "song-e3714cf6",
+    "workId": "work-song-e3714cf6",
     "title": "錦鯉抄",
     "originalArtist": "雲の泣 & 銀臨",
     "tags": [],
@@ -2215,6 +2338,7 @@
   },
   {
     "id": "song-e52ee89c",
+    "workId": "work-song-e52ee89c",
     "title": "Electric Angel",
     "originalArtist": "ヤスオ",
     "tags": [],
@@ -2233,6 +2357,7 @@
   },
   {
     "id": "song-e58dbf13",
+    "workId": "work-song-e58dbf13",
     "title": "Odds & Ends",
     "originalArtist": "ryo(supercell)",
     "tags": [],
@@ -2251,6 +2376,7 @@
   },
   {
     "id": "song-e69be755",
+    "workId": "work-song-150",
     "title": "寄明月",
     "originalArtist": "SING女團",
     "tags": [],
@@ -2269,6 +2395,7 @@
   },
   {
     "id": "song-e7bdc090",
+    "workId": "work-song-ad74e4c8",
     "title": "FOCUS",
     "originalArtist": "KIRA",
     "tags": [],
@@ -2287,6 +2414,7 @@
   },
   {
     "id": "song-e8439c85",
+    "workId": "work-song-e8439c85",
     "title": "威風堂々",
     "originalArtist": "梅とら feat. 初音ミク, 鏡音リン, 巡音ルカ, GUMI, IA",
     "tags": [],
@@ -2305,6 +2433,7 @@
   },
   {
     "id": "song-eb6811e0",
+    "workId": "work-song-2555",
     "title": "流光記",
     "originalArtist": "銀臨",
     "tags": [],
@@ -2323,6 +2452,7 @@
   },
   {
     "id": "song-ee19a9d9",
+    "workId": "work-song-204",
     "title": "大魚",
     "originalArtist": "周深",
     "tags": [],
@@ -2341,6 +2471,7 @@
   },
   {
     "id": "song-ef4445fb",
+    "workId": "work-song-5611694d",
     "title": "グッバイ宣言",
     "originalArtist": "Chinozo",
     "tags": [],
@@ -2359,6 +2490,7 @@
   },
   {
     "id": "song-efd31c05",
+    "workId": "work-song-a7997b7e",
     "title": "赤伶",
     "originalArtist": "等什麼君",
     "tags": [],
@@ -2377,6 +2509,7 @@
   },
   {
     "id": "song-f3cba954",
+    "workId": "work-song-1980",
     "title": "浪人琵琶",
     "originalArtist": "胡66",
     "tags": [],
@@ -2395,6 +2528,7 @@
   },
   {
     "id": "song-f3d07931",
+    "workId": "work-song-931",
     "title": "愛言葉Ⅳ",
     "originalArtist": "DECO*27",
     "tags": [],
@@ -2413,6 +2547,7 @@
   },
   {
     "id": "song-f4d7925f",
+    "workId": "work-song-f4d7925f",
     "title": "いーあるふぁんくらぶ",
     "originalArtist": "みきとP feat.GUMI・鏡音リン",
     "tags": [],
@@ -2431,6 +2566,7 @@
   },
   {
     "id": "song-f802d4e5",
+    "workId": "work-song-e58dbf13",
     "title": "Odds & Ends",
     "originalArtist": "ryo(supercell)",
     "tags": [],
@@ -2449,6 +2585,7 @@
   },
   {
     "id": "song-fa8cebb6",
+    "workId": "work-song-196",
     "title": "深海少女",
     "originalArtist": "ゆうゆ",
     "tags": [],
@@ -2467,6 +2604,7 @@
   },
   {
     "id": "song-fbd3cea4",
+    "workId": "work-song-fbd3cea4",
     "title": "畫地為牢",
     "originalArtist": "雲の泣 & 葉里",
     "tags": [],
@@ -2485,6 +2623,7 @@
   },
   {
     "id": "song-fbff3b8e",
+    "workId": "work-song-fbff3b8e",
     "title": "Dear",
     "originalArtist": "19's Sound Factory feat. 初音ミク",
     "tags": [],
@@ -2503,6 +2642,7 @@
   },
   {
     "id": "song-fe54c316",
+    "workId": "work-song-fe54c316",
     "title": "狂乱 Key Kids!!",
     "originalArtist": "THE ORAL CIGARETTES",
     "tags": [],

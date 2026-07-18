@@ -1,6 +1,7 @@
 [
   {
     "id": "song-0156acd7",
+    "workId": "work-song-0156acd7",
     "title": "ちゅ、多様性",
     "originalArtist": "Unknown",
     "tags": [],
@@ -19,6 +20,7 @@
   },
   {
     "id": "song-269e97d0",
+    "workId": "work-song-0745398b",
     "title": "可愛くてごめん",
     "originalArtist": "HoneyWorks",
     "tags": [],
@@ -37,6 +39,7 @@
   },
   {
     "id": "song-26cba52d",
+    "workId": "work-song-26cba52d",
     "title": "花に亡霊",
     "originalArtist": "Unknown",
     "tags": [],
@@ -55,6 +58,7 @@
   },
   {
     "id": "song-2eef9a77",
+    "workId": "work-song-19",
     "title": "ただ君に晴れ",
     "originalArtist": "ヨルシカ",
     "tags": [],
@@ -73,6 +77,7 @@
   },
   {
     "id": "song-34e28666",
+    "workId": "work-song-34e28666",
     "title": "すずめ",
     "originalArtist": "Unknown",
     "tags": [],
@@ -91,6 +96,7 @@
   },
   {
     "id": "song-35a9561d",
+    "workId": "work-song-07fb1c70",
     "title": "残酷な天使のテーゼ",
     "originalArtist": "高橋洋子",
     "tags": [],
@@ -109,6 +115,7 @@
   },
   {
     "id": "song-3a59fe5b",
+    "workId": "work-song-1815",
     "title": "花に亡霊",
     "originalArtist": "ヨルシカ",
     "tags": [],
@@ -127,6 +134,7 @@
   },
   {
     "id": "song-3ac0eadf",
+    "workId": "work-song-3ac0eadf",
     "title": "ヒッチコック",
     "originalArtist": "Unknown",
     "tags": [],
@@ -145,6 +153,7 @@
   },
   {
     "id": "song-3ace8fe5",
+    "workId": "work-song-3ace8fe5",
     "title": "怪獣の花唄",
     "originalArtist": "Unknown",
     "tags": [],
@@ -163,6 +172,7 @@
   },
   {
     "id": "song-4329b4f0",
+    "workId": "work-song-4329b4f0",
     "title": "乖乖歌",
     "originalArtist": "Gabu",
     "tags": [],
@@ -181,6 +191,7 @@
   },
   {
     "id": "song-476868e8",
+    "workId": "work-song-476868e8",
     "title": "点描の唄",
     "originalArtist": "Mrs.GREEN APPLE,井上苑子",
     "tags": [],
@@ -199,6 +210,7 @@
   },
   {
     "id": "song-54f2541d",
+    "workId": "work-song-54f2541d",
     "title": "残響散歌",
     "originalArtist": "Aimer",
     "tags": [],
@@ -217,6 +229,7 @@
   },
   {
     "id": "song-66ebee9f",
+    "workId": "work-song-66ebee9f",
     "title": "晴る",
     "originalArtist": "Unknown",
     "tags": [],
@@ -235,6 +248,7 @@
   },
   {
     "id": "song-6a0eb89e",
+    "workId": "work-song-6a0eb89e",
     "title": "おジャ魔女カーニバル",
     "originalArtist": "Unknown",
     "tags": [],
@@ -253,6 +267,7 @@
   },
   {
     "id": "song-6e7a44f9",
+    "workId": "work-song-416",
     "title": "Pretender",
     "originalArtist": "Official髭男dism",
     "tags": [],
@@ -271,6 +286,7 @@
   },
   {
     "id": "song-72318f54",
+    "workId": "work-song-72318f54",
     "title": "生日快樂歌",
     "originalArtist": "Unknown",
     "tags": [],
@@ -289,6 +305,7 @@
   },
   {
     "id": "song-89be9b4e",
+    "workId": "work-song-89be9b4e",
     "title": "森の小さなレストラン",
     "originalArtist": "Unknown",
     "tags": [],
@@ -307,6 +324,7 @@
   },
   {
     "id": "song-8ff9f5c1",
+    "workId": "work-song-421",
     "title": "風になる",
     "originalArtist": "つじあやの",
     "tags": [],
@@ -325,6 +343,7 @@
   },
   {
     "id": "song-9c770426",
+    "workId": "work-song-9c770426",
     "title": "ファジーネーブル",
     "originalArtist": "Unknown",
     "tags": [],
@@ -343,6 +362,7 @@
   },
   {
     "id": "song-9fa9e9c6",
+    "workId": "work-song-9fa9e9c6",
     "title": "点描の唄",
     "originalArtist": "Unknown",
     "tags": [],
@@ -361,6 +381,7 @@
   },
   {
     "id": "song-af4afa75",
+    "workId": "work-song-af4afa75",
     "title": "忘れじの言の葉",
     "originalArtist": "Unknown",
     "tags": [],
@@ -379,6 +400,7 @@
   },
   {
     "id": "song-b09351ba",
+    "workId": "work-song-b09351ba",
     "title": "天黑黑",
     "originalArtist": "Unknown",
     "tags": [],
@@ -397,6 +419,7 @@
   },
   {
     "id": "song-b6381653",
+    "workId": "work-song-28534ae4",
     "title": "ドライフラワー",
     "originalArtist": "優里",
     "tags": [],
@@ -415,6 +438,7 @@
   },
   {
     "id": "song-caa4aa95",
+    "workId": "work-song-caa4aa95",
     "title": "SAKURA",
     "originalArtist": "いきものがかり",
     "tags": [],
@@ -433,6 +457,7 @@
   },
   {
     "id": "song-cfb065e8",
+    "workId": "work-song-1143",
     "title": "Lemon",
     "originalArtist": "米津玄師",
     "tags": [],
@@ -451,6 +476,7 @@
   },
   {
     "id": "song-d1b3fab3",
+    "workId": "work-song-395ed5fa",
     "title": "secret base ～君がくれたもの～",
     "originalArtist": "ZONE",
     "tags": [],
@@ -469,6 +495,7 @@
   },
   {
     "id": "song-d5f01b4b",
+    "workId": "work-song-d5f01b4b",
     "title": "小小戀歌",
     "originalArtist": "MONGOL800",
     "tags": [],
@@ -487,6 +514,7 @@
   },
   {
     "id": "song-d7c53cc7",
+    "workId": "work-song-d7c53cc7",
     "title": "青空",
     "originalArtist": "Unknown",
     "tags": [],
@@ -505,6 +533,7 @@
   },
   {
     "id": "song-dfb4128e",
+    "workId": "work-song-dfb4128e",
     "title": "晚餐歌",
     "originalArtist": "Unknown",
     "tags": [],
@@ -523,6 +552,7 @@
   },
   {
     "id": "song-e03c3ef2",
+    "workId": "work-song-e03c3ef2",
     "title": "蝶々結び",
     "originalArtist": "Unknown",
     "tags": [],
@@ -541,6 +571,7 @@
   },
   {
     "id": "song-fc144523",
+    "workId": "work-song-424e636c",
     "title": "たばこ",
     "originalArtist": "コレサワ",
     "tags": [],

@@ -1,6 +1,7 @@
 [
   {
     "id": "song-06be676d",
+    "workId": "work-song-06be676d",
     "title": "うらたねこ♀",
     "originalArtist": "HoneyWorks",
     "tags": [],
@@ -19,6 +20,7 @@
   },
   {
     "id": "song-9552b6c2",
+    "workId": "work-song-9552b6c2",
     "title": "会いたくて 会いたくて",
     "originalArtist": "西野加奈",
     "tags": [],

@@ -1,6 +1,7 @@
 [
   {
     "id": "song-00335630",
+    "workId": "work-song-00335630",
     "title": "離島の歌",
     "originalArtist": "不知火 (東山奈央)",
     "tags": [],
@@ -19,6 +20,7 @@
   },
   {
     "id": "song-1461c1b3",
+    "workId": "work-song-1461c1b3",
     "title": "嘉賓",
     "originalArtist": "張遠",
     "tags": [],
@@ -37,6 +39,7 @@
   },
   {
     "id": "song-19e65c75",
+    "workId": "work-song-19e65c75",
     "title": "はじまりの風",
     "originalArtist": "平原綾香",
     "tags": [],
@@ -55,6 +58,7 @@
   },
   {
     "id": "song-1ce01ad9",
+    "workId": "work-song-1ce01ad9",
     "title": "星辰大海",
     "originalArtist": "黃霄雲",
     "tags": [],
@@ -73,6 +77,7 @@
   },
   {
     "id": "song-2ae06379",
+    "workId": "work-song-2ae06379",
     "title": "會呼吸的痛",
     "originalArtist": "梁靜茹",
     "tags": [],
@@ -91,6 +96,7 @@
   },
   {
     "id": "song-4edd3601",
+    "workId": "work-song-4edd3601",
     "title": "訣愛",
     "originalArtist": "詹雯婷",
     "tags": [],
@@ -109,6 +115,7 @@
   },
   {
     "id": "song-50afc100",
+    "workId": "work-song-50afc100",
     "title": "五天幾年",
     "originalArtist": "林凡",
     "tags": [],
@@ -127,6 +134,7 @@
   },
   {
     "id": "song-6bae41e2",
+    "workId": "work-song-6bae41e2",
     "title": "心訊 Heart Signal",
     "originalArtist": "煦Hiyori",
     "tags": [],
@@ -145,6 +153,7 @@
   },
   {
     "id": "song-747ee7b3",
+    "workId": "work-song-14c9e056",
     "title": "她說",
     "originalArtist": "林俊傑",
     "tags": [],
@@ -163,6 +172,7 @@
   },
   {
     "id": "song-7a4d7e8e",
+    "workId": "work-song-170",
     "title": "炎",
     "originalArtist": "LiSA",
     "tags": [],
@@ -181,6 +191,7 @@
   },
   {
     "id": "song-82640606",
+    "workId": "work-song-298",
     "title": "失落沙洲",
     "originalArtist": "徐佳瑩",
     "tags": [],
@@ -199,6 +210,7 @@
   },
   {
     "id": "song-a101cb49",
+    "workId": "work-song-a101cb49",
     "title": "指望",
     "originalArtist": "郁可唯",
     "tags": [],
@@ -217,6 +229,7 @@
   },
   {
     "id": "song-a133b5de",
+    "workId": "work-song-308",
     "title": "寶貝",
     "originalArtist": "張懸",
     "tags": [],
@@ -235,6 +248,7 @@
   },
   {
     "id": "song-aaafd07e",
+    "workId": "work-song-2248",
     "title": "時間煮雨",
     "originalArtist": "郁可唯",
     "tags": [],
@@ -253,6 +267,7 @@
   },
   {
     "id": "song-c6c7138a",
+    "workId": "work-song-1472",
     "title": "永不失聯的愛",
     "originalArtist": "周興哲",
     "tags": [],
@@ -271,6 +286,7 @@
   },
   {
     "id": "song-c9a61844",
+    "workId": "work-song-1683",
     "title": "人質",
     "originalArtist": "張惠妹",
     "tags": [],
@@ -289,6 +305,7 @@
   },
   {
     "id": "song-d8bdc29d",
+    "workId": "work-song-719",
     "title": "年輪",
     "originalArtist": "張碧晨",
     "tags": [],
@@ -307,6 +324,7 @@
   },
   {
     "id": "song-dd0dc534",
+    "workId": "work-song-1322",
     "title": "雨愛",
     "originalArtist": "楊丞琳",
     "tags": [],
@@ -325,6 +343,7 @@
   },
   {
     "id": "song-f1629572",
+    "workId": "work-song-f1629572",
     "title": "馬德里不思議",
     "originalArtist": "蔡依林",
     "tags": [],
@@ -343,6 +362,7 @@
   },
   {
     "id": "song-fa308963",
+    "workId": "work-song-1216",
     "title": "独りんぼエンヴィー",
     "originalArtist": "電ポルP",
     "tags": [],
