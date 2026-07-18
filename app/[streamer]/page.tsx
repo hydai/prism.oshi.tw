@@ -3,7 +3,7 @@
 import { useState, useMemo, useEffect, useRef, useCallback } from 'react';
 import Link from 'next/link';
 import { useVirtualizer } from '@tanstack/react-virtual';
-import { Search, Play, Shuffle, ExternalLink, Mic2, Youtube, Twitter, Facebook, Instagram, Twitch, Sparkles, ListMusic, Clock, Heart, Disc3, ChevronDown, ChevronRight, Plus, ListPlus, X, SlidersHorizontal, WifiOff, House, Radio, Film } from 'lucide-react';
+import { Search, Play, Shuffle, ExternalLink, Mic2, Youtube, Twitter, Facebook, Instagram, Twitch, Sparkles, ListMusic, Clock, Heart, ChevronDown, ChevronRight, Plus, ListPlus, X, SlidersHorizontal, WifiOff, House, Radio, Film } from 'lucide-react';
 import { useStreamer } from '../contexts/StreamerContext';
 import { usePlayer } from '../contexts/PlayerContext';
 import { usePlaylist } from '../contexts/PlaylistContext';
@@ -20,6 +20,7 @@ import TimelineRow from '../components/TimelineRow';
 import SongCard from '../components/SongCard';
 import MobileSearchRow from '../components/MobileSearchRow';
 import ThemeToggle from '../components/ThemeToggle';
+import ViewModeToggle from '../components/ViewModeToggle';
 import {
   filterFlattenedSongs,
   filterGroupedSongs,
@@ -944,6 +945,23 @@ export default function Home() {
             )}
           </div>
 
+          {/* Mobile View Mode Toggle — full-width touch target, scrolls with page */}
+          <div
+            data-testid="mobile-view-mode-bar"
+            className="lg:hidden flex items-center flex-shrink-0 px-5 py-3"
+            style={{
+              background: 'var(--bg-overlay)',
+              borderBottom: '1px solid var(--border-glass)',
+            }}
+          >
+            <ViewModeToggle
+              value={viewMode}
+              onChange={setViewMode}
+              testIdPrefix="mobile-view-toggle"
+              fullWidth
+            />
+          </div>
+
           {/* Mobile Year Filter Scroll — horizontal scrolling row, mobile only */}
           <div
             data-testid="mobile-stream-scroll"
@@ -1083,52 +1101,7 @@ export default function Home() {
               )}
 
               {/* View Mode Toggle — restyled to match design language */}
-              <div
-                className="hidden lg:flex items-center gap-1 flex-shrink-0"
-                style={{
-                  background: 'var(--bg-surface-muted)',
-                  borderRadius: 'var(--radius-pill)',
-                  padding: '3px',
-                  border: '1px solid var(--border-glass)',
-                }}
-              >
-                <button
-                  data-testid="view-toggle-timeline"
-                  onClick={() => setViewMode('timeline')}
-                  className={`flex items-center gap-1.5 font-semibold transition-all ${
-                    viewMode === 'timeline'
-                      ? 'bg-gradient-to-r from-accent-pink-light to-accent-blue-light text-white shadow-md'
-                      : ''
-                  }`}
-                  style={{
-                    borderRadius: 'var(--radius-pill)',
-                    fontSize: 'var(--font-size-sm)',
-                    padding: 'var(--space-2) var(--space-4)',
-                    color: viewMode === 'timeline' ? 'var(--text-on-accent)' : 'var(--text-secondary)',
-                  }}
-                >
-                  <Clock className="w-3.5 h-3.5" />
-                  時間序列
-                </button>
-                <button
-                  data-testid="view-toggle-grouped"
-                  onClick={() => setViewMode('grouped')}
-                  className={`flex items-center gap-1.5 font-semibold transition-all ${
-                    viewMode === 'grouped'
-                      ? 'bg-gradient-to-r from-accent-pink-light to-accent-blue-light text-white shadow-md'
-                      : ''
-                  }`}
-                  style={{
-                    borderRadius: 'var(--radius-pill)',
-                    fontSize: 'var(--font-size-sm)',
-                    padding: 'var(--space-2) var(--space-4)',
-                    color: viewMode === 'grouped' ? 'var(--text-on-accent)' : 'var(--text-secondary)',
-                  }}
-                >
-                  <Disc3 className="w-3.5 h-3.5" />
-                  歌曲分組
-                </button>
-              </div>
+              <ViewModeToggle value={viewMode} onChange={setViewMode} />
             </div>
 
             {/* Flexible spacer */}
