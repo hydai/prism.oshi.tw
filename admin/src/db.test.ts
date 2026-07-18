@@ -1,6 +1,7 @@
 import {
   bulkUnapproveStream,
   deleteStreamCascade,
+  exportSongs,
   importVodToAdminDb,
   listGlobalWorksPaginated,
   mergeSongs,
@@ -56,6 +57,12 @@ class FakeStatement {
     if (this.sql.includes('FROM songs') && this.sql.includes('id IN')) {
       return { results: this.fakeDb.mergeRows as T[] };
     }
+    if (this.sql.includes('FROM songs AS song') && this.sql.includes('LEFT JOIN song_work_links')) {
+      return { results: this.fakeDb.exportSongRows as T[] };
+    }
+    if (this.sql.includes('FROM performances WHERE streamer_id = ?')) {
+      return { results: this.fakeDb.exportPerformanceRows as T[] };
+    }
     return { results: [] };
   }
 
@@ -80,6 +87,8 @@ class FakeD1Database {
     readonly exactSongId: string | null = null,
     readonly mergeRows: unknown[] = [],
     readonly globalWorkFixture: GlobalWorkFixture | null = null,
+    readonly exportSongRows: unknown[] = [],
+    readonly exportPerformanceRows: unknown[] = [],
   ) {}
 
   prepare(sql: string): FakeStatement {
@@ -301,6 +310,8 @@ async function testSongIdentityEditRelinksGlobalWorkAtomically(): Promise<void> 
 }
 
 async function testGlobalWorksListAggregatesAcrossStreamers(): Promise<void> {
+  const longSearch = '窗外下著雨看著路上撐傘的行人害我一直想到你';
+  assert(new TextEncoder().encode(longSearch).length > 48, 'regression search exceeds D1 LIKE pattern limit');
   const fakeDb = new FakeD1Database(null, null, [], {
     count: 1,
     rows: [{
@@ -325,7 +336,7 @@ async function testGlobalWorksListAggregatesAcrossStreamers(): Promise<void> {
   });
 
   const result = await listGlobalWorksPaginated(fakeDb as unknown as D1Database, {
-    search: 'Shared',
+    search: longSearch,
     sharedOnly: true,
     page: 2,
     pageSize: 25,
@@ -343,10 +354,34 @@ async function testGlobalWorksListAggregatesAcrossStreamers(): Promise<void> {
   const dataQuery = fakeDb.batchStatements[1];
   assert(/WHERE\s+streamer_count\s+>\s+1/i.test(countQuery.sql), 'shared-only filter is applied after aggregation');
   assert(/ORDER\s+BY\s+streamer_count\s+ASC/i.test(dataQuery.sql), 'sort column is selected from the safe allowlist');
-  assertEqual(dataQuery.params[0], '%Shared%', 'title search is bound, never interpolated');
-  assertEqual(dataQuery.params[1], '%Shared%', 'artist search is bound, never interpolated');
+  assert(/instr\s*\(\s*lower\(work\.title\)/i.test(dataQuery.sql), 'title search avoids D1 LIKE pattern limits');
+  assert(/instr\s*\(\s*lower\(work\.original_artist\)/i.test(dataQuery.sql), 'artist search avoids D1 LIKE pattern limits');
+  assert(!/\bLIKE\b/i.test(dataQuery.sql), 'global search does not build a length-limited LIKE pattern');
+  assertEqual(dataQuery.params[0], longSearch, 'title search is bound without wildcard expansion');
+  assertEqual(dataQuery.params[1], longSearch, 'artist search is bound without wildcard expansion');
   assertEqual(dataQuery.params[2], 25, 'page size is bound');
   assertEqual(dataQuery.params[3], 25, 'second-page offset is bound');
+}
+
+async function testFanSiteExportOmitsNullWorkIds(): Promise<void> {
+  const baseSong = {
+    original_artist: 'Original Artist',
+    tags: '[]',
+    status: 'approved',
+    submitted_by: null,
+    reviewed_by: null,
+    created_at: '2026-01-01',
+    updated_at: '2026-01-02',
+  };
+  const fakeDb = new FakeD1Database(null, null, [], null, [
+    { ...baseSong, id: 'song-linked', work_id: 'work-shared', title: 'Linked Song' },
+    { ...baseSong, id: 'song-unlinked', work_id: null, title: 'Unlinked Song' },
+  ]);
+
+  const songs = await exportSongs(fakeDb as unknown as D1Database, 'alice');
+
+  assertEqual(songs[0].workId, 'work-shared', 'linked fan-site song exports its global work ID');
+  assert(!Object.prototype.hasOwnProperty.call(songs[1], 'workId'), 'unlinked fan-site song omits workId instead of exporting null');
 }
 
 function mergeRow(
@@ -458,6 +493,7 @@ async function main(): Promise<void> {
   await testVodImportReusesExactSong();
   await testSongIdentityEditRelinksGlobalWorkAtomically();
   await testGlobalWorksListAggregatesAcrossStreamers();
+  await testFanSiteExportOmitsNullWorkIds();
   await testMergeSongsPreservesPerformances();
   await testMergeSongsRejectsMissingOrCrossStreamerSource();
   await testSharedSongsSurviveStreamMutations();

@@ -311,10 +311,11 @@ export async function listGlobalWorksPaginated(
   const sortDir = opts.sortDir === 'asc' ? 'ASC' : 'DESC';
 
   const searchWhere = opts.search
-    ? 'WHERE work.title LIKE ? OR work.original_artist LIKE ?'
+    ? `WHERE instr(lower(work.title), lower(?)) > 0
+       OR instr(lower(work.original_artist), lower(?)) > 0`
     : '';
   const searchBinds = opts.search
-    ? [`%${opts.search}%`, `%${opts.search}%`]
+    ? [opts.search, opts.search]
     : [];
   const sharedWhere = opts.sharedOnly ? 'WHERE streamer_count > 1' : '';
   const rollupSql = `
@@ -1501,7 +1502,7 @@ export async function exportSongs(db: D1Database, streamerId: string) {
 
   return songRows.map((row) => ({
     id: row.id,
-    workId: row.work_id,
+    ...(row.work_id ? { workId: row.work_id } : {}),
     title: row.title,
     originalArtist: row.original_artist,
     tags: JSON.parse(row.tags) as string[],
