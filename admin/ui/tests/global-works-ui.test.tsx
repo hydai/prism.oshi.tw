@@ -62,7 +62,7 @@ async function main(): Promise<void> {
 
   const { api } = await import('../src/api/client');
   const { getVisibleNavItems } = await import('../src/components/Layout');
-  const { default: GlobalWorks } = await import('../src/pages/GlobalWorks');
+  const { default: GlobalWorks, SortHeader } = await import('../src/pages/GlobalWorks');
 
   await api.listGlobalWorks({ search: 'Shared', sharedOnly: true, page: 1 });
   assert(requestedUrl.startsWith('/api/works?'), 'global library uses the global works endpoint');
@@ -85,6 +85,25 @@ async function main(): Promise<void> {
   assert(html.includes('Global Song Library'), 'global library page renders its heading');
   assert(html.includes('Shared by multiple VTubers only'), 'global library page renders its cross-streamer filter');
   assert(html.includes('Unlinked songs'), 'global library page renders its coverage warning card');
+
+  const sortHeaderHtml = renderToStaticMarkup(
+    <table>
+      <thead>
+        <tr>
+          <SortHeader
+            label="Title"
+            field="title"
+            activeField="title"
+            sortDir="asc"
+            onSort={() => undefined}
+          />
+        </tr>
+      </thead>
+    </table>,
+  );
+  assert(sortHeaderHtml.includes('aria-sort="ascending"'), 'active column header exposes its sort direction');
+  assert(sortHeaderHtml.includes('<button type="button"'), 'sortable column header uses a keyboard-accessible button');
+  assert(sortHeaderHtml.includes('aria-hidden="true"'), 'decorative sort arrow stays out of the accessible name');
 
   console.log('✓ Global Library stays site-wide and curator-only');
 }

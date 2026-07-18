@@ -20,6 +20,37 @@ const EMPTY_STATS: GlobalWorkStats = {
   unlinkedSongs: 0,
 };
 
+export function SortHeader({
+  label,
+  field,
+  activeField,
+  sortDir,
+  onSort,
+}: {
+  label: string;
+  field: SortKey;
+  activeField: SortKey;
+  sortDir: SortDir;
+  onSort: (field: SortKey) => void;
+}) {
+  const isActive = activeField === field;
+  return (
+    <th
+      className="px-4 py-3"
+      aria-sort={isActive ? (sortDir === 'asc' ? 'ascending' : 'descending') : undefined}
+    >
+      <button
+        type="button"
+        className="flex w-full cursor-pointer select-none items-center gap-1 text-left hover:text-slate-700 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500"
+        onClick={() => onSort(field)}
+      >
+        <span>{label}</span>
+        {isActive && <span aria-hidden="true">{sortDir === 'asc' ? '↑' : '↓'}</span>}
+      </button>
+    </th>
+  );
+}
+
 export default function GlobalWorks() {
   const [works, setWorks] = useState<GlobalWorkSummary[]>([]);
   const [stats, setStats] = useState<GlobalWorkStats>(EMPTY_STATS);
@@ -80,15 +111,6 @@ export default function GlobalWorks() {
       setSortDir(key === 'title' || key === 'originalArtist' ? 'asc' : 'desc');
     }
   };
-
-  const SortHeader = ({ label, field }: { label: string; field: SortKey }) => (
-    <th
-      className="cursor-pointer select-none px-4 py-3 hover:text-slate-700"
-      onClick={() => toggleSort(field)}
-    >
-      {label} {sortKey === field ? (sortDir === 'asc' ? '↑' : '↓') : ''}
-    </th>
-  );
 
   const startItem = total === 0 ? 0 : (page - 1) * PAGE_SIZE + 1;
   const endItem = Math.min(page * PAGE_SIZE, total);
@@ -165,11 +187,41 @@ export default function GlobalWorks() {
             <table className="w-full text-left text-sm">
               <thead className="border-b border-slate-200 bg-slate-50 text-xs uppercase text-slate-500">
                 <tr>
-                  <SortHeader label="Title" field="title" />
-                  <SortHeader label="Original artist" field="originalArtist" />
-                  <SortHeader label="VTubers" field="streamerCount" />
-                  <SortHeader label="Local songs" field="songCount" />
-                  <SortHeader label="Performances" field="performanceCount" />
+                  <SortHeader
+                    label="Title"
+                    field="title"
+                    activeField={sortKey}
+                    sortDir={sortDir}
+                    onSort={toggleSort}
+                  />
+                  <SortHeader
+                    label="Original artist"
+                    field="originalArtist"
+                    activeField={sortKey}
+                    sortDir={sortDir}
+                    onSort={toggleSort}
+                  />
+                  <SortHeader
+                    label="VTubers"
+                    field="streamerCount"
+                    activeField={sortKey}
+                    sortDir={sortDir}
+                    onSort={toggleSort}
+                  />
+                  <SortHeader
+                    label="Local songs"
+                    field="songCount"
+                    activeField={sortKey}
+                    sortDir={sortDir}
+                    onSort={toggleSort}
+                  />
+                  <SortHeader
+                    label="Performances"
+                    field="performanceCount"
+                    activeField={sortKey}
+                    sortDir={sortDir}
+                    onSort={toggleSort}
+                  />
                   <th className="px-4 py-3">Work ID</th>
                 </tr>
               </thead>
