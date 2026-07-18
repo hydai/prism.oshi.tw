@@ -38,7 +38,7 @@
       "description": "Gabu💙左邊日本人右邊台灣人的假的日本人！",
       "avatarUrl": "https://yt3.ggpht.com/EiXx2rZ6H0vP5277BDSgfPbLCfT24tpVpjR75SnlHuCcwmE_REEDYozWjtN6jr_F5IyF_32G6W4=s240-c-k-c0x00ffffff-no-rj",
       "brandName": "GabuPrism",
-      "subscriberCount": "7.87萬",
+      "subscriberCount": "7.88萬",
       "group": "個人勢",
       "socialLinks": {
         "youtube": "https://www.youtube.com/channel/UCCHsCWNTcGJ8Jml_oZ6nG2Q",
@@ -269,6 +269,37 @@
       "enabled": true
     },
     {
+      "slug": "ichii",
+      "displayName": "莓Ichii Channel",
+      "description": "大家好！我是子午計畫所屬【沉珀Aetris】ㄉ莓ichii :3\n被你發現啦၄၃ꪔ̤̮",
+      "avatarUrl": "https://yt3.ggpht.com/iRJblrgl5Atfp-w2BNYahQ6_7f77x3iQAiVgut2_2zVdD9qCwG3MOuCh-EsEgA2o7Mmj_Oee=s240-c-k-c0x00ffffff-no-rj",
+      "brandName": "Ichii",
+      "subscriberCount": "8,620",
+      "group": "子午計畫",
+      "socialLinks": {
+        "youtube": "https://www.youtube.com/@%E8%8E%93Ichii_Channel",
+        "twitter": "https://x.com/Ichii_Aetris",
+        "facebook": "https://facebook.com/IchiiAetris",
+        "instagram": "https://instagram.com/ichii_aetris",
+        "twitch": "https://twitch.tv/ichii_aetris"
+      },
+      "theme": {
+        "accentPrimary": "#EC4899",
+        "accentPrimaryDark": "#DB2777",
+        "accentPrimaryLight": "#F472B6",
+        "accentSecondary": "#3B82F6",
+        "accentSecondaryLight": "#60A5FA",
+        "bgPageStart": "#FFF0F5",
+        "bgPageMid": "#F0F8FF",
+        "bgPageEnd": "#E6E6FA",
+        "bgAccentPrimary": "#FDF2F8",
+        "bgAccentPrimaryMuted": "#FCE7F3",
+        "borderAccentPrimary": "#FBCFE8",
+        "borderAccentSecondary": "#BFDBFE"
+      },
+      "enabled": true
+    },
+    {
       "slug": "inori",
       "displayName": "Inori Ch.秋月祁",
       "description": "馬來西亞多語言雜談系Vtuber\n頻道主要活動在於雜談和歌回",
@@ -311,6 +342,37 @@
         "facebook": "https://www.facebook.com/iruniianvs",
         "instagram": "https://www.instagram.com/iruni_ianvs/",
         "twitch": "https://www.twitch.tv/iruni_ianvs"
+      },
+      "theme": {
+        "accentPrimary": "#EC4899",
+        "accentPrimaryDark": "#DB2777",
+        "accentPrimaryLight": "#F472B6",
+        "accentSecondary": "#3B82F6",
+        "accentSecondaryLight": "#60A5FA",
+        "bgPageStart": "#FFF0F5",
+        "bgPageMid": "#F0F8FF",
+        "bgPageEnd": "#E6E6FA",
+        "bgAccentPrimary": "#FDF2F8",
+        "bgAccentPrimaryMuted": "#FCE7F3",
+        "borderAccentPrimary": "#FBCFE8",
+        "borderAccentSecondary": "#BFDBFE"
+      },
+      "enabled": true
+    },
+    {
+      "slug": "iseri",
+      "displayName": "宓Iseri Channel",
+      "description": "大家好呀 ^⦁᎑-^ ੭ 我是子午計畫所屬【沉珀Aetris】的宓Iseri\n想成為你的光芒照亮你 ☽ ·* ✧˚",
+      "avatarUrl": "https://yt3.ggpht.com/qIWSkH0lIeZrldrVX-VKRJtMyDYFHKXMfwcrwVbKnODCUpn2TiTs8iiGx7UAcYS_Kw4ivtyh=s240-c-k-c0x00ffffff-no-rj",
+      "brandName": "Iseri",
+      "subscriberCount": "8,350",
+      "group": "子午計畫",
+      "socialLinks": {
+        "youtube": "https://www.youtube.com/@%E5%AE%93Iseri_Channel",
+        "twitter": "https://x.com/Iseri_Aetris",
+        "facebook": "https://facebook.com/IseriAetris",
+        "instagram": "https://instagram.com/iseri_aetris",
+        "twitch": "https://twitch.tv/iseri_aetris"
       },
       "theme": {
         "accentPrimary": "#EC4899",
@@ -595,6 +657,37 @@
       "enabled": true
     },
     {
+      "slug": "miri",
+      "displayName": "璃Miri Channel",
+      "description": "大家好 我是子午計畫所屬【沉珀Aetris】的璃Miri\n讓我待在你身邊守護你吧｡·* ✧˚",
+      "avatarUrl": "https://yt3.ggpht.com/erJlmpAFYLgcsBlRl4nSKFV3B0lD1sk6ZlXp6JEWe_n9fWynvli9aAhiL-oFqIfXFkdcba7S3Q=s240-c-k-c0x00ffffff-no-rj",
+      "brandName": "Miri",
+      "subscriberCount": "8,080",
+      "group": "子午計畫",
+      "socialLinks": {
+        "youtube": "https://www.youtube.com/@%E7%92%83Miri_Channel",
+        "twitter": "https://x.com/Miri_Aetris",
+        "facebook": "https://facebook.com/MiriAetris",
+        "instagram": "https://instagram.com/miri_aetris",
+        "twitch": "https://twitch.tv/miri_aetris"
+      },
+      "theme": {
+        "accentPrimary": "#EC4899",
+        "accentPrimaryDark": "#DB2777",
+        "accentPrimaryLight": "#F472B6",
+        "accentSecondary": "#3B82F6",
+        "accentSecondaryLight": "#60A5FA",
+        "bgPageStart": "#FFF0F5",
+        "bgPageMid": "#F0F8FF",
+        "bgPageEnd": "#E6E6FA",
+        "bgAccentPrimary": "#FDF2F8",
+        "bgAccentPrimaryMuted": "#FCE7F3",
+        "borderAccentPrimary": "#FBCFE8",
+        "borderAccentSecondary": "#BFDBFE"
+      },
+      "enabled": true
+    },
+    {
       "slug": "nagi",
       "displayName": "NAGi",
       "description": "來自遙遠星球的宇宙歌姫",
@@ -778,7 +871,7 @@
       "description": "搭家豪💚這邊是BO荷🌱\n是可愛的金吉拉💖\n喜歡迷因🌝寫字🖊️興趣是畫圖\n很喜歡小番茄🍅跟芭樂汁💚\n希望可以成為你們心中的小太陽☀️\n主要在YT直播雜談、企劃、台詞回、歌回✨\n多種形態任你選擇🥰一頻道多個推\n喜歡蘿莉、姐姐、貓咪、婆婆...都歡迎乃認識窩💚",
       "avatarUrl": "https://yt3.ggpht.com/2_CpHCrwr8Yw3R5_6R1xNDdwYCejSwtMLTeiK3EtxEK875wS_TnWFavqIchBT46DzwlG5U-dYA=s240-c-k-c0x00ffffff-no-rj",
       "brandName": "RaimuMinto",
-      "subscriberCount": "4.13萬",
+      "subscriberCount": "4.14萬",
       "group": "個人勢",
       "socialLinks": {
         "youtube": "https://youtube.com/channel/UCwAUQdBH_rg9SYjrydUj-dQ?si=AbDrIBHb-i7jrcIg"
