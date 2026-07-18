@@ -108,6 +108,7 @@ const PROTECTED_ROUTES: Route[] = [
   { method: 'POST', path: '/api/streams/stream-1/paste-import', body: { text: 'Song - Artist 0:10', replace: true } },
   { method: 'DELETE', path: '/api/streams/stream-1/end-timestamps' },
   { method: 'POST', path: '/api/performances/perf-1/fetch-duration' },
+  { method: 'POST', path: '/api/harmonize/merge', body: { canonicalSongId: 'song-1', sourceSongIds: ['song-2'] } },
   { method: 'GET', path: '/api/vod-export/status' },
   { method: 'POST', path: '/api/vod-export/preview' },
   { method: 'GET', path: '/api/vod-export/candidates/00000000-0000-4000-8000-000000000000' },

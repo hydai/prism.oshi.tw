@@ -16,6 +16,25 @@ CREATE TABLE IF NOT EXISTS songs (
   updated_at TEXT DEFAULT (datetime('now'))
 );
 
+-- Historical mapping for merged song entities. Source row fields are retained
+-- so a curator can audit or reverse a merge from a database backup without
+-- sacrificing any performance rows.
+CREATE TABLE IF NOT EXISTS song_aliases (
+  source_song_id TEXT PRIMARY KEY,
+  canonical_song_id TEXT NOT NULL,
+  streamer_id TEXT NOT NULL,
+  source_title TEXT NOT NULL,
+  source_original_artist TEXT NOT NULL,
+  source_status TEXT NOT NULL CHECK(source_status IN ('pending', 'approved', 'rejected', 'excluded', 'extracted')),
+  source_tags TEXT NOT NULL CHECK(json_valid(source_tags)),
+  source_submitted_by TEXT,
+  source_reviewed_by TEXT,
+  source_created_at TEXT NOT NULL,
+  merged_by TEXT NOT NULL,
+  merged_at TEXT NOT NULL DEFAULT (datetime('now')),
+  CHECK(source_song_id <> canonical_song_id)
+);
+
 -- Performances (linked to songs)
 CREATE TABLE IF NOT EXISTS performances (
   id TEXT PRIMARY KEY,
@@ -55,6 +74,9 @@ CREATE TABLE IF NOT EXISTS streams (
 CREATE INDEX IF NOT EXISTS idx_songs_status ON songs(status);
 CREATE INDEX IF NOT EXISTS idx_songs_streamer ON songs(streamer_id);
 CREATE INDEX IF NOT EXISTS idx_songs_streamer_status ON songs(streamer_id, status);
+CREATE INDEX IF NOT EXISTS idx_songs_streamer_title_artist ON songs(streamer_id, title, original_artist);
+CREATE INDEX IF NOT EXISTS idx_song_aliases_canonical ON song_aliases(canonical_song_id);
+CREATE INDEX IF NOT EXISTS idx_song_aliases_streamer ON song_aliases(streamer_id);
 CREATE INDEX IF NOT EXISTS idx_performances_song_id ON performances(song_id);
 CREATE INDEX IF NOT EXISTS idx_performances_stream_id ON performances(stream_id);
 CREATE INDEX IF NOT EXISTS idx_performances_status ON performances(status);

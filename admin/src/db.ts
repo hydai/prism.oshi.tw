@@ -480,6 +480,91 @@ export async function listPerformancesForStream(
   return results.map(stampPerformanceFromRow);
 }
 
+interface ExactSongIdentity {
+  title: string;
+  originalArtist: string;
+}
+
+interface NewExactSong extends ExactSongIdentity {
+  id: string;
+}
+
+function exactSongIdentityKey(identity: ExactSongIdentity): string {
+  return JSON.stringify([identity.title, identity.originalArtist]);
+}
+
+/**
+ * Resolve exact title + original-artist matches before adding performances.
+ * Approved/pending songs are reusable catalog entities; rejected/excluded rows
+ * deliberately do not absorb a fresh submission. Duplicate identities within
+ * one import share the same generated song ID.
+ */
+async function resolveExactSongIds(
+  db: D1Database,
+  streamerId: string,
+  identities: ExactSongIdentity[],
+  excludeSongsOnlyInStreamId?: string,
+): Promise<{ songIds: string[]; newSongs: NewExactSong[] }> {
+  const uniqueByKey = new Map<string, ExactSongIdentity>();
+  for (const identity of identities) {
+    uniqueByKey.set(exactSongIdentityKey(identity), identity);
+  }
+
+  const unique = [...uniqueByKey.entries()];
+  const existingByKey = new Map<string, string>();
+  const LOOKUP_CHUNK_SIZE = 50;
+
+  for (let offset = 0; offset < unique.length; offset += LOOKUP_CHUNK_SIZE) {
+    const chunk = unique.slice(offset, offset + LOOKUP_CHUNK_SIZE);
+    const statements = chunk.map(([, identity]) => {
+      let sql = `SELECT s.id
+        FROM songs AS s
+        WHERE s.streamer_id = ?
+          AND s.title = ?
+          AND s.original_artist = ?
+          AND s.status IN ('approved', 'pending')`;
+      const binds: string[] = [streamerId, identity.title, identity.originalArtist];
+
+      if (excludeSongsOnlyInStreamId !== undefined) {
+        sql += `
+          AND EXISTS (
+            SELECT 1 FROM performances AS p
+            WHERE p.song_id = s.id AND p.stream_id <> ?
+          )`;
+        binds.push(excludeSongsOnlyInStreamId);
+      }
+
+      sql += `
+        ORDER BY
+          CASE s.status WHEN 'approved' THEN 0 ELSE 1 END,
+          s.created_at ASC,
+          s.id ASC
+        LIMIT 1`;
+      return db.prepare(sql).bind(...binds);
+    });
+
+    const results = await db.batch<{ id: string }>(statements);
+    results.forEach((result, index) => {
+      const row = result.results[0];
+      if (row) existingByKey.set(chunk[index][0], row.id);
+    });
+  }
+
+  const assignedByKey = new Map(existingByKey);
+  const newSongs: NewExactSong[] = [];
+  for (const [key, identity] of unique) {
+    if (assignedByKey.has(key)) continue;
+    const song: NewExactSong = { ...identity, id: generateSongId() };
+    assignedByKey.set(key, song.id);
+    newSongs.push(song);
+  }
+
+  return {
+    songIds: identities.map((identity) => assignedByKey.get(exactSongIdentityKey(identity))!),
+    newSongs,
+  };
+}
+
 export async function createSongAndPerformance(
   db: D1Database,
   streamerId: string,
@@ -494,22 +579,28 @@ export async function createSongAndPerformance(
   note: string,
   submittedBy: string,
 ): Promise<{ songId: string; performanceId: string }> {
-  const songId = generateSongId();
+  const { songIds, newSongs } = await resolveExactSongIds(db, streamerId, [
+    { title, originalArtist },
+  ]);
+  const songId = songIds[0];
   const perfId = generatePerformanceId();
 
-  await db.batch([
+  const statements: D1PreparedStatement[] = newSongs.map((song) =>
     db
       .prepare(
         'INSERT INTO songs (id, streamer_id, title, original_artist, tags, status, submitted_by) VALUES (?, ?, ?, ?, ?, ?, ?)',
       )
-      .bind(songId, streamerId, title, originalArtist, '[]', 'pending', submittedBy),
+      .bind(song.id, streamerId, song.title, song.originalArtist, '[]', 'pending', submittedBy),
+  );
+  statements.push(
     db
       .prepare(
         `INSERT INTO performances (id, streamer_id, song_id, stream_id, date, stream_title, video_id, timestamp, end_timestamp, note, status, submitted_by)
          VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
       )
       .bind(perfId, streamerId, songId, streamId, date, streamTitle, videoId, timestamp, endTimestamp, note, 'pending', submittedBy),
-  ]);
+  );
+  await db.batch(statements);
 
   return { songId, performanceId: perfId };
 }
@@ -628,6 +719,16 @@ export async function bulkCreatePerformances(
   submittedBy: string,
   replace: boolean,
 ): Promise<{ created: number }> {
+  const identities = songs.map((song) => ({
+    title: song.songName,
+    originalArtist: song.artist || 'Unknown',
+  }));
+  const { songIds, newSongs } = await resolveExactSongIds(
+    db,
+    streamerId,
+    identities,
+    replace ? streamId : undefined,
+  );
   const stmts: D1PreparedStatement[] = [];
 
   if (replace) {
@@ -636,7 +737,10 @@ export async function bulkCreatePerformances(
         `DELETE FROM songs WHERE id IN (
            SELECT p.song_id FROM performances p
            WHERE p.stream_id = ?
-           AND (SELECT COUNT(*) FROM performances p2 WHERE p2.song_id = p.song_id) = 1
+           GROUP BY p.song_id
+           HAVING COUNT(*) = (
+             SELECT COUNT(*) FROM performances p2 WHERE p2.song_id = p.song_id
+           )
          )`,
       ).bind(streamId),
     );
@@ -645,22 +749,25 @@ export async function bulkCreatePerformances(
     );
   }
 
-  for (const song of songs) {
-    const songId = generateSongId();
-    const perfId = generatePerformanceId();
-
+  for (const song of newSongs) {
     stmts.push(
       db.prepare(
         'INSERT INTO songs (id, streamer_id, title, original_artist, tags, status, submitted_by) VALUES (?, ?, ?, ?, ?, ?, ?)',
-      ).bind(songId, streamerId, song.songName, song.artist || 'Unknown', '[]', 'pending', submittedBy),
+      ).bind(song.id, streamerId, song.title, song.originalArtist, '[]', 'pending', submittedBy),
     );
+  }
+
+  songs.forEach((song, index) => {
+    const songId = songIds[index];
+    const perfId = generatePerformanceId();
+
     stmts.push(
       db.prepare(
         `INSERT INTO performances (id, streamer_id, song_id, stream_id, date, stream_title, video_id, timestamp, end_timestamp, note, status, submitted_by)
          VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
       ).bind(perfId, streamerId, songId, streamId, date, streamTitle, videoId, song.startSeconds, song.endSeconds, '', 'pending', submittedBy),
     );
-  }
+  });
 
   await db.batch(stmts);
   return { created: songs.length };
@@ -729,22 +836,31 @@ export async function importVodToAdminDb(
     );
   }
 
-  for (const song of vodSongs) {
-    const songId = generateSongId();
-    const perfId = generatePerformanceId();
+  const identities = vodSongs.map((song) => ({
+    title: song.song_title,
+    originalArtist: song.original_artist || 'Unknown',
+  }));
+  const { songIds, newSongs } = await resolveExactSongIds(db, streamerId, identities);
 
+  for (const song of newSongs) {
     stmts.push(
       db.prepare(
         'INSERT INTO songs (id, streamer_id, title, original_artist, tags, status, submitted_by) VALUES (?, ?, ?, ?, ?, ?, ?)',
-      ).bind(songId, streamerId, song.song_title, song.original_artist || 'Unknown', '[]', 'pending', submittedBy),
+      ).bind(song.id, streamerId, song.title, song.originalArtist, '[]', 'pending', submittedBy),
     );
+  }
+
+  vodSongs.forEach((song, index) => {
+    const songId = songIds[index];
+    const perfId = generatePerformanceId();
+
     stmts.push(
       db.prepare(
         `INSERT INTO performances (id, streamer_id, song_id, stream_id, date, stream_title, video_id, timestamp, end_timestamp, note, status, submitted_by)
          VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
       ).bind(perfId, streamerId, songId, streamId, streamDate, streamTitle, vod.video_id, song.start_timestamp, song.end_timestamp, '', 'pending', submittedBy),
     );
-  }
+  });
 
   if (stmts.length > 0) {
     await db.batch(stmts);
@@ -797,9 +913,16 @@ export async function bulkUnapproveStream(
          WHERE id IN (
            SELECT p.song_id FROM performances p
            WHERE p.stream_id = ? AND p.status = 'approved'
-         ) AND status = 'approved'`,
+         )
+         AND status = 'approved'
+         AND NOT EXISTS (
+           SELECT 1 FROM performances other
+           WHERE other.song_id = songs.id
+             AND other.stream_id <> ?
+             AND other.status = 'approved'
+         )`,
       )
-      .bind(streamId),
+      .bind(streamId, streamId),
     db
       .prepare(
         `UPDATE performances SET status = 'pending', updated_at = datetime('now')
@@ -828,13 +951,16 @@ export async function deleteStreamCascade(
     .first<{ cnt: number }>();
 
   const results = await db.batch([
-    // Songs whose only performances are in this stream
+    // Songs whose complete performance set is in this stream
     // (their performances go too via ON DELETE CASCADE)
     db.prepare(
       `DELETE FROM songs WHERE id IN (
          SELECT p.song_id FROM performances p
          WHERE p.stream_id = ?
-         AND (SELECT COUNT(*) FROM performances p2 WHERE p2.song_id = p.song_id) = 1
+         GROUP BY p.song_id
+         HAVING COUNT(*) = (
+           SELECT COUNT(*) FROM performances p2 WHERE p2.song_id = p.song_id
+         )
        )`,
     ).bind(streamId),
     // Defensive: performances whose songs also appear in other streams
@@ -1098,8 +1224,6 @@ export async function getSongSimilarityGroups(
 
   for (const [key, items] of exactGroups) {
     if (items.length >= 2) {
-      const allSame = items.every((i) => i.title === items[0].title);
-      if (allSame) continue;
       result.push({ normalizedKey: key, matchType: 'exact', items });
       for (const item of items) grouped.add(item.id);
     }
@@ -1250,6 +1374,191 @@ export async function getArtistSimilarityGroups(
 
   result.sort((a, b) => b.items.length - a.items.length);
   return result;
+}
+
+type SongMergeErrorCode = 'invalid_request' | 'song_not_found';
+
+export class SongMergeError extends Error {
+  constructor(
+    readonly code: SongMergeErrorCode,
+    message: string,
+  ) {
+    super(message);
+    this.name = 'SongMergeError';
+  }
+}
+
+interface SongMergeRow {
+  id: string;
+  streamer_id: string;
+  title: string;
+  original_artist: string;
+  tags: string;
+  status: Status;
+  submitted_by: string | null;
+  reviewed_by: string | null;
+  created_at: string;
+}
+
+export interface MergeSongsResult {
+  canonicalSongId: string;
+  mergedSongs: number;
+  movedPerformances: number;
+}
+
+const MERGE_SOURCE_LIMIT = 50;
+const MERGED_STATUS_PRIORITY: Status[] = [
+  'approved',
+  'pending',
+  'extracted',
+  'excluded',
+  'rejected',
+];
+
+function parseSongTags(tags: string): string[] {
+  try {
+    const parsed: unknown = JSON.parse(tags);
+    return Array.isArray(parsed)
+      ? parsed.filter((tag): tag is string => typeof tag === 'string')
+      : [];
+  } catch {
+    return [];
+  }
+}
+
+/**
+ * Atomically merge explicit source song entities into one canonical song.
+ * Performances are repointed, source rows are snapshotted in song_aliases,
+ * and no performance rows are deleted.
+ */
+export async function mergeSongs(
+  db: D1Database,
+  streamerId: string,
+  canonicalSongId: string,
+  sourceSongIds: string[],
+  mergedBy: string,
+): Promise<MergeSongsResult> {
+  const uniqueSourceIds = [...new Set(sourceSongIds)];
+  if (!canonicalSongId || uniqueSourceIds.length === 0) {
+    throw new SongMergeError('invalid_request', 'A canonical song and at least one source song are required');
+  }
+  if (uniqueSourceIds.length !== sourceSongIds.length) {
+    throw new SongMergeError('invalid_request', 'Source song IDs must be unique');
+  }
+  if (uniqueSourceIds.includes(canonicalSongId)) {
+    throw new SongMergeError('invalid_request', 'The canonical song cannot also be a source song');
+  }
+  if (uniqueSourceIds.length > MERGE_SOURCE_LIMIT) {
+    throw new SongMergeError('invalid_request', `At most ${MERGE_SOURCE_LIMIT} source songs can be merged at once`);
+  }
+
+  const requestedIds = [canonicalSongId, ...uniqueSourceIds];
+  const placeholders = requestedIds.map(() => '?').join(', ');
+  const { results: rows } = await db
+    .prepare(
+      `SELECT id, streamer_id, title, original_artist, tags, status,
+              submitted_by, reviewed_by, created_at
+       FROM songs
+       WHERE streamer_id = ? AND id IN (${placeholders})`,
+    )
+    .bind(streamerId, ...requestedIds)
+    .all<SongMergeRow>();
+
+  const rowById = new Map(rows.map((row) => [row.id, row]));
+  if (rowById.size !== requestedIds.length) {
+    throw new SongMergeError('song_not_found', 'One or more songs do not exist for the selected streamer');
+  }
+
+  const sourcePlaceholders = uniqueSourceIds.map(() => '?').join(', ');
+  const mismatchedPerformance = await db
+    .prepare(
+      `SELECT COUNT(*) AS count
+       FROM performances
+       WHERE song_id IN (${sourcePlaceholders}) AND streamer_id <> ?`,
+    )
+    .bind(...uniqueSourceIds, streamerId)
+    .first<{ count: number }>();
+  if ((mismatchedPerformance?.count ?? 0) > 0) {
+    throw new SongMergeError(
+      'invalid_request',
+      'A source song has performances assigned to a different streamer',
+    );
+  }
+
+  const canonical = rowById.get(canonicalSongId)!;
+  const sources = uniqueSourceIds.map((id) => rowById.get(id)!);
+  const allRows = [canonical, ...sources];
+  const tags = [...new Set(allRows.flatMap((row) => parseSongTags(row.tags)))];
+  const mergedStatus = MERGED_STATUS_PRIORITY.find((status) =>
+    allRows.some((row) => row.status === status),
+  ) ?? canonical.status;
+  const reviewedBy = canonical.reviewed_by
+    ?? allRows.find((row) => row.status === mergedStatus && row.reviewed_by)?.reviewed_by
+    ?? null;
+
+  const statements: D1PreparedStatement[] = [
+    db.prepare(
+      `UPDATE song_aliases
+       SET canonical_song_id = ?
+       WHERE streamer_id = ? AND canonical_song_id IN (${sourcePlaceholders})`,
+    ).bind(canonicalSongId, streamerId, ...uniqueSourceIds),
+  ];
+
+  for (const source of sources) {
+    statements.push(
+      db.prepare(
+        `INSERT INTO song_aliases (
+           source_song_id, canonical_song_id, streamer_id,
+           source_title, source_original_artist, source_status, source_tags,
+           source_submitted_by, source_reviewed_by, source_created_at, merged_by
+         ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+      ).bind(
+        source.id,
+        canonicalSongId,
+        streamerId,
+        source.title,
+        source.original_artist,
+        source.status,
+        source.tags,
+        source.submitted_by,
+        source.reviewed_by,
+        source.created_at,
+        mergedBy,
+      ),
+    );
+  }
+
+  statements.push(
+    db.prepare(
+      `UPDATE songs
+       SET tags = ?, status = ?, reviewed_by = ?, updated_at = datetime('now')
+       WHERE id = ? AND streamer_id = ?`,
+    ).bind(JSON.stringify(tags), mergedStatus, reviewedBy, canonicalSongId, streamerId),
+  );
+
+  const performanceUpdateIndex = statements.length;
+  statements.push(
+    db.prepare(
+      `UPDATE performances
+       SET song_id = ?, updated_at = datetime('now')
+       WHERE streamer_id = ? AND song_id IN (${sourcePlaceholders})`,
+    ).bind(canonicalSongId, streamerId, ...uniqueSourceIds),
+  );
+
+  const songDeleteIndex = statements.length;
+  statements.push(
+    db.prepare(
+      `DELETE FROM songs
+       WHERE streamer_id = ? AND id IN (${sourcePlaceholders})`,
+    ).bind(streamerId, ...uniqueSourceIds),
+  );
+
+  const batchResults = await db.batch(statements);
+  return {
+    canonicalSongId,
+    mergedSongs: batchResults[songDeleteIndex].meta.changes,
+    movedPerformances: batchResults[performanceUpdateIndex].meta.changes,
+  };
 }
 
 export async function batchUpdateSongs(

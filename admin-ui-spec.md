@@ -726,7 +726,7 @@ Two tabs: **Similar Songs** | **Similar Artists**
 - **Mode dropdown**: Exact / Fuzzy
 - **Threshold** input (only shown in Fuzzy mode): number 0.50–1.00, step 0.05, default 0.85
 - **Stats**: "N group(s), M song(s) affected"
-- **Apply All Reviewed** button (green, right-aligned): applies all canonical selections
+- Song merges are applied one reviewed group at a time; there is no bulk merge button
 
 #### Similarity Groups
 Each group is an expandable card (`rounded-lg border border-slate-200 bg-white`):
@@ -742,11 +742,13 @@ Each group is an expandable card (`rounded-lg border border-slate-200 bg-white`)
 |--------|---------|
 | Use (radio) | Select canonical version — selected row gets `bg-blue-50` |
 | Title | Canonical title shown in `text-blue-700 font-medium`; non-canonical shows ~~strikethrough~~ original + new blue text |
-| Artist | `text-slate-600` |
+| Artist | Canonical artist stays unchanged; non-canonical differences preview the replacement |
 | Status | StatusBadge |
 | Perfs | Performance count (right-aligned) |
 
-- **Apply to Group** button (blue) at bottom right
+- **Merge into Selected Song** button (blue) at bottom right
+- Confirmation shows the number of source song rows and performances
+- Applying a group repoints every performance to the canonical song, records source rows in `song_aliases`, then removes only those source song rows; it never deletes performances
 
 #### Auto-Selection Logic
 Canonical is auto-selected as the song with:

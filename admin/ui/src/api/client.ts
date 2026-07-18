@@ -38,6 +38,8 @@ import type {
   HarmonizeSongsResponse,
   HarmonizeArtistsResponse,
   HarmonizeApplyBody,
+  HarmonizeMergeBody,
+  HarmonizeMergeResponse,
   HarmonizeMatchType,
   BulkFetchSubscribersResponse,
 } from '../../../shared/types';
@@ -481,6 +483,12 @@ export const api = {
 
   harmonizeApply: (body: HarmonizeApplyBody) =>
     request<{ ok: boolean; updated: number }>('/api/harmonize/apply', {
+      method: 'POST',
+      body: JSON.stringify(body),
+    }),
+
+  harmonizeMerge: (body: HarmonizeMergeBody) =>
+    request<HarmonizeMergeResponse>('/api/harmonize/merge', {
       method: 'POST',
       body: JSON.stringify(body),
     }),

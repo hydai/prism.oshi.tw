@@ -464,3 +464,15 @@ export interface HarmonizeArtistsResponse {
 export interface HarmonizeApplyBody {
   updates: Array<{ songId: string; title?: string; originalArtist?: string }>;
 }
+
+export interface HarmonizeMergeBody {
+  canonicalSongId: string;
+  sourceSongIds: string[];
+}
+
+export interface HarmonizeMergeResponse {
+  ok: true;
+  canonicalSongId: string;
+  mergedSongs: number;
+  movedPerformances: number;
+}

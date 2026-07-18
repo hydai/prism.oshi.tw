@@ -78,19 +78,6 @@
     "lastError": null
   },
   {
-    "songId": "song-7",
-    "fetchStatus": "no_match",
-    "matchConfidence": null,
-    "albumArtUrl": null,
-    "albumArtUrls": null,
-    "albumTitle": null,
-    "deezerTrackId": null,
-    "deezerArtistId": null,
-    "trackDuration": null,
-    "fetchedAt": "2026-02-25T16:22:57.415957+00:00",
-    "lastError": null
-  },
-  {
     "songId": "song-8",
     "fetchStatus": "no_match",
     "matchConfidence": null,
@@ -247,7 +234,7 @@
     "lastError": null
   },
   {
-    "songId": "song-20",
+    "songId": "song-176",
     "fetchStatus": "no_match",
     "matchConfidence": null,
     "albumArtUrl": null,
@@ -416,7 +403,7 @@
     "lastError": null
   },
   {
-    "songId": "song-33",
+    "songId": "song-1168",
     "fetchStatus": "no_match",
     "matchConfidence": null,
     "albumArtUrl": null,
