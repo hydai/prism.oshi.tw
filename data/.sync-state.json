@@ -64,6 +64,15 @@
       "performancesCount": 47,
       "streamsCount": 5
     },
+    "ichii": {
+      "lastSyncedAt": null,
+      "maxSongUpdatedAt": null,
+      "maxPerfUpdatedAt": null,
+      "maxStreamUpdatedAt": null,
+      "songsCount": 0,
+      "performancesCount": 0,
+      "streamsCount": 0
+    },
     "inori": {
       "lastSyncedAt": "2026-05-19T04:02:25.354Z",
       "maxSongUpdatedAt": "2026-05-18 16:13:26",
@@ -75,6 +84,15 @@
     },
     "iruni": {
       "lastSyncedAt": "2026-04-19T11:27:52.877Z",
+      "maxSongUpdatedAt": null,
+      "maxPerfUpdatedAt": null,
+      "maxStreamUpdatedAt": null,
+      "songsCount": 0,
+      "performancesCount": 0,
+      "streamsCount": 0
+    },
+    "iseri": {
+      "lastSyncedAt": null,
       "maxSongUpdatedAt": null,
       "maxPerfUpdatedAt": null,
       "maxStreamUpdatedAt": null,
@@ -156,6 +174,15 @@
     },
     "minatoaqua": {
       "lastSyncedAt": "2026-04-19T11:28:26.709Z",
+      "maxSongUpdatedAt": null,
+      "maxPerfUpdatedAt": null,
+      "maxStreamUpdatedAt": null,
+      "songsCount": 0,
+      "performancesCount": 0,
+      "streamsCount": 0
+    },
+    "miri": {
+      "lastSyncedAt": null,
       "maxSongUpdatedAt": null,
       "maxPerfUpdatedAt": null,
       "maxStreamUpdatedAt": null,
