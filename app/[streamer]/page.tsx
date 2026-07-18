@@ -30,6 +30,7 @@ import {
   followingTracksFromGrouped,
   getAllArtists,
   getAvailableYears,
+  groupSongsByWorkId,
   mergeAlbumArt,
   sortGroupedSongs,
   sortStreamsByNewest,
@@ -244,7 +245,10 @@ export default function Home() {
     () => filterFlattenedSongs(allFlattenedSongs, archiveFilters),
     [allFlattenedSongs, archiveFilters],
   );
-  const allGroupedSongs: ArchiveSong[] = useMemo(() => sortGroupedSongs(songs), [songs]);
+  const allGroupedSongs: ArchiveSong[] = useMemo(
+    () => sortGroupedSongs(groupSongsByWorkId(songs)),
+    [songs],
+  );
   const groupedSongs: ArchiveSong[] = useMemo(
     () => filterGroupedSongs(allGroupedSongs, archiveFilters),
     [allGroupedSongs, archiveFilters],

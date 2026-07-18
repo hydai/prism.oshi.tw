@@ -93,6 +93,38 @@ export function filterFlattenedSongs(
   });
 }
 
+export function groupSongsByWorkId(songs: ArchiveSong[]): ArchiveSong[] {
+  const groups = new Map<string, ArchiveSong[]>();
+
+  songs.forEach((song, index) => {
+    const workId = song.workId?.trim();
+    // Missing work IDs are legacy data. Keep every legacy song independent
+    // instead of falling back to mutable title/artist text.
+    const groupKey = workId ? `work:${workId}` : `legacy:${index}`;
+    const group = groups.get(groupKey);
+    if (group) {
+      group.push(song);
+    } else {
+      groups.set(groupKey, [song]);
+    }
+  });
+
+  return Array.from(groups.values(), (members) => {
+    const orderedMembers = [...members].sort((a, b) => a.id.localeCompare(b.id));
+    const canonical = orderedMembers[0];
+    const workId = canonical.workId?.trim();
+    const albumArtUrl = orderedMembers.find((song) => song.albumArtUrl)?.albumArtUrl;
+
+    return {
+      ...canonical,
+      ...(workId ? { workId } : {}),
+      tags: Array.from(new Set(orderedMembers.flatMap((song) => song.tags))),
+      performances: orderedMembers.flatMap((song) => song.performances),
+      albumArtUrl,
+    };
+  });
+}
+
 export function sortGroupedSongs(songs: ArchiveSong[]): ArchiveSong[] {
   return [...songs].sort((a, b) => a.title.localeCompare(b.title, "zh-TW"));
 }

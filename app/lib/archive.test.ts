@@ -8,6 +8,7 @@ import {
   followingTracksFromGrouped,
   getAllArtists,
   getAvailableYears,
+  groupSongsByWorkId,
   mergeAlbumArt,
   sortGroupedSongs,
   sortStreamsByNewest,
@@ -142,6 +143,85 @@ assert.deepEqual(
   }),
   [],
 );
+
+const workIdSongs: ArchiveSong[] = [
+  {
+    id: "song-shared-z",
+    workId: "work-shared",
+    title: "Shared Song (legacy spelling)",
+    originalArtist: "Shared Artist",
+    tags: ["acoustic"],
+    albumArtUrl: "shared-art",
+    performances: [
+      {
+        id: "perf-shared-z",
+        date: "2023-01-01",
+        streamTitle: "Older performance",
+        videoId: "video-shared-z",
+        timestamp: 10,
+        note: "",
+      },
+    ],
+  },
+  {
+    id: "song-shared-a",
+    workId: " work-shared ",
+    title: "Shared Song",
+    originalArtist: "Shared Artist",
+    tags: ["ballad", "acoustic"],
+    performances: [
+      {
+        id: "perf-shared-a",
+        date: "2025-01-01",
+        streamTitle: "Newer performance",
+        videoId: "video-shared-a",
+        timestamp: 20,
+        note: "",
+      },
+    ],
+  },
+  {
+    id: "song-other-work",
+    workId: "work-other",
+    title: "Shared Song",
+    originalArtist: "Shared Artist",
+    tags: [],
+    performances: [],
+  },
+  {
+    id: "song-legacy-a",
+    title: "Shared Song",
+    originalArtist: "Shared Artist",
+    tags: [],
+    performances: [],
+  },
+  {
+    id: "song-legacy-b",
+    workId: "   ",
+    title: "Shared Song",
+    originalArtist: "Shared Artist",
+    tags: [],
+    performances: [],
+  },
+];
+const workIdSongsBeforeGrouping = structuredClone(workIdSongs);
+const groupedByWorkId = groupSongsByWorkId(workIdSongs);
+const sharedWork = groupedByWorkId.find((song) => song.workId === "work-shared");
+assert.equal(groupedByWorkId.length, 4);
+assert.equal(sharedWork?.id, "song-shared-a");
+assert.equal(sharedWork?.title, "Shared Song");
+assert.equal(sharedWork?.albumArtUrl, "shared-art");
+assert.deepEqual(sharedWork?.tags, ["ballad", "acoustic"]);
+assert.deepEqual(
+  sharedWork?.performances.map((performance) => performance.id),
+  ["perf-shared-a", "perf-shared-z"],
+);
+assert.equal(
+  groupedByWorkId.filter((song) => song.title === "Shared Song").length,
+  4,
+);
+assert.deepEqual(groupSongsByWorkId(groupedByWorkId), groupedByWorkId);
+assert.deepEqual(workIdSongs, workIdSongsBeforeGrouping);
 
 const grouped = sortGroupedSongs(songs);
 assert.deepEqual(grouped.map((song) => song.id), ["song-b", "song-a", "song-c"]);
