@@ -322,7 +322,7 @@ async function testGlobalWorksListAggregatesAcrossStreamers(): Promise<void> {
       streamer_count: 2,
       song_count: 3,
       performance_count: 7,
-      streamer_ids: 'alice,bob',
+      streamer_ids: 'bob,alice',
       created_at: '2026-01-01',
       updated_at: '2026-01-02',
     }],
@@ -347,7 +347,7 @@ async function testGlobalWorksListAggregatesAcrossStreamers(): Promise<void> {
   assertEqual(result.page, 2, 'global page preserves valid requested page');
   assertEqual(result.pageSize, 25, 'global page preserves valid requested page size');
   assertEqual(result.works[0].id, 'work-shared', 'global work row is mapped');
-  assertEqual(result.works[0].streamerIds.join('|'), 'alice|bob', 'cross-streamer membership is exposed');
+  assertEqual(result.works[0].streamerIds.join('|'), 'alice|bob', 'cross-streamer membership is stable');
   assertEqual(result.stats.linkedPerformances, 12, 'site-wide coverage stats are mapped');
 
   const countQuery = fakeDb.batchStatements[0];

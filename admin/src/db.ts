@@ -391,7 +391,7 @@ export async function listGlobalWorksPaginated(
     streamerCount: row.streamer_count,
     songCount: row.song_count,
     performanceCount: row.performance_count,
-    streamerIds: row.streamer_ids ? row.streamer_ids.split(',') : [],
+    streamerIds: row.streamer_ids ? row.streamer_ids.split(',').sort() : [],
     createdAt: row.created_at,
     updatedAt: row.updated_at,
   }));
