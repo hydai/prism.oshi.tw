@@ -152,25 +152,6 @@
     ]
   },
   {
-    "id": "song-0b948d3f",
-    "workId": "work-song-0b948d3f",
-    "title": "忘れじの言の葉",
-    "originalArtist": "安次嶺希和子",
-    "tags": [],
-    "performances": [
-      {
-        "id": "p-519ccce5",
-        "streamId": "stream-02c40ac6",
-        "date": "2026-05-17",
-        "streamTitle": "【#歌回 】300贊耐久感冒歌回！！ | #MalaysiaVtuber #馬來西亞Vtuber【秋月イノリ | 秋月祁】",
-        "videoId": "ODikksIsYEc",
-        "timestamp": 11792,
-        "endTimestamp": 12026,
-        "note": ""
-      }
-    ]
-  },
-  {
     "id": "song-0c224a90",
     "workId": "work-song-0c224a90",
     "title": "リードコントロール",
@@ -376,6 +357,16 @@
         "timestamp": 3102,
         "endTimestamp": 3299,
         "note": ""
+      },
+      {
+        "id": "p-d5520d20",
+        "streamId": "stream-0a97675c",
+        "date": "2026-05-10",
+        "streamTitle": "【#歌回 】今天是古風歌回 SC可點歌 但今天只唱古風～ | #MalaysiaVtuber #馬來西亞Vtuber【秋月イノリ | 秋月祁】",
+        "videoId": "rSCyxZQ4Sis",
+        "timestamp": 15745,
+        "endTimestamp": 15944,
+        "note": ""
       }
     ]
   },
@@ -528,6 +519,16 @@
         "timestamp": 1595,
         "endTimestamp": 1808,
         "note": ""
+      },
+      {
+        "id": "p-d3922176",
+        "streamId": "stream-2026-04-26",
+        "date": "2026-04-26",
+        "streamTitle": "【#歌回 】130同接耐久點歌歌回 SC可點歌!!!",
+        "videoId": "QuPB5nDhK5o",
+        "timestamp": 2034,
+        "endTimestamp": 2247,
+        "note": ""
       }
     ]
   },
@@ -546,25 +547,6 @@
         "videoId": "QuPB5nDhK5o",
         "timestamp": 7446,
         "endTimestamp": 7638,
-        "note": ""
-      }
-    ]
-  },
-  {
-    "id": "song-33c059fe",
-    "workId": "work-song-33c059fe",
-    "title": "愛言葉Ⅲ",
-    "originalArtist": "DECO*27",
-    "tags": [],
-    "performances": [
-      {
-        "id": "p-43337414",
-        "streamId": "stream-2026-04-26",
-        "date": "2026-04-26",
-        "streamTitle": "【#歌回 】130同接耐久點歌歌回 SC可點歌!!!",
-        "videoId": "QuPB5nDhK5o",
-        "timestamp": 7097,
-        "endTimestamp": 7341,
         "note": ""
       }
     ]
@@ -1254,25 +1236,6 @@
     ]
   },
   {
-    "id": "song-87ac241c",
-    "workId": "work-song-1172",
-    "title": "妄想感傷代償連盟",
-    "originalArtist": "DECO*27",
-    "tags": [],
-    "performances": [
-      {
-        "id": "p-286709b5",
-        "streamId": "stream-2026-04-26",
-        "date": "2026-04-26",
-        "streamTitle": "【#歌回 】130同接耐久點歌歌回 SC可點歌!!!",
-        "videoId": "QuPB5nDhK5o",
-        "timestamp": 3685,
-        "endTimestamp": 3947,
-        "note": ""
-      }
-    ]
-  },
-  {
     "id": "song-885c54ab",
     "workId": "work-song-885c54ab",
     "title": "わたしの一番かわいいところ",
@@ -1459,6 +1422,16 @@
         "timestamp": 5870,
         "endTimestamp": 6103,
         "note": ""
+      },
+      {
+        "id": "p-519ccce5",
+        "streamId": "stream-02c40ac6",
+        "date": "2026-05-17",
+        "streamTitle": "【#歌回 】300贊耐久感冒歌回！！ | #MalaysiaVtuber #馬來西亞Vtuber【秋月イノリ | 秋月祁】",
+        "videoId": "ODikksIsYEc",
+        "timestamp": 11792,
+        "endTimestamp": 12026,
+        "note": ""
       }
     ]
   },
@@ -1520,25 +1493,6 @@
     ]
   },
   {
-    "id": "song-a8ef4da0",
-    "workId": "work-song-3095dd3f",
-    "title": "六兆年と一夜物語",
-    "originalArtist": "Kemu",
-    "tags": [],
-    "performances": [
-      {
-        "id": "p-d3922176",
-        "streamId": "stream-2026-04-26",
-        "date": "2026-04-26",
-        "streamTitle": "【#歌回 】130同接耐久點歌歌回 SC可點歌!!!",
-        "videoId": "QuPB5nDhK5o",
-        "timestamp": 2034,
-        "endTimestamp": 2247,
-        "note": ""
-      }
-    ]
-  },
-  {
     "id": "song-a9491a80",
     "workId": "work-song-a9491a80",
     "title": "ULTRA C",
@@ -1591,6 +1545,16 @@
         "videoId": "d1NGgYgGuoY",
         "timestamp": 11025,
         "endTimestamp": 11224,
+        "note": ""
+      },
+      {
+        "id": "p-5ccca337",
+        "streamId": "stream-2026-04-26",
+        "date": "2026-04-26",
+        "streamTitle": "【#歌回 】130同接耐久點歌歌回 SC可點歌!!!",
+        "videoId": "QuPB5nDhK5o",
+        "timestamp": 9779,
+        "endTimestamp": 9978,
         "note": ""
       }
     ]
@@ -1934,6 +1898,16 @@
         "timestamp": 4439,
         "endTimestamp": 4701,
         "note": ""
+      },
+      {
+        "id": "p-286709b5",
+        "streamId": "stream-2026-04-26",
+        "date": "2026-04-26",
+        "streamTitle": "【#歌回 】130同接耐久點歌歌回 SC可點歌!!!",
+        "videoId": "QuPB5nDhK5o",
+        "timestamp": 3685,
+        "endTimestamp": 3947,
+        "note": ""
       }
     ]
   },
@@ -2071,25 +2045,6 @@
     ]
   },
   {
-    "id": "song-d8538fe5",
-    "workId": "work-song-1ebee093",
-    "title": "清清如我",
-    "originalArtist": "郁可唯",
-    "tags": [],
-    "performances": [
-      {
-        "id": "p-d5520d20",
-        "streamId": "stream-0a97675c",
-        "date": "2026-05-10",
-        "streamTitle": "【#歌回 】今天是古風歌回 SC可點歌 但今天只唱古風～ | #MalaysiaVtuber #馬來西亞Vtuber【秋月イノリ | 秋月祁】",
-        "videoId": "rSCyxZQ4Sis",
-        "timestamp": 15745,
-        "endTimestamp": 15944,
-        "note": ""
-      }
-    ]
-  },
-  {
     "id": "song-d86135e5",
     "workId": "work-song-d86135e5",
     "title": "シネマ",
@@ -2218,6 +2173,16 @@
         "videoId": "d1NGgYgGuoY",
         "timestamp": 9317,
         "endTimestamp": 9563,
+        "note": ""
+      },
+      {
+        "id": "p-43337414",
+        "streamId": "stream-2026-04-26",
+        "date": "2026-04-26",
+        "streamTitle": "【#歌回 】130同接耐久點歌歌回 SC可點歌!!!",
+        "videoId": "QuPB5nDhK5o",
+        "timestamp": 7097,
+        "endTimestamp": 7341,
         "note": ""
       }
     ]
@@ -2371,6 +2336,16 @@
         "timestamp": 6170,
         "endTimestamp": 6499,
         "note": ""
+      },
+      {
+        "id": "p-5d2411b5",
+        "streamId": "stream-2026-04-26",
+        "date": "2026-04-26",
+        "streamTitle": "【#歌回 】130同接耐久點歌歌回 SC可點歌!!!",
+        "videoId": "QuPB5nDhK5o",
+        "timestamp": 2411,
+        "endTimestamp": 2740,
+        "note": ""
       }
     ]
   },
@@ -2389,25 +2364,6 @@
         "videoId": "rSCyxZQ4Sis",
         "timestamp": 8376,
         "endTimestamp": 8601,
-        "note": ""
-      }
-    ]
-  },
-  {
-    "id": "song-e7bdc090",
-    "workId": "work-song-ad74e4c8",
-    "title": "FOCUS",
-    "originalArtist": "KIRA",
-    "tags": [],
-    "performances": [
-      {
-        "id": "p-5ccca337",
-        "streamId": "stream-2026-04-26",
-        "date": "2026-04-26",
-        "streamTitle": "【#歌回 】130同接耐久點歌歌回 SC可點歌!!!",
-        "videoId": "QuPB5nDhK5o",
-        "timestamp": 9779,
-        "endTimestamp": 9978,
         "note": ""
       }
     ]
@@ -2560,25 +2516,6 @@
         "videoId": "ODikksIsYEc",
         "timestamp": 3025,
         "endTimestamp": 3257,
-        "note": ""
-      }
-    ]
-  },
-  {
-    "id": "song-f802d4e5",
-    "workId": "work-song-e58dbf13",
-    "title": "Odds & Ends",
-    "originalArtist": "ryo(supercell)",
-    "tags": [],
-    "performances": [
-      {
-        "id": "p-5d2411b5",
-        "streamId": "stream-2026-04-26",
-        "date": "2026-04-26",
-        "streamTitle": "【#歌回 】130同接耐久點歌歌回 SC可點歌!!!",
-        "videoId": "QuPB5nDhK5o",
-        "timestamp": 2411,
-        "endTimestamp": 2740,
         "note": ""
       }
     ]

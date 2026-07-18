@@ -53,6 +53,16 @@
         "timestamp": 6819,
         "endTimestamp": 7081,
         "note": ""
+      },
+      {
+        "id": "p-855183b4",
+        "streamId": "stream-2026-06-01",
+        "date": "2026-06-01",
+        "streamTitle": "【伴睡歌回】有些再見，用的不是一句話，而是一段陪伴。さよならって、一言じゃなくて、一緒に過ごした時間そのものなんだよね。　░ 睡眠導入歌枠｜Singing Stream",
+        "videoId": "58n4IS3D4m8",
+        "timestamp": 4760,
+        "endTimestamp": 5019,
+        "note": ""
       }
     ]
   },
@@ -90,25 +100,6 @@
         "videoId": "KB2cNRbeaKc",
         "timestamp": 8314,
         "endTimestamp": 8606,
-        "note": ""
-      }
-    ]
-  },
-  {
-    "id": "song-04a30480",
-    "workId": "work-song-04a30480",
-    "title": "letter song(piano arrange)",
-    "originalArtist": "doriko feat. 初音ミク",
-    "tags": [],
-    "performances": [
-      {
-        "id": "p-fa222093",
-        "streamId": "stream-bc303791",
-        "date": "2026-06-03",
-        "streamTitle": "【突發歌雜】不想讓腦袋的聲音充斥安靜的夜晚，那來聽聽歌吧　░ 睡眠導入歌枠｜Singing Stream #shorts",
-        "videoId": "KB2cNRbeaKc",
-        "timestamp": 7672,
-        "endTimestamp": 8037,
         "note": ""
       }
     ]
@@ -185,6 +176,16 @@
         "videoId": "2iZkLT5vemI",
         "timestamp": 9525,
         "endTimestamp": 9712,
+        "note": ""
+      },
+      {
+        "id": "p-9a54fe43",
+        "streamId": "stream-2026-04-06",
+        "date": "2026-04-06",
+        "streamTitle": "【伴睡歌回】那些真心付出過的，不是錯過了什麼，而是你曾經很用力在喜歡。本気で想っていた気持ちは、何かを失ったわけじゃなくて、ただ好きだった証だ。░ 睡眠導入歌枠｜Singing Stream",
+        "videoId": "zlRzb3iDgn4",
+        "timestamp": 9911,
+        "endTimestamp": 10098,
         "note": ""
       }
     ]
@@ -349,6 +350,16 @@
     "tags": [],
     "performances": [
       {
+        "id": "p-4d10f2bf",
+        "streamId": "stream-2022-09-05",
+        "date": "2022-09-05",
+        "streamTitle": "【中文歌枠】粉絲名決定！星期一來點動力！【厄倫蒂兒 Earendel】",
+        "videoId": "EZtqMl9Vwa4",
+        "timestamp": 2326,
+        "endTimestamp": 2505,
+        "note": ""
+      },
+      {
         "id": "p-485c187d",
         "streamId": "stream-c85e01e7",
         "date": "2026-03-24",
@@ -375,6 +386,16 @@
         "videoId": "2iZkLT5vemI",
         "timestamp": 3205,
         "endTimestamp": 3567,
+        "note": ""
+      },
+      {
+        "id": "p-133a1d87",
+        "streamId": "stream-2026-06-01",
+        "date": "2026-06-01",
+        "streamTitle": "【伴睡歌回】有些再見，用的不是一句話，而是一段陪伴。さよならって、一言じゃなくて、一緒に過ごした時間そのものなんだよね。　░ 睡眠導入歌枠｜Singing Stream",
+        "videoId": "58n4IS3D4m8",
+        "timestamp": 6709,
+        "endTimestamp": 7068,
         "note": ""
       }
     ]
@@ -413,25 +434,6 @@
         "videoId": "gYOqDomZj48",
         "timestamp": 4653,
         "endTimestamp": 4943,
-        "note": ""
-      }
-    ]
-  },
-  {
-    "id": "song-1214f3f8",
-    "workId": "work-song-1214f3f8",
-    "title": "你啊你啊",
-    "originalArtist": "魏如萱",
-    "tags": [],
-    "performances": [
-      {
-        "id": "p-17a0a004",
-        "streamId": "stream-08cd4aad",
-        "date": "2022-09-14",
-        "streamTitle": "【 寝落ち歌枠】睡前唱些輕柔的歌，再兩天就放假了加油！【厄倫蒂兒 Earendel】",
-        "videoId": "Fq2wuNB-E7c",
-        "timestamp": 2647,
-        "endTimestamp": 2969,
         "note": ""
       }
     ]
@@ -494,31 +496,22 @@
     ]
   },
   {
-    "id": "song-13e927d3",
-    "workId": "work-song-13e927d3",
-    "title": "ベテルギウス",
-    "originalArtist": "優里",
-    "tags": [],
-    "performances": [
-      {
-        "id": "p-60abeb57",
-        "streamId": "stream-2026-06-08",
-        "date": "2026-06-08",
-        "streamTitle": "【伴睡歌回】是不是連放鬆的時候，腦袋裡還在責怪自己。自分を責めるの、少し休みませんか？　░ 睡眠導入歌枠｜Singing Stream",
-        "videoId": "6S3gCcIE4K4",
-        "timestamp": 8406,
-        "endTimestamp": 8643,
-        "note": ""
-      }
-    ]
-  },
-  {
     "id": "song-1461d0d3",
     "workId": "work-song-1461d0d3",
     "title": "瞬き",
     "originalArtist": "back number",
     "tags": [],
     "performances": [
+      {
+        "id": "p-2d57267a",
+        "streamId": "stream-daaf4871",
+        "date": "2022-08-29",
+        "streamTitle": "【歌枠】２次會💫輕鬆唱唱  【厄倫蒂兒．Vtuber】",
+        "videoId": "GsG6hS5bOsA",
+        "timestamp": 1006,
+        "endTimestamp": 1326,
+        "note": ""
+      },
       {
         "id": "p-2355e65a",
         "streamId": "stream-2026-03-16",
@@ -570,25 +563,6 @@
     ]
   },
   {
-    "id": "song-15b9ec3b",
-    "workId": "work-song-15b9ec3b",
-    "title": "孤獨的總和",
-    "originalArtist": "吳汶芳",
-    "tags": [],
-    "performances": [
-      {
-        "id": "p-45bcd2d0",
-        "streamId": "stream-2026-06-01",
-        "date": "2026-06-01",
-        "streamTitle": "【伴睡歌回】有些再見，用的不是一句話，而是一段陪伴。さよならって、一言じゃなくて、一緒に過ごした時間そのものなんだよね。　░ 睡眠導入歌枠｜Singing Stream",
-        "videoId": "58n4IS3D4m8",
-        "timestamp": 1018,
-        "endTimestamp": 1261,
-        "note": ""
-      }
-    ]
-  },
-  {
     "id": "song-15ec806f",
     "workId": "work-song-150b2c0e",
     "title": "你知道星星多重嗎",
@@ -604,24 +578,15 @@
         "timestamp": 9694,
         "endTimestamp": 9991,
         "note": ""
-      }
-    ]
-  },
-  {
-    "id": "song-167fbcff",
-    "workId": "work-song-167fbcff",
-    "title": "超跑情人夢",
-    "originalArtist": "卜學亮",
-    "tags": [],
-    "performances": [
+      },
       {
-        "id": "p-4ac4bb4a",
-        "streamId": "stream-2026-05-27",
-        "date": "2026-05-27",
-        "streamTitle": "【暖場歌回】竟然有怪怪生化人助陣！挑戰丟掉包袱嗨起來！！！ !   @Cetro.Timaeus 　░ 合唱歌回｜Singing Stream",
-        "videoId": "gYOqDomZj48",
-        "timestamp": 1234,
-        "endTimestamp": 1475,
+        "id": "p-d50a6045",
+        "streamId": "stream-2026-03-30",
+        "date": "2026-03-30",
+        "streamTitle": "【伴睡歌回】當世界開始讓你懷疑自己的時候，是不是又在想，為什麼明明努力了卻好像只有自己跟不上。頑張ってるのに、自分だけ追いつけないって思うとき。░ 睡眠導入歌枠｜Singing Stream",
+        "videoId": "2iZkLT5vemI",
+        "timestamp": 9063,
+        "endTimestamp": 9360,
         "note": ""
       }
     ]
@@ -641,25 +606,6 @@
         "videoId": "WTPx_GgMKs8",
         "timestamp": 10168,
         "endTimestamp": 10548,
-        "note": ""
-      }
-    ]
-  },
-  {
-    "id": "song-1d1c3454",
-    "workId": "work-song-10ff8edf",
-    "title": "出口",
-    "originalArtist": "徐佳瑩",
-    "tags": [],
-    "performances": [
-      {
-        "id": "p-4d10f2bf",
-        "streamId": "stream-2022-09-05",
-        "date": "2022-09-05",
-        "streamTitle": "【中文歌枠】粉絲名決定！星期一來點動力！【厄倫蒂兒 Earendel】",
-        "videoId": "EZtqMl9Vwa4",
-        "timestamp": 2326,
-        "endTimestamp": 2505,
         "note": ""
       }
     ]
@@ -699,6 +645,16 @@
         "timestamp": 8032,
         "endTimestamp": 8337,
         "note": ""
+      },
+      {
+        "id": "p-2fcbfde5",
+        "streamId": "stream-2026-07-06",
+        "date": "2026-07-06",
+        "streamTitle": "【伴睡歌回】有時候，明知道不會有結果，還是會想對一個人好。うまくいかないってわかってるのに、それでも誰かに優しくしたくなるときってあるよね。　░ 睡眠導入歌枠｜Singing Stream",
+        "videoId": "q3B24mwXF2k",
+        "timestamp": 1179,
+        "endTimestamp": 1471,
+        "note": ""
       }
     ]
   },
@@ -737,43 +693,15 @@
         "timestamp": 2692,
         "endTimestamp": 2927,
         "note": ""
-      }
-    ]
-  },
-  {
-    "id": "song-215b1b2d",
-    "workId": "work-song-215b1b2d",
-    "title": "ちゃんとあるよ",
-    "originalArtist": "傘村トータ feat. 可不",
-    "tags": [],
-    "performances": [
+      },
       {
-        "id": "p-cc65828f",
+        "id": "p-1f76c204",
         "streamId": "stream-2026-06-15",
         "date": "2026-06-15",
         "streamTitle": "【伴睡歌回】有些話不是不想說，只是無奈地選擇不說了。彷彿就像最近的雨下得斷斷續續，有些情緒也是。言えなかったんじゃなくて、ただ言わなかっただけ。　░ 睡眠導入歌枠｜Singing Stream",
         "videoId": "ZsObrmIQLGk",
-        "timestamp": 5873,
-        "endTimestamp": 6164,
-        "note": ""
-      }
-    ]
-  },
-  {
-    "id": "song-21f3d90d",
-    "workId": "work-song-21f3d90d",
-    "title": "好想愛這個世界啊",
-    "originalArtist": "華晨宇",
-    "tags": [],
-    "performances": [
-      {
-        "id": "p-e27bad53",
-        "streamId": "stream-2026-06-15",
-        "date": "2026-06-15",
-        "streamTitle": "【伴睡歌回】有些話不是不想說，只是無奈地選擇不說了。彷彿就像最近的雨下得斷斷續續，有些情緒也是。言えなかったんじゃなくて、ただ言わなかっただけ。　░ 睡眠導入歌枠｜Singing Stream",
-        "videoId": "ZsObrmIQLGk",
-        "timestamp": 8343,
-        "endTimestamp": 8596,
+        "timestamp": 6385,
+        "endTimestamp": 6610,
         "note": ""
       }
     ]
@@ -798,25 +726,6 @@
     ]
   },
   {
-    "id": "song-2594fb40",
-    "workId": "work-song-2594fb40",
-    "title": "暮色迴響",
-    "originalArtist": "吉星出租",
-    "tags": [],
-    "performances": [
-      {
-        "id": "p-6c94c2f0",
-        "streamId": "stream-2026-06-01",
-        "date": "2026-06-01",
-        "streamTitle": "【伴睡歌回】有些再見，用的不是一句話，而是一段陪伴。さよならって、一言じゃなくて、一緒に過ごした時間そのものなんだよね。　░ 睡眠導入歌枠｜Singing Stream",
-        "videoId": "58n4IS3D4m8",
-        "timestamp": 8849,
-        "endTimestamp": 9027,
-        "note": ""
-      }
-    ]
-  },
-  {
     "id": "song-259a78ce",
     "workId": "work-song-1330",
     "title": "有一種悲傷",
@@ -831,6 +740,26 @@
         "videoId": "tqLA2FnNO84",
         "timestamp": 5320,
         "endTimestamp": 5548,
+        "note": ""
+      },
+      {
+        "id": "p-9c368a74",
+        "streamId": "stream-2026-04-06",
+        "date": "2026-04-06",
+        "streamTitle": "【伴睡歌回】那些真心付出過的，不是錯過了什麼，而是你曾經很用力在喜歡。本気で想っていた気持ちは、何かを失ったわけじゃなくて、ただ好きだった証だ。░ 睡眠導入歌枠｜Singing Stream",
+        "videoId": "zlRzb3iDgn4",
+        "timestamp": 4780,
+        "endTimestamp": 5008,
+        "note": ""
+      },
+      {
+        "id": "p-7a5622be",
+        "streamId": "stream-2026-07-06",
+        "date": "2026-07-06",
+        "streamTitle": "【伴睡歌回】有時候，明知道不會有結果，還是會想對一個人好。うまくいかないってわかってるのに、それでも誰かに優しくしたくなるときってあるよね。　░ 睡眠導入歌枠｜Singing Stream",
+        "videoId": "q3B24mwXF2k",
+        "timestamp": 8843,
+        "endTimestamp": 9193,
         "note": ""
       }
     ]
@@ -855,25 +784,6 @@
     ]
   },
   {
-    "id": "song-2795e570",
-    "workId": "work-song-2795e570",
-    "title": "歌に形はないけれど",
-    "originalArtist": "doriko feat.初音ミク",
-    "tags": [],
-    "performances": [
-      {
-        "id": "p-12048e04",
-        "streamId": "stream-2026-03-30",
-        "date": "2026-03-30",
-        "streamTitle": "【伴睡歌回】當世界開始讓你懷疑自己的時候，是不是又在想，為什麼明明努力了卻好像只有自己跟不上。頑張ってるのに、自分だけ追いつけないって思うとき。░ 睡眠導入歌枠｜Singing Stream",
-        "videoId": "2iZkLT5vemI",
-        "timestamp": 9854,
-        "endTimestamp": 10184,
-        "note": ""
-      }
-    ]
-  },
-  {
     "id": "song-27a0cd03",
     "workId": "work-song-27a0cd03",
     "title": "沒那麼簡單",
@@ -888,25 +798,6 @@
         "videoId": "KB2cNRbeaKc",
         "timestamp": 9291,
         "endTimestamp": 9586,
-        "note": ""
-      }
-    ]
-  },
-  {
-    "id": "song-28ea832a",
-    "workId": "work-song-2554",
-    "title": "行星",
-    "originalArtist": "理想混蛋",
-    "tags": [],
-    "performances": [
-      {
-        "id": "p-6941b074",
-        "streamId": "stream-2026-06-12",
-        "date": "2026-06-12",
-        "streamTitle": "【深夜歌雜】別急著站起來，偶爾跌倒後躺著看天空也不錯　░  歌枠｜Singing Stream #shorts",
-        "videoId": "WTPx_GgMKs8",
-        "timestamp": 10771,
-        "endTimestamp": 11093,
         "note": ""
       }
     ]
@@ -946,6 +837,26 @@
         "timestamp": 3363,
         "endTimestamp": 3705,
         "note": ""
+      },
+      {
+        "id": "p-3074f0b9",
+        "streamId": "stream-2026-06-12",
+        "date": "2026-06-12",
+        "streamTitle": "【深夜歌雜】別急著站起來，偶爾跌倒後躺著看天空也不錯　░  歌枠｜Singing Stream #shorts",
+        "videoId": "WTPx_GgMKs8",
+        "timestamp": 12613,
+        "endTimestamp": 12988,
+        "note": ""
+      },
+      {
+        "id": "p-3274d79e",
+        "streamId": "stream-2026-07-06",
+        "date": "2026-07-06",
+        "streamTitle": "【伴睡歌回】有時候，明知道不會有結果，還是會想對一個人好。うまくいかないってわかってるのに、それでも誰かに優しくしたくなるときってあるよね。　░ 睡眠導入歌枠｜Singing Stream",
+        "videoId": "q3B24mwXF2k",
+        "timestamp": 9602,
+        "endTimestamp": 9977,
+        "note": ""
       }
     ]
   },
@@ -964,44 +875,6 @@
         "videoId": "dJ4z3FliynU",
         "timestamp": 4610,
         "endTimestamp": 4862,
-        "note": ""
-      }
-    ]
-  },
-  {
-    "id": "song-2cb06613",
-    "workId": "work-song-2",
-    "title": "僕が死のうと思ったのは",
-    "originalArtist": "中島美嘉",
-    "tags": [],
-    "performances": [
-      {
-        "id": "p-17fa789b",
-        "streamId": "stream-2026-04-06",
-        "date": "2026-04-06",
-        "streamTitle": "【伴睡歌回】那些真心付出過的，不是錯過了什麼，而是你曾經很用力在喜歡。本気で想っていた気持ちは、何かを失ったわけじゃなくて、ただ好きだった証だ。░ 睡眠導入歌枠｜Singing Stream",
-        "videoId": "zlRzb3iDgn4",
-        "timestamp": 7848,
-        "endTimestamp": 8190,
-        "note": ""
-      }
-    ]
-  },
-  {
-    "id": "song-2cd92dcf",
-    "workId": "work-song-2cd92dcf",
-    "title": "暖暖",
-    "originalArtist": "梁靜茹",
-    "tags": [],
-    "performances": [
-      {
-        "id": "p-d5713747",
-        "streamId": "stream-2026-06-12",
-        "date": "2026-06-12",
-        "streamTitle": "【深夜歌雜】別急著站起來，偶爾跌倒後躺著看天空也不錯　░  歌枠｜Singing Stream #shorts",
-        "videoId": "WTPx_GgMKs8",
-        "timestamp": 2123,
-        "endTimestamp": 2366,
         "note": ""
       }
     ]
@@ -1033,6 +906,26 @@
     "tags": [],
     "performances": [
       {
+        "id": "p-6c3ac483",
+        "streamId": "stream-daaf4871",
+        "date": "2022-08-29",
+        "streamTitle": "【歌枠】２次會💫輕鬆唱唱  【厄倫蒂兒．Vtuber】",
+        "videoId": "GsG6hS5bOsA",
+        "timestamp": 3560,
+        "endTimestamp": 3780,
+        "note": ""
+      },
+      {
+        "id": "p-362ac1b8",
+        "streamId": "stream-08cd4aad",
+        "date": "2022-09-14",
+        "streamTitle": "【 寝落ち歌枠】睡前唱些輕柔的歌，再兩天就放假了加油！【厄倫蒂兒 Earendel】",
+        "videoId": "Fq2wuNB-E7c",
+        "timestamp": 3953,
+        "endTimestamp": 4172,
+        "note": ""
+      },
+      {
         "id": "p-801a0519",
         "streamId": "stream-2026-04-03",
         "date": "2026-04-03",
@@ -1040,6 +933,16 @@
         "videoId": "KzjBXLsjzU4",
         "timestamp": 3325,
         "endTimestamp": 3574,
+        "note": ""
+      },
+      {
+        "id": "p-45bcd2d0",
+        "streamId": "stream-2026-06-01",
+        "date": "2026-06-01",
+        "streamTitle": "【伴睡歌回】有些再見，用的不是一句話，而是一段陪伴。さよならって、一言じゃなくて、一緒に過ごした時間そのものなんだよね。　░ 睡眠導入歌枠｜Singing Stream",
+        "videoId": "58n4IS3D4m8",
+        "timestamp": 1018,
+        "endTimestamp": 1261,
         "note": ""
       }
     ]
@@ -1128,6 +1031,16 @@
     "tags": [],
     "performances": [
       {
+        "id": "p-9c336325",
+        "streamId": "stream-2026-05-27",
+        "date": "2026-05-27",
+        "streamTitle": "【暖場歌回】竟然有怪怪生化人助陣！挑戰丟掉包袱嗨起來！！！ !   @Cetro.Timaeus 　░ 合唱歌回｜Singing Stream",
+        "videoId": "gYOqDomZj48",
+        "timestamp": 3232,
+        "endTimestamp": 3464,
+        "note": ""
+      },
+      {
         "id": "p-d6cf1020",
         "streamId": "stream-2026-06-15",
         "date": "2026-06-15",
@@ -1197,31 +1110,22 @@
     ]
   },
   {
-    "id": "song-395ed5fa",
-    "workId": "work-song-395ed5fa",
-    "title": "secret base ～君がくれたもの～",
-    "originalArtist": "ZONE",
-    "tags": [],
-    "performances": [
-      {
-        "id": "p-e70a9de0",
-        "streamId": "stream-2026-04-06",
-        "date": "2026-04-06",
-        "streamTitle": "【伴睡歌回】那些真心付出過的，不是錯過了什麼，而是你曾經很用力在喜歡。本気で想っていた気持ちは、何かを失ったわけじゃなくて、ただ好きだった証だ。░ 睡眠導入歌枠｜Singing Stream",
-        "videoId": "zlRzb3iDgn4",
-        "timestamp": 4234,
-        "endTimestamp": 4638,
-        "note": ""
-      }
-    ]
-  },
-  {
     "id": "song-3a1f1b88",
     "workId": "work-song-3a1f1b88",
     "title": "重唱",
     "originalArtist": "Unknown",
     "tags": [],
     "performances": [
+      {
+        "id": "p-4ee5f8a5",
+        "streamId": "stream-2026-03-09",
+        "date": "2026-03-09",
+        "streamTitle": "【伴睡歌回】有些感受不是說不出口，是說了也不一定被懂。給還醒著的你：今晚輕輕唱陪你入睡。 言えないわけじゃない。でも、言っても伝わらないこともあるよね。░ 睡眠導入歌枠｜Singing Stream",
+        "videoId": "IVfl4IDi0co",
+        "timestamp": 6470,
+        "endTimestamp": 6806,
+        "note": ""
+      },
       {
         "id": "p-ee1d7c31",
         "streamId": "stream-2026-03-16",
@@ -1287,25 +1191,6 @@
         "videoId": "IVlHQ7Xn-pQ",
         "timestamp": 7171,
         "endTimestamp": 7452,
-        "note": ""
-      }
-    ]
-  },
-  {
-    "id": "song-3b8c1aa4",
-    "workId": "work-song-1330",
-    "title": "有一種悲傷",
-    "originalArtist": "A-Lin",
-    "tags": [],
-    "performances": [
-      {
-        "id": "p-9c368a74",
-        "streamId": "stream-2026-04-06",
-        "date": "2026-04-06",
-        "streamTitle": "【伴睡歌回】那些真心付出過的，不是錯過了什麼，而是你曾經很用力在喜歡。本気で想っていた気持ちは、何かを失ったわけじゃなくて、ただ好きだった証だ。░ 睡眠導入歌枠｜Singing Stream",
-        "videoId": "zlRzb3iDgn4",
-        "timestamp": 4780,
-        "endTimestamp": 5008,
         "note": ""
       }
     ]
@@ -1383,6 +1268,26 @@
         "timestamp": 6364,
         "endTimestamp": 6687,
         "note": ""
+      },
+      {
+        "id": "p-1c707ba9",
+        "streamId": "stream-bc303791",
+        "date": "2026-06-03",
+        "streamTitle": "【突發歌雜】不想讓腦袋的聲音充斥安靜的夜晚，那來聽聽歌吧　░ 睡眠導入歌枠｜Singing Stream #shorts",
+        "videoId": "KB2cNRbeaKc",
+        "timestamp": 2253,
+        "endTimestamp": 2574,
+        "note": ""
+      },
+      {
+        "id": "p-6941b074",
+        "streamId": "stream-2026-06-12",
+        "date": "2026-06-12",
+        "streamTitle": "【深夜歌雜】別急著站起來，偶爾跌倒後躺著看天空也不錯　░  歌枠｜Singing Stream #shorts",
+        "videoId": "WTPx_GgMKs8",
+        "timestamp": 10771,
+        "endTimestamp": 11093,
+        "note": ""
       }
     ]
   },
@@ -1401,25 +1306,6 @@
         "videoId": "WTPx_GgMKs8",
         "timestamp": 6543,
         "endTimestamp": 6735,
-        "note": ""
-      }
-    ]
-  },
-  {
-    "id": "song-446ee41f",
-    "workId": "work-song-2",
-    "title": "僕が死のうと思ったのは",
-    "originalArtist": "中島美嘉",
-    "tags": [],
-    "performances": [
-      {
-        "id": "p-e605d62d",
-        "streamId": "stream-2026-03-30",
-        "date": "2026-03-30",
-        "streamTitle": "【伴睡歌回】當世界開始讓你懷疑自己的時候，是不是又在想，為什麼明明努力了卻好像只有自己跟不上。頑張ってるのに、自分だけ追いつけないって思うとき。░ 睡眠導入歌枠｜Singing Stream",
-        "videoId": "2iZkLT5vemI",
-        "timestamp": 4660,
-        "endTimestamp": 5002,
         "note": ""
       }
     ]
@@ -1451,6 +1337,16 @@
     "tags": [],
     "performances": [
       {
+        "id": "p-e605d62d",
+        "streamId": "stream-2026-03-30",
+        "date": "2026-03-30",
+        "streamTitle": "【伴睡歌回】當世界開始讓你懷疑自己的時候，是不是又在想，為什麼明明努力了卻好像只有自己跟不上。頑張ってるのに、自分だけ追いつけないって思うとき。░ 睡眠導入歌枠｜Singing Stream",
+        "videoId": "2iZkLT5vemI",
+        "timestamp": 4660,
+        "endTimestamp": 5002,
+        "note": ""
+      },
+      {
         "id": "p-ef9175c7",
         "streamId": "stream-2026-04-03",
         "date": "2026-04-03",
@@ -1458,6 +1354,26 @@
         "videoId": "KzjBXLsjzU4",
         "timestamp": 1621,
         "endTimestamp": 1963,
+        "note": ""
+      },
+      {
+        "id": "p-17fa789b",
+        "streamId": "stream-2026-04-06",
+        "date": "2026-04-06",
+        "streamTitle": "【伴睡歌回】那些真心付出過的，不是錯過了什麼，而是你曾經很用力在喜歡。本気で想っていた気持ちは、何かを失ったわけじゃなくて、ただ好きだった証だ。░ 睡眠導入歌枠｜Singing Stream",
+        "videoId": "zlRzb3iDgn4",
+        "timestamp": 7848,
+        "endTimestamp": 8190,
+        "note": ""
+      },
+      {
+        "id": "p-55bcbf4d",
+        "streamId": "stream-2026-06-12",
+        "date": "2026-06-12",
+        "streamTitle": "【深夜歌雜】別急著站起來，偶爾跌倒後躺著看天空也不錯　░  歌枠｜Singing Stream #shorts",
+        "videoId": "WTPx_GgMKs8",
+        "timestamp": 5732,
+        "endTimestamp": 6113,
         "note": ""
       }
     ]
@@ -1477,82 +1393,6 @@
         "videoId": "WTPx_GgMKs8",
         "timestamp": 7015,
         "endTimestamp": 7183,
-        "note": ""
-      }
-    ]
-  },
-  {
-    "id": "song-47313238",
-    "workId": "work-song-114c348c",
-    "title": "逢いたくていま",
-    "originalArtist": "MISIA",
-    "tags": [],
-    "performances": [
-      {
-        "id": "p-133a1d87",
-        "streamId": "stream-2026-06-01",
-        "date": "2026-06-01",
-        "streamTitle": "【伴睡歌回】有些再見，用的不是一句話，而是一段陪伴。さよならって、一言じゃなくて、一緒に過ごした時間そのものなんだよね。　░ 睡眠導入歌枠｜Singing Stream",
-        "videoId": "58n4IS3D4m8",
-        "timestamp": 6709,
-        "endTimestamp": 7068,
-        "note": ""
-      }
-    ]
-  },
-  {
-    "id": "song-47aed4ec",
-    "workId": "work-song-1557",
-    "title": "我喜歡你",
-    "originalArtist": "洪安妮",
-    "tags": [],
-    "performances": [
-      {
-        "id": "p-1fe6b15a",
-        "streamId": "stream-2022-09-19",
-        "date": "2022-09-19",
-        "streamTitle": "【 寝落ち歌枠】聊著天唱著歌～突然就想睡了呢！【厄倫蒂兒 Earendel】",
-        "videoId": "71i2JN0e-xE",
-        "timestamp": 3500,
-        "endTimestamp": 3744,
-        "note": ""
-      }
-    ]
-  },
-  {
-    "id": "song-4859ac9c",
-    "workId": "work-song-4859ac9c",
-    "title": "願溫柔的你被世界溫柔以待",
-    "originalArtist": "綠繡眼",
-    "tags": [],
-    "performances": [
-      {
-        "id": "p-5a8bd845",
-        "streamId": "stream-2026-04-03",
-        "date": "2026-04-03",
-        "streamTitle": "【倫家想唱歌】練習唱唱歌！想把開心帶給你們！辛苦惹你這次連假要做甚麼呢  ░ 歌枠｜Singing Stream",
-        "videoId": "KzjBXLsjzU4",
-        "timestamp": 1002,
-        "endTimestamp": 1232,
-        "note": ""
-      }
-    ]
-  },
-  {
-    "id": "song-48ca8ab3",
-    "workId": "work-song-3183",
-    "title": "シリウスの心臓",
-    "originalArtist": "ヰ世界情緒",
-    "tags": [],
-    "performances": [
-      {
-        "id": "p-9003d5f8",
-        "streamId": "stream-2026-07-06",
-        "date": "2026-07-06",
-        "streamTitle": "【伴睡歌回】有時候，明知道不會有結果，還是會想對一個人好。うまくいかないってわかってるのに、それでも誰かに優しくしたくなるときってあるよね。　░ 睡眠導入歌枠｜Singing Stream",
-        "videoId": "q3B24mwXF2k",
-        "timestamp": 5909,
-        "endTimestamp": 6203,
         "note": ""
       }
     ]
@@ -1592,6 +1432,26 @@
         "timestamp": 4642,
         "endTimestamp": 4928,
         "note": ""
+      },
+      {
+        "id": "p-c1e5824b",
+        "streamId": "stream-2026-06-15",
+        "date": "2026-06-15",
+        "streamTitle": "【伴睡歌回】有些話不是不想說，只是無奈地選擇不說了。彷彿就像最近的雨下得斷斷續續，有些情緒也是。言えなかったんじゃなくて、ただ言わなかっただけ。　░ 睡眠導入歌枠｜Singing Stream",
+        "videoId": "ZsObrmIQLGk",
+        "timestamp": 4884,
+        "endTimestamp": 5166,
+        "note": ""
+      },
+      {
+        "id": "p-b8fdb100",
+        "streamId": "stream-2026-07-06",
+        "date": "2026-07-06",
+        "streamTitle": "【伴睡歌回】有時候，明知道不會有結果，還是會想對一個人好。うまくいかないってわかってるのに、それでも誰かに優しくしたくなるときってあるよね。　░ 睡眠導入歌枠｜Singing Stream",
+        "videoId": "q3B24mwXF2k",
+        "timestamp": 4896,
+        "endTimestamp": 5182,
+        "note": ""
       }
     ]
   },
@@ -1629,6 +1489,16 @@
         "videoId": "58n4IS3D4m8",
         "timestamp": 9390,
         "endTimestamp": 9621,
+        "note": ""
+      },
+      {
+        "id": "p-0984a904",
+        "streamId": "stream-2026-06-15",
+        "date": "2026-06-15",
+        "streamTitle": "【伴睡歌回】有些話不是不想說，只是無奈地選擇不說了。彷彿就像最近的雨下得斷斷續續，有些情緒也是。言えなかったんじゃなくて、ただ言わなかっただけ。　░ 睡眠導入歌枠｜Singing Stream",
+        "videoId": "ZsObrmIQLGk",
+        "timestamp": 2793,
+        "endTimestamp": 3024,
         "note": ""
       }
     ]
@@ -1672,31 +1542,22 @@
     ]
   },
   {
-    "id": "song-4d8251e1",
-    "workId": "work-song-215b1b2d",
-    "title": "ちゃんとあるよ",
-    "originalArtist": "傘村トータ feat. 可不",
-    "tags": [],
-    "performances": [
-      {
-        "id": "p-b9fa5424",
-        "streamId": "stream-2026-06-08",
-        "date": "2026-06-08",
-        "streamTitle": "【伴睡歌回】是不是連放鬆的時候，腦袋裡還在責怪自己。自分を責めるの、少し休みませんか？　░ 睡眠導入歌枠｜Singing Stream",
-        "videoId": "6S3gCcIE4K4",
-        "timestamp": 7706,
-        "endTimestamp": 7997,
-        "note": ""
-      }
-    ]
-  },
-  {
     "id": "song-4fc49677",
     "workId": "work-song-4fc49677",
     "title": "愛你",
     "originalArtist": "王心凌",
     "tags": [],
     "performances": [
+      {
+        "id": "p-2372cdb4",
+        "streamId": "stream-daaf4871",
+        "date": "2022-08-29",
+        "streamTitle": "【歌枠】２次會💫輕鬆唱唱  【厄倫蒂兒．Vtuber】",
+        "videoId": "GsG6hS5bOsA",
+        "timestamp": 1984,
+        "endTimestamp": 2142,
+        "note": ""
+      },
       {
         "id": "p-f4279f9d",
         "streamId": "stream-e5230a57",
@@ -1705,6 +1566,16 @@
         "videoId": "xQ5TCl3JnXs",
         "timestamp": 11578,
         "endTimestamp": 11789,
+        "note": ""
+      },
+      {
+        "id": "p-3fe8578f",
+        "streamId": "stream-c85e01e7",
+        "date": "2026-03-24",
+        "streamTitle": "【倫家想唱歌】來陪你惹!!!!!!!趁你午休偷偷唱歌偷偷聊天🤩🤩🤩 和玩玩看新東西!!! ░ 歌枠｜Singing Stream",
+        "videoId": "dJ4z3FliynU",
+        "timestamp": 5425,
+        "endTimestamp": 5641,
         "note": ""
       }
     ]
@@ -1763,6 +1634,26 @@
         "timestamp": 10156,
         "endTimestamp": 10427,
         "note": ""
+      },
+      {
+        "id": "p-0b6bd26c",
+        "streamId": "stream-2026-04-06",
+        "date": "2026-04-06",
+        "streamTitle": "【伴睡歌回】那些真心付出過的，不是錯過了什麼，而是你曾經很用力在喜歡。本気で想っていた気持ちは、何かを失ったわけじゃなくて、ただ好きだった証だ。░ 睡眠導入歌枠｜Singing Stream",
+        "videoId": "zlRzb3iDgn4",
+        "timestamp": 3701,
+        "endTimestamp": 3972,
+        "note": ""
+      },
+      {
+        "id": "p-e8f1650e",
+        "streamId": "stream-bc303791",
+        "date": "2026-06-03",
+        "streamTitle": "【突發歌雜】不想讓腦袋的聲音充斥安靜的夜晚，那來聽聽歌吧　░ 睡眠導入歌枠｜Singing Stream #shorts",
+        "videoId": "KB2cNRbeaKc",
+        "timestamp": 4782,
+        "endTimestamp": 5053,
+        "note": ""
       }
     ]
   },
@@ -1781,44 +1672,6 @@
         "videoId": "Fq2wuNB-E7c",
         "timestamp": 1166,
         "endTimestamp": 1469,
-        "note": ""
-      }
-    ]
-  },
-  {
-    "id": "song-52b17ad4",
-    "workId": "work-song-52b17ad4",
-    "title": "這是你期盼的長大嗎",
-    "originalArtist": "張齊山",
-    "tags": [],
-    "performances": [
-      {
-        "id": "p-dffdb4bb",
-        "streamId": "stream-2026-03-30",
-        "date": "2026-03-30",
-        "streamTitle": "【伴睡歌回】當世界開始讓你懷疑自己的時候，是不是又在想，為什麼明明努力了卻好像只有自己跟不上。頑張ってるのに、自分だけ追いつけないって思うとき。░ 睡眠導入歌枠｜Singing Stream",
-        "videoId": "2iZkLT5vemI",
-        "timestamp": 5545,
-        "endTimestamp": 5828,
-        "note": ""
-      }
-    ]
-  },
-  {
-    "id": "song-537b9587",
-    "workId": "work-song-02cd11cf",
-    "title": "For フルーツバスケット",
-    "originalArtist": "岡崎律子",
-    "tags": [],
-    "performances": [
-      {
-        "id": "p-855183b4",
-        "streamId": "stream-2026-06-01",
-        "date": "2026-06-01",
-        "streamTitle": "【伴睡歌回】有些再見，用的不是一句話，而是一段陪伴。さよならって、一言じゃなくて、一緒に過ごした時間そのものなんだよね。　░ 睡眠導入歌枠｜Singing Stream",
-        "videoId": "58n4IS3D4m8",
-        "timestamp": 4760,
-        "endTimestamp": 5019,
         "note": ""
       }
     ]
@@ -1881,25 +1734,6 @@
     ]
   },
   {
-    "id": "song-55337351",
-    "workId": "work-song-1214f3f8",
-    "title": "你啊你啊",
-    "originalArtist": "魏如萱",
-    "tags": [],
-    "performances": [
-      {
-        "id": "p-52f03253",
-        "streamId": "stream-2022-09-05",
-        "date": "2022-09-05",
-        "streamTitle": "【中文歌枠】粉絲名決定！星期一來點動力！【厄倫蒂兒 Earendel】",
-        "videoId": "EZtqMl9Vwa4",
-        "timestamp": 1349,
-        "endTimestamp": 1670,
-        "note": ""
-      }
-    ]
-  },
-  {
     "id": "song-55a6c690",
     "workId": "work-song-55a6c690",
     "title": "オレンジ",
@@ -1914,6 +1748,16 @@
         "videoId": "tqLA2FnNO84",
         "timestamp": 3590,
         "endTimestamp": 3942,
+        "note": ""
+      },
+      {
+        "id": "p-1f85b8da",
+        "streamId": "stream-2026-04-06",
+        "date": "2026-04-06",
+        "streamTitle": "【伴睡歌回】那些真心付出過的，不是錯過了什麼，而是你曾經很用力在喜歡。本気で想っていた気持ちは、何かを失ったわけじゃなくて、ただ好きだった証だ。░ 睡眠導入歌枠｜Singing Stream",
+        "videoId": "zlRzb3iDgn4",
+        "timestamp": 873,
+        "endTimestamp": 1225,
         "note": ""
       }
     ]
@@ -1938,63 +1782,6 @@
     ]
   },
   {
-    "id": "song-566f5f98",
-    "workId": "work-song-1330",
-    "title": "有一種悲傷",
-    "originalArtist": "A-Lin",
-    "tags": [],
-    "performances": [
-      {
-        "id": "p-7a5622be",
-        "streamId": "stream-2026-07-06",
-        "date": "2026-07-06",
-        "streamTitle": "【伴睡歌回】有時候，明知道不會有結果，還是會想對一個人好。うまくいかないってわかってるのに、それでも誰かに優しくしたくなるときってあるよね。　░ 睡眠導入歌枠｜Singing Stream",
-        "videoId": "q3B24mwXF2k",
-        "timestamp": 8843,
-        "endTimestamp": 9193,
-        "note": ""
-      }
-    ]
-  },
-  {
-    "id": "song-56c9a5a7",
-    "workId": "work-song-3183",
-    "title": "シリウスの心臓",
-    "originalArtist": "ヰ世界情緒",
-    "tags": [],
-    "performances": [
-      {
-        "id": "p-8077e4f5",
-        "streamId": "stream-2026-04-06",
-        "date": "2026-04-06",
-        "streamTitle": "【伴睡歌回】那些真心付出過的，不是錯過了什麼，而是你曾經很用力在喜歡。本気で想っていた気持ちは、何かを失ったわけじゃなくて、ただ好きだった証だ。░ 睡眠導入歌枠｜Singing Stream",
-        "videoId": "zlRzb3iDgn4",
-        "timestamp": 5408,
-        "endTimestamp": 5706,
-        "note": ""
-      }
-    ]
-  },
-  {
-    "id": "song-57b63a9f",
-    "workId": "work-song-08806a0a",
-    "title": "昔漣",
-    "originalArtist": "張韶涵",
-    "tags": [],
-    "performances": [
-      {
-        "id": "p-9a54fe43",
-        "streamId": "stream-2026-04-06",
-        "date": "2026-04-06",
-        "streamTitle": "【伴睡歌回】那些真心付出過的，不是錯過了什麼，而是你曾經很用力在喜歡。本気で想っていた気持ちは、何かを失ったわけじゃなくて、ただ好きだった証だ。░ 睡眠導入歌枠｜Singing Stream",
-        "videoId": "zlRzb3iDgn4",
-        "timestamp": 9911,
-        "endTimestamp": 10098,
-        "note": ""
-      }
-    ]
-  },
-  {
     "id": "song-5cac803c",
     "workId": "work-song-4859ac9c",
     "title": "願溫柔的你被世界溫柔以待",
@@ -2009,6 +1796,26 @@
         "videoId": "IVfl4IDi0co",
         "timestamp": 10709,
         "endTimestamp": 10939,
+        "note": ""
+      },
+      {
+        "id": "p-5a8bd845",
+        "streamId": "stream-2026-04-03",
+        "date": "2026-04-03",
+        "streamTitle": "【倫家想唱歌】練習唱唱歌！想把開心帶給你們！辛苦惹你這次連假要做甚麼呢  ░ 歌枠｜Singing Stream",
+        "videoId": "KzjBXLsjzU4",
+        "timestamp": 1002,
+        "endTimestamp": 1232,
+        "note": ""
+      },
+      {
+        "id": "p-ee59a893",
+        "streamId": "stream-bc303791",
+        "date": "2026-06-03",
+        "streamTitle": "【突發歌雜】不想讓腦袋的聲音充斥安靜的夜晚，那來聽聽歌吧　░ 睡眠導入歌枠｜Singing Stream #shorts",
+        "videoId": "KB2cNRbeaKc",
+        "timestamp": 9860,
+        "endTimestamp": 10086,
         "note": ""
       }
     ]
@@ -2033,44 +1840,6 @@
     ]
   },
   {
-    "id": "song-5f00d53b",
-    "workId": "work-song-5f00d53b",
-    "title": "拾光者",
-    "originalArtist": "厄倫蒂兒",
-    "tags": [],
-    "performances": [
-      {
-        "id": "p-720bc613",
-        "streamId": "stream-2026-06-08",
-        "date": "2026-06-08",
-        "streamTitle": "【伴睡歌回】是不是連放鬆的時候，腦袋裡還在責怪自己。自分を責めるの、少し休みませんか？　░ 睡眠導入歌枠｜Singing Stream",
-        "videoId": "6S3gCcIE4K4",
-        "timestamp": 7406,
-        "endTimestamp": 7654,
-        "note": ""
-      }
-    ]
-  },
-  {
-    "id": "song-61c6d5cf",
-    "workId": "work-song-2",
-    "title": "僕が死のうと思ったのは",
-    "originalArtist": "中島美嘉",
-    "tags": [],
-    "performances": [
-      {
-        "id": "p-55bcbf4d",
-        "streamId": "stream-2026-06-12",
-        "date": "2026-06-12",
-        "streamTitle": "【深夜歌雜】別急著站起來，偶爾跌倒後躺著看天空也不錯　░  歌枠｜Singing Stream #shorts",
-        "videoId": "WTPx_GgMKs8",
-        "timestamp": 5732,
-        "endTimestamp": 6113,
-        "note": ""
-      }
-    ]
-  },
-  {
     "id": "song-62432ee9",
     "workId": "work-song-52b17ad4",
     "title": "這是你期盼的長大嗎",
@@ -2085,6 +1854,16 @@
         "videoId": "IVfl4IDi0co",
         "timestamp": 7437,
         "endTimestamp": 7720,
+        "note": ""
+      },
+      {
+        "id": "p-dffdb4bb",
+        "streamId": "stream-2026-03-30",
+        "date": "2026-03-30",
+        "streamTitle": "【伴睡歌回】當世界開始讓你懷疑自己的時候，是不是又在想，為什麼明明努力了卻好像只有自己跟不上。頑張ってるのに、自分だけ追いつけないって思うとき。░ 睡眠導入歌枠｜Singing Stream",
+        "videoId": "2iZkLT5vemI",
+        "timestamp": 5545,
+        "endTimestamp": 5828,
         "note": ""
       }
     ]
@@ -2147,25 +1926,6 @@
     ]
   },
   {
-    "id": "song-697fab33",
-    "workId": "work-song-53187977",
-    "title": "プラチナ",
-    "originalArtist": "坂本真綾",
-    "tags": [],
-    "performances": [
-      {
-        "id": "p-3ffcb8b2",
-        "streamId": "stream-2026-05-29",
-        "date": "2026-05-29",
-        "streamTitle": "【倫家想唱歌】願意來聽一首歌嗎！一起享受周五晚上的時間吧！✨一曲聴きませんか？金曜日の夜を一緒に楽しみましょう！✨   ░ 歌枠｜Singing Stream　#karaoke #shorts",
-        "videoId": "IVlHQ7Xn-pQ",
-        "timestamp": 6821,
-        "endTimestamp": 7070,
-        "note": ""
-      }
-    ]
-  },
-  {
     "id": "song-69bff3ac",
     "workId": "work-song-69bff3ac",
     "title": "The Fox",
@@ -2199,25 +1959,6 @@
         "videoId": "zlRzb3iDgn4",
         "timestamp": 6051,
         "endTimestamp": 6273,
-        "note": ""
-      }
-    ]
-  },
-  {
-    "id": "song-6b76dc92",
-    "workId": "work-song-6b76dc92",
-    "title": "下雨的晚上",
-    "originalArtist": "黃玠",
-    "tags": [],
-    "performances": [
-      {
-        "id": "p-3c0d5450",
-        "streamId": "stream-2026-06-12",
-        "date": "2026-06-12",
-        "streamTitle": "【深夜歌雜】別急著站起來，偶爾跌倒後躺著看天空也不錯　░  歌枠｜Singing Stream #shorts",
-        "videoId": "WTPx_GgMKs8",
-        "timestamp": 4401,
-        "endTimestamp": 4698,
         "note": ""
       }
     ]
@@ -2333,24 +2074,15 @@
         "timestamp": 7245,
         "endTimestamp": 7465,
         "note": ""
-      }
-    ]
-  },
-  {
-    "id": "song-6faf5512",
-    "workId": "work-song-2bb8d010",
-    "title": "六等星の夜",
-    "originalArtist": "Aimer",
-    "tags": [],
-    "performances": [
+      },
       {
-        "id": "p-3274d79e",
-        "streamId": "stream-2026-07-06",
-        "date": "2026-07-06",
-        "streamTitle": "【伴睡歌回】有時候，明知道不會有結果，還是會想對一個人好。うまくいかないってわかってるのに、それでも誰かに優しくしたくなるときってあるよね。　░ 睡眠導入歌枠｜Singing Stream",
-        "videoId": "q3B24mwXF2k",
-        "timestamp": 9602,
-        "endTimestamp": 9977,
+        "id": "p-1c87981e",
+        "streamId": "stream-2026-04-06",
+        "date": "2026-04-06",
+        "streamTitle": "【伴睡歌回】那些真心付出過的，不是錯過了什麼，而是你曾經很用力在喜歡。本気で想っていた気持ちは、何かを失ったわけじゃなくて、ただ好きだった証だ。░ 睡眠導入歌枠｜Singing Stream",
+        "videoId": "zlRzb3iDgn4",
+        "timestamp": 9238,
+        "endTimestamp": 9458,
         "note": ""
       }
     ]
@@ -2381,6 +2113,26 @@
     "originalArtist": "魏如萱",
     "tags": [],
     "performances": [
+      {
+        "id": "p-52f03253",
+        "streamId": "stream-2022-09-05",
+        "date": "2022-09-05",
+        "streamTitle": "【中文歌枠】粉絲名決定！星期一來點動力！【厄倫蒂兒 Earendel】",
+        "videoId": "EZtqMl9Vwa4",
+        "timestamp": 1349,
+        "endTimestamp": 1670,
+        "note": ""
+      },
+      {
+        "id": "p-17a0a004",
+        "streamId": "stream-08cd4aad",
+        "date": "2022-09-14",
+        "streamTitle": "【 寝落ち歌枠】睡前唱些輕柔的歌，再兩天就放假了加油！【厄倫蒂兒 Earendel】",
+        "videoId": "Fq2wuNB-E7c",
+        "timestamp": 2647,
+        "endTimestamp": 2969,
+        "note": ""
+      },
       {
         "id": "p-232ecc26",
         "streamId": "stream-2026-04-06",
@@ -2458,6 +2210,26 @@
     "tags": [],
     "performances": [
       {
+        "id": "p-71f6e4ae",
+        "streamId": "stream-2022-09-05",
+        "date": "2022-09-05",
+        "streamTitle": "【中文歌枠】粉絲名決定！星期一來點動力！【厄倫蒂兒 Earendel】",
+        "videoId": "EZtqMl9Vwa4",
+        "timestamp": 2763,
+        "endTimestamp": 3006,
+        "note": ""
+      },
+      {
+        "id": "p-1fe6b15a",
+        "streamId": "stream-2022-09-19",
+        "date": "2022-09-19",
+        "streamTitle": "【 寝落ち歌枠】聊著天唱著歌～突然就想睡了呢！【厄倫蒂兒 Earendel】",
+        "videoId": "71i2JN0e-xE",
+        "timestamp": 3500,
+        "endTimestamp": 3744,
+        "note": ""
+      },
+      {
         "id": "p-4ac32df6",
         "streamId": "stream-2026-04-03",
         "date": "2026-04-03",
@@ -2508,25 +2280,6 @@
     ]
   },
   {
-    "id": "song-7832b3b1",
-    "workId": "work-song-204fbbb4",
-    "title": "11",
-    "originalArtist": "隊長 & 黃禮格",
-    "tags": [],
-    "performances": [
-      {
-        "id": "p-1f76c204",
-        "streamId": "stream-2026-06-15",
-        "date": "2026-06-15",
-        "streamTitle": "【伴睡歌回】有些話不是不想說，只是無奈地選擇不說了。彷彿就像最近的雨下得斷斷續續，有些情緒也是。言えなかったんじゃなくて、ただ言わなかっただけ。　░ 睡眠導入歌枠｜Singing Stream",
-        "videoId": "ZsObrmIQLGk",
-        "timestamp": 6385,
-        "endTimestamp": 6610,
-        "note": ""
-      }
-    ]
-  },
-  {
     "id": "song-78c9d321",
     "workId": "work-song-21f3d90d",
     "title": "好想愛這個世界啊",
@@ -2541,6 +2294,16 @@
         "videoId": "71i2JN0e-xE",
         "timestamp": 1080,
         "endTimestamp": 1350,
+        "note": ""
+      },
+      {
+        "id": "p-e27bad53",
+        "streamId": "stream-2026-06-15",
+        "date": "2026-06-15",
+        "streamTitle": "【伴睡歌回】有些話不是不想說，只是無奈地選擇不說了。彷彿就像最近的雨下得斷斷續續，有些情緒也是。言えなかったんじゃなくて、ただ言わなかっただけ。　░ 睡眠導入歌枠｜Singing Stream",
+        "videoId": "ZsObrmIQLGk",
+        "timestamp": 8343,
+        "endTimestamp": 8596,
         "note": ""
       }
     ]
@@ -2618,24 +2381,15 @@
         "timestamp": 7395,
         "endTimestamp": 7653,
         "note": ""
-      }
-    ]
-  },
-  {
-    "id": "song-7b9dece0",
-    "workId": "work-song-03d847b3",
-    "title": "刻在我心底的名字",
-    "originalArtist": "盧廣仲",
-    "tags": [],
-    "performances": [
+      },
       {
-        "id": "p-2fcbfde5",
-        "streamId": "stream-2026-07-06",
-        "date": "2026-07-06",
-        "streamTitle": "【伴睡歌回】有時候，明知道不會有結果，還是會想對一個人好。うまくいかないってわかってるのに、それでも誰かに優しくしたくなるときってあるよね。　░ 睡眠導入歌枠｜Singing Stream",
-        "videoId": "q3B24mwXF2k",
-        "timestamp": 1179,
-        "endTimestamp": 1471,
+        "id": "p-6165ccea",
+        "streamId": "stream-bc303791",
+        "date": "2026-06-03",
+        "streamTitle": "【突發歌雜】不想讓腦袋的聲音充斥安靜的夜晚，那來聽聽歌吧　░ 睡眠導入歌枠｜Singing Stream #shorts",
+        "videoId": "KB2cNRbeaKc",
+        "timestamp": 6683,
+        "endTimestamp": 6918,
         "note": ""
       }
     ]
@@ -2679,25 +2433,6 @@
     ]
   },
   {
-    "id": "song-7ef7c097",
-    "workId": "work-song-2554",
-    "title": "行星",
-    "originalArtist": "理想混蛋",
-    "tags": [],
-    "performances": [
-      {
-        "id": "p-1c707ba9",
-        "streamId": "stream-bc303791",
-        "date": "2026-06-03",
-        "streamTitle": "【突發歌雜】不想讓腦袋的聲音充斥安靜的夜晚，那來聽聽歌吧　░ 睡眠導入歌枠｜Singing Stream #shorts",
-        "videoId": "KB2cNRbeaKc",
-        "timestamp": 2253,
-        "endTimestamp": 2574,
-        "note": ""
-      }
-    ]
-  },
-  {
     "id": "song-80b5a8f3",
     "workId": "work-song-80b5a8f3",
     "title": "致姍姍來遲的你",
@@ -2731,25 +2466,6 @@
         "videoId": "tqLA2FnNO84",
         "timestamp": 4055,
         "endTimestamp": 4387,
-        "note": ""
-      }
-    ]
-  },
-  {
-    "id": "song-814d9cf7",
-    "workId": "work-song-2594fb40",
-    "title": "暮色迴響",
-    "originalArtist": "吉星出租",
-    "tags": [],
-    "performances": [
-      {
-        "id": "p-e9c9a77a",
-        "streamId": "stream-2026-04-03",
-        "date": "2026-04-03",
-        "streamTitle": "【倫家想唱歌】練習唱唱歌！想把開心帶給你們！辛苦惹你這次連假要做甚麼呢  ░ 歌枠｜Singing Stream",
-        "videoId": "KzjBXLsjzU4",
-        "timestamp": 3736,
-        "endTimestamp": 3914,
         "note": ""
       }
     ]
@@ -2789,24 +2505,15 @@
         "timestamp": 7136,
         "endTimestamp": 7384,
         "note": ""
-      }
-    ]
-  },
-  {
-    "id": "song-85c77c4b",
-    "workId": "work-song-6b76dc92",
-    "title": "下雨的晚上",
-    "originalArtist": "黃玠",
-    "tags": [],
-    "performances": [
+      },
       {
-        "id": "p-e92a00d7",
-        "streamId": "stream-2022-09-19",
-        "date": "2022-09-19",
-        "streamTitle": "【 寝落ち歌枠】聊著天唱著歌～突然就想睡了呢！【厄倫蒂兒 Earendel】",
-        "videoId": "71i2JN0e-xE",
-        "timestamp": 4008,
-        "endTimestamp": 4304,
+        "id": "p-720bc613",
+        "streamId": "stream-2026-06-08",
+        "date": "2026-06-08",
+        "streamTitle": "【伴睡歌回】是不是連放鬆的時候，腦袋裡還在責怪自己。自分を責めるの、少し休みませんか？　░ 睡眠導入歌枠｜Singing Stream",
+        "videoId": "6S3gCcIE4K4",
+        "timestamp": 7406,
+        "endTimestamp": 7654,
         "note": ""
       }
     ]
@@ -2826,25 +2533,6 @@
         "videoId": "71i2JN0e-xE",
         "timestamp": 2516,
         "endTimestamp": 2761,
-        "note": ""
-      }
-    ]
-  },
-  {
-    "id": "song-86af7956",
-    "workId": "work-song-86af7956",
-    "title": "Remember",
-    "originalArtist": "月見ヤチヨ",
-    "tags": [],
-    "performances": [
-      {
-        "id": "p-c14e0deb",
-        "streamId": "stream-c85e01e7",
-        "date": "2026-03-24",
-        "streamTitle": "【倫家想唱歌】來陪你惹!!!!!!!趁你午休偷偷唱歌偷偷聊天🤩🤩🤩 和玩玩看新東西!!! ░ 歌枠｜Singing Stream",
-        "videoId": "dJ4z3FliynU",
-        "timestamp": 3515,
-        "endTimestamp": 3750,
         "note": ""
       }
     ]
@@ -2907,25 +2595,6 @@
     ]
   },
   {
-    "id": "song-8a4a4b54",
-    "workId": "work-song-7a477d24",
-    "title": "求救訊號",
-    "originalArtist": "VH",
-    "tags": [],
-    "performances": [
-      {
-        "id": "p-6165ccea",
-        "streamId": "stream-bc303791",
-        "date": "2026-06-03",
-        "streamTitle": "【突發歌雜】不想讓腦袋的聲音充斥安靜的夜晚，那來聽聽歌吧　░ 睡眠導入歌枠｜Singing Stream #shorts",
-        "videoId": "KB2cNRbeaKc",
-        "timestamp": 6683,
-        "endTimestamp": 6918,
-        "note": ""
-      }
-    ]
-  },
-  {
     "id": "song-8c159afa",
     "workId": "work-song-8c159afa",
     "title": "platinum(プラチナ)",
@@ -2978,25 +2647,6 @@
         "videoId": "WTPx_GgMKs8",
         "timestamp": 8814,
         "endTimestamp": 9112,
-        "note": ""
-      }
-    ]
-  },
-  {
-    "id": "song-8f8abf79",
-    "workId": "work-song-4fc49677",
-    "title": "愛你",
-    "originalArtist": "王心凌",
-    "tags": [],
-    "performances": [
-      {
-        "id": "p-2372cdb4",
-        "streamId": "stream-daaf4871",
-        "date": "2022-08-29",
-        "streamTitle": "【歌枠】２次會💫輕鬆唱唱  【厄倫蒂兒．Vtuber】",
-        "videoId": "GsG6hS5bOsA",
-        "timestamp": 1984,
-        "endTimestamp": 2142,
         "note": ""
       }
     ]
@@ -3073,6 +2723,16 @@
         "videoId": "tqLA2FnNO84",
         "timestamp": 783,
         "endTimestamp": 1043,
+        "note": ""
+      },
+      {
+        "id": "p-b3937a25",
+        "streamId": "stream-2026-06-08",
+        "date": "2026-06-08",
+        "streamTitle": "【伴睡歌回】是不是連放鬆的時候，腦袋裡還在責怪自己。自分を責めるの、少し休みませんか？　░ 睡眠導入歌枠｜Singing Stream",
+        "videoId": "6S3gCcIE4K4",
+        "timestamp": 767,
+        "endTimestamp": 1027,
         "note": ""
       }
     ]
@@ -3168,6 +2828,26 @@
         "videoId": "IVfl4IDi0co",
         "timestamp": 6203,
         "endTimestamp": 6381,
+        "note": ""
+      },
+      {
+        "id": "p-e9c9a77a",
+        "streamId": "stream-2026-04-03",
+        "date": "2026-04-03",
+        "streamTitle": "【倫家想唱歌】練習唱唱歌！想把開心帶給你們！辛苦惹你這次連假要做甚麼呢  ░ 歌枠｜Singing Stream",
+        "videoId": "KzjBXLsjzU4",
+        "timestamp": 3736,
+        "endTimestamp": 3914,
+        "note": ""
+      },
+      {
+        "id": "p-6c94c2f0",
+        "streamId": "stream-2026-06-01",
+        "date": "2026-06-01",
+        "streamTitle": "【伴睡歌回】有些再見，用的不是一句話，而是一段陪伴。さよならって、一言じゃなくて、一緒に過ごした時間そのものなんだよね。　░ 睡眠導入歌枠｜Singing Stream",
+        "videoId": "58n4IS3D4m8",
+        "timestamp": 8849,
+        "endTimestamp": 9027,
         "note": ""
       }
     ]
@@ -3325,25 +3005,6 @@
     ]
   },
   {
-    "id": "song-9c114291",
-    "workId": "work-song-131",
-    "title": "言不由衷",
-    "originalArtist": "徐佳瑩",
-    "tags": [],
-    "performances": [
-      {
-        "id": "p-b3937a25",
-        "streamId": "stream-2026-06-08",
-        "date": "2026-06-08",
-        "streamTitle": "【伴睡歌回】是不是連放鬆的時候，腦袋裡還在責怪自己。自分を責めるの、少し休みませんか？　░ 睡眠導入歌枠｜Singing Stream",
-        "videoId": "6S3gCcIE4K4",
-        "timestamp": 767,
-        "endTimestamp": 1027,
-        "note": ""
-      }
-    ]
-  },
-  {
     "id": "song-9c323b31",
     "workId": "work-song-79e1ae1f",
     "title": "懸日",
@@ -3435,24 +3096,15 @@
         "timestamp": 7982,
         "endTimestamp": 8312,
         "note": ""
-      }
-    ]
-  },
-  {
-    "id": "song-9ebb6402",
-    "workId": "work-song-3a1f1b88",
-    "title": "重唱",
-    "originalArtist": "Unknown",
-    "tags": [],
-    "performances": [
+      },
       {
-        "id": "p-4ee5f8a5",
-        "streamId": "stream-2026-03-09",
-        "date": "2026-03-09",
-        "streamTitle": "【伴睡歌回】有些感受不是說不出口，是說了也不一定被懂。給還醒著的你：今晚輕輕唱陪你入睡。 言えないわけじゃない。でも、言っても伝わらないこともあるよね。░ 睡眠導入歌枠｜Singing Stream",
-        "videoId": "IVfl4IDi0co",
-        "timestamp": 6470,
-        "endTimestamp": 6806,
+        "id": "p-12048e04",
+        "streamId": "stream-2026-03-30",
+        "date": "2026-03-30",
+        "streamTitle": "【伴睡歌回】當世界開始讓你懷疑自己的時候，是不是又在想，為什麼明明努力了卻好像只有自己跟不上。頑張ってるのに、自分だけ追いつけないって思うとき。░ 睡眠導入歌枠｜Singing Stream",
+        "videoId": "2iZkLT5vemI",
+        "timestamp": 9854,
+        "endTimestamp": 10184,
         "note": ""
       }
     ]
@@ -3472,6 +3124,26 @@
         "videoId": "tqLA2FnNO84",
         "timestamp": 6811,
         "endTimestamp": 7109,
+        "note": ""
+      },
+      {
+        "id": "p-8077e4f5",
+        "streamId": "stream-2026-04-06",
+        "date": "2026-04-06",
+        "streamTitle": "【伴睡歌回】那些真心付出過的，不是錯過了什麼，而是你曾經很用力在喜歡。本気で想っていた気持ちは、何かを失ったわけじゃなくて、ただ好きだった証だ。░ 睡眠導入歌枠｜Singing Stream",
+        "videoId": "zlRzb3iDgn4",
+        "timestamp": 5408,
+        "endTimestamp": 5706,
+        "note": ""
+      },
+      {
+        "id": "p-9003d5f8",
+        "streamId": "stream-2026-07-06",
+        "date": "2026-07-06",
+        "streamTitle": "【伴睡歌回】有時候，明知道不會有結果，還是會想對一個人好。うまくいかないってわかってるのに、それでも誰かに優しくしたくなるときってあるよね。　░ 睡眠導入歌枠｜Singing Stream",
+        "videoId": "q3B24mwXF2k",
+        "timestamp": 5909,
+        "endTimestamp": 6203,
         "note": ""
       }
     ]
@@ -3503,6 +3175,26 @@
     "tags": [],
     "performances": [
       {
+        "id": "p-0a4611b5",
+        "streamId": "stream-2022-09-05",
+        "date": "2022-09-05",
+        "streamTitle": "【中文歌枠】粉絲名決定！星期一來點動力！【厄倫蒂兒 Earendel】",
+        "videoId": "EZtqMl9Vwa4",
+        "timestamp": 4285,
+        "endTimestamp": 4386,
+        "note": ""
+      },
+      {
+        "id": "p-e92a00d7",
+        "streamId": "stream-2022-09-19",
+        "date": "2022-09-19",
+        "streamTitle": "【 寝落ち歌枠】聊著天唱著歌～突然就想睡了呢！【厄倫蒂兒 Earendel】",
+        "videoId": "71i2JN0e-xE",
+        "timestamp": 4008,
+        "endTimestamp": 4304,
+        "note": ""
+      },
+      {
         "id": "p-ab5bf1d4",
         "streamId": "stream-2026-03-16",
         "date": "2026-03-16",
@@ -3511,24 +3203,25 @@
         "timestamp": 7723,
         "endTimestamp": 8018,
         "note": ""
-      }
-    ]
-  },
-  {
-    "id": "song-9f6c9c6c",
-    "workId": "work-song-1557",
-    "title": "我喜歡你",
-    "originalArtist": "洪安妮",
-    "tags": [],
-    "performances": [
+      },
       {
-        "id": "p-71f6e4ae",
-        "streamId": "stream-2022-09-05",
-        "date": "2022-09-05",
-        "streamTitle": "【中文歌枠】粉絲名決定！星期一來點動力！【厄倫蒂兒 Earendel】",
-        "videoId": "EZtqMl9Vwa4",
-        "timestamp": 2763,
-        "endTimestamp": 3006,
+        "id": "p-b5ca3909",
+        "streamId": "stream-2026-04-06",
+        "date": "2026-04-06",
+        "streamTitle": "【伴睡歌回】那些真心付出過的，不是錯過了什麼，而是你曾經很用力在喜歡。本気で想っていた気持ちは、何かを失ったわけじゃなくて、ただ好きだった証だ。░ 睡眠導入歌枠｜Singing Stream",
+        "videoId": "zlRzb3iDgn4",
+        "timestamp": 10952,
+        "endTimestamp": 11247,
+        "note": ""
+      },
+      {
+        "id": "p-3c0d5450",
+        "streamId": "stream-2026-06-12",
+        "date": "2026-06-12",
+        "streamTitle": "【深夜歌雜】別急著站起來，偶爾跌倒後躺著看天空也不錯　░  歌枠｜Singing Stream #shorts",
+        "videoId": "WTPx_GgMKs8",
+        "timestamp": 4401,
+        "endTimestamp": 4698,
         "note": ""
       }
     ]
@@ -3591,44 +3284,6 @@
     ]
   },
   {
-    "id": "song-a24ee1b1",
-    "workId": "work-song-a24ee1b1",
-    "title": "ワールドイズマイン",
-    "originalArtist": "ryo feat. 初音ミク",
-    "tags": [],
-    "performances": [
-      {
-        "id": "p-12f4026c",
-        "streamId": "stream-2026-04-03",
-        "date": "2026-04-03",
-        "streamTitle": "【倫家想唱歌】練習唱唱歌！想把開心帶給你們！辛苦惹你這次連假要做甚麼呢  ░ 歌枠｜Singing Stream",
-        "videoId": "KzjBXLsjzU4",
-        "timestamp": 6338,
-        "endTimestamp": 6516,
-        "note": ""
-      }
-    ]
-  },
-  {
-    "id": "song-a34ef755",
-    "workId": "work-song-1461d0d3",
-    "title": "瞬き",
-    "originalArtist": "back number",
-    "tags": [],
-    "performances": [
-      {
-        "id": "p-2d57267a",
-        "streamId": "stream-daaf4871",
-        "date": "2022-08-29",
-        "streamTitle": "【歌枠】２次會💫輕鬆唱唱  【厄倫蒂兒．Vtuber】",
-        "videoId": "GsG6hS5bOsA",
-        "timestamp": 1006,
-        "endTimestamp": 1326,
-        "note": ""
-      }
-    ]
-  },
-  {
     "id": "song-a525c8c7",
     "workId": "work-song-2070",
     "title": "変わらないもの",
@@ -3654,6 +3309,16 @@
     "originalArtist": "doriko feat. 初音ミク",
     "tags": [],
     "performances": [
+      {
+        "id": "p-fa222093",
+        "streamId": "stream-bc303791",
+        "date": "2026-06-03",
+        "streamTitle": "【突發歌雜】不想讓腦袋的聲音充斥安靜的夜晚，那來聽聽歌吧　░ 睡眠導入歌枠｜Singing Stream #shorts",
+        "videoId": "KB2cNRbeaKc",
+        "timestamp": 7672,
+        "endTimestamp": 8037,
+        "note": ""
+      },
       {
         "id": "p-e56551da",
         "streamId": "stream-2026-06-08",
@@ -3731,6 +3396,16 @@
     "tags": [],
     "performances": [
       {
+        "id": "p-fc7d0148",
+        "streamId": "stream-8c4cf2a6",
+        "date": "2022-09-10",
+        "streamTitle": "【 中秋歌回！】唱些與夏夜相關及棉花糖的點歌！【厄倫蒂兒 Earendel】",
+        "videoId": "hraT9N8sQI4",
+        "timestamp": 2634,
+        "endTimestamp": 2882,
+        "note": ""
+      },
+      {
         "id": "p-f298cb62",
         "streamId": "stream-bc303791",
         "date": "2026-06-03",
@@ -3738,25 +3413,6 @@
         "videoId": "KB2cNRbeaKc",
         "timestamp": 6283,
         "endTimestamp": 6533,
-        "note": ""
-      }
-    ]
-  },
-  {
-    "id": "song-ac576cf6",
-    "workId": "work-song-28534ae4",
-    "title": "ドライフラワー",
-    "originalArtist": "優里",
-    "tags": [],
-    "performances": [
-      {
-        "id": "p-c1e5824b",
-        "streamId": "stream-2026-06-15",
-        "date": "2026-06-15",
-        "streamTitle": "【伴睡歌回】有些話不是不想說，只是無奈地選擇不說了。彷彿就像最近的雨下得斷斷續續，有些情緒也是。言えなかったんじゃなくて、ただ言わなかっただけ。　░ 睡眠導入歌枠｜Singing Stream",
-        "videoId": "ZsObrmIQLGk",
-        "timestamp": 4884,
-        "endTimestamp": 5166,
         "note": ""
       }
     ]
@@ -3800,25 +3456,6 @@
     ]
   },
   {
-    "id": "song-af645e18",
-    "workId": "work-song-2bb8d010",
-    "title": "六等星の夜",
-    "originalArtist": "Aimer",
-    "tags": [],
-    "performances": [
-      {
-        "id": "p-3074f0b9",
-        "streamId": "stream-2026-06-12",
-        "date": "2026-06-12",
-        "streamTitle": "【深夜歌雜】別急著站起來，偶爾跌倒後躺著看天空也不錯　░  歌枠｜Singing Stream #shorts",
-        "videoId": "WTPx_GgMKs8",
-        "timestamp": 12613,
-        "endTimestamp": 12988,
-        "note": ""
-      }
-    ]
-  },
-  {
     "id": "song-b43a8cc8",
     "workId": "work-song-215b1b2d",
     "title": "ちゃんとあるよ",
@@ -3833,6 +3470,26 @@
         "videoId": "2iZkLT5vemI",
         "timestamp": 6089,
         "endTimestamp": 6384,
+        "note": ""
+      },
+      {
+        "id": "p-b9fa5424",
+        "streamId": "stream-2026-06-08",
+        "date": "2026-06-08",
+        "streamTitle": "【伴睡歌回】是不是連放鬆的時候，腦袋裡還在責怪自己。自分を責めるの、少し休みませんか？　░ 睡眠導入歌枠｜Singing Stream",
+        "videoId": "6S3gCcIE4K4",
+        "timestamp": 7706,
+        "endTimestamp": 7997,
+        "note": ""
+      },
+      {
+        "id": "p-cc65828f",
+        "streamId": "stream-2026-06-15",
+        "date": "2026-06-15",
+        "streamTitle": "【伴睡歌回】有些話不是不想說，只是無奈地選擇不說了。彷彿就像最近的雨下得斷斷續續，有些情緒也是。言えなかったんじゃなくて、ただ言わなかっただけ。　░ 睡眠導入歌枠｜Singing Stream",
+        "videoId": "ZsObrmIQLGk",
+        "timestamp": 5873,
+        "endTimestamp": 6164,
         "note": ""
       }
     ]
@@ -3933,25 +3590,6 @@
     ]
   },
   {
-    "id": "song-b8049b4c",
-    "workId": "work-song-0c7b9a02",
-    "title": "いのちの名前",
-    "originalArtist": "木村弓",
-    "tags": [],
-    "performances": [
-      {
-        "id": "p-87f9f2cd",
-        "streamId": "stream-2026-06-12",
-        "date": "2026-06-12",
-        "streamTitle": "【深夜歌雜】別急著站起來，偶爾跌倒後躺著看天空也不錯　░  歌枠｜Singing Stream #shorts",
-        "videoId": "WTPx_GgMKs8",
-        "timestamp": 5088,
-        "endTimestamp": 5319,
-        "note": ""
-      }
-    ]
-  },
-  {
     "id": "song-b884c90f",
     "workId": "work-song-395ed5fa",
     "title": "secret base ～君がくれたもの～",
@@ -3967,24 +3605,15 @@
         "timestamp": 2513,
         "endTimestamp": 2809,
         "note": ""
-      }
-    ]
-  },
-  {
-    "id": "song-b9138d08",
-    "workId": "work-song-013c53cd",
-    "title": "晩餐歌",
-    "originalArtist": "tuki.",
-    "tags": [],
-    "performances": [
+      },
       {
-        "id": "p-9c336325",
-        "streamId": "stream-2026-05-27",
-        "date": "2026-05-27",
-        "streamTitle": "【暖場歌回】竟然有怪怪生化人助陣！挑戰丟掉包袱嗨起來！！！ !   @Cetro.Timaeus 　░ 合唱歌回｜Singing Stream",
-        "videoId": "gYOqDomZj48",
-        "timestamp": 3232,
-        "endTimestamp": 3464,
+        "id": "p-e70a9de0",
+        "streamId": "stream-2026-04-06",
+        "date": "2026-04-06",
+        "streamTitle": "【伴睡歌回】那些真心付出過的，不是錯過了什麼，而是你曾經很用力在喜歡。本気で想っていた気持ちは、何かを失ったわけじゃなくて、ただ好きだった証だ。░ 睡眠導入歌枠｜Singing Stream",
+        "videoId": "zlRzb3iDgn4",
+        "timestamp": 4234,
+        "endTimestamp": 4638,
         "note": ""
       }
     ]
@@ -4004,25 +3633,6 @@
         "videoId": "IVfl4IDi0co",
         "timestamp": 1689,
         "endTimestamp": 1886,
-        "note": ""
-      }
-    ]
-  },
-  {
-    "id": "song-bbbcd8c9",
-    "workId": "work-song-55a6c690",
-    "title": "オレンジ",
-    "originalArtist": "7!!",
-    "tags": [],
-    "performances": [
-      {
-        "id": "p-1f85b8da",
-        "streamId": "stream-2026-04-06",
-        "date": "2026-04-06",
-        "streamTitle": "【伴睡歌回】那些真心付出過的，不是錯過了什麼，而是你曾經很用力在喜歡。本気で想っていた気持ちは、何かを失ったわけじゃなくて、ただ好きだった証だ。░ 睡眠導入歌枠｜Singing Stream",
-        "videoId": "zlRzb3iDgn4",
-        "timestamp": 873,
-        "endTimestamp": 1225,
         "note": ""
       }
     ]
@@ -4085,25 +3695,6 @@
     ]
   },
   {
-    "id": "song-be5fcf6c",
-    "workId": "work-song-150b2c0e",
-    "title": "你知道星星多重嗎",
-    "originalArtist": "鄭興",
-    "tags": [],
-    "performances": [
-      {
-        "id": "p-d50a6045",
-        "streamId": "stream-2026-03-30",
-        "date": "2026-03-30",
-        "streamTitle": "【伴睡歌回】當世界開始讓你懷疑自己的時候，是不是又在想，為什麼明明努力了卻好像只有自己跟不上。頑張ってるのに、自分だけ追いつけないって思うとき。░ 睡眠導入歌枠｜Singing Stream",
-        "videoId": "2iZkLT5vemI",
-        "timestamp": 9063,
-        "endTimestamp": 9360,
-        "note": ""
-      }
-    ]
-  },
-  {
     "id": "song-bf95d23e",
     "workId": "work-song-bf95d23e",
     "title": "時間都去哪了",
@@ -4161,63 +3752,6 @@
     ]
   },
   {
-    "id": "song-c27edf31",
-    "workId": "work-song-15b9ec3b",
-    "title": "孤獨的總和",
-    "originalArtist": "吳汶芳",
-    "tags": [],
-    "performances": [
-      {
-        "id": "p-362ac1b8",
-        "streamId": "stream-08cd4aad",
-        "date": "2022-09-14",
-        "streamTitle": "【 寝落ち歌枠】睡前唱些輕柔的歌，再兩天就放假了加油！【厄倫蒂兒 Earendel】",
-        "videoId": "Fq2wuNB-E7c",
-        "timestamp": 3953,
-        "endTimestamp": 4172,
-        "note": ""
-      }
-    ]
-  },
-  {
-    "id": "song-c3afca43",
-    "workId": "work-song-27329092",
-    "title": "這條小魚在乎",
-    "originalArtist": "王OK & 洪佩瑜",
-    "tags": [],
-    "performances": [
-      {
-        "id": "p-e8f1650e",
-        "streamId": "stream-bc303791",
-        "date": "2026-06-03",
-        "streamTitle": "【突發歌雜】不想讓腦袋的聲音充斥安靜的夜晚，那來聽聽歌吧　░ 睡眠導入歌枠｜Singing Stream #shorts",
-        "videoId": "KB2cNRbeaKc",
-        "timestamp": 4782,
-        "endTimestamp": 5053,
-        "note": ""
-      }
-    ]
-  },
-  {
-    "id": "song-c3b86904",
-    "workId": "work-song-12cd2b80",
-    "title": "星炬不熄",
-    "originalArtist": "飛行雪絨 & 星炬學院畢業生",
-    "tags": [],
-    "performances": [
-      {
-        "id": "p-0984a904",
-        "streamId": "stream-2026-06-15",
-        "date": "2026-06-15",
-        "streamTitle": "【伴睡歌回】有些話不是不想說，只是無奈地選擇不說了。彷彿就像最近的雨下得斷斷續續，有些情緒也是。言えなかったんじゃなくて、ただ言わなかっただけ。　░ 睡眠導入歌枠｜Singing Stream",
-        "videoId": "ZsObrmIQLGk",
-        "timestamp": 2793,
-        "endTimestamp": 3024,
-        "note": ""
-      }
-    ]
-  },
-  {
     "id": "song-c416b214",
     "workId": "work-song-c416b214",
     "title": "練習一個人生活",
@@ -4232,25 +3766,6 @@
         "videoId": "6S3gCcIE4K4",
         "timestamp": 3390,
         "endTimestamp": 3676,
-        "note": ""
-      }
-    ]
-  },
-  {
-    "id": "song-c45db257",
-    "workId": "work-song-15b9ec3b",
-    "title": "孤獨的總和",
-    "originalArtist": "吳汶芳",
-    "tags": [],
-    "performances": [
-      {
-        "id": "p-6c3ac483",
-        "streamId": "stream-daaf4871",
-        "date": "2022-08-29",
-        "streamTitle": "【歌枠】２次會💫輕鬆唱唱  【厄倫蒂兒．Vtuber】",
-        "videoId": "GsG6hS5bOsA",
-        "timestamp": 3560,
-        "endTimestamp": 3780,
         "note": ""
       }
     ]
@@ -4484,44 +3999,6 @@
     ]
   },
   {
-    "id": "song-cf251784",
-    "workId": "work-song-cf251784",
-    "title": "幸福在歌唱",
-    "originalArtist": "A-Lin",
-    "tags": [],
-    "performances": [
-      {
-        "id": "p-1f945adf",
-        "streamId": "stream-2026-06-01",
-        "date": "2026-06-01",
-        "streamTitle": "【伴睡歌回】有些再見，用的不是一句話，而是一段陪伴。さよならって、一言じゃなくて、一緒に過ごした時間そのものなんだよね。　░ 睡眠導入歌枠｜Singing Stream",
-        "videoId": "58n4IS3D4m8",
-        "timestamp": 2268,
-        "endTimestamp": 2544,
-        "note": ""
-      }
-    ]
-  },
-  {
-    "id": "song-cf8d35f4",
-    "workId": "work-song-cf8d35f4",
-    "title": "days",
-    "originalArtist": "じん feat. Lia",
-    "tags": [],
-    "performances": [
-      {
-        "id": "p-71101031",
-        "streamId": "stream-2026-07-06",
-        "date": "2026-07-06",
-        "streamTitle": "【伴睡歌回】有時候，明知道不會有結果，還是會想對一個人好。うまくいかないってわかってるのに、それでも誰かに優しくしたくなるときってあるよね。　░ 睡眠導入歌枠｜Singing Stream",
-        "videoId": "q3B24mwXF2k",
-        "timestamp": 8231,
-        "endTimestamp": 8571,
-        "note": ""
-      }
-    ]
-  },
-  {
     "id": "song-d021342d",
     "workId": "work-song-167fbcff",
     "title": "超跑情人夢",
@@ -4536,6 +4013,16 @@
         "videoId": "xQ5TCl3JnXs",
         "timestamp": 11054,
         "endTimestamp": 11305,
+        "note": ""
+      },
+      {
+        "id": "p-4ac4bb4a",
+        "streamId": "stream-2026-05-27",
+        "date": "2026-05-27",
+        "streamTitle": "【暖場歌回】竟然有怪怪生化人助陣！挑戰丟掉包袱嗨起來！！！ !   @Cetro.Timaeus 　░ 合唱歌回｜Singing Stream",
+        "videoId": "gYOqDomZj48",
+        "timestamp": 1234,
+        "endTimestamp": 1475,
         "note": ""
       }
     ]
@@ -4586,6 +4073,26 @@
     "tags": [],
     "performances": [
       {
+        "id": "p-1c25b526",
+        "streamId": "stream-2022-09-19",
+        "date": "2022-09-19",
+        "streamTitle": "【 寝落ち歌枠】聊著天唱著歌～突然就想睡了呢！【厄倫蒂兒 Earendel】",
+        "videoId": "71i2JN0e-xE",
+        "timestamp": 1640,
+        "endTimestamp": 1892,
+        "note": ""
+      },
+      {
+        "id": "p-f19fce22",
+        "streamId": "stream-2026-03-09",
+        "date": "2026-03-09",
+        "streamTitle": "【伴睡歌回】有些感受不是說不出口，是說了也不一定被懂。給還醒著的你：今晚輕輕唱陪你入睡。 言えないわけじゃない。でも、言っても伝わらないこともあるよね。░ 睡眠導入歌枠｜Singing Stream",
+        "videoId": "IVfl4IDi0co",
+        "timestamp": 4438,
+        "endTimestamp": 4694,
+        "note": ""
+      },
+      {
         "id": "p-cdac3d56",
         "streamId": "stream-2026-03-09",
         "date": "2026-03-09",
@@ -4632,24 +4139,15 @@
         "timestamp": 3655,
         "endTimestamp": 3932,
         "note": ""
-      }
-    ]
-  },
-  {
-    "id": "song-d4ec267b",
-    "workId": "work-song-297",
-    "title": "燈光",
-    "originalArtist": "謝震廷",
-    "tags": [],
-    "performances": [
+      },
       {
-        "id": "p-1c87981e",
-        "streamId": "stream-2026-04-06",
-        "date": "2026-04-06",
-        "streamTitle": "【伴睡歌回】那些真心付出過的，不是錯過了什麼，而是你曾經很用力在喜歡。本気で想っていた気持ちは、何かを失ったわけじゃなくて、ただ好きだった証だ。░ 睡眠導入歌枠｜Singing Stream",
-        "videoId": "zlRzb3iDgn4",
-        "timestamp": 9238,
-        "endTimestamp": 9458,
+        "id": "p-87f9f2cd",
+        "streamId": "stream-2026-06-12",
+        "date": "2026-06-12",
+        "streamTitle": "【深夜歌雜】別急著站起來，偶爾跌倒後躺著看天空也不錯　░  歌枠｜Singing Stream #shorts",
+        "videoId": "WTPx_GgMKs8",
+        "timestamp": 5088,
+        "endTimestamp": 5319,
         "note": ""
       }
     ]
@@ -4689,24 +4187,15 @@
         "timestamp": 2855,
         "endTimestamp": 3195,
         "note": ""
-      }
-    ]
-  },
-  {
-    "id": "song-d868e2ab",
-    "workId": "work-song-1143",
-    "title": "Lemon",
-    "originalArtist": "米津玄師",
-    "tags": [],
-    "performances": [
+      },
       {
-        "id": "p-f19fce22",
-        "streamId": "stream-2026-03-09",
-        "date": "2026-03-09",
-        "streamTitle": "【伴睡歌回】有些感受不是說不出口，是說了也不一定被懂。給還醒著的你：今晚輕輕唱陪你入睡。 言えないわけじゃない。でも、言っても伝わらないこともあるよね。░ 睡眠導入歌枠｜Singing Stream",
-        "videoId": "IVfl4IDi0co",
-        "timestamp": 4438,
-        "endTimestamp": 4694,
+        "id": "p-71101031",
+        "streamId": "stream-2026-07-06",
+        "date": "2026-07-06",
+        "streamTitle": "【伴睡歌回】有時候，明知道不會有結果，還是會想對一個人好。うまくいかないってわかってるのに、それでも誰かに優しくしたくなるときってあるよね。　░ 睡眠導入歌枠｜Singing Stream",
+        "videoId": "q3B24mwXF2k",
+        "timestamp": 8231,
+        "endTimestamp": 8571,
         "note": ""
       }
     ]
@@ -4803,6 +4292,16 @@
         "timestamp": 8600,
         "endTimestamp": 8850,
         "note": ""
+      },
+      {
+        "id": "p-3ffcb8b2",
+        "streamId": "stream-2026-05-29",
+        "date": "2026-05-29",
+        "streamTitle": "【倫家想唱歌】願意來聽一首歌嗎！一起享受周五晚上的時間吧！✨一曲聴きませんか？金曜日の夜を一緒に楽しみましょう！✨   ░ 歌枠｜Singing Stream　#karaoke #shorts",
+        "videoId": "IVlHQ7Xn-pQ",
+        "timestamp": 6821,
+        "endTimestamp": 7070,
+        "note": ""
       }
     ]
   },
@@ -4826,25 +4325,6 @@
     ]
   },
   {
-    "id": "song-dae5760b",
-    "workId": "work-song-6b76dc92",
-    "title": "下雨的晚上",
-    "originalArtist": "黃玠",
-    "tags": [],
-    "performances": [
-      {
-        "id": "p-b5ca3909",
-        "streamId": "stream-2026-04-06",
-        "date": "2026-04-06",
-        "streamTitle": "【伴睡歌回】那些真心付出過的，不是錯過了什麼，而是你曾經很用力在喜歡。本気で想っていた気持ちは、何かを失ったわけじゃなくて、ただ好きだった証だ。░ 睡眠導入歌枠｜Singing Stream",
-        "videoId": "zlRzb3iDgn4",
-        "timestamp": 10952,
-        "endTimestamp": 11247,
-        "note": ""
-      }
-    ]
-  },
-  {
     "id": "song-db699475",
     "workId": "work-song-1aaee745",
     "title": "最後一頁",
@@ -4859,25 +4339,6 @@
         "videoId": "tqLA2FnNO84",
         "timestamp": 1727,
         "endTimestamp": 1995,
-        "note": ""
-      }
-    ]
-  },
-  {
-    "id": "song-dbd031a7",
-    "workId": "work-song-4859ac9c",
-    "title": "願溫柔的你被世界溫柔以待",
-    "originalArtist": "綠繡眼",
-    "tags": [],
-    "performances": [
-      {
-        "id": "p-ee59a893",
-        "streamId": "stream-bc303791",
-        "date": "2026-06-03",
-        "streamTitle": "【突發歌雜】不想讓腦袋的聲音充斥安靜的夜晚，那來聽聽歌吧　░ 睡眠導入歌枠｜Singing Stream #shorts",
-        "videoId": "KB2cNRbeaKc",
-        "timestamp": 9860,
-        "endTimestamp": 10086,
         "note": ""
       }
     ]
@@ -4917,6 +4378,16 @@
         "timestamp": 5334,
         "endTimestamp": 5582,
         "note": ""
+      },
+      {
+        "id": "p-d8937288",
+        "streamId": "stream-2026-04-03",
+        "date": "2026-04-03",
+        "streamTitle": "【倫家想唱歌】練習唱唱歌！想把開心帶給你們！辛苦惹你這次連假要做甚麼呢  ░ 歌枠｜Singing Stream",
+        "videoId": "KzjBXLsjzU4",
+        "timestamp": 5873,
+        "endTimestamp": 6121,
+        "note": ""
       }
     ]
   },
@@ -4955,24 +4426,15 @@
         "timestamp": 2095,
         "endTimestamp": 2335,
         "note": ""
-      }
-    ]
-  },
-  {
-    "id": "song-e0f13baf",
-    "workId": "work-song-1143",
-    "title": "Lemon",
-    "originalArtist": "米津玄師",
-    "tags": [],
-    "performances": [
+      },
       {
-        "id": "p-1c25b526",
-        "streamId": "stream-2022-09-19",
-        "date": "2022-09-19",
-        "streamTitle": "【 寝落ち歌枠】聊著天唱著歌～突然就想睡了呢！【厄倫蒂兒 Earendel】",
-        "videoId": "71i2JN0e-xE",
-        "timestamp": 1640,
-        "endTimestamp": 1892,
+        "id": "p-d5713747",
+        "streamId": "stream-2026-06-12",
+        "date": "2026-06-12",
+        "streamTitle": "【深夜歌雜】別急著站起來，偶爾跌倒後躺著看天空也不錯　░  歌枠｜Singing Stream #shorts",
+        "videoId": "WTPx_GgMKs8",
+        "timestamp": 2123,
+        "endTimestamp": 2366,
         "note": ""
       }
     ]
@@ -5050,6 +4512,16 @@
         "timestamp": 8577,
         "endTimestamp": 8755,
         "note": ""
+      },
+      {
+        "id": "p-12f4026c",
+        "streamId": "stream-2026-04-03",
+        "date": "2026-04-03",
+        "streamTitle": "【倫家想唱歌】練習唱唱歌！想把開心帶給你們！辛苦惹你這次連假要做甚麼呢  ░ 歌枠｜Singing Stream",
+        "videoId": "KzjBXLsjzU4",
+        "timestamp": 6338,
+        "endTimestamp": 6516,
+        "note": ""
       }
     ]
   },
@@ -5068,44 +4540,6 @@
         "videoId": "xQ5TCl3JnXs",
         "timestamp": 9491,
         "endTimestamp": 9749,
-        "note": ""
-      }
-    ]
-  },
-  {
-    "id": "song-e9609aa6",
-    "workId": "work-song-4fc49677",
-    "title": "愛你",
-    "originalArtist": "王心凌",
-    "tags": [],
-    "performances": [
-      {
-        "id": "p-3fe8578f",
-        "streamId": "stream-c85e01e7",
-        "date": "2026-03-24",
-        "streamTitle": "【倫家想唱歌】來陪你惹!!!!!!!趁你午休偷偷唱歌偷偷聊天🤩🤩🤩 和玩玩看新東西!!! ░ 歌枠｜Singing Stream",
-        "videoId": "dJ4z3FliynU",
-        "timestamp": 5425,
-        "endTimestamp": 5641,
-        "note": ""
-      }
-    ]
-  },
-  {
-    "id": "song-ea132f8c",
-    "workId": "work-song-3db8fe5c",
-    "title": "Butter-Fly",
-    "originalArtist": "和田光司",
-    "tags": [],
-    "performances": [
-      {
-        "id": "p-d8937288",
-        "streamId": "stream-2026-04-03",
-        "date": "2026-04-03",
-        "streamTitle": "【倫家想唱歌】練習唱唱歌！想把開心帶給你們！辛苦惹你這次連假要做甚麼呢  ░ 歌枠｜Singing Stream",
-        "videoId": "KzjBXLsjzU4",
-        "timestamp": 5873,
-        "endTimestamp": 6121,
         "note": ""
       }
     ]
@@ -5201,25 +4635,6 @@
         "videoId": "zlRzb3iDgn4",
         "timestamp": 8736,
         "endTimestamp": 8987,
-        "note": ""
-      }
-    ]
-  },
-  {
-    "id": "song-ee77ebde",
-    "workId": "work-song-0a53aeb7",
-    "title": "星屑ビーナス",
-    "originalArtist": "Aimer",
-    "tags": [],
-    "performances": [
-      {
-        "id": "p-fc7d0148",
-        "streamId": "stream-8c4cf2a6",
-        "date": "2022-09-10",
-        "streamTitle": "【 中秋歌回！】唱些與夏夜相關及棉花糖的點歌！【厄倫蒂兒 Earendel】",
-        "videoId": "hraT9N8sQI4",
-        "timestamp": 2634,
-        "endTimestamp": 2882,
         "note": ""
       }
     ]
@@ -5335,43 +4750,15 @@
         "timestamp": 9009,
         "endTimestamp": 9283,
         "note": ""
-      }
-    ]
-  },
-  {
-    "id": "song-f4a1db47",
-    "workId": "work-song-28534ae4",
-    "title": "ドライフラワー",
-    "originalArtist": "優里",
-    "tags": [],
-    "performances": [
+      },
       {
-        "id": "p-b8fdb100",
-        "streamId": "stream-2026-07-06",
-        "date": "2026-07-06",
-        "streamTitle": "【伴睡歌回】有時候，明知道不會有結果，還是會想對一個人好。うまくいかないってわかってるのに、それでも誰かに優しくしたくなるときってあるよね。　░ 睡眠導入歌枠｜Singing Stream",
-        "videoId": "q3B24mwXF2k",
-        "timestamp": 4896,
-        "endTimestamp": 5182,
-        "note": ""
-      }
-    ]
-  },
-  {
-    "id": "song-f4e81773",
-    "workId": "work-song-27329092",
-    "title": "這條小魚在乎",
-    "originalArtist": "王OK & 洪佩瑜",
-    "tags": [],
-    "performances": [
-      {
-        "id": "p-0b6bd26c",
-        "streamId": "stream-2026-04-06",
-        "date": "2026-04-06",
-        "streamTitle": "【伴睡歌回】那些真心付出過的，不是錯過了什麼，而是你曾經很用力在喜歡。本気で想っていた気持ちは、何かを失ったわけじゃなくて、ただ好きだった証だ。░ 睡眠導入歌枠｜Singing Stream",
-        "videoId": "zlRzb3iDgn4",
-        "timestamp": 3701,
-        "endTimestamp": 3972,
+        "id": "p-bc27e2a2",
+        "streamId": "stream-2026-04-03",
+        "date": "2026-04-03",
+        "streamTitle": "【倫家想唱歌】練習唱唱歌！想把開心帶給你們！辛苦惹你這次連假要做甚麼呢  ░ 歌枠｜Singing Stream",
+        "videoId": "KzjBXLsjzU4",
+        "timestamp": 5415,
+        "endTimestamp": 5689,
         "note": ""
       }
     ]
@@ -5449,6 +4836,16 @@
         "timestamp": 1890,
         "endTimestamp": 2156,
         "note": ""
+      },
+      {
+        "id": "p-d5b662cf",
+        "streamId": "stream-2022-09-19",
+        "date": "2022-09-19",
+        "streamTitle": "【 寝落ち歌枠】聊著天唱著歌～突然就想睡了呢！【厄倫蒂兒 Earendel】",
+        "videoId": "71i2JN0e-xE",
+        "timestamp": 508,
+        "endTimestamp": 773,
+        "note": ""
       }
     ]
   },
@@ -5467,44 +4864,6 @@
         "videoId": "q3B24mwXF2k",
         "timestamp": 2352,
         "endTimestamp": 2679,
-        "note": ""
-      }
-    ]
-  },
-  {
-    "id": "song-f8f802d2",
-    "workId": "work-song-6b76dc92",
-    "title": "下雨的晚上",
-    "originalArtist": "黃玠",
-    "tags": [],
-    "performances": [
-      {
-        "id": "p-0a4611b5",
-        "streamId": "stream-2022-09-05",
-        "date": "2022-09-05",
-        "streamTitle": "【中文歌枠】粉絲名決定！星期一來點動力！【厄倫蒂兒 Earendel】",
-        "videoId": "EZtqMl9Vwa4",
-        "timestamp": 4285,
-        "endTimestamp": 4386,
-        "note": ""
-      }
-    ]
-  },
-  {
-    "id": "song-f9c2171d",
-    "workId": "work-song-1322",
-    "title": "雨愛",
-    "originalArtist": "楊丞琳",
-    "tags": [],
-    "performances": [
-      {
-        "id": "p-f3c99261",
-        "streamId": "stream-2026-06-08",
-        "date": "2026-06-08",
-        "streamTitle": "【伴睡歌回】是不是連放鬆的時候，腦袋裡還在責怪自己。自分を責めるの、少し休みませんか？　░ 睡眠導入歌枠｜Singing Stream",
-        "videoId": "6S3gCcIE4K4",
-        "timestamp": 6562,
-        "endTimestamp": 6822,
         "note": ""
       }
     ]
@@ -5544,6 +4903,16 @@
         "timestamp": 3915,
         "endTimestamp": 4195,
         "note": ""
+      },
+      {
+        "id": "p-1f945adf",
+        "streamId": "stream-2026-06-01",
+        "date": "2026-06-01",
+        "streamTitle": "【伴睡歌回】有些再見，用的不是一句話，而是一段陪伴。さよならって、一言じゃなくて、一緒に過ごした時間そのものなんだよね。　░ 睡眠導入歌枠｜Singing Stream",
+        "videoId": "58n4IS3D4m8",
+        "timestamp": 2268,
+        "endTimestamp": 2544,
+        "note": ""
       }
     ]
   },
@@ -5582,6 +4951,16 @@
         "timestamp": 3507,
         "endTimestamp": 3767,
         "note": ""
+      },
+      {
+        "id": "p-f3c99261",
+        "streamId": "stream-2026-06-08",
+        "date": "2026-06-08",
+        "streamTitle": "【伴睡歌回】是不是連放鬆的時候，腦袋裡還在責怪自己。自分を責めるの、少し休みませんか？　░ 睡眠導入歌枠｜Singing Stream",
+        "videoId": "6S3gCcIE4K4",
+        "timestamp": 6562,
+        "endTimestamp": 6822,
+        "note": ""
       }
     ]
   },
@@ -5605,25 +4984,6 @@
     ]
   },
   {
-    "id": "song-fd602ace",
-    "workId": "work-song-f848c123",
-    "title": "風のゆくえ",
-    "originalArtist": "Ado",
-    "tags": [],
-    "performances": [
-      {
-        "id": "p-d5b662cf",
-        "streamId": "stream-2022-09-19",
-        "date": "2022-09-19",
-        "streamTitle": "【 寝落ち歌枠】聊著天唱著歌～突然就想睡了呢！【厄倫蒂兒 Earendel】",
-        "videoId": "71i2JN0e-xE",
-        "timestamp": 508,
-        "endTimestamp": 773,
-        "note": ""
-      }
-    ]
-  },
-  {
     "id": "song-feba1f63",
     "workId": "work-song-13e927d3",
     "title": "ベテルギウス",
@@ -5638,6 +4998,16 @@
         "videoId": "IVfl4IDi0co",
         "timestamp": 6883,
         "endTimestamp": 7113,
+        "note": ""
+      },
+      {
+        "id": "p-60abeb57",
+        "streamId": "stream-2026-06-08",
+        "date": "2026-06-08",
+        "streamTitle": "【伴睡歌回】是不是連放鬆的時候，腦袋裡還在責怪自己。自分を責めるの、少し休みませんか？　░ 睡眠導入歌枠｜Singing Stream",
+        "videoId": "6S3gCcIE4K4",
+        "timestamp": 8406,
+        "endTimestamp": 8643,
         "note": ""
       }
     ]
@@ -5658,24 +5028,15 @@
         "timestamp": 589,
         "endTimestamp": 822,
         "note": ""
-      }
-    ]
-  },
-  {
-    "id": "song-ff400788",
-    "workId": "work-song-f47b06d0",
-    "title": "肅聖！！ ロリ神レクイエム★",
-    "originalArtist": "しぐれうい(9さい)",
-    "tags": [],
-    "performances": [
+      },
       {
-        "id": "p-bc27e2a2",
-        "streamId": "stream-2026-04-03",
-        "date": "2026-04-03",
-        "streamTitle": "【倫家想唱歌】練習唱唱歌！想把開心帶給你們！辛苦惹你這次連假要做甚麼呢  ░ 歌枠｜Singing Stream",
-        "videoId": "KzjBXLsjzU4",
-        "timestamp": 5415,
-        "endTimestamp": 5689,
+        "id": "p-c14e0deb",
+        "streamId": "stream-c85e01e7",
+        "date": "2026-03-24",
+        "streamTitle": "【倫家想唱歌】來陪你惹!!!!!!!趁你午休偷偷唱歌偷偷聊天🤩🤩🤩 和玩玩看新東西!!! ░ 歌枠｜Singing Stream",
+        "videoId": "dJ4z3FliynU",
+        "timestamp": 3515,
+        "endTimestamp": 3750,
         "note": ""
       }
     ]

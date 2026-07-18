@@ -19,25 +19,6 @@
     ]
   },
   {
-    "id": "song-01548993",
-    "workId": "work-song-01548993",
-    "title": "陰陽怪氣 Holy Moly",
-    "originalArtist": "玥Itsuki",
-    "tags": [],
-    "performances": [
-      {
-        "id": "p-b1c8417d",
-        "streamId": "stream-2026-03-23",
-        "date": "2026-03-23",
-        "streamTitle": "【心情好歌回】趕走EMO，不要M只接受EEOO",
-        "videoId": "oR2RrWacI2Y",
-        "timestamp": 4610,
-        "endTimestamp": 4774,
-        "note": ""
-      }
-    ]
-  },
-  {
     "id": "song-01e4d52b",
     "workId": "work-song-01e4d52b",
     "title": "是什麼讓我遇見這樣的你",
@@ -90,25 +71,6 @@
         "videoId": "wRZSj5cHzqI",
         "timestamp": 6717,
         "endTimestamp": 6947,
-        "note": ""
-      }
-    ]
-  },
-  {
-    "id": "song-03f9f10b",
-    "workId": "work-song-03f9f10b",
-    "title": "ELEVEN",
-    "originalArtist": "IVE",
-    "tags": [],
-    "performances": [
-      {
-        "id": "p-66a5259b",
-        "streamId": "stream-2025-03-11",
-        "date": "2025-03-11",
-        "streamTitle": "【雙人歌回】與Seki姐姐的超讚kpop歌回！！！！ft.汐seki",
-        "videoId": "GZzsCcNsMBw",
-        "timestamp": 1634,
-        "endTimestamp": 1811,
         "note": ""
       }
     ]
@@ -262,24 +224,15 @@
         "timestamp": 2690,
         "endTimestamp": 2919,
         "note": ""
-      }
-    ]
-  },
-  {
-    "id": "song-0d4b639d",
-    "workId": "work-song-0d4b639d",
-    "title": "Die With A Smile",
-    "originalArtist": "Lady Gaga, Bruno Mars",
-    "tags": [],
-    "performances": [
+      },
       {
-        "id": "p-40d87062",
-        "streamId": "stream-2024-12-14",
-        "date": "2024-12-14",
-        "streamTitle": "【歌回】復丑時間，我讓你們PON然心動...",
-        "videoId": "wRZSj5cHzqI",
-        "timestamp": 5559,
-        "endTimestamp": 5806,
+        "id": "p-5f534ace",
+        "streamId": "stream-2026-01-09",
+        "date": "2026-01-09",
+        "streamTitle": "【生日3D Mini Live】玥影如歌",
+        "videoId": "7mSLMi2CrJM",
+        "timestamp": 5168,
+        "endTimestamp": 5239,
         "note": ""
       }
     ]
@@ -338,6 +291,16 @@
         "timestamp": 940,
         "endTimestamp": 1096,
         "note": ""
+      },
+      {
+        "id": "p-d0d61df3",
+        "streamId": "stream-2025-03-11",
+        "date": "2025-03-11",
+        "streamTitle": "【雙人歌回】與Seki姐姐的超讚kpop歌回！！！！ft.汐seki",
+        "videoId": "GZzsCcNsMBw",
+        "timestamp": 6987,
+        "endTimestamp": 7141,
+        "note": ""
       }
     ]
   },
@@ -375,6 +338,16 @@
         "videoId": "yfWcdOXraqw",
         "timestamp": 6130,
         "endTimestamp": 6337,
+        "note": ""
+      },
+      {
+        "id": "p-fd1bf51e",
+        "streamId": "stream-2026-03-23",
+        "date": "2026-03-23",
+        "streamTitle": "【心情好歌回】趕走EMO，不要M只接受EEOO",
+        "videoId": "oR2RrWacI2Y",
+        "timestamp": 1692,
+        "endTimestamp": 1900,
         "note": ""
       }
     ]
@@ -418,31 +391,22 @@
     ]
   },
   {
-    "id": "song-0f4d0182",
-    "workId": "work-song-0f4d0182",
-    "title": "Always Remember Us This Way",
-    "originalArtist": "Lady Gaga",
-    "tags": [],
-    "performances": [
-      {
-        "id": "p-e4edbb1c",
-        "streamId": "stream-b5a5a3d7",
-        "date": "2024-12-24",
-        "streamTitle": "【歌回】我是滿玥寶寶，出道一個玥啦！左手指月，會被月亮割耳朵",
-        "videoId": "gyuM1a8FV24",
-        "timestamp": 6602,
-        "endTimestamp": 6801,
-        "note": ""
-      }
-    ]
-  },
-  {
     "id": "song-10d02929",
     "workId": "work-song-09aaca44",
     "title": "晴る",
     "originalArtist": "ヨルシカ",
     "tags": [],
     "performances": [
+      {
+        "id": "p-930779e6",
+        "streamId": "stream-2025-11-24",
+        "date": "2025-11-24",
+        "streamTitle": "【一週年合唱】週年慶祝合唱企劃，謝謝大家一年以來的照顧 | 玥Itsuki  ft.很多人",
+        "videoId": "gl5wEctKomU",
+        "timestamp": 10311,
+        "endTimestamp": 10582,
+        "note": ""
+      },
       {
         "id": "p-20bff017",
         "streamId": "stream-2026-01-19",
@@ -500,6 +464,16 @@
     "originalArtist": "玥Itsuki",
     "tags": [],
     "performances": [
+      {
+        "id": "p-d36243d0",
+        "streamId": "stream-2024-12-14",
+        "date": "2024-12-14",
+        "streamTitle": "【歌回】復丑時間，我讓你們PON然心動...",
+        "videoId": "wRZSj5cHzqI",
+        "timestamp": 1511,
+        "endTimestamp": 1697,
+        "note": ""
+      },
       {
         "id": "p-333eed53",
         "streamId": "stream-2025-03-11",
@@ -900,6 +874,16 @@
     "tags": [],
     "performances": [
       {
+        "id": "p-9a1e4bab",
+        "streamId": "stream-2024-12-20",
+        "date": "2024-12-20",
+        "streamTitle": "【歌回】晚安，New Jeans，我最喜歡！",
+        "videoId": "_pyphlrZ_JQ",
+        "timestamp": 3363,
+        "endTimestamp": 3537,
+        "note": ""
+      },
+      {
         "id": "p-17fd4801",
         "streamId": "stream-2025-03-11",
         "date": "2025-03-11",
@@ -937,6 +921,16 @@
     "originalArtist": "XG",
     "tags": [],
     "performances": [
+      {
+        "id": "p-60625438",
+        "streamId": "stream-2025-03-11",
+        "date": "2025-03-11",
+        "streamTitle": "【雙人歌回】與Seki姐姐的超讚kpop歌回！！！！ft.汐seki",
+        "videoId": "GZzsCcNsMBw",
+        "timestamp": 3371,
+        "endTimestamp": 3573,
+        "note": ""
+      },
       {
         "id": "p-0789a422",
         "streamId": "stream-2026-02-17",
@@ -1013,6 +1007,16 @@
     "originalArtist": "Cynthia Erivo",
     "tags": [],
     "performances": [
+      {
+        "id": "p-09d9ed6f",
+        "streamId": "stream-b5a5a3d7",
+        "date": "2024-12-24",
+        "streamTitle": "【歌回】我是滿玥寶寶，出道一個玥啦！左手指月，會被月亮割耳朵",
+        "videoId": "gyuM1a8FV24",
+        "timestamp": 7003,
+        "endTimestamp": 7300,
+        "note": ""
+      },
       {
         "id": "p-39543a40",
         "streamId": "stream-2026-01-19",
@@ -1121,25 +1125,6 @@
     ]
   },
   {
-    "id": "song-2ca5447e",
-    "workId": "work-song-2ca5447e",
-    "title": "革命道中",
-    "originalArtist": "アイナ・ジ・エンド",
-    "tags": [],
-    "performances": [
-      {
-        "id": "p-9839969c",
-        "streamId": "stream-2026-03-23",
-        "date": "2026-03-23",
-        "streamTitle": "【心情好歌回】趕走EMO，不要M只接受EEOO",
-        "videoId": "oR2RrWacI2Y",
-        "timestamp": 6734,
-        "endTimestamp": 6928,
-        "note": ""
-      }
-    ]
-  },
-  {
     "id": "song-2f931595",
     "workId": "work-song-2f931595",
     "title": "Supernova",
@@ -1173,25 +1158,6 @@
         "videoId": "SkboY-_a5Sw",
         "timestamp": 4471,
         "endTimestamp": 4565,
-        "note": ""
-      }
-    ]
-  },
-  {
-    "id": "song-325af048",
-    "workId": "work-song-325af048",
-    "title": "怪天氣",
-    "originalArtist": "YELLOW黃宣 & 9m88",
-    "tags": [],
-    "performances": [
-      {
-        "id": "p-272a79e4",
-        "streamId": "stream-2025-03-11",
-        "date": "2025-03-11",
-        "streamTitle": "【雙人歌回】與Seki姐姐的超讚kpop歌回！！！！ft.汐seki",
-        "videoId": "GZzsCcNsMBw",
-        "timestamp": 6410,
-        "endTimestamp": 6665,
         "note": ""
       }
     ]
@@ -1299,6 +1265,16 @@
     "tags": [],
     "performances": [
       {
+        "id": "p-a9b25da3",
+        "streamId": "stream-2024-12-20",
+        "date": "2024-12-20",
+        "streamTitle": "【歌回】晚安，New Jeans，我最喜歡！",
+        "videoId": "_pyphlrZ_JQ",
+        "timestamp": 4681,
+        "endTimestamp": 4898,
+        "note": ""
+      },
+      {
         "id": "p-d46049f9",
         "streamId": "stream-2024-12-20",
         "date": "2024-12-20",
@@ -1306,25 +1282,6 @@
         "videoId": "_pyphlrZ_JQ",
         "timestamp": 5183,
         "endTimestamp": 5400,
-        "note": ""
-      }
-    ]
-  },
-  {
-    "id": "song-39b75c5f",
-    "workId": "work-song-1820",
-    "title": "POP/STARS",
-    "originalArtist": "K/DA",
-    "tags": [],
-    "performances": [
-      {
-        "id": "p-fac6275d",
-        "streamId": "stream-2025-03-11",
-        "date": "2025-03-11",
-        "streamTitle": "【雙人歌回】與Seki姐姐的超讚kpop歌回！！！！ft.汐seki",
-        "videoId": "GZzsCcNsMBw",
-        "timestamp": 9756,
-        "endTimestamp": 9945,
         "note": ""
       }
     ]
@@ -1394,6 +1351,16 @@
     "tags": [],
     "performances": [
       {
+        "id": "p-40d87062",
+        "streamId": "stream-2024-12-14",
+        "date": "2024-12-14",
+        "streamTitle": "【歌回】復丑時間，我讓你們PON然心動...",
+        "videoId": "wRZSj5cHzqI",
+        "timestamp": 5559,
+        "endTimestamp": 5806,
+        "note": ""
+      },
+      {
         "id": "p-b8c9895a",
         "streamId": "stream-2025-08-19",
         "date": "2025-08-19",
@@ -1458,6 +1425,16 @@
         "videoId": "oR2RrWacI2Y",
         "timestamp": 5476,
         "endTimestamp": 5785,
+        "note": ""
+      },
+      {
+        "id": "p-282628fb",
+        "streamId": "stream-2026-03-23",
+        "date": "2026-03-23",
+        "streamTitle": "【心情好歌回】趕走EMO，不要M只接受EEOO",
+        "videoId": "oR2RrWacI2Y",
+        "timestamp": 7080,
+        "endTimestamp": 7388,
         "note": ""
       }
     ]
@@ -1526,6 +1503,16 @@
     "originalArtist": "IVE",
     "tags": [],
     "performances": [
+      {
+        "id": "p-66a5259b",
+        "streamId": "stream-2025-03-11",
+        "date": "2025-03-11",
+        "streamTitle": "【雙人歌回】與Seki姐姐的超讚kpop歌回！！！！ft.汐seki",
+        "videoId": "GZzsCcNsMBw",
+        "timestamp": 1634,
+        "endTimestamp": 1811,
+        "note": ""
+      },
       {
         "id": "p-19f9b186",
         "streamId": "stream-2026-01-04",
@@ -1615,25 +1602,6 @@
     ]
   },
   {
-    "id": "song-4e69f788",
-    "workId": "work-song-0ba6de74",
-    "title": "How Sweet",
-    "originalArtist": "NewJeans",
-    "tags": [],
-    "performances": [
-      {
-        "id": "p-a9b25da3",
-        "streamId": "stream-2024-12-20",
-        "date": "2024-12-20",
-        "streamTitle": "【歌回】晚安，New Jeans，我最喜歡！",
-        "videoId": "_pyphlrZ_JQ",
-        "timestamp": 4681,
-        "endTimestamp": 4898,
-        "note": ""
-      }
-    ]
-  },
-  {
     "id": "song-4ec7244e",
     "workId": "work-song-4ec7244e",
     "title": "Ditto",
@@ -1649,43 +1617,15 @@
         "timestamp": 5270,
         "endTimestamp": 5451,
         "note": ""
-      }
-    ]
-  },
-  {
-    "id": "song-4ee7111e",
-    "workId": "work-song-4ee7111e",
-    "title": "From the Start",
-    "originalArtist": "Laufey",
-    "tags": [],
-    "performances": [
+      },
       {
-        "id": "p-6debe62b",
-        "streamId": "stream-2025-03-11",
-        "date": "2025-03-11",
-        "streamTitle": "【雙人歌回】與Seki姐姐的超讚kpop歌回！！！！ft.汐seki",
-        "videoId": "GZzsCcNsMBw",
-        "timestamp": 8739,
-        "endTimestamp": 8908,
-        "note": ""
-      }
-    ]
-  },
-  {
-    "id": "song-4f120c43",
-    "workId": "work-song-4f120c43",
-    "title": "不在一起就不會分開",
-    "originalArtist": "洪佩瑜",
-    "tags": [],
-    "performances": [
-      {
-        "id": "p-b0d5d964",
-        "streamId": "stream-2025-06-03",
-        "date": "2025-06-03",
-        "streamTitle": "【上賊船歌回】哈咍我姐的旅費她要自己賺 ft.王月她姐",
-        "videoId": "E918lZvKX1s",
-        "timestamp": 4780,
-        "endTimestamp": 5062,
+        "id": "p-89e076d3",
+        "streamId": "stream-2024-12-20",
+        "date": "2024-12-20",
+        "streamTitle": "【歌回】晚安，New Jeans，我最喜歡！",
+        "videoId": "_pyphlrZ_JQ",
+        "timestamp": 7175,
+        "endTimestamp": 7359,
         "note": ""
       }
     ]
@@ -1706,6 +1646,16 @@
         "timestamp": 2775,
         "endTimestamp": 2960,
         "note": ""
+      },
+      {
+        "id": "p-c6297f31",
+        "streamId": "stream-2024-12-14",
+        "date": "2024-12-14",
+        "streamTitle": "【歌回】復丑時間，我讓你們PON然心動...",
+        "videoId": "wRZSj5cHzqI",
+        "timestamp": 4432,
+        "endTimestamp": 4630,
+        "note": ""
       }
     ]
   },
@@ -1724,25 +1674,6 @@
         "videoId": "OwNrtFg5Y1Q",
         "timestamp": 2476,
         "endTimestamp": 2927,
-        "note": ""
-      }
-    ]
-  },
-  {
-    "id": "song-527f3af4",
-    "workId": "work-song-527f3af4",
-    "title": "火星人",
-    "originalArtist": "ヨルシカ",
-    "tags": [],
-    "performances": [
-      {
-        "id": "p-c16acdb8",
-        "streamId": "stream-2026-03-10",
-        "date": "2026-03-10",
-        "streamTitle": "【影視歌回】好的作品與音樂相輔相成，唱一些影視作品中的音樂 !",
-        "videoId": "KEKRbzfJTAU",
-        "timestamp": 7143,
-        "endTimestamp": 7375,
         "note": ""
       }
     ]
@@ -1964,6 +1895,16 @@
     "tags": [],
     "performances": [
       {
+        "id": "p-e7b84f8c",
+        "streamId": "stream-2025-11-24",
+        "date": "2025-11-24",
+        "streamTitle": "【一週年合唱】週年慶祝合唱企劃，謝謝大家一年以來的照顧 | 玥Itsuki  ft.很多人",
+        "videoId": "gl5wEctKomU",
+        "timestamp": 2741,
+        "endTimestamp": 2971,
+        "note": ""
+      },
+      {
         "id": "p-07ea23d4",
         "streamId": "stream-2026-03-10",
         "date": "2026-03-10",
@@ -2009,6 +1950,16 @@
         "videoId": "A8SFiRFftsA",
         "timestamp": 1741,
         "endTimestamp": 1837,
+        "note": ""
+      },
+      {
+        "id": "p-0e6899dd",
+        "streamId": "stream-2025-12-23",
+        "date": "2025-12-23",
+        "streamTitle": "【歌回】痛苦的感覺，二選一歌回！",
+        "videoId": "A8SFiRFftsA",
+        "timestamp": 2063,
+        "endTimestamp": 2158,
         "note": ""
       }
     ]
@@ -2071,25 +2022,6 @@
     ]
   },
   {
-    "id": "song-6424e5c9",
-    "workId": "work-song-4f86ea6d",
-    "title": "Pity Party",
-    "originalArtist": "Melanie Martinez",
-    "tags": [],
-    "performances": [
-      {
-        "id": "p-c6297f31",
-        "streamId": "stream-2024-12-14",
-        "date": "2024-12-14",
-        "streamTitle": "【歌回】復丑時間，我讓你們PON然心動...",
-        "videoId": "wRZSj5cHzqI",
-        "timestamp": 4432,
-        "endTimestamp": 4630,
-        "note": ""
-      }
-    ]
-  },
-  {
     "id": "song-64401784",
     "workId": "work-song-64401784",
     "title": "母系社會",
@@ -2123,6 +2055,16 @@
         "videoId": "yfWcdOXraqw",
         "timestamp": 9194,
         "endTimestamp": 9426,
+        "note": ""
+      },
+      {
+        "id": "p-c16acdb8",
+        "streamId": "stream-2026-03-10",
+        "date": "2026-03-10",
+        "streamTitle": "【影視歌回】好的作品與音樂相輔相成，唱一些影視作品中的音樂 !",
+        "videoId": "KEKRbzfJTAU",
+        "timestamp": 7143,
+        "endTimestamp": 7375,
         "note": ""
       }
     ]
@@ -2299,25 +2241,6 @@
     ]
   },
   {
-    "id": "song-70185775",
-    "workId": "work-song-0e7f7016",
-    "title": "カントリー・ロード",
-    "originalArtist": "本名陽子",
-    "tags": [],
-    "performances": [
-      {
-        "id": "p-fd1bf51e",
-        "streamId": "stream-2026-03-23",
-        "date": "2026-03-23",
-        "streamTitle": "【心情好歌回】趕走EMO，不要M只接受EEOO",
-        "videoId": "oR2RrWacI2Y",
-        "timestamp": 1692,
-        "endTimestamp": 1900,
-        "note": ""
-      }
-    ]
-  },
-  {
     "id": "song-70bb310c",
     "workId": "work-song-70bb310c",
     "title": "Tears",
@@ -2362,6 +2285,16 @@
     "originalArtist": "扉暮IANVS",
     "tags": [],
     "performances": [
+      {
+        "id": "p-1e3e55d9",
+        "streamId": "stream-2024-12-14",
+        "date": "2024-12-14",
+        "streamTitle": "【歌回】復丑時間，我讓你們PON然心動...",
+        "videoId": "wRZSj5cHzqI",
+        "timestamp": 6276,
+        "endTimestamp": 6493,
+        "note": ""
+      },
       {
         "id": "p-8cdec081",
         "streamId": "stream-2025-08-19",
@@ -2446,6 +2379,16 @@
         "videoId": "b22FzJ7GQI0",
         "timestamp": 1332,
         "endTimestamp": 1504,
+        "note": ""
+      },
+      {
+        "id": "p-a433d112",
+        "streamId": "stream-2025-03-11",
+        "date": "2025-03-11",
+        "streamTitle": "【雙人歌回】與Seki姐姐的超讚kpop歌回！！！！ft.汐seki",
+        "videoId": "GZzsCcNsMBw",
+        "timestamp": 4812,
+        "endTimestamp": 4985,
         "note": ""
       }
     ]
@@ -2641,44 +2584,6 @@
     ]
   },
   {
-    "id": "song-7de2139a",
-    "workId": "work-song-0dbec16d",
-    "title": "Sticky",
-    "originalArtist": "KISS OF LIFE",
-    "tags": [],
-    "performances": [
-      {
-        "id": "p-d0d61df3",
-        "streamId": "stream-2025-03-11",
-        "date": "2025-03-11",
-        "streamTitle": "【雙人歌回】與Seki姐姐的超讚kpop歌回！！！！ft.汐seki",
-        "videoId": "GZzsCcNsMBw",
-        "timestamp": 6987,
-        "endTimestamp": 7141,
-        "note": ""
-      }
-    ]
-  },
-  {
-    "id": "song-7f1b0921",
-    "workId": "work-song-1337",
-    "title": "小半",
-    "originalArtist": "陳粒",
-    "tags": [],
-    "performances": [
-      {
-        "id": "p-5f47173c",
-        "streamId": "stream-2025-11-24",
-        "date": "2025-11-24",
-        "streamTitle": "【一週年合唱】週年慶祝合唱企劃，謝謝大家一年以來的照顧 | 玥Itsuki  ft.很多人",
-        "videoId": "gl5wEctKomU",
-        "timestamp": 10764,
-        "endTimestamp": 11051,
-        "note": ""
-      }
-    ]
-  },
-  {
     "id": "song-7f49af13",
     "workId": "work-song-7f49af13",
     "title": "Don't Let Me Down",
@@ -2743,6 +2648,26 @@
     "tags": [],
     "performances": [
       {
+        "id": "p-272a79e4",
+        "streamId": "stream-2025-03-11",
+        "date": "2025-03-11",
+        "streamTitle": "【雙人歌回】與Seki姐姐的超讚kpop歌回！！！！ft.汐seki",
+        "videoId": "GZzsCcNsMBw",
+        "timestamp": 6410,
+        "endTimestamp": 6665,
+        "note": ""
+      },
+      {
+        "id": "p-01a64533",
+        "streamId": "stream-2025-12-09",
+        "date": "2025-12-09",
+        "streamTitle": "【雙人歌回】是妳嗎 ? 那個治癒的歌聲..ft.埃穆亞@OumuaXDFP",
+        "videoId": "iDpZWouxZyY",
+        "timestamp": 6630,
+        "endTimestamp": 6883,
+        "note": ""
+      },
+      {
         "id": "p-6774e0f3",
         "streamId": "stream-2026-01-09",
         "date": "2026-01-09",
@@ -2793,25 +2718,6 @@
     ]
   },
   {
-    "id": "song-83b71027",
-    "workId": "work-song-325af048",
-    "title": "怪天氣",
-    "originalArtist": "YELLOW黃宣 & 9m88",
-    "tags": [],
-    "performances": [
-      {
-        "id": "p-01a64533",
-        "streamId": "stream-2025-12-09",
-        "date": "2025-12-09",
-        "streamTitle": "【雙人歌回】是妳嗎 ? 那個治癒的歌聲..ft.埃穆亞@OumuaXDFP",
-        "videoId": "iDpZWouxZyY",
-        "timestamp": 6630,
-        "endTimestamp": 6883,
-        "note": ""
-      }
-    ]
-  },
-  {
     "id": "song-83c7cc70",
     "workId": "work-song-83c7cc70",
     "title": "Four Seasons",
@@ -2837,6 +2743,16 @@
     "originalArtist": "Laufey",
     "tags": [],
     "performances": [
+      {
+        "id": "p-6debe62b",
+        "streamId": "stream-2025-03-11",
+        "date": "2025-03-11",
+        "streamTitle": "【雙人歌回】與Seki姐姐的超讚kpop歌回！！！！ft.汐seki",
+        "videoId": "GZzsCcNsMBw",
+        "timestamp": 8739,
+        "endTimestamp": 8908,
+        "note": ""
+      },
       {
         "id": "p-377d960a",
         "streamId": "stream-2026-01-09",
@@ -3104,6 +3020,16 @@
     "tags": [],
     "performances": [
       {
+        "id": "p-fac6275d",
+        "streamId": "stream-2025-03-11",
+        "date": "2025-03-11",
+        "streamTitle": "【雙人歌回】與Seki姐姐的超讚kpop歌回！！！！ft.汐seki",
+        "videoId": "GZzsCcNsMBw",
+        "timestamp": 9756,
+        "endTimestamp": 9945,
+        "note": ""
+      },
+      {
         "id": "p-38ad19a1",
         "streamId": "stream-2025-08-19",
         "date": "2025-08-19",
@@ -3111,25 +3037,6 @@
         "videoId": "4RVuqtFoCO0",
         "timestamp": 6677,
         "endTimestamp": 6863,
-        "note": ""
-      }
-    ]
-  },
-  {
-    "id": "song-97618aea",
-    "workId": "work-song-97618aea",
-    "title": "又三郎",
-    "originalArtist": "ヨルシカ",
-    "tags": [],
-    "performances": [
-      {
-        "id": "p-c63b1256",
-        "streamId": "stream-2026-01-09",
-        "date": "2026-01-09",
-        "streamTitle": "【生日3D Mini Live】玥影如歌",
-        "videoId": "7mSLMi2CrJM",
-        "timestamp": 1569,
-        "endTimestamp": 1832,
         "note": ""
       }
     ]
@@ -3230,44 +3137,6 @@
     ]
   },
   {
-    "id": "song-9cff9d7a",
-    "workId": "work-song-145b7854",
-    "title": "情緒廢物",
-    "originalArtist": "玥Itsuki",
-    "tags": [],
-    "performances": [
-      {
-        "id": "p-d36243d0",
-        "streamId": "stream-2024-12-14",
-        "date": "2024-12-14",
-        "streamTitle": "【歌回】復丑時間，我讓你們PON然心動...",
-        "videoId": "wRZSj5cHzqI",
-        "timestamp": 1511,
-        "endTimestamp": 1697,
-        "note": ""
-      }
-    ]
-  },
-  {
-    "id": "song-9d69094b",
-    "workId": "work-song-957ec9af",
-    "title": "失戀無罪",
-    "originalArtist": "A-Lin",
-    "tags": [],
-    "performances": [
-      {
-        "id": "p-d112114f",
-        "streamId": "stream-2026-01-19",
-        "date": "2026-01-19",
-        "streamTitle": "【耐久歌回】我們要唱到7萬，７７７",
-        "videoId": "yfWcdOXraqw",
-        "timestamp": 752,
-        "endTimestamp": 995,
-        "note": ""
-      }
-    ]
-  },
-  {
     "id": "song-9ebb0f88",
     "workId": "work-song-9ebb0f88",
     "title": "管它什麼",
@@ -3320,44 +3189,6 @@
         "videoId": "KEKRbzfJTAU",
         "timestamp": 2709,
         "endTimestamp": 2859,
-        "note": ""
-      }
-    ]
-  },
-  {
-    "id": "song-9f895bb4",
-    "workId": "work-song-0c7b9a02",
-    "title": "いのちの名前",
-    "originalArtist": "木村弓",
-    "tags": [],
-    "performances": [
-      {
-        "id": "p-5f534ace",
-        "streamId": "stream-2026-01-09",
-        "date": "2026-01-09",
-        "streamTitle": "【生日3D Mini Live】玥影如歌",
-        "videoId": "7mSLMi2CrJM",
-        "timestamp": 5168,
-        "endTimestamp": 5239,
-        "note": ""
-      }
-    ]
-  },
-  {
-    "id": "song-a05ec410",
-    "workId": "work-song-2411e410",
-    "title": "SHOOTING STAR",
-    "originalArtist": "XG",
-    "tags": [],
-    "performances": [
-      {
-        "id": "p-60625438",
-        "streamId": "stream-2025-03-11",
-        "date": "2025-03-11",
-        "streamTitle": "【雙人歌回】與Seki姐姐的超讚kpop歌回！！！！ft.汐seki",
-        "videoId": "GZzsCcNsMBw",
-        "timestamp": 3371,
-        "endTimestamp": 3573,
         "note": ""
       }
     ]
@@ -3420,63 +3251,6 @@
     ]
   },
   {
-    "id": "song-a3325618",
-    "workId": "work-song-1330",
-    "title": "有一種悲傷",
-    "originalArtist": "A-Lin",
-    "tags": [],
-    "performances": [
-      {
-        "id": "p-e7b84f8c",
-        "streamId": "stream-2025-11-24",
-        "date": "2025-11-24",
-        "streamTitle": "【一週年合唱】週年慶祝合唱企劃，謝謝大家一年以來的照顧 | 玥Itsuki  ft.很多人",
-        "videoId": "gl5wEctKomU",
-        "timestamp": 2741,
-        "endTimestamp": 2971,
-        "note": ""
-      }
-    ]
-  },
-  {
-    "id": "song-a3d92b37",
-    "workId": "work-song-61cb242b",
-    "title": "Wake up!",
-    "originalArtist": "煌Kirali",
-    "tags": [],
-    "performances": [
-      {
-        "id": "p-0e6899dd",
-        "streamId": "stream-2025-12-23",
-        "date": "2025-12-23",
-        "streamTitle": "【歌回】痛苦的感覺，二選一歌回！",
-        "videoId": "A8SFiRFftsA",
-        "timestamp": 2063,
-        "endTimestamp": 2158,
-        "note": ""
-      }
-    ]
-  },
-  {
-    "id": "song-a43f3155",
-    "workId": "work-song-09aaca44",
-    "title": "晴る",
-    "originalArtist": "ヨルシカ",
-    "tags": [],
-    "performances": [
-      {
-        "id": "p-930779e6",
-        "streamId": "stream-2025-11-24",
-        "date": "2025-11-24",
-        "streamTitle": "【一週年合唱】週年慶祝合唱企劃，謝謝大家一年以來的照顧 | 玥Itsuki  ft.很多人",
-        "videoId": "gl5wEctKomU",
-        "timestamp": 10311,
-        "endTimestamp": 10582,
-        "note": ""
-      }
-    ]
-  },
-  {
     "id": "song-a610c710",
     "workId": "work-song-a610c710",
     "title": "So Easy",
@@ -3491,6 +3265,16 @@
         "videoId": "5tc5NgwrZdE",
         "timestamp": 1924,
         "endTimestamp": 2092,
+        "note": ""
+      },
+      {
+        "id": "p-697da25b",
+        "streamId": "stream-2026-03-23",
+        "date": "2026-03-23",
+        "streamTitle": "【心情好歌回】趕走EMO，不要M只接受EEOO",
+        "videoId": "oR2RrWacI2Y",
+        "timestamp": 6269,
+        "endTimestamp": 6437,
         "note": ""
       }
     ]
@@ -3700,6 +3484,16 @@
         "videoId": "SkboY-_a5Sw",
         "timestamp": 3278,
         "endTimestamp": 3529,
+        "note": ""
+      },
+      {
+        "id": "p-46c2d286",
+        "streamId": "stream-2025-06-03",
+        "date": "2025-06-03",
+        "streamTitle": "【上賊船歌回】哈咍我姐的旅費她要自己賺 ft.王月她姐",
+        "videoId": "E918lZvKX1s",
+        "timestamp": 2597,
+        "endTimestamp": 2849,
         "note": ""
       }
     ]
@@ -3959,6 +3753,16 @@
     "tags": [],
     "performances": [
       {
+        "id": "p-d112114f",
+        "streamId": "stream-2026-01-19",
+        "date": "2026-01-19",
+        "streamTitle": "【耐久歌回】我們要唱到7萬，７７７",
+        "videoId": "yfWcdOXraqw",
+        "timestamp": 752,
+        "endTimestamp": 995,
+        "note": ""
+      },
+      {
         "id": "p-a340a28e",
         "streamId": "stream-2026-02-24",
         "date": "2026-02-24",
@@ -4024,24 +3828,15 @@
         "timestamp": 982,
         "endTimestamp": 1141,
         "note": ""
-      }
-    ]
-  },
-  {
-    "id": "song-bb36445d",
-    "workId": "work-song-753c615b",
-    "title": "斑馬斑馬",
-    "originalArtist": "宋冬野",
-    "tags": [],
-    "performances": [
+      },
       {
-        "id": "p-46c2d286",
-        "streamId": "stream-2025-06-03",
-        "date": "2025-06-03",
-        "streamTitle": "【上賊船歌回】哈咍我姐的旅費她要自己賺 ft.王月她姐",
-        "videoId": "E918lZvKX1s",
-        "timestamp": 2597,
-        "endTimestamp": 2849,
+        "id": "p-b1c8417d",
+        "streamId": "stream-2026-03-23",
+        "date": "2026-03-23",
+        "streamTitle": "【心情好歌回】趕走EMO，不要M只接受EEOO",
+        "videoId": "oR2RrWacI2Y",
+        "timestamp": 4610,
+        "endTimestamp": 4774,
         "note": ""
       }
     ]
@@ -4180,25 +3975,6 @@
     ]
   },
   {
-    "id": "song-c14230bb",
-    "workId": "work-song-7bbfd1ba",
-    "title": "身騎白馬",
-    "originalArtist": "徐佳瑩",
-    "tags": [],
-    "performances": [
-      {
-        "id": "p-2439d848",
-        "streamId": "stream-2025-06-03",
-        "date": "2025-06-03",
-        "streamTitle": "【上賊船歌回】哈咍我姐的旅費她要自己賺 ft.王月她姐",
-        "videoId": "E918lZvKX1s",
-        "timestamp": 7480,
-        "endTimestamp": 7778,
-        "note": ""
-      }
-    ]
-  },
-  {
     "id": "song-c29f63b0",
     "workId": "work-song-25",
     "title": "Speechless",
@@ -4294,25 +4070,6 @@
     ]
   },
   {
-    "id": "song-c82400e4",
-    "workId": "work-song-761e35a0",
-    "title": "TOMBOY",
-    "originalArtist": "(G)I-DLE",
-    "tags": [],
-    "performances": [
-      {
-        "id": "p-a433d112",
-        "streamId": "stream-2025-03-11",
-        "date": "2025-03-11",
-        "streamTitle": "【雙人歌回】與Seki姐姐的超讚kpop歌回！！！！ft.汐seki",
-        "videoId": "GZzsCcNsMBw",
-        "timestamp": 4812,
-        "endTimestamp": 4985,
-        "note": ""
-      }
-    ]
-  },
-  {
     "id": "song-c9d58dbd",
     "workId": "work-song-c9d58dbd",
     "title": "Sabor A Mi",
@@ -4365,6 +4122,16 @@
         "videoId": "7mSLMi2CrJM",
         "timestamp": 5333,
         "endTimestamp": 5534,
+        "note": ""
+      },
+      {
+        "id": "p-9839969c",
+        "streamId": "stream-2026-03-23",
+        "date": "2026-03-23",
+        "streamTitle": "【心情好歌回】趕走EMO，不要M只接受EEOO",
+        "videoId": "oR2RrWacI2Y",
+        "timestamp": 6734,
+        "endTimestamp": 6928,
         "note": ""
       }
     ]
@@ -4479,25 +4246,6 @@
         "videoId": "E918lZvKX1s",
         "timestamp": 6090,
         "endTimestamp": 6376,
-        "note": ""
-      }
-    ]
-  },
-  {
-    "id": "song-d03e80d1",
-    "workId": "work-song-a610c710",
-    "title": "So Easy",
-    "originalArtist": "Olivia Dean",
-    "tags": [],
-    "performances": [
-      {
-        "id": "p-697da25b",
-        "streamId": "stream-2026-03-23",
-        "date": "2026-03-23",
-        "streamTitle": "【心情好歌回】趕走EMO，不要M只接受EEOO",
-        "videoId": "oR2RrWacI2Y",
-        "timestamp": 6269,
-        "endTimestamp": 6437,
         "note": ""
       }
     ]
@@ -4643,6 +4391,16 @@
     "tags": [],
     "performances": [
       {
+        "id": "p-2439d848",
+        "streamId": "stream-2025-06-03",
+        "date": "2025-06-03",
+        "streamTitle": "【上賊船歌回】哈咍我姐的旅費她要自己賺 ft.王月她姐",
+        "videoId": "E918lZvKX1s",
+        "timestamp": 7480,
+        "endTimestamp": 7778,
+        "note": ""
+      },
+      {
         "id": "p-fc1156fe",
         "streamId": "stream-2025-08-19",
         "date": "2025-08-19",
@@ -4650,25 +4408,6 @@
         "videoId": "4RVuqtFoCO0",
         "timestamp": 3097,
         "endTimestamp": 3394,
-        "note": ""
-      }
-    ]
-  },
-  {
-    "id": "song-d64847c8",
-    "workId": "work-song-4ec7244e",
-    "title": "Ditto",
-    "originalArtist": "NewJeans",
-    "tags": [],
-    "performances": [
-      {
-        "id": "p-89e076d3",
-        "streamId": "stream-2024-12-20",
-        "date": "2024-12-20",
-        "streamTitle": "【歌回】晚安，New Jeans，我最喜歡！",
-        "videoId": "_pyphlrZ_JQ",
-        "timestamp": 7175,
-        "endTimestamp": 7359,
         "note": ""
       }
     ]
@@ -4731,25 +4470,6 @@
     ]
   },
   {
-    "id": "song-d7aae9a1",
-    "workId": "work-song-2663",
-    "title": "暮光 Gloaming Light",
-    "originalArtist": "扉暮IANVS",
-    "tags": [],
-    "performances": [
-      {
-        "id": "p-1e3e55d9",
-        "streamId": "stream-2024-12-14",
-        "date": "2024-12-14",
-        "streamTitle": "【歌回】復丑時間，我讓你們PON然心動...",
-        "videoId": "wRZSj5cHzqI",
-        "timestamp": 6276,
-        "endTimestamp": 6493,
-        "note": ""
-      }
-    ]
-  },
-  {
     "id": "song-d7c76796",
     "workId": "work-song-d7c76796",
     "title": "Ashes",
@@ -4776,6 +4496,16 @@
     "tags": [],
     "performances": [
       {
+        "id": "p-b0d5d964",
+        "streamId": "stream-2025-06-03",
+        "date": "2025-06-03",
+        "streamTitle": "【上賊船歌回】哈咍我姐的旅費她要自己賺 ft.王月她姐",
+        "videoId": "E918lZvKX1s",
+        "timestamp": 4780,
+        "endTimestamp": 5062,
+        "note": ""
+      },
+      {
         "id": "p-1063d588",
         "streamId": "stream-2026-02-24",
         "date": "2026-02-24",
@@ -4788,7 +4518,7 @@
     ]
   },
   {
-    "id": "song-d973fcad",
+    "id": "song-daefa172",
     "workId": "work-song-d973fcad",
     "title": "無慣例的早晨",
     "originalArtist": "洪佩瑜",
@@ -4803,16 +4533,7 @@
         "timestamp": 1862,
         "endTimestamp": 2074,
         "note": ""
-      }
-    ]
-  },
-  {
-    "id": "song-daefa172",
-    "workId": "work-song-d973fcad",
-    "title": "無慣例的早晨",
-    "originalArtist": "洪佩瑜",
-    "tags": [],
-    "performances": [
+      },
       {
         "id": "p-64829314",
         "streamId": "stream-2026-02-24",
@@ -4859,6 +4580,16 @@
         "videoId": "SkboY-_a5Sw",
         "timestamp": 3961,
         "endTimestamp": 4250,
+        "note": ""
+      },
+      {
+        "id": "p-5f47173c",
+        "streamId": "stream-2025-11-24",
+        "date": "2025-11-24",
+        "streamTitle": "【一週年合唱】週年慶祝合唱企劃，謝謝大家一年以來的照顧 | 玥Itsuki  ft.很多人",
+        "videoId": "gl5wEctKomU",
+        "timestamp": 10764,
+        "endTimestamp": 11051,
         "note": ""
       }
     ]
@@ -4917,24 +4648,15 @@
         "timestamp": 7195,
         "endTimestamp": 7422,
         "note": ""
-      }
-    ]
-  },
-  {
-    "id": "song-e512e030",
-    "workId": "work-song-27a0d0b5",
-    "title": "Stand Up",
-    "originalArtist": "Cynthia Erivo",
-    "tags": [],
-    "performances": [
+      },
       {
-        "id": "p-09d9ed6f",
-        "streamId": "stream-b5a5a3d7",
-        "date": "2024-12-24",
-        "streamTitle": "【歌回】我是滿玥寶寶，出道一個玥啦！左手指月，會被月亮割耳朵",
-        "videoId": "gyuM1a8FV24",
-        "timestamp": 7003,
-        "endTimestamp": 7300,
+        "id": "p-c63b1256",
+        "streamId": "stream-2026-01-09",
+        "date": "2026-01-09",
+        "streamTitle": "【生日3D Mini Live】玥影如歌",
+        "videoId": "7mSLMi2CrJM",
+        "timestamp": 1569,
+        "endTimestamp": 1832,
         "note": ""
       }
     ]
@@ -5092,25 +4814,6 @@
     ]
   },
   {
-    "id": "song-eb5769a7",
-    "workId": "work-song-440fcaa3",
-    "title": "Michi Teyu Ku",
-    "originalArtist": "Fujii Kaze",
-    "tags": [],
-    "performances": [
-      {
-        "id": "p-282628fb",
-        "streamId": "stream-2026-03-23",
-        "date": "2026-03-23",
-        "streamTitle": "【心情好歌回】趕走EMO，不要M只接受EEOO",
-        "videoId": "oR2RrWacI2Y",
-        "timestamp": 7080,
-        "endTimestamp": 7388,
-        "note": ""
-      }
-    ]
-  },
-  {
     "id": "song-eb81c22d",
     "workId": "work-song-eb81c22d",
     "title": "Maniac 鋼琴ver",
@@ -5182,25 +4885,6 @@
         "videoId": "f46nqn6MlyE",
         "timestamp": 7260,
         "endTimestamp": 7500,
-        "note": ""
-      }
-    ]
-  },
-  {
-    "id": "song-f0317f5f",
-    "workId": "work-song-2338cdd2",
-    "title": "Hype Boy",
-    "originalArtist": "NewJeans",
-    "tags": [],
-    "performances": [
-      {
-        "id": "p-9a1e4bab",
-        "streamId": "stream-2024-12-20",
-        "date": "2024-12-20",
-        "streamTitle": "【歌回】晚安，New Jeans，我最喜歡！",
-        "videoId": "_pyphlrZ_JQ",
-        "timestamp": 3363,
-        "endTimestamp": 3537,
         "note": ""
       }
     ]
@@ -5288,6 +4972,16 @@
     "originalArtist": "Lady Gaga",
     "tags": [],
     "performances": [
+      {
+        "id": "p-e4edbb1c",
+        "streamId": "stream-b5a5a3d7",
+        "date": "2024-12-24",
+        "streamTitle": "【歌回】我是滿玥寶寶，出道一個玥啦！左手指月，會被月亮割耳朵",
+        "videoId": "gyuM1a8FV24",
+        "timestamp": 6602,
+        "endTimestamp": 6801,
+        "note": ""
+      },
       {
         "id": "p-c16dbbb3",
         "streamId": "stream-2026-03-10",
