@@ -3,7 +3,7 @@ import * as fs from 'node:fs';
 import * as os from 'node:os';
 import * as path from 'node:path';
 
-import { readRegistry, type StreamerRegistryEntry } from './detect.ts';
+import { AGG_SQL, readRegistry, type StreamerRegistryEntry } from './detect.ts';
 
 function test(name: string, fn: () => void): void {
   try {
@@ -31,6 +31,11 @@ test('readRegistry returns the enabled streamers for a valid registry', () => {
   const root = tmpRegistry([{ slug: 'mizuki', enabled: true }, { slug: 'aurora-2' }]);
   const result = readRegistry(root);
   assert.deepEqual(result.map((s) => s.slug), ['mizuki', 'aurora-2']);
+});
+
+test('song freshness includes global work-link updates', () => {
+  assert.match(AGG_SQL, /LEFT JOIN song_work_links AS link ON link\.song_id = song\.id/);
+  assert.match(AGG_SQL, /link\.updated_at > song\.updated_at/);
 });
 
 test('readRegistry throws (fail-closed) on an enabled malicious slug, naming it and the source', () => {

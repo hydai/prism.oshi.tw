@@ -3,7 +3,12 @@ import { execFileSync } from 'node:child_process';
 import * as path from 'node:path';
 import { fileURLToPath } from 'node:url';
 
-import { dataAnnouncementBatch, songCountsByStream, streamsToAnnounce } from './sync.ts';
+import {
+  assembleFanSiteSongs,
+  dataAnnouncementBatch,
+  songCountsByStream,
+  streamsToAnnounce,
+} from './sync.ts';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
@@ -42,6 +47,21 @@ test('songCountsByStream counts distinct songs per stream (two performances of o
   const counts = songCountsByStream(songs);
   assert.equal(counts.get('s1'), 2);
   assert.equal(counts.get('s2'), 1);
+});
+
+test('assembleFanSiteSongs exports the shared work ID without replacing local song IDs', () => {
+  const songs = assembleFanSiteSongs(
+    [
+      { id: 'alice-local', work_id: 'work-shared', title: 'Song', original_artist: 'Artist', tags: '[]' },
+      { id: 'legacy-local', work_id: null, title: 'Legacy', original_artist: 'Artist', tags: '["tag"]' },
+    ],
+    [],
+  );
+
+  assert.equal(songs[0].id, 'alice-local');
+  assert.equal(songs[0].workId, 'work-shared');
+  assert.equal(songs[1].id, 'legacy-local');
+  assert.equal('workId' in songs[1], false, 'unlinked legacy rows stay backward compatible');
 });
 
 test('streamsToAnnounce fires for a brand-new stream published with songs', () => {

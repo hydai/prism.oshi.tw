@@ -7,6 +7,7 @@ export type Status = 'pending' | 'approved' | 'rejected' | 'excluded' | 'extract
 
 export interface SongRow {
   id: string;
+  work_id: string | null;
   title: string;
   original_artist: string;
   tags: string;       // JSON array string
@@ -49,6 +50,7 @@ export interface StreamRow {
 
 export interface Song {
   id: string;
+  workId: string | null;
   title: string;
   originalArtist: string;
   tags: string[];
@@ -475,4 +477,31 @@ export interface HarmonizeMergeResponse {
   canonicalSongId: string;
   mergedSongs: number;
   movedPerformances: number;
+}
+
+// --- Global song library ---
+
+export interface GlobalWorkSummary {
+  id: string;
+  title: string;
+  originalArtist: string;
+  tags: string[];
+  streamerCount: number;
+  songCount: number;
+  performanceCount: number;
+  streamerIds: string[];
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface GlobalWorkStats {
+  totalWorks: number;
+  sharedWorks: number;
+  linkedSongs: number;
+  linkedPerformances: number;
+  unlinkedSongs: number;
+}
+
+export interface GlobalWorksResponse extends PaginatedResponse<GlobalWorkSummary> {
+  stats: GlobalWorkStats;
 }

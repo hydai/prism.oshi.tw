@@ -30,6 +30,7 @@ const ADMIN_DIR = path.resolve(ROOT, 'admin');
 
 interface SongRow {
   id: string;
+  work_id: string | null;
   title: string;
   original_artist: string;
   tags: string; // JSON array
@@ -71,6 +72,7 @@ interface FanSitePerformance {
 
 interface FanSiteSong {
   id: string;
+  workId?: string;
   title: string;
   originalArtist: string;
   tags: string[];
@@ -103,12 +105,23 @@ function queryD1<T>(sql: string): T[] {
 
 function buildSongs(streamerId: string): FanSiteSong[] {
   const songRows = queryD1<SongRow>(
-    `SELECT id, title, original_artist, tags FROM songs WHERE streamer_id = '${streamerId}' AND status = 'approved' ORDER BY id`,
+    `SELECT song.id, link.work_id, song.title, song.original_artist, song.tags
+     FROM songs AS song
+     LEFT JOIN song_work_links AS link ON link.song_id = song.id
+     WHERE song.streamer_id = '${streamerId}' AND song.status = 'approved'
+     ORDER BY song.id`,
   );
   const perfRows = queryD1<PerformanceRow>(
     `SELECT id, song_id, stream_id, date, stream_title, video_id, timestamp, end_timestamp, note FROM performances WHERE streamer_id = '${streamerId}' AND status = 'approved' ORDER BY date`,
   );
 
+  return assembleFanSiteSongs(songRows, perfRows);
+}
+
+export function assembleFanSiteSongs(
+  songRows: SongRow[],
+  perfRows: PerformanceRow[],
+): FanSiteSong[] {
   const perfsBySong = new Map<string, PerformanceRow[]>();
   for (const p of perfRows) {
     const list = perfsBySong.get(p.song_id) || [];
@@ -118,6 +131,7 @@ function buildSongs(streamerId: string): FanSiteSong[] {
 
   return songRows.map((row) => ({
     id: row.id,
+    ...(row.work_id ? { workId: row.work_id } : {}),
     title: row.title,
     originalArtist: row.original_artist,
     tags: JSON.parse(row.tags) as string[],
@@ -170,6 +184,26 @@ interface SnapshotRow {
 }
 
 function querySnapshot(table: 'songs' | 'performances' | 'streams', streamerId: string): SnapshotRow {
+  if (table === 'songs') {
+    // songs.json now also depends on the global bridge. Including the link
+    // timestamp makes the initial backfill (and any future manual relink) mark
+    // that streamer's static export stale even when the local song row itself
+    // did not change.
+    const rows = queryD1<SnapshotRow>(
+      `SELECT
+         MAX(CASE
+           WHEN link.updated_at IS NULL THEN song.updated_at
+           WHEN song.updated_at IS NULL OR link.updated_at > song.updated_at THEN link.updated_at
+           ELSE song.updated_at
+         END) AS max_ts,
+         COUNT(*) AS cnt
+       FROM songs AS song
+       LEFT JOIN song_work_links AS link ON link.song_id = song.id
+       WHERE song.streamer_id = '${streamerId}' AND song.status = 'approved'`,
+    );
+    return rows[0] ?? { max_ts: null, cnt: 0 };
+  }
+
   const rows = queryD1<SnapshotRow>(
     `SELECT MAX(updated_at) AS max_ts, COUNT(*) AS cnt FROM ${table} WHERE streamer_id = '${streamerId}' AND status = 'approved'`,
   );

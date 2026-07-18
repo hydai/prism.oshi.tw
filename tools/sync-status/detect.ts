@@ -53,9 +53,18 @@ interface AggRow {
   cnt: number;
 }
 
-const AGG_SQL = `
-  SELECT streamer_id, 'songs' AS source, MAX(updated_at) AS max_ts, COUNT(*) AS cnt
-    FROM songs WHERE status = 'approved' GROUP BY streamer_id
+export const AGG_SQL = `
+  SELECT song.streamer_id, 'songs' AS source,
+         MAX(CASE
+           WHEN link.updated_at IS NULL THEN song.updated_at
+           WHEN song.updated_at IS NULL OR link.updated_at > song.updated_at THEN link.updated_at
+           ELSE song.updated_at
+         END) AS max_ts,
+         COUNT(*) AS cnt
+    FROM songs AS song
+    LEFT JOIN song_work_links AS link ON link.song_id = song.id
+    WHERE song.status = 'approved'
+    GROUP BY song.streamer_id
   UNION ALL
   SELECT streamer_id, 'performances' AS source, MAX(updated_at) AS max_ts, COUNT(*) AS cnt
     FROM performances WHERE status = 'approved' GROUP BY streamer_id
