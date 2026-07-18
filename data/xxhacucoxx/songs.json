@@ -1,6 +1,7 @@
 [
   {
     "id": "song-07bab4f3",
+    "workId": "work-song-07bab4f3",
     "title": "少女レイ",
     "originalArtist": "みきとP",
     "tags": [],
@@ -19,6 +20,7 @@
   },
   {
     "id": "song-368c8ec3",
+    "workId": "work-song-1990",
     "title": "rain stops, good-bye",
     "originalArtist": "におP",
     "tags": [],
@@ -37,6 +39,7 @@
   },
   {
     "id": "song-422d0590",
+    "workId": "work-song-422d0590",
     "title": "ステラ",
     "originalArtist": "needLe",
     "tags": [],
@@ -55,6 +58,7 @@
   },
   {
     "id": "song-56492feb",
+    "workId": "work-song-56492feb",
     "title": "1/6 out of the gravity",
     "originalArtist": "ぼーかりおどP",
     "tags": [],
@@ -73,6 +77,7 @@
   },
   {
     "id": "song-6d8cd13c",
+    "workId": "work-song-1552",
     "title": "Dear",
     "originalArtist": "19's Sound Factory",
     "tags": [],
@@ -91,6 +96,7 @@
   },
   {
     "id": "song-77d78961",
+    "workId": "work-song-77d78961",
     "title": "こっちを向いてよ",
     "originalArtist": "WEAVER",
     "tags": [],
@@ -109,6 +115,7 @@
   },
   {
     "id": "song-7a6252f6",
+    "workId": "work-song-7a6252f6",
     "title": "ワールドイズマイン",
     "originalArtist": "Ryo",
     "tags": [],
@@ -127,6 +134,7 @@
   },
   {
     "id": "song-9ac4bce6",
+    "workId": "work-song-649",
     "title": "太陽系デスコ",
     "originalArtist": "ナユタン星人",
     "tags": [],
@@ -145,6 +153,7 @@
   },
   {
     "id": "song-aaf75986",
+    "workId": "work-song-aaf75986",
     "title": "celluloid",
     "originalArtist": "baker",
     "tags": [],
@@ -163,6 +172,7 @@
   },
   {
     "id": "song-dbaf808c",
+    "workId": "work-song-667",
     "title": "ピエロ",
     "originalArtist": "KEI",
     "tags": [],
@@ -181,6 +191,7 @@
   },
   {
     "id": "song-e326617e",
+    "workId": "work-song-560",
     "title": "from Y to Y",
     "originalArtist": "ジミーサムP",
     "tags": [],
@@ -199,6 +210,7 @@
   },
   {
     "id": "song-eb5736b5",
+    "workId": "work-song-a77bc6da",
     "title": "Catch You Catch Me",
     "originalArtist": "日向めぐみ",
     "tags": [],
@@ -217,6 +229,7 @@
   },
   {
     "id": "song-f2a82e4d",
+    "workId": "work-song-1047",
     "title": "夜咄ディセイブ",
     "originalArtist": "じん",
     "tags": [],
@@ -235,6 +248,7 @@
   },
   {
     "id": "song-fbb4f75b",
+    "workId": "work-song-335",
     "title": "白い雪のプリンセスは",
     "originalArtist": "のぼる↑P",
     "tags": [],

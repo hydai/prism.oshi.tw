@@ -1,6 +1,7 @@
 [
   {
     "id": "song-0124f797",
+    "workId": "work-song-0124f797",
     "title": "路邊的野花",
     "originalArtist": "Sabrina 胡恂舞",
     "tags": [],
@@ -19,6 +20,7 @@
   },
   {
     "id": "song-01548993",
+    "workId": "work-song-01548993",
     "title": "陰陽怪氣 Holy Moly",
     "originalArtist": "玥Itsuki",
     "tags": [],
@@ -37,6 +39,7 @@
   },
   {
     "id": "song-01e4d52b",
+    "workId": "work-song-01e4d52b",
     "title": "是什麼讓我遇見這樣的你",
     "originalArtist": "Ann白安",
     "tags": [],
@@ -55,6 +58,7 @@
   },
   {
     "id": "song-038c4c1b",
+    "workId": "work-song-038c4c1b",
     "title": "有一種悲傷 A Kind of Sorrow",
     "originalArtist": "A-Lin",
     "tags": [],
@@ -73,6 +77,7 @@
   },
   {
     "id": "song-03a93493",
+    "workId": "work-song-03a93493",
     "title": "Hey Girl",
     "originalArtist": "小男孩樂團",
     "tags": [],
@@ -91,6 +96,7 @@
   },
   {
     "id": "song-03f9f10b",
+    "workId": "work-song-03f9f10b",
     "title": "ELEVEN",
     "originalArtist": "IVE",
     "tags": [],
@@ -109,6 +115,7 @@
   },
   {
     "id": "song-05752dc2",
+    "workId": "work-song-05752dc2",
     "title": "與浪之間",
     "originalArtist": "Vast & Hazy",
     "tags": [],
@@ -127,6 +134,7 @@
   },
   {
     "id": "song-05be6569",
+    "workId": "work-song-05be6569",
     "title": "99",
     "originalArtist": "LÜCY",
     "tags": [],
@@ -145,6 +153,7 @@
   },
   {
     "id": "song-05d3050a",
+    "workId": "work-song-05d3050a",
     "title": "Galaxy (우주를 줄게)",
     "originalArtist": "臉紅的思春期 (볼빨간 사춘기)",
     "tags": [],
@@ -163,6 +172,7 @@
   },
   {
     "id": "song-06b388bd",
+    "workId": "work-song-06b388bd",
     "title": "聽見下雨的聲音",
     "originalArtist": "周杰倫",
     "tags": [],
@@ -181,6 +191,7 @@
   },
   {
     "id": "song-07073c1c",
+    "workId": "work-song-07073c1c",
     "title": "來自天堂的魔鬼",
     "originalArtist": "鄧紫棋",
     "tags": [],
@@ -199,6 +210,7 @@
   },
   {
     "id": "song-083016e6",
+    "workId": "work-song-083016e6",
     "title": "暁の車",
     "originalArtist": "FictionJunction YUUKA",
     "tags": [],
@@ -217,6 +229,7 @@
   },
   {
     "id": "song-0a6a397b",
+    "workId": "work-song-0a6a397b",
     "title": "他們說我是沒有用的年輕人",
     "originalArtist": "好樂團",
     "tags": [],
@@ -235,6 +248,7 @@
   },
   {
     "id": "song-0c7b9a02",
+    "workId": "work-song-0c7b9a02",
     "title": "いのちの名前",
     "originalArtist": "木村弓",
     "tags": [],
@@ -253,6 +267,7 @@
   },
   {
     "id": "song-0d4b639d",
+    "workId": "work-song-0d4b639d",
     "title": "Die With A Smile",
     "originalArtist": "Lady Gaga, Bruno Mars",
     "tags": [],
@@ -271,6 +286,7 @@
   },
   {
     "id": "song-0d8b597d",
+    "workId": "work-song-07fb1c70",
     "title": "残酷な天使のテーゼ",
     "originalArtist": "高橋洋子",
     "tags": [],
@@ -289,6 +305,7 @@
   },
   {
     "id": "song-0d92721b",
+    "workId": "work-song-0d92721b",
     "title": "Paper Hearts",
     "originalArtist": "Tori Kelly",
     "tags": [],
@@ -307,6 +324,7 @@
   },
   {
     "id": "song-0dbec16d",
+    "workId": "work-song-0dbec16d",
     "title": "Sticky",
     "originalArtist": "KISS OF LIFE",
     "tags": [],
@@ -325,6 +343,7 @@
   },
   {
     "id": "song-0e4b0c31",
+    "workId": "work-song-0e4b0c31",
     "title": "My Mind",
     "originalArtist": "YEBBA",
     "tags": [],
@@ -343,6 +362,7 @@
   },
   {
     "id": "song-0e7f7016",
+    "workId": "work-song-0e7f7016",
     "title": "カントリー・ロード",
     "originalArtist": "本名陽子",
     "tags": [],
@@ -361,6 +381,7 @@
   },
   {
     "id": "song-0e879506",
+    "workId": "work-song-0e879506",
     "title": "yes, and?",
     "originalArtist": "Ariana Grande",
     "tags": [],
@@ -379,6 +400,7 @@
   },
   {
     "id": "song-0e97f98f",
+    "workId": "work-song-0e97f98f",
     "title": "GOLDEN",
     "originalArtist": "Huntrix",
     "tags": [],
@@ -397,6 +419,7 @@
   },
   {
     "id": "song-0f4d0182",
+    "workId": "work-song-0f4d0182",
     "title": "Always Remember Us This Way",
     "originalArtist": "Lady Gaga",
     "tags": [],
@@ -415,6 +438,7 @@
   },
   {
     "id": "song-10d02929",
+    "workId": "work-song-09aaca44",
     "title": "晴る",
     "originalArtist": "ヨルシカ",
     "tags": [],
@@ -433,6 +457,7 @@
   },
   {
     "id": "song-10e50f0c",
+    "workId": "work-song-10e50f0c",
     "title": "Kawaii Kaiwai",
     "originalArtist": "PiKi",
     "tags": [],
@@ -451,6 +476,7 @@
   },
   {
     "id": "song-1173127f",
+    "workId": "work-song-1173127f",
     "title": "Let Me In",
     "originalArtist": "H.E.R.",
     "tags": [],
@@ -469,6 +495,7 @@
   },
   {
     "id": "song-145b7854",
+    "workId": "work-song-145b7854",
     "title": "情緒廢物",
     "originalArtist": "玥Itsuki",
     "tags": [],
@@ -487,6 +514,7 @@
   },
   {
     "id": "song-149ed80d",
+    "workId": "work-song-149ed80d",
     "title": "Broken World",
     "originalArtist": "孫盛希 Shi Shi",
     "tags": [],
@@ -505,6 +533,7 @@
   },
   {
     "id": "song-15084c9d",
+    "workId": "work-song-15084c9d",
     "title": "ドライフラワー (Ure ver)",
     "originalArtist": "優里",
     "tags": [],
@@ -523,6 +552,7 @@
   },
   {
     "id": "song-15b9d7de",
+    "workId": "work-song-15b9d7de",
     "title": "年輪說",
     "originalArtist": "楊丞琳",
     "tags": [],
@@ -541,6 +571,7 @@
   },
   {
     "id": "song-171397e5",
+    "workId": "work-song-171397e5",
     "title": "Keep Me Warm",
     "originalArtist": "Chace",
     "tags": [],
@@ -559,6 +590,7 @@
   },
   {
     "id": "song-173054da",
+    "workId": "work-song-173054da",
     "title": "eight(에잇) 鋼琴ver",
     "originalArtist": "IU",
     "tags": [],
@@ -577,6 +609,7 @@
   },
   {
     "id": "song-1ad5d9a4",
+    "workId": "work-song-1ad5d9a4",
     "title": "Tell Your World",
     "originalArtist": "初音ミク",
     "tags": [],
@@ -595,6 +628,7 @@
   },
   {
     "id": "song-1b9d54cd",
+    "workId": "work-song-1b9d54cd",
     "title": "夢遊 Flyaway",
     "originalArtist": "孫盛希 Shi Shi",
     "tags": [],
@@ -613,6 +647,7 @@
   },
   {
     "id": "song-1ccb4d20",
+    "workId": "work-song-1ccb4d20",
     "title": "STUNNER",
     "originalArtist": "TEN",
     "tags": [],
@@ -631,6 +666,7 @@
   },
   {
     "id": "song-1cf181c5",
+    "workId": "work-song-1cf181c5",
     "title": "Fish Love",
     "originalArtist": "蔡依林",
     "tags": [],
@@ -649,6 +685,7 @@
   },
   {
     "id": "song-1d4d2769",
+    "workId": "work-song-1d4d2769",
     "title": "Titanium 鋼琴ver",
     "originalArtist": "David Guetta",
     "tags": [],
@@ -667,6 +704,7 @@
   },
   {
     "id": "song-1d52eb7c",
+    "workId": "work-song-1d52eb7c",
     "title": "玫瑰少年",
     "originalArtist": "蔡依林 Jolin Tsai",
     "tags": [],
@@ -685,6 +723,7 @@
   },
   {
     "id": "song-1f83ef1b",
+    "workId": "work-song-1f83ef1b",
     "title": "うたたね",
     "originalArtist": "Leina",
     "tags": [],
@@ -703,6 +742,7 @@
   },
   {
     "id": "song-20eb8332",
+    "workId": "work-song-20eb8332",
     "title": "bad guy",
     "originalArtist": "Billie Eilish",
     "tags": [],
@@ -721,6 +761,7 @@
   },
   {
     "id": "song-21093bc9",
+    "workId": "work-song-21093bc9",
     "title": "死ぬのがいいわ 鋼琴ver",
     "originalArtist": "Fujii Kaze",
     "tags": [],
@@ -739,6 +780,7 @@
   },
   {
     "id": "song-229978c7",
+    "workId": "work-song-1188",
     "title": "THE BADDEST",
     "originalArtist": "K/DA",
     "tags": [],
@@ -757,6 +799,7 @@
   },
   {
     "id": "song-22a98e2f",
+    "workId": "work-song-1745",
     "title": "我要我們在一起",
     "originalArtist": "范曉萱",
     "tags": [],
@@ -775,6 +818,7 @@
   },
   {
     "id": "song-22daa100",
+    "workId": "work-song-22daa100",
     "title": "Please Please Please",
     "originalArtist": "Sabrina Carpenter",
     "tags": [],
@@ -793,6 +837,7 @@
   },
   {
     "id": "song-23019dfe",
+    "workId": "work-song-23019dfe",
     "title": "Arrietty's Song",
     "originalArtist": "Cecile Corbel",
     "tags": [],
@@ -811,6 +856,7 @@
   },
   {
     "id": "song-2317f19e",
+    "workId": "work-song-2317f19e",
     "title": "遇見",
     "originalArtist": "燕姿",
     "tags": [],
@@ -829,6 +875,7 @@
   },
   {
     "id": "song-23297824",
+    "workId": "work-song-23297824",
     "title": "Million Reasons (Piano ver.)",
     "originalArtist": "Lady Gaga",
     "tags": [],
@@ -847,6 +894,7 @@
   },
   {
     "id": "song-2338cdd2",
+    "workId": "work-song-2338cdd2",
     "title": "Hype Boy",
     "originalArtist": "NewJeans",
     "tags": [],
@@ -865,6 +913,7 @@
   },
   {
     "id": "song-23c7e0e9",
+    "workId": "work-song-155c023b",
     "title": "踮起腳尖愛",
     "originalArtist": "洪佩瑜",
     "tags": [],
@@ -883,6 +932,7 @@
   },
   {
     "id": "song-2411e410",
+    "workId": "work-song-2411e410",
     "title": "SHOOTING STAR",
     "originalArtist": "XG",
     "tags": [],
@@ -901,6 +951,7 @@
   },
   {
     "id": "song-24970a26",
+    "workId": "work-song-1396",
     "title": "極楽浄土",
     "originalArtist": "GARNiDELiA",
     "tags": [],
@@ -919,6 +970,7 @@
   },
   {
     "id": "song-258c689e",
+    "workId": "work-song-258c689e",
     "title": "到底你是要不要我啦",
     "originalArtist": "持修",
     "tags": [],
@@ -937,6 +989,7 @@
   },
   {
     "id": "song-268949e6",
+    "workId": "work-song-268949e6",
     "title": "Ninelie",
     "originalArtist": "Aimer",
     "tags": [],
@@ -955,6 +1008,7 @@
   },
   {
     "id": "song-27a0d0b5",
+    "workId": "work-song-27a0d0b5",
     "title": "Stand Up",
     "originalArtist": "Cynthia Erivo",
     "tags": [],
@@ -973,6 +1027,7 @@
   },
   {
     "id": "song-2843575f",
+    "workId": "work-song-2843575f",
     "title": "聲聲慢",
     "originalArtist": "鄧福如 AFÜ",
     "tags": [],
@@ -991,6 +1046,7 @@
   },
   {
     "id": "song-28ee375f",
+    "workId": "work-song-28ee375f",
     "title": "地球儀",
     "originalArtist": "米津玄師",
     "tags": [],
@@ -1009,6 +1065,7 @@
   },
   {
     "id": "song-29274174",
+    "workId": "work-song-29274174",
     "title": "Save ME",
     "originalArtist": "BTS",
     "tags": [],
@@ -1027,6 +1084,7 @@
   },
   {
     "id": "song-2b37b7c2",
+    "workId": "work-song-2b37b7c2",
     "title": "君をのせて",
     "originalArtist": "井上あずみ",
     "tags": [],
@@ -1045,6 +1103,7 @@
   },
   {
     "id": "song-2c7d9e83",
+    "workId": "work-song-100",
     "title": "血腥愛情故事",
     "originalArtist": "張惠妹",
     "tags": [],
@@ -1063,6 +1122,7 @@
   },
   {
     "id": "song-2ca5447e",
+    "workId": "work-song-2ca5447e",
     "title": "革命道中",
     "originalArtist": "アイナ・ジ・エンド",
     "tags": [],
@@ -1081,6 +1141,7 @@
   },
   {
     "id": "song-2f931595",
+    "workId": "work-song-2f931595",
     "title": "Supernova",
     "originalArtist": "aespa",
     "tags": [],
@@ -1099,6 +1160,7 @@
   },
   {
     "id": "song-31e43d12",
+    "workId": "work-song-31e43d12",
     "title": "浪漫體質",
     "originalArtist": "王彙筑",
     "tags": [],
@@ -1117,6 +1179,7 @@
   },
   {
     "id": "song-325af048",
+    "workId": "work-song-325af048",
     "title": "怪天氣",
     "originalArtist": "YELLOW黃宣 & 9m88",
     "tags": [],
@@ -1135,6 +1198,7 @@
   },
   {
     "id": "song-332aac39",
+    "workId": "work-song-332aac39",
     "title": "Décalcomanie",
     "originalArtist": "MAMAMOO",
     "tags": [],
@@ -1153,6 +1217,7 @@
   },
   {
     "id": "song-367c1cac",
+    "workId": "work-song-367c1cac",
     "title": "bad enough",
     "originalArtist": "Madison Beer",
     "tags": [],
@@ -1171,6 +1236,7 @@
   },
   {
     "id": "song-372cea11",
+    "workId": "work-song-372cea11",
     "title": "人樣 Love Me Like A Liar",
     "originalArtist": "孫盛希 Shi Shi",
     "tags": [],
@@ -1189,6 +1255,7 @@
   },
   {
     "id": "song-372f55c2",
+    "workId": "work-song-372f55c2",
     "title": "Hey Dear",
     "originalArtist": "王彙筑",
     "tags": [],
@@ -1207,6 +1274,7 @@
   },
   {
     "id": "song-37f753fd",
+    "workId": "work-song-37f753fd",
     "title": "B.O.",
     "originalArtist": "ØZI",
     "tags": [],
@@ -1225,6 +1293,7 @@
   },
   {
     "id": "song-385f94b2",
+    "workId": "work-song-0ba6de74",
     "title": "How Sweet",
     "originalArtist": "NewJeans",
     "tags": [],
@@ -1243,6 +1312,7 @@
   },
   {
     "id": "song-39b75c5f",
+    "workId": "work-song-1820",
     "title": "POP/STARS",
     "originalArtist": "K/DA",
     "tags": [],
@@ -1261,6 +1331,7 @@
   },
   {
     "id": "song-3dcb2bc4",
+    "workId": "work-song-3dcb2bc4",
     "title": "這該死的拘執佮愛",
     "originalArtist": "珂拉琪 Collage",
     "tags": [],
@@ -1279,6 +1350,7 @@
   },
   {
     "id": "song-3e1c8a0f",
+    "workId": "work-song-36b58319",
     "title": "Alcohol-Free",
     "originalArtist": "TWICE",
     "tags": [],
@@ -1297,6 +1369,7 @@
   },
   {
     "id": "song-3f56ef53",
+    "workId": "work-song-3f56ef53",
     "title": "Supernatural",
     "originalArtist": "NewJeans",
     "tags": [],
@@ -1315,6 +1388,7 @@
   },
   {
     "id": "song-3fe6c90a",
+    "workId": "work-song-0d4b639d",
     "title": "Die With A Smile",
     "originalArtist": "Lady Gaga, Bruno Mars",
     "tags": [],
@@ -1333,6 +1407,7 @@
   },
   {
     "id": "song-41833775",
+    "workId": "work-song-41833775",
     "title": "Taste",
     "originalArtist": "Sabrina Carpenter",
     "tags": [],
@@ -1351,6 +1426,7 @@
   },
   {
     "id": "song-41a32f28",
+    "workId": "work-song-41a32f28",
     "title": "ハルジオン",
     "originalArtist": "YOASOBI",
     "tags": [],
@@ -1369,6 +1445,7 @@
   },
   {
     "id": "song-440fcaa3",
+    "workId": "work-song-440fcaa3",
     "title": "Michi Teyu Ku",
     "originalArtist": "Fujii Kaze",
     "tags": [],
@@ -1387,6 +1464,7 @@
   },
   {
     "id": "song-4503493b",
+    "workId": "work-song-1201",
     "title": "Ain't It Fun",
     "originalArtist": "Paramore",
     "tags": [],
@@ -1405,6 +1483,7 @@
   },
   {
     "id": "song-46244f0a",
+    "workId": "work-song-46244f0a",
     "title": "煙幕",
     "originalArtist": "陳忻玥 Vicky Chen",
     "tags": [],
@@ -1423,6 +1502,7 @@
   },
   {
     "id": "song-4860c1d7",
+    "workId": "work-song-4860c1d7",
     "title": "Travel",
     "originalArtist": "BOL4",
     "tags": [],
@@ -1441,6 +1521,7 @@
   },
   {
     "id": "song-4877fb61",
+    "workId": "work-song-03f9f10b",
     "title": "ELEVEN",
     "originalArtist": "IVE",
     "tags": [],
@@ -1459,6 +1540,7 @@
   },
   {
     "id": "song-49c2ee75",
+    "workId": "work-song-49c2ee75",
     "title": "Treat You Better",
     "originalArtist": "Shawn Mendes",
     "tags": [],
@@ -1477,6 +1559,7 @@
   },
   {
     "id": "song-4afa350c",
+    "workId": "work-song-4afa350c",
     "title": "INSANE",
     "originalArtist": "Black Gryph0n",
     "tags": [],
@@ -1495,6 +1578,7 @@
   },
   {
     "id": "song-4c1507bb",
+    "workId": "work-song-30",
     "title": "給我一個理由忘記",
     "originalArtist": "A-Lin",
     "tags": [],
@@ -1513,6 +1597,7 @@
   },
   {
     "id": "song-4ccf9b6e",
+    "workId": "work-song-4ccf9b6e",
     "title": "別找我麻煩",
     "originalArtist": "蔡健雅",
     "tags": [],
@@ -1531,6 +1616,7 @@
   },
   {
     "id": "song-4e69f788",
+    "workId": "work-song-0ba6de74",
     "title": "How Sweet",
     "originalArtist": "NewJeans",
     "tags": [],
@@ -1549,6 +1635,7 @@
   },
   {
     "id": "song-4ec7244e",
+    "workId": "work-song-4ec7244e",
     "title": "Ditto",
     "originalArtist": "NewJeans",
     "tags": [],
@@ -1567,6 +1654,7 @@
   },
   {
     "id": "song-4ee7111e",
+    "workId": "work-song-4ee7111e",
     "title": "From the Start",
     "originalArtist": "Laufey",
     "tags": [],
@@ -1585,6 +1673,7 @@
   },
   {
     "id": "song-4f120c43",
+    "workId": "work-song-4f120c43",
     "title": "不在一起就不會分開",
     "originalArtist": "洪佩瑜",
     "tags": [],
@@ -1603,6 +1692,7 @@
   },
   {
     "id": "song-4f86ea6d",
+    "workId": "work-song-4f86ea6d",
     "title": "Pity Party",
     "originalArtist": "Melanie Martinez",
     "tags": [],
@@ -1621,6 +1711,7 @@
   },
   {
     "id": "song-52581efb",
+    "workId": "work-song-52581efb",
     "title": "Defying Gravity",
     "originalArtist": "Wicked The Soundtrack",
     "tags": [],
@@ -1639,6 +1730,7 @@
   },
   {
     "id": "song-527f3af4",
+    "workId": "work-song-527f3af4",
     "title": "火星人",
     "originalArtist": "ヨルシカ",
     "tags": [],
@@ -1657,6 +1749,7 @@
   },
   {
     "id": "song-52a39c9e",
+    "workId": "work-song-52a39c9e",
     "title": "你攏無咧看",
     "originalArtist": "蕭煌奇 Ricky Hsiao",
     "tags": [],
@@ -1675,6 +1768,7 @@
   },
   {
     "id": "song-530e4d8c",
+    "workId": "work-song-530e4d8c",
     "title": "What It Sounds Like",
     "originalArtist": "Huntrix",
     "tags": [],
@@ -1693,6 +1787,7 @@
   },
   {
     "id": "song-538309b9",
+    "workId": "work-song-538309b9",
     "title": "Live Forever",
     "originalArtist": "Kotomi & Ryan Elder",
     "tags": [],
@@ -1711,6 +1806,7 @@
   },
   {
     "id": "song-53950200",
+    "workId": "work-song-1019",
     "title": "VILLAIN",
     "originalArtist": "K/DA",
     "tags": [],
@@ -1729,6 +1825,7 @@
   },
   {
     "id": "song-5837cc54",
+    "workId": "work-song-123",
     "title": "テルーの唄",
     "originalArtist": "手嶌葵",
     "tags": [],
@@ -1747,6 +1844,7 @@
   },
   {
     "id": "song-5abcff55",
+    "workId": "work-song-5abcff55",
     "title": "DAISIES",
     "originalArtist": "Black Gryph0n & Baasik",
     "tags": [],
@@ -1765,6 +1863,7 @@
   },
   {
     "id": "song-5c73219c",
+    "workId": "work-song-5c73219c",
     "title": "總有一顆屬於你的星球",
     "originalArtist": "告五人 & Solar",
     "tags": [],
@@ -1783,6 +1882,7 @@
   },
   {
     "id": "song-5d1013e4",
+    "workId": "work-song-5d1013e4",
     "title": "One Last Time 鋼琴ver",
     "originalArtist": "Ariana Grande",
     "tags": [],
@@ -1801,6 +1901,7 @@
   },
   {
     "id": "song-5e061441",
+    "workId": "work-song-382",
     "title": "別問很可怕",
     "originalArtist": "J.Sheon",
     "tags": [],
@@ -1819,6 +1920,7 @@
   },
   {
     "id": "song-5e797111",
+    "workId": "work-song-5e797111",
     "title": "フクロウ ～フクロウが知らせる客が来たと～",
     "originalArtist": "Kokia",
     "tags": [],
@@ -1837,6 +1939,7 @@
   },
   {
     "id": "song-5f5ec3f1",
+    "workId": "work-song-5f5ec3f1",
     "title": "HOWL",
     "originalArtist": "Ayumu Imazu",
     "tags": [],
@@ -1855,6 +1958,7 @@
   },
   {
     "id": "song-6175199d",
+    "workId": "work-song-1330",
     "title": "有一種悲傷",
     "originalArtist": "A-Lin",
     "tags": [],
@@ -1873,6 +1977,7 @@
   },
   {
     "id": "song-61c7b060",
+    "workId": "work-song-61c7b060",
     "title": "故梦 (玥姐solo)",
     "originalArtist": "双笙",
     "tags": [],
@@ -1891,6 +1996,7 @@
   },
   {
     "id": "song-61cb242b",
+    "workId": "work-song-61cb242b",
     "title": "Wake up!",
     "originalArtist": "煌Kirali",
     "tags": [],
@@ -1909,6 +2015,7 @@
   },
   {
     "id": "song-61ed5495",
+    "workId": "work-song-2721e410",
     "title": "來自天堂的魔鬼 (鄧tsuki&煦美環ver)",
     "originalArtist": "​​鄧紫棋",
     "tags": [],
@@ -1927,6 +2034,7 @@
   },
   {
     "id": "song-62339c56",
+    "workId": "work-song-62339c56",
     "title": "LILAC",
     "originalArtist": "IU",
     "tags": [],
@@ -1945,6 +2053,7 @@
   },
   {
     "id": "song-6271c269",
+    "workId": "work-song-6271c269",
     "title": "你的行李",
     "originalArtist": "謝震廷 feat. 徐靖玟",
     "tags": [],
@@ -1963,6 +2072,7 @@
   },
   {
     "id": "song-6424e5c9",
+    "workId": "work-song-4f86ea6d",
     "title": "Pity Party",
     "originalArtist": "Melanie Martinez",
     "tags": [],
@@ -1981,6 +2091,7 @@
   },
   {
     "id": "song-64401784",
+    "workId": "work-song-64401784",
     "title": "母系社會",
     "originalArtist": "AMIT",
     "tags": [],
@@ -1999,6 +2110,7 @@
   },
   {
     "id": "song-644c3a9f",
+    "workId": "work-song-527f3af4",
     "title": "火星人",
     "originalArtist": "ヨルシカ",
     "tags": [],
@@ -2017,6 +2129,7 @@
   },
   {
     "id": "song-68673518",
+    "workId": "work-song-68673518",
     "title": "忘れじの言の葉",
     "originalArtist": "未来古代楽団 ft.安次嶺希和子",
     "tags": [],
@@ -2035,6 +2148,7 @@
   },
   {
     "id": "song-69bf88fc",
+    "workId": "work-song-69bf88fc",
     "title": "喜劇",
     "originalArtist": "星野源",
     "tags": [],
@@ -2053,6 +2167,7 @@
   },
   {
     "id": "song-6a0615f9",
+    "workId": "work-song-162",
     "title": "月亮代表我的心",
     "originalArtist": "鄧麗君",
     "tags": [],
@@ -2071,6 +2186,7 @@
   },
   {
     "id": "song-6a39fe7b",
+    "workId": "work-song-6a39fe7b",
     "title": "透明的",
     "originalArtist": "持修ChihSiou",
     "tags": [],
@@ -2089,6 +2205,7 @@
   },
   {
     "id": "song-6a5eecc1",
+    "workId": "work-song-6a5eecc1",
     "title": "千鳥",
     "originalArtist": "ヨルシカ",
     "tags": [],
@@ -2107,6 +2224,7 @@
   },
   {
     "id": "song-6b482094",
+    "workId": "work-song-1815",
     "title": "花に亡霊",
     "originalArtist": "ヨルシカ",
     "tags": [],
@@ -2125,6 +2243,7 @@
   },
   {
     "id": "song-6d3e8efc",
+    "workId": "work-song-6d3e8efc",
     "title": "Young And Beautiful 鋼琴ver",
     "originalArtist": "Lana Del Rey",
     "tags": [],
@@ -2143,6 +2262,7 @@
   },
   {
     "id": "song-6dbe20fd",
+    "workId": "work-song-6dbe20fd",
     "title": "INTO THE UNKNOWN",
     "originalArtist": "AURORA Ver.",
     "tags": [],
@@ -2161,6 +2281,7 @@
   },
   {
     "id": "song-6dc83491",
+    "workId": "work-song-42bf7137",
     "title": "OMG",
     "originalArtist": "NewJeans",
     "tags": [],
@@ -2179,6 +2300,7 @@
   },
   {
     "id": "song-70185775",
+    "workId": "work-song-0e7f7016",
     "title": "カントリー・ロード",
     "originalArtist": "本名陽子",
     "tags": [],
@@ -2197,6 +2319,7 @@
   },
   {
     "id": "song-70bb310c",
+    "workId": "work-song-70bb310c",
     "title": "Tears",
     "originalArtist": "Sabrina Carpenter",
     "tags": [],
@@ -2215,6 +2338,7 @@
   },
   {
     "id": "song-72b62b10",
+    "workId": "work-song-1e531a8d",
     "title": "If I Ain't Got You",
     "originalArtist": "Alicia Keys",
     "tags": [],
@@ -2233,6 +2357,7 @@
   },
   {
     "id": "song-72cec674",
+    "workId": "work-song-2663",
     "title": "暮光 Gloaming Light",
     "originalArtist": "扉暮IANVS",
     "tags": [],
@@ -2251,6 +2376,7 @@
   },
   {
     "id": "song-73f01c63",
+    "workId": "work-song-73f01c63",
     "title": "lovely",
     "originalArtist": "Billie Eilish, Khalid",
     "tags": [],
@@ -2269,6 +2395,7 @@
   },
   {
     "id": "song-741adaff",
+    "workId": "work-song-741adaff",
     "title": "開 Still Moving",
     "originalArtist": "洪佩瑜",
     "tags": [],
@@ -2287,6 +2414,7 @@
   },
   {
     "id": "song-746f58a7",
+    "workId": "work-song-746f58a7",
     "title": "Just Like Fire",
     "originalArtist": "P!nk",
     "tags": [],
@@ -2305,6 +2433,7 @@
   },
   {
     "id": "song-761e35a0",
+    "workId": "work-song-761e35a0",
     "title": "TOMBOY",
     "originalArtist": "(G)I-DLE",
     "tags": [],
@@ -2323,6 +2452,7 @@
   },
   {
     "id": "song-761ff713",
+    "workId": "work-song-761ff713",
     "title": "我的存在就是愛你",
     "originalArtist": "張惠妹",
     "tags": [],
@@ -2341,6 +2471,7 @@
   },
   {
     "id": "song-788abe0d",
+    "workId": "work-song-788abe0d",
     "title": "STRESS",
     "originalArtist": "CHUNG HA",
     "tags": [],
@@ -2359,6 +2490,7 @@
   },
   {
     "id": "song-791de5ef",
+    "workId": "work-song-791de5ef",
     "title": "Say My Name",
     "originalArtist": "미연 (MIYEON)",
     "tags": [],
@@ -2377,6 +2509,7 @@
   },
   {
     "id": "song-79e1ae1f",
+    "workId": "work-song-79e1ae1f",
     "title": "懸日",
     "originalArtist": "田馥甄",
     "tags": [],
@@ -2395,6 +2528,7 @@
   },
   {
     "id": "song-7a5ff03f",
+    "workId": "work-song-7a5ff03f",
     "title": "血腥愛情故事",
     "originalArtist": "AMIT",
     "tags": [],
@@ -2413,6 +2547,7 @@
   },
   {
     "id": "song-7a79e377",
+    "workId": "work-song-7a79e377",
     "title": "Re：Re：",
     "originalArtist": "ASIAN KUNG-FU GENERATION",
     "tags": [],
@@ -2431,6 +2566,7 @@
   },
   {
     "id": "song-7aa8e8c6",
+    "workId": "work-song-7aa8e8c6",
     "title": "Splinter Wolf",
     "originalArtist": "KOHTA YAMAMOTO",
     "tags": [],
@@ -2449,6 +2585,7 @@
   },
   {
     "id": "song-7b1bdc8f",
+    "workId": "work-song-021ff5f0",
     "title": "易燃易爆炸",
     "originalArtist": "陳粒",
     "tags": [],
@@ -2467,6 +2604,7 @@
   },
   {
     "id": "song-7c2dd8f9",
+    "workId": "work-song-7c2dd8f9",
     "title": "TT (可愛玥&煦ver)",
     "originalArtist": "TWICE",
     "tags": [],
@@ -2485,6 +2623,7 @@
   },
   {
     "id": "song-7d145ccc",
+    "workId": "work-song-7d145ccc",
     "title": "Break Free",
     "originalArtist": "Ariana Grande",
     "tags": [],
@@ -2503,6 +2642,7 @@
   },
   {
     "id": "song-7de2139a",
+    "workId": "work-song-0dbec16d",
     "title": "Sticky",
     "originalArtist": "KISS OF LIFE",
     "tags": [],
@@ -2521,6 +2661,7 @@
   },
   {
     "id": "song-7f1b0921",
+    "workId": "work-song-1337",
     "title": "小半",
     "originalArtist": "陳粒",
     "tags": [],
@@ -2539,6 +2680,7 @@
   },
   {
     "id": "song-7f49af13",
+    "workId": "work-song-7f49af13",
     "title": "Don't Let Me Down",
     "originalArtist": "The Chainsmokers, Daya",
     "tags": [],
@@ -2557,6 +2699,7 @@
   },
   {
     "id": "song-7f8b0c64",
+    "workId": "work-song-7f8b0c64",
     "title": "小心翻閱",
     "originalArtist": "孫盛希",
     "tags": [],
@@ -2575,6 +2718,7 @@
   },
   {
     "id": "song-80c3edab",
+    "workId": "work-song-80c3edab",
     "title": "The Line",
     "originalArtist": "Twenty One Pilots",
     "tags": [],
@@ -2593,6 +2737,7 @@
   },
   {
     "id": "song-81dbdce3",
+    "workId": "work-song-325af048",
     "title": "怪天氣",
     "originalArtist": "YELLOW黃宣 & 9m88",
     "tags": [],
@@ -2611,6 +2756,7 @@
   },
   {
     "id": "song-832eeab4",
+    "workId": "work-song-832eeab4",
     "title": "INVU",
     "originalArtist": "TAEYEON (태연)",
     "tags": [],
@@ -2629,6 +2775,7 @@
   },
   {
     "id": "song-8375b82a",
+    "workId": "work-song-8375b82a",
     "title": "ETA",
     "originalArtist": "NewJeans",
     "tags": [],
@@ -2647,6 +2794,7 @@
   },
   {
     "id": "song-83b71027",
+    "workId": "work-song-325af048",
     "title": "怪天氣",
     "originalArtist": "YELLOW黃宣 & 9m88",
     "tags": [],
@@ -2665,6 +2813,7 @@
   },
   {
     "id": "song-83c7cc70",
+    "workId": "work-song-83c7cc70",
     "title": "Four Seasons",
     "originalArtist": "TAEYEON (태연)",
     "tags": [],
@@ -2683,6 +2832,7 @@
   },
   {
     "id": "song-86944e0e",
+    "workId": "work-song-4ee7111e",
     "title": "From the Start",
     "originalArtist": "Laufey",
     "tags": [],
@@ -2701,6 +2851,7 @@
   },
   {
     "id": "song-8754d774",
+    "workId": "work-song-8754d774",
     "title": "'1.2.3.4'",
     "originalArtist": "LEE HI",
     "tags": [],
@@ -2719,6 +2870,7 @@
   },
   {
     "id": "song-8950fb5c",
+    "workId": "work-song-8950fb5c",
     "title": "Aperture",
     "originalArtist": "Harry Styles",
     "tags": [],
@@ -2737,6 +2889,7 @@
   },
   {
     "id": "song-8989c004",
+    "workId": "work-song-8989c004",
     "title": "Dynamite",
     "originalArtist": "BTS",
     "tags": [],
@@ -2755,6 +2908,7 @@
   },
   {
     "id": "song-8ab14b81",
+    "workId": "work-song-8ab14b81",
     "title": "Bassline",
     "originalArtist": "Ayumu Imazu",
     "tags": [],
@@ -2773,6 +2927,7 @@
   },
   {
     "id": "song-8c329cc2",
+    "workId": "work-song-8c329cc2",
     "title": "The Loneliest Girl",
     "originalArtist": "Carole & Tuesday",
     "tags": [],
@@ -2791,6 +2946,7 @@
   },
   {
     "id": "song-8c459bd4",
+    "workId": "work-song-3defc6e4",
     "title": "怪天氣",
     "originalArtist": "黃宣",
     "tags": [],
@@ -2809,6 +2965,7 @@
   },
   {
     "id": "song-8dbf27b3",
+    "workId": "work-song-8dbf27b3",
     "title": "From The Start 鋼琴ver",
     "originalArtist": "Laufey",
     "tags": [],
@@ -2827,6 +2984,7 @@
   },
   {
     "id": "song-8ee4037f",
+    "workId": "work-song-264",
     "title": "GODS",
     "originalArtist": "NewJeans",
     "tags": [],
@@ -2845,6 +3003,7 @@
   },
   {
     "id": "song-907f6931",
+    "workId": "work-song-107365c4",
     "title": "新時代",
     "originalArtist": "Ado",
     "tags": [],
@@ -2863,6 +3022,7 @@
   },
   {
     "id": "song-91e8035e",
+    "workId": "work-song-76677357",
     "title": "Talking to the Moon",
     "originalArtist": "Bruno Mars",
     "tags": [],
@@ -2881,6 +3041,7 @@
   },
   {
     "id": "song-92003f59",
+    "workId": "work-song-222",
     "title": "アンコール",
     "originalArtist": "YOASOBI",
     "tags": [],
@@ -2899,6 +3060,7 @@
   },
   {
     "id": "song-925888f1",
+    "workId": "work-song-925888f1",
     "title": "リセット",
     "originalArtist": "平原綾香",
     "tags": [],
@@ -2917,6 +3079,7 @@
   },
   {
     "id": "song-94044a02",
+    "workId": "work-song-7b221900",
     "title": "Wish You Hell",
     "originalArtist": "WENDY",
     "tags": [],
@@ -2935,6 +3098,7 @@
   },
   {
     "id": "song-975db65e",
+    "workId": "work-song-1820",
     "title": "POP/STARS",
     "originalArtist": "K/DA",
     "tags": [],
@@ -2953,6 +3117,7 @@
   },
   {
     "id": "song-97618aea",
+    "workId": "work-song-97618aea",
     "title": "又三郎",
     "originalArtist": "ヨルシカ",
     "tags": [],
@@ -2971,6 +3136,7 @@
   },
   {
     "id": "song-98d864fc",
+    "workId": "work-song-98d864fc",
     "title": "CLOSER",
     "originalArtist": "JEON SOMI",
     "tags": [],
@@ -2989,6 +3155,7 @@
   },
   {
     "id": "song-9a1a98f1",
+    "workId": "work-song-9a1a98f1",
     "title": "A Dangerous Thing",
     "originalArtist": "AURORA",
     "tags": [],
@@ -3007,6 +3174,7 @@
   },
   {
     "id": "song-9b312b7e",
+    "workId": "work-song-9b312b7e",
     "title": "若水",
     "originalArtist": "西樓",
     "tags": [],
@@ -3025,6 +3193,7 @@
   },
   {
     "id": "song-9b9d3415",
+    "workId": "work-song-9b9d3415",
     "title": "If I Ain't Got You 鋼琴ver",
     "originalArtist": "Alicia Keys",
     "tags": [],
@@ -3043,6 +3212,7 @@
   },
   {
     "id": "song-9c7e6187",
+    "workId": "work-song-9c7e6187",
     "title": "Coffee",
     "originalArtist": "a!ka",
     "tags": [],
@@ -3061,6 +3231,7 @@
   },
   {
     "id": "song-9cff9d7a",
+    "workId": "work-song-145b7854",
     "title": "情緒廢物",
     "originalArtist": "玥Itsuki",
     "tags": [],
@@ -3079,6 +3250,7 @@
   },
   {
     "id": "song-9d69094b",
+    "workId": "work-song-957ec9af",
     "title": "失戀無罪",
     "originalArtist": "A-Lin",
     "tags": [],
@@ -3097,6 +3269,7 @@
   },
   {
     "id": "song-9ebb0f88",
+    "workId": "work-song-9ebb0f88",
     "title": "管它什麼",
     "originalArtist": "劉戀",
     "tags": [],
@@ -3115,6 +3288,7 @@
   },
   {
     "id": "song-9ed58882",
+    "workId": "work-song-195",
     "title": "魚仔",
     "originalArtist": "盧廣仲",
     "tags": [],
@@ -3133,6 +3307,7 @@
   },
   {
     "id": "song-9f149f1f",
+    "workId": "work-song-9f149f1f",
     "title": "Broken World",
     "originalArtist": "孫盛希",
     "tags": [],
@@ -3151,6 +3326,7 @@
   },
   {
     "id": "song-9f895bb4",
+    "workId": "work-song-0c7b9a02",
     "title": "いのちの名前",
     "originalArtist": "木村弓",
     "tags": [],
@@ -3169,6 +3345,7 @@
   },
   {
     "id": "song-a05ec410",
+    "workId": "work-song-2411e410",
     "title": "SHOOTING STAR",
     "originalArtist": "XG",
     "tags": [],
@@ -3187,6 +3364,7 @@
   },
   {
     "id": "song-a0fd32d2",
+    "workId": "work-song-07107cd7",
     "title": "路過人間",
     "originalArtist": "郁可唯",
     "tags": [],
@@ -3205,6 +3383,7 @@
   },
   {
     "id": "song-a2150185",
+    "workId": "work-song-a2150185",
     "title": "虎豹母",
     "originalArtist": "王彙筑",
     "tags": [],
@@ -3223,6 +3402,7 @@
   },
   {
     "id": "song-a22f4745",
+    "workId": "work-song-a22f4745",
     "title": "Dance The Night",
     "originalArtist": "Dua Lipa",
     "tags": [],
@@ -3241,6 +3421,7 @@
   },
   {
     "id": "song-a3325618",
+    "workId": "work-song-1330",
     "title": "有一種悲傷",
     "originalArtist": "A-Lin",
     "tags": [],
@@ -3259,6 +3440,7 @@
   },
   {
     "id": "song-a3d92b37",
+    "workId": "work-song-61cb242b",
     "title": "Wake up!",
     "originalArtist": "煌Kirali",
     "tags": [],
@@ -3277,6 +3459,7 @@
   },
   {
     "id": "song-a43f3155",
+    "workId": "work-song-09aaca44",
     "title": "晴る",
     "originalArtist": "ヨルシカ",
     "tags": [],
@@ -3295,6 +3478,7 @@
   },
   {
     "id": "song-a610c710",
+    "workId": "work-song-a610c710",
     "title": "So Easy",
     "originalArtist": "Olivia Dean",
     "tags": [],
@@ -3313,6 +3497,7 @@
   },
   {
     "id": "song-a71a1d62",
+    "workId": "work-song-a71a1d62",
     "title": "悲傷的五個步驟",
     "originalArtist": "艾薇 Ivy",
     "tags": [],
@@ -3331,6 +3516,7 @@
   },
   {
     "id": "song-a71efec7",
+    "workId": "work-song-42c4ed95",
     "title": "Bubble Gum",
     "originalArtist": "NewJeans",
     "tags": [],
@@ -3349,6 +3535,7 @@
   },
   {
     "id": "song-acf5c382",
+    "workId": "work-song-acf5c382",
     "title": "再見的時候",
     "originalArtist": "洪佩瑜",
     "tags": [],
@@ -3367,6 +3554,7 @@
   },
   {
     "id": "song-ad13cfd3",
+    "workId": "work-song-ad13cfd3",
     "title": "JANE DOE",
     "originalArtist": "米津玄師＆宇多田ヒカル",
     "tags": [],
@@ -3385,6 +3573,7 @@
   },
   {
     "id": "song-ad42ff59",
+    "workId": "work-song-ad42ff59",
     "title": "Playground",
     "originalArtist": "Bea Miller",
     "tags": [],
@@ -3403,6 +3592,7 @@
   },
   {
     "id": "song-ad7329ae",
+    "workId": "work-song-23cc221a",
     "title": "關鍵詞",
     "originalArtist": "林俊傑",
     "tags": [],
@@ -3421,6 +3611,7 @@
   },
   {
     "id": "song-aee429a9",
+    "workId": "work-song-aee429a9",
     "title": "Super Shy",
     "originalArtist": "NewJeans",
     "tags": [],
@@ -3439,6 +3630,7 @@
   },
   {
     "id": "song-af25c1b1",
+    "workId": "work-song-af25c1b1",
     "title": "NEW WOMAN",
     "originalArtist": "LISA",
     "tags": [],
@@ -3457,6 +3649,7 @@
   },
   {
     "id": "song-af87c0e3",
+    "workId": "work-song-1058",
     "title": "悪魔の子",
     "originalArtist": "ヒグチアイ",
     "tags": [],
@@ -3475,6 +3668,7 @@
   },
   {
     "id": "song-b0139d6c",
+    "workId": "work-song-b0139d6c",
     "title": "Talk to Me",
     "originalArtist": "Damiano David, Tyla, Nile Rodgers",
     "tags": [],
@@ -3493,6 +3687,7 @@
   },
   {
     "id": "song-b0d46d2c",
+    "workId": "work-song-753c615b",
     "title": "斑馬斑馬",
     "originalArtist": "宋冬野",
     "tags": [],
@@ -3511,6 +3706,7 @@
   },
   {
     "id": "song-b11670f4",
+    "workId": "work-song-1f2368eb",
     "title": "Toxic",
     "originalArtist": "Britney Spears",
     "tags": [],
@@ -3529,6 +3725,7 @@
   },
   {
     "id": "song-b14ffd93",
+    "workId": "work-song-b14ffd93",
     "title": "Blind to you",
     "originalArtist": "Aimer",
     "tags": [],
@@ -3547,6 +3744,7 @@
   },
   {
     "id": "song-b30beabf",
+    "workId": "work-song-68455697",
     "title": "不醉不會",
     "originalArtist": "田馥甄",
     "tags": [],
@@ -3565,6 +3763,7 @@
   },
   {
     "id": "song-b40670be",
+    "workId": "work-song-b40670be",
     "title": "Get Jinxed",
     "originalArtist": "Djerv",
     "tags": [],
@@ -3583,6 +3782,7 @@
   },
   {
     "id": "song-b454c033",
+    "workId": "work-song-02c7b728",
     "title": "Teeth",
     "originalArtist": "5 Seconds of Summer",
     "tags": [],
@@ -3601,6 +3801,7 @@
   },
   {
     "id": "song-b4d4bf13",
+    "workId": "work-song-b4d4bf13",
     "title": "Mono",
     "originalArtist": "i-dle",
     "tags": [],
@@ -3619,6 +3820,7 @@
   },
   {
     "id": "song-b550d60e",
+    "workId": "work-song-b550d60e",
     "title": "Bellyache",
     "originalArtist": "Billie Eilish",
     "tags": [],
@@ -3637,6 +3839,7 @@
   },
   {
     "id": "song-b64d229e",
+    "workId": "work-song-98d979a2",
     "title": "LOVE DIVE",
     "originalArtist": "IVE",
     "tags": [],
@@ -3655,6 +3858,7 @@
   },
   {
     "id": "song-b66d20f4",
+    "workId": "work-song-006cfcd3",
     "title": "怪物",
     "originalArtist": "YOASOBI",
     "tags": [],
@@ -3673,6 +3877,7 @@
   },
   {
     "id": "song-b6e5be49",
+    "workId": "work-song-b6e5be49",
     "title": "we can’t be friends (wait for your love)",
     "originalArtist": "Ariana Grande",
     "tags": [],
@@ -3691,6 +3896,7 @@
   },
   {
     "id": "song-b76b86db",
+    "workId": "work-song-b76b86db",
     "title": "HOWLING",
     "originalArtist": "XG",
     "tags": [],
@@ -3709,6 +3915,7 @@
   },
   {
     "id": "song-b7bc9014",
+    "workId": "work-song-1151",
     "title": "Love Me Like You Do",
     "originalArtist": "Ellie Goulding",
     "tags": [],
@@ -3727,6 +3934,7 @@
   },
   {
     "id": "song-b871330d",
+    "workId": "work-song-b871330d",
     "title": "send my love",
     "originalArtist": "adele",
     "tags": [],
@@ -3745,6 +3953,7 @@
   },
   {
     "id": "song-b8a7b19e",
+    "workId": "work-song-957ec9af",
     "title": "失戀無罪",
     "originalArtist": "A-Lin",
     "tags": [],
@@ -3763,6 +3972,7 @@
   },
   {
     "id": "song-b8f573c5",
+    "workId": "work-song-159",
     "title": "左手指月",
     "originalArtist": "薩頂頂",
     "tags": [],
@@ -3781,6 +3991,7 @@
   },
   {
     "id": "song-b9813aca",
+    "workId": "work-song-b9813aca",
     "title": "Oh My God",
     "originalArtist": "Adele",
     "tags": [],
@@ -3799,6 +4010,7 @@
   },
   {
     "id": "song-bad08b89",
+    "workId": "work-song-01548993",
     "title": "陰陽怪氣 Holy Moly",
     "originalArtist": "玥Itsuki",
     "tags": [],
@@ -3817,6 +4029,7 @@
   },
   {
     "id": "song-bb36445d",
+    "workId": "work-song-753c615b",
     "title": "斑馬斑馬",
     "originalArtist": "宋冬野",
     "tags": [],
@@ -3835,6 +4048,7 @@
   },
   {
     "id": "song-bb72a8ba",
+    "workId": "work-song-bb72a8ba",
     "title": "You Don't Own Me",
     "originalArtist": "Grace",
     "tags": [],
@@ -3853,6 +4067,7 @@
   },
   {
     "id": "song-bcf43d46",
+    "workId": "work-song-bcf43d46",
     "title": "化身孤島的鯨 (玥姐solo)",
     "originalArtist": "不才",
     "tags": [],
@@ -3871,6 +4086,7 @@
   },
   {
     "id": "song-bd31a301",
+    "workId": "work-song-bd31a301",
     "title": "New Rules",
     "originalArtist": "Dua Lipa",
     "tags": [],
@@ -3889,6 +4105,7 @@
   },
   {
     "id": "song-bd3e96ff",
+    "workId": "work-song-bd3e96ff",
     "title": "jagi",
     "originalArtist": "孫盛希 feat. KIRE",
     "tags": [],
@@ -3907,6 +4124,7 @@
   },
   {
     "id": "song-bf627c2f",
+    "workId": "work-song-bf627c2f",
     "title": "電線桿上的鳥",
     "originalArtist": "LÜCY",
     "tags": [],
@@ -3925,6 +4143,7 @@
   },
   {
     "id": "song-c0847d66",
+    "workId": "work-song-c0847d66",
     "title": "After LIKE",
     "originalArtist": "IVE",
     "tags": [],
@@ -3943,6 +4162,7 @@
   },
   {
     "id": "song-c1095ecc",
+    "workId": "work-song-c1095ecc",
     "title": "像無數的星星",
     "originalArtist": "Limi",
     "tags": [],
@@ -3961,6 +4181,7 @@
   },
   {
     "id": "song-c14230bb",
+    "workId": "work-song-7bbfd1ba",
     "title": "身騎白馬",
     "originalArtist": "徐佳瑩",
     "tags": [],
@@ -3979,6 +4200,7 @@
   },
   {
     "id": "song-c29f63b0",
+    "workId": "work-song-25",
     "title": "Speechless",
     "originalArtist": "Naomi Scott",
     "tags": [],
@@ -3997,6 +4219,7 @@
   },
   {
     "id": "song-c6583c73",
+    "workId": "work-song-c6583c73",
     "title": "Before Spring Ends",
     "originalArtist": "WANG OK",
     "tags": [],
@@ -4015,6 +4238,7 @@
   },
   {
     "id": "song-c6a07c1b",
+    "workId": "work-song-c6a07c1b",
     "title": "Stay With Me",
     "originalArtist": "松原みき",
     "tags": [],
@@ -4033,6 +4257,7 @@
   },
   {
     "id": "song-c76d5dca",
+    "workId": "work-song-c76d5dca",
     "title": "Zombie",
     "originalArtist": "The Cranberries",
     "tags": [],
@@ -4051,6 +4276,7 @@
   },
   {
     "id": "song-c7929255",
+    "workId": "work-song-c7929255",
     "title": "Disease",
     "originalArtist": "Lady Gaga",
     "tags": [],
@@ -4069,6 +4295,7 @@
   },
   {
     "id": "song-c82400e4",
+    "workId": "work-song-761e35a0",
     "title": "TOMBOY",
     "originalArtist": "(G)I-DLE",
     "tags": [],
@@ -4087,6 +4314,7 @@
   },
   {
     "id": "song-c9d58dbd",
+    "workId": "work-song-c9d58dbd",
     "title": "Sabor A Mi",
     "originalArtist": "Luis Miguel",
     "tags": [],
@@ -4105,6 +4333,7 @@
   },
   {
     "id": "song-cb1f67c3",
+    "workId": "work-song-cb1f67c3",
     "title": "STYX HELIX",
     "originalArtist": "MYTH&ROID",
     "tags": [],
@@ -4123,6 +4352,7 @@
   },
   {
     "id": "song-cc63372b",
+    "workId": "work-song-2ca5447e",
     "title": "革命道中",
     "originalArtist": "アイナ・ジ・エンド",
     "tags": [],
@@ -4141,6 +4371,7 @@
   },
   {
     "id": "song-cc9cb19a",
+    "workId": "work-song-cc9cb19a",
     "title": "28 Reasons",
     "originalArtist": "Seul Gi (슬기)",
     "tags": [],
@@ -4159,6 +4390,7 @@
   },
   {
     "id": "song-cd685a2f",
+    "workId": "work-song-3012",
     "title": "Free",
     "originalArtist": "KPop Demon Hunters",
     "tags": [],
@@ -4177,6 +4409,7 @@
   },
   {
     "id": "song-ceae407d",
+    "workId": "work-song-2756",
     "title": "七彩的微風",
     "originalArtist": "真珠美人魚",
     "tags": [],
@@ -4195,6 +4428,7 @@
   },
   {
     "id": "song-cecc7060",
+    "workId": "work-song-cecc7060",
     "title": "Afterthought",
     "originalArtist": "Joji & BENEE",
     "tags": [],
@@ -4213,6 +4447,7 @@
   },
   {
     "id": "song-cfdcc6f3",
+    "workId": "work-song-cfdcc6f3",
     "title": "HYPNOTIZE",
     "originalArtist": "XG",
     "tags": [],
@@ -4231,6 +4466,7 @@
   },
   {
     "id": "song-cfe636a1",
+    "workId": "work-song-cfe636a1",
     "title": "我這個人 (玥姐solo)",
     "originalArtist": "艾怡良",
     "tags": [],
@@ -4249,6 +4485,7 @@
   },
   {
     "id": "song-d03e80d1",
+    "workId": "work-song-a610c710",
     "title": "So Easy",
     "originalArtist": "Olivia Dean",
     "tags": [],
@@ -4267,6 +4504,7 @@
   },
   {
     "id": "song-d1b5fab6",
+    "workId": "work-song-d1b5fab6",
     "title": "Physical",
     "originalArtist": "Red Velvet",
     "tags": [],
@@ -4285,6 +4523,7 @@
   },
   {
     "id": "song-d2ed82b6",
+    "workId": "work-song-d2ed82b6",
     "title": "Hey Girl",
     "originalArtist": "小男孩樂團 Men Envy Children",
     "tags": [],
@@ -4303,6 +4542,7 @@
   },
   {
     "id": "song-d332b8e3",
+    "workId": "work-song-d332b8e3",
     "title": "M2M",
     "originalArtist": "CODY JON",
     "tags": [],
@@ -4321,6 +4561,7 @@
   },
   {
     "id": "song-d3c9bf7c",
+    "workId": "work-song-d3c9bf7c",
     "title": "畫心",
     "originalArtist": "張靚穎",
     "tags": [],
@@ -4339,6 +4580,7 @@
   },
   {
     "id": "song-d42f056c",
+    "workId": "work-song-d42f056c",
     "title": "Cool With You",
     "originalArtist": "NewJeans",
     "tags": [],
@@ -4357,6 +4599,7 @@
   },
   {
     "id": "song-d4682c9a",
+    "workId": "work-song-2503",
     "title": "TT",
     "originalArtist": "TWICE",
     "tags": [],
@@ -4375,6 +4618,7 @@
   },
   {
     "id": "song-d48d29bc",
+    "workId": "work-song-d48d29bc",
     "title": "Distance",
     "originalArtist": "Yebba",
     "tags": [],
@@ -4393,6 +4637,7 @@
   },
   {
     "id": "song-d4e7d378",
+    "workId": "work-song-7bbfd1ba",
     "title": "身騎白馬",
     "originalArtist": "徐佳瑩",
     "tags": [],
@@ -4411,6 +4656,7 @@
   },
   {
     "id": "song-d64847c8",
+    "workId": "work-song-4ec7244e",
     "title": "Ditto",
     "originalArtist": "NewJeans",
     "tags": [],
@@ -4429,6 +4675,7 @@
   },
   {
     "id": "song-d6d09c95",
+    "workId": "work-song-6167ca7b",
     "title": "Whiplash",
     "originalArtist": "aespa",
     "tags": [],
@@ -4447,6 +4694,7 @@
   },
   {
     "id": "song-d7121a80",
+    "workId": "work-song-d7121a80",
     "title": "ばかみたい",
     "originalArtist": "黒田崇矢",
     "tags": [],
@@ -4465,6 +4713,7 @@
   },
   {
     "id": "song-d799c9f5",
+    "workId": "work-song-d799c9f5",
     "title": "Flowers 鋼琴ver",
     "originalArtist": "Miley Cyrus",
     "tags": [],
@@ -4483,6 +4732,7 @@
   },
   {
     "id": "song-d7aae9a1",
+    "workId": "work-song-2663",
     "title": "暮光 Gloaming Light",
     "originalArtist": "扉暮IANVS",
     "tags": [],
@@ -4501,6 +4751,7 @@
   },
   {
     "id": "song-d7c76796",
+    "workId": "work-song-d7c76796",
     "title": "Ashes",
     "originalArtist": "Céline Dion",
     "tags": [],
@@ -4519,6 +4770,7 @@
   },
   {
     "id": "song-d81a8f81",
+    "workId": "work-song-4f120c43",
     "title": "不在一起就不會分開",
     "originalArtist": "洪佩瑜",
     "tags": [],
@@ -4537,6 +4789,7 @@
   },
   {
     "id": "song-d973fcad",
+    "workId": "work-song-d973fcad",
     "title": "無慣例的早晨",
     "originalArtist": "洪佩瑜",
     "tags": [],
@@ -4555,6 +4808,7 @@
   },
   {
     "id": "song-daefa172",
+    "workId": "work-song-d973fcad",
     "title": "無慣例的早晨",
     "originalArtist": "洪佩瑜",
     "tags": [],
@@ -4573,6 +4827,7 @@
   },
   {
     "id": "song-ddbdfd98",
+    "workId": "work-song-a9a4ba26",
     "title": "小幸運",
     "originalArtist": "田馥甄",
     "tags": [],
@@ -4591,6 +4846,7 @@
   },
   {
     "id": "song-df057336",
+    "workId": "work-song-1337",
     "title": "小半",
     "originalArtist": "陳粒",
     "tags": [],
@@ -4609,6 +4865,7 @@
   },
   {
     "id": "song-e03027c0",
+    "workId": "work-song-e03027c0",
     "title": "WILDFLOWER",
     "originalArtist": "Billie Eilish",
     "tags": [],
@@ -4627,6 +4884,7 @@
   },
   {
     "id": "song-e16a1817",
+    "workId": "work-song-e16a1817",
     "title": "Imaginary Friend",
     "originalArtist": "ITZY",
     "tags": [],
@@ -4645,6 +4903,7 @@
   },
   {
     "id": "song-e35723d4",
+    "workId": "work-song-97618aea",
     "title": "又三郎",
     "originalArtist": "ヨルシカ",
     "tags": [],
@@ -4663,6 +4922,7 @@
   },
   {
     "id": "song-e512e030",
+    "workId": "work-song-27a0d0b5",
     "title": "Stand Up",
     "originalArtist": "Cynthia Erivo",
     "tags": [],
@@ -4681,6 +4941,7 @@
   },
   {
     "id": "song-e797e639",
+    "workId": "work-song-e797e639",
     "title": "純妹妹",
     "originalArtist": "單依純",
     "tags": [],
@@ -4699,6 +4960,7 @@
   },
   {
     "id": "song-e830f58f",
+    "workId": "work-song-e830f58f",
     "title": "Never Gonna Give You Up",
     "originalArtist": "Rick Astley",
     "tags": [],
@@ -4717,6 +4979,7 @@
   },
   {
     "id": "song-e999e777",
+    "workId": "work-song-e999e777",
     "title": "VERTIGO",
     "originalArtist": "CITIZEN",
     "tags": [],
@@ -4735,6 +4998,7 @@
   },
   {
     "id": "song-e9e9abc7",
+    "workId": "work-song-e9e9abc7",
     "title": "Pacify Her",
     "originalArtist": "Melanie Martinez",
     "tags": [],
@@ -4753,6 +5017,7 @@
   },
   {
     "id": "song-eacf248e",
+    "workId": "work-song-eacf248e",
     "title": "Drunk On A Flight",
     "originalArtist": "Eloise",
     "tags": [],
@@ -4771,6 +5036,7 @@
   },
   {
     "id": "song-eb0a27aa",
+    "workId": "work-song-53a8a024",
     "title": "IRIS OUT",
     "originalArtist": "米津玄師",
     "tags": [],
@@ -4789,6 +5055,7 @@
   },
   {
     "id": "song-eb40c0bd",
+    "workId": "work-song-eb40c0bd",
     "title": "보여줄게",
     "originalArtist": "에일리",
     "tags": [],
@@ -4807,6 +5074,7 @@
   },
   {
     "id": "song-eb535364",
+    "workId": "work-song-12",
     "title": "Dangerous Woman",
     "originalArtist": "Ariana Grande",
     "tags": [],
@@ -4825,6 +5093,7 @@
   },
   {
     "id": "song-eb5769a7",
+    "workId": "work-song-440fcaa3",
     "title": "Michi Teyu Ku",
     "originalArtist": "Fujii Kaze",
     "tags": [],
@@ -4843,6 +5112,7 @@
   },
   {
     "id": "song-eb81c22d",
+    "workId": "work-song-eb81c22d",
     "title": "Maniac 鋼琴ver",
     "originalArtist": "Conan Gray",
     "tags": [],
@@ -4861,6 +5131,7 @@
   },
   {
     "id": "song-eb8f240c",
+    "workId": "work-song-2161",
     "title": "Style",
     "originalArtist": "Taylor Swift",
     "tags": [],
@@ -4879,6 +5150,7 @@
   },
   {
     "id": "song-ee36f5d1",
+    "workId": "work-song-ee36f5d1",
     "title": "Bang Bang",
     "originalArtist": "Jessie J ft. Ariana Grande, Nicki Minaj",
     "tags": [],
@@ -4897,6 +5169,7 @@
   },
   {
     "id": "song-f00ccf01",
+    "workId": "work-song-2666",
     "title": "BIRDS OF A FEATHER",
     "originalArtist": "Billie Eilish",
     "tags": [],
@@ -4915,6 +5188,7 @@
   },
   {
     "id": "song-f0317f5f",
+    "workId": "work-song-2338cdd2",
     "title": "Hype Boy",
     "originalArtist": "NewJeans",
     "tags": [],
@@ -4933,6 +5207,7 @@
   },
   {
     "id": "song-f086b39f",
+    "workId": "work-song-f086b39f",
     "title": "一萬次悲傷",
     "originalArtist": "逃跑計劃",
     "tags": [],
@@ -4951,6 +5226,7 @@
   },
   {
     "id": "song-f117147b",
+    "workId": "work-song-f117147b",
     "title": "すずめ (feat. 十明)",
     "originalArtist": "RADWIMPS",
     "tags": [],
@@ -4969,6 +5245,7 @@
   },
   {
     "id": "song-f20fd4bb",
+    "workId": "work-song-1539",
     "title": "いけないボーダーライン",
     "originalArtist": "ワルキューレ",
     "tags": [],
@@ -4987,6 +5264,7 @@
   },
   {
     "id": "song-f28de13c",
+    "workId": "work-song-f28de13c",
     "title": "怪獸",
     "originalArtist": "サカナクション",
     "tags": [],
@@ -5005,6 +5283,7 @@
   },
   {
     "id": "song-f363d6b8",
+    "workId": "work-song-0f4d0182",
     "title": "Always Remember Us This Way",
     "originalArtist": "Lady Gaga",
     "tags": [],
@@ -5023,6 +5302,7 @@
   },
   {
     "id": "song-f609fd5a",
+    "workId": "work-song-f609fd5a",
     "title": "雨不停。流",
     "originalArtist": "孫盛希",
     "tags": [],
@@ -5041,6 +5321,7 @@
   },
   {
     "id": "song-f7937c1c",
+    "workId": "work-song-f7937c1c",
     "title": "桜色の夢",
     "originalArtist": "Ending Theme",
     "tags": [],
@@ -5059,6 +5340,7 @@
   },
   {
     "id": "song-fcbd67d0",
+    "workId": "work-song-fcbd67d0",
     "title": "Espresso 鋼琴ver",
     "originalArtist": "Sabrina Carpenter",
     "tags": [],
@@ -5077,6 +5359,7 @@
   },
   {
     "id": "song-fcd9ed82",
+    "workId": "work-song-fcd9ed82",
     "title": "月牙灣",
     "originalArtist": "F.I.R.",
     "tags": [],
@@ -5095,6 +5378,7 @@
   },
   {
     "id": "song-fdde0894",
+    "workId": "work-song-104",
     "title": "Skyfall",
     "originalArtist": "Adele",
     "tags": [],

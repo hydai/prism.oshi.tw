@@ -1,6 +1,7 @@
 [
   {
     "id": "song-441640bd",
+    "workId": "work-song-441640bd",
     "title": "明明就（升1key破音ver）",
     "originalArtist": "周杰倫",
     "tags": [],
@@ -19,6 +20,7 @@
   },
   {
     "id": "song-472efcf3",
+    "workId": "work-song-1333",
     "title": "填空",
     "originalArtist": "家家",
     "tags": [],
@@ -37,6 +39,7 @@
   },
   {
     "id": "song-808dffab",
+    "workId": "work-song-808dffab",
     "title": "致你",
     "originalArtist": "yihuik苡慧",
     "tags": [],
@@ -55,6 +58,7 @@
   },
   {
     "id": "song-82fc451c",
+    "workId": "work-song-4b765c90",
     "title": "無人之島",
     "originalArtist": "任然",
     "tags": [],
@@ -73,6 +77,7 @@
   },
   {
     "id": "song-86d4637b",
+    "workId": "work-song-86d4637b",
     "title": "聽海",
     "originalArtist": "張惠妺",
     "tags": [],
@@ -91,6 +96,7 @@
   },
   {
     "id": "song-971c32a6",
+    "workId": "work-song-971c32a6",
     "title": "從前說",
     "originalArtist": "小阿七",
     "tags": [],
@@ -109,6 +115,7 @@
   },
   {
     "id": "song-da632b91",
+    "workId": "work-song-96a31be1",
     "title": "我太笨",
     "originalArtist": "錘娜麗莎",
     "tags": [],
@@ -127,6 +134,7 @@
   },
   {
     "id": "song-f4f5dece",
+    "workId": "work-song-f4f5dece",
     "title": "不眠之夜",
     "originalArtist": "HOYO-MiX",
     "tags": [],
@@ -145,6 +153,7 @@
   },
   {
     "id": "song-fff3233e",
+    "workId": "work-song-fff3233e",
     "title": "明明就（升1key）",
     "originalArtist": "周杰倫",
     "tags": [],

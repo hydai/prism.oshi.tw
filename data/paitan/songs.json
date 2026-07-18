@@ -1,6 +1,7 @@
 [
   {
     "id": "song-424e636c",
+    "workId": "work-song-424e636c",
     "title": "たばこ",
     "originalArtist": "コレサワ",
     "tags": [],
@@ -19,6 +20,7 @@
   },
   {
     "id": "song-9100b55e",
+    "workId": "work-song-07bab4f3",
     "title": "少女レイ",
     "originalArtist": "みきとP",
     "tags": [],
@@ -37,6 +39,7 @@
   },
   {
     "id": "song-fcf7d3f7",
+    "workId": "work-song-2ccade11",
     "title": "踊",
     "originalArtist": "Ado",
     "tags": [],

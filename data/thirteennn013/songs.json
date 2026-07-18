@@ -1,6 +1,7 @@
 [
   {
     "id": "song-144cd0fa",
+    "workId": "work-song-144cd0fa",
     "title": "Kick back",
     "originalArtist": "米津玄師",
     "tags": [],
@@ -19,6 +20,7 @@
   },
   {
     "id": "song-1f98c249",
+    "workId": "work-song-1f98c249",
     "title": "美人",
     "originalArtist": "ちゃんみな",
     "tags": [],
@@ -37,6 +39,7 @@
   },
   {
     "id": "song-2e099427",
+    "workId": "work-song-2022",
     "title": "ダーリン",
     "originalArtist": "須田景凪",
     "tags": [],
@@ -55,6 +58,7 @@
   },
   {
     "id": "song-7a79efd1",
+    "workId": "work-song-2ca5447e",
     "title": "革命道中",
     "originalArtist": "アイナ・ジ・エンド",
     "tags": [],
@@ -73,6 +77,7 @@
   },
   {
     "id": "song-8cab8997",
+    "workId": "work-song-1edb7152",
     "title": "Golden",
     "originalArtist": "HUNTR/X",
     "tags": [],
@@ -91,6 +96,7 @@
   },
   {
     "id": "song-a9488859",
+    "workId": "work-song-17",
     "title": "完全感覚Dreamer",
     "originalArtist": "ONE OK ROCK",
     "tags": [],
@@ -109,6 +115,7 @@
   },
   {
     "id": "song-aa13810b",
+    "workId": "work-song-2986",
     "title": "罪と罰",
     "originalArtist": "椎名林檎",
     "tags": [],
@@ -127,6 +134,7 @@
   },
   {
     "id": "song-aeda2a44",
+    "workId": "work-song-aeda2a44",
     "title": "擱淺",
     "originalArtist": "周杰倫",
     "tags": [],
@@ -145,6 +153,7 @@
   },
   {
     "id": "song-e86e70bc",
+    "workId": "work-song-1217",
     "title": "丸の内サディスティック",
     "originalArtist": "椎名林檎",
     "tags": [],
@@ -163,6 +172,7 @@
   },
   {
     "id": "song-f2b96314",
+    "workId": "work-song-1433",
     "title": "The Beginning",
     "originalArtist": "ONE OK ROCK",
     "tags": [],
@@ -181,6 +191,7 @@
   },
   {
     "id": "song-f637a748",
+    "workId": "work-song-f637a748",
     "title": "Save yourself",
     "originalArtist": "ONE OK ROCK",
     "tags": [],
