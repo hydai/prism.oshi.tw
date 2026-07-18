@@ -5,6 +5,7 @@ import { api } from './api/client';
 import Layout from './components/Layout';
 import Dashboard from './pages/Dashboard';
 import SongsList from './pages/SongsList';
+import GlobalWorks from './pages/GlobalWorks';
 import SongDetail from './pages/SongDetail';
 import StreamsList from './pages/StreamsList';
 import SubmitSong from './pages/SubmitSong';
@@ -58,6 +59,10 @@ export default function App() {
       <Routes>
         <Route path="/" element={<Dashboard />} />
         <Route path="/songs" element={<SongsList user={user} />} />
+        <Route
+          path="/works"
+          element={user.role === 'curator' ? <GlobalWorks /> : <Navigate to="/" replace />}
+        />
         <Route path="/songs/:id" element={<SongDetail user={user} />} />
         <Route path="/streams" element={<StreamsList user={user} />} />
         <Route path="/streams/:id" element={<StreamDetailPage user={user} />} />

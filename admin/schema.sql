@@ -2,6 +2,32 @@
 -- Cloudflare D1 (SQLite-based)
 -- Multi-streamer: all tables include streamer_id for data isolation
 
+-- Global song identities shared by every streamer. A work represents the
+-- underlying composition; streamer-local display and review state stay on
+-- songs so existing fan pages and moderation flows remain isolated.
+CREATE TABLE IF NOT EXISTS works (
+  id TEXT PRIMARY KEY,
+  title TEXT NOT NULL,
+  original_artist TEXT NOT NULL,
+  tags TEXT NOT NULL DEFAULT '[]' CHECK(json_valid(tags)),
+  created_at TEXT NOT NULL DEFAULT (datetime('now')),
+  updated_at TEXT NOT NULL DEFAULT (datetime('now')),
+  UNIQUE(title, original_artist)
+);
+
+-- Historical mapping for merged global works. Like song_aliases, source
+-- values are retained without a foreign key to the deleted source row.
+CREATE TABLE IF NOT EXISTS work_aliases (
+  source_work_id TEXT PRIMARY KEY,
+  canonical_work_id TEXT NOT NULL,
+  source_title TEXT NOT NULL,
+  source_original_artist TEXT NOT NULL,
+  source_tags TEXT NOT NULL CHECK(json_valid(source_tags)),
+  merged_by TEXT NOT NULL,
+  merged_at TEXT NOT NULL DEFAULT (datetime('now')),
+  CHECK(source_work_id <> canonical_work_id)
+);
+
 -- Songs staging table
 CREATE TABLE IF NOT EXISTS songs (
   id TEXT PRIMARY KEY,
@@ -33,6 +59,18 @@ CREATE TABLE IF NOT EXISTS song_aliases (
   merged_by TEXT NOT NULL,
   merged_at TEXT NOT NULL DEFAULT (datetime('now')),
   CHECK(source_song_id <> canonical_song_id)
+);
+
+-- Non-destructive many-to-one bridge from streamer-local songs to a global
+-- work. Keeping this as a separate table avoids rebuilding songs (and its
+-- performance foreign keys) when rolling the global catalog out to D1.
+CREATE TABLE IF NOT EXISTS song_work_links (
+  song_id TEXT PRIMARY KEY REFERENCES songs(id) ON DELETE CASCADE,
+  work_id TEXT NOT NULL REFERENCES works(id) ON DELETE RESTRICT,
+  link_method TEXT NOT NULL CHECK(link_method IN ('migration_exact', 'import_exact', 'manual')),
+  linked_by TEXT NOT NULL,
+  linked_at TEXT NOT NULL DEFAULT (datetime('now')),
+  updated_at TEXT NOT NULL DEFAULT (datetime('now'))
 );
 
 -- Performances (linked to songs)
@@ -75,8 +113,11 @@ CREATE INDEX IF NOT EXISTS idx_songs_status ON songs(status);
 CREATE INDEX IF NOT EXISTS idx_songs_streamer ON songs(streamer_id);
 CREATE INDEX IF NOT EXISTS idx_songs_streamer_status ON songs(streamer_id, status);
 CREATE INDEX IF NOT EXISTS idx_songs_streamer_title_artist ON songs(streamer_id, title, original_artist);
+CREATE INDEX IF NOT EXISTS idx_works_title_artist ON works(title, original_artist);
+CREATE INDEX IF NOT EXISTS idx_work_aliases_canonical ON work_aliases(canonical_work_id);
 CREATE INDEX IF NOT EXISTS idx_song_aliases_canonical ON song_aliases(canonical_song_id);
 CREATE INDEX IF NOT EXISTS idx_song_aliases_streamer ON song_aliases(streamer_id);
+CREATE INDEX IF NOT EXISTS idx_song_work_links_work ON song_work_links(work_id);
 CREATE INDEX IF NOT EXISTS idx_performances_song_id ON performances(song_id);
 CREATE INDEX IF NOT EXISTS idx_performances_stream_id ON performances(stream_id);
 CREATE INDEX IF NOT EXISTS idx_performances_status ON performances(status);

@@ -8,7 +8,8 @@
  *     "streamers": {
  *       "<slug>": {
  *         "lastSyncedAt":       ISO-8601 timestamp when sync-data last ran
- *         "maxSongUpdatedAt":   MAX(songs.updated_at) pulled that run
+ *         "maxSongUpdatedAt":   MAX(songs.updated_at, song_work_links.updated_at)
+ *                               pulled that run
  *         "maxPerfUpdatedAt":   MAX(performances.updated_at) pulled that run
  *         "maxStreamUpdatedAt": MAX(streams.updated_at) pulled that run
  *         "songsCount":         COUNT of approved songs at that time

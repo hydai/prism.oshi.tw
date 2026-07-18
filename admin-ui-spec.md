@@ -1,7 +1,7 @@
 # Prism Admin UI Specification
 
 > Comprehensive reference for discussing the admin dashboard redesign with designers.
-> Generated from the current codebase as of 2026-04-03.
+> Generated from the current codebase as of 2026-07-18.
 
 ---
 
@@ -24,6 +24,7 @@
 15. [Nova VOD Submissions](#15-nova-vod-submissions-novavods-page)
 16. [Crystal Tickets](#16-crystal-tickets-crystal-page)
 17. [Navigation Flow & Page Relationships](#17-navigation-flow--page-relationships)
+18. [Global Song Library](#18-global-song-library-works-page)
 
 ---
 
@@ -62,7 +63,7 @@
 - Options populated from `GET /api/streamers` (approved streamers only)
 
 #### 1.3 Navigation Links
-11 links in a vertical list, each styled as:
+Links in a vertical list, each styled as:
 - Rounded pill (`rounded-md px-3 py-2 text-sm font-medium`)
 - **Active**: `bg-slate-700 text-white`
 - **Inactive**: `text-slate-300 hover:bg-slate-800 hover:text-white`
@@ -72,6 +73,7 @@ Navigation items in order:
 |-------|-------|
 | Dashboard | `/` |
 | Songs | `/songs` |
+| Global Library (curator-only) | `/works` |
 | Streams | `/streams` |
 | Submit Song | `/submit/song` |
 | Submit Stream | `/submit/stream` |
@@ -110,6 +112,7 @@ Navigation items in order:
 - **Approve/Reject buttons**: curator-only
 - **Edit button** on Song Detail: curator-only (contributors cannot see it)
 - **Pipeline, Harmonizer, Nova, Crystal pages**: all API calls are curator-only, though the nav links remain visible
+- **Global Library**: route, navigation item, and API are curator-only
 
 ---
 
@@ -955,6 +958,8 @@ Dashboard ─┐
             │      ↑ (submit)
             │      └── Submit Song
             │
+            ├──→ Global Song Library (cross-streamer, curator-only)
+            │
             ├──→ Streams List ──→ Stream Detail ──→ (same as Stamp Editor features)
             │      ↑ (submit)
             │      └── Submit Stream
@@ -983,8 +988,9 @@ Dashboard ─┐
 - Submit Stream → Streams List (after submit or cancel)
 
 ### Data Dependencies
-- **Streamer selector** (global) affects all pages — changing it reloads data
+- **Streamer selector** affects streamer-scoped pages; the Global Library is the deliberate site-wide exception
 - **Songs** reference **Performances** which reference **Streams**
+- Streamer-local **Songs** reference one global **Work**; the Global Library aggregates those links across every streamer and is not scoped by the streamer selector
 - **Pipeline** creates Streams and Performances
 - **Harmonizer** modifies Song titles and artist names
 - **Nova Submissions** feeds the streamer selector dropdown
@@ -1011,3 +1017,31 @@ Dashboard ─┐
          └──── can unapprove ───────┘
                  back to pending
 ```
+
+---
+
+## 18. Global Song Library (`/works` page)
+
+### Purpose
+Curator-only, cross-streamer view of the composition catalog. A work is the shared identity for exact `title + original artist` matches; local song rows keep each streamer's moderation state, tags, and performances.
+
+### Scope and summary cards
+- The request deliberately omits the selected-streamer parameter and aggregates the entire site.
+- Five cards show: global works, works shared by multiple VTubers, linked local songs, linked performances, and unlinked local songs.
+- A non-zero unlinked count is highlighted in amber as a rollout/integrity warning.
+
+### Filters and table
+- Search by global title or original artist.
+- “Shared by multiple VTubers only” checkbox isolates likely cross-channel reuse.
+- Server-side sorting and 50-row pagination.
+
+| Column | Content |
+|--------|---------|
+| Title | Canonical work title plus global tag pills |
+| Original artist | Canonical original-artist text |
+| VTubers | Streamer slug pills for every linked local song |
+| Local songs | Number of linked streamer-local song rows |
+| Performances | Number of performances reachable through those songs |
+| Work ID | Stable global identity exported to fan-site `songs.json` as `workId` |
+
+The initial page is read-only. Global alias/merge controls can be layered on later without changing the existing song or performance IDs.

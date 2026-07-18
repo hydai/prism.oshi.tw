@@ -6,6 +6,7 @@ import { api, getCurrentStreamer, setCurrentStreamer, onStreamerChange } from '.
 const navItems: Array<{ to: string; label: string; curatorOnly?: boolean }> = [
   { to: '/', label: 'Dashboard' },
   { to: '/songs', label: 'Songs' },
+  { to: '/works', label: 'Global Library', curatorOnly: true },
   { to: '/streams', label: 'Streams' },
   { to: '/submit/song', label: 'Submit Song' },
   { to: '/submit/stream', label: 'Submit Stream' },

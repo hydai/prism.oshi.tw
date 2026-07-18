@@ -11,6 +11,8 @@ import type {
   StreamDetail,
   StampStats,
   Status,
+  GlobalWorkSummary,
+  GlobalWorkStats,
 } from '../shared/types';
 
 // --- Row → API type mappers ---
@@ -18,6 +20,7 @@ import type {
 export function songFromRow(row: SongRow): Song {
   return {
     id: row.id,
+    workId: row.work_id,
     title: row.title,
     originalArtist: row.original_artist,
     tags: JSON.parse(row.tags),
@@ -67,6 +70,12 @@ export function generateSongId(): string {
   return `song-${crypto.randomUUID().slice(0, 8)}`;
 }
 
+export function generateWorkId(): string {
+  // Global IDs live across every streamer, so retain the full UUID instead of
+  // the shorter local-entity suffixes used by songs and performances.
+  return `work-${crypto.randomUUID()}`;
+}
+
 export function generatePerformanceId(): string {
   return `p-${crypto.randomUUID().slice(0, 8)}`;
 }
@@ -79,6 +88,87 @@ export function generateStreamIdFallback(): string {
   return `stream-${crypto.randomUUID().slice(0, 8)}`;
 }
 
+type WorkLinkMethod = 'migration_exact' | 'import_exact' | 'manual';
+
+function prepareEnsureExactWork(
+  db: D1Database,
+  candidateWorkId: string,
+  title: string,
+  originalArtist: string,
+  tagsJson = '[]',
+): D1PreparedStatement {
+  return db.prepare(
+    `INSERT INTO works (id, title, original_artist, tags)
+     VALUES (?, ?, ?, ?)
+     ON CONFLICT(title, original_artist) DO NOTHING`,
+  ).bind(candidateWorkId, title, originalArtist, tagsJson);
+}
+
+function prepareLinkSongToExactWork(
+  db: D1Database,
+  songId: string,
+  title: string,
+  originalArtist: string,
+  linkMethod: WorkLinkMethod,
+  linkedBy: string,
+): D1PreparedStatement {
+  return db.prepare(
+    `INSERT OR IGNORE INTO song_work_links (
+       song_id, work_id, link_method, linked_by
+     )
+     SELECT ?, work.id, ?, ?
+     FROM works AS work
+     WHERE work.title = ? AND work.original_artist = ?`,
+  ).bind(songId, linkMethod, linkedBy, title, originalArtist);
+}
+
+function prepareEnsureWorkForSongUpdate(
+  db: D1Database,
+  candidateWorkId: string,
+  songId: string,
+  title: string | undefined,
+  originalArtist: string | undefined,
+  tags: string[] | undefined,
+): D1PreparedStatement {
+  return db.prepare(
+    `INSERT INTO works (id, title, original_artist, tags)
+     SELECT ?, COALESCE(?, song.title), COALESCE(?, song.original_artist),
+            COALESCE(?, song.tags)
+     FROM songs AS song
+     WHERE song.id = ?
+     ON CONFLICT(title, original_artist) DO NOTHING`,
+  ).bind(
+    candidateWorkId,
+    title ?? null,
+    originalArtist ?? null,
+    tags === undefined ? null : JSON.stringify(tags),
+    songId,
+  );
+}
+
+function prepareRelinkSongToExactWork(
+  db: D1Database,
+  songId: string,
+  linkedBy: string,
+): D1PreparedStatement {
+  return db.prepare(
+    `INSERT INTO song_work_links (
+       song_id, work_id, link_method, linked_by
+     )
+     SELECT song.id, work.id, 'manual', ?
+     FROM songs AS song
+     JOIN works AS work
+       ON work.title = song.title
+      AND work.original_artist = song.original_artist
+     WHERE song.id = ?
+     ON CONFLICT(song_id) DO UPDATE SET
+       work_id = excluded.work_id,
+       link_method = excluded.link_method,
+       linked_by = excluded.linked_by,
+       updated_at = datetime('now')`,
+  ).bind(linkedBy, songId);
+}
+
 // --- Query helpers ---
 
 export async function listSongs(
@@ -87,8 +177,16 @@ export async function listSongs(
   status?: string,
 ): Promise<Song[]> {
   const query = status
-    ? db.prepare('SELECT * FROM songs WHERE streamer_id = ? AND status = ? ORDER BY created_at DESC').bind(streamerId, status)
-    : db.prepare('SELECT * FROM songs WHERE streamer_id = ? ORDER BY created_at DESC').bind(streamerId);
+    ? db.prepare(`SELECT s.*, link.work_id
+        FROM songs AS s
+        LEFT JOIN song_work_links AS link ON link.song_id = s.id
+        WHERE s.streamer_id = ? AND s.status = ?
+        ORDER BY s.created_at DESC`).bind(streamerId, status)
+    : db.prepare(`SELECT s.*, link.work_id
+        FROM songs AS s
+        LEFT JOIN song_work_links AS link ON link.song_id = s.id
+        WHERE s.streamer_id = ?
+        ORDER BY s.created_at DESC`).bind(streamerId);
   const { results } = await query.all<SongRow>();
   return results.map(songFromRow);
 }
@@ -96,10 +194,10 @@ export async function listSongs(
 // --- Paginated song listing ---
 
 const SORT_COLUMN_MAP: Record<string, string> = {
-  title: 'title',
-  originalArtist: 'original_artist',
-  status: 'status',
-  createdAt: 'created_at',
+  title: 's.title',
+  originalArtist: 's.original_artist',
+  status: 's.status',
+  createdAt: 's.created_at',
 };
 
 export async function listSongsPaginated(
@@ -117,18 +215,18 @@ export async function listSongsPaginated(
   const page = Math.max(1, opts.page ?? 1);
   const pageSize = Math.min(100, Math.max(1, opts.pageSize ?? 50));
   const offset = (page - 1) * pageSize;
-  const sortCol = SORT_COLUMN_MAP[opts.sortBy ?? ''] ?? 'created_at';
+  const sortCol = SORT_COLUMN_MAP[opts.sortBy ?? ''] ?? 's.created_at';
   const sortDir = opts.sortDir === 'asc' ? 'ASC' : 'DESC';
 
-  const conditions: string[] = ['streamer_id = ?'];
+  const conditions: string[] = ['s.streamer_id = ?'];
   const binds: (string | number)[] = [streamerId];
 
   if (opts.status) {
-    conditions.push('status = ?');
+    conditions.push('s.status = ?');
     binds.push(opts.status);
   }
   if (opts.search) {
-    conditions.push('(title LIKE ? OR original_artist LIKE ?)');
+    conditions.push('(s.title LIKE ? OR s.original_artist LIKE ?)');
     const like = `%${opts.search}%`;
     binds.push(like, like);
   }
@@ -136,11 +234,16 @@ export async function listSongsPaginated(
   const where = conditions.join(' AND ');
 
   const countStmt = db
-    .prepare(`SELECT COUNT(*) AS cnt FROM songs WHERE ${where}`)
+    .prepare(`SELECT COUNT(*) AS cnt FROM songs AS s WHERE ${where}`)
     .bind(...binds);
   const dataStmt = db
     .prepare(
-      `SELECT * FROM songs WHERE ${where} ORDER BY ${sortCol} ${sortDir} LIMIT ? OFFSET ?`,
+      `SELECT s.*, link.work_id
+       FROM songs AS s
+       LEFT JOIN song_work_links AS link ON link.song_id = s.id
+       WHERE ${where}
+       ORDER BY ${sortCol} ${sortDir}
+       LIMIT ? OFFSET ?`,
     )
     .bind(...binds, pageSize, offset);
 
@@ -152,12 +255,167 @@ export async function listSongsPaginated(
   return { songs, total };
 }
 
+interface GlobalWorkSummaryRow {
+  id: string;
+  title: string;
+  original_artist: string;
+  tags: string;
+  streamer_count: number;
+  song_count: number;
+  performance_count: number;
+  streamer_ids: string;
+  created_at: string;
+  updated_at: string;
+}
+
+interface GlobalWorkStatsRow {
+  total_works: number;
+  shared_works: number;
+  linked_songs: number;
+  linked_performances: number;
+  unlinked_songs: number;
+}
+
+const GLOBAL_WORK_SORT_COLUMN_MAP: Record<string, string> = {
+  title: 'title',
+  originalArtist: 'original_artist',
+  streamerCount: 'streamer_count',
+  songCount: 'song_count',
+  performanceCount: 'performance_count',
+  updatedAt: 'updated_at',
+};
+
+export async function listGlobalWorksPaginated(
+  db: D1Database,
+  opts: {
+    search?: string;
+    sharedOnly?: boolean;
+    page?: number;
+    pageSize?: number;
+    sortBy?: string;
+    sortDir?: 'asc' | 'desc';
+  } = {},
+): Promise<{
+  works: GlobalWorkSummary[];
+  total: number;
+  stats: GlobalWorkStats;
+  page: number;
+  pageSize: number;
+}> {
+  const requestedPage = Number.isFinite(opts.page) ? Math.trunc(opts.page!) : 1;
+  const requestedPageSize = Number.isFinite(opts.pageSize) ? Math.trunc(opts.pageSize!) : 50;
+  const page = Math.max(1, requestedPage);
+  const pageSize = Math.min(100, Math.max(1, requestedPageSize));
+  const offset = (page - 1) * pageSize;
+  const sortCol = GLOBAL_WORK_SORT_COLUMN_MAP[opts.sortBy ?? ''] ?? 'performance_count';
+  const sortDir = opts.sortDir === 'asc' ? 'ASC' : 'DESC';
+
+  const searchWhere = opts.search
+    ? `WHERE instr(lower(work.title), lower(?)) > 0
+       OR instr(lower(work.original_artist), lower(?)) > 0`
+    : '';
+  const searchBinds = opts.search
+    ? [opts.search, opts.search]
+    : [];
+  const sharedWhere = opts.sharedOnly ? 'WHERE streamer_count > 1' : '';
+  const rollupSql = `
+    WITH work_rollup AS (
+      SELECT
+        work.id,
+        work.title,
+        work.original_artist,
+        work.tags,
+        COUNT(DISTINCT song.streamer_id) AS streamer_count,
+        COUNT(DISTINCT song.id) AS song_count,
+        COUNT(DISTINCT performance.id) AS performance_count,
+        GROUP_CONCAT(DISTINCT song.streamer_id) AS streamer_ids,
+        work.created_at,
+        work.updated_at
+      FROM works AS work
+      JOIN song_work_links AS link ON link.work_id = work.id
+      JOIN songs AS song ON song.id = link.song_id
+      LEFT JOIN performances AS performance ON performance.song_id = song.id
+      ${searchWhere}
+      GROUP BY
+        work.id, work.title, work.original_artist, work.tags,
+        work.created_at, work.updated_at
+    )`;
+
+  const countStatement = db
+    .prepare(`${rollupSql}
+      SELECT COUNT(*) AS count FROM work_rollup ${sharedWhere}`)
+    .bind(...searchBinds);
+  const dataStatement = db
+    .prepare(`${rollupSql}
+      SELECT * FROM work_rollup
+      ${sharedWhere}
+      ORDER BY ${sortCol} ${sortDir}, title ASC, original_artist ASC, id ASC
+      LIMIT ? OFFSET ?`)
+    .bind(...searchBinds, pageSize, offset);
+  const statsStatement = db.prepare(`
+    WITH active_works AS (
+      SELECT
+        link.work_id,
+        COUNT(DISTINCT song.streamer_id) AS streamer_count
+      FROM song_work_links AS link
+      JOIN songs AS song ON song.id = link.song_id
+      GROUP BY link.work_id
+    )
+    SELECT
+      (SELECT COUNT(*) FROM active_works) AS total_works,
+      (SELECT COUNT(*) FROM active_works WHERE streamer_count > 1) AS shared_works,
+      (SELECT COUNT(*) FROM song_work_links) AS linked_songs,
+      (
+        SELECT COUNT(*)
+        FROM performances AS performance
+        JOIN song_work_links AS link ON link.song_id = performance.song_id
+      ) AS linked_performances,
+      (
+        SELECT COUNT(*)
+        FROM songs AS song
+        LEFT JOIN song_work_links AS link ON link.song_id = song.id
+        WHERE link.song_id IS NULL
+      ) AS unlinked_songs`);
+
+  const [countResult, dataResult, statsResult] = await db.batch([
+    countStatement,
+    dataStatement,
+    statsStatement,
+  ]);
+  const total = (countResult.results[0] as { count: number } | undefined)?.count ?? 0;
+  const works = (dataResult.results as unknown as GlobalWorkSummaryRow[]).map((row) => ({
+    id: row.id,
+    title: row.title,
+    originalArtist: row.original_artist,
+    tags: JSON.parse(row.tags) as string[],
+    streamerCount: row.streamer_count,
+    songCount: row.song_count,
+    performanceCount: row.performance_count,
+    streamerIds: row.streamer_ids ? row.streamer_ids.split(',').sort() : [],
+    createdAt: row.created_at,
+    updatedAt: row.updated_at,
+  }));
+  const statsRow = statsResult.results[0] as GlobalWorkStatsRow | undefined;
+  const stats: GlobalWorkStats = {
+    totalWorks: statsRow?.total_works ?? 0,
+    sharedWorks: statsRow?.shared_works ?? 0,
+    linkedSongs: statsRow?.linked_songs ?? 0,
+    linkedPerformances: statsRow?.linked_performances ?? 0,
+    unlinkedSongs: statsRow?.unlinked_songs ?? 0,
+  };
+
+  return { works, total, stats, page, pageSize };
+}
+
 export async function getSongById(
   db: D1Database,
   id: string,
 ): Promise<Song | null> {
   const row = await db
-    .prepare('SELECT * FROM songs WHERE id = ?')
+    .prepare(`SELECT s.*, link.work_id
+      FROM songs AS s
+      LEFT JOIN song_work_links AS link ON link.song_id = s.id
+      WHERE s.id = ?`)
     .bind(id)
     .first<SongRow>();
   if (!row) return null;
@@ -180,18 +438,22 @@ export async function insertSong(
   tags: string[],
   submittedBy: string,
 ): Promise<void> {
-  await db
-    .prepare(
+  const workId = generateWorkId();
+  const tagsJson = JSON.stringify(tags);
+  await db.batch([
+    prepareEnsureExactWork(db, workId, title, originalArtist, tagsJson),
+    db.prepare(
       'INSERT INTO songs (id, streamer_id, title, original_artist, tags, status, submitted_by) VALUES (?, ?, ?, ?, ?, ?, ?)',
-    )
-    .bind(id, streamerId, title, originalArtist, JSON.stringify(tags), 'pending', submittedBy)
-    .run();
+    ).bind(id, streamerId, title, originalArtist, tagsJson, 'pending', submittedBy),
+    prepareLinkSongToExactWork(db, id, title, originalArtist, 'import_exact', submittedBy),
+  ]);
 }
 
 export async function updateSong(
   db: D1Database,
   id: string,
   fields: { title?: string; originalArtist?: string; tags?: string[] },
+  updatedBy = 'system:song-update',
 ): Promise<void> {
   const sets: string[] = [];
   const values: (string | number)[] = [];
@@ -214,10 +476,30 @@ export async function updateSong(
   sets.push("updated_at = datetime('now')");
   values.push(id);
 
-  await db
+  const updateStatement = db
     .prepare(`UPDATE songs SET ${sets.join(', ')} WHERE id = ?`)
-    .bind(...values)
-    .run();
+    .bind(...values);
+
+  if (fields.title === undefined && fields.originalArtist === undefined) {
+    await updateStatement.run();
+    return;
+  }
+
+  // A title/artist edit changes the exact global identity. Create or reuse the
+  // destination work, update the streamer-local song, then repoint its bridge
+  // in one ordered D1 batch so the two catalog layers cannot drift apart.
+  await db.batch([
+    prepareEnsureWorkForSongUpdate(
+      db,
+      generateWorkId(),
+      id,
+      fields.title,
+      fields.originalArtist,
+      fields.tags,
+    ),
+    updateStatement,
+    prepareRelinkSongToExactWork(db, id, updatedBy),
+  ]);
 }
 
 export async function updateSongStatus(
@@ -489,6 +771,14 @@ interface NewExactSong extends ExactSongIdentity {
   id: string;
 }
 
+interface ExactWorkCandidate extends ExactSongIdentity {
+  id: string;
+}
+
+interface ExactSongLink extends ExactSongIdentity {
+  songId: string;
+}
+
 function exactSongIdentityKey(identity: ExactSongIdentity): string {
   return JSON.stringify([identity.title, identity.originalArtist]);
 }
@@ -504,7 +794,12 @@ async function resolveExactSongIds(
   streamerId: string,
   identities: ExactSongIdentity[],
   excludeSongsOnlyInStreamId?: string,
-): Promise<{ songIds: string[]; newSongs: NewExactSong[] }> {
+): Promise<{
+  songIds: string[];
+  newSongs: NewExactSong[];
+  workCandidates: ExactWorkCandidate[];
+  songLinks: ExactSongLink[];
+}> {
   const uniqueByKey = new Map<string, ExactSongIdentity>();
   for (const identity of identities) {
     uniqueByKey.set(exactSongIdentityKey(identity), identity);
@@ -559,9 +854,20 @@ async function resolveExactSongIds(
     newSongs.push(song);
   }
 
+  const workCandidates: ExactWorkCandidate[] = unique.map(([, identity]) => ({
+    ...identity,
+    id: generateWorkId(),
+  }));
+  const songLinks: ExactSongLink[] = unique.map(([key, identity]) => ({
+    ...identity,
+    songId: assignedByKey.get(key)!,
+  }));
+
   return {
     songIds: identities.map((identity) => assignedByKey.get(exactSongIdentityKey(identity))!),
     newSongs,
+    workCandidates,
+    songLinks,
   };
 }
 
@@ -579,19 +885,32 @@ export async function createSongAndPerformance(
   note: string,
   submittedBy: string,
 ): Promise<{ songId: string; performanceId: string }> {
-  const { songIds, newSongs } = await resolveExactSongIds(db, streamerId, [
+  const { songIds, newSongs, workCandidates, songLinks } = await resolveExactSongIds(db, streamerId, [
     { title, originalArtist },
   ]);
   const songId = songIds[0];
   const perfId = generatePerformanceId();
 
-  const statements: D1PreparedStatement[] = newSongs.map((song) =>
+  const statements: D1PreparedStatement[] = workCandidates.map((work) =>
+    prepareEnsureExactWork(db, work.id, work.title, work.originalArtist),
+  );
+  statements.push(...newSongs.map((song) =>
     db
       .prepare(
         'INSERT INTO songs (id, streamer_id, title, original_artist, tags, status, submitted_by) VALUES (?, ?, ?, ?, ?, ?, ?)',
       )
       .bind(song.id, streamerId, song.title, song.originalArtist, '[]', 'pending', submittedBy),
-  );
+  ));
+  statements.push(...songLinks.map((link) =>
+    prepareLinkSongToExactWork(
+      db,
+      link.songId,
+      link.title,
+      link.originalArtist,
+      'import_exact',
+      submittedBy,
+    ),
+  ));
   statements.push(
     db
       .prepare(
@@ -636,6 +955,7 @@ export async function updatePerformanceSongDetails(
   db: D1Database,
   perfId: string,
   fields: { title?: string; originalArtist?: string },
+  updatedBy = 'system:performance-update',
 ): Promise<boolean> {
   const row = await db
     .prepare('SELECT song_id FROM performances WHERE id = ?')
@@ -646,7 +966,7 @@ export async function updatePerformanceSongDetails(
   await updateSong(db, row.song_id, {
     title: fields.title,
     originalArtist: fields.originalArtist,
-  });
+  }, updatedBy);
   return true;
 }
 
@@ -723,13 +1043,15 @@ export async function bulkCreatePerformances(
     title: song.songName,
     originalArtist: song.artist || 'Unknown',
   }));
-  const { songIds, newSongs } = await resolveExactSongIds(
+  const { songIds, newSongs, workCandidates, songLinks } = await resolveExactSongIds(
     db,
     streamerId,
     identities,
     replace ? streamId : undefined,
   );
-  const stmts: D1PreparedStatement[] = [];
+  const stmts: D1PreparedStatement[] = workCandidates.map((work) =>
+    prepareEnsureExactWork(db, work.id, work.title, work.originalArtist),
+  );
 
   if (replace) {
     stmts.push(
@@ -754,6 +1076,19 @@ export async function bulkCreatePerformances(
       db.prepare(
         'INSERT INTO songs (id, streamer_id, title, original_artist, tags, status, submitted_by) VALUES (?, ?, ?, ?, ?, ?, ?)',
       ).bind(song.id, streamerId, song.title, song.originalArtist, '[]', 'pending', submittedBy),
+    );
+  }
+
+  for (const link of songLinks) {
+    stmts.push(
+      prepareLinkSongToExactWork(
+        db,
+        link.songId,
+        link.title,
+        link.originalArtist,
+        'import_exact',
+        submittedBy,
+      ),
     );
   }
 
@@ -840,13 +1175,34 @@ export async function importVodToAdminDb(
     title: song.song_title,
     originalArtist: song.original_artist || 'Unknown',
   }));
-  const { songIds, newSongs } = await resolveExactSongIds(db, streamerId, identities);
+  const { songIds, newSongs, workCandidates, songLinks } = await resolveExactSongIds(
+    db,
+    streamerId,
+    identities,
+  );
+
+  for (const work of workCandidates) {
+    stmts.push(prepareEnsureExactWork(db, work.id, work.title, work.originalArtist));
+  }
 
   for (const song of newSongs) {
     stmts.push(
       db.prepare(
         'INSERT INTO songs (id, streamer_id, title, original_artist, tags, status, submitted_by) VALUES (?, ?, ?, ?, ?, ?, ?)',
       ).bind(song.id, streamerId, song.title, song.originalArtist, '[]', 'pending', submittedBy),
+    );
+  }
+
+  for (const link of songLinks) {
+    stmts.push(
+      prepareLinkSongToExactWork(
+        db,
+        link.songId,
+        link.title,
+        link.originalArtist,
+        'import_exact',
+        submittedBy,
+      ),
     );
   }
 
@@ -1100,7 +1456,12 @@ export async function getDashboardStats(db: D1Database, streamerId: string) {
   ]);
 
   const { results: recentSongRows } = await db
-    .prepare("SELECT * FROM songs WHERE streamer_id = ? ORDER BY created_at DESC LIMIT 5")
+    .prepare(`SELECT song.*, link.work_id
+      FROM songs AS song
+      LEFT JOIN song_work_links AS link ON link.song_id = song.id
+      WHERE song.streamer_id = ?
+      ORDER BY song.created_at DESC
+      LIMIT 5`)
     .bind(streamerId)
     .all<SongRow>();
   const { results: recentStreamRows } = await db
@@ -1120,7 +1481,11 @@ export async function getDashboardStats(db: D1Database, streamerId: string) {
 
 export async function exportSongs(db: D1Database, streamerId: string) {
   const { results: songRows } = await db
-    .prepare("SELECT * FROM songs WHERE streamer_id = ? AND status = 'approved' ORDER BY title")
+    .prepare(`SELECT song.*, link.work_id
+      FROM songs AS song
+      LEFT JOIN song_work_links AS link ON link.song_id = song.id
+      WHERE song.streamer_id = ? AND song.status = 'approved'
+      ORDER BY song.title`)
     .bind(streamerId)
     .all<SongRow>();
   const { results: perfRows } = await db
@@ -1137,6 +1502,7 @@ export async function exportSongs(db: D1Database, streamerId: string) {
 
   return songRows.map((row) => ({
     id: row.id,
+    ...(row.work_id ? { workId: row.work_id } : {}),
     title: row.title,
     originalArtist: row.original_artist,
     tags: JSON.parse(row.tags) as string[],
@@ -1564,16 +1930,19 @@ export async function mergeSongs(
 export async function batchUpdateSongs(
   db: D1Database,
   updates: Array<{ songId: string; title?: string; originalArtist?: string }>,
+  updatedBy = 'system:harmonizer',
 ): Promise<number> {
   if (updates.length === 0) return 0;
 
-  // Chunk by 50 for D1 batch limits
-  const CHUNK_SIZE = 50;
+  // Each identity update emits three ordered statements (ensure work, update
+  // local song, relink work), so keep each D1 batch comfortably bounded.
+  const CHUNK_SIZE = 25;
   let totalUpdated = 0;
 
   for (let i = 0; i < updates.length; i += CHUNK_SIZE) {
     const chunk = updates.slice(i, i + CHUNK_SIZE);
     const stmts: D1PreparedStatement[] = [];
+    const updateStatementIndexes: number[] = [];
 
     for (const u of chunk) {
       const sets: string[] = [];
@@ -1594,14 +1963,26 @@ export async function batchUpdateSongs(
       values.push(u.songId);
 
       stmts.push(
+        prepareEnsureWorkForSongUpdate(
+          db,
+          generateWorkId(),
+          u.songId,
+          u.title,
+          u.originalArtist,
+          undefined,
+        ),
+      );
+      updateStatementIndexes.push(stmts.length);
+      stmts.push(
         db.prepare(`UPDATE songs SET ${sets.join(', ')} WHERE id = ?`).bind(...values),
+        prepareRelinkSongToExactWork(db, u.songId, updatedBy),
       );
     }
 
     if (stmts.length > 0) {
       const results = await db.batch(stmts);
-      for (const r of results) {
-        totalUpdated += r.meta.changes;
+      for (const index of updateStatementIndexes) {
+        totalUpdated += results[index].meta.changes;
       }
     }
   }

@@ -1,9 +1,12 @@
 import {
   bulkUnapproveStream,
   deleteStreamCascade,
+  exportSongs,
   importVodToAdminDb,
+  listGlobalWorksPaginated,
   mergeSongs,
   SongMergeError,
+  updateSong,
 } from './db';
 
 declare const process: { exitCode?: number };
@@ -54,8 +57,24 @@ class FakeStatement {
     if (this.sql.includes('FROM songs') && this.sql.includes('id IN')) {
       return { results: this.fakeDb.mergeRows as T[] };
     }
+    if (this.sql.includes('FROM songs AS song') && this.sql.includes('LEFT JOIN song_work_links')) {
+      return { results: this.fakeDb.exportSongRows as T[] };
+    }
+    if (this.sql.includes('FROM performances WHERE streamer_id = ?')) {
+      return { results: this.fakeDb.exportPerformanceRows as T[] };
+    }
     return { results: [] };
   }
+
+  async run(): Promise<{ meta: { changes: number } }> {
+    return { meta: { changes: 1 } };
+  }
+}
+
+interface GlobalWorkFixture {
+  count: number;
+  rows: unknown[];
+  stats: unknown;
 }
 
 class FakeD1Database {
@@ -67,6 +86,9 @@ class FakeD1Database {
     readonly existingStream: ExistingStream,
     readonly exactSongId: string | null = null,
     readonly mergeRows: unknown[] = [],
+    readonly globalWorkFixture: GlobalWorkFixture | null = null,
+    readonly exportSongRows: unknown[] = [],
+    readonly exportPerformanceRows: unknown[] = [],
   ) {}
 
   prepare(sql: string): FakeStatement {
@@ -77,6 +99,14 @@ class FakeD1Database {
     this.batchStatements.push(
       ...statements.map((statement) => ({ sql: statement.sql, params: statement.params })),
     );
+    if (this.globalWorkFixture && statements[0]?.sql.includes('WITH work_rollup')) {
+      return [
+        { results: [{ count: this.globalWorkFixture.count }], meta: { changes: 0 } },
+        { results: this.globalWorkFixture.rows, meta: { changes: 0 } },
+        { results: [this.globalWorkFixture.stats], meta: { changes: 0 } },
+      ];
+    }
+
     return statements.map((statement) => {
       if (statement.sql.includes('SELECT s.id') && statement.sql.includes('s.original_artist = ?')) {
         return {
@@ -245,11 +275,113 @@ async function testVodImportReusesExactSong(): Promise<void> {
   );
   assertEqual(songInserts.length, 0, 'an exact existing song must be reused instead of duplicated');
 
+  const workInserts = fakeDb.batchStatements.filter((statement) =>
+    /INSERT\s+INTO\s+works/i.test(statement.sql),
+  );
+  assertEqual(workInserts.length, 1, 'an exact import ensures one global work identity');
+  const workLinks = fakeDb.batchStatements.filter((statement) =>
+    /INSERT\s+OR\s+IGNORE\s+INTO\s+song_work_links/i.test(statement.sql),
+  );
+  assertEqual(workLinks.length, 1, 'a reused local song is linked to its exact global work');
+
   const performanceInsert = fakeDb.batchStatements.find((statement) =>
     /INSERT\s+INTO\s+performances/i.test(statement.sql),
   );
   if (!performanceInsert) throw new Error('reused song should still receive a new performance');
   assertEqual(performanceInsert.params[PERF_SONG_ID], 'song-canonical', 'new performance links to exact canonical song');
+}
+
+async function testSongIdentityEditRelinksGlobalWorkAtomically(): Promise<void> {
+  const fakeDb = new FakeD1Database(null);
+  await updateSong(
+    fakeDb as unknown as D1Database,
+    'song-local',
+    { title: 'Canonical Title', originalArtist: 'Original Artist' },
+    'curator@example.com',
+  );
+
+  assertEqual(fakeDb.batchStatements.length, 3, 'identity edit uses one ordered three-statement batch');
+  assert(/INSERT\s+INTO\s+works/i.test(fakeDb.batchStatements[0].sql), 'destination global work is ensured first');
+  assert(/UPDATE\s+songs/i.test(fakeDb.batchStatements[1].sql), 'local song identity updates second');
+  assert(/INSERT\s+INTO\s+song_work_links/i.test(fakeDb.batchStatements[2].sql), 'global bridge is relinked last');
+  assert(/ON\s+CONFLICT\s*\(song_id\)\s+DO\s+UPDATE/i.test(fakeDb.batchStatements[2].sql), 'existing bridge is repointed, not duplicated');
+  assertEqual(fakeDb.batchStatements[2].params[0], 'curator@example.com', 'relink records the responsible curator');
+  assertEqual(fakeDb.batchStatements[2].params[1], 'song-local', 'relink remains scoped to the edited local song');
+}
+
+async function testGlobalWorksListAggregatesAcrossStreamers(): Promise<void> {
+  const longSearch = '窗外下著雨看著路上撐傘的行人害我一直想到你';
+  assert(new TextEncoder().encode(longSearch).length > 48, 'regression search exceeds D1 LIKE pattern limit');
+  const fakeDb = new FakeD1Database(null, null, [], {
+    count: 1,
+    rows: [{
+      id: 'work-shared',
+      title: 'Shared Song',
+      original_artist: 'Original Artist',
+      tags: '["pop"]',
+      streamer_count: 2,
+      song_count: 3,
+      performance_count: 7,
+      streamer_ids: 'bob,alice',
+      created_at: '2026-01-01',
+      updated_at: '2026-01-02',
+    }],
+    stats: {
+      total_works: 4,
+      shared_works: 1,
+      linked_songs: 6,
+      linked_performances: 12,
+      unlinked_songs: 0,
+    },
+  });
+
+  const result = await listGlobalWorksPaginated(fakeDb as unknown as D1Database, {
+    search: longSearch,
+    sharedOnly: true,
+    page: 2,
+    pageSize: 25,
+    sortBy: 'streamerCount',
+    sortDir: 'asc',
+  });
+
+  assertEqual(result.page, 2, 'global page preserves valid requested page');
+  assertEqual(result.pageSize, 25, 'global page preserves valid requested page size');
+  assertEqual(result.works[0].id, 'work-shared', 'global work row is mapped');
+  assertEqual(result.works[0].streamerIds.join('|'), 'alice|bob', 'cross-streamer membership is stable');
+  assertEqual(result.stats.linkedPerformances, 12, 'site-wide coverage stats are mapped');
+
+  const countQuery = fakeDb.batchStatements[0];
+  const dataQuery = fakeDb.batchStatements[1];
+  assert(/WHERE\s+streamer_count\s+>\s+1/i.test(countQuery.sql), 'shared-only filter is applied after aggregation');
+  assert(/ORDER\s+BY\s+streamer_count\s+ASC/i.test(dataQuery.sql), 'sort column is selected from the safe allowlist');
+  assert(/instr\s*\(\s*lower\(work\.title\)/i.test(dataQuery.sql), 'title search avoids D1 LIKE pattern limits');
+  assert(/instr\s*\(\s*lower\(work\.original_artist\)/i.test(dataQuery.sql), 'artist search avoids D1 LIKE pattern limits');
+  assert(!/\bLIKE\b/i.test(dataQuery.sql), 'global search does not build a length-limited LIKE pattern');
+  assertEqual(dataQuery.params[0], longSearch, 'title search is bound without wildcard expansion');
+  assertEqual(dataQuery.params[1], longSearch, 'artist search is bound without wildcard expansion');
+  assertEqual(dataQuery.params[2], 25, 'page size is bound');
+  assertEqual(dataQuery.params[3], 25, 'second-page offset is bound');
+}
+
+async function testFanSiteExportOmitsNullWorkIds(): Promise<void> {
+  const baseSong = {
+    original_artist: 'Original Artist',
+    tags: '[]',
+    status: 'approved',
+    submitted_by: null,
+    reviewed_by: null,
+    created_at: '2026-01-01',
+    updated_at: '2026-01-02',
+  };
+  const fakeDb = new FakeD1Database(null, null, [], null, [
+    { ...baseSong, id: 'song-linked', work_id: 'work-shared', title: 'Linked Song' },
+    { ...baseSong, id: 'song-unlinked', work_id: null, title: 'Unlinked Song' },
+  ]);
+
+  const songs = await exportSongs(fakeDb as unknown as D1Database, 'alice');
+
+  assertEqual(songs[0].workId, 'work-shared', 'linked fan-site song exports its global work ID');
+  assert(!Object.prototype.hasOwnProperty.call(songs[1], 'workId'), 'unlinked fan-site song omits workId instead of exporting null');
 }
 
 function mergeRow(
@@ -359,6 +491,9 @@ async function main(): Promise<void> {
   await testVodImportPreservesExistingStream();
   await testVodImportCreatesNewStreamWhenAbsent();
   await testVodImportReusesExactSong();
+  await testSongIdentityEditRelinksGlobalWorkAtomically();
+  await testGlobalWorksListAggregatesAcrossStreamers();
+  await testFanSiteExportOmitsNullWorkIds();
   await testMergeSongsPreservesPerformances();
   await testMergeSongsRejectsMissingOrCrossStreamerSource();
   await testSharedSongsSurviveStreamMutations();

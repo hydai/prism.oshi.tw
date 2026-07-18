@@ -3,8 +3,8 @@ import { requireApiRequestAuthenticity, requireAuth, requireCurator } from './au
 import { getRouteParam, getStreamerId } from './http';
 import { canHardDeleteStream, isValidTransition, shouldImportVod, VALID_STATUSES } from './status';
 import {
-  listSongs,
   listSongsPaginated,
+  listGlobalWorksPaginated,
   getSongById,
   insertSong,
   updateSong,
@@ -110,6 +110,7 @@ import type {
   CrystalTicketStatus,
   BulkFetchSubscribersResult,
   BulkFetchSubscribersResponse,
+  GlobalWorksResponse,
 } from '../shared/types';
 
 type Bindings = {
@@ -233,6 +234,36 @@ app.get('/api/streamers', async (c) => {
   return c.json({ data });
 });
 
+// --- Global works (cross-streamer) ---
+
+app.get('/api/works', requireCurator, async (c) => {
+  const search = c.req.query('search')?.trim() || undefined;
+  const page = Number.parseInt(c.req.query('page') || '1', 10);
+  const pageSize = Number.parseInt(c.req.query('pageSize') || '50', 10);
+  const sortBy = c.req.query('sortBy');
+  const sortDir = c.req.query('sortDir') as 'asc' | 'desc' | undefined;
+  const sharedOnlyValue = c.req.query('sharedOnly');
+  const sharedOnly = sharedOnlyValue === 'true' || sharedOnlyValue === '1';
+
+  const result = await listGlobalWorksPaginated(c.env.DB, {
+    search,
+    sharedOnly,
+    page,
+    pageSize,
+    sortBy,
+    sortDir,
+  });
+  const response: GlobalWorksResponse = {
+    data: result.works,
+    total: result.total,
+    page: result.page,
+    pageSize: result.pageSize,
+    totalPages: Math.ceil(result.total / result.pageSize),
+    stats: result.stats,
+  };
+  return c.json(response);
+});
+
 // --- Songs ---
 
 app.get('/api/songs', async (c) => {
@@ -321,7 +352,7 @@ app.put('/api/songs/:id', async (c) => {
     title: body.title,
     originalArtist: body.originalArtist,
     tags: body.tags,
-  });
+  }, user.email);
 
   const updated = await getSongById(c.env.DB, id);
   return c.json(updated);
@@ -581,7 +612,7 @@ app.patch('/api/performances/:id/details', requireCurator, async (c) => {
   const updated = await updatePerformanceSongDetails(c.env.DB, id, {
     title: body.title,
     originalArtist: body.originalArtist,
-  });
+  }, c.get('user').email);
   if (!updated) return c.json({ error: 'Performance not found' }, 404);
   return c.json({ ok: true });
 });
@@ -1167,7 +1198,7 @@ app.post('/api/harmonize/apply', requireCurator, async (c) => {
     return c.json({ error: 'updates array is required' }, 400);
   }
 
-  const updated = await batchUpdateSongs(c.env.DB, body.updates);
+  const updated = await batchUpdateSongs(c.env.DB, body.updates, c.get('user').email);
   return c.json({ ok: true, updated });
 });
 

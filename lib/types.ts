@@ -11,6 +11,8 @@ export interface Performance {
 
 export interface Song {
   id: string;
+  /** Cross-streamer composition identity. Older static exports may omit it. */
+  workId?: string;
   title: string;
   originalArtist: string;
   tags: string[];

@@ -42,6 +42,7 @@ import type {
   HarmonizeMergeResponse,
   HarmonizeMatchType,
   BulkFetchSubscribersResponse,
+  GlobalWorksResponse,
 } from '../../../shared/types';
 import { REQUEST_AUTHENTICITY_HEADER, REQUEST_AUTHENTICITY_VALUE } from '../../../shared/csrf';
 import type {
@@ -206,6 +207,30 @@ export const api = {
     if (params?.sortDir) sp.set('sortDir', params.sortDir);
     const qs = sp.toString();
     return request<PaginatedResponse<Song>>(`/api/songs${qs ? `?${qs}` : ''}`);
+  },
+
+  // Cross-streamer global song library
+  listGlobalWorks: (params?: {
+    search?: string;
+    sharedOnly?: boolean;
+    page?: number;
+    pageSize?: number;
+    sortBy?: string;
+    sortDir?: 'asc' | 'desc';
+  }) => {
+    const sp = new URLSearchParams();
+    if (params?.search) sp.set('search', params.search);
+    if (params?.sharedOnly) sp.set('sharedOnly', 'true');
+    if (params?.page) sp.set('page', String(params.page));
+    if (params?.pageSize) sp.set('pageSize', String(params.pageSize));
+    if (params?.sortBy) sp.set('sortBy', params.sortBy);
+    if (params?.sortDir) sp.set('sortDir', params.sortDir);
+    const qs = sp.toString();
+    return request<GlobalWorksResponse>(
+      `/api/works${qs ? `?${qs}` : ''}`,
+      undefined,
+      { skipStreamer: true },
+    );
   },
 
   getSong: (id: string) => request<Song>(`/api/songs/${id}`),

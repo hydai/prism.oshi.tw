@@ -48,8 +48,8 @@ class RecordingD1 {
     return new RecordingStatement(this, sql);
   }
 
-  async batch(statements: RecordingStatement[]): Promise<Array<{ meta: { changes: number } }>> {
-    return statements.map(() => ({ meta: { changes: 0 } }));
+  async batch(statements: RecordingStatement[]): Promise<Array<{ results: unknown[]; meta: { changes: number } }>> {
+    return statements.map(() => ({ results: [], meta: { changes: 0 } }));
   }
 }
 
@@ -98,9 +98,10 @@ function reqInit(route: Route, email: string): RequestInit {
   return init;
 }
 
-// Every stamp-editor mutation route. These edit/delete approved catalog staging
-// data, so they must be curator-only — a contributor must never reach the DB.
+// Curator-only catalog and publication routes. A contributor must never reach
+// the data layer for any of them, including the read-only global catalog.
 const PROTECTED_ROUTES: Route[] = [
+  { method: 'GET', path: '/api/works' },
   { method: 'PATCH', path: '/api/performances/perf-1/timestamps', body: { timestamp: 999, endTimestamp: 1001 } },
   { method: 'PATCH', path: '/api/performances/perf-1/details', body: { title: 'Hacked', originalArtist: 'Hacker' } },
   { method: 'DELETE', path: '/api/performances/perf-1' },
@@ -201,7 +202,7 @@ async function main(): Promise<void> {
   await testCuratorPassesAuthorization();
   await testContributorBlockedFromStampMutations();
   await testVodExportMutationRequiresAuthenticityHeader();
-  console.log('✓ curator-only Admin mutations and VOD export CSRF boundaries');
+  console.log('✓ curator-only Admin routes and VOD export CSRF boundaries');
 }
 
 main().catch((error: unknown) => {
