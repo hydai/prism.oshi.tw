@@ -23,7 +23,6 @@ function SimilarSongsTab() {
   const [expanded, setExpanded] = useState<Set<string>>(new Set());
   // Track applying state per group
   const [applying, setApplying] = useState<Set<string>>(new Set());
-  const [applyingAll, setApplyingAll] = useState(false);
 
   const handleScan = async () => {
     setLoading(true);
@@ -56,52 +55,29 @@ function SimilarSongsTab() {
     const canonical = group.items.find((i) => i.id === canonicalId);
     if (!canonical) return;
 
-    const updates = group.items
+    const sourceSongIds = group.items
       .filter((i) => i.id !== canonicalId)
-      .map((i) => ({ songId: i.id, title: canonical.title }));
+      .map((i) => i.id);
 
-    if (updates.length === 0) return;
+    if (sourceSongIds.length === 0) return;
+    const performanceCount = group.items.reduce((sum, item) => sum + item.performanceCount, 0);
+    if (!window.confirm(
+      `Merge ${sourceSongIds.length} song record(s) into "${canonical.title}" by ${canonical.originalArtist}?\n\nAll ${performanceCount} performances will be preserved.`,
+    )) return;
 
     setApplying((prev) => new Set(prev).add(group.normalizedKey));
     try {
-      await api.harmonizeApply({ updates });
+      await api.harmonizeMerge({ canonicalSongId: canonicalId, sourceSongIds });
       // Remove this group from state
       setGroups((prev) => prev.filter((g) => g.normalizedKey !== group.normalizedKey));
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Failed to apply');
+      setError(err instanceof Error ? err.message : 'Failed to merge');
     } finally {
       setApplying((prev) => {
         const next = new Set(prev);
         next.delete(group.normalizedKey);
         return next;
       });
-    }
-  };
-
-  const handleApplyAll = async () => {
-    setApplyingAll(true);
-    setError(null);
-    try {
-      const allUpdates: Array<{ songId: string; title: string }> = [];
-      for (const group of groups) {
-        const canonicalId = canonicals.get(group.normalizedKey);
-        if (!canonicalId) continue;
-        const canonical = group.items.find((i) => i.id === canonicalId);
-        if (!canonical) continue;
-        for (const item of group.items) {
-          if (item.id !== canonicalId) {
-            allUpdates.push({ songId: item.id, title: canonical.title });
-          }
-        }
-      }
-      if (allUpdates.length > 0) {
-        await api.harmonizeApply({ updates: allUpdates });
-        setGroups([]);
-      }
-    } catch (err) {
-      setError(err instanceof Error ? err.message : 'Failed to apply all');
-    } finally {
-      setApplyingAll(false);
     }
   };
 
@@ -154,15 +130,6 @@ function SimilarSongsTab() {
           <span className="text-sm text-slate-500">
             {stats.groupCount} group(s), {stats.affectedSongs} song(s) affected
           </span>
-        )}
-        {groups.length > 0 && (
-          <button
-            onClick={handleApplyAll}
-            disabled={applyingAll}
-            className="ml-auto rounded-md bg-green-600 px-4 py-2 text-sm font-medium text-white hover:bg-green-700 disabled:opacity-50"
-          >
-            {applyingAll ? 'Applying...' : 'Apply All Reviewed'}
-          </button>
         )}
       </div>
 
@@ -239,7 +206,16 @@ function SimilarSongsTab() {
                                 </span>
                               )}
                             </td>
-                            <td className="py-1.5 text-slate-600">{item.originalArtist}</td>
+                            <td className="py-1.5 text-slate-600">
+                              {isCanonical || !canonical || item.originalArtist === canonical.originalArtist ? (
+                                item.originalArtist
+                              ) : (
+                                <span>
+                                  <span className="text-slate-400 line-through">{item.originalArtist}</span>
+                                  <span className="ml-2 text-blue-600">{canonical.originalArtist}</span>
+                                </span>
+                              )}
+                            </td>
                             <td className="py-1.5">
                               <StatusBadge status={item.status} />
                             </td>
@@ -255,7 +231,7 @@ function SimilarSongsTab() {
                       disabled={isApplying}
                       className="rounded-md bg-blue-600 px-3 py-1.5 text-sm font-medium text-white hover:bg-blue-700 disabled:opacity-50"
                     >
-                      {isApplying ? 'Applying...' : 'Apply to Group'}
+                      {isApplying ? 'Merging...' : 'Merge into Selected Song'}
                     </button>
                   </div>
                 </div>
@@ -579,7 +555,7 @@ export default function Harmonizer({ user: _user }: { user: AuthUser }) {
     <div>
       <h1 className="mb-4 text-2xl font-bold text-slate-800">Harmonizer</h1>
       <p className="mb-6 text-sm text-slate-500">
-        Identify and fix naming inconsistencies in song titles and artist names.
+        Merge duplicate song records without losing performances, and fix artist naming inconsistencies.
       </p>
 
       {/* Tab switcher */}

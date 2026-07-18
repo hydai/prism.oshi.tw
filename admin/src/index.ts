@@ -46,6 +46,8 @@ import {
   getSongSimilarityGroups,
   getArtistSimilarityGroups,
   batchUpdateSongs,
+  mergeSongs,
+  SongMergeError,
 } from './db';
 import { fetchItunesDuration } from './itunes';
 import { parseTextToSongs } from '../shared/parse';
@@ -96,6 +98,8 @@ import type {
   HarmonizeSongsResponse,
   HarmonizeArtistsResponse,
   HarmonizeApplyBody,
+  HarmonizeMergeBody,
+  HarmonizeMergeResponse,
   HarmonizeMatchType,
   NovaSubmission,
   NovaStatus,
@@ -1121,6 +1125,40 @@ app.get('/api/harmonize/artists', requireCurator, async (c) => {
       affectedEntries,
     },
   });
+});
+
+app.post('/api/harmonize/merge', requireCurator, async (c) => {
+  const body = await c.req.json<HarmonizeMergeBody>();
+  if (
+    typeof body.canonicalSongId !== 'string'
+    || !body.canonicalSongId
+    || !Array.isArray(body.sourceSongIds)
+    || body.sourceSongIds.length === 0
+    || !body.sourceSongIds.every((id) => typeof id === 'string' && id.length > 0)
+  ) {
+    return c.json({ error: 'canonicalSongId and a non-empty sourceSongIds array are required' }, 400);
+  }
+
+  const streamerId = getStreamerId(c);
+  const user = c.get('user');
+  try {
+    const result = await mergeSongs(
+      c.env.DB,
+      streamerId,
+      body.canonicalSongId,
+      body.sourceSongIds,
+      user.email,
+    );
+    return c.json<HarmonizeMergeResponse>({ ok: true, ...result });
+  } catch (error) {
+    if (error instanceof SongMergeError) {
+      return c.json(
+        { error: error.message },
+        error.code === 'song_not_found' ? 404 : 400,
+      );
+    }
+    throw error;
+  }
 });
 
 app.post('/api/harmonize/apply', requireCurator, async (c) => {

@@ -15,6 +15,7 @@
     "test:discord": "npx tsx shared/discord.test.ts",
     "test:nova-url-safety": "npx tsx shared/nova-url-safety.test.ts",
     "test:db": "npx tsx src/db.test.ts",
+    "test:song-merge": "sh migrations/test_song_merge.sh",
     "test:auth": "npx tsx src/auth.test.ts",
     "test:authz": "npx tsx src/authz.test.ts",
     "test:nova-url-routes": "npx tsx src/nova-url-safety-routes.test.ts",
@@ -31,7 +32,7 @@
     "verify:vod-export-docs": "npx tsx scripts/vod-export-docs.ts verify-public",
     "publish:vod-export-docs": "npx tsx scripts/vod-export-docs.ts publish",
     "test:youtube-verification": "npx tsx src/youtube-verification.test.ts",
-    "check": "npm run typecheck && npm run test:helpers && npm run test:itunes && npm run test:discord && npm run test:nova-url-safety && npm run test:db && npm run test:auth && npm run test:authz && npm run test:nova-url-routes && npm run test:youtube-verification && npm run test:vod-export-schema && npm run test:vod-export-core && npm run test:vod-export-source && npm run test:vod-export-json-stream && npm run test:vod-export-api && npm run test:vod-export-publication && npm run test:vod-export-maintenance && npm run test:vod-export-docs && npm run test:vod-export-stress"
+    "check": "npm run typecheck && npm run test:helpers && npm run test:itunes && npm run test:discord && npm run test:nova-url-safety && npm run test:db && npm run test:song-merge && npm run test:auth && npm run test:authz && npm run test:nova-url-routes && npm run test:youtube-verification && npm run test:vod-export-schema && npm run test:vod-export-core && npm run test:vod-export-source && npm run test:vod-export-json-stream && npm run test:vod-export-api && npm run test:vod-export-publication && npm run test:vod-export-maintenance && npm run test:vod-export-docs && npm run test:vod-export-stress"
   },
   "dependencies": {
     "hono": "^4.12.29"

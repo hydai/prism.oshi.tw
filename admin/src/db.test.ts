@@ -1,4 +1,10 @@
-import { importVodToAdminDb } from './db';
+import {
+  bulkUnapproveStream,
+  deleteStreamCascade,
+  importVodToAdminDb,
+  mergeSongs,
+  SongMergeError,
+} from './db';
 
 declare const process: { exitCode?: number };
 
@@ -42,23 +48,49 @@ class FakeStatement {
     }
     return null;
   }
+
+  async all<T>(): Promise<{ results: T[] }> {
+    this.fakeDb.allStatements.push({ sql: this.sql, params: this.params });
+    if (this.sql.includes('FROM songs') && this.sql.includes('id IN')) {
+      return { results: this.fakeDb.mergeRows as T[] };
+    }
+    return { results: [] };
+  }
 }
 
 class FakeD1Database {
   readonly firstStatements: CapturedStatement[] = [];
+  readonly allStatements: CapturedStatement[] = [];
   readonly batchStatements: CapturedStatement[] = [];
 
-  constructor(readonly existingStream: ExistingStream) {}
+  constructor(
+    readonly existingStream: ExistingStream,
+    readonly exactSongId: string | null = null,
+    readonly mergeRows: unknown[] = [],
+  ) {}
 
   prepare(sql: string): FakeStatement {
     return new FakeStatement(this, sql);
   }
 
-  async batch(statements: FakeStatement[]): Promise<Array<{ meta: { changes: number } }>> {
+  async batch(statements: FakeStatement[]): Promise<Array<{ results: unknown[]; meta: { changes: number } }>> {
     this.batchStatements.push(
       ...statements.map((statement) => ({ sql: statement.sql, params: statement.params })),
     );
-    return statements.map(() => ({ meta: { changes: 1 } }));
+    return statements.map((statement) => {
+      if (statement.sql.includes('SELECT s.id') && statement.sql.includes('s.original_artist = ?')) {
+        return {
+          results: this.exactSongId ? [{ id: this.exactSongId }] : [],
+          meta: { changes: 0 },
+        };
+      }
+      const changes = /UPDATE\s+performances/i.test(statement.sql)
+        ? 3
+        : /DELETE\s+FROM\s+songs/i.test(statement.sql)
+          ? 2
+          : 1;
+      return { results: [], meta: { changes } };
+    });
   }
 }
 
@@ -66,6 +98,7 @@ class FakeD1Database {
 // 0 id, 1 streamer_id, 2 song_id, 3 stream_id, 4 date, 5 stream_title,
 // 6 video_id, 7 timestamp, 8 end_timestamp, 9 note, 10 status, 11 submitted_by
 const PERF_STREAM_ID = 3;
+const PERF_SONG_ID = 2;
 const PERF_DATE = 4;
 const PERF_TITLE = 5;
 const PERF_STATUS = 10;
@@ -183,10 +216,153 @@ async function testVodImportCreatesNewStreamWhenAbsent(): Promise<void> {
   assertEqual(performanceInsert.params[PERF_STATUS], 'pending', 'fresh performance must stay pending for curator review');
 }
 
+async function testVodImportReusesExactSong(): Promise<void> {
+  const fakeDb = new FakeD1Database(
+    { id: 'stream-existing', title: 'Existing Stream', date: '2026-01-01' },
+    'song-canonical',
+  );
+
+  await importVodToAdminDb(
+    fakeDb as unknown as D1Database,
+    {
+      streamer_slug: 'alice',
+      video_id: 'DUPVIDEO123',
+      video_url: 'https://www.youtube.com/watch?v=DUPVIDEO123',
+      stream_title: 'Existing Stream',
+      stream_date: '2026-01-01',
+    },
+    [{
+      song_title: 'Same Song',
+      original_artist: 'Same Artist',
+      start_timestamp: 12,
+      end_timestamp: 34,
+    }],
+    'curator@example.com',
+  );
+
+  const songInserts = fakeDb.batchStatements.filter((statement) =>
+    /INSERT\s+INTO\s+songs/i.test(statement.sql),
+  );
+  assertEqual(songInserts.length, 0, 'an exact existing song must be reused instead of duplicated');
+
+  const performanceInsert = fakeDb.batchStatements.find((statement) =>
+    /INSERT\s+INTO\s+performances/i.test(statement.sql),
+  );
+  if (!performanceInsert) throw new Error('reused song should still receive a new performance');
+  assertEqual(performanceInsert.params[PERF_SONG_ID], 'song-canonical', 'new performance links to exact canonical song');
+}
+
+function mergeRow(
+  id: string,
+  status: 'pending' | 'approved',
+  tags: string,
+  artist = 'Artist',
+): Record<string, unknown> {
+  return {
+    id,
+    streamer_id: 'alice',
+    title: 'Song',
+    original_artist: artist,
+    tags,
+    status,
+    submitted_by: 'submitter@example.com',
+    reviewed_by: status === 'approved' ? 'reviewer@example.com' : null,
+    created_at: '2026-01-01 00:00:00',
+  };
+}
+
+async function testMergeSongsPreservesPerformances(): Promise<void> {
+  const fakeDb = new FakeD1Database(null, null, [
+    mergeRow('song-canonical', 'pending', '["canonical"]'),
+    mergeRow('song-source-1', 'approved', '["source"]'),
+    mergeRow('song-source-2', 'approved', '[]', 'Cover Artist'),
+  ]);
+
+  const result = await mergeSongs(
+    fakeDb as unknown as D1Database,
+    'alice',
+    'song-canonical',
+    ['song-source-1', 'song-source-2'],
+    'curator@example.com',
+  );
+
+  assertEqual(result.mergedSongs, 2, 'both source song rows are deleted');
+  assertEqual(result.movedPerformances, 3, 'all source performances are repointed');
+
+  const sql = fakeDb.batchStatements.map((statement) => statement.sql).join('\n');
+  assert(/UPDATE\s+performances/i.test(sql), 'merge must repoint performances');
+  assert(!/DELETE\s+FROM\s+performances/i.test(sql), 'merge must never delete performances');
+
+  const aliasInserts = fakeDb.batchStatements.filter((statement) =>
+    /INSERT\s+INTO\s+song_aliases/i.test(statement.sql),
+  );
+  assertEqual(aliasInserts.length, 2, 'every deleted song gets an alias snapshot');
+
+  const canonicalUpdate = fakeDb.batchStatements.find((statement) =>
+    /UPDATE\s+songs/i.test(statement.sql),
+  );
+  if (!canonicalUpdate) throw new Error('canonical metadata should be updated');
+  assertEqual(canonicalUpdate.params[0], '["canonical","source"]', 'source tags are unioned into canonical tags');
+  assertEqual(canonicalUpdate.params[1], 'approved', 'approved status is preserved when canonical was pending');
+}
+
+async function testMergeSongsRejectsMissingOrCrossStreamerSource(): Promise<void> {
+  const fakeDb = new FakeD1Database(null, null, [
+    mergeRow('song-canonical', 'approved', '[]'),
+  ]);
+
+  let caught: unknown;
+  try {
+    await mergeSongs(
+      fakeDb as unknown as D1Database,
+      'alice',
+      'song-canonical',
+      ['song-from-another-streamer'],
+      'curator@example.com',
+    );
+  } catch (error) {
+    caught = error;
+  }
+
+  assert(caught instanceof SongMergeError, 'missing scoped source should raise SongMergeError');
+  assertEqual((caught as SongMergeError).code, 'song_not_found', 'cross-streamer source is indistinguishable from missing');
+  assertEqual(fakeDb.batchStatements.length, 0, 'validation failure must not execute a write batch');
+}
+
+async function testSharedSongsSurviveStreamMutations(): Promise<void> {
+  const unapproveDb = new FakeD1Database(null);
+  await bulkUnapproveStream(unapproveDb as unknown as D1Database, 'stream-one');
+  const songUnapprove = unapproveDb.batchStatements.find((statement) =>
+    /UPDATE\s+songs/i.test(statement.sql),
+  );
+  if (!songUnapprove) throw new Error('bulk unapprove should update eligible songs');
+  assert(
+    /NOT\s+EXISTS[\s\S]+other\.stream_id\s+<>\s+\?/i.test(songUnapprove.sql),
+    'bulk unapprove must keep a song approved while another stream has an approved performance',
+  );
+  assertEqual(songUnapprove.params[0], 'stream-one', 'target stream is scoped in the selected songs');
+  assertEqual(songUnapprove.params[1], 'stream-one', 'other approved streams are excluded from demotion');
+
+  const deleteDb = new FakeD1Database(null);
+  await deleteStreamCascade(deleteDb as unknown as D1Database, 'stream-one');
+  const songDelete = deleteDb.batchStatements.find((statement) =>
+    /DELETE\s+FROM\s+songs/i.test(statement.sql),
+  );
+  if (!songDelete) throw new Error('stream delete should remove songs owned only by that stream');
+  assert(
+    /GROUP\s+BY\s+p\.song_id[\s\S]+HAVING\s+COUNT\(\*\)/i.test(songDelete.sql),
+    'stream delete must handle multiple same-stream performances without leaving orphan songs',
+  );
+}
+
 async function main(): Promise<void> {
   await testVodImportPreservesExistingStream();
   await testVodImportCreatesNewStreamWhenAbsent();
-  console.log('✓ importVodToAdminDb preserves existing stream data and still imports fresh VODs');
+  await testVodImportReusesExactSong();
+  await testMergeSongsPreservesPerformances();
+  await testMergeSongsRejectsMissingOrCrossStreamerSource();
+  await testSharedSongsSurviveStreamMutations();
+  console.log('✓ song imports reuse exact entities and merges preserve every performance');
 }
 
 main().catch((error: unknown) => {
