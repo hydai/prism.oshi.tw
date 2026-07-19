@@ -58,6 +58,12 @@ const SOURCE_ROWS: WorkMatchSourceRow[] = [
   row('work-japanese-combining-handakuten-mark', 'か\u309a', 'Japanese Combining Guard', 'song-m', 'lena', 1),
 ];
 
+const PARTIAL_MERGE_ROWS: WorkMatchSourceRow[] = [
+  row('work-partial-main', 'Partial Title', 'Example Artist', 'partial-song-a', 'alice', 10),
+  row('work-partial-one', 'partial title', 'Example Artist', 'partial-song-b', 'bob', 4),
+  row('work-partial-two', 'Ｐａｒｔｉａｌ Ｔｉｔｌｅ', 'Example Artist', 'partial-song-c', 'carol', 2),
+];
+
 type CapturedStatement = { sql: string; params: unknown[] };
 
 class FakeStatement {
@@ -246,6 +252,7 @@ async function testGlobalWorkMergePreservesLocalEntities(): Promise<void> {
     {
       candidateKey: candidate.candidateKey,
       fingerprint: candidate.fingerprint,
+      catalogRevision: 7,
       canonicalWorkId: 'work-case-main',
       sourceWorkIds: ['work-case-alt'],
     },
@@ -282,6 +289,7 @@ async function testGlobalWorkMergePreservesLocalEntities(): Promise<void> {
       {
         candidateKey: candidate.candidateKey,
         fingerprint: candidate.fingerprint,
+        catalogRevision: 7,
         canonicalWorkId: 'work-case-main',
         sourceWorkIds: ['work-case-alt'],
       },
@@ -292,6 +300,53 @@ async function testGlobalWorkMergePreservesLocalEntities(): Promise<void> {
   }
   assert(caught instanceof WorkMatchError, 'transaction-time catalog changes fail closed');
   equal(caught.code, 'work_match_stale', 'stale merge returns the conflict code');
+
+  const staleDisplayDb = new FakeD1(SOURCE_ROWS);
+  caught = undefined;
+  try {
+    await mergeWorkMatchCandidate(
+      staleDisplayDb as unknown as D1Database,
+      {
+        candidateKey: candidate.candidateKey,
+        fingerprint: candidate.fingerprint,
+        catalogRevision: 6,
+        canonicalWorkId: 'work-case-main',
+        sourceWorkIds: ['work-case-alt'],
+      },
+      'curator@example.com',
+    );
+  } catch (error) {
+    caught = error;
+  }
+  assert(caught instanceof WorkMatchError, 'a changed displayed catalog revision fails closed');
+  equal(caught.code, 'work_match_stale', 'displayed revision conflicts require reconfirmation');
+  equal(staleDisplayDb.mergeStatements.length, 0, 'stale displayed impact performs no writes');
+}
+
+async function testPartialGlobalWorkMerge(): Promise<void> {
+  const candidate = (await buildHighConfidenceWorkCandidates(PARTIAL_MERGE_ROWS))[0];
+  assert(candidate, 'partial merge fixture candidate exists');
+  equal(candidate.works.length, 3, 'partial merge fixture has multiple possible sources');
+
+  const fakeDb = new FakeD1(PARTIAL_MERGE_ROWS);
+  const result = await mergeWorkMatchCandidate(
+    fakeDb as unknown as D1Database,
+    {
+      candidateKey: candidate.candidateKey,
+      fingerprint: candidate.fingerprint,
+      catalogRevision: 7,
+      canonicalWorkId: 'work-partial-main',
+      sourceWorkIds: ['work-partial-one'],
+    },
+    'curator@example.com',
+  );
+
+  equal(result.preservedSongs, 2, 'partial merge reports only the confirmed batch songs');
+  equal(result.preservedPerformances, 14, 'partial merge reports only the confirmed batch performances');
+  const expectedWorkState = JSON.parse(String(fakeDb.mergeStatements[0]?.params[0])) as Record<string, unknown>;
+  assert(expectedWorkState['work-partial-main'], 'partial guard includes the canonical work');
+  assert(expectedWorkState['work-partial-one'], 'partial guard includes the confirmed source');
+  assert(!expectedWorkState['work-partial-two'], 'partial guard excludes deferred sources');
 }
 
 async function main(): Promise<void> {
@@ -299,6 +354,7 @@ async function main(): Promise<void> {
   await testReviewedFingerprintFiltering();
   await testReviewDecisionUsesRevisionGuard();
   await testGlobalWorkMergePreservesLocalEntities();
+  await testPartialGlobalWorkMerge();
   console.log('✓ global work review is conservative, content-addressed, and performance-safe');
 }
 

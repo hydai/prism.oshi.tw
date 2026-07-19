@@ -31,17 +31,47 @@ const FILTERS: Array<{ value: WorkMatchFilter; label: string }> = [
   { value: 'all', label: 'All' },
 ];
 
-export function MergeImpact({ candidate }: { candidate: WorkMatchCandidate }) {
+export function candidateReviewStateKey(candidate: WorkMatchCandidate): string {
+  return `${candidate.candidateKey}:${candidate.fingerprint}`;
+}
+
+export function selectMergeSourceWorkIds(
+  candidate: WorkMatchCandidate,
+  canonicalWorkId: string,
+): string[] {
+  return candidate.works
+    .filter((work) => work.id !== canonicalWorkId)
+    .slice(0, GLOBAL_WORK_MERGE_SOURCE_LIMIT)
+    .map((work) => work.id);
+}
+
+export function MergeImpact({
+  candidate,
+  canonicalWorkId,
+  sourceWorkIds,
+}: {
+  candidate: WorkMatchCandidate;
+  canonicalWorkId: string;
+  sourceWorkIds: string[];
+}) {
+  const selectedWorkIds = new Set([canonicalWorkId, ...sourceWorkIds]);
+  const selectedWorks = candidate.works.filter((work) => selectedWorkIds.has(work.id));
+  const selectedStreamers = new Set(selectedWorks.flatMap((work) => work.streamerIds));
+  const selectedSongs = selectedWorks.reduce((sum, work) => sum + work.songCount, 0);
+  const selectedPerformances = selectedWorks.reduce(
+    (sum, work) => sum + work.performanceCount,
+    0,
+  );
   return (
     <div className="rounded-md border border-amber-300 bg-amber-50 p-3 text-sm text-amber-950">
       <p className="font-semibold">Site-wide identity change</p>
       <p className="mt-1">
-        This retires {candidate.works.length - 1} work ID(s) while keeping{' '}
-        {candidate.songCount} local song record(s) across {candidate.streamerCount} VTuber(s).
+        This retires {sourceWorkIds.length} work ID(s) while keeping{' '}
+        {selectedSongs} local song record(s) across {selectedStreamers.size} VTuber(s).
         Only source song-to-work links are repointed.
       </p>
       <p className="mt-1 font-medium">
-        All {candidate.performanceCount} performances and their performance IDs are preserved.
+        All {selectedPerformances} performances and their performance IDs are preserved.
         No song or performance row is deleted.
       </p>
     </div>
@@ -62,7 +92,8 @@ export default function GlobalWorkReview() {
   const [total, setTotal] = useState(0);
   const [totalPages, setTotalPages] = useState(0);
   const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
+  const [scanError, setScanError] = useState<string | null>(null);
+  const [actionError, setActionError] = useState<string | null>(null);
   const [message, setMessage] = useState<string | null>(null);
   const [refreshVersion, setRefreshVersion] = useState(0);
   const [canonicalByCandidate, setCanonicalByCandidate] = useState<Record<string, string>>({});
@@ -73,7 +104,11 @@ export default function GlobalWorkReview() {
   useEffect(() => {
     let active = true;
     setLoading(true);
-    setError(null);
+    setScanError(null);
+    setCandidates([]);
+    setStats(EMPTY_STATS);
+    setTotal(0);
+    setTotalPages(0);
     api.listWorkMatches({ filter, page, pageSize: PAGE_SIZE })
       .then((response) => {
         if (!active) return;
@@ -101,8 +136,9 @@ export default function GlobalWorkReview() {
         setNotes((current) => {
           const next = { ...current };
           for (const candidate of response.data) {
-            if (next[candidate.candidateKey] === undefined) {
-              next[candidate.candidateKey] = candidate.reviewNote;
+            const stateKey = candidateReviewStateKey(candidate);
+            if (next[stateKey] === undefined) {
+              next[stateKey] = candidate.reviewNote;
             }
           }
           return next;
@@ -110,7 +146,7 @@ export default function GlobalWorkReview() {
       })
       .catch((caught: unknown) => {
         if (active) {
-          setError(caught instanceof Error ? caught.message : 'Failed to scan global works');
+          setScanError(caught instanceof Error ? caught.message : 'Failed to scan global works');
         }
       })
       .finally(() => {
@@ -133,7 +169,7 @@ export default function GlobalWorkReview() {
 
   const saveDecision = async (candidate: WorkMatchCandidate, decision: WorkMatchDecision) => {
     setActionCandidateKey(candidate.candidateKey);
-    setError(null);
+    setActionError(null);
     setMessage(null);
     try {
       await api.reviewWorkMatch({
@@ -141,31 +177,31 @@ export default function GlobalWorkReview() {
         fingerprint: candidate.fingerprint,
         workIds: candidate.works.map((work) => work.id),
         decision,
-        note: notes[candidate.candidateKey] ?? '',
+        note: notes[candidateReviewStateKey(candidate)] ?? '',
       });
       setMessage(decision === 'not_duplicate' ? 'Saved as not duplicate.' : 'Saved for source research.');
       refresh();
     } catch (caught: unknown) {
-      setError(caught instanceof Error ? caught.message : 'Failed to save review decision');
+      setActionError(caught instanceof Error ? caught.message : 'Failed to save review decision');
       refresh();
     } finally {
       setActionCandidateKey(null);
     }
   };
 
-  const confirmMerge = async (candidate: WorkMatchCandidate) => {
-    const canonicalWorkId = canonicalByCandidate[candidate.candidateKey]
-      ?? candidate.suggestedCanonicalWorkId;
-    const sourceWorkIds = candidate.works
-      .filter((work) => work.id !== canonicalWorkId)
-      .map((work) => work.id);
+  const confirmMerge = async (
+    candidate: WorkMatchCandidate,
+    canonicalWorkId: string,
+    sourceWorkIds: string[],
+  ) => {
     setActionCandidateKey(candidate.candidateKey);
-    setError(null);
+    setActionError(null);
     setMessage(null);
     try {
       const result = await api.mergeWorkMatch({
         candidateKey: candidate.candidateKey,
         fingerprint: candidate.fingerprint,
+        catalogRevision: candidate.catalogRevision,
         canonicalWorkId,
         sourceWorkIds,
       });
@@ -174,7 +210,7 @@ export default function GlobalWorkReview() {
       );
       refresh();
     } catch (caught: unknown) {
-      setError(caught instanceof Error ? caught.message : 'Failed to merge global works');
+      setActionError(caught instanceof Error ? caught.message : 'Failed to merge global works');
       refresh();
     } finally {
       setActionCandidateKey(null);
@@ -223,6 +259,8 @@ export default function GlobalWorkReview() {
             key={option.value}
             type="button"
             onClick={() => {
+              setActionError(null);
+              setMessage(null);
               setFilter(option.value);
               setPage(1);
               setConfirmingCandidateKey(null);
@@ -243,9 +281,9 @@ export default function GlobalWorkReview() {
           {message}
         </p>
       )}
-      {error && (
+      {(actionError ?? scanError) && (
         <p className="mt-4 rounded-md border border-red-200 bg-red-50 p-3 text-sm text-red-700">
-          {error}
+          {actionError ?? scanError}
         </p>
       )}
 
@@ -262,7 +300,9 @@ export default function GlobalWorkReview() {
               ?? candidate.suggestedCanonicalWorkId;
             const acting = actionCandidateKey === candidate.candidateKey;
             const isConfirming = confirmingCandidate?.candidateKey === candidate.candidateKey;
-            const mergeExceedsLimit = candidate.works.length - 1 > GLOBAL_WORK_MERGE_SOURCE_LIMIT;
+            const sourceWorkIds = selectMergeSourceWorkIds(candidate, selectedCanonical);
+            const deferredSourceCount = candidate.works.length - 1 - sourceWorkIds.length;
+            const noteStateKey = candidateReviewStateKey(candidate);
             return (
               <section
                 key={candidate.candidateKey}
@@ -351,21 +391,21 @@ export default function GlobalWorkReview() {
                   </p>
                 )}
 
-                {mergeExceedsLimit && (
+                {deferredSourceCount > 0 && (
                   <p className="mt-3 rounded-md bg-amber-50 p-2 text-sm text-amber-800">
-                    This candidate has more than {GLOBAL_WORK_MERGE_SOURCE_LIMIT} source work IDs.
-                    Split it into smaller reviewed merges before continuing.
+                    This reviewed batch will retire {sourceWorkIds.length} source work IDs;{' '}
+                    {deferredSourceCount} will remain and reappear for another confirmed batch.
                   </p>
                 )}
 
                 <label className="mt-4 block text-sm font-medium text-slate-700">
                   Review note (optional)
                   <textarea
-                    value={notes[candidate.candidateKey] ?? ''}
+                    value={notes[noteStateKey] ?? ''}
                     maxLength={2000}
                     onChange={(event) => setNotes((current) => ({
                       ...current,
-                      [candidate.candidateKey]: event.target.value,
+                      [noteStateKey]: event.target.value,
                     }))}
                     rows={2}
                     className="mt-1 block w-full rounded-md border border-slate-300 px-3 py-2 text-sm focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500"
@@ -375,16 +415,24 @@ export default function GlobalWorkReview() {
 
                 {isConfirming ? (
                   <div className="mt-4 space-y-3">
-                    <MergeImpact candidate={candidate} />
+                    <MergeImpact
+                      candidate={candidate}
+                      canonicalWorkId={selectedCanonical}
+                      sourceWorkIds={sourceWorkIds}
+                    />
                     <p className="break-all text-xs text-slate-500">
                       Canonical: <code>{selectedCanonical}</code><br />
-                      Retire: <code>{candidate.works.filter((work) => work.id !== selectedCanonical).map((work) => work.id).join(', ')}</code>
+                      Retire: <code>{sourceWorkIds.join(', ')}</code>
                     </p>
                     <div className="flex flex-wrap gap-2">
                       <button
                         type="button"
-                        disabled={acting || mergeExceedsLimit}
-                        onClick={() => void confirmMerge(candidate)}
+                        disabled={acting}
+                        onClick={() => void confirmMerge(
+                          candidate,
+                          selectedCanonical,
+                          sourceWorkIds,
+                        )}
                         className="rounded-md bg-red-700 px-3 py-1.5 text-sm font-semibold text-white hover:bg-red-800 disabled:opacity-50"
                       >
                         {acting ? 'Merging...' : 'Confirm global work merge'}
@@ -403,7 +451,7 @@ export default function GlobalWorkReview() {
                   <div className="mt-4 flex flex-wrap gap-2">
                     <button
                       type="button"
-                      disabled={acting || mergeExceedsLimit}
+                      disabled={acting}
                       onClick={() => setConfirmingCandidateKey(candidate.candidateKey)}
                       className="rounded-md bg-slate-800 px-3 py-1.5 text-sm font-medium text-white hover:bg-slate-900 disabled:opacity-50"
                     >
@@ -439,7 +487,12 @@ export default function GlobalWorkReview() {
           <div className="flex items-center gap-2">
             <button
               type="button"
-              onClick={() => setPage((current) => Math.max(1, current - 1))}
+              onClick={() => {
+                setActionError(null);
+                setMessage(null);
+                setConfirmingCandidateKey(null);
+                setPage((current) => Math.max(1, current - 1));
+              }}
               disabled={page <= 1}
               className="rounded-md border border-slate-300 px-3 py-1.5 hover:bg-slate-100 disabled:opacity-40"
             >
@@ -448,7 +501,12 @@ export default function GlobalWorkReview() {
             <span>Page {page} of {totalPages}</span>
             <button
               type="button"
-              onClick={() => setPage((current) => Math.min(totalPages, current + 1))}
+              onClick={() => {
+                setActionError(null);
+                setMessage(null);
+                setConfirmingCandidateKey(null);
+                setPage((current) => Math.min(totalPages, current + 1));
+              }}
               disabled={page >= totalPages}
               className="rounded-md border border-slate-300 px-3 py-1.5 hover:bg-slate-100 disabled:opacity-40"
             >

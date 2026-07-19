@@ -554,6 +554,7 @@ export interface WorkMatchLocalDuplicate {
 export interface WorkMatchCandidate {
   candidateKey: string;
   fingerprint: string;
+  catalogRevision: number;
   confidence: 'high';
   reasons: WorkMatchReason[];
   works: WorkMatchCandidateWork[];
@@ -591,6 +592,7 @@ export interface WorkMatchReviewBody {
 export interface WorkMatchMergeBody {
   candidateKey: string;
   fingerprint: string;
+  catalogRevision: number;
   canonicalWorkId: string;
   sourceWorkIds: string[];
 }

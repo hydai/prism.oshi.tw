@@ -119,6 +119,7 @@ const PROTECTED_ROUTES: Route[] = [
     body: {
       candidateKey: 'a'.repeat(64),
       fingerprint: 'b'.repeat(64),
+      catalogRevision: 1,
       canonicalWorkId: 'work-1',
       sourceWorkIds: ['work-2'],
     },
