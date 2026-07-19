@@ -73,6 +73,39 @@ CREATE TABLE IF NOT EXISTS song_work_links (
   updated_at TEXT NOT NULL DEFAULT (datetime('now'))
 );
 
+-- Curator decisions for content-addressed global-work duplicate candidates.
+-- Keeping the fingerprint in the primary key preserves prior decisions when a
+-- later title/artist edit creates a new reviewable candidate state.
+CREATE TABLE IF NOT EXISTS work_match_reviews (
+  candidate_key TEXT NOT NULL CHECK (
+    length(candidate_key) = 64
+    AND candidate_key NOT GLOB '*[^0-9a-f]*'
+  ),
+  fingerprint TEXT NOT NULL CHECK (
+    length(fingerprint) = 64
+    AND fingerprint NOT GLOB '*[^0-9a-f]*'
+  ),
+  work_ids TEXT NOT NULL CHECK (json_valid(work_ids)),
+  decision TEXT NOT NULL CHECK (
+    decision IN ('not_duplicate', 'needs_research')
+  ),
+  note TEXT NOT NULL DEFAULT '' CHECK (length(note) <= 2000),
+  reviewed_by TEXT NOT NULL CHECK (length(reviewed_by) > 0),
+  reviewed_at TEXT NOT NULL DEFAULT (datetime('now')),
+  PRIMARY KEY (candidate_key, fingerprint)
+);
+
+-- Monotonic revision used to bind a review/merge to the exact global catalog
+-- snapshot scanned by the Worker.
+CREATE TABLE IF NOT EXISTS work_match_state (
+  id INTEGER PRIMARY KEY CHECK (id = 1),
+  revision INTEGER NOT NULL DEFAULT 0 CHECK (
+    typeof(revision) = 'integer' AND revision >= 0
+  )
+);
+
+INSERT OR IGNORE INTO work_match_state (id, revision) VALUES (1, 0);
+
 -- Performances (linked to songs)
 CREATE TABLE IF NOT EXISTS performances (
   id TEXT PRIMARY KEY,
@@ -118,6 +151,8 @@ CREATE INDEX IF NOT EXISTS idx_work_aliases_canonical ON work_aliases(canonical_
 CREATE INDEX IF NOT EXISTS idx_song_aliases_canonical ON song_aliases(canonical_song_id);
 CREATE INDEX IF NOT EXISTS idx_song_aliases_streamer ON song_aliases(streamer_id);
 CREATE INDEX IF NOT EXISTS idx_song_work_links_work ON song_work_links(work_id);
+CREATE INDEX IF NOT EXISTS idx_work_match_reviews_decision
+  ON work_match_reviews(decision, reviewed_at);
 CREATE INDEX IF NOT EXISTS idx_performances_song_id ON performances(song_id);
 CREATE INDEX IF NOT EXISTS idx_performances_stream_id ON performances(stream_id);
 CREATE INDEX IF NOT EXISTS idx_performances_status ON performances(status);
@@ -127,6 +162,48 @@ CREATE INDEX IF NOT EXISTS idx_streams_status ON streams(status);
 CREATE INDEX IF NOT EXISTS idx_streams_video_id ON streams(video_id);
 CREATE INDEX IF NOT EXISTS idx_streams_streamer ON streams(streamer_id);
 CREATE INDEX IF NOT EXISTS idx_streams_streamer_status ON streams(streamer_id, status);
+
+CREATE TRIGGER IF NOT EXISTS work_match_works_insert_revision
+AFTER INSERT ON works
+FOR EACH ROW
+BEGIN
+  UPDATE work_match_state SET revision = revision + 1 WHERE id = 1;
+END;
+
+CREATE TRIGGER IF NOT EXISTS work_match_works_delete_revision
+AFTER DELETE ON works
+FOR EACH ROW
+BEGIN
+  UPDATE work_match_state SET revision = revision + 1 WHERE id = 1;
+END;
+
+CREATE TRIGGER IF NOT EXISTS work_match_works_update_revision
+AFTER UPDATE OF id, title, original_artist, tags ON works
+FOR EACH ROW
+BEGIN
+  UPDATE work_match_state SET revision = revision + 1 WHERE id = 1;
+END;
+
+CREATE TRIGGER IF NOT EXISTS work_match_links_insert_revision
+AFTER INSERT ON song_work_links
+FOR EACH ROW
+BEGIN
+  UPDATE work_match_state SET revision = revision + 1 WHERE id = 1;
+END;
+
+CREATE TRIGGER IF NOT EXISTS work_match_links_delete_revision
+AFTER DELETE ON song_work_links
+FOR EACH ROW
+BEGIN
+  UPDATE work_match_state SET revision = revision + 1 WHERE id = 1;
+END;
+
+CREATE TRIGGER IF NOT EXISTS work_match_links_update_revision
+AFTER UPDATE OF song_id, work_id ON song_work_links
+FOR EACH ROW
+BEGIN
+  UPDATE work_match_state SET revision = revision + 1 WHERE id = 1;
+END;
 
 -- VOD export source revision. Fresh bootstraps start at revision zero; all
 -- later export-relevant writes increment the singleton in the same transaction.

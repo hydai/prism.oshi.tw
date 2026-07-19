@@ -125,10 +125,20 @@ export default function GlobalWorks() {
   return (
     <div>
       <div>
-        <h2 className="text-xl font-semibold text-slate-800">Global Song Library</h2>
-        <p className="mt-1 text-sm text-slate-500">
-          One composition identity shared by streamer-local songs and their performances.
-        </p>
+        <div className="flex flex-wrap items-start justify-between gap-3">
+          <div>
+            <h2 className="text-xl font-semibold text-slate-800">Global Song Library</h2>
+            <p className="mt-1 text-sm text-slate-500">
+              One composition identity shared by streamer-local songs and their performances.
+            </p>
+          </div>
+          <a
+            href="/works/review"
+            className="rounded-md bg-slate-800 px-3 py-1.5 text-sm font-medium text-white hover:bg-slate-900"
+          >
+            Review possible duplicates
+          </a>
+        </div>
       </div>
 
       <div className="mt-5 grid gap-3 sm:grid-cols-2 xl:grid-cols-5">
