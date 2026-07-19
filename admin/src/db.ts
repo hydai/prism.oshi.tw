@@ -1,3 +1,4 @@
+import { HARMONIZE_MERGE_SOURCE_LIMIT } from '../shared/types';
 import type {
   Song,
   SongRow,
@@ -1874,7 +1875,6 @@ export interface MergeSongsResult {
   relinkedSongs: number;
 }
 
-const MERGE_SOURCE_LIMIT = 50;
 const MERGED_STATUS_PRIORITY: Status[] = [
   'approved',
   'pending',
@@ -2022,8 +2022,11 @@ export async function mergeSongs(
   if (uniqueSourceIds.includes(canonicalSongId)) {
     throw new SongMergeError('invalid_request', 'The canonical song cannot also be a source song');
   }
-  if (uniqueSourceIds.length > MERGE_SOURCE_LIMIT) {
-    throw new SongMergeError('invalid_request', `At most ${MERGE_SOURCE_LIMIT} source songs can be merged at once`);
+  if (uniqueSourceIds.length > HARMONIZE_MERGE_SOURCE_LIMIT) {
+    throw new SongMergeError(
+      'invalid_request',
+      `At most ${HARMONIZE_MERGE_SOURCE_LIMIT} source songs can be merged at once`,
+    );
   }
 
   const requestedIds = [canonicalSongId, ...uniqueSourceIds];

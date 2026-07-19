@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { HARMONIZE_MERGE_SOURCE_LIMIT } from '../../../shared/types';
 import type {
   AuthUser,
   HarmonizeSongEntry,
@@ -18,6 +19,28 @@ export interface HarmonizeWorkMergePlan {
   sourceWorkIds: string[];
   missingSongIds: string[];
   requiresGlobalMerge: boolean;
+}
+
+export interface HarmonizeMergeBatch {
+  items: HarmonizeSongEntry[];
+  deferredSourceCount: number;
+}
+
+export function getWorkAwareMergeBatch(
+  items: HarmonizeSongEntry[],
+  canonicalSongId: string,
+): HarmonizeMergeBatch {
+  const canonical = items.find((item) => item.id === canonicalSongId);
+  if (canonical === undefined) {
+    return { items: [], deferredSourceCount: items.length };
+  }
+
+  const sources = items.filter((item) => item.id !== canonicalSongId);
+  const selectedSources = sources.slice(0, HARMONIZE_MERGE_SOURCE_LIMIT);
+  return {
+    items: [canonical, ...selectedSources],
+    deferredSourceCount: sources.length - selectedSources.length,
+  };
 }
 
 export function getWorkMergePlan(
@@ -45,12 +68,11 @@ export function buildWorkAwareMergeRequest(
   items: HarmonizeSongEntry[],
   canonicalSongId: string,
 ): HarmonizeMergeBody | null {
-  const plan = getWorkMergePlan(items, canonicalSongId);
+  const batch = getWorkAwareMergeBatch(items, canonicalSongId);
+  const plan = getWorkMergePlan(batch.items, canonicalSongId);
   if (plan.canonicalWorkId === null || plan.missingSongIds.length > 0) return null;
 
-  const sourceSongIds = items
-    .filter((item) => item.id !== canonicalSongId)
-    .map((item) => item.id);
+  const sourceSongIds = batch.items.slice(1).map((item) => item.id);
   if (sourceSongIds.length === 0) return null;
 
   return {
@@ -161,7 +183,8 @@ function SimilarSongsTab() {
 
     const canonical = group.items.find((i) => i.id === canonicalId);
     if (!canonical) return;
-    const workPlan = getWorkMergePlan(group.items, canonicalId);
+    const mergeBatch = getWorkAwareMergeBatch(group.items, canonicalId);
+    const workPlan = getWorkMergePlan(mergeBatch.items, canonicalId);
     const mergeRequest = buildWorkAwareMergeRequest(group.items, canonicalId);
 
     if (mergeRequest === null) {
@@ -170,12 +193,18 @@ function SimilarSongsTab() {
     }
 
     const { sourceSongIds } = mergeRequest;
-    const performanceCount = group.items.reduce((sum, item) => sum + item.performanceCount, 0);
+    const performanceCount = mergeBatch.items.reduce(
+      (sum, item) => sum + item.performanceCount,
+      0,
+    );
+    const batchNotice = mergeBatch.deferredSourceCount > 0
+      ? `\n\nThis group exceeds the per-request safety limit. This batch will locally merge ${sourceSongIds.length} source records; ${mergeBatch.deferredSourceCount} will remain as local song records. A global work merge may still repoint their workId. Run Scan again after this batch to continue.`
+      : '';
     const workImpact = workPlan.requiresGlobalMerge
       ? `GLOBAL WORK MERGE\n\nCanonical workId: ${workPlan.canonicalWorkId}\nWorkId(s) to retire: ${workPlan.sourceWorkIds.join(', ')}\n\nEvery surviving song across all VTubers linked to the retired workId(s) will be repointed to the canonical work.`
       : `LOCAL SONG MERGE\n\nworkId remains: ${workPlan.canonicalWorkId}\n\nThe global work identity will not be merged or replaced.`;
     if (!window.confirm(
-      `${workImpact}\n\nMerge ${sourceSongIds.length} song record(s) into "${canonical.title}" by ${canonical.originalArtist}?\n\nAll ${performanceCount} performances will be preserved.`,
+      `${workImpact}\n\nMerge ${sourceSongIds.length} song record(s) into "${canonical.title}" by ${canonical.originalArtist}?${batchNotice}\n\nAll ${performanceCount} performances in this batch will be preserved.`,
     )) return;
 
     setError(null);
@@ -258,9 +287,13 @@ function SimilarSongsTab() {
           const canonicalId = canonicals.get(group.normalizedKey);
           const canonical = group.items.find((i) => i.id === canonicalId);
           const isApplying = applying.has(group.normalizedKey);
-          const workPlan = canonicalId === undefined
+          const mergeBatch = canonicalId === undefined
             ? null
-            : getWorkMergePlan(group.items, canonicalId);
+            : getWorkAwareMergeBatch(group.items, canonicalId);
+          const workPlan = canonicalId === undefined || mergeBatch === null
+            ? null
+            : getWorkMergePlan(mergeBatch.items, canonicalId);
+          const deferredSourceCount = mergeBatch?.deferredSourceCount ?? 0;
           const mergeBlocked = workPlan === null
             || workPlan.canonicalWorkId === null
             || workPlan.missingSongIds.length > 0;
@@ -286,6 +319,15 @@ function SimilarSongsTab() {
               {isExpanded && (
                 <div className="border-t border-slate-100 px-4 py-3">
                   {workPlan && <WorkMergeNotice plan={workPlan} />}
+                  {deferredSourceCount > 0 && (
+                    <div className="mb-3 rounded-md border border-blue-200 bg-blue-50 p-3 text-sm text-blue-800">
+                      Large group: this action will merge the first{' '}
+                      {HARMONIZE_MERGE_SOURCE_LIMIT} source records. The remaining{' '}
+                      {deferredSourceCount} record(s) will not be locally merged in this batch;
+                      global work relinking may still update their workId. Run Scan again afterward
+                      to continue.
+                    </div>
+                  )}
                   <table className="w-full text-sm">
                     <thead>
                       <tr className="text-left text-xs font-medium uppercase text-slate-500">
@@ -355,6 +397,10 @@ function SimilarSongsTab() {
                     >
                       {isApplying
                         ? 'Merging...'
+                        : deferredSourceCount > 0
+                          ? workPlan?.requiresGlobalMerge
+                            ? `Merge First ${HARMONIZE_MERGE_SOURCE_LIMIT} + Global Works`
+                            : `Merge First ${HARMONIZE_MERGE_SOURCE_LIMIT} Local Duplicates`
                         : workPlan?.requiresGlobalMerge
                           ? 'Merge Songs + Global Works'
                           : 'Merge Local Duplicates'}

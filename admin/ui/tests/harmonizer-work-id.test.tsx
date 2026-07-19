@@ -1,6 +1,9 @@
 import * as React from 'react';
 import { renderToStaticMarkup } from 'react-dom/server';
-import type { HarmonizeSongEntry } from '../../shared/types';
+import {
+  HARMONIZE_MERGE_SOURCE_LIMIT,
+  type HarmonizeSongEntry,
+} from '../../shared/types';
 
 function assert(condition: boolean, message: string): asserts condition {
   if (!condition) throw new Error(message);
@@ -88,6 +91,28 @@ async function main(): Promise<void> {
   assert(
     crossWorkRequest.sourceSongIds.join('|') === 'source-one|source-two',
     'merge payload contains every non-canonical local song exactly once',
+  );
+
+  const oversizedSongs = [
+    song('large-canonical', 'work-large-canonical'),
+    ...Array.from({ length: 51 }, (_, index) => song(
+      `large-source-${index + 1}`,
+      index === 50 ? 'work-deferred' : 'work-large-source',
+    )),
+  ];
+  const oversizedRequest = buildWorkAwareMergeRequest(oversizedSongs, 'large-canonical');
+  assert(oversizedRequest !== null, 'oversized linked groups still produce an actionable batch');
+  assert(
+    oversizedRequest.sourceSongIds.length === HARMONIZE_MERGE_SOURCE_LIMIT,
+    'one Harmonizer request never exceeds the server source-song limit',
+  );
+  assert(
+    oversizedRequest.sourceSongIds.at(-1) === 'large-source-50',
+    'the first batch preserves deterministic source ordering',
+  );
+  assert(
+    oversizedRequest.workMergeConfirmation?.sourceWorkIds.join('|') === 'work-large-source',
+    'global-work confirmation covers only work IDs present in the bounded batch',
   );
 
   const reversePlan = getWorkMergePlan(crossWorkSongs, 'source-one');
