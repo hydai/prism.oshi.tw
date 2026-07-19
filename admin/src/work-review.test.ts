@@ -56,6 +56,10 @@ const SOURCE_ROWS: WorkMatchSourceRow[] = [
   row('work-japanese-combining-dakuten-mark', 'わ\u3099', 'Japanese Combining Guard', 'song-k', 'jane', 1),
   row('work-japanese-combining-handakuten-base', 'か', 'Japanese Combining Guard', 'song-l', 'kate', 1),
   row('work-japanese-combining-handakuten-mark', 'か\u309a', 'Japanese Combining Guard', 'song-m', 'lena', 1),
+  row('work-symbol-heart', 'Love ♥', 'Symbol Guard', 'song-n', 'mona', 1),
+  row('work-symbol-star', 'Love ☆', 'Symbol Guard', 'song-o', 'nora', 1),
+  row('work-symbol-flat', 'Song ♭', 'Symbol Guard', 'song-p', 'olivia', 1),
+  row('work-symbol-sharp', 'Song ♯', 'Symbol Guard', 'song-q', 'pat', 1),
 ];
 
 const PARTIAL_MERGE_ROWS: WorkMatchSourceRow[] = [
@@ -156,6 +160,10 @@ async function testTierACandidateGeneration(): Promise<void> {
     caseCandidate.reasons.includes('case_width_whitespace'),
     'case normalization is an explicit reason',
   );
+  assert(
+    !caseCandidate.reasons.includes('punctuation_spacing'),
+    'case-only matches are not mislabeled as punctuation variants',
+  );
 
   const accentCandidate = candidates.find((candidate) => (
     candidate.works.some((work) => work.id === 'work-accent-main')
@@ -170,6 +178,12 @@ async function testTierACandidateGeneration(): Promise<void> {
       work.id.startsWith('work-japanese-combining-')
     ))),
     'non-composable Japanese voicing marks remain significant',
+  );
+  assert(
+    !candidates.some((candidate) => candidate.works.some((work) => (
+      work.id.startsWith('work-symbol-')
+    ))),
+    'semantic Unicode symbol differences remain significant',
   );
   assert(candidates.every((candidate) => candidate.candidateKey.length === 64), 'candidate keys are SHA-256');
   assert(candidates.every((candidate) => candidate.fingerprint.length === 64), 'fingerprints are SHA-256');

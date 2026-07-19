@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import { GLOBAL_WORK_MERGE_SOURCE_LIMIT } from '../../../shared/types';
 import type {
   WorkMatchCandidate,
@@ -100,6 +100,7 @@ export default function GlobalWorkReview() {
   const [notes, setNotes] = useState<Record<string, string>>({});
   const [confirmingCandidateKey, setConfirmingCandidateKey] = useState<string | null>(null);
   const [actionCandidateKey, setActionCandidateKey] = useState<string | null>(null);
+  const actionInFlightRef = useRef(false);
 
   useEffect(() => {
     let active = true;
@@ -167,10 +168,22 @@ export default function GlobalWorkReview() {
     setRefreshVersion((current) => current + 1);
   };
 
-  const saveDecision = async (candidate: WorkMatchCandidate, decision: WorkMatchDecision) => {
-    setActionCandidateKey(candidate.candidateKey);
+  const beginAction = (candidateKey: string): boolean => {
+    if (actionInFlightRef.current) return false;
+    actionInFlightRef.current = true;
+    setActionCandidateKey(candidateKey);
     setActionError(null);
     setMessage(null);
+    return true;
+  };
+
+  const finishAction = () => {
+    actionInFlightRef.current = false;
+    setActionCandidateKey(null);
+  };
+
+  const saveDecision = async (candidate: WorkMatchCandidate, decision: WorkMatchDecision) => {
+    if (!beginAction(candidate.candidateKey)) return;
     try {
       await api.reviewWorkMatch({
         candidateKey: candidate.candidateKey,
@@ -185,7 +198,7 @@ export default function GlobalWorkReview() {
       setActionError(caught instanceof Error ? caught.message : 'Failed to save review decision');
       refresh();
     } finally {
-      setActionCandidateKey(null);
+      finishAction();
     }
   };
 
@@ -194,9 +207,7 @@ export default function GlobalWorkReview() {
     canonicalWorkId: string,
     sourceWorkIds: string[],
   ) => {
-    setActionCandidateKey(candidate.candidateKey);
-    setActionError(null);
-    setMessage(null);
+    if (!beginAction(candidate.candidateKey)) return;
     try {
       const result = await api.mergeWorkMatch({
         candidateKey: candidate.candidateKey,
@@ -213,12 +224,13 @@ export default function GlobalWorkReview() {
       setActionError(caught instanceof Error ? caught.message : 'Failed to merge global works');
       refresh();
     } finally {
-      setActionCandidateKey(null);
+      finishAction();
     }
   };
 
   const startItem = total === 0 ? 0 : (page - 1) * PAGE_SIZE + 1;
   const endItem = Math.min(page * PAGE_SIZE, total);
+  const queueBusy = actionCandidateKey !== null;
 
   return (
     <div>
@@ -258,6 +270,7 @@ export default function GlobalWorkReview() {
           <button
             key={option.value}
             type="button"
+            disabled={queueBusy}
             onClick={() => {
               setActionError(null);
               setMessage(null);
@@ -265,7 +278,7 @@ export default function GlobalWorkReview() {
               setPage(1);
               setConfirmingCandidateKey(null);
             }}
-            className={`rounded-md px-3 py-1.5 text-sm font-medium ${
+            className={`rounded-md px-3 py-1.5 text-sm font-medium disabled:opacity-50 ${
               filter === option.value
                 ? 'bg-slate-800 text-white'
                 : 'border border-slate-300 bg-white text-slate-700 hover:bg-slate-50'
@@ -347,6 +360,7 @@ export default function GlobalWorkReview() {
                         name={`canonical-${candidate.candidateKey}`}
                         value={work.id}
                         checked={selectedCanonical === work.id}
+                        disabled={queueBusy}
                         onChange={() => setCanonicalByCandidate((current) => ({
                           ...current,
                           [candidate.candidateKey]: work.id,
@@ -403,6 +417,7 @@ export default function GlobalWorkReview() {
                   <textarea
                     value={notes[noteStateKey] ?? ''}
                     maxLength={2000}
+                    disabled={queueBusy}
                     onChange={(event) => setNotes((current) => ({
                       ...current,
                       [noteStateKey]: event.target.value,
@@ -427,7 +442,7 @@ export default function GlobalWorkReview() {
                     <div className="flex flex-wrap gap-2">
                       <button
                         type="button"
-                        disabled={acting}
+                        disabled={queueBusy}
                         onClick={() => void confirmMerge(
                           candidate,
                           selectedCanonical,
@@ -439,7 +454,7 @@ export default function GlobalWorkReview() {
                       </button>
                       <button
                         type="button"
-                        disabled={acting}
+                        disabled={queueBusy}
                         onClick={() => setConfirmingCandidateKey(null)}
                         className="rounded-md border border-slate-300 px-3 py-1.5 text-sm text-slate-700 hover:bg-slate-50"
                       >
@@ -451,7 +466,7 @@ export default function GlobalWorkReview() {
                   <div className="mt-4 flex flex-wrap gap-2">
                     <button
                       type="button"
-                      disabled={acting}
+                      disabled={queueBusy}
                       onClick={() => setConfirmingCandidateKey(candidate.candidateKey)}
                       className="rounded-md bg-slate-800 px-3 py-1.5 text-sm font-medium text-white hover:bg-slate-900 disabled:opacity-50"
                     >
@@ -459,7 +474,7 @@ export default function GlobalWorkReview() {
                     </button>
                     <button
                       type="button"
-                      disabled={acting}
+                      disabled={queueBusy}
                       onClick={() => void saveDecision(candidate, 'needs_research')}
                       className="rounded-md border border-amber-400 bg-amber-50 px-3 py-1.5 text-sm font-medium text-amber-800 hover:bg-amber-100 disabled:opacity-50"
                     >
@@ -467,7 +482,7 @@ export default function GlobalWorkReview() {
                     </button>
                     <button
                       type="button"
-                      disabled={acting}
+                      disabled={queueBusy}
                       onClick={() => void saveDecision(candidate, 'not_duplicate')}
                       className="rounded-md border border-slate-300 px-3 py-1.5 text-sm font-medium text-slate-700 hover:bg-slate-50 disabled:opacity-50"
                     >
@@ -493,7 +508,7 @@ export default function GlobalWorkReview() {
                 setConfirmingCandidateKey(null);
                 setPage((current) => Math.max(1, current - 1));
               }}
-              disabled={page <= 1}
+              disabled={queueBusy || page <= 1}
               className="rounded-md border border-slate-300 px-3 py-1.5 hover:bg-slate-100 disabled:opacity-40"
             >
               Previous
@@ -507,7 +522,7 @@ export default function GlobalWorkReview() {
                 setConfirmingCandidateKey(null);
                 setPage((current) => Math.min(totalPages, current + 1));
               }}
-              disabled={page >= totalPages}
+              disabled={queueBusy || page >= totalPages}
               className="rounded-md border border-slate-300 px-3 py-1.5 hover:bg-slate-100 disabled:opacity-40"
             >
               Next
