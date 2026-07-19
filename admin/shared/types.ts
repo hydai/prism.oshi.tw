@@ -565,6 +565,7 @@ export interface WorkMatchCandidate {
   localDuplicates: WorkMatchLocalDuplicate[];
   decision: WorkMatchDecision | null;
   reviewNote: string;
+  reviewVersion: number | null;
   reviewedBy: string | null;
   reviewedAt: string | null;
 }
@@ -586,6 +587,7 @@ export interface WorkMatchReviewBody {
   fingerprint: string;
   workIds: string[];
   decision: WorkMatchDecision;
+  expectedReviewVersion: number | null;
   note?: string;
 }
 

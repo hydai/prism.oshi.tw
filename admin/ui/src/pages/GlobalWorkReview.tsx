@@ -55,20 +55,37 @@ export function MergeImpact({
   sourceWorkIds: string[];
 }) {
   const selectedWorkIds = new Set([canonicalWorkId, ...sourceWorkIds]);
-  const selectedWorks = candidate.works.filter((work) => selectedWorkIds.has(work.id));
+  const selectedWorks = candidate.works
+    .filter((work) => selectedWorkIds.has(work.id))
+    .sort((left, right) => {
+      if (left.id === canonicalWorkId) return -1;
+      if (right.id === canonicalWorkId) return 1;
+      if (left.id < right.id) return -1;
+      if (left.id > right.id) return 1;
+      return 0;
+    });
   const selectedStreamers = new Set(selectedWorks.flatMap((work) => work.streamerIds));
   const selectedSongs = selectedWorks.reduce((sum, work) => sum + work.songCount, 0);
   const selectedPerformances = selectedWorks.reduce(
     (sum, work) => sum + work.performanceCount,
     0,
   );
+  const canonicalTags = new Set(
+    selectedWorks.find((work) => work.id === canonicalWorkId)?.tags ?? [],
+  );
+  const resultingTags = [...new Set(selectedWorks.flatMap((work) => work.tags))];
+  const addedTags = resultingTags.filter((tag) => !canonicalTags.has(tag));
   return (
     <div className="rounded-md border border-amber-300 bg-amber-50 p-3 text-sm text-amber-950">
       <p className="font-semibold">Site-wide identity change</p>
       <p className="mt-1">
         This retires {sourceWorkIds.length} work ID(s) while keeping{' '}
         {selectedSongs} local song record(s) across {selectedStreamers.size} VTuber(s).
-        Only source song-to-work links are repointed.
+        Source song-to-work links are repointed to the surviving identity.
+      </p>
+      <p className="mt-1">
+        Canonical tags after merge: {resultingTags.length > 0 ? resultingTags.join(', ') : 'none'}.
+        {addedTags.length > 0 ? ` Adds: ${addedTags.join(', ')}.` : ' No tags are added.'}
       </p>
       <p className="mt-1 font-medium">
         All {selectedPerformances} performances and their performance IDs are preserved.
@@ -190,6 +207,7 @@ export default function GlobalWorkReview() {
         fingerprint: candidate.fingerprint,
         workIds: candidate.works.map((work) => work.id),
         decision,
+        expectedReviewVersion: candidate.reviewVersion,
         note: notes[candidateReviewStateKey(candidate)] ?? '',
       });
       setMessage(decision === 'not_duplicate' ? 'Saved as not duplicate.' : 'Saved for source research.');
