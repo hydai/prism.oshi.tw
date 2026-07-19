@@ -252,9 +252,10 @@ assert_sql "SELECT work_id FROM song_work_links WHERE song_id = 'song-c';" 'work
 assert_sql 'PRAGMA integrity_check;' 'ok' 'SQLite integrity after retired identity resolution'
 assert_sql 'SELECT COUNT(*) FROM pragma_foreign_key_check;' '0' 'foreign keys after retired identity resolution'
 
-# Exercise the transaction-local guard shape used by Harmonizer merges. A stale
-# reviewed link must leave every guarded mutation as a no-op; a current link set
-# must keep authorizing later statements even after the bridge itself changes.
+# Exercise the transaction-local guard shape used by Harmonizer merges. Stale
+# reviewed work metadata must leave every guarded mutation as a no-op; a current
+# reviewed state must keep authorizing later statements even after the bridge
+# itself changes.
 sqlite3 "$tmp_db" <<'SQL'
 PRAGMA foreign_keys = ON;
 INSERT INTO works (id, title, original_artist, tags)
@@ -276,10 +277,21 @@ PRAGMA foreign_keys = ON;
 BEGIN;
 WITH expected_links(song_id, work_id) AS (
   SELECT key, value
-  FROM json_each('{"song-a":"work-song-a","song-guard-source":"work-stale"}')
+  FROM json_each('{"song-a":"work-song-a","song-guard-source":"work-guard-source"}')
+),
+expected_work_state(work_id, tags) AS (
+  SELECT key, value
+  FROM json_each('{"work-song-a":"[\"stale\"]","work-guard-source":"[]"}')
 ),
 merge_guard(valid) AS (
   SELECT COUNT(*) = (SELECT COUNT(*) FROM expected_links)
+     AND (
+       SELECT COUNT(*)
+       FROM expected_work_state AS expected_work
+       JOIN works AS guarded_state
+         ON guarded_state.id = expected_work.work_id
+        AND guarded_state.tags = expected_work.tags
+     ) = (SELECT COUNT(*) FROM expected_work_state)
   FROM expected_links AS expected
   JOIN songs AS guarded_song
     ON guarded_song.id = expected.song_id
@@ -335,8 +347,8 @@ WHERE source_work_id = 'merge-guard-stale-source'
 COMMIT;
 SQL
 
-assert_sql "SELECT work_id FROM song_work_links WHERE song_id = 'song-guard-source';" 'work-guard-source' 'stale transaction guard blocks bridge mutation'
-assert_sql "SELECT COUNT(*) FROM works WHERE id = 'work-guard-source';" '1' 'stale transaction guard blocks work deletion'
+assert_sql "SELECT work_id FROM song_work_links WHERE song_id = 'song-guard-source';" 'work-guard-source' 'stale work metadata blocks bridge mutation'
+assert_sql "SELECT COUNT(*) FROM works WHERE id = 'work-guard-source';" '1' 'stale work metadata blocks work deletion'
 
 sqlite3 "$tmp_db" >/dev/null <<'SQL'
 PRAGMA foreign_keys = ON;
@@ -345,8 +357,19 @@ WITH expected_links(song_id, work_id) AS (
   SELECT key, value
   FROM json_each('{"song-a":"work-song-a","song-guard-source":"work-guard-source"}')
 ),
+expected_work_state(work_id, tags) AS (
+  SELECT key, value
+  FROM json_each('{"work-song-a":"[\"pop\"]","work-guard-source":"[]"}')
+),
 merge_guard(valid) AS (
   SELECT COUNT(*) = (SELECT COUNT(*) FROM expected_links)
+     AND (
+       SELECT COUNT(*)
+       FROM expected_work_state AS expected_work
+       JOIN works AS guarded_state
+         ON guarded_state.id = expected_work.work_id
+        AND guarded_state.tags = expected_work.tags
+     ) = (SELECT COUNT(*) FROM expected_work_state)
   FROM expected_links AS expected
   JOIN songs AS guarded_song
     ON guarded_song.id = expected.song_id

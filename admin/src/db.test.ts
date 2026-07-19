@@ -550,6 +550,11 @@ async function testMergeSongsPreservesPerformances(): Promise<void> {
     !fakeDb.batchStatements.some((statement) => /UPDATE\s+works/i.test(statement.sql)),
     'same-work merge keeps local tags out of global work metadata',
   );
+  assertEqual(
+    fakeDb.batchStatements[0]?.params[1],
+    '{}',
+    'same-work merge does not depend on unrelated global work metadata',
+  );
 
   const sql = fakeDb.batchStatements.map((statement) => statement.sql).join('\n');
   assert(/UPDATE\s+performances/i.test(sql), 'merge must repoint performances');
@@ -697,10 +702,16 @@ async function testMergeSongsMergesGlobalWorksAcrossVtubers(): Promise<void> {
   assert(fakeDb.batchStatements.length <= 12, 'set-based global merge stays within a small D1 batch');
 }
 
-async function testMergeSongsRevalidatesWorkLinksInsideBatch(): Promise<void> {
+async function testMergeSongsRevalidatesReviewedStateInsideBatch(): Promise<void> {
   const fakeDb = new FakeD1Database(null, null, [
-    mergeRow('song-canonical', 'approved', '[]', { workId: 'work-canonical' }),
-    mergeRow('song-source', 'approved', '[]', { workId: 'work-source' }),
+    mergeRow('song-canonical', 'approved', '[]', {
+      workId: 'work-canonical',
+      workTags: '["canonical-reviewed"]',
+    }),
+    mergeRow('song-source', 'approved', '[]', {
+      workId: 'work-source',
+      workTags: '["source-reviewed"]',
+    }),
   ]);
   fakeDb.mergeGuardValid = false;
 
@@ -729,14 +740,28 @@ async function testMergeSongsRevalidatesWorkLinksInsideBatch(): Promise<void> {
   );
   assert(
     /WITH\s+expected_links/i.test(fakeDb.batchStatements[0]?.sql ?? '')
+      && /expected_work_state/i.test(fakeDb.batchStatements[0]?.sql ?? '')
       && /RETURNING\s+1\s+AS\s+valid/i.test(fakeDb.batchStatements[0]?.sql ?? ''),
-    'the first statement revalidates every reviewed song-to-work link inside the D1 batch',
+    'the first statement revalidates reviewed links and work metadata inside the D1 batch',
   );
   const expectedLinks = JSON.parse(
     String(fakeDb.batchStatements[0]?.params[0] ?? '{}'),
   ) as Record<string, string>;
   assertEqual(expectedLinks['song-canonical'], 'work-canonical', 'guard binds the reviewed canonical link');
   assertEqual(expectedLinks['song-source'], 'work-source', 'guard binds every reviewed source link');
+  const expectedWorkState = JSON.parse(
+    String(fakeDb.batchStatements[0]?.params[1] ?? '{}'),
+  ) as Record<string, string>;
+  assertEqual(
+    expectedWorkState['work-canonical'],
+    '["canonical-reviewed"]',
+    'guard binds the reviewed canonical work tags',
+  );
+  assertEqual(
+    expectedWorkState['work-source'],
+    '["source-reviewed"]',
+    'guard binds every reviewed source work tag set',
+  );
   const mutations = fakeDb.batchStatements.slice(1, -1);
   assert(mutations.length > 0, 'the guarded merge still prepares its mutation set');
   assert(
@@ -744,7 +769,7 @@ async function testMergeSongsRevalidatesWorkLinksInsideBatch(): Promise<void> {
       /WITH\s+merge_guard/i.test(statement.sql)
       && /SELECT\s+valid\s+FROM\s+merge_guard/i.test(statement.sql)
     )),
-    'every merge mutation is conditional on the same transaction-time work-link guard',
+    'every merge mutation is conditional on the same transaction-time reviewed-state guard',
   );
   assert(
     /DELETE\s+FROM\s+work_aliases/i.test(fakeDb.batchStatements.at(-1)?.sql ?? ''),
@@ -928,7 +953,7 @@ async function main(): Promise<void> {
   await testMergeSongsPreservesPerformances();
   await testMergeSongsRequiresExplicitGlobalWorkConfirmation();
   await testMergeSongsMergesGlobalWorksAcrossVtubers();
-  await testMergeSongsRevalidatesWorkLinksInsideBatch();
+  await testMergeSongsRevalidatesReviewedStateInsideBatch();
   await testMergeSongsRejectsStaleWorkConfirmation();
   await testMergeSongsRejectsUnlinkedWork();
   await testMergeSongsRejectsMissingOrCrossStreamerSource();
