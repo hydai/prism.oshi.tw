@@ -102,6 +102,27 @@ function reqInit(route: Route, email: string): RequestInit {
 // the data layer for any of them, including the read-only global catalog.
 const PROTECTED_ROUTES: Route[] = [
   { method: 'GET', path: '/api/works' },
+  { method: 'GET', path: '/api/work-matches' },
+  {
+    method: 'POST',
+    path: '/api/work-matches/review',
+    body: {
+      candidateKey: 'a'.repeat(64),
+      fingerprint: 'b'.repeat(64),
+      workIds: ['work-1', 'work-2'],
+      decision: 'needs_research',
+    },
+  },
+  {
+    method: 'POST',
+    path: '/api/work-matches/merge',
+    body: {
+      candidateKey: 'a'.repeat(64),
+      fingerprint: 'b'.repeat(64),
+      canonicalWorkId: 'work-1',
+      sourceWorkIds: ['work-2'],
+    },
+  },
   { method: 'PATCH', path: '/api/performances/perf-1/timestamps', body: { timestamp: 999, endTimestamp: 1001 } },
   { method: 'PATCH', path: '/api/performances/perf-1/details', body: { title: 'Hacked', originalArtist: 'Hacker' } },
   { method: 'DELETE', path: '/api/performances/perf-1' },

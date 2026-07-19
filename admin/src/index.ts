@@ -72,6 +72,12 @@ import {
   requireExporterBuildId,
 } from './vod-export/publication';
 import { runVodExportMaintenance } from './vod-export/maintenance';
+import {
+  listWorkMatchCandidates,
+  mergeWorkMatchCandidate,
+  reviewWorkMatchCandidate,
+  WorkMatchError,
+} from './work-review';
 import type {
   AuthUser,
   CreateSongBody,
@@ -111,6 +117,10 @@ import type {
   BulkFetchSubscribersResult,
   BulkFetchSubscribersResponse,
   GlobalWorksResponse,
+  WorkMatchCandidatesResponse,
+  WorkMatchFilter,
+  WorkMatchMergeBody,
+  WorkMatchReviewBody,
 } from '../shared/types';
 
 type Bindings = {
@@ -229,6 +239,57 @@ function parseHarmonizeMergeBody(value: unknown): HarmonizeMergeBody | null {
   };
 }
 
+function parseWorkMatchReviewBody(value: unknown): WorkMatchReviewBody | null {
+  if (!isUnknownRecord(value)) return null;
+  if (
+    typeof value.candidateKey !== 'string'
+    || typeof value.fingerprint !== 'string'
+    || !Array.isArray(value.workIds)
+    || value.workIds.length < 2
+    || !value.workIds.every((id): id is string => typeof id === 'string' && id.trim().length > 0)
+    || (value.decision !== 'not_duplicate' && value.decision !== 'needs_research')
+    || (value.note !== undefined && typeof value.note !== 'string')
+  ) return null;
+
+  const workIds = value.workIds.map((id) => id.trim());
+  if (new Set(workIds).size !== workIds.length) return null;
+  return {
+    candidateKey: value.candidateKey.trim(),
+    fingerprint: value.fingerprint.trim(),
+    workIds,
+    decision: value.decision,
+    ...(value.note === undefined ? {} : { note: value.note }),
+  };
+}
+
+function parseWorkMatchMergeBody(value: unknown): WorkMatchMergeBody | null {
+  if (!isUnknownRecord(value)) return null;
+  if (
+    typeof value.candidateKey !== 'string'
+    || typeof value.fingerprint !== 'string'
+    || typeof value.canonicalWorkId !== 'string'
+    || value.canonicalWorkId.trim().length === 0
+    || !Array.isArray(value.sourceWorkIds)
+    || value.sourceWorkIds.length === 0
+    || !value.sourceWorkIds.every(
+      (id): id is string => typeof id === 'string' && id.trim().length > 0,
+    )
+  ) return null;
+
+  const canonicalWorkId = value.canonicalWorkId.trim();
+  const sourceWorkIds = value.sourceWorkIds.map((id) => id.trim());
+  if (
+    new Set(sourceWorkIds).size !== sourceWorkIds.length
+    || sourceWorkIds.includes(canonicalWorkId)
+  ) return null;
+  return {
+    candidateKey: value.candidateKey.trim(),
+    fingerprint: value.fingerprint.trim(),
+    canonicalWorkId,
+    sourceWorkIds,
+  };
+}
+
 function hasCurrentChannelVerification(value: {
   youtube_channel_id: string;
   youtube_channel_verified_id: string | null;
@@ -311,6 +372,65 @@ app.get('/api/works', requireCurator, async (c) => {
     stats: result.stats,
   };
   return c.json(response);
+});
+
+// --- Global work duplicate review (site-wide) ---
+
+app.get('/api/work-matches', requireCurator, async (c) => {
+  const requestedFilter = c.req.query('filter') ?? 'pending';
+  const allowedFilters = new Set<WorkMatchFilter>([
+    'pending',
+    'not_duplicate',
+    'needs_research',
+    'all',
+  ]);
+  if (!allowedFilters.has(requestedFilter as WorkMatchFilter)) {
+    return c.json({ error: 'Invalid work-match filter' }, 400);
+  }
+  const page = Number.parseInt(c.req.query('page') || '1', 10);
+  const pageSize = Number.parseInt(c.req.query('pageSize') || '25', 10);
+  const result = await listWorkMatchCandidates(c.env.DB, {
+    filter: requestedFilter as WorkMatchFilter,
+    page,
+    pageSize,
+  });
+  const response: WorkMatchCandidatesResponse = {
+    ...result,
+    totalPages: Math.ceil(result.total / result.pageSize),
+  };
+  return c.json(response);
+});
+
+app.post('/api/work-matches/review', requireCurator, async (c) => {
+  const body = parseWorkMatchReviewBody(await c.req.json<unknown>());
+  if (!body) return c.json({ error: 'Invalid global work review request' }, 400);
+
+  try {
+    await reviewWorkMatchCandidate(c.env.DB, body, c.get('user').email);
+    return c.json({ ok: true });
+  } catch (error) {
+    if (error instanceof WorkMatchError) {
+      const status = error.code === 'work_match_stale' ? 409 : 400;
+      return c.json({ error: error.message, code: error.code }, status);
+    }
+    throw error;
+  }
+});
+
+app.post('/api/work-matches/merge', requireCurator, async (c) => {
+  const body = parseWorkMatchMergeBody(await c.req.json<unknown>());
+  if (!body) return c.json({ error: 'Invalid global work merge request' }, 400);
+
+  try {
+    const result = await mergeWorkMatchCandidate(c.env.DB, body, c.get('user').email);
+    return c.json(result);
+  } catch (error) {
+    if (error instanceof WorkMatchError) {
+      const status = error.code === 'work_match_stale' ? 409 : 400;
+      return c.json({ error: error.message, code: error.code }, status);
+    }
+    throw error;
+  }
 });
 
 // --- Songs ---

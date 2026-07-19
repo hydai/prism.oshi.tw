@@ -518,3 +518,88 @@ export interface GlobalWorkStats {
 export interface GlobalWorksResponse extends PaginatedResponse<GlobalWorkSummary> {
   stats: GlobalWorkStats;
 }
+
+// --- Global work duplicate review ---
+
+export const GLOBAL_WORK_MERGE_SOURCE_LIMIT = 50;
+
+export type WorkMatchReason =
+  | 'case_width_whitespace'
+  | 'punctuation_spacing'
+  | 'diacritic_variant';
+
+export type WorkMatchDecision = 'not_duplicate' | 'needs_research';
+export type WorkMatchFilter = 'pending' | WorkMatchDecision | 'all';
+
+export interface WorkMatchCandidateWork {
+  id: string;
+  title: string;
+  originalArtist: string;
+  tags: string[];
+  streamerCount: number;
+  songCount: number;
+  performanceCount: number;
+  approvedSongCount: number;
+  pendingSongCount: number;
+  streamerIds: string[];
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface WorkMatchLocalDuplicate {
+  streamerId: string;
+  songCount: number;
+}
+
+export interface WorkMatchCandidate {
+  candidateKey: string;
+  fingerprint: string;
+  confidence: 'high';
+  reasons: WorkMatchReason[];
+  works: WorkMatchCandidateWork[];
+  suggestedCanonicalWorkId: string;
+  streamerCount: number;
+  songCount: number;
+  performanceCount: number;
+  localDuplicates: WorkMatchLocalDuplicate[];
+  decision: WorkMatchDecision | null;
+  reviewNote: string;
+  reviewedBy: string | null;
+  reviewedAt: string | null;
+}
+
+export interface WorkMatchStats {
+  candidateCount: number;
+  pendingCount: number;
+  notDuplicateCount: number;
+  needsResearchCount: number;
+  affectedWorks: number;
+}
+
+export interface WorkMatchCandidatesResponse extends PaginatedResponse<WorkMatchCandidate> {
+  stats: WorkMatchStats;
+}
+
+export interface WorkMatchReviewBody {
+  candidateKey: string;
+  fingerprint: string;
+  workIds: string[];
+  decision: WorkMatchDecision;
+  note?: string;
+}
+
+export interface WorkMatchMergeBody {
+  candidateKey: string;
+  fingerprint: string;
+  canonicalWorkId: string;
+  sourceWorkIds: string[];
+}
+
+export interface WorkMatchMergeResponse {
+  ok: true;
+  canonicalWorkId: string;
+  mergedWorks: number;
+  relinkedSongs: number;
+  preservedSongs: number;
+  preservedPerformances: number;
+}

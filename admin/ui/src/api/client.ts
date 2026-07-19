@@ -43,6 +43,11 @@ import type {
   HarmonizeMatchType,
   BulkFetchSubscribersResponse,
   GlobalWorksResponse,
+  WorkMatchCandidatesResponse,
+  WorkMatchFilter,
+  WorkMatchMergeBody,
+  WorkMatchMergeResponse,
+  WorkMatchReviewBody,
 } from '../../../shared/types';
 import { REQUEST_AUTHENTICITY_HEADER, REQUEST_AUTHENTICITY_VALUE } from '../../../shared/csrf';
 import type {
@@ -232,6 +237,37 @@ export const api = {
       { skipStreamer: true },
     );
   },
+
+  listWorkMatches: (params?: {
+    filter?: WorkMatchFilter;
+    page?: number;
+    pageSize?: number;
+  }) => {
+    const sp = new URLSearchParams();
+    if (params?.filter) sp.set('filter', params.filter);
+    if (params?.page) sp.set('page', String(params.page));
+    if (params?.pageSize) sp.set('pageSize', String(params.pageSize));
+    const qs = sp.toString();
+    return request<WorkMatchCandidatesResponse>(
+      `/api/work-matches${qs ? `?${qs}` : ''}`,
+      undefined,
+      { skipStreamer: true },
+    );
+  },
+
+  reviewWorkMatch: (body: WorkMatchReviewBody) =>
+    request<{ ok: true }>(
+      '/api/work-matches/review',
+      { method: 'POST', body: JSON.stringify(body) },
+      { skipStreamer: true },
+    ),
+
+  mergeWorkMatch: (body: WorkMatchMergeBody) =>
+    request<WorkMatchMergeResponse>(
+      '/api/work-matches/merge',
+      { method: 'POST', body: JSON.stringify(body) },
+      { skipStreamer: true },
+    ),
 
   getSong: (id: string) => request<Song>(`/api/songs/${id}`),
 

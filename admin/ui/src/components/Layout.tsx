@@ -7,6 +7,7 @@ const navItems: Array<{ to: string; label: string; curatorOnly?: boolean }> = [
   { to: '/', label: 'Dashboard' },
   { to: '/songs', label: 'Songs' },
   { to: '/works', label: 'Global Library', curatorOnly: true },
+  { to: '/works/review', label: 'Work Review', curatorOnly: true },
   { to: '/streams', label: 'Streams' },
   { to: '/submit/song', label: 'Submit Song' },
   { to: '/submit/stream', label: 'Submit Stream' },

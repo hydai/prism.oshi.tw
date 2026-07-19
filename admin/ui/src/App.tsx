@@ -6,6 +6,7 @@ import Layout from './components/Layout';
 import Dashboard from './pages/Dashboard';
 import SongsList from './pages/SongsList';
 import GlobalWorks from './pages/GlobalWorks';
+import GlobalWorkReview from './pages/GlobalWorkReview';
 import SongDetail from './pages/SongDetail';
 import StreamsList from './pages/StreamsList';
 import SubmitSong from './pages/SubmitSong';
@@ -62,6 +63,10 @@ export default function App() {
         <Route
           path="/works"
           element={user.role === 'curator' ? <GlobalWorks /> : <Navigate to="/" replace />}
+        />
+        <Route
+          path="/works/review"
+          element={user.role === 'curator' ? <GlobalWorkReview /> : <Navigate to="/" replace />}
         />
         <Route path="/songs/:id" element={<SongDetail user={user} />} />
         <Route path="/streams" element={<StreamsList user={user} />} />
