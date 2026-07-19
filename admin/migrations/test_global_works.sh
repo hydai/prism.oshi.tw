@@ -14,6 +14,7 @@ CREATE TABLE songs (
   original_artist TEXT NOT NULL,
   tags TEXT,
   status TEXT NOT NULL,
+  reviewed_by TEXT,
   created_at TEXT NOT NULL,
   updated_at TEXT NOT NULL
 );
@@ -24,11 +25,11 @@ CREATE TABLE performances (
 );
 
 INSERT INTO songs VALUES
-  ('song-a', 'alice', 'Shared Song', 'Original Artist', '["pop"]', 'approved', '2026-01-01', '2026-01-02'),
-  ('song-b', 'bob',   'Shared Song', 'Original Artist', '[]',      'approved', '2026-01-03', '2026-01-04'),
-  ('song-c', 'alice', 'Shared Song', 'Other Artist',    '[]',      'approved', '2026-01-05', '2026-01-06'),
-  ('song-d', 'alice', 'Shared Song', 'Original Artist', '[]',      'pending',  '2026-01-07', '2026-01-08'),
-  ('song-e', 'carol', 'Solo Song',   'Solo Artist',     'invalid', 'rejected', '2026-01-09', '2026-01-10');
+  ('song-a', 'alice', 'Shared Song', 'Original Artist', '["pop"]', 'approved', NULL, '2026-01-01', '2026-01-02'),
+  ('song-b', 'bob',   'Shared Song', 'Original Artist', '[]',      'approved', NULL, '2026-01-03', '2026-01-04'),
+  ('song-c', 'alice', 'Shared Song', 'Other Artist',    '[]',      'approved', NULL, '2026-01-05', '2026-01-06'),
+  ('song-d', 'alice', 'Shared Song', 'Original Artist', '[]',      'pending',  NULL, '2026-01-07', '2026-01-08'),
+  ('song-e', 'carol', 'Solo Song',   'Solo Artist',     'invalid', 'rejected', NULL, '2026-01-09', '2026-01-10');
 
 INSERT INTO performances VALUES
   ('perf-a', 'song-a'),
@@ -253,24 +254,122 @@ assert_sql 'PRAGMA integrity_check;' 'ok' 'SQLite integrity after retired identi
 assert_sql 'SELECT COUNT(*) FROM pragma_foreign_key_check;' '0' 'foreign keys after retired identity resolution'
 
 # Exercise the transaction-local guard shape used by Harmonizer merges. Stale
-# reviewed work metadata must leave every guarded mutation as a no-op; a current
-# reviewed state must keep authorizing later statements even after the bridge
-# itself changes.
+# reviewed song or work metadata must leave every guarded mutation as a no-op;
+# a current reviewed state must keep authorizing later statements even after
+# the bridge itself changes.
 sqlite3 "$tmp_db" <<'SQL'
 PRAGMA foreign_keys = ON;
 INSERT INTO works (id, title, original_artist, tags)
 VALUES ('work-guard-source', 'Guard Source', 'Guard Artist', '[]');
 INSERT INTO songs (
   id, streamer_id, title, original_artist, tags, status,
-  created_at, updated_at
+  reviewed_by, created_at, updated_at
 )
 VALUES (
   'song-guard-source', 'alice', 'Guard Source', 'Guard Artist',
-  '[]', 'approved', datetime('now'), datetime('now')
+  '[]', 'approved', 'guard-reviewer', datetime('now'), datetime('now')
 );
 INSERT INTO song_work_links (song_id, work_id, link_method, linked_by)
 VALUES ('song-guard-source', 'work-guard-source', 'manual', 'test-curator');
 SQL
+
+# The links and global work tags are still current, but the reviewed local tags
+# no longer match. No canonical update or source deletion may be authorized.
+sqlite3 "$tmp_db" >/dev/null <<'SQL'
+PRAGMA foreign_keys = ON;
+BEGIN;
+WITH expected_links(song_id, work_id) AS (
+  SELECT key, value
+  FROM json_each('{"song-a":"work-song-a","song-guard-source":"work-guard-source"}')
+),
+expected_song_state(
+  song_id, title, original_artist, tags, status, reviewed_by
+) AS (
+  SELECT key,
+         json_extract(value, '$.title'),
+         json_extract(value, '$.originalArtist'),
+         json_extract(value, '$.tags'),
+         json_extract(value, '$.status'),
+         json_extract(value, '$.reviewedBy')
+  FROM json_each('{"song-a":{"title":"Shared Song","originalArtist":"Original Artist","tags":"[\"pop\"]","status":"approved","reviewedBy":null},"song-guard-source":{"title":"Guard Source","originalArtist":"Guard Artist","tags":"[\"stale\"]","status":"approved","reviewedBy":"guard-reviewer"}}')
+),
+expected_work_state(work_id, tags) AS (
+  SELECT key, value
+  FROM json_each('{"work-song-a":"[\"pop\"]","work-guard-source":"[]"}')
+),
+merge_guard(valid) AS (
+  SELECT COUNT(*) = (SELECT COUNT(*) FROM expected_links)
+     AND (
+       SELECT COUNT(*)
+       FROM expected_work_state AS expected_work
+       JOIN works AS guarded_state
+         ON guarded_state.id = expected_work.work_id
+        AND guarded_state.tags = expected_work.tags
+     ) = (SELECT COUNT(*) FROM expected_work_state)
+  FROM expected_links AS expected
+  JOIN expected_song_state AS expected_song
+    ON expected_song.song_id = expected.song_id
+  JOIN songs AS guarded_song
+    ON guarded_song.id = expected.song_id
+   AND guarded_song.streamer_id = 'alice'
+   AND guarded_song.title = expected_song.title
+   AND guarded_song.original_artist = expected_song.original_artist
+   AND guarded_song.tags = expected_song.tags
+   AND guarded_song.status = expected_song.status
+   AND guarded_song.reviewed_by IS expected_song.reviewed_by
+  JOIN song_work_links AS guarded_link
+    ON guarded_link.song_id = expected.song_id
+   AND guarded_link.work_id = expected.work_id
+  JOIN works AS guarded_work
+    ON guarded_work.id = expected.work_id
+)
+INSERT INTO work_aliases (
+  source_work_id, canonical_work_id, source_title,
+  source_original_artist, source_tags, merged_by
+)
+SELECT 'merge-guard-stale-song-source', 'merge-guard-stale-song-canonical',
+       '__merge_guard__', '__merge_guard__', '[]',
+       'system:harmonizer-merge-guard'
+FROM merge_guard
+WHERE valid
+RETURNING 1 AS valid;
+
+WITH merge_guard(valid) AS (
+  SELECT EXISTS (
+    SELECT 1
+    FROM work_aliases
+    WHERE source_work_id = 'merge-guard-stale-song-source'
+      AND canonical_work_id = 'merge-guard-stale-song-canonical'
+      AND merged_by = 'system:harmonizer-merge-guard'
+  )
+)
+UPDATE songs
+SET tags = '["should-not-apply"]'
+WHERE id = 'song-a'
+  AND (SELECT valid FROM merge_guard);
+
+WITH merge_guard(valid) AS (
+  SELECT EXISTS (
+    SELECT 1
+    FROM work_aliases
+    WHERE source_work_id = 'merge-guard-stale-song-source'
+      AND canonical_work_id = 'merge-guard-stale-song-canonical'
+      AND merged_by = 'system:harmonizer-merge-guard'
+  )
+)
+DELETE FROM songs
+WHERE id = 'song-guard-source'
+  AND (SELECT valid FROM merge_guard);
+
+DELETE FROM work_aliases
+WHERE source_work_id = 'merge-guard-stale-song-source'
+  AND canonical_work_id = 'merge-guard-stale-song-canonical'
+  AND merged_by = 'system:harmonizer-merge-guard';
+COMMIT;
+SQL
+
+assert_sql "SELECT tags FROM songs WHERE id = 'song-a';" '["pop"]' 'stale song metadata blocks canonical overwrite'
+assert_sql "SELECT COUNT(*) FROM songs WHERE id = 'song-guard-source';" '1' 'stale song metadata blocks source deletion'
 
 sqlite3 "$tmp_db" >/dev/null <<'SQL'
 PRAGMA foreign_keys = ON;
@@ -278,6 +377,17 @@ BEGIN;
 WITH expected_links(song_id, work_id) AS (
   SELECT key, value
   FROM json_each('{"song-a":"work-song-a","song-guard-source":"work-guard-source"}')
+),
+expected_song_state(
+  song_id, title, original_artist, tags, status, reviewed_by
+) AS (
+  SELECT key,
+         json_extract(value, '$.title'),
+         json_extract(value, '$.originalArtist'),
+         json_extract(value, '$.tags'),
+         json_extract(value, '$.status'),
+         json_extract(value, '$.reviewedBy')
+  FROM json_each('{"song-a":{"title":"Shared Song","originalArtist":"Original Artist","tags":"[\"pop\"]","status":"approved","reviewedBy":null},"song-guard-source":{"title":"Guard Source","originalArtist":"Guard Artist","tags":"[]","status":"approved","reviewedBy":"guard-reviewer"}}')
 ),
 expected_work_state(work_id, tags) AS (
   SELECT key, value
@@ -293,9 +403,16 @@ merge_guard(valid) AS (
         AND guarded_state.tags = expected_work.tags
      ) = (SELECT COUNT(*) FROM expected_work_state)
   FROM expected_links AS expected
+  JOIN expected_song_state AS expected_song
+    ON expected_song.song_id = expected.song_id
   JOIN songs AS guarded_song
     ON guarded_song.id = expected.song_id
    AND guarded_song.streamer_id = 'alice'
+   AND guarded_song.title = expected_song.title
+   AND guarded_song.original_artist = expected_song.original_artist
+   AND guarded_song.tags = expected_song.tags
+   AND guarded_song.status = expected_song.status
+   AND guarded_song.reviewed_by IS expected_song.reviewed_by
   JOIN song_work_links AS guarded_link
     ON guarded_link.song_id = expected.song_id
    AND guarded_link.work_id = expected.work_id
@@ -357,6 +474,17 @@ WITH expected_links(song_id, work_id) AS (
   SELECT key, value
   FROM json_each('{"song-a":"work-song-a","song-guard-source":"work-guard-source"}')
 ),
+expected_song_state(
+  song_id, title, original_artist, tags, status, reviewed_by
+) AS (
+  SELECT key,
+         json_extract(value, '$.title'),
+         json_extract(value, '$.originalArtist'),
+         json_extract(value, '$.tags'),
+         json_extract(value, '$.status'),
+         json_extract(value, '$.reviewedBy')
+  FROM json_each('{"song-a":{"title":"Shared Song","originalArtist":"Original Artist","tags":"[\"pop\"]","status":"approved","reviewedBy":null},"song-guard-source":{"title":"Guard Source","originalArtist":"Guard Artist","tags":"[]","status":"approved","reviewedBy":"guard-reviewer"}}')
+),
 expected_work_state(work_id, tags) AS (
   SELECT key, value
   FROM json_each('{"work-song-a":"[\"pop\"]","work-guard-source":"[]"}')
@@ -371,9 +499,16 @@ merge_guard(valid) AS (
         AND guarded_state.tags = expected_work.tags
      ) = (SELECT COUNT(*) FROM expected_work_state)
   FROM expected_links AS expected
+  JOIN expected_song_state AS expected_song
+    ON expected_song.song_id = expected.song_id
   JOIN songs AS guarded_song
     ON guarded_song.id = expected.song_id
    AND guarded_song.streamer_id = 'alice'
+   AND guarded_song.title = expected_song.title
+   AND guarded_song.original_artist = expected_song.original_artist
+   AND guarded_song.tags = expected_song.tags
+   AND guarded_song.status = expected_song.status
+   AND guarded_song.reviewed_by IS expected_song.reviewed_by
   JOIN song_work_links AS guarded_link
     ON guarded_link.song_id = expected.song_id
    AND guarded_link.work_id = expected.work_id
