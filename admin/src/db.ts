@@ -1898,12 +1898,14 @@ const SONG_MERGE_GUARD_ACTOR = 'system:harmonizer-merge-guard';
 
 // D1 exposes atomic batches but no interactive transaction callback. The first
 // statement writes this short-lived token only when every selected song still
-// has its reviewed work link. Every business mutation checks the token, and the
-// final statement removes it before the batch commits, so stale batches are
-// entirely no-op without exposing guard state outside the transaction.
+// has its reviewed work link and, for a cross-work merge, every affected work
+// still has its reviewed tags. Every business mutation checks the token, and
+// the final statement removes it before the batch commits, so stale batches
+// are entirely no-op without exposing guard state outside the transaction.
 function prepareSongMergeGuard(
   db: D1Database,
   expectedLinksJson: string,
+  expectedWorkStateJson: string,
   streamerId: string,
   guardSourceId: string,
   guardCanonicalId: string,
@@ -1913,8 +1915,19 @@ function prepareSongMergeGuard(
        SELECT key, value
        FROM json_each(?)
      ),
+     expected_work_state(work_id, tags) AS (
+       SELECT key, value
+       FROM json_each(?)
+     ),
      merge_guard(valid) AS (
        SELECT COUNT(*) = (SELECT COUNT(*) FROM expected_links)
+          AND (
+            SELECT COUNT(*)
+            FROM expected_work_state AS expected_work
+            JOIN works AS guarded_state
+              ON guarded_state.id = expected_work.work_id
+             AND guarded_state.tags = expected_work.tags
+          ) = (SELECT COUNT(*) FROM expected_work_state)
        FROM expected_links AS expected
        JOIN songs AS guarded_song
          ON guarded_song.id = expected.song_id
@@ -1935,6 +1948,7 @@ function prepareSongMergeGuard(
      RETURNING 1 AS valid`,
   ).bind(
     expectedLinksJson,
+    expectedWorkStateJson,
     streamerId,
     guardSourceId,
     guardCanonicalId,
@@ -2070,7 +2084,7 @@ export async function mergeSongs(
     if (!confirmationMatches) {
       throw new SongMergeError(
         'work_merge_stale',
-        'Global work links changed after review; scan again before merging',
+        'Song links or global work metadata changed after review; scan again before merging',
       );
     }
   }
@@ -2086,6 +2100,12 @@ export async function mergeSongs(
   const expectedLinksJson = JSON.stringify(Object.fromEntries(
     allRows.map((row) => [row.id, row.work_id!]),
   ));
+  const expectedWorkStateJson = sourceWorkIds.length === 0
+    ? '{}'
+    : JSON.stringify(Object.fromEntries([
+      [canonicalWorkId, canonical.work_tags!],
+      ...[...sourceWorks.entries()].map(([workId, row]) => [workId, row.work_tags!]),
+    ]));
   const guardSourceId = `merge-guard-source-${crypto.randomUUID()}`;
   const guardCanonicalId = `merge-guard-canonical-${crypto.randomUUID()}`;
   const guarded = (sql: string, bindings: unknown[] = []): D1PreparedStatement => (
@@ -2101,6 +2121,7 @@ export async function mergeSongs(
     prepareSongMergeGuard(
       db,
       expectedLinksJson,
+      expectedWorkStateJson,
       streamerId,
       guardSourceId,
       guardCanonicalId,
@@ -2243,7 +2264,7 @@ export async function mergeSongs(
   if (mergeGuard?.valid !== 1 && mergeGuard?.valid !== true) {
     throw new SongMergeError(
       'work_merge_stale',
-      'Global work links changed after review; scan again before merging',
+      'Song links or global work metadata changed after review; scan again before merging',
     );
   }
   return {
