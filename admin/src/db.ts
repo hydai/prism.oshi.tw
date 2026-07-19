@@ -1545,6 +1545,7 @@ export async function exportStreams(db: D1Database, streamerId: string) {
 
 interface SongWithPerfCount {
   id: string;
+  work_id: string | null;
   title: string;
   original_artist: string;
   status: Status;
@@ -1560,15 +1561,18 @@ export async function getSongSimilarityGroups(
 ): Promise<SimilarityGroup<HarmonizeSongEntry>[]> {
   const { results } = await db
     .prepare(
-      `SELECT s.id, s.title, s.original_artist, s.status, s.created_at,
+      `SELECT s.id, link.work_id, s.title, s.original_artist, s.status, s.created_at,
               (SELECT COUNT(*) FROM performances p WHERE p.song_id = s.id) AS perf_count
-       FROM songs s WHERE s.streamer_id = ?`,
+       FROM songs s
+       LEFT JOIN song_work_links AS link ON link.song_id = s.id
+       WHERE s.streamer_id = ?`,
     )
     .bind(streamerId)
     .all<SongWithPerfCount>();
 
   const entries: HarmonizeSongEntry[] = results.map((r) => ({
     id: r.id,
+    workId: r.work_id,
     title: r.title,
     originalArtist: r.original_artist,
     status: r.status,
@@ -1576,21 +1580,54 @@ export async function getSongSimilarityGroups(
     performanceCount: r.perf_count,
   }));
 
-  // Pass 1: exact normalization grouping
-  const exactGroups = new Map<string, HarmonizeSongEntry[]>();
-  for (const entry of entries) {
-    const key = normalizeForMatching(entry.title);
-    const group = exactGroups.get(key);
-    if (group) group.push(entry);
-    else exactGroups.set(key, [entry]);
+  // Pass 1: build connected components from either authoritative work IDs or
+  // conservative title normalization. This keeps same-work local duplicates
+  // discoverable even when their display text has drifted significantly.
+  const parent = entries.map((_, index) => index);
+  function findEntry(index: number): number {
+    if (parent[index] !== index) parent[index] = findEntry(parent[index]);
+    return parent[index];
   }
+  function unionEntries(left: number, right: number): void {
+    parent[findEntry(left)] = findEntry(right);
+  }
+
+  const firstByTitle = new Map<string, number>();
+  const firstByWork = new Map<string, number>();
+  entries.forEach((entry, index) => {
+    const titleKey = normalizeForMatching(entry.title);
+    const titleMatch = firstByTitle.get(titleKey);
+    if (titleMatch === undefined) firstByTitle.set(titleKey, index);
+    else unionEntries(index, titleMatch);
+
+    if (entry.workId) {
+      const workMatch = firstByWork.get(entry.workId);
+      if (workMatch === undefined) firstByWork.set(entry.workId, index);
+      else unionEntries(index, workMatch);
+    }
+  });
+
+  const exactGroups = new Map<number, HarmonizeSongEntry[]>();
+  entries.forEach((entry, index) => {
+    const root = findEntry(index);
+    const group = exactGroups.get(root);
+    if (group) group.push(entry);
+    else exactGroups.set(root, [entry]);
+  });
 
   const result: SimilarityGroup<HarmonizeSongEntry>[] = [];
   const grouped = new Set<string>();
 
-  for (const [key, items] of exactGroups) {
+  for (const items of exactGroups.values()) {
     if (items.length >= 2) {
-      result.push({ normalizedKey: key, matchType: 'exact', items });
+      const workIds = new Set(items.map((item) => item.workId).filter((id): id is string => id !== null));
+      const allShareWork = workIds.size === 1 && items.every((item) => item.workId !== null);
+      const sharedWorkId = allShareWork ? [...workIds][0] : null;
+      result.push({
+        normalizedKey: sharedWorkId ? `work:${sharedWorkId}` : normalizeForMatching(items[0].title),
+        matchType: sharedWorkId ? 'work_id' : 'exact',
+        items,
+      });
       for (const item of items) grouped.add(item.id);
     }
   }
@@ -1742,7 +1779,11 @@ export async function getArtistSimilarityGroups(
   return result;
 }
 
-type SongMergeErrorCode = 'invalid_request' | 'song_not_found';
+type SongMergeErrorCode =
+  | 'invalid_request'
+  | 'song_not_found'
+  | 'work_not_linked'
+  | 'work_merge_required';
 
 export class SongMergeError extends Error {
   constructor(
@@ -1757,6 +1798,10 @@ export class SongMergeError extends Error {
 interface SongMergeRow {
   id: string;
   streamer_id: string;
+  work_id: string | null;
+  work_title: string | null;
+  work_original_artist: string | null;
+  work_tags: string | null;
   title: string;
   original_artist: string;
   tags: string;
@@ -1768,8 +1813,11 @@ interface SongMergeRow {
 
 export interface MergeSongsResult {
   canonicalSongId: string;
+  canonicalWorkId: string;
   mergedSongs: number;
   movedPerformances: number;
+  mergedWorks: number;
+  relinkedSongs: number;
 }
 
 const MERGE_SOURCE_LIMIT = 50;
@@ -1795,7 +1843,8 @@ function parseSongTags(tags: string): string[] {
 /**
  * Atomically merge explicit source song entities into one canonical song.
  * Performances are repointed, source rows are snapshotted in song_aliases,
- * and no performance rows are deleted.
+ * and no performance rows are deleted. When explicitly authorized, distinct
+ * global works are also snapshotted, flattened, and repointed site-wide.
  */
 export async function mergeSongs(
   db: D1Database,
@@ -1803,6 +1852,7 @@ export async function mergeSongs(
   canonicalSongId: string,
   sourceSongIds: string[],
   mergedBy: string,
+  mergeGlobalWorks = false,
 ): Promise<MergeSongsResult> {
   const uniqueSourceIds = [...new Set(sourceSongIds)];
   if (!canonicalSongId || uniqueSourceIds.length === 0) {
@@ -1822,10 +1872,16 @@ export async function mergeSongs(
   const placeholders = requestedIds.map(() => '?').join(', ');
   const { results: rows } = await db
     .prepare(
-      `SELECT id, streamer_id, title, original_artist, tags, status,
-              submitted_by, reviewed_by, created_at
-       FROM songs
-       WHERE streamer_id = ? AND id IN (${placeholders})`,
+      `SELECT song.id, song.streamer_id, link.work_id,
+              work.title AS work_title,
+              work.original_artist AS work_original_artist,
+              work.tags AS work_tags,
+              song.title, song.original_artist, song.tags, song.status,
+              song.submitted_by, song.reviewed_by, song.created_at
+       FROM songs AS song
+       LEFT JOIN song_work_links AS link ON link.song_id = song.id
+       LEFT JOIN works AS work ON work.id = link.work_id
+       WHERE song.streamer_id = ? AND song.id IN (${placeholders})`,
     )
     .bind(streamerId, ...requestedIds)
     .all<SongMergeRow>();
@@ -1854,7 +1910,38 @@ export async function mergeSongs(
   const canonical = rowById.get(canonicalSongId)!;
   const sources = uniqueSourceIds.map((id) => rowById.get(id)!);
   const allRows = [canonical, ...sources];
+  const unlinked = allRows.find((row) => (
+    row.work_id === null
+    || row.work_title === null
+    || row.work_original_artist === null
+    || row.work_tags === null
+  ));
+  if (unlinked) {
+    throw new SongMergeError(
+      'work_not_linked',
+      `Song ${unlinked.id} is not linked to an active global work`,
+    );
+  }
+
+  const canonicalWorkId = canonical.work_id!;
+  const sourceWorks = new Map<string, SongMergeRow>();
+  for (const source of sources) {
+    if (source.work_id !== canonicalWorkId) sourceWorks.set(source.work_id!, source);
+  }
+  const sourceWorkIds = [...sourceWorks.keys()];
+  if (sourceWorkIds.length > 0 && !mergeGlobalWorks) {
+    throw new SongMergeError(
+      'work_merge_required',
+      `This merge spans ${sourceWorkIds.length + 1} global works and requires explicit confirmation`,
+    );
+  }
+
   const tags = [...new Set(allRows.flatMap((row) => parseSongTags(row.tags)))];
+  const workTags = [...new Set([
+    ...parseSongTags(canonical.work_tags!),
+    ...[...sourceWorks.values()].flatMap((row) => parseSongTags(row.work_tags!)),
+    ...tags,
+  ])];
   const mergedStatus = MERGED_STATUS_PRIORITY.find((status) =>
     allRows.some((row) => row.status === status),
   ) ?? canonical.status;
@@ -1870,29 +1957,20 @@ export async function mergeSongs(
     ).bind(canonicalSongId, streamerId, ...uniqueSourceIds),
   ];
 
-  for (const source of sources) {
-    statements.push(
-      db.prepare(
-        `INSERT INTO song_aliases (
-           source_song_id, canonical_song_id, streamer_id,
-           source_title, source_original_artist, source_status, source_tags,
-           source_submitted_by, source_reviewed_by, source_created_at, merged_by
-         ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
-      ).bind(
-        source.id,
-        canonicalSongId,
-        streamerId,
-        source.title,
-        source.original_artist,
-        source.status,
-        source.tags,
-        source.submitted_by,
-        source.reviewed_by,
-        source.created_at,
-        mergedBy,
-      ),
-    );
-  }
+  statements.push(
+    db.prepare(
+      `INSERT INTO song_aliases (
+         source_song_id, canonical_song_id, streamer_id,
+         source_title, source_original_artist, source_status, source_tags,
+         source_submitted_by, source_reviewed_by, source_created_at, merged_by
+       )
+       SELECT source.id, ?, source.streamer_id,
+              source.title, source.original_artist, source.status, source.tags,
+              source.submitted_by, source.reviewed_by, source.created_at, ?
+       FROM songs AS source
+       WHERE source.streamer_id = ? AND source.id IN (${sourcePlaceholders})`,
+    ).bind(canonicalSongId, mergedBy, streamerId, ...uniqueSourceIds),
+  );
 
   statements.push(
     db.prepare(
@@ -1919,11 +1997,64 @@ export async function mergeSongs(
     ).bind(streamerId, ...uniqueSourceIds),
   );
 
+  let workRelinkIndex: number | null = null;
+  let workDeleteIndex: number | null = null;
+  if (sourceWorkIds.length > 0) {
+    const workPlaceholders = sourceWorkIds.map(() => '?').join(', ');
+
+    statements.push(
+      db.prepare(
+        `UPDATE work_aliases
+         SET canonical_work_id = ?
+         WHERE canonical_work_id IN (${workPlaceholders})`,
+      ).bind(canonicalWorkId, ...sourceWorkIds),
+      db.prepare(
+        `INSERT INTO work_aliases (
+           source_work_id, canonical_work_id, source_title,
+           source_original_artist, source_tags, merged_by
+         )
+         SELECT source.id, ?, source.title,
+                source.original_artist, source.tags, ?
+         FROM works AS source
+         WHERE source.id IN (${workPlaceholders})`,
+      ).bind(canonicalWorkId, mergedBy, ...sourceWorkIds),
+    );
+
+    workRelinkIndex = statements.length;
+    statements.push(
+      db.prepare(
+        `UPDATE song_work_links
+         SET work_id = ?, link_method = 'manual', linked_by = ?,
+             updated_at = datetime('now')
+         WHERE work_id IN (${workPlaceholders})`,
+      ).bind(canonicalWorkId, mergedBy, ...sourceWorkIds),
+    );
+  }
+
+  statements.push(
+    db.prepare(
+      `UPDATE works
+       SET tags = ?, updated_at = datetime('now')
+       WHERE id = ?`,
+    ).bind(JSON.stringify(workTags), canonicalWorkId),
+  );
+
+  if (sourceWorkIds.length > 0) {
+    const workPlaceholders = sourceWorkIds.map(() => '?').join(', ');
+    workDeleteIndex = statements.length;
+    statements.push(
+      db.prepare(`DELETE FROM works WHERE id IN (${workPlaceholders})`).bind(...sourceWorkIds),
+    );
+  }
+
   const batchResults = await db.batch(statements);
   return {
     canonicalSongId,
+    canonicalWorkId,
     mergedSongs: batchResults[songDeleteIndex].meta.changes,
     movedPerformances: batchResults[performanceUpdateIndex].meta.changes,
+    mergedWorks: workDeleteIndex === null ? 0 : batchResults[workDeleteIndex].meta.changes,
+    relinkedSongs: workRelinkIndex === null ? 0 : batchResults[workRelinkIndex].meta.changes,
   };
 }
 

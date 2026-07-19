@@ -109,7 +109,11 @@ const PROTECTED_ROUTES: Route[] = [
   { method: 'POST', path: '/api/streams/stream-1/paste-import', body: { text: 'Song - Artist 0:10', replace: true } },
   { method: 'DELETE', path: '/api/streams/stream-1/end-timestamps' },
   { method: 'POST', path: '/api/performances/perf-1/fetch-duration' },
-  { method: 'POST', path: '/api/harmonize/merge', body: { canonicalSongId: 'song-1', sourceSongIds: ['song-2'] } },
+  {
+    method: 'POST',
+    path: '/api/harmonize/merge',
+    body: { canonicalSongId: 'song-1', sourceSongIds: ['song-2'], mergeGlobalWorks: true },
+  },
   { method: 'GET', path: '/api/vod-export/status' },
   { method: 'POST', path: '/api/vod-export/preview' },
   { method: 'GET', path: '/api/vod-export/candidates/00000000-0000-4000-8000-000000000000' },
@@ -196,12 +200,32 @@ async function testVodExportMutationRequiresAuthenticityHeader(): Promise<void> 
   assertEqual(db.prepareCalls, 0, 'CSRF-blocked VOD export mutation never reaches D1');
 }
 
+async function testHarmonizerRejectsInvalidGlobalMergeFlag(): Promise<void> {
+  const db = new RecordingD1();
+  const res = await app.request(
+    '/api/harmonize/merge',
+    reqInit({
+      method: 'POST',
+      path: '/api/harmonize/merge',
+      body: {
+        canonicalSongId: 'song-1',
+        sourceSongIds: ['song-2'],
+        mergeGlobalWorks: 'yes',
+      },
+    }, CURATOR),
+    envFor(db),
+  );
+  assertEqual(res.status, 400, 'global-work authorization must be an explicit boolean');
+  assertEqual(db.prepareCalls, 0, 'invalid global-work authorization is rejected before D1');
+}
+
 async function main(): Promise<void> {
   await testContributorStillAuthenticates();
   await testContributorRetainsReadOnlyStampAccess();
   await testCuratorPassesAuthorization();
   await testContributorBlockedFromStampMutations();
   await testVodExportMutationRequiresAuthenticityHeader();
+  await testHarmonizerRejectsInvalidGlobalMergeFlag();
   console.log('✓ curator-only Admin routes and VOD export CSRF boundaries');
 }
 

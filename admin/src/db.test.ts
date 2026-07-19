@@ -1,7 +1,9 @@
 import {
+  batchUpdateSongs,
   bulkUnapproveStream,
   deleteStreamCascade,
   exportSongs,
+  getSongSimilarityGroups,
   importVodToAdminDb,
   listGlobalWorksPaginated,
   mergeSongs,
@@ -54,6 +56,9 @@ class FakeStatement {
 
   async all<T>(): Promise<{ results: T[] }> {
     this.fakeDb.allStatements.push({ sql: this.sql, params: this.params });
+    if (this.sql.includes('AS perf_count') && this.sql.includes('LEFT JOIN song_work_links')) {
+      return { results: this.fakeDb.harmonizerRows as T[] };
+    }
     if (this.sql.includes('FROM songs') && this.sql.includes('id IN')) {
       return { results: this.fakeDb.mergeRows as T[] };
     }
@@ -89,6 +94,7 @@ class FakeD1Database {
     readonly globalWorkFixture: GlobalWorkFixture | null = null,
     readonly exportSongRows: unknown[] = [],
     readonly exportPerformanceRows: unknown[] = [],
+    readonly harmonizerRows: unknown[] = [],
   ) {}
 
   prepare(sql: string): FakeStatement {
@@ -117,8 +123,10 @@ class FakeD1Database {
       const changes = /UPDATE\s+performances/i.test(statement.sql)
         ? 3
         : /DELETE\s+FROM\s+songs/i.test(statement.sql)
-          ? 2
-          : 1;
+          ? Math.max(0, statement.params.length - 1)
+          : /DELETE\s+FROM\s+works/i.test(statement.sql)
+            ? statement.params.length
+            : 1;
       return { results: [], meta: { changes } };
     });
   }
@@ -309,6 +317,31 @@ async function testSongIdentityEditRelinksGlobalWorkAtomically(): Promise<void> 
   assertEqual(fakeDb.batchStatements[2].params[1], 'song-local', 'relink remains scoped to the edited local song');
 }
 
+async function testHarmonizerArtistUpdatesRelinkEveryEditedSong(): Promise<void> {
+  const fakeDb = new FakeD1Database(null);
+  const updated = await batchUpdateSongs(
+    fakeDb as unknown as D1Database,
+    [
+      { songId: 'song-one', originalArtist: 'Canonical Artist' },
+      { songId: 'song-two', originalArtist: 'Canonical Artist' },
+    ],
+    'curator@example.com',
+  );
+
+  assertEqual(updated, 2, 'Harmonizer reports both local identity updates');
+  assertEqual(fakeDb.batchStatements.length, 6, 'each artist edit emits ensure, update, and relink statements');
+  for (let index = 0; index < fakeDb.batchStatements.length; index += 3) {
+    const ensure = fakeDb.batchStatements[index];
+    const update = fakeDb.batchStatements[index + 1];
+    const relink = fakeDb.batchStatements[index + 2];
+    assert(/INSERT\s+INTO\s+works/i.test(ensure.sql), 'Harmonizer ensures the destination work');
+    assert(/UPDATE\s+songs/i.test(update.sql), 'Harmonizer updates local display metadata');
+    assert(/INSERT\s+INTO\s+song_work_links/i.test(relink.sql), 'Harmonizer relinks the work bridge');
+    assert(/updated_at\s*=\s*datetime\('now'\)/i.test(relink.sql), 'relink marks static data stale');
+    assertEqual(relink.params[0], 'curator@example.com', 'relink records the responsible curator');
+  }
+}
+
 async function testGlobalWorksListAggregatesAcrossStreamers(): Promise<void> {
   const longSearch = '窗外下著雨看著路上撐傘的行人害我一直想到你';
   assert(new TextEncoder().encode(longSearch).length > 48, 'regression search exceeds D1 LIKE pattern limit');
@@ -388,12 +421,26 @@ function mergeRow(
   id: string,
   status: 'pending' | 'approved',
   tags: string,
-  artist = 'Artist',
+  options: {
+    artist?: string;
+    title?: string;
+    workId?: string | null;
+    workTitle?: string;
+    workArtist?: string;
+    workTags?: string;
+  } = {},
 ): Record<string, unknown> {
+  const artist = options.artist ?? 'Artist';
+  const title = options.title ?? 'Song';
+  const workId = options.workId === undefined ? 'work-shared' : options.workId;
   return {
     id,
     streamer_id: 'alice',
-    title: 'Song',
+    work_id: workId,
+    work_title: workId === null ? null : (options.workTitle ?? title),
+    work_original_artist: workId === null ? null : (options.workArtist ?? artist),
+    work_tags: workId === null ? null : (options.workTags ?? '[]'),
+    title,
     original_artist: artist,
     tags,
     status,
@@ -403,11 +450,56 @@ function mergeRow(
   };
 }
 
+async function testHarmonizerScanUsesAndExposesWorkIds(): Promise<void> {
+  const row = (
+    id: string,
+    workId: string | null,
+    title: string,
+    perfCount: number,
+  ) => ({
+    id,
+    work_id: workId,
+    title,
+    original_artist: 'Artist',
+    status: 'approved',
+    created_at: '2026-01-01 00:00:00',
+    perf_count: perfCount,
+  });
+  const fakeDb = new FakeD1Database(null, null, [], null, [], [], [
+    row('same-work-a', 'work-one', 'Alpha', 2),
+    row('same-work-b', 'work-one', 'Completely Different Title', 1),
+    row('same-title-a', 'work-two', 'Shared Title', 4),
+    row('same-title-b', 'work-three', 'shared title', 3),
+  ]);
+
+  const groups = await getSongSimilarityGroups(
+    fakeDb as unknown as D1Database,
+    'alice',
+    'exact',
+    0.85,
+  );
+
+  assertEqual(groups.length, 2, 'work identity and normalized title each form a review group');
+  const workGroup = groups.find((group) => group.matchType === 'work_id');
+  if (!workGroup) throw new Error('same workId songs should form a work_id group');
+  assertEqual(workGroup.normalizedKey, 'work:work-one', 'same-work group identifies its authoritative work');
+  assertEqual(workGroup.items[0].workId, 'work-one', 'scan response exposes workId to the UI');
+  assertEqual(workGroup.items[1].workId, 'work-one', 'every scan entry exposes workId');
+
+  const crossWorkGroup = groups.find((group) => group.matchType === 'exact');
+  if (!crossWorkGroup) throw new Error('same normalized title across works should stay reviewable');
+  assertEqual(
+    crossWorkGroup.items.map((item) => item.workId).join('|'),
+    'work-two|work-three',
+    'exact title group preserves distinct work identities for explicit review',
+  );
+}
+
 async function testMergeSongsPreservesPerformances(): Promise<void> {
   const fakeDb = new FakeD1Database(null, null, [
     mergeRow('song-canonical', 'pending', '["canonical"]'),
     mergeRow('song-source-1', 'approved', '["source"]'),
-    mergeRow('song-source-2', 'approved', '[]', 'Cover Artist'),
+    mergeRow('song-source-2', 'approved', '[]', { artist: 'Cover Artist' }),
   ]);
 
   const result = await mergeSongs(
@@ -420,6 +512,9 @@ async function testMergeSongsPreservesPerformances(): Promise<void> {
 
   assertEqual(result.mergedSongs, 2, 'both source song rows are deleted');
   assertEqual(result.movedPerformances, 3, 'all source performances are repointed');
+  assertEqual(result.canonicalWorkId, 'work-shared', 'same-work merge retains its global identity');
+  assertEqual(result.mergedWorks, 0, 'same-work merge never deletes a global work');
+  assertEqual(result.relinkedSongs, 0, 'same-work merge does not repoint unrelated song bridges');
 
   const sql = fakeDb.batchStatements.map((statement) => statement.sql).join('\n');
   assert(/UPDATE\s+performances/i.test(sql), 'merge must repoint performances');
@@ -428,7 +523,10 @@ async function testMergeSongsPreservesPerformances(): Promise<void> {
   const aliasInserts = fakeDb.batchStatements.filter((statement) =>
     /INSERT\s+INTO\s+song_aliases/i.test(statement.sql),
   );
-  assertEqual(aliasInserts.length, 2, 'every deleted song gets an alias snapshot');
+  assertEqual(aliasInserts.length, 1, 'all deleted songs are snapshotted with one bounded statement');
+  assert(/SELECT\s+source\.id/i.test(aliasInserts[0].sql), 'song aliases are copied from authoritative source rows');
+  assertEqual(aliasInserts[0].params.at(-2), 'song-source-1', 'first source receives an alias');
+  assertEqual(aliasInserts[0].params.at(-1), 'song-source-2', 'every unique source receives an alias');
 
   const canonicalUpdate = fakeDb.batchStatements.find((statement) =>
     /UPDATE\s+songs/i.test(statement.sql),
@@ -436,6 +534,152 @@ async function testMergeSongsPreservesPerformances(): Promise<void> {
   if (!canonicalUpdate) throw new Error('canonical metadata should be updated');
   assertEqual(canonicalUpdate.params[0], '["canonical","source"]', 'source tags are unioned into canonical tags');
   assertEqual(canonicalUpdate.params[1], 'approved', 'approved status is preserved when canonical was pending');
+}
+
+async function testMergeSongsRequiresExplicitGlobalWorkConfirmation(): Promise<void> {
+  const rows = [
+    mergeRow('song-canonical', 'approved', '[]', { workId: 'work-canonical' }),
+    mergeRow('song-source', 'approved', '[]', { workId: 'work-source' }),
+  ];
+  const fakeDb = new FakeD1Database(null, null, rows);
+
+  let caught: unknown;
+  try {
+    await mergeSongs(
+      fakeDb as unknown as D1Database,
+      'alice',
+      'song-canonical',
+      ['song-source'],
+      'curator@example.com',
+    );
+  } catch (error) {
+    caught = error;
+  }
+
+  assert(caught instanceof SongMergeError, 'cross-work merge without confirmation should fail closed');
+  assertEqual((caught as SongMergeError).code, 'work_merge_required', 'failure tells UI to request global confirmation');
+  assertEqual(fakeDb.batchStatements.length, 0, 'missing global confirmation never writes partial data');
+}
+
+async function testMergeSongsMergesGlobalWorksAcrossVtubers(): Promise<void> {
+  const fakeDb = new FakeD1Database(null, null, [
+    mergeRow('song-canonical', 'approved', '["canonical-local"]', {
+      workId: 'work-canonical',
+      workTags: '["canonical-work"]',
+    }),
+    mergeRow('song-source-1', 'approved', '["source-local"]', {
+      workId: 'work-source',
+      workTags: '["source-work"]',
+    }),
+    mergeRow('song-source-2', 'approved', '[]', {
+      workId: 'work-source',
+      workTags: '["source-work"]',
+    }),
+    mergeRow('song-source-3', 'approved', '["third-local"]', {
+      workId: 'work-third',
+      workTags: '["third-work"]',
+    }),
+  ]);
+
+  const result = await mergeSongs(
+    fakeDb as unknown as D1Database,
+    'alice',
+    'song-canonical',
+    ['song-source-1', 'song-source-2', 'song-source-3'],
+    'curator@example.com',
+    true,
+  );
+
+  assertEqual(result.canonicalWorkId, 'work-canonical', 'selected canonical song controls the global work direction');
+  assertEqual(result.mergedSongs, 3, 'all selected local source songs are merged');
+  assertEqual(result.mergedWorks, 2, 'every distinct source work is retired exactly once');
+  assertEqual(result.relinkedSongs, 1, 'surviving linked songs are reported as repointed');
+
+  const aliasFlatten = fakeDb.batchStatements.find((statement) =>
+    /UPDATE\s+work_aliases/i.test(statement.sql),
+  );
+  if (!aliasFlatten) throw new Error('existing aliases should be flattened to the final canonical work');
+  assertEqual(
+    aliasFlatten.params.join('|'),
+    'work-canonical|work-source|work-third',
+    'alias chains point directly to the final work',
+  );
+
+  const workAliasInsert = fakeDb.batchStatements.find((statement) =>
+    /INSERT\s+INTO\s+work_aliases/i.test(statement.sql),
+  );
+  if (!workAliasInsert) throw new Error('retired work should receive an audit snapshot');
+  assert(/SELECT\s+source\.id/i.test(workAliasInsert.sql), 'work alias snapshot comes from the source work row');
+  assertEqual(
+    workAliasInsert.params.join('|'),
+    'work-canonical|curator@example.com|work-source|work-third',
+    'one alias is written per distinct source work',
+  );
+
+  const globalRelink = fakeDb.batchStatements.find((statement) =>
+    /UPDATE\s+song_work_links/i.test(statement.sql),
+  );
+  if (!globalRelink) throw new Error('cross-work merge should repoint all surviving song bridges');
+  assert(!/streamer_id/i.test(globalRelink.sql), 'global bridge update is deliberately not scoped to one VTuber');
+  assert(/updated_at\s*=\s*datetime\('now'\)/i.test(globalRelink.sql), 'global relink marks every affected static export stale');
+  assertEqual(
+    globalRelink.params.join('|'),
+    'work-canonical|curator@example.com|work-source|work-third',
+    'global bridge update records canonical work, curator, and retired work',
+  );
+
+  const workUpdate = fakeDb.batchStatements.find((statement) => /UPDATE\s+works/i.test(statement.sql));
+  if (!workUpdate) throw new Error('canonical work tags should be updated');
+  assertEqual(
+    workUpdate.params[0],
+    '["canonical-work","source-work","third-work","canonical-local","source-local","third-local"]',
+    'canonical work preserves global and local tags from every merged identity',
+  );
+  assert(
+    fakeDb.batchStatements.some((statement) => /DELETE\s+FROM\s+works/i.test(statement.sql)),
+    'retired work is deleted only after every bridge and alias is updated',
+  );
+  assert(
+    !fakeDb.batchStatements.some((statement) => /DELETE\s+FROM\s+performances/i.test(statement.sql)),
+    'global work merge never deletes performances',
+  );
+  const statementIndex = (pattern: RegExp): number => (
+    fakeDb.batchStatements.findIndex((statement) => pattern.test(statement.sql))
+  );
+  assert(
+    statementIndex(/INSERT\s+INTO\s+work_aliases/i) < statementIndex(/UPDATE\s+song_work_links/i),
+    'source work metadata is snapshotted before its global links move',
+  );
+  assert(
+    statementIndex(/UPDATE\s+song_work_links/i) < statementIndex(/DELETE\s+FROM\s+works/i),
+    'every VTuber song bridge moves before the source work is deleted',
+  );
+  assert(fakeDb.batchStatements.length <= 10, 'set-based global merge stays within a small D1 batch');
+}
+
+async function testMergeSongsRejectsUnlinkedWork(): Promise<void> {
+  const fakeDb = new FakeD1Database(null, null, [
+    mergeRow('song-canonical', 'approved', '[]'),
+    mergeRow('song-unlinked', 'approved', '[]', { workId: null }),
+  ]);
+
+  let caught: unknown;
+  try {
+    await mergeSongs(
+      fakeDb as unknown as D1Database,
+      'alice',
+      'song-canonical',
+      ['song-unlinked'],
+      'curator@example.com',
+      true,
+    );
+  } catch (error) {
+    caught = error;
+  }
+
+  assert(caught instanceof SongMergeError, 'unlinked merge should raise SongMergeError');
+  assertEqual((caught as SongMergeError).code, 'work_not_linked', 'unlinked songs fail with a repairable conflict');
+  assertEqual(fakeDb.batchStatements.length, 0, 'unlinked song cannot trigger any merge writes');
 }
 
 async function testMergeSongsRejectsMissingOrCrossStreamerSource(): Promise<void> {
@@ -459,6 +703,31 @@ async function testMergeSongsRejectsMissingOrCrossStreamerSource(): Promise<void
   assert(caught instanceof SongMergeError, 'missing scoped source should raise SongMergeError');
   assertEqual((caught as SongMergeError).code, 'song_not_found', 'cross-streamer source is indistinguishable from missing');
   assertEqual(fakeDb.batchStatements.length, 0, 'validation failure must not execute a write batch');
+}
+
+async function testMergeSongsRejectsDuplicateSourceIds(): Promise<void> {
+  const fakeDb = new FakeD1Database(null, null, [
+    mergeRow('song-canonical', 'approved', '[]'),
+    mergeRow('song-source', 'approved', '[]'),
+  ]);
+
+  let caught: unknown;
+  try {
+    await mergeSongs(
+      fakeDb as unknown as D1Database,
+      'alice',
+      'song-canonical',
+      ['song-source', 'song-source'],
+      'curator@example.com',
+    );
+  } catch (error) {
+    caught = error;
+  }
+
+  assert(caught instanceof SongMergeError, 'duplicate source request should fail deterministically');
+  assertEqual((caught as SongMergeError).code, 'invalid_request', 'duplicate source IDs are rejected as invalid');
+  assertEqual(fakeDb.allStatements.length, 0, 'duplicate source IDs are rejected before database reads');
+  assertEqual(fakeDb.batchStatements.length, 0, 'duplicate source IDs cannot create duplicate alias writes');
 }
 
 async function testSharedSongsSurviveStreamMutations(): Promise<void> {
@@ -492,10 +761,16 @@ async function main(): Promise<void> {
   await testVodImportCreatesNewStreamWhenAbsent();
   await testVodImportReusesExactSong();
   await testSongIdentityEditRelinksGlobalWorkAtomically();
+  await testHarmonizerArtistUpdatesRelinkEveryEditedSong();
   await testGlobalWorksListAggregatesAcrossStreamers();
   await testFanSiteExportOmitsNullWorkIds();
+  await testHarmonizerScanUsesAndExposesWorkIds();
   await testMergeSongsPreservesPerformances();
+  await testMergeSongsRequiresExplicitGlobalWorkConfirmation();
+  await testMergeSongsMergesGlobalWorksAcrossVtubers();
+  await testMergeSongsRejectsUnlinkedWork();
   await testMergeSongsRejectsMissingOrCrossStreamerSource();
+  await testMergeSongsRejectsDuplicateSourceIds();
   await testSharedSongsSurviveStreamMutations();
   console.log('✓ song imports reuse exact entities and merges preserve every performance');
 }
