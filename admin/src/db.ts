@@ -13,6 +13,7 @@ import type {
   Status,
   GlobalWorkSummary,
   GlobalWorkStats,
+  HarmonizeWorkMergeConfirmation,
 } from '../shared/types';
 
 // --- Row → API type mappers ---
@@ -99,9 +100,17 @@ function prepareEnsureExactWork(
 ): D1PreparedStatement {
   return db.prepare(
     `INSERT INTO works (id, title, original_artist, tags)
-     VALUES (?, ?, ?, ?)
+     SELECT ?, ?, ?, ?
+     WHERE NOT EXISTS (
+       SELECT 1
+       FROM work_aliases AS alias
+       JOIN works AS canonical_work
+         ON canonical_work.id = alias.canonical_work_id
+       WHERE alias.source_title = ?
+         AND alias.source_original_artist = ?
+     )
      ON CONFLICT(title, original_artist) DO NOTHING`,
-  ).bind(candidateWorkId, title, originalArtist, tagsJson);
+  ).bind(candidateWorkId, title, originalArtist, tagsJson, title, originalArtist);
 }
 
 function prepareLinkSongToExactWork(
@@ -116,10 +125,25 @@ function prepareLinkSongToExactWork(
     `INSERT OR IGNORE INTO song_work_links (
        song_id, work_id, link_method, linked_by
      )
-     SELECT ?, work.id, ?, ?
-     FROM works AS work
-     WHERE work.title = ? AND work.original_artist = ?`,
-  ).bind(songId, linkMethod, linkedBy, title, originalArtist);
+     SELECT ?, resolved.work_id, ?, ?
+     FROM (
+       SELECT alias.canonical_work_id AS work_id, 0 AS resolution_order
+       FROM work_aliases AS alias
+       JOIN works AS canonical_work
+         ON canonical_work.id = alias.canonical_work_id
+       WHERE alias.source_title = ?
+         AND alias.source_original_artist = ?
+
+       UNION ALL
+
+       SELECT work.id AS work_id, 1 AS resolution_order
+       FROM works AS work
+       WHERE work.title = ? AND work.original_artist = ?
+
+       ORDER BY resolution_order
+       LIMIT 1
+     ) AS resolved`,
+  ).bind(songId, linkMethod, linkedBy, title, originalArtist, title, originalArtist);
 }
 
 function prepareEnsureWorkForSongUpdate(
@@ -132,10 +156,22 @@ function prepareEnsureWorkForSongUpdate(
 ): D1PreparedStatement {
   return db.prepare(
     `INSERT INTO works (id, title, original_artist, tags)
-     SELECT ?, COALESCE(?, song.title), COALESCE(?, song.original_artist),
-            COALESCE(?, song.tags)
-     FROM songs AS song
-     WHERE song.id = ?
+     SELECT ?, identity.title, identity.original_artist, identity.tags
+     FROM (
+       SELECT COALESCE(?, song.title) AS title,
+              COALESCE(?, song.original_artist) AS original_artist,
+              COALESCE(?, song.tags) AS tags
+       FROM songs AS song
+       WHERE song.id = ?
+     ) AS identity
+     WHERE NOT EXISTS (
+       SELECT 1
+       FROM work_aliases AS alias
+       JOIN works AS canonical_work
+         ON canonical_work.id = alias.canonical_work_id
+       WHERE alias.source_title = identity.title
+         AND alias.source_original_artist = identity.original_artist
+     )
      ON CONFLICT(title, original_artist) DO NOTHING`,
   ).bind(
     candidateWorkId,
@@ -155,11 +191,28 @@ function prepareRelinkSongToExactWork(
     `INSERT INTO song_work_links (
        song_id, work_id, link_method, linked_by
      )
-     SELECT song.id, work.id, 'manual', ?
+     SELECT song.id, resolved_work.id, 'manual', ?
      FROM songs AS song
-     JOIN works AS work
-       ON work.title = song.title
-      AND work.original_artist = song.original_artist
+     JOIN works AS resolved_work
+       ON resolved_work.id = COALESCE(
+         (
+           SELECT alias.canonical_work_id
+           FROM work_aliases AS alias
+           JOIN works AS canonical_work
+             ON canonical_work.id = alias.canonical_work_id
+           WHERE alias.source_title = song.title
+             AND alias.source_original_artist = song.original_artist
+           ORDER BY alias.merged_at DESC, alias.source_work_id DESC
+           LIMIT 1
+         ),
+         (
+           SELECT work.id
+           FROM works AS work
+           WHERE work.title = song.title
+             AND work.original_artist = song.original_artist
+           LIMIT 1
+         )
+       )
      WHERE song.id = ?
      ON CONFLICT(song_id) DO UPDATE SET
        work_id = excluded.work_id,
@@ -1783,7 +1836,8 @@ type SongMergeErrorCode =
   | 'invalid_request'
   | 'song_not_found'
   | 'work_not_linked'
-  | 'work_merge_required';
+  | 'work_merge_required'
+  | 'work_merge_stale';
 
 export class SongMergeError extends Error {
   constructor(
@@ -1852,7 +1906,7 @@ export async function mergeSongs(
   canonicalSongId: string,
   sourceSongIds: string[],
   mergedBy: string,
-  mergeGlobalWorks = false,
+  workMergeConfirmation?: HarmonizeWorkMergeConfirmation,
 ): Promise<MergeSongsResult> {
   const uniqueSourceIds = [...new Set(sourceSongIds)];
   if (!canonicalSongId || uniqueSourceIds.length === 0) {
@@ -1929,11 +1983,27 @@ export async function mergeSongs(
     if (source.work_id !== canonicalWorkId) sourceWorks.set(source.work_id!, source);
   }
   const sourceWorkIds = [...sourceWorks.keys()];
-  if (sourceWorkIds.length > 0 && !mergeGlobalWorks) {
+  if (sourceWorkIds.length > 0 && workMergeConfirmation === undefined) {
     throw new SongMergeError(
       'work_merge_required',
       `This merge spans ${sourceWorkIds.length + 1} global works and requires explicit confirmation`,
     );
+  }
+  if (workMergeConfirmation !== undefined) {
+    const confirmedSourceWorkIds = [...new Set(workMergeConfirmation.sourceWorkIds)];
+    const confirmationMatches = (
+      sourceWorkIds.length > 0
+      && workMergeConfirmation.canonicalWorkId === canonicalWorkId
+      && confirmedSourceWorkIds.length === workMergeConfirmation.sourceWorkIds.length
+      && confirmedSourceWorkIds.length === sourceWorkIds.length
+      && confirmedSourceWorkIds.every((workId) => sourceWorks.has(workId))
+    );
+    if (!confirmationMatches) {
+      throw new SongMergeError(
+        'work_merge_stale',
+        'Global work links changed after review; scan again before merging',
+      );
+    }
   }
 
   const tags = [...new Set(allRows.flatMap((row) => parseSongTags(row.tags)))];

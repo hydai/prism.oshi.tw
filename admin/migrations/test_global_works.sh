@@ -121,4 +121,135 @@ assert_sql "SELECT work_id FROM song_work_links WHERE song_id = 'song-a';" 'work
 assert_sql "SELECT linked_by FROM song_work_links WHERE song_id = 'song-b';" 'test-curator' 'manual relink is auditable'
 assert_sql 'SELECT COUNT(*) FROM pragma_foreign_key_check;' '0' 'foreign keys after identity relink'
 
+# Once a work identity is retired, exact imports and identity edits must resolve
+# its historical title/artist through work_aliases instead of recreating it.
+sqlite3 "$tmp_db" <<'SQL'
+PRAGMA foreign_keys = ON;
+INSERT INTO works (id, title, original_artist, tags)
+VALUES ('work-retired', 'Retired Title', 'Retired Artist', '[]');
+INSERT INTO work_aliases (
+  source_work_id, canonical_work_id, source_title,
+  source_original_artist, source_tags, merged_by
+)
+VALUES (
+  'work-retired', 'work-song-a', 'Retired Title',
+  'Retired Artist', '[]', 'test-curator'
+);
+DELETE FROM works WHERE id = 'work-retired';
+
+BEGIN;
+INSERT INTO works (id, title, original_artist, tags)
+SELECT 'work-import-candidate', 'Retired Title', 'Retired Artist', '[]'
+WHERE NOT EXISTS (
+  SELECT 1
+  FROM work_aliases AS alias
+  JOIN works AS canonical_work
+    ON canonical_work.id = alias.canonical_work_id
+  WHERE alias.source_title = 'Retired Title'
+    AND alias.source_original_artist = 'Retired Artist'
+)
+ON CONFLICT(title, original_artist) DO NOTHING;
+
+INSERT INTO songs (
+  id, streamer_id, title, original_artist, tags, status,
+  created_at, updated_at
+)
+VALUES (
+  'song-retired-import', 'dave', 'Retired Title', 'Retired Artist',
+  '[]', 'pending', datetime('now'), datetime('now')
+);
+
+INSERT OR IGNORE INTO song_work_links (
+  song_id, work_id, link_method, linked_by
+)
+SELECT 'song-retired-import', resolved.work_id, 'import_exact', 'test-import'
+FROM (
+  SELECT alias.canonical_work_id AS work_id, 0 AS resolution_order
+  FROM work_aliases AS alias
+  JOIN works AS canonical_work
+    ON canonical_work.id = alias.canonical_work_id
+  WHERE alias.source_title = 'Retired Title'
+    AND alias.source_original_artist = 'Retired Artist'
+
+  UNION ALL
+
+  SELECT work.id AS work_id, 1 AS resolution_order
+  FROM works AS work
+  WHERE work.title = 'Retired Title'
+    AND work.original_artist = 'Retired Artist'
+
+  ORDER BY resolution_order
+  LIMIT 1
+) AS resolved;
+COMMIT;
+SQL
+
+assert_sql "SELECT COUNT(*) FROM works WHERE title = 'Retired Title' AND original_artist = 'Retired Artist';" '0' 'exact import does not recreate a retired identity'
+assert_sql "SELECT work_id FROM song_work_links WHERE song_id = 'song-retired-import';" 'work-song-a' 'exact import resolves a retired identity to canonical work'
+
+sqlite3 "$tmp_db" <<'SQL'
+PRAGMA foreign_keys = ON;
+BEGIN;
+INSERT INTO works (id, title, original_artist, tags)
+SELECT 'work-edit-candidate', identity.title,
+       identity.original_artist, identity.tags
+FROM (
+  SELECT COALESCE('Retired Title', song.title) AS title,
+         COALESCE('Retired Artist', song.original_artist) AS original_artist,
+         COALESCE(NULL, song.tags) AS tags
+  FROM songs AS song
+  WHERE song.id = 'song-c'
+) AS identity
+WHERE NOT EXISTS (
+  SELECT 1
+  FROM work_aliases AS alias
+  JOIN works AS canonical_work
+    ON canonical_work.id = alias.canonical_work_id
+  WHERE alias.source_title = identity.title
+    AND alias.source_original_artist = identity.original_artist
+)
+ON CONFLICT(title, original_artist) DO NOTHING;
+
+UPDATE songs
+SET title = 'Retired Title', original_artist = 'Retired Artist',
+    updated_at = datetime('now')
+WHERE id = 'song-c';
+
+INSERT INTO song_work_links (song_id, work_id, link_method, linked_by)
+SELECT song.id, resolved_work.id, 'manual', 'test-curator'
+FROM songs AS song
+JOIN works AS resolved_work
+  ON resolved_work.id = COALESCE(
+    (
+      SELECT alias.canonical_work_id
+      FROM work_aliases AS alias
+      JOIN works AS canonical_work
+        ON canonical_work.id = alias.canonical_work_id
+      WHERE alias.source_title = song.title
+        AND alias.source_original_artist = song.original_artist
+      ORDER BY alias.merged_at DESC, alias.source_work_id DESC
+      LIMIT 1
+    ),
+    (
+      SELECT work.id
+      FROM works AS work
+      WHERE work.title = song.title
+        AND work.original_artist = song.original_artist
+      LIMIT 1
+    )
+  )
+WHERE song.id = 'song-c'
+ON CONFLICT(song_id) DO UPDATE SET
+  work_id = excluded.work_id,
+  link_method = excluded.link_method,
+  linked_by = excluded.linked_by,
+  updated_at = datetime('now');
+COMMIT;
+SQL
+
+assert_sql "SELECT COUNT(*) FROM works WHERE title = 'Retired Title' AND original_artist = 'Retired Artist';" '0' 'identity edit does not recreate a retired identity'
+assert_sql "SELECT work_id FROM song_work_links WHERE song_id = 'song-c';" 'work-song-a' 'identity edit resolves a retired identity to canonical work'
+assert_sql 'PRAGMA integrity_check;' 'ok' 'SQLite integrity after retired identity resolution'
+assert_sql 'SELECT COUNT(*) FROM pragma_foreign_key_check;' '0' 'foreign keys after retired identity resolution'
+
 echo '✓ global works migration is idempotent and preserves all songs and performances'

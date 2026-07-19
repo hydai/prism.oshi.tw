@@ -469,10 +469,15 @@ export interface HarmonizeApplyBody {
   updates: Array<{ songId: string; title?: string; originalArtist?: string }>;
 }
 
+export interface HarmonizeWorkMergeConfirmation {
+  canonicalWorkId: string;
+  sourceWorkIds: string[];
+}
+
 export interface HarmonizeMergeBody {
   canonicalSongId: string;
   sourceSongIds: string[];
-  mergeGlobalWorks?: boolean;
+  workMergeConfirmation?: HarmonizeWorkMergeConfirmation;
 }
 
 export interface HarmonizeMergeResponse {

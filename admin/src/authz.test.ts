@@ -112,7 +112,14 @@ const PROTECTED_ROUTES: Route[] = [
   {
     method: 'POST',
     path: '/api/harmonize/merge',
-    body: { canonicalSongId: 'song-1', sourceSongIds: ['song-2'], mergeGlobalWorks: true },
+    body: {
+      canonicalSongId: 'song-1',
+      sourceSongIds: ['song-2'],
+      workMergeConfirmation: {
+        canonicalWorkId: 'work-1',
+        sourceWorkIds: ['work-2'],
+      },
+    },
   },
   { method: 'GET', path: '/api/vod-export/status' },
   { method: 'POST', path: '/api/vod-export/preview' },
@@ -200,9 +207,9 @@ async function testVodExportMutationRequiresAuthenticityHeader(): Promise<void> 
   assertEqual(db.prepareCalls, 0, 'CSRF-blocked VOD export mutation never reaches D1');
 }
 
-async function testHarmonizerRejectsInvalidGlobalMergeFlag(): Promise<void> {
-  const db = new RecordingD1();
-  const res = await app.request(
+async function testHarmonizerRejectsInvalidWorkMergeConfirmation(): Promise<void> {
+  const legacyDb = new RecordingD1();
+  const legacyRes = await app.request(
     '/api/harmonize/merge',
     reqInit({
       method: 'POST',
@@ -210,13 +217,33 @@ async function testHarmonizerRejectsInvalidGlobalMergeFlag(): Promise<void> {
       body: {
         canonicalSongId: 'song-1',
         sourceSongIds: ['song-2'],
-        mergeGlobalWorks: 'yes',
+        mergeGlobalWorks: true,
       },
     }, CURATOR),
-    envFor(db),
+    envFor(legacyDb),
   );
-  assertEqual(res.status, 400, 'global-work authorization must be an explicit boolean');
-  assertEqual(db.prepareCalls, 0, 'invalid global-work authorization is rejected before D1');
+  assertEqual(legacyRes.status, 400, 'legacy boolean cannot authorize a global work merge');
+  assertEqual(legacyDb.prepareCalls, 0, 'legacy authorization is rejected before D1');
+
+  const malformedDb = new RecordingD1();
+  const malformedRes = await app.request(
+    '/api/harmonize/merge',
+    reqInit({
+      method: 'POST',
+      path: '/api/harmonize/merge',
+      body: {
+        canonicalSongId: 'song-1',
+        sourceSongIds: ['song-2'],
+        workMergeConfirmation: {
+          canonicalWorkId: 'work-1',
+          sourceWorkIds: ['work-2', 'work-2'],
+        },
+      },
+    }, CURATOR),
+    envFor(malformedDb),
+  );
+  assertEqual(malformedRes.status, 400, 'duplicate confirmed work IDs are invalid');
+  assertEqual(malformedDb.prepareCalls, 0, 'malformed confirmation is rejected before D1');
 }
 
 async function main(): Promise<void> {
@@ -225,7 +252,7 @@ async function main(): Promise<void> {
   await testCuratorPassesAuthorization();
   await testContributorBlockedFromStampMutations();
   await testVodExportMutationRequiresAuthenticityHeader();
-  await testHarmonizerRejectsInvalidGlobalMergeFlag();
+  await testHarmonizerRejectsInvalidWorkMergeConfirmation();
   console.log('✓ curator-only Admin routes and VOD export CSRF boundaries');
 }
 

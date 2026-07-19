@@ -195,15 +195,37 @@ function parseHarmonizeMergeBody(value: unknown): HarmonizeMergeBody | null {
     || !body.sourceSongIds.every(
       (id): id is string => typeof id === 'string' && id.trim().length > 0,
     )
-    || (body.mergeGlobalWorks !== undefined && typeof body.mergeGlobalWorks !== 'boolean')
+    || 'mergeGlobalWorks' in body
   ) return null;
 
+  let workMergeConfirmation: HarmonizeMergeBody['workMergeConfirmation'];
+  if (body.workMergeConfirmation !== undefined) {
+    if (!isUnknownRecord(body.workMergeConfirmation)) return null;
+    const confirmation = body.workMergeConfirmation;
+    if (
+      typeof confirmation.canonicalWorkId !== 'string'
+      || confirmation.canonicalWorkId.trim().length === 0
+      || !Array.isArray(confirmation.sourceWorkIds)
+      || confirmation.sourceWorkIds.length === 0
+      || !confirmation.sourceWorkIds.every(
+        (id): id is string => typeof id === 'string' && id.trim().length > 0,
+      )
+    ) return null;
+
+    const canonicalWorkId = confirmation.canonicalWorkId.trim();
+    const sourceWorkIds = confirmation.sourceWorkIds.map((id) => id.trim());
+    if (
+      new Set(sourceWorkIds).size !== sourceWorkIds.length
+      || sourceWorkIds.includes(canonicalWorkId)
+    ) return null;
+
+    workMergeConfirmation = { canonicalWorkId, sourceWorkIds };
+  }
+
   return {
-    canonicalSongId: body.canonicalSongId,
-    sourceSongIds: body.sourceSongIds,
-    ...(body.mergeGlobalWorks === undefined
-      ? {}
-      : { mergeGlobalWorks: body.mergeGlobalWorks }),
+    canonicalSongId: body.canonicalSongId.trim(),
+    sourceSongIds: body.sourceSongIds.map((id) => id.trim()),
+    ...(workMergeConfirmation === undefined ? {} : { workMergeConfirmation }),
   };
 }
 
@@ -1198,14 +1220,18 @@ app.post('/api/harmonize/merge', requireCurator, async (c) => {
       body.canonicalSongId,
       body.sourceSongIds,
       user.email,
-      body.mergeGlobalWorks === true,
+      body.workMergeConfirmation,
     );
     return c.json<HarmonizeMergeResponse>({ ok: true, ...result });
   } catch (error) {
     if (error instanceof SongMergeError) {
       const body = { error: error.message, code: error.code };
       if (error.code === 'song_not_found') return c.json(body, 404);
-      if (error.code === 'work_not_linked' || error.code === 'work_merge_required') {
+      if (
+        error.code === 'work_not_linked'
+        || error.code === 'work_merge_required'
+        || error.code === 'work_merge_stale'
+      ) {
         return c.json(body, 409);
       }
       return c.json(body, 400);
