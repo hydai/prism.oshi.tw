@@ -86,6 +86,7 @@ class FakeD1Database {
   readonly firstStatements: CapturedStatement[] = [];
   readonly allStatements: CapturedStatement[] = [];
   readonly batchStatements: CapturedStatement[] = [];
+  mergeGuardValid = true;
 
   constructor(
     readonly existingStream: ExistingStream,
@@ -114,18 +115,28 @@ class FakeD1Database {
     }
 
     return statements.map((statement) => {
+      if (/RETURNING\s+1\s+AS\s+valid/i.test(statement.sql)) {
+        return {
+          results: this.mergeGuardValid ? [{ valid: 1 }] : [],
+          meta: { changes: this.mergeGuardValid ? 1 : 0 },
+        };
+      }
+      if (!this.mergeGuardValid && /merge_guard/i.test(statement.sql)) {
+        return { results: [], meta: { changes: 0 } };
+      }
       if (statement.sql.includes('SELECT s.id') && statement.sql.includes('s.original_artist = ?')) {
         return {
           results: this.exactSongId ? [{ id: this.exactSongId }] : [],
           meta: { changes: 0 },
         };
       }
+      const guardedParamCount = /merge_guard/i.test(statement.sql) ? 2 : 0;
       const changes = /UPDATE\s+performances/i.test(statement.sql)
         ? 3
         : /DELETE\s+FROM\s+songs/i.test(statement.sql)
-          ? Math.max(0, statement.params.length - 1)
+          ? Math.max(0, statement.params.length - guardedParamCount - 1)
           : /DELETE\s+FROM\s+works/i.test(statement.sql)
-            ? statement.params.length
+            ? statement.params.length - guardedParamCount
             : 1;
       return { results: [], meta: { changes } };
     });
@@ -535,6 +546,10 @@ async function testMergeSongsPreservesPerformances(): Promise<void> {
   assertEqual(result.canonicalWorkId, 'work-shared', 'same-work merge retains its global identity');
   assertEqual(result.mergedWorks, 0, 'same-work merge never deletes a global work');
   assertEqual(result.relinkedSongs, 0, 'same-work merge does not repoint unrelated song bridges');
+  assert(
+    !fakeDb.batchStatements.some((statement) => /UPDATE\s+works/i.test(statement.sql)),
+    'same-work merge keeps local tags out of global work metadata',
+  );
 
   const sql = fakeDb.batchStatements.map((statement) => statement.sql).join('\n');
   assert(/UPDATE\s+performances/i.test(sql), 'merge must repoint performances');
@@ -552,8 +567,8 @@ async function testMergeSongsPreservesPerformances(): Promise<void> {
     /UPDATE\s+songs/i.test(statement.sql),
   );
   if (!canonicalUpdate) throw new Error('canonical metadata should be updated');
-  assertEqual(canonicalUpdate.params[0], '["canonical","source"]', 'source tags are unioned into canonical tags');
-  assertEqual(canonicalUpdate.params[1], 'approved', 'approved status is preserved when canonical was pending');
+  assertEqual(canonicalUpdate.params.at(-5), '["canonical","source"]', 'source tags are unioned into canonical tags');
+  assertEqual(canonicalUpdate.params.at(-4), 'approved', 'approved status is preserved when canonical was pending');
 }
 
 async function testMergeSongsRequiresExplicitGlobalWorkConfirmation(): Promise<void> {
@@ -623,18 +638,19 @@ async function testMergeSongsMergesGlobalWorksAcrossVtubers(): Promise<void> {
   );
   if (!aliasFlatten) throw new Error('existing aliases should be flattened to the final canonical work');
   assertEqual(
-    aliasFlatten.params.join('|'),
+    aliasFlatten.params.slice(-3).join('|'),
     'work-canonical|work-source|work-third',
     'alias chains point directly to the final work',
   );
 
   const workAliasInsert = fakeDb.batchStatements.find((statement) =>
-    /INSERT\s+INTO\s+work_aliases/i.test(statement.sql),
+    /INSERT\s+INTO\s+work_aliases/i.test(statement.sql)
+      && /SELECT\s+source\.id/i.test(statement.sql),
   );
   if (!workAliasInsert) throw new Error('retired work should receive an audit snapshot');
   assert(/SELECT\s+source\.id/i.test(workAliasInsert.sql), 'work alias snapshot comes from the source work row');
   assertEqual(
-    workAliasInsert.params.join('|'),
+    workAliasInsert.params.slice(-4).join('|'),
     'work-canonical|curator@example.com|work-source|work-third',
     'one alias is written per distinct source work',
   );
@@ -643,10 +659,11 @@ async function testMergeSongsMergesGlobalWorksAcrossVtubers(): Promise<void> {
     /UPDATE\s+song_work_links/i.test(statement.sql),
   );
   if (!globalRelink) throw new Error('cross-work merge should repoint all surviving song bridges');
-  assert(!/streamer_id/i.test(globalRelink.sql), 'global bridge update is deliberately not scoped to one VTuber');
+  const globalRelinkUpdate = globalRelink.sql.split(/UPDATE\s+song_work_links/i)[1] ?? '';
+  assert(!/streamer_id/i.test(globalRelinkUpdate), 'global bridge update is deliberately not scoped to one VTuber');
   assert(/updated_at\s*=\s*datetime\('now'\)/i.test(globalRelink.sql), 'global relink marks every affected static export stale');
   assertEqual(
-    globalRelink.params.join('|'),
+    globalRelink.params.slice(-4).join('|'),
     'work-canonical|curator@example.com|work-source|work-third',
     'global bridge update records canonical work, curator, and retired work',
   );
@@ -654,7 +671,7 @@ async function testMergeSongsMergesGlobalWorksAcrossVtubers(): Promise<void> {
   const workUpdate = fakeDb.batchStatements.find((statement) => /UPDATE\s+works/i.test(statement.sql));
   if (!workUpdate) throw new Error('canonical work tags should be updated');
   assertEqual(
-    workUpdate.params[0],
+    workUpdate.params.at(-2),
     '["canonical-work","source-work","third-work","canonical-local","source-local","third-local"]',
     'canonical work preserves global and local tags from every merged identity',
   );
@@ -677,7 +694,62 @@ async function testMergeSongsMergesGlobalWorksAcrossVtubers(): Promise<void> {
     statementIndex(/UPDATE\s+song_work_links/i) < statementIndex(/DELETE\s+FROM\s+works/i),
     'every VTuber song bridge moves before the source work is deleted',
   );
-  assert(fakeDb.batchStatements.length <= 10, 'set-based global merge stays within a small D1 batch');
+  assert(fakeDb.batchStatements.length <= 12, 'set-based global merge stays within a small D1 batch');
+}
+
+async function testMergeSongsRevalidatesWorkLinksInsideBatch(): Promise<void> {
+  const fakeDb = new FakeD1Database(null, null, [
+    mergeRow('song-canonical', 'approved', '[]', { workId: 'work-canonical' }),
+    mergeRow('song-source', 'approved', '[]', { workId: 'work-source' }),
+  ]);
+  fakeDb.mergeGuardValid = false;
+
+  let caught: unknown;
+  try {
+    await mergeSongs(
+      fakeDb as unknown as D1Database,
+      'alice',
+      'song-canonical',
+      ['song-source'],
+      'curator@example.com',
+      {
+        canonicalWorkId: 'work-canonical',
+        sourceWorkIds: ['work-source'],
+      },
+    );
+  } catch (error) {
+    caught = error;
+  }
+
+  assert(caught instanceof SongMergeError, 'a link change before the transaction should fail closed');
+  assertEqual(
+    (caught as SongMergeError).code,
+    'work_merge_stale',
+    'transaction-time link changes invalidate the reviewed confirmation',
+  );
+  assert(
+    /WITH\s+expected_links/i.test(fakeDb.batchStatements[0]?.sql ?? '')
+      && /RETURNING\s+1\s+AS\s+valid/i.test(fakeDb.batchStatements[0]?.sql ?? ''),
+    'the first statement revalidates every reviewed song-to-work link inside the D1 batch',
+  );
+  const expectedLinks = JSON.parse(
+    String(fakeDb.batchStatements[0]?.params[0] ?? '{}'),
+  ) as Record<string, string>;
+  assertEqual(expectedLinks['song-canonical'], 'work-canonical', 'guard binds the reviewed canonical link');
+  assertEqual(expectedLinks['song-source'], 'work-source', 'guard binds every reviewed source link');
+  const mutations = fakeDb.batchStatements.slice(1, -1);
+  assert(mutations.length > 0, 'the guarded merge still prepares its mutation set');
+  assert(
+    mutations.every((statement) => (
+      /WITH\s+merge_guard/i.test(statement.sql)
+      && /SELECT\s+valid\s+FROM\s+merge_guard/i.test(statement.sql)
+    )),
+    'every merge mutation is conditional on the same transaction-time work-link guard',
+  );
+  assert(
+    /DELETE\s+FROM\s+work_aliases/i.test(fakeDb.batchStatements.at(-1)?.sql ?? ''),
+    'the transaction removes its short-lived guard token after the merge',
+  );
 }
 
 async function testMergeSongsRejectsStaleWorkConfirmation(): Promise<void> {
@@ -856,6 +928,7 @@ async function main(): Promise<void> {
   await testMergeSongsPreservesPerformances();
   await testMergeSongsRequiresExplicitGlobalWorkConfirmation();
   await testMergeSongsMergesGlobalWorksAcrossVtubers();
+  await testMergeSongsRevalidatesWorkLinksInsideBatch();
   await testMergeSongsRejectsStaleWorkConfirmation();
   await testMergeSongsRejectsUnlinkedWork();
   await testMergeSongsRejectsMissingOrCrossStreamerSource();

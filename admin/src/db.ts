@@ -1894,6 +1894,75 @@ function parseSongTags(tags: string): string[] {
   }
 }
 
+const SONG_MERGE_GUARD_ACTOR = 'system:harmonizer-merge-guard';
+
+// D1 exposes atomic batches but no interactive transaction callback. The first
+// statement writes this short-lived token only when every selected song still
+// has its reviewed work link. Every business mutation checks the token, and the
+// final statement removes it before the batch commits, so stale batches are
+// entirely no-op without exposing guard state outside the transaction.
+function prepareSongMergeGuard(
+  db: D1Database,
+  expectedLinksJson: string,
+  streamerId: string,
+  guardSourceId: string,
+  guardCanonicalId: string,
+): D1PreparedStatement {
+  return db.prepare(
+    `WITH expected_links(song_id, work_id) AS (
+       SELECT key, value
+       FROM json_each(?)
+     ),
+     merge_guard(valid) AS (
+       SELECT COUNT(*) = (SELECT COUNT(*) FROM expected_links)
+       FROM expected_links AS expected
+       JOIN songs AS guarded_song
+         ON guarded_song.id = expected.song_id
+        AND guarded_song.streamer_id = ?
+       JOIN song_work_links AS guarded_link
+         ON guarded_link.song_id = expected.song_id
+        AND guarded_link.work_id = expected.work_id
+       JOIN works AS guarded_work
+         ON guarded_work.id = expected.work_id
+     )
+     INSERT INTO work_aliases (
+       source_work_id, canonical_work_id, source_title,
+       source_original_artist, source_tags, merged_by
+     )
+     SELECT ?, ?, '__merge_guard__', '__merge_guard__', '[]', ?
+     FROM merge_guard
+     WHERE valid
+     RETURNING 1 AS valid`,
+  ).bind(
+    expectedLinksJson,
+    streamerId,
+    guardSourceId,
+    guardCanonicalId,
+    SONG_MERGE_GUARD_ACTOR,
+  );
+}
+
+function prepareGuardedSongMergeMutation(
+  db: D1Database,
+  guardSourceId: string,
+  guardCanonicalId: string,
+  sql: string,
+  bindings: unknown[] = [],
+): D1PreparedStatement {
+  return db.prepare(
+    `WITH merge_guard(valid) AS (
+       SELECT EXISTS (
+         SELECT 1
+         FROM work_aliases
+         WHERE source_work_id = ?
+           AND canonical_work_id = ?
+           AND merged_by = '${SONG_MERGE_GUARD_ACTOR}'
+       )
+     )
+     ${sql}`,
+  ).bind(guardSourceId, guardCanonicalId, ...bindings);
+}
+
 /**
  * Atomically merge explicit source song entities into one canonical song.
  * Performances are repointed, source rows are snapshotted in song_aliases,
@@ -2007,11 +2076,6 @@ export async function mergeSongs(
   }
 
   const tags = [...new Set(allRows.flatMap((row) => parseSongTags(row.tags)))];
-  const workTags = [...new Set([
-    ...parseSongTags(canonical.work_tags!),
-    ...[...sourceWorks.values()].flatMap((row) => parseSongTags(row.work_tags!)),
-    ...tags,
-  ])];
   const mergedStatus = MERGED_STATUS_PRIORITY.find((status) =>
     allRows.some((row) => row.status === status),
   ) ?? canonical.status;
@@ -2019,16 +2083,40 @@ export async function mergeSongs(
     ?? allRows.find((row) => row.status === mergedStatus && row.reviewed_by)?.reviewed_by
     ?? null;
 
+  const expectedLinksJson = JSON.stringify(Object.fromEntries(
+    allRows.map((row) => [row.id, row.work_id!]),
+  ));
+  const guardSourceId = `merge-guard-source-${crypto.randomUUID()}`;
+  const guardCanonicalId = `merge-guard-canonical-${crypto.randomUUID()}`;
+  const guarded = (sql: string, bindings: unknown[] = []): D1PreparedStatement => (
+    prepareGuardedSongMergeMutation(
+      db,
+      guardSourceId,
+      guardCanonicalId,
+      sql,
+      bindings,
+    )
+  );
   const statements: D1PreparedStatement[] = [
-    db.prepare(
+    prepareSongMergeGuard(
+      db,
+      expectedLinksJson,
+      streamerId,
+      guardSourceId,
+      guardCanonicalId,
+    ),
+    guarded(
       `UPDATE song_aliases
        SET canonical_song_id = ?
-       WHERE streamer_id = ? AND canonical_song_id IN (${sourcePlaceholders})`,
-    ).bind(canonicalSongId, streamerId, ...uniqueSourceIds),
+       WHERE streamer_id = ?
+         AND canonical_song_id IN (${sourcePlaceholders})
+         AND (SELECT valid FROM merge_guard)`,
+      [canonicalSongId, streamerId, ...uniqueSourceIds],
+    ),
   ];
 
   statements.push(
-    db.prepare(
+    guarded(
       `INSERT INTO song_aliases (
          source_song_id, canonical_song_id, streamer_id,
          source_title, source_original_artist, source_status, source_tags,
@@ -2038,33 +2126,42 @@ export async function mergeSongs(
               source.title, source.original_artist, source.status, source.tags,
               source.submitted_by, source.reviewed_by, source.created_at, ?
        FROM songs AS source
-       WHERE source.streamer_id = ? AND source.id IN (${sourcePlaceholders})`,
-    ).bind(canonicalSongId, mergedBy, streamerId, ...uniqueSourceIds),
+       WHERE source.streamer_id = ?
+         AND source.id IN (${sourcePlaceholders})
+         AND (SELECT valid FROM merge_guard)`,
+      [canonicalSongId, mergedBy, streamerId, ...uniqueSourceIds],
+    ),
   );
 
   statements.push(
-    db.prepare(
+    guarded(
       `UPDATE songs
        SET tags = ?, status = ?, reviewed_by = ?, updated_at = datetime('now')
-       WHERE id = ? AND streamer_id = ?`,
-    ).bind(JSON.stringify(tags), mergedStatus, reviewedBy, canonicalSongId, streamerId),
+       WHERE id = ? AND streamer_id = ?
+         AND (SELECT valid FROM merge_guard)`,
+      [JSON.stringify(tags), mergedStatus, reviewedBy, canonicalSongId, streamerId],
+    ),
   );
 
   const performanceUpdateIndex = statements.length;
   statements.push(
-    db.prepare(
+    guarded(
       `UPDATE performances
        SET song_id = ?, updated_at = datetime('now')
-       WHERE streamer_id = ? AND song_id IN (${sourcePlaceholders})`,
-    ).bind(canonicalSongId, streamerId, ...uniqueSourceIds),
+       WHERE streamer_id = ? AND song_id IN (${sourcePlaceholders})
+         AND (SELECT valid FROM merge_guard)`,
+      [canonicalSongId, streamerId, ...uniqueSourceIds],
+    ),
   );
 
   const songDeleteIndex = statements.length;
   statements.push(
-    db.prepare(
+    guarded(
       `DELETE FROM songs
-       WHERE streamer_id = ? AND id IN (${sourcePlaceholders})`,
-    ).bind(streamerId, ...uniqueSourceIds),
+       WHERE streamer_id = ? AND id IN (${sourcePlaceholders})
+         AND (SELECT valid FROM merge_guard)`,
+      [streamerId, ...uniqueSourceIds],
+    ),
   );
 
   let workRelinkIndex: number | null = null;
@@ -2073,12 +2170,14 @@ export async function mergeSongs(
     const workPlaceholders = sourceWorkIds.map(() => '?').join(', ');
 
     statements.push(
-      db.prepare(
+      guarded(
         `UPDATE work_aliases
          SET canonical_work_id = ?
-         WHERE canonical_work_id IN (${workPlaceholders})`,
-      ).bind(canonicalWorkId, ...sourceWorkIds),
-      db.prepare(
+         WHERE canonical_work_id IN (${workPlaceholders})
+           AND (SELECT valid FROM merge_guard)`,
+        [canonicalWorkId, ...sourceWorkIds],
+      ),
+      guarded(
         `INSERT INTO work_aliases (
            source_work_id, canonical_work_id, source_title,
            source_original_artist, source_tags, merged_by
@@ -2086,38 +2185,67 @@ export async function mergeSongs(
          SELECT source.id, ?, source.title,
                 source.original_artist, source.tags, ?
          FROM works AS source
-         WHERE source.id IN (${workPlaceholders})`,
-      ).bind(canonicalWorkId, mergedBy, ...sourceWorkIds),
+         WHERE source.id IN (${workPlaceholders})
+           AND (SELECT valid FROM merge_guard)`,
+        [canonicalWorkId, mergedBy, ...sourceWorkIds],
+      ),
     );
 
     workRelinkIndex = statements.length;
     statements.push(
-      db.prepare(
+      guarded(
         `UPDATE song_work_links
          SET work_id = ?, link_method = 'manual', linked_by = ?,
              updated_at = datetime('now')
-         WHERE work_id IN (${workPlaceholders})`,
-      ).bind(canonicalWorkId, mergedBy, ...sourceWorkIds),
+         WHERE work_id IN (${workPlaceholders})
+           AND (SELECT valid FROM merge_guard)`,
+        [canonicalWorkId, mergedBy, ...sourceWorkIds],
+      ),
+    );
+
+    const workTags = [...new Set([
+      ...parseSongTags(canonical.work_tags!),
+      ...[...sourceWorks.values()].flatMap((row) => parseSongTags(row.work_tags!)),
+      ...tags,
+    ])];
+    statements.push(
+      guarded(
+        `UPDATE works
+         SET tags = ?, updated_at = datetime('now')
+         WHERE id = ?
+           AND (SELECT valid FROM merge_guard)`,
+        [JSON.stringify(workTags), canonicalWorkId],
+      ),
+    );
+
+    workDeleteIndex = statements.length;
+    statements.push(
+      guarded(
+        `DELETE FROM works
+         WHERE id IN (${workPlaceholders})
+           AND (SELECT valid FROM merge_guard)`,
+        sourceWorkIds,
+      ),
     );
   }
 
   statements.push(
     db.prepare(
-      `UPDATE works
-       SET tags = ?, updated_at = datetime('now')
-       WHERE id = ?`,
-    ).bind(JSON.stringify(workTags), canonicalWorkId),
+      `DELETE FROM work_aliases
+       WHERE source_work_id = ?
+         AND canonical_work_id = ?
+         AND merged_by = ?`,
+    ).bind(guardSourceId, guardCanonicalId, SONG_MERGE_GUARD_ACTOR),
   );
 
-  if (sourceWorkIds.length > 0) {
-    const workPlaceholders = sourceWorkIds.map(() => '?').join(', ');
-    workDeleteIndex = statements.length;
-    statements.push(
-      db.prepare(`DELETE FROM works WHERE id IN (${workPlaceholders})`).bind(...sourceWorkIds),
+  const batchResults = await db.batch(statements);
+  const mergeGuard = batchResults[0]?.results[0] as { valid?: number | boolean } | undefined;
+  if (mergeGuard?.valid !== 1 && mergeGuard?.valid !== true) {
+    throw new SongMergeError(
+      'work_merge_stale',
+      'Global work links changed after review; scan again before merging',
     );
   }
-
-  const batchResults = await db.batch(statements);
   return {
     canonicalSongId,
     canonicalWorkId,

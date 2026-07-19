@@ -252,4 +252,160 @@ assert_sql "SELECT work_id FROM song_work_links WHERE song_id = 'song-c';" 'work
 assert_sql 'PRAGMA integrity_check;' 'ok' 'SQLite integrity after retired identity resolution'
 assert_sql 'SELECT COUNT(*) FROM pragma_foreign_key_check;' '0' 'foreign keys after retired identity resolution'
 
+# Exercise the transaction-local guard shape used by Harmonizer merges. A stale
+# reviewed link must leave every guarded mutation as a no-op; a current link set
+# must keep authorizing later statements even after the bridge itself changes.
+sqlite3 "$tmp_db" <<'SQL'
+PRAGMA foreign_keys = ON;
+INSERT INTO works (id, title, original_artist, tags)
+VALUES ('work-guard-source', 'Guard Source', 'Guard Artist', '[]');
+INSERT INTO songs (
+  id, streamer_id, title, original_artist, tags, status,
+  created_at, updated_at
+)
+VALUES (
+  'song-guard-source', 'alice', 'Guard Source', 'Guard Artist',
+  '[]', 'approved', datetime('now'), datetime('now')
+);
+INSERT INTO song_work_links (song_id, work_id, link_method, linked_by)
+VALUES ('song-guard-source', 'work-guard-source', 'manual', 'test-curator');
+SQL
+
+sqlite3 "$tmp_db" >/dev/null <<'SQL'
+PRAGMA foreign_keys = ON;
+BEGIN;
+WITH expected_links(song_id, work_id) AS (
+  SELECT key, value
+  FROM json_each('{"song-a":"work-song-a","song-guard-source":"work-stale"}')
+),
+merge_guard(valid) AS (
+  SELECT COUNT(*) = (SELECT COUNT(*) FROM expected_links)
+  FROM expected_links AS expected
+  JOIN songs AS guarded_song
+    ON guarded_song.id = expected.song_id
+   AND guarded_song.streamer_id = 'alice'
+  JOIN song_work_links AS guarded_link
+    ON guarded_link.song_id = expected.song_id
+   AND guarded_link.work_id = expected.work_id
+  JOIN works AS guarded_work
+    ON guarded_work.id = expected.work_id
+)
+INSERT INTO work_aliases (
+  source_work_id, canonical_work_id, source_title,
+  source_original_artist, source_tags, merged_by
+)
+SELECT 'merge-guard-stale-source', 'merge-guard-stale-canonical',
+       '__merge_guard__', '__merge_guard__', '[]',
+       'system:harmonizer-merge-guard'
+FROM merge_guard
+WHERE valid
+RETURNING 1 AS valid;
+
+WITH merge_guard(valid) AS (
+  SELECT EXISTS (
+    SELECT 1
+    FROM work_aliases
+    WHERE source_work_id = 'merge-guard-stale-source'
+      AND canonical_work_id = 'merge-guard-stale-canonical'
+      AND merged_by = 'system:harmonizer-merge-guard'
+  )
+)
+UPDATE song_work_links
+SET work_id = 'work-song-a'
+WHERE work_id = 'work-guard-source'
+  AND (SELECT valid FROM merge_guard);
+
+WITH merge_guard(valid) AS (
+  SELECT EXISTS (
+    SELECT 1
+    FROM work_aliases
+    WHERE source_work_id = 'merge-guard-stale-source'
+      AND canonical_work_id = 'merge-guard-stale-canonical'
+      AND merged_by = 'system:harmonizer-merge-guard'
+  )
+)
+DELETE FROM works
+WHERE id = 'work-guard-source'
+  AND (SELECT valid FROM merge_guard);
+
+DELETE FROM work_aliases
+WHERE source_work_id = 'merge-guard-stale-source'
+  AND canonical_work_id = 'merge-guard-stale-canonical'
+  AND merged_by = 'system:harmonizer-merge-guard';
+COMMIT;
+SQL
+
+assert_sql "SELECT work_id FROM song_work_links WHERE song_id = 'song-guard-source';" 'work-guard-source' 'stale transaction guard blocks bridge mutation'
+assert_sql "SELECT COUNT(*) FROM works WHERE id = 'work-guard-source';" '1' 'stale transaction guard blocks work deletion'
+
+sqlite3 "$tmp_db" >/dev/null <<'SQL'
+PRAGMA foreign_keys = ON;
+BEGIN;
+WITH expected_links(song_id, work_id) AS (
+  SELECT key, value
+  FROM json_each('{"song-a":"work-song-a","song-guard-source":"work-guard-source"}')
+),
+merge_guard(valid) AS (
+  SELECT COUNT(*) = (SELECT COUNT(*) FROM expected_links)
+  FROM expected_links AS expected
+  JOIN songs AS guarded_song
+    ON guarded_song.id = expected.song_id
+   AND guarded_song.streamer_id = 'alice'
+  JOIN song_work_links AS guarded_link
+    ON guarded_link.song_id = expected.song_id
+   AND guarded_link.work_id = expected.work_id
+  JOIN works AS guarded_work
+    ON guarded_work.id = expected.work_id
+)
+INSERT INTO work_aliases (
+  source_work_id, canonical_work_id, source_title,
+  source_original_artist, source_tags, merged_by
+)
+SELECT 'merge-guard-valid-source', 'merge-guard-valid-canonical',
+       '__merge_guard__', '__merge_guard__', '[]',
+       'system:harmonizer-merge-guard'
+FROM merge_guard
+WHERE valid
+RETURNING 1 AS valid;
+
+WITH merge_guard(valid) AS (
+  SELECT EXISTS (
+    SELECT 1
+    FROM work_aliases
+    WHERE source_work_id = 'merge-guard-valid-source'
+      AND canonical_work_id = 'merge-guard-valid-canonical'
+      AND merged_by = 'system:harmonizer-merge-guard'
+  )
+)
+UPDATE song_work_links
+SET work_id = 'work-song-a'
+WHERE work_id = 'work-guard-source'
+  AND (SELECT valid FROM merge_guard);
+
+WITH merge_guard(valid) AS (
+  SELECT EXISTS (
+    SELECT 1
+    FROM work_aliases
+    WHERE source_work_id = 'merge-guard-valid-source'
+      AND canonical_work_id = 'merge-guard-valid-canonical'
+      AND merged_by = 'system:harmonizer-merge-guard'
+  )
+)
+DELETE FROM works
+WHERE id = 'work-guard-source'
+  AND (SELECT valid FROM merge_guard);
+
+DELETE FROM work_aliases
+WHERE source_work_id = 'merge-guard-valid-source'
+  AND canonical_work_id = 'merge-guard-valid-canonical'
+  AND merged_by = 'system:harmonizer-merge-guard';
+COMMIT;
+SQL
+
+assert_sql "SELECT work_id FROM song_work_links WHERE song_id = 'song-guard-source';" 'work-song-a' 'valid transaction guard survives its own bridge mutation'
+assert_sql "SELECT COUNT(*) FROM works WHERE id = 'work-guard-source';" '0' 'valid transaction guard authorizes source work deletion'
+assert_sql "SELECT COUNT(*) FROM work_aliases WHERE merged_by = 'system:harmonizer-merge-guard';" '0' 'transaction guard leaves no persistent alias row'
+assert_sql 'PRAGMA integrity_check;' 'ok' 'SQLite integrity after transaction guard'
+assert_sql 'SELECT COUNT(*) FROM pragma_foreign_key_check;' '0' 'foreign keys after transaction guard'
+
 echo '✓ global works migration is idempotent and preserves all songs and performances'
