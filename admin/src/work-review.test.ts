@@ -301,8 +301,10 @@ async function testGlobalWorkMergePreservesLocalEntities(): Promise<void> {
       candidateKey: candidate.candidateKey,
       fingerprint: candidate.fingerprint,
       catalogRevision: 7,
+      expectedReviewVersion: null,
       canonicalWorkId: 'work-case-main',
       sourceWorkIds: ['work-case-alt'],
+      note: '  Verified official source  ',
     },
     'curator@example.com',
   );
@@ -315,7 +317,14 @@ async function testGlobalWorkMergePreservesLocalEntities(): Promise<void> {
   const sql = fakeDb.mergeStatements.map((statement) => statement.sql).join('\n');
   assert(/work_match_state/i.test(fakeDb.mergeStatements[0]?.sql ?? ''), 'merge guard binds the catalog revision');
   assert(/expected_links/i.test(fakeDb.mergeStatements[0]?.sql ?? ''), 'merge guard binds every reviewed song link');
+  assert(/work_match_reviews/i.test(fakeDb.mergeStatements[0]?.sql ?? ''), 'merge guard binds the displayed review record');
+  assert(/review_version/i.test(fakeDb.mergeStatements[0]?.sql ?? ''), 'merge guard checks the displayed review version');
   assert(/INSERT\s+INTO\s+work_aliases/i.test(sql), 'retired work metadata is snapshotted');
+  const audit = fakeDb.mergeStatements.find((statement) => (
+    /INSERT\s+INTO\s+work_match_merge_audits/i.test(statement.sql)
+  ));
+  assert(audit, 'confirmed merge writes durable review audit evidence');
+  assert(audit.params.includes('Verified official source'), 'merge audit preserves the trimmed curator note');
   assert(/UPDATE\s+song_work_links/i.test(sql), 'local songs are repointed through the bridge');
   assert(/DELETE\s+FROM\s+works/i.test(sql), 'only source work identities are deleted');
   assert(!/DELETE\s+FROM\s+songs/i.test(sql), 'global merge never deletes a song');
@@ -338,6 +347,7 @@ async function testGlobalWorkMergePreservesLocalEntities(): Promise<void> {
         candidateKey: candidate.candidateKey,
         fingerprint: candidate.fingerprint,
         catalogRevision: 7,
+        expectedReviewVersion: null,
         canonicalWorkId: 'work-case-main',
         sourceWorkIds: ['work-case-alt'],
       },
@@ -358,6 +368,7 @@ async function testGlobalWorkMergePreservesLocalEntities(): Promise<void> {
         candidateKey: candidate.candidateKey,
         fingerprint: candidate.fingerprint,
         catalogRevision: 6,
+        expectedReviewVersion: null,
         canonicalWorkId: 'work-case-main',
         sourceWorkIds: ['work-case-alt'],
       },
@@ -369,6 +380,36 @@ async function testGlobalWorkMergePreservesLocalEntities(): Promise<void> {
   assert(caught instanceof WorkMatchError, 'a changed displayed catalog revision fails closed');
   equal(caught.code, 'work_match_stale', 'displayed revision conflicts require reconfirmation');
   equal(staleDisplayDb.mergeStatements.length, 0, 'stale displayed impact performs no writes');
+
+  const concurrentReviewDb = new FakeD1(SOURCE_ROWS, [{
+    candidate_key: candidate.candidateKey,
+    fingerprint: candidate.fingerprint,
+    decision: 'not_duplicate',
+    note: 'Saved in another session',
+    review_version: 2,
+    reviewed_by: 'other-curator@example.com',
+    reviewed_at: '2026-07-19 02:00:00',
+  }]);
+  caught = undefined;
+  try {
+    await mergeWorkMatchCandidate(
+      concurrentReviewDb as unknown as D1Database,
+      {
+        candidateKey: candidate.candidateKey,
+        fingerprint: candidate.fingerprint,
+        catalogRevision: 7,
+        expectedReviewVersion: null,
+        canonicalWorkId: 'work-case-main',
+        sourceWorkIds: ['work-case-alt'],
+      },
+      'curator@example.com',
+    );
+  } catch (error) {
+    caught = error;
+  }
+  assert(caught instanceof WorkMatchError, 'a changed review decision invalidates an open confirmation');
+  equal(caught.code, 'work_match_stale', 'changed review versions require reconfirmation');
+  equal(concurrentReviewDb.mergeStatements.length, 0, 'stale displayed review performs no writes');
 }
 
 async function testPartialGlobalWorkMerge(): Promise<void> {
@@ -383,6 +424,7 @@ async function testPartialGlobalWorkMerge(): Promise<void> {
       candidateKey: candidate.candidateKey,
       fingerprint: candidate.fingerprint,
       catalogRevision: 7,
+      expectedReviewVersion: null,
       canonicalWorkId: 'work-partial-main',
       sourceWorkIds: ['work-partial-one'],
     },

@@ -641,16 +641,22 @@ export async function mergeWorkMatchCandidate(
   body: WorkMatchMergeBody,
   mergedBy: string,
 ): Promise<WorkMatchMergeResponse> {
+  const note = body.note?.trim() ?? '';
   if (
     !mergedBy
     || !Number.isSafeInteger(body.catalogRevision)
     || body.catalogRevision < 0
+    || (body.expectedReviewVersion !== null && (
+      !Number.isSafeInteger(body.expectedReviewVersion)
+      || body.expectedReviewVersion < 1
+    ))
     || !body.canonicalWorkId
     || !Array.isArray(body.sourceWorkIds)
     || body.sourceWorkIds.length === 0
     || body.sourceWorkIds.length > GLOBAL_WORK_MERGE_SOURCE_LIMIT
     || new Set(body.sourceWorkIds).size !== body.sourceWorkIds.length
     || body.sourceWorkIds.includes(body.canonicalWorkId)
+    || note.length > 2000
   ) {
     throw new WorkMatchError('invalid_request', 'Invalid global work merge request');
   }
@@ -666,6 +672,12 @@ export async function mergeWorkMatchCandidate(
     throw new WorkMatchError(
       'work_match_stale',
       'The displayed catalog changed before confirmation; refresh and review the impact again',
+    );
+  }
+  if (body.expectedReviewVersion !== candidate.candidate.reviewVersion) {
+    throw new WorkMatchError(
+      'work_match_stale',
+      'This candidate review changed before confirmation; refresh and review the impact again',
     );
   }
   if (!canonical || body.sourceWorkIds.some((workId) => !workById.has(workId))) {
@@ -740,6 +752,17 @@ export async function mergeWorkMatchCandidate(
                ON current_link.song_id = expected_link.song_id
               AND current_link.work_id = expected_link.work_id
            ) = (SELECT COUNT(*) FROM expected_links)
+           AND (
+             (? IS NULL AND NOT EXISTS (
+               SELECT 1 FROM work_match_reviews
+               WHERE candidate_key = ? AND fingerprint = ?
+             ))
+             OR (? IS NOT NULL AND EXISTS (
+               SELECT 1 FROM work_match_reviews
+               WHERE candidate_key = ? AND fingerprint = ?
+                 AND review_version = ?
+             ))
+           )
        )
        INSERT INTO work_aliases (
          source_work_id, canonical_work_id, source_title,
@@ -753,6 +776,13 @@ export async function mergeWorkMatchCandidate(
       expectedWorkState,
       expectedLinks,
       scan.revision,
+      body.expectedReviewVersion,
+      body.candidateKey,
+      body.fingerprint,
+      body.expectedReviewVersion,
+      body.candidateKey,
+      body.fingerprint,
+      body.expectedReviewVersion,
       guardToken,
       canonical.id,
       WORK_MATCH_GUARD_ACTOR,
@@ -775,6 +805,26 @@ export async function mergeWorkMatchCandidate(
        WHERE source.id IN (${sourcePlaceholders})
          AND (SELECT valid FROM work_merge_guard)`,
       [canonical.id, mergedBy, ...sourceWorkIds],
+    ),
+    guarded(
+      `INSERT INTO work_match_merge_audits (
+         id, candidate_key, fingerprint, catalog_revision, review_version,
+         canonical_work_id, source_work_ids, note, merged_by, merged_at
+       )
+       SELECT ?, ?, ?, ?, ?, ?, ?, ?, ?, datetime('now')
+       FROM work_merge_guard
+       WHERE valid`,
+      [
+        guardToken,
+        body.candidateKey,
+        body.fingerprint,
+        scan.revision,
+        body.expectedReviewVersion,
+        canonical.id,
+        JSON.stringify(sourceWorkIds),
+        note,
+        mergedBy,
+      ],
     ),
   ];
 

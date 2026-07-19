@@ -98,6 +98,36 @@ CREATE TABLE IF NOT EXISTS work_match_reviews (
   PRIMARY KEY (candidate_key, fingerprint)
 );
 
+-- Audit evidence for each confirmed review-queue merge. Source work rows
+-- are retired by the merge, so this table intentionally keeps IDs as values
+-- instead of foreign keys and preserves the curator's displayed note/version.
+CREATE TABLE IF NOT EXISTS work_match_merge_audits (
+  id TEXT PRIMARY KEY CHECK (length(id) > 0),
+  candidate_key TEXT NOT NULL CHECK (
+    length(candidate_key) = 64
+    AND candidate_key NOT GLOB '*[^0-9a-f]*'
+  ),
+  fingerprint TEXT NOT NULL CHECK (
+    length(fingerprint) = 64
+    AND fingerprint NOT GLOB '*[^0-9a-f]*'
+  ),
+  catalog_revision INTEGER NOT NULL CHECK (
+    typeof(catalog_revision) = 'integer' AND catalog_revision >= 0
+  ),
+  review_version INTEGER CHECK (
+    review_version IS NULL
+    OR (typeof(review_version) = 'integer' AND review_version >= 1)
+  ),
+  canonical_work_id TEXT NOT NULL,
+  source_work_ids TEXT NOT NULL CHECK (json_valid(source_work_ids)),
+  note TEXT NOT NULL DEFAULT '' CHECK (length(note) <= 2000),
+  merged_by TEXT NOT NULL CHECK (length(merged_by) > 0),
+  merged_at TEXT NOT NULL DEFAULT (datetime('now'))
+);
+
+CREATE INDEX IF NOT EXISTS idx_work_match_merge_audits_candidate
+  ON work_match_merge_audits(candidate_key, fingerprint, merged_at);
+
 -- Monotonic revision used to bind a review/merge to the exact global catalog
 -- snapshot scanned by the Worker.
 CREATE TABLE IF NOT EXISTS work_match_state (
