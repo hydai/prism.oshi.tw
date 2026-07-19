@@ -430,6 +430,8 @@ export interface CrystalTicket {
 
 // --- Harmonizer types ---
 
+export const HARMONIZE_MERGE_SOURCE_LIMIT = 50;
+
 export interface HarmonizeSongEntry {
   id: string;
   workId: string | null;
