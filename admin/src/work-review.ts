@@ -16,6 +16,7 @@ const WORK_MATCH_ALGORITHM = 'tier-a-v1';
 const WORK_MATCH_GUARD_ACTOR = 'system:global-work-review-guard';
 const HEX_64 = /^[0-9a-f]{64}$/;
 const LETTER_OR_NUMBER = /[\p{L}\p{N}]/u;
+const LETTER_NUMBER_OR_MARK = /[\p{L}\p{N}\p{M}]/u;
 const LATIN_CHARACTER = /\p{Script=Latin}/u;
 const COMBINING_MARK = /\p{M}/u;
 
@@ -86,25 +87,32 @@ function compareText(left: string, right: string): number {
   return 0;
 }
 
-/** Remove punctuation and spacing while retaining Unicode letters/numbers. */
+/** Remove punctuation and spacing while retaining letters, numbers, and semantic combining marks. */
 export function compactWorkText(text: string): string {
   return Array.from(normalizeForMatching(text))
-    .filter((character) => LETTER_OR_NUMBER.test(character))
+    .filter((character) => LETTER_NUMBER_OR_MARK.test(character))
     .join('');
 }
 
 /** Fold accents for Latin text without stripping Japanese dakuten/handakuten. */
 export function accentCompactWorkText(text: string): string {
   const characters: string[] = [];
+  let lastBaseWasLatin = false;
   for (const character of normalizeForMatching(text)) {
     if (LATIN_CHARACTER.test(character)) {
+      lastBaseWasLatin = true;
       for (const part of character.normalize('NFKD')) {
         if (!COMBINING_MARK.test(part) && LETTER_OR_NUMBER.test(part)) {
           characters.push(part);
         }
       }
+    } else if (COMBINING_MARK.test(character)) {
+      if (!lastBaseWasLatin) characters.push(character);
     } else if (LETTER_OR_NUMBER.test(character)) {
       characters.push(character);
+      lastBaseWasLatin = false;
+    } else {
+      lastBaseWasLatin = false;
     }
   }
   return characters.join('');

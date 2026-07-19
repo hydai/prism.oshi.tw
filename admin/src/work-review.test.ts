@@ -52,6 +52,10 @@ const SOURCE_ROWS: WorkMatchSourceRow[] = [
   row('work-accent-alt', 'My Heart Will Go On', 'Celine Dion', 'song-g', 'frank', 1),
   row('work-japanese-one', 'Japanese Guard', 'ボカロP', 'song-h', 'gina', 1),
   row('work-japanese-two', 'Japanese Guard', 'ポカロP', 'song-i', 'hank', 1),
+  row('work-japanese-combining-dakuten-base', 'わ', 'Japanese Combining Guard', 'song-j', 'iris', 1),
+  row('work-japanese-combining-dakuten-mark', 'わ\u3099', 'Japanese Combining Guard', 'song-k', 'jane', 1),
+  row('work-japanese-combining-handakuten-base', 'か', 'Japanese Combining Guard', 'song-l', 'kate', 1),
+  row('work-japanese-combining-handakuten-mark', 'か\u309a', 'Japanese Combining Guard', 'song-m', 'lena', 1),
 ];
 
 type CapturedStatement = { sql: string; params: unknown[] };
@@ -154,6 +158,12 @@ async function testTierACandidateGeneration(): Promise<void> {
   assert(
     !candidates.some((candidate) => candidate.works.some((work) => work.id === 'work-japanese-one')),
     'Japanese dakuten differences are not folded as Latin accents',
+  );
+  assert(
+    !candidates.some((candidate) => candidate.works.some((work) => (
+      work.id.startsWith('work-japanese-combining-')
+    ))),
+    'non-composable Japanese voicing marks remain significant',
   );
   assert(candidates.every((candidate) => candidate.candidateKey.length === 64), 'candidate keys are SHA-256');
   assert(candidates.every((candidate) => candidate.fingerprint.length === 64), 'fingerprints are SHA-256');
