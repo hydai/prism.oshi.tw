@@ -16,9 +16,9 @@ const WORK_MATCH_ALGORITHM = 'tier-a-v1';
 const WORK_MATCH_GUARD_ACTOR = 'system:global-work-review-guard';
 const HEX_64 = /^[0-9a-f]{64}$/;
 const LETTER_OR_NUMBER = /[\p{L}\p{N}]/u;
-const LETTER_NUMBER_OR_MARK = /[\p{L}\p{N}\p{M}]/u;
 const LATIN_CHARACTER = /\p{Script=Latin}/u;
 const COMBINING_MARK = /\p{M}/u;
+const PUNCTUATION_OR_SEPARATOR = /[\p{P}\p{Z}]/u;
 
 export interface WorkMatchSourceRow {
   work_id: string;
@@ -87,10 +87,10 @@ function compareText(left: string, right: string): number {
   return 0;
 }
 
-/** Remove punctuation and spacing while retaining letters, numbers, and semantic combining marks. */
+/** Remove only punctuation and spacing, retaining semantic marks and symbols. */
 export function compactWorkText(text: string): string {
   return Array.from(normalizeForMatching(text))
-    .filter((character) => LETTER_NUMBER_OR_MARK.test(character))
+    .filter((character) => !PUNCTUATION_OR_SEPARATOR.test(character))
     .join('');
 }
 
@@ -108,7 +108,7 @@ export function accentCompactWorkText(text: string): string {
       }
     } else if (COMBINING_MARK.test(character)) {
       if (!lastBaseWasLatin) characters.push(character);
-    } else if (LETTER_OR_NUMBER.test(character)) {
+    } else if (!PUNCTUATION_OR_SEPARATOR.test(character)) {
       characters.push(character);
       lastBaseWasLatin = false;
     } else {
@@ -265,6 +265,10 @@ async function buildInternalCandidates(
   addEdges(
     (work) => [compactWorkText(work.title), compactWorkText(work.originalArtist)],
     'punctuation_spacing',
+    (left, right) => (
+      normalizeForMatching(left.title) === normalizeForMatching(right.title)
+      && normalizeForMatching(left.originalArtist) === normalizeForMatching(right.originalArtist)
+    ),
   );
   addEdges(
     (work) => [
