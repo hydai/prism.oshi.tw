@@ -231,8 +231,10 @@ export default function GlobalWorkReview() {
         candidateKey: candidate.candidateKey,
         fingerprint: candidate.fingerprint,
         catalogRevision: candidate.catalogRevision,
+        expectedReviewVersion: candidate.reviewVersion,
         canonicalWorkId,
         sourceWorkIds,
+        note: notes[candidateReviewStateKey(candidate)] ?? '',
       });
       setMessage(
         `Merged ${result.mergedWorks} work ID(s); preserved ${result.preservedSongs} songs and ${result.preservedPerformances} performances.`,
@@ -431,7 +433,7 @@ export default function GlobalWorkReview() {
                 )}
 
                 <label className="mt-4 block text-sm font-medium text-slate-700">
-                  Review note (optional)
+                  Review note (optional — saved with the decision or merge)
                   <textarea
                     value={notes[noteStateKey] ?? ''}
                     maxLength={2000}

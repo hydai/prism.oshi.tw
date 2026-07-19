@@ -54,9 +54,9 @@ assert_sql() {
 }
 
 assert_sql "$migration_db" \
-  "SELECT COUNT(*) FROM sqlite_schema WHERE type = 'table' AND name IN ('work_match_reviews', 'work_match_state');" \
-  '2' \
-  'migration creates review and revision tables idempotently'
+  "SELECT COUNT(*) FROM sqlite_schema WHERE type = 'table' AND name IN ('work_match_reviews', 'work_match_merge_audits', 'work_match_state');" \
+  '3' \
+  'migration creates review, merge-audit, and revision tables idempotently'
 assert_sql "$migration_db" \
   "SELECT COUNT(*) FROM sqlite_schema WHERE type = 'trigger' AND name GLOB 'work_match_*_revision';" \
   '12' \
@@ -109,6 +109,18 @@ assert_sql "$migration_db" \
   '1:1' \
   'review decisions start with a monotonic record version'
 
+sqlite3 "$migration_db" "INSERT INTO work_match_merge_audits (
+  id, candidate_key, fingerprint, catalog_revision, review_version,
+  canonical_work_id, source_work_ids, note, merged_by
+) VALUES (
+  'merge-a', '$key_a', '$fingerprint_a', 12, 1,
+  'work-a', '[\"work-b\"]', 'verified official source', 'curator@example.com'
+);"
+assert_sql "$migration_db" \
+  "SELECT review_version || ':' || note FROM work_match_merge_audits WHERE id = 'merge-a';" \
+  '1:verified official source' \
+  'merge audit preserves the displayed review version and curator note'
+
 if sqlite3 "$migration_db" "INSERT INTO work_match_reviews (
   candidate_key, fingerprint, work_ids, decision, reviewed_by
 ) VALUES (
@@ -121,8 +133,8 @@ fi
 
 sqlite3 "$bootstrap_db" < schema.sql
 assert_sql "$bootstrap_db" \
-  "SELECT COUNT(*) FROM sqlite_schema WHERE type = 'table' AND name IN ('work_match_reviews', 'work_match_state');" \
-  '2' \
+  "SELECT COUNT(*) FROM sqlite_schema WHERE type = 'table' AND name IN ('work_match_reviews', 'work_match_merge_audits', 'work_match_state');" \
+  '3' \
   'fresh schema includes global work review state'
 assert_sql "$bootstrap_db" \
   "SELECT COUNT(*) FROM sqlite_schema WHERE type = 'trigger' AND name GLOB 'work_match_*_revision';" \
@@ -133,4 +145,4 @@ assert_sql "$bootstrap_db" \
   'ok' \
   'fresh schema integrity'
 
-echo '✓ work match reviews are content-addressed and catalog mutations are revisioned'
+echo '✓ work match reviews and merge audits are versioned while catalog mutations are revisioned'

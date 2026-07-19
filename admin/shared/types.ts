@@ -595,8 +595,10 @@ export interface WorkMatchMergeBody {
   candidateKey: string;
   fingerprint: string;
   catalogRevision: number;
+  expectedReviewVersion: number | null;
   canonicalWorkId: string;
   sourceWorkIds: string[];
+  note?: string;
 }
 
 export interface WorkMatchMergeResponse {

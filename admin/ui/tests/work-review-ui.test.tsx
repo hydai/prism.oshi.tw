@@ -146,8 +146,10 @@ async function main(): Promise<void> {
     candidateKey: candidate.candidateKey,
     fingerprint: candidate.fingerprint,
     catalogRevision: candidate.catalogRevision,
+    expectedReviewVersion: candidate.reviewVersion,
     canonicalWorkId: 'work-canonical',
     sourceWorkIds: ['work-source'],
+    note: 'Verified official release credits',
   });
 
   assert(requests[0]?.url === '/api/work-matches?filter=pending&page=2&pageSize=20', 'scan API is site-wide and paginated');
@@ -158,6 +160,8 @@ async function main(): Promise<void> {
   assert(requests[2]?.init?.method === 'POST', 'global merge uses an authenticated mutation request');
   const mergeBody = JSON.parse(String(requests[2]?.init?.body)) as Record<string, unknown>;
   assert(mergeBody.catalogRevision === 7, 'merge payload binds the displayed catalog revision');
+  assert(mergeBody.expectedReviewVersion === null, 'merge payload binds the displayed review version');
+  assert(mergeBody.note === 'Verified official release credits', 'merge payload preserves the curator note');
   assert(mergeBody.canonicalWorkId === 'work-canonical', 'merge payload binds the reviewed canonical ID');
   assert(
     Array.isArray(mergeBody.sourceWorkIds) && mergeBody.sourceWorkIds[0] === 'work-source',

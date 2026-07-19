@@ -276,6 +276,11 @@ function parseWorkMatchMergeBody(value: unknown): WorkMatchMergeBody | null {
     || typeof value.catalogRevision !== 'number'
     || !Number.isSafeInteger(value.catalogRevision)
     || value.catalogRevision < 0
+    || (value.expectedReviewVersion !== null && (
+      typeof value.expectedReviewVersion !== 'number'
+      || !Number.isSafeInteger(value.expectedReviewVersion)
+      || value.expectedReviewVersion < 1
+    ))
     || typeof value.canonicalWorkId !== 'string'
     || value.canonicalWorkId.trim().length === 0
     || !Array.isArray(value.sourceWorkIds)
@@ -283,6 +288,7 @@ function parseWorkMatchMergeBody(value: unknown): WorkMatchMergeBody | null {
     || !value.sourceWorkIds.every(
       (id): id is string => typeof id === 'string' && id.trim().length > 0,
     )
+    || (value.note !== undefined && typeof value.note !== 'string')
   ) return null;
 
   const canonicalWorkId = value.canonicalWorkId.trim();
@@ -295,8 +301,10 @@ function parseWorkMatchMergeBody(value: unknown): WorkMatchMergeBody | null {
     candidateKey: value.candidateKey.trim(),
     fingerprint: value.fingerprint.trim(),
     catalogRevision: value.catalogRevision,
+    expectedReviewVersion: value.expectedReviewVersion,
     canonicalWorkId,
     sourceWorkIds,
+    ...(value.note === undefined ? {} : { note: value.note }),
   };
 }
 
