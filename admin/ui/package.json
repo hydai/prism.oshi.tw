@@ -10,6 +10,7 @@
     "test:streams-filter": "npx tsx tests/streams-filter.test.ts",
     "test:streams-render": "npx tsx tests/streams-list-render.test.tsx",
     "test:global-works": "npx tsx tests/global-works-ui.test.tsx",
+    "test:harmonizer-work-id": "npx tsx tests/harmonizer-work-id.test.tsx",
     "test:vod-export": "npx tsx tests/vod-export-ui.test.tsx",
     "preview": "vite preview"
   },

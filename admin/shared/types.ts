@@ -432,6 +432,7 @@ export interface CrystalTicket {
 
 export interface HarmonizeSongEntry {
   id: string;
+  workId: string | null;
   title: string;
   originalArtist: string;
   status: Status;
@@ -446,10 +447,11 @@ export interface HarmonizeArtistEntry {
 }
 
 export type HarmonizeMatchType = 'exact' | 'fuzzy';
+export type HarmonizeGroupMatchType = HarmonizeMatchType | 'work_id';
 
 export interface SimilarityGroup<T> {
   normalizedKey: string;
-  matchType: HarmonizeMatchType;
+  matchType: HarmonizeGroupMatchType;
   items: T[];
 }
 
@@ -470,13 +472,17 @@ export interface HarmonizeApplyBody {
 export interface HarmonizeMergeBody {
   canonicalSongId: string;
   sourceSongIds: string[];
+  mergeGlobalWorks?: boolean;
 }
 
 export interface HarmonizeMergeResponse {
   ok: true;
   canonicalSongId: string;
+  canonicalWorkId: string;
   mergedSongs: number;
   movedPerformances: number;
+  mergedWorks: number;
+  relinkedSongs: number;
 }
 
 // --- Global song library ---

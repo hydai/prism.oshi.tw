@@ -3,12 +3,112 @@ import type {
   AuthUser,
   HarmonizeSongEntry,
   HarmonizeArtistEntry,
+  HarmonizeMergeBody,
   SimilarityGroup,
+  HarmonizeGroupMatchType,
   HarmonizeMatchType,
 } from '../../../shared/types';
 import { api } from '../api/client';
 
 // --- Similar Songs Tab ---
+
+export interface HarmonizeWorkMergePlan {
+  canonicalWorkId: string | null;
+  workIds: string[];
+  sourceWorkIds: string[];
+  missingSongIds: string[];
+  requiresGlobalMerge: boolean;
+}
+
+export function getWorkMergePlan(
+  items: HarmonizeSongEntry[],
+  canonicalSongId: string,
+): HarmonizeWorkMergePlan {
+  const canonicalWorkId = items.find((item) => item.id === canonicalSongId)?.workId ?? null;
+  const workIds = [...new Set(
+    items.flatMap((item) => (item.workId === null ? [] : [item.workId])),
+  )];
+  const sourceWorkIds = canonicalWorkId === null
+    ? []
+    : workIds.filter((workId) => workId !== canonicalWorkId);
+
+  return {
+    canonicalWorkId,
+    workIds,
+    sourceWorkIds,
+    missingSongIds: items.filter((item) => item.workId === null).map((item) => item.id),
+    requiresGlobalMerge: sourceWorkIds.length > 0,
+  };
+}
+
+export function buildWorkAwareMergeRequest(
+  items: HarmonizeSongEntry[],
+  canonicalSongId: string,
+): HarmonizeMergeBody | null {
+  const plan = getWorkMergePlan(items, canonicalSongId);
+  if (plan.canonicalWorkId === null || plan.missingSongIds.length > 0) return null;
+
+  const sourceSongIds = items
+    .filter((item) => item.id !== canonicalSongId)
+    .map((item) => item.id);
+  if (sourceSongIds.length === 0) return null;
+
+  return {
+    canonicalSongId,
+    sourceSongIds,
+    mergeGlobalWorks: plan.requiresGlobalMerge,
+  };
+}
+
+export function WorkIdBadge({ workId }: { workId: string | null }) {
+  if (workId === null) {
+    return (
+      <span className="rounded bg-red-100 px-1.5 py-0.5 text-xs font-semibold text-red-700">
+        UNLINKED
+      </span>
+    );
+  }
+
+  return (
+    <code className="break-all text-xs text-slate-600" title={workId}>
+      {workId}
+    </code>
+  );
+}
+
+export function WorkMergeNotice({ plan }: { plan: HarmonizeWorkMergePlan }) {
+  if (plan.missingSongIds.length > 0 || plan.canonicalWorkId === null) {
+    return (
+      <div className="mb-3 rounded-md border border-red-200 bg-red-50 p-3 text-sm text-red-700">
+        Merge blocked: {plan.missingSongIds.length} selected song record(s) do not have a workId.
+        Link every song to a global work before merging.
+      </div>
+    );
+  }
+
+  if (plan.requiresGlobalMerge) {
+    return (
+      <div className="mb-3 rounded-md border border-amber-300 bg-amber-50 p-3 text-sm text-amber-800">
+        <span className="font-semibold">Global work merge required.</span>{' '}
+        The selected canonical workId is <code>{plan.canonicalWorkId}</code>. Merging will retire{' '}
+        <code>{plan.sourceWorkIds.join(', ')}</code> and repoint every linked song across all VTubers.
+      </div>
+    );
+  }
+
+  return (
+    <div className="mb-3 rounded-md border border-green-200 bg-green-50 p-3 text-sm text-green-700">
+      Local duplicate merge only. Every selected song already uses workId{' '}
+      <code>{plan.canonicalWorkId}</code>, so the global work identity will stay unchanged.
+    </div>
+  );
+}
+
+function matchTypeClasses(matchType: HarmonizeGroupMatchType): string {
+  if (matchType === 'work_id') return 'bg-blue-100 text-blue-700';
+  if (matchType === 'exact') return 'bg-green-100 text-green-700';
+  return 'bg-yellow-100 text-yellow-700';
+}
 
 function SimilarSongsTab() {
   const [groups, setGroups] = useState<SimilarityGroup<HarmonizeSongEntry>[]>([]);
@@ -54,20 +154,27 @@ function SimilarSongsTab() {
 
     const canonical = group.items.find((i) => i.id === canonicalId);
     if (!canonical) return;
+    const workPlan = getWorkMergePlan(group.items, canonicalId);
+    const mergeRequest = buildWorkAwareMergeRequest(group.items, canonicalId);
 
-    const sourceSongIds = group.items
-      .filter((i) => i.id !== canonicalId)
-      .map((i) => i.id);
+    if (mergeRequest === null) {
+      setError('Every selected song must have a workId before it can be merged.');
+      return;
+    }
 
-    if (sourceSongIds.length === 0) return;
+    const { sourceSongIds } = mergeRequest;
     const performanceCount = group.items.reduce((sum, item) => sum + item.performanceCount, 0);
+    const workImpact = workPlan.requiresGlobalMerge
+      ? `GLOBAL WORK MERGE\n\nCanonical workId: ${workPlan.canonicalWorkId}\nWorkId(s) to retire: ${workPlan.sourceWorkIds.join(', ')}\n\nEvery surviving song across all VTubers linked to the retired workId(s) will be repointed to the canonical work.`
+      : `LOCAL SONG MERGE\n\nworkId remains: ${workPlan.canonicalWorkId}\n\nThe global work identity will not be merged or replaced.`;
     if (!window.confirm(
-      `Merge ${sourceSongIds.length} song record(s) into "${canonical.title}" by ${canonical.originalArtist}?\n\nAll ${performanceCount} performances will be preserved.`,
+      `${workImpact}\n\nMerge ${sourceSongIds.length} song record(s) into "${canonical.title}" by ${canonical.originalArtist}?\n\nAll ${performanceCount} performances will be preserved.`,
     )) return;
 
+    setError(null);
     setApplying((prev) => new Set(prev).add(group.normalizedKey));
     try {
-      await api.harmonizeMerge({ canonicalSongId: canonicalId, sourceSongIds });
+      await api.harmonizeMerge(mergeRequest);
       // Remove this group from state
       setGroups((prev) => prev.filter((g) => g.normalizedKey !== group.normalizedKey));
     } catch (err) {
@@ -144,6 +251,12 @@ function SimilarSongsTab() {
           const canonicalId = canonicals.get(group.normalizedKey);
           const canonical = group.items.find((i) => i.id === canonicalId);
           const isApplying = applying.has(group.normalizedKey);
+          const workPlan = canonicalId === undefined
+            ? null
+            : getWorkMergePlan(group.items, canonicalId);
+          const mergeBlocked = workPlan === null
+            || workPlan.canonicalWorkId === null
+            || workPlan.missingSongIds.length > 0;
 
           return (
             <div key={group.normalizedKey} className="rounded-lg border border-slate-200 bg-white">
@@ -156,11 +269,7 @@ function SimilarSongsTab() {
                 <span className="font-medium text-slate-800">{group.normalizedKey}</span>
                 <span className="text-sm text-slate-500">{group.items.length} variants</span>
                 <span
-                  className={`rounded-full px-2 py-0.5 text-xs font-medium ${
-                    group.matchType === 'exact'
-                      ? 'bg-green-100 text-green-700'
-                      : 'bg-yellow-100 text-yellow-700'
-                  }`}
+                  className={`rounded-full px-2 py-0.5 text-xs font-medium ${matchTypeClasses(group.matchType)}`}
                 >
                   {group.matchType.toUpperCase()}
                 </span>
@@ -169,12 +278,14 @@ function SimilarSongsTab() {
               {/* Body */}
               {isExpanded && (
                 <div className="border-t border-slate-100 px-4 py-3">
+                  {workPlan && <WorkMergeNotice plan={workPlan} />}
                   <table className="w-full text-sm">
                     <thead>
                       <tr className="text-left text-xs font-medium uppercase text-slate-500">
                         <th className="w-10 pb-2">Use</th>
                         <th className="pb-2">Title</th>
                         <th className="pb-2">Artist</th>
+                        <th className="pb-2">Work ID</th>
                         <th className="pb-2">Status</th>
                         <th className="pb-2 text-right">Perfs</th>
                       </tr>
@@ -216,6 +327,9 @@ function SimilarSongsTab() {
                                 </span>
                               )}
                             </td>
+                            <td className="max-w-56 py-1.5 pr-3">
+                              <WorkIdBadge workId={item.workId} />
+                            </td>
                             <td className="py-1.5">
                               <StatusBadge status={item.status} />
                             </td>
@@ -228,10 +342,15 @@ function SimilarSongsTab() {
                   <div className="mt-3 flex justify-end">
                     <button
                       onClick={() => handleApplyGroup(group)}
-                      disabled={isApplying}
+                      disabled={isApplying || mergeBlocked}
+                      title={mergeBlocked ? 'Link every selected song to a workId before merging' : undefined}
                       className="rounded-md bg-blue-600 px-3 py-1.5 text-sm font-medium text-white hover:bg-blue-700 disabled:opacity-50"
                     >
-                      {isApplying ? 'Merging...' : 'Merge into Selected Song'}
+                      {isApplying
+                        ? 'Merging...'
+                        : workPlan?.requiresGlobalMerge
+                          ? 'Merge Songs + Global Works'
+                          : 'Merge Local Duplicates'}
                     </button>
                   </div>
                 </div>
@@ -427,11 +546,7 @@ function SimilarArtistsTab() {
                 <span className="font-medium text-slate-800">{group.normalizedKey}</span>
                 <span className="text-sm text-slate-500">{group.items.length} variants</span>
                 <span
-                  className={`rounded-full px-2 py-0.5 text-xs font-medium ${
-                    group.matchType === 'exact'
-                      ? 'bg-green-100 text-green-700'
-                      : 'bg-yellow-100 text-yellow-700'
-                  }`}
+                  className={`rounded-full px-2 py-0.5 text-xs font-medium ${matchTypeClasses(group.matchType)}`}
                 >
                   {group.matchType.toUpperCase()}
                 </span>

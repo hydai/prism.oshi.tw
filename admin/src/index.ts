@@ -180,6 +180,33 @@ function isNovaUpdateBody(value: unknown): value is NovaUpdateBody {
   return typeof value === 'object' && value !== null && !Array.isArray(value);
 }
 
+function isUnknownRecord(value: unknown): value is Record<string, unknown> {
+  return typeof value === 'object' && value !== null && !Array.isArray(value);
+}
+
+function parseHarmonizeMergeBody(value: unknown): HarmonizeMergeBody | null {
+  if (!isUnknownRecord(value)) return null;
+  const body = value;
+  if (
+    typeof body.canonicalSongId !== 'string'
+    || body.canonicalSongId.trim().length === 0
+    || !Array.isArray(body.sourceSongIds)
+    || body.sourceSongIds.length === 0
+    || !body.sourceSongIds.every(
+      (id): id is string => typeof id === 'string' && id.trim().length > 0,
+    )
+    || (body.mergeGlobalWorks !== undefined && typeof body.mergeGlobalWorks !== 'boolean')
+  ) return null;
+
+  return {
+    canonicalSongId: body.canonicalSongId,
+    sourceSongIds: body.sourceSongIds,
+    ...(body.mergeGlobalWorks === undefined
+      ? {}
+      : { mergeGlobalWorks: body.mergeGlobalWorks }),
+  };
+}
+
 function hasCurrentChannelVerification(value: {
   youtube_channel_id: string;
   youtube_channel_verified_id: string | null;
@@ -1159,16 +1186,8 @@ app.get('/api/harmonize/artists', requireCurator, async (c) => {
 });
 
 app.post('/api/harmonize/merge', requireCurator, async (c) => {
-  const body = await c.req.json<HarmonizeMergeBody>();
-  if (
-    typeof body.canonicalSongId !== 'string'
-    || !body.canonicalSongId
-    || !Array.isArray(body.sourceSongIds)
-    || body.sourceSongIds.length === 0
-    || !body.sourceSongIds.every((id) => typeof id === 'string' && id.length > 0)
-  ) {
-    return c.json({ error: 'canonicalSongId and a non-empty sourceSongIds array are required' }, 400);
-  }
+  const body = parseHarmonizeMergeBody(await c.req.json<unknown>());
+  if (!body) return c.json({ error: 'Invalid Harmonizer merge request' }, 400);
 
   const streamerId = getStreamerId(c);
   const user = c.get('user');
@@ -1179,14 +1198,17 @@ app.post('/api/harmonize/merge', requireCurator, async (c) => {
       body.canonicalSongId,
       body.sourceSongIds,
       user.email,
+      body.mergeGlobalWorks === true,
     );
     return c.json<HarmonizeMergeResponse>({ ok: true, ...result });
   } catch (error) {
     if (error instanceof SongMergeError) {
-      return c.json(
-        { error: error.message },
-        error.code === 'song_not_found' ? 404 : 400,
-      );
+      const body = { error: error.message, code: error.code };
+      if (error.code === 'song_not_found') return c.json(body, 404);
+      if (error.code === 'work_not_linked' || error.code === 'work_merge_required') {
+        return c.json(body, 409);
+      }
+      return c.json(body, 400);
     }
     throw error;
   }
