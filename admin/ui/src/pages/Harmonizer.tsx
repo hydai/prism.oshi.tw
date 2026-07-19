@@ -56,7 +56,14 @@ export function buildWorkAwareMergeRequest(
   return {
     canonicalSongId,
     sourceSongIds,
-    mergeGlobalWorks: plan.requiresGlobalMerge,
+    ...(plan.requiresGlobalMerge
+      ? {
+          workMergeConfirmation: {
+            canonicalWorkId: plan.canonicalWorkId,
+            sourceWorkIds: plan.sourceWorkIds,
+          },
+        }
+      : {}),
   };
 }
 

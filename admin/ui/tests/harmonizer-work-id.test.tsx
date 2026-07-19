@@ -58,7 +58,10 @@ async function main(): Promise<void> {
   assert(sameWorkPlan.sourceWorkIds.length === 0, 'same workId has no global source work to retire');
   const sameWorkRequest = buildWorkAwareMergeRequest(sameWorkSongs, 'canonical');
   assert(sameWorkRequest !== null, 'linked same-work songs produce a merge request');
-  assert(sameWorkRequest.mergeGlobalWorks === false, 'same-work request cannot authorize a global merge');
+  assert(
+    sameWorkRequest.workMergeConfirmation === undefined,
+    'same-work request carries no global-work authorization',
+  );
 
   const crossWorkSongs = [
     song('canonical', 'work-one'),
@@ -74,7 +77,14 @@ async function main(): Promise<void> {
   );
   const crossWorkRequest = buildWorkAwareMergeRequest(crossWorkSongs, 'canonical');
   assert(crossWorkRequest !== null, 'linked cross-work songs produce a merge request');
-  assert(crossWorkRequest.mergeGlobalWorks === true, 'cross-work request explicitly authorizes global effects');
+  assert(
+    crossWorkRequest.workMergeConfirmation?.canonicalWorkId === 'work-one',
+    'cross-work authorization is bound to the reviewed canonical workId',
+  );
+  assert(
+    crossWorkRequest.workMergeConfirmation?.sourceWorkIds.join('|') === 'work-two',
+    'cross-work authorization is bound to the reviewed source workIds',
+  );
   assert(
     crossWorkRequest.sourceSongIds.join('|') === 'source-one|source-two',
     'merge payload contains every non-canonical local song exactly once',
