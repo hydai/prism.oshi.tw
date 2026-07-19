@@ -1898,13 +1898,15 @@ const SONG_MERGE_GUARD_ACTOR = 'system:harmonizer-merge-guard';
 
 // D1 exposes atomic batches but no interactive transaction callback. The first
 // statement writes this short-lived token only when every selected song still
-// has its reviewed work link and, for a cross-work merge, every affected work
-// still has its reviewed tags. Every business mutation checks the token, and
-// the final statement removes it before the batch commits, so stale batches
-// are entirely no-op without exposing guard state outside the transaction.
+// has its reviewed metadata and work link and, for a cross-work merge, every
+// affected work still has its reviewed tags. Every business mutation checks
+// the token, and the final statement removes it before the batch commits, so
+// stale batches are entirely no-op without exposing guard state outside the
+// transaction.
 function prepareSongMergeGuard(
   db: D1Database,
   expectedLinksJson: string,
+  expectedSongStateJson: string,
   expectedWorkStateJson: string,
   streamerId: string,
   guardSourceId: string,
@@ -1913,6 +1915,17 @@ function prepareSongMergeGuard(
   return db.prepare(
     `WITH expected_links(song_id, work_id) AS (
        SELECT key, value
+       FROM json_each(?)
+     ),
+     expected_song_state(
+       song_id, title, original_artist, tags, status, reviewed_by
+     ) AS (
+       SELECT key,
+              json_extract(value, '$.title'),
+              json_extract(value, '$.originalArtist'),
+              json_extract(value, '$.tags'),
+              json_extract(value, '$.status'),
+              json_extract(value, '$.reviewedBy')
        FROM json_each(?)
      ),
      expected_work_state(work_id, tags) AS (
@@ -1929,9 +1942,16 @@ function prepareSongMergeGuard(
              AND guarded_state.tags = expected_work.tags
           ) = (SELECT COUNT(*) FROM expected_work_state)
        FROM expected_links AS expected
+       JOIN expected_song_state AS expected_song
+         ON expected_song.song_id = expected.song_id
        JOIN songs AS guarded_song
          ON guarded_song.id = expected.song_id
         AND guarded_song.streamer_id = ?
+        AND guarded_song.title = expected_song.title
+        AND guarded_song.original_artist = expected_song.original_artist
+        AND guarded_song.tags = expected_song.tags
+        AND guarded_song.status = expected_song.status
+        AND guarded_song.reviewed_by IS expected_song.reviewed_by
        JOIN song_work_links AS guarded_link
          ON guarded_link.song_id = expected.song_id
         AND guarded_link.work_id = expected.work_id
@@ -1948,6 +1968,7 @@ function prepareSongMergeGuard(
      RETURNING 1 AS valid`,
   ).bind(
     expectedLinksJson,
+    expectedSongStateJson,
     expectedWorkStateJson,
     streamerId,
     guardSourceId,
@@ -2084,7 +2105,7 @@ export async function mergeSongs(
     if (!confirmationMatches) {
       throw new SongMergeError(
         'work_merge_stale',
-        'Song links or global work metadata changed after review; scan again before merging',
+        'Selected song or global work data changed after review; scan again before merging',
       );
     }
   }
@@ -2099,6 +2120,15 @@ export async function mergeSongs(
 
   const expectedLinksJson = JSON.stringify(Object.fromEntries(
     allRows.map((row) => [row.id, row.work_id!]),
+  ));
+  const expectedSongStateJson = JSON.stringify(Object.fromEntries(
+    allRows.map((row) => [row.id, {
+      title: row.title,
+      originalArtist: row.original_artist,
+      tags: row.tags,
+      status: row.status,
+      reviewedBy: row.reviewed_by,
+    }]),
   ));
   const expectedWorkStateJson = sourceWorkIds.length === 0
     ? '{}'
@@ -2121,6 +2151,7 @@ export async function mergeSongs(
     prepareSongMergeGuard(
       db,
       expectedLinksJson,
+      expectedSongStateJson,
       expectedWorkStateJson,
       streamerId,
       guardSourceId,
@@ -2264,7 +2295,7 @@ export async function mergeSongs(
   if (mergeGuard?.valid !== 1 && mergeGuard?.valid !== true) {
     throw new SongMergeError(
       'work_merge_stale',
-      'Song links or global work metadata changed after review; scan again before merging',
+      'Selected song or global work data changed after review; scan again before merging',
     );
   }
   return {

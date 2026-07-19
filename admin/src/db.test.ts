@@ -551,7 +551,7 @@ async function testMergeSongsPreservesPerformances(): Promise<void> {
     'same-work merge keeps local tags out of global work metadata',
   );
   assertEqual(
-    fakeDb.batchStatements[0]?.params[1],
+    fakeDb.batchStatements[0]?.params[2],
     '{}',
     'same-work merge does not depend on unrelated global work metadata',
   );
@@ -740,17 +740,36 @@ async function testMergeSongsRevalidatesReviewedStateInsideBatch(): Promise<void
   );
   assert(
     /WITH\s+expected_links/i.test(fakeDb.batchStatements[0]?.sql ?? '')
+      && /expected_song_state/i.test(fakeDb.batchStatements[0]?.sql ?? '')
       && /expected_work_state/i.test(fakeDb.batchStatements[0]?.sql ?? '')
       && /RETURNING\s+1\s+AS\s+valid/i.test(fakeDb.batchStatements[0]?.sql ?? ''),
-    'the first statement revalidates reviewed links and work metadata inside the D1 batch',
+    'the first statement revalidates reviewed song and work state inside the D1 batch',
   );
   const expectedLinks = JSON.parse(
     String(fakeDb.batchStatements[0]?.params[0] ?? '{}'),
   ) as Record<string, string>;
   assertEqual(expectedLinks['song-canonical'], 'work-canonical', 'guard binds the reviewed canonical link');
   assertEqual(expectedLinks['song-source'], 'work-source', 'guard binds every reviewed source link');
-  const expectedWorkState = JSON.parse(
+  const expectedSongState = JSON.parse(
     String(fakeDb.batchStatements[0]?.params[1] ?? '{}'),
+  ) as Record<string, {
+    title: string;
+    originalArtist: string;
+    tags: string;
+    status: string;
+    reviewedBy: string | null;
+  }>;
+  assertEqual(expectedSongState['song-canonical']?.title, 'Song', 'guard binds canonical title');
+  assertEqual(expectedSongState['song-source']?.originalArtist, 'Artist', 'guard binds source artist');
+  assertEqual(expectedSongState['song-canonical']?.tags, '[]', 'guard binds canonical local tags');
+  assertEqual(expectedSongState['song-source']?.status, 'approved', 'guard binds source status');
+  assertEqual(
+    expectedSongState['song-source']?.reviewedBy,
+    'reviewer@example.com',
+    'guard binds source reviewer state',
+  );
+  const expectedWorkState = JSON.parse(
+    String(fakeDb.batchStatements[0]?.params[2] ?? '{}'),
   ) as Record<string, string>;
   assertEqual(
     expectedWorkState['work-canonical'],
@@ -769,7 +788,7 @@ async function testMergeSongsRevalidatesReviewedStateInsideBatch(): Promise<void
       /WITH\s+merge_guard/i.test(statement.sql)
       && /SELECT\s+valid\s+FROM\s+merge_guard/i.test(statement.sql)
     )),
-    'every merge mutation is conditional on the same transaction-time reviewed-state guard',
+    'every merge mutation is conditional on the same transaction-time song-and-work-state guard',
   );
   assert(
     /DELETE\s+FROM\s+work_aliases/i.test(fakeDb.batchStatements.at(-1)?.sql ?? ''),
