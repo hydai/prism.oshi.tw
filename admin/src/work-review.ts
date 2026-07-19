@@ -197,7 +197,10 @@ function publicWork(snapshot: WorkSnapshot): WorkMatchCandidateWork {
   };
 }
 
-async function buildInternalCandidates(rows: WorkMatchSourceRow[]): Promise<InternalCandidate[]> {
+async function buildInternalCandidates(
+  rows: WorkMatchSourceRow[],
+  catalogRevision = 0,
+): Promise<InternalCandidate[]> {
   const works = snapshotsFromRows(rows);
   const parent = works.map((_, index) => index);
 
@@ -314,6 +317,7 @@ async function buildInternalCandidates(rows: WorkMatchSourceRow[]): Promise<Inte
           candidate: {
             candidateKey,
             fingerprint,
+            catalogRevision,
             confidence: 'high',
             reasons,
             works: snapshots.map(publicWork),
@@ -388,6 +392,7 @@ async function scanWorkMatches(db: D1Database): Promise<WorkMatchScan> {
 
   const candidates = await buildInternalCandidates(
     sourceResult.results as unknown as WorkMatchSourceRow[],
+    revision,
   );
   const reviews = new Map(
     (reviewResult.results as unknown as WorkMatchReviewRow[]).map((review) => [
@@ -602,6 +607,8 @@ export async function mergeWorkMatchCandidate(
 ): Promise<WorkMatchMergeResponse> {
   if (
     !mergedBy
+    || !Number.isSafeInteger(body.catalogRevision)
+    || body.catalogRevision < 0
     || !body.canonicalWorkId
     || !Array.isArray(body.sourceWorkIds)
     || body.sourceWorkIds.length === 0
@@ -619,20 +626,27 @@ export async function mergeWorkMatchCandidate(
   );
   const workById = new Map(candidate.snapshots.map((work) => [work.id, work]));
   const canonical = workById.get(body.canonicalWorkId);
-  const expectedSources = candidate.snapshots
-    .filter((work) => work.id !== body.canonicalWorkId)
-    .map((work) => work.id);
-  if (!canonical || !sameStringSet(body.sourceWorkIds, expectedSources)) {
+  if (body.catalogRevision !== scan.revision) {
     throw new WorkMatchError(
       'work_match_stale',
-      'The confirmed canonical/source work IDs no longer match this candidate',
+      'The displayed catalog changed before confirmation; refresh and review the impact again',
+    );
+  }
+  if (!canonical || body.sourceWorkIds.some((workId) => !workById.has(workId))) {
+    throw new WorkMatchError(
+      'work_match_stale',
+      'The confirmed canonical/source work IDs no longer belong to this candidate',
     );
   }
 
   const sourceWorkIds = [...body.sourceWorkIds].sort(compareText);
+  const mergeSnapshots = [
+    canonical,
+    ...sourceWorkIds.map((workId) => workById.get(workId)!),
+  ];
   const sourcePlaceholders = sourceWorkIds.map(() => '?').join(', ');
   const expectedWorkState = JSON.stringify(Object.fromEntries(
-    candidate.snapshots.map((work) => [work.id, {
+    mergeSnapshots.map((work) => [work.id, {
       title: work.title,
       originalArtist: work.originalArtist,
       tags: work.rawTags,
@@ -640,9 +654,9 @@ export async function mergeWorkMatchCandidate(
     }]),
   ));
   const expectedLinks = JSON.stringify(Object.fromEntries(
-    candidate.snapshots.flatMap((work) => work.songIds.map((songId) => [songId, work.id])),
+    mergeSnapshots.flatMap((work) => work.songIds.map((songId) => [songId, work.id])),
   ));
-  const mergedTags = [...new Set(candidate.snapshots.flatMap((work) => work.tags))];
+  const mergedTags = [...new Set(mergeSnapshots.flatMap((work) => work.tags))];
   const guardToken = `work-match-guard-${crypto.randomUUID()}`;
   const guarded = (sql: string, bindings: unknown[] = []): D1PreparedStatement => (
     guardedWorkMergeStatement(db, guardToken, canonical.id, sql, bindings)
@@ -777,7 +791,10 @@ export async function mergeWorkMatchCandidate(
     canonicalWorkId: canonical.id,
     mergedWorks: results[deleteIndex]?.meta.changes ?? 0,
     relinkedSongs: results[relinkIndex]?.meta.changes ?? 0,
-    preservedSongs: candidate.candidate.songCount,
-    preservedPerformances: candidate.candidate.performanceCount,
+    preservedSongs: mergeSnapshots.reduce((sum, work) => sum + work.songCount, 0),
+    preservedPerformances: mergeSnapshots.reduce(
+      (sum, work) => sum + work.performanceCount,
+      0,
+    ),
   };
 }

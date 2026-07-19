@@ -38,6 +38,7 @@ function installLocalStorage(): void {
 const candidate: WorkMatchCandidate = {
   candidateKey: 'a'.repeat(64),
   fingerprint: 'b'.repeat(64),
+  catalogRevision: 7,
   confidence: 'high',
   reasons: ['case_width_whitespace'],
   works: [
@@ -124,7 +125,12 @@ async function main(): Promise<void> {
 
   const { api } = await import('../src/api/client');
   const { getVisibleNavItems } = await import('../src/components/Layout');
-  const { default: GlobalWorkReview, MergeImpact } = await import('../src/pages/GlobalWorkReview');
+  const {
+    default: GlobalWorkReview,
+    MergeImpact,
+    candidateReviewStateKey,
+    selectMergeSourceWorkIds,
+  } = await import('../src/pages/GlobalWorkReview');
 
   await api.listWorkMatches({ filter: 'pending', page: 2, pageSize: 20 });
   await api.reviewWorkMatch({
@@ -137,6 +143,7 @@ async function main(): Promise<void> {
   await api.mergeWorkMatch({
     candidateKey: candidate.candidateKey,
     fingerprint: candidate.fingerprint,
+    catalogRevision: candidate.catalogRevision,
     canonicalWorkId: 'work-canonical',
     sourceWorkIds: ['work-source'],
   });
@@ -146,6 +153,7 @@ async function main(): Promise<void> {
   assert(requests[1]?.init?.method === 'POST', 'review decision uses an authenticated mutation request');
   assert(requests[2]?.init?.method === 'POST', 'global merge uses an authenticated mutation request');
   const mergeBody = JSON.parse(String(requests[2]?.init?.body)) as Record<string, unknown>;
+  assert(mergeBody.catalogRevision === 7, 'merge payload binds the displayed catalog revision');
   assert(mergeBody.canonicalWorkId === 'work-canonical', 'merge payload binds the reviewed canonical ID');
   assert(
     Array.isArray(mergeBody.sourceWorkIds) && mergeBody.sourceWorkIds[0] === 'work-source',
@@ -166,10 +174,32 @@ async function main(): Promise<void> {
   const pageHtml = renderToStaticMarkup(<GlobalWorkReview />);
   assert(pageHtml.includes('Global Work Review'), 'review page renders its global heading');
   assert(pageHtml.includes('never merges automatically'), 'review page states its manual-only safety boundary');
-  const impactHtml = renderToStaticMarkup(<MergeImpact candidate={candidate} />);
+  const impactHtml = renderToStaticMarkup(
+    <MergeImpact
+      candidate={candidate}
+      canonicalWorkId="work-canonical"
+      sourceWorkIds={['work-source']}
+    />,
+  );
   assert(impactHtml.includes('Site-wide identity change'), 'confirmation states the global scope');
   assert(impactHtml.includes('performance IDs are preserved'), 'confirmation guarantees stable playback identities');
   assert(impactHtml.includes('No song or performance row is deleted'), 'confirmation states the non-destructive boundary');
+
+  const changedFingerprint = { ...candidate, fingerprint: 'c'.repeat(64) };
+  assert(
+    candidateReviewStateKey(candidate) !== candidateReviewStateKey(changedFingerprint),
+    'review notes are isolated by candidate fingerprint',
+  );
+  const oversizedCandidate: WorkMatchCandidate = {
+    ...candidate,
+    works: Array.from({ length: 53 }, (_, index) => ({
+      ...candidate.works[0]!,
+      id: `work-${index}`,
+    })),
+  };
+  const partialSources = selectMergeSourceWorkIds(oversizedCandidate, 'work-0');
+  assert(partialSources.length === 50, 'over-limit candidates are split into server-safe batches');
+  assert(!partialSources.includes('work-0'), 'partial merge sources exclude the canonical work');
 
   console.log('✓ work review UI is curator-only, site-wide, and explicit about preserved performances');
 }

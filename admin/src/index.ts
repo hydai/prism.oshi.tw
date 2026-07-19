@@ -267,6 +267,9 @@ function parseWorkMatchMergeBody(value: unknown): WorkMatchMergeBody | null {
   if (
     typeof value.candidateKey !== 'string'
     || typeof value.fingerprint !== 'string'
+    || typeof value.catalogRevision !== 'number'
+    || !Number.isSafeInteger(value.catalogRevision)
+    || value.catalogRevision < 0
     || typeof value.canonicalWorkId !== 'string'
     || value.canonicalWorkId.trim().length === 0
     || !Array.isArray(value.sourceWorkIds)
@@ -285,6 +288,7 @@ function parseWorkMatchMergeBody(value: unknown): WorkMatchMergeBody | null {
   return {
     candidateKey: value.candidateKey.trim(),
     fingerprint: value.fingerprint.trim(),
+    catalogRevision: value.catalogRevision,
     canonicalWorkId,
     sourceWorkIds,
   };
