@@ -188,6 +188,30 @@ SQL
 assert_sql "SELECT COUNT(*) FROM works WHERE title = 'Retired Title' AND original_artist = 'Retired Artist';" '0' 'exact import does not recreate a retired identity'
 assert_sql "SELECT work_id FROM song_work_links WHERE song_id = 'song-retired-import';" 'work-song-a' 'exact import resolves a retired identity to canonical work'
 
+# Reapplying the global-work migration after a merge must not seed the retired
+# title/artist again. An unlinked legacy song must resolve through the alias.
+sqlite3 "$tmp_db" "PRAGMA foreign_keys = ON; DELETE FROM song_work_links WHERE song_id = 'song-retired-import';"
+sqlite3 "$tmp_db" < migrations/0005_create_global_works.sql
+assert_sql "SELECT COUNT(*) FROM works WHERE title = 'Retired Title' AND original_artist = 'Retired Artist';" '0' 'migration reseed excludes retired identities'
+assert_sql "SELECT work_id FROM song_work_links WHERE song_id = 'song-retired-import';" 'work-song-a' 'migration reseed resolves retired identities to canonical work'
+
+# Repair the exact shape an older migration reapplication could have left:
+# a recreated work plus a migration-owned bridge to that duplicate.
+sqlite3 "$tmp_db" <<'SQL'
+PRAGMA foreign_keys = ON;
+INSERT INTO works (id, title, original_artist, tags)
+VALUES ('work-reseeded-retired', 'Retired Title', 'Retired Artist', '[]');
+UPDATE song_work_links
+SET work_id = 'work-reseeded-retired',
+    link_method = 'migration_exact',
+    linked_by = 'migration:0005-global-works',
+    updated_at = datetime('now')
+WHERE song_id = 'song-retired-import';
+SQL
+sqlite3 "$tmp_db" < migrations/0005_create_global_works.sql
+assert_sql "SELECT COUNT(*) FROM works WHERE id = 'work-reseeded-retired';" '0' 'migration removes an orphaned reseeded work'
+assert_sql "SELECT work_id FROM song_work_links WHERE song_id = 'song-retired-import';" 'work-song-a' 'migration repairs a legacy reseeded bridge'
+
 sqlite3 "$tmp_db" <<'SQL'
 PRAGMA foreign_keys = ON;
 BEGIN;

@@ -42,10 +42,64 @@ CREATE INDEX IF NOT EXISTS idx_works_title_artist ON works(title, original_artis
 CREATE INDEX IF NOT EXISTS idx_work_aliases_canonical ON work_aliases(canonical_work_id);
 CREATE INDEX IF NOT EXISTS idx_song_work_links_work ON song_work_links(work_id);
 
+-- Repair identities recreated by an older reapplication of this migration.
+-- Only migration-owned links are repointed automatically; manual/import links
+-- remain curator-controlled. Once those links move, remove only unreferenced
+-- duplicates that are not themselves the canonical target of another alias.
+UPDATE song_work_links
+SET work_id = (
+      SELECT alias.canonical_work_id
+      FROM works AS linked_work
+      JOIN work_aliases AS alias
+        ON alias.source_title = linked_work.title
+       AND alias.source_original_artist = linked_work.original_artist
+      JOIN works AS canonical_work
+        ON canonical_work.id = alias.canonical_work_id
+      WHERE linked_work.id = song_work_links.work_id
+        AND linked_work.id <> alias.canonical_work_id
+      ORDER BY alias.merged_at DESC, alias.source_work_id DESC
+      LIMIT 1
+    ),
+    linked_by = 'migration:0005-global-works',
+    updated_at = datetime('now')
+WHERE link_method = 'migration_exact'
+  AND EXISTS (
+    SELECT 1
+    FROM works AS linked_work
+    JOIN work_aliases AS alias
+      ON alias.source_title = linked_work.title
+     AND alias.source_original_artist = linked_work.original_artist
+    JOIN works AS canonical_work
+      ON canonical_work.id = alias.canonical_work_id
+    WHERE linked_work.id = song_work_links.work_id
+      AND linked_work.id <> alias.canonical_work_id
+  );
+
+DELETE FROM works
+WHERE NOT EXISTS (
+    SELECT 1
+    FROM song_work_links AS link
+    WHERE link.work_id = works.id
+  )
+  AND NOT EXISTS (
+    SELECT 1
+    FROM work_aliases AS canonical_alias
+    WHERE canonical_alias.canonical_work_id = works.id
+  )
+  AND EXISTS (
+    SELECT 1
+    FROM work_aliases AS retired_alias
+    JOIN works AS canonical_work
+      ON canonical_work.id = retired_alias.canonical_work_id
+    WHERE retired_alias.source_title = works.title
+      AND retired_alias.source_original_artist = works.original_artist
+      AND retired_alias.canonical_work_id <> works.id
+  );
+
 -- Seed exactly one global work for each byte-for-byte title + original-artist
 -- identity. The deterministic ID is based on the smallest existing song ID;
 -- the UNIQUE identity constraint remains authoritative if a partial run or a
--- newer Worker already created the work.
+-- newer Worker already created the work. Historical aliases remain retired.
 INSERT OR IGNORE INTO works (
   id,
   title,
@@ -80,10 +134,20 @@ SELECT
   first_seen_at,
   last_seen_at
 FROM ranked_songs
-WHERE canonical_rank = 1;
+WHERE canonical_rank = 1
+  AND NOT EXISTS (
+    SELECT 1
+    FROM work_aliases AS alias
+    JOIN works AS canonical_work
+      ON canonical_work.id = alias.canonical_work_id
+    WHERE alias.source_title = ranked_songs.title
+      AND alias.source_original_artist = ranked_songs.original_artist
+  );
 
--- Link every current song to the exact global identity. Existing manual or
--- import links win because song_id is the primary key and this is OR IGNORE.
+-- Link every current song to its active global identity. A retired exact
+-- title/artist resolves through work_aliases before considering an active
+-- exact work. Existing manual or import links still win because song_id is the
+-- primary key and this is OR IGNORE.
 INSERT OR IGNORE INTO song_work_links (
   song_id,
   work_id,
@@ -94,12 +158,29 @@ INSERT OR IGNORE INTO song_work_links (
 )
 SELECT
   song.id,
-  work.id,
+  resolved_work.id,
   'migration_exact',
   'migration:0005-global-works',
   COALESCE(song.created_at, datetime('now')),
   datetime('now')
 FROM songs AS song
-JOIN works AS work
-  ON work.title = song.title
- AND work.original_artist = song.original_artist;
+JOIN works AS resolved_work
+  ON resolved_work.id = COALESCE(
+    (
+      SELECT alias.canonical_work_id
+      FROM work_aliases AS alias
+      JOIN works AS canonical_work
+        ON canonical_work.id = alias.canonical_work_id
+      WHERE alias.source_title = song.title
+        AND alias.source_original_artist = song.original_artist
+      ORDER BY alias.merged_at DESC, alias.source_work_id DESC
+      LIMIT 1
+    ),
+    (
+      SELECT work.id
+      FROM works AS work
+      WHERE work.title = song.title
+        AND work.original_artist = song.original_artist
+      LIMIT 1
+    )
+  );
