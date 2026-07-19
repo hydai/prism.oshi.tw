@@ -87,7 +87,7 @@ class FakeStatement {
     this.db.executed.push({ sql: this.sql, params: this.params });
     if (/INSERT\s+INTO\s+work_match_reviews/i.test(this.sql)) {
       return {
-        results: (this.db.reviewGuardValid ? [{ candidate_key: this.params[2] }] : []) as T[],
+        results: (this.db.reviewGuardValid ? [{ candidate_key: 'fake-candidate' }] : []) as T[],
       };
     }
     return { results: [] };
@@ -197,6 +197,7 @@ async function testReviewedFingerprintFiltering(): Promise<void> {
     fingerprint: reviewed.fingerprint,
     decision: 'not_duplicate',
     note: 'Verified separate compositions',
+    review_version: 3,
     reviewed_by: 'curator@example.com',
     reviewed_at: '2026-07-19 00:00:00',
   }]);
@@ -212,6 +213,7 @@ async function testReviewedFingerprintFiltering(): Promise<void> {
   });
   equal(dismissed.total, 1, 'reviewed candidate remains auditable');
   equal(dismissed.data[0]?.reviewNote, 'Verified separate compositions', 'review note is retained');
+  equal(dismissed.data[0]?.reviewVersion, 3, 'review record version is exposed for optimistic concurrency');
 }
 
 async function testReviewDecisionUsesRevisionGuard(): Promise<void> {
@@ -224,6 +226,7 @@ async function testReviewDecisionUsesRevisionGuard(): Promise<void> {
       fingerprint: candidate.fingerprint,
       workIds: candidate.works.map((work) => work.id),
       decision: 'needs_research',
+      expectedReviewVersion: null,
       note: 'Check official credits',
     },
     'curator@example.com',
@@ -233,6 +236,7 @@ async function testReviewDecisionUsesRevisionGuard(): Promise<void> {
   assert(write, 'review decision is persisted');
   assert(/work_match_state/i.test(write.sql), 'review write is bound to the scanned catalog revision');
   assert(/ON\s+CONFLICT\s*\(candidate_key,\s*fingerprint\)/i.test(write.sql), 'reviews are content-addressed');
+  assert(/review_version\s*=\s*work_match_reviews\.review_version\s*\+\s*1/i.test(write.sql), 'review updates increment an atomic record version');
 
   const staleDb = new FakeD1(SOURCE_ROWS);
   staleDb.reviewGuardValid = false;
@@ -245,6 +249,7 @@ async function testReviewDecisionUsesRevisionGuard(): Promise<void> {
         fingerprint: candidate.fingerprint,
         workIds: candidate.works.map((work) => work.id),
         decision: 'not_duplicate',
+        expectedReviewVersion: null,
       },
       'curator@example.com',
     );
@@ -253,6 +258,35 @@ async function testReviewDecisionUsesRevisionGuard(): Promise<void> {
   }
   assert(caught instanceof WorkMatchError, 'stale review fails closed');
   equal(caught.code, 'work_match_stale', 'stale review has a retryable conflict code');
+
+  const concurrentReviewDb = new FakeD1(SOURCE_ROWS, [{
+    candidate_key: candidate.candidateKey,
+    fingerprint: candidate.fingerprint,
+    decision: 'needs_research',
+    note: 'Saved in another session',
+    review_version: 2,
+    reviewed_by: 'other-curator@example.com',
+    reviewed_at: '2026-07-19 01:00:00',
+  }]);
+  caught = undefined;
+  try {
+    await reviewWorkMatchCandidate(
+      concurrentReviewDb as unknown as D1Database,
+      {
+        candidateKey: candidate.candidateKey,
+        fingerprint: candidate.fingerprint,
+        workIds: candidate.works.map((work) => work.id),
+        decision: 'not_duplicate',
+        expectedReviewVersion: null,
+      },
+      'curator@example.com',
+    );
+  } catch (error) {
+    caught = error;
+  }
+  assert(caught instanceof WorkMatchError, 'concurrent review decision changes fail closed');
+  equal(caught.code, 'work_match_stale', 'concurrent review overwrite requires a refresh');
+  equal(concurrentReviewDb.executed.length, 0, 'stale review version performs no write');
 }
 
 async function testGlobalWorkMergePreservesLocalEntities(): Promise<void> {

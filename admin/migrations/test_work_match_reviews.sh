@@ -25,6 +25,17 @@ CREATE TABLE song_work_links (
   linked_at TEXT NOT NULL DEFAULT (datetime('now')),
   updated_at TEXT NOT NULL DEFAULT (datetime('now'))
 );
+
+CREATE TABLE songs (
+  id TEXT PRIMARY KEY,
+  streamer_id TEXT NOT NULL,
+  status TEXT NOT NULL
+);
+
+CREATE TABLE performances (
+  id TEXT PRIMARY KEY,
+  song_id TEXT NOT NULL
+);
 SQL
 
 sqlite3 "$migration_db" < migrations/0006_add_work_match_reviews.sql
@@ -48,8 +59,8 @@ assert_sql "$migration_db" \
   'migration creates review and revision tables idempotently'
 assert_sql "$migration_db" \
   "SELECT COUNT(*) FROM sqlite_schema WHERE type = 'trigger' AND name GLOB 'work_match_*_revision';" \
-  '6' \
-  'migration creates all work and link revision triggers'
+  '12' \
+  'migration creates every displayed-state revision trigger'
 assert_sql "$migration_db" \
   'SELECT revision FROM work_match_state WHERE id = 1;' \
   '0' \
@@ -64,11 +75,18 @@ VALUES ('song-a', 'work-a', 'manual', 'curator@example.com');
 UPDATE song_work_links SET work_id = 'work-a' WHERE song_id = 'song-a';
 DELETE FROM song_work_links WHERE song_id = 'song-a';
 DELETE FROM works WHERE id = 'work-a';
+INSERT INTO songs (id, streamer_id, status)
+VALUES ('song-state', 'alice', 'pending');
+UPDATE songs SET status = 'approved' WHERE id = 'song-state';
+INSERT INTO performances (id, song_id) VALUES ('performance-state', 'song-state');
+UPDATE performances SET song_id = 'song-state' WHERE id = 'performance-state';
+DELETE FROM performances WHERE id = 'performance-state';
+DELETE FROM songs WHERE id = 'song-state';
 SQL
 assert_sql "$migration_db" \
   'SELECT revision FROM work_match_state WHERE id = 1;' \
-  '6' \
-  'every catalog identity/link mutation increments the scan revision'
+  '12' \
+  'every displayed work, link, song, and performance mutation increments the scan revision'
 
 key_a='aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa'
 fingerprint_a='bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb'
@@ -86,6 +104,10 @@ assert_sql "$migration_db" \
   'SELECT COUNT(*) FROM work_match_reviews;' \
   '2' \
   'changed fingerprints retain historical review decisions'
+assert_sql "$migration_db" \
+  'SELECT MIN(review_version) || ":" || MAX(review_version) FROM work_match_reviews;' \
+  '1:1' \
+  'review decisions start with a monotonic record version'
 
 if sqlite3 "$migration_db" "INSERT INTO work_match_reviews (
   candidate_key, fingerprint, work_ids, decision, reviewed_by
@@ -104,7 +126,7 @@ assert_sql "$bootstrap_db" \
   'fresh schema includes global work review state'
 assert_sql "$bootstrap_db" \
   "SELECT COUNT(*) FROM sqlite_schema WHERE type = 'trigger' AND name GLOB 'work_match_*_revision';" \
-  '6' \
+  '12' \
   'fresh schema includes every catalog revision trigger'
 assert_sql "$bootstrap_db" \
   'PRAGMA integrity_check;' \

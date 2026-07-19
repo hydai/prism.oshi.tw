@@ -248,6 +248,11 @@ function parseWorkMatchReviewBody(value: unknown): WorkMatchReviewBody | null {
     || value.workIds.length < 2
     || !value.workIds.every((id): id is string => typeof id === 'string' && id.trim().length > 0)
     || (value.decision !== 'not_duplicate' && value.decision !== 'needs_research')
+    || (value.expectedReviewVersion !== null && (
+      typeof value.expectedReviewVersion !== 'number'
+      || !Number.isSafeInteger(value.expectedReviewVersion)
+      || value.expectedReviewVersion < 1
+    ))
     || (value.note !== undefined && typeof value.note !== 'string')
   ) return null;
 
@@ -258,6 +263,7 @@ function parseWorkMatchReviewBody(value: unknown): WorkMatchReviewBody | null {
     fingerprint: value.fingerprint.trim(),
     workIds,
     decision: value.decision,
+    expectedReviewVersion: value.expectedReviewVersion,
     ...(value.note === undefined ? {} : { note: value.note }),
   };
 }

@@ -38,6 +38,7 @@ interface WorkMatchReviewRow {
   fingerprint: string;
   decision: WorkMatchDecision;
   note: string;
+  review_version: number;
   reviewed_by: string;
   reviewed_at: string;
 }
@@ -335,6 +336,7 @@ async function buildInternalCandidates(
               .sort((left, right) => compareText(left.streamerId, right.streamerId)),
             decision: null,
             reviewNote: '',
+            reviewVersion: null,
             reviewedBy: null,
             reviewedAt: null,
           },
@@ -383,7 +385,7 @@ async function scanWorkMatches(db: D1Database): Promise<WorkMatchScan> {
     JOIN songs AS song ON song.id = link.song_id
     LEFT JOIN performance_counts ON performance_counts.song_id = song.id
     ORDER BY work.id, song.id`),
-    db.prepare(`SELECT candidate_key, fingerprint, decision, note,
+    db.prepare(`SELECT candidate_key, fingerprint, decision, note, review_version,
                        reviewed_by, reviewed_at
                 FROM work_match_reviews`),
   ]);
@@ -415,6 +417,7 @@ async function scanWorkMatches(db: D1Database): Promise<WorkMatchScan> {
       ...internal.candidate,
       decision: review.decision,
       reviewNote: review.note,
+      reviewVersion: Number(review.review_version),
       reviewedBy: review.reviewed_by,
       reviewedAt: review.reviewed_at,
     };
@@ -509,6 +512,10 @@ export async function reviewWorkMatchCandidate(
     || body.workIds.length < 2
     || new Set(body.workIds).size !== body.workIds.length
     || (body.decision !== 'not_duplicate' && body.decision !== 'needs_research')
+    || (body.expectedReviewVersion !== null && (
+      !Number.isSafeInteger(body.expectedReviewVersion)
+      || body.expectedReviewVersion < 1
+    ))
     || note.length > 2000
   ) {
     throw new WorkMatchError('invalid_request', 'Invalid global work review decision');
@@ -522,6 +529,12 @@ export async function reviewWorkMatchCandidate(
   const currentWorkIds = candidate.snapshots.map((work) => work.id);
   if (!sameStringSet(body.workIds, currentWorkIds)) {
     throw new WorkMatchError('work_match_stale', 'The reviewed work set has changed');
+  }
+  if (body.expectedReviewVersion !== candidate.candidate.reviewVersion) {
+    throw new WorkMatchError(
+      'work_match_stale',
+      'This review decision changed after it was displayed; refresh before overwriting it',
+    );
   }
 
   const expectedIdentity = JSON.stringify(Object.fromEntries(
@@ -549,24 +562,43 @@ export async function reviewWorkMatchCandidate(
             AND current.title = expected.title
             AND current.original_artist = expected.original_artist
          ) = (SELECT COUNT(*) FROM expected_work_state)
+         AND (
+           (? IS NULL AND NOT EXISTS (
+             SELECT 1 FROM work_match_reviews
+             WHERE candidate_key = ? AND fingerprint = ?
+           ))
+           OR (? IS NOT NULL AND EXISTS (
+             SELECT 1 FROM work_match_reviews
+             WHERE candidate_key = ? AND fingerprint = ?
+               AND review_version = ?
+           ))
+         )
      )
      INSERT INTO work_match_reviews (
        candidate_key, fingerprint, work_ids, decision,
-       note, reviewed_by, reviewed_at
+       note, review_version, reviewed_by, reviewed_at
      )
-     SELECT ?, ?, ?, ?, ?, ?, datetime('now')
+     SELECT ?, ?, ?, ?, ?, 1, ?, datetime('now')
      FROM review_guard
      WHERE valid
      ON CONFLICT(candidate_key, fingerprint) DO UPDATE SET
        work_ids = excluded.work_ids,
        decision = excluded.decision,
        note = excluded.note,
+       review_version = work_match_reviews.review_version + 1,
        reviewed_by = excluded.reviewed_by,
        reviewed_at = excluded.reviewed_at
      RETURNING candidate_key`,
   ).bind(
     expectedIdentity,
     scan.revision,
+    body.expectedReviewVersion,
+    body.candidateKey,
+    body.fingerprint,
+    body.expectedReviewVersion,
+    body.candidateKey,
+    body.fingerprint,
+    body.expectedReviewVersion,
     body.candidateKey,
     body.fingerprint,
     workIdsJson,

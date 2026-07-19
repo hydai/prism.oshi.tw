@@ -111,6 +111,7 @@ const PROTECTED_ROUTES: Route[] = [
       fingerprint: 'b'.repeat(64),
       workIds: ['work-1', 'work-2'],
       decision: 'needs_research',
+      expectedReviewVersion: null,
     },
   },
   {

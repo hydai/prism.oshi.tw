@@ -16,6 +16,9 @@ CREATE TABLE IF NOT EXISTS work_match_reviews (
     decision IN ('not_duplicate', 'needs_research')
   ),
   note TEXT NOT NULL DEFAULT '' CHECK (length(note) <= 2000),
+  review_version INTEGER NOT NULL DEFAULT 1 CHECK (
+    typeof(review_version) = 'integer' AND review_version >= 1
+  ),
   reviewed_by TEXT NOT NULL CHECK (length(reviewed_by) > 0),
   reviewed_at TEXT NOT NULL DEFAULT (datetime('now')),
   PRIMARY KEY (candidate_key, fingerprint)
@@ -74,6 +77,48 @@ END;
 
 CREATE TRIGGER IF NOT EXISTS work_match_links_update_revision
 AFTER UPDATE OF song_id, work_id ON song_work_links
+FOR EACH ROW
+BEGIN
+  UPDATE work_match_state SET revision = revision + 1 WHERE id = 1;
+END;
+
+CREATE TRIGGER IF NOT EXISTS work_match_songs_insert_revision
+AFTER INSERT ON songs
+FOR EACH ROW
+BEGIN
+  UPDATE work_match_state SET revision = revision + 1 WHERE id = 1;
+END;
+
+CREATE TRIGGER IF NOT EXISTS work_match_songs_delete_revision
+AFTER DELETE ON songs
+FOR EACH ROW
+BEGIN
+  UPDATE work_match_state SET revision = revision + 1 WHERE id = 1;
+END;
+
+CREATE TRIGGER IF NOT EXISTS work_match_songs_update_revision
+AFTER UPDATE OF id, streamer_id, status ON songs
+FOR EACH ROW
+BEGIN
+  UPDATE work_match_state SET revision = revision + 1 WHERE id = 1;
+END;
+
+CREATE TRIGGER IF NOT EXISTS work_match_performances_insert_revision
+AFTER INSERT ON performances
+FOR EACH ROW
+BEGIN
+  UPDATE work_match_state SET revision = revision + 1 WHERE id = 1;
+END;
+
+CREATE TRIGGER IF NOT EXISTS work_match_performances_delete_revision
+AFTER DELETE ON performances
+FOR EACH ROW
+BEGIN
+  UPDATE work_match_state SET revision = revision + 1 WHERE id = 1;
+END;
+
+CREATE TRIGGER IF NOT EXISTS work_match_performances_update_revision
+AFTER UPDATE OF song_id ON performances
 FOR EACH ROW
 BEGIN
   UPDATE work_match_state SET revision = revision + 1 WHERE id = 1;

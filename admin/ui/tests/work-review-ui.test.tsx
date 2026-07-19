@@ -60,7 +60,7 @@ const candidate: WorkMatchCandidate = {
       id: 'work-source',
       title: 'I love you 3000',
       originalArtist: 'Stephanie Poetri',
-      tags: [],
+      tags: ['english'],
       streamerCount: 1,
       songCount: 1,
       performanceCount: 2,
@@ -78,6 +78,7 @@ const candidate: WorkMatchCandidate = {
   localDuplicates: [{ streamerId: 'alice', songCount: 2 }],
   decision: null,
   reviewNote: '',
+  reviewVersion: null,
   reviewedBy: null,
   reviewedAt: null,
 };
@@ -138,6 +139,7 @@ async function main(): Promise<void> {
     fingerprint: candidate.fingerprint,
     workIds: candidate.works.map((work) => work.id),
     decision: 'needs_research',
+    expectedReviewVersion: candidate.reviewVersion,
     note: 'Verify official source',
   });
   await api.mergeWorkMatch({
@@ -151,6 +153,8 @@ async function main(): Promise<void> {
   assert(requests[0]?.url === '/api/work-matches?filter=pending&page=2&pageSize=20', 'scan API is site-wide and paginated');
   assert(!requests.some((request) => request.url.includes('streamer=')), 'work review never inherits the selected streamer');
   assert(requests[1]?.init?.method === 'POST', 'review decision uses an authenticated mutation request');
+  const reviewBody = JSON.parse(String(requests[1]?.init?.body)) as Record<string, unknown>;
+  assert(reviewBody.expectedReviewVersion === null, 'review payload binds the displayed decision version');
   assert(requests[2]?.init?.method === 'POST', 'global merge uses an authenticated mutation request');
   const mergeBody = JSON.parse(String(requests[2]?.init?.body)) as Record<string, unknown>;
   assert(mergeBody.catalogRevision === 7, 'merge payload binds the displayed catalog revision');
@@ -184,6 +188,8 @@ async function main(): Promise<void> {
   assert(impactHtml.includes('Site-wide identity change'), 'confirmation states the global scope');
   assert(impactHtml.includes('performance IDs are preserved'), 'confirmation guarantees stable playback identities');
   assert(impactHtml.includes('No song or performance row is deleted'), 'confirmation states the non-destructive boundary');
+  assert(impactHtml.includes('Canonical tags after merge: pop, english'), 'confirmation discloses the resulting tag union');
+  assert(impactHtml.includes('Adds: english'), 'confirmation identifies tags added to the canonical work');
 
   const changedFingerprint = { ...candidate, fingerprint: 'c'.repeat(64) };
   assert(
