@@ -1,6 +1,6 @@
 'use client';
 
-import { memo } from 'react';
+import { memo, useMemo } from 'react';
 import { Disc3, ChevronDown, ChevronRight, Play, Plus, ExternalLink, Heart } from 'lucide-react';
 import AddToPlaylistDropdown from './AddToPlaylistDropdown';
 import type { ArchivePerformance, ArchiveSong, ArchiveTrack } from '../types/archive';
@@ -25,9 +25,12 @@ const formatTime = (seconds: number): string => {
 };
 
 function SongCardInner({ song, isExpanded, onToggleExpand, onPlay, onAddToQueue, onAddToPlaylistSuccess, isLiked, onToggleLike, unavailableVideoIds, streamerSlug }: SongCardProps) {
-  const sortedPerformances = isExpanded
-    ? [...song.performances].sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime())
-    : [];
+  const sortedPerformances = useMemo(
+    () => isExpanded
+      ? [...song.performances].sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime())
+      : [],
+    [isExpanded, song.performances]
+  );
 
   return (
     <div
@@ -345,7 +348,12 @@ const SongCard = memo(SongCardInner, (prev, next) => {
   return (
     prev.song.id === next.song.id &&
     prev.isExpanded === next.isExpanded &&
-    prev.song.performances.length === next.song.performances.length
+    prev.song.performances.length === next.song.performances.length &&
+    // Both have change-only identities: isLiked is useCallback'd on the liked
+    // set, unavailableVideoIds is replaced only when a video errors. Without
+    // these an already-rendered card kept stale hearts/disabled states.
+    prev.isLiked === next.isLiked &&
+    prev.unavailableVideoIds === next.unavailableVideoIds
   );
 });
 

@@ -98,11 +98,14 @@ export default function PlaylistPanel({ show, onClose, songsData, onToast }: Pla
     }
   };
 
-  const checkVersionExists = (performanceId: string): boolean => {
-    return songsData.some(song =>
-      song.performances.some(p => p.id === performanceId)
-    );
-  };
+  // O(1) membership — a per-row nested scan over all songs × performances
+  // ran ~540k iterations per render on a 100-item playlist
+  const existingPerformanceIds = useMemo(
+    () => new Set(songsData.flatMap(song => song.performances.map(p => p.id))),
+    [songsData]
+  );
+  const checkVersionExists = (performanceId: string): boolean =>
+    existingPerformanceIds.has(performanceId);
 
   const handleImportFile = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
