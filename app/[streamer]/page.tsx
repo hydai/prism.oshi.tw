@@ -19,6 +19,7 @@ import SidebarNav from '../components/SidebarNav';
 import TimelineRow from '../components/TimelineRow';
 import SongCard from '../components/SongCard';
 import MobileSearchRow from '../components/MobileSearchRow';
+import SearchBox from '../components/SearchBox';
 import ThemeToggle from '../components/ThemeToggle';
 import ViewModeToggle from '../components/ViewModeToggle';
 import {
@@ -46,7 +47,6 @@ import type {
 export default function Home() {
   const streamerData = useStreamer();
   const slug = streamerData.slug;
-  const [searchInput, setSearchInput] = useState('');
   const [debouncedSearch, setDebouncedSearch] = useState('');
   const [streams, setStreams] = useState<StreamSummary[]>([]);
   const [selectedStreamId, setSelectedStreamId] = useState<string | null>(null);
@@ -154,16 +154,6 @@ export default function Home() {
     sessionStorage.setItem('mizukiprism-view-mode', viewMode);
   }, [viewMode]);
 
-  // Debounce search input — 150ms delay before triggering filter
-  useEffect(() => {
-    if (searchInput === '') {
-      setDebouncedSearch('');
-      return;
-    }
-    const timer = setTimeout(() => setDebouncedSearch(searchInput), 150);
-    return () => clearTimeout(timer);
-  }, [searchInput]);
-
   const toggleSongExpansion = useCallback((songId: string) => {
     setExpandedSongs(prev => {
       const newSet = new Set(prev);
@@ -197,10 +187,9 @@ export default function Home() {
     setSelectedStreamId(null);
   };
 
-  const hasActiveFilters = searchInput !== '' || selectedStreamId !== null || selectedArtist !== null || selectedYears.size > 0;
+  const hasActiveFilters = debouncedSearch !== '' || selectedStreamId !== null || selectedArtist !== null || selectedYears.size > 0;
 
   const clearAllFilters = () => {
-    setSearchInput('');
     setDebouncedSearch('');
     setSelectedStreamId(null);
     setSelectedArtist(null);
@@ -322,28 +311,28 @@ export default function Home() {
         recentlyPlayedCount={recentCount}
         searchSlot={
           <div className="px-3 pb-3 flex-shrink-0">
-            <div className="relative group">
-              <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                <Search
-                  className="w-4 h-4 transition-colors"
-                  style={{ color: 'var(--text-tertiary)' }}
-                />
-              </div>
-              <input
-                type="text"
-                placeholder="搜尋歌曲..."
-                value={searchInput}
-                onChange={(e) => setSearchInput(e.target.value)}
-                className="w-full font-medium py-2.5 pl-9 pr-4 outline-none transition-all text-base"
-                style={{
-                  background: 'var(--bg-surface-glass)',
-                  backdropFilter: 'blur(8px)',
-                  border: '1px solid var(--border-glass)',
-                  borderRadius: 'var(--radius-pill)',
-                  color: 'var(--text-primary)',
-                }}
-              />
-            </div>
+            <SearchBox
+              value={debouncedSearch}
+              onDebouncedChange={setDebouncedSearch}
+              placeholder="搜尋歌曲..."
+              containerClassName="relative group"
+              icon={
+                <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                  <Search
+                    className="w-4 h-4 transition-colors"
+                    style={{ color: 'var(--text-tertiary)' }}
+                  />
+                </div>
+              }
+              inputClassName="w-full font-medium py-2.5 pl-9 pr-4 outline-none transition-all text-base"
+              inputStyle={{
+                background: 'var(--bg-surface-glass)',
+                backdropFilter: 'blur(8px)',
+                border: '1px solid var(--border-glass)',
+                borderRadius: 'var(--radius-pill)',
+                color: 'var(--text-primary)',
+              }}
+            />
           </div>
         }
       >
@@ -1397,28 +1386,28 @@ export default function Home() {
               data-testid="mobile-search-tab"
             >
               {/* Search input */}
-              <div className="relative mb-4">
-                <Search
-                  className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4"
-                  style={{ color: 'var(--text-tertiary)' }}
-                />
-                <input
-                  type="text"
-                  placeholder="搜尋..."
-                  value={searchInput}
-                  onChange={(e) => setSearchInput(e.target.value)}
-                  className="w-full py-3 pl-10 pr-4 text-base outline-none"
-                  style={{
-                    background: 'var(--bg-surface-glass)',
-                    border: '1px solid var(--border-glass)',
-                    borderRadius: 'var(--radius-pill)',
-                    color: 'var(--text-primary)',
-                    backdropFilter: 'blur(8px)',
-                  }}
-                  data-testid="mobile-search-input"
-                  autoFocus
-                />
-              </div>
+              <SearchBox
+                value={debouncedSearch}
+                onDebouncedChange={setDebouncedSearch}
+                placeholder="搜尋..."
+                containerClassName="relative mb-4"
+                icon={
+                  <Search
+                    className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4"
+                    style={{ color: 'var(--text-tertiary)' }}
+                  />
+                }
+                inputClassName="w-full py-3 pl-10 pr-4 text-base outline-none"
+                inputStyle={{
+                  background: 'var(--bg-surface-glass)',
+                  border: '1px solid var(--border-glass)',
+                  borderRadius: 'var(--radius-pill)',
+                  color: 'var(--text-primary)',
+                  backdropFilter: 'blur(8px)',
+                }}
+                inputTestId="mobile-search-input"
+                autoFocus
+              />
               {/* Artist filter */}
               <div className="relative mb-3">
                 <select
