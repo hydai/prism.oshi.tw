@@ -32,6 +32,9 @@ jobs:
       - run: npm run lint
       - run: npm run test:parse
       - run: npm run test:archive
+      - run: npm run test:archive-loader
+      - run: npm run test:playback-time-store
+      - run: npm run test:format
       - run: npm run test:playlist-storage
       - run: npm run test:safe-links
       - run: npm run test:youtube-iframe
