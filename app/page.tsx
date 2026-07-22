@@ -385,11 +385,16 @@ function StreamerCard({ streamer }: { streamer: StreamerConfig }) {
         color: 'inherit',
       }}
     >
-      {/* Avatar image */}
+      {/* Avatar image — lazy: with ~40 streamers these are ~1MB of external
+          images that would otherwise all load on first paint */}
       {/* eslint-disable-next-line @next/next/no-img-element */}
       <img
         src={streamer.avatarUrl}
         alt={streamer.displayName}
+        loading="lazy"
+        decoding="async"
+        width={240}
+        height={240}
         className="aspect-square w-full object-cover sm:max-h-[240px]"
       />
 
