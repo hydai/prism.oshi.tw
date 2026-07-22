@@ -1,6 +1,6 @@
 'use client';
 
-import { createContext, useContext, useState, useEffect, ReactNode } from 'react';
+import { createContext, useContext, useState, useEffect, useCallback, useMemo, useRef, ReactNode } from 'react';
 
 export interface RecentPlay {
   performanceId: string;
@@ -77,42 +77,52 @@ export const RecentlyPlayedProvider = ({ streamerSlug, children }: { streamerSlu
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  const saveToLocalStorage = (plays: RecentPlay[]): boolean => {
+  const saveToLocalStorage = useCallback((plays: RecentPlay[]): boolean => {
     try {
       localStorage.setItem(STORAGE_KEY, JSON.stringify(plays));
       return true;
     } catch {
       return false;
     }
-  };
+  }, [STORAGE_KEY]);
 
-  const addRecentPlay = (play: Omit<RecentPlay, 'playedAt'>) => {
+  // Reads current plays from a ref (not the render closure) so two rapid
+  // calls in the same tick can't drop each other's entry
+  const recentPlaysRef = useRef<RecentPlay[]>([]);
+  useEffect(() => { recentPlaysRef.current = recentPlays; }, [recentPlays]);
+
+  const addRecentPlay = useCallback((play: Omit<RecentPlay, 'playedAt'>) => {
     if (!localStorageSupported) return;
 
     // Dedup: remove old entry for same performanceId, prepend new
-    const filtered = recentPlays.filter(r => r.performanceId !== play.performanceId);
+    const filtered = recentPlaysRef.current.filter(r => r.performanceId !== play.performanceId);
     const newPlays = [{ ...play, playedAt: Date.now() }, ...filtered].slice(0, MAX_ENTRIES);
 
     const saved = saveToLocalStorage(newPlays);
     if (saved) {
+      recentPlaysRef.current = newPlays;
       setRecentPlays(newPlays);
     }
-  };
+  }, [localStorageSupported, saveToLocalStorage]);
 
-  const clearHistory = () => {
+  const clearHistory = useCallback(() => {
     saveToLocalStorage([]);
+    recentPlaysRef.current = [];
     setRecentPlays([]);
-  };
+  }, [saveToLocalStorage]);
+
+  const value = useMemo(
+    () => ({
+      recentPlays,
+      addRecentPlay,
+      clearHistory,
+      recentCount: recentPlays.length,
+    }),
+    [recentPlays, addRecentPlay, clearHistory],
+  );
 
   return (
-    <RecentlyPlayedContext.Provider
-      value={{
-        recentPlays,
-        addRecentPlay,
-        clearHistory,
-        recentCount: recentPlays.length,
-      }}
-    >
+    <RecentlyPlayedContext.Provider value={value}>
       {children}
     </RecentlyPlayedContext.Provider>
   );

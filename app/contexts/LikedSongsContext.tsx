@@ -1,6 +1,6 @@
 'use client';
 
-import { createContext, useContext, useState, useEffect, useCallback, ReactNode } from 'react';
+import { createContext, useContext, useState, useEffect, useCallback, useMemo, ReactNode } from 'react';
 
 export interface LikedVersion {
   performanceId: string;
@@ -63,7 +63,32 @@ export const LikedSongsProvider = ({ streamerSlug, children }: { streamerSlug: s
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  // Load from localStorage on mount
+  // O(1) lookups — isLiked is called for every visible row (several times per
+  // performance in expanded cards)
+  const likedIds = useMemo(
+    () => new Set(likedSongs.map(s => s.performanceId)),
+    [likedSongs],
+  );
+  const isLiked = useCallback(
+    (performanceId: string): boolean => likedIds.has(performanceId),
+    [likedIds],
+  );
+
+  const toggleLike = useCallback((version: Omit<LikedVersion, 'likedAt'>) => {
+    if (!localStorageSupported) return;
+
+    // Compute outside the updater — updaters must stay pure (StrictMode
+    // invokes them twice, which double-wrote localStorage here before)
+    setLikedSongs(prev => {
+      const exists = prev.some(s => s.performanceId === version.performanceId);
+      return exists
+        ? prev.filter(s => s.performanceId !== version.performanceId)
+        : [{ ...version, likedAt: Date.now() }, ...prev];
+    });
+  }, [localStorageSupported]);
+
+  // Persist on change (skips the initial empty render via likedLoaded flag)
+  const [likedLoaded, setLikedLoaded] = useState(false);
   useEffect(() => {
     try {
       const stored = localStorage.getItem(STORAGE_KEY);
@@ -73,35 +98,26 @@ export const LikedSongsProvider = ({ streamerSlug, children }: { streamerSlug: s
     } catch (error) {
       console.error('Failed to load liked songs from localStorage:', error);
     }
+    setLikedLoaded(true);
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
+  useEffect(() => {
+    if (!likedLoaded || !localStorageSupported) return;
+    try { localStorage.setItem(STORAGE_KEY, JSON.stringify(likedSongs)); } catch {}
+  }, [likedSongs, likedLoaded, localStorageSupported, STORAGE_KEY]);
 
-  const isLiked = (performanceId: string): boolean => {
-    return likedSongs.some(s => s.performanceId === performanceId);
-  };
-
-  const toggleLike = useCallback((version: Omit<LikedVersion, 'likedAt'>) => {
-    if (!localStorageSupported) return;
-
-    setLikedSongs(prev => {
-      const exists = prev.some(s => s.performanceId === version.performanceId);
-      const newSongs = exists
-        ? prev.filter(s => s.performanceId !== version.performanceId)
-        : [{ ...version, likedAt: Date.now() }, ...prev];
-      try { localStorage.setItem(STORAGE_KEY, JSON.stringify(newSongs)); } catch {}
-      return newSongs;
-    });
-  }, [STORAGE_KEY, localStorageSupported]);
+  const value = useMemo(
+    () => ({
+      likedSongs,
+      isLiked,
+      toggleLike,
+      likedCount: likedSongs.length,
+    }),
+    [likedSongs, isLiked, toggleLike],
+  );
 
   return (
-    <LikedSongsContext.Provider
-      value={{
-        likedSongs,
-        isLiked,
-        toggleLike,
-        likedCount: likedSongs.length,
-      }}
-    >
+    <LikedSongsContext.Provider value={value}>
       {children}
     </LikedSongsContext.Provider>
   );
