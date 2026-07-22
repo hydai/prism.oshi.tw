@@ -31,10 +31,9 @@ import {
   getAllArtists,
   getAvailableYears,
   groupSongsByWorkId,
-  mergeAlbumArt,
   sortGroupedSongs,
-  sortStreamsByNewest,
 } from '../lib/archive';
+import { loadArchiveData, type ArchiveLoadState } from '../lib/archive-loader';
 import type {
   ArchiveSong,
   ArchiveTrack,
@@ -63,57 +62,32 @@ export default function Home() {
   const [showCreateDialog, setShowCreateDialog] = useState(false);
   const [mobileTab, setMobileTab] = useState<MobileArchiveTab>('home');
   const [songs, setSongs] = useState<ArchiveSong[]>([]);
-  const [loadError, setLoadError] = useState(false);
-  // Map from songId to albumArtUrl — populated from /api/metadata
-  const albumArtMapRef = useRef<Map<string, string>>(new Map());
+  const [loadState, setLoadState] = useState<ArchiveLoadState>('loading');
+  const loadAbortRef = useRef<AbortController | null>(null);
 
-  // Fetch songs from API — extracted so the retry button can call it again
-  const fetchSongs = () => {
-    fetch(`/api/${slug}/songs`)
-      .then(res => {
-        if (!res.ok) throw new Error('API error');
-        return res.json();
-      })
-      .then((data: ArchiveSong[]) => {
-        setSongs(mergeAlbumArt(data, albumArtMapRef.current));
-        setLoadError(false);
+  // Load songs/streams/metadata in parallel — the retry button calls this again
+  const loadData = useCallback(() => {
+    loadAbortRef.current?.abort();
+    const controller = new AbortController();
+    loadAbortRef.current = controller;
+    setLoadState('loading');
+    loadArchiveData(slug, undefined, controller.signal)
+      .then(({ songs: loadedSongs, streams: loadedStreams }) => {
+        if (controller.signal.aborted) return;
+        setSongs(loadedSongs);
+        setStreams(loadedStreams);
+        setLoadState('ready');
       })
       .catch(() => {
-        setLoadError(true);
+        if (controller.signal.aborted) return;
+        setLoadState('error');
       });
-  };
+  }, [slug]);
 
-  // Fetch metadata on mount and populate albumArtMap, then fetch songs
   useEffect(() => {
-    fetch(`/api/${slug}/metadata`)
-      .then(res => (res.ok ? res.json() : { songMetadata: [], artistInfo: [] }))
-      .then((data: { songMetadata: { songId: string; albumArtUrl?: string; albumArtUrls?: { small: string } }[] }) => {
-        const map = new Map<string, string>();
-        for (const entry of data.songMetadata) {
-          const url = entry.albumArtUrl ?? entry.albumArtUrls?.small;
-          if (url) {
-            map.set(entry.songId, url);
-          }
-        }
-        albumArtMapRef.current = map;
-      })
-      .catch(() => {
-        // metadata fetch failed — continue without art
-      })
-      .finally(() => {
-        fetchSongs();
-      });
-
-    fetch(`/api/${slug}/streams`)
-      .then(res => res.ok ? res.json() : [])
-      .then((data: StreamSummary[]) => {
-        setStreams(sortStreamsByNewest(data));
-      })
-      .catch(() => {
-        // streams fetch failed — continue without stream list
-      });
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+    loadData();
+    return () => loadAbortRef.current?.abort();
+  }, [loadData]);
 
   const { currentTrack, playTrackWithQueue, addToQueue, apiLoadError, unavailableVideoIds, timestampWarning, clearTimestampWarning, skipNotification, clearSkipNotification, shuffleOn, toggleShuffle } = usePlayer();
   const currentTrackId = currentTrack?.id ?? null;
@@ -1167,7 +1141,7 @@ export default function Home() {
             {/* Always-visible logical counts for E2E tests (virtual scrolling caps DOM nodes) */}
             <span data-testid="total-performance-count" className="sr-only">{flattenedSongs.length}</span>
             <span data-testid="total-song-card-count" className="sr-only">{groupedSongs.length}</span>
-            {loadError ? (
+            {loadState === 'error' ? (
               /* Song API Load Error State */
               <div
                 data-testid="song-load-error"
@@ -1188,7 +1162,7 @@ export default function Home() {
                 </p>
                 <button
                   data-testid="retry-button"
-                  onClick={fetchSongs}
+                  onClick={loadData}
                   className="font-semibold transition-all hover:opacity-90"
                   style={{
                     background: 'linear-gradient(135deg, var(--accent-pink-light), var(--accent-blue-light))',
@@ -1200,6 +1174,21 @@ export default function Home() {
                 >
                   重新整理
                 </button>
+              </div>
+            ) : loadState === 'loading' ? (
+              /* Initial catalog loading skeleton — keeps the "no songs" empty
+                 state from flashing while data is still in flight */
+              <div data-testid="catalog-loading" aria-busy="true" className="mt-2">
+                {Array.from({ length: 8 }, (_, i) => (
+                  <div key={i} className="flex items-center gap-3 px-3 animate-pulse" style={{ height: 56 }}>
+                    <div className="w-8" />
+                    <div className="w-10 h-10 rounded" style={{ background: 'var(--border-table)', opacity: 0.5 }} />
+                    <div className="flex-1 min-w-0">
+                      <div className="h-3 rounded mb-2" style={{ background: 'var(--border-table)', width: '40%' }} />
+                      <div className="h-3 rounded" style={{ background: 'var(--border-table)', width: '24%', opacity: 0.6 }} />
+                    </div>
+                  </div>
+                ))}
               </div>
             ) : viewMode === 'timeline' ? (
               /* Timeline View */
