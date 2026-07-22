@@ -1,6 +1,7 @@
 'use client';
 
 import { createContext, useContext, useState, useEffect, useRef, ReactNode } from 'react';
+import { loadYouTubeIframeApi } from '../../lib/youtube-iframe';
 import type {
   YouTubeNamespace,
   YouTubePlayer,
@@ -122,7 +123,6 @@ export const PlayerProvider = ({ children }: { children: ReactNode }) => {
   const playerDivId = 'youtube-player';
   const timeUpdateIntervalRef = useRef<NodeJS.Timeout | null>(null);
   const loadedVideoIdRef = useRef<string | null>(null);
-  const apiLoadTimeoutRef = useRef<NodeJS.Timeout | null>(null);
   // Refs to always have fresh values in async callbacks
   const queueRef = useRef<Track[]>([]);
   const currentTrackRef = useRef<Track | null>(null);
@@ -284,52 +284,45 @@ export const PlayerProvider = ({ children }: { children: ReactNode }) => {
     return true;
   };
 
-  // Load YouTube IFrame API
+  // Load the YouTube IFrame API on demand. Safe to call repeatedly — the
+  // loader caches an in-flight/successful load and a failed load is retried
+  // by the next call.
+  const ensurePlayerApi = () => {
+    if (typeof window === 'undefined') return;
+    loadYouTubeIframeApi(window, document)
+      .then(() => {
+        setApiLoadError(null);
+        setIsPlayerReady(true);
+      })
+      .catch(() => {
+        setApiLoadError('播放器載入失敗，請重新整理頁面');
+      });
+  };
+
+  // Prefetch the YouTube API once the browser is idle so the first play is
+  // instant, without competing with the initial page load for connections.
   useEffect(() => {
     if (typeof window === 'undefined') return;
-
-    if (window.YT && window.YT.Player) {
-      setIsPlayerReady(true);
-      return;
+    const w = window as Window & {
+      requestIdleCallback?: (cb: () => void, opts?: { timeout: number }) => number;
+      cancelIdleCallback?: (id: number) => void;
+    };
+    let idleId: number | null = null;
+    let timerId: ReturnType<typeof setTimeout> | null = null;
+    if (typeof w.requestIdleCallback === 'function') {
+      idleId = w.requestIdleCallback(ensurePlayerApi, { timeout: 8000 });
+    } else {
+      timerId = setTimeout(ensurePlayerApi, 2500);
     }
-
-    const tag = document.createElement('script');
-    tag.src = 'https://www.youtube.com/iframe_api';
-    const firstScriptTag = document.getElementsByTagName('script')[0];
-    firstScriptTag.parentNode?.insertBefore(tag, firstScriptTag);
-
-    // Set timeout for API load failure (10 seconds)
-    apiLoadTimeoutRef.current = setTimeout(() => {
-      if (!window.YT || !window.YT.Player) {
-        setApiLoadError('播放器載入失敗，請重新整理頁面');
-      }
-    }, 10000);
-
-    window.onYouTubeIframeAPIReady = () => {
-      if (apiLoadTimeoutRef.current) {
-        clearTimeout(apiLoadTimeoutRef.current);
-        apiLoadTimeoutRef.current = null;
-      }
-      setIsPlayerReady(true);
-    };
-
-    // Handle script load error
-    tag.onerror = () => {
-      if (apiLoadTimeoutRef.current) {
-        clearTimeout(apiLoadTimeoutRef.current);
-        apiLoadTimeoutRef.current = null;
-      }
-      setApiLoadError('播放器載入失敗，請重新整理頁面');
-    };
-
     return () => {
+      if (idleId !== null) w.cancelIdleCallback?.(idleId);
+      if (timerId !== null) clearTimeout(timerId);
       if (timeUpdateIntervalRef.current) {
         clearInterval(timeUpdateIntervalRef.current);
       }
-      if (apiLoadTimeoutRef.current) {
-        clearTimeout(apiLoadTimeoutRef.current);
-      }
     };
+  // ensurePlayerApi only touches stable setters and the idempotent loader.
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   // Start (or restart) the time-update polling interval.
@@ -514,6 +507,8 @@ export const PlayerProvider = ({ children }: { children: ReactNode }) => {
   // Reads currentTrackRef (not state) so stale closures held by memoized list
   // rows can still call it safely.
   const playTrackWithQueue = (track: Track, following: Track[]) => {
+    // Covers fast clicks that land before the idle prefetch has run
+    ensurePlayerApi();
     const prevTrack = currentTrackRef.current;
     if (prevTrack && prevTrack.id !== track.id) {
       setPlayHistory((prev) => [...prev, prevTrack]);
