@@ -58,10 +58,45 @@ test('assembleFanSiteSongs exports the shared work ID without replacing local so
     [],
   );
 
-  assert.equal(songs[0].id, 'alice-local');
-  assert.equal(songs[0].workId, 'work-shared');
-  assert.equal(songs[1].id, 'legacy-local');
-  assert.equal('workId' in songs[1], false, 'unlinked legacy rows stay backward compatible');
+  const linked = songs.find((s) => s.id === 'alice-local')!;
+  const legacy = songs.find((s) => s.id === 'legacy-local')!;
+  assert.equal(linked.workId, 'work-shared');
+  assert.equal('workId' in legacy, false, 'unlinked legacy rows stay backward compatible');
+});
+
+test('assembleFanSiteSongs emits slim performances without stream-derived fields', () => {
+  const songs = assembleFanSiteSongs(
+    [{ id: 'song1', work_id: null, title: 'Song', original_artist: 'Artist', tags: '[]' }],
+    [{ id: 'p1', song_id: 'song1', stream_id: 's1', date: '2024-01-01', stream_title: 'Stream night', video_id: 'v1', timestamp: 10, end_timestamp: 99, note: '' }],
+  );
+  const p = songs[0].performances[0];
+  assert.equal('streamTitle' in p, false, 'streamTitle is derivable from streams.json by streamId');
+  assert.equal('date' in p, false, 'date is derivable from streams.json by streamId');
+  assert.equal('note' in p, false, 'empty notes are omitted');
+  assert.deepEqual(p, { id: 'p1', streamId: 's1', videoId: 'v1', timestamp: 10, endTimestamp: 99 });
+});
+
+test('assembleFanSiteSongs keeps non-empty notes', () => {
+  const songs = assembleFanSiteSongs(
+    [{ id: 'song1', work_id: null, title: 'Song', original_artist: 'Artist', tags: '[]' }],
+    [{ id: 'p1', song_id: 'song1', stream_id: 's1', date: '2024-01-01', stream_title: '', video_id: 'v1', timestamp: 0, end_timestamp: null, note: 'encore' }],
+  );
+  assert.equal(songs[0].performances[0].note, 'encore');
+});
+
+test('assembleFanSiteSongs sorts songs by zh-TW title and performances newest-first', () => {
+  const songs = assembleFanSiteSongs(
+    [
+      { id: 'turtle', work_id: null, title: '龜', original_artist: '', tags: '[]' },
+      { id: 'one', work_id: null, title: '一', original_artist: '', tags: '[]' },
+    ],
+    [
+      { id: 'p-old', song_id: 'one', stream_id: 's1', date: '2023-05-01', stream_title: '', video_id: 'v1', timestamp: 0, end_timestamp: null, note: '' },
+      { id: 'p-new', song_id: 'one', stream_id: 's2', date: '2025-05-01', stream_title: '', video_id: 'v2', timestamp: 0, end_timestamp: null, note: '' },
+    ],
+  );
+  assert.deepEqual(songs.map((s) => s.id), ['one', 'turtle'], 'songs sorted by zh-TW collation');
+  assert.deepEqual(songs[0].performances.map((p) => p.id), ['p-new', 'p-old'], 'performances sorted newest first');
 });
 
 test('streamsToAnnounce fires for a brand-new stream published with songs', () => {

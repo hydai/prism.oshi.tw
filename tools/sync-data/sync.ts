@@ -59,15 +59,16 @@ interface StreamRow {
 
 // --- Fan-site output types ---
 
+// Slim performance format (Stage 1 de-dup): `date` and `streamTitle` are NOT
+// exported — the fan site derives both from streams.json via streamId at load
+// time. Empty notes are omitted. This halves songs.json for large streamers.
 interface FanSitePerformance {
   id: string;
   streamId: string;
-  date: string;
-  streamTitle: string;
   videoId: string;
   timestamp: number;
   endTimestamp: number | null;
-  note: string;
+  note?: string;
 }
 
 interface FanSiteSong {
@@ -129,23 +130,27 @@ export function assembleFanSiteSongs(
     perfsBySong.set(p.song_id, list);
   }
 
-  return songRows.map((row) => ({
-    id: row.id,
-    ...(row.work_id ? { workId: row.work_id } : {}),
-    title: row.title,
-    originalArtist: row.original_artist,
-    tags: JSON.parse(row.tags) as string[],
-    performances: (perfsBySong.get(row.id) || []).map((p) => ({
-      id: p.id,
-      streamId: p.stream_id,
-      date: p.date,
-      streamTitle: p.stream_title,
-      videoId: p.video_id,
-      timestamp: p.timestamp,
-      endTimestamp: p.end_timestamp,
-      note: p.note,
-    })),
-  }));
+  return songRows
+    .map((row) => ({
+      id: row.id,
+      ...(row.work_id ? { workId: row.work_id } : {}),
+      title: row.title,
+      originalArtist: row.original_artist,
+      tags: JSON.parse(row.tags) as string[],
+      performances: (perfsBySong.get(row.id) || [])
+        // Newest first — the canonical order the timeline consumes (dates come
+        // from the DB rows; the slim output no longer carries them)
+        .sort((a, b) => b.date.localeCompare(a.date))
+        .map((p) => ({
+          id: p.id,
+          streamId: p.stream_id,
+          videoId: p.video_id,
+          timestamp: p.timestamp,
+          endTimestamp: p.end_timestamp,
+          ...(p.note ? { note: p.note } : {}),
+        })),
+    }))
+    .sort((a, b) => a.title.localeCompare(b.title, 'zh-TW'));
 }
 
 // --- Build fan-site streams.json ---

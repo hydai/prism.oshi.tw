@@ -1,77 +1,17 @@
 [
   {
-    "id": "song-05ae7822",
-    "workId": "work-song-05ae7822",
-    "title": "今晚我一定要X死你",
-    "originalArtist": "6yi7",
+    "id": "song-72051b3c",
+    "workId": "work-song-e9f5270a",
+    "title": "下一站·與你",
+    "originalArtist": "KSP",
     "tags": [],
     "performances": [
       {
-        "id": "p-5bde22a8",
-        "streamId": "stream-3c3e418c",
-        "date": "2026-04-09",
-        "streamTitle": "【彈唱歌回】惡魔也要唱情歌★吉他彈唱☆挽回最婆偶像的形象！｜拉斐利婭Laphria",
-        "videoId": "aT7tRAB4XUM",
-        "timestamp": 3759,
-        "endTimestamp": 4017,
-        "note": ""
-      }
-    ]
-  },
-  {
-    "id": "song-0f41e3a3",
-    "workId": "work-song-0f41e3a3",
-    "title": "落雨聲",
-    "originalArtist": "江蕙 （自彈）",
-    "tags": [],
-    "performances": [
-      {
-        "id": "p-41854a61",
+        "id": "p-7cd9c3a8",
         "streamId": "stream-89529a81",
-        "date": "2026-04-06",
-        "streamTitle": "【初配信】惡魔高校生來襲❤︎｜次元裂縫開啟 ｜拉斐利婭Laphria",
         "videoId": "iJ9DIokXMnk",
-        "timestamp": 976,
-        "endTimestamp": 1133,
-        "note": ""
-      }
-    ]
-  },
-  {
-    "id": "song-1aaee745",
-    "workId": "work-song-1aaee745",
-    "title": "最後一頁",
-    "originalArtist": "江語晨",
-    "tags": [],
-    "performances": [
-      {
-        "id": "p-54dd87e4",
-        "streamId": "stream-3c3e418c",
-        "date": "2026-04-09",
-        "streamTitle": "【彈唱歌回】惡魔也要唱情歌★吉他彈唱☆挽回最婆偶像的形象！｜拉斐利婭Laphria",
-        "videoId": "aT7tRAB4XUM",
-        "timestamp": 2083,
-        "endTimestamp": 2329,
-        "note": ""
-      }
-    ]
-  },
-  {
-    "id": "song-1d9b45c7",
-    "workId": "work-song-1d9b45c7",
-    "title": "心跳的證明",
-    "originalArtist": "劉人語",
-    "tags": [],
-    "performances": [
-      {
-        "id": "p-45027122",
-        "streamId": "stream-89529a81",
-        "date": "2026-04-06",
-        "streamTitle": "【初配信】惡魔高校生來襲❤︎｜次元裂縫開啟 ｜拉斐利婭Laphria",
-        "videoId": "iJ9DIokXMnk",
-        "timestamp": 1508,
-        "endTimestamp": 1730,
-        "note": ""
+        "timestamp": 277,
+        "endTimestamp": 507
       }
     ]
   },
@@ -85,12 +25,9 @@
       {
         "id": "p-fb82f526",
         "streamId": "stream-3c3e418c",
-        "date": "2026-04-09",
-        "streamTitle": "【彈唱歌回】惡魔也要唱情歌★吉他彈唱☆挽回最婆偶像的形象！｜拉斐利婭Laphria",
         "videoId": "aT7tRAB4XUM",
         "timestamp": 1706,
-        "endTimestamp": 1959,
-        "note": ""
+        "endTimestamp": 1959
       }
     ]
   },
@@ -104,202 +41,25 @@
       {
         "id": "p-72907a92",
         "streamId": "stream-3c3e418c",
-        "date": "2026-04-09",
-        "streamTitle": "【彈唱歌回】惡魔也要唱情歌★吉他彈唱☆挽回最婆偶像的形象！｜拉斐利婭Laphria",
         "videoId": "aT7tRAB4XUM",
         "timestamp": 490,
-        "endTimestamp": 737,
-        "note": ""
+        "endTimestamp": 737
       }
     ]
   },
   {
-    "id": "song-2d054e8f",
-    "workId": "work-song-2d054e8f",
-    "title": "抱歉",
-    "originalArtist": "芒果醬",
+    "id": "song-05ae7822",
+    "workId": "work-song-05ae7822",
+    "title": "今晚我一定要X死你",
+    "originalArtist": "6yi7",
     "tags": [],
     "performances": [
       {
-        "id": "p-ba20890a",
+        "id": "p-5bde22a8",
         "streamId": "stream-3c3e418c",
-        "date": "2026-04-09",
-        "streamTitle": "【彈唱歌回】惡魔也要唱情歌★吉他彈唱☆挽回最婆偶像的形象！｜拉斐利婭Laphria",
         "videoId": "aT7tRAB4XUM",
-        "timestamp": 4470,
-        "endTimestamp": 4638,
-        "note": ""
-      }
-    ]
-  },
-  {
-    "id": "song-411f3062",
-    "workId": "work-song-2104",
-    "title": "晚餐歌",
-    "originalArtist": "tuki.",
-    "tags": [],
-    "performances": [
-      {
-        "id": "p-ab441f6b",
-        "streamId": "stream-89529a81",
-        "date": "2026-04-06",
-        "streamTitle": "【初配信】惡魔高校生來襲❤︎｜次元裂縫開啟 ｜拉斐利婭Laphria",
-        "videoId": "iJ9DIokXMnk",
-        "timestamp": 1765,
-        "endTimestamp": 1981,
-        "note": ""
-      }
-    ]
-  },
-  {
-    "id": "song-448dfe55",
-    "workId": "work-song-308",
-    "title": "寶貝",
-    "originalArtist": "張懸",
-    "tags": [],
-    "performances": [
-      {
-        "id": "p-56caf835",
-        "streamId": "stream-3c3e418c",
-        "date": "2026-04-09",
-        "streamTitle": "【彈唱歌回】惡魔也要唱情歌★吉他彈唱☆挽回最婆偶像的形象！｜拉斐利婭Laphria",
-        "videoId": "aT7tRAB4XUM",
-        "timestamp": 281,
-        "endTimestamp": 442,
-        "note": ""
-      }
-    ]
-  },
-  {
-    "id": "song-4aaebd44",
-    "workId": "work-song-4aaebd44",
-    "title": "家後",
-    "originalArtist": "江蕙",
-    "tags": [],
-    "performances": [
-      {
-        "id": "p-e199f4b9",
-        "streamId": "stream-3c3e418c",
-        "date": "2026-04-09",
-        "streamTitle": "【彈唱歌回】惡魔也要唱情歌★吉他彈唱☆挽回最婆偶像的形象！｜拉斐利婭Laphria",
-        "videoId": "aT7tRAB4XUM",
-        "timestamp": 1023,
-        "endTimestamp": 1276,
-        "note": ""
-      }
-    ]
-  },
-  {
-    "id": "song-4b4f9b2b",
-    "workId": "work-song-4b4f9b2b",
-    "title": "晴天",
-    "originalArtist": "周杰倫",
-    "tags": [],
-    "performances": [
-      {
-        "id": "p-3e2872e5",
-        "streamId": "stream-3c3e418c",
-        "date": "2026-04-09",
-        "streamTitle": "【彈唱歌回】惡魔也要唱情歌★吉他彈唱☆挽回最婆偶像的形象！｜拉斐利婭Laphria",
-        "videoId": "aT7tRAB4XUM",
-        "timestamp": 3429,
-        "endTimestamp": 3699,
-        "note": ""
-      }
-    ]
-  },
-  {
-    "id": "song-6f752354",
-    "workId": "work-song-6f752354",
-    "title": "蚵仔麵線",
-    "originalArtist": "琳誼Ring",
-    "tags": [],
-    "performances": [
-      {
-        "id": "p-d25a11b2",
-        "streamId": "stream-3c3e418c",
-        "date": "2026-04-09",
-        "streamTitle": "【彈唱歌回】惡魔也要唱情歌★吉他彈唱☆挽回最婆偶像的形象！｜拉斐利婭Laphria",
-        "videoId": "aT7tRAB4XUM",
-        "timestamp": 3115,
-        "endTimestamp": 3325,
-        "note": ""
-      }
-    ]
-  },
-  {
-    "id": "song-72051b3c",
-    "workId": "work-song-e9f5270a",
-    "title": "下一站·與你",
-    "originalArtist": "KSP",
-    "tags": [],
-    "performances": [
-      {
-        "id": "p-7cd9c3a8",
-        "streamId": "stream-89529a81",
-        "date": "2026-04-06",
-        "streamTitle": "【初配信】惡魔高校生來襲❤︎｜次元裂縫開啟 ｜拉斐利婭Laphria",
-        "videoId": "iJ9DIokXMnk",
-        "timestamp": 277,
-        "endTimestamp": 507,
-        "note": ""
-      }
-    ]
-  },
-  {
-    "id": "song-74a82a0d",
-    "workId": "work-song-74a82a0d",
-    "title": "time machine",
-    "originalArtist": "Mj Apanay",
-    "tags": [],
-    "performances": [
-      {
-        "id": "p-4cf4f51f",
-        "streamId": "stream-3c3e418c",
-        "date": "2026-04-09",
-        "streamTitle": "【彈唱歌回】惡魔也要唱情歌★吉他彈唱☆挽回最婆偶像的形象！｜拉斐利婭Laphria",
-        "videoId": "aT7tRAB4XUM",
-        "timestamp": 4131,
-        "endTimestamp": 4357,
-        "note": ""
-      }
-    ]
-  },
-  {
-    "id": "song-82ccc0ee",
-    "workId": "work-song-7bbfd1ba",
-    "title": "身騎白馬",
-    "originalArtist": "徐佳瑩",
-    "tags": [],
-    "performances": [
-      {
-        "id": "p-91bfb118",
-        "streamId": "stream-3c3e418c",
-        "date": "2026-04-09",
-        "streamTitle": "【彈唱歌回】惡魔也要唱情歌★吉他彈唱☆挽回最婆偶像的形象！｜拉斐利婭Laphria",
-        "videoId": "aT7tRAB4XUM",
-        "timestamp": 2804,
-        "endTimestamp": 3111,
-        "note": ""
-      }
-    ]
-  },
-  {
-    "id": "song-9c6dce3c",
-    "workId": "work-song-43e7f35b",
-    "title": "孤單北半球",
-    "originalArtist": "林依晨",
-    "tags": [],
-    "performances": [
-      {
-        "id": "p-86d91a59",
-        "streamId": "stream-3c3e418c",
-        "date": "2026-04-09",
-        "streamTitle": "【彈唱歌回】惡魔也要唱情歌★吉他彈唱☆挽回最婆偶像的形象！｜拉斐利婭Laphria",
-        "videoId": "aT7tRAB4XUM",
-        "timestamp": 1388,
-        "endTimestamp": 1654,
-        "note": ""
+        "timestamp": 3759,
+        "endTimestamp": 4017
       }
     ]
   },
@@ -313,12 +73,25 @@
       {
         "id": "p-82490d34",
         "streamId": "stream-3c3e418c",
-        "date": "2026-04-09",
-        "streamTitle": "【彈唱歌回】惡魔也要唱情歌★吉他彈唱☆挽回最婆偶像的形象！｜拉斐利婭Laphria",
         "videoId": "aT7tRAB4XUM",
         "timestamp": 2442,
-        "endTimestamp": 2678,
-        "note": ""
+        "endTimestamp": 2678
+      }
+    ]
+  },
+  {
+    "id": "song-1d9b45c7",
+    "workId": "work-song-1d9b45c7",
+    "title": "心跳的證明",
+    "originalArtist": "劉人語",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-45027122",
+        "streamId": "stream-89529a81",
+        "videoId": "iJ9DIokXMnk",
+        "timestamp": 1508,
+        "endTimestamp": 1730
       }
     ]
   },
@@ -332,12 +105,185 @@
       {
         "id": "p-4c32e637",
         "streamId": "stream-3c3e418c",
-        "date": "2026-04-09",
-        "streamTitle": "【彈唱歌回】惡魔也要唱情歌★吉他彈唱☆挽回最婆偶像的形象！｜拉斐利婭Laphria",
         "videoId": "aT7tRAB4XUM",
         "timestamp": 777,
-        "endTimestamp": 935,
-        "note": ""
+        "endTimestamp": 935
+      }
+    ]
+  },
+  {
+    "id": "song-82ccc0ee",
+    "workId": "work-song-7bbfd1ba",
+    "title": "身騎白馬",
+    "originalArtist": "徐佳瑩",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-91bfb118",
+        "streamId": "stream-3c3e418c",
+        "videoId": "aT7tRAB4XUM",
+        "timestamp": 2804,
+        "endTimestamp": 3111
+      }
+    ]
+  },
+  {
+    "id": "song-9c6dce3c",
+    "workId": "work-song-43e7f35b",
+    "title": "孤單北半球",
+    "originalArtist": "林依晨",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-86d91a59",
+        "streamId": "stream-3c3e418c",
+        "videoId": "aT7tRAB4XUM",
+        "timestamp": 1388,
+        "endTimestamp": 1654
+      }
+    ]
+  },
+  {
+    "id": "song-2d054e8f",
+    "workId": "work-song-2d054e8f",
+    "title": "抱歉",
+    "originalArtist": "芒果醬",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-ba20890a",
+        "streamId": "stream-3c3e418c",
+        "videoId": "aT7tRAB4XUM",
+        "timestamp": 4470,
+        "endTimestamp": 4638
+      }
+    ]
+  },
+  {
+    "id": "song-4aaebd44",
+    "workId": "work-song-4aaebd44",
+    "title": "家後",
+    "originalArtist": "江蕙",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-e199f4b9",
+        "streamId": "stream-3c3e418c",
+        "videoId": "aT7tRAB4XUM",
+        "timestamp": 1023,
+        "endTimestamp": 1276
+      }
+    ]
+  },
+  {
+    "id": "song-411f3062",
+    "workId": "work-song-2104",
+    "title": "晚餐歌",
+    "originalArtist": "tuki.",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-ab441f6b",
+        "streamId": "stream-89529a81",
+        "videoId": "iJ9DIokXMnk",
+        "timestamp": 1765,
+        "endTimestamp": 1981
+      }
+    ]
+  },
+  {
+    "id": "song-6f752354",
+    "workId": "work-song-6f752354",
+    "title": "蚵仔麵線",
+    "originalArtist": "琳誼Ring",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-d25a11b2",
+        "streamId": "stream-3c3e418c",
+        "videoId": "aT7tRAB4XUM",
+        "timestamp": 3115,
+        "endTimestamp": 3325
+      }
+    ]
+  },
+  {
+    "id": "song-1aaee745",
+    "workId": "work-song-1aaee745",
+    "title": "最後一頁",
+    "originalArtist": "江語晨",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-54dd87e4",
+        "streamId": "stream-3c3e418c",
+        "videoId": "aT7tRAB4XUM",
+        "timestamp": 2083,
+        "endTimestamp": 2329
+      }
+    ]
+  },
+  {
+    "id": "song-4b4f9b2b",
+    "workId": "work-song-4b4f9b2b",
+    "title": "晴天",
+    "originalArtist": "周杰倫",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-3e2872e5",
+        "streamId": "stream-3c3e418c",
+        "videoId": "aT7tRAB4XUM",
+        "timestamp": 3429,
+        "endTimestamp": 3699
+      }
+    ]
+  },
+  {
+    "id": "song-0f41e3a3",
+    "workId": "work-song-0f41e3a3",
+    "title": "落雨聲",
+    "originalArtist": "江蕙 （自彈）",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-41854a61",
+        "streamId": "stream-89529a81",
+        "videoId": "iJ9DIokXMnk",
+        "timestamp": 976,
+        "endTimestamp": 1133
+      }
+    ]
+  },
+  {
+    "id": "song-448dfe55",
+    "workId": "work-song-308",
+    "title": "寶貝",
+    "originalArtist": "張懸",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-56caf835",
+        "streamId": "stream-3c3e418c",
+        "videoId": "aT7tRAB4XUM",
+        "timestamp": 281,
+        "endTimestamp": 442
+      }
+    ]
+  },
+  {
+    "id": "song-74a82a0d",
+    "workId": "work-song-74a82a0d",
+    "title": "time machine",
+    "originalArtist": "Mj Apanay",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-4cf4f51f",
+        "streamId": "stream-3c3e418c",
+        "videoId": "aT7tRAB4XUM",
+        "timestamp": 4131,
+        "endTimestamp": 4357
       }
     ]
   }

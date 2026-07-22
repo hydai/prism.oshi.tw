@@ -1,267 +1,17 @@
 [
   {
-    "id": "song-021ff5f0",
-    "workId": "work-song-021ff5f0",
-    "title": "易燃易爆炸",
-    "originalArtist": "陳粒",
+    "id": "song-6d6bc543",
+    "workId": "work-song-6d6bc543",
+    "title": "500天",
+    "originalArtist": "九九",
     "tags": [],
     "performances": [
       {
-        "id": "p-29968299",
-        "streamId": "stream-2025-10-28",
-        "date": "2025-10-28",
-        "streamTitle": "【萬聖節歌回】萬聖節要跟惡魔大人一起合唱！｜煦Hiyori ft. @ItsukiIanvs",
-        "videoId": "OwNrtFg5Y1Q",
-        "timestamp": 4596,
-        "endTimestamp": 4784,
-        "note": ""
-      }
-    ]
-  },
-  {
-    "id": "song-065d3a79",
-    "workId": "work-song-006cfcd3",
-    "title": "怪物",
-    "originalArtist": "YOASOBI",
-    "tags": [],
-    "performances": [
-      {
-        "id": "p-eb03d8e9",
-        "streamId": "stream-2025-10-28",
-        "date": "2025-10-28",
-        "streamTitle": "【萬聖節歌回】萬聖節要跟惡魔大人一起合唱！｜煦Hiyori ft. @ItsukiIanvs",
-        "videoId": "OwNrtFg5Y1Q",
-        "timestamp": 5040,
-        "endTimestamp": 5242,
-        "note": ""
-      }
-    ]
-  },
-  {
-    "id": "song-0a72420e",
-    "workId": "work-song-0a72420e",
-    "title": "Love More",
-    "originalArtist": "畢書盡 Bii",
-    "tags": [],
-    "performances": [
-      {
-        "id": "p-72e04408",
-        "streamId": "stream-ff86ebf5",
-        "date": "2026-02-12",
-        "streamTitle": "【甜蜜歌回】情人節要甜甜蜜蜜！｜煦Hiyori",
-        "videoId": "vsdY8ku2Gm0",
-        "timestamp": 2282,
-        "endTimestamp": 2529,
-        "note": ""
-      }
-    ]
-  },
-  {
-    "id": "song-11784c12",
-    "workId": "work-song-11784c12",
-    "title": "Knock Knock",
-    "originalArtist": "TWICE",
-    "tags": [],
-    "performances": [
-      {
-        "id": "p-ec715a0f",
-        "streamId": "stream-2026-01-08",
-        "date": "2026-01-08",
-        "streamTitle": "【歌回】唱快樂的歌！因為我很快樂！｜煦Hiyori",
-        "videoId": "fsZQmluUmMI",
-        "timestamp": 8233,
-        "endTimestamp": 8429,
-        "note": ""
-      }
-    ]
-  },
-  {
-    "id": "song-2721e410",
-    "workId": "work-song-2721e410",
-    "title": "來自天堂的魔鬼 (鄧tsuki&煦美環ver)",
-    "originalArtist": "​​鄧紫棋",
-    "tags": [],
-    "performances": [
-      {
-        "id": "p-94056d69",
-        "streamId": "stream-2025-10-28",
-        "date": "2025-10-28",
-        "streamTitle": "【萬聖節歌回】萬聖節要跟惡魔大人一起合唱！｜煦Hiyori ft. @ItsukiIanvs",
-        "videoId": "OwNrtFg5Y1Q",
-        "timestamp": 6122,
-        "endTimestamp": 6367,
-        "note": ""
-      }
-    ]
-  },
-  {
-    "id": "song-27a53171",
-    "workId": "work-song-74227975",
-    "title": "普通朋友",
-    "originalArtist": "陶喆 David Tao",
-    "tags": [],
-    "performances": [
-      {
-        "id": "p-b153ef74",
-        "streamId": "stream-ff86ebf5",
-        "date": "2026-02-12",
-        "streamTitle": "【甜蜜歌回】情人節要甜甜蜜蜜！｜煦Hiyori",
-        "videoId": "vsdY8ku2Gm0",
-        "timestamp": 5339,
-        "endTimestamp": 5678,
-        "note": ""
-      }
-    ]
-  },
-  {
-    "id": "song-3784c866",
-    "workId": "work-song-3784c866",
-    "title": "基因決定我愛你",
-    "originalArtist": "陳彥允 Ian Chen",
-    "tags": [],
-    "performances": [
-      {
-        "id": "p-ec9b36a4",
-        "streamId": "stream-ff86ebf5",
-        "date": "2026-02-12",
-        "streamTitle": "【甜蜜歌回】情人節要甜甜蜜蜜！｜煦Hiyori",
-        "videoId": "vsdY8ku2Gm0",
-        "timestamp": 4367,
-        "endTimestamp": 4594,
-        "note": ""
-      }
-    ]
-  },
-  {
-    "id": "song-44681e7b",
-    "workId": "work-song-44681e7b",
-    "title": "倒帶",
-    "originalArtist": "蔡依林",
-    "tags": [],
-    "performances": [
-      {
-        "id": "p-0141bfbf",
+        "id": "p-2a85f222",
         "streamId": "stream-2025-11-17",
-        "date": "2025-11-17",
-        "streamTitle": "【深夜歌回】不能睡！起來嗨！！！｜煦Hiyori",
         "videoId": "VnHAACcjZ10",
-        "timestamp": 1449,
-        "endTimestamp": 1710,
-        "note": ""
-      }
-    ]
-  },
-  {
-    "id": "song-4550a977",
-    "workId": "work-song-07107cd7",
-    "title": "路過人間",
-    "originalArtist": "郁可唯",
-    "tags": [],
-    "performances": [
-      {
-        "id": "p-2e8875d2",
-        "streamId": "stream-2025-10-08",
-        "date": "2025-10-08",
-        "streamTitle": "【歌回】首次歌回！唱一些溫暖的歌給你們聽｜煦Hiyori",
-        "videoId": "b6m1VSTGQq0",
-        "timestamp": 5544,
-        "endTimestamp": 5788,
-        "note": ""
-      }
-    ]
-  },
-  {
-    "id": "song-4a6fc404",
-    "workId": "work-song-1329",
-    "title": "如果可以",
-    "originalArtist": "韋禮安",
-    "tags": [],
-    "performances": [
-      {
-        "id": "p-ebccc659",
-        "streamId": "stream-2025-10-08",
-        "date": "2025-10-08",
-        "streamTitle": "【歌回】首次歌回！唱一些溫暖的歌給你們聽｜煦Hiyori",
-        "videoId": "b6m1VSTGQq0",
-        "timestamp": 2069,
-        "endTimestamp": 2339,
-        "note": ""
-      }
-    ]
-  },
-  {
-    "id": "song-5ca9f783",
-    "workId": "work-song-07073c1c",
-    "title": "來自天堂的魔鬼",
-    "originalArtist": "鄧紫棋",
-    "tags": [],
-    "performances": [
-      {
-        "id": "p-177d38f7",
-        "streamId": "stream-2025-10-28",
-        "date": "2025-10-28",
-        "streamTitle": "【萬聖節歌回】萬聖節要跟惡魔大人一起合唱！｜煦Hiyori ft. @ItsukiIanvs",
-        "videoId": "OwNrtFg5Y1Q",
-        "timestamp": 5766,
-        "endTimestamp": 6009,
-        "note": ""
-      }
-    ]
-  },
-  {
-    "id": "song-5d1e956e",
-    "workId": "work-song-5d1e956e",
-    "title": "Into the new world",
-    "originalArtist": "SNSD",
-    "tags": [],
-    "performances": [
-      {
-        "id": "p-75178f17",
-        "streamId": "stream-2025-10-08",
-        "date": "2025-10-08",
-        "streamTitle": "【歌回】首次歌回！唱一些溫暖的歌給你們聽｜煦Hiyori",
-        "videoId": "b6m1VSTGQq0",
-        "timestamp": 3540,
-        "endTimestamp": 3806,
-        "note": ""
-      }
-    ]
-  },
-  {
-    "id": "song-628c1f46",
-    "workId": "work-song-4fc49677",
-    "title": "愛你",
-    "originalArtist": "王心凌",
-    "tags": [],
-    "performances": [
-      {
-        "id": "p-4d429dc5",
-        "streamId": "stream-2025-11-17",
-        "date": "2025-11-17",
-        "streamTitle": "【深夜歌回】不能睡！起來嗨！！！｜煦Hiyori",
-        "videoId": "VnHAACcjZ10",
-        "timestamp": 3232,
-        "endTimestamp": 3447,
-        "note": ""
-      }
-    ]
-  },
-  {
-    "id": "song-65d378b3",
-    "workId": "work-song-52581efb",
-    "title": "Defying Gravity",
-    "originalArtist": "Wicked The Soundtrack",
-    "tags": [],
-    "performances": [
-      {
-        "id": "p-b09545bc",
-        "streamId": "stream-2025-10-28",
-        "date": "2025-10-28",
-        "streamTitle": "【萬聖節歌回】萬聖節要跟惡魔大人一起合唱！｜煦Hiyori ft. @ItsukiIanvs",
-        "videoId": "OwNrtFg5Y1Q",
-        "timestamp": 2476,
-        "endTimestamp": 2927,
-        "note": ""
+        "timestamp": 4205,
+        "endTimestamp": 4450
       }
     ]
   },
@@ -275,183 +25,9 @@
       {
         "id": "p-5259e0d9",
         "streamId": "stream-ff86ebf5",
-        "date": "2026-02-12",
-        "streamTitle": "【甜蜜歌回】情人節要甜甜蜜蜜！｜煦Hiyori",
         "videoId": "vsdY8ku2Gm0",
         "timestamp": 1735,
-        "endTimestamp": 1958,
-        "note": ""
-      }
-    ]
-  },
-  {
-    "id": "song-6d6bc543",
-    "workId": "work-song-6d6bc543",
-    "title": "500天",
-    "originalArtist": "九九",
-    "tags": [],
-    "performances": [
-      {
-        "id": "p-2a85f222",
-        "streamId": "stream-2025-11-17",
-        "date": "2025-11-17",
-        "streamTitle": "【深夜歌回】不能睡！起來嗨！！！｜煦Hiyori",
-        "videoId": "VnHAACcjZ10",
-        "timestamp": 4205,
-        "endTimestamp": 4450,
-        "note": ""
-      }
-    ]
-  },
-  {
-    "id": "song-7321184c",
-    "workId": "work-song-7321184c",
-    "title": "overdrive challenge",
-    "originalArtist": "ザ・チェインスモーカーズ",
-    "tags": [],
-    "performances": [
-      {
-        "id": "p-fbd80483",
-        "streamId": "stream-ff86ebf5",
-        "date": "2026-02-12",
-        "streamTitle": "【甜蜜歌回】情人節要甜甜蜜蜜！｜煦Hiyori",
-        "videoId": "vsdY8ku2Gm0",
-        "timestamp": 2740,
-        "endTimestamp": 2760,
-        "note": ""
-      }
-    ]
-  },
-  {
-    "id": "song-7a35e156",
-    "workId": "work-song-7a35e156",
-    "title": "淋雨一直走",
-    "originalArtist": "張韶涵",
-    "tags": [],
-    "performances": [
-      {
-        "id": "p-d92c3812",
-        "streamId": "stream-2026-01-08",
-        "date": "2026-01-08",
-        "streamTitle": "【歌回】唱快樂的歌！因為我很快樂！｜煦Hiyori",
-        "videoId": "fsZQmluUmMI",
-        "timestamp": 4203,
-        "endTimestamp": 4404,
-        "note": ""
-      }
-    ]
-  },
-  {
-    "id": "song-7b221900",
-    "workId": "work-song-7b221900",
-    "title": "Wish You Hell",
-    "originalArtist": "WENDY",
-    "tags": [],
-    "performances": [
-      {
-        "id": "p-7ab8824d",
-        "streamId": "stream-2025-10-28",
-        "date": "2025-10-28",
-        "streamTitle": "【萬聖節歌回】萬聖節要跟惡魔大人一起合唱！｜煦Hiyori ft. @ItsukiIanvs",
-        "videoId": "OwNrtFg5Y1Q",
-        "timestamp": 1640,
-        "endTimestamp": 1806,
-        "note": ""
-      }
-    ]
-  },
-  {
-    "id": "song-7e47ccc1",
-    "workId": "work-song-1322",
-    "title": "雨愛",
-    "originalArtist": "楊丞琳",
-    "tags": [],
-    "performances": [
-      {
-        "id": "p-a75121f7",
-        "streamId": "stream-2025-10-08",
-        "date": "2025-10-08",
-        "streamTitle": "【歌回】首次歌回！唱一些溫暖的歌給你們聽｜煦Hiyori",
-        "videoId": "b6m1VSTGQq0",
-        "timestamp": 6483,
-        "endTimestamp": 6743,
-        "note": ""
-      }
-    ]
-  },
-  {
-    "id": "song-81855847",
-    "workId": "work-song-7f3fdd56",
-    "title": "旅行的意義",
-    "originalArtist": "陳綺貞",
-    "tags": [],
-    "performances": [
-      {
-        "id": "p-132e3bbc",
-        "streamId": "stream-2025-10-08",
-        "date": "2025-10-08",
-        "streamTitle": "【歌回】首次歌回！唱一些溫暖的歌給你們聽｜煦Hiyori",
-        "videoId": "b6m1VSTGQq0",
-        "timestamp": 4952,
-        "endTimestamp": 5205,
-        "note": ""
-      }
-    ]
-  },
-  {
-    "id": "song-85692b2b",
-    "workId": "work-song-85692b2b",
-    "title": "離開的一路上",
-    "originalArtist": "理想混蛋",
-    "tags": [],
-    "performances": [
-      {
-        "id": "p-2954bf51",
-        "streamId": "stream-2025-11-17",
-        "date": "2025-11-17",
-        "streamTitle": "【深夜歌回】不能睡！起來嗨！！！｜煦Hiyori",
-        "videoId": "VnHAACcjZ10",
-        "timestamp": 5790,
-        "endTimestamp": 6043,
-        "note": ""
-      }
-    ]
-  },
-  {
-    "id": "song-86ae2feb",
-    "workId": "work-song-140",
-    "title": "Perfect",
-    "originalArtist": "Ed Sheeran",
-    "tags": [],
-    "performances": [
-      {
-        "id": "p-19376d69",
-        "streamId": "stream-2025-11-17",
-        "date": "2025-11-17",
-        "streamTitle": "【深夜歌回】不能睡！起來嗨！！！｜煦Hiyori",
-        "videoId": "VnHAACcjZ10",
-        "timestamp": 4779,
-        "endTimestamp": 5042,
-        "note": ""
-      }
-    ]
-  },
-  {
-    "id": "song-876e85ad",
-    "workId": "work-song-876e85ad",
-    "title": "道聽塗說",
-    "originalArtist": "林芯儀",
-    "tags": [],
-    "performances": [
-      {
-        "id": "p-2e21064e",
-        "streamId": "stream-2025-11-17",
-        "date": "2025-11-17",
-        "streamTitle": "【深夜歌回】不能睡！起來嗨！！！｜煦Hiyori",
-        "videoId": "VnHAACcjZ10",
-        "timestamp": 6277,
-        "endTimestamp": 6575,
-        "note": ""
+        "endTimestamp": 1958
       }
     ]
   },
@@ -465,316 +41,9 @@
       {
         "id": "p-640cb750",
         "streamId": "stream-2025-10-08",
-        "date": "2025-10-08",
-        "streamTitle": "【歌回】首次歌回！唱一些溫暖的歌給你們聽｜煦Hiyori",
         "videoId": "b6m1VSTGQq0",
         "timestamp": 2631,
-        "endTimestamp": 2873,
-        "note": ""
-      }
-    ]
-  },
-  {
-    "id": "song-94da30b9",
-    "workId": "work-song-1f2368eb",
-    "title": "Toxic",
-    "originalArtist": "Britney Spears",
-    "tags": [],
-    "performances": [
-      {
-        "id": "p-9da6ba2f",
-        "streamId": "stream-2025-10-28",
-        "date": "2025-10-28",
-        "streamTitle": "【萬聖節歌回】萬聖節要跟惡魔大人一起合唱！｜煦Hiyori ft. @ItsukiIanvs",
-        "videoId": "OwNrtFg5Y1Q",
-        "timestamp": 3567,
-        "endTimestamp": 3766,
-        "note": ""
-      }
-    ]
-  },
-  {
-    "id": "song-996d1983",
-    "workId": "work-song-996d1983",
-    "title": "Stuck with U",
-    "originalArtist": "Ariana Grande & Justin Bieber",
-    "tags": [],
-    "performances": [
-      {
-        "id": "p-31dbcc90",
-        "streamId": "stream-2025-11-17",
-        "date": "2025-11-17",
-        "streamTitle": "【深夜歌回】不能睡！起來嗨！！！｜煦Hiyori",
-        "videoId": "VnHAACcjZ10",
-        "timestamp": 636,
-        "endTimestamp": 867,
-        "note": ""
-      }
-    ]
-  },
-  {
-    "id": "song-99dcd77c",
-    "workId": "work-song-99dcd77c",
-    "title": "倫敦的愛情",
-    "originalArtist": "藍又時",
-    "tags": [],
-    "performances": [
-      {
-        "id": "p-ac333fbb",
-        "streamId": "stream-2025-11-17",
-        "date": "2025-11-17",
-        "streamTitle": "【深夜歌回】不能睡！起來嗨！！！｜煦Hiyori",
-        "videoId": "VnHAACcjZ10",
-        "timestamp": 5279,
-        "endTimestamp": 5540,
-        "note": ""
-      }
-    ]
-  },
-  {
-    "id": "song-9d3e2dda",
-    "workId": "work-song-9d3e2dda",
-    "title": "梁山伯與茱麗葉",
-    "originalArtist": "卓文萱 Genie Chuo&曹格 Gary Chaw",
-    "tags": [],
-    "performances": [
-      {
-        "id": "p-b23a793a",
-        "streamId": "stream-ff86ebf5",
-        "date": "2026-02-12",
-        "streamTitle": "【甜蜜歌回】情人節要甜甜蜜蜜！｜煦Hiyori",
-        "videoId": "vsdY8ku2Gm0",
-        "timestamp": 3182,
-        "endTimestamp": 3413,
-        "note": ""
-      }
-    ]
-  },
-  {
-    "id": "song-9ee42c20",
-    "workId": "work-song-792",
-    "title": "Good Time",
-    "originalArtist": "Owl City & Carly Rae Jepsen",
-    "tags": [],
-    "performances": [
-      {
-        "id": "p-9ce3b96b",
-        "streamId": "stream-2026-01-08",
-        "date": "2026-01-08",
-        "streamTitle": "【歌回】唱快樂的歌！因為我很快樂！｜煦Hiyori",
-        "videoId": "fsZQmluUmMI",
-        "timestamp": 4898,
-        "endTimestamp": 5097,
-        "note": ""
-      }
-    ]
-  },
-  {
-    "id": "song-9f31dcc6",
-    "workId": "work-song-9f31dcc6",
-    "title": "Some(썸 탈꺼야)",
-    "originalArtist": "BOL4(볼빨간사춘기)",
-    "tags": [],
-    "performances": [
-      {
-        "id": "p-e007b6ac",
-        "streamId": "stream-ff86ebf5",
-        "date": "2026-02-12",
-        "streamTitle": "【甜蜜歌回】情人節要甜甜蜜蜜！｜煦Hiyori",
-        "videoId": "vsdY8ku2Gm0",
-        "timestamp": 5886,
-        "endTimestamp": 6067,
-        "note": ""
-      }
-    ]
-  },
-  {
-    "id": "song-aae80d63",
-    "workId": "work-song-1333",
-    "title": "填空",
-    "originalArtist": "家家",
-    "tags": [],
-    "performances": [
-      {
-        "id": "p-c04e7175",
-        "streamId": "stream-2025-11-17",
-        "date": "2025-11-17",
-        "streamTitle": "【深夜歌回】不能睡！起來嗨！！！｜煦Hiyori",
-        "videoId": "VnHAACcjZ10",
-        "timestamp": 2721,
-        "endTimestamp": 2991,
-        "note": ""
-      }
-    ]
-  },
-  {
-    "id": "song-b045fd48",
-    "workId": "work-song-2e43ea15",
-    "title": "惡作劇",
-    "originalArtist": "王藍茵",
-    "tags": [],
-    "performances": [
-      {
-        "id": "p-cbe4bdb3",
-        "streamId": "stream-2026-01-08",
-        "date": "2026-01-08",
-        "streamTitle": "【歌回】唱快樂的歌！因為我很快樂！｜煦Hiyori",
-        "videoId": "fsZQmluUmMI",
-        "timestamp": 3351,
-        "endTimestamp": 3581,
-        "note": ""
-      }
-    ]
-  },
-  {
-    "id": "song-b3c05060",
-    "workId": "work-song-100",
-    "title": "血腥愛情故事",
-    "originalArtist": "張惠妹",
-    "tags": [],
-    "performances": [
-      {
-        "id": "p-8e11bbac",
-        "streamId": "stream-2025-10-28",
-        "date": "2025-10-28",
-        "streamTitle": "【萬聖節歌回】萬聖節要跟惡魔大人一起合唱！｜煦Hiyori ft. @ItsukiIanvs",
-        "videoId": "OwNrtFg5Y1Q",
-        "timestamp": 3890,
-        "endTimestamp": 4149,
-        "note": ""
-      }
-    ]
-  },
-  {
-    "id": "song-c2b6954f",
-    "workId": "work-song-c2b6954f",
-    "title": "說愛你",
-    "originalArtist": "蔡依林",
-    "tags": [],
-    "performances": [
-      {
-        "id": "p-026ea45e",
-        "streamId": "stream-2026-01-08",
-        "date": "2026-01-08",
-        "streamTitle": "【歌回】唱快樂的歌！因為我很快樂！｜煦Hiyori",
-        "videoId": "fsZQmluUmMI",
-        "timestamp": 2396,
-        "endTimestamp": 2623,
-        "note": ""
-      }
-    ]
-  },
-  {
-    "id": "song-ca4e5d7a",
-    "workId": "work-song-7c2dd8f9",
-    "title": "TT (可愛玥&煦ver)",
-    "originalArtist": "TWICE",
-    "tags": [],
-    "performances": [
-      {
-        "id": "p-731c4984",
-        "streamId": "stream-2025-10-28",
-        "date": "2025-10-28",
-        "streamTitle": "【萬聖節歌回】萬聖節要跟惡魔大人一起合唱！｜煦Hiyori ft. @ItsukiIanvs",
-        "videoId": "OwNrtFg5Y1Q",
-        "timestamp": 6620,
-        "endTimestamp": 6830,
-        "note": ""
-      }
-    ]
-  },
-  {
-    "id": "song-cef73260",
-    "workId": "work-song-0f4d0182",
-    "title": "Always Remember Us This Way",
-    "originalArtist": "Lady Gaga",
-    "tags": [],
-    "performances": [
-      {
-        "id": "p-7ad2187e",
-        "streamId": "stream-2025-11-17",
-        "date": "2025-11-17",
-        "streamTitle": "【深夜歌回】不能睡！起來嗨！！！｜煦Hiyori",
-        "videoId": "VnHAACcjZ10",
-        "timestamp": 6974,
-        "endTimestamp": 7174,
-        "note": ""
-      }
-    ]
-  },
-  {
-    "id": "song-cf7ec132",
-    "workId": "work-song-270",
-    "title": "I Really Like You",
-    "originalArtist": "Carly Rae Jepsen",
-    "tags": [],
-    "performances": [
-      {
-        "id": "p-12ad124d",
-        "streamId": "stream-2026-01-08",
-        "date": "2026-01-08",
-        "streamTitle": "【歌回】唱快樂的歌！因為我很快樂！｜煦Hiyori",
-        "videoId": "fsZQmluUmMI",
-        "timestamp": 5631,
-        "endTimestamp": 5840,
-        "note": ""
-      }
-    ]
-  },
-  {
-    "id": "song-cfc9405a",
-    "workId": "work-song-535",
-    "title": "Flashlight",
-    "originalArtist": "Jessie J",
-    "tags": [],
-    "performances": [
-      {
-        "id": "p-47424b6f",
-        "streamId": "stream-2025-10-08",
-        "date": "2025-10-08",
-        "streamTitle": "【歌回】首次歌回！唱一些溫暖的歌給你們聽｜煦Hiyori",
-        "videoId": "b6m1VSTGQq0",
-        "timestamp": 4009,
-        "endTimestamp": 4209,
-        "note": ""
-      }
-    ]
-  },
-  {
-    "id": "song-d0c9e1e1",
-    "workId": "work-song-d0c9e1e1",
-    "title": "第一天",
-    "originalArtist": "孫燕姿",
-    "tags": [],
-    "performances": [
-      {
-        "id": "p-34413123",
-        "streamId": "stream-2026-01-08",
-        "date": "2026-01-08",
-        "streamTitle": "【歌回】唱快樂的歌！因為我很快樂！｜煦Hiyori",
-        "videoId": "fsZQmluUmMI",
-        "timestamp": 1661,
-        "endTimestamp": 1912,
-        "note": ""
-      }
-    ]
-  },
-  {
-    "id": "song-d1d1ccac",
-    "workId": "work-song-2503",
-    "title": "TT",
-    "originalArtist": "TWICE",
-    "tags": [],
-    "performances": [
-      {
-        "id": "p-af5af788",
-        "streamId": "stream-2025-10-28",
-        "date": "2025-10-28",
-        "streamTitle": "【萬聖節歌回】萬聖節要跟惡魔大人一起合唱！｜煦Hiyori ft. @ItsukiIanvs",
-        "videoId": "OwNrtFg5Y1Q",
-        "timestamp": 488,
-        "endTimestamp": 699,
-        "note": ""
+        "endTimestamp": 2873
       }
     ]
   },
@@ -788,50 +57,41 @@
       {
         "id": "p-ac46fbf2",
         "streamId": "stream-2025-11-17",
-        "date": "2025-11-17",
-        "streamTitle": "【深夜歌回】不能睡！起來嗨！！！｜煦Hiyori",
         "videoId": "VnHAACcjZ10",
         "timestamp": 8307,
-        "endTimestamp": 8349,
-        "note": ""
+        "endTimestamp": 8349
       }
     ]
   },
   {
-    "id": "song-d7b170c3",
-    "workId": "work-song-1140",
-    "title": "Love Story",
-    "originalArtist": "Taylor Swift",
+    "id": "song-4a6fc404",
+    "workId": "work-song-1329",
+    "title": "如果可以",
+    "originalArtist": "韋禮安",
     "tags": [],
     "performances": [
       {
-        "id": "p-54625ecc",
-        "streamId": "stream-ff86ebf5",
-        "date": "2026-02-12",
-        "streamTitle": "【甜蜜歌回】情人節要甜甜蜜蜜！｜煦Hiyori",
-        "videoId": "vsdY8ku2Gm0",
-        "timestamp": 6421,
-        "endTimestamp": 6656,
-        "note": ""
-      }
-    ]
-  },
-  {
-    "id": "song-d98bea04",
-    "workId": "work-song-2681",
-    "title": "煦日 Apricity",
-    "originalArtist": "澪Rei",
-    "tags": [],
-    "performances": [
-      {
-        "id": "p-c8cf798c",
+        "id": "p-ebccc659",
         "streamId": "stream-2025-10-08",
-        "date": "2025-10-08",
-        "streamTitle": "【歌回】首次歌回！唱一些溫暖的歌給你們聽｜煦Hiyori",
         "videoId": "b6m1VSTGQq0",
-        "timestamp": 1083,
-        "endTimestamp": 1336,
-        "note": ""
+        "timestamp": 2069,
+        "endTimestamp": 2339
+      }
+    ]
+  },
+  {
+    "id": "song-b3c05060",
+    "workId": "work-song-100",
+    "title": "血腥愛情故事",
+    "originalArtist": "張惠妹",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-8e11bbac",
+        "streamId": "stream-2025-10-28",
+        "videoId": "OwNrtFg5Y1Q",
+        "timestamp": 3890,
+        "endTimestamp": 4149
       }
     ]
   },
@@ -845,12 +105,153 @@
       {
         "id": "p-a58fb408",
         "streamId": "stream-2025-11-17",
-        "date": "2025-11-17",
-        "streamTitle": "【深夜歌回】不能睡！起來嗨！！！｜煦Hiyori",
         "videoId": "VnHAACcjZ10",
         "timestamp": 3770,
-        "endTimestamp": 3976,
-        "note": ""
+        "endTimestamp": 3976
+      }
+    ]
+  },
+  {
+    "id": "song-5ca9f783",
+    "workId": "work-song-07073c1c",
+    "title": "來自天堂的魔鬼",
+    "originalArtist": "鄧紫棋",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-177d38f7",
+        "streamId": "stream-2025-10-28",
+        "videoId": "OwNrtFg5Y1Q",
+        "timestamp": 5766,
+        "endTimestamp": 6009
+      }
+    ]
+  },
+  {
+    "id": "song-2721e410",
+    "workId": "work-song-2721e410",
+    "title": "來自天堂的魔鬼 (鄧tsuki&煦美環ver)",
+    "originalArtist": "​​鄧紫棋",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-94056d69",
+        "streamId": "stream-2025-10-28",
+        "videoId": "OwNrtFg5Y1Q",
+        "timestamp": 6122,
+        "endTimestamp": 6367
+      }
+    ]
+  },
+  {
+    "id": "song-065d3a79",
+    "workId": "work-song-006cfcd3",
+    "title": "怪物",
+    "originalArtist": "YOASOBI",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-eb03d8e9",
+        "streamId": "stream-2025-10-28",
+        "videoId": "OwNrtFg5Y1Q",
+        "timestamp": 5040,
+        "endTimestamp": 5242
+      }
+    ]
+  },
+  {
+    "id": "song-021ff5f0",
+    "workId": "work-song-021ff5f0",
+    "title": "易燃易爆炸",
+    "originalArtist": "陳粒",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-29968299",
+        "streamId": "stream-2025-10-28",
+        "videoId": "OwNrtFg5Y1Q",
+        "timestamp": 4596,
+        "endTimestamp": 4784
+      }
+    ]
+  },
+  {
+    "id": "song-7e47ccc1",
+    "workId": "work-song-1322",
+    "title": "雨愛",
+    "originalArtist": "楊丞琳",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-a75121f7",
+        "streamId": "stream-2025-10-08",
+        "videoId": "b6m1VSTGQq0",
+        "timestamp": 6483,
+        "endTimestamp": 6743
+      }
+    ]
+  },
+  {
+    "id": "song-44681e7b",
+    "workId": "work-song-44681e7b",
+    "title": "倒帶",
+    "originalArtist": "蔡依林",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-0141bfbf",
+        "streamId": "stream-2025-11-17",
+        "videoId": "VnHAACcjZ10",
+        "timestamp": 1449,
+        "endTimestamp": 1710
+      }
+    ]
+  },
+  {
+    "id": "song-99dcd77c",
+    "workId": "work-song-99dcd77c",
+    "title": "倫敦的愛情",
+    "originalArtist": "藍又時",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-ac333fbb",
+        "streamId": "stream-2025-11-17",
+        "videoId": "VnHAACcjZ10",
+        "timestamp": 5279,
+        "endTimestamp": 5540
+      }
+    ]
+  },
+  {
+    "id": "song-81855847",
+    "workId": "work-song-7f3fdd56",
+    "title": "旅行的意義",
+    "originalArtist": "陳綺貞",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-132e3bbc",
+        "streamId": "stream-2025-10-08",
+        "videoId": "b6m1VSTGQq0",
+        "timestamp": 4952,
+        "endTimestamp": 5205
+      }
+    ]
+  },
+  {
+    "id": "song-3784c866",
+    "workId": "work-song-3784c866",
+    "title": "基因決定我愛你",
+    "originalArtist": "陳彥允 Ian Chen",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-ec9b36a4",
+        "streamId": "stream-ff86ebf5",
+        "videoId": "vsdY8ku2Gm0",
+        "timestamp": 4367,
+        "endTimestamp": 4594
       }
     ]
   },
@@ -864,12 +265,425 @@
       {
         "id": "p-f9976331",
         "streamId": "stream-ff86ebf5",
-        "date": "2026-02-12",
-        "streamTitle": "【甜蜜歌回】情人節要甜甜蜜蜜！｜煦Hiyori",
         "videoId": "vsdY8ku2Gm0",
         "timestamp": 3864,
-        "endTimestamp": 4124,
-        "note": ""
+        "endTimestamp": 4124
+      }
+    ]
+  },
+  {
+    "id": "song-9d3e2dda",
+    "workId": "work-song-9d3e2dda",
+    "title": "梁山伯與茱麗葉",
+    "originalArtist": "卓文萱 Genie Chuo&曹格 Gary Chaw",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-b23a793a",
+        "streamId": "stream-ff86ebf5",
+        "videoId": "vsdY8ku2Gm0",
+        "timestamp": 3182,
+        "endTimestamp": 3413
+      }
+    ]
+  },
+  {
+    "id": "song-7a35e156",
+    "workId": "work-song-7a35e156",
+    "title": "淋雨一直走",
+    "originalArtist": "張韶涵",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-d92c3812",
+        "streamId": "stream-2026-01-08",
+        "videoId": "fsZQmluUmMI",
+        "timestamp": 4203,
+        "endTimestamp": 4404
+      }
+    ]
+  },
+  {
+    "id": "song-d0c9e1e1",
+    "workId": "work-song-d0c9e1e1",
+    "title": "第一天",
+    "originalArtist": "孫燕姿",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-34413123",
+        "streamId": "stream-2026-01-08",
+        "videoId": "fsZQmluUmMI",
+        "timestamp": 1661,
+        "endTimestamp": 1912
+      }
+    ]
+  },
+  {
+    "id": "song-b045fd48",
+    "workId": "work-song-2e43ea15",
+    "title": "惡作劇",
+    "originalArtist": "王藍茵",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-cbe4bdb3",
+        "streamId": "stream-2026-01-08",
+        "videoId": "fsZQmluUmMI",
+        "timestamp": 3351,
+        "endTimestamp": 3581
+      }
+    ]
+  },
+  {
+    "id": "song-27a53171",
+    "workId": "work-song-74227975",
+    "title": "普通朋友",
+    "originalArtist": "陶喆 David Tao",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-b153ef74",
+        "streamId": "stream-ff86ebf5",
+        "videoId": "vsdY8ku2Gm0",
+        "timestamp": 5339,
+        "endTimestamp": 5678
+      }
+    ]
+  },
+  {
+    "id": "song-aae80d63",
+    "workId": "work-song-1333",
+    "title": "填空",
+    "originalArtist": "家家",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-c04e7175",
+        "streamId": "stream-2025-11-17",
+        "videoId": "VnHAACcjZ10",
+        "timestamp": 2721,
+        "endTimestamp": 2991
+      }
+    ]
+  },
+  {
+    "id": "song-628c1f46",
+    "workId": "work-song-4fc49677",
+    "title": "愛你",
+    "originalArtist": "王心凌",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-4d429dc5",
+        "streamId": "stream-2025-11-17",
+        "videoId": "VnHAACcjZ10",
+        "timestamp": 3232,
+        "endTimestamp": 3447
+      }
+    ]
+  },
+  {
+    "id": "song-d98bea04",
+    "workId": "work-song-2681",
+    "title": "煦日 Apricity",
+    "originalArtist": "澪Rei",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-c8cf798c",
+        "streamId": "stream-2025-10-08",
+        "videoId": "b6m1VSTGQq0",
+        "timestamp": 1083,
+        "endTimestamp": 1336
+      }
+    ]
+  },
+  {
+    "id": "song-4550a977",
+    "workId": "work-song-07107cd7",
+    "title": "路過人間",
+    "originalArtist": "郁可唯",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-2e8875d2",
+        "streamId": "stream-2025-10-08",
+        "videoId": "b6m1VSTGQq0",
+        "timestamp": 5544,
+        "endTimestamp": 5788
+      }
+    ]
+  },
+  {
+    "id": "song-876e85ad",
+    "workId": "work-song-876e85ad",
+    "title": "道聽塗說",
+    "originalArtist": "林芯儀",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-2e21064e",
+        "streamId": "stream-2025-11-17",
+        "videoId": "VnHAACcjZ10",
+        "timestamp": 6277,
+        "endTimestamp": 6575
+      }
+    ]
+  },
+  {
+    "id": "song-c2b6954f",
+    "workId": "work-song-c2b6954f",
+    "title": "說愛你",
+    "originalArtist": "蔡依林",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-026ea45e",
+        "streamId": "stream-2026-01-08",
+        "videoId": "fsZQmluUmMI",
+        "timestamp": 2396,
+        "endTimestamp": 2623
+      }
+    ]
+  },
+  {
+    "id": "song-85692b2b",
+    "workId": "work-song-85692b2b",
+    "title": "離開的一路上",
+    "originalArtist": "理想混蛋",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-2954bf51",
+        "streamId": "stream-2025-11-17",
+        "videoId": "VnHAACcjZ10",
+        "timestamp": 5790,
+        "endTimestamp": 6043
+      }
+    ]
+  },
+  {
+    "id": "song-cef73260",
+    "workId": "work-song-0f4d0182",
+    "title": "Always Remember Us This Way",
+    "originalArtist": "Lady Gaga",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-7ad2187e",
+        "streamId": "stream-2025-11-17",
+        "videoId": "VnHAACcjZ10",
+        "timestamp": 6974,
+        "endTimestamp": 7174
+      }
+    ]
+  },
+  {
+    "id": "song-65d378b3",
+    "workId": "work-song-52581efb",
+    "title": "Defying Gravity",
+    "originalArtist": "Wicked The Soundtrack",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-b09545bc",
+        "streamId": "stream-2025-10-28",
+        "videoId": "OwNrtFg5Y1Q",
+        "timestamp": 2476,
+        "endTimestamp": 2927
+      }
+    ]
+  },
+  {
+    "id": "song-cfc9405a",
+    "workId": "work-song-535",
+    "title": "Flashlight",
+    "originalArtist": "Jessie J",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-47424b6f",
+        "streamId": "stream-2025-10-08",
+        "videoId": "b6m1VSTGQq0",
+        "timestamp": 4009,
+        "endTimestamp": 4209
+      }
+    ]
+  },
+  {
+    "id": "song-9ee42c20",
+    "workId": "work-song-792",
+    "title": "Good Time",
+    "originalArtist": "Owl City & Carly Rae Jepsen",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-9ce3b96b",
+        "streamId": "stream-2026-01-08",
+        "videoId": "fsZQmluUmMI",
+        "timestamp": 4898,
+        "endTimestamp": 5097
+      }
+    ]
+  },
+  {
+    "id": "song-cf7ec132",
+    "workId": "work-song-270",
+    "title": "I Really Like You",
+    "originalArtist": "Carly Rae Jepsen",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-12ad124d",
+        "streamId": "stream-2026-01-08",
+        "videoId": "fsZQmluUmMI",
+        "timestamp": 5631,
+        "endTimestamp": 5840
+      }
+    ]
+  },
+  {
+    "id": "song-5d1e956e",
+    "workId": "work-song-5d1e956e",
+    "title": "Into the new world",
+    "originalArtist": "SNSD",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-75178f17",
+        "streamId": "stream-2025-10-08",
+        "videoId": "b6m1VSTGQq0",
+        "timestamp": 3540,
+        "endTimestamp": 3806
+      }
+    ]
+  },
+  {
+    "id": "song-11784c12",
+    "workId": "work-song-11784c12",
+    "title": "Knock Knock",
+    "originalArtist": "TWICE",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-ec715a0f",
+        "streamId": "stream-2026-01-08",
+        "videoId": "fsZQmluUmMI",
+        "timestamp": 8233,
+        "endTimestamp": 8429
+      }
+    ]
+  },
+  {
+    "id": "song-0a72420e",
+    "workId": "work-song-0a72420e",
+    "title": "Love More",
+    "originalArtist": "畢書盡 Bii",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-72e04408",
+        "streamId": "stream-ff86ebf5",
+        "videoId": "vsdY8ku2Gm0",
+        "timestamp": 2282,
+        "endTimestamp": 2529
+      }
+    ]
+  },
+  {
+    "id": "song-d7b170c3",
+    "workId": "work-song-1140",
+    "title": "Love Story",
+    "originalArtist": "Taylor Swift",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-54625ecc",
+        "streamId": "stream-ff86ebf5",
+        "videoId": "vsdY8ku2Gm0",
+        "timestamp": 6421,
+        "endTimestamp": 6656
+      }
+    ]
+  },
+  {
+    "id": "song-7321184c",
+    "workId": "work-song-7321184c",
+    "title": "overdrive challenge",
+    "originalArtist": "ザ・チェインスモーカーズ",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-fbd80483",
+        "streamId": "stream-ff86ebf5",
+        "videoId": "vsdY8ku2Gm0",
+        "timestamp": 2740,
+        "endTimestamp": 2760
+      }
+    ]
+  },
+  {
+    "id": "song-86ae2feb",
+    "workId": "work-song-140",
+    "title": "Perfect",
+    "originalArtist": "Ed Sheeran",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-19376d69",
+        "streamId": "stream-2025-11-17",
+        "videoId": "VnHAACcjZ10",
+        "timestamp": 4779,
+        "endTimestamp": 5042
+      }
+    ]
+  },
+  {
+    "id": "song-9f31dcc6",
+    "workId": "work-song-9f31dcc6",
+    "title": "Some(썸 탈꺼야)",
+    "originalArtist": "BOL4(볼빨간사춘기)",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-e007b6ac",
+        "streamId": "stream-ff86ebf5",
+        "videoId": "vsdY8ku2Gm0",
+        "timestamp": 5886,
+        "endTimestamp": 6067
+      }
+    ]
+  },
+  {
+    "id": "song-996d1983",
+    "workId": "work-song-996d1983",
+    "title": "Stuck with U",
+    "originalArtist": "Ariana Grande & Justin Bieber",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-31dbcc90",
+        "streamId": "stream-2025-11-17",
+        "videoId": "VnHAACcjZ10",
+        "timestamp": 636,
+        "endTimestamp": 867
+      }
+    ]
+  },
+  {
+    "id": "song-94da30b9",
+    "workId": "work-song-1f2368eb",
+    "title": "Toxic",
+    "originalArtist": "Britney Spears",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-9da6ba2f",
+        "streamId": "stream-2025-10-28",
+        "videoId": "OwNrtFg5Y1Q",
+        "timestamp": 3567,
+        "endTimestamp": 3766
       }
     ]
   },
@@ -883,12 +697,57 @@
       {
         "id": "p-971d3eaa",
         "streamId": "stream-2026-01-08",
-        "date": "2026-01-08",
-        "streamTitle": "【歌回】唱快樂的歌！因為我很快樂！｜煦Hiyori",
         "videoId": "fsZQmluUmMI",
         "timestamp": 6551,
-        "endTimestamp": 6772,
-        "note": ""
+        "endTimestamp": 6772
+      }
+    ]
+  },
+  {
+    "id": "song-d1d1ccac",
+    "workId": "work-song-2503",
+    "title": "TT",
+    "originalArtist": "TWICE",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-af5af788",
+        "streamId": "stream-2025-10-28",
+        "videoId": "OwNrtFg5Y1Q",
+        "timestamp": 488,
+        "endTimestamp": 699
+      }
+    ]
+  },
+  {
+    "id": "song-ca4e5d7a",
+    "workId": "work-song-7c2dd8f9",
+    "title": "TT (可愛玥&煦ver)",
+    "originalArtist": "TWICE",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-731c4984",
+        "streamId": "stream-2025-10-28",
+        "videoId": "OwNrtFg5Y1Q",
+        "timestamp": 6620,
+        "endTimestamp": 6830
+      }
+    ]
+  },
+  {
+    "id": "song-7b221900",
+    "workId": "work-song-7b221900",
+    "title": "Wish You Hell",
+    "originalArtist": "WENDY",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-7ab8824d",
+        "streamId": "stream-2025-10-28",
+        "videoId": "OwNrtFg5Y1Q",
+        "timestamp": 1640,
+        "endTimestamp": 1806
       }
     ]
   }

@@ -1,12 +1,14 @@
+// Stored (exported) performance — `date` and `streamTitle` are intentionally
+// absent: the fan site derives both from the stream record (join by streamId)
+// at load time. See app/lib/archive-loader.ts hydrateSongs().
 export interface Performance {
   id: string;
   streamId: string;
-  date: string;
-  streamTitle: string;
   videoId: string;
   timestamp: number;
   endTimestamp: number | null;
-  note: string;
+  /** Present only when non-empty */
+  note?: string;
 }
 
 export interface Song {

@@ -1,87 +1,40 @@
 [
   {
-    "id": "song-0745634f",
-    "workId": "work-song-0745634f",
-    "title": "Bling-Bang-Bang-Born",
-    "originalArtist": "Creepy Nuts",
+    "id": "song-562ecb16",
+    "workId": "work-song-562ecb16",
+    "title": "115万キロのフィルム",
+    "originalArtist": "髭男",
     "tags": [],
     "performances": [
       {
-        "id": "p-422fca9a",
-        "streamId": "stream-69047977",
-        "date": "2026-04-18",
-        "streamTitle": "【歌回】上週沒唱到歌！久等了耶！｜朧Oboro",
-        "videoId": "NjGAsumGDdQ",
-        "timestamp": 1774,
-        "endTimestamp": 1942,
-        "note": ""
-      }
-    ]
-  },
-  {
-    "id": "song-0dbe4e3d",
-    "workId": "work-song-0dbe4e3d",
-    "title": "徘徊",
-    "originalArtist": "AKASAKI",
-    "tags": [],
-    "performances": [
-      {
-        "id": "p-715942bd",
-        "streamId": "stream-69047977",
-        "date": "2026-04-18",
-        "streamTitle": "【歌回】上週沒唱到歌！久等了耶！｜朧Oboro",
-        "videoId": "NjGAsumGDdQ",
-        "timestamp": 1263,
-        "endTimestamp": 1453,
-        "note": ""
-      }
-    ]
-  },
-  {
-    "id": "song-14242dbb",
-    "workId": "work-song-14242dbb",
-    "title": "如果雨之後",
-    "originalArtist": "周興哲",
-    "tags": [],
-    "performances": [
-      {
-        "id": "p-bc0453a3",
+        "id": "p-9eeaf37f",
         "streamId": "stream-591c50e8",
-        "date": "2026-04-04",
-        "streamTitle": "【歌回】哇拉拉拉拉拉拉歌回｜朧Oboro",
         "videoId": "zjFwAVFay8Y",
-        "timestamp": 6207,
-        "endTimestamp": 6471,
-        "note": ""
+        "timestamp": 2933,
+        "endTimestamp": 3254
+      }
+    ]
+  },
+  {
+    "id": "song-99030ff8",
+    "workId": "work-song-45adfe21",
+    "title": "小悪魔だってかまわない！",
+    "originalArtist": "HoneyWorks feat. 初音ミク",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-b8648fc4",
+        "streamId": "stream-69047977",
+        "videoId": "NjGAsumGDdQ",
+        "timestamp": 5373,
+        "endTimestamp": 5579
       },
       {
-        "id": "p-e92b5391",
-        "streamId": "stream-2026-04-30",
-        "date": "2026-04-30",
-        "streamTitle": "【哄睡歌回】嘿嘿 在我的歌聲中睡去吧！｜朧Oboro",
-        "videoId": "KfadSsRBCi8",
-        "timestamp": 2497,
-        "endTimestamp": 2768,
-        "note": ""
-      }
-    ]
-  },
-  {
-    "id": "song-1b1770d6",
-    "workId": "work-song-1b1770d6",
-    "title": "夜のピエロ",
-    "originalArtist": "Ado",
-    "tags": [],
-    "performances": [
-      {
-        "id": "p-5fea5dfc",
+        "id": "p-dcfb7c15",
         "streamId": "stream-591c50e8",
-        "date": "2026-04-04",
-        "streamTitle": "【歌回】哇拉拉拉拉拉拉歌回｜朧Oboro",
         "videoId": "zjFwAVFay8Y",
-        "timestamp": 1205,
-        "endTimestamp": 1404,
-        "note": ""
+        "timestamp": 5119,
+        "endTimestamp": 5325
       }
     ]
   },
@@ -95,782 +48,9 @@
       {
         "id": "p-f7b7bc92",
         "streamId": "stream-2026-04-30",
-        "date": "2026-04-30",
-        "streamTitle": "【哄睡歌回】嘿嘿 在我的歌聲中睡去吧！｜朧Oboro",
         "videoId": "KfadSsRBCi8",
         "timestamp": 1302,
-        "endTimestamp": 1617,
-        "note": ""
-      }
-    ]
-  },
-  {
-    "id": "song-4ad21f46",
-    "workId": "work-song-1650",
-    "title": "孤勇者",
-    "originalArtist": "陳奕迅",
-    "tags": [],
-    "performances": [
-      {
-        "id": "p-0b1082a2",
-        "streamId": "stream-591c50e8",
-        "date": "2026-04-04",
-        "streamTitle": "【歌回】哇拉拉拉拉拉拉歌回｜朧Oboro",
-        "videoId": "zjFwAVFay8Y",
-        "timestamp": 5404,
-        "endTimestamp": 5659,
-        "note": ""
-      }
-    ]
-  },
-  {
-    "id": "song-511d4f3f",
-    "workId": "work-song-2148",
-    "title": "泡沫の夜",
-    "originalArtist": "nqrse",
-    "tags": [],
-    "performances": [
-      {
-        "id": "p-cac0f746",
-        "streamId": "stream-69047977",
-        "date": "2026-04-18",
-        "streamTitle": "【歌回】上週沒唱到歌！久等了耶！｜朧Oboro",
-        "videoId": "NjGAsumGDdQ",
-        "timestamp": 4346,
-        "endTimestamp": 4561,
-        "note": ""
-      }
-    ]
-  },
-  {
-    "id": "song-53a8a024",
-    "workId": "work-song-53a8a024",
-    "title": "IRIS OUT",
-    "originalArtist": "米津玄師",
-    "tags": [],
-    "performances": [
-      {
-        "id": "p-a3d2fc2e",
-        "streamId": "stream-591c50e8",
-        "date": "2026-04-04",
-        "streamTitle": "【歌回】哇拉拉拉拉拉拉歌回｜朧Oboro",
-        "videoId": "zjFwAVFay8Y",
-        "timestamp": 7693,
-        "endTimestamp": 7840,
-        "note": ""
-      }
-    ]
-  },
-  {
-    "id": "song-557bf660",
-    "workId": "work-song-557bf660",
-    "title": "深昏睡",
-    "originalArtist": "春野 feat. 初音ミク",
-    "tags": [],
-    "performances": [
-      {
-        "id": "p-05f38894",
-        "streamId": "stream-2026-04-30",
-        "date": "2026-04-30",
-        "streamTitle": "【哄睡歌回】嘿嘿 在我的歌聲中睡去吧！｜朧Oboro",
-        "videoId": "KfadSsRBCi8",
-        "timestamp": 4153,
-        "endTimestamp": 4393,
-        "note": ""
-      }
-    ]
-  },
-  {
-    "id": "song-562ecb16",
-    "workId": "work-song-562ecb16",
-    "title": "115万キロのフィルム",
-    "originalArtist": "髭男",
-    "tags": [],
-    "performances": [
-      {
-        "id": "p-9eeaf37f",
-        "streamId": "stream-591c50e8",
-        "date": "2026-04-04",
-        "streamTitle": "【歌回】哇拉拉拉拉拉拉歌回｜朧Oboro",
-        "videoId": "zjFwAVFay8Y",
-        "timestamp": 2933,
-        "endTimestamp": 3254,
-        "note": ""
-      }
-    ]
-  },
-  {
-    "id": "song-5ff734da",
-    "workId": "work-song-5ff734da",
-    "title": "真生活",
-    "originalArtist": "案山子 feat. 初音ミク",
-    "tags": [],
-    "performances": [
-      {
-        "id": "p-134c78ed",
-        "streamId": "stream-69047977",
-        "date": "2026-04-18",
-        "streamTitle": "【歌回】上週沒唱到歌！久等了耶！｜朧Oboro",
-        "videoId": "NjGAsumGDdQ",
-        "timestamp": 465,
-        "endTimestamp": 709,
-        "note": ""
-      }
-    ]
-  },
-  {
-    "id": "song-65fe6deb",
-    "workId": "work-song-65fe6deb",
-    "title": "青春修煉手冊",
-    "originalArtist": "TFBOYS",
-    "tags": [],
-    "performances": [
-      {
-        "id": "p-c02c87ff",
-        "streamId": "stream-591c50e8",
-        "date": "2026-04-04",
-        "streamTitle": "【歌回】哇拉拉拉拉拉拉歌回｜朧Oboro",
-        "videoId": "zjFwAVFay8Y",
-        "timestamp": 4478,
-        "endTimestamp": 4741,
-        "note": ""
-      }
-    ]
-  },
-  {
-    "id": "song-74baa9d8",
-    "workId": "work-song-74baa9d8",
-    "title": "flos",
-    "originalArtist": "R Sound Design feat. 初音ミク",
-    "tags": [],
-    "performances": [
-      {
-        "id": "p-cb2e5dfd",
-        "streamId": "stream-2026-04-30",
-        "date": "2026-04-30",
-        "streamTitle": "【哄睡歌回】嘿嘿 在我的歌聲中睡去吧！｜朧Oboro",
-        "videoId": "KfadSsRBCi8",
-        "timestamp": 2885,
-        "endTimestamp": 3157,
-        "note": ""
-      }
-    ]
-  },
-  {
-    "id": "song-752b5d39",
-    "workId": "work-song-1283",
-    "title": "Love Yourself",
-    "originalArtist": "Justin Bieber",
-    "tags": [],
-    "performances": [
-      {
-        "id": "p-26666bbd",
-        "streamId": "stream-2026-04-30",
-        "date": "2026-04-30",
-        "streamTitle": "【哄睡歌回】嘿嘿 在我的歌聲中睡去吧！｜朧Oboro",
-        "videoId": "KfadSsRBCi8",
-        "timestamp": 982,
-        "endTimestamp": 1236,
-        "note": ""
-      }
-    ]
-  },
-  {
-    "id": "song-7d28ba70",
-    "workId": "work-song-424e636c",
-    "title": "たばこ",
-    "originalArtist": "コレサワ",
-    "tags": [],
-    "performances": [
-      {
-        "id": "p-0ead53d6",
-        "streamId": "stream-69047977",
-        "date": "2026-04-18",
-        "streamTitle": "【歌回】上週沒唱到歌！久等了耶！｜朧Oboro",
-        "videoId": "NjGAsumGDdQ",
-        "timestamp": 3903,
-        "endTimestamp": 4260,
-        "note": ""
-      }
-    ]
-  },
-  {
-    "id": "song-8cb605dc",
-    "workId": "work-song-8cb605dc",
-    "title": "ファンサ",
-    "originalArtist": "HoneyWorks feat. mona (CV：夏川椎菜)",
-    "tags": [],
-    "performances": [
-      {
-        "id": "p-db300b10",
-        "streamId": "stream-69047977",
-        "date": "2026-04-18",
-        "streamTitle": "【歌回】上週沒唱到歌！久等了耶！｜朧Oboro",
-        "videoId": "NjGAsumGDdQ",
-        "timestamp": 5605,
-        "endTimestamp": 5855,
-        "note": ""
-      }
-    ]
-  },
-  {
-    "id": "song-8d59c545",
-    "workId": "work-song-781",
-    "title": "My Dearest",
-    "originalArtist": "supercell",
-    "tags": [],
-    "performances": [
-      {
-        "id": "p-90eccc52",
-        "streamId": "stream-591c50e8",
-        "date": "2026-04-04",
-        "streamTitle": "【歌回】哇拉拉拉拉拉拉歌回｜朧Oboro",
-        "videoId": "zjFwAVFay8Y",
-        "timestamp": 2523,
-        "endTimestamp": 2857,
-        "note": ""
-      }
-    ]
-  },
-  {
-    "id": "song-928e50e5",
-    "workId": "work-song-928e50e5",
-    "title": "愛言葉IV",
-    "originalArtist": "DECO*27 feat. 初音ミク",
-    "tags": [],
-    "performances": [
-      {
-        "id": "p-2034d328",
-        "streamId": "stream-69047977",
-        "date": "2026-04-18",
-        "streamTitle": "【歌回】上週沒唱到歌！久等了耶！｜朧Oboro",
-        "videoId": "NjGAsumGDdQ",
-        "timestamp": 3311,
-        "endTimestamp": 3528,
-        "note": ""
-      }
-    ]
-  },
-  {
-    "id": "song-99030ff8",
-    "workId": "work-song-45adfe21",
-    "title": "小悪魔だってかまわない！",
-    "originalArtist": "HoneyWorks feat. 初音ミク",
-    "tags": [],
-    "performances": [
-      {
-        "id": "p-dcfb7c15",
-        "streamId": "stream-591c50e8",
-        "date": "2026-04-04",
-        "streamTitle": "【歌回】哇拉拉拉拉拉拉歌回｜朧Oboro",
-        "videoId": "zjFwAVFay8Y",
-        "timestamp": 5119,
-        "endTimestamp": 5325,
-        "note": ""
-      },
-      {
-        "id": "p-b8648fc4",
-        "streamId": "stream-69047977",
-        "date": "2026-04-18",
-        "streamTitle": "【歌回】上週沒唱到歌！久等了耶！｜朧Oboro",
-        "videoId": "NjGAsumGDdQ",
-        "timestamp": 5373,
-        "endTimestamp": 5579,
-        "note": ""
-      }
-    ]
-  },
-  {
-    "id": "song-9b5e91a1",
-    "workId": "work-song-2015",
-    "title": "失眠飛行",
-    "originalArtist": "接個吻， 開一槍、沈以誠、薛明媛",
-    "tags": [],
-    "performances": [
-      {
-        "id": "p-2b9e7842",
-        "streamId": "stream-69047977",
-        "date": "2026-04-18",
-        "streamTitle": "【歌回】上週沒唱到歌！久等了耶！｜朧Oboro",
-        "videoId": "NjGAsumGDdQ",
-        "timestamp": 2239,
-        "endTimestamp": 2446,
-        "note": ""
-      }
-    ]
-  },
-  {
-    "id": "song-a11a4aef",
-    "workId": "work-song-206",
-    "title": "怪獣の花唄",
-    "originalArtist": "Vaundy",
-    "tags": [],
-    "performances": [
-      {
-        "id": "p-6c6ad6a4",
-        "streamId": "stream-591c50e8",
-        "date": "2026-04-04",
-        "streamTitle": "【歌回】哇拉拉拉拉拉拉歌回｜朧Oboro",
-        "videoId": "zjFwAVFay8Y",
-        "timestamp": 5890,
-        "endTimestamp": 6113,
-        "note": ""
-      }
-    ]
-  },
-  {
-    "id": "song-a1c1bc91",
-    "workId": "work-song-a1c1bc91",
-    "title": "fake face dance music",
-    "originalArtist": "音田雅則",
-    "tags": [],
-    "performances": [
-      {
-        "id": "p-f221a8d9",
-        "streamId": "stream-591c50e8",
-        "date": "2026-04-04",
-        "streamTitle": "【歌回】哇拉拉拉拉拉拉歌回｜朧Oboro",
-        "videoId": "zjFwAVFay8Y",
-        "timestamp": 2132,
-        "endTimestamp": 2282,
-        "note": ""
-      }
-    ]
-  },
-  {
-    "id": "song-a4292374",
-    "workId": "work-song-130",
-    "title": "アイネクライネ",
-    "originalArtist": "米津玄師",
-    "tags": [],
-    "performances": [
-      {
-        "id": "p-4e44e500",
-        "streamId": "stream-69047977",
-        "date": "2026-04-18",
-        "streamTitle": "【歌回】上週沒唱到歌！久等了耶！｜朧Oboro",
-        "videoId": "NjGAsumGDdQ",
-        "timestamp": 2512,
-        "endTimestamp": 2802,
-        "note": ""
-      }
-    ]
-  },
-  {
-    "id": "song-a700e63c",
-    "workId": "work-song-a700e63c",
-    "title": "愛我的時候",
-    "originalArtist": "周興哲、單依純",
-    "tags": [],
-    "performances": [
-      {
-        "id": "p-1ead6c93",
-        "streamId": "stream-69047977",
-        "date": "2026-04-18",
-        "streamTitle": "【歌回】上週沒唱到歌！久等了耶！｜朧Oboro",
-        "videoId": "NjGAsumGDdQ",
-        "timestamp": 758,
-        "endTimestamp": 979,
-        "note": ""
-      }
-    ]
-  },
-  {
-    "id": "song-ad031d58",
-    "workId": "work-song-03d847b3",
-    "title": "刻在我心底的名字",
-    "originalArtist": "盧廣仲",
-    "tags": [],
-    "performances": [
-      {
-        "id": "p-c49cd143",
-        "streamId": "stream-591c50e8",
-        "date": "2026-04-04",
-        "streamTitle": "【歌回】哇拉拉拉拉拉拉歌回｜朧Oboro",
-        "videoId": "zjFwAVFay8Y",
-        "timestamp": 3333,
-        "endTimestamp": 3640,
-        "note": ""
-      }
-    ]
-  },
-  {
-    "id": "song-b0a69152",
-    "workId": "work-song-3046",
-    "title": "聽見下雨的聲音",
-    "originalArtist": "魏如昀",
-    "tags": [],
-    "performances": [
-      {
-        "id": "p-baa6eba1",
-        "streamId": "stream-2026-04-30",
-        "date": "2026-04-30",
-        "streamTitle": "【哄睡歌回】嘿嘿 在我的歌聲中睡去吧！｜朧Oboro",
-        "videoId": "KfadSsRBCi8",
-        "timestamp": 3777,
-        "endTimestamp": 4057,
-        "note": ""
-      }
-    ]
-  },
-  {
-    "id": "song-b3f6614d",
-    "workId": "work-song-3cbb79f1",
-    "title": "希望你回來",
-    "originalArtist": "TRASH",
-    "tags": [],
-    "performances": [
-      {
-        "id": "p-b97ed03d",
-        "streamId": "stream-69047977",
-        "date": "2026-04-18",
-        "streamTitle": "【歌回】上週沒唱到歌！久等了耶！｜朧Oboro",
-        "videoId": "NjGAsumGDdQ",
-        "timestamp": 6282,
-        "endTimestamp": 6679,
-        "note": ""
-      }
-    ]
-  },
-  {
-    "id": "song-b46a2b6a",
-    "workId": "work-song-893c71f2",
-    "title": "プロポーズ",
-    "originalArtist": "内緒のピアス feat. 可不",
-    "tags": [],
-    "performances": [
-      {
-        "id": "p-8542a844",
-        "streamId": "stream-69047977",
-        "date": "2026-04-18",
-        "streamTitle": "【歌回】上週沒唱到歌！久等了耶！｜朧Oboro",
-        "videoId": "NjGAsumGDdQ",
-        "timestamp": 5970,
-        "endTimestamp": 6204,
-        "note": ""
-      }
-    ]
-  },
-  {
-    "id": "song-b58f95de",
-    "workId": "work-song-1549",
-    "title": "ぎゅっと。",
-    "originalArtist": "もさを。",
-    "tags": [],
-    "performances": [
-      {
-        "id": "p-b73f1a22",
-        "streamId": "stream-2026-04-30",
-        "date": "2026-04-30",
-        "streamTitle": "【哄睡歌回】嘿嘿 在我的歌聲中睡去吧！｜朧Oboro",
-        "videoId": "KfadSsRBCi8",
-        "timestamp": 131,
-        "endTimestamp": 396,
-        "note": ""
-      }
-    ]
-  },
-  {
-    "id": "song-bd3e71e9",
-    "workId": "work-song-1709",
-    "title": "Beauty and a Beat",
-    "originalArtist": "Justin Bieber",
-    "tags": [],
-    "performances": [
-      {
-        "id": "p-765c079b",
-        "streamId": "stream-2026-04-30",
-        "date": "2026-04-30",
-        "streamTitle": "【哄睡歌回】嘿嘿 在我的歌聲中睡去吧！｜朧Oboro",
-        "videoId": "KfadSsRBCi8",
-        "timestamp": 2146,
-        "endTimestamp": 2331,
-        "note": ""
-      }
-    ]
-  },
-  {
-    "id": "song-c8d97e10",
-    "workId": "work-song-20d0c012",
-    "title": "Glimpse of Us",
-    "originalArtist": "Joji",
-    "tags": [],
-    "performances": [
-      {
-        "id": "p-ae6a1d6d",
-        "streamId": "stream-2026-04-30",
-        "date": "2026-04-30",
-        "streamTitle": "【哄睡歌回】嘿嘿 在我的歌聲中睡去吧！｜朧Oboro",
-        "videoId": "KfadSsRBCi8",
-        "timestamp": 3283,
-        "endTimestamp": 3462,
-        "note": ""
-      }
-    ]
-  },
-  {
-    "id": "song-cec27eb2",
-    "workId": "work-song-2123",
-    "title": "你，好不好？",
-    "originalArtist": "周興哲",
-    "tags": [],
-    "performances": [
-      {
-        "id": "p-452c5789",
-        "streamId": "stream-591c50e8",
-        "date": "2026-04-04",
-        "streamTitle": "【歌回】哇拉拉拉拉拉拉歌回｜朧Oboro",
-        "videoId": "zjFwAVFay8Y",
-        "timestamp": 6589,
-        "endTimestamp": 6872,
-        "note": ""
-      }
-    ]
-  },
-  {
-    "id": "song-d93258c0",
-    "workId": "work-song-2335",
-    "title": "東京サマーセッション",
-    "originalArtist": "HoneyWorks",
-    "tags": [],
-    "performances": [
-      {
-        "id": "p-3c8bca3e",
-        "streamId": "stream-591c50e8",
-        "date": "2026-04-04",
-        "streamTitle": "【歌回】哇拉拉拉拉拉拉歌回｜朧Oboro",
-        "videoId": "zjFwAVFay8Y",
-        "timestamp": 3850,
-        "endTimestamp": 4075,
-        "note": ""
-      }
-    ]
-  },
-  {
-    "id": "song-dbca74ad",
-    "workId": "work-song-54e3adfe",
-    "title": "紅豆",
-    "originalArtist": "王菲",
-    "tags": [],
-    "performances": [
-      {
-        "id": "p-0c558270",
-        "streamId": "stream-2026-04-30",
-        "date": "2026-04-30",
-        "streamTitle": "【哄睡歌回】嘿嘿 在我的歌聲中睡去吧！｜朧Oboro",
-        "videoId": "KfadSsRBCi8",
-        "timestamp": 5013,
-        "endTimestamp": 5248,
-        "note": ""
-      }
-    ]
-  },
-  {
-    "id": "song-dd2838de",
-    "workId": "work-song-5dbfed7f",
-    "title": "Someone You Loved",
-    "originalArtist": "Lewis Capaldi",
-    "tags": [],
-    "performances": [
-      {
-        "id": "p-489104b9",
-        "streamId": "stream-69047977",
-        "date": "2026-04-18",
-        "streamTitle": "【歌回】上週沒唱到歌！久等了耶！｜朧Oboro",
-        "videoId": "NjGAsumGDdQ",
-        "timestamp": 6818,
-        "endTimestamp": 6996,
-        "note": ""
-      }
-    ]
-  },
-  {
-    "id": "song-de9a3d6d",
-    "workId": "work-song-1815",
-    "title": "花に亡霊",
-    "originalArtist": "ヨルシカ",
-    "tags": [],
-    "performances": [
-      {
-        "id": "p-0b1d3407",
-        "streamId": "stream-591c50e8",
-        "date": "2026-04-04",
-        "streamTitle": "【歌回】哇拉拉拉拉拉拉歌回｜朧Oboro",
-        "videoId": "zjFwAVFay8Y",
-        "timestamp": 1634,
-        "endTimestamp": 1873,
-        "note": ""
-      }
-    ]
-  },
-  {
-    "id": "song-e1e30f8f",
-    "workId": "work-song-1151",
-    "title": "Love Me Like You Do",
-    "originalArtist": "Ellie Goulding",
-    "tags": [],
-    "performances": [
-      {
-        "id": "p-0b0758af",
-        "streamId": "stream-2026-04-30",
-        "date": "2026-04-30",
-        "streamTitle": "【哄睡歌回】嘿嘿 在我的歌聲中睡去吧！｜朧Oboro",
-        "videoId": "KfadSsRBCi8",
-        "timestamp": 4656,
-        "endTimestamp": 4905,
-        "note": ""
-      }
-    ]
-  },
-  {
-    "id": "song-e38febd1",
-    "workId": "work-song-61f73aa3",
-    "title": "鬼ノ宴",
-    "originalArtist": "友成空",
-    "tags": [],
-    "performances": [
-      {
-        "id": "p-89128293",
-        "streamId": "stream-69047977",
-        "date": "2026-04-18",
-        "streamTitle": "【歌回】上週沒唱到歌！久等了耶！｜朧Oboro",
-        "videoId": "NjGAsumGDdQ",
-        "timestamp": 1518,
-        "endTimestamp": 1695,
-        "note": ""
-      }
-    ]
-  },
-  {
-    "id": "song-ed8ffb3b",
-    "workId": "work-song-ed8ffb3b",
-    "title": "マーシャル・マキシマイザー",
-    "originalArtist": "柊マグネタイト feat. 可不",
-    "tags": [],
-    "performances": [
-      {
-        "id": "p-d6ad7472",
-        "streamId": "stream-69047977",
-        "date": "2026-04-18",
-        "streamTitle": "【歌回】上週沒唱到歌！久等了耶！｜朧Oboro",
-        "videoId": "NjGAsumGDdQ",
-        "timestamp": 264,
-        "endTimestamp": 426,
-        "note": ""
-      }
-    ]
-  },
-  {
-    "id": "song-ee688b03",
-    "workId": "work-song-27",
-    "title": "Ref:rain",
-    "originalArtist": "Aimer",
-    "tags": [],
-    "performances": [
-      {
-        "id": "p-e2611b1a",
-        "streamId": "stream-2026-04-30",
-        "date": "2026-04-30",
-        "streamTitle": "【哄睡歌回】嘿嘿 在我的歌聲中睡去吧！｜朧Oboro",
-        "videoId": "KfadSsRBCi8",
-        "timestamp": 1712,
-        "endTimestamp": 1999,
-        "note": ""
-      }
-    ]
-  },
-  {
-    "id": "song-eff3ba2d",
-    "workId": "work-song-eff3ba2d",
-    "title": "有些",
-    "originalArtist": "顏人中",
-    "tags": [],
-    "performances": [
-      {
-        "id": "p-7821fc45",
-        "streamId": "stream-69047977",
-        "date": "2026-04-18",
-        "streamTitle": "【歌回】上週沒唱到歌！久等了耶！｜朧Oboro",
-        "videoId": "NjGAsumGDdQ",
-        "timestamp": 2853,
-        "endTimestamp": 3080,
-        "note": ""
-      }
-    ]
-  },
-  {
-    "id": "song-f5aed223",
-    "workId": "work-song-0c2ee33c",
-    "title": "幾分之幾",
-    "originalArtist": "盧廣仲",
-    "tags": [],
-    "performances": [
-      {
-        "id": "p-3e696e36",
-        "streamId": "stream-69047977",
-        "date": "2026-04-18",
-        "streamTitle": "【歌回】上週沒唱到歌！久等了耶！｜朧Oboro",
-        "videoId": "NjGAsumGDdQ",
-        "timestamp": 4908,
-        "endTimestamp": 5129,
-        "note": ""
-      }
-    ]
-  },
-  {
-    "id": "song-f8de293b",
-    "workId": "work-song-f8de293b",
-    "title": "スイートマジック",
-    "originalArtist": "ろん×Junky",
-    "tags": [],
-    "performances": [
-      {
-        "id": "p-4fae6ce8",
-        "streamId": "stream-69047977",
-        "date": "2026-04-18",
-        "streamTitle": "【歌回】上週沒唱到歌！久等了耶！｜朧Oboro",
-        "videoId": "NjGAsumGDdQ",
-        "timestamp": 3578,
-        "endTimestamp": 3792,
-        "note": ""
-      }
-    ]
-  },
-  {
-    "id": "song-fb50c3c2",
-    "workId": "work-song-fb50c3c2",
-    "title": "beside you",
-    "originalArtist": "keshi",
-    "tags": [],
-    "performances": [
-      {
-        "id": "p-72405574",
-        "streamId": "stream-69047977",
-        "date": "2026-04-18",
-        "streamTitle": "【歌回】上週沒唱到歌！久等了耶！｜朧Oboro",
-        "videoId": "NjGAsumGDdQ",
-        "timestamp": 4651,
-        "endTimestamp": 4819,
-        "note": ""
-      }
-    ]
-  },
-  {
-    "id": "song-fc807347",
-    "workId": "work-song-2104",
-    "title": "晚餐歌",
-    "originalArtist": "tuki.",
-    "tags": [],
-    "performances": [
-      {
-        "id": "p-1bf5ab3e",
-        "streamId": "stream-591c50e8",
-        "date": "2026-04-04",
-        "streamTitle": "【歌回】哇拉拉拉拉拉拉歌回｜朧Oboro",
-        "videoId": "zjFwAVFay8Y",
-        "timestamp": 532,
-        "endTimestamp": 748,
-        "note": ""
+        "endTimestamp": 1617
       }
     ]
   },
@@ -884,12 +64,688 @@
       {
         "id": "p-a3403ce1",
         "streamId": "stream-591c50e8",
-        "date": "2026-04-04",
-        "streamTitle": "【歌回】哇拉拉拉拉拉拉歌回｜朧Oboro",
         "videoId": "zjFwAVFay8Y",
         "timestamp": 6968,
-        "endTimestamp": 7203,
-        "note": ""
+        "endTimestamp": 7203
+      }
+    ]
+  },
+  {
+    "id": "song-9b5e91a1",
+    "workId": "work-song-2015",
+    "title": "失眠飛行",
+    "originalArtist": "接個吻， 開一槍、沈以誠、薛明媛",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-2b9e7842",
+        "streamId": "stream-69047977",
+        "videoId": "NjGAsumGDdQ",
+        "timestamp": 2239,
+        "endTimestamp": 2446
+      }
+    ]
+  },
+  {
+    "id": "song-14242dbb",
+    "workId": "work-song-14242dbb",
+    "title": "如果雨之後",
+    "originalArtist": "周興哲",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-e92b5391",
+        "streamId": "stream-2026-04-30",
+        "videoId": "KfadSsRBCi8",
+        "timestamp": 2497,
+        "endTimestamp": 2768
+      },
+      {
+        "id": "p-bc0453a3",
+        "streamId": "stream-591c50e8",
+        "videoId": "zjFwAVFay8Y",
+        "timestamp": 6207,
+        "endTimestamp": 6471
+      }
+    ]
+  },
+  {
+    "id": "song-eff3ba2d",
+    "workId": "work-song-eff3ba2d",
+    "title": "有些",
+    "originalArtist": "顏人中",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-7821fc45",
+        "streamId": "stream-69047977",
+        "videoId": "NjGAsumGDdQ",
+        "timestamp": 2853,
+        "endTimestamp": 3080
+      }
+    ]
+  },
+  {
+    "id": "song-cec27eb2",
+    "workId": "work-song-2123",
+    "title": "你，好不好？",
+    "originalArtist": "周興哲",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-452c5789",
+        "streamId": "stream-591c50e8",
+        "videoId": "zjFwAVFay8Y",
+        "timestamp": 6589,
+        "endTimestamp": 6872
+      }
+    ]
+  },
+  {
+    "id": "song-b3f6614d",
+    "workId": "work-song-3cbb79f1",
+    "title": "希望你回來",
+    "originalArtist": "TRASH",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-b97ed03d",
+        "streamId": "stream-69047977",
+        "videoId": "NjGAsumGDdQ",
+        "timestamp": 6282,
+        "endTimestamp": 6679
+      }
+    ]
+  },
+  {
+    "id": "song-ad031d58",
+    "workId": "work-song-03d847b3",
+    "title": "刻在我心底的名字",
+    "originalArtist": "盧廣仲",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-c49cd143",
+        "streamId": "stream-591c50e8",
+        "videoId": "zjFwAVFay8Y",
+        "timestamp": 3333,
+        "endTimestamp": 3640
+      }
+    ]
+  },
+  {
+    "id": "song-1b1770d6",
+    "workId": "work-song-1b1770d6",
+    "title": "夜のピエロ",
+    "originalArtist": "Ado",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-5fea5dfc",
+        "streamId": "stream-591c50e8",
+        "videoId": "zjFwAVFay8Y",
+        "timestamp": 1205,
+        "endTimestamp": 1404
+      }
+    ]
+  },
+  {
+    "id": "song-4ad21f46",
+    "workId": "work-song-1650",
+    "title": "孤勇者",
+    "originalArtist": "陳奕迅",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-0b1082a2",
+        "streamId": "stream-591c50e8",
+        "videoId": "zjFwAVFay8Y",
+        "timestamp": 5404,
+        "endTimestamp": 5659
+      }
+    ]
+  },
+  {
+    "id": "song-a11a4aef",
+    "workId": "work-song-206",
+    "title": "怪獣の花唄",
+    "originalArtist": "Vaundy",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-6c6ad6a4",
+        "streamId": "stream-591c50e8",
+        "videoId": "zjFwAVFay8Y",
+        "timestamp": 5890,
+        "endTimestamp": 6113
+      }
+    ]
+  },
+  {
+    "id": "song-d93258c0",
+    "workId": "work-song-2335",
+    "title": "東京サマーセッション",
+    "originalArtist": "HoneyWorks",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-3c8bca3e",
+        "streamId": "stream-591c50e8",
+        "videoId": "zjFwAVFay8Y",
+        "timestamp": 3850,
+        "endTimestamp": 4075
+      }
+    ]
+  },
+  {
+    "id": "song-511d4f3f",
+    "workId": "work-song-2148",
+    "title": "泡沫の夜",
+    "originalArtist": "nqrse",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-cac0f746",
+        "streamId": "stream-69047977",
+        "videoId": "NjGAsumGDdQ",
+        "timestamp": 4346,
+        "endTimestamp": 4561
+      }
+    ]
+  },
+  {
+    "id": "song-de9a3d6d",
+    "workId": "work-song-1815",
+    "title": "花に亡霊",
+    "originalArtist": "ヨルシカ",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-0b1d3407",
+        "streamId": "stream-591c50e8",
+        "videoId": "zjFwAVFay8Y",
+        "timestamp": 1634,
+        "endTimestamp": 1873
+      }
+    ]
+  },
+  {
+    "id": "song-65fe6deb",
+    "workId": "work-song-65fe6deb",
+    "title": "青春修煉手冊",
+    "originalArtist": "TFBOYS",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-c02c87ff",
+        "streamId": "stream-591c50e8",
+        "videoId": "zjFwAVFay8Y",
+        "timestamp": 4478,
+        "endTimestamp": 4741
+      }
+    ]
+  },
+  {
+    "id": "song-dbca74ad",
+    "workId": "work-song-54e3adfe",
+    "title": "紅豆",
+    "originalArtist": "王菲",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-0c558270",
+        "streamId": "stream-2026-04-30",
+        "videoId": "KfadSsRBCi8",
+        "timestamp": 5013,
+        "endTimestamp": 5248
+      }
+    ]
+  },
+  {
+    "id": "song-5ff734da",
+    "workId": "work-song-5ff734da",
+    "title": "真生活",
+    "originalArtist": "案山子 feat. 初音ミク",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-134c78ed",
+        "streamId": "stream-69047977",
+        "videoId": "NjGAsumGDdQ",
+        "timestamp": 465,
+        "endTimestamp": 709
+      }
+    ]
+  },
+  {
+    "id": "song-e38febd1",
+    "workId": "work-song-61f73aa3",
+    "title": "鬼ノ宴",
+    "originalArtist": "友成空",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-89128293",
+        "streamId": "stream-69047977",
+        "videoId": "NjGAsumGDdQ",
+        "timestamp": 1518,
+        "endTimestamp": 1695
+      }
+    ]
+  },
+  {
+    "id": "song-0dbe4e3d",
+    "workId": "work-song-0dbe4e3d",
+    "title": "徘徊",
+    "originalArtist": "AKASAKI",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-715942bd",
+        "streamId": "stream-69047977",
+        "videoId": "NjGAsumGDdQ",
+        "timestamp": 1263,
+        "endTimestamp": 1453
+      }
+    ]
+  },
+  {
+    "id": "song-fc807347",
+    "workId": "work-song-2104",
+    "title": "晚餐歌",
+    "originalArtist": "tuki.",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-1bf5ab3e",
+        "streamId": "stream-591c50e8",
+        "videoId": "zjFwAVFay8Y",
+        "timestamp": 532,
+        "endTimestamp": 748
+      }
+    ]
+  },
+  {
+    "id": "song-557bf660",
+    "workId": "work-song-557bf660",
+    "title": "深昏睡",
+    "originalArtist": "春野 feat. 初音ミク",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-05f38894",
+        "streamId": "stream-2026-04-30",
+        "videoId": "KfadSsRBCi8",
+        "timestamp": 4153,
+        "endTimestamp": 4393
+      }
+    ]
+  },
+  {
+    "id": "song-f5aed223",
+    "workId": "work-song-0c2ee33c",
+    "title": "幾分之幾",
+    "originalArtist": "盧廣仲",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-3e696e36",
+        "streamId": "stream-69047977",
+        "videoId": "NjGAsumGDdQ",
+        "timestamp": 4908,
+        "endTimestamp": 5129
+      }
+    ]
+  },
+  {
+    "id": "song-a700e63c",
+    "workId": "work-song-a700e63c",
+    "title": "愛我的時候",
+    "originalArtist": "周興哲、單依純",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-1ead6c93",
+        "streamId": "stream-69047977",
+        "videoId": "NjGAsumGDdQ",
+        "timestamp": 758,
+        "endTimestamp": 979
+      }
+    ]
+  },
+  {
+    "id": "song-928e50e5",
+    "workId": "work-song-928e50e5",
+    "title": "愛言葉IV",
+    "originalArtist": "DECO*27 feat. 初音ミク",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-2034d328",
+        "streamId": "stream-69047977",
+        "videoId": "NjGAsumGDdQ",
+        "timestamp": 3311,
+        "endTimestamp": 3528
+      }
+    ]
+  },
+  {
+    "id": "song-b0a69152",
+    "workId": "work-song-3046",
+    "title": "聽見下雨的聲音",
+    "originalArtist": "魏如昀",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-baa6eba1",
+        "streamId": "stream-2026-04-30",
+        "videoId": "KfadSsRBCi8",
+        "timestamp": 3777,
+        "endTimestamp": 4057
+      }
+    ]
+  },
+  {
+    "id": "song-bd3e71e9",
+    "workId": "work-song-1709",
+    "title": "Beauty and a Beat",
+    "originalArtist": "Justin Bieber",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-765c079b",
+        "streamId": "stream-2026-04-30",
+        "videoId": "KfadSsRBCi8",
+        "timestamp": 2146,
+        "endTimestamp": 2331
+      }
+    ]
+  },
+  {
+    "id": "song-fb50c3c2",
+    "workId": "work-song-fb50c3c2",
+    "title": "beside you",
+    "originalArtist": "keshi",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-72405574",
+        "streamId": "stream-69047977",
+        "videoId": "NjGAsumGDdQ",
+        "timestamp": 4651,
+        "endTimestamp": 4819
+      }
+    ]
+  },
+  {
+    "id": "song-0745634f",
+    "workId": "work-song-0745634f",
+    "title": "Bling-Bang-Bang-Born",
+    "originalArtist": "Creepy Nuts",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-422fca9a",
+        "streamId": "stream-69047977",
+        "videoId": "NjGAsumGDdQ",
+        "timestamp": 1774,
+        "endTimestamp": 1942
+      }
+    ]
+  },
+  {
+    "id": "song-a1c1bc91",
+    "workId": "work-song-a1c1bc91",
+    "title": "fake face dance music",
+    "originalArtist": "音田雅則",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-f221a8d9",
+        "streamId": "stream-591c50e8",
+        "videoId": "zjFwAVFay8Y",
+        "timestamp": 2132,
+        "endTimestamp": 2282
+      }
+    ]
+  },
+  {
+    "id": "song-74baa9d8",
+    "workId": "work-song-74baa9d8",
+    "title": "flos",
+    "originalArtist": "R Sound Design feat. 初音ミク",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-cb2e5dfd",
+        "streamId": "stream-2026-04-30",
+        "videoId": "KfadSsRBCi8",
+        "timestamp": 2885,
+        "endTimestamp": 3157
+      }
+    ]
+  },
+  {
+    "id": "song-c8d97e10",
+    "workId": "work-song-20d0c012",
+    "title": "Glimpse of Us",
+    "originalArtist": "Joji",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-ae6a1d6d",
+        "streamId": "stream-2026-04-30",
+        "videoId": "KfadSsRBCi8",
+        "timestamp": 3283,
+        "endTimestamp": 3462
+      }
+    ]
+  },
+  {
+    "id": "song-53a8a024",
+    "workId": "work-song-53a8a024",
+    "title": "IRIS OUT",
+    "originalArtist": "米津玄師",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-a3d2fc2e",
+        "streamId": "stream-591c50e8",
+        "videoId": "zjFwAVFay8Y",
+        "timestamp": 7693,
+        "endTimestamp": 7840
+      }
+    ]
+  },
+  {
+    "id": "song-e1e30f8f",
+    "workId": "work-song-1151",
+    "title": "Love Me Like You Do",
+    "originalArtist": "Ellie Goulding",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-0b0758af",
+        "streamId": "stream-2026-04-30",
+        "videoId": "KfadSsRBCi8",
+        "timestamp": 4656,
+        "endTimestamp": 4905
+      }
+    ]
+  },
+  {
+    "id": "song-752b5d39",
+    "workId": "work-song-1283",
+    "title": "Love Yourself",
+    "originalArtist": "Justin Bieber",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-26666bbd",
+        "streamId": "stream-2026-04-30",
+        "videoId": "KfadSsRBCi8",
+        "timestamp": 982,
+        "endTimestamp": 1236
+      }
+    ]
+  },
+  {
+    "id": "song-8d59c545",
+    "workId": "work-song-781",
+    "title": "My Dearest",
+    "originalArtist": "supercell",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-90eccc52",
+        "streamId": "stream-591c50e8",
+        "videoId": "zjFwAVFay8Y",
+        "timestamp": 2523,
+        "endTimestamp": 2857
+      }
+    ]
+  },
+  {
+    "id": "song-ee688b03",
+    "workId": "work-song-27",
+    "title": "Ref:rain",
+    "originalArtist": "Aimer",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-e2611b1a",
+        "streamId": "stream-2026-04-30",
+        "videoId": "KfadSsRBCi8",
+        "timestamp": 1712,
+        "endTimestamp": 1999
+      }
+    ]
+  },
+  {
+    "id": "song-dd2838de",
+    "workId": "work-song-5dbfed7f",
+    "title": "Someone You Loved",
+    "originalArtist": "Lewis Capaldi",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-489104b9",
+        "streamId": "stream-69047977",
+        "videoId": "NjGAsumGDdQ",
+        "timestamp": 6818,
+        "endTimestamp": 6996
+      }
+    ]
+  },
+  {
+    "id": "song-a4292374",
+    "workId": "work-song-130",
+    "title": "アイネクライネ",
+    "originalArtist": "米津玄師",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-4e44e500",
+        "streamId": "stream-69047977",
+        "videoId": "NjGAsumGDdQ",
+        "timestamp": 2512,
+        "endTimestamp": 2802
+      }
+    ]
+  },
+  {
+    "id": "song-b58f95de",
+    "workId": "work-song-1549",
+    "title": "ぎゅっと。",
+    "originalArtist": "もさを。",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-b73f1a22",
+        "streamId": "stream-2026-04-30",
+        "videoId": "KfadSsRBCi8",
+        "timestamp": 131,
+        "endTimestamp": 396
+      }
+    ]
+  },
+  {
+    "id": "song-f8de293b",
+    "workId": "work-song-f8de293b",
+    "title": "スイートマジック",
+    "originalArtist": "ろん×Junky",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-4fae6ce8",
+        "streamId": "stream-69047977",
+        "videoId": "NjGAsumGDdQ",
+        "timestamp": 3578,
+        "endTimestamp": 3792
+      }
+    ]
+  },
+  {
+    "id": "song-7d28ba70",
+    "workId": "work-song-424e636c",
+    "title": "たばこ",
+    "originalArtist": "コレサワ",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-0ead53d6",
+        "streamId": "stream-69047977",
+        "videoId": "NjGAsumGDdQ",
+        "timestamp": 3903,
+        "endTimestamp": 4260
+      }
+    ]
+  },
+  {
+    "id": "song-8cb605dc",
+    "workId": "work-song-8cb605dc",
+    "title": "ファンサ",
+    "originalArtist": "HoneyWorks feat. mona (CV：夏川椎菜)",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-db300b10",
+        "streamId": "stream-69047977",
+        "videoId": "NjGAsumGDdQ",
+        "timestamp": 5605,
+        "endTimestamp": 5855
+      }
+    ]
+  },
+  {
+    "id": "song-b46a2b6a",
+    "workId": "work-song-893c71f2",
+    "title": "プロポーズ",
+    "originalArtist": "内緒のピアス feat. 可不",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-8542a844",
+        "streamId": "stream-69047977",
+        "videoId": "NjGAsumGDdQ",
+        "timestamp": 5970,
+        "endTimestamp": 6204
+      }
+    ]
+  },
+  {
+    "id": "song-ed8ffb3b",
+    "workId": "work-song-ed8ffb3b",
+    "title": "マーシャル・マキシマイザー",
+    "originalArtist": "柊マグネタイト feat. 可不",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-d6ad7472",
+        "streamId": "stream-69047977",
+        "videoId": "NjGAsumGDdQ",
+        "timestamp": 264,
+        "endTimestamp": 426
       }
     ]
   }

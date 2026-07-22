@@ -1,305 +1,17 @@
 [
   {
-    "id": "song-006cfcd3",
-    "workId": "work-song-006cfcd3",
-    "title": "怪物",
-    "originalArtist": "YOASOBI",
+    "id": "song-92a8829d",
+    "workId": "work-song-4ce2c5e1",
+    "title": "女孩",
+    "originalArtist": "韋禮安",
     "tags": [],
     "performances": [
       {
-        "id": "p-239f2ca6",
-        "streamId": "stream-b39375a3",
-        "date": "2025-12-31",
-        "streamTitle": "【跨年前歌回】2025年最後一唱，特別的日子當然要來點更特別的！",
-        "videoId": "WdkRZyLwmF4",
-        "timestamp": 3804,
-        "endTimestamp": 4007,
-        "note": ""
-      }
-    ]
-  },
-  {
-    "id": "song-03d847b3",
-    "workId": "work-song-03d847b3",
-    "title": "刻在我心底的名字",
-    "originalArtist": "盧廣仲",
-    "tags": [],
-    "performances": [
-      {
-        "id": "p-5d8b327f",
-        "streamId": "stream-2025-11-29",
-        "date": "2025-11-29",
-        "streamTitle": "【每月歌回】我愛唱歌、唱歌愛我，今天準備多一點中文歌！",
-        "videoId": "FthND9ZSB2Y",
-        "timestamp": 2200,
-        "endTimestamp": 2503,
-        "note": ""
-      }
-    ]
-  },
-  {
-    "id": "song-254f60c4",
-    "workId": "work-song-254f60c4",
-    "title": "老大",
-    "originalArtist": "Bridge",
-    "tags": [],
-    "performances": [
-      {
-        "id": "p-4c7d01f4",
+        "id": "p-6a79088f",
         "streamId": "stream-2026-02-05",
-        "date": "2026-02-05",
-        "streamTitle": "【歌回】即使人生有很多困難要跨越，卻還是要微笑面對，但首先今天要成為一個饒舌歌手！",
         "videoId": "AnuYwZNXN0I",
-        "timestamp": 5852,
-        "endTimestamp": 6014,
-        "note": ""
-      }
-    ]
-  },
-  {
-    "id": "song-2582b069",
-    "workId": "work-song-1233",
-    "title": "summertime",
-    "originalArtist": "cinnamons × evening cinema",
-    "tags": [],
-    "performances": [
-      {
-        "id": "p-390d71b8",
-        "streamId": "stream-dc06272b",
-        "date": "2025-10-29",
-        "streamTitle": "【首次歌回】新人vtuber即將滿月！準備了滿滿的心意給大家",
-        "videoId": "eb22brGYmck",
-        "timestamp": 1358,
-        "endTimestamp": 1510,
-        "note": ""
-      }
-    ]
-  },
-  {
-    "id": "song-2dae12e8",
-    "workId": "work-song-2dae12e8",
-    "title": "給我一首歌的時間",
-    "originalArtist": "周杰倫",
-    "tags": [],
-    "performances": [
-      {
-        "id": "p-a1f12902",
-        "streamId": "stream-2025-11-29",
-        "date": "2025-11-29",
-        "streamTitle": "【每月歌回】我愛唱歌、唱歌愛我，今天準備多一點中文歌！",
-        "videoId": "FthND9ZSB2Y",
-        "timestamp": 5559,
-        "endTimestamp": 5809,
-        "note": ""
-      }
-    ]
-  },
-  {
-    "id": "song-3a255c8d",
-    "workId": "work-song-3a255c8d",
-    "title": "ワールドイズマイン",
-    "originalArtist": "supercell feat. 初音ミク",
-    "tags": [],
-    "performances": [
-      {
-        "id": "p-32534671",
-        "streamId": "stream-2026-02-05",
-        "date": "2026-02-05",
-        "streamTitle": "【歌回】即使人生有很多困難要跨越，卻還是要微笑面對，但首先今天要成為一個饒舌歌手！",
-        "videoId": "AnuYwZNXN0I",
-        "timestamp": 5269,
-        "endTimestamp": 5520,
-        "note": ""
-      }
-    ]
-  },
-  {
-    "id": "song-3b3acc95",
-    "workId": "work-song-3b3acc95",
-    "title": "夜撫でるメノウ",
-    "originalArtist": "Ayase",
-    "tags": [],
-    "performances": [
-      {
-        "id": "p-1fcbee2d",
-        "streamId": "stream-b39375a3",
-        "date": "2025-12-31",
-        "streamTitle": "【跨年前歌回】2025年最後一唱，特別的日子當然要來點更特別的！",
-        "videoId": "WdkRZyLwmF4",
-        "timestamp": 568,
-        "endTimestamp": 846,
-        "note": ""
-      }
-    ]
-  },
-  {
-    "id": "song-46e6ac55",
-    "workId": "work-song-46e6ac55",
-    "title": "買榜",
-    "originalArtist": "熊仔 & 吳卓源",
-    "tags": [],
-    "performances": [
-      {
-        "id": "p-3a6f8bcf",
-        "streamId": "stream-2026-02-05",
-        "date": "2026-02-05",
-        "streamTitle": "【歌回】即使人生有很多困難要跨越，卻還是要微笑面對，但首先今天要成為一個饒舌歌手！",
-        "videoId": "AnuYwZNXN0I",
-        "timestamp": 3820,
-        "endTimestamp": 4050,
-        "note": ""
-      }
-    ]
-  },
-  {
-    "id": "song-4c828f0f",
-    "workId": "work-song-2349",
-    "title": "unholy",
-    "originalArtist": "Sam Smith, Kim Petras",
-    "tags": [],
-    "performances": [
-      {
-        "id": "p-09816716",
-        "streamId": "stream-dc06272b",
-        "date": "2025-10-29",
-        "streamTitle": "【首次歌回】新人vtuber即將滿月！準備了滿滿的心意給大家",
-        "videoId": "eb22brGYmck",
-        "timestamp": 4073,
-        "endTimestamp": 4232,
-        "note": ""
-      }
-    ]
-  },
-  {
-    "id": "song-60d627f6",
-    "workId": "work-song-60d627f6",
-    "title": "COLORFUL",
-    "originalArtist": "婁峻碩 SHOU",
-    "tags": [],
-    "performances": [
-      {
-        "id": "p-54f95f37",
-        "streamId": "stream-2026-02-05",
-        "date": "2026-02-05",
-        "streamTitle": "【歌回】即使人生有很多困難要跨越，卻還是要微笑面對，但首先今天要成為一個饒舌歌手！",
-        "videoId": "AnuYwZNXN0I",
-        "timestamp": 3171,
-        "endTimestamp": 3387,
-        "note": ""
-      }
-    ]
-  },
-  {
-    "id": "song-6c35e292",
-    "workId": "work-song-37f753fd",
-    "title": "B.O.",
-    "originalArtist": "ØZI",
-    "tags": [],
-    "performances": [
-      {
-        "id": "p-39712b99",
-        "streamId": "stream-2025-11-29",
-        "date": "2025-11-29",
-        "streamTitle": "【每月歌回】我愛唱歌、唱歌愛我，今天準備多一點中文歌！",
-        "videoId": "FthND9ZSB2Y",
-        "timestamp": 2786,
-        "endTimestamp": 2999,
-        "note": ""
-      }
-    ]
-  },
-  {
-    "id": "song-6e983db6",
-    "workId": "work-song-6e983db6",
-    "title": "想和你看五月的晚霞",
-    "originalArtist": "陳華",
-    "tags": [],
-    "performances": [
-      {
-        "id": "p-cfa7fd80",
-        "streamId": "stream-dc06272b",
-        "date": "2025-10-29",
-        "streamTitle": "【首次歌回】新人vtuber即將滿月！準備了滿滿的心意給大家",
-        "videoId": "eb22brGYmck",
-        "timestamp": 2724,
-        "endTimestamp": 2938,
-        "note": ""
-      }
-    ]
-  },
-  {
-    "id": "song-7592ff4b",
-    "workId": "work-song-7592ff4b",
-    "title": "無樂不作",
-    "originalArtist": "范逸臣",
-    "tags": [],
-    "performances": [
-      {
-        "id": "p-ba54c620",
-        "streamId": "stream-dc06272b",
-        "date": "2025-10-29",
-        "streamTitle": "【首次歌回】新人vtuber即將滿月！準備了滿滿的心意給大家",
-        "videoId": "eb22brGYmck",
-        "timestamp": 3692,
-        "endTimestamp": 3862,
-        "note": ""
-      }
-    ]
-  },
-  {
-    "id": "song-8170e864",
-    "workId": "work-song-8ef9c4cb",
-    "title": "Night dancer",
-    "originalArtist": "imase",
-    "tags": [],
-    "performances": [
-      {
-        "id": "p-4d1e38c3",
-        "streamId": "stream-b39375a3",
-        "date": "2025-12-31",
-        "streamTitle": "【跨年前歌回】2025年最後一唱，特別的日子當然要來點更特別的！",
-        "videoId": "WdkRZyLwmF4",
-        "timestamp": 2996,
-        "endTimestamp": 3213,
-        "note": ""
-      }
-    ]
-  },
-  {
-    "id": "song-824e0636",
-    "workId": "work-song-126",
-    "title": "想見你想見你想見你",
-    "originalArtist": "八三夭",
-    "tags": [],
-    "performances": [
-      {
-        "id": "p-19079bf7",
-        "streamId": "stream-2025-11-29",
-        "date": "2025-11-29",
-        "streamTitle": "【每月歌回】我愛唱歌、唱歌愛我，今天準備多一點中文歌！",
-        "videoId": "FthND9ZSB2Y",
-        "timestamp": 1759,
-        "endTimestamp": 2000,
-        "note": ""
-      }
-    ]
-  },
-  {
-    "id": "song-84bdba4f",
-    "workId": "work-song-2142",
-    "title": "追光者",
-    "originalArtist": "岑寧兒",
-    "tags": [],
-    "performances": [
-      {
-        "id": "p-9d893f09",
-        "streamId": "stream-2025-11-29",
-        "date": "2025-11-29",
-        "streamTitle": "【每月歌回】我愛唱歌、唱歌愛我，今天準備多一點中文歌！",
-        "videoId": "FthND9ZSB2Y",
-        "timestamp": 3224,
-        "endTimestamp": 3384,
-        "note": ""
+        "timestamp": 1304,
+        "endTimestamp": 1604
       }
     ]
   },
@@ -313,12 +25,9 @@
       {
         "id": "p-501fb576",
         "streamId": "stream-dc06272b",
-        "date": "2025-10-29",
-        "streamTitle": "【首次歌回】新人vtuber即將滿月！準備了滿滿的心意給大家",
         "videoId": "eb22brGYmck",
         "timestamp": 2171,
-        "endTimestamp": 2447,
-        "note": ""
+        "endTimestamp": 2447
       }
     ]
   },
@@ -332,240 +41,9 @@
       {
         "id": "p-0608e498",
         "streamId": "stream-2025-11-29",
-        "date": "2025-11-29",
-        "streamTitle": "【每月歌回】我愛唱歌、唱歌愛我，今天準備多一點中文歌！",
         "videoId": "FthND9ZSB2Y",
         "timestamp": 1137,
-        "endTimestamp": 1350,
-        "note": ""
-      }
-    ]
-  },
-  {
-    "id": "song-8dc82148",
-    "workId": "work-song-263",
-    "title": "モエチャッカファイア",
-    "originalArtist": "弌誠",
-    "tags": [],
-    "performances": [
-      {
-        "id": "p-dc06232b",
-        "streamId": "stream-dc06272b",
-        "date": "2025-10-29",
-        "streamTitle": "【首次歌回】新人vtuber即將滿月！準備了滿滿的心意給大家",
-        "videoId": "eb22brGYmck",
-        "timestamp": 3339,
-        "endTimestamp": 3494,
-        "note": ""
-      }
-    ]
-  },
-  {
-    "id": "song-92a8829d",
-    "workId": "work-song-4ce2c5e1",
-    "title": "女孩",
-    "originalArtist": "韋禮安",
-    "tags": [],
-    "performances": [
-      {
-        "id": "p-6a79088f",
-        "streamId": "stream-2026-02-05",
-        "date": "2026-02-05",
-        "streamTitle": "【歌回】即使人生有很多困難要跨越，卻還是要微笑面對，但首先今天要成為一個饒舌歌手！",
-        "videoId": "AnuYwZNXN0I",
-        "timestamp": 1304,
-        "endTimestamp": 1604,
-        "note": ""
-      }
-    ]
-  },
-  {
-    "id": "song-956e0147",
-    "workId": "work-song-956e0147",
-    "title": "皇后區的皇后",
-    "originalArtist": "葛仲珊",
-    "tags": [],
-    "performances": [
-      {
-        "id": "p-1e4d35d8",
-        "streamId": "stream-2026-02-05",
-        "date": "2026-02-05",
-        "streamTitle": "【歌回】即使人生有很多困難要跨越，卻還是要微笑面對，但首先今天要成為一個饒舌歌手！",
-        "videoId": "AnuYwZNXN0I",
-        "timestamp": 576,
-        "endTimestamp": 754,
-        "note": ""
-      }
-    ]
-  },
-  {
-    "id": "song-96f52592",
-    "workId": "work-song-1508",
-    "title": "I Love You 3000",
-    "originalArtist": "Stephanie Poetri",
-    "tags": [],
-    "performances": [
-      {
-        "id": "p-7383054a",
-        "streamId": "stream-2025-11-29",
-        "date": "2025-11-29",
-        "streamTitle": "【每月歌回】我愛唱歌、唱歌愛我，今天準備多一點中文歌！",
-        "videoId": "FthND9ZSB2Y",
-        "timestamp": 5142,
-        "endTimestamp": 5350,
-        "note": ""
-      }
-    ]
-  },
-  {
-    "id": "song-9cf7c290",
-    "workId": "work-song-3136",
-    "title": "國境之南",
-    "originalArtist": "范逸臣",
-    "tags": [],
-    "performances": [
-      {
-        "id": "p-fdae7547",
-        "streamId": "stream-2025-11-29",
-        "date": "2025-11-29",
-        "streamTitle": "【每月歌回】我愛唱歌、唱歌愛我，今天準備多一點中文歌！",
-        "videoId": "FthND9ZSB2Y",
-        "timestamp": 3604,
-        "endTimestamp": 3815,
-        "note": ""
-      }
-    ]
-  },
-  {
-    "id": "song-9eb436c2",
-    "workId": "work-song-5d8444e2",
-    "title": "喜歡你",
-    "originalArtist": "陳潔儀",
-    "tags": [],
-    "performances": [
-      {
-        "id": "p-9cc78e93",
-        "streamId": "stream-2025-11-29",
-        "date": "2025-11-29",
-        "streamTitle": "【每月歌回】我愛唱歌、唱歌愛我，今天準備多一點中文歌！",
-        "videoId": "FthND9ZSB2Y",
-        "timestamp": 4688,
-        "endTimestamp": 4939,
-        "note": ""
-      }
-    ]
-  },
-  {
-    "id": "song-a8800b48",
-    "workId": "work-song-a8800b48",
-    "title": "差不多姑娘",
-    "originalArtist": "鄧紫棋",
-    "tags": [],
-    "performances": [
-      {
-        "id": "p-4ca5e0d4",
-        "streamId": "stream-2026-02-05",
-        "date": "2026-02-05",
-        "streamTitle": "【歌回】即使人生有很多困難要跨越，卻還是要微笑面對，但首先今天要成為一個饒舌歌手！",
-        "videoId": "AnuYwZNXN0I",
-        "timestamp": 4559,
-        "endTimestamp": 4786,
-        "note": ""
-      }
-    ]
-  },
-  {
-    "id": "song-ada65eca",
-    "workId": "work-song-1322",
-    "title": "雨愛",
-    "originalArtist": "楊丞琳",
-    "tags": [],
-    "performances": [
-      {
-        "id": "p-90e255c1",
-        "streamId": "stream-dc06272b",
-        "date": "2025-10-29",
-        "streamTitle": "【首次歌回】新人vtuber即將滿月！準備了滿滿的心意給大家",
-        "videoId": "eb22brGYmck",
-        "timestamp": 4411,
-        "endTimestamp": 4671,
-        "note": ""
-      }
-    ]
-  },
-  {
-    "id": "song-bd246338",
-    "workId": "work-song-139",
-    "title": "愛你",
-    "originalArtist": "陳芳語",
-    "tags": [],
-    "performances": [
-      {
-        "id": "p-4c84c2c4",
-        "streamId": "stream-2025-11-29",
-        "date": "2025-11-29",
-        "streamTitle": "【每月歌回】我愛唱歌、唱歌愛我，今天準備多一點中文歌！",
-        "videoId": "FthND9ZSB2Y",
-        "timestamp": 543,
-        "endTimestamp": 749,
-        "note": ""
-      }
-    ]
-  },
-  {
-    "id": "song-be2d68d3",
-    "workId": "work-song-be2d68d3",
-    "title": "SPECIALZ",
-    "originalArtist": "King Gnu",
-    "tags": [],
-    "performances": [
-      {
-        "id": "p-645afb55",
-        "streamId": "stream-b39375a3",
-        "date": "2025-12-31",
-        "streamTitle": "【跨年前歌回】2025年最後一唱，特別的日子當然要來點更特別的！",
-        "videoId": "WdkRZyLwmF4",
-        "timestamp": 4333,
-        "endTimestamp": 4567,
-        "note": ""
-      }
-    ]
-  },
-  {
-    "id": "song-d1ce67a8",
-    "workId": "work-song-2ea03c71",
-    "title": "シルエット",
-    "originalArtist": "KANA-BOON",
-    "tags": [],
-    "performances": [
-      {
-        "id": "p-845257a0",
-        "streamId": "stream-b39375a3",
-        "date": "2025-12-31",
-        "streamTitle": "【跨年前歌回】2025年最後一唱，特別的日子當然要來點更特別的！",
-        "videoId": "WdkRZyLwmF4",
-        "timestamp": 5015,
-        "endTimestamp": 5251,
-        "note": ""
-      }
-    ]
-  },
-  {
-    "id": "song-d49bf5f7",
-    "workId": "work-song-546",
-    "title": "我還年輕 我還年輕",
-    "originalArtist": "老王樂隊",
-    "tags": [],
-    "performances": [
-      {
-        "id": "p-b566bb9d",
-        "streamId": "stream-2025-11-29",
-        "date": "2025-11-29",
-        "streamTitle": "【每月歌回】我愛唱歌、唱歌愛我，今天準備多一點中文歌！",
-        "videoId": "FthND9ZSB2Y",
-        "timestamp": 4152,
-        "endTimestamp": 4504,
-        "note": ""
+        "endTimestamp": 1350
       }
     ]
   },
@@ -579,88 +57,9 @@
       {
         "id": "p-412b453f",
         "streamId": "stream-dc06272b",
-        "date": "2025-10-29",
-        "streamTitle": "【首次歌回】新人vtuber即將滿月！準備了滿滿的心意給大家",
         "videoId": "eb22brGYmck",
         "timestamp": 1751,
-        "endTimestamp": 1990,
-        "note": ""
-      }
-    ]
-  },
-  {
-    "id": "song-dceea062",
-    "workId": "work-song-dceea062",
-    "title": "Sweet, sexy lover",
-    "originalArtist": "PiA 樂團",
-    "tags": [],
-    "performances": [
-      {
-        "id": "p-f86a7060",
-        "streamId": "stream-dc06272b",
-        "date": "2025-10-29",
-        "streamTitle": "【首次歌回】新人vtuber即將滿月！準備了滿滿的心意給大家",
-        "videoId": "eb22brGYmck",
-        "timestamp": 314,
-        "endTimestamp": 532,
-        "note": ""
-      }
-    ]
-  },
-  {
-    "id": "song-ebb0bbbe",
-    "workId": "work-song-ebb0bbbe",
-    "title": "SWAG午覺",
-    "originalArtist": "異鄉人",
-    "tags": [],
-    "performances": [
-      {
-        "id": "p-99f5986a",
-        "streamId": "stream-dc06272b",
-        "date": "2025-10-29",
-        "streamTitle": "【首次歌回】新人vtuber即將滿月！準備了滿滿的心意給大家",
-        "videoId": "eb22brGYmck",
-        "timestamp": 818,
-        "endTimestamp": 1037,
-        "note": ""
-      }
-    ]
-  },
-  {
-    "id": "song-ed3a8533",
-    "workId": "work-song-53a8a024",
-    "title": "IRIS OUT",
-    "originalArtist": "米津玄師",
-    "tags": [],
-    "performances": [
-      {
-        "id": "p-7c9f7594",
-        "streamId": "stream-b39375a3",
-        "date": "2025-12-31",
-        "streamTitle": "【跨年前歌回】2025年最後一唱，特別的日子當然要來點更特別的！",
-        "videoId": "WdkRZyLwmF4",
-        "timestamp": 2470,
-        "endTimestamp": 2615,
-        "note": ""
-      }
-    ]
-  },
-  {
-    "id": "song-edf196f8",
-    "workId": "work-song-edf196f8",
-    "title": "IDOL",
-    "originalArtist": "YOASOBI",
-    "tags": [],
-    "performances": [
-      {
-        "id": "p-855477ea",
-        "streamId": "stream-b39375a3",
-        "date": "2025-12-31",
-        "streamTitle": "【跨年前歌回】2025年最後一唱，特別的日子當然要來點更特別的！",
-        "videoId": "WdkRZyLwmF4",
-        "timestamp": 1233,
-        "endTimestamp": 1445,
-        "note": ""
+        "endTimestamp": 1990
       }
     ]
   },
@@ -674,12 +73,25 @@
       {
         "id": "p-d56634cf",
         "streamId": "stream-2026-02-05",
-        "date": "2026-02-05",
-        "streamTitle": "【歌回】即使人生有很多困難要跨越，卻還是要微笑面對，但首先今天要成為一個饒舌歌手！",
         "videoId": "AnuYwZNXN0I",
         "timestamp": 2022,
-        "endTimestamp": 2238,
-        "note": ""
+        "endTimestamp": 2238
+      }
+    ]
+  },
+  {
+    "id": "song-254f60c4",
+    "workId": "work-song-254f60c4",
+    "title": "老大",
+    "originalArtist": "Bridge",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-4c7d01f4",
+        "streamId": "stream-2026-02-05",
+        "videoId": "AnuYwZNXN0I",
+        "timestamp": 5852,
+        "endTimestamp": 6014
       }
     ]
   },
@@ -693,31 +105,153 @@
       {
         "id": "p-467cd5e2",
         "streamId": "stream-2026-02-05",
-        "date": "2026-02-05",
-        "streamTitle": "【歌回】即使人生有很多困難要跨越，卻還是要微笑面對，但首先今天要成為一個饒舌歌手！",
         "videoId": "AnuYwZNXN0I",
         "timestamp": 2708,
-        "endTimestamp": 2951,
-        "note": ""
+        "endTimestamp": 2951
       }
     ]
   },
   {
-    "id": "song-fa0f128a",
-    "workId": "work-song-1808",
-    "title": "Say So",
-    "originalArtist": "Doja Cat",
+    "id": "song-d49bf5f7",
+    "workId": "work-song-546",
+    "title": "我還年輕 我還年輕",
+    "originalArtist": "老王樂隊",
     "tags": [],
     "performances": [
       {
-        "id": "p-c8326b80",
+        "id": "p-b566bb9d",
+        "streamId": "stream-2025-11-29",
+        "videoId": "FthND9ZSB2Y",
+        "timestamp": 4152,
+        "endTimestamp": 4504
+      }
+    ]
+  },
+  {
+    "id": "song-03d847b3",
+    "workId": "work-song-03d847b3",
+    "title": "刻在我心底的名字",
+    "originalArtist": "盧廣仲",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-5d8b327f",
+        "streamId": "stream-2025-11-29",
+        "videoId": "FthND9ZSB2Y",
+        "timestamp": 2200,
+        "endTimestamp": 2503
+      }
+    ]
+  },
+  {
+    "id": "song-3b3acc95",
+    "workId": "work-song-3b3acc95",
+    "title": "夜撫でるメノウ",
+    "originalArtist": "Ayase",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-1fcbee2d",
         "streamId": "stream-b39375a3",
-        "date": "2025-12-31",
-        "streamTitle": "【跨年前歌回】2025年最後一唱，特別的日子當然要來點更特別的！",
         "videoId": "WdkRZyLwmF4",
-        "timestamp": 1865,
-        "endTimestamp": 2099,
-        "note": ""
+        "timestamp": 568,
+        "endTimestamp": 846
+      }
+    ]
+  },
+  {
+    "id": "song-006cfcd3",
+    "workId": "work-song-006cfcd3",
+    "title": "怪物",
+    "originalArtist": "YOASOBI",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-239f2ca6",
+        "streamId": "stream-b39375a3",
+        "videoId": "WdkRZyLwmF4",
+        "timestamp": 3804,
+        "endTimestamp": 4007
+      }
+    ]
+  },
+  {
+    "id": "song-ada65eca",
+    "workId": "work-song-1322",
+    "title": "雨愛",
+    "originalArtist": "楊丞琳",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-90e255c1",
+        "streamId": "stream-dc06272b",
+        "videoId": "eb22brGYmck",
+        "timestamp": 4411,
+        "endTimestamp": 4671
+      }
+    ]
+  },
+  {
+    "id": "song-956e0147",
+    "workId": "work-song-956e0147",
+    "title": "皇后區的皇后",
+    "originalArtist": "葛仲珊",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-1e4d35d8",
+        "streamId": "stream-2026-02-05",
+        "videoId": "AnuYwZNXN0I",
+        "timestamp": 576,
+        "endTimestamp": 754
+      }
+    ]
+  },
+  {
+    "id": "song-a8800b48",
+    "workId": "work-song-a8800b48",
+    "title": "差不多姑娘",
+    "originalArtist": "鄧紫棋",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-4ca5e0d4",
+        "streamId": "stream-2026-02-05",
+        "videoId": "AnuYwZNXN0I",
+        "timestamp": 4559,
+        "endTimestamp": 4786
+      }
+    ]
+  },
+  {
+    "id": "song-84bdba4f",
+    "workId": "work-song-2142",
+    "title": "追光者",
+    "originalArtist": "岑寧兒",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-9d893f09",
+        "streamId": "stream-2025-11-29",
+        "videoId": "FthND9ZSB2Y",
+        "timestamp": 3224,
+        "endTimestamp": 3384
+      }
+    ]
+  },
+  {
+    "id": "song-9cf7c290",
+    "workId": "work-song-3136",
+    "title": "國境之南",
+    "originalArtist": "范逸臣",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-fdae7547",
+        "streamId": "stream-2025-11-29",
+        "videoId": "FthND9ZSB2Y",
+        "timestamp": 3604,
+        "endTimestamp": 3815
       }
     ]
   },
@@ -731,12 +265,361 @@
       {
         "id": "p-799c11b9",
         "streamId": "stream-dc06272b",
-        "date": "2025-10-29",
-        "streamTitle": "【首次歌回】新人vtuber即將滿月！準備了滿滿的心意給大家",
         "videoId": "eb22brGYmck",
         "timestamp": 4873,
-        "endTimestamp": 5089,
-        "note": ""
+        "endTimestamp": 5089
+      }
+    ]
+  },
+  {
+    "id": "song-9eb436c2",
+    "workId": "work-song-5d8444e2",
+    "title": "喜歡你",
+    "originalArtist": "陳潔儀",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-9cc78e93",
+        "streamId": "stream-2025-11-29",
+        "videoId": "FthND9ZSB2Y",
+        "timestamp": 4688,
+        "endTimestamp": 4939
+      }
+    ]
+  },
+  {
+    "id": "song-7592ff4b",
+    "workId": "work-song-7592ff4b",
+    "title": "無樂不作",
+    "originalArtist": "范逸臣",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-ba54c620",
+        "streamId": "stream-dc06272b",
+        "videoId": "eb22brGYmck",
+        "timestamp": 3692,
+        "endTimestamp": 3862
+      }
+    ]
+  },
+  {
+    "id": "song-2dae12e8",
+    "workId": "work-song-2dae12e8",
+    "title": "給我一首歌的時間",
+    "originalArtist": "周杰倫",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-a1f12902",
+        "streamId": "stream-2025-11-29",
+        "videoId": "FthND9ZSB2Y",
+        "timestamp": 5559,
+        "endTimestamp": 5809
+      }
+    ]
+  },
+  {
+    "id": "song-46e6ac55",
+    "workId": "work-song-46e6ac55",
+    "title": "買榜",
+    "originalArtist": "熊仔 & 吳卓源",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-3a6f8bcf",
+        "streamId": "stream-2026-02-05",
+        "videoId": "AnuYwZNXN0I",
+        "timestamp": 3820,
+        "endTimestamp": 4050
+      }
+    ]
+  },
+  {
+    "id": "song-824e0636",
+    "workId": "work-song-126",
+    "title": "想見你想見你想見你",
+    "originalArtist": "八三夭",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-19079bf7",
+        "streamId": "stream-2025-11-29",
+        "videoId": "FthND9ZSB2Y",
+        "timestamp": 1759,
+        "endTimestamp": 2000
+      }
+    ]
+  },
+  {
+    "id": "song-6e983db6",
+    "workId": "work-song-6e983db6",
+    "title": "想和你看五月的晚霞",
+    "originalArtist": "陳華",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-cfa7fd80",
+        "streamId": "stream-dc06272b",
+        "videoId": "eb22brGYmck",
+        "timestamp": 2724,
+        "endTimestamp": 2938
+      }
+    ]
+  },
+  {
+    "id": "song-bd246338",
+    "workId": "work-song-139",
+    "title": "愛你",
+    "originalArtist": "陳芳語",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-4c84c2c4",
+        "streamId": "stream-2025-11-29",
+        "videoId": "FthND9ZSB2Y",
+        "timestamp": 543,
+        "endTimestamp": 749
+      }
+    ]
+  },
+  {
+    "id": "song-6c35e292",
+    "workId": "work-song-37f753fd",
+    "title": "B.O.",
+    "originalArtist": "ØZI",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-39712b99",
+        "streamId": "stream-2025-11-29",
+        "videoId": "FthND9ZSB2Y",
+        "timestamp": 2786,
+        "endTimestamp": 2999
+      }
+    ]
+  },
+  {
+    "id": "song-60d627f6",
+    "workId": "work-song-60d627f6",
+    "title": "COLORFUL",
+    "originalArtist": "婁峻碩 SHOU",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-54f95f37",
+        "streamId": "stream-2026-02-05",
+        "videoId": "AnuYwZNXN0I",
+        "timestamp": 3171,
+        "endTimestamp": 3387
+      }
+    ]
+  },
+  {
+    "id": "song-96f52592",
+    "workId": "work-song-1508",
+    "title": "I Love You 3000",
+    "originalArtist": "Stephanie Poetri",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-7383054a",
+        "streamId": "stream-2025-11-29",
+        "videoId": "FthND9ZSB2Y",
+        "timestamp": 5142,
+        "endTimestamp": 5350
+      }
+    ]
+  },
+  {
+    "id": "song-edf196f8",
+    "workId": "work-song-edf196f8",
+    "title": "IDOL",
+    "originalArtist": "YOASOBI",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-855477ea",
+        "streamId": "stream-b39375a3",
+        "videoId": "WdkRZyLwmF4",
+        "timestamp": 1233,
+        "endTimestamp": 1445
+      }
+    ]
+  },
+  {
+    "id": "song-ed3a8533",
+    "workId": "work-song-53a8a024",
+    "title": "IRIS OUT",
+    "originalArtist": "米津玄師",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-7c9f7594",
+        "streamId": "stream-b39375a3",
+        "videoId": "WdkRZyLwmF4",
+        "timestamp": 2470,
+        "endTimestamp": 2615
+      }
+    ]
+  },
+  {
+    "id": "song-8170e864",
+    "workId": "work-song-8ef9c4cb",
+    "title": "Night dancer",
+    "originalArtist": "imase",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-4d1e38c3",
+        "streamId": "stream-b39375a3",
+        "videoId": "WdkRZyLwmF4",
+        "timestamp": 2996,
+        "endTimestamp": 3213
+      }
+    ]
+  },
+  {
+    "id": "song-fa0f128a",
+    "workId": "work-song-1808",
+    "title": "Say So",
+    "originalArtist": "Doja Cat",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-c8326b80",
+        "streamId": "stream-b39375a3",
+        "videoId": "WdkRZyLwmF4",
+        "timestamp": 1865,
+        "endTimestamp": 2099
+      }
+    ]
+  },
+  {
+    "id": "song-be2d68d3",
+    "workId": "work-song-be2d68d3",
+    "title": "SPECIALZ",
+    "originalArtist": "King Gnu",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-645afb55",
+        "streamId": "stream-b39375a3",
+        "videoId": "WdkRZyLwmF4",
+        "timestamp": 4333,
+        "endTimestamp": 4567
+      }
+    ]
+  },
+  {
+    "id": "song-2582b069",
+    "workId": "work-song-1233",
+    "title": "summertime",
+    "originalArtist": "cinnamons × evening cinema",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-390d71b8",
+        "streamId": "stream-dc06272b",
+        "videoId": "eb22brGYmck",
+        "timestamp": 1358,
+        "endTimestamp": 1510
+      }
+    ]
+  },
+  {
+    "id": "song-ebb0bbbe",
+    "workId": "work-song-ebb0bbbe",
+    "title": "SWAG午覺",
+    "originalArtist": "異鄉人",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-99f5986a",
+        "streamId": "stream-dc06272b",
+        "videoId": "eb22brGYmck",
+        "timestamp": 818,
+        "endTimestamp": 1037
+      }
+    ]
+  },
+  {
+    "id": "song-dceea062",
+    "workId": "work-song-dceea062",
+    "title": "Sweet, sexy lover",
+    "originalArtist": "PiA 樂團",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-f86a7060",
+        "streamId": "stream-dc06272b",
+        "videoId": "eb22brGYmck",
+        "timestamp": 314,
+        "endTimestamp": 532
+      }
+    ]
+  },
+  {
+    "id": "song-4c828f0f",
+    "workId": "work-song-2349",
+    "title": "unholy",
+    "originalArtist": "Sam Smith, Kim Petras",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-09816716",
+        "streamId": "stream-dc06272b",
+        "videoId": "eb22brGYmck",
+        "timestamp": 4073,
+        "endTimestamp": 4232
+      }
+    ]
+  },
+  {
+    "id": "song-d1ce67a8",
+    "workId": "work-song-2ea03c71",
+    "title": "シルエット",
+    "originalArtist": "KANA-BOON",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-845257a0",
+        "streamId": "stream-b39375a3",
+        "videoId": "WdkRZyLwmF4",
+        "timestamp": 5015,
+        "endTimestamp": 5251
+      }
+    ]
+  },
+  {
+    "id": "song-8dc82148",
+    "workId": "work-song-263",
+    "title": "モエチャッカファイア",
+    "originalArtist": "弌誠",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-dc06232b",
+        "streamId": "stream-dc06272b",
+        "videoId": "eb22brGYmck",
+        "timestamp": 3339,
+        "endTimestamp": 3494
+      }
+    ]
+  },
+  {
+    "id": "song-3a255c8d",
+    "workId": "work-song-3a255c8d",
+    "title": "ワールドイズマイン",
+    "originalArtist": "supercell feat. 初音ミク",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-32534671",
+        "streamId": "stream-2026-02-05",
+        "videoId": "AnuYwZNXN0I",
+        "timestamp": 5269,
+        "endTimestamp": 5520
       }
     ]
   }

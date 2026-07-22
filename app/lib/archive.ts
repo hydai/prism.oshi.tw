@@ -13,16 +13,6 @@ interface ArchiveFilters {
   selectedYears: Set<number>;
 }
 
-export function mergeAlbumArt(
-  songs: ArchiveSong[],
-  albumArtBySongId: Map<string, string>,
-): ArchiveSong[] {
-  return songs.map((song) => ({
-    ...song,
-    albumArtUrl: albumArtBySongId.get(song.id),
-  }));
-}
-
 export function sortStreamsByNewest(streams: StreamSummary[]): StreamSummary[] {
   return streams
     .map((stream) => ({ stream, sortTime: new Date(stream.date).getTime() }))

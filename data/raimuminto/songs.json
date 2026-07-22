@@ -1,24 +1,5 @@
 [
   {
-    "id": "song-06be676d",
-    "workId": "work-song-06be676d",
-    "title": "うらたねこ♀",
-    "originalArtist": "HoneyWorks",
-    "tags": [],
-    "performances": [
-      {
-        "id": "p-da765a2c",
-        "streamId": "stream-e69c4ad1",
-        "date": "2026-02-14",
-        "streamTitle": "うらたねこ♀ / 萊姆薄荷【歌ってみた】#賣勾萊拉",
-        "videoId": "Jnsbgg_g7e0",
-        "timestamp": 0,
-        "endTimestamp": 183,
-        "note": ""
-      }
-    ]
-  },
-  {
     "id": "song-9552b6c2",
     "workId": "work-song-9552b6c2",
     "title": "会いたくて 会いたくて",
@@ -28,12 +9,25 @@
       {
         "id": "p-4467849c",
         "streamId": "stream-2026-06-06",
-        "date": "2026-06-06",
-        "streamTitle": "会いたくて 会いたくて / 萊姆薄荷【歌ってみた】 #賣勾萊拉",
         "videoId": "_6thsBkNKj0",
         "timestamp": 0,
-        "endTimestamp": 280,
-        "note": ""
+        "endTimestamp": 280
+      }
+    ]
+  },
+  {
+    "id": "song-06be676d",
+    "workId": "work-song-06be676d",
+    "title": "うらたねこ♀",
+    "originalArtist": "HoneyWorks",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-da765a2c",
+        "streamId": "stream-e69c4ad1",
+        "videoId": "Jnsbgg_g7e0",
+        "timestamp": 0,
+        "endTimestamp": 183
       }
     ]
   }

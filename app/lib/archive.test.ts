@@ -9,7 +9,6 @@ import {
   getAllArtists,
   getAvailableYears,
   groupSongsByWorkId,
-  mergeAlbumArt,
   sortGroupedSongs,
   sortStreamsByNewest,
   trackFromFlattenedSong,
@@ -77,11 +76,6 @@ const streams: StreamSummary[] = [
   { id: "stream-2025", title: "Newest", date: "2025-01-10", videoId: "new" },
   { id: "stream-2024", title: "Middle", date: "2024-06-15", videoId: "mid" },
 ];
-
-const merged = mergeAlbumArt(songs, new Map([["song-a", "new-art"]]));
-assert.equal(merged[0]?.albumArtUrl, "new-art");
-assert.equal(merged[1]?.albumArtUrl, undefined);
-assert.equal(songs[0]?.albumArtUrl, "old-art");
 
 assert.deepEqual(sortStreamsByNewest(streams).map((stream) => stream.id), [
   "stream-2025",

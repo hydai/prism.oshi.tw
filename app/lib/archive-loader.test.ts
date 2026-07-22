@@ -1,21 +1,28 @@
 import assert from "node:assert/strict";
 import { loadArchiveData } from "./archive-loader";
-import type { ArchiveSong, StreamSummary } from "../types/archive";
+import type { StreamSummary } from "../types/archive";
 
-const baseSongs: ArchiveSong[] = [
+// Slim stored format — performances carry no streamTitle/date (derived from
+// streams.json at load time) and omit empty notes.
+const slimSongs = [
   {
     id: "song-a",
     title: "Alpha",
     originalArtist: "Artist A",
     tags: [],
-    performances: [],
+    performances: [
+      { id: "p-new", streamId: "s-new", videoId: "v2", timestamp: 30, endTimestamp: 90 },
+      { id: "p-old", streamId: "s-old", videoId: "v1", timestamp: 10, endTimestamp: null, note: "encore" },
+    ],
   },
   {
     id: "song-b",
     title: "Beta",
     originalArtist: "Artist B",
     tags: [],
-    performances: [],
+    performances: [
+      { id: "p-orphan", streamId: "s-gone", videoId: "v3", timestamp: 0, endTimestamp: null },
+    ],
   },
 ];
 
@@ -46,7 +53,7 @@ function makeFetch(routes: Record<string, FakeRoute>, requested: string[] = [], 
 }
 
 async function run() {
-  // fires all three requests in the same tick (no waterfall)
+  // fires songs and streams together, and no longer requests metadata
   {
     const requested: string[] = [];
     let release!: () => void;
@@ -57,100 +64,85 @@ async function run() {
     }) as typeof fetch;
 
     const pending = loadArchiveData("mizuki", gatedFetch);
-    assert.equal(requested.length, 3, "all three requests should start before any response resolves");
+    assert.equal(requested.length, 2, "exactly two requests should start together");
     assert.ok(requested.some((u) => u.endsWith("/api/mizuki/songs")));
-    assert.ok(requested.some((u) => u.endsWith("/api/mizuki/metadata")));
     assert.ok(requested.some((u) => u.endsWith("/api/mizuki/streams")));
+    assert.ok(!requested.some((u) => u.includes("metadata")), "metadata request was removed");
     release();
     await pending.catch(() => undefined);
   }
 
-  // merges album art from metadata into songs (albumArtUrl and albumArtUrls.small)
+  // hydrates streamTitle/date from streams by streamId; empty note defaults
   {
     const fetchImpl = makeFetch({
-      "/api/mizuki/songs": { body: baseSongs },
-      "/api/mizuki/metadata": {
-        body: {
-          songMetadata: [
-            { songId: "song-a", albumArtUrl: "art-a" },
-            { songId: "song-b", albumArtUrls: { small: "art-b-small" } },
-          ],
-          artistInfo: [],
-        },
-      },
-      "/api/mizuki/streams": { body: [] },
+      "/api/mizuki/songs": { body: slimSongs },
+      "/api/mizuki/streams": { body: baseStreams },
     });
-    const result = await loadArchiveData("mizuki", fetchImpl);
-    assert.equal(result.songs[0].albumArtUrl, "art-a");
-    assert.equal(result.songs[1].albumArtUrl, "art-b-small");
+    const { songs } = await loadArchiveData("mizuki", fetchImpl);
+    const [pNew, pOld] = songs.find((s) => s.id === "song-a")!.performances;
+    assert.equal(pNew.streamTitle, "New stream");
+    assert.equal(pNew.date, "2025-06-01");
+    assert.equal(pNew.note, "");
+    assert.equal(pOld.streamTitle, "Old stream");
+    assert.equal(pOld.date, "2023-01-01");
+    assert.equal(pOld.note, "encore");
   }
 
-  // songs still load when the metadata request fails
+  // a performance whose stream is missing keeps a deterministic fallback
   {
     const fetchImpl = makeFetch({
-      "/api/mizuki/songs": { body: baseSongs },
-      "/api/mizuki/metadata": { reject: true },
-      "/api/mizuki/streams": { body: [] },
+      "/api/mizuki/songs": { body: slimSongs },
+      "/api/mizuki/streams": { body: baseStreams },
     });
-    const result = await loadArchiveData("mizuki", fetchImpl);
-    assert.equal(result.songs.length, 2);
-    assert.equal(result.songs[0].albumArtUrl, undefined);
-  }
-
-  // songs still load when the metadata response is not ok
-  {
-    const fetchImpl = makeFetch({
-      "/api/mizuki/songs": { body: baseSongs },
-      "/api/mizuki/metadata": { ok: false, body: null },
-      "/api/mizuki/streams": { body: [] },
-    });
-    const result = await loadArchiveData("mizuki", fetchImpl);
-    assert.equal(result.songs.length, 2);
-  }
-
-  // streams degrade to empty on failure
-  {
-    const fetchImpl = makeFetch({
-      "/api/mizuki/songs": { body: baseSongs },
-      "/api/mizuki/metadata": { body: { songMetadata: [], artistInfo: [] } },
-      "/api/mizuki/streams": { reject: true },
-    });
-    const result = await loadArchiveData("mizuki", fetchImpl);
-    assert.deepEqual(result.streams, []);
+    const { songs } = await loadArchiveData("mizuki", fetchImpl);
+    const orphan = songs.find((s) => s.id === "song-b")!.performances[0];
+    assert.equal(orphan.streamTitle, "");
+    assert.equal(orphan.date, "1970-01-01");
   }
 
   // streams are sorted newest first
   {
     const fetchImpl = makeFetch({
       "/api/mizuki/songs": { body: [] },
-      "/api/mizuki/metadata": { body: { songMetadata: [], artistInfo: [] } },
       "/api/mizuki/streams": { body: baseStreams },
     });
-    const result = await loadArchiveData("mizuki", fetchImpl);
-    assert.deepEqual(result.streams.map((s) => s.id), ["s-new", "s-old"]);
+    const { streams } = await loadArchiveData("mizuki", fetchImpl);
+    assert.deepEqual(streams.map((s) => s.id), ["s-new", "s-old"]);
   }
 
-  // rejects when the songs request fails
+  // songs failure rejects
   {
     const fetchImpl = makeFetch({
       "/api/mizuki/songs": { reject: true },
-      "/api/mizuki/metadata": { body: { songMetadata: [], artistInfo: [] } },
       "/api/mizuki/streams": { body: [] },
     });
     await assert.rejects(() => loadArchiveData("mizuki", fetchImpl));
   }
-
-  // rejects when the songs response is not ok
   {
     const fetchImpl = makeFetch({
       "/api/mizuki/songs": { ok: false, body: null },
-      "/api/mizuki/metadata": { body: { songMetadata: [], artistInfo: [] } },
       "/api/mizuki/streams": { body: [] },
     });
     await assert.rejects(() => loadArchiveData("mizuki", fetchImpl));
   }
 
-  // forwards the abort signal to every request
+  // streams failure now rejects too — hydration cannot proceed without it
+  {
+    const fetchImpl = makeFetch({
+      "/api/mizuki/songs": { body: slimSongs },
+      "/api/mizuki/streams": { reject: true },
+    });
+    await assert.rejects(() => loadArchiveData("mizuki", fetchImpl));
+  }
+  {
+    const fetchImpl = makeFetch({
+      "/api/mizuki/songs": { body: slimSongs },
+      "/api/mizuki/streams": { ok: false, body: null },
+    });
+    await assert.rejects(() => loadArchiveData("mizuki", fetchImpl));
+  }
+
+  // forwards the abort signal to both requests
   {
     const requested: string[] = [];
     const signals: (AbortSignal | undefined)[] = [];
@@ -158,14 +150,13 @@ async function run() {
     const fetchImpl = makeFetch(
       {
         "/api/mizuki/songs": { body: [] },
-        "/api/mizuki/metadata": { body: { songMetadata: [], artistInfo: [] } },
         "/api/mizuki/streams": { body: [] },
       },
       requested,
       signals,
     );
     await loadArchiveData("mizuki", fetchImpl, controller.signal);
-    assert.equal(signals.length, 3);
+    assert.equal(signals.length, 2);
     assert.ok(signals.every((s) => s === controller.signal), "every request should carry the caller's signal");
   }
 

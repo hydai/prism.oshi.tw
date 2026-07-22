@@ -1,5 +1,21 @@
 [
   {
+    "id": "song-e5845858",
+    "workId": "work-song-2014",
+    "title": "一輪花",
+    "originalArtist": "tuki.",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-f3f45e37",
+        "streamId": "stream-2026-03-24",
+        "videoId": "ZGAGCfooHe8",
+        "timestamp": 2630,
+        "endTimestamp": 2852
+      }
+    ]
+  },
+  {
     "id": "song-013c53cd",
     "workId": "work-song-013c53cd",
     "title": "晩餐歌",
@@ -9,69 +25,9 @@
       {
         "id": "p-f6610216",
         "streamId": "stream-2026-03-24",
-        "date": "2026-03-24",
-        "streamTitle": "【晚餐歌回】新玩具的歌回！【涅默Nemesis】",
         "videoId": "ZGAGCfooHe8",
         "timestamp": 4107,
-        "endTimestamp": 4323,
-        "note": ""
-      }
-    ]
-  },
-  {
-    "id": "song-0e902aae",
-    "workId": "work-song-0e902aae",
-    "title": "だから僕は音楽を辞めた",
-    "originalArtist": "ヨルシカ",
-    "tags": [],
-    "performances": [
-      {
-        "id": "p-69029f05",
-        "streamId": "stream-2026-03-24",
-        "date": "2026-03-24",
-        "streamTitle": "【晚餐歌回】新玩具的歌回！【涅默Nemesis】",
-        "videoId": "ZGAGCfooHe8",
-        "timestamp": 4545,
-        "endTimestamp": 4788,
-        "note": ""
-      }
-    ]
-  },
-  {
-    "id": "song-0f2b5f3b",
-    "workId": "work-song-0e879506",
-    "title": "yes,and?",
-    "originalArtist": "Ariana Grande",
-    "tags": [],
-    "performances": [
-      {
-        "id": "p-851b495d",
-        "streamId": "stream-2026-03-24",
-        "date": "2026-03-24",
-        "streamTitle": "【晚餐歌回】新玩具的歌回！【涅默Nemesis】",
-        "videoId": "ZGAGCfooHe8",
-        "timestamp": 2061,
-        "endTimestamp": 2272,
-        "note": ""
-      }
-    ]
-  },
-  {
-    "id": "song-2b64a89a",
-    "workId": "work-song-2f998b9e",
-    "title": "ギラギラ",
-    "originalArtist": "ADO",
-    "tags": [],
-    "performances": [
-      {
-        "id": "p-b294d16f",
-        "streamId": "stream-2026-03-24",
-        "date": "2026-03-24",
-        "streamTitle": "【晚餐歌回】新玩具的歌回！【涅默Nemesis】",
-        "videoId": "ZGAGCfooHe8",
-        "timestamp": 641,
-        "endTimestamp": 912,
-        "note": ""
+        "endTimestamp": 4323
       }
     ]
   },
@@ -85,50 +41,9 @@
       {
         "id": "p-c539a0b0",
         "streamId": "stream-2026-03-24",
-        "date": "2026-03-24",
-        "streamTitle": "【晚餐歌回】新玩具的歌回！【涅默Nemesis】",
         "videoId": "ZGAGCfooHe8",
         "timestamp": 1480,
-        "endTimestamp": 1773,
-        "note": ""
-      }
-    ]
-  },
-  {
-    "id": "song-3dfc4641",
-    "workId": "work-song-11f89711",
-    "title": "Wherever You Are",
-    "originalArtist": "ONE OK ROCK",
-    "tags": [],
-    "performances": [
-      {
-        "id": "p-689effc3",
-        "streamId": "stream-2026-03-24",
-        "date": "2026-03-24",
-        "streamTitle": "【晚餐歌回】新玩具的歌回！【涅默Nemesis】",
-        "videoId": "ZGAGCfooHe8",
-        "timestamp": 1082,
-        "endTimestamp": 1380,
-        "note": ""
-      }
-    ]
-  },
-  {
-    "id": "song-53187977",
-    "workId": "work-song-53187977",
-    "title": "プラチナ",
-    "originalArtist": "坂本真綾",
-    "tags": [],
-    "performances": [
-      {
-        "id": "p-aa74ce1b",
-        "streamId": "stream-2026-03-24",
-        "date": "2026-03-24",
-        "streamTitle": "【晚餐歌回】新玩具的歌回！【涅默Nemesis】",
-        "videoId": "ZGAGCfooHe8",
-        "timestamp": 3724,
-        "endTimestamp": 3964,
-        "note": ""
+        "endTimestamp": 1773
       }
     ]
   },
@@ -142,31 +57,89 @@
       {
         "id": "p-aa17635a",
         "streamId": "stream-2026-03-24",
-        "date": "2026-03-24",
-        "streamTitle": "【晚餐歌回】新玩具的歌回！【涅默Nemesis】",
         "videoId": "ZGAGCfooHe8",
         "timestamp": 3289,
-        "endTimestamp": 3551,
-        "note": ""
+        "endTimestamp": 3551
       }
     ]
   },
   {
-    "id": "song-e5845858",
-    "workId": "work-song-2014",
-    "title": "一輪花",
-    "originalArtist": "tuki.",
+    "id": "song-3dfc4641",
+    "workId": "work-song-11f89711",
+    "title": "Wherever You Are",
+    "originalArtist": "ONE OK ROCK",
     "tags": [],
     "performances": [
       {
-        "id": "p-f3f45e37",
+        "id": "p-689effc3",
         "streamId": "stream-2026-03-24",
-        "date": "2026-03-24",
-        "streamTitle": "【晚餐歌回】新玩具的歌回！【涅默Nemesis】",
         "videoId": "ZGAGCfooHe8",
-        "timestamp": 2630,
-        "endTimestamp": 2852,
-        "note": ""
+        "timestamp": 1082,
+        "endTimestamp": 1380
+      }
+    ]
+  },
+  {
+    "id": "song-0f2b5f3b",
+    "workId": "work-song-0e879506",
+    "title": "yes,and?",
+    "originalArtist": "Ariana Grande",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-851b495d",
+        "streamId": "stream-2026-03-24",
+        "videoId": "ZGAGCfooHe8",
+        "timestamp": 2061,
+        "endTimestamp": 2272
+      }
+    ]
+  },
+  {
+    "id": "song-2b64a89a",
+    "workId": "work-song-2f998b9e",
+    "title": "ギラギラ",
+    "originalArtist": "ADO",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-b294d16f",
+        "streamId": "stream-2026-03-24",
+        "videoId": "ZGAGCfooHe8",
+        "timestamp": 641,
+        "endTimestamp": 912
+      }
+    ]
+  },
+  {
+    "id": "song-0e902aae",
+    "workId": "work-song-0e902aae",
+    "title": "だから僕は音楽を辞めた",
+    "originalArtist": "ヨルシカ",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-69029f05",
+        "streamId": "stream-2026-03-24",
+        "videoId": "ZGAGCfooHe8",
+        "timestamp": 4545,
+        "endTimestamp": 4788
+      }
+    ]
+  },
+  {
+    "id": "song-53187977",
+    "workId": "work-song-53187977",
+    "title": "プラチナ",
+    "originalArtist": "坂本真綾",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-aa74ce1b",
+        "streamId": "stream-2026-03-24",
+        "videoId": "ZGAGCfooHe8",
+        "timestamp": 3724,
+        "endTimestamp": 3964
       }
     ]
   }
