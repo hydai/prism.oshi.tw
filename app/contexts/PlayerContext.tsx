@@ -1,6 +1,7 @@
 'use client';
 
-import { createContext, useContext, useState, useEffect, useRef, ReactNode } from 'react';
+import { createContext, useContext, useState, useEffect, useRef, useSyncExternalStore, ReactNode } from 'react';
+import { createPlaybackTimeStore, type PlaybackTimeStore } from '../lib/playback-time-store';
 import { loadYouTubeIframeApi } from '../../lib/youtube-iframe';
 import type {
   YouTubeNamespace,
@@ -44,10 +45,8 @@ interface PlayerContextType {
   clearTimestampWarning: () => void;
   skipNotification: string | null;
   clearSkipNotification: () => void;
-  currentTime: number;
-  duration: number;
-  trackCurrentTime: number;
-  trackDuration: number | null;
+  /** High-frequency playback clock — consume via usePlaybackTime(), not directly */
+  timeStore: PlaybackTimeStore;
   playTrackWithQueue: (track: Track, following: Track[]) => void;
   togglePlayPause: () => void;
   seekTo: (seconds: number) => void;
@@ -81,6 +80,25 @@ export const usePlayer = () => {
   return context;
 };
 
+// Playback clock for components that display time/progress. Subscribing here
+// re-renders only those components on the 500ms tick — the PlayerContext value
+// itself no longer changes while a track plays.
+export const usePlaybackTime = () => {
+  const { timeStore, currentTrack } = usePlayer();
+  const { currentTime, duration } = useSyncExternalStore(
+    timeStore.subscribe,
+    timeStore.getSnapshot,
+    timeStore.getSnapshot,
+  );
+  const trackCurrentTime = currentTrack
+    ? Math.max(0, currentTime - currentTrack.timestamp)
+    : 0;
+  const trackDuration = currentTrack?.endTimestamp != null
+    ? currentTrack.endTimestamp - currentTrack.timestamp
+    : null;
+  return { currentTime, duration, trackCurrentTime, trackDuration };
+};
+
 declare global {
   interface Window {
     YT?: YouTubeNamespace;
@@ -99,8 +117,11 @@ export const PlayerProvider = ({ children }: { children: ReactNode }) => {
   const [unavailableVideoIds, setUnavailableVideoIds] = useState<Set<string>>(new Set());
   const [timestampWarning, setTimestampWarning] = useState<string | null>(null);
   const [skipNotification, setSkipNotification] = useState<string | null>(null);
-  const [currentTime, setCurrentTime] = useState(0);
-  const [duration, setDuration] = useState(0);
+  const timeStoreRef = useRef<PlaybackTimeStore | null>(null);
+  if (timeStoreRef.current === null) {
+    timeStoreRef.current = createPlaybackTimeStore();
+  }
+  const timeStore = timeStoreRef.current;
   const [showModal, setShowModal] = useState(false);
   const [playHistory, setPlayHistory] = useState<Track[]>([]);
   const [queue, setQueue] = useState<Track[]>([]);
@@ -110,14 +131,6 @@ export const PlayerProvider = ({ children }: { children: ReactNode }) => {
   const [allTracks, setAllTracks] = useState<Track[]>([]);
   const [volume, setVolumeState] = useState(75);
   const [isMuted, setIsMuted] = useState(false);
-
-  // Derived track-relative time values (never fall back to full VOD duration)
-  const trackCurrentTime = currentTrack
-    ? Math.max(0, currentTime - currentTrack.timestamp)
-    : 0;
-  const trackDuration = currentTrack?.endTimestamp != null
-    ? currentTrack.endTimestamp - currentTrack.timestamp
-    : null;
 
   const playerRef = useRef<YouTubePlayer | null>(null);
   const playerDivId = 'youtube-player';
@@ -280,7 +293,7 @@ export const PlayerProvider = ({ children }: { children: ReactNode }) => {
       setSkipNotification('已跳過無法播放的版本');
     }
     setCurrentTrack(nextTrack);
-    setCurrentTime(nextTrack.timestamp);
+    timeStore.setTime(nextTrack.timestamp);
     return true;
   };
 
@@ -325,16 +338,21 @@ export const PlayerProvider = ({ children }: { children: ReactNode }) => {
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
+  const stopTimeUpdateInterval = () => {
+    if (timeUpdateIntervalRef.current) {
+      clearInterval(timeUpdateIntervalRef.current);
+      timeUpdateIntervalRef.current = null;
+    }
+  };
+
   // Start (or restart) the time-update polling interval.
   // Uses refs so the callback always sees fresh track/queue state.
   const startTimeUpdateInterval = () => {
-    if (timeUpdateIntervalRef.current) {
-      clearInterval(timeUpdateIntervalRef.current);
-    }
+    stopTimeUpdateInterval();
     timeUpdateIntervalRef.current = setInterval(() => {
       if (playerRef.current && playerRef.current.getCurrentTime) {
         const current = playerRef.current.getCurrentTime();
-        setCurrentTime(current);
+        timeStore.setTime(current);
 
         const track = currentTrackRef.current;
         // Check if reached end timestamp
@@ -351,9 +369,7 @@ export const PlayerProvider = ({ children }: { children: ReactNode }) => {
           } else {
             playerRef.current.pauseVideo();
             setIsPlaying(false);
-            if (timeUpdateIntervalRef.current) {
-              clearInterval(timeUpdateIntervalRef.current);
-            }
+            stopTimeUpdateInterval();
           }
         }
       }
@@ -424,7 +440,7 @@ export const PlayerProvider = ({ children }: { children: ReactNode }) => {
       events: {
         onReady: (event: YouTubeReadyEvent) => {
           const videoDuration = event.target.getDuration();
-          setDuration(videoDuration);
+          timeStore.setDuration(videoDuration);
 
           // Check if timestamp exceeds video length
           if (currentTrack.timestamp > 0 && videoDuration > 0 && currentTrack.timestamp >= videoDuration) {
@@ -450,11 +466,15 @@ export const PlayerProvider = ({ children }: { children: ReactNode }) => {
           // YT.PlayerState: PLAYING=1, PAUSED=2, ENDED=0
           if (event.data === 1) {
             setIsPlaying(true);
+            // Resume polling (covers pause/resume via the YouTube UI too)
+            startTimeUpdateInterval();
             // Update duration (needed after loadVideoById since onReady doesn't re-fire)
             const d = event.target.getDuration();
-            if (d > 0) setDuration(d);
+            if (d > 0) timeStore.setDuration(d);
           } else if (event.data === 2) {
             setIsPlaying(false);
+            // No polling while paused — the clock is frozen anyway
+            stopTimeUpdateInterval();
           } else if (event.data === 0) {
             // Video ended — repeat-one: seek back and replay
             if (repeatModeRef.current === 'one' && currentTrackRef.current) {
@@ -514,7 +534,7 @@ export const PlayerProvider = ({ children }: { children: ReactNode }) => {
       setPlayHistory((prev) => [...prev, prevTrack]);
     }
     setCurrentTrack(track);
-    setCurrentTime(track.timestamp);
+    timeStore.setTime(track.timestamp);
     setQueue(following);
     setAllTracks((prev) => {
       const seen = new Set(prev.map((t) => t.id));
@@ -535,22 +555,24 @@ export const PlayerProvider = ({ children }: { children: ReactNode }) => {
     if (isPlaying) {
       playerRef.current.pauseVideo();
       setIsPlaying(false);
+      stopTimeUpdateInterval();
     } else {
       playerRef.current.playVideo();
       setIsPlaying(true);
+      startTimeUpdateInterval();
     }
   };
 
   const seekTo = (seconds: number) => {
     if (!playerRef.current) return;
     playerRef.current.seekTo(seconds, true);
-    setCurrentTime(seconds);
+    timeStore.setTime(seconds);
   };
 
   const previous = () => {
     if (!currentTrack) return;
 
-    const timePlayed = currentTime - currentTrack.timestamp;
+    const timePlayed = timeStore.getSnapshot().currentTime - currentTrack.timestamp;
 
     if (timePlayed > 3) {
       // Restart current song
@@ -561,7 +583,7 @@ export const PlayerProvider = ({ children }: { children: ReactNode }) => {
         const prevTrack = playHistory[playHistory.length - 1];
         setPlayHistory((prev) => prev.slice(0, -1));
         setCurrentTrack(prevTrack);
-        setCurrentTime(prevTrack.timestamp);
+        timeStore.setTime(prevTrack.timestamp);
       }
     }
   };
@@ -610,10 +632,7 @@ export const PlayerProvider = ({ children }: { children: ReactNode }) => {
         clearTimestampWarning,
         skipNotification,
         clearSkipNotification,
-        currentTime,
-        duration,
-        trackCurrentTime,
-        trackDuration,
+        timeStore,
         playTrackWithQueue,
         togglePlayPause,
         seekTo,

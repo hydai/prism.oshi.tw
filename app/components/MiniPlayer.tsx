@@ -4,7 +4,7 @@ import { useEffect } from 'react';
 import { usePathname } from 'next/navigation';
 import Link from 'next/link';
 import { Play, Pause, SkipBack, SkipForward, ListMusic, AlertCircle, Shuffle, Repeat, Repeat1, Maximize2, Heart } from 'lucide-react';
-import { usePlayer } from '../contexts/PlayerContext';
+import { usePlayer, usePlaybackTime } from '../contexts/PlayerContext';
 import { useLikedSongs } from '../contexts/LikedSongsContext';
 import AlbumArt from './AlbumArt';
 import VolumeControl from './VolumeControl';
@@ -15,8 +15,6 @@ export default function MiniPlayer() {
     currentTrack,
     isPlaying,
     playerError,
-    trackCurrentTime,
-    trackDuration,
     togglePlayPause,
     seekTo,
     previous,
@@ -30,6 +28,7 @@ export default function MiniPlayer() {
     toggleShuffle,
   } = usePlayer();
 
+  const { trackCurrentTime, trackDuration } = usePlaybackTime();
   const { isLiked, toggleLike } = useLikedSongs();
 
   const pathname = usePathname();

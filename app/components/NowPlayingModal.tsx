@@ -3,7 +3,7 @@
 import { useEffect, useState } from 'react';
 import { createPortal } from 'react-dom';
 import { X, Play, Pause, SkipBack, SkipForward, ChevronDown, Shuffle, Repeat, Repeat1, ListMusic, Heart } from 'lucide-react';
-import { usePlayer } from '../contexts/PlayerContext';
+import { usePlayer, usePlaybackTime } from '../contexts/PlayerContext';
 import { useLikedSongs } from '../contexts/LikedSongsContext';
 import AlbumArt from './AlbumArt';
 import VolumeControl from './VolumeControl';
@@ -19,8 +19,6 @@ export default function NowPlayingModal() {
   const {
     currentTrack,
     isPlaying,
-    trackCurrentTime,
-    trackDuration,
     togglePlayPause,
     seekTo,
     previous,
@@ -34,6 +32,7 @@ export default function NowPlayingModal() {
     queue,
     setShowQueue,
   } = usePlayer();
+  const { trackCurrentTime, trackDuration } = usePlaybackTime();
 
   const { isLiked, toggleLike } = useLikedSongs();
 
