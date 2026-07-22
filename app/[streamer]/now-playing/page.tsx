@@ -16,12 +16,7 @@ import LikedSongsPanel from '../../components/LikedSongsPanel';
 import RecentlyPlayedPanel from '../../components/RecentlyPlayedPanel';
 import Toast from '../../components/Toast';
 import Link from 'next/link';
-
-const formatTime = (seconds: number): string => {
-  const m = Math.floor(seconds / 60);
-  const s = Math.floor(seconds % 60);
-  return `${m}:${s.toString().padStart(2, '0')}`;
-};
+import { formatTime } from '../../lib/format';
 
 export default function NowPlayingPage() {
   const router = useRouter();

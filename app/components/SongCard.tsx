@@ -4,6 +4,7 @@ import { memo, useMemo } from 'react';
 import { Disc3, ChevronDown, ChevronRight, Play, Plus, ExternalLink, Heart } from 'lucide-react';
 import AddToPlaylistDropdown from './AddToPlaylistDropdown';
 import type { ArchivePerformance, ArchiveSong, ArchiveTrack } from '../types/archive';
+import { formatTime } from '../lib/format';
 
 interface SongCardProps {
   song: ArchiveSong;
@@ -17,12 +18,6 @@ interface SongCardProps {
   unavailableVideoIds: Set<string>;
   streamerSlug: string;
 }
-
-const formatTime = (seconds: number): string => {
-  const m = Math.floor(seconds / 60);
-  const s = seconds % 60;
-  return `${m}:${s.toString().padStart(2, '0')}`;
-};
 
 function SongCardInner({ song, isExpanded, onToggleExpand, onPlay, onAddToQueue, onAddToPlaylistSuccess, isLiked, onToggleLike, unavailableVideoIds, streamerSlug }: SongCardProps) {
   const sortedPerformances = useMemo(

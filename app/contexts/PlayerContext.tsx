@@ -106,6 +106,10 @@ declare global {
   }
 }
 
+// previous() only ever pops the top of the history stack — a bounded window
+// is invisible to users but keeps long sessions from growing without limit
+const PLAY_HISTORY_LIMIT = 100;
+
 export const PlayerProvider = ({ children }: { children: ReactNode }) => {
   const volumeKey = 'prism_volume';
   const mutedKey = 'prism_muted';
@@ -128,6 +132,8 @@ export const PlayerProvider = ({ children }: { children: ReactNode }) => {
   const [showQueue, setShowQueue] = useState(false);
   const [repeatMode, setRepeatMode] = useState<RepeatMode>('off');
   const [shuffleOn, setShuffleOn] = useState(false);
+  // Repeat-all refill pool — deliberately uncapped: it is deduped by id and
+  // bounded by the number of distinct performances played this session
   const [allTracks, setAllTracks] = useState<Track[]>([]);
   const [volume, setVolumeState] = useState(75);
   const [isMuted, setIsMuted] = useState(false);
@@ -287,7 +293,7 @@ export const PlayerProvider = ({ children }: { children: ReactNode }) => {
     setQueue(newQueue);
 
     if (fromTrack) {
-      setPlayHistory(prev => [...prev, fromTrack]);
+      setPlayHistory(prev => [...prev, fromTrack].slice(-PLAY_HISTORY_LIMIT));
     }
     if (skippedAny) {
       setSkipNotification('已跳過無法播放的版本');
@@ -531,7 +537,7 @@ export const PlayerProvider = ({ children }: { children: ReactNode }) => {
     ensurePlayerApi();
     const prevTrack = currentTrackRef.current;
     if (prevTrack && prevTrack.id !== track.id) {
-      setPlayHistory((prev) => [...prev, prevTrack]);
+      setPlayHistory((prev) => [...prev, prevTrack].slice(-PLAY_HISTORY_LIMIT));
     }
     setCurrentTrack(track);
     timeStore.setTime(track.timestamp);

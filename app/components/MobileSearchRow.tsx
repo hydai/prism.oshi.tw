@@ -2,6 +2,7 @@
 
 import { memo } from 'react';
 import { Play } from 'lucide-react';
+import { formatTime } from '../lib/format';
 
 interface MobileSearchRowProps {
   song: {
@@ -19,12 +20,6 @@ interface MobileSearchRowProps {
   onPlay: (track: { id: string; songId: string; title: string; originalArtist: string; videoId: string; timestamp: number; endTimestamp?: number; albumArtUrl?: string; streamerSlug: string }) => void;
   streamerSlug: string;
 }
-
-const formatTime = (seconds: number): string => {
-  const m = Math.floor(seconds / 60);
-  const s = seconds % 60;
-  return `${m}:${s.toString().padStart(2, '0')}`;
-};
 
 function MobileSearchRowInner({ song, isCurrentlyPlaying, isUnavailable, onPlay, streamerSlug }: MobileSearchRowProps) {
   return (

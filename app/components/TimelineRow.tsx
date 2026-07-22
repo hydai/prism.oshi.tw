@@ -5,6 +5,7 @@ import { Play, Disc3, Plus, ExternalLink, Heart } from 'lucide-react';
 import AlbumArt from './AlbumArt';
 import AddToPlaylistDropdown from './AddToPlaylistDropdown';
 import type { ArchiveTrack, FlattenedSong } from '../types/archive';
+import { formatTime } from '../lib/format';
 
 interface TimelineRowProps {
   song: FlattenedSong;
@@ -18,12 +19,6 @@ interface TimelineRowProps {
   onAddToPlaylistSuccess: () => void;
   streamerSlug: string;
 }
-
-const formatTime = (seconds: number): string => {
-  const m = Math.floor(seconds / 60);
-  const s = seconds % 60;
-  return `${m}:${s.toString().padStart(2, '0')}`;
-};
 
 function TimelineRowInner({ song, index, isCurrentlyPlaying, isUnavailable, isLiked, onToggleLike, onPlay, onAddToQueue, onAddToPlaylistSuccess, streamerSlug }: TimelineRowProps) {
   const track = {

@@ -8,6 +8,7 @@ import { useLikedSongs } from '../contexts/LikedSongsContext';
 import AlbumArt from './AlbumArt';
 import VolumeControl from './VolumeControl';
 import ProgressBar from './ProgressBar';
+import { formatTime } from '../lib/format';
 
 export default function NowPlayingModal() {
   const [mounted, setMounted] = useState(false);
@@ -72,12 +73,6 @@ export default function NowPlayingModal() {
   const handleSeek = (percentage: number) => {
     if (!hasKnownDuration) return;
     seekTo(currentTrack.timestamp + trackDuration * percentage);
-  };
-
-  const formatTime = (seconds: number): string => {
-    const m = Math.floor(seconds / 60);
-    const s = Math.floor(seconds % 60);
-    return `${m}:${s.toString().padStart(2, '0')}`;
   };
 
   if (!mounted) return null;
