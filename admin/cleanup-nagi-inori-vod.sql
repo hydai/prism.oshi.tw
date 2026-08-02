@@ -7,7 +7,7 @@
 -- 1 excluded stream row. The matching Nova inbox row (vod-8ec08f66 in
 -- oshi-prism-nova) is deleted separately — different database.
 --
--- Usage: npx wrangler d1 execute oshi-prism-db --remote --file=cleanup-nagi-inori-vod.sql
+-- Usage: npx wrangler@latest d1 execute oshi-prism-db --remote --file=cleanup-nagi-inori-vod.sql
 
 -- 1. Delete nagi songs whose only performances are in the polluted stream
 --    (performances.song_id has ON DELETE CASCADE, so their performances go too)

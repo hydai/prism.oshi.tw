@@ -1,7 +1,7 @@
 -- Diagnostic: find duplicate songs (same title + artist + streamer)
 -- Safe read-only query — run this first to review before cleanup.
 --
--- Usage: npx wrangler d1 execute oshi-prism-db --remote --file=admin/find-duplicates.sql
+-- Usage: npx wrangler@latest d1 execute oshi-prism-db --remote --file=admin/find-duplicates.sql
 
 SELECT s.streamer_id, s.title, s.original_artist, COUNT(*) as song_copies,
        GROUP_CONCAT(s.id) as song_ids

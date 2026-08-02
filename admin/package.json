@@ -3,11 +3,11 @@
   "version": "0.1.0",
   "private": true,
   "scripts": {
-    "dev": "wrangler dev",
-    "deploy": "wrangler deploy",
-    "db:create": "wrangler d1 create oshi-prism-db",
-    "db:migrate": "wrangler d1 execute oshi-prism-db --remote --file=schema.sql",
-    "db:migrate:local": "wrangler d1 execute oshi-prism-db --local --file=schema.sql",
+    "dev": "npx wrangler@latest dev",
+    "deploy": "npx wrangler@latest deploy",
+    "db:create": "npx wrangler@latest d1 create oshi-prism-db",
+    "db:migrate": "npx wrangler@latest d1 execute oshi-prism-db --remote --file=schema.sql",
+    "db:migrate:local": "npx wrangler@latest d1 execute oshi-prism-db --local --file=schema.sql",
     "db:seed:local": "npx tsx seed.ts --local",
     "typecheck": "tsc --noEmit",
     "test:helpers": "npx tsx src/helpers.test.ts",
@@ -46,7 +46,6 @@
     "ajv": "^8.20.0",
     "ajv-formats": "^3.0.1",
     "tsx": "^4.22.3",
-    "typescript": "^5.9.3",
-    "wrangler": "^4.110.0"
+    "typescript": "^5.9.3"
   }
 }

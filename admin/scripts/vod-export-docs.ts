@@ -27,7 +27,8 @@ import type {
 const SCRIPT_DIR = dirname(fileURLToPath(import.meta.url));
 const ADMIN_DIR = resolve(SCRIPT_DIR, '..');
 const REPOSITORY_ROOT = resolve(ADMIN_DIR, '..');
-const WRANGLER_BIN = resolve(ADMIN_DIR, 'node_modules', '.bin', 'wrangler');
+const WRANGLER_COMMAND = 'npx';
+const WRANGLER_ARGS = ['wrangler@latest'] as const;
 
 export const VOD_EXPORT_PUBLIC_ORIGIN = 'https://data.oshi.tw';
 export const VOD_EXPORT_PUBLIC_BUCKET = 'prism-vod-export-public';
@@ -534,8 +535,9 @@ async function readResponseBytes(
 
 function readRemoteR2Object(key: string): Uint8Array | null {
   const result = spawnSync(
-    WRANGLER_BIN,
+    WRANGLER_COMMAND,
     [
+      ...WRANGLER_ARGS,
       'r2',
       'object',
       'get',
@@ -552,7 +554,7 @@ function readRemoteR2Object(key: string): Uint8Array | null {
 }
 
 function runWrangler(args: readonly string[]): void {
-  const result = spawnSync(WRANGLER_BIN, args, {
+  const result = spawnSync(WRANGLER_COMMAND, [...WRANGLER_ARGS, ...args], {
     cwd: ADMIN_DIR,
     encoding: 'utf8',
     stdio: ['ignore', 'pipe', 'pipe'],

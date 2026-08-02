@@ -5,7 +5,7 @@
 -- a cover attribution and is merged into the canonical niki song.
 --
 -- This migration is intentionally idempotent and is applied directly with:
---   npx wrangler d1 execute oshi-prism-db --remote \
+--   npx wrangler@latest d1 execute oshi-prism-db --remote \
 --     --file=migrations/0004_merge_mizuki_duplicate_songs.sql
 
 CREATE TABLE IF NOT EXISTS song_aliases (

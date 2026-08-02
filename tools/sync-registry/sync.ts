@@ -102,7 +102,7 @@ function queryNovaDb(): SubmissionRow[] {
 
   const raw = execFileSync(
     'npx',
-    ['wrangler', 'd1', 'execute', 'oshi-prism-nova', '--remote', '--json', `--command=${sql}`],
+    ['wrangler@latest', 'd1', 'execute', 'oshi-prism-nova', '--remote', '--json', `--command=${sql}`],
     { cwd: NOVA_DIR, encoding: 'utf-8', maxBuffer: 10 * 1024 * 1024 },
   );
 

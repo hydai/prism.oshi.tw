@@ -5,7 +5,7 @@
 -- song_work_links; performances are never rewritten by this migration.
 --
 -- The migration is intentionally idempotent and is applied directly with:
---   npx wrangler d1 execute oshi-prism-db --remote \
+--   npx wrangler@latest d1 execute oshi-prism-db --remote \
 --     --file=migrations/0005_create_global_works.sql
 
 CREATE TABLE IF NOT EXISTS works (
