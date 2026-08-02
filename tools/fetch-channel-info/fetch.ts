@@ -101,7 +101,7 @@ export function formatSummary(response: BulkFetchSubscribersResponse): string {
 // --- I/O ---
 
 function queryD1<T>(sql: string): T[] {
-  const raw = execFileSync('npx', ['wrangler', 'd1', 'execute', NOVA_DB, '--remote', '--json', `--command=${sql}`], {
+  const raw = execFileSync('npx', ['wrangler@latest', 'd1', 'execute', NOVA_DB, '--remote', '--json', `--command=${sql}`], {
     cwd: NOVA_DIR,
     encoding: 'utf-8',
     maxBuffer: 10 * 1024 * 1024,
@@ -110,7 +110,7 @@ function queryD1<T>(sql: string): T[] {
 }
 
 function executeD1File(filePath: string): void {
-  execFileSync('npx', ['wrangler', 'd1', 'execute', NOVA_DB, '--remote', `--file=${filePath}`], {
+  execFileSync('npx', ['wrangler@latest', 'd1', 'execute', NOVA_DB, '--remote', `--file=${filePath}`], {
     cwd: NOVA_DIR,
     encoding: 'utf-8',
     maxBuffer: 10 * 1024 * 1024,
@@ -151,7 +151,7 @@ export async function main(): Promise<void> {
   try {
     rows = queryD1<ApprovedRow>(APPROVED_WITH_CHANNEL_SQL);
   } catch (err) {
-    console.error('ERROR: failed to query Nova D1. Is wrangler authenticated? Run `npx wrangler login`.');
+    console.error('ERROR: failed to query Nova D1. Is wrangler authenticated? Run `npx wrangler@latest login`.');
     console.error(err instanceof Error ? err.message : String(err));
     process.exit(1);
   }

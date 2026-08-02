@@ -94,7 +94,7 @@ interface FanSiteStream {
 function queryD1<T>(sql: string): T[] {
   const raw = execFileSync(
     'npx',
-    ['wrangler', 'd1', 'execute', 'oshi-prism-db', '--remote', '--json', `--command=${sql}`],
+    ['wrangler@latest', 'd1', 'execute', 'oshi-prism-db', '--remote', '--json', `--command=${sql}`],
     { cwd: ADMIN_DIR, encoding: 'utf-8', maxBuffer: 10 * 1024 * 1024 },
   );
 

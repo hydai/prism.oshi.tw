@@ -2,7 +2,7 @@
 -- Scoped to streamer_id = 'seki' only.
 -- Uses created_at consistently to pick the canonical (oldest) song.
 --
--- Usage: npx wrangler d1 execute oshi-prism-db --remote --file=admin/cleanup-duplicates.sql
+-- Usage: npx wrangler@latest d1 execute oshi-prism-db --remote --file=admin/cleanup-duplicates.sql
 
 -- 1. Reassign performances from duplicate songs to canonical song (oldest created_at per title+artist)
 UPDATE performances SET song_id = (

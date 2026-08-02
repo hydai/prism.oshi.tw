@@ -1095,7 +1095,7 @@ Expected: `true`
 
 - [ ] **Step 3: 設定回饋 webhook（worker secret）**
 
-Run: `cd admin && npx wrangler secret put DISCORD_WEBHOOK_FEEDBACK`
+Run: `cd admin && npx wrangler@latest secret put DISCORD_WEBHOOK_FEEDBACK`
 貼上回饋頻道 webhook URL。
 （如需本地 `wrangler dev` 測試，另在 `admin/.dev.vars` 加 `DISCORD_WEBHOOK_FEEDBACK=<同一 URL>`。）
 
@@ -1115,7 +1115,7 @@ Run: `cd admin && npx wrangler secret put DISCORD_WEBHOOK_FEEDBACK`
 
 - [ ] **Step 7: 換正式 webhook（若 Step 1 用測試頻道）**
 
-把 `admin/.dev.vars` 的 `DISCORD_WEBHOOK_ANNOUNCE` 換成正式公告頻道 URL；重設 `cd admin && npx wrangler secret put DISCORD_WEBHOOK_FEEDBACK` 為正式回饋頻道 URL，並再次 `/deploy-admin`。
+把 `admin/.dev.vars` 的 `DISCORD_WEBHOOK_ANNOUNCE` 換成正式公告頻道 URL；重設 `cd admin && npx wrangler@latest secret put DISCORD_WEBHOOK_FEEDBACK` 為正式回饋頻道 URL，並再次 `/deploy-admin`。
 
 ---
 

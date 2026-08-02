@@ -70,7 +70,7 @@ function execD1(sql: string, mode: string): void {
   const tmpFile = resolve(__dirname, '.seed-batch.sql');
   writeFileSync(tmpFile, sql, 'utf-8');
   try {
-    execFileSync('npx', ['wrangler', 'd1', 'execute', DB_NAME, mode, `--file=${tmpFile}`], {
+    execFileSync('npx', ['wrangler@latest', 'd1', 'execute', DB_NAME, mode, `--file=${tmpFile}`], {
       stdio: 'inherit',
       cwd: __dirname,
     });

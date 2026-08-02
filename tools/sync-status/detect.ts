@@ -77,7 +77,7 @@ function queryAdminD1(root: string): AggRow[] {
   const adminDir = path.resolve(root, 'admin');
   const raw = execFileSync(
     'npx',
-    ['wrangler', 'd1', 'execute', 'oshi-prism-db', '--remote', '--json', `--command=${AGG_SQL}`],
+    ['wrangler@latest', 'd1', 'execute', 'oshi-prism-db', '--remote', '--json', `--command=${AGG_SQL}`],
     { cwd: adminDir, encoding: 'utf-8', maxBuffer: 10 * 1024 * 1024 },
   );
   const parsed = JSON.parse(raw);

@@ -43,7 +43,7 @@ service token; the comparison lives in the design discussion / commit history.)
 
 | State / Operation | Result |
 |---|---|
-| `wrangler` not authenticated | Stop; instruct the operator to run `npx wrangler login`. |
+| `wrangler` not authenticated | Stop; instruct the operator to run `npx wrangler@latest login`. |
 | `YOUTUBE_API_KEY` absent from `admin/.dev.vars` | Stop; instruct the operator to add it. |
 | No approved streamers with a channel ID | Report "nothing to fetch"; exit success. |
 | Channel hidden or not found | Record a per-streamer failure; leave that row unchanged; continue. |

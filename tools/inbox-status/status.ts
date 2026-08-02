@@ -179,7 +179,7 @@ export function parseWranglerResults<T>(raw: string): T[] {
 function queryD1<T>(cwd: string, databaseName: string, sql: string): T[] {
   const raw = execFileSync(
     'npx',
-    ['wrangler', 'd1', 'execute', databaseName, '--remote', '--json', `--command=${sql}`],
+    ['wrangler@latest', 'd1', 'execute', databaseName, '--remote', '--json', `--command=${sql}`],
     { cwd, encoding: 'utf-8', maxBuffer: 10 * 1024 * 1024 },
   );
   return parseWranglerResults<T>(raw);

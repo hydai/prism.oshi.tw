@@ -1,7 +1,7 @@
 -- Migration 0001: add updated_at to performances and streams
 --
 -- Apply against remote D1 (from admin/ directory):
---   npx wrangler d1 execute oshi-prism-db --remote --file=migrations/0001_add_updated_at.sql
+--   npx wrangler@latest d1 execute oshi-prism-db --remote --file=migrations/0001_add_updated_at.sql
 --
 -- SQLite ALTER TABLE ADD COLUMN cannot use a non-constant DEFAULT (datetime('now')),
 -- so we add the column as nullable, then backfill existing rows from created_at.

@@ -46,16 +46,16 @@ safe, but it must not be used to skip or baseline migration history.
 First record Time Travel information for both databases:
 
 ```sh
-npx wrangler d1 time-travel info oshi-prism-db
-npx wrangler d1 time-travel info oshi-prism-nova
+npx wrangler@latest d1 time-travel info oshi-prism-db
+npx wrangler@latest d1 time-travel info oshi-prism-nova
 ```
 
 Then apply only the three new reviewed files:
 
 ```sh
-npx wrangler d1 execute oshi-prism-db --remote --file=migrations/0002_add_vod_export_state.sql
-npx wrangler d1 execute oshi-prism-nova --remote --file=../tools/nova/migrations/0014_add_vod_export_state.sql
-npx wrangler d1 execute oshi-prism-db --remote --file=migrations/0003_add_vod_export_source_indexes.sql
+npx wrangler@latest d1 execute oshi-prism-db --remote --file=migrations/0002_add_vod_export_state.sql
+npx wrangler@latest d1 execute oshi-prism-nova --remote --file=../tools/nova/migrations/0014_add_vod_export_state.sql
+npx wrangler@latest d1 execute oshi-prism-db --remote --file=migrations/0003_add_vod_export_source_indexes.sql
 ```
 
 Treat each state-table file as a one-time migration. Before running it, inspect the target
@@ -82,22 +82,22 @@ shape.
 Create the two Standard buckets:
 
 ```sh
-npx wrangler r2 bucket create prism-vod-export-public
-npx wrangler r2 bucket create prism-vod-export-private
+npx wrangler@latest r2 bucket create prism-vod-export-public
+npx wrangler@latest r2 bucket create prism-vod-export-private
 ```
 
 Disable `r2.dev` on both:
 
 ```sh
-npx wrangler r2 bucket dev-url disable prism-vod-export-public
-npx wrangler r2 bucket dev-url disable prism-vod-export-private
+npx wrangler@latest r2 bucket dev-url disable prism-vod-export-public
+npx wrangler@latest r2 bucket dev-url disable prism-vod-export-private
 ```
 
 Add the private candidate cleanup backstop and the public snapshot lock:
 
 ```sh
-npx wrangler r2 bucket lifecycle add prism-vod-export-private expire-private-candidates candidates/v1/ --expire-days 2
-npx wrangler r2 bucket lock add prism-vod-export-public retain-v1-snapshots vod/v1/snapshots/ --retention-days 400
+npx wrangler@latest r2 bucket lifecycle add prism-vod-export-private expire-private-candidates candidates/v1/ --expire-days 2
+npx wrangler@latest r2 bucket lock add prism-vod-export-public retain-v1-snapshots vod/v1/snapshots/ --retention-days 400
 ```
 
 Do not add an age-only deletion lifecycle to the public snapshot prefix.
@@ -110,7 +110,7 @@ Configure no CORS policy on either bucket. Attach only the public bucket to
 an environment variable, the Custom Domain command is:
 
 ```sh
-npx wrangler r2 bucket domain add prism-vod-export-public --domain data.oshi.tw --zone-id YOUR_ZONE_ID --min-tls 1.2
+npx wrangler@latest r2 bucket domain add prism-vod-export-public --domain data.oshi.tw --zone-id YOUR_ZONE_ID --min-tls 1.2
 ```
 
 The public bucket also contains the source-controlled consumer guide and
@@ -172,14 +172,14 @@ npm run verify:vod-export-docs
 Before the first schema release, protect its prefix at the storage layer:
 
 ```sh
-npx wrangler r2 bucket lock add prism-vod-export-public \
+npx wrangler@latest r2 bucket lock add prism-vod-export-public \
   retain-v1-schemas vod/v1/schemas/ --retention-indefinite --force
 ```
 
 Confirm `retain-v1-schemas` is enabled with:
 
 ```sh
-npx wrangler r2 bucket lock list prism-vod-export-public
+npx wrangler@latest r2 bucket lock list prism-vod-export-public
 ```
 
 The indefinite prefix lock permits new schema keys but prevents deletion or
