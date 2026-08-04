@@ -165,6 +165,50 @@ async function run() {
   }
 
   console.log("archive-loader tests passed");
+  // song.tags is no longer serialized: the exporter omits the derivable union and every
+  // empty tag array, so hydration has to rebuild the effective set from what is on the
+  // wire. Without this a tagged archive loads with every song untagged.
+  {
+    const slimmed = [
+      {
+        id: "song-slim",
+        title: "Slim",
+        originalArtist: "Artist S",
+        inheritedTags: ["genre:rock"],
+        performances: [
+          { id: "p-slim", streamId: "s-new", videoId: "v9", timestamp: 5, endTimestamp: null, tags: ["language:zh"] },
+        ],
+      },
+      {
+        id: "song-untagged",
+        title: "Untagged",
+        originalArtist: "Artist U",
+        performances: [
+          { id: "p-untagged", streamId: "s-new", videoId: "v10", timestamp: 6, endTimestamp: null },
+        ],
+      },
+    ];
+    const fetchImpl = makeFetch({
+      "/api/mizuki/songs": { body: slimmed },
+      "/api/mizuki/streams": { body: baseStreams },
+    });
+    const { songs } = await loadArchiveData("mizuki", fetchImpl);
+
+    const slim = songs.find((s) => s.id === "song-slim")!;
+    assert.deepEqual(
+      slim.tags,
+      ["language:zh", "genre:rock"],
+      "the effective union is rebuilt from inheritedTags plus rendition tags",
+    );
+    assert.deepEqual(slim.inheritedTags, ["genre:rock"]);
+    assert.deepEqual(slim.performances[0].tags, ["language:zh"]);
+
+    const untagged = songs.find((s) => s.id === "song-untagged")!;
+    assert.deepEqual(untagged.tags, [], "an entirely untagged song hydrates to empty arrays");
+    assert.deepEqual(untagged.inheritedTags, []);
+    assert.deepEqual(untagged.performances[0].tags, []);
+  }
+
 }
 
 run().catch((error) => {

@@ -1129,6 +1129,7 @@ function MobileSearchTab() {
                         >
                           <MobileSearchRow
                             song={song}
+                        selectedTags={selectedTags}
                             isCurrentlyPlaying={currentTrackId === song.performanceId}
                             isUnavailable={unavailableVideoIds.has(song.videoId)}
                             onPlay={handlePlayFromFlattened}

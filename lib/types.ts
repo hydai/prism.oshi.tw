@@ -11,7 +11,7 @@ export interface Performance {
   endTimestamp: number | null;
   /** Present only when non-empty */
   note?: string;
-  tags: string[];
+  tags?: string[];
 }
 
 export interface Song {
@@ -21,8 +21,8 @@ export interface Song {
   title: string;
   originalArtist: string;
   /** Work and legacy song tags inherited by every performance. */
-  inheritedTags: string[];
-  tags: string[];
+  inheritedTags?: string[];
+  tags?: string[];
   performances: Performance[];
 }
 

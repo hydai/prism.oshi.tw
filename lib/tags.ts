@@ -199,6 +199,29 @@ export function matchesTagSelection(songTags: Iterable<string>, selectedTags: It
   );
 }
 
+// Lowercased search terms for a tag set, kept as discrete entries. Callers must match
+// these as whole terms: several aliases contain spaces ('Rhythm and blues', 'A cappella'),
+// so a joined string cannot be split back apart, and substring matching against them
+// makes short queries ('op' inside 'Pop') match nearly the whole archive.
+export function tagSearchTermList(tags: Iterable<string>): string[] {
+  const terms: string[] = [];
+  for (const id of tags) {
+    const definition = getTagDefinition(id);
+    if (!definition) {
+      terms.push(id.toLowerCase());
+      continue;
+    }
+    terms.push(definition.label.toLowerCase());
+    for (const alias of definition.aliases) terms.push(alias.toLowerCase());
+  }
+  return terms;
+}
+
+export function matchesTagSearchTerm(tags: Iterable<string>, lowerTerm: string): boolean {
+  if (!lowerTerm) return false;
+  return tagSearchTermList(tags).includes(lowerTerm);
+}
+
 export function tagSearchTerms(tags: Iterable<string>): string {
   return [...tags]
     .flatMap((id) => {

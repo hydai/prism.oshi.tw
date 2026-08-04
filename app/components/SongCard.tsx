@@ -3,11 +3,13 @@
 import { memo, useMemo } from 'react';
 import { Disc3, ChevronDown, ChevronRight } from 'lucide-react';
 import type { ArchiveSong, PerformanceRef } from '../types/archive';
+import { visibleSongCardTags } from '../lib/song-card';
 import SongVersionsList from './SongVersionsList';
 import { getTagLabel } from '../../lib/tags';
 
 interface SongCardProps {
   song: ArchiveSong;
+  selectedTags?: ReadonlySet<string>;
   isExpanded: boolean;
   onToggleExpand: (songId: string) => void;
   onPlay: (track: PerformanceRef) => void;
@@ -19,12 +21,16 @@ interface SongCardProps {
   streamerSlug: string;
 }
 
-function SongCardInner({ song, isExpanded, onToggleExpand, onPlay, onAddToQueue, onAddToPlaylistSuccess, isLiked, onToggleLike, unavailableVideoIds, streamerSlug }: SongCardProps) {
+function SongCardInner({ song, isExpanded, onToggleExpand, onPlay, onAddToQueue, onAddToPlaylistSuccess, isLiked, onToggleLike, unavailableVideoIds, streamerSlug, selectedTags }: SongCardProps) {
   const sortedPerformances = useMemo(
     () => isExpanded
       ? [...song.performances].sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime())
       : [],
     [isExpanded, song.performances]
+  );
+  const visibleTags = useMemo(
+    () => visibleSongCardTags(song.tags, selectedTags),
+    [song.tags, selectedTags],
   );
 
   return (
@@ -71,7 +77,7 @@ function SongCardInner({ song, isExpanded, onToggleExpand, onPlay, onAddToQueue,
               >
                 {song.performances.length} 個版本
               </span>
-              {song.tags.slice(0, 3).map((tag) => (
+              {visibleTags.shown.map((tag) => (
                 <span
                   key={tag}
                   className="font-medium"
@@ -86,6 +92,19 @@ function SongCardInner({ song, isExpanded, onToggleExpand, onPlay, onAddToQueue,
                   {getTagLabel(tag)}
                 </span>
               ))}
+              {visibleTags.hidden > 0 && (
+                <span
+                  className="font-medium"
+                  title={song.tags.map(getTagLabel).join('、')}
+                  style={{
+                    fontSize: 'var(--font-size-xs)',
+                    color: 'var(--text-tertiary)',
+                    padding: 'var(--space-1) var(--space-2)',
+                  }}
+                >
+                  +{visibleTags.hidden}
+                </span>
+              )}
             </div>
           </div>
         </div>

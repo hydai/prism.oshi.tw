@@ -18,10 +18,11 @@ union of every effective performance
   = song.tags (card counts and backward compatibility)
 ```
 
-Do not edit generated `data/*/songs.json` files to assign tags by hand. The initial
-catalog is versioned in `data/tag-catalog.json`; `npm run tags:build` applies it to
-the static song files and generates the matching D1 backfill migration. Later
-curator changes still come from Admin D1 and are exported by `sync:data`.
+Do not edit generated `data/*/songs.json` files to assign tags by hand. D1 is the
+authoritative source after the initial rollout, and `sync:data` exports curator
+changes to the static files. The versioned `data/tag-catalog.json` and migration
+0008 are frozen records of the one-time seed; catalog tooling never overlays those
+assignments onto a D1 export.
 
 ## Initial catalog
 
@@ -41,16 +42,21 @@ are not guessed from an artist's general catalog. The generated catalog retains 
 evidence string for every assignment, and `tools/tag-catalog/apple-artist-metadata.json`
 retains the external lookup results used by the classifier.
 
-Run these checks after changing a rule or reviewed artist:
+The classifier and frozen artifacts have separate checks:
 
 ```bash
-npm run tags:build
 npm run test:tag-catalog
 ```
 
-`tags:build` removes the previous generated assignment before applying its
-replacement, while preserving tags that are not owned by the catalog. CI runs
-`tags:check` to catch stale generated files.
+`tags:check` validates the committed catalog records and confirms migration 0008
+was rendered from exactly those records. It deliberately does not read or rewrite
+`data/*/songs.json`, so removing or replacing a seeded tag in Admin remains
+authoritative after `sync:data`.
+
+`npm run tags:seed:build` is an explicit seed-authoring command retained for a new
+pre-rollout seed. It rebuilds only `data/tag-catalog.json` and migration 0008 from
+the current static snapshot; it never changes streamer song files. Do not run it
+as part of normal curator, sync, or CI workflows.
 
 ## Taxonomy
 
@@ -84,9 +90,9 @@ effective tags on the next sync.
 
 ## Initial rollout
 
-The static song files already contain the initial effective tags. Before running a
-future D1-to-static sync, apply the generated additive migration so D1 becomes
-consistent with those files:
+The static song files shipped with the initial effective tags. Before the first
+D1-to-static sync in an environment that has not received the seed, apply the
+generated additive migration so D1 becomes consistent with those files:
 
 ```bash
 cd admin
@@ -99,10 +105,12 @@ npx wrangler@latest d1 execute oshi-prism-db --remote \
 
 Migration 0007 adds the storage column and moves any controlled language/style IDs
 already present on songs or works down to their linked performances. Migration 0008
-preserves existing curator tags, de-duplicates generated tags, and is safe to retry.
-Apply them in order. As with every production D1 change, record the Time Travel
-bookmark first. Deploying the Worker and applying migrations are separate operator
-actions; merging the PR does not mutate production D1.
+preserves existing tags and de-duplicates the generated seed. Apply them in order.
+Only retry migration 0008 while completing the initial rollout, before handing tag
+ownership to curators; running it later would re-add seed values that a curator may
+have intentionally removed. As with every production D1 change, record the Time
+Travel bookmark first. Deploying the Worker and applying migrations are separate
+operator actions; merging the PR does not mutate production D1.
 
 ## Scope
 

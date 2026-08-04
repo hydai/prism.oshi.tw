@@ -1,7 +1,7 @@
 import type { Performance, Song } from "../../lib/types";
 
 export type ArchivePerformance = Performance & { streamTitle: string; date: string; note: string; inheritedTags: string[]; tags: string[] };
-export type ArchiveSong = Omit<Song, "performances"> & { inheritedTags: string[]; performances: ArchivePerformance[] };
+export type ArchiveSong = Omit<Song, "performances"> & { inheritedTags: string[]; tags: string[]; performances: ArchivePerformance[] };
 
 export interface FlattenedSong {
   id: string;
@@ -17,6 +17,8 @@ export interface FlattenedSong {
   endTimestamp: number | null;
   note: string;
   searchString: string;
+  // Tag labels/aliases are matched as whole terms, so they are kept out of searchString.
+  tagTerms: string[];
   year: number;
 }
 

@@ -1,4 +1,5 @@
 import { sortStreamsByNewest } from "./archive";
+import { mergeTagIds } from "../../lib/tags";
 import type { ArchiveSong, StreamSummary } from "../types/archive";
 import type { Song } from "../../lib/types";
 
@@ -16,21 +17,25 @@ const ORPHAN_DATE = "1970-01-01";
 export function hydrateSongs(stored: Song[], streams: StreamSummary[]): ArchiveSong[] {
   const streamById = new Map(streams.map((s) => [s.id, s]));
   return stored.map((song) => {
-    const inheritedTags = song.inheritedTags ?? song.tags;
+    const inheritedTags = song.inheritedTags ?? song.tags ?? [];
+    const performances = song.performances.map((p) => {
+      const stream = streamById.get(p.streamId);
+      return {
+        ...p,
+        streamTitle: stream?.title ?? "",
+        date: stream?.date ?? ORPHAN_DATE,
+        note: p.note ?? "",
+        inheritedTags,
+        tags: p.tags ?? [],
+      };
+    });
     return {
       ...song,
       inheritedTags,
-      performances: song.performances.map((p) => {
-        const stream = streamById.get(p.streamId);
-        return {
-          ...p,
-          streamTitle: stream?.title ?? "",
-          date: stream?.date ?? ORPHAN_DATE,
-          note: p.note ?? "",
-          inheritedTags,
-          tags: p.tags ?? [],
-        };
-      }),
+      // The exporter omits this union because it is fully derivable, so rebuild it here
+      // in the same order the tag chips and filters expect.
+      tags: mergeTagIds(inheritedTags, performances.flatMap((p) => p.tags)),
+      performances,
     };
   });
 }

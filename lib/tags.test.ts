@@ -10,6 +10,7 @@ import {
   matchesTagSelection,
   mergeTagIds,
   normalizeTagIds,
+  tagSearchTermList,
   tagSearchTerms,
   validateTagSelection,
   validateTagSelectionForScope,
@@ -106,5 +107,10 @@ const searchTerms = tagSearchTerms(['language:zh', 'style:parody']);
 assert.match(searchTerms, /中文歌/);
 assert.match(searchTerms, /華語/);
 assert.match(searchTerms, /惡搞/);
+
+const termList = tagSearchTermList(['language:zh', 'legacy:Old']);
+assert.ok(termList.includes('中文歌') && termList.includes('chinese'), 'labels and aliases are listed lowercased');
+assert.ok(termList.includes('legacy:old'), 'unregistered IDs are kept as their own lowercased term');
+assert.equal(termList.indexOf('中文歌'), 0, 'terms keep catalog order, label before aliases');
 
 console.log('tags tests passed');

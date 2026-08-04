@@ -13,7 +13,8 @@ import { useArchiveData } from './archive-data-context';
 import { useArchiveUi } from './archive-ui-context';
 import { usePlayerActions, usePlayerStore } from '../contexts/PlayerContext';
 import {
-  getTagCounts,
+  getFlattenedTagCounts,
+  getGroupedTagCounts,
   filterFlattenedSongs,
   filterGroupedSongs,
   filterStreamsByYears,
@@ -68,7 +69,6 @@ export function ArchiveFiltersProvider({ children }: { children: ReactNode }) {
   const [selectedYears, setSelectedYears] = useState<Set<number>>(new Set());
 
   const [selectedTags, setSelectedTags] = useState<Set<string>>(new Set());
-  const tagCounts = useMemo(() => getTagCounts(allGroupedSongs), [allGroupedSongs]);
   const toggleTag = useCallback((tagId: string) => {
     setSelectedTags(prev => {
       const next = new Set(prev);
@@ -122,6 +122,13 @@ export function ArchiveFiltersProvider({ children }: { children: ReactNode }) {
   const groupedSongs: ArchiveSong[] = useMemo(
     () => filterGroupedSongs(allGroupedSongs, archiveFilters),
     [allGroupedSongs, archiveFilters],
+  );
+
+  const tagCounts = useMemo(
+    () => (viewMode === 'timeline'
+      ? getFlattenedTagCounts(allFlattenedSongs, archiveFilters)
+      : getGroupedTagCounts(allGroupedSongs, archiveFilters)),
+    [viewMode, allFlattenedSongs, allGroupedSongs, archiveFilters],
   );
 
   const playerStore = usePlayerStore();

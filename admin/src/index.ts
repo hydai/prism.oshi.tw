@@ -617,6 +617,16 @@ app.post('/api/songs', async (c) => {
   const tagSelection = validateTagSelection(body.tags ?? []);
   if (!tagSelection.ok) return c.json({ error: tagSelection.error }, 400);
   const workTags = filterTagIdsByScope(tagSelection.tags, 'work');
+  if (workTags.length > 0) {
+    if (c.get('user').role !== 'curator') {
+      return c.json({
+        error: 'Forbidden: work-scoped tags can only be edited by a curator in Global Song Library',
+      }, 403);
+    }
+    return c.json({
+      error: 'Work-scoped tags must be edited in Global Song Library',
+    }, 400);
+  }
   const legacyPerformanceTags = filterTagIdsByScope(tagSelection.tags, 'performance');
   if (legacyPerformanceTags.length > 0 && (!body.performances || body.performances.length === 0)) {
     return c.json({ error: 'performance-scoped tags require at least one performance' }, 400);
@@ -631,7 +641,7 @@ app.post('/api/songs', async (c) => {
 
   const user = c.get('user');
   const id = generateSongId();
-  await insertSong(c.env.DB, streamerId, id, body.title, body.originalArtist, workTags, user.email);
+  await insertSong(c.env.DB, streamerId, id, body.title, body.originalArtist, [], user.email);
   await insertPerformances(c.env.DB, streamerId, id, inserts.map((perf, index) => ({ ...perf, tags: performanceTags[index] })), user.email);
 
   const song = await getSongById(c.env.DB, id);
@@ -659,6 +669,13 @@ app.put('/api/songs/:id', async (c) => {
   if ('error' in parsedBody) return c.json({ error: parsedBody.error }, 400);
   const body = parsedBody;
 
+  // Tags now live on the work and performance scopes. Accepting the retired field
+  // would return 200 for an edit this route silently discards.
+  if (body.tags !== undefined) {
+    return c.json({
+      error: 'Song tags are no longer set here. Use PUT /api/works/:id/tags for work tags or PATCH /api/performances/:id/tags for rendition tags.',
+    }, 400);
+  }
   await updateSong(c.env.DB, id, {
     title: body.title,
     originalArtist: body.originalArtist,
