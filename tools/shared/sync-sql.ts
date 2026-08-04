@@ -4,13 +4,8 @@
  * (tools/sync-data/sync.ts), so the two never drift apart.
  */
 
-/**
- * Computes a song's latest change: the later of its own `updated_at` and its
- * work link's (song_work_links) — a cross-streamer work-link edit (e.g. a
- * merge) can change a song's identity without touching the song row itself,
- * so the link's timestamp must be considered too. Expects `song` and `link`
- * aliases in scope (`FROM songs AS song LEFT JOIN song_work_links AS link ON
- * link.song_id = song.id`).
+/** Latest visible metadata change, including the shared work's tags.
+ * Callers must join songs AS song, song_work_links AS link, and works AS work.
  */
 export const LATEST_UPDATED_AT_SQL =
-  `MAX(CASE WHEN link.updated_at IS NULL THEN song.updated_at WHEN song.updated_at IS NULL OR link.updated_at > song.updated_at THEN link.updated_at ELSE song.updated_at END) AS max_ts`;
+  `MAX(MAX(COALESCE(song.updated_at, ''), COALESCE(link.updated_at, ''), COALESCE(work.updated_at, ''))) AS max_ts`;

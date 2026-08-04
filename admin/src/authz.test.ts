@@ -102,6 +102,12 @@ function reqInit(route: Route, email: string): RequestInit {
 // the data layer for any of them, including the read-only global catalog.
 const PROTECTED_ROUTES: Route[] = [
   { method: 'GET', path: '/api/works' },
+  { method: 'PUT', path: '/api/works/work-1/tags', body: { tags: ['genre:rock'] } },
+  {
+    method: 'POST',
+    path: '/api/works/tags/bulk',
+    body: { workIds: ['work-1'], addTags: ['genre:rock'], removeTags: [] },
+  },
   { method: 'GET', path: '/api/work-matches' },
   {
     method: 'POST',
@@ -271,6 +277,30 @@ async function testHarmonizerRejectsInvalidWorkMergeConfirmation(): Promise<void
   assertEqual(malformedDb.prepareCalls, 0, 'malformed confirmation is rejected before D1');
 }
 
+async function testWorkTagsRejectInvalidSelectionsBeforeD1(): Promise<void> {
+  const unknownDb = new RecordingD1();
+  const unknownResponse = await app.request(
+    '/api/works/work-1/tags',
+    reqInit({ method: 'PUT', path: '/api/works/work-1/tags', body: { tags: ['unknown:tag'] } }, CURATOR),
+    envFor(unknownDb),
+  );
+  assertEqual(unknownResponse.status, 400, 'unknown work tag is rejected');
+  assertEqual(unknownDb.prepareCalls, 0, 'unknown work tag is rejected before D1');
+
+  const conflictingDb = new RecordingD1();
+  const conflictingResponse = await app.request(
+    '/api/works/tags/bulk',
+    reqInit({
+      method: 'POST',
+      path: '/api/works/tags/bulk',
+      body: { workIds: ['work-1'], addTags: ['genre:rock'], removeTags: ['genre:rock'] },
+    }, CURATOR),
+    envFor(conflictingDb),
+  );
+  assertEqual(conflictingResponse.status, 400, 'bulk update cannot add and remove the same tag');
+  assertEqual(conflictingDb.prepareCalls, 0, 'conflicting bulk update is rejected before D1');
+}
+
 async function main(): Promise<void> {
   await testContributorStillAuthenticates();
   await testContributorRetainsReadOnlyStampAccess();
@@ -278,6 +308,7 @@ async function main(): Promise<void> {
   await testContributorBlockedFromStampMutations();
   await testVodExportMutationRequiresAuthenticityHeader();
   await testHarmonizerRejectsInvalidWorkMergeConfirmation();
+  await testWorkTagsRejectInvalidSelectionsBeforeD1();
   console.log('✓ curator-only Admin routes and VOD export CSRF boundaries');
 }
 

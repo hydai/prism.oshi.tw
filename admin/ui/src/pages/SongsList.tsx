@@ -6,6 +6,7 @@ import { useApiResource } from '../lib/apiResource';
 import StatusBadge from '../components/StatusBadge';
 import { Pagination } from '../components/Pagination';
 import { SortHeader, type SortDirection } from '../components/SortHeader';
+import { getTagLabel } from '../../../../lib/tags';
 
 type SortKey = 'title' | 'originalArtist' | 'status' | 'createdAt';
 
@@ -152,7 +153,7 @@ export default function SongsList({ user }: { user: AuthUser }) {
                       {song.tags.length > 0
                         ? song.tags.map((t) => (
                             <span key={t} className="mr-1 inline-block rounded bg-slate-100 px-1.5 py-0.5 text-xs">
-                              {t}
+                              {getTagLabel(t)}
                             </span>
                           ))
                         : '—'}

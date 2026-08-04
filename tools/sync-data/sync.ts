@@ -16,6 +16,7 @@ import { queryD1 } from '../shared/d1.ts';
 import { syncStatePath, upsertEntry, type SyncStateEntry } from '../shared/sync-state.ts';
 import { assertValidSlug } from '../shared/slug.ts';
 import { LATEST_UPDATED_AT_SQL } from '../shared/sync-sql.ts';
+import { mergeTagIds } from '../../lib/tags.ts';
 
 import { newStreamEmbed, newStreamsSummaryEmbed, type DiscordEmbed } from '../../admin/shared/discord.ts';
 import { enqueueAnnouncements, hashSources, loadAnnounceWebhook, type PendingBatch } from '../shared/announce.ts';
@@ -31,7 +32,8 @@ interface SongRow {
   work_id: string | null;
   title: string;
   original_artist: string;
-  tags: string; // JSON array
+  song_tags: string; // JSON array
+  work_tags: string | null; // JSON array; null for legacy unlinked rows
 }
 
 interface PerformanceRow {
@@ -120,7 +122,10 @@ export function assembleFanSiteSongs(
       ...(row.work_id ? { workId: row.work_id } : {}),
       title: row.title,
       originalArtist: row.original_artist,
-      tags: JSON.parse(row.tags) as string[],
+      tags: mergeTagIds(
+        row.work_tags ? JSON.parse(row.work_tags) as string[] : [],
+        JSON.parse(row.song_tags) as string[],
+      ),
       performances: (perfsBySong.get(row.id) || [])
         // Newest first — the canonical order the timeline consumes (dates come
         // from the DB rows; the slim output no longer carries them)
@@ -171,9 +176,10 @@ export function buildExportSql(streamerId: string): string {
     SELECT * FROM (
     SELECT 'song' AS kind, json_object(
       'id', song.id, 'work_id', link.work_id, 'title', song.title,
-      'original_artist', song.original_artist, 'tags', song.tags
+      'original_artist', song.original_artist, 'song_tags', song.tags, 'work_tags', work.tags
     ) AS payload
     FROM songs AS song LEFT JOIN song_work_links AS link ON link.song_id = song.id
+      LEFT JOIN works AS work ON work.id = link.work_id
     WHERE song.streamer_id = '${streamerId}' AND song.status = 'approved'
     UNION ALL
     SELECT 'performance', json_object(
@@ -192,6 +198,7 @@ export function buildExportSql(streamerId: string): string {
     SELECT 'songs-snapshot', json_object('max_ts', max_ts, 'cnt', cnt) FROM (
       SELECT ${LATEST_UPDATED_AT_SQL}, COUNT(*) AS cnt
       FROM songs AS song LEFT JOIN song_work_links AS link ON link.song_id = song.id
+      LEFT JOIN works AS work ON work.id = link.work_id
       WHERE song.streamer_id = '${streamerId}' AND song.status = 'approved'
     )
     UNION ALL

@@ -31,6 +31,7 @@ jobs:
       - run: npm ci
       - run: npm run lint
       - run: npm test
+      - run: npm run test:tag-catalog
       - run: npm run test:youtube-iframe-types
       - run: npm run test:aurora-nova
       - run: npm run test:browser-storage

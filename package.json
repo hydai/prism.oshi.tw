@@ -32,7 +32,13 @@
     "sync:registry:test": "npx tsx tools/sync-registry/sync.test.ts",
     "sync:data:test": "npx tsx tools/sync-data/sync.test.ts",
     "sync:status:test": "npx tsx tools/sync-status/detect.test.ts",
-    "announce:flush": "npx tsx tools/announce-flush/flush.ts"
+    "announce:flush": "npx tsx tools/announce-flush/flush.ts",
+    "test:tags": "npx tsx lib/tags.test.ts",
+    "test:tag-filter": "npx tsx app/components/TagFilterPanel.test.tsx",
+    "test:tag-catalog": "npx tsx --test tools/tag-catalog/classify.test.ts && npm run tags:check",
+    "tags:metadata": "npx tsx tools/tag-catalog/fetch-apple-artist-metadata.ts",
+    "tags:build": "npx tsx tools/tag-catalog/build.ts",
+    "tags:check": "npx tsx tools/tag-catalog/build.ts --check"
   },
   "keywords": [],
   "author": "",

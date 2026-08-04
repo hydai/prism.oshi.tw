@@ -70,6 +70,16 @@ Streamers are managed through the Nova admin backend, **not** by hand-editing fi
 3. `npm run sync:data -- <slug>` — exports that streamer's approved songs/streams to `data/<slug>/`
 4. Commit & push → GitHub Actions rebuilds and deploys
 
+## Managing Song Tags
+
+Tags are curated in the Admin UI and exported from D1; do not edit generated
+`data/*/songs.json` files by hand. See [`docs/tag-system.md`](docs/tag-system.md)
+for taxonomy, bulk-editing, filtering, and sync behavior.
+
+The repository includes a generated initial catalog, so tag filtering has data on
+first deploy. Use `npm run test:tag-catalog` to verify the catalog and generated
+song files; see the rollout section in the guide before the next D1 sync.
+
 ## License
 
 [MIT](LICENSE)

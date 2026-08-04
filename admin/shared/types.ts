@@ -113,6 +113,25 @@ export interface UpdateSongBody {
   tags?: string[];
 }
 
+export interface UpdateWorkTagsBody {
+  tags: string[];
+}
+
+export interface BulkUpdateWorkTagsBody {
+  workIds: string[];
+  addTags: string[];
+  removeTags: string[];
+}
+
+export interface WorkTagsUpdate {
+  id: string;
+  tags: string[];
+}
+
+export interface BulkUpdateWorkTagsResponse {
+  updated: WorkTagsUpdate[];
+}
+
 export interface CreatePerformanceBody {
   songId: string;
   streamId: string;

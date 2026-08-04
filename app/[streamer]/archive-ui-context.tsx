@@ -25,6 +25,8 @@ interface ArchiveUiValue {
   toggleSongExpansion: (songId: string) => void;
   mobileTab: MobileArchiveTab;
   setMobileTab: Dispatch<SetStateAction<MobileArchiveTab>>;
+  showTagFilter: boolean;
+  setShowTagFilter: Dispatch<SetStateAction<boolean>>;
   showPlaylistPanel: boolean;
   setShowPlaylistPanel: Dispatch<SetStateAction<boolean>>;
   showLikedSongsPanel: boolean;
@@ -69,6 +71,7 @@ export function ArchiveUiProvider({ children }: { children: ReactNode }) {
 
   const [expandedSongs, setExpandedSongs] = useState<Set<string>>(new Set());
   const [toastMessage, setToastMessage] = useState<string | null>(null);
+  const [showTagFilter, setShowTagFilter] = useState(false);
   const [showPlaylistPanel, setShowPlaylistPanel] = useState(false);
   const [showLikedSongsPanel, setShowLikedSongsPanel] = useState(false);
   const [showRecentlyPlayedPanel, setShowRecentlyPlayedPanel] = useState(false);
@@ -133,7 +136,9 @@ export function ArchiveUiProvider({ children }: { children: ReactNode }) {
     toggleSongExpansion,
     mobileTab,
     setMobileTab,
+    showTagFilter,
     showPlaylistPanel,
+    setShowTagFilter,
     setShowPlaylistPanel,
     showLikedSongsPanel,
     setShowLikedSongsPanel,
@@ -154,6 +159,7 @@ export function ArchiveUiProvider({ children }: { children: ReactNode }) {
     expandedSongs,
     toggleSongExpansion,
     mobileTab,
+    showTagFilter,
     showPlaylistPanel,
     showLikedSongsPanel,
     showRecentlyPlayedPanel,

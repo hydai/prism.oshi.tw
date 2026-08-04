@@ -8,6 +8,7 @@ import {
   followingTracksFromGrouped,
   getAllArtists,
   getAvailableYears,
+  getTagCounts,
   groupSongsByWorkId,
   pickPerformanceRef,
   sortGroupedSongs,
@@ -22,7 +23,7 @@ const songs: ArchiveSong[] = [
     id: "song-a",
     title: "Beta Song",
     originalArtist: "Zeta",
-    tags: ["rock"],
+    tags: ["genre:rock", "language:zh"],
     performances: [
       {
         id: "perf-old",
@@ -97,6 +98,7 @@ assert.deepEqual(
 );
 
 assert.deepEqual(getAllArtists(songs), ["Alpha", "Zeta"]);
+assert.deepEqual([...getTagCounts(songs)], [["genre:rock", 1], ["language:zh", 1]]);
 
 const flattened = flattenSongs(songs);
 assert.deepEqual(flattened.map((song) => song.performanceId), [
@@ -104,13 +106,14 @@ assert.deepEqual(flattened.map((song) => song.performanceId), [
   "perf-no-stream",
   "perf-old",
 ]);
-assert.equal(flattened[0]?.searchString, "beta song zeta stream beta");
+assert.match(flattened[0]?.searchString ?? "", /中文歌/);
+assert.match(flattened[0]?.searchString ?? "", /搖滾/);
 assert.equal(flattened[0]?.year, 2025);
 assert.equal(flattened[0]?.endTimestamp, 50);
 assert.equal(flattened[1]?.streamId, "stream-unlisted");
 assert.equal(flattened[2]?.endTimestamp, null);
 assert.equal("performances" in flattened[0]!, false);
-assert.equal("tags" in flattened[0]!, false);
+assert.deepEqual(flattened[0]?.tags, ["genre:rock", "language:zh"]);
 
 assert.deepEqual(
   filterFlattenedSongs(flattened, {
@@ -118,6 +121,7 @@ assert.deepEqual(
     selectedStreamId: "stream-2025",
     selectedArtist: "Zeta",
     selectedYears: new Set([2025]),
+    selectedTags: new Set(),
   }).map((song) => song.performanceId),
   ["perf-new"],
 );
@@ -127,6 +131,7 @@ assert.deepEqual(
     selectedStreamId: null,
     selectedArtist: null,
     selectedYears: new Set(),
+    selectedTags: new Set(),
   }).map((song) => song.performanceId),
   ["perf-no-stream"],
 );
@@ -136,6 +141,28 @@ assert.deepEqual(
     selectedStreamId: "missing",
     selectedArtist: null,
     selectedYears: new Set(),
+    selectedTags: new Set(),
+  }),
+  [],
+);
+assert.deepEqual(
+  filterFlattenedSongs(flattened, {
+    search: "",
+    selectedStreamId: null,
+    selectedArtist: null,
+    selectedYears: new Set(),
+    selectedTags: new Set(["language:en", "language:zh", "genre:rock"]),
+  }).map((song) => song.performanceId),
+  ["perf-new", "perf-old"],
+  "same-category languages are OR while genre is AND",
+);
+assert.deepEqual(
+  filterFlattenedSongs(flattened, {
+    search: "",
+    selectedStreamId: null,
+    selectedArtist: null,
+    selectedYears: new Set(),
+    selectedTags: new Set(["language:zh", "genre:pop"]),
   }),
   [],
 );
@@ -230,6 +257,7 @@ assert.deepEqual(
     selectedStreamId: null,
     selectedArtist: null,
     selectedYears: new Set(),
+    selectedTags: new Set(),
   }),
   [],
 );
@@ -239,6 +267,17 @@ assert.deepEqual(
     selectedStreamId: "stream-2023",
     selectedArtist: null,
     selectedYears: new Set(),
+    selectedTags: new Set(),
+  }).map((song) => song.id),
+  ["song-a"],
+);
+assert.deepEqual(
+  filterGroupedSongs(grouped, {
+    search: "",
+    selectedStreamId: null,
+    selectedArtist: null,
+    selectedYears: new Set(),
+    selectedTags: new Set(["language:zh", "genre:rock"]),
   }).map((song) => song.id),
   ["song-a"],
 );
@@ -248,6 +287,7 @@ assert.deepEqual(
     selectedStreamId: null,
     selectedArtist: "Zeta",
     selectedYears: new Set([2024]),
+    selectedTags: new Set(),
   }),
   [],
 );
@@ -257,6 +297,7 @@ assert.deepEqual(
     selectedStreamId: null,
     selectedArtist: "Zeta",
     selectedYears: new Set([2025]),
+    selectedTags: new Set(),
   }).map((song) => song.id),
   ["song-a"],
 );
