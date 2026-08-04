@@ -1,6 +1,6 @@
 import type { Performance, Song } from "../../lib/types";
 
-export type ArchivePerformance = Performance & { streamTitle: string; date: string; note: string; tags: string[] };
+export type ArchivePerformance = Performance & { streamTitle: string; date: string; note: string; inheritedTags: string[]; tags: string[] };
 export type ArchiveSong = Omit<Song, "performances"> & { inheritedTags: string[]; performances: ArchivePerformance[] };
 
 export interface FlattenedSong {
