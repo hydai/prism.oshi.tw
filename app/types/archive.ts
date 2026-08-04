@@ -7,6 +7,8 @@ export interface ArchivePerformance {
   timestamp: number;
   endTimestamp?: number | null;
   note: string;
+  /** Originating local song tags, hydrated for rendition-scoped filtering. */
+  inheritedTags: string[];
   tags: string[];
 }
 
@@ -16,7 +18,7 @@ export interface ArchiveSong {
   workId?: string;
   title: string;
   originalArtist: string;
-  /** Work and legacy song tags inherited by every performance. */
+  /** Local inherited layer; grouped songs contain the union across their members. */
   inheritedTags: string[];
   tags: string[];
   performances: ArchivePerformance[];

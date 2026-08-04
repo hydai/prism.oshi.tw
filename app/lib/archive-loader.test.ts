@@ -9,7 +9,8 @@ const slimSongs = [
     id: "song-a",
     title: "Alpha",
     originalArtist: "Artist A",
-    tags: [],
+    inheritedTags: ["genre:rock"],
+    tags: ["genre:rock"],
     performances: [
       { id: "p-new", streamId: "s-new", videoId: "v2", timestamp: 30, endTimestamp: 90 },
       { id: "p-old", streamId: "s-old", videoId: "v1", timestamp: 10, endTimestamp: null, note: "encore" },
@@ -19,7 +20,7 @@ const slimSongs = [
     id: "song-b",
     title: "Beta",
     originalArtist: "Artist B",
-    tags: [],
+    tags: ["legacy-tag"],
     performances: [
       { id: "p-orphan", streamId: "s-gone", videoId: "v3", timestamp: 0, endTimestamp: null },
     ],
@@ -83,9 +84,11 @@ async function run() {
     assert.equal(pNew.streamTitle, "New stream");
     assert.equal(pNew.date, "2025-06-01");
     assert.equal(pNew.note, "");
+    assert.deepEqual(pNew.inheritedTags, ["genre:rock"]);
     assert.equal(pOld.streamTitle, "Old stream");
     assert.equal(pOld.date, "2023-01-01");
     assert.equal(pOld.note, "encore");
+    assert.deepEqual(pOld.inheritedTags, ["genre:rock"]);
   }
 
   // a performance whose stream is missing keeps a deterministic fallback
@@ -98,6 +101,7 @@ async function run() {
     const orphan = songs.find((s) => s.id === "song-b")!.performances[0];
     assert.equal(orphan.streamTitle, "");
     assert.equal(orphan.date, "1970-01-01");
+    assert.deepEqual(orphan.inheritedTags, ["legacy-tag"]);
   }
 
   // streams are sorted newest first

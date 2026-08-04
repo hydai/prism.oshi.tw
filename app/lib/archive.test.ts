@@ -35,6 +35,7 @@ const songs: ArchiveSong[] = [
         timestamp: 10,
         endTimestamp: null,
         note: "",
+        inheritedTags: ["genre:rock"],
         tags: ["language:zh"],
       },
       {
@@ -46,6 +47,7 @@ const songs: ArchiveSong[] = [
         timestamp: 20,
         endTimestamp: 50,
         note: "encore",
+        inheritedTags: ["genre:rock"],
         tags: ["language:en"],
       },
     ],
@@ -64,6 +66,7 @@ const songs: ArchiveSong[] = [
         videoId: "video-mid",
         timestamp: 30,
         note: "",
+        inheritedTags: [],
         tags: [],
       },
     ],
@@ -194,6 +197,7 @@ const workIdSongs: ArchiveSong[] = [
         videoId: "video-shared-z",
         timestamp: 10,
         note: "",
+        inheritedTags: ["acoustic"],
         tags: [],
       },
     ],
@@ -213,6 +217,7 @@ const workIdSongs: ArchiveSong[] = [
         videoId: "video-shared-a",
         timestamp: 20,
         note: "",
+        inheritedTags: ["ballad", "acoustic"],
         tags: [],
       },
     ],
@@ -264,6 +269,75 @@ assert.equal(
 assert.deepEqual(groupSongsByWorkId(groupedByWorkId), groupedByWorkId);
 assert.deepEqual(workIdSongs, workIdSongsBeforeGrouping);
 
+const balladGrouped = filterGroupedSongs(groupedByWorkId, {
+  search: "",
+  selectedStreamId: null,
+  selectedArtist: null,
+  selectedYears: new Set(),
+  selectedTags: new Set(["ballad"]),
+});
+assert.deepEqual(balladGrouped.map((song) => song.id), ["song-shared-a"]);
+assert.deepEqual(
+  balladGrouped[0]?.performances.map((performance) => performance.id),
+  ["perf-shared-a"],
+  "local inherited tags do not leak to sibling song rows in the same work",
+);
+assert.deepEqual(balladGrouped[0]?.tags, ["acoustic", "ballad"]);
+assert.deepEqual(
+  filterGroupedSongs(groupedByWorkId, {
+    search: "",
+    selectedStreamId: null,
+    selectedArtist: null,
+    selectedYears: new Set([2023]),
+    selectedTags: new Set(),
+  }).map((song) => ({
+    id: song.id,
+    performanceIds: song.performances.map((performance) => performance.id),
+    tags: song.tags,
+  })),
+  [{ id: "song-shared-a", performanceIds: ["perf-shared-z"], tags: ["acoustic"] }],
+  "group tags are recomputed from the retained performances",
+);
+assert.deepEqual(
+  filterGroupedSongs(groupedByWorkId, {
+    search: "ballad",
+    selectedStreamId: null,
+    selectedArtist: null,
+    selectedYears: new Set(),
+    selectedTags: new Set(),
+  }).map((song) => ({
+    id: song.id,
+    performanceIds: song.performances.map((performance) => performance.id),
+  })),
+  [{ id: "song-shared-a", performanceIds: ["perf-shared-a"] }],
+  "local inherited tag searches keep only the originating song row",
+);
+assert.deepEqual(
+  filterGroupedSongs(groupedByWorkId, {
+    search: "ballad",
+    selectedStreamId: null,
+    selectedArtist: null,
+    selectedYears: new Set([2023]),
+    selectedTags: new Set(),
+  }),
+  [],
+  "tag search and year filters must match the same local rendition",
+);
+assert.deepEqual(
+  filterGroupedSongs(groupSongsByWorkId(groupedByWorkId), {
+    search: "",
+    selectedStreamId: null,
+    selectedArtist: null,
+    selectedYears: new Set(),
+    selectedTags: new Set(["ballad"]),
+  }).map((song) => ({
+    id: song.id,
+    performanceIds: song.performances.map((performance) => performance.id),
+  })),
+  [{ id: "song-shared-a", performanceIds: ["perf-shared-a"] }],
+  "grouping remains functionally idempotent with local tag provenance",
+);
+
 const grouped = sortGroupedSongs(songs);
 assert.deepEqual(grouped.map((song) => song.id), ["song-b", "song-a", "song-c"]);
 assert.deepEqual(songs.map((song) => song.id), ["song-a", "song-b", "song-c"]);
@@ -276,6 +350,86 @@ assert.deepEqual(
     selectedTags: new Set(),
   }),
   [],
+);
+const chineseSearchGrouped = filterGroupedSongs(grouped, {
+  search: "中文歌",
+  selectedStreamId: null,
+  selectedArtist: null,
+  selectedYears: new Set(),
+  selectedTags: new Set(),
+});
+assert.deepEqual(chineseSearchGrouped.map((song) => song.id), ["song-a"]);
+assert.deepEqual(
+  chineseSearchGrouped[0]?.performances.map((performance) => performance.id),
+  ["perf-old"],
+  "rendition tag searches keep only performances that match the search term",
+);
+assert.deepEqual(chineseSearchGrouped[0]?.tags, ["language:zh", "genre:rock"]);
+assert.deepEqual(
+  filterGroupedSongs(grouped, {
+    search: "中文歌",
+    selectedStreamId: null,
+    selectedArtist: null,
+    selectedYears: new Set([2025]),
+    selectedTags: new Set(),
+  }),
+  [],
+  "search and year filters must match the same rendition",
+);
+assert.deepEqual(
+  filterGroupedSongs(grouped, {
+    search: "中文歌",
+    selectedStreamId: "stream-2025",
+    selectedArtist: null,
+    selectedYears: new Set(),
+    selectedTags: new Set(),
+  }),
+  [],
+  "search and stream filters must match the same rendition",
+);
+assert.deepEqual(
+  filterGroupedSongs(grouped, {
+    search: "中文歌",
+    selectedStreamId: null,
+    selectedArtist: null,
+    selectedYears: new Set([2023]),
+    selectedTags: new Set(),
+  }).map((song) => ({
+    id: song.id,
+    performanceIds: song.performances.map((performance) => performance.id),
+    tags: song.tags,
+  })),
+  [{
+    id: "song-a",
+    performanceIds: ["perf-old"],
+    tags: ["language:zh", "genre:rock"],
+  }],
+  "matching search and year filters retain their shared rendition",
+);
+assert.deepEqual(
+  filterGroupedSongs(grouped, {
+    search: "搖滾",
+    selectedStreamId: null,
+    selectedArtist: null,
+    selectedYears: new Set(),
+    selectedTags: new Set(),
+  }).map((song) => ({
+    id: song.id,
+    performanceIds: song.performances.map((performance) => performance.id),
+  })),
+  [{ id: "song-a", performanceIds: ["perf-old", "perf-new"] }],
+  "inherited tag searches retain every rendition that inherits the tag",
+);
+assert.deepEqual(
+  filterGroupedSongs(grouped, {
+    search: "Gamma Song",
+    selectedStreamId: null,
+    selectedArtist: null,
+    selectedYears: new Set(),
+    selectedTags: new Set(),
+  }).map((song) => song.id),
+  ["song-c"],
+  "work-level search keeps songs without performances visible",
 );
 assert.deepEqual(
   filterGroupedSongs(grouped, {
