@@ -35,6 +35,7 @@ jobs:
       - run: npm run test:archive-loader
       - run: npm run test:tags
       - run: npm run test:tag-filter
+      - run: npm run test:song-card
       - run: npm run test:tag-catalog
       - run: npm run test:playback-time-store
       - run: npm run test:player-context

@@ -2,22 +2,9 @@
 
 import { memo, useMemo } from 'react';
 import { Disc3, ChevronDown, ChevronRight } from 'lucide-react';
-import type { ArchivePerformance, ArchiveSong, ArchiveTrack } from '../types/archive';
 import SongVersionsList from './SongVersionsList';
 import { getTagLabel } from '../../lib/tags';
-
-interface SongCardProps {
-  song: ArchiveSong;
-  isExpanded: boolean;
-  onToggleExpand: (songId: string) => void;
-  onPlay: (track: ArchiveTrack) => void;
-  onAddToQueue: (track: ArchiveTrack) => void;
-  onAddToPlaylistSuccess: () => void;
-  isLiked: (performanceId: string) => boolean;
-  onToggleLike: (perf: ArchivePerformance, song: ArchiveSong) => void;
-  unavailableVideoIds: Set<string>;
-  streamerSlug: string;
-}
+import { areSongCardPropsEqual, type SongCardProps } from '../lib/song-card';
 
 function SongCardInner({ song, isExpanded, onToggleExpand, onPlay, onAddToQueue, onAddToPlaylistSuccess, isLiked, onToggleLike, unavailableVideoIds, streamerSlug }: SongCardProps) {
   const sortedPerformances = useMemo(
@@ -134,19 +121,7 @@ function SongCardInner({ song, isExpanded, onToggleExpand, onPlay, onAddToQueue,
   );
 }
 
-const SongCard = memo(SongCardInner, (prev, next) => {
-  return (
-    prev.song.id === next.song.id &&
-    prev.isExpanded === next.isExpanded &&
-    prev.song.performances.length === next.song.performances.length &&
-    prev.song.tags.join('\u0000') === next.song.tags.join('\u0000') &&
-    // Both have change-only identities: isLiked is useCallback'd on the liked
-    // set, unavailableVideoIds is replaced only when a video errors. Without
-    // these an already-rendered card kept stale hearts/disabled states.
-    prev.isLiked === next.isLiked &&
-    prev.unavailableVideoIds === next.unavailableVideoIds
-  );
-});
+const SongCard = memo(SongCardInner, areSongCardPropsEqual);
 
 SongCard.displayName = 'SongCard';
 

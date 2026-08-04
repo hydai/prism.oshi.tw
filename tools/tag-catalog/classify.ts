@@ -98,6 +98,88 @@ const VOCALOID_ARTISTS = new Set([
 // Apple's search results even when the query score is high.
 const APPLE_GENRE_DENYLIST = new Set(['niki']);
 
+// Apple localizes many established artist names, so text equality alone cannot
+// verify them. These IDs were reviewed against the checked-in Apple snapshot;
+// ambiguous short-name searches must stay out of this map until independently
+// verified.
+const VERIFIED_APPLE_ARTIST_IDS = new Map<string, number>([
+  ['(G)I-DLE', 1378887586],
+  ['40㍍P', 334467964],
+  ['F.I.R. 飛兒樂團', 205561210],
+  ['F.I.R.飛兒樂團', 205561210],
+  ['aMEI張惠妹', 422255649],
+  ['丁噹', 453466412],
+  ['五月天', 369211611],
+  ['天月-あまつき-', 919347368],
+  ['手嶌葵', 210783561],
+  ['王力宏', 117741179],
+  ['王心凌', 347815083],
+  ['王菲', 41760704],
+  ['田馥甄', 417691809],
+  ['好樂團', 1163014602],
+  ['江蕙', 395158183],
+  ['米津玄師', 530814268],
+  ['告五人', 1284151651],
+  ['李榮浩', 307674970],
+  ['那英', 15930315],
+  ['周杰倫', 300117743],
+  ['周杰倫 (Jay Chou)', 300117743],
+  ['周興哲', 903273139],
+  ['林俊傑', 216635866],
+  ['林宥嘉', 436847316],
+  ['林宥嘉 (Yoga Lin)', 436847316],
+  ['奏音69', 821322902],
+  ['星野源', 269598403],
+  ['星街すいせい', 1503670948],
+  ['洪佩瑜', 437273420],
+  ['美波', 1449555775],
+  ['郁可唯', 369227516],
+  ['韋禮安', 441921723],
+  ['孫盛希', 878542994],
+  ['孫燕姿', 83405200],
+  ['徐佳瑩', 387317532],
+  ['張惠妹', 422255649],
+  ['張韶涵', 535400872],
+  ['張學友', 256718696],
+  ['張懸', 300117902],
+  ['梁靜茹', 531134701],
+  ['梅とら', 660141875],
+  ['煌Kirali', 1718898166],
+  ['莫文蔚', 162585630],
+  ['蛋堡', 403689551],
+  ['陳奕迅', 137938148],
+  ['陶喆', 16789930],
+  ['傘村トータ', 1445379338],
+  ['單依純', 1546181214],
+  ['椎名林檎', 74576999],
+  ['楊丞琳', 299846702],
+  ['楊宗緯', 466427122],
+  ['趙露思', 1380598428],
+  ['銀臨', 1340827642],
+  ['蔡依林', 152678183],
+  ['蔡健雅', 387313548],
+  ['鄧紫棋', 425208570],
+  ['鄧麗君', 137320901],
+  ['澪Rei', 1718898280],
+  ['盧廣仲', 477669285],
+  ['優里', 1489331027],
+  ['薛之謙', 160809474],
+  ['魏如萱', 426913195],
+  ['蘇打綠', 345954909],
+  ['볼빨간사춘기', 1188975595],
+  ['태연', 435966642],
+  ['あいみょん', 1165017710],
+  ['かいりきベア', 599887397],
+  ['サカナクション', 252312257],
+  ['ジミーサムP', 337255810],
+  ['ちゃんみな', 1104839687],
+  ['ハチ', 530814268],
+  ['ひとしずくP・やま△', 916631321],
+  ['まふまふ', 614405787],
+  ['みきとP', 509466458],
+  ['ヨルシカ', 1250709916],
+]);
+
 const VOCAL_SYNTH_CJK = /(?:ボカロ|初音(?:ミク|未來)|鏡音(?:リン|レン)|巡音ルカ|洛天依|重音テト|音街ウナ|結月ゆかり)/u;
 const VOCAL_SYNTH_LATIN = /(?:^|[^\p{Letter}\p{Number}])(?:vocaloid|gumi|kaito|meiko|flower|ia)(?=$|[^\p{Letter}\p{Number}])/iu;
 const KAFU = /(?:^|[^\p{Script=Han}])可不(?=$|[^\p{Script=Han}])/u;
@@ -138,6 +220,36 @@ function normalizeArtist(value: string): string {
     .replace(/[‐‑‒–—―]/gu, '-')
     .replace(/\s+/g, ' ')
     .trim();
+}
+
+function artistIdentityKeys(value: string): Set<string> {
+  const normalized = normalizeArtist(value);
+  const candidates = [
+    normalized,
+    normalized.replace(/[（(][^）)]*[）)]/gu, ' '),
+    ...[...normalized.matchAll(/[（(]([^）)]+)[）)]/gu)].map((match) => match[1]),
+  ];
+  return new Set(candidates
+    .map((candidate) => candidate.replace(/[^\p{Letter}\p{Number}]+/gu, ''))
+    .filter(Boolean));
+}
+
+function verifiedAppleResults(lookup: AppleArtistLookup | undefined): AppleArtistLookup['results'] {
+  if (!lookup) return [];
+  const verifiedArtistId = VERIFIED_APPLE_ARTIST_IDS.get(lookup.artist);
+  if (verifiedArtistId !== undefined) {
+    return lookup.results.filter((result) => result.artistId === verifiedArtistId);
+  }
+  const expectedKeys = artistIdentityKeys(lookup.artist);
+  const verifiedArtistIds = new Set(lookup.results.flatMap((result) => (
+    result.artistId !== null
+      && [...artistIdentityKeys(result.artistName)].some((key) => expectedKeys.has(key))
+      ? [result.artistId]
+      : []
+  )));
+  return lookup.results.filter((result) => (
+    result.artistId !== null && verifiedArtistIds.has(result.artistId)
+  ));
 }
 
 function titleWords(title: string): string[] {
@@ -185,8 +297,8 @@ function strongTitleLanguage(title: string): string | null {
 }
 
 function languageFromApple(lookup: AppleArtistLookup | undefined): string | null {
-  if (!lookup) return null;
-  const genres = lookup.results.map((result) => result.primaryGenreName.toLocaleLowerCase('en'));
+  const results = verifiedAppleResults(lookup);
+  const genres = results.map((result) => result.primaryGenreName.toLocaleLowerCase('en'));
   const counts = new Map<string, number>();
   for (const genre of genres) counts.set(genre, (counts.get(genre) ?? 0) + 1);
   const dominant = [...counts].sort((left, right) => right[1] - left[1])[0];
@@ -198,14 +310,15 @@ function languageFromApple(lookup: AppleArtistLookup | undefined): string | null
 }
 
 function genreFromApple(lookup: AppleArtistLookup | undefined): TagAssignment[] {
-  if (!lookup || lookup.results.length === 0) return [];
+  const results = verifiedAppleResults(lookup);
+  if (results.length === 0) return [];
   const artistIdCounts = new Map<number, number>();
-  for (const result of lookup.results) {
+  for (const result of results) {
     if (result.artistId !== null) artistIdCounts.set(result.artistId, (artistIdCounts.get(result.artistId) ?? 0) + 1);
   }
   const dominantArtist = [...artistIdCounts].sort((left, right) => right[1] - left[1])[0];
   if (!dominantArtist || dominantArtist[1] < 3) return [];
-  const genres = lookup.results
+  const genres = results
     .filter((result) => result.artistId === dominantArtist[0])
     .map((result) => result.primaryGenreName.toLocaleLowerCase('en'));
   const tags = new Set<string>();
@@ -235,10 +348,10 @@ function normalizeTrackTitle(value: string): string {
 }
 
 function sourceFromApple(song: CatalogSong, lookup: AppleArtistLookup | undefined): TagAssignment[] {
-  if (!lookup) return [];
   const title = normalizeTrackTitle(song.title);
   if (title.length < 3) return [];
-  const exact = lookup.results.find((result) => normalizeTrackTitle(result.trackName) === title);
+  const exact = verifiedAppleResults(lookup)
+    .find((result) => normalizeTrackTitle(result.trackName) === title);
   if (!exact) return [];
   const genre = exact.primaryGenreName.toLocaleLowerCase('en');
   if (genre === 'anime') {

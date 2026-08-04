@@ -239,7 +239,7 @@ function main(): void {
   const catalog: TagCatalog = {
     schemaVersion: 2,
     generatedAt: apple.fetchedAt,
-    methodology: 'Conservative high-confidence rules: explicit annotations and writing systems, cross-song artist profiles, curated frequent-artist review, and dominant Apple catalog genres. Ambiguous fields remain untagged.',
+    methodology: 'Conservative high-confidence rules: explicit annotations and writing systems, cross-song artist profiles, curated frequent-artist review, and identity-verified dominant Apple catalog genres. Ambiguous fields remain untagged.',
     sources: [
       'Repository data/*/songs.json and data/registry.json',
       'Apple iTunes Search API artist metadata snapshot in tools/tag-catalog/apple-artist-metadata.json',

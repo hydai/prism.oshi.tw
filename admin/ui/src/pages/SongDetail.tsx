@@ -6,6 +6,7 @@ import StatusBadge from '../components/StatusBadge';
 import YouTubeEmbed from '../components/YouTubeEmbed';
 import TagPicker from '../components/TagPicker';
 import { getTagLabel } from '../../../../lib/tags';
+import { effectiveSongTags } from '../lib/songTags';
 
 export default function SongDetail({ user }: { user: AuthUser }) {
   const { id } = useParams<{ id: string }>();
@@ -128,12 +129,15 @@ export default function SongDetail({ user }: { user: AuthUser }) {
               <>
                 <h2 className="text-xl font-semibold text-slate-800">{song.title}</h2>
                 <p className="mt-1 text-slate-600">{song.originalArtist}</p>
-                <div className="mt-2 flex flex-wrap gap-1">
-                  {song.tags.map((t) => (
+                <div className="mt-2 flex flex-wrap items-center gap-1">
+                  {effectiveSongTags(song).map((t) => (
                     <span key={t} className="rounded bg-slate-100 px-2 py-0.5 text-xs text-slate-600">
                       {getTagLabel(t)}
                     </span>
                   ))}
+                  <span className="text-xs text-slate-400">
+                    演出標籤彙總；作品標籤請至 Global Library 編輯
+                  </span>
                 </div>
               </>
             )}

@@ -32,6 +32,7 @@ export interface GlobalWorksState {
   editTags: string[];
   batchTags: string[];
   savingTags: boolean;
+  reloadRevision: number;
 }
 
 export const EMPTY_GLOBAL_WORK_STATS: GlobalWorkStats = {
@@ -61,6 +62,7 @@ export const initialGlobalWorksState: GlobalWorksState = {
   editTags: [],
   batchTags: [],
   savingTags: false,
+  reloadRevision: 0,
 };
 
 export type GlobalWorksAction =
@@ -83,13 +85,23 @@ export type GlobalWorksAction =
   | { type: 'editTagsChanged'; tags: string[] }
   | { type: 'batchTagsChanged'; tags: string[] }
   | { type: 'saveStarted' }
-  | { type: 'workTagsSaved'; work: { id: string; tags: string[] } }
-  | { type: 'bulkTagsApplied'; updated: Array<{ id: string; tags: string[] }> }
+  | { type: 'workTagsSaved' }
+  | { type: 'bulkTagsApplied' }
   | { type: 'saveFailed'; error: string }
   | { type: 'saveFinished' };
 
 function defaultSortDir(sortKey: GlobalWorksSortKey): GlobalWorksSortDir {
   return sortKey === 'title' || sortKey === 'originalArtist' ? 'asc' : 'desc';
+}
+
+export function pageAfterReload(currentPage: number, totalPages: number): number {
+  return Math.min(currentPage, Math.max(1, totalPages));
+}
+
+// A save never patches rows in place: only the server knows the resulting tag set, so
+// the list is reloaded instead.
+function reloaded(state: GlobalWorksState): GlobalWorksState {
+  return { ...state, loading: true, reloadRevision: state.reloadRevision + 1 };
 }
 
 export function globalWorksReducer(
@@ -106,6 +118,7 @@ export function globalWorksReducer(
         stats: action.response.stats,
         total: action.response.total,
         totalPages: action.response.totalPages,
+        page: pageAfterReload(state.page, action.response.totalPages),
         selectedWorkIds: new Set(),
         editingWorkId: null,
       };
@@ -172,26 +185,9 @@ export function globalWorksReducer(
     case 'saveStarted':
       return { ...state, savingTags: true, error: null };
     case 'workTagsSaved':
-      return {
-        ...state,
-        editingWorkId: null,
-        works: state.works.map((work) => (
-          work.id === action.work.id ? { ...work, tags: action.work.tags } : work
-        )),
-      };
-    case 'bulkTagsApplied': {
-      const tagsById = new Map<string, string[]>();
-      for (const work of action.updated) tagsById.set(work.id, work.tags);
-      return {
-        ...state,
-        batchTags: [],
-        selectedWorkIds: new Set(),
-        works: state.works.map((work) => {
-          const tags = tagsById.get(work.id);
-          return tags ? { ...work, tags } : work;
-        }),
-      };
-    }
+      return reloaded({ ...state, editingWorkId: null });
+    case 'bulkTagsApplied':
+      return reloaded({ ...state, batchTags: [], selectedWorkIds: new Set() });
     case 'saveFailed':
       return { ...state, error: action.error };
     case 'saveFinished':

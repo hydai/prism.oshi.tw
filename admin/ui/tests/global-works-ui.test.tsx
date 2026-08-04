@@ -71,7 +71,7 @@ async function main(): Promise<void> {
   const { getVisibleNavItems } = await import('../src/lib/navigation');
   const { default: GlobalWorks, SortHeader } = await import('../src/pages/GlobalWorks');
   const { default: TagPicker } = await import('../src/components/TagPicker');
-  const { globalWorksReducer, initialGlobalWorksState } = await import('../src/pages/global-works-state');
+  const { globalWorksReducer, initialGlobalWorksState, pageAfterReload } = await import('../src/pages/global-works-state');
 
   await api.listGlobalWorks({ search: 'Shared', sharedOnly: true, page: 1 });
   assert(requestedUrl.startsWith('/api/works?'), 'global library uses the global works endpoint');
@@ -90,6 +90,8 @@ async function main(): Promise<void> {
   await api.bulkUpdateWorkTags({ workIds: ['work-1'], addTags: ['genre:rock'], removeTags: [] });
   assert(requestedUrl === '/api/works/tags/bulk', 'bulk work tag update stays global');
   assert(requestedInit?.method === 'POST', 'bulk work tag update uses POST');
+  assert(pageAfterReload(3, 2) === 2, 'tag updates clamp a page that no longer exists');
+  assert(pageAfterReload(1, 0) === 1, 'an empty filtered result stays on page one');
 
   const loaded = globalWorksReducer(
     { ...initialGlobalWorksState, page: 2, selectedWorkIds: new Set(['work-1']), editingWorkId: 'work-1' },
@@ -134,12 +136,15 @@ async function main(): Promise<void> {
   const selected = globalWorksReducer(loaded, { type: 'pageSelectionToggled' });
   assert(selected.selectedWorkIds.has('work-1'), 'page selection selects every listed work');
   assert(globalWorksReducer(selected, { type: 'pageSelectionToggled' }).selectedWorkIds.size === 0, 'page selection toggles back to none');
-  const bulkApplied = globalWorksReducer(
-    { ...selected, batchTags: ['genre:rock'] },
-    { type: 'bulkTagsApplied', updated: [{ id: 'work-1', tags: ['genre:rock'] }] },
-  );
-  assert(bulkApplied.works[0]?.tags[0] === 'genre:rock', 'a bulk update patches the listed works in place');
+  const bulkApplied = globalWorksReducer({ ...selected, batchTags: ['genre:rock'] }, { type: 'bulkTagsApplied' });
   assert(bulkApplied.batchTags.length === 0 && bulkApplied.selectedWorkIds.size === 0, 'a bulk update resets the batch editor');
+  assert(bulkApplied.loading && bulkApplied.reloadRevision === selected.reloadRevision + 1, 'a bulk update reloads the list from the server');
+  const saved = globalWorksReducer({ ...loaded, editingWorkId: 'work-1' }, { type: 'workTagsSaved' });
+  assert(saved.editingWorkId === null && saved.reloadRevision === loaded.reloadRevision + 1, 'a single save closes the editor and reloads');
+  assert(
+    globalWorksReducer({ ...loaded, page: 3 }, { type: 'loadSucceeded', response: { ...response, totalPages: 2 } }).page === 2,
+    'a reload clamps a page that no longer exists',
+  );
 
   const curator: AuthUser = { email: 'curator@example.com', role: 'curator' };
   const contributor: AuthUser = { email: 'contributor@example.com', role: 'contributor' };

@@ -3,7 +3,6 @@ import { Link } from 'react-router-dom';
 import type { Song, AuthUser, Status } from '../../../shared/types';
 import { api } from '../api/client';
 import StatusBadge from '../components/StatusBadge';
-import { getTagLabel } from '../../../../lib/tags';
 
 type SortKey = 'title' | 'originalArtist' | 'status' | 'createdAt';
 type SortDir = 'asc' | 'desc';
@@ -170,7 +169,6 @@ export default function SongsList({ user }: { user: AuthUser }) {
                   <SortHeader label="Title" field="title" activeField={sortKey} direction={sortDir} onSort={toggleSort} />
                   <SortHeader label="Artist" field="originalArtist" activeField={sortKey} direction={sortDir} onSort={toggleSort} />
                   <SortHeader label="Status" field="status" activeField={sortKey} direction={sortDir} onSort={toggleSort} />
-                  <th className="px-4 py-3">Tags</th>
                   <SortHeader label="Created" field="createdAt" activeField={sortKey} direction={sortDir} onSort={toggleSort} />
                   {isCurator && <th className="px-4 py-3">Actions</th>}
                 </tr>
@@ -186,15 +184,6 @@ export default function SongsList({ user }: { user: AuthUser }) {
                     <td className="px-4 py-3 text-slate-600">{song.originalArtist}</td>
                     <td className="px-4 py-3">
                       <StatusBadge status={song.status} />
-                    </td>
-                    <td className="px-4 py-3 text-slate-500">
-                      {song.tags.length > 0
-                        ? song.tags.map((t) => (
-                            <span key={t} className="mr-1 inline-block rounded bg-slate-100 px-1.5 py-0.5 text-xs">
-                              {getTagLabel(t)}
-                            </span>
-                          ))
-                        : '—'}
                     </td>
                     <td className="px-4 py-3 text-slate-500">{song.createdAt}</td>
                     {isCurator && (
@@ -221,7 +210,7 @@ export default function SongsList({ user }: { user: AuthUser }) {
                 ))}
                 {songs.length === 0 && (
                   <tr>
-                    <td colSpan={isCurator ? 6 : 5} className="px-4 py-8 text-center text-slate-400">
+                    <td colSpan={isCurator ? 5 : 4} className="px-4 py-8 text-center text-slate-400">
                       No songs found.
                     </td>
                   </tr>

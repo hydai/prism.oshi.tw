@@ -58,6 +58,7 @@ function useGlobalWorksController() {
     editTags,
     selectedWorkIds,
     batchTags,
+    reloadRevision,
   } = state;
 
   useEffect(() => {
@@ -91,7 +92,7 @@ function useGlobalWorksController() {
     return () => {
       active = false;
     };
-  }, [submittedSearch, sharedOnly, tagFilter, untaggedOnly, page, sortKey, sortDir]);
+  }, [submittedSearch, sharedOnly, tagFilter, untaggedOnly, page, sortKey, sortDir, reloadRevision]);
 
   const submitSearch = (event: FormEvent) => {
     event.preventDefault();
@@ -102,8 +103,8 @@ function useGlobalWorksController() {
     if (!editingWorkId) return;
     dispatch({ type: 'saveStarted' });
     try {
-      const updated = await api.updateWorkTags(editingWorkId, { tags: editTags });
-      dispatch({ type: 'workTagsSaved', work: updated });
+      await api.updateWorkTags(editingWorkId, { tags: editTags });
+      dispatch({ type: 'workTagsSaved' });
     } catch (err: unknown) {
       dispatch({
         type: 'saveFailed',
@@ -118,12 +119,12 @@ function useGlobalWorksController() {
     if (selectedWorkIds.size === 0 || batchTags.length === 0) return;
     dispatch({ type: 'saveStarted' });
     try {
-      const response = await api.bulkUpdateWorkTags({
+      await api.bulkUpdateWorkTags({
         workIds: [...selectedWorkIds],
         addTags: mode === 'add' ? batchTags : [],
         removeTags: mode === 'remove' ? batchTags : [],
       });
-      dispatch({ type: 'bulkTagsApplied', updated: response.updated });
+      dispatch({ type: 'bulkTagsApplied' });
     } catch (err: unknown) {
       dispatch({
         type: 'saveFailed',

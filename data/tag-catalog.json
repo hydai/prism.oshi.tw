@@ -1,7 +1,7 @@
 {
   "schemaVersion": 2,
   "generatedAt": "2026-08-04T13:51:17.275Z",
-  "methodology": "Conservative high-confidence rules: explicit annotations and writing systems, cross-song artist profiles, curated frequent-artist review, and dominant Apple catalog genres. Ambiguous fields remain untagged.",
+  "methodology": "Conservative high-confidence rules: explicit annotations and writing systems, cross-song artist profiles, curated frequent-artist review, and identity-verified dominant Apple catalog genres. Ambiguous fields remain untagged.",
   "sources": [
     "Repository data/*/songs.json and data/registry.json",
     "Apple iTunes Search API artist metadata snapshot in tools/tag-catalog/apple-artist-metadata.json"
@@ -10,18 +10,17 @@
     "totalWorks": 4217,
     "totalSongs": 4993,
     "totalPerformances": 8541,
-    "taggedWorks": 1424,
+    "taggedWorks": 1417,
     "taggedSongs": 3576,
     "taggedPerformances": 6252,
     "effectiveTaggedSongs": 3624,
     "countsByTag": {
-      "genre:electronic": 8,
       "genre:folk": 55,
       "genre:jazz": 7,
-      "genre:pop": 1440,
+      "genre:pop": 1424,
       "genre:rap": 20,
       "genre:rnb": 13,
-      "genre:rock": 242,
+      "genre:rock": 231,
       "language:en": 573,
       "language:ja": 1736,
       "language:ko": 225,
@@ -1013,11 +1012,9 @@
       "title": "夜咄ディセイブ",
       "originalArtist": "じん",
       "tags": [
-        "genre:rock",
         "source:vocaloid"
       ],
       "evidence": {
-        "genre:rock": "Apple artist catalog genres: alternative",
         "source:vocaloid": "curated Vocaloid producer: じん"
       }
     },
@@ -1332,11 +1329,9 @@
       "title": "アディショナルメモリー",
       "originalArtist": "じん",
       "tags": [
-        "genre:rock",
         "source:vocaloid"
       ],
       "evidence": {
-        "genre:rock": "Apple artist catalog genres: alternative",
         "source:vocaloid": "curated Vocaloid producer: じん"
       }
     },
@@ -1752,11 +1747,9 @@
       "title": "daze",
       "originalArtist": "じん",
       "tags": [
-        "genre:rock",
         "source:vocaloid"
       ],
       "evidence": {
-        "genre:rock": "Apple artist catalog genres: alternative",
         "source:vocaloid": "curated Vocaloid producer: じん"
       }
     },
@@ -1789,11 +1782,9 @@
       "title": "days",
       "originalArtist": "じん",
       "tags": [
-        "genre:rock",
         "source:vocaloid"
       ],
       "evidence": {
-        "genre:rock": "Apple artist catalog genres: alternative",
         "source:vocaloid": "curated Vocaloid producer: じん"
       }
     },
@@ -2243,11 +2234,9 @@
       "title": "恋愛裁判 Love Trial",
       "originalArtist": "初音ミク",
       "tags": [
-        "genre:pop",
         "source:vocaloid"
       ],
       "evidence": {
-        "genre:pop": "Apple artist catalog genres: pop",
         "source:vocaloid": "voice-synth name in title or original artist"
       }
     },
@@ -3365,11 +3354,9 @@
       "title": "想像フォレスト",
       "originalArtist": "じん",
       "tags": [
-        "genre:rock",
         "source:vocaloid"
       ],
       "evidence": {
-        "genre:rock": "Apple artist catalog genres: alternative",
         "source:vocaloid": "curated Vocaloid producer: じん"
       }
     },
@@ -4241,11 +4228,9 @@
       "title": "1/6  out of the gravity",
       "originalArtist": "初音ミク",
       "tags": [
-        "genre:pop",
         "source:vocaloid"
       ],
       "evidence": {
-        "genre:pop": "Apple artist catalog genres: pop",
         "source:vocaloid": "voice-synth name in title or original artist"
       }
     },
@@ -4457,11 +4442,9 @@
       "title": "Tell Your World",
       "originalArtist": "初音ミク",
       "tags": [
-        "genre:pop",
         "source:vocaloid"
       ],
       "evidence": {
-        "genre:pop": "Apple artist catalog genres: pop",
         "source:vocaloid": "voice-synth name in title or original artist"
       }
     },
@@ -4930,11 +4913,9 @@
       "title": "絶え間なく藍色",
       "originalArtist": "初音ミク",
       "tags": [
-        "genre:pop",
         "source:vocaloid"
       ],
       "evidence": {
-        "genre:pop": "Apple artist catalog genres: pop",
         "source:vocaloid": "voice-synth name in title or original artist"
       }
     },
@@ -4954,11 +4935,9 @@
       "title": "百年の恋",
       "originalArtist": "初音ミク",
       "tags": [
-        "genre:pop",
         "source:vocaloid"
       ],
       "evidence": {
-        "genre:pop": "Apple artist catalog genres: pop",
         "source:vocaloid": "voice-synth name in title or original artist"
       }
     },
@@ -5660,17 +5639,6 @@
       }
     },
     {
-      "id": "work-song-2278",
-      "title": "メルト",
-      "originalArtist": "ryo",
-      "tags": [
-        "genre:electronic"
-      ],
-      "evidence": {
-        "genre:electronic": "Apple artist catalog genres: electronic"
-      }
-    },
-    {
       "id": "work-song-2279",
       "title": "言って。",
       "originalArtist": "ヨルシカ",
@@ -5751,17 +5719,6 @@
       "evidence": {
         "genre:pop": "Apple artist catalog genres: anime, j-pop",
         "source:vocaloid": "curated Vocaloid producer: ジミーサムp"
-      }
-    },
-    {
-      "id": "work-song-2297",
-      "title": "罪の名前",
-      "originalArtist": "ryo",
-      "tags": [
-        "genre:electronic"
-      ],
-      "evidence": {
-        "genre:electronic": "Apple artist catalog genres: electronic"
       }
     },
     {
@@ -5933,11 +5890,9 @@
       "title": "空想フォレスト",
       "originalArtist": "じん",
       "tags": [
-        "genre:rock",
         "source:vocaloid"
       ],
       "evidence": {
-        "genre:rock": "Apple artist catalog genres: alternative",
         "source:vocaloid": "curated Vocaloid producer: じん"
       }
     },
@@ -6001,11 +5956,9 @@
       "title": "命に嫌われている。",
       "originalArtist": "初音ミク",
       "tags": [
-        "genre:pop",
         "source:vocaloid"
       ],
       "evidence": {
-        "genre:pop": "Apple artist catalog genres: pop",
         "source:vocaloid": "voice-synth name in title or original artist"
       }
     },
@@ -6036,11 +5989,9 @@
       "title": "君の脈で踊りたかった",
       "originalArtist": "初音ミク",
       "tags": [
-        "genre:pop",
         "source:vocaloid"
       ],
       "evidence": {
-        "genre:pop": "Apple artist catalog genres: pop",
         "source:vocaloid": "voice-synth name in title or original artist"
       }
     },
@@ -6062,11 +6013,9 @@
       "title": "それがあなたの幸せとしても",
       "originalArtist": "初音ミク",
       "tags": [
-        "genre:pop",
         "source:vocaloid"
       ],
       "evidence": {
-        "genre:pop": "Apple artist catalog genres: pop",
         "source:vocaloid": "voice-synth name in title or original artist"
       }
     },
@@ -6843,11 +6792,9 @@
       "title": "千本桜",
       "originalArtist": "初音ミク",
       "tags": [
-        "genre:pop",
         "source:vocaloid"
       ],
       "evidence": {
-        "genre:pop": "Apple artist catalog genres: pop",
         "source:vocaloid": "voice-synth name in title or original artist"
       }
     },
@@ -7356,11 +7303,9 @@
       "title": "Calc.",
       "originalArtist": "初音ミク",
       "tags": [
-        "genre:pop",
         "source:vocaloid"
       ],
       "evidence": {
-        "genre:pop": "Apple artist catalog genres: pop",
         "source:vocaloid": "voice-synth name in title or original artist"
       }
     },
@@ -7369,11 +7314,9 @@
       "title": "FLOS",
       "originalArtist": "初音ミク",
       "tags": [
-        "genre:pop",
         "source:vocaloid"
       ],
       "evidence": {
-        "genre:pop": "Apple artist catalog genres: pop",
         "source:vocaloid": "voice-synth name in title or original artist"
       }
     },
@@ -7393,11 +7336,9 @@
       "title": "アイデンティティ",
       "originalArtist": "初音ミク",
       "tags": [
-        "genre:pop",
         "source:vocaloid"
       ],
       "evidence": {
-        "genre:pop": "Apple artist catalog genres: pop",
         "source:vocaloid": "voice-synth name in title or original artist"
       }
     },
@@ -7428,11 +7369,9 @@
       "title": "8月31日",
       "originalArtist": "初音ミク",
       "tags": [
-        "genre:pop",
         "source:vocaloid"
       ],
       "evidence": {
-        "genre:pop": "Apple artist catalog genres: pop",
         "source:vocaloid": "voice-synth name in title or original artist"
       }
     },
@@ -7452,11 +7391,9 @@
       "title": "ハロ/ハワユ",
       "originalArtist": "初音ミク",
       "tags": [
-        "genre:pop",
         "source:vocaloid"
       ],
       "evidence": {
-        "genre:pop": "Apple artist catalog genres: pop",
         "source:vocaloid": "voice-synth name in title or original artist"
       }
     },
@@ -7691,11 +7628,9 @@
       "title": "Last Night , Good NIght",
       "originalArtist": "初音ミク",
       "tags": [
-        "genre:pop",
         "source:vocaloid"
       ],
       "evidence": {
-        "genre:pop": "Apple artist catalog genres: pop",
         "source:vocaloid": "voice-synth name in title or original artist"
       }
     },
@@ -7737,11 +7672,9 @@
       "title": "starduster",
       "originalArtist": "初音ミク",
       "tags": [
-        "genre:pop",
         "source:vocaloid"
       ],
       "evidence": {
-        "genre:pop": "Apple artist catalog genres: pop",
         "source:vocaloid": "voice-synth name in title or original artist"
       }
     },
@@ -8585,17 +8518,6 @@
       ],
       "evidence": {
         "genre:pop": "Apple artist catalog genres: pop"
-      }
-    },
-    {
-      "id": "work-song-3115",
-      "title": "こっち向いて Baby",
-      "originalArtist": "ryo",
-      "tags": [
-        "genre:electronic"
-      ],
-      "evidence": {
-        "genre:electronic": "Apple artist catalog genres: electronic"
       }
     },
     {
@@ -11283,11 +11205,9 @@
       "title": "夕景イエスタデイ",
       "originalArtist": "じん",
       "tags": [
-        "genre:rock",
         "source:vocaloid"
       ],
       "evidence": {
-        "genre:rock": "Apple artist catalog genres: alternative",
         "source:vocaloid": "curated Vocaloid producer: じん"
       }
     },
@@ -11414,11 +11334,9 @@
       "title": "アヤノの幸福理論",
       "originalArtist": "じん",
       "tags": [
-        "genre:rock",
         "source:vocaloid"
       ],
       "evidence": {
-        "genre:rock": "Apple artist catalog genres: alternative",
         "source:vocaloid": "curated Vocaloid producer: じん"
       }
     },
@@ -11468,17 +11386,6 @@
       "evidence": {
         "genre:pop": "Apple artist catalog genres: anime, j-pop",
         "source:vocaloid": "curated Vocaloid producer: 傘村トータ"
-      }
-    },
-    {
-      "id": "work-song-637",
-      "title": "ODDS&ENDS",
-      "originalArtist": "ryo",
-      "tags": [
-        "genre:electronic"
-      ],
-      "evidence": {
-        "genre:electronic": "Apple artist catalog genres: electronic"
       }
     },
     {
@@ -11804,17 +11711,6 @@
       }
     },
     {
-      "id": "work-song-695",
-      "title": "メルト (Melt)",
-      "originalArtist": "ryo",
-      "tags": [
-        "genre:electronic"
-      ],
-      "evidence": {
-        "genre:electronic": "Apple artist catalog genres: electronic"
-      }
-    },
-    {
       "id": "work-song-698",
       "title": "永遠の不在証明",
       "originalArtist": "椎名林檎",
@@ -12038,17 +11934,6 @@
       ],
       "evidence": {
         "genre:pop": "Apple artist catalog genres: j-pop"
-      }
-    },
-    {
-      "id": "work-song-71e014a2",
-      "title": "恋は戦争",
-      "originalArtist": "ryo",
-      "tags": [
-        "genre:electronic"
-      ],
-      "evidence": {
-        "genre:electronic": "Apple artist catalog genres: electronic"
       }
     },
     {
@@ -13425,11 +13310,9 @@
       "title": "カゲロウデイズ",
       "originalArtist": "じん",
       "tags": [
-        "genre:rock",
         "source:vocaloid"
       ],
       "evidence": {
-        "genre:rock": "Apple artist catalog genres: alternative",
         "source:vocaloid": "curated Vocaloid producer: じん"
       }
     },
@@ -13438,11 +13321,9 @@
       "title": "サマータイムレコード",
       "originalArtist": "じん",
       "tags": [
-        "genre:rock",
         "source:vocaloid"
       ],
       "evidence": {
-        "genre:rock": "Apple artist catalog genres: alternative",
         "source:vocaloid": "curated Vocaloid producer: じん"
       }
     },
@@ -13943,17 +13824,6 @@
         "genre:pop": "Apple artist catalog genres: j-pop, rock",
         "genre:rock": "Apple artist catalog genres: j-pop, rock",
         "source:vocaloid": "curated Vocaloid producer: 奏音69"
-      }
-    },
-    {
-      "id": "work-song-97",
-      "title": "ワールドイズマイン",
-      "originalArtist": "Ryo",
-      "tags": [
-        "genre:electronic"
-      ],
-      "evidence": {
-        "genre:electronic": "Apple artist catalog genres: electronic"
       }
     },
     {
