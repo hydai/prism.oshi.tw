@@ -320,6 +320,44 @@ async function testWorkTagsRejectInvalidSelectionsBeforeD1(): Promise<void> {
   assertEqual(conflictingDb.prepareCalls, 0, 'conflicting bulk update is rejected before D1');
 }
 
+async function testSongCreationRejectsWorkTagsBeforeD1(): Promise<void> {
+  const contributorDb = new RecordingD1();
+  const contributorResponse = await app.request(
+    '/api/songs',
+    reqInit({
+      method: 'POST',
+      path: '/api/songs',
+      body: { title: 'Song', originalArtist: 'Artist', tags: ['genre:rock'] },
+    }, CONTRIBUTOR),
+    envFor(contributorDb),
+  );
+  assertEqual(contributorResponse.status, 403, 'contributor cannot submit work-scoped tags with a song');
+  const contributorBody = (await contributorResponse.json()) as { error: string };
+  assert(
+    contributorBody.error.includes('curator') && contributorBody.error.includes('Global Song Library'),
+    'contributor rejection directs work-tag edits to a curator in Global Song Library',
+  );
+  assertEqual(contributorDb.prepareCalls, 0, 'contributor work tags are rejected before D1');
+
+  const curatorDb = new RecordingD1();
+  const curatorResponse = await app.request(
+    '/api/songs',
+    reqInit({
+      method: 'POST',
+      path: '/api/songs',
+      body: { title: 'Song', originalArtist: 'Artist', tags: ['genre:rock'] },
+    }, CURATOR),
+    envFor(curatorDb),
+  );
+  assertEqual(curatorResponse.status, 400, 'curator must edit work tags through Global Song Library');
+  const curatorBody = (await curatorResponse.json()) as { error: string };
+  assert(
+    curatorBody.error.includes('Global Song Library'),
+    'curator rejection identifies the supported work-tag workflow',
+  );
+  assertEqual(curatorDb.prepareCalls, 0, 'curator work tags are rejected before D1 instead of being silently lost');
+}
+
 async function main(): Promise<void> {
   await testContributorStillAuthenticates();
   await testContributorRetainsReadOnlyStampAccess();
@@ -328,6 +366,7 @@ async function main(): Promise<void> {
   await testVodExportMutationRequiresAuthenticityHeader();
   await testHarmonizerRejectsInvalidWorkMergeConfirmation();
   await testWorkTagsRejectInvalidSelectionsBeforeD1();
+  await testSongCreationRejectsWorkTagsBeforeD1();
   console.log('✓ curator-only Admin routes and VOD export CSRF boundaries');
 }
 

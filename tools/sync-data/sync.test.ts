@@ -64,10 +64,8 @@ test('assembleFanSiteSongs exports the shared work ID without replacing local so
   const legacy = songs.find((s) => s.id === 'legacy-local')!;
   assert.equal(linked.workId, 'work-shared');
   assert.deepEqual(linked.inheritedTags, ['genre:rock']);
-  assert.deepEqual(linked.tags, ['genre:rock']);
   assert.equal('workId' in legacy, false, 'unlinked legacy rows stay backward compatible');
   assert.deepEqual(legacy.inheritedTags, ['legacy-tag']);
-  assert.deepEqual(legacy.tags, ['legacy-tag']);
 });
 
 test('assembleFanSiteSongs keeps inherited tags separate and aggregates performance tags', () => {
@@ -87,7 +85,6 @@ test('assembleFanSiteSongs keeps inherited tags separate and aggregates performa
     }],
   );
   assert.deepEqual(songs[0].inheritedTags, ['genre:rock', 'style:parody']);
-  assert.deepEqual(songs[0].tags, ['language:zh', 'genre:rock', 'style:parody']);
   assert.deepEqual(songs[0].performances[0].tags, ['language:zh', 'style:parody']);
 });
 
@@ -100,7 +97,8 @@ test('assembleFanSiteSongs emits slim performances without stream-derived fields
   assert.equal('streamTitle' in p, false, 'streamTitle is derivable from streams.json by streamId');
   assert.equal('date' in p, false, 'date is derivable from streams.json by streamId');
   assert.equal('note' in p, false, 'empty notes are omitted');
-  assert.deepEqual(p, { id: 'p1', streamId: 's1', videoId: 'v1', timestamp: 10, endTimestamp: 99, tags: [] });
+  assert.equal('tags' in p, false, 'empty rendition tags are omitted');
+  assert.deepEqual(p, { id: 'p1', streamId: 's1', videoId: 'v1', timestamp: 10, endTimestamp: 99 });
 });
 
 test('assembleFanSiteSongs keeps non-empty notes', () => {
@@ -213,3 +211,29 @@ test('sync-data CLI rejects a SQL-injection slug with a clear error (before any 
 });
 
 console.log('sync-data.test: all passed');
+
+// song.tags is fully derivable from inheritedTags ∪ performances[].tags, and empty tag
+// arrays are the common case, so neither belongs on the wire — hydrateSongs recomputes
+// the union and already defaults the absent fields.
+{
+  const songs = assembleFanSiteSongs(
+    [
+      { id: 'tagged', work_id: 'work-1', title: 'Tagged', original_artist: 'A', song_tags: '[]', work_tags: '["genre:rock"]' },
+      { id: 'bare', work_id: null, title: 'Bare', original_artist: 'A', song_tags: '[]', work_tags: null },
+    ],
+    [
+      { id: 'p-tagged', song_id: 'tagged', stream_id: 's1', date: '2024-01-01', stream_title: '', video_id: 'v1', timestamp: 0, end_timestamp: null, note: '', tags: '["language:zh"]' },
+      { id: 'p-bare', song_id: 'bare', stream_id: 's1', date: '2024-01-01', stream_title: '', video_id: 'v2', timestamp: 0, end_timestamp: null, note: '', tags: '[]' },
+    ],
+  );
+
+  const tagged = songs.find((s) => s.id === 'tagged')!;
+  const bare = songs.find((s) => s.id === 'bare')!;
+
+  assert.equal('tags' in tagged, false, 'the derivable song.tags union is not serialized');
+  assert.deepEqual(tagged.inheritedTags, ['genre:rock'], 'non-empty inherited tags are kept');
+  assert.deepEqual(tagged.performances[0].tags, ['language:zh'], 'non-empty rendition tags are kept');
+
+  assert.equal('inheritedTags' in bare, false, 'an empty inheritedTags array is omitted');
+  assert.equal('tags' in bare.performances[0], false, 'an empty performance tags array is omitted');
+}

@@ -76,9 +76,10 @@ Tags are curated in the Admin UI and exported from D1; do not edit generated
 `data/*/songs.json` files by hand. See [`docs/tag-system.md`](docs/tag-system.md)
 for taxonomy, bulk-editing, filtering, and sync behavior.
 
-The repository includes a generated initial catalog, so tag filtering has data on
-first deploy. Use `npm run test:tag-catalog` to verify the catalog and generated
-song files; see the rollout section in the guide before the next D1 sync.
+The repository retains the frozen one-time seed catalog used for the initial
+rollout. Use `npm run test:tag-catalog` to validate that catalog and its matching
+D1 migration; synced song files remain authoritative exports of curator-owned D1
+data. See the rollout section before the first D1 sync in an unseeded environment.
 
 ## License
 

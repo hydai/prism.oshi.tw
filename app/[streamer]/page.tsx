@@ -33,7 +33,8 @@ import {
   followingTracksFromGrouped,
   getAllArtists,
   getAvailableYears,
-  getTagCounts,
+  getFlattenedTagCounts,
+  getGroupedTagCounts,
   groupSongsByWorkId,
   sortGroupedSongs,
 } from '../lib/archive';
@@ -173,7 +174,6 @@ export default function Home() {
 
   const allArtists = useMemo(() => getAllArtists(songs), [songs]);
   const availableYears = useMemo(() => getAvailableYears(streams), [streams]);
-  const tagCounts = useMemo(() => getTagCounts(songs), [songs]);
   const filteredStreams = useMemo(
     () => filterStreamsByYears(streams, selectedYears),
     [streams, selectedYears],
@@ -231,6 +231,15 @@ export default function Home() {
   const groupedSongs: ArchiveSong[] = useMemo(
     () => filterGroupedSongs(allGroupedSongs, archiveFilters),
     [allGroupedSongs, archiveFilters],
+  );
+
+  // Counted against the collection the active view renders, under the filters that are
+  // already applied, so a chip's number is what clicking it actually returns.
+  const tagCounts = useMemo(
+    () => (viewMode === 'timeline'
+      ? getFlattenedTagCounts(allFlattenedSongs, archiveFilters)
+      : getGroupedTagCounts(allGroupedSongs, archiveFilters)),
+    [viewMode, allFlattenedSongs, allGroupedSongs, archiveFilters],
   );
 
   // Click handlers below are passed to memoized rows whose comparators ignore
@@ -1376,6 +1385,7 @@ export default function Home() {
                         >
                           <SongCard
                             song={song}
+                            selectedTags={selectedTags}
                             isExpanded={expandedSongs.has(song.id)}
                             onToggleExpand={toggleSongExpansion}
                             onPlay={handlePlayFromGrouped}

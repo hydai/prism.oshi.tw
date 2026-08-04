@@ -105,7 +105,7 @@ export interface Stream {
 export interface CreateSongBody {
   title: string;
   originalArtist: string;
-  /** Legacy input; scoped IDs are routed to work/performance storage by the API. */
+  /** Legacy performance-scoped input. Work tags must be edited in Global Song Library. */
   tags?: string[];
   performances?: CreatePerformanceBody[];
 }

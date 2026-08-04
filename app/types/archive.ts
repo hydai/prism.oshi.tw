@@ -39,6 +39,8 @@ export interface FlattenedSong {
   endTimestamp?: number;
   note: string;
   searchString: string;
+  // Tag labels/aliases are matched as whole terms, so they are kept out of searchString.
+  tagTerms: string[];
   year: number;
   albumArtUrl?: string;
 }

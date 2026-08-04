@@ -72,7 +72,8 @@ interface FanSitePerformance {
   timestamp: number;
   endTimestamp: number | null;
   note?: string;
-  tags: string[];
+  /** Rendition-scope tags. Omitted when empty. */
+  tags?: string[];
 }
 
 interface FanSiteSong {
@@ -80,9 +81,8 @@ interface FanSiteSong {
   workId?: string;
   title: string;
   originalArtist: string;
-  /** Tags inherited by every performance (work + legacy song layers). */
-  inheritedTags: string[];
-  tags: string[];
+  /** Tags inherited by every performance (work + legacy song layers). Omitted when empty. */
+  inheritedTags?: string[];
   performances: FanSitePerformance[];
 }
 
@@ -150,11 +150,10 @@ export function assembleFanSiteSongs(
         ...(row.work_id ? { workId: row.work_id } : {}),
         title: row.title,
         originalArtist: row.original_artist,
-        inheritedTags,
-        tags: mergeTagIds(
-          inheritedTags,
-          performances.flatMap((performance) => JSON.parse(performance.tags) as string[]),
-        ),
+        // The effective union is derivable from inheritedTags plus the rendition tags, so
+        // hydrateSongs recomputes it rather than every visitor downloading it. Empty tag
+        // arrays are the common case and are omitted for the same reason.
+        ...(inheritedTags.length > 0 ? { inheritedTags } : {}),
         performances: performances
         // Newest first — the canonical order the timeline consumes (dates come
         // from the DB rows; the slim output no longer carries them)
@@ -166,7 +165,10 @@ export function assembleFanSiteSongs(
           timestamp: p.timestamp,
           endTimestamp: p.end_timestamp,
           ...(p.note ? { note: p.note } : {}),
-          tags: JSON.parse(p.tags) as string[],
+          ...(() => {
+            const tags = JSON.parse(p.tags) as string[];
+            return tags.length > 0 ? { tags } : {};
+          })(),
         })),
       };
     })
