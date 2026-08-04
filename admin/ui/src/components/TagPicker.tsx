@@ -9,7 +9,7 @@ import {
 interface TagPickerProps {
   value: string[];
   onChange: (tags: string[]) => void;
-  recommendedScope?: TagScope;
+  scope: TagScope;
   disabled?: boolean;
   compact?: boolean;
 }
@@ -17,7 +17,7 @@ interface TagPickerProps {
 export default function TagPicker({
   value,
   onChange,
-  recommendedScope,
+  scope,
   disabled = false,
   compact = false,
 }: TagPickerProps) {
@@ -32,7 +32,10 @@ export default function TagPicker({
   return (
     <div className={compact ? 'space-y-2' : 'space-y-3'} data-testid="tag-picker">
       {TAG_CATEGORIES.map((category) => {
-        const tags = TAG_DEFINITIONS.filter((tag) => tag.active && tag.category === category.id);
+        const tags = TAG_DEFINITIONS.filter((tag) => (
+          tag.active && tag.scope === scope && tag.category === category.id
+        ));
+        if (tags.length === 0) return null;
         return (
           <fieldset key={category.id}>
             <legend className="mb-1 text-xs font-semibold uppercase tracking-wide text-slate-500">
@@ -41,7 +44,6 @@ export default function TagPicker({
             <div className="flex flex-wrap gap-1.5">
               {tags.map((tag) => {
                 const isSelected = selected.has(tag.id);
-                const isRecommended = !recommendedScope || tag.recommendedScope === recommendedScope;
                 return (
                   <button
                     key={tag.id}
@@ -49,14 +51,11 @@ export default function TagPicker({
                     aria-pressed={isSelected}
                     disabled={disabled}
                     onClick={() => toggle(tag.id)}
-                    title={isRecommended ? undefined : `通常建議設定在${tag.recommendedScope === 'work' ? '共用作品' : '當地歌曲版本'}`}
                     data-testid={`tag-option-${tag.id.replace(':', '-')}`}
                     className={`rounded-full border px-2.5 py-1 text-xs font-medium transition-colors disabled:cursor-not-allowed disabled:opacity-50 ${
                       isSelected
                         ? 'border-blue-600 bg-blue-600 text-white'
-                        : isRecommended
-                          ? 'border-slate-300 bg-white text-slate-700 hover:border-blue-400'
-                          : 'border-dashed border-slate-300 bg-slate-50 text-slate-500 hover:border-blue-400'
+                        : 'border-slate-300 bg-white text-slate-700 hover:border-blue-400'
                     }`}
                   >
                     {tag.label}

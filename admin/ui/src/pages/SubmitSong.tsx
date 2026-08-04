@@ -13,6 +13,7 @@ interface PerformanceForm {
   timestamp: string;
   endTimestamp: string;
   note: string;
+  tags: string[];
 }
 
 const emptyPerformance: Omit<PerformanceForm, 'clientId'> = {
@@ -23,6 +24,7 @@ const emptyPerformance: Omit<PerformanceForm, 'clientId'> = {
   timestamp: '0',
   endTimestamp: '',
   note: '',
+  tags: [],
 };
 
 export default function SubmitSong() {
@@ -30,7 +32,6 @@ export default function SubmitSong() {
   const formId = useId();
   const [title, setTitle] = useState('');
   const [originalArtist, setOriginalArtist] = useState('');
-  const [tags, setTags] = useState<string[]>([]);
   const [performances, setPerformances] = useState<PerformanceForm[]>([]);
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -39,11 +40,19 @@ export default function SubmitSong() {
 
   const addPerformance = () => {
     const clientId = `${performanceIdPrefix}-${nextPerformanceId.current++}`;
-    setPerformances((previous) => [...previous, { ...emptyPerformance, clientId }]);
+    setPerformances((previous) => [...previous, { ...emptyPerformance, clientId, tags: [] }]);
   };
 
-  const updatePerformance = (idx: number, field: keyof PerformanceForm, value: string) => {
+  const updatePerformance = (
+    idx: number,
+    field: Exclude<keyof PerformanceForm, 'tags'>,
+    value: string,
+  ) => {
     setPerformances((prev) => prev.map((p, i) => (i === idx ? { ...p, [field]: value } : p)));
+  };
+
+  const updatePerformanceTags = (idx: number, tags: string[]) => {
+    setPerformances((prev) => prev.map((p, i) => (i === idx ? { ...p, tags } : p)));
   };
 
   const removePerformance = (idx: number) => {
@@ -77,13 +86,13 @@ export default function SubmitSong() {
           ? parseInt(performance.endTimestamp, 10)
           : null,
         note: performance.note,
+        tags: performance.tags,
       });
     }
 
     const body: CreateSongBody = {
       title: title.trim(),
       originalArtist: originalArtist.trim(),
-      tags,
       performances: perfBodies.length > 0 ? perfBodies : undefined,
     };
 
@@ -130,13 +139,6 @@ export default function SubmitSong() {
             className="mt-1 w-full rounded-md border border-slate-300 px-3 py-2 text-sm focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500"
             required
           />
-        </div>
-
-        <div>
-          <label className="block text-sm font-medium text-slate-700">Tags</label>
-          <div className="mt-1 rounded-md border border-slate-300 bg-slate-50 p-3">
-            <TagPicker value={tags} onChange={setTags} recommendedScope="song" compact />
-          </div>
         </div>
 
         {/* Performances */}
@@ -254,6 +256,15 @@ export default function SubmitSong() {
                   value={perf.note}
                   onChange={(e) => updatePerformance(idx, 'note', e.target.value)}
                   className="mt-1 w-full rounded border border-slate-300 px-2 py-1 text-sm"
+                />
+              </div>
+              <div className="rounded border border-slate-200 bg-white p-2">
+                <p className="mb-2 text-xs text-slate-500">這一次演唱的語言與形式</p>
+                <TagPicker
+                  value={perf.tags}
+                  onChange={(tags) => updatePerformanceTags(idx, tags)}
+                  scope="performance"
+                  compact
                 />
               </div>
             </div>

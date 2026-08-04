@@ -17,6 +17,7 @@ export function hydrateSongs(stored: Song[], streams: StreamSummary[]): ArchiveS
   const streamById = new Map(streams.map((s) => [s.id, s]));
   return stored.map((song) => ({
     ...song,
+    inheritedTags: song.inheritedTags ?? song.tags,
     performances: song.performances.map((p) => {
       const stream = streamById.get(p.streamId);
       return {
@@ -24,6 +25,7 @@ export function hydrateSongs(stored: Song[], streams: StreamSummary[]): ArchiveS
         streamTitle: stream?.title ?? "",
         date: stream?.date ?? ORPHAN_DATE,
         note: p.note ?? "",
+        tags: p.tags ?? [],
       };
     }),
   }));

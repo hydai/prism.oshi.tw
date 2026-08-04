@@ -46,6 +46,7 @@ interface PerformanceRow {
   timestamp: number;
   end_timestamp: number | null;
   note: string;
+  tags: string; // JSON array
 }
 
 interface StreamRow {
@@ -69,6 +70,7 @@ interface FanSitePerformance {
   timestamp: number;
   endTimestamp: number | null;
   note?: string;
+  tags: string[];
 }
 
 interface FanSiteSong {
@@ -76,6 +78,8 @@ interface FanSiteSong {
   workId?: string;
   title: string;
   originalArtist: string;
+  /** Tags inherited by every performance (work + legacy song layers). */
+  inheritedTags: string[];
   tags: string[];
   performances: FanSitePerformance[];
 }
@@ -117,16 +121,23 @@ export function assembleFanSiteSongs(
   }
 
   return songRows
-    .map((row) => ({
-      id: row.id,
-      ...(row.work_id ? { workId: row.work_id } : {}),
-      title: row.title,
-      originalArtist: row.original_artist,
-      tags: mergeTagIds(
+    .map((row) => {
+      const performances = perfsBySong.get(row.id) || [];
+      const inheritedTags = mergeTagIds(
         row.work_tags ? JSON.parse(row.work_tags) as string[] : [],
         JSON.parse(row.song_tags) as string[],
-      ),
-      performances: (perfsBySong.get(row.id) || [])
+      );
+      return {
+        id: row.id,
+        ...(row.work_id ? { workId: row.work_id } : {}),
+        title: row.title,
+        originalArtist: row.original_artist,
+        inheritedTags,
+        tags: mergeTagIds(
+          inheritedTags,
+          performances.flatMap((performance) => JSON.parse(performance.tags) as string[]),
+        ),
+        performances: performances
         // Newest first — the canonical order the timeline consumes (dates come
         // from the DB rows; the slim output no longer carries them)
         .sort((a, b) => b.date.localeCompare(a.date) ||
@@ -138,8 +149,10 @@ export function assembleFanSiteSongs(
           timestamp: p.timestamp,
           endTimestamp: p.end_timestamp,
           ...(p.note ? { note: p.note } : {}),
+          tags: JSON.parse(p.tags) as string[],
         })),
-    }))
+      };
+    })
     .sort((a, b) => a.title.localeCompare(b.title, 'zh-TW') || songTieOrder(a, b));
 }
 
@@ -185,7 +198,7 @@ export function buildExportSql(streamerId: string): string {
     SELECT 'performance', json_object(
       'id', id, 'song_id', song_id, 'stream_id', stream_id, 'date', date,
       'stream_title', stream_title, 'video_id', video_id, 'timestamp', timestamp,
-      'end_timestamp', end_timestamp, 'note', note
+      'end_timestamp', end_timestamp, 'note', note, 'tags', tags
     ) FROM performances WHERE streamer_id = '${streamerId}' AND status = 'approved'
     UNION ALL
     SELECT 'stream', json_object(

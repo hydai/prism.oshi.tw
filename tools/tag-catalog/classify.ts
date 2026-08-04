@@ -1,6 +1,6 @@
 import { mergeTagIds } from '../../lib/tags';
 
-export type AssignmentScope = 'work' | 'song';
+export type AssignmentScope = 'work' | 'performance';
 
 export interface CatalogSong {
   slug: string;
@@ -8,7 +8,7 @@ export interface CatalogSong {
   workId: string;
   title: string;
   originalArtist: string;
-  performances: Array<{ note?: string }>;
+  performances: Array<{ id: string; note?: string }>;
 }
 
 export interface AppleArtistLookup {
@@ -28,7 +28,7 @@ export interface TagAssignment {
 
 export interface ClassifiedCatalog {
   workAssignments: Map<string, TagAssignment[]>;
-  songAssignments: Map<string, TagAssignment[]>;
+  performanceAssignments: Map<string, TagAssignment[]>;
   artistLanguages: Map<string, string>;
 }
 
@@ -150,12 +150,13 @@ function titleWords(title: string): string[] {
     .filter(Boolean);
 }
 
-function explicitLanguage(title: string): string | null {
-  if (/(?:中文|華語|国语|國語|chinese)(?:版|ver(?:sion)?\.?)?/iu.test(title)) return 'language:zh';
-  if (/(?:英文|english)(?:版|ver(?:sion)?\.?)?/iu.test(title)) return 'language:en';
-  if (/(?:日文|日語|日本語|japanese)(?:版|ver(?:sion)?\.?)?/iu.test(title)) return 'language:ja';
-  if (/(?:韓文|韓語|한국어|korean)(?:版|ver(?:sion)?\.?)?/iu.test(title)) return 'language:ko';
-  return null;
+function explicitLanguages(text: string): string[] {
+  const tags: string[] = [];
+  if (/(?:中文|華語|国语|國語|chinese)(?:版|ver(?:sion)?\.?)?/iu.test(text)) tags.push('language:zh');
+  if (/(?:英文|english)(?:版|ver(?:sion)?\.?)?/iu.test(text)) tags.push('language:en');
+  if (/(?:日文|日語|日本語|japanese)(?:版|ver(?:sion)?\.?)?/iu.test(text)) tags.push('language:ja');
+  if (/(?:韓文|韓語|한국어|korean)(?:版|ver(?:sion)?\.?)?/iu.test(text)) tags.push('language:ko');
+  return mergeTagIds(tags);
 }
 
 function hasVocalSynthEvidence(song: CatalogSong): boolean {
@@ -166,8 +167,9 @@ function hasVocalSynthEvidence(song: CatalogSong): boolean {
 }
 
 function strongTitleLanguage(title: string): string | null {
-  const explicit = explicitLanguage(title);
-  if (explicit) return explicit;
+  const explicit = explicitLanguages(title);
+  if (explicit.length === 1) return explicit[0];
+  if (explicit.length > 1) return null;
   if (HANGUL.test(title)) return 'language:ko';
   if (KANA.test(title)) return 'language:ja';
   if (BOPOMOFO.test(title)) return 'language:zh';
@@ -317,35 +319,45 @@ export function classifyCatalog(
   }
 
   const workAssignments = new Map<string, TagAssignment[]>();
-  const songAssignments = new Map<string, TagAssignment[]>();
+  const performanceAssignments = new Map<string, TagAssignment[]>();
   for (const song of songs) {
-    const songTags: TagAssignment[] = [];
     const directLanguage = strongTitleLanguage(song.title);
     const artistLanguage = artistLanguages.get(song.originalArtist);
-    const language = SONG_LANGUAGE_OVERRIDES.get(`${song.originalArtist}\u0000${song.title}`)
-      ?? explicitLanguage(song.title)
+    const inferredLanguage = SONG_LANGUAGE_OVERRIDES.get(`${song.originalArtist}\u0000${song.title}`)
       ?? (HANGUL.test(song.title) ? 'language:ko' : null)
       ?? (KANA.test(song.title) ? 'language:ja' : null)
       ?? artistLanguage
       ?? directLanguage;
-    if (language) {
-      songTags.push({
-        tag: language,
-        evidence: explicitLanguage(song.title)
-          ? 'explicit language annotation in title'
-          : (HANGUL.test(song.title) || KANA.test(song.title))
+    const sharedRenditionText = renditionAnnotation(song);
+    for (const performance of song.performances) {
+      const performanceTags: TagAssignment[] = [];
+      const explicit = explicitLanguages(`${song.title} ${performance.note ?? ''}`);
+      if (explicit.length > 0) {
+        performanceTags.push(...explicit.map((tag) => ({
+          tag,
+          evidence: 'explicit language annotation in title or performance note',
+        })));
+      } else if (inferredLanguage) {
+        performanceTags.push({
+          tag: inferredLanguage,
+          evidence: (HANGUL.test(song.title) || KANA.test(song.title))
             ? 'language-specific title script'
             : artistLanguage
               ? `curated or catalog-derived artist language: ${song.originalArtist}`
               : 'high-confidence title vocabulary or script',
-      });
-    }
+        });
+      }
 
-    const styleText = renditionAnnotation(song);
-    for (const rule of STYLE_RULES) {
-      if (rule.pattern.test(styleText)) songTags.push({ tag: rule.tag, evidence: rule.evidence });
+      const performanceText = `${sharedRenditionText} ${performance.note ?? ''}`;
+      for (const rule of STYLE_RULES) {
+        if (rule.pattern.test(performanceText)) {
+          performanceTags.push({ tag: rule.tag, evidence: rule.evidence });
+        }
+      }
+      if (performanceTags.length > 0) {
+        performanceAssignments.set(performance.id, dedupeAssignments(performanceTags));
+      }
     }
-    if (songTags.length > 0) songAssignments.set(song.id, dedupeAssignments(songTags));
 
     const workTags = workAssignments.get(song.workId) ?? [];
     const normalizedArtist = normalizeArtist(song.originalArtist);
@@ -370,10 +382,10 @@ export function classifyCatalog(
       workTags.push({ tag: 'source:original', evidence: `original artist matches streamer ${song.slug}` });
     }
     for (const rule of MOOD_RULES) {
-      if (rule.pattern.test(styleText)) workTags.push({ tag: rule.tag, evidence: rule.evidence });
+      if (rule.pattern.test(sharedRenditionText)) workTags.push({ tag: rule.tag, evidence: rule.evidence });
     }
     if (workTags.length > 0) workAssignments.set(song.workId, dedupeAssignments(workTags));
   }
 
-  return { workAssignments, songAssignments, artistLanguages };
+  return { workAssignments, performanceAssignments, artistLanguages };
 }

@@ -4,13 +4,14 @@ import test from 'node:test';
 import { classifyCatalog, type AppleArtistLookup, type CatalogSong } from './classify';
 
 function song(overrides: Partial<CatalogSong> = {}): CatalogSong {
+  const id = overrides.id ?? 'song-1';
   return {
     slug: 'tester',
-    id: 'song-1',
+    id,
     workId: 'work-1',
     title: '夜に駆ける',
     originalArtist: 'YOASOBI',
-    performances: [],
+    performances: [{ id: `perf-${id}` }],
     ...overrides,
   };
 }
@@ -25,14 +26,14 @@ const apple: AppleArtistLookup[] = [{
   })),
 }];
 
-test('assigns language to the song scope and genre to the work scope', () => {
+test('assigns language to the performance scope and genre to the work scope', () => {
   const result = classifyCatalog([
     song({ id: 'song-ja', workId: 'work-ja' }),
     song({ id: 'song-rock', workId: 'work-rock', title: 'The Story', originalArtist: 'Rock Band' }),
   ], apple, new Map());
 
-  assert.deepEqual(result.songAssignments.get('song-ja')?.map(({ tag }) => tag), ['language:ja']);
-  assert.deepEqual(result.songAssignments.get('song-rock')?.map(({ tag }) => tag), ['language:en']);
+  assert.deepEqual(result.performanceAssignments.get('perf-song-ja')?.map(({ tag }) => tag), ['language:ja']);
+  assert.deepEqual(result.performanceAssignments.get('perf-song-rock')?.map(({ tag }) => tag), ['language:en']);
   assert.deepEqual(result.workAssignments.get('work-rock')?.map(({ tag }) => tag), ['genre:pop', 'genre:rock']);
 });
 
@@ -46,7 +47,7 @@ test('recognizes explicit rendition styles and Vocaloid evidence', () => {
     }),
   ], [], new Map());
 
-  assert.deepEqual(result.songAssignments.get('song-style')?.map(({ tag }) => tag), [
+  assert.deepEqual(result.performanceAssignments.get('perf-song-style')?.map(({ tag }) => tag), [
     'language:ja',
     'style:a-cappella',
   ]);
@@ -112,8 +113,8 @@ test('does not propagate a language from generic unknown artists', () => {
     song({ id: 'song-unknown-zh', workId: 'work-zh', title: '沒說歌名', originalArtist: 'Unknown' }),
   ], [], new Map());
 
-  assert.deepEqual(result.songAssignments.get('song-unknown-ja')?.map(({ tag }) => tag), ['language:ja']);
-  assert.deepEqual(result.songAssignments.get('song-unknown-zh')?.map(({ tag }) => tag), ['language:zh']);
+  assert.deepEqual(result.performanceAssignments.get('perf-song-unknown-ja')?.map(({ tag }) => tag), ['language:ja']);
+  assert.deepEqual(result.performanceAssignments.get('perf-song-unknown-zh')?.map(({ tag }) => tag), ['language:zh']);
 });
 
 test('requires standalone Latin voice-synth names', () => {
@@ -134,6 +135,44 @@ test('does not treat an original choir artist as a duet rendition', () => {
     song({ id: 'song-duet', workId: 'work-duet', title: 'Only', originalArtist: 'LeeHi (老師合唱版)' }),
   ], [], new Map());
 
-  assert.equal(result.songAssignments.get('song-choir')?.some(({ tag }) => tag === 'style:duet') ?? false, false);
-  assert.equal(result.songAssignments.get('song-duet')?.some(({ tag }) => tag === 'style:duet'), true);
+  assert.equal(result.performanceAssignments.get('perf-song-choir')?.some(({ tag }) => tag === 'style:duet') ?? false, false);
+  assert.equal(result.performanceAssignments.get('perf-song-duet')?.some(({ tag }) => tag === 'style:duet'), true);
+});
+
+test('preserves every explicitly listed performance language', () => {
+  const result = classifyCatalog([
+    song({
+      id: 'song-bilingual',
+      title: "Arrietty's Song (Japanese & English ver.)",
+      originalArtist: 'Cécile Corbel',
+    }),
+  ], [], new Map());
+
+  assert.deepEqual(
+    result.performanceAssignments.get('perf-song-bilingual')?.map(({ tag }) => tag),
+    ['language:en', 'language:ja'],
+  );
+});
+
+test('keeps note-specific rendition styles on their own performances', () => {
+  const result = classifyCatalog([
+    song({
+      id: 'song-versions',
+      title: 'The Story',
+      originalArtist: 'Unknown',
+      performances: [
+        { id: 'perf-acoustic', note: 'acoustic' },
+        { id: 'perf-duet', note: 'duet' },
+      ],
+    }),
+  ], [], new Map());
+
+  assert.deepEqual(
+    result.performanceAssignments.get('perf-acoustic')?.map(({ tag }) => tag),
+    ['language:en', 'style:acoustic'],
+  );
+  assert.deepEqual(
+    result.performanceAssignments.get('perf-duet')?.map(({ tag }) => tag),
+    ['language:en', 'style:duet'],
+  );
 });

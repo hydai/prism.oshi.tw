@@ -31,6 +31,7 @@ function isFiniteNonNegativeNumber(value: unknown): value is number {
 // --- Songs ---
 
 export interface CreateSongPerformanceParsed {
+  tags?: string[];
   streamId: string;
   timestamp: number;
   endTimestamp?: number | null;
@@ -72,7 +73,11 @@ function parseInlinePerformances(value: unknown): CreateSongPerformanceParsed[] 
     if (item.note !== undefined && typeof item.note !== 'string') {
       return { error: `Invalid performances[${i}].note: expected a string` };
     }
+    if (item.tags !== undefined && !isStringArray(item.tags)) {
+      return { error: `Invalid performances[${i}].tags: expected an array of strings` };
+    }
     result.push({
+      ...(item.tags === undefined ? {} : { tags: item.tags as string[] }),
       streamId: item.streamId,
       timestamp: item.timestamp,
       ...(item.endTimestamp === undefined ? {} : { endTimestamp: item.endTimestamp as number | null }),
@@ -140,6 +145,7 @@ export function parseUpdateSongBody(value: unknown): UpdateSongBodyParsed | { er
 // --- Performances ---
 
 export interface CreatePerformanceBodyParsed {
+  tags?: string[];
   songId: string;
   streamId: string;
   timestamp: number;
@@ -169,8 +175,11 @@ export function parseCreatePerformanceBody(value: unknown): CreatePerformanceBod
     return { error: 'Invalid note: expected a string' };
   }
 
+  if (value.tags !== undefined && !isStringArray(value.tags)) {
+    return { error: 'Invalid tags: expected an array of strings' };
+  }
   return {
-    songId: value.songId,
+    ...(value.tags === undefined ? {} : { tags: value.tags as string[] }),    songId: value.songId,
     streamId: value.streamId,
     timestamp: value.timestamp,
     ...(value.endTimestamp === undefined ? {} : { endTimestamp: value.endTimestamp as number | null }),
@@ -216,6 +225,7 @@ export function parseUpdateTimestampsBody(value: unknown): UpdateTimestampsBodyP
 }
 
 export interface CreateStampPerformanceBodyParsed {
+  tags?: string[];
   title: string;
   originalArtist: string;
   timestamp: number;
@@ -245,8 +255,11 @@ export function parseCreateStampPerformanceBody(value: unknown): CreateStampPerf
   if (value.note !== undefined && typeof value.note !== 'string') {
     return { error: 'Invalid note: expected a string' };
   }
+  if (value.tags !== undefined && !isStringArray(value.tags)) {
+    return { error: 'Invalid tags: expected an array of strings' };
+  }
   return {
-    title: value.title,
+    ...(value.tags === undefined ? {} : { tags: value.tags as string[] }),    title: value.title,
     originalArtist: value.originalArtist,
     timestamp: value.timestamp,
     endTimestamp: value.endTimestamp === undefined ? null : (value.endTimestamp as number | null),

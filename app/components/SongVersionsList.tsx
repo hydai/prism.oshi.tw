@@ -4,6 +4,7 @@ import { Heart, Play, Plus } from 'lucide-react';
 import type { ArchivePerformance, ArchiveSong, PerformanceRef } from '../types/archive';
 import { trackFromPerformance } from '../lib/archive';
 import { formatTime } from '../lib/format';
+import { getTagLabel } from '../../lib/tags';
 import AddToPlaylistDropdown from './AddToPlaylistDropdown';
 import YouTubeWatchLink from './YouTubeWatchLink';
 
@@ -98,6 +99,19 @@ export default function SongVersionsList({
                 >
                   {performance.date}
                 </span>
+                {performance.tags.map((tag) => (
+                  <span
+                    key={tag}
+                    className="rounded-full px-2 py-0.5"
+                    style={{
+                      background: 'var(--bg-accent-pink)',
+                      color: 'var(--accent-pink)',
+                      fontSize: 'var(--font-size-xs)',
+                    }}
+                  >
+                    {getTagLabel(tag)}
+                  </span>
+                ))}
                 {performance.note && (
                   <span
                     className="inline-flex items-center border font-medium bg-accent-bg-blue-muted text-accent-blue border-border-token-accent-blue rounded-radius-pill text-token-xs py-token-1 px-token-3"

@@ -133,6 +133,7 @@ const PROTECTED_ROUTES: Route[] = [
       note: 'Verified against official credits',
     },
   },
+  { method: 'PATCH', path: '/api/performances/perf-1/tags', body: { tags: ['language:ja'] } },
   { method: 'PATCH', path: '/api/performances/perf-1/timestamps', body: { timestamp: 999, endTimestamp: 1001 } },
   { method: 'PATCH', path: '/api/performances/perf-1/details', body: { title: 'Hacked', originalArtist: 'Hacker' } },
   { method: 'DELETE', path: '/api/performances/perf-1' },
@@ -286,6 +287,24 @@ async function testWorkTagsRejectInvalidSelectionsBeforeD1(): Promise<void> {
   );
   assertEqual(unknownResponse.status, 400, 'unknown work tag is rejected');
   assertEqual(unknownDb.prepareCalls, 0, 'unknown work tag is rejected before D1');
+
+  const renditionOnWorkDb = new RecordingD1();
+  const renditionOnWorkResponse = await app.request(
+    '/api/works/work-1/tags',
+    reqInit({ method: 'PUT', path: '/api/works/work-1/tags', body: { tags: ['language:ja'] } }, CURATOR),
+    envFor(renditionOnWorkDb),
+  );
+  assertEqual(renditionOnWorkResponse.status, 400, 'performance tag is rejected at work scope');
+  assertEqual(renditionOnWorkDb.prepareCalls, 0, 'wrong-scope work tag is rejected before D1');
+
+  const workOnRenditionDb = new RecordingD1();
+  const workOnRenditionResponse = await app.request(
+    '/api/performances/perf-1/tags',
+    reqInit({ method: 'PATCH', path: '/api/performances/perf-1/tags', body: { tags: ['genre:rock'] } }, CURATOR),
+    envFor(workOnRenditionDb),
+  );
+  assertEqual(workOnRenditionResponse.status, 400, 'work tag is rejected at performance scope');
+  assertEqual(workOnRenditionDb.prepareCalls, 0, 'wrong-scope performance tag is rejected before D1');
 
   const conflictingDb = new RecordingD1();
   const conflictingResponse = await app.request(

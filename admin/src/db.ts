@@ -1,5 +1,12 @@
 import { HARMONIZE_MERGE_SOURCE_LIMIT } from '../shared/types';
-import { applyTagDelta, MAX_TAGS_PER_ENTITY } from '../../lib/tags';
+import {
+  activeTagIds,
+  applyTagDelta,
+  filterTagIdsByScope,
+  getTagDefinition,
+  mergeTagIds,
+  MAX_TAGS_PER_ENTITY,
+} from '../../lib/tags';
 import type {
   Song,
   SongRow,
@@ -52,9 +59,11 @@ export function performanceFromRow(row: PerformanceRow): Performance {
     timestamp: row.timestamp,
     endTimestamp: row.end_timestamp,
     note: row.note,
+    tags: JSON.parse(row.tags ?? '[]') as string[],
     status: row.status,
     submittedBy: row.submitted_by,
     createdAt: row.created_at,
+    updatedAt: row.updated_at ?? row.created_at,
   };
 }
 
@@ -167,7 +176,6 @@ function prepareEnsureWorkForSongUpdate(
   songId: string,
   title: string | undefined,
   originalArtist: string | undefined,
-  tags: string[] | undefined,
 ): D1PreparedStatement {
   return db.prepare(
     `INSERT INTO works (id, title, original_artist, tags)
@@ -175,7 +183,15 @@ function prepareEnsureWorkForSongUpdate(
      FROM (
        SELECT COALESCE(?, song.title) AS title,
               COALESCE(?, song.original_artist) AS original_artist,
-              COALESCE(?, song.tags) AS tags
+              -- The song is relinked to this new work, so its curated work tags have to
+              -- come along. Read them from the work, never from the dead legacy column
+              -- on the local song row.
+              COALESCE((
+                SELECT current_work.tags
+                FROM song_work_links AS link
+                JOIN works AS current_work ON current_work.id = link.work_id
+                WHERE link.song_id = song.id
+              ), '[]') AS tags
        FROM songs AS song
        WHERE song.id = ?
      ) AS identity
@@ -192,7 +208,6 @@ function prepareEnsureWorkForSongUpdate(
     candidateWorkId,
     title ?? null,
     originalArtist ?? null,
-    tags === undefined ? null : JSON.stringify(tags),
     songId,
   );
 }
@@ -505,7 +520,7 @@ export async function updateGlobalWorkTags(
 ): Promise<boolean> {
   const result = await db
     .prepare("UPDATE works SET tags = ?, updated_at = datetime('now') WHERE id = ?")
-    .bind(JSON.stringify(tags), workId)
+    .bind(JSON.stringify(filterTagIdsByScope(tags, 'work')), workId)
     .run();
   return result.meta.changes > 0;
 }
@@ -524,25 +539,95 @@ export async function bulkUpdateGlobalWorkTags(
   removeTags: string[],
 ): Promise<Array<{ id: string; tags: string[] }>> {
   if (workIds.length === 0) return [];
-  const placeholders = workIds.map(() => '?').join(', ');
-  const { results } = await db
-    .prepare(`SELECT id, tags FROM works WHERE id IN (${placeholders})`)
-    .bind(...workIds)
-    .all<{ id: string; tags: string }>();
+  const requestedJson = JSON.stringify(workIds);
+  const additionsJson = JSON.stringify(filterTagIdsByScope(addTags, 'work'));
+  const removalsJson = JSON.stringify(filterTagIdsByScope(removeTags, 'work'));
+  const tagOrderJson = JSON.stringify(activeTagIds('work'));
+  const atomicDeltaSql = `
+    WITH requested(id) AS (
+      SELECT value FROM json_each(?)
+    ),
+    additions(tag) AS (
+      SELECT value FROM json_each(?)
+    ),
+    removals(tag) AS (
+      SELECT value FROM json_each(?)
+    ),
+    tag_order(tag, sort_order) AS (
+      SELECT value, CAST(key AS INTEGER) FROM json_each(?)
+    ),
+    candidate_tags(id, tag) AS (
+      SELECT work.id, current.value
+      FROM requested
+      JOIN works AS work ON work.id = requested.id
+      JOIN json_each(work.tags) AS current
+      WHERE current.value NOT IN (SELECT tag FROM removals)
 
-  if (results.length !== workIds.length) return [];
-  const currentById = new Map(results.map((row) => [row.id, row.tags]));
-  const updates = workIds.map((id) => ({
-    id,
-    tags: applyTagDelta(JSON.parse(currentById.get(id)!) as string[], addTags, removeTags),
-  }));
-  const oversized = updates.find((update) => update.tags.length > MAX_TAGS_PER_ENTITY);
-  if (oversized) throw new WorkTagLimitError(oversized.id);
-  await db.batch(updates.map((update) =>
-    db.prepare("UPDATE works SET tags = ?, updated_at = datetime('now') WHERE id = ?")
-      .bind(JSON.stringify(update.tags), update.id),
-  ));
-  return updates;
+      UNION
+
+      SELECT work.id, additions.tag
+      FROM requested
+      JOIN works AS work ON work.id = requested.id
+      CROSS JOIN additions
+    ),
+    computed(id, tags) AS (
+      SELECT requested.id,
+             COALESCE((
+               SELECT json_group_array(tag)
+               FROM (
+                 SELECT candidate.tag
+                 FROM candidate_tags AS candidate
+                 LEFT JOIN tag_order ON tag_order.tag = candidate.tag
+                 WHERE candidate.id = requested.id
+                 ORDER BY COALESCE(tag_order.sort_order, 999), candidate.tag
+               )
+             ), '[]')
+      FROM requested
+      JOIN works AS work ON work.id = requested.id
+    ),
+    validation(ok) AS (
+      SELECT COUNT(*) = (SELECT COUNT(*) FROM requested)
+         AND COALESCE(MAX(json_array_length(tags)), 0) <= ?
+      FROM computed
+    )
+    UPDATE works
+    SET tags = (SELECT computed.tags FROM computed WHERE computed.id = works.id),
+        updated_at = datetime('now')
+    WHERE id IN (SELECT id FROM requested)
+      AND (SELECT ok FROM validation)
+    RETURNING id, tags`;
+
+  for (let attempt = 0; attempt < 2; attempt += 1) {
+    const { results } = await db
+      .prepare(atomicDeltaSql)
+      .bind(
+        requestedJson,
+        additionsJson,
+        removalsJson,
+        tagOrderJson,
+        MAX_TAGS_PER_ENTITY,
+      )
+      .all<{ id: string; tags: string }>();
+    if (results.length === workIds.length) {
+      const updatedById = new Map(results.map((row) => [row.id, JSON.parse(row.tags) as string[]]));
+      return workIds.map((id) => ({ id, tags: updatedById.get(id)! }));
+    }
+
+    const placeholders = workIds.map(() => '?').join(', ');
+    const { results: currentRows } = await db
+      .prepare(`SELECT id, tags FROM works WHERE id IN (${placeholders})`)
+      .bind(...workIds)
+      .all<{ id: string; tags: string }>();
+    if (currentRows.length !== workIds.length) return [];
+
+    const oversized = currentRows.find((row) => (
+      applyTagDelta(JSON.parse(row.tags) as string[], addTags, removeTags).length
+      > MAX_TAGS_PER_ENTITY
+    ));
+    if (oversized) throw new WorkTagLimitError(oversized.id);
+  }
+
+  throw new Error('Bulk work tag delta could not be applied atomically');
 }
 
 export async function getSongById(
@@ -589,13 +674,14 @@ export async function insertSong(
   id: string,
   title: string,
   originalArtist: string,
-  tags: string[],
+  workTags: string[],
   submittedBy: string,
 ): Promise<void> {
   const workId = generateWorkId();
+  const workTagsJson = JSON.stringify(filterTagIdsByScope(workTags, 'work'));
   await db.batch([
-    prepareEnsureExactWork(db, workId, title, originalArtist, JSON.stringify(tags)),
-    prepareSongInsert(db, streamerId, id, title, originalArtist, tags, submittedBy),
+    prepareEnsureExactWork(db, workId, title, originalArtist, workTagsJson),
+    prepareSongInsert(db, streamerId, id, title, originalArtist, [], submittedBy),
     prepareLinkSongToExactWork(db, id, title, originalArtist, 'import_exact', submittedBy),
   ]);
 }
@@ -603,7 +689,7 @@ export async function insertSong(
 export async function updateSong(
   db: D1Database,
   id: string,
-  fields: { title?: string; originalArtist?: string; tags?: string[] },
+  fields: { title?: string; originalArtist?: string },
   updatedBy = 'system:song-update',
 ): Promise<void> {
   const sets: string[] = [];
@@ -617,11 +703,6 @@ export async function updateSong(
     sets.push('original_artist = ?');
     values.push(fields.originalArtist);
   }
-  if (fields.tags !== undefined) {
-    sets.push('tags = ?');
-    values.push(JSON.stringify(fields.tags));
-  }
-
   if (sets.length === 0) return;
 
   sets.push("updated_at = datetime('now')");
@@ -646,7 +727,6 @@ export async function updateSong(
       id,
       fields.title,
       fields.originalArtist,
-      fields.tags,
     ),
     updateStatement,
     prepareRelinkSongToExactWork(db, id, updatedBy),
@@ -679,6 +759,7 @@ export interface PerformanceInsert {
   readonly timestamp: number;
   readonly endTimestamp: number | null;
   readonly note: string;
+  readonly tags?: readonly string[];
 }
 
 function preparePerformanceInsert(
@@ -690,8 +771,8 @@ function preparePerformanceInsert(
 ): D1PreparedStatement {
   return db
     .prepare(
-      `INSERT INTO performances (id, streamer_id, song_id, stream_id, date, stream_title, video_id, timestamp, end_timestamp, note, status, submitted_by, updated_at)
-       VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, datetime('now'))`,
+      `INSERT INTO performances (id, streamer_id, song_id, stream_id, date, stream_title, video_id, timestamp, end_timestamp, note, tags, status, submitted_by, updated_at)
+       VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, datetime('now'))`,
     )
     .bind(
       performance.id,
@@ -704,6 +785,7 @@ function preparePerformanceInsert(
       performance.timestamp,
       performance.endTimestamp,
       performance.note,
+      JSON.stringify(filterTagIdsByScope(performance.tags ?? [], 'performance')),
       'pending',
       submittedBy,
     );
@@ -754,6 +836,18 @@ export async function insertPerformances(
   await db.batch(performances.map((performance) =>
     preparePerformanceInsert(db, streamerId, songId, performance, submittedBy),
   ));
+}
+
+export async function updatePerformanceTags(
+  db: D1Database,
+  id: string,
+  tags: string[],
+): Promise<boolean> {
+  const result = await db
+    .prepare("UPDATE performances SET tags = ?, updated_at = datetime('now') WHERE id = ?")
+    .bind(JSON.stringify(filterTagIdsByScope(tags, 'performance')), id)
+    .run();
+  return result.meta.changes > 0;
 }
 
 export async function getPerformanceStatus(
@@ -1011,6 +1105,7 @@ interface StampPerformanceRow {
   timestamp: number;
   end_timestamp: number | null;
   note: string;
+  tags: string;
   status: Status;
 }
 
@@ -1023,6 +1118,7 @@ function stampPerformanceFromRow(row: StampPerformanceRow): StampPerformance {
     timestamp: row.timestamp,
     endTimestamp: row.end_timestamp,
     note: row.note,
+    tags: JSON.parse(row.tags ?? '[]') as string[],
     status: row.status,
   };
 }
@@ -1033,7 +1129,7 @@ export async function listPerformancesForStream(
 ): Promise<StampPerformance[]> {
   const { results } = await db
     .prepare(
-      `SELECT p.id, p.song_id, s.title, s.original_artist, p.timestamp, p.end_timestamp, p.note, p.status
+      `SELECT p.id, p.song_id, s.title, s.original_artist, p.timestamp, p.end_timestamp, p.note, p.tags, p.status
        FROM performances p
        JOIN songs s ON s.id = p.song_id
        WHERE p.stream_id = ?
@@ -1045,6 +1141,7 @@ export async function listPerformancesForStream(
 }
 
 export interface CatalogSongInput {
+  readonly tags?: readonly string[];
   readonly title: string;
   readonly originalArtist: string;
   readonly timestamp: number;
@@ -1084,6 +1181,7 @@ function prepareCatalogWrites(
     }
     return {
       ...song, ...identity, originalArtist,
+      tags: filterTagIdsByScope(song.tags ?? [], 'performance'),
       performanceId: generatePerformanceId(),
       streamerId: input.streamerId, streamId: input.streamId,
       date: input.date, streamTitle: input.streamTitle, videoId: input.videoId,
@@ -1102,7 +1200,8 @@ function prepareCatalogWrites(
       value ->> '$.performanceId' AS performance_id, value ->> '$.streamId' AS stream_id,
       value ->> '$.date' AS date, value ->> '$.streamTitle' AS stream_title,
       value ->> '$.videoId' AS video_id, value ->> '$.timestamp' AS timestamp,
-      value ->> '$.endTimestamp' AS end_timestamp, value ->> '$.note' AS note
+      value ->> '$.endTimestamp' AS end_timestamp, value ->> '$.note' AS note,
+      value ->> '$.tags' AS tags
     FROM json_each(?)
   ), identities AS (
     SELECT DISTINCT song_id, work_id, title, original_artist, streamer_id, submitted_by, exclude_stream_id
@@ -1150,10 +1249,10 @@ function prepareCatalogWrites(
       ), 'import_exact', submitted_by FROM resolved AS item`).bind(payload),
     db.prepare(`${resolved}
       INSERT INTO performances (id, streamer_id, song_id, stream_id, date, stream_title, video_id,
-        timestamp, end_timestamp, note, status, submitted_by, updated_at)
+        timestamp, end_timestamp, note, tags, status, submitted_by, updated_at)
       SELECT entry.performance_id, entry.streamer_id, resolved.resolved_song_id, entry.stream_id,
         entry.date, entry.stream_title, entry.video_id, entry.timestamp, entry.end_timestamp,
-        entry.note, 'pending', entry.submitted_by, datetime('now')
+        entry.note, entry.tags, 'pending', entry.submitted_by, datetime('now')
       FROM entries AS entry JOIN resolved ON resolved.song_id = entry.song_id
       RETURNING id, song_id`).bind(payload),
   ];
@@ -1161,6 +1260,7 @@ function prepareCatalogWrites(
 }
 
 export interface CreateSongAndPerformanceInput {
+  readonly tags?: readonly string[];
   readonly streamerId: string;
   readonly streamId: string;
   readonly date: string;
@@ -1190,6 +1290,7 @@ export async function createSongAndPerformance(
       timestamp: input.timestamp,
       endTimestamp: input.endTimestamp,
       note: input.note,
+      tags: input.tags,
     }],
     submittedBy: input.submittedBy,
   });
@@ -1360,6 +1461,35 @@ async function writeStreamPerformances(
   own: D1PreparedStatement[],
   excludeSongsOnlyInStreamId?: string,
 ): Promise<{ created: number }> {
+  const identityKey = (title: string, artist: string) => JSON.stringify([title, artist]);
+  const preserved = new Map<string, Array<{ timestamp: number; tags: string[] }>>();
+  const incomingCounts = new Map<string, number>();
+  for (const song of input.songs) {
+    const key = identityKey(song.songName, song.artist || 'Unknown');
+    incomingCounts.set(key, (incomingCounts.get(key) ?? 0) + 1);
+  }
+  if (excludeSongsOnlyInStreamId) {
+    // Resolve retained annotations by song identity: replacement may allocate new local IDs.
+    const existing = await db.prepare(`
+      SELECT song.title, song.original_artist, performance.timestamp, performance.tags
+      FROM performances AS performance JOIN songs AS song ON song.id = performance.song_id
+      WHERE performance.stream_id = ? AND performance.streamer_id = ?
+    `).bind(input.streamId, input.streamerId)
+      .all<{ title: string; original_artist: string; timestamp: number; tags: string }>();
+    for (const row of existing.results) {
+      const key = identityKey(row.title, row.original_artist);
+      const entries = preserved.get(key) ?? [];
+      entries.push({ timestamp: row.timestamp, tags: parseSongTags(row.tags) });
+      preserved.set(key, entries);
+    }
+  }
+  const retainedTags = (song: StreamPerformancesInput['songs'][number]): string[] => {
+    const key = identityKey(song.songName, song.artist || 'Unknown');
+    const entries = preserved.get(key) ?? [];
+    const exact = entries.filter(entry => entry.timestamp === song.startSeconds);
+    if (exact.length > 0) return mergeTagIds(...exact.map(entry => entry.tags));
+    return entries.length === 1 && incomingCounts.get(key) === 1 ? entries[0].tags : [];
+  };
   const catalog = prepareCatalogWrites(db, {
     streamerId: input.streamerId,
     streamId: input.streamId,
@@ -1372,6 +1502,7 @@ async function writeStreamPerformances(
       timestamp: song.startSeconds,
       endTimestamp: song.endSeconds,
       note: '',
+      tags: retainedTags(song),
     })),
     submittedBy: input.submittedBy,
     excludeSongsOnlyInStreamId,
@@ -1786,6 +1917,8 @@ export async function getDashboardStats(db: D1Database, streamerId: string) {
 
 // --- Export helpers (fan-site format) ---
 
+interface ExportSongRow extends SongRow { work_tags: string | null }
+
 /**
  * One performance as `GET /api/export/songs` puts it on the wire.
  *
@@ -1800,6 +1933,7 @@ export async function getDashboardStats(db: D1Database, streamerId: string) {
  * shape that drifted.
  */
 export interface ExportedPerformance {
+  tags: string[];
   id: string;
   streamId: string;
   date: string;
@@ -1817,6 +1951,7 @@ export interface ExportedPerformance {
  * matches what the fan site's optional `workId` expects.
  */
 export interface ExportedSong {
+  inheritedTags: string[];
   id: string;
   workId?: string;
   title: string;
@@ -1828,9 +1963,10 @@ export interface ExportedSong {
 export async function exportSongs(db: D1Database, streamerId: string): Promise<ExportedSong[]> {
   const [songResult, performanceResult] = await db.batch([
     db
-      .prepare(`SELECT song.*, link.work_id
+      .prepare(`SELECT song.*, link.work_id, work.tags AS work_tags
         FROM songs AS song
         LEFT JOIN song_work_links AS link ON link.song_id = song.id
+        LEFT JOIN works AS work ON work.id = link.work_id
         WHERE song.streamer_id = ? AND song.status = 'approved'
         ORDER BY song.title`)
       .bind(streamerId),
@@ -1838,7 +1974,7 @@ export async function exportSongs(db: D1Database, streamerId: string): Promise<E
       .prepare("SELECT * FROM performances WHERE streamer_id = ? AND status = 'approved' ORDER BY date")
       .bind(streamerId),
   ]);
-  const songRows = songResult.results as SongRow[];
+  const songRows = songResult.results as ExportSongRow[];
   const perfRows = performanceResult.results as PerformanceRow[];
 
   const perfsBySong = new Map<string, PerformanceRow[]>();
@@ -1848,23 +1984,35 @@ export async function exportSongs(db: D1Database, streamerId: string): Promise<E
     perfsBySong.set(p.song_id, list);
   }
 
-  return songRows.map((row) => ({
-    id: row.id,
-    ...(row.work_id ? { workId: row.work_id } : {}),
-    title: row.title,
-    originalArtist: row.original_artist,
-    tags: JSON.parse(row.tags) as string[],
-    performances: (perfsBySong.get(row.id) || []).map((p) => ({
-      id: p.id,
-      streamId: p.stream_id,
-      date: p.date,
-      streamTitle: p.stream_title,
-      videoId: p.video_id,
-      timestamp: p.timestamp,
-      endTimestamp: p.end_timestamp,
-      note: p.note,
-    })),
-  }));
+  return songRows.map((row) => {
+    const performances = perfsBySong.get(row.id) || [];
+    const inheritedTags = mergeTagIds(
+      row.work_tags ? parseSongTags(row.work_tags) : [],
+      parseSongTags(row.tags),
+    );
+    return {
+      id: row.id,
+      ...(row.work_id ? { workId: row.work_id } : {}),
+      title: row.title,
+      originalArtist: row.original_artist,
+      inheritedTags,
+      tags: mergeTagIds(
+        inheritedTags,
+        performances.flatMap((performance) => parseSongTags(performance.tags)),
+      ),
+      performances: performances.map((p) => ({
+        id: p.id,
+        streamId: p.stream_id,
+        date: p.date,
+        streamTitle: p.stream_title,
+        videoId: p.video_id,
+        timestamp: p.timestamp,
+        endTimestamp: p.end_timestamp,
+        note: p.note,
+        tags: parseSongTags(p.tags),
+      })),
+    };
+  });
 }
 
 export async function exportStreams(db: D1Database, streamerId: string) {
@@ -2506,11 +2654,10 @@ export async function mergeSongs({
       ),
     );
 
-    const workTags = [...new Set([
-      ...parseSongTags(canonical.work_tags!),
-      ...[...sourceWorks.values()].flatMap((row) => parseSongTags(row.work_tags!)),
-      ...tags,
-    ])];
+    const workTags = mergeTagIds(
+      parseSongTags(canonical.work_tags!),
+      [...sourceWorks.values()].flatMap((row) => parseSongTags(row.work_tags!)),
+    ).filter((tag) => getTagDefinition(tag)?.scope !== 'performance');
     statements.push(
       guarded(
         `UPDATE works
@@ -2606,7 +2753,6 @@ export async function batchUpdateSongs(
           u.songId,
           u.title,
           u.originalArtist,
-          undefined,
         ),
       );
       updateStatementIndexes.push(stmts.length);
