@@ -4,7 +4,9 @@
     "workId": "work-song-56492feb",
     "title": "1/6 out of the gravity",
     "originalArtist": "ぼーかりおどP",
-    "tags": [],
+    "tags": [
+      "language:ja"
+    ],
     "performances": [
       {
         "id": "p-1210c5e2",
@@ -20,7 +22,9 @@
     "workId": "work-song-649",
     "title": "太陽系デスコ",
     "originalArtist": "ナユタン星人",
-    "tags": [],
+    "tags": [
+      "language:ja"
+    ],
     "performances": [
       {
         "id": "p-2ed7f104",
@@ -36,7 +40,11 @@
     "workId": "work-song-07bab4f3",
     "title": "少女レイ",
     "originalArtist": "みきとP",
-    "tags": [],
+    "tags": [
+      "language:ja",
+      "genre:pop",
+      "source:vocaloid"
+    ],
     "performances": [
       {
         "id": "p-7648cf29",
@@ -52,7 +60,10 @@
     "workId": "work-song-335",
     "title": "白い雪のプリンセスは",
     "originalArtist": "のぼる↑P",
-    "tags": [],
+    "tags": [
+      "language:ja",
+      "source:vocaloid"
+    ],
     "performances": [
       {
         "id": "p-febede3d",
@@ -68,7 +79,11 @@
     "workId": "work-song-1047",
     "title": "夜咄ディセイブ",
     "originalArtist": "じん",
-    "tags": [],
+    "tags": [
+      "language:ja",
+      "genre:rock",
+      "source:vocaloid"
+    ],
     "performances": [
       {
         "id": "p-f4c8b790",
@@ -84,7 +99,9 @@
     "workId": "work-song-a77bc6da",
     "title": "Catch You Catch Me",
     "originalArtist": "日向めぐみ",
-    "tags": [],
+    "tags": [
+      "language:ja"
+    ],
     "performances": [
       {
         "id": "p-68b7cd5c",
@@ -116,7 +133,10 @@
     "workId": "work-song-1552",
     "title": "Dear",
     "originalArtist": "19's Sound Factory",
-    "tags": [],
+    "tags": [
+      "language:en",
+      "source:vocaloid"
+    ],
     "performances": [
       {
         "id": "p-f1bd5af0",
@@ -132,7 +152,11 @@
     "workId": "work-song-560",
     "title": "from Y to Y",
     "originalArtist": "ジミーサムP",
-    "tags": [],
+    "tags": [
+      "language:ja",
+      "genre:pop",
+      "source:vocaloid"
+    ],
     "performances": [
       {
         "id": "p-3e8501df",
@@ -148,7 +172,10 @@
     "workId": "work-song-1990",
     "title": "rain stops, good-bye",
     "originalArtist": "におP",
-    "tags": [],
+    "tags": [
+      "language:ja",
+      "source:vocaloid"
+    ],
     "performances": [
       {
         "id": "p-3b4ad4ac",
@@ -164,7 +191,9 @@
     "workId": "work-song-77d78961",
     "title": "こっちを向いてよ",
     "originalArtist": "WEAVER",
-    "tags": [],
+    "tags": [
+      "language:ja"
+    ],
     "performances": [
       {
         "id": "p-8c536988",
@@ -180,7 +209,9 @@
     "workId": "work-song-422d0590",
     "title": "ステラ",
     "originalArtist": "needLe",
-    "tags": [],
+    "tags": [
+      "language:ja"
+    ],
     "performances": [
       {
         "id": "p-7e7ee978",
@@ -196,7 +227,9 @@
     "workId": "work-song-667",
     "title": "ピエロ",
     "originalArtist": "KEI",
-    "tags": [],
+    "tags": [
+      "language:ja"
+    ],
     "performances": [
       {
         "id": "p-11566dae",
@@ -212,7 +245,10 @@
     "workId": "work-song-97",
     "title": "ワールドイズマイン",
     "originalArtist": "Ryo",
-    "tags": [],
+    "tags": [
+      "language:ja",
+      "genre:electronic"
+    ],
     "performances": [
       {
         "id": "p-8cdb649d",

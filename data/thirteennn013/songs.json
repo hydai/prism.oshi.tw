@@ -4,7 +4,10 @@
     "workId": "work-song-1217",
     "title": "丸の内サディスティック",
     "originalArtist": "椎名林檎",
-    "tags": [],
+    "tags": [
+      "language:ja",
+      "genre:pop"
+    ],
     "performances": [
       {
         "id": "p-ebc9aadf",
@@ -20,7 +23,10 @@
     "workId": "work-song-17",
     "title": "完全感覚Dreamer",
     "originalArtist": "ONE OK ROCK",
-    "tags": [],
+    "tags": [
+      "language:ja",
+      "genre:rock"
+    ],
     "performances": [
       {
         "id": "p-15ff0d62",
@@ -36,7 +42,11 @@
     "workId": "work-song-1f98c249",
     "title": "美人",
     "originalArtist": "ちゃんみな",
-    "tags": [],
+    "tags": [
+      "language:ja",
+      "genre:pop",
+      "genre:rap"
+    ],
     "performances": [
       {
         "id": "p-2c22211b",
@@ -52,7 +62,9 @@
     "workId": "work-song-2ca5447e",
     "title": "革命道中",
     "originalArtist": "アイナ・ジ・エンド",
-    "tags": [],
+    "tags": [
+      "language:ja"
+    ],
     "performances": [
       {
         "id": "p-bb5d2f73",
@@ -68,7 +80,10 @@
     "workId": "work-song-2986",
     "title": "罪と罰",
     "originalArtist": "椎名林檎",
-    "tags": [],
+    "tags": [
+      "language:ja",
+      "genre:pop"
+    ],
     "performances": [
       {
         "id": "p-a224d8f3",
@@ -84,7 +99,10 @@
     "workId": "work-song-aeda2a44",
     "title": "擱淺",
     "originalArtist": "周杰倫",
-    "tags": [],
+    "tags": [
+      "language:zh",
+      "genre:pop"
+    ],
     "performances": [
       {
         "id": "p-9a656987",
@@ -100,7 +118,9 @@
     "workId": "work-song-1edb7152",
     "title": "Golden",
     "originalArtist": "HUNTR/X",
-    "tags": [],
+    "tags": [
+      "language:en"
+    ],
     "performances": [
       {
         "id": "p-7452a884",
@@ -116,7 +136,10 @@
     "workId": "work-song-024be7af",
     "title": "Kick back",
     "originalArtist": "米津玄師",
-    "tags": [],
+    "tags": [
+      "language:ja",
+      "genre:pop"
+    ],
     "performances": [
       {
         "id": "p-d0ba9955",
@@ -132,7 +155,10 @@
     "workId": "work-song-f637a748",
     "title": "Save yourself",
     "originalArtist": "ONE OK ROCK",
-    "tags": [],
+    "tags": [
+      "language:ja",
+      "genre:rock"
+    ],
     "performances": [
       {
         "id": "p-6fd77db7",
@@ -148,7 +174,10 @@
     "workId": "work-song-1433",
     "title": "The Beginning",
     "originalArtist": "ONE OK ROCK",
-    "tags": [],
+    "tags": [
+      "language:ja",
+      "genre:rock"
+    ],
     "performances": [
       {
         "id": "p-e2a07fcd",
@@ -164,7 +193,9 @@
     "workId": "work-song-2022",
     "title": "ダーリン",
     "originalArtist": "須田景凪",
-    "tags": [],
+    "tags": [
+      "language:ja"
+    ],
     "performances": [
       {
         "id": "p-24f3fc2c",

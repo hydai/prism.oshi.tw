@@ -20,7 +20,10 @@
     "workId": "work-song-1724a8eb",
     "title": "小酒窩",
     "originalArtist": "林俊傑",
-    "tags": [],
+    "tags": [
+      "language:zh",
+      "genre:pop"
+    ],
     "performances": [
       {
         "id": "p-5259e0d9",
@@ -36,7 +39,9 @@
     "workId": "work-song-6bae41e2",
     "title": "心訊 Heart Signal",
     "originalArtist": "煦Hiyori",
-    "tags": [],
+    "tags": [
+      "source:original"
+    ],
     "performances": [
       {
         "id": "p-640cb750",
@@ -52,7 +57,9 @@
     "workId": "work-song-d66fa2f2",
     "title": "心訊 Heart Signal",
     "originalArtist": "煦Hiyori (煦清唱)",
-    "tags": [],
+    "tags": [
+      "style:a-cappella"
+    ],
     "performances": [
       {
         "id": "p-ac46fbf2",
@@ -68,7 +75,10 @@
     "workId": "work-song-1329",
     "title": "如果可以",
     "originalArtist": "韋禮安",
-    "tags": [],
+    "tags": [
+      "language:zh",
+      "genre:pop"
+    ],
     "performances": [
       {
         "id": "p-ebccc659",
@@ -84,7 +94,10 @@
     "workId": "work-song-100",
     "title": "血腥愛情故事",
     "originalArtist": "張惠妹",
-    "tags": [],
+    "tags": [
+      "language:zh",
+      "genre:pop"
+    ],
     "performances": [
       {
         "id": "p-8e11bbac",
@@ -100,7 +113,9 @@
     "workId": "work-song-350",
     "title": "我的歌聲裡",
     "originalArtist": "曲婉婷",
-    "tags": [],
+    "tags": [
+      "language:zh"
+    ],
     "performances": [
       {
         "id": "p-a58fb408",
@@ -116,7 +131,10 @@
     "workId": "work-song-07073c1c",
     "title": "來自天堂的魔鬼",
     "originalArtist": "鄧紫棋",
-    "tags": [],
+    "tags": [
+      "language:zh",
+      "genre:pop"
+    ],
     "performances": [
       {
         "id": "p-177d38f7",
@@ -148,7 +166,10 @@
     "workId": "work-song-006cfcd3",
     "title": "怪物",
     "originalArtist": "YOASOBI",
-    "tags": [],
+    "tags": [
+      "language:ja",
+      "genre:pop"
+    ],
     "performances": [
       {
         "id": "p-eb03d8e9",
@@ -180,7 +201,10 @@
     "workId": "work-song-1322",
     "title": "雨愛",
     "originalArtist": "楊丞琳",
-    "tags": [],
+    "tags": [
+      "language:zh",
+      "genre:pop"
+    ],
     "performances": [
       {
         "id": "p-a75121f7",
@@ -196,7 +220,10 @@
     "workId": "work-song-44681e7b",
     "title": "倒帶",
     "originalArtist": "蔡依林",
-    "tags": [],
+    "tags": [
+      "language:zh",
+      "genre:pop"
+    ],
     "performances": [
       {
         "id": "p-0141bfbf",
@@ -212,7 +239,9 @@
     "workId": "work-song-99dcd77c",
     "title": "倫敦的愛情",
     "originalArtist": "藍又時",
-    "tags": [],
+    "tags": [
+      "language:zh"
+    ],
     "performances": [
       {
         "id": "p-ac333fbb",
@@ -244,7 +273,9 @@
     "workId": "work-song-3784c866",
     "title": "基因決定我愛你",
     "originalArtist": "陳彥允 Ian Chen",
-    "tags": [],
+    "tags": [
+      "language:zh"
+    ],
     "performances": [
       {
         "id": "p-ec9b36a4",
@@ -260,7 +291,10 @@
     "workId": "work-song-f14c523a",
     "title": "情歌",
     "originalArtist": "梁靜茹",
-    "tags": [],
+    "tags": [
+      "language:zh",
+      "genre:pop"
+    ],
     "performances": [
       {
         "id": "p-f9976331",
@@ -276,7 +310,9 @@
     "workId": "work-song-9d3e2dda",
     "title": "梁山伯與茱麗葉",
     "originalArtist": "卓文萱 Genie Chuo&曹格 Gary Chaw",
-    "tags": [],
+    "tags": [
+      "language:zh"
+    ],
     "performances": [
       {
         "id": "p-b23a793a",
@@ -292,7 +328,10 @@
     "workId": "work-song-7a35e156",
     "title": "淋雨一直走",
     "originalArtist": "張韶涵",
-    "tags": [],
+    "tags": [
+      "language:zh",
+      "genre:pop"
+    ],
     "performances": [
       {
         "id": "p-d92c3812",
@@ -308,7 +347,10 @@
     "workId": "work-song-d0c9e1e1",
     "title": "第一天",
     "originalArtist": "孫燕姿",
-    "tags": [],
+    "tags": [
+      "language:zh",
+      "genre:pop"
+    ],
     "performances": [
       {
         "id": "p-34413123",
@@ -372,7 +414,10 @@
     "workId": "work-song-4fc49677",
     "title": "愛你",
     "originalArtist": "王心凌",
-    "tags": [],
+    "tags": [
+      "language:zh",
+      "genre:pop"
+    ],
     "performances": [
       {
         "id": "p-4d429dc5",
@@ -388,7 +433,10 @@
     "workId": "work-song-2681",
     "title": "煦日 Apricity",
     "originalArtist": "澪Rei",
-    "tags": [],
+    "tags": [
+      "language:zh",
+      "source:original"
+    ],
     "performances": [
       {
         "id": "p-c8cf798c",
@@ -404,7 +452,10 @@
     "workId": "work-song-07107cd7",
     "title": "路過人間",
     "originalArtist": "郁可唯",
-    "tags": [],
+    "tags": [
+      "language:zh",
+      "genre:pop"
+    ],
     "performances": [
       {
         "id": "p-2e8875d2",
@@ -420,7 +471,9 @@
     "workId": "work-song-876e85ad",
     "title": "道聽塗說",
     "originalArtist": "林芯儀",
-    "tags": [],
+    "tags": [
+      "language:zh"
+    ],
     "performances": [
       {
         "id": "p-2e21064e",
@@ -436,7 +489,10 @@
     "workId": "work-song-c2b6954f",
     "title": "說愛你",
     "originalArtist": "蔡依林",
-    "tags": [],
+    "tags": [
+      "language:zh",
+      "genre:pop"
+    ],
     "performances": [
       {
         "id": "p-026ea45e",
@@ -452,7 +508,9 @@
     "workId": "work-song-85692b2b",
     "title": "離開的一路上",
     "originalArtist": "理想混蛋",
-    "tags": [],
+    "tags": [
+      "language:zh"
+    ],
     "performances": [
       {
         "id": "p-2954bf51",
@@ -468,7 +526,10 @@
     "workId": "work-song-0f4d0182",
     "title": "Always Remember Us This Way",
     "originalArtist": "Lady Gaga",
-    "tags": [],
+    "tags": [
+      "language:en",
+      "genre:pop"
+    ],
     "performances": [
       {
         "id": "p-7ad2187e",
@@ -516,7 +577,9 @@
     "workId": "work-song-792",
     "title": "Good Time",
     "originalArtist": "Owl City & Carly Rae Jepsen",
-    "tags": [],
+    "tags": [
+      "language:en"
+    ],
     "performances": [
       {
         "id": "p-9ce3b96b",
@@ -532,7 +595,9 @@
     "workId": "work-song-270",
     "title": "I Really Like You",
     "originalArtist": "Carly Rae Jepsen",
-    "tags": [],
+    "tags": [
+      "language:en"
+    ],
     "performances": [
       {
         "id": "p-12ad124d",
@@ -548,7 +613,9 @@
     "workId": "work-song-5d1e956e",
     "title": "Into the new world",
     "originalArtist": "SNSD",
-    "tags": [],
+    "tags": [
+      "language:en"
+    ],
     "performances": [
       {
         "id": "p-75178f17",
@@ -564,7 +631,10 @@
     "workId": "work-song-11784c12",
     "title": "Knock Knock",
     "originalArtist": "TWICE",
-    "tags": [],
+    "tags": [
+      "language:ko",
+      "genre:pop"
+    ],
     "performances": [
       {
         "id": "p-ec715a0f",
@@ -596,7 +666,11 @@
     "workId": "work-song-1140",
     "title": "Love Story",
     "originalArtist": "Taylor Swift",
-    "tags": [],
+    "tags": [
+      "language:en",
+      "genre:pop",
+      "genre:folk"
+    ],
     "performances": [
       {
         "id": "p-54625ecc",
@@ -612,7 +686,9 @@
     "workId": "work-song-7321184c",
     "title": "overdrive challenge",
     "originalArtist": "ザ・チェインスモーカーズ",
-    "tags": [],
+    "tags": [
+      "language:ja"
+    ],
     "performances": [
       {
         "id": "p-fbd80483",
@@ -628,7 +704,10 @@
     "workId": "work-song-140",
     "title": "Perfect",
     "originalArtist": "Ed Sheeran",
-    "tags": [],
+    "tags": [
+      "language:en",
+      "genre:pop"
+    ],
     "performances": [
       {
         "id": "p-19376d69",
@@ -644,7 +723,9 @@
     "workId": "work-song-9f31dcc6",
     "title": "Some(썸 탈꺼야)",
     "originalArtist": "BOL4(볼빨간사춘기)",
-    "tags": [],
+    "tags": [
+      "language:ko"
+    ],
     "performances": [
       {
         "id": "p-e007b6ac",
@@ -692,7 +773,9 @@
     "workId": "work-song-fdc50feb",
     "title": "Travel(여행)",
     "originalArtist": "BOL4(볼빨간사춘기)",
-    "tags": [],
+    "tags": [
+      "language:ko"
+    ],
     "performances": [
       {
         "id": "p-971d3eaa",
@@ -708,7 +791,10 @@
     "workId": "work-song-2503",
     "title": "TT",
     "originalArtist": "TWICE",
-    "tags": [],
+    "tags": [
+      "language:ko",
+      "genre:pop"
+    ],
     "performances": [
       {
         "id": "p-af5af788",
@@ -724,7 +810,10 @@
     "workId": "work-song-7c2dd8f9",
     "title": "TT (可愛玥&煦ver)",
     "originalArtist": "TWICE",
-    "tags": [],
+    "tags": [
+      "language:ko",
+      "genre:pop"
+    ],
     "performances": [
       {
         "id": "p-731c4984",

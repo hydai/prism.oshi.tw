@@ -4,7 +4,10 @@
     "workId": "work-song-2014",
     "title": "一輪花",
     "originalArtist": "tuki.",
-    "tags": [],
+    "tags": [
+      "language:ja",
+      "genre:pop"
+    ],
     "performances": [
       {
         "id": "p-f3f45e37",
@@ -20,7 +23,10 @@
     "workId": "work-song-013c53cd",
     "title": "晩餐歌",
     "originalArtist": "tuki.",
-    "tags": [],
+    "tags": [
+      "language:ja",
+      "genre:pop"
+    ],
     "performances": [
       {
         "id": "p-f6610216",
@@ -36,7 +42,11 @@
     "workId": "work-song-30e8effd",
     "title": "嘘月",
     "originalArtist": "ヨルシカ",
-    "tags": [],
+    "tags": [
+      "language:ja",
+      "genre:pop",
+      "genre:rock"
+    ],
     "performances": [
       {
         "id": "p-c539a0b0",
@@ -68,7 +78,10 @@
     "workId": "work-song-11f89711",
     "title": "Wherever You Are",
     "originalArtist": "ONE OK ROCK",
-    "tags": [],
+    "tags": [
+      "language:ja",
+      "genre:rock"
+    ],
     "performances": [
       {
         "id": "p-689effc3",
@@ -84,7 +97,10 @@
     "workId": "work-song-0e879506",
     "title": "yes,and?",
     "originalArtist": "Ariana Grande",
-    "tags": [],
+    "tags": [
+      "language:en",
+      "genre:pop"
+    ],
     "performances": [
       {
         "id": "p-851b495d",
@@ -100,7 +116,10 @@
     "workId": "work-song-2f998b9e",
     "title": "ギラギラ",
     "originalArtist": "ADO",
-    "tags": [],
+    "tags": [
+      "language:ja",
+      "genre:pop"
+    ],
     "performances": [
       {
         "id": "p-b294d16f",
@@ -116,7 +135,11 @@
     "workId": "work-song-0e902aae",
     "title": "だから僕は音楽を辞めた",
     "originalArtist": "ヨルシカ",
-    "tags": [],
+    "tags": [
+      "language:ja",
+      "genre:pop",
+      "genre:rock"
+    ],
     "performances": [
       {
         "id": "p-69029f05",
@@ -132,7 +155,9 @@
     "workId": "work-song-53187977",
     "title": "プラチナ",
     "originalArtist": "坂本真綾",
-    "tags": [],
+    "tags": [
+      "language:ja"
+    ],
     "performances": [
       {
         "id": "p-aa74ce1b",

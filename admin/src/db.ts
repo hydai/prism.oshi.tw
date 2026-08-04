@@ -1,4 +1,5 @@
 import { HARMONIZE_MERGE_SOURCE_LIMIT } from '../shared/types';
+import { applyTagDelta, MAX_TAGS_PER_ENTITY } from '../../lib/tags';
 import type {
   Song,
   SongRow,
@@ -344,6 +345,8 @@ export async function listGlobalWorksPaginated(
   opts: {
     search?: string;
     sharedOnly?: boolean;
+    tag?: string;
+    untaggedOnly?: boolean;
     page?: number;
     pageSize?: number;
     sortBy?: string;
@@ -364,13 +367,21 @@ export async function listGlobalWorksPaginated(
   const sortCol = GLOBAL_WORK_SORT_COLUMN_MAP[opts.sortBy ?? ''] ?? 'performance_count';
   const sortDir = opts.sortDir === 'asc' ? 'ASC' : 'DESC';
 
-  const searchWhere = opts.search
-    ? `WHERE instr(lower(work.title), lower(?)) > 0
-       OR instr(lower(work.original_artist), lower(?)) > 0`
-    : '';
-  const searchBinds = opts.search
-    ? [opts.search, opts.search]
-    : [];
+  const sourceConditions: string[] = [];
+  const sourceBinds: string[] = [];
+  if (opts.search) {
+    sourceConditions.push(`(
+      instr(lower(work.title), lower(?)) > 0
+      OR instr(lower(work.original_artist), lower(?)) > 0
+    )`);
+    sourceBinds.push(opts.search, opts.search);
+  }
+  if (opts.tag) {
+    sourceConditions.push('EXISTS (SELECT 1 FROM json_each(work.tags) WHERE json_each.value = ?)');
+    sourceBinds.push(opts.tag);
+  }
+  if (opts.untaggedOnly) sourceConditions.push('json_array_length(work.tags) = 0');
+  const sourceWhere = sourceConditions.length > 0 ? `WHERE ${sourceConditions.join(' AND ')}` : '';
   const sharedWhere = opts.sharedOnly ? 'WHERE streamer_count > 1' : '';
   const rollupSql = `
     WITH work_rollup AS (
@@ -389,7 +400,7 @@ export async function listGlobalWorksPaginated(
       JOIN song_work_links AS link ON link.work_id = work.id
       JOIN songs AS song ON song.id = link.song_id
       LEFT JOIN performances AS performance ON performance.song_id = song.id
-      ${searchWhere}
+      ${sourceWhere}
       GROUP BY
         work.id, work.title, work.original_artist, work.tags,
         work.created_at, work.updated_at
@@ -398,14 +409,14 @@ export async function listGlobalWorksPaginated(
   const countStatement = db
     .prepare(`${rollupSql}
       SELECT COUNT(*) AS count FROM work_rollup ${sharedWhere}`)
-    .bind(...searchBinds);
+    .bind(...sourceBinds);
   const dataStatement = db
     .prepare(`${rollupSql}
       SELECT * FROM work_rollup
       ${sharedWhere}
       ORDER BY ${sortCol} ${sortDir}, title ASC, original_artist ASC, id ASC
       LIMIT ? OFFSET ?`)
-    .bind(...searchBinds, pageSize, offset);
+    .bind(...sourceBinds, pageSize, offset);
   const statsStatement = db.prepare(`
     WITH active_works AS (
       SELECT
@@ -459,6 +470,53 @@ export async function listGlobalWorksPaginated(
   };
 
   return { works, total, stats, page, pageSize };
+}
+
+export async function updateGlobalWorkTags(
+  db: D1Database,
+  workId: string,
+  tags: string[],
+): Promise<boolean> {
+  const result = await db
+    .prepare("UPDATE works SET tags = ?, updated_at = datetime('now') WHERE id = ?")
+    .bind(JSON.stringify(tags), workId)
+    .run();
+  return result.meta.changes > 0;
+}
+
+export class WorkTagLimitError extends Error {
+  constructor(readonly workId: string) {
+    super(`Work ${workId} would exceed the ${MAX_TAGS_PER_ENTITY}-tag limit`);
+    this.name = 'WorkTagLimitError';
+  }
+}
+
+export async function bulkUpdateGlobalWorkTags(
+  db: D1Database,
+  workIds: string[],
+  addTags: string[],
+  removeTags: string[],
+): Promise<Array<{ id: string; tags: string[] }>> {
+  if (workIds.length === 0) return [];
+  const placeholders = workIds.map(() => '?').join(', ');
+  const { results } = await db
+    .prepare(`SELECT id, tags FROM works WHERE id IN (${placeholders})`)
+    .bind(...workIds)
+    .all<{ id: string; tags: string }>();
+
+  if (results.length !== workIds.length) return [];
+  const currentById = new Map(results.map((row) => [row.id, row.tags]));
+  const updates = workIds.map((id) => ({
+    id,
+    tags: applyTagDelta(JSON.parse(currentById.get(id)!) as string[], addTags, removeTags),
+  }));
+  const oversized = updates.find((update) => update.tags.length > MAX_TAGS_PER_ENTITY);
+  if (oversized) throw new WorkTagLimitError(oversized.id);
+  await db.batch(updates.map((update) =>
+    db.prepare("UPDATE works SET tags = ?, updated_at = datetime('now') WHERE id = ?")
+      .bind(JSON.stringify(update.tags), update.id),
+  ));
+  return updates;
 }
 
 export async function getSongById(

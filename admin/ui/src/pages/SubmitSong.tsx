@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import type { CreateSongBody, CreatePerformanceBody } from '../../../shared/types';
 import { api } from '../api/client';
+import TagPicker from '../components/TagPicker';
 
 interface PerformanceForm {
   streamId: string;
@@ -27,7 +28,7 @@ export default function SubmitSong() {
   const navigate = useNavigate();
   const [title, setTitle] = useState('');
   const [originalArtist, setOriginalArtist] = useState('');
-  const [tags, setTags] = useState('');
+  const [tags, setTags] = useState<string[]>([]);
   const [performances, setPerformances] = useState<PerformanceForm[]>([]);
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -68,10 +69,7 @@ export default function SubmitSong() {
     const body: CreateSongBody = {
       title: title.trim(),
       originalArtist: originalArtist.trim(),
-      tags: tags
-        .split(',')
-        .map((t) => t.trim())
-        .filter(Boolean),
+      tags,
       performances: perfBodies.length > 0 ? perfBodies : undefined,
     };
 
@@ -120,13 +118,9 @@ export default function SubmitSong() {
 
         <div>
           <label className="block text-sm font-medium text-slate-700">Tags</label>
-          <input
-            type="text"
-            value={tags}
-            onChange={(e) => setTags(e.target.value)}
-            placeholder="Comma-separated, e.g. J-Pop, anime"
-            className="mt-1 w-full rounded-md border border-slate-300 px-3 py-2 text-sm focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500"
-          />
+          <div className="mt-1 rounded-md border border-slate-300 bg-slate-50 p-3">
+            <TagPicker value={tags} onChange={setTags} recommendedScope="song" compact />
+          </div>
         </div>
 
         {/* Performances */}

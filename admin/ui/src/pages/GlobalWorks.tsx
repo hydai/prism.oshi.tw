@@ -1,6 +1,8 @@
-import { useEffect, useState, type FormEvent } from 'react';
+import { Fragment, useEffect, useState, type FormEvent } from 'react';
 import type { GlobalWorkStats, GlobalWorkSummary } from '../../../shared/types';
 import { api } from '../api/client';
+import TagPicker from '../components/TagPicker';
+import { TAG_CATEGORIES, TAG_DEFINITIONS, getTagLabel } from '../../../../lib/tags';
 
 type SortKey =
   | 'title'
@@ -59,11 +61,18 @@ export default function GlobalWorks() {
   const [search, setSearch] = useState('');
   const [submittedSearch, setSubmittedSearch] = useState('');
   const [sharedOnly, setSharedOnly] = useState(false);
+  const [tagFilter, setTagFilter] = useState('');
+  const [untaggedOnly, setUntaggedOnly] = useState(false);
   const [sortKey, setSortKey] = useState<SortKey>('performanceCount');
   const [sortDir, setSortDir] = useState<SortDir>('desc');
   const [page, setPage] = useState(1);
   const [total, setTotal] = useState(0);
   const [totalPages, setTotalPages] = useState(0);
+  const [selectedWorkIds, setSelectedWorkIds] = useState<Set<string>>(new Set());
+  const [editingWorkId, setEditingWorkId] = useState<string | null>(null);
+  const [editTags, setEditTags] = useState<string[]>([]);
+  const [batchTags, setBatchTags] = useState<string[]>([]);
+  const [savingTags, setSavingTags] = useState(false);
 
   useEffect(() => {
     let active = true;
@@ -72,6 +81,8 @@ export default function GlobalWorks() {
     api.listGlobalWorks({
       search: submittedSearch || undefined,
       sharedOnly,
+      tag: tagFilter || undefined,
+      untaggedOnly,
       page,
       pageSize: PAGE_SIZE,
       sortBy: sortKey,
@@ -83,6 +94,8 @@ export default function GlobalWorks() {
         setStats(response.stats);
         setTotal(response.total);
         setTotalPages(response.totalPages);
+        setSelectedWorkIds(new Set());
+        setEditingWorkId(null);
       })
       .catch((err: unknown) => {
         if (active) setError(err instanceof Error ? err.message : 'Failed to load global library');
@@ -94,7 +107,7 @@ export default function GlobalWorks() {
     return () => {
       active = false;
     };
-  }, [submittedSearch, sharedOnly, page, sortKey, sortDir]);
+  }, [submittedSearch, sharedOnly, tagFilter, untaggedOnly, page, sortKey, sortDir]);
 
   const submitSearch = (event: FormEvent) => {
     event.preventDefault();
@@ -109,6 +122,64 @@ export default function GlobalWorks() {
     } else {
       setSortKey(key);
       setSortDir(key === 'title' || key === 'originalArtist' ? 'asc' : 'desc');
+    }
+  };
+
+  const toggleWorkSelection = (id: string) => {
+    setSelectedWorkIds((current) => {
+      const next = new Set(current);
+      if (next.has(id)) next.delete(id);
+      else next.add(id);
+      return next;
+    });
+  };
+
+  const togglePageSelection = () => {
+    setSelectedWorkIds((current) =>
+      current.size === works.length
+        ? new Set()
+        : new Set(works.map((work) => work.id)),
+    );
+  };
+
+  const saveWorkTags = async () => {
+    if (!editingWorkId) return;
+    setSavingTags(true);
+    setError(null);
+    try {
+      const updated = await api.updateWorkTags(editingWorkId, { tags: editTags });
+      setWorks((current) => current.map((work) =>
+        work.id === updated.id ? { ...work, tags: updated.tags } : work,
+      ));
+      setEditingWorkId(null);
+    } catch (err: unknown) {
+      setError(err instanceof Error ? err.message : 'Failed to update work tags');
+    } finally {
+      setSavingTags(false);
+    }
+  };
+
+  const applyBulkTags = async (mode: 'add' | 'remove') => {
+    if (selectedWorkIds.size === 0 || batchTags.length === 0) return;
+    setSavingTags(true);
+    setError(null);
+    try {
+      const response = await api.bulkUpdateWorkTags({
+        workIds: [...selectedWorkIds],
+        addTags: mode === 'add' ? batchTags : [],
+        removeTags: mode === 'remove' ? batchTags : [],
+      });
+      const updatedById = new Map(response.updated.map((work) => [work.id, work.tags]));
+      setWorks((current) => current.map((work) => {
+        const tags = updatedById.get(work.id);
+        return tags ? { ...work, tags } : work;
+      }));
+      setBatchTags([]);
+      setSelectedWorkIds(new Set());
+    } catch (err: unknown) {
+      setError(err instanceof Error ? err.message : 'Failed to update work tags');
+    } finally {
+      setSavingTags(false);
     }
   };
 
@@ -185,9 +256,78 @@ export default function GlobalWorks() {
           />
           Shared by multiple VTubers only
         </label>
+        <select
+          value={tagFilter}
+          onChange={(event) => {
+            setPage(1);
+            setTagFilter(event.target.value);
+            if (event.target.value) setUntaggedOnly(false);
+          }}
+          className="rounded-md border border-slate-300 px-3 py-1.5 text-sm"
+          aria-label="Filter global works by tag"
+        >
+          <option value="">All tags</option>
+          {TAG_CATEGORIES.map((category) => (
+            <optgroup key={category.id} label={category.label}>
+              {TAG_DEFINITIONS.filter((tag) => tag.active && tag.category === category.id).map((tag) => (
+                <option key={tag.id} value={tag.id}>{tag.label}</option>
+              ))}
+            </optgroup>
+          ))}
+        </select>
+        <label className="flex cursor-pointer items-center gap-2 text-sm text-slate-700">
+          <input
+            type="checkbox"
+            checked={untaggedOnly}
+            onChange={(event) => {
+              setPage(1);
+              setUntaggedOnly(event.target.checked);
+              if (event.target.checked) setTagFilter('');
+            }}
+            className="h-4 w-4 rounded border-slate-300 text-blue-600"
+          />
+          Untagged only
+        </label>
       </div>
 
       {error && <p className="mt-4 text-sm text-red-600">{error}</p>}
+
+      {selectedWorkIds.size > 0 && (
+        <div className="mt-4 rounded-lg border border-blue-200 bg-blue-50 p-4" data-testid="bulk-tag-editor">
+          <div className="mb-3 flex flex-wrap items-center justify-between gap-2">
+            <div>
+              <h3 className="text-sm font-semibold text-slate-800">批次編輯共用標籤</h3>
+              <p className="text-xs text-slate-500">已選擇 {selectedWorkIds.size} 個作品</p>
+            </div>
+            <button
+              type="button"
+              onClick={() => setSelectedWorkIds(new Set())}
+              className="text-xs text-slate-600 hover:underline"
+            >
+              取消選取
+            </button>
+          </div>
+          <TagPicker value={batchTags} onChange={setBatchTags} recommendedScope="work" compact />
+          <div className="mt-3 flex gap-2">
+            <button
+              type="button"
+              disabled={savingTags || batchTags.length === 0}
+              onClick={() => applyBulkTags('add')}
+              className="rounded bg-blue-600 px-3 py-1.5 text-sm text-white disabled:opacity-50"
+            >
+              加入所選標籤
+            </button>
+            <button
+              type="button"
+              disabled={savingTags || batchTags.length === 0}
+              onClick={() => applyBulkTags('remove')}
+              className="rounded border border-red-300 bg-white px-3 py-1.5 text-sm text-red-700 disabled:opacity-50"
+            >
+              移除所選標籤
+            </button>
+          </div>
+        </div>
+      )}
 
       {loading ? (
         <p className="mt-6 text-slate-500">Loading...</p>
@@ -197,6 +337,14 @@ export default function GlobalWorks() {
             <table className="w-full text-left text-sm">
               <thead className="border-b border-slate-200 bg-slate-50 text-xs uppercase text-slate-500">
                 <tr>
+                  <th className="w-10 px-4 py-3">
+                    <input
+                      type="checkbox"
+                      aria-label="Select all works on this page"
+                      checked={works.length > 0 && selectedWorkIds.size === works.length}
+                      onChange={togglePageSelection}
+                    />
+                  </th>
                   <SortHeader
                     label="Title"
                     field="title"
@@ -233,18 +381,28 @@ export default function GlobalWorks() {
                     onSort={toggleSort}
                   />
                   <th className="px-4 py-3">Work ID</th>
+                  <th className="px-4 py-3">Actions</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-slate-100">
                 {works.map((work) => (
-                  <tr key={work.id} className="align-top hover:bg-slate-50">
+                  <Fragment key={work.id}>
+                  <tr className="align-top hover:bg-slate-50">
+                    <td className="px-4 py-3">
+                      <input
+                        type="checkbox"
+                        aria-label={`Select ${work.title}`}
+                        checked={selectedWorkIds.has(work.id)}
+                        onChange={() => toggleWorkSelection(work.id)}
+                      />
+                    </td>
                     <td className="px-4 py-3">
                       <div className="font-medium text-slate-800">{work.title}</div>
                       {work.tags.length > 0 && (
                         <div className="mt-1 flex flex-wrap gap-1">
                           {work.tags.map((tag) => (
                             <span key={tag} className="rounded bg-slate-100 px-1.5 py-0.5 text-xs text-slate-500">
-                              {tag}
+                              {getTagLabel(tag)}
                             </span>
                           ))}
                         </div>
@@ -263,11 +421,53 @@ export default function GlobalWorks() {
                     <td className="px-4 py-3 tabular-nums text-slate-600">{work.songCount}</td>
                     <td className="px-4 py-3 tabular-nums text-slate-600">{work.performanceCount}</td>
                     <td className="px-4 py-3 font-mono text-xs text-slate-400">{work.id}</td>
+                    <td className="px-4 py-3">
+                      <button
+                        type="button"
+                        onClick={() => {
+                          setEditingWorkId(work.id);
+                          setEditTags(work.tags);
+                        }}
+                        className="whitespace-nowrap rounded border border-slate-300 px-2 py-1 text-xs text-slate-700 hover:bg-slate-100"
+                      >
+                        Edit tags
+                      </button>
+                    </td>
                   </tr>
+                  {editingWorkId === work.id && (
+                    <tr>
+                      <td colSpan={8} className="bg-slate-50 px-6 py-4">
+                        <div className="mb-3">
+                          <h3 className="text-sm font-semibold text-slate-800">{work.title} — 共用作品標籤</h3>
+                          <p className="text-xs text-slate-500">會套用到所有連結此 Work ID 的 VTuber 歌曲。</p>
+                        </div>
+                        <TagPicker value={editTags} onChange={setEditTags} recommendedScope="work" compact />
+                        <div className="mt-3 flex gap-2">
+                          <button
+                            type="button"
+                            disabled={savingTags}
+                            onClick={saveWorkTags}
+                            className="rounded bg-blue-600 px-3 py-1.5 text-sm text-white disabled:opacity-50"
+                          >
+                            {savingTags ? 'Saving...' : 'Save tags'}
+                          </button>
+                          <button
+                            type="button"
+                            disabled={savingTags}
+                            onClick={() => setEditingWorkId(null)}
+                            className="rounded bg-slate-200 px-3 py-1.5 text-sm text-slate-700"
+                          >
+                            Cancel
+                          </button>
+                        </div>
+                      </td>
+                    </tr>
+                  )}
+                  </Fragment>
                 ))}
                 {works.length === 0 && (
                   <tr>
-                    <td colSpan={6} className="px-4 py-10 text-center text-slate-400">
+                    <td colSpan={8} className="px-4 py-10 text-center text-slate-400">
                       No global works found.
                     </td>
                   </tr>

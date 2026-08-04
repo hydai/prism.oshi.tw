@@ -20,7 +20,10 @@
     "workId": "work-song-77a7f7ef",
     "title": "一點點",
     "originalArtist": "周杰倫 (Jay Chou)",
-    "tags": [],
+    "tags": [
+      "language:zh",
+      "genre:pop"
+    ],
     "performances": [
       {
         "id": "p-8a7e7c6b",
@@ -52,7 +55,9 @@
     "workId": "work-song-20a94e77",
     "title": "子午聖誕禮物(日文版)",
     "originalArtist": "#子午聖誕接力",
-    "tags": [],
+    "tags": [
+      "language:ja"
+    ],
     "performances": [
       {
         "id": "p-80dd858e",
@@ -68,7 +73,9 @@
     "workId": "work-song-32773037",
     "title": "子午聖誕禮物(英文版)",
     "originalArtist": "#子午聖誕接力",
-    "tags": [],
+    "tags": [
+      "language:en"
+    ],
     "performances": [
       {
         "id": "p-56c1964f",
@@ -84,7 +91,9 @@
     "workId": "work-song-9ae00703",
     "title": "子午聖誕禮物(韓文版)",
     "originalArtist": "#子午聖誕接力",
-    "tags": [],
+    "tags": [
+      "language:ko"
+    ],
     "performances": [
       {
         "id": "p-b68cb62a",
@@ -100,7 +109,10 @@
     "workId": "work-song-4f120c43",
     "title": "不在一起就不會分開",
     "originalArtist": "洪佩瑜",
-    "tags": [],
+    "tags": [
+      "language:zh",
+      "genre:pop"
+    ],
     "performances": [
       {
         "id": "p-c0617506",
@@ -116,7 +128,9 @@
     "workId": "work-song-9792b1ec",
     "title": "不是因為天氣晴朗才愛你",
     "originalArtist": "理想混蛋 (Bestards)",
-    "tags": [],
+    "tags": [
+      "language:zh"
+    ],
     "performances": [
       {
         "id": "p-fb02d438",
@@ -139,7 +153,10 @@
     "workId": "work-song-f9996600",
     "title": "手語",
     "originalArtist": "周杰倫 (Jay Chou)",
-    "tags": [],
+    "tags": [
+      "language:zh",
+      "genre:pop"
+    ],
     "performances": [
       {
         "id": "p-d2b2d89b",
@@ -155,7 +172,9 @@
     "workId": "work-song-0c85e008",
     "title": "只有副歌的新歌",
     "originalArtist": "朔Sakuro",
-    "tags": [],
+    "tags": [
+      "source:original"
+    ],
     "performances": [
       {
         "id": "p-845b7e89",
@@ -178,7 +197,10 @@
     "workId": "work-song-7c26681e",
     "title": "叮叮噹 最喜歡你啦",
     "originalArtist": "朔Sakuro",
-    "tags": [],
+    "tags": [
+      "language:zh",
+      "source:original"
+    ],
     "performances": [
       {
         "id": "p-cb705198",
@@ -210,7 +232,9 @@
     "workId": "work-song-1712",
     "title": "正想著你呢",
     "originalArtist": "持修",
-    "tags": [],
+    "tags": [
+      "language:zh"
+    ],
     "performances": [
       {
         "id": "p-f339db6a",
@@ -242,7 +266,10 @@
     "workId": "work-song-1c5908cc",
     "title": "在夜裡跳舞",
     "originalArtist": "單依純",
-    "tags": [],
+    "tags": [
+      "language:zh",
+      "genre:pop"
+    ],
     "performances": [
       {
         "id": "p-ca569242",
@@ -290,7 +317,9 @@
     "workId": "work-song-f551ea18",
     "title": "你是不是有點動心",
     "originalArtist": "吳卓源",
-    "tags": [],
+    "tags": [
+      "language:zh"
+    ],
     "performances": [
       {
         "id": "p-eeb958be",
@@ -338,7 +367,9 @@
     "workId": "work-song-f4d5794d",
     "title": "我好想你",
     "originalArtist": "蘇打綠 (sodagreen)",
-    "tags": [],
+    "tags": [
+      "language:zh"
+    ],
     "performances": [
       {
         "id": "p-5788cb2c",
@@ -370,7 +401,9 @@
     "workId": "work-song-1557",
     "title": "我喜歡你",
     "originalArtist": "洪安妮",
-    "tags": [],
+    "tags": [
+      "language:zh"
+    ],
     "performances": [
       {
         "id": "p-824ea389",
@@ -400,7 +433,9 @@
     "workId": "work-song-e7af3336",
     "title": "我當你空氣",
     "originalArtist": "旺福 (Wonfu)",
-    "tags": [],
+    "tags": [
+      "language:zh"
+    ],
     "performances": [
       {
         "id": "p-ec7cf293",
@@ -416,7 +451,10 @@
     "workId": "work-song-39636c3a",
     "title": "李白",
     "originalArtist": "李榮浩",
-    "tags": [],
+    "tags": [
+      "language:zh",
+      "genre:pop"
+    ],
     "performances": [
       {
         "id": "p-2e87ce0f",
@@ -448,7 +486,9 @@
     "workId": "work-song-f0c1603e",
     "title": "走了嗎",
     "originalArtist": "袁惟仁",
-    "tags": [],
+    "tags": [
+      "language:zh"
+    ],
     "performances": [
       {
         "id": "p-37c6db30",
@@ -512,7 +552,9 @@
     "workId": "work-song-7995a462",
     "title": "雨愛",
     "originalArtist": "楊丞琳 (Rainie Yang)",
-    "tags": [],
+    "tags": [
+      "language:zh"
+    ],
     "performances": [
       {
         "id": "p-59d1eab5",
@@ -535,7 +577,10 @@
     "workId": "work-song-83b0e5ff",
     "title": "信號 Signal",
     "originalArtist": "汐Seki",
-    "tags": [],
+    "tags": [
+      "language:zh",
+      "source:original"
+    ],
     "performances": [
       {
         "id": "p-2bdb75ef",
@@ -567,7 +612,10 @@
     "workId": "work-song-0a53aeb7",
     "title": "星屑ビーナス",
     "originalArtist": "Aimer",
-    "tags": [],
+    "tags": [
+      "language:ja",
+      "genre:pop"
+    ],
     "performances": [
       {
         "id": "p-75d7e5a8",
@@ -599,7 +647,10 @@
     "workId": "work-song-02cf3ebd",
     "title": "夏夢",
     "originalArtist": "汐Seki",
-    "tags": [],
+    "tags": [
+      "language:zh",
+      "source:original"
+    ],
     "performances": [
       {
         "id": "p-082af233",
@@ -615,7 +666,9 @@
     "workId": "work-song-04752c37",
     "title": "迷醉 Sangria",
     "originalArtist": "朔Sakuro",
-    "tags": [],
+    "tags": [
+      "source:original"
+    ],
     "performances": [
       {
         "id": "p-378b4ed5",
@@ -631,7 +684,9 @@
     "workId": "work-song-13d5137c",
     "title": "偽顔",
     "originalArtist": "yama",
-    "tags": [],
+    "tags": [
+      "language:ja"
+    ],
     "performances": [
       {
         "id": "p-90c2281e",
@@ -647,7 +702,10 @@
     "workId": "work-song-2104",
     "title": "晚餐歌",
     "originalArtist": "tuki.",
-    "tags": [],
+    "tags": [
+      "language:ja",
+      "genre:pop"
+    ],
     "performances": [
       {
         "id": "p-40758575",
@@ -679,7 +737,9 @@
     "workId": "work-song-1314",
     "title": "連名帶姓",
     "originalArtist": "aMEI (張惠妹)",
-    "tags": [],
+    "tags": [
+      "genre:pop"
+    ],
     "performances": [
       {
         "id": "p-bbe0ea32",
@@ -702,7 +762,10 @@
     "workId": "work-song-96471ecf",
     "title": "陪你 Stay with you",
     "originalArtist": "朔Sakuro",
-    "tags": [],
+    "tags": [
+      "language:en",
+      "source:original"
+    ],
     "performances": [
       {
         "id": "p-80c46ccd",
@@ -734,7 +797,10 @@
     "workId": "work-song-841cc60e",
     "title": "等你下課",
     "originalArtist": "周杰倫 (Jay Chou)",
-    "tags": [],
+    "tags": [
+      "language:zh",
+      "genre:pop"
+    ],
     "performances": [
       {
         "id": "p-81ae9e6d",
@@ -782,7 +848,9 @@
     "workId": "work-song-57dbf3ae",
     "title": "愛♡スクリーム！",
     "originalArtist": "AiScReam",
-    "tags": [],
+    "tags": [
+      "language:ja"
+    ],
     "performances": [
       {
         "id": "p-04da797f",
@@ -853,7 +921,10 @@
     "workId": "work-song-155c023b",
     "title": "踮起腳尖愛",
     "originalArtist": "洪佩瑜",
-    "tags": [],
+    "tags": [
+      "language:zh",
+      "genre:pop"
+    ],
     "performances": [
       {
         "id": "p-a23eedb8",
@@ -885,7 +956,9 @@
     "workId": "work-song-9361056c",
     "title": "靠近(清唱)",
     "originalArtist": "袁婭維TIA RAY",
-    "tags": [],
+    "tags": [
+      "style:a-cappella"
+    ],
     "performances": [
       {
         "id": "p-9c491328",
@@ -933,7 +1006,11 @@
     "workId": "work-song-2180",
     "title": "Back To December",
     "originalArtist": "Taylor Swift",
-    "tags": [],
+    "tags": [
+      "language:en",
+      "genre:pop",
+      "genre:folk"
+    ],
     "performances": [
       {
         "id": "p-8644d439",
@@ -949,7 +1026,10 @@
     "workId": "work-song-d479cdc8",
     "title": "beside you(找不到key版)",
     "originalArtist": "keshi",
-    "tags": [],
+    "tags": [
+      "language:en",
+      "genre:pop"
+    ],
     "performances": [
       {
         "id": "p-8cf9f989",
@@ -965,7 +1045,10 @@
     "workId": "work-song-e1caa96e",
     "title": "beside you(補唱忘記的)",
     "originalArtist": "keshi",
-    "tags": [],
+    "tags": [
+      "language:en",
+      "genre:pop"
+    ],
     "performances": [
       {
         "id": "p-89c41eda",
@@ -997,7 +1080,9 @@
     "workId": "work-song-c8baf23b",
     "title": "Close To You",
     "originalArtist": "Carpenters (木匠兄妹合唱團)",
-    "tags": [],
+    "tags": [
+      "language:en"
+    ],
     "performances": [
       {
         "id": "p-461c75e8",
@@ -1013,7 +1098,10 @@
     "workId": "work-song-7b1c25de",
     "title": "Easy On Me",
     "originalArtist": "Adele",
-    "tags": [],
+    "tags": [
+      "language:en",
+      "genre:pop"
+    ],
     "performances": [
       {
         "id": "p-58f6f82f",
@@ -1045,7 +1133,9 @@
     "workId": "work-song-26927912",
     "title": "Everything Goes On",
     "originalArtist": "Porter Robinson",
-    "tags": [],
+    "tags": [
+      "language:en"
+    ],
     "performances": [
       {
         "id": "p-059a1a99",
@@ -1077,7 +1167,9 @@
     "workId": "work-song-1540",
     "title": "Fly Me To The Moon",
     "originalArtist": "Frank Sinatra",
-    "tags": [],
+    "tags": [
+      "language:en"
+    ],
     "performances": [
       {
         "id": "p-8c535078",
@@ -1093,7 +1185,9 @@
     "workId": "work-song-e4a3251f",
     "title": "Give It to Me",
     "originalArtist": "孫盛希 (Shi Shi)",
-    "tags": [],
+    "tags": [
+      "language:en"
+    ],
     "performances": [
       {
         "id": "p-402aef16",
@@ -1109,7 +1203,9 @@
     "workId": "work-song-b3a441af",
     "title": "Good-bye Days",
     "originalArtist": "Yui",
-    "tags": [],
+    "tags": [
+      "language:en"
+    ],
     "performances": [
       {
         "id": "p-6742caf0",
@@ -1125,7 +1221,9 @@
     "workId": "work-song-f69ebff4",
     "title": "goodbye",
     "originalArtist": "清水翔太",
-    "tags": [],
+    "tags": [
+      "language:ja"
+    ],
     "performances": [
       {
         "id": "p-93eece9e",
@@ -1173,7 +1271,9 @@
     "workId": "work-song-dd3aef43",
     "title": "HEAVEN",
     "originalArtist": "Ailee (에일리)",
-    "tags": [],
+    "tags": [
+      "language:ko"
+    ],
     "performances": [
       {
         "id": "p-0d772a4c",
@@ -1237,7 +1337,9 @@
     "workId": "work-song-1508",
     "title": "I love you 3000",
     "originalArtist": "Stephanie Poetri",
-    "tags": [],
+    "tags": [
+      "language:en"
+    ],
     "performances": [
       {
         "id": "p-43b7fca3",
@@ -1260,7 +1362,9 @@
     "workId": "work-song-1508",
     "title": "I Love You 3000",
     "originalArtist": "Stephanie Poetri",
-    "tags": [],
+    "tags": [
+      "language:en"
+    ],
     "performances": [
       {
         "id": "p-4d821b9d",
@@ -1283,7 +1387,10 @@
     "workId": "work-song-85",
     "title": "Into You",
     "originalArtist": "Ariana Grande",
-    "tags": [],
+    "tags": [
+      "language:en",
+      "genre:pop"
+    ],
     "performances": [
       {
         "id": "p-534d0d13",
@@ -1315,7 +1422,9 @@
     "workId": "work-song-1151",
     "title": "Love Me Like You Do",
     "originalArtist": "Ellie Goulding",
-    "tags": [],
+    "tags": [
+      "language:en"
+    ],
     "performances": [
       {
         "id": "p-21e6a3fc",
@@ -1331,7 +1440,9 @@
     "workId": "work-song-71777b0f",
     "title": "Love Story",
     "originalArtist": "Taylor Swift (泰勒絲)",
-    "tags": [],
+    "tags": [
+      "language:en"
+    ],
     "performances": [
       {
         "id": "p-0a7c40d1",
@@ -1347,7 +1458,10 @@
     "workId": "work-song-1283",
     "title": "Love Yourself",
     "originalArtist": "Justin Bieber",
-    "tags": [],
+    "tags": [
+      "language:en",
+      "genre:pop"
+    ],
     "performances": [
       {
         "id": "p-a8c351b8",
@@ -1379,7 +1493,10 @@
     "workId": "work-song-a271993d",
     "title": "Mistletoe",
     "originalArtist": "Justin Bieber",
-    "tags": [],
+    "tags": [
+      "language:en",
+      "genre:pop"
+    ],
     "performances": [
       {
         "id": "p-b46c75d3",
@@ -1395,7 +1512,9 @@
     "workId": "work-song-21d7acdf",
     "title": "Paradise Island",
     "originalArtist": "ØZI",
-    "tags": [],
+    "tags": [
+      "language:zh"
+    ],
     "performances": [
       {
         "id": "p-536bbd8e",
@@ -1418,7 +1537,10 @@
     "workId": "work-song-4dc8fe0e",
     "title": "Santa Claus Is Coming to Town",
     "originalArtist": "Michael Bublé",
-    "tags": [],
+    "tags": [
+      "language:en",
+      "genre:pop"
+    ],
     "performances": [
       {
         "id": "p-66cc809a",
@@ -1434,7 +1556,10 @@
     "workId": "work-song-031b164f",
     "title": "skeletons",
     "originalArtist": "keshi",
-    "tags": [],
+    "tags": [
+      "language:en",
+      "genre:pop"
+    ],
     "performances": [
       {
         "id": "p-55eae5e7",
@@ -1482,7 +1607,9 @@
     "workId": "work-song-0fafd4a8",
     "title": "Somebody That I Used To Know",
     "originalArtist": "Gotye",
-    "tags": [],
+    "tags": [
+      "language:en"
+    ],
     "performances": [
       {
         "id": "p-3f81e285",
@@ -1498,7 +1625,9 @@
     "workId": "work-song-d08574b1",
     "title": "Someone Like You",
     "originalArtist": "Adele (愛黛兒)",
-    "tags": [],
+    "tags": [
+      "language:en"
+    ],
     "performances": [
       {
         "id": "p-721a6b6b",
@@ -1514,7 +1643,9 @@
     "workId": "work-song-8b36cb5f",
     "title": "Stay",
     "originalArtist": "Zedd, Alessia Cara",
-    "tags": [],
+    "tags": [
+      "language:en"
+    ],
     "performances": [
       {
         "id": "p-7e622f16",
@@ -1530,7 +1661,9 @@
     "workId": "work-song-256",
     "title": "STAY",
     "originalArtist": "The Kid LAROI, Justin Bieber",
-    "tags": [],
+    "tags": [
+      "language:en"
+    ],
     "performances": [
       {
         "id": "p-a48fe460",
@@ -1546,7 +1679,10 @@
     "workId": "work-song-51e9eb06",
     "title": "thank u, next",
     "originalArtist": "Ariana Grande",
-    "tags": [],
+    "tags": [
+      "language:en",
+      "genre:pop"
+    ],
     "performances": [
       {
         "id": "p-dadf27f1",
@@ -1562,7 +1698,10 @@
     "workId": "work-song-60ad905b",
     "title": "WANTCHU",
     "originalArtist": "keshi",
-    "tags": [],
+    "tags": [
+      "language:en",
+      "genre:pop"
+    ],
     "performances": [
       {
         "id": "p-81486936",
@@ -1578,7 +1717,9 @@
     "workId": "work-song-73515f2c",
     "title": "What About Me",
     "originalArtist": "Emily Osment",
-    "tags": [],
+    "tags": [
+      "language:en"
+    ],
     "performances": [
       {
         "id": "p-92e9a375",
@@ -1594,7 +1735,11 @@
     "workId": "work-song-2473",
     "title": "When You're Gone",
     "originalArtist": "Avril Lavigne",
-    "tags": [],
+    "tags": [
+      "language:en",
+      "genre:pop",
+      "genre:rock"
+    ],
     "performances": [
       {
         "id": "p-5abd964b",
@@ -1626,7 +1771,9 @@
     "workId": "work-song-155ba1b7",
     "title": "You And Me",
     "originalArtist": "Lifehouse",
-    "tags": [],
+    "tags": [
+      "language:en"
+    ],
     "performances": [
       {
         "id": "p-159f1df2",
@@ -1642,7 +1789,9 @@
     "workId": "work-song-7c14294c",
     "title": "널 사랑하지 않아",
     "originalArtist": "Urban Zakapa (어반 자카파)",
-    "tags": [],
+    "tags": [
+      "language:ko"
+    ],
     "performances": [
       {
         "id": "p-eb2b04ad",
@@ -1658,7 +1807,10 @@
     "workId": "work-song-28534ae4",
     "title": "ドライフラワー",
     "originalArtist": "優里",
-    "tags": [],
+    "tags": [
+      "language:ja",
+      "genre:rock"
+    ],
     "performances": [
       {
         "id": "p-d3e99dc4",
@@ -1681,7 +1833,11 @@
     "workId": "work-song-2697",
     "title": "ハレンチ",
     "originalArtist": "ちゃんみな",
-    "tags": [],
+    "tags": [
+      "language:ja",
+      "genre:pop",
+      "genre:rap"
+    ],
     "performances": [
       {
         "id": "p-c11f8832",
@@ -1711,7 +1867,10 @@
     "workId": "work-song-13e927d3",
     "title": "ベテルギウス",
     "originalArtist": "優里",
-    "tags": [],
+    "tags": [
+      "language:ja",
+      "genre:rock"
+    ],
     "performances": [
       {
         "id": "p-f625a05c",
@@ -1727,7 +1886,9 @@
     "workId": "work-song-58150868",
     "title": "ユキコイ",
     "originalArtist": "當山みれい",
-    "tags": [],
+    "tags": [
+      "language:ja"
+    ],
     "performances": [
       {
         "id": "p-003f966f",

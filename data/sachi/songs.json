@@ -4,7 +4,10 @@
     "workId": "work-song-1683",
     "title": "人質",
     "originalArtist": "張惠妹",
-    "tags": [],
+    "tags": [
+      "language:zh",
+      "genre:pop"
+    ],
     "performances": [
       {
         "id": "p-b9ec30bb",
@@ -36,7 +39,9 @@
     "workId": "work-song-6bae41e2",
     "title": "心訊 Heart Signal",
     "originalArtist": "煦Hiyori",
-    "tags": [],
+    "tags": [
+      "source:original"
+    ],
     "performances": [
       {
         "id": "p-e28f69b6",
@@ -52,7 +57,10 @@
     "workId": "work-song-298",
     "title": "失落沙洲",
     "originalArtist": "徐佳瑩",
-    "tags": [],
+    "tags": [
+      "language:zh",
+      "genre:pop"
+    ],
     "performances": [
       {
         "id": "p-e0eff02b",
@@ -68,7 +76,10 @@
     "workId": "work-song-1472",
     "title": "永不失聯的愛",
     "originalArtist": "周興哲",
-    "tags": [],
+    "tags": [
+      "language:zh",
+      "genre:pop"
+    ],
     "performances": [
       {
         "id": "p-4c33070a",
@@ -84,7 +95,10 @@
     "workId": "work-song-14c9e056",
     "title": "她說",
     "originalArtist": "林俊傑",
-    "tags": [],
+    "tags": [
+      "language:zh",
+      "genre:pop"
+    ],
     "performances": [
       {
         "id": "p-f3233beb",
@@ -116,7 +130,9 @@
     "workId": "work-song-170",
     "title": "炎",
     "originalArtist": "LiSA",
-    "tags": [],
+    "tags": [
+      "language:ja"
+    ],
     "performances": [
       {
         "id": "p-5f30f9bb",
@@ -132,7 +148,10 @@
     "workId": "work-song-1322",
     "title": "雨愛",
     "originalArtist": "楊丞琳",
-    "tags": [],
+    "tags": [
+      "language:zh",
+      "genre:pop"
+    ],
     "performances": [
       {
         "id": "p-8daca7f6",
@@ -148,7 +167,10 @@
     "workId": "work-song-a101cb49",
     "title": "指望",
     "originalArtist": "郁可唯",
-    "tags": [],
+    "tags": [
+      "language:zh",
+      "genre:pop"
+    ],
     "performances": [
       {
         "id": "p-573154a3",
@@ -180,7 +202,9 @@
     "workId": "work-song-1216",
     "title": "独りんぼエンヴィー",
     "originalArtist": "電ポルP",
-    "tags": [],
+    "tags": [
+      "language:ja"
+    ],
     "performances": [
       {
         "id": "p-23af92f2",
@@ -196,7 +220,10 @@
     "workId": "work-song-2248",
     "title": "時間煮雨",
     "originalArtist": "郁可唯",
-    "tags": [],
+    "tags": [
+      "language:zh",
+      "genre:pop"
+    ],
     "performances": [
       {
         "id": "p-03b10643",
@@ -212,7 +239,10 @@
     "workId": "work-song-f1629572",
     "title": "馬德里不思議",
     "originalArtist": "蔡依林",
-    "tags": [],
+    "tags": [
+      "language:zh",
+      "genre:pop"
+    ],
     "performances": [
       {
         "id": "p-5f8e7030",
@@ -228,7 +258,9 @@
     "workId": "work-song-4edd3601",
     "title": "訣愛",
     "originalArtist": "詹雯婷",
-    "tags": [],
+    "tags": [
+      "language:zh"
+    ],
     "performances": [
       {
         "id": "p-31979ea9",
@@ -244,7 +276,10 @@
     "workId": "work-song-2ae06379",
     "title": "會呼吸的痛",
     "originalArtist": "梁靜茹",
-    "tags": [],
+    "tags": [
+      "language:zh",
+      "genre:pop"
+    ],
     "performances": [
       {
         "id": "p-6f3a653d",
@@ -276,7 +311,9 @@
     "workId": "work-song-00335630",
     "title": "離島の歌",
     "originalArtist": "不知火 (東山奈央)",
-    "tags": [],
+    "tags": [
+      "language:ja"
+    ],
     "performances": [
       {
         "id": "p-c10f0869",
@@ -292,7 +329,10 @@
     "workId": "work-song-308",
     "title": "寶貝",
     "originalArtist": "張懸",
-    "tags": [],
+    "tags": [
+      "language:zh",
+      "genre:pop"
+    ],
     "performances": [
       {
         "id": "p-9bc08792",
@@ -308,7 +348,9 @@
     "workId": "work-song-19e65c75",
     "title": "はじまりの風",
     "originalArtist": "平原綾香",
-    "tags": [],
+    "tags": [
+      "language:ja"
+    ],
     "performances": [
       {
         "id": "p-8e136213",

@@ -4,7 +4,9 @@
     "workId": "work-song-562ecb16",
     "title": "115万キロのフィルム",
     "originalArtist": "髭男",
-    "tags": [],
+    "tags": [
+      "language:ja"
+    ],
     "performances": [
       {
         "id": "p-9eeaf37f",
@@ -20,7 +22,10 @@
     "workId": "work-song-45adfe21",
     "title": "小悪魔だってかまわない！",
     "originalArtist": "HoneyWorks feat. 初音ミク",
-    "tags": [],
+    "tags": [
+      "language:ja",
+      "source:vocaloid"
+    ],
     "performances": [
       {
         "id": "p-b8648fc4",
@@ -59,7 +64,10 @@
     "workId": "work-song-2399",
     "title": "以後別做朋友",
     "originalArtist": "周興哲",
-    "tags": [],
+    "tags": [
+      "language:zh",
+      "genre:pop"
+    ],
     "performances": [
       {
         "id": "p-a3403ce1",
@@ -91,7 +99,10 @@
     "workId": "work-song-14242dbb",
     "title": "如果雨之後",
     "originalArtist": "周興哲",
-    "tags": [],
+    "tags": [
+      "language:zh",
+      "genre:pop"
+    ],
     "performances": [
       {
         "id": "p-e92b5391",
@@ -130,7 +141,10 @@
     "workId": "work-song-2123",
     "title": "你，好不好？",
     "originalArtist": "周興哲",
-    "tags": [],
+    "tags": [
+      "language:zh",
+      "genre:pop"
+    ],
     "performances": [
       {
         "id": "p-452c5789",
@@ -162,7 +176,10 @@
     "workId": "work-song-03d847b3",
     "title": "刻在我心底的名字",
     "originalArtist": "盧廣仲",
-    "tags": [],
+    "tags": [
+      "language:zh",
+      "genre:pop"
+    ],
     "performances": [
       {
         "id": "p-c49cd143",
@@ -178,7 +195,10 @@
     "workId": "work-song-1b1770d6",
     "title": "夜のピエロ",
     "originalArtist": "Ado",
-    "tags": [],
+    "tags": [
+      "language:ja",
+      "genre:pop"
+    ],
     "performances": [
       {
         "id": "p-5fea5dfc",
@@ -194,7 +214,10 @@
     "workId": "work-song-1650",
     "title": "孤勇者",
     "originalArtist": "陳奕迅",
-    "tags": [],
+    "tags": [
+      "language:zh",
+      "genre:pop"
+    ],
     "performances": [
       {
         "id": "p-0b1082a2",
@@ -210,7 +233,9 @@
     "workId": "work-song-206",
     "title": "怪獣の花唄",
     "originalArtist": "Vaundy",
-    "tags": [],
+    "tags": [
+      "language:ja"
+    ],
     "performances": [
       {
         "id": "p-6c6ad6a4",
@@ -226,7 +251,10 @@
     "workId": "work-song-2335",
     "title": "東京サマーセッション",
     "originalArtist": "HoneyWorks",
-    "tags": [],
+    "tags": [
+      "language:ja",
+      "genre:pop"
+    ],
     "performances": [
       {
         "id": "p-3c8bca3e",
@@ -242,7 +270,9 @@
     "workId": "work-song-2148",
     "title": "泡沫の夜",
     "originalArtist": "nqrse",
-    "tags": [],
+    "tags": [
+      "language:ja"
+    ],
     "performances": [
       {
         "id": "p-cac0f746",
@@ -258,7 +288,11 @@
     "workId": "work-song-1815",
     "title": "花に亡霊",
     "originalArtist": "ヨルシカ",
-    "tags": [],
+    "tags": [
+      "language:ja",
+      "genre:pop",
+      "genre:rock"
+    ],
     "performances": [
       {
         "id": "p-0b1d3407",
@@ -290,7 +324,10 @@
     "workId": "work-song-54e3adfe",
     "title": "紅豆",
     "originalArtist": "王菲",
-    "tags": [],
+    "tags": [
+      "language:zh",
+      "genre:pop"
+    ],
     "performances": [
       {
         "id": "p-0c558270",
@@ -306,7 +343,10 @@
     "workId": "work-song-5ff734da",
     "title": "真生活",
     "originalArtist": "案山子 feat. 初音ミク",
-    "tags": [],
+    "tags": [
+      "language:ja",
+      "source:vocaloid"
+    ],
     "performances": [
       {
         "id": "p-134c78ed",
@@ -322,7 +362,9 @@
     "workId": "work-song-61f73aa3",
     "title": "鬼ノ宴",
     "originalArtist": "友成空",
-    "tags": [],
+    "tags": [
+      "language:ja"
+    ],
     "performances": [
       {
         "id": "p-89128293",
@@ -354,7 +396,10 @@
     "workId": "work-song-2104",
     "title": "晚餐歌",
     "originalArtist": "tuki.",
-    "tags": [],
+    "tags": [
+      "language:ja",
+      "genre:pop"
+    ],
     "performances": [
       {
         "id": "p-1bf5ab3e",
@@ -370,7 +415,10 @@
     "workId": "work-song-557bf660",
     "title": "深昏睡",
     "originalArtist": "春野 feat. 初音ミク",
-    "tags": [],
+    "tags": [
+      "language:ja",
+      "source:vocaloid"
+    ],
     "performances": [
       {
         "id": "p-05f38894",
@@ -386,7 +434,10 @@
     "workId": "work-song-0c2ee33c",
     "title": "幾分之幾",
     "originalArtist": "盧廣仲",
-    "tags": [],
+    "tags": [
+      "language:zh",
+      "genre:pop"
+    ],
     "performances": [
       {
         "id": "p-3e696e36",
@@ -402,7 +453,9 @@
     "workId": "work-song-a700e63c",
     "title": "愛我的時候",
     "originalArtist": "周興哲、單依純",
-    "tags": [],
+    "tags": [
+      "language:zh"
+    ],
     "performances": [
       {
         "id": "p-1ead6c93",
@@ -418,7 +471,10 @@
     "workId": "work-song-928e50e5",
     "title": "愛言葉IV",
     "originalArtist": "DECO*27 feat. 初音ミク",
-    "tags": [],
+    "tags": [
+      "language:ja",
+      "source:vocaloid"
+    ],
     "performances": [
       {
         "id": "p-2034d328",
@@ -434,7 +490,9 @@
     "workId": "work-song-3046",
     "title": "聽見下雨的聲音",
     "originalArtist": "魏如昀",
-    "tags": [],
+    "tags": [
+      "language:zh"
+    ],
     "performances": [
       {
         "id": "p-baa6eba1",
@@ -450,7 +508,10 @@
     "workId": "work-song-1709",
     "title": "Beauty and a Beat",
     "originalArtist": "Justin Bieber",
-    "tags": [],
+    "tags": [
+      "language:en",
+      "genre:pop"
+    ],
     "performances": [
       {
         "id": "p-765c079b",
@@ -466,7 +527,10 @@
     "workId": "work-song-fb50c3c2",
     "title": "beside you",
     "originalArtist": "keshi",
-    "tags": [],
+    "tags": [
+      "language:en",
+      "genre:pop"
+    ],
     "performances": [
       {
         "id": "p-72405574",
@@ -514,7 +578,10 @@
     "workId": "work-song-74baa9d8",
     "title": "flos",
     "originalArtist": "R Sound Design feat. 初音ミク",
-    "tags": [],
+    "tags": [
+      "language:ja",
+      "source:vocaloid"
+    ],
     "performances": [
       {
         "id": "p-cb2e5dfd",
@@ -530,7 +597,9 @@
     "workId": "work-song-20d0c012",
     "title": "Glimpse of Us",
     "originalArtist": "Joji",
-    "tags": [],
+    "tags": [
+      "language:en"
+    ],
     "performances": [
       {
         "id": "p-ae6a1d6d",
@@ -546,7 +615,10 @@
     "workId": "work-song-53a8a024",
     "title": "IRIS OUT",
     "originalArtist": "米津玄師",
-    "tags": [],
+    "tags": [
+      "language:ja",
+      "genre:pop"
+    ],
     "performances": [
       {
         "id": "p-a3d2fc2e",
@@ -562,7 +634,9 @@
     "workId": "work-song-1151",
     "title": "Love Me Like You Do",
     "originalArtist": "Ellie Goulding",
-    "tags": [],
+    "tags": [
+      "language:en"
+    ],
     "performances": [
       {
         "id": "p-0b0758af",
@@ -578,7 +652,10 @@
     "workId": "work-song-1283",
     "title": "Love Yourself",
     "originalArtist": "Justin Bieber",
-    "tags": [],
+    "tags": [
+      "language:en",
+      "genre:pop"
+    ],
     "performances": [
       {
         "id": "p-26666bbd",
@@ -594,7 +671,10 @@
     "workId": "work-song-781",
     "title": "My Dearest",
     "originalArtist": "supercell",
-    "tags": [],
+    "tags": [
+      "language:ja",
+      "source:anime"
+    ],
     "performances": [
       {
         "id": "p-90eccc52",
@@ -610,7 +690,10 @@
     "workId": "work-song-27",
     "title": "Ref:rain",
     "originalArtist": "Aimer",
-    "tags": [],
+    "tags": [
+      "language:ja",
+      "genre:pop"
+    ],
     "performances": [
       {
         "id": "p-e2611b1a",
@@ -642,7 +725,10 @@
     "workId": "work-song-130",
     "title": "アイネクライネ",
     "originalArtist": "米津玄師",
-    "tags": [],
+    "tags": [
+      "language:ja",
+      "genre:pop"
+    ],
     "performances": [
       {
         "id": "p-4e44e500",
@@ -658,7 +744,9 @@
     "workId": "work-song-1549",
     "title": "ぎゅっと。",
     "originalArtist": "もさを。",
-    "tags": [],
+    "tags": [
+      "language:ja"
+    ],
     "performances": [
       {
         "id": "p-b73f1a22",
@@ -674,7 +762,9 @@
     "workId": "work-song-f8de293b",
     "title": "スイートマジック",
     "originalArtist": "ろん×Junky",
-    "tags": [],
+    "tags": [
+      "language:ja"
+    ],
     "performances": [
       {
         "id": "p-4fae6ce8",
@@ -690,7 +780,9 @@
     "workId": "work-song-424e636c",
     "title": "たばこ",
     "originalArtist": "コレサワ",
-    "tags": [],
+    "tags": [
+      "language:ja"
+    ],
     "performances": [
       {
         "id": "p-0ead53d6",
@@ -706,7 +798,9 @@
     "workId": "work-song-8cb605dc",
     "title": "ファンサ",
     "originalArtist": "HoneyWorks feat. mona (CV：夏川椎菜)",
-    "tags": [],
+    "tags": [
+      "language:ja"
+    ],
     "performances": [
       {
         "id": "p-db300b10",
@@ -722,7 +816,10 @@
     "workId": "work-song-893c71f2",
     "title": "プロポーズ",
     "originalArtist": "内緒のピアス feat. 可不",
-    "tags": [],
+    "tags": [
+      "language:ja",
+      "source:vocaloid"
+    ],
     "performances": [
       {
         "id": "p-8542a844",
@@ -738,7 +835,10 @@
     "workId": "work-song-ed8ffb3b",
     "title": "マーシャル・マキシマイザー",
     "originalArtist": "柊マグネタイト feat. 可不",
-    "tags": [],
+    "tags": [
+      "language:ja",
+      "source:vocaloid"
+    ],
     "performances": [
       {
         "id": "p-d6ad7472",

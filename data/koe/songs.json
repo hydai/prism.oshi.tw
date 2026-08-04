@@ -4,7 +4,9 @@
     "workId": "work-song-3ddb4896",
     "title": "小さな恋のうた",
     "originalArtist": "MONGOL800",
-    "tags": [],
+    "tags": [
+      "language:ja"
+    ],
     "performances": [
       {
         "id": "p-4a9e4b78",
@@ -20,7 +22,9 @@
     "workId": "work-song-778",
     "title": "好きだから。",
     "originalArtist": "『ユイカ』",
-    "tags": [],
+    "tags": [
+      "language:ja"
+    ],
     "performances": [
       {
         "id": "p-6c72f9f9",
@@ -36,7 +40,11 @@
     "workId": "work-song-505790ca",
     "title": "恋",
     "originalArtist": "星野源",
-    "tags": [],
+    "tags": [
+      "language:ja",
+      "genre:pop",
+      "genre:rock"
+    ],
     "performances": [
       {
         "id": "p-1690de3e",
@@ -52,7 +60,10 @@
     "workId": "work-song-14702476",
     "title": "高嶺の花子さん",
     "originalArtist": "back number",
-    "tags": [],
+    "tags": [
+      "language:ja",
+      "genre:pop"
+    ],
     "performances": [
       {
         "id": "p-4d7f9c55",
@@ -68,7 +79,9 @@
     "workId": "work-song-1508",
     "title": "I Love You 3000",
     "originalArtist": "Stephanie Poetri",
-    "tags": [],
+    "tags": [
+      "language:en"
+    ],
     "performances": [
       {
         "id": "p-ab2cbc31",
@@ -84,7 +97,10 @@
     "workId": "work-song-064dceaa",
     "title": "カタオモイ",
     "originalArtist": "Aimer",
-    "tags": [],
+    "tags": [
+      "language:ja",
+      "genre:pop"
+    ],
     "performances": [
       {
         "id": "p-6a823c9f",
@@ -100,7 +116,10 @@
     "workId": "work-song-1704",
     "title": "ライラック",
     "originalArtist": "美波",
-    "tags": [],
+    "tags": [
+      "language:ja",
+      "genre:pop"
+    ],
     "performances": [
       {
         "id": "p-bd94f5d5",

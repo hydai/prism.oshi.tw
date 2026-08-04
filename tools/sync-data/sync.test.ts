@@ -52,8 +52,8 @@ test('songCountsByStream counts distinct songs per stream (two performances of o
 test('assembleFanSiteSongs exports the shared work ID without replacing local song IDs', () => {
   const songs = assembleFanSiteSongs(
     [
-      { id: 'alice-local', work_id: 'work-shared', title: 'Song', original_artist: 'Artist', tags: '[]' },
-      { id: 'legacy-local', work_id: null, title: 'Legacy', original_artist: 'Artist', tags: '["tag"]' },
+      { id: 'alice-local', work_id: 'work-shared', title: 'Song', original_artist: 'Artist', song_tags: '[]', work_tags: '["genre:rock"]' },
+      { id: 'legacy-local', work_id: null, title: 'Legacy', original_artist: 'Artist', song_tags: '["legacy-tag"]', work_tags: null },
     ],
     [],
   );
@@ -61,12 +61,29 @@ test('assembleFanSiteSongs exports the shared work ID without replacing local so
   const linked = songs.find((s) => s.id === 'alice-local')!;
   const legacy = songs.find((s) => s.id === 'legacy-local')!;
   assert.equal(linked.workId, 'work-shared');
+  assert.deepEqual(linked.tags, ['genre:rock']);
   assert.equal('workId' in legacy, false, 'unlinked legacy rows stay backward compatible');
+  assert.deepEqual(legacy.tags, ['legacy-tag']);
+});
+
+test('assembleFanSiteSongs unions, de-duplicates, and orders work plus local tags', () => {
+  const songs = assembleFanSiteSongs(
+    [{
+      id: 'song1',
+      work_id: 'work1',
+      title: 'Song',
+      original_artist: 'Artist',
+      song_tags: '["style:parody","genre:rock"]',
+      work_tags: '["genre:rock","language:zh"]',
+    }],
+    [],
+  );
+  assert.deepEqual(songs[0].tags, ['language:zh', 'genre:rock', 'style:parody']);
 });
 
 test('assembleFanSiteSongs emits slim performances without stream-derived fields', () => {
   const songs = assembleFanSiteSongs(
-    [{ id: 'song1', work_id: null, title: 'Song', original_artist: 'Artist', tags: '[]' }],
+    [{ id: 'song1', work_id: null, title: 'Song', original_artist: 'Artist', song_tags: '[]', work_tags: null }],
     [{ id: 'p1', song_id: 'song1', stream_id: 's1', date: '2024-01-01', stream_title: 'Stream night', video_id: 'v1', timestamp: 10, end_timestamp: 99, note: '' }],
   );
   const p = songs[0].performances[0];
@@ -78,7 +95,7 @@ test('assembleFanSiteSongs emits slim performances without stream-derived fields
 
 test('assembleFanSiteSongs keeps non-empty notes', () => {
   const songs = assembleFanSiteSongs(
-    [{ id: 'song1', work_id: null, title: 'Song', original_artist: 'Artist', tags: '[]' }],
+    [{ id: 'song1', work_id: null, title: 'Song', original_artist: 'Artist', song_tags: '[]', work_tags: null }],
     [{ id: 'p1', song_id: 'song1', stream_id: 's1', date: '2024-01-01', stream_title: '', video_id: 'v1', timestamp: 0, end_timestamp: null, note: 'encore' }],
   );
   assert.equal(songs[0].performances[0].note, 'encore');
@@ -87,8 +104,8 @@ test('assembleFanSiteSongs keeps non-empty notes', () => {
 test('assembleFanSiteSongs sorts songs by zh-TW title and performances newest-first', () => {
   const songs = assembleFanSiteSongs(
     [
-      { id: 'turtle', work_id: null, title: '龜', original_artist: '', tags: '[]' },
-      { id: 'one', work_id: null, title: '一', original_artist: '', tags: '[]' },
+      { id: 'turtle', work_id: null, title: '龜', original_artist: '', song_tags: '[]', work_tags: null },
+      { id: 'one', work_id: null, title: '一', original_artist: '', song_tags: '[]', work_tags: null },
     ],
     [
       { id: 'p-old', song_id: 'one', stream_id: 's1', date: '2023-05-01', stream_title: '', video_id: 'v1', timestamp: 0, end_timestamp: null, note: '' },

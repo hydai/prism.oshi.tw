@@ -4,7 +4,9 @@
     "workId": "work-song-9552b6c2",
     "title": "会いたくて 会いたくて",
     "originalArtist": "西野加奈",
-    "tags": [],
+    "tags": [
+      "language:ja"
+    ],
     "performances": [
       {
         "id": "p-4467849c",
@@ -20,7 +22,10 @@
     "workId": "work-song-06be676d",
     "title": "うらたねこ♀",
     "originalArtist": "HoneyWorks",
-    "tags": [],
+    "tags": [
+      "language:ja",
+      "genre:pop"
+    ],
     "performances": [
       {
         "id": "p-da765a2c",

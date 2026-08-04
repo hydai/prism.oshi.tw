@@ -4,7 +4,10 @@
     "workId": "work-song-4ce2c5e1",
     "title": "女孩",
     "originalArtist": "韋禮安",
-    "tags": [],
+    "tags": [
+      "language:zh",
+      "genre:pop"
+    ],
     "performances": [
       {
         "id": "p-6a79088f",
@@ -20,7 +23,11 @@
     "workId": "work-song-3b557e22",
     "title": "小夜子",
     "originalArtist": "みきとP",
-    "tags": [],
+    "tags": [
+      "language:ja",
+      "genre:pop",
+      "source:vocaloid"
+    ],
     "performances": [
       {
         "id": "p-501fb576",
@@ -36,7 +43,10 @@
     "workId": "work-song-2522",
     "title": "小情歌",
     "originalArtist": "蘇打綠",
-    "tags": [],
+    "tags": [
+      "language:zh",
+      "genre:pop"
+    ],
     "performances": [
       {
         "id": "p-0608e498",
@@ -52,7 +62,9 @@
     "workId": "work-song-6bae41e2",
     "title": "心訊 Heart Signal",
     "originalArtist": "煦Hiyori",
-    "tags": [],
+    "tags": [
+      "source:original"
+    ],
     "performances": [
       {
         "id": "p-412b453f",
@@ -116,7 +128,9 @@
     "workId": "work-song-546",
     "title": "我還年輕 我還年輕",
     "originalArtist": "老王樂隊",
-    "tags": [],
+    "tags": [
+      "language:zh"
+    ],
     "performances": [
       {
         "id": "p-b566bb9d",
@@ -132,7 +146,10 @@
     "workId": "work-song-03d847b3",
     "title": "刻在我心底的名字",
     "originalArtist": "盧廣仲",
-    "tags": [],
+    "tags": [
+      "language:zh",
+      "genre:pop"
+    ],
     "performances": [
       {
         "id": "p-5d8b327f",
@@ -148,7 +165,11 @@
     "workId": "work-song-3b3acc95",
     "title": "夜撫でるメノウ",
     "originalArtist": "Ayase",
-    "tags": [],
+    "tags": [
+      "language:ja",
+      "genre:pop",
+      "source:vocaloid"
+    ],
     "performances": [
       {
         "id": "p-1fcbee2d",
@@ -164,7 +185,10 @@
     "workId": "work-song-006cfcd3",
     "title": "怪物",
     "originalArtist": "YOASOBI",
-    "tags": [],
+    "tags": [
+      "language:ja",
+      "genre:pop"
+    ],
     "performances": [
       {
         "id": "p-239f2ca6",
@@ -180,7 +204,10 @@
     "workId": "work-song-1322",
     "title": "雨愛",
     "originalArtist": "楊丞琳",
-    "tags": [],
+    "tags": [
+      "language:zh",
+      "genre:pop"
+    ],
     "performances": [
       {
         "id": "p-90e255c1",
@@ -212,7 +239,10 @@
     "workId": "work-song-a8800b48",
     "title": "差不多姑娘",
     "originalArtist": "鄧紫棋",
-    "tags": [],
+    "tags": [
+      "language:zh",
+      "genre:pop"
+    ],
     "performances": [
       {
         "id": "p-4ca5e0d4",
@@ -260,7 +290,9 @@
     "workId": "work-song-1398",
     "title": "寄り酔い",
     "originalArtist": "和ぬか",
-    "tags": [],
+    "tags": [
+      "language:ja"
+    ],
     "performances": [
       {
         "id": "p-799c11b9",
@@ -276,7 +308,9 @@
     "workId": "work-song-5d8444e2",
     "title": "喜歡你",
     "originalArtist": "陳潔儀",
-    "tags": [],
+    "tags": [
+      "language:zh"
+    ],
     "performances": [
       {
         "id": "p-9cc78e93",
@@ -292,7 +326,9 @@
     "workId": "work-song-7592ff4b",
     "title": "無樂不作",
     "originalArtist": "范逸臣",
-    "tags": [],
+    "tags": [
+      "language:zh"
+    ],
     "performances": [
       {
         "id": "p-ba54c620",
@@ -308,7 +344,10 @@
     "workId": "work-song-2dae12e8",
     "title": "給我一首歌的時間",
     "originalArtist": "周杰倫",
-    "tags": [],
+    "tags": [
+      "language:zh",
+      "genre:pop"
+    ],
     "performances": [
       {
         "id": "p-a1f12902",
@@ -372,7 +411,9 @@
     "workId": "work-song-139",
     "title": "愛你",
     "originalArtist": "陳芳語",
-    "tags": [],
+    "tags": [
+      "language:zh"
+    ],
     "performances": [
       {
         "id": "p-4c84c2c4",
@@ -388,7 +429,9 @@
     "workId": "work-song-37f753fd",
     "title": "B.O.",
     "originalArtist": "ØZI",
-    "tags": [],
+    "tags": [
+      "language:zh"
+    ],
     "performances": [
       {
         "id": "p-39712b99",
@@ -420,7 +463,9 @@
     "workId": "work-song-1508",
     "title": "I Love You 3000",
     "originalArtist": "Stephanie Poetri",
-    "tags": [],
+    "tags": [
+      "language:en"
+    ],
     "performances": [
       {
         "id": "p-7383054a",
@@ -436,7 +481,10 @@
     "workId": "work-song-edf196f8",
     "title": "IDOL",
     "originalArtist": "YOASOBI",
-    "tags": [],
+    "tags": [
+      "language:ja",
+      "genre:pop"
+    ],
     "performances": [
       {
         "id": "p-855477ea",
@@ -452,7 +500,10 @@
     "workId": "work-song-53a8a024",
     "title": "IRIS OUT",
     "originalArtist": "米津玄師",
-    "tags": [],
+    "tags": [
+      "language:ja",
+      "genre:pop"
+    ],
     "performances": [
       {
         "id": "p-7c9f7594",
@@ -484,7 +535,9 @@
     "workId": "work-song-1808",
     "title": "Say So",
     "originalArtist": "Doja Cat",
-    "tags": [],
+    "tags": [
+      "language:en"
+    ],
     "performances": [
       {
         "id": "p-c8326b80",
@@ -548,7 +601,9 @@
     "workId": "work-song-dceea062",
     "title": "Sweet, sexy lover",
     "originalArtist": "PiA 樂團",
-    "tags": [],
+    "tags": [
+      "language:en"
+    ],
     "performances": [
       {
         "id": "p-f86a7060",
@@ -580,7 +635,9 @@
     "workId": "work-song-2ea03c71",
     "title": "シルエット",
     "originalArtist": "KANA-BOON",
-    "tags": [],
+    "tags": [
+      "language:ja"
+    ],
     "performances": [
       {
         "id": "p-845257a0",
@@ -596,7 +653,9 @@
     "workId": "work-song-263",
     "title": "モエチャッカファイア",
     "originalArtist": "弌誠",
-    "tags": [],
+    "tags": [
+      "language:ja"
+    ],
     "performances": [
       {
         "id": "p-dc06232b",
@@ -612,7 +671,10 @@
     "workId": "work-song-3a255c8d",
     "title": "ワールドイズマイン",
     "originalArtist": "supercell feat. 初音ミク",
-    "tags": [],
+    "tags": [
+      "language:ja",
+      "source:vocaloid"
+    ],
     "performances": [
       {
         "id": "p-32534671",

@@ -3,7 +3,7 @@
 import { useState, useMemo, useEffect, useRef, useCallback } from 'react';
 import Link from 'next/link';
 import { useVirtualizer } from '@tanstack/react-virtual';
-import { Search, Play, Shuffle, ExternalLink, Mic2, Youtube, Twitter, Facebook, Instagram, Twitch, Sparkles, ListMusic, Clock, Heart, ChevronDown, ChevronRight, Plus, ListPlus, X, SlidersHorizontal, WifiOff, House, Radio, Film } from 'lucide-react';
+import { Search, Play, Shuffle, ExternalLink, Mic2, Youtube, Twitter, Facebook, Instagram, Twitch, Sparkles, ListMusic, Clock, Heart, ChevronDown, ChevronRight, Plus, ListPlus, X, SlidersHorizontal, WifiOff, House, Radio, Film, Tags } from 'lucide-react';
 import { useStreamer } from '../contexts/StreamerContext';
 import { usePlayer } from '../contexts/PlayerContext';
 import { usePlaylist } from '../contexts/PlaylistContext';
@@ -22,6 +22,8 @@ import MobileSearchRow from '../components/MobileSearchRow';
 import SearchBox from '../components/SearchBox';
 import ThemeToggle from '../components/ThemeToggle';
 import ViewModeToggle from '../components/ViewModeToggle';
+import BottomSheet from '../components/BottomSheet';
+import TagFilterPanel from '../components/TagFilterPanel';
 import {
   filterFlattenedSongs,
   filterGroupedSongs,
@@ -31,6 +33,7 @@ import {
   followingTracksFromGrouped,
   getAllArtists,
   getAvailableYears,
+  getTagCounts,
   groupSongsByWorkId,
   sortGroupedSongs,
 } from '../lib/archive';
@@ -52,6 +55,8 @@ export default function Home() {
   const [selectedStreamId, setSelectedStreamId] = useState<string | null>(null);
   const [selectedArtist, setSelectedArtist] = useState<string | null>(null);
   const [selectedYears, setSelectedYears] = useState<Set<number>>(new Set());
+  const [selectedTags, setSelectedTags] = useState<Set<string>>(new Set());
+  const [showTagFilter, setShowTagFilter] = useState(false);
   const [viewMode, setViewMode] = useState<ArchiveViewMode>('timeline');
   const [expandedSongs, setExpandedSongs] = useState<Set<string>>(new Set());
   const [showToast, setShowToast] = useState(false);
@@ -168,6 +173,7 @@ export default function Home() {
 
   const allArtists = useMemo(() => getAllArtists(songs), [songs]);
   const availableYears = useMemo(() => getAvailableYears(streams), [streams]);
+  const tagCounts = useMemo(() => getTagCounts(songs), [songs]);
   const filteredStreams = useMemo(
     () => filterStreamsByYears(streams, selectedYears),
     [streams, selectedYears],
@@ -187,13 +193,22 @@ export default function Home() {
     setSelectedStreamId(null);
   };
 
-  const hasActiveFilters = debouncedSearch !== '' || selectedStreamId !== null || selectedArtist !== null || selectedYears.size > 0;
+  const toggleTag = useCallback((tag: string) => {
+    setSelectedTags((current) => {
+      const next = new Set(current);
+      if (next.has(tag)) next.delete(tag); else next.add(tag);
+      return next;
+    });
+  }, []);
+
+  const hasActiveFilters = debouncedSearch !== '' || selectedStreamId !== null || selectedArtist !== null || selectedYears.size > 0 || selectedTags.size > 0;
 
   const clearAllFilters = () => {
     setDebouncedSearch('');
     setSelectedStreamId(null);
     setSelectedArtist(null);
     setSelectedYears(new Set());
+    setSelectedTags(new Set());
   };
 
   const archiveFilters = useMemo(() => ({
@@ -201,7 +216,8 @@ export default function Home() {
     selectedStreamId,
     selectedArtist,
     selectedYears,
-  }), [debouncedSearch, selectedStreamId, selectedArtist, selectedYears]);
+    selectedTags,
+  }), [debouncedSearch, selectedStreamId, selectedArtist, selectedYears, selectedTags]);
 
   const allFlattenedSongs: FlattenedSong[] = useMemo(() => flattenSongs(songs), [songs]);
   const flattenedSongs: FlattenedSong[] = useMemo(
@@ -379,6 +395,16 @@ export default function Home() {
               <ChevronDown className="w-3.5 h-3.5" style={{ color: 'var(--text-tertiary)' }} />
             </div>
           </div>
+
+          {tagCounts.size > 0 && (
+            <div className="px-1 mb-3" data-testid="desktop-tag-filters">
+              <TagFilterPanel
+                tagCounts={tagCounts}
+                selectedTags={selectedTags}
+                onToggleTag={toggleTag}
+              />
+            </div>
+          )}
 
           {/* Year filter chips */}
           <div className="flex flex-wrap gap-1.5 px-1" data-testid="year-filter-sidebar">
@@ -1431,6 +1457,23 @@ export default function Home() {
                   <ChevronDown className="w-3.5 h-3.5" style={{ color: 'var(--text-tertiary)' }} />
                 </div>
               </div>
+              {tagCounts.size > 0 && (
+                <button
+                  type="button"
+                  onClick={() => setShowTagFilter(true)}
+                  className="mb-3 flex w-full items-center justify-between px-3 py-2 text-sm font-medium"
+                  style={{
+                    background: 'var(--bg-surface-glass)',
+                    border: '1px solid var(--border-glass)',
+                    borderRadius: 'var(--radius-lg)',
+                    color: selectedTags.size > 0 ? 'var(--accent-pink)' : 'var(--text-secondary)',
+                  }}
+                  data-testid="mobile-tag-filter-button"
+                >
+                  <span className="flex items-center gap-2"><Tags className="h-4 w-4" />標籤篩選</span>
+                  <span>{selectedTags.size > 0 ? `已選 ${selectedTags.size}` : '全部'}</span>
+                </button>
+              )}
               {/* Search results */}
               <div>
                 {flattenedSongs.length === 0 ? (
@@ -1790,6 +1833,33 @@ export default function Home() {
         </button>
 
       </nav>
+
+      <BottomSheet
+        show={showTagFilter}
+        onClose={() => setShowTagFilter(false)}
+        title="標籤篩選"
+        titleIcon={<Tags className="h-5 w-5 text-pink-400" />}
+        testId="mobile-tag-filter-sheet"
+        headerRight={selectedTags.size > 0 ? (
+          <button
+            type="button"
+            onClick={() => setSelectedTags(new Set())}
+            className="text-xs text-pink-300 hover:text-pink-200"
+          >
+            清除
+          </button>
+        ) : undefined}
+      >
+        <div className="p-4">
+          <TagFilterPanel
+            tagCounts={tagCounts}
+            selectedTags={selectedTags}
+            onToggleTag={toggleTag}
+            tone="sheet"
+            testId="mobile-tag-filter-options"
+          />
+        </div>
+      </BottomSheet>
 
       {/* Playlist UI */}
       <PlaylistPanel

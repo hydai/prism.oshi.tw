@@ -1,5 +1,6 @@
 import {
   batchUpdateSongs,
+  bulkUpdateGlobalWorkTags,
   bulkUnapproveStream,
   deleteStreamCascade,
   exportSongs,
@@ -65,6 +66,9 @@ class FakeStatement {
     if (this.sql.includes('FROM songs AS song') && this.sql.includes('LEFT JOIN song_work_links')) {
       return { results: this.fakeDb.exportSongRows as T[] };
     }
+    if (this.sql.includes('SELECT id, tags FROM works WHERE id IN')) {
+      return { results: this.fakeDb.workTagRows as T[] };
+    }
     if (this.sql.includes('FROM performances WHERE streamer_id = ?')) {
       return { results: this.fakeDb.exportPerformanceRows as T[] };
     }
@@ -87,6 +91,7 @@ class FakeD1Database {
   readonly allStatements: CapturedStatement[] = [];
   readonly batchStatements: CapturedStatement[] = [];
   mergeGuardValid = true;
+  workTagRows: Array<{ id: string; tags: string }> = [];
 
   constructor(
     readonly existingStream: ExistingStream,
@@ -402,6 +407,7 @@ async function testGlobalWorksListAggregatesAcrossStreamers(): Promise<void> {
   const result = await listGlobalWorksPaginated(fakeDb as unknown as D1Database, {
     search: longSearch,
     sharedOnly: true,
+    tag: 'genre:rock',
     page: 2,
     pageSize: 25,
     sortBy: 'streamerCount',
@@ -421,10 +427,39 @@ async function testGlobalWorksListAggregatesAcrossStreamers(): Promise<void> {
   assert(/instr\s*\(\s*lower\(work\.title\)/i.test(dataQuery.sql), 'title search avoids D1 LIKE pattern limits');
   assert(/instr\s*\(\s*lower\(work\.original_artist\)/i.test(dataQuery.sql), 'artist search avoids D1 LIKE pattern limits');
   assert(!/\bLIKE\b/i.test(dataQuery.sql), 'global search does not build a length-limited LIKE pattern');
+  assert(/json_each\(work\.tags\)/i.test(dataQuery.sql), 'global tag filter uses exact JSON-array membership');
   assertEqual(dataQuery.params[0], longSearch, 'title search is bound without wildcard expansion');
   assertEqual(dataQuery.params[1], longSearch, 'artist search is bound without wildcard expansion');
-  assertEqual(dataQuery.params[2], 25, 'page size is bound');
-  assertEqual(dataQuery.params[3], 25, 'second-page offset is bound');
+  assertEqual(dataQuery.params[2], 'genre:rock', 'stable tag ID is bound without string interpolation');
+  assertEqual(dataQuery.params[3], 25, 'page size is bound');
+  assertEqual(dataQuery.params[4], 25, 'second-page offset is bound');
+}
+
+async function testBulkWorkTagsApplyStableDelta(): Promise<void> {
+  const fakeDb = new FakeD1Database(null);
+  fakeDb.workTagRows = [
+    { id: 'work-1', tags: '["genre:rock","mood:ballad"]' },
+    { id: 'work-2', tags: '["language:zh"]' },
+  ];
+
+  const updated = await bulkUpdateGlobalWorkTags(
+    fakeDb as unknown as D1Database,
+    ['work-1', 'work-2'],
+    ['style:parody', 'genre:rock'],
+    ['mood:ballad'],
+  );
+
+  assertEqual(updated.length, 2, 'bulk tag update returns every selected work');
+  assertEqual(
+    JSON.stringify(updated[0]?.tags),
+    JSON.stringify(['genre:rock', 'style:parody']),
+    'bulk tag update adds, removes, de-duplicates, and orders tags',
+  );
+  assertEqual(fakeDb.batchStatements.length, 2, 'bulk tag update writes every selected work in one D1 batch');
+  assert(
+    fakeDb.batchStatements.every((statement) => statement.sql.includes("updated_at = datetime('now')")),
+    'work tag writes advance freshness timestamps',
+  );
 }
 
 async function testFanSiteExportOmitsNullWorkIds(): Promise<void> {
@@ -967,6 +1002,7 @@ async function main(): Promise<void> {
   await testSongIdentityEditRelinksGlobalWorkAtomically();
   await testHarmonizerArtistUpdatesRelinkEveryEditedSong();
   await testGlobalWorksListAggregatesAcrossStreamers();
+  await testBulkWorkTagsApplyStableDelta();
   await testFanSiteExportOmitsNullWorkIds();
   await testHarmonizerScanUsesAndExposesWorkIds();
   await testMergeSongsPreservesPerformances();

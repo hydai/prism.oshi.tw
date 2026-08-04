@@ -55,14 +55,15 @@ interface AggRow {
 
 export const AGG_SQL = `
   SELECT song.streamer_id, 'songs' AS source,
-         MAX(CASE
-           WHEN link.updated_at IS NULL THEN song.updated_at
-           WHEN song.updated_at IS NULL OR link.updated_at > song.updated_at THEN link.updated_at
-           ELSE song.updated_at
-         END) AS max_ts,
+         MAX(MAX(
+           COALESCE(song.updated_at, ''),
+           COALESCE(link.updated_at, ''),
+           COALESCE(work.updated_at, '')
+         )) AS max_ts,
          COUNT(*) AS cnt
     FROM songs AS song
     LEFT JOIN song_work_links AS link ON link.song_id = song.id
+    LEFT JOIN works AS work ON work.id = link.work_id
     WHERE song.status = 'approved'
     GROUP BY song.streamer_id
   UNION ALL

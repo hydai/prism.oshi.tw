@@ -1,0 +1,5677 @@
+{
+  "schemaVersion": 1,
+  "provider": "Apple iTunes Search API",
+  "source": "https://itunes.apple.com/search",
+  "fetchedAt": "2026-08-04T13:51:17.275Z",
+  "lookups": [
+    {
+      "artist": "(G)I-DLE",
+      "workCount": 5,
+      "fetchedAt": "2026-08-04T13:49:19.977Z",
+      "results": [
+        {
+          "artistId": 1378887586,
+          "artistName": "i-dle",
+          "trackId": 1802620989,
+          "trackName": "Queencard",
+          "primaryGenreName": "K-Pop"
+        },
+        {
+          "artistId": 1378887586,
+          "artistName": "i-dle",
+          "trackId": 1802621240,
+          "trackName": "TOMBOY",
+          "primaryGenreName": "K-Pop"
+        },
+        {
+          "artistId": 1378887586,
+          "artistName": "i-dle",
+          "trackId": 1504618354,
+          "trackName": "Oh my god",
+          "primaryGenreName": "K-Pop"
+        },
+        {
+          "artistId": 1378887586,
+          "artistName": "i-dle",
+          "trackId": 1802621266,
+          "trackName": "MY BAG",
+          "primaryGenreName": "K-Pop"
+        },
+        {
+          "artistId": 1378887586,
+          "artistName": "i-dle",
+          "trackId": 1426297999,
+          "trackName": "HANN (Alone)",
+          "primaryGenreName": "K-Pop"
+        }
+      ]
+    },
+    {
+      "artist": "40mP",
+      "workCount": 11,
+      "fetchedAt": "2026-08-04T13:45:25.504Z",
+      "results": [
+        {
+          "artistId": 334467964,
+          "artistName": "40mp",
+          "trackId": 555001985,
+          "trackName": "Karakuri Pierrot (feat. Hatsune Miku)",
+          "primaryGenreName": "Pop"
+        },
+        {
+          "artistId": 334467964,
+          "artistName": "40mp",
+          "trackId": 1119977582,
+          "trackName": "Love Trial",
+          "primaryGenreName": "Anime"
+        },
+        {
+          "artistId": 334467964,
+          "artistName": "40mp",
+          "trackId": 555001983,
+          "trackName": "Torinokocity (feat. Hatsune Miku)",
+          "primaryGenreName": "Pop"
+        },
+        {
+          "artistId": 334467964,
+          "artistName": "40mp",
+          "trackId": 969914556,
+          "trackName": "Karakuri Pierrot (Hatsune Miku Magical Mirai 2014 Live) [feat. Hatsune Miku]",
+          "primaryGenreName": "Pop"
+        },
+        {
+          "artistId": 334467964,
+          "artistName": "40mp",
+          "trackId": 555001986,
+          "trackName": "Mousou Sketch (feat. Hatsune Miku)",
+          "primaryGenreName": "Pop"
+        }
+      ]
+    },
+    {
+      "artist": "40㍍P",
+      "workCount": 10,
+      "fetchedAt": "2026-08-04T13:46:24.265Z",
+      "results": [
+        {
+          "artistId": 334467964,
+          "artistName": "40mp",
+          "trackId": 555001985,
+          "trackName": "Karakuri Pierrot (feat. Hatsune Miku)",
+          "primaryGenreName": "Pop"
+        },
+        {
+          "artistId": 334467964,
+          "artistName": "40mp",
+          "trackId": 555001986,
+          "trackName": "Mousou Sketch (feat. Hatsune Miku)",
+          "primaryGenreName": "Pop"
+        },
+        {
+          "artistId": 334467964,
+          "artistName": "40mp",
+          "trackId": 1119977582,
+          "trackName": "Love Trial",
+          "primaryGenreName": "Anime"
+        },
+        {
+          "artistId": 334467964,
+          "artistName": "40mp",
+          "trackId": 555001983,
+          "trackName": "Torinokocity (feat. Hatsune Miku)",
+          "primaryGenreName": "Pop"
+        },
+        {
+          "artistId": 334467964,
+          "artistName": "40mp & Hatsune Miku",
+          "trackId": 1498015580,
+          "trackName": "Kiss the Villain",
+          "primaryGenreName": "Anime"
+        }
+      ]
+    },
+    {
+      "artist": "丁噹",
+      "workCount": 5,
+      "fetchedAt": "2026-08-04T13:49:20.010Z",
+      "results": [
+        {
+          "artistId": 453466412,
+          "artistName": "Della Wu",
+          "trackId": 1084617353,
+          "trackName": "手掌心",
+          "primaryGenreName": "Mandopop"
+        },
+        {
+          "artistId": 453466412,
+          "artistName": "Della Wu",
+          "trackId": 1085515006,
+          "trackName": "你為什麼說謊",
+          "primaryGenreName": "Mandopop"
+        },
+        {
+          "artistId": 453466412,
+          "artistName": "Della Wu",
+          "trackId": 1086004551,
+          "trackName": "猜不透",
+          "primaryGenreName": "Mandopop"
+        },
+        {
+          "artistId": 453466412,
+          "artistName": "Della Wu",
+          "trackId": 1085515014,
+          "trackName": "我愛他",
+          "primaryGenreName": "Mandopop"
+        },
+        {
+          "artistId": 453466412,
+          "artistName": "Della Wu",
+          "trackId": 1084617350,
+          "trackName": "身不由己",
+          "primaryGenreName": "Mandopop"
+        }
+      ]
+    },
+    {
+      "artist": "五月天",
+      "workCount": 11,
+      "fetchedAt": "2026-08-04T13:45:25.908Z",
+      "results": [
+        {
+          "artistId": 369211611,
+          "artistName": "Mayday",
+          "trackId": 1158763996,
+          "trackName": "後來的我們",
+          "primaryGenreName": "Mandopop"
+        },
+        {
+          "artistId": 369211611,
+          "artistName": "Mayday",
+          "trackId": 1081309211,
+          "trackName": "我不願讓你一個人",
+          "primaryGenreName": "Mandopop"
+        },
+        {
+          "artistId": 369211611,
+          "artistName": "Mayday",
+          "trackId": 183919743,
+          "trackName": "倔強",
+          "primaryGenreName": "Chinese Rock"
+        },
+        {
+          "artistId": 369211611,
+          "artistName": "Mayday",
+          "trackId": 1081381266,
+          "trackName": "突然好想你",
+          "primaryGenreName": "Mandopop"
+        },
+        {
+          "artistId": 104129527,
+          "artistName": "S.H.E",
+          "trackId": 456173962,
+          "trackName": "May Day",
+          "primaryGenreName": "Mandopop"
+        }
+      ]
+    },
+    {
+      "artist": "五月天Mayday",
+      "workCount": 5,
+      "fetchedAt": "2026-08-04T13:49:20.003Z",
+      "results": [
+        {
+          "artistId": 104129527,
+          "artistName": "S.H.E",
+          "trackId": 456173962,
+          "trackName": "May Day",
+          "primaryGenreName": "Mandopop"
+        },
+        {
+          "artistId": 1973668,
+          "artistName": "Three Days Grace",
+          "trackId": 1811868495,
+          "trackName": "Mayday",
+          "primaryGenreName": "Rock"
+        },
+        {
+          "artistId": 395664545,
+          "artistName": "TheFatRat & Laura Brehm",
+          "trackId": 1888246434,
+          "trackName": "MAYDAY",
+          "primaryGenreName": "Dance"
+        },
+        {
+          "artistId": 958641367,
+          "artistName": "Crush",
+          "trackId": 1513111218,
+          "trackName": "Mayday (feat. JOY)",
+          "primaryGenreName": "R&B/Soul"
+        },
+        {
+          "artistId": 1065470220,
+          "artistName": "VICTON",
+          "trackId": 1516451236,
+          "trackName": "Mayday",
+          "primaryGenreName": "K-Pop"
+        }
+      ]
+    },
+    {
+      "artist": "天月-あまつき-",
+      "workCount": 5,
+      "fetchedAt": "2026-08-04T13:49:20.211Z",
+      "results": [
+        {
+          "artistId": 919347368,
+          "artistName": "AMATSUKI",
+          "trackId": 1397288181,
+          "trackName": "Kaishin no Ichigeki",
+          "primaryGenreName": "J-Pop"
+        },
+        {
+          "artistId": 919347368,
+          "artistName": "AMATSUKI",
+          "trackId": 1557633875,
+          "trackName": "無責任せんせーしょん",
+          "primaryGenreName": "J-Pop"
+        },
+        {
+          "artistId": 919347368,
+          "artistName": "AMATSUKI",
+          "trackId": 1557628826,
+          "trackName": "花鳥諷詠",
+          "primaryGenreName": "J-Pop"
+        },
+        {
+          "artistId": 919347368,
+          "artistName": "AMATSUKI",
+          "trackId": 1447072339,
+          "trackName": "Koini Oborete",
+          "primaryGenreName": "J-Pop"
+        },
+        {
+          "artistId": 919347368,
+          "artistName": "AMATSUKI",
+          "trackId": 1531971609,
+          "trackName": "Life Is Beautiful (feat. nqrse)",
+          "primaryGenreName": "J-Pop"
+        }
+      ]
+    },
+    {
+      "artist": "手嶌葵",
+      "workCount": 6,
+      "fetchedAt": "2026-08-04T13:48:21.452Z",
+      "results": [
+        {
+          "artistId": 210783561,
+          "artistName": "Aoi Teshima",
+          "trackId": 1678898357,
+          "trackName": "Mori No Chiisana Restaurant",
+          "primaryGenreName": "J-Pop"
+        },
+        {
+          "artistId": 210783561,
+          "artistName": "Aoi Teshima",
+          "trackId": 1445399908,
+          "trackName": "C'est si bon",
+          "primaryGenreName": "J-Pop"
+        },
+        {
+          "artistId": 210783561,
+          "artistName": "Aoi Teshima",
+          "trackId": 883507142,
+          "trackName": "Therru's Song – Movie Version in a Cappella",
+          "primaryGenreName": "Original Score"
+        },
+        {
+          "artistId": 210783561,
+          "artistName": "Aoi Teshima",
+          "trackId": 1549505636,
+          "trackName": "Tadaima",
+          "primaryGenreName": "J-Pop"
+        },
+        {
+          "artistId": 210783561,
+          "artistName": "Aoi Teshima",
+          "trackId": 1474563460,
+          "trackName": "La Vie en Rose",
+          "primaryGenreName": "J-Pop"
+        }
+      ]
+    },
+    {
+      "artist": "王力宏",
+      "workCount": 6,
+      "fetchedAt": "2026-08-04T13:48:21.549Z",
+      "results": [
+        {
+          "artistId": 117741179,
+          "artistName": "Wang Leehom",
+          "trackId": 1134344911,
+          "trackName": "Wrong Love",
+          "primaryGenreName": "Mandopop"
+        },
+        {
+          "artistId": 117741179,
+          "artistName": "Wang Leehom",
+          "trackId": 1528146380,
+          "trackName": "All The Things You Never Knew",
+          "primaryGenreName": "Pop"
+        },
+        {
+          "artistId": 117741179,
+          "artistName": "Wang Leehom",
+          "trackId": 1134353955,
+          "trackName": "Big City Small Love",
+          "primaryGenreName": "Mandopop"
+        },
+        {
+          "artistId": 117741179,
+          "artistName": "Wang Leehom",
+          "trackId": 1691044822,
+          "trackName": "Our Song",
+          "primaryGenreName": "Mandopop"
+        },
+        {
+          "artistId": 117741179,
+          "artistName": "Wang Leehom",
+          "trackId": 1134353952,
+          "trackName": "Kiss Goodbye",
+          "primaryGenreName": "Mandopop"
+        }
+      ]
+    },
+    {
+      "artist": "王心凌",
+      "workCount": 11,
+      "fetchedAt": "2026-08-04T13:45:25.707Z",
+      "results": [
+        {
+          "artistId": 347815083,
+          "artistName": "Cyndi Wang",
+          "trackId": 1705380966,
+          "trackName": "The Big Sleep",
+          "primaryGenreName": "Mandopop"
+        },
+        {
+          "artistId": 347815083,
+          "artistName": "Cyndi Wang",
+          "trackId": 1708557590,
+          "trackName": "愛你",
+          "primaryGenreName": "Mandopop"
+        },
+        {
+          "artistId": 347815083,
+          "artistName": "Cyndi Wang",
+          "trackId": 1708558463,
+          "trackName": "第一次愛的人",
+          "primaryGenreName": "Mandopop"
+        },
+        {
+          "artistId": 347815083,
+          "artistName": "Cyndi Wang",
+          "trackId": 1708557400,
+          "trackName": "彩虹的微笑",
+          "primaryGenreName": "Mandopop"
+        },
+        {
+          "artistId": 347815083,
+          "artistName": "Cyndi Wang",
+          "trackId": 1708557614,
+          "trackName": "我會好好的",
+          "primaryGenreName": "Mandopop"
+        }
+      ]
+    },
+    {
+      "artist": "王菲",
+      "workCount": 8,
+      "fetchedAt": "2026-08-04T13:46:24.408Z",
+      "results": [
+        {
+          "artistId": 41760704,
+          "artistName": "Faye Wong",
+          "trackId": 1791923800,
+          "trackName": "世界贈予我的",
+          "primaryGenreName": "Mandopop"
+        },
+        {
+          "artistId": 41760704,
+          "artistName": "Faye Wong",
+          "trackId": 1591180619,
+          "trackName": "如愿",
+          "primaryGenreName": "Soundtrack"
+        },
+        {
+          "artistId": 41760704,
+          "artistName": "Faye Wong",
+          "trackId": 965771855,
+          "trackName": "紅豆",
+          "primaryGenreName": "Mandopop"
+        },
+        {
+          "artistId": 41760704,
+          "artistName": "Faye Wong",
+          "trackId": 6764870467,
+          "trackName": "主角",
+          "primaryGenreName": "Mandopop"
+        },
+        {
+          "artistId": 41760704,
+          "artistName": "Faye Wong",
+          "trackId": 1443889780,
+          "trackName": "執迷不悔",
+          "primaryGenreName": "Mandopop"
+        }
+      ]
+    },
+    {
+      "artist": "田馥甄",
+      "workCount": 10,
+      "fetchedAt": "2026-08-04T13:46:24.284Z",
+      "results": [
+        {
+          "artistId": 417691809,
+          "artistName": "Hebe Tien",
+          "trackId": 780523277,
+          "trackName": "You Better Not Think About Me",
+          "primaryGenreName": "Mandopop"
+        },
+        {
+          "artistId": 417691809,
+          "artistName": "Hebe Tien",
+          "trackId": 1019650261,
+          "trackName": "A Little Happiness",
+          "primaryGenreName": "Mandopop"
+        },
+        {
+          "artistId": 417691809,
+          "artistName": "Hebe Tien",
+          "trackId": 1534005710,
+          "trackName": "無人知曉",
+          "primaryGenreName": "Mandopop"
+        },
+        {
+          "artistId": 417691809,
+          "artistName": "Hebe Tien",
+          "trackId": 462724475,
+          "trackName": "Angel Devil",
+          "primaryGenreName": "Mandopop"
+        },
+        {
+          "artistId": 417691809,
+          "artistName": "Hebe Tien",
+          "trackId": 780523284,
+          "trackName": "Forever Love",
+          "primaryGenreName": "Mandopop"
+        }
+      ]
+    },
+    {
+      "artist": "好樂團",
+      "workCount": 6,
+      "fetchedAt": "2026-08-04T13:48:21.543Z",
+      "results": [
+        {
+          "artistId": 1163014602,
+          "artistName": "GoodBand",
+          "trackId": 1802208397,
+          "trackName": "他們說我是沒有用的年輕人",
+          "primaryGenreName": "Rock"
+        },
+        {
+          "artistId": 1163014602,
+          "artistName": "GoodBand",
+          "trackId": 1812700797,
+          "trackName": "The Useless Young Man (Live in Zepp New Taipei 2023)",
+          "primaryGenreName": "Alternative"
+        },
+        {
+          "artistId": 1163014602,
+          "artistName": "GoodBand",
+          "trackId": 1800747053,
+          "trackName": "我把我的青春給你",
+          "primaryGenreName": "Mandopop"
+        },
+        {
+          "artistId": 1163014602,
+          "artistName": "GoodBand",
+          "trackId": 1800790445,
+          "trackName": "All We Have is Pity",
+          "primaryGenreName": "Pop"
+        },
+        {
+          "artistId": 1163014602,
+          "artistName": "GoodBand",
+          "trackId": 1802208399,
+          "trackName": "遊蕩的人 (feat. 李玖哲)",
+          "primaryGenreName": "Rock"
+        }
+      ]
+    },
+    {
+      "artist": "汐Seki",
+      "workCount": 9,
+      "fetchedAt": "2026-08-04T13:46:24.370Z",
+      "results": [
+        {
+          "artistId": 263016240,
+          "artistName": "Snotkop",
+          "trackId": 1620129101,
+          "trackName": "Tsek!",
+          "primaryGenreName": "Afrikaans"
+        },
+        {
+          "artistId": 1421275405,
+          "artistName": "Q-Mark & TpZee",
+          "trackId": 1587669154,
+          "trackName": "Africa Rise (feat. Tseki M)",
+          "primaryGenreName": "Dance"
+        },
+        {
+          "artistId": 1684896780,
+          "artistName": "Seki",
+          "trackId": 1775896740,
+          "trackName": "Summer Dream",
+          "primaryGenreName": "Mandopop"
+        },
+        {
+          "artistId": 1684896780,
+          "artistName": "Seki",
+          "trackId": 1686878979,
+          "trackName": "信號",
+          "primaryGenreName": "Mandopop"
+        },
+        {
+          "artistId": 1684896780,
+          "artistName": "Seki",
+          "trackId": 1816121680,
+          "trackName": "Take the Lead",
+          "primaryGenreName": "Mandopop"
+        }
+      ]
+    },
+    {
+      "artist": "江蕙",
+      "workCount": 5,
+      "fetchedAt": "2026-08-04T13:49:19.977Z",
+      "results": [
+        {
+          "artistId": 395158183,
+          "artistName": "Jody Chiang",
+          "trackId": 905215581,
+          "trackName": "傷心酒店",
+          "primaryGenreName": "Tai-Pop"
+        },
+        {
+          "artistId": 395158183,
+          "artistName": "Jody Chiang",
+          "trackId": 1689528098,
+          "trackName": "家後",
+          "primaryGenreName": "Taiwanese Folk"
+        },
+        {
+          "artistId": 395158183,
+          "artistName": "Jody Chiang",
+          "trackId": 908194987,
+          "trackName": "酒後的心聲",
+          "primaryGenreName": "Tai-Pop"
+        },
+        {
+          "artistId": 395158183,
+          "artistName": "Jody Chiang",
+          "trackId": 905206337,
+          "trackName": "秋雨彼一暝 (合唱:伍思凱)",
+          "primaryGenreName": "Tai-Pop"
+        },
+        {
+          "artistId": 395158183,
+          "artistName": "Jody Chiang",
+          "trackId": 1620985598,
+          "trackName": "落雨聲 (Live)",
+          "primaryGenreName": "Chinese"
+        }
+      ]
+    },
+    {
+      "artist": "米津玄師",
+      "workCount": 17,
+      "fetchedAt": "2026-08-04T13:44:26.902Z",
+      "results": [
+        {
+          "artistId": 530814268,
+          "artistName": "Kenshi Yonezu",
+          "trackId": 1837658529,
+          "trackName": "IRIS OUT",
+          "primaryGenreName": "J-Pop"
+        },
+        {
+          "artistId": 530814268,
+          "artistName": "Kenshi Yonezu",
+          "trackId": 1538275659,
+          "trackName": "Loser",
+          "primaryGenreName": "J-Pop"
+        },
+        {
+          "artistId": 547853144,
+          "artistName": "DAOKO×米津玄師",
+          "trackId": 1263790415,
+          "trackName": "Uchiagehanabi",
+          "primaryGenreName": "J-Pop"
+        },
+        {
+          "artistId": 530814268,
+          "artistName": "Kenshi Yonezu",
+          "trackId": 1648272180,
+          "trackName": "KICK BACK",
+          "primaryGenreName": "J-Pop"
+        },
+        {
+          "artistId": 530814268,
+          "artistName": "Kenshi Yonezu & Hikaru Utada",
+          "trackId": 1840081736,
+          "trackName": "JANE DOE",
+          "primaryGenreName": "J-Pop"
+        }
+      ]
+    },
+    {
+      "artist": "初音ミク",
+      "workCount": 16,
+      "fetchedAt": "2026-08-04T13:44:26.899Z",
+      "results": [
+        {
+          "artistId": 1596685450,
+          "artistName": "Rusino",
+          "trackId": 1856790861,
+          "trackName": "Looping the Rooms (feat. HATSUNE MIKU)",
+          "primaryGenreName": "Anime"
+        },
+        {
+          "artistId": 1742770143,
+          "artistName": "2pointO, Multiply & Hatsune Miku",
+          "trackId": 6795281761,
+          "trackName": "NO MORE TIME",
+          "primaryGenreName": "Pop"
+        },
+        {
+          "artistId": 1742770143,
+          "artistName": "2pointO, Multiply & Hatsune Miku",
+          "trackId": 6795281762,
+          "trackName": "ALL NIGHT EVERY NIGHT",
+          "primaryGenreName": "Pop"
+        },
+        {
+          "artistId": 1742770143,
+          "artistName": "2pointO, Multiply & Hatsune Miku",
+          "trackId": 6795281763,
+          "trackName": "Static Between Us",
+          "primaryGenreName": "Pop"
+        },
+        {
+          "artistId": 1742770143,
+          "artistName": "2pointO, Multiply & Hatsune Miku",
+          "trackId": 6795281765,
+          "trackName": "GHOSTS",
+          "primaryGenreName": "Pop"
+        }
+      ]
+    },
+    {
+      "artist": "告五人",
+      "workCount": 8,
+      "fetchedAt": "2026-08-04T13:46:24.351Z",
+      "results": [
+        {
+          "artistId": 1284151651,
+          "artistName": "Accusefive",
+          "trackId": 1546062805,
+          "trackName": "愛人錯過",
+          "primaryGenreName": "Mandopop"
+        },
+        {
+          "artistId": 1284151651,
+          "artistName": "Accusefive",
+          "trackId": 1492688176,
+          "trackName": "帶我去找夜生活",
+          "primaryGenreName": "Mandopop"
+        },
+        {
+          "artistId": 1284151651,
+          "artistName": "Accusefive",
+          "trackId": 1544722556,
+          "trackName": "唯一 (三立/台視戲劇《戀愛是科學》插曲)",
+          "primaryGenreName": "Mandopop"
+        },
+        {
+          "artistId": 1284151651,
+          "artistName": "Accusefive",
+          "trackId": 1599730941,
+          "trackName": "好不容易 (《華燈初上》片尾曲)",
+          "primaryGenreName": "Mandopop"
+        },
+        {
+          "artistId": 1284151651,
+          "artistName": "Accusefive",
+          "trackId": 1670343372,
+          "trackName": "我想要佔據你",
+          "primaryGenreName": "Mandopop"
+        }
+      ]
+    },
+    {
+      "artist": "李榮浩",
+      "workCount": 9,
+      "fetchedAt": "2026-08-04T13:46:24.373Z",
+      "results": [
+        {
+          "artistId": 307674970,
+          "artistName": "Li Ronghao",
+          "trackId": 1752810781,
+          "trackName": "Lovers",
+          "primaryGenreName": "Mandopop"
+        },
+        {
+          "artistId": 307674970,
+          "artistName": "Li Ronghao",
+          "trackId": 1072339996,
+          "trackName": "Can't Bear It (Ending Credit Theme Song of ''You Are My Sunshine'')",
+          "primaryGenreName": "Mandopop"
+        },
+        {
+          "artistId": 307674970,
+          "artistName": "Li Ronghao",
+          "trackId": 1411387590,
+          "trackName": "If I Were Young",
+          "primaryGenreName": "Mandopop"
+        },
+        {
+          "artistId": 307674970,
+          "artistName": "Li Ronghao",
+          "trackId": 1655821629,
+          "trackName": "The Dark Plum Sauce",
+          "primaryGenreName": "Mandopop"
+        },
+        {
+          "artistId": 307674970,
+          "artistName": "Li Ronghao",
+          "trackId": 1743353792,
+          "trackName": "Li Bai",
+          "primaryGenreName": "Mandopop"
+        }
+      ]
+    },
+    {
+      "artist": "那英",
+      "workCount": 8,
+      "fetchedAt": "2026-08-04T13:47:22.825Z",
+      "results": [
+        {
+          "artistId": 15930315,
+          "artistName": "Na Ying",
+          "trackId": 1482650144,
+          "trackName": "Just Like A Dream",
+          "primaryGenreName": "Mandopop"
+        },
+        {
+          "artistId": 15930315,
+          "artistName": "Na Ying",
+          "trackId": 548229194,
+          "trackName": "The Day Doesn't Know the Night",
+          "primaryGenreName": "Mandopop"
+        },
+        {
+          "artistId": 15930315,
+          "artistName": "Na Ying",
+          "trackId": 1751194697,
+          "trackName": "mo (live)",
+          "primaryGenreName": "Mandopop"
+        },
+        {
+          "artistId": 15930315,
+          "artistName": "Na Ying",
+          "trackId": 993867602,
+          "trackName": "Conquer (Remastered)",
+          "primaryGenreName": "Mandopop"
+        },
+        {
+          "artistId": 15930315,
+          "artistName": "Na Ying & 孙楠",
+          "trackId": 1877034760,
+          "trackName": "只要有你 (Live)",
+          "primaryGenreName": "Mandopop"
+        }
+      ]
+    },
+    {
+      "artist": "周杰倫",
+      "workCount": 16,
+      "fetchedAt": "2026-08-04T13:44:26.843Z",
+      "results": [
+        {
+          "artistId": 300117743,
+          "artistName": "Jay Chou",
+          "trackId": 1721450037,
+          "trackName": "Qi-Li-Xiang",
+          "primaryGenreName": "Mandopop"
+        },
+        {
+          "artistId": 300117743,
+          "artistName": "Jay Chou",
+          "trackId": 1721464906,
+          "trackName": "Sunny Day",
+          "primaryGenreName": "Mandopop"
+        },
+        {
+          "artistId": 300117743,
+          "artistName": "Jay Chou",
+          "trackId": 1721467261,
+          "trackName": "紅塵客棧",
+          "primaryGenreName": "Mandopop"
+        },
+        {
+          "artistId": 300117743,
+          "artistName": "Jay Chou",
+          "trackId": 1721450038,
+          "trackName": "Excuse",
+          "primaryGenreName": "Mandopop"
+        },
+        {
+          "artistId": 300117743,
+          "artistName": "Jay Chou",
+          "trackId": 1721459213,
+          "trackName": "Adorable Lady",
+          "primaryGenreName": "Mandopop"
+        }
+      ]
+    },
+    {
+      "artist": "周杰倫 (Jay Chou)",
+      "workCount": 51,
+      "fetchedAt": "2026-08-04T13:44:26.889Z",
+      "results": [
+        {
+          "artistId": 300117743,
+          "artistName": "Jay Chou",
+          "trackId": 1721454108,
+          "trackName": "Nocturne",
+          "primaryGenreName": "Mandopop"
+        },
+        {
+          "artistId": 300117743,
+          "artistName": "Jay Chou",
+          "trackId": 1721464906,
+          "trackName": "Sunny Day",
+          "primaryGenreName": "Mandopop"
+        },
+        {
+          "artistId": 300117743,
+          "artistName": "Jay Chou",
+          "trackId": 1721455873,
+          "trackName": "Blue and White Porcelain",
+          "primaryGenreName": "Mandopop"
+        },
+        {
+          "artistId": 300117743,
+          "artistName": "Jay Chou",
+          "trackId": 1721453506,
+          "trackName": "Spark (feat. Kobe Bryant)",
+          "primaryGenreName": "Mandopop"
+        },
+        {
+          "artistId": 300117743,
+          "artistName": "Jay Chou",
+          "trackId": 1721897352,
+          "trackName": "Spark (feat. Kobe Bryant)",
+          "primaryGenreName": "Mandopop"
+        }
+      ]
+    },
+    {
+      "artist": "周興哲",
+      "workCount": 6,
+      "fetchedAt": "2026-08-04T13:48:21.533Z",
+      "results": [
+        {
+          "artistId": 903273139,
+          "artistName": "Eric Chou",
+          "trackId": 1321295662,
+          "trackName": "The Chaos After You",
+          "primaryGenreName": "Mandopop"
+        },
+        {
+          "artistId": 903273139,
+          "artistName": "Eric Chou",
+          "trackId": 1687085293,
+          "trackName": "Best Friend",
+          "primaryGenreName": "Mandopop"
+        },
+        {
+          "artistId": 903273139,
+          "artistName": "Eric Chou",
+          "trackId": 1321295664,
+          "trackName": "Unbreakable Love",
+          "primaryGenreName": "Mandopop"
+        },
+        {
+          "artistId": 903273139,
+          "artistName": "Eric Chou",
+          "trackId": 1448253831,
+          "trackName": "What's Wrong",
+          "primaryGenreName": "Mandopop"
+        },
+        {
+          "artistId": 903273139,
+          "artistName": "Eric Chou",
+          "trackId": 1492970602,
+          "trackName": "I'm Happy",
+          "primaryGenreName": "Mandopop"
+        }
+      ]
+    },
+    {
+      "artist": "林俊傑",
+      "workCount": 12,
+      "fetchedAt": "2026-08-04T13:45:25.464Z",
+      "results": [
+        {
+          "artistId": 216635866,
+          "artistName": "JJ Lin",
+          "trackId": 1071753628,
+          "trackName": "江南",
+          "primaryGenreName": "Mandopop"
+        },
+        {
+          "artistId": 216635866,
+          "artistName": "JJ Lin",
+          "trackId": 1788007696,
+          "trackName": "If Only",
+          "primaryGenreName": "Mandopop"
+        },
+        {
+          "artistId": 216635866,
+          "artistName": "JJ Lin",
+          "trackId": 1071506929,
+          "trackName": "她說",
+          "primaryGenreName": "Mandopop"
+        },
+        {
+          "artistId": 216635866,
+          "artistName": "JJ Lin",
+          "trackId": 1871400637,
+          "trackName": "Twilight",
+          "primaryGenreName": "Mandopop"
+        },
+        {
+          "artistId": 216635866,
+          "artistName": "JJ Lin",
+          "trackId": 1073049130,
+          "trackName": "一千年以後",
+          "primaryGenreName": "Mandopop"
+        }
+      ]
+    },
+    {
+      "artist": "林宥嘉",
+      "workCount": 7,
+      "fetchedAt": "2026-08-04T13:47:22.867Z",
+      "results": [
+        {
+          "artistId": 436847316,
+          "artistName": "Yoga Lin",
+          "trackId": 436835926,
+          "trackName": "想自由",
+          "primaryGenreName": "Mandopop"
+        },
+        {
+          "artistId": 436847316,
+          "artistName": "Yoga Lin",
+          "trackId": 464207307,
+          "trackName": "Fairy Tale",
+          "primaryGenreName": "Mandopop"
+        },
+        {
+          "artistId": 436847316,
+          "artistName": "Yoga Lin",
+          "trackId": 464264019,
+          "trackName": "Cruel Moonlight",
+          "primaryGenreName": "Mandopop"
+        },
+        {
+          "artistId": 436847316,
+          "artistName": "Yoga Lin",
+          "trackId": 1407107890,
+          "trackName": "成全 (Live)",
+          "primaryGenreName": "Mandopop"
+        },
+        {
+          "artistId": 436847316,
+          "artistName": "Yoga Lin",
+          "trackId": 600210281,
+          "trackName": "Fairy Tale",
+          "primaryGenreName": "Jazz"
+        }
+      ]
+    },
+    {
+      "artist": "林宥嘉 (Yoga Lin)",
+      "workCount": 10,
+      "fetchedAt": "2026-08-04T13:46:24.273Z",
+      "results": [
+        {
+          "artistId": 436847316,
+          "artistName": "Yoga Lin",
+          "trackId": 436835926,
+          "trackName": "想自由",
+          "primaryGenreName": "Mandopop"
+        },
+        {
+          "artistId": 436847316,
+          "artistName": "Yoga Lin",
+          "trackId": 540614337,
+          "trackName": "Unrequited",
+          "primaryGenreName": "Pop"
+        },
+        {
+          "artistId": 436847316,
+          "artistName": "Yoga Lin",
+          "trackId": 540614500,
+          "trackName": "Fool",
+          "primaryGenreName": "Pop"
+        },
+        {
+          "artistId": 436847316,
+          "artistName": "Yoga Lin",
+          "trackId": 464207307,
+          "trackName": "Fairy Tale",
+          "primaryGenreName": "Mandopop"
+        },
+        {
+          "artistId": 436847316,
+          "artistName": "Yoga Lin",
+          "trackId": 1125343367,
+          "trackName": "Spoiled Innocence",
+          "primaryGenreName": "Mandopop"
+        }
+      ]
+    },
+    {
+      "artist": "奏音69",
+      "workCount": 25,
+      "fetchedAt": "2026-08-04T13:44:26.839Z",
+      "results": [
+        {
+          "artistId": 821322902,
+          "artistName": "Kanon69",
+          "trackId": 1493615580,
+          "trackName": "Queen of Hearts",
+          "primaryGenreName": "J-Pop"
+        },
+        {
+          "artistId": 821322902,
+          "artistName": "Kanon69",
+          "trackId": 1510485387,
+          "trackName": "Necro No Hanayome",
+          "primaryGenreName": "J-Pop"
+        },
+        {
+          "artistId": 1489441861,
+          "artistName": "Royal Scandal",
+          "trackId": 1799654274,
+          "trackName": "Cherry Hunt (feat. KANON69)",
+          "primaryGenreName": "J-Pop"
+        },
+        {
+          "artistId": 821322902,
+          "artistName": "Kanon69",
+          "trackId": 1703703348,
+          "trackName": "Tensai",
+          "primaryGenreName": "J-Pop"
+        },
+        {
+          "artistId": 821322902,
+          "artistName": "Kanon69",
+          "trackId": 958003269,
+          "trackName": "Queen of Hearts (feat. Megurine Luka)",
+          "primaryGenreName": "Rock"
+        }
+      ]
+    },
+    {
+      "artist": "星野源",
+      "workCount": 5,
+      "fetchedAt": "2026-08-04T13:50:18.626Z",
+      "results": [
+        {
+          "artistId": 269598403,
+          "artistName": "Gen Hoshino",
+          "trackId": 1156375396,
+          "trackName": "Koi",
+          "primaryGenreName": "J-Pop"
+        },
+        {
+          "artistId": 269598403,
+          "artistName": "Gen Hoshino",
+          "trackId": 1617909669,
+          "trackName": "Comedy",
+          "primaryGenreName": "Alternative"
+        },
+        {
+          "artistId": 269598403,
+          "artistName": "Gen Hoshino",
+          "trackId": 1564408393,
+          "trackName": "FUSHIGI",
+          "primaryGenreName": "Alternative"
+        },
+        {
+          "artistId": 269598403,
+          "artistName": "Gen Hoshino",
+          "trackId": 1003258781,
+          "trackName": "SUN",
+          "primaryGenreName": "J-Pop"
+        },
+        {
+          "artistId": 269598403,
+          "artistName": "Gen Hoshino",
+          "trackId": 1444990823,
+          "trackName": "Pop Virus",
+          "primaryGenreName": "J-Pop"
+        }
+      ]
+    },
+    {
+      "artist": "星街すいせい",
+      "workCount": 8,
+      "fetchedAt": "2026-08-04T13:47:22.823Z",
+      "results": [
+        {
+          "artistId": 1503670948,
+          "artistName": "Hoshimachi Suisei",
+          "trackId": 1585332603,
+          "trackName": "Next Color Planet (Still Still Stellar ver.)",
+          "primaryGenreName": "J-Pop"
+        },
+        {
+          "artistId": 1503670948,
+          "artistName": "Hoshimachi Suisei",
+          "trackId": 1585332602,
+          "trackName": "Stellar Stellar",
+          "primaryGenreName": "J-Pop"
+        },
+        {
+          "artistId": 1503670948,
+          "artistName": "Hoshimachi Suisei",
+          "trackId": 1585332605,
+          "trackName": "Ghost (Still Still Stellar ver.)",
+          "primaryGenreName": "J-Pop"
+        },
+        {
+          "artistId": 1503670948,
+          "artistName": "Hoshimachi Suisei",
+          "trackId": 1562662497,
+          "trackName": "GHOST",
+          "primaryGenreName": "Alternative"
+        },
+        {
+          "artistId": 1503670948,
+          "artistName": "Hoshimachi Suisei",
+          "trackId": 1523284507,
+          "trackName": "NEXT COLOR PLANET",
+          "primaryGenreName": "J-Pop"
+        }
+      ]
+    },
+    {
+      "artist": "洪佩瑜",
+      "workCount": 7,
+      "fetchedAt": "2026-08-04T13:47:22.878Z",
+      "results": [
+        {
+          "artistId": 437273420,
+          "artistName": "Pei-Yu Hung",
+          "trackId": 437273419,
+          "trackName": "踮起腳尖愛",
+          "primaryGenreName": "Mandopop"
+        },
+        {
+          "artistId": 437273420,
+          "artistName": "Pei-Yu Hung",
+          "trackId": 1647124263,
+          "trackName": "Silver Lining",
+          "primaryGenreName": "Mandopop"
+        },
+        {
+          "artistId": 1602373766,
+          "artistName": "Wang OK & Pei-Yu Hung",
+          "trackId": 1743355810,
+          "trackName": "I‘m a Little Fish",
+          "primaryGenreName": "Mandopop"
+        },
+        {
+          "artistId": 437273420,
+          "artistName": "Pei-Yu Hung",
+          "trackId": 1647124728,
+          "trackName": "Unconventional Mornings",
+          "primaryGenreName": "Mandopop"
+        },
+        {
+          "artistId": 437273420,
+          "artistName": "Pei-Yu Hung",
+          "trackId": 1647124273,
+          "trackName": "Fly to the Moon",
+          "primaryGenreName": "Mandopop"
+        }
+      ]
+    },
+    {
+      "artist": "美波",
+      "workCount": 7,
+      "fetchedAt": "2026-08-04T13:47:23.004Z",
+      "results": [
+        {
+          "artistId": 1449555775,
+          "artistName": "Minami",
+          "trackId": 1725802551,
+          "trackName": "Kawakiwoameku",
+          "primaryGenreName": "J-Pop"
+        },
+        {
+          "artistId": 1449555775,
+          "artistName": "Minami",
+          "trackId": 1518803625,
+          "trackName": "Ame Wo Matsu",
+          "primaryGenreName": "J-Pop"
+        },
+        {
+          "artistId": 1551768752,
+          "artistName": "MAISONdes",
+          "trackId": 1648665627,
+          "trackName": "aiue (feat. Minami & SAKURAmoti)",
+          "primaryGenreName": "Alternative"
+        },
+        {
+          "artistId": 1449555775,
+          "artistName": "Minami",
+          "trackId": 1725802555,
+          "trackName": "Lilac",
+          "primaryGenreName": "J-Pop"
+        },
+        {
+          "artistId": 1449555775,
+          "artistName": "Minami",
+          "trackId": 1725802561,
+          "trackName": "Hollowness",
+          "primaryGenreName": "J-Pop"
+        }
+      ]
+    },
+    {
+      "artist": "郁可唯",
+      "workCount": 5,
+      "fetchedAt": "2026-08-04T13:50:18.659Z",
+      "results": [
+        {
+          "artistId": 369227516,
+          "artistName": "Yisa Yu",
+          "trackId": 1631476431,
+          "trackName": "时间煮雨 (电影《小时代》主题宣传曲)",
+          "primaryGenreName": "Mandopop"
+        },
+        {
+          "artistId": 369227516,
+          "artistName": "Yisa Yu",
+          "trackId": 1461744055,
+          "trackName": "Walking by the world",
+          "primaryGenreName": "Mandopop"
+        },
+        {
+          "artistId": 369227516,
+          "artistName": "Yisa Yu",
+          "trackId": 1884873983,
+          "trackName": "Pure as I Am (Emotional Theme Song from the TV Series ''Pursuit of Jade'')",
+          "primaryGenreName": "Soundtrack"
+        },
+        {
+          "artistId": 369227516,
+          "artistName": "Yisa Yu",
+          "trackId": 1676379003,
+          "trackName": "水中花 (Live)",
+          "primaryGenreName": "Mandopop"
+        },
+        {
+          "artistId": 369227516,
+          "artistName": "Yisa Yu",
+          "trackId": 543433662,
+          "trackName": "指望",
+          "primaryGenreName": "Mandopop"
+        }
+      ]
+    },
+    {
+      "artist": "韋禮安",
+      "workCount": 10,
+      "fetchedAt": "2026-08-04T13:46:24.267Z",
+      "results": [
+        {
+          "artistId": 441921723,
+          "artistName": "WeiBird",
+          "trackId": 1592498330,
+          "trackName": "Red Scarf (\"Till We Meet Again\" Movie Theme Song)",
+          "primaryGenreName": "Mandopop"
+        },
+        {
+          "artistId": 441921723,
+          "artistName": "WeiBird",
+          "trackId": 547180357,
+          "trackName": "Still",
+          "primaryGenreName": "Mandopop"
+        },
+        {
+          "artistId": 441921723,
+          "artistName": "WeiBird",
+          "trackId": 998283600,
+          "trackName": "Girl",
+          "primaryGenreName": "Mandopop"
+        },
+        {
+          "artistId": 441921723,
+          "artistName": "WeiBird",
+          "trackId": 1034701011,
+          "trackName": "別說沒愛過",
+          "primaryGenreName": "Mandopop"
+        },
+        {
+          "artistId": 441921723,
+          "artistName": "WeiBird",
+          "trackId": 535064648,
+          "trackName": "Have or Have Not",
+          "primaryGenreName": "Mandopop"
+        }
+      ]
+    },
+    {
+      "artist": "夏代孝明",
+      "workCount": 8,
+      "fetchedAt": "2026-08-04T13:47:22.864Z",
+      "results": [
+        {
+          "artistId": 774888708,
+          "artistName": "夏代孝明",
+          "trackId": 1237496740,
+          "trackName": "トランジット",
+          "primaryGenreName": "Anime"
+        },
+        {
+          "artistId": 774888708,
+          "artistName": "Takaaki Natsushiro",
+          "trackId": 1409493516,
+          "trackName": "Endroll",
+          "primaryGenreName": "J-Pop"
+        },
+        {
+          "artistId": 774888708,
+          "artistName": "夏代孝明",
+          "trackId": 1199319886,
+          "trackName": "ケイデンス",
+          "primaryGenreName": "Anime"
+        },
+        {
+          "artistId": 774888708,
+          "artistName": "Takaaki Natsushiro",
+          "trackId": 1439060437,
+          "trackName": "Juggernaut",
+          "primaryGenreName": "J-Pop"
+        },
+        {
+          "artistId": 774888708,
+          "artistName": "Takaaki Natsushiro",
+          "trackId": 1439060439,
+          "trackName": "Near",
+          "primaryGenreName": "J-Pop"
+        }
+      ]
+    },
+    {
+      "artist": "孫盛希",
+      "workCount": 8,
+      "fetchedAt": "2026-08-04T13:47:22.851Z",
+      "results": [
+        {
+          "artistId": 878542994,
+          "artistName": "Shi Shi",
+          "trackId": 1888092031,
+          "trackName": "Falling in Love",
+          "primaryGenreName": "Pop"
+        },
+        {
+          "artistId": 878542994,
+          "artistName": "Shi Shi",
+          "trackId": 1480194896,
+          "trackName": "Someday or One day",
+          "primaryGenreName": "Mandopop"
+        },
+        {
+          "artistId": 878542994,
+          "artistName": "Shi Shi",
+          "trackId": 1660515063,
+          "trackName": "Remembered (電影《想見你》主題曲)",
+          "primaryGenreName": "Mandopop"
+        },
+        {
+          "artistId": 878542994,
+          "artistName": "Shi Shi",
+          "trackId": 948121015,
+          "trackName": "少一點天份",
+          "primaryGenreName": "TV Soundtrack"
+        },
+        {
+          "artistId": 878542994,
+          "artistName": "Shi Shi",
+          "trackId": 1440113115,
+          "trackName": "Tensions (feat. ØZI)",
+          "primaryGenreName": "Mandopop"
+        }
+      ]
+    },
+    {
+      "artist": "孫燕姿",
+      "workCount": 14,
+      "fetchedAt": "2026-08-04T13:45:25.386Z",
+      "results": [
+        {
+          "artistId": 83405200,
+          "artistName": "Yanzi Sun",
+          "trackId": 905226305,
+          "trackName": "我懷念的",
+          "primaryGenreName": "Mandopop"
+        },
+        {
+          "artistId": 83405200,
+          "artistName": "Yanzi Sun",
+          "trackId": 255921025,
+          "trackName": "我不難過",
+          "primaryGenreName": "Mandopop"
+        },
+        {
+          "artistId": 83405200,
+          "artistName": "Yanzi Sun",
+          "trackId": 280911996,
+          "trackName": "遇見",
+          "primaryGenreName": "Mandopop"
+        },
+        {
+          "artistId": 83405200,
+          "artistName": "Yanzi Sun",
+          "trackId": 280911990,
+          "trackName": "開始懂了",
+          "primaryGenreName": "Mandopop"
+        },
+        {
+          "artistId": 83405200,
+          "artistName": "Yanzi Sun",
+          "trackId": 905226302,
+          "trackName": "逆光",
+          "primaryGenreName": "Mandopop"
+        }
+      ]
+    },
+    {
+      "artist": "徐佳瑩",
+      "workCount": 16,
+      "fetchedAt": "2026-08-04T13:44:26.921Z",
+      "results": [
+        {
+          "artistId": 387317532,
+          "artistName": "Lala Hsu",
+          "trackId": 1326770827,
+          "trackName": "The Prayer",
+          "primaryGenreName": "Mandopop"
+        },
+        {
+          "artistId": 387317532,
+          "artistName": "Lala Hsu",
+          "trackId": 672648894,
+          "trackName": "Down in Sandbar",
+          "primaryGenreName": "Mandopop"
+        },
+        {
+          "artistId": 387317532,
+          "artistName": "Lala Hsu",
+          "trackId": 672648897,
+          "trackName": "The Same Moonlight",
+          "primaryGenreName": "Mandopop"
+        },
+        {
+          "artistId": 387317532,
+          "artistName": "Lala Hsu",
+          "trackId": 672648896,
+          "trackName": "Riding a White Horse",
+          "primaryGenreName": "Mandopop"
+        },
+        {
+          "artistId": 387317532,
+          "artistName": "Lala Hsu",
+          "trackId": 1098553462,
+          "trackName": "突然好想你",
+          "primaryGenreName": "Mandopop"
+        }
+      ]
+    },
+    {
+      "artist": "朔Sakuro",
+      "workCount": 6,
+      "fetchedAt": "2026-08-04T13:48:21.579Z",
+      "results": [
+        {
+          "artistId": 1607681484,
+          "artistName": "SSKuro",
+          "trackId": 1677634657,
+          "trackName": "Serotonina",
+          "primaryGenreName": "Hip-Hop"
+        },
+        {
+          "artistId": 1607681484,
+          "artistName": "SSKuro",
+          "trackId": 1692833311,
+          "trackName": "Uber",
+          "primaryGenreName": "R&B/Soul"
+        },
+        {
+          "artistId": 1607681484,
+          "artistName": "SSKuro",
+          "trackId": 1713359902,
+          "trackName": "Garota Eu Te Amei",
+          "primaryGenreName": "Hip-Hop"
+        },
+        {
+          "artistId": 1769568345,
+          "artistName": "Sakuro",
+          "trackId": 1771394468,
+          "trackName": "Sangria",
+          "primaryGenreName": "Mandopop"
+        },
+        {
+          "artistId": 1769568345,
+          "artistName": "Sakuro",
+          "trackId": 1852657911,
+          "trackName": "陪你",
+          "primaryGenreName": "Mandopop"
+        }
+      ]
+    },
+    {
+      "artist": "浠Mizuki",
+      "workCount": 17,
+      "fetchedAt": "2026-08-04T13:44:26.940Z",
+      "results": [
+        {
+          "artistId": 1612560922,
+          "artistName": "Mizuki",
+          "trackId": 1852457427,
+          "trackName": "浠望",
+          "primaryGenreName": "Rock"
+        },
+        {
+          "artistId": 1612560922,
+          "artistName": "Mizuki",
+          "trackId": 1679265890,
+          "trackName": "Day by Day",
+          "primaryGenreName": "Pop"
+        },
+        {
+          "artistId": 1612560922,
+          "artistName": "Mizuki",
+          "trackId": 1725761940,
+          "trackName": "Forbidden Love",
+          "primaryGenreName": "Pop"
+        },
+        {
+          "artistId": 1612560922,
+          "artistName": "Mizuki",
+          "trackId": 1744336591,
+          "trackName": "Sakura Reverberation",
+          "primaryGenreName": "J-Pop"
+        },
+        {
+          "artistId": 1612560922,
+          "artistName": "Mizuki",
+          "trackId": 1612604452,
+          "trackName": "Michimitou Arusuhairu",
+          "primaryGenreName": "J-Pop"
+        }
+      ]
+    },
+    {
+      "artist": "張惠妹",
+      "workCount": 27,
+      "fetchedAt": "2026-08-04T13:44:26.946Z",
+      "results": [
+        {
+          "artistId": 422255649,
+          "artistName": "aMEI",
+          "trackId": 1834199249,
+          "trackName": "連名帶姓",
+          "primaryGenreName": "Mandopop"
+        },
+        {
+          "artistId": 422255649,
+          "artistName": "aMEI",
+          "trackId": 201549866,
+          "trackName": "人質",
+          "primaryGenreName": "Mandopop"
+        },
+        {
+          "artistId": 422255649,
+          "artistName": "aMEI",
+          "trackId": 1834199186,
+          "trackName": "如果你也聽說",
+          "primaryGenreName": "Mandopop"
+        },
+        {
+          "artistId": 422255649,
+          "artistName": "aMEI",
+          "trackId": 1854813611,
+          "trackName": "Chen Zao",
+          "primaryGenreName": "Mandopop"
+        },
+        {
+          "artistId": 422255649,
+          "artistName": "aMEI",
+          "trackId": 1854824118,
+          "trackName": "Ting Hai",
+          "primaryGenreName": "Mandopop"
+        }
+      ]
+    },
+    {
+      "artist": "張韶涵",
+      "workCount": 10,
+      "fetchedAt": "2026-08-04T13:46:24.254Z",
+      "results": [
+        {
+          "artistId": 535400872,
+          "artistName": "Angela Chang",
+          "trackId": 535770131,
+          "trackName": "歐若拉",
+          "primaryGenreName": "Mandopop"
+        },
+        {
+          "artistId": 535400872,
+          "artistName": "Angela Chang",
+          "trackId": 535402066,
+          "trackName": "親愛的那不是愛情",
+          "primaryGenreName": "Mandopop"
+        },
+        {
+          "artistId": 535400872,
+          "artistName": "Angela Chang",
+          "trackId": 535741167,
+          "trackName": "隱形的翅膀",
+          "primaryGenreName": "Mandopop"
+        },
+        {
+          "artistId": 287299102,
+          "artistName": "Christine Fan",
+          "trackId": 535747439,
+          "trackName": "如果的事 (feat. 張韶涵)",
+          "primaryGenreName": "Mandopop"
+        },
+        {
+          "artistId": 535400872,
+          "artistName": "Angela Chang",
+          "trackId": 536111075,
+          "trackName": "遺失的美好",
+          "primaryGenreName": "Mandopop"
+        }
+      ]
+    },
+    {
+      "artist": "張學友",
+      "workCount": 5,
+      "fetchedAt": "2026-08-04T13:50:18.638Z",
+      "results": [
+        {
+          "artistId": 256718696,
+          "artistName": "Jacky Cheung",
+          "trackId": 1440912487,
+          "trackName": "一千個傷心的理由",
+          "primaryGenreName": "Mandopop"
+        },
+        {
+          "artistId": 256718696,
+          "artistName": "Jacky Cheung",
+          "trackId": 1506176356,
+          "trackName": "愛如潮水 (Live)",
+          "primaryGenreName": "Mandopop"
+        },
+        {
+          "artistId": 256718696,
+          "artistName": "Jacky Cheung",
+          "trackId": 1444065615,
+          "trackName": "慢慢",
+          "primaryGenreName": "Mandopop"
+        },
+        {
+          "artistId": 256718696,
+          "artistName": "Jacky Cheung",
+          "trackId": 1440912735,
+          "trackName": "每天愛你多一些",
+          "primaryGenreName": "Mandopop"
+        },
+        {
+          "artistId": 41756376,
+          "artistName": "Karen Tong & Jacky Cheung",
+          "trackId": 1443841325,
+          "trackName": "相思風雨中",
+          "primaryGenreName": "Cantopop/HK-Pop"
+        }
+      ]
+    },
+    {
+      "artist": "張懸",
+      "workCount": 6,
+      "fetchedAt": "2026-08-04T13:48:21.556Z",
+      "results": [
+        {
+          "artistId": 300117902,
+          "artistName": "Deserts Chang",
+          "trackId": 547978564,
+          "trackName": "玫瑰色的你 (Rose-Colored)",
+          "primaryGenreName": "Mandopop"
+        },
+        {
+          "artistId": 300117902,
+          "artistName": "Deserts Chang",
+          "trackId": 317557860,
+          "trackName": "關於我愛你",
+          "primaryGenreName": "Mandopop"
+        },
+        {
+          "artistId": 300117902,
+          "artistName": "Deserts Chang",
+          "trackId": 547978774,
+          "trackName": "艷火 (Pyrojewel)",
+          "primaryGenreName": "Mandopop"
+        },
+        {
+          "artistId": 300117902,
+          "artistName": "Deserts Chang",
+          "trackId": 300117920,
+          "trackName": "寶貝 (In a Day)",
+          "primaryGenreName": "Mandopop"
+        },
+        {
+          "artistId": 300117902,
+          "artistName": "Deserts Chang",
+          "trackId": 300117918,
+          "trackName": "無狀態",
+          "primaryGenreName": "Mandopop"
+        }
+      ]
+    },
+    {
+      "artist": "梁靜茹",
+      "workCount": 14,
+      "fetchedAt": "2026-08-04T13:45:25.373Z",
+      "results": [
+        {
+          "artistId": 531134701,
+          "artistName": "Fish Leong",
+          "trackId": 1095630246,
+          "trackName": "情歌",
+          "primaryGenreName": "Mandopop"
+        },
+        {
+          "artistId": 531134701,
+          "artistName": "Fish Leong",
+          "trackId": 1097016179,
+          "trackName": "會呼吸的痛",
+          "primaryGenreName": "Mandopop"
+        },
+        {
+          "artistId": 531134701,
+          "artistName": "Fish Leong",
+          "trackId": 1692291089,
+          "trackName": "勇氣",
+          "primaryGenreName": "Mandopop"
+        },
+        {
+          "artistId": 531134701,
+          "artistName": "Fish Leong",
+          "trackId": 1095630152,
+          "trackName": "没有如果",
+          "primaryGenreName": "Mandopop"
+        },
+        {
+          "artistId": 531134701,
+          "artistName": "Fish Leong",
+          "trackId": 1097016175,
+          "trackName": "崇拜",
+          "primaryGenreName": "Mandopop"
+        }
+      ]
+    },
+    {
+      "artist": "梅とら",
+      "workCount": 6,
+      "fetchedAt": "2026-08-04T13:49:19.975Z",
+      "results": [
+        {
+          "artistId": 660141875,
+          "artistName": "Umetora",
+          "trackId": 976473617,
+          "trackName": "Ifuudoudou (feat. Kradness)",
+          "primaryGenreName": "Anime"
+        },
+        {
+          "artistId": 660141875,
+          "artistName": "Umetora",
+          "trackId": 989128088,
+          "trackName": "Ifuudoudou",
+          "primaryGenreName": "Anime"
+        },
+        {
+          "artistId": 660141875,
+          "artistName": "Umetora",
+          "trackId": 980934992,
+          "trackName": "Ifuudoudou (feat. Shoose)",
+          "primaryGenreName": "Anime"
+        },
+        {
+          "artistId": 512448222,
+          "artistName": "UMETORA",
+          "trackId": 512448227,
+          "trackName": "isshinhuran (feat. 巡音ルカ, 初音ミク & メグッポイド)",
+          "primaryGenreName": "J-Pop"
+        },
+        {
+          "artistId": 660141875,
+          "artistName": "Umetora",
+          "trackId": 979829956,
+          "trackName": "Ifuudoudou",
+          "primaryGenreName": "Anime"
+        }
+      ]
+    },
+    {
+      "artist": "莫文蔚",
+      "workCount": 5,
+      "fetchedAt": "2026-08-04T13:50:18.563Z",
+      "results": [
+        {
+          "artistId": 162585630,
+          "artistName": "Karen Mok",
+          "trackId": 1722205331,
+          "trackName": "忽然之間",
+          "primaryGenreName": "Mandopop"
+        },
+        {
+          "artistId": 162585630,
+          "artistName": "Karen Mok",
+          "trackId": 300117761,
+          "trackName": "如果沒有你",
+          "primaryGenreName": "Mandopop"
+        },
+        {
+          "artistId": 162585630,
+          "artistName": "Karen Mok",
+          "trackId": 1865459415,
+          "trackName": "这世界那么多人 (电影《我要我们在一起》主题曲)",
+          "primaryGenreName": "Soundtrack"
+        },
+        {
+          "artistId": 162585630,
+          "artistName": "Karen Mok",
+          "trackId": 1075792176,
+          "trackName": "陰天",
+          "primaryGenreName": "Mandopop"
+        },
+        {
+          "artistId": 162585630,
+          "artistName": "Karen Mok",
+          "trackId": 1075792543,
+          "trackName": "電台情歌",
+          "primaryGenreName": "Mandopop"
+        }
+      ]
+    },
+    {
+      "artist": "蛋堡",
+      "workCount": 5,
+      "fetchedAt": "2026-08-04T13:50:18.621Z",
+      "results": [
+        {
+          "artistId": 403689551,
+          "artistName": "Soft Lipa",
+          "trackId": 1069242165,
+          "trackName": "I Want You",
+          "primaryGenreName": "Chinese Hip-Hop"
+        },
+        {
+          "artistId": 403689551,
+          "artistName": "Soft Lipa",
+          "trackId": 1178538990,
+          "trackName": "Lotion",
+          "primaryGenreName": "Chinese Hip-Hop"
+        },
+        {
+          "artistId": 403689551,
+          "artistName": "Soft Lipa",
+          "trackId": 1069242168,
+          "trackName": "過程",
+          "primaryGenreName": "Chinese Hip-Hop"
+        },
+        {
+          "artistId": 403689551,
+          "artistName": "Soft Lipa",
+          "trackId": 677031526,
+          "trackName": "Biking",
+          "primaryGenreName": "Chinese Hip-Hop"
+        },
+        {
+          "artistId": 403689551,
+          "artistName": "Soft Lipa",
+          "trackId": 1172720497,
+          "trackName": "The Sorrows of Young Werther",
+          "primaryGenreName": "Chinese Hip-Hop"
+        }
+      ]
+    },
+    {
+      "artist": "陳奕迅",
+      "workCount": 12,
+      "fetchedAt": "2026-08-04T13:45:25.470Z",
+      "results": [
+        {
+          "artistId": 137938148,
+          "artistName": "Eason Chan",
+          "trackId": 1443346107,
+          "trackName": "富士山下",
+          "primaryGenreName": "Cantopop/HK-Pop"
+        },
+        {
+          "artistId": 137938148,
+          "artistName": "Eason Chan",
+          "trackId": 1442913348,
+          "trackName": "最佳損友",
+          "primaryGenreName": "Cantopop/HK-Pop"
+        },
+        {
+          "artistId": 137938148,
+          "artistName": "Eason Chan",
+          "trackId": 542922095,
+          "trackName": "十年",
+          "primaryGenreName": "Mandopop"
+        },
+        {
+          "artistId": 137938148,
+          "artistName": "Eason Chan",
+          "trackId": 1596938779,
+          "trackName": "孤勇者 (《英雄聯盟:雙城之戰》動畫劇集中文主題曲)",
+          "primaryGenreName": "Mandopop"
+        },
+        {
+          "artistId": 137938148,
+          "artistName": "Eason Chan",
+          "trackId": 667921993,
+          "trackName": "K歌之王 (國)",
+          "primaryGenreName": "Mandopop"
+        }
+      ]
+    },
+    {
+      "artist": "陶喆",
+      "workCount": 6,
+      "fetchedAt": "2026-08-04T13:49:19.953Z",
+      "results": [
+        {
+          "artistId": 16789930,
+          "artistName": "David Tao",
+          "trackId": 905206660,
+          "trackName": "愛我還是他",
+          "primaryGenreName": "Mandopop"
+        },
+        {
+          "artistId": 16789930,
+          "artistName": "David Tao",
+          "trackId": 1416149929,
+          "trackName": "Airport in 10:30",
+          "primaryGenreName": "Mandopop"
+        },
+        {
+          "artistId": 16789930,
+          "artistName": "David Tao",
+          "trackId": 905206479,
+          "trackName": "普通朋友",
+          "primaryGenreName": "Mandopop"
+        },
+        {
+          "artistId": 16789930,
+          "artistName": "David Tao",
+          "trackId": 914664940,
+          "trackName": "Melody",
+          "primaryGenreName": "Mandopop"
+        },
+        {
+          "artistId": 16789930,
+          "artistName": "David Tao",
+          "trackId": 914664938,
+          "trackName": "蝴蝶",
+          "primaryGenreName": "Mandopop"
+        }
+      ]
+    },
+    {
+      "artist": "傘村トータ",
+      "workCount": 7,
+      "fetchedAt": "2026-08-04T13:47:22.829Z",
+      "results": [
+        {
+          "artistId": 1445379338,
+          "artistName": "Tota Kasamura",
+          "trackId": 1445394921,
+          "trackName": "White",
+          "primaryGenreName": "Anime"
+        },
+        {
+          "artistId": 1445379338,
+          "artistName": "Tota Kasamura",
+          "trackId": 1513784093,
+          "trackName": "Dareka No Hero Ni Naritakatta",
+          "primaryGenreName": "Anime"
+        },
+        {
+          "artistId": 1445379338,
+          "artistName": "Tota Kasamura",
+          "trackId": 1445394972,
+          "trackName": "Boku Ga Yume Wo Sute Te Otona Ni Naru Made",
+          "primaryGenreName": "Anime"
+        },
+        {
+          "artistId": 1445379338,
+          "artistName": "Tota Kasamura",
+          "trackId": 1509285150,
+          "trackName": "Seiten Wo Ugatsu",
+          "primaryGenreName": "J-Pop"
+        },
+        {
+          "artistId": 1445379338,
+          "artistName": "Tota Kasamura, Hatsune Miku & Megurine Luka",
+          "trackId": 1719081183,
+          "trackName": "Fly With You",
+          "primaryGenreName": "J-Pop"
+        }
+      ]
+    },
+    {
+      "artist": "單依純",
+      "workCount": 10,
+      "fetchedAt": "2026-08-04T13:46:24.266Z",
+      "results": [
+        {
+          "artistId": 1546181214,
+          "artistName": "Yichun Shan",
+          "trackId": 1601955488,
+          "trackName": "永不失联的爱 (Live)",
+          "primaryGenreName": "Mandopop"
+        },
+        {
+          "artistId": 1546181214,
+          "artistName": "Yichun Shan",
+          "trackId": 1697113448,
+          "trackName": "想你时风起 (电视剧《我的人间烟火》回忆主题曲)",
+          "primaryGenreName": "Soundtrack"
+        },
+        {
+          "artistId": 657686835,
+          "artistName": "Silence Wang & Yichun Shan",
+          "trackId": 1731761265,
+          "trackName": "If Love Forgets (live)",
+          "primaryGenreName": "Pop"
+        },
+        {
+          "artistId": 903273139,
+          "artistName": "Eric Chou & Yichun Shan",
+          "trackId": 1555702418,
+          "trackName": "When You Loved Me",
+          "primaryGenreName": "Mandopop"
+        },
+        {
+          "artistId": 1546181214,
+          "artistName": "Yichun Shan",
+          "trackId": 1864543213,
+          "trackName": "我表示理解",
+          "primaryGenreName": "Mandopop"
+        }
+      ]
+    },
+    {
+      "artist": "椎名林檎",
+      "workCount": 5,
+      "fetchedAt": "2026-08-04T13:50:18.746Z",
+      "results": [
+        {
+          "artistId": 74576999,
+          "artistName": "Sheena Ringo",
+          "trackId": 1384341683,
+          "trackName": "Marunouchi Sadistic",
+          "primaryGenreName": "J-Pop"
+        },
+        {
+          "artistId": 74576999,
+          "artistName": "Sheena Ringo",
+          "trackId": 1385325649,
+          "trackName": "A Double Suicide",
+          "primaryGenreName": "J-Pop"
+        },
+        {
+          "artistId": 1742550757,
+          "artistName": "ꉈꀧ꒒꒒ꁄꍈꍈꀧ꒦ꉈ ꉣꅔꎡꅔꁕꁄ & Sheena Ringo",
+          "trackId": 1742550758,
+          "trackName": "2045",
+          "primaryGenreName": "Alternative"
+        },
+        {
+          "artistId": 74576999,
+          "artistName": "Sheena Ringo",
+          "trackId": 1385307020,
+          "trackName": "La Salle De Bain",
+          "primaryGenreName": "J-Pop"
+        },
+        {
+          "artistId": 74576999,
+          "artistName": "Sheena Ringo",
+          "trackId": 1384351747,
+          "trackName": "Flight JL005",
+          "primaryGenreName": "J-Pop"
+        }
+      ]
+    },
+    {
+      "artist": "楊丞琳",
+      "workCount": 7,
+      "fetchedAt": "2026-08-04T13:47:22.847Z",
+      "results": [
+        {
+          "artistId": 299846702,
+          "artistName": "Rainie Yang",
+          "trackId": 347295290,
+          "trackName": "雨愛",
+          "primaryGenreName": "Mandopop"
+        },
+        {
+          "artistId": 299846702,
+          "artistName": "Rainie Yang",
+          "trackId": 312657435,
+          "trackName": "左邊",
+          "primaryGenreName": "Mandopop"
+        },
+        {
+          "artistId": 299846702,
+          "artistName": "Rainie Yang",
+          "trackId": 320615259,
+          "trackName": "帶我走",
+          "primaryGenreName": "Mandopop"
+        },
+        {
+          "artistId": 299846702,
+          "artistName": "Rainie Yang",
+          "trackId": 1834198640,
+          "trackName": "年輪說",
+          "primaryGenreName": "Mandopop"
+        },
+        {
+          "artistId": 299846702,
+          "artistName": "Rainie Yang",
+          "trackId": 312657445,
+          "trackName": "慶祝",
+          "primaryGenreName": "Mandopop"
+        }
+      ]
+    },
+    {
+      "artist": "楊宗緯",
+      "workCount": 5,
+      "fetchedAt": "2026-08-04T13:50:18.560Z",
+      "results": [
+        {
+          "artistId": 466427122,
+          "artistName": "Aska Yang",
+          "trackId": 1726104180,
+          "trackName": "Nothing Left Between Us",
+          "primaryGenreName": "Mandopop"
+        },
+        {
+          "artistId": 466427122,
+          "artistName": "Aska Yang",
+          "trackId": 1206743907,
+          "trackName": "凉凉 (with 張碧晨)",
+          "primaryGenreName": "TV Soundtrack"
+        },
+        {
+          "artistId": 466427122,
+          "artistName": "Aska Yang",
+          "trackId": 1445132452,
+          "trackName": "洋蔥",
+          "primaryGenreName": "Mandopop"
+        },
+        {
+          "artistId": 466427122,
+          "artistName": "Aska Yang, Gem & Yuzhou Wang Leto",
+          "trackId": 1753001244,
+          "trackName": "若月亮没来 (Live)",
+          "primaryGenreName": "Mandopop"
+        },
+        {
+          "artistId": 466427122,
+          "artistName": "Aska Yang",
+          "trackId": 1260513430,
+          "trackName": "Over the Hills",
+          "primaryGenreName": "Mandopop"
+        }
+      ]
+    },
+    {
+      "artist": "煌Kirali",
+      "workCount": 10,
+      "fetchedAt": "2026-08-04T13:46:24.389Z",
+      "results": [
+        {
+          "artistId": 1718898166,
+          "artistName": "Kirali",
+          "trackId": 1719594364,
+          "trackName": "Liar",
+          "primaryGenreName": "Mandopop"
+        },
+        {
+          "artistId": 1718898166,
+          "artistName": "Kirali",
+          "trackId": 1805760345,
+          "trackName": "Shine",
+          "primaryGenreName": "Mandopop"
+        },
+        {
+          "artistId": 1718898166,
+          "artistName": "Kirali",
+          "trackId": 1790774664,
+          "trackName": "Listen to me",
+          "primaryGenreName": "Mandopop"
+        },
+        {
+          "artistId": 1718898166,
+          "artistName": "Kirali",
+          "trackId": 1876752722,
+          "trackName": "ExtraOrdinary",
+          "primaryGenreName": "Mandopop"
+        },
+        {
+          "artistId": 1718898166,
+          "artistName": "Kirali",
+          "trackId": 1806044419,
+          "trackName": "Mist",
+          "primaryGenreName": "Mandopop"
+        }
+      ]
+    },
+    {
+      "artist": "煌Sir有汐",
+      "workCount": 5,
+      "fetchedAt": "2026-08-04T13:50:18.606Z",
+      "results": []
+    },
+    {
+      "artist": "趙露思",
+      "workCount": 5,
+      "fetchedAt": "2026-08-04T13:50:18.579Z",
+      "results": [
+        {
+          "artistId": 1380598428,
+          "artistName": "Rosy",
+          "trackId": 1692905927,
+          "trackName": "我有喜欢的人了(《偷偷藏不住》电视剧片尾曲)",
+          "primaryGenreName": "TV Soundtrack"
+        },
+        {
+          "artistId": 1380598428,
+          "artistName": "Rosy",
+          "trackId": 1711777174,
+          "trackName": "You Are My Light",
+          "primaryGenreName": "Mandopop"
+        },
+        {
+          "artistId": 657686835,
+          "artistName": "Silence Wang & Rosy",
+          "trackId": 1692905594,
+          "trackName": "只想把你偷偷藏好(《偷偷藏不住》电视剧主题曲/片头曲)",
+          "primaryGenreName": "TV Soundtrack"
+        },
+        {
+          "artistId": 1380598428,
+          "artistName": "Rosy",
+          "trackId": 1396407739,
+          "trackName": "好像掉進愛情海裡 (獨唱版)",
+          "primaryGenreName": "Mandopop"
+        },
+        {
+          "artistId": 657686835,
+          "artistName": "Silence Wang & Rosy",
+          "trackId": 1692888995,
+          "trackName": "只想把你偷偷藏好(《偷偷藏不住》电视剧主题曲/片头曲)",
+          "primaryGenreName": "Mandopop"
+        }
+      ]
+    },
+    {
+      "artist": "銀臨",
+      "workCount": 7,
+      "fetchedAt": "2026-08-04T13:47:22.839Z",
+      "results": [
+        {
+          "artistId": 1340827642,
+          "artistName": "Rachel",
+          "trackId": 1598068839,
+          "trackName": "流光记",
+          "primaryGenreName": "Mandopop"
+        },
+        {
+          "artistId": 1340827642,
+          "artistName": "Rachel",
+          "trackId": 1636451671,
+          "trackName": "[Interlude] Yi Nan Ping",
+          "primaryGenreName": "Pop"
+        },
+        {
+          "artistId": 1340827642,
+          "artistName": "Rachel",
+          "trackId": 1340849227,
+          "trackName": "不老夢",
+          "primaryGenreName": "Mandopop"
+        },
+        {
+          "artistId": 1340827642,
+          "artistName": "Rachel & Aki Ajie",
+          "trackId": 1691672163,
+          "trackName": "Silk Drawing Drama",
+          "primaryGenreName": "Pop"
+        },
+        {
+          "artistId": 1340827642,
+          "artistName": "Rachel & 河图",
+          "trackId": 1340849226,
+          "trackName": "是風動",
+          "primaryGenreName": "Mandopop"
+        }
+      ]
+    },
+    {
+      "artist": "蔡依林",
+      "workCount": 20,
+      "fetchedAt": "2026-08-04T13:44:26.836Z",
+      "results": [
+        {
+          "artistId": 152678183,
+          "artistName": "JOLIN",
+          "trackId": 339414579,
+          "trackName": "倒帶",
+          "primaryGenreName": "Mandopop"
+        },
+        {
+          "artistId": 152678183,
+          "artistName": "JOLIN",
+          "trackId": 320494519,
+          "trackName": "說愛你",
+          "primaryGenreName": "Mandopop"
+        },
+        {
+          "artistId": 152678183,
+          "artistName": "JOLIN",
+          "trackId": 1725226209,
+          "trackName": "Sun Will Never Set",
+          "primaryGenreName": "Mandopop"
+        },
+        {
+          "artistId": 152678183,
+          "artistName": "JOLIN",
+          "trackId": 320494551,
+          "trackName": "布拉格廣場",
+          "primaryGenreName": "Mandopop"
+        },
+        {
+          "artistId": 152678183,
+          "artistName": "JOLIN",
+          "trackId": 320494529,
+          "trackName": "看我72變",
+          "primaryGenreName": "Mandopop"
+        }
+      ]
+    },
+    {
+      "artist": "蔡健雅",
+      "workCount": 11,
+      "fetchedAt": "2026-08-04T13:45:25.484Z",
+      "results": [
+        {
+          "artistId": 387313548,
+          "artistName": "Tanya Chua",
+          "trackId": 672641999,
+          "trackName": "Red High Heels",
+          "primaryGenreName": "Mandopop"
+        },
+        {
+          "artistId": 387313548,
+          "artistName": "Tanya Chua",
+          "trackId": 672994663,
+          "trackName": "Letting Go",
+          "primaryGenreName": "Mandopop"
+        },
+        {
+          "artistId": 387313548,
+          "artistName": "Tanya Chua",
+          "trackId": 672617601,
+          "trackName": "達爾文",
+          "primaryGenreName": "Mandopop"
+        },
+        {
+          "artistId": 387313548,
+          "artistName": "Tanya Chua",
+          "trackId": 280787183,
+          "trackName": "Beautiful Love",
+          "primaryGenreName": "Mandopop"
+        },
+        {
+          "artistId": 387313548,
+          "artistName": "Tanya Chua",
+          "trackId": 672617604,
+          "trackName": "空白格",
+          "primaryGenreName": "Mandopop"
+        }
+      ]
+    },
+    {
+      "artist": "鄧紫棋",
+      "workCount": 7,
+      "fetchedAt": "2026-08-04T13:47:22.930Z",
+      "results": [
+        {
+          "artistId": 425208570,
+          "artistName": "G.E.M.",
+          "trackId": 1717034230,
+          "trackName": "Only One",
+          "primaryGenreName": "Mandopop"
+        },
+        {
+          "artistId": 425208570,
+          "artistName": "G.E.M.",
+          "trackId": 1190070744,
+          "trackName": "Light Years Away (Theme from Movie \"Passengers\")",
+          "primaryGenreName": "Soundtrack"
+        },
+        {
+          "artistId": 425208570,
+          "artistName": "G.E.M.",
+          "trackId": 1422581998,
+          "trackName": "Tik Tok",
+          "primaryGenreName": "Mandopop"
+        },
+        {
+          "artistId": 425208570,
+          "artistName": "G.E.M.",
+          "trackId": 908972123,
+          "trackName": "喜歡你",
+          "primaryGenreName": "Cantopop/HK-Pop"
+        },
+        {
+          "artistId": 425208570,
+          "artistName": "G.E.M.",
+          "trackId": 1098553466,
+          "trackName": "你不是真正的快樂",
+          "primaryGenreName": "Mandopop"
+        }
+      ]
+    },
+    {
+      "artist": "鄧麗君",
+      "workCount": 5,
+      "fetchedAt": "2026-08-04T13:50:18.653Z",
+      "results": [
+        {
+          "artistId": 137320901,
+          "artistName": "Teresa Teng",
+          "trackId": 1714141092,
+          "trackName": "月亮代表我的心",
+          "primaryGenreName": "Mandopop"
+        },
+        {
+          "artistId": 137320901,
+          "artistName": "Teresa Teng",
+          "trackId": 1417133253,
+          "trackName": "我只在乎你",
+          "primaryGenreName": "Mandopop"
+        },
+        {
+          "artistId": 137320901,
+          "artistName": "Teresa Teng",
+          "trackId": 1440660000,
+          "trackName": "小城故事",
+          "primaryGenreName": "Mandopop"
+        },
+        {
+          "artistId": 137320901,
+          "artistName": "Teresa Teng",
+          "trackId": 1417131447,
+          "trackName": "但願人長久",
+          "primaryGenreName": "Mandopop"
+        },
+        {
+          "artistId": 137320901,
+          "artistName": "Teresa Teng",
+          "trackId": 1440660164,
+          "trackName": "甜蜜蜜",
+          "primaryGenreName": "Mandopop"
+        }
+      ]
+    },
+    {
+      "artist": "澪Rei",
+      "workCount": 6,
+      "fetchedAt": "2026-08-04T13:49:19.976Z",
+      "results": [
+        {
+          "artistId": 1718898280,
+          "artistName": "Rei",
+          "trackId": 1719594575,
+          "trackName": "Sleepless",
+          "primaryGenreName": "Mandopop"
+        },
+        {
+          "artistId": 1718898280,
+          "artistName": "Rei",
+          "trackId": 1791467305,
+          "trackName": "Apricity",
+          "primaryGenreName": "Mandopop"
+        },
+        {
+          "artistId": 1718898280,
+          "artistName": "Rei",
+          "trackId": 1876751765,
+          "trackName": "Cherish 向光",
+          "primaryGenreName": "Mandopop"
+        },
+        {
+          "artistId": 1851910242,
+          "artistName": "煦Hiyori, Rei, 涅默, 熙歌, 森森鈴蘭 & 瑪格麗特 · 諾爾絲",
+          "trackId": 6790727110,
+          "trackName": "You Are My Air (KMC 5th Anniversary Vtuber Party Ver.)",
+          "primaryGenreName": "Mandopop"
+        },
+        {
+          "artistId": 1718898280,
+          "artistName": "Rei",
+          "trackId": 1876753123,
+          "trackName": "Undefined",
+          "primaryGenreName": "Mandopop"
+        }
+      ]
+    },
+    {
+      "artist": "盧廣仲",
+      "workCount": 5,
+      "fetchedAt": "2026-08-04T13:50:18.608Z",
+      "results": [
+        {
+          "artistId": 477669285,
+          "artistName": "Crowd Lu",
+          "trackId": 1839368232,
+          "trackName": "Sun & Earth",
+          "primaryGenreName": "Mandopop"
+        },
+        {
+          "artistId": 477669285,
+          "artistName": "Crowd Lu",
+          "trackId": 1528149435,
+          "trackName": "Your Name Engraved Herein (Theme Song from \"Your Name Engraved Herein\")",
+          "primaryGenreName": "Mandopop"
+        },
+        {
+          "artistId": 477669285,
+          "artistName": "Crowd Lu",
+          "trackId": 799184031,
+          "trackName": "我愛你",
+          "primaryGenreName": "Mandopop"
+        },
+        {
+          "artistId": 477669285,
+          "artistName": "Crowd Lu",
+          "trackId": 1342141668,
+          "trackName": "You Complete Me (Theme Song from \"Back to the Good Times\")",
+          "primaryGenreName": "Mandopop"
+        },
+        {
+          "artistId": 477669285,
+          "artistName": "Crowd Lu",
+          "trackId": 1238558518,
+          "trackName": "He-R",
+          "primaryGenreName": "Mandopop"
+        }
+      ]
+    },
+    {
+      "artist": "優里",
+      "workCount": 11,
+      "fetchedAt": "2026-08-04T13:45:25.484Z",
+      "results": [
+        {
+          "artistId": 1489331027,
+          "artistName": "Yuuri",
+          "trackId": 1534620183,
+          "trackName": "Dried Flower",
+          "primaryGenreName": "Rock"
+        },
+        {
+          "artistId": 1489331027,
+          "artistName": "Yuuri",
+          "trackId": 1589915077,
+          "trackName": "BETELGEUSE",
+          "primaryGenreName": "Rock"
+        },
+        {
+          "artistId": 1489331027,
+          "artistName": "Yuuri",
+          "trackId": 1754899924,
+          "trackName": "Curtain Call",
+          "primaryGenreName": "Rock"
+        },
+        {
+          "artistId": 1489331027,
+          "artistName": "Yuuri",
+          "trackId": 1658757540,
+          "trackName": "Billimillion",
+          "primaryGenreName": "Rock"
+        },
+        {
+          "artistId": 1489331027,
+          "artistName": "Yuuri",
+          "trackId": 1599543187,
+          "trackName": "Leo",
+          "primaryGenreName": "Rock"
+        }
+      ]
+    },
+    {
+      "artist": "薛之謙",
+      "workCount": 5,
+      "fetchedAt": "2026-08-04T13:50:18.658Z",
+      "results": [
+        {
+          "artistId": 160809474,
+          "artistName": "Joker Xue",
+          "trackId": 1787929825,
+          "trackName": "演员",
+          "primaryGenreName": "Mandopop"
+        },
+        {
+          "artistId": 160809474,
+          "artistName": "Joker Xue",
+          "trackId": 1788255151,
+          "trackName": "你还要我怎样",
+          "primaryGenreName": "Mandopop"
+        },
+        {
+          "artistId": 160809474,
+          "artistName": "Joker Xue",
+          "trackId": 1787447448,
+          "trackName": "天外来物",
+          "primaryGenreName": "Mandopop"
+        },
+        {
+          "artistId": 160809474,
+          "artistName": "Joker Xue",
+          "trackId": 1787929908,
+          "trackName": "我好像在哪见过你",
+          "primaryGenreName": "Mandopop"
+        },
+        {
+          "artistId": 160809474,
+          "artistName": "Joker Xue",
+          "trackId": 1788255157,
+          "trackName": "方圆几里",
+          "primaryGenreName": "Mandopop"
+        }
+      ]
+    },
+    {
+      "artist": "魏如萱",
+      "workCount": 15,
+      "fetchedAt": "2026-08-04T13:44:27.008Z",
+      "results": [
+        {
+          "artistId": 426913195,
+          "artistName": "Waa Wei",
+          "trackId": 1171898023,
+          "trackName": "你啊你啊",
+          "primaryGenreName": "Mandopop"
+        },
+        {
+          "artistId": 426913195,
+          "artistName": "Waa Wei",
+          "trackId": 1714396297,
+          "trackName": "na mo miss you",
+          "primaryGenreName": "Mandopop"
+        },
+        {
+          "artistId": 426913195,
+          "artistName": "Waa Wei",
+          "trackId": 1494000763,
+          "trackName": "香格里拉",
+          "primaryGenreName": "Mandopop"
+        },
+        {
+          "artistId": 426913195,
+          "artistName": "Waa Wei",
+          "trackId": 1568844079,
+          "trackName": "Have A Nice Day",
+          "primaryGenreName": "Mandopop"
+        },
+        {
+          "artistId": 426913195,
+          "artistName": "Waa Wei",
+          "trackId": 1487931532,
+          "trackName": "Heaven",
+          "primaryGenreName": "Mandopop"
+        }
+      ]
+    },
+    {
+      "artist": "蘇打綠",
+      "workCount": 8,
+      "fetchedAt": "2026-08-04T13:47:22.854Z",
+      "results": [
+        {
+          "artistId": 345954909,
+          "artistName": "sodagreen",
+          "trackId": 1461046348,
+          "trackName": "小情歌",
+          "primaryGenreName": "Mandopop"
+        },
+        {
+          "artistId": 345954909,
+          "artistName": "sodagreen",
+          "trackId": 1480717221,
+          "trackName": "我好想你",
+          "primaryGenreName": "Mandopop"
+        },
+        {
+          "artistId": 345954909,
+          "artistName": "sodagreen",
+          "trackId": 1462002612,
+          "trackName": "無與倫比的美麗",
+          "primaryGenreName": "Mandopop"
+        },
+        {
+          "artistId": 345954909,
+          "artistName": "sodagreen",
+          "trackId": 1461041607,
+          "trackName": "當我們一起走過",
+          "primaryGenreName": "Mandopop"
+        },
+        {
+          "artistId": 345954909,
+          "artistName": "sodagreen",
+          "trackId": 1461735098,
+          "trackName": "他夏了夏天",
+          "primaryGenreName": "Mandopop"
+        }
+      ]
+    },
+    {
+      "artist": "A-Lin",
+      "workCount": 15,
+      "fetchedAt": "2026-08-04T13:45:25.381Z",
+      "results": [
+        {
+          "artistId": 370412270,
+          "artistName": "A-Lin",
+          "trackId": 1438207200,
+          "trackName": "A Kind of Sorrow (The Movie Theme Song of \"More Than Blue\")",
+          "primaryGenreName": "Mandopop"
+        },
+        {
+          "artistId": 370412270,
+          "artistName": "A-Lin",
+          "trackId": 1166987712,
+          "trackName": "天若有情 (電視劇《錦繡未央》主題曲)",
+          "primaryGenreName": "Mandopop"
+        },
+        {
+          "artistId": 370412270,
+          "artistName": "A-Lin",
+          "trackId": 802902494,
+          "trackName": "失戀無罪",
+          "primaryGenreName": "Mandopop"
+        },
+        {
+          "artistId": 370412270,
+          "artistName": "A-Lin",
+          "trackId": 1616484709,
+          "trackName": "Best Friend",
+          "primaryGenreName": "Mandopop"
+        },
+        {
+          "artistId": 370412270,
+          "artistName": "A-Lin",
+          "trackId": 797355639,
+          "trackName": "幸福了 然後呢",
+          "primaryGenreName": "Mandopop"
+        }
+      ]
+    },
+    {
+      "artist": "ABBA",
+      "workCount": 6,
+      "fetchedAt": "2026-08-04T13:49:19.988Z",
+      "results": [
+        {
+          "artistId": 372976,
+          "artistName": "ABBA",
+          "trackId": 1422648513,
+          "trackName": "Dancing Queen",
+          "primaryGenreName": "Pop"
+        },
+        {
+          "artistId": 372976,
+          "artistName": "ABBA",
+          "trackId": 1422648970,
+          "trackName": "Gimme! Gimme! Gimme! (A Man After Midnight)",
+          "primaryGenreName": "Pop"
+        },
+        {
+          "artistId": 372976,
+          "artistName": "ABBA",
+          "trackId": 1422648520,
+          "trackName": "Take a Chance On Me",
+          "primaryGenreName": "Pop"
+        },
+        {
+          "artistId": 372976,
+          "artistName": "ABBA",
+          "trackId": 1422648844,
+          "trackName": "The Winner Takes It All",
+          "primaryGenreName": "Pop"
+        },
+        {
+          "artistId": 372976,
+          "artistName": "ABBA",
+          "trackId": 1422648821,
+          "trackName": "Mamma Mia",
+          "primaryGenreName": "Pop"
+        }
+      ]
+    },
+    {
+      "artist": "Adele",
+      "workCount": 7,
+      "fetchedAt": "2026-08-04T13:47:23.045Z",
+      "results": [
+        {
+          "artistId": 262836961,
+          "artistName": "Adele",
+          "trackId": 1544491998,
+          "trackName": "Someone Like You",
+          "primaryGenreName": "Pop"
+        },
+        {
+          "artistId": 262836961,
+          "artistName": "Adele",
+          "trackId": 1544491988,
+          "trackName": "Set Fire to the Rain",
+          "primaryGenreName": "Pop"
+        },
+        {
+          "artistId": 262836961,
+          "artistName": "Adele",
+          "trackId": 1544491233,
+          "trackName": "Rolling in the Deep",
+          "primaryGenreName": "Pop"
+        },
+        {
+          "artistId": 262836961,
+          "artistName": "Adele",
+          "trackId": 1590036021,
+          "trackName": "Easy On Me",
+          "primaryGenreName": "Pop"
+        },
+        {
+          "artistId": 262836961,
+          "artistName": "Adele",
+          "trackId": 1544494392,
+          "trackName": "Hello",
+          "primaryGenreName": "Pop"
+        }
+      ]
+    },
+    {
+      "artist": "Ado",
+      "workCount": 19,
+      "fetchedAt": "2026-08-04T13:44:26.853Z",
+      "results": [
+        {
+          "artistId": 1492604670,
+          "artistName": "Ado",
+          "trackId": 1535123742,
+          "trackName": "Usseewa",
+          "primaryGenreName": "J-Pop"
+        },
+        {
+          "artistId": 1492604670,
+          "artistName": "Ado",
+          "trackId": 1718531998,
+          "trackName": "Aishite Aishite Aishite",
+          "primaryGenreName": "J-Pop"
+        },
+        {
+          "artistId": 1492604670,
+          "artistName": "Ado",
+          "trackId": 1704093812,
+          "trackName": "Show",
+          "primaryGenreName": "J-Pop"
+        },
+        {
+          "artistId": 1492604670,
+          "artistName": "Ado",
+          "trackId": 1562772211,
+          "trackName": "Odo",
+          "primaryGenreName": "J-Pop"
+        },
+        {
+          "artistId": 1492604670,
+          "artistName": "Ado",
+          "trackId": 1718531999,
+          "trackName": "Crime And Punishment",
+          "primaryGenreName": "J-Pop"
+        }
+      ]
+    },
+    {
+      "artist": "Aimer",
+      "workCount": 16,
+      "fetchedAt": "2026-08-04T13:44:26.934Z",
+      "results": [
+        {
+          "artistId": 569972619,
+          "artistName": "Aimer",
+          "trackId": 1594814706,
+          "trackName": "Zankyosanka",
+          "primaryGenreName": "J-Pop"
+        },
+        {
+          "artistId": 569972619,
+          "artistName": "Aimer",
+          "trackId": 1538259004,
+          "trackName": "Kataomoi",
+          "primaryGenreName": "J-Pop"
+        },
+        {
+          "artistId": 569972619,
+          "artistName": "Aimer",
+          "trackId": 1536130473,
+          "trackName": "Last Stardust",
+          "primaryGenreName": "J-Pop"
+        },
+        {
+          "artistId": 26486099,
+          "artistName": "Damien Sargue & Joy Esther",
+          "trackId": 345891690,
+          "trackName": "Aimer",
+          "primaryGenreName": "French Pop"
+        },
+        {
+          "artistId": 569972619,
+          "artistName": "Aimer",
+          "trackId": 1827140072,
+          "trackName": "A World Where the Sun Never Rises",
+          "primaryGenreName": "Anime"
+        }
+      ]
+    },
+    {
+      "artist": "aMEI張惠妹",
+      "workCount": 5,
+      "fetchedAt": "2026-08-04T13:50:18.760Z",
+      "results": [
+        {
+          "artistId": 300117743,
+          "artistName": "Jay Chou",
+          "trackId": 1721456390,
+          "trackName": "Shouldn't Be (feat. a-mei)",
+          "primaryGenreName": "Mandopop"
+        },
+        {
+          "artistId": 422255649,
+          "artistName": "aMEI",
+          "trackId": 1834199249,
+          "trackName": "連名帶姓",
+          "primaryGenreName": "Mandopop"
+        },
+        {
+          "artistId": 422255649,
+          "artistName": "aMEI",
+          "trackId": 201549866,
+          "trackName": "人質",
+          "primaryGenreName": "Mandopop"
+        },
+        {
+          "artistId": 422255649,
+          "artistName": "aMEI",
+          "trackId": 1854824118,
+          "trackName": "Ting Hai",
+          "primaryGenreName": "Mandopop"
+        },
+        {
+          "artistId": 422255649,
+          "artistName": "aMEI",
+          "trackId": 1834199186,
+          "trackName": "如果你也聽說",
+          "primaryGenreName": "Mandopop"
+        }
+      ]
+    },
+    {
+      "artist": "Aqu3ra",
+      "workCount": 7,
+      "fetchedAt": "2026-08-04T13:47:22.935Z",
+      "results": [
+        {
+          "artistId": 1528308534,
+          "artistName": "Aqu3ra",
+          "trackId": 1652622034,
+          "trackName": "Lonely Universe",
+          "primaryGenreName": "Anime"
+        },
+        {
+          "artistId": 1528308534,
+          "artistName": "Aqu3ra",
+          "trackId": 1614607928,
+          "trackName": "Ice Drop",
+          "primaryGenreName": "Anime"
+        },
+        {
+          "artistId": 1094587427,
+          "artistName": "Harumakigohan, NILFRUITS, Takeaki Wada (Kurage-P), Yuri Kuriyama, Jin, Kairiki Bear, Teniwoha, CHINOZO, PinocchioP, INABAKUMORI, hifumi, Aqu3ra, Neru & Nayutan Seijin",
+          "trackId": 1589624930,
+          "trackName": "Dance Robot Dance (Arrange Medley (Chimera Version))",
+          "primaryGenreName": "Anime"
+        },
+        {
+          "artistId": 1551768752,
+          "artistName": "MAISONdes",
+          "trackId": 1579671996,
+          "trackName": "Grumpy (feat. haruno & Aqu3ra)",
+          "primaryGenreName": "J-Pop"
+        },
+        {
+          "artistId": 1528308534,
+          "artistName": "Aqu3ra & Yachiyo Runami(cv.Saori Hayami)",
+          "trackId": 1869843665,
+          "trackName": "Starry Sea",
+          "primaryGenreName": "Anime"
+        }
+      ]
+    },
+    {
+      "artist": "Ariana Grande",
+      "workCount": 19,
+      "fetchedAt": "2026-08-04T13:44:26.808Z",
+      "results": [
+        {
+          "artistId": 412778295,
+          "artistName": "Ariana Grande",
+          "trackId": 6763656725,
+          "trackName": "hate that i made you love me",
+          "primaryGenreName": "Pop"
+        },
+        {
+          "artistId": 412778295,
+          "artistName": "Ariana Grande",
+          "trackId": 6763657127,
+          "trackName": "warning signs (interlude)",
+          "primaryGenreName": "Pop"
+        },
+        {
+          "artistId": 412778295,
+          "artistName": "Ariana Grande",
+          "trackId": 6763657122,
+          "trackName": "oh well",
+          "primaryGenreName": "Pop"
+        },
+        {
+          "artistId": 412778295,
+          "artistName": "Ariana Grande",
+          "trackId": 6763656871,
+          "trackName": "kiss me",
+          "primaryGenreName": "Pop"
+        },
+        {
+          "artistId": 412778295,
+          "artistName": "Ariana Grande",
+          "trackId": 6763656880,
+          "trackName": "stay",
+          "primaryGenreName": "Pop"
+        }
+      ]
+    },
+    {
+      "artist": "Avril Lavigne",
+      "workCount": 5,
+      "fetchedAt": "2026-08-04T13:50:18.678Z",
+      "results": [
+        {
+          "artistId": 459885,
+          "artistName": "Avril Lavigne",
+          "trackId": 315025823,
+          "trackName": "Complicated",
+          "primaryGenreName": "Pop"
+        },
+        {
+          "artistId": 459885,
+          "artistName": "Avril Lavigne",
+          "trackId": 315025826,
+          "trackName": "Sk8er Boi",
+          "primaryGenreName": "Rock"
+        },
+        {
+          "artistId": 459885,
+          "artistName": "Avril Lavigne",
+          "trackId": 315025828,
+          "trackName": "I'm with You",
+          "primaryGenreName": "Pop"
+        },
+        {
+          "artistId": 459885,
+          "artistName": "Avril Lavigne",
+          "trackId": 268993517,
+          "trackName": "When You're Gone",
+          "primaryGenreName": "Pop"
+        },
+        {
+          "artistId": 459885,
+          "artistName": "Avril Lavigne",
+          "trackId": 532458095,
+          "trackName": "What the Hell",
+          "primaryGenreName": "Pop"
+        }
+      ]
+    },
+    {
+      "artist": "Ayase",
+      "workCount": 6,
+      "fetchedAt": "2026-08-04T13:49:19.961Z",
+      "results": [
+        {
+          "artistId": 1487088719,
+          "artistName": "Ayase",
+          "trackId": 1660182617,
+          "trackName": "SHOCK!",
+          "primaryGenreName": "J-Pop"
+        },
+        {
+          "artistId": 1490256993,
+          "artistName": "YOASOBI",
+          "trackId": 1544083979,
+          "trackName": "Monster",
+          "primaryGenreName": "J-Pop"
+        },
+        {
+          "artistId": 1490256993,
+          "artistName": "YOASOBI",
+          "trackId": 1490256995,
+          "trackName": "夜に駆ける",
+          "primaryGenreName": "J-Pop"
+        },
+        {
+          "artistId": 1487088719,
+          "artistName": "Ayase",
+          "trackId": 1584158554,
+          "trackName": "Yorunaderu Menou",
+          "primaryGenreName": "J-Pop"
+        },
+        {
+          "artistId": 1487088719,
+          "artistName": "Ayase & R Shitei",
+          "trackId": 1694567674,
+          "trackName": "Hiten",
+          "primaryGenreName": "J-Pop"
+        }
+      ]
+    },
+    {
+      "artist": "back number",
+      "workCount": 7,
+      "fetchedAt": "2026-08-04T13:47:22.917Z",
+      "results": [
+        {
+          "artistId": 302361237,
+          "artistName": "back number",
+          "trackId": 1451567963,
+          "trackName": "Takaneno Hanakosan",
+          "primaryGenreName": "J-Pop"
+        },
+        {
+          "artistId": 302361237,
+          "artistName": "back number",
+          "trackId": 1451566361,
+          "trackName": "Heroine",
+          "primaryGenreName": "J-Pop"
+        },
+        {
+          "artistId": 302361237,
+          "artistName": "back number",
+          "trackId": 1451567751,
+          "trackName": "Happy End",
+          "primaryGenreName": "J-Pop"
+        },
+        {
+          "artistId": 302361237,
+          "artistName": "back number",
+          "trackId": 1579439168,
+          "trackName": "Suiheisen",
+          "primaryGenreName": "J-Pop"
+        },
+        {
+          "artistId": 302361237,
+          "artistName": "back number",
+          "trackId": 1451567627,
+          "trackName": "Christmas Song",
+          "primaryGenreName": "J-Pop"
+        }
+      ]
+    },
+    {
+      "artist": "Bee Gees",
+      "workCount": 7,
+      "fetchedAt": "2026-08-04T13:48:21.455Z",
+      "results": [
+        {
+          "artistId": 31937250,
+          "artistName": "Bee Gees",
+          "trackId": 1442259185,
+          "trackName": "Stayin' Alive",
+          "primaryGenreName": "Pop"
+        },
+        {
+          "artistId": 31937250,
+          "artistName": "Bee Gees",
+          "trackId": 1445664553,
+          "trackName": "How Deep Is Your Love",
+          "primaryGenreName": "Pop"
+        },
+        {
+          "artistId": 31937250,
+          "artistName": "Bee Gees",
+          "trackId": 1442259374,
+          "trackName": "More Than A Woman",
+          "primaryGenreName": "Pop"
+        },
+        {
+          "artistId": 31937250,
+          "artistName": "Bee Gees",
+          "trackId": 1423191436,
+          "trackName": "Too Much Heaven",
+          "primaryGenreName": "Pop"
+        },
+        {
+          "artistId": 31937250,
+          "artistName": "Bee Gees",
+          "trackId": 1445664307,
+          "trackName": "Night Fever (From \"Saturday Night Fever\" Soundtrack)",
+          "primaryGenreName": "Pop"
+        }
+      ]
+    },
+    {
+      "artist": "Billie Eilish",
+      "workCount": 7,
+      "fetchedAt": "2026-08-04T13:48:21.455Z",
+      "results": [
+        {
+          "artistId": 1065981054,
+          "artistName": "Billie Eilish",
+          "trackId": 1739659144,
+          "trackName": "WILDFLOWER",
+          "primaryGenreName": "Alternative"
+        },
+        {
+          "artistId": 1065981054,
+          "artistName": "Billie Eilish",
+          "trackId": 1739659142,
+          "trackName": "BIRDS OF A FEATHER",
+          "primaryGenreName": "Alternative"
+        },
+        {
+          "artistId": 1065981054,
+          "artistName": "Billie Eilish",
+          "trackId": 1440899467,
+          "trackName": "ocean eyes",
+          "primaryGenreName": "Alternative"
+        },
+        {
+          "artistId": 1065981054,
+          "artistName": "Billie Eilish & Khalid",
+          "trackId": 1369380479,
+          "trackName": "lovely",
+          "primaryGenreName": "Pop"
+        },
+        {
+          "artistId": 1065981054,
+          "artistName": "Billie Eilish",
+          "trackId": 1450695739,
+          "trackName": "bad guy",
+          "primaryGenreName": "Alternative"
+        }
+      ]
+    },
+    {
+      "artist": "Bruno Mars",
+      "workCount": 9,
+      "fetchedAt": "2026-08-04T13:46:24.411Z",
+      "results": [
+        {
+          "artistId": 278873078,
+          "artistName": "Bruno Mars",
+          "trackId": 1866732797,
+          "trackName": "Risk It All",
+          "primaryGenreName": "Pop"
+        },
+        {
+          "artistId": 278873078,
+          "artistName": "Bruno Mars",
+          "trackId": 1866732800,
+          "trackName": "I Just Might",
+          "primaryGenreName": "Pop"
+        },
+        {
+          "artistId": 277293880,
+          "artistName": "Lady Gaga & Bruno Mars",
+          "trackId": 1762656732,
+          "trackName": "Die With A Smile",
+          "primaryGenreName": "Pop"
+        },
+        {
+          "artistId": 278873078,
+          "artistName": "Bruno Mars",
+          "trackId": 576670459,
+          "trackName": "Just the Way You Are",
+          "primaryGenreName": "Pop"
+        },
+        {
+          "artistId": 278873078,
+          "artistName": "Bruno Mars",
+          "trackId": 1161504024,
+          "trackName": "24K Magic",
+          "primaryGenreName": "Pop"
+        }
+      ]
+    },
+    {
+      "artist": "buzzG",
+      "workCount": 6,
+      "fetchedAt": "2026-08-04T13:49:19.947Z",
+      "results": [
+        {
+          "artistId": 378463407,
+          "artistName": "BuzzG",
+          "trackId": 975208239,
+          "trackName": "Shiwa",
+          "primaryGenreName": "Anime"
+        },
+        {
+          "artistId": 378463407,
+          "artistName": "BuzzG & Hatsune Miku",
+          "trackId": 1843024216,
+          "trackName": "Artifact",
+          "primaryGenreName": "Rock"
+        },
+        {
+          "artistId": 378463407,
+          "artistName": "BuzzG & Hatsune Miku",
+          "trackId": 1741494897,
+          "trackName": "the WALL",
+          "primaryGenreName": "Pop"
+        },
+        {
+          "artistId": 378463407,
+          "artistName": "BuzzG",
+          "trackId": 1501304134,
+          "trackName": "Albino [revive] [feat. Hatsune Miku]",
+          "primaryGenreName": "Rock"
+        }
+      ]
+    },
+    {
+      "artist": "CHiCO with HoneyWorks",
+      "workCount": 18,
+      "fetchedAt": "2026-08-04T13:44:26.823Z",
+      "results": [
+        {
+          "artistId": 894513894,
+          "artistName": "CHiCO with HoneyWorks",
+          "trackId": 1840348833,
+          "trackName": "Senjyo no Hana",
+          "primaryGenreName": "Anime"
+        },
+        {
+          "artistId": 894513894,
+          "artistName": "CHiCO with HoneyWorks",
+          "trackId": 1054719664,
+          "trackName": "Sekai Wa Koi Ni Ochiteiru",
+          "primaryGenreName": "Worldwide"
+        },
+        {
+          "artistId": 894513894,
+          "artistName": "CHiCO with HoneyWorks",
+          "trackId": 1580704143,
+          "trackName": "Gamushara",
+          "primaryGenreName": "Anime"
+        },
+        {
+          "artistId": 894513894,
+          "artistName": "CHiCO with HoneyWorks",
+          "trackId": 1530015304,
+          "trackName": "Kessen spirit",
+          "primaryGenreName": "Anime"
+        },
+        {
+          "artistId": 894513894,
+          "artistName": "CHiCO with HoneyWorks",
+          "trackId": 1054719993,
+          "trackName": "Pride Kakumei",
+          "primaryGenreName": "Worldwide"
+        }
+      ]
+    },
+    {
+      "artist": "DECO*27",
+      "workCount": 36,
+      "fetchedAt": "2026-08-04T13:44:26.819Z",
+      "results": [
+        {
+          "artistId": 353899348,
+          "artistName": "DECO*27",
+          "trackId": 1775600454,
+          "trackName": "Monitoring",
+          "primaryGenreName": "J-Pop"
+        },
+        {
+          "artistId": 353899348,
+          "artistName": "DECO*27",
+          "trackId": 1685142715,
+          "trackName": "Rabbit Hole",
+          "primaryGenreName": "J-Pop"
+        },
+        {
+          "artistId": 353899348,
+          "artistName": "DECO*27",
+          "trackId": 1555448592,
+          "trackName": "The Vampire",
+          "primaryGenreName": "Anime"
+        },
+        {
+          "artistId": 353899348,
+          "artistName": "DECO*27",
+          "trackId": 1794967656,
+          "trackName": "Telepathy",
+          "primaryGenreName": "J-Pop"
+        },
+        {
+          "artistId": 353899348,
+          "artistName": "DECO*27",
+          "trackId": 1602365723,
+          "trackName": "Salamander",
+          "primaryGenreName": "Anime"
+        }
+      ]
+    },
+    {
+      "artist": "DECO*27 feat. 初音ミク",
+      "workCount": 5,
+      "fetchedAt": "2026-08-04T13:50:18.612Z",
+      "results": [
+        {
+          "artistId": 307086919,
+          "artistName": "Sasakure.Uk & DECO*27",
+          "trackId": 1589931480,
+          "trackName": "39 (feat. Hatsune Miku)",
+          "primaryGenreName": "Anime"
+        },
+        {
+          "artistId": 353899348,
+          "artistName": "DECO*27",
+          "trackId": 1566319293,
+          "trackName": "Streaming Heart (feat. Hatsune Miku)",
+          "primaryGenreName": "Anime"
+        },
+        {
+          "artistId": 1596685450,
+          "artistName": "Rusino",
+          "trackId": 1856790861,
+          "trackName": "Looping the Rooms (feat. HATSUNE MIKU)",
+          "primaryGenreName": "Anime"
+        },
+        {
+          "artistId": 265024913,
+          "artistName": "Anamanaguchi & Hatsune Miku",
+          "trackId": 1651285988,
+          "trackName": "Miku",
+          "primaryGenreName": "Pop"
+        },
+        {
+          "artistId": 307078957,
+          "artistName": "Hatsune Miku & supercell",
+          "trackId": 440374091,
+          "trackName": "The World Is Mine (feat. Hatsune Miku)",
+          "primaryGenreName": "Worldwide"
+        }
+      ]
+    },
+    {
+      "artist": "doriko",
+      "workCount": 5,
+      "fetchedAt": "2026-08-04T13:50:18.735Z",
+      "results": [
+        {
+          "artistId": 327055033,
+          "artistName": "doriko",
+          "trackId": 1648263854,
+          "trackName": "ロミオとシンデレラ",
+          "primaryGenreName": "Anime"
+        },
+        {
+          "artistId": 327055033,
+          "artistName": "doriko",
+          "trackId": 1711348008,
+          "trackName": "Cat Food",
+          "primaryGenreName": "J-Pop"
+        },
+        {
+          "artistId": 327055033,
+          "artistName": "doriko",
+          "trackId": 1711347810,
+          "trackName": "Uta Ni Katachi Wa Nai Keredo",
+          "primaryGenreName": "J-Pop"
+        },
+        {
+          "artistId": 327055033,
+          "artistName": "doriko",
+          "trackId": 642832889,
+          "trackName": "Romeo and Cinderella (feat. Hatsune Miku) [Mikunopolis Live]",
+          "primaryGenreName": "Pop"
+        },
+        {
+          "artistId": 327055033,
+          "artistName": "doriko",
+          "trackId": 925582993,
+          "trackName": "Romeo and Cinderella (Miku Expo 2014 in Indonesia Live)",
+          "primaryGenreName": "Pop"
+        }
+      ]
+    },
+    {
+      "artist": "Ed Sheeran",
+      "workCount": 5,
+      "fetchedAt": "2026-08-04T13:50:18.643Z",
+      "results": [
+        {
+          "artistId": 183313439,
+          "artistName": "Ed Sheeran",
+          "trackId": 1193701400,
+          "trackName": "Perfect",
+          "primaryGenreName": "Pop"
+        },
+        {
+          "artistId": 183313439,
+          "artistName": "Ed Sheeran",
+          "trackId": 1050204631,
+          "trackName": "Thinking Out Loud",
+          "primaryGenreName": "Pop"
+        },
+        {
+          "artistId": 183313439,
+          "artistName": "Ed Sheeran",
+          "trackId": 1193701392,
+          "trackName": "Shape of You",
+          "primaryGenreName": "Pop"
+        },
+        {
+          "artistId": 183313439,
+          "artistName": "Ed Sheeran",
+          "trackId": 1581087034,
+          "trackName": "Shivers",
+          "primaryGenreName": "Pop"
+        },
+        {
+          "artistId": 183313439,
+          "artistName": "Ed Sheeran",
+          "trackId": 1050204626,
+          "trackName": "Photograph",
+          "primaryGenreName": "Pop"
+        }
+      ]
+    },
+    {
+      "artist": "F.I.R. 飛兒樂團",
+      "workCount": 5,
+      "fetchedAt": "2026-08-04T13:50:18.684Z",
+      "results": [
+        {
+          "artistId": 205561210,
+          "artistName": "F.I.R.",
+          "trackId": 205561214,
+          "trackName": "Get High",
+          "primaryGenreName": "Mandopop"
+        },
+        {
+          "artistId": 205561210,
+          "artistName": "F.I.R.",
+          "trackId": 255924045,
+          "trackName": "Lydia",
+          "primaryGenreName": "TV Soundtrack"
+        },
+        {
+          "artistId": 205561210,
+          "artistName": "F.I.R.",
+          "trackId": 255921211,
+          "trackName": "Lydia",
+          "primaryGenreName": "Mandopop"
+        },
+        {
+          "artistId": 205561210,
+          "artistName": "F.I.R.",
+          "trackId": 278677307,
+          "trackName": "月牙灣",
+          "primaryGenreName": "Mandopop"
+        },
+        {
+          "artistId": 205561210,
+          "artistName": "F.I.R.",
+          "trackId": 255921032,
+          "trackName": "無限",
+          "primaryGenreName": "Mandopop"
+        }
+      ]
+    },
+    {
+      "artist": "F.I.R.飛兒樂團",
+      "workCount": 5,
+      "fetchedAt": "2026-08-04T13:51:17.250Z",
+      "results": [
+        {
+          "artistId": 205561210,
+          "artistName": "F.I.R.",
+          "trackId": 205561214,
+          "trackName": "Get High",
+          "primaryGenreName": "Mandopop"
+        },
+        {
+          "artistId": 205561210,
+          "artistName": "F.I.R.",
+          "trackId": 255924045,
+          "trackName": "Lydia",
+          "primaryGenreName": "TV Soundtrack"
+        },
+        {
+          "artistId": 205561210,
+          "artistName": "F.I.R.",
+          "trackId": 255921211,
+          "trackName": "Lydia",
+          "primaryGenreName": "Mandopop"
+        },
+        {
+          "artistId": 205561210,
+          "artistName": "F.I.R.",
+          "trackId": 278677307,
+          "trackName": "月牙灣",
+          "primaryGenreName": "Mandopop"
+        },
+        {
+          "artistId": 205561210,
+          "artistName": "F.I.R.",
+          "trackId": 255921032,
+          "trackName": "無限",
+          "primaryGenreName": "Mandopop"
+        }
+      ]
+    },
+    {
+      "artist": "halyosy",
+      "workCount": 5,
+      "fetchedAt": "2026-08-04T13:51:17.225Z",
+      "results": [
+        {
+          "artistId": 395156256,
+          "artistName": "halyosy",
+          "trackId": 1633940134,
+          "trackName": "Blessing (feat. Hatsune Miku, 鏡音リン, 鏡音レン, Megurine Luka, KAITO & MEIKO)",
+          "primaryGenreName": "Anime"
+        },
+        {
+          "artistId": 395156256,
+          "artistName": "halyosy",
+          "trackId": 1720077026,
+          "trackName": "Snowman (Rerec)",
+          "primaryGenreName": "J-Pop"
+        },
+        {
+          "artistId": 395156256,
+          "artistName": "halyosy feat.Vocalists(halyosy・りぶ・そらる・ろん・KK・れをる・しゃけみー・弟の姉)",
+          "trackId": 945340537,
+          "trackName": "Connecting (feat. Ribu, Soraru, Ron, KK, Reoru, Shakemi & Ototo no Ane)",
+          "primaryGenreName": "J-Pop"
+        },
+        {
+          "artistId": 395156256,
+          "artistName": "halyosy",
+          "trackId": 1767977981,
+          "trackName": "Fire◎flower (Rerec)",
+          "primaryGenreName": "J-Pop"
+        },
+        {
+          "artistId": 395156256,
+          "artistName": "halyosy",
+          "trackId": 1720109178,
+          "trackName": "I'm Mine",
+          "primaryGenreName": "J-Pop"
+        }
+      ]
+    },
+    {
+      "artist": "HoneyWorks",
+      "workCount": 48,
+      "fetchedAt": "2026-08-04T13:44:26.850Z",
+      "results": [
+        {
+          "artistId": 415606364,
+          "artistName": "HoneyWorks",
+          "trackId": 1653728090,
+          "trackName": "Kawaikute Gomen (feat. Chuutan (CV: Saori Hayami))",
+          "primaryGenreName": "Anime"
+        },
+        {
+          "artistId": 415606364,
+          "artistName": "HoneyWorks",
+          "trackId": 1638049033,
+          "trackName": "Kawaikutegomen (feat. Capi)",
+          "primaryGenreName": "Anime"
+        },
+        {
+          "artistId": 415606364,
+          "artistName": "HoneyWorks, Minamo Shio(CV: Rin Kusumi), Hiodoshi Akari(CV: Yu Serizawa), Tsukimi Runa(CV: Sae Hiratsuka) & Hinata Haru(CV: Yuuki Yamamoto)",
+          "trackId": 1858848141,
+          "trackName": "I LOVE YOU",
+          "primaryGenreName": "Anime"
+        },
+        {
+          "artistId": 415606364,
+          "artistName": "HoneyWorks",
+          "trackId": 1537331831,
+          "trackName": "Kotobano Iranai Yakusoku (feat. Sana)",
+          "primaryGenreName": "Anime"
+        },
+        {
+          "artistId": 415606364,
+          "artistName": "HoneyWorks",
+          "trackId": 969914433,
+          "trackName": "Suki Kirai (Hatsune Miku Magical Mirai 2014 Live) [feat. Kagamine Rin & Kagamine Len]",
+          "primaryGenreName": "Pop"
+        }
+      ]
+    },
+    {
+      "artist": "HYBS",
+      "workCount": 6,
+      "fetchedAt": "2026-08-04T13:49:19.937Z",
+      "results": [
+        {
+          "artistId": 1585638812,
+          "artistName": "HYBS",
+          "trackId": 1688539331,
+          "trackName": "Tip Toe",
+          "primaryGenreName": "R&B/Soul"
+        },
+        {
+          "artistId": 1585638812,
+          "artistName": "HYBS",
+          "trackId": 1638156967,
+          "trackName": "Would You Mind",
+          "primaryGenreName": "Indie Pop"
+        },
+        {
+          "artistId": 1585638812,
+          "artistName": "HYBS",
+          "trackId": 1585638814,
+          "trackName": "Ride",
+          "primaryGenreName": "R&B/Soul"
+        },
+        {
+          "artistId": 1585638812,
+          "artistName": "HYBS",
+          "trackId": 1638157242,
+          "trackName": "Prettiest To Me",
+          "primaryGenreName": "Indie Pop"
+        },
+        {
+          "artistId": 1585638812,
+          "artistName": "HYBS, slchld & asiatic.wav",
+          "trackId": 1658034196,
+          "trackName": "Good Care",
+          "primaryGenreName": "Pop"
+        }
+      ]
+    },
+    {
+      "artist": "IU",
+      "workCount": 10,
+      "fetchedAt": "2026-08-04T13:46:24.342Z",
+      "results": [
+        {
+          "artistId": 409076743,
+          "artistName": "IU",
+          "trackId": 1560113134,
+          "trackName": "Lilac",
+          "primaryGenreName": "K-Pop"
+        },
+        {
+          "artistId": 409076743,
+          "artistName": "IU",
+          "trackId": 1726888402,
+          "trackName": "Love wins all",
+          "primaryGenreName": "K-Pop"
+        },
+        {
+          "artistId": 409076743,
+          "artistName": "IU",
+          "trackId": 1511885178,
+          "trackName": "eight (feat. SUGA)",
+          "primaryGenreName": "K-Pop"
+        },
+        {
+          "artistId": 409076743,
+          "artistName": "IU",
+          "trackId": 1488300930,
+          "trackName": "Blueming",
+          "primaryGenreName": "K-Pop"
+        },
+        {
+          "artistId": 409076743,
+          "artistName": "IU",
+          "trackId": 1229073310,
+          "trackName": "Palette (feat. G-DRAGON)",
+          "primaryGenreName": "K-Pop"
+        }
+      ]
+    },
+    {
+      "artist": "IVE",
+      "workCount": 5,
+      "fetchedAt": "2026-08-04T13:51:17.275Z",
+      "results": [
+        {
+          "artistId": 1594159996,
+          "artistName": "IVE",
+          "trackId": 1680047366,
+          "trackName": "I AM",
+          "primaryGenreName": "K-Pop"
+        },
+        {
+          "artistId": 1594159996,
+          "artistName": "IVE",
+          "trackId": 1616804152,
+          "trackName": "LOVE DIVE",
+          "primaryGenreName": "K-Pop"
+        },
+        {
+          "artistId": 1594159996,
+          "artistName": "IVE",
+          "trackId": 1873882200,
+          "trackName": "BLACKHOLE",
+          "primaryGenreName": "K-Pop"
+        },
+        {
+          "artistId": 1594159996,
+          "artistName": "IVE",
+          "trackId": 1639416903,
+          "trackName": "After LIKE",
+          "primaryGenreName": "K-Pop"
+        },
+        {
+          "artistId": 1594159996,
+          "artistName": "IVE",
+          "trackId": 1873882204,
+          "trackName": "BANG BANG",
+          "primaryGenreName": "K-Pop"
+        }
+      ]
+    },
+    {
+      "artist": "Justin Bieber",
+      "workCount": 7,
+      "fetchedAt": "2026-08-04T13:48:21.523Z",
+      "results": [
+        {
+          "artistId": 320569549,
+          "artistName": "Justin Bieber",
+          "trackId": 1440650961,
+          "trackName": "Beauty and a Beat (feat. Nicki Minaj)",
+          "primaryGenreName": "Pop"
+        },
+        {
+          "artistId": 320569549,
+          "artistName": "Justin Bieber",
+          "trackId": 1825994649,
+          "trackName": "DAISIES",
+          "primaryGenreName": "Pop"
+        },
+        {
+          "artistId": 320569549,
+          "artistName": "Justin Bieber",
+          "trackId": 1440661545,
+          "trackName": "Baby (feat. Ludacris)",
+          "primaryGenreName": "Pop"
+        },
+        {
+          "artistId": 320569549,
+          "artistName": "Justin Bieber",
+          "trackId": 1825994651,
+          "trackName": "YUKON",
+          "primaryGenreName": "Pop"
+        },
+        {
+          "artistId": 320569549,
+          "artistName": "Justin Bieber",
+          "trackId": 1440616473,
+          "trackName": "One Less Lonely Girl",
+          "primaryGenreName": "Pop"
+        }
+      ]
+    },
+    {
+      "artist": "Kanaria",
+      "workCount": 11,
+      "fetchedAt": "2026-08-04T13:45:25.470Z",
+      "results": [
+        {
+          "artistId": 1522309252,
+          "artistName": "Kanaria",
+          "trackId": 1525673476,
+          "trackName": "King",
+          "primaryGenreName": "Anime"
+        },
+        {
+          "artistId": 1522309252,
+          "artistName": "Kanaria",
+          "trackId": 1622001134,
+          "trackName": "Yoidoreshirazu",
+          "primaryGenreName": "Anime"
+        },
+        {
+          "artistId": 1522309252,
+          "artistName": "Kanaria",
+          "trackId": 1773258542,
+          "trackName": "Brain",
+          "primaryGenreName": "J-Pop"
+        },
+        {
+          "artistId": 1522309252,
+          "artistName": "Kanaria",
+          "trackId": 1638567997,
+          "trackName": "Queen",
+          "primaryGenreName": "Anime"
+        },
+        {
+          "artistId": 1522309252,
+          "artistName": "Kanaria",
+          "trackId": 1652628498,
+          "trackName": "Rendezvous",
+          "primaryGenreName": "Anime"
+        }
+      ]
+    },
+    {
+      "artist": "keshi",
+      "workCount": 7,
+      "fetchedAt": "2026-08-04T13:48:21.453Z",
+      "results": [
+        {
+          "artistId": 430144465,
+          "artistName": "keshi",
+          "trackId": 1755275212,
+          "trackName": "Soft Spot",
+          "primaryGenreName": "Pop"
+        },
+        {
+          "artistId": 430144465,
+          "artistName": "keshi",
+          "trackId": 1610442783,
+          "trackName": "UNDERSTAND",
+          "primaryGenreName": "Pop"
+        },
+        {
+          "artistId": 430144465,
+          "artistName": "keshi",
+          "trackId": 1830289196,
+          "trackName": "WANTCHU",
+          "primaryGenreName": "Pop"
+        },
+        {
+          "artistId": 430144465,
+          "artistName": "keshi",
+          "trackId": 1563170158,
+          "trackName": "beside you",
+          "primaryGenreName": "Pop"
+        },
+        {
+          "artistId": 430144465,
+          "artistName": "keshi",
+          "trackId": 1755274998,
+          "trackName": "Say",
+          "primaryGenreName": "Pop"
+        }
+      ]
+    },
+    {
+      "artist": "Lady Gaga",
+      "workCount": 7,
+      "fetchedAt": "2026-08-04T13:48:21.565Z",
+      "results": [
+        {
+          "artistId": 277293880,
+          "artistName": "Lady Gaga",
+          "trackId": 1434372043,
+          "trackName": "Always Remember Us This Way",
+          "primaryGenreName": "Soundtrack"
+        },
+        {
+          "artistId": 277293880,
+          "artistName": "Lady Gaga",
+          "trackId": 1793869710,
+          "trackName": "Abracadabra",
+          "primaryGenreName": "Pop"
+        },
+        {
+          "artistId": 277293880,
+          "artistName": "Lady Gaga & Bruno Mars",
+          "trackId": 1762656732,
+          "trackName": "Die With A Smile",
+          "primaryGenreName": "Pop"
+        },
+        {
+          "artistId": 277293880,
+          "artistName": "Lady Gaga",
+          "trackId": 1476727675,
+          "trackName": "Telephone (feat. Beyoncé)",
+          "primaryGenreName": "Pop"
+        },
+        {
+          "artistId": 277293880,
+          "artistName": "Lady Gaga & Bradley Cooper",
+          "trackId": 1434371887,
+          "trackName": "Shallow",
+          "primaryGenreName": "Soundtrack"
+        }
+      ]
+    },
+    {
+      "artist": "LiSA",
+      "workCount": 15,
+      "fetchedAt": "2026-08-04T13:45:25.390Z",
+      "results": [
+        {
+          "artistId": 1583908668,
+          "artistName": "LISA",
+          "trackId": 1584836387,
+          "trackName": "LALISA",
+          "primaryGenreName": "K-Pop"
+        },
+        {
+          "artistId": 38341,
+          "artistName": "Chris Botti",
+          "trackId": 193532532,
+          "trackName": "Lisa",
+          "primaryGenreName": "Jazz"
+        },
+        {
+          "artistId": 544227,
+          "artistName": "Stanley Clarke",
+          "trackId": 281094382,
+          "trackName": "Lisa",
+          "primaryGenreName": "Jazz"
+        },
+        {
+          "artistId": 1257472443,
+          "artistName": "Makeout",
+          "trackId": 1473464703,
+          "trackName": "Lisa",
+          "primaryGenreName": "Alternative"
+        },
+        {
+          "artistId": 6059320,
+          "artistName": "Gustavo Cerati",
+          "trackId": 325221770,
+          "trackName": "Lisa",
+          "primaryGenreName": "Rock y Alternativo"
+        }
+      ]
+    },
+    {
+      "artist": "Maroon 5",
+      "workCount": 6,
+      "fetchedAt": "2026-08-04T13:49:19.944Z",
+      "results": [
+        {
+          "artistId": 1798556,
+          "artistName": "Maroon 5",
+          "trackId": 1440851722,
+          "trackName": "She Will Be Loved",
+          "primaryGenreName": "Vocal"
+        },
+        {
+          "artistId": 1798556,
+          "artistName": "Maroon 5",
+          "trackId": 1440851719,
+          "trackName": "This Love",
+          "primaryGenreName": "Pop"
+        },
+        {
+          "artistId": 1798556,
+          "artistName": "Maroon 5",
+          "trackId": 1381582728,
+          "trackName": "Girls Like You (feat. Cardi B)",
+          "primaryGenreName": "Pop"
+        },
+        {
+          "artistId": 1798556,
+          "artistName": "Maroon 5",
+          "trackId": 1440855552,
+          "trackName": "Animals",
+          "primaryGenreName": "Pop"
+        },
+        {
+          "artistId": 1798556,
+          "artistName": "Maroon 5",
+          "trackId": 1440859510,
+          "trackName": "Moves Like Jagger (feat. Christina Aguilera)",
+          "primaryGenreName": "Pop"
+        }
+      ]
+    },
+    {
+      "artist": "Meghan Trainor",
+      "workCount": 5,
+      "fetchedAt": "2026-08-04T13:51:17.214Z",
+      "results": [
+        {
+          "artistId": 348580754,
+          "artistName": "Meghan Trainor",
+          "trackId": 1229163691,
+          "trackName": "Me Too",
+          "primaryGenreName": "Pop"
+        },
+        {
+          "artistId": 348580754,
+          "artistName": "Meghan Trainor",
+          "trackId": 929825616,
+          "trackName": "Dear Future Husband",
+          "primaryGenreName": "Pop"
+        },
+        {
+          "artistId": 348580754,
+          "artistName": "Meghan Trainor",
+          "trackId": 929825619,
+          "trackName": "Like I'm Gonna Lose You (feat. John Legend)",
+          "primaryGenreName": "Pop"
+        },
+        {
+          "artistId": 348580754,
+          "artistName": "Meghan Trainor",
+          "trackId": 1229163693,
+          "trackName": "NO",
+          "primaryGenreName": "Pop"
+        },
+        {
+          "artistId": 348580754,
+          "artistName": "Meghan Trainor",
+          "trackId": 929825624,
+          "trackName": "Lips Are Movin",
+          "primaryGenreName": "Pop"
+        }
+      ]
+    },
+    {
+      "artist": "Michael Bublé",
+      "workCount": 5,
+      "fetchedAt": "2026-08-04T13:51:17.208Z",
+      "results": [
+        {
+          "artistId": 799597,
+          "artistName": "Michael Bublé",
+          "trackId": 668403227,
+          "trackName": "Feeling Good",
+          "primaryGenreName": "Pop"
+        },
+        {
+          "artistId": 799597,
+          "artistName": "Michael Bublé",
+          "trackId": 668403662,
+          "trackName": "Haven't Met You Yet",
+          "primaryGenreName": "Pop"
+        },
+        {
+          "artistId": 799597,
+          "artistName": "Michael Bublé",
+          "trackId": 670069305,
+          "trackName": "Everything",
+          "primaryGenreName": "Pop"
+        },
+        {
+          "artistId": 799597,
+          "artistName": "Michael Bublé",
+          "trackId": 668403430,
+          "trackName": "Sway",
+          "primaryGenreName": "Pop"
+        },
+        {
+          "artistId": 799597,
+          "artistName": "Michael Bublé",
+          "trackId": 668403671,
+          "trackName": "Home",
+          "primaryGenreName": "Pop"
+        }
+      ]
+    },
+    {
+      "artist": "Mrs. GREEN APPLE",
+      "workCount": 15,
+      "fetchedAt": "2026-08-04T13:45:25.345Z",
+      "results": [
+        {
+          "artistId": 962221033,
+          "artistName": "Mrs. GREEN APPLE",
+          "trackId": 1471459432,
+          "trackName": "Inferno",
+          "primaryGenreName": "Rock"
+        },
+        {
+          "artistId": 962221033,
+          "artistName": "Mrs. GREEN APPLE",
+          "trackId": 1739088799,
+          "trackName": "Lilac",
+          "primaryGenreName": "Rock"
+        },
+        {
+          "artistId": 962221033,
+          "artistName": "Mrs. GREEN APPLE",
+          "trackId": 1867354081,
+          "trackName": "lulu.",
+          "primaryGenreName": "Rock"
+        },
+        {
+          "artistId": 962221033,
+          "artistName": "Mrs. GREEN APPLE",
+          "trackId": 1681600508,
+          "trackName": "Que Sera Sera",
+          "primaryGenreName": "Rock"
+        },
+        {
+          "artistId": 962221033,
+          "artistName": "Mrs. GREEN APPLE",
+          "trackId": 1648865575,
+          "trackName": "Soranji",
+          "primaryGenreName": "Rock"
+        }
+      ]
+    },
+    {
+      "artist": "NewJeans",
+      "workCount": 12,
+      "fetchedAt": "2026-08-04T13:45:25.470Z",
+      "results": [
+        {
+          "artistId": 1635469693,
+          "artistName": "NewJeans",
+          "trackId": 1692686265,
+          "trackName": "New Jeans",
+          "primaryGenreName": "K-Pop"
+        },
+        {
+          "artistId": 1635469693,
+          "artistName": "NewJeans",
+          "trackId": 1659513445,
+          "trackName": "OMG",
+          "primaryGenreName": "K-Pop"
+        },
+        {
+          "artistId": 1635469693,
+          "artistName": "NewJeans",
+          "trackId": 1657231962,
+          "trackName": "Ditto",
+          "primaryGenreName": "K-Pop"
+        },
+        {
+          "artistId": 1635469693,
+          "artistName": "NewJeans",
+          "trackId": 1750576834,
+          "trackName": "Supernatural",
+          "primaryGenreName": "J-Pop"
+        },
+        {
+          "artistId": 1635469693,
+          "artistName": "NewJeans",
+          "trackId": 1695951900,
+          "trackName": "ETA",
+          "primaryGenreName": "K-Pop"
+        }
+      ]
+    },
+    {
+      "artist": "niki",
+      "workCount": 8,
+      "fetchedAt": "2026-08-04T13:47:22.841Z",
+      "results": [
+        {
+          "artistId": 1324809450,
+          "artistName": "NIKI",
+          "trackId": 1579788063,
+          "trackName": "Every Summertime",
+          "primaryGenreName": "Pop"
+        },
+        {
+          "artistId": 1324809450,
+          "artistName": "NIKI",
+          "trackId": 1806176608,
+          "trackName": "You'll Be In My Heart",
+          "primaryGenreName": "Alternative"
+        },
+        {
+          "artistId": 1324809450,
+          "artistName": "NIKI",
+          "trackId": 1766383800,
+          "trackName": "Oceans & Engines",
+          "primaryGenreName": "Alternative"
+        },
+        {
+          "artistId": 1324809450,
+          "artistName": "NIKI",
+          "trackId": 1724860237,
+          "trackName": "I Like U",
+          "primaryGenreName": "R&B/Soul"
+        },
+        {
+          "artistId": 1386385733,
+          "artistName": "88rising & NIKI",
+          "trackId": 1724851618,
+          "trackName": "Indigo",
+          "primaryGenreName": "R&B/Soul"
+        }
+      ]
+    },
+    {
+      "artist": "ONE OK ROCK",
+      "workCount": 28,
+      "fetchedAt": "2026-08-04T13:44:26.839Z",
+      "results": [
+        {
+          "artistId": 252239625,
+          "artistName": "ONE OK ROCK",
+          "trackId": 1703323320,
+          "trackName": "Make It Out Alive",
+          "primaryGenreName": "Rock"
+        },
+        {
+          "artistId": 252239625,
+          "artistName": "ONE OK ROCK",
+          "trackId": 1838917472,
+          "trackName": "The Beginning",
+          "primaryGenreName": "Rock"
+        },
+        {
+          "artistId": 252239625,
+          "artistName": "ONE OK ROCK",
+          "trackId": 1838917139,
+          "trackName": "Wherever you are",
+          "primaryGenreName": "Rock"
+        },
+        {
+          "artistId": 252239625,
+          "artistName": "ONE OK ROCK",
+          "trackId": 1176157429,
+          "trackName": "We Are",
+          "primaryGenreName": "Rock"
+        },
+        {
+          "artistId": 252239625,
+          "artistName": "ONE OK ROCK",
+          "trackId": 1441817578,
+          "trackName": "Stand Out Fit In",
+          "primaryGenreName": "Rock"
+        }
+      ]
+    },
+    {
+      "artist": "Orangestar",
+      "workCount": 8,
+      "fetchedAt": "2026-08-04T13:47:22.830Z",
+      "results": [
+        {
+          "artistId": 1515449554,
+          "artistName": "Orangestar",
+          "trackId": 1526182514,
+          "trackName": "Daybreak Frontline",
+          "primaryGenreName": "J-Pop"
+        },
+        {
+          "artistId": 1515449554,
+          "artistName": "Orangestar",
+          "trackId": 1525987926,
+          "trackName": "Night Sky Patrol of Tomorrow",
+          "primaryGenreName": "Anime"
+        },
+        {
+          "artistId": 1515449554,
+          "artistName": "Orangestar",
+          "trackId": 1526182294,
+          "trackName": "Alice in Freezer",
+          "primaryGenreName": "J-Pop"
+        },
+        {
+          "artistId": 1515449554,
+          "artistName": "Orangestar",
+          "trackId": 1516093917,
+          "trackName": "Kimi No Yozora Shoukaihan (feat. IA)",
+          "primaryGenreName": "Anime"
+        },
+        {
+          "artistId": 1515449554,
+          "artistName": "Orangestar",
+          "trackId": 1526182764,
+          "trackName": "Sky Passing Around, Moon Rabbit",
+          "primaryGenreName": "J-Pop"
+        }
+      ]
+    },
+    {
+      "artist": "ØZI",
+      "workCount": 7,
+      "fetchedAt": "2026-08-04T13:48:21.453Z",
+      "results": [
+        {
+          "artistId": 878542994,
+          "artistName": "Shi Shi",
+          "trackId": 1440113115,
+          "trackName": "Tensions (feat. ØZI)",
+          "primaryGenreName": "Mandopop"
+        },
+        {
+          "artistId": 1316963118,
+          "artistName": "ØZI",
+          "trackId": 1526275439,
+          "trackName": "LAVA!",
+          "primaryGenreName": "R&B/Soul"
+        },
+        {
+          "artistId": 1458335754,
+          "artistName": "James Reid, JAY B & Transparent Arts",
+          "trackId": 1869441509,
+          "trackName": "Hello 2.0 (Legends Only) [feat. ØZI]",
+          "primaryGenreName": "Pop"
+        },
+        {
+          "artistId": 1316963118,
+          "artistName": "ØZI",
+          "trackId": 1407720887,
+          "trackName": "Black Out (feat. 9m88)",
+          "primaryGenreName": "Hip-Hop/Rap"
+        },
+        {
+          "artistId": 1709139239,
+          "artistName": "HEARTSTEEL, League of Legends Music & BAEKHYUN",
+          "trackId": 1831860404,
+          "trackName": "PARANOIA (feat. tobi lou, ØZI & Cal Scruby)",
+          "primaryGenreName": "Hip-Hop/Rap"
+        }
+      ]
+    },
+    {
+      "artist": "R Sound Design",
+      "workCount": 5,
+      "fetchedAt": "2026-08-04T13:51:17.231Z",
+      "results": [
+        {
+          "artistId": 1225503960,
+          "artistName": "R Sound Design",
+          "trackId": 1435764968,
+          "trackName": "Flos",
+          "primaryGenreName": "J-Pop"
+        },
+        {
+          "artistId": 1225503960,
+          "artistName": "R Sound Design",
+          "trackId": 1309469967,
+          "trackName": "Imperial Girl",
+          "primaryGenreName": "J-Pop"
+        },
+        {
+          "artistId": 1225503960,
+          "artistName": "R Sound Design feat. POEMI",
+          "trackId": 1526634623,
+          "trackName": "Urban Planning of Mercury (feat. POEMI)",
+          "primaryGenreName": "Anime"
+        },
+        {
+          "artistId": 1225503960,
+          "artistName": "R Sound Design",
+          "trackId": 1309469964,
+          "trackName": "Sonority",
+          "primaryGenreName": "J-Pop"
+        },
+        {
+          "artistId": 1225503960,
+          "artistName": "R Sound Design",
+          "trackId": 1688512537,
+          "trackName": "Retropolis (feat. Kafu)",
+          "primaryGenreName": "J-Pop"
+        }
+      ]
+    },
+    {
+      "artist": "RADWIMPS",
+      "workCount": 13,
+      "fetchedAt": "2026-08-04T13:45:25.486Z",
+      "results": [
+        {
+          "artistId": 91160335,
+          "artistName": "RADWIMPS",
+          "trackId": 1647112151,
+          "trackName": "Suzume (feat. Toaka)",
+          "primaryGenreName": "Rock"
+        },
+        {
+          "artistId": 91160335,
+          "artistName": "RADWIMPS",
+          "trackId": 1434005924,
+          "trackName": "Sparkle - Movie Ver.",
+          "primaryGenreName": "Rock"
+        },
+        {
+          "artistId": 91160335,
+          "artistName": "RADWIMPS",
+          "trackId": 1434005771,
+          "trackName": "Dream Lantern",
+          "primaryGenreName": "Rock"
+        },
+        {
+          "artistId": 91160335,
+          "artistName": "RADWIMPS",
+          "trackId": 1434005783,
+          "trackName": "Zenzenzense - Movie Ver.",
+          "primaryGenreName": "Rock"
+        },
+        {
+          "artistId": 91160335,
+          "artistName": "RADWIMPS",
+          "trackId": 1406232121,
+          "trackName": "Hyperventilation",
+          "primaryGenreName": "Rock"
+        }
+      ]
+    },
+    {
+      "artist": "ryo",
+      "workCount": 7,
+      "fetchedAt": "2026-08-04T13:48:21.535Z",
+      "results": [
+        {
+          "artistId": 121949655,
+          "artistName": "Joris Voorn",
+          "trackId": 1488790381,
+          "trackName": "Ryo",
+          "primaryGenreName": "Electronic"
+        },
+        {
+          "artistId": 121949655,
+          "artistName": "Joris Voorn",
+          "trackId": 1517681544,
+          "trackName": "Ryo (Mees Salomé Remix)",
+          "primaryGenreName": "Electronic"
+        },
+        {
+          "artistId": 958641367,
+          "artistName": "Crush",
+          "trackId": 1609044005,
+          "trackName": "RYO (feat. CIFIKA & Byung Un)",
+          "primaryGenreName": "Hip-Hop"
+        },
+        {
+          "artistId": 939561587,
+          "artistName": "kensuke ushio",
+          "trackId": 1367471664,
+          "trackName": "Ryo",
+          "primaryGenreName": "Soundtrack"
+        },
+        {
+          "artistId": 121949655,
+          "artistName": "Joris Voorn",
+          "trackId": 1461474941,
+          "trackName": "Ryo (Single Version)",
+          "primaryGenreName": "Electronic"
+        }
+      ]
+    },
+    {
+      "artist": "Sabrina Carpenter",
+      "workCount": 7,
+      "fetchedAt": "2026-08-04T13:48:21.454Z",
+      "results": [
+        {
+          "artistId": 390647681,
+          "artistName": "Sabrina Carpenter",
+          "trackId": 1750307079,
+          "trackName": "Taste",
+          "primaryGenreName": "Pop"
+        },
+        {
+          "artistId": 390647681,
+          "artistName": "Sabrina Carpenter",
+          "trackId": 1819861170,
+          "trackName": "House Tour",
+          "primaryGenreName": "Pop"
+        },
+        {
+          "artistId": 390647681,
+          "artistName": "Sabrina Carpenter",
+          "trackId": 1750307088,
+          "trackName": "Bed Chem",
+          "primaryGenreName": "Pop"
+        },
+        {
+          "artistId": 390647681,
+          "artistName": "Sabrina Carpenter",
+          "trackId": 1819861167,
+          "trackName": "When Did You Get Hot?",
+          "primaryGenreName": "Pop"
+        },
+        {
+          "artistId": 390647681,
+          "artistName": "Sabrina Carpenter",
+          "trackId": 1631579019,
+          "trackName": "Nonsense",
+          "primaryGenreName": "Pop"
+        }
+      ]
+    },
+    {
+      "artist": "SPYAIR",
+      "workCount": 7,
+      "fetchedAt": "2026-08-04T13:48:21.507Z",
+      "results": [
+        {
+          "artistId": 308131412,
+          "artistName": "SPYAIR",
+          "trackId": 1728595882,
+          "trackName": "Orange",
+          "primaryGenreName": "Rock"
+        },
+        {
+          "artistId": 308131412,
+          "artistName": "SPYAIR",
+          "trackId": 1535521927,
+          "trackName": "Some Like It Hot!!",
+          "primaryGenreName": "Rock"
+        },
+        {
+          "artistId": 308131412,
+          "artistName": "SPYAIR",
+          "trackId": 1538097345,
+          "trackName": "Sakuramitsutsuki",
+          "primaryGenreName": "Rock"
+        },
+        {
+          "artistId": 308131412,
+          "artistName": "SPYAIR",
+          "trackId": 859822147,
+          "trackName": "Imagination",
+          "primaryGenreName": "Rock"
+        },
+        {
+          "artistId": 308131412,
+          "artistName": "SPYAIR",
+          "trackId": 1535522048,
+          "trackName": "Last Moment",
+          "primaryGenreName": "Rock"
+        }
+      ]
+    },
+    {
+      "artist": "supercell",
+      "workCount": 9,
+      "fetchedAt": "2026-08-04T13:46:24.351Z",
+      "results": [
+        {
+          "artistId": 440629621,
+          "artistName": "King Gizzard & The Lizard Wizard",
+          "trackId": 1684380392,
+          "trackName": "Supercell",
+          "primaryGenreName": "Metal"
+        },
+        {
+          "artistId": 307078957,
+          "artistName": "Hatsune Miku & supercell",
+          "trackId": 440374091,
+          "trackName": "The World Is Mine (feat. Hatsune Miku)",
+          "primaryGenreName": "Worldwide"
+        },
+        {
+          "artistId": 631665100,
+          "artistName": "supercell",
+          "trackId": 1539323019,
+          "trackName": "My Dearest",
+          "primaryGenreName": "Anime"
+        },
+        {
+          "artistId": 3858833,
+          "artistName": "Aesop Rock",
+          "trackId": 1516775433,
+          "trackName": "Supercell",
+          "primaryGenreName": "Hip-Hop/Rap"
+        },
+        {
+          "artistId": 3858833,
+          "artistName": "Aesop Rock",
+          "trackId": 1516773355,
+          "trackName": "Supercell",
+          "primaryGenreName": "Hip-Hop/Rap"
+        }
+      ]
+    },
+    {
+      "artist": "syudou",
+      "workCount": 5,
+      "fetchedAt": "2026-08-04T13:51:17.199Z",
+      "results": [
+        {
+          "artistId": 1437504637,
+          "artistName": "syudou",
+          "trackId": 1839130642,
+          "trackName": "In the Back Room",
+          "primaryGenreName": "J-Pop"
+        },
+        {
+          "artistId": 1437504637,
+          "artistName": "syudou",
+          "trackId": 1839130464,
+          "trackName": "Kareshi No Jude",
+          "primaryGenreName": "J-Pop"
+        },
+        {
+          "artistId": 1437504637,
+          "artistName": "syudou",
+          "trackId": 1838981493,
+          "trackName": "Jack Pot Sad Girl",
+          "primaryGenreName": "J-Pop"
+        },
+        {
+          "artistId": 1437504637,
+          "artistName": "syudou",
+          "trackId": 1839041992,
+          "trackName": "Gambling",
+          "primaryGenreName": "J-Pop"
+        },
+        {
+          "artistId": 1437504637,
+          "artistName": "syudou",
+          "trackId": 1839130258,
+          "trackName": "Cute Na Kanojo",
+          "primaryGenreName": "J-Pop"
+        }
+      ]
+    },
+    {
+      "artist": "Taylor Swift",
+      "workCount": 34,
+      "fetchedAt": "2026-08-04T13:44:26.827Z",
+      "results": [
+        {
+          "artistId": 159260351,
+          "artistName": "Taylor Swift",
+          "trackId": 1833328840,
+          "trackName": "The Fate of Ophelia",
+          "primaryGenreName": "Pop"
+        },
+        {
+          "artistId": 159260351,
+          "artistName": "Taylor Swift",
+          "trackId": 1468058171,
+          "trackName": "Cruel Summer",
+          "primaryGenreName": "Pop"
+        },
+        {
+          "artistId": 159260351,
+          "artistName": "Taylor Swift",
+          "trackId": 1452859427,
+          "trackName": "You Belong With Me",
+          "primaryGenreName": "Country"
+        },
+        {
+          "artistId": 159260351,
+          "artistName": "Taylor Swift",
+          "trackId": 1440936016,
+          "trackName": "Shake It Off",
+          "primaryGenreName": "Pop"
+        },
+        {
+          "artistId": 159260351,
+          "artistName": "Taylor Swift",
+          "trackId": 1440935808,
+          "trackName": "Blank Space",
+          "primaryGenreName": "Pop"
+        }
+      ]
+    },
+    {
+      "artist": "The Pretty Reckless",
+      "workCount": 7,
+      "fetchedAt": "2026-08-04T13:48:21.465Z",
+      "results": [
+        {
+          "artistId": 363203347,
+          "artistName": "The Pretty Reckless",
+          "trackId": 1440932790,
+          "trackName": "Heaven Knows",
+          "primaryGenreName": "Hard Rock"
+        },
+        {
+          "artistId": 363203347,
+          "artistName": "The Pretty Reckless",
+          "trackId": 1440768256,
+          "trackName": "Make Me Wanna Die",
+          "primaryGenreName": "Hard Rock"
+        },
+        {
+          "artistId": 363203347,
+          "artistName": "The Pretty Reckless",
+          "trackId": 1440939674,
+          "trackName": "Take Me Down",
+          "primaryGenreName": "Hard Rock"
+        },
+        {
+          "artistId": 363203347,
+          "artistName": "The Pretty Reckless",
+          "trackId": 1830382225,
+          "trackName": "For I Am Death",
+          "primaryGenreName": "Rock"
+        },
+        {
+          "artistId": 363203347,
+          "artistName": "The Pretty Reckless",
+          "trackId": 1440932589,
+          "trackName": "Follow Me Down",
+          "primaryGenreName": "Hard Rock"
+        }
+      ]
+    },
+    {
+      "artist": "tuki.",
+      "workCount": 6,
+      "fetchedAt": "2026-08-04T13:49:19.963Z",
+      "results": [
+        {
+          "artistId": 1706278800,
+          "artistName": "TUKI.",
+          "trackId": 1705678978,
+          "trackName": "Bansanka",
+          "primaryGenreName": "J-Pop"
+        },
+        {
+          "artistId": 1706278800,
+          "artistName": "TUKI.",
+          "trackId": 1755114940,
+          "trackName": "Hyururirapappa",
+          "primaryGenreName": "J-Pop"
+        },
+        {
+          "artistId": 1706278800,
+          "artistName": "TUKI.",
+          "trackId": 1886100218,
+          "trackName": "zero",
+          "primaryGenreName": "J-Pop"
+        },
+        {
+          "artistId": 1141188624,
+          "artistName": "Nase Foai",
+          "trackId": 1246558015,
+          "trackName": "Tuki (Evolution)",
+          "primaryGenreName": "Dance"
+        },
+        {
+          "artistId": 1206012900,
+          "artistName": "Sofía Martín",
+          "trackId": 1657456547,
+          "trackName": "TUKI",
+          "primaryGenreName": "Pop"
+        }
+      ]
+    },
+    {
+      "artist": "TWICE",
+      "workCount": 11,
+      "fetchedAt": "2026-08-04T13:45:25.506Z",
+      "results": [
+        {
+          "artistId": 1203816887,
+          "artistName": "TWICE",
+          "trackId": 1813490998,
+          "trackName": "THIS IS FOR",
+          "primaryGenreName": "K-Pop"
+        },
+        {
+          "artistId": 1203816887,
+          "artistName": "TWICE",
+          "trackId": 1555390083,
+          "trackName": "What is Love?",
+          "primaryGenreName": "K-Pop"
+        },
+        {
+          "artistId": 1203816887,
+          "artistName": "TWICE",
+          "trackId": 1820264153,
+          "trackName": "Strategy",
+          "primaryGenreName": "K-Pop"
+        },
+        {
+          "artistId": 1203816887,
+          "artistName": "TWICE",
+          "trackId": 1607381008,
+          "trackName": "The Feels",
+          "primaryGenreName": "K-Pop"
+        },
+        {
+          "artistId": 1203816887,
+          "artistName": "TWICE",
+          "trackId": 1555390187,
+          "trackName": "FANCY",
+          "primaryGenreName": "K-Pop"
+        }
+      ]
+    },
+    {
+      "artist": "XG",
+      "workCount": 6,
+      "fetchedAt": "2026-08-04T13:49:19.944Z",
+      "results": [
+        {
+          "artistId": 1609409493,
+          "artistName": "XG",
+          "trackId": 1861009528,
+          "trackName": "HYPNOTIZE",
+          "primaryGenreName": "Pop"
+        },
+        {
+          "artistId": 1609409493,
+          "artistName": "XG",
+          "trackId": 1742262123,
+          "trackName": "WOKE UP",
+          "primaryGenreName": "Hip-Hop/Rap"
+        },
+        {
+          "artistId": 1609409493,
+          "artistName": "XG",
+          "trackId": 1660487909,
+          "trackName": "LEFT RIGHT",
+          "primaryGenreName": "R&B/Soul"
+        },
+        {
+          "artistId": 1609409493,
+          "artistName": "XG",
+          "trackId": 1775445637,
+          "trackName": "IS THIS LOVE",
+          "primaryGenreName": "Pop"
+        },
+        {
+          "artistId": 1609409493,
+          "artistName": "XG",
+          "trackId": 1660487904,
+          "trackName": "SHOOTING STAR",
+          "primaryGenreName": "R&B/Soul"
+        }
+      ]
+    },
+    {
+      "artist": "YOASOBI",
+      "workCount": 12,
+      "fetchedAt": "2026-08-04T13:45:25.473Z",
+      "results": [
+        {
+          "artistId": 1490256993,
+          "artistName": "YOASOBI",
+          "trackId": 1679278167,
+          "trackName": "Idol",
+          "primaryGenreName": "J-Pop"
+        },
+        {
+          "artistId": 1490256993,
+          "artistName": "YOASOBI",
+          "trackId": 1490256995,
+          "trackName": "夜に駆ける",
+          "primaryGenreName": "J-Pop"
+        },
+        {
+          "artistId": 1490256993,
+          "artistName": "YOASOBI",
+          "trackId": 1544083979,
+          "trackName": "Monster",
+          "primaryGenreName": "J-Pop"
+        },
+        {
+          "artistId": 1490256993,
+          "artistName": "YOASOBI",
+          "trackId": 1528119630,
+          "trackName": "Gunjou",
+          "primaryGenreName": "J-Pop"
+        },
+        {
+          "artistId": 1490256993,
+          "artistName": "YOASOBI",
+          "trackId": 1707001466,
+          "trackName": "Yuusha",
+          "primaryGenreName": "J-Pop"
+        }
+      ]
+    },
+    {
+      "artist": "볼빨간사춘기",
+      "workCount": 9,
+      "fetchedAt": "2026-08-04T13:46:24.360Z",
+      "results": [
+        {
+          "artistId": 1188975595,
+          "artistName": "BOL4",
+          "trackId": 1550029641,
+          "trackName": "Some",
+          "primaryGenreName": "K-Pop"
+        },
+        {
+          "artistId": 1188975595,
+          "artistName": "BOL4",
+          "trackId": 1550539052,
+          "trackName": "Travel",
+          "primaryGenreName": "Rock"
+        },
+        {
+          "artistId": 1188975595,
+          "artistName": "BOL4",
+          "trackId": 1550545937,
+          "trackName": "Bom",
+          "primaryGenreName": "Folk"
+        },
+        {
+          "artistId": 1188975595,
+          "artistName": "BOL4",
+          "trackId": 1550029645,
+          "trackName": "To My Youth",
+          "primaryGenreName": "K-Pop"
+        },
+        {
+          "artistId": 1188975595,
+          "artistName": "BOL4",
+          "trackId": 1550029643,
+          "trackName": "Fix me",
+          "primaryGenreName": "K-Pop"
+        }
+      ]
+    },
+    {
+      "artist": "태연",
+      "workCount": 7,
+      "fetchedAt": "2026-08-04T13:48:21.452Z",
+      "results": [
+        {
+          "artistId": 435966642,
+          "artistName": "TAEYEON",
+          "trackId": 1609049613,
+          "trackName": "INVU",
+          "primaryGenreName": "K-Pop"
+        },
+        {
+          "artistId": 435966642,
+          "artistName": "TAEYEON",
+          "trackId": 1046202717,
+          "trackName": "I (feat. Verbal Jint)",
+          "primaryGenreName": "K-Pop"
+        },
+        {
+          "artistId": 435966642,
+          "artistName": "TAEYEON",
+          "trackId": 1717568642,
+          "trackName": "To. X",
+          "primaryGenreName": "K-Pop"
+        },
+        {
+          "artistId": 435966642,
+          "artistName": "TAEYEON",
+          "trackId": 1170409098,
+          "trackName": "11:11",
+          "primaryGenreName": "K-Pop"
+        },
+        {
+          "artistId": 435966642,
+          "artistName": "TAEYEON",
+          "trackId": 1574308371,
+          "trackName": "Weekend",
+          "primaryGenreName": "K-Pop"
+        }
+      ]
+    },
+    {
+      "artist": "あいみょん",
+      "workCount": 8,
+      "fetchedAt": "2026-08-04T13:47:22.946Z",
+      "results": [
+        {
+          "artistId": 1165017710,
+          "artistName": "Aimyon",
+          "trackId": 1273710101,
+          "trackName": "Ai Wo Tsutaetaidatoka",
+          "primaryGenreName": "J-Pop"
+        },
+        {
+          "artistId": 1165017710,
+          "artistName": "Aimyon",
+          "trackId": 1446781787,
+          "trackName": "Marigold",
+          "primaryGenreName": "J-Pop"
+        },
+        {
+          "artistId": 1165017710,
+          "artistName": "Aimyon",
+          "trackId": 1790853829,
+          "trackName": "Sketch",
+          "primaryGenreName": "J-Pop"
+        },
+        {
+          "artistId": 1165017710,
+          "artistName": "Aimyon",
+          "trackId": 1525540119,
+          "trackName": "Morning Sun",
+          "primaryGenreName": "J-Pop"
+        },
+        {
+          "artistId": 1165017710,
+          "artistName": "Aimyon",
+          "trackId": 1753270236,
+          "trackName": "Jealous of Cats",
+          "primaryGenreName": "J-Pop"
+        }
+      ]
+    },
+    {
+      "artist": "かいりきベア",
+      "workCount": 5,
+      "fetchedAt": "2026-08-04T13:51:17.196Z",
+      "results": [
+        {
+          "artistId": 599887397,
+          "artistName": "Kairiki Bear",
+          "trackId": 977617172,
+          "trackName": "Mane Mane Psychotropic",
+          "primaryGenreName": "Anime"
+        },
+        {
+          "artistId": 599887397,
+          "artistName": "Kairiki Bear",
+          "trackId": 1588038115,
+          "trackName": "Darling Dance",
+          "primaryGenreName": "J-Pop"
+        },
+        {
+          "artistId": 599887397,
+          "artistName": "Kairiki Bear & Hatsune Miku",
+          "trackId": 1733381362,
+          "trackName": "MELLOMELLOID",
+          "primaryGenreName": "J-Pop"
+        },
+        {
+          "artistId": 599887397,
+          "artistName": "Kairiki Bear",
+          "trackId": 1633836046,
+          "trackName": "Bug",
+          "primaryGenreName": "J-Pop"
+        },
+        {
+          "artistId": 599887397,
+          "artistName": "Kairiki Bear",
+          "trackId": 1533049835,
+          "trackName": "ネロイズム(feat. 鳴花ミコト)",
+          "primaryGenreName": "Anime"
+        }
+      ]
+    },
+    {
+      "artist": "サカナクション",
+      "workCount": 6,
+      "fetchedAt": "2026-08-04T13:49:19.966Z",
+      "results": [
+        {
+          "artistId": 252312257,
+          "artistName": "sakanaction",
+          "trackId": 604748203,
+          "trackName": "Yoru No Odoriko",
+          "primaryGenreName": "Rock"
+        },
+        {
+          "artistId": 252312257,
+          "artistName": "sakanaction",
+          "trackId": 1795905600,
+          "trackName": "Kaiju",
+          "primaryGenreName": "Rock"
+        },
+        {
+          "artistId": 252312257,
+          "artistName": "sakanaction",
+          "trackId": 1465208768,
+          "trackName": "Wasurerarenaino",
+          "primaryGenreName": "Rock"
+        },
+        {
+          "artistId": 252312257,
+          "artistName": "sakanaction",
+          "trackId": 604748202,
+          "trackName": "Music",
+          "primaryGenreName": "Rock"
+        },
+        {
+          "artistId": 252312257,
+          "artistName": "sakanaction",
+          "trackId": 604748207,
+          "trackName": "Aoi",
+          "primaryGenreName": "Rock"
+        }
+      ]
+    },
+    {
+      "artist": "ジミーサムP",
+      "workCount": 5,
+      "fetchedAt": "2026-08-04T13:51:17.199Z",
+      "results": [
+        {
+          "artistId": 337255810,
+          "artistName": "ジミーサムP × 喋々P",
+          "trackId": 1031795582,
+          "trackName": "From Y To Y (feat. Naozumi Takahashi)",
+          "primaryGenreName": "Anime"
+        },
+        {
+          "artistId": 337255810,
+          "artistName": "ジミーサムP × 喋々P",
+          "trackId": 980177549,
+          "trackName": "Calc.",
+          "primaryGenreName": "Anime"
+        },
+        {
+          "artistId": 337255810,
+          "artistName": "ジミーサムP × 喋々P",
+          "trackId": 1017003237,
+          "trackName": "No Logic [feat. Kettaro]",
+          "primaryGenreName": "J-Pop"
+        },
+        {
+          "artistId": 337255810,
+          "artistName": "ジミーサムP × 喋々P",
+          "trackId": 979828252,
+          "trackName": "Calc.",
+          "primaryGenreName": "Anime"
+        },
+        {
+          "artistId": 337255810,
+          "artistName": "ジミーサムP × 喋々P",
+          "trackId": 980177641,
+          "trackName": "from Y to Y",
+          "primaryGenreName": "Anime"
+        }
+      ]
+    },
+    {
+      "artist": "じん",
+      "workCount": 10,
+      "fetchedAt": "2026-08-04T13:46:24.389Z",
+      "results": [
+        {
+          "artistId": 358714030,
+          "artistName": "Imagine Dragons",
+          "trackId": 1411628148,
+          "trackName": "Whatever It Takes",
+          "primaryGenreName": "Alternative"
+        },
+        {
+          "artistId": 358714030,
+          "artistName": "Imagine Dragons",
+          "trackId": 1411628233,
+          "trackName": "Believer",
+          "primaryGenreName": "Alternative"
+        },
+        {
+          "artistId": 358714030,
+          "artistName": "Imagine Dragons",
+          "trackId": 1411629089,
+          "trackName": "Thunder",
+          "primaryGenreName": "Alternative"
+        },
+        {
+          "artistId": 1579400,
+          "artistName": "Bobby Helms",
+          "trackId": 1358462132,
+          "trackName": "Jingle Bell Rock",
+          "primaryGenreName": "Holiday"
+        },
+        {
+          "artistId": 648992,
+          "artistName": "Ginuwine",
+          "trackId": 157465470,
+          "trackName": "Pony",
+          "primaryGenreName": "R&B/Soul"
+        }
+      ]
+    },
+    {
+      "artist": "ちゃんみな",
+      "workCount": 6,
+      "fetchedAt": "2026-08-04T13:49:20.056Z",
+      "results": [
+        {
+          "artistId": 1104839687,
+          "artistName": "Chanmina",
+          "trackId": 1866862252,
+          "trackName": "TEST ME",
+          "primaryGenreName": "J-Pop"
+        },
+        {
+          "artistId": 1104839687,
+          "artistName": "Chanmina",
+          "trackId": 1585848051,
+          "trackName": "Harenchi",
+          "primaryGenreName": "Hip-Hop/Rap"
+        },
+        {
+          "artistId": 1104839687,
+          "artistName": "Chanmina",
+          "trackId": 1468137287,
+          "trackName": "Never Grow Up",
+          "primaryGenreName": "Hip-Hop/Rap"
+        },
+        {
+          "artistId": 1104839687,
+          "artistName": "Chanmina",
+          "trackId": 1491957483,
+          "trackName": "Voice Memo No. 5",
+          "primaryGenreName": "Hip-Hop/Rap"
+        },
+        {
+          "artistId": 1104839687,
+          "artistName": "Chanmina",
+          "trackId": 1434309167,
+          "trackName": "Doctor",
+          "primaryGenreName": "Hip-Hop/Rap"
+        }
+      ]
+    },
+    {
+      "artist": "ハチ",
+      "workCount": 6,
+      "fetchedAt": "2026-08-04T13:49:20.007Z",
+      "results": [
+        {
+          "artistId": 530814268,
+          "artistName": "Kenshi Yonezu",
+          "trackId": 1837658529,
+          "trackName": "IRIS OUT",
+          "primaryGenreName": "J-Pop"
+        },
+        {
+          "artistId": 530814268,
+          "artistName": "Kenshi Yonezu",
+          "trackId": 1648272180,
+          "trackName": "KICK BACK",
+          "primaryGenreName": "J-Pop"
+        },
+        {
+          "artistId": 530814268,
+          "artistName": "Kenshi Yonezu",
+          "trackId": 1537460612,
+          "trackName": "Lemon",
+          "primaryGenreName": "J-Pop"
+        },
+        {
+          "artistId": 530814268,
+          "artistName": "Kenshi Yonezu & Hikaru Utada",
+          "trackId": 1840081736,
+          "trackName": "JANE DOE",
+          "primaryGenreName": "J-Pop"
+        },
+        {
+          "artistId": 530814268,
+          "artistName": "Kenshi Yonezu",
+          "trackId": 1538275660,
+          "trackName": "Peace Sign",
+          "primaryGenreName": "J-Pop"
+        }
+      ]
+    },
+    {
+      "artist": "ひとしずくP・やま△",
+      "workCount": 9,
+      "fetchedAt": "2026-08-04T13:46:24.389Z",
+      "results": [
+        {
+          "artistId": 456084227,
+          "artistName": "ひとしずくP×やま△ feat.IA",
+          "trackId": 905892325,
+          "trackName": "Onegaisekai (feat. IA)",
+          "primaryGenreName": "Anime"
+        },
+        {
+          "artistId": 916631321,
+          "artistName": "Hitoshizuku & Yama",
+          "trackId": 1596480907,
+          "trackName": "Mr. Schadenfreude",
+          "primaryGenreName": "Anime"
+        },
+        {
+          "artistId": 916631321,
+          "artistName": "Hitoshizuku & Yama",
+          "trackId": 1274010746,
+          "trackName": "Sister 's mercY (feat. Kagamine Rin&Kagamine Len)",
+          "primaryGenreName": "Rock"
+        },
+        {
+          "artistId": 916631321,
+          "artistName": "Hitoshizuku & Yama",
+          "trackId": 1351552903,
+          "trackName": "Vampire's pathoS (feat. kagamine len)",
+          "primaryGenreName": "Rock"
+        },
+        {
+          "artistId": 916631321,
+          "artistName": "Hitoshizuku & Yama",
+          "trackId": 958877263,
+          "trackName": "Portrait of pirate F (feat. Kagamine Len&Kagamine Rin&Megurine Luka&MEIKO&KAITO)",
+          "primaryGenreName": "Pop"
+        }
+      ]
+    },
+    {
+      "artist": "まふまふ",
+      "workCount": 7,
+      "fetchedAt": "2026-08-04T13:48:21.515Z",
+      "results": [
+        {
+          "artistId": 614405787,
+          "artistName": "Mafumafu",
+          "trackId": 1801572684,
+          "trackName": "夢のまた夢",
+          "primaryGenreName": "Anime"
+        },
+        {
+          "artistId": 614405787,
+          "artistName": "Mafumafu",
+          "trackId": 1838981186,
+          "trackName": "Shinobi No Susume",
+          "primaryGenreName": "J-Pop"
+        },
+        {
+          "artistId": 614405787,
+          "artistName": "Mafumafu",
+          "trackId": 1838981189,
+          "trackName": "Jigsaw Puzzle",
+          "primaryGenreName": "J-Pop"
+        },
+        {
+          "artistId": 614405787,
+          "artistName": "Mafumafu",
+          "trackId": 1838981188,
+          "trackName": "Sacrifice",
+          "primaryGenreName": "J-Pop"
+        },
+        {
+          "artistId": 614405787,
+          "artistName": "Mafumafu",
+          "trackId": 1838981206,
+          "trackName": "Onnanoko Ni Naritai",
+          "primaryGenreName": "J-Pop"
+        }
+      ]
+    },
+    {
+      "artist": "みきとP",
+      "workCount": 9,
+      "fetchedAt": "2026-08-04T13:46:24.479Z",
+      "results": [
+        {
+          "artistId": 509466458,
+          "artistName": "mikitoP",
+          "trackId": 1700193018,
+          "trackName": "Shojo Rei",
+          "primaryGenreName": "Anime"
+        },
+        {
+          "artistId": 509466458,
+          "artistName": "mikitoP",
+          "trackId": 1003233496,
+          "trackName": "Breriko",
+          "primaryGenreName": "Anime"
+        },
+        {
+          "artistId": 509466458,
+          "artistName": "mikitoP",
+          "trackId": 1408577702,
+          "trackName": "Shoujo Rei",
+          "primaryGenreName": "Anime"
+        },
+        {
+          "artistId": 509466458,
+          "artistName": "mikitoP",
+          "trackId": 1266159134,
+          "trackName": "39 Music!",
+          "primaryGenreName": "Anime"
+        },
+        {
+          "artistId": 509466458,
+          "artistName": "mikitoP",
+          "trackId": 1597711849,
+          "trackName": "Roki",
+          "primaryGenreName": "Anime"
+        }
+      ]
+    },
+    {
+      "artist": "ヨルシカ",
+      "workCount": 13,
+      "fetchedAt": "2026-08-04T13:45:25.362Z",
+      "results": [
+        {
+          "artistId": 1250709916,
+          "artistName": "Yorushika",
+          "trackId": 1721450223,
+          "trackName": "Sunny",
+          "primaryGenreName": "Alternative"
+        },
+        {
+          "artistId": 1250709916,
+          "artistName": "Yorushika",
+          "trackId": 1648877323,
+          "trackName": "だから僕は音楽を辞めた",
+          "primaryGenreName": "Rock"
+        },
+        {
+          "artistId": 1250709916,
+          "artistName": "Yorushika",
+          "trackId": 1506849814,
+          "trackName": "Ghost In A Flower",
+          "primaryGenreName": "J-Pop"
+        },
+        {
+          "artistId": 1250709916,
+          "artistName": "Yorushika",
+          "trackId": 1648876333,
+          "trackName": "ただ君に晴れ",
+          "primaryGenreName": "Rock"
+        },
+        {
+          "artistId": 1250709916,
+          "artistName": "Yorushika",
+          "trackId": 1648882055,
+          "trackName": "言って。",
+          "primaryGenreName": "Rock"
+        }
+      ]
+    },
+    {
+      "artist": "れるりり",
+      "workCount": 5,
+      "fetchedAt": "2026-08-04T13:51:17.237Z",
+      "results": [
+        {
+          "artistId": 345355221,
+          "artistName": "れるりり&もじゃ(大柴広己)",
+          "trackId": 985156225,
+          "trackName": "聖槍爆裂ボーイ",
+          "primaryGenreName": "Anime"
+        },
+        {
+          "artistId": 345355221,
+          "artistName": "Rerulili",
+          "trackId": 1537925864,
+          "trackName": "Noushou Sakuretsu Girl (2015 Version)",
+          "primaryGenreName": "J-Pop"
+        },
+        {
+          "artistId": 1679787581,
+          "artistName": "Sleepy Nuts",
+          "trackId": 6794161747,
+          "trackName": "Super Deep Sleep Guitar Meditation Healing Music/Sleepy Songs Sleep Induction Music for Relaxation and Sound Sleep (River Babble for Sleep to Regulate the Autonomic Nervous System)",
+          "primaryGenreName": "Instrumental"
+        },
+        {
+          "artistId": 1679787581,
+          "artistName": "Sleepy Nuts",
+          "trackId": 6794162194,
+          "trackName": "The Ultimate in Healing Guitar Healing Sleep BGM and Sleepy Songs to Relieve Stress With Soothing Guitar and Relaxing Music (River Babble for Sleep to Regulate the Autonomic Nervous System)",
+          "primaryGenreName": "Instrumental"
+        },
+        {
+          "artistId": 1679787581,
+          "artistName": "Sleepy Nuts",
+          "trackId": 6794161744,
+          "trackName": "Fluctuation Guitar That Stimulates Alpha Waves. Relaxing Music to Induce Sleep and Reduce Stress. (River Babble for Sleep to Regulate the Autonomic Nervous System)",
+          "primaryGenreName": "Instrumental"
+        }
+      ]
+    }
+  ]
+}

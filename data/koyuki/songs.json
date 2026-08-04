@@ -36,7 +36,10 @@
     "workId": "work-song-fff3233e",
     "title": "明明就（升1key）",
     "originalArtist": "周杰倫",
-    "tags": [],
+    "tags": [
+      "language:zh",
+      "genre:pop"
+    ],
     "performances": [
       {
         "id": "p-41aa9fca",
@@ -52,7 +55,10 @@
     "workId": "work-song-441640bd",
     "title": "明明就（升1key破音ver）",
     "originalArtist": "周杰倫",
-    "tags": [],
+    "tags": [
+      "language:zh",
+      "genre:pop"
+    ],
     "performances": [
       {
         "id": "p-658a971a",
@@ -84,7 +90,9 @@
     "workId": "work-song-971c32a6",
     "title": "從前說",
     "originalArtist": "小阿七",
-    "tags": [],
+    "tags": [
+      "language:zh"
+    ],
     "performances": [
       {
         "id": "p-50841a65",
@@ -100,7 +108,9 @@
     "workId": "work-song-4b765c90",
     "title": "無人之島",
     "originalArtist": "任然",
-    "tags": [],
+    "tags": [
+      "language:zh"
+    ],
     "performances": [
       {
         "id": "p-9fe05874",
@@ -132,7 +142,9 @@
     "workId": "work-song-86d4637b",
     "title": "聽海",
     "originalArtist": "張惠妺",
-    "tags": [],
+    "tags": [
+      "language:zh"
+    ],
     "performances": [
       {
         "id": "p-2759a933",

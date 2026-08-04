@@ -4,7 +4,9 @@
     "workId": "work-song-75326d9e",
     "title": "「下一站，與你」",
     "originalArtist": "高捷少女小穹形象歌曲",
-    "tags": [],
+    "tags": [
+      "language:zh"
+    ],
     "performances": [
       {
         "id": "p-61f875fe",
@@ -36,7 +38,11 @@
     "workId": "work-song-3b5194af",
     "title": "少女 (Otomen)",
     "originalArtist": "林宥嘉",
-    "tags": [],
+    "tags": [
+      "language:zh",
+      "genre:pop",
+      "genre:jazz"
+    ],
     "performances": [
       {
         "id": "p-2cb2c484",
@@ -52,7 +58,9 @@
     "workId": "work-song-7d18e0cf",
     "title": "少女變成了一隻甲蟲",
     "originalArtist": "吾橋有水",
-    "tags": [],
+    "tags": [
+      "language:zh"
+    ],
     "performances": [
       {
         "id": "p-a9c738f5",
@@ -68,7 +76,9 @@
     "workId": "work-song-2e1e6412",
     "title": "少女A",
     "originalArtist": "椎名もた",
-    "tags": [],
+    "tags": [
+      "language:ja"
+    ],
     "performances": [
       {
         "id": "p-39137330",
@@ -84,7 +94,10 @@
     "workId": "work-song-b6f41993",
     "title": "少女レイ",
     "originalArtist": "みきとP ft.初音ミク",
-    "tags": [],
+    "tags": [
+      "language:ja",
+      "source:vocaloid"
+    ],
     "performances": [
       {
         "id": "p-1586bf34",
@@ -116,7 +129,10 @@
     "workId": "work-song-1214f3f8",
     "title": "你啊你啊",
     "originalArtist": "魏如萱",
-    "tags": [],
+    "tags": [
+      "language:zh",
+      "genre:pop"
+    ],
     "performances": [
       {
         "id": "p-d49edd19",
@@ -132,7 +148,9 @@
     "workId": "work-song-3",
     "title": "君の知らない物語",
     "originalArtist": "supercell",
-    "tags": [],
+    "tags": [
+      "language:ja"
+    ],
     "performances": [
       {
         "id": "p-c03faba5",
@@ -148,7 +166,9 @@
     "workId": "work-song-255",
     "title": "星座になれたら",
     "originalArtist": "結束バンド",
-    "tags": [],
+    "tags": [
+      "language:ja"
+    ],
     "performances": [
       {
         "id": "p-ca352616",
@@ -164,7 +184,9 @@
     "workId": "work-song-07fb1c70",
     "title": "残酷な天使のテーゼ",
     "originalArtist": "高橋洋子",
-    "tags": [],
+    "tags": [
+      "language:ja"
+    ],
     "performances": [
       {
         "id": "p-04af3e03",
@@ -180,7 +202,9 @@
     "workId": "work-song-59976ef5",
     "title": "留給你的我從未",
     "originalArtist": "甜約翰",
-    "tags": [],
+    "tags": [
+      "language:zh"
+    ],
     "performances": [
       {
         "id": "p-d27e6e80",
@@ -196,7 +220,10 @@
     "workId": "work-song-2dbecb55",
     "title": "深海少女",
     "originalArtist": "ゆうゆ (篠螺悠那) ft.初音ミク",
-    "tags": [],
+    "tags": [
+      "language:ja",
+      "source:vocaloid"
+    ],
     "performances": [
       {
         "id": "p-022ef797",
@@ -212,7 +239,9 @@
     "workId": "work-song-bf56f1c3",
     "title": "都落ち",
     "originalArtist": "ヨルシカ (Yorushika)",
-    "tags": [],
+    "tags": [
+      "language:ja"
+    ],
     "performances": [
       {
         "id": "p-42d25408",
@@ -228,7 +257,9 @@
     "workId": "work-song-050dfdb8",
     "title": "無眠",
     "originalArtist": "蘇打綠 (復仇)",
-    "tags": [],
+    "tags": [
+      "language:zh"
+    ],
     "performances": [
       {
         "id": "p-141e4c11",
@@ -244,7 +275,10 @@
     "workId": "work-song-170de3d8",
     "title": "無眠",
     "originalArtist": "蘇打綠",
-    "tags": [],
+    "tags": [
+      "language:zh",
+      "genre:pop"
+    ],
     "performances": [
       {
         "id": "p-19491816",
@@ -260,7 +294,10 @@
     "workId": "work-song-4f4221ed",
     "title": "漫夜 Sleepless",
     "originalArtist": "澪Rei",
-    "tags": [],
+    "tags": [
+      "language:zh",
+      "source:original"
+    ],
     "performances": [
       {
         "id": "p-202f88a4",
@@ -276,7 +313,10 @@
     "workId": "work-song-a6be1a89",
     "title": "鎖の少女-Re Alive-",
     "originalArtist": "のぼる↑P ft.初音ミク",
-    "tags": [],
+    "tags": [
+      "language:ja",
+      "source:vocaloid"
+    ],
     "performances": [
       {
         "id": "p-12e8296c",
@@ -340,7 +380,11 @@
     "workId": "work-song-1290",
     "title": "flos",
     "originalArtist": "R Sound Design",
-    "tags": [],
+    "tags": [
+      "language:ja",
+      "genre:pop",
+      "source:vocaloid"
+    ],
     "performances": [
       {
         "id": "p-ef2a11e9",
@@ -356,7 +400,9 @@
     "workId": "work-song-4febbc8f",
     "title": "God knows",
     "originalArtist": "平野綾",
-    "tags": [],
+    "tags": [
+      "language:ja"
+    ],
     "performances": [
       {
         "id": "p-4bf24c2b",
@@ -372,7 +418,10 @@
     "workId": "work-song-2077",
     "title": "Liar 謊癮",
     "originalArtist": "煌Kirali",
-    "tags": [],
+    "tags": [
+      "language:zh",
+      "source:original"
+    ],
     "performances": [
       {
         "id": "p-61232076",
@@ -388,7 +437,9 @@
     "workId": "work-song-d64faf4e",
     "title": "love like you",
     "originalArtist": "Rebecca Sugar",
-    "tags": [],
+    "tags": [
+      "language:en"
+    ],
     "performances": [
       {
         "id": "p-f9c2c039",
@@ -404,7 +455,10 @@
     "workId": "work-song-1283",
     "title": "Love Yourself",
     "originalArtist": "Justin Bieber",
-    "tags": [],
+    "tags": [
+      "language:en",
+      "genre:pop"
+    ],
     "performances": [
       {
         "id": "p-c1103dc8",
@@ -436,7 +490,9 @@
     "workId": "work-song-848f8d9f",
     "title": "コネクト",
     "originalArtist": "ClariS (クラリス)",
-    "tags": [],
+    "tags": [
+      "language:ja"
+    ],
     "performances": [
       {
         "id": "p-9cd09cd0",
@@ -452,7 +508,9 @@
     "workId": "work-song-2ea03c71",
     "title": "シルエット",
     "originalArtist": "KANA-BOON",
-    "tags": [],
+    "tags": [
+      "language:ja"
+    ],
     "performances": [
       {
         "id": "p-9cbc3434",
@@ -468,7 +526,9 @@
     "workId": "work-song-1663",
     "title": "すずめ",
     "originalArtist": "RADWIMPS ft.十明",
-    "tags": [],
+    "tags": [
+      "language:ja"
+    ],
     "performances": [
       {
         "id": "p-7a5fecd2",
@@ -484,7 +544,9 @@
     "workId": "work-song-23936c29",
     "title": "ただ声一つ",
     "originalArtist": "ロクデナシ",
-    "tags": [],
+    "tags": [
+      "language:ja"
+    ],
     "performances": [
       {
         "id": "p-8657feae",
@@ -500,7 +562,9 @@
     "workId": "work-song-53187977",
     "title": "プラチナ",
     "originalArtist": "坂本真綾",
-    "tags": [],
+    "tags": [
+      "language:ja"
+    ],
     "performances": [
       {
         "id": "p-dca6200c",

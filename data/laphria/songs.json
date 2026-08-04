@@ -4,7 +4,9 @@
     "workId": "work-song-e9f5270a",
     "title": "下一站·與你",
     "originalArtist": "KSP",
-    "tags": [],
+    "tags": [
+      "language:zh"
+    ],
     "performances": [
       {
         "id": "p-7cd9c3a8",
@@ -36,7 +38,10 @@
     "workId": "work-song-254ee811",
     "title": "小手拉大手",
     "originalArtist": "梁靜茹",
-    "tags": [],
+    "tags": [
+      "language:zh",
+      "genre:pop"
+    ],
     "performances": [
       {
         "id": "p-72907a92",
@@ -68,7 +73,10 @@
     "workId": "work-song-415",
     "title": "天黑黑",
     "originalArtist": "孫燕姿",
-    "tags": [],
+    "tags": [
+      "language:zh",
+      "genre:pop"
+    ],
     "performances": [
       {
         "id": "p-82490d34",
@@ -116,7 +124,10 @@
     "workId": "work-song-7bbfd1ba",
     "title": "身騎白馬",
     "originalArtist": "徐佳瑩",
-    "tags": [],
+    "tags": [
+      "language:zh",
+      "genre:pop"
+    ],
     "performances": [
       {
         "id": "p-91bfb118",
@@ -164,7 +175,11 @@
     "workId": "work-song-4aaebd44",
     "title": "家後",
     "originalArtist": "江蕙",
-    "tags": [],
+    "tags": [
+      "language:zh",
+      "genre:pop",
+      "genre:folk"
+    ],
     "performances": [
       {
         "id": "p-e199f4b9",
@@ -180,7 +195,10 @@
     "workId": "work-song-2104",
     "title": "晚餐歌",
     "originalArtist": "tuki.",
-    "tags": [],
+    "tags": [
+      "language:ja",
+      "genre:pop"
+    ],
     "performances": [
       {
         "id": "p-ab441f6b",
@@ -212,7 +230,9 @@
     "workId": "work-song-1aaee745",
     "title": "最後一頁",
     "originalArtist": "江語晨",
-    "tags": [],
+    "tags": [
+      "language:zh"
+    ],
     "performances": [
       {
         "id": "p-54dd87e4",
@@ -228,7 +248,10 @@
     "workId": "work-song-4b4f9b2b",
     "title": "晴天",
     "originalArtist": "周杰倫",
-    "tags": [],
+    "tags": [
+      "language:zh",
+      "genre:pop"
+    ],
     "performances": [
       {
         "id": "p-3e2872e5",
@@ -244,7 +267,9 @@
     "workId": "work-song-0f41e3a3",
     "title": "落雨聲",
     "originalArtist": "江蕙 （自彈）",
-    "tags": [],
+    "tags": [
+      "language:zh"
+    ],
     "performances": [
       {
         "id": "p-41854a61",
@@ -260,7 +285,10 @@
     "workId": "work-song-308",
     "title": "寶貝",
     "originalArtist": "張懸",
-    "tags": [],
+    "tags": [
+      "language:zh",
+      "genre:pop"
+    ],
     "performances": [
       {
         "id": "p-56caf835",

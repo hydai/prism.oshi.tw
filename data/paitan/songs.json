@@ -4,7 +4,11 @@
     "workId": "work-song-07bab4f3",
     "title": "少女レイ",
     "originalArtist": "みきとP",
-    "tags": [],
+    "tags": [
+      "language:ja",
+      "genre:pop",
+      "source:vocaloid"
+    ],
     "performances": [
       {
         "id": "p-9be28ca5",
@@ -20,7 +24,10 @@
     "workId": "work-song-2ccade11",
     "title": "踊",
     "originalArtist": "Ado",
-    "tags": [],
+    "tags": [
+      "language:ja",
+      "genre:pop"
+    ],
     "performances": [
       {
         "id": "p-540ffbc9",
@@ -36,7 +43,9 @@
     "workId": "work-song-424e636c",
     "title": "たばこ",
     "originalArtist": "コレサワ",
-    "tags": [],
+    "tags": [
+      "language:ja"
+    ],
     "performances": [
       {
         "id": "p-92ed3059",
