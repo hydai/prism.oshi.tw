@@ -16,6 +16,7 @@ import {
   listPerformances,
   insertPerformance,
   insertPerformances,
+  updatePerformanceTags,
   getPerformanceStatus as db_getPerformanceStatus,
   updatePerformanceStatus,
   generatePerformanceId,
@@ -53,7 +54,13 @@ import {
   mergeSongs,
   SongMergeError,
 } from './db';
-import { getTagDefinition, validateTagSelection } from '../../lib/tags';
+import {
+  filterTagIdsByScope,
+  getTagDefinition,
+  mergeTagIds,
+  validateTagSelection,
+  validateTagSelectionForScope,
+} from '../../lib/tags';
 import { fetchItunesDuration } from './itunes';
 import { parseTextToSongs } from '../shared/parse';
 import { formatSubscriberCount } from '../shared/format';
@@ -89,6 +96,7 @@ import type {
   CreateSongBody,
   UpdateSongBody,
   CreatePerformanceBody,
+  UpdatePerformanceTagsBody,
   CreateStreamBody,
   StatusUpdateBody,
   CreateStampPerformanceBody,
@@ -381,7 +389,9 @@ app.get('/api/works', requireCurator, async (c) => {
   const sharedOnlyValue = c.req.query('sharedOnly');
   const sharedOnly = sharedOnlyValue === 'true' || sharedOnlyValue === '1';
   const tag = c.req.query('tag')?.trim() || undefined;
-  if (tag && !getTagDefinition(tag)?.active) return c.json({ error: 'Invalid tag filter' }, 400);
+  if (tag && (!getTagDefinition(tag)?.active || getTagDefinition(tag)?.scope !== 'work')) {
+    return c.json({ error: 'Invalid work tag filter' }, 400);
+  }
   const untaggedValue = c.req.query('untaggedOnly');
   const untaggedOnly = untaggedValue === 'true' || untaggedValue === '1';
   if (tag && untaggedOnly) return c.json({ error: 'tag and untaggedOnly cannot be combined' }, 400);
@@ -409,7 +419,7 @@ app.get('/api/works', requireCurator, async (c) => {
 
 app.put('/api/works/:id/tags', requireCurator, async (c) => {
   const body = await c.req.json<UpdateWorkTagsBody>();
-  const selection = validateTagSelection(body.tags);
+  const selection = validateTagSelectionForScope(body.tags, 'work');
   if (!selection.ok) return c.json({ error: selection.error }, 400);
 
   const id = getRouteParam(c, 'id');
@@ -431,9 +441,9 @@ app.post('/api/works/tags/bulk', requireCurator, async (c) => {
     return c.json({ error: 'workIds must not contain duplicates' }, 400);
   }
 
-  const add = validateTagSelection(body.addTags);
+  const add = validateTagSelectionForScope(body.addTags, 'work');
   if (!add.ok) return c.json({ error: add.error }, 400);
-  const remove = validateTagSelection(body.removeTags);
+  const remove = validateTagSelectionForScope(body.removeTags, 'work');
   if (!remove.ok) return c.json({ error: remove.error }, 400);
   if (add.tags.length === 0 && remove.tags.length === 0) {
     return c.json({ error: 'at least one tag must be added or removed' }, 400);
@@ -555,10 +565,22 @@ app.post('/api/songs', async (c) => {
 
   const tagSelection = validateTagSelection(body.tags ?? []);
   if (!tagSelection.ok) return c.json({ error: tagSelection.error }, 400);
+  const workTags = filterTagIdsByScope(tagSelection.tags, 'work');
+  const legacyPerformanceTags = filterTagIdsByScope(tagSelection.tags, 'performance');
+  if (legacyPerformanceTags.length > 0 && (!body.performances || body.performances.length === 0)) {
+    return c.json({ error: 'performance-scoped tags require at least one performance' }, 400);
+  }
+
+  const performanceTags: string[][] = [];
+  for (const performance of body.performances ?? []) {
+    const selection = validateTagSelectionForScope(performance.tags ?? [], 'performance');
+    if (!selection.ok) return c.json({ error: selection.error }, 400);
+    performanceTags.push(mergeTagIds(legacyPerformanceTags, selection.tags));
+  }
 
   const user = c.get('user');
   const id = generateSongId();
-  await insertSong(c.env.DB, streamerId, id, body.title, body.originalArtist, tagSelection.tags, user.email);
+  await insertSong(c.env.DB, streamerId, id, body.title, body.originalArtist, workTags, user.email);
 
   // If inline performances are provided, insert them too
   if (body.performances && body.performances.length > 0) {
@@ -566,7 +588,7 @@ app.post('/api/songs', async (c) => {
       c.env.DB,
       streamerId,
       id,
-      body.performances.map((perf) => ({
+      body.performances.map((perf, index) => ({
         id: generatePerformanceId(),
         streamId: perf.streamId,
         date: perf.date,
@@ -575,6 +597,7 @@ app.post('/api/songs', async (c) => {
         timestamp: perf.timestamp,
         endTimestamp: perf.endTimestamp ?? null,
         note: perf.note ?? '',
+        tags: performanceTags[index],
       })),
       user.email,
     );
@@ -602,12 +625,9 @@ app.put('/api/songs/:id', async (c) => {
   }
 
   const body = await c.req.json<UpdateSongBody>();
-  const tagSelection = body.tags === undefined ? undefined : validateTagSelection(body.tags);
-  if (tagSelection && !tagSelection.ok) return c.json({ error: tagSelection.error }, 400);
   await updateSong(c.env.DB, id, {
     title: body.title,
     originalArtist: body.originalArtist,
-    tags: tagSelection?.tags,
   }, user.email);
 
   const updated = await getSongById(c.env.DB, id);
@@ -653,6 +673,8 @@ app.post('/api/performances', async (c) => {
   }
 
   const user = c.get('user');
+  const tagSelection = validateTagSelectionForScope(body.tags ?? [], 'performance');
+  if (!tagSelection.ok) return c.json({ error: tagSelection.error }, 400);
   const id = generatePerformanceId();
   await insertPerformance(
     c.env.DB,
@@ -667,9 +689,21 @@ app.post('/api/performances', async (c) => {
     body.endTimestamp ?? null,
     body.note ?? '',
     user.email,
+    tagSelection.tags,
   );
 
   return c.json({ id, status: 'pending' }, 201);
+});
+
+app.patch('/api/performances/:id/tags', requireCurator, async (c) => {
+  const id = getRouteParam(c, 'id');
+  const body = await c.req.json<UpdatePerformanceTagsBody>();
+  const selection = validateTagSelectionForScope(body.tags, 'performance');
+  if (!selection.ok) return c.json({ error: selection.error }, 400);
+
+  const updated = await updatePerformanceTags(c.env.DB, id, selection.tags);
+  if (!updated) return c.json({ error: 'Performance not found' }, 404);
+  return c.json({ id, tags: selection.tags });
 });
 
 app.patch('/api/performances/:id/status', requireCurator, async (c) => {
@@ -796,6 +830,9 @@ app.post('/api/streams/:streamId/performances', async (c) => {
   const stream = await getStreamById(c.env.DB, streamId);
   if (!stream) return c.json({ error: 'Stream not found' }, 404);
 
+  const tagSelection = validateTagSelectionForScope(body.tags ?? [], 'performance');
+  if (!tagSelection.ok) return c.json({ error: tagSelection.error }, 400);
+
   const user = c.get('user');
   const result = await createSongAndPerformance(
     c.env.DB,
@@ -810,6 +847,7 @@ app.post('/api/streams/:streamId/performances', async (c) => {
     body.endTimestamp ?? null,
     body.note ?? '',
     user.email,
+    tagSelection.tags,
   );
 
   return c.json(result, 201);

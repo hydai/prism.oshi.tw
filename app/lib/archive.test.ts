@@ -22,7 +22,8 @@ const songs: ArchiveSong[] = [
     id: "song-a",
     title: "Beta Song",
     originalArtist: "Zeta",
-    tags: ["genre:rock", "language:zh"],
+    inheritedTags: ["genre:rock"],
+    tags: ["language:zh", "language:en", "genre:rock"],
     albumArtUrl: "old-art",
     performances: [
       {
@@ -34,6 +35,7 @@ const songs: ArchiveSong[] = [
         timestamp: 10,
         endTimestamp: null,
         note: "",
+        tags: ["language:zh"],
       },
       {
         id: "perf-new",
@@ -44,6 +46,7 @@ const songs: ArchiveSong[] = [
         timestamp: 20,
         endTimestamp: 50,
         note: "encore",
+        tags: ["language:en"],
       },
     ],
   },
@@ -51,6 +54,7 @@ const songs: ArchiveSong[] = [
     id: "song-b",
     title: "Alpha Song",
     originalArtist: "Alpha",
+    inheritedTags: [],
     tags: [],
     performances: [
       {
@@ -60,6 +64,7 @@ const songs: ArchiveSong[] = [
         videoId: "video-mid",
         timestamp: 30,
         note: "",
+        tags: [],
       },
     ],
   },
@@ -67,6 +72,7 @@ const songs: ArchiveSong[] = [
     id: "song-c",
     title: "Gamma Song",
     originalArtist: "Zeta",
+    inheritedTags: [],
     tags: [],
     performances: [],
   },
@@ -96,7 +102,11 @@ assert.deepEqual(
 );
 
 assert.deepEqual(getAllArtists(songs), ["Alpha", "Zeta"]);
-assert.deepEqual([...getTagCounts(songs)], [["genre:rock", 1], ["language:zh", 1]]);
+assert.deepEqual([...getTagCounts(songs)], [
+  ["language:zh", 1],
+  ["language:en", 1],
+  ["genre:rock", 1],
+]);
 
 const flattened = flattenSongs(songs);
 assert.deepEqual(flattened.map((song) => song.performanceId), [
@@ -104,14 +114,16 @@ assert.deepEqual(flattened.map((song) => song.performanceId), [
   "perf-no-stream",
   "perf-old",
 ]);
-assert.match(flattened[0]?.searchString ?? "", /中文歌/);
+assert.match(flattened[0]?.searchString ?? "", /英文歌/);
+assert.doesNotMatch(flattened[0]?.searchString ?? "", /中文歌/);
 assert.match(flattened[0]?.searchString ?? "", /搖滾/);
 assert.equal(flattened[0]?.year, 2025);
 assert.equal(flattened[0]?.endTimestamp, 50);
 assert.equal(flattened[1]?.streamId, undefined);
 assert.equal(flattened[2]?.endTimestamp, undefined);
 assert.equal("performances" in flattened[0]!, false);
-assert.deepEqual(flattened[0]?.tags, ["genre:rock", "language:zh"]);
+assert.deepEqual(flattened[0]?.tags, ["language:en", "genre:rock"]);
+assert.deepEqual(flattened[2]?.tags, ["language:zh", "genre:rock"]);
 
 assert.deepEqual(
   filterFlattenedSongs(flattened, {
@@ -171,6 +183,7 @@ const workIdSongs: ArchiveSong[] = [
     workId: "work-shared",
     title: "Shared Song (legacy spelling)",
     originalArtist: "Shared Artist",
+    inheritedTags: ["acoustic"],
     tags: ["acoustic"],
     albumArtUrl: "shared-art",
     performances: [
@@ -181,6 +194,7 @@ const workIdSongs: ArchiveSong[] = [
         videoId: "video-shared-z",
         timestamp: 10,
         note: "",
+        tags: [],
       },
     ],
   },
@@ -189,6 +203,7 @@ const workIdSongs: ArchiveSong[] = [
     workId: " work-shared ",
     title: "Shared Song",
     originalArtist: "Shared Artist",
+    inheritedTags: ["ballad", "acoustic"],
     tags: ["ballad", "acoustic"],
     performances: [
       {
@@ -198,6 +213,7 @@ const workIdSongs: ArchiveSong[] = [
         videoId: "video-shared-a",
         timestamp: 20,
         note: "",
+        tags: [],
       },
     ],
   },
@@ -206,6 +222,7 @@ const workIdSongs: ArchiveSong[] = [
     workId: "work-other",
     title: "Shared Song",
     originalArtist: "Shared Artist",
+    inheritedTags: [],
     tags: [],
     performances: [],
   },
@@ -213,6 +230,7 @@ const workIdSongs: ArchiveSong[] = [
     id: "song-legacy-a",
     title: "Shared Song",
     originalArtist: "Shared Artist",
+    inheritedTags: [],
     tags: [],
     performances: [],
   },
@@ -221,6 +239,7 @@ const workIdSongs: ArchiveSong[] = [
     workId: "   ",
     title: "Shared Song",
     originalArtist: "Shared Artist",
+    inheritedTags: [],
     tags: [],
     performances: [],
   },
@@ -232,6 +251,7 @@ assert.equal(groupedByWorkId.length, 4);
 assert.equal(sharedWork?.id, "song-shared-a");
 assert.equal(sharedWork?.title, "Shared Song");
 assert.equal(sharedWork?.albumArtUrl, "shared-art");
+assert.deepEqual(sharedWork?.inheritedTags, ["acoustic", "ballad"]);
 assert.deepEqual(sharedWork?.tags, ["ballad", "acoustic"]);
 assert.deepEqual(
   sharedWork?.performances.map((performance) => performance.id),
@@ -267,15 +287,19 @@ assert.deepEqual(
   }).map((song) => song.id),
   ["song-a"],
 );
-assert.deepEqual(
-  filterGroupedSongs(grouped, {
+const chineseGrouped = filterGroupedSongs(grouped, {
     search: "",
     selectedStreamId: null,
     selectedArtist: null,
     selectedYears: new Set(),
     selectedTags: new Set(["language:zh", "genre:rock"]),
-  }).map((song) => song.id),
-  ["song-a"],
+  });
+assert.deepEqual(chineseGrouped.map((song) => song.id), ["song-a"]);
+assert.deepEqual(chineseGrouped[0]?.tags, ["language:zh", "genre:rock"]);
+assert.deepEqual(
+  chineseGrouped[0]?.performances.map((performance) => performance.id),
+  ["perf-old"],
+  "grouped tag filtering keeps only performances that actually match the rendition tags",
 );
 assert.deepEqual(
   filterGroupedSongs(grouped, {

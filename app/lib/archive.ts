@@ -5,7 +5,7 @@ import type {
   FlattenedSong,
   StreamSummary,
 } from "../types/archive";
-import { matchesTagSelection, tagSearchTerms } from "../../lib/tags";
+import { matchesTagSelection, mergeTagIds, tagSearchTerms } from "../../lib/tags";
 
 export interface ArchiveFilters {
   search: string;
@@ -57,11 +57,12 @@ export function flattenSongs(songs: ArchiveSong[]): FlattenedSong[] {
   songs.forEach((song) => {
     song.performances.forEach((performance) => {
       const performanceDate = new Date(performance.date);
+      const tags = mergeTagIds(song.inheritedTags, performance.tags);
       result.push({
         id: song.id,
         title: song.title,
         originalArtist: song.originalArtist,
-        tags: song.tags,
+        tags,
         albumArtUrl: song.albumArtUrl,
         performanceId: performance.id,
         streamId: performance.streamId,
@@ -71,7 +72,7 @@ export function flattenSongs(songs: ArchiveSong[]): FlattenedSong[] {
         timestamp: performance.timestamp,
         endTimestamp: performance.endTimestamp ?? undefined,
         note: performance.note,
-        searchString: `${song.title} ${song.originalArtist} ${performance.streamTitle} ${tagSearchTerms(song.tags)}`.toLowerCase(),
+        searchString: `${song.title} ${song.originalArtist} ${performance.streamTitle} ${tagSearchTerms(tags)}`.toLowerCase(),
         year: performanceDate.getFullYear(),
         sortTime: performanceDate.getTime(),
       });
@@ -122,6 +123,7 @@ export function groupSongsByWorkId(songs: ArchiveSong[]): ArchiveSong[] {
     return {
       ...canonical,
       ...(workId ? { workId } : {}),
+      inheritedTags: mergeTagIds(orderedMembers.flatMap((song) => song.inheritedTags)),
       tags: Array.from(new Set(orderedMembers.flatMap((song) => song.tags))),
       performances: orderedMembers.flatMap((song) => song.performances),
       albumArtUrl,
@@ -138,18 +140,40 @@ export function filterGroupedSongs(
   filters: ArchiveFilters,
 ): ArchiveSong[] {
   const lowerTerm = filters.search.toLowerCase();
-  return songs.filter((song) => {
+  return songs.flatMap((song) => {
     const matchesSearch = !lowerTerm
       || `${song.title} ${song.originalArtist} ${tagSearchTerms(song.tags)}`.toLowerCase().includes(lowerTerm);
-    const matchesStream = filters.selectedStreamId
-      ? song.performances.some((performance) => performance.streamId === filters.selectedStreamId)
-      : true;
     const matchesArtist = filters.selectedArtist ? song.originalArtist === filters.selectedArtist : true;
-    const matchesYear = filters.selectedYears.size > 0
-      ? song.performances.some((performance) => filters.selectedYears.has(new Date(performance.date).getFullYear()))
-      : true;
-    const matchesTags = matchesTagSelection(song.tags, filters.selectedTags);
-    return matchesSearch && matchesStream && matchesArtist && matchesYear && matchesTags;
+    if (!matchesSearch || !matchesArtist) return [];
+
+    const hasPerformanceFilters = filters.selectedStreamId !== null
+      || filters.selectedYears.size > 0
+      || filters.selectedTags.size > 0;
+    if (!hasPerformanceFilters) return [song];
+
+    const performances = song.performances.filter((performance) => {
+      const matchesStream = filters.selectedStreamId
+        ? performance.streamId === filters.selectedStreamId
+        : true;
+      const matchesYear = filters.selectedYears.size > 0
+        ? filters.selectedYears.has(new Date(performance.date).getFullYear())
+        : true;
+      const matchesTags = matchesTagSelection(
+        mergeTagIds(song.inheritedTags, performance.tags),
+        filters.selectedTags,
+      );
+      return matchesStream && matchesYear && matchesTags;
+    });
+    return performances.length > 0
+      ? [{
+          ...song,
+          tags: mergeTagIds(
+            song.inheritedTags,
+            performances.flatMap((performance) => performance.tags),
+          ),
+          performances,
+        }]
+      : [];
   });
 }
 

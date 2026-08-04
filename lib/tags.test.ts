@@ -1,15 +1,18 @@
 import assert from 'node:assert/strict';
 import {
+  activeTagIds,
   activeTagsByCategory,
   applyTagDelta,
   TAG_CATEGORIES,
   TAG_DEFINITIONS,
   getTagLabel,
+  filterTagIdsByScope,
   matchesTagSelection,
   mergeTagIds,
   normalizeTagIds,
   tagSearchTerms,
   validateTagSelection,
+  validateTagSelectionForScope,
 } from './tags';
 
 assert.equal(new Set(TAG_DEFINITIONS.map((tag) => tag.id)).size, TAG_DEFINITIONS.length, 'tag IDs are unique');
@@ -22,30 +25,37 @@ assert.equal(getTagLabel('language:zh'), '中文歌');
 assert.equal(getTagLabel('legacy:unknown'), 'legacy:unknown');
 
 {
-  const groups = activeTagsByCategory();
+  const groups = activeTagsByCategory('work');
   const expectedCategoryIds: string[] = [];
-  let activeCount = 0;
+  const expectedIds: string[] = [];
   for (const category of TAG_CATEGORIES) {
-    if (TAG_DEFINITIONS.some((tag) => tag.active && tag.category === category.id)) {
+    if (TAG_DEFINITIONS.some((tag) => tag.active && tag.scope === 'work' && tag.category === category.id)) {
       expectedCategoryIds.push(category.id);
     }
   }
   for (const tag of TAG_DEFINITIONS) {
-    if (tag.active) activeCount += 1;
+    if (tag.active && tag.scope === 'work') expectedIds.push(tag.id);
   }
   assert.deepEqual(
     groups.map((group) => group.category.id),
     expectedCategoryIds,
-    'groups follow the category order and skip categories with no active tag',
+    'groups follow the category order and skip categories with no active tag in the scope',
   );
   assert.ok(
-    groups.every((group) => group.tags.every((tag) => tag.active && tag.category === group.category.id)),
-    'each group holds only active tags of its own category',
+    groups.every((group) => group.tags.every((tag) => (
+      tag.active && tag.scope === 'work' && tag.category === group.category.id
+    ))),
+    'each group holds only active tags of its own category and scope',
   );
+  assert.deepEqual(activeTagIds('work'), expectedIds, 'active work tag IDs keep catalog order');
   assert.equal(
     groups.reduce((count, group) => count + group.tags.length, 0),
-    activeCount,
-    'every active tag lands in exactly one group',
+    expectedIds.length,
+    'every active work tag lands in exactly one group',
+  );
+  assert.ok(
+    activeTagIds('performance').every((id) => !expectedIds.includes(id)),
+    'the two scopes never share an active tag',
   );
 }
 
@@ -73,6 +83,15 @@ assert.deepEqual(validateTagSelection('genre:rock'), {
 assert.deepEqual(validateTagSelection(['not-real']), {
   ok: false,
   error: 'unknown or inactive tag IDs: not-real',
+});
+assert.deepEqual(filterTagIdsByScope(['language:zh', 'genre:rock'], 'performance'), ['language:zh']);
+assert.deepEqual(validateTagSelectionForScope(['genre:rock'], 'work'), {
+  ok: true,
+  tags: ['genre:rock'],
+});
+assert.deepEqual(validateTagSelectionForScope(['language:zh'], 'work'), {
+  ok: false,
+  error: 'tag IDs are not valid for work scope: language:zh',
 });
 
 const tags = ['language:zh', 'genre:rock'];

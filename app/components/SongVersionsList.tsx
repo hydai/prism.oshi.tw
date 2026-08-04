@@ -3,6 +3,7 @@
 import { ExternalLink, Heart, Play, Plus } from 'lucide-react';
 import type { ArchivePerformance, ArchiveSong, ArchiveTrack } from '../types/archive';
 import { formatTime } from '../lib/format';
+import { getTagLabel } from '../../lib/tags';
 import AddToPlaylistDropdown from './AddToPlaylistDropdown';
 
 interface SongVersionsListProps {
@@ -126,6 +127,19 @@ export default function SongVersionsList({
                 >
                   {performance.date}
                 </span>
+                {performance.tags.map((tag) => (
+                  <span
+                    key={tag}
+                    className="rounded-full px-2 py-0.5"
+                    style={{
+                      background: 'var(--bg-accent-pink)',
+                      color: 'var(--accent-pink)',
+                      fontSize: 'var(--font-size-xs)',
+                    }}
+                  >
+                    {getTagLabel(tag)}
+                  </span>
+                ))}
                 {performance.note && (
                   <span
                     className="inline-flex items-center border border-blue-200 text-blue-500 bg-blue-50 font-medium"

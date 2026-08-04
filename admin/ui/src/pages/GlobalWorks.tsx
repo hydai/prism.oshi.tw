@@ -212,7 +212,7 @@ function FilterBar({ controller }: { controller: GlobalWorksController }) {
         aria-label="Filter global works by tag"
       >
         <option value="">All tags</option>
-        {activeTagsByCategory().map(({ category, tags }) => (
+        {activeTagsByCategory('work').map(({ category, tags }) => (
           <optgroup key={category.id} label={category.label}>
             {tags.map((tag) => (
               <option key={tag.id} value={tag.id}>{tag.label}</option>
@@ -255,7 +255,7 @@ function BulkTagEditor({ controller }: { controller: GlobalWorksController }) {
       <TagPicker
         value={batchTags}
         onChange={(tags) => dispatch({ type: 'batchTagsChanged', tags })}
-        recommendedScope="work"
+        scope="work"
         compact
       />
       <div className="mt-3 flex gap-2">
@@ -293,7 +293,7 @@ function WorkTagEditorRow({ work, controller }: { work: GlobalWorkSummary; contr
         <TagPicker
           value={editTags}
           onChange={(tags) => dispatch({ type: 'editTagsChanged', tags })}
-          recommendedScope="work"
+          scope="work"
           compact
         />
         <div className="mt-3 flex gap-2">
