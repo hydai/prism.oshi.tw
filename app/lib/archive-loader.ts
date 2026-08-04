@@ -36,20 +36,24 @@ const ORPHAN_DATE = "1970-01-01";
 
 export function hydrateSongs(stored: StoredSong[], streams: StreamSummary[]): ArchiveSong[] {
   const streamById = new Map(streams.map((s) => [s.id, s]));
-  return stored.map((song) => ({
-    ...song,
-    inheritedTags: song.inheritedTags ?? song.tags,
-    performances: song.performances.map((p) => {
-      const stream = streamById.get(p.streamId);
-      return {
-        ...p,
-        streamTitle: stream?.title ?? "",
-        date: stream?.date ?? ORPHAN_DATE,
-        note: p.note ?? "",
-        tags: p.tags ?? [],
-      };
-    }),
-  }));
+  return stored.map((song) => {
+    const inheritedTags = song.inheritedTags ?? song.tags;
+    return {
+      ...song,
+      inheritedTags,
+      performances: song.performances.map((p) => {
+        const stream = streamById.get(p.streamId);
+        return {
+          ...p,
+          streamTitle: stream?.title ?? "",
+          date: stream?.date ?? ORPHAN_DATE,
+          note: p.note ?? "",
+          inheritedTags,
+          tags: p.tags ?? [],
+        };
+      }),
+    };
+  });
 }
 
 // Loads songs and streams for a streamer with both requests in flight at once,

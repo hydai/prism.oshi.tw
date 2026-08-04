@@ -12,6 +12,7 @@ function performance(id: string): ArchivePerformance {
     videoId: `video-${id}`,
     timestamp: 10,
     note: '',
+    inheritedTags: ['genre:pop'],
     tags: ['language:ja'],
   };
 }

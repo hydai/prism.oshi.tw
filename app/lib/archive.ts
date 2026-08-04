@@ -52,12 +52,16 @@ export function filterStreamsByYears(
   return streams.filter((stream) => selectedYears.has(new Date(stream.date).getFullYear()));
 }
 
+function effectivePerformanceTags(performance: ArchivePerformance): string[] {
+  return mergeTagIds(performance.inheritedTags, performance.tags);
+}
+
 export function flattenSongs(songs: ArchiveSong[]): FlattenedSong[] {
   const result: Array<FlattenedSong & { sortTime: number }> = [];
   songs.forEach((song) => {
     song.performances.forEach((performance) => {
       const performanceDate = new Date(performance.date);
-      const tags = mergeTagIds(song.inheritedTags, performance.tags);
+      const tags = effectivePerformanceTags(performance);
       result.push({
         id: song.id,
         title: song.title,
@@ -141,36 +145,44 @@ export function filterGroupedSongs(
 ): ArchiveSong[] {
   const lowerTerm = filters.search.toLowerCase();
   return songs.flatMap((song) => {
-    const matchesSearch = !lowerTerm
-      || `${song.title} ${song.originalArtist} ${tagSearchTerms(song.tags)}`.toLowerCase().includes(lowerTerm);
     const matchesArtist = filters.selectedArtist ? song.originalArtist === filters.selectedArtist : true;
-    if (!matchesSearch || !matchesArtist) return [];
+    if (!matchesArtist) return [];
+
+    const workSearchString = `${song.title} ${song.originalArtist}`.toLowerCase();
+    const matchesWorkSearch = !lowerTerm || workSearchString.includes(lowerTerm);
 
     const hasPerformanceFilters = filters.selectedStreamId !== null
       || filters.selectedYears.size > 0
       || filters.selectedTags.size > 0;
-    if (!hasPerformanceFilters) return [song];
+    const needsPerformanceSearch = Boolean(lowerTerm) && !matchesWorkSearch;
+    if (!hasPerformanceFilters && !needsPerformanceSearch) return [song];
+
+    if (song.performances.length === 0) {
+      const matchesSearch = `${workSearchString} ${tagSearchTerms(song.inheritedTags).toLowerCase()}`
+        .includes(lowerTerm);
+      return !hasPerformanceFilters && matchesSearch ? [song] : [];
+    }
 
     const performances = song.performances.filter((performance) => {
+      const effectiveTags = effectivePerformanceTags(performance);
+      const matchesSearch = matchesWorkSearch
+        || `${workSearchString} ${tagSearchTerms(effectiveTags).toLowerCase()}`.includes(lowerTerm);
       const matchesStream = filters.selectedStreamId
         ? performance.streamId === filters.selectedStreamId
         : true;
       const matchesYear = filters.selectedYears.size > 0
         ? filters.selectedYears.has(new Date(performance.date).getFullYear())
         : true;
-      const matchesTags = matchesTagSelection(
-        mergeTagIds(song.inheritedTags, performance.tags),
-        filters.selectedTags,
-      );
-      return matchesStream && matchesYear && matchesTags;
+      const matchesTags = matchesTagSelection(effectiveTags, filters.selectedTags);
+      return matchesSearch && matchesStream && matchesYear && matchesTags;
     });
     return performances.length > 0
       ? [{
           ...song,
-          tags: mergeTagIds(
-            song.inheritedTags,
-            performances.flatMap((performance) => performance.tags),
+          inheritedTags: mergeTagIds(
+            performances.flatMap((performance) => performance.inheritedTags),
           ),
+          tags: mergeTagIds(performances.flatMap(effectivePerformanceTags)),
           performances,
         }]
       : [];
