@@ -1,6 +1,7 @@
 import {
   TAG_CATEGORIES,
   TAG_DEFINITIONS,
+  activeTagIds,
   getTagDefinition,
   normalizeTagIds,
   type TagScope,
@@ -22,6 +23,12 @@ export default function TagPicker({
   compact = false,
 }: TagPickerProps) {
   const selected = new Set(value);
+  const renderableIds = new Set(activeTagIds(scope));
+  // Everything the row carries that the category list below will not render: a known tag
+  // belonging to another scope, a deactivated tag, or an unregistered legacy ID. Toggling
+  // re-emits the whole selection, so an entry that is invisible here can never be removed
+  // and the server rejects every save of the row.
+  const strandedIds = value.filter((id) => !renderableIds.has(id));
   const toggle = (id: string) => {
     const next = new Set(selected);
     if (next.has(id)) next.delete(id);
@@ -67,24 +74,28 @@ export default function TagPicker({
         );
       })}
 
-      {value.some((id) => !getTagDefinition(id)) && (
+      {strandedIds.length > 0 && (
         <fieldset>
           <legend className="mb-1 text-xs font-semibold uppercase tracking-wide text-amber-600">
-            舊版標籤
+            舊版／不適用標籤
           </legend>
           <div className="flex flex-wrap gap-1.5">
-            {value.filter((id) => !getTagDefinition(id)).map((id) => (
-              <button
-                key={id}
-                type="button"
-                disabled={disabled}
-                onClick={() => toggle(id)}
-                className="rounded-full border border-amber-300 bg-amber-50 px-2.5 py-1 text-xs text-amber-800"
-                title="點擊移除未登錄的舊版標籤"
-              >
-                {id} ×
-              </button>
-            ))}
+            {strandedIds.map((id) => {
+              const definition = getTagDefinition(id);
+              return (
+                <button
+                  key={id}
+                  type="button"
+                  disabled={disabled}
+                  onClick={() => toggle(id)}
+                  data-testid={`tag-stranded-${id.replace(':', '-')}`}
+                  className="rounded-full border border-amber-300 bg-amber-50 px-2.5 py-1 text-xs text-amber-800"
+                  title="這個標籤不適用於目前的範圍，點擊移除"
+                >
+                  {definition ? `${definition.label}（${id}）` : id} ×
+                </button>
+              );
+            })}
           </div>
         </fieldset>
       )}

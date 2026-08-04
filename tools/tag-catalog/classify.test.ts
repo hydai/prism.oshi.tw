@@ -20,7 +20,7 @@ const apple: AppleArtistLookup[] = [{
   artist: 'Rock Band',
   results: [1, 2, 3, 4, 5].map((trackId) => ({
     artistId: 10,
-    artistName: 'Rock Band',
+    artistName: trackId === 5 ? 'Rock Band & Guest' : 'Rock Band',
     trackName: trackId === 1 ? 'Anime Theme' : `Track ${trackId}`,
     primaryGenreName: trackId === 5 ? 'Pop' : 'Rock',
   })),
@@ -35,6 +35,56 @@ test('assigns language to the performance scope and genre to the work scope', ()
   assert.deepEqual(result.performanceAssignments.get('perf-song-ja')?.map(({ tag }) => tag), ['language:ja']);
   assert.deepEqual(result.performanceAssignments.get('perf-song-rock')?.map(({ tag }) => tag), ['language:en']);
   assert.deepEqual(result.workAssignments.get('work-rock')?.map(({ tag }) => tag), ['genre:pop', 'genre:rock']);
+});
+
+test('rejects repeated Apple results from an unrelated artist', () => {
+  const ambiguousApple: AppleArtistLookup[] = [
+    {
+      artist: 'ryo',
+      results: [1, 2, 3].map((trackId) => ({
+        artistId: 121949655,
+        artistName: 'Joris Voorn',
+        trackName: `Ryo ${trackId}`,
+        primaryGenreName: 'Electronic',
+      })),
+    },
+    {
+      artist: 'じん',
+      results: [1, 2, 3].map((trackId) => ({
+        artistId: 358714030,
+        artistName: 'Imagine Dragons',
+        trackName: `Track ${trackId}`,
+        primaryGenreName: 'Alternative',
+      })),
+    },
+  ];
+  const result = classifyCatalog([
+    song({ id: 'song-ryo', workId: 'work-ryo', title: 'メルト', originalArtist: 'ryo' }),
+    song({ id: 'song-jin', workId: 'work-jin', title: 'カゲロウデイズ', originalArtist: 'じん' }),
+  ], ambiguousApple, new Map());
+
+  assert.equal(
+    result.workAssignments.get('work-ryo')?.some(({ tag }) => tag === 'genre:electronic') ?? false,
+    false,
+  );
+  assert.deepEqual(result.workAssignments.get('work-jin')?.map(({ tag }) => tag), ['source:vocaloid']);
+});
+
+test('accepts a reviewed Apple artist ID when Apple localizes the artist name', () => {
+  const localizedApple: AppleArtistLookup[] = [{
+    artist: '周杰倫',
+    results: [1, 2, 3].map((trackId) => ({
+      artistId: 300117743,
+      artistName: 'Jay Chou',
+      trackName: `Track ${trackId}`,
+      primaryGenreName: 'Mandopop',
+    })),
+  }];
+  const result = classifyCatalog([
+    song({ id: 'song-jay', workId: 'work-jay', title: '晴天', originalArtist: '周杰倫' }),
+  ], localizedApple, new Map());
+
+  assert.deepEqual(result.workAssignments.get('work-jay')?.map(({ tag }) => tag), ['genre:pop']);
 });
 
 test('recognizes explicit rendition styles and Vocaloid evidence', () => {
