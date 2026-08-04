@@ -13,6 +13,7 @@
     "test:archive-loader": "npx tsx app/lib/archive-loader.test.ts",
     "test:tags": "npx tsx lib/tags.test.ts",
     "test:tag-filter": "npx tsx app/components/TagFilterPanel.test.tsx",
+    "test:song-card": "npx tsx app/components/SongCard.test.tsx",
     "test:tag-catalog": "npx tsx --test tools/tag-catalog/classify.test.ts && npm run tags:check",
     "tags:metadata": "npx tsx tools/tag-catalog/fetch-apple-artist-metadata.ts",
     "tags:build": "npx tsx tools/tag-catalog/build.ts",

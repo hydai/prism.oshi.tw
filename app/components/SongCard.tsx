@@ -7,7 +7,7 @@ import type { ArchivePerformance, ArchiveSong, ArchiveTrack } from '../types/arc
 import { formatTime } from '../lib/format';
 import { getTagLabel } from '../../lib/tags';
 
-interface SongCardProps {
+export interface SongCardProps {
   song: ArchiveSong;
   isExpanded: boolean;
   onToggleExpand: (songId: string) => void;
@@ -368,11 +368,11 @@ function SongCardInner({ song, isExpanded, onToggleExpand, onPlay, onAddToQueue,
   );
 }
 
-const SongCard = memo(SongCardInner, (prev, next) => {
+export function areSongCardPropsEqual(prev: SongCardProps, next: SongCardProps): boolean {
   return (
     prev.song.id === next.song.id &&
     prev.isExpanded === next.isExpanded &&
-    prev.song.performances.length === next.song.performances.length &&
+    prev.song.performances === next.song.performances &&
     prev.song.tags.join('\u0000') === next.song.tags.join('\u0000') &&
     // Both have change-only identities: isLiked is useCallback'd on the liked
     // set, unavailableVideoIds is replaced only when a video errors. Without
@@ -380,7 +380,9 @@ const SongCard = memo(SongCardInner, (prev, next) => {
     prev.isLiked === next.isLiked &&
     prev.unavailableVideoIds === next.unavailableVideoIds
   );
-});
+}
+
+const SongCard = memo(SongCardInner, areSongCardPropsEqual);
 
 SongCard.displayName = 'SongCard';
 

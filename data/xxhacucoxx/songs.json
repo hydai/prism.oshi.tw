@@ -102,7 +102,6 @@
     "originalArtist": "じん",
     "tags": [
       "language:ja",
-      "genre:rock",
       "source:vocaloid"
     ],
     "performances": [
@@ -118,7 +117,6 @@
       }
     ],
     "inheritedTags": [
-      "genre:rock",
       "source:vocaloid"
     ]
   },
@@ -311,8 +309,7 @@
     "title": "ワールドイズマイン",
     "originalArtist": "Ryo",
     "tags": [
-      "language:ja",
-      "genre:electronic"
+      "language:ja"
     ],
     "performances": [
       {
@@ -326,8 +323,6 @@
         ]
       }
     ],
-    "inheritedTags": [
-      "genre:electronic"
-    ]
+    "inheritedTags": []
   }
 ]

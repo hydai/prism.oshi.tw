@@ -366,7 +366,6 @@
     "originalArtist": "初音ミク",
     "tags": [
       "language:ja",
-      "genre:pop",
       "source:vocaloid"
     ],
     "performances": [
@@ -382,7 +381,6 @@
       }
     ],
     "inheritedTags": [
-      "genre:pop",
       "source:vocaloid"
     ]
   },
@@ -847,7 +845,6 @@
     "originalArtist": "初音ミク",
     "tags": [
       "language:ja",
-      "genre:pop",
       "source:vocaloid"
     ],
     "performances": [
@@ -863,7 +860,6 @@
       }
     ],
     "inheritedTags": [
-      "genre:pop",
       "source:vocaloid"
     ]
   },
@@ -2286,7 +2282,6 @@
     "originalArtist": "初音ミク",
     "tags": [
       "language:ja",
-      "genre:pop",
       "source:vocaloid"
     ],
     "performances": [
@@ -2312,7 +2307,6 @@
       }
     ],
     "inheritedTags": [
-      "genre:pop",
       "source:vocaloid"
     ]
   },
@@ -2405,7 +2399,6 @@
     "originalArtist": "じん",
     "tags": [
       "language:ja",
-      "genre:rock",
       "source:vocaloid"
     ],
     "performances": [
@@ -2431,7 +2424,6 @@
       }
     ],
     "inheritedTags": [
-      "genre:rock",
       "source:vocaloid"
     ]
   },
@@ -11035,7 +11027,6 @@
     "originalArtist": "初音ミク",
     "tags": [
       "language:ja",
-      "genre:pop",
       "source:vocaloid"
     ],
     "performances": [
@@ -11061,7 +11052,6 @@
       }
     ],
     "inheritedTags": [
-      "genre:pop",
       "source:vocaloid"
     ]
   },
@@ -12760,7 +12750,6 @@
     "originalArtist": "初音ミク",
     "tags": [
       "language:ja",
-      "genre:pop",
       "source:vocaloid"
     ],
     "performances": [
@@ -12776,7 +12765,6 @@
       }
     ],
     "inheritedTags": [
-      "genre:pop",
       "source:vocaloid"
     ]
   },
@@ -15441,7 +15429,6 @@
     "originalArtist": "初音ミク",
     "tags": [
       "language:ja",
-      "genre:pop",
       "source:vocaloid"
     ],
     "performances": [
@@ -15457,7 +15444,6 @@
       }
     ],
     "inheritedTags": [
-      "genre:pop",
       "source:vocaloid"
     ]
   },
@@ -15671,7 +15657,6 @@
     "originalArtist": "じん",
     "tags": [
       "language:ja",
-      "genre:rock",
       "source:vocaloid"
     ],
     "performances": [
@@ -15717,7 +15702,6 @@
       }
     ],
     "inheritedTags": [
-      "genre:rock",
       "source:vocaloid"
     ]
   },
@@ -17969,7 +17953,6 @@
     "originalArtist": "じん",
     "tags": [
       "language:ja",
-      "genre:rock",
       "source:vocaloid"
     ],
     "performances": [
@@ -17985,7 +17968,6 @@
       }
     ],
     "inheritedTags": [
-      "genre:rock",
       "source:vocaloid"
     ]
   },
@@ -22712,7 +22694,6 @@
     "originalArtist": "初音ミク",
     "tags": [
       "language:ja",
-      "genre:pop",
       "source:vocaloid"
     ],
     "performances": [
@@ -22728,7 +22709,6 @@
       }
     ],
     "inheritedTags": [
-      "genre:pop",
       "source:vocaloid"
     ]
   },
@@ -22985,8 +22965,7 @@
     "title": "恋は戦争",
     "originalArtist": "ryo",
     "tags": [
-      "language:ja",
-      "genre:electronic"
+      "language:ja"
     ],
     "performances": [
       {
@@ -23000,9 +22979,7 @@
         ]
       }
     ],
-    "inheritedTags": [
-      "genre:electronic"
-    ]
+    "inheritedTags": []
   },
   {
     "id": "song-1366",
@@ -29934,7 +29911,6 @@
     "originalArtist": "初音ミク",
     "tags": [
       "language:ja",
-      "genre:pop",
       "source:vocaloid"
     ],
     "performances": [
@@ -29950,7 +29926,6 @@
       }
     ],
     "inheritedTags": [
-      "genre:pop",
       "source:vocaloid"
     ]
   },
@@ -30827,7 +30802,6 @@
     "originalArtist": "じん",
     "tags": [
       "language:ja",
-      "genre:rock",
       "source:vocaloid"
     ],
     "performances": [
@@ -30853,7 +30827,6 @@
       }
     ],
     "inheritedTags": [
-      "genre:rock",
       "source:vocaloid"
     ]
   },
@@ -32447,8 +32420,7 @@
     "title": "罪の名前",
     "originalArtist": "ryo",
     "tags": [
-      "language:ja",
-      "genre:electronic"
+      "language:ja"
     ],
     "performances": [
       {
@@ -32462,9 +32434,7 @@
         ]
       }
     ],
-    "inheritedTags": [
-      "genre:electronic"
-    ]
+    "inheritedTags": []
   },
   {
     "id": "song-479",
@@ -41418,7 +41388,6 @@
     "originalArtist": "初音ミク",
     "tags": [
       "language:ja",
-      "genre:pop",
       "source:vocaloid"
     ],
     "performances": [
@@ -41434,7 +41403,6 @@
       }
     ],
     "inheritedTags": [
-      "genre:pop",
       "source:vocaloid"
     ]
   },
@@ -43512,7 +43480,6 @@
     "originalArtist": "じん",
     "tags": [
       "language:ja",
-      "genre:rock",
       "source:vocaloid"
     ],
     "performances": [
@@ -43548,7 +43515,6 @@
       }
     ],
     "inheritedTags": [
-      "genre:rock",
       "source:vocaloid"
     ]
   },
@@ -43559,7 +43525,6 @@
     "originalArtist": "じん",
     "tags": [
       "language:ja",
-      "genre:rock",
       "source:vocaloid"
     ],
     "performances": [
@@ -43575,7 +43540,6 @@
       }
     ],
     "inheritedTags": [
-      "genre:rock",
       "source:vocaloid"
     ]
   },
@@ -45837,7 +45801,6 @@
     "originalArtist": "初音ミク",
     "tags": [
       "language:ja",
-      "genre:pop",
       "source:vocaloid"
     ],
     "performances": [
@@ -45853,7 +45816,6 @@
       }
     ],
     "inheritedTags": [
-      "genre:pop",
       "source:vocaloid"
     ]
   },
@@ -50664,7 +50626,6 @@
     "originalArtist": "初音ミク",
     "tags": [
       "language:ja",
-      "genre:pop",
       "source:vocaloid"
     ],
     "performances": [
@@ -50680,7 +50641,6 @@
       }
     ],
     "inheritedTags": [
-      "genre:pop",
       "source:vocaloid"
     ]
   },
@@ -54917,8 +54877,7 @@
     "title": "ODDS&ENDS",
     "originalArtist": "ryo",
     "tags": [
-      "language:ja",
-      "genre:electronic"
+      "language:ja"
     ],
     "performances": [
       {
@@ -54942,9 +54901,7 @@
         ]
       }
     ],
-    "inheritedTags": [
-      "genre:electronic"
-    ]
+    "inheritedTags": []
   },
   {
     "id": "song-767",
@@ -61141,7 +61098,6 @@
     "originalArtist": "初音ミク",
     "tags": [
       "language:ja",
-      "genre:pop",
       "source:vocaloid"
     ],
     "performances": [
@@ -61157,7 +61113,6 @@
       }
     ],
     "inheritedTags": [
-      "genre:pop",
       "source:vocaloid"
     ]
   },
@@ -66654,7 +66609,6 @@
     "originalArtist": "初音ミク",
     "tags": [
       "language:ja",
-      "genre:pop",
       "source:vocaloid"
     ],
     "performances": [
@@ -66670,7 +66624,6 @@
       }
     ],
     "inheritedTags": [
-      "genre:pop",
       "source:vocaloid"
     ]
   },
@@ -67336,7 +67289,6 @@
     "originalArtist": "じん",
     "tags": [
       "language:ja",
-      "genre:rock",
       "source:vocaloid"
     ],
     "performances": [
@@ -67352,7 +67304,6 @@
       }
     ],
     "inheritedTags": [
-      "genre:rock",
       "source:vocaloid"
     ]
   },
@@ -67590,7 +67541,6 @@
     "originalArtist": "じん",
     "tags": [
       "language:ja",
-      "genre:rock",
       "source:vocaloid"
     ],
     "performances": [
@@ -67646,7 +67596,6 @@
       }
     ],
     "inheritedTags": [
-      "genre:rock",
       "source:vocaloid"
     ]
   },
@@ -69970,7 +69919,6 @@
     "originalArtist": "じん",
     "tags": [
       "language:ja",
-      "genre:rock",
       "source:vocaloid"
     ],
     "performances": [
@@ -69986,7 +69934,6 @@
       }
     ],
     "inheritedTags": [
-      "genre:rock",
       "source:vocaloid"
     ]
   },
@@ -71761,8 +71708,7 @@
     "title": "こっち向いて Baby",
     "originalArtist": "ryo",
     "tags": [
-      "language:ja",
-      "genre:electronic"
+      "language:ja"
     ],
     "performances": [
       {
@@ -71776,9 +71722,7 @@
         ]
       }
     ],
-    "inheritedTags": [
-      "genre:electronic"
-    ]
+    "inheritedTags": []
   },
   {
     "id": "song-144",
@@ -72221,7 +72165,6 @@
     "originalArtist": "じん",
     "tags": [
       "language:ja",
-      "genre:rock",
       "source:vocaloid"
     ],
     "performances": [
@@ -72257,7 +72200,6 @@
       }
     ],
     "inheritedTags": [
-      "genre:rock",
       "source:vocaloid"
     ]
   },
@@ -73601,7 +73543,6 @@
     "originalArtist": "初音ミク",
     "tags": [
       "language:ja",
-      "genre:pop",
       "source:vocaloid"
     ],
     "performances": [
@@ -73617,7 +73558,6 @@
       }
     ],
     "inheritedTags": [
-      "genre:pop",
       "source:vocaloid"
     ]
   },
@@ -76933,7 +76873,6 @@
     "originalArtist": "初音ミク",
     "tags": [
       "language:ja",
-      "genre:pop",
       "source:vocaloid"
     ],
     "performances": [
@@ -76949,7 +76888,6 @@
       }
     ],
     "inheritedTags": [
-      "genre:pop",
       "source:vocaloid"
     ]
   },
@@ -80194,8 +80132,7 @@
     "title": "メルト",
     "originalArtist": "ryo",
     "tags": [
-      "language:ja",
-      "genre:electronic"
+      "language:ja"
     ],
     "performances": [
       {
@@ -80209,9 +80146,7 @@
         ]
       }
     ],
-    "inheritedTags": [
-      "genre:electronic"
-    ]
+    "inheritedTags": []
   },
   {
     "id": "song-695",
@@ -80219,8 +80154,7 @@
     "title": "メルト (Melt)",
     "originalArtist": "ryo",
     "tags": [
-      "language:ja",
-      "genre:electronic"
+      "language:ja"
     ],
     "performances": [
       {
@@ -80234,9 +80168,7 @@
         ]
       }
     ],
-    "inheritedTags": [
-      "genre:electronic"
-    ]
+    "inheritedTags": []
   },
   {
     "id": "song-2445",
@@ -81804,8 +81736,7 @@
     "title": "ワールドイズマイン",
     "originalArtist": "ryo",
     "tags": [
-      "language:ja",
-      "genre:electronic"
+      "language:ja"
     ],
     "performances": [
       {
@@ -81839,9 +81770,7 @@
         ]
       }
     ],
-    "inheritedTags": [
-      "genre:electronic"
-    ]
+    "inheritedTags": []
   },
   {
     "id": "song-743",

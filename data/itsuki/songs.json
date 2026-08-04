@@ -4935,7 +4935,6 @@
     "originalArtist": "初音ミク",
     "tags": [
       "language:ja",
-      "genre:pop",
       "source:vocaloid"
     ],
     "performances": [
@@ -4951,7 +4950,6 @@
       }
     ],
     "inheritedTags": [
-      "genre:pop",
       "source:vocaloid"
     ]
   },

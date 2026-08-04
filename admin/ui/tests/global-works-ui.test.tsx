@@ -69,7 +69,7 @@ async function main(): Promise<void> {
 
   const { api } = await import('../src/api/client');
   const { getVisibleNavItems } = await import('../src/components/Layout');
-  const { default: GlobalWorks, SortHeader } = await import('../src/pages/GlobalWorks');
+  const { default: GlobalWorks, SortHeader, pageAfterReload } = await import('../src/pages/GlobalWorks');
   const { default: TagPicker } = await import('../src/components/TagPicker');
 
   await api.listGlobalWorks({ search: 'Shared', sharedOnly: true, page: 1 });
@@ -89,6 +89,8 @@ async function main(): Promise<void> {
   await api.bulkUpdateWorkTags({ workIds: ['work-1'], addTags: ['genre:rock'], removeTags: [] });
   assert(requestedUrl === '/api/works/tags/bulk', 'bulk work tag update stays global');
   assert(requestedInit?.method === 'POST', 'bulk work tag update uses POST');
+  assert(pageAfterReload(3, 2) === 2, 'tag updates clamp a page that no longer exists');
+  assert(pageAfterReload(1, 0) === 1, 'an empty filtered result stays on page one');
 
   const curator: AuthUser = { email: 'curator@example.com', role: 'curator' };
   const contributor: AuthUser = { email: 'contributor@example.com', role: 'contributor' };

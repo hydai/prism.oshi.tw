@@ -53,6 +53,10 @@ export function SortHeader({
   );
 }
 
+export function pageAfterReload(currentPage: number, totalPages: number): number {
+  return Math.min(currentPage, Math.max(1, totalPages));
+}
+
 export default function GlobalWorks() {
   const [works, setWorks] = useState<GlobalWorkSummary[]>([]);
   const [stats, setStats] = useState<GlobalWorkStats>(EMPTY_STATS);
@@ -73,6 +77,12 @@ export default function GlobalWorks() {
   const [editTags, setEditTags] = useState<string[]>([]);
   const [batchTags, setBatchTags] = useState<string[]>([]);
   const [savingTags, setSavingTags] = useState(false);
+  const [reloadRevision, setReloadRevision] = useState(0);
+
+  const refetchWorks = () => {
+    setLoading(true);
+    setReloadRevision((current) => current + 1);
+  };
 
   useEffect(() => {
     let active = true;
@@ -96,6 +106,8 @@ export default function GlobalWorks() {
         setTotalPages(response.totalPages);
         setSelectedWorkIds(new Set());
         setEditingWorkId(null);
+        const nextPage = pageAfterReload(page, response.totalPages);
+        if (nextPage !== page) setPage(nextPage);
       })
       .catch((err: unknown) => {
         if (active) setError(err instanceof Error ? err.message : 'Failed to load global library');
@@ -107,7 +119,7 @@ export default function GlobalWorks() {
     return () => {
       active = false;
     };
-  }, [submittedSearch, sharedOnly, tagFilter, untaggedOnly, page, sortKey, sortDir]);
+  }, [submittedSearch, sharedOnly, tagFilter, untaggedOnly, page, sortKey, sortDir, reloadRevision]);
 
   const submitSearch = (event: FormEvent) => {
     event.preventDefault();
@@ -147,11 +159,9 @@ export default function GlobalWorks() {
     setSavingTags(true);
     setError(null);
     try {
-      const updated = await api.updateWorkTags(editingWorkId, { tags: editTags });
-      setWorks((current) => current.map((work) =>
-        work.id === updated.id ? { ...work, tags: updated.tags } : work,
-      ));
+      await api.updateWorkTags(editingWorkId, { tags: editTags });
       setEditingWorkId(null);
+      refetchWorks();
     } catch (err: unknown) {
       setError(err instanceof Error ? err.message : 'Failed to update work tags');
     } finally {
@@ -164,18 +174,14 @@ export default function GlobalWorks() {
     setSavingTags(true);
     setError(null);
     try {
-      const response = await api.bulkUpdateWorkTags({
+      await api.bulkUpdateWorkTags({
         workIds: [...selectedWorkIds],
         addTags: mode === 'add' ? batchTags : [],
         removeTags: mode === 'remove' ? batchTags : [],
       });
-      const updatedById = new Map(response.updated.map((work) => [work.id, work.tags]));
-      setWorks((current) => current.map((work) => {
-        const tags = updatedById.get(work.id);
-        return tags ? { ...work, tags } : work;
-      }));
       setBatchTags([]);
       setSelectedWorkIds(new Set());
+      refetchWorks();
     } catch (err: unknown) {
       setError(err instanceof Error ? err.message : 'Failed to update work tags');
     } finally {

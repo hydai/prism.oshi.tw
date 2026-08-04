@@ -31,8 +31,8 @@ as soon as this change is merged. Classification uses, in descending confidence:
 1. explicit language and rendition annotations in the title;
 2. language-specific writing systems;
 3. a reviewed frequent-artist language table and cross-song artist signals;
-4. dominant genres returned for the same frequent artist by Apple's public iTunes
-   Search API snapshot;
+4. dominant genres returned for an identity-verified frequent artist by Apple's
+   public iTunes Search API snapshot; localized names use reviewed Apple artist IDs;
 5. explicit voice-synth names, reviewed Vocaloid producers, and streamer/artist
    identity matches.
 
