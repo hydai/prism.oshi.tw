@@ -1108,6 +1108,7 @@ function SongCatalog() {
     expandedSongs,
     toggleSongExpansion,
     handlePlayFromGrouped,
+    selectedTags,
   } = useArchivePageView();
 
   return (
@@ -1337,6 +1338,7 @@ function SongCatalog() {
                         >
                           <SongCard
                             song={song}
+                            selectedTags={selectedTags}
                             isExpanded={expandedSongs.has(song.id)}
                             onToggleExpand={toggleSongExpansion}
                             onPlay={handlePlayFromGrouped}

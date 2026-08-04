@@ -8,7 +8,8 @@ import {
   followingTracksFromGrouped,
   getAllArtists,
   getAvailableYears,
-  getTagCounts,
+  getFlattenedTagCounts,
+  getGroupedTagCounts,
   groupSongsByWorkId,
   sortGroupedSongs,
   sortStreamsByNewest,
@@ -105,21 +106,18 @@ assert.deepEqual(
 );
 
 assert.deepEqual(getAllArtists(songs), ["Alpha", "Zeta"]);
-assert.deepEqual([...getTagCounts(songs)], [
-  ["language:zh", 1],
-  ["language:en", 1],
-  ["genre:rock", 1],
-]);
-
 const flattened = flattenSongs(songs);
 assert.deepEqual(flattened.map((song) => song.performanceId), [
   "perf-new",
   "perf-no-stream",
   "perf-old",
 ]);
-assert.match(flattened[0]?.searchString ?? "", /英文歌/);
-assert.doesNotMatch(flattened[0]?.searchString ?? "", /中文歌/);
-assert.match(flattened[0]?.searchString ?? "", /搖滾/);
+// Tag vocabulary is indexed separately from the free-text fields so that it can be
+// matched as a whole term rather than as a substring.
+assert.doesNotMatch(flattened[0]?.searchString ?? "", /英文歌/);
+assert.ok(flattened[0]?.tagTerms.includes("英文歌"));
+assert.ok(!flattened[0]?.tagTerms.includes("中文歌"));
+assert.ok(flattened[0]?.tagTerms.includes("搖滾"));
 assert.equal(flattened[0]?.year, 2025);
 assert.equal(flattened[0]?.endTimestamp, 50);
 assert.equal(flattened[1]?.streamId, undefined);
@@ -257,7 +255,9 @@ assert.equal(sharedWork?.id, "song-shared-a");
 assert.equal(sharedWork?.title, "Shared Song");
 assert.equal(sharedWork?.albumArtUrl, "shared-art");
 assert.deepEqual(sharedWork?.inheritedTags, ["acoustic", "ballad"]);
-assert.deepEqual(sharedWork?.tags, ["ballad", "acoustic"]);
+// Same ordering as inheritedTags above: both go through mergeTagIds, which falls back to
+// a locale compare for unregistered legacy IDs like these.
+assert.deepEqual(sharedWork?.tags, ["acoustic", "ballad"]);
 assert.deepEqual(
   sharedWork?.performances.map((performance) => performance.id),
   ["perf-shared-a", "perf-shared-z"],
@@ -268,6 +268,82 @@ assert.equal(
 );
 assert.deepEqual(groupSongsByWorkId(groupedByWorkId), groupedByWorkId);
 assert.deepEqual(workIdSongs, workIdSongsBeforeGrouping);
+
+const zeroPerformanceSong: ArchiveSong = {
+  id: "song-zero-performance",
+  workId: "work-zero-performance",
+  title: "Pending Rendition",
+  originalArtist: "Pending Artist",
+  inheritedTags: ["genre:rock", "style:parody"],
+  tags: ["genre:rock", "style:parody"],
+  performances: [],
+};
+assert.deepEqual(
+  filterGroupedSongs([zeroPerformanceSong], {
+    search: "",
+    selectedStreamId: null,
+    selectedArtist: null,
+    selectedYears: new Set(),
+    selectedTags: new Set(["genre:rock"]),
+  }).map((song) => song.id),
+  ["song-zero-performance"],
+  "work tags match inherited tags even without an approved performance",
+);
+assert.deepEqual(
+  filterGroupedSongs([zeroPerformanceSong], {
+    search: "",
+    selectedStreamId: null,
+    selectedArtist: null,
+    selectedYears: new Set(),
+    selectedTags: new Set(["style:parody"]),
+  }),
+  [],
+  "performance-scoped tags still require an approved performance",
+);
+assert.deepEqual(
+  filterGroupedSongs([zeroPerformanceSong], {
+    search: "",
+    selectedStreamId: "stream-pending",
+    selectedArtist: null,
+    selectedYears: new Set(),
+    selectedTags: new Set(["genre:rock"]),
+  }),
+  [],
+  "stream filters still require an approved performance",
+);
+assert.deepEqual(
+  filterGroupedSongs([zeroPerformanceSong], {
+    search: "",
+    selectedStreamId: null,
+    selectedArtist: null,
+    selectedYears: new Set([2026]),
+    selectedTags: new Set(["genre:rock"]),
+  }),
+  [],
+  "year filters still require an approved performance",
+);
+assert.deepEqual(
+  filterGroupedSongs([zeroPerformanceSong], {
+    search: "\u6416\u6efe",
+    selectedStreamId: null,
+    selectedArtist: null,
+    selectedYears: new Set(),
+    selectedTags: new Set(["genre:rock"]),
+  }).map((song) => song.id),
+  ["song-zero-performance"],
+  "tag search and tag filters can match the same inherited work tag",
+);
+assert.deepEqual(
+  filterGroupedSongs([zeroPerformanceSong], {
+    search: "unrelated",
+    selectedStreamId: null,
+    selectedArtist: null,
+    selectedYears: new Set(),
+    selectedTags: new Set(["genre:rock"]),
+  }),
+  [],
+  "a matching tag filter does not bypass a non-matching search",
+);
 
 const balladGrouped = filterGroupedSongs(groupedByWorkId, {
   search: "",
@@ -540,3 +616,196 @@ assert.deepEqual(
 assert.deepEqual(grouped.map((song) => song.id), ["song-b", "song-a", "song-c"]);
 
 console.log("✓ archive helpers");
+
+// Tag vocabulary must match as a whole term. Aliases like "Pop"/"English" are folded
+// into the same index as titles, so substring matching turned two-letter queries into
+// thousands of hits ("op" matched 86 rows before tags, 1812 after).
+{
+  const taggedSong: ArchiveSong = {
+    id: "song-alias",
+    title: "Quiet Night",
+    originalArtist: "Someone",
+    inheritedTags: ["genre:pop"],
+    tags: ["genre:pop", "language:en"],
+    performances: [
+      {
+        id: "perf-alias",
+        streamId: "stream-2025",
+        date: "2025-03-03",
+        streamTitle: "Stream Gamma",
+        videoId: "video-alias",
+        timestamp: 5,
+        endTimestamp: null,
+        note: "",
+        inheritedTags: ["genre:pop"],
+        tags: ["language:en"],
+      },
+    ],
+  };
+
+  const filters = (search: string) => ({
+    search,
+    selectedStreamId: null,
+    selectedArtist: null,
+    selectedYears: new Set<number>(),
+    selectedTags: new Set<string>(),
+  });
+
+  const flat = flattenSongs([taggedSong]);
+
+  assert.deepEqual(
+    filterFlattenedSongs(flat, filters("op")).map((song) => song.id),
+    [],
+    "a fragment of the alias 'Pop' must not match on tags",
+  );
+  assert.deepEqual(
+    filterFlattenedSongs(flat, filters("en")).map((song) => song.id),
+    [],
+    "a fragment of the alias 'English' must not match on tags",
+  );
+  assert.deepEqual(
+    filterFlattenedSongs(flat, filters("pop")).map((song) => song.id),
+    ["song-alias"],
+    "the complete alias still matches",
+  );
+  assert.deepEqual(
+    filterFlattenedSongs(flat, filters("流行")).map((song) => song.id),
+    ["song-alias"],
+    "the tag label still matches",
+  );
+  assert.deepEqual(
+    filterFlattenedSongs(flat, filters("quiet")).map((song) => song.id),
+    ["song-alias"],
+    "ordinary title substring search is unaffected",
+  );
+
+  assert.deepEqual(
+    filterGroupedSongs([taggedSong], filters("op")).map((song) => song.id),
+    [],
+    "grouped view also refuses alias fragments",
+  );
+  assert.deepEqual(
+    filterGroupedSongs([taggedSong], filters("流行")).map((song) => song.id),
+    ["song-alias"],
+    "grouped view still matches a complete tag label",
+  );
+}
+
+// A chip's number must predict what clicking it produces, in the unit the active view
+// renders. Counting the raw ungrouped, unfiltered song list produced a number that
+// neither view ever yields — a chip could read 6 and then show the empty state.
+{
+  const noFilters = {
+    search: "",
+    selectedStreamId: null,
+    selectedArtist: null,
+    selectedYears: new Set<number>(),
+    selectedTags: new Set<string>(),
+  };
+  const flat = flattenSongs(songs);
+  const grouped = groupSongsByWorkId(songs);
+
+  const countFor = (
+    counts: Map<string, number>,
+    tag: string,
+  ) => counts.get(tag) ?? 0;
+
+  // song-a has two performances: perf-old (language:zh, 2023) and perf-new (language:en, 2025).
+  const timelineCounts = getFlattenedTagCounts(flat, noFilters);
+  assert.equal(
+    countFor(timelineCounts, "genre:rock"),
+    filterFlattenedSongs(flat, { ...noFilters, selectedTags: new Set(["genre:rock"]) }).length,
+    "timeline count equals the rows the chip yields",
+  );
+  assert.equal(countFor(timelineCounts, "genre:rock"), 2, "genre:rock covers both renditions");
+
+  const groupedCounts = getGroupedTagCounts(grouped, noFilters);
+  assert.equal(
+    countFor(groupedCounts, "genre:rock"),
+    filterGroupedSongs(grouped, { ...noFilters, selectedTags: new Set(["genre:rock"]) }).length,
+    "grouped count equals the cards the chip yields",
+  );
+  assert.equal(countFor(groupedCounts, "genre:rock"), 1, "one card carries genre:rock");
+
+  // With a 2023 filter only perf-old survives, so language:en can no longer yield anything.
+  const only2023 = { ...noFilters, selectedYears: new Set([2023]) };
+  const filteredCounts = getFlattenedTagCounts(flat, only2023);
+  assert.equal(
+    countFor(filteredCounts, "language:en"),
+    0,
+    "a chip that cannot yield a row under the active filters must read zero",
+  );
+  assert.equal(
+    countFor(filteredCounts, "language:zh"),
+    1,
+    "the surviving rendition is still counted",
+  );
+}
+
+// A card's chips must not reorder just because a filter was applied. groupSongsByWorkId
+// built the union in member order while filterGroupedSongs rebuilt it with mergeTagIds,
+// so the same card silently switched chip order the moment any filter became active.
+{
+  const orderingSongs: ArchiveSong[] = [
+    {
+      id: "song-order-a",
+      workId: "work-order",
+      title: "Order Song",
+      originalArtist: "Order Artist",
+      inheritedTags: ["genre:pop"],
+      tags: ["genre:pop"],
+      performances: [
+        {
+          id: "perf-order-a",
+          date: "2024-01-01",
+          streamTitle: "Ordering Stream",
+          videoId: "video-order-a",
+          timestamp: 1,
+          note: "",
+          inheritedTags: ["genre:pop"],
+          tags: [],
+        },
+      ],
+    },
+    {
+      id: "song-order-b",
+      workId: "work-order",
+      title: "Order Song",
+      originalArtist: "Order Artist",
+      inheritedTags: [],
+      tags: ["language:zh"],
+      performances: [
+        {
+          id: "perf-order-b",
+          date: "2024-01-02",
+          streamTitle: "Ordering Stream",
+          videoId: "video-order-b",
+          timestamp: 2,
+          note: "",
+          inheritedTags: [],
+          tags: ["language:zh"],
+        },
+      ],
+    },
+  ];
+
+  const groupedOrdering = groupSongsByWorkId(orderingSongs);
+  const filteredOrdering = filterGroupedSongs(groupedOrdering, {
+    search: "",
+    selectedStreamId: null,
+    selectedArtist: null,
+    selectedYears: new Set([2024]),
+    selectedTags: new Set<string>(),
+  });
+
+  assert.deepEqual(
+    groupedOrdering[0]?.tags,
+    filteredOrdering[0]?.tags,
+    "grouped chip order must survive applying a filter that removes no performance",
+  );
+  assert.deepEqual(
+    groupedOrdering[0]?.tags,
+    ["language:zh", "genre:pop"],
+    "grouped tags use the shared category ordering",
+  );
+}

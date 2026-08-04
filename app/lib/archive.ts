@@ -5,7 +5,13 @@ import type {
   FlattenedSong,
   StreamSummary,
 } from "../types/archive";
-import { matchesTagSelection, mergeTagIds, tagSearchTerms } from "../../lib/tags";
+import {
+  filterTagIdsByScope,
+  matchesTagSelection,
+  mergeTagIds,
+  matchesTagSearchTerm,
+  tagSearchTermList,
+} from "../../lib/tags";
 
 export interface ArchiveFilters {
   search: string;
@@ -34,12 +40,39 @@ export function getAvailableYears(streams: StreamSummary[]): number[] {
   return Array.from(years).sort((a, b) => b - a);
 }
 
-export function getTagCounts(songs: ArchiveSong[]): Map<string, number> {
+function tagUniverse(rows: Array<{ tags: string[] }>): Set<string> {
+  const universe = new Set<string>();
+  for (const row of rows) {
+    for (const tag of row.tags) universe.add(tag);
+  }
+  return universe;
+}
+
+// A chip's number has to predict its own click, in the unit the active view renders.
+// Counting the raw ungrouped, unfiltered song list produced a number neither view ever
+// yields, so a chip could promise rows and then show the empty state.
+export function getFlattenedTagCounts(
+  songs: FlattenedSong[],
+  filters: ArchiveFilters,
+): Map<string, number> {
   const counts = new Map<string, number>();
-  for (const song of songs) {
-    for (const tag of new Set(song.tags)) {
-      counts.set(tag, (counts.get(tag) ?? 0) + 1);
-    }
+  for (const tag of tagUniverse(songs)) {
+    const selectedTags = new Set(filters.selectedTags);
+    selectedTags.add(tag);
+    counts.set(tag, filterFlattenedSongs(songs, { ...filters, selectedTags }).length);
+  }
+  return counts;
+}
+
+export function getGroupedTagCounts(
+  songs: ArchiveSong[],
+  filters: ArchiveFilters,
+): Map<string, number> {
+  const counts = new Map<string, number>();
+  for (const tag of tagUniverse(songs)) {
+    const selectedTags = new Set(filters.selectedTags);
+    selectedTags.add(tag);
+    counts.set(tag, filterGroupedSongs(songs, { ...filters, selectedTags }).length);
   }
   return counts;
 }
@@ -76,7 +109,8 @@ export function flattenSongs(songs: ArchiveSong[]): FlattenedSong[] {
         timestamp: performance.timestamp,
         endTimestamp: performance.endTimestamp ?? undefined,
         note: performance.note,
-        searchString: `${song.title} ${song.originalArtist} ${performance.streamTitle} ${tagSearchTerms(tags)}`.toLowerCase(),
+        searchString: `${song.title} ${song.originalArtist} ${performance.streamTitle}`.toLowerCase(),
+        tagTerms: tagSearchTermList(tags),
         year: performanceDate.getFullYear(),
         sortTime: performanceDate.getTime(),
       });
@@ -93,7 +127,9 @@ export function filterFlattenedSongs(
 ): FlattenedSong[] {
   const lowerTerm = filters.search.toLowerCase();
   return songs.filter((song) => {
-    const matchesSearch = !lowerTerm || song.searchString.includes(lowerTerm);
+    const matchesSearch = !lowerTerm
+      || song.searchString.includes(lowerTerm)
+      || song.tagTerms.includes(lowerTerm);
     const matchesStream = filters.selectedStreamId ? song.streamId === filters.selectedStreamId : true;
     const matchesArtist = filters.selectedArtist ? song.originalArtist === filters.selectedArtist : true;
     const matchesYear = filters.selectedYears.size > 0 ? filters.selectedYears.has(song.year) : true;
@@ -128,7 +164,9 @@ export function groupSongsByWorkId(songs: ArchiveSong[]): ArchiveSong[] {
       ...canonical,
       ...(workId ? { workId } : {}),
       inheritedTags: mergeTagIds(orderedMembers.flatMap((song) => song.inheritedTags)),
-      tags: Array.from(new Set(orderedMembers.flatMap((song) => song.tags))),
+      // Same ordering as filterGroupedSongs rebuilds below, so a card's chips do not
+      // reorder the moment a filter becomes active.
+      tags: mergeTagIds(orderedMembers.flatMap((song) => song.tags)),
       performances: orderedMembers.flatMap((song) => song.performances),
       albumArtUrl,
     };
@@ -158,15 +196,20 @@ export function filterGroupedSongs(
     if (!hasPerformanceFilters && !needsPerformanceSearch) return [song];
 
     if (song.performances.length === 0) {
-      const matchesSearch = `${workSearchString} ${tagSearchTerms(song.inheritedTags).toLowerCase()}`
-        .includes(lowerTerm);
-      return !hasPerformanceFilters && matchesSearch ? [song] : [];
+      const matchesSearch = workSearchString.includes(lowerTerm)
+        || matchesTagSearchTerm(song.inheritedTags, lowerTerm);
+      const matchesStream = filters.selectedStreamId === null;
+      const matchesYear = filters.selectedYears.size === 0;
+      const selectedWorkTags = filterTagIdsByScope(filters.selectedTags, "work");
+      const matchesTags = selectedWorkTags.length === filters.selectedTags.size
+        && matchesTagSelection(song.inheritedTags, selectedWorkTags);
+      return matchesSearch && matchesStream && matchesYear && matchesTags ? [song] : [];
     }
 
     const performances = song.performances.filter((performance) => {
       const effectiveTags = effectivePerformanceTags(performance);
       const matchesSearch = matchesWorkSearch
-        || `${workSearchString} ${tagSearchTerms(effectiveTags).toLowerCase()}`.includes(lowerTerm);
+        || matchesTagSearchTerm(effectiveTags, lowerTerm);
       const matchesStream = filters.selectedStreamId
         ? performance.streamId === filters.selectedStreamId
         : true;
