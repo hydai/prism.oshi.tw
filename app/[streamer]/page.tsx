@@ -16,6 +16,7 @@ import {
   followingTracksFromGrouped,
   getAllArtists,
   getAvailableYears,
+  getTagCounts,
   groupSongsByWorkId,
   sortGroupedSongs,
 } from '../lib/archive';
@@ -38,6 +39,8 @@ function useArchivePageController() {
   const [selectedStreamId, setSelectedStreamId] = useState<string | null>(null);
   const [selectedArtist, setSelectedArtist] = useState<string | null>(null);
   const [selectedYears, setSelectedYears] = useState<Set<number>>(new Set());
+  const [selectedTags, setSelectedTags] = useState<Set<string>>(new Set());
+  const [showTagFilter, setShowTagFilter] = useState(false);
   const [viewMode, setViewMode] = useState<ArchiveViewMode>('timeline');
   const [expandedSongs, setExpandedSongs] = useState<Set<string>>(new Set());
   const [toastMessage, setToastMessage] = useState<string | null>(null);
@@ -149,6 +152,7 @@ function useArchivePageController() {
 
   const allArtists = useMemo(() => getAllArtists(songs), [songs]);
   const availableYears = useMemo(() => getAvailableYears(streams), [streams]);
+  const tagCounts = useMemo(() => getTagCounts(songs), [songs]);
   const filteredStreams = useMemo(
     () => filterStreamsByYears(streams, selectedYears),
     [streams, selectedYears],
@@ -168,13 +172,22 @@ function useArchivePageController() {
     setSelectedStreamId(null);
   };
 
-  const hasActiveFilters = debouncedSearch !== '' || selectedStreamId !== null || selectedArtist !== null || selectedYears.size > 0;
+  const toggleTag = useCallback((tag: string) => {
+    setSelectedTags((current) => {
+      const next = new Set(current);
+      if (next.has(tag)) next.delete(tag); else next.add(tag);
+      return next;
+    });
+  }, []);
+
+  const hasActiveFilters = debouncedSearch !== '' || selectedStreamId !== null || selectedArtist !== null || selectedYears.size > 0 || selectedTags.size > 0;
 
   const clearAllFilters = () => {
     setDebouncedSearch('');
     setSelectedStreamId(null);
     setSelectedArtist(null);
     setSelectedYears(new Set());
+    setSelectedTags(new Set());
   };
 
   const archiveFilters = useMemo(() => ({
@@ -182,7 +195,8 @@ function useArchivePageController() {
     selectedStreamId,
     selectedArtist,
     selectedYears,
-  }), [debouncedSearch, selectedStreamId, selectedArtist, selectedYears]);
+    selectedTags,
+  }), [debouncedSearch, selectedStreamId, selectedArtist, selectedYears, selectedTags]);
 
   const allFlattenedSongs: FlattenedSong[] = useMemo(() => flattenSongs(songs), [songs]);
   const flattenedSongs: FlattenedSong[] = useMemo(
@@ -272,6 +286,12 @@ function useArchivePageController() {
     selectedArtist,
     setSelectedArtist,
     selectedYears,
+    selectedTags,
+    setSelectedTags,
+    showTagFilter,
+    setShowTagFilter,
+    tagCounts,
+    toggleTag,
     viewMode,
     setViewMode,
     expandedSongs,

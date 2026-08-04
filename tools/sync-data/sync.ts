@@ -15,6 +15,7 @@ import { fileURLToPath } from 'node:url';
 
 import { syncStatePath, upsertEntry, type SyncStateEntry } from '../shared/sync-state.ts';
 import { assertValidSlug } from '../shared/slug.ts';
+import { mergeTagIds } from '../../lib/tags.ts';
 
 import { newStreamEmbed, newStreamsSummaryEmbed, type DiscordEmbed } from '../../admin/shared/discord.ts';
 import { enqueueAnnouncements, hashSources, loadAnnounceWebhook, type PendingBatch } from '../shared/announce.ts';
@@ -33,7 +34,8 @@ interface SongRow {
   work_id: string | null;
   title: string;
   original_artist: string;
-  tags: string; // JSON array
+  song_tags: string; // JSON array
+  work_tags: string | null; // JSON array; null for legacy unlinked rows
 }
 
 interface PerformanceRow {
@@ -106,9 +108,11 @@ function queryD1<T>(sql: string): T[] {
 
 function buildSongs(streamerId: string): FanSiteSong[] {
   const songRows = queryD1<SongRow>(
-    `SELECT song.id, link.work_id, song.title, song.original_artist, song.tags
+    `SELECT song.id, link.work_id, song.title, song.original_artist,
+            song.tags AS song_tags, work.tags AS work_tags
      FROM songs AS song
      LEFT JOIN song_work_links AS link ON link.song_id = song.id
+     LEFT JOIN works AS work ON work.id = link.work_id
      WHERE song.streamer_id = '${streamerId}' AND song.status = 'approved'
      ORDER BY song.id`,
   );
@@ -136,7 +140,10 @@ export function assembleFanSiteSongs(
       ...(row.work_id ? { workId: row.work_id } : {}),
       title: row.title,
       originalArtist: row.original_artist,
-      tags: JSON.parse(row.tags) as string[],
+      tags: mergeTagIds(
+        row.work_tags ? JSON.parse(row.work_tags) as string[] : [],
+        JSON.parse(row.song_tags) as string[],
+      ),
       performances: (perfsBySong.get(row.id) || [])
         // Newest first — the canonical order the timeline consumes (dates come
         // from the DB rows; the slim output no longer carries them)
@@ -196,14 +203,15 @@ function querySnapshot(table: 'songs' | 'performances' | 'streams', streamerId: 
     // did not change.
     const rows = queryD1<SnapshotRow>(
       `SELECT
-         MAX(CASE
-           WHEN link.updated_at IS NULL THEN song.updated_at
-           WHEN song.updated_at IS NULL OR link.updated_at > song.updated_at THEN link.updated_at
-           ELSE song.updated_at
-         END) AS max_ts,
+         MAX(MAX(
+           COALESCE(song.updated_at, ''),
+           COALESCE(link.updated_at, ''),
+           COALESCE(work.updated_at, '')
+         )) AS max_ts,
          COUNT(*) AS cnt
        FROM songs AS song
        LEFT JOIN song_work_links AS link ON link.song_id = song.id
+       LEFT JOIN works AS work ON work.id = link.work_id
        WHERE song.streamer_id = '${streamerId}' AND song.status = 'approved'`,
     );
     return rows[0] ?? { max_ts: null, cnt: 0 };

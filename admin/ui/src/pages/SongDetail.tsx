@@ -4,6 +4,8 @@ import type { Song, AuthUser, UpdateSongBody } from '../../../shared/types';
 import { api } from '../api/client';
 import StatusBadge from '../components/StatusBadge';
 import YouTubeEmbed from '../components/YouTubeEmbed';
+import TagPicker from '../components/TagPicker';
+import { getTagLabel } from '../../../../lib/tags';
 
 export default function SongDetail({ user }: { user: AuthUser }) {
   const { id } = useParams<{ id: string }>();
@@ -83,22 +85,15 @@ export default function SongDetail({ user }: { user: AuthUser }) {
                   placeholder="Original artist"
                   className="w-full rounded border border-slate-300 px-3 py-1.5 text-sm focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500"
                 />
-                <input
-                  type="text"
-                  aria-label="Tags, comma-separated"
-                  value={editForm.tags?.join(', ') ?? ''}
-                  onChange={(e) =>
-                    setEditForm((f) => ({
-                      ...f,
-                      tags: e.target.value
-                        .split(',')
-                        .map((t) => t.trim())
-                        .filter(Boolean),
-                    }))
-                  }
-                  placeholder="Tags (comma-separated)"
-                  className="w-full rounded border border-slate-300 px-3 py-1.5 text-sm focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500"
-                />
+                <div className="rounded border border-slate-200 bg-slate-50 p-3">
+                  <p className="mb-2 text-xs text-slate-500">此 VTuber 歌曲版本的附加標籤</p>
+                  <TagPicker
+                    value={editForm.tags ?? []}
+                    onChange={(tags) => setEditForm((form) => ({ ...form, tags }))}
+                    recommendedScope="song"
+                    compact
+                  />
+                </div>
                 <div className="flex gap-2">
                   <button
                     onClick={handleSave}
@@ -122,7 +117,7 @@ export default function SongDetail({ user }: { user: AuthUser }) {
                 <div className="mt-2 flex flex-wrap gap-1">
                   {song.tags.map((t) => (
                     <span key={t} className="rounded bg-slate-100 px-2 py-0.5 text-xs text-slate-600">
-                      {t}
+                      {getTagLabel(t)}
                     </span>
                   ))}
                 </div>

@@ -4,6 +4,7 @@ import { memo, useMemo } from 'react';
 import { Disc3, ChevronDown, ChevronRight } from 'lucide-react';
 import type { ArchivePerformance, ArchiveSong, ArchiveTrack } from '../types/archive';
 import SongVersionsList from './SongVersionsList';
+import { getTagLabel } from '../../lib/tags';
 
 interface SongCardProps {
   song: ArchiveSong;
@@ -86,6 +87,21 @@ function SongCardInner({ song, isExpanded, onToggleExpand, onPlay, onAddToQueue,
               >
                 {song.performances.length} 個版本
               </span>
+              {song.tags.slice(0, 3).map((tag) => (
+                <span
+                  key={tag}
+                  className="font-medium"
+                  style={{
+                    fontSize: 'var(--font-size-xs)',
+                    color: 'var(--text-secondary)',
+                    background: 'var(--bg-surface-muted)',
+                    padding: 'var(--space-1) var(--space-2)',
+                    borderRadius: 'var(--radius-pill)',
+                  }}
+                >
+                  {getTagLabel(tag)}
+                </span>
+              ))}
             </div>
           </div>
         </div>
@@ -123,6 +139,7 @@ const SongCard = memo(SongCardInner, (prev, next) => {
     prev.song.id === next.song.id &&
     prev.isExpanded === next.isExpanded &&
     prev.song.performances.length === next.song.performances.length &&
+    prev.song.tags.join('\u0000') === next.song.tags.join('\u0000') &&
     // Both have change-only identities: isLiked is useCallback'd on the liked
     // set, unavailableVideoIds is replaced only when a video errors. Without
     // these an already-rendered card kept stale hearts/disabled states.

@@ -35,6 +35,7 @@ async function main(): Promise<void> {
   installLocalStorage();
 
   let requestedUrl = '';
+  let requestedInit: RequestInit | undefined;
   const response: GlobalWorksResponse = {
     data: [],
     total: 0,
@@ -51,9 +52,15 @@ async function main(): Promise<void> {
   };
   Object.defineProperty(globalThis, 'fetch', {
     configurable: true,
-    value: async (input: RequestInfo | URL) => {
+    value: async (input: RequestInfo | URL, init?: RequestInit) => {
       requestedUrl = String(input);
-      return new Response(JSON.stringify(response), {
+      requestedInit = init;
+      const body = requestedUrl.endsWith('/tags/bulk')
+        ? { updated: [{ id: 'work-1', tags: ['genre:rock'] }] }
+        : requestedUrl.includes('/tags')
+          ? { id: 'work-1', tags: ['genre:rock'] }
+          : response;
+      return new Response(JSON.stringify(body), {
         status: 200,
         headers: { 'Content-Type': 'application/json' },
       });
@@ -63,12 +70,76 @@ async function main(): Promise<void> {
   const { api } = await import('../src/api/client');
   const { getVisibleNavItems } = await import('../src/lib/navigation');
   const { default: GlobalWorks, SortHeader } = await import('../src/pages/GlobalWorks');
+  const { default: TagPicker } = await import('../src/components/TagPicker');
+  const { globalWorksReducer, initialGlobalWorksState } = await import('../src/pages/global-works-state');
 
   await api.listGlobalWorks({ search: 'Shared', sharedOnly: true, page: 1 });
   assert(requestedUrl.startsWith('/api/works?'), 'global library uses the global works endpoint');
   assert(requestedUrl.includes('search=Shared'), 'global library binds its search query');
   assert(requestedUrl.includes('sharedOnly=true'), 'global library requests cross-streamer-only results');
   assert(!requestedUrl.includes('streamer='), 'global library is never scoped by the selected streamer');
+
+  await api.listGlobalWorks({ tag: 'genre:rock', untaggedOnly: false });
+  assert(requestedUrl.includes('tag=genre%3Arock'), 'global library can filter by a stable tag ID');
+
+  await api.updateWorkTags('work-1', { tags: ['genre:rock'] });
+  assert(requestedUrl === '/api/works/work-1/tags', 'single work tag update stays global');
+  assert(requestedInit?.method === 'PUT', 'single work tag update uses PUT');
+  assert(String(requestedInit?.body).includes('genre:rock'), 'single work tag update sends stable IDs');
+
+  await api.bulkUpdateWorkTags({ workIds: ['work-1'], addTags: ['genre:rock'], removeTags: [] });
+  assert(requestedUrl === '/api/works/tags/bulk', 'bulk work tag update stays global');
+  assert(requestedInit?.method === 'POST', 'bulk work tag update uses POST');
+
+  const loaded = globalWorksReducer(
+    { ...initialGlobalWorksState, page: 2, selectedWorkIds: new Set(['work-1']), editingWorkId: 'work-1' },
+    {
+      type: 'loadSucceeded',
+      response: {
+        ...response,
+        data: [{
+          id: 'work-1',
+          title: 'Shared',
+          originalArtist: 'Artist',
+          tags: [],
+          streamerCount: 1,
+          songCount: 1,
+          performanceCount: 1,
+          streamerIds: ['mizuki'],
+          createdAt: '2026-01-01',
+          updatedAt: '2026-01-01',
+        }],
+        total: 1,
+        totalPages: 1,
+      },
+    },
+  );
+  assert(loaded.works.length === 1 && loaded.total === 1, 'a load replaces the listed works and totals');
+  assert(loaded.selectedWorkIds.size === 0 && loaded.editingWorkId === null, 'a load drops selection and inline editing of stale rows');
+
+  const tagFiltered = globalWorksReducer(
+    { ...initialGlobalWorksState, page: 3, untaggedOnly: true },
+    { type: 'tagFilterChanged', tagFilter: 'genre:rock' },
+  );
+  assert(tagFiltered.page === 1 && tagFiltered.tagFilter === 'genre:rock', 'choosing a tag filter restarts from page one');
+  assert(!tagFiltered.untaggedOnly, 'a tag filter switches "untagged only" off');
+  const untagged = globalWorksReducer(tagFiltered, { type: 'untaggedOnlyChanged', untaggedOnly: true });
+  assert(untagged.untaggedOnly && untagged.tagFilter === '', '"untagged only" clears the tag filter');
+
+  const sortedByTitle = globalWorksReducer(initialGlobalWorksState, { type: 'sortToggled', sortKey: 'title' });
+  assert(sortedByTitle.sortKey === 'title' && sortedByTitle.sortDir === 'asc', 'text columns start ascending');
+  const flipped = globalWorksReducer(sortedByTitle, { type: 'sortToggled', sortKey: 'title' });
+  assert(flipped.sortDir === 'desc', 'toggling the active column flips its direction');
+
+  const selected = globalWorksReducer(loaded, { type: 'pageSelectionToggled' });
+  assert(selected.selectedWorkIds.has('work-1'), 'page selection selects every listed work');
+  assert(globalWorksReducer(selected, { type: 'pageSelectionToggled' }).selectedWorkIds.size === 0, 'page selection toggles back to none');
+  const bulkApplied = globalWorksReducer(
+    { ...selected, batchTags: ['genre:rock'] },
+    { type: 'bulkTagsApplied', updated: [{ id: 'work-1', tags: ['genre:rock'] }] },
+  );
+  assert(bulkApplied.works[0]?.tags[0] === 'genre:rock', 'a bulk update patches the listed works in place');
+  assert(bulkApplied.batchTags.length === 0 && bulkApplied.selectedWorkIds.size === 0, 'a bulk update resets the batch editor');
 
   const curator: AuthUser = { email: 'curator@example.com', role: 'curator' };
   const contributor: AuthUser = { email: 'contributor@example.com', role: 'contributor' };
@@ -104,6 +175,12 @@ async function main(): Promise<void> {
   assert(sortHeaderHtml.includes('aria-sort="ascending"'), 'active column header exposes its sort direction');
   assert(sortHeaderHtml.includes('<button type="button"'), 'sortable column header uses a keyboard-accessible button');
   assert(sortHeaderHtml.includes('aria-hidden="true"'), 'decorative sort arrow stays out of the accessible name');
+
+  const pickerHtml = renderToStaticMarkup(
+    <TagPicker value={['genre:rock']} onChange={() => undefined} recommendedScope="work" />,
+  );
+  assert(pickerHtml.includes('搖滾'), 'tag picker renders localized labels');
+  assert(pickerHtml.includes('aria-pressed="true"'), 'tag picker exposes selected state');
 
   console.log('✓ Global Library stays site-wide and curator-only');
 }

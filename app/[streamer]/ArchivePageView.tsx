@@ -22,6 +22,7 @@ import {
   House,
   Radio,
   Film,
+  Tags,
 } from 'lucide-react';
 import Toast from '../components/Toast';
 import PlaylistPanel from '../components/PlaylistPanel';
@@ -35,6 +36,8 @@ import MobileSearchRow from '../components/MobileSearchRow';
 import SearchBox from '../components/SearchBox';
 import ThemeToggle from '../components/ThemeToggle';
 import ViewModeToggle from '../components/ViewModeToggle';
+import BottomSheet from '../components/BottomSheet';
+import TagFilterPanel from '../components/TagFilterPanel';
 import type { ArchivePageController } from './page';
 
 interface ArchivePageViewProps {
@@ -69,6 +72,7 @@ function ArchivePageChrome() {
         <MainContent />
       </div>
       <MobileBottomNavigation />
+      <TagFilterOverlay />
       <PlaylistOverlays />
     </>
   );
@@ -118,6 +122,9 @@ function ArchiveSidebar() {
     availableYears,
     toggleYear,
     selectedYears,
+    tagCounts,
+    selectedTags,
+    toggleTag,
     filteredStreams,
     setSelectedStreamId,
     selectedStreamId,
@@ -212,6 +219,16 @@ function ArchiveSidebar() {
               <ChevronDown className="w-3.5 h-3.5" style={{ color: 'var(--text-tertiary)' }} />
             </div>
           </div>
+
+          {tagCounts.size > 0 && (
+            <div className="px-1 mb-3" data-testid="desktop-tag-filters">
+              <TagFilterPanel
+                tagCounts={tagCounts}
+                selectedTags={selectedTags}
+                onToggleTag={toggleTag}
+              />
+            </div>
+          )}
 
           {/* Year filter chips */}
           <div className="flex flex-wrap gap-1.5 px-1" data-testid="year-filter-sidebar">
@@ -1359,6 +1376,9 @@ function MobileSearchTab() {
     selectedArtist,
     setSelectedArtist,
     allArtists,
+    tagCounts,
+    selectedTags,
+    setShowTagFilter,
     flattenedSongs,
     mobileSearchListRef,
     mobileSearchVirtualizer,
@@ -1427,6 +1447,23 @@ function MobileSearchTab() {
                   <ChevronDown className="w-3.5 h-3.5" style={{ color: 'var(--text-tertiary)' }} />
                 </div>
               </div>
+              {tagCounts.size > 0 && (
+                <button
+                  type="button"
+                  onClick={() => setShowTagFilter(true)}
+                  className="mb-3 flex w-full items-center justify-between px-3 py-2 text-sm font-medium"
+                  style={{
+                    background: 'var(--bg-surface-glass)',
+                    border: '1px solid var(--border-glass)',
+                    borderRadius: 'var(--radius-lg)',
+                    color: selectedTags.size > 0 ? 'var(--accent-pink)' : 'var(--text-secondary)',
+                  }}
+                  data-testid="mobile-tag-filter-button"
+                >
+                  <span className="flex items-center gap-2"><Tags className="h-4 w-4" />標籤篩選</span>
+                  <span>{selectedTags.size > 0 ? `已選 ${selectedTags.size}` : '全部'}</span>
+                </button>
+              )}
               {/* Search results */}
               <div>
                 {flattenedSongs.length === 0 ? (
@@ -1836,6 +1873,46 @@ function MobileBottomNavigation() {
   );
 }
 
+
+function TagFilterOverlay() {
+  const {
+    showTagFilter,
+    setShowTagFilter,
+    selectedTags,
+    setSelectedTags,
+    tagCounts,
+    toggleTag,
+  } = useArchivePageView();
+
+  return (
+    <BottomSheet
+      show={showTagFilter}
+      onClose={() => setShowTagFilter(false)}
+      title="標籤篩選"
+      titleIcon={<Tags className="h-5 w-5 text-pink-400" />}
+      testId="mobile-tag-filter-sheet"
+      headerRight={selectedTags.size > 0 ? (
+        <button
+          type="button"
+          onClick={() => setSelectedTags(new Set())}
+          className="text-xs text-pink-300 hover:text-pink-200"
+        >
+          清除
+        </button>
+      ) : undefined}
+    >
+      <div className="p-4">
+        <TagFilterPanel
+          tagCounts={tagCounts}
+          selectedTags={selectedTags}
+          onToggleTag={toggleTag}
+          tone="sheet"
+          testId="mobile-tag-filter-options"
+        />
+      </div>
+    </BottomSheet>
+  );
+}
 
 function PlaylistOverlays() {
   const {

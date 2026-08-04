@@ -5,12 +5,14 @@ import type {
   FlattenedSong,
   StreamSummary,
 } from "../types/archive";
+import { matchesTagSelection, tagSearchTerms } from "../../lib/tags";
 
-interface ArchiveFilters {
+export interface ArchiveFilters {
   search: string;
   selectedStreamId: string | null;
   selectedArtist: string | null;
   selectedYears: Set<number>;
+  selectedTags: Set<string>;
 }
 
 export function sortStreamsByNewest(streams: StreamSummary[]): StreamSummary[] {
@@ -32,6 +34,16 @@ export function getAvailableYears(streams: StreamSummary[]): number[] {
   return Array.from(years).sort((a, b) => b - a);
 }
 
+export function getTagCounts(songs: ArchiveSong[]): Map<string, number> {
+  const counts = new Map<string, number>();
+  for (const song of songs) {
+    for (const tag of new Set(song.tags)) {
+      counts.set(tag, (counts.get(tag) ?? 0) + 1);
+    }
+  }
+  return counts;
+}
+
 export function filterStreamsByYears(
   streams: StreamSummary[],
   selectedYears: Set<number>,
@@ -49,6 +61,7 @@ export function flattenSongs(songs: ArchiveSong[]): FlattenedSong[] {
         id: song.id,
         title: song.title,
         originalArtist: song.originalArtist,
+        tags: song.tags,
         albumArtUrl: song.albumArtUrl,
         performanceId: performance.id,
         streamId: performance.streamId,
@@ -58,7 +71,7 @@ export function flattenSongs(songs: ArchiveSong[]): FlattenedSong[] {
         timestamp: performance.timestamp,
         endTimestamp: performance.endTimestamp ?? undefined,
         note: performance.note,
-        searchString: `${song.title} ${song.originalArtist} ${performance.streamTitle}`.toLowerCase(),
+        searchString: `${song.title} ${song.originalArtist} ${performance.streamTitle} ${tagSearchTerms(song.tags)}`.toLowerCase(),
         year: performanceDate.getFullYear(),
         sortTime: performanceDate.getTime(),
       });
@@ -79,7 +92,8 @@ export function filterFlattenedSongs(
     const matchesStream = filters.selectedStreamId ? song.streamId === filters.selectedStreamId : true;
     const matchesArtist = filters.selectedArtist ? song.originalArtist === filters.selectedArtist : true;
     const matchesYear = filters.selectedYears.size > 0 ? filters.selectedYears.has(song.year) : true;
-    return matchesSearch && matchesStream && matchesArtist && matchesYear;
+    const matchesTags = matchesTagSelection(song.tags, filters.selectedTags);
+    return matchesSearch && matchesStream && matchesArtist && matchesYear && matchesTags;
   });
 }
 
@@ -125,7 +139,8 @@ export function filterGroupedSongs(
 ): ArchiveSong[] {
   const lowerTerm = filters.search.toLowerCase();
   return songs.filter((song) => {
-    const matchesSearch = !lowerTerm || `${song.title} ${song.originalArtist}`.toLowerCase().includes(lowerTerm);
+    const matchesSearch = !lowerTerm
+      || `${song.title} ${song.originalArtist} ${tagSearchTerms(song.tags)}`.toLowerCase().includes(lowerTerm);
     const matchesStream = filters.selectedStreamId
       ? song.performances.some((performance) => performance.streamId === filters.selectedStreamId)
       : true;
@@ -133,7 +148,8 @@ export function filterGroupedSongs(
     const matchesYear = filters.selectedYears.size > 0
       ? song.performances.some((performance) => filters.selectedYears.has(new Date(performance.date).getFullYear()))
       : true;
-    return matchesSearch && matchesStream && matchesArtist && matchesYear;
+    const matchesTags = matchesTagSelection(song.tags, filters.selectedTags);
+    return matchesSearch && matchesStream && matchesArtist && matchesYear && matchesTags;
   });
 }
 
