@@ -126,10 +126,17 @@ async function main(): Promise<void> {
   assert(sortHeaderHtml.includes('aria-hidden="true"'), 'decorative sort arrow stays out of the accessible name');
 
   const pickerHtml = renderToStaticMarkup(
-    <TagPicker value={['genre:rock']} onChange={() => undefined} recommendedScope="work" />,
+    <TagPicker value={['genre:rock']} onChange={() => undefined} scope="work" />,
   );
   assert(pickerHtml.includes('搖滾'), 'tag picker renders localized labels');
   assert(pickerHtml.includes('aria-pressed="true"'), 'tag picker exposes selected state');
+  assert(!pickerHtml.includes('中文歌'), 'work picker does not expose performance-scoped language tags');
+
+  const performancePickerHtml = renderToStaticMarkup(
+    <TagPicker value={['language:ja']} onChange={() => undefined} scope="performance" />,
+  );
+  assert(performancePickerHtml.includes('日文歌'), 'performance picker exposes rendition language tags');
+  assert(!performancePickerHtml.includes('搖滾'), 'performance picker does not expose work-scoped genre tags');
 
   console.log('✓ Global Library stays site-wide and curator-only');
 }

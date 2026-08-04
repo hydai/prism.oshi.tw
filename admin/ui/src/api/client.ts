@@ -17,6 +17,7 @@ import type {
   UpdateTimestampsBody,
   UpdateStreamBody,
   UpdateSongDetailsBody,
+  UpdatePerformanceTagsBody,
   PasteImportBody,
   PasteImportResponse,
   StreamDetail,
@@ -368,6 +369,12 @@ export const api = {
     request<{ ok: boolean }>(`/api/performances/${id}/status`, {
       method: 'PATCH',
       body: JSON.stringify({ status }),
+    }),
+
+  updatePerformanceTags: (id: string, body: UpdatePerformanceTagsBody) =>
+    request<{ id: string; tags: string[] }>(`/api/performances/${id}/tags`, {
+      method: 'PATCH',
+      body: JSON.stringify(body),
     }),
 
   updatePerformanceTimestamps: (id: string, body: UpdateTimestampsBody) =>

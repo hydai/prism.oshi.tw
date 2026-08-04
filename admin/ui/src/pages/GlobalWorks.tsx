@@ -267,9 +267,13 @@ export default function GlobalWorks() {
           aria-label="Filter global works by tag"
         >
           <option value="">All tags</option>
-          {TAG_CATEGORIES.map((category) => (
+          {TAG_CATEGORIES.filter((category) => TAG_DEFINITIONS.some((tag) => (
+            tag.active && tag.scope === 'work' && tag.category === category.id
+          ))).map((category) => (
             <optgroup key={category.id} label={category.label}>
-              {TAG_DEFINITIONS.filter((tag) => tag.active && tag.category === category.id).map((tag) => (
+              {TAG_DEFINITIONS.filter((tag) => (
+                tag.active && tag.scope === 'work' && tag.category === category.id
+              )).map((tag) => (
                 <option key={tag.id} value={tag.id}>{tag.label}</option>
               ))}
             </optgroup>
@@ -307,7 +311,7 @@ export default function GlobalWorks() {
               取消選取
             </button>
           </div>
-          <TagPicker value={batchTags} onChange={setBatchTags} recommendedScope="work" compact />
+          <TagPicker value={batchTags} onChange={setBatchTags} scope="work" compact />
           <div className="mt-3 flex gap-2">
             <button
               type="button"
@@ -441,7 +445,7 @@ export default function GlobalWorks() {
                           <h3 className="text-sm font-semibold text-slate-800">{work.title} — 共用作品標籤</h3>
                           <p className="text-xs text-slate-500">會套用到所有連結此 Work ID 的 VTuber 歌曲。</p>
                         </div>
-                        <TagPicker value={editTags} onChange={setEditTags} recommendedScope="work" compact />
+                        <TagPicker value={editTags} onChange={setEditTags} scope="work" compact />
                         <div className="mt-3 flex gap-2">
                           <button
                             type="button"

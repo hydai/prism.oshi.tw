@@ -48,6 +48,7 @@ interface PerformanceRow {
   timestamp: number;
   end_timestamp: number | null;
   note: string;
+  tags: string; // JSON array
 }
 
 interface StreamRow {
@@ -71,6 +72,7 @@ interface FanSitePerformance {
   timestamp: number;
   endTimestamp: number | null;
   note?: string;
+  tags: string[];
 }
 
 interface FanSiteSong {
@@ -78,6 +80,8 @@ interface FanSiteSong {
   workId?: string;
   title: string;
   originalArtist: string;
+  /** Tags inherited by every performance (work + legacy song layers). */
+  inheritedTags: string[];
   tags: string[];
   performances: FanSitePerformance[];
 }
@@ -117,7 +121,7 @@ function buildSongs(streamerId: string): FanSiteSong[] {
      ORDER BY song.id`,
   );
   const perfRows = queryD1<PerformanceRow>(
-    `SELECT id, song_id, stream_id, date, stream_title, video_id, timestamp, end_timestamp, note FROM performances WHERE streamer_id = '${streamerId}' AND status = 'approved' ORDER BY date`,
+    `SELECT id, song_id, stream_id, date, stream_title, video_id, timestamp, end_timestamp, note, tags FROM performances WHERE streamer_id = '${streamerId}' AND status = 'approved' ORDER BY date`,
   );
 
   return assembleFanSiteSongs(songRows, perfRows);
@@ -135,16 +139,23 @@ export function assembleFanSiteSongs(
   }
 
   return songRows
-    .map((row) => ({
-      id: row.id,
-      ...(row.work_id ? { workId: row.work_id } : {}),
-      title: row.title,
-      originalArtist: row.original_artist,
-      tags: mergeTagIds(
+    .map((row) => {
+      const performances = perfsBySong.get(row.id) || [];
+      const inheritedTags = mergeTagIds(
         row.work_tags ? JSON.parse(row.work_tags) as string[] : [],
         JSON.parse(row.song_tags) as string[],
-      ),
-      performances: (perfsBySong.get(row.id) || [])
+      );
+      return {
+        id: row.id,
+        ...(row.work_id ? { workId: row.work_id } : {}),
+        title: row.title,
+        originalArtist: row.original_artist,
+        inheritedTags,
+        tags: mergeTagIds(
+          inheritedTags,
+          performances.flatMap((performance) => JSON.parse(performance.tags) as string[]),
+        ),
+        performances: performances
         // Newest first — the canonical order the timeline consumes (dates come
         // from the DB rows; the slim output no longer carries them)
         .sort((a, b) => b.date.localeCompare(a.date))
@@ -155,8 +166,10 @@ export function assembleFanSiteSongs(
           timestamp: p.timestamp,
           endTimestamp: p.end_timestamp,
           ...(p.note ? { note: p.note } : {}),
+          tags: JSON.parse(p.tags) as string[],
         })),
-    }))
+      };
+    })
     .sort((a, b) => a.title.localeCompare(b.title, 'zh-TW'));
 }
 
@@ -358,6 +371,13 @@ async function main(): Promise<void> {
 
   console.log(`sync-data: exporting approved data for "${slug}"...`);
 
+  // Capture freshness before any export query. If D1 changes while the files are
+  // being assembled, sync:status will see a newer snapshot and keep the streamer
+  // stale instead of stamping stale JSON with the newer database timestamp.
+  const songsSnap = querySnapshot('songs', slug);
+  const perfsSnap = querySnapshot('performances', slug);
+  const streamsSnap = querySnapshot('streams', slug);
+
   const songs = buildSongs(slug);
   const streams = buildStreams(slug);
 
@@ -377,10 +397,6 @@ async function main(): Promise<void> {
 
   const totalPerfs = songs.reduce((sum, s) => sum + s.performances.length, 0);
   console.log(`  total: ${songs.length} songs, ${totalPerfs} performances, ${streams.length} streams`);
-
-  const songsSnap = querySnapshot('songs', slug);
-  const perfsSnap = querySnapshot('performances', slug);
-  const streamsSnap = querySnapshot('streams', slug);
 
   if (perfsSnap.cnt !== totalPerfs) {
     console.log(

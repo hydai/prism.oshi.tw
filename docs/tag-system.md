@@ -1,12 +1,21 @@
 # Tag system
 
-Prism stores stable tag IDs on the existing `works.tags` and `songs.tags` JSON arrays.
-The fan-site exporter publishes the normalized union of both layers:
+Prism stores stable tag IDs at the scope where they are true. Composition metadata
+lives in `works.tags`; rendition metadata lives in `performances.tags`.
+`songs.tags` remains a read-only compatibility layer for older data that applies to
+every performance linked to that local song. The fan-site exporter publishes both an
+inherited layer and each concrete performance layer:
 
 ```text
 works.tags (shared composition metadata)
-  + songs.tags (streamer-local rendition metadata)
-  = data/{slug}/songs.json tags (effective public tags)
+  + legacy songs.tags (local metadata inherited by every performance)
+  = song.inheritedTags
+
+song.inheritedTags + performance.tags
+  = tags used to filter that concrete performance
+
+union of every effective performance
+  = song.tags (card counts and backward compatibility)
 ```
 
 Do not edit generated `data/*/songs.json` files to assign tags by hand. The initial
@@ -56,15 +65,16 @@ Categories use faceted matching on the fan site:
 - tag conditions are ANDed with search, artist, year, and stream filters.
 
 Language describes the language actually sung in that rendition, not the origin
-country of the composition. Genre/source tags normally belong on a global work;
-language and rendition-style tags normally belong on the streamer-local song.
+country of the composition. Genre, source, and composition-level mood belong on a
+global work; language and rendition-style tags belong on a concrete performance.
+The API rejects controlled IDs written at the wrong scope.
 
 ## Curator workflow
 
 1. Use **Global Song Library** to edit tags shared by every linked VTuber song.
 2. Select up to 100 works on the current page to add or remove tags in bulk.
 3. Use **Untagged only** to work through the initial catalog backlog.
-4. Use a song's detail page for rendition-specific additions.
+4. Use a song's detail page to edit each performance's language and rendition style.
 5. Run `npm run sync:stale` (or `npm run sync:data -- <slug>`) and commit the
    regenerated static data.
 
@@ -82,16 +92,20 @@ consistent with those files:
 cd admin
 npx wrangler@latest d1 time-travel info oshi-prism-db
 npx wrangler@latest d1 execute oshi-prism-db --remote \
-  --file=migrations/0007_seed_initial_tags.sql
+  --file=migrations/0007_add_performance_tags.sql
+npx wrangler@latest d1 execute oshi-prism-db --remote \
+  --file=migrations/0008_seed_initial_tags.sql
 ```
 
-The migration preserves existing curator tags, de-duplicates the generated tags,
-and is safe to retry. As with every production D1 change, record the Time Travel
-bookmark before applying it. Deploying the Worker and applying this migration are
-separate operator actions; merging the PR does not mutate production D1.
+Migration 0007 adds the storage column and moves any controlled language/style IDs
+already present on songs or works down to their linked performances. Migration 0008
+preserves existing curator tags, de-duplicates generated tags, and is safe to retry.
+Apply them in order. As with every production D1 change, record the Time Travel
+bookmark first. Deploying the Worker and applying migrations are separate operator
+actions; merging the PR does not mutate production D1.
 
 ## Scope
 
-Tags currently apply to a song and all of its performances. A property that only
-describes one performance (for example one specific parody rendition) should remain
-in the performance note until a future performance-level tag model is introduced.
+Work tags apply to every linked rendition. Performance tags apply only to the
+specific recording, so a bilingual, parody, acoustic, duet, or a-cappella rendition
+does not change the metadata of another performance of the same song.

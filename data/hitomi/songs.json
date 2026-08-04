@@ -14,8 +14,14 @@
         "streamId": "stream-2026-02-05",
         "videoId": "AnuYwZNXN0I",
         "timestamp": 1304,
-        "endTimestamp": 1604
+        "endTimestamp": 1604,
+        "tags": [
+          "language:zh"
+        ]
       }
+    ],
+    "inheritedTags": [
+      "genre:pop"
     ]
   },
   {
@@ -34,8 +40,15 @@
         "streamId": "stream-dc06272b",
         "videoId": "eb22brGYmck",
         "timestamp": 2171,
-        "endTimestamp": 2447
+        "endTimestamp": 2447,
+        "tags": [
+          "language:ja"
+        ]
       }
+    ],
+    "inheritedTags": [
+      "genre:pop",
+      "source:vocaloid"
     ]
   },
   {
@@ -53,8 +66,14 @@
         "streamId": "stream-2025-11-29",
         "videoId": "FthND9ZSB2Y",
         "timestamp": 1137,
-        "endTimestamp": 1350
+        "endTimestamp": 1350,
+        "tags": [
+          "language:zh"
+        ]
       }
+    ],
+    "inheritedTags": [
+      "genre:pop"
     ]
   },
   {
@@ -71,8 +90,12 @@
         "streamId": "stream-dc06272b",
         "videoId": "eb22brGYmck",
         "timestamp": 1751,
-        "endTimestamp": 1990
+        "endTimestamp": 1990,
+        "tags": []
       }
+    ],
+    "inheritedTags": [
+      "source:original"
     ]
   },
   {
@@ -87,9 +110,11 @@
         "streamId": "stream-2026-02-05",
         "videoId": "AnuYwZNXN0I",
         "timestamp": 2022,
-        "endTimestamp": 2238
+        "endTimestamp": 2238,
+        "tags": []
       }
-    ]
+    ],
+    "inheritedTags": []
   },
   {
     "id": "song-254f60c4",
@@ -103,9 +128,11 @@
         "streamId": "stream-2026-02-05",
         "videoId": "AnuYwZNXN0I",
         "timestamp": 5852,
-        "endTimestamp": 6014
+        "endTimestamp": 6014,
+        "tags": []
       }
-    ]
+    ],
+    "inheritedTags": []
   },
   {
     "id": "song-f8fcf33a",
@@ -119,9 +146,11 @@
         "streamId": "stream-2026-02-05",
         "videoId": "AnuYwZNXN0I",
         "timestamp": 2708,
-        "endTimestamp": 2951
+        "endTimestamp": 2951,
+        "tags": []
       }
-    ]
+    ],
+    "inheritedTags": []
   },
   {
     "id": "song-d49bf5f7",
@@ -137,9 +166,13 @@
         "streamId": "stream-2025-11-29",
         "videoId": "FthND9ZSB2Y",
         "timestamp": 4152,
-        "endTimestamp": 4504
+        "endTimestamp": 4504,
+        "tags": [
+          "language:zh"
+        ]
       }
-    ]
+    ],
+    "inheritedTags": []
   },
   {
     "id": "song-03d847b3",
@@ -156,8 +189,14 @@
         "streamId": "stream-2025-11-29",
         "videoId": "FthND9ZSB2Y",
         "timestamp": 2200,
-        "endTimestamp": 2503
+        "endTimestamp": 2503,
+        "tags": [
+          "language:zh"
+        ]
       }
+    ],
+    "inheritedTags": [
+      "genre:pop"
     ]
   },
   {
@@ -176,8 +215,15 @@
         "streamId": "stream-b39375a3",
         "videoId": "WdkRZyLwmF4",
         "timestamp": 568,
-        "endTimestamp": 846
+        "endTimestamp": 846,
+        "tags": [
+          "language:ja"
+        ]
       }
+    ],
+    "inheritedTags": [
+      "genre:pop",
+      "source:vocaloid"
     ]
   },
   {
@@ -195,8 +241,14 @@
         "streamId": "stream-b39375a3",
         "videoId": "WdkRZyLwmF4",
         "timestamp": 3804,
-        "endTimestamp": 4007
+        "endTimestamp": 4007,
+        "tags": [
+          "language:ja"
+        ]
       }
+    ],
+    "inheritedTags": [
+      "genre:pop"
     ]
   },
   {
@@ -214,8 +266,14 @@
         "streamId": "stream-dc06272b",
         "videoId": "eb22brGYmck",
         "timestamp": 4411,
-        "endTimestamp": 4671
+        "endTimestamp": 4671,
+        "tags": [
+          "language:zh"
+        ]
       }
+    ],
+    "inheritedTags": [
+      "genre:pop"
     ]
   },
   {
@@ -230,9 +288,11 @@
         "streamId": "stream-2026-02-05",
         "videoId": "AnuYwZNXN0I",
         "timestamp": 576,
-        "endTimestamp": 754
+        "endTimestamp": 754,
+        "tags": []
       }
-    ]
+    ],
+    "inheritedTags": []
   },
   {
     "id": "song-a8800b48",
@@ -249,8 +309,14 @@
         "streamId": "stream-2026-02-05",
         "videoId": "AnuYwZNXN0I",
         "timestamp": 4559,
-        "endTimestamp": 4786
+        "endTimestamp": 4786,
+        "tags": [
+          "language:zh"
+        ]
       }
+    ],
+    "inheritedTags": [
+      "genre:pop"
     ]
   },
   {
@@ -265,9 +331,11 @@
         "streamId": "stream-2025-11-29",
         "videoId": "FthND9ZSB2Y",
         "timestamp": 3224,
-        "endTimestamp": 3384
+        "endTimestamp": 3384,
+        "tags": []
       }
-    ]
+    ],
+    "inheritedTags": []
   },
   {
     "id": "song-9cf7c290",
@@ -281,9 +349,11 @@
         "streamId": "stream-2025-11-29",
         "videoId": "FthND9ZSB2Y",
         "timestamp": 3604,
-        "endTimestamp": 3815
+        "endTimestamp": 3815,
+        "tags": []
       }
-    ]
+    ],
+    "inheritedTags": []
   },
   {
     "id": "song-fcd4e7fc",
@@ -299,9 +369,13 @@
         "streamId": "stream-dc06272b",
         "videoId": "eb22brGYmck",
         "timestamp": 4873,
-        "endTimestamp": 5089
+        "endTimestamp": 5089,
+        "tags": [
+          "language:ja"
+        ]
       }
-    ]
+    ],
+    "inheritedTags": []
   },
   {
     "id": "song-9eb436c2",
@@ -317,9 +391,13 @@
         "streamId": "stream-2025-11-29",
         "videoId": "FthND9ZSB2Y",
         "timestamp": 4688,
-        "endTimestamp": 4939
+        "endTimestamp": 4939,
+        "tags": [
+          "language:zh"
+        ]
       }
-    ]
+    ],
+    "inheritedTags": []
   },
   {
     "id": "song-7592ff4b",
@@ -335,9 +413,13 @@
         "streamId": "stream-dc06272b",
         "videoId": "eb22brGYmck",
         "timestamp": 3692,
-        "endTimestamp": 3862
+        "endTimestamp": 3862,
+        "tags": [
+          "language:zh"
+        ]
       }
-    ]
+    ],
+    "inheritedTags": []
   },
   {
     "id": "song-2dae12e8",
@@ -354,8 +436,14 @@
         "streamId": "stream-2025-11-29",
         "videoId": "FthND9ZSB2Y",
         "timestamp": 5559,
-        "endTimestamp": 5809
+        "endTimestamp": 5809,
+        "tags": [
+          "language:zh"
+        ]
       }
+    ],
+    "inheritedTags": [
+      "genre:pop"
     ]
   },
   {
@@ -370,9 +458,11 @@
         "streamId": "stream-2026-02-05",
         "videoId": "AnuYwZNXN0I",
         "timestamp": 3820,
-        "endTimestamp": 4050
+        "endTimestamp": 4050,
+        "tags": []
       }
-    ]
+    ],
+    "inheritedTags": []
   },
   {
     "id": "song-824e0636",
@@ -386,9 +476,11 @@
         "streamId": "stream-2025-11-29",
         "videoId": "FthND9ZSB2Y",
         "timestamp": 1759,
-        "endTimestamp": 2000
+        "endTimestamp": 2000,
+        "tags": []
       }
-    ]
+    ],
+    "inheritedTags": []
   },
   {
     "id": "song-6e983db6",
@@ -402,9 +494,11 @@
         "streamId": "stream-dc06272b",
         "videoId": "eb22brGYmck",
         "timestamp": 2724,
-        "endTimestamp": 2938
+        "endTimestamp": 2938,
+        "tags": []
       }
-    ]
+    ],
+    "inheritedTags": []
   },
   {
     "id": "song-bd246338",
@@ -420,9 +514,13 @@
         "streamId": "stream-2025-11-29",
         "videoId": "FthND9ZSB2Y",
         "timestamp": 543,
-        "endTimestamp": 749
+        "endTimestamp": 749,
+        "tags": [
+          "language:zh"
+        ]
       }
-    ]
+    ],
+    "inheritedTags": []
   },
   {
     "id": "song-6c35e292",
@@ -438,9 +536,13 @@
         "streamId": "stream-2025-11-29",
         "videoId": "FthND9ZSB2Y",
         "timestamp": 2786,
-        "endTimestamp": 2999
+        "endTimestamp": 2999,
+        "tags": [
+          "language:zh"
+        ]
       }
-    ]
+    ],
+    "inheritedTags": []
   },
   {
     "id": "song-60d627f6",
@@ -454,9 +556,11 @@
         "streamId": "stream-2026-02-05",
         "videoId": "AnuYwZNXN0I",
         "timestamp": 3171,
-        "endTimestamp": 3387
+        "endTimestamp": 3387,
+        "tags": []
       }
-    ]
+    ],
+    "inheritedTags": []
   },
   {
     "id": "song-96f52592",
@@ -472,9 +576,13 @@
         "streamId": "stream-2025-11-29",
         "videoId": "FthND9ZSB2Y",
         "timestamp": 5142,
-        "endTimestamp": 5350
+        "endTimestamp": 5350,
+        "tags": [
+          "language:en"
+        ]
       }
-    ]
+    ],
+    "inheritedTags": []
   },
   {
     "id": "song-edf196f8",
@@ -491,8 +599,14 @@
         "streamId": "stream-b39375a3",
         "videoId": "WdkRZyLwmF4",
         "timestamp": 1233,
-        "endTimestamp": 1445
+        "endTimestamp": 1445,
+        "tags": [
+          "language:ja"
+        ]
       }
+    ],
+    "inheritedTags": [
+      "genre:pop"
     ]
   },
   {
@@ -510,8 +624,14 @@
         "streamId": "stream-b39375a3",
         "videoId": "WdkRZyLwmF4",
         "timestamp": 2470,
-        "endTimestamp": 2615
+        "endTimestamp": 2615,
+        "tags": [
+          "language:ja"
+        ]
       }
+    ],
+    "inheritedTags": [
+      "genre:pop"
     ]
   },
   {
@@ -526,9 +646,11 @@
         "streamId": "stream-b39375a3",
         "videoId": "WdkRZyLwmF4",
         "timestamp": 2996,
-        "endTimestamp": 3213
+        "endTimestamp": 3213,
+        "tags": []
       }
-    ]
+    ],
+    "inheritedTags": []
   },
   {
     "id": "song-fa0f128a",
@@ -544,9 +666,13 @@
         "streamId": "stream-b39375a3",
         "videoId": "WdkRZyLwmF4",
         "timestamp": 1865,
-        "endTimestamp": 2099
+        "endTimestamp": 2099,
+        "tags": [
+          "language:en"
+        ]
       }
-    ]
+    ],
+    "inheritedTags": []
   },
   {
     "id": "song-be2d68d3",
@@ -560,9 +686,11 @@
         "streamId": "stream-b39375a3",
         "videoId": "WdkRZyLwmF4",
         "timestamp": 4333,
-        "endTimestamp": 4567
+        "endTimestamp": 4567,
+        "tags": []
       }
-    ]
+    ],
+    "inheritedTags": []
   },
   {
     "id": "song-2582b069",
@@ -576,9 +704,11 @@
         "streamId": "stream-dc06272b",
         "videoId": "eb22brGYmck",
         "timestamp": 1358,
-        "endTimestamp": 1510
+        "endTimestamp": 1510,
+        "tags": []
       }
-    ]
+    ],
+    "inheritedTags": []
   },
   {
     "id": "song-ebb0bbbe",
@@ -592,9 +722,11 @@
         "streamId": "stream-dc06272b",
         "videoId": "eb22brGYmck",
         "timestamp": 818,
-        "endTimestamp": 1037
+        "endTimestamp": 1037,
+        "tags": []
       }
-    ]
+    ],
+    "inheritedTags": []
   },
   {
     "id": "song-dceea062",
@@ -610,9 +742,13 @@
         "streamId": "stream-dc06272b",
         "videoId": "eb22brGYmck",
         "timestamp": 314,
-        "endTimestamp": 532
+        "endTimestamp": 532,
+        "tags": [
+          "language:en"
+        ]
       }
-    ]
+    ],
+    "inheritedTags": []
   },
   {
     "id": "song-4c828f0f",
@@ -626,9 +762,11 @@
         "streamId": "stream-dc06272b",
         "videoId": "eb22brGYmck",
         "timestamp": 4073,
-        "endTimestamp": 4232
+        "endTimestamp": 4232,
+        "tags": []
       }
-    ]
+    ],
+    "inheritedTags": []
   },
   {
     "id": "song-d1ce67a8",
@@ -644,9 +782,13 @@
         "streamId": "stream-b39375a3",
         "videoId": "WdkRZyLwmF4",
         "timestamp": 5015,
-        "endTimestamp": 5251
+        "endTimestamp": 5251,
+        "tags": [
+          "language:ja"
+        ]
       }
-    ]
+    ],
+    "inheritedTags": []
   },
   {
     "id": "song-8dc82148",
@@ -662,9 +804,13 @@
         "streamId": "stream-dc06272b",
         "videoId": "eb22brGYmck",
         "timestamp": 3339,
-        "endTimestamp": 3494
+        "endTimestamp": 3494,
+        "tags": [
+          "language:ja"
+        ]
       }
-    ]
+    ],
+    "inheritedTags": []
   },
   {
     "id": "song-3a255c8d",
@@ -681,8 +827,14 @@
         "streamId": "stream-2026-02-05",
         "videoId": "AnuYwZNXN0I",
         "timestamp": 5269,
-        "endTimestamp": 5520
+        "endTimestamp": 5520,
+        "tags": [
+          "language:ja"
+        ]
       }
+    ],
+    "inheritedTags": [
+      "source:vocaloid"
     ]
   }
 ]

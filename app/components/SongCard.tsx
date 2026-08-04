@@ -216,6 +216,19 @@ function SongCardInner({ song, isExpanded, onToggleExpand, onPlay, onAddToQueue,
                   >
                     {perf.date}
                   </span>
+                  {perf.tags.map((tag) => (
+                    <span
+                      key={tag}
+                      className="rounded-full px-2 py-0.5"
+                      style={{
+                        background: 'var(--bg-accent-pink)',
+                        color: 'var(--accent-pink)',
+                        fontSize: 'var(--font-size-xs)',
+                      }}
+                    >
+                      {getTagLabel(tag)}
+                    </span>
+                  ))}
                   {perf.note && (
                     <span
                       className="inline-flex items-center border border-blue-200 text-blue-500 bg-blue-50 font-medium"

@@ -7,6 +7,7 @@ export interface ArchivePerformance {
   timestamp: number;
   endTimestamp?: number | null;
   note: string;
+  tags: string[];
 }
 
 export interface ArchiveSong {
@@ -15,6 +16,8 @@ export interface ArchiveSong {
   workId?: string;
   title: string;
   originalArtist: string;
+  /** Work and legacy song tags inherited by every performance. */
+  inheritedTags: string[];
   tags: string[];
   performances: ArchivePerformance[];
   albumArtUrl?: string;

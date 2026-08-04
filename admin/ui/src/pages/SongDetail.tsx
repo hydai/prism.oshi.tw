@@ -14,6 +14,8 @@ export default function SongDetail({ user }: { user: AuthUser }) {
   const [editing, setEditing] = useState(false);
   const [editForm, setEditForm] = useState<UpdateSongBody>({});
   const [saving, setSaving] = useState(false);
+  const [performanceTagDrafts, setPerformanceTagDrafts] = useState<Record<string, string[]>>({});
+  const [savingPerformanceId, setSavingPerformanceId] = useState<string | null>(null);
 
   useEffect(() => {
     if (!id) return;
@@ -21,7 +23,10 @@ export default function SongDetail({ user }: { user: AuthUser }) {
       .getSong(id)
       .then((s) => {
         setSong(s);
-        setEditForm({ title: s.title, originalArtist: s.originalArtist, tags: s.tags });
+        setEditForm({ title: s.title, originalArtist: s.originalArtist });
+        setPerformanceTagDrafts(Object.fromEntries(
+          (s.performances ?? []).map((performance) => [performance.id, performance.tags]),
+        ));
       })
       .catch((err: unknown) => setError(err instanceof Error ? err.message : 'Failed to load song'))
       .finally(() => setLoading(false));
@@ -48,6 +53,24 @@ export default function SongDetail({ user }: { user: AuthUser }) {
       setSong(updated);
     } catch {
       // unchanged state is visible
+    }
+  };
+
+  const handlePerformanceTagsSave = async (performanceId: string) => {
+    const tags = performanceTagDrafts[performanceId] ?? [];
+    setSavingPerformanceId(performanceId);
+    try {
+      const updated = await api.updatePerformanceTags(performanceId, { tags });
+      setSong((current) => current ? {
+        ...current,
+        performances: current.performances?.map((performance) => (
+          performance.id === performanceId ? { ...performance, tags: updated.tags } : performance
+        )),
+      } : current);
+    } catch (err: unknown) {
+      setError(err instanceof Error ? err.message : 'Failed to save performance tags');
+    } finally {
+      setSavingPerformanceId(null);
     }
   };
 
@@ -82,15 +105,6 @@ export default function SongDetail({ user }: { user: AuthUser }) {
                   placeholder="Original artist"
                   className="w-full rounded border border-slate-300 px-3 py-1.5 text-sm focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500"
                 />
-                <div className="rounded border border-slate-200 bg-slate-50 p-3">
-                  <p className="mb-2 text-xs text-slate-500">此 VTuber 歌曲版本的附加標籤</p>
-                  <TagPicker
-                    value={editForm.tags ?? []}
-                    onChange={(tags) => setEditForm((form) => ({ ...form, tags }))}
-                    recommendedScope="song"
-                    compact
-                  />
-                </div>
                 <div className="flex gap-2">
                   <button
                     onClick={handleSave}
@@ -190,9 +204,41 @@ export default function SongDetail({ user }: { user: AuthUser }) {
                       {perf.endTimestamp != null && ` – ${formatTimestamp(perf.endTimestamp)}`}
                     </p>
                     {perf.note && <p className="mt-1 text-sm text-slate-600">{perf.note}</p>}
+                    {perf.tags.length > 0 && (
+                      <div className="mt-2 flex flex-wrap gap-1">
+                        {perf.tags.map((tag) => (
+                          <span key={tag} className="rounded bg-blue-50 px-2 py-0.5 text-xs text-blue-700">
+                            {getTagLabel(tag)}
+                          </span>
+                        ))}
+                      </div>
+                    )}
                   </div>
                   <StatusBadge status={perf.status} />
                 </div>
+
+                {isCurator && (
+                  <div className="mt-3 rounded border border-slate-200 bg-slate-50 p-3">
+                    <p className="mb-2 text-xs text-slate-500">這一次演唱的語言與形式</p>
+                    <TagPicker
+                      value={performanceTagDrafts[perf.id] ?? perf.tags}
+                      onChange={(tags) => setPerformanceTagDrafts((drafts) => ({
+                        ...drafts,
+                        [perf.id]: tags,
+                      }))}
+                      scope="performance"
+                      compact
+                    />
+                    <button
+                      type="button"
+                      onClick={() => handlePerformanceTagsSave(perf.id)}
+                      disabled={savingPerformanceId === perf.id}
+                      className="mt-3 rounded bg-blue-600 px-3 py-1.5 text-xs font-medium text-white hover:bg-blue-700 disabled:opacity-50"
+                    >
+                      {savingPerformanceId === perf.id ? 'Saving...' : 'Save performance tags'}
+                    </button>
+                  </div>
+                )}
 
                 {/* YouTube embed */}
                 <div className="mt-3 aspect-video w-full max-w-lg overflow-hidden rounded-md">

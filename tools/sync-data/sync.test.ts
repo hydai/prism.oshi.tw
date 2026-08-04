@@ -33,11 +33,13 @@ const perf = (id: string, streamId: string) => ({
   timestamp: 0,
   endTimestamp: null,
   note: '',
+  tags: [] as string[],
 });
 const song = (id: string, performances: ReturnType<typeof perf>[]) => ({
   id,
   title: id,
   originalArtist: '',
+  inheritedTags: [] as string[],
   tags: [] as string[],
   performances,
 });
@@ -61,12 +63,14 @@ test('assembleFanSiteSongs exports the shared work ID without replacing local so
   const linked = songs.find((s) => s.id === 'alice-local')!;
   const legacy = songs.find((s) => s.id === 'legacy-local')!;
   assert.equal(linked.workId, 'work-shared');
+  assert.deepEqual(linked.inheritedTags, ['genre:rock']);
   assert.deepEqual(linked.tags, ['genre:rock']);
   assert.equal('workId' in legacy, false, 'unlinked legacy rows stay backward compatible');
+  assert.deepEqual(legacy.inheritedTags, ['legacy-tag']);
   assert.deepEqual(legacy.tags, ['legacy-tag']);
 });
 
-test('assembleFanSiteSongs unions, de-duplicates, and orders work plus local tags', () => {
+test('assembleFanSiteSongs keeps inherited tags separate and aggregates performance tags', () => {
   const songs = assembleFanSiteSongs(
     [{
       id: 'song1',
@@ -74,29 +78,35 @@ test('assembleFanSiteSongs unions, de-duplicates, and orders work plus local tag
       title: 'Song',
       original_artist: 'Artist',
       song_tags: '["style:parody","genre:rock"]',
-      work_tags: '["genre:rock","language:zh"]',
+      work_tags: '["genre:rock"]',
     }],
-    [],
+    [{
+      id: 'p1', song_id: 'song1', stream_id: 's1', date: '2024-01-01',
+      stream_title: '', video_id: 'v1', timestamp: 0, end_timestamp: null,
+      note: '', tags: '["language:zh","style:parody"]',
+    }],
   );
+  assert.deepEqual(songs[0].inheritedTags, ['genre:rock', 'style:parody']);
   assert.deepEqual(songs[0].tags, ['language:zh', 'genre:rock', 'style:parody']);
+  assert.deepEqual(songs[0].performances[0].tags, ['language:zh', 'style:parody']);
 });
 
 test('assembleFanSiteSongs emits slim performances without stream-derived fields', () => {
   const songs = assembleFanSiteSongs(
     [{ id: 'song1', work_id: null, title: 'Song', original_artist: 'Artist', song_tags: '[]', work_tags: null }],
-    [{ id: 'p1', song_id: 'song1', stream_id: 's1', date: '2024-01-01', stream_title: 'Stream night', video_id: 'v1', timestamp: 10, end_timestamp: 99, note: '' }],
+    [{ id: 'p1', song_id: 'song1', stream_id: 's1', date: '2024-01-01', stream_title: 'Stream night', video_id: 'v1', timestamp: 10, end_timestamp: 99, note: '', tags: '[]' }],
   );
   const p = songs[0].performances[0];
   assert.equal('streamTitle' in p, false, 'streamTitle is derivable from streams.json by streamId');
   assert.equal('date' in p, false, 'date is derivable from streams.json by streamId');
   assert.equal('note' in p, false, 'empty notes are omitted');
-  assert.deepEqual(p, { id: 'p1', streamId: 's1', videoId: 'v1', timestamp: 10, endTimestamp: 99 });
+  assert.deepEqual(p, { id: 'p1', streamId: 's1', videoId: 'v1', timestamp: 10, endTimestamp: 99, tags: [] });
 });
 
 test('assembleFanSiteSongs keeps non-empty notes', () => {
   const songs = assembleFanSiteSongs(
     [{ id: 'song1', work_id: null, title: 'Song', original_artist: 'Artist', song_tags: '[]', work_tags: null }],
-    [{ id: 'p1', song_id: 'song1', stream_id: 's1', date: '2024-01-01', stream_title: '', video_id: 'v1', timestamp: 0, end_timestamp: null, note: 'encore' }],
+    [{ id: 'p1', song_id: 'song1', stream_id: 's1', date: '2024-01-01', stream_title: '', video_id: 'v1', timestamp: 0, end_timestamp: null, note: 'encore', tags: '[]' }],
   );
   assert.equal(songs[0].performances[0].note, 'encore');
 });
@@ -108,8 +118,8 @@ test('assembleFanSiteSongs sorts songs by zh-TW title and performances newest-fi
       { id: 'one', work_id: null, title: '一', original_artist: '', song_tags: '[]', work_tags: null },
     ],
     [
-      { id: 'p-old', song_id: 'one', stream_id: 's1', date: '2023-05-01', stream_title: '', video_id: 'v1', timestamp: 0, end_timestamp: null, note: '' },
-      { id: 'p-new', song_id: 'one', stream_id: 's2', date: '2025-05-01', stream_title: '', video_id: 'v2', timestamp: 0, end_timestamp: null, note: '' },
+      { id: 'p-old', song_id: 'one', stream_id: 's1', date: '2023-05-01', stream_title: '', video_id: 'v1', timestamp: 0, end_timestamp: null, note: '', tags: '[]' },
+      { id: 'p-new', song_id: 'one', stream_id: 's2', date: '2025-05-01', stream_title: '', video_id: 'v2', timestamp: 0, end_timestamp: null, note: '', tags: '[]' },
     ],
   );
   assert.deepEqual(songs.map((s) => s.id), ['one', 'turtle'], 'songs sorted by zh-TW collation');
@@ -189,7 +199,7 @@ test('sync-data CLI rejects a SQL-injection slug with a clear error (before any 
   const script = path.join(__dirname, 'sync.ts');
   let threw = false;
   try {
-    execFileSync('npx', ['tsx', script, "inject'--"], {
+    execFileSync(process.execPath, ['--import', 'tsx', script, "inject'--"], {
       encoding: 'utf-8',
       stdio: ['ignore', 'pipe', 'pipe'],
     });

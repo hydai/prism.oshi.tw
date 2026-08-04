@@ -17,6 +17,7 @@ interface StoredPerformance {
   timestamp: number;
   endTimestamp: number | null;
   note?: string;
+  tags?: string[];
 }
 
 interface StoredSong {
@@ -24,6 +25,7 @@ interface StoredSong {
   workId?: string;
   title: string;
   originalArtist: string;
+  inheritedTags?: string[];
   tags: string[];
   performances: StoredPerformance[];
 }
@@ -36,6 +38,7 @@ export function hydrateSongs(stored: StoredSong[], streams: StreamSummary[]): Ar
   const streamById = new Map(streams.map((s) => [s.id, s]));
   return stored.map((song) => ({
     ...song,
+    inheritedTags: song.inheritedTags ?? song.tags,
     performances: song.performances.map((p) => {
       const stream = streamById.get(p.streamId);
       return {
@@ -43,6 +46,7 @@ export function hydrateSongs(stored: StoredSong[], streams: StreamSummary[]): Ar
         streamTitle: stream?.title ?? "",
         date: stream?.date ?? ORPHAN_DATE,
         note: p.note ?? "",
+        tags: p.tags ?? [],
       };
     }),
   }));

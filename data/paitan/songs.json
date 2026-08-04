@@ -15,8 +15,15 @@
         "streamId": "stream-f4c6796a",
         "videoId": "1OB3OA7Kir8",
         "timestamp": 513,
-        "endTimestamp": 763
+        "endTimestamp": 763,
+        "tags": [
+          "language:ja"
+        ]
       }
+    ],
+    "inheritedTags": [
+      "genre:pop",
+      "source:vocaloid"
     ]
   },
   {
@@ -34,8 +41,14 @@
         "streamId": "stream-f4c6796a",
         "videoId": "1OB3OA7Kir8",
         "timestamp": 3620,
-        "endTimestamp": 3836
+        "endTimestamp": 3836,
+        "tags": [
+          "language:ja"
+        ]
       }
+    ],
+    "inheritedTags": [
+      "genre:pop"
     ]
   },
   {
@@ -52,8 +65,12 @@
         "streamId": "stream-f4c6796a",
         "videoId": "1OB3OA7Kir8",
         "timestamp": 4541,
-        "endTimestamp": 4902
+        "endTimestamp": 4902,
+        "tags": [
+          "language:ja"
+        ]
       }
-    ]
+    ],
+    "inheritedTags": []
   }
 ]

@@ -4,11 +4,13 @@ import {
   TAG_CATEGORIES,
   TAG_DEFINITIONS,
   getTagLabel,
+  filterTagIdsByScope,
   matchesTagSelection,
   mergeTagIds,
   normalizeTagIds,
   tagSearchTerms,
   validateTagSelection,
+  validateTagSelectionForScope,
 } from './tags';
 
 assert.equal(new Set(TAG_DEFINITIONS.map((tag) => tag.id)).size, TAG_DEFINITIONS.length, 'tag IDs are unique');
@@ -44,6 +46,15 @@ assert.deepEqual(validateTagSelection('genre:rock'), {
 assert.deepEqual(validateTagSelection(['not-real']), {
   ok: false,
   error: 'unknown or inactive tag IDs: not-real',
+});
+assert.deepEqual(filterTagIdsByScope(['language:zh', 'genre:rock'], 'performance'), ['language:zh']);
+assert.deepEqual(validateTagSelectionForScope(['genre:rock'], 'work'), {
+  ok: true,
+  tags: ['genre:rock'],
+});
+assert.deepEqual(validateTagSelectionForScope(['language:zh'], 'work'), {
+  ok: false,
+  error: 'tag IDs are not valid for work scope: language:zh',
 });
 
 const tags = ['language:zh', 'genre:rock'];

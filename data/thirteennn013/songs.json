@@ -14,8 +14,14 @@
         "streamId": "stream-c22c3bca",
         "videoId": "Rz1r1LDGBhw",
         "timestamp": 1173,
-        "endTimestamp": 1384
+        "endTimestamp": 1384,
+        "tags": [
+          "language:ja"
+        ]
       }
+    ],
+    "inheritedTags": [
+      "genre:pop"
     ]
   },
   {
@@ -33,8 +39,14 @@
         "streamId": "stream-c22c3bca",
         "videoId": "Rz1r1LDGBhw",
         "timestamp": 5386,
-        "endTimestamp": 5604
+        "endTimestamp": 5604,
+        "tags": [
+          "language:ja"
+        ]
       }
+    ],
+    "inheritedTags": [
+      "genre:rock"
     ]
   },
   {
@@ -53,8 +65,15 @@
         "streamId": "stream-c22c3bca",
         "videoId": "Rz1r1LDGBhw",
         "timestamp": 5057,
-        "endTimestamp": 5204
+        "endTimestamp": 5204,
+        "tags": [
+          "language:ja"
+        ]
       }
+    ],
+    "inheritedTags": [
+      "genre:pop",
+      "genre:rap"
     ]
   },
   {
@@ -71,9 +90,13 @@
         "streamId": "stream-c22c3bca",
         "videoId": "Rz1r1LDGBhw",
         "timestamp": 4368,
-        "endTimestamp": 4565
+        "endTimestamp": 4565,
+        "tags": [
+          "language:ja"
+        ]
       }
-    ]
+    ],
+    "inheritedTags": []
   },
   {
     "id": "song-aa13810b",
@@ -90,8 +113,14 @@
         "streamId": "stream-c22c3bca",
         "videoId": "Rz1r1LDGBhw",
         "timestamp": 3138,
-        "endTimestamp": 3404
+        "endTimestamp": 3404,
+        "tags": [
+          "language:ja"
+        ]
       }
+    ],
+    "inheritedTags": [
+      "genre:pop"
     ]
   },
   {
@@ -109,8 +138,14 @@
         "streamId": "stream-c22c3bca",
         "videoId": "Rz1r1LDGBhw",
         "timestamp": 1618,
-        "endTimestamp": 1841
+        "endTimestamp": 1841,
+        "tags": [
+          "language:zh"
+        ]
       }
+    ],
+    "inheritedTags": [
+      "genre:pop"
     ]
   },
   {
@@ -127,9 +162,13 @@
         "streamId": "stream-c22c3bca",
         "videoId": "Rz1r1LDGBhw",
         "timestamp": 3551,
-        "endTimestamp": 3729
+        "endTimestamp": 3729,
+        "tags": [
+          "language:en"
+        ]
       }
-    ]
+    ],
+    "inheritedTags": []
   },
   {
     "id": "song-144cd0fa",
@@ -146,8 +185,14 @@
         "streamId": "stream-c22c3bca",
         "videoId": "Rz1r1LDGBhw",
         "timestamp": 4683,
-        "endTimestamp": 4867
+        "endTimestamp": 4867,
+        "tags": [
+          "language:ja"
+        ]
       }
+    ],
+    "inheritedTags": [
+      "genre:pop"
     ]
   },
   {
@@ -165,8 +210,14 @@
         "streamId": "stream-c22c3bca",
         "videoId": "Rz1r1LDGBhw",
         "timestamp": 2227,
-        "endTimestamp": 2417
+        "endTimestamp": 2417,
+        "tags": [
+          "language:ja"
+        ]
       }
+    ],
+    "inheritedTags": [
+      "genre:rock"
     ]
   },
   {
@@ -184,8 +235,14 @@
         "streamId": "stream-c22c3bca",
         "videoId": "Rz1r1LDGBhw",
         "timestamp": 2641,
-        "endTimestamp": 2931
+        "endTimestamp": 2931,
+        "tags": [
+          "language:ja"
+        ]
       }
+    ],
+    "inheritedTags": [
+      "genre:rock"
     ]
   },
   {
@@ -202,8 +259,12 @@
         "streamId": "stream-c22c3bca",
         "videoId": "Rz1r1LDGBhw",
         "timestamp": 4110,
-        "endTimestamp": 4241
+        "endTimestamp": 4241,
+        "tags": [
+          "language:ja"
+        ]
       }
-    ]
+    ],
+    "inheritedTags": []
   }
 ]
