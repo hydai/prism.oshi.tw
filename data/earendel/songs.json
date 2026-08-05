@@ -266,6 +266,13 @@
     "tags": [],
     "performances": [
       {
+        "id": "p-e4f55452",
+        "streamId": "stream-2026-08-03",
+        "videoId": "wep9ztMuicY",
+        "timestamp": 9228,
+        "endTimestamp": 9604
+      },
+      {
         "id": "p-3274d79e",
         "streamId": "stream-2026-07-06",
         "videoId": "q3B24mwXF2k",
@@ -429,6 +436,22 @@
         "videoId": "ZsObrmIQLGk",
         "timestamp": 2324,
         "endTimestamp": 2524
+      }
+    ]
+  },
+  {
+    "id": "song-c5cd5619",
+    "workId": "work-song-29176ab5",
+    "title": "水星記",
+    "originalArtist": "郭頂",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-5730080b",
+        "streamId": "stream-2026-08-03",
+        "videoId": "wep9ztMuicY",
+        "timestamp": 8653,
+        "endTimestamp": 8935
       }
     ]
   },
@@ -853,11 +876,34 @@
     "tags": [],
     "performances": [
       {
+        "id": "p-83dc45b2",
+        "streamId": "stream-2026-08-03",
+        "videoId": "wep9ztMuicY",
+        "timestamp": 991,
+        "endTimestamp": 1327
+      },
+      {
         "id": "p-0595b07b",
         "streamId": "stream-2026-06-01",
         "videoId": "58n4IS3D4m8",
         "timestamp": 7312,
         "endTimestamp": 7648
+      }
+    ]
+  },
+  {
+    "id": "song-342bbbcb",
+    "workId": "work-68c68987-a114-41a8-a8b7-8877c14a8732",
+    "title": "声をきかせて",
+    "originalArtist": "MAHO堂",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-a20d968b",
+        "streamId": "stream-2026-08-03",
+        "videoId": "wep9ztMuicY",
+        "timestamp": 1764,
+        "endTimestamp": 2000
       }
     ]
   },
@@ -1073,6 +1119,22 @@
     ]
   },
   {
+    "id": "song-d59a5cc6",
+    "workId": "work-ebd9245d-c837-4a6a-abad-5556393dfd61",
+    "title": "沒有我的那個宇宙",
+    "originalArtist": "持修",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-6ce27a99",
+        "streamId": "stream-2026-08-03",
+        "videoId": "wep9ztMuicY",
+        "timestamp": 6744,
+        "endTimestamp": 6947
+      }
+    ]
+  },
+  {
     "id": "song-27a0cd03",
     "workId": "work-song-27a0cd03",
     "title": "沒那麼簡單",
@@ -1241,6 +1303,13 @@
     "tags": [],
     "performances": [
       {
+        "id": "p-0ffa9b27",
+        "streamId": "stream-bbce9199",
+        "videoId": "QEUFU9f3Opg",
+        "timestamp": 1727,
+        "endTimestamp": 1950
+      },
+      {
         "id": "p-b8176b3d",
         "streamId": "stream-e5230a57",
         "videoId": "xQ5TCl3JnXs",
@@ -1396,6 +1465,13 @@
     "originalArtist": "奥華子",
     "tags": [],
     "performances": [
+      {
+        "id": "p-a43caac7",
+        "streamId": "stream-2026-08-03",
+        "videoId": "wep9ztMuicY",
+        "timestamp": 8203,
+        "endTimestamp": 8487
+      },
       {
         "id": "p-34de4345",
         "streamId": "stream-2026-06-08",
@@ -1578,11 +1654,34 @@
     "tags": [],
     "performances": [
       {
+        "id": "p-594f2f5f",
+        "streamId": "stream-bbce9199",
+        "videoId": "QEUFU9f3Opg",
+        "timestamp": 4942,
+        "endTimestamp": 5196
+      },
+      {
         "id": "p-a388513c",
         "streamId": "stream-e5230a57",
         "videoId": "xQ5TCl3JnXs",
         "timestamp": 9491,
         "endTimestamp": 9749
+      }
+    ]
+  },
+  {
+    "id": "song-fbc6eda5",
+    "workId": "work-efb7c346-f5f1-421b-935b-3b1625fca96a",
+    "title": "星間旅行",
+    "originalArtist": "茶理理",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-c8e96fb5",
+        "streamId": "stream-bbce9199",
+        "videoId": "QEUFU9f3Opg",
+        "timestamp": 5661,
+        "endTimestamp": 5751
       }
     ]
   },
@@ -2267,6 +2366,22 @@
     ]
   },
   {
+    "id": "song-bfe5bf01",
+    "workId": "work-song-30",
+    "title": "給我一個理由忘記",
+    "originalArtist": "A-Lin",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-5cd9cea7",
+        "streamId": "stream-2026-08-03",
+        "videoId": "wep9ztMuicY",
+        "timestamp": 7672,
+        "endTimestamp": 7952
+      }
+    ]
+  },
+  {
     "id": "song-7264aee3",
     "workId": "work-song-077e91b8",
     "title": "買你",
@@ -2306,6 +2421,22 @@
     ]
   },
   {
+    "id": "song-f4e077bd",
+    "workId": "work-87437de9-1f02-419c-a439-881f778a729f",
+    "title": "黑暗的盡頭",
+    "originalArtist": "Crispy 脆樂團",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-22931263",
+        "streamId": "stream-2026-08-03",
+        "videoId": "wep9ztMuicY",
+        "timestamp": 5475,
+        "endTimestamp": 5748
+      }
+    ]
+  },
+  {
     "id": "song-90c2179b",
     "workId": "work-song-90c2179b",
     "title": "想自由",
@@ -2313,11 +2444,34 @@
     "tags": [],
     "performances": [
       {
+        "id": "p-1f67c79f",
+        "streamId": "stream-2026-08-03",
+        "videoId": "wep9ztMuicY",
+        "timestamp": 3463,
+        "endTimestamp": 3733
+      },
+      {
         "id": "p-566a9b61",
         "streamId": "stream-bc303791",
         "videoId": "KB2cNRbeaKc",
         "timestamp": 4234,
         "endTimestamp": 4537
+      }
+    ]
+  },
+  {
+    "id": "song-ecb1f1bd",
+    "workId": "work-song-01dd78b5",
+    "title": "愛♡スクリ～ム！",
+    "originalArtist": "AiScReam",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-0aae1ef3",
+        "streamId": "stream-bbce9199",
+        "videoId": "QEUFU9f3Opg",
+        "timestamp": 4209,
+        "endTimestamp": 4465
       }
     ]
   },
@@ -2348,6 +2502,22 @@
         "videoId": "GsG6hS5bOsA",
         "timestamp": 1984,
         "endTimestamp": 2142
+      }
+    ]
+  },
+  {
+    "id": "song-a28f07c7",
+    "workId": "work-song-107365c4",
+    "title": "新時代",
+    "originalArtist": "Ado",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-bbedb7b9",
+        "streamId": "stream-bbce9199",
+        "videoId": "QEUFU9f3Opg",
+        "timestamp": 3745,
+        "endTimestamp": 3969
       }
     ]
   },
@@ -2468,6 +2638,13 @@
     "originalArtist": "中島美嘉",
     "tags": [],
     "performances": [
+      {
+        "id": "p-bca91cd2",
+        "streamId": "stream-2026-08-03",
+        "videoId": "wep9ztMuicY",
+        "timestamp": 6063,
+        "endTimestamp": 6446
+      },
       {
         "id": "p-55bcbf4d",
         "streamId": "stream-2026-06-12",
@@ -2694,6 +2871,22 @@
     ]
   },
   {
+    "id": "song-712e297b",
+    "workId": "work-song-712e297b",
+    "title": "總會有人",
+    "originalArtist": "向思思",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-3959135d",
+        "streamId": "stream-2026-08-03",
+        "videoId": "wep9ztMuicY",
+        "timestamp": 2331,
+        "endTimestamp": 2541
+      }
+    ]
+  },
+  {
     "id": "song-b7f695f0",
     "workId": "work-song-b7f695f0",
     "title": "雙棲動物",
@@ -2716,6 +2909,13 @@
     "originalArtist": "王艷薇",
     "tags": [],
     "performances": [
+      {
+        "id": "p-a9aef2f7",
+        "streamId": "stream-2026-08-03",
+        "videoId": "wep9ztMuicY",
+        "timestamp": 9826,
+        "endTimestamp": 10057
+      },
       {
         "id": "p-9dc77db7",
         "streamId": "stream-2026-06-15",
@@ -2884,12 +3084,35 @@
     ]
   },
   {
+    "id": "song-56653516",
+    "workId": "work-aa9fbbc0-9208-4f73-8caf-93fab25984af",
+    "title": "Believe",
+    "originalArtist": "Folder5",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-fb1e57ba",
+        "streamId": "stream-bbce9199",
+        "videoId": "QEUFU9f3Opg",
+        "timestamp": 2802,
+        "endTimestamp": 3027
+      }
+    ]
+  },
+  {
     "id": "song-fd117e78",
     "workId": "work-song-fd117e78",
     "title": "BON VOYAGE!",
     "originalArtist": "Bon-Bon Blanco",
     "tags": [],
     "performances": [
+      {
+        "id": "p-a125241a",
+        "streamId": "stream-bbce9199",
+        "videoId": "QEUFU9f3Opg",
+        "timestamp": 5359,
+        "endTimestamp": 5626
+      },
       {
         "id": "p-5f0026ee",
         "streamId": "stream-2026-05-29",
@@ -3397,6 +3620,22 @@
     ]
   },
   {
+    "id": "song-3a1770fe",
+    "workId": "work-35165be6-1d7c-4d54-95cd-4ffc0a356bd3",
+    "title": "Mela!",
+    "originalArtist": "緑黄色社会",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-b75d67f9",
+        "streamId": "stream-bbce9199",
+        "videoId": "QEUFU9f3Opg",
+        "timestamp": 846,
+        "endTimestamp": 1088
+      }
+    ]
+  },
+  {
     "id": "song-f3b57906",
     "workId": "work-song-f3b57906",
     "title": "NO, Thank You!",
@@ -3489,6 +3728,22 @@
         "videoId": "GsG6hS5bOsA",
         "timestamp": 2342,
         "endTimestamp": 2701
+      }
+    ]
+  },
+  {
+    "id": "song-1966aff6",
+    "workId": "work-song-d222e5cf",
+    "title": "ray",
+    "originalArtist": "かぐや（CV：夏吉ゆうこ）& 月見ヤチヨ（CV：早見沙織）",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-2d0d4df3",
+        "streamId": "stream-bbce9199",
+        "videoId": "QEUFU9f3Opg",
+        "timestamp": 2305,
+        "endTimestamp": 2607
       }
     ]
   },
@@ -3667,6 +3922,22 @@
     ]
   },
   {
+    "id": "song-083b65bf",
+    "workId": "work-song-209",
+    "title": "SUN",
+    "originalArtist": "星野源",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-a3fdd0e6",
+        "streamId": "stream-bbce9199",
+        "videoId": "QEUFU9f3Opg",
+        "timestamp": 4625,
+        "endTimestamp": 4868
+      }
+    ]
+  },
+  {
     "id": "song-69bff3ac",
     "workId": "work-song-69bff3ac",
     "title": "The Fox",
@@ -3834,12 +4105,51 @@
     ]
   },
   {
+    "id": "song-d0b28278",
+    "workId": "work-bbfa276a-01d7-4b64-b313-727d41d5c88d",
+    "title": "ウィーアー！",
+    "originalArtist": "きただにひろし",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-c560edad",
+        "streamId": "stream-bbce9199",
+        "videoId": "QEUFU9f3Opg",
+        "timestamp": 3299,
+        "endTimestamp": 3541
+      }
+    ]
+  },
+  {
+    "id": "song-09997bf3",
+    "workId": "work-5f959a9b-6b01-402c-98a9-e55e6d3249ce",
+    "title": "エウテルペ",
+    "originalArtist": "EGOIST",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-0b9501ec",
+        "streamId": "stream-2026-08-03",
+        "videoId": "wep9ztMuicY",
+        "timestamp": 3041,
+        "endTimestamp": 3264
+      }
+    ]
+  },
+  {
     "id": "song-55a6c690",
     "workId": "work-song-55a6c690",
     "title": "オレンジ",
     "originalArtist": "7!!",
     "tags": [],
     "performances": [
+      {
+        "id": "p-e4173296",
+        "streamId": "stream-2026-08-03",
+        "videoId": "wep9ztMuicY",
+        "timestamp": 4788,
+        "endTimestamp": 5134
+      },
       {
         "id": "p-1f85b8da",
         "streamId": "stream-2026-04-06",
@@ -4246,6 +4556,13 @@
     "originalArtist": "ASA",
     "tags": [],
     "performances": [
+      {
+        "id": "p-9b705169",
+        "streamId": "stream-2026-08-03",
+        "videoId": "wep9ztMuicY",
+        "timestamp": 7184,
+        "endTimestamp": 7495
+      },
       {
         "id": "p-74720ca9",
         "streamId": "stream-2026-03-09",
