@@ -13,7 +13,10 @@
     "test:work-review": "npx tsx tests/work-review-ui.test.tsx",
     "test:harmonizer-work-id": "npx tsx tests/harmonizer-work-id.test.tsx",
     "test:vod-export": "npx tsx tests/vod-export-ui.test.tsx",
-    "preview": "vite preview"
+    "preview": "vite preview",
+    "test:tag-picker": "npx tsx tests/tag-picker.test.tsx",
+    "test:song-tags": "npx tsx tests/song-tags.test.ts",
+    "check": "npm run build && npm run test:nova-links && npm run test:streams-filter && npm run test:streams-render && npm run test:global-works && npm run test:work-review && npm run test:harmonizer-work-id && npm run test:vod-export && npm run test:tag-picker && npm run test:song-tags"
   },
   "dependencies": {
     "react": "^19.2.6",

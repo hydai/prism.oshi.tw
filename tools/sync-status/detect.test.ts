@@ -33,9 +33,11 @@ test('readRegistry returns the enabled streamers for a valid registry', () => {
   assert.deepEqual(result.map((s) => s.slug), ['mizuki', 'aurora-2']);
 });
 
-test('song freshness includes global work-link updates', () => {
+test('song freshness includes global work-link and work metadata updates', () => {
   assert.match(AGG_SQL, /LEFT JOIN song_work_links AS link ON link\.song_id = song\.id/);
-  assert.match(AGG_SQL, /link\.updated_at > song\.updated_at/);
+  assert.match(AGG_SQL, /LEFT JOIN works AS work ON work\.id = link\.work_id/);
+  assert.match(AGG_SQL, /COALESCE\(link\.updated_at, ''\)/);
+  assert.match(AGG_SQL, /COALESCE\(work\.updated_at, ''\)/);
 });
 
 test('readRegistry throws (fail-closed) on an enabled malicious slug, naming it and the source', () => {

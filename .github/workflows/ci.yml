@@ -33,6 +33,10 @@ jobs:
       - run: npm run test:parse
       - run: npm run test:archive
       - run: npm run test:archive-loader
+      - run: npm run test:tags
+      - run: npm run test:tag-filter
+      - run: npm run test:song-card
+      - run: npm run test:tag-catalog
       - run: npm run test:playback-time-store
       - run: npm run test:format
       - run: npm run test:playlist-storage
@@ -53,9 +57,9 @@ jobs:
           - name: Admin worker check
             path: admin
             command: npm run check
-          - name: Admin UI build
+          - name: Admin UI build and tests
             path: admin/ui
-            command: npm run build
+            command: npm run check
           - name: Aurora build
             path: tools/aurora
             command: npm run build

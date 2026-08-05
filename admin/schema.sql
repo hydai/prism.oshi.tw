@@ -151,6 +151,7 @@ CREATE TABLE IF NOT EXISTS performances (
   timestamp INTEGER NOT NULL,
   end_timestamp INTEGER,
   note TEXT DEFAULT '',
+  tags TEXT NOT NULL DEFAULT '[]' CHECK(json_valid(tags)),
   status TEXT DEFAULT 'pending' CHECK(status IN ('pending', 'approved', 'rejected', 'excluded', 'extracted')),
   submitted_by TEXT,
   created_at TEXT DEFAULT (datetime('now')),

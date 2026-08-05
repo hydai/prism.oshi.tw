@@ -5,6 +5,9 @@ import { canHardDeleteStream, isValidTransition, shouldImportVod, VALID_STATUSES
 import {
   listSongsPaginated,
   listGlobalWorksPaginated,
+  updateGlobalWorkTags,
+  bulkUpdateGlobalWorkTags,
+  WorkTagLimitError,
   getSongById,
   insertSong,
   updateSong,
@@ -12,6 +15,7 @@ import {
   generateSongId,
   listPerformances,
   insertPerformance,
+  updatePerformanceTags,
   getPerformanceStatus as db_getPerformanceStatus,
   updatePerformanceStatus,
   generatePerformanceId,
@@ -49,6 +53,13 @@ import {
   mergeSongs,
   SongMergeError,
 } from './db';
+import {
+  filterTagIdsByScope,
+  getTagDefinition,
+  mergeTagIds,
+  validateTagSelection,
+  validateTagSelectionForScope,
+} from '../../lib/tags';
 import { fetchItunesDuration } from './itunes';
 import { parseTextToSongs } from '../shared/parse';
 import { formatSubscriberCount } from '../shared/format';
@@ -83,6 +94,7 @@ import type {
   CreateSongBody,
   UpdateSongBody,
   CreatePerformanceBody,
+  UpdatePerformanceTagsBody,
   CreateStreamBody,
   StatusUpdateBody,
   CreateStampPerformanceBody,
@@ -117,6 +129,9 @@ import type {
   BulkFetchSubscribersResult,
   BulkFetchSubscribersResponse,
   GlobalWorksResponse,
+  UpdateWorkTagsBody,
+  BulkUpdateWorkTagsBody,
+  BulkUpdateWorkTagsResponse,
   WorkMatchCandidatesResponse,
   WorkMatchFilter,
   WorkMatchMergeBody,
@@ -372,10 +387,19 @@ app.get('/api/works', requireCurator, async (c) => {
   const sortDir = c.req.query('sortDir') as 'asc' | 'desc' | undefined;
   const sharedOnlyValue = c.req.query('sharedOnly');
   const sharedOnly = sharedOnlyValue === 'true' || sharedOnlyValue === '1';
+  const tag = c.req.query('tag')?.trim() || undefined;
+  if (tag && (!getTagDefinition(tag)?.active || getTagDefinition(tag)?.scope !== 'work')) {
+    return c.json({ error: 'Invalid work tag filter' }, 400);
+  }
+  const untaggedValue = c.req.query('untaggedOnly');
+  const untaggedOnly = untaggedValue === 'true' || untaggedValue === '1';
+  if (tag && untaggedOnly) return c.json({ error: 'tag and untaggedOnly cannot be combined' }, 400);
 
   const result = await listGlobalWorksPaginated(c.env.DB, {
     search,
     sharedOnly,
+    tag,
+    untaggedOnly,
     page,
     pageSize,
     sortBy,
@@ -389,6 +413,55 @@ app.get('/api/works', requireCurator, async (c) => {
     totalPages: Math.ceil(result.total / result.pageSize),
     stats: result.stats,
   };
+  return c.json(response);
+});
+
+app.put('/api/works/:id/tags', requireCurator, async (c) => {
+  const body = await c.req.json<UpdateWorkTagsBody>();
+  const selection = validateTagSelectionForScope(body.tags, 'work');
+  if (!selection.ok) return c.json({ error: selection.error }, 400);
+
+  const id = getRouteParam(c, 'id');
+  const updated = await updateGlobalWorkTags(c.env.DB, id, selection.tags);
+  if (!updated) return c.json({ error: 'Work not found' }, 404);
+  return c.json({ id, tags: selection.tags });
+});
+
+app.post('/api/works/tags/bulk', requireCurator, async (c) => {
+  const body = await c.req.json<BulkUpdateWorkTagsBody>();
+  if (!Array.isArray(body.workIds) || body.workIds.length === 0 || body.workIds.length > 100) {
+    return c.json({ error: 'workIds must contain between 1 and 100 IDs' }, 400);
+  }
+  if (body.workIds.some((id) => typeof id !== 'string' || id.trim() === '')) {
+    return c.json({ error: 'every work ID must be a non-empty string' }, 400);
+  }
+  const workIds = [...new Set(body.workIds)];
+  if (workIds.length !== body.workIds.length) {
+    return c.json({ error: 'workIds must not contain duplicates' }, 400);
+  }
+
+  const add = validateTagSelectionForScope(body.addTags, 'work');
+  if (!add.ok) return c.json({ error: add.error }, 400);
+  const remove = validateTagSelectionForScope(body.removeTags, 'work');
+  if (!remove.ok) return c.json({ error: remove.error }, 400);
+  if (add.tags.length === 0 && remove.tags.length === 0) {
+    return c.json({ error: 'at least one tag must be added or removed' }, 400);
+  }
+  if (add.tags.some((tag) => remove.tags.includes(tag))) {
+    return c.json({ error: 'the same tag cannot be added and removed' }, 400);
+  }
+
+  let updated: Awaited<ReturnType<typeof bulkUpdateGlobalWorkTags>>;
+  try {
+    updated = await bulkUpdateGlobalWorkTags(c.env.DB, workIds, add.tags, remove.tags);
+  } catch (error) {
+    if (error instanceof WorkTagLimitError) return c.json({ error: error.message }, 400);
+    throw error;
+  }
+  if (updated.length !== workIds.length) {
+    return c.json({ error: 'One or more works were not found' }, 404);
+  }
+  const response: BulkUpdateWorkTagsResponse = { updated };
   return c.json(response);
 });
 
@@ -488,13 +561,38 @@ app.post('/api/songs', async (c) => {
     return c.json({ error: 'title and originalArtist are required' }, 400);
   }
 
+  const tagSelection = validateTagSelection(body.tags ?? []);
+  if (!tagSelection.ok) return c.json({ error: tagSelection.error }, 400);
+  const workTags = filterTagIdsByScope(tagSelection.tags, 'work');
+  if (workTags.length > 0) {
+    if (c.get('user').role !== 'curator') {
+      return c.json({
+        error: 'Forbidden: work-scoped tags can only be edited by a curator in Global Song Library',
+      }, 403);
+    }
+    return c.json({
+      error: 'Work-scoped tags must be edited in Global Song Library',
+    }, 400);
+  }
+  const legacyPerformanceTags = filterTagIdsByScope(tagSelection.tags, 'performance');
+  if (legacyPerformanceTags.length > 0 && (!body.performances || body.performances.length === 0)) {
+    return c.json({ error: 'performance-scoped tags require at least one performance' }, 400);
+  }
+
+  const performanceTags: string[][] = [];
+  for (const performance of body.performances ?? []) {
+    const selection = validateTagSelectionForScope(performance.tags ?? [], 'performance');
+    if (!selection.ok) return c.json({ error: selection.error }, 400);
+    performanceTags.push(mergeTagIds(legacyPerformanceTags, selection.tags));
+  }
+
   const user = c.get('user');
   const id = generateSongId();
-  await insertSong(c.env.DB, streamerId, id, body.title, body.originalArtist, body.tags || [], user.email);
+  await insertSong(c.env.DB, streamerId, id, body.title, body.originalArtist, [], user.email);
 
   // If inline performances are provided, insert them too
   if (body.performances && body.performances.length > 0) {
-    for (const perf of body.performances) {
+    for (const [index, perf] of body.performances.entries()) {
       const perfId = generatePerformanceId();
       await insertPerformance(
         c.env.DB,
@@ -509,6 +607,7 @@ app.post('/api/songs', async (c) => {
         perf.endTimestamp ?? null,
         perf.note ?? '',
         user.email,
+        performanceTags[index],
       );
     }
   }
@@ -534,11 +633,17 @@ app.put('/api/songs/:id', async (c) => {
     }
   }
 
-  const body = await c.req.json<UpdateSongBody>();
+  const body = await c.req.json<UpdateSongBody & { tags?: unknown }>();
+  // Tags now live on the work and performance scopes. Accepting the retired field
+  // would return 200 for an edit this route silently discards.
+  if (body.tags !== undefined) {
+    return c.json({
+      error: 'Song tags are no longer set here. Use PUT /api/works/:id/tags for work tags or PATCH /api/performances/:id/tags for rendition tags.',
+    }, 400);
+  }
   await updateSong(c.env.DB, id, {
     title: body.title,
     originalArtist: body.originalArtist,
-    tags: body.tags,
   }, user.email);
 
   const updated = await getSongById(c.env.DB, id);
@@ -584,6 +689,8 @@ app.post('/api/performances', async (c) => {
   }
 
   const user = c.get('user');
+  const tagSelection = validateTagSelectionForScope(body.tags ?? [], 'performance');
+  if (!tagSelection.ok) return c.json({ error: tagSelection.error }, 400);
   const id = generatePerformanceId();
   await insertPerformance(
     c.env.DB,
@@ -598,9 +705,21 @@ app.post('/api/performances', async (c) => {
     body.endTimestamp ?? null,
     body.note ?? '',
     user.email,
+    tagSelection.tags,
   );
 
   return c.json({ id, status: 'pending' }, 201);
+});
+
+app.patch('/api/performances/:id/tags', requireCurator, async (c) => {
+  const id = getRouteParam(c, 'id');
+  const body = await c.req.json<UpdatePerformanceTagsBody>();
+  const selection = validateTagSelectionForScope(body.tags, 'performance');
+  if (!selection.ok) return c.json({ error: selection.error }, 400);
+
+  const updated = await updatePerformanceTags(c.env.DB, id, selection.tags);
+  if (!updated) return c.json({ error: 'Performance not found' }, 404);
+  return c.json({ id, tags: selection.tags });
 });
 
 app.patch('/api/performances/:id/status', requireCurator, async (c) => {
@@ -727,6 +846,9 @@ app.post('/api/streams/:streamId/performances', async (c) => {
   const stream = await getStreamById(c.env.DB, streamId);
   if (!stream) return c.json({ error: 'Stream not found' }, 404);
 
+  const tagSelection = validateTagSelectionForScope(body.tags ?? [], 'performance');
+  if (!tagSelection.ok) return c.json({ error: tagSelection.error }, 400);
+
   const user = c.get('user');
   const result = await createSongAndPerformance(
     c.env.DB,
@@ -741,6 +863,7 @@ app.post('/api/streams/:streamId/performances', async (c) => {
     body.endTimestamp ?? null,
     body.note ?? '',
     user.email,
+    tagSelection.tags,
   );
 
   return c.json(result, 201);

@@ -5,8 +5,9 @@ import { Disc3, ChevronDown, ChevronRight, Play, Plus, ExternalLink, Heart } fro
 import AddToPlaylistDropdown from './AddToPlaylistDropdown';
 import type { ArchivePerformance, ArchiveSong, ArchiveTrack } from '../types/archive';
 import { formatTime } from '../lib/format';
+import { getTagLabel } from '../../lib/tags';
 
-interface SongCardProps {
+export interface SongCardProps {
   song: ArchiveSong;
   isExpanded: boolean;
   onToggleExpand: (songId: string) => void;
@@ -17,14 +18,20 @@ interface SongCardProps {
   onToggleLike: (perf: ArchivePerformance, song: ArchiveSong) => void;
   unavailableVideoIds: Set<string>;
   streamerSlug: string;
+  /** Currently active tag filter, so the matched chips are shown first. */
+  selectedTags?: ReadonlySet<string>;
 }
 
-function SongCardInner({ song, isExpanded, onToggleExpand, onPlay, onAddToQueue, onAddToPlaylistSuccess, isLiked, onToggleLike, unavailableVideoIds, streamerSlug }: SongCardProps) {
+function SongCardInner({ song, isExpanded, onToggleExpand, onPlay, onAddToQueue, onAddToPlaylistSuccess, isLiked, onToggleLike, unavailableVideoIds, streamerSlug, selectedTags }: SongCardProps) {
   const sortedPerformances = useMemo(
     () => isExpanded
       ? [...song.performances].sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime())
       : [],
     [isExpanded, song.performances]
+  );
+  const visibleTags = useMemo(
+    () => visibleSongCardTags(song.tags, selectedTags),
+    [song.tags, selectedTags],
   );
 
   return (
@@ -87,6 +94,34 @@ function SongCardInner({ song, isExpanded, onToggleExpand, onPlay, onAddToQueue,
               >
                 {song.performances.length} 個版本
               </span>
+              {visibleTags.shown.map((tag) => (
+                <span
+                  key={tag}
+                  className="font-medium"
+                  style={{
+                    fontSize: 'var(--font-size-xs)',
+                    color: 'var(--text-secondary)',
+                    background: 'var(--bg-surface-muted)',
+                    padding: 'var(--space-1) var(--space-2)',
+                    borderRadius: 'var(--radius-pill)',
+                  }}
+                >
+                  {getTagLabel(tag)}
+                </span>
+              ))}
+              {visibleTags.hidden > 0 && (
+                <span
+                  className="font-medium"
+                  title={song.tags.map(getTagLabel).join('、')}
+                  style={{
+                    fontSize: 'var(--font-size-xs)',
+                    color: 'var(--text-tertiary)',
+                    padding: 'var(--space-1) var(--space-2)',
+                  }}
+                >
+                  +{visibleTags.hidden}
+                </span>
+              )}
             </div>
           </div>
         </div>
@@ -200,6 +235,19 @@ function SongCardInner({ song, isExpanded, onToggleExpand, onPlay, onAddToQueue,
                   >
                     {perf.date}
                   </span>
+                  {perf.tags.map((tag) => (
+                    <span
+                      key={tag}
+                      className="rounded-full px-2 py-0.5"
+                      style={{
+                        background: 'var(--bg-accent-pink)',
+                        color: 'var(--accent-pink)',
+                        fontSize: 'var(--font-size-xs)',
+                      }}
+                    >
+                      {getTagLabel(tag)}
+                    </span>
+                  ))}
                   {perf.note && (
                     <span
                       className="inline-flex items-center border border-blue-200 text-blue-500 bg-blue-50 font-medium"
@@ -339,18 +387,42 @@ function SongCardInner({ song, isExpanded, onToggleExpand, onPlay, onAddToQueue,
   );
 }
 
-const SongCard = memo(SongCardInner, (prev, next) => {
+export const SONG_CARD_TAG_LIMIT = 3;
+
+// Chips the collapsed card shows. Tags the user is currently filtering by come first, so a
+// card in a filtered list always displays the evidence of why it matched; the rest keep
+// their catalog ordering. `hidden` is returned so truncation is never silent.
+export function visibleSongCardTags(
+  tags: readonly string[],
+  selectedTags: ReadonlySet<string> | undefined,
+  limit: number = SONG_CARD_TAG_LIMIT,
+): { shown: string[]; hidden: number } {
+  const ordered = selectedTags && selectedTags.size > 0
+    ? [
+        ...tags.filter((tag) => selectedTags.has(tag)),
+        ...tags.filter((tag) => !selectedTags.has(tag)),
+      ]
+    : [...tags];
+  return { shown: ordered.slice(0, limit), hidden: Math.max(0, ordered.length - limit) };
+}
+
+export function areSongCardPropsEqual(prev: SongCardProps, next: SongCardProps): boolean {
   return (
     prev.song.id === next.song.id &&
+    // Selected tags reorder the visible chips, so the card must re-render when they change.
+    prev.selectedTags === next.selectedTags &&
     prev.isExpanded === next.isExpanded &&
-    prev.song.performances.length === next.song.performances.length &&
+    prev.song.performances === next.song.performances &&
+    prev.song.tags.join('\u0000') === next.song.tags.join('\u0000') &&
     // Both have change-only identities: isLiked is useCallback'd on the liked
     // set, unavailableVideoIds is replaced only when a video errors. Without
     // these an already-rendered card kept stale hearts/disabled states.
     prev.isLiked === next.isLiked &&
     prev.unavailableVideoIds === next.unavailableVideoIds
   );
-});
+}
+
+const SongCard = memo(SongCardInner, areSongCardPropsEqual);
 
 SongCard.displayName = 'SongCard';
 

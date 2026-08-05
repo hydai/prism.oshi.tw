@@ -33,11 +33,13 @@ const perf = (id: string, streamId: string) => ({
   timestamp: 0,
   endTimestamp: null,
   note: '',
+  tags: [] as string[],
 });
 const song = (id: string, performances: ReturnType<typeof perf>[]) => ({
   id,
   title: id,
   originalArtist: '',
+  inheritedTags: [] as string[],
   tags: [] as string[],
   performances,
 });
@@ -52,8 +54,8 @@ test('songCountsByStream counts distinct songs per stream (two performances of o
 test('assembleFanSiteSongs exports the shared work ID without replacing local song IDs', () => {
   const songs = assembleFanSiteSongs(
     [
-      { id: 'alice-local', work_id: 'work-shared', title: 'Song', original_artist: 'Artist', tags: '[]' },
-      { id: 'legacy-local', work_id: null, title: 'Legacy', original_artist: 'Artist', tags: '["tag"]' },
+      { id: 'alice-local', work_id: 'work-shared', title: 'Song', original_artist: 'Artist', song_tags: '[]', work_tags: '["genre:rock"]' },
+      { id: 'legacy-local', work_id: null, title: 'Legacy', original_artist: 'Artist', song_tags: '["legacy-tag"]', work_tags: null },
     ],
     [],
   );
@@ -61,25 +63,48 @@ test('assembleFanSiteSongs exports the shared work ID without replacing local so
   const linked = songs.find((s) => s.id === 'alice-local')!;
   const legacy = songs.find((s) => s.id === 'legacy-local')!;
   assert.equal(linked.workId, 'work-shared');
+  assert.deepEqual(linked.inheritedTags, ['genre:rock']);
   assert.equal('workId' in legacy, false, 'unlinked legacy rows stay backward compatible');
+  assert.deepEqual(legacy.inheritedTags, ['legacy-tag']);
+});
+
+test('assembleFanSiteSongs keeps inherited tags separate and aggregates performance tags', () => {
+  const songs = assembleFanSiteSongs(
+    [{
+      id: 'song1',
+      work_id: 'work1',
+      title: 'Song',
+      original_artist: 'Artist',
+      song_tags: '["style:parody","genre:rock"]',
+      work_tags: '["genre:rock"]',
+    }],
+    [{
+      id: 'p1', song_id: 'song1', stream_id: 's1', date: '2024-01-01',
+      stream_title: '', video_id: 'v1', timestamp: 0, end_timestamp: null,
+      note: '', tags: '["language:zh","style:parody"]',
+    }],
+  );
+  assert.deepEqual(songs[0].inheritedTags, ['genre:rock', 'style:parody']);
+  assert.deepEqual(songs[0].performances[0].tags, ['language:zh', 'style:parody']);
 });
 
 test('assembleFanSiteSongs emits slim performances without stream-derived fields', () => {
   const songs = assembleFanSiteSongs(
-    [{ id: 'song1', work_id: null, title: 'Song', original_artist: 'Artist', tags: '[]' }],
-    [{ id: 'p1', song_id: 'song1', stream_id: 's1', date: '2024-01-01', stream_title: 'Stream night', video_id: 'v1', timestamp: 10, end_timestamp: 99, note: '' }],
+    [{ id: 'song1', work_id: null, title: 'Song', original_artist: 'Artist', song_tags: '[]', work_tags: null }],
+    [{ id: 'p1', song_id: 'song1', stream_id: 's1', date: '2024-01-01', stream_title: 'Stream night', video_id: 'v1', timestamp: 10, end_timestamp: 99, note: '', tags: '[]' }],
   );
   const p = songs[0].performances[0];
   assert.equal('streamTitle' in p, false, 'streamTitle is derivable from streams.json by streamId');
   assert.equal('date' in p, false, 'date is derivable from streams.json by streamId');
   assert.equal('note' in p, false, 'empty notes are omitted');
+  assert.equal('tags' in p, false, 'empty rendition tags are omitted');
   assert.deepEqual(p, { id: 'p1', streamId: 's1', videoId: 'v1', timestamp: 10, endTimestamp: 99 });
 });
 
 test('assembleFanSiteSongs keeps non-empty notes', () => {
   const songs = assembleFanSiteSongs(
-    [{ id: 'song1', work_id: null, title: 'Song', original_artist: 'Artist', tags: '[]' }],
-    [{ id: 'p1', song_id: 'song1', stream_id: 's1', date: '2024-01-01', stream_title: '', video_id: 'v1', timestamp: 0, end_timestamp: null, note: 'encore' }],
+    [{ id: 'song1', work_id: null, title: 'Song', original_artist: 'Artist', song_tags: '[]', work_tags: null }],
+    [{ id: 'p1', song_id: 'song1', stream_id: 's1', date: '2024-01-01', stream_title: '', video_id: 'v1', timestamp: 0, end_timestamp: null, note: 'encore', tags: '[]' }],
   );
   assert.equal(songs[0].performances[0].note, 'encore');
 });
@@ -87,12 +112,12 @@ test('assembleFanSiteSongs keeps non-empty notes', () => {
 test('assembleFanSiteSongs sorts songs by zh-TW title and performances newest-first', () => {
   const songs = assembleFanSiteSongs(
     [
-      { id: 'turtle', work_id: null, title: '龜', original_artist: '', tags: '[]' },
-      { id: 'one', work_id: null, title: '一', original_artist: '', tags: '[]' },
+      { id: 'turtle', work_id: null, title: '龜', original_artist: '', song_tags: '[]', work_tags: null },
+      { id: 'one', work_id: null, title: '一', original_artist: '', song_tags: '[]', work_tags: null },
     ],
     [
-      { id: 'p-old', song_id: 'one', stream_id: 's1', date: '2023-05-01', stream_title: '', video_id: 'v1', timestamp: 0, end_timestamp: null, note: '' },
-      { id: 'p-new', song_id: 'one', stream_id: 's2', date: '2025-05-01', stream_title: '', video_id: 'v2', timestamp: 0, end_timestamp: null, note: '' },
+      { id: 'p-old', song_id: 'one', stream_id: 's1', date: '2023-05-01', stream_title: '', video_id: 'v1', timestamp: 0, end_timestamp: null, note: '', tags: '[]' },
+      { id: 'p-new', song_id: 'one', stream_id: 's2', date: '2025-05-01', stream_title: '', video_id: 'v2', timestamp: 0, end_timestamp: null, note: '', tags: '[]' },
     ],
   );
   assert.deepEqual(songs.map((s) => s.id), ['one', 'turtle'], 'songs sorted by zh-TW collation');
@@ -172,7 +197,7 @@ test('sync-data CLI rejects a SQL-injection slug with a clear error (before any 
   const script = path.join(__dirname, 'sync.ts');
   let threw = false;
   try {
-    execFileSync('npx', ['tsx', script, "inject'--"], {
+    execFileSync(process.execPath, ['--import', 'tsx', script, "inject'--"], {
       encoding: 'utf-8',
       stdio: ['ignore', 'pipe', 'pipe'],
     });
@@ -186,3 +211,29 @@ test('sync-data CLI rejects a SQL-injection slug with a clear error (before any 
 });
 
 console.log('sync-data.test: all passed');
+
+// song.tags is fully derivable from inheritedTags ∪ performances[].tags, and empty tag
+// arrays are the common case, so neither belongs on the wire — hydrateSongs recomputes
+// the union and already defaults the absent fields.
+{
+  const songs = assembleFanSiteSongs(
+    [
+      { id: 'tagged', work_id: 'work-1', title: 'Tagged', original_artist: 'A', song_tags: '[]', work_tags: '["genre:rock"]' },
+      { id: 'bare', work_id: null, title: 'Bare', original_artist: 'A', song_tags: '[]', work_tags: null },
+    ],
+    [
+      { id: 'p-tagged', song_id: 'tagged', stream_id: 's1', date: '2024-01-01', stream_title: '', video_id: 'v1', timestamp: 0, end_timestamp: null, note: '', tags: '["language:zh"]' },
+      { id: 'p-bare', song_id: 'bare', stream_id: 's1', date: '2024-01-01', stream_title: '', video_id: 'v2', timestamp: 0, end_timestamp: null, note: '', tags: '[]' },
+    ],
+  );
+
+  const tagged = songs.find((s) => s.id === 'tagged')!;
+  const bare = songs.find((s) => s.id === 'bare')!;
+
+  assert.equal('tags' in tagged, false, 'the derivable song.tags union is not serialized');
+  assert.deepEqual(tagged.inheritedTags, ['genre:rock'], 'non-empty inherited tags are kept');
+  assert.deepEqual(tagged.performances[0].tags, ['language:zh'], 'non-empty rendition tags are kept');
+
+  assert.equal('inheritedTags' in bare, false, 'an empty inheritedTags array is omitted');
+  assert.equal('tags' in bare.performances[0], false, 'an empty performance tags array is omitted');
+}
