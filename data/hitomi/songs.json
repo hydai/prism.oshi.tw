@@ -1,5 +1,37 @@
 [
   {
+    "id": "song-132b3953",
+    "workId": "work-d41e94fd-ff20-4e86-ac64-79a9c2b5aca2",
+    "title": "九彎十八拐",
+    "originalArtist": "芒果醬",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-8e3c8ac2",
+        "streamId": "stream-2026-04-22",
+        "videoId": "s3niM7j56Xs",
+        "timestamp": 6378,
+        "endTimestamp": 6604
+      }
+    ]
+  },
+  {
+    "id": "song-975aef5b",
+    "workId": "work-song-0583f252",
+    "title": "下一個天亮",
+    "originalArtist": "郭靜",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-f6beb08c",
+        "streamId": "stream-2026-04-22",
+        "videoId": "s3niM7j56Xs",
+        "timestamp": 4859,
+        "endTimestamp": 5126
+      }
+    ]
+  },
+  {
     "id": "song-92a8829d",
     "workId": "work-song-4ce2c5e1",
     "title": "女孩",
@@ -48,6 +80,22 @@
     ]
   },
   {
+    "id": "song-a2d821cc",
+    "workId": "work-1d0d218d-6bde-4fdc-949a-1013fe3379e5",
+    "title": "不該",
+    "originalArtist": "周杰倫 & 張惠妹",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-03f1c4b4",
+        "streamId": "stream-2026-04-22",
+        "videoId": "s3niM7j56Xs",
+        "timestamp": 5267,
+        "endTimestamp": 5558
+      }
+    ]
+  },
+  {
     "id": "song-da0c0470",
     "workId": "work-song-6bae41e2",
     "title": "心訊 Heart Signal",
@@ -60,6 +108,54 @@
         "videoId": "eb22brGYmck",
         "timestamp": 1751,
         "endTimestamp": 1990
+      }
+    ]
+  },
+  {
+    "id": "song-53dfbf16",
+    "workId": "work-song-492038e0",
+    "title": "心牆",
+    "originalArtist": "郭靜",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-a6ad3597",
+        "streamId": "stream-2026-04-22",
+        "videoId": "s3niM7j56Xs",
+        "timestamp": 3926,
+        "endTimestamp": 4218
+      }
+    ]
+  },
+  {
+    "id": "song-64b4ff40",
+    "workId": "work-029f2009-fa1c-45af-a883-157acbba6ea2",
+    "title": "心願便利貼",
+    "originalArtist": "元若藍 & 吳忠明",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-5df93caa",
+        "streamId": "stream-2a8423f9",
+        "videoId": "LbE2R_4HADg",
+        "timestamp": 775,
+        "endTimestamp": 1030
+      }
+    ]
+  },
+  {
+    "id": "song-cd07ac97",
+    "workId": "work-9f34a354-2755-4564-8126-03464089d035",
+    "title": "可愛くてごめん",
+    "originalArtist": "HoneyWorks feat. かぴ",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-d1657dec",
+        "streamId": "stream-2a8423f9",
+        "videoId": "LbE2R_4HADg",
+        "timestamp": 1311,
+        "endTimestamp": 1531
       }
     ]
   },
@@ -80,6 +176,102 @@
     ]
   },
   {
+    "id": "song-395bf21b",
+    "workId": "work-song-957ec9af",
+    "title": "失戀無罪",
+    "originalArtist": "A-Lin",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-0a8e13f7",
+        "streamId": "stream-2026-07-24",
+        "videoId": "4YbARt682jA",
+        "timestamp": 4622,
+        "endTimestamp": 4869
+      }
+    ]
+  },
+  {
+    "id": "song-3cceadc9",
+    "workId": "work-song-64401784",
+    "title": "母系社會",
+    "originalArtist": "張惠妹",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-11e1bae6",
+        "streamId": "stream-2026-07-24",
+        "videoId": "4YbARt682jA",
+        "timestamp": 2910,
+        "endTimestamp": 3145
+      }
+    ]
+  },
+  {
+    "id": "song-6b91986c",
+    "workId": "work-song-14c9e056",
+    "title": "她說",
+    "originalArtist": "林俊傑",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-b8478ac8",
+        "streamId": "stream-2026-04-22",
+        "videoId": "s3niM7j56Xs",
+        "timestamp": 5753,
+        "endTimestamp": 6072
+      }
+    ]
+  },
+  {
+    "id": "song-3c17492a",
+    "workId": "work-song-778",
+    "title": "好きだから。",
+    "originalArtist": "ユイカ",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-ab8da46f",
+        "streamId": "stream-5a199959",
+        "videoId": "1kB5vpoxzWw",
+        "timestamp": 1016,
+        "endTimestamp": 1315
+      }
+    ]
+  },
+  {
+    "id": "song-e98176a7",
+    "workId": "work-song-1329",
+    "title": "如果可以",
+    "originalArtist": "韋禮安",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-82341581",
+        "streamId": "stream-2026-04-22",
+        "videoId": "s3niM7j56Xs",
+        "timestamp": 875,
+        "endTimestamp": 1149
+      }
+    ]
+  },
+  {
+    "id": "song-8941b13c",
+    "workId": "work-song-1330",
+    "title": "有一種悲傷",
+    "originalArtist": "A-Lin",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-58f42af1",
+        "streamId": "stream-2026-04-22",
+        "videoId": "s3niM7j56Xs",
+        "timestamp": 4317,
+        "endTimestamp": 4545
+      }
+    ]
+  },
+  {
     "id": "song-254f60c4",
     "workId": "work-song-254f60c4",
     "title": "老大",
@@ -92,6 +284,54 @@
         "videoId": "AnuYwZNXN0I",
         "timestamp": 5852,
         "endTimestamp": 6014
+      }
+    ]
+  },
+  {
+    "id": "song-930afccd",
+    "workId": "work-song-100",
+    "title": "血腥愛情故事",
+    "originalArtist": "張惠妹",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-96ab57e4",
+        "streamId": "stream-2026-07-24",
+        "videoId": "4YbARt682jA",
+        "timestamp": 1051,
+        "endTimestamp": 1313
+      }
+    ]
+  },
+  {
+    "id": "song-47e05ffb",
+    "workId": "work-song-f551ea18",
+    "title": "你是不是有點動心",
+    "originalArtist": "吳卓源",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-0c35eaf2",
+        "streamId": "stream-f6092600",
+        "videoId": "WCpaxuWiJ3E",
+        "timestamp": 1872,
+        "endTimestamp": 2155
+      }
+    ]
+  },
+  {
+    "id": "song-b994a747",
+    "workId": "work-song-51ba5087",
+    "title": "我多喜歡你，你會知道",
+    "originalArtist": "王俊琪",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-60c5a01d",
+        "streamId": "stream-2a8423f9",
+        "videoId": "LbE2R_4HADg",
+        "timestamp": 3508,
+        "endTimestamp": 3708
       }
     ]
   },
@@ -124,6 +364,22 @@
         "videoId": "FthND9ZSB2Y",
         "timestamp": 4152,
         "endTimestamp": 4504
+      }
+    ]
+  },
+  {
+    "id": "song-438a582c",
+    "workId": "work-song-2560",
+    "title": "那些年",
+    "originalArtist": "胡夏",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-06344dbc",
+        "streamId": "stream-2026-04-22",
+        "videoId": "s3niM7j56Xs",
+        "timestamp": 1482,
+        "endTimestamp": 1852
       }
     ]
   },
@@ -192,6 +448,22 @@
     ]
   },
   {
+    "id": "song-d2585c83",
+    "workId": "work-song-e3d53199",
+    "title": "勇氣",
+    "originalArtist": "梁靜茹",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-379ca81a",
+        "streamId": "stream-2026-04-22",
+        "videoId": "s3niM7j56Xs",
+        "timestamp": 3493,
+        "endTimestamp": 3732
+      }
+    ]
+  },
+  {
     "id": "song-956e0147",
     "workId": "work-song-956e0147",
     "title": "皇后區的皇后",
@@ -208,6 +480,70 @@
     ]
   },
   {
+    "id": "song-ceb1727b",
+    "workId": "work-song-06ff3ffd",
+    "title": "致姍姍來遲的你",
+    "originalArtist": "阿肆 & 林宥嘉",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-e30f05d7",
+        "streamId": "stream-f6092600",
+        "videoId": "WCpaxuWiJ3E",
+        "timestamp": 4822,
+        "endTimestamp": 5068
+      }
+    ]
+  },
+  {
+    "id": "song-a7445152",
+    "workId": "work-1862c072-743f-4b0a-921d-50d3b421fa60",
+    "title": "革命道中 - On The Way",
+    "originalArtist": "アイナ・ジ・エンド",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-9f282c2f",
+        "streamId": "stream-5a199959",
+        "videoId": "1kB5vpoxzWw",
+        "timestamp": 2283,
+        "endTimestamp": 2481
+      }
+    ]
+  },
+  {
+    "id": "song-3e8326ed",
+    "workId": "work-song-da80ca2e",
+    "title": "食虫植物",
+    "originalArtist": "理芽",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-654accb0",
+        "streamId": "stream-f6092600",
+        "videoId": "WCpaxuWiJ3E",
+        "timestamp": 2348,
+        "endTimestamp": 2506
+      }
+    ]
+  },
+  {
+    "id": "song-bc058e00",
+    "workId": "work-song-a0ec4a75",
+    "title": "家家酒",
+    "originalArtist": "家家",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-de7ccbb6",
+        "streamId": "stream-2026-04-22",
+        "videoId": "s3niM7j56Xs",
+        "timestamp": 2771,
+        "endTimestamp": 3044
+      }
+    ]
+  },
+  {
     "id": "song-a8800b48",
     "workId": "work-song-a8800b48",
     "title": "差不多姑娘",
@@ -220,6 +556,61 @@
         "videoId": "AnuYwZNXN0I",
         "timestamp": 4559,
         "endTimestamp": 4786
+      }
+    ]
+  },
+  {
+    "id": "song-80bdb0b1",
+    "workId": "work-song-1289",
+    "title": "恋愛サーキュレーション",
+    "originalArtist": "花澤香菜",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-528c66b9",
+        "streamId": "stream-2026-07-24",
+        "videoId": "4YbARt682jA",
+        "timestamp": 6532,
+        "endTimestamp": 6787
+      },
+      {
+        "id": "p-4eb8cc55",
+        "streamId": "stream-5a199959",
+        "videoId": "1kB5vpoxzWw",
+        "timestamp": 2728,
+        "endTimestamp": 2983
+      }
+    ]
+  },
+  {
+    "id": "song-96e0b91c",
+    "workId": "work-song-07fb1c70",
+    "title": "残酷な天使のテーゼ",
+    "originalArtist": "高橋洋子",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-adf13d22",
+        "streamId": "stream-5a199959",
+        "videoId": "1kB5vpoxzWw",
+        "timestamp": 4278,
+        "endTimestamp": 4524
+      }
+    ]
+  },
+  {
+    "id": "song-ae3a6969",
+    "workId": "work-song-04752c37",
+    "title": "迷醉 Sangria",
+    "originalArtist": "朔Sakuro",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-14684d6d",
+        "streamId": "stream-f6092600",
+        "videoId": "WCpaxuWiJ3E",
+        "timestamp": 6237,
+        "endTimestamp": 6432
       }
     ]
   },
@@ -263,11 +654,98 @@
     "tags": [],
     "performances": [
       {
+        "id": "p-06b3c0af",
+        "streamId": "stream-f6092600",
+        "videoId": "WCpaxuWiJ3E",
+        "timestamp": 6574,
+        "endTimestamp": 6793
+      },
+      {
         "id": "p-799c11b9",
         "streamId": "stream-dc06272b",
         "videoId": "eb22brGYmck",
         "timestamp": 4873,
         "endTimestamp": 5089
+      }
+    ]
+  },
+  {
+    "id": "song-be8e430f",
+    "workId": "work-song-7390ebf3",
+    "title": "強風オールバック",
+    "originalArtist": "Yukopi feat. 歌愛ユキ",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-ac2f4437",
+        "streamId": "stream-2a8423f9",
+        "videoId": "LbE2R_4HADg",
+        "timestamp": 5425,
+        "endTimestamp": 5563
+      }
+    ]
+  },
+  {
+    "id": "song-781cfe33",
+    "workId": "work-song-1058",
+    "title": "悪魔の子",
+    "originalArtist": "ヒグチアイ",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-1c76cb4d",
+        "streamId": "stream-2026-07-24",
+        "videoId": "4YbARt682jA",
+        "timestamp": 2174,
+        "endTimestamp": 2467
+      }
+    ]
+  },
+  {
+    "id": "song-9dab2850",
+    "workId": "work-song-76",
+    "title": "情人",
+    "originalArtist": "蔡徐坤",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-791547f9",
+        "streamId": "stream-f6092600",
+        "videoId": "WCpaxuWiJ3E",
+        "timestamp": 3410,
+        "endTimestamp": 3605
+      }
+    ]
+  },
+  {
+    "id": "song-a8345d95",
+    "workId": "work-song-013c53cd",
+    "title": "晩餐歌",
+    "originalArtist": "tuki.",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-6fcff8f6",
+        "streamId": "stream-5a199959",
+        "videoId": "1kB5vpoxzWw",
+        "timestamp": 5148,
+        "endTimestamp": 5364
+      }
+    ]
+  },
+  {
+    "id": "song-b62404e0",
+    "workId": "work-7677f772-7b68-4e66-918f-67d2d8e51eff",
+    "title": "酔いどれ知らず",
+    "originalArtist": "Kanaria feat. GUMI",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-c502c24b",
+        "streamId": "stream-f6092600",
+        "videoId": "WCpaxuWiJ3E",
+        "timestamp": 3910,
+        "endTimestamp": 4045
       }
     ]
   },
@@ -316,6 +794,22 @@
         "videoId": "FthND9ZSB2Y",
         "timestamp": 5559,
         "endTimestamp": 5809
+      }
+    ]
+  },
+  {
+    "id": "song-1e8a4d73",
+    "workId": "work-song-077e91b8",
+    "title": "買你",
+    "originalArtist": "魏如萱",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-73a1d1ee",
+        "streamId": "stream-2a8423f9",
+        "videoId": "LbE2R_4HADg",
+        "timestamp": 2628,
+        "endTimestamp": 2834
       }
     ]
   },
@@ -384,6 +878,134 @@
     ]
   },
   {
+    "id": "song-9a8480d8",
+    "workId": "work-song-1561",
+    "title": "當你",
+    "originalArtist": "王心凌",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-eba2aeef",
+        "streamId": "stream-2026-04-22",
+        "videoId": "s3niM7j56Xs",
+        "timestamp": 2235,
+        "endTimestamp": 2499
+      }
+    ]
+  },
+  {
+    "id": "song-2d4f8c52",
+    "workId": "work-song-479",
+    "title": "群青",
+    "originalArtist": "YOASOBI",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-e33dd282",
+        "streamId": "stream-2026-07-24",
+        "videoId": "4YbARt682jA",
+        "timestamp": 5110,
+        "endTimestamp": 5358
+      }
+    ]
+  },
+  {
+    "id": "song-758da6ee",
+    "workId": "work-song-c2b6954f",
+    "title": "說愛你",
+    "originalArtist": "蔡依林",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-30c81b20",
+        "streamId": "stream-2a8423f9",
+        "videoId": "LbE2R_4HADg",
+        "timestamp": 1849,
+        "endTimestamp": 2076
+      }
+    ]
+  },
+  {
+    "id": "song-809df97c",
+    "workId": "work-song-2ccade11",
+    "title": "踊",
+    "originalArtist": "Ado",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-b77aced0",
+        "streamId": "stream-5a199959",
+        "videoId": "1kB5vpoxzWw",
+        "timestamp": 3256,
+        "endTimestamp": 3464
+      }
+    ]
+  },
+  {
+    "id": "song-04c30abb",
+    "workId": "work-song-c4bcdc7a",
+    "title": "撥接",
+    "originalArtist": "吳卓源",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-e661b4f6",
+        "streamId": "stream-2a8423f9",
+        "videoId": "LbE2R_4HADg",
+        "timestamp": 4734,
+        "endTimestamp": 4925
+      }
+    ]
+  },
+  {
+    "id": "song-9759df4b",
+    "workId": "work-song-308",
+    "title": "寶貝",
+    "originalArtist": "張懸",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-321ec77a",
+        "streamId": "stream-2a8423f9",
+        "videoId": "LbE2R_4HADg",
+        "timestamp": 5089,
+        "endTimestamp": 5250
+      }
+    ]
+  },
+  {
+    "id": "song-01c75455",
+    "workId": "work-song-640",
+    "title": "All About That Bass",
+    "originalArtist": "Meghan Trainor",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-c603ea9b",
+        "streamId": "stream-2a8423f9",
+        "videoId": "LbE2R_4HADg",
+        "timestamp": 3098,
+        "endTimestamp": 3286
+      }
+    ]
+  },
+  {
+    "id": "song-af73e9dc",
+    "workId": "work-song-2615",
+    "title": "APT.",
+    "originalArtist": "ROSÉ & Bruno Mars",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-b266de9e",
+        "streamId": "stream-2a8423f9",
+        "videoId": "LbE2R_4HADg",
+        "timestamp": 5954,
+        "endTimestamp": 6124
+      }
+    ]
+  },
+  {
     "id": "song-6c35e292",
     "workId": "work-song-37f753fd",
     "title": "B.O.",
@@ -396,6 +1018,38 @@
         "videoId": "FthND9ZSB2Y",
         "timestamp": 2786,
         "endTimestamp": 2999
+      }
+    ]
+  },
+  {
+    "id": "song-52130a9a",
+    "workId": "work-367a765f-df95-42b8-81ae-0691169cd2eb",
+    "title": "Baby you",
+    "originalArtist": "有華",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-b5ea72ee",
+        "streamId": "stream-2a8423f9",
+        "videoId": "LbE2R_4HADg",
+        "timestamp": 2308,
+        "endTimestamp": 2471
+      }
+    ]
+  },
+  {
+    "id": "song-8f33b129",
+    "workId": "work-song-300",
+    "title": "Bunny Girl",
+    "originalArtist": "AKASAKI",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-8323cdb7",
+        "streamId": "stream-f6092600",
+        "videoId": "WCpaxuWiJ3E",
+        "timestamp": 5418,
+        "endTimestamp": 5635
       }
     ]
   },
@@ -416,6 +1070,70 @@
     ]
   },
   {
+    "id": "song-9edd6e41",
+    "workId": "work-song-12",
+    "title": "Dangerous Woman",
+    "originalArtist": "Ariana Grande",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-f2f74dc4",
+        "streamId": "stream-f6092600",
+        "videoId": "WCpaxuWiJ3E",
+        "timestamp": 4329,
+        "endTimestamp": 4565
+      }
+    ]
+  },
+  {
+    "id": "song-83754abf",
+    "workId": "work-song-cfd0ad94",
+    "title": "Dangerously",
+    "originalArtist": "Charlie Puth",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-b81c2424",
+        "streamId": "stream-2026-07-24",
+        "videoId": "4YbARt682jA",
+        "timestamp": 1732,
+        "endTimestamp": 1931
+      }
+    ]
+  },
+  {
+    "id": "song-10358f4e",
+    "workId": "work-d96c78b5-5237-4678-9700-a36c179d4826",
+    "title": "DINOSAUR",
+    "originalArtist": "AKMU",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-3766fbe0",
+        "streamId": "stream-2026-07-24",
+        "videoId": "4YbARt682jA",
+        "timestamp": 3828,
+        "endTimestamp": 4069
+      }
+    ]
+  },
+  {
+    "id": "song-7d7e0bc9",
+    "workId": "work-song-74baa9d8",
+    "title": "flos",
+    "originalArtist": "R Sound Design feat. 初音ミク",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-20218857",
+        "streamId": "stream-5a199959",
+        "videoId": "1kB5vpoxzWw",
+        "timestamp": 3794,
+        "endTimestamp": 4072
+      }
+    ]
+  },
+  {
     "id": "song-96f52592",
     "workId": "work-song-1508",
     "title": "I Love You 3000",
@@ -428,6 +1146,22 @@
         "videoId": "FthND9ZSB2Y",
         "timestamp": 5142,
         "endTimestamp": 5350
+      }
+    ]
+  },
+  {
+    "id": "song-422f6f3a",
+    "workId": "work-0f20a455-ee37-4d93-b631-bdc456c75a7d",
+    "title": "I Will Show You",
+    "originalArtist": "Ailee",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-09600382",
+        "streamId": "stream-2026-07-24",
+        "videoId": "4YbARt682jA",
+        "timestamp": 5950,
+        "endTimestamp": 6184
       }
     ]
   },
@@ -464,6 +1198,70 @@
     ]
   },
   {
+    "id": "song-9e64cd61",
+    "workId": "work-58dc032b-c29c-45bf-9a7f-457bc7730a04",
+    "title": "KING",
+    "originalArtist": "Kanaria feat. GUMI",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-da125a88",
+        "streamId": "stream-5a199959",
+        "videoId": "1kB5vpoxzWw",
+        "timestamp": 565,
+        "endTimestamp": 700
+      }
+    ]
+  },
+  {
+    "id": "song-26d63118",
+    "workId": "work-93ed3002-06c6-4728-a9db-7da6cd470f8b",
+    "title": "LIKE THAT",
+    "originalArtist": "BABYMONSTER",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-eee54384",
+        "streamId": "stream-f6092600",
+        "videoId": "WCpaxuWiJ3E",
+        "timestamp": 2765,
+        "endTimestamp": 2933
+      }
+    ]
+  },
+  {
+    "id": "song-8d875670",
+    "workId": "work-e347be8d-776b-446e-97e2-9f398382610d",
+    "title": "LOVE",
+    "originalArtist": "CNBLUE",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-ef934872",
+        "streamId": "stream-2026-07-24",
+        "videoId": "4YbARt682jA",
+        "timestamp": 2536,
+        "endTimestamp": 2764
+      }
+    ]
+  },
+  {
+    "id": "song-648749c1",
+    "workId": "work-9864705d-2408-450b-a344-835b662c0e9e",
+    "title": "Me Too",
+    "originalArtist": "Meghan Trainor",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-e875c117",
+        "streamId": "stream-2a8423f9",
+        "videoId": "LbE2R_4HADg",
+        "timestamp": 5707,
+        "endTimestamp": 5888
+      }
+    ]
+  },
+  {
     "id": "song-8170e864",
     "workId": "work-song-8ef9c4cb",
     "title": "Night dancer",
@@ -476,6 +1274,22 @@
         "videoId": "WdkRZyLwmF4",
         "timestamp": 2996,
         "endTimestamp": 3213
+      }
+    ]
+  },
+  {
+    "id": "song-36efa464",
+    "workId": "work-song-1820",
+    "title": "POP/STARS",
+    "originalArtist": "K/DA",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-53c457a3",
+        "streamId": "stream-2026-07-24",
+        "videoId": "4YbARt682jA",
+        "timestamp": 5560,
+        "endTimestamp": 5751
       }
     ]
   },
@@ -560,6 +1374,22 @@
     ]
   },
   {
+    "id": "song-68f7ff2f",
+    "workId": "work-song-1f2368eb",
+    "title": "Toxic",
+    "originalArtist": "Britney Spears",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-4a578550",
+        "streamId": "stream-f6092600",
+        "videoId": "WCpaxuWiJ3E",
+        "timestamp": 1355,
+        "endTimestamp": 1554
+      }
+    ]
+  },
+  {
     "id": "song-4c828f0f",
     "workId": "work-song-2349",
     "title": "unholy",
@@ -572,6 +1402,54 @@
         "videoId": "eb22brGYmck",
         "timestamp": 4073,
         "endTimestamp": 4232
+      }
+    ]
+  },
+  {
+    "id": "song-e1acf25d",
+    "workId": "work-song-174ec6fe",
+    "title": "うっせぇわ",
+    "originalArtist": "Ado",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-68ed3462",
+        "streamId": "stream-2026-07-24",
+        "videoId": "4YbARt682jA",
+        "timestamp": 3416,
+        "endTimestamp": 3621
+      }
+    ]
+  },
+  {
+    "id": "song-0618804e",
+    "workId": "work-c863a20d-329d-4d78-8754-c94460eb40c9",
+    "title": "エウテルペ",
+    "originalArtist": "EGOIST (chelly)",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-7cbc6862",
+        "streamId": "stream-5a199959",
+        "videoId": "1kB5vpoxzWw",
+        "timestamp": 4689,
+        "endTimestamp": 4915
+      }
+    ]
+  },
+  {
+    "id": "song-ff1a442a",
+    "workId": "work-song-2f998b9e",
+    "title": "ギラギラ",
+    "originalArtist": "Ado",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-25268887",
+        "streamId": "stream-5a199959",
+        "videoId": "1kB5vpoxzWw",
+        "timestamp": 1699,
+        "endTimestamp": 1975
       }
     ]
   },
@@ -592,6 +1470,54 @@
     ]
   },
   {
+    "id": "song-5a44e229",
+    "workId": "work-b0b54324-e1cd-494f-8b08-a34e06742b68",
+    "title": "チェリーポップ",
+    "originalArtist": "DECO*27 feat. 初音ミク",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-fb93f2f3",
+        "streamId": "stream-2a8423f9",
+        "videoId": "LbE2R_4HADg",
+        "timestamp": 4338,
+        "endTimestamp": 4609
+      }
+    ]
+  },
+  {
+    "id": "song-ff9c35ab",
+    "workId": "work-song-2658",
+    "title": "ちゅ、多様性。",
+    "originalArtist": "ano",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-3301fbe9",
+        "streamId": "stream-2a8423f9",
+        "videoId": "LbE2R_4HADg",
+        "timestamp": 3969,
+        "endTimestamp": 4154
+      }
+    ]
+  },
+  {
+    "id": "song-9a7f5beb",
+    "workId": "work-song-1503",
+    "title": "ほろよい",
+    "originalArtist": "さんひ",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-3701b7f7",
+        "streamId": "stream-f6092600",
+        "videoId": "WCpaxuWiJ3E",
+        "timestamp": 7004,
+        "endTimestamp": 7208
+      }
+    ]
+  },
+  {
     "id": "song-8dc82148",
     "workId": "work-song-263",
     "title": "モエチャッカファイア",
@@ -604,6 +1530,22 @@
         "videoId": "eb22brGYmck",
         "timestamp": 3339,
         "endTimestamp": 3494
+      }
+    ]
+  },
+  {
+    "id": "song-d60cbf2b",
+    "workId": "work-song-0c224a90",
+    "title": "リードコントロール",
+    "originalArtist": "なるみや",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-d79c93c3",
+        "streamId": "stream-f6092600",
+        "videoId": "WCpaxuWiJ3E",
+        "timestamp": 5855,
+        "endTimestamp": 6124
       }
     ]
   },
