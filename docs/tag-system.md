@@ -26,8 +26,11 @@ assignments onto a D1 export.
 
 ## Initial catalog
 
-The repository ships with conservative initial assignments so the filter is useful
-as soon as this change is merged. Classification uses, in descending confidence:
+The repository ships conservative initial assignments in `data/tag-catalog.json`,
+rendered into migration 0008. They are a seed for D1, not static site data: the
+assignments reach the fan site only after the migrations are applied and `sync:data`
+regenerates the streamer files (see [Initial rollout](#initial-rollout)).
+Classification uses, in descending confidence:
 
 1. explicit language and rendition annotations in the title;
 2. language-specific writing systems;
@@ -90,27 +93,54 @@ effective tags on the next sync.
 
 ## Initial rollout
 
-The static song files shipped with the initial effective tags. Before the first
-D1-to-static sync in an environment that has not received the seed, apply the
-generated additive migration so D1 becomes consistent with those files:
+D1 is the source of truth for tags. `data/*/songs.json` carries no tag data until
+`sync:data` regenerates it from D1, so the fan-site tag panel stays hidden — the page
+gates it on `tagCounts.size > 0` — until the last step lands.
+
+The order below is a constraint, not a preference:
 
 ```bash
 cd admin
-npx wrangler@latest d1 time-travel info oshi-prism-db
+npx wrangler@latest d1 time-travel info oshi-prism-db          # 1. record the bookmark
+
 npx wrangler@latest d1 execute oshi-prism-db --remote \
-  --file=migrations/0007_add_performance_tags.sql
+  --file=migrations/0007_add_performance_tags.sql              # 2. storage + scope repair
+
+npm run deploy                                                 # 3. Worker
+
 npx wrangler@latest d1 execute oshi-prism-db --remote \
-  --file=migrations/0008_seed_initial_tags.sql
+  --file=migrations/0008_seed_initial_tags.sql                 # 4. seed
+
+cd .. && npm run sync:data -- <slug>                           # 5. regenerate static data
 ```
 
+**0007 must precede the deploy.** The Worker names `performances.tags` in its INSERT
+and SELECT statements and in `PATCH /api/performances/:id/tags`, so deploying it
+against an unmigrated database fails with `no such column: tags` the first time a
+performance is written.
+
+**Do not curate between steps 2 and 3.** The previously deployed Worker still writes
+the legacy layer: `PUT /api/songs/:id` forwards `body.tags` into `songs.tags`, and its
+`prepareEnsureWorkForSongUpdate` copies `songs.tags` into the work it creates for a
+renamed song. Either one re-introduces the out-of-scope IDs that 0007 has just moved
+down, and 0007 is not meant to be re-run — its `ALTER TABLE` is one-shot, and the
+recovery procedure is in the migration header. Keep this window short.
+
+**0008 is a commitment.** It unions the seed into existing tags and never removes
+anything, and its header forbids reapplying it once curators own the data. Applying it
+gives up the ability to correct the seed: if the classifier changes afterwards,
+already-seeded rows can only be fixed by hand. Apply it only when
+`data/tag-catalog.json` is final, and retry it only while still completing this
+rollout, before handing tag ownership to curators.
+
 Migration 0007 adds the storage column and moves any controlled language/style IDs
-already present on songs or works down to their linked performances. Migration 0008
-preserves existing tags and de-duplicates the generated seed. Apply them in order.
-Only retry migration 0008 while completing the initial rollout, before handing tag
-ownership to curators; running it later would re-add seed values that a curator may
-have intentionally removed. As with every production D1 change, record the Time
-Travel bookmark first. Deploying the Worker and applying migrations are separate
-operator actions; merging the PR does not mutate production D1.
+already present on songs or works down to their linked performances. It leaves them in
+place when a song or work has no performance to receive them — demoting them there
+would delete them outright — and TagPicker surfaces those leftovers so a curator can
+clear them.
+
+Deploying the Worker and applying migrations are separate operator actions; merging
+the PR does not mutate production D1.
 
 ## Scope
 
