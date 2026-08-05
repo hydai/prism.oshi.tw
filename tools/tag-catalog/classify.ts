@@ -94,6 +94,13 @@ const VOCALOID_ARTISTS = new Set([
   '奏音69', '梅とら', '蝶々p', "19's sound factory",
 ]);
 
+// Lookups go through normalizeArtist(), which NFKC-folds compatibility characters
+// ('40㍍p' -> '40メートルp'), so the curated spellings have to be folded the same way
+// to be reachable at all. The curated form stays as the value for evidence text.
+const VOCALOID_ARTIST_LOOKUP = new Map(
+  [...VOCALOID_ARTISTS].map((candidate) => [normalizeArtist(candidate), candidate] as const),
+);
+
 // Short artist names can resolve to a different, more popular performer in
 // Apple's search results even when the query score is high.
 const APPLE_GENRE_DENYLIST = new Set(['niki']);
@@ -264,7 +271,7 @@ function titleWords(title: string): string[] {
 
 function explicitLanguages(text: string): string[] {
   const tags: string[] = [];
-  if (/(?:中文|華語|国语|國語|chinese)(?:版|ver(?:sion)?\.?)?/iu.test(text)) tags.push('language:zh');
+  if (/(?:中文|華語|国语|國語|台語|臺語|台语|閩南語|闽南语|chinese)(?:版|ver(?:sion)?\.?)?/iu.test(text)) tags.push('language:zh');
   if (/(?:英文|english)(?:版|ver(?:sion)?\.?)?/iu.test(text)) tags.push('language:en');
   if (/(?:日文|日語|日本語|japanese)(?:版|ver(?:sion)?\.?)?/iu.test(text)) tags.push('language:ja');
   if (/(?:韓文|韓語|한국어|korean)(?:版|ver(?:sion)?\.?)?/iu.test(text)) tags.push('language:ko');
@@ -288,11 +295,20 @@ function strongTitleLanguage(title: string): string | null {
   if (CYRILLIC.test(title) || THAI.test(title) || ARABIC.test(title) || DEVANAGARI.test(title)) {
     return 'language:other';
   }
+  // Script evidence outranks the English-word heuristic: titleWords() drops every
+  // non-Latin character, so a Chinese title with a parenthesised English subtitle
+  // would otherwise be judged on the subtitle alone. Kana was already ruled out
+  // above, so Han plus a Chinese-only marker is unambiguous here.
+  if (HAN.test(title) && CHINESE_MARKERS.test(title)) return 'language:zh';
+  // A bracketed translation must not decide the language of the title it translates.
+  // Leaving such a title unassigned is recoverable — the seed migration unions tags
+  // in, so a missing one can still be added; a wrong one can never be withdrawn.
+  const titleProper = title.replace(/[（(【\[][^）)】\]]*[）)】\]]/gu, ' ');
+  if (HAN.test(titleProper)) return null;
   const words = titleWords(title);
   const englishMatches = words.filter((word) => ENGLISH_WORDS.has(word)).length;
   if (words.length >= 2 && englishMatches >= Math.min(2, words.length)) return 'language:en';
   if (words.length === 1 && ENGLISH_WORDS.has(words[0])) return 'language:en';
-  if (HAN.test(title) && CHINESE_MARKERS.test(title)) return 'language:zh';
   return null;
 }
 
@@ -363,15 +379,20 @@ function sourceFromApple(song: CatalogSong, lookup: AppleArtistLookup | undefine
   return [];
 }
 
-function isLocalArtist(song: CatalogSong, displayNamesBySlug: ReadonlyMap<string, string>): boolean {
+function findLocalArtist(
+  song: CatalogSong,
+  displayNamesBySlug: ReadonlyMap<string, string>,
+): { slug: string; displayName: string } | null {
   const artist = normalizeArtist(song.originalArtist).replace(/[^\p{Letter}\p{Number}]/gu, '');
-  if (artist.length < 3) return false;
+  if (artist.length < 3) return null;
   for (const [slugValue, displayValue] of displayNamesBySlug) {
     const slug = normalizeArtist(slugValue).replace(/[^\p{Letter}\p{Number}]/gu, '');
     const display = normalizeArtist(displayValue).replace(/[^\p{Letter}\p{Number}]/gu, '');
-    if (artist === slug || artist === display || (artist.length >= 5 && display.includes(artist))) return true;
+    if (artist === slug || artist === display || (artist.length >= 5 && display.includes(artist))) {
+      return { slug: slugValue, displayName: displayValue };
+    }
   }
-  return false;
+  return null;
 }
 
 function renditionAnnotation(song: CatalogSong): string {
@@ -436,11 +457,24 @@ export function classifyCatalog(
   for (const song of songs) {
     const directLanguage = strongTitleLanguage(song.title);
     const artistLanguage = artistLanguages.get(song.originalArtist);
-    const inferredLanguage = SONG_LANGUAGE_OVERRIDES.get(`${song.originalArtist}\u0000${song.title}`)
-      ?? (HANGUL.test(song.title) ? 'language:ko' : null)
-      ?? (KANA.test(song.title) ? 'language:ja' : null)
-      ?? artistLanguage
-      ?? directLanguage;
+    const overrideLanguage = SONG_LANGUAGE_OVERRIDES.get(`${song.originalArtist}\u0000${song.title}`);
+    const inferredLanguage: TagAssignment | null = overrideLanguage
+      ? {
+          tag: overrideLanguage,
+          evidence: `curated song language override: ${song.originalArtist} — ${song.title}`,
+        }
+      : HANGUL.test(song.title)
+        ? { tag: 'language:ko', evidence: 'language-specific title script' }
+        : KANA.test(song.title)
+          ? { tag: 'language:ja', evidence: 'language-specific title script' }
+          : artistLanguage
+            ? {
+                tag: artistLanguage,
+                evidence: `curated or catalog-derived artist language: ${song.originalArtist}`,
+              }
+            : directLanguage
+              ? { tag: directLanguage, evidence: 'high-confidence title vocabulary or script' }
+              : null;
     const sharedRenditionText = renditionAnnotation(song);
     for (const performance of song.performances) {
       const performanceTags: TagAssignment[] = [];
@@ -451,14 +485,7 @@ export function classifyCatalog(
           evidence: 'explicit language annotation in title or performance note',
         })));
       } else if (inferredLanguage) {
-        performanceTags.push({
-          tag: inferredLanguage,
-          evidence: (HANGUL.test(song.title) || KANA.test(song.title))
-            ? 'language-specific title script'
-            : artistLanguage
-              ? `curated or catalog-derived artist language: ${song.originalArtist}`
-              : 'high-confidence title vocabulary or script',
-        });
+        performanceTags.push(inferredLanguage);
       }
 
       const performanceText = `${sharedRenditionText} ${performance.note ?? ''}`;
@@ -474,9 +501,11 @@ export function classifyCatalog(
 
     const workTags = workAssignments.get(song.workId) ?? [];
     const normalizedArtist = normalizeArtist(song.originalArtist);
-    const producer = [...VOCALOID_ARTISTS].find((candidate) => normalizedArtist === candidate || normalizedArtist.startsWith(`${candidate} `));
+    const producer = [...VOCALOID_ARTIST_LOOKUP]
+      .find(([folded]) => normalizedArtist === folded || normalizedArtist.startsWith(`${folded} `))?.[1];
     const hasVoiceSynth = hasVocalSynthEvidence(song);
-    const allowApple = !isLocalArtist(song, displayNamesBySlug) && !APPLE_GENRE_DENYLIST.has(normalizedArtist);
+    const localArtist = findLocalArtist(song, displayNamesBySlug);
+    const allowApple = !localArtist && !APPLE_GENRE_DENYLIST.has(normalizedArtist);
     if (allowApple) {
       workTags.push(...genreFromApple(appleByArtist.get(song.originalArtist)));
       if (!producer && !hasVoiceSynth) {
@@ -491,8 +520,8 @@ export function classifyCatalog(
           : `curated Vocaloid producer: ${producer}`,
       });
     }
-    if (isLocalArtist(song, displayNamesBySlug)) {
-      workTags.push({ tag: 'source:original', evidence: `original artist matches streamer ${song.slug}` });
+    if (localArtist) {
+      workTags.push({ tag: 'source:original', evidence: `original artist matches streamer ${localArtist.slug}` });
     }
     for (const rule of MOOD_RULES) {
       if (rule.pattern.test(sharedRenditionText)) workTags.push({ tag: rule.tag, evidence: rule.evidence });
