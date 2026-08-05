@@ -1,1 +1,505 @@
-[]
+[
+  {
+    "id": "song-49cd5c2c",
+    "workId": "work-96db56dd-8df2-4927-8377-338d5910a43b",
+    "title": "一百個不喜歡你的方法",
+    "originalArtist": "房東的貓",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-41b13bc4",
+        "streamId": "stream-2023-02-23",
+        "videoId": "R4EPlvTPa8Y",
+        "timestamp": 1833,
+        "endTimestamp": 2111
+      }
+    ]
+  },
+  {
+    "id": "song-23198f8d",
+    "workId": "work-c9253386-d3e2-49a9-a6bc-b412cde2a7e8",
+    "title": "人間不值得",
+    "originalArtist": "黃詩扶（蘭蘭 ver.）",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-7245123f",
+        "streamId": "stream-2023-02-23",
+        "videoId": "R4EPlvTPa8Y",
+        "timestamp": 779,
+        "endTimestamp": 1031
+      }
+    ]
+  },
+  {
+    "id": "song-56060af8",
+    "workId": "work-1d1c6718-4529-460e-a40f-8c255b0d53e5",
+    "title": "不被允許的平庸",
+    "originalArtist": "瑪格麗特・諾爾絲",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-1d111365",
+        "streamId": "stream-2026-07-16",
+        "videoId": "cLZpMXxVGh4",
+        "timestamp": 881,
+        "endTimestamp": 1103
+      }
+    ]
+  },
+  {
+    "id": "song-b3b88c5e",
+    "workId": "work-24c0eea2-622e-4745-a89d-707e148bd135",
+    "title": "丹青",
+    "originalArtist": "音闕詩聽 & 咬人貓（蘭蘭 ver.）",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-2765f6a1",
+        "streamId": "stream-2023-02-23",
+        "videoId": "R4EPlvTPa8Y",
+        "timestamp": 5061,
+        "endTimestamp": 5254
+      }
+    ]
+  },
+  {
+    "id": "song-e6bf087d",
+    "workId": "work-song-7d18e0cf",
+    "title": "少女變成了一隻甲蟲",
+    "originalArtist": "吾橋有水",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-2d35ea72",
+        "streamId": "stream-2023-02-23",
+        "videoId": "R4EPlvTPa8Y",
+        "timestamp": 3559,
+        "endTimestamp": 3853
+      }
+    ]
+  },
+  {
+    "id": "song-9dd64f70",
+    "workId": "work-8dd7320c-f019-4911-bedb-77ccf2521fa7",
+    "title": "月色奇遇",
+    "originalArtist": "瑪格麗特・諾爾絲",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-8fe9ac53",
+        "streamId": "stream-2026-07-16",
+        "videoId": "cLZpMXxVGh4",
+        "timestamp": 3473,
+        "endTimestamp": 3673
+      }
+    ]
+  },
+  {
+    "id": "song-93e1ceed",
+    "workId": "work-9f34a354-2755-4564-8126-03464089d035",
+    "title": "可愛くてごめん",
+    "originalArtist": "HoneyWorks feat. かぴ",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-a9a5443e",
+        "streamId": "stream-2026-07-16",
+        "videoId": "cLZpMXxVGh4",
+        "timestamp": 2427,
+        "endTimestamp": 2647
+      }
+    ]
+  },
+  {
+    "id": "song-ab57b732",
+    "workId": "work-767855b8-cf13-48fb-a91f-c9aeb54b879b",
+    "title": "可愛くてごめん",
+    "originalArtist": "ちゅーたん（CV：早見沙織）",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-f02d9afe",
+        "streamId": "stream-2023-02-23",
+        "videoId": "R4EPlvTPa8Y",
+        "timestamp": 7149,
+        "endTimestamp": 7368
+      }
+    ]
+  },
+  {
+    "id": "song-67e8f487",
+    "workId": "work-de560f40-b804-4a7a-b62a-e73fdd4d036c",
+    "title": "在加納共和國離婚",
+    "originalArtist": "菲道爾 & Dior 大穎",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-923bf586",
+        "streamId": "stream-2026-07-16",
+        "videoId": "cLZpMXxVGh4",
+        "timestamp": 2689,
+        "endTimestamp": 2950
+      }
+    ]
+  },
+  {
+    "id": "song-84d45d08",
+    "workId": "work-1dcc8208-df28-49e6-b8d2-4bdf2558f657",
+    "title": "我是你的小狗",
+    "originalArtist": "西彬",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-4f101f9d",
+        "streamId": "stream-2026-07-16",
+        "videoId": "cLZpMXxVGh4",
+        "timestamp": 2952,
+        "endTimestamp": 3134
+      }
+    ]
+  },
+  {
+    "id": "song-bafeeee1",
+    "workId": "work-song-b22649fb",
+    "title": "我們的愛",
+    "originalArtist": "F.I.R. 飛兒樂團",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-42b1c7f4",
+        "streamId": "stream-2023-02-23",
+        "videoId": "R4EPlvTPa8Y",
+        "timestamp": 342,
+        "endTimestamp": 629
+      }
+    ]
+  },
+  {
+    "id": "song-02f62881",
+    "workId": "work-song-1345",
+    "title": "我當你空氣",
+    "originalArtist": "旺福",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-5b74bbe5",
+        "streamId": "stream-2026-07-16",
+        "videoId": "cLZpMXxVGh4",
+        "timestamp": 1594,
+        "endTimestamp": 1830
+      }
+    ]
+  },
+  {
+    "id": "song-22b88c80",
+    "workId": "work-song-1d73ad7a",
+    "title": "求救訊號",
+    "originalArtist": "Vast & Hazy",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-5dc3adad",
+        "streamId": "stream-2023-02-23",
+        "videoId": "R4EPlvTPa8Y",
+        "timestamp": 1323,
+        "endTimestamp": 1581
+      }
+    ]
+  },
+  {
+    "id": "song-d92ddc4b",
+    "workId": "work-a8c2980b-92b8-4199-bc7e-818fd1bbd8b0",
+    "title": "男子漢",
+    "originalArtist": "成龍",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-e73ca997",
+        "streamId": "stream-2026-07-16",
+        "videoId": "cLZpMXxVGh4",
+        "timestamp": 3224,
+        "endTimestamp": 3446
+      }
+    ]
+  },
+  {
+    "id": "song-771f495a",
+    "workId": "work-song-15b9ec3b",
+    "title": "孤獨的總和",
+    "originalArtist": "吳汶芳",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-9b8f6b1e",
+        "streamId": "stream-2026-07-16",
+        "videoId": "cLZpMXxVGh4",
+        "timestamp": 84,
+        "endTimestamp": 333
+      },
+      {
+        "id": "p-60ee960d",
+        "streamId": "stream-2023-02-23",
+        "videoId": "R4EPlvTPa8Y",
+        "timestamp": 1587,
+        "endTimestamp": 1836
+      }
+    ]
+  },
+  {
+    "id": "song-530a789a",
+    "workId": "work-7f7b8d6e-8f7e-45fa-b5a4-8088615872c1",
+    "title": "易燃易爆炸",
+    "originalArtist": "華晨宇",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-fc3b0e3d",
+        "streamId": "stream-2023-02-23",
+        "videoId": "R4EPlvTPa8Y",
+        "timestamp": 3075,
+        "endTimestamp": 3320
+      }
+    ]
+  },
+  {
+    "id": "song-1ff15555",
+    "workId": "work-song-128",
+    "title": "花",
+    "originalArtist": "Hello Nico",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-8b934f16",
+        "streamId": "stream-2023-02-23",
+        "videoId": "R4EPlvTPa8Y",
+        "timestamp": 6307,
+        "endTimestamp": 6660
+      }
+    ]
+  },
+  {
+    "id": "song-0f9717a8",
+    "workId": "work-song-6dc769fc",
+    "title": "星の消えた夜に",
+    "originalArtist": "Aimer",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-88168578",
+        "streamId": "stream-2026-07-16",
+        "videoId": "cLZpMXxVGh4",
+        "timestamp": 1858,
+        "endTimestamp": 2214
+      }
+    ]
+  },
+  {
+    "id": "song-b4322bc8",
+    "workId": "work-a366643a-c438-494d-8a58-99f85a0e50a6",
+    "title": "眉間雪",
+    "originalArtist": "晴愔",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-a30b83fc",
+        "streamId": "stream-2023-02-23",
+        "videoId": "R4EPlvTPa8Y",
+        "timestamp": 2528,
+        "endTimestamp": 2756
+      }
+    ]
+  },
+  {
+    "id": "song-13255612",
+    "workId": "work-762f5ee0-9c5c-4351-8da2-d6bb1308b62c",
+    "title": "食蟲植物",
+    "originalArtist": "理芽",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-95b55b83",
+        "streamId": "stream-2026-07-16",
+        "videoId": "cLZpMXxVGh4",
+        "timestamp": 2235,
+        "endTimestamp": 2393
+      }
+    ]
+  },
+  {
+    "id": "song-0572c9e9",
+    "workId": "work-song-301",
+    "title": "特務J",
+    "originalArtist": "蔡依林",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-57da0f06",
+        "streamId": "stream-2026-07-16",
+        "videoId": "cLZpMXxVGh4",
+        "timestamp": 675,
+        "endTimestamp": 891
+      }
+    ]
+  },
+  {
+    "id": "song-8c2e56d8",
+    "workId": "work-4fe7180f-b469-49f2-89d2-95624c61280b",
+    "title": "涼涼",
+    "originalArtist": "楊宗緯 & 張碧晨（蘭蘭 ver.）",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-e9c52127",
+        "streamId": "stream-2023-02-23",
+        "videoId": "R4EPlvTPa8Y",
+        "timestamp": 4149,
+        "endTimestamp": 4482
+      }
+    ]
+  },
+  {
+    "id": "song-2c5e6834",
+    "workId": "work-song-2ae06379",
+    "title": "會呼吸的痛",
+    "originalArtist": "梁靜茹",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-66d79813",
+        "streamId": "stream-2023-02-23",
+        "videoId": "R4EPlvTPa8Y",
+        "timestamp": 5492,
+        "endTimestamp": 5767
+      }
+    ]
+  },
+  {
+    "id": "song-371205bf",
+    "workId": "work-song-1238",
+    "title": "詩人漫步",
+    "originalArtist": "蔡依林",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-d76328ca",
+        "streamId": "stream-2026-07-16",
+        "videoId": "cLZpMXxVGh4",
+        "timestamp": 340,
+        "endTimestamp": 648
+      }
+    ]
+  },
+  {
+    "id": "song-9e22ed66",
+    "workId": "work-song-02fb6f23",
+    "title": "像魚",
+    "originalArtist": "王貳浪",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-37d8f47a",
+        "streamId": "stream-2023-02-23",
+        "videoId": "R4EPlvTPa8Y",
+        "timestamp": 6841,
+        "endTimestamp": 7126
+      }
+    ]
+  },
+  {
+    "id": "song-57620e24",
+    "workId": "work-a3833840-500c-4807-b6a2-f45bb62f26e3",
+    "title": "種一片玫瑰送你",
+    "originalArtist": "一顆狼星",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-1bb7d580",
+        "streamId": "stream-2023-02-23",
+        "videoId": "R4EPlvTPa8Y",
+        "timestamp": 2106,
+        "endTimestamp": 2346
+      }
+    ]
+  },
+  {
+    "id": "song-26d55f64",
+    "workId": "work-song-05752dc2",
+    "title": "與浪之間",
+    "originalArtist": "Vast & Hazy",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-f755691b",
+        "streamId": "stream-2023-02-23",
+        "videoId": "R4EPlvTPa8Y",
+        "timestamp": 6016,
+        "endTimestamp": 6306
+      }
+    ]
+  },
+  {
+    "id": "song-476bc783",
+    "workId": "work-17fa117c-617e-4223-84c2-8f5bb4afdbd0",
+    "title": "蜜月アン・ドゥ・トロワ",
+    "originalArtist": "DATEKEN feat. 鏡音リン",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-8390b94d",
+        "streamId": "stream-2026-07-16",
+        "videoId": "cLZpMXxVGh4",
+        "timestamp": 1105,
+        "endTimestamp": 1358
+      }
+    ]
+  },
+  {
+    "id": "song-33669f64",
+    "workId": "work-c09eb3d5-c0d7-4ee4-9b7b-da2dc189b81f",
+    "title": "親親",
+    "originalArtist": "梁靜茹",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-c72c906f",
+        "streamId": "stream-2023-02-23",
+        "videoId": "R4EPlvTPa8Y",
+        "timestamp": 5292,
+        "endTimestamp": 5541
+      }
+    ]
+  },
+  {
+    "id": "song-7bac4fa7",
+    "workId": "work-dd1d9836-a448-445f-9ad7-c04c8d11efaf",
+    "title": "講真的",
+    "originalArtist": "曾惜",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-43ee55b1",
+        "streamId": "stream-2026-07-16",
+        "videoId": "cLZpMXxVGh4",
+        "timestamp": 1353,
+        "endTimestamp": 1591
+      }
+    ]
+  },
+  {
+    "id": "song-2b4800dc",
+    "workId": "work-8cece21a-996e-42d4-b570-24be866898b5",
+    "title": "Tequila",
+    "originalArtist": "Unknown",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-6b38e14b",
+        "streamId": "stream-2026-07-16",
+        "videoId": "cLZpMXxVGh4",
+        "timestamp": 3083,
+        "endTimestamp": 3267
+      }
+    ]
+  }
+]
