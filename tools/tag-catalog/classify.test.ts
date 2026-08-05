@@ -121,6 +121,42 @@ test('marks a matching streamer artist as original and ignores ambiguous Apple g
   assert.deepEqual(result.workAssignments.get('work-original')?.map(({ tag }) => tag), ['source:original']);
 });
 
+test('attributes original-source evidence to the streamer whose name matched the artist', () => {
+  const result = classifyCatalog([
+    song({
+      slug: 'mizuki',
+      id: 'song-kirali-cover',
+      workId: 'work-kirali-cover',
+      title: 'Liar 謊癮',
+      originalArtist: '煌Kirali',
+    }),
+  ], [], new Map([
+    ['mizuki', '浠Mizuki'],
+    ['kirali', '煌Kirali'],
+  ]));
+
+  assert.deepEqual(result.workAssignments.get('work-kirali-cover'), [{
+    tag: 'source:original',
+    evidence: 'original artist matches streamer kirali',
+  }]);
+});
+
+test('attributes curated song language overrides before artist inference', () => {
+  const result = classifyCatalog([
+    song({ id: 'song-every-heart', workId: 'work-every-heart', title: 'Every Heart', originalArtist: 'BoA' }),
+    song({ id: 'song-only-one', workId: 'work-only-one', title: 'Only One', originalArtist: 'BoA' }),
+  ], [], new Map());
+
+  assert.deepEqual(result.performanceAssignments.get('perf-song-every-heart'), [{
+    tag: 'language:ja',
+    evidence: 'curated song language override: BoA — Every Heart',
+  }]);
+  assert.deepEqual(result.performanceAssignments.get('perf-song-only-one'), [{
+    tag: 'language:ko',
+    evidence: 'curated song language override: BoA — Only One',
+  }]);
+});
+
 test('assigns anime source only for an exact Apple track match', () => {
   const animeApple: AppleArtistLookup[] = [{
     artist: 'Anime Artist',
@@ -225,4 +261,56 @@ test('keeps note-specific rendition styles on their own performances', () => {
     result.performanceAssignments.get('perf-duet')?.map(({ tag }) => tag),
     ['language:en', 'style:duet'],
   );
+});
+
+test('reads a CJK title as Chinese even when its Latin subtitle is all English words', () => {
+  const result = classifyCatalog([
+    song({
+      id: 'song-beast',
+      workId: 'work-beast',
+      title: '美女與野獸 ( Beauty and the Beast )',
+      originalArtist: '田馥甄 & 井柏然',
+    }),
+  ], [], new Map());
+
+  assert.deepEqual(
+    result.performanceAssignments.get('perf-song-beast')?.map(({ tag }) => tag),
+    ['language:zh'],
+  );
+});
+
+test('matches a curated Vocaloid producer whose name NFKC-folds to a different string', () => {
+  const result = classifyCatalog([
+    song({ id: 'song-40m', workId: 'work-40m', title: 'からくりピエロ', originalArtist: '40㍍P' }),
+  ], [], new Map());
+
+  assert.equal(
+    result.workAssignments.get('work-40m')?.some(({ tag }) => tag === 'source:vocaloid') ?? false,
+    true,
+  );
+});
+
+test('treats a Taiwanese-language annotation as an explicit Chinese rendition', () => {
+  const result = classifyCatalog([
+    song({ id: 'song-taigi', workId: 'work-taigi', title: 'Let it go(台語版)', originalArtist: '柏慎' }),
+  ], [], new Map());
+
+  assert.deepEqual(
+    result.performanceAssignments.get('perf-song-taigi')?.map(({ tag }) => tag),
+    ['language:zh'],
+  );
+});
+
+test('refuses to call a CJK title English on the strength of its bracketed translation', () => {
+  const result = classifyCatalog([
+    song({
+      id: 'song-world',
+      workId: 'work-world',
+      title: '嚮往的世界 (Part Of Your World)',
+      originalArtist: '閻奕格',
+    }),
+  ], [], new Map());
+
+  const tags = result.performanceAssignments.get('perf-song-world')?.map(({ tag }) => tag) ?? [];
+  assert.equal(tags.includes('language:en'), false);
 });

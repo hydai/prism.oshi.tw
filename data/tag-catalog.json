@@ -11,9 +11,9 @@
     "totalSongs": 4993,
     "totalPerformances": 8541,
     "taggedWorks": 1417,
-    "taggedSongs": 3576,
-    "taggedPerformances": 6252,
-    "effectiveTaggedSongs": 3624,
+    "taggedSongs": 3571,
+    "taggedPerformances": 6247,
+    "effectiveTaggedSongs": 3621,
     "countsByTag": {
       "genre:folk": 55,
       "genre:jazz": 7,
@@ -21,13 +21,13 @@
       "genre:rap": 20,
       "genre:rnb": 13,
       "genre:rock": 231,
-      "language:en": 573,
+      "language:en": 564,
       "language:ja": 1736,
       "language:ko": 225,
-      "language:zh": 1036,
+      "language:zh": 1040,
       "source:anime": 2,
       "source:original": 80,
-      "source:vocaloid": 384,
+      "source:vocaloid": 394,
       "style:a-cappella": 12,
       "style:acoustic": 5,
       "style:duet": 3
@@ -165,7 +165,7 @@
         "source:original"
       ],
       "evidence": {
-        "source:original": "original artist matches streamer sakuro"
+        "source:original": "original artist matches streamer seki"
       }
     },
     {
@@ -187,7 +187,7 @@
         "source:original"
       ],
       "evidence": {
-        "source:original": "original artist matches streamer seki"
+        "source:original": "original artist matches streamer kirali"
       }
     },
     {
@@ -312,7 +312,7 @@
         "source:original"
       ],
       "evidence": {
-        "source:original": "original artist matches streamer mizuki"
+        "source:original": "original artist matches streamer sakuro"
       }
     },
     {
@@ -744,7 +744,7 @@
         "source:original"
       ],
       "evidence": {
-        "source:original": "original artist matches streamer mizuki"
+        "source:original": "original artist matches streamer hibiki"
       }
     },
     {
@@ -4670,10 +4670,12 @@
       "title": "トリノコシティ",
       "originalArtist": "40㍍P",
       "tags": [
-        "genre:pop"
+        "genre:pop",
+        "source:vocaloid"
       ],
       "evidence": {
-        "genre:pop": "Apple artist catalog genres: pop, anime"
+        "genre:pop": "Apple artist catalog genres: pop, anime",
+        "source:vocaloid": "curated Vocaloid producer: 40㍍p"
       }
     },
     {
@@ -4824,7 +4826,7 @@
         "source:original"
       ],
       "evidence": {
-        "source:original": "original artist matches streamer mizuki"
+        "source:original": "original artist matches streamer kirali"
       }
     },
     {
@@ -4962,7 +4964,7 @@
         "source:original"
       ],
       "evidence": {
-        "source:original": "original artist matches streamer mizuki"
+        "source:original": "original artist matches streamer rei"
       }
     },
     {
@@ -5343,10 +5345,12 @@
       "title": "恋愛裁判",
       "originalArtist": "40㍍P",
       "tags": [
-        "genre:pop"
+        "genre:pop",
+        "source:vocaloid"
       ],
       "evidence": {
-        "genre:pop": "Apple artist catalog genres: pop, anime"
+        "genre:pop": "Apple artist catalog genres: pop, anime",
+        "source:vocaloid": "curated Vocaloid producer: 40㍍p"
       }
     },
     {
@@ -5380,10 +5384,12 @@
       "title": "ドレミファロンド",
       "originalArtist": "40㍍P",
       "tags": [
-        "genre:pop"
+        "genre:pop",
+        "source:vocaloid"
       ],
       "evidence": {
-        "genre:pop": "Apple artist catalog genres: pop, anime"
+        "genre:pop": "Apple artist catalog genres: pop, anime",
+        "source:vocaloid": "curated Vocaloid producer: 40㍍p"
       }
     },
     {
@@ -5413,10 +5419,12 @@
       "title": "からくりピエロ",
       "originalArtist": "40㍍P",
       "tags": [
-        "genre:pop"
+        "genre:pop",
+        "source:vocaloid"
       ],
       "evidence": {
-        "genre:pop": "Apple artist catalog genres: pop, anime"
+        "genre:pop": "Apple artist catalog genres: pop, anime",
+        "source:vocaloid": "curated Vocaloid producer: 40㍍p"
       }
     },
     {
@@ -5505,10 +5513,12 @@
       "title": "雨音ノイズ",
       "originalArtist": "40㍍P",
       "tags": [
-        "genre:pop"
+        "genre:pop",
+        "source:vocaloid"
       ],
       "evidence": {
-        "genre:pop": "Apple artist catalog genres: pop, anime"
+        "genre:pop": "Apple artist catalog genres: pop, anime",
+        "source:vocaloid": "curated Vocaloid producer: 40㍍p"
       }
     },
     {
@@ -5552,7 +5562,7 @@
         "source:original"
       ],
       "evidence": {
-        "source:original": "original artist matches streamer mizuki"
+        "source:original": "original artist matches streamer koe"
       }
     },
     {
@@ -6438,7 +6448,7 @@
         "source:original"
       ],
       "evidence": {
-        "source:original": "original artist matches streamer mizuki"
+        "source:original": "original artist matches streamer rei"
       }
     },
     {
@@ -6746,10 +6756,12 @@
       "title": "夏恋花火",
       "originalArtist": "40㍍P",
       "tags": [
-        "genre:pop"
+        "genre:pop",
+        "source:vocaloid"
       ],
       "evidence": {
-        "genre:pop": "Apple artist catalog genres: pop, anime"
+        "genre:pop": "Apple artist catalog genres: pop, anime",
+        "source:vocaloid": "curated Vocaloid producer: 40㍍p"
       }
     },
     {
@@ -6784,7 +6796,7 @@
         "source:original"
       ],
       "evidence": {
-        "source:original": "original artist matches streamer mizuki"
+        "source:original": "original artist matches streamer hibiki"
       }
     },
     {
@@ -7009,10 +7021,12 @@
       "title": "フタリボシ",
       "originalArtist": "40㍍P",
       "tags": [
-        "genre:pop"
+        "genre:pop",
+        "source:vocaloid"
       ],
       "evidence": {
-        "genre:pop": "Apple artist catalog genres: pop, anime"
+        "genre:pop": "Apple artist catalog genres: pop, anime",
+        "source:vocaloid": "curated Vocaloid producer: 40㍍p"
       }
     },
     {
@@ -7045,7 +7059,7 @@
         "source:original"
       ],
       "evidence": {
-        "source:original": "original artist matches streamer mizuki"
+        "source:original": "original artist matches streamer sakuro"
       }
     },
     {
@@ -7056,7 +7070,7 @@
         "source:original"
       ],
       "evidence": {
-        "source:original": "original artist matches streamer mizuki"
+        "source:original": "original artist matches streamer seki"
       }
     },
     {
@@ -7137,7 +7151,7 @@
         "source:original"
       ],
       "evidence": {
-        "source:original": "original artist matches streamer hiyori"
+        "source:original": "original artist matches streamer rei"
       }
     },
     {
@@ -7892,7 +7906,7 @@
         "source:original"
       ],
       "evidence": {
-        "source:original": "original artist matches streamer mizuki"
+        "source:original": "original artist matches streamer rei"
       }
     },
     {
@@ -7903,7 +7917,7 @@
         "source:original"
       ],
       "evidence": {
-        "source:original": "original artist matches streamer mizuki"
+        "source:original": "original artist matches streamer hibiki"
       }
     },
     {
@@ -8017,7 +8031,7 @@
         "source:original"
       ],
       "evidence": {
-        "source:original": "original artist matches streamer mizuki"
+        "source:original": "original artist matches streamer kirali"
       }
     },
     {
@@ -8243,7 +8257,7 @@
         "source:original"
       ],
       "evidence": {
-        "source:original": "original artist matches streamer seki"
+        "source:original": "original artist matches streamer kirali"
       }
     },
     {
@@ -8612,10 +8626,12 @@
       "title": "名前のない星",
       "originalArtist": "40㍍P",
       "tags": [
-        "genre:pop"
+        "genre:pop",
+        "source:vocaloid"
       ],
       "evidence": {
-        "genre:pop": "Apple artist catalog genres: pop, anime"
+        "genre:pop": "Apple artist catalog genres: pop, anime",
+        "source:vocaloid": "curated Vocaloid producer: 40㍍p"
       }
     },
     {
@@ -8659,7 +8675,7 @@
         "source:original"
       ],
       "evidence": {
-        "source:original": "original artist matches streamer mizuki"
+        "source:original": "original artist matches streamer rei"
       }
     },
     {
@@ -8926,10 +8942,12 @@
       "title": "Snow Fairy Story",
       "originalArtist": "40㍍P",
       "tags": [
-        "genre:pop"
+        "genre:pop",
+        "source:vocaloid"
       ],
       "evidence": {
-        "genre:pop": "Apple artist catalog genres: pop, anime"
+        "genre:pop": "Apple artist catalog genres: pop, anime",
+        "source:vocaloid": "curated Vocaloid producer: 40㍍p"
       }
     },
     {
@@ -8948,10 +8966,12 @@
       "title": "人生に拍手喝采を",
       "originalArtist": "40㍍P",
       "tags": [
-        "genre:pop"
+        "genre:pop",
+        "source:vocaloid"
       ],
       "evidence": {
-        "genre:pop": "Apple artist catalog genres: pop, anime"
+        "genre:pop": "Apple artist catalog genres: pop, anime",
+        "source:vocaloid": "curated Vocaloid producer: 40㍍p"
       }
     },
     {
@@ -10298,7 +10318,7 @@
         "source:original"
       ],
       "evidence": {
-        "source:original": "original artist matches streamer mizuki"
+        "source:original": "original artist matches streamer rei"
       }
     },
     {
@@ -11267,7 +11287,7 @@
         "source:original"
       ],
       "evidence": {
-        "source:original": "original artist matches streamer itsuki"
+        "source:original": "original artist matches streamer kirali"
       }
     },
     {
@@ -11777,7 +11797,7 @@
         "source:original"
       ],
       "evidence": {
-        "source:original": "original artist matches streamer hitomi"
+        "source:original": "original artist matches streamer hiyori"
       }
     },
     {
@@ -12253,7 +12273,7 @@
         "source:original"
       ],
       "evidence": {
-        "source:original": "original artist matches streamer earendel"
+        "source:original": "original artist matches streamer kirali"
       }
     },
     {
@@ -12817,7 +12837,7 @@
         "source:original"
       ],
       "evidence": {
-        "source:original": "original artist matches streamer sakuro"
+        "source:original": "original artist matches streamer seki"
       }
     },
     {
@@ -13752,7 +13772,7 @@
         "source:original"
       ],
       "evidence": {
-        "source:original": "original artist matches streamer kirali"
+        "source:original": "original artist matches streamer sakuro"
       }
     },
     {
@@ -14109,7 +14129,7 @@
         "source:original"
       ],
       "evidence": {
-        "source:original": "original artist matches streamer earendel"
+        "source:original": "original artist matches streamer kirali"
       }
     },
     {
@@ -14844,7 +14864,7 @@
         "source:original"
       ],
       "evidence": {
-        "source:original": "original artist matches streamer seki"
+        "source:original": "original artist matches streamer sakuro"
       }
     },
     {
@@ -16304,7 +16324,7 @@
         "source:original"
       ],
       "evidence": {
-        "source:original": "original artist matches streamer seki"
+        "source:original": "original artist matches streamer kirali"
       }
     },
     {
@@ -17997,20 +18017,6 @@
       ],
       "evidence": {
         "language:zh": "curated or catalog-derived artist language: 煌Kirali"
-      }
-    },
-    {
-      "id": "p-0e6b89b9",
-      "songId": "song-e4c1bc66",
-      "workId": "work-song-96471ecf",
-      "streamer": "kirali",
-      "title": "陪你 Stay with you",
-      "originalArtist": "朔Sakuro",
-      "tags": [
-        "language:en"
-      ],
-      "evidence": {
-        "language:en": "high-confidence title vocabulary or script"
       }
     },
     {
@@ -20975,10 +20981,10 @@
       "title": "夏夢 Summer dream",
       "originalArtist": "汐Seki ft.澪Rei 橙Yuzumi",
       "tags": [
-        "language:en"
+        "language:zh"
       ],
       "evidence": {
-        "language:en": "high-confidence title vocabulary or script"
+        "language:zh": "high-confidence title vocabulary or script"
       }
     },
     {
@@ -32146,20 +32152,6 @@
       }
     },
     {
-      "id": "p-760cc8fe",
-      "songId": "song-d1129102",
-      "workId": "work-song-d1129102",
-      "streamer": "seki",
-      "title": "Stay With Me - 鬼怪",
-      "originalArtist": "CHANYEOL & PUNCH",
-      "tags": [
-        "language:en"
-      ],
-      "evidence": {
-        "language:en": "high-confidence title vocabulary or script"
-      }
-    },
-    {
       "id": "p-76402f93",
       "songId": "song-1701",
       "workId": "work-song-1701",
@@ -33564,20 +33556,6 @@
       }
     },
     {
-      "id": "p-80c46ccd",
-      "songId": "song-96471ecf",
-      "workId": "work-song-96471ecf",
-      "streamer": "sakuro",
-      "title": "陪你 Stay with you",
-      "originalArtist": "朔Sakuro",
-      "tags": [
-        "language:en"
-      ],
-      "evidence": {
-        "language:en": "high-confidence title vocabulary or script"
-      }
-    },
-    {
       "id": "p-80dd858e",
       "songId": "song-20a94e77",
       "workId": "work-song-20a94e77",
@@ -33854,7 +33832,7 @@
         "language:ko"
       ],
       "evidence": {
-        "language:ko": "curated or catalog-derived artist language: BoA"
+        "language:ko": "curated song language override: BoA — Only One"
       }
     },
     {
@@ -34975,20 +34953,6 @@
       ],
       "evidence": {
         "language:ko": "curated or catalog-derived artist language: Girls' Generation"
-      }
-    },
-    {
-      "id": "p-8abaafc4",
-      "songId": "song-372cea11",
-      "workId": "work-song-372cea11",
-      "streamer": "itsuki",
-      "title": "人樣 Love Me Like A Liar",
-      "originalArtist": "孫盛希 Shi Shi",
-      "tags": [
-        "language:en"
-      ],
-      "evidence": {
-        "language:en": "high-confidence title vocabulary or script"
       }
     },
     {
@@ -46380,7 +46344,7 @@
         "language:ja"
       ],
       "evidence": {
-        "language:ja": "curated or catalog-derived artist language: BoA"
+        "language:ja": "curated song language override: BoA — Every Heart"
       }
     },
     {
@@ -81278,20 +81242,6 @@
       }
     },
     {
-      "id": "p2693-1",
-      "songId": "song-2693",
-      "workId": "work-song-2693",
-      "streamer": "mizuki",
-      "title": "嚮往的世界 (Part Of Your World)",
-      "originalArtist": "閻奕格",
-      "tags": [
-        "language:en"
-      ],
-      "evidence": {
-        "language:en": "high-confidence title vocabulary or script"
-      }
-    },
-    {
       "id": "p2694-1",
       "songId": "song-2694",
       "workId": "work-song-2694",
@@ -81299,10 +81249,10 @@
       "title": "美女與野獸 ( Beauty and the Beast )",
       "originalArtist": "田馥甄 & 井柏然",
       "tags": [
-        "language:en"
+        "language:zh"
       ],
       "evidence": {
-        "language:en": "high-confidence title vocabulary or script"
+        "language:zh": "high-confidence title vocabulary or script"
       }
     },
     {
@@ -83455,10 +83405,10 @@
       "title": "戀夏 Summer",
       "originalArtist": "霓NEO(n)",
       "tags": [
-        "language:en"
+        "language:zh"
       ],
       "evidence": {
-        "language:en": "high-confidence title vocabulary or script"
+        "language:zh": "high-confidence title vocabulary or script"
       }
     },
     {
@@ -90721,10 +90671,10 @@
       "title": "Let it go(台語版)",
       "originalArtist": "柏慎",
       "tags": [
-        "language:en"
+        "language:zh"
       ],
       "evidence": {
-        "language:en": "high-confidence title vocabulary or script"
+        "language:zh": "explicit language annotation in title or performance note"
       }
     },
     {
