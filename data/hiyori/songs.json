@@ -80,6 +80,38 @@
     ]
   },
   {
+    "id": "song-a8ec146f",
+    "workId": "work-ab3e09b0-6631-4ebc-8d6f-ed4547cc43ba",
+    "title": "江南",
+    "originalArtist": "林俊傑",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-63ff1a1f",
+        "streamId": "stream-2026-08-02",
+        "videoId": "X3tkaTac5VI",
+        "timestamp": 5605,
+        "endTimestamp": 5873
+      }
+    ]
+  },
+  {
+    "id": "song-aa7df071",
+    "workId": "work-song-8a6dc748",
+    "title": "至少還有你",
+    "originalArtist": "林憶蓮",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-95094adb",
+        "streamId": "stream-2026-08-02",
+        "videoId": "X3tkaTac5VI",
+        "timestamp": 4554,
+        "endTimestamp": 4829
+      }
+    ]
+  },
+  {
     "id": "song-b3c05060",
     "workId": "work-song-100",
     "title": "血腥愛情故事",
@@ -92,6 +124,22 @@
         "videoId": "OwNrtFg5Y1Q",
         "timestamp": 3890,
         "endTimestamp": 4149
+      }
+    ]
+  },
+  {
+    "id": "song-947276cb",
+    "workId": "work-song-9d48f080",
+    "title": "忘記擁抱",
+    "originalArtist": "A-Lin",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-d6242915",
+        "streamId": "stream-2026-08-02",
+        "videoId": "X3tkaTac5VI",
+        "timestamp": 6166,
+        "endTimestamp": 6448
       }
     ]
   },
@@ -144,6 +192,22 @@
     ]
   },
   {
+    "id": "song-4577aec1",
+    "workId": "work-song-cb28131a",
+    "title": "孤單心事",
+    "originalArtist": "藍又時",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-459ac551",
+        "streamId": "stream-2026-08-02",
+        "videoId": "X3tkaTac5VI",
+        "timestamp": 2622,
+        "endTimestamp": 2875
+      }
+    ]
+  },
+  {
     "id": "song-065d3a79",
     "workId": "work-song-006cfcd3",
     "title": "怪物",
@@ -156,6 +220,22 @@
         "videoId": "OwNrtFg5Y1Q",
         "timestamp": 5040,
         "endTimestamp": 5242
+      }
+    ]
+  },
+  {
+    "id": "song-516a782a",
+    "workId": "work-0c543ed5-9814-4b46-8fd3-c65fb7568445",
+    "title": "房間",
+    "originalArtist": "劉瑞琦",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-4470c3a4",
+        "streamId": "stream-2026-08-02",
+        "videoId": "X3tkaTac5VI",
+        "timestamp": 7119,
+        "endTimestamp": 7361
       }
     ]
   },
@@ -188,6 +268,22 @@
         "videoId": "b6m1VSTGQq0",
         "timestamp": 6483,
         "endTimestamp": 6743
+      }
+    ]
+  },
+  {
+    "id": "song-cd3c3873",
+    "workId": "work-song-768aea11",
+    "title": "背對背擁抱",
+    "originalArtist": "林俊傑",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-c7f7f91c",
+        "streamId": "stream-2026-08-02",
+        "videoId": "X3tkaTac5VI",
+        "timestamp": 3930,
+        "endTimestamp": 4165
       }
     ]
   },
@@ -236,6 +332,22 @@
         "videoId": "b6m1VSTGQq0",
         "timestamp": 4952,
         "endTimestamp": 5205
+      }
+    ]
+  },
+  {
+    "id": "song-117249da",
+    "workId": "work-song-295",
+    "title": "荒唐",
+    "originalArtist": "A-Lin",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-44abffc3",
+        "streamId": "stream-2026-08-02",
+        "videoId": "X3tkaTac5VI",
+        "timestamp": 6632,
+        "endTimestamp": 6880
       }
     ]
   },
@@ -368,6 +480,22 @@
     ]
   },
   {
+    "id": "song-926f003c",
+    "workId": "work-song-90c2179b",
+    "title": "想自由",
+    "originalArtist": "林宥嘉",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-3ec52895",
+        "streamId": "stream-2026-08-02",
+        "videoId": "X3tkaTac5VI",
+        "timestamp": 3146,
+        "endTimestamp": 3428
+      }
+    ]
+  },
+  {
     "id": "song-628c1f46",
     "workId": "work-song-4fc49677",
     "title": "愛你",
@@ -380,6 +508,22 @@
         "videoId": "VnHAACcjZ10",
         "timestamp": 3232,
         "endTimestamp": 3447
+      }
+    ]
+  },
+  {
+    "id": "song-d6823cb5",
+    "workId": "work-30659aa6-59ae-4be3-b118-71535a9b81ae",
+    "title": "愛我的時候",
+    "originalArtist": "周興哲 & 單依純",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-aec3d668",
+        "streamId": "stream-2026-08-02",
+        "videoId": "X3tkaTac5VI",
+        "timestamp": 1437,
+        "endTimestamp": 1661
       }
     ]
   },
@@ -432,6 +576,22 @@
     ]
   },
   {
+    "id": "song-f02f3281",
+    "workId": "work-song-1153",
+    "title": "慢慢喜歡你",
+    "originalArtist": "莫文蔚",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-66bf2c2b",
+        "streamId": "stream-2026-08-02",
+        "videoId": "X3tkaTac5VI",
+        "timestamp": 2122,
+        "endTimestamp": 2343
+      }
+    ]
+  },
+  {
     "id": "song-c2b6954f",
     "workId": "work-song-c2b6954f",
     "title": "說愛你",
@@ -460,6 +620,22 @@
         "videoId": "VnHAACcjZ10",
         "timestamp": 5790,
         "endTimestamp": 6043
+      }
+    ]
+  },
+  {
+    "id": "song-7af8206f",
+    "workId": "work-22f9e8b2-8245-48c3-a233-5e93844a97f2",
+    "title": "變成陌生人",
+    "originalArtist": "王心凌",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-e6c70093",
+        "streamId": "stream-2026-08-02",
+        "videoId": "X3tkaTac5VI",
+        "timestamp": 4976,
+        "endTimestamp": 5245
       }
     ]
   },
@@ -572,6 +748,22 @@
         "videoId": "fsZQmluUmMI",
         "timestamp": 8233,
         "endTimestamp": 8429
+      }
+    ]
+  },
+  {
+    "id": "song-c3216cea",
+    "workId": "work-song-3b1a26ea",
+    "title": "Letting Go",
+    "originalArtist": "蔡健雅",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-27deed98",
+        "streamId": "stream-2026-08-02",
+        "videoId": "X3tkaTac5VI",
+        "timestamp": 745,
+        "endTimestamp": 1008
       }
     ]
   },
