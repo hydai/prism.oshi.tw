@@ -1,1 +1,2071 @@
-[]
+[
+  {
+    "id": "song-1460afeb",
+    "workId": "work-song-2389",
+    "title": "大眠",
+    "originalArtist": "王心凌",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-7e4cb8cb",
+        "streamId": "stream-2026-06-26",
+        "videoId": "6TttY4i1LdM",
+        "timestamp": 5629,
+        "endTimestamp": 5869
+      }
+    ]
+  },
+  {
+    "id": "song-c2e764f4",
+    "workId": "work-song-1337",
+    "title": "小半",
+    "originalArtist": "陳粒",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-d9b671b6",
+        "streamId": "stream-2026-06-21",
+        "videoId": "RKyK4n9s0w4",
+        "timestamp": 1812,
+        "endTimestamp": 2109
+      }
+    ]
+  },
+  {
+    "id": "song-c2204aeb",
+    "workId": "work-3025a0d0-69c3-4901-af3f-520fc9535f84",
+    "title": "山頂黑狗兄",
+    "originalArtist": "洪一峰",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-4f99d5f9",
+        "streamId": "stream-2026-07-03",
+        "videoId": "le5J7nIHeHQ",
+        "timestamp": 4830,
+        "endTimestamp": 5101
+      }
+    ]
+  },
+  {
+    "id": "song-9eb7f6fb",
+    "workId": "work-b35e5cdb-9d37-4766-9618-fccb26a8d1db",
+    "title": "不哭",
+    "originalArtist": "王心凌",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-9e13fbc6",
+        "streamId": "stream-2026-06-26",
+        "videoId": "6TttY4i1LdM",
+        "timestamp": 4436,
+        "endTimestamp": 4696
+      }
+    ]
+  },
+  {
+    "id": "song-01807568",
+    "workId": "work-song-50afc100",
+    "title": "五天幾年",
+    "originalArtist": "林凡",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-0beffe53",
+        "streamId": "stream-2026-07-26",
+        "videoId": "u6TFpV4a9oI",
+        "timestamp": 8156,
+        "endTimestamp": 8392
+      }
+    ]
+  },
+  {
+    "id": "song-ae432544",
+    "workId": "work-c51e59fd-3fa6-49b9-84df-7a21e454355e",
+    "title": "天真有邪",
+    "originalArtist": "林宥嘉",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-9f6a523b",
+        "streamId": "stream-2026-06-21",
+        "videoId": "RKyK4n9s0w4",
+        "timestamp": 2553,
+        "endTimestamp": 2883
+      }
+    ]
+  },
+  {
+    "id": "song-a0b36911",
+    "workId": "work-e88873ac-55be-403a-95c6-253511bb9dcc",
+    "title": "左邊的人",
+    "originalArtist": "Unknown",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-4f6d4a47",
+        "streamId": "stream-2026-06-13",
+        "videoId": "hKF46hExo5E",
+        "timestamp": 3777,
+        "endTimestamp": 3986
+      }
+    ]
+  },
+  {
+    "id": "song-4e45f200",
+    "workId": "work-f611314f-80fb-41a4-9178-c0cb9b4e6e79",
+    "title": "再會啦心愛的無緣的人",
+    "originalArtist": "江蕙",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-59bb43a0",
+        "streamId": "stream-2026-07-03",
+        "videoId": "le5J7nIHeHQ",
+        "timestamp": 9816,
+        "endTimestamp": 10069
+      }
+    ]
+  },
+  {
+    "id": "song-a1fb747b",
+    "workId": "work-song-1943",
+    "title": "安九",
+    "originalArtist": "老王樂隊",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-7f152237",
+        "streamId": "stream-2026-07-12",
+        "videoId": "OLCY5inzZvg",
+        "timestamp": 10555,
+        "endTimestamp": 10941
+      }
+    ]
+  },
+  {
+    "id": "song-82354887",
+    "workId": "work-song-15b9d7de",
+    "title": "年輪說",
+    "originalArtist": "楊丞琳",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-5f91b767",
+        "streamId": "stream-2026-06-21",
+        "videoId": "RKyK4n9s0w4",
+        "timestamp": 3707,
+        "endTimestamp": 3973
+      }
+    ]
+  },
+  {
+    "id": "song-1d84807a",
+    "workId": "work-80e1c96e-eb6a-453d-b169-6ffa17aec539",
+    "title": "次回予告",
+    "originalArtist": "キタニタツヤ",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-d21b019f",
+        "streamId": "stream-2026-06-21",
+        "videoId": "RKyK4n9s0w4",
+        "timestamp": 6221,
+        "endTimestamp": 6426
+      }
+    ]
+  },
+  {
+    "id": "song-1c567dc3",
+    "workId": "work-20bd9149-f6b1-4206-a2b7-df3fd4da3b14",
+    "title": "死ぬな！（練習）",
+    "originalArtist": "こっちのけんと",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-f3c114ae",
+        "streamId": "stream-2026-07-12",
+        "videoId": "OLCY5inzZvg",
+        "timestamp": 3066,
+        "endTimestamp": 3274
+      }
+    ]
+  },
+  {
+    "id": "song-e57f8e70",
+    "workId": "work-song-361",
+    "title": "自然醒",
+    "originalArtist": "林宥嘉",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-9819c3f9",
+        "streamId": "stream-2026-06-21",
+        "videoId": "RKyK4n9s0w4",
+        "timestamp": 4165,
+        "endTimestamp": 4410
+      }
+    ]
+  },
+  {
+    "id": "song-92a663a4",
+    "workId": "work-bfb27067-33e5-479b-b048-3b643b258fe7",
+    "title": "你是我的花朵",
+    "originalArtist": "伍佰",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-0b1baac9",
+        "streamId": "stream-2026-07-12",
+        "videoId": "OLCY5inzZvg",
+        "timestamp": 7941,
+        "endTimestamp": 8143
+      }
+    ]
+  },
+  {
+    "id": "song-d44651d2",
+    "workId": "work-5f79e4c8-7d45-43fc-b8f4-d6d9a2f52581",
+    "title": "你是我的眼",
+    "originalArtist": "蕭煌奇",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-9d057595",
+        "streamId": "stream-2026-06-21",
+        "videoId": "RKyK4n9s0w4",
+        "timestamp": 5204,
+        "endTimestamp": 5525
+      }
+    ]
+  },
+  {
+    "id": "song-f3b5d394",
+    "workId": "work-fa2128d0-6c78-4590-b0a8-a373dd262884",
+    "title": "你要的愛",
+    "originalArtist": "戴佩妮",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-6670feeb",
+        "streamId": "stream-2026-06-26",
+        "videoId": "6TttY4i1LdM",
+        "timestamp": 1377,
+        "endTimestamp": 1638
+      }
+    ]
+  },
+  {
+    "id": "song-8d7ee3f0",
+    "workId": "work-94cc1521-ce9e-4235-8961-bee08f2ffa64",
+    "title": "你攏無咧看",
+    "originalArtist": "蕭煌奇",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-6d72de16",
+        "streamId": "stream-2026-07-12",
+        "videoId": "OLCY5inzZvg",
+        "timestamp": 4655,
+        "endTimestamp": 4854
+      },
+      {
+        "id": "p-436664d0",
+        "streamId": "stream-2026-06-21",
+        "videoId": "RKyK4n9s0w4",
+        "timestamp": 4674,
+        "endTimestamp": 4873
+      }
+    ]
+  },
+  {
+    "id": "song-011bcc99",
+    "workId": "work-song-fd4a929e",
+    "title": "含淚跳恰恰",
+    "originalArtist": "謝金燕",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-05190c67",
+        "streamId": "stream-2026-07-03",
+        "videoId": "le5J7nIHeHQ",
+        "timestamp": 3249,
+        "endTimestamp": 3453
+      }
+    ]
+  },
+  {
+    "id": "song-ede3ea86",
+    "workId": "work-c7f5efcf-8b00-4c76-ad9e-0fc63576303d",
+    "title": "我的心裡只有你沒有他",
+    "originalArtist": "黃小琥",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-1e4971de",
+        "streamId": "stream-2026-07-12",
+        "videoId": "OLCY5inzZvg",
+        "timestamp": 9381,
+        "endTimestamp": 9602
+      }
+    ]
+  },
+  {
+    "id": "song-4b12bcc2",
+    "workId": "work-59dce3ba-aaf2-436c-9820-de10ccab4042",
+    "title": "我的心裡只有你沒有他（搖保健食品版）",
+    "originalArtist": "黃小琥",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-7b10398d",
+        "streamId": "stream-2026-07-12",
+        "videoId": "OLCY5inzZvg",
+        "timestamp": 9686,
+        "endTimestamp": 9930
+      }
+    ]
+  },
+  {
+    "id": "song-e16e13f5",
+    "workId": "work-1912c023-a160-4ab9-a134-554aab7bc4bf",
+    "title": "我的秘密",
+    "originalArtist": "鄧紫棋",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-759fe3da",
+        "streamId": "stream-2026-06-26",
+        "videoId": "6TttY4i1LdM",
+        "timestamp": 2454,
+        "endTimestamp": 2704
+      }
+    ]
+  },
+  {
+    "id": "song-9459732b",
+    "workId": "work-song-546",
+    "title": "我還年輕我還年輕",
+    "originalArtist": "老王樂隊",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-03afe4b7",
+        "streamId": "stream-2026-07-12",
+        "videoId": "OLCY5inzZvg",
+        "timestamp": 9956,
+        "endTimestamp": 10304
+      }
+    ]
+  },
+  {
+    "id": "song-e48047b7",
+    "workId": "work-song-1d73ad7a",
+    "title": "求救訊號",
+    "originalArtist": "Vast & Hazy",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-ba19e1c3",
+        "streamId": "stream-2026-07-26",
+        "videoId": "u6TFpV4a9oI",
+        "timestamp": 5172,
+        "endTimestamp": 5430
+      },
+      {
+        "id": "p-b56a0bf5",
+        "streamId": "stream-2026-06-26",
+        "videoId": "6TttY4i1LdM",
+        "timestamp": 7985,
+        "endTimestamp": 8243
+      }
+    ]
+  },
+  {
+    "id": "song-f3aa4c0f",
+    "workId": "work-a9a4524e-fa63-41f3-a3a4-795850b791be",
+    "title": "走馬燈",
+    "originalArtist": "陳小雲",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-2423a98e",
+        "streamId": "stream-2026-07-03",
+        "videoId": "le5J7nIHeHQ",
+        "timestamp": 5186,
+        "endTimestamp": 5483
+      }
+    ]
+  },
+  {
+    "id": "song-1e057a44",
+    "workId": "work-song-2023",
+    "title": "玫瑰少年",
+    "originalArtist": "蔡依林",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-ee57d2d2",
+        "streamId": "stream-2026-06-21",
+        "videoId": "RKyK4n9s0w4",
+        "timestamp": 10116,
+        "endTimestamp": 10311
+      }
+    ]
+  },
+  {
+    "id": "song-fa840d0f",
+    "workId": "work-69fb152b-d548-4c2e-9c5b-e9cdd9895f0c",
+    "title": "雨夜花 (清唱)",
+    "originalArtist": "秀蘭瑪雅",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-a3817c90",
+        "streamId": "stream-2026-06-21",
+        "videoId": "RKyK4n9s0w4",
+        "timestamp": 3123,
+        "endTimestamp": 3367
+      }
+    ]
+  },
+  {
+    "id": "song-d9e1f878",
+    "workId": "work-868ddb2e-936e-4abc-b07b-cf54e3304e58",
+    "title": "非常女",
+    "originalArtist": "黃妃",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-319d738f",
+        "streamId": "stream-2026-07-03",
+        "videoId": "le5J7nIHeHQ",
+        "timestamp": 2508,
+        "endTimestamp": 2733
+      }
+    ]
+  },
+  {
+    "id": "song-285d4dea",
+    "workId": "work-7a49187e-de38-4ed3-b259-9c666e69537d",
+    "title": "思念你的心肝你敢知",
+    "originalArtist": "曾心梅",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-1008ed17",
+        "streamId": "stream-2026-07-03",
+        "videoId": "le5J7nIHeHQ",
+        "timestamp": 8452,
+        "endTimestamp": 8747
+      }
+    ]
+  },
+  {
+    "id": "song-0a0cd514",
+    "workId": "work-song-a101cb49",
+    "title": "指望",
+    "originalArtist": "郁可唯",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-e1aaac71",
+        "streamId": "stream-2026-06-26",
+        "videoId": "6TttY4i1LdM",
+        "timestamp": 3520,
+        "endTimestamp": 3759
+      }
+    ]
+  },
+  {
+    "id": "song-a472e4cc",
+    "workId": "work-a01271d9-7cdf-438e-bf9a-4bc9b20f62ca",
+    "title": "星期三或禮拜三",
+    "originalArtist": "Unknown",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-a9b617cb",
+        "streamId": "stream-2026-06-13",
+        "videoId": "hKF46hExo5E",
+        "timestamp": 2433,
+        "endTimestamp": 2694
+      }
+    ]
+  },
+  {
+    "id": "song-c2270f24",
+    "workId": "work-song-6dc769fc",
+    "title": "星の消えた夜に",
+    "originalArtist": "Aimer",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-83e45bd9",
+        "streamId": "stream-2026-07-26",
+        "videoId": "u6TFpV4a9oI",
+        "timestamp": 4229,
+        "endTimestamp": 4585
+      }
+    ]
+  },
+  {
+    "id": "song-84bb1ced",
+    "workId": "work-2bc9dc87-5589-4845-8640-62ae1a9b030a",
+    "title": "查某囡仔",
+    "originalArtist": "李千娜",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-1e10b789",
+        "streamId": "stream-2026-06-26",
+        "videoId": "6TttY4i1LdM",
+        "timestamp": 6409,
+        "endTimestamp": 6708
+      }
+    ]
+  },
+  {
+    "id": "song-02a4e2e3",
+    "workId": "work-song-2403",
+    "title": "美好的事可不可以發生在我身上",
+    "originalArtist": "康士坦的變化球",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-4437f42b",
+        "streamId": "stream-2026-07-26",
+        "videoId": "u6TFpV4a9oI",
+        "timestamp": 7361,
+        "endTimestamp": 7724
+      }
+    ]
+  },
+  {
+    "id": "song-26be5c0f",
+    "workId": "work-24e51d98-a136-48ac-a563-271400a4dec8",
+    "title": "苦海女神龍",
+    "originalArtist": "李翊君",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-8739b74f",
+        "streamId": "stream-2026-07-03",
+        "videoId": "le5J7nIHeHQ",
+        "timestamp": 5891,
+        "endTimestamp": 6139
+      }
+    ]
+  },
+  {
+    "id": "song-e4238b54",
+    "workId": "work-a0e119de-bc88-4d11-b02e-7dde4262e865",
+    "title": "重出江湖",
+    "originalArtist": "袁小迪",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-b2d3641c",
+        "streamId": "stream-2026-07-03",
+        "videoId": "le5J7nIHeHQ",
+        "timestamp": 8212,
+        "endTimestamp": 8416
+      }
+    ]
+  },
+  {
+    "id": "song-ea6f3016",
+    "workId": "work-19196161-6d1e-40e9-89d1-6fcf6b4a99f3",
+    "title": "飛鳥和蟬",
+    "originalArtist": "Unknown",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-dbe71090",
+        "streamId": "stream-2026-06-13",
+        "videoId": "hKF46hExo5E",
+        "timestamp": 11498,
+        "endTimestamp": 11788
+      }
+    ]
+  },
+  {
+    "id": "song-f239d87a",
+    "workId": "work-46d20b16-87be-486a-9a01-404a4eb45c1c",
+    "title": "飛龍在天",
+    "originalArtist": "江宏恩 & 賈靜雯 & 黃少祺 & 張鳳書",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-b1705faa",
+        "streamId": "stream-2026-07-03",
+        "videoId": "le5J7nIHeHQ",
+        "timestamp": 9503,
+        "endTimestamp": 9705
+      }
+    ]
+  },
+  {
+    "id": "song-8494b2ad",
+    "workId": "work-song-4aaebd44",
+    "title": "家後",
+    "originalArtist": "江蕙",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-be488b9d",
+        "streamId": "stream-2026-07-03",
+        "videoId": "le5J7nIHeHQ",
+        "timestamp": 5475,
+        "endTimestamp": 5728
+      }
+    ]
+  },
+  {
+    "id": "song-2c8e6dcf",
+    "workId": "work-song-2c567618",
+    "title": "浪流連",
+    "originalArtist": "茄子蛋",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-e6a391e9",
+        "streamId": "stream-2026-06-26",
+        "videoId": "6TttY4i1LdM",
+        "timestamp": 5924,
+        "endTimestamp": 6177
+      }
+    ]
+  },
+  {
+    "id": "song-10b3dd7d",
+    "workId": "work-ce391b08-a039-4deb-a5e9-4f27922c908b",
+    "title": "海波浪",
+    "originalArtist": "郭桂彬 & 黃乙玲",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-fd8c0c5f",
+        "streamId": "stream-2026-07-03",
+        "videoId": "le5J7nIHeHQ",
+        "timestamp": 8764,
+        "endTimestamp": 9035
+      }
+    ]
+  },
+  {
+    "id": "song-6b56b777",
+    "workId": "work-9c76f205-1f9e-42a1-8a47-941a7775d042",
+    "title": "秘密",
+    "originalArtist": "藍又時",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-8582beb9",
+        "streamId": "stream-2026-06-26",
+        "videoId": "6TttY4i1LdM",
+        "timestamp": 3967,
+        "endTimestamp": 4275
+      }
+    ]
+  },
+  {
+    "id": "song-217ec358",
+    "workId": "work-song-03a0f792",
+    "title": "追追追",
+    "originalArtist": "黃妃",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-c4eaf77a",
+        "streamId": "stream-2026-07-03",
+        "videoId": "le5J7nIHeHQ",
+        "timestamp": 1460,
+        "endTimestamp": 1701
+      }
+    ]
+  },
+  {
+    "id": "song-0a9c9d7e",
+    "workId": "work-b68f0e52-1f60-422f-939d-f61d59c9a49d",
+    "title": "逆夢",
+    "originalArtist": "King Gnu",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-9b2b14e6",
+        "streamId": "stream-2026-06-21",
+        "videoId": "RKyK4n9s0w4",
+        "timestamp": 5769,
+        "endTimestamp": 6077
+      }
+    ]
+  },
+  {
+    "id": "song-a10839b6",
+    "workId": "work-song-216",
+    "title": "兜圈",
+    "originalArtist": "林宥嘉",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-37224632",
+        "streamId": "stream-2026-06-21",
+        "videoId": "RKyK4n9s0w4",
+        "timestamp": 10351,
+        "endTimestamp": 10596
+      }
+    ]
+  },
+  {
+    "id": "song-552d28d7",
+    "workId": "work-ad12eddd-fff3-4f97-acf3-fe6b223c71af",
+    "title": "捨不得的時刻",
+    "originalArtist": "陳華",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-74b00523",
+        "streamId": "stream-2026-07-26",
+        "videoId": "u6TFpV4a9oI",
+        "timestamp": 6054,
+        "endTimestamp": 6295
+      }
+    ]
+  },
+  {
+    "id": "song-8d2b95f3",
+    "workId": "work-song-2104",
+    "title": "晚餐歌",
+    "originalArtist": "tuki.",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-0e960556",
+        "streamId": "stream-2026-07-26",
+        "videoId": "u6TFpV4a9oI",
+        "timestamp": 8427,
+        "endTimestamp": 8643
+      }
+    ]
+  },
+  {
+    "id": "song-6e48c72b",
+    "workId": "work-22457d03-6d8f-443c-a9ba-2479a3ba16a9",
+    "title": "第三惑星",
+    "originalArtist": "tuki.",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-89cb43a4",
+        "streamId": "stream-2026-07-26",
+        "videoId": "u6TFpV4a9oI",
+        "timestamp": 1288,
+        "endTimestamp": 1475
+      }
+    ]
+  },
+  {
+    "id": "song-c24d1690",
+    "workId": "work-25f0b9ec-dff7-4f49-a045-30f80083ab8e",
+    "title": "酔いどれ知らず",
+    "originalArtist": "Unknown",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-670ea13c",
+        "streamId": "stream-2026-06-13",
+        "videoId": "hKF46hExo5E",
+        "timestamp": 10856,
+        "endTimestamp": 10982
+      }
+    ]
+  },
+  {
+    "id": "song-d9118d29",
+    "workId": "work-6c9f1369-3aa9-4eb0-8195-4d66bfdbba95",
+    "title": "雪中紅",
+    "originalArtist": "王識賢 & 陳亮吟",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-f6617e2e",
+        "streamId": "stream-2026-07-03",
+        "videoId": "le5J7nIHeHQ",
+        "timestamp": 4417,
+        "endTimestamp": 4656
+      }
+    ]
+  },
+  {
+    "id": "song-97afbdeb",
+    "workId": "work-f36f04d6-7d4a-44c1-b14e-156f8076bfeb",
+    "title": "最後一次哭",
+    "originalArtist": "曾沛慈",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-10f4fc0b",
+        "streamId": "stream-2026-07-26",
+        "videoId": "u6TFpV4a9oI",
+        "timestamp": 3315,
+        "endTimestamp": 3529
+      }
+    ]
+  },
+  {
+    "id": "song-eb22b09f",
+    "workId": "work-song-66ebee9f",
+    "title": "晴る",
+    "originalArtist": "Unknown",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-d3eb447a",
+        "streamId": "stream-2026-06-13",
+        "videoId": "hKF46hExo5E",
+        "timestamp": 2973,
+        "endTimestamp": 3245
+      }
+    ]
+  },
+  {
+    "id": "song-933b56e2",
+    "workId": "work-b1031aca-b1f9-4d51-8bf7-2c0a4b0fd0b5",
+    "title": "無人熟識",
+    "originalArtist": "江蕙",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-cd64b65e",
+        "streamId": "stream-2026-07-03",
+        "videoId": "le5J7nIHeHQ",
+        "timestamp": 3513,
+        "endTimestamp": 3785
+      }
+    ]
+  },
+  {
+    "id": "song-ccbdd3f8",
+    "workId": "work-81b6039f-75da-4337-9055-3f502770ae4a",
+    "title": "無字的情批",
+    "originalArtist": "黃乙玲",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-db91391d",
+        "streamId": "stream-2026-07-03",
+        "videoId": "le5J7nIHeHQ",
+        "timestamp": 7656,
+        "endTimestamp": 7920
+      }
+    ]
+  },
+  {
+    "id": "song-abd5c76d",
+    "workId": "work-f46be27b-bfa6-4b14-98e8-5e31f31358c7",
+    "title": "猫日",
+    "originalArtist": "suis",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-5f9d8098",
+        "streamId": "stream-2026-07-26",
+        "videoId": "u6TFpV4a9oI",
+        "timestamp": 1674,
+        "endTimestamp": 1904
+      }
+    ]
+  },
+  {
+    "id": "song-712de35a",
+    "workId": "work-bc604a08-f38c-4287-baa1-94c860ea49dd",
+    "title": "雲中月圓",
+    "originalArtist": "王識賢 & 孫淑媚",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-578f64e9",
+        "streamId": "stream-2026-07-03",
+        "videoId": "le5J7nIHeHQ",
+        "timestamp": 2178,
+        "endTimestamp": 2448
+      }
+    ]
+  },
+  {
+    "id": "song-133d7df4",
+    "workId": "work-a3a54033-f961-4f03-a08f-7fe29b70f429",
+    "title": "傷心的人別聽慢歌",
+    "originalArtist": "五月天",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-729f1108",
+        "streamId": "stream-2026-07-12",
+        "videoId": "OLCY5inzZvg",
+        "timestamp": 5281,
+        "endTimestamp": 5497
+      }
+    ]
+  },
+  {
+    "id": "song-17ef64ad",
+    "workId": "work-song-9b54244d",
+    "title": "傻瓜",
+    "originalArtist": "溫嵐",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-684db9fa",
+        "streamId": "stream-2026-07-12",
+        "videoId": "OLCY5inzZvg",
+        "timestamp": 1538,
+        "endTimestamp": 1814
+      }
+    ]
+  },
+  {
+    "id": "song-83ce0fdc",
+    "workId": "work-c2a5224d-202b-477c-b24d-78286375be75",
+    "title": "微加幸福",
+    "originalArtist": "郁可唯",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-e2a2f7ce",
+        "streamId": "stream-2026-06-21",
+        "videoId": "RKyK4n9s0w4",
+        "timestamp": 9570,
+        "endTimestamp": 9853
+      }
+    ]
+  },
+  {
+    "id": "song-3ed393f4",
+    "workId": "work-song-90c2179b",
+    "title": "想自由",
+    "originalArtist": "林宥嘉",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-82143046",
+        "streamId": "stream-2026-06-21",
+        "videoId": "RKyK4n9s0w4",
+        "timestamp": 3351,
+        "endTimestamp": 3633
+      }
+    ]
+  },
+  {
+    "id": "song-a015061f",
+    "workId": "work-song-e761fb12",
+    "title": "愛到才知痛",
+    "originalArtist": "黃乙玲",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-b71cb37c",
+        "streamId": "stream-2026-07-03",
+        "videoId": "le5J7nIHeHQ",
+        "timestamp": 10257,
+        "endTimestamp": 10542
+      }
+    ]
+  },
+  {
+    "id": "song-3585e443",
+    "workId": "work-6892c8e4-ce31-4fe0-b7a1-3b27fce855b0",
+    "title": "愛情限時批",
+    "originalArtist": "伍佰 & 萬芳",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-4f566b35",
+        "streamId": "stream-2026-07-03",
+        "videoId": "le5J7nIHeHQ",
+        "timestamp": 9193,
+        "endTimestamp": 9417
+      }
+    ]
+  },
+  {
+    "id": "song-c4064013",
+    "workId": "work-song-b21ceebc",
+    "title": "落雨聲",
+    "originalArtist": "江蕙",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-3d5465f9",
+        "streamId": "stream-2026-07-03",
+        "videoId": "le5J7nIHeHQ",
+        "timestamp": 6465,
+        "endTimestamp": 6769
+      }
+    ]
+  },
+  {
+    "id": "song-41ec89f1",
+    "workId": "work-a73fd044-fd5d-4372-bbc2-b732c317196a",
+    "title": "葉子",
+    "originalArtist": "阿桑",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-47b8aca5",
+        "streamId": "stream-2026-06-26",
+        "videoId": "6TttY4i1LdM",
+        "timestamp": 1753,
+        "endTimestamp": 2045
+      },
+      {
+        "id": "p-181735ea",
+        "streamId": "stream-2026-06-26",
+        "videoId": "6TttY4i1LdM",
+        "timestamp": 2062,
+        "endTimestamp": 2354
+      }
+    ]
+  },
+  {
+    "id": "song-e80bc93d",
+    "workId": "work-song-07107cd7",
+    "title": "路過人間",
+    "originalArtist": "郁可唯",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-b70a1ac0",
+        "streamId": "stream-2026-07-26",
+        "videoId": "u6TFpV4a9oI",
+        "timestamp": 6623,
+        "endTimestamp": 6870
+      }
+    ]
+  },
+  {
+    "id": "song-a35c132c",
+    "workId": "work-d000747d-2142-4a7f-bf53-91bdbe3ac832",
+    "title": "墓仔埔也敢去",
+    "originalArtist": "葉啟田",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-a982652c",
+        "streamId": "stream-2026-07-03",
+        "videoId": "le5J7nIHeHQ",
+        "timestamp": 6264,
+        "endTimestamp": 6463
+      }
+    ]
+  },
+  {
+    "id": "song-80e92208",
+    "workId": "work-1f22d2e7-5e5c-4ab0-80c6-01a567efb4da",
+    "title": "夢中的情話",
+    "originalArtist": "江蕙 & 阿杜",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-923188fb",
+        "streamId": "stream-2026-07-03",
+        "videoId": "le5J7nIHeHQ",
+        "timestamp": 965,
+        "endTimestamp": 1254
+      }
+    ]
+  },
+  {
+    "id": "song-3f787083",
+    "workId": "work-song-a17d3c7c",
+    "title": "夢醒時分",
+    "originalArtist": "陳淑樺",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-2bd22485",
+        "streamId": "stream-2026-07-12",
+        "videoId": "OLCY5inzZvg",
+        "timestamp": 8209,
+        "endTimestamp": 8456
+      }
+    ]
+  },
+  {
+    "id": "song-e9afc7b3",
+    "workId": "work-1bbc8489-fbd3-42fd-8743-0a675555a925",
+    "title": "綠光",
+    "originalArtist": "Unknown",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-64516d5f",
+        "streamId": "stream-2026-06-13",
+        "videoId": "hKF46hExo5E",
+        "timestamp": 6392,
+        "endTimestamp": 6580
+      }
+    ]
+  },
+  {
+    "id": "song-9226a69a",
+    "workId": "work-5f14b711-f731-4948-a5ac-b2ab4b571416",
+    "title": "舞女",
+    "originalArtist": "陳小雲",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-06ca7af0",
+        "streamId": "stream-2026-07-03",
+        "videoId": "le5J7nIHeHQ",
+        "timestamp": 7046,
+        "endTimestamp": 7261
+      }
+    ]
+  },
+  {
+    "id": "song-ce215341",
+    "workId": "work-song-cd845dcf",
+    "title": "蒲公英的約定",
+    "originalArtist": "周杰倫",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-caa631e2",
+        "streamId": "stream-2026-06-26",
+        "videoId": "6TttY4i1LdM",
+        "timestamp": 6869,
+        "endTimestamp": 7116
+      }
+    ]
+  },
+  {
+    "id": "song-f9f13fab",
+    "workId": "work-8e92db9f-2051-4585-9678-ae78ea085bb8",
+    "title": "廢墟之燼",
+    "originalArtist": "許茹芸",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-0909a1f0",
+        "streamId": "stream-2026-07-26",
+        "videoId": "u6TFpV4a9oI",
+        "timestamp": 3770,
+        "endTimestamp": 4040
+      }
+    ]
+  },
+  {
+    "id": "song-6e54c522",
+    "workId": "work-9149487d-a63f-43c3-8007-009b2413cb9a",
+    "title": "壊レタ世界ノ歌",
+    "originalArtist": "Unknown",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-c4f43ca0",
+        "streamId": "stream-2026-06-13",
+        "videoId": "hKF46hExo5E",
+        "timestamp": 303,
+        "endTimestamp": 642
+      }
+    ]
+  },
+  {
+    "id": "song-533bce5d",
+    "workId": "work-song-b19adb74",
+    "title": "燕尾蝶",
+    "originalArtist": "梁靜茹",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-1840b676",
+        "streamId": "stream-2026-06-26",
+        "videoId": "6TttY4i1LdM",
+        "timestamp": 8344,
+        "endTimestamp": 8589
+      }
+    ]
+  },
+  {
+    "id": "song-df3f47c5",
+    "workId": "work-7ede19dd-9fe8-4532-9eb9-7e4241c37fc9",
+    "title": "舊情也綿綿",
+    "originalArtist": "沈文程 & 張瀛仁",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-a9961e28",
+        "streamId": "stream-2026-07-03",
+        "videoId": "le5J7nIHeHQ",
+        "timestamp": 2798,
+        "endTimestamp": 3053
+      }
+    ]
+  },
+  {
+    "id": "song-881a1be7",
+    "workId": "work-0d0627bc-896d-4766-8364-1054e8fe7d03",
+    "title": "歡喜就好",
+    "originalArtist": "陳雷",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-90c31d2f",
+        "streamId": "stream-2026-07-03",
+        "videoId": "le5J7nIHeHQ",
+        "timestamp": 7330,
+        "endTimestamp": 7538
+      }
+    ]
+  },
+  {
+    "id": "song-ac91ce2f",
+    "workId": "work-song-640",
+    "title": "All About That Bass",
+    "originalArtist": "Meghan Trainor",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-ed70323c",
+        "streamId": "stream-2026-07-17",
+        "videoId": "DSRIq22dUiM",
+        "timestamp": 7192,
+        "endTimestamp": 7380
+      }
+    ]
+  },
+  {
+    "id": "song-bc892d6f",
+    "workId": "work-05ff6535-8a06-44d5-97ee-2028dcf221b3",
+    "title": "Applause",
+    "originalArtist": "Lady Gaga",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-d956086a",
+        "streamId": "stream-2026-06-21",
+        "videoId": "RKyK4n9s0w4",
+        "timestamp": 8476,
+        "endTimestamp": 8688
+      }
+    ]
+  },
+  {
+    "id": "song-a0ae3661",
+    "workId": "work-3ca27bb4-ccc7-499f-92c2-31e003ebe6cb",
+    "title": "APT (中東版)",
+    "originalArtist": "Unknown",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-ed057b4a",
+        "streamId": "stream-2026-06-13",
+        "videoId": "hKF46hExo5E",
+        "timestamp": 6796,
+        "endTimestamp": 6980
+      }
+    ]
+  },
+  {
+    "id": "song-8f6259e6",
+    "workId": "work-song-20eb8332",
+    "title": "Bad Guy",
+    "originalArtist": "Billie Eilish",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-3c32489c",
+        "streamId": "stream-2026-07-17",
+        "videoId": "DSRIq22dUiM",
+        "timestamp": 1372,
+        "endTimestamp": 1566
+      }
+    ]
+  },
+  {
+    "id": "song-a5f9347e",
+    "workId": "work-song-503",
+    "title": "Believer",
+    "originalArtist": "Imagine Dragons",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-e4dba301",
+        "streamId": "stream-2026-07-12",
+        "videoId": "OLCY5inzZvg",
+        "timestamp": 11730,
+        "endTimestamp": 11934
+      }
+    ]
+  },
+  {
+    "id": "song-2817d1fb",
+    "workId": "work-song-1834",
+    "title": "Blank Space",
+    "originalArtist": "Taylor Swift",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-0e94abf4",
+        "streamId": "stream-2026-07-17",
+        "videoId": "DSRIq22dUiM",
+        "timestamp": 6126,
+        "endTimestamp": 6358
+      }
+    ]
+  },
+  {
+    "id": "song-66bf4857",
+    "workId": "work-song-300",
+    "title": "Bunny Girl",
+    "originalArtist": "AKASAKI",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-9c32b8a4",
+        "streamId": "stream-2026-07-12",
+        "videoId": "OLCY5inzZvg",
+        "timestamp": 1858,
+        "endTimestamp": 2075
+      }
+    ]
+  },
+  {
+    "id": "song-58628b6e",
+    "workId": "work-1a7c0c82-a9fb-48b7-9fce-0357128bff18",
+    "title": "Call of Silence",
+    "originalArtist": "澤野弘之 ft. Gemie",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-9ebd6442",
+        "streamId": "stream-2026-07-26",
+        "videoId": "u6TFpV4a9oI",
+        "timestamp": 2873,
+        "endTimestamp": 3051
+      }
+    ]
+  },
+  {
+    "id": "song-eb95d2db",
+    "workId": "work-d45621ff-70f8-4eae-a336-17ab8741b8d6",
+    "title": "Can't Fight the Moonlight",
+    "originalArtist": "LeAnn Rimes",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-85a29e0b",
+        "streamId": "stream-2026-07-17",
+        "videoId": "DSRIq22dUiM",
+        "timestamp": 4218,
+        "endTimestamp": 4434
+      }
+    ]
+  },
+  {
+    "id": "song-3309e8e8",
+    "workId": "work-song-33c749dc",
+    "title": "Can't Take My Eyes Off You",
+    "originalArtist": "Frankie Valli",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-24885eb3",
+        "streamId": "stream-2026-07-17",
+        "videoId": "DSRIq22dUiM",
+        "timestamp": 3469,
+        "endTimestamp": 3672
+      }
+    ]
+  },
+  {
+    "id": "song-7da03160",
+    "workId": "work-song-08107d29",
+    "title": "Close to You",
+    "originalArtist": "Carpenters",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-472f30a0",
+        "streamId": "stream-2026-07-17",
+        "videoId": "DSRIq22dUiM",
+        "timestamp": 3244,
+        "endTimestamp": 3518
+      }
+    ]
+  },
+  {
+    "id": "song-76c8934e",
+    "workId": "work-song-1049",
+    "title": "Complicated",
+    "originalArtist": "Avril Lavigne",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-3a3a889a",
+        "streamId": "stream-2026-07-17",
+        "videoId": "DSRIq22dUiM",
+        "timestamp": 5377,
+        "endTimestamp": 5622
+      }
+    ]
+  },
+  {
+    "id": "song-e249ae1d",
+    "workId": "work-94c29dbc-541a-4184-bcf9-639736f79db1",
+    "title": "DADDY! DADDY! DO!",
+    "originalArtist": "鈴木雅之",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-db76ccf7",
+        "streamId": "stream-2026-07-12",
+        "videoId": "OLCY5inzZvg",
+        "timestamp": 9017,
+        "endTimestamp": 9272
+      }
+    ]
+  },
+  {
+    "id": "song-dcf69beb",
+    "workId": "work-00d7665c-4029-4de4-ad2f-a6121150c7c6",
+    "title": "Departure!",
+    "originalArtist": "小野正利",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-64d2e8ce",
+        "streamId": "stream-2026-07-12",
+        "videoId": "OLCY5inzZvg",
+        "timestamp": 7443,
+        "endTimestamp": 7700
+      }
+    ]
+  },
+  {
+    "id": "song-0ec83d53",
+    "workId": "work-43e4b8d2-5809-4b90-84e6-060522ef5a66",
+    "title": "Despacito",
+    "originalArtist": "Luis Fonsi feat. Daddy Yankee",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-f6a7fe71",
+        "streamId": "stream-2026-07-12",
+        "videoId": "OLCY5inzZvg",
+        "timestamp": 11280,
+        "endTimestamp": 11509
+      }
+    ]
+  },
+  {
+    "id": "song-e688483f",
+    "workId": "work-eb25bc3a-9228-4475-8c99-ddccb4353ceb",
+    "title": "Despacito（奇諾比奧版）",
+    "originalArtist": "Luis Fonsi feat. Daddy Yankee",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-bc3ab25b",
+        "streamId": "stream-2026-07-12",
+        "videoId": "OLCY5inzZvg",
+        "timestamp": 11070,
+        "endTimestamp": 11179
+      }
+    ]
+  },
+  {
+    "id": "song-0385d98c",
+    "workId": "work-7c3b6df8-cb51-489c-a5f4-40ef89a3ed80",
+    "title": "Disco Heaven",
+    "originalArtist": "Lady Gaga",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-c6a670ee",
+        "streamId": "stream-2026-06-21",
+        "videoId": "RKyK4n9s0w4",
+        "timestamp": 8774,
+        "endTimestamp": 8995
+      }
+    ]
+  },
+  {
+    "id": "song-b4c8aec8",
+    "workId": "work-song-8989c004",
+    "title": "Dynamite",
+    "originalArtist": "BTS",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-7f91121a",
+        "streamId": "stream-2026-07-12",
+        "videoId": "OLCY5inzZvg",
+        "timestamp": 11445,
+        "endTimestamp": 11644
+      }
+    ]
+  },
+  {
+    "id": "song-5f5c33bd",
+    "workId": "work-c5f25b5e-9ba2-4010-952c-9398c2b15438",
+    "title": "Faded",
+    "originalArtist": "Unknown",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-87218f1a",
+        "streamId": "stream-2026-06-13",
+        "videoId": "hKF46hExo5E",
+        "timestamp": 6177,
+        "endTimestamp": 6388
+      }
+    ]
+  },
+  {
+    "id": "song-ce87ca00",
+    "workId": "work-5e277f8f-bd58-46d8-9370-e9d614515522",
+    "title": "Girls Like You",
+    "originalArtist": "Maroon 5 ft. Cardi B",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-d27b901f",
+        "streamId": "stream-2026-07-17",
+        "videoId": "DSRIq22dUiM",
+        "timestamp": 6848,
+        "endTimestamp": 7084
+      }
+    ]
+  },
+  {
+    "id": "song-50f6ed3a",
+    "workId": "work-song-1865",
+    "title": "Golden Hour",
+    "originalArtist": "JVKE",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-d180a8fe",
+        "streamId": "stream-2026-07-17",
+        "videoId": "DSRIq22dUiM",
+        "timestamp": 8884,
+        "endTimestamp": 9093
+      }
+    ]
+  },
+  {
+    "id": "song-518bc7c9",
+    "workId": "work-71ea3ad9-558d-4dd9-89bb-ffaf35bd4ebc",
+    "title": "Heart Attack",
+    "originalArtist": "Unknown",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-4e362cc2",
+        "streamId": "stream-2026-06-13",
+        "videoId": "hKF46hExo5E",
+        "timestamp": 10247,
+        "endTimestamp": 10460
+      }
+    ]
+  },
+  {
+    "id": "song-2a290c1b",
+    "workId": "work-7056a997-7a5e-4d6d-9f72-2a8fd357401a",
+    "title": "Here's to Never Growing Up",
+    "originalArtist": "Avril Lavigne",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-8449dc5a",
+        "streamId": "stream-2026-07-17",
+        "videoId": "DSRIq22dUiM",
+        "timestamp": 8373,
+        "endTimestamp": 8587
+      }
+    ]
+  },
+  {
+    "id": "song-78a99e6b",
+    "workId": "work-song-2211",
+    "title": "I Ain't Worried",
+    "originalArtist": "OneRepublic",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-c9895cd9",
+        "streamId": "stream-2026-07-12",
+        "videoId": "OLCY5inzZvg",
+        "timestamp": 12803,
+        "endTimestamp": 12951
+      }
+    ]
+  },
+  {
+    "id": "song-5ec84a0e",
+    "workId": "work-eaaaa6b0-d2af-4fdb-8735-50de99e2ff7e",
+    "title": "I Feel Good",
+    "originalArtist": "James Brown",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-d183c633",
+        "streamId": "stream-2026-06-21",
+        "videoId": "RKyK4n9s0w4",
+        "timestamp": 7215,
+        "endTimestamp": 7382
+      }
+    ]
+  },
+  {
+    "id": "song-6dff9345",
+    "workId": "work-song-3004",
+    "title": "I Feel the Earth Move",
+    "originalArtist": "Carole King",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-5dfb431f",
+        "streamId": "stream-2026-07-26",
+        "videoId": "u6TFpV4a9oI",
+        "timestamp": 7032,
+        "endTimestamp": 7211
+      }
+    ]
+  },
+  {
+    "id": "song-a31dbcb8",
+    "workId": "work-song-2176",
+    "title": "I Knew You Were Trouble",
+    "originalArtist": "Taylor Swift",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-a8e465d8",
+        "streamId": "stream-2026-07-17",
+        "videoId": "DSRIq22dUiM",
+        "timestamp": 7527,
+        "endTimestamp": 7747
+      }
+    ]
+  },
+  {
+    "id": "song-e9febc08",
+    "workId": "work-song-2812f122",
+    "title": "Into the Unknown",
+    "originalArtist": "Idina Menzel, AURORA",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-af33cae9",
+        "streamId": "stream-2026-06-26",
+        "videoId": "6TttY4i1LdM",
+        "timestamp": 7476,
+        "endTimestamp": 7671
+      }
+    ]
+  },
+  {
+    "id": "song-e5f0c124",
+    "workId": "work-song-2845",
+    "title": "Kiss Me",
+    "originalArtist": "Sixpence None The Richer",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-15dbd042",
+        "streamId": "stream-2026-07-17",
+        "videoId": "DSRIq22dUiM",
+        "timestamp": 5081,
+        "endTimestamp": 5290
+      }
+    ]
+  },
+  {
+    "id": "song-a9886f83",
+    "workId": "work-41bc676a-ee6c-400b-8b5f-0e599d777b33",
+    "title": "LA LA LA",
+    "originalArtist": "Naughty Boy feat. Sam Smith",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-3059af8a",
+        "streamId": "stream-2026-06-21",
+        "videoId": "RKyK4n9s0w4",
+        "timestamp": 6971,
+        "endTimestamp": 7192
+      }
+    ]
+  },
+  {
+    "id": "song-2e1a4b97",
+    "workId": "work-f90a614d-0b90-48d6-a1cd-6c2a257e6bce",
+    "title": "Levitating",
+    "originalArtist": "Dua Lipa",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-30d31513",
+        "streamId": "stream-2026-07-17",
+        "videoId": "DSRIq22dUiM",
+        "timestamp": 8637,
+        "endTimestamp": 8841
+      }
+    ]
+  },
+  {
+    "id": "song-0e1a600f",
+    "workId": "work-0879b4fa-355e-4656-a920-8129225366a6",
+    "title": "Like I'm Gonna Lose You",
+    "originalArtist": "Meghan Trainor",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-b3b0184f",
+        "streamId": "stream-2026-07-17",
+        "videoId": "DSRIq22dUiM",
+        "timestamp": 8032,
+        "endTimestamp": 8258
+      }
+    ]
+  },
+  {
+    "id": "song-006675bc",
+    "workId": "work-9bbcf55d-50fe-4a8b-b204-b16515287629",
+    "title": "LOST IN PARADISE",
+    "originalArtist": "Unknown",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-de8ac9bd",
+        "streamId": "stream-2026-06-13",
+        "videoId": "hKF46hExo5E",
+        "timestamp": 9812,
+        "endTimestamp": 10139
+      }
+    ]
+  },
+  {
+    "id": "song-44b34925",
+    "workId": "work-song-1140",
+    "title": "Love Story",
+    "originalArtist": "Taylor Swift",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-e7203a38",
+        "streamId": "stream-2026-07-17",
+        "videoId": "DSRIq22dUiM",
+        "timestamp": 6407,
+        "endTimestamp": 6642
+      }
+    ]
+  },
+  {
+    "id": "song-a02f75d3",
+    "workId": "work-song-1283",
+    "title": "Love Yourself",
+    "originalArtist": "Justin Bieber",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-3d78a030",
+        "streamId": "stream-2026-07-17",
+        "videoId": "DSRIq22dUiM",
+        "timestamp": 2959,
+        "endTimestamp": 3193
+      }
+    ]
+  },
+  {
+    "id": "song-b61e292e",
+    "workId": "work-07ab7243-de5c-42d3-be64-05cc7c0e5f59",
+    "title": "Magia",
+    "originalArtist": "Kalafina",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-f9deb735",
+        "streamId": "stream-2026-07-12",
+        "videoId": "OLCY5inzZvg",
+        "timestamp": 6312,
+        "endTimestamp": 6625
+      }
+    ]
+  },
+  {
+    "id": "song-97437fa0",
+    "workId": "work-97b48692-c0a0-4afd-8f31-5983c86d7f67",
+    "title": "Monochrome",
+    "originalArtist": "BABYMETAL",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-95a5f9b0",
+        "streamId": "stream-2026-07-26",
+        "videoId": "u6TFpV4a9oI",
+        "timestamp": 2258,
+        "endTimestamp": 2495
+      }
+    ]
+  },
+  {
+    "id": "song-c02b4990",
+    "workId": "work-a542071a-96c9-4524-8450-0e9caa246dda",
+    "title": "Monochrome",
+    "originalArtist": "Unknown",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-5748f41d",
+        "streamId": "stream-2026-06-13",
+        "videoId": "hKF46hExo5E",
+        "timestamp": 7952,
+        "endTimestamp": 8186
+      }
+    ]
+  },
+  {
+    "id": "song-f7b4eb7e",
+    "workId": "work-88127e56-df42-4cfc-b388-b9fd134daccb",
+    "title": "Overdose",
+    "originalArtist": "Natori",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-21bcfa43",
+        "streamId": "stream-2026-07-12",
+        "videoId": "OLCY5inzZvg",
+        "timestamp": 2790,
+        "endTimestamp": 2984
+      }
+    ]
+  },
+  {
+    "id": "song-baedb972",
+    "workId": "work-song-1278ff4c",
+    "title": "Photograph",
+    "originalArtist": "Ed Sheeran",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-17e5fdbb",
+        "streamId": "stream-2026-07-12",
+        "videoId": "OLCY5inzZvg",
+        "timestamp": 12383,
+        "endTimestamp": 12642
+      }
+    ]
+  },
+  {
+    "id": "song-002ca26b",
+    "workId": "work-81c4cc62-ff6c-4bc2-9bbe-464ce68735df",
+    "title": "Renegade (We Never Run)",
+    "originalArtist": "Stefflon Don, Raja Kumari ft. Jarina de Marco",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-fc53888a",
+        "streamId": "stream-2026-07-17",
+        "videoId": "DSRIq22dUiM",
+        "timestamp": 4574,
+        "endTimestamp": 4735
+      }
+    ]
+  },
+  {
+    "id": "song-0a530b2c",
+    "workId": "work-song-669",
+    "title": "Set Fire to the Rain",
+    "originalArtist": "Adele",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-ff60ca47",
+        "streamId": "stream-2026-06-21",
+        "videoId": "RKyK4n9s0w4",
+        "timestamp": 7575,
+        "endTimestamp": 7818
+      }
+    ]
+  },
+  {
+    "id": "song-d0cefa7d",
+    "workId": "work-song-7aa8e8c6",
+    "title": "Splinter Wolf",
+    "originalArtist": "KOHTA YAMAMOTO",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-a6293261",
+        "streamId": "stream-2026-07-12",
+        "videoId": "OLCY5inzZvg",
+        "timestamp": 6627,
+        "endTimestamp": 6949
+      }
+    ]
+  },
+  {
+    "id": "song-4d390b4f",
+    "workId": "work-song-439",
+    "title": "Sugar",
+    "originalArtist": "Maroon 5",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-3cefd2f0",
+        "streamId": "stream-2026-06-21",
+        "videoId": "RKyK4n9s0w4",
+        "timestamp": 7906,
+        "endTimestamp": 8141
+      }
+    ]
+  },
+  {
+    "id": "song-99cde991",
+    "workId": "work-song-1f2368eb",
+    "title": "Toxic",
+    "originalArtist": "Britney Spears",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-7ffb117d",
+        "streamId": "stream-2026-07-17",
+        "videoId": "DSRIq22dUiM",
+        "timestamp": 1693,
+        "endTimestamp": 1892
+      }
+    ]
+  },
+  {
+    "id": "song-13c99ebe",
+    "workId": "work-b91db883-c909-4b4e-8eff-571883cc4ec6",
+    "title": "Upside Down",
+    "originalArtist": "Black Gryph0n, Baasik",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-e62b2c52",
+        "streamId": "stream-2026-06-21",
+        "videoId": "RKyK4n9s0w4",
+        "timestamp": 8245,
+        "endTimestamp": 8404
+      }
+    ]
+  },
+  {
+    "id": "song-7eb9bf09",
+    "workId": "work-c8f58edc-93b1-40de-9b67-ab1beeb7de66",
+    "title": "UPSIDE DOWN",
+    "originalArtist": "Unknown",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-2e620e26",
+        "streamId": "stream-2026-06-13",
+        "videoId": "hKF46hExo5E",
+        "timestamp": 8668,
+        "endTimestamp": 8824
+      }
+    ]
+  },
+  {
+    "id": "song-56c56f81",
+    "workId": "work-song-bc11b28d",
+    "title": "Uptown Funk",
+    "originalArtist": "Mark Ronson ft. Bruno Mars",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-91fccb26",
+        "streamId": "stream-2026-07-17",
+        "videoId": "DSRIq22dUiM",
+        "timestamp": 2396,
+        "endTimestamp": 2666
+      }
+    ]
+  },
+  {
+    "id": "song-39783959",
+    "workId": "work-song-c76d5dca",
+    "title": "Zombie",
+    "originalArtist": "The Cranberries",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-3f853c4f",
+        "streamId": "stream-2026-07-17",
+        "videoId": "DSRIq22dUiM",
+        "timestamp": 1995,
+        "endTimestamp": 2302
+      }
+    ]
+  },
+  {
+    "id": "song-1a61d81a",
+    "workId": "work-92a94e60-638a-4d99-8abf-0c9144552f57",
+    "title": "あぶく",
+    "originalArtist": "Unknown",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-3dbadd85",
+        "streamId": "stream-2026-06-13",
+        "videoId": "hKF46hExo5E",
+        "timestamp": 9274,
+        "endTimestamp": 9508
+      }
+    ]
+  },
+  {
+    "id": "song-b1731bce",
+    "workId": "work-5b9b7617-b7e0-4d96-9d13-64889dab63f0",
+    "title": "ないものねだり",
+    "originalArtist": "Unknown",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-02317608",
+        "streamId": "stream-2026-06-13",
+        "videoId": "hKF46hExo5E",
+        "timestamp": 4608,
+        "endTimestamp": 4869
+      }
+    ]
+  },
+  {
+    "id": "song-0dd8b5f6",
+    "workId": "work-song-9",
+    "title": "はいよろこんで",
+    "originalArtist": "こっちのけんと",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-c32fc665",
+        "streamId": "stream-2026-07-12",
+        "videoId": "OLCY5inzZvg",
+        "timestamp": 4969,
+        "endTimestamp": 5134
+      }
+    ]
+  },
+  {
+    "id": "song-acba064d",
+    "workId": "work-6162e4c5-28fa-4f82-86a3-17dc6e8acc48",
+    "title": "ブルーバード",
+    "originalArtist": "Unknown",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-c9c69247",
+        "streamId": "stream-2026-06-13",
+        "videoId": "hKF46hExo5E",
+        "timestamp": 7159,
+        "endTimestamp": 7391
+      }
+    ]
+  }
+]

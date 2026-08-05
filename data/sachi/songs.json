@@ -4,24 +4,31 @@
     "workId": "work-song-1683",
     "title": "人質",
     "originalArtist": "張惠妹",
-    "tags": [
-      "language:zh",
-      "genre:pop"
-    ],
+    "tags": [],
     "performances": [
       {
         "id": "p-b9ec30bb",
         "streamId": "stream-d8da6c3d",
         "videoId": "HjdbVH6GVAg",
         "timestamp": 2847,
-        "endTimestamp": 3074,
-        "tags": [
-          "language:zh"
-        ]
+        "endTimestamp": 3074
       }
-    ],
-    "inheritedTags": [
-      "genre:pop"
+    ]
+  },
+  {
+    "id": "song-a5cc6553",
+    "workId": "work-song-bf727142",
+    "title": "不老夢",
+    "originalArtist": "銀臨",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-2fd69650",
+        "streamId": "stream-b5bce075",
+        "videoId": "CxKe35bjzRg",
+        "timestamp": 2207,
+        "endTimestamp": 2464
+      }
     ]
   },
   {
@@ -36,32 +43,40 @@
         "streamId": "stream-d8da6c3d",
         "videoId": "HjdbVH6GVAg",
         "timestamp": 516,
-        "endTimestamp": 748,
-        "tags": []
+        "endTimestamp": 748
       }
-    ],
-    "inheritedTags": []
+    ]
+  },
+  {
+    "id": "song-e99958bd",
+    "workId": "work-84e7316e-708d-4ec8-b756-020a1dcf20dc",
+    "title": "天涯",
+    "originalArtist": "郁可唯",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-fccabdb5",
+        "streamId": "stream-b5bce075",
+        "videoId": "CxKe35bjzRg",
+        "timestamp": 3676,
+        "endTimestamp": 3899
+      }
+    ]
   },
   {
     "id": "song-6bae41e2",
     "workId": "work-song-6bae41e2",
     "title": "心訊 Heart Signal",
     "originalArtist": "煦Hiyori",
-    "tags": [
-      "source:original"
-    ],
+    "tags": [],
     "performances": [
       {
         "id": "p-e28f69b6",
         "streamId": "stream-2025-12-15",
         "videoId": "Kb2xALB6P7A",
         "timestamp": 4442,
-        "endTimestamp": 4679,
-        "tags": []
+        "endTimestamp": 4679
       }
-    ],
-    "inheritedTags": [
-      "source:original"
     ]
   },
   {
@@ -69,24 +84,15 @@
     "workId": "work-song-298",
     "title": "失落沙洲",
     "originalArtist": "徐佳瑩",
-    "tags": [
-      "language:zh",
-      "genre:pop"
-    ],
+    "tags": [],
     "performances": [
       {
         "id": "p-e0eff02b",
         "streamId": "stream-2025-10-23",
         "videoId": "mkrEPCX49ek",
         "timestamp": 2030,
-        "endTimestamp": 2329,
-        "tags": [
-          "language:zh"
-        ]
+        "endTimestamp": 2329
       }
-    ],
-    "inheritedTags": [
-      "genre:pop"
     ]
   },
   {
@@ -94,24 +100,31 @@
     "workId": "work-song-1472",
     "title": "永不失聯的愛",
     "originalArtist": "周興哲",
-    "tags": [
-      "language:zh",
-      "genre:pop"
-    ],
+    "tags": [],
     "performances": [
       {
         "id": "p-4c33070a",
         "streamId": "stream-2026-01-05",
         "videoId": "e4M8gRKkvIw",
         "timestamp": 4507,
-        "endTimestamp": 4768,
-        "tags": [
-          "language:zh"
-        ]
+        "endTimestamp": 4768
       }
-    ],
-    "inheritedTags": [
-      "genre:pop"
+    ]
+  },
+  {
+    "id": "song-8d379b00",
+    "workId": "work-f41c5593-b034-45b8-bdc3-44d25ff51f0e",
+    "title": "白石溪",
+    "originalArtist": "銀臨",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-0b82bcdf",
+        "streamId": "stream-b5bce075",
+        "videoId": "CxKe35bjzRg",
+        "timestamp": 4864,
+        "endTimestamp": 4974
+      }
     ]
   },
   {
@@ -119,24 +132,15 @@
     "workId": "work-song-14c9e056",
     "title": "她說",
     "originalArtist": "林俊傑",
-    "tags": [
-      "language:zh",
-      "genre:pop"
-    ],
+    "tags": [],
     "performances": [
       {
         "id": "p-f3233beb",
         "streamId": "stream-2025-10-23",
         "videoId": "mkrEPCX49ek",
         "timestamp": 1029,
-        "endTimestamp": 1347,
-        "tags": [
-          "language:zh"
-        ]
+        "endTimestamp": 1347
       }
-    ],
-    "inheritedTags": [
-      "genre:pop"
     ]
   },
   {
@@ -151,57 +155,56 @@
         "streamId": "stream-d8da6c3d",
         "videoId": "HjdbVH6GVAg",
         "timestamp": 4672,
-        "endTimestamp": 4943,
-        "tags": []
+        "endTimestamp": 4943
       }
-    ],
-    "inheritedTags": []
+    ]
+  },
+  {
+    "id": "song-bb35f24c",
+    "workId": "work-song-cfff763c",
+    "title": "赤伶",
+    "originalArtist": "HITA",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-f19a130f",
+        "streamId": "stream-b5bce075",
+        "videoId": "CxKe35bjzRg",
+        "timestamp": 894,
+        "endTimestamp": 1160
+      }
+    ]
   },
   {
     "id": "song-7a4d7e8e",
     "workId": "work-song-170",
     "title": "炎",
     "originalArtist": "LiSA",
-    "tags": [
-      "language:ja"
-    ],
+    "tags": [],
     "performances": [
       {
         "id": "p-5f30f9bb",
         "streamId": "stream-2025-12-15",
         "videoId": "Kb2xALB6P7A",
         "timestamp": 2847,
-        "endTimestamp": 3116,
-        "tags": [
-          "language:ja"
-        ]
+        "endTimestamp": 3116
       }
-    ],
-    "inheritedTags": []
+    ]
   },
   {
     "id": "song-dd0dc534",
     "workId": "work-song-1322",
     "title": "雨愛",
     "originalArtist": "楊丞琳",
-    "tags": [
-      "language:zh",
-      "genre:pop"
-    ],
+    "tags": [],
     "performances": [
       {
         "id": "p-8daca7f6",
         "streamId": "stream-d8da6c3d",
         "videoId": "HjdbVH6GVAg",
         "timestamp": 4256,
-        "endTimestamp": 4515,
-        "tags": [
-          "language:zh"
-        ]
+        "endTimestamp": 4515
       }
-    ],
-    "inheritedTags": [
-      "genre:pop"
     ]
   },
   {
@@ -209,24 +212,15 @@
     "workId": "work-song-a101cb49",
     "title": "指望",
     "originalArtist": "郁可唯",
-    "tags": [
-      "language:zh",
-      "genre:pop"
-    ],
+    "tags": [],
     "performances": [
       {
         "id": "p-573154a3",
         "streamId": "stream-d8da6c3d",
         "videoId": "HjdbVH6GVAg",
         "timestamp": 3793,
-        "endTimestamp": 4032,
-        "tags": [
-          "language:zh"
-        ]
+        "endTimestamp": 4032
       }
-    ],
-    "inheritedTags": [
-      "genre:pop"
     ]
   },
   {
@@ -241,57 +235,56 @@
         "streamId": "stream-2026-01-05",
         "videoId": "e4M8gRKkvIw",
         "timestamp": 626,
-        "endTimestamp": 834,
-        "tags": []
+        "endTimestamp": 834
       }
-    ],
-    "inheritedTags": []
+    ]
   },
   {
     "id": "song-fa308963",
     "workId": "work-song-1216",
     "title": "独りんぼエンヴィー",
     "originalArtist": "電ポルP",
-    "tags": [
-      "language:ja"
-    ],
+    "tags": [],
     "performances": [
       {
         "id": "p-23af92f2",
         "streamId": "stream-2025-12-15",
         "videoId": "Kb2xALB6P7A",
         "timestamp": 3895,
-        "endTimestamp": 4097,
-        "tags": [
-          "language:ja"
-        ]
+        "endTimestamp": 4097
       }
-    ],
-    "inheritedTags": []
+    ]
   },
   {
     "id": "song-aaafd07e",
     "workId": "work-song-2248",
     "title": "時間煮雨",
     "originalArtist": "郁可唯",
-    "tags": [
-      "language:zh",
-      "genre:pop"
-    ],
+    "tags": [],
     "performances": [
       {
         "id": "p-03b10643",
         "streamId": "stream-2026-01-05",
         "videoId": "e4M8gRKkvIw",
         "timestamp": 1680,
-        "endTimestamp": 1919,
-        "tags": [
-          "language:zh"
-        ]
+        "endTimestamp": 1919
       }
-    ],
-    "inheritedTags": [
-      "genre:pop"
+    ]
+  },
+  {
+    "id": "song-d3ae632f",
+    "workId": "work-f37c528b-b1ca-4bfa-b157-0c5d812a5b8e",
+    "title": "桃花諾",
+    "originalArtist": "G.E.M. 鄧紫棋",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-458e4a98",
+        "streamId": "stream-b5bce075",
+        "videoId": "CxKe35bjzRg",
+        "timestamp": 1427,
+        "endTimestamp": 1647
+      }
     ]
   },
   {
@@ -299,24 +292,31 @@
     "workId": "work-song-f1629572",
     "title": "馬德里不思議",
     "originalArtist": "蔡依林",
-    "tags": [
-      "language:zh",
-      "genre:pop"
-    ],
+    "tags": [],
     "performances": [
       {
         "id": "p-5f8e7030",
         "streamId": "stream-2025-10-23",
         "videoId": "mkrEPCX49ek",
         "timestamp": 264,
-        "endTimestamp": 475,
-        "tags": [
-          "language:zh"
-        ]
+        "endTimestamp": 475
       }
-    ],
-    "inheritedTags": [
-      "genre:pop"
+    ]
+  },
+  {
+    "id": "song-f3632b88",
+    "workId": "work-7f449cc7-ed6e-4f46-9505-134a838e33dd",
+    "title": "參商",
+    "originalArtist": "不才",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-6a099c8f",
+        "streamId": "stream-b5bce075",
+        "videoId": "CxKe35bjzRg",
+        "timestamp": 4271,
+        "endTimestamp": 4543
+      }
     ]
   },
   {
@@ -324,46 +324,63 @@
     "workId": "work-song-4edd3601",
     "title": "訣愛",
     "originalArtist": "詹雯婷",
-    "tags": [
-      "language:zh"
-    ],
+    "tags": [],
     "performances": [
       {
         "id": "p-31979ea9",
         "streamId": "stream-2026-01-05",
         "videoId": "e4M8gRKkvIw",
         "timestamp": 4158,
-        "endTimestamp": 4347,
-        "tags": [
-          "language:zh"
-        ]
+        "endTimestamp": 4347
       }
-    ],
-    "inheritedTags": []
+    ]
+  },
+  {
+    "id": "song-78d893be",
+    "workId": "work-song-73ded5c3",
+    "title": "雪落下的聲音",
+    "originalArtist": "陸虎",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-9074635b",
+        "streamId": "stream-b5bce075",
+        "videoId": "CxKe35bjzRg",
+        "timestamp": 2940,
+        "endTimestamp": 3251
+      }
+    ]
+  },
+  {
+    "id": "song-59cd46ab",
+    "workId": "work-4dc6e6d4-3521-4bbb-9079-8d39742b43ca",
+    "title": "無字碑",
+    "originalArtist": "張靚穎",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-1b47967e",
+        "streamId": "stream-b5bce075",
+        "videoId": "CxKe35bjzRg",
+        "timestamp": 76,
+        "endTimestamp": 257
+      }
+    ]
   },
   {
     "id": "song-2ae06379",
     "workId": "work-song-2ae06379",
     "title": "會呼吸的痛",
     "originalArtist": "梁靜茹",
-    "tags": [
-      "language:zh",
-      "genre:pop"
-    ],
+    "tags": [],
     "performances": [
       {
         "id": "p-6f3a653d",
         "streamId": "stream-2026-01-05",
         "videoId": "e4M8gRKkvIw",
         "timestamp": 2687,
-        "endTimestamp": 3003,
-        "tags": [
-          "language:zh"
-        ]
+        "endTimestamp": 3003
       }
-    ],
-    "inheritedTags": [
-      "genre:pop"
     ]
   },
   {
@@ -378,57 +395,40 @@
         "streamId": "stream-d8da6c3d",
         "videoId": "HjdbVH6GVAg",
         "timestamp": 1030,
-        "endTimestamp": 1301,
-        "tags": []
+        "endTimestamp": 1301
       }
-    ],
-    "inheritedTags": []
+    ]
   },
   {
     "id": "song-00335630",
     "workId": "work-song-00335630",
     "title": "離島の歌",
     "originalArtist": "不知火 (東山奈央)",
-    "tags": [
-      "language:ja"
-    ],
+    "tags": [],
     "performances": [
       {
         "id": "p-c10f0869",
         "streamId": "stream-2025-12-15",
         "videoId": "Kb2xALB6P7A",
         "timestamp": 1614,
-        "endTimestamp": 1834,
-        "tags": [
-          "language:ja"
-        ]
+        "endTimestamp": 1834
       }
-    ],
-    "inheritedTags": []
+    ]
   },
   {
     "id": "song-a133b5de",
     "workId": "work-song-308",
     "title": "寶貝",
     "originalArtist": "張懸",
-    "tags": [
-      "language:zh",
-      "genre:pop"
-    ],
+    "tags": [],
     "performances": [
       {
         "id": "p-9bc08792",
         "streamId": "stream-d8da6c3d",
         "videoId": "HjdbVH6GVAg",
         "timestamp": 2033,
-        "endTimestamp": 2177,
-        "tags": [
-          "language:zh"
-        ]
+        "endTimestamp": 2177
       }
-    ],
-    "inheritedTags": [
-      "genre:pop"
     ]
   },
   {
@@ -436,21 +436,15 @@
     "workId": "work-song-19e65c75",
     "title": "はじまりの風",
     "originalArtist": "平原綾香",
-    "tags": [
-      "language:ja"
-    ],
+    "tags": [],
     "performances": [
       {
         "id": "p-8e136213",
         "streamId": "stream-2025-12-15",
         "videoId": "Kb2xALB6P7A",
         "timestamp": 839,
-        "endTimestamp": 1121,
-        "tags": [
-          "language:ja"
-        ]
+        "endTimestamp": 1121
       }
-    ],
-    "inheritedTags": []
+    ]
   }
 ]

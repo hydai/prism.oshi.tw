@@ -1,1 +1,242 @@
-[]
+[
+  {
+    "id": "song-985a05fc",
+    "workId": "work-song-58af4c18",
+    "title": "一個人還是想著一個人",
+    "originalArtist": "曾沛慈",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-3556de41",
+        "streamId": "stream-2025-04-06",
+        "videoId": "mT_i3TPG2s0",
+        "timestamp": 7100,
+        "endTimestamp": 7392
+      }
+    ]
+  },
+  {
+    "id": "song-f6d91511",
+    "workId": "work-cafb3a27-6cc6-4e40-aad3-0ac89fdd2042",
+    "title": "不過失去了一點點",
+    "originalArtist": "曾沛慈",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-8dea0d1a",
+        "streamId": "stream-2025-04-06",
+        "videoId": "mT_i3TPG2s0",
+        "timestamp": 7785,
+        "endTimestamp": 8089
+      }
+    ]
+  },
+  {
+    "id": "song-a384c211",
+    "workId": "work-song-1611",
+    "title": "太陽",
+    "originalArtist": "邱振哲",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-bb649142",
+        "streamId": "stream-2025-04-06",
+        "videoId": "mT_i3TPG2s0",
+        "timestamp": 8732,
+        "endTimestamp": 8994
+      }
+    ]
+  },
+  {
+    "id": "song-afe1d8be",
+    "workId": "work-song-fdeeba17",
+    "title": "好想你",
+    "originalArtist": "朱主愛",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-4dca3bc3",
+        "streamId": "stream-2025-04-06",
+        "videoId": "mT_i3TPG2s0",
+        "timestamp": 9148,
+        "endTimestamp": 9306
+      }
+    ]
+  },
+  {
+    "id": "song-e0c4e9c4",
+    "workId": "work-song-1d73ad7a",
+    "title": "求救訊號",
+    "originalArtist": "Vast & Hazy",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-4694dcc3",
+        "streamId": "stream-2025-04-06",
+        "videoId": "mT_i3TPG2s0",
+        "timestamp": 9616,
+        "endTimestamp": 9874
+      }
+    ]
+  },
+  {
+    "id": "song-ce551254",
+    "workId": "work-27d1632a-5e01-4a8a-b49d-4ff59d1cf74b",
+    "title": "潤餅（The Rumbling）",
+    "originalArtist": "SiM",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-3242d17a",
+        "streamId": "stream-2025-04-06",
+        "videoId": "mT_i3TPG2s0",
+        "timestamp": 6312,
+        "endTimestamp": 6533
+      }
+    ]
+  },
+  {
+    "id": "song-19af703f",
+    "workId": "work-a88c065e-3009-48e4-9c16-33e074a9259c",
+    "title": "響念 Missing 抒情版",
+    "originalArtist": "響Hibiki",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-12af046f",
+        "streamId": "stream-2025-04-06",
+        "videoId": "mT_i3TPG2s0",
+        "timestamp": 9949,
+        "endTimestamp": 10224
+      }
+    ]
+  },
+  {
+    "id": "song-ccb8c70c",
+    "workId": "work-song-505",
+    "title": "Chandelier",
+    "originalArtist": "Sia",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-2dd2602a",
+        "streamId": "stream-2025-04-06",
+        "videoId": "mT_i3TPG2s0",
+        "timestamp": 11055,
+        "endTimestamp": 11271
+      }
+    ]
+  },
+  {
+    "id": "song-8aed9b02",
+    "workId": "work-song-08107d29",
+    "title": "Close To You",
+    "originalArtist": "Carpenters",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-6018dd15",
+        "streamId": "stream-2025-04-06",
+        "videoId": "mT_i3TPG2s0",
+        "timestamp": 11931,
+        "endTimestamp": 12205
+      }
+    ]
+  },
+  {
+    "id": "song-107ffbda",
+    "workId": "work-0ae6dc0d-efdb-49a3-9b97-716f8dea97eb",
+    "title": "Heart Attack",
+    "originalArtist": "Demi Lovato",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-3994a67e",
+        "streamId": "stream-2025-04-06",
+        "videoId": "mT_i3TPG2s0",
+        "timestamp": 5504,
+        "endTimestamp": 5715
+      }
+    ]
+  },
+  {
+    "id": "song-38b86b1b",
+    "workId": "work-song-1283",
+    "title": "Love Yourself",
+    "originalArtist": "Justin Bieber",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-f5117917",
+        "streamId": "stream-2025-04-06",
+        "videoId": "mT_i3TPG2s0",
+        "timestamp": 3358,
+        "endTimestamp": 3592
+      }
+    ]
+  },
+  {
+    "id": "song-caf04988",
+    "workId": "work-92b15447-8d33-4005-9293-59ae265d2741",
+    "title": "Speechless",
+    "originalArtist": "Lady Gaga",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-55d3f422",
+        "streamId": "stream-2025-04-06",
+        "videoId": "mT_i3TPG2s0",
+        "timestamp": 4202,
+        "endTimestamp": 4473
+      }
+    ]
+  },
+  {
+    "id": "song-cde38217",
+    "workId": "work-song-25",
+    "title": "Speechless",
+    "originalArtist": "Naomi Scott",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-ece158c6",
+        "streamId": "stream-2025-04-06",
+        "videoId": "mT_i3TPG2s0",
+        "timestamp": 5136,
+        "endTimestamp": 5345
+      }
+    ]
+  },
+  {
+    "id": "song-6d0da491",
+    "workId": "work-song-1f2368eb",
+    "title": "Toxic",
+    "originalArtist": "Britney Spears",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-a3fb3faa",
+        "streamId": "stream-2025-04-06",
+        "videoId": "mT_i3TPG2s0",
+        "timestamp": 3867,
+        "endTimestamp": 4066
+      }
+    ]
+  },
+  {
+    "id": "song-68243884",
+    "workId": "work-song-1134",
+    "title": "Try",
+    "originalArtist": "Colbie Caillat",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-02984208",
+        "streamId": "stream-2025-04-06",
+        "videoId": "mT_i3TPG2s0",
+        "timestamp": 2626,
+        "endTimestamp": 2851
+      }
+    ]
+  }
+]

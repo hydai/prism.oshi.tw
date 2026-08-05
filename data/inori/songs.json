@@ -11,35 +11,24 @@
         "streamId": "stream-2026-03-22",
         "videoId": "d1NGgYgGuoY",
         "timestamp": 13950,
-        "endTimestamp": 14141,
-        "tags": []
+        "endTimestamp": 14141
       }
-    ],
-    "inheritedTags": []
+    ]
   },
   {
     "id": "song-d9138fe2",
     "workId": "work-song-d9138fe2",
     "title": "39",
     "originalArtist": "sasakure.UK feat. 初音ミク",
-    "tags": [
-      "language:ja",
-      "source:vocaloid"
-    ],
+    "tags": [],
     "performances": [
       {
         "id": "p-ec7618d5",
         "streamId": "stream-02c40ac6",
         "videoId": "ODikksIsYEc",
         "timestamp": 11495,
-        "endTimestamp": 11751,
-        "tags": [
-          "language:ja"
-        ]
+        "endTimestamp": 11751
       }
-    ],
-    "inheritedTags": [
-      "source:vocaloid"
     ]
   },
   {
@@ -47,22 +36,16 @@
     "workId": "work-song-22d30f12",
     "title": "一年二ヶ月と二十日",
     "originalArtist": "BRIGHT",
-    "tags": [
-      "language:ja"
-    ],
+    "tags": [],
     "performances": [
       {
         "id": "p-2a53c10c",
         "streamId": "stream-2026-03-22",
         "videoId": "d1NGgYgGuoY",
         "timestamp": 13566,
-        "endTimestamp": 13873,
-        "tags": [
-          "language:ja"
-        ]
+        "endTimestamp": 13873
       }
-    ],
-    "inheritedTags": []
+    ]
   },
   {
     "id": "song-56688706",
@@ -76,37 +59,24 @@
         "streamId": "stream-0a97675c",
         "videoId": "rSCyxZQ4Sis",
         "timestamp": 12246,
-        "endTimestamp": 12426,
-        "tags": []
+        "endTimestamp": 12426
       }
-    ],
-    "inheritedTags": []
+    ]
   },
   {
     "id": "song-07f852a6",
     "workId": "work-song-07f852a6",
     "title": "乙女解剖",
     "originalArtist": "DECO*27",
-    "tags": [
-      "language:ja",
-      "genre:pop",
-      "source:vocaloid"
-    ],
+    "tags": [],
     "performances": [
       {
         "id": "p-3e345762",
         "streamId": "stream-2026-03-22",
         "videoId": "d1NGgYgGuoY",
         "timestamp": 8284,
-        "endTimestamp": 8504,
-        "tags": [
-          "language:ja"
-        ]
+        "endTimestamp": 8504
       }
-    ],
-    "inheritedTags": [
-      "genre:pop",
-      "source:vocaloid"
     ]
   },
   {
@@ -121,33 +91,25 @@
         "streamId": "stream-0a97675c",
         "videoId": "rSCyxZQ4Sis",
         "timestamp": 5358,
-        "endTimestamp": 5635,
-        "tags": []
+        "endTimestamp": 5635
       }
-    ],
-    "inheritedTags": []
+    ]
   },
   {
     "id": "song-00345323",
     "workId": "work-song-00345323",
     "title": "千本桜",
     "originalArtist": "黒うさP",
-    "tags": [
-      "language:ja"
-    ],
+    "tags": [],
     "performances": [
       {
         "id": "p-2be52027",
         "streamId": "stream-2026-04-26",
         "videoId": "QuPB5nDhK5o",
         "timestamp": 3277,
-        "endTimestamp": 3517,
-        "tags": [
-          "language:ja"
-        ]
+        "endTimestamp": 3517
       }
-    ],
-    "inheritedTags": []
+    ]
   },
   {
     "id": "song-ee19a9d9",
@@ -161,11 +123,9 @@
         "streamId": "stream-0a97675c",
         "videoId": "rSCyxZQ4Sis",
         "timestamp": 10032,
-        "endTimestamp": 10341,
-        "tags": []
+        "endTimestamp": 10341
       }
-    ],
-    "inheritedTags": []
+    ]
   },
   {
     "id": "song-cd6fd91c",
@@ -179,35 +139,24 @@
         "streamId": "stream-0a97675c",
         "videoId": "rSCyxZQ4Sis",
         "timestamp": 5115,
-        "endTimestamp": 5293,
-        "tags": []
+        "endTimestamp": 5293
       }
-    ],
-    "inheritedTags": []
+    ]
   },
   {
     "id": "song-bf727142",
     "workId": "work-song-bf727142",
     "title": "不老夢",
     "originalArtist": "銀臨",
-    "tags": [
-      "language:zh",
-      "genre:pop"
-    ],
+    "tags": [],
     "performances": [
       {
         "id": "p-1ad1309a",
         "streamId": "stream-0a97675c",
         "videoId": "rSCyxZQ4Sis",
         "timestamp": 10402,
-        "endTimestamp": 10655,
-        "tags": [
-          "language:zh"
-        ]
+        "endTimestamp": 10655
       }
-    ],
-    "inheritedTags": [
-      "genre:pop"
     ]
   },
   {
@@ -215,78 +164,54 @@
     "workId": "work-song-1106",
     "title": "六兆年と一夜物語",
     "originalArtist": "Kemu",
-    "tags": [
-      "language:ja"
-    ],
+    "tags": [],
     "performances": [
       {
         "id": "p-d3922176",
         "streamId": "stream-2026-04-26",
         "videoId": "QuPB5nDhK5o",
         "timestamp": 2034,
-        "endTimestamp": 2247,
-        "tags": [
-          "language:ja"
-        ]
+        "endTimestamp": 2247
       },
       {
         "id": "p-87252f6c",
         "streamId": "stream-2026-03-22",
         "videoId": "d1NGgYgGuoY",
         "timestamp": 1595,
-        "endTimestamp": 1808,
-        "tags": [
-          "language:ja"
-        ]
+        "endTimestamp": 1808
       }
-    ],
-    "inheritedTags": []
+    ]
   },
   {
     "id": "song-240a3cfe",
     "workId": "work-song-240a3cfe",
     "title": "六等星",
     "originalArtist": "ざらめ",
-    "tags": [
-      "language:ja"
-    ],
+    "tags": [],
     "performances": [
       {
         "id": "p-a5fd9ce1",
         "streamId": "stream-2026-03-22",
         "videoId": "d1NGgYgGuoY",
         "timestamp": 12375,
-        "endTimestamp": 12628,
-        "tags": [
-          "language:ja"
-        ]
+        "endTimestamp": 12628
       }
-    ],
-    "inheritedTags": []
+    ]
   },
   {
     "id": "song-8c616b65",
     "workId": "work-song-2bb8d010",
     "title": "六等星の夜",
     "originalArtist": "Aimer",
-    "tags": [
-      "language:ja",
-      "genre:pop"
-    ],
+    "tags": [],
     "performances": [
       {
         "id": "p-bc184a88",
         "streamId": "stream-2026-03-22",
         "videoId": "d1NGgYgGuoY",
         "timestamp": 3190,
-        "endTimestamp": 3522,
-        "tags": [
-          "language:ja"
-        ]
+        "endTimestamp": 3522
       }
-    ],
-    "inheritedTags": [
-      "genre:pop"
     ]
   },
   {
@@ -294,26 +219,15 @@
     "workId": "work-song-07bab4f3",
     "title": "少女レイ",
     "originalArtist": "みきとP",
-    "tags": [
-      "language:ja",
-      "genre:pop",
-      "source:vocaloid"
-    ],
+    "tags": [],
     "performances": [
       {
         "id": "p-9e705498",
         "streamId": "stream-2026-04-26",
         "videoId": "QuPB5nDhK5o",
         "timestamp": 8100,
-        "endTimestamp": 8373,
-        "tags": [
-          "language:ja"
-        ]
+        "endTimestamp": 8373
       }
-    ],
-    "inheritedTags": [
-      "genre:pop",
-      "source:vocaloid"
     ]
   },
   {
@@ -321,24 +235,15 @@
     "workId": "work-song-a0302d99",
     "title": "少女レイ",
     "originalArtist": "みきとP feat. 初音ミク",
-    "tags": [
-      "language:ja",
-      "source:vocaloid"
-    ],
+    "tags": [],
     "performances": [
       {
         "id": "p-25beb23e",
         "streamId": "stream-02c40ac6",
         "videoId": "ODikksIsYEc",
         "timestamp": 7105,
-        "endTimestamp": 7380,
-        "tags": [
-          "language:ja"
-        ]
+        "endTimestamp": 7380
       }
-    ],
-    "inheritedTags": [
-      "source:vocaloid"
     ]
   },
   {
@@ -346,24 +251,15 @@
     "workId": "work-song-208",
     "title": "心做し",
     "originalArtist": "蝶々P",
-    "tags": [
-      "language:ja",
-      "source:vocaloid"
-    ],
+    "tags": [],
     "performances": [
       {
         "id": "p-e1fe22a9",
         "streamId": "stream-2026-04-26",
         "videoId": "QuPB5nDhK5o",
         "timestamp": 4730,
-        "endTimestamp": 4995,
-        "tags": [
-          "language:ja"
-        ]
+        "endTimestamp": 4995
       }
-    ],
-    "inheritedTags": [
-      "source:vocaloid"
     ]
   },
   {
@@ -378,33 +274,25 @@
         "streamId": "stream-0a97675c",
         "videoId": "rSCyxZQ4Sis",
         "timestamp": 9708,
-        "endTimestamp": 9961,
-        "tags": []
+        "endTimestamp": 9961
       }
-    ],
-    "inheritedTags": []
+    ]
   },
   {
     "id": "song-55951594",
     "workId": "work-song-55951594",
     "title": "右肩の蝶",
     "originalArtist": "のりぴー",
-    "tags": [
-      "language:ja"
-    ],
+    "tags": [],
     "performances": [
       {
         "id": "p-acdbf6c8",
         "streamId": "stream-2026-04-26",
         "videoId": "QuPB5nDhK5o",
         "timestamp": 820,
-        "endTimestamp": 1082,
-        "tags": [
-          "language:ja"
-        ]
+        "endTimestamp": 1082
       }
-    ],
-    "inheritedTags": []
+    ]
   },
   {
     "id": "song-c791bb66",
@@ -418,11 +306,9 @@
         "streamId": "stream-0a97675c",
         "videoId": "rSCyxZQ4Sis",
         "timestamp": 4722,
-        "endTimestamp": 4949,
-        "tags": []
+        "endTimestamp": 4949
       }
-    ],
-    "inheritedTags": []
+    ]
   },
   {
     "id": "song-e18776c4",
@@ -436,59 +322,40 @@
         "streamId": "stream-02c40ac6",
         "videoId": "ODikksIsYEc",
         "timestamp": 16763,
-        "endTimestamp": 16995,
-        "tags": []
+        "endTimestamp": 16995
       }
-    ],
-    "inheritedTags": []
+    ]
   },
   {
     "id": "song-1855f8a3",
     "workId": "work-song-778",
     "title": "好きだから",
     "originalArtist": "ユイカ",
-    "tags": [
-      "language:ja"
-    ],
+    "tags": [],
     "performances": [
       {
         "id": "p-628223d8",
         "streamId": "stream-2026-03-22",
         "videoId": "d1NGgYgGuoY",
         "timestamp": 693,
-        "endTimestamp": 998,
-        "tags": [
-          "language:ja"
-        ]
+        "endTimestamp": 998
       }
-    ],
-    "inheritedTags": []
+    ]
   },
   {
     "id": "song-390f0183",
     "workId": "work-song-1598",
     "title": "妄想税",
     "originalArtist": "DECO*27",
-    "tags": [
-      "language:ja",
-      "genre:pop",
-      "source:vocaloid"
-    ],
+    "tags": [],
     "performances": [
       {
         "id": "p-b06a286e",
         "streamId": "stream-2026-04-26",
         "videoId": "QuPB5nDhK5o",
         "timestamp": 6656,
-        "endTimestamp": 6869,
-        "tags": [
-          "language:ja"
-        ]
+        "endTimestamp": 6869
       }
-    ],
-    "inheritedTags": [
-      "genre:pop",
-      "source:vocaloid"
     ]
   },
   {
@@ -496,24 +363,15 @@
     "workId": "work-song-00364f82",
     "title": "妄想感傷代償連盟",
     "originalArtist": "DECO*27 feat. 初音ミク",
-    "tags": [
-      "language:ja",
-      "source:vocaloid"
-    ],
+    "tags": [],
     "performances": [
       {
         "id": "p-195ef860",
         "streamId": "stream-02c40ac6",
         "videoId": "ODikksIsYEc",
         "timestamp": 3390,
-        "endTimestamp": 3648,
-        "tags": [
-          "language:ja"
-        ]
+        "endTimestamp": 3648
       }
-    ],
-    "inheritedTags": [
-      "source:vocaloid"
     ]
   },
   {
@@ -521,36 +379,22 @@
     "workId": "work-song-1172",
     "title": "妄想感傷代償連盟",
     "originalArtist": "DECO*27",
-    "tags": [
-      "language:ja",
-      "genre:pop",
-      "source:vocaloid"
-    ],
+    "tags": [],
     "performances": [
       {
         "id": "p-286709b5",
         "streamId": "stream-2026-04-26",
         "videoId": "QuPB5nDhK5o",
         "timestamp": 3685,
-        "endTimestamp": 3947,
-        "tags": [
-          "language:ja"
-        ]
+        "endTimestamp": 3947
       },
       {
         "id": "p-593072a4",
         "streamId": "stream-2026-03-22",
         "videoId": "d1NGgYgGuoY",
         "timestamp": 4439,
-        "endTimestamp": 4701,
-        "tags": [
-          "language:ja"
-        ]
+        "endTimestamp": 4701
       }
-    ],
-    "inheritedTags": [
-      "genre:pop",
-      "source:vocaloid"
     ]
   },
   {
@@ -558,58 +402,38 @@
     "workId": "work-song-0b948d3f",
     "title": "忘れじの言の葉",
     "originalArtist": "安次嶺希和子",
-    "tags": [
-      "language:ja"
-    ],
+    "tags": [],
     "performances": [
       {
         "id": "p-519ccce5",
         "streamId": "stream-02c40ac6",
         "videoId": "ODikksIsYEc",
         "timestamp": 11792,
-        "endTimestamp": 12026,
-        "tags": [
-          "language:ja"
-        ]
+        "endTimestamp": 12026
       },
       {
         "id": "p-b1fd2d2c",
         "streamId": "stream-2026-03-22",
         "videoId": "d1NGgYgGuoY",
         "timestamp": 5870,
-        "endTimestamp": 6103,
-        "tags": [
-          "language:ja"
-        ]
+        "endTimestamp": 6103
       }
-    ],
-    "inheritedTags": []
+    ]
   },
   {
     "id": "song-a61a442b",
     "workId": "work-song-612",
     "title": "快晴",
     "originalArtist": "Orangestar",
-    "tags": [
-      "language:ja",
-      "genre:pop",
-      "source:vocaloid"
-    ],
+    "tags": [],
     "performances": [
       {
         "id": "p-2c137501",
         "streamId": "stream-2026-04-26",
         "videoId": "QuPB5nDhK5o",
         "timestamp": 5605,
-        "endTimestamp": 5862,
-        "tags": [
-          "language:ja"
-        ]
+        "endTimestamp": 5862
       }
-    ],
-    "inheritedTags": [
-      "genre:pop",
-      "source:vocaloid"
     ]
   },
   {
@@ -624,11 +448,9 @@
         "streamId": "stream-0a97675c",
         "videoId": "rSCyxZQ4Sis",
         "timestamp": 14736,
-        "endTimestamp": 15043,
-        "tags": []
+        "endTimestamp": 15043
       }
-    ],
-    "inheritedTags": []
+    ]
   },
   {
     "id": "song-ae7bd215",
@@ -642,11 +464,9 @@
         "streamId": "stream-0a97675c",
         "videoId": "rSCyxZQ4Sis",
         "timestamp": 11918,
-        "endTimestamp": 12190,
-        "tags": []
+        "endTimestamp": 12190
       }
-    ],
-    "inheritedTags": []
+    ]
   },
   {
     "id": "song-fe54c316",
@@ -660,33 +480,25 @@
         "streamId": "stream-02c40ac6",
         "videoId": "ODikksIsYEc",
         "timestamp": 9656,
-        "endTimestamp": 9903,
-        "tags": []
+        "endTimestamp": 9903
       }
-    ],
-    "inheritedTags": []
+    ]
   },
   {
     "id": "song-267effa4",
     "workId": "work-song-267effa4",
     "title": "私は、わたしの事が好き。",
     "originalArtist": "夏吉ゆうこ",
-    "tags": [
-      "language:ja"
-    ],
+    "tags": [],
     "performances": [
       {
         "id": "p-7012b545",
         "streamId": "stream-2026-03-22",
         "videoId": "d1NGgYgGuoY",
         "timestamp": 7379,
-        "endTimestamp": 7627,
-        "tags": [
-          "language:ja"
-        ]
+        "endTimestamp": 7627
       }
-    ],
-    "inheritedTags": []
+    ]
   },
   {
     "id": "song-efd31c05",
@@ -700,79 +512,56 @@
         "streamId": "stream-0a97675c",
         "videoId": "rSCyxZQ4Sis",
         "timestamp": 6929,
-        "endTimestamp": 7189,
-        "tags": []
+        "endTimestamp": 7189
       }
-    ],
-    "inheritedTags": []
+    ]
   },
   {
     "id": "song-757081bb",
     "workId": "work-song-757081bb",
     "title": "命に嫌われている",
     "originalArtist": "Kanzaki Iori",
-    "tags": [
-      "language:ja"
-    ],
+    "tags": [],
     "performances": [
       {
         "id": "p-b95dc5b8",
         "streamId": "stream-2026-03-22",
         "videoId": "d1NGgYgGuoY",
         "timestamp": 3694,
-        "endTimestamp": 3964,
-        "tags": [
-          "language:ja"
-        ]
+        "endTimestamp": 3964
       }
-    ],
-    "inheritedTags": []
+    ]
   },
   {
     "id": "song-44a277fe",
     "workId": "work-song-44a277fe",
     "title": "夜明けと蛍",
     "originalArtist": "n-buna",
-    "tags": [
-      "language:ja"
-    ],
+    "tags": [],
     "performances": [
       {
         "id": "p-203705d8",
         "streamId": "stream-02c40ac6",
         "videoId": "ODikksIsYEc",
         "timestamp": 10663,
-        "endTimestamp": 10969,
-        "tags": [
-          "language:ja"
-        ]
+        "endTimestamp": 10969
       }
-    ],
-    "inheritedTags": []
+    ]
   },
   {
     "id": "song-16e6f425",
     "workId": "work-song-16e6f425",
     "title": "夜もすがら君想ふ",
     "originalArtist": "TOKOTOKO (西沢さんP) feat. GUMI",
-    "tags": [
-      "language:ja",
-      "source:vocaloid"
-    ],
+    "tags": [],
     "performances": [
       {
         "id": "p-4be9c4c1",
         "streamId": "stream-02c40ac6",
         "videoId": "ODikksIsYEc",
         "timestamp": 4710,
-        "endTimestamp": 4942,
-        "tags": [
-          "language:ja"
-        ]
+        "endTimestamp": 4942
       }
-    ],
-    "inheritedTags": [
-      "source:vocaloid"
     ]
   },
   {
@@ -787,33 +576,25 @@
         "streamId": "stream-0a97675c",
         "videoId": "rSCyxZQ4Sis",
         "timestamp": 3827,
-        "endTimestamp": 4061,
-        "tags": []
+        "endTimestamp": 4061
       }
-    ],
-    "inheritedTags": []
+    ]
   },
   {
     "id": "song-c33f92ec",
     "workId": "work-song-170",
     "title": "炎",
     "originalArtist": "LiSA",
-    "tags": [
-      "language:ja"
-    ],
+    "tags": [],
     "performances": [
       {
         "id": "p-dc82da87",
         "streamId": "stream-2026-03-22",
         "videoId": "d1NGgYgGuoY",
         "timestamp": 1218,
-        "endTimestamp": 1488,
-        "tags": [
-          "language:ja"
-        ]
+        "endTimestamp": 1488
       }
-    ],
-    "inheritedTags": []
+    ]
   },
   {
     "id": "song-46013a02",
@@ -827,57 +608,40 @@
         "streamId": "stream-0a97675c",
         "videoId": "rSCyxZQ4Sis",
         "timestamp": 2558,
-        "endTimestamp": 2828,
-        "tags": []
+        "endTimestamp": 2828
       }
-    ],
-    "inheritedTags": []
+    ]
   },
   {
     "id": "song-49337df9",
     "workId": "work-song-49337df9",
     "title": "花になって",
     "originalArtist": "緑黄色社会",
-    "tags": [
-      "language:ja"
-    ],
+    "tags": [],
     "performances": [
       {
         "id": "p-2ba659a3",
         "streamId": "stream-02c40ac6",
         "videoId": "ODikksIsYEc",
         "timestamp": 9383,
-        "endTimestamp": 9579,
-        "tags": [
-          "language:ja"
-        ]
+        "endTimestamp": 9579
       }
-    ],
-    "inheritedTags": []
+    ]
   },
   {
     "id": "song-3635cffd",
     "workId": "work-song-2361",
     "title": "青花瓷",
     "originalArtist": "周杰倫",
-    "tags": [
-      "language:zh",
-      "genre:pop"
-    ],
+    "tags": [],
     "performances": [
       {
         "id": "p-15a99ffa",
         "streamId": "stream-0a97675c",
         "videoId": "rSCyxZQ4Sis",
         "timestamp": 1357,
-        "endTimestamp": 1589,
-        "tags": [
-          "language:zh"
-        ]
+        "endTimestamp": 1589
       }
-    ],
-    "inheritedTags": [
-      "genre:pop"
     ]
   },
   {
@@ -885,24 +649,15 @@
     "workId": "work-song-e8439c85",
     "title": "威風堂々",
     "originalArtist": "梅とら feat. 初音ミク, 鏡音リン, 巡音ルカ, GUMI, IA",
-    "tags": [
-      "language:ja",
-      "source:vocaloid"
-    ],
+    "tags": [],
     "performances": [
       {
         "id": "p-d608efbd",
         "streamId": "stream-02c40ac6",
         "videoId": "ODikksIsYEc",
         "timestamp": 1828,
-        "endTimestamp": 2026,
-        "tags": [
-          "language:ja"
-        ]
+        "endTimestamp": 2026
       }
-    ],
-    "inheritedTags": [
-      "source:vocaloid"
     ]
   },
   {
@@ -910,26 +665,15 @@
     "workId": "work-song-ded184ed",
     "title": "幽霊東京(串燒版)",
     "originalArtist": "Ayase",
-    "tags": [
-      "language:ja",
-      "genre:pop",
-      "source:vocaloid"
-    ],
+    "tags": [],
     "performances": [
       {
         "id": "p-c1efefd4",
         "streamId": "stream-2026-03-22",
         "videoId": "d1NGgYgGuoY",
         "timestamp": 5348,
-        "endTimestamp": 5548,
-        "tags": [
-          "language:ja"
-        ]
+        "endTimestamp": 5548
       }
-    ],
-    "inheritedTags": [
-      "genre:pop",
-      "source:vocaloid"
     ]
   },
   {
@@ -937,46 +681,31 @@
     "workId": "work-song-153b6a87",
     "title": "拜無憂",
     "originalArtist": "蕭憶情",
-    "tags": [
-      "language:zh"
-    ],
+    "tags": [],
     "performances": [
       {
         "id": "p-9bac2235",
         "streamId": "stream-0a97675c",
         "videoId": "rSCyxZQ4Sis",
         "timestamp": 13724,
-        "endTimestamp": 13934,
-        "tags": [
-          "language:zh"
-        ]
+        "endTimestamp": 13934
       }
-    ],
-    "inheritedTags": []
+    ]
   },
   {
     "id": "song-ae1b9107",
     "workId": "work-song-ae1b9107",
     "title": "春嵐",
     "originalArtist": "john feat. 初音ミク",
-    "tags": [
-      "language:ja",
-      "source:vocaloid"
-    ],
+    "tags": [],
     "performances": [
       {
         "id": "p-a9086ce1",
         "streamId": "stream-02c40ac6",
         "videoId": "ODikksIsYEc",
         "timestamp": 13003,
-        "endTimestamp": 13155,
-        "tags": [
-          "language:ja"
-        ]
+        "endTimestamp": 13155
       }
-    ],
-    "inheritedTags": [
-      "source:vocaloid"
     ]
   },
   {
@@ -984,24 +713,15 @@
     "workId": "work-song-1524",
     "title": "春雷",
     "originalArtist": "米津玄師",
-    "tags": [
-      "language:ja",
-      "genre:pop"
-    ],
+    "tags": [],
     "performances": [
       {
         "id": "p-b8666505",
         "streamId": "stream-02c40ac6",
         "videoId": "ODikksIsYEc",
         "timestamp": 13250,
-        "endTimestamp": 13533,
-        "tags": [
-          "language:ja"
-        ]
+        "endTimestamp": 13533
       }
-    ],
-    "inheritedTags": [
-      "genre:pop"
     ]
   },
   {
@@ -1009,22 +729,16 @@
     "workId": "work-song-491",
     "title": "春を告げる",
     "originalArtist": "yama",
-    "tags": [
-      "language:ja"
-    ],
+    "tags": [],
     "performances": [
       {
         "id": "p-471ed0fd",
         "streamId": "stream-2026-03-22",
         "videoId": "d1NGgYgGuoY",
         "timestamp": 10207,
-        "endTimestamp": 10403,
-        "tags": [
-          "language:ja"
-        ]
+        "endTimestamp": 10403
       }
-    ],
-    "inheritedTags": []
+    ]
   },
   {
     "id": "song-da68b13e",
@@ -1038,35 +752,24 @@
         "streamId": "stream-0a97675c",
         "videoId": "rSCyxZQ4Sis",
         "timestamp": 15118,
-        "endTimestamp": 15403,
-        "tags": []
+        "endTimestamp": 15403
       }
-    ],
-    "inheritedTags": []
+    ]
   },
   {
     "id": "song-eb6811e0",
     "workId": "work-song-2555",
     "title": "流光記",
     "originalArtist": "銀臨",
-    "tags": [
-      "language:zh",
-      "genre:pop"
-    ],
+    "tags": [],
     "performances": [
       {
         "id": "p-a043a655",
         "streamId": "stream-0a97675c",
         "videoId": "rSCyxZQ4Sis",
         "timestamp": 7280,
-        "endTimestamp": 7552,
-        "tags": [
-          "language:zh"
-        ]
+        "endTimestamp": 7552
       }
-    ],
-    "inheritedTags": [
-      "genre:pop"
     ]
   },
   {
@@ -1081,33 +784,25 @@
         "streamId": "stream-02c40ac6",
         "videoId": "ODikksIsYEc",
         "timestamp": 6194,
-        "endTimestamp": 6349,
-        "tags": []
+        "endTimestamp": 6349
       }
-    ],
-    "inheritedTags": []
+    ]
   },
   {
     "id": "song-22675cd5",
     "workId": "work-song-22675cd5",
     "title": "修煉愛情 × 跳樓機",
     "originalArtist": "林俊傑, LBI利比",
-    "tags": [
-      "language:zh"
-    ],
+    "tags": [],
     "performances": [
       {
         "id": "p-52f9c7a6",
         "streamId": "stream-02c40ac6",
         "videoId": "ODikksIsYEc",
         "timestamp": 5067,
-        "endTimestamp": 5348,
-        "tags": [
-          "language:zh"
-        ]
+        "endTimestamp": 5348
       }
-    ],
-    "inheritedTags": []
+    ]
   },
   {
     "id": "song-0305c679",
@@ -1121,35 +816,24 @@
         "streamId": "stream-2026-03-22",
         "videoId": "d1NGgYgGuoY",
         "timestamp": 4091,
-        "endTimestamp": 4342,
-        "tags": []
+        "endTimestamp": 4342
       }
-    ],
-    "inheritedTags": []
+    ]
   },
   {
     "id": "song-e1a57fe7",
     "workId": "work-song-e1a57fe7",
     "title": "桃花諾",
     "originalArtist": "鄧紫棋",
-    "tags": [
-      "language:zh",
-      "genre:pop"
-    ],
+    "tags": [],
     "performances": [
       {
         "id": "p-63065c81",
         "streamId": "stream-02c40ac6",
         "videoId": "ODikksIsYEc",
         "timestamp": 1462,
-        "endTimestamp": 1673,
-        "tags": [
-          "language:zh"
-        ]
+        "endTimestamp": 1673
       }
-    ],
-    "inheritedTags": [
-      "genre:pop"
     ]
   },
   {
@@ -1164,35 +848,24 @@
         "streamId": "stream-0a97675c",
         "videoId": "rSCyxZQ4Sis",
         "timestamp": 12592,
-        "endTimestamp": 12812,
-        "tags": []
+        "endTimestamp": 12812
       }
-    ],
-    "inheritedTags": []
+    ]
   },
   {
     "id": "song-8ac24f25",
     "workId": "work-song-8ac24f25",
     "title": "草泥馬之歌 (寶寶祁)",
     "originalArtist": "洛天依",
-    "tags": [
-      "language:zh",
-      "source:vocaloid"
-    ],
+    "tags": [],
     "performances": [
       {
         "id": "p-8f67c843",
         "streamId": "stream-02c40ac6",
         "videoId": "ODikksIsYEc",
         "timestamp": 5621,
-        "endTimestamp": 5701,
-        "tags": [
-          "language:zh"
-        ]
+        "endTimestamp": 5701
       }
-    ],
-    "inheritedTags": [
-      "source:vocaloid"
     ]
   },
   {
@@ -1207,35 +880,24 @@
         "streamId": "stream-0a97675c",
         "videoId": "rSCyxZQ4Sis",
         "timestamp": 8376,
-        "endTimestamp": 8601,
-        "tags": []
+        "endTimestamp": 8601
       }
-    ],
-    "inheritedTags": []
+    ]
   },
   {
     "id": "song-980caa83",
     "workId": "work-song-013c53cd",
     "title": "晩餐歌",
     "originalArtist": "tuki.",
-    "tags": [
-      "language:ja",
-      "genre:pop"
-    ],
+    "tags": [],
     "performances": [
       {
         "id": "p-414dcf67",
         "streamId": "stream-02c40ac6",
         "videoId": "ODikksIsYEc",
         "timestamp": 17313,
-        "endTimestamp": 17528,
-        "tags": [
-          "language:ja"
-        ]
+        "endTimestamp": 17528
       }
-    ],
-    "inheritedTags": [
-      "genre:pop"
     ]
   },
   {
@@ -1250,67 +912,47 @@
         "streamId": "stream-0a97675c",
         "videoId": "rSCyxZQ4Sis",
         "timestamp": 4255,
-        "endTimestamp": 4580,
-        "tags": []
+        "endTimestamp": 4580
       }
-    ],
-    "inheritedTags": []
+    ]
   },
   {
     "id": "song-fa8cebb6",
     "workId": "work-song-196",
     "title": "深海少女",
     "originalArtist": "ゆうゆ",
-    "tags": [
-      "language:ja"
-    ],
+    "tags": [],
     "performances": [
       {
         "id": "p-2e33664d",
         "streamId": "stream-2026-04-26",
         "videoId": "QuPB5nDhK5o",
         "timestamp": 2903,
-        "endTimestamp": 3113,
-        "tags": [
-          "language:ja"
-        ]
+        "endTimestamp": 3113
       }
-    ],
-    "inheritedTags": []
+    ]
   },
   {
     "id": "song-1ebee093",
     "workId": "work-song-1ebee093",
     "title": "清清如我",
     "originalArtist": "郁可唯",
-    "tags": [
-      "language:zh",
-      "genre:pop"
-    ],
+    "tags": [],
     "performances": [
       {
         "id": "p-02aaa291",
         "streamId": "stream-0a97675c",
         "videoId": "rSCyxZQ4Sis",
         "timestamp": 3102,
-        "endTimestamp": 3299,
-        "tags": [
-          "language:zh"
-        ]
+        "endTimestamp": 3299
       },
       {
         "id": "p-d5520d20",
         "streamId": "stream-0a97675c",
         "videoId": "rSCyxZQ4Sis",
         "timestamp": 15745,
-        "endTimestamp": 15944,
-        "tags": [
-          "language:zh"
-        ]
+        "endTimestamp": 15944
       }
-    ],
-    "inheritedTags": [
-      "genre:pop"
     ]
   },
   {
@@ -1325,11 +967,9 @@
         "streamId": "stream-0a97675c",
         "videoId": "rSCyxZQ4Sis",
         "timestamp": 10742,
-        "endTimestamp": 10977,
-        "tags": []
+        "endTimestamp": 10977
       }
-    ],
-    "inheritedTags": []
+    ]
   },
   {
     "id": "song-bc79da23",
@@ -1343,33 +983,25 @@
         "streamId": "stream-02c40ac6",
         "videoId": "ODikksIsYEc",
         "timestamp": 17045,
-        "endTimestamp": 17116,
-        "tags": []
+        "endTimestamp": 17116
       }
-    ],
-    "inheritedTags": []
+    ]
   },
   {
     "id": "song-73ded5c3",
     "workId": "work-song-73ded5c3",
     "title": "雪落下的聲音",
     "originalArtist": "陸虎",
-    "tags": [
-      "language:zh"
-    ],
+    "tags": [],
     "performances": [
       {
         "id": "p-9755c9e1",
         "streamId": "stream-0a97675c",
         "videoId": "rSCyxZQ4Sis",
         "timestamp": 9243,
-        "endTimestamp": 9539,
-        "tags": [
-          "language:zh"
-        ]
+        "endTimestamp": 9539
       }
-    ],
-    "inheritedTags": []
+    ]
   },
   {
     "id": "song-0c91ab5e",
@@ -1383,79 +1015,56 @@
         "streamId": "stream-0a97675c",
         "videoId": "rSCyxZQ4Sis",
         "timestamp": 7991,
-        "endTimestamp": 8220,
-        "tags": []
+        "endTimestamp": 8220
       }
-    ],
-    "inheritedTags": []
+    ]
   },
   {
     "id": "song-a8d2416a",
     "workId": "work-song-2d7462b1",
     "title": "創聖のアクエリオン",
     "originalArtist": "AKINO",
-    "tags": [
-      "language:ja"
-    ],
+    "tags": [],
     "performances": [
       {
         "id": "p-0e5c4b87",
         "streamId": "stream-2026-03-22",
         "videoId": "d1NGgYgGuoY",
         "timestamp": 7872,
-        "endTimestamp": 8150,
-        "tags": [
-          "language:ja"
-        ]
+        "endTimestamp": 8150
       }
-    ],
-    "inheritedTags": []
+    ]
   },
   {
     "id": "song-ce26476b",
     "workId": "work-song-ce26476b",
     "title": "惑星ループ",
     "originalArtist": "ナユタン星人",
-    "tags": [
-      "language:ja"
-    ],
+    "tags": [],
     "performances": [
       {
         "id": "p-e164aca4",
         "streamId": "stream-2026-03-22",
         "videoId": "d1NGgYgGuoY",
         "timestamp": 15104,
-        "endTimestamp": 15297,
-        "tags": [
-          "language:ja"
-        ]
+        "endTimestamp": 15297
       }
-    ],
-    "inheritedTags": []
+    ]
   },
   {
     "id": "song-6cccf79f",
     "workId": "work-song-1751",
     "title": "棠梨煎雪",
     "originalArtist": "銀臨",
-    "tags": [
-      "language:zh",
-      "genre:pop"
-    ],
+    "tags": [],
     "performances": [
       {
         "id": "p-41453f53",
         "streamId": "stream-0a97675c",
         "videoId": "rSCyxZQ4Sis",
         "timestamp": 12962,
-        "endTimestamp": 13198,
-        "tags": [
-          "language:zh"
-        ]
+        "endTimestamp": 13198
       }
-    ],
-    "inheritedTags": [
-      "genre:pop"
     ]
   },
   {
@@ -1463,68 +1072,47 @@
     "workId": "work-song-fbd3cea4",
     "title": "畫地為牢",
     "originalArtist": "雲の泣 & 葉里",
-    "tags": [
-      "language:ja"
-    ],
+    "tags": [],
     "performances": [
       {
         "id": "p-f20f26ce",
         "streamId": "stream-0a97675c",
         "videoId": "rSCyxZQ4Sis",
         "timestamp": 6299,
-        "endTimestamp": 6652,
-        "tags": [
-          "language:ja"
-        ]
+        "endTimestamp": 6652
       }
-    ],
-    "inheritedTags": []
+    ]
   },
   {
     "id": "song-95033708",
     "workId": "work-song-95033708",
     "title": "盜將行",
     "originalArtist": "花粥",
-    "tags": [
-      "language:zh"
-    ],
+    "tags": [],
     "performances": [
       {
         "id": "p-20a835d7",
         "streamId": "stream-0a97675c",
         "videoId": "rSCyxZQ4Sis",
         "timestamp": 13324,
-        "endTimestamp": 13516,
-        "tags": [
-          "language:zh"
-        ]
+        "endTimestamp": 13516
       }
-    ],
-    "inheritedTags": []
+    ]
   },
   {
     "id": "song-df543f0c",
     "workId": "work-song-24928401",
     "title": "菊花台",
     "originalArtist": "周杰倫",
-    "tags": [
-      "language:zh",
-      "genre:pop"
-    ],
+    "tags": [],
     "performances": [
       {
         "id": "p-2d685a91",
         "streamId": "stream-0a97675c",
         "videoId": "rSCyxZQ4Sis",
         "timestamp": 11295,
-        "endTimestamp": 11588,
-        "tags": [
-          "language:zh"
-        ]
+        "endTimestamp": 11588
       }
-    ],
-    "inheritedTags": [
-      "genre:pop"
     ]
   },
   {
@@ -1539,37 +1127,24 @@
         "streamId": "stream-02c40ac6",
         "videoId": "ODikksIsYEc",
         "timestamp": 2566,
-        "endTimestamp": 2780,
-        "tags": []
+        "endTimestamp": 2780
       }
-    ],
-    "inheritedTags": []
+    ]
   },
   {
     "id": "song-c62fd626",
     "workId": "work-song-1274",
     "title": "愛言葉",
     "originalArtist": "DECO*27",
-    "tags": [
-      "language:ja",
-      "genre:pop",
-      "source:vocaloid"
-    ],
+    "tags": [],
     "performances": [
       {
         "id": "p-311cc59d",
         "streamId": "stream-2026-03-22",
         "videoId": "d1NGgYgGuoY",
         "timestamp": 8606,
-        "endTimestamp": 8869,
-        "tags": [
-          "language:ja"
-        ]
+        "endTimestamp": 8869
       }
-    ],
-    "inheritedTags": [
-      "genre:pop",
-      "source:vocaloid"
     ]
   },
   {
@@ -1577,26 +1152,15 @@
     "workId": "work-song-083ed044",
     "title": "愛言葉Ⅱ",
     "originalArtist": "DECO*27",
-    "tags": [
-      "language:ja",
-      "genre:pop",
-      "source:vocaloid"
-    ],
+    "tags": [],
     "performances": [
       {
         "id": "p-5c90b5f0",
         "streamId": "stream-2026-03-22",
         "videoId": "d1NGgYgGuoY",
         "timestamp": 8912,
-        "endTimestamp": 9176,
-        "tags": [
-          "language:ja"
-        ]
+        "endTimestamp": 9176
       }
-    ],
-    "inheritedTags": [
-      "genre:pop",
-      "source:vocaloid"
     ]
   },
   {
@@ -1604,36 +1168,22 @@
     "workId": "work-song-33c059fe",
     "title": "愛言葉Ⅲ",
     "originalArtist": "DECO*27",
-    "tags": [
-      "language:ja",
-      "genre:pop",
-      "source:vocaloid"
-    ],
+    "tags": [],
     "performances": [
       {
         "id": "p-43337414",
         "streamId": "stream-2026-04-26",
         "videoId": "QuPB5nDhK5o",
         "timestamp": 7097,
-        "endTimestamp": 7341,
-        "tags": [
-          "language:ja"
-        ]
+        "endTimestamp": 7341
       },
       {
         "id": "p-4dc7731c",
         "streamId": "stream-2026-03-22",
         "videoId": "d1NGgYgGuoY",
         "timestamp": 9317,
-        "endTimestamp": 9563,
-        "tags": [
-          "language:ja"
-        ]
+        "endTimestamp": 9563
       }
-    ],
-    "inheritedTags": [
-      "genre:pop",
-      "source:vocaloid"
     ]
   },
   {
@@ -1641,24 +1191,15 @@
     "workId": "work-song-928e50e5",
     "title": "愛言葉Ⅳ",
     "originalArtist": "DECO*27 feat. 初音ミク",
-    "tags": [
-      "language:ja",
-      "source:vocaloid"
-    ],
+    "tags": [],
     "performances": [
       {
         "id": "p-2ba97493",
         "streamId": "stream-02c40ac6",
         "videoId": "ODikksIsYEc",
         "timestamp": 12592,
-        "endTimestamp": 12809,
-        "tags": [
-          "language:ja"
-        ]
+        "endTimestamp": 12809
       }
-    ],
-    "inheritedTags": [
-      "source:vocaloid"
     ]
   },
   {
@@ -1666,26 +1207,15 @@
     "workId": "work-song-931",
     "title": "愛言葉Ⅳ",
     "originalArtist": "DECO*27",
-    "tags": [
-      "language:ja",
-      "genre:pop",
-      "source:vocaloid"
-    ],
+    "tags": [],
     "performances": [
       {
         "id": "p-64de7907",
         "streamId": "stream-2026-03-22",
         "videoId": "d1NGgYgGuoY",
         "timestamp": 9621,
-        "endTimestamp": 9839,
-        "tags": [
-          "language:ja"
-        ]
+        "endTimestamp": 9839
       }
-    ],
-    "inheritedTags": [
-      "genre:pop",
-      "source:vocaloid"
     ]
   },
   {
@@ -1693,26 +1223,15 @@
     "workId": "work-song-b32b3c6d",
     "title": "愛言葉Ⅴ",
     "originalArtist": "DECO*27",
-    "tags": [
-      "language:ja",
-      "genre:pop",
-      "source:vocaloid"
-    ],
+    "tags": [],
     "performances": [
       {
         "id": "p-466107d7",
         "streamId": "stream-2026-03-22",
         "videoId": "d1NGgYgGuoY",
         "timestamp": 9879,
-        "endTimestamp": 10096,
-        "tags": [
-          "language:ja"
-        ]
+        "endTimestamp": 10096
       }
-    ],
-    "inheritedTags": [
-      "genre:pop",
-      "source:vocaloid"
     ]
   },
   {
@@ -1720,70 +1239,47 @@
     "workId": "work-song-6ef32a4a",
     "title": "愛殤",
     "originalArtist": "小時姑娘",
-    "tags": [
-      "language:zh"
-    ],
+    "tags": [],
     "performances": [
       {
         "id": "p-f55b9cab",
         "streamId": "stream-0a97675c",
         "videoId": "rSCyxZQ4Sis",
         "timestamp": 13988,
-        "endTimestamp": 14283,
-        "tags": [
-          "language:zh"
-        ]
+        "endTimestamp": 14283
       }
-    ],
-    "inheritedTags": []
+    ]
   },
   {
     "id": "song-6e329a3f",
     "workId": "work-song-6e329a3f",
     "title": "夢傾天下",
     "originalArtist": "蘭音 Reine",
-    "tags": [
-      "language:zh"
-    ],
+    "tags": [],
     "performances": [
       {
         "id": "p-95a535d1",
         "streamId": "stream-0a97675c",
         "videoId": "rSCyxZQ4Sis",
         "timestamp": 2153,
-        "endTimestamp": 2339,
-        "tags": [
-          "language:zh"
-        ]
+        "endTimestamp": 2339
       }
-    ],
-    "inheritedTags": []
+    ]
   },
   {
     "id": "song-9c0a9b5c",
     "workId": "work-song-1664",
     "title": "歌に形はないけれど",
     "originalArtist": "doriko",
-    "tags": [
-      "language:ja",
-      "genre:pop",
-      "source:vocaloid"
-    ],
+    "tags": [],
     "performances": [
       {
         "id": "p-445d15bb",
         "streamId": "stream-2026-04-26",
         "videoId": "QuPB5nDhK5o",
         "timestamp": 1405,
-        "endTimestamp": 1732,
-        "tags": [
-          "language:ja"
-        ]
+        "endTimestamp": 1732
       }
-    ],
-    "inheritedTags": [
-      "genre:pop",
-      "source:vocaloid"
     ]
   },
   {
@@ -1791,44 +1287,32 @@
     "workId": "work-song-0336eae8",
     "title": "銀河與星斗",
     "originalArtist": "Yihuik苡慧",
-    "tags": [
-      "language:zh"
-    ],
+    "tags": [],
     "performances": [
       {
         "id": "p-9a71a4db",
         "streamId": "stream-02c40ac6",
         "videoId": "ODikksIsYEc",
         "timestamp": 7985,
-        "endTimestamp": 8179,
-        "tags": [
-          "language:zh"
-        ]
+        "endTimestamp": 8179
       }
-    ],
-    "inheritedTags": []
+    ]
   },
   {
     "id": "song-4ffd7997",
     "workId": "work-song-4ffd7997",
     "title": "雑魚",
     "originalArtist": "柊マグネタイト",
-    "tags": [
-      "language:ja"
-    ],
+    "tags": [],
     "performances": [
       {
         "id": "p-5c73776f",
         "streamId": "stream-2026-04-26",
         "videoId": "QuPB5nDhK5o",
         "timestamp": 8520,
-        "endTimestamp": 8727,
-        "tags": [
-          "language:ja"
-        ]
+        "endTimestamp": 8727
       }
-    ],
-    "inheritedTags": []
+    ]
   },
   {
     "id": "song-0e7932c2",
@@ -1842,77 +1326,57 @@
         "streamId": "stream-0a97675c",
         "videoId": "rSCyxZQ4Sis",
         "timestamp": 5767,
-        "endTimestamp": 5977,
-        "tags": []
+        "endTimestamp": 5977
       }
-    ],
-    "inheritedTags": []
+    ]
   },
   {
     "id": "song-3b6dcf08",
     "workId": "work-song-3b6dcf08",
     "title": "壊レタ世界ノ歌",
     "originalArtist": "河野万里奈",
-    "tags": [
-      "language:ja"
-    ],
+    "tags": [],
     "performances": [
       {
         "id": "p-154cc236",
         "streamId": "stream-2026-03-22",
         "videoId": "d1NGgYgGuoY",
         "timestamp": 2672,
-        "endTimestamp": 3012,
-        "tags": [
-          "language:ja"
-        ]
+        "endTimestamp": 3012
       }
-    ],
-    "inheritedTags": []
+    ]
   },
   {
     "id": "song-e3714cf6",
     "workId": "work-song-e3714cf6",
     "title": "錦鯉抄",
     "originalArtist": "雲の泣 & 銀臨",
-    "tags": [
-      "language:ja"
-    ],
+    "tags": [],
     "performances": [
       {
         "id": "p-5184055a",
         "streamId": "stream-0a97675c",
         "videoId": "rSCyxZQ4Sis",
         "timestamp": 8728,
-        "endTimestamp": 8969,
-        "tags": [
-          "language:ja"
-        ]
+        "endTimestamp": 8969
       }
-    ],
-    "inheritedTags": []
+    ]
   },
   {
     "id": "song-c7ce03ea",
     "workId": "work-song-c7ce03ea",
     "title": "戀愛頻率",
     "originalArtist": "許志安, 許慧欣",
-    "tags": [
-      "language:zh"
-    ],
+    "tags": [],
     "performances": [
       {
         "id": "p-0c974392",
         "streamId": "stream-02c40ac6",
         "videoId": "ODikksIsYEc",
         "timestamp": 7745,
-        "endTimestamp": 7937,
-        "tags": [
-          "language:zh"
-        ]
+        "endTimestamp": 7937
       }
-    ],
-    "inheritedTags": []
+    ]
   },
   {
     "id": "song-70fbba06",
@@ -1926,11 +1390,9 @@
         "streamId": "stream-2026-04-26",
         "videoId": "QuPB5nDhK5o",
         "timestamp": 9574,
-        "endTimestamp": 9707,
-        "tags": []
+        "endTimestamp": 9707
       }
-    ],
-    "inheritedTags": []
+    ]
   },
   {
     "id": "song-89a5ca2d",
@@ -1944,35 +1406,24 @@
         "streamId": "stream-2026-04-26",
         "videoId": "QuPB5nDhK5o",
         "timestamp": 10247,
-        "endTimestamp": 10439,
-        "tags": []
+        "endTimestamp": 10439
       }
-    ],
-    "inheritedTags": []
+    ]
   },
   {
     "id": "song-fbff3b8e",
     "workId": "work-song-fbff3b8e",
     "title": "Dear",
     "originalArtist": "19's Sound Factory feat. 初音ミク",
-    "tags": [
-      "language:ja",
-      "source:vocaloid"
-    ],
+    "tags": [],
     "performances": [
       {
         "id": "p-3b195f67",
         "streamId": "stream-02c40ac6",
         "videoId": "ODikksIsYEc",
         "timestamp": 8567,
-        "endTimestamp": 8830,
-        "tags": [
-          "language:ja"
-        ]
+        "endTimestamp": 8830
       }
-    ],
-    "inheritedTags": [
-      "source:vocaloid"
     ]
   },
   {
@@ -1980,22 +1431,16 @@
     "workId": "work-song-e52ee89c",
     "title": "Electric Angel",
     "originalArtist": "ヤスオ",
-    "tags": [
-      "language:ja"
-    ],
+    "tags": [],
     "performances": [
       {
         "id": "p-ccab5c5d",
         "streamId": "stream-2026-04-26",
         "videoId": "QuPB5nDhK5o",
         "timestamp": 5307,
-        "endTimestamp": 5503,
-        "tags": [
-          "language:ja"
-        ]
+        "endTimestamp": 5503
       }
-    ],
-    "inheritedTags": []
+    ]
   },
   {
     "id": "song-ac40449b",
@@ -2009,35 +1454,24 @@
         "streamId": "stream-2026-03-22",
         "videoId": "d1NGgYgGuoY",
         "timestamp": 12803,
-        "endTimestamp": 13060,
-        "tags": []
+        "endTimestamp": 13060
       }
-    ],
-    "inheritedTags": []
+    ]
   },
   {
     "id": "song-bd00931d",
     "workId": "work-song-bd00931d",
     "title": "Focus",
     "originalArtist": "Ariana Grande",
-    "tags": [
-      "language:en",
-      "genre:pop"
-    ],
+    "tags": [],
     "performances": [
       {
         "id": "p-eaeddc34",
         "streamId": "stream-2026-03-22",
         "videoId": "d1NGgYgGuoY",
         "timestamp": 11371,
-        "endTimestamp": 11579,
-        "tags": [
-          "language:en"
-        ]
+        "endTimestamp": 11579
       }
-    ],
-    "inheritedTags": [
-      "genre:pop"
     ]
   },
   {
@@ -2052,40 +1486,31 @@
         "streamId": "stream-2026-04-26",
         "videoId": "QuPB5nDhK5o",
         "timestamp": 9779,
-        "endTimestamp": 9978,
-        "tags": []
+        "endTimestamp": 9978
       },
       {
         "id": "p-ceaddbf4",
         "streamId": "stream-2026-03-22",
         "videoId": "d1NGgYgGuoY",
         "timestamp": 11025,
-        "endTimestamp": 11224,
-        "tags": []
+        "endTimestamp": 11224
       }
-    ],
-    "inheritedTags": []
+    ]
   },
   {
     "id": "song-d51657eb",
     "workId": "work-song-d51657eb",
     "title": "FOCUS",
     "originalArtist": "KIRA feat. GUMI",
-    "tags": [
-      "source:vocaloid"
-    ],
+    "tags": [],
     "performances": [
       {
         "id": "p-5ddaa395",
         "streamId": "stream-02c40ac6",
         "videoId": "ODikksIsYEc",
         "timestamp": 5883,
-        "endTimestamp": 6081,
-        "tags": []
+        "endTimestamp": 6081
       }
-    ],
-    "inheritedTags": [
-      "source:vocaloid"
     ]
   },
   {
@@ -2093,24 +1518,15 @@
     "workId": "work-song-7728909c",
     "title": "GETCHA!",
     "originalArtist": "Giga, KIRA feat. 初音ミク",
-    "tags": [
-      "language:ja",
-      "source:vocaloid"
-    ],
+    "tags": [],
     "performances": [
       {
         "id": "p-34fe66af",
         "streamId": "stream-02c40ac6",
         "videoId": "ODikksIsYEc",
         "timestamp": 10363,
-        "endTimestamp": 10591,
-        "tags": [
-          "language:ja"
-        ]
+        "endTimestamp": 10591
       }
-    ],
-    "inheritedTags": [
-      "source:vocaloid"
     ]
   },
   {
@@ -2125,35 +1541,24 @@
         "streamId": "stream-2026-04-26",
         "videoId": "QuPB5nDhK5o",
         "timestamp": 7706,
-        "endTimestamp": 7985,
-        "tags": []
+        "endTimestamp": 7985
       }
-    ],
-    "inheritedTags": []
+    ]
   },
   {
     "id": "song-7b126762",
     "workId": "work-song-7b126762",
     "title": "Lemon + 哥布林檬 + 檸檬",
     "originalArtist": "米津玄師",
-    "tags": [
-      "language:ja",
-      "genre:pop"
-    ],
+    "tags": [],
     "performances": [
       {
         "id": "p-787cefde",
         "streamId": "stream-02c40ac6",
         "videoId": "ODikksIsYEc",
         "timestamp": 3749,
-        "endTimestamp": 3998,
-        "tags": [
-          "language:ja"
-        ]
+        "endTimestamp": 3998
       }
-    ],
-    "inheritedTags": [
-      "genre:pop"
     ]
   },
   {
@@ -2161,22 +1566,16 @@
     "workId": "work-song-0765a179",
     "title": "Love it?",
     "originalArtist": "biz × ZERA",
-    "tags": [
-      "language:en"
-    ],
+    "tags": [],
     "performances": [
       {
         "id": "p-14e885c4",
         "streamId": "stream-02c40ac6",
         "videoId": "ODikksIsYEc",
         "timestamp": 15329,
-        "endTimestamp": 15475,
-        "tags": [
-          "language:en"
-        ]
+        "endTimestamp": 15475
       }
-    ],
-    "inheritedTags": []
+    ]
   },
   {
     "id": "song-2f53e01c",
@@ -2190,11 +1589,9 @@
         "streamId": "stream-02c40ac6",
         "videoId": "ODikksIsYEc",
         "timestamp": 2189,
-        "endTimestamp": 2440,
-        "tags": []
+        "endTimestamp": 2440
       }
-    ],
-    "inheritedTags": []
+    ]
   },
   {
     "id": "song-e58dbf13",
@@ -2208,45 +1605,31 @@
         "streamId": "stream-2026-04-26",
         "videoId": "QuPB5nDhK5o",
         "timestamp": 2411,
-        "endTimestamp": 2740,
-        "tags": []
+        "endTimestamp": 2740
       },
       {
         "id": "p-dab5e343",
         "streamId": "stream-2026-03-22",
         "videoId": "d1NGgYgGuoY",
         "timestamp": 6170,
-        "endTimestamp": 6499,
-        "tags": []
+        "endTimestamp": 6499
       }
-    ],
-    "inheritedTags": []
+    ]
   },
   {
     "id": "song-29fc5ced",
     "workId": "work-song-00bb0fb8",
     "title": "Stellar Stellar",
     "originalArtist": "星街すいせい",
-    "tags": [
-      "language:ja",
-      "genre:pop",
-      "genre:rock"
-    ],
+    "tags": [],
     "performances": [
       {
         "id": "p-172b5521",
         "streamId": "stream-2026-03-22",
         "videoId": "d1NGgYgGuoY",
         "timestamp": 4899,
-        "endTimestamp": 5197,
-        "tags": [
-          "language:ja"
-        ]
+        "endTimestamp": 5197
       }
-    ],
-    "inheritedTags": [
-      "genre:pop",
-      "genre:rock"
     ]
   },
   {
@@ -2254,24 +1637,15 @@
     "workId": "work-song-1433",
     "title": "The Beginning",
     "originalArtist": "ONE OK ROCK",
-    "tags": [
-      "language:ja",
-      "genre:rock"
-    ],
+    "tags": [],
     "performances": [
       {
         "id": "p-b5340c31",
         "streamId": "stream-2026-03-22",
         "videoId": "d1NGgYgGuoY",
         "timestamp": 11975,
-        "endTimestamp": 12259,
-        "tags": [
-          "language:ja"
-        ]
+        "endTimestamp": 12259
       }
-    ],
-    "inheritedTags": [
-      "genre:rock"
     ]
   },
   {
@@ -2279,22 +1653,16 @@
     "workId": "work-song-6da32724",
     "title": "THERE IS A REASON",
     "originalArtist": "鈴木このみ",
-    "tags": [
-      "language:ja"
-    ],
+    "tags": [],
     "performances": [
       {
         "id": "p-02ce26b0",
         "streamId": "stream-02c40ac6",
         "videoId": "ODikksIsYEc",
         "timestamp": 4128,
-        "endTimestamp": 4414,
-        "tags": [
-          "language:ja"
-        ]
+        "endTimestamp": 4414
       }
-    ],
-    "inheritedTags": []
+    ]
   },
   {
     "id": "song-a9491a80",
@@ -2308,11 +1676,9 @@
         "streamId": "stream-2026-03-22",
         "videoId": "d1NGgYgGuoY",
         "timestamp": 14268,
-        "endTimestamp": 14445,
-        "tags": []
+        "endTimestamp": 14445
       }
-    ],
-    "inheritedTags": []
+    ]
   },
   {
     "id": "song-d69df5ce",
@@ -2326,35 +1692,24 @@
         "streamId": "stream-02c40ac6",
         "videoId": "ODikksIsYEc",
         "timestamp": 9959,
-        "endTimestamp": 10232,
-        "tags": []
+        "endTimestamp": 10232
       }
-    ],
-    "inheritedTags": []
+    ]
   },
   {
     "id": "song-309f3146",
     "workId": "work-song-309f3146",
     "title": "WAVE",
     "originalArtist": "niki",
-    "tags": [
-      "language:ja",
-      "source:vocaloid"
-    ],
+    "tags": [],
     "performances": [
       {
         "id": "p-a46d806c",
         "streamId": "stream-2026-04-26",
         "videoId": "QuPB5nDhK5o",
         "timestamp": 7446,
-        "endTimestamp": 7638,
-        "tags": [
-          "language:ja"
-        ]
+        "endTimestamp": 7638
       }
-    ],
-    "inheritedTags": [
-      "source:vocaloid"
     ]
   },
   {
@@ -2362,46 +1717,31 @@
     "workId": "work-song-41c53f2b",
     "title": "アイロニ",
     "originalArtist": "scop",
-    "tags": [
-      "language:ja"
-    ],
+    "tags": [],
     "performances": [
       {
         "id": "p-d5617f32",
         "streamId": "stream-2026-03-22",
         "videoId": "d1NGgYgGuoY",
         "timestamp": 14819,
-        "endTimestamp": 15066,
-        "tags": [
-          "language:ja"
-        ]
+        "endTimestamp": 15066
       }
-    ],
-    "inheritedTags": []
+    ]
   },
   {
     "id": "song-f4d7925f",
     "workId": "work-song-f4d7925f",
     "title": "いーあるふぁんくらぶ",
     "originalArtist": "みきとP feat.GUMI・鏡音リン",
-    "tags": [
-      "language:ja",
-      "source:vocaloid"
-    ],
+    "tags": [],
     "performances": [
       {
         "id": "p-43090aae",
         "streamId": "stream-02c40ac6",
         "videoId": "ODikksIsYEc",
         "timestamp": 3025,
-        "endTimestamp": 3257,
-        "tags": [
-          "language:ja"
-        ]
+        "endTimestamp": 3257
       }
-    ],
-    "inheritedTags": [
-      "source:vocaloid"
     ]
   },
   {
@@ -2409,26 +1749,15 @@
     "workId": "work-song-1005",
     "title": "ヴァンパイア",
     "originalArtist": "DECO*27",
-    "tags": [
-      "language:ja",
-      "genre:pop",
-      "source:vocaloid"
-    ],
+    "tags": [],
     "performances": [
       {
         "id": "p-38f7e417",
         "streamId": "stream-02c40ac6",
         "videoId": "ODikksIsYEc",
         "timestamp": 6431,
-        "endTimestamp": 6608,
-        "tags": [
-          "language:ja"
-        ]
+        "endTimestamp": 6608
       }
-    ],
-    "inheritedTags": [
-      "genre:pop",
-      "source:vocaloid"
     ]
   },
   {
@@ -2436,26 +1765,15 @@
     "workId": "work-song-492",
     "title": "からくりピエロ",
     "originalArtist": "40mP",
-    "tags": [
-      "language:ja",
-      "genre:pop",
-      "source:vocaloid"
-    ],
+    "tags": [],
     "performances": [
       {
         "id": "p-e87bf202",
         "streamId": "stream-2026-04-26",
         "videoId": "QuPB5nDhK5o",
         "timestamp": 4233,
-        "endTimestamp": 4515,
-        "tags": [
-          "language:ja"
-        ]
+        "endTimestamp": 4515
       }
-    ],
-    "inheritedTags": [
-      "genre:pop",
-      "source:vocaloid"
     ]
   },
   {
@@ -2463,46 +1781,31 @@
     "workId": "work-song-5611694d",
     "title": "グッバイ宣言",
     "originalArtist": "Chinozo",
-    "tags": [
-      "language:ja"
-    ],
+    "tags": [],
     "performances": [
       {
         "id": "p-d17a15c9",
         "streamId": "stream-02c40ac6",
         "videoId": "ODikksIsYEc",
         "timestamp": 14178,
-        "endTimestamp": 14348,
-        "tags": [
-          "language:ja"
-        ]
+        "endTimestamp": 14348
       }
-    ],
-    "inheritedTags": []
+    ]
   },
   {
     "id": "song-689cd56c",
     "workId": "work-song-689cd56c",
     "title": "シネマ",
     "originalArtist": "Ayase feat. 初音ミク",
-    "tags": [
-      "language:ja",
-      "source:vocaloid"
-    ],
+    "tags": [],
     "performances": [
       {
         "id": "p-e744bf32",
         "streamId": "stream-02c40ac6",
         "videoId": "ODikksIsYEc",
         "timestamp": 14638,
-        "endTimestamp": 14843,
-        "tags": [
-          "language:ja"
-        ]
+        "endTimestamp": 14843
       }
-    ],
-    "inheritedTags": [
-      "source:vocaloid"
     ]
   },
   {
@@ -2510,26 +1813,15 @@
     "workId": "work-song-d86135e5",
     "title": "シネマ",
     "originalArtist": "Ayase",
-    "tags": [
-      "language:ja",
-      "genre:pop",
-      "source:vocaloid"
-    ],
+    "tags": [],
     "performances": [
       {
         "id": "p-ae8df6f4",
         "streamId": "stream-2026-03-22",
         "videoId": "d1NGgYgGuoY",
         "timestamp": 13162,
-        "endTimestamp": 13369,
-        "tags": [
-          "language:ja"
-        ]
+        "endTimestamp": 13369
       }
-    ],
-    "inheritedTags": [
-      "genre:pop",
-      "source:vocaloid"
     ]
   },
   {
@@ -2537,24 +1829,15 @@
     "workId": "work-song-65402c63",
     "title": "すずめ",
     "originalArtist": "RADWIMPS",
-    "tags": [
-      "language:ja",
-      "genre:rock"
-    ],
+    "tags": [],
     "performances": [
       {
         "id": "p-268d9df4",
         "streamId": "stream-02c40ac6",
         "videoId": "ODikksIsYEc",
         "timestamp": 11114,
-        "endTimestamp": 11347,
-        "tags": [
-          "language:ja"
-        ]
+        "endTimestamp": 11347
       }
-    ],
-    "inheritedTags": [
-      "genre:rock"
     ]
   },
   {
@@ -2562,26 +1845,15 @@
     "workId": "work-song-537cf20a",
     "title": "チェリーポップ",
     "originalArtist": "DECO*27",
-    "tags": [
-      "language:ja",
-      "genre:pop",
-      "source:vocaloid"
-    ],
+    "tags": [],
     "performances": [
       {
         "id": "p-c242e7f6",
         "streamId": "stream-02c40ac6",
         "videoId": "ODikksIsYEc",
         "timestamp": 6914,
-        "endTimestamp": 7054,
-        "tags": [
-          "language:ja"
-        ]
+        "endTimestamp": 7054
       }
-    ],
-    "inheritedTags": [
-      "genre:pop",
-      "source:vocaloid"
     ]
   },
   {
@@ -2589,46 +1861,31 @@
     "workId": "work-song-1698",
     "title": "チチをもげ",
     "originalArtist": "高橋広樹",
-    "tags": [
-      "language:ja"
-    ],
+    "tags": [],
     "performances": [
       {
         "id": "p-a01bdf16",
         "streamId": "stream-2026-03-22",
         "videoId": "d1NGgYgGuoY",
         "timestamp": 15668,
-        "endTimestamp": 15866,
-        "tags": [
-          "language:ja"
-        ]
+        "endTimestamp": 15866
       }
-    ],
-    "inheritedTags": []
+    ]
   },
   {
     "id": "song-08f21ded",
     "workId": "work-song-08f21ded",
     "title": "テトリス",
     "originalArtist": "柊マグネタイト feat. 重音テト",
-    "tags": [
-      "language:ja",
-      "source:vocaloid"
-    ],
+    "tags": [],
     "performances": [
       {
         "id": "p-a87a1180",
         "streamId": "stream-02c40ac6",
         "videoId": "ODikksIsYEc",
         "timestamp": 13994,
-        "endTimestamp": 14135,
-        "tags": [
-          "language:ja"
-        ]
+        "endTimestamp": 14135
       }
-    ],
-    "inheritedTags": [
-      "source:vocaloid"
     ]
   },
   {
@@ -2636,114 +1893,79 @@
     "workId": "work-song-db397cc9",
     "title": "テトリス",
     "originalArtist": "柊マグネタイト",
-    "tags": [
-      "language:ja"
-    ],
+    "tags": [],
     "performances": [
       {
         "id": "p-b28f77fb",
         "streamId": "stream-2026-04-26",
         "videoId": "QuPB5nDhK5o",
         "timestamp": 9336,
-        "endTimestamp": 9477,
-        "tags": [
-          "language:ja"
-        ]
+        "endTimestamp": 9477
       }
-    ],
-    "inheritedTags": []
+    ]
   },
   {
     "id": "song-5650d8e0",
     "workId": "work-song-5650d8e0",
     "title": "トウキョウ・シャンディ・ランデヴ",
     "originalArtist": "MAISONdes feat. 花譜, ツミキ",
-    "tags": [
-      "language:ja"
-    ],
+    "tags": [],
     "performances": [
       {
         "id": "p-332dfb06",
         "streamId": "stream-02c40ac6",
         "videoId": "ODikksIsYEc",
         "timestamp": 14411,
-        "endTimestamp": 14592,
-        "tags": [
-          "language:ja"
-        ]
+        "endTimestamp": 14592
       }
-    ],
-    "inheritedTags": []
+    ]
   },
   {
     "id": "song-778da96a",
     "workId": "work-song-1111259a",
     "title": "ドラマツルギー",
     "originalArtist": "Eve",
-    "tags": [
-      "language:ja"
-    ],
+    "tags": [],
     "performances": [
       {
         "id": "p-e5285e37",
         "streamId": "stream-02c40ac6",
         "videoId": "ODikksIsYEc",
         "timestamp": 14907,
-        "endTimestamp": 15142,
-        "tags": [
-          "language:ja"
-        ]
+        "endTimestamp": 15142
       }
-    ],
-    "inheritedTags": []
+    ]
   },
   {
     "id": "song-9aa2a40a",
     "workId": "work-song-227",
     "title": "にゃんにゃんにゃん",
     "originalArtist": "コレサワ",
-    "tags": [
-      "language:ja"
-    ],
+    "tags": [],
     "performances": [
       {
         "id": "p-760c4d44",
         "streamId": "stream-2026-03-22",
         "videoId": "d1NGgYgGuoY",
         "timestamp": 6642,
-        "endTimestamp": 6892,
-        "tags": [
-          "language:ja"
-        ]
+        "endTimestamp": 6892
       }
-    ],
-    "inheritedTags": []
+    ]
   },
   {
     "id": "song-6d96717d",
     "workId": "work-song-6d96717d",
     "title": "ビビデバ (1.5 倍速)",
     "originalArtist": "星街すいせい",
-    "tags": [
-      "language:ja",
-      "genre:pop",
-      "genre:rock"
-    ],
+    "tags": [],
     "performances": [
       {
         "id": "p-ea387386",
         "streamId": "stream-2026-03-22",
         "videoId": "d1NGgYgGuoY",
         "timestamp": 7025,
-        "endTimestamp": 7136,
-        "tags": [
-          "language:ja"
-        ]
+        "endTimestamp": 7136
       }
-    ],
-    "inheritedTags": [
-      "genre:pop",
-      "genre:rock"
     ]
   },
   {
@@ -2751,26 +1973,15 @@
     "workId": "work-song-55fee578",
     "title": "ビビデバ (2.0 倍速)",
     "originalArtist": "星街すいせい",
-    "tags": [
-      "language:ja",
-      "genre:pop",
-      "genre:rock"
-    ],
+    "tags": [],
     "performances": [
       {
         "id": "p-79817da4",
         "streamId": "stream-2026-03-22",
         "videoId": "d1NGgYgGuoY",
         "timestamp": 7186,
-        "endTimestamp": 7269,
-        "tags": [
-          "language:ja"
-        ]
+        "endTimestamp": 7269
       }
-    ],
-    "inheritedTags": [
-      "genre:pop",
-      "genre:rock"
     ]
   },
   {
@@ -2778,70 +1989,47 @@
     "workId": "work-song-be20ab87",
     "title": "フィクサー",
     "originalArtist": "ぬゆり",
-    "tags": [
-      "language:ja"
-    ],
+    "tags": [],
     "performances": [
       {
         "id": "p-7e8af90a",
         "streamId": "stream-02c40ac6",
         "videoId": "ODikksIsYEc",
         "timestamp": 13628,
-        "endTimestamp": 13868,
-        "tags": [
-          "language:ja"
-        ]
+        "endTimestamp": 13868
       }
-    ],
-    "inheritedTags": []
+    ]
   },
   {
     "id": "song-139a2f8d",
     "workId": "work-song-139a2f8d",
     "title": "ふわふわ時間",
     "originalArtist": "放課後ティータイム",
-    "tags": [
-      "language:ja"
-    ],
+    "tags": [],
     "performances": [
       {
         "id": "p-dc047ac3",
         "streamId": "stream-2026-03-22",
         "videoId": "d1NGgYgGuoY",
         "timestamp": 15409,
-        "endTimestamp": 15643,
-        "tags": [
-          "language:ja"
-        ]
+        "endTimestamp": 15643
       }
-    ],
-    "inheritedTags": []
+    ]
   },
   {
     "id": "song-9e8ca74c",
     "workId": "work-song-9e8ca74c",
     "title": "みちずれ",
     "originalArtist": "星街すいせい",
-    "tags": [
-      "language:ja",
-      "genre:pop",
-      "genre:rock"
-    ],
+    "tags": [],
     "performances": [
       {
         "id": "p-2825d45d",
         "streamId": "stream-02c40ac6",
         "videoId": "ODikksIsYEc",
         "timestamp": 16396,
-        "endTimestamp": 16584,
-        "tags": [
-          "language:ja"
-        ]
+        "endTimestamp": 16584
       }
-    ],
-    "inheritedTags": [
-      "genre:pop",
-      "genre:rock"
     ]
   },
   {
@@ -2849,46 +2037,31 @@
     "workId": "work-song-659",
     "title": "メランコリック",
     "originalArtist": "Junky",
-    "tags": [
-      "language:ja"
-    ],
+    "tags": [],
     "performances": [
       {
         "id": "p-6d7d4c04",
         "streamId": "stream-2026-03-22",
         "videoId": "d1NGgYgGuoY",
         "timestamp": 14575,
-        "endTimestamp": 14792,
-        "tags": [
-          "language:ja"
-        ]
+        "endTimestamp": 14792
       }
-    ],
-    "inheritedTags": []
+    ]
   },
   {
     "id": "song-5b168961",
     "workId": "work-song-06c577a0",
     "title": "メリーゴーランド",
     "originalArtist": "優里",
-    "tags": [
-      "language:ja",
-      "genre:rock"
-    ],
+    "tags": [],
     "performances": [
       {
         "id": "p-2648914d",
         "streamId": "stream-02c40ac6",
         "videoId": "ODikksIsYEc",
         "timestamp": 16001,
-        "endTimestamp": 16248,
-        "tags": [
-          "language:ja"
-        ]
+        "endTimestamp": 16248
       }
-    ],
-    "inheritedTags": [
-      "genre:rock"
     ]
   },
   {
@@ -2896,68 +2069,47 @@
     "workId": "work-song-263",
     "title": "モエチャッカファイア",
     "originalArtist": "弌誠",
-    "tags": [
-      "language:ja"
-    ],
+    "tags": [],
     "performances": [
       {
         "id": "p-c7369a1b",
         "streamId": "stream-02c40ac6",
         "videoId": "ODikksIsYEc",
         "timestamp": 7497,
-        "endTimestamp": 7650,
-        "tags": [
-          "language:ja"
-        ]
+        "endTimestamp": 7650
       }
-    ],
-    "inheritedTags": []
+    ]
   },
   {
     "id": "song-0c224a90",
     "workId": "work-song-0c224a90",
     "title": "リードコントロール",
     "originalArtist": "なるみや",
-    "tags": [
-      "language:ja"
-    ],
+    "tags": [],
     "performances": [
       {
         "id": "p-2ac6a363",
         "streamId": "stream-02c40ac6",
         "videoId": "ODikksIsYEc",
         "timestamp": 15771,
-        "endTimestamp": 15913,
-        "tags": [
-          "language:ja"
-        ]
+        "endTimestamp": 15913
       }
-    ],
-    "inheritedTags": []
+    ]
   },
   {
     "id": "song-534e1cba",
     "workId": "work-song-1459",
     "title": "レオ",
     "originalArtist": "優里",
-    "tags": [
-      "language:ja",
-      "genre:rock"
-    ],
+    "tags": [],
     "performances": [
       {
         "id": "p-9e472170",
         "streamId": "stream-2026-03-22",
         "videoId": "d1NGgYgGuoY",
         "timestamp": 1891,
-        "endTimestamp": 2126,
-        "tags": [
-          "language:ja"
-        ]
+        "endTimestamp": 2126
       }
-    ],
-    "inheritedTags": [
-      "genre:rock"
     ]
   },
   {
@@ -2965,48 +2117,31 @@
     "workId": "work-song-1108",
     "title": "ロストワンの号哭",
     "originalArtist": "Neru",
-    "tags": [
-      "language:ja"
-    ],
+    "tags": [],
     "performances": [
       {
         "id": "p-3c3a2bb9",
         "streamId": "stream-2026-04-26",
         "videoId": "QuPB5nDhK5o",
         "timestamp": 9010,
-        "endTimestamp": 9222,
-        "tags": [
-          "language:ja"
-        ]
+        "endTimestamp": 9222
       }
-    ],
-    "inheritedTags": []
+    ]
   },
   {
     "id": "song-c3b32ae5",
     "workId": "work-song-2043",
     "title": "ロンリーユニバース",
     "originalArtist": "Aqu3ra",
-    "tags": [
-      "language:ja",
-      "genre:pop",
-      "source:vocaloid"
-    ],
+    "tags": [],
     "performances": [
       {
         "id": "p-ae31412f",
         "streamId": "stream-2026-04-26",
         "videoId": "QuPB5nDhK5o",
         "timestamp": 6174,
-        "endTimestamp": 6390,
-        "tags": [
-          "language:ja"
-        ]
+        "endTimestamp": 6390
       }
-    ],
-    "inheritedTags": [
-      "genre:pop",
-      "source:vocaloid"
     ]
   },
   {
@@ -3014,43 +2149,31 @@
     "workId": "work-song-cc56c5b7",
     "title": "ワールドイズマイン",
     "originalArtist": "ryo(supercell)",
-    "tags": [
-      "language:ja"
-    ],
+    "tags": [],
     "performances": [
       {
         "id": "p-7a01ba72",
         "streamId": "stream-2026-03-22",
         "videoId": "d1NGgYgGuoY",
         "timestamp": 11670,
-        "endTimestamp": 11895,
-        "tags": [
-          "language:ja"
-        ]
+        "endTimestamp": 11895
       }
-    ],
-    "inheritedTags": []
+    ]
   },
   {
     "id": "song-885c54ab",
     "workId": "work-song-885c54ab",
     "title": "わたしの一番かわいいところ",
     "originalArtist": "FRUITS ZIPPER",
-    "tags": [
-      "language:ja"
-    ],
+    "tags": [],
     "performances": [
       {
         "id": "p-e1136e69",
         "streamId": "stream-02c40ac6",
         "videoId": "ODikksIsYEc",
         "timestamp": 12156,
-        "endTimestamp": 12404,
-        "tags": [
-          "language:ja"
-        ]
+        "endTimestamp": 12404
       }
-    ],
-    "inheritedTags": []
+    ]
   }
 ]

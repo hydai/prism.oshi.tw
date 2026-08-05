@@ -4,70 +4,47 @@
     "workId": "work-song-56492feb",
     "title": "1/6 out of the gravity",
     "originalArtist": "ぼーかりおどP",
-    "tags": [
-      "language:ja"
-    ],
+    "tags": [],
     "performances": [
       {
         "id": "p-1210c5e2",
         "streamId": "stream-659ad7b2",
         "videoId": "c07NibFaY8M",
         "timestamp": 0,
-        "endTimestamp": 266,
-        "tags": [
-          "language:ja"
-        ]
+        "endTimestamp": 266
       }
-    ],
-    "inheritedTags": []
+    ]
   },
   {
     "id": "song-9ac4bce6",
     "workId": "work-song-649",
     "title": "太陽系デスコ",
     "originalArtist": "ナユタン星人",
-    "tags": [
-      "language:ja"
-    ],
+    "tags": [],
     "performances": [
       {
         "id": "p-2ed7f104",
         "streamId": "stream-659ad7b2",
         "videoId": "c07NibFaY8M",
         "timestamp": 3912,
-        "endTimestamp": 4123,
-        "tags": [
-          "language:ja"
-        ]
+        "endTimestamp": 4123
       }
-    ],
-    "inheritedTags": []
+    ]
   },
   {
     "id": "song-07bab4f3",
     "workId": "work-song-07bab4f3",
     "title": "少女レイ",
     "originalArtist": "みきとP",
-    "tags": [
-      "language:ja",
-      "genre:pop",
-      "source:vocaloid"
-    ],
+    "tags": [],
     "performances": [
       {
         "id": "p-7648cf29",
         "streamId": "stream-659ad7b2",
         "videoId": "c07NibFaY8M",
         "timestamp": 2895,
-        "endTimestamp": 3175,
-        "tags": [
-          "language:ja"
-        ]
+        "endTimestamp": 3175
       }
-    ],
-    "inheritedTags": [
-      "genre:pop",
-      "source:vocaloid"
     ]
   },
   {
@@ -75,24 +52,15 @@
     "workId": "work-song-335",
     "title": "白い雪のプリンセスは",
     "originalArtist": "のぼる↑P",
-    "tags": [
-      "language:ja",
-      "source:vocaloid"
-    ],
+    "tags": [],
     "performances": [
       {
         "id": "p-febede3d",
         "streamId": "stream-659ad7b2",
         "videoId": "c07NibFaY8M",
         "timestamp": 2590,
-        "endTimestamp": 2851,
-        "tags": [
-          "language:ja"
-        ]
+        "endTimestamp": 2851
       }
-    ],
-    "inheritedTags": [
-      "source:vocaloid"
     ]
   },
   {
@@ -100,24 +68,15 @@
     "workId": "work-song-1047",
     "title": "夜咄ディセイブ",
     "originalArtist": "じん",
-    "tags": [
-      "language:ja",
-      "source:vocaloid"
-    ],
+    "tags": [],
     "performances": [
       {
         "id": "p-f4c8b790",
         "streamId": "stream-659ad7b2",
         "videoId": "c07NibFaY8M",
         "timestamp": 3430,
-        "endTimestamp": 3623,
-        "tags": [
-          "language:ja"
-        ]
+        "endTimestamp": 3623
       }
-    ],
-    "inheritedTags": [
-      "source:vocaloid"
     ]
   },
   {
@@ -125,22 +84,16 @@
     "workId": "work-song-a77bc6da",
     "title": "Catch You Catch Me",
     "originalArtist": "日向めぐみ",
-    "tags": [
-      "language:ja"
-    ],
+    "tags": [],
     "performances": [
       {
         "id": "p-68b7cd5c",
         "streamId": "stream-659ad7b2",
         "videoId": "c07NibFaY8M",
         "timestamp": 5862,
-        "endTimestamp": 6083,
-        "tags": [
-          "language:ja"
-        ]
+        "endTimestamp": 6083
       }
-    ],
-    "inheritedTags": []
+    ]
   },
   {
     "id": "song-aaf75986",
@@ -154,35 +107,24 @@
         "streamId": "stream-659ad7b2",
         "videoId": "c07NibFaY8M",
         "timestamp": 2303,
-        "endTimestamp": 2538,
-        "tags": []
+        "endTimestamp": 2538
       }
-    ],
-    "inheritedTags": []
+    ]
   },
   {
     "id": "song-6d8cd13c",
-    "workId": "work-song-1552",
+    "workId": "work-song-4",
     "title": "Dear",
     "originalArtist": "19's Sound Factory",
-    "tags": [
-      "language:en",
-      "source:vocaloid"
-    ],
+    "tags": [],
     "performances": [
       {
         "id": "p-f1bd5af0",
         "streamId": "stream-659ad7b2",
         "videoId": "c07NibFaY8M",
         "timestamp": 7436,
-        "endTimestamp": 7700,
-        "tags": [
-          "language:en"
-        ]
+        "endTimestamp": 7700
       }
-    ],
-    "inheritedTags": [
-      "source:vocaloid"
     ]
   },
   {
@@ -190,26 +132,15 @@
     "workId": "work-song-560",
     "title": "from Y to Y",
     "originalArtist": "ジミーサムP",
-    "tags": [
-      "language:ja",
-      "genre:pop",
-      "source:vocaloid"
-    ],
+    "tags": [],
     "performances": [
       {
         "id": "p-3e8501df",
         "streamId": "stream-659ad7b2",
         "videoId": "c07NibFaY8M",
         "timestamp": 6752,
-        "endTimestamp": 7080,
-        "tags": [
-          "language:ja"
-        ]
+        "endTimestamp": 7080
       }
-    ],
-    "inheritedTags": [
-      "genre:pop",
-      "source:vocaloid"
     ]
   },
   {
@@ -217,24 +148,15 @@
     "workId": "work-song-1990",
     "title": "rain stops, good-bye",
     "originalArtist": "におP",
-    "tags": [
-      "language:ja",
-      "source:vocaloid"
-    ],
+    "tags": [],
     "performances": [
       {
         "id": "p-3b4ad4ac",
         "streamId": "stream-659ad7b2",
         "videoId": "c07NibFaY8M",
         "timestamp": 740,
-        "endTimestamp": 1063,
-        "tags": [
-          "language:ja"
-        ]
+        "endTimestamp": 1063
       }
-    ],
-    "inheritedTags": [
-      "source:vocaloid"
     ]
   },
   {
@@ -242,87 +164,63 @@
     "workId": "work-song-77d78961",
     "title": "こっちを向いてよ",
     "originalArtist": "WEAVER",
-    "tags": [
-      "language:ja"
-    ],
+    "tags": [],
     "performances": [
       {
         "id": "p-8c536988",
         "streamId": "stream-659ad7b2",
         "videoId": "c07NibFaY8M",
         "timestamp": 6341,
-        "endTimestamp": 6652,
-        "tags": [
-          "language:ja"
-        ]
+        "endTimestamp": 6652
       }
-    ],
-    "inheritedTags": []
+    ]
   },
   {
     "id": "song-422d0590",
     "workId": "work-song-422d0590",
     "title": "ステラ",
     "originalArtist": "needLe",
-    "tags": [
-      "language:ja"
-    ],
+    "tags": [],
     "performances": [
       {
         "id": "p-7e7ee978",
         "streamId": "stream-659ad7b2",
         "videoId": "c07NibFaY8M",
         "timestamp": 4969,
-        "endTimestamp": 5289,
-        "tags": [
-          "language:ja"
-        ]
+        "endTimestamp": 5289
       }
-    ],
-    "inheritedTags": []
+    ]
   },
   {
     "id": "song-dbaf808c",
     "workId": "work-song-667",
     "title": "ピエロ",
     "originalArtist": "KEI",
-    "tags": [
-      "language:ja"
-    ],
+    "tags": [],
     "performances": [
       {
         "id": "p-11566dae",
         "streamId": "stream-659ad7b2",
         "videoId": "c07NibFaY8M",
         "timestamp": 1096,
-        "endTimestamp": 1389,
-        "tags": [
-          "language:ja"
-        ]
+        "endTimestamp": 1389
       }
-    ],
-    "inheritedTags": []
+    ]
   },
   {
     "id": "song-7a6252f6",
     "workId": "work-song-97",
     "title": "ワールドイズマイン",
     "originalArtist": "Ryo",
-    "tags": [
-      "language:ja"
-    ],
+    "tags": [],
     "performances": [
       {
         "id": "p-8cdb649d",
         "streamId": "stream-659ad7b2",
         "videoId": "c07NibFaY8M",
         "timestamp": 7760,
-        "endTimestamp": 8026,
-        "tags": [
-          "language:ja"
-        ]
+        "endTimestamp": 8026
       }
-    ],
-    "inheritedTags": []
+    ]
   }
 ]

@@ -4,26 +4,15 @@
     "workId": "work-song-07bab4f3",
     "title": "少女レイ",
     "originalArtist": "みきとP",
-    "tags": [
-      "language:ja",
-      "genre:pop",
-      "source:vocaloid"
-    ],
+    "tags": [],
     "performances": [
       {
         "id": "p-9be28ca5",
         "streamId": "stream-f4c6796a",
         "videoId": "1OB3OA7Kir8",
         "timestamp": 513,
-        "endTimestamp": 763,
-        "tags": [
-          "language:ja"
-        ]
+        "endTimestamp": 763
       }
-    ],
-    "inheritedTags": [
-      "genre:pop",
-      "source:vocaloid"
     ]
   },
   {
@@ -31,24 +20,15 @@
     "workId": "work-song-2ccade11",
     "title": "踊",
     "originalArtist": "Ado",
-    "tags": [
-      "language:ja",
-      "genre:pop"
-    ],
+    "tags": [],
     "performances": [
       {
         "id": "p-540ffbc9",
         "streamId": "stream-f4c6796a",
         "videoId": "1OB3OA7Kir8",
         "timestamp": 3620,
-        "endTimestamp": 3836,
-        "tags": [
-          "language:ja"
-        ]
+        "endTimestamp": 3836
       }
-    ],
-    "inheritedTags": [
-      "genre:pop"
     ]
   },
   {
@@ -56,21 +36,15 @@
     "workId": "work-song-424e636c",
     "title": "たばこ",
     "originalArtist": "コレサワ",
-    "tags": [
-      "language:ja"
-    ],
+    "tags": [],
     "performances": [
       {
         "id": "p-92ed3059",
         "streamId": "stream-f4c6796a",
         "videoId": "1OB3OA7Kir8",
         "timestamp": 4541,
-        "endTimestamp": 4902,
-        "tags": [
-          "language:ja"
-        ]
+        "endTimestamp": 4902
       }
-    ],
-    "inheritedTags": []
+    ]
   }
 ]

@@ -4,56 +4,38 @@
     "workId": "work-song-562ecb16",
     "title": "115万キロのフィルム",
     "originalArtist": "髭男",
-    "tags": [
-      "language:ja"
-    ],
+    "tags": [],
     "performances": [
       {
         "id": "p-9eeaf37f",
         "streamId": "stream-591c50e8",
         "videoId": "zjFwAVFay8Y",
         "timestamp": 2933,
-        "endTimestamp": 3254,
-        "tags": [
-          "language:ja"
-        ]
+        "endTimestamp": 3254
       }
-    ],
-    "inheritedTags": []
+    ]
   },
   {
     "id": "song-99030ff8",
     "workId": "work-song-45adfe21",
     "title": "小悪魔だってかまわない！",
     "originalArtist": "HoneyWorks feat. 初音ミク",
-    "tags": [
-      "language:ja",
-      "source:vocaloid"
-    ],
+    "tags": [],
     "performances": [
       {
         "id": "p-b8648fc4",
         "streamId": "stream-69047977",
         "videoId": "NjGAsumGDdQ",
         "timestamp": 5373,
-        "endTimestamp": 5579,
-        "tags": [
-          "language:ja"
-        ]
+        "endTimestamp": 5579
       },
       {
         "id": "p-dcfb7c15",
         "streamId": "stream-591c50e8",
         "videoId": "zjFwAVFay8Y",
         "timestamp": 5119,
-        "endTimestamp": 5325,
-        "tags": [
-          "language:ja"
-        ]
+        "endTimestamp": 5325
       }
-    ],
-    "inheritedTags": [
-      "source:vocaloid"
     ]
   },
   {
@@ -68,35 +50,24 @@
         "streamId": "stream-2026-04-30",
         "videoId": "KfadSsRBCi8",
         "timestamp": 1302,
-        "endTimestamp": 1617,
-        "tags": []
+        "endTimestamp": 1617
       }
-    ],
-    "inheritedTags": []
+    ]
   },
   {
     "id": "song-fd8d7d0a",
     "workId": "work-song-2399",
     "title": "以後別做朋友",
     "originalArtist": "周興哲",
-    "tags": [
-      "language:zh",
-      "genre:pop"
-    ],
+    "tags": [],
     "performances": [
       {
         "id": "p-a3403ce1",
         "streamId": "stream-591c50e8",
         "videoId": "zjFwAVFay8Y",
         "timestamp": 6968,
-        "endTimestamp": 7203,
-        "tags": [
-          "language:zh"
-        ]
+        "endTimestamp": 7203
       }
-    ],
-    "inheritedTags": [
-      "genre:pop"
     ]
   },
   {
@@ -111,45 +82,31 @@
         "streamId": "stream-69047977",
         "videoId": "NjGAsumGDdQ",
         "timestamp": 2239,
-        "endTimestamp": 2446,
-        "tags": []
+        "endTimestamp": 2446
       }
-    ],
-    "inheritedTags": []
+    ]
   },
   {
     "id": "song-14242dbb",
     "workId": "work-song-14242dbb",
     "title": "如果雨之後",
     "originalArtist": "周興哲",
-    "tags": [
-      "language:zh",
-      "genre:pop"
-    ],
+    "tags": [],
     "performances": [
       {
         "id": "p-e92b5391",
         "streamId": "stream-2026-04-30",
         "videoId": "KfadSsRBCi8",
         "timestamp": 2497,
-        "endTimestamp": 2768,
-        "tags": [
-          "language:zh"
-        ]
+        "endTimestamp": 2768
       },
       {
         "id": "p-bc0453a3",
         "streamId": "stream-591c50e8",
         "videoId": "zjFwAVFay8Y",
         "timestamp": 6207,
-        "endTimestamp": 6471,
-        "tags": [
-          "language:zh"
-        ]
+        "endTimestamp": 6471
       }
-    ],
-    "inheritedTags": [
-      "genre:pop"
     ]
   },
   {
@@ -164,35 +121,24 @@
         "streamId": "stream-69047977",
         "videoId": "NjGAsumGDdQ",
         "timestamp": 2853,
-        "endTimestamp": 3080,
-        "tags": []
+        "endTimestamp": 3080
       }
-    ],
-    "inheritedTags": []
+    ]
   },
   {
     "id": "song-cec27eb2",
     "workId": "work-song-2123",
     "title": "你，好不好？",
     "originalArtist": "周興哲",
-    "tags": [
-      "language:zh",
-      "genre:pop"
-    ],
+    "tags": [],
     "performances": [
       {
         "id": "p-452c5789",
         "streamId": "stream-591c50e8",
         "videoId": "zjFwAVFay8Y",
         "timestamp": 6589,
-        "endTimestamp": 6872,
-        "tags": [
-          "language:zh"
-        ]
+        "endTimestamp": 6872
       }
-    ],
-    "inheritedTags": [
-      "genre:pop"
     ]
   },
   {
@@ -207,35 +153,24 @@
         "streamId": "stream-69047977",
         "videoId": "NjGAsumGDdQ",
         "timestamp": 6282,
-        "endTimestamp": 6679,
-        "tags": []
+        "endTimestamp": 6679
       }
-    ],
-    "inheritedTags": []
+    ]
   },
   {
     "id": "song-ad031d58",
     "workId": "work-song-03d847b3",
     "title": "刻在我心底的名字",
     "originalArtist": "盧廣仲",
-    "tags": [
-      "language:zh",
-      "genre:pop"
-    ],
+    "tags": [],
     "performances": [
       {
         "id": "p-c49cd143",
         "streamId": "stream-591c50e8",
         "videoId": "zjFwAVFay8Y",
         "timestamp": 3333,
-        "endTimestamp": 3640,
-        "tags": [
-          "language:zh"
-        ]
+        "endTimestamp": 3640
       }
-    ],
-    "inheritedTags": [
-      "genre:pop"
     ]
   },
   {
@@ -243,24 +178,15 @@
     "workId": "work-song-1b1770d6",
     "title": "夜のピエロ",
     "originalArtist": "Ado",
-    "tags": [
-      "language:ja",
-      "genre:pop"
-    ],
+    "tags": [],
     "performances": [
       {
         "id": "p-5fea5dfc",
         "streamId": "stream-591c50e8",
         "videoId": "zjFwAVFay8Y",
         "timestamp": 1205,
-        "endTimestamp": 1404,
-        "tags": [
-          "language:ja"
-        ]
+        "endTimestamp": 1404
       }
-    ],
-    "inheritedTags": [
-      "genre:pop"
     ]
   },
   {
@@ -268,24 +194,15 @@
     "workId": "work-song-1650",
     "title": "孤勇者",
     "originalArtist": "陳奕迅",
-    "tags": [
-      "language:zh",
-      "genre:pop"
-    ],
+    "tags": [],
     "performances": [
       {
         "id": "p-0b1082a2",
         "streamId": "stream-591c50e8",
         "videoId": "zjFwAVFay8Y",
         "timestamp": 5404,
-        "endTimestamp": 5659,
-        "tags": [
-          "language:zh"
-        ]
+        "endTimestamp": 5659
       }
-    ],
-    "inheritedTags": [
-      "genre:pop"
     ]
   },
   {
@@ -293,46 +210,31 @@
     "workId": "work-song-206",
     "title": "怪獣の花唄",
     "originalArtist": "Vaundy",
-    "tags": [
-      "language:ja"
-    ],
+    "tags": [],
     "performances": [
       {
         "id": "p-6c6ad6a4",
         "streamId": "stream-591c50e8",
         "videoId": "zjFwAVFay8Y",
         "timestamp": 5890,
-        "endTimestamp": 6113,
-        "tags": [
-          "language:ja"
-        ]
+        "endTimestamp": 6113
       }
-    ],
-    "inheritedTags": []
+    ]
   },
   {
     "id": "song-d93258c0",
     "workId": "work-song-2335",
     "title": "東京サマーセッション",
     "originalArtist": "HoneyWorks",
-    "tags": [
-      "language:ja",
-      "genre:pop"
-    ],
+    "tags": [],
     "performances": [
       {
         "id": "p-3c8bca3e",
         "streamId": "stream-591c50e8",
         "videoId": "zjFwAVFay8Y",
         "timestamp": 3850,
-        "endTimestamp": 4075,
-        "tags": [
-          "language:ja"
-        ]
+        "endTimestamp": 4075
       }
-    ],
-    "inheritedTags": [
-      "genre:pop"
     ]
   },
   {
@@ -340,48 +242,31 @@
     "workId": "work-song-2148",
     "title": "泡沫の夜",
     "originalArtist": "nqrse",
-    "tags": [
-      "language:ja"
-    ],
+    "tags": [],
     "performances": [
       {
         "id": "p-cac0f746",
         "streamId": "stream-69047977",
         "videoId": "NjGAsumGDdQ",
         "timestamp": 4346,
-        "endTimestamp": 4561,
-        "tags": [
-          "language:ja"
-        ]
+        "endTimestamp": 4561
       }
-    ],
-    "inheritedTags": []
+    ]
   },
   {
     "id": "song-de9a3d6d",
     "workId": "work-song-1815",
     "title": "花に亡霊",
     "originalArtist": "ヨルシカ",
-    "tags": [
-      "language:ja",
-      "genre:pop",
-      "genre:rock"
-    ],
+    "tags": [],
     "performances": [
       {
         "id": "p-0b1d3407",
         "streamId": "stream-591c50e8",
         "videoId": "zjFwAVFay8Y",
         "timestamp": 1634,
-        "endTimestamp": 1873,
-        "tags": [
-          "language:ja"
-        ]
+        "endTimestamp": 1873
       }
-    ],
-    "inheritedTags": [
-      "genre:pop",
-      "genre:rock"
     ]
   },
   {
@@ -396,35 +281,24 @@
         "streamId": "stream-591c50e8",
         "videoId": "zjFwAVFay8Y",
         "timestamp": 4478,
-        "endTimestamp": 4741,
-        "tags": []
+        "endTimestamp": 4741
       }
-    ],
-    "inheritedTags": []
+    ]
   },
   {
     "id": "song-dbca74ad",
     "workId": "work-song-54e3adfe",
     "title": "紅豆",
     "originalArtist": "王菲",
-    "tags": [
-      "language:zh",
-      "genre:pop"
-    ],
+    "tags": [],
     "performances": [
       {
         "id": "p-0c558270",
         "streamId": "stream-2026-04-30",
         "videoId": "KfadSsRBCi8",
         "timestamp": 5013,
-        "endTimestamp": 5248,
-        "tags": [
-          "language:zh"
-        ]
+        "endTimestamp": 5248
       }
-    ],
-    "inheritedTags": [
-      "genre:pop"
     ]
   },
   {
@@ -432,24 +306,15 @@
     "workId": "work-song-5ff734da",
     "title": "真生活",
     "originalArtist": "案山子 feat. 初音ミク",
-    "tags": [
-      "language:ja",
-      "source:vocaloid"
-    ],
+    "tags": [],
     "performances": [
       {
         "id": "p-134c78ed",
         "streamId": "stream-69047977",
         "videoId": "NjGAsumGDdQ",
         "timestamp": 465,
-        "endTimestamp": 709,
-        "tags": [
-          "language:ja"
-        ]
+        "endTimestamp": 709
       }
-    ],
-    "inheritedTags": [
-      "source:vocaloid"
     ]
   },
   {
@@ -457,22 +322,16 @@
     "workId": "work-song-61f73aa3",
     "title": "鬼ノ宴",
     "originalArtist": "友成空",
-    "tags": [
-      "language:ja"
-    ],
+    "tags": [],
     "performances": [
       {
         "id": "p-89128293",
         "streamId": "stream-69047977",
         "videoId": "NjGAsumGDdQ",
         "timestamp": 1518,
-        "endTimestamp": 1695,
-        "tags": [
-          "language:ja"
-        ]
+        "endTimestamp": 1695
       }
-    ],
-    "inheritedTags": []
+    ]
   },
   {
     "id": "song-0dbe4e3d",
@@ -486,35 +345,24 @@
         "streamId": "stream-69047977",
         "videoId": "NjGAsumGDdQ",
         "timestamp": 1263,
-        "endTimestamp": 1453,
-        "tags": []
+        "endTimestamp": 1453
       }
-    ],
-    "inheritedTags": []
+    ]
   },
   {
     "id": "song-fc807347",
     "workId": "work-song-2104",
     "title": "晚餐歌",
     "originalArtist": "tuki.",
-    "tags": [
-      "language:ja",
-      "genre:pop"
-    ],
+    "tags": [],
     "performances": [
       {
         "id": "p-1bf5ab3e",
         "streamId": "stream-591c50e8",
         "videoId": "zjFwAVFay8Y",
         "timestamp": 532,
-        "endTimestamp": 748,
-        "tags": [
-          "language:ja"
-        ]
+        "endTimestamp": 748
       }
-    ],
-    "inheritedTags": [
-      "genre:pop"
     ]
   },
   {
@@ -522,24 +370,15 @@
     "workId": "work-song-557bf660",
     "title": "深昏睡",
     "originalArtist": "春野 feat. 初音ミク",
-    "tags": [
-      "language:ja",
-      "source:vocaloid"
-    ],
+    "tags": [],
     "performances": [
       {
         "id": "p-05f38894",
         "streamId": "stream-2026-04-30",
         "videoId": "KfadSsRBCi8",
         "timestamp": 4153,
-        "endTimestamp": 4393,
-        "tags": [
-          "language:ja"
-        ]
+        "endTimestamp": 4393
       }
-    ],
-    "inheritedTags": [
-      "source:vocaloid"
     ]
   },
   {
@@ -547,71 +386,47 @@
     "workId": "work-song-0c2ee33c",
     "title": "幾分之幾",
     "originalArtist": "盧廣仲",
-    "tags": [
-      "language:zh",
-      "genre:pop"
-    ],
+    "tags": [],
     "performances": [
       {
         "id": "p-3e696e36",
         "streamId": "stream-69047977",
         "videoId": "NjGAsumGDdQ",
         "timestamp": 4908,
-        "endTimestamp": 5129,
-        "tags": [
-          "language:zh"
-        ]
+        "endTimestamp": 5129
       }
-    ],
-    "inheritedTags": [
-      "genre:pop"
     ]
   },
   {
     "id": "song-a700e63c",
-    "workId": "work-song-a700e63c",
+    "workId": "work-30659aa6-59ae-4be3-b118-71535a9b81ae",
     "title": "愛我的時候",
     "originalArtist": "周興哲、單依純",
-    "tags": [
-      "language:zh"
-    ],
+    "tags": [],
     "performances": [
       {
         "id": "p-1ead6c93",
         "streamId": "stream-69047977",
         "videoId": "NjGAsumGDdQ",
         "timestamp": 758,
-        "endTimestamp": 979,
-        "tags": [
-          "language:zh"
-        ]
+        "endTimestamp": 979
       }
-    ],
-    "inheritedTags": []
+    ]
   },
   {
     "id": "song-928e50e5",
     "workId": "work-song-928e50e5",
     "title": "愛言葉IV",
     "originalArtist": "DECO*27 feat. 初音ミク",
-    "tags": [
-      "language:ja",
-      "source:vocaloid"
-    ],
+    "tags": [],
     "performances": [
       {
         "id": "p-2034d328",
         "streamId": "stream-69047977",
         "videoId": "NjGAsumGDdQ",
         "timestamp": 3311,
-        "endTimestamp": 3528,
-        "tags": [
-          "language:ja"
-        ]
+        "endTimestamp": 3528
       }
-    ],
-    "inheritedTags": [
-      "source:vocaloid"
     ]
   },
   {
@@ -619,46 +434,31 @@
     "workId": "work-song-3046",
     "title": "聽見下雨的聲音",
     "originalArtist": "魏如昀",
-    "tags": [
-      "language:zh"
-    ],
+    "tags": [],
     "performances": [
       {
         "id": "p-baa6eba1",
         "streamId": "stream-2026-04-30",
         "videoId": "KfadSsRBCi8",
         "timestamp": 3777,
-        "endTimestamp": 4057,
-        "tags": [
-          "language:zh"
-        ]
+        "endTimestamp": 4057
       }
-    ],
-    "inheritedTags": []
+    ]
   },
   {
     "id": "song-bd3e71e9",
     "workId": "work-song-1709",
     "title": "Beauty and a Beat",
     "originalArtist": "Justin Bieber",
-    "tags": [
-      "language:en",
-      "genre:pop"
-    ],
+    "tags": [],
     "performances": [
       {
         "id": "p-765c079b",
         "streamId": "stream-2026-04-30",
         "videoId": "KfadSsRBCi8",
         "timestamp": 2146,
-        "endTimestamp": 2331,
-        "tags": [
-          "language:en"
-        ]
+        "endTimestamp": 2331
       }
-    ],
-    "inheritedTags": [
-      "genre:pop"
     ]
   },
   {
@@ -666,24 +466,15 @@
     "workId": "work-song-fb50c3c2",
     "title": "beside you",
     "originalArtist": "keshi",
-    "tags": [
-      "language:en",
-      "genre:pop"
-    ],
+    "tags": [],
     "performances": [
       {
         "id": "p-72405574",
         "streamId": "stream-69047977",
         "videoId": "NjGAsumGDdQ",
         "timestamp": 4651,
-        "endTimestamp": 4819,
-        "tags": [
-          "language:en"
-        ]
+        "endTimestamp": 4819
       }
-    ],
-    "inheritedTags": [
-      "genre:pop"
     ]
   },
   {
@@ -698,11 +489,9 @@
         "streamId": "stream-69047977",
         "videoId": "NjGAsumGDdQ",
         "timestamp": 1774,
-        "endTimestamp": 1942,
-        "tags": []
+        "endTimestamp": 1942
       }
-    ],
-    "inheritedTags": []
+    ]
   },
   {
     "id": "song-a1c1bc91",
@@ -716,35 +505,24 @@
         "streamId": "stream-591c50e8",
         "videoId": "zjFwAVFay8Y",
         "timestamp": 2132,
-        "endTimestamp": 2282,
-        "tags": []
+        "endTimestamp": 2282
       }
-    ],
-    "inheritedTags": []
+    ]
   },
   {
     "id": "song-74baa9d8",
     "workId": "work-song-74baa9d8",
     "title": "flos",
     "originalArtist": "R Sound Design feat. 初音ミク",
-    "tags": [
-      "language:ja",
-      "source:vocaloid"
-    ],
+    "tags": [],
     "performances": [
       {
         "id": "p-cb2e5dfd",
         "streamId": "stream-2026-04-30",
         "videoId": "KfadSsRBCi8",
         "timestamp": 2885,
-        "endTimestamp": 3157,
-        "tags": [
-          "language:ja"
-        ]
+        "endTimestamp": 3157
       }
-    ],
-    "inheritedTags": [
-      "source:vocaloid"
     ]
   },
   {
@@ -752,46 +530,31 @@
     "workId": "work-song-20d0c012",
     "title": "Glimpse of Us",
     "originalArtist": "Joji",
-    "tags": [
-      "language:en"
-    ],
+    "tags": [],
     "performances": [
       {
         "id": "p-ae6a1d6d",
         "streamId": "stream-2026-04-30",
         "videoId": "KfadSsRBCi8",
         "timestamp": 3283,
-        "endTimestamp": 3462,
-        "tags": [
-          "language:en"
-        ]
+        "endTimestamp": 3462
       }
-    ],
-    "inheritedTags": []
+    ]
   },
   {
     "id": "song-53a8a024",
     "workId": "work-song-53a8a024",
     "title": "IRIS OUT",
     "originalArtist": "米津玄師",
-    "tags": [
-      "language:ja",
-      "genre:pop"
-    ],
+    "tags": [],
     "performances": [
       {
         "id": "p-a3d2fc2e",
         "streamId": "stream-591c50e8",
         "videoId": "zjFwAVFay8Y",
         "timestamp": 7693,
-        "endTimestamp": 7840,
-        "tags": [
-          "language:ja"
-        ]
+        "endTimestamp": 7840
       }
-    ],
-    "inheritedTags": [
-      "genre:pop"
     ]
   },
   {
@@ -799,46 +562,31 @@
     "workId": "work-song-1151",
     "title": "Love Me Like You Do",
     "originalArtist": "Ellie Goulding",
-    "tags": [
-      "language:en"
-    ],
+    "tags": [],
     "performances": [
       {
         "id": "p-0b0758af",
         "streamId": "stream-2026-04-30",
         "videoId": "KfadSsRBCi8",
         "timestamp": 4656,
-        "endTimestamp": 4905,
-        "tags": [
-          "language:en"
-        ]
+        "endTimestamp": 4905
       }
-    ],
-    "inheritedTags": []
+    ]
   },
   {
     "id": "song-752b5d39",
     "workId": "work-song-1283",
     "title": "Love Yourself",
     "originalArtist": "Justin Bieber",
-    "tags": [
-      "language:en",
-      "genre:pop"
-    ],
+    "tags": [],
     "performances": [
       {
         "id": "p-26666bbd",
         "streamId": "stream-2026-04-30",
         "videoId": "KfadSsRBCi8",
         "timestamp": 982,
-        "endTimestamp": 1236,
-        "tags": [
-          "language:en"
-        ]
+        "endTimestamp": 1236
       }
-    ],
-    "inheritedTags": [
-      "genre:pop"
     ]
   },
   {
@@ -846,24 +594,15 @@
     "workId": "work-song-781",
     "title": "My Dearest",
     "originalArtist": "supercell",
-    "tags": [
-      "language:ja",
-      "source:anime"
-    ],
+    "tags": [],
     "performances": [
       {
         "id": "p-90eccc52",
         "streamId": "stream-591c50e8",
         "videoId": "zjFwAVFay8Y",
         "timestamp": 2523,
-        "endTimestamp": 2857,
-        "tags": [
-          "language:ja"
-        ]
+        "endTimestamp": 2857
       }
-    ],
-    "inheritedTags": [
-      "source:anime"
     ]
   },
   {
@@ -871,24 +610,15 @@
     "workId": "work-song-27",
     "title": "Ref:rain",
     "originalArtist": "Aimer",
-    "tags": [
-      "language:ja",
-      "genre:pop"
-    ],
+    "tags": [],
     "performances": [
       {
         "id": "p-e2611b1a",
         "streamId": "stream-2026-04-30",
         "videoId": "KfadSsRBCi8",
         "timestamp": 1712,
-        "endTimestamp": 1999,
-        "tags": [
-          "language:ja"
-        ]
+        "endTimestamp": 1999
       }
-    ],
-    "inheritedTags": [
-      "genre:pop"
     ]
   },
   {
@@ -903,35 +633,24 @@
         "streamId": "stream-69047977",
         "videoId": "NjGAsumGDdQ",
         "timestamp": 6818,
-        "endTimestamp": 6996,
-        "tags": []
+        "endTimestamp": 6996
       }
-    ],
-    "inheritedTags": []
+    ]
   },
   {
     "id": "song-a4292374",
     "workId": "work-song-130",
     "title": "アイネクライネ",
     "originalArtist": "米津玄師",
-    "tags": [
-      "language:ja",
-      "genre:pop"
-    ],
+    "tags": [],
     "performances": [
       {
         "id": "p-4e44e500",
         "streamId": "stream-69047977",
         "videoId": "NjGAsumGDdQ",
         "timestamp": 2512,
-        "endTimestamp": 2802,
-        "tags": [
-          "language:ja"
-        ]
+        "endTimestamp": 2802
       }
-    ],
-    "inheritedTags": [
-      "genre:pop"
     ]
   },
   {
@@ -939,112 +658,79 @@
     "workId": "work-song-1549",
     "title": "ぎゅっと。",
     "originalArtist": "もさを。",
-    "tags": [
-      "language:ja"
-    ],
+    "tags": [],
     "performances": [
       {
         "id": "p-b73f1a22",
         "streamId": "stream-2026-04-30",
         "videoId": "KfadSsRBCi8",
         "timestamp": 131,
-        "endTimestamp": 396,
-        "tags": [
-          "language:ja"
-        ]
+        "endTimestamp": 396
       }
-    ],
-    "inheritedTags": []
+    ]
   },
   {
     "id": "song-f8de293b",
     "workId": "work-song-f8de293b",
     "title": "スイートマジック",
     "originalArtist": "ろん×Junky",
-    "tags": [
-      "language:ja"
-    ],
+    "tags": [],
     "performances": [
       {
         "id": "p-4fae6ce8",
         "streamId": "stream-69047977",
         "videoId": "NjGAsumGDdQ",
         "timestamp": 3578,
-        "endTimestamp": 3792,
-        "tags": [
-          "language:ja"
-        ]
+        "endTimestamp": 3792
       }
-    ],
-    "inheritedTags": []
+    ]
   },
   {
     "id": "song-7d28ba70",
     "workId": "work-song-424e636c",
     "title": "たばこ",
     "originalArtist": "コレサワ",
-    "tags": [
-      "language:ja"
-    ],
+    "tags": [],
     "performances": [
       {
         "id": "p-0ead53d6",
         "streamId": "stream-69047977",
         "videoId": "NjGAsumGDdQ",
         "timestamp": 3903,
-        "endTimestamp": 4260,
-        "tags": [
-          "language:ja"
-        ]
+        "endTimestamp": 4260
       }
-    ],
-    "inheritedTags": []
+    ]
   },
   {
     "id": "song-8cb605dc",
     "workId": "work-song-8cb605dc",
     "title": "ファンサ",
     "originalArtist": "HoneyWorks feat. mona (CV：夏川椎菜)",
-    "tags": [
-      "language:ja"
-    ],
+    "tags": [],
     "performances": [
       {
         "id": "p-db300b10",
         "streamId": "stream-69047977",
         "videoId": "NjGAsumGDdQ",
         "timestamp": 5605,
-        "endTimestamp": 5855,
-        "tags": [
-          "language:ja"
-        ]
+        "endTimestamp": 5855
       }
-    ],
-    "inheritedTags": []
+    ]
   },
   {
     "id": "song-b46a2b6a",
     "workId": "work-song-893c71f2",
     "title": "プロポーズ",
     "originalArtist": "内緒のピアス feat. 可不",
-    "tags": [
-      "language:ja",
-      "source:vocaloid"
-    ],
+    "tags": [],
     "performances": [
       {
         "id": "p-8542a844",
         "streamId": "stream-69047977",
         "videoId": "NjGAsumGDdQ",
         "timestamp": 5970,
-        "endTimestamp": 6204,
-        "tags": [
-          "language:ja"
-        ]
+        "endTimestamp": 6204
       }
-    ],
-    "inheritedTags": [
-      "source:vocaloid"
     ]
   },
   {
@@ -1052,24 +738,15 @@
     "workId": "work-song-ed8ffb3b",
     "title": "マーシャル・マキシマイザー",
     "originalArtist": "柊マグネタイト feat. 可不",
-    "tags": [
-      "language:ja",
-      "source:vocaloid"
-    ],
+    "tags": [],
     "performances": [
       {
         "id": "p-d6ad7472",
         "streamId": "stream-69047977",
         "videoId": "NjGAsumGDdQ",
         "timestamp": 264,
-        "endTimestamp": 426,
-        "tags": [
-          "language:ja"
-        ]
+        "endTimestamp": 426
       }
-    ],
-    "inheritedTags": [
-      "source:vocaloid"
     ]
   }
 ]

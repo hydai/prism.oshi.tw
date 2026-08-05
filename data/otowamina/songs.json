@@ -1,1 +1,18 @@
-[]
+[
+  {
+    "id": "song-b96cab8a",
+    "workId": "work-song-258",
+    "title": "Payphone",
+    "originalArtist": "Maroon 5",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-54210b7d",
+        "streamId": "stream-67b72e6f",
+        "videoId": "VEP4KZ7fg2o",
+        "timestamp": 0,
+        "endTimestamp": 234
+      }
+    ]
+  }
+]

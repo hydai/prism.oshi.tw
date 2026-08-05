@@ -4,24 +4,15 @@
     "workId": "work-song-2014",
     "title": "一輪花",
     "originalArtist": "tuki.",
-    "tags": [
-      "language:ja",
-      "genre:pop"
-    ],
+    "tags": [],
     "performances": [
       {
         "id": "p-f3f45e37",
         "streamId": "stream-2026-03-24",
         "videoId": "ZGAGCfooHe8",
         "timestamp": 2630,
-        "endTimestamp": 2852,
-        "tags": [
-          "language:ja"
-        ]
+        "endTimestamp": 2852
       }
-    ],
-    "inheritedTags": [
-      "genre:pop"
     ]
   },
   {
@@ -29,24 +20,15 @@
     "workId": "work-song-013c53cd",
     "title": "晩餐歌",
     "originalArtist": "tuki.",
-    "tags": [
-      "language:ja",
-      "genre:pop"
-    ],
+    "tags": [],
     "performances": [
       {
         "id": "p-f6610216",
         "streamId": "stream-2026-03-24",
         "videoId": "ZGAGCfooHe8",
         "timestamp": 4107,
-        "endTimestamp": 4323,
-        "tags": [
-          "language:ja"
-        ]
+        "endTimestamp": 4323
       }
-    ],
-    "inheritedTags": [
-      "genre:pop"
     ]
   },
   {
@@ -54,26 +36,15 @@
     "workId": "work-song-30e8effd",
     "title": "嘘月",
     "originalArtist": "ヨルシカ",
-    "tags": [
-      "language:ja",
-      "genre:pop",
-      "genre:rock"
-    ],
+    "tags": [],
     "performances": [
       {
         "id": "p-c539a0b0",
         "streamId": "stream-2026-03-24",
         "videoId": "ZGAGCfooHe8",
         "timestamp": 1480,
-        "endTimestamp": 1773,
-        "tags": [
-          "language:ja"
-        ]
+        "endTimestamp": 1773
       }
-    ],
-    "inheritedTags": [
-      "genre:pop",
-      "genre:rock"
     ]
   },
   {
@@ -88,35 +59,24 @@
         "streamId": "stream-2026-03-24",
         "videoId": "ZGAGCfooHe8",
         "timestamp": 3289,
-        "endTimestamp": 3551,
-        "tags": []
+        "endTimestamp": 3551
       }
-    ],
-    "inheritedTags": []
+    ]
   },
   {
     "id": "song-3dfc4641",
     "workId": "work-song-11f89711",
     "title": "Wherever You Are",
     "originalArtist": "ONE OK ROCK",
-    "tags": [
-      "language:ja",
-      "genre:rock"
-    ],
+    "tags": [],
     "performances": [
       {
         "id": "p-689effc3",
         "streamId": "stream-2026-03-24",
         "videoId": "ZGAGCfooHe8",
         "timestamp": 1082,
-        "endTimestamp": 1380,
-        "tags": [
-          "language:ja"
-        ]
+        "endTimestamp": 1380
       }
-    ],
-    "inheritedTags": [
-      "genre:rock"
     ]
   },
   {
@@ -124,24 +84,15 @@
     "workId": "work-song-0e879506",
     "title": "yes,and?",
     "originalArtist": "Ariana Grande",
-    "tags": [
-      "language:en",
-      "genre:pop"
-    ],
+    "tags": [],
     "performances": [
       {
         "id": "p-851b495d",
         "streamId": "stream-2026-03-24",
         "videoId": "ZGAGCfooHe8",
         "timestamp": 2061,
-        "endTimestamp": 2272,
-        "tags": [
-          "language:en"
-        ]
+        "endTimestamp": 2272
       }
-    ],
-    "inheritedTags": [
-      "genre:pop"
     ]
   },
   {
@@ -149,24 +100,15 @@
     "workId": "work-song-2f998b9e",
     "title": "ギラギラ",
     "originalArtist": "ADO",
-    "tags": [
-      "language:ja",
-      "genre:pop"
-    ],
+    "tags": [],
     "performances": [
       {
         "id": "p-b294d16f",
         "streamId": "stream-2026-03-24",
         "videoId": "ZGAGCfooHe8",
         "timestamp": 641,
-        "endTimestamp": 912,
-        "tags": [
-          "language:ja"
-        ]
+        "endTimestamp": 912
       }
-    ],
-    "inheritedTags": [
-      "genre:pop"
     ]
   },
   {
@@ -174,26 +116,15 @@
     "workId": "work-song-0e902aae",
     "title": "だから僕は音楽を辞めた",
     "originalArtist": "ヨルシカ",
-    "tags": [
-      "language:ja",
-      "genre:pop",
-      "genre:rock"
-    ],
+    "tags": [],
     "performances": [
       {
         "id": "p-69029f05",
         "streamId": "stream-2026-03-24",
         "videoId": "ZGAGCfooHe8",
         "timestamp": 4545,
-        "endTimestamp": 4788,
-        "tags": [
-          "language:ja"
-        ]
+        "endTimestamp": 4788
       }
-    ],
-    "inheritedTags": [
-      "genre:pop",
-      "genre:rock"
     ]
   },
   {
@@ -201,21 +132,15 @@
     "workId": "work-song-53187977",
     "title": "プラチナ",
     "originalArtist": "坂本真綾",
-    "tags": [
-      "language:ja"
-    ],
+    "tags": [],
     "performances": [
       {
         "id": "p-aa74ce1b",
         "streamId": "stream-2026-03-24",
         "videoId": "ZGAGCfooHe8",
         "timestamp": 3724,
-        "endTimestamp": 3964,
-        "tags": [
-          "language:ja"
-        ]
+        "endTimestamp": 3964
       }
-    ],
-    "inheritedTags": []
+    ]
   }
 ]

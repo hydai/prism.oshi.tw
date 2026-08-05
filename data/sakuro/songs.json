@@ -11,35 +11,24 @@
         "streamId": "stream-2025-11-30",
         "videoId": "Mi9lEynnVbE",
         "timestamp": 1266,
-        "endTimestamp": 1501,
-        "tags": []
+        "endTimestamp": 1501
       }
-    ],
-    "inheritedTags": []
+    ]
   },
   {
     "id": "song-77a7f7ef",
     "workId": "work-song-77a7f7ef",
     "title": "一點點",
     "originalArtist": "周杰倫 (Jay Chou)",
-    "tags": [
-      "language:zh",
-      "genre:pop"
-    ],
+    "tags": [],
     "performances": [
       {
         "id": "p-8a7e7c6b",
         "streamId": "stream-d0080c2a",
         "videoId": "ybC0KHGXjaA",
         "timestamp": 3764,
-        "endTimestamp": 3986,
-        "tags": [
-          "language:zh"
-        ]
+        "endTimestamp": 3986
       }
-    ],
-    "inheritedTags": [
-      "genre:pop"
     ]
   },
   {
@@ -54,101 +43,72 @@
         "streamId": "stream-2025-12-21",
         "videoId": "CizYyIizGug",
         "timestamp": 2408,
-        "endTimestamp": 2502,
-        "tags": []
+        "endTimestamp": 2502
       }
-    ],
-    "inheritedTags": []
+    ]
   },
   {
     "id": "song-20a94e77",
     "workId": "work-song-20a94e77",
     "title": "子午聖誕禮物(日文版)",
     "originalArtist": "#子午聖誕接力",
-    "tags": [
-      "language:ja"
-    ],
+    "tags": [],
     "performances": [
       {
         "id": "p-80dd858e",
         "streamId": "stream-2025-12-21",
         "videoId": "CizYyIizGug",
         "timestamp": 8629,
-        "endTimestamp": 8724,
-        "tags": [
-          "language:ja"
-        ]
+        "endTimestamp": 8724
       }
-    ],
-    "inheritedTags": []
+    ]
   },
   {
     "id": "song-32773037",
     "workId": "work-song-32773037",
     "title": "子午聖誕禮物(英文版)",
     "originalArtist": "#子午聖誕接力",
-    "tags": [
-      "language:en"
-    ],
+    "tags": [],
     "performances": [
       {
         "id": "p-56c1964f",
         "streamId": "stream-2025-12-21",
         "videoId": "CizYyIizGug",
         "timestamp": 8781,
-        "endTimestamp": 8875,
-        "tags": [
-          "language:en"
-        ]
+        "endTimestamp": 8875
       }
-    ],
-    "inheritedTags": []
+    ]
   },
   {
     "id": "song-9ae00703",
     "workId": "work-song-9ae00703",
     "title": "子午聖誕禮物(韓文版)",
     "originalArtist": "#子午聖誕接力",
-    "tags": [
-      "language:ko"
-    ],
+    "tags": [],
     "performances": [
       {
         "id": "p-b68cb62a",
         "streamId": "stream-2025-12-21",
         "videoId": "CizYyIizGug",
         "timestamp": 8468,
-        "endTimestamp": 8566,
-        "tags": [
-          "language:ko"
-        ]
+        "endTimestamp": 8566
       }
-    ],
-    "inheritedTags": []
+    ]
   },
   {
     "id": "song-e39f9cc7",
     "workId": "work-song-4f120c43",
     "title": "不在一起就不會分開",
     "originalArtist": "洪佩瑜",
-    "tags": [
-      "language:zh",
-      "genre:pop"
-    ],
+    "tags": [],
     "performances": [
       {
         "id": "p-c0617506",
         "streamId": "stream-2026-01-25",
         "videoId": "OrwsCyMKewY",
         "timestamp": 5221,
-        "endTimestamp": 5485,
-        "tags": [
-          "language:zh"
-        ]
+        "endTimestamp": 5485
       }
-    ],
-    "inheritedTags": [
-      "genre:pop"
     ]
   },
   {
@@ -156,56 +116,38 @@
     "workId": "work-song-9792b1ec",
     "title": "不是因為天氣晴朗才愛你",
     "originalArtist": "理想混蛋 (Bestards)",
-    "tags": [
-      "language:zh"
-    ],
+    "tags": [],
     "performances": [
       {
         "id": "p-fb02d438",
         "streamId": "stream-08669a76",
         "videoId": "t18t-chE1wM",
         "timestamp": 2732,
-        "endTimestamp": 2962,
-        "tags": [
-          "language:zh"
-        ]
+        "endTimestamp": 2962
       },
       {
         "id": "p-ca3577af",
         "streamId": "stream-e0f35849",
         "videoId": "0xT5uHGGMC0",
         "timestamp": 245,
-        "endTimestamp": 500,
-        "tags": [
-          "language:zh"
-        ]
+        "endTimestamp": 500
       }
-    ],
-    "inheritedTags": []
+    ]
   },
   {
     "id": "song-f9996600",
     "workId": "work-song-f9996600",
     "title": "手語",
     "originalArtist": "周杰倫 (Jay Chou)",
-    "tags": [
-      "language:zh",
-      "genre:pop"
-    ],
+    "tags": [],
     "performances": [
       {
         "id": "p-d2b2d89b",
         "streamId": "stream-e0f35849",
         "videoId": "0xT5uHGGMC0",
         "timestamp": 9476,
-        "endTimestamp": 9760,
-        "tags": [
-          "language:zh"
-        ]
+        "endTimestamp": 9760
       }
-    ],
-    "inheritedTags": [
-      "genre:pop"
     ]
   },
   {
@@ -213,29 +155,22 @@
     "workId": "work-song-0c85e008",
     "title": "只有副歌的新歌",
     "originalArtist": "朔Sakuro",
-    "tags": [
-      "source:original"
-    ],
+    "tags": [],
     "performances": [
       {
         "id": "p-845b7e89",
         "streamId": "stream-2026-01-18",
         "videoId": "SVEtS6mQFPY",
         "timestamp": 1512,
-        "endTimestamp": 1561,
-        "tags": []
+        "endTimestamp": 1561
       },
       {
         "id": "p-f553e74c",
         "streamId": "stream-2026-01-18",
         "videoId": "SVEtS6mQFPY",
         "timestamp": 1632,
-        "endTimestamp": 1752,
-        "tags": []
+        "endTimestamp": 1752
       }
-    ],
-    "inheritedTags": [
-      "source:original"
     ]
   },
   {
@@ -243,24 +178,15 @@
     "workId": "work-song-7c26681e",
     "title": "叮叮噹 最喜歡你啦",
     "originalArtist": "朔Sakuro",
-    "tags": [
-      "language:zh",
-      "source:original"
-    ],
+    "tags": [],
     "performances": [
       {
         "id": "p-cb705198",
         "streamId": "stream-2025-12-21",
         "videoId": "CizYyIizGug",
         "timestamp": 5728,
-        "endTimestamp": 5942,
-        "tags": [
-          "language:zh"
-        ]
+        "endTimestamp": 5942
       }
-    ],
-    "inheritedTags": [
-      "source:original"
     ]
   },
   {
@@ -275,33 +201,25 @@
         "streamId": "stream-08669a76",
         "videoId": "t18t-chE1wM",
         "timestamp": 856,
-        "endTimestamp": 1066,
-        "tags": []
+        "endTimestamp": 1066
       }
-    ],
-    "inheritedTags": []
+    ]
   },
   {
     "id": "song-8ff6d1ae",
     "workId": "work-song-1712",
     "title": "正想著你呢",
     "originalArtist": "持修",
-    "tags": [
-      "language:zh"
-    ],
+    "tags": [],
     "performances": [
       {
         "id": "p-f339db6a",
         "streamId": "stream-c46886e2",
         "videoId": "Ck-5ls8cwTQ",
         "timestamp": 546,
-        "endTimestamp": 763,
-        "tags": [
-          "language:zh"
-        ]
+        "endTimestamp": 763
       }
-    ],
-    "inheritedTags": []
+    ]
   },
   {
     "id": "song-89bd956b",
@@ -315,35 +233,24 @@
         "streamId": "stream-c46886e2",
         "videoId": "Ck-5ls8cwTQ",
         "timestamp": 2279,
-        "endTimestamp": 2519,
-        "tags": []
+        "endTimestamp": 2519
       }
-    ],
-    "inheritedTags": []
+    ]
   },
   {
     "id": "song-1c5908cc",
     "workId": "work-song-1c5908cc",
     "title": "在夜裡跳舞",
     "originalArtist": "單依純",
-    "tags": [
-      "language:zh",
-      "genre:pop"
-    ],
+    "tags": [],
     "performances": [
       {
         "id": "p-ca569242",
         "streamId": "stream-2026-01-11",
         "videoId": "IK44-KOhau0",
         "timestamp": 1668,
-        "endTimestamp": 1925,
-        "tags": [
-          "language:zh"
-        ]
+        "endTimestamp": 1925
       }
-    ],
-    "inheritedTags": [
-      "genre:pop"
     ]
   },
   {
@@ -358,11 +265,9 @@
         "streamId": "stream-d0080c2a",
         "videoId": "ybC0KHGXjaA",
         "timestamp": 3177,
-        "endTimestamp": 3335,
-        "tags": []
+        "endTimestamp": 3335
       }
-    ],
-    "inheritedTags": []
+    ]
   },
   {
     "id": "song-ef6fbd41",
@@ -376,33 +281,25 @@
         "streamId": "stream-c46886e2",
         "videoId": "Ck-5ls8cwTQ",
         "timestamp": 3240,
-        "endTimestamp": 3485,
-        "tags": []
+        "endTimestamp": 3485
       }
-    ],
-    "inheritedTags": []
+    ]
   },
   {
     "id": "song-f551ea18",
     "workId": "work-song-f551ea18",
     "title": "你是不是有點動心",
     "originalArtist": "吳卓源",
-    "tags": [
-      "language:zh"
-    ],
+    "tags": [],
     "performances": [
       {
         "id": "p-eeb958be",
         "streamId": "stream-0b82931e",
         "videoId": "Hmeugi8WS9k",
         "timestamp": 5028,
-        "endTimestamp": 5295,
-        "tags": [
-          "language:zh"
-        ]
+        "endTimestamp": 5295
       }
-    ],
-    "inheritedTags": []
+    ]
   },
   {
     "id": "song-6f15bcab",
@@ -416,11 +313,9 @@
         "streamId": "stream-e0f35849",
         "videoId": "0xT5uHGGMC0",
         "timestamp": 4188,
-        "endTimestamp": 4390,
-        "tags": []
+        "endTimestamp": 4390
       }
-    ],
-    "inheritedTags": []
+    ]
   },
   {
     "id": "song-3cbb79f1",
@@ -434,33 +329,25 @@
         "streamId": "stream-2025-12-07",
         "videoId": "aKuD3fvW3fY",
         "timestamp": 7898,
-        "endTimestamp": 8279,
-        "tags": []
+        "endTimestamp": 8279
       }
-    ],
-    "inheritedTags": []
+    ]
   },
   {
     "id": "song-f878026e",
     "workId": "work-song-f4d5794d",
     "title": "我好想你",
     "originalArtist": "蘇打綠 (sodagreen)",
-    "tags": [
-      "language:zh"
-    ],
+    "tags": [],
     "performances": [
       {
         "id": "p-5788cb2c",
         "streamId": "stream-2026-01-25",
         "videoId": "OrwsCyMKewY",
         "timestamp": 2132,
-        "endTimestamp": 2438,
-        "tags": [
-          "language:zh"
-        ]
+        "endTimestamp": 2438
       }
-    ],
-    "inheritedTags": []
+    ]
   },
   {
     "id": "song-a2d9268d",
@@ -474,99 +361,70 @@
         "streamId": "stream-0b82931e",
         "videoId": "Hmeugi8WS9k",
         "timestamp": 536,
-        "endTimestamp": 798,
-        "tags": []
+        "endTimestamp": 798
       }
-    ],
-    "inheritedTags": []
+    ]
   },
   {
     "id": "song-d72afbe5",
     "workId": "work-song-1557",
     "title": "我喜歡你",
     "originalArtist": "洪安妮",
-    "tags": [
-      "language:zh"
-    ],
+    "tags": [],
     "performances": [
       {
         "id": "p-824ea389",
         "streamId": "stream-d0080c2a",
         "videoId": "ybC0KHGXjaA",
         "timestamp": 8170,
-        "endTimestamp": 8417,
-        "tags": [
-          "language:zh"
-        ]
+        "endTimestamp": 8417
       },
       {
         "id": "p-4b42afed",
         "streamId": "stream-2026-01-11",
         "videoId": "IK44-KOhau0",
         "timestamp": 4311,
-        "endTimestamp": 4558,
-        "tags": [
-          "language:zh"
-        ]
+        "endTimestamp": 4558
       },
       {
         "id": "p-3decb071",
         "streamId": "stream-e0f35849",
         "videoId": "0xT5uHGGMC0",
         "timestamp": 905,
-        "endTimestamp": 1230,
-        "tags": [
-          "language:zh"
-        ]
+        "endTimestamp": 1230
       }
-    ],
-    "inheritedTags": []
+    ]
   },
   {
     "id": "song-e7af3336",
     "workId": "work-song-e7af3336",
     "title": "我當你空氣",
     "originalArtist": "旺福 (Wonfu)",
-    "tags": [
-      "language:zh"
-    ],
+    "tags": [],
     "performances": [
       {
         "id": "p-ec7cf293",
         "streamId": "stream-e0f35849",
         "videoId": "0xT5uHGGMC0",
         "timestamp": 4657,
-        "endTimestamp": 4892,
-        "tags": [
-          "language:zh"
-        ]
+        "endTimestamp": 4892
       }
-    ],
-    "inheritedTags": []
+    ]
   },
   {
     "id": "song-e710f6a5",
     "workId": "work-song-39636c3a",
     "title": "李白",
     "originalArtist": "李榮浩",
-    "tags": [
-      "language:zh",
-      "genre:pop"
-    ],
+    "tags": [],
     "performances": [
       {
         "id": "p-2e87ce0f",
         "streamId": "stream-2026-01-18",
         "videoId": "SVEtS6mQFPY",
         "timestamp": 276,
-        "endTimestamp": 541,
-        "tags": [
-          "language:zh"
-        ]
+        "endTimestamp": 541
       }
-    ],
-    "inheritedTags": [
-      "genre:pop"
     ]
   },
   {
@@ -581,33 +439,25 @@
         "streamId": "stream-d0080c2a",
         "videoId": "ybC0KHGXjaA",
         "timestamp": 1581,
-        "endTimestamp": 1839,
-        "tags": []
+        "endTimestamp": 1839
       }
-    ],
-    "inheritedTags": []
+    ]
   },
   {
     "id": "song-f0c1603e",
     "workId": "work-song-f0c1603e",
     "title": "走了嗎",
     "originalArtist": "袁惟仁",
-    "tags": [
-      "language:zh"
-    ],
+    "tags": [],
     "performances": [
       {
         "id": "p-37c6db30",
         "streamId": "stream-d0080c2a",
         "videoId": "ybC0KHGXjaA",
         "timestamp": 2133,
-        "endTimestamp": 2381,
-        "tags": [
-          "language:zh"
-        ]
+        "endTimestamp": 2381
       }
-    ],
-    "inheritedTags": []
+    ]
   },
   {
     "id": "song-65ce72ee",
@@ -621,11 +471,9 @@
         "streamId": "stream-2026-01-11",
         "videoId": "IK44-KOhau0",
         "timestamp": 6150,
-        "endTimestamp": 6455,
-        "tags": []
+        "endTimestamp": 6455
       }
-    ],
-    "inheritedTags": []
+    ]
   },
   {
     "id": "song-5ce38389",
@@ -639,11 +487,9 @@
         "streamId": "stream-2025-12-07",
         "videoId": "aKuD3fvW3fY",
         "timestamp": 2609,
-        "endTimestamp": 2888,
-        "tags": []
+        "endTimestamp": 2888
       }
-    ],
-    "inheritedTags": []
+    ]
   },
   {
     "id": "song-0eda6e2c",
@@ -657,67 +503,47 @@
         "streamId": "stream-2026-01-18",
         "videoId": "SVEtS6mQFPY",
         "timestamp": 6223,
-        "endTimestamp": 6456,
-        "tags": []
+        "endTimestamp": 6456
       }
-    ],
-    "inheritedTags": []
+    ]
   },
   {
     "id": "song-7e26647f",
     "workId": "work-song-7995a462",
     "title": "雨愛",
     "originalArtist": "楊丞琳 (Rainie Yang)",
-    "tags": [
-      "language:zh"
-    ],
+    "tags": [],
     "performances": [
       {
         "id": "p-59d1eab5",
         "streamId": "stream-d0080c2a",
         "videoId": "ybC0KHGXjaA",
         "timestamp": 4765,
-        "endTimestamp": 5025,
-        "tags": [
-          "language:zh"
-        ]
+        "endTimestamp": 5025
       },
       {
         "id": "p-17680137",
         "streamId": "stream-2025-12-07",
         "videoId": "aKuD3fvW3fY",
         "timestamp": 6221,
-        "endTimestamp": 6484,
-        "tags": [
-          "language:zh"
-        ]
+        "endTimestamp": 6484
       }
-    ],
-    "inheritedTags": []
+    ]
   },
   {
     "id": "song-12a6f114",
     "workId": "work-song-83b0e5ff",
     "title": "信號 Signal",
     "originalArtist": "汐Seki",
-    "tags": [
-      "language:zh",
-      "source:original"
-    ],
+    "tags": [],
     "performances": [
       {
         "id": "p-2bdb75ef",
         "streamId": "stream-2026-01-18",
         "videoId": "SVEtS6mQFPY",
         "timestamp": 2104,
-        "endTimestamp": 2322,
-        "tags": [
-          "language:zh"
-        ]
+        "endTimestamp": 2322
       }
-    ],
-    "inheritedTags": [
-      "source:original"
     ]
   },
   {
@@ -732,35 +558,24 @@
         "streamId": "stream-08669a76",
         "videoId": "t18t-chE1wM",
         "timestamp": 1843,
-        "endTimestamp": 2125,
-        "tags": []
+        "endTimestamp": 2125
       }
-    ],
-    "inheritedTags": []
+    ]
   },
   {
     "id": "song-80ef44af",
     "workId": "work-song-0a53aeb7",
     "title": "星屑ビーナス",
     "originalArtist": "Aimer",
-    "tags": [
-      "language:ja",
-      "genre:pop"
-    ],
+    "tags": [],
     "performances": [
       {
         "id": "p-75d7e5a8",
         "streamId": "stream-2025-12-07",
         "videoId": "aKuD3fvW3fY",
         "timestamp": 1897,
-        "endTimestamp": 2152,
-        "tags": [
-          "language:ja"
-        ]
+        "endTimestamp": 2152
       }
-    ],
-    "inheritedTags": [
-      "genre:pop"
     ]
   },
   {
@@ -775,35 +590,24 @@
         "streamId": "stream-c46886e2",
         "videoId": "Ck-5ls8cwTQ",
         "timestamp": 5277,
-        "endTimestamp": 5497,
-        "tags": []
+        "endTimestamp": 5497
       }
-    ],
-    "inheritedTags": []
+    ]
   },
   {
     "id": "song-02cf3ebd",
     "workId": "work-song-02cf3ebd",
     "title": "夏夢",
     "originalArtist": "汐Seki",
-    "tags": [
-      "language:zh",
-      "source:original"
-    ],
+    "tags": [],
     "performances": [
       {
         "id": "p-082af233",
         "streamId": "stream-0b82931e",
         "videoId": "Hmeugi8WS9k",
         "timestamp": 2002,
-        "endTimestamp": 2273,
-        "tags": [
-          "language:zh"
-        ]
+        "endTimestamp": 2273
       }
-    ],
-    "inheritedTags": [
-      "source:original"
     ]
   },
   {
@@ -811,21 +615,15 @@
     "workId": "work-song-04752c37",
     "title": "迷醉 Sangria",
     "originalArtist": "朔Sakuro",
-    "tags": [
-      "source:original"
-    ],
+    "tags": [],
     "performances": [
       {
         "id": "p-378b4ed5",
         "streamId": "stream-2026-01-18",
         "videoId": "SVEtS6mQFPY",
         "timestamp": 6822,
-        "endTimestamp": 7016,
-        "tags": []
+        "endTimestamp": 7016
       }
-    ],
-    "inheritedTags": [
-      "source:original"
     ]
   },
   {
@@ -833,46 +631,31 @@
     "workId": "work-song-13d5137c",
     "title": "偽顔",
     "originalArtist": "yama",
-    "tags": [
-      "language:ja"
-    ],
+    "tags": [],
     "performances": [
       {
         "id": "p-90c2281e",
         "streamId": "stream-2025-12-14",
         "videoId": "U6oVkXmfrgI",
         "timestamp": 2355,
-        "endTimestamp": 2519,
-        "tags": [
-          "language:ja"
-        ]
+        "endTimestamp": 2519
       }
-    ],
-    "inheritedTags": []
+    ]
   },
   {
     "id": "song-5011cdee",
     "workId": "work-song-2104",
     "title": "晚餐歌",
     "originalArtist": "tuki.",
-    "tags": [
-      "language:ja",
-      "genre:pop"
-    ],
+    "tags": [],
     "performances": [
       {
         "id": "p-40758575",
         "streamId": "stream-2025-12-14",
         "videoId": "U6oVkXmfrgI",
         "timestamp": 3670,
-        "endTimestamp": 3885,
-        "tags": [
-          "language:ja"
-        ]
+        "endTimestamp": 3885
       }
-    ],
-    "inheritedTags": [
-      "genre:pop"
     ]
   },
   {
@@ -887,40 +670,31 @@
         "streamId": "stream-2025-12-14",
         "videoId": "U6oVkXmfrgI",
         "timestamp": 5935,
-        "endTimestamp": 6213,
-        "tags": []
+        "endTimestamp": 6213
       }
-    ],
-    "inheritedTags": []
+    ]
   },
   {
     "id": "song-c00a619b",
     "workId": "work-song-1314",
     "title": "連名帶姓",
     "originalArtist": "aMEI (張惠妹)",
-    "tags": [
-      "genre:pop"
-    ],
+    "tags": [],
     "performances": [
       {
         "id": "p-bbe0ea32",
         "streamId": "stream-c46886e2",
         "videoId": "Ck-5ls8cwTQ",
         "timestamp": 1562,
-        "endTimestamp": 1854,
-        "tags": []
+        "endTimestamp": 1854
       },
       {
         "id": "p-e8930f0f",
         "streamId": "stream-2026-01-11",
         "videoId": "IK44-KOhau0",
         "timestamp": 3524,
-        "endTimestamp": 3813,
-        "tags": []
+        "endTimestamp": 3813
       }
-    ],
-    "inheritedTags": [
-      "genre:pop"
     ]
   },
   {
@@ -928,24 +702,15 @@
     "workId": "work-song-96471ecf",
     "title": "陪你 Stay with you",
     "originalArtist": "朔Sakuro",
-    "tags": [
-      "language:en",
-      "source:original"
-    ],
+    "tags": [],
     "performances": [
       {
         "id": "p-80c46ccd",
         "streamId": "stream-2025-12-14",
         "videoId": "U6oVkXmfrgI",
         "timestamp": 5428,
-        "endTimestamp": 5637,
-        "tags": [
-          "language:en"
-        ]
+        "endTimestamp": 5637
       }
-    ],
-    "inheritedTags": [
-      "source:original"
     ]
   },
   {
@@ -960,35 +725,24 @@
         "streamId": "stream-e0f35849",
         "videoId": "0xT5uHGGMC0",
         "timestamp": 6274,
-        "endTimestamp": 6507,
-        "tags": []
+        "endTimestamp": 6507
       }
-    ],
-    "inheritedTags": []
+    ]
   },
   {
     "id": "song-841cc60e",
     "workId": "work-song-841cc60e",
     "title": "等你下課",
     "originalArtist": "周杰倫 (Jay Chou)",
-    "tags": [
-      "language:zh",
-      "genre:pop"
-    ],
+    "tags": [],
     "performances": [
       {
         "id": "p-81ae9e6d",
         "streamId": "stream-2026-01-18",
         "videoId": "SVEtS6mQFPY",
         "timestamp": 907,
-        "endTimestamp": 1187,
-        "tags": [
-          "language:zh"
-        ]
+        "endTimestamp": 1187
       }
-    ],
-    "inheritedTags": [
-      "genre:pop"
     ]
   },
   {
@@ -1003,11 +757,9 @@
         "streamId": "stream-e0f35849",
         "videoId": "0xT5uHGGMC0",
         "timestamp": 8974,
-        "endTimestamp": 9157,
-        "tags": []
+        "endTimestamp": 9157
       }
-    ],
-    "inheritedTags": []
+    ]
   },
   {
     "id": "song-d2e82402",
@@ -1021,33 +773,25 @@
         "streamId": "stream-2026-01-11",
         "videoId": "IK44-KOhau0",
         "timestamp": 1138,
-        "endTimestamp": 1348,
-        "tags": []
+        "endTimestamp": 1348
       }
-    ],
-    "inheritedTags": []
+    ]
   },
   {
     "id": "song-57dbf3ae",
     "workId": "work-song-57dbf3ae",
     "title": "愛♡スクリーム！",
     "originalArtist": "AiScReam",
-    "tags": [
-      "language:ja"
-    ],
+    "tags": [],
     "performances": [
       {
         "id": "p-04da797f",
         "streamId": "stream-2026-01-18",
         "videoId": "SVEtS6mQFPY",
         "timestamp": 3681,
-        "endTimestamp": 3937,
-        "tags": [
-          "language:ja"
-        ]
+        "endTimestamp": 3937
       }
-    ],
-    "inheritedTags": []
+    ]
   },
   {
     "id": "song-41bacfbb",
@@ -1061,11 +805,9 @@
         "streamId": "stream-08669a76",
         "videoId": "t18t-chE1wM",
         "timestamp": 8114,
-        "endTimestamp": 8373,
-        "tags": []
+        "endTimestamp": 8373
       }
-    ],
-    "inheritedTags": []
+    ]
   },
   {
     "id": "song-d24c3b2c",
@@ -1079,19 +821,16 @@
         "streamId": "stream-0b82931e",
         "videoId": "Hmeugi8WS9k",
         "timestamp": 3012,
-        "endTimestamp": 3252,
-        "tags": []
+        "endTimestamp": 3252
       },
       {
         "id": "p-55bb1866",
         "streamId": "stream-e0f35849",
         "videoId": "0xT5uHGGMC0",
         "timestamp": 655,
-        "endTimestamp": 905,
-        "tags": []
+        "endTimestamp": 905
       }
-    ],
-    "inheritedTags": []
+    ]
   },
   {
     "id": "song-9da73da4",
@@ -1105,35 +844,24 @@
         "streamId": "stream-2026-01-11",
         "videoId": "IK44-KOhau0",
         "timestamp": 2459,
-        "endTimestamp": 2645,
-        "tags": []
+        "endTimestamp": 2645
       }
-    ],
-    "inheritedTags": []
+    ]
   },
   {
     "id": "song-155c023b",
     "workId": "work-song-155c023b",
     "title": "踮起腳尖愛",
     "originalArtist": "洪佩瑜",
-    "tags": [
-      "language:zh",
-      "genre:pop"
-    ],
+    "tags": [],
     "performances": [
       {
         "id": "p-a23eedb8",
         "streamId": "stream-2026-01-25",
         "videoId": "OrwsCyMKewY",
         "timestamp": 1025,
-        "endTimestamp": 1290,
-        "tags": [
-          "language:zh"
-        ]
+        "endTimestamp": 1290
       }
-    ],
-    "inheritedTags": [
-      "genre:pop"
     ]
   },
   {
@@ -1148,33 +876,25 @@
         "streamId": "stream-2026-01-18",
         "videoId": "SVEtS6mQFPY",
         "timestamp": 8272,
-        "endTimestamp": 8478,
-        "tags": []
+        "endTimestamp": 8478
       }
-    ],
-    "inheritedTags": []
+    ]
   },
   {
     "id": "song-9361056c",
     "workId": "work-song-9361056c",
     "title": "靠近(清唱)",
     "originalArtist": "袁婭維TIA RAY",
-    "tags": [
-      "style:a-cappella"
-    ],
+    "tags": [],
     "performances": [
       {
         "id": "p-9c491328",
         "streamId": "stream-e0f35849",
         "videoId": "0xT5uHGGMC0",
         "timestamp": 10124,
-        "endTimestamp": 10243,
-        "tags": [
-          "style:a-cappella"
-        ]
+        "endTimestamp": 10243
       }
-    ],
-    "inheritedTags": []
+    ]
   },
   {
     "id": "song-4da4a721",
@@ -1188,11 +908,9 @@
         "streamId": "stream-08669a76",
         "videoId": "t18t-chE1wM",
         "timestamp": 6131,
-        "endTimestamp": 6348,
-        "tags": []
+        "endTimestamp": 6348
       }
-    ],
-    "inheritedTags": []
+    ]
   },
   {
     "id": "song-1a23ef12",
@@ -1206,37 +924,24 @@
         "streamId": "stream-08669a76",
         "videoId": "t18t-chE1wM",
         "timestamp": 6773,
-        "endTimestamp": 7099,
-        "tags": []
+        "endTimestamp": 7099
       }
-    ],
-    "inheritedTags": []
+    ]
   },
   {
     "id": "song-9a9799e3",
     "workId": "work-song-2180",
     "title": "Back To December",
     "originalArtist": "Taylor Swift",
-    "tags": [
-      "language:en",
-      "genre:pop",
-      "genre:folk"
-    ],
+    "tags": [],
     "performances": [
       {
         "id": "p-8644d439",
         "streamId": "stream-2025-11-30",
         "videoId": "Mi9lEynnVbE",
         "timestamp": 6472,
-        "endTimestamp": 6743,
-        "tags": [
-          "language:en"
-        ]
+        "endTimestamp": 6743
       }
-    ],
-    "inheritedTags": [
-      "genre:pop",
-      "genre:folk"
     ]
   },
   {
@@ -1244,24 +949,15 @@
     "workId": "work-song-d479cdc8",
     "title": "beside you(找不到key版)",
     "originalArtist": "keshi",
-    "tags": [
-      "language:en",
-      "genre:pop"
-    ],
+    "tags": [],
     "performances": [
       {
         "id": "p-8cf9f989",
         "streamId": "stream-c46886e2",
         "videoId": "Ck-5ls8cwTQ",
         "timestamp": 7120,
-        "endTimestamp": 7390,
-        "tags": [
-          "language:en"
-        ]
+        "endTimestamp": 7390
       }
-    ],
-    "inheritedTags": [
-      "genre:pop"
     ]
   },
   {
@@ -1269,24 +965,15 @@
     "workId": "work-song-e1caa96e",
     "title": "beside you(補唱忘記的)",
     "originalArtist": "keshi",
-    "tags": [
-      "language:en",
-      "genre:pop"
-    ],
+    "tags": [],
     "performances": [
       {
         "id": "p-89c41eda",
         "streamId": "stream-c46886e2",
         "videoId": "Ck-5ls8cwTQ",
         "timestamp": 7693,
-        "endTimestamp": 7781,
-        "tags": [
-          "language:en"
-        ]
+        "endTimestamp": 7781
       }
-    ],
-    "inheritedTags": [
-      "genre:pop"
     ]
   },
   {
@@ -1301,57 +988,40 @@
         "streamId": "stream-2025-12-14",
         "videoId": "U6oVkXmfrgI",
         "timestamp": 3078,
-        "endTimestamp": 3251,
-        "tags": []
+        "endTimestamp": 3251
       }
-    ],
-    "inheritedTags": []
+    ]
   },
   {
     "id": "song-c8baf23b",
     "workId": "work-song-c8baf23b",
     "title": "Close To You",
     "originalArtist": "Carpenters (木匠兄妹合唱團)",
-    "tags": [
-      "language:en"
-    ],
+    "tags": [],
     "performances": [
       {
         "id": "p-461c75e8",
         "streamId": "stream-08669a76",
         "videoId": "t18t-chE1wM",
         "timestamp": 7314,
-        "endTimestamp": 7539,
-        "tags": [
-          "language:en"
-        ]
+        "endTimestamp": 7539
       }
-    ],
-    "inheritedTags": []
+    ]
   },
   {
     "id": "song-8c997f3e",
     "workId": "work-song-7b1c25de",
     "title": "Easy On Me",
     "originalArtist": "Adele",
-    "tags": [
-      "language:en",
-      "genre:pop"
-    ],
+    "tags": [],
     "performances": [
       {
         "id": "p-58f6f82f",
         "streamId": "stream-0b82931e",
         "videoId": "Hmeugi8WS9k",
         "timestamp": 6149,
-        "endTimestamp": 6383,
-        "tags": [
-          "language:en"
-        ]
+        "endTimestamp": 6383
       }
-    ],
-    "inheritedTags": [
-      "genre:pop"
     ]
   },
   {
@@ -1366,33 +1036,25 @@
         "streamId": "stream-2025-12-14",
         "videoId": "U6oVkXmfrgI",
         "timestamp": 2021,
-        "endTimestamp": 2184,
-        "tags": []
+        "endTimestamp": 2184
       }
-    ],
-    "inheritedTags": []
+    ]
   },
   {
     "id": "song-26927912",
     "workId": "work-song-26927912",
     "title": "Everything Goes On",
     "originalArtist": "Porter Robinson",
-    "tags": [
-      "language:en"
-    ],
+    "tags": [],
     "performances": [
       {
         "id": "p-059a1a99",
         "streamId": "stream-08669a76",
         "videoId": "t18t-chE1wM",
         "timestamp": 4311,
-        "endTimestamp": 4510,
-        "tags": [
-          "language:en"
-        ]
+        "endTimestamp": 4510
       }
-    ],
-    "inheritedTags": []
+    ]
   },
   {
     "id": "song-33e598a2",
@@ -1406,99 +1068,73 @@
         "streamId": "stream-2025-12-21",
         "videoId": "CizYyIizGug",
         "timestamp": 7118,
-        "endTimestamp": 7300,
-        "tags": []
+        "endTimestamp": 7300
       }
-    ],
-    "inheritedTags": []
+    ]
   },
   {
     "id": "song-e837174d",
     "workId": "work-song-1540",
     "title": "Fly Me To The Moon",
     "originalArtist": "Frank Sinatra",
-    "tags": [
-      "language:en"
-    ],
+    "tags": [],
     "performances": [
       {
         "id": "p-8c535078",
         "streamId": "stream-2026-03-08",
         "videoId": "2wxID-o2_kU",
         "timestamp": 6513,
-        "endTimestamp": 6628,
-        "tags": [
-          "language:en"
-        ]
+        "endTimestamp": 6628
       }
-    ],
-    "inheritedTags": []
+    ]
   },
   {
     "id": "song-e4a3251f",
     "workId": "work-song-e4a3251f",
     "title": "Give It to Me",
     "originalArtist": "孫盛希 (Shi Shi)",
-    "tags": [
-      "language:en"
-    ],
+    "tags": [],
     "performances": [
       {
         "id": "p-402aef16",
         "streamId": "stream-2026-01-18",
         "videoId": "SVEtS6mQFPY",
         "timestamp": 3099,
-        "endTimestamp": 3270,
-        "tags": [
-          "language:en"
-        ]
+        "endTimestamp": 3270
       }
-    ],
-    "inheritedTags": []
+    ]
   },
   {
     "id": "song-b3a441af",
     "workId": "work-song-b3a441af",
     "title": "Good-bye Days",
     "originalArtist": "Yui",
-    "tags": [
-      "language:en"
-    ],
+    "tags": [],
     "performances": [
       {
         "id": "p-6742caf0",
         "streamId": "stream-2025-12-07",
         "videoId": "aKuD3fvW3fY",
         "timestamp": 7375,
-        "endTimestamp": 7558,
-        "tags": [
-          "language:en"
-        ]
+        "endTimestamp": 7558
       }
-    ],
-    "inheritedTags": []
+    ]
   },
   {
     "id": "song-f69ebff4",
     "workId": "work-song-f69ebff4",
     "title": "goodbye",
     "originalArtist": "清水翔太",
-    "tags": [
-      "language:ja"
-    ],
+    "tags": [],
     "performances": [
       {
         "id": "p-93eece9e",
         "streamId": "stream-0b82931e",
         "videoId": "Hmeugi8WS9k",
         "timestamp": 4031,
-        "endTimestamp": 4382,
-        "tags": [
-          "language:ja"
-        ]
+        "endTimestamp": 4382
       }
-    ],
-    "inheritedTags": []
+    ]
   },
   {
     "id": "song-e8e72e10",
@@ -1512,11 +1148,9 @@
         "streamId": "stream-2025-11-30",
         "videoId": "Mi9lEynnVbE",
         "timestamp": 7476,
-        "endTimestamp": 7735,
-        "tags": []
+        "endTimestamp": 7735
       }
-    ],
-    "inheritedTags": []
+    ]
   },
   {
     "id": "song-9db407c7",
@@ -1530,33 +1164,25 @@
         "streamId": "stream-2026-01-11",
         "videoId": "IK44-KOhau0",
         "timestamp": 6922,
-        "endTimestamp": 7170,
-        "tags": []
+        "endTimestamp": 7170
       }
-    ],
-    "inheritedTags": []
+    ]
   },
   {
     "id": "song-dd3aef43",
     "workId": "work-song-dd3aef43",
     "title": "HEAVEN",
     "originalArtist": "Ailee (에일리)",
-    "tags": [
-      "language:ko"
-    ],
+    "tags": [],
     "performances": [
       {
         "id": "p-0d772a4c",
         "streamId": "stream-2025-11-30",
         "videoId": "Mi9lEynnVbE",
         "timestamp": 5757,
-        "endTimestamp": 5992,
-        "tags": [
-          "language:ko"
-        ]
+        "endTimestamp": 5992
       }
-    ],
-    "inheritedTags": []
+    ]
   },
   {
     "id": "song-4b278a33",
@@ -1570,11 +1196,9 @@
         "streamId": "stream-2026-01-25",
         "videoId": "OrwsCyMKewY",
         "timestamp": 4648,
-        "endTimestamp": 4919,
-        "tags": []
+        "endTimestamp": 4919
       }
-    ],
-    "inheritedTags": []
+    ]
   },
   {
     "id": "song-3922bd1b",
@@ -1588,11 +1212,9 @@
         "streamId": "stream-0b82931e",
         "videoId": "Hmeugi8WS9k",
         "timestamp": 1126,
-        "endTimestamp": 1395,
-        "tags": []
+        "endTimestamp": 1395
       }
-    ],
-    "inheritedTags": []
+    ]
   },
   {
     "id": "song-a091dc84",
@@ -1606,99 +1228,70 @@
         "streamId": "stream-2026-03-08",
         "videoId": "2wxID-o2_kU",
         "timestamp": 1580,
-        "endTimestamp": 1775,
-        "tags": []
+        "endTimestamp": 1775
       }
-    ],
-    "inheritedTags": []
+    ]
   },
   {
     "id": "song-69c96a4e",
     "workId": "work-song-1508",
     "title": "I love you 3000",
     "originalArtist": "Stephanie Poetri",
-    "tags": [
-      "language:en"
-    ],
+    "tags": [],
     "performances": [
       {
         "id": "p-43b7fca3",
         "streamId": "stream-2026-01-25",
         "videoId": "OrwsCyMKewY",
         "timestamp": 2805,
-        "endTimestamp": 3045,
-        "tags": [
-          "language:en"
-        ]
+        "endTimestamp": 3045
       },
       {
         "id": "p-d050977c",
         "streamId": "stream-2026-01-18",
         "videoId": "SVEtS6mQFPY",
         "timestamp": 4829,
-        "endTimestamp": 5038,
-        "tags": [
-          "language:en"
-        ]
+        "endTimestamp": 5038
       }
-    ],
-    "inheritedTags": []
+    ]
   },
   {
     "id": "song-c281c91c",
     "workId": "work-song-1508",
     "title": "I Love You 3000",
     "originalArtist": "Stephanie Poetri",
-    "tags": [
-      "language:en"
-    ],
+    "tags": [],
     "performances": [
       {
         "id": "p-4d821b9d",
         "streamId": "stream-08669a76",
         "videoId": "t18t-chE1wM",
         "timestamp": 3746,
-        "endTimestamp": 4000,
-        "tags": [
-          "language:en"
-        ]
+        "endTimestamp": 4000
       },
       {
         "id": "p-247c3e12",
         "streamId": "stream-e0f35849",
         "videoId": "0xT5uHGGMC0",
         "timestamp": 8181,
-        "endTimestamp": 8500,
-        "tags": [
-          "language:en"
-        ]
+        "endTimestamp": 8500
       }
-    ],
-    "inheritedTags": []
+    ]
   },
   {
     "id": "song-cbcd377e",
     "workId": "work-song-85",
     "title": "Into You",
     "originalArtist": "Ariana Grande",
-    "tags": [
-      "language:en",
-      "genre:pop"
-    ],
+    "tags": [],
     "performances": [
       {
         "id": "p-534d0d13",
         "streamId": "stream-2026-03-08",
         "videoId": "2wxID-o2_kU",
         "timestamp": 541,
-        "endTimestamp": 768,
-        "tags": [
-          "language:en"
-        ]
+        "endTimestamp": 768
       }
-    ],
-    "inheritedTags": [
-      "genre:pop"
     ]
   },
   {
@@ -1713,79 +1306,56 @@
         "streamId": "stream-2026-01-25",
         "videoId": "OrwsCyMKewY",
         "timestamp": 6816,
-        "endTimestamp": 7042,
-        "tags": []
+        "endTimestamp": 7042
       }
-    ],
-    "inheritedTags": []
+    ]
   },
   {
     "id": "song-5eebbc1a",
     "workId": "work-song-1151",
     "title": "Love Me Like You Do",
     "originalArtist": "Ellie Goulding",
-    "tags": [
-      "language:en"
-    ],
+    "tags": [],
     "performances": [
       {
         "id": "p-21e6a3fc",
         "streamId": "stream-2026-03-08",
         "videoId": "2wxID-o2_kU",
         "timestamp": 2669,
-        "endTimestamp": 2869,
-        "tags": [
-          "language:en"
-        ]
+        "endTimestamp": 2869
       }
-    ],
-    "inheritedTags": []
+    ]
   },
   {
     "id": "song-71777b0f",
     "workId": "work-song-71777b0f",
     "title": "Love Story",
     "originalArtist": "Taylor Swift (泰勒絲)",
-    "tags": [
-      "language:en"
-    ],
+    "tags": [],
     "performances": [
       {
         "id": "p-0a7c40d1",
         "streamId": "stream-2025-11-30",
         "videoId": "Mi9lEynnVbE",
         "timestamp": 3169,
-        "endTimestamp": 3390,
-        "tags": [
-          "language:en"
-        ]
+        "endTimestamp": 3390
       }
-    ],
-    "inheritedTags": []
+    ]
   },
   {
     "id": "song-64a5cef0",
     "workId": "work-song-1283",
     "title": "Love Yourself",
     "originalArtist": "Justin Bieber",
-    "tags": [
-      "language:en",
-      "genre:pop"
-    ],
+    "tags": [],
     "performances": [
       {
         "id": "p-a8c351b8",
         "streamId": "stream-d0080c2a",
         "videoId": "ybC0KHGXjaA",
         "timestamp": 5444,
-        "endTimestamp": 5678,
-        "tags": [
-          "language:en"
-        ]
+        "endTimestamp": 5678
       }
-    ],
-    "inheritedTags": [
-      "genre:pop"
     ]
   },
   {
@@ -1800,35 +1370,24 @@
         "streamId": "stream-2026-03-08",
         "videoId": "2wxID-o2_kU",
         "timestamp": 3271,
-        "endTimestamp": 3512,
-        "tags": []
+        "endTimestamp": 3512
       }
-    ],
-    "inheritedTags": []
+    ]
   },
   {
     "id": "song-a271993d",
     "workId": "work-song-a271993d",
     "title": "Mistletoe",
     "originalArtist": "Justin Bieber",
-    "tags": [
-      "language:en",
-      "genre:pop"
-    ],
+    "tags": [],
     "performances": [
       {
         "id": "p-b46c75d3",
         "streamId": "stream-2025-12-21",
         "videoId": "CizYyIizGug",
         "timestamp": 2065,
-        "endTimestamp": 2247,
-        "tags": [
-          "language:en"
-        ]
+        "endTimestamp": 2247
       }
-    ],
-    "inheritedTags": [
-      "genre:pop"
     ]
   },
   {
@@ -1836,56 +1395,38 @@
     "workId": "work-song-21d7acdf",
     "title": "Paradise Island",
     "originalArtist": "ØZI",
-    "tags": [
-      "language:zh"
-    ],
+    "tags": [],
     "performances": [
       {
         "id": "p-536bbd8e",
         "streamId": "stream-c46886e2",
         "videoId": "Ck-5ls8cwTQ",
         "timestamp": 4068,
-        "endTimestamp": 4305,
-        "tags": [
-          "language:zh"
-        ]
+        "endTimestamp": 4305
       },
       {
         "id": "p-beba6e5f",
         "streamId": "stream-08669a76",
         "videoId": "t18t-chE1wM",
         "timestamp": 5455,
-        "endTimestamp": 5661,
-        "tags": [
-          "language:zh"
-        ]
+        "endTimestamp": 5661
       }
-    ],
-    "inheritedTags": []
+    ]
   },
   {
     "id": "song-4dc8fe0e",
     "workId": "work-song-4dc8fe0e",
     "title": "Santa Claus Is Coming to Town",
     "originalArtist": "Michael Bublé",
-    "tags": [
-      "language:en",
-      "genre:pop"
-    ],
+    "tags": [],
     "performances": [
       {
         "id": "p-66cc809a",
         "streamId": "stream-2025-12-21",
         "videoId": "CizYyIizGug",
         "timestamp": 660,
-        "endTimestamp": 832,
-        "tags": [
-          "language:en"
-        ]
+        "endTimestamp": 832
       }
-    ],
-    "inheritedTags": [
-      "genre:pop"
     ]
   },
   {
@@ -1893,24 +1434,15 @@
     "workId": "work-song-031b164f",
     "title": "skeletons",
     "originalArtist": "keshi",
-    "tags": [
-      "language:en",
-      "genre:pop"
-    ],
+    "tags": [],
     "performances": [
       {
         "id": "p-55eae5e7",
         "streamId": "stream-2025-12-14",
         "videoId": "U6oVkXmfrgI",
         "timestamp": 1190,
-        "endTimestamp": 1336,
-        "tags": [
-          "language:en"
-        ]
+        "endTimestamp": 1336
       }
-    ],
-    "inheritedTags": [
-      "genre:pop"
     ]
   },
   {
@@ -1925,11 +1457,9 @@
         "streamId": "stream-2025-12-07",
         "videoId": "aKuD3fvW3fY",
         "timestamp": 4164,
-        "endTimestamp": 4382,
-        "tags": []
+        "endTimestamp": 4382
       }
-    ],
-    "inheritedTags": []
+    ]
   },
   {
     "id": "song-08b95712",
@@ -1943,123 +1473,88 @@
         "streamId": "stream-d0080c2a",
         "videoId": "ybC0KHGXjaA",
         "timestamp": 6286,
-        "endTimestamp": 6493,
-        "tags": []
+        "endTimestamp": 6493
       }
-    ],
-    "inheritedTags": []
+    ]
   },
   {
     "id": "song-0fafd4a8",
     "workId": "work-song-0fafd4a8",
     "title": "Somebody That I Used To Know",
     "originalArtist": "Gotye",
-    "tags": [
-      "language:en"
-    ],
+    "tags": [],
     "performances": [
       {
         "id": "p-3f81e285",
         "streamId": "stream-2026-03-08",
         "videoId": "2wxID-o2_kU",
         "timestamp": 5847,
-        "endTimestamp": 6090,
-        "tags": [
-          "language:en"
-        ]
+        "endTimestamp": 6090
       }
-    ],
-    "inheritedTags": []
+    ]
   },
   {
     "id": "song-d08574b1",
     "workId": "work-song-d08574b1",
     "title": "Someone Like You",
     "originalArtist": "Adele (愛黛兒)",
-    "tags": [
-      "language:en"
-    ],
+    "tags": [],
     "performances": [
       {
         "id": "p-721a6b6b",
         "streamId": "stream-c46886e2",
         "videoId": "Ck-5ls8cwTQ",
         "timestamp": 5887,
-        "endTimestamp": 6171,
-        "tags": [
-          "language:en"
-        ]
+        "endTimestamp": 6171
       }
-    ],
-    "inheritedTags": []
+    ]
   },
   {
     "id": "song-8b36cb5f",
     "workId": "work-song-8b36cb5f",
     "title": "Stay",
     "originalArtist": "Zedd, Alessia Cara",
-    "tags": [
-      "language:en"
-    ],
+    "tags": [],
     "performances": [
       {
         "id": "p-7e622f16",
         "streamId": "stream-2026-03-08",
         "videoId": "2wxID-o2_kU",
         "timestamp": 5417,
-        "endTimestamp": 5573,
-        "tags": [
-          "language:en"
-        ]
+        "endTimestamp": 5573
       }
-    ],
-    "inheritedTags": []
+    ]
   },
   {
     "id": "song-f5803ab8",
     "workId": "work-song-256",
     "title": "STAY",
     "originalArtist": "The Kid LAROI, Justin Bieber",
-    "tags": [
-      "language:en"
-    ],
+    "tags": [],
     "performances": [
       {
         "id": "p-a48fe460",
         "streamId": "stream-2026-03-08",
         "videoId": "2wxID-o2_kU",
         "timestamp": 4403,
-        "endTimestamp": 4560,
-        "tags": [
-          "language:en"
-        ]
+        "endTimestamp": 4560
       }
-    ],
-    "inheritedTags": []
+    ]
   },
   {
     "id": "song-3693e66b",
     "workId": "work-song-51e9eb06",
     "title": "thank u, next",
     "originalArtist": "Ariana Grande",
-    "tags": [
-      "language:en",
-      "genre:pop"
-    ],
+    "tags": [],
     "performances": [
       {
         "id": "p-dadf27f1",
         "streamId": "stream-d0080c2a",
         "videoId": "ybC0KHGXjaA",
         "timestamp": 6869,
-        "endTimestamp": 7051,
-        "tags": [
-          "language:en"
-        ]
+        "endTimestamp": 7051
       }
-    ],
-    "inheritedTags": [
-      "genre:pop"
     ]
   },
   {
@@ -2067,24 +1562,15 @@
     "workId": "work-song-60ad905b",
     "title": "WANTCHU",
     "originalArtist": "keshi",
-    "tags": [
-      "language:en",
-      "genre:pop"
-    ],
+    "tags": [],
     "performances": [
       {
         "id": "p-81486936",
         "streamId": "stream-2025-12-14",
         "videoId": "U6oVkXmfrgI",
         "timestamp": 622,
-        "endTimestamp": 821,
-        "tags": [
-          "language:en"
-        ]
+        "endTimestamp": 821
       }
-    ],
-    "inheritedTags": [
-      "genre:pop"
     ]
   },
   {
@@ -2092,48 +1578,31 @@
     "workId": "work-song-73515f2c",
     "title": "What About Me",
     "originalArtist": "Emily Osment",
-    "tags": [
-      "language:en"
-    ],
+    "tags": [],
     "performances": [
       {
         "id": "p-92e9a375",
         "streamId": "stream-c46886e2",
         "videoId": "Ck-5ls8cwTQ",
         "timestamp": 6680,
-        "endTimestamp": 6923,
-        "tags": [
-          "language:en"
-        ]
+        "endTimestamp": 6923
       }
-    ],
-    "inheritedTags": []
+    ]
   },
   {
     "id": "song-88effa0b",
     "workId": "work-song-2473",
     "title": "When You're Gone",
     "originalArtist": "Avril Lavigne",
-    "tags": [
-      "language:en",
-      "genre:pop",
-      "genre:rock"
-    ],
+    "tags": [],
     "performances": [
       {
         "id": "p-5abd964b",
         "streamId": "stream-2025-11-30",
         "videoId": "Mi9lEynnVbE",
         "timestamp": 166,
-        "endTimestamp": 401,
-        "tags": [
-          "language:en"
-        ]
+        "endTimestamp": 401
       }
-    ],
-    "inheritedTags": [
-      "genre:pop",
-      "genre:rock"
     ]
   },
   {
@@ -2148,89 +1617,63 @@
         "streamId": "stream-0b82931e",
         "videoId": "Hmeugi8WS9k",
         "timestamp": 5643,
-        "endTimestamp": 5860,
-        "tags": []
+        "endTimestamp": 5860
       }
-    ],
-    "inheritedTags": []
+    ]
   },
   {
     "id": "song-155ba1b7",
     "workId": "work-song-155ba1b7",
     "title": "You And Me",
     "originalArtist": "Lifehouse",
-    "tags": [
-      "language:en"
-    ],
+    "tags": [],
     "performances": [
       {
         "id": "p-159f1df2",
         "streamId": "stream-2025-12-07",
         "videoId": "aKuD3fvW3fY",
         "timestamp": 3296,
-        "endTimestamp": 3491,
-        "tags": [
-          "language:en"
-        ]
+        "endTimestamp": 3491
       }
-    ],
-    "inheritedTags": []
+    ]
   },
   {
     "id": "song-7c14294c",
     "workId": "work-song-7c14294c",
     "title": "널 사랑하지 않아",
     "originalArtist": "Urban Zakapa (어반 자카파)",
-    "tags": [
-      "language:ko"
-    ],
+    "tags": [],
     "performances": [
       {
         "id": "p-eb2b04ad",
         "streamId": "stream-2025-12-07",
         "videoId": "aKuD3fvW3fY",
         "timestamp": 1098,
-        "endTimestamp": 1350,
-        "tags": [
-          "language:ko"
-        ]
+        "endTimestamp": 1350
       }
-    ],
-    "inheritedTags": []
+    ]
   },
   {
     "id": "song-825b534c",
     "workId": "work-song-28534ae4",
     "title": "ドライフラワー",
     "originalArtist": "優里",
-    "tags": [
-      "language:ja",
-      "genre:rock"
-    ],
+    "tags": [],
     "performances": [
       {
         "id": "p-d3e99dc4",
         "streamId": "stream-2026-01-11",
         "videoId": "IK44-KOhau0",
         "timestamp": 5420,
-        "endTimestamp": 5829,
-        "tags": [
-          "language:ja"
-        ]
+        "endTimestamp": 5829
       },
       {
         "id": "p-e30f7f34",
         "streamId": "stream-2025-12-07",
         "videoId": "aKuD3fvW3fY",
         "timestamp": 6751,
-        "endTimestamp": 7015,
-        "tags": [
-          "language:ja"
-        ]
+        "endTimestamp": 7015
       }
-    ],
-    "inheritedTags": [
-      "genre:rock"
     ]
   },
   {
@@ -2238,46 +1681,29 @@
     "workId": "work-song-2697",
     "title": "ハレンチ",
     "originalArtist": "ちゃんみな",
-    "tags": [
-      "language:ja",
-      "genre:pop",
-      "genre:rap"
-    ],
+    "tags": [],
     "performances": [
       {
         "id": "p-c11f8832",
         "streamId": "stream-2026-01-18",
         "videoId": "SVEtS6mQFPY",
         "timestamp": 7367,
-        "endTimestamp": 7391,
-        "tags": [
-          "language:ja"
-        ]
+        "endTimestamp": 7391
       },
       {
         "id": "p-ad52c99b",
         "streamId": "stream-2026-01-18",
         "videoId": "SVEtS6mQFPY",
         "timestamp": 7541,
-        "endTimestamp": 7578,
-        "tags": [
-          "language:ja"
-        ]
+        "endTimestamp": 7578
       },
       {
         "id": "p-848e4c6e",
         "streamId": "stream-2026-01-18",
         "videoId": "SVEtS6mQFPY",
         "timestamp": 7731,
-        "endTimestamp": 7771,
-        "tags": [
-          "language:ja"
-        ]
+        "endTimestamp": 7771
       }
-    ],
-    "inheritedTags": [
-      "genre:pop",
-      "genre:rap"
     ]
   },
   {
@@ -2285,24 +1711,15 @@
     "workId": "work-song-13e927d3",
     "title": "ベテルギウス",
     "originalArtist": "優里",
-    "tags": [
-      "language:ja",
-      "genre:rock"
-    ],
+    "tags": [],
     "performances": [
       {
         "id": "p-f625a05c",
         "streamId": "stream-2025-11-30",
         "videoId": "Mi9lEynnVbE",
         "timestamp": 2015,
-        "endTimestamp": 2244,
-        "tags": [
-          "language:ja"
-        ]
+        "endTimestamp": 2244
       }
-    ],
-    "inheritedTags": [
-      "genre:rock"
     ]
   },
   {
@@ -2310,21 +1727,15 @@
     "workId": "work-song-58150868",
     "title": "ユキコイ",
     "originalArtist": "當山みれい",
-    "tags": [
-      "language:ja"
-    ],
+    "tags": [],
     "performances": [
       {
         "id": "p-003f966f",
         "streamId": "stream-2026-01-25",
         "videoId": "OrwsCyMKewY",
         "timestamp": 3615,
-        "endTimestamp": 3860,
-        "tags": [
-          "language:ja"
-        ]
+        "endTimestamp": 3860
       }
-    ],
-    "inheritedTags": []
+    ]
   }
 ]

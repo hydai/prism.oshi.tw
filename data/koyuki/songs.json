@@ -1,5 +1,21 @@
 [
   {
+    "id": "song-8cd343a3",
+    "workId": "work-song-4ce2c5e1",
+    "title": "女孩",
+    "originalArtist": "韋禮安",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-c8e62f2b",
+        "streamId": "stream-2026-07-31",
+        "videoId": "jV0ma_AcdT8",
+        "timestamp": 2892,
+        "endTimestamp": 3198
+      }
+    ]
+  },
+  {
     "id": "song-f4f5dece",
     "workId": "work-song-f4f5dece",
     "title": "不眠之夜",
@@ -11,11 +27,73 @@
         "streamId": "stream-8c6ccab5",
         "videoId": "Tke2WI0JHVI",
         "timestamp": 1170,
-        "endTimestamp": 1315,
-        "tags": []
+        "endTimestamp": 1315
       }
-    ],
-    "inheritedTags": []
+    ]
+  },
+  {
+    "id": "song-d5f05473",
+    "workId": "work-song-1d9b45c7",
+    "title": "心跳的證明",
+    "originalArtist": "劉人語",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-a75aa9c8",
+        "streamId": "stream-2026-07-31",
+        "videoId": "jV0ma_AcdT8",
+        "timestamp": 4739,
+        "endTimestamp": 4970
+      }
+    ]
+  },
+  {
+    "id": "song-cc54d159",
+    "workId": "work-e0e3bade-b3e7-4fdc-beaf-62ce1ac0d35e",
+    "title": "有你在",
+    "originalArtist": "蘇盈之",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-0aa22659",
+        "streamId": "stream-2026-07-31",
+        "videoId": "jV0ma_AcdT8",
+        "timestamp": 730,
+        "endTimestamp": 1011
+      }
+    ]
+  },
+  {
+    "id": "song-fb798938",
+    "workId": "work-song-8a6dc748",
+    "title": "至少還有你",
+    "originalArtist": "林憶蓮",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-14cd5262",
+        "streamId": "stream-2026-07-31",
+        "videoId": "jV0ma_AcdT8",
+        "timestamp": 2258,
+        "endTimestamp": 2533
+      }
+    ]
+  },
+  {
+    "id": "song-98bbc437",
+    "workId": "work-82128eb6-f777-4197-b917-deb5885e5966",
+    "title": "你眼中的我",
+    "originalArtist": "郭靜",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-642188d3",
+        "streamId": "stream-2026-07-31",
+        "videoId": "jV0ma_AcdT8",
+        "timestamp": 5218,
+        "endTimestamp": 5469
+      }
+    ]
   },
   {
     "id": "song-da632b91",
@@ -29,35 +107,56 @@
         "streamId": "stream-8c6ccab5",
         "videoId": "Tke2WI0JHVI",
         "timestamp": 4594,
-        "endTimestamp": 4859,
-        "tags": []
+        "endTimestamp": 4859
       }
-    ],
-    "inheritedTags": []
+    ]
+  },
+  {
+    "id": "song-b934451b",
+    "workId": "work-4c3aa6c1-ad0d-49b3-95f1-d188dcc35e2b",
+    "title": "我的秘密",
+    "originalArtist": "G.E.M. 鄧紫棋",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-16c33ef5",
+        "streamId": "stream-2026-07-31",
+        "videoId": "jV0ma_AcdT8",
+        "timestamp": 4132,
+        "endTimestamp": 4382
+      }
+    ]
+  },
+  {
+    "id": "song-1bea0298",
+    "workId": "work-c0b69c5d-079d-43d3-a433-c8f74c44f89f",
+    "title": "奔赴星空",
+    "originalArtist": "尹昔眠",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-5c319a39",
+        "streamId": "stream-2026-07-31",
+        "videoId": "jV0ma_AcdT8",
+        "timestamp": 3559,
+        "endTimestamp": 3763
+      }
+    ]
   },
   {
     "id": "song-fff3233e",
     "workId": "work-song-fff3233e",
     "title": "明明就（升1key）",
     "originalArtist": "周杰倫",
-    "tags": [
-      "language:zh",
-      "genre:pop"
-    ],
+    "tags": [],
     "performances": [
       {
         "id": "p-41aa9fca",
         "streamId": "stream-8c6ccab5",
         "videoId": "Tke2WI0JHVI",
         "timestamp": 2605,
-        "endTimestamp": 2861,
-        "tags": [
-          "language:zh"
-        ]
+        "endTimestamp": 2861
       }
-    ],
-    "inheritedTags": [
-      "genre:pop"
     ]
   },
   {
@@ -65,24 +164,15 @@
     "workId": "work-song-441640bd",
     "title": "明明就（升1key破音ver）",
     "originalArtist": "周杰倫",
-    "tags": [
-      "language:zh",
-      "genre:pop"
-    ],
+    "tags": [],
     "performances": [
       {
         "id": "p-658a971a",
         "streamId": "stream-8c6ccab5",
         "videoId": "Tke2WI0JHVI",
         "timestamp": 2406,
-        "endTimestamp": 2591,
-        "tags": [
-          "language:zh"
-        ]
+        "endTimestamp": 2591
       }
-    ],
-    "inheritedTags": [
-      "genre:pop"
     ]
   },
   {
@@ -97,55 +187,41 @@
         "streamId": "stream-8c6ccab5",
         "videoId": "Tke2WI0JHVI",
         "timestamp": 4200,
-        "endTimestamp": 4401,
-        "tags": []
+        "endTimestamp": 4401
       }
-    ],
-    "inheritedTags": []
+    ]
   },
   {
     "id": "song-971c32a6",
     "workId": "work-song-971c32a6",
     "title": "從前說",
     "originalArtist": "小阿七",
-    "tags": [
-      "language:zh"
-    ],
+    "tags": [],
     "performances": [
       {
         "id": "p-50841a65",
         "streamId": "stream-8c6ccab5",
         "videoId": "Tke2WI0JHVI",
         "timestamp": 3168,
-        "endTimestamp": 3420,
-        "tags": [
-          "language:zh"
-        ]
+        "endTimestamp": 3420
       }
-    ],
-    "inheritedTags": []
+    ]
   },
   {
     "id": "song-82fc451c",
     "workId": "work-song-4b765c90",
     "title": "無人之島",
     "originalArtist": "任然",
-    "tags": [
-      "language:zh"
-    ],
+    "tags": [],
     "performances": [
       {
         "id": "p-9fe05874",
         "streamId": "stream-8c6ccab5",
         "videoId": "Tke2WI0JHVI",
         "timestamp": 1888,
-        "endTimestamp": 2173,
-        "tags": [
-          "language:zh"
-        ]
+        "endTimestamp": 2173
       }
-    ],
-    "inheritedTags": []
+    ]
   },
   {
     "id": "song-472efcf3",
@@ -159,32 +235,40 @@
         "streamId": "stream-8c6ccab5",
         "videoId": "Tke2WI0JHVI",
         "timestamp": 3753,
-        "endTimestamp": 3999,
-        "tags": []
+        "endTimestamp": 3999
       }
-    ],
-    "inheritedTags": []
+    ]
+  },
+  {
+    "id": "song-864b0adb",
+    "workId": "work-de0179c0-6c79-4c50-8afa-7ef95c58ec70",
+    "title": "遇到",
+    "originalArtist": "方雅賢",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-30e820a1",
+        "streamId": "stream-2026-07-31",
+        "videoId": "jV0ma_AcdT8",
+        "timestamp": 1680,
+        "endTimestamp": 1864
+      }
+    ]
   },
   {
     "id": "song-86d4637b",
     "workId": "work-song-86d4637b",
     "title": "聽海",
     "originalArtist": "張惠妺",
-    "tags": [
-      "language:zh"
-    ],
+    "tags": [],
     "performances": [
       {
         "id": "p-2759a933",
         "streamId": "stream-8c6ccab5",
         "videoId": "Tke2WI0JHVI",
         "timestamp": 553,
-        "endTimestamp": 874,
-        "tags": [
-          "language:zh"
-        ]
+        "endTimestamp": 874
       }
-    ],
-    "inheritedTags": []
+    ]
   }
 ]

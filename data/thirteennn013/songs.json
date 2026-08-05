@@ -4,24 +4,31 @@
     "workId": "work-song-1217",
     "title": "丸の内サディスティック",
     "originalArtist": "椎名林檎",
-    "tags": [
-      "language:ja",
-      "genre:pop"
-    ],
+    "tags": [],
     "performances": [
       {
         "id": "p-ebc9aadf",
         "streamId": "stream-c22c3bca",
         "videoId": "Rz1r1LDGBhw",
         "timestamp": 1173,
-        "endTimestamp": 1384,
-        "tags": [
-          "language:ja"
-        ]
+        "endTimestamp": 1384
       }
-    ],
-    "inheritedTags": [
-      "genre:pop"
+    ]
+  },
+  {
+    "id": "song-7fc67846",
+    "workId": "work-song-2bb8d010",
+    "title": "六等星の夜",
+    "originalArtist": "Aimer",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-025d3344",
+        "streamId": "stream-2022-02-23",
+        "videoId": "ZFMcNagdk9M",
+        "timestamp": 767,
+        "endTimestamp": 1083
+      }
     ]
   },
   {
@@ -29,24 +36,15 @@
     "workId": "work-song-17",
     "title": "完全感覚Dreamer",
     "originalArtist": "ONE OK ROCK",
-    "tags": [
-      "language:ja",
-      "genre:rock"
-    ],
+    "tags": [],
     "performances": [
       {
         "id": "p-15ff0d62",
         "streamId": "stream-c22c3bca",
         "videoId": "Rz1r1LDGBhw",
         "timestamp": 5386,
-        "endTimestamp": 5604,
-        "tags": [
-          "language:ja"
-        ]
+        "endTimestamp": 5604
       }
-    ],
-    "inheritedTags": [
-      "genre:rock"
     ]
   },
   {
@@ -54,26 +52,15 @@
     "workId": "work-song-1f98c249",
     "title": "美人",
     "originalArtist": "ちゃんみな",
-    "tags": [
-      "language:ja",
-      "genre:pop",
-      "genre:rap"
-    ],
+    "tags": [],
     "performances": [
       {
         "id": "p-2c22211b",
         "streamId": "stream-c22c3bca",
         "videoId": "Rz1r1LDGBhw",
         "timestamp": 5057,
-        "endTimestamp": 5204,
-        "tags": [
-          "language:ja"
-        ]
+        "endTimestamp": 5204
       }
-    ],
-    "inheritedTags": [
-      "genre:pop",
-      "genre:rap"
     ]
   },
   {
@@ -81,46 +68,95 @@
     "workId": "work-song-2ca5447e",
     "title": "革命道中",
     "originalArtist": "アイナ・ジ・エンド",
-    "tags": [
-      "language:ja"
-    ],
+    "tags": [],
     "performances": [
       {
         "id": "p-bb5d2f73",
         "streamId": "stream-c22c3bca",
         "videoId": "Rz1r1LDGBhw",
         "timestamp": 4368,
-        "endTimestamp": 4565,
-        "tags": [
-          "language:ja"
-        ]
+        "endTimestamp": 4565
       }
-    ],
-    "inheritedTags": []
+    ]
+  },
+  {
+    "id": "song-4c75a9cb",
+    "workId": "work-song-114c348c",
+    "title": "逢いたくていま",
+    "originalArtist": "MISIA",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-fd251b40",
+        "streamId": "stream-2022-02-23",
+        "videoId": "ZFMcNagdk9M",
+        "timestamp": 4608,
+        "endTimestamp": 4956
+      }
+    ]
+  },
+  {
+    "id": "song-d801bc7a",
+    "workId": "work-7356c877-387a-42be-a42c-feb15b778d6b",
+    "title": "楽園都市",
+    "originalArtist": "大石昌良",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-7349138d",
+        "streamId": "stream-2022-02-23",
+        "videoId": "ZFMcNagdk9M",
+        "timestamp": 2760,
+        "endTimestamp": 2983
+      }
+    ]
   },
   {
     "id": "song-aa13810b",
     "workId": "work-song-2986",
     "title": "罪と罰",
     "originalArtist": "椎名林檎",
-    "tags": [
-      "language:ja",
-      "genre:pop"
-    ],
+    "tags": [],
     "performances": [
       {
         "id": "p-a224d8f3",
         "streamId": "stream-c22c3bca",
         "videoId": "Rz1r1LDGBhw",
         "timestamp": 3138,
-        "endTimestamp": 3404,
-        "tags": [
-          "language:ja"
-        ]
+        "endTimestamp": 3404
       }
-    ],
-    "inheritedTags": [
-      "genre:pop"
+    ]
+  },
+  {
+    "id": "song-bdb5d4a8",
+    "workId": "work-song-2",
+    "title": "僕が死のうと思ったのは",
+    "originalArtist": "中島美嘉",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-a2510abb",
+        "streamId": "stream-2022-02-23",
+        "videoId": "ZFMcNagdk9M",
+        "timestamp": 5144,
+        "endTimestamp": 5443
+      }
+    ]
+  },
+  {
+    "id": "song-0eff33fc",
+    "workId": "work-song-2ccade11",
+    "title": "踊",
+    "originalArtist": "Ado",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-dfad20f0",
+        "streamId": "stream-2022-02-23",
+        "videoId": "ZFMcNagdk9M",
+        "timestamp": 1433,
+        "endTimestamp": 1641
+      }
     ]
   },
   {
@@ -128,24 +164,31 @@
     "workId": "work-song-aeda2a44",
     "title": "擱淺",
     "originalArtist": "周杰倫",
-    "tags": [
-      "language:zh",
-      "genre:pop"
-    ],
+    "tags": [],
     "performances": [
       {
         "id": "p-9a656987",
         "streamId": "stream-c22c3bca",
         "videoId": "Rz1r1LDGBhw",
         "timestamp": 1618,
-        "endTimestamp": 1841,
-        "tags": [
-          "language:zh"
-        ]
+        "endTimestamp": 1841
       }
-    ],
-    "inheritedTags": [
-      "genre:pop"
+    ]
+  },
+  {
+    "id": "song-bf3e5ce0",
+    "workId": "work-song-74baa9d8",
+    "title": "flos",
+    "originalArtist": "R Sound Design feat. 初音ミク",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-93e6e940",
+        "streamId": "stream-2022-02-23",
+        "videoId": "ZFMcNagdk9M",
+        "timestamp": 2202,
+        "endTimestamp": 2474
+      }
     ]
   },
   {
@@ -153,46 +196,63 @@
     "workId": "work-song-1edb7152",
     "title": "Golden",
     "originalArtist": "HUNTR/X",
-    "tags": [
-      "language:en"
-    ],
+    "tags": [],
     "performances": [
       {
         "id": "p-7452a884",
         "streamId": "stream-c22c3bca",
         "videoId": "Rz1r1LDGBhw",
         "timestamp": 3551,
-        "endTimestamp": 3729,
-        "tags": [
-          "language:en"
-        ]
+        "endTimestamp": 3729
       }
-    ],
-    "inheritedTags": []
+    ]
+  },
+  {
+    "id": "song-7d35033a",
+    "workId": "work-song-511",
+    "title": "Here",
+    "originalArtist": "Junna",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-8871e75b",
+        "streamId": "stream-2022-02-23",
+        "videoId": "ZFMcNagdk9M",
+        "timestamp": 3546,
+        "endTimestamp": 3799
+      }
+    ]
   },
   {
     "id": "song-144cd0fa",
     "workId": "work-song-024be7af",
     "title": "Kick back",
     "originalArtist": "米津玄師",
-    "tags": [
-      "language:ja",
-      "genre:pop"
-    ],
+    "tags": [],
     "performances": [
       {
         "id": "p-d0ba9955",
         "streamId": "stream-c22c3bca",
         "videoId": "Rz1r1LDGBhw",
         "timestamp": 4683,
-        "endTimestamp": 4867,
-        "tags": [
-          "language:ja"
-        ]
+        "endTimestamp": 4867
       }
-    ],
-    "inheritedTags": [
-      "genre:pop"
+    ]
+  },
+  {
+    "id": "song-5f42bfa7",
+    "workId": "work-song-471",
+    "title": "KING",
+    "originalArtist": "Kanaria",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-3154d959",
+        "streamId": "stream-2022-02-23",
+        "videoId": "ZFMcNagdk9M",
+        "timestamp": 1862,
+        "endTimestamp": 1998
+      }
     ]
   },
   {
@@ -200,24 +260,15 @@
     "workId": "work-song-f637a748",
     "title": "Save yourself",
     "originalArtist": "ONE OK ROCK",
-    "tags": [
-      "language:ja",
-      "genre:rock"
-    ],
+    "tags": [],
     "performances": [
       {
         "id": "p-6fd77db7",
         "streamId": "stream-c22c3bca",
         "videoId": "Rz1r1LDGBhw",
         "timestamp": 2227,
-        "endTimestamp": 2417,
-        "tags": [
-          "language:ja"
-        ]
+        "endTimestamp": 2417
       }
-    ],
-    "inheritedTags": [
-      "genre:rock"
     ]
   },
   {
@@ -225,24 +276,63 @@
     "workId": "work-song-1433",
     "title": "The Beginning",
     "originalArtist": "ONE OK ROCK",
-    "tags": [
-      "language:ja",
-      "genre:rock"
-    ],
+    "tags": [],
     "performances": [
       {
         "id": "p-e2a07fcd",
         "streamId": "stream-c22c3bca",
         "videoId": "Rz1r1LDGBhw",
         "timestamp": 2641,
-        "endTimestamp": 2931,
-        "tags": [
-          "language:ja"
-        ]
+        "endTimestamp": 2931
       }
-    ],
-    "inheritedTags": [
-      "genre:rock"
+    ]
+  },
+  {
+    "id": "song-cf3fb993",
+    "workId": "work-9d347322-1103-4a96-b2fe-97009bd5eeef",
+    "title": "あなたに出会わなければ ～夏雪冬花～",
+    "originalArtist": "Aimer",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-24aa1a36",
+        "streamId": "stream-2022-02-23",
+        "videoId": "ZFMcNagdk9M",
+        "timestamp": 4081,
+        "endTimestamp": 4439
+      }
+    ]
+  },
+  {
+    "id": "song-8db03abf",
+    "workId": "work-d4bfbd0c-ca1c-4403-82be-40cb9decffc0",
+    "title": "いけないボーダーライン",
+    "originalArtist": "ワルキューレ（feat. 13醬）",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-4a0b8be0",
+        "streamId": "stream-2022-02-23",
+        "videoId": "ZFMcNagdk9M",
+        "timestamp": 5675,
+        "endTimestamp": 5958
+      }
+    ]
+  },
+  {
+    "id": "song-0b1f6690",
+    "workId": "work-song-44",
+    "title": "エンヴィーベイビー",
+    "originalArtist": "Kanaria",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-54e69f7d",
+        "streamId": "stream-2022-02-23",
+        "videoId": "ZFMcNagdk9M",
+        "timestamp": 3167,
+        "endTimestamp": 3301
+      }
     ]
   },
   {
@@ -250,21 +340,15 @@
     "workId": "work-song-2022",
     "title": "ダーリン",
     "originalArtist": "須田景凪",
-    "tags": [
-      "language:ja"
-    ],
+    "tags": [],
     "performances": [
       {
         "id": "p-24f3fc2c",
         "streamId": "stream-c22c3bca",
         "videoId": "Rz1r1LDGBhw",
         "timestamp": 4110,
-        "endTimestamp": 4241,
-        "tags": [
-          "language:ja"
-        ]
+        "endTimestamp": 4241
       }
-    ],
-    "inheritedTags": []
+    ]
   }
 ]
