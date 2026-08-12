@@ -1,11 +1,19 @@
 import assert from 'node:assert/strict';
 import {
+  dedupePlaylistVersions,
   getStorageSaveError,
   isStorageQuotaError,
   saveJsonToStorage,
   STORAGE_QUOTA_ERROR,
   STORAGE_SAVE_ERROR,
 } from './playlist-storage';
+
+const duplicateVersions = [
+  { performanceId: 'performance-1', title: 'first occurrence' },
+  { performanceId: 'performance-2', title: 'unique occurrence' },
+  { performanceId: 'performance-1', title: 'duplicate occurrence' },
+];
+assert.deepEqual(dedupePlaylistVersions(duplicateVersions), duplicateVersions.slice(0, 2));
 
 type SetItemCall = [key: string, value: string];
 

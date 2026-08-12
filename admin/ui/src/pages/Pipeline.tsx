@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useId, useRef } from 'react';
 import type {
   AuthUser,
   CandidateComment,
@@ -253,6 +253,17 @@ function CandidateCard({
 
 // --- Extract Tab ---
 
+function useIdentifySongs() {
+  const songIdPrefix = useId();
+  const nextSongId = useRef(0);
+
+  return (songs: PasteImportParsedSong[]): EditableParsedSong[] =>
+    songs.map((song) => ({
+      ...song,
+      clientId: `${songIdPrefix}-${nextSongId.current++}`,
+    }));
+}
+
 function ExtractTab() {
   const [streams, setStreams] = useState<Stream[]>([]);
   const [selectedStreamId, setSelectedStreamId] = useState('');
@@ -264,6 +275,7 @@ function ExtractTab() {
   const [importStatus, setImportStatus] = useState<string | null>(null);
   const [importing, setImporting] = useState(false);
   const [credit, setCredit] = useState<StreamCredit | null>(null);
+  const identifySongs = useIdentifySongs();
 
   // Fetch streams needing extraction (status = pending)
   useEffect(() => {
@@ -599,7 +611,3 @@ export default function Pipeline({ user: _user }: { user: AuthUser }) {
 }
 
 type EditableParsedSong = PasteImportParsedSong & { clientId: string };
-
-function identifySongs(songs: PasteImportParsedSong[]): EditableParsedSong[] {
-  return songs.map((song) => ({ ...song, clientId: crypto.randomUUID() }));
-}

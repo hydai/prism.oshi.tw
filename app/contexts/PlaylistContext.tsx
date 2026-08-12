@@ -2,6 +2,7 @@
 
 import { createContext, useContext, useState, useEffect, ReactNode } from 'react';
 import {
+  dedupePlaylistVersions,
   saveJsonToStorage,
   type StorageSaveResult,
 } from '../lib/playlist-storage';
@@ -134,7 +135,7 @@ function validateImport(data: unknown): { valid: true; playlists: Playlist[] } |
       validPlaylists.push({
         id: p.id,
         name: p.name,
-        versions,
+        versions: dedupePlaylistVersions(versions),
         createdAt: p.createdAt,
         updatedAt: p.updatedAt,
       });
@@ -178,7 +179,9 @@ export const PlaylistProvider = ({ streamerSlug, children }: { streamerSlug: str
       const filtered = parsed
         .map(p => ({
           ...p,
-          versions: p.versions.filter(v => v.streamerSlug === streamerSlug),
+          versions: dedupePlaylistVersions(
+            p.versions.filter(v => v.streamerSlug === streamerSlug),
+          ),
           updatedAt: p.updatedAt || p.createdAt || Date.now(),
         }))
         .filter(p => p.versions.length > 0);
@@ -197,6 +200,7 @@ export const PlaylistProvider = ({ streamerSlug, children }: { streamerSlug: str
         const parsed = JSON.parse(stored) as Partial<Playlist>[];
         const normalized = parsed.map((p) => ({
           ...p,
+          versions: dedupePlaylistVersions(p.versions ?? []),
           updatedAt: p.updatedAt || p.createdAt || Date.now(),
         })) as Playlist[];
         setPlaylists(normalized);

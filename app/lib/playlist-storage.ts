@@ -3,6 +3,17 @@ export const STORAGE_SAVE_ERROR = '無法儲存播放清單，請確認瀏覽器
 
 export type StorageSaveResult = { success: true } | { success: false; error: string };
 
+export function dedupePlaylistVersions<T extends { performanceId: string }>(
+  versions: readonly T[],
+): T[] {
+  const seen = new Set<string>();
+  return versions.filter((version) => {
+    if (seen.has(version.performanceId)) return false;
+    seen.add(version.performanceId);
+    return true;
+  });
+}
+
 type StorageErrorShape = {
   name?: string;
   code?: number;
