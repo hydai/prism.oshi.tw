@@ -15,11 +15,12 @@ export default function Toast({ message, show, onHide }: ToastProps) {
   useEffect(() => {
     if (show) {
       setIsVisible(true);
-      const timer = setTimeout(() => {
-        setIsVisible(false);
-        setTimeout(onHide, 300); // Wait for fade out
-      }, 2000);
-      return () => clearTimeout(timer);
+      const fadeTimer = setTimeout(() => setIsVisible(false), 2000);
+      const hideTimer = setTimeout(onHide, 2300); // Wait for the 300ms fade out
+      return () => {
+        clearTimeout(fadeTimer);
+        clearTimeout(hideTimer);
+      };
     }
   }, [show, onHide]);
 

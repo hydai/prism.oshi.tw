@@ -51,22 +51,31 @@ export default function AuroraPage() {
   const [fillingIndex, setFillingIndex] = useState<number | null>(null);
   const [bulkFillStatus, setBulkFillStatus] = useState<string | null>(null);
   const playerRef = useRef<YouTubeEmbedHandle>(null);
-  const saveTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const pendingSaveRef = useRef<{ videoId: string; songs: AuroraSong[] } | null>(null);
 
-  // Debounced save to localStorage
-  const scheduleSave = useCallback((vid: string, data: AuroraSong[]) => {
-    if (saveTimerRef.current) clearTimeout(saveTimerRef.current);
-    saveTimerRef.current = setTimeout(() => saveSession(vid, data), 500);
+  // Persist committed song state after a short debounce. Keeping this side
+  // effect outside the state updater lets React replay updates safely.
+  useEffect(() => {
+    if (!videoId) return;
+    const pendingSave = { videoId, songs };
+    pendingSaveRef.current = pendingSave;
+    const timer = setTimeout(() => {
+      saveSession(videoId, songs);
+      if (pendingSaveRef.current === pendingSave) pendingSaveRef.current = null;
+    }, 500);
+    return () => clearTimeout(timer);
+  }, [videoId, songs]);
+
+  // A route change can unmount the editor before the debounce expires.
+  useEffect(() => () => {
+    const pendingSave = pendingSaveRef.current;
+    if (pendingSave) saveSession(pendingSave.videoId, pendingSave.songs);
   }, []);
 
-  // Update songs with auto-save
+  // Keep song updaters pure; persistence is handled after commit above.
   const updateSongs = useCallback((updater: (prev: AuroraSong[]) => AuroraSong[]) => {
-    setSongs((prev) => {
-      const next = updater(prev);
-      if (videoId) scheduleSave(videoId, next);
-      return next;
-    });
-  }, [videoId, scheduleSave]);
+    setSongs(updater);
+  }, []);
 
   // Load video
   const handleLoadVideo = () => {
@@ -79,6 +88,11 @@ export default function AuroraPage() {
     if (!id) {
       setUrlError('無法解析影片 ID');
       return;
+    }
+    const pendingSave = pendingSaveRef.current;
+    if (pendingSave) {
+      saveSession(pendingSave.videoId, pendingSave.songs);
+      pendingSaveRef.current = null;
     }
     setUrlError('');
     setVideoId(id);
@@ -100,8 +114,8 @@ export default function AuroraPage() {
       endSeconds: null,
     };
     updateSongs((prev) => [...prev, newSong]);
-    setSongs((prev) => { setSelectedIndex(prev.length - 1); return prev; });
-  }, [updateSongs]);
+    setSelectedIndex(songs.length);
+  }, [songs.length, updateSongs]);
 
   const handleUpdate = useCallback((index: number, patch: Partial<AuroraSong>) => {
     updateSongs((prev) => prev.map((s, i) => i === index ? { ...s, ...patch } : s));
@@ -143,9 +157,10 @@ export default function AuroraPage() {
       setSelectedIndex(newSongs.length > 0 ? 0 : null);
     } else {
       updateSongs((prev) => [...prev, ...newSongs]);
-      setSongs((prev) => { setSelectedIndex(prev.length - 1); return prev; });
+      const lastIndex = songs.length + newSongs.length - 1;
+      setSelectedIndex(lastIndex >= 0 ? lastIndex : null);
     }
-  }, [updateSongs]);
+  }, [songs.length, updateSongs]);
 
   const handleClear = useCallback(() => {
     if (!window.confirm('確定要清除所有歌曲嗎？此操作無法復原。')) return;
