@@ -342,7 +342,7 @@ export default function PlaylistPanel({ show, onClose, songsData, onToast }: Pla
 
                   return (
                     <div
-                      key={`${version.performanceId}-${index}`}
+                      key={version.performanceId}
                       draggable
                       onDragStart={(e) => handleDragStart(e, index)}
                       onDragOver={(e) => handleDragOver(e, index)}

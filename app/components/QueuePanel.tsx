@@ -60,7 +60,7 @@ export default function QueuePanel() {
         <div className="p-4 space-y-2">
           {queue.map((track, index) => (
             <div
-              key={`${track.id}-${index}`}
+              key={track.queueEntryId}
               data-testid="queue-item"
               draggable
               onDragStart={(e) => handleDragStart(e, index)}

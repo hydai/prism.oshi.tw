@@ -260,7 +260,7 @@ function ExtractTab() {
   const [loadingStreams, setLoadingStreams] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [extractResult, setExtractResult] = useState<ExtractResponse | null>(null);
-  const [editedSongs, setEditedSongs] = useState<PasteImportParsedSong[]>([]);
+  const [editedSongs, setEditedSongs] = useState<EditableParsedSong[]>([]);
   const [importStatus, setImportStatus] = useState<string | null>(null);
   const [importing, setImporting] = useState(false);
   const [credit, setCredit] = useState<StreamCredit | null>(null);
@@ -288,7 +288,7 @@ function ExtractTab() {
     try {
       const res = await api.extractTimestamps(id);
       setExtractResult(res);
-      setEditedSongs([...res.parsedSongs]);
+      setEditedSongs(identifySongs(res.parsedSongs));
       setCredit(res.credit);
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Failed to extract');
@@ -299,7 +299,7 @@ function ExtractTab() {
 
   const handleUseCandidate = (candidateText: string, candidateAuthor: string, candidateId: string) => {
     const parsed = parseTextToSongs(candidateText);
-    setEditedSongs(parsed);
+    setEditedSongs(identifySongs(parsed));
     const selectedStream = streams.find((s) => s.id === selectedStreamId);
     setCredit({
       author: candidateAuthor,
@@ -508,7 +508,7 @@ function ExtractTab() {
             </thead>
             <tbody className="divide-y divide-slate-100">
               {editedSongs.map((song, i) => (
-                <tr key={i} className="hover:bg-slate-50">
+                <tr key={song.clientId} className="hover:bg-slate-50">
                   <td className="px-4 py-2 text-slate-400">{i + 1}</td>
                   <td className="px-4 py-2 text-slate-600 font-mono text-xs">
                     {formatTimestamp(song.startSeconds)}
@@ -596,4 +596,10 @@ export default function Pipeline({ user: _user }: { user: AuthUser }) {
       </div>
     </div>
   );
+}
+
+type EditableParsedSong = PasteImportParsedSong & { clientId: string };
+
+function identifySongs(songs: PasteImportParsedSong[]): EditableParsedSong[] {
+  return songs.map((song) => ({ ...song, clientId: crypto.randomUUID() }));
 }

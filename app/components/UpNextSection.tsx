@@ -38,7 +38,7 @@ export default function UpNextSection() {
       <div className="flex flex-col" style={{ gap: '8px' }}>
         {visibleItems.map((track, i) => (
           <div
-            key={track.id}
+            key={track.queueEntryId}
             className="flex items-center"
             style={{
               borderRadius: '12px',
