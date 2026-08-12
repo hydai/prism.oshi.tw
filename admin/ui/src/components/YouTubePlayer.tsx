@@ -72,7 +72,10 @@ export const YouTubePlayer = forwardRef<YouTubePlayerHandle, Props>(
     const playerRef = useRef<YTPlayer | null>(null);
     const readyRef = useRef(false);
     const onReadyRef = useRef(onReady);
-    onReadyRef.current = onReady;
+
+    useEffect(() => {
+      onReadyRef.current = onReady;
+    }, [onReady]);
 
     const initPlayer = useCallback((vid: string) => {
       if (!containerRef.current) return;
