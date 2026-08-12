@@ -17,6 +17,7 @@ import type {
   UpdateTimestampsBody,
   UpdateStreamBody,
   UpdateSongDetailsBody,
+  UpdatePerformanceTagsBody,
   PasteImportBody,
   PasteImportResponse,
   StreamDetail,
@@ -43,6 +44,10 @@ import type {
   HarmonizeMatchType,
   BulkFetchSubscribersResponse,
   GlobalWorksResponse,
+  UpdateWorkTagsBody,
+  BulkUpdateWorkTagsBody,
+  BulkUpdateWorkTagsResponse,
+  WorkTagsUpdate,
   WorkMatchCandidatesResponse,
   WorkMatchFilter,
   WorkMatchMergeBody,
@@ -218,6 +223,8 @@ export const api = {
   listGlobalWorks: (params?: {
     search?: string;
     sharedOnly?: boolean;
+    tag?: string;
+    untaggedOnly?: boolean;
     page?: number;
     pageSize?: number;
     sortBy?: string;
@@ -226,6 +233,8 @@ export const api = {
     const sp = new URLSearchParams();
     if (params?.search) sp.set('search', params.search);
     if (params?.sharedOnly) sp.set('sharedOnly', 'true');
+    if (params?.tag) sp.set('tag', params.tag);
+    if (params?.untaggedOnly) sp.set('untaggedOnly', 'true');
     if (params?.page) sp.set('page', String(params.page));
     if (params?.pageSize) sp.set('pageSize', String(params.pageSize));
     if (params?.sortBy) sp.set('sortBy', params.sortBy);
@@ -237,6 +246,20 @@ export const api = {
       { skipStreamer: true },
     );
   },
+
+  updateWorkTags: (id: string, body: UpdateWorkTagsBody) =>
+    request<WorkTagsUpdate>(
+      `/api/works/${encodeURIComponent(id)}/tags`,
+      { method: 'PUT', body: JSON.stringify(body) },
+      { skipStreamer: true },
+    ),
+
+  bulkUpdateWorkTags: (body: BulkUpdateWorkTagsBody) =>
+    request<BulkUpdateWorkTagsResponse>(
+      '/api/works/tags/bulk',
+      { method: 'POST', body: JSON.stringify(body) },
+      { skipStreamer: true },
+    ),
 
   listWorkMatches: (params?: {
     filter?: WorkMatchFilter;
@@ -346,6 +369,12 @@ export const api = {
     request<{ ok: boolean }>(`/api/performances/${id}/status`, {
       method: 'PATCH',
       body: JSON.stringify({ status }),
+    }),
+
+  updatePerformanceTags: (id: string, body: UpdatePerformanceTagsBody) =>
+    request<{ id: string; tags: string[] }>(`/api/performances/${id}/tags`, {
+      method: 'PATCH',
+      body: JSON.stringify(body),
     }),
 
   updatePerformanceTimestamps: (id: string, body: UpdateTimestampsBody) =>

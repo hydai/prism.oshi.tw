@@ -1,15 +1,20 @@
 import {
   batchUpdateSongs,
+  bulkCreatePerformances,
+  bulkUpdateGlobalWorkTags,
   bulkUnapproveStream,
   deleteStreamCascade,
   exportSongs,
   getSongSimilarityGroups,
   importVodToAdminDb,
+  insertPerformance,
+  insertSong,
   listGlobalWorksPaginated,
   mergeSongs,
   SongMergeError,
   updateSong,
 } from './db';
+import { applyTagDelta } from '../../lib/tags';
 
 declare const process: { exitCode?: number };
 
@@ -56,6 +61,18 @@ class FakeStatement {
 
   async all<T>(): Promise<{ results: T[] }> {
     this.fakeDb.allStatements.push({ sql: this.sql, params: this.params });
+    if (this.sql.includes('candidate_tags') && this.sql.includes('RETURNING id, tags')) {
+      const requested = JSON.parse(String(this.params[0])) as string[];
+      const additions = JSON.parse(String(this.params[1])) as string[];
+      const removals = JSON.parse(String(this.params[2])) as string[];
+      const rows = this.fakeDb.workTagRows
+        .filter((row) => requested.includes(row.id))
+        .map((row) => ({
+          id: row.id,
+          tags: JSON.stringify(applyTagDelta(JSON.parse(row.tags) as string[], additions, removals)),
+        }));
+      return { results: rows as T[] };
+    }
     if (this.sql.includes('AS perf_count') && this.sql.includes('LEFT JOIN song_work_links')) {
       return { results: this.fakeDb.harmonizerRows as T[] };
     }
@@ -65,13 +82,20 @@ class FakeStatement {
     if (this.sql.includes('FROM songs AS song') && this.sql.includes('LEFT JOIN song_work_links')) {
       return { results: this.fakeDb.exportSongRows as T[] };
     }
+    if (this.sql.includes('SELECT id, tags FROM works WHERE id IN')) {
+      return { results: this.fakeDb.workTagRows as T[] };
+    }
     if (this.sql.includes('FROM performances WHERE streamer_id = ?')) {
       return { results: this.fakeDb.exportPerformanceRows as T[] };
+    }
+    if (this.sql.includes('FROM performances WHERE stream_id = ?')) {
+      return { results: this.fakeDb.existingPerformanceTagRows as T[] };
     }
     return { results: [] };
   }
 
   async run(): Promise<{ meta: { changes: number } }> {
+    this.fakeDb.runStatements.push({ sql: this.sql, params: this.params });
     return { meta: { changes: 1 } };
   }
 }
@@ -86,7 +110,10 @@ class FakeD1Database {
   readonly firstStatements: CapturedStatement[] = [];
   readonly allStatements: CapturedStatement[] = [];
   readonly batchStatements: CapturedStatement[] = [];
+  readonly runStatements: CapturedStatement[] = [];
   mergeGuardValid = true;
+  workTagRows: Array<{ id: string; tags: string }> = [];
+  existingPerformanceTagRows: Array<{ song_id: string; timestamp: number; tags: string }> = [];
 
   constructor(
     readonly existingStream: ExistingStream,
@@ -346,6 +373,58 @@ async function testSongIdentityEditRelinksGlobalWorkAtomically(): Promise<void> 
   assert(/ON\s+CONFLICT\s*\(song_id\)\s+DO\s+UPDATE/i.test(fakeDb.batchStatements[2].sql), 'existing bridge is repointed, not duplicated');
   assertEqual(fakeDb.batchStatements[2].params[0], 'curator@example.com', 'relink records the responsible curator');
   assertEqual(fakeDb.batchStatements[2].params[1], 'song-local', 'relink remains scoped to the edited local song');
+  assert(
+    !/song\.tags/i.test(fakeDb.batchStatements[0].sql),
+    'identity relinks must not promote the dead local song tag layer',
+  );
+  // The renamed song is relinked to this freshly created work, so without carrying the
+  // current work's tags a title typo fix silently drops every curated work tag.
+  assert(
+    /SELECT\s+\?,\s*identity\.title,\s*identity\.original_artist,\s*identity\.tags\b/i.test(fakeDb.batchStatements[0].sql),
+    'the created work must store the inherited tags, not a hardcoded empty list',
+  );
+  assert(
+    /identity\.tags[\s\S]*?FROM\s+song_work_links[\s\S]+JOIN\s+works/i.test(fakeDb.batchStatements[0].sql),
+    'identity relinks source those tags from the currently linked work',
+  );
+}
+
+async function testWritesKeepTagsAtTheirDeclaredScope(): Promise<void> {
+  const fakeDb = new FakeD1Database(null);
+  await insertSong(
+    fakeDb as unknown as D1Database,
+    'alice',
+    'song-local',
+    'Song',
+    'Artist',
+    ['genre:rock', 'language:ja'],
+    'contributor@example.com',
+  );
+
+  const workInsert = fakeDb.batchStatements.find((statement) => /INSERT\s+INTO\s+works/i.test(statement.sql));
+  const songInsert = fakeDb.batchStatements.find((statement) => /INSERT\s+INTO\s+songs/i.test(statement.sql));
+  if (!workInsert || !songInsert) throw new Error('song creation must create a local row and ensure its work');
+  assertEqual(workInsert.params[3], '["genre:rock"]', 'new work receives only work-scoped tags');
+  assertEqual(songInsert.params[4], '[]', 'new local song is not used as rendition tag storage');
+
+  await insertPerformance(
+    fakeDb as unknown as D1Database,
+    'alice',
+    'perf-local',
+    'song-local',
+    'stream-local',
+    '2026-01-01',
+    'Stream',
+    'video',
+    10,
+    null,
+    '',
+    'contributor@example.com',
+    ['language:ja', 'genre:rock'],
+  );
+  const performanceInsert = fakeDb.runStatements.find((statement) => /INSERT\s+INTO\s+performances/i.test(statement.sql));
+  if (!performanceInsert) throw new Error('performance creation must insert a performance row');
+  assertEqual(performanceInsert.params[10], '["language:ja"]', 'performance receives only rendition-scoped tags');
 }
 
 async function testHarmonizerArtistUpdatesRelinkEveryEditedSong(): Promise<void> {
@@ -402,6 +481,7 @@ async function testGlobalWorksListAggregatesAcrossStreamers(): Promise<void> {
   const result = await listGlobalWorksPaginated(fakeDb as unknown as D1Database, {
     search: longSearch,
     sharedOnly: true,
+    tag: 'genre:rock',
     page: 2,
     pageSize: 25,
     sortBy: 'streamerCount',
@@ -421,10 +501,40 @@ async function testGlobalWorksListAggregatesAcrossStreamers(): Promise<void> {
   assert(/instr\s*\(\s*lower\(work\.title\)/i.test(dataQuery.sql), 'title search avoids D1 LIKE pattern limits');
   assert(/instr\s*\(\s*lower\(work\.original_artist\)/i.test(dataQuery.sql), 'artist search avoids D1 LIKE pattern limits');
   assert(!/\bLIKE\b/i.test(dataQuery.sql), 'global search does not build a length-limited LIKE pattern');
+  assert(/json_each\(work\.tags\)/i.test(dataQuery.sql), 'global tag filter uses exact JSON-array membership');
   assertEqual(dataQuery.params[0], longSearch, 'title search is bound without wildcard expansion');
   assertEqual(dataQuery.params[1], longSearch, 'artist search is bound without wildcard expansion');
-  assertEqual(dataQuery.params[2], 25, 'page size is bound');
-  assertEqual(dataQuery.params[3], 25, 'second-page offset is bound');
+  assertEqual(dataQuery.params[2], 'genre:rock', 'stable tag ID is bound without string interpolation');
+  assertEqual(dataQuery.params[3], 25, 'page size is bound');
+  assertEqual(dataQuery.params[4], 25, 'second-page offset is bound');
+}
+
+async function testBulkWorkTagsApplyStableDelta(): Promise<void> {
+  const fakeDb = new FakeD1Database(null);
+  fakeDb.workTagRows = [
+    { id: 'work-1', tags: '["genre:rock","mood:ballad"]' },
+    { id: 'work-2', tags: '["language:zh"]' },
+  ];
+
+  const updated = await bulkUpdateGlobalWorkTags(
+    fakeDb as unknown as D1Database,
+    ['work-1', 'work-2'],
+    ['source:anime', 'genre:rock'],
+    ['mood:ballad'],
+  );
+
+  assertEqual(updated.length, 2, 'bulk tag update returns every selected work');
+  assertEqual(
+    JSON.stringify(updated[0]?.tags),
+    JSON.stringify(['genre:rock', 'source:anime']),
+    'bulk tag update adds, removes, de-duplicates, and orders tags',
+  );
+  const atomicUpdate = fakeDb.allStatements.find((statement) => statement.sql.includes('candidate_tags'));
+  if (!atomicUpdate) throw new Error('bulk tag update must compute every delta in the writing SQL statement');
+  assert(
+    atomicUpdate.sql.includes("updated_at = datetime('now')") && atomicUpdate.sql.includes('RETURNING id, tags'),
+    'work tag writes advance freshness timestamps',
+  );
 }
 
 async function testFanSiteExportOmitsNullWorkIds(): Promise<void> {
@@ -438,13 +548,40 @@ async function testFanSiteExportOmitsNullWorkIds(): Promise<void> {
     updated_at: '2026-01-02',
   };
   const fakeDb = new FakeD1Database(null, null, [], null, [
-    { ...baseSong, id: 'song-linked', work_id: 'work-shared', title: 'Linked Song' },
-    { ...baseSong, id: 'song-unlinked', work_id: null, title: 'Unlinked Song' },
-  ]);
+    {
+      ...baseSong,
+      id: 'song-linked',
+      work_id: 'work-shared',
+      work_tags: '["genre:rock"]',
+      title: 'Linked Song',
+    },
+    { ...baseSong, id: 'song-unlinked', work_id: null, work_tags: null, title: 'Unlinked Song' },
+  ], [{
+    id: 'perf-linked',
+    song_id: 'song-linked',
+    stream_id: 'stream-1',
+    date: '2026-01-01',
+    stream_title: 'Stream',
+    video_id: 'video',
+    timestamp: 10,
+    end_timestamp: null,
+    note: '',
+    tags: '["language:ja"]',
+  }]);
 
   const songs = await exportSongs(fakeDb as unknown as D1Database, 'alice');
 
   assertEqual(songs[0].workId, 'work-shared', 'linked fan-site song exports its global work ID');
+  assertEqual(
+    JSON.stringify(songs[0].tags),
+    JSON.stringify(['language:ja', 'genre:rock']),
+    'Admin fan-site export merges work and concrete performance tags',
+  );
+  assertEqual(
+    JSON.stringify(songs[0].inheritedTags),
+    JSON.stringify(['genre:rock']),
+    'Admin fan-site export identifies tags inherited by every performance',
+  );
   assert(!Object.prototype.hasOwnProperty.call(songs[1], 'workId'), 'unlinked fan-site song omits workId instead of exporting null');
 }
 
@@ -605,19 +742,19 @@ async function testMergeSongsMergesGlobalWorksAcrossVtubers(): Promise<void> {
   const fakeDb = new FakeD1Database(null, null, [
     mergeRow('song-canonical', 'approved', '["canonical-local"]', {
       workId: 'work-canonical',
-      workTags: '["canonical-work"]',
+      workTags: '["genre:rock","language:ja"]',
     }),
     mergeRow('song-source-1', 'approved', '["source-local"]', {
       workId: 'work-source',
-      workTags: '["source-work"]',
+      workTags: '["source:anime","style:parody"]',
     }),
     mergeRow('song-source-2', 'approved', '[]', {
       workId: 'work-source',
-      workTags: '["source-work"]',
+      workTags: '["source:anime","style:parody"]',
     }),
     mergeRow('song-source-3', 'approved', '["third-local"]', {
       workId: 'work-third',
-      workTags: '["third-work"]',
+      workTags: '["mood:healing","language:en"]',
     }),
   ]);
 
@@ -677,8 +814,8 @@ async function testMergeSongsMergesGlobalWorksAcrossVtubers(): Promise<void> {
   if (!workUpdate) throw new Error('canonical work tags should be updated');
   assertEqual(
     workUpdate.params.at(-2),
-    '["canonical-work","source-work","third-work","canonical-local","source-local","third-local"]',
-    'canonical work preserves global and local tags from every merged identity',
+    '["genre:rock","mood:healing","source:anime"]',
+    'canonical work preserves only work-scoped tags from every merged identity',
   );
   assert(
     fakeDb.batchStatements.some((statement) => /DELETE\s+FROM\s+works/i.test(statement.sql)),
@@ -960,13 +1097,51 @@ async function testSharedSongsSurviveStreamMutations(): Promise<void> {
   );
 }
 
+// Re-pasting a setlist with "replace" deletes and recreates the stream's performances.
+// Rendition tags are curator-owned and exist nowhere else, so a rendition that survives
+// the re-paste must carry its tags across the delete.
+async function testReplaceImportPreservesRenditionTags(): Promise<void> {
+  const fakeDb = new FakeD1Database(null, 'song-1');
+  fakeDb.existingPerformanceTagRows = [
+    { song_id: 'song-1', timestamp: 100, tags: '["language:ja","style:duet"]' },
+  ];
+
+  await bulkCreatePerformances(
+    fakeDb as unknown as D1Database,
+    'mizuki',
+    'stream-1',
+    '2026-01-01',
+    'Karaoke Stream',
+    'VIDEO123',
+    [{ songName: 'Song One', artist: 'Artist One', startSeconds: 100, endSeconds: 200 }],
+    'curator@example.com',
+    true,
+  );
+
+  const insert = fakeDb.batchStatements.find(
+    (statement) => /INSERT\s+INTO\s+performances/i.test(statement.sql),
+  );
+  assert(insert !== undefined, 'replace import must insert the pasted performances');
+  assert(
+    /\(\s*id,[^)]*\btags\b/i.test(insert!.sql),
+    'replace import must write the tags column instead of falling back to the default',
+  );
+  assert(
+    insert!.params.includes('["language:ja","style:duet"]'),
+    `surviving rendition must keep its curator tags, got ${JSON.stringify(insert!.params)}`,
+  );
+}
+
 async function main(): Promise<void> {
+  await testReplaceImportPreservesRenditionTags();
   await testVodImportPreservesExistingStream();
   await testVodImportCreatesNewStreamWhenAbsent();
   await testVodImportReusesExactSong();
   await testSongIdentityEditRelinksGlobalWorkAtomically();
+  await testWritesKeepTagsAtTheirDeclaredScope();
   await testHarmonizerArtistUpdatesRelinkEveryEditedSong();
   await testGlobalWorksListAggregatesAcrossStreamers();
+  await testBulkWorkTagsApplyStableDelta();
   await testFanSiteExportOmitsNullWorkIds();
   await testHarmonizerScanUsesAndExposesWorkIds();
   await testMergeSongsPreservesPerformances();
