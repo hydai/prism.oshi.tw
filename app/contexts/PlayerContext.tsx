@@ -1,6 +1,16 @@
 'use client';
 
-import { createContext, useContext, useState, useEffect, useId, useRef, useSyncExternalStore, ReactNode } from 'react';
+import {
+  createContext,
+  useContext,
+  useState,
+  useEffect,
+  useEffectEvent,
+  useId,
+  useRef,
+  useSyncExternalStore,
+  type ReactNode,
+} from 'react';
 import { createPlaybackTimeStore, type PlaybackTimeStore } from '../lib/playback-time-store';
 import { loadYouTubeIframeApi } from '../../lib/youtube-iframe';
 import type {
@@ -144,7 +154,6 @@ export const PlayerProvider = ({ children }: { children: ReactNode }) => {
 
   const playerRef = useRef<YouTubePlayer | null>(null);
   const playerDivId = 'youtube-player';
-  const timeUpdateIntervalRef = useRef<NodeJS.Timeout | null>(null);
   const loadedVideoIdRef = useRef<string | null>(null);
   // Refs to always have fresh values in async callbacks
   const queueRef = useRef<QueueEntry[]>([]);
@@ -348,49 +357,46 @@ export const PlayerProvider = ({ children }: { children: ReactNode }) => {
     return () => {
       if (idleId !== null) w.cancelIdleCallback?.(idleId);
       if (timerId !== null) clearTimeout(timerId);
-      if (timeUpdateIntervalRef.current) {
-        clearInterval(timeUpdateIntervalRef.current);
-      }
     };
   }, []);
 
-  const stopTimeUpdateInterval = () => {
-    if (timeUpdateIntervalRef.current) {
-      clearInterval(timeUpdateIntervalRef.current);
-      timeUpdateIntervalRef.current = null;
-    }
-  };
+  useEffect(() => () => {
+    playerRef.current?.destroy();
+    playerRef.current = null;
+  }, []);
 
-  // Start (or restart) the time-update polling interval.
-  // Uses refs so the callback always sees fresh track/queue state.
-  const startTimeUpdateInterval = () => {
-    stopTimeUpdateInterval();
-    timeUpdateIntervalRef.current = setInterval(() => {
-      if (playerRef.current && playerRef.current.getCurrentTime) {
-        const current = playerRef.current.getCurrentTime();
-        timeStore.setTime(current);
+  const updatePlaybackTime = useEffectEvent(() => {
+    if (playerRef.current && playerRef.current.getCurrentTime) {
+      const current = playerRef.current.getCurrentTime();
+      timeStore.setTime(current);
 
-        const track = currentTrackRef.current;
-        // Check if reached end timestamp
-        if (track?.endTimestamp && current >= track.endTimestamp) {
-          // Repeat-one: loop back to start of current track
-          if (repeatModeRef.current === 'one') {
-            playerRef.current.seekTo(track.timestamp, true);
-            return;
-          }
-          // Auto-play next song in queue if available, skipping deleted versions
-          const freshQueue = queueRef.current;
-          if (freshQueue.length > 0 || repeatModeRef.current === 'all') {
-            advanceSkippingDeleted(freshQueue, currentTrackRef.current);
-          } else {
-            playerRef.current.pauseVideo();
-            setIsPlaying(false);
-            stopTimeUpdateInterval();
-          }
+      const track = currentTrackRef.current;
+      // Check if reached end timestamp
+      if (track?.endTimestamp && current >= track.endTimestamp) {
+        // Repeat-one: loop back to start of current track
+        if (repeatModeRef.current === 'one') {
+          playerRef.current.seekTo(track.timestamp, true);
+          return;
+        }
+        // Auto-play next song in queue if available, skipping deleted versions
+        const freshQueue = queueRef.current;
+        if (freshQueue.length > 0 || repeatModeRef.current === 'all') {
+          advanceSkippingDeleted(freshQueue, currentTrackRef.current);
+        } else {
+          playerRef.current.pauseVideo();
+          setIsPlaying(false);
         }
       }
-    }, 500);
-  };
+    }
+  });
+
+  // React owns the polling timer's lifetime so pause and provider unmount
+  // always stop it, including when YouTube callbacks arrive asynchronously.
+  useEffect(() => {
+    if (!isPlaying) return;
+    const intervalId = window.setInterval(updatePlaybackTime, 500);
+    return () => window.clearInterval(intervalId);
+  }, [isPlaying]);
 
   // Initialize YouTube player when ready and track is available.
   // Reuses the existing player instance to preserve autoplay permission.
@@ -417,7 +423,6 @@ export const PlayerProvider = ({ children }: { children: ReactNode }) => {
         if (isMutedRef.current) { player.mute(); } else { player.unMute(); }
         player.playVideo();
         setIsPlaying(true);
-        startTimeUpdateInterval();
         return;
       } else {
         // Different VOD — load new video without destroying the iframe
@@ -429,7 +434,6 @@ export const PlayerProvider = ({ children }: { children: ReactNode }) => {
         player.setVolume(volumeRef.current);
         if (isMutedRef.current) { player.mute(); } else { player.unMute(); }
         setIsPlaying(true);
-        startTimeUpdateInterval();
         return;
       }
     }
@@ -476,21 +480,16 @@ export const PlayerProvider = ({ children }: { children: ReactNode }) => {
 
           event.target.playVideo();
           setIsPlaying(true);
-          startTimeUpdateInterval();
         },
         onStateChange: (event: YouTubePlayerEventWithData<number>) => {
           // YT.PlayerState: PLAYING=1, PAUSED=2, ENDED=0
           if (event.data === 1) {
             setIsPlaying(true);
-            // Resume polling (covers pause/resume via the YouTube UI too)
-            startTimeUpdateInterval();
             // Update duration (needed after loadVideoById since onReady doesn't re-fire)
             const d = event.target.getDuration();
             if (d > 0) timeStore.setDuration(d);
           } else if (event.data === 2) {
             setIsPlaying(false);
-            // No polling while paused — the clock is frozen anyway
-            stopTimeUpdateInterval();
           } else if (event.data === 0) {
             // Video ended — repeat-one: seek back and replay
             if (repeatModeRef.current === 'one' && currentTrackRef.current) {
@@ -522,9 +521,9 @@ export const PlayerProvider = ({ children }: { children: ReactNode }) => {
         },
       },
     });
-  // startTimeUpdateInterval reads latest playback state from refs.
+  // YouTube event callbacks read mutable playback state through refs.
   // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [isPlayerReady, currentTrack]);
+  }, [isPlayerReady, currentTrack, timeStore]);
 
   const toggleRepeat = () => {
     setRepeatMode(prev => prev === 'off' ? 'all' : prev === 'all' ? 'one' : 'off');
@@ -571,11 +570,9 @@ export const PlayerProvider = ({ children }: { children: ReactNode }) => {
     if (isPlaying) {
       playerRef.current.pauseVideo();
       setIsPlaying(false);
-      stopTimeUpdateInterval();
     } else {
       playerRef.current.playVideo();
       setIsPlaying(true);
-      startTimeUpdateInterval();
     }
   };
 
