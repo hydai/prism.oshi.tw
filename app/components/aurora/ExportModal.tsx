@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useEffect, useId, useRef, useState } from 'react';
 import { X, Copy, Check, Download } from 'lucide-react';
 import { formatSongList } from '@/lib/parse';
 import type { AuroraSong } from './SongListEditor';
@@ -14,6 +14,28 @@ interface Props {
 
 export default function ExportModal({ open, onClose, songs, vodUrl }: Props) {
   const [copied, setCopied] = useState(false);
+  const dialogRef = useRef<HTMLDialogElement>(null);
+  const closeButtonRef = useRef<HTMLButtonElement>(null);
+  const titleId = useId();
+  const textareaId = useId();
+
+  useEffect(() => {
+    if (!open) return;
+
+    const dialog = dialogRef.current;
+    if (!dialog) return;
+
+    const previouslyFocused = document.activeElement instanceof HTMLElement
+      ? document.activeElement
+      : null;
+    dialog.showModal();
+    closeButtonRef.current?.focus();
+
+    return () => {
+      if (dialog.open) dialog.close();
+      previouslyFocused?.focus();
+    };
+  }, [open]);
 
   if (!open) return null;
 
@@ -35,7 +57,16 @@ export default function ExportModal({ open, onClose, songs, vodUrl }: Props) {
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/30 backdrop-blur-sm" onClick={onClose}>
+    <dialog
+      ref={dialogRef}
+      className="fixed inset-0 z-50 m-0 h-dvh max-h-none w-screen max-w-none border-0 bg-transparent p-0"
+      aria-labelledby={titleId}
+      onCancel={(event) => {
+        event.preventDefault();
+        onClose();
+      }}
+    >
+      <div className="flex h-full items-center justify-center bg-black/30 backdrop-blur-sm" onClick={onClose}>
       <div
         className="w-full max-w-2xl mx-4 rounded-2xl shadow-xl border border-[var(--border-default)]"
         style={{ background: 'var(--bg-surface)' }}
@@ -45,16 +76,26 @@ export default function ExportModal({ open, onClose, songs, vodUrl }: Props) {
         <div className="flex items-center justify-between px-5 py-4 border-b border-[var(--border-default)]">
           <div className="flex items-center gap-2">
             <Download size={18} className="text-[var(--accent-purple)]" />
-            <h2 className="text-[15px] font-semibold text-[var(--text-primary)]">匯出時間戳</h2>
+            <h2 id={titleId} className="text-[15px] font-semibold text-[var(--text-primary)]">匯出時間戳</h2>
           </div>
-          <button onClick={onClose} className="p-1 rounded-lg hover:bg-black/5">
+          <button
+            ref={closeButtonRef}
+            type="button"
+            onClick={onClose}
+            className="p-1 rounded-lg hover:bg-black/5"
+            aria-label="關閉匯出時間戳對話框"
+          >
             <X size={18} />
           </button>
         </div>
 
         {/* Body */}
         <div className="px-5 py-4">
+          <label htmlFor={textareaId} className="block text-[12px] font-medium text-[var(--text-secondary)] mb-1.5">
+            匯出內容
+          </label>
           <textarea
+            id={textareaId}
             readOnly
             className="w-full h-64 rounded-lg border border-[var(--border-default)] bg-white/60 px-3 py-2 text-base font-mono outline-none resize-none"
             value={output}
@@ -83,6 +124,7 @@ export default function ExportModal({ open, onClose, songs, vodUrl }: Props) {
           </button>
         </div>
       </div>
-    </div>
+      </div>
+    </dialog>
   );
 }

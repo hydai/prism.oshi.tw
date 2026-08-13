@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useEffect, useId, useRef, useState } from 'react';
 import { X, FileText, Plus, Replace } from 'lucide-react';
 import { parseTextToSongs, parsedSongKey, type ParsedSong } from '../lib/parse';
 
@@ -18,6 +18,28 @@ interface Props {
 export default function PasteImportModal({ open, onClose, onImport }: Props) {
   const [text, setText] = useState('');
   const [mode, setMode] = useState<'replace' | 'append'>('replace');
+  const dialogRef = useRef<HTMLDialogElement>(null);
+  const closeButtonRef = useRef<HTMLButtonElement>(null);
+  const titleId = useId();
+  const textareaId = useId();
+
+  useEffect(() => {
+    if (!open) return;
+
+    const dialog = dialogRef.current;
+    if (!dialog) return;
+
+    const previouslyFocused = document.activeElement instanceof HTMLElement
+      ? document.activeElement
+      : null;
+    dialog.showModal();
+    closeButtonRef.current?.focus();
+
+    return () => {
+      if (dialog.open) dialog.close();
+      previouslyFocused?.focus();
+    };
+  }, [open]);
 
   if (!open) return null;
 
@@ -31,7 +53,16 @@ export default function PasteImportModal({ open, onClose, onImport }: Props) {
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/30 backdrop-blur-sm" onClick={onClose}>
+    <dialog
+      ref={dialogRef}
+      className="fixed inset-0 z-50 m-0 h-dvh max-h-none w-screen max-w-none border-0 bg-transparent p-0"
+      aria-labelledby={titleId}
+      onCancel={(event) => {
+        event.preventDefault();
+        onClose();
+      }}
+    >
+      <div className="flex h-full items-center justify-center bg-black/30 backdrop-blur-sm" onClick={onClose}>
       <div
         className="w-full max-w-2xl mx-4 rounded-2xl shadow-xl border border-[var(--border-default)]"
         style={{ background: 'var(--bg-surface)' }}
@@ -41,9 +72,15 @@ export default function PasteImportModal({ open, onClose, onImport }: Props) {
         <div className="flex items-center justify-between px-5 py-4 border-b border-[var(--border-default)]">
           <div className="flex items-center gap-2">
             <FileText size={18} className="text-[var(--accent-purple)]" />
-            <h2 className="text-[15px] font-semibold text-[var(--text-primary)]">匯入時間戳</h2>
+            <h2 id={titleId} className="text-[15px] font-semibold text-[var(--text-primary)]">匯入時間戳</h2>
           </div>
-          <button onClick={onClose} className="p-1 rounded-lg hover:bg-black/5 dark:hover:bg-white/[0.06]">
+          <button
+            ref={closeButtonRef}
+            type="button"
+            onClick={onClose}
+            className="p-1 rounded-lg hover:bg-black/5 dark:hover:bg-white/[0.06]"
+            aria-label="關閉匯入時間戳對話框"
+          >
             <X size={18} />
           </button>
         </div>
@@ -77,14 +114,19 @@ export default function PasteImportModal({ open, onClose, onImport }: Props) {
           </div>
 
           {/* Textarea */}
-          <textarea
-            className="w-full h-40 rounded-lg border border-[var(--border-default)] bg-white/60 dark:bg-white/[0.06] px-3 py-2 text-base font-mono outline-none focus:border-[var(--accent-purple)] resize-none"
-            placeholder={'貼上時間戳文字...\n例如:\n0:00 歌名 / 原唱\n5:30 另一首歌 - 歌手'}
-            value={text}
-            onChange={(e) => setText(e.target.value)}
-            data-testid="paste-import-textarea"
-            autoFocus
-          />
+          <div className="flex flex-col gap-1.5">
+            <label htmlFor={textareaId} className="text-[12px] font-medium text-[var(--text-secondary)]">
+              時間戳文字
+            </label>
+            <textarea
+              id={textareaId}
+              className="w-full h-40 rounded-lg border border-[var(--border-default)] bg-white/60 dark:bg-white/[0.06] px-3 py-2 text-base font-mono outline-none focus:border-[var(--accent-purple)] resize-none"
+              placeholder={'貼上時間戳文字...\n例如:\n0:00 歌名 / 原唱\n5:30 另一首歌 - 歌手'}
+              value={text}
+              onChange={(e) => setText(e.target.value)}
+              data-testid="paste-import-textarea"
+            />
+          </div>
 
           {/* Preview */}
           {parsed.length > 0 && (
@@ -138,6 +180,7 @@ export default function PasteImportModal({ open, onClose, onImport }: Props) {
           </button>
         </div>
       </div>
-    </div>
+      </div>
+    </dialog>
   );
 }
