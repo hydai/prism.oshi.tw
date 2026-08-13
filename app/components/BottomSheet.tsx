@@ -75,9 +75,11 @@ export default function BottomSheet({
   return createPortal(
     <>
       {/* Backdrop */}
-      <div
+      <button
+        type="button"
         className="fixed inset-0 bg-black/50 backdrop-blur-sm z-40"
         onClick={onClose}
+        aria-label={`關閉${title}`}
         data-testid={testId ? `${testId}-backdrop` : undefined}
       />
 

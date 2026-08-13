@@ -125,6 +125,9 @@ async function main(): Promise<void> {
   assert(valid.includes('src="https://yt3.ggpht.com/avatar=s240"'), 'valid YouTube avatar URL renders as an img src');
   assert(valid.includes('href="https://x.com/safe"'), 'valid X URL renders as an href');
   assert(valid.includes('href="https://www.twitch.tv/safe"'), 'valid YouTube redirect to Twitch is unwrapped and linked');
+  assert(valid.includes('tabindex="0"'), 'submission row is keyboard focusable');
+  assert(valid.includes('aria-expanded="true"'), 'submission row exposes its expanded state');
+  assert(valid.includes('aria-controls="nova-submission-details-sub-test"'), 'submission row identifies its details');
 
   console.log('✓ Nova submission links render safely');
 }

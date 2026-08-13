@@ -323,11 +323,16 @@ export default function AuroraPage() {
 
       {/* Shortcuts help overlay */}
       {showShortcuts && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/30 backdrop-blur-sm" onClick={() => setShowShortcuts(false)}>
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/30 backdrop-blur-sm">
+          <button
+            type="button"
+            className="absolute inset-0"
+            onClick={() => setShowShortcuts(false)}
+            aria-label="關閉鍵盤快捷鍵"
+          />
           <div
-            className="w-full max-w-sm mx-4 rounded-2xl shadow-xl border border-[var(--border-default)] p-5"
+            className="relative mx-4 w-full max-w-sm rounded-2xl border border-[var(--border-default)] p-5 shadow-xl"
             style={{ background: 'var(--bg-surface)' }}
-            onClick={(e) => e.stopPropagation()}
           >
             <h3 className="text-[15px] font-semibold mb-3 text-[var(--text-primary)]">鍵盤快捷鍵</h3>
             <p className="text-[11px] text-[var(--text-tertiary)] mb-3">在沒有輸入框聚焦時生效</p>

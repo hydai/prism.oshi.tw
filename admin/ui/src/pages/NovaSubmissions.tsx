@@ -400,7 +400,20 @@ export function SubmissionRow({
 
   return (
     <>
-      <tr className="cursor-pointer hover:bg-slate-50" onClick={onToggle}>
+      <tr
+        className="cursor-pointer hover:bg-slate-50 focus-visible:outline-2 focus-visible:outline-offset-[-2px] focus-visible:outline-blue-500"
+        onClick={onToggle}
+        onKeyDown={(event) => {
+          if (event.target !== event.currentTarget) return;
+          if (event.key !== 'Enter' && event.key !== ' ') return;
+          event.preventDefault();
+          onToggle();
+        }}
+        tabIndex={0}
+        aria-expanded={expanded}
+        aria-controls={`nova-submission-details-${sub.id}`}
+        aria-label={`${expanded ? '收合' : '展開'} ${sub.display_name}`}
+      >
         <td className="px-4 py-3 font-medium text-slate-800">
           <span className="mr-1 text-xs text-slate-400">{expanded ? '▼' : '▶'}</span>
           {sub.display_name}
@@ -467,7 +480,7 @@ export function SubmissionRow({
         )}
       </tr>
       {expanded && (
-        <tr className="bg-slate-50">
+        <tr id={`nova-submission-details-${sub.id}`} className="bg-slate-50">
           <td colSpan={isCurator ? 7 : 6} className="px-6 py-4">
             {/* Edit / View toggle button */}
             {isCurator && (

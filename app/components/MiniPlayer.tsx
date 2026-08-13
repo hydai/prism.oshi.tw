@@ -53,13 +53,12 @@ export default function MiniPlayer() {
   // Keyboard navigation: Space for play/pause when player is active
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
-      // Only handle Space if no input/textarea/button is focused
+      // Let focused controls handle Space themselves.
       const activeElement = document.activeElement;
-      const isInputFocused = activeElement instanceof HTMLInputElement ||
-        activeElement instanceof HTMLTextAreaElement ||
-        activeElement instanceof HTMLSelectElement;
+      const isControlFocused = activeElement instanceof HTMLElement
+        && activeElement.matches('input, textarea, select, button, a[href], [role="slider"], [contenteditable="true"]');
 
-      if (e.code === 'Space' && !isInputFocused && currentTrack) {
+      if (e.code === 'Space' && !isControlFocused && currentTrack) {
         e.preventDefault();
         togglePlayPause();
       }
@@ -108,34 +107,38 @@ export default function MiniPlayer() {
         {/* Content row: cover + song info + queue + play/pause */}
         <div
           className="flex items-center"
-          style={{ padding: '10px 16px', gap: '12px', cursor: 'pointer' }}
-          onClick={(e) => {
-            if ((e.target as HTMLElement).closest('button')) return;
-            setShowModal(true);
-          }}
+          style={{ padding: '10px 16px', gap: '12px' }}
         >
-          {/* Cover thumbnail — 40×40 */}
-          <AlbumArt
-            src={currentTrack.albumArtUrl}
-            alt={`${currentTrack.title} - ${currentTrack.originalArtist}`}
-            size={40}
-          />
+          <button
+            type="button"
+            className="flex min-w-0 flex-1 items-center text-left"
+            style={{ gap: '12px' }}
+            onClick={() => setShowModal(true)}
+            aria-label={`開啟正在播放：${currentTrack.title}`}
+          >
+            {/* Cover thumbnail — 40×40 */}
+            <AlbumArt
+              src={currentTrack.albumArtUrl}
+              alt={`${currentTrack.title} - ${currentTrack.originalArtist}`}
+              size={40}
+            />
 
-          {/* Song info — vertical, gap 2, fill remaining space */}
-          <div className="flex flex-col min-w-0 flex-1" style={{ gap: '2px' }}>
-            <div
-              className="truncate"
-              style={{ fontSize: '13px', fontWeight: 600, color: 'var(--text-primary)' }}
-            >
-              {currentTrack.title}
+            {/* Song info — vertical, gap 2, fill remaining space */}
+            <div className="flex min-w-0 flex-1 flex-col" style={{ gap: '2px' }}>
+              <div
+                className="truncate"
+                style={{ fontSize: '13px', fontWeight: 600, color: 'var(--text-primary)' }}
+              >
+                {currentTrack.title}
+              </div>
+              <div
+                className="truncate"
+                style={{ fontSize: '11px', color: 'var(--text-secondary)' }}
+              >
+                {currentTrack.originalArtist}
+              </div>
             </div>
-            <div
-              className="truncate"
-              style={{ fontSize: '11px', color: 'var(--text-secondary)' }}
-            >
-              {currentTrack.originalArtist}
-            </div>
-          </div>
+          </button>
 
           {/* Like button — mobile */}
           <button
@@ -214,17 +217,14 @@ export default function MiniPlayer() {
         {/* 3-column layout */}
         <div
           className="flex items-center h-full px-4 gap-4"
-          onClick={(e) => {
-            // Don't expand if clicking on buttons or interactive elements
-            if ((e.target as HTMLElement).closest('button, input')) return;
-            setShowModal(true);
-          }}
-          style={{ cursor: 'pointer' }}
         >
           {/* LEFT COLUMN: 280px — album art, track info */}
-          <div
-            className="flex items-center gap-3 flex-shrink-0"
+          <button
+            type="button"
+            className="flex flex-shrink-0 items-center gap-3 text-left"
             style={{ width: '280px' }}
+            onClick={() => setShowModal(true)}
+            aria-label={`開啟正在播放：${currentTrack.title}`}
           >
             {/* Album cover thumbnail — 48×48 desktop */}
             <AlbumArt
@@ -259,13 +259,12 @@ export default function MiniPlayer() {
                 </div>
               )}
             </div>
-          </div>
+          </button>
 
           {/* CENTER COLUMN: fill — transport controls + progress bar */}
           <div
             className="flex-1 flex flex-col items-center justify-center gap-1"
             style={{ minWidth: 0 }}
-            onClick={(e) => e.stopPropagation()}
           >
             {/* Transport controls row */}
             <div className="flex items-center gap-4">
@@ -368,7 +367,6 @@ export default function MiniPlayer() {
           <div
             className="flex items-center gap-3 flex-shrink-0 justify-end"
             style={{ width: '200px' }}
-            onClick={(e) => e.stopPropagation()}
           >
             {/* Expand to full Now Playing page */}
             <Link

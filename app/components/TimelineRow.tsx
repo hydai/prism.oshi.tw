@@ -112,12 +112,13 @@ function TimelineRowInner({ song, index, isCurrentlyPlaying, isUnavailable, isLi
       </div>
 
       {/* Title column */}
-      <div
-        className="min-w-0 lg:pl-3 cursor-pointer"
+      <button
+        type="button"
+        className="min-w-0 cursor-pointer text-left lg:pl-3 disabled:cursor-not-allowed"
+        disabled={isUnavailable}
+        data-testid="song-title-button"
         onClick={() => {
-          if (!isUnavailable) {
-            onPlay(track);
-          }
+          onPlay(track);
         }}
       >
         <div className="flex flex-col gap-0.5">
@@ -157,7 +158,7 @@ function TimelineRowInner({ song, index, isCurrentlyPlaying, isUnavailable, isLi
             {song.originalArtist}
           </div>
         </div>
-      </div>
+      </button>
 
       {/* Stream title column (desktop only) */}
       <div

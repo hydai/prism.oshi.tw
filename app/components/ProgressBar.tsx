@@ -42,10 +42,47 @@ export default function ProgressBar({
     onSeek(getPercentage(e.touches[0].clientX));
   };
 
+  const handleKeyDown = (e: React.KeyboardEvent<HTMLDivElement>) => {
+    const current = clamped / 100;
+    const next = (() => {
+      switch (e.key) {
+        case 'ArrowRight':
+        case 'ArrowUp':
+          return current + 0.05;
+        case 'ArrowLeft':
+        case 'ArrowDown':
+          return current - 0.05;
+        case 'PageUp':
+          return current + 0.1;
+        case 'PageDown':
+          return current - 0.1;
+        case 'Home':
+          return 0;
+        case 'End':
+          return 1;
+        default:
+          return null;
+      }
+    })();
+
+    if (next === null) return;
+    e.preventDefault();
+    onSeek(Math.min(1, Math.max(0, next)));
+  };
+
   if (variant === 'mini') {
     return (
       <div
+        role="slider"
+        tabIndex={0}
+        aria-label="播放進度"
+        aria-valuemin={0}
+        aria-valuemax={100}
+        aria-valuenow={Math.round(clamped)}
+        aria-valuetext={`${Math.round(clamped)}%`}
+        onKeyDown={handleKeyDown}
         ref={barRef}
+        className="focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--accent-pink-light)]"
         style={{
           height: `${height}px`,
           background: 'var(--bg-surface-muted)',
@@ -72,8 +109,16 @@ export default function ProgressBar({
 
   const bar = (
     <div
+      role="slider"
+      tabIndex={0}
+      aria-label="播放進度"
+      aria-valuemin={0}
+      aria-valuemax={100}
+      aria-valuenow={Math.round(clamped)}
+      aria-valuetext={`${Math.round(clamped)}%`}
+      onKeyDown={handleKeyDown}
       ref={barRef}
-      className="flex-1 cursor-pointer relative group"
+      className="group relative flex-1 cursor-pointer focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--accent-pink-light)]"
       style={{
         height: `${height}px`,
         borderRadius: `${height / 2}px`,
