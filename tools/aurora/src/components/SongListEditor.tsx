@@ -25,6 +25,7 @@ function parseHMS(value: string): number | null {
 
 interface InlineCellProps {
   value: string;
+  ariaLabel: string;
   onCommit: (value: string) => void;
   className?: string;
   onClick?: () => void;
@@ -32,7 +33,7 @@ interface InlineCellProps {
   placeholder?: string;
 }
 
-function InlineCell({ value, onCommit, className = '', onClick, onFocus, placeholder }: InlineCellProps) {
+function InlineCell({ value, ariaLabel, onCommit, className = '', onClick, onFocus, placeholder }: InlineCellProps) {
   const [editing, setEditing] = useState(false);
   const [draft, setDraft] = useState('');
   const inputRef = useRef<HTMLInputElement>(null);
@@ -48,6 +49,7 @@ function InlineCell({ value, onCommit, className = '', onClick, onFocus, placeho
     return (
       <input
         ref={inputRef}
+        aria-label={ariaLabel}
         className={`bg-white/80 dark:bg-white/[0.10] border border-[var(--border-default)] rounded px-1 py-0.5 text-base w-full outline-none focus:border-[var(--accent-purple)] ${className}`}
         value={draft}
         onFocus={onFocus}
@@ -128,6 +130,7 @@ export default function SongListEditor({ songs, selectedIndex, onSelect, onUpdat
             <div className="flex items-center gap-2">
               <InlineCell
                 value={song.name}
+                ariaLabel={`第 ${i + 1} 首歌曲名稱`}
                 onCommit={(v) => onUpdate(i, { name: v })}
                 onFocus={() => onSelect(i)}
                 className="font-medium text-[var(--text-primary)] flex-1"
@@ -137,6 +140,7 @@ export default function SongListEditor({ songs, selectedIndex, onSelect, onUpdat
             <div className="flex items-center gap-2 text-[12px]">
               <InlineCell
                 value={song.artist}
+                ariaLabel={`第 ${i + 1} 首原唱`}
                 onCommit={(v) => onUpdate(i, { artist: v })}
                 onFocus={() => onSelect(i)}
                 className="text-[var(--text-secondary)] flex-1"
@@ -149,6 +153,7 @@ export default function SongListEditor({ songs, selectedIndex, onSelect, onUpdat
           <div className="flex items-center gap-1 shrink-0 font-mono text-[12px]">
             <InlineCell
               value={toHMS(song.startSeconds)}
+              ariaLabel={`第 ${i + 1} 首開始時間`}
               onClick={() => onSeekTo(song.startSeconds)}
               onFocus={() => onSelect(i)}
               onCommit={(v) => {
@@ -160,6 +165,7 @@ export default function SongListEditor({ songs, selectedIndex, onSelect, onUpdat
             <span className="text-[var(--text-tertiary)]">~</span>
             <InlineCell
               value={song.endSeconds !== null ? toHMS(song.endSeconds) : '--:--:--'}
+              ariaLabel={`第 ${i + 1} 首結束時間`}
               onClick={() => { if (song.endSeconds !== null) onSeekTo(song.endSeconds); }}
               onFocus={() => onSelect(i)}
               onCommit={(v) => {
