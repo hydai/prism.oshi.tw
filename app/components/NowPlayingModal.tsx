@@ -227,7 +227,7 @@ export default function NowPlayingModal() {
               <div className="flex flex-col">
                 {queue.slice(0, 5).map((track, index) => (
                   <div
-                    key={track.id}
+                    key={track.queueEntryId}
                     className="flex items-center gap-3 py-2"
                     style={{ borderBottom: index < Math.min(queue.length, 5) - 1 ? '1px solid var(--border-default)' : undefined }}
                   >

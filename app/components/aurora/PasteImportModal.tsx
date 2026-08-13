@@ -2,7 +2,7 @@
 
 import { useState } from 'react';
 import { X, FileText, Plus, Replace } from 'lucide-react';
-import { parseTextToSongs, type ParsedSong } from '@/lib/parse';
+import { parseTextToSongs, parsedSongKey, type ParsedSong } from '@/lib/parse';
 
 function toHMS(seconds: number): string {
   const h = Math.floor(seconds / 3600);
@@ -107,7 +107,7 @@ export default function PasteImportModal({ open, onClose, onImport }: Props) {
                   </thead>
                   <tbody>
                     {parsed.map((s, i) => (
-                      <tr key={i} className="border-b border-[var(--border-default)] last:border-0" data-testid="import-preview-row">
+                      <tr key={parsedSongKey(s)} className="border-b border-[var(--border-default)] last:border-0" data-testid="import-preview-row">
                         <td className="px-3 py-1 font-mono text-[var(--text-tertiary)]">{String(i + 1).padStart(2, '0')}</td>
                         <td className="px-3 py-1 text-[var(--text-primary)]">{s.songName}</td>
                         <td className="px-3 py-1 text-[var(--text-secondary)]">{s.artist || '—'}</td>

@@ -5,7 +5,7 @@ import { api } from '../api/client';
 import StatusBadge from '../components/StatusBadge';
 import { YouTubePlayer } from '../components/YouTubePlayer';
 import type { YouTubePlayerHandle } from '../components/YouTubePlayer';
-import { parseTextToSongs, formatSongList } from '../../../shared/parse';
+import { parseTextToSongs, formatSongList, parsedSongKey } from '../../../shared/parse';
 import { fetchItunesDuration, summarizeDurationOutcome } from '../lib/itunes';
 import type { OutcomeTone } from '../lib/itunes';
 import { FetchLogPanel } from '../components/FetchLogPanel';
@@ -211,7 +211,7 @@ function PasteImportModal({ streamId, hasExisting, onDone, onCancel }: {
                   </thead>
                   <tbody className="divide-y divide-slate-100">
                     {preview.map((song, i) => (
-                      <tr key={i} className="hover:bg-slate-50">
+                      <tr key={parsedSongKey(song)} className="hover:bg-slate-50">
                         <td className="px-3 py-1.5 text-slate-400">{i + 1}</td>
                         <td className="px-3 py-1.5 font-mono text-xs">{song.startTimestamp}</td>
                         <td className="px-3 py-1.5 font-mono text-xs text-slate-400">{song.endTimestamp ?? '—'}</td>

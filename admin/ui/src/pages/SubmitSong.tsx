@@ -1,9 +1,10 @@
-import { useState } from 'react';
+import { useId, useRef, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import type { CreateSongBody, CreatePerformanceBody } from '../../../shared/types';
 import { api } from '../api/client';
 
 interface PerformanceForm {
+  clientId: string;
   streamId: string;
   date: string;
   streamTitle: string;
@@ -13,7 +14,7 @@ interface PerformanceForm {
   note: string;
 }
 
-const emptyPerformance: PerformanceForm = {
+const emptyPerformance: Omit<PerformanceForm, 'clientId'> = {
   streamId: '',
   date: '',
   streamTitle: '',
@@ -31,8 +32,13 @@ export default function SubmitSong() {
   const [performances, setPerformances] = useState<PerformanceForm[]>([]);
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const performanceIdPrefix = useId();
+  const nextPerformanceId = useRef(0);
 
-  const addPerformance = () => setPerformances((p) => [...p, { ...emptyPerformance }]);
+  const addPerformance = () => {
+    const clientId = `${performanceIdPrefix}-${nextPerformanceId.current++}`;
+    setPerformances((previous) => [...previous, { ...emptyPerformance, clientId }]);
+  };
 
   const updatePerformance = (idx: number, field: keyof PerformanceForm, value: string) => {
     setPerformances((prev) => prev.map((p, i) => (i === idx ? { ...p, [field]: value } : p)));
@@ -143,7 +149,7 @@ export default function SubmitSong() {
           </div>
 
           {performances.map((perf, idx) => (
-            <div key={idx} className="mt-3 rounded-md border border-slate-200 bg-slate-50 p-3 space-y-2">
+            <div key={perf.clientId} className="mt-3 rounded-md border border-slate-200 bg-slate-50 p-3 space-y-2">
               <div className="flex justify-between">
                 <span className="text-xs font-medium text-slate-500">Performance #{idx + 1}</span>
                 <button

@@ -45,6 +45,34 @@ function FilterPill({
   );
 }
 
+function SortHeader({
+  label,
+  field,
+  activeField,
+  direction,
+  onSort,
+}: {
+  label: string;
+  field: SortKey;
+  activeField: SortKey;
+  direction: SortDir;
+  onSort: (field: SortKey) => void;
+}) {
+  const active = activeField === field;
+
+  return (
+    <th scope="col" aria-sort={active ? (direction === 'asc' ? 'ascending' : 'descending') : 'none'}>
+      <button
+        type="button"
+        className="w-full cursor-pointer select-none px-4 py-3 text-left hover:text-slate-700"
+        onClick={() => onSort(field)}
+      >
+        {label} {active ? (direction === 'asc' ? '↑' : '↓') : ''}
+      </button>
+    </th>
+  );
+}
+
 export default function StreamsList({ user }: { user: AuthUser }) {
   const [initialParams] = useSearchParams();
   const requestedStreamer = initialParams.get('streamer');
@@ -157,15 +185,6 @@ export default function StreamsList({ user }: { user: AuthUser }) {
 
   const isCurator = user.role === 'curator';
 
-  const SortHeader = ({ label, field }: { label: string; field: SortKey }) => (
-    <th
-      className="cursor-pointer select-none px-4 py-3 hover:text-slate-700"
-      onClick={() => toggleSort(field)}
-    >
-      {label} {sortKey === field ? (sortDir === 'asc' ? '↑' : '↓') : ''}
-    </th>
-  );
-
   return (
     <div>
       <div className="flex items-center justify-between">
@@ -254,12 +273,12 @@ export default function StreamsList({ user }: { user: AuthUser }) {
           <table className="w-full text-left text-sm">
             <thead className="border-b border-slate-200 bg-slate-50 text-xs uppercase text-slate-500">
               <tr>
-                <SortHeader label="Title" field="title" />
-                <SortHeader label="Date" field="date" />
+                <SortHeader label="Title" field="title" activeField={sortKey} direction={sortDir} onSort={toggleSort} />
+                <SortHeader label="Date" field="date" activeField={sortKey} direction={sortDir} onSort={toggleSort} />
                 <th className="px-4 py-3">Video ID</th>
-                <SortHeader label="Status" field="status" />
+                <SortHeader label="Status" field="status" activeField={sortKey} direction={sortDir} onSort={toggleSort} />
                 <th className="px-4 py-3">Submitted By</th>
-                <SortHeader label="Created" field="createdAt" />
+                <SortHeader label="Created" field="createdAt" activeField={sortKey} direction={sortDir} onSort={toggleSort} />
                 {isCurator && <th className="px-4 py-3">Actions</th>}
               </tr>
             </thead>

@@ -227,6 +227,7 @@ export interface PasteImportBody {
 }
 
 export interface PasteImportParsedSong {
+  orderIndex: number;
   songName: string;
   artist: string;
   startSeconds: number;

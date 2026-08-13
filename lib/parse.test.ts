@@ -1,6 +1,7 @@
 import assert from "node:assert/strict";
 import {
   formatSongList,
+  parsedSongKey,
   parseTextToSongs,
   parseTimestamp,
   secondsToTimestamp,
@@ -41,6 +42,9 @@ assert.deepEqual(parsed[2], {
   startTimestamp: "1:02:03",
   endTimestamp: null,
 });
+
+assert.notEqual(parsedSongKey(parsed[0]!), parsedSongKey({ ...parsed[0]!, orderIndex: 1 }));
+assert.equal(parsedSongKey(parsed[0]!), parsedSongKey({ ...parsed[0]! }));
 
 assert.equal(parseTimestamp("1:02:03"), 3723);
 assert.equal(parseTimestamp("bad input"), null);

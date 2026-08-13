@@ -429,8 +429,8 @@ export function FindingsPanel({ findings }: { findings: VodExportFinding[] }) {
             <div>
               <h4 className="text-sm font-semibold text-red-700">Errors</h4>
               <ul className="mt-2 space-y-2">
-                {visibleErrors.map((finding, index) => (
-                  <FindingCard key={`error-${finding.code}-${index}`} finding={finding} />
+                {visibleErrors.map((finding) => (
+                  <FindingCard key={findingKey(finding)} finding={finding} />
                 ))}
               </ul>
             </div>
@@ -439,8 +439,8 @@ export function FindingsPanel({ findings }: { findings: VodExportFinding[] }) {
             <div>
               <h4 className="text-sm font-semibold text-amber-800">Warnings</h4>
               <ul className="mt-2 space-y-2">
-                {visibleWarnings.map((finding, index) => (
-                  <FindingCard key={`warning-${finding.code}-${index}`} finding={finding} />
+                {visibleWarnings.map((finding) => (
+                  <FindingCard key={findingKey(finding)} finding={finding} />
                 ))}
               </ul>
             </div>
@@ -972,8 +972,8 @@ export default function VodExport({ user }: { user: AuthUser }) {
           {status.controlWarning}
         </div>
       )}
-      {postCommitWarnings.map((warning, index) => (
-        <div key={index} className="mt-4 rounded-md border border-amber-200 bg-amber-50 px-4 py-3 text-sm text-amber-800" role="alert">
+      {postCommitWarnings.map((warning) => (
+        <div key={warning} className="mt-4 rounded-md border border-amber-200 bg-amber-50 px-4 py-3 text-sm text-amber-800" role="alert">
           Publication committed, but follow-up recovery is required: {warning}
           {status.recoveryAvailable && (
             <button
@@ -1083,4 +1083,15 @@ export default function VodExport({ user }: { user: AuthUser }) {
       )}
     </div>
   );
+}
+
+function findingKey(finding: VodExportFinding): string {
+  return [
+    finding.code,
+    finding.streamerSlug ?? '',
+    finding.entityType ?? '',
+    finding.entityId ?? '',
+    finding.field ?? '',
+    JSON.stringify(finding.details ?? {}),
+  ].join('\u0000');
 }

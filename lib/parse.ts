@@ -12,6 +12,17 @@ export interface ParsedSong {
   endTimestamp: string | null;
 }
 
+/**
+ * Build a content-based identity for read-only parsed-song previews.
+ * Parsed rows do not have persisted IDs yet, so their timestamp and content
+ * together are the closest stable identity while the source text is edited.
+ */
+export function parsedSongKey(
+  song: Pick<ParsedSong, 'orderIndex' | 'startSeconds' | 'endSeconds' | 'songName' | 'artist'>,
+): string {
+  return [song.orderIndex, song.startSeconds, song.endSeconds ?? '', song.songName, song.artist].join('\u0000');
+}
+
 // --- Regex patterns (mirroring Python originals) ---
 
 const TIMESTAMP_RE = /^(?:(\d{1,2}):)?(\d{1,2}):(\d{2})$/;

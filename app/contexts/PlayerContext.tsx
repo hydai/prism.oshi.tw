@@ -1,6 +1,6 @@
 'use client';
 
-import { createContext, useContext, useState, useEffect, useRef, useSyncExternalStore, ReactNode } from 'react';
+import { createContext, useContext, useState, useEffect, useId, useRef, useSyncExternalStore, ReactNode } from 'react';
 import { createPlaybackTimeStore, type PlaybackTimeStore } from '../lib/playback-time-store';
 import { loadYouTubeIframeApi } from '../../lib/youtube-iframe';
 import type {
@@ -21,6 +21,10 @@ export interface Track {
   deleted?: boolean;
   albumArtUrl?: string;
   streamerSlug: string;
+}
+
+export interface QueueEntry extends Track {
+  queueEntryId: string;
 }
 
 export type RepeatMode = 'off' | 'all' | 'one';
@@ -54,7 +58,7 @@ interface PlayerContextType {
   next: () => void;
   showModal: boolean;
   setShowModal: (show: boolean) => void;
-  queue: Track[];
+  queue: QueueEntry[];
   addToQueue: (track: Track) => void;
   removeFromQueue: (index: number) => void;
   reorderQueue: (fromIndex: number, toIndex: number) => void;
@@ -128,7 +132,7 @@ export const PlayerProvider = ({ children }: { children: ReactNode }) => {
   const timeStore = timeStoreRef.current;
   const [showModal, setShowModal] = useState(false);
   const [playHistory, setPlayHistory] = useState<Track[]>([]);
-  const [queue, setQueue] = useState<Track[]>([]);
+  const [queue, setQueue] = useState<QueueEntry[]>([]);
   const [showQueue, setShowQueue] = useState(false);
   const [repeatMode, setRepeatMode] = useState<RepeatMode>('off');
   const [shuffleOn, setShuffleOn] = useState(false);
@@ -143,13 +147,20 @@ export const PlayerProvider = ({ children }: { children: ReactNode }) => {
   const timeUpdateIntervalRef = useRef<NodeJS.Timeout | null>(null);
   const loadedVideoIdRef = useRef<string | null>(null);
   // Refs to always have fresh values in async callbacks
-  const queueRef = useRef<Track[]>([]);
+  const queueRef = useRef<QueueEntry[]>([]);
   const currentTrackRef = useRef<Track | null>(null);
   const repeatModeRef = useRef<RepeatMode>('off');
   const shuffleOnRef = useRef(false);
   const allTracksRef = useRef<Track[]>([]);
   const volumeRef = useRef(75);
   const isMutedRef = useRef(false);
+  const queueEntryIdPrefix = useId();
+  const nextQueueEntryId = useRef(0);
+
+  const createQueueEntry = (track: Track): QueueEntry => ({
+    ...track,
+    queueEntryId: `${queueEntryIdPrefix}-${nextQueueEntryId.current++}`,
+  });
 
   const clearTimestampWarning = () => setTimestampWarning(null);
   const clearSkipNotification = () => setSkipNotification(null);
@@ -241,7 +252,7 @@ export const PlayerProvider = ({ children }: { children: ReactNode }) => {
 
   // Advance to next non-deleted track in queue, skipping deleted ones.
   // Returns true if a non-deleted track was found and set as current, false if all remaining are deleted or queue is empty.
-  const advanceSkippingDeleted = (currentQ: Track[], fromTrack: Track | null): boolean => {
+  const advanceSkippingDeleted = (currentQ: QueueEntry[], fromTrack: Track | null): boolean => {
     // Filter out deleted tracks
     let skippedAny = false;
     let remainingQueue = currentQ;
@@ -254,7 +265,8 @@ export const PlayerProvider = ({ children }: { children: ReactNode }) => {
     if (remainingQueue.length === 0 && repeatModeRef.current === 'all' && allTracksRef.current.length > 0) {
       const tracks = allTracksRef.current.filter(t => !t.deleted);
       if (tracks.length > 0) {
-        remainingQueue = shuffleOnRef.current ? shuffleArray(tracks) : [...tracks];
+        const entries = tracks.map(createQueueEntry);
+        remainingQueue = shuffleOnRef.current ? shuffleArray(entries) : entries;
       }
     }
 
@@ -288,7 +300,7 @@ export const PlayerProvider = ({ children }: { children: ReactNode }) => {
     newQueue.splice(actualIndex, 1);
     // Repeat-all: rotate the finished track to the end of the queue
     if (repeatModeRef.current === 'all' && fromTrack && !fromTrack.deleted) {
-      newQueue.push(fromTrack);
+      newQueue.push(createQueueEntry(fromTrack));
     }
     setQueue(newQueue);
 
@@ -340,8 +352,6 @@ export const PlayerProvider = ({ children }: { children: ReactNode }) => {
         clearInterval(timeUpdateIntervalRef.current);
       }
     };
-  // ensurePlayerApi only touches stable setters and the idempotent loader.
-  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   const stopTimeUpdateInterval = () => {
@@ -541,7 +551,7 @@ export const PlayerProvider = ({ children }: { children: ReactNode }) => {
     }
     setCurrentTrack(track);
     timeStore.setTime(track.timestamp);
-    setQueue(following);
+    setQueue(following.map(createQueueEntry));
     setAllTracks((prev) => {
       const seen = new Set(prev.map((t) => t.id));
       const merged = [...prev];
@@ -608,7 +618,8 @@ export const PlayerProvider = ({ children }: { children: ReactNode }) => {
   };
 
   const addToQueue = (track: Track) => {
-    setQueue(prev => [...prev, track]);
+    const entry = createQueueEntry(track);
+    setQueue(prev => [...prev, entry]);
     addToAllTracks(track);
   };
 
