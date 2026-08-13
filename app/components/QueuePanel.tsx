@@ -67,7 +67,7 @@ export default function QueuePanel() {
               onDragOver={(e) => handleDragOver(e, index)}
               onDrop={(e) => handleDrop(e, index)}
               onDragEnd={handleDragEnd}
-              className={`group flex items-center gap-3 p-3 rounded-xl bg-white/5 border border-white/10 hover:bg-white/10 transition-all lg:cursor-move ${
+              className={`group flex items-center gap-3 p-3 rounded-xl bg-white/5 border border-white/10 hover:bg-white/10 transition-[background-color,border-color,opacity] lg:cursor-move ${
                 draggedIndex === index ? 'opacity-50' : ''
               } ${
                 draggedOverIndex === index ? 'border-pink-400 bg-pink-500/10' : ''
@@ -118,7 +118,7 @@ export default function QueuePanel() {
               {/* Remove Button */}
               <button
                 onClick={() => removeFromQueue(index)}
-                className="lg:opacity-0 lg:group-hover:opacity-100 text-white/30 hover:text-red-400 transition-all p-1 flex-shrink-0"
+                className="lg:opacity-0 lg:group-hover:opacity-100 text-white/30 hover:text-red-400 transition-[color,opacity] p-1 flex-shrink-0"
                 aria-label="Remove from queue"
               >
                 <X className="w-4 h-4" />

@@ -37,7 +37,7 @@ export default function NowPlayingControls({ size }: NowPlayingControlsProps) {
       {/* Shuffle */}
       <button
         onClick={toggleShuffle}
-        className="transition-all hover:scale-110"
+        className="transition-[color,transform] hover:scale-110"
         aria-label="Shuffle"
         data-testid="np-shuffle-button"
         style={{ color: shuffleOn ? 'var(--accent-pink)' : 'var(--text-tertiary)' }}
@@ -48,7 +48,7 @@ export default function NowPlayingControls({ size }: NowPlayingControlsProps) {
       {/* Previous */}
       <button
         onClick={previous}
-        className="transition-all hover:scale-110"
+        className="transition-transform hover:scale-110"
         aria-label="Previous"
         style={{ color: 'var(--text-primary)' }}
       >
@@ -58,7 +58,7 @@ export default function NowPlayingControls({ size }: NowPlayingControlsProps) {
       {/* Play/Pause — gradient circle */}
       <button
         onClick={togglePlayPause}
-        className="flex items-center justify-center flex-shrink-0 transition-all hover:brightness-110 hover:scale-105"
+        className="flex items-center justify-center flex-shrink-0 transition-[filter,transform] hover:brightness-110 hover:scale-105"
         aria-label={isPlaying ? 'Pause' : 'Play'}
         data-testid="np-play-button"
         style={{
@@ -80,7 +80,7 @@ export default function NowPlayingControls({ size }: NowPlayingControlsProps) {
       {/* Next */}
       <button
         onClick={next}
-        className="transition-all hover:scale-110"
+        className="transition-transform hover:scale-110"
         aria-label="Next"
         style={{ color: 'var(--text-primary)' }}
       >
@@ -90,7 +90,7 @@ export default function NowPlayingControls({ size }: NowPlayingControlsProps) {
       {/* Repeat */}
       <button
         onClick={toggleRepeat}
-        className="transition-all hover:scale-110"
+        className="transition-[color,transform] hover:scale-110"
         aria-label="Repeat"
         data-testid="np-repeat-button"
         style={{ color: repeatMode !== 'off' ? 'var(--accent-pink)' : 'var(--text-tertiary)' }}

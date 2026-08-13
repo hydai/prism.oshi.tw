@@ -48,7 +48,7 @@ export default function ViewModeToggle({
             data-testid={`${testIdPrefix}-${option.value}`}
             aria-pressed={isActive}
             onClick={() => onChange(option.value)}
-            className={`flex items-center gap-1.5 font-semibold transition-all ${
+            className={`flex items-center gap-1.5 font-semibold transition-[background,box-shadow,color] ${
               fullWidth ? 'flex-1 justify-center' : ''
             } ${
               isActive

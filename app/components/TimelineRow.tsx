@@ -36,7 +36,7 @@ function TimelineRowInner({ song, index, isCurrentlyPlaying, isUnavailable, isLi
   return (
     <div
       data-testid="performance-row"
-      className="group hover-row grid grid-cols-[32px_40px_1fr_60px] lg:grid-cols-[32px_40px_2fr_2fr_100px_60px] gap-0 items-center transition-all cursor-default"
+      className="group hover-row grid grid-cols-[32px_40px_1fr_60px] lg:grid-cols-[32px_40px_2fr_2fr_100px_60px] gap-0 items-center transition-colors cursor-default"
       style={{
         borderRadius: 'var(--radius-lg)',
         padding: 'var(--space-3) var(--space-4)',
@@ -87,7 +87,7 @@ function TimelineRowInner({ song, index, isCurrentlyPlaying, isUnavailable, isLi
           }}
           disabled={isUnavailable}
           data-testid="play-button"
-          className={`hidden lg:flex absolute inset-0 items-center justify-center opacity-0 group-hover:opacity-100 transition-all ${
+          className={`hidden lg:flex absolute inset-0 items-center justify-center opacity-0 group-hover:opacity-100 transition-[color,opacity,transform] ${
             isUnavailable
               ? 'cursor-not-allowed'
               : 'transform hover:scale-110'
@@ -183,7 +183,7 @@ function TimelineRowInner({ song, index, isCurrentlyPlaying, isUnavailable, isLi
       >
         <button
           onClick={onToggleLike}
-          className={`transition-all transform hover:scale-110 ${isLiked ? '' : 'lg:opacity-0 lg:group-hover:opacity-100'}`}
+          className={`transition-[color,opacity,transform] transform hover:scale-110 ${isLiked ? '' : 'lg:opacity-0 lg:group-hover:opacity-100'}`}
           style={{
             background: 'var(--bg-surface)',
             padding: 'var(--space-2)',
@@ -198,7 +198,7 @@ function TimelineRowInner({ song, index, isCurrentlyPlaying, isUnavailable, isLi
         </button>
         <button
           onClick={() => onAddToQueue(track)}
-          className="lg:opacity-0 lg:group-hover:opacity-100 transition-all transform hover:scale-110"
+          className="lg:opacity-0 lg:group-hover:opacity-100 transition-[opacity,transform] transform hover:scale-110"
           style={{
             background: 'var(--bg-surface)',
             padding: 'var(--space-2)',
@@ -214,7 +214,7 @@ function TimelineRowInner({ song, index, isCurrentlyPlaying, isUnavailable, isLi
           <Plus className="w-4 h-4" />
         </button>
         <div
-          className="lg:opacity-0 lg:group-hover:opacity-100 transition-all"
+          className="lg:opacity-0 lg:group-hover:opacity-100 transition-opacity"
           style={{
             background: 'var(--bg-surface)',
             padding: 'var(--space-2)',
@@ -239,7 +239,7 @@ function TimelineRowInner({ song, index, isCurrentlyPlaying, isUnavailable, isLi
           href={`https://www.youtube.com/watch?v=${song.videoId}&t=${song.timestamp}s`}
           target="_blank"
           rel="noopener noreferrer"
-          className="lg:opacity-0 lg:group-hover:opacity-100 transition-all transform hover:scale-110"
+          className="lg:opacity-0 lg:group-hover:opacity-100 transition-[opacity,transform] transform hover:scale-110"
           style={{
             background: 'var(--bg-surface)',
             padding: 'var(--space-2)',

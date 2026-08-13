@@ -25,7 +25,7 @@ function MobileSearchRowInner({ song, isCurrentlyPlaying, isUnavailable, onPlay,
   return (
     <div
       data-testid="performance-row"
-      className="flex items-center gap-3 transition-all cursor-default"
+      className="flex items-center gap-3 transition-colors cursor-default"
       style={{
         borderRadius: 'var(--radius-lg)',
         padding: '12px 16px',

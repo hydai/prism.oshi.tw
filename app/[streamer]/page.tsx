@@ -324,7 +324,7 @@ export default function Home() {
                   />
                 </div>
               }
-              inputClassName="w-full font-medium py-2.5 pl-9 pr-4 outline-none transition-all text-base"
+              inputClassName="w-full font-medium py-2.5 pl-9 pr-4 outline-none transition-colors text-base"
               inputStyle={{
                 background: 'var(--bg-surface-glass)',
                 backdropFilter: 'blur(8px)',
@@ -361,7 +361,7 @@ export default function Home() {
             <select
               value={selectedArtist ?? ''}
               onChange={(e) => setSelectedArtist(e.target.value || null)}
-              className="w-full font-medium py-2 px-3 outline-none appearance-none text-sm cursor-pointer transition-all"
+              className="w-full font-medium py-2 px-3 outline-none appearance-none text-sm cursor-pointer transition-colors"
               style={{
                 background: 'var(--bg-surface-glass)',
                 border: '1px solid var(--border-glass)',
@@ -387,7 +387,7 @@ export default function Home() {
                 key={year}
                 data-testid="year-filter-chip"
                 onClick={() => toggleYear(year)}
-                className="font-medium text-sm transition-all"
+                className="font-medium text-sm transition-colors"
                 style={{
                   borderRadius: 'var(--radius-pill)',
                   padding: '4px 12px',
@@ -412,7 +412,7 @@ export default function Home() {
           </div>
           <button
             onClick={() => setSelectedStreamId(null)}
-            className="w-full text-left px-3 py-2 rounded-radius-lg text-sm font-medium transition-all"
+            className="w-full text-left px-3 py-2 rounded-radius-lg text-sm font-medium transition-colors"
             style={
               selectedStreamId === null
                 ? { color: 'var(--accent-pink)', background: 'var(--bg-accent-pink)' }
@@ -426,7 +426,7 @@ export default function Home() {
               key={stream.id}
               data-testid="stream-filter-button"
               onClick={() => setSelectedStreamId(stream.id === selectedStreamId ? null : stream.id)}
-              className="w-full text-left px-3 py-2 rounded-radius-lg text-sm font-medium transition-all hover:bg-surface-muted"
+              className="w-full text-left px-3 py-2 rounded-radius-lg text-sm font-medium transition-colors hover:bg-surface-muted"
               style={
                 selectedStreamId === stream.id
                   ? { color: 'var(--accent-pink)', background: 'var(--bg-accent-pink)' }
@@ -719,7 +719,7 @@ export default function Home() {
                   href={streamerData.socialLinks.youtube}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="flex items-center gap-1.5 transition-all hover:opacity-80"
+                  className="flex items-center gap-1.5 transition-opacity hover:opacity-80"
                   style={{
                     background: 'var(--bg-surface-glass)',
                     border: '1px solid var(--border-glass)',
@@ -741,7 +741,7 @@ export default function Home() {
                   href={streamerData.socialLinks.twitter}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="flex items-center gap-1.5 transition-all hover:opacity-80"
+                  className="flex items-center gap-1.5 transition-opacity hover:opacity-80"
                   style={{
                     background: 'var(--bg-surface-glass)',
                     border: '1px solid var(--border-glass)',
@@ -763,7 +763,7 @@ export default function Home() {
                   href={streamerData.socialLinks.facebook}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="flex items-center gap-1.5 transition-all hover:opacity-80"
+                  className="flex items-center gap-1.5 transition-opacity hover:opacity-80"
                   style={{
                     background: 'var(--bg-surface-glass)',
                     border: '1px solid var(--border-glass)',
@@ -785,7 +785,7 @@ export default function Home() {
                   href={streamerData.socialLinks.instagram}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="flex items-center gap-1.5 transition-all hover:opacity-80"
+                  className="flex items-center gap-1.5 transition-opacity hover:opacity-80"
                   style={{
                     background: 'var(--bg-surface-glass)',
                     border: '1px solid var(--border-glass)',
@@ -807,7 +807,7 @@ export default function Home() {
                   href={streamerData.socialLinks.twitch}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="flex items-center gap-1.5 transition-all hover:opacity-80"
+                  className="flex items-center gap-1.5 transition-opacity hover:opacity-80"
                   style={{
                     background: 'var(--bg-surface-glass)',
                     border: '1px solid var(--border-glass)',
@@ -854,7 +854,7 @@ export default function Home() {
             {/* Play button: 48×48 circle, gradient fill (pink→blue) */}
             <button
               data-testid="mobile-play-all-button"
-              className="flex items-center justify-center flex-shrink-0 transition-all hover:scale-105"
+              className="flex items-center justify-center flex-shrink-0 transition-transform hover:scale-105"
               style={{
                 width: '48px',
                 height: '48px',
@@ -873,7 +873,7 @@ export default function Home() {
             <button
               data-testid="mobile-shuffle-button"
               onClick={() => toggleShuffle()}
-              className="flex items-center justify-center flex-shrink-0 transition-all hover:opacity-90"
+              className="flex items-center justify-center flex-shrink-0 transition-[background,border-color,color,opacity] hover:opacity-90"
               style={{
                 background: shuffleOn
                   ? 'linear-gradient(135deg, var(--accent-pink-light), var(--accent-blue-light))'
@@ -897,7 +897,7 @@ export default function Home() {
                 target="_blank"
                 rel="noopener noreferrer"
                 data-testid="mobile-follow-button"
-                className="flex items-center justify-center flex-shrink-0 font-semibold transition-all hover:opacity-80"
+                className="flex items-center justify-center flex-shrink-0 font-semibold transition-opacity hover:opacity-80"
                 style={{
                   border: '1px solid var(--border-default)',
                   borderRadius: '20px',
@@ -948,7 +948,7 @@ export default function Home() {
             {/* All years chip */}
             <button
               onClick={clearYears}
-              className="flex-shrink-0 font-medium transition-all"
+              className="flex-shrink-0 font-medium transition-colors"
               style={{
                 height: '36px',
                 borderRadius: '12px',
@@ -974,7 +974,7 @@ export default function Home() {
                 key={year}
                 data-testid="year-filter-chip"
                 onClick={() => toggleYear(year)}
-                className="flex-shrink-0 font-medium transition-all"
+                className="flex-shrink-0 font-medium transition-colors"
                 style={{
                   height: '36px',
                   borderRadius: '12px',
@@ -1019,7 +1019,7 @@ export default function Home() {
               {/* PlayButton — 48×48 circular gradient play button */}
               <button
                 data-testid="desktop-play-all-button"
-                className="bg-gradient-to-r from-pink-400 to-blue-400 text-white flex items-center justify-center transition-all hover:scale-105 hover:brightness-110 flex-shrink-0"
+                className="bg-gradient-to-r from-pink-400 to-blue-400 text-white flex items-center justify-center transition-[filter,transform] hover:scale-105 hover:brightness-110 flex-shrink-0"
                 style={{
                   width: '48px',
                   height: '48px',
@@ -1035,7 +1035,7 @@ export default function Home() {
 
               {/* GradientButton — "播放全部" pill */}
               <button
-                className="font-semibold text-white flex items-center gap-1.5 transition-all hover:opacity-90 flex-shrink-0"
+                className="font-semibold text-white flex items-center gap-1.5 transition-opacity hover:opacity-90 flex-shrink-0"
                 style={{
                   background: 'linear-gradient(135deg, var(--accent-pink-light), var(--accent-blue-light))',
                   borderRadius: 'var(--radius-pill)',
@@ -1053,7 +1053,7 @@ export default function Home() {
                   href={streamerData.socialLinks.youtube}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="font-semibold flex items-center gap-1.5 transition-all hover:opacity-80 flex-shrink-0"
+                  className="font-semibold flex items-center gap-1.5 transition-opacity hover:opacity-80 flex-shrink-0"
                   style={{
                     background: 'transparent',
                     border: '1px solid var(--border-default)',
@@ -1079,7 +1079,7 @@ export default function Home() {
               {/* "全部" chip */}
               <button
                 onClick={clearYears}
-                className="font-medium transition-all"
+                className="font-medium transition-colors"
                 style={{
                   borderRadius: 'var(--radius-pill)',
                   fontSize: 'var(--font-size-sm)',
@@ -1102,7 +1102,7 @@ export default function Home() {
                   key={year}
                   data-testid="year-filter-chip"
                   onClick={() => toggleYear(year)}
-                  className="font-medium transition-all"
+                  className="font-medium transition-colors"
                   style={{
                     borderRadius: 'var(--radius-pill)',
                     fontSize: 'var(--font-size-sm)',
@@ -1152,7 +1152,7 @@ export default function Home() {
                 <button
                   data-testid="retry-button"
                   onClick={loadData}
-                  className="font-semibold transition-all hover:opacity-90"
+                  className="font-semibold transition-opacity hover:opacity-90"
                   style={{
                     background: 'linear-gradient(135deg, var(--accent-pink-light), var(--accent-blue-light))',
                     borderRadius: 'var(--radius-pill)',
@@ -1490,7 +1490,7 @@ export default function Home() {
                 {/* Liked Songs */}
                 <button
                   onClick={() => setShowLikedSongsPanel(true)}
-                  className="w-full flex items-center justify-between px-4 py-3 rounded-radius-lg font-medium text-sm transition-all mb-2"
+                  className="w-full flex items-center justify-between px-4 py-3 rounded-radius-lg font-medium text-sm transition-colors mb-2"
                   style={{
                     background: 'var(--bg-surface-glass)',
                     border: '1px solid var(--border-glass)',
@@ -1516,7 +1516,7 @@ export default function Home() {
                 {/* Recently Played */}
                 <button
                   onClick={() => setShowRecentlyPlayedPanel(true)}
-                  className="w-full flex items-center justify-between px-4 py-3 rounded-radius-lg font-medium text-sm transition-all mb-2"
+                  className="w-full flex items-center justify-between px-4 py-3 rounded-radius-lg font-medium text-sm transition-colors mb-2"
                   style={{
                     background: 'var(--bg-surface-glass)',
                     border: '1px solid var(--border-glass)',
@@ -1542,7 +1542,7 @@ export default function Home() {
                 {/* Create Playlist */}
                 <button
                   onClick={() => setShowCreateDialog(true)}
-                  className="w-full flex items-center gap-3 px-4 py-3 rounded-radius-lg font-medium text-sm transition-all"
+                  className="w-full flex items-center gap-3 px-4 py-3 rounded-radius-lg font-medium text-sm transition-colors"
                   style={{
                     background: 'var(--bg-surface-glass)',
                     border: '1px solid var(--border-glass)',
@@ -1559,7 +1559,7 @@ export default function Home() {
                 <div>
                   <button
                     onClick={() => setShowPlaylistPanel(true)}
-                    className="w-full flex items-center justify-between px-4 py-3 rounded-radius-lg font-medium text-sm transition-all mb-2"
+                    className="w-full flex items-center justify-between px-4 py-3 rounded-radius-lg font-medium text-sm transition-colors mb-2"
                     style={{
                       background: 'var(--bg-surface-glass)',
                       border: '1px solid var(--border-glass)',
@@ -1603,7 +1603,7 @@ export default function Home() {
                     key={year}
                     data-testid="mobile-streams-year-chip"
                     onClick={() => toggleYear(year)}
-                    className="font-medium text-sm transition-all flex-shrink-0"
+                    className="font-medium text-sm transition-colors flex-shrink-0"
                     style={{
                       borderRadius: 'var(--radius-pill)',
                       padding: '4px 12px',
@@ -1618,7 +1618,7 @@ export default function Home() {
                 {selectedYears.size > 0 && (
                   <button
                     onClick={clearYears}
-                    className="font-medium text-xs transition-all flex-shrink-0"
+                    className="font-medium text-xs transition-colors flex-shrink-0"
                     style={{
                       borderRadius: 'var(--radius-pill)',
                       padding: '4px 10px',
@@ -1633,7 +1633,7 @@ export default function Home() {
               {/* All songs button */}
               <button
                 onClick={() => { setSelectedStreamId(null); setMobileTab('home'); }}
-                className="w-full text-left px-4 py-3 rounded-radius-lg text-sm font-medium transition-all mb-2"
+                className="w-full text-left px-4 py-3 rounded-radius-lg text-sm font-medium transition-colors mb-2"
                 style={{
                   background: 'var(--bg-surface-glass)',
                   border: '1px solid var(--border-glass)',
@@ -1657,7 +1657,7 @@ export default function Home() {
                       key={stream.id}
                       data-testid="mobile-stream-card"
                       onClick={() => { setSelectedStreamId(stream.id); setMobileTab('home'); }}
-                      className="w-full text-left px-4 py-3 rounded-radius-lg transition-all"
+                      className="w-full text-left px-4 py-3 rounded-radius-lg transition-colors"
                       style={{
                         background: 'var(--bg-surface-glass)',
                         border: '1px solid var(--border-glass)',

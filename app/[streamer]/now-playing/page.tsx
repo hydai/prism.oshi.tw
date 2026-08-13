@@ -192,7 +192,7 @@ export default function NowPlayingPage() {
               </span>
               <button
                 onClick={handleToggleLike}
-                className="transition-all transform hover:scale-110"
+                className="transition-[color,transform] transform hover:scale-110"
                 aria-label={liked ? '取消喜愛' : '喜愛'}
                 data-testid="np-like-button"
                 style={{ color: liked ? 'var(--accent-pink)' : 'var(--text-tertiary)', padding: '4px' }}
@@ -264,7 +264,7 @@ export default function NowPlayingPage() {
             </span>
             <button
               onClick={handleToggleLike}
-              className="transition-all transform hover:scale-110"
+              className="transition-[color,transform] transform hover:scale-110"
               aria-label={liked ? '取消喜愛' : '喜愛'}
               data-testid="np-like-button-desktop"
               style={{ color: liked ? 'var(--accent-pink)' : 'var(--text-tertiary)', padding: '4px' }}

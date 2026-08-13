@@ -352,7 +352,7 @@ export default function PlaylistPanel({ show, onClose, songsData, onToast }: Pla
                       onDrop={(e) => handleDrop(e, index)}
                       onDragEnd={handleDragEnd}
                       className={`
-                        bg-white/5 rounded-lg p-3 flex items-center gap-3 group transition-all
+                        bg-white/5 rounded-lg p-3 flex items-center gap-3 group transition-[background-color,border-color,opacity]
                         ${isDragging ? 'opacity-50' : ''}
                         ${isDraggedOver ? 'border-2 border-pink-400' : 'border-2 border-transparent'}
                         hover:bg-white/10

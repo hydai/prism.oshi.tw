@@ -314,7 +314,7 @@ export default function MiniPlayer() {
                   e.stopPropagation();
                   togglePlayPause();
                 }}
-                className="flex items-center justify-center flex-shrink-0 transition-all hover:brightness-110"
+                className="flex items-center justify-center flex-shrink-0 transition-[filter] hover:brightness-110"
                 aria-label={isPlaying ? 'Pause' : 'Play'}
                 data-testid="mini-player-play-button"
                 style={{
