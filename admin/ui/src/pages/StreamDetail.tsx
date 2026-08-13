@@ -7,6 +7,7 @@ import { YouTubePlayer } from '../components/YouTubePlayer';
 import type { YouTubePlayerHandle } from '../components/YouTubePlayer';
 import { parseTextToSongs, formatSongList, parsedSongKey } from '../../../shared/parse';
 import { fetchItunesDuration, summarizeDurationOutcome } from '../lib/itunes';
+import { runWithLoadingState } from '../lib/loadingState';
 import type { OutcomeTone } from '../lib/itunes';
 import { FetchLogPanel } from '../components/FetchLogPanel';
 import type { FetchLogEntry } from '../components/FetchLogPanel';
@@ -641,60 +642,66 @@ export default function StreamDetail({ user }: { user: AuthUser }) {
       return;
     }
 
-    setIsFetchingAll(true);
-    let fetched = 0;
-    let noMatch = 0;
-    let errors = 0;
-    let consecutiveErrors = 0;
-    let aborted = false;
+    try {
+      await runWithLoadingState(setIsFetchingAll, async () => {
+        let fetched = 0;
+        let noMatch = 0;
+        let errors = 0;
+        let consecutiveErrors = 0;
+        let aborted = false;
 
-    for (let i = 0; i < missing.length; i++) {
-      const { perf, index } = missing[i]!;
-      showToast(`Fetching ${i + 1}/${missing.length}: ${perf.title}...`);
+        for (let i = 0; i < missing.length; i++) {
+          const { perf, index } = missing[i]!;
+          showToast(`Fetching ${i + 1}/${missing.length}: ${perf.title}...`);
 
-      const outcome = await fetchItunesDuration(perf.originalArtist, perf.title);
-      const summary = summarizeDurationOutcome(outcome);
-      appendFetchLog(perf.title, summary.tone, summary.text);
+          const outcome = await fetchItunesDuration(perf.originalArtist, perf.title);
+          const summary = summarizeDurationOutcome(outcome);
+          appendFetchLog(perf.title, summary.tone, summary.text);
 
-      if (outcome.status === 'found') {
-        consecutiveErrors = 0;
-        const endTimestamp = perf.timestamp + outcome.durationSec;
-        try {
-          await api.updatePerformanceTimestamps(perf.id, { endTimestamp });
-          updatePerformance(index, { endTimestamp });
-          fetched++;
-        } catch (err: unknown) {
-          errors++;
-          const msg = err instanceof Error ? err.message : 'unknown error';
-          appendFetchLog(perf.title, 'error', `Found ${outcome.durationSec}s but saving failed: ${msg}`);
+          if (outcome.status === 'found') {
+            consecutiveErrors = 0;
+            const endTimestamp = perf.timestamp + outcome.durationSec;
+            try {
+              await api.updatePerformanceTimestamps(perf.id, { endTimestamp });
+              updatePerformance(index, { endTimestamp });
+              fetched++;
+            } catch (err: unknown) {
+              errors++;
+              const msg = err instanceof Error ? err.message : 'unknown error';
+              appendFetchLog(perf.title, 'error', `Found ${outcome.durationSec}s but saving failed: ${msg}`);
+            }
+          } else if (outcome.status === 'no-match') {
+            consecutiveErrors = 0;
+            noMatch++;
+          } else if (outcome.status === 'rate-limited') {
+            aborted = true;
+            appendFetchLog(perf.title, 'error',
+              `Batch stopped at ${i + 1}/${missing.length} — wait ${outcome.retryAfterSec ?? '~60'}s, then press F to fetch the remaining songs.`);
+            break;
+          } else {
+            errors++;
+            consecutiveErrors++;
+            if (consecutiveErrors >= 3) {
+              aborted = true;
+              appendFetchLog(perf.title, 'error',
+                `Batch stopped at ${i + 1}/${missing.length} after 3 consecutive request failures — likely a network issue or Apple rate limiting this IP. Wait ~1 min, then press F to fetch the remaining songs.`);
+              break;
+            }
+          }
         }
-      } else if (outcome.status === 'no-match') {
-        consecutiveErrors = 0;
-        noMatch++;
-      } else if (outcome.status === 'rate-limited') {
-        aborted = true;
-        appendFetchLog(perf.title, 'error',
-          `Batch stopped at ${i + 1}/${missing.length} — wait ${outcome.retryAfterSec ?? '~60'}s, then press F to fetch the remaining songs.`);
-        break;
-      } else {
-        errors++;
-        consecutiveErrors++;
-        if (consecutiveErrors >= 3) {
-          aborted = true;
-          appendFetchLog(perf.title, 'error',
-            `Batch stopped at ${i + 1}/${missing.length} after 3 consecutive request failures — likely a network issue or Apple rate limiting this IP. Wait ~1 min, then press F to fetch the remaining songs.`);
-          break;
-        }
-      }
+
+        showToast(
+          aborted
+            ? `Stopped by iTunes errors — ${fetched} saved before stopping, see fetch log`
+            : `Fetched ${fetched}/${missing.length}, ${noMatch} no match, ${errors} errors — see fetch log`,
+          aborted,
+        );
+      });
+    } catch (err: unknown) {
+      const message = err instanceof Error ? err.message : 'unknown error';
+      appendFetchLog('Batch duration fetch', 'error', `Batch stopped unexpectedly: ${message}`);
+      showToast(`Batch duration fetch failed: ${message}`, true);
     }
-
-    setIsFetchingAll(false);
-    showToast(
-      aborted
-        ? `Stopped by iTunes errors — ${fetched} saved before stopping, see fetch log`
-        : `Fetched ${fetched}/${missing.length}, ${noMatch} no match, ${errors} errors — see fetch log`,
-      aborted,
-    );
   }, [detail, isFetchingAll, showToast, updatePerformance, appendFetchLog]);
 
   const handleAddSong = useCallback(async (title: string, artist: string) => {
