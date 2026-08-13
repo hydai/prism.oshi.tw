@@ -10,6 +10,7 @@ import type {
   HarmonizeMatchType,
 } from '../../../shared/types';
 import { api } from '../api/client';
+import { finiteInputNumber, isNumberInRange } from '../lib/numeric-input';
 
 // --- Similar Songs Tab ---
 
@@ -143,7 +144,7 @@ function SimilarSongsTab() {
   const [groups, setGroups] = useState<SimilarityGroup<HarmonizeSongEntry>[]>([]);
   const [stats, setStats] = useState<{ totalSongs: number; groupCount: number; affectedSongs: number } | null>(null);
   const [mode, setMode] = useState<HarmonizeMatchType>('exact');
-  const [threshold, setThreshold] = useState(0.85);
+  const [threshold, setThreshold] = useState<number | undefined>(0.85);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   // Track canonical song per group (key = normalizedKey)
@@ -152,12 +153,18 @@ function SimilarSongsTab() {
   const [expanded, setExpanded] = useState<Set<string>>(new Set());
   // Track applying state per group
   const [applying, setApplying] = useState<Set<string>>(new Set());
+  const thresholdIsValid = isNumberInRange(threshold, 0.5, 1);
 
   const handleScan = async () => {
+    if (mode === 'fuzzy' && !thresholdIsValid) return;
+
     setLoading(true);
     setError(null);
     try {
-      const res = await api.harmonizeSongs({ mode, threshold });
+      const res = await api.harmonizeSongs({
+        mode,
+        threshold: mode === 'fuzzy' ? threshold : undefined,
+      });
       setGroups(res.groups);
       setStats(res.stats);
       // Auto-select canonical: song with most performances or approved status
@@ -239,14 +246,15 @@ function SimilarSongsTab() {
       <div className="mb-4 flex flex-wrap items-center gap-3">
         <button
           onClick={handleScan}
-          disabled={loading}
+          disabled={loading || (mode === 'fuzzy' && !thresholdIsValid)}
           className="rounded-md bg-blue-600 px-4 py-2 text-sm font-medium text-white hover:bg-blue-700 disabled:opacity-50"
         >
           {loading ? 'Scanning...' : 'Scan'}
         </button>
         <div className="flex items-center gap-2">
-          <label className="text-sm font-medium text-slate-600">Mode:</label>
+          <label htmlFor="song-harmonizer-mode" className="text-sm font-medium text-slate-600">Mode:</label>
           <select
+            id="song-harmonizer-mode"
             value={mode}
             onChange={(e) => setMode(e.target.value as HarmonizeMatchType)}
             className="rounded-md border border-slate-300 px-2 py-1.5 text-sm"
@@ -257,16 +265,25 @@ function SimilarSongsTab() {
         </div>
         {mode === 'fuzzy' && (
           <div className="flex items-center gap-2">
-            <label className="text-sm font-medium text-slate-600">Threshold:</label>
+            <label htmlFor="song-harmonizer-threshold" className="text-sm font-medium text-slate-600">Threshold:</label>
             <input
+              id="song-harmonizer-threshold"
               type="number"
               min="0.5"
               max="1"
               step="0.05"
-              value={threshold}
-              onChange={(e) => setThreshold(parseFloat(e.target.value))}
+              value={threshold ?? ''}
+              onChange={(event) => setThreshold(finiteInputNumber(event.currentTarget.valueAsNumber))}
+              aria-invalid={!thresholdIsValid}
+              aria-describedby={!thresholdIsValid ? 'song-harmonizer-threshold-error' : undefined}
+              required
               className="w-20 rounded-md border border-slate-300 px-2 py-1.5 text-sm"
             />
+            {!thresholdIsValid && (
+              <span id="song-harmonizer-threshold-error" className="text-xs text-red-600">
+                Enter 0.5–1
+              </span>
+            )}
           </div>
         )}
         {stats && (
@@ -426,7 +443,7 @@ function SimilarArtistsTab() {
   const [groups, setGroups] = useState<SimilarityGroup<HarmonizeArtistEntry>[]>([]);
   const [stats, setStats] = useState<{ totalArtists: number; groupCount: number; affectedEntries: number } | null>(null);
   const [mode, setMode] = useState<HarmonizeMatchType>('exact');
-  const [threshold, setThreshold] = useState(0.85);
+  const [threshold, setThreshold] = useState<number | undefined>(0.85);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   // Track canonical artist name per group
@@ -434,12 +451,18 @@ function SimilarArtistsTab() {
   const [expanded, setExpanded] = useState<Set<string>>(new Set());
   const [applying, setApplying] = useState<Set<string>>(new Set());
   const [applyingAll, setApplyingAll] = useState(false);
+  const thresholdIsValid = isNumberInRange(threshold, 0.5, 1);
 
   const handleScan = async () => {
+    if (mode === 'fuzzy' && !thresholdIsValid) return;
+
     setLoading(true);
     setError(null);
     try {
-      const res = await api.harmonizeArtists({ mode, threshold });
+      const res = await api.harmonizeArtists({
+        mode,
+        threshold: mode === 'fuzzy' ? threshold : undefined,
+      });
       setGroups(res.groups);
       setStats(res.stats);
       const newCanonicals = new Map<string, string>();
@@ -531,14 +554,15 @@ function SimilarArtistsTab() {
       <div className="mb-4 flex flex-wrap items-center gap-3">
         <button
           onClick={handleScan}
-          disabled={loading}
+          disabled={loading || (mode === 'fuzzy' && !thresholdIsValid)}
           className="rounded-md bg-blue-600 px-4 py-2 text-sm font-medium text-white hover:bg-blue-700 disabled:opacity-50"
         >
           {loading ? 'Scanning...' : 'Scan'}
         </button>
         <div className="flex items-center gap-2">
-          <label className="text-sm font-medium text-slate-600">Mode:</label>
+          <label htmlFor="artist-harmonizer-mode" className="text-sm font-medium text-slate-600">Mode:</label>
           <select
+            id="artist-harmonizer-mode"
             value={mode}
             onChange={(e) => setMode(e.target.value as HarmonizeMatchType)}
             className="rounded-md border border-slate-300 px-2 py-1.5 text-sm"
@@ -549,16 +573,25 @@ function SimilarArtistsTab() {
         </div>
         {mode === 'fuzzy' && (
           <div className="flex items-center gap-2">
-            <label className="text-sm font-medium text-slate-600">Threshold:</label>
+            <label htmlFor="artist-harmonizer-threshold" className="text-sm font-medium text-slate-600">Threshold:</label>
             <input
+              id="artist-harmonizer-threshold"
               type="number"
               min="0.5"
               max="1"
               step="0.05"
-              value={threshold}
-              onChange={(e) => setThreshold(parseFloat(e.target.value))}
+              value={threshold ?? ''}
+              onChange={(event) => setThreshold(finiteInputNumber(event.currentTarget.valueAsNumber))}
+              aria-invalid={!thresholdIsValid}
+              aria-describedby={!thresholdIsValid ? 'artist-harmonizer-threshold-error' : undefined}
+              required
               className="w-20 rounded-md border border-slate-300 px-2 py-1.5 text-sm"
             />
+            {!thresholdIsValid && (
+              <span id="artist-harmonizer-threshold-error" className="text-xs text-red-600">
+                Enter 0.5–1
+              </span>
+            )}
           </div>
         )}
         {stats && (

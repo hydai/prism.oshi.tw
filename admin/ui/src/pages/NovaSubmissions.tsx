@@ -4,6 +4,7 @@ import { sanitizeNovaUrl } from '../../../shared/nova-url-safety';
 import { api } from '../api/client';
 import StatusBadge from '../components/StatusBadge';
 import { useSearchParams } from 'react-router-dom';
+import { finiteInputNumber } from '../lib/numeric-input';
 
 type EditableKey =
   | 'display_name' | 'slug' | 'brand_name' | 'youtube_channel_url' | 'youtube_channel_id'
@@ -288,7 +289,7 @@ export function SubmissionRow({
   const [draft, setDraft] = useState<Record<EditableKey, string>>(() => buildDraft(sub));
   const [themeDraft, setThemeDraft] = useState<ThemeColors>(() => parseThemeJson(sub.theme_json));
   const [enabledDraft, setEnabledDraft] = useState(sub.enabled === 1);
-  const [orderDraft, setOrderDraft] = useState(sub.display_order ?? 0);
+  const [orderDraft, setOrderDraft] = useState<number | undefined>(sub.display_order ?? 0);
   const [saving, setSaving] = useState(false);
   const [saveError, setSaveError] = useState<string | null>(null);
   const [fetchingSubs, setFetchingSubs] = useState(false);
@@ -305,6 +306,11 @@ export function SubmissionRow({
   }, [sub]);
 
   const handleSave = async () => {
+    if (orderDraft === undefined) {
+      setSaveError('Display order must be a number.');
+      return;
+    }
+
     setSaving(true);
     setSaveError(null);
     try {
@@ -505,7 +511,7 @@ export function SubmissionRow({
                 ) : (
                   <>
                     <button
-                      disabled={saving}
+                      disabled={saving || orderDraft === undefined}
                       onClick={handleSave}
                       className="rounded bg-blue-600 px-3 py-1 text-xs font-medium text-white hover:bg-blue-700 disabled:opacity-50"
                     >
@@ -598,14 +604,24 @@ export function SubmissionRow({
                         </span>
                       </div>
                       <div className="flex items-center gap-2">
-                        <label className="text-xs font-medium uppercase text-slate-400">Order</label>
+                        <label htmlFor={`nova-display-order-${sub.id}`} className="text-xs font-medium uppercase text-slate-400">Order</label>
                         <input
+                          id={`nova-display-order-${sub.id}`}
                           type="number"
-                          value={orderDraft}
-                          onChange={(e) => setOrderDraft(Number(e.target.value))}
+                          value={orderDraft ?? ''}
+                          onChange={(event) => setOrderDraft(finiteInputNumber(event.currentTarget.valueAsNumber))}
+                          aria-invalid={orderDraft === undefined}
+                          aria-describedby={orderDraft === undefined ? `nova-display-order-error-${sub.id}` : undefined}
+                          required
                           className="w-20 rounded-md border border-slate-300 px-2 py-1 text-sm focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500"
                         />
-                        <span className="text-xs text-slate-500">Lower = first</span>
+                        {orderDraft === undefined ? (
+                          <span id={`nova-display-order-error-${sub.id}`} className="text-xs text-red-600">
+                            Enter a number
+                          </span>
+                        ) : (
+                          <span className="text-xs text-slate-500">Lower = first</span>
+                        )}
                       </div>
                     </div>
 
