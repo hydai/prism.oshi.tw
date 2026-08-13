@@ -39,6 +39,7 @@ jobs:
       - run: npm run test:safe-links
       - run: npm run test:youtube-iframe
       - run: npm run test:aurora-nova
+      - run: npm run test:turnstile
       - run: npm run test:deploy-workflow-permissions
       - run: npm run inbox:status:test
       - run: npm run build
