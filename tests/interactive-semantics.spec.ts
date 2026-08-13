@@ -1,6 +1,24 @@
 import { test, expect } from '@playwright/test';
 
 test.describe('interactive semantics', () => {
+  test('exposes names for public search, navigation, filter, and playback controls', async ({ page }) => {
+    await page.setViewportSize({ width: 1280, height: 900 });
+    await page.goto('/');
+
+    await expect(page.getByRole('textbox', { name: '搜尋 VTuber' }).filter({ visible: true })).toBeVisible();
+    await expect(page.getByRole('link', { name: '回報 / 建議' }).filter({ visible: true })).toBeVisible();
+    await expect(page.getByRole('link', { name: 'Discord 伺服器' }).filter({ visible: true })).toBeVisible();
+    await expect(page.getByRole('link', { name: '新增 VOD' }).filter({ visible: true })).toBeVisible();
+
+    await page.goto('/mizuki');
+
+    await expect(page.getByRole('textbox', { name: '搜尋歌曲' })).toBeVisible();
+    await expect(page.getByRole('combobox', { name: '依歌手篩選' })).toBeVisible();
+    await expect(
+      page.getByTestId('performance-row').first().getByRole('button', { name: /^播放 / }),
+    ).toHaveAccessibleName(/^播放 .+/);
+  });
+
   test('opens and closes the create-playlist dialog from the keyboard', async ({ page }) => {
     await page.setViewportSize({ width: 1280, height: 900 });
     await page.goto('/mizuki');
@@ -43,7 +61,7 @@ test.describe('interactive semantics', () => {
   test('lets focused Aurora controls handle Space', async ({ page }) => {
     await page.goto('/mizuki/aurora');
 
-    await page.getByTestId('vod-url-input').fill('https://www.youtube.com/watch?v=qgMiX4lw2TQ');
+    await page.getByRole('textbox', { name: 'YouTube 歌枠網址' }).fill('https://www.youtube.com/watch?v=qgMiX4lw2TQ');
     await page.getByTestId('load-video-button').click();
 
     await page.getByTitle('鍵盤快捷鍵').click();

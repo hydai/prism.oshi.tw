@@ -1,11 +1,12 @@
 'use client';
 
-import { useEffect, useRef, useState, type CSSProperties, type ReactNode } from 'react';
+import { useEffect, useId, useRef, useState, type CSSProperties, type ReactNode } from 'react';
 
 interface SearchBoxProps {
   /** Debounced external value — the page's single source of truth */
   value: string;
   onDebouncedChange: (term: string) => void;
+  label: string;
   placeholder: string;
   containerClassName: string;
   inputClassName: string;
@@ -22,6 +23,7 @@ interface SearchBoxProps {
 export default function SearchBox({
   value,
   onDebouncedChange,
+  label,
   placeholder,
   containerClassName,
   inputClassName,
@@ -30,6 +32,7 @@ export default function SearchBox({
   autoFocus,
   inputTestId,
 }: SearchBoxProps) {
+  const inputId = useId();
   const [text, setText] = useState(value);
   const lastReported = useRef(value);
 
@@ -57,8 +60,12 @@ export default function SearchBox({
 
   return (
     <div className={containerClassName}>
+      <label htmlFor={inputId} className="sr-only">
+        {label}
+      </label>
       {icon}
       <input
+        id={inputId}
         type="text"
         placeholder={placeholder}
         value={text}

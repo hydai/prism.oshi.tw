@@ -371,8 +371,12 @@ export default function AuroraPage() {
               <p className="text-[var(--text-secondary)] text-[14px]">社群時間戳工具 — 為歌枠直播建立結構化的時間戳列表</p>
             </div>
             <div className="w-full max-w-lg">
+              <label htmlFor="aurora-vod-url" className="sr-only">
+                YouTube 歌枠網址
+              </label>
               <div className="flex gap-2">
                 <input
+                  id="aurora-vod-url"
                   className="flex-1 rounded-xl border border-[var(--border-default)] bg-white/60 px-4 py-3 text-base outline-none focus:border-[var(--accent-purple)] placeholder:text-[var(--text-tertiary)]"
                   placeholder="貼上 YouTube 歌枠網址..."
                   value={vodUrl}

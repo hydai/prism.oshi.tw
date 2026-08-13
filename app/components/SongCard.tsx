@@ -128,6 +128,8 @@ function SongCardInner({ song, isExpanded, onToggleExpand, onPlay, onAddToQueue,
                 style={{ width: '32px', height: '32px' }}
               >
                 <button
+                  type="button"
+                  aria-label={`播放 ${song.title}（${perf.date}）`}
                   onClick={() => {
                     if (!unavailableVideoIds.has(perf.videoId)) {
                       onPlay({
@@ -165,6 +167,8 @@ function SongCardInner({ song, isExpanded, onToggleExpand, onPlay, onAddToQueue,
               <div className="min-w-0 pl-1 lg:pl-3 flex items-center gap-2 lg:block">
                 {/* Mobile play button */}
                 <button
+                  type="button"
+                  aria-label={`播放 ${song.title}（${perf.date}）`}
                   onClick={() => {
                     if (!unavailableVideoIds.has(perf.videoId)) {
                       onPlay({

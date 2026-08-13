@@ -80,6 +80,8 @@ function TimelineRowInner({ song, index, isCurrentlyPlaying, isUnavailable, isLi
           {index + 1}
         </span>
         <button
+          type="button"
+          aria-label={`播放 ${song.title}`}
           onClick={() => {
             if (!isUnavailable) {
               onPlay(track);
