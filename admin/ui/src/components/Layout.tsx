@@ -1,5 +1,5 @@
 import { NavLink, useNavigate } from 'react-router-dom';
-import { useEffect, useState, type ReactNode } from 'react';
+import { useEffect, useEffectEvent, useState, type ReactNode } from 'react';
 import type { AuthUser, StreamerInfo } from '../../../shared/types';
 import { api, getCurrentStreamer, setCurrentStreamer, onStreamerChange } from '../api/client';
 
@@ -30,6 +30,7 @@ export default function Layout({ user, children }: { user: AuthUser; children: R
   const navigate = useNavigate();
   const [streamer, setStreamer] = useState(getCurrentStreamer);
   const [streamers, setStreamers] = useState<StreamerInfo[]>([]);
+  const navigateToDashboard = useEffectEvent(() => navigate('/'));
 
   useEffect(() => onStreamerChange(setStreamer), []);
 
@@ -41,13 +42,13 @@ export default function Layout({ user, children }: { user: AuthUser; children: R
         const first = res.data[0];
         if (first && !res.data.some((s) => s.slug === getCurrentStreamer())) {
           setCurrentStreamer(first.slug);
-          navigate('/');
+          navigateToDashboard();
         }
       })
       .catch(() => {
         // Fallback: keep current localStorage value
       });
-  }, [navigate]);
+  }, []);
 
   return (
     <div className="flex h-screen">
