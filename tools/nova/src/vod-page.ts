@@ -170,9 +170,6 @@ const VOD_SCRIPT = String.raw`
               if (data.inAdmin && data.adminStatus === 'approved') {
                 urlCheck.className = 'check-ok';
                 urlCheck.textContent = '此 VOD 已收錄於歌單中，無需再提交';
-              } else if (data.inAdmin && (data.adminStatus === 'pending' || data.adminStatus === 'extracted')) {
-                urlCheck.className = 'check-resubmit';
-                urlCheck.textContent = '此 VOD 正在處理中，請耐心等候';
               } else if (data.exists && data.hasApproved) {
                 urlCheck.className = 'check-exists';
                 urlCheck.textContent = '此 VOD 已通過審核，無需重複提交';
@@ -182,6 +179,10 @@ const VOD_SCRIPT = String.raw`
               } else if (data.exists && data.rejectedCount > 0) {
                 urlCheck.className = 'check-exists';
                 urlCheck.textContent = '此 VOD 先前的提交已被拒絕，歡迎重新提交修正版本';
+              } else if (data.inAdmin && (data.adminStatus === 'pending' || data.adminStatus === 'extracted')) {
+                // Pipeline state alone does not mean a Nova submission exists.
+                urlCheck.style.display = 'none';
+                urlCheck.textContent = '';
               } else {
                 urlCheck.className = 'check-ok';
                 urlCheck.textContent = '此 VOD 尚未被提交';
@@ -288,10 +289,16 @@ const VOD_SCRIPT = String.raw`
             thumbnailUrl = '';
             if (window.turnstile) turnstile.reset();
           } else if (res.status === 409) {
-            resultDiv.className = 'result-msg result-warning';
-            resultDiv.textContent = data.inAdmin
-              ? (data.adminStatus === 'approved' ? '此 VOD 已收錄於歌單中，無需再提交' : '此 VOD 正在處理中，請耐心等候')
-              : '此 VOD 已通過審核，無需重複提交';
+            if (data.inAdmin && (data.adminStatus === 'pending' || data.adminStatus === 'extracted')) {
+              // Keep pipeline-only conflicts silent until they can be distinguished from submissions.
+              resultDiv.style.display = 'none';
+              resultDiv.textContent = '';
+            } else {
+              resultDiv.className = 'result-msg result-warning';
+              resultDiv.textContent = data.inAdmin
+                ? '此 VOD 已收錄於歌單中，無需再提交'
+                : '此 VOD 已通過審核，無需重複提交';
+            }
           } else {
             resultDiv.className = 'result-msg result-error';
             resultDiv.textContent = data.error || '提交失敗，請稍後再試';
@@ -300,7 +307,7 @@ const VOD_SCRIPT = String.raw`
           resultDiv.className = 'result-msg result-error';
           resultDiv.textContent = '網路錯誤，請檢查連線後再試';
         } finally {
-          resultDiv.style.display = '';
+          resultDiv.style.display = resultDiv.textContent ? '' : 'none';
           submitBtn.disabled = false;
           submitBtn.textContent = '提交 VOD';
         }

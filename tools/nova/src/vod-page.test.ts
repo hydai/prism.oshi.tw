@@ -51,10 +51,25 @@ function testRejectsInvalidStreamerSlug(): void {
   console.log('invalid streamer slugs are excluded from dropdown options');
 }
 
+function testHidesAdminProcessingMessage(): void {
+  const html = render([]);
+  const pipelineCondition = "data.inAdmin && (data.adminStatus === 'pending' || data.adminStatus === 'extracted')";
+
+  assert(!html.includes('此 VOD 正在處理中，請耐心等候'), 'admin processing message is not rendered');
+  assert(
+    html.split(pipelineCondition).length - 1 === 2,
+    'pending and extracted pipeline entries are hidden during both checks and submission',
+  );
+  assert(html.includes("resultDiv.style.display = resultDiv.textContent ? '' : 'none'"), 'empty result messages stay hidden');
+  assert(html.includes('筆提交（審核中），你仍可提交新版本'), 'real pending Nova submissions still show their count');
+  console.log('admin processing message is hidden while pipeline blocking remains intact');
+}
+
 try {
   testEscapesStreamerOptionFields();
   testRendersValidStreamerSlug();
   testRejectsInvalidStreamerSlug();
+  testHidesAdminProcessingMessage();
   console.log('vod-page.test: all passed');
 } catch (error) {
   console.error(error);
