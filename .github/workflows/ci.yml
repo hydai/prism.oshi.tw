@@ -56,9 +56,9 @@ jobs:
           - name: Admin worker check
             path: admin
             command: npm run check
-          - name: Admin UI build
+          - name: Admin UI check
             path: admin/ui
-            command: npm run build
+            command: npm run check
           - name: Aurora build
             path: tools/aurora
             command: npm run build
