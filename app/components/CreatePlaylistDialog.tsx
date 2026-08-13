@@ -50,16 +50,17 @@ export default function CreatePlaylistDialog({ show, onClose, onSuccess }: Creat
   return createPortal(
     <>
       {/* Backdrop */}
-      <div
+      <button
+        type="button"
         className="fixed inset-0 bg-black/50 backdrop-blur-sm z-50"
         onClick={onClose}
+        aria-label="關閉建立播放清單對話框"
         data-testid="create-playlist-backdrop"
       />
 
       {/* Dialog */}
       <div
         className="fixed top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-full max-w-md bg-white/10 backdrop-blur-md border border-white/20 rounded-lg shadow-2xl z-50 p-6"
-        onClick={(e) => e.stopPropagation()}
         data-testid="create-playlist-dialog"
       >
         <div className="flex items-center justify-between mb-4">

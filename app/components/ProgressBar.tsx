@@ -5,6 +5,7 @@ import { useRef, useCallback } from 'react';
 interface ProgressBarProps {
   progress: number;
   onSeek: (percentage: number) => void;
+  disabled?: boolean;
   height?: number;
   showTimestamps?: boolean;
   currentTime?: string;
@@ -15,6 +16,7 @@ interface ProgressBarProps {
 export default function ProgressBar({
   progress,
   onSeek,
+  disabled = false,
   height = 4,
   showTimestamps,
   currentTime,
@@ -42,10 +44,48 @@ export default function ProgressBar({
     onSeek(getPercentage(e.touches[0].clientX));
   };
 
+  const handleKeyDown = (e: React.KeyboardEvent<HTMLDivElement>) => {
+    const current = clamped / 100;
+    const next = (() => {
+      switch (e.key) {
+        case 'ArrowRight':
+        case 'ArrowUp':
+          return current + 0.05;
+        case 'ArrowLeft':
+        case 'ArrowDown':
+          return current - 0.05;
+        case 'PageUp':
+          return current + 0.1;
+        case 'PageDown':
+          return current - 0.1;
+        case 'Home':
+          return 0;
+        case 'End':
+          return 1;
+        default:
+          return null;
+      }
+    })();
+
+    if (next === null) return;
+    e.preventDefault();
+    onSeek(Math.min(1, Math.max(0, next)));
+  };
+
   if (variant === 'mini') {
     return (
       <div
+        role="slider"
+        tabIndex={disabled ? -1 : 0}
+        aria-label="播放進度"
+        aria-disabled={disabled || undefined}
+        aria-valuemin={0}
+        aria-valuemax={100}
+        aria-valuenow={Math.round(clamped)}
+        aria-valuetext={disabled ? '歌曲時長不明，無法調整進度' : `${Math.round(clamped)}%`}
+        onKeyDown={disabled ? undefined : handleKeyDown}
         ref={barRef}
+        className="focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--accent-pink-light)]"
         style={{
           height: `${height}px`,
           background: 'var(--bg-surface-muted)',
@@ -53,9 +93,9 @@ export default function ProgressBar({
           overflow: 'hidden',
           touchAction: 'none',
         }}
-        onClick={handleClick}
-        onTouchStart={handleTouchStart}
-        onTouchMove={handleTouchMove}
+        onClick={disabled ? undefined : handleClick}
+        onTouchStart={disabled ? undefined : handleTouchStart}
+        onTouchMove={disabled ? undefined : handleTouchMove}
       >
         <div
           style={{
@@ -72,17 +112,26 @@ export default function ProgressBar({
 
   const bar = (
     <div
+      role="slider"
+      tabIndex={disabled ? -1 : 0}
+      aria-label="播放進度"
+      aria-disabled={disabled || undefined}
+      aria-valuemin={0}
+      aria-valuemax={100}
+      aria-valuenow={Math.round(clamped)}
+      aria-valuetext={disabled ? '歌曲時長不明，無法調整進度' : `${Math.round(clamped)}%`}
+      onKeyDown={disabled ? undefined : handleKeyDown}
       ref={barRef}
-      className="flex-1 cursor-pointer relative group"
+      className={`group relative flex-1 ${disabled ? 'cursor-default' : 'cursor-pointer'} focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--accent-pink-light)]`}
       style={{
         height: `${height}px`,
         borderRadius: `${height / 2}px`,
         background: 'var(--bg-surface-muted)',
         touchAction: 'none',
       }}
-      onClick={handleClick}
-      onTouchStart={handleTouchStart}
-      onTouchMove={handleTouchMove}
+      onClick={disabled ? undefined : handleClick}
+      onTouchStart={disabled ? undefined : handleTouchStart}
+      onTouchMove={disabled ? undefined : handleTouchMove}
     >
       <div
         style={{

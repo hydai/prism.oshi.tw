@@ -912,26 +912,29 @@ export default function StampEditor({ user }: { user: AuthUser }) {
         </div>
         <ul className="flex-1 overflow-y-auto">
           {filteredStreams.map((stream) => (
-            <li
-              key={stream.id}
-              onClick={() => selectStream(stream)}
-              className={`cursor-pointer border-b border-slate-100 px-3 py-2.5 transition-colors hover:bg-slate-50 ${
-                stream.id === selectedStreamId
-                  ? 'border-l-2 border-l-blue-500 bg-blue-50'
-                  : ''
-              }`}
-            >
-              <div className="flex items-center gap-1.5">
-                <span className="truncate text-sm font-medium text-slate-800">
-                  {stream.title || stream.videoId}
-                </span>
-                {stream.pendingCount > 0 && (
-                  <span className="flex-shrink-0 rounded-full bg-amber-100 px-1.5 py-0.5 text-[10px] font-semibold text-amber-700">
-                    {stream.pendingCount}
+            <li key={stream.id}>
+              <button
+                type="button"
+                onClick={() => selectStream(stream)}
+                aria-pressed={stream.id === selectedStreamId}
+                className={`block w-full cursor-pointer border-b border-slate-100 px-3 py-2.5 text-left transition-colors hover:bg-slate-50 ${
+                  stream.id === selectedStreamId
+                    ? 'border-l-2 border-l-blue-500 bg-blue-50'
+                    : ''
+                }`}
+              >
+                <span className="flex items-center gap-1.5">
+                  <span className="truncate text-sm font-medium text-slate-800">
+                    {stream.title || stream.videoId}
                   </span>
-                )}
-              </div>
-              <div className="mt-0.5 text-xs text-slate-500">{stream.date}</div>
+                  {stream.pendingCount > 0 && (
+                    <span className="flex-shrink-0 rounded-full bg-amber-100 px-1.5 py-0.5 text-[10px] font-semibold text-amber-700">
+                      {stream.pendingCount}
+                    </span>
+                  )}
+                </span>
+                <span className="mt-0.5 block text-xs text-slate-500">{stream.date}</span>
+              </button>
             </li>
           ))}
           {filteredStreams.length === 0 && (
@@ -1082,24 +1085,29 @@ export default function StampEditor({ user }: { user: AuthUser }) {
                   No songs in this stream
                 </div>
               ) : (
-                <ul>
+                <ul aria-label="Songs in selected stream">
                   {performances.map((perf, i) => (
                     <li
                       key={perf.id}
-                      onClick={() => {
-                        setSelectedIndex(i);
-                        setEditingField(null);
-                      }}
-                      className={`flex cursor-pointer items-center gap-2 border-b border-slate-100 px-3 py-2 text-sm transition-colors hover:bg-slate-50 ${
+                      className={`flex items-center gap-2 border-b border-slate-100 px-3 py-2 text-sm transition-colors hover:bg-slate-50 ${
                         i === selectedIndex
                           ? 'border-l-2 border-l-blue-500 bg-blue-50'
                           : ''
                       }`}
                     >
                       {/* Index */}
-                      <span className="w-8 flex-shrink-0 text-xs font-medium text-slate-400">
+                      <button
+                        type="button"
+                        className="w-8 flex-shrink-0 text-left text-xs font-medium text-slate-400"
+                        onClick={() => {
+                          setSelectedIndex(i);
+                          setEditingField(null);
+                        }}
+                        aria-pressed={i === selectedIndex}
+                        title={`Select song ${i + 1}`}
+                      >
                         #{i + 1}
-                      </span>
+                      </button>
 
                       {/* Song name + artist (editable) */}
                       <div className="min-w-0 flex-1">
@@ -1110,16 +1118,23 @@ export default function StampEditor({ user }: { user: AuthUser }) {
                             onCancel={() => setEditingField(null)}
                           />
                         ) : (
-                          <span
-                            className="cursor-text truncate font-medium text-slate-800"
-                            onDoubleClick={(e) => {
-                              e.stopPropagation();
+                          <button
+                            type="button"
+                            className="max-w-full cursor-text truncate text-left align-bottom font-medium text-slate-800"
+                            onClick={() => setSelectedIndex(i)}
+                            onDoubleClick={() => {
                               setEditingField({ index: i, field: 'title' });
                             }}
-                            title="Double-click to edit title"
+                            onKeyDown={(event) => {
+                              if (event.key === 'F2') {
+                                event.preventDefault();
+                                setEditingField({ index: i, field: 'title' });
+                              }
+                            }}
+                            title="Double-click or press F2 to edit title"
                           >
                             {perf.title}
-                          </span>
+                          </button>
                         )}
                         {editingField?.index === i && editingField.field === 'artist' ? (
                           <InlineEdit
@@ -1129,20 +1144,27 @@ export default function StampEditor({ user }: { user: AuthUser }) {
                             onCancel={() => setEditingField(null)}
                           />
                         ) : (
-                          <span
-                            className={`ml-1 cursor-text truncate text-xs ${
+                          <button
+                            type="button"
+                            className={`ml-1 max-w-full cursor-text truncate text-left align-bottom text-xs ${
                               perf.originalArtist
                                 ? 'text-slate-500'
                                 : 'italic text-slate-400'
                             }`}
-                            onDoubleClick={(e) => {
-                              e.stopPropagation();
+                            onClick={() => setSelectedIndex(i)}
+                            onDoubleClick={() => {
                               setEditingField({ index: i, field: 'artist' });
                             }}
-                            title="Double-click to edit artist"
+                            onKeyDown={(event) => {
+                              if (event.key === 'F2') {
+                                event.preventDefault();
+                                setEditingField({ index: i, field: 'artist' });
+                              }
+                            }}
+                            title="Double-click or press F2 to edit artist"
                           >
                             {perf.originalArtist ? ` \u2014 ${perf.originalArtist}` : ' add artist'}
-                          </span>
+                          </button>
                         )}
                       </div>
 

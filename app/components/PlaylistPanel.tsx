@@ -231,11 +231,14 @@ export default function PlaylistPanel({ show, onClose, songsData, onToast }: Pla
                     ) : (
                       <>
                         <div className="flex items-center justify-between mb-2">
-                          <h3
-                            className="text-white font-medium cursor-pointer"
-                            onClick={() => setSelectedPlaylistId(playlist.id)}
-                          >
-                            {playlist.name}
+                          <h3 className="min-w-0 text-white font-medium">
+                            <button
+                              type="button"
+                              className="max-w-full cursor-pointer truncate text-left"
+                              onClick={() => setSelectedPlaylistId(playlist.id)}
+                            >
+                              {playlist.name}
+                            </button>
                           </h3>
                           <div className="flex items-center gap-2 lg:opacity-0 lg:group-hover:opacity-100 transition-opacity">
                             <button

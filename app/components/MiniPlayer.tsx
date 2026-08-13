@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect } from 'react';
+import { useEffect, useId } from 'react';
 import { usePathname } from 'next/navigation';
 import Link from 'next/link';
 import { Play, Pause, SkipBack, SkipForward, ListMusic, AlertCircle, Shuffle, Repeat, Repeat1, Maximize2, Heart } from 'lucide-react';
@@ -31,6 +31,7 @@ export default function MiniPlayer() {
 
   const { trackCurrentTime, trackDuration } = usePlaybackTime();
   const { isLiked, toggleLike } = useLikedSongs();
+  const playerErrorId = useId();
 
   const pathname = usePathname();
   const pageSlug = pathname?.split('/')[1] || '';
@@ -53,13 +54,12 @@ export default function MiniPlayer() {
   // Keyboard navigation: Space for play/pause when player is active
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
-      // Only handle Space if no input/textarea/button is focused
+      // Let focused controls handle Space themselves.
       const activeElement = document.activeElement;
-      const isInputFocused = activeElement instanceof HTMLInputElement ||
-        activeElement instanceof HTMLTextAreaElement ||
-        activeElement instanceof HTMLSelectElement;
+      const isControlFocused = activeElement instanceof HTMLElement
+        && activeElement.matches('input, textarea, select, button, a[href], [role="slider"], [contenteditable="true"]');
 
-      if (e.code === 'Space' && !isInputFocused && currentTrack) {
+      if (e.code === 'Space' && !isControlFocused && currentTrack) {
         e.preventDefault();
         togglePlayPause();
       }
@@ -89,6 +89,12 @@ export default function MiniPlayer() {
       className="fixed left-0 right-0 z-[60] mini-player-bottom"
       style={{ display: isNowPlayingPage ? 'none' : undefined }}
     >
+      {playerError && (
+        <span id={playerErrorId} role="status" className="sr-only">
+          {playerError}
+        </span>
+      )}
+
       {/* ── MOBILE MINI PLAYER (hidden on lg+) ── */}
       <div
         className="lg:hidden"
@@ -103,39 +109,50 @@ export default function MiniPlayer() {
         }}
       >
         {/* Progress bar at top — 3px height, gradient fill */}
-        <ProgressBar progress={clampedProgress} onSeek={handleSeek} height={3} variant="mini" />
+        <ProgressBar
+          progress={clampedProgress}
+          onSeek={handleSeek}
+          disabled={!hasKnownDuration}
+          height={3}
+          variant="mini"
+        />
 
         {/* Content row: cover + song info + queue + play/pause */}
         <div
           className="flex items-center"
-          style={{ padding: '10px 16px', gap: '12px', cursor: 'pointer' }}
-          onClick={(e) => {
-            if ((e.target as HTMLElement).closest('button')) return;
-            setShowModal(true);
-          }}
+          style={{ padding: '10px 16px', gap: '12px' }}
         >
-          {/* Cover thumbnail — 40×40 */}
-          <AlbumArt
-            src={currentTrack.albumArtUrl}
-            alt={`${currentTrack.title} - ${currentTrack.originalArtist}`}
-            size={40}
-          />
+          <button
+            type="button"
+            className="flex min-w-0 flex-1 items-center text-left"
+            style={{ gap: '12px' }}
+            onClick={() => setShowModal(true)}
+            aria-label={`開啟正在播放：${currentTrack.title}`}
+            aria-describedby={playerError ? playerErrorId : undefined}
+          >
+            {/* Cover thumbnail — 40×40 */}
+            <AlbumArt
+              src={currentTrack.albumArtUrl}
+              alt={`${currentTrack.title} - ${currentTrack.originalArtist}`}
+              size={40}
+            />
 
-          {/* Song info — vertical, gap 2, fill remaining space */}
-          <div className="flex flex-col min-w-0 flex-1" style={{ gap: '2px' }}>
-            <div
-              className="truncate"
-              style={{ fontSize: '13px', fontWeight: 600, color: 'var(--text-primary)' }}
-            >
-              {currentTrack.title}
+            {/* Song info — vertical, gap 2, fill remaining space */}
+            <div className="flex min-w-0 flex-1 flex-col" style={{ gap: '2px' }}>
+              <div
+                className="truncate"
+                style={{ fontSize: '13px', fontWeight: 600, color: 'var(--text-primary)' }}
+              >
+                {currentTrack.title}
+              </div>
+              <div
+                className="truncate"
+                style={{ fontSize: '11px', color: 'var(--text-secondary)' }}
+              >
+                {currentTrack.originalArtist}
+              </div>
             </div>
-            <div
-              className="truncate"
-              style={{ fontSize: '11px', color: 'var(--text-secondary)' }}
-            >
-              {currentTrack.originalArtist}
-            </div>
-          </div>
+          </button>
 
           {/* Like button — mobile */}
           <button
@@ -214,17 +231,15 @@ export default function MiniPlayer() {
         {/* 3-column layout */}
         <div
           className="flex items-center h-full px-4 gap-4"
-          onClick={(e) => {
-            // Don't expand if clicking on buttons or interactive elements
-            if ((e.target as HTMLElement).closest('button, input')) return;
-            setShowModal(true);
-          }}
-          style={{ cursor: 'pointer' }}
         >
           {/* LEFT COLUMN: 280px — album art, track info */}
-          <div
-            className="flex items-center gap-3 flex-shrink-0"
+          <button
+            type="button"
+            className="flex flex-shrink-0 items-center gap-3 text-left"
             style={{ width: '280px' }}
+            onClick={() => setShowModal(true)}
+            aria-label={`開啟正在播放：${currentTrack.title}`}
+            aria-describedby={playerError ? playerErrorId : undefined}
           >
             {/* Album cover thumbnail — 48×48 desktop */}
             <AlbumArt
@@ -246,6 +261,7 @@ export default function MiniPlayer() {
                   className="flex items-center gap-1 truncate text-red-500"
                   style={{ fontSize: 'var(--font-size-xs)' }}
                   data-testid="player-error-message"
+                  aria-hidden="true"
                 >
                   <AlertCircle style={{ width: '12px', height: '12px', flexShrink: 0 }} />
                   <span>{playerError}</span>
@@ -259,13 +275,12 @@ export default function MiniPlayer() {
                 </div>
               )}
             </div>
-          </div>
+          </button>
 
           {/* CENTER COLUMN: fill — transport controls + progress bar */}
           <div
             className="flex-1 flex flex-col items-center justify-center gap-1"
             style={{ minWidth: 0 }}
-            onClick={(e) => e.stopPropagation()}
           >
             {/* Transport controls row */}
             <div className="flex items-center gap-4">
@@ -354,7 +369,12 @@ export default function MiniPlayer() {
               >
                 {formatTime(trackCurrentTime)}
               </span>
-              <ProgressBar progress={clampedProgress} onSeek={handleSeek} height={4} />
+              <ProgressBar
+                progress={clampedProgress}
+                onSeek={handleSeek}
+                disabled={!hasKnownDuration}
+                height={4}
+              />
               <span
                 className="flex-shrink-0 font-mono"
                 style={{ fontSize: 'var(--font-size-xs)', color: 'var(--text-tertiary)', minWidth: '32px' }}
@@ -368,7 +388,6 @@ export default function MiniPlayer() {
           <div
             className="flex items-center gap-3 flex-shrink-0 justify-end"
             style={{ width: '200px' }}
-            onClick={(e) => e.stopPropagation()}
           >
             {/* Expand to full Now Playing page */}
             <Link

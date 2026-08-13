@@ -30,10 +30,11 @@ interface InlineCellProps {
   onCommit: (value: string) => void;
   className?: string;
   onClick?: () => void;
+  onFocus?: () => void;
   placeholder?: string;
 }
 
-function InlineCell({ value, onCommit, className = '', onClick, placeholder }: InlineCellProps) {
+function InlineCell({ value, onCommit, className = '', onClick, onFocus, placeholder }: InlineCellProps) {
   const [editing, setEditing] = useState(false);
   const [draft, setDraft] = useState(value);
   const inputRef = useRef<HTMLInputElement>(null);
@@ -47,6 +48,7 @@ function InlineCell({ value, onCommit, className = '', onClick, placeholder }: I
         ref={inputRef}
         className={`bg-white/80 border border-[var(--border-default)] rounded px-1 py-0.5 text-base w-full outline-none focus:border-[var(--accent-purple)] ${className}`}
         value={draft}
+        onFocus={onFocus}
         onChange={(e) => setDraft(e.target.value)}
         onBlur={() => { onCommit(draft); setEditing(false); }}
         onKeyDown={(e) => {
@@ -58,14 +60,22 @@ function InlineCell({ value, onCommit, className = '', onClick, placeholder }: I
   }
 
   return (
-    <span
-      className={`cursor-text hover:bg-white/60 rounded px-1 py-0.5 min-h-[24px] inline-block ${className}`}
+    <button
+      type="button"
+      className={`inline-block min-h-[24px] cursor-text rounded px-1 py-0.5 text-left hover:bg-white/60 ${className}`}
+      onFocus={onFocus}
       onClick={(e) => { onClick?.(); if (!onClick) setEditing(true); e.stopPropagation(); }}
       onDoubleClick={() => setEditing(true)}
+      onKeyDown={(e) => {
+        if (e.key === 'F2') {
+          e.preventDefault();
+          setEditing(true);
+        }
+      }}
       title={onClick ? '點擊跳轉 / 雙擊編輯' : '點擊編輯'}
     >
       {value || <span className="text-[var(--text-tertiary)]">{placeholder || '—'}</span>}
-    </span>
+    </button>
   );
 }
 
@@ -93,18 +103,23 @@ export default function SongListEditor({ songs, selectedIndex, onSelect, onUpdat
       {songs.map((song, i) => (
         <div
           key={song.id}
-          className={`group flex items-center gap-2 px-3 py-2 rounded-lg transition-colors cursor-pointer ${
+          className={`group flex items-center gap-2 px-3 py-2 rounded-lg transition-colors ${
             selectedIndex === i
               ? 'bg-[var(--accent-purple)]/10 border border-[var(--accent-purple)]/30'
               : 'hover:bg-white/40 border border-transparent'
           }`}
-          onClick={() => onSelect(i)}
           data-testid="song-row"
         >
           {/* Row number */}
-          <span className="text-[var(--text-tertiary)] text-[12px] font-mono w-6 text-right shrink-0">
+          <button
+            type="button"
+            className="w-6 shrink-0 text-right font-mono text-[12px] text-[var(--text-tertiary)]"
+            onClick={() => onSelect(i)}
+            aria-pressed={selectedIndex === i}
+            aria-label={`選取第 ${i + 1} 首：${song.name || '未命名歌曲'}`}
+          >
             {String(i + 1).padStart(2, '0')}
-          </span>
+          </button>
 
           {/* Song info */}
           <div className="flex-1 min-w-0 flex flex-col gap-0.5">
@@ -112,6 +127,7 @@ export default function SongListEditor({ songs, selectedIndex, onSelect, onUpdat
               <InlineCell
                 value={song.name}
                 onCommit={(v) => onUpdate(i, { name: v })}
+                onFocus={() => onSelect(i)}
                 className="font-medium text-[var(--text-primary)] flex-1"
                 placeholder="歌名"
               />
@@ -120,6 +136,7 @@ export default function SongListEditor({ songs, selectedIndex, onSelect, onUpdat
               <InlineCell
                 value={song.artist}
                 onCommit={(v) => onUpdate(i, { artist: v })}
+                onFocus={() => onSelect(i)}
                 className="text-[var(--text-secondary)] flex-1"
                 placeholder="原唱"
               />
@@ -131,6 +148,7 @@ export default function SongListEditor({ songs, selectedIndex, onSelect, onUpdat
             <InlineCell
               value={toHMS(song.startSeconds)}
               onClick={() => onSeekTo(song.startSeconds)}
+              onFocus={() => onSelect(i)}
               onCommit={(v) => {
                 const sec = parseHMS(v);
                 if (sec !== null) onUpdate(i, { startSeconds: sec });
@@ -141,6 +159,7 @@ export default function SongListEditor({ songs, selectedIndex, onSelect, onUpdat
             <InlineCell
               value={song.endSeconds !== null ? toHMS(song.endSeconds) : '--:--:--'}
               onClick={() => { if (song.endSeconds !== null) onSeekTo(song.endSeconds); }}
+              onFocus={() => onSelect(i)}
               onCommit={(v) => {
                 if (v === '--:--:--' || v === '') {
                   onUpdate(i, { endSeconds: null });
