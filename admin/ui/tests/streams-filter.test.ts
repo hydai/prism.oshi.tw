@@ -47,6 +47,16 @@ function main(): void {
   const empty = loadStreamsFilter();
   assert(empty.status === '' && empty.year === '', 'empty storage yields defaults');
 
+  // The unversioned key migrates without losing a remembered filter.
+  localStorage.setItem(
+    'prism_admin_streams_filter',
+    JSON.stringify({ status: 'pending', year: '2024' }),
+  );
+  const migrated = loadStreamsFilter();
+  assert(migrated.status === 'pending' && migrated.year === '2024', 'legacy filter migrates');
+  assert(localStorage.getItem('prism_admin_streams_filter') === null, 'legacy key is removed');
+  assert(localStorage.getItem(STREAMS_FILTER_KEY) !== null, 'versioned key is populated');
+
   // A saved filter round-trips through save -> load.
   saveStreamsFilter({ status: 'approved', year: '2025' });
   const restored = loadStreamsFilter();

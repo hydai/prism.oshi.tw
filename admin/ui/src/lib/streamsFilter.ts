@@ -8,7 +8,8 @@ export interface StreamsFilter {
 }
 
 /** Single global key — the same remembered choice across all streamers. */
-export const STREAMS_FILTER_KEY = 'prism_admin_streams_filter';
+export const STREAMS_FILTER_KEY = 'prism_admin_streams_filter:v1';
+const LEGACY_STREAMS_FILTER_KEY = 'prism_admin_streams_filter';
 
 const VALID_STATUSES: readonly Status[] = [
   'pending',
@@ -27,7 +28,9 @@ const DEFAULT_FILTER: StreamsFilter = { status: '', year: '' };
  */
 export function loadStreamsFilter(): StreamsFilter {
   try {
-    const raw = localStorage.getItem(STREAMS_FILTER_KEY);
+    let raw = localStorage.getItem(STREAMS_FILTER_KEY);
+    const shouldMigrate = raw === null;
+    if (shouldMigrate) raw = localStorage.getItem(LEGACY_STREAMS_FILTER_KEY);
     if (!raw) return { ...DEFAULT_FILTER };
     const parsed = JSON.parse(raw) as Partial<Record<keyof StreamsFilter, unknown>>;
     const status =
@@ -35,7 +38,16 @@ export function loadStreamsFilter(): StreamsFilter {
         ? (parsed.status as Status)
         : '';
     const year = typeof parsed.year === 'string' && /^\d{4}$/.test(parsed.year) ? parsed.year : '';
-    return { status, year };
+    const filter: StreamsFilter = { status, year };
+    if (shouldMigrate) {
+      try {
+        localStorage.setItem(STREAMS_FILTER_KEY, JSON.stringify(filter));
+        localStorage.removeItem(LEGACY_STREAMS_FILTER_KEY);
+      } catch {
+        // Return the recovered filter even when migration cannot be persisted.
+      }
+    }
+    return filter;
   } catch {
     return { ...DEFAULT_FILTER };
   }
