@@ -10,6 +10,9 @@ test.describe('interactive semantics', () => {
     await page.keyboard.press('Enter');
 
     await expect(page.getByTestId('create-playlist-dialog')).toBeVisible();
+    const nameInput = page.getByTestId('playlist-name-input');
+    await expect(nameInput).toBeFocused();
+    await nameInput.fill('暫存播放清單');
 
     const backdrop = page.getByTestId('create-playlist-backdrop');
     await expect(backdrop).toHaveRole('button');
@@ -17,6 +20,11 @@ test.describe('interactive semantics', () => {
     await page.keyboard.press('Enter');
 
     await expect(page.getByTestId('create-playlist-dialog')).toBeHidden();
+
+    await createButton.focus();
+    await page.keyboard.press('Enter');
+    await expect(nameInput).toBeFocused();
+    await expect(nameInput).toHaveValue('');
   });
 
   test('plays a timeline row from its semantic title control', async ({ page }) => {
@@ -48,7 +56,17 @@ test.describe('interactive semantics', () => {
     const titleButton = page.getByTestId('song-list-editor').getByRole('button', { name: '歌名' });
     await titleButton.focus();
     await page.keyboard.press('Space');
-    await expect(page.getByTestId('song-list-editor').getByRole('textbox')).toBeVisible();
+    const titleInput = page.getByTestId('song-list-editor').getByRole('textbox');
+    await expect(titleInput).toBeVisible();
+    await titleInput.fill('測試歌曲');
+    await page.keyboard.press('Enter');
+
+    const updatedTitleButton = page
+      .getByTestId('song-list-editor')
+      .getByRole('button', { name: '測試歌曲', exact: true });
+    await updatedTitleButton.focus();
+    await page.keyboard.press('F2');
+    await expect(titleInput).toHaveValue('測試歌曲');
   });
 
   test('disables seeking when a performance has no known duration', async ({ page }) => {
