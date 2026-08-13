@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef, useCallback, useMemo } from 'react';
+import { useState, useEffect, useEffectEvent, useRef, useCallback, useMemo } from 'react';
 import { useParams, useNavigate, Link, useSearchParams } from 'react-router-dom';
 import type { AuthUser, StreamDetail as StreamDetailType, StampPerformance, Status, Stream } from '../../../shared/types';
 import { api } from '../api/client';
@@ -723,43 +723,43 @@ export default function StreamDetail({ user }: { user: AuthUser }) {
   }, [streamId, loadDetail, showToast]);
 
   // --- Keyboard shortcuts ---
+  const handleShortcutKeyDown = useEffectEvent((e: KeyboardEvent) => {
+    const target = e.target as HTMLElement;
+    if (target.tagName === 'INPUT' || target.tagName === 'TEXTAREA') return;
+    if (showAddModal || showPasteImport) return;
+
+    switch (e.key) {
+      case 'm': markEndTimestamp(); break;
+      case 't': markStartTimestamp(); break;
+      case 's': seekToStart(); break;
+      case 'e': seekToEnd(5); break;
+      case 'E': seekToEnd(0); break;
+      case 'n': selectNext(); break;
+      case 'p': selectPrev(); break;
+      case 'c': copyVodUrl(); break;
+      case 'f': fetchDuration(); break;
+      case 'F': fetchAllDurations(); break;
+      case 'x': exportSongList(); break;
+      case 'i': if (streamId) setShowPasteImport(true); break;
+      case 'ArrowLeft':
+        if (playerRef.current) {
+          e.preventDefault();
+          playerRef.current.seekTo(playerRef.current.getCurrentTime() - 5);
+        }
+        break;
+      case 'ArrowRight':
+        if (playerRef.current) {
+          e.preventDefault();
+          playerRef.current.seekTo(playerRef.current.getCurrentTime() + 5);
+        }
+        break;
+    }
+  });
+
   useEffect(() => {
-    const handler = (e: KeyboardEvent) => {
-      const target = e.target as HTMLElement;
-      if (target.tagName === 'INPUT' || target.tagName === 'TEXTAREA') return;
-      if (showAddModal || showPasteImport) return;
-
-      switch (e.key) {
-        case 'm': markEndTimestamp(); break;
-        case 't': markStartTimestamp(); break;
-        case 's': seekToStart(); break;
-        case 'e': seekToEnd(5); break;
-        case 'E': seekToEnd(0); break;
-        case 'n': selectNext(); break;
-        case 'p': selectPrev(); break;
-        case 'c': copyVodUrl(); break;
-        case 'f': fetchDuration(); break;
-        case 'F': fetchAllDurations(); break;
-        case 'x': exportSongList(); break;
-        case 'i': if (streamId) setShowPasteImport(true); break;
-        case 'ArrowLeft':
-          if (playerRef.current) {
-            e.preventDefault();
-            playerRef.current.seekTo(playerRef.current.getCurrentTime() - 5);
-          }
-          break;
-        case 'ArrowRight':
-          if (playerRef.current) {
-            e.preventDefault();
-            playerRef.current.seekTo(playerRef.current.getCurrentTime() + 5);
-          }
-          break;
-      }
-    };
-
-    document.addEventListener('keydown', handler);
-    return () => document.removeEventListener('keydown', handler);
-  }, [markEndTimestamp, markStartTimestamp, seekToStart, seekToEnd, selectNext, selectPrev, copyVodUrl, exportSongList, fetchDuration, fetchAllDurations, showAddModal, showPasteImport, streamId]);
+    document.addEventListener('keydown', handleShortcutKeyDown);
+    return () => document.removeEventListener('keydown', handleShortcutKeyDown);
+  }, []);
 
   // --- Derived values ---
   const unstampedCount = detail ? detail.performances.filter(p => p.endTimestamp === null).length : 0;

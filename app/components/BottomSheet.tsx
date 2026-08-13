@@ -1,6 +1,6 @@
 'use client';
 
-import { useRef, useCallback, useEffect, useState } from 'react';
+import { useRef, useCallback, useEffect, useEffectEvent, useState } from 'react';
 import { createPortal } from 'react-dom';
 import { X } from 'lucide-react';
 
@@ -34,14 +34,15 @@ export default function BottomSheet({
     setMounted(true);
   }, []);
 
+  const handleKeyDown = useEffectEvent((e: KeyboardEvent) => {
+    if (e.key === 'Escape') onClose();
+  });
+
   useEffect(() => {
     if (!show) return;
-    const handleKeyDown = (e: KeyboardEvent) => {
-      if (e.key === 'Escape') onClose();
-    };
     window.addEventListener('keydown', handleKeyDown);
     return () => window.removeEventListener('keydown', handleKeyDown);
-  }, [show, onClose]);
+  }, [show]);
 
   const handleTouchStart = useCallback((e: React.TouchEvent) => {
     dragStartY.current = e.touches[0].clientY;

@@ -1,4 +1,4 @@
-import { useState, useRef, useCallback, useEffect } from 'react';
+import { useState, useRef, useCallback, useEffect, useEffectEvent } from 'react';
 import { ArrowLeft, Plus, FileText, Download, Trash2, Sparkles, Keyboard, Clock, Send, ExternalLink } from 'lucide-react';
 import { extractVideoId, validateYoutubeUrl } from './lib/utils';
 import { YouTubeEmbed, type YouTubeEmbedHandle } from './components/YouTubeEmbed';
@@ -395,32 +395,31 @@ export function App() {
   }, [selectedStreamer, songs, videoId, vodUrl, turnstileToken, submitStreamDate, submitNote]);
 
   // Keyboard shortcuts
+  const handleShortcutKeyDown = useEffectEvent((e: KeyboardEvent) => {
+    if (e.defaultPrevented || isInteractiveShortcutTarget(e.target)) return;
+
+    switch (e.key) {
+      case 't': handleSetStart(); break;
+      case 'm': handleSetEnd(); break;
+      case 's': handleSeekToStart(); break;
+      case 'e': handleSeekToEnd(); break;
+      case 'n': handleSelectNext(); break;
+      case 'p': handleSelectPrev(); break;
+      case 'a': addSong(); break;
+      case ' ': handleTogglePlay(); break;
+      case 'ArrowLeft': handleSeekBackward(); break;
+      case 'ArrowRight': handleSeekForward(); break;
+      case 'f': if (selectedIndex !== null && fillingIndex === null) handleFillDuration(selectedIndex); break;
+      default: return;
+    }
+    e.preventDefault();
+  });
+
   useEffect(() => {
     if (!videoId) return;
-
-    const handler = (e: KeyboardEvent) => {
-      if (e.defaultPrevented || isInteractiveShortcutTarget(e.target)) return;
-
-      switch (e.key) {
-        case 't': handleSetStart(); break;
-        case 'm': handleSetEnd(); break;
-        case 's': handleSeekToStart(); break;
-        case 'e': handleSeekToEnd(); break;
-        case 'n': handleSelectNext(); break;
-        case 'p': handleSelectPrev(); break;
-        case 'a': addSong(); break;
-        case ' ': handleTogglePlay(); break;
-        case 'ArrowLeft': handleSeekBackward(); break;
-        case 'ArrowRight': handleSeekForward(); break;
-        case 'f': if (selectedIndex !== null && fillingIndex === null) handleFillDuration(selectedIndex); break;
-        default: return;
-      }
-      e.preventDefault();
-    };
-
-    window.addEventListener('keydown', handler);
-    return () => window.removeEventListener('keydown', handler);
-  }, [videoId, addSong, handleTogglePlay, handleSeekBackward, handleSeekForward, handleSelectPrev, handleSelectNext, handleSetStart, handleSetEnd, handleSeekToStart, handleSeekToEnd, handleFillDuration, selectedIndex, fillingIndex]);
+    window.addEventListener('keydown', handleShortcutKeyDown);
+    return () => window.removeEventListener('keydown', handleShortcutKeyDown);
+  }, [videoId]);
 
   // Poll current playback time while playing
   useEffect(() => {
