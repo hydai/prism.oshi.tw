@@ -47,7 +47,7 @@ export default function Layout({ user, children }: { user: AuthUser; children: R
       .catch(() => {
         // Fallback: keep current localStorage value
       });
-  }, []);
+  }, [navigate]);
 
   return (
     <div className="flex h-screen">

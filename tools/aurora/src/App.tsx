@@ -10,20 +10,13 @@ import AuroraStampControls from './components/AuroraStampControls';
 import ThemeToggle from './components/ThemeToggle';
 import type { ParsedSong } from './lib/parse';
 import { fetchItunesDuration } from './lib/itunes';
+import { loadNovaStreamers, loadNovaVideoDate, type StreamerOption } from './lib/nova';
 
 const SHORTCUT_INTERACTIVE_SELECTOR =
   'input, textarea, select, button, a[href], [role="button"], [role="slider"], [contenteditable="true"]';
 
 function isInteractiveShortcutTarget(target: EventTarget | null): boolean {
   return target instanceof Element && target.closest(SHORTCUT_INTERACTIVE_SELECTOR) !== null;
-}
-
-// --- Streamer types ---
-
-interface StreamerOption {
-  slug: string;
-  display_name: string;
-  avatar_url: string;
 }
 
 // --- localStorage helpers ---
@@ -69,10 +62,11 @@ export function App() {
 
   // Fetch available streamers
   useEffect(() => {
-    fetch('https://nova.oshi.tw/vod/api/streamers')
-      .then(r => r.json())
-      .then(data => setStreamers(data))
+    const controller = new AbortController();
+    loadNovaStreamers(controller.signal)
+      .then(setStreamers)
       .catch(() => {}); // Silently fail - user can still use editor without streamer selection
+    return () => controller.abort();
   }, []);
 
   // Persist committed song state after a short debounce. Keeping this side
@@ -127,13 +121,14 @@ export function App() {
   // Auto-fetch stream date from Nova when video loads
   useEffect(() => {
     if (!videoId) return;
+    const controller = new AbortController();
     setSubmitStreamDate('');
     const url = vodUrl || `https://youtube.com/watch?v=${videoId}`;
-    fetch(`https://nova.oshi.tw/vod/api/video-info?url=${encodeURIComponent(url)}`)
-      .then((r) => r.ok ? r.json() : Promise.reject())
-      .then((info: { date?: string }) => { if (info.date) setSubmitStreamDate(info.date); })
+    loadNovaVideoDate(url, controller.signal)
+      .then((date) => { if (date) setSubmitStreamDate(date); })
       .catch(() => {});
-  }, [videoId]);
+    return () => controller.abort();
+  }, [videoId, vodUrl]);
 
   // Song CRUD
   const addSong = useCallback(() => {
