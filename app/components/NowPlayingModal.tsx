@@ -121,7 +121,7 @@ export default function NowPlayingModal() {
             <p className="text-lg" style={{ color: 'var(--text-secondary)' }}>{currentTrack.originalArtist}</p>
             <button
               onClick={handleToggleLike}
-              className="mt-3 transition-all transform hover:scale-110"
+              className="mt-3 transition-[color,transform] transform hover:scale-110"
               aria-label={liked ? '取消喜愛' : '喜愛'}
               data-testid="modal-like-button"
               style={{ color: liked ? 'var(--accent-pink)' : 'var(--text-tertiary)' }}
@@ -148,7 +148,7 @@ export default function NowPlayingModal() {
           <div className="flex items-center justify-center gap-6 mt-8">
             <button
               onClick={toggleShuffle}
-              className="transition-all transform hover:scale-110"
+              className="transition-[color,transform] transform hover:scale-110"
               aria-label="Shuffle"
               data-testid="modal-shuffle-button"
               style={{ color: shuffleOn ? 'var(--accent-pink)' : undefined }}
@@ -158,7 +158,7 @@ export default function NowPlayingModal() {
 
             <button
               onClick={previous}
-              className="transition-all transform hover:scale-110"
+              className="transition-transform transform hover:scale-110"
               style={{ color: 'var(--text-tertiary)' }}
               aria-label="Previous"
             >
@@ -167,7 +167,7 @@ export default function NowPlayingModal() {
 
             <button
               onClick={togglePlayPause}
-              className="w-16 h-16 rounded-full bg-gradient-to-r from-pink-400 to-blue-400 text-white flex items-center justify-center shadow-2xl hover:brightness-110 transform hover:scale-105 transition-all"
+              className="w-16 h-16 rounded-full bg-gradient-to-r from-pink-400 to-blue-400 text-white flex items-center justify-center shadow-2xl hover:brightness-110 transform hover:scale-105 transition-[filter,transform]"
               aria-label={isPlaying ? 'Pause' : 'Play'}
             >
               {isPlaying ? (
@@ -179,7 +179,7 @@ export default function NowPlayingModal() {
 
             <button
               onClick={next}
-              className="transition-all transform hover:scale-110"
+              className="transition-transform transform hover:scale-110"
               style={{ color: 'var(--text-tertiary)' }}
               aria-label="Next"
             >
@@ -188,7 +188,7 @@ export default function NowPlayingModal() {
 
             <button
               onClick={toggleRepeat}
-              className="transition-all transform hover:scale-110"
+              className="transition-[color,transform] transform hover:scale-110"
               aria-label="Repeat"
               data-testid="modal-repeat-button"
               style={{ color: repeatMode !== 'off' ? 'var(--accent-pink)' : undefined }}

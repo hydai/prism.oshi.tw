@@ -30,7 +30,7 @@ function SongCardInner({ song, isExpanded, onToggleExpand, onPlay, onAddToQueue,
   return (
     <div
       data-testid="song-card"
-      className="overflow-hidden transition-all"
+      className="overflow-hidden transition-colors"
       style={{
         background: 'var(--bg-surface-glass)',
         border: '1px solid var(--border-glass)',
@@ -42,7 +42,7 @@ function SongCardInner({ song, isExpanded, onToggleExpand, onPlay, onAddToQueue,
       {/* Song Header - Clickable */}
       <button
         onClick={() => onToggleExpand(song.id)}
-        className="w-full flex items-center justify-between transition-all group hover-row"
+        className="w-full flex items-center justify-between transition-colors group hover-row"
         style={{
           padding: 'var(--space-5) var(--space-6)',
         }}
@@ -116,7 +116,7 @@ function SongCardInner({ song, isExpanded, onToggleExpand, onPlay, onAddToQueue,
             <div
               key={perf.id}
               data-testid="version-row"
-              className="group/version hover-row grid grid-cols-[1fr_60px] lg:grid-cols-[32px_1fr_140px_60px] gap-0 items-center transition-all"
+              className="group/version hover-row grid grid-cols-[1fr_60px] lg:grid-cols-[32px_1fr_140px_60px] gap-0 items-center transition-colors"
               style={{
                 borderRadius: 'var(--radius-lg)',
                 padding: 'var(--space-3) var(--space-4)',
@@ -145,7 +145,7 @@ function SongCardInner({ song, isExpanded, onToggleExpand, onPlay, onAddToQueue,
                   }}
                   disabled={unavailableVideoIds.has(perf.videoId)}
                   data-testid="play-button"
-                  className={`w-8 h-8 rounded-full text-white flex items-center justify-center opacity-0 group-hover/version:opacity-100 transition-all flex-shrink-0 ${
+                  className={`w-8 h-8 rounded-full text-white flex items-center justify-center opacity-0 group-hover/version:opacity-100 transition-[opacity,transform] flex-shrink-0 ${
                     unavailableVideoIds.has(perf.videoId)
                       ? 'cursor-not-allowed'
                       : 'hover:scale-110'
@@ -238,7 +238,7 @@ function SongCardInner({ song, isExpanded, onToggleExpand, onPlay, onAddToQueue,
               >
                 <button
                   onClick={() => onToggleLike(perf, song)}
-                  className={`transition-all transform hover:scale-110 ${isLiked(perf.id) ? '' : 'opacity-0 group-hover/version:opacity-100'}`}
+                  className={`transition-[color,opacity,transform] transform hover:scale-110 ${isLiked(perf.id) ? '' : 'opacity-0 group-hover/version:opacity-100'}`}
                   style={{
                     background: 'var(--bg-surface)',
                     padding: 'var(--space-2)',
@@ -263,7 +263,7 @@ function SongCardInner({ song, isExpanded, onToggleExpand, onPlay, onAddToQueue,
                     albumArtUrl: song.albumArtUrl,
                     streamerSlug,
                   })}
-                  className="opacity-0 group-hover/version:opacity-100 transition-all transform hover:scale-110"
+                  className="opacity-0 group-hover/version:opacity-100 transition-[opacity,transform] transform hover:scale-110"
                   style={{
                     background: 'var(--bg-surface)',
                     padding: 'var(--space-2)',
@@ -279,7 +279,7 @@ function SongCardInner({ song, isExpanded, onToggleExpand, onPlay, onAddToQueue,
                   <Plus className="w-4 h-4" />
                 </button>
                 <div
-                  className="opacity-0 group-hover/version:opacity-100 transition-all"
+                  className="opacity-0 group-hover/version:opacity-100 transition-opacity"
                   style={{
                     background: 'var(--bg-surface)',
                     padding: 'var(--space-2)',
@@ -304,7 +304,7 @@ function SongCardInner({ song, isExpanded, onToggleExpand, onPlay, onAddToQueue,
                   href={`https://www.youtube.com/watch?v=${perf.videoId}&t=${perf.timestamp}s`}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="opacity-0 group-hover/version:opacity-100 transition-all transform hover:scale-110"
+                  className="opacity-0 group-hover/version:opacity-100 transition-[opacity,transform] transform hover:scale-110"
                   style={{
                     background: 'var(--bg-surface)',
                     padding: 'var(--space-2)',

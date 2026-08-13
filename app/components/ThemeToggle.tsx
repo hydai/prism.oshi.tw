@@ -39,7 +39,7 @@ export default function ThemeToggle() {
     <button
       onClick={toggleTheme}
       aria-label={theme === 'light' ? 'Switch to dark mode' : 'Switch to light mode'}
-      className="transition-all hover:scale-110 flex-shrink-0"
+      className="transition-[background-color,border-color,color,transform] hover:scale-110 flex-shrink-0"
       style={{
         width: 32,
         height: 32,

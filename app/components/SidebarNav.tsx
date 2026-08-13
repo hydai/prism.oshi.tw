@@ -66,7 +66,7 @@ export default function SidebarNav({
   const nowPlayingActive = activePage === 'now-playing';
 
   const navItemClass =
-    'w-full flex items-center gap-3 px-3 py-2.5 rounded-radius-lg font-medium text-sm transition-all';
+    'w-full flex items-center gap-3 px-3 py-2.5 rounded-radius-lg font-medium text-sm transition-colors';
   const inactiveNavItemClass = `${navItemClass} hover:bg-surface-muted`;
 
   return (
@@ -188,7 +188,7 @@ export default function SidebarNav({
           <button
             onClick={onViewLikedSongs}
             className={likedSongsCount > 0
-              ? "w-full flex items-center justify-between px-3 py-2.5 rounded-radius-lg font-medium text-sm transition-all hover:bg-surface-muted"
+              ? "w-full flex items-center justify-between px-3 py-2.5 rounded-radius-lg font-medium text-sm transition-colors hover:bg-surface-muted"
               : inactiveNavItemClass}
             style={INACTIVE_NAV_STYLE}
             data-testid="view-liked-songs-button"
@@ -211,7 +211,7 @@ export default function SidebarNav({
           <button
             onClick={onViewRecentlyPlayed}
             className={recentlyPlayedCount > 0
-              ? "w-full flex items-center justify-between px-3 py-2.5 rounded-radius-lg font-medium text-sm transition-all hover:bg-surface-muted"
+              ? "w-full flex items-center justify-between px-3 py-2.5 rounded-radius-lg font-medium text-sm transition-colors hover:bg-surface-muted"
               : inactiveNavItemClass}
             style={INACTIVE_NAV_STYLE}
             data-testid="view-recently-played-button"
@@ -247,7 +247,7 @@ export default function SidebarNav({
           {onViewPlaylists && playlistCount > 0 && (
             <button
               onClick={onViewPlaylists}
-              className="w-full flex items-center justify-between px-3 py-2.5 rounded-radius-lg font-medium text-sm transition-all hover:bg-surface-muted"
+              className="w-full flex items-center justify-between px-3 py-2.5 rounded-radius-lg font-medium text-sm transition-colors hover:bg-surface-muted"
               style={INACTIVE_NAV_STYLE}
               data-testid="view-playlists-button"
             >

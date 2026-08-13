@@ -29,7 +29,7 @@ export default function Toast({ message, show, onHide }: ToastProps) {
   return (
     <div
       data-testid="toast"
-      className={`fixed top-8 left-1/2 -translate-x-1/2 z-[200] transition-all duration-300 ${
+      className={`fixed top-8 left-1/2 -translate-x-1/2 z-[200] transition-[opacity,transform] duration-300 ${
         isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 -translate-y-4'
       }`}
     >

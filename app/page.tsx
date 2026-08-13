@@ -376,7 +376,7 @@ function StreamerCard({ streamer }: { streamer: StreamerConfig }) {
   return (
     <Wrapper
       {...linkProps}
-      className="group sm:flex-shrink-0 snap-start rounded-radius-xl overflow-hidden transition-all duration-200 hover:scale-[1.03] hover:shadow-xl"
+      className="group sm:flex-shrink-0 snap-start rounded-radius-xl overflow-hidden transition-[box-shadow,transform] duration-200 hover:scale-[1.03] hover:shadow-xl"
       style={{
         minWidth: '240px',
         background: 'var(--bg-surface-frosted)',
