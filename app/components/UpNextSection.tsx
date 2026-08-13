@@ -2,18 +2,18 @@
 
 import { usePlayer } from '../contexts/PlayerContext';
 
+function formatDuration(track: { timestamp: number; endTimestamp?: number }): string {
+  if (!track.endTimestamp) return '--:--';
+  const secs = track.endTimestamp - track.timestamp;
+  const m = Math.floor(secs / 60);
+  const s = Math.floor(secs % 60);
+  return `${m}:${s.toString().padStart(2, '0')}`;
+}
+
 export default function UpNextSection() {
   const { queue } = usePlayer();
 
   if (queue.length === 0) return null;
-
-  const formatDuration = (track: { timestamp: number; endTimestamp?: number }): string => {
-    if (!track.endTimestamp) return '--:--';
-    const secs = track.endTimestamp - track.timestamp;
-    const m = Math.floor(secs / 60);
-    const s = Math.floor(secs % 60);
-    return `${m}:${s.toString().padStart(2, '0')}`;
-  };
 
   const visibleItems = queue.slice(0, 5);
 

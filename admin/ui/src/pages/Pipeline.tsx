@@ -569,13 +569,13 @@ function ExtractTab() {
 
 type Tab = 'discover' | 'extract';
 
+const PIPELINE_TABS: { key: Tab; label: string }[] = [
+  { key: 'discover', label: 'Discover' },
+  { key: 'extract', label: 'Extract' },
+];
+
 export default function Pipeline({ user: _user }: { user: AuthUser }) {
   const [activeTab, setActiveTab] = useState<Tab>('discover');
-
-  const tabs: { key: Tab; label: string }[] = [
-    { key: 'discover', label: 'Discover' },
-    { key: 'extract', label: 'Extract' },
-  ];
 
   return (
     <div>
@@ -586,7 +586,7 @@ export default function Pipeline({ user: _user }: { user: AuthUser }) {
 
       {/* Tab bar */}
       <div className="mt-4 flex border-b border-slate-200">
-        {tabs.map((tab) => (
+        {PIPELINE_TABS.map((tab) => (
           <button
             key={tab.key}
             onClick={() => setActiveTab(tab.key)}

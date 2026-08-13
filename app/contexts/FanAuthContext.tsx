@@ -7,16 +7,18 @@ interface FanAuthContextType {
   isLoading: false;
 }
 
-const FanAuthContext = createContext<FanAuthContextType>({
+const FAN_AUTH_VALUE: FanAuthContextType = {
   isLoggedIn: false,
   isLoading: false,
-});
+};
+
+const FanAuthContext = createContext<FanAuthContextType>(FAN_AUTH_VALUE);
 
 export const useFanAuth = () => useContext(FanAuthContext);
 
 export const FanAuthProvider = ({ children }: { children: ReactNode }) => {
   return (
-    <FanAuthContext.Provider value={{ isLoggedIn: false, isLoading: false }}>
+    <FanAuthContext.Provider value={FAN_AUTH_VALUE}>
       {children}
     </FanAuthContext.Provider>
   );
