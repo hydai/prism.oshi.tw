@@ -14,6 +14,13 @@ import AuroraStampControls from '../../components/aurora/AuroraStampControls';
 import type { ParsedSong } from '@/lib/parse';
 import { fetchItunesDuration } from '@/lib/itunes';
 
+const SHORTCUT_INTERACTIVE_SELECTOR =
+  'input, textarea, select, button, a[href], [role="button"], [role="slider"], [contenteditable="true"]';
+
+function isInteractiveShortcutTarget(target: EventTarget | null): boolean {
+  return target instanceof Element && target.closest(SHORTCUT_INTERACTIVE_SELECTOR) !== null;
+}
+
 // --- localStorage helpers ---
 
 function loadSession(videoId: string): AuroraSong[] {
@@ -270,8 +277,7 @@ export default function AuroraPage() {
     if (!videoId) return;
 
     const handler = (e: KeyboardEvent) => {
-      const tag = document.activeElement?.tagName;
-      if (tag === 'INPUT' || tag === 'TEXTAREA' || tag === 'SELECT') return;
+      if (e.defaultPrevented || isInteractiveShortcutTarget(e.target)) return;
 
       switch (e.key) {
         case 't': handleSetStart(); break;

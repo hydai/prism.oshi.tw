@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect } from 'react';
+import { useEffect, useId } from 'react';
 import { usePathname } from 'next/navigation';
 import Link from 'next/link';
 import { Play, Pause, SkipBack, SkipForward, ListMusic, AlertCircle, Shuffle, Repeat, Repeat1, Maximize2, Heart } from 'lucide-react';
@@ -31,6 +31,7 @@ export default function MiniPlayer() {
 
   const { trackCurrentTime, trackDuration } = usePlaybackTime();
   const { isLiked, toggleLike } = useLikedSongs();
+  const playerErrorId = useId();
 
   const pathname = usePathname();
   const pageSlug = pathname?.split('/')[1] || '';
@@ -88,6 +89,12 @@ export default function MiniPlayer() {
       className="fixed left-0 right-0 z-[60] mini-player-bottom"
       style={{ display: isNowPlayingPage ? 'none' : undefined }}
     >
+      {playerError && (
+        <span id={playerErrorId} role="status" className="sr-only">
+          {playerError}
+        </span>
+      )}
+
       {/* ── MOBILE MINI PLAYER (hidden on lg+) ── */}
       <div
         className="lg:hidden"
@@ -102,7 +109,13 @@ export default function MiniPlayer() {
         }}
       >
         {/* Progress bar at top — 3px height, gradient fill */}
-        <ProgressBar progress={clampedProgress} onSeek={handleSeek} height={3} variant="mini" />
+        <ProgressBar
+          progress={clampedProgress}
+          onSeek={handleSeek}
+          disabled={!hasKnownDuration}
+          height={3}
+          variant="mini"
+        />
 
         {/* Content row: cover + song info + queue + play/pause */}
         <div
@@ -115,6 +128,7 @@ export default function MiniPlayer() {
             style={{ gap: '12px' }}
             onClick={() => setShowModal(true)}
             aria-label={`開啟正在播放：${currentTrack.title}`}
+            aria-describedby={playerError ? playerErrorId : undefined}
           >
             {/* Cover thumbnail — 40×40 */}
             <AlbumArt
@@ -225,6 +239,7 @@ export default function MiniPlayer() {
             style={{ width: '280px' }}
             onClick={() => setShowModal(true)}
             aria-label={`開啟正在播放：${currentTrack.title}`}
+            aria-describedby={playerError ? playerErrorId : undefined}
           >
             {/* Album cover thumbnail — 48×48 desktop */}
             <AlbumArt
@@ -246,6 +261,7 @@ export default function MiniPlayer() {
                   className="flex items-center gap-1 truncate text-red-500"
                   style={{ fontSize: 'var(--font-size-xs)' }}
                   data-testid="player-error-message"
+                  aria-hidden="true"
                 >
                   <AlertCircle style={{ width: '12px', height: '12px', flexShrink: 0 }} />
                   <span>{playerError}</span>
@@ -353,7 +369,12 @@ export default function MiniPlayer() {
               >
                 {formatTime(trackCurrentTime)}
               </span>
-              <ProgressBar progress={clampedProgress} onSeek={handleSeek} height={4} />
+              <ProgressBar
+                progress={clampedProgress}
+                onSeek={handleSeek}
+                disabled={!hasKnownDuration}
+                height={4}
+              />
               <span
                 className="flex-shrink-0 font-mono"
                 style={{ fontSize: 'var(--font-size-xs)', color: 'var(--text-tertiary)', minWidth: '32px' }}

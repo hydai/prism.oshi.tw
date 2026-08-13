@@ -135,6 +135,7 @@ export default function NowPlayingModal() {
             <ProgressBar
               progress={Math.min(100, Math.max(0, progress))}
               onSeek={handleSeek}
+              disabled={!hasKnownDuration}
               height={8}
             />
             <div className="flex justify-between text-xs mt-2 font-mono" style={{ color: 'var(--text-tertiary)' }}>
