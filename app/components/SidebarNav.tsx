@@ -37,6 +37,16 @@ interface SidebarNavProps {
   children?: ReactNode;
 }
 
+const ACTIVE_NAV_STYLE = {
+  background: 'linear-gradient(135deg, var(--accent-pink-light), var(--accent-blue-light))',
+  color: 'var(--text-on-accent)',
+};
+
+const INACTIVE_NAV_STYLE = {
+  background: 'transparent',
+  color: 'var(--text-secondary)',
+};
+
 export default function SidebarNav({
   activePage,
   isHomeActive,
@@ -54,15 +64,6 @@ export default function SidebarNav({
   const { slug, brandName, displayName } = useStreamer();
   const homeActive = isHomeActive ?? activePage === 'home';
   const nowPlayingActive = activePage === 'now-playing';
-
-  const activeStyle = {
-    background: 'linear-gradient(135deg, var(--accent-pink-light), var(--accent-blue-light))',
-    color: 'var(--text-on-accent)',
-  };
-  const inactiveStyle = {
-    background: 'transparent',
-    color: 'var(--text-secondary)',
-  };
 
   const navItemClass =
     'w-full flex items-center gap-3 px-3 py-2.5 rounded-radius-lg font-medium text-sm transition-all';
@@ -116,7 +117,7 @@ export default function SidebarNav({
             <button
               onClick={onHomeClick}
               className={navItemClass}
-              style={homeActive ? activeStyle : inactiveStyle}
+              style={homeActive ? ACTIVE_NAV_STYLE : INACTIVE_NAV_STYLE}
             >
               <HomeIcon className="w-4 h-4 flex-shrink-0" />
               首頁
@@ -125,7 +126,7 @@ export default function SidebarNav({
             <Link
               href={`/${slug}`}
               className={homeActive ? navItemClass : inactiveNavItemClass}
-              style={homeActive ? activeStyle : inactiveStyle}
+              style={homeActive ? ACTIVE_NAV_STYLE : INACTIVE_NAV_STYLE}
             >
               <HomeIcon className="w-4 h-4 flex-shrink-0" />
               首頁
@@ -136,7 +137,7 @@ export default function SidebarNav({
           <Link
             href={`/${slug}/now-playing`}
             className={nowPlayingActive ? navItemClass : inactiveNavItemClass}
-            style={nowPlayingActive ? activeStyle : inactiveStyle}
+            style={nowPlayingActive ? ACTIVE_NAV_STYLE : INACTIVE_NAV_STYLE}
           >
             <Play className="w-4 h-4 flex-shrink-0" style={nowPlayingActive ? { fill: 'currentColor' } : undefined} />
             正在播放
@@ -148,7 +149,7 @@ export default function SidebarNav({
             target="_blank"
             rel="noopener noreferrer"
             className={inactiveNavItemClass}
-            style={inactiveStyle}
+            style={INACTIVE_NAV_STYLE}
           >
             <Film className="w-4 h-4 flex-shrink-0" />
             <span className="flex-1">歌回 VOD 資料庫</span>
@@ -158,7 +159,7 @@ export default function SidebarNav({
           {/* Browse */}
           <button
             className={inactiveNavItemClass}
-            style={inactiveStyle}
+            style={INACTIVE_NAV_STYLE}
           >
             <LayoutList className="w-4 h-4 flex-shrink-0" />
             瀏覽
@@ -167,7 +168,7 @@ export default function SidebarNav({
           {/* Trending */}
           <button
             className={inactiveNavItemClass}
-            style={inactiveStyle}
+            style={INACTIVE_NAV_STYLE}
           >
             <Sparkles className="w-4 h-4 flex-shrink-0" />
             熱門
@@ -189,7 +190,7 @@ export default function SidebarNav({
             className={likedSongsCount > 0
               ? "w-full flex items-center justify-between px-3 py-2.5 rounded-radius-lg font-medium text-sm transition-all hover:bg-surface-muted"
               : inactiveNavItemClass}
-            style={inactiveStyle}
+            style={INACTIVE_NAV_STYLE}
             data-testid="view-liked-songs-button"
           >
             <span className="flex items-center gap-3">
@@ -212,7 +213,7 @@ export default function SidebarNav({
             className={recentlyPlayedCount > 0
               ? "w-full flex items-center justify-between px-3 py-2.5 rounded-radius-lg font-medium text-sm transition-all hover:bg-surface-muted"
               : inactiveNavItemClass}
-            style={inactiveStyle}
+            style={INACTIVE_NAV_STYLE}
             data-testid="view-recently-played-button"
           >
             <span className="flex items-center gap-3">
@@ -234,7 +235,7 @@ export default function SidebarNav({
             <button
               onClick={onCreatePlaylist}
               className={inactiveNavItemClass}
-              style={inactiveStyle}
+              style={INACTIVE_NAV_STYLE}
               data-testid="create-playlist-button"
             >
               <Plus className="w-4 h-4 flex-shrink-0" />
@@ -247,7 +248,7 @@ export default function SidebarNav({
             <button
               onClick={onViewPlaylists}
               className="w-full flex items-center justify-between px-3 py-2.5 rounded-radius-lg font-medium text-sm transition-all hover:bg-surface-muted"
-              style={inactiveStyle}
+              style={INACTIVE_NAV_STYLE}
               data-testid="view-playlists-button"
             >
               <span className="flex items-center gap-3">
