@@ -33,6 +33,8 @@ function MobileSearchRowInner({ song, isCurrentlyPlaying, isUnavailable, onPlay,
       }}
     >
       <button
+        type="button"
+        aria-label={`播放 ${song.title}`}
         onClick={() => {
           if (!isUnavailable) {
             onPlay({

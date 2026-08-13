@@ -314,6 +314,7 @@ export default function Home() {
             <SearchBox
               value={debouncedSearch}
               onDebouncedChange={setDebouncedSearch}
+              label="搜尋歌曲"
               placeholder="搜尋歌曲..."
               containerClassName="relative group"
               icon={
@@ -358,7 +359,11 @@ export default function Home() {
 
           {/* Artist dropdown */}
           <div className="relative px-1 mb-2">
+            <label htmlFor="artist-filter" className="sr-only">
+              依歌手篩選
+            </label>
             <select
+              id="artist-filter"
               value={selectedArtist ?? ''}
               onChange={(e) => setSelectedArtist(e.target.value || null)}
               className="w-full font-medium py-2 px-3 outline-none appearance-none text-sm cursor-pointer transition-colors"
@@ -1389,6 +1394,7 @@ export default function Home() {
               <SearchBox
                 value={debouncedSearch}
                 onDebouncedChange={setDebouncedSearch}
+                label="搜尋歌曲"
                 placeholder="搜尋..."
                 containerClassName="relative mb-4"
                 icon={
@@ -1410,7 +1416,11 @@ export default function Home() {
               />
               {/* Artist filter */}
               <div className="relative mb-3">
+                <label htmlFor="mobile-artist-filter" className="sr-only">
+                  依歌手篩選
+                </label>
                 <select
+                  id="mobile-artist-filter"
                   value={selectedArtist ?? ''}
                   onChange={(e) => setSelectedArtist(e.target.value || null)}
                   className="w-full font-medium py-2 px-3 outline-none appearance-none text-sm cursor-pointer"

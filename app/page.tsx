@@ -89,11 +89,15 @@ export default function HomePage() {
               border: '1px solid var(--border-glass)',
             }}
           >
+            <label htmlFor="desktop-streamer-search" className="sr-only">
+              搜尋 VTuber
+            </label>
             <Search
               className="h-4 w-4 flex-shrink-0"
               style={{ color: 'var(--text-tertiary)' }}
             />
             <input
+              id="desktop-streamer-search"
               type="text"
               placeholder="搜尋 VTuber…"
               value={searchText}
@@ -232,6 +236,7 @@ export default function HomePage() {
               href="https://crystal.oshi.tw"
               target="_blank"
               rel="noopener noreferrer"
+              aria-label="回報 / 建議"
               className="inline-flex items-center gap-1 rounded-radius-lg px-2.5 py-2 text-token-sm font-semibold transition-opacity hover:opacity-90"
               style={{
                 border: '1px solid var(--border-accent)',
@@ -244,6 +249,7 @@ export default function HomePage() {
               href="https://discord.gg/bUYva8q7Jr"
               target="_blank"
               rel="noopener noreferrer"
+              aria-label="Discord 伺服器"
               className="inline-flex items-center gap-1 rounded-radius-lg px-2.5 py-2 text-token-sm font-semibold transition-opacity hover:opacity-90"
               style={{
                 border: '1px solid var(--border-accent)',
@@ -269,6 +275,7 @@ export default function HomePage() {
               href="https://nova.oshi.tw/vod"
               target="_blank"
               rel="noopener noreferrer"
+              aria-label="新增 VOD"
               className="inline-flex items-center gap-1 rounded-radius-lg px-2.5 py-2 text-token-sm font-semibold transition-opacity hover:opacity-90"
               style={{
                 border: '1px solid var(--border-accent)',
@@ -302,11 +309,15 @@ export default function HomePage() {
               border: '1px solid var(--border-glass)',
             }}
           >
+            <label htmlFor="mobile-streamer-search" className="sr-only">
+              搜尋 VTuber
+            </label>
             <Search
               className="h-4 w-4 flex-shrink-0"
               style={{ color: 'var(--text-tertiary)' }}
             />
             <input
+              id="mobile-streamer-search"
               type="text"
               placeholder="搜尋 VTuber…"
               value={searchText}

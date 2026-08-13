@@ -195,6 +195,7 @@ export default function PlaylistPanel({ show, onClose, songsData, onToast }: Pla
                         <div className="flex items-center gap-2">
                           <input
                             type="text"
+                            aria-label={`重新命名「${playlist.name}」`}
                             value={editName}
                             onChange={(e) => {
                               setEditName(e.target.value);

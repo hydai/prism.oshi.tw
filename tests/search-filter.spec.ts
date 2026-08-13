@@ -10,7 +10,7 @@ test.describe('archive search', () => {
     await expect(countEl).not.toHaveText('0');
     const fullCount = Number(await countEl.textContent());
 
-    const input = page.getByPlaceholder('搜尋歌曲...');
+    const input = page.getByRole('textbox', { name: '搜尋歌曲' }).filter({ visible: true });
     await input.fill('Way Back Into Love');
 
     await expect
@@ -35,7 +35,7 @@ test.describe('archive search', () => {
     const fullCount = Number(await countEl.textContent());
 
     await page.getByTestId('bottom-nav-search').click();
-    await page.getByTestId('mobile-search-input').fill('Way Back');
+    await page.getByRole('textbox', { name: '搜尋歌曲' }).filter({ visible: true }).fill('Way Back');
 
     await expect
       .poll(async () => Number(await countEl.textContent()))
