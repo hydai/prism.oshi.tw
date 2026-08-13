@@ -36,11 +36,15 @@ interface InlineCellProps {
 
 function InlineCell({ value, onCommit, className = '', onClick, onFocus, placeholder }: InlineCellProps) {
   const [editing, setEditing] = useState(false);
-  const [draft, setDraft] = useState(value);
+  const [draft, setDraft] = useState('');
   const inputRef = useRef<HTMLInputElement>(null);
 
-  useEffect(() => { setDraft(value); }, [value]);
   useEffect(() => { if (editing) inputRef.current?.select(); }, [editing]);
+
+  const beginEditing = () => {
+    setDraft(value);
+    setEditing(true);
+  };
 
   if (editing) {
     return (
@@ -64,12 +68,12 @@ function InlineCell({ value, onCommit, className = '', onClick, onFocus, placeho
       type="button"
       className={`inline-block min-h-[24px] cursor-text rounded px-1 py-0.5 text-left hover:bg-white/60 ${className}`}
       onFocus={onFocus}
-      onClick={(e) => { onClick?.(); if (!onClick) setEditing(true); e.stopPropagation(); }}
-      onDoubleClick={() => setEditing(true)}
+      onClick={(e) => { onClick?.(); if (!onClick) beginEditing(); e.stopPropagation(); }}
+      onDoubleClick={beginEditing}
       onKeyDown={(e) => {
         if (e.key === 'F2') {
           e.preventDefault();
-          setEditing(true);
+          beginEditing();
         }
       }}
       title={onClick ? '點擊跳轉 / 雙擊編輯' : '點擊編輯'}

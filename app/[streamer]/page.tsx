@@ -1808,14 +1808,15 @@ export default function Home() {
         onClose={() => setShowRecentlyPlayedPanel(false)}
         onToast={(msg) => { setToastMessage(msg); setShowToast(true); }}
       />
-      <CreatePlaylistDialog
-        show={showCreateDialog}
-        onClose={() => setShowCreateDialog(false)}
-        onSuccess={() => {
-          setToastMessage('播放清單已建立');
-          setShowToast(true);
-        }}
-      />
+      {showCreateDialog && (
+        <CreatePlaylistDialog
+          onClose={() => setShowCreateDialog(false)}
+          onSuccess={() => {
+            setToastMessage('播放清單已建立');
+            setShowToast(true);
+          }}
+        />
+      )}
     </>
   );
 }

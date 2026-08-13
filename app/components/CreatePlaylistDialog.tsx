@@ -1,35 +1,25 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { createPortal } from 'react-dom';
 import { X } from 'lucide-react';
 import { usePlaylist } from '../contexts/PlaylistContext';
 
 interface CreatePlaylistDialogProps {
-  show: boolean;
   onClose: () => void;
   onSuccess?: () => void;
 }
 
-export default function CreatePlaylistDialog({ show, onClose, onSuccess }: CreatePlaylistDialogProps) {
-  const [mounted, setMounted] = useState(false);
+export default function CreatePlaylistDialog({ onClose, onSuccess }: CreatePlaylistDialogProps) {
   const [name, setName] = useState('');
   const [error, setError] = useState('');
+  const inputRef = useRef<HTMLInputElement>(null);
 
   const { createPlaylist } = usePlaylist();
 
   useEffect(() => {
-    setMounted(true);
+    inputRef.current?.focus();
   }, []);
-
-  useEffect(() => {
-    if (!show) {
-      setName('');
-      setError('');
-    }
-  }, [show]);
-
-  if (!mounted || !show) return null;
 
   const handleCreate = () => {
     const result = createPlaylist(name);
@@ -46,6 +36,8 @@ export default function CreatePlaylistDialog({ show, onClose, onSuccess }: Creat
       handleCreate();
     }
   };
+
+  if (typeof document === 'undefined') return null;
 
   return createPortal(
     <>
@@ -79,6 +71,7 @@ export default function CreatePlaylistDialog({ show, onClose, onSuccess }: Creat
             播放清單名稱
           </label>
           <input
+            ref={inputRef}
             id="playlist-name"
             type="text"
             value={name}
@@ -89,7 +82,6 @@ export default function CreatePlaylistDialog({ show, onClose, onSuccess }: Creat
             onKeyPress={handleKeyPress}
             placeholder="例如: 我的最愛"
             className="w-full bg-white/10 text-white px-4 py-3 rounded-lg border border-white/20 focus:outline-none focus:border-pink-400 placeholder-white/40"
-            autoFocus
             data-testid="playlist-name-input"
           />
           {error && (
