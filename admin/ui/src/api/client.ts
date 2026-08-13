@@ -65,7 +65,23 @@ import type {
 
 const STREAMER_STORAGE_KEY = 'prism_admin_streamer';
 
-let _currentStreamer = localStorage.getItem(STREAMER_STORAGE_KEY) || 'mizuki';
+function getBrowserStorage(): Storage | undefined {
+  try {
+    return typeof localStorage === 'undefined' ? undefined : localStorage;
+  } catch {
+    return undefined;
+  }
+}
+
+function loadCurrentStreamer(): string {
+  try {
+    return getBrowserStorage()?.getItem(STREAMER_STORAGE_KEY) || 'mizuki';
+  } catch {
+    return 'mizuki';
+  }
+}
+
+let _currentStreamer = loadCurrentStreamer();
 const _listeners = new Set<(s: string) => void>();
 
 export function getCurrentStreamer(): string {
@@ -74,7 +90,11 @@ export function getCurrentStreamer(): string {
 
 export function setCurrentStreamer(slug: string): void {
   _currentStreamer = slug;
-  localStorage.setItem(STREAMER_STORAGE_KEY, slug);
+  try {
+    getBrowserStorage()?.setItem(STREAMER_STORAGE_KEY, slug);
+  } catch {
+    // Storage can be blocked while the in-memory selection remains usable.
+  }
   _listeners.forEach((fn) => fn(slug));
 }
 

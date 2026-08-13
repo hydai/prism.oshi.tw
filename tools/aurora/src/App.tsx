@@ -11,6 +11,7 @@ import ThemeToggle from './components/ThemeToggle';
 import type { ParsedSong } from './lib/parse';
 import { fetchItunesDuration } from './lib/itunes';
 import { loadNovaStreamers, loadNovaVideoDate, type StreamerOption } from './lib/nova';
+import { pushRecentVideo } from './lib/recent';
 
 const SHORTCUT_INTERACTIVE_SELECTOR =
   'input, textarea, select, button, a[href], [role="button"], [role="slider"], [contenteditable="true"]';
@@ -30,16 +31,6 @@ function loadSession(videoId: string): AuroraSong[] {
 
 function saveSession(videoId: string, songs: AuroraSong[]) {
   localStorage.setItem(`aurora:${videoId}`, JSON.stringify(songs));
-}
-
-function pushRecent(videoId: string) {
-  try {
-    const raw = localStorage.getItem('aurora:recent');
-    const recent: string[] = raw ? JSON.parse(raw) : [];
-    const filtered = recent.filter((id) => id !== videoId);
-    filtered.unshift(videoId);
-    localStorage.setItem('aurora:recent', JSON.stringify(filtered.slice(0, 10)));
-  } catch { /* ignore */ }
 }
 
 export function App() {
@@ -112,7 +103,7 @@ export function App() {
     }
     setUrlError('');
     setVideoId(id);
-    pushRecent(id);
+    pushRecentVideo(id);
     const saved = loadSession(id);
     setSongs(saved);
     setSelectedIndex(saved.length > 0 ? 0 : null);
