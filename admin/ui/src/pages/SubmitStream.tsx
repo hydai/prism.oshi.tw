@@ -2,6 +2,7 @@ import { useId, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import type { CreateStreamBody } from '../../../shared/types';
 import { api } from '../api/client';
+import YouTubeEmbed from '../components/YouTubeEmbed';
 
 function extractVideoId(url: string): string {
   try {
@@ -189,12 +190,7 @@ export default function SubmitStream() {
           <div className="border-t border-slate-200 pt-4">
             <h3 className="text-sm font-semibold text-slate-700">Preview</h3>
             <div className="mt-2 aspect-video w-full max-w-md overflow-hidden rounded-md">
-              <iframe
-                src={`https://www.youtube.com/embed/${videoId}`}
-                title="Stream preview"
-                allowFullScreen
-                className="h-full w-full"
-              />
+              <YouTubeEmbed videoId={videoId} title="Stream preview" />
             </div>
           </div>
         )}
