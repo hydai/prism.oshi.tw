@@ -81,8 +81,8 @@ function InlineEdit({ value, placeholder, onSave, onCancel }: {
 
 // --- Inline Date Edit ---
 
-function InlineDateEdit({ value, onSave, onCancel }: {
-  value: string;
+function InlineDateEdit({ value, label, onSave, onCancel }: {
+  value: string; label: string;
   onSave: (val: string) => void; onCancel: () => void;
 }) {
   const [date, setDate] = useState(value);
@@ -97,7 +97,7 @@ function InlineDateEdit({ value, onSave, onCancel }: {
 
   return (
     <input
-      ref={inputRef} type="date" value={date}
+      ref={inputRef} type="date" aria-label={label} value={date}
       onChange={(e) => setDate(e.target.value)}
       onKeyDown={(e) => {
         if (e.key === 'Enter') { e.preventDefault(); commit(); }
@@ -132,11 +132,11 @@ function AddSongModal({ onSubmit, onCancel }: {
       <form onSubmit={handleSubmit} className="w-full max-w-sm rounded-lg bg-white p-6 shadow-xl">
         <h3 className="text-lg font-semibold text-slate-800">Add Song</h3>
         <div className="mt-4 space-y-3">
-          <input ref={inputRef} type="text" placeholder="Song title *" value={title}
+          <input ref={inputRef} type="text" aria-label="Song title" placeholder="Song title *" value={title}
             onChange={(e) => setTitle(e.target.value)}
             className="w-full rounded-md border border-slate-300 px-3 py-2 text-sm focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500"
             required />
-          <input type="text" placeholder="Original artist" value={artist}
+          <input type="text" aria-label="Original artist" placeholder="Original artist" value={artist}
             onChange={(e) => setArtist(e.target.value)}
             className="w-full rounded-md border border-slate-300 px-3 py-2 text-sm focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500" />
         </div>
@@ -188,7 +188,7 @@ function PasteImportModal({ streamId, hasExisting, onDone, onCancel }: {
           <p className="mt-1 text-sm text-slate-500">Paste a timestamp list (e.g. "5:30 Song Name - Artist")</p>
         </div>
         <div className="flex-1 overflow-y-auto px-6 py-4">
-          <textarea ref={textareaRef} value={text} onChange={(e) => setText(e.target.value)}
+          <textarea ref={textareaRef} aria-label="Paste a timestamp list" value={text} onChange={(e) => setText(e.target.value)}
             placeholder={`0:00 Song Title / Artist Name\n3:45 Another Song - Another Artist`}
             className="h-40 w-full rounded-md border border-slate-300 px-3 py-2 font-mono text-sm focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500"
           />
@@ -811,7 +811,7 @@ export default function StreamDetail({ user }: { user: AuthUser }) {
             </h2>
             <div className="mt-1 flex flex-wrap items-center gap-3 text-sm text-slate-500">
               {editingField?.type === 'stream' && editingField.field === 'date' ? (
-                <InlineDateEdit value={detail.date} onSave={(v) => handleStreamSave('date', v)} onCancel={() => setEditingField(null)} />
+                <InlineDateEdit value={detail.date} label="Stream date" onSave={(v) => handleStreamSave('date', v)} onCancel={() => setEditingField(null)} />
               ) : (
                 <span className={isCurator ? 'cursor-text' : ''} onDoubleClick={() => { if (isCurator) setEditingField({ type: 'stream', field: 'date' }); }} title={isCurator ? 'Double-click to edit' : undefined}>
                   {detail.date}
