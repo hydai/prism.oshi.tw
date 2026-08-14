@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useId, useState } from 'react';
 import type { AuthUser, NovaVodSubmission, NovaVodSong, NovaStatus } from '../../../shared/types';
 import { api } from '../api/client';
 import StatusBadge from '../components/StatusBadge';
@@ -22,6 +22,8 @@ export default function NovaVodSubmissions({ user }: { user: AuthUser }) {
   const [expandedSongs, setExpandedSongs] = useState<NovaVodSong[]>([]);
   const [rejectNote, setRejectNote] = useState<Record<string, string>>({});
   const [actionLoading, setActionLoading] = useState<string | null>(null);
+  const statusFilterId = useId();
+  const streamerFilterId = useId();
 
   const fetchVods = () => {
     setLoading(true);
@@ -100,7 +102,11 @@ export default function NovaVodSubmissions({ user }: { user: AuthUser }) {
 
       {/* Filters */}
       <div className="mt-4 flex gap-3">
+        <label htmlFor={statusFilterId} className="sr-only">
+          Filter VOD submissions by status
+        </label>
         <select
+          id={statusFilterId}
           value={statusFilter}
           onChange={(e) => setStatusFilter(e.target.value as '' | NovaStatus)}
           className="rounded-md border border-slate-300 px-3 py-1.5 text-sm"
@@ -110,7 +116,11 @@ export default function NovaVodSubmissions({ user }: { user: AuthUser }) {
           <option value="approved">Approved</option>
           <option value="rejected">Rejected</option>
         </select>
+        <label htmlFor={streamerFilterId} className="sr-only">
+          Filter VOD submissions by streamer
+        </label>
         <select
+          id={streamerFilterId}
           value={streamerFilter}
           onChange={(e) => setStreamerFilter(e.target.value)}
           className="rounded-md border border-slate-300 px-3 py-1.5 text-sm"
@@ -194,6 +204,8 @@ function VodRow({
   onDelete: (vod: NovaVodSubmission) => void;
   actionLoading: boolean;
 }) {
+  const rejectNoteId = useId();
+
   return (
     <>
       <tr className="cursor-pointer hover:bg-slate-50" onClick={onToggle}>
@@ -338,10 +350,11 @@ function VodRow({
               {/* Right: reject note */}
               {isCurator && vod.status === 'pending' && (
                 <div>
-                  <label className="text-xs font-medium uppercase text-slate-400">
+                  <label htmlFor={rejectNoteId} className="text-xs font-medium uppercase text-slate-400">
                     Reviewer Note (optional, shown on reject)
                   </label>
                   <textarea
+                    id={rejectNoteId}
                     value={rejectNote}
                     onChange={(e) => onRejectNoteChange(e.target.value)}
                     placeholder="Reason for rejection..."
