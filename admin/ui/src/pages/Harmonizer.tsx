@@ -364,6 +364,7 @@ function SimilarSongsTab() {
                             <td className="py-1.5">
                               <input
                                 type="radio"
+                                aria-label={`Use record ${item.id}: ${item.title} by ${item.originalArtist || 'unknown artist'} as canonical; work ${item.workId ?? 'unlinked'}; ${item.performanceCount} performances`}
                                 name={`canonical-${group.normalizedKey}`}
                                 checked={isCanonical}
                                 onChange={() =>
@@ -620,6 +621,7 @@ function SimilarArtistsTab() {
           const isExpanded = expanded.has(group.normalizedKey);
           const canonicalName = canonicals.get(group.normalizedKey) ?? '';
           const isApplying = applying.has(group.normalizedKey);
+          const canonicalNameId = `canonical-artist-${encodeURIComponent(group.normalizedKey)}`;
 
           return (
             <div key={group.normalizedKey} className="rounded-lg border border-slate-200 bg-white">
@@ -642,8 +644,12 @@ function SimilarArtistsTab() {
               {isExpanded && (
                 <div className="border-t border-slate-100 px-4 py-3">
                   <div className="mb-3 flex items-center gap-2">
-                    <label className="text-sm font-medium text-slate-600">Canonical name:</label>
+                    <label htmlFor={canonicalNameId} className="text-sm font-medium text-slate-600">
+                      <span aria-hidden="true">Canonical name:</span>
+                      <span className="sr-only">Canonical name for {group.normalizedKey}</span>
+                    </label>
                     <input
+                      id={canonicalNameId}
                       type="text"
                       value={canonicalName}
                       onChange={(e) =>

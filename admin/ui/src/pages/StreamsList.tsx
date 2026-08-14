@@ -207,6 +207,7 @@ export default function StreamsList({ user }: { user: AuthUser }) {
         <form onSubmit={handleSearch} className="flex gap-2">
           <input
             type="text"
+            aria-label="Search streams by title"
             placeholder="Search by title..."
             value={search}
             onChange={(e) => setSearch(e.target.value)}
