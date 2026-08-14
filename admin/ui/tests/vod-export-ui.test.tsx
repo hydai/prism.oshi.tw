@@ -229,6 +229,7 @@ async function main(): Promise<void> {
       onConfirm={() => undefined}
     />,
   );
+  assert(dialogHtml.startsWith('<dialog'), 'confirmation uses the native dialog element');
   assert(dialogHtml.includes('Publish snapshot'), 'confirmation requires a second explicit publish action');
   assert(dialogHtml.includes(hash), 'confirmation shows the full candidate identity');
   assert(dialogHtml.includes('8,534'), 'confirmation shows candidate scope');
