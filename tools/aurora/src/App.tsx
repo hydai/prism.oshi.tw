@@ -439,6 +439,7 @@ export function App() {
           {/* Streamer selector */}
           {streamers.length > 0 && (
             <select
+              aria-label="選擇 VTuber"
               value={selectedStreamer}
               onChange={(e) => setSelectedStreamer(e.target.value)}
               className="text-[13px] px-2 py-1.5 rounded-lg border border-[var(--border-default)] bg-white/60 dark:bg-white/[0.06] text-[var(--text-secondary)] outline-none focus:border-[var(--accent-purple)]"
@@ -485,6 +486,7 @@ export function App() {
             <div className="w-full max-w-lg">
               <div className="flex gap-2">
                 <input
+                  aria-label="貼上 YouTube 歌枠網址"
                   className="flex-1 rounded-xl border border-[var(--border-default)] bg-white/60 dark:bg-white/[0.06] px-4 py-3 text-base outline-none focus:border-[var(--accent-purple)] placeholder:text-[var(--text-tertiary)]"
                   placeholder="貼上 YouTube 歌枠網址..."
                   value={vodUrl}
@@ -709,8 +711,11 @@ export function App() {
 
             <div className="flex flex-col gap-3 mb-4">
               <div>
-                <label className="block text-[13px] text-[var(--text-secondary)] mb-1">直播日期</label>
+                <label htmlFor="aurora-submit-stream-date" className="block text-[13px] text-[var(--text-secondary)] mb-1">
+                  直播日期
+                </label>
                 <input
+                  id="aurora-submit-stream-date"
                   type="date"
                   value={submitStreamDate}
                   onChange={(e) => setSubmitStreamDate(e.target.value)}
@@ -718,8 +723,11 @@ export function App() {
                 />
               </div>
               <div>
-                <label className="block text-[13px] text-[var(--text-secondary)] mb-1">備註（選填）</label>
+                <label htmlFor="aurora-submit-note" className="block text-[13px] text-[var(--text-secondary)] mb-1">
+                  備註（選填）
+                </label>
                 <input
+                  id="aurora-submit-note"
                   type="text"
                   value={submitNote}
                   onChange={(e) => setSubmitNote(e.target.value)}
