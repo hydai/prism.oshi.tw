@@ -339,7 +339,7 @@ function ExtractTab() {
     setEditedSongs((prev) => prev.filter((_, i) => i !== index));
   };
 
-  const handleImport = async (replace = false) => {
+  const handleImport = async (replace = false, creditSnapshot = creditRef.current) => {
     if (!selectedStreamId || editedSongs.length === 0) return;
     setImporting(true);
     setError(null);
@@ -352,7 +352,7 @@ function ExtractTab() {
           startSeconds: s.startSeconds,
           endSeconds: s.endSeconds,
         })),
-        credit: creditRef.current ?? undefined,
+        credit: creditSnapshot ?? undefined,
         replace,
       });
       setImportStatus(`Imported ${res.created} song(s)`);
@@ -363,7 +363,7 @@ function ExtractTab() {
         const ok = window.confirm(`${err.message}\n\nDo you want to replace the existing songs?`);
         if (ok) {
           setImporting(false);
-          return handleImport(true);
+          return handleImport(true, creditSnapshot);
         }
       } else {
         setError(err instanceof Error ? err.message : 'Failed to import');
