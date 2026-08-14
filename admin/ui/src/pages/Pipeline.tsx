@@ -116,7 +116,7 @@ function DiscoverTab() {
               <tr>
                 <th className="px-4 py-3">
                   <input
-                    type="checkbox"
+                    type="checkbox" aria-label="Select all new streams"
                     checked={selected.size === newCount && newCount > 0}
                     onChange={toggleAll}
                     className="rounded"
@@ -134,7 +134,7 @@ function DiscoverTab() {
                   <td className="px-4 py-3">
                     {s.isNew ? (
                       <input
-                        type="checkbox"
+                        type="checkbox" aria-label={`Select stream ${s.title || s.videoId}`}
                         checked={selected.has(s.videoId)}
                         onChange={() => toggleSelect(s.videoId)}
                         className="rounded"
@@ -532,7 +532,7 @@ function ExtractTab() {
                   </td>
                   <td className="px-4 py-2">
                     <input
-                      type="text"
+                      type="text" aria-label={`Song ${i + 1} title`}
                       value={song.songName}
                       onChange={(e) => updateSong(i, 'songName', e.target.value)}
                       className="w-full rounded border border-slate-200 px-2 py-1 text-sm focus:border-blue-500 focus:outline-none"
@@ -540,7 +540,7 @@ function ExtractTab() {
                   </td>
                   <td className="px-4 py-2">
                     <input
-                      type="text"
+                      type="text" aria-label={`Song ${i + 1} artist`}
                       value={song.artist}
                       onChange={(e) => updateSong(i, 'artist', e.target.value)}
                       className="w-full rounded border border-slate-200 px-2 py-1 text-sm focus:border-blue-500 focus:outline-none"
