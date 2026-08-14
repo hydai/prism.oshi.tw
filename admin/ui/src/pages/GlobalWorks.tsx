@@ -161,6 +161,7 @@ export default function GlobalWorks() {
         <form onSubmit={submitSearch} className="flex gap-2">
           <input
             type="search"
+            aria-label="Search global works"
             placeholder="Search title or original artist..."
             value={search}
             onChange={(event) => setSearch(event.target.value)}
