@@ -274,7 +274,7 @@ function ExtractTab() {
   const [editedSongs, setEditedSongs] = useState<EditableParsedSong[]>([]);
   const [importStatus, setImportStatus] = useState<string | null>(null);
   const [importing, setImporting] = useState(false);
-  const [credit, setCredit] = useState<StreamCredit | null>(null);
+  const creditRef = useRef<StreamCredit | null>(null);
   const identifySongs = useIdentifySongs();
 
   // Fetch streams needing extraction (status = pending)
@@ -301,7 +301,7 @@ function ExtractTab() {
       const res = await api.extractTimestamps(id);
       setExtractResult(res);
       setEditedSongs(identifySongs(res.parsedSongs));
-      setCredit(res.credit);
+      creditRef.current = res.credit;
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Failed to extract');
     } finally {
@@ -313,10 +313,10 @@ function ExtractTab() {
     const parsed = parseTextToSongs(candidateText);
     setEditedSongs(identifySongs(parsed));
     const selectedStream = streams.find((s) => s.id === selectedStreamId);
-    setCredit({
+    creditRef.current = {
       author: candidateAuthor,
       commentUrl: `https://www.youtube.com/watch?v=${selectedStream?.videoId}&lc=${candidateId}`,
-    });
+    };
     setExtractResult((prev) =>
       prev
         ? {
@@ -339,7 +339,7 @@ function ExtractTab() {
     setEditedSongs((prev) => prev.filter((_, i) => i !== index));
   };
 
-  const handleImport = async (replace = false) => {
+  const handleImport = async (replace = false, creditSnapshot = creditRef.current) => {
     if (!selectedStreamId || editedSongs.length === 0) return;
     setImporting(true);
     setError(null);
@@ -352,7 +352,7 @@ function ExtractTab() {
           startSeconds: s.startSeconds,
           endSeconds: s.endSeconds,
         })),
-        credit: credit ?? undefined,
+        credit: creditSnapshot ?? undefined,
         replace,
       });
       setImportStatus(`Imported ${res.created} song(s)`);
@@ -363,7 +363,7 @@ function ExtractTab() {
         const ok = window.confirm(`${err.message}\n\nDo you want to replace the existing songs?`);
         if (ok) {
           setImporting(false);
-          return handleImport(true);
+          return handleImport(true, creditSnapshot);
         }
       } else {
         setError(err instanceof Error ? err.message : 'Failed to import');
