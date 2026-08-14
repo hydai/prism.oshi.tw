@@ -3,6 +3,7 @@ import { useParams, Link } from 'react-router-dom';
 import type { Song, AuthUser, UpdateSongBody } from '../../../shared/types';
 import { api } from '../api/client';
 import StatusBadge from '../components/StatusBadge';
+import YouTubeEmbed from '../components/YouTubeEmbed';
 
 export default function SongDetail({ user }: { user: AuthUser }) {
   const { id } = useParams<{ id: string }>();
@@ -200,11 +201,10 @@ export default function SongDetail({ user }: { user: AuthUser }) {
 
                 {/* YouTube embed */}
                 <div className="mt-3 aspect-video w-full max-w-lg overflow-hidden rounded-md">
-                  <iframe
-                    src={`https://www.youtube.com/embed/${perf.videoId}?start=${perf.timestamp}`}
+                  <YouTubeEmbed
+                    videoId={perf.videoId}
+                    startSeconds={perf.timestamp}
                     title={perf.streamTitle}
-                    allowFullScreen
-                    className="h-full w-full"
                   />
                 </div>
               </div>

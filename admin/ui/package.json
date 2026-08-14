@@ -6,8 +6,9 @@
   "scripts": {
     "dev": "vite",
     "build": "tsc -b && vite build",
-    "check": "npm run test:numeric-input && npm run build",
+    "check": "npm run test:numeric-input && npm run test:youtube-embed && npm run build",
     "test:numeric-input": "npx tsx tests/numeric-input.test.ts",
+    "test:youtube-embed": "npx tsx tests/youtube-embed.test.tsx",
     "test:nova-links": "npx tsx tests/nova-submissions-links.test.tsx",
     "test:streams-filter": "npx tsx tests/streams-filter.test.ts",
     "test:streams-render": "npx tsx tests/streams-list-render.test.tsx",
