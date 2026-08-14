@@ -152,6 +152,7 @@ export default function NovaSubmissions({ user }: { user: AuthUser }) {
       {/* Status filter + bulk actions */}
       <div className="mt-4 flex items-center gap-3">
         <select
+          aria-label="Filter submissions by status"
           value={statusFilter}
           onChange={(e) => setStatusFilter(e.target.value as '' | NovaStatus)}
           className="rounded-md border border-slate-300 px-3 py-1.5 text-sm"
@@ -170,6 +171,7 @@ export default function NovaSubmissions({ user }: { user: AuthUser }) {
         >
           <input
             type="search"
+            aria-label="Search submissions"
             value={search}
             onChange={(event) => setSearch(event.target.value)}
             placeholder="Search ID, slug, channel..."
@@ -554,9 +556,15 @@ export function SubmissionRow({
                   <>
                     {EDITABLE_FIELDS.map(({ key, label, multiline }) => (
                       <div key={key}>
-                        <label className="text-xs font-medium uppercase text-slate-400">{label}</label>
+                        <label
+                          htmlFor={`nova-${sub.id}-${key}`}
+                          className="text-xs font-medium uppercase text-slate-400"
+                        >
+                          {label}
+                        </label>
                         {multiline ? (
                           <textarea
+                            id={`nova-${sub.id}-${key}`}
                             value={draft[key]}
                             onChange={(e) => setDraft((d) => ({ ...d, [key]: e.target.value }))}
                             rows={3}
@@ -565,6 +573,7 @@ export function SubmissionRow({
                         ) : (
                           <div className={key === 'subscriber_count' ? 'mt-1 flex gap-2' : 'mt-1'}>
                             <input
+                              id={`nova-${sub.id}-${key}`}
                               type="text"
                               value={draft[key]}
                               onChange={(e) => setDraft((d) => ({ ...d, [key]: e.target.value }))}
@@ -592,8 +601,14 @@ export function SubmissionRow({
                     {/* Enabled toggle + Display order */}
                     <div className="flex items-center gap-4">
                       <div className="flex items-center gap-2">
-                        <label className="text-xs font-medium uppercase text-slate-400">Enabled</label>
+                        <label
+                          htmlFor={`nova-enabled-${sub.id}`}
+                          className="text-xs font-medium uppercase text-slate-400"
+                        >
+                          Enabled
+                        </label>
                         <input
+                          id={`nova-enabled-${sub.id}`}
                           type="checkbox"
                           checked={enabledDraft}
                           onChange={(e) => setEnabledDraft(e.target.checked)}
@@ -627,12 +642,13 @@ export function SubmissionRow({
 
                     {/* Theme color editor */}
                     <div>
-                      <label className="text-xs font-medium uppercase text-slate-400">Theme Colors</label>
+                      <p className="text-xs font-medium uppercase text-slate-400">Theme Colors</p>
                       <div className="mt-1 grid grid-cols-2 gap-2">
                         {THEME_KEYS.map((key) => (
                           <div key={key} className="flex items-center gap-2">
                             <input
                               type="color"
+                              aria-label={`${key} theme color`}
                               value={themeDraft[key]}
                               onChange={(e) =>
                                 setThemeDraft((d) => ({ ...d, [key]: e.target.value.toUpperCase() }))
@@ -734,10 +750,14 @@ export function SubmissionRow({
               {/* Right column: reject note (curators only, pending only, view mode only) */}
               {isCurator && sub.status === 'pending' && !editing && (
                 <div>
-                  <label className="text-xs font-medium uppercase text-slate-400">
+                  <label
+                    htmlFor={`nova-reject-note-${sub.id}`}
+                    className="text-xs font-medium uppercase text-slate-400"
+                  >
                     Reviewer Note (optional, shown on reject)
                   </label>
                   <textarea
+                    id={`nova-reject-note-${sub.id}`}
                     value={rejectNote}
                     onChange={(e) => onRejectNoteChange(e.target.value)}
                     placeholder="Reason for rejection..."
