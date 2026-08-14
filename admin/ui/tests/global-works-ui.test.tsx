@@ -61,7 +61,7 @@ async function main(): Promise<void> {
   });
 
   const { api } = await import('../src/api/client');
-  const { getVisibleNavItems } = await import('../src/components/Layout');
+  const { getVisibleNavItems } = await import('../src/lib/navigation');
   const { default: GlobalWorks, SortHeader } = await import('../src/pages/GlobalWorks');
 
   await api.listGlobalWorks({ search: 'Shared', sharedOnly: true, page: 1 });

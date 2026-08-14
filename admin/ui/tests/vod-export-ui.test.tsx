@@ -48,7 +48,7 @@ async function main(): Promise<void> {
     getPublishDisabledReason,
     safeRepairPath,
   } = await import('../src/pages/VodExport');
-  const { getVisibleNavItems } = await import('../src/components/Layout');
+  const { getVisibleNavItems } = await import('../src/lib/navigation');
 
   const curator: AuthUser = { email: 'curator@example.com', role: 'curator' };
   const contributor: AuthUser = { email: 'contributor@example.com', role: 'contributor' };
