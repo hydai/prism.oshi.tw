@@ -28,6 +28,9 @@ const STATUS_COLORS: Record<CrystalTicketStatus, string> = {
   closed: 'bg-slate-100 text-slate-500',
 };
 
+const STATUS_FILTER_LABEL_ID = 'crystal-ticket-status-filter-label';
+const TYPE_FILTER_LABEL_ID = 'crystal-ticket-type-filter-label';
+
 export default function CrystalTickets({ user }: { user: AuthUser }) {
   const [tickets, setTickets] = useState<CrystalTicket[]>([]);
   const [loading, setLoading] = useState(true);
@@ -96,11 +99,22 @@ export default function CrystalTickets({ user }: { user: AuthUser }) {
 
       {/* Filters */}
       <div className="mb-4 flex flex-wrap gap-3">
-        <div className="flex gap-1">
-          <label className="mr-1 self-center text-xs font-medium uppercase text-slate-500">Status:</label>
+        <div
+          className="flex gap-1"
+          role="group"
+          aria-labelledby={STATUS_FILTER_LABEL_ID}
+        >
+          <span
+            id={STATUS_FILTER_LABEL_ID}
+            className="mr-1 self-center text-xs font-medium uppercase text-slate-500"
+          >
+            Status:
+          </span>
           {(['', 'pending', 'replied', 'closed'] as const).map((s) => (
             <button
               key={s}
+              type="button"
+              aria-pressed={statusFilter === s}
               onClick={() => setStatusFilter(s)}
               className={`rounded-md px-3 py-1 text-xs font-medium transition-colors ${
                 statusFilter === s
@@ -113,11 +127,22 @@ export default function CrystalTickets({ user }: { user: AuthUser }) {
           ))}
         </div>
 
-        <div className="flex gap-1">
-          <label className="mr-1 self-center text-xs font-medium uppercase text-slate-500">Type:</label>
+        <div
+          className="flex gap-1"
+          role="group"
+          aria-labelledby={TYPE_FILTER_LABEL_ID}
+        >
+          <span
+            id={TYPE_FILTER_LABEL_ID}
+            className="mr-1 self-center text-xs font-medium uppercase text-slate-500"
+          >
+            Type:
+          </span>
           {(['', 'bug', 'feat', 'ui', 'other'] as const).map((t) => (
             <button
               key={t}
+              type="button"
+              aria-pressed={typeFilter === t}
               onClick={() => setTypeFilter(t)}
               className={`rounded-md px-3 py-1 text-xs font-medium transition-colors ${
                 typeFilter === t
