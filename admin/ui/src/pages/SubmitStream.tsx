@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useId, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import type { CreateStreamBody } from '../../../shared/types';
 import { api } from '../api/client';
@@ -17,6 +17,7 @@ function extractVideoId(url: string): string {
 
 export default function SubmitStream() {
   const navigate = useNavigate();
+  const formId = useId();
   const [title, setTitle] = useState('');
   const [date, setDate] = useState('');
   const [youtubeUrl, setYoutubeUrl] = useState('');
@@ -76,10 +77,11 @@ export default function SubmitStream() {
         {error && <p className="text-sm text-red-600">{error}</p>}
 
         <div>
-          <label className="block text-sm font-medium text-slate-700">
-            Title <span className="text-red-500">*</span>
+          <label htmlFor={`${formId}-title`} className="block text-sm font-medium text-slate-700">
+            Title <span aria-hidden="true" className="text-red-500">*</span>
           </label>
           <input
+            id={`${formId}-title`}
             type="text"
             value={title}
             onChange={(e) => setTitle(e.target.value)}
@@ -90,10 +92,11 @@ export default function SubmitStream() {
         </div>
 
         <div>
-          <label className="block text-sm font-medium text-slate-700">
-            Date <span className="text-red-500">*</span>
+          <label htmlFor={`${formId}-date`} className="block text-sm font-medium text-slate-700">
+            Date <span aria-hidden="true" className="text-red-500">*</span>
           </label>
           <input
+            id={`${formId}-date`}
             type="date"
             value={date}
             onChange={(e) => setDate(e.target.value)}
@@ -103,22 +106,29 @@ export default function SubmitStream() {
         </div>
 
         <div>
-          <label className="block text-sm font-medium text-slate-700">YouTube URL</label>
+          <label htmlFor={`${formId}-youtube-url`} className="block text-sm font-medium text-slate-700">
+            YouTube URL
+          </label>
           <input
+            id={`${formId}-youtube-url`}
             type="url"
             value={youtubeUrl}
             onChange={(e) => handleUrlChange(e.target.value)}
             placeholder="https://www.youtube.com/watch?v=..."
+            aria-describedby={`${formId}-youtube-url-help`}
             className="mt-1 w-full rounded-md border border-slate-300 px-3 py-2 text-sm focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500"
           />
-          <p className="mt-1 text-xs text-slate-500">Video ID will be extracted automatically.</p>
+          <p id={`${formId}-youtube-url-help`} className="mt-1 text-xs text-slate-500">
+            Video ID will be extracted automatically.
+          </p>
         </div>
 
         <div>
-          <label className="block text-sm font-medium text-slate-700">
-            Video ID <span className="text-red-500">*</span>
+          <label htmlFor={`${formId}-video-id`} className="block text-sm font-medium text-slate-700">
+            Video ID <span aria-hidden="true" className="text-red-500">*</span>
           </label>
           <input
+            id={`${formId}-video-id`}
             type="text"
             value={videoId}
             onChange={(e) => setVideoId(e.target.value)}
@@ -132,27 +142,45 @@ export default function SubmitStream() {
         <div className="border-t border-slate-200 pt-4">
           <h3 className="text-sm font-semibold text-slate-700">Credit (optional)</h3>
           <div className="mt-2 space-y-2">
-            <input
-              type="text"
-              value={creditAuthor}
-              onChange={(e) => setCreditAuthor(e.target.value)}
-              placeholder="Credit author"
-              className="w-full rounded-md border border-slate-300 px-3 py-2 text-sm focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500"
-            />
-            <input
-              type="url"
-              value={creditAuthorUrl}
-              onChange={(e) => setCreditAuthorUrl(e.target.value)}
-              placeholder="Author URL"
-              className="w-full rounded-md border border-slate-300 px-3 py-2 text-sm focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500"
-            />
-            <input
-              type="url"
-              value={creditCommentUrl}
-              onChange={(e) => setCreditCommentUrl(e.target.value)}
-              placeholder="Comment URL"
-              className="w-full rounded-md border border-slate-300 px-3 py-2 text-sm focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500"
-            />
+            <div>
+              <label htmlFor={`${formId}-credit-author`} className="block text-xs font-medium text-slate-600">
+                Credit author
+              </label>
+              <input
+                id={`${formId}-credit-author`}
+                type="text"
+                value={creditAuthor}
+                onChange={(e) => setCreditAuthor(e.target.value)}
+                placeholder="e.g. Timestamp contributor"
+                className="mt-1 w-full rounded-md border border-slate-300 px-3 py-2 text-sm focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500"
+              />
+            </div>
+            <div>
+              <label htmlFor={`${formId}-credit-author-url`} className="block text-xs font-medium text-slate-600">
+                Author URL
+              </label>
+              <input
+                id={`${formId}-credit-author-url`}
+                type="url"
+                value={creditAuthorUrl}
+                onChange={(e) => setCreditAuthorUrl(e.target.value)}
+                placeholder="https://..."
+                className="mt-1 w-full rounded-md border border-slate-300 px-3 py-2 text-sm focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500"
+              />
+            </div>
+            <div>
+              <label htmlFor={`${formId}-credit-comment-url`} className="block text-xs font-medium text-slate-600">
+                Comment URL
+              </label>
+              <input
+                id={`${formId}-credit-comment-url`}
+                type="url"
+                value={creditCommentUrl}
+                onChange={(e) => setCreditCommentUrl(e.target.value)}
+                placeholder="https://..."
+                className="mt-1 w-full rounded-md border border-slate-300 px-3 py-2 text-sm focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500"
+              />
+            </div>
           </div>
         </div>
 

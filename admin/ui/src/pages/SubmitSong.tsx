@@ -26,6 +26,7 @@ const emptyPerformance: Omit<PerformanceForm, 'clientId'> = {
 
 export default function SubmitSong() {
   const navigate = useNavigate();
+  const formId = useId();
   const [title, setTitle] = useState('');
   const [originalArtist, setOriginalArtist] = useState('');
   const [tags, setTags] = useState('');
@@ -99,10 +100,11 @@ export default function SubmitSong() {
         {error && <p className="text-sm text-red-600">{error}</p>}
 
         <div>
-          <label className="block text-sm font-medium text-slate-700">
-            Title <span className="text-red-500">*</span>
+          <label htmlFor={`${formId}-title`} className="block text-sm font-medium text-slate-700">
+            Title <span aria-hidden="true" className="text-red-500">*</span>
           </label>
           <input
+            id={`${formId}-title`}
             type="text"
             value={title}
             onChange={(e) => setTitle(e.target.value)}
@@ -112,10 +114,11 @@ export default function SubmitSong() {
         </div>
 
         <div>
-          <label className="block text-sm font-medium text-slate-700">
-            Original Artist <span className="text-red-500">*</span>
+          <label htmlFor={`${formId}-artist`} className="block text-sm font-medium text-slate-700">
+            Original Artist <span aria-hidden="true" className="text-red-500">*</span>
           </label>
           <input
+            id={`${formId}-artist`}
             type="text"
             value={originalArtist}
             onChange={(e) => setOriginalArtist(e.target.value)}
@@ -125,8 +128,11 @@ export default function SubmitSong() {
         </div>
 
         <div>
-          <label className="block text-sm font-medium text-slate-700">Tags</label>
+          <label htmlFor={`${formId}-tags`} className="block text-sm font-medium text-slate-700">
+            Tags
+          </label>
           <input
+            id={`${formId}-tags`}
             type="text"
             value={tags}
             onChange={(e) => setTags(e.target.value)}
@@ -161,55 +167,97 @@ export default function SubmitSong() {
                 </button>
               </div>
               <div className="grid grid-cols-2 gap-2">
+                <div>
+                  <label htmlFor={`${perf.clientId}-stream-id`} className="block text-xs font-medium text-slate-600">
+                    Stream ID
+                  </label>
+                  <input
+                    id={`${perf.clientId}-stream-id`}
+                    type="text"
+                    placeholder="Stream ID"
+                    value={perf.streamId}
+                    onChange={(e) => updatePerformance(idx, 'streamId', e.target.value)}
+                    className="mt-1 w-full rounded border border-slate-300 px-2 py-1 text-sm"
+                  />
+                </div>
+                <div>
+                  <label htmlFor={`${perf.clientId}-stream-title`} className="block text-xs font-medium text-slate-600">
+                    Stream title
+                  </label>
+                  <input
+                    id={`${perf.clientId}-stream-title`}
+                    type="text"
+                    placeholder="Stream title"
+                    value={perf.streamTitle}
+                    onChange={(e) => updatePerformance(idx, 'streamTitle', e.target.value)}
+                    className="mt-1 w-full rounded border border-slate-300 px-2 py-1 text-sm"
+                  />
+                </div>
+                <div>
+                  <label htmlFor={`${perf.clientId}-video-id`} className="block text-xs font-medium text-slate-600">
+                    Video ID
+                  </label>
+                  <input
+                    id={`${perf.clientId}-video-id`}
+                    type="text"
+                    placeholder="Video ID"
+                    value={perf.videoId}
+                    onChange={(e) => updatePerformance(idx, 'videoId', e.target.value)}
+                    className="mt-1 w-full rounded border border-slate-300 px-2 py-1 text-sm"
+                  />
+                </div>
+                <div>
+                  <label htmlFor={`${perf.clientId}-date`} className="block text-xs font-medium text-slate-600">
+                    Date
+                  </label>
+                  <input
+                    id={`${perf.clientId}-date`}
+                    type="date"
+                    value={perf.date}
+                    onChange={(e) => updatePerformance(idx, 'date', e.target.value)}
+                    className="mt-1 w-full rounded border border-slate-300 px-2 py-1 text-sm"
+                  />
+                </div>
+                <div>
+                  <label htmlFor={`${perf.clientId}-start`} className="block text-xs font-medium text-slate-600">
+                    Start (seconds)
+                  </label>
+                  <input
+                    id={`${perf.clientId}-start`}
+                    type="number"
+                    placeholder="Start (seconds)"
+                    value={perf.timestamp}
+                    onChange={(e) => updatePerformance(idx, 'timestamp', e.target.value)}
+                    className="mt-1 w-full rounded border border-slate-300 px-2 py-1 text-sm"
+                  />
+                </div>
+                <div>
+                  <label htmlFor={`${perf.clientId}-end`} className="block text-xs font-medium text-slate-600">
+                    End (seconds, optional)
+                  </label>
+                  <input
+                    id={`${perf.clientId}-end`}
+                    type="number"
+                    placeholder="End (seconds, optional)"
+                    value={perf.endTimestamp}
+                    onChange={(e) => updatePerformance(idx, 'endTimestamp', e.target.value)}
+                    className="mt-1 w-full rounded border border-slate-300 px-2 py-1 text-sm"
+                  />
+                </div>
+              </div>
+              <div>
+                <label htmlFor={`${perf.clientId}-note`} className="block text-xs font-medium text-slate-600">
+                  Note (optional)
+                </label>
                 <input
+                  id={`${perf.clientId}-note`}
                   type="text"
-                  placeholder="Stream ID"
-                  value={perf.streamId}
-                  onChange={(e) => updatePerformance(idx, 'streamId', e.target.value)}
-                  className="rounded border border-slate-300 px-2 py-1 text-sm"
-                />
-                <input
-                  type="text"
-                  placeholder="Stream title"
-                  value={perf.streamTitle}
-                  onChange={(e) => updatePerformance(idx, 'streamTitle', e.target.value)}
-                  className="rounded border border-slate-300 px-2 py-1 text-sm"
-                />
-                <input
-                  type="text"
-                  placeholder="Video ID"
-                  value={perf.videoId}
-                  onChange={(e) => updatePerformance(idx, 'videoId', e.target.value)}
-                  className="rounded border border-slate-300 px-2 py-1 text-sm"
-                />
-                <input
-                  type="date"
-                  value={perf.date}
-                  onChange={(e) => updatePerformance(idx, 'date', e.target.value)}
-                  className="rounded border border-slate-300 px-2 py-1 text-sm"
-                />
-                <input
-                  type="number"
-                  placeholder="Start (seconds)"
-                  value={perf.timestamp}
-                  onChange={(e) => updatePerformance(idx, 'timestamp', e.target.value)}
-                  className="rounded border border-slate-300 px-2 py-1 text-sm"
-                />
-                <input
-                  type="number"
-                  placeholder="End (seconds, optional)"
-                  value={perf.endTimestamp}
-                  onChange={(e) => updatePerformance(idx, 'endTimestamp', e.target.value)}
-                  className="rounded border border-slate-300 px-2 py-1 text-sm"
+                  placeholder="Note (optional)"
+                  value={perf.note}
+                  onChange={(e) => updatePerformance(idx, 'note', e.target.value)}
+                  className="mt-1 w-full rounded border border-slate-300 px-2 py-1 text-sm"
                 />
               </div>
-              <input
-                type="text"
-                placeholder="Note (optional)"
-                value={perf.note}
-                onChange={(e) => updatePerformance(idx, 'note', e.target.value)}
-                className="w-full rounded border border-slate-300 px-2 py-1 text-sm"
-              />
             </div>
           ))}
         </div>
