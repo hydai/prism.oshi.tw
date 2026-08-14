@@ -128,6 +128,7 @@ export default function SongsList({ user }: { user: AuthUser }) {
         <form onSubmit={handleSearch} className="flex gap-2">
           <input
             type="text"
+            aria-label="Search songs by title or artist"
             placeholder="Search by title or artist..."
             value={search}
             onChange={(e) => setSearch(e.target.value)}
@@ -141,6 +142,7 @@ export default function SongsList({ user }: { user: AuthUser }) {
           </button>
         </form>
         <select
+          aria-label="Filter songs by status"
           value={statusFilter}
           onChange={(e) => handleStatusChange(e.target.value as '' | Status)}
           className="rounded-md border border-slate-300 px-3 py-1.5 text-sm"

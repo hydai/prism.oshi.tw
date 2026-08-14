@@ -70,12 +70,14 @@ export default function SongDetail({ user }: { user: AuthUser }) {
               <div className="space-y-3">
                 <input
                   type="text"
+                  aria-label="Song title"
                   value={editForm.title ?? ''}
                   onChange={(e) => setEditForm((f) => ({ ...f, title: e.target.value }))}
                   className="w-full rounded border border-slate-300 px-3 py-1.5 text-lg font-semibold focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500"
                 />
                 <input
                   type="text"
+                  aria-label="Original artist"
                   value={editForm.originalArtist ?? ''}
                   onChange={(e) => setEditForm((f) => ({ ...f, originalArtist: e.target.value }))}
                   placeholder="Original artist"
@@ -83,6 +85,7 @@ export default function SongDetail({ user }: { user: AuthUser }) {
                 />
                 <input
                   type="text"
+                  aria-label="Tags, comma-separated"
                   value={editForm.tags?.join(', ') ?? ''}
                   onChange={(e) =>
                     setEditForm((f) => ({
