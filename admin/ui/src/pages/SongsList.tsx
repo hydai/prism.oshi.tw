@@ -128,7 +128,7 @@ export default function SongsList({ user }: { user: AuthUser }) {
         <form onSubmit={handleSearch} className="flex gap-2">
           <input
             type="text"
-            aria-label="Search songs by title or artist"
+            aria-label="Search by title or artist..."
             placeholder="Search by title or artist..."
             value={search}
             onChange={(e) => setSearch(e.target.value)}
