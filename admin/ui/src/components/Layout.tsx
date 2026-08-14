@@ -1,35 +1,14 @@
 import { NavLink, useNavigate } from 'react-router-dom';
-import { useEffect, useEffectEvent, useState, type ReactNode } from 'react';
+import { useEffect, useEffectEvent, useId, useState, type ReactNode } from 'react';
 import type { AuthUser, StreamerInfo } from '../../../shared/types';
 import { api, getCurrentStreamer, setCurrentStreamer, onStreamerChange } from '../api/client';
-
-const navItems: Array<{ to: string; label: string; curatorOnly?: boolean }> = [
-  { to: '/', label: 'Dashboard' },
-  { to: '/songs', label: 'Songs' },
-  { to: '/works', label: 'Global Library', curatorOnly: true },
-  { to: '/works/review', label: 'Work Review', curatorOnly: true },
-  { to: '/streams', label: 'Streams' },
-  { to: '/submit/song', label: 'Submit Song' },
-  { to: '/submit/stream', label: 'Submit Stream' },
-  { to: '/stamp', label: 'Stamp Editor' },
-  { to: '/pipeline', label: 'Pipeline' },
-  { to: '/harmonizer', label: 'Harmonizer' },
-  { to: '/nova', label: 'Nova' },
-  { to: '/nova/vods', label: 'Nova VODs' },
-  { to: '/crystal', label: 'Crystal' },
-  { to: '/vod-export', label: 'VOD Export', curatorOnly: true },
-];
-
-export function getVisibleNavItems(user: AuthUser): Array<{ to: string; label: string }> {
-  return navItems
-    .filter((item) => !item.curatorOnly || user.role === 'curator')
-    .map(({ to, label }) => ({ to, label }));
-}
+import { getVisibleNavItems } from '../lib/navigation';
 
 export default function Layout({ user, children }: { user: AuthUser; children: ReactNode }) {
   const navigate = useNavigate();
   const [streamer, setStreamer] = useState(getCurrentStreamer);
   const [streamers, setStreamers] = useState<StreamerInfo[]>([]);
+  const streamerSelectId = useId();
   const navigateToDashboard = useEffectEvent(() => navigate('/'));
 
   useEffect(() => onStreamerChange(setStreamer), []);
@@ -62,10 +41,14 @@ export default function Layout({ user, children }: { user: AuthUser; children: R
 
         {/* Streamer selector */}
         <div className="border-b border-slate-700 px-4 py-3">
-          <label className="mb-1 block text-xs font-medium uppercase tracking-wider text-slate-500">
+          <label
+            htmlFor={streamerSelectId}
+            className="mb-1 block text-xs font-medium uppercase tracking-wider text-slate-500"
+          >
             Streamer
           </label>
           <select
+            id={streamerSelectId}
             value={streamer}
             onChange={(e) => {
               setCurrentStreamer(e.target.value);
