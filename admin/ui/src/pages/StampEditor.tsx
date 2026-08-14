@@ -94,6 +94,7 @@ function AddSongModal({
           <input
             ref={inputRef}
             type="text"
+            aria-label="Song title"
             placeholder="Song title *"
             value={title}
             onChange={(e) => setTitle(e.target.value)}
@@ -102,6 +103,7 @@ function AddSongModal({
           />
           <input
             type="text"
+            aria-label="Original artist"
             placeholder="Original artist"
             value={artist}
             onChange={(e) => setArtist(e.target.value)}
@@ -188,6 +190,7 @@ function PasteImportModal({
         <div className="flex-1 overflow-y-auto px-6 py-4">
           <textarea
             ref={textareaRef}
+            aria-label="Paste a timestamp list"
             value={text}
             onChange={(e) => setText(e.target.value)}
             placeholder={`0:00 Song Title / Artist Name\n3:45 Another Song - Another Artist\n7:20 Third Song`}
@@ -899,6 +902,7 @@ export default function StampEditor({ user }: { user: AuthUser }) {
             <h3 className="text-sm font-semibold text-slate-700">Streams</h3>
             {streamYears.length > 1 && (
               <select
+                aria-label="Filter streams by year"
                 value={streamYearFilter}
                 onChange={(e) => setStreamYearFilter(e.target.value)}
                 className="rounded border border-slate-300 px-1 py-0.5 text-xs"
@@ -912,6 +916,7 @@ export default function StampEditor({ user }: { user: AuthUser }) {
           </div>
           <input
             type="text"
+            aria-label="Search streams"
             placeholder="Search streams..."
             value={streamSearch}
             onChange={(e) => setStreamSearch(e.target.value)}
