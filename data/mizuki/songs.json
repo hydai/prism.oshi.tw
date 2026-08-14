@@ -1863,6 +1863,13 @@
     "tags": [],
     "performances": [
       {
+        "id": "p-10b603b4",
+        "streamId": "stream-2026-08-11",
+        "videoId": "T4ORfh2Iv8c",
+        "timestamp": 2149,
+        "endTimestamp": 2399
+      },
+      {
         "id": "p-d210fd25",
         "streamId": "stream-533770ff",
         "videoId": "IOxT48R2-00",
@@ -5008,6 +5015,22 @@
     ]
   },
   {
+    "id": "song-dfd912be",
+    "workId": "work-6cdbc690-a0ae-49ad-b0e0-20c4504ff5de",
+    "title": "失眠飛行",
+    "originalArtist": "接個吻，開一槍",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-185ea0de",
+        "streamId": "stream-2026-08-11",
+        "videoId": "T4ORfh2Iv8c",
+        "timestamp": 2980,
+        "endTimestamp": 3189
+      }
+    ]
+  },
+  {
     "id": "song-298",
     "workId": "work-song-298",
     "title": "失落沙洲",
@@ -5801,6 +5824,13 @@
     "originalArtist": "周興哲",
     "tags": [],
     "performances": [
+      {
+        "id": "p-2c3b3903",
+        "streamId": "stream-2026-08-11",
+        "videoId": "T4ORfh2Iv8c",
+        "timestamp": 4461,
+        "endTimestamp": 4721
+      },
       {
         "id": "p1472-3",
         "streamId": "stream-2026-01-17",
@@ -21508,29 +21538,6 @@
     ]
   },
   {
-    "id": "song-2040",
-    "workId": "work-song-2040",
-    "title": "絕頂讚歌",
-    "originalArtist": "和ぬか",
-    "tags": [],
-    "performances": [
-      {
-        "id": "p2040-2",
-        "streamId": "stream-2025-06-30",
-        "videoId": "Nlo7YSuhw9E",
-        "timestamp": 206,
-        "endTimestamp": 446
-      },
-      {
-        "id": "p2040-1",
-        "streamId": "stream-2024-02-23",
-        "videoId": "WWpl_k9SROk",
-        "timestamp": 4100,
-        "endTimestamp": 4340
-      }
-    ]
-  },
-  {
     "id": "song-1426",
     "workId": "work-song-1426",
     "title": "給他",
@@ -21617,6 +21624,36 @@
         "videoId": "NITiSZwQxnU",
         "timestamp": 2248,
         "endTimestamp": 2457
+      }
+    ]
+  },
+  {
+    "id": "song-2040",
+    "workId": "work-song-91",
+    "title": "絶頂讃歌",
+    "originalArtist": "和ぬか",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-6327568a",
+        "streamId": "stream-2026-08-11",
+        "videoId": "T4ORfh2Iv8c",
+        "timestamp": 3205,
+        "endTimestamp": 3383
+      },
+      {
+        "id": "p2040-2",
+        "streamId": "stream-2025-06-30",
+        "videoId": "Nlo7YSuhw9E",
+        "timestamp": 206,
+        "endTimestamp": 446
+      },
+      {
+        "id": "p2040-1",
+        "streamId": "stream-2024-02-23",
+        "videoId": "WWpl_k9SROk",
+        "timestamp": 4100,
+        "endTimestamp": 4340
       }
     ]
   },
@@ -29250,6 +29287,22 @@
     ]
   },
   {
+    "id": "song-0fae7a56",
+    "workId": "work-d0e6370a-0dd6-45ce-9bba-07794f2df235",
+    "title": "Before You Fall (DEMO)",
+    "originalArtist": "浠Mizuki",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-96d3fc39",
+        "streamId": "stream-2026-08-11",
+        "videoId": "T4ORfh2Iv8c",
+        "timestamp": 5196,
+        "endTimestamp": 5449
+      }
+    ]
+  },
+  {
     "id": "song-503",
     "workId": "work-song-503",
     "title": "Believer",
@@ -30112,6 +30165,22 @@
         "videoId": "-QOqeIiWUJQ",
         "timestamp": 5674,
         "endTimestamp": 5897
+      }
+    ]
+  },
+  {
+    "id": "song-1b937276",
+    "workId": "work-3816dda7-96ba-42de-b7bf-16627a249818",
+    "title": "Call me by Your Name",
+    "originalArtist": "浠Mizuki",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-077c2409",
+        "streamId": "stream-2026-08-11",
+        "videoId": "T4ORfh2Iv8c",
+        "timestamp": 5702,
+        "endTimestamp": 5862
       }
     ]
   },
@@ -35575,6 +35644,13 @@
     "tags": [],
     "performances": [
       {
+        "id": "p-4d3b5480",
+        "streamId": "stream-2026-08-11",
+        "videoId": "T4ORfh2Iv8c",
+        "timestamp": 2508,
+        "endTimestamp": 2712
+      },
+      {
         "id": "p270-1",
         "streamId": "stream-2025-02-01",
         "videoId": "X0aDZwv-Pw0",
@@ -37982,6 +38058,13 @@
     "tags": [],
     "performances": [
       {
+        "id": "p-e5dc533f",
+        "streamId": "stream-2026-08-11",
+        "videoId": "T4ORfh2Iv8c",
+        "timestamp": 4737,
+        "endTimestamp": 4988
+      },
+      {
         "id": "p-ba15c3f9",
         "streamId": "stream-2026-03-07",
         "videoId": "lAAiVzu7xYE",
@@ -39033,6 +39116,13 @@
     "originalArtist": "Audrey Hepburn",
     "tags": [],
     "performances": [
+      {
+        "id": "p-ec74bf01",
+        "streamId": "stream-2026-08-11",
+        "videoId": "T4ORfh2Iv8c",
+        "timestamp": 1380,
+        "endTimestamp": 1594
+      },
       {
         "id": "p2069-3",
         "streamId": "stream-2025-10-17",
@@ -45105,6 +45195,22 @@
         "videoId": "INPkn_yTziI",
         "timestamp": 7881,
         "endTimestamp": 8081
+      }
+    ]
+  },
+  {
+    "id": "song-8f224f34",
+    "workId": "work-b228918e-1f97-4586-953f-482ab82ef424",
+    "title": "Stay Right Here (離れ Night)",
+    "originalArtist": "浠Mizuki",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-a360a2c9",
+        "streamId": "stream-2026-08-11",
+        "videoId": "T4ORfh2Iv8c",
+        "timestamp": 6024,
+        "endTimestamp": 6222
       }
     ]
   },
@@ -51254,6 +51360,13 @@
     "tags": [],
     "performances": [
       {
+        "id": "p-579c3d11",
+        "streamId": "stream-2026-08-11",
+        "videoId": "T4ORfh2Iv8c",
+        "timestamp": 1607,
+        "endTimestamp": 1815
+      },
+      {
         "id": "p210-1",
         "streamId": "stream-2026-02-01",
         "videoId": "u3s--W56f8Q",
@@ -55105,6 +55218,22 @@
     ]
   },
   {
+    "id": "song-a223658c",
+    "workId": "work-6116916f-6666-4c8a-aeec-feed0f2ef238",
+    "title": "なんでもないや  中文ver.",
+    "originalArtist": "RADWIMPS",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-51f6fe18",
+        "streamId": "stream-2026-08-11",
+        "videoId": "T4ORfh2Iv8c",
+        "timestamp": 949,
+        "endTimestamp": 1267
+      }
+    ]
+  },
+  {
     "id": "song-1842",
     "workId": "work-song-1842",
     "title": "なんでもないや中文ver.",
@@ -56228,6 +56357,22 @@
         "videoId": "dnRpPieRaLg",
         "timestamp": 1480,
         "endTimestamp": 1676
+      }
+    ]
+  },
+  {
+    "id": "song-42c8342b",
+    "workId": "work-2fff6113-aea4-4c83-a006-6909ca6acc7a",
+    "title": "ヒッチコック",
+    "originalArtist": "ヨルシカ",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-997a4eaa",
+        "streamId": "stream-2026-08-11",
+        "videoId": "T4ORfh2Iv8c",
+        "timestamp": 577,
+        "endTimestamp": 805
       }
     ]
   },
