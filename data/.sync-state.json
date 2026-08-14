@@ -191,13 +191,13 @@
       "streamsCount": 0
     },
     "mizuki": {
-      "lastSyncedAt": "2026-08-05T04:02:24.983Z",
-      "maxSongUpdatedAt": "2026-08-04 18:16:47",
-      "maxPerfUpdatedAt": "2026-08-04 18:16:47",
-      "maxStreamUpdatedAt": "2026-08-04 15:57:48",
-      "songsCount": 2391,
-      "performancesCount": 5424,
-      "streamsCount": 305
+      "lastSyncedAt": "2026-08-14T04:01:37.214Z",
+      "maxSongUpdatedAt": "2026-08-13 16:35:36",
+      "maxPerfUpdatedAt": "2026-08-13 16:35:17",
+      "maxStreamUpdatedAt": "2026-08-13 16:35:17",
+      "songsCount": 2397,
+      "performancesCount": 5437,
+      "streamsCount": 306
     },
     "nagi": {
       "lastSyncedAt": "2026-08-05T04:03:37.963Z",
