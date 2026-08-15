@@ -6,6 +6,7 @@ import {
   getDashboardStats,
   getSongSimilarityGroups,
   importVodToAdminDb,
+  insertPerformances,
   listGlobalWorksPaginated,
   mergeSongs,
   SongMergeError,
@@ -87,6 +88,7 @@ class FakeD1Database {
   readonly firstStatements: CapturedStatement[] = [];
   readonly allStatements: CapturedStatement[] = [];
   readonly batchStatements: CapturedStatement[] = [];
+  batchCallCount = 0;
   mergeGuardValid = true;
   streamPerformanceCount = 0;
   dashboardStatusRows: Record<'songs' | 'streams' | 'performances', unknown[]> = {
@@ -112,6 +114,7 @@ class FakeD1Database {
   }
 
   async batch(statements: FakeStatement[]): Promise<Array<{ results: unknown[]; meta: { changes: number } }>> {
+    this.batchCallCount += 1;
     this.batchStatements.push(
       ...statements.map((statement) => ({ sql: statement.sql, params: statement.params })),
     );
@@ -183,6 +186,49 @@ class FakeD1Database {
       return { results: [], meta: { changes } };
     });
   }
+}
+
+async function testInsertPerformancesUsesOneBatch(): Promise<void> {
+  const fakeDb = new FakeD1Database(null);
+  await insertPerformances(
+    fakeDb as unknown as D1Database,
+    'alice',
+    'song-one',
+    [
+      {
+        id: 'perf-one',
+        streamId: 'stream-one',
+        date: '2026-08-16',
+        streamTitle: 'First stream',
+        videoId: 'video-one',
+        timestamp: 10,
+        endTimestamp: 20,
+        note: 'first',
+      },
+      {
+        id: 'perf-two',
+        streamId: 'stream-two',
+        date: '2026-08-17',
+        streamTitle: 'Second stream',
+        videoId: 'video-two',
+        timestamp: 30,
+        endTimestamp: null,
+        note: '',
+      },
+    ],
+    'curator@example.com',
+  );
+
+  assertEqual(fakeDb.batchCallCount, 1, 'inline performances share one D1 batch');
+  assertEqual(fakeDb.batchStatements.length, 2, 'one insert is prepared for each performance');
+  assert(
+    fakeDb.batchStatements.every((statement) => /INSERT\s+INTO\s+performances/i.test(statement.sql)),
+    'the batch contains only performance inserts',
+  );
+  assertEqual(fakeDb.batchStatements[0]?.params[0], 'perf-one', 'the first generated performance ID is preserved');
+  assertEqual(fakeDb.batchStatements[1]?.params[0], 'perf-two', 'the second generated performance ID is preserved');
+  assertEqual(fakeDb.batchStatements[0]?.params[2], 'song-one', 'every performance targets the new song');
+  assertEqual(fakeDb.batchStatements[1]?.params[11], 'curator@example.com', 'the submitter is preserved');
 }
 
 // performances columns, in bind order:
@@ -1070,6 +1116,7 @@ async function testSharedSongsSurviveStreamMutations(): Promise<void> {
 }
 
 async function main(): Promise<void> {
+  await testInsertPerformancesUsesOneBatch();
   await testVodImportPreservesExistingStream();
   await testVodImportCreatesNewStreamWhenAbsent();
   await testVodImportReusesExactSong();
