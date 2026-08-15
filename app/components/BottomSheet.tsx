@@ -1,8 +1,9 @@
 'use client';
 
-import { useRef, useCallback, useEffect, useEffectEvent, useState } from 'react';
+import { useRef, useCallback, useEffect, useEffectEvent } from 'react';
 import { createPortal } from 'react-dom';
 import { X } from 'lucide-react';
+import { useHydrated } from '../lib/use-hydrated';
 
 interface BottomSheetProps {
   show: boolean;
@@ -25,14 +26,10 @@ export default function BottomSheet({
   desktopWidth = 500,
   testId,
 }: BottomSheetProps) {
-  const [mounted, setMounted] = useState(false);
+  const hydrated = useHydrated();
   const sheetRef = useRef<HTMLDivElement>(null);
   const dragStartY = useRef<number | null>(null);
   const currentTranslateY = useRef(0);
-
-  useEffect(() => {
-    setMounted(true);
-  }, []);
 
   const handleKeyDown = useEffectEvent((e: KeyboardEvent) => {
     if (e.key === 'Escape') onClose();
@@ -71,7 +68,7 @@ export default function BottomSheet({
     currentTranslateY.current = 0;
   }, [onClose]);
 
-  if (!mounted || !show) return null;
+  if (!hydrated || !show) return null;
 
   return createPortal(
     <>

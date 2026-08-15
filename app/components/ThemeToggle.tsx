@@ -2,13 +2,11 @@
 
 import { useEffect, useSyncExternalStore } from 'react';
 import { Sun, Moon } from 'lucide-react';
+import { useHydrated } from '../lib/use-hydrated';
 
 type Theme = 'light' | 'dark';
 
 const THEME_CHANGE_EVENT = 'prism-theme-change';
-const emptySubscribe = () => () => {};
-const getClientSnapshot = () => true;
-const getServerSnapshot = () => false;
 
 function getThemeSnapshot(): Theme {
   return document.documentElement.classList.contains('dark') ? 'dark' : 'light';
@@ -29,11 +27,7 @@ function updateDocumentTheme(theme: Theme) {
 }
 
 export default function ThemeToggle() {
-  const hydrated = useSyncExternalStore(
-    emptySubscribe,
-    getClientSnapshot,
-    getServerSnapshot,
-  );
+  const hydrated = useHydrated();
   const theme = useSyncExternalStore(
     subscribeToTheme,
     getThemeSnapshot,
