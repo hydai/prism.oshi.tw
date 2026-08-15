@@ -256,9 +256,11 @@ export function App() {
   }, [songs, handleUpdate]);
 
   const handleFillAllDurations = useCallback(async () => {
-    const targets = songs
-      .map((s, i) => ({ song: s, index: i }))
-      .filter(({ song }) => song.name.trim() !== '');
+    const targets: { song: AuroraSong; index: number }[] = [];
+    for (let index = 0; index < songs.length; index++) {
+      const song = songs[index]!;
+      if (song.name.trim() !== '') targets.push({ song, index });
+    }
     if (targets.length === 0) return;
 
     let filled = 0;
@@ -331,15 +333,26 @@ export function App() {
 
     try {
       const vodUrlStr = vodUrl || `https://youtube.com/watch?v=${videoId}`;
+      const submittedSongs: Array<{
+        song_title: string;
+        original_artist: string;
+        start_timestamp: number;
+        end_timestamp: number | null;
+      }> = [];
+      for (const song of songs) {
+        if (song.name.trim() === '') continue;
+        submittedSongs.push({
+          song_title: song.name,
+          original_artist: song.artist,
+          start_timestamp: song.startSeconds,
+          end_timestamp: song.endSeconds,
+        });
+      }
+
       const body = {
         streamer_slug: selectedStreamer,
         video_url: vodUrlStr,
-        songs: songs.filter((s) => s.name.trim() !== '').map((s) => ({
-          song_title: s.name,
-          original_artist: s.artist,
-          start_timestamp: s.startSeconds,
-          end_timestamp: s.endSeconds,
-        })),
+        songs: submittedSongs,
         turnstile_token: turnstileToken,
         stream_date: submitStreamDate || undefined,
         submitter_note: submitNote || undefined,
