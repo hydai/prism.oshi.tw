@@ -59,26 +59,36 @@ export default function SubmitSong() {
     setSubmitting(true);
     setError(null);
 
-    const perfBodies: CreatePerformanceBody[] = performances
-      .filter((p) => p.videoId.trim() && p.streamId.trim())
-      .map((p) => ({
+    const perfBodies: CreatePerformanceBody[] = [];
+    for (const performance of performances) {
+      const streamId = performance.streamId.trim();
+      const videoId = performance.videoId.trim();
+      if (!streamId || !videoId) continue;
+
+      perfBodies.push({
         songId: '', // filled by API
-        streamId: p.streamId.trim(),
-        date: p.date,
-        streamTitle: p.streamTitle,
-        videoId: p.videoId.trim(),
-        timestamp: parseInt(p.timestamp, 10) || 0,
-        endTimestamp: p.endTimestamp ? parseInt(p.endTimestamp, 10) : null,
-        note: p.note,
-      }));
+        streamId,
+        date: performance.date,
+        streamTitle: performance.streamTitle,
+        videoId,
+        timestamp: parseInt(performance.timestamp, 10) || 0,
+        endTimestamp: performance.endTimestamp
+          ? parseInt(performance.endTimestamp, 10)
+          : null,
+        note: performance.note,
+      });
+    }
+
+    const normalizedTags: string[] = [];
+    for (const tag of tags.split(',')) {
+      const normalizedTag = tag.trim();
+      if (normalizedTag) normalizedTags.push(normalizedTag);
+    }
 
     const body: CreateSongBody = {
       title: title.trim(),
       originalArtist: originalArtist.trim(),
-      tags: tags
-        .split(',')
-        .map((t) => t.trim())
-        .filter(Boolean),
+      tags: normalizedTags,
       performances: perfBodies.length > 0 ? perfBodies : undefined,
     };
 
