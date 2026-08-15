@@ -9,7 +9,6 @@ import { createFinding } from './findings';
 import { capacityDiagnostic } from './limits';
 import {
   PRIVATE_JSON_HTTP_METADATA,
-  VodExportR2Error,
   assertHttpMetadata,
   checksumSha256Hex,
   createBytesObject,
@@ -202,13 +201,6 @@ export async function readAndVerifyCandidateBytes(
   return bytes;
 }
 
-export async function deleteCandidate(
-  bucket: R2Bucket,
-  candidate: VodExportCandidateMetadata,
-): Promise<void> {
-  await bucket.delete([candidate.snapshotKey, candidateMetadataKey(candidate.candidateId)]);
-}
-
 export async function deleteCandidateById(bucket: R2Bucket, candidateId: string): Promise<void> {
   await bucket.delete([candidateSnapshotKey(candidateId), candidateMetadataKey(candidateId)]);
 }
@@ -376,11 +368,4 @@ function hasExactKeys(record: Record<string, unknown>, keys: readonly string[]):
 
 function hasOnlyKeys(record: Record<string, unknown>, keys: ReadonlySet<string>): boolean {
   return Object.keys(record).every((key) => keys.has(key));
-}
-
-export function candidateErrorFromR2(error: unknown): never {
-  if (error instanceof VodExportR2Error) {
-    throw new VodExportCandidateError('CANDIDATE_CORRUPT', error.message, error.status);
-  }
-  throw error;
 }

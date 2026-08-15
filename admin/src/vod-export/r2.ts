@@ -4,7 +4,6 @@ import {
   VOD_EXPORT_SNAPSHOT_CACHE_CONTROL,
 } from './constants';
 
-const textEncoder = new TextEncoder();
 const textDecoder = new TextDecoder('utf-8', { fatal: true, ignoreBOM: true });
 
 export const PRIVATE_JSON_HTTP_METADATA: R2HTTPMetadata = {
@@ -70,10 +69,6 @@ export async function getJsonObject<T>(
   } catch {
     throw new VodExportR2Error('R2_OBJECT_INVALID_JSON', `R2 object ${key} is not valid JSON`);
   }
-}
-
-export function encodePrivateJson(value: unknown): Uint8Array {
-  return textEncoder.encode(JSON.stringify(value));
 }
 
 export async function createJsonObject(

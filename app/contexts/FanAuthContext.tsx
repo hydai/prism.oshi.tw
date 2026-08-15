@@ -1,6 +1,6 @@
 'use client';
 
-import { createContext, useContext, ReactNode } from 'react';
+import { createContext, ReactNode } from 'react';
 
 interface FanAuthContextType {
   isLoggedIn: false;
@@ -13,8 +13,6 @@ const FAN_AUTH_VALUE: FanAuthContextType = {
 };
 
 const FanAuthContext = createContext<FanAuthContextType>(FAN_AUTH_VALUE);
-
-export const useFanAuth = () => useContext(FanAuthContext);
 
 export const FanAuthProvider = ({ children }: { children: ReactNode }) => {
   return (
