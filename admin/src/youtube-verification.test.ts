@@ -1,4 +1,4 @@
-import { verifyChannelId } from './youtube';
+import { discoverStreams, verifyChannelId } from './youtube';
 
 declare const process: { exitCode?: number };
 
@@ -33,6 +33,85 @@ async function testExactChannelVerification(): Promise<void> {
   });
 }
 
+async function testDiscoveryFiltersKaraokeUploadsInOrder(): Promise<void> {
+  let playlistRequests = 0;
+  let detailsRequests = 0;
+
+  await withFetch(async (input, init) => {
+    const url = new URL(String(input));
+    assert(
+      new Headers(init?.headers).get('Referer') === 'https://prism-admin.oshi.tw/',
+      'uses the restricted-key Referer',
+    );
+
+    if (url.pathname.endsWith('/youtube/v3/playlistItems')) {
+      playlistRequests++;
+      assert(
+        url.searchParams.get('playlistId') === 'UU-test',
+        'converts the channel ID to its uploads playlist',
+      );
+
+      if (url.searchParams.get('pageToken') === null) {
+        return Response.json({
+          items: [
+            { snippet: { title: 'Weekly chat', resourceId: { videoId: 'chat' } } },
+            { snippet: { title: '【歌枠】First set', resourceId: { videoId: 'first-set' } } },
+          ],
+          nextPageToken: 'page-2',
+        });
+      }
+
+      assert(url.searchParams.get('pageToken') === 'page-2', 'requests the next uploads page');
+      return Response.json({
+        items: [
+          { snippet: { title: 'Late night singing', resourceId: { videoId: 'singing-set' } } },
+          { snippet: { title: 'Game stream', resourceId: { videoId: 'game' } } },
+        ],
+      });
+    }
+
+    assert(url.pathname.endsWith('/youtube/v3/videos'), 'uses videos.list for matching upload details');
+    detailsRequests++;
+    assert(
+      url.searchParams.get('id') === 'first-set,singing-set',
+      'passes only karaoke uploads to videos.list in discovery order',
+    );
+    return Response.json({
+      items: [
+        {
+          id: 'first-set',
+          snippet: {
+            title: '【歌枠】First set',
+            publishedAt: '2026-08-01T12:00:00Z',
+            description: 'first',
+            liveBroadcastContent: 'none',
+          },
+          contentDetails: { duration: 'PT1H' },
+        },
+        {
+          id: 'singing-set',
+          snippet: {
+            title: 'Late night singing',
+            publishedAt: '2026-08-02T12:00:00Z',
+            description: 'second',
+            liveBroadcastContent: 'none',
+          },
+          contentDetails: { duration: 'PT2H' },
+        },
+      ],
+    });
+  }, async () => {
+    const videos = await discoverStreams('test-key', 'UC-test');
+    assert(
+      videos.map((video) => video.videoId).join(',') === 'first-set,singing-set',
+      'preserves discovery order',
+    );
+  });
+
+  assert(playlistRequests === 2, 'reads every uploads page');
+  assert(detailsRequests === 1, 'fetches matching video details once');
+}
+
 async function testRejectsMissingOrDifferentIdentity(): Promise<void> {
   await withFetch(
     async () => Response.json({ items: [{ id: 'UC-different', snippet: {} }] }),
@@ -65,10 +144,11 @@ async function testApiErrorDoesNotEchoResponseBody(): Promise<void> {
 }
 
 void (async () => {
+  await testDiscoveryFiltersKaraokeUploadsInOrder();
   await testExactChannelVerification();
   await testRejectsMissingOrDifferentIdentity();
   await testApiErrorDoesNotEchoResponseBody();
-  console.log('✓ YouTube channel identity verification');
+  console.log('✓ YouTube discovery and channel identity verification');
 })().catch((error: unknown) => {
   console.error(error);
   process.exitCode = 1;
