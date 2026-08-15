@@ -184,10 +184,13 @@ export function followingTracksFromFlattened(
   streamerSlug: string,
   unavailableVideoIds: Set<string>,
 ): ArchiveTrack[] {
-  return songs
-    .slice(clickedIndex + 1)
-    .filter((song) => !unavailableVideoIds.has(song.videoId))
-    .map((song) => trackFromFlattenedSong(song, streamerSlug));
+  const tracks: ArchiveTrack[] = [];
+  for (const song of songs.slice(clickedIndex + 1)) {
+    if (!unavailableVideoIds.has(song.videoId)) {
+      tracks.push(trackFromFlattenedSong(song, streamerSlug));
+    }
+  }
+  return tracks;
 }
 
 // Tracks that should play after clicking song `clickedSongIndex` in the grouped
