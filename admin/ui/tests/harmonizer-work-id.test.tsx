@@ -48,10 +48,12 @@ function song(id: string, workId: string | null): HarmonizeSongEntry {
 
 async function main(): Promise<void> {
   installLocalStorage();
-  const {
-    WorkIdBadge,
-    WorkMergeNotice,
-  } = await import('../src/pages/Harmonizer');
+  const { default: WorkIdBadge } = await import(
+    '../src/components/harmonizer/WorkIdBadge'
+  );
+  const { default: WorkMergeNotice } = await import(
+    '../src/components/harmonizer/WorkMergeNotice'
+  );
   const {
     buildWorkAwareMergeRequest,
     getWorkMergePlan,
