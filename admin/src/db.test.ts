@@ -3,6 +3,7 @@ import {
   bulkUnapproveStream,
   deleteStreamCascade,
   exportSongs,
+  getDashboardStats,
   getSongSimilarityGroups,
   importVodToAdminDb,
   listGlobalWorksPaginated,
@@ -87,6 +88,14 @@ class FakeD1Database {
   readonly allStatements: CapturedStatement[] = [];
   readonly batchStatements: CapturedStatement[] = [];
   mergeGuardValid = true;
+  streamPerformanceCount = 0;
+  dashboardStatusRows: Record<'songs' | 'streams' | 'performances', unknown[]> = {
+    songs: [],
+    streams: [],
+    performances: [],
+  };
+  dashboardRecentSongRows: unknown[] = [];
+  dashboardRecentStreamRows: unknown[] = [];
 
   constructor(
     readonly existingStream: ExistingStream,
@@ -115,6 +124,39 @@ class FakeD1Database {
     }
 
     return statements.map((statement) => {
+      if (statement.sql.includes('SELECT COUNT(*) AS cnt FROM performances WHERE stream_id = ?')) {
+        return {
+          results: [{ cnt: this.streamPerformanceCount }],
+          meta: { changes: 0 },
+        };
+      }
+      const statusTable = (['songs', 'streams', 'performances'] as const).find((table) =>
+        statement.sql.includes(`FROM ${table} WHERE streamer_id = ? GROUP BY status`),
+      );
+      if (statusTable) {
+        return {
+          results: this.dashboardStatusRows[statusTable],
+          meta: { changes: 0 },
+        };
+      }
+      if (statement.sql.includes('ORDER BY song.created_at DESC')) {
+        return { results: this.dashboardRecentSongRows, meta: { changes: 0 } };
+      }
+      if (statement.sql.includes('FROM streams WHERE streamer_id = ? ORDER BY created_at DESC LIMIT 5')) {
+        return { results: this.dashboardRecentStreamRows, meta: { changes: 0 } };
+      }
+      if (
+        statement.sql.includes('FROM songs AS song')
+        && statement.sql.includes("song.status = 'approved'")
+      ) {
+        return { results: this.exportSongRows, meta: { changes: 0 } };
+      }
+      if (
+        statement.sql.includes('FROM performances WHERE streamer_id = ?')
+        && statement.sql.includes("status = 'approved'")
+      ) {
+        return { results: this.exportPerformanceRows, meta: { changes: 0 } };
+      }
       if (/RETURNING\s+1\s+AS\s+valid/i.test(statement.sql)) {
         return {
           results: this.mergeGuardValid ? [{ valid: 1 }] : [],
@@ -446,6 +488,66 @@ async function testFanSiteExportOmitsNullWorkIds(): Promise<void> {
 
   assertEqual(songs[0].workId, 'work-shared', 'linked fan-site song exports its global work ID');
   assert(!Object.prototype.hasOwnProperty.call(songs[1], 'workId'), 'unlinked fan-site song omits workId instead of exporting null');
+  assertEqual(fakeDb.allStatements.length, 0, 'fan-site export avoids separate D1 read calls');
+  assertEqual(fakeDb.batchStatements.length, 2, 'fan-site export fetches songs and performances in one batch');
+}
+
+async function testDashboardStatsBatchesIndependentReads(): Promise<void> {
+  const fakeDb = new FakeD1Database(null);
+  fakeDb.dashboardStatusRows = {
+    songs: [
+      { status: 'pending', count: 2 },
+      { status: 'approved', count: 3 },
+    ],
+    streams: [{ status: 'rejected', count: 4 }],
+    performances: [
+      { status: 'excluded', count: 5 },
+      { status: 'extracted', count: 6 },
+    ],
+  };
+  fakeDb.dashboardRecentSongRows = [{
+    id: 'song-recent',
+    work_id: null,
+    title: 'Recent Song',
+    original_artist: 'Artist',
+    tags: '[]',
+    status: 'pending',
+    submitted_by: null,
+    reviewed_by: null,
+    created_at: '2026-01-02 00:00:00',
+    updated_at: '2026-01-02 00:00:00',
+  }];
+  fakeDb.dashboardRecentStreamRows = [{
+    id: 'stream-recent',
+    title: 'Recent Stream',
+    date: '2026-01-03',
+    video_id: 'video-recent',
+    youtube_url: 'https://www.youtube.com/watch?v=video-recent',
+    credit: '{}',
+    status: 'approved',
+    submitted_by: null,
+    reviewed_by: null,
+    created_at: '2026-01-03 00:00:00',
+  }];
+
+  const stats = await getDashboardStats(fakeDb as unknown as D1Database, 'alice');
+
+  assertEqual(stats.songs.pending, 2, 'dashboard maps batched pending song count');
+  assertEqual(stats.songs.approved, 3, 'dashboard maps batched approved song count');
+  assertEqual(stats.streams.rejected, 4, 'dashboard maps batched rejected stream count');
+  assertEqual(stats.performances.excluded, 5, 'dashboard maps batched excluded performance count');
+  assertEqual(stats.performances.extracted, 6, 'dashboard maps batched extracted performance count');
+  assertEqual(
+    stats.recentSubmissions.map((submission) => submission.id).join('|'),
+    'stream-recent|song-recent',
+    'dashboard keeps recent submissions ordered after batched reads',
+  );
+  assertEqual(fakeDb.allStatements.length, 0, 'dashboard avoids separate D1 read calls');
+  assertEqual(fakeDb.batchStatements.length, 5, 'dashboard fetches all independent reads in one batch');
+  assert(
+    fakeDb.batchStatements.every((statement) => statement.params[0] === 'alice'),
+    'every dashboard query remains scoped to the requested streamer',
+  );
 }
 
 function mergeRow(
@@ -949,7 +1051,14 @@ async function testSharedSongsSurviveStreamMutations(): Promise<void> {
   assertEqual(songUnapprove.params[1], 'stream-one', 'other approved streams are excluded from demotion');
 
   const deleteDb = new FakeD1Database(null);
-  await deleteStreamCascade(deleteDb as unknown as D1Database, 'stream-one');
+  deleteDb.streamPerformanceCount = 4;
+  const deleted = await deleteStreamCascade(deleteDb as unknown as D1Database, 'stream-one');
+  assertEqual(deleteDb.firstStatements.length, 0, 'stream delete avoids a separate count call');
+  assert(
+    /SELECT\s+COUNT\(\*\)\s+AS\s+cnt/i.test(deleteDb.batchStatements[0]?.sql ?? ''),
+    'stream delete counts performances before its mutation statements',
+  );
+  assertEqual(deleted.performances, 4, 'stream delete reports the pre-cascade performance count');
   const songDelete = deleteDb.batchStatements.find((statement) =>
     /DELETE\s+FROM\s+songs/i.test(statement.sql),
   );
@@ -968,6 +1077,7 @@ async function main(): Promise<void> {
   await testHarmonizerArtistUpdatesRelinkEveryEditedSong();
   await testGlobalWorksListAggregatesAcrossStreamers();
   await testFanSiteExportOmitsNullWorkIds();
+  await testDashboardStatsBatchesIndependentReads();
   await testHarmonizerScanUsesAndExposesWorkIds();
   await testMergeSongsPreservesPerformances();
   await testMergeSongsRequiresExplicitGlobalWorkConfirmation();
