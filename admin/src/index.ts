@@ -12,6 +12,7 @@ import {
   generateSongId,
   listPerformances,
   insertPerformance,
+  insertPerformances,
   getPerformanceStatus as db_getPerformanceStatus,
   updatePerformanceStatus,
   generatePerformanceId,
@@ -494,23 +495,22 @@ app.post('/api/songs', async (c) => {
 
   // If inline performances are provided, insert them too
   if (body.performances && body.performances.length > 0) {
-    for (const perf of body.performances) {
-      const perfId = generatePerformanceId();
-      await insertPerformance(
-        c.env.DB,
-        streamerId,
-        perfId,
-        id,
-        perf.streamId,
-        perf.date,
-        perf.streamTitle,
-        perf.videoId,
-        perf.timestamp,
-        perf.endTimestamp ?? null,
-        perf.note ?? '',
-        user.email,
-      );
-    }
+    await insertPerformances(
+      c.env.DB,
+      streamerId,
+      id,
+      body.performances.map((perf) => ({
+        id: generatePerformanceId(),
+        streamId: perf.streamId,
+        date: perf.date,
+        streamTitle: perf.streamTitle,
+        videoId: perf.videoId,
+        timestamp: perf.timestamp,
+        endTimestamp: perf.endTimestamp ?? null,
+        note: perf.note ?? '',
+      })),
+      user.email,
+    );
   }
 
   const song = await getSongById(c.env.DB, id);
@@ -1144,20 +1144,21 @@ app.post('/api/pipeline/import-streams', requireCurator, async (c) => {
 
   const user = c.get('user');
   const streamIds: string[] = [];
+  const db = c.env.DB;
 
   try {
     for (const v of videos) {
-      if (await videoIdExists(c.env.DB, v.videoId, streamerId)) {
+      if (await videoIdExists(db, v.videoId, streamerId)) {
         continue; // already imported, skip
       }
 
       let id = generateStreamId(v.date);
-      if (await streamIdExists(c.env.DB, id)) {
+      if (await streamIdExists(db, id)) {
         id = generateStreamIdFallback();
       }
 
       await insertStream(
-        c.env.DB,
+        db,
         streamerId,
         id,
         v.title,

@@ -551,6 +551,45 @@ export async function updateSongStatus(
 
 // --- Performances ---
 
+interface PerformanceInsert {
+  readonly id: string;
+  readonly streamId: string;
+  readonly date: string;
+  readonly streamTitle: string;
+  readonly videoId: string;
+  readonly timestamp: number;
+  readonly endTimestamp: number | null;
+  readonly note: string;
+}
+
+function preparePerformanceInsert(
+  db: D1Database,
+  streamerId: string,
+  songId: string,
+  performance: PerformanceInsert,
+  submittedBy: string,
+): D1PreparedStatement {
+  return db
+    .prepare(
+      `INSERT INTO performances (id, streamer_id, song_id, stream_id, date, stream_title, video_id, timestamp, end_timestamp, note, status, submitted_by)
+       VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+    )
+    .bind(
+      performance.id,
+      streamerId,
+      songId,
+      performance.streamId,
+      performance.date,
+      performance.streamTitle,
+      performance.videoId,
+      performance.timestamp,
+      performance.endTimestamp,
+      performance.note,
+      'pending',
+      submittedBy,
+    );
+}
+
 export async function listPerformances(
   db: D1Database,
   streamerId: string,
@@ -589,13 +628,29 @@ export async function insertPerformance(
   note: string,
   submittedBy: string,
 ): Promise<void> {
-  await db
-    .prepare(
-      `INSERT INTO performances (id, streamer_id, song_id, stream_id, date, stream_title, video_id, timestamp, end_timestamp, note, status, submitted_by)
-       VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
-    )
-    .bind(id, streamerId, songId, streamId, date, streamTitle, videoId, timestamp, endTimestamp, note, 'pending', submittedBy)
-    .run();
+  await preparePerformanceInsert(db, streamerId, songId, {
+    id,
+    streamId,
+    date,
+    streamTitle,
+    videoId,
+    timestamp,
+    endTimestamp,
+    note,
+  }, submittedBy).run();
+}
+
+export async function insertPerformances(
+  db: D1Database,
+  streamerId: string,
+  songId: string,
+  performances: readonly PerformanceInsert[],
+  submittedBy: string,
+): Promise<void> {
+  if (performances.length === 0) return;
+  await db.batch(performances.map((performance) =>
+    preparePerformanceInsert(db, streamerId, songId, performance, submittedBy),
+  ));
 }
 
 export async function getPerformanceStatus(
