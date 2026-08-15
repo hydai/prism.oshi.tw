@@ -171,10 +171,11 @@ export async function discoverStreams(
     }
 
     const data = (await res.json()) as PlaylistItemsResponse;
-    const ids = data.items
-      .filter((item) => matchesKaraoke(item.snippet.title))
-      .map((item) => item.snippet.resourceId.videoId);
-    allVideoIds.push(...ids);
+    for (const item of data.items) {
+      if (matchesKaraoke(item.snippet.title)) {
+        allVideoIds.push(item.snippet.resourceId.videoId);
+      }
+    }
 
     pageToken = data.nextPageToken;
   } while (pageToken);
