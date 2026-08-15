@@ -3,6 +3,7 @@
 import { createContext, useContext, useState, useEffect, ReactNode } from 'react';
 import {
   dedupePlaylistVersions,
+  migrateGlobalPlaylistsForStreamer,
   saveJsonToStorage,
   type StorageSaveResult,
 } from '../lib/playlist-storage';
@@ -173,18 +174,9 @@ export const PlaylistProvider = ({ streamerSlug, children }: { streamerSlug: str
         }
         return;
       }
-      // Filter global playlists: keep playlists that have at least one version for this streamer,
-      // or playlists with no versions (empty playlists are kept for all streamers)
+      // Keep global playlists that still have at least one version for this streamer.
       const parsed = JSON.parse(globalData) as Playlist[];
-      const filtered = parsed
-        .map(p => ({
-          ...p,
-          versions: dedupePlaylistVersions(
-            p.versions.filter(v => v.streamerSlug === streamerSlug),
-          ),
-          updatedAt: p.updatedAt || p.createdAt || Date.now(),
-        }))
-        .filter(p => p.versions.length > 0);
+      const filtered = migrateGlobalPlaylistsForStreamer(parsed, streamerSlug);
       if (filtered.length > 0) {
         localStorage.setItem(STORAGE_KEY, JSON.stringify(filtered));
       }
