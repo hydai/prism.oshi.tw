@@ -291,58 +291,65 @@ async function buildInternalCandidates(
     else components.set(root, [index]);
   });
 
-  const candidates = await Promise.all(
-    [...components.values()]
-      .filter((indexes) => indexes.length >= 2)
-      .map(async (indexes): Promise<InternalCandidate> => {
-        const snapshots = indexes.map((index) => works[index]!).sort(canonicalOrder);
-        const workIds = snapshots.map((work) => work.id).sort(compareText);
-        const indexSet = new Set(indexes);
-        const reasons = [...new Set(
-          edges
-            .filter((edge) => indexSet.has(edge.left) && indexSet.has(edge.right))
-            .map((edge) => edge.reason),
-        )].sort(compareText);
-        const candidateKey = await sha256Hex(JSON.stringify([WORK_MATCH_ALGORITHM, workIds]));
-        const identityState = [...snapshots]
-          .sort((left, right) => compareText(left.id, right.id))
-          .map((work) => [work.id, work.title, work.originalArtist]);
-        const fingerprint = await sha256Hex(JSON.stringify([WORK_MATCH_ALGORITHM, identityState]));
-        const streamerIds = new Set<string>();
-        const songsByStreamer = new Map<string, number>();
-        for (const work of snapshots) {
-          work.streamerIds.forEach((streamerId) => streamerIds.add(streamerId));
-          for (const [streamerId, count] of work.songCountsByStreamer) {
-            songsByStreamer.set(streamerId, (songsByStreamer.get(streamerId) ?? 0) + count);
-          }
-        }
+  const buildCandidate = async (indexes: number[]): Promise<InternalCandidate> => {
+    const snapshots = indexes.map((index) => works[index]!).sort(canonicalOrder);
+    const workIds = snapshots.map((work) => work.id).sort(compareText);
+    const indexSet = new Set(indexes);
+    const reasonSet = new Set<WorkMatchReason>();
+    for (const edge of edges) {
+      if (indexSet.has(edge.left) && indexSet.has(edge.right)) {
+        reasonSet.add(edge.reason);
+      }
+    }
+    const reasons = [...reasonSet].sort(compareText);
+    const candidateKey = await sha256Hex(JSON.stringify([WORK_MATCH_ALGORITHM, workIds]));
+    const identityState = [...snapshots]
+      .sort((left, right) => compareText(left.id, right.id))
+      .map((work) => [work.id, work.title, work.originalArtist]);
+    const fingerprint = await sha256Hex(JSON.stringify([WORK_MATCH_ALGORITHM, identityState]));
+    const streamerIds = new Set<string>();
+    const songsByStreamer = new Map<string, number>();
+    for (const work of snapshots) {
+      work.streamerIds.forEach((streamerId) => streamerIds.add(streamerId));
+      for (const [streamerId, count] of work.songCountsByStreamer) {
+        songsByStreamer.set(streamerId, (songsByStreamer.get(streamerId) ?? 0) + count);
+      }
+    }
 
-        return {
-          snapshots,
-          candidate: {
-            candidateKey,
-            fingerprint,
-            catalogRevision,
-            confidence: 'high',
-            reasons,
-            works: snapshots.map(publicWork),
-            suggestedCanonicalWorkId: snapshots[0]!.id,
-            streamerCount: streamerIds.size,
-            songCount: snapshots.reduce((sum, work) => sum + work.songCount, 0),
-            performanceCount: snapshots.reduce((sum, work) => sum + work.performanceCount, 0),
-            localDuplicates: [...songsByStreamer]
-              .filter(([, count]) => count > 1)
-              .map(([streamerId, songCount]) => ({ streamerId, songCount }))
-              .sort((left, right) => compareText(left.streamerId, right.streamerId)),
-            decision: null,
-            reviewNote: '',
-            reviewVersion: null,
-            reviewedBy: null,
-            reviewedAt: null,
-          },
-        };
-      }),
-  );
+    const localDuplicates: WorkMatchCandidate['localDuplicates'] = [];
+    for (const [streamerId, songCount] of songsByStreamer) {
+      if (songCount > 1) localDuplicates.push({ streamerId, songCount });
+    }
+    localDuplicates.sort((left, right) => compareText(left.streamerId, right.streamerId));
+
+    return {
+      snapshots,
+      candidate: {
+        candidateKey,
+        fingerprint,
+        catalogRevision,
+        confidence: 'high',
+        reasons,
+        works: snapshots.map(publicWork),
+        suggestedCanonicalWorkId: snapshots[0]!.id,
+        streamerCount: streamerIds.size,
+        songCount: snapshots.reduce((sum, work) => sum + work.songCount, 0),
+        performanceCount: snapshots.reduce((sum, work) => sum + work.performanceCount, 0),
+        localDuplicates,
+        decision: null,
+        reviewNote: '',
+        reviewVersion: null,
+        reviewedBy: null,
+        reviewedAt: null,
+      },
+    };
+  };
+
+  const candidatePromises: Promise<InternalCandidate>[] = [];
+  for (const indexes of components.values()) {
+    if (indexes.length >= 2) candidatePromises.push(buildCandidate(indexes));
+  }
+  const candidates = await Promise.all(candidatePromises);
 
   return candidates.sort((left, right) => (
     right.candidate.performanceCount - left.candidate.performanceCount
