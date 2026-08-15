@@ -316,11 +316,16 @@ const VOD_SCRIPT = String.raw`
 `;
 
 export function renderVodPage(siteKey: string, streamers: ApprovedStreamer[]) {
-  const streamerOptions = streamers
-    .filter((s) => validateSlug(s.slug))
-    .map((s) => `<option value="${escapeHtml(s.slug)}">${escapeHtml(s.display_name)}</option>`)
-    .join('');
-  const streamerSelectOptions = streamerOptions || '<option value="" disabled>暫無可選 VTuber（請聯繫管理員）</option>';
+  const streamerOptions: string[] = [];
+  for (const streamer of streamers) {
+    if (validateSlug(streamer.slug)) {
+      streamerOptions.push(
+        `<option value="${escapeHtml(streamer.slug)}">${escapeHtml(streamer.display_name)}</option>`,
+      );
+    }
+  }
+  const streamerSelectOptions = streamerOptions.join('')
+    || '<option value="" disabled>暫無可選 VTuber（請聯繫管理員）</option>';
 
   return html`<!doctype html>
 <html lang="zh-Hant">
