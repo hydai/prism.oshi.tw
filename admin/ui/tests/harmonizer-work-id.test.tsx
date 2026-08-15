@@ -51,9 +51,11 @@ async function main(): Promise<void> {
   const {
     WorkIdBadge,
     WorkMergeNotice,
+  } = await import('../src/pages/Harmonizer');
+  const {
     buildWorkAwareMergeRequest,
     getWorkMergePlan,
-  } = await import('../src/pages/Harmonizer');
+  } = await import('../src/lib/harmonizer-work-merge');
 
   const sameWorkSongs = [song('canonical', 'work-one'), song('source', 'work-one')];
   const sameWorkPlan = getWorkMergePlan(sameWorkSongs, 'canonical');

@@ -129,9 +129,11 @@ async function main(): Promise<void> {
   const {
     default: GlobalWorkReview,
     MergeImpact,
+  } = await import('../src/pages/GlobalWorkReview');
+  const {
     candidateReviewStateKey,
     selectMergeSourceWorkIds,
-  } = await import('../src/pages/GlobalWorkReview');
+  } = await import('../src/lib/global-work-review');
 
   await api.listWorkMatches({ filter: 'pending', page: 2, pageSize: 20 });
   await api.reviewWorkMatch({

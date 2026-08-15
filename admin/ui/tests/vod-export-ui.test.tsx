@@ -45,9 +45,11 @@ async function main(): Promise<void> {
     CurrentPublicationPanel,
     FindingsPanel,
     PublishConfirmationDialog,
+  } = await import('../src/pages/VodExport');
+  const {
     getPublishDisabledReason,
     safeRepairPath,
-  } = await import('../src/pages/VodExport');
+  } = await import('../src/lib/vod-export-helpers');
   const { getVisibleNavItems } = await import('../src/lib/navigation');
 
   const curator: AuthUser = { email: 'curator@example.com', role: 'curator' };
