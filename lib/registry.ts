@@ -17,5 +17,9 @@ export function getStreamerConfig(slug: string): StreamerConfig | undefined {
 
 export function getAllStreamerSlugs(): string[] {
   const registry = getRegistry();
-  return registry.streamers.filter(s => s.enabled).map(s => s.slug);
+  const slugs: string[] = [];
+  for (const streamer of registry.streamers) {
+    if (streamer.enabled) slugs.push(streamer.slug);
+  }
+  return slugs;
 }
