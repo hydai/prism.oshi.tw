@@ -1353,14 +1353,13 @@ export async function deleteStreamCascade(
   db: D1Database,
   streamId: string,
 ): Promise<{ songs: number; performances: number }> {
-  // Count up front: deleting orphan songs cascades to their performances,
-  // so meta.changes on the performance delete alone would under-report.
-  const perfCount = await db
-    .prepare('SELECT COUNT(*) AS cnt FROM performances WHERE stream_id = ?')
-    .bind(streamId)
-    .first<{ cnt: number }>();
-
   const results = await db.batch([
+    // Count first: deleting orphan songs cascades to their performances, so
+    // meta.changes on the performance delete alone would under-report. D1
+    // executes a batch in order and in one transaction.
+    db
+      .prepare('SELECT COUNT(*) AS cnt FROM performances WHERE stream_id = ?')
+      .bind(streamId),
     // Songs whose complete performance set is in this stream
     // (their performances go too via ON DELETE CASCADE)
     db.prepare(
@@ -1377,9 +1376,10 @@ export async function deleteStreamCascade(
     db.prepare('DELETE FROM performances WHERE stream_id = ?').bind(streamId),
     db.prepare('DELETE FROM streams WHERE id = ?').bind(streamId),
   ]);
+  const perfCount = results[0].results[0] as { cnt: number } | undefined;
 
   return {
-    songs: results[0].meta.changes,
+    songs: results[1].meta.changes,
     performances: perfCount?.cnt ?? 0,
   };
 }
@@ -1483,18 +1483,24 @@ export async function getPerformanceWithSong(
 import type { StatusCounts, HarmonizeSongEntry, HarmonizeArtistEntry, SimilarityGroup, HarmonizeMatchType } from '../shared/types';
 import { normalizeForMatching, normalizeAggressive, similarityScore } from '../shared/normalize';
 
-async function countByStatus(
-  db: D1Database,
-  table: string,
-  streamerId: string,
-): Promise<StatusCounts> {
-  const { results } = await db
-    .prepare(`SELECT status, COUNT(*) as count FROM ${table} WHERE streamer_id = ? GROUP BY status`)
-    .bind(streamerId)
-    .all<{ status: string; count: number }>();
+interface StatusCountRow {
+  status: string;
+  count: number;
+}
 
+function prepareStatusCount(
+  db: D1Database,
+  table: 'songs' | 'streams' | 'performances',
+  streamerId: string,
+): D1PreparedStatement {
+  return db
+    .prepare(`SELECT status, COUNT(*) as count FROM ${table} WHERE streamer_id = ? GROUP BY status`)
+    .bind(streamerId);
+}
+
+function statusCountsFromRows(rows: StatusCountRow[]): StatusCounts {
   const counts: StatusCounts = { pending: 0, approved: 0, rejected: 0, excluded: 0, extracted: 0 };
-  for (const row of results) {
+  for (const row of rows) {
     if (row.status in counts) {
       counts[row.status as keyof StatusCounts] = row.count;
     }
@@ -1503,25 +1509,33 @@ async function countByStatus(
 }
 
 export async function getDashboardStats(db: D1Database, streamerId: string) {
-  const [songs, streams, performances] = await Promise.all([
-    countByStatus(db, 'songs', streamerId),
-    countByStatus(db, 'streams', streamerId),
-    countByStatus(db, 'performances', streamerId),
+  const [
+    songCountResult,
+    streamCountResult,
+    performanceCountResult,
+    recentSongResult,
+    recentStreamResult,
+  ] = await db.batch([
+    prepareStatusCount(db, 'songs', streamerId),
+    prepareStatusCount(db, 'streams', streamerId),
+    prepareStatusCount(db, 'performances', streamerId),
+    db
+      .prepare(`SELECT song.*, link.work_id
+        FROM songs AS song
+        LEFT JOIN song_work_links AS link ON link.song_id = song.id
+        WHERE song.streamer_id = ?
+        ORDER BY song.created_at DESC
+        LIMIT 5`)
+      .bind(streamerId),
+    db
+      .prepare("SELECT * FROM streams WHERE streamer_id = ? ORDER BY created_at DESC LIMIT 5")
+      .bind(streamerId),
   ]);
-
-  const { results: recentSongRows } = await db
-    .prepare(`SELECT song.*, link.work_id
-      FROM songs AS song
-      LEFT JOIN song_work_links AS link ON link.song_id = song.id
-      WHERE song.streamer_id = ?
-      ORDER BY song.created_at DESC
-      LIMIT 5`)
-    .bind(streamerId)
-    .all<SongRow>();
-  const { results: recentStreamRows } = await db
-    .prepare("SELECT * FROM streams WHERE streamer_id = ? ORDER BY created_at DESC LIMIT 5")
-    .bind(streamerId)
-    .all<StreamRow>();
+  const songs = statusCountsFromRows(songCountResult.results as StatusCountRow[]);
+  const streams = statusCountsFromRows(streamCountResult.results as StatusCountRow[]);
+  const performances = statusCountsFromRows(performanceCountResult.results as StatusCountRow[]);
+  const recentSongRows = recentSongResult.results as SongRow[];
+  const recentStreamRows = recentStreamResult.results as StreamRow[];
 
   const recentSubmissions = [
     ...recentSongRows.map(songFromRow),
@@ -1534,18 +1548,20 @@ export async function getDashboardStats(db: D1Database, streamerId: string) {
 // --- Export helpers (fan-site format) ---
 
 export async function exportSongs(db: D1Database, streamerId: string) {
-  const { results: songRows } = await db
-    .prepare(`SELECT song.*, link.work_id
-      FROM songs AS song
-      LEFT JOIN song_work_links AS link ON link.song_id = song.id
-      WHERE song.streamer_id = ? AND song.status = 'approved'
-      ORDER BY song.title`)
-    .bind(streamerId)
-    .all<SongRow>();
-  const { results: perfRows } = await db
-    .prepare("SELECT * FROM performances WHERE streamer_id = ? AND status = 'approved' ORDER BY date")
-    .bind(streamerId)
-    .all<PerformanceRow>();
+  const [songResult, performanceResult] = await db.batch([
+    db
+      .prepare(`SELECT song.*, link.work_id
+        FROM songs AS song
+        LEFT JOIN song_work_links AS link ON link.song_id = song.id
+        WHERE song.streamer_id = ? AND song.status = 'approved'
+        ORDER BY song.title`)
+      .bind(streamerId),
+    db
+      .prepare("SELECT * FROM performances WHERE streamer_id = ? AND status = 'approved' ORDER BY date")
+      .bind(streamerId),
+  ]);
+  const songRows = songResult.results as SongRow[];
+  const perfRows = performanceResult.results as PerformanceRow[];
 
   const perfsBySong = new Map<string, PerformanceRow[]>();
   for (const p of perfRows) {
