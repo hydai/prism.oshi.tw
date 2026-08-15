@@ -39,7 +39,11 @@ function DiscoverTab() {
       const res = await api.discoverStreams();
       setStreams(res.streams);
       // Pre-select new streams
-      setSelected(new Set(res.streams.filter((s) => s.isNew).map((s) => s.videoId)));
+      const newStreamIds = new Set<string>();
+      for (const stream of res.streams) {
+        if (stream.isNew) newStreamIds.add(stream.videoId);
+      }
+      setSelected(newStreamIds);
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Failed to discover streams');
     } finally {
