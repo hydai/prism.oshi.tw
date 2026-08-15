@@ -84,19 +84,25 @@ const FINDING_MESSAGE: Readonly<Record<FindingCode, string>> = {
   MISSING_ORIGINAL_ARTIST: 'Original artist is missing and was replaced with null.',
 };
 
-const CODE_DETAIL_KEYS: Readonly<Partial<Record<FindingCode, readonly (keyof FindingDetails)[]>>> = {
-  MISSING_STREAMER_SLUG: ['submissionId'],
-  INVALID_STREAMER_SLUG: ['submissionId'],
-  DUPLICATE_STREAMER_SLUG: ['duplicateCount'],
-  DUPLICATE_YOUTUBE_CHANNEL_ID: ['duplicateCount'],
-  MISSING_VIDEO_ID: ['streamId'],
-  INVALID_VIDEO_ID: ['streamId'],
-  DUPLICATE_VOD_VIDEO_ID: ['duplicateCount'],
-  MISSING_SONG_ID: ['rowId'],
-  MISSING_PERFORMANCE_ID: ['rowId'],
-  INVALID_END_RANGE: ['startSeconds', 'endSeconds'],
-  UNSAFE_SOCIAL_LINK: SOCIAL_PROVIDERS,
-  MISSING_ORIGINAL_ARTIST: ['affectedPerformanceCount'],
+function detailKeySet(...keys: (keyof FindingDetails)[]): ReadonlySet<keyof FindingDetails> {
+  return new Set(keys);
+}
+
+const SOCIAL_PROVIDER_DETAIL_KEYS = detailKeySet(...SOCIAL_PROVIDERS);
+const EMPTY_DETAIL_KEYS = detailKeySet();
+const CODE_DETAIL_KEYS: Readonly<Partial<Record<FindingCode, ReadonlySet<keyof FindingDetails>>>> = {
+  MISSING_STREAMER_SLUG: detailKeySet('submissionId'),
+  INVALID_STREAMER_SLUG: detailKeySet('submissionId'),
+  DUPLICATE_STREAMER_SLUG: detailKeySet('duplicateCount'),
+  DUPLICATE_YOUTUBE_CHANNEL_ID: detailKeySet('duplicateCount'),
+  MISSING_VIDEO_ID: detailKeySet('streamId'),
+  INVALID_VIDEO_ID: detailKeySet('streamId'),
+  DUPLICATE_VOD_VIDEO_ID: detailKeySet('duplicateCount'),
+  MISSING_SONG_ID: detailKeySet('rowId'),
+  MISSING_PERFORMANCE_ID: detailKeySet('rowId'),
+  INVALID_END_RANGE: detailKeySet('startSeconds', 'endSeconds'),
+  UNSAFE_SOCIAL_LINK: SOCIAL_PROVIDER_DETAIL_KEYS,
+  MISSING_ORIGINAL_ARTIST: detailKeySet('affectedPerformanceCount'),
 };
 
 const CODE_REQUIRED_DETAIL_KEYS: Readonly<Partial<Record<FindingCode, readonly (keyof FindingDetails)[]>>> = {
@@ -228,9 +234,9 @@ function normalizeAndValidateDetails(input: FindingInput): FindingDetails | unde
   const actualKeys = Object.keys(providedDetails) as (keyof FindingDetails)[];
   const needsFallbackLocator = input.entityId === undefined || input.streamerSlug === undefined;
   const fallbackKey = needsFallbackLocator ? fallbackKeyForEntity(input.entityType) : undefined;
-  const allowedKeys = CODE_DETAIL_KEYS[input.code] ?? [];
+  const allowedKeys = CODE_DETAIL_KEYS[input.code] ?? EMPTY_DETAIL_KEYS;
   for (const key of actualKeys) {
-    if (!allowedKeys.includes(key) && key !== fallbackKey) {
+    if (!allowedKeys.has(key) && key !== fallbackKey) {
       throw new TypeError(`Finding ${input.code} does not allow details.${key}`);
     }
   }
@@ -271,7 +277,7 @@ function validateDetailValue(key: keyof FindingDetails, value: string | number |
     return;
   }
 
-  if ((SOCIAL_PROVIDERS as readonly string[]).includes(key)) {
+  if (SOCIAL_PROVIDER_DETAIL_KEYS.has(key)) {
     if (value !== true) throw new TypeError(`details.${key} must be true when present`);
     return;
   }
