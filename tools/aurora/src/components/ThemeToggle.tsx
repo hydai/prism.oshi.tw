@@ -1,23 +1,43 @@
-import { useState, useEffect } from 'react';
+import { useEffect, useSyncExternalStore } from 'react';
 import { Sun, Moon } from 'lucide-react';
 
+type Theme = 'light' | 'dark';
+
+const THEME_CHANGE_EVENT = 'prism-theme-change';
+
+function getThemeSnapshot(): Theme {
+  return document.documentElement.classList.contains('dark') ? 'dark' : 'light';
+}
+
+function getServerThemeSnapshot(): Theme {
+  return 'light';
+}
+
+function subscribeToTheme(onStoreChange: () => void) {
+  window.addEventListener(THEME_CHANGE_EVENT, onStoreChange);
+  return () => window.removeEventListener(THEME_CHANGE_EVENT, onStoreChange);
+}
+
+function updateDocumentTheme(theme: Theme) {
+  document.documentElement.classList.toggle('dark', theme === 'dark');
+  window.dispatchEvent(new Event(THEME_CHANGE_EVENT));
+}
+
 export default function ThemeToggle() {
-  const [theme, setTheme] = useState<'light' | 'dark'>('light');
-  const [mounted, setMounted] = useState(false);
+  const theme = useSyncExternalStore(
+    subscribeToTheme,
+    getThemeSnapshot,
+    getServerThemeSnapshot,
+  );
 
   useEffect(() => {
-    setMounted(true);
-    const isDark = document.documentElement.classList.contains('dark');
-    setTheme(isDark ? 'dark' : 'light');
-
     const stored = localStorage.getItem('theme');
     if (stored) return;
 
     const mq = window.matchMedia('(prefers-color-scheme: dark)');
     const handler = (e: MediaQueryListEvent) => {
       const next = e.matches ? 'dark' : 'light';
-      setTheme(next);
-      document.documentElement.classList.toggle('dark', next === 'dark');
+      updateDocumentTheme(next);
     };
     mq.addEventListener('change', handler);
     return () => mq.removeEventListener('change', handler);
@@ -25,12 +45,9 @@ export default function ThemeToggle() {
 
   const toggleTheme = () => {
     const next = theme === 'light' ? 'dark' : 'light';
-    setTheme(next);
-    document.documentElement.classList.toggle('dark', next === 'dark');
+    updateDocumentTheme(next);
     localStorage.setItem('theme', next);
   };
-
-  if (!mounted) return <div className="w-8 h-8" />;
 
   return (
     <button
