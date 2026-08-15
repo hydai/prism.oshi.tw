@@ -22,6 +22,35 @@ import type {
 const SHA256_PATTERN = /^[0-9a-f]{64}$/;
 const PUBLISHED_AT_PATTERN = /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}\.\d{3}Z$/;
 const textEncoder = new TextEncoder();
+const MANIFEST_KEYS: ReadonlySet<string> = new Set([
+  'schemaVersion',
+  'snapshotUrl',
+  'sha256',
+  'publishedAt',
+  'uncompressedBytes',
+  'counts',
+]);
+const COUNTS_KEYS: ReadonlySet<string> = new Set(['streamers', 'vods', 'performances']);
+const SNAPSHOT_KEYS: ReadonlySet<string> = new Set(['schemaVersion', 'streamers']);
+const STREAMER_KEYS: ReadonlySet<string> = new Set([
+  'slug',
+  'displayName',
+  'youtubeChannelId',
+  'avatarUrl',
+  'group',
+  'socialLinks',
+  'vods',
+]);
+const SOCIAL_PROVIDER_KEYS: ReadonlySet<string> = new Set(SOCIAL_PROVIDERS);
+const VOD_KEYS: ReadonlySet<string> = new Set(['title', 'date', 'videoId', 'performances']);
+const PERFORMANCE_KEYS: ReadonlySet<string> = new Set([
+  'performanceId',
+  'songId',
+  'title',
+  'originalArtist',
+  'startSeconds',
+  'endSeconds',
+]);
 
 export class CanonicalJsonError extends Error {
   constructor(message: string) {
@@ -50,10 +79,10 @@ export function serializeCanonicalManifest(
 ): Uint8Array {
   assertExactKeys(
     manifest,
-    ['schemaVersion', 'snapshotUrl', 'sha256', 'publishedAt', 'uncompressedBytes', 'counts'],
+    MANIFEST_KEYS,
     'manifest',
   );
-  assertExactKeys(manifest.counts, ['streamers', 'vods', 'performances'], 'manifest.counts');
+  assertExactKeys(manifest.counts, COUNTS_KEYS, 'manifest.counts');
   if (manifest.schemaVersion !== VOD_EXPORT_SCHEMA_VERSION) {
     throw new CanonicalJsonError(`Unsupported manifest schemaVersion: ${manifest.schemaVersion}`);
   }
@@ -379,7 +408,7 @@ function canonicalIntegerDigitLength(value: number): number {
 }
 
 function countSnapshotTokens(snapshot: VodExportSnapshot, counter: CanonicalTokenSink): void {
-  assertExactKeys(snapshot, ['schemaVersion', 'streamers'], 'snapshot');
+  assertExactKeys(snapshot, SNAPSHOT_KEYS, 'snapshot');
   if (snapshot.schemaVersion !== VOD_EXPORT_SCHEMA_VERSION) {
     throw new CanonicalJsonError(`Unsupported snapshot schemaVersion: ${snapshot.schemaVersion}`);
   }
@@ -400,7 +429,7 @@ function countSnapshotTokens(snapshot: VodExportSnapshot, counter: CanonicalToke
 function countStreamerTokens(streamer: VodExportStreamer, counter: CanonicalTokenSink): void {
   assertExactKeys(
     streamer,
-    ['slug', 'displayName', 'youtubeChannelId', 'avatarUrl', 'group', 'socialLinks', 'vods'],
+    STREAMER_KEYS,
     'streamer',
   );
   if (!Array.isArray(streamer.vods)) throw new CanonicalJsonError('streamer.vods must be an array');
@@ -548,7 +577,7 @@ function writeOwnedSnapshotTokens(snapshot: VodExportSnapshot, sink: CanonicalTo
 }
 
 function* snapshotTokens(snapshot: VodExportSnapshot): Generator<string> {
-  assertExactKeys(snapshot, ['schemaVersion', 'streamers'], 'snapshot');
+  assertExactKeys(snapshot, SNAPSHOT_KEYS, 'snapshot');
   if (snapshot.schemaVersion !== VOD_EXPORT_SCHEMA_VERSION) {
     throw new CanonicalJsonError(`Unsupported snapshot schemaVersion: ${snapshot.schemaVersion}`);
   }
@@ -589,7 +618,7 @@ function* manifestTokens(manifest: VodExportManifest): Generator<string> {
 function* streamerTokens(streamer: VodExportStreamer): Generator<string> {
   assertExactKeys(
     streamer,
-    ['slug', 'displayName', 'youtubeChannelId', 'avatarUrl', 'group', 'socialLinks', 'vods'],
+    STREAMER_KEYS,
     'streamer',
   );
   if (!Array.isArray(streamer.vods)) throw new CanonicalJsonError('streamer.vods must be an array');
@@ -675,13 +704,13 @@ function assertSocialLinksObject(socialLinks: VodExportSocialLinks): void {
     throw new CanonicalJsonError('streamer.socialLinks must be an object');
   }
   const unknownKeys = Object.keys(socialLinks).filter(
-    (key) => !(SOCIAL_PROVIDERS as readonly string[]).includes(key),
+    (key) => !SOCIAL_PROVIDER_KEYS.has(key),
   );
   if (unknownKeys.length > 0) throw new CanonicalJsonError('streamer.socialLinks contains an unknown provider');
 }
 
 function assertVodObject(vod: VodExportVod): void {
-  assertExactKeys(vod, ['title', 'date', 'videoId', 'performances'], 'vod');
+  assertExactKeys(vod, VOD_KEYS, 'vod');
   if (!Array.isArray(vod.performances)) throw new CanonicalJsonError('vod.performances must be an array');
   if (vod.performances.length === 0) throw new CanonicalJsonError('Exported VODs must have at least one performance');
 }
@@ -689,7 +718,7 @@ function assertVodObject(vod: VodExportVod): void {
 function assertPerformanceObject(performance: VodExportPerformance): void {
   assertExactKeys(
     performance,
-    ['performanceId', 'songId', 'title', 'originalArtist', 'startSeconds', 'endSeconds'],
+    PERFORMANCE_KEYS,
     'performance',
   );
   assertCanonicalInteger(performance.startSeconds, 'performance.startSeconds', true);
@@ -770,9 +799,9 @@ function normalizePublicOrigin(value: string): string {
   return parsed.origin;
 }
 
-function assertExactKeys(value: object, expected: readonly string[], label: string): void {
+function assertExactKeys(value: object, expected: ReadonlySet<string>, label: string): void {
   const actual = Object.keys(value);
-  if (actual.length !== expected.length || actual.some((key) => !expected.includes(key))) {
+  if (actual.length !== expected.size || actual.some((key) => !expected.has(key))) {
     throw new CanonicalJsonError(`${label} must contain exactly the v1 contract properties`);
   }
 }

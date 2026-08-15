@@ -32,6 +32,16 @@ const CANDIDATE_PREFIX = 'candidates/v1/';
 const CANDIDATE_METADATA_LIMIT = 5_000_000;
 const CANDIDATE_LIFETIME_MS = 24 * 60 * 60 * 1000;
 const CANDIDATE_ID_PATTERN = /^[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/;
+const CANDIDATE_FINDING_KEYS: ReadonlySet<string> = new Set([
+  'code',
+  'severity',
+  'message',
+  'streamerSlug',
+  'entityType',
+  'entityId',
+  'field',
+  'details',
+]);
 
 export interface VodExportCandidateMetadata {
   kind: 'vod-export-candidate-v1';
@@ -303,7 +313,7 @@ function areCandidateFindings(value: unknown, warningCount: unknown): value is V
       || (record.entityId !== undefined && typeof record.entityId !== 'string')
       || (record.field !== undefined && typeof record.field !== 'string')
       || (record.details !== undefined && (record.details === null || typeof record.details !== 'object' || Array.isArray(record.details)))
-      || !hasOnlyKeys(record, ['code', 'severity', 'message', 'streamerSlug', 'entityType', 'entityId', 'field', 'details'])
+      || !hasOnlyKeys(record, CANDIDATE_FINDING_KEYS)
     ) return false;
     try {
       const canonical = createFinding({
@@ -364,8 +374,8 @@ function hasExactKeys(record: Record<string, unknown>, keys: readonly string[]):
   return Object.keys(record).length === keys.length && keys.every((key) => Object.hasOwn(record, key));
 }
 
-function hasOnlyKeys(record: Record<string, unknown>, keys: readonly string[]): boolean {
-  return Object.keys(record).every((key) => keys.includes(key));
+function hasOnlyKeys(record: Record<string, unknown>, keys: ReadonlySet<string>): boolean {
+  return Object.keys(record).every((key) => keys.has(key));
 }
 
 export function candidateErrorFromR2(error: unknown): never {
