@@ -410,26 +410,38 @@ async function findingsForApi(
   bindings: Pick<VodExportPublicationBindings, 'DB' | 'NOVA_DB'>,
   findings: readonly VodExportFinding[],
 ): Promise<VodExportFindingApi[]> {
-  const performanceIds = [...new Set(findings
-    .filter((finding) => finding.entityType === 'performance' && finding.entityId !== undefined)
-    .map((finding) => finding.entityId!))];
-  const songIds = [...new Set(findings
-    .filter((finding) => finding.entityType === 'song' && finding.entityId !== undefined)
-    .map((finding) => finding.entityId!))];
-  const vodIds = [...new Set(findings
-    .filter((finding) => finding.entityType === 'vod' && finding.entityId !== undefined)
-    .map((finding) => finding.entityId!))];
-  const vodStreamIds = [...new Set(findings
-    .filter((finding) => finding.entityType === 'vod' && finding.details?.streamId !== undefined)
-    .map((finding) => finding.details!.streamId!))];
-  const submissionIds = [...new Set(findings
-    .filter((finding) => finding.entityType === 'streamer' && finding.details?.submissionId !== undefined)
-    .map((finding) => finding.details!.submissionId!))];
+  const performanceIds = new Set<string>();
+  const songIds = new Set<string>();
+  const vodIds = new Set<string>();
+  const vodStreamIds = new Set<string>();
+  const submissionIds = new Set<string>();
+  for (const finding of findings) {
+    if (finding.entityType === 'performance' && finding.entityId !== undefined) {
+      performanceIds.add(finding.entityId);
+    } else if (finding.entityType === 'song' && finding.entityId !== undefined) {
+      songIds.add(finding.entityId);
+    } else if (finding.entityType === 'vod') {
+      if (finding.entityId !== undefined) vodIds.add(finding.entityId);
+      if (finding.details?.streamId !== undefined) vodStreamIds.add(finding.details.streamId);
+    } else if (
+      finding.entityType === 'streamer'
+      && finding.details?.submissionId !== undefined
+    ) {
+      submissionIds.add(finding.details.submissionId);
+    }
+  }
   const lookupWorkspace = createD1LookupWorkspace();
-  const performances = await lookupPerformanceRepairRows(bindings.DB, performanceIds, lookupWorkspace);
-  const songs = await lookupSongRepairRows(bindings.DB, songIds, lookupWorkspace);
-  const streams = await lookupVodRepairRows(bindings.DB, vodIds, vodStreamIds, lookupWorkspace);
-  const submissions = await lookupStreamerRepairRows(bindings.NOVA_DB, submissionIds, lookupWorkspace);
+  // Each lookup must consume the shared reusable buffer before the next one mutates it.
+  const performances = await lookupPerformanceRepairRows(
+    bindings.DB, [...performanceIds], lookupWorkspace,
+  );
+  const songs = await lookupSongRepairRows(bindings.DB, [...songIds], lookupWorkspace);
+  const streams = await lookupVodRepairRows(
+    bindings.DB, [...vodIds], [...vodStreamIds], lookupWorkspace,
+  );
+  const submissions = await lookupStreamerRepairRows(
+    bindings.NOVA_DB, [...submissionIds], lookupWorkspace,
+  );
   const performanceById = new Map(performances
     .filter((row): row is { id: string; row_id: number } => typeof row.id === 'string')
     .map((row) => [row.id, Number(row.row_id)]));
