@@ -223,28 +223,6 @@ function prepareRelinkSongToExactWork(
   ).bind(linkedBy, songId);
 }
 
-// --- Query helpers ---
-
-export async function listSongs(
-  db: D1Database,
-  streamerId: string,
-  status?: string,
-): Promise<Song[]> {
-  const query = status
-    ? db.prepare(`SELECT s.*, link.work_id
-        FROM songs AS s
-        LEFT JOIN song_work_links AS link ON link.song_id = s.id
-        WHERE s.streamer_id = ? AND s.status = ?
-        ORDER BY s.created_at DESC`).bind(streamerId, status)
-    : db.prepare(`SELECT s.*, link.work_id
-        FROM songs AS s
-        LEFT JOIN song_work_links AS link ON link.song_id = s.id
-        WHERE s.streamer_id = ?
-        ORDER BY s.created_at DESC`).bind(streamerId);
-  const { results } = await query.all<SongRow>();
-  return results.map(songFromRow);
-}
-
 // --- Paginated song listing ---
 
 const SORT_COLUMN_MAP: Record<string, string> = {
