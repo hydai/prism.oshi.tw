@@ -235,9 +235,13 @@ export default function AuroraPage() {
   }, [songs, handleUpdate]);
 
   const handleFillAllDurations = useCallback(async () => {
-    const targets = songs
-      .map((s, i) => ({ song: s, index: i }))
-      .filter(({ song }) => song.endSeconds === null && song.name.trim() !== '');
+    const targets: { song: AuroraSong; index: number }[] = [];
+    for (let index = 0; index < songs.length; index++) {
+      const song = songs[index]!;
+      if (song.endSeconds === null && song.name.trim() !== '') {
+        targets.push({ song, index });
+      }
+    }
     if (targets.length === 0) return;
 
     let filled = 0;
