@@ -130,6 +130,9 @@ async function main(): Promise<void> {
     default: GlobalWorkReview,
     MergeImpact,
   } = await import('../src/pages/GlobalWorkReview');
+  const { default: WorkMatchCandidateCard } = await import(
+    '../src/components/WorkMatchCandidateCard'
+  );
   const {
     candidateReviewStateKey,
     selectMergeSourceWorkIds,
@@ -196,6 +199,28 @@ async function main(): Promise<void> {
   assert(impactHtml.includes('No song or performance row is deleted'), 'confirmation states the non-destructive boundary');
   assert(impactHtml.includes('Canonical tags after merge: pop, english'), 'confirmation discloses the resulting tag union');
   assert(impactHtml.includes('Adds: english'), 'confirmation identifies tags added to the canonical work');
+
+  const candidateHtml = renderToStaticMarkup(
+    <WorkMatchCandidateCard
+      candidate={candidate}
+      selectedCanonicalWorkId="work-canonical"
+      note="Verify official source"
+      queueBusy={false}
+      acting={false}
+      isConfirming={false}
+      onCanonicalChange={() => undefined}
+      onNoteChange={() => undefined}
+      onReviewMergeImpact={() => undefined}
+      onCancelMerge={() => undefined}
+      onConfirmMerge={() => undefined}
+      onSaveDecision={() => undefined}
+    />,
+  );
+  assert(candidateHtml.includes('I Love You 3000'), 'candidate card renders the canonical work');
+  assert(candidateHtml.includes('I love you 3000'), 'candidate card renders the possible duplicate');
+  assert(candidateHtml.includes('Verify official source'), 'candidate card preserves the draft review note');
+  assert(candidateHtml.includes('Review merge impact'), 'candidate card exposes the merge review action');
+  assert(candidateHtml.includes('Local follow-up required'), 'candidate card discloses local duplicate follow-up');
 
   const changedFingerprint = { ...candidate, fingerprint: 'c'.repeat(64) };
   assert(
