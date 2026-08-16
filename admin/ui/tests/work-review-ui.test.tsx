@@ -137,6 +137,10 @@ async function main(): Promise<void> {
     candidateReviewStateKey,
     selectMergeSourceWorkIds,
   } = await import('../src/lib/global-work-review');
+  const {
+    initialWorkReviewState,
+    workReviewReducer,
+  } = await import('../src/pages/work-review-state');
 
   await api.listWorkMatches({ filter: 'pending', page: 2, pageSize: 20 });
   await api.reviewWorkMatch({
@@ -238,7 +242,75 @@ async function main(): Promise<void> {
   assert(partialSources.length === 50, 'over-limit candidates are split into server-safe batches');
   assert(!partialSources.includes('work-0'), 'partial merge sources exclude the canonical work');
 
-  console.log('✓ work review UI is curator-only, site-wide, and explicit about preserved performances');
+  let reviewState = workReviewReducer(
+    {
+      ...initialWorkReviewState,
+      candidates: [candidate],
+      stats: listResponse.stats,
+      total: 1,
+      totalPages: 1,
+      scanError: 'stale scan error',
+    },
+    { type: 'scanStarted' },
+  );
+  assert(reviewState.loading, 'starting a scan enables the loading state');
+  assert(reviewState.candidates.length === 0, 'starting a scan clears stale candidates');
+  assert(reviewState.total === 0 && reviewState.totalPages === 0, 'starting a scan resets pagination totals');
+  assert(reviewState.scanError === null, 'starting a scan clears the previous scan error');
+
+  reviewState = workReviewReducer(reviewState, {
+    type: 'scanSucceeded',
+    response: listResponse,
+  });
+  assert(reviewState.candidates[0]?.candidateKey === candidate.candidateKey, 'a scan stores its candidates');
+  assert(reviewState.stats.candidateCount === 1, 'a scan stores aggregate queue statistics');
+  assert(reviewState.total === 1 && reviewState.totalPages === 1, 'a scan stores pagination totals');
+
+  reviewState = {
+    ...reviewState,
+    page: 1,
+    totalPages: 3,
+    actionError: 'stale action error',
+    message: 'stale success message',
+    confirmingCandidateKey: candidate.candidateKey,
+  };
+  reviewState = workReviewReducer(reviewState, { type: 'nextPageRequested' });
+  reviewState = workReviewReducer(reviewState, { type: 'nextPageRequested' });
+  assert(reviewState.page === 3, 'consecutive page actions use the latest reducer state');
+  assert(reviewState.actionError === null && reviewState.message === null, 'changing pages clears action feedback');
+  assert(reviewState.confirmingCandidateKey === null, 'changing pages closes merge confirmation');
+
+  reviewState = workReviewReducer(
+    {
+      ...reviewState,
+      page: 3,
+      actionError: 'stale action error',
+      message: 'stale success message',
+      confirmingCandidateKey: candidate.candidateKey,
+    },
+    { type: 'filterChanged', filter: 'needs_research' },
+  );
+  assert(reviewState.filter === 'needs_research', 'changing the filter stores the selected queue');
+  assert(reviewState.page === 1, 'changing the filter returns to the first page');
+  assert(reviewState.actionError === null && reviewState.message === null, 'changing the filter clears action feedback');
+  assert(reviewState.confirmingCandidateKey === null, 'changing the filter closes merge confirmation');
+
+  reviewState = workReviewReducer(reviewState, {
+    type: 'actionStarted',
+    candidateKey: candidate.candidateKey,
+  });
+  assert(reviewState.actionCandidateKey === candidate.candidateKey, 'an action marks its candidate as busy');
+  reviewState = workReviewReducer(reviewState, {
+    type: 'actionSucceeded',
+    message: 'Saved for source research.',
+  });
+  reviewState = workReviewReducer(reviewState, { type: 'refreshRequested' });
+  reviewState = workReviewReducer(reviewState, { type: 'actionFinished' });
+  assert(reviewState.message === 'Saved for source research.', 'a successful action preserves its feedback through refresh');
+  assert(reviewState.refreshVersion === 1, 'a completed action requests a fresh scan');
+  assert(reviewState.actionCandidateKey === null, 'finishing an action releases the queue lock');
+
+  console.log('✓ work review UI and state transitions preserve curator safeguards');
 }
 
 await main();
