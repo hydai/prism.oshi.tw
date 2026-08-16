@@ -50,6 +50,10 @@ async function main(): Promise<void> {
     getPublishDisabledReason,
     safeRepairPath,
   } = await import('../src/lib/vod-export-helpers');
+  const {
+    createVodExportPageState,
+    vodExportPageReducer,
+  } = await import('../src/pages/vod-export-state');
   const { getVisibleNavItems } = await import('../src/lib/navigation');
 
   const curator: AuthUser = { email: 'curator@example.com', role: 'curator' };
@@ -163,6 +167,102 @@ async function main(): Promise<void> {
     uncompressedBytes: 1_630_280,
     counts,
   };
+
+  let pageState = createVodExportPageState();
+  assert(pageState.statusLoading, 'publication status starts in a loading state');
+  pageState = vodExportPageReducer(pageState, {
+    type: 'statusFailed',
+    error: 'Status unavailable.',
+  });
+  pageState = vodExportPageReducer(pageState, { type: 'statusLoadingFinished' });
+  assert(pageState.statusError === 'Status unavailable.', 'status failures remain visible after loading');
+  pageState = vodExportPageReducer(pageState, {
+    type: 'statusSucceeded',
+    status: {
+      currentPublication: publication,
+      changesNotPublished: true,
+      publicationInProgress: false,
+      generationInProgress: false,
+      recoveryAvailable: false,
+    },
+  });
+  assert(pageState.status.currentPublication === publication, 'status refresh replaces authoritative status');
+  assert(pageState.statusError === null, 'successful status refresh clears the prior error');
+
+  pageState = vodExportPageReducer(pageState, { type: 'previewGenerationStarted' });
+  assert(pageState.generating && !pageState.previewLoaded, 'preview generation clears stale preview state');
+  pageState = vodExportPageReducer(pageState, {
+    type: 'previewGenerationSucceeded',
+    response: {
+      candidate,
+      canPublish: true,
+      findings: [],
+      capacity: [],
+    },
+  });
+  pageState = vodExportPageReducer(pageState, { type: 'previewGenerationFinished' });
+  assert(pageState.candidate === candidate, 'generated candidate and eligibility update together');
+  assert(pageState.canPublish && pageState.previewLoaded, 'valid preview becomes publishable atomically');
+  assert(!pageState.generating, 'preview generation always leaves its busy state');
+
+  pageState = vodExportPageReducer(pageState, { type: 'candidateCheckStarted' });
+  pageState = vodExportPageReducer(pageState, {
+    type: 'candidateCheckSucceeded',
+    response: {
+      candidate: { ...candidate, state: 'stale' },
+      canPublish: false,
+      findings: [],
+      capacity: [],
+    },
+  });
+  pageState = vodExportPageReducer(pageState, { type: 'candidateCheckFinished' });
+  assert(pageState.candidateState === 'stale', 'candidate recheck records a stale server response');
+  assert(!pageState.confirming, 'stale candidate never opens the publication confirmation');
+  assert(pageState.operationError?.includes('no longer publishable') === true, 'stale recheck explains why publication stopped');
+
+  pageState = vodExportPageReducer(pageState, { type: 'previewGenerationStarted' });
+  pageState = vodExportPageReducer(pageState, {
+    type: 'previewGenerationSucceeded',
+    response: { candidate, canPublish: true, findings: [], capacity: [] },
+  });
+  pageState = vodExportPageReducer(pageState, { type: 'previewGenerationFinished' });
+  pageState = vodExportPageReducer(pageState, { type: 'candidateCheckStarted' });
+  pageState = vodExportPageReducer(pageState, {
+    type: 'candidateCheckSucceeded',
+    response: { candidate, canPublish: true, findings: [], capacity: [] },
+  });
+  pageState = vodExportPageReducer(pageState, { type: 'candidateCheckFinished' });
+  assert(pageState.confirming, 'current publishable candidate opens confirmation after recheck');
+
+  pageState = vodExportPageReducer(pageState, { type: 'publicationStarted' });
+  pageState = vodExportPageReducer(pageState, {
+    type: 'publicationSucceeded',
+    response: {
+      outcome: 'published',
+      currentPublication: publication,
+      warnings: ['Audit recovery pending.'],
+    },
+  });
+  assert(pageState.candidate === null && !pageState.canPublish, 'successful publication consumes its candidate');
+  assert(pageState.postCommitWarnings.length === 1, 'post-commit recovery warning is retained');
+  assert(pageState.resultMessage?.includes('recovery') === true, 'publication success distinguishes pending recovery');
+  pageState = vodExportPageReducer(pageState, { type: 'publicationFinished' });
+  assert(!pageState.publishing && !pageState.confirming, 'publication completion clears busy and confirmation state');
+
+  pageState = vodExportPageReducer(pageState, {
+    type: 'previewGenerationSucceeded',
+    response: { candidate, canPublish: true, findings: [], capacity: [] },
+  });
+  pageState = vodExportPageReducer(pageState, { type: 'recoveryStarted' });
+  pageState = vodExportPageReducer(pageState, {
+    type: 'recoverySucceeded',
+    response: { outcome: 'recovered', currentPublication: publication },
+  });
+  pageState = vodExportPageReducer(pageState, { type: 'recoveryFinished' });
+  assert(pageState.candidate === null && !pageState.canPublish, 'completed recovery clears the recovered candidate');
+  assert(pageState.postCommitWarnings.length === 0, 'completed recovery clears prior warnings');
+  assert(!pageState.publishing, 'recovery completion clears its busy state');
+
   const publicationHtml = renderToStaticMarkup(
     <CurrentPublicationPanel publication={publication} loading={false} />,
   );

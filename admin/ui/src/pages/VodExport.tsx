@@ -2,6 +2,7 @@ import {
   useCallback,
   useEffect,
   useMemo,
+  useReducer,
   useRef,
   useState,
   type ReactNode,
@@ -18,21 +19,13 @@ import type {
   VodExportFinding,
   VodExportFindingSeverity,
   VodExportPublication,
-  VodExportStatusResponse,
 } from '../api/vodExportTypes';
 import {
   getPublishDisabledReason,
   safeRepairPath,
   type CandidateLocalState,
 } from '../lib/vod-export-helpers';
-
-const EMPTY_STATUS: VodExportStatusResponse = {
-  currentPublication: null,
-  changesNotPublished: false,
-  publicationInProgress: false,
-  generationInProgress: false,
-  recoveryAvailable: false,
-};
+import { createVodExportPageState, vodExportPageReducer } from './vod-export-state';
 
 type SeverityFilter = 'all' | VodExportFindingSeverity;
 
@@ -656,34 +649,38 @@ function operationMessage(error: unknown, fallback: string): string {
 
 export default function VodExport({ user }: { user: AuthUser }) {
   const publishButtonRef = useRef<HTMLButtonElement>(null);
-  const [status, setStatus] = useState<VodExportStatusResponse>(EMPTY_STATUS);
-  const [statusLoading, setStatusLoading] = useState(true);
-  const [statusError, setStatusError] = useState<string | null>(null);
-  const [candidate, setCandidate] = useState<VodExportCandidate | null>(null);
-  const [candidateState, setCandidateState] = useState<CandidateLocalState>('ready');
-  const [canPublish, setCanPublish] = useState(false);
-  const [findings, setFindings] = useState<VodExportFinding[]>([]);
-  const [capacity, setCapacity] = useState<VodExportCapacityDiagnostic[]>([]);
-  const [previewLoaded, setPreviewLoaded] = useState(false);
-  const [generating, setGenerating] = useState(false);
-  const [publishing, setPublishing] = useState(false);
-  const [downloading, setDownloading] = useState(false);
-  const [checkingCandidate, setCheckingCandidate] = useState(false);
-  const [confirming, setConfirming] = useState(false);
-  const [operationError, setOperationError] = useState<string | null>(null);
-  const [resultMessage, setResultMessage] = useState<string | null>(null);
-  const [postCommitWarnings, setPostCommitWarnings] = useState<string[]>([]);
-  const [copyMessage, setCopyMessage] = useState<string | null>(null);
+  const [{
+    status,
+    statusLoading,
+    statusError,
+    candidate,
+    candidateState,
+    canPublish,
+    findings,
+    capacity,
+    previewLoaded,
+    generating,
+    publishing,
+    downloading,
+    checkingCandidate,
+    confirming,
+    operationError,
+    resultMessage,
+    postCommitWarnings,
+    copyMessage,
+  }, dispatch] = useReducer(vodExportPageReducer, undefined, createVodExportPageState);
   const [now, setNow] = useState(() => Date.now());
 
   const refreshStatus = useCallback(async (): Promise<boolean> => {
     try {
       const current = await api.vodExportStatus();
-      setStatus(current);
-      setStatusError(null);
+      dispatch({ type: 'statusSucceeded', status: current });
       return true;
     } catch (error) {
-      setStatusError(operationMessage(error, 'Failed to refresh publication status.'));
+      dispatch({
+        type: 'statusFailed',
+        error: operationMessage(error, 'Failed to refresh publication status.'),
+      });
       return false;
     }
   }, []);
@@ -693,13 +690,18 @@ export default function VodExport({ user }: { user: AuthUser }) {
     api
       .vodExportStatus()
       .then((response) => {
-        if (active) setStatus(response);
+        if (active) dispatch({ type: 'statusSucceeded', status: response });
       })
       .catch((error: unknown) => {
-        if (active) setStatusError(operationMessage(error, 'Failed to load publication status.'));
+        if (active) {
+          dispatch({
+            type: 'statusFailed',
+            error: operationMessage(error, 'Failed to load publication status.'),
+          });
+        }
       })
       .finally(() => {
-        if (active) setStatusLoading(false);
+        if (active) dispatch({ type: 'statusLoadingFinished' });
       });
     return () => {
       active = false;
@@ -754,46 +756,30 @@ export default function VodExport({ user }: { user: AuthUser }) {
   const warningCount = findings.filter((finding) => finding.severity === 'warning').length;
 
   const notifyCopied = () => {
-    setCopyMessage('Copied to clipboard.');
-    window.setTimeout(() => setCopyMessage(null), 2_000);
+    dispatch({ type: 'copyMessageShown' });
+    window.setTimeout(() => dispatch({ type: 'copyMessageCleared' }), 2_000);
   };
 
   const generatePreview = async () => {
-    setGenerating(true);
-    setOperationError(null);
-    setResultMessage(null);
-    setPostCommitWarnings([]);
-    setCandidate(null);
-    setCandidateState('ready');
-    setCanPublish(false);
-    setFindings([]);
-    setCapacity([]);
-    setPreviewLoaded(false);
+    dispatch({ type: 'previewGenerationStarted' });
 
     try {
       const response = await api.generateVodExportPreview();
-      setPreviewLoaded(true);
-      setCanPublish(response.canPublish);
-      setFindings(response.findings);
-      setCapacity(response.capacity);
-      setCandidate(response.candidate);
-      if (response.candidate?.state === 'stale') setCandidateState('stale');
-      if (response.candidate?.state === 'already_published') setCandidateState('already_published');
-      if (response.canPublish && !response.candidate) {
-        setOperationError('The server marked the preview publishable but did not return a candidate. Generate it again.');
-      }
+      dispatch({ type: 'previewGenerationSucceeded', response });
     } catch (error) {
-      if (error instanceof ApiError) setCapacity(error.diagnostics);
-      setOperationError(operationMessage(error, 'Failed to generate preview.'));
+      dispatch({
+        type: 'previewGenerationFailed',
+        error: operationMessage(error, 'Failed to generate preview.'),
+        capacity: error instanceof ApiError ? error.diagnostics : undefined,
+      });
     } finally {
-      setGenerating(false);
+      dispatch({ type: 'previewGenerationFinished' });
     }
   };
 
   const download = async () => {
     if (!candidate) return;
-    setDownloading(true);
-    setOperationError(null);
+    dispatch({ type: 'downloadStarted' });
     try {
       const result = await api.downloadVodExportCandidate(candidate.candidateId, candidate.sha256);
       const objectUrl = URL.createObjectURL(result.blob);
@@ -803,97 +789,72 @@ export default function VodExport({ user }: { user: AuthUser }) {
       anchor.click();
       window.setTimeout(() => URL.revokeObjectURL(objectUrl), 0);
     } catch (error) {
-      setOperationError(operationMessage(error, 'Failed to download candidate.'));
+      dispatch({
+        type: 'downloadFailed',
+        error: operationMessage(error, 'Failed to download candidate.'),
+      });
     } finally {
-      setDownloading(false);
+      dispatch({ type: 'downloadFinished' });
     }
   };
 
   const confirmCurrentCandidate = async () => {
     if (!candidate || disabledReason) return;
-    setCheckingCandidate(true);
-    setOperationError(null);
+    dispatch({ type: 'candidateCheckStarted' });
     try {
       const response = await api.getVodExportCandidate(candidate.candidateId);
-      setCanPublish(response.canPublish);
-      setFindings(response.findings);
-      setCapacity(response.capacity);
-      setCandidate(response.candidate);
-      const state = response.candidate?.state;
-      setCandidateState(state === 'stale' ? 'stale' : state === 'already_published' ? 'already_published' : 'ready');
-      if (response.canPublish && response.candidate?.state !== 'stale') {
-        setConfirming(true);
-      } else {
-        setOperationError('This candidate is no longer publishable. Generate a fresh preview.');
-      }
+      dispatch({ type: 'candidateCheckSucceeded', response });
     } catch (error) {
-      setOperationError(operationMessage(error, 'Failed to recheck candidate.'));
+      dispatch({
+        type: 'candidateCheckFailed',
+        error: operationMessage(error, 'Failed to recheck candidate.'),
+      });
     } finally {
-      setCheckingCandidate(false);
+      dispatch({ type: 'candidateCheckFinished' });
     }
   };
 
   const publish = async () => {
     if (!candidate || disabledReason) return;
-    setPublishing(true);
-    setOperationError(null);
-    setResultMessage(null);
-    setPostCommitWarnings([]);
+    dispatch({ type: 'publicationStarted' });
     try {
       const response = await api.publishVodExportCandidate(candidate.candidateId);
-      setPostCommitWarnings(response.warnings);
-      if (response.outcome === 'already_published') {
-        setCandidateState('already_published');
-        setResultMessage('Reviewed source recorded. Public files and publication time were unchanged.');
-      } else {
-        setCandidate(null);
-        setCanPublish(false);
-        setResultMessage(response.warnings.length > 0
-          ? 'Snapshot published; private audit or cleanup recovery still needs to finish.'
-          : 'Snapshot published successfully.');
-      }
+      dispatch({ type: 'publicationSucceeded', response });
       await refreshStatus();
     } catch (error) {
-      if (error instanceof ApiError && error.code === 'CANDIDATE_STALE') setCandidateState('stale');
-      setOperationError(operationMessage(error, 'Failed to publish candidate.'));
+      dispatch({
+        type: 'publicationFailed',
+        error: operationMessage(error, 'Failed to publish candidate.'),
+        stale: error instanceof ApiError && error.code === 'CANDIDATE_STALE',
+      });
       // The request may have committed remotely even if its HTTP response was
       // lost. Always fetch authoritative status so prepared recovery appears.
       await refreshStatus();
     } finally {
-      setPublishing(false);
-      setConfirming(false);
+      dispatch({ type: 'publicationFinished' });
     }
   };
 
   const recoverPublication = async () => {
-    setPublishing(true);
-    setOperationError(null);
+    dispatch({ type: 'recoveryStarted' });
     try {
       const response = await api.reconcileVodExportPublication();
-      setPostCommitWarnings([]);
-      if (response.outcome === 'recovered') {
-        setCandidate(null);
-        setCanPublish(false);
-        setResultMessage('Publication audit and cleanup recovery completed.');
-      } else if (response.outcome === 'already_published') {
-        setResultMessage('The public snapshot was already current; recovery completed without rewriting it.');
-      } else if (response.outcome === 'released_not_committed') {
-        setResultMessage('The uncommitted prepared attempt was released safely. Its candidate remains available until expiry.');
-      } else {
-        setResultMessage('There is no prepared publication to recover.');
-      }
+      dispatch({ type: 'recoverySucceeded', response });
       await refreshStatus();
     } catch (error) {
-      setOperationError(operationMessage(error, 'Failed to recover publication state.'));
+      dispatch({
+        type: 'recoveryFailed',
+        error: operationMessage(error, 'Failed to recover publication state.'),
+      });
     } finally {
-      setPublishing(false);
+      dispatch({ type: 'recoveryFinished' });
     }
   };
 
   const retryStatus = async () => {
-    setStatusLoading(true);
+    dispatch({ type: 'statusLoadingStarted' });
     await refreshStatus();
-    setStatusLoading(false);
+    dispatch({ type: 'statusLoadingFinished' });
   };
 
   return (
@@ -1069,7 +1030,7 @@ export default function VodExport({ user }: { user: AuthUser }) {
           publishing={publishing}
           unchanged={candidateState === 'already_published' || candidate.state === 'already_published'}
           returnFocusElement={publishButtonRef.current}
-          onCancel={() => setConfirming(false)}
+          onCancel={() => dispatch({ type: 'confirmationCancelled' })}
           onConfirm={publish}
         />
       )}
