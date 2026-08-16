@@ -1,6 +1,14 @@
 'use client';
 
-import { createContext, useContext, useState, useEffect, ReactNode } from 'react';
+import {
+  createContext,
+  useCallback,
+  useContext,
+  useEffect,
+  useMemo,
+  useState,
+  ReactNode,
+} from 'react';
 import {
   dedupePlaylistVersions,
   migrateGlobalPlaylistsForStreamer,
@@ -203,7 +211,7 @@ export const PlaylistProvider = ({ streamerSlug, children }: { streamerSlug: str
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  const saveToLocalStorage = (newPlaylists: Playlist[]): StorageSaveResult => {
+  const saveToLocalStorage = useCallback((newPlaylists: Playlist[]): StorageSaveResult => {
     const result = saveJsonToStorage(localStorage, STORAGE_KEY, newPlaylists);
     if (result.success) {
       setStorageError(null);
@@ -211,9 +219,9 @@ export const PlaylistProvider = ({ streamerSlug, children }: { streamerSlug: str
       setStorageError(result.error);
     }
     return result;
-  };
+  }, [STORAGE_KEY]);
 
-  const createPlaylist = (name: string): { success: boolean; error?: string } => {
+  const createPlaylist = useCallback((name: string): { success: boolean; error?: string } => {
     if (!localStorageSupported) {
       setStorageError(STORAGE_UNSUPPORTED_ERROR);
       return { success: false, error: STORAGE_UNSUPPORTED_ERROR };
@@ -241,15 +249,15 @@ export const PlaylistProvider = ({ streamerSlug, children }: { streamerSlug: str
       return { success: true };
     }
     return saved;
-  };
+  }, [localStorageSupported, playlists, saveToLocalStorage]);
 
-  const deletePlaylist = (id: string) => {
+  const deletePlaylist = useCallback((id: string) => {
     const newPlaylists = playlists.filter(p => p.id !== id);
     saveToLocalStorage(newPlaylists);
     setPlaylists(newPlaylists);
-  };
+  }, [playlists, saveToLocalStorage]);
 
-  const renamePlaylist = (id: string, newName: string): { success: boolean; error?: string } => {
+  const renamePlaylist = useCallback((id: string, newName: string): { success: boolean; error?: string } => {
     const trimmedName = newName.trim();
     if (!trimmedName) {
       return { success: false, error: '播放清單名稱不可為空' };
@@ -266,9 +274,9 @@ export const PlaylistProvider = ({ streamerSlug, children }: { streamerSlug: str
       return { success: true };
     }
     return saved;
-  };
+  }, [playlists, saveToLocalStorage]);
 
-  const addVersionToPlaylist = (playlistId: string, version: PlaylistVersion): { success: boolean; error?: string } => {
+  const addVersionToPlaylist = useCallback((playlistId: string, version: PlaylistVersion): { success: boolean; error?: string } => {
     if (!localStorageSupported) {
       setStorageError(STORAGE_UNSUPPORTED_ERROR);
       return { success: false, error: STORAGE_UNSUPPORTED_ERROR };
@@ -297,9 +305,9 @@ export const PlaylistProvider = ({ streamerSlug, children }: { streamerSlug: str
       return { success: true };
     }
     return saved;
-  };
+  }, [localStorageSupported, playlists, saveToLocalStorage]);
 
-  const removeVersionFromPlaylist = (playlistId: string, performanceId: string) => {
+  const removeVersionFromPlaylist = useCallback((playlistId: string, performanceId: string) => {
     const now = Date.now();
     const newPlaylists = playlists.map(p =>
       p.id === playlistId
@@ -308,9 +316,9 @@ export const PlaylistProvider = ({ streamerSlug, children }: { streamerSlug: str
     );
     saveToLocalStorage(newPlaylists);
     setPlaylists(newPlaylists);
-  };
+  }, [playlists, saveToLocalStorage]);
 
-  const reorderVersionsInPlaylist = (playlistId: string, fromIndex: number, toIndex: number) => {
+  const reorderVersionsInPlaylist = useCallback((playlistId: string, fromIndex: number, toIndex: number) => {
     const now = Date.now();
     const newPlaylists = playlists.map(p => {
       if (p.id === playlistId) {
@@ -323,22 +331,22 @@ export const PlaylistProvider = ({ streamerSlug, children }: { streamerSlug: str
     });
     saveToLocalStorage(newPlaylists);
     setPlaylists(newPlaylists);
-  };
+  }, [playlists, saveToLocalStorage]);
 
-  const clearStorageError = () => setStorageError(null);
+  const clearStorageError = useCallback(() => setStorageError(null), []);
 
-  const exportAll = () => {
+  const exportAll = useCallback(() => {
     if (playlists.length === 0) return;
     downloadJson(buildEnvelope(playlists), `prism-playlists-${formatDate()}.json`);
-  };
+  }, [playlists]);
 
-  const exportSingle = (playlistId: string) => {
+  const exportSingle = useCallback((playlistId: string) => {
     const playlist = playlists.find(p => p.id === playlistId);
     if (!playlist) return;
     downloadJson(buildEnvelope([playlist]), `prism-${playlist.name}-${formatDate()}.json`);
-  };
+  }, [playlists]);
 
-  const importPlaylists = async (file: File): Promise<{ success: boolean; count?: number; error?: string }> => {
+  const importPlaylists = useCallback(async (file: File): Promise<{ success: boolean; count?: number; error?: string }> => {
     try {
       const text = await file.text();
       let data: unknown;
@@ -391,25 +399,38 @@ export const PlaylistProvider = ({ streamerSlug, children }: { streamerSlug: str
     } catch {
       return { success: false, error: '無法匯入：檔案格式無效' };
     }
-  };
+  }, [playlists, saveToLocalStorage]);
+
+  const value = useMemo<PlaylistContextType>(() => ({
+    playlists,
+    createPlaylist,
+    deletePlaylist,
+    renamePlaylist,
+    addVersionToPlaylist,
+    removeVersionFromPlaylist,
+    reorderVersionsInPlaylist,
+    storageError,
+    clearStorageError,
+    exportAll,
+    exportSingle,
+    importPlaylists,
+  }), [
+    playlists,
+    createPlaylist,
+    deletePlaylist,
+    renamePlaylist,
+    addVersionToPlaylist,
+    removeVersionFromPlaylist,
+    reorderVersionsInPlaylist,
+    storageError,
+    clearStorageError,
+    exportAll,
+    exportSingle,
+    importPlaylists,
+  ]);
 
   return (
-    <PlaylistContext.Provider
-      value={{
-        playlists,
-        createPlaylist,
-        deletePlaylist,
-        renamePlaylist,
-        addVersionToPlaylist,
-        removeVersionFromPlaylist,
-        reorderVersionsInPlaylist,
-        storageError,
-        clearStorageError,
-        exportAll,
-        exportSingle,
-        importPlaylists,
-      }}
-    >
+    <PlaylistContext.Provider value={value}>
       {children}
     </PlaylistContext.Provider>
   );
