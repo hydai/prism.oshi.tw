@@ -40,6 +40,8 @@ class FakeR2Bucket {
   private readonly objects = new Map<string, FakeStoredObject>();
   private etagSequence = 0;
 
+  constructor(private readonly beforeList?: () => void | Promise<void>) {}
+
   asBucket(): R2Bucket {
     return this as unknown as R2Bucket;
   }
@@ -110,6 +112,7 @@ class FakeR2Bucket {
   }
 
   async list(options: { prefix?: string }): Promise<R2Objects> {
+    if (this.beforeList !== undefined) await this.beforeList();
     const prefix = options.prefix ?? '';
     const objects = [...this.objects.values()]
       .filter((object) => object.key.startsWith(prefix))
@@ -185,6 +188,7 @@ class FakeD1Statement {
 
   async run(): Promise<D1Result> {
     if (this.sql.includes('UPDATE vod_export_publication_resolutions')) {
+      await this.database.waitBeforeResolutionFinalize();
       const changes = this.database.pendingResolutions;
       this.database.pendingResolutions = 0;
       return result([], changes);
@@ -232,7 +236,11 @@ class FakeD1Database {
   pendingResolutions: number;
   expiredResolutions: number;
 
-  constructor(rows: AuditRow[], resolutions: { pending?: number; expired?: number } = {}) {
+  constructor(
+    rows: AuditRow[],
+    resolutions: { pending?: number; expired?: number } = {},
+    private readonly beforeResolutionFinalize?: () => Promise<void>,
+  ) {
     this.rows = rows.map((row) => ({ ...row }));
     this.pendingResolutions = resolutions.pending ?? 0;
     this.expiredResolutions = resolutions.expired ?? 0;
@@ -252,6 +260,10 @@ class FakeD1Database {
     return new FakeD1Statement(this, sql).asStatement();
   }
 
+  async waitBeforeResolutionFinalize(): Promise<void> {
+    if (this.beforeResolutionFinalize !== undefined) await this.beforeResolutionFinalize();
+  }
+
   async batch(statements: D1PreparedStatement[]): Promise<D1Result[]> {
     const results: D1Result[] = [];
     for (const statement of statements) {
@@ -269,6 +281,14 @@ class FakeD1Database {
 
 function result<T>(results: T[], changes = 0): D1Result<T> {
   return { results, success: true, meta: { changes } } as unknown as D1Result<T>;
+}
+
+function createGate(): { promise: Promise<void>; release: () => void } {
+  let release: () => void = () => undefined;
+  const promise = new Promise<void>((resolve) => {
+    release = resolve;
+  });
+  return { promise, release };
 }
 
 function conditionMatches(
@@ -475,6 +495,45 @@ async function testResolutionHistoryFinalizesAndExpiresOnlyUnderTheMutex(): Prom
   await assertControlIdle(privateBucket, 'publication resolution retention');
 }
 
+async function testIndependentInputsOverlapWithoutReleasingTheMutexEarly(): Promise<void> {
+  const resolutionStarted = createGate();
+  const releaseResolution = createGate();
+  const referenceError = new Error('reference scan failed');
+  let referenceScanStarted = false;
+  const database = new FakeD1Database([], { pending: 1 }, async () => {
+    resolutionStarted.release();
+    await releaseResolution.promise;
+  });
+  const publicBucket = new FakeR2Bucket(() => {
+    referenceScanStarted = true;
+    throw referenceError;
+  });
+  const privateBucket = new FakeR2Bucket();
+
+  const maintenancePromise = runVodExportMaintenance({
+    DB: database.asDatabase(),
+    VOD_EXPORT_PUBLIC: publicBucket.asBucket(),
+    VOD_EXPORT_PRIVATE: privateBucket.asBucket(),
+  }, NOW);
+
+  await resolutionStarted.promise;
+  await Promise.resolve();
+  assert(referenceScanStarted, 'manifest references should start while resolution maintenance is pending');
+  const activeControl = await readPublicationControl(privateBucket.asBucket());
+  equal(activeControl?.slot.state, 'acquired', 'publication control while one parallel input is pending');
+
+  releaseResolution.release();
+  let caught: unknown;
+  try {
+    await maintenancePromise;
+  } catch (error) {
+    caught = error;
+  }
+  equal(caught, referenceError, 'reference scan failure should be preserved');
+  equal(database.pendingResolutions, 0, 'in-flight resolution maintenance should finish before rejection');
+  await assertControlIdle(privateBucket, 'parallel maintenance input failure');
+}
+
 function assert(condition: unknown, message: string): asserts condition {
   if (!condition) throw new Error(message);
 }
@@ -491,6 +550,7 @@ async function main(): Promise<void> {
   await testSnapshotIsNotDeletedBeforeFourHundredDayBoundary();
   await testRereferencedSnapshotClearsUnreferencedMarker();
   await testResolutionHistoryFinalizesAndExpiresOnlyUnderTheMutex();
+  await testIndependentInputsOverlapWithoutReleasingTheMutexEarly();
   console.log('✓ VOD export maintenance retention safety');
 }
 
