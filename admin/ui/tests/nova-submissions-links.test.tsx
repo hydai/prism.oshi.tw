@@ -132,6 +132,16 @@ async function main(): Promise<void> {
   assert(valid.includes('tabindex="0"'), 'submission row is keyboard focusable');
   assert(valid.includes('aria-expanded="true"'), 'submission row exposes its expanded state');
   assert(valid.includes('aria-controls="nova-submission-details-sub-test"'), 'submission row identifies its details');
+  assert(valid.includes('>Approve</button>'), 'pending curator action retains approve control');
+  assert(valid.includes('>Reject</button>'), 'pending curator action retains reject control');
+  assert(valid.includes('>Delete</button>'), 'curator action retains delete control');
+  assert(valid.includes('>Edit</button>'), 'expanded curator details retain edit control');
+  assert(valid.includes('>Verify channel</button>'), 'expanded curator details retain channel verification');
+  assert(valid.includes('Social Links'), 'expanded view retains submission detail sections');
+  assert(
+    valid.includes('Reviewer Note (optional, shown on reject)'),
+    'pending curator details retain the rejection note editor',
+  );
 
   const original = makeSubmission();
   let rowState = createSubmissionRowState(original);
