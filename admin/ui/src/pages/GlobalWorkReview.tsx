@@ -1,25 +1,17 @@
-import { useEffect, useMemo, useRef, useState } from 'react';
+import { useEffect, useMemo, useReducer, useRef, useState } from 'react';
 import type {
   WorkMatchCandidate,
   WorkMatchDecision,
   WorkMatchFilter,
-  WorkMatchStats,
 } from '../../../shared/types';
 import { api } from '../api/client';
 import WorkMatchCandidateCard from '../components/WorkMatchCandidateCard';
 import { candidateReviewStateKey } from '../lib/global-work-review';
+import { initialWorkReviewState, workReviewReducer } from './work-review-state';
 
 export { MergeImpact } from '../components/WorkMatchCandidateCard';
 
 const PAGE_SIZE = 20;
-const EMPTY_STATS: WorkMatchStats = {
-  candidateCount: 0,
-  pendingCount: 0,
-  notDuplicateCount: 0,
-  needsResearchCount: 0,
-  affectedWorks: 0,
-};
-
 const FILTERS: Array<{ value: WorkMatchFilter; label: string }> = [
   { value: 'pending', label: 'Pending' },
   { value: 'needs_research', label: 'Needs research' },
@@ -28,31 +20,28 @@ const FILTERS: Array<{ value: WorkMatchFilter; label: string }> = [
 ];
 
 export default function GlobalWorkReview() {
-  const [candidates, setCandidates] = useState<WorkMatchCandidate[]>([]);
-  const [stats, setStats] = useState<WorkMatchStats>(EMPTY_STATS);
-  const [filter, setFilter] = useState<WorkMatchFilter>('pending');
-  const [page, setPage] = useState(1);
-  const [total, setTotal] = useState(0);
-  const [totalPages, setTotalPages] = useState(0);
-  const [loading, setLoading] = useState(true);
-  const [scanError, setScanError] = useState<string | null>(null);
-  const [actionError, setActionError] = useState<string | null>(null);
-  const [message, setMessage] = useState<string | null>(null);
-  const [refreshVersion, setRefreshVersion] = useState(0);
+  const [{
+    candidates,
+    stats,
+    filter,
+    page,
+    total,
+    totalPages,
+    loading,
+    scanError,
+    actionError,
+    message,
+    refreshVersion,
+    confirmingCandidateKey,
+    actionCandidateKey,
+  }, dispatch] = useReducer(workReviewReducer, initialWorkReviewState);
   const [canonicalByCandidate, setCanonicalByCandidate] = useState<Record<string, string>>({});
   const [notes, setNotes] = useState<Record<string, string>>({});
-  const [confirmingCandidateKey, setConfirmingCandidateKey] = useState<string | null>(null);
-  const [actionCandidateKey, setActionCandidateKey] = useState<string | null>(null);
   const actionInFlightRef = useRef(false);
 
   useEffect(() => {
     let active = true;
-    setLoading(true);
-    setScanError(null);
-    setCandidates([]);
-    setStats(EMPTY_STATS);
-    setTotal(0);
-    setTotalPages(0);
+    dispatch({ type: 'scanStarted' });
     api.listWorkMatches({ filter, page, pageSize: PAGE_SIZE })
       .then((response) => {
         if (!active) return;
@@ -60,13 +49,10 @@ export default function GlobalWorkReview() {
           ? 1
           : Math.min(page, response.totalPages);
         if (validPage !== page) {
-          setPage(validPage);
+          dispatch({ type: 'scanPageCorrected', page: validPage });
           return;
         }
-        setCandidates(response.data);
-        setStats(response.stats);
-        setTotal(response.total);
-        setTotalPages(response.totalPages);
+        dispatch({ type: 'scanSucceeded', response });
         setCanonicalByCandidate((current) => {
           const next = { ...current };
           for (const candidate of response.data) {
@@ -90,11 +76,14 @@ export default function GlobalWorkReview() {
       })
       .catch((caught: unknown) => {
         if (active) {
-          setScanError(caught instanceof Error ? caught.message : 'Failed to scan global works');
+          dispatch({
+            type: 'scanFailed',
+            error: caught instanceof Error ? caught.message : 'Failed to scan global works',
+          });
         }
       })
       .finally(() => {
-        if (active) setLoading(false);
+        if (active) dispatch({ type: 'scanFinished' });
       });
     return () => {
       active = false;
@@ -107,22 +96,19 @@ export default function GlobalWorkReview() {
   );
 
   const refresh = () => {
-    setConfirmingCandidateKey(null);
-    setRefreshVersion((current) => current + 1);
+    dispatch({ type: 'refreshRequested' });
   };
 
   const beginAction = (candidateKey: string): boolean => {
     if (actionInFlightRef.current) return false;
     actionInFlightRef.current = true;
-    setActionCandidateKey(candidateKey);
-    setActionError(null);
-    setMessage(null);
+    dispatch({ type: 'actionStarted', candidateKey });
     return true;
   };
 
   const finishAction = () => {
     actionInFlightRef.current = false;
-    setActionCandidateKey(null);
+    dispatch({ type: 'actionFinished' });
   };
 
   const saveDecision = async (candidate: WorkMatchCandidate, decision: WorkMatchDecision) => {
@@ -136,10 +122,18 @@ export default function GlobalWorkReview() {
         expectedReviewVersion: candidate.reviewVersion,
         note: notes[candidateReviewStateKey(candidate)] ?? '',
       });
-      setMessage(decision === 'not_duplicate' ? 'Saved as not duplicate.' : 'Saved for source research.');
+      dispatch({
+        type: 'actionSucceeded',
+        message: decision === 'not_duplicate'
+          ? 'Saved as not duplicate.'
+          : 'Saved for source research.',
+      });
       refresh();
     } catch (caught: unknown) {
-      setActionError(caught instanceof Error ? caught.message : 'Failed to save review decision');
+      dispatch({
+        type: 'actionFailed',
+        error: caught instanceof Error ? caught.message : 'Failed to save review decision',
+      });
       refresh();
     } finally {
       finishAction();
@@ -162,12 +156,16 @@ export default function GlobalWorkReview() {
         sourceWorkIds,
         note: notes[candidateReviewStateKey(candidate)] ?? '',
       });
-      setMessage(
-        `Merged ${result.mergedWorks} work ID(s); preserved ${result.preservedSongs} songs and ${result.preservedPerformances} performances.`,
-      );
+      dispatch({
+        type: 'actionSucceeded',
+        message: `Merged ${result.mergedWorks} work ID(s); preserved ${result.preservedSongs} songs and ${result.preservedPerformances} performances.`,
+      });
       refresh();
     } catch (caught: unknown) {
-      setActionError(caught instanceof Error ? caught.message : 'Failed to merge global works');
+      dispatch({
+        type: 'actionFailed',
+        error: caught instanceof Error ? caught.message : 'Failed to merge global works',
+      });
       refresh();
     } finally {
       finishAction();
@@ -218,11 +216,7 @@ export default function GlobalWorkReview() {
             type="button"
             disabled={queueBusy}
             onClick={() => {
-              setActionError(null);
-              setMessage(null);
-              setFilter(option.value);
-              setPage(1);
-              setConfirmingCandidateKey(null);
+              dispatch({ type: 'filterChanged', filter: option.value });
             }}
             className={`rounded-md px-3 py-1.5 text-sm font-medium disabled:opacity-50 ${
               filter === option.value
@@ -275,8 +269,11 @@ export default function GlobalWorkReview() {
                   ...current,
                   [noteStateKey]: note,
                 }))}
-                onReviewMergeImpact={() => setConfirmingCandidateKey(candidate.candidateKey)}
-                onCancelMerge={() => setConfirmingCandidateKey(null)}
+                onReviewMergeImpact={() => dispatch({
+                  type: 'mergeConfirmationStarted',
+                  candidateKey: candidate.candidateKey,
+                })}
+                onCancelMerge={() => dispatch({ type: 'mergeConfirmationCancelled' })}
                 onConfirmMerge={(canonicalWorkId, sourceWorkIds) => void confirmMerge(
                   candidate,
                   canonicalWorkId,
@@ -296,10 +293,7 @@ export default function GlobalWorkReview() {
             <button
               type="button"
               onClick={() => {
-                setActionError(null);
-                setMessage(null);
-                setConfirmingCandidateKey(null);
-                setPage((current) => Math.max(1, current - 1));
+                dispatch({ type: 'previousPageRequested' });
               }}
               disabled={queueBusy || page <= 1}
               className="rounded-md border border-slate-300 px-3 py-1.5 hover:bg-slate-100 disabled:opacity-40"
@@ -310,10 +304,7 @@ export default function GlobalWorkReview() {
             <button
               type="button"
               onClick={() => {
-                setActionError(null);
-                setMessage(null);
-                setConfirmingCandidateKey(null);
-                setPage((current) => Math.min(totalPages, current + 1));
+                dispatch({ type: 'nextPageRequested' });
               }}
               disabled={queueBusy || page >= totalPages}
               className="rounded-md border border-slate-300 px-3 py-1.5 hover:bg-slate-100 disabled:opacity-40"
