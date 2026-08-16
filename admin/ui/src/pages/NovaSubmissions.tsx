@@ -1,4 +1,5 @@
 import { useEffect, useReducer, useState } from 'react';
+import type { Dispatch } from 'react';
 import type { AuthUser, NovaSubmission, NovaStatus, BulkFetchSubscribersResponse } from '../../../shared/types';
 import { sanitizeNovaUrl } from '../../../shared/nova-url-safety';
 import { api } from '../api/client';
@@ -11,6 +12,10 @@ import {
   parseThemeJson,
   submissionRowReducer,
   THEME_KEYS,
+} from './nova-submission-row-state';
+import type {
+  SubmissionRowAction,
+  SubmissionRowState,
 } from './nova-submission-row-state';
 
 function isCanonicalUtcTimestamp(value: string | null): value is string {
@@ -370,385 +375,569 @@ export function SubmissionRow({
 
   return (
     <>
-      <tr
-        className="cursor-pointer hover:bg-slate-50 focus-visible:outline-2 focus-visible:outline-offset-[-2px] focus-visible:outline-blue-500"
-        onClick={onToggle}
-        onKeyDown={(event) => {
-          if (event.target !== event.currentTarget) return;
-          if (event.key !== 'Enter' && event.key !== ' ') return;
-          event.preventDefault();
-          onToggle();
-        }}
-        tabIndex={0}
-        aria-expanded={expanded}
-        aria-controls={`nova-submission-details-${sub.id}`}
-        aria-label={`${expanded ? '收合' : '展開'} ${sub.display_name}`}
-      >
-        <td className="px-4 py-3 font-medium text-slate-800">
-          <span className="mr-1 text-xs text-slate-400">{expanded ? '▼' : '▶'}</span>
-          {sub.display_name}
-        </td>
-        <td className="px-4 py-3 font-mono text-xs text-slate-600">{sub.slug}</td>
-        <td className="px-4 py-3">
-          {youtubeChannelUrl ? (
-            <a
-              href={youtubeChannelUrl}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="text-blue-600 hover:underline"
-              onClick={(e) => e.stopPropagation()}
-            >
-              {sub.brand_name || sub.youtube_channel_url}
-            </a>
-          ) : (
-            <span className="text-slate-600">{sub.brand_name || sub.youtube_channel_url || '—'}</span>
-          )}
-        </td>
-        <td className="px-4 py-3 text-slate-600">{sub.subscriber_count || '—'}</td>
-        <td className="px-4 py-3">
-          <StatusBadge status={sub.status} />
-        </td>
-        <td className="px-4 py-3 text-slate-500">{sub.submitted_at}</td>
-        {isCurator && (
-          <td className="px-4 py-3" onClick={(e) => e.stopPropagation()}>
-            <div className="flex gap-1">
-              {sub.status === 'pending' ? (
-                <>
-                  <button
-                    disabled={actionLoading}
-                    onClick={() => onAction(sub.id, 'approved')}
-                    className="rounded bg-green-600 px-2 py-1 text-xs text-white hover:bg-green-700 disabled:opacity-50"
-                  >
-                    Approve
-                  </button>
-                  <button
-                    disabled={actionLoading}
-                    onClick={() => onAction(sub.id, 'rejected')}
-                    className="rounded bg-red-600 px-2 py-1 text-xs text-white hover:bg-red-700 disabled:opacity-50"
-                  >
-                    Reject
-                  </button>
-                </>
-              ) : (
-                <button
-                  disabled={actionLoading}
-                  onClick={() => onAction(sub.id, 'pending')}
-                  className="rounded bg-amber-500 px-2 py-1 text-xs text-white hover:bg-amber-600 disabled:opacity-50"
-                >
-                  Revert to Pending
-                </button>
-              )}
-              <button
-                disabled={actionLoading}
-                onClick={() => onDelete(sub)}
-                className="ml-2 rounded bg-red-800 px-2 py-1 text-xs text-white hover:bg-red-900 disabled:opacity-50"
-              >
-                Delete
-              </button>
-            </div>
-          </td>
-        )}
-      </tr>
+      <SubmissionSummaryRow
+        sub={sub}
+        isCurator={isCurator}
+        expanded={expanded}
+        onToggle={onToggle}
+        onAction={onAction}
+        onDelete={onDelete}
+        actionLoading={actionLoading}
+      />
       {expanded && (
         <tr id={`nova-submission-details-${sub.id}`} className="bg-slate-50">
           <td colSpan={isCurator ? 7 : 6} className="px-6 py-4">
-            {/* Edit / View toggle button */}
             {isCurator && (
-              <div className="mb-3 flex items-center gap-2">
-                {!editing ? (
-                  <>
-                    <button
-                      onClick={() => dispatch({ type: 'editStarted' })}
-                      className="rounded bg-slate-700 px-3 py-1 text-xs font-medium text-white hover:bg-slate-800"
-                    >
-                      Edit
-                    </button>
-                    <button
-                      type="button"
-                      disabled={verifyingChannel || !sub.youtube_channel_id || channelVerified}
-                      onClick={handleVerifyChannel}
-                      className="rounded bg-indigo-600 px-3 py-1 text-xs font-medium text-white hover:bg-indigo-700 disabled:cursor-not-allowed disabled:opacity-50"
-                    >
-                      {verifyingChannel ? 'Verifying...' : channelVerified ? 'Channel verified' : 'Verify channel'}
-                    </button>
-                  </>
-                ) : (
-                  <>
-                    <button
-                      disabled={saving || orderDraft === undefined}
-                      onClick={handleSave}
-                      className="rounded bg-blue-600 px-3 py-1 text-xs font-medium text-white hover:bg-blue-700 disabled:opacity-50"
-                    >
-                      {saving ? 'Saving...' : 'Save'}
-                    </button>
-                    <button
-                      disabled={saving}
-                      onClick={handleCancel}
-                      className="rounded bg-slate-200 px-3 py-1 text-xs font-medium text-slate-700 hover:bg-slate-300 disabled:opacity-50"
-                    >
-                      Cancel
-                    </button>
-                  </>
-                )}
-                {saveError && <span className="text-xs text-red-600">{saveError}</span>}
-                {verificationError && <span className="text-xs text-red-600">{verificationError}</span>}
-              </div>
+              <SubmissionToolbar
+                sub={sub}
+                state={{
+                  editing,
+                  saving,
+                  saveError,
+                  orderDraft,
+                  verifyingChannel,
+                  verificationError,
+                }}
+                channelVerified={channelVerified}
+                onEdit={() => dispatch({ type: 'editStarted' })}
+                onSave={handleSave}
+                onCancel={handleCancel}
+                onVerifyChannel={handleVerifyChannel}
+              />
             )}
 
             <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
               {/* Left column: submission fields */}
               <div className="space-y-3">
-                {/* Avatar preview (not editable inline, but URL is) */}
-                {sub.avatar_url && !editing && (
-                  <div>
-                    {avatarUrl ? (
-                      <img
-                        src={avatarUrl}
-                        alt={sub.display_name}
-                        className="h-16 w-16 rounded-full border border-slate-200"
-                      />
-                    ) : (
-                      <p className="text-xs text-slate-400 break-all">Invalid avatar URL: {sub.avatar_url}</p>
-                    )}
-                  </div>
-                )}
+                {!editing && <SubmissionAvatar sub={sub} safeUrl={avatarUrl} />}
 
                 {editing ? (
-                  // Edit mode: render all editable fields as inputs
-                  <>
-                    {EDITABLE_FIELDS.map(({ key, label, multiline }) => (
-                      <div key={key}>
-                        <label
-                          htmlFor={`nova-${sub.id}-${key}`}
-                          className="text-xs font-medium uppercase text-slate-400"
-                        >
-                          {label}
-                        </label>
-                        {multiline ? (
-                          <textarea
-                            id={`nova-${sub.id}-${key}`}
-                            value={draft[key]}
-                            onChange={(event) => dispatch({
-                              type: 'draftFieldChanged',
-                              key,
-                              value: event.target.value,
-                            })}
-                            rows={3}
-                            className="mt-1 w-full rounded-md border border-slate-300 px-3 py-1.5 text-sm focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500"
-                          />
-                        ) : (
-                          <div className={key === 'subscriber_count' ? 'mt-1 flex gap-2' : 'mt-1'}>
-                            <input
-                              id={`nova-${sub.id}-${key}`}
-                              type="text"
-                              value={draft[key]}
-                              onChange={(event) => dispatch({
-                                type: 'draftFieldChanged',
-                                key,
-                                value: event.target.value,
-                              })}
-                              className="w-full rounded-md border border-slate-300 px-3 py-1.5 text-sm focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500"
-                            />
-                            {key === 'subscriber_count' && (
-                              <button
-                                type="button"
-                                disabled={fetchingSubs || !sub.youtube_channel_id}
-                                onClick={handleFetchSubscribers}
-                                title={!sub.youtube_channel_id ? 'Set YouTube Channel ID first' : 'Fetch subscriber count & avatar from YouTube'}
-                                className="shrink-0 rounded bg-indigo-600 px-3 py-1.5 text-xs font-medium text-white hover:bg-indigo-700 disabled:opacity-50 disabled:cursor-not-allowed"
-                              >
-                                {fetchingSubs ? 'Fetching...' : 'Fetch'}
-                              </button>
-                            )}
-                          </div>
-                        )}
-                        {key === 'subscriber_count' && fetchSubsError && (
-                          <p className="mt-1 text-xs text-red-600">{fetchSubsError}</p>
-                        )}
-                      </div>
-                    ))}
-
-                    {/* Enabled toggle + Display order */}
-                    <div className="flex items-center gap-4">
-                      <div className="flex items-center gap-2">
-                        <label
-                          htmlFor={`nova-enabled-${sub.id}`}
-                          className="text-xs font-medium uppercase text-slate-400"
-                        >
-                          Enabled
-                        </label>
-                        <input
-                          id={`nova-enabled-${sub.id}`}
-                          type="checkbox"
-                          checked={enabledDraft}
-                          onChange={(event) => dispatch({
-                            type: 'enabledChanged',
-                            enabled: event.target.checked,
-                          })}
-                          className="h-4 w-4 rounded border-slate-300 text-blue-600 focus:ring-blue-500"
-                        />
-                        <span className="text-xs text-slate-500">
-                          {enabledDraft ? 'Visible on site' : 'Hidden from site'}
-                        </span>
-                      </div>
-                      <div className="flex items-center gap-2">
-                        <label htmlFor={`nova-display-order-${sub.id}`} className="text-xs font-medium uppercase text-slate-400">Order</label>
-                        <input
-                          id={`nova-display-order-${sub.id}`}
-                          type="number"
-                          value={orderDraft ?? ''}
-                          onChange={(event) => dispatch({
-                            type: 'orderChanged',
-                            order: finiteInputNumber(event.currentTarget.valueAsNumber),
-                          })}
-                          aria-invalid={orderDraft === undefined}
-                          aria-describedby={orderDraft === undefined ? `nova-display-order-error-${sub.id}` : undefined}
-                          required
-                          className="w-20 rounded-md border border-slate-300 px-2 py-1 text-sm focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500"
-                        />
-                        {orderDraft === undefined ? (
-                          <span id={`nova-display-order-error-${sub.id}`} className="text-xs text-red-600">
-                            Enter a number
-                          </span>
-                        ) : (
-                          <span className="text-xs text-slate-500">Lower = first</span>
-                        )}
-                      </div>
-                    </div>
-
-                    {/* Theme color editor */}
-                    <div>
-                      <p className="text-xs font-medium uppercase text-slate-400">Theme Colors</p>
-                      <div className="mt-1 grid grid-cols-2 gap-2">
-                        {THEME_KEYS.map((key) => (
-                          <div key={key} className="flex items-center gap-2">
-                            <input
-                              type="color"
-                              aria-label={`${key} theme color`}
-                              value={themeDraft[key]}
-                              onChange={(event) => dispatch({
-                                type: 'themeColorChanged',
-                                key,
-                                value: event.target.value.toUpperCase(),
-                              })}
-                              className="h-7 w-7 cursor-pointer rounded border border-slate-300 p-0"
-                            />
-                            <div className="min-w-0 flex-1">
-                              <span className="block truncate text-xs text-slate-600">{key}</span>
-                              <span className="block font-mono text-[10px] text-slate-400">{themeDraft[key]}</span>
-                            </div>
-                          </div>
-                        ))}
-                      </div>
-                    </div>
-                  </>
+                  <SubmissionEditor
+                    sub={sub}
+                    state={{
+                      draft,
+                      themeDraft,
+                      enabledDraft,
+                      orderDraft,
+                      fetchingSubscribers: fetchingSubs,
+                      fetchSubscribersError: fetchSubsError,
+                    }}
+                    dispatch={dispatch}
+                    onFetchSubscribers={handleFetchSubscribers}
+                  />
                 ) : (
-                  // View mode: render all fields as read-only
-                  <>
-                    <DetailField label="Brand Name" value={sub.brand_name} />
-                    <DetailField label="Group" value={sub.group} />
-                    <DetailField label="Enabled" value={sub.enabled === 1 ? 'Yes' : 'No'} />
-                    <DetailField label="Display Order" value={String(sub.display_order ?? 0)} />
-                    <DetailField label="YouTube Channel URL">
-                      {youtubeChannelUrl ? (
-                        <a
-                          href={youtubeChannelUrl}
-                          target="_blank"
-                          rel="noopener noreferrer"
-                          className="text-sm text-blue-600 hover:underline break-all"
-                        >
-                          {sub.youtube_channel_url}
-                        </a>
-                      ) : (
-                        <span className="text-sm text-slate-600 break-all">{sub.youtube_channel_url || '—'}</span>
-                      )}
-                    </DetailField>
-                    <DetailField label="YouTube Channel ID" value={sub.youtube_channel_id} />
-                    <DetailField
-                      label="Channel verification"
-                      value={channelVerified ? `Verified ${sub.youtube_channel_verified_at}` : 'Not verified'}
-                    />
-                    <DetailField label="Description" value={sub.description} />
-                    <DetailField label="Subscriber Count" value={sub.subscriber_count} />
-
-                    <div>
-                      <p className="text-xs font-medium uppercase text-slate-400">Social Links</p>
-                      <div className="mt-1 flex flex-wrap gap-2">
-                        {socialLinks.map((l) => (
-                          <span key={l.label}>
-                            {l.safeUrl ? (
-                              <a
-                                href={l.safeUrl}
-                                target="_blank"
-                                rel="noopener noreferrer"
-                                className="rounded-md bg-slate-200 px-2 py-1 text-xs text-slate-700 hover:bg-slate-300"
-                              >
-                                {l.label}
-                              </a>
-                            ) : l.url ? (
-                              <span
-                                title={l.url}
-                                className="rounded-md bg-amber-100 px-2 py-1 text-xs text-amber-700"
-                              >
-                                Invalid {l.label}
-                              </span>
-                            ) : (
-                              <span className="rounded-md bg-slate-100 px-2 py-1 text-xs text-slate-400 line-through">
-                                {l.label}
-                              </span>
-                            )}
-                          </span>
-                        ))}
-                      </div>
-                    </div>
-
-                    {/* Theme color preview */}
-                    {sub.theme_json && (
-                      <div>
-                        <p className="text-xs font-medium uppercase text-slate-400">Theme Colors</p>
-                        <div className="mt-1 flex flex-wrap gap-1">
-                          {Object.entries(parseThemeJson(sub.theme_json)).map(([key, color]) => (
-                            <div
-                              key={key}
-                              title={`${key}: ${color}`}
-                              className="h-5 w-5 rounded border border-slate-200"
-                              style={{ backgroundColor: color }}
-                            />
-                          ))}
-                        </div>
-                      </div>
-                    )}
-
-                    <DetailField label="Reviewed At" value={sub.reviewed_at ?? ''} />
-                    <DetailField label="Reviewer Note" value={sub.reviewer_note} />
-                  </>
+                  <SubmissionView
+                    sub={sub}
+                    youtubeChannelUrl={youtubeChannelUrl}
+                    channelVerified={channelVerified}
+                    socialLinks={socialLinks}
+                  />
                 )}
               </div>
 
-              {/* Right column: reject note (curators only, pending only, view mode only) */}
               {isCurator && sub.status === 'pending' && !editing && (
-                <div>
-                  <label
-                    htmlFor={`nova-reject-note-${sub.id}`}
-                    className="text-xs font-medium uppercase text-slate-400"
-                  >
-                    Reviewer Note (optional, shown on reject)
-                  </label>
-                  <textarea
-                    id={`nova-reject-note-${sub.id}`}
-                    value={rejectNote}
-                    onChange={(e) => onRejectNoteChange(e.target.value)}
-                    placeholder="Reason for rejection..."
-                    rows={3}
-                    className="mt-1 w-full rounded-md border border-slate-300 px-3 py-2 text-sm focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500"
-                  />
-                </div>
+                <RejectNoteEditor
+                  submissionId={sub.id}
+                  value={rejectNote}
+                  onChange={onRejectNoteChange}
+                />
               )}
             </div>
           </td>
         </tr>
       )}
     </>
+  );
+}
+
+function SubmissionSummaryRow({
+  sub,
+  isCurator,
+  expanded,
+  onToggle,
+  onAction,
+  onDelete,
+  actionLoading,
+}: {
+  sub: NovaSubmission;
+  isCurator: boolean;
+  expanded: boolean;
+  onToggle: () => void;
+  onAction: (id: string, status: NovaStatus) => void;
+  onDelete: (sub: NovaSubmission) => void;
+  actionLoading: boolean;
+}) {
+  const youtubeChannelUrl = sanitizeNovaUrl(sub.youtube_channel_url, 'youtube');
+
+  return (
+    <tr
+      className="cursor-pointer hover:bg-slate-50 focus-visible:outline-2 focus-visible:outline-offset-[-2px] focus-visible:outline-blue-500"
+      onClick={onToggle}
+      onKeyDown={(event) => {
+        if (event.target !== event.currentTarget) return;
+        if (event.key !== 'Enter' && event.key !== ' ') return;
+        event.preventDefault();
+        onToggle();
+      }}
+      tabIndex={0}
+      aria-expanded={expanded}
+      aria-controls={`nova-submission-details-${sub.id}`}
+      aria-label={`${expanded ? '收合' : '展開'} ${sub.display_name}`}
+    >
+      <td className="px-4 py-3 font-medium text-slate-800">
+        <span className="mr-1 text-xs text-slate-400">{expanded ? '▼' : '▶'}</span>
+        {sub.display_name}
+      </td>
+      <td className="px-4 py-3 font-mono text-xs text-slate-600">{sub.slug}</td>
+      <td className="px-4 py-3">
+        {youtubeChannelUrl ? (
+          <a
+            href={youtubeChannelUrl}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="text-blue-600 hover:underline"
+            onClick={(event) => event.stopPropagation()}
+          >
+            {sub.brand_name || sub.youtube_channel_url}
+          </a>
+        ) : (
+          <span className="text-slate-600">{sub.brand_name || sub.youtube_channel_url || '—'}</span>
+        )}
+      </td>
+      <td className="px-4 py-3 text-slate-600">{sub.subscriber_count || '—'}</td>
+      <td className="px-4 py-3">
+        <StatusBadge status={sub.status} />
+      </td>
+      <td className="px-4 py-3 text-slate-500">{sub.submitted_at}</td>
+      {isCurator && (
+        <td className="px-4 py-3" onClick={(event) => event.stopPropagation()}>
+          <div className="flex gap-1">
+            {sub.status === 'pending' ? (
+              <>
+                <button
+                  disabled={actionLoading}
+                  onClick={() => onAction(sub.id, 'approved')}
+                  className="rounded bg-green-600 px-2 py-1 text-xs text-white hover:bg-green-700 disabled:opacity-50"
+                >
+                  Approve
+                </button>
+                <button
+                  disabled={actionLoading}
+                  onClick={() => onAction(sub.id, 'rejected')}
+                  className="rounded bg-red-600 px-2 py-1 text-xs text-white hover:bg-red-700 disabled:opacity-50"
+                >
+                  Reject
+                </button>
+              </>
+            ) : (
+              <button
+                disabled={actionLoading}
+                onClick={() => onAction(sub.id, 'pending')}
+                className="rounded bg-amber-500 px-2 py-1 text-xs text-white hover:bg-amber-600 disabled:opacity-50"
+              >
+                Revert to Pending
+              </button>
+            )}
+            <button
+              disabled={actionLoading}
+              onClick={() => onDelete(sub)}
+              className="ml-2 rounded bg-red-800 px-2 py-1 text-xs text-white hover:bg-red-900 disabled:opacity-50"
+            >
+              Delete
+            </button>
+          </div>
+        </td>
+      )}
+    </tr>
+  );
+}
+
+type SubmissionToolbarState = Pick<
+  SubmissionRowState,
+  | 'editing'
+  | 'saving'
+  | 'saveError'
+  | 'orderDraft'
+  | 'verifyingChannel'
+  | 'verificationError'
+>;
+
+function SubmissionToolbar({
+  sub,
+  state,
+  channelVerified,
+  onEdit,
+  onSave,
+  onCancel,
+  onVerifyChannel,
+}: {
+  sub: NovaSubmission;
+  state: SubmissionToolbarState;
+  channelVerified: boolean;
+  onEdit: () => void;
+  onSave: () => void;
+  onCancel: () => void;
+  onVerifyChannel: () => void;
+}) {
+  const {
+    editing,
+    saving,
+    saveError,
+    orderDraft,
+    verifyingChannel,
+    verificationError,
+  } = state;
+
+  return (
+    <div className="mb-3 flex items-center gap-2">
+      {!editing ? (
+        <>
+          <button
+            onClick={onEdit}
+            className="rounded bg-slate-700 px-3 py-1 text-xs font-medium text-white hover:bg-slate-800"
+          >
+            Edit
+          </button>
+          <button
+            type="button"
+            disabled={verifyingChannel || !sub.youtube_channel_id || channelVerified}
+            onClick={onVerifyChannel}
+            className="rounded bg-indigo-600 px-3 py-1 text-xs font-medium text-white hover:bg-indigo-700 disabled:cursor-not-allowed disabled:opacity-50"
+          >
+            {verifyingChannel ? 'Verifying...' : channelVerified ? 'Channel verified' : 'Verify channel'}
+          </button>
+        </>
+      ) : (
+        <>
+          <button
+            disabled={saving || orderDraft === undefined}
+            onClick={onSave}
+            className="rounded bg-blue-600 px-3 py-1 text-xs font-medium text-white hover:bg-blue-700 disabled:opacity-50"
+          >
+            {saving ? 'Saving...' : 'Save'}
+          </button>
+          <button
+            disabled={saving}
+            onClick={onCancel}
+            className="rounded bg-slate-200 px-3 py-1 text-xs font-medium text-slate-700 hover:bg-slate-300 disabled:opacity-50"
+          >
+            Cancel
+          </button>
+        </>
+      )}
+      {saveError && <span className="text-xs text-red-600">{saveError}</span>}
+      {verificationError && <span className="text-xs text-red-600">{verificationError}</span>}
+    </div>
+  );
+}
+
+function SubmissionAvatar({
+  sub,
+  safeUrl,
+}: {
+  sub: NovaSubmission;
+  safeUrl: string | null;
+}) {
+  if (!sub.avatar_url) return null;
+
+  return (
+    <div>
+      {safeUrl ? (
+        <img
+          src={safeUrl}
+          alt={sub.display_name}
+          className="h-16 w-16 rounded-full border border-slate-200"
+        />
+      ) : (
+        <p className="text-xs text-slate-400 break-all">Invalid avatar URL: {sub.avatar_url}</p>
+      )}
+    </div>
+  );
+}
+
+type SubmissionEditorState = Pick<
+  SubmissionRowState,
+  | 'draft'
+  | 'themeDraft'
+  | 'enabledDraft'
+  | 'orderDraft'
+  | 'fetchingSubscribers'
+  | 'fetchSubscribersError'
+>;
+
+function SubmissionEditor({
+  sub,
+  state,
+  dispatch,
+  onFetchSubscribers,
+}: {
+  sub: NovaSubmission;
+  state: SubmissionEditorState;
+  dispatch: Dispatch<SubmissionRowAction>;
+  onFetchSubscribers: () => void;
+}) {
+  const {
+    draft,
+    themeDraft,
+    enabledDraft,
+    orderDraft,
+    fetchingSubscribers,
+    fetchSubscribersError,
+  } = state;
+
+  return (
+    <>
+      {EDITABLE_FIELDS.map(({ key, label, multiline }) => (
+        <div key={key}>
+          <label
+            htmlFor={`nova-${sub.id}-${key}`}
+            className="text-xs font-medium uppercase text-slate-400"
+          >
+            {label}
+          </label>
+          {multiline ? (
+            <textarea
+              id={`nova-${sub.id}-${key}`}
+              value={draft[key]}
+              onChange={(event) => dispatch({
+                type: 'draftFieldChanged',
+                key,
+                value: event.target.value,
+              })}
+              rows={3}
+              className="mt-1 w-full rounded-md border border-slate-300 px-3 py-1.5 text-sm focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500"
+            />
+          ) : (
+            <div className={key === 'subscriber_count' ? 'mt-1 flex gap-2' : 'mt-1'}>
+              <input
+                id={`nova-${sub.id}-${key}`}
+                type="text"
+                value={draft[key]}
+                onChange={(event) => dispatch({
+                  type: 'draftFieldChanged',
+                  key,
+                  value: event.target.value,
+                })}
+                className="w-full rounded-md border border-slate-300 px-3 py-1.5 text-sm focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500"
+              />
+              {key === 'subscriber_count' && (
+                <button
+                  type="button"
+                  disabled={fetchingSubscribers || !sub.youtube_channel_id}
+                  onClick={onFetchSubscribers}
+                  title={!sub.youtube_channel_id ? 'Set YouTube Channel ID first' : 'Fetch subscriber count & avatar from YouTube'}
+                  className="shrink-0 rounded bg-indigo-600 px-3 py-1.5 text-xs font-medium text-white hover:bg-indigo-700 disabled:opacity-50 disabled:cursor-not-allowed"
+                >
+                  {fetchingSubscribers ? 'Fetching...' : 'Fetch'}
+                </button>
+              )}
+            </div>
+          )}
+          {key === 'subscriber_count' && fetchSubscribersError && (
+            <p className="mt-1 text-xs text-red-600">{fetchSubscribersError}</p>
+          )}
+        </div>
+      ))}
+
+      <div className="flex items-center gap-4">
+        <div className="flex items-center gap-2">
+          <label
+            htmlFor={`nova-enabled-${sub.id}`}
+            className="text-xs font-medium uppercase text-slate-400"
+          >
+            Enabled
+          </label>
+          <input
+            id={`nova-enabled-${sub.id}`}
+            type="checkbox"
+            checked={enabledDraft}
+            onChange={(event) => dispatch({
+              type: 'enabledChanged',
+              enabled: event.target.checked,
+            })}
+            className="h-4 w-4 rounded border-slate-300 text-blue-600 focus:ring-blue-500"
+          />
+          <span className="text-xs text-slate-500">
+            {enabledDraft ? 'Visible on site' : 'Hidden from site'}
+          </span>
+        </div>
+        <div className="flex items-center gap-2">
+          <label htmlFor={`nova-display-order-${sub.id}`} className="text-xs font-medium uppercase text-slate-400">Order</label>
+          <input
+            id={`nova-display-order-${sub.id}`}
+            type="number"
+            value={orderDraft ?? ''}
+            onChange={(event) => dispatch({
+              type: 'orderChanged',
+              order: finiteInputNumber(event.currentTarget.valueAsNumber),
+            })}
+            aria-invalid={orderDraft === undefined}
+            aria-describedby={orderDraft === undefined ? `nova-display-order-error-${sub.id}` : undefined}
+            required
+            className="w-20 rounded-md border border-slate-300 px-2 py-1 text-sm focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500"
+          />
+          {orderDraft === undefined ? (
+            <span id={`nova-display-order-error-${sub.id}`} className="text-xs text-red-600">
+              Enter a number
+            </span>
+          ) : (
+            <span className="text-xs text-slate-500">Lower = first</span>
+          )}
+        </div>
+      </div>
+
+      <div>
+        <p className="text-xs font-medium uppercase text-slate-400">Theme Colors</p>
+        <div className="mt-1 grid grid-cols-2 gap-2">
+          {THEME_KEYS.map((key) => (
+            <div key={key} className="flex items-center gap-2">
+              <input
+                type="color"
+                aria-label={`${key} theme color`}
+                value={themeDraft[key]}
+                onChange={(event) => dispatch({
+                  type: 'themeColorChanged',
+                  key,
+                  value: event.target.value.toUpperCase(),
+                })}
+                className="h-7 w-7 cursor-pointer rounded border border-slate-300 p-0"
+              />
+              <div className="min-w-0 flex-1">
+                <span className="block truncate text-xs text-slate-600">{key}</span>
+                <span className="block font-mono text-[10px] text-slate-400">{themeDraft[key]}</span>
+              </div>
+            </div>
+          ))}
+        </div>
+      </div>
+    </>
+  );
+}
+
+interface SubmissionSocialLink {
+  label: string;
+  url: string;
+  safeUrl: string | null;
+}
+
+function SubmissionView({
+  sub,
+  youtubeChannelUrl,
+  channelVerified,
+  socialLinks,
+}: {
+  sub: NovaSubmission;
+  youtubeChannelUrl: string | null;
+  channelVerified: boolean;
+  socialLinks: SubmissionSocialLink[];
+}) {
+  return (
+    <>
+      <DetailField label="Brand Name" value={sub.brand_name} />
+      <DetailField label="Group" value={sub.group} />
+      <DetailField label="Enabled" value={sub.enabled === 1 ? 'Yes' : 'No'} />
+      <DetailField label="Display Order" value={String(sub.display_order ?? 0)} />
+      <DetailField label="YouTube Channel URL">
+        {youtubeChannelUrl ? (
+          <a
+            href={youtubeChannelUrl}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="text-sm text-blue-600 hover:underline break-all"
+          >
+            {sub.youtube_channel_url}
+          </a>
+        ) : (
+          <span className="text-sm text-slate-600 break-all">{sub.youtube_channel_url || '—'}</span>
+        )}
+      </DetailField>
+      <DetailField label="YouTube Channel ID" value={sub.youtube_channel_id} />
+      <DetailField
+        label="Channel verification"
+        value={channelVerified ? `Verified ${sub.youtube_channel_verified_at}` : 'Not verified'}
+      />
+      <DetailField label="Description" value={sub.description} />
+      <DetailField label="Subscriber Count" value={sub.subscriber_count} />
+
+      <div>
+        <p className="text-xs font-medium uppercase text-slate-400">Social Links</p>
+        <div className="mt-1 flex flex-wrap gap-2">
+          {socialLinks.map((link) => (
+            <span key={link.label}>
+              {link.safeUrl ? (
+                <a
+                  href={link.safeUrl}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="rounded-md bg-slate-200 px-2 py-1 text-xs text-slate-700 hover:bg-slate-300"
+                >
+                  {link.label}
+                </a>
+              ) : link.url ? (
+                <span
+                  title={link.url}
+                  className="rounded-md bg-amber-100 px-2 py-1 text-xs text-amber-700"
+                >
+                  Invalid {link.label}
+                </span>
+              ) : (
+                <span className="rounded-md bg-slate-100 px-2 py-1 text-xs text-slate-400 line-through">
+                  {link.label}
+                </span>
+              )}
+            </span>
+          ))}
+        </div>
+      </div>
+
+      {sub.theme_json && (
+        <div>
+          <p className="text-xs font-medium uppercase text-slate-400">Theme Colors</p>
+          <div className="mt-1 flex flex-wrap gap-1">
+            {Object.entries(parseThemeJson(sub.theme_json)).map(([key, color]) => (
+              <div
+                key={key}
+                title={`${key}: ${color}`}
+                className="h-5 w-5 rounded border border-slate-200"
+                style={{ backgroundColor: color }}
+              />
+            ))}
+          </div>
+        </div>
+      )}
+
+      <DetailField label="Reviewed At" value={sub.reviewed_at ?? ''} />
+      <DetailField label="Reviewer Note" value={sub.reviewer_note} />
+    </>
+  );
+}
+
+function RejectNoteEditor({
+  submissionId,
+  value,
+  onChange,
+}: {
+  submissionId: string;
+  value: string;
+  onChange: (value: string) => void;
+}) {
+  return (
+    <div>
+      <label
+        htmlFor={`nova-reject-note-${submissionId}`}
+        className="text-xs font-medium uppercase text-slate-400"
+      >
+        Reviewer Note (optional, shown on reject)
+      </label>
+      <textarea
+        id={`nova-reject-note-${submissionId}`}
+        value={value}
+        onChange={(event) => onChange(event.target.value)}
+        placeholder="Reason for rejection..."
+        rows={3}
+        className="mt-1 w-full rounded-md border border-slate-300 px-3 py-2 text-sm focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500"
+      />
+    </div>
   );
 }
 
