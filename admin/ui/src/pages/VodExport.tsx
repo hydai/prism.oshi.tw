@@ -19,6 +19,7 @@ import type {
   VodExportFinding,
   VodExportFindingSeverity,
   VodExportPublication,
+  VodExportStatusResponse,
 } from '../api/vodExportTypes';
 import {
   getPublishDisabledReason,
@@ -624,6 +625,267 @@ export function PublishConfirmationDialog({
   );
 }
 
+function VodExportHeader({
+  status,
+  statusLoading,
+  statusError,
+  generating,
+  publishing,
+  onGenerate,
+}: {
+  status: VodExportStatusResponse;
+  statusLoading: boolean;
+  statusError: string | null;
+  generating: boolean;
+  publishing: boolean;
+  onGenerate: () => void;
+}) {
+  return (
+    <div className="flex flex-wrap items-start justify-between gap-4">
+      <div>
+        <div className="flex flex-wrap items-center gap-2">
+          <h2 className="text-xl font-semibold text-slate-800">VOD Export</h2>
+          {status.changesNotPublished && (
+            <span className="rounded-full bg-amber-100 px-2.5 py-1 text-xs font-semibold text-amber-800">
+              Changes not published
+            </span>
+          )}
+        </div>
+        <p className="mt-1 max-w-2xl text-sm text-slate-500">
+          Validate all approved streamer VOD and performance data, review the exact candidate, then explicitly publish it.
+        </p>
+      </div>
+      <button
+        type="button"
+        onClick={onGenerate}
+        disabled={
+          generating
+          || publishing
+          || statusLoading
+          || statusError !== null
+          || status.publicationInProgress
+          || status.generationInProgress
+        }
+        className="rounded-md bg-blue-600 px-4 py-2 text-sm font-medium text-white hover:bg-blue-700 disabled:cursor-not-allowed disabled:opacity-50"
+      >
+        {generating ? 'Generating preview...' : 'Generate preview'}
+      </button>
+    </div>
+  );
+}
+
+function VodExportFeedback({
+  status,
+  statusLoading,
+  statusError,
+  operationError,
+  resultMessage,
+  postCommitWarnings,
+  copyMessage,
+  publishing,
+  onRetryStatus,
+  onRecoverPublication,
+}: {
+  status: VodExportStatusResponse;
+  statusLoading: boolean;
+  statusError: string | null;
+  operationError: string | null;
+  resultMessage: string | null;
+  postCommitWarnings: string[];
+  copyMessage: string | null;
+  publishing: boolean;
+  onRetryStatus: () => void;
+  onRecoverPublication: () => void;
+}) {
+  return (
+    <>
+      {copyMessage && (
+        <p className="mt-4 rounded-md bg-slate-800 px-3 py-2 text-sm text-white" role="status">
+          {copyMessage}
+        </p>
+      )}
+      {statusError && (
+        <div className="mt-4 flex flex-wrap items-center gap-3 rounded-md border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700" role="alert">
+          <span>{statusError}</span>
+          <button
+            type="button"
+            disabled={statusLoading}
+            onClick={onRetryStatus}
+            className="rounded bg-red-700 px-2.5 py-1 text-xs font-medium text-white disabled:opacity-50"
+          >
+            {statusLoading ? 'Retrying...' : 'Retry status'}
+          </button>
+        </div>
+      )}
+      {operationError && (
+        <div className="mt-4 rounded-md border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700" role="alert">
+          {operationError}
+        </div>
+      )}
+      {resultMessage && (
+        <div className="mt-4 rounded-md border border-emerald-200 bg-emerald-50 px-4 py-3 text-sm text-emerald-800" role="status">
+          {resultMessage}
+        </div>
+      )}
+      {status.controlWarning && (
+        <div className="mt-4 rounded-md border border-amber-200 bg-amber-50 px-4 py-3 text-sm text-amber-800" role="alert">
+          {status.controlWarning}
+        </div>
+      )}
+      {postCommitWarnings.map((warning) => (
+        <div key={warning} className="mt-4 rounded-md border border-amber-200 bg-amber-50 px-4 py-3 text-sm text-amber-800" role="alert">
+          Publication committed, but follow-up recovery is required: {warning}
+          {status.recoveryAvailable && (
+            <button
+              type="button"
+              disabled={publishing}
+              onClick={onRecoverPublication}
+              className="ml-3 rounded bg-amber-800 px-2.5 py-1 text-xs font-medium text-white disabled:opacity-50"
+            >
+              {publishing ? 'Recovering...' : 'Retry recovery'}
+            </button>
+          )}
+        </div>
+      ))}
+      {status.recoveryAvailable && postCommitWarnings.length === 0 && (
+        <div className="mt-4 rounded-md border border-amber-200 bg-amber-50 px-4 py-3 text-sm text-amber-800" role="alert">
+          A prepared publication needs authoritative reconciliation before new publication actions can continue.
+          <button
+            type="button"
+            disabled={publishing}
+            onClick={onRecoverPublication}
+            className="ml-3 rounded bg-amber-800 px-2.5 py-1 text-xs font-medium text-white disabled:opacity-50"
+          >
+            {publishing ? 'Recovering...' : 'Reconcile publication'}
+          </button>
+        </div>
+      )}
+    </>
+  );
+}
+
+function PublicationOverview({
+  status,
+  statusLoading,
+  statusUnavailable,
+  onCopied,
+}: {
+  status: VodExportStatusResponse;
+  statusLoading: boolean;
+  statusUnavailable: boolean;
+  onCopied: () => void;
+}) {
+  return (
+    <div className="mt-6 grid gap-6 xl:grid-cols-2">
+      <CurrentPublicationPanel
+        publication={status.currentPublication}
+        loading={statusLoading}
+        unavailable={statusUnavailable}
+        onCopied={onCopied}
+      />
+
+      <section className="rounded-lg border border-slate-200 bg-white p-5 shadow-sm" aria-labelledby="workflow-heading">
+        <h3 id="workflow-heading" className="text-base font-semibold text-slate-800">
+          Publication workflow
+        </h3>
+        <ol className="mt-4 space-y-4 text-sm">
+          <li className="flex gap-3">
+            <span className="flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-blue-100 text-xs font-semibold text-blue-700">1</span>
+            <div>
+              <p className="font-medium text-slate-800">Generate preview</p>
+              <p className="mt-0.5 text-slate-500">Reads and validates the complete approved source only when requested.</p>
+            </div>
+          </li>
+          <li className="flex gap-3">
+            <span className="flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-blue-100 text-xs font-semibold text-blue-700">2</span>
+            <div>
+              <p className="font-medium text-slate-800">Review findings and identity</p>
+              <p className="mt-0.5 text-slate-500">Blocking errors create no candidate. Warnings remain visible but do not block publication.</p>
+            </div>
+          </li>
+          <li className="flex gap-3">
+            <span className="flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-blue-100 text-xs font-semibold text-blue-700">3</span>
+            <div>
+              <p className="font-medium text-slate-800">Confirm and publish</p>
+              <p className="mt-0.5 text-slate-500">A second explicit action advances the public manifest to the exact stored bytes.</p>
+            </div>
+          </li>
+        </ol>
+        {status.publicationInProgress && (
+          <p className="mt-4 rounded-md bg-amber-50 px-3 py-2 text-sm text-amber-800">
+            A publication is currently in progress. New publication actions are disabled.
+          </p>
+        )}
+        {status.generationInProgress && (
+          <p className="mt-4 rounded-md bg-amber-50 px-3 py-2 text-sm text-amber-800">
+            A preview is currently being generated. New preview actions are disabled.
+          </p>
+        )}
+      </section>
+    </div>
+  );
+}
+
+function PreviewReview({
+  capacity,
+  candidate,
+  candidateState,
+  canPublish,
+  disabledReason,
+  downloading,
+  checkingCandidate,
+  previewLoaded,
+  findings,
+  publishButtonRef,
+  onDownload,
+  onPublish,
+  onCopied,
+}: {
+  capacity: VodExportCapacityDiagnostic[];
+  candidate: VodExportCandidate | null;
+  candidateState: CandidateLocalState;
+  canPublish: boolean;
+  disabledReason: string | null;
+  downloading: boolean;
+  checkingCandidate: boolean;
+  previewLoaded: boolean;
+  findings: VodExportFinding[];
+  publishButtonRef: RefObject<HTMLButtonElement | null>;
+  onDownload: () => void;
+  onPublish: () => void;
+  onCopied: () => void;
+}) {
+  return (
+    <div className="mt-6 space-y-6">
+      <CapacityPanel diagnostics={capacity} />
+
+      {candidate && (
+        <CandidatePanel
+          candidate={candidate}
+          localState={candidateState}
+          canPublish={canPublish}
+          disabledReason={disabledReason}
+          downloading={downloading}
+          checking={checkingCandidate}
+          onDownload={onDownload}
+          onPublish={onPublish}
+          onCopied={onCopied}
+          publishButtonRef={publishButtonRef}
+        />
+      )}
+
+      {!candidate && (
+        <EmptyCandidatePanel
+          reason={disabledReason ?? 'Generate a fresh preview.'}
+          previewLoaded={previewLoaded}
+        />
+      )}
+
+      {previewLoaded && <FindingsPanel findings={findings} />}
+    </div>
+  );
+}
+
 function operationMessage(error: unknown, fallback: string): string {
   if (!(error instanceof ApiError)) return error instanceof Error ? error.message : fallback;
 
@@ -859,169 +1121,47 @@ export default function VodExport({ user }: { user: AuthUser }) {
 
   return (
     <div className="mx-auto max-w-6xl">
-      <div className="flex flex-wrap items-start justify-between gap-4">
-        <div>
-          <div className="flex flex-wrap items-center gap-2">
-            <h2 className="text-xl font-semibold text-slate-800">VOD Export</h2>
-            {status.changesNotPublished && (
-              <span className="rounded-full bg-amber-100 px-2.5 py-1 text-xs font-semibold text-amber-800">
-                Changes not published
-              </span>
-            )}
-          </div>
-          <p className="mt-1 max-w-2xl text-sm text-slate-500">
-            Validate all approved streamer VOD and performance data, review the exact candidate, then explicitly publish it.
-          </p>
-        </div>
-        <button
-          type="button"
-          onClick={generatePreview}
-          disabled={
-            generating
-            || publishing
-            || statusLoading
-            || statusError !== null
-            || status.publicationInProgress
-            || status.generationInProgress
-          }
-          className="rounded-md bg-blue-600 px-4 py-2 text-sm font-medium text-white hover:bg-blue-700 disabled:cursor-not-allowed disabled:opacity-50"
-        >
-          {generating ? 'Generating preview...' : 'Generate preview'}
-        </button>
-      </div>
-
-      {copyMessage && (
-        <p className="mt-4 rounded-md bg-slate-800 px-3 py-2 text-sm text-white" role="status">
-          {copyMessage}
-        </p>
-      )}
-      {statusError && (
-        <div className="mt-4 flex flex-wrap items-center gap-3 rounded-md border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700" role="alert">
-          <span>{statusError}</span>
-          <button
-            type="button"
-            disabled={statusLoading}
-            onClick={() => void retryStatus()}
-            className="rounded bg-red-700 px-2.5 py-1 text-xs font-medium text-white disabled:opacity-50"
-          >
-            {statusLoading ? 'Retrying...' : 'Retry status'}
-          </button>
-        </div>
-      )}
-      {operationError && (
-        <div className="mt-4 rounded-md border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700" role="alert">
-          {operationError}
-        </div>
-      )}
-      {resultMessage && (
-        <div className="mt-4 rounded-md border border-emerald-200 bg-emerald-50 px-4 py-3 text-sm text-emerald-800" role="status">
-          {resultMessage}
-        </div>
-      )}
-      {status.controlWarning && (
-        <div className="mt-4 rounded-md border border-amber-200 bg-amber-50 px-4 py-3 text-sm text-amber-800" role="alert">
-          {status.controlWarning}
-        </div>
-      )}
-      {postCommitWarnings.map((warning) => (
-        <div key={warning} className="mt-4 rounded-md border border-amber-200 bg-amber-50 px-4 py-3 text-sm text-amber-800" role="alert">
-          Publication committed, but follow-up recovery is required: {warning}
-          {status.recoveryAvailable && (
-            <button
-              type="button"
-              disabled={publishing}
-              onClick={recoverPublication}
-              className="ml-3 rounded bg-amber-800 px-2.5 py-1 text-xs font-medium text-white disabled:opacity-50"
-            >
-              {publishing ? 'Recovering...' : 'Retry recovery'}
-            </button>
-          )}
-        </div>
-      ))}
-      {status.recoveryAvailable && postCommitWarnings.length === 0 && (
-        <div className="mt-4 rounded-md border border-amber-200 bg-amber-50 px-4 py-3 text-sm text-amber-800" role="alert">
-          A prepared publication needs authoritative reconciliation before new publication actions can continue.
-          <button
-            type="button"
-            disabled={publishing}
-            onClick={recoverPublication}
-            className="ml-3 rounded bg-amber-800 px-2.5 py-1 text-xs font-medium text-white disabled:opacity-50"
-          >
-            {publishing ? 'Recovering...' : 'Reconcile publication'}
-          </button>
-        </div>
-      )}
-
-      <div className="mt-6 grid gap-6 xl:grid-cols-2">
-        <CurrentPublicationPanel
-          publication={status.currentPublication}
-          loading={statusLoading}
-          unavailable={statusError !== null}
-          onCopied={notifyCopied}
-        />
-
-        <section className="rounded-lg border border-slate-200 bg-white p-5 shadow-sm" aria-labelledby="workflow-heading">
-          <h3 id="workflow-heading" className="text-base font-semibold text-slate-800">
-            Publication workflow
-          </h3>
-          <ol className="mt-4 space-y-4 text-sm">
-            <li className="flex gap-3">
-              <span className="flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-blue-100 text-xs font-semibold text-blue-700">1</span>
-              <div>
-                <p className="font-medium text-slate-800">Generate preview</p>
-                <p className="mt-0.5 text-slate-500">Reads and validates the complete approved source only when requested.</p>
-              </div>
-            </li>
-            <li className="flex gap-3">
-              <span className="flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-blue-100 text-xs font-semibold text-blue-700">2</span>
-              <div>
-                <p className="font-medium text-slate-800">Review findings and identity</p>
-                <p className="mt-0.5 text-slate-500">Blocking errors create no candidate. Warnings remain visible but do not block publication.</p>
-              </div>
-            </li>
-            <li className="flex gap-3">
-              <span className="flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-blue-100 text-xs font-semibold text-blue-700">3</span>
-              <div>
-                <p className="font-medium text-slate-800">Confirm and publish</p>
-                <p className="mt-0.5 text-slate-500">A second explicit action advances the public manifest to the exact stored bytes.</p>
-              </div>
-            </li>
-          </ol>
-          {status.publicationInProgress && (
-            <p className="mt-4 rounded-md bg-amber-50 px-3 py-2 text-sm text-amber-800">
-              A publication is currently in progress. New publication actions are disabled.
-            </p>
-          )}
-          {status.generationInProgress && (
-            <p className="mt-4 rounded-md bg-amber-50 px-3 py-2 text-sm text-amber-800">
-              A preview is currently being generated. New preview actions are disabled.
-            </p>
-          )}
-        </section>
-      </div>
-
-      <div className="mt-6 space-y-6">
-        <CapacityPanel diagnostics={capacity} />
-
-        {candidate && (
-          <CandidatePanel
-            candidate={candidate}
-            localState={candidateState}
-            canPublish={canPublish}
-            disabledReason={disabledReason}
-            downloading={downloading}
-            checking={checkingCandidate}
-            onDownload={download}
-            onPublish={confirmCurrentCandidate}
-            onCopied={notifyCopied}
-            publishButtonRef={publishButtonRef}
-          />
-        )}
-
-        {!candidate && <EmptyCandidatePanel reason={disabledReason ?? 'Generate a fresh preview.'} previewLoaded={previewLoaded} />}
-
-        {previewLoaded && <FindingsPanel findings={findings} />}
-      </div>
+      <VodExportHeader
+        status={status}
+        statusLoading={statusLoading}
+        statusError={statusError}
+        generating={generating}
+        publishing={publishing}
+        onGenerate={generatePreview}
+      />
+      <VodExportFeedback
+        status={status}
+        statusLoading={statusLoading}
+        statusError={statusError}
+        operationError={operationError}
+        resultMessage={resultMessage}
+        postCommitWarnings={postCommitWarnings}
+        copyMessage={copyMessage}
+        publishing={publishing}
+        onRetryStatus={() => void retryStatus()}
+        onRecoverPublication={recoverPublication}
+      />
+      <PublicationOverview
+        status={status}
+        statusLoading={statusLoading}
+        statusUnavailable={statusError !== null}
+        onCopied={notifyCopied}
+      />
+      <PreviewReview
+        capacity={capacity}
+        candidate={candidate}
+        candidateState={candidateState}
+        canPublish={canPublish}
+        disabledReason={disabledReason}
+        downloading={downloading}
+        checkingCandidate={checkingCandidate}
+        previewLoaded={previewLoaded}
+        findings={findings}
+        publishButtonRef={publishButtonRef}
+        onDownload={download}
+        onPublish={confirmCurrentCandidate}
+        onCopied={notifyCopied}
+      />
 
       {confirming && candidate && (
         <PublishConfirmationDialog

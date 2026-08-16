@@ -43,6 +43,7 @@ async function main(): Promise<void> {
   const {
     CapacityPanel,
     CurrentPublicationPanel,
+    default: VodExport,
     FindingsPanel,
     PublishConfirmationDialog,
   } = await import('../src/pages/VodExport');
@@ -66,6 +67,24 @@ async function main(): Promise<void> {
     !getVisibleNavItems(contributor).some((item) => item.to === '/vod-export'),
     'contributors do not see the VOD Export navigation entry',
   );
+
+  const initialPageHtml = renderToStaticMarkup(
+    <MemoryRouter>
+      <VodExport user={curator} />
+    </MemoryRouter>,
+  );
+  assert(initialPageHtml.includes('VOD Export'), 'curator page retains its heading');
+  assert(initialPageHtml.includes('Publication workflow'), 'curator page retains publication guidance');
+  assert(initialPageHtml.includes('Loading publication status'), 'curator page retains authoritative status loading');
+  assert(initialPageHtml.includes('No preview candidate'), 'curator page retains the empty preview state');
+
+  const deniedPageHtml = renderToStaticMarkup(
+    <MemoryRouter>
+      <VodExport user={contributor} />
+    </MemoryRouter>,
+  );
+  assert(deniedPageHtml.includes('Curator access is required'), 'non-curators retain the access guard');
+  assert(!deniedPageHtml.includes('Publication workflow'), 'access guard does not render curator controls');
 
   const hash = 'a'.repeat(64);
   const counts = { streamers: 36, vods: 554, performances: 8534 };
