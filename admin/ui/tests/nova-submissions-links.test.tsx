@@ -97,6 +97,10 @@ function installLocalStorage(): void {
 async function main(): Promise<void> {
   installLocalStorage();
   ({ SubmissionRow } = await import('../src/pages/NovaSubmissions'));
+  const {
+    createSubmissionRowState,
+    submissionRowReducer,
+  } = await import('../src/pages/nova-submission-row-state');
 
   const malicious = renderRow(makeSubmission({
     youtube_channel_url: 'data:text/html,<script>alert(1)</script>',
@@ -129,7 +133,74 @@ async function main(): Promise<void> {
   assert(valid.includes('aria-expanded="true"'), 'submission row exposes its expanded state');
   assert(valid.includes('aria-controls="nova-submission-details-sub-test"'), 'submission row identifies its details');
 
-  console.log('✓ Nova submission links render safely');
+  const original = makeSubmission();
+  let rowState = createSubmissionRowState(original);
+  rowState = submissionRowReducer(rowState, { type: 'editStarted' });
+  rowState = submissionRowReducer(rowState, {
+    type: 'draftFieldChanged',
+    key: 'display_name',
+    value: 'Edited Streamer',
+  });
+  rowState = submissionRowReducer(rowState, {
+    type: 'themeColorChanged',
+    key: 'accentPrimary',
+    value: '#123456',
+  });
+  rowState = submissionRowReducer(rowState, { type: 'enabledChanged', enabled: false });
+  rowState = submissionRowReducer(rowState, { type: 'orderChanged', order: undefined });
+  rowState = submissionRowReducer(rowState, {
+    type: 'saveValidationFailed',
+    error: 'Display order must be a number.',
+  });
+  assert(rowState.editing, 'edit mode is explicit reducer state');
+  assert(rowState.draft.display_name === 'Edited Streamer', 'field edits update the requested draft');
+  assert(rowState.themeDraft.accentPrimary === '#123456', 'theme edits update the requested color');
+  assert(!rowState.enabledDraft && rowState.orderDraft === undefined, 'registry settings update independently');
+
+  rowState = submissionRowReducer(rowState, {
+    type: 'editCancelled',
+    submission: original,
+  });
+  assert(!rowState.editing, 'cancelling exits edit mode');
+  assert(rowState.draft.display_name === original.display_name, 'cancelling restores text drafts');
+  assert(rowState.themeDraft.accentPrimary === '#000000', 'cancelling restores theme drafts');
+  assert(rowState.enabledDraft && rowState.orderDraft === 0, 'cancelling restores registry settings');
+  assert(rowState.saveError === null, 'cancelling clears validation feedback');
+
+  const fetched = makeSubmission({
+    subscriber_count: '9,876',
+    avatar_url: 'https://yt3.ggpht.com/refreshed=s240',
+  });
+  rowState = submissionRowReducer(rowState, { type: 'subscribersFetchStarted' });
+  rowState = submissionRowReducer(rowState, {
+    type: 'subscribersFetchSucceeded',
+    submission: fetched,
+    updateDraft: true,
+  });
+  rowState = submissionRowReducer(rowState, { type: 'subscribersFetchFinished' });
+  assert(!rowState.fetchingSubscribers, 'subscriber refresh completion clears its loading state');
+  assert(rowState.draft.subscriber_count === '9,876', 'subscriber refresh updates the active draft count');
+  assert(rowState.draft.avatar_url === fetched.avatar_url, 'subscriber refresh updates the active draft avatar');
+
+  rowState = submissionRowReducer(
+    { ...rowState, saveError: 'stale save error' },
+    { type: 'saveStarted' },
+  );
+  assert(rowState.saving && rowState.saveError === null, 'saving starts with stale feedback cleared');
+  rowState = submissionRowReducer(rowState, { type: 'saveSucceeded' });
+  rowState = submissionRowReducer(rowState, { type: 'saveFinished' });
+  assert(!rowState.saving && !rowState.editing, 'successful save completion releases edit mode');
+
+  rowState = submissionRowReducer(rowState, { type: 'verificationStarted' });
+  rowState = submissionRowReducer(rowState, {
+    type: 'verificationFailed',
+    error: 'Channel verification failed',
+  });
+  rowState = submissionRowReducer(rowState, { type: 'verificationFinished' });
+  assert(!rowState.verifyingChannel, 'verification completion clears its loading state');
+  assert(rowState.verificationError === 'Channel verification failed', 'verification failure remains visible');
+
+  console.log('✓ Nova submission links and row state transitions remain safe');
 }
 
 await main();

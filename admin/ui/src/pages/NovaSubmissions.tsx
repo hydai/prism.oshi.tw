@@ -1,57 +1,17 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useReducer, useState } from 'react';
 import type { AuthUser, NovaSubmission, NovaStatus, BulkFetchSubscribersResponse } from '../../../shared/types';
 import { sanitizeNovaUrl } from '../../../shared/nova-url-safety';
 import { api } from '../api/client';
 import StatusBadge from '../components/StatusBadge';
 import { useSearchParams } from 'react-router-dom';
 import { finiteInputNumber } from '../lib/numeric-input';
-
-type EditableKey =
-  | 'display_name' | 'slug' | 'brand_name' | 'youtube_channel_url' | 'youtube_channel_id'
-  | 'description' | 'avatar_url' | 'subscriber_count'
-  | 'link_youtube' | 'link_twitter' | 'link_facebook' | 'link_instagram' | 'link_twitch'
-  | 'group' | 'external_url';
-
-/** Fields curators can edit on a submission. */
-const EDITABLE_FIELDS: ReadonlyArray<{ key: EditableKey; label: string; multiline?: boolean }> = [
-  { key: 'display_name', label: 'Display Name' },
-  { key: 'slug', label: 'Slug' },
-  { key: 'brand_name', label: 'Brand Name' },
-  { key: 'group', label: 'Group' },
-  { key: 'youtube_channel_url', label: 'YouTube Channel URL' },
-  { key: 'youtube_channel_id', label: 'YouTube Channel ID' },
-  { key: 'description', label: 'Description', multiline: true },
-  { key: 'avatar_url', label: 'Avatar URL' },
-  { key: 'subscriber_count', label: 'Subscriber Count' },
-  { key: 'link_youtube', label: 'Link: YouTube' },
-  { key: 'link_twitter', label: 'Link: Twitter' },
-  { key: 'link_facebook', label: 'Link: Facebook' },
-  { key: 'link_instagram', label: 'Link: Instagram' },
-  { key: 'link_twitch', label: 'Link: Twitch' },
-  { key: 'external_url', label: 'External URL' },
-];
-
-/** The 12 theme color tokens used in registry.json. */
-const THEME_KEYS = [
-  'accentPrimary', 'accentPrimaryDark', 'accentPrimaryLight',
-  'accentSecondary', 'accentSecondaryLight',
-  'bgPageStart', 'bgPageMid', 'bgPageEnd',
-  'bgAccentPrimary', 'bgAccentPrimaryMuted',
-  'borderAccentPrimary', 'borderAccentSecondary',
-] as const;
-
-type ThemeColors = Record<(typeof THEME_KEYS)[number], string>;
-
-function parseThemeJson(json: string): ThemeColors {
-  const empty: ThemeColors = Object.fromEntries(THEME_KEYS.map((k) => [k, '#000000'])) as ThemeColors;
-  if (!json) return empty;
-  try {
-    const parsed = JSON.parse(json);
-    return { ...empty, ...parsed };
-  } catch {
-    return empty;
-  }
-}
+import {
+  createSubmissionRowState,
+  EDITABLE_FIELDS,
+  parseThemeJson,
+  submissionRowReducer,
+  THEME_KEYS,
+} from './nova-submission-row-state';
 
 function isCanonicalUtcTimestamp(value: string | null): value is string {
   if (value === null || !/^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}\.\d{3}Z$/.test(value)) return false;
@@ -287,34 +247,32 @@ export function SubmissionRow({
   onSave: (updated: NovaSubmission) => void;
   actionLoading: boolean;
 }) {
-  const [editing, setEditing] = useState(false);
-  const [draft, setDraft] = useState<Record<EditableKey, string>>(() => buildDraft(sub));
-  const [themeDraft, setThemeDraft] = useState<ThemeColors>(() => parseThemeJson(sub.theme_json));
-  const [enabledDraft, setEnabledDraft] = useState(sub.enabled === 1);
-  const [orderDraft, setOrderDraft] = useState<number | undefined>(sub.display_order ?? 0);
-  const [saving, setSaving] = useState(false);
-  const [saveError, setSaveError] = useState<string | null>(null);
-  const [fetchingSubs, setFetchingSubs] = useState(false);
-  const [fetchSubsError, setFetchSubsError] = useState<string | null>(null);
-  const [verifyingChannel, setVerifyingChannel] = useState(false);
-  const [verificationError, setVerificationError] = useState<string | null>(null);
+  const [{
+    editing,
+    draft,
+    themeDraft,
+    enabledDraft,
+    orderDraft,
+    saving,
+    saveError,
+    fetchingSubscribers: fetchingSubs,
+    fetchSubscribersError: fetchSubsError,
+    verifyingChannel,
+    verificationError,
+  }, dispatch] = useReducer(submissionRowReducer, sub, createSubmissionRowState);
 
   // Reset draft when submission changes (e.g. after save or status change)
   useEffect(() => {
-    setDraft(buildDraft(sub));
-    setThemeDraft(parseThemeJson(sub.theme_json));
-    setEnabledDraft(sub.enabled === 1);
-    setOrderDraft(sub.display_order ?? 0);
+    dispatch({ type: 'submissionChanged', submission: sub });
   }, [sub]);
 
   const handleSave = async () => {
     if (orderDraft === undefined) {
-      setSaveError('Display order must be a number.');
+      dispatch({ type: 'saveValidationFailed', error: 'Display order must be a number.' });
       return;
     }
 
-    setSaving(true);
-    setSaveError(null);
+    dispatch({ type: 'saveStarted' });
     try {
       // Only send fields that actually changed
       const changes: Record<string, string | number> = {};
@@ -338,53 +296,57 @@ export function SubmissionRow({
         changes.display_order = orderDraft;
       }
       if (Object.keys(changes).length === 0) {
-        setEditing(false);
+        dispatch({ type: 'saveSucceeded' });
         return;
       }
       const updated = await api.updateNovaSubmission(sub.id, changes);
       onSave(updated);
-      setEditing(false);
+      dispatch({ type: 'saveSucceeded' });
     } catch (err) {
-      setSaveError(err instanceof Error ? err.message : 'Save failed');
+      dispatch({
+        type: 'saveFailed',
+        error: err instanceof Error ? err.message : 'Save failed',
+      });
     } finally {
-      setSaving(false);
+      dispatch({ type: 'saveFinished' });
     }
   };
 
   const handleCancel = () => {
-    setDraft(buildDraft(sub));
-    setThemeDraft(parseThemeJson(sub.theme_json));
-    setEnabledDraft(sub.enabled === 1);
-    setOrderDraft(sub.display_order ?? 0);
-    setSaveError(null);
-    setEditing(false);
+    dispatch({ type: 'editCancelled', submission: sub });
   };
 
   const handleFetchSubscribers = async () => {
-    setFetchingSubs(true);
-    setFetchSubsError(null);
+    dispatch({ type: 'subscribersFetchStarted' });
     try {
       const updated = await api.fetchNovaSubscribers(sub.id);
       onSave(updated);
-      if (editing) {
-        setDraft((d) => ({ ...d, subscriber_count: updated.subscriber_count ?? '', avatar_url: updated.avatar_url ?? '' }));
-      }
+      dispatch({
+        type: 'subscribersFetchSucceeded',
+        submission: updated,
+        updateDraft: editing,
+      });
     } catch (err) {
-      setFetchSubsError(err instanceof Error ? err.message : 'Failed to fetch subscribers');
+      dispatch({
+        type: 'subscribersFetchFailed',
+        error: err instanceof Error ? err.message : 'Failed to fetch subscribers',
+      });
     } finally {
-      setFetchingSubs(false);
+      dispatch({ type: 'subscribersFetchFinished' });
     }
   };
 
   const handleVerifyChannel = async () => {
-    setVerifyingChannel(true);
-    setVerificationError(null);
+    dispatch({ type: 'verificationStarted' });
     try {
       onSave(await api.verifyNovaYoutubeChannel(sub.id));
     } catch (err) {
-      setVerificationError(err instanceof Error ? err.message : 'Channel verification failed');
+      dispatch({
+        type: 'verificationFailed',
+        error: err instanceof Error ? err.message : 'Channel verification failed',
+      });
     } finally {
-      setVerifyingChannel(false);
+      dispatch({ type: 'verificationFinished' });
     }
   };
 
@@ -496,7 +458,7 @@ export function SubmissionRow({
                 {!editing ? (
                   <>
                     <button
-                      onClick={() => setEditing(true)}
+                      onClick={() => dispatch({ type: 'editStarted' })}
                       className="rounded bg-slate-700 px-3 py-1 text-xs font-medium text-white hover:bg-slate-800"
                     >
                       Edit
@@ -566,7 +528,11 @@ export function SubmissionRow({
                           <textarea
                             id={`nova-${sub.id}-${key}`}
                             value={draft[key]}
-                            onChange={(e) => setDraft((d) => ({ ...d, [key]: e.target.value }))}
+                            onChange={(event) => dispatch({
+                              type: 'draftFieldChanged',
+                              key,
+                              value: event.target.value,
+                            })}
                             rows={3}
                             className="mt-1 w-full rounded-md border border-slate-300 px-3 py-1.5 text-sm focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500"
                           />
@@ -576,7 +542,11 @@ export function SubmissionRow({
                               id={`nova-${sub.id}-${key}`}
                               type="text"
                               value={draft[key]}
-                              onChange={(e) => setDraft((d) => ({ ...d, [key]: e.target.value }))}
+                              onChange={(event) => dispatch({
+                                type: 'draftFieldChanged',
+                                key,
+                                value: event.target.value,
+                              })}
                               className="w-full rounded-md border border-slate-300 px-3 py-1.5 text-sm focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500"
                             />
                             {key === 'subscriber_count' && (
@@ -611,7 +581,10 @@ export function SubmissionRow({
                           id={`nova-enabled-${sub.id}`}
                           type="checkbox"
                           checked={enabledDraft}
-                          onChange={(e) => setEnabledDraft(e.target.checked)}
+                          onChange={(event) => dispatch({
+                            type: 'enabledChanged',
+                            enabled: event.target.checked,
+                          })}
                           className="h-4 w-4 rounded border-slate-300 text-blue-600 focus:ring-blue-500"
                         />
                         <span className="text-xs text-slate-500">
@@ -624,7 +597,10 @@ export function SubmissionRow({
                           id={`nova-display-order-${sub.id}`}
                           type="number"
                           value={orderDraft ?? ''}
-                          onChange={(event) => setOrderDraft(finiteInputNumber(event.currentTarget.valueAsNumber))}
+                          onChange={(event) => dispatch({
+                            type: 'orderChanged',
+                            order: finiteInputNumber(event.currentTarget.valueAsNumber),
+                          })}
                           aria-invalid={orderDraft === undefined}
                           aria-describedby={orderDraft === undefined ? `nova-display-order-error-${sub.id}` : undefined}
                           required
@@ -650,9 +626,11 @@ export function SubmissionRow({
                               type="color"
                               aria-label={`${key} theme color`}
                               value={themeDraft[key]}
-                              onChange={(e) =>
-                                setThemeDraft((d) => ({ ...d, [key]: e.target.value.toUpperCase() }))
-                              }
+                              onChange={(event) => dispatch({
+                                type: 'themeColorChanged',
+                                key,
+                                value: event.target.value.toUpperCase(),
+                              })}
                               className="h-7 w-7 cursor-pointer rounded border border-slate-300 p-0"
                             />
                             <div className="min-w-0 flex-1">
@@ -772,14 +750,6 @@ export function SubmissionRow({
       )}
     </>
   );
-}
-
-function buildDraft(sub: NovaSubmission): Record<EditableKey, string> {
-  const draft = {} as Record<EditableKey, string>;
-  for (const { key } of EDITABLE_FIELDS) {
-    draft[key] = sub[key] ?? '';
-  }
-  return draft;
 }
 
 function DetailField({ label, value, children }: { label: string; value?: string; children?: React.ReactNode }) {
