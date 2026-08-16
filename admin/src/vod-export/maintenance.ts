@@ -96,8 +96,18 @@ async function runLockedVodExportMaintenance(
   bindings: VodExportMaintenanceBindings,
   now: Date,
 ): Promise<VodExportMaintenanceResult> {
-  const resolutionMaintenance = await maintainPublicationResolutions(bindings.DB, now);
-  const references = await readRetainedManifestReferences(bindings.VOD_EXPORT_PUBLIC);
+  // These operations touch independent stores. Wait for both to settle so the
+  // outer publication mutex is never released while either operation is still
+  // running, even when its peer fails.
+  const [resolutionResult, referencesResult] = await Promise.allSettled([
+    maintainPublicationResolutions(bindings.DB, now),
+    readRetainedManifestReferences(bindings.VOD_EXPORT_PUBLIC),
+  ]);
+  // Preserve the former sequential error precedence when both operations fail.
+  if (resolutionResult.status === 'rejected') throw resolutionResult.reason;
+  if (referencesResult.status === 'rejected') throw referencesResult.reason;
+  const resolutionMaintenance = resolutionResult.value;
+  const references = referencesResult.value;
   const audits = await bindings.DB.withSession('first-primary')
     .prepare(`
       SELECT intent_id, snapshot_url, candidate_sha256, identity_retained_until,
