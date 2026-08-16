@@ -2,14 +2,12 @@
 
 import { useEffect, useId } from 'react';
 import { usePathname } from 'next/navigation';
-import Link from 'next/link';
-import { Play, Pause, SkipBack, SkipForward, ListMusic, AlertCircle, Shuffle, Repeat, Repeat1, Maximize2, Heart } from 'lucide-react';
+import { Play, Pause, ListMusic, Heart } from 'lucide-react';
 import { usePlayer, usePlaybackTime } from '../contexts/PlayerContext';
 import { useLikedSongs } from '../contexts/LikedSongsContext';
 import AlbumArt from './AlbumArt';
-import VolumeControl from './VolumeControl';
 import ProgressBar from './ProgressBar';
-import { formatTime } from '../lib/format';
+import DesktopMiniPlayer from './DesktopMiniPlayer';
 
 export default function MiniPlayer() {
   const {
@@ -217,238 +215,30 @@ export default function MiniPlayer() {
         </div>
       </div>
 
-      {/* ── DESKTOP NOW PLAYING BAR (hidden on mobile) ── */}
-      <div
-        className="hidden lg:block"
-        style={{
-          height: '80px',
-          background: 'var(--bg-surface-frosted)',
-          backdropFilter: 'blur(12px)',
-          WebkitBackdropFilter: 'blur(12px)',
-          borderTop: '1px solid var(--border-glass)',
-        }}
-      >
-        {/* 3-column layout */}
-        <div
-          className="flex items-center h-full px-4 gap-4"
-        >
-          {/* LEFT COLUMN: 280px — album art, track info */}
-          <button
-            type="button"
-            className="flex flex-shrink-0 items-center gap-3 text-left"
-            style={{ width: '280px' }}
-            onClick={() => setShowModal(true)}
-            aria-label={`開啟正在播放：${currentTrack.title}`}
-            aria-describedby={playerError ? playerErrorId : undefined}
-          >
-            {/* Album cover thumbnail — 48×48 desktop */}
-            <AlbumArt
-              src={currentTrack.albumArtUrl}
-              alt={`${currentTrack.title} - ${currentTrack.originalArtist}`}
-              size={48}
-            />
-
-            {/* Track info */}
-            <div className="min-w-0 flex-1">
-              <div
-                className="font-bold truncate"
-                style={{ fontSize: 'var(--font-size-sm)', fontWeight: 500, color: 'var(--text-primary)' }}
-              >
-                {currentTrack.title}
-              </div>
-              {playerError ? (
-                <div
-                  className="flex items-center gap-1 truncate text-red-500"
-                  style={{ fontSize: 'var(--font-size-xs)' }}
-                  data-testid="player-error-message"
-                  aria-hidden="true"
-                >
-                  <AlertCircle style={{ width: '12px', height: '12px', flexShrink: 0 }} />
-                  <span>{playerError}</span>
-                </div>
-              ) : (
-                <div
-                  className="truncate"
-                  style={{ fontSize: 'var(--font-size-xs)', color: 'var(--text-secondary)' }}
-                >
-                  {currentTrack.originalArtist}
-                </div>
-              )}
-            </div>
-          </button>
-
-          {/* CENTER COLUMN: fill — transport controls + progress bar */}
-          <div
-            className="flex-1 flex flex-col items-center justify-center gap-1"
-            style={{ minWidth: 0 }}
-          >
-            {/* Transport controls row */}
-            <div className="flex items-center gap-4">
-              {/* Shuffle */}
-              <button
-                className={`transition-colors ${!shuffleOn ? 'hover-text-primary' : ''}`}
-                aria-label="Shuffle"
-                data-testid="desktop-shuffle-button"
-                onClick={(e) => { e.stopPropagation(); toggleShuffle(); }}
-                style={{ color: shuffleOn ? 'var(--accent-pink)' : 'var(--text-tertiary)' }}
-              >
-                <Shuffle style={{ width: '16px', height: '16px' }} />
-              </button>
-
-              {/* Previous */}
-              <button
-                onClick={(e) => {
-                  e.stopPropagation();
-                  previous();
-                }}
-                className="transition-colors hover-text-primary"
-                aria-label="Previous"
-                style={{ color: 'var(--text-tertiary)' }}
-              >
-                <SkipBack style={{ width: '18px', height: '18px' }} />
-              </button>
-
-              {/* Play/Pause — 40×40 gradient circle */}
-              <button
-                onClick={(e) => {
-                  e.stopPropagation();
-                  togglePlayPause();
-                }}
-                className="flex items-center justify-center flex-shrink-0 transition-[filter] hover:brightness-110"
-                aria-label={isPlaying ? 'Pause' : 'Play'}
-                data-testid="mini-player-play-button"
-                style={{
-                  width: '40px',
-                  height: '40px',
-                  borderRadius: 'var(--radius-circle)',
-                  background: 'linear-gradient(135deg, var(--accent-pink-light), var(--accent-blue-light))',
-                  color: 'white',
-                  flexShrink: 0,
-                }}
-              >
-                {isPlaying ? (
-                  <Pause style={{ width: '18px', height: '18px', fill: 'currentColor' }} />
-                ) : (
-                  <Play style={{ width: '18px', height: '18px', fill: 'currentColor', marginLeft: '2px' }} />
-                )}
-              </button>
-
-              {/* Next */}
-              <button
-                onClick={(e) => {
-                  e.stopPropagation();
-                  next();
-                }}
-                className="transition-colors hover-text-primary"
-                aria-label="Next"
-                style={{ color: 'var(--text-tertiary)' }}
-              >
-                <SkipForward style={{ width: '18px', height: '18px' }} />
-              </button>
-
-              {/* Repeat */}
-              <button
-                className={`transition-colors ${repeatMode === 'off' ? 'hover-text-primary' : ''}`}
-                aria-label="Repeat"
-                data-testid="desktop-repeat-button"
-                onClick={(e) => { e.stopPropagation(); toggleRepeat(); }}
-                style={{ color: repeatMode !== 'off' ? 'var(--accent-pink)' : 'var(--text-tertiary)' }}
-              >
-                {repeatMode === 'one'
-                  ? <Repeat1 style={{ width: '16px', height: '16px' }} />
-                  : <Repeat style={{ width: '16px', height: '16px' }} />
-                }
-              </button>
-            </div>
-
-            {/* Progress bar row */}
-            <div className="flex items-center gap-2 w-full" style={{ maxWidth: '480px' }}>
-              <span
-                className="flex-shrink-0 font-mono"
-                style={{ fontSize: 'var(--font-size-xs)', color: 'var(--text-tertiary)', minWidth: '32px', textAlign: 'right' }}
-              >
-                {formatTime(trackCurrentTime)}
-              </span>
-              <ProgressBar
-                progress={clampedProgress}
-                onSeek={handleSeek}
-                disabled={!hasKnownDuration}
-                height={4}
-              />
-              <span
-                className="flex-shrink-0 font-mono"
-                style={{ fontSize: 'var(--font-size-xs)', color: 'var(--text-tertiary)', minWidth: '32px' }}
-              >
-                {hasKnownDuration ? formatTime(trackDuration) : '--:--'}
-              </span>
-            </div>
-          </div>
-
-          {/* RIGHT COLUMN: 200px — expand, queue, volume */}
-          <div
-            className="flex items-center gap-3 flex-shrink-0 justify-end"
-            style={{ width: '200px' }}
-          >
-            {/* Expand to full Now Playing page */}
-            <Link
-              href={pageSlug ? `/${pageSlug}/now-playing` : '#'}
-              onClick={(e) => e.stopPropagation()}
-              className="transition-colors hover-text-primary"
-              aria-label="Expand to full page"
-              data-testid="expand-now-playing-button"
-              style={{ color: 'var(--text-tertiary)' }}
-            >
-              <Maximize2 style={{ width: '18px', height: '18px' }} />
-            </Link>
-
-            {/* Like button — desktop */}
-            <button
-              onClick={(e) => {
-                e.stopPropagation();
-                handleToggleLike();
-              }}
-              className="transition-colors hover-text-primary"
-              aria-label={liked ? '取消喜愛' : '喜愛'}
-              data-testid="mini-player-like-button"
-              style={{ color: liked ? 'var(--accent-pink)' : 'var(--text-tertiary)' }}
-            >
-              <Heart style={{ width: '18px', height: '18px' }} className={liked ? 'fill-current' : ''} />
-            </button>
-
-            {/* Queue button */}
-            <button
-              onClick={(e) => {
-                e.stopPropagation();
-                setShowQueue(true);
-              }}
-              className="relative transition-colors hover-text-primary"
-              aria-label="Open queue"
-              data-testid="queue-button"
-              style={{ color: 'var(--text-tertiary)' }}
-            >
-              <ListMusic style={{ width: '18px', height: '18px' }} />
-              {queue.length > 0 && (
-                <span
-                  className="absolute -top-1 -right-1 flex items-center justify-center font-bold"
-                  style={{
-                    width: '16px',
-                    height: '16px',
-                    borderRadius: 'var(--radius-circle)',
-                    background: 'linear-gradient(135deg, var(--accent-pink-light), var(--accent-blue-light))',
-                    color: 'white',
-                    fontSize: '10px',
-                  }}
-                >
-                  {queue.length}
-                </span>
-              )}
-            </button>
-
-            {/* Volume control */}
-            <VolumeControl size="compact" />
-          </div>
-        </div>
-      </div>
+      <DesktopMiniPlayer
+        currentTrack={currentTrack}
+        isPlaying={isPlaying}
+        playerError={playerError}
+        playerErrorId={playerErrorId}
+        pageSlug={pageSlug}
+        liked={liked}
+        queueLength={queue.length}
+        repeatMode={repeatMode}
+        shuffleOn={shuffleOn}
+        trackCurrentTime={trackCurrentTime}
+        trackDuration={trackDuration}
+        clampedProgress={clampedProgress}
+        hasKnownDuration={hasKnownDuration}
+        onOpenPlayer={() => setShowModal(true)}
+        onToggleLike={handleToggleLike}
+        onOpenQueue={() => setShowQueue(true)}
+        onTogglePlayPause={togglePlayPause}
+        onPrevious={previous}
+        onNext={next}
+        onToggleRepeat={toggleRepeat}
+        onToggleShuffle={toggleShuffle}
+        onSeek={handleSeek}
+      />
     </div>
   );
 }
