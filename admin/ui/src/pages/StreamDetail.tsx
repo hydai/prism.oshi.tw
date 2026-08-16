@@ -245,7 +245,7 @@ type EditingField =
   | { type: 'perf'; perfId: string; field: 'title' | 'artist' | 'note' }
   | { type: 'stream'; field: 'title' | 'date' };
 
-export default function StreamDetail({ user }: { user: AuthUser }) {
+function useStreamDetailController(user: AuthUser) {
   const { id: streamId } = useParams<{ id: string }>();
   const [initialParams] = useSearchParams();
   const requestedPerformanceId = initialParams.get('performance');
@@ -764,6 +764,83 @@ export default function StreamDetail({ user }: { user: AuthUser }) {
   // --- Derived values ---
   const unstampedCount = detail ? detail.performances.filter(p => p.endTimestamp === null).length : 0;
 
+  return {
+    streamId,
+    detail,
+    loading,
+    error,
+    toast,
+    editingField,
+    setEditingField,
+    showPasteImport,
+    setShowPasteImport,
+    playerRef,
+    playerBoxRef,
+    currentTime,
+    selectedIndex,
+    setSelectedIndex,
+    showAddModal,
+    setShowAddModal,
+    fetchLog,
+    clearFetchLog: () => setFetchLog([]),
+    isCurator,
+    prevStream,
+    nextStream,
+    unstampedCount,
+    handleStreamStatus,
+    handleStreamSave,
+    handleDeleteStream,
+    handlePasteImportDone,
+    copyVodUrl,
+    exportSongList,
+    handleSave,
+    handleDelete,
+    handlePerformanceStatus,
+    handleApproveAll,
+    handleUnapproveAll,
+    clearEndTimestamp,
+    clearAllEndTimestamps,
+    handleAddSong,
+  };
+}
+
+export type StreamDetailController = ReturnType<typeof useStreamDetailController>;
+
+export function StreamDetailView({ controller }: { controller: StreamDetailController }) {
+  const {
+    streamId,
+    detail,
+    loading,
+    error,
+    toast,
+    editingField,
+    setEditingField,
+    showPasteImport,
+    setShowPasteImport,
+    playerRef,
+    playerBoxRef,
+    currentTime,
+    selectedIndex,
+    showAddModal,
+    setShowAddModal,
+    fetchLog,
+    clearFetchLog,
+    isCurator,
+    prevStream,
+    nextStream,
+    unstampedCount,
+    handleStreamStatus,
+    handleStreamSave,
+    handleDeleteStream,
+    handlePasteImportDone,
+    copyVodUrl,
+    exportSongList,
+    handleApproveAll,
+    handleUnapproveAll,
+    clearAllEndTimestamps,
+    handleAddSong,
+  } = controller;
+
   if (loading) return <div className="text-slate-500">Loading...</div>;
   if (error || !detail) return <div className="text-red-600">{error ?? 'Stream not found'}</div>;
 
@@ -916,7 +993,7 @@ export default function StreamDetail({ user }: { user: AuthUser }) {
       </div>
 
       {/* iTunes duration fetch log */}
-      <FetchLogPanel entries={fetchLog} onClear={() => setFetchLog([])} />
+      <FetchLogPanel entries={fetchLog} onClear={clearFetchLog} />
 
       {/* Performances header */}
       <div className="mt-6 flex items-center justify-between">
@@ -966,120 +1043,7 @@ export default function StreamDetail({ user }: { user: AuthUser }) {
         </div>
       </div>
 
-      {/* Performances table */}
-      <div className="mt-3 overflow-x-auto rounded-lg border border-slate-200 bg-white">
-        {detail.performances.length === 0 ? (
-          <div className="p-6 text-center text-sm text-slate-400">No performances in this stream.</div>
-        ) : (
-          <table className="w-full text-left text-sm">
-            <thead className="border-b border-slate-200 bg-slate-50 text-xs uppercase text-slate-500">
-              <tr>
-                <th className="px-4 py-3">#</th>
-                <th className="px-4 py-3">Title</th>
-                <th className="px-4 py-3">Artist</th>
-                <th className="px-4 py-3">Start</th>
-                <th className="px-4 py-3">End</th>
-                <th className="px-4 py-3">Note</th>
-                <th className="px-4 py-3">Status</th>
-                <th className="px-4 py-3">Actions</th>
-              </tr>
-            </thead>
-            <tbody className="divide-y divide-slate-100">
-              {detail.performances.map((perf, i) => (
-                <tr key={perf.id} id={`performance-row-${perf.id}`}
-                  onClick={() => { setSelectedIndex(i); setEditingField(null); }}
-                  className={`cursor-pointer transition-colors hover:bg-slate-50 ${
-                    i === selectedIndex ? 'border-l-2 border-l-blue-500 bg-blue-50' : ''
-                  }`}>
-                  <td className="px-4 py-3 text-slate-400">{i + 1}</td>
-
-                  {/* Title */}
-                  <td className="px-4 py-3">
-                    {editingField?.type === 'perf' && editingField.perfId === perf.id && editingField.field === 'title' ? (
-                      <InlineEdit value={perf.title} onSave={(v) => handleSave(perf.id, 'title', v)} onCancel={() => setEditingField(null)} />
-                    ) : (
-                      <span className="cursor-text font-medium text-slate-800" onDoubleClick={(e) => { e.stopPropagation(); setEditingField({ type: 'perf', perfId: perf.id, field: 'title' }); }} title="Double-click to edit">
-                        {perf.title}
-                      </span>
-                    )}
-                  </td>
-
-                  {/* Artist */}
-                  <td className="px-4 py-3">
-                    {editingField?.type === 'perf' && editingField.perfId === perf.id && editingField.field === 'artist' ? (
-                      <InlineEdit value={perf.originalArtist} placeholder="add artist" onSave={(v) => handleSave(perf.id, 'artist', v)} onCancel={() => setEditingField(null)} />
-                    ) : (
-                      <span className={`cursor-text ${perf.originalArtist ? 'text-slate-600' : 'italic text-slate-400'}`}
-                        onDoubleClick={(e) => { e.stopPropagation(); setEditingField({ type: 'perf', perfId: perf.id, field: 'artist' }); }} title="Double-click to edit">
-                        {perf.originalArtist || 'add artist'}
-                      </span>
-                    )}
-                  </td>
-
-                  {/* Timestamps */}
-                  <td className="px-4 py-3 font-mono text-xs">
-                    <button onClick={(e) => { e.stopPropagation(); playerRef.current?.seekTo(perf.timestamp); }} className="text-blue-600 hover:underline" title="Seek to start">
-                      {formatTimestamp(perf.timestamp)}
-                    </button>
-                  </td>
-                  <td className={`px-4 py-3 font-mono text-xs ${perf.endTimestamp !== null ? 'text-green-600' : 'text-slate-300'}`}>
-                    <span className="inline-flex items-center gap-1">
-                      {perf.endTimestamp !== null ? (
-                        <>
-                          <button onClick={(e) => { e.stopPropagation(); playerRef.current?.seekTo(Math.max(0, perf.endTimestamp! - (e.shiftKey ? 0 : 5))); }} className="hover:underline" title="Seek end -5s (Shift+click: exact end)">
-                            {formatTimestamp(perf.endTimestamp)}
-                          </button>
-                          <button onClick={(e) => { e.stopPropagation(); clearEndTimestamp(perf.id, i); }}
-                            className="rounded p-0.5 text-slate-400 hover:bg-slate-200 hover:text-slate-600" title="Clear end timestamp">
-                            &#x21BA;
-                          </button>
-                        </>
-                      ) : '—'}
-                    </span>
-                  </td>
-
-                  {/* Note */}
-                  <td className="max-w-48 px-4 py-3">
-                    {editingField?.type === 'perf' && editingField.perfId === perf.id && editingField.field === 'note' ? (
-                      <InlineEdit value={perf.note} placeholder="add note" onSave={(v) => handleSave(perf.id, 'note', v)} onCancel={() => setEditingField(null)} />
-                    ) : (
-                      <span className={`cursor-text truncate text-xs ${perf.note ? 'text-slate-600' : 'italic text-slate-400'}`}
-                        onDoubleClick={(e) => { e.stopPropagation(); setEditingField({ type: 'perf', perfId: perf.id, field: 'note' }); }} title="Double-click to edit note">
-                        {perf.note || 'add note'}
-                      </span>
-                    )}
-                  </td>
-
-                  {/* Status */}
-                  <td className="px-4 py-3"><StatusBadge status={perf.status} /></td>
-
-                  {/* Actions */}
-                  <td className="px-4 py-3">
-                    <div className="flex items-center gap-1">
-                      {isCurator && perf.status !== 'approved' && (
-                        <button onClick={(e) => { e.stopPropagation(); handlePerformanceStatus(perf.id, 'approved'); }}
-                          className="rounded px-1.5 py-0.5 text-xs text-green-600 hover:bg-green-100" title="Approve">
-                          &#x2713;
-                        </button>
-                      )}
-                      {isCurator && perf.status === 'approved' && (
-                        <button onClick={(e) => { e.stopPropagation(); handlePerformanceStatus(perf.id, 'pending'); }}
-                          className="rounded px-1.5 py-0.5 text-xs text-yellow-600 hover:bg-yellow-100" title="Unapprove">
-                          &#x21A9;
-                        </button>
-                      )}
-                      <button onClick={(e) => { e.stopPropagation(); handleDelete(perf); }}
-                        className="rounded p-1 text-slate-400 hover:bg-red-100 hover:text-red-600" title="Delete">
-                        &times;
-                      </button>
-                    </div>
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        )}
-      </div>
+      <PerformanceTable controller={controller} />
 
       {/* Add Song Modal */}
       {showAddModal && (
@@ -1099,4 +1063,137 @@ export default function StreamDetail({ user }: { user: AuthUser }) {
       <Toast toast={toast} />
     </div>
   );
+}
+
+function PerformanceTable({ controller }: { controller: StreamDetailController }) {
+  const {
+    detail,
+    editingField,
+    setEditingField,
+    playerRef,
+    selectedIndex,
+    setSelectedIndex,
+    isCurator,
+    handleSave,
+    handleDelete,
+    handlePerformanceStatus,
+    clearEndTimestamp,
+  } = controller;
+
+  if (!detail) return null;
+
+  return (
+    <div className="mt-3 overflow-x-auto rounded-lg border border-slate-200 bg-white">
+      {detail.performances.length === 0 ? (
+        <div className="p-6 text-center text-sm text-slate-400">No performances in this stream.</div>
+      ) : (
+        <table className="w-full text-left text-sm">
+          <thead className="border-b border-slate-200 bg-slate-50 text-xs uppercase text-slate-500">
+            <tr>
+              <th className="px-4 py-3">#</th>
+              <th className="px-4 py-3">Title</th>
+              <th className="px-4 py-3">Artist</th>
+              <th className="px-4 py-3">Start</th>
+              <th className="px-4 py-3">End</th>
+              <th className="px-4 py-3">Note</th>
+              <th className="px-4 py-3">Status</th>
+              <th className="px-4 py-3">Actions</th>
+            </tr>
+          </thead>
+          <tbody className="divide-y divide-slate-100">
+            {detail.performances.map((perf, i) => (
+              <tr key={perf.id} id={`performance-row-${perf.id}`}
+                onClick={() => { setSelectedIndex(i); setEditingField(null); }}
+                className={`cursor-pointer transition-colors hover:bg-slate-50 ${
+                  i === selectedIndex ? 'border-l-2 border-l-blue-500 bg-blue-50' : ''
+                }`}>
+                <td className="px-4 py-3 text-slate-400">{i + 1}</td>
+
+                <td className="px-4 py-3">
+                  {editingField?.type === 'perf' && editingField.perfId === perf.id && editingField.field === 'title' ? (
+                    <InlineEdit value={perf.title} onSave={(v) => handleSave(perf.id, 'title', v)} onCancel={() => setEditingField(null)} />
+                  ) : (
+                    <span className="cursor-text font-medium text-slate-800" onDoubleClick={(e) => { e.stopPropagation(); setEditingField({ type: 'perf', perfId: perf.id, field: 'title' }); }} title="Double-click to edit">
+                      {perf.title}
+                    </span>
+                  )}
+                </td>
+
+                <td className="px-4 py-3">
+                  {editingField?.type === 'perf' && editingField.perfId === perf.id && editingField.field === 'artist' ? (
+                    <InlineEdit value={perf.originalArtist} placeholder="add artist" onSave={(v) => handleSave(perf.id, 'artist', v)} onCancel={() => setEditingField(null)} />
+                  ) : (
+                    <span className={`cursor-text ${perf.originalArtist ? 'text-slate-600' : 'italic text-slate-400'}`}
+                      onDoubleClick={(e) => { e.stopPropagation(); setEditingField({ type: 'perf', perfId: perf.id, field: 'artist' }); }} title="Double-click to edit">
+                      {perf.originalArtist || 'add artist'}
+                    </span>
+                  )}
+                </td>
+
+                <td className="px-4 py-3 font-mono text-xs">
+                  <button onClick={(e) => { e.stopPropagation(); playerRef.current?.seekTo(perf.timestamp); }} className="text-blue-600 hover:underline" title="Seek to start">
+                    {formatTimestamp(perf.timestamp)}
+                  </button>
+                </td>
+                <td className={`px-4 py-3 font-mono text-xs ${perf.endTimestamp !== null ? 'text-green-600' : 'text-slate-300'}`}>
+                  <span className="inline-flex items-center gap-1">
+                    {perf.endTimestamp !== null ? (
+                      <>
+                        <button onClick={(e) => { e.stopPropagation(); playerRef.current?.seekTo(Math.max(0, perf.endTimestamp! - (e.shiftKey ? 0 : 5))); }} className="hover:underline" title="Seek end -5s (Shift+click: exact end)">
+                          {formatTimestamp(perf.endTimestamp)}
+                        </button>
+                        <button onClick={(e) => { e.stopPropagation(); clearEndTimestamp(perf.id, i); }}
+                          className="rounded p-0.5 text-slate-400 hover:bg-slate-200 hover:text-slate-600" title="Clear end timestamp">
+                          &#x21BA;
+                        </button>
+                      </>
+                    ) : '—'}
+                  </span>
+                </td>
+
+                <td className="max-w-48 px-4 py-3">
+                  {editingField?.type === 'perf' && editingField.perfId === perf.id && editingField.field === 'note' ? (
+                    <InlineEdit value={perf.note} placeholder="add note" onSave={(v) => handleSave(perf.id, 'note', v)} onCancel={() => setEditingField(null)} />
+                  ) : (
+                    <span className={`cursor-text truncate text-xs ${perf.note ? 'text-slate-600' : 'italic text-slate-400'}`}
+                      onDoubleClick={(e) => { e.stopPropagation(); setEditingField({ type: 'perf', perfId: perf.id, field: 'note' }); }} title="Double-click to edit note">
+                      {perf.note || 'add note'}
+                    </span>
+                  )}
+                </td>
+
+                <td className="px-4 py-3"><StatusBadge status={perf.status} /></td>
+
+                <td className="px-4 py-3">
+                  <div className="flex items-center gap-1">
+                    {isCurator && perf.status !== 'approved' && (
+                      <button onClick={(e) => { e.stopPropagation(); handlePerformanceStatus(perf.id, 'approved'); }}
+                        className="rounded px-1.5 py-0.5 text-xs text-green-600 hover:bg-green-100" title="Approve">
+                        &#x2713;
+                      </button>
+                    )}
+                    {isCurator && perf.status === 'approved' && (
+                      <button onClick={(e) => { e.stopPropagation(); handlePerformanceStatus(perf.id, 'pending'); }}
+                        className="rounded px-1.5 py-0.5 text-xs text-yellow-600 hover:bg-yellow-100" title="Unapprove">
+                        &#x21A9;
+                      </button>
+                    )}
+                    <button onClick={(e) => { e.stopPropagation(); handleDelete(perf); }}
+                      className="rounded p-1 text-slate-400 hover:bg-red-100 hover:text-red-600" title="Delete">
+                      &times;
+                    </button>
+                  </div>
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      )}
+    </div>
+  );
+}
+
+export default function StreamDetail({ user }: { user: AuthUser }) {
+  const controller = useStreamDetailController(user);
+  return <StreamDetailView controller={controller} />;
 }
