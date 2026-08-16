@@ -1,15 +1,18 @@
-import { useState, useEffect, useId, useRef } from 'react';
+import { useEffect, useId, useReducer, useRef, useState } from 'react';
 import type {
   AuthUser,
   CandidateComment,
   DiscoveredStream,
-  ExtractResponse,
   PasteImportParsedSong,
-  Stream,
   StreamCredit,
 } from '../../../shared/types';
 import { parseTextToSongs } from '../../../shared/parse';
 import { api, ApiError } from '../api/client';
+import {
+  extractReducer,
+  initialExtractState,
+  type EditableParsedSong,
+} from './pipeline-extract-state';
 
 // --- Helpers ---
 
@@ -269,15 +272,18 @@ function useIdentifySongs() {
 }
 
 function ExtractTab() {
-  const [streams, setStreams] = useState<Stream[]>([]);
-  const [selectedStreamId, setSelectedStreamId] = useState('');
-  const [loading, setLoading] = useState(false);
-  const [loadingStreams, setLoadingStreams] = useState(true);
-  const [error, setError] = useState<string | null>(null);
-  const [extractResult, setExtractResult] = useState<ExtractResponse | null>(null);
-  const [editedSongs, setEditedSongs] = useState<EditableParsedSong[]>([]);
-  const [importStatus, setImportStatus] = useState<string | null>(null);
-  const [importing, setImporting] = useState(false);
+  const [state, dispatch] = useReducer(extractReducer, initialExtractState);
+  const {
+    streams,
+    selectedStreamId,
+    loading,
+    loadingStreams,
+    error,
+    extractResult,
+    editedSongs,
+    importStatus,
+    importing,
+  } = state;
   const creditRef = useRef<StreamCredit | null>(null);
   const identifySongs = useIdentifySongs();
 
@@ -286,67 +292,56 @@ function ExtractTab() {
     api
       .listStreams({ status: 'pending' })
       .then((res) => {
-        setStreams(res.data);
-        if (res.data.length > 0) setSelectedStreamId(res.data[0]!.id);
+        dispatch({ type: 'streamsLoaded', streams: res.data });
       })
       .catch(() => {})
-      .finally(() => setLoadingStreams(false));
+      .finally(() => dispatch({ type: 'streamsLoadingFinished' }));
   }, []);
 
   const handleExtract = async (streamId?: string) => {
     const id = streamId ?? selectedStreamId;
     if (!id) return;
-    setSelectedStreamId(id);
-    setLoading(true);
-    setError(null);
-    setExtractResult(null);
-    setImportStatus(null);
+    dispatch({ type: 'extractStarted', streamId: id });
     try {
       const res = await api.extractTimestamps(id);
-      setExtractResult(res);
-      setEditedSongs(identifySongs(res.parsedSongs));
+      const identifiedSongs = identifySongs(res.parsedSongs);
       creditRef.current = res.credit;
+      dispatch({ type: 'extractSucceeded', result: res, editedSongs: identifiedSongs });
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Failed to extract');
-    } finally {
-      setLoading(false);
+      dispatch({
+        type: 'extractFailed',
+        error: err instanceof Error ? err.message : 'Failed to extract',
+      });
     }
   };
 
   const handleUseCandidate = (candidateText: string, candidateAuthor: string, candidateId: string) => {
     const parsed = parseTextToSongs(candidateText);
-    setEditedSongs(identifySongs(parsed));
+    const identifiedSongs = identifySongs(parsed);
     const selectedStream = streams.find((s) => s.id === selectedStreamId);
     creditRef.current = {
       author: candidateAuthor,
       commentUrl: `https://www.youtube.com/watch?v=${selectedStream?.videoId}&lc=${candidateId}`,
     };
-    setExtractResult((prev) =>
-      prev
-        ? {
-            ...prev,
-            source: 'comment',
-            parsedSongs: parsed,
-            candidateComment: prev.allCandidates.find((c) => c.commentId === candidateId) ?? null,
-          }
-        : null,
-    );
+    dispatch({
+      type: 'candidateSelected',
+      candidateId,
+      parsedSongs: parsed,
+      editedSongs: identifiedSongs,
+    });
   };
 
   const updateSong = (index: number, field: keyof PasteImportParsedSong, value: string | number) => {
-    setEditedSongs((prev) =>
-      prev.map((s, i) => (i === index ? { ...s, [field]: value } : s)),
-    );
+    dispatch({ type: 'songUpdated', index, field, value });
   };
 
   const removeSong = (index: number) => {
-    setEditedSongs((prev) => prev.filter((_, i) => i !== index));
+    dispatch({ type: 'songRemoved', index });
   };
 
   const handleImport = async (replace = false, creditSnapshot = creditRef.current) => {
     if (!selectedStreamId || editedSongs.length === 0) return;
-    setImporting(true);
-    setError(null);
+    dispatch({ type: 'importStarted' });
     try {
       const res = await api.extractImport({
         streamId: selectedStreamId,
@@ -359,21 +354,22 @@ function ExtractTab() {
         credit: creditSnapshot ?? undefined,
         replace,
       });
-      setImportStatus(`Imported ${res.created} song(s)`);
-      setExtractResult(null);
-      setEditedSongs([]);
+      dispatch({ type: 'importSucceeded', status: `Imported ${res.created} song(s)` });
     } catch (err) {
       if (err instanceof ApiError && err.status === 409) {
         const ok = window.confirm(`${err.message}\n\nDo you want to replace the existing songs?`);
         if (ok) {
-          setImporting(false);
+          dispatch({ type: 'importFinished' });
           return handleImport(true, creditSnapshot);
         }
       } else {
-        setError(err instanceof Error ? err.message : 'Failed to import');
+        dispatch({
+          type: 'importFailed',
+          error: err instanceof Error ? err.message : 'Failed to import',
+        });
       }
     } finally {
-      setImporting(false);
+      dispatch({ type: 'importFinished' });
     }
   };
 
@@ -418,12 +414,7 @@ function ExtractTab() {
                       </td>
                       <td className="px-4 py-3">
                         <button
-                          onClick={() => {
-                            setExtractResult(null);
-                            setEditedSongs([]);
-                            setImportStatus(null);
-                            handleExtract(s.id);
-                          }}
+                          onClick={() => handleExtract(s.id)}
                           disabled={loading}
                           className="rounded-md bg-blue-600 px-3 py-1.5 text-xs font-medium text-white hover:bg-blue-700 disabled:opacity-50"
                         >
@@ -613,5 +604,3 @@ export default function Pipeline({ user: _user }: { user: AuthUser }) {
     </div>
   );
 }
-
-type EditableParsedSong = PasteImportParsedSong & { clientId: string };

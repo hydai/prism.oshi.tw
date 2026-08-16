@@ -6,10 +6,11 @@
   "scripts": {
     "dev": "vite",
     "build": "tsc -b && vite build",
-    "check": "npm run test:numeric-input && npm run test:youtube-embed && npm run test:crystal-tickets && npm run build",
+    "check": "npm run test:numeric-input && npm run test:youtube-embed && npm run test:crystal-tickets && npm run test:pipeline-extract-state && npm run build",
     "test:numeric-input": "npx tsx tests/numeric-input.test.ts",
     "test:youtube-embed": "npx tsx tests/youtube-embed.test.tsx",
     "test:crystal-tickets": "npx tsx tests/crystal-tickets-ui.test.tsx",
+    "test:pipeline-extract-state": "npx tsx tests/pipeline-extract-state.test.ts",
     "test:nova-links": "npx tsx tests/nova-submissions-links.test.tsx",
     "test:streams-filter": "npx tsx tests/streams-filter.test.ts",
     "test:streams-render": "npx tsx tests/streams-list-render.test.tsx",
