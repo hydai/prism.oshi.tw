@@ -12,6 +12,7 @@
     "test:archive": "npx tsx app/lib/archive.test.ts",
     "test:archive-loader": "npx tsx app/lib/archive-loader.test.ts",
     "test:playback-time-store": "npx tsx app/lib/playback-time-store.test.ts",
+    "test:player-context": "npx tsx app/contexts/player-context.test.tsx",
     "test:hydration": "npx tsx app/components/hydration.test.tsx",
     "test:format": "npx tsx app/lib/format.test.ts",
     "test:playlist-storage": "npx tsx app/lib/playlist-storage.test.ts",
