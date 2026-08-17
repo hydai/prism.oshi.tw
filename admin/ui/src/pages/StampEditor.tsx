@@ -332,7 +332,7 @@ interface EditingField {
   field: 'title' | 'artist';
 }
 
-export default function StampEditor({ user }: { user: AuthUser }) {
+function useStampEditorController(user: AuthUser) {
   const [initialParams] = useSearchParams();
   const requestedStreamId = initialParams.get('stream');
   const requestedPerformanceId = initialParams.get('performance');
@@ -891,7 +891,76 @@ export default function StampEditor({ user }: { user: AuthUser }) {
     return list;
   }, [streams, streamYearFilter, streamSearch]);
 
-  // --- Render ---
+  return {
+    user,
+    streamSearch,
+    setStreamSearch,
+    streamYearFilter,
+    setStreamYearFilter,
+    selectedStreamId,
+    performances,
+    selectedIndex,
+    setSelectedIndex,
+    toast,
+    showAddModal,
+    setShowAddModal,
+    showPasteImport,
+    setShowPasteImport,
+    editingField,
+    setEditingField,
+    loading,
+    stampStats,
+    fetchLog,
+    clearFetchLog: () => setFetchLog([]),
+    playerRef,
+    currentTime,
+    selectedStream,
+    streamYears,
+    filteredStreams,
+    selectStream,
+    clearEndTimestamp,
+    deletePerformance,
+    handleAddSong,
+    handlePasteImportDone,
+    handleInlineEditSave,
+    exportSongList,
+    clearAllEndTimestampsAction,
+    approveAllAction,
+  };
+}
+
+export type StampEditorController = ReturnType<typeof useStampEditorController>;
+
+export function StampEditorView({ controller }: { controller: StampEditorController }) {
+  const {
+    user,
+    streamSearch,
+    setStreamSearch,
+    streamYearFilter,
+    setStreamYearFilter,
+    selectedStreamId,
+    performances,
+    selectedIndex,
+    toast,
+    showAddModal,
+    setShowAddModal,
+    showPasteImport,
+    setShowPasteImport,
+    stampStats,
+    fetchLog,
+    clearFetchLog,
+    playerRef,
+    currentTime,
+    selectedStream,
+    streamYears,
+    filteredStreams,
+    selectStream,
+    handleAddSong,
+    handlePasteImportDone,
+    exportSongList,
+    clearAllEndTimestampsAction,
+    approveAllAction,
+  } = controller;
 
   return (
     <div className="flex h-full gap-4">
@@ -1030,7 +1099,7 @@ export default function StampEditor({ user }: { user: AuthUser }) {
             </div>
 
             {/* iTunes duration fetch log */}
-            <FetchLogPanel entries={fetchLog} onClear={() => setFetchLog([])} />
+            <FetchLogPanel entries={fetchLog} onClear={clearFetchLog} />
 
             {/* Stamp stats */}
             {stampStats && (
@@ -1089,147 +1158,7 @@ export default function StampEditor({ user }: { user: AuthUser }) {
               </div>
             </div>
 
-            {/* Song list */}
-            <div className="flex-1 overflow-y-auto rounded-lg border border-slate-200 bg-white">
-              {loading ? (
-                <div className="p-4 text-center text-sm text-slate-400">Loading...</div>
-              ) : performances.length === 0 ? (
-                <div className="p-4 text-center text-sm text-slate-400">
-                  No songs in this stream
-                </div>
-              ) : (
-                <ul aria-label="Songs in selected stream">
-                  {performances.map((perf, i) => (
-                    <li
-                      key={perf.id}
-                      className={`flex items-center gap-2 border-b border-slate-100 px-3 py-2 text-sm transition-colors hover:bg-slate-50 ${
-                        i === selectedIndex
-                          ? 'border-l-2 border-l-blue-500 bg-blue-50'
-                          : ''
-                      }`}
-                    >
-                      {/* Index */}
-                      <button
-                        type="button"
-                        className="w-8 flex-shrink-0 text-left text-xs font-medium text-slate-400"
-                        onClick={() => {
-                          setSelectedIndex(i);
-                          setEditingField(null);
-                        }}
-                        aria-pressed={i === selectedIndex}
-                        title={`Select song ${i + 1}`}
-                      >
-                        #{i + 1}
-                      </button>
-
-                      {/* Song name + artist (editable) */}
-                      <div className="min-w-0 flex-1">
-                        {editingField?.index === i && editingField.field === 'title' ? (
-                          <InlineEdit
-                            value={perf.title}
-                            onSave={(val) => handleInlineEditSave(i, 'title', val)}
-                            onCancel={() => setEditingField(null)}
-                          />
-                        ) : (
-                          <button
-                            type="button"
-                            className="max-w-full cursor-text truncate text-left align-bottom font-medium text-slate-800"
-                            onClick={() => setSelectedIndex(i)}
-                            onDoubleClick={() => {
-                              setEditingField({ index: i, field: 'title' });
-                            }}
-                            onKeyDown={(event) => {
-                              if (event.key === 'F2') {
-                                event.preventDefault();
-                                setEditingField({ index: i, field: 'title' });
-                              }
-                            }}
-                            title="Double-click or press F2 to edit title"
-                          >
-                            {perf.title}
-                          </button>
-                        )}
-                        {editingField?.index === i && editingField.field === 'artist' ? (
-                          <InlineEdit
-                            value={perf.originalArtist}
-                            placeholder="add artist"
-                            onSave={(val) => handleInlineEditSave(i, 'artist', val)}
-                            onCancel={() => setEditingField(null)}
-                          />
-                        ) : (
-                          <button
-                            type="button"
-                            className={`ml-1 max-w-full cursor-text truncate text-left align-bottom text-xs ${
-                              perf.originalArtist
-                                ? 'text-slate-500'
-                                : 'italic text-slate-400'
-                            }`}
-                            onClick={() => setSelectedIndex(i)}
-                            onDoubleClick={() => {
-                              setEditingField({ index: i, field: 'artist' });
-                            }}
-                            onKeyDown={(event) => {
-                              if (event.key === 'F2') {
-                                event.preventDefault();
-                                setEditingField({ index: i, field: 'artist' });
-                              }
-                            }}
-                            title="Double-click or press F2 to edit artist"
-                          >
-                            {perf.originalArtist ? ` \u2014 ${perf.originalArtist}` : ' add artist'}
-                          </button>
-                        )}
-                      </div>
-
-                      {/* Timestamps */}
-                      <span className="flex-shrink-0 text-xs text-slate-500">
-                        {formatTimestamp(perf.timestamp)}
-                      </span>
-                      <span className="flex-shrink-0 text-xs font-medium">
-                        &rarr;
-                      </span>
-                      <span
-                        className={`flex-shrink-0 text-xs font-medium ${
-                          perf.endTimestamp !== null
-                            ? 'text-green-600'
-                            : 'text-slate-300'
-                        }`}
-                      >
-                        {perf.endTimestamp !== null
-                          ? formatTimestamp(perf.endTimestamp)
-                          : '\u2014'}
-                      </span>
-
-                      {/* Undo clear end timestamp */}
-                      {perf.endTimestamp !== null && (
-                        <button
-                          onClick={(e) => {
-                            e.stopPropagation();
-                            clearEndTimestamp(perf.id, i);
-                          }}
-                          className="flex-shrink-0 rounded p-0.5 text-slate-400 hover:bg-slate-200 hover:text-slate-600"
-                          title="Clear end timestamp"
-                        >
-                          &#x21BA;
-                        </button>
-                      )}
-
-                      {/* Delete */}
-                      <button
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          deletePerformance(perf.id, i);
-                        }}
-                        className="flex-shrink-0 rounded p-0.5 text-slate-400 hover:bg-red-100 hover:text-red-600"
-                        title="Delete song"
-                      >
-                        &times;
-                      </button>
-                    </li>
-                  ))}
-                </ul>
-              )}
-            </div>
+            <SongList controller={controller} />
           </>
         )}
       </div>
@@ -1256,4 +1185,161 @@ export default function StampEditor({ user }: { user: AuthUser }) {
       <Toast toast={toast} />
     </div>
   );
+}
+
+function SongList({ controller }: { controller: StampEditorController }) {
+  const {
+    performances,
+    loading,
+    selectedIndex,
+    setSelectedIndex,
+    editingField,
+    setEditingField,
+    handleInlineEditSave,
+    clearEndTimestamp,
+    deletePerformance,
+  } = controller;
+
+  return (
+    <div className="flex-1 overflow-y-auto rounded-lg border border-slate-200 bg-white">
+      {loading ? (
+        <div className="p-4 text-center text-sm text-slate-400">Loading...</div>
+      ) : performances.length === 0 ? (
+        <div className="p-4 text-center text-sm text-slate-400">
+          No songs in this stream
+        </div>
+      ) : (
+        <ul aria-label="Songs in selected stream">
+          {performances.map((perf, i) => (
+            <li
+              key={perf.id}
+              className={`flex items-center gap-2 border-b border-slate-100 px-3 py-2 text-sm transition-colors hover:bg-slate-50 ${
+                i === selectedIndex
+                  ? 'border-l-2 border-l-blue-500 bg-blue-50'
+                  : ''
+              }`}
+            >
+              <button
+                type="button"
+                className="w-8 flex-shrink-0 text-left text-xs font-medium text-slate-400"
+                onClick={() => {
+                  setSelectedIndex(i);
+                  setEditingField(null);
+                }}
+                aria-pressed={i === selectedIndex}
+                title={`Select song ${i + 1}`}
+              >
+                #{i + 1}
+              </button>
+
+              <div className="min-w-0 flex-1">
+                {editingField?.index === i && editingField.field === 'title' ? (
+                  <InlineEdit
+                    value={perf.title}
+                    onSave={(val) => handleInlineEditSave(i, 'title', val)}
+                    onCancel={() => setEditingField(null)}
+                  />
+                ) : (
+                  <button
+                    type="button"
+                    className="max-w-full cursor-text truncate text-left align-bottom font-medium text-slate-800"
+                    onClick={() => setSelectedIndex(i)}
+                    onDoubleClick={() => {
+                      setEditingField({ index: i, field: 'title' });
+                    }}
+                    onKeyDown={(event) => {
+                      if (event.key === 'F2') {
+                        event.preventDefault();
+                        setEditingField({ index: i, field: 'title' });
+                      }
+                    }}
+                    title="Double-click or press F2 to edit title"
+                  >
+                    {perf.title}
+                  </button>
+                )}
+                {editingField?.index === i && editingField.field === 'artist' ? (
+                  <InlineEdit
+                    value={perf.originalArtist}
+                    placeholder="add artist"
+                    onSave={(val) => handleInlineEditSave(i, 'artist', val)}
+                    onCancel={() => setEditingField(null)}
+                  />
+                ) : (
+                  <button
+                    type="button"
+                    className={`ml-1 max-w-full cursor-text truncate text-left align-bottom text-xs ${
+                      perf.originalArtist
+                        ? 'text-slate-500'
+                        : 'italic text-slate-400'
+                    }`}
+                    onClick={() => setSelectedIndex(i)}
+                    onDoubleClick={() => {
+                      setEditingField({ index: i, field: 'artist' });
+                    }}
+                    onKeyDown={(event) => {
+                      if (event.key === 'F2') {
+                        event.preventDefault();
+                        setEditingField({ index: i, field: 'artist' });
+                      }
+                    }}
+                    title="Double-click or press F2 to edit artist"
+                  >
+                    {perf.originalArtist ? ` \u2014 ${perf.originalArtist}` : ' add artist'}
+                  </button>
+                )}
+              </div>
+
+              <span className="flex-shrink-0 text-xs text-slate-500">
+                {formatTimestamp(perf.timestamp)}
+              </span>
+              <span className="flex-shrink-0 text-xs font-medium">
+                &rarr;
+              </span>
+              <span
+                className={`flex-shrink-0 text-xs font-medium ${
+                  perf.endTimestamp !== null
+                    ? 'text-green-600'
+                    : 'text-slate-300'
+                }`}
+              >
+                {perf.endTimestamp !== null
+                  ? formatTimestamp(perf.endTimestamp)
+                  : '\u2014'}
+              </span>
+
+              {perf.endTimestamp !== null && (
+                <button
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    clearEndTimestamp(perf.id, i);
+                  }}
+                  className="flex-shrink-0 rounded p-0.5 text-slate-400 hover:bg-slate-200 hover:text-slate-600"
+                  title="Clear end timestamp"
+                >
+                  &#x21BA;
+                </button>
+              )}
+
+              <button
+                onClick={(e) => {
+                  e.stopPropagation();
+                  deletePerformance(perf.id, i);
+                }}
+                className="flex-shrink-0 rounded p-0.5 text-slate-400 hover:bg-red-100 hover:text-red-600"
+                title="Delete song"
+              >
+                &times;
+              </button>
+            </li>
+          ))}
+        </ul>
+      )}
+    </div>
+  );
+}
+
+export default function StampEditor({ user }: { user: AuthUser }) {
+  const controller = useStampEditorController(user);
+  return <StampEditorView controller={controller} />;
 }
