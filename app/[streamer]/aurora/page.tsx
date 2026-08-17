@@ -1,16 +1,11 @@
 'use client';
 
 import { useState, useRef, useCallback, useEffect, useEffectEvent } from 'react';
-import { ArrowLeft, Plus, FileText, Download, Trash2, Sparkles, Keyboard, Clock } from 'lucide-react';
-import Link from 'next/link';
 import { useStreamer } from '../../contexts/StreamerContext';
 import { extractVideoId, validateYoutubeUrl } from '@/lib/utils';
-import { YouTubeEmbed, type YouTubeEmbedHandle } from '../../components/aurora/YouTubeEmbed';
-import SongListEditor, { type AuroraSong } from '../../components/aurora/SongListEditor';
-import PasteImportModal from '../../components/aurora/PasteImportModal';
-import ExportModal from '../../components/aurora/ExportModal';
-import AuroraPlayerControls from '../../components/aurora/AuroraPlayerControls';
-import AuroraStampControls from '../../components/aurora/AuroraStampControls';
+import type { YouTubeEmbedHandle } from '../../components/aurora/YouTubeEmbed';
+import type { AuroraSong } from '../../components/aurora/SongListEditor';
+import AuroraPageView, { type AuroraOverlay } from '../../components/aurora/AuroraPageView';
 import type { ParsedSong } from '@/lib/parse';
 import { fetchItunesDuration } from '@/lib/itunes';
 import { pushRecentVideo } from '@/lib/aurora-recent';
@@ -35,24 +30,10 @@ function saveSession(videoId: string, songs: AuroraSong[]) {
   localStorage.setItem(`aurora:${videoId}`, JSON.stringify(songs));
 }
 
-export default function AuroraPage() {
-  const { slug } = useStreamer();
-  const [vodUrl, setVodUrl] = useState('');
-  const [videoId, setVideoId] = useState<string | null>(null);
-  const [urlError, setUrlError] = useState('');
-  const [songs, setSongs] = useState<AuroraSong[]>([]);
-  const [selectedIndex, setSelectedIndex] = useState<number | null>(null);
-  const [showImport, setShowImport] = useState(false);
-  const [showExport, setShowExport] = useState(false);
-  const [showShortcuts, setShowShortcuts] = useState(false);
-  const [isPlaying, setIsPlaying] = useState(false);
-  const [fillingIndex, setFillingIndex] = useState<number | null>(null);
-  const [bulkFillStatus, setBulkFillStatus] = useState<string | null>(null);
-  const playerRef = useRef<YouTubeEmbedHandle>(null);
+function useSessionPersistence(videoId: string | null, songs: AuroraSong[]) {
   const pendingSaveRef = useRef<{ videoId: string; songs: AuroraSong[] } | null>(null);
 
-  // Persist committed song state after a short debounce. Keeping this side
-  // effect outside the state updater lets React replay updates safely.
+  // Persist committed song state after a short debounce so state updaters stay pure.
   useEffect(() => {
     if (!videoId) return;
     const pendingSave = { videoId, songs };
@@ -64,11 +45,33 @@ export default function AuroraPage() {
     return () => clearTimeout(timer);
   }, [videoId, songs]);
 
+  const flushPendingSave = useCallback(() => {
+    const pendingSave = pendingSaveRef.current;
+    if (!pendingSave) return;
+    saveSession(pendingSave.videoId, pendingSave.songs);
+    pendingSaveRef.current = null;
+  }, []);
+
   // A route change can unmount the editor before the debounce expires.
   useEffect(() => () => {
-    const pendingSave = pendingSaveRef.current;
-    if (pendingSave) saveSession(pendingSave.videoId, pendingSave.songs);
-  }, []);
+    flushPendingSave();
+  }, [flushPendingSave]);
+  return flushPendingSave;
+}
+
+export default function AuroraPage() {
+  const { slug } = useStreamer();
+  const [vodUrl, setVodUrl] = useState('');
+  const [videoId, setVideoId] = useState<string | null>(null);
+  const [urlError, setUrlError] = useState('');
+  const [songs, setSongs] = useState<AuroraSong[]>([]);
+  const [selectedIndex, setSelectedIndex] = useState<number | null>(null);
+  const [activeOverlay, setActiveOverlay] = useState<AuroraOverlay>(null);
+  const [isPlaying, setIsPlaying] = useState(false);
+  const [fillingIndex, setFillingIndex] = useState<number | null>(null);
+  const [bulkFillStatus, setBulkFillStatus] = useState<string | null>(null);
+  const playerRef = useRef<YouTubeEmbedHandle>(null);
+  const flushPendingSave = useSessionPersistence(videoId, songs);
 
   // Keep song updaters pure; persistence is handled after commit above.
   const updateSongs = useCallback((updater: (prev: AuroraSong[]) => AuroraSong[]) => {
@@ -87,11 +90,7 @@ export default function AuroraPage() {
       setUrlError('無法解析影片 ID');
       return;
     }
-    const pendingSave = pendingSaveRef.current;
-    if (pendingSave) {
-      saveSession(pendingSave.videoId, pendingSave.songs);
-      pendingSaveRef.current = null;
-    }
+    flushPendingSave();
     setUrlError('');
     setVideoId(id);
     pushRecentVideo(id);
@@ -295,227 +294,44 @@ export default function AuroraPage() {
   }, [videoId]);
 
   return (
-    <div className="min-h-screen flex flex-col">
-      {/* Header */}
-      <header className="sticky top-0 z-30 border-b border-[var(--border-default)]" style={{ background: 'var(--bg-surface-frosted)', backdropFilter: 'blur(16px)' }}>
-        <div className="max-w-7xl mx-auto px-4 py-3 flex items-center gap-3">
-          <Link href={`/${slug}`} className="flex items-center gap-1.5 text-[var(--text-secondary)] hover:text-[var(--text-primary)] transition-colors">
-            <ArrowLeft size={16} />
-            <span className="text-[13px]">MizukiPrism</span>
-          </Link>
-          <div className="flex items-center gap-2">
-            <Sparkles size={18} className="text-[var(--accent-purple)]" />
-            <h1 className="text-[17px] font-bold bg-gradient-to-r from-purple-500 to-teal-400 bg-clip-text text-transparent">
-              Aurora
-            </h1>
-          </div>
-          <span className="text-[12px] text-[var(--text-tertiary)] hidden sm:inline">社群時間戳工具</span>
-          <div className="flex-1" />
-          <button
-            onClick={() => setShowShortcuts((v) => !v)}
-            className="p-2 rounded-lg hover:bg-black/5 text-[var(--text-tertiary)]"
-            title="鍵盤快捷鍵"
-          >
-            <Keyboard size={16} />
-          </button>
-        </div>
-      </header>
-
-      {/* Shortcuts help overlay */}
-      {showShortcuts && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/30 backdrop-blur-sm">
-          <button
-            type="button"
-            className="absolute inset-0"
-            onClick={() => setShowShortcuts(false)}
-            aria-label="關閉鍵盤快捷鍵"
-          />
-          <div
-            className="relative mx-4 w-full max-w-sm rounded-2xl border border-[var(--border-default)] p-5 shadow-xl"
-            style={{ background: 'var(--bg-surface)' }}
-          >
-            <h3 className="text-[15px] font-semibold mb-3 text-[var(--text-primary)]">鍵盤快捷鍵</h3>
-            <p className="text-[11px] text-[var(--text-tertiary)] mb-3">在沒有輸入框聚焦時生效</p>
-            <div className="space-y-2 text-[13px]">
-              {[
-                ['T', '設定選取歌曲的開始時間'],
-                ['M', '設定選取歌曲的結束時間'],
-                ['S', '跳轉到選取歌曲的開始'],
-                ['E', '跳轉到選取歌曲的結束'],
-                ['N', '選取下一首歌'],
-                ['P', '選取上一首歌'],
-                ['A', '在當前播放時間新增歌曲'],
-                ['F', '從 iTunes 填入選取歌曲的時長'],
-                ['Space', '播放 / 暫停'],
-                ['←', '倒退 5 秒'],
-                ['→', '快進 5 秒'],
-              ].map(([key, desc]) => (
-                <div key={key} className="flex items-center gap-3">
-                  <kbd className="w-7 text-center px-1.5 py-0.5 rounded bg-white/60 border border-[var(--border-default)] text-[12px] font-mono font-medium">{key}</kbd>
-                  <span className="text-[var(--text-secondary)]">{desc}</span>
-                </div>
-              ))}
-            </div>
-          </div>
-        </div>
-      )}
-
-      {/* Main content */}
-      <main className="flex-1 max-w-7xl mx-auto w-full px-4 py-6">
-        {!videoId ? (
-          /* URL Input */
-          <div className="flex flex-col items-center justify-center min-h-[60vh] gap-6">
-            <div className="text-center">
-              <div className="flex items-center justify-center gap-2 mb-3">
-                <Sparkles size={28} className="text-[var(--accent-purple)]" />
-                <h2 className="text-[28px] font-bold bg-gradient-to-r from-purple-500 to-teal-400 bg-clip-text text-transparent">
-                  MizukiAurora
-                </h2>
-              </div>
-              <p className="text-[var(--text-secondary)] text-[14px]">社群時間戳工具 — 為歌枠直播建立結構化的時間戳列表</p>
-            </div>
-            <div className="w-full max-w-lg">
-              <label htmlFor="aurora-vod-url" className="sr-only">
-                YouTube 歌枠網址
-              </label>
-              <div className="flex gap-2">
-                <input
-                  id="aurora-vod-url"
-                  className="flex-1 rounded-xl border border-[var(--border-default)] bg-white/60 px-4 py-3 text-base outline-none focus:border-[var(--accent-purple)] placeholder:text-[var(--text-tertiary)]"
-                  placeholder="貼上 YouTube 歌枠網址..."
-                  value={vodUrl}
-                  onChange={(e) => { setVodUrl(e.target.value); setUrlError(''); }}
-                  onKeyDown={(e) => { if (e.key === 'Enter') handleLoadVideo(); }}
-                  data-testid="vod-url-input"
-                />
-                <button
-                  onClick={handleLoadVideo}
-                  className="px-5 py-3 rounded-xl bg-[var(--accent-purple)] text-white font-medium text-[14px] hover:opacity-90 transition-opacity shrink-0"
-                  data-testid="load-video-button"
-                >
-                  載入
-                </button>
-              </div>
-              {urlError && (
-                <p className="text-red-500 text-[12px] mt-2" data-testid="url-error">{urlError}</p>
-              )}
-            </div>
-          </div>
-        ) : (
-          /* Workspace */
-          <div className="flex flex-col lg:flex-row gap-6" data-testid="aurora-workspace">
-            {/* Left: YouTube Player */}
-            <div className="lg:w-1/2 flex flex-col gap-4">
-              <YouTubeEmbed ref={playerRef} videoId={videoId} onStateChange={setIsPlaying} />
-              <AuroraPlayerControls
-                isPlaying={isPlaying}
-                onTogglePlay={handleTogglePlay}
-                onSeekBackward={handleSeekBackward}
-                onSeekForward={handleSeekForward}
-              />
-              <p className="text-[12px] text-[var(--text-tertiary)] font-mono truncate">
-                {vodUrl || `https://youtube.com/watch?v=${videoId}`}
-              </p>
-            </div>
-
-            {/* Right: Song List */}
-            <div className="lg:w-1/2 flex flex-col gap-3">
-              {/* Toolbar */}
-              <div className="flex items-center gap-2 flex-wrap">
-                <button
-                  onClick={addSong}
-                  className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-[var(--accent-purple)] text-white text-[13px] font-medium hover:opacity-90"
-                  data-testid="add-song-button"
-                >
-                  <Plus size={14} />
-                  新增歌曲
-                </button>
-                <button
-                  onClick={() => setShowImport(true)}
-                  className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-white/60 border border-[var(--border-default)] text-[var(--text-secondary)] text-[13px] font-medium hover:bg-white/80"
-                  data-testid="import-button"
-                >
-                  <FileText size={14} />
-                  <span className="hidden sm:inline">匯入</span>
-                </button>
-                <button
-                  onClick={() => setShowExport(true)}
-                  disabled={songs.length === 0}
-                  className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-white/60 border border-[var(--border-default)] text-[var(--text-secondary)] text-[13px] font-medium hover:bg-white/80 disabled:opacity-40"
-                  data-testid="export-button"
-                >
-                  <Download size={14} />
-                  <span className="hidden sm:inline">匯出</span>
-                </button>
-                <button
-                  onClick={handleFillAllDurations}
-                  disabled={fillingIndex !== null || !songs.some((s) => s.endSeconds === null && s.name.trim() !== '')}
-                  className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-white/60 border border-[var(--border-default)] text-[var(--text-secondary)] text-[13px] font-medium hover:bg-white/80 disabled:opacity-40"
-                  data-testid="fill-all-durations-button"
-                >
-                  <Clock size={14} className={fillingIndex !== null ? 'animate-spin' : ''} />
-                  <span className="hidden sm:inline">{bulkFillStatus ?? '填入時長'}</span>
-                </button>
-                <div className="flex-1" />
-                {songs.length > 0 && (
-                  <button
-                    onClick={handleClear}
-                    className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-red-400 hover:text-red-600 hover:bg-red-50 text-[13px] font-medium"
-                  >
-                    <Trash2 size={14} />
-                    <span className="hidden sm:inline">清除</span>
-                  </button>
-                )}
-              </div>
-
-              {/* Stamp controls */}
-              <AuroraStampControls
-                selectedIndex={selectedIndex}
-                selectedSong={selectedIndex !== null ? songs[selectedIndex] ?? null : null}
-                onSetStart={handleSetStart}
-                onSetEnd={handleSetEnd}
-                onSeekToStart={handleSeekToStart}
-                onSeekToEnd={handleSeekToEnd}
-              />
-
-              {/* Song list */}
-              <div
-                className="flex-1 rounded-xl border border-[var(--border-default)] p-2 min-h-[300px]"
-                style={{ background: 'var(--bg-surface-frosted)', backdropFilter: 'blur(8px)' }}
-              >
-                <SongListEditor
-                  songs={songs}
-                  selectedIndex={selectedIndex}
-                  onSelect={setSelectedIndex}
-                  onUpdate={handleUpdate}
-                  onDelete={handleDelete}
-                  onMove={handleMove}
-                  onSeekTo={handleSeekTo}
-                  onFillDuration={handleFillDuration}
-                  fillingIndex={fillingIndex}
-                />
-              </div>
-
-              <p className="text-[11px] text-[var(--text-tertiary)]">
-                {songs.length} 首歌曲 {selectedIndex !== null ? `· 已選取 #${selectedIndex + 1}` : ''}
-              </p>
-            </div>
-          </div>
-        )}
-      </main>
-
-      {/* Modals */}
-      <PasteImportModal
-        open={showImport}
-        onClose={() => setShowImport(false)}
-        onImport={handleImport}
-      />
-      <ExportModal
-        open={showExport}
-        onClose={() => setShowExport(false)}
-        songs={songs}
-        vodUrl={vodUrl || (videoId ? `https://youtube.com/watch?v=${videoId}` : '')}
-      />
-    </div>
+    <AuroraPageView
+      slug={slug}
+      vodUrl={vodUrl}
+      videoId={videoId}
+      urlError={urlError}
+      songs={songs}
+      selectedIndex={selectedIndex}
+      activeOverlay={activeOverlay}
+      isPlaying={isPlaying}
+      fillingIndex={fillingIndex}
+      bulkFillStatus={bulkFillStatus}
+      playerRef={playerRef}
+      onVodUrlChange={(value) => { setVodUrl(value); setUrlError(''); }}
+      onLoadVideo={handleLoadVideo}
+      onToggleShortcuts={() => setActiveOverlay((overlay) => overlay === 'shortcuts' ? null : 'shortcuts')}
+      onCloseShortcuts={() => setActiveOverlay(null)}
+      onPlayingChange={setIsPlaying}
+      onTogglePlay={handleTogglePlay}
+      onSeekBackward={handleSeekBackward}
+      onSeekForward={handleSeekForward}
+      onAddSong={addSong}
+      onOpenImport={() => setActiveOverlay('import')}
+      onCloseImport={() => setActiveOverlay(null)}
+      onImport={handleImport}
+      onOpenExport={() => setActiveOverlay('export')}
+      onCloseExport={() => setActiveOverlay(null)}
+      onFillAllDurations={handleFillAllDurations}
+      onClear={handleClear}
+      onSetStart={handleSetStart}
+      onSetEnd={handleSetEnd}
+      onSeekToStart={handleSeekToStart}
+      onSeekToEnd={handleSeekToEnd}
+      onSelectSong={setSelectedIndex}
+      onUpdateSong={handleUpdate}
+      onDeleteSong={handleDelete}
+      onMoveSong={handleMove}
+      onSeekTo={handleSeekTo}
+      onFillDuration={handleFillDuration}
+    />
   );
 }
