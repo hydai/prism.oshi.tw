@@ -3,10 +3,12 @@
 import {
   createContext,
   useContext,
+  useCallback,
   useState,
   useEffect,
   useEffectEvent,
   useId,
+  useMemo,
   useRef,
   useSyncExternalStore,
   type ReactNode,
@@ -124,7 +126,7 @@ declare global {
 // is invisible to users but keeps long sessions from growing without limit
 const PLAY_HISTORY_LIMIT = 100;
 
-export const PlayerProvider = ({ children }: { children: ReactNode }) => {
+function usePlayerController(): PlayerContextType {
   const volumeKey = 'prism_volume';
   const mutedKey = 'prism_muted';
   const [currentTrack, setCurrentTrack] = useState<Track | null>(null);
@@ -166,13 +168,13 @@ export const PlayerProvider = ({ children }: { children: ReactNode }) => {
   const queueEntryIdPrefix = useId();
   const nextQueueEntryId = useRef(0);
 
-  const createQueueEntry = (track: Track): QueueEntry => ({
+  const createQueueEntry = useCallback((track: Track): QueueEntry => ({
     ...track,
     queueEntryId: `${queueEntryIdPrefix}-${nextQueueEntryId.current++}`,
-  });
+  }), [queueEntryIdPrefix]);
 
-  const clearTimestampWarning = () => setTimestampWarning(null);
-  const clearSkipNotification = () => setSkipNotification(null);
+  const clearTimestampWarning = useCallback(() => setTimestampWarning(null), []);
+  const clearSkipNotification = useCallback(() => setSkipNotification(null), []);
 
   // Keep refs in sync with state
   useEffect(() => { queueRef.current = queue; }, [queue]);
@@ -229,7 +231,7 @@ export const PlayerProvider = ({ children }: { children: ReactNode }) => {
     }
   }, []);
 
-  const setVolume = (n: number) => {
+  const setVolume = useCallback((n: number) => {
     const clamped = Math.max(0, Math.min(100, n));
     setVolumeState(clamped);
     if (playerRef.current && playerRef.current.setVolume) {
@@ -244,9 +246,9 @@ export const PlayerProvider = ({ children }: { children: ReactNode }) => {
       try { localStorage.setItem(mutedKey, 'false'); } catch {}
     }
     try { localStorage.setItem(volumeKey, String(clamped)); } catch {}
-  };
+  }, [mutedKey, volumeKey]);
 
-  const toggleMute = () => {
+  const toggleMute = useCallback(() => {
     const newMuted = !isMutedRef.current;
     setIsMuted(newMuted);
     if (playerRef.current) {
@@ -257,11 +259,11 @@ export const PlayerProvider = ({ children }: { children: ReactNode }) => {
       }
     }
     try { localStorage.setItem(mutedKey, String(newMuted)); } catch {}
-  };
+  }, [mutedKey]);
 
   // Advance to next non-deleted track in queue, skipping deleted ones.
   // Returns true if a non-deleted track was found and set as current, false if all remaining are deleted or queue is empty.
-  const advanceSkippingDeleted = (currentQ: QueueEntry[], fromTrack: Track | null): boolean => {
+  const advanceSkippingDeleted = useCallback((currentQ: QueueEntry[], fromTrack: Track | null): boolean => {
     // Filter out deleted tracks
     let skippedAny = false;
     let remainingQueue = currentQ;
@@ -322,12 +324,12 @@ export const PlayerProvider = ({ children }: { children: ReactNode }) => {
     setCurrentTrack(nextTrack);
     timeStore.setTime(nextTrack.timestamp);
     return true;
-  };
+  }, [createQueueEntry, timeStore]);
 
   // Load the YouTube IFrame API on demand. Safe to call repeatedly — the
   // loader caches an in-flight/successful load and a failed load is retried
   // by the next call.
-  const ensurePlayerApi = () => {
+  const ensurePlayerApi = useCallback(() => {
     if (typeof window === 'undefined') return;
     loadYouTubeIframeApi(window, document)
       .then(() => {
@@ -337,7 +339,7 @@ export const PlayerProvider = ({ children }: { children: ReactNode }) => {
       .catch(() => {
         setApiLoadError('播放器載入失敗，請重新整理頁面');
       });
-  };
+  }, []);
 
   // Prefetch the YouTube API once the browser is idle so the first play is
   // instant, without competing with the initial page load for connections.
@@ -358,7 +360,7 @@ export const PlayerProvider = ({ children }: { children: ReactNode }) => {
       if (idleId !== null) w.cancelIdleCallback?.(idleId);
       if (timerId !== null) clearTimeout(timerId);
     };
-  }, []);
+  }, [ensurePlayerApi]);
 
   useEffect(() => () => {
     playerRef.current?.destroy();
@@ -522,26 +524,25 @@ export const PlayerProvider = ({ children }: { children: ReactNode }) => {
       },
     });
   // YouTube event callbacks read mutable playback state through refs.
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [isPlayerReady, currentTrack, timeStore]);
+  }, [isPlayerReady, currentTrack, timeStore, advanceSkippingDeleted]);
 
-  const toggleRepeat = () => {
+  const toggleRepeat = useCallback(() => {
     setRepeatMode(prev => prev === 'off' ? 'all' : prev === 'all' ? 'one' : 'off');
-  };
+  }, []);
 
-  const toggleShuffle = () => {
+  const toggleShuffle = useCallback(() => {
     setShuffleOn(prev => !prev);
-  };
+  }, []);
 
-  const addToAllTracks = (track: Track) => {
+  const addToAllTracks = useCallback((track: Track) => {
     setAllTracks(prev => prev.some(t => t.id === track.id) ? prev : [...prev, track]);
-  };
+  }, []);
 
   // Play a track and REPLACE the whole queue with `following` — clicking a song
   // in any list establishes that list as the new playback context (Spotify-style).
   // Reads currentTrackRef (not state) so stale closures held by memoized list
   // rows can still call it safely.
-  const playTrackWithQueue = (track: Track, following: Track[]) => {
+  const playTrackWithQueue = useCallback((track: Track, following: Track[]) => {
     // Covers fast clicks that land before the idle prefetch has run
     ensurePlayerApi();
     const prevTrack = currentTrackRef.current;
@@ -562,9 +563,9 @@ export const PlayerProvider = ({ children }: { children: ReactNode }) => {
       }
       return merged.length === prev.length ? prev : merged;
     });
-  };
+  }, [createQueueEntry, ensurePlayerApi, timeStore]);
 
-  const togglePlayPause = () => {
+  const togglePlayPause = useCallback(() => {
     if (!playerRef.current) return;
 
     if (isPlaying) {
@@ -574,15 +575,15 @@ export const PlayerProvider = ({ children }: { children: ReactNode }) => {
       playerRef.current.playVideo();
       setIsPlaying(true);
     }
-  };
+  }, [isPlaying]);
 
-  const seekTo = (seconds: number) => {
+  const seekTo = useCallback((seconds: number) => {
     if (!playerRef.current) return;
     playerRef.current.seekTo(seconds, true);
     timeStore.setTime(seconds);
-  };
+  }, [timeStore]);
 
-  const previous = () => {
+  const previous = useCallback(() => {
     if (!currentTrack) return;
 
     const timePlayed = timeStore.getSnapshot().currentTime - currentTrack.timestamp;
@@ -599,9 +600,9 @@ export const PlayerProvider = ({ children }: { children: ReactNode }) => {
         timeStore.setTime(prevTrack.timestamp);
       }
     }
-  };
+  }, [currentTrack, playHistory, seekTo, timeStore]);
 
-  const next = () => {
+  const next = useCallback(() => {
     // User pressed next — always advance (ignore repeat-one)
     if (queue.length > 0 || repeatMode === 'all') {
       advanceSkippingDeleted(queue, currentTrack);
@@ -612,65 +613,97 @@ export const PlayerProvider = ({ children }: { children: ReactNode }) => {
         setIsPlaying(false);
       }
     }
-  };
+  }, [advanceSkippingDeleted, currentTrack, queue, repeatMode]);
 
-  const addToQueue = (track: Track) => {
+  const addToQueue = useCallback((track: Track) => {
     const entry = createQueueEntry(track);
     setQueue(prev => [...prev, entry]);
     addToAllTracks(track);
-  };
+  }, [addToAllTracks, createQueueEntry]);
 
-  const removeFromQueue = (index: number) => {
+  const removeFromQueue = useCallback((index: number) => {
     setQueue(prev => prev.filter((_, i) => i !== index));
-  };
+  }, []);
 
-  const reorderQueue = (fromIndex: number, toIndex: number) => {
+  const reorderQueue = useCallback((fromIndex: number, toIndex: number) => {
     setQueue(prev => {
       const newQueue = [...prev];
       const [removed] = newQueue.splice(fromIndex, 1);
       newQueue.splice(toIndex, 0, removed);
       return newQueue;
     });
-  };
+  }, []);
 
-  return (
-    <PlayerContext.Provider
-      value={{
-        currentTrack,
-        isPlaying,
-        isPlayerReady,
-        playerError,
-        apiLoadError,
-        unavailableVideoIds,
-        timestampWarning,
-        clearTimestampWarning,
-        skipNotification,
-        clearSkipNotification,
-        timeStore,
-        playTrackWithQueue,
-        togglePlayPause,
-        seekTo,
-        previous,
-        next,
-        showModal,
-        setShowModal,
-        queue,
-        addToQueue,
-        removeFromQueue,
-        reorderQueue,
-        showQueue,
-        setShowQueue,
-        repeatMode,
-        shuffleOn,
-        toggleRepeat,
-        toggleShuffle,
-        volume,
-        isMuted,
-        setVolume,
-        toggleMute,
-      }}
-    >
-      {children}
-    </PlayerContext.Provider>
-  );
+  return useMemo<PlayerContextType>(() => ({
+    currentTrack,
+    isPlaying,
+    isPlayerReady,
+    playerError,
+    apiLoadError,
+    unavailableVideoIds,
+    timestampWarning,
+    clearTimestampWarning,
+    skipNotification,
+    clearSkipNotification,
+    timeStore,
+    playTrackWithQueue,
+    togglePlayPause,
+    seekTo,
+    previous,
+    next,
+    showModal,
+    setShowModal,
+    queue,
+    addToQueue,
+    removeFromQueue,
+    reorderQueue,
+    showQueue,
+    setShowQueue,
+    repeatMode,
+    shuffleOn,
+    toggleRepeat,
+    toggleShuffle,
+    volume,
+    isMuted,
+    setVolume,
+    toggleMute,
+  }), [
+    currentTrack,
+    isPlaying,
+    isPlayerReady,
+    playerError,
+    apiLoadError,
+    unavailableVideoIds,
+    timestampWarning,
+    clearTimestampWarning,
+    skipNotification,
+    clearSkipNotification,
+    timeStore,
+    playTrackWithQueue,
+    togglePlayPause,
+    seekTo,
+    previous,
+    next,
+    showModal,
+    setShowModal,
+    queue,
+    addToQueue,
+    removeFromQueue,
+    reorderQueue,
+    showQueue,
+    setShowQueue,
+    repeatMode,
+    shuffleOn,
+    toggleRepeat,
+    toggleShuffle,
+    volume,
+    isMuted,
+    setVolume,
+    toggleMute,
+  ]);
+}
+
+export const PlayerProvider = ({ children }: { children: ReactNode }) => {
+  const value = usePlayerController();
+  return <PlayerContext.Provider value={value}>{children}</PlayerContext.Provider>;
 };
