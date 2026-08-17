@@ -19,7 +19,19 @@ test.describe('archive search', () => {
     await expect
       .poll(async () => Number(await countEl.textContent()))
       .toBeGreaterThan(0);
+    await expect(input).toHaveValue('Way Back Into Love');
+    await expect(input).toBeFocused();
 
+    await page.getByRole('button', { name: '首頁' }).click();
+    await expect(input).toHaveValue('');
+    await expect
+      .poll(async () => Number(await countEl.textContent()))
+      .toBe(fullCount);
+
+    await input.fill('Way Back Into Love');
+    await expect
+      .poll(async () => Number(await countEl.textContent()))
+      .toBeLessThan(fullCount);
     await input.fill('');
     await expect
       .poll(async () => Number(await countEl.textContent()))
