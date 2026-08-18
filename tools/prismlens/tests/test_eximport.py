@@ -14,8 +14,8 @@ from unittest.mock import patch
 import pytest
 from click.testing import CliRunner
 
-from mizukilens.cache import open_db, upsert_stream, upsert_parsed_songs
-from mizukilens.cli import main
+from prismlens.cache import open_db, upsert_stream, upsert_parsed_songs
+from prismlens.cli import main
 
 
 # ---------------------------------------------------------------------------
@@ -98,8 +98,8 @@ class TestEximportEndToEnd:
 
         runner = CliRunner()
         with (
-            patch("mizukilens.cache.open_db", side_effect=mock_open_db),
-            patch("mizukilens.discovery.get_active_channel_info", return_value=("UCtest", [])),
+            patch("prismlens.cache.open_db", side_effect=mock_open_db),
+            patch("prismlens.discovery.get_active_channel_info", return_value=("UCtest", [])),
         ):
             result = runner.invoke(
                 main,
@@ -137,8 +137,8 @@ class TestEximportEndToEnd:
 
         runner = CliRunner()
         with (
-            patch("mizukilens.cache.open_db", side_effect=mock_open_db),
-            patch("mizukilens.discovery.get_active_channel_info", return_value=("UCtest", [])),
+            patch("prismlens.cache.open_db", side_effect=mock_open_db),
+            patch("prismlens.discovery.get_active_channel_info", return_value=("UCtest", [])),
         ):
             result = runner.invoke(
                 main,
@@ -168,8 +168,8 @@ class TestEximportNoApproved:
 
         runner = CliRunner()
         with (
-            patch("mizukilens.cache.open_db", side_effect=mock_open_db),
-            patch("mizukilens.discovery.get_active_channel_info", return_value=("UCtest", [])),
+            patch("prismlens.cache.open_db", side_effect=mock_open_db),
+            patch("prismlens.discovery.get_active_channel_info", return_value=("UCtest", [])),
         ):
             result = runner.invoke(main, ["eximport"])
 
@@ -196,9 +196,9 @@ class TestEximportFilters:
 
         runner = CliRunner()
         with (
-            patch("mizukilens.cache.open_db", side_effect=mock_open_db),
-            patch("mizukilens.discovery.get_active_channel_info", return_value=("UCtest", [])),
-            patch("mizukilens.export.export_approved_streams", side_effect=mock_export),
+            patch("prismlens.cache.open_db", side_effect=mock_open_db),
+            patch("prismlens.discovery.get_active_channel_info", return_value=("UCtest", [])),
+            patch("prismlens.export.export_approved_streams", side_effect=mock_export),
         ):
             result = runner.invoke(main, ["eximport", "--since", "2024-03-01"])
 
@@ -220,9 +220,9 @@ class TestEximportFilters:
 
         runner = CliRunner()
         with (
-            patch("mizukilens.cache.open_db", side_effect=mock_open_db),
-            patch("mizukilens.discovery.get_active_channel_info", return_value=("UCtest", [])),
-            patch("mizukilens.export.export_approved_streams", side_effect=mock_export),
+            patch("prismlens.cache.open_db", side_effect=mock_open_db),
+            patch("prismlens.discovery.get_active_channel_info", return_value=("UCtest", [])),
+            patch("prismlens.export.export_approved_streams", side_effect=mock_export),
         ):
             result = runner.invoke(main, ["eximport", "--stream", "videoXYZ"])
 
@@ -243,8 +243,8 @@ class TestEximportFilters:
 
         runner = CliRunner()
         with (
-            patch("mizukilens.cache.open_db", side_effect=mock_open_db),
-            patch("mizukilens.discovery.get_active_channel_info", return_value=("UCtest", [])),
+            patch("prismlens.cache.open_db", side_effect=mock_open_db),
+            patch("prismlens.discovery.get_active_channel_info", return_value=("UCtest", [])),
         ):
             result = runner.invoke(
                 main,
@@ -279,8 +279,8 @@ class TestEximportCancellation:
 
         runner = CliRunner()
         with (
-            patch("mizukilens.cache.open_db", side_effect=mock_open_db),
-            patch("mizukilens.discovery.get_active_channel_info", return_value=("UCtest", [])),
+            patch("prismlens.cache.open_db", side_effect=mock_open_db),
+            patch("prismlens.discovery.get_active_channel_info", return_value=("UCtest", [])),
         ):
             result = runner.invoke(
                 main,

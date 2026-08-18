@@ -15,7 +15,7 @@ from unittest.mock import patch
 
 import pytest
 
-from mizukilens.importer import (
+from prismlens.importer import (
     ImportPlan,
     ImportResult,
     compute_import_plan,
@@ -43,7 +43,7 @@ def _make_export_payload(
     return {
         "version": "1.0",
         "exportedAt": "2024-03-15T12:00:00Z",
-        "source": "mizukilens",
+        "source": "prismlens",
         "channelId": "UCtest",
         "data": {
             "streams": streams or [],
@@ -183,7 +183,7 @@ class TestValidateExportJson:
             validate_export_json([1, 2, 3])
 
     def test_missing_version_key_raises(self) -> None:
-        payload = {"source": "mizukilens", "data": {"streams": [], "songs": [], "versions": []}}
+        payload = {"source": "prismlens", "data": {"streams": [], "songs": [], "versions": []}}
         with pytest.raises(ValueError, match="version"):
             validate_export_json(payload)
 
@@ -193,17 +193,17 @@ class TestValidateExportJson:
             validate_export_json(payload)
 
     def test_missing_data_key_raises(self) -> None:
-        payload = {"version": "1.0", "source": "mizukilens"}
+        payload = {"version": "1.0", "source": "prismlens"}
         with pytest.raises(ValueError):
             validate_export_json(payload)
 
     def test_missing_data_streams_raises(self) -> None:
-        payload = {"version": "1.0", "source": "mizukilens", "data": {"songs": [], "versions": []}}
+        payload = {"version": "1.0", "source": "prismlens", "data": {"songs": [], "versions": []}}
         with pytest.raises(ValueError, match="streams"):
             validate_export_json(payload)
 
     def test_data_streams_not_array_raises(self) -> None:
-        payload = {"version": "1.0", "source": "mizukilens", "data": {"streams": {}, "songs": [], "versions": []}}
+        payload = {"version": "1.0", "source": "prismlens", "data": {"streams": {}, "songs": [], "versions": []}}
         with pytest.raises(ValueError):
             validate_export_json(payload)
 
@@ -909,13 +909,13 @@ class TestCacheStatusUpdate:
     """execute_import must update cache status to 'imported' for imported streams."""
 
     def test_status_updated_to_imported_for_exported_stream(self, tmp_path: Path) -> None:
-        from mizukilens.cache import open_db, upsert_stream, get_stream
+        from prismlens.cache import open_db, upsert_stream, get_stream
 
         db_path = tmp_path / "test.db"
         conn = open_db(db_path)
         # Stream starts as exported
         upsert_stream(conn, video_id="vid001", status="approved", title="T", date="2024-01-01")
-        from mizukilens.cache import update_stream_status
+        from prismlens.cache import update_stream_status
         update_stream_status(conn, "vid001", "exported")
 
         songs_path = tmp_path / "songs.json"
@@ -934,7 +934,7 @@ class TestCacheStatusUpdate:
         conn.close()
 
     def test_status_updated_for_multiple_streams(self, tmp_path: Path) -> None:
-        from mizukilens.cache import open_db, upsert_stream, get_stream, update_stream_status
+        from prismlens.cache import open_db, upsert_stream, get_stream, update_stream_status
 
         db_path = tmp_path / "test.db"
         conn = open_db(db_path)
@@ -964,7 +964,7 @@ class TestCacheStatusUpdate:
 
     def test_stream_not_in_cache_doesnt_raise(self, tmp_path: Path) -> None:
         """execute_import must not fail if a video_id is not in the cache."""
-        from mizukilens.cache import open_db
+        from prismlens.cache import open_db
 
         db_path = tmp_path / "test.db"
         conn = open_db(db_path)
@@ -1177,7 +1177,7 @@ class TestImportCli:
 
     def test_import_no_file_shows_error(self) -> None:
         from click.testing import CliRunner
-        from mizukilens.cli import main
+        from prismlens.cli import main
 
         runner = CliRunner()
         result = runner.invoke(main, ["import"])
@@ -1185,7 +1185,7 @@ class TestImportCli:
 
     def test_import_invalid_json_shows_error(self, tmp_path: Path) -> None:
         from click.testing import CliRunner
-        from mizukilens.cli import main
+        from prismlens.cli import main
 
         bad_file = tmp_path / "bad.json"
         bad_file.write_text("{ not valid json", encoding="utf-8")
@@ -1196,7 +1196,7 @@ class TestImportCli:
 
     def test_import_schema_validation_error(self, tmp_path: Path) -> None:
         from click.testing import CliRunner
-        from mizukilens.cli import main
+        from prismlens.cli import main
 
         bad_payload = {"version": "1.0"}  # missing required keys
         bad_file = tmp_path / "bad_schema.json"
@@ -1208,7 +1208,7 @@ class TestImportCli:
 
     def test_import_shows_change_summary(self, tmp_path: Path) -> None:
         from click.testing import CliRunner
-        from mizukilens.cli import main
+        from prismlens.cli import main
 
         songs_path = tmp_path / "songs.json"
         streams_path = tmp_path / "streams.json"
@@ -1247,7 +1247,7 @@ class TestImportCli:
 
     def test_import_writes_data_files(self, tmp_path: Path) -> None:
         from click.testing import CliRunner
-        from mizukilens.cli import main
+        from prismlens.cli import main
 
         songs_path = tmp_path / "songs.json"
         streams_path = tmp_path / "streams.json"
@@ -1288,7 +1288,7 @@ class TestImportCli:
 
     def test_import_cancel_does_not_write(self, tmp_path: Path) -> None:
         from click.testing import CliRunner
-        from mizukilens.cli import main
+        from prismlens.cli import main
 
         songs_path = tmp_path / "songs.json"
         streams_path = tmp_path / "streams.json"
@@ -1323,7 +1323,7 @@ class TestImportCli:
 
     def test_import_conflict_skip_choice(self, tmp_path: Path) -> None:
         from click.testing import CliRunner
-        from mizukilens.cli import main
+        from prismlens.cli import main
 
         songs_path = tmp_path / "songs.json"
         streams_path = tmp_path / "streams.json"
@@ -1356,7 +1356,7 @@ class TestImportCli:
 
     def test_import_creates_backup_files(self, tmp_path: Path) -> None:
         from click.testing import CliRunner
-        from mizukilens.cli import main
+        from prismlens.cli import main
 
         songs_path = tmp_path / "songs.json"
         streams_path = tmp_path / "streams.json"

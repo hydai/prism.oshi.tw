@@ -7,7 +7,7 @@ const YOUTUBE_VIDEO_BATCH_SIZE = 50;
 // Match Workers' cap for outbound connections waiting on response headers.
 const YOUTUBE_VIDEO_BATCH_CONCURRENCY = 6;
 
-// Karaoke stream detection keywords (from MizukiLens config.py)
+// Karaoke stream detection keywords (from PrismLens config.py)
 const KARAOKE_KEYWORDS = ['歌回', '歌枠', '唱歌', 'singing', 'karaoke'];
 
 // Minimum timestamps required for a comment to be a candidate

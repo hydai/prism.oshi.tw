@@ -1,4 +1,4 @@
-"""Tests for the MizukiLens extraction module (LENS-004).
+"""Tests for the PrismLens extraction module (LENS-004).
 
 All tests mock youtube-comment-downloader and yt-dlp — no real YouTube calls.
 """
@@ -10,13 +10,13 @@ from unittest.mock import MagicMock, patch
 
 import pytest
 
-from mizukilens.cache import (
+from prismlens.cache import (
     open_db,
     upsert_stream,
     get_stream,
     get_parsed_songs,
 )
-from mizukilens.extraction import (
+from prismlens.extraction import (
     SUSPICIOUS_THRESHOLD,
     ExtractionResult,
     ExtractionError,
@@ -730,7 +730,7 @@ class TestExtractTimestampsPending:
     def test_pending_when_no_comment_no_description(self, db):
         _add_stream(db, "vid022")
 
-        with patch("mizukilens.extraction.get_description_from_ytdlp", return_value=None):
+        with patch("prismlens.extraction.get_description_from_ytdlp", return_value=None):
             result = extract_timestamps(
                 db, "vid022",
                 comment_generator=iter([]),
@@ -1218,7 +1218,7 @@ class TestKeywordCandidates:
 
     def test_candidates_cached_during_extraction(self, db):
         """Integration: extraction saves keyword candidates to DB."""
-        from mizukilens.cache import list_candidate_comments
+        from prismlens.cache import list_candidate_comments
 
         _add_stream(db, "kw_vid1")
         # Comment with keyword but also with timestamps
@@ -1237,7 +1237,7 @@ class TestKeywordCandidates:
 
     def test_candidates_cached_even_when_extraction_succeeds(self, db):
         """Candidates are saved regardless of extraction outcome."""
-        from mizukilens.cache import list_candidate_comments
+        from prismlens.cache import list_candidate_comments
 
         _add_stream(db, "kw_vid2")
         good_comment = _make_comment_dict(_GOOD_COMMENT_TEXT, cid="good_cmt")
@@ -1261,7 +1261,7 @@ class TestKeywordCandidates:
 
     def test_extract_from_candidate(self, db):
         """Re-extraction using a specific candidate comment."""
-        from mizukilens.cache import save_candidate_comments, list_candidate_comments
+        from prismlens.cache import save_candidate_comments, list_candidate_comments
 
         _add_stream(db, "cand_vid1")
         # Save a candidate with parseable timestamps
@@ -1284,13 +1284,13 @@ class TestKeywordCandidates:
         assert result.comment_author == "SongLister"
 
         # Candidate should be marked as approved
-        from mizukilens.cache import get_candidate_comment
+        from prismlens.cache import get_candidate_comment
         cand = get_candidate_comment(db, cand_id)
         assert cand["status"] == "approved"
 
     def test_extract_from_candidate_no_songs(self, db):
         """Re-extraction with unparseable candidate returns no songs."""
-        from mizukilens.cache import save_candidate_comments, list_candidate_comments
+        from prismlens.cache import save_candidate_comments, list_candidate_comments
 
         _add_stream(db, "cand_vid2")
         save_candidate_comments(db, "cand_vid2", [{
@@ -1311,7 +1311,7 @@ class TestKeywordCandidates:
 
     def test_extract_from_candidate_wrong_video_raises(self, db):
         """Candidate belonging to a different video should raise ValueError."""
-        from mizukilens.cache import save_candidate_comments, list_candidate_comments
+        from prismlens.cache import save_candidate_comments, list_candidate_comments
 
         _add_stream(db, "cand_vid3a")
         _add_stream(db, "cand_vid3b")
@@ -1652,7 +1652,7 @@ class TestExtractFromText:
         assert result.songs[1]["song_name"] == "ただ君に晴れ"
         assert result.songs[2]["song_name"] == "怪物"
 
-    @patch("mizukilens.extraction.get_video_info_from_ytdlp")
+    @patch("prismlens.extraction.get_video_info_from_ytdlp")
     def test_auto_create_stream_when_missing(self, mock_info, db):
         mock_info.return_value = {"title": "歌回 Vol.99", "date": "2021-09-25"}
         result = extract_from_text(db, "newvid01", SAMPLE_TEXT)
@@ -1662,7 +1662,7 @@ class TestExtractFromText:
         stream = get_stream(db, "newvid01")
         assert stream is not None
 
-    @patch("mizukilens.extraction.get_video_info_from_ytdlp")
+    @patch("prismlens.extraction.get_video_info_from_ytdlp")
     def test_auto_create_stores_title_and_date(self, mock_info, db):
         mock_info.return_value = {"title": "歌回 Vol.99", "date": "2021-09-25"}
         extract_from_text(db, "newvid02", SAMPLE_TEXT)
@@ -1670,7 +1670,7 @@ class TestExtractFromText:
         assert stream["title"] == "歌回 Vol.99"
         assert stream["date"] == "2021-09-25"
 
-    @patch("mizukilens.extraction.get_video_info_from_ytdlp")
+    @patch("prismlens.extraction.get_video_info_from_ytdlp")
     def test_auto_create_ytdlp_fails(self, mock_info, db):
         mock_info.return_value = {"title": None, "date": None}
         result = extract_from_text(db, "newvid03", SAMPLE_TEXT)
@@ -1681,7 +1681,7 @@ class TestExtractFromText:
 
     def test_existing_stream_not_recreated(self, db):
         _add_stream(db, "txt002", status="pending")
-        with patch("mizukilens.extraction.get_video_info_from_ytdlp") as mock_info:
+        with patch("prismlens.extraction.get_video_info_from_ytdlp") as mock_info:
             extract_from_text(db, "txt002", SAMPLE_TEXT)
             mock_info.assert_not_called()
 

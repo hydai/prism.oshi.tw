@@ -1,4 +1,4 @@
-"""Tests for mizukilens.db_client — Admin API client + db CLI commands.
+"""Tests for prismlens.db_client — Admin API client + db CLI commands.
 
 Coverage:
   - AdminApiClient initialization (env vars, missing config)
@@ -18,8 +18,8 @@ from unittest.mock import MagicMock, patch
 import pytest
 from click.testing import CliRunner
 
-from mizukilens.cli import main
-from mizukilens.db_client import AdminApiClient, AdminApiError
+from prismlens.cli import main
+from prismlens.db_client import AdminApiClient, AdminApiError
 
 
 # ---------------------------------------------------------------------------
@@ -146,7 +146,7 @@ class TestGetApprovedSongs:
         mock_resp = _make_response(200, SAMPLE_SONGS)
         with patch.object(client._client, "get", return_value=mock_resp) as mock_get:
             result = client.get_approved_songs()
-            mock_get.assert_called_once_with("/api/export/songs")
+            mock_get.assert_called_once_with("/api/export/songs?streamer=mizuki")
             assert len(result) == 2
             assert result[0]["id"] == "song-2"
         client.close()
@@ -225,7 +225,7 @@ class TestGetApprovedStreams:
         mock_resp = _make_response(200, SAMPLE_STREAMS)
         with patch.object(client._client, "get", return_value=mock_resp) as mock_get:
             result = client.get_approved_streams()
-            mock_get.assert_called_once_with("/api/export/streams")
+            mock_get.assert_called_once_with("/api/export/streams?streamer=mizuki")
             assert len(result) == 2
         client.close()
 
@@ -238,7 +238,7 @@ class TestGetStats:
         mock_resp = _make_response(200, SAMPLE_STATS)
         with patch.object(client._client, "get", return_value=mock_resp) as mock_get:
             result = client.get_stats()
-            mock_get.assert_called_once_with("/api/stats")
+            mock_get.assert_called_once_with("/api/stats?streamer=mizuki")
             assert result["songs"]["approved"] == 42
         client.close()
 
@@ -256,9 +256,9 @@ class TestGetStats:
 # ---------------------------------------------------------------------------
 
 class TestDbExportCli:
-    """CLI integration tests for `mizukilens db export`."""
+    """CLI integration tests for `prismlens db export`."""
 
-    @patch("mizukilens.db_client.AdminApiClient")
+    @patch("prismlens.db_client.AdminApiClient")
     def test_export_writes_files(self, MockClient, tmp_path):
         mock_client = MockClient.return_value
         mock_client.get_approved_songs.return_value = list(SAMPLE_SONGS)
@@ -282,7 +282,7 @@ class TestDbExportCli:
         # Streams sorted by date descending
         assert streams[0]["date"] >= streams[1]["date"]
 
-    @patch("mizukilens.db_client.AdminApiClient")
+    @patch("prismlens.db_client.AdminApiClient")
     def test_export_dry_run(self, MockClient, tmp_path):
         mock_client = MockClient.return_value
         mock_client.get_approved_songs.return_value = list(SAMPLE_SONGS)
@@ -296,7 +296,7 @@ class TestDbExportCli:
         assert "dry run" in result.output.lower()
         assert not (tmp_path / "out" / "songs.json").exists()
 
-    @patch("mizukilens.db_client.AdminApiClient")
+    @patch("prismlens.db_client.AdminApiClient")
     def test_export_api_error(self, MockClient):
         mock_client = MockClient.return_value
         mock_client.get_approved_songs.side_effect = AdminApiError("Connection refused")
@@ -307,7 +307,7 @@ class TestDbExportCli:
         assert result.exit_code != 0
         assert "Connection refused" in result.output
 
-    @patch("mizukilens.db_client.AdminApiClient")
+    @patch("prismlens.db_client.AdminApiClient")
     def test_export_missing_env(self, MockClient):
         MockClient.side_effect = AdminApiError("ADMIN_API_URL is not set")
 
@@ -317,7 +317,7 @@ class TestDbExportCli:
         assert result.exit_code != 0
         assert "ADMIN_API_URL" in result.output
 
-    @patch("mizukilens.db_client.AdminApiClient")
+    @patch("prismlens.db_client.AdminApiClient")
     def test_export_json_format(self, MockClient, tmp_path):
         """Verify output uses ensure_ascii=False and indent=2."""
         mock_client = MockClient.return_value
@@ -342,9 +342,9 @@ class TestDbExportCli:
 # ---------------------------------------------------------------------------
 
 class TestDbStatusCli:
-    """CLI integration tests for `mizukilens db status`."""
+    """CLI integration tests for `prismlens db status`."""
 
-    @patch("mizukilens.db_client.AdminApiClient")
+    @patch("prismlens.db_client.AdminApiClient")
     def test_status_displays_stats(self, MockClient):
         mock_client = MockClient.return_value
         mock_client.get_stats.return_value = SAMPLE_STATS
@@ -356,7 +356,7 @@ class TestDbStatusCli:
         assert "42" in result.output
         assert "approved" in result.output
 
-    @patch("mizukilens.db_client.AdminApiClient")
+    @patch("prismlens.db_client.AdminApiClient")
     def test_status_api_error(self, MockClient):
         mock_client = MockClient.return_value
         mock_client.get_stats.side_effect = AdminApiError("401 Unauthorized")

@@ -1,4 +1,4 @@
-"""Tests for mizukilens CLI entry point and stub commands."""
+"""Tests for prismlens CLI entry point and stub commands."""
 
 from __future__ import annotations
 
@@ -9,7 +9,7 @@ from unittest.mock import MagicMock, patch
 import pytest
 from click.testing import CliRunner
 
-from mizukilens.cli import main
+from prismlens.cli import main
 
 
 class TestCliHelp:
@@ -38,7 +38,7 @@ class TestStubCommands:
         assert result.exit_code != 0 or "モード" in result.output or "エラー" in result.output
 
     def test_review_launches_tui(self, tmp_path: Path) -> None:
-        from mizukilens.cache import open_db
+        from prismlens.cache import open_db
         db_path = tmp_path / "review_test.db"
         conn = open_db(db_path)
         conn.close()
@@ -48,8 +48,8 @@ class TestStubCommands:
 
         runner = CliRunner()
         with (
-            patch("mizukilens.cache.open_db", side_effect=mock_open_db),
-            patch("mizukilens.tui.launch_review_tui") as mock_tui,
+            patch("prismlens.cache.open_db", side_effect=mock_open_db),
+            patch("prismlens.tui.launch_review_tui") as mock_tui,
         ):
             result = runner.invoke(main, ["review"])
         assert result.exit_code == 0
@@ -88,19 +88,19 @@ class TestExtractCommand:
         assert "エラー" in result.output
 
     def test_extract_stream_not_in_cache_shows_error(self, tmp_path: Path) -> None:
-        from mizukilens.cache import open_db
+        from prismlens.cache import open_db
         db_path = tmp_path / "test.db"
         conn = open_db(db_path)
         conn.close()
 
-        with patch("mizukilens.cache.open_db", return_value=open_db(db_path)):
+        with patch("prismlens.cache.open_db", return_value=open_db(db_path)):
             runner = CliRunner()
             result = runner.invoke(main, ["extract", "--stream", "nonexistent_vid"])
             assert result.exit_code != 0
             assert "見つかりません" in result.output
 
     def test_extract_stream_success(self, tmp_path: Path) -> None:
-        from mizukilens.cache import open_db, upsert_stream
+        from prismlens.cache import open_db, upsert_stream
         db_path = tmp_path / "test.db"
         conn = open_db(db_path)
         upsert_stream(conn, video_id="vid_test", status="discovered", title="Test Stream")
@@ -122,7 +122,7 @@ class TestExtractCommand:
         mock_downloader.get_comments.return_value = iter([mock_comment])
 
         with (
-            patch("mizukilens.cache.open_db", side_effect=mock_open_db),
+            patch("prismlens.cache.open_db", side_effect=mock_open_db),
             patch(
                 "youtube_comment_downloader.YoutubeCommentDownloader",
                 return_value=mock_downloader,
@@ -135,7 +135,7 @@ class TestExtractCommand:
         assert "完了" in result.output
 
     def test_extract_all_no_discovered_streams(self, tmp_path: Path) -> None:
-        from mizukilens.cache import open_db
+        from prismlens.cache import open_db
         db_path = tmp_path / "test.db"
         conn = open_db(db_path)
         conn.close()
@@ -143,7 +143,7 @@ class TestExtractCommand:
         def mock_open_db(*args, **kwargs):
             return open_db(db_path)
 
-        with patch("mizukilens.cache.open_db", side_effect=mock_open_db):
+        with patch("prismlens.cache.open_db", side_effect=mock_open_db):
             runner = CliRunner()
             result = runner.invoke(main, ["extract", "--all"])
 
@@ -161,8 +161,8 @@ class TestConfigCommand:
 
         # Provide valid UC channel ID via stdin
         with (
-            patch("mizukilens.config.CONFIG_PATH", missing_cfg),
-            patch("mizukilens.config.CONFIG_DIR", tmp_path),
+            patch("prismlens.config.CONFIG_PATH", missing_cfg),
+            patch("prismlens.config.CONFIG_DIR", tmp_path),
         ):
             result = runner.invoke(
                 main,
@@ -180,8 +180,8 @@ class TestConfigCommand:
         missing_cfg = tmp_path / "config.toml"
 
         with (
-            patch("mizukilens.config.CONFIG_PATH", missing_cfg),
-            patch("mizukilens.config.CONFIG_DIR", tmp_path),
+            patch("prismlens.config.CONFIG_PATH", missing_cfg),
+            patch("prismlens.config.CONFIG_DIR", tmp_path),
         ):
             # First input is invalid, second is valid
             result = runner.invoke(
@@ -213,16 +213,16 @@ class TestConfigCommand:
                     "keywords": ["歌回"],
                 },
             },
-            "cache": {"path": "~/.local/share/mizukilens/cache.db"},
-            "export": {"output_dir": "~/.local/share/mizukilens/exports"},
+            "cache": {"path": "~/.local/share/prismlens/cache.db"},
+            "export": {"output_dir": "~/.local/share/prismlens/exports"},
         }
         with cfg_file.open("wb") as fh:
             tomli_w.dump(cfg, fh)
 
         runner = CliRunner()
         with (
-            patch("mizukilens.config.CONFIG_PATH", cfg_file),
-            patch("mizukilens.config.CONFIG_DIR", tmp_path),
+            patch("prismlens.config.CONFIG_PATH", cfg_file),
+            patch("prismlens.config.CONFIG_DIR", tmp_path),
         ):
             # Choose 'q' to quit without modification
             result = runner.invoke(
@@ -242,8 +242,8 @@ class TestConfigCommand:
         missing_cfg = tmp_path / "config.toml"
 
         with (
-            patch("mizukilens.config.CONFIG_PATH", missing_cfg),
-            patch("mizukilens.config.CONFIG_DIR", tmp_path),
+            patch("prismlens.config.CONFIG_PATH", missing_cfg),
+            patch("prismlens.config.CONFIG_DIR", tmp_path),
         ):
             result = runner.invoke(
                 main,
@@ -274,8 +274,8 @@ class TestConfigCommand:
         missing_cfg = tmp_path / "config.toml"
 
         with (
-            patch("mizukilens.config.CONFIG_PATH", missing_cfg),
-            patch("mizukilens.config.CONFIG_DIR", tmp_path),
+            patch("prismlens.config.CONFIG_PATH", missing_cfg),
+            patch("prismlens.config.CONFIG_DIR", tmp_path),
         ):
             result = runner.invoke(
                 main,
@@ -318,10 +318,10 @@ class TestConfigCommand:
 
 
 class TestCandidatesCLI:
-    """Tests for the ``mizukilens candidates`` command group."""
+    """Tests for the ``prismlens candidates`` command group."""
 
     def _make_db_with_candidates(self, tmp_path: Path) -> Path:
-        from mizukilens.cache import open_db, upsert_stream, save_candidate_comments
+        from prismlens.cache import open_db, upsert_stream, save_candidate_comments
 
         db_path = tmp_path / "cand_test.db"
         conn = open_db(db_path)
@@ -346,14 +346,14 @@ class TestCandidatesCLI:
         return db_path
 
     def test_candidates_list_empty(self, tmp_path: Path) -> None:
-        from mizukilens.cache import open_db
+        from prismlens.cache import open_db
 
         db_path = tmp_path / "empty_cand.db"
         conn = open_db(db_path)
         conn.close()
 
         runner = CliRunner()
-        with patch("mizukilens.cache._resolve_cache_path", return_value=db_path):
+        with patch("prismlens.cache._resolve_cache_path", return_value=db_path):
             result = runner.invoke(main, ["candidates"], catch_exceptions=False)
         assert result.exit_code == 0
         assert "ありません" in result.output
@@ -362,7 +362,7 @@ class TestCandidatesCLI:
         db_path = self._make_db_with_candidates(tmp_path)
 
         runner = CliRunner()
-        with patch("mizukilens.cache._resolve_cache_path", return_value=db_path):
+        with patch("prismlens.cache._resolve_cache_path", return_value=db_path):
             result = runner.invoke(main, ["candidates"], catch_exceptions=False)
         assert result.exit_code == 0
         assert "歌單bot" in result.output
@@ -372,7 +372,7 @@ class TestCandidatesCLI:
         db_path = self._make_db_with_candidates(tmp_path)
 
         runner = CliRunner()
-        with patch("mizukilens.cache._resolve_cache_path", return_value=db_path):
+        with patch("prismlens.cache._resolve_cache_path", return_value=db_path):
             result = runner.invoke(
                 main, ["candidates", "--video", "cv1"], catch_exceptions=False
             )
@@ -383,14 +383,14 @@ class TestCandidatesCLI:
         db_path = self._make_db_with_candidates(tmp_path)
 
         # Get the candidate ID
-        from mizukilens.cache import open_db, list_candidate_comments
+        from prismlens.cache import open_db, list_candidate_comments
         conn = open_db(db_path)
         rows = list_candidate_comments(conn, video_id="cv1")
         cand_id = rows[0]["id"]
         conn.close()
 
         runner = CliRunner()
-        with patch("mizukilens.cache._resolve_cache_path", return_value=db_path):
+        with patch("prismlens.cache._resolve_cache_path", return_value=db_path):
             result = runner.invoke(
                 main, ["candidates", "show", str(cand_id)], catch_exceptions=False
             )
@@ -400,14 +400,14 @@ class TestCandidatesCLI:
     def test_candidates_approve(self, tmp_path: Path) -> None:
         db_path = self._make_db_with_candidates(tmp_path)
 
-        from mizukilens.cache import open_db, list_candidate_comments
+        from prismlens.cache import open_db, list_candidate_comments
         conn = open_db(db_path)
         rows = list_candidate_comments(conn, video_id="cv1")
         cand_id = rows[0]["id"]
         conn.close()
 
         runner = CliRunner()
-        with patch("mizukilens.cache._resolve_cache_path", return_value=db_path):
+        with patch("prismlens.cache._resolve_cache_path", return_value=db_path):
             result = runner.invoke(
                 main, ["candidates", "approve", str(cand_id)], catch_exceptions=False
             )
@@ -416,7 +416,7 @@ class TestCandidatesCLI:
 
         # Verify candidate is now approved
         conn = open_db(db_path)
-        from mizukilens.cache import get_candidate_comment
+        from prismlens.cache import get_candidate_comment
         cand = get_candidate_comment(conn, cand_id)
         assert cand["status"] == "approved"
         conn.close()
@@ -424,14 +424,14 @@ class TestCandidatesCLI:
     def test_candidates_reject(self, tmp_path: Path) -> None:
         db_path = self._make_db_with_candidates(tmp_path)
 
-        from mizukilens.cache import open_db, list_candidate_comments
+        from prismlens.cache import open_db, list_candidate_comments
         conn = open_db(db_path)
         rows = list_candidate_comments(conn, video_id="cv1")
         cand_id = rows[1]["id"]
         conn.close()
 
         runner = CliRunner()
-        with patch("mizukilens.cache._resolve_cache_path", return_value=db_path):
+        with patch("prismlens.cache._resolve_cache_path", return_value=db_path):
             result = runner.invoke(
                 main, ["candidates", "reject", str(cand_id)], catch_exceptions=False
             )
@@ -440,7 +440,7 @@ class TestCandidatesCLI:
 
         # Verify candidate is now rejected
         conn = open_db(db_path)
-        from mizukilens.cache import get_candidate_comment
+        from prismlens.cache import get_candidate_comment
         cand = get_candidate_comment(conn, cand_id)
         assert cand["status"] == "rejected"
         conn.close()
@@ -487,7 +487,7 @@ class TestExtractFromTextCLI:
 
     def test_from_text_with_stream_succeeds(self, tmp_path: Path) -> None:
         """Happy path: --from-text + --stream extracts successfully."""
-        from mizukilens.cache import open_db, upsert_stream
+        from prismlens.cache import open_db, upsert_stream
 
         text_file = tmp_path / "songs.txt"
         text_file.write_text(
@@ -502,7 +502,7 @@ class TestExtractFromTextCLI:
         def mock_open_db(*args, **kwargs):
             return open_db(db_path)
 
-        with patch("mizukilens.cache.open_db", side_effect=mock_open_db):
+        with patch("prismlens.cache.open_db", side_effect=mock_open_db):
             runner = CliRunner()
             result = runner.invoke(
                 main,

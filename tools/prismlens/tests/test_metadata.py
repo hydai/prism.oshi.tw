@@ -1,4 +1,4 @@
-"""Tests for mizukilens.metadata — iTunes integration.
+"""Tests for prismlens.metadata — iTunes integration.
 
 Coverage:
   - normalize_artist()
@@ -27,8 +27,8 @@ from unittest.mock import patch
 import pytest
 from click.testing import CliRunner
 
-from mizukilens.cli import main
-from mizukilens.metadata import (
+from prismlens.cli import main
+from prismlens.metadata import (
     STALE_DAYS,
     FetchResult,
     SongStatusRecord,
@@ -79,6 +79,19 @@ def _stale_iso() -> str:
     return (datetime.now(tz=timezone.utc) - timedelta(days=STALE_DAYS + 1)).isoformat()
 
 
+def _make_streamer_data_dir(root: Path, streamer: str = "mizuki") -> Path:
+    """Create the current multi-streamer project layout for CLI tests."""
+    data_root = root / "data"
+    data_root.mkdir()
+    (data_root / "registry.json").write_text(
+        json.dumps({"streamers": [{"slug": streamer, "enabled": True}]}) + "\n",
+        encoding="utf-8",
+    )
+    data_dir = data_root / streamer
+    data_dir.mkdir()
+    return data_dir
+
+
 # ---------------------------------------------------------------------------
 # normalize_artist
 # ---------------------------------------------------------------------------
@@ -113,7 +126,7 @@ class TestFetchItunesMetadata:
     def test_strategy_1_exact_match(self):
         """Strategy 1 (artist + title) succeeds → returns match_confidence='exact'."""
         track = make_itunes_track()
-        with patch("mizukilens.metadata._itunes_search", return_value=[track]) as mock_search:
+        with patch("prismlens.metadata._itunes_search", return_value=[track]) as mock_search:
             result = fetch_itunes_metadata("Test Artist", "Test Song")
         assert result is not None
         assert result["match_confidence"] == "exact"
@@ -136,7 +149,7 @@ class TestFetchItunesMetadata:
                 return []  # artist+title failed
             return [track]  # title-only succeeded
 
-        with patch("mizukilens.metadata._itunes_search", side_effect=side_effect):
+        with patch("prismlens.metadata._itunes_search", side_effect=side_effect):
             result = fetch_itunes_metadata("Test Artist", "Test Song")
 
         assert result["match_confidence"] == "fuzzy"
@@ -144,7 +157,7 @@ class TestFetchItunesMetadata:
 
     def test_all_strategies_no_match(self):
         """All strategies return empty → match_confidence is None, last_error None."""
-        with patch("mizukilens.metadata._itunes_search", return_value=[]):
+        with patch("prismlens.metadata._itunes_search", return_value=[]):
             result = fetch_itunes_metadata("Unknown Artist", "Unknown Song")
 
         assert result["match_confidence"] is None
@@ -152,7 +165,7 @@ class TestFetchItunesMetadata:
 
     def test_timeout_marks_error(self):
         """Timeout on all strategies → last_error='timeout'."""
-        with patch("mizukilens.metadata._itunes_search", side_effect=TimeoutError("timeout")):
+        with patch("prismlens.metadata._itunes_search", side_effect=TimeoutError("timeout")):
             result = fetch_itunes_metadata("Test Artist", "Test Song")
 
         assert result["match_confidence"] is None
@@ -160,7 +173,7 @@ class TestFetchItunesMetadata:
 
     def test_http_error_marks_error(self):
         """HTTP error on all strategies → last_error set."""
-        with patch("mizukilens.metadata._itunes_search",
+        with patch("prismlens.metadata._itunes_search",
                    side_effect=urllib.error.URLError("connection refused")):
             result = fetch_itunes_metadata("Test Artist", "Test Song")
 
@@ -170,7 +183,7 @@ class TestFetchItunesMetadata:
     def test_artwork_url_resizing(self):
         """iTunes artwork URLs are resized from 100x100bb template."""
         track = make_itunes_track()
-        with patch("mizukilens.metadata._itunes_search", return_value=[track]):
+        with patch("prismlens.metadata._itunes_search", return_value=[track]):
             result = fetch_itunes_metadata("Test Artist", "Test Song")
 
         assert result["albumArtUrls"]["small"] == "https://example.com/art60x60bb.jpg"
@@ -181,7 +194,7 @@ class TestFetchItunesMetadata:
     def test_duration_ms_to_seconds(self):
         """trackTimeMillis is converted to seconds."""
         track = make_itunes_track(duration_ms=240000)
-        with patch("mizukilens.metadata._itunes_search", return_value=[track]):
+        with patch("prismlens.metadata._itunes_search", return_value=[track]):
             result = fetch_itunes_metadata("Test Artist", "Test Song")
 
         assert result["trackDuration"] == 240
@@ -189,7 +202,7 @@ class TestFetchItunesMetadata:
     def test_collection_id_extracted(self):
         """collectionId is extracted as itunesCollectionId."""
         track = make_itunes_track()
-        with patch("mizukilens.metadata._itunes_search", return_value=[track]):
+        with patch("prismlens.metadata._itunes_search", return_value=[track]):
             result = fetch_itunes_metadata("Test Artist", "Test Song")
 
         assert result["itunesCollectionId"] == 100
@@ -204,7 +217,7 @@ class TestFetchItunesMetadata:
                 raise TimeoutError("timeout")
             return [track]
 
-        with patch("mizukilens.metadata._itunes_search", side_effect=side_effect):
+        with patch("prismlens.metadata._itunes_search", side_effect=side_effect):
             result = fetch_itunes_metadata("Test Artist", "Test Song")
 
         # Strategy 2 (title-only) should have succeeded
@@ -275,7 +288,7 @@ class TestItunesConditionalStrategies:
             queries.append(query)
             return []  # no match for any
 
-        with patch("mizukilens.metadata._itunes_search", side_effect=side_effect):
+        with patch("prismlens.metadata._itunes_search", side_effect=side_effect):
             result = fetch_itunes_metadata("きくお feat. 初音ミク", "テスト曲")
 
         assert result["match_confidence"] is None
@@ -291,7 +304,7 @@ class TestItunesConditionalStrategies:
             queries.append(query)
             return []
 
-        with patch("mizukilens.metadata._itunes_search", side_effect=side_effect):
+        with patch("prismlens.metadata._itunes_search", side_effect=side_effect):
             result = fetch_itunes_metadata("Artist", "うっせぇわ！")
 
         assert result["match_confidence"] is None
@@ -311,7 +324,7 @@ class TestItunesConditionalStrategies:
                 return []
             return [track]  # cleaned title succeeds
 
-        with patch("mizukilens.metadata._itunes_search", side_effect=side_effect):
+        with patch("prismlens.metadata._itunes_search", side_effect=side_effect):
             result = fetch_itunes_metadata("Artist", "うっせぇわ！")
 
         assert result["match_confidence"] == "fuzzy_cleaned"
@@ -323,7 +336,7 @@ class TestItunesConditionalStrategies:
             queries.append(query)
             return []
 
-        with patch("mizukilens.metadata._itunes_search", side_effect=side_effect):
+        with patch("prismlens.metadata._itunes_search", side_effect=side_effect):
             fetch_itunes_metadata("Test Artist", "Test Song")
 
         # artist+title, title-only = 2
@@ -514,7 +527,7 @@ class TestFetchSongMetadata:
     def test_matched_itunes(self, metadata_dir, song):
         track = make_itunes_track()
 
-        with patch("mizukilens.metadata._itunes_search", return_value=[track]):
+        with patch("prismlens.metadata._itunes_search", return_value=[track]):
             result = fetch_song_metadata(song, metadata_dir)
 
         assert result.art_status == "matched"
@@ -532,13 +545,13 @@ class TestFetchSongMetadata:
         assert artists[0]["normalizedArtist"] == "test artist"
 
     def test_itunes_no_match(self, metadata_dir, song):
-        with patch("mizukilens.metadata._itunes_search", return_value=[]):
+        with patch("prismlens.metadata._itunes_search", return_value=[]):
             result = fetch_song_metadata(song, metadata_dir)
 
         assert result.art_status == "no_match"
 
     def test_itunes_error(self, metadata_dir, song):
-        with patch("mizukilens.metadata._itunes_search", side_effect=TimeoutError("timeout")):
+        with patch("prismlens.metadata._itunes_search", side_effect=TimeoutError("timeout")):
             result = fetch_song_metadata(song, metadata_dir)
 
         assert result.art_status == "error"
@@ -550,7 +563,7 @@ class TestFetchSongMetadata:
     def test_upsert_updates_existing_entry(self, metadata_dir, song):
         """Calling fetch twice updates the existing record (upsert behavior)."""
         track = make_itunes_track()
-        with patch("mizukilens.metadata._itunes_search", return_value=[track]):
+        with patch("prismlens.metadata._itunes_search", return_value=[track]):
             fetch_song_metadata(song, metadata_dir)
             fetch_song_metadata(song, metadata_dir)
 
@@ -564,7 +577,7 @@ class TestFetchSongMetadata:
         song1 = {"id": "song-1", "title": "Song A", "originalArtist": "YOASOBI"}
         song2 = {"id": "song-2", "title": "Song B", "originalArtist": "YOASOBI"}
 
-        with patch("mizukilens.metadata._itunes_search", return_value=[track]):
+        with patch("prismlens.metadata._itunes_search", return_value=[track]):
             fetch_song_metadata(song1, metadata_dir)
             fetch_song_metadata(song2, metadata_dir)
 
@@ -577,7 +590,7 @@ class TestFetchSongMetadata:
         metadata_dir = tmp_path / "brand_new_dir"
         # Don't create it
         track = make_itunes_track()
-        with patch("mizukilens.metadata._itunes_search", return_value=[track]):
+        with patch("prismlens.metadata._itunes_search", return_value=[track]):
             result = fetch_song_metadata(song, metadata_dir)
 
         assert result.art_status == "matched"
@@ -586,7 +599,7 @@ class TestFetchSongMetadata:
     def test_album_art_url_set_to_xl(self, metadata_dir, song):
         """albumArtUrl is set to the XL URL."""
         track = make_itunes_track()
-        with patch("mizukilens.metadata._itunes_search", return_value=[track]):
+        with patch("prismlens.metadata._itunes_search", return_value=[track]):
             fetch_song_metadata(song, metadata_dir)
 
         metadata = json.loads((metadata_dir / "song-metadata.json").read_text())
@@ -602,7 +615,7 @@ class TestRateLimiting:
 
     def test_itunes_rate_limit_respected(self):
         """Two consecutive iTunes calls should have _wait_itunes invoked."""
-        import mizukilens.metadata as m_module
+        import prismlens.metadata as m_module
 
         # Reset last call time to simulate a fresh start
         m_module._last_itunes_call = 0.0
@@ -628,7 +641,7 @@ class TestRateLimiting:
 
     def test_min_interval_enforced(self):
         """The _wait_itunes function sleeps if called too quickly."""
-        import mizukilens.metadata as m_module
+        import prismlens.metadata as m_module
 
         sleep_calls = []
 
@@ -638,7 +651,7 @@ class TestRateLimiting:
         # Set last call to "just happened"
         m_module._last_itunes_call = time.monotonic()
 
-        with patch("mizukilens.metadata.time.sleep", side_effect=mock_sleep):
+        with patch("prismlens.metadata.time.sleep", side_effect=mock_sleep):
             m_module._wait_itunes()
 
         # Should have slept for approximately ITUNES_MIN_INTERVAL_SEC
@@ -652,13 +665,12 @@ class TestRateLimiting:
 # ---------------------------------------------------------------------------
 
 class TestCLIMetadataFetch:
-    """Tests for the `mizukilens metadata fetch` CLI command."""
+    """Tests for the `prismlens metadata fetch` CLI command."""
 
     @pytest.fixture()
     def prism_root(self, tmp_path):
         """Set up a minimal MizukiPrism project root."""
-        data_dir = tmp_path / "data"
-        data_dir.mkdir()
+        data_dir = _make_streamer_data_dir(tmp_path)
         metadata_dir = data_dir / "metadata"
         metadata_dir.mkdir()
 
@@ -687,7 +699,7 @@ class TestCLIMetadataFetch:
 
     def test_fetch_missing_fetches_all_when_none_exist(self, prism_root):
         track = make_itunes_track()
-        with patch("mizukilens.metadata._itunes_search", return_value=[track]):
+        with patch("prismlens.metadata._itunes_search", return_value=[track]):
             result = self._run(["metadata", "fetch", "--missing"], prism_root)
 
         assert result.exit_code == 0
@@ -695,7 +707,7 @@ class TestCLIMetadataFetch:
 
         # Verify files were written
         metadata = json.loads(
-            (prism_root / "data" / "metadata" / "song-metadata.json").read_text()
+            (prism_root / "data" / "mizuki" / "metadata" / "song-metadata.json").read_text()
         )
         assert len(metadata) == 2
 
@@ -703,7 +715,7 @@ class TestCLIMetadataFetch:
         """--missing only fetches songs without any existing metadata."""
         # Pre-populate song-1's metadata
         existing = [{"songId": "song-1", "fetchStatus": "matched", "fetchedAt": _fresh_iso()}]
-        (prism_root / "data" / "metadata" / "song-metadata.json").write_text(
+        (prism_root / "data" / "mizuki" / "metadata" / "song-metadata.json").write_text(
             json.dumps(existing) + "\n", encoding="utf-8"
         )
 
@@ -714,7 +726,7 @@ class TestCLIMetadataFetch:
             fetch_calls.append(query)
             return [track]
 
-        with patch("mizukilens.metadata._itunes_search", side_effect=track_itunes):
+        with patch("prismlens.metadata._itunes_search", side_effect=track_itunes):
             result = self._run(["metadata", "fetch", "--missing"], prism_root)
 
         assert result.exit_code == 0
@@ -729,7 +741,7 @@ class TestCLIMetadataFetch:
             {"songId": "song-1", "fetchStatus": "matched", "fetchedAt": _stale_iso()},  # stale
             {"songId": "song-2", "fetchStatus": "matched", "fetchedAt": _fresh_iso()},  # fresh
         ]
-        (prism_root / "data" / "metadata" / "song-metadata.json").write_text(
+        (prism_root / "data" / "mizuki" / "metadata" / "song-metadata.json").write_text(
             json.dumps(existing) + "\n", encoding="utf-8"
         )
 
@@ -740,7 +752,7 @@ class TestCLIMetadataFetch:
             fetch_calls.append(query)
             return [track]
 
-        with patch("mizukilens.metadata._itunes_search", side_effect=track_itunes):
+        with patch("prismlens.metadata._itunes_search", side_effect=track_itunes):
             result = self._run(["metadata", "fetch", "--stale"], prism_root)
 
         assert result.exit_code == 0
@@ -754,7 +766,7 @@ class TestCLIMetadataFetch:
             {"songId": "song-1", "fetchStatus": "manual", "fetchedAt": _fresh_iso()},
             {"songId": "song-2", "fetchStatus": "matched", "fetchedAt": _fresh_iso()},
         ]
-        (prism_root / "data" / "metadata" / "song-metadata.json").write_text(
+        (prism_root / "data" / "mizuki" / "metadata" / "song-metadata.json").write_text(
             json.dumps(existing) + "\n", encoding="utf-8"
         )
 
@@ -765,7 +777,7 @@ class TestCLIMetadataFetch:
             fetch_calls.append(query)
             return [track]
 
-        with patch("mizukilens.metadata._itunes_search", side_effect=track_itunes):
+        with patch("prismlens.metadata._itunes_search", side_effect=track_itunes):
             result = self._run(["metadata", "fetch", "--all"], prism_root)
 
         assert result.exit_code == 0
@@ -780,7 +792,7 @@ class TestCLIMetadataFetch:
         existing = [
             {"songId": "song-1", "fetchStatus": "manual", "fetchedAt": _fresh_iso()},
         ]
-        (prism_root / "data" / "metadata" / "song-metadata.json").write_text(
+        (prism_root / "data" / "mizuki" / "metadata" / "song-metadata.json").write_text(
             json.dumps(existing) + "\n", encoding="utf-8"
         )
 
@@ -791,7 +803,7 @@ class TestCLIMetadataFetch:
             fetch_calls.append(query)
             return [track]
 
-        with patch("mizukilens.metadata._itunes_search", side_effect=track_itunes):
+        with patch("prismlens.metadata._itunes_search", side_effect=track_itunes):
             result = self._run(["metadata", "fetch", "--all", "--force"], prism_root)
 
         assert result.exit_code == 0
@@ -807,7 +819,7 @@ class TestCLIMetadataFetch:
             fetch_calls.append(query)
             return [track]
 
-        with patch("mizukilens.metadata._itunes_search", side_effect=track_itunes):
+        with patch("prismlens.metadata._itunes_search", side_effect=track_itunes):
             result = self._run(["metadata", "fetch", "--song", "song-1"], prism_root)
 
         assert result.exit_code == 0
@@ -832,7 +844,7 @@ class TestCLIMetadataFetch:
                 raise TimeoutError("timeout")
             return [make_itunes_track()]
 
-        with patch("mizukilens.metadata._itunes_search", side_effect=side_effect):
+        with patch("prismlens.metadata._itunes_search", side_effect=side_effect):
             result = self._run(["metadata", "fetch", "--missing"], prism_root)
 
         assert result.exit_code == 0
@@ -842,7 +854,7 @@ class TestCLIMetadataFetch:
     def test_summary_table_shown(self, prism_root):
         """Summary table is displayed after fetching."""
         track = make_itunes_track()
-        with patch("mizukilens.metadata._itunes_search", return_value=[track]):
+        with patch("prismlens.metadata._itunes_search", return_value=[track]):
             result = self._run(["metadata", "fetch", "--missing"], prism_root)
 
         assert result.exit_code == 0
@@ -856,7 +868,7 @@ class TestCLIMetadataFetch:
             {"songId": "song-1", "fetchStatus": "matched", "fetchedAt": _fresh_iso()},
             {"songId": "song-2", "fetchStatus": "matched", "fetchedAt": _fresh_iso()},
         ]
-        (prism_root / "data" / "metadata" / "song-metadata.json").write_text(
+        (prism_root / "data" / "mizuki" / "metadata" / "song-metadata.json").write_text(
             json.dumps(existing) + "\n", encoding="utf-8"
         )
 
@@ -867,11 +879,11 @@ class TestCLIMetadataFetch:
     def test_fetched_at_is_set(self, prism_root):
         """Each fetched entry has a fetchedAt timestamp."""
         track = make_itunes_track()
-        with patch("mizukilens.metadata._itunes_search", return_value=[track]):
+        with patch("prismlens.metadata._itunes_search", return_value=[track]):
             self._run(["metadata", "fetch", "--missing"], prism_root)
 
         metadata = json.loads(
-            (prism_root / "data" / "metadata" / "song-metadata.json").read_text()
+            (prism_root / "data" / "mizuki" / "metadata" / "song-metadata.json").read_text()
         )
         for entry in metadata:
             assert entry.get("fetchedAt") is not None
@@ -881,11 +893,11 @@ class TestCLIMetadataFetch:
     def test_metadata_schema_has_required_fields(self, prism_root):
         """song-metadata.json entries have all required schema fields."""
         track = make_itunes_track()
-        with patch("mizukilens.metadata._itunes_search", return_value=[track]):
+        with patch("prismlens.metadata._itunes_search", return_value=[track]):
             self._run(["metadata", "fetch", "--missing"], prism_root)
 
         metadata = json.loads(
-            (prism_root / "data" / "metadata" / "song-metadata.json").read_text()
+            (prism_root / "data" / "mizuki" / "metadata" / "song-metadata.json").read_text()
         )
         required_fields = {"songId", "fetchStatus", "albumArtUrl", "albumArtUrls", "fetchedAt", "matchConfidence"}
         for entry in metadata:
@@ -895,11 +907,11 @@ class TestCLIMetadataFetch:
     def test_artist_info_schema_has_required_fields(self, prism_root):
         """artist-info.json entries have all required schema fields."""
         track = make_itunes_track()
-        with patch("mizukilens.metadata._itunes_search", return_value=[track]):
+        with patch("prismlens.metadata._itunes_search", return_value=[track]):
             self._run(["metadata", "fetch", "--missing"], prism_root)
 
         artists = json.loads(
-            (prism_root / "data" / "metadata" / "artist-info.json").read_text()
+            (prism_root / "data" / "mizuki" / "metadata" / "artist-info.json").read_text()
         )
         required_fields = {"normalizedArtist", "originalName", "itunesArtistId", "fetchedAt"}
         for entry in artists:
@@ -909,13 +921,13 @@ class TestCLIMetadataFetch:
     def test_default_mode_is_missing(self, prism_root):
         """Running `metadata fetch` without a mode flag defaults to --missing."""
         track = make_itunes_track()
-        with patch("mizukilens.metadata._itunes_search", return_value=[track]):
+        with patch("prismlens.metadata._itunes_search", return_value=[track]):
             result = self._run(["metadata", "fetch"], prism_root)
 
         assert result.exit_code == 0
         # Should have processed songs (--missing is the default)
         metadata = json.loads(
-            (prism_root / "data" / "metadata" / "song-metadata.json").read_text()
+            (prism_root / "data" / "mizuki" / "metadata" / "song-metadata.json").read_text()
         )
         assert len(metadata) == 2
 
@@ -923,7 +935,7 @@ class TestCLIMetadataFetch:
         """metadata fetch without mode flag processes missing songs."""
         # Pre-populate song-1's metadata (so only song-2 should be fetched)
         existing = [{"songId": "song-1", "fetchStatus": "matched", "fetchedAt": _fresh_iso()}]
-        (prism_root / "data" / "metadata" / "song-metadata.json").write_text(
+        (prism_root / "data" / "mizuki" / "metadata" / "song-metadata.json").write_text(
             json.dumps(existing) + "\n", encoding="utf-8"
         )
 
@@ -934,7 +946,7 @@ class TestCLIMetadataFetch:
             fetch_calls.append(query)
             return [track]
 
-        with patch("mizukilens.metadata._itunes_search", side_effect=track_itunes):
+        with patch("prismlens.metadata._itunes_search", side_effect=track_itunes):
             result = self._run(["metadata", "fetch"], prism_root)
 
         assert result.exit_code == 0
@@ -1101,13 +1113,12 @@ class TestGetMetadataStatus:
 # ---------------------------------------------------------------------------
 
 class TestCLIMetadataStatus:
-    """Tests for the `mizukilens metadata status` CLI command."""
+    """Tests for the `prismlens metadata status` CLI command."""
 
     @pytest.fixture()
     def prism_root(self, tmp_path):
         """Set up a minimal MizukiPrism project root with mixed statuses."""
-        data_dir = tmp_path / "data"
-        data_dir.mkdir()
+        data_dir = _make_streamer_data_dir(tmp_path)
         metadata_dir = data_dir / "metadata"
         metadata_dir.mkdir()
 
@@ -1297,8 +1308,7 @@ class TestCLIMetadataStatus:
 
     def test_all_pending_no_metadata_files(self, tmp_path):
         """When metadata files are absent, all songs show as pending."""
-        data_dir = tmp_path / "data"
-        data_dir.mkdir()
+        data_dir = _make_streamer_data_dir(tmp_path)
         metadata_dir = data_dir / "metadata"
         metadata_dir.mkdir()
         songs = [
@@ -1337,13 +1347,12 @@ class TestCLIMetadataStatus:
 # ---------------------------------------------------------------------------
 
 class TestCLIMetadataOverride:
-    """Tests for the `mizukilens metadata override` CLI command."""
+    """Tests for the `prismlens metadata override` CLI command."""
 
     @pytest.fixture()
     def prism_root(self, tmp_path):
         """Set up a minimal MizukiPrism project root with two songs."""
-        data_dir = tmp_path / "data"
-        data_dir.mkdir()
+        data_dir = _make_streamer_data_dir(tmp_path)
         metadata_dir = data_dir / "metadata"
         metadata_dir.mkdir()
 
@@ -1382,7 +1391,7 @@ class TestCLIMetadataOverride:
         assert result.exit_code == 0
 
         metadata = json.loads(
-            (prism_root / "data" / "metadata" / "song-metadata.json").read_text()
+            (prism_root / "data" / "mizuki" / "metadata" / "song-metadata.json").read_text()
         )
         assert len(metadata) == 1
         entry = metadata[0]
@@ -1400,7 +1409,7 @@ class TestCLIMetadataOverride:
         )
 
         metadata = json.loads(
-            (prism_root / "data" / "metadata" / "song-metadata.json").read_text()
+            (prism_root / "data" / "mizuki" / "metadata" / "song-metadata.json").read_text()
         )
         entry = metadata[0]
         assert entry["albumArtUrls"]["small"] == url
@@ -1417,7 +1426,7 @@ class TestCLIMetadataOverride:
         )
 
         metadata = json.loads(
-            (prism_root / "data" / "metadata" / "song-metadata.json").read_text()
+            (prism_root / "data" / "mizuki" / "metadata" / "song-metadata.json").read_text()
         )
         entry = metadata[0]
         assert entry.get("fetchedAt") is not None
@@ -1432,7 +1441,7 @@ class TestCLIMetadataOverride:
         )
 
         metadata = json.loads(
-            (prism_root / "data" / "metadata" / "song-metadata.json").read_text()
+            (prism_root / "data" / "mizuki" / "metadata" / "song-metadata.json").read_text()
         )
         assert metadata[0]["lastError"] is None
 
@@ -1450,7 +1459,7 @@ class TestCLIMetadataOverride:
                 "lastError": "some error",
             }
         ]
-        (prism_root / "data" / "metadata" / "song-metadata.json").write_text(
+        (prism_root / "data" / "mizuki" / "metadata" / "song-metadata.json").write_text(
             json.dumps(existing) + "\n", encoding="utf-8"
         )
 
@@ -1462,7 +1471,7 @@ class TestCLIMetadataOverride:
         assert result.exit_code == 0
 
         metadata = json.loads(
-            (prism_root / "data" / "metadata" / "song-metadata.json").read_text()
+            (prism_root / "data" / "mizuki" / "metadata" / "song-metadata.json").read_text()
         )
         # Should still have only one entry (upserted, not appended)
         assert len(metadata) == 1
@@ -1484,7 +1493,7 @@ class TestCLIMetadataOverride:
 
         # Entry should still be written
         metadata = json.loads(
-            (prism_root / "data" / "metadata" / "song-metadata.json").read_text()
+            (prism_root / "data" / "mizuki" / "metadata" / "song-metadata.json").read_text()
         )
         assert any(e["songId"] == "song-999" for e in metadata)
 
@@ -1513,14 +1522,14 @@ class TestCLIMetadataOverride:
 
         # Verify manual status is set
         metadata_before = json.loads(
-            (prism_root / "data" / "metadata" / "song-metadata.json").read_text()
+            (prism_root / "data" / "mizuki" / "metadata" / "song-metadata.json").read_text()
         )
         assert metadata_before[0]["fetchStatus"] == "manual"
 
         # Now run `metadata fetch --missing`
         # song-1 already has an entry, so --missing should skip it
         track = make_itunes_track()
-        with patch("mizukilens.metadata._itunes_search", return_value=[track]):
+        with patch("prismlens.metadata._itunes_search", return_value=[track]):
             fetch_result = self._run(
                 ["metadata", "fetch", "--missing"],
                 prism_root,
@@ -1529,7 +1538,7 @@ class TestCLIMetadataOverride:
 
         # song-1's manual entry should be unchanged
         metadata_after = json.loads(
-            (prism_root / "data" / "metadata" / "song-metadata.json").read_text()
+            (prism_root / "data" / "mizuki" / "metadata" / "song-metadata.json").read_text()
         )
         song1_after = next(e for e in metadata_after if e["songId"] == "song-1")
         assert song1_after["fetchStatus"] == "manual"
@@ -1546,7 +1555,7 @@ class TestCLIMetadataOverride:
 
         # Now run `metadata fetch --all --force`
         track = make_itunes_track()
-        with patch("mizukilens.metadata._itunes_search", return_value=[track]):
+        with patch("prismlens.metadata._itunes_search", return_value=[track]):
             fetch_result = self._run(
                 ["metadata", "fetch", "--all", "--force"],
                 prism_root,
@@ -1555,7 +1564,7 @@ class TestCLIMetadataOverride:
 
         # song-1 should now be overwritten (fetchStatus != manual)
         metadata_after = json.loads(
-            (prism_root / "data" / "metadata" / "song-metadata.json").read_text()
+            (prism_root / "data" / "mizuki" / "metadata" / "song-metadata.json").read_text()
         )
         song1_after = next(e for e in metadata_after if e["songId"] == "song-1")
         # After --force, should be 'matched' (from iTunes mock), not 'manual'
@@ -1572,7 +1581,7 @@ class TestCLIMetadataOverride:
         )
 
         metadata = json.loads(
-            (prism_root / "data" / "metadata" / "song-metadata.json").read_text()
+            (prism_root / "data" / "mizuki" / "metadata" / "song-metadata.json").read_text()
         )
         assert metadata[0]["fetchStatus"] == "manual"
 
@@ -1585,7 +1594,7 @@ class TestCLIMetadataOverride:
         )
 
         metadata = json.loads(
-            (prism_root / "data" / "metadata" / "song-metadata.json").read_text()
+            (prism_root / "data" / "mizuki" / "metadata" / "song-metadata.json").read_text()
         )
         assert metadata[0]["matchConfidence"] == "manual"
 
@@ -1622,7 +1631,7 @@ class TestCLIMetadataOverride:
 
         # Now run `metadata fetch --all` WITHOUT --force
         track = make_itunes_track()
-        with patch("mizukilens.metadata._itunes_search", return_value=[track]):
+        with patch("prismlens.metadata._itunes_search", return_value=[track]):
             fetch_result = self._run(
                 ["metadata", "fetch", "--all"],
                 prism_root,
@@ -1631,7 +1640,7 @@ class TestCLIMetadataOverride:
 
         # song-1's manual entry should be unchanged
         metadata_after = json.loads(
-            (prism_root / "data" / "metadata" / "song-metadata.json").read_text()
+            (prism_root / "data" / "mizuki" / "metadata" / "song-metadata.json").read_text()
         )
         song1_after = next(e for e in metadata_after if e["songId"] == "song-1")
         assert song1_after["fetchStatus"] == "manual"
@@ -1648,7 +1657,7 @@ class TestCLIMetadataOverride:
         assert result.exit_code == 0
 
         metadata = json.loads(
-            (prism_root / "data" / "metadata" / "song-metadata.json").read_text()
+            (prism_root / "data" / "mizuki" / "metadata" / "song-metadata.json").read_text()
         )
         assert len(metadata) == 1
         entry = metadata[0]
@@ -1672,7 +1681,7 @@ class TestCLIMetadataOverride:
         assert result.exit_code == 0
 
         metadata = json.loads(
-            (prism_root / "data" / "metadata" / "song-metadata.json").read_text()
+            (prism_root / "data" / "mizuki" / "metadata" / "song-metadata.json").read_text()
         )
         assert len(metadata) == 1
         entry = metadata[0]
@@ -1694,7 +1703,7 @@ class TestCLIMetadataOverride:
         assert result.exit_code == 0
 
         metadata = json.loads(
-            (prism_root / "data" / "metadata" / "song-metadata.json").read_text()
+            (prism_root / "data" / "mizuki" / "metadata" / "song-metadata.json").read_text()
         )
         assert len(metadata) == 1
         entry = metadata[0]
@@ -1709,7 +1718,7 @@ class TestCLIMetadataOverride:
         )
 
         metadata = json.loads(
-            (prism_root / "data" / "metadata" / "song-metadata.json").read_text()
+            (prism_root / "data" / "mizuki" / "metadata" / "song-metadata.json").read_text()
         )
         assert metadata[0]["fetchStatus"] == "manual"
         assert metadata[0]["matchConfidence"] == "manual"
@@ -1730,7 +1739,7 @@ class TestCLIMetadataOverride:
 
         # No metadata should have been written
         metadata = json.loads(
-            (prism_root / "data" / "metadata" / "song-metadata.json").read_text()
+            (prism_root / "data" / "mizuki" / "metadata" / "song-metadata.json").read_text()
         )
         assert len(metadata) == 0
 
@@ -1742,7 +1751,7 @@ class TestCLIMetadataOverride:
         )
 
         track = make_itunes_track()
-        with patch("mizukilens.metadata._itunes_search", return_value=[track]):
+        with patch("prismlens.metadata._itunes_search", return_value=[track]):
             fetch_result = self._run(
                 ["metadata", "fetch", "--missing"],
                 prism_root,
@@ -1750,7 +1759,7 @@ class TestCLIMetadataOverride:
         assert fetch_result.exit_code == 0
 
         metadata = json.loads(
-            (prism_root / "data" / "metadata" / "song-metadata.json").read_text()
+            (prism_root / "data" / "mizuki" / "metadata" / "song-metadata.json").read_text()
         )
         song1 = next(e for e in metadata if e["songId"] == "song-1")
         assert song1["fetchStatus"] == "manual"
@@ -1772,13 +1781,12 @@ class TestCLIMetadataOverride:
 # ---------------------------------------------------------------------------
 
 class TestCLIMetadataClear:
-    """Tests for the `mizukilens metadata clear` CLI command."""
+    """Tests for the `prismlens metadata clear` CLI command."""
 
     @pytest.fixture()
     def prism_root(self, tmp_path):
         """Set up a minimal MizukiPrism project root with two songs and metadata."""
-        data_dir = tmp_path / "data"
-        data_dir.mkdir()
+        data_dir = _make_streamer_data_dir(tmp_path)
         metadata_dir = data_dir / "metadata"
         metadata_dir.mkdir()
 
@@ -1866,7 +1874,7 @@ class TestCLIMetadataClear:
         assert result.exit_code == 0
 
         metadata = json.loads(
-            (prism_root / "data" / "metadata" / "song-metadata.json").read_text()
+            (prism_root / "data" / "mizuki" / "metadata" / "song-metadata.json").read_text()
         )
         song_ids = [e["songId"] for e in metadata]
         assert "song-1" not in song_ids
@@ -1881,7 +1889,7 @@ class TestCLIMetadataClear:
         assert result.exit_code == 0
 
         artist_info = json.loads(
-            (prism_root / "data" / "metadata" / "artist-info.json").read_text()
+            (prism_root / "data" / "mizuki" / "metadata" / "artist-info.json").read_text()
         )
         # Both artist entries should still be present
         normalized = [e["normalizedArtist"] for e in artist_info]
@@ -1919,18 +1927,18 @@ class TestCLIMetadataClear:
     def test_clear_nonexistent_song_id_does_not_modify_files(self, prism_root):
         """When song ID not found, metadata files are not modified."""
         metadata_before = json.loads(
-            (prism_root / "data" / "metadata" / "song-metadata.json").read_text()
+            (prism_root / "data" / "mizuki" / "metadata" / "song-metadata.json").read_text()
         )
         self._run(["metadata", "clear", "song-999", "--force"], prism_root)
         metadata_after = json.loads(
-            (prism_root / "data" / "metadata" / "song-metadata.json").read_text()
+            (prism_root / "data" / "mizuki" / "metadata" / "song-metadata.json").read_text()
         )
         assert len(metadata_before) == len(metadata_after)
 
     def test_clear_song_id_not_in_songs_json_warns(self, prism_root):
         """Clearing a song not in songs.json prints a warning but still clears."""
         # Add song-3 to metadata but NOT to songs.json
-        metadata_path = prism_root / "data" / "metadata" / "song-metadata.json"
+        metadata_path = prism_root / "data" / "mizuki" / "metadata" / "song-metadata.json"
         metadata = json.loads(metadata_path.read_text())
         metadata.append({
             "songId": "song-3",
@@ -1963,7 +1971,7 @@ class TestCLIMetadataClear:
         assert result.exit_code == 0
         # Should NOT have cleared anything
         metadata = json.loads(
-            (prism_root / "data" / "metadata" / "song-metadata.json").read_text()
+            (prism_root / "data" / "mizuki" / "metadata" / "song-metadata.json").read_text()
         )
         assert any(e["songId"] == "song-1" for e in metadata)
 
@@ -1976,7 +1984,7 @@ class TestCLIMetadataClear:
         )
         assert result.exit_code == 0
         metadata = json.loads(
-            (prism_root / "data" / "metadata" / "song-metadata.json").read_text()
+            (prism_root / "data" / "mizuki" / "metadata" / "song-metadata.json").read_text()
         )
         assert not any(e["songId"] == "song-1" for e in metadata)
 
@@ -1991,7 +1999,7 @@ class TestCLIMetadataClear:
         assert result.exit_code == 0
 
         metadata = json.loads(
-            (prism_root / "data" / "metadata" / "song-metadata.json").read_text()
+            (prism_root / "data" / "mizuki" / "metadata" / "song-metadata.json").read_text()
         )
         assert metadata == []
 
@@ -2004,7 +2012,7 @@ class TestCLIMetadataClear:
         assert result.exit_code == 0
 
         artist_info = json.loads(
-            (prism_root / "data" / "metadata" / "artist-info.json").read_text()
+            (prism_root / "data" / "mizuki" / "metadata" / "artist-info.json").read_text()
         )
         # Both artist entries should still be present
         assert len(artist_info) == 2
@@ -2042,7 +2050,7 @@ class TestCLIMetadataClear:
         assert result.exit_code == 0
         # Files should be unchanged
         metadata = json.loads(
-            (prism_root / "data" / "metadata" / "song-metadata.json").read_text()
+            (prism_root / "data" / "mizuki" / "metadata" / "song-metadata.json").read_text()
         )
         assert len(metadata) == 2  # Both entries still present
 
@@ -2065,13 +2073,13 @@ class TestCLIMetadataClear:
 
         # Verify it's gone
         metadata = json.loads(
-            (prism_root / "data" / "metadata" / "song-metadata.json").read_text()
+            (prism_root / "data" / "mizuki" / "metadata" / "song-metadata.json").read_text()
         )
         assert not any(e["songId"] == "song-1" for e in metadata)
 
         # Re-fetch
         track = make_itunes_track()
-        with patch("mizukilens.metadata._itunes_search", return_value=[track]):
+        with patch("prismlens.metadata._itunes_search", return_value=[track]):
             fetch_result = self._run(
                 ["metadata", "fetch", "--song", "song-1"],
                 prism_root,
@@ -2080,7 +2088,7 @@ class TestCLIMetadataClear:
 
         # Verify song-1 is now fetched again
         metadata_after = json.loads(
-            (prism_root / "data" / "metadata" / "song-metadata.json").read_text()
+            (prism_root / "data" / "mizuki" / "metadata" / "song-metadata.json").read_text()
         )
         assert any(e["songId"] == "song-1" for e in metadata_after)
 

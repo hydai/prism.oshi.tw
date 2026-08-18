@@ -1,4 +1,4 @@
-"""Tests for the MizukiLens EndStamp feature (cache + Flask API)."""
+"""Tests for the PrismLens EndStamp feature (cache + Flask API)."""
 
 from __future__ import annotations
 
@@ -11,7 +11,7 @@ import pytest
 
 from unittest.mock import patch
 
-from mizukilens.cache import (
+from prismlens.cache import (
     clear_all_end_timestamps,
     clear_song_end_timestamp,
     get_parsed_songs,
@@ -25,7 +25,7 @@ from mizukilens.cache import (
     upsert_parsed_songs,
     upsert_stream,
 )
-from mizukilens.stamp import create_app
+from prismlens.stamp import create_app
 
 
 # ---------------------------------------------------------------------------
@@ -728,7 +728,7 @@ class TestIndexPage:
     def test_index_returns_html(self, client) -> None:
         resp = client.get("/")
         assert resp.status_code == 200
-        assert b"MizukiLens EndStamp Editor" in resp.data
+        assert b"PrismLens EndStamp Editor" in resp.data
 
 
 # ===========================================================================
@@ -737,7 +737,7 @@ class TestIndexPage:
 
 class TestStampCliRegistration:
     def test_stamp_command_exists(self) -> None:
-        from mizukilens.cli import main
+        from prismlens.cli import main
         from click.testing import CliRunner
 
         runner = CliRunner()
@@ -746,7 +746,7 @@ class TestStampCliRegistration:
         assert "EndStamp" in result.output
 
     def test_stamp_default_options(self) -> None:
-        from mizukilens.cli import main
+        from prismlens.cli import main
         from click.testing import CliRunner
 
         runner = CliRunner()
@@ -1039,7 +1039,7 @@ class TestApiFetchDuration:
         with app.test_client() as c:
             songs = c.get("/api/streams/abc123/songs").get_json()
             song_id = songs[0]["id"]
-            with patch("mizukilens.metadata.fetch_itunes_metadata", _mock_itunes_success):
+            with patch("prismlens.metadata.fetch_itunes_metadata", _mock_itunes_success):
                 resp = c.post(f"/api/songs/{song_id}/fetch-duration")
 
         assert resp.status_code == 200
@@ -1067,7 +1067,7 @@ class TestApiFetchDuration:
         with app.test_client() as c:
             songs = c.get("/api/streams/abc123/songs").get_json()
             song_id = songs[0]["id"]
-            with patch("mizukilens.metadata.fetch_itunes_metadata", _mock_itunes_no_match):
+            with patch("prismlens.metadata.fetch_itunes_metadata", _mock_itunes_no_match):
                 resp = c.post(f"/api/songs/{song_id}/fetch-duration")
 
         assert resp.status_code == 200
@@ -1095,7 +1095,7 @@ class TestApiFetchDuration:
             songs = c.get("/api/streams/abc123/songs").get_json()
             # Song C has artist=None
             song_c_id = songs[2]["id"]
-            with patch("mizukilens.metadata.fetch_itunes_metadata", _mock_itunes_success):
+            with patch("prismlens.metadata.fetch_itunes_metadata", _mock_itunes_success):
                 resp = c.post(f"/api/songs/{song_c_id}/fetch-duration")
 
         assert resp.status_code == 200
@@ -1224,13 +1224,13 @@ class TestApiClearAllEndTimestamps:
 
 class TestDeleteParsedSong:
     def test_delete_returns_video_id(self, populated_db: sqlite3.Connection) -> None:
-        from mizukilens.cache import delete_parsed_song
+        from prismlens.cache import delete_parsed_song
         songs = get_parsed_songs(populated_db, "abc123")
         result = delete_parsed_song(populated_db, songs[1]["id"])
         assert result == "abc123"
 
     def test_delete_removes_song(self, populated_db: sqlite3.Connection) -> None:
-        from mizukilens.cache import delete_parsed_song
+        from prismlens.cache import delete_parsed_song
         songs = get_parsed_songs(populated_db, "abc123")
         delete_parsed_song(populated_db, songs[1]["id"])  # remove Song B
         remaining = get_parsed_songs(populated_db, "abc123")
@@ -1239,7 +1239,7 @@ class TestDeleteParsedSong:
         assert remaining[1]["song_name"] == "Song C"
 
     def test_delete_reindexes(self, populated_db: sqlite3.Connection) -> None:
-        from mizukilens.cache import delete_parsed_song
+        from prismlens.cache import delete_parsed_song
         songs = get_parsed_songs(populated_db, "abc123")
         delete_parsed_song(populated_db, songs[0]["id"])  # remove Song A
         remaining = get_parsed_songs(populated_db, "abc123")
@@ -1247,11 +1247,11 @@ class TestDeleteParsedSong:
         assert remaining[1]["order_index"] == 1
 
     def test_delete_nonexistent_returns_none(self, populated_db: sqlite3.Connection) -> None:
-        from mizukilens.cache import delete_parsed_song
+        from prismlens.cache import delete_parsed_song
         assert delete_parsed_song(populated_db, 99999) is None
 
     def test_delete_last_song(self, populated_db: sqlite3.Connection) -> None:
-        from mizukilens.cache import delete_parsed_song
+        from prismlens.cache import delete_parsed_song
         songs = get_parsed_songs(populated_db, "abc123")
         for s in songs:
             delete_parsed_song(populated_db, s["id"])
@@ -1360,7 +1360,7 @@ class TestApiRefetchStream:
         app.config["TESTING"] = True
         with app.test_client() as c:
             with patch(
-                "mizukilens.extraction.extract_timestamps",
+                "prismlens.extraction.extract_timestamps",
                 return_value=FakeResult(),
             ):
                 resp = c.post("/api/streams/abc123/refetch")
@@ -1391,7 +1391,7 @@ class TestApiRefetchStream:
         app.config["TESTING"] = True
         with app.test_client() as c:
             with patch(
-                "mizukilens.extraction.extract_timestamps",
+                "prismlens.extraction.extract_timestamps",
                 return_value=FakePendingResult(),
             ):
                 resp = c.post("/api/streams/abc123/refetch")

@@ -6,7 +6,7 @@ from copy import deepcopy
 
 import pytest
 
-from mizukilens.fill_artists import (
+from prismlens.fill_artists import (
     FillCandidate,
     apply_fill_plan,
     compute_fill_plan,

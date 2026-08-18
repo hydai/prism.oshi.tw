@@ -1,4 +1,4 @@
-"""Tests for mizukilens.config module."""
+"""Tests for prismlens.config module."""
 
 from __future__ import annotations
 
@@ -10,7 +10,7 @@ from unittest.mock import MagicMock, patch
 
 import pytest
 
-from mizukilens.config import (
+from prismlens.config import (
     CONFIG_PATH,
     DEFAULT_KEYWORDS,
     _default_config,
@@ -102,8 +102,8 @@ class TestSaveLoadConfig:
         config_file = tmp_path / "config.toml"
         # Patch CONFIG_PATH and CONFIG_DIR so writes go to tmp_path
         with (
-            patch("mizukilens.config.CONFIG_PATH", config_file),
-            patch("mizukilens.config.CONFIG_DIR", tmp_path),
+            patch("prismlens.config.CONFIG_PATH", config_file),
+            patch("prismlens.config.CONFIG_DIR", tmp_path),
         ):
             save_config(cfg)
             loaded = load_config()
@@ -117,7 +117,7 @@ class TestSaveLoadConfig:
     def test_load_config_returns_none_when_missing(self, tmp_path: Path) -> None:
         """load_config() returns None when no config file exists."""
         missing_path = tmp_path / "does_not_exist.toml"
-        with patch("mizukilens.config.CONFIG_PATH", missing_path):
+        with patch("prismlens.config.CONFIG_PATH", missing_path):
             result = load_config()
         assert result is None
 
@@ -129,13 +129,13 @@ class TestSaveLoadConfig:
                 "channel_a": {"id": "UCaaaaaaaaaaaaaaaaaaaaaaa", "name": "A", "keywords": []},
                 "channel_b": {"id": "UCbbbbbbbbbbbbbbbbbbbbbbb", "name": "B", "keywords": []},
             },
-            "cache": {"path": "~/.local/share/mizukilens/cache.db"},
-            "export": {"output_dir": "~/.local/share/mizukilens/exports"},
+            "cache": {"path": "~/.local/share/prismlens/cache.db"},
+            "export": {"output_dir": "~/.local/share/prismlens/exports"},
         }
         config_file = tmp_path / "config.toml"
         with (
-            patch("mizukilens.config.CONFIG_PATH", config_file),
-            patch("mizukilens.config.CONFIG_DIR", tmp_path),
+            patch("prismlens.config.CONFIG_PATH", config_file),
+            patch("prismlens.config.CONFIG_DIR", tmp_path),
         ):
             save_config(cfg)
             loaded = load_config()

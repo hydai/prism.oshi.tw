@@ -10,7 +10,7 @@ from unittest.mock import patch
 import pytest
 from click.testing import CliRunner
 
-from mizukilens.cache import (
+from prismlens.cache import (
     get_parsed_songs,
     get_stream,
     list_streams,
@@ -19,8 +19,8 @@ from mizukilens.cache import (
     upsert_parsed_songs,
     upsert_stream,
 )
-from mizukilens.cli import main
-from mizukilens.review_ops import (
+from prismlens.cli import main
+from prismlens.review_ops import (
     _clean_artist_field,
     _has_emoji_artifacts,
     batch_approve,
@@ -287,7 +287,7 @@ class TestBatchApprove:
     def test_approve_confirmation_declined(self, db: sqlite3.Connection) -> None:
         _add_stream(db, "k1", "歌枠")
 
-        with patch("mizukilens.review_ops._confirm", return_value=False):
+        with patch("prismlens.review_ops._confirm", return_value=False):
             count = batch_approve(db, karaoke=True)
         assert count == 0
         assert get_stream(db, "k1")["status"] == "extracted"
@@ -362,7 +362,7 @@ class TestBatchExclude:
     def test_exclude_confirmation_declined(self, db: sqlite3.Connection) -> None:
         _add_stream(db, "g1", "Game")
 
-        with patch("mizukilens.review_ops._confirm", return_value=False):
+        with patch("prismlens.review_ops._confirm", return_value=False):
             count = batch_exclude(db, non_karaoke=True)
         assert count == 0
         assert get_stream(db, "g1")["status"] == "extracted"
@@ -537,8 +537,8 @@ class TestReviewCLIIntegration:
 
         runner = CliRunner()
         with (
-            patch("mizukilens.cache.open_db", side_effect=mock_open_db),
-            patch("mizukilens.tui.launch_review_tui") as mock_tui,
+            patch("prismlens.cache.open_db", side_effect=mock_open_db),
+            patch("prismlens.tui.launch_review_tui") as mock_tui,
         ):
             result = runner.invoke(main, ["review"])
         assert result.exit_code == 0
@@ -557,7 +557,7 @@ class TestReviewCLIIntegration:
         conn.close()
 
         runner = CliRunner()
-        with patch("mizukilens.cache.open_db", return_value=open_db(db_path)):
+        with patch("prismlens.cache.open_db", return_value=open_db(db_path)):
             result = runner.invoke(main, ["review", "report"])
         assert result.exit_code == 0
 
@@ -567,7 +567,7 @@ class TestReviewCLIIntegration:
         conn.close()
 
         runner = CliRunner()
-        with patch("mizukilens.cache.open_db", return_value=open_db(db_path)):
+        with patch("prismlens.cache.open_db", return_value=open_db(db_path)):
             result = runner.invoke(main, ["review", "approve"])
         assert result.exit_code != 0
 
@@ -577,7 +577,7 @@ class TestReviewCLIIntegration:
         conn.close()
 
         runner = CliRunner()
-        with patch("mizukilens.cache.open_db", return_value=open_db(db_path)):
+        with patch("prismlens.cache.open_db", return_value=open_db(db_path)):
             result = runner.invoke(main, ["review", "exclude"])
         assert result.exit_code != 0
 
@@ -588,7 +588,7 @@ class TestReviewCLIIntegration:
         conn.close()
 
         runner = CliRunner()
-        with patch("mizukilens.cache.open_db", return_value=open_db(db_path)):
+        with patch("prismlens.cache.open_db", return_value=open_db(db_path)):
             result = runner.invoke(main, ["review", "approve", "--karaoke", "--dry-run"])
         assert result.exit_code == 0
         assert "Dry run" in result.output
@@ -600,7 +600,7 @@ class TestReviewCLIIntegration:
         conn.close()
 
         runner = CliRunner()
-        with patch("mizukilens.cache.open_db", return_value=open_db(db_path)):
+        with patch("prismlens.cache.open_db", return_value=open_db(db_path)):
             result = runner.invoke(main, ["review", "exclude", "--non-karaoke", "--dry-run"])
         assert result.exit_code == 0
         assert "Dry run" in result.output
@@ -613,7 +613,7 @@ class TestReviewCLIIntegration:
         conn.close()
 
         runner = CliRunner()
-        with patch("mizukilens.cache.open_db", return_value=open_db(db_path)):
+        with patch("prismlens.cache.open_db", return_value=open_db(db_path)):
             result = runner.invoke(main, ["review", "clean", "--dry-run"])
         assert result.exit_code == 0
         assert "Dry run" in result.output or "would be cleaned" in result.output
