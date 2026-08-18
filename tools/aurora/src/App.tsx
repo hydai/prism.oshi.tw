@@ -1,17 +1,11 @@
-import { useState, useRef, useCallback, useEffect, useEffectEvent } from 'react';
-import { ArrowLeft, Plus, FileText, Download, Trash2, Sparkles, Keyboard, Clock, Send, ExternalLink } from 'lucide-react';
-import { extractVideoId, validateYoutubeUrl } from './lib/utils';
-import { YouTubeEmbed, type YouTubeEmbedHandle } from './components/YouTubeEmbed';
-import SongListEditor, { type AuroraSong } from './components/SongListEditor';
-import PasteImportModal from './components/PasteImportModal';
-import ExportModal from './components/ExportModal';
-import AuroraPlayerControls from './components/AuroraPlayerControls';
-import AuroraStampControls from './components/AuroraStampControls';
-import ThemeToggle from './components/ThemeToggle';
-import type { ParsedSong } from './lib/parse';
-import { fetchItunesDuration } from './lib/itunes';
-import { loadNovaStreamers, loadNovaVideoDate, type StreamerOption } from './lib/nova';
+import { useCallback, useEffect, useEffectEvent, useRef, useState } from 'react';
+import AuroraAppView from './components/AuroraAppView';
+import type { YouTubeEmbedHandle } from './components/YouTubeEmbed';
+import { useAuroraSongEditor } from './hooks/useAuroraSongEditor';
+import { useNovaSubmission } from './hooks/useNovaSubmission';
+import { loadNovaStreamers, type StreamerOption } from './lib/nova';
 import { pushRecentVideo } from './lib/recent';
+import { extractVideoId, validateYoutubeUrl } from './lib/utils';
 
 const SHORTCUT_INTERACTIVE_SELECTOR =
   'input, textarea, select, button, a[href], [role="button"], [role="slider"], [contenteditable="true"]';
@@ -20,403 +14,94 @@ function isInteractiveShortcutTarget(target: EventTarget | null): boolean {
   return target instanceof Element && target.closest(SHORTCUT_INTERACTIVE_SELECTOR) !== null;
 }
 
-// --- localStorage helpers ---
-
-function loadSession(videoId: string): AuroraSong[] {
-  try {
-    const raw = localStorage.getItem(`aurora:${videoId}`);
-    return raw ? JSON.parse(raw) : [];
-  } catch { return []; }
-}
-
-function saveSession(videoId: string, songs: AuroraSong[]) {
-  localStorage.setItem(`aurora:${videoId}`, JSON.stringify(songs));
-}
-
 export function App() {
   const [streamers, setStreamers] = useState<StreamerOption[]>([]);
   const [selectedStreamer, setSelectedStreamer] = useState('');
   const [vodUrl, setVodUrl] = useState('');
   const [videoId, setVideoId] = useState<string | null>(null);
   const [urlError, setUrlError] = useState('');
-  const [songs, setSongs] = useState<AuroraSong[]>([]);
-  const [selectedIndex, setSelectedIndex] = useState<number | null>(null);
-  const [showImport, setShowImport] = useState(false);
-  const [showExport, setShowExport] = useState(false);
+  const [activeDialog, setActiveDialog] = useState<'import' | 'export' | null>(null);
   const [showShortcuts, setShowShortcuts] = useState(false);
   const [isPlaying, setIsPlaying] = useState(false);
   const [currentTime, setCurrentTime] = useState(0);
-  const [fillingIndex, setFillingIndex] = useState<number | null>(null);
-  const [bulkFillStatus, setBulkFillStatus] = useState<string | null>(null);
   const playerRef = useRef<YouTubeEmbedHandle>(null);
-  const pendingSaveRef = useRef<{ videoId: string; songs: AuroraSong[] } | null>(null);
 
-  // Fetch available streamers
+  const editor = useAuroraSongEditor(videoId, playerRef);
+  const submission = useNovaSubmission({
+    selectedStreamer,
+    songs: editor.songs,
+    videoId,
+    vodUrl,
+  });
+
   useEffect(() => {
     const controller = new AbortController();
     loadNovaStreamers(controller.signal)
       .then(setStreamers)
-      .catch(() => {}); // Silently fail - user can still use editor without streamer selection
+      .catch(() => {});
     return () => controller.abort();
   }, []);
 
-  // Persist committed song state after a short debounce. Keeping this side
-  // effect outside the state updater lets React replay updates safely.
-  useEffect(() => {
-    if (!videoId) return;
-    const pendingSave = { videoId, songs };
-    pendingSaveRef.current = pendingSave;
-    const timer = setTimeout(() => {
-      saveSession(videoId, songs);
-      if (pendingSaveRef.current === pendingSave) pendingSaveRef.current = null;
-    }, 500);
-    return () => clearTimeout(timer);
-  }, [videoId, songs]);
-
-  // A route change can unmount the editor before the debounce expires.
-  useEffect(() => () => {
-    const pendingSave = pendingSaveRef.current;
-    if (pendingSave) saveSession(pendingSave.videoId, pendingSave.songs);
+  const handleVodUrlChange = useCallback((url: string) => {
+    setVodUrl(url);
+    setUrlError('');
   }, []);
 
-  // Keep song updaters pure; persistence is handled after commit above.
-  const updateSongs = useCallback((updater: (prev: AuroraSong[]) => AuroraSong[]) => {
-    setSongs(updater);
-  }, []);
-
-  // Load video
-  const handleLoadVideo = () => {
+  const handleLoadVideo = useCallback(() => {
     const trimmed = vodUrl.trim();
     if (!validateYoutubeUrl(trimmed)) {
       setUrlError('請輸入有效的 YouTube 網址');
       return;
     }
-    const id = extractVideoId(trimmed);
-    if (!id) {
+
+    const nextVideoId = extractVideoId(trimmed);
+    if (!nextVideoId) {
       setUrlError('無法解析影片 ID');
       return;
     }
-    const pendingSave = pendingSaveRef.current;
-    if (pendingSave) {
-      saveSession(pendingSave.videoId, pendingSave.songs);
-      pendingSaveRef.current = null;
-    }
+
+    editor.loadVideoSession(nextVideoId);
     setUrlError('');
-    setVideoId(id);
-    pushRecentVideo(id);
-    const saved = loadSession(id);
-    setSongs(saved);
-    setSelectedIndex(saved.length > 0 ? 0 : null);
-  };
+    setVideoId(nextVideoId);
+    pushRecentVideo(nextVideoId);
+  }, [editor.loadVideoSession, vodUrl]);
 
-  // Auto-fetch stream date from Nova when video loads
-  useEffect(() => {
-    if (!videoId) return;
-    const controller = new AbortController();
-    setSubmitStreamDate('');
-    const url = vodUrl || `https://youtube.com/watch?v=${videoId}`;
-    loadNovaVideoDate(url, controller.signal)
-      .then((date) => { if (date) setSubmitStreamDate(date); })
-      .catch(() => {});
-    return () => controller.abort();
-  }, [videoId, vodUrl]);
-
-  // Song CRUD
-  const addSong = useCallback(() => {
-    const currentTime = playerRef.current?.getCurrentTime() ?? 0;
-    const startSeconds = Math.floor(currentTime);
-    const newSong: AuroraSong = {
-      id: crypto.randomUUID(),
-      name: '',
-      artist: '',
-      startSeconds,
-      endSeconds: null,
-    };
-    updateSongs((prev) => [...prev, newSong]);
-    setSelectedIndex(songs.length);
-  }, [songs.length, updateSongs]);
-
-  const handleUpdate = useCallback((index: number, patch: Partial<AuroraSong>) => {
-    updateSongs((prev) => prev.map((s, i) => i === index ? { ...s, ...patch } : s));
-  }, [updateSongs]);
-
-  const handleDelete = useCallback((index: number) => {
-    updateSongs((prev) => prev.filter((_, i) => i !== index));
-    setSelectedIndex((prev) => {
-      if (prev === null) return null;
-      if (prev >= index && prev > 0) return prev - 1;
-      return prev;
-    });
-  }, [updateSongs]);
-
-  const handleMove = useCallback((index: number, direction: 'up' | 'down') => {
-    updateSongs((prev) => {
-      const target = direction === 'up' ? index - 1 : index + 1;
-      if (target < 0 || target >= prev.length) return prev;
-      const next = [...prev];
-      [next[index], next[target]] = [next[target]!, next[index]!];
-      return next;
-    });
-    setSelectedIndex((prev) => {
-      if (prev === index) return direction === 'up' ? index - 1 : index + 1;
-      return prev;
-    });
-  }, [updateSongs]);
-
-  const handleImport = useCallback((parsed: ParsedSong[], mode: 'replace' | 'append') => {
-    const newSongs: AuroraSong[] = parsed.map((p) => ({
-      id: crypto.randomUUID(),
-      name: p.songName,
-      artist: p.artist,
-      startSeconds: p.startSeconds,
-      endSeconds: p.endSeconds,
-    }));
-    if (mode === 'replace') {
-      updateSongs(() => newSongs);
-      setSelectedIndex(newSongs.length > 0 ? 0 : null);
-    } else {
-      updateSongs((prev) => [...prev, ...newSongs]);
-      const lastIndex = songs.length + newSongs.length - 1;
-      setSelectedIndex(lastIndex >= 0 ? lastIndex : null);
-    }
-  }, [songs.length, updateSongs]);
-
-  const handleClear = useCallback(() => {
-    if (!window.confirm('確定要清除所有歌曲嗎？此操作無法復原。')) return;
-    updateSongs(() => []);
-    setSelectedIndex(null);
-  }, [updateSongs]);
-
-  // Seek player
-  const handleSeekTo = useCallback((seconds: number) => {
-    playerRef.current?.seekTo(seconds);
-  }, []);
-
-  // Shared action callbacks (used by both keyboard shortcuts and control buttons)
   const handleTogglePlay = useCallback(() => {
     playerRef.current?.togglePlay();
   }, []);
 
   const handleSeekBackward = useCallback(() => {
-    const cur = playerRef.current?.getCurrentTime() ?? 0;
-    playerRef.current?.seekTo(Math.max(0, cur - 5));
+    const current = playerRef.current?.getCurrentTime() ?? 0;
+    playerRef.current?.seekTo(Math.max(0, current - 5));
   }, []);
 
   const handleSeekForward = useCallback(() => {
-    const cur = playerRef.current?.getCurrentTime() ?? 0;
-    playerRef.current?.seekTo(cur + 5);
+    const current = playerRef.current?.getCurrentTime() ?? 0;
+    playerRef.current?.seekTo(current + 5);
   }, []);
 
-  const handleSelectPrev = useCallback(() => {
-    if (songs.length === 0) return;
-    setSelectedIndex((prev) => prev === null ? 0 : Math.max(prev - 1, 0));
-  }, [songs.length]);
+  const handleShortcutKeyDown = useEffectEvent((event: KeyboardEvent) => {
+    if (event.defaultPrevented || isInteractiveShortcutTarget(event.target)) return;
 
-  const handleSelectNext = useCallback(() => {
-    if (songs.length === 0) return;
-    setSelectedIndex((prev) => prev === null ? 0 : Math.min(prev + 1, songs.length - 1));
-  }, [songs.length]);
-
-  const handleSetStart = useCallback(() => {
-    if (selectedIndex === null) return;
-    const time = Math.floor(playerRef.current?.getCurrentTime() ?? 0);
-    handleUpdate(selectedIndex, { startSeconds: time });
-  }, [selectedIndex, handleUpdate]);
-
-  const handleSetEnd = useCallback(() => {
-    if (selectedIndex === null) return;
-    const time = Math.floor(playerRef.current?.getCurrentTime() ?? 0);
-    handleUpdate(selectedIndex, { endSeconds: time });
-  }, [selectedIndex, handleUpdate]);
-
-  const handleSeekToStart = useCallback(() => {
-    if (selectedIndex === null || !songs[selectedIndex]) return;
-    playerRef.current?.seekTo(songs[selectedIndex].startSeconds);
-  }, [selectedIndex, songs]);
-
-  const handleSeekToEnd = useCallback(() => {
-    if (selectedIndex === null || !songs[selectedIndex]) return;
-    const end = songs[selectedIndex].endSeconds;
-    if (end !== null) playerRef.current?.seekTo(end);
-  }, [selectedIndex, songs]);
-
-  // Fill duration from iTunes
-  const handleFillDuration = useCallback(async (index: number) => {
-    const song = songs[index];
-    if (!song || !song.name) return;
-    setFillingIndex(index);
-    try {
-      const { durationSec } = await fetchItunesDuration(song.artist, song.name);
-      if (durationSec !== null) {
-        handleUpdate(index, { endSeconds: song.startSeconds + durationSec });
-      }
-    } finally {
-      setFillingIndex(null);
-    }
-  }, [songs, handleUpdate]);
-
-  const handleFillAllDurations = useCallback(async () => {
-    const targets: { song: AuroraSong; index: number }[] = [];
-    for (let index = 0; index < songs.length; index++) {
-      const song = songs[index]!;
-      if (song.name.trim() !== '') targets.push({ song, index });
-    }
-    if (targets.length === 0) return;
-
-    let filled = 0;
-    let noMatch = 0;
-    for (let ti = 0; ti < targets.length; ti++) {
-      const { song, index } = targets[ti]!;
-      setFillingIndex(index);
-      setBulkFillStatus(`填入中 ${ti + 1}/${targets.length}...`);
-      try {
-        const { durationSec } = await fetchItunesDuration(song.artist, song.name);
-        if (durationSec !== null) {
-          handleUpdate(index, { endSeconds: song.startSeconds + durationSec });
-          filled++;
-        } else {
-          noMatch++;
-        }
-      } catch {
-        noMatch++;
-      }
-    }
-    setFillingIndex(null);
-    setBulkFillStatus(`完成：${filled} 首填入，${noMatch} 首未找到`);
-    setTimeout(() => setBulkFillStatus(null), 5000);
-  }, [songs, handleUpdate]);
-
-  // Submit to Nova
-  const [submitStatus, setSubmitStatus] = useState<{ type: 'success' | 'error'; message: string } | null>(null);
-  const [submitting, setSubmitting] = useState(false);
-  const [showSubmitModal, setShowSubmitModal] = useState(false);
-  const [submitStreamDate, setSubmitStreamDate] = useState('');
-  const [submitNote, setSubmitNote] = useState('');
-  const [turnstileToken, setTurnstileToken] = useState('');
-  const turnstileContainerRef = useRef<HTMLDivElement>(null);
-  const turnstileWidgetIdRef = useRef<string | null>(null);
-
-  // Render Turnstile when submit modal opens
-  useEffect(() => {
-    if (!showSubmitModal || !turnstileContainerRef.current) return;
-
-    const w = window as unknown as { turnstile?: { render: (el: HTMLElement, opts: Record<string, unknown>) => string; remove: (id: string) => void } };
-    if (!w.turnstile) return;
-
-    // Clear any previous widget
-    if (turnstileWidgetIdRef.current) {
-      try { w.turnstile.remove(turnstileWidgetIdRef.current); } catch { /* ignore */ }
-    }
-
-    const widgetId = w.turnstile.render(turnstileContainerRef.current, {
-      sitekey: '0x4AAAAAAClisXs99lkojH74',
-      theme: document.documentElement.classList.contains('dark') ? 'dark' : 'light',
-      callback: (token: string) => setTurnstileToken(token),
-    });
-    turnstileWidgetIdRef.current = widgetId;
-
-    return () => {
-      if (widgetId && w.turnstile) {
-        try { w.turnstile.remove(widgetId); } catch { /* ignore */ }
-      }
-      turnstileWidgetIdRef.current = null;
-      setTurnstileToken('');
-      setSubmitNote('');
-    };
-  }, [showSubmitModal]);
-
-  const handleSubmitToNova = useCallback(async () => {
-    if (!selectedStreamer || songs.length === 0 || !videoId || !turnstileToken) return;
-
-    setSubmitting(true);
-    setSubmitStatus(null);
-
-    try {
-      const vodUrlStr = vodUrl || `https://youtube.com/watch?v=${videoId}`;
-      const submittedSongs: Array<{
-        song_title: string;
-        original_artist: string;
-        start_timestamp: number;
-        end_timestamp: number | null;
-      }> = [];
-      for (const song of songs) {
-        if (song.name.trim() === '') continue;
-        submittedSongs.push({
-          song_title: song.name,
-          original_artist: song.artist,
-          start_timestamp: song.startSeconds,
-          end_timestamp: song.endSeconds,
-        });
-      }
-
-      const body = {
-        streamer_slug: selectedStreamer,
-        video_url: vodUrlStr,
-        songs: submittedSongs,
-        turnstile_token: turnstileToken,
-        stream_date: submitStreamDate || undefined,
-        submitter_note: submitNote || undefined,
-      };
-
-      const res = await fetch('https://nova.oshi.tw/vod/api/submit', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(body),
-      });
-      const data = await res.json();
-
-      if (res.ok) {
-        setSubmitStatus({
-          type: 'success',
-          message: data.resubmitted
-            ? `重新提交成功！ID: ${data.id}`
-            : `提交成功！ID: ${data.id}`,
-        });
-        setShowSubmitModal(false);
-        setSubmitStreamDate('');
-        setSubmitNote('');
-      } else if (res.status === 409) {
-        setSubmitStatus({
-          type: 'error',
-          message: `此 VOD 已於 ${data.submittedAt} 提交過（狀態：${data.status}）`,
-        });
-      } else {
-        setSubmitStatus({
-          type: 'error',
-          message: data.error || '提交失敗，請稍後再試',
-        });
-      }
-    } catch {
-      setSubmitStatus({
-        type: 'error',
-        message: '網路錯誤，請檢查連線後再試',
-      });
-    } finally {
-      setSubmitting(false);
-      setTurnstileToken('');
-      setTimeout(() => setSubmitStatus(null), 8000);
-    }
-  }, [selectedStreamer, songs, videoId, vodUrl, turnstileToken, submitStreamDate, submitNote]);
-
-  // Keyboard shortcuts
-  const handleShortcutKeyDown = useEffectEvent((e: KeyboardEvent) => {
-    if (e.defaultPrevented || isInteractiveShortcutTarget(e.target)) return;
-
-    switch (e.key) {
-      case 't': handleSetStart(); break;
-      case 'm': handleSetEnd(); break;
-      case 's': handleSeekToStart(); break;
-      case 'e': handleSeekToEnd(); break;
-      case 'n': handleSelectNext(); break;
-      case 'p': handleSelectPrev(); break;
-      case 'a': addSong(); break;
+    switch (event.key) {
+      case 't': editor.setStart(); break;
+      case 'm': editor.setEnd(); break;
+      case 's': editor.seekToStart(); break;
+      case 'e': editor.seekToEnd(); break;
+      case 'n': editor.selectNext(); break;
+      case 'p': editor.selectPrevious(); break;
+      case 'a': editor.addSong(); break;
       case ' ': handleTogglePlay(); break;
       case 'ArrowLeft': handleSeekBackward(); break;
       case 'ArrowRight': handleSeekForward(); break;
-      case 'f': if (selectedIndex !== null && fillingIndex === null) handleFillDuration(selectedIndex); break;
+      case 'f':
+        if (editor.selectedIndex !== null && editor.fillingIndex === null) {
+          void editor.fillDuration(editor.selectedIndex);
+        }
+        break;
       default: return;
     }
-    e.preventDefault();
+    event.preventDefault();
   });
 
   useEffect(() => {
@@ -425,353 +110,49 @@ export function App() {
     return () => window.removeEventListener('keydown', handleShortcutKeyDown);
   }, [videoId]);
 
-  // Poll current playback time while playing
   useEffect(() => {
     if (!isPlaying) return;
-    const id = setInterval(() => {
-      const t = playerRef.current?.getCurrentTime();
-      if (t !== undefined) setCurrentTime(t);
+    const timer = setInterval(() => {
+      const nextTime = playerRef.current?.getCurrentTime();
+      if (nextTime !== undefined) setCurrentTime(nextTime);
     }, 250);
-    return () => clearInterval(id);
+    return () => clearInterval(timer);
   }, [isPlaying]);
 
   return (
-    <div className="min-h-screen flex flex-col">
-      {/* Header */}
-      <header className="sticky top-0 z-30 border-b border-[var(--border-default)]" style={{ background: 'var(--bg-surface-frosted)', backdropFilter: 'blur(16px)' }}>
-        <div className="max-w-7xl mx-auto px-4 py-3 flex items-center gap-3">
-          <div className="flex items-center gap-2">
-            <Sparkles size={18} className="text-[var(--accent-purple)]" />
-            <h1 className="text-[17px] font-bold bg-gradient-to-r from-purple-500 to-teal-400 bg-clip-text text-transparent">
-              Aurora
-            </h1>
-          </div>
-          <span className="text-[12px] text-[var(--text-tertiary)] hidden sm:inline">社群時間戳工具</span>
-          <div className="flex-1" />
-
-          {/* Streamer selector */}
-          {streamers.length > 0 && (
-            <select
-              aria-label="選擇 VTuber"
-              value={selectedStreamer}
-              onChange={(e) => setSelectedStreamer(e.target.value)}
-              className="text-[13px] px-2 py-1.5 rounded-lg border border-[var(--border-default)] bg-white/60 dark:bg-white/[0.06] text-[var(--text-secondary)] outline-none focus:border-[var(--accent-purple)]"
-            >
-              <option value="">選擇 VTuber...</option>
-              {streamers.map((s) => (
-                <option key={s.slug} value={s.slug}>{s.display_name}</option>
-              ))}
-            </select>
-          )}
-
-          {/* Cross-links */}
-          {selectedStreamer && (
-            <a
-              href={`https://prism.oshi.tw/${selectedStreamer}`}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="flex items-center gap-1 text-[12px] text-[var(--text-tertiary)] hover:text-[var(--accent-purple)] transition-colors"
-              title="在 Prism 中查看"
-            >
-              <ExternalLink size={12} />
-              <span className="hidden md:inline">Prism</span>
-            </a>
-          )}
-
-          <ThemeToggle />
-        </div>
-      </header>
-
-      {/* Main content */}
-      <main className="flex-1 max-w-7xl mx-auto w-full px-4 py-6">
-        {!videoId ? (
-          /* URL Input */
-          <div className="flex flex-col items-center justify-center min-h-[60vh] gap-6">
-            <div className="text-center">
-              <div className="flex items-center justify-center gap-2 mb-3">
-                <Sparkles size={28} className="text-[var(--accent-purple)]" />
-                <h2 className="text-[28px] font-bold bg-gradient-to-r from-purple-500 to-teal-400 bg-clip-text text-transparent">
-                  Aurora
-                </h2>
-              </div>
-              <p className="text-[var(--text-secondary)] text-[14px]">社群時間戳工具 — 為歌枠直播建立結構化的時間戳列表</p>
-            </div>
-            <div className="w-full max-w-lg">
-              <div className="flex gap-2">
-                <input
-                  aria-label="貼上 YouTube 歌枠網址"
-                  className="flex-1 rounded-xl border border-[var(--border-default)] bg-white/60 dark:bg-white/[0.06] px-4 py-3 text-base outline-none focus:border-[var(--accent-purple)] placeholder:text-[var(--text-tertiary)]"
-                  placeholder="貼上 YouTube 歌枠網址..."
-                  value={vodUrl}
-                  onChange={(e) => { setVodUrl(e.target.value); setUrlError(''); }}
-                  onKeyDown={(e) => { if (e.key === 'Enter') handleLoadVideo(); }}
-                  data-testid="vod-url-input"
-                />
-                <button
-                  onClick={handleLoadVideo}
-                  className="px-5 py-3 rounded-xl bg-[var(--accent-purple)] text-white font-medium text-[14px] hover:opacity-90 transition-opacity shrink-0"
-                  data-testid="load-video-button"
-                >
-                  載入
-                </button>
-              </div>
-              {urlError && (
-                <p className="text-red-500 dark:text-red-400 text-[12px] mt-2" data-testid="url-error">{urlError}</p>
-              )}
-            </div>
-          </div>
-        ) : (
-          /* Workspace */
-          <div className="flex flex-col lg:flex-row gap-6" data-testid="aurora-workspace">
-            {/* Left: YouTube Player */}
-            <div className="lg:w-1/2 flex flex-col gap-4">
-              <YouTubeEmbed ref={playerRef} videoId={videoId} onStateChange={setIsPlaying} />
-              <AuroraPlayerControls
-                isPlaying={isPlaying}
-                currentTime={currentTime}
-                onTogglePlay={handleTogglePlay}
-                onSeekBackward={handleSeekBackward}
-                onSeekForward={handleSeekForward}
-              />
-              <button
-                onClick={() => setShowShortcuts((v) => !v)}
-                className="flex items-center gap-1.5 text-[12px] text-[var(--text-tertiary)] hover:text-[var(--text-secondary)] transition-colors self-start"
-              >
-                <Keyboard size={14} />
-                <span>快捷鍵</span>
-              </button>
-              {showShortcuts && (
-                <div className="rounded-lg border border-[var(--border-default)] bg-white/40 dark:bg-white/[0.04] px-4 py-3">
-                  <p className="text-[11px] text-[var(--text-tertiary)] mb-2">在沒有輸入框聚焦時生效</p>
-                  <div className="grid grid-cols-2 gap-x-6 gap-y-1.5 text-[12px]">
-                    {[
-                      ['T', '設定開始時間'],
-                      ['M', '設定結束時間'],
-                      ['S', '跳轉到開始'],
-                      ['E', '跳轉到結束'],
-                      ['N', '下一首歌'],
-                      ['P', '上一首歌'],
-                      ['A', '新增歌曲'],
-                      ['F', '填入時長'],
-                      ['Space', '播放 / 暫停'],
-                      ['← →', '倒退 / 快進 5 秒'],
-                    ].map(([key, desc]) => (
-                      <div key={key} className="flex items-center gap-2">
-                        <kbd className="min-w-[28px] text-center px-1 py-0.5 rounded bg-white/60 dark:bg-white/[0.06] border border-[var(--border-default)] text-[11px] font-mono font-medium">{key}</kbd>
-                        <span className="text-[var(--text-secondary)]">{desc}</span>
-                      </div>
-                    ))}
-                  </div>
-                </div>
-              )}
-              <p className="text-[12px] text-[var(--text-tertiary)] font-mono truncate">
-                {vodUrl || `https://youtube.com/watch?v=${videoId}`}
-              </p>
-            </div>
-
-            {/* Right: Song List */}
-            <div className="lg:w-1/2 flex flex-col gap-3">
-              {/* Toolbar */}
-              <div className="flex items-center gap-2 flex-wrap">
-                <button
-                  onClick={addSong}
-                  className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-[var(--accent-purple)] text-white text-[13px] font-medium hover:opacity-90"
-                  data-testid="add-song-button"
-                >
-                  <Plus size={14} />
-                  新增歌曲
-                </button>
-                <button
-                  onClick={() => setShowImport(true)}
-                  className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-white/60 dark:bg-white/[0.06] border border-[var(--border-default)] text-[var(--text-secondary)] text-[13px] font-medium hover:bg-white/80 dark:hover:bg-white/[0.10]"
-                  data-testid="import-button"
-                >
-                  <FileText size={14} />
-                  <span className="hidden sm:inline">匯入</span>
-                </button>
-                <button
-                  onClick={() => setShowExport(true)}
-                  disabled={songs.length === 0}
-                  className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-white/60 dark:bg-white/[0.06] border border-[var(--border-default)] text-[var(--text-secondary)] text-[13px] font-medium hover:bg-white/80 dark:hover:bg-white/[0.10] disabled:opacity-40"
-                  data-testid="export-button"
-                >
-                  <Download size={14} />
-                  <span className="hidden sm:inline">匯出</span>
-                </button>
-                <button
-                  onClick={handleFillAllDurations}
-                  disabled={fillingIndex !== null || !songs.some((s) => s.name.trim() !== '')}
-                  className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-white/60 dark:bg-white/[0.06] border border-[var(--border-default)] text-[var(--text-secondary)] text-[13px] font-medium hover:bg-white/80 dark:hover:bg-white/[0.10] disabled:opacity-40"
-                  data-testid="fill-all-durations-button"
-                >
-                  <Clock size={14} className={fillingIndex !== null ? 'animate-spin' : ''} />
-                  <span className="hidden sm:inline">{bulkFillStatus ?? '填入時長'}</span>
-                </button>
-                <button
-                  onClick={() => setShowSubmitModal(true)}
-                  disabled={songs.length === 0 || !selectedStreamer || submitting}
-                  className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-emerald-500 dark:bg-emerald-600 text-white text-[13px] font-medium hover:opacity-90 disabled:opacity-40"
-                  title={!selectedStreamer ? '請先選擇 VTuber' : '提交到 Nova'}
-                  data-testid="submit-to-nova-button"
-                >
-                  <Send size={14} />
-                  <span className="hidden sm:inline">提交 Nova</span>
-                </button>
-                <div className="flex-1" />
-                {songs.length > 0 && (
-                  <button
-                    onClick={handleClear}
-                    className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-red-400 hover:text-red-600 hover:bg-red-50 dark:hover:bg-red-500/10 text-[13px] font-medium"
-                  >
-                    <Trash2 size={14} />
-                    <span className="hidden sm:inline">清除</span>
-                  </button>
-                )}
-              </div>
-
-              {/* Submit status */}
-              {submitStatus && (
-                <div
-                  className={`text-[13px] px-3 py-2 rounded-lg ${
-                    submitStatus.type === 'success' ? 'bg-emerald-50 text-emerald-700 dark:bg-emerald-500/10 dark:text-emerald-400' : 'bg-red-50 text-red-700 dark:bg-red-500/10 dark:text-red-400'
-                  }`}
-                >
-                  {submitStatus.message}
-                </div>
-              )}
-
-              {/* Stamp controls */}
-              <AuroraStampControls
-                selectedIndex={selectedIndex}
-                selectedSong={selectedIndex !== null ? songs[selectedIndex] ?? null : null}
-                onSetStart={handleSetStart}
-                onSetEnd={handleSetEnd}
-                onSeekToStart={handleSeekToStart}
-                onSeekToEnd={handleSeekToEnd}
-              />
-
-              {/* Song list */}
-              <div
-                className="flex-1 rounded-xl border border-[var(--border-default)] p-2 min-h-[300px]"
-                style={{ background: 'var(--bg-surface-frosted)', backdropFilter: 'blur(8px)' }}
-              >
-                <SongListEditor
-                  songs={songs}
-                  selectedIndex={selectedIndex}
-                  onSelect={setSelectedIndex}
-                  onUpdate={handleUpdate}
-                  onDelete={handleDelete}
-                  onMove={handleMove}
-                  onSeekTo={handleSeekTo}
-                  onFillDuration={handleFillDuration}
-                  fillingIndex={fillingIndex}
-                />
-              </div>
-
-              <p className="text-[11px] text-[var(--text-tertiary)]">
-                {songs.length} 首歌曲 {selectedIndex !== null ? `· 已選取 #${selectedIndex + 1}` : ''}
-              </p>
-            </div>
-          </div>
-        )}
-      </main>
-
-      {/* Footer */}
-      <footer className="py-4 text-center">
-        <div className="flex items-center justify-center gap-4 text-[13px]">
-          <a href="https://nova.oshi.tw/vod" className="text-[var(--accent-purple)] hover:opacity-70 transition-opacity">Nova VOD</a>
-          <span className="text-[var(--text-tertiary)]">|</span>
-          <a href="https://prism.oshi.tw" className="text-[var(--accent-purple)] hover:opacity-70 transition-opacity">前往 Prism 歌單</a>
-        </div>
-        <p className="text-[11px] text-[var(--text-tertiary)] mt-4">
-          Prism &mdash; 為你喜愛的 VTuber 打造歌單頁面
-        </p>
-      </footer>
-
-      {/* Modals */}
-      <PasteImportModal
-        open={showImport}
-        onClose={() => setShowImport(false)}
-        onImport={handleImport}
-      />
-      <ExportModal
-        open={showExport}
-        onClose={() => setShowExport(false)}
-        songs={songs}
-        vodUrl={vodUrl || (videoId ? `https://youtube.com/watch?v=${videoId}` : '')}
-      />
-
-      {/* Submit to Nova modal */}
-      {showSubmitModal && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/30 backdrop-blur-sm">
-          <button
-            type="button"
-            className="absolute inset-0"
-            onClick={() => setShowSubmitModal(false)}
-            aria-label="關閉提交到 Nova 對話框"
-          />
-          <div
-            className="relative mx-4 w-full max-w-sm rounded-2xl border border-[var(--border-default)] p-5 shadow-xl"
-            style={{ background: 'var(--bg-surface)' }}
-          >
-            <h3 className="text-[15px] font-semibold mb-2 text-[var(--text-primary)]">提交到 Nova</h3>
-            <p className="text-[13px] text-[var(--text-secondary)] mb-1">
-              VTuber: <strong>{streamers.find((s) => s.slug === selectedStreamer)?.display_name ?? selectedStreamer}</strong>
-            </p>
-            <p className="text-[13px] text-[var(--text-secondary)] mb-4">
-              {songs.filter((s) => s.name.trim() !== '').length} 首歌曲的時間戳
-            </p>
-
-            <div className="flex flex-col gap-3 mb-4">
-              <div>
-                <label htmlFor="aurora-submit-stream-date" className="block text-[13px] text-[var(--text-secondary)] mb-1">
-                  直播日期
-                </label>
-                <input
-                  id="aurora-submit-stream-date"
-                  type="date"
-                  value={submitStreamDate}
-                  onChange={(e) => setSubmitStreamDate(e.target.value)}
-                  className="w-full rounded-lg border border-[var(--border-default)] bg-white/60 dark:bg-white/[0.06] px-3 py-1.5 text-[13px] outline-none focus:border-[var(--accent-purple)]"
-                />
-              </div>
-              <div>
-                <label htmlFor="aurora-submit-note" className="block text-[13px] text-[var(--text-secondary)] mb-1">
-                  備註（選填）
-                </label>
-                <input
-                  id="aurora-submit-note"
-                  type="text"
-                  value={submitNote}
-                  onChange={(e) => setSubmitNote(e.target.value)}
-                  placeholder="任何補充說明（選填）"
-                  className="w-full rounded-lg border border-[var(--border-default)] bg-white/60 dark:bg-white/[0.06] px-3 py-1.5 text-[13px] outline-none focus:border-[var(--accent-purple)] placeholder:text-[var(--text-tertiary)]"
-                />
-              </div>
-            </div>
-
-            <div className="flex justify-center mb-4">
-              <div ref={turnstileContainerRef} />
-            </div>
-
-            <div className="flex gap-2">
-              <button
-                onClick={() => { setShowSubmitModal(false); setSubmitNote(''); }}
-                className="flex-1 px-4 py-2 rounded-lg bg-white/60 dark:bg-white/[0.06] border border-[var(--border-default)] text-[var(--text-secondary)] text-[13px] font-medium hover:bg-white/80 dark:hover:bg-white/[0.10]"
-              >
-                取消
-              </button>
-              <button
-                onClick={handleSubmitToNova}
-                disabled={!turnstileToken || submitting}
-                className="flex-1 px-4 py-2 rounded-lg bg-emerald-500 dark:bg-emerald-600 text-white text-[13px] font-medium hover:opacity-90 disabled:opacity-40"
-              >
-                {submitting ? '提交中...' : '確認提交'}
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
-    </div>
+    <AuroraAppView
+      streamer={{
+        options: streamers,
+        selected: selectedStreamer,
+        onChange: setSelectedStreamer,
+      }}
+      video={{
+        url: vodUrl,
+        id: videoId,
+        error: urlError,
+        onUrlChange: handleVodUrlChange,
+        onLoad: handleLoadVideo,
+      }}
+      player={{
+        ref: playerRef,
+        isPlaying,
+        currentTime,
+        onStateChange: setIsPlaying,
+        onTogglePlay: handleTogglePlay,
+        onSeekBackward: handleSeekBackward,
+        onSeekForward: handleSeekForward,
+      }}
+      editor={editor}
+      shortcuts={{
+        visible: showShortcuts,
+        onToggle: () => setShowShortcuts((visible) => !visible),
+      }}
+      dialogs={{
+        active: activeDialog,
+        open: setActiveDialog,
+        close: () => setActiveDialog(null),
+      }}
+      submission={submission}
+    />
   );
 }
