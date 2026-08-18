@@ -4,7 +4,7 @@
  *
  * Usage: npx tsx tools/sync-registry/sync.ts
  *
- * Follows the same "source → static JSON" pattern as prismlens.
+ * Follows the repository's "source → static JSON" sync pattern.
  * Runs wrangler from tools/nova/ where wrangler.toml binds oshi-prism-nova.
  */
 

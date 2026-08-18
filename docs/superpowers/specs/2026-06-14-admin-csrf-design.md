@@ -133,7 +133,6 @@ headers: {
 | **admin** | `admin/src/` | `admin.oshi.tw` | ✅ 唯一修改對象 |
 | **NOVA** | `tools/nova/src/` | `nova.oshi.tw` | ❌ 獨立 Worker(`/api/submit`、`/vod/api/submit`… 是它自己的) |
 | **Crystal** | `tools/crystal/src/` | crystal 網域 | ❌ 獨立 Worker |
-| **prismlens** | `tools/prismlens/`(Python) | 本地 | ❌ 自帶本地 server 的 `/api/*` |
 
 ### 5.2 關鍵區別:D1 binding(直連)vs. HTTP `/api/*`
 

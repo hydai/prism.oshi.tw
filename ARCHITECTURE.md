@@ -325,8 +325,6 @@ inherit vars from document.body
 | `tools/sync-registry/` | CLI script (tsx) | Nova DB → `data/registry.json` |
 | `tools/sync-data/` | CLI script (tsx) | Admin DB → `data/{slug}/songs.json` & `streams.json` |
 | `admin/` | Cloudflare Worker + React UI | Curator dashboard (review, approve, export) |
-| `tools/prismlens/` | Python CLI + Flask/Textual | YouTube scraper (legacy data pipeline) |
-| `scripts/eximport-all.sh` | Shell script | Batch runner for prismlens eximport |
 
 ### Three D1 Databases
 

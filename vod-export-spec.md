@@ -67,9 +67,9 @@ Admin already exposes curator-only endpoints for one selected streamer:
 - `GET /api/export/songs?streamer={slug}`
 
 They return two unversioned top-level arrays in the current fan-site format.
-They are also consumed by Prismlens, so their routes and response shapes are a
-compatibility boundary and must not be changed by this project. A unified
-format uses separate R2 paths and new types.
+They remain available for existing curator workflows. This project does not
+change their routes or response shapes; any future deprecation should be
+handled separately. A unified format uses separate R2 paths and new types.
 
 ### 3.3 Relationship and canonical-field constraints
 
