@@ -16,7 +16,7 @@ from unittest.mock import patch
 
 import pytest
 
-from mizukilens.cache import (
+from prismlens.cache import (
     get_parsed_songs,
     get_stream,
     open_db,
@@ -24,7 +24,7 @@ from mizukilens.cache import (
     upsert_parsed_songs,
     upsert_stream,
 )
-from mizukilens.export import (
+from prismlens.export import (
     ExportResult,
     _new_song_id,
     _new_version_id,
@@ -144,12 +144,12 @@ class TestTopLevelStructure:
             data = json.load(fh)
         assert data["version"] == "1.0"
 
-    def test_source_is_mizukilens(self, db: sqlite3.Connection, tmp_path: Path) -> None:
+    def test_source_is_prismlens(self, db: sqlite3.Connection, tmp_path: Path) -> None:
         _add_approved_stream(db, songs=[_SONG_A])
         result = export_approved_streams(db, output_dir=tmp_path, channel_id="UCtest")
         with result.output_path.open() as fh:
             data = json.load(fh)
-        assert data["source"] == "mizukilens"
+        assert data["source"] == "prismlens"
 
     def test_channel_id_is_embedded(self, db: sqlite3.Connection, tmp_path: Path) -> None:
         _add_approved_stream(db, songs=[_SONG_A])
@@ -481,7 +481,7 @@ class TestSinceFilter:
         conn.commit()
 
         result_streams = []
-        from mizukilens.export import _load_approved_streams
+        from prismlens.export import _load_approved_streams
         rows = _load_approved_streams(conn, since="2024-02-01")
         assert len(rows) == 0, "Old stream should be excluded by --since"
         conn.close()
@@ -504,7 +504,7 @@ class TestSinceFilter:
         )
         conn.commit()
 
-        from mizukilens.export import _load_approved_streams
+        from prismlens.export import _load_approved_streams
         rows = _load_approved_streams(conn, since="2024-03-01")
         assert len(rows) == 1
         assert rows[0]["video_id"] == "new_vid"
@@ -524,7 +524,7 @@ class TestSinceFilter:
             )
         conn.commit()
 
-        from mizukilens.export import _load_approved_streams
+        from prismlens.export import _load_approved_streams
         rows = _load_approved_streams(conn, since="2024-02-01")
         assert len(rows) == 1
         assert rows[0]["video_id"] == "new"
@@ -711,7 +711,7 @@ class TestExportResult:
         _add_approved_stream(db, songs=[_SONG_A])
         result = export_approved_streams(db, output_dir=tmp_path, channel_id="UCtest")
         name = result.output_path.name
-        assert re.fullmatch(r"mizukilens-export-\d{4}-\d{2}-\d{2}-\d{6}\.json", name), (
+        assert re.fullmatch(r"prismlens-export-\d{4}-\d{2}-\d{2}-\d{6}\.json", name), (
             f"Unexpected filename: {name}"
         )
 
@@ -728,7 +728,7 @@ class TestExportResult:
 # ===========================================================================
 
 class TestExportCli:
-    """Integration tests for the `mizukilens export` CLI command."""
+    """Integration tests for the `prismlens export` CLI command."""
 
     def _make_db_and_open(self, tmp_path: Path) -> sqlite3.Connection:
         db_path = tmp_path / "cli_test.db"
@@ -736,7 +736,7 @@ class TestExportCli:
 
     def test_export_no_approved_shows_message(self, tmp_path: Path) -> None:
         from click.testing import CliRunner
-        from mizukilens.cli import main
+        from prismlens.cli import main
 
         db_path = tmp_path / "cli.db"
         conn = open_db(db_path)
@@ -747,8 +747,8 @@ class TestExportCli:
 
         runner = CliRunner()
         with (
-            patch("mizukilens.cache.open_db", side_effect=mock_open_db),
-            patch("mizukilens.discovery.get_active_channel_info", return_value=("UCtest", [])),
+            patch("prismlens.cache.open_db", side_effect=mock_open_db),
+            patch("prismlens.discovery.get_active_channel_info", return_value=("UCtest", [])),
         ):
             result = runner.invoke(main, ["export"])
 
@@ -757,7 +757,7 @@ class TestExportCli:
 
     def test_export_creates_file_and_shows_summary(self, tmp_path: Path) -> None:
         from click.testing import CliRunner
-        from mizukilens.cli import main
+        from prismlens.cli import main
 
         db_path = tmp_path / "cli.db"
         export_dir = tmp_path / "exports"
@@ -770,7 +770,7 @@ class TestExportCli:
 
         # Patch export to use our tmp_path as output_dir
         original_export = __import__(
-            "mizukilens.export", fromlist=["export_approved_streams"]
+            "prismlens.export", fromlist=["export_approved_streams"]
         ).export_approved_streams
 
         def mock_export(conn, *, since=None, stream_id=None, output_dir=None, channel_id=""):
@@ -781,9 +781,9 @@ class TestExportCli:
 
         runner = CliRunner()
         with (
-            patch("mizukilens.cache.open_db", side_effect=mock_open_db),
-            patch("mizukilens.discovery.get_active_channel_info", return_value=("UCtest", [])),
-            patch("mizukilens.export.export_approved_streams", side_effect=mock_export),
+            patch("prismlens.cache.open_db", side_effect=mock_open_db),
+            patch("prismlens.discovery.get_active_channel_info", return_value=("UCtest", [])),
+            patch("prismlens.export.export_approved_streams", side_effect=mock_export),
         ):
             result = runner.invoke(main, ["export"])
 
@@ -794,7 +794,7 @@ class TestExportCli:
 
     def test_export_since_flag_passed_through(self, tmp_path: Path) -> None:
         from click.testing import CliRunner
-        from mizukilens.cli import main
+        from prismlens.cli import main
 
         db_path = tmp_path / "cli.db"
         conn = open_db(db_path)
@@ -811,9 +811,9 @@ class TestExportCli:
 
         runner = CliRunner()
         with (
-            patch("mizukilens.cache.open_db", side_effect=mock_open_db),
-            patch("mizukilens.discovery.get_active_channel_info", return_value=("UCtest", [])),
-            patch("mizukilens.export.export_approved_streams", side_effect=mock_export),
+            patch("prismlens.cache.open_db", side_effect=mock_open_db),
+            patch("prismlens.discovery.get_active_channel_info", return_value=("UCtest", [])),
+            patch("prismlens.export.export_approved_streams", side_effect=mock_export),
         ):
             result = runner.invoke(main, ["export", "--since", "2024-03-01"])
 
@@ -821,7 +821,7 @@ class TestExportCli:
 
     def test_export_stream_flag_passed_through(self, tmp_path: Path) -> None:
         from click.testing import CliRunner
-        from mizukilens.cli import main
+        from prismlens.cli import main
 
         db_path = tmp_path / "cli.db"
         conn = open_db(db_path)
@@ -838,9 +838,9 @@ class TestExportCli:
 
         runner = CliRunner()
         with (
-            patch("mizukilens.cache.open_db", side_effect=mock_open_db),
-            patch("mizukilens.discovery.get_active_channel_info", return_value=("UCtest", [])),
-            patch("mizukilens.export.export_approved_streams", side_effect=mock_export),
+            patch("prismlens.cache.open_db", side_effect=mock_open_db),
+            patch("prismlens.discovery.get_active_channel_info", return_value=("UCtest", [])),
+            patch("prismlens.export.export_approved_streams", side_effect=mock_export),
         ):
             result = runner.invoke(main, ["export", "--stream", "videoABC"])
 

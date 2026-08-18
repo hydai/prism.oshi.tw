@@ -1,4 +1,4 @@
-"""Tests for the MizukiLens review TUI (LENS-005).
+"""Tests for the PrismLens review TUI (LENS-005).
 
 Uses direct DB state verification and method-level testing.
 Async Textual pilot tests are intentionally avoided because
@@ -14,7 +14,7 @@ from unittest.mock import MagicMock, patch
 
 import pytest
 
-from mizukilens.cache import (
+from prismlens.cache import (
     get_parsed_songs,
     get_stream,
     list_streams,
@@ -23,7 +23,7 @@ from mizukilens.cache import (
     upsert_parsed_songs,
     upsert_stream,
 )
-from mizukilens.tui import (
+from prismlens.tui import (
     CandidateListDialog,
     ConfirmDialog,
     EditSongDialog,
@@ -512,7 +512,7 @@ class TestStatusChangesDirectly:
         app._current_stream_idx = 0
 
         # Call internal method directly (bypass TUI notification)
-        from mizukilens.cache import update_stream_status
+        from prismlens.cache import update_stream_status
         update_stream_status(db, "vid001", "approved")
 
         stream = get_stream(db, "vid001")
@@ -521,7 +521,7 @@ class TestStatusChangesDirectly:
     def test_do_exclude_stream_sets_excluded(self, db: sqlite3.Connection) -> None:
         _add_stream(db, "vid001", status="extracted")
 
-        from mizukilens.cache import update_stream_status
+        from prismlens.cache import update_stream_status
         update_stream_status(db, "vid001", "excluded")
 
         stream = get_stream(db, "vid001")
@@ -530,7 +530,7 @@ class TestStatusChangesDirectly:
     def test_pending_stream_can_be_approved(self, db: sqlite3.Connection) -> None:
         _add_stream(db, "vid001", status="pending")
 
-        from mizukilens.cache import update_stream_status
+        from prismlens.cache import update_stream_status
         update_stream_status(db, "vid001", "approved")
 
         stream = get_stream(db, "vid001")
@@ -569,7 +569,7 @@ class TestRefetchIntegration:
             "youtube_comment_downloader.YoutubeCommentDownloader",
             return_value=mock_downloader,
         ):
-            from mizukilens.extraction import extract_timestamps
+            from prismlens.extraction import extract_timestamps
             result = extract_timestamps(db, "vid001")
 
         assert result.status == "extracted"
@@ -605,9 +605,9 @@ class TestRefetchIntegration:
                 "youtube_comment_downloader.YoutubeCommentDownloader",
                 return_value=mock_downloader,
             ),
-            patch("mizukilens.extraction.get_description_from_ytdlp", return_value=None),
+            patch("prismlens.extraction.get_description_from_ytdlp", return_value=None),
         ):
-            from mizukilens.extraction import extract_timestamps
+            from prismlens.extraction import extract_timestamps
             # Note: extracted → pending is not a valid transition in the cache module.
             # The _safe_transition helper silently skips invalid transitions.
             result = extract_timestamps(db, "vid001")
@@ -629,7 +629,7 @@ class TestCliReviewCommand:
     def test_review_command_calls_launch_tui(self, tmp_path: Path) -> None:
         """Verify the review CLI command invokes launch_review_tui."""
         from click.testing import CliRunner
-        from mizukilens.cli import main
+        from prismlens.cli import main
 
         db_path = tmp_path / "test_review.db"
         conn = open_db(db_path)
@@ -639,8 +639,8 @@ class TestCliReviewCommand:
             return open_db(db_path)
 
         with (
-            patch("mizukilens.cache.open_db", side_effect=mock_open_db),
-            patch("mizukilens.tui.launch_review_tui") as mock_launch,
+            patch("prismlens.cache.open_db", side_effect=mock_open_db),
+            patch("prismlens.tui.launch_review_tui") as mock_launch,
         ):
             runner = CliRunner()
             result = runner.invoke(main, ["review"])
@@ -651,7 +651,7 @@ class TestCliReviewCommand:
     def test_review_command_passes_show_all_flag(self, tmp_path: Path) -> None:
         """Verify --all flag is passed to launch_review_tui."""
         from click.testing import CliRunner
-        from mizukilens.cli import main
+        from prismlens.cli import main
 
         db_path = tmp_path / "test_review_all.db"
         conn = open_db(db_path)
@@ -661,8 +661,8 @@ class TestCliReviewCommand:
             return open_db(db_path)
 
         with (
-            patch("mizukilens.cache.open_db", side_effect=mock_open_db),
-            patch("mizukilens.tui.launch_review_tui") as mock_launch,
+            patch("prismlens.cache.open_db", side_effect=mock_open_db),
+            patch("prismlens.tui.launch_review_tui") as mock_launch,
         ):
             runner = CliRunner()
             result = runner.invoke(main, ["review", "--all"])
@@ -677,7 +677,7 @@ class TestCliReviewCommand:
     def test_review_command_exists(self) -> None:
         """Verify the review command is registered in the CLI."""
         from click.testing import CliRunner
-        from mizukilens.cli import main
+        from prismlens.cli import main
 
         runner = CliRunner()
         result = runner.invoke(main, ["--help"])
@@ -814,7 +814,7 @@ class TestPendingStreamWorkflow:
         _add_stream(db, "vid001", status="pending")
         _add_songs(db, "vid001", count=2)
 
-        from mizukilens.cache import update_stream_status
+        from prismlens.cache import update_stream_status
         update_stream_status(db, "vid001", "approved")
 
         stream = get_stream(db, "vid001")
@@ -1278,7 +1278,7 @@ class TestPasteAction:
         app._current_stream_idx = 0
         app._songs = []
 
-        from mizukilens.extraction import parse_text_to_songs
+        from prismlens.extraction import parse_text_to_songs
         songs = parse_text_to_songs(PASTE_SAMPLE)
 
         with patch.object(app, "notify"):
@@ -1298,7 +1298,7 @@ class TestPasteAction:
         app._current_stream_idx = 0
         app._songs = list(get_parsed_songs(db, "paste02"))
 
-        from mizukilens.extraction import parse_text_to_songs
+        from prismlens.extraction import parse_text_to_songs
         songs = parse_text_to_songs(PASTE_SAMPLE)
 
         with patch.object(app, "notify"):
@@ -1315,7 +1315,7 @@ class TestPasteAction:
         app._current_stream_idx = 0
         app._songs = []
 
-        from mizukilens.extraction import parse_text_to_songs
+        from prismlens.extraction import parse_text_to_songs
         songs = parse_text_to_songs(PASTE_SAMPLE)
 
         with patch.object(app, "notify"):
@@ -1489,7 +1489,7 @@ class TestYearFilter:
         app._show_all = True
         # Only test _load_streams' year extraction, mock _apply_year_filter
         with patch.object(app, "_apply_year_filter"):
-            from mizukilens.cache import list_streams as _ls
+            from prismlens.cache import list_streams as _ls
 
             app._all_streams = list(_ls(db))
             years: set[str] = set()
@@ -1509,7 +1509,7 @@ class TestYearFilter:
         app = ReviewApp(conn=db)
         app._show_all = True
         with patch.object(app, "_apply_year_filter"):
-            from mizukilens.cache import list_streams as _ls
+            from prismlens.cache import list_streams as _ls
 
             app._all_streams = list(_ls(db))
             years: set[str] = set()
@@ -1529,7 +1529,7 @@ class TestYearFilter:
 
         app = ReviewApp(conn=db)
         app._show_all = True
-        from mizukilens.cache import list_streams as _ls
+        from prismlens.cache import list_streams as _ls
 
         app._all_streams = list(_ls(db))
 
@@ -1549,7 +1549,7 @@ class TestYearFilter:
 
         app = ReviewApp(conn=db)
         app._show_all = True
-        from mizukilens.cache import list_streams as _ls
+        from prismlens.cache import list_streams as _ls
 
         app._all_streams = list(_ls(db))
         app._year_filter = None
@@ -1561,7 +1561,7 @@ class TestYearFilter:
         _add_stream(db, "v1", date="2024-03-15")
 
         app = ReviewApp(conn=db)
-        from mizukilens.cache import list_streams as _ls
+        from prismlens.cache import list_streams as _ls
 
         app._all_streams = list(_ls(db))
         app._year_filter = "2099"

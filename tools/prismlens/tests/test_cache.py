@@ -1,4 +1,4 @@
-"""Tests for the MizukiLens SQLite cache module (LENS-002)."""
+"""Tests for the PrismLens SQLite cache module (LENS-002)."""
 
 from __future__ import annotations
 
@@ -10,7 +10,7 @@ from unittest.mock import MagicMock, patch
 import pytest
 from click.testing import CliRunner
 
-from mizukilens.cache import (
+from prismlens.cache import (
     VALID_CANDIDATE_STATUSES,
     VALID_STATUSES,
     VALID_TRANSITIONS,
@@ -36,7 +36,7 @@ from mizukilens.cache import (
     upsert_parsed_songs,
     upsert_stream,
 )
-from mizukilens.cli import main
+from prismlens.cli import main
 
 
 # ---------------------------------------------------------------------------
@@ -138,15 +138,15 @@ class TestDatabaseCreation:
     def test_get_db_path_default(self) -> None:
         """With no override, get_db_path should return a path under ~/.local/share."""
         # load_config is imported inside _resolve_cache_path so patch from the config module
-        with patch("mizukilens.config.load_config", return_value=None):
+        with patch("prismlens.config.load_config", return_value=None):
             path = get_db_path()
-        assert "mizukilens" in str(path)
+        assert "prismlens" in str(path)
         assert path.suffix == ".db"
 
     def test_get_db_path_from_config(self, tmp_path: Path) -> None:
         db_file = tmp_path / "custom.db"
         cfg = {"cache": {"path": str(db_file)}}
-        with patch("mizukilens.config.load_config", return_value=cfg):
+        with patch("prismlens.config.load_config", return_value=cfg):
             path = get_db_path()
         assert path == db_file
 
@@ -494,7 +494,7 @@ class TestCacheClearOperations:
 # ===========================================================================
 
 class TestStatusCLICommand:
-    """Test the ``mizukilens status`` and ``mizukilens status --detail`` commands."""
+    """Test the ``prismlens status`` and ``prismlens status --detail`` commands."""
 
     def _make_db(self, tmp_path: Path) -> Path:
         db_path = tmp_path / "cache.db"
@@ -508,7 +508,7 @@ class TestStatusCLICommand:
     def test_status_shows_counts(self, tmp_path: Path) -> None:
         db_path = self._make_db(tmp_path)
         runner = CliRunner()
-        with patch("mizukilens.cache._resolve_cache_path", return_value=db_path):
+        with patch("prismlens.cache._resolve_cache_path", return_value=db_path):
             result = runner.invoke(main, ["status"], catch_exceptions=False)
         assert result.exit_code == 0
         assert "discovered" in result.output
@@ -518,7 +518,7 @@ class TestStatusCLICommand:
     def test_status_shows_total(self, tmp_path: Path) -> None:
         db_path = self._make_db(tmp_path)
         runner = CliRunner()
-        with patch("mizukilens.cache._resolve_cache_path", return_value=db_path):
+        with patch("prismlens.cache._resolve_cache_path", return_value=db_path):
             result = runner.invoke(main, ["status"], catch_exceptions=False)
         assert result.exit_code == 0
         assert "Total" in result.output
@@ -526,7 +526,7 @@ class TestStatusCLICommand:
     def test_status_detail_shows_streams(self, tmp_path: Path) -> None:
         db_path = self._make_db(tmp_path)
         runner = CliRunner()
-        with patch("mizukilens.cache._resolve_cache_path", return_value=db_path):
+        with patch("prismlens.cache._resolve_cache_path", return_value=db_path):
             result = runner.invoke(main, ["status", "--detail"], catch_exceptions=False)
         assert result.exit_code == 0
         assert "v1" in result.output
@@ -536,7 +536,7 @@ class TestStatusCLICommand:
     def test_status_detail_shows_all_streams(self, tmp_path: Path) -> None:
         db_path = self._make_db(tmp_path)
         runner = CliRunner()
-        with patch("mizukilens.cache._resolve_cache_path", return_value=db_path):
+        with patch("prismlens.cache._resolve_cache_path", return_value=db_path):
             result = runner.invoke(main, ["status", "--detail"], catch_exceptions=False)
         assert result.exit_code == 0
         assert "v1" in result.output
@@ -548,7 +548,7 @@ class TestStatusCLICommand:
         conn = open_db(db_path)
         conn.close()
         runner = CliRunner()
-        with patch("mizukilens.cache._resolve_cache_path", return_value=db_path):
+        with patch("prismlens.cache._resolve_cache_path", return_value=db_path):
             result = runner.invoke(main, ["status"], catch_exceptions=False)
         assert result.exit_code == 0
         assert "0" in result.output  # all counts are 0
@@ -559,7 +559,7 @@ class TestStatusCLICommand:
 # ===========================================================================
 
 class TestCacheClearCLICommand:
-    """Test the ``mizukilens cache clear`` command."""
+    """Test the ``prismlens cache clear`` command."""
 
     def _make_db_with_streams(self, tmp_path: Path) -> Path:
         db_path = tmp_path / "cache.db"
@@ -572,7 +572,7 @@ class TestCacheClearCLICommand:
     def test_cache_clear_all_with_confirm(self, tmp_path: Path) -> None:
         db_path = self._make_db_with_streams(tmp_path)
         runner = CliRunner()
-        with patch("mizukilens.cache._resolve_cache_path", return_value=db_path):
+        with patch("prismlens.cache._resolve_cache_path", return_value=db_path):
             result = runner.invoke(
                 main, ["cache", "clear"], input="y\n", catch_exceptions=False
             )
@@ -585,7 +585,7 @@ class TestCacheClearCLICommand:
     def test_cache_clear_all_aborted(self, tmp_path: Path) -> None:
         db_path = self._make_db_with_streams(tmp_path)
         runner = CliRunner()
-        with patch("mizukilens.cache._resolve_cache_path", return_value=db_path):
+        with patch("prismlens.cache._resolve_cache_path", return_value=db_path):
             result = runner.invoke(
                 main, ["cache", "clear"], input="n\n", catch_exceptions=False
             )
@@ -598,7 +598,7 @@ class TestCacheClearCLICommand:
     def test_cache_clear_stream_with_confirm(self, tmp_path: Path) -> None:
         db_path = self._make_db_with_streams(tmp_path)
         runner = CliRunner()
-        with patch("mizukilens.cache._resolve_cache_path", return_value=db_path):
+        with patch("prismlens.cache._resolve_cache_path", return_value=db_path):
             result = runner.invoke(
                 main, ["cache", "clear", "--stream", "v1"],
                 input="y\n", catch_exceptions=False,
@@ -612,7 +612,7 @@ class TestCacheClearCLICommand:
     def test_cache_clear_stream_aborted(self, tmp_path: Path) -> None:
         db_path = self._make_db_with_streams(tmp_path)
         runner = CliRunner()
-        with patch("mizukilens.cache._resolve_cache_path", return_value=db_path):
+        with patch("prismlens.cache._resolve_cache_path", return_value=db_path):
             result = runner.invoke(
                 main, ["cache", "clear", "--stream", "v1"],
                 input="n\n", catch_exceptions=False,
@@ -625,7 +625,7 @@ class TestCacheClearCLICommand:
     def test_cache_clear_missing_stream_reports_not_found(self, tmp_path: Path) -> None:
         db_path = self._make_db_with_streams(tmp_path)
         runner = CliRunner()
-        with patch("mizukilens.cache._resolve_cache_path", return_value=db_path):
+        with patch("prismlens.cache._resolve_cache_path", return_value=db_path):
             result = runner.invoke(
                 main, ["cache", "clear", "--stream", "no_such_id"],
                 input="y\n", catch_exceptions=False,
@@ -636,7 +636,7 @@ class TestCacheClearCLICommand:
     def test_cache_clear_confirmation_prompt_shown(self, tmp_path: Path) -> None:
         db_path = self._make_db_with_streams(tmp_path)
         runner = CliRunner()
-        with patch("mizukilens.cache._resolve_cache_path", return_value=db_path):
+        with patch("prismlens.cache._resolve_cache_path", return_value=db_path):
             result = runner.invoke(
                 main, ["cache", "clear"], input="n\n", catch_exceptions=False
             )
@@ -1195,7 +1195,7 @@ class TestCacheFillDurations:
         """Return a mock open_db that yields db but prevents close()."""
         mock_db = MagicMock(wraps=db)
         mock_db.close = MagicMock()  # no-op close to keep fixture alive
-        return patch("mizukilens.cache.open_db", return_value=mock_db)
+        return patch("prismlens.cache.open_db", return_value=mock_db)
 
     def test_dry_run_no_changes(self, db: sqlite3.Connection, tmp_path: Path) -> None:
         """Dry run previews changes but doesn't write."""
@@ -1207,7 +1207,7 @@ class TestCacheFillDurations:
 
         runner = CliRunner()
         with self._mock_open_db(db), \
-             patch("mizukilens.metadata.fetch_itunes_metadata", return_value=_make_itunes_result(240)):
+             patch("prismlens.metadata.fetch_itunes_metadata", return_value=_make_itunes_result(240)):
             result = runner.invoke(main, ["cache", "fill-durations", "--dry-run"])
 
         assert result.exit_code == 0
@@ -1226,7 +1226,7 @@ class TestCacheFillDurations:
 
         runner = CliRunner()
         with self._mock_open_db(db), \
-             patch("mizukilens.metadata.fetch_itunes_metadata", return_value=_make_itunes_result(240)):
+             patch("prismlens.metadata.fetch_itunes_metadata", return_value=_make_itunes_result(240)):
             result = runner.invoke(main, ["cache", "fill-durations"])
 
         assert result.exit_code == 0
@@ -1246,7 +1246,7 @@ class TestCacheFillDurations:
         no_match = {"match_confidence": None, "last_error": None}
         runner = CliRunner()
         with self._mock_open_db(db), \
-             patch("mizukilens.metadata.fetch_itunes_metadata", return_value=no_match):
+             patch("prismlens.metadata.fetch_itunes_metadata", return_value=no_match):
             result = runner.invoke(main, ["cache", "fill-durations"])
 
         assert result.exit_code == 0
@@ -1268,7 +1268,7 @@ class TestCacheFillDurations:
 
         runner = CliRunner()
         with self._mock_open_db(db), \
-             patch("mizukilens.metadata.fetch_itunes_metadata", return_value=_make_itunes_result(180)):
+             patch("prismlens.metadata.fetch_itunes_metadata", return_value=_make_itunes_result(180)):
             result = runner.invoke(main, ["cache", "fill-durations", "--stream", "vid1"])
 
         assert result.exit_code == 0
@@ -1287,7 +1287,7 @@ class TestCacheFillDurations:
 
         runner = CliRunner()
         with self._mock_open_db(db), \
-             patch("mizukilens.metadata.fetch_itunes_metadata", side_effect=Exception("network")):
+             patch("prismlens.metadata.fetch_itunes_metadata", side_effect=Exception("network")):
             result = runner.invoke(main, ["cache", "fill-durations"])
 
         assert result.exit_code == 0

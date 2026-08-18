@@ -1,4 +1,4 @@
-/* MizukiLens EndStamp Editor — served directly by Flask from stamp_static. */
+/* PrismLens EndStamp Editor — served directly by Flask from stamp_static. */
 
 (function () {
   "use strict";

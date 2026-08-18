@@ -1,4 +1,4 @@
-"""Tests for mizukilens.discovery — stream discovery module.
+"""Tests for prismlens.discovery — stream discovery module.
 
 All tests mock scrapetube.get_channel() so NO real YouTube API calls are made.
 """
@@ -12,8 +12,8 @@ from unittest.mock import MagicMock, patch
 
 import pytest
 
-from mizukilens.cache import get_stream, list_streams, open_db
-from mizukilens.discovery import (
+from prismlens.cache import get_stream, list_streams, open_db
+from prismlens.discovery import (
     FetchResult,
     NetworkError,
     _is_upcoming_stream,
@@ -31,7 +31,7 @@ from mizukilens.discovery import (
 
 @pytest.fixture()
 def mem_db() -> Generator[sqlite3.Connection, None, None]:
-    """In-memory SQLite database with MizukiLens schema initialised."""
+    """In-memory SQLite database with PrismLens schema initialised."""
     conn = open_db(":memory:")
     yield conn
     conn.close()
@@ -162,8 +162,8 @@ class TestGetActiveChannelInfo:
         return {
             "default": {"active_channel": "mizuki"},
             "channels": {"mizuki": {"id": channel_id, "name": "Mizuki", "keywords": keywords}},
-            "cache": {"path": "~/.local/share/mizukilens/cache.db"},
-            "export": {"output_dir": "~/.local/share/mizukilens/exports"},
+            "cache": {"path": "~/.local/share/prismlens/cache.db"},
+            "export": {"output_dir": "~/.local/share/prismlens/exports"},
         }
 
     def test_returns_channel_id_and_keywords(self) -> None:
@@ -174,7 +174,7 @@ class TestGetActiveChannelInfo:
         assert "singing" in kws
 
     def test_raises_when_no_config(self) -> None:
-        with patch("mizukilens.config.load_config", return_value=None):
+        with patch("prismlens.config.load_config", return_value=None):
             with pytest.raises(RuntimeError, match="設定ファイル"):
                 get_active_channel_info()
 
@@ -202,7 +202,7 @@ class TestGetActiveChannelInfo:
             "channels": {"mizuki": {"id": "UCtest1234567890123456789", "name": "Mizuki"}},
         }
         _, kws = get_active_channel_info(cfg=cfg)
-        from mizukilens.config import DEFAULT_KEYWORDS
+        from prismlens.config import DEFAULT_KEYWORDS
         assert kws == DEFAULT_KEYWORDS
 
 
@@ -243,7 +243,7 @@ class TestFetchStreamsBasic:
 
     def test_fetch_skips_already_cached(self, mem_db: sqlite3.Connection) -> None:
         """Streams already in cache (non-excluded, non-imported) are counted as existing."""
-        from mizukilens.cache import upsert_stream
+        from prismlens.cache import upsert_stream
 
         upsert_stream(mem_db, video_id="vid1", status="discovered", title="already cached")
 
@@ -263,7 +263,7 @@ class TestFetchStreamsBasic:
 
     def test_fetch_skips_excluded_without_force(self, mem_db: sqlite3.Connection) -> None:
         """Excluded streams are skipped unless --force."""
-        from mizukilens.cache import upsert_stream
+        from prismlens.cache import upsert_stream
 
         upsert_stream(mem_db, video_id="vid1", status="excluded", title="excluded stream")
 
@@ -286,11 +286,11 @@ class TestFetchStreamsBasic:
 
     def test_fetch_skips_imported_without_force(self, mem_db: sqlite3.Connection) -> None:
         """Imported streams are skipped unless --force."""
-        from mizukilens.cache import upsert_stream
+        from prismlens.cache import upsert_stream
 
         upsert_stream(mem_db, video_id="vid1", status="discovered", title="stream")
         # transition to imported via valid steps: discovered→extracted→approved→exported→imported
-        from mizukilens.cache import update_stream_status
+        from prismlens.cache import update_stream_status
         update_stream_status(mem_db, "vid1", "extracted")
         update_stream_status(mem_db, "vid1", "approved")
         update_stream_status(mem_db, "vid1", "exported")
@@ -479,7 +479,7 @@ class TestFetchStreamsForce:
 
     def test_force_reprocesses_excluded(self, mem_db: sqlite3.Connection) -> None:
         """--force causes excluded streams to be re-saved as 'discovered'."""
-        from mizukilens.cache import upsert_stream
+        from prismlens.cache import upsert_stream
 
         upsert_stream(mem_db, video_id="vid1", status="excluded", title="excluded stream")
 
@@ -500,7 +500,7 @@ class TestFetchStreamsForce:
 
     def test_force_reprocesses_imported(self, mem_db: sqlite3.Connection) -> None:
         """--force causes imported streams to be re-saved as 'discovered'."""
-        from mizukilens.cache import upsert_stream, update_stream_status
+        from prismlens.cache import upsert_stream, update_stream_status
 
         upsert_stream(mem_db, video_id="vid1", status="discovered", title="stream")
         update_stream_status(mem_db, "vid1", "extracted")
@@ -753,13 +753,13 @@ class TestFetchCmdCli:
         return {
             "default": {"active_channel": "mizuki"},
             "channels": {"mizuki": {"id": "UCtest1234567890123456789", "name": "Mizuki", "keywords": ["歌回"]}},
-            "cache": {"path": "~/.local/share/mizukilens/cache.db"},
-            "export": {"output_dir": "~/.local/share/mizukilens/exports"},
+            "cache": {"path": "~/.local/share/prismlens/cache.db"},
+            "export": {"output_dir": "~/.local/share/prismlens/exports"},
         }
 
     def test_fetch_no_mode_exits_with_error(self) -> None:
         from click.testing import CliRunner
-        from mizukilens.cli import main
+        from prismlens.cli import main
 
         runner = CliRunner()
         result = runner.invoke(main, ["fetch"])
@@ -767,7 +767,7 @@ class TestFetchCmdCli:
 
     def test_fetch_all_and_recent_mutually_exclusive(self) -> None:
         from click.testing import CliRunner
-        from mizukilens.cli import main
+        from prismlens.cli import main
 
         runner = CliRunner()
         result = runner.invoke(main, ["fetch", "--all", "--recent", "5"])
@@ -775,7 +775,7 @@ class TestFetchCmdCli:
 
     def test_fetch_before_without_after_is_error(self) -> None:
         from click.testing import CliRunner
-        from mizukilens.cli import main
+        from prismlens.cli import main
 
         runner = CliRunner()
         result = runner.invoke(main, ["fetch", "--before", "2024-03-01"])
@@ -784,15 +784,15 @@ class TestFetchCmdCli:
     def test_fetch_all_success(self, tmp_path) -> None:
         """fetch --all with mocked scrapetube shows success summary."""
         from click.testing import CliRunner
-        from mizukilens.cli import main
+        from prismlens.cli import main
 
         videos = [_make_video("vid1", "歌回テスト", "2024-01-01")]
         db_path = tmp_path / "cache.db"
 
         runner = CliRunner()
         with (
-            patch("mizukilens.config.load_config", return_value=self._make_cfg()),
-            patch("mizukilens.cache._resolve_cache_path", return_value=db_path),
+            patch("prismlens.config.load_config", return_value=self._make_cfg()),
+            patch("prismlens.cache._resolve_cache_path", return_value=db_path),
             patch("scrapetube.get_channel", return_value=iter(videos)),
         ):
             result = runner.invoke(main, ["fetch", "--all"], catch_exceptions=False)
@@ -803,7 +803,7 @@ class TestFetchCmdCli:
     def test_fetch_all_network_error_shows_message(self, tmp_path) -> None:
         """fetch --all shows friendly message on network error."""
         from click.testing import CliRunner
-        from mizukilens.cli import main
+        from prismlens.cli import main
 
         def failing_gen():
             raise ConnectionError("no network")
@@ -813,8 +813,8 @@ class TestFetchCmdCli:
 
         runner = CliRunner()
         with (
-            patch("mizukilens.config.load_config", return_value=self._make_cfg()),
-            patch("mizukilens.cache._resolve_cache_path", return_value=db_path),
+            patch("prismlens.config.load_config", return_value=self._make_cfg()),
+            patch("prismlens.cache._resolve_cache_path", return_value=db_path),
             patch("scrapetube.get_channel", return_value=failing_gen()),
         ):
             result = runner.invoke(main, ["fetch", "--all"], catch_exceptions=False)
@@ -824,14 +824,14 @@ class TestFetchCmdCli:
     def test_fetch_recent_passes_limit(self, tmp_path) -> None:
         """fetch --recent 3 passes limit=3 to scrapetube."""
         from click.testing import CliRunner
-        from mizukilens.cli import main
+        from prismlens.cli import main
 
         db_path = tmp_path / "cache.db"
 
         runner = CliRunner()
         with (
-            patch("mizukilens.config.load_config", return_value=self._make_cfg()),
-            patch("mizukilens.cache._resolve_cache_path", return_value=db_path),
+            patch("prismlens.config.load_config", return_value=self._make_cfg()),
+            patch("prismlens.cache._resolve_cache_path", return_value=db_path),
             patch("scrapetube.get_channel", return_value=iter([])) as mock_sc,
         ):
             result = runner.invoke(main, ["fetch", "--recent", "3"], catch_exceptions=False)
@@ -843,14 +843,14 @@ class TestFetchCmdCli:
     def test_fetch_after_date_mode(self, tmp_path) -> None:
         """fetch --after YYYY-MM-DD runs without error."""
         from click.testing import CliRunner
-        from mizukilens.cli import main
+        from prismlens.cli import main
 
         db_path = tmp_path / "cache.db"
 
         runner = CliRunner()
         with (
-            patch("mizukilens.config.load_config", return_value=self._make_cfg()),
-            patch("mizukilens.cache._resolve_cache_path", return_value=db_path),
+            patch("prismlens.config.load_config", return_value=self._make_cfg()),
+            patch("prismlens.cache._resolve_cache_path", return_value=db_path),
             patch("scrapetube.get_channel", return_value=iter([])),
         ):
             result = runner.invoke(main, ["fetch", "--after", "2024-01-01"], catch_exceptions=False)
@@ -860,14 +860,14 @@ class TestFetchCmdCli:
     def test_fetch_force_flag(self, tmp_path) -> None:
         """fetch --all --force runs without error."""
         from click.testing import CliRunner
-        from mizukilens.cli import main
+        from prismlens.cli import main
 
         db_path = tmp_path / "cache.db"
 
         runner = CliRunner()
         with (
-            patch("mizukilens.config.load_config", return_value=self._make_cfg()),
-            patch("mizukilens.cache._resolve_cache_path", return_value=db_path),
+            patch("prismlens.config.load_config", return_value=self._make_cfg()),
+            patch("prismlens.cache._resolve_cache_path", return_value=db_path),
             patch("scrapetube.get_channel", return_value=iter([])),
         ):
             result = runner.invoke(main, ["fetch", "--all", "--force"], catch_exceptions=False)
@@ -877,10 +877,10 @@ class TestFetchCmdCli:
     def test_fetch_no_config_shows_error(self) -> None:
         """fetch --all shows config error when no config exists."""
         from click.testing import CliRunner
-        from mizukilens.cli import main
+        from prismlens.cli import main
 
         runner = CliRunner()
-        with patch("mizukilens.config.load_config", return_value=None):
+        with patch("prismlens.config.load_config", return_value=None):
             result = runner.invoke(main, ["fetch", "--all"], catch_exceptions=False)
 
         assert result.exit_code != 0 or "設定" in result.output or "エラー" in result.output
@@ -896,8 +896,8 @@ class TestResolvePreciseDates:
 
     def test_resolve_success(self, mem_db: sqlite3.Connection) -> None:
         """Successfully resolves a date via yt-dlp mock."""
-        from mizukilens.cache import upsert_stream
-        from mizukilens.discovery import resolve_precise_dates
+        from prismlens.cache import upsert_stream
+        from prismlens.discovery import resolve_precise_dates
 
         upsert_stream(
             mem_db, video_id="vid_resolve1", status="discovered",
@@ -908,7 +908,7 @@ class TestResolvePreciseDates:
         mock_proc.returncode = 0
         mock_proc.stdout = "20240315\n"
 
-        with patch("mizukilens.discovery.subprocess.run", return_value=mock_proc):
+        with patch("prismlens.discovery.subprocess.run", return_value=mock_proc):
             count = resolve_precise_dates(mem_db, ["vid_resolve1"])
 
         assert count == 1
@@ -918,8 +918,8 @@ class TestResolvePreciseDates:
 
     def test_resolve_partial_failure(self, mem_db: sqlite3.Connection) -> None:
         """One video succeeds, one fails — only the successful one is updated."""
-        from mizukilens.cache import upsert_stream
-        from mizukilens.discovery import resolve_precise_dates
+        from prismlens.cache import upsert_stream
+        from prismlens.discovery import resolve_precise_dates
 
         upsert_stream(
             mem_db, video_id="vid_ok", status="discovered",
@@ -941,7 +941,7 @@ class TestResolvePreciseDates:
                 result.stdout = ""
             return result
 
-        with patch("mizukilens.discovery.subprocess.run", side_effect=mock_run):
+        with patch("prismlens.discovery.subprocess.run", side_effect=mock_run):
             count = resolve_precise_dates(mem_db, ["vid_ok", "vid_fail"])
 
         assert count == 1
@@ -952,8 +952,8 @@ class TestResolvePreciseDates:
 
     def test_resolve_timeout(self, mem_db: sqlite3.Connection) -> None:
         """Subprocess timeout is handled gracefully."""
-        from mizukilens.cache import upsert_stream
-        from mizukilens.discovery import resolve_precise_dates
+        from prismlens.cache import upsert_stream
+        from prismlens.discovery import resolve_precise_dates
         import subprocess as sp
 
         upsert_stream(
@@ -962,7 +962,7 @@ class TestResolvePreciseDates:
         )
 
         with patch(
-            "mizukilens.discovery.subprocess.run",
+            "prismlens.discovery.subprocess.run",
             side_effect=sp.TimeoutExpired("yt-dlp", 30),
         ):
             count = resolve_precise_dates(mem_db, ["vid_timeout"])
@@ -974,9 +974,9 @@ class TestResolvePreciseDates:
 
     def test_resolve_empty_list(self, mem_db: sqlite3.Connection) -> None:
         """Empty video list returns 0 without calling subprocess."""
-        from mizukilens.discovery import resolve_precise_dates
+        from prismlens.discovery import resolve_precise_dates
 
-        with patch("mizukilens.discovery.subprocess.run") as mock_run:
+        with patch("prismlens.discovery.subprocess.run") as mock_run:
             count = resolve_precise_dates(mem_db, [])
 
         assert count == 0
@@ -984,8 +984,8 @@ class TestResolvePreciseDates:
 
     def test_resolve_auto_selects_imprecise(self, mem_db: sqlite3.Connection) -> None:
         """When video_ids=None, only non-precise streams are selected."""
-        from mizukilens.cache import upsert_stream
-        from mizukilens.discovery import resolve_precise_dates
+        from prismlens.cache import upsert_stream
+        from prismlens.discovery import resolve_precise_dates
 
         upsert_stream(
             mem_db, video_id="vid_precise", status="discovered",
@@ -1000,7 +1000,7 @@ class TestResolvePreciseDates:
         mock_proc.returncode = 0
         mock_proc.stdout = "20240220\n"
 
-        with patch("mizukilens.discovery.subprocess.run", return_value=mock_proc) as mock_run:
+        with patch("prismlens.discovery.subprocess.run", return_value=mock_proc) as mock_run:
             count = resolve_precise_dates(mem_db, None)
 
         assert count == 1
@@ -1011,8 +1011,8 @@ class TestResolvePreciseDates:
 
     def test_progress_callback_called(self, mem_db: sqlite3.Connection) -> None:
         """Progress callback receives (video_id, date_or_none)."""
-        from mizukilens.cache import upsert_stream
-        from mizukilens.discovery import resolve_precise_dates
+        from prismlens.cache import upsert_stream
+        from prismlens.discovery import resolve_precise_dates
 
         upsert_stream(
             mem_db, video_id="vid_cb", status="discovered",
@@ -1025,7 +1025,7 @@ class TestResolvePreciseDates:
 
         calls: list[tuple[str, str | None]] = []
 
-        with patch("mizukilens.discovery.subprocess.run", return_value=mock_proc):
+        with patch("prismlens.discovery.subprocess.run", return_value=mock_proc):
             resolve_precise_dates(
                 mem_db, ["vid_cb"], progress_callback=lambda v, d: calls.append((v, d))
             )
@@ -1047,7 +1047,7 @@ class TestFetchStreamsDateSource:
         videos = [_make_video("vid_ds1", "歌回テスト", "3 days ago")]
 
         with patch("scrapetube.get_channel", return_value=iter(videos)):
-            with patch("mizukilens.discovery.resolve_precise_dates", return_value=0):
+            with patch("prismlens.discovery.resolve_precise_dates", return_value=0):
                 result = fetch_streams(
                     mem_db,
                     channel_id="UCtest",
@@ -1232,7 +1232,7 @@ class TestFetchStreamsDateBackfill:
 
     def test_backfills_null_date(self, mem_db: sqlite3.Connection) -> None:
         """Existing entry with NULL date gets backfilled when scrapetube provides one."""
-        from mizukilens.cache import upsert_stream
+        from prismlens.cache import upsert_stream
 
         upsert_stream(mem_db, video_id="vid_null", status="discovered", title="Stream")
         assert get_stream(mem_db, "vid_null")["date"] is None
@@ -1254,7 +1254,7 @@ class TestFetchStreamsDateBackfill:
 
     def test_no_backfill_when_date_already_set(self, mem_db: sqlite3.Connection) -> None:
         """Existing entry with a date is not backfilled."""
-        from mizukilens.cache import upsert_stream
+        from prismlens.cache import upsert_stream
 
         upsert_stream(
             mem_db, video_id="vid_dated", status="discovered",
@@ -1276,7 +1276,7 @@ class TestFetchStreamsDateBackfill:
 
     def test_no_backfill_when_scrapetube_date_is_none(self, mem_db: sqlite3.Connection) -> None:
         """No backfill when scrapetube also has no date."""
-        from mizukilens.cache import upsert_stream
+        from prismlens.cache import upsert_stream
 
         upsert_stream(mem_db, video_id="vid_both_null", status="discovered", title="Stream")
 
@@ -1295,7 +1295,7 @@ class TestFetchStreamsDateBackfill:
 
     def test_backfill_works_for_imported_status(self, mem_db: sqlite3.Connection) -> None:
         """Backfill works even for imported streams (any status)."""
-        from mizukilens.cache import upsert_stream, update_stream_status
+        from prismlens.cache import upsert_stream, update_stream_status
 
         upsert_stream(mem_db, video_id="vid_imp", status="discovered", title="Stream")
         update_stream_status(mem_db, "vid_imp", "extracted")
