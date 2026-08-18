@@ -394,6 +394,9 @@ function MobileHero() {
                   overflow: 'hidden',
                 }}
               >
+                {/* Runtime remote avatar in a static export; no Next image optimizer is available. */}
+                {/* eslint-disable @next/next/no-img-element */}
+                {/* react-doctor-disable-next-line react-doctor/nextjs-no-img-element */}
                 <img
                   src={streamerData.avatarUrl}
                   alt={streamerData.displayName}
@@ -407,6 +410,7 @@ function MobileHero() {
                     }
                   }}
                 />
+                {/* eslint-enable @next/next/no-img-element */}
               </div>
             </div>
 
@@ -508,6 +512,9 @@ function DesktopHero() {
                 marginBottom: '40px',
               }}
             >
+              {/* Runtime remote avatar in a static export; no Next image optimizer is available. */}
+              {/* eslint-disable @next/next/no-img-element */}
+              {/* react-doctor-disable-next-line react-doctor/nextjs-no-img-element */}
               <img
                 src={streamerData.avatarUrl}
                 alt={streamerData.displayName}
@@ -524,6 +531,7 @@ function DesktopHero() {
                   }
                 }}
               />
+              {/* eslint-enable @next/next/no-img-element */}
             </div>
 
             {/* Right: Info Stack */}

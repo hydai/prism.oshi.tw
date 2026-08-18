@@ -250,6 +250,8 @@ export default function AuroraPage() {
       setFillingIndex(index);
       setBulkFillStatus(`填入中 ${ti + 1}/${targets.length}...`);
       try {
+        // The shared iTunes limiter is stateful; preserve its three-second request spacing.
+        // react-doctor-disable-next-line react-doctor/async-await-in-loop
         const { durationSec } = await fetchItunesDuration(song.artist, song.name);
         if (durationSec !== null) {
           handleUpdate(index, { endSeconds: song.startSeconds + durationSec });

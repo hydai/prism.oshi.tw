@@ -251,7 +251,9 @@ function StreamerCard({ streamer }: { streamer: StreamerConfig }) {
     >
       {/* Avatar image — lazy: with ~40 streamers these are ~1MB of external
           images that would otherwise all load on first paint */}
-      {/* eslint-disable-next-line @next/next/no-img-element */}
+      {/* Static export keeps these runtime remote URLs native and source-sized. */}
+      {/* eslint-disable @next/next/no-img-element */}
+      {/* react-doctor-disable-next-line react-doctor/nextjs-no-img-element */}
       <img
         src={streamer.avatarUrl}
         alt={streamer.displayName}
@@ -261,6 +263,7 @@ function StreamerCard({ streamer }: { streamer: StreamerConfig }) {
         height={240}
         className="aspect-square w-full object-cover sm:max-h-[240px]"
       />
+      {/* eslint-enable @next/next/no-img-element */}
 
       {/* Info row */}
       <div className="flex items-center justify-between px-4 py-3">
