@@ -313,6 +313,8 @@ function snapshotKeyFromUrl(value: string): string | null {
 
 async function runBatches(db: D1Database, statements: D1PreparedStatement[]): Promise<void> {
   for (let index = 0; index < statements.length; index += D1_BATCH_SIZE) {
+    // One D1 database executes queries serially; keep bounded transactions ordered.
+    // react-doctor-disable-next-line react-doctor/async-await-in-loop
     await db.batch(statements.slice(index, index + D1_BATCH_SIZE));
   }
 }

@@ -925,6 +925,8 @@ async function resolveExactSongIds(
       return db.prepare(sql).bind(...binds);
     });
 
+    // D1 executes one query at a time per database, so parallel chunk calls only queue.
+    // react-doctor-disable-next-line react-doctor/async-await-in-loop
     const results = await db.batch<{ id: string }>(statements);
     results.forEach((result, index) => {
       const row = result.results[0];
