@@ -1,5 +1,4 @@
 // Timestamp parser — ported from admin/shared/parse.ts
-// Originally ported from tools/prismlens/src/prismlens/extraction.py
 // Parses pasted song lists like "5:30 Song - Artist" into structured data.
 
 export interface ParsedSong {

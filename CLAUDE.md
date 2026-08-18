@@ -78,7 +78,7 @@ Hidden `<iframe>` controlled via YouTube IFrame API. Songs reference specific vi
 - `lib/` — shared utilities (data loading, parsing, iTunes API, types)
 - `data/` — static JSON data files per streamer
 - `admin/` — Cloudflare Workers admin dashboard + D1 database (`schema.sql`, `migrations/`, `seed.ts`); excluded from tsconfig
-- `tools/` — backend services & data pipeline (excluded from tsconfig): `nova` (submission worker), `crystal` (feedback worker), `aurora` (Cloudflare Pages song editor), `sync-{registry,data,stale,status}` (Nova DB → repo sync), `fetch-channel-info`, `inbox-status`, `prismlens` (extraction), `shared`
+- `tools/` — backend services & data pipeline (excluded from tsconfig): `nova` (submission worker), `crystal` (feedback worker), `aurora` (Cloudflare Pages song editor), `sync-{registry,data,stale,status}` (Nova DB → repo sync), `fetch-channel-info`, `inbox-status`, `shared`
 
 ## Adding a New Streamer
 

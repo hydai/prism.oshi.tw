@@ -34,7 +34,7 @@ async function itunesSearch(query: string): Promise<ItunesTrack[]> {
   });
   const url = `${ITUNES_SEARCH_URL}?${params}`;
   const resp = await fetch(url, {
-    headers: { 'User-Agent': 'PrismLens/1.0 (MizukiPrism curator tool)' },
+    headers: { 'User-Agent': 'PrismAdmin/1.0 (Prism curator tool)' },
   });
   if (!resp.ok) return [];
   const data = (await resp.json()) as ItunesResponse;
