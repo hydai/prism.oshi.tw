@@ -2,6 +2,7 @@
 // Uses playlistItems.list (1 unit) instead of search.list (100 units) to save quota.
 
 const YT_API = 'https://www.googleapis.com/youtube/v3';
+export const YOUTUBE_CHANNEL_BATCH_SIZE = 50;
 
 // Karaoke stream detection keywords (from MizukiLens config.py)
 const KARAOKE_KEYWORDS = ['歌回', '歌枠', '唱歌', 'singing', 'karaoke'];
@@ -46,21 +47,23 @@ interface VideosResponse {
   items: VideoDetails[];
 }
 
+interface ChannelResource {
+  id: string;
+  snippet?: {
+    thumbnails?: {
+      default?: { url: string };
+      medium?: { url: string };
+      high?: { url: string };
+    };
+  };
+  statistics?: {
+    subscriberCount: string;
+    hiddenSubscriberCount: boolean;
+  };
+}
+
 interface ChannelResponse {
-  items: Array<{
-    id: string;
-    snippet?: {
-      thumbnails?: {
-        default?: { url: string };
-        medium?: { url: string };
-        high?: { url: string };
-      };
-    };
-    statistics?: {
-      subscriberCount: string;
-      hiddenSubscriberCount: boolean;
-    };
-  }>;
+  items: ChannelResource[];
 }
 
 export interface ChannelInfo {
@@ -305,9 +308,25 @@ export async function fetchChannelInfo(
   apiKey: string,
   channelId: string,
 ): Promise<ChannelInfo | null> {
+  const infos = await fetchChannelInfos(apiKey, [channelId]);
+  return infos[0] ?? null;
+}
+
+/** Fetch subscriber metadata for up to 50 channel IDs in one quota-unit call. */
+export async function fetchChannelInfos(
+  apiKey: string,
+  channelIds: string[],
+): Promise<ChannelInfo[]> {
+  const uniqueIds = [...new Set(channelIds)];
+  if (uniqueIds.length === 0) return [];
+  if (uniqueIds.length > YOUTUBE_CHANNEL_BATCH_SIZE) {
+    throw new RangeError(`YouTube channels.list accepts at most ${YOUTUBE_CHANNEL_BATCH_SIZE} IDs`);
+  }
+
   const url = new URL(`${YT_API}/channels`);
   url.searchParams.set('part', 'statistics,snippet');
-  url.searchParams.set('id', channelId);
+  url.searchParams.set('id', uniqueIds.join(','));
+  url.searchParams.set('maxResults', String(uniqueIds.length));
   url.searchParams.set('key', apiKey);
 
   const res = await ytFetch(url.toString());
@@ -317,19 +336,15 @@ export async function fetchChannelInfo(
   }
 
   const data = (await res.json()) as ChannelResponse;
-  if (!data.items || data.items.length === 0) return null;
-
-  const item = data.items[0]!;
-  if (!item.statistics || item.statistics.hiddenSubscriberCount) return null;
-
-  const thumbs = item.snippet?.thumbnails;
-  const avatarUrl = thumbs?.medium?.url ?? thumbs?.default?.url ?? '';
-
-  return {
-    channelId: item.id,
-    subscriberCount: parseInt(item.statistics.subscriberCount, 10),
-    avatarUrl,
-  };
+  return (data.items ?? []).flatMap((item) => {
+    if (!item.statistics || item.statistics.hiddenSubscriberCount) return [];
+    const thumbs = item.snippet?.thumbnails;
+    return [{
+      channelId: item.id,
+      subscriberCount: parseInt(item.statistics.subscriberCount, 10),
+      avatarUrl: thumbs?.medium?.url ?? thumbs?.default?.url ?? '',
+    }];
+  });
 }
 
 /**

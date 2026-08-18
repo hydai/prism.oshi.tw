@@ -56,6 +56,7 @@ import { formatSubscriberCount } from '../shared/format';
 import { feedbackEmbedForSubmission, feedbackEmbedForVod, postDiscord } from '../shared/discord';
 import { sanitizeNovaUrl, type NovaUrlProvider } from '../shared/nova-url-safety';
 import { discoverStreams, getVideoDetails, fetchComments, findCandidateComment, countTimestamps, fetchChannelInfo, verifyChannelId } from './youtube';
+import { refreshSubscriberCounts, type SubscriberRefreshRow } from './subscriber-refresh';
 import {
   downloadVodExportCandidate,
   generateVodExportPreviewApi,
@@ -115,7 +116,6 @@ import type {
   StreamerInfo,
   CrystalTicket,
   CrystalTicketStatus,
-  BulkFetchSubscribersResult,
   BulkFetchSubscribersResponse,
   GlobalWorksResponse,
   WorkMatchCandidatesResponse,
@@ -1427,52 +1427,10 @@ app.post('/api/nova/submissions/fetch-all-subscribers', requireCurator, async (c
 
   const { results: subs } = await c.env.NOVA_DB
     .prepare("SELECT id, display_name, youtube_channel_id FROM submissions WHERE status = 'approved' AND youtube_channel_id != ''")
-    .all<{ id: string; display_name: string; youtube_channel_id: string }>();
+    .all<SubscriberRefreshRow>();
 
-  const results: BulkFetchSubscribersResult[] = [];
-  let updated = 0;
-  let failed = 0;
-
-  for (const sub of subs) {
-    try {
-      const info = await fetchChannelInfo(apiKey, sub.youtube_channel_id);
-      if (info === null) {
-        results.push({ id: sub.id, display_name: sub.display_name, subscriber_count: null, avatar_url: null, error: 'Hidden or not found' });
-        failed++;
-        continue;
-      }
-      if (info.channelId !== sub.youtube_channel_id) {
-        results.push({ id: sub.id, display_name: sub.display_name, subscriber_count: null, avatar_url: null, error: 'Channel identity mismatch' });
-        failed++;
-        continue;
-      }
-      const formatted = formatSubscriberCount(info.subscriberCount);
-      const verifiedAt = new Date().toISOString();
-      const update = await c.env.NOVA_DB
-        .prepare(`
-          UPDATE submissions
-          SET subscriber_count = ?, avatar_url = ?,
-              youtube_channel_verified_id = ?, youtube_channel_verified_at = ?
-          WHERE id = ? AND youtube_channel_id = ?
-          RETURNING id
-        `)
-        .bind(formatted, info.avatarUrl, info.channelId, verifiedAt, sub.id, sub.youtube_channel_id)
-        .run<{ id: string }>();
-      if (update.results[0]?.id !== sub.id) {
-        results.push({ id: sub.id, display_name: sub.display_name, subscriber_count: null, avatar_url: null, error: 'Channel ID changed during refresh' });
-        failed++;
-        continue;
-      }
-      results.push({ id: sub.id, display_name: sub.display_name, subscriber_count: formatted, avatar_url: info.avatarUrl });
-      updated++;
-    } catch (err) {
-      const msg = err instanceof Error ? err.message : 'Unknown error';
-      results.push({ id: sub.id, display_name: sub.display_name, subscriber_count: null, avatar_url: null, error: msg });
-      failed++;
-    }
-  }
-
-  return c.json<BulkFetchSubscribersResponse>({ updated, failed, results });
+  const response = await refreshSubscriberCounts(c.env.NOVA_DB, apiKey, subs);
+  return c.json<BulkFetchSubscribersResponse>(response);
 });
 
 // POST /api/nova/submissions/:id/verify-youtube-channel — verify an existing
