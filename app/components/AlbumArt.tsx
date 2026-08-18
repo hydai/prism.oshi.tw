@@ -66,7 +66,9 @@ export default function AlbumArt({ src, alt, size, borderRadius }: AlbumArtProps
           <Music style={{ width: `${iconSize}px`, height: `${iconSize}px`, color: 'white' }} />
         </div>
       )}
-      {/* eslint-disable-next-line @next/next/no-img-element */}
+      {/* Runtime iTunes artwork is source-sized; static export has no Next image optimizer. */}
+      {/* eslint-disable @next/next/no-img-element */}
+      {/* react-doctor-disable-next-line react-doctor/nextjs-no-img-element */}
       <img
         src={src}
         alt={alt}
@@ -82,6 +84,7 @@ export default function AlbumArt({ src, alt, size, borderRadius }: AlbumArtProps
           opacity: imgLoaded ? 1 : 0,
         }}
       />
+      {/* eslint-enable @next/next/no-img-element */}
     </div>
   );
 }

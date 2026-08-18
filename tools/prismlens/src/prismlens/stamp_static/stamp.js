@@ -1,4 +1,4 @@
-/* MizukiLens EndStamp Editor — Frontend Logic */
+/* MizukiLens EndStamp Editor — served directly by Flask from stamp_static. */
 
 (function () {
   "use strict";
@@ -543,6 +543,8 @@
       var song = missing[i];
       showToast("Fetching " + (i + 1) + "/" + missing.length + ": " + song.songName + "\u2026");
       try {
+        // The server-side iTunes limiter and per-song SQLite writes require ordered requests.
+        // react-doctor-disable-next-line react-doctor/async-await-in-loop
         var data = await fetchJSON("/api/songs/" + song.id + "/fetch-duration", {
           method: "POST",
         });

@@ -1,0 +1,11 @@
+{
+  "$schema": "https://react.doctor/schema/config.json",
+  "ignore": {
+    "overrides": [
+      {
+        "files": ["tools/prismlens/src/prismlens/stamp_static/stamp.js"],
+        "rules": ["deslop/unused-file"]
+      }
+    ]
+  }
+}
