@@ -1,4 +1,4 @@
-import { discoverStreams, verifyChannelId } from './youtube';
+import { discoverStreams, getVideoDetails, verifyChannelId } from './youtube';
 
 declare const process: { exitCode?: number };
 
@@ -112,6 +112,45 @@ async function testDiscoveryFiltersKaraokeUploadsInOrder(): Promise<void> {
   assert(detailsRequests === 1, 'fetches matching video details once');
 }
 
+async function testVideoDetailBatchesUseBoundedConcurrency(): Promise<void> {
+  const videoIds = Array.from(
+    { length: 351 },
+    (_, index) => `video-${String(index).padStart(3, '0')}`,
+  );
+  const requestSizes: number[] = [];
+  let activeRequests = 0;
+  let maxActiveRequests = 0;
+
+  await withFetch(async (input) => {
+    const url = new URL(String(input));
+    const ids = url.searchParams.get('id')?.split(',') ?? [];
+    requestSizes.push(ids.length);
+    activeRequests += 1;
+    maxActiveRequests = Math.max(maxActiveRequests, activeRequests);
+    await new Promise((resolve) => setTimeout(resolve, 5));
+    activeRequests -= 1;
+    return Response.json({
+      items: ids.map((id) => ({
+        id,
+        snippet: {
+          title: id,
+          publishedAt: '2026-08-01T12:00:00Z',
+          description: `Description for ${id}`,
+          liveBroadcastContent: 'none',
+        },
+        contentDetails: { duration: 'PT1H' },
+      })),
+    });
+  }, async () => {
+    const videos = await getVideoDetails('test-key', videoIds);
+    assert(requestSizes.join(',') === '50,50,50,50,50,50,50,1', 'uses 50-ID batches');
+    assert(maxActiveRequests === 6, 'runs at most six YouTube batches concurrently');
+    assert(videos.length === videoIds.length, 'returns every video detail');
+    assert(videos[0]?.videoId === videoIds[0], 'preserves the first batch result order');
+    assert(videos.at(-1)?.videoId === videoIds.at(-1), 'preserves the final batch result order');
+  });
+}
+
 async function testRejectsMissingOrDifferentIdentity(): Promise<void> {
   await withFetch(
     async () => Response.json({ items: [{ id: 'UC-different', snippet: {} }] }),
@@ -145,6 +184,7 @@ async function testApiErrorDoesNotEchoResponseBody(): Promise<void> {
 
 void (async () => {
   await testDiscoveryFiltersKaraokeUploadsInOrder();
+  await testVideoDetailBatchesUseBoundedConcurrency();
   await testExactChannelVerification();
   await testRejectsMissingOrDifferentIdentity();
   await testApiErrorDoesNotEchoResponseBody();

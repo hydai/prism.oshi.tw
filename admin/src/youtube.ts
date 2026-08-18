@@ -3,6 +3,9 @@
 
 const YT_API = 'https://www.googleapis.com/youtube/v3';
 export const YOUTUBE_CHANNEL_BATCH_SIZE = 50;
+const YOUTUBE_VIDEO_BATCH_SIZE = 50;
+// Match Workers' cap for outbound connections waiting on response headers.
+const YOUTUBE_VIDEO_BATCH_CONCURRENCY = 6;
 
 // Karaoke stream detection keywords (from MizukiLens config.py)
 const KARAOKE_KEYWORDS = ['歌回', '歌枠', '唱歌', 'singing', 'karaoke'];
@@ -196,37 +199,54 @@ export async function getVideoDetails(
   apiKey: string,
   videoIds: string[],
 ): Promise<DiscoveredVideo[]> {
-  const results: DiscoveredVideo[] = [];
+  const batches: string[][] = [];
+  for (let offset = 0; offset < videoIds.length; offset += YOUTUBE_VIDEO_BATCH_SIZE) {
+    batches.push(videoIds.slice(offset, offset + YOUTUBE_VIDEO_BATCH_SIZE));
+  }
+  return fetchVideoDetailWaves(apiKey, batches);
+}
 
-  // Process in chunks of 50
-  for (let i = 0; i < videoIds.length; i += 50) {
-    const chunk = videoIds.slice(i, i + 50);
-    const url = new URL(`${YT_API}/videos`);
-    url.searchParams.set('part', 'snippet,contentDetails,liveStreamingDetails');
-    url.searchParams.set('id', chunk.join(','));
-    url.searchParams.set('key', apiKey);
+async function fetchVideoDetailWaves(
+  apiKey: string,
+  batches: string[][],
+  offset = 0,
+): Promise<DiscoveredVideo[]> {
+  const wave = batches.slice(offset, offset + YOUTUBE_VIDEO_BATCH_CONCURRENCY);
+  if (wave.length === 0) return [];
 
-    const res = await ytFetch(url.toString());
-    if (!res.ok) {
-      const body = await res.text();
-      throw new Error(`YouTube videos.list failed (${res.status}): ${body}`);
-    }
+  const waveResults = (await Promise.all(
+    wave.map((batch) => fetchVideoDetailBatch(apiKey, batch)),
+  )).flat();
+  const nextOffset = offset + YOUTUBE_VIDEO_BATCH_CONCURRENCY;
+  if (nextOffset >= batches.length) return waveResults;
 
-    const data = (await res.json()) as VideosResponse;
-    for (const item of data.items) {
-      // Use actual stream start time if available, else publishedAt
-      const dateSource =
-        item.liveStreamingDetails?.actualStartTime ?? item.snippet.publishedAt;
-      results.push({
-        videoId: item.id,
-        title: item.snippet.title,
-        date: toDateStr(dateSource),
-        description: item.snippet.description,
-      });
-    }
+  const remainingResults = await fetchVideoDetailWaves(apiKey, batches, nextOffset);
+  return [...waveResults, ...remainingResults];
+}
+
+async function fetchVideoDetailBatch(
+  apiKey: string,
+  videoIds: string[],
+): Promise<DiscoveredVideo[]> {
+  const url = new URL(`${YT_API}/videos`);
+  url.searchParams.set('part', 'snippet,contentDetails,liveStreamingDetails');
+  url.searchParams.set('id', videoIds.join(','));
+  url.searchParams.set('key', apiKey);
+
+  const res = await ytFetch(url.toString());
+  if (!res.ok) {
+    const body = await res.text();
+    throw new Error(`YouTube videos.list failed (${res.status}): ${body}`);
   }
 
-  return results;
+  const data = (await res.json()) as VideosResponse;
+  return data.items.map((item) => ({
+    videoId: item.id,
+    title: item.snippet.title,
+    // Use actual stream start time if available, else publishedAt.
+    date: toDateStr(item.liveStreamingDetails?.actualStartTime ?? item.snippet.publishedAt),
+    description: item.snippet.description,
+  }));
 }
 
 /**
