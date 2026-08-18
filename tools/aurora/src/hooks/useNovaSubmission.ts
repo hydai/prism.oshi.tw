@@ -37,6 +37,12 @@ export function useNovaSubmission({
   const turnstileWidgetIdRef = useRef<string | null>(null);
 
   useEffect(() => {
+    if (!status) return;
+    const timer = setTimeout(() => setStatus(null), 8000);
+    return () => clearTimeout(timer);
+  }, [status]);
+
+  useEffect(() => {
     if (!videoId) return;
     const controller = new AbortController();
     setStreamDate('');
@@ -154,7 +160,6 @@ export function useNovaSubmission({
     } finally {
       setSubmitting(false);
       setTurnstileToken('');
-      setTimeout(() => setStatus(null), 8000);
     }
   }, [note, selectedStreamer, songs, streamDate, turnstileToken, videoId, vodUrl]);
 
