@@ -87,6 +87,26 @@ test.describe('interactive semantics', () => {
     await expect(titleInput).toHaveValue('測試歌曲');
   });
 
+  test('opens one Aurora overlay at a time', async ({ page }) => {
+    await page.goto('/mizuki/aurora');
+    await page.getByRole('textbox', { name: 'YouTube 歌枠網址' }).fill('https://www.youtube.com/watch?v=qgMiX4lw2TQ');
+    await page.getByTestId('load-video-button').click();
+
+    await page.getByTestId('import-button').click();
+    await expect(page.getByRole('dialog', { name: '匯入時間戳' })).toBeVisible();
+    await page.getByRole('button', { name: '關閉匯入時間戳對話框' }).click();
+    await expect(page.getByRole('dialog', { name: '匯入時間戳' })).toBeHidden();
+
+    await page.getByTestId('add-song-button').click();
+    await page.getByTestId('export-button').click();
+    await expect(page.getByRole('dialog', { name: '匯出時間戳' })).toBeVisible();
+    await page.getByRole('button', { name: '關閉匯出時間戳對話框' }).click();
+    await expect(page.getByRole('dialog', { name: '匯出時間戳' })).toBeHidden();
+
+    await page.getByTitle('鍵盤快捷鍵').click();
+    await expect(page.getByRole('button', { name: '關閉鍵盤快捷鍵' })).toBeVisible();
+  });
+
   test('disables seeking when a performance has no known duration', async ({ page }) => {
     await page.route('**/api/mizuki/songs', async (route) => {
       await route.fulfill({
