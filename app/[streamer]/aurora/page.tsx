@@ -71,7 +71,16 @@ export default function AuroraPage() {
   const [fillingIndex, setFillingIndex] = useState<number | null>(null);
   const [bulkFillStatus, setBulkFillStatus] = useState<string | null>(null);
   const playerRef = useRef<YouTubeEmbedHandle>(null);
+  const bulkFillStatusTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const flushPendingSave = useSessionPersistence(videoId, songs);
+
+  const clearBulkFillStatusTimer = useCallback(() => {
+    if (bulkFillStatusTimerRef.current === null) return;
+    clearTimeout(bulkFillStatusTimerRef.current);
+    bulkFillStatusTimerRef.current = null;
+  }, []);
+
+  useEffect(() => clearBulkFillStatusTimer, [clearBulkFillStatusTimer]);
 
   // Keep song updaters pure; persistence is handled after commit above.
   const updateSongs = useCallback((updater: (prev: AuroraSong[]) => AuroraSong[]) => {
@@ -242,6 +251,7 @@ export default function AuroraPage() {
       }
     }
     if (targets.length === 0) return;
+    clearBulkFillStatusTimer();
 
     let filled = 0;
     let noMatch = 0;
@@ -265,8 +275,11 @@ export default function AuroraPage() {
     }
     setFillingIndex(null);
     setBulkFillStatus(`完成：${filled} 首填入，${noMatch} 首未找到`);
-    setTimeout(() => setBulkFillStatus(null), 5000);
-  }, [songs, handleUpdate]);
+    bulkFillStatusTimerRef.current = setTimeout(() => {
+      bulkFillStatusTimerRef.current = null;
+      setBulkFillStatus(null);
+    }, 5000);
+  }, [songs, handleUpdate, clearBulkFillStatusTimer]);
 
   // Keyboard shortcuts
   const handleShortcutKeyDown = useEffectEvent((e: KeyboardEvent) => {
