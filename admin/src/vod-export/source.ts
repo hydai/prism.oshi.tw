@@ -992,6 +992,7 @@ export async function readOrderedPublicationFingerprint(
 ): Promise<VodExportSourceFingerprint> {
   assertFingerprintConfiguration(bindings, exporterBuildId);
   const dbRevision = await readRevision(bindings.DB, 'DB');
+  // react-doctor-disable-next-line react-doctor/server-sequential-independent-await
   const novaRevision = await readRevision(bindings.NOVA_DB, 'NOVA_DB');
   return {
     dbId: bindings.VOD_EXPORT_DB_ID,

@@ -431,14 +431,18 @@ async function findingsForApi(
     }
   }
   const lookupWorkspace = createD1LookupWorkspace();
-  // Each lookup must consume the shared reusable buffer before the next one mutates it.
+  // Each lookup must consume the shared reusable buffer before the next one mutates it;
+  // allocating one maximum-size workspace per lookup would break the export memory budget.
+  // react-doctor-disable-next-line react-doctor/async-parallel
   const performances = await lookupPerformanceRepairRows(
     bindings.DB, [...performanceIds], lookupWorkspace,
   );
+  // react-doctor-disable-next-line react-doctor/server-sequential-independent-await
   const songs = await lookupSongRepairRows(bindings.DB, [...songIds], lookupWorkspace);
   const streams = await lookupVodRepairRows(
     bindings.DB, [...vodIds], [...vodStreamIds], lookupWorkspace,
   );
+  // react-doctor-disable-next-line react-doctor/server-sequential-independent-await
   const submissions = await lookupStreamerRepairRows(
     bindings.NOVA_DB, [...submissionIds], lookupWorkspace,
   );
@@ -621,6 +625,8 @@ export async function forEachD1LookupBinding(
     const valueBytes = utf8ByteLength(textValue);
     const entryBytes = D1_LOOKUP_LENGTH_PREFIX_BYTES + valueBytes;
     if (entryBytes > D1_LOOKUP_PAYLOAD_TARGET_BYTES) {
+      // Flushes and consumes must finish before the shared buffer and counters are reused.
+      // react-doctor-disable-next-line react-doctor/async-await-in-loop
       await flush();
       if (valueBytes <= D1_MAX_BOUND_VALUE_BYTES) {
         await consume({ kind: 'direct', value });
