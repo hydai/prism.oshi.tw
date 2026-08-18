@@ -40,8 +40,8 @@ function useArchivePageController() {
   const [selectedYears, setSelectedYears] = useState<Set<number>>(new Set());
   const [viewMode, setViewMode] = useState<ArchiveViewMode>('timeline');
   const [expandedSongs, setExpandedSongs] = useState<Set<string>>(new Set());
-  const [showToast, setShowToast] = useState(false);
-  const [toastMessage, setToastMessage] = useState('');
+  const [toastMessage, setToastMessage] = useState<string | null>(null);
+  const hideToast = useCallback(() => setToastMessage(null), []);
   const [showPlaylistPanel, setShowPlaylistPanel] = useState(false);
   const [showLikedSongsPanel, setShowLikedSongsPanel] = useState(false);
   const [showRecentlyPlayedPanel, setShowRecentlyPlayedPanel] = useState(false);
@@ -84,7 +84,6 @@ function useArchivePageController() {
   const handleAddToQueue = useCallback((track: ArchiveTrack) => {
     addToQueue(track);
     setToastMessage('已加入播放佇列');
-    setShowToast(true);
   }, [addToQueue]);
 
   const handlePlayAll = () => {
@@ -97,14 +96,12 @@ function useArchivePageController() {
 
   const handleAddToPlaylistSuccess = useCallback(() => {
     setToastMessage('已加入播放清單');
-    setShowToast(true);
   }, []);
 
   // Show storage error toast
   useEffect(() => {
     if (storageError) {
       setToastMessage(storageError);
-      setShowToast(true);
       clearStorageError();
     }
   }, [storageError, clearStorageError]);
@@ -113,7 +110,6 @@ function useArchivePageController() {
   useEffect(() => {
     if (timestampWarning) {
       setToastMessage(timestampWarning);
-      setShowToast(true);
       clearTimestampWarning();
     }
   }, [timestampWarning, clearTimestampWarning]);
@@ -122,7 +118,6 @@ function useArchivePageController() {
   useEffect(() => {
     if (skipNotification) {
       setToastMessage(skipNotification);
-      setShowToast(true);
       clearSkipNotification();
     }
   }, [skipNotification, clearSkipNotification]);
@@ -280,10 +275,9 @@ function useArchivePageController() {
     viewMode,
     setViewMode,
     expandedSongs,
-    showToast,
-    setShowToast,
     toastMessage,
     setToastMessage,
+    hideToast,
     showPlaylistPanel,
     setShowPlaylistPanel,
     showLikedSongsPanel,

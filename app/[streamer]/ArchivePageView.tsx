@@ -78,14 +78,13 @@ function ArchivePageChrome() {
 function StatusOverlays() {
   const {
     toastMessage,
-    showToast,
-    setShowToast,
+    hideToast,
     apiLoadError,
   } = useArchivePageView();
 
   return (
     <>
-      <Toast message={toastMessage} show={showToast} onHide={() => setShowToast(false)} />
+      <Toast message={toastMessage} onHide={hideToast} />
       {/* API Load Error Banner */}
       {apiLoadError && (
         <div
@@ -1844,7 +1843,6 @@ function PlaylistOverlays() {
     setShowPlaylistPanel,
     songs,
     setToastMessage,
-    setShowToast,
     showLikedSongsPanel,
     setShowLikedSongsPanel,
     showRecentlyPlayedPanel,
@@ -1860,25 +1858,22 @@ function PlaylistOverlays() {
         show={showPlaylistPanel}
         onClose={() => setShowPlaylistPanel(false)}
         songsData={songs}
-        onToast={(msg) => { setToastMessage(msg); setShowToast(true); }}
+        onToast={setToastMessage}
       />
       <LikedSongsPanel
         show={showLikedSongsPanel}
         onClose={() => setShowLikedSongsPanel(false)}
-        onToast={(msg) => { setToastMessage(msg); setShowToast(true); }}
+        onToast={setToastMessage}
       />
       <RecentlyPlayedPanel
         show={showRecentlyPlayedPanel}
         onClose={() => setShowRecentlyPlayedPanel(false)}
-        onToast={(msg) => { setToastMessage(msg); setShowToast(true); }}
+        onToast={setToastMessage}
       />
       {showCreateDialog && (
         <CreatePlaylistDialog
           onClose={() => setShowCreateDialog(false)}
-          onSuccess={() => {
-            setToastMessage('播放清單已建立');
-            setShowToast(true);
-          }}
+          onSuccess={() => setToastMessage('播放清單已建立')}
         />
       )}
     </>

@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { ChevronDown, Music2, Share2, Heart } from 'lucide-react';
 import { useStreamer } from '../../contexts/StreamerContext';
@@ -30,8 +30,8 @@ export default function NowPlayingPage() {
 
   const [showLikedSongsPanel, setShowLikedSongsPanel] = useState(false);
   const [showRecentlyPlayedPanel, setShowRecentlyPlayedPanel] = useState(false);
-  const [showToast, setShowToast] = useState(false);
-  const [toastMessage, setToastMessage] = useState('');
+  const [toastMessage, setToastMessage] = useState<string | null>(null);
+  const hideToast = useCallback(() => setToastMessage(null), []);
   const { likedCount, isLiked, toggleLike } = useLikedSongs();
   const { recentCount } = useRecentlyPlayed();
 
@@ -293,16 +293,16 @@ export default function NowPlayingPage() {
         <UpNextSection />
       </main>
 
-      <Toast message={toastMessage} show={showToast} onHide={() => setShowToast(false)} />
+      <Toast message={toastMessage} onHide={hideToast} />
       <LikedSongsPanel
         show={showLikedSongsPanel}
         onClose={() => setShowLikedSongsPanel(false)}
-        onToast={(msg) => { setToastMessage(msg); setShowToast(true); }}
+        onToast={setToastMessage}
       />
       <RecentlyPlayedPanel
         show={showRecentlyPlayedPanel}
         onClose={() => setShowRecentlyPlayedPanel(false)}
-        onToast={(msg) => { setToastMessage(msg); setShowToast(true); }}
+        onToast={setToastMessage}
       />
     </div>
   );

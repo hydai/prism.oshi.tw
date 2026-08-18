@@ -1,30 +1,33 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useEffect, useEffectEvent, useState } from 'react';
 import { CheckCircle } from 'lucide-react';
 
 interface ToastProps {
-  message: string;
-  show: boolean;
+  message: string | null;
   onHide: () => void;
 }
 
-export default function Toast({ message, show, onHide }: ToastProps) {
+export default function Toast({ message, onHide }: ToastProps) {
   const [isVisible, setIsVisible] = useState(false);
+  const hideToast = useEffectEvent(onHide);
 
   useEffect(() => {
-    if (show) {
-      setIsVisible(true);
-      const fadeTimer = setTimeout(() => setIsVisible(false), 2000);
-      const hideTimer = setTimeout(onHide, 2300); // Wait for the 300ms fade out
-      return () => {
-        clearTimeout(fadeTimer);
-        clearTimeout(hideTimer);
-      };
+    if (message === null) {
+      setIsVisible(false);
+      return;
     }
-  }, [show, onHide]);
 
-  if (!show && !isVisible) return null;
+    setIsVisible(true);
+    const fadeTimer = setTimeout(() => setIsVisible(false), 2000);
+    const hideTimer = setTimeout(hideToast, 2300); // Wait for the 300ms fade out
+    return () => {
+      clearTimeout(fadeTimer);
+      clearTimeout(hideTimer);
+    };
+  }, [message]);
+
+  if (message === null) return null;
 
   return (
     <div
