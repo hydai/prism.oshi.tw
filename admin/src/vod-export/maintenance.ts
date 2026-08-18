@@ -226,15 +226,19 @@ async function maintainPublicationResolutions(
   // crash after its R2 release, then retain it for a fresh 30-day interval.
   const finalizedAt = now.toISOString();
   const deleteAfter = new Date(now.getTime() + RESOLUTION_RETENTION_MS).toISOString();
-  const finalized = await db.prepare(`
-    UPDATE vod_export_publication_resolutions
-    SET finalized_at = ?, delete_after = ?
-    WHERE finalized_at IS NULL AND delete_after IS NULL
-  `).bind(finalizedAt, deleteAfter).run();
-  const deleted = await db.prepare(`
-    DELETE FROM vod_export_publication_resolutions
-    WHERE finalized_at IS NOT NULL AND delete_after <= ?
-  `).bind(finalizedAt).run();
+  // D1 batches keep these lifecycle writes ordered and transactional while
+  // avoiding a second database round trip.
+  const [finalized, deleted] = await db.batch([
+    db.prepare(`
+      UPDATE vod_export_publication_resolutions
+      SET finalized_at = ?, delete_after = ?
+      WHERE finalized_at IS NULL AND delete_after IS NULL
+    `).bind(finalizedAt, deleteAfter),
+    db.prepare(`
+      DELETE FROM vod_export_publication_resolutions
+      WHERE finalized_at IS NOT NULL AND delete_after <= ?
+    `).bind(finalizedAt),
+  ]);
   return {
     finalized: finalized.meta.changes ?? 0,
     deleted: deleted.meta.changes ?? 0,

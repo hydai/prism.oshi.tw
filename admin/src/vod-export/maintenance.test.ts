@@ -201,6 +201,10 @@ class FakeD1Statement {
     return this.execute();
   }
 
+  maintainsPublicationResolutions(): boolean {
+    return this.sql.includes('vod_export_publication_resolutions');
+  }
+
   async execute(): Promise<D1Result> {
     if (this.sql.includes('SET snapshot_unreferenced_at = NULL')) {
       const [intentId] = this.values as [string];
@@ -233,6 +237,7 @@ class FakeD1Statement {
 
 class FakeD1Database {
   readonly rows: AuditRow[];
+  readonly resolutionBatchSizes: number[] = [];
   pendingResolutions: number;
   expiredResolutions: number;
 
@@ -265,9 +270,13 @@ class FakeD1Database {
   }
 
   async batch(statements: D1PreparedStatement[]): Promise<D1Result[]> {
+    const fakeStatements = statements as unknown as FakeD1Statement[];
+    if (fakeStatements.some((statement) => statement.maintainsPublicationResolutions())) {
+      this.resolutionBatchSizes.push(fakeStatements.length);
+    }
     const results: D1Result[] = [];
-    for (const statement of statements) {
-      results.push(await (statement as unknown as FakeD1Statement).execute());
+    for (const statement of fakeStatements) {
+      results.push(await statement.run());
     }
     return results;
   }
@@ -492,6 +501,8 @@ async function testResolutionHistoryFinalizesAndExpiresOnlyUnderTheMutex(): Prom
 
   equal(maintenance.publicationResolutionsFinalized, 2, 'pending cross-store resolutions are finalized');
   equal(maintenance.publicationResolutionsDeleted, 3, 'only already-expired resolution history is deleted');
+  equal(database.resolutionBatchSizes.length, 1, 'resolution maintenance should use one D1 batch');
+  equal(database.resolutionBatchSizes[0], 2, 'resolution maintenance batch should contain both writes');
   await assertControlIdle(privateBucket, 'publication resolution retention');
 }
 
