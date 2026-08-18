@@ -26,6 +26,15 @@ export function useAuroraSongEditor(
   const [fillingIndex, setFillingIndex] = useState<number | null>(null);
   const [bulkFillStatus, setBulkFillStatus] = useState<string | null>(null);
   const pendingSaveRef = useRef<{ videoId: string; songs: AuroraSong[] } | null>(null);
+  const bulkFillStatusTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+  const clearBulkFillStatusTimer = useCallback(() => {
+    if (bulkFillStatusTimerRef.current === null) return;
+    clearTimeout(bulkFillStatusTimerRef.current);
+    bulkFillStatusTimerRef.current = null;
+  }, []);
+
+  useEffect(() => clearBulkFillStatusTimer, [clearBulkFillStatusTimer]);
 
   useEffect(() => {
     if (!videoId) return;
@@ -187,6 +196,7 @@ export function useAuroraSongEditor(
       if (song.name.trim() !== '') targets.push({ song, index });
     }
     if (targets.length === 0) return;
+    clearBulkFillStatusTimer();
 
     let filled = 0;
     let noMatch = 0;
@@ -210,8 +220,11 @@ export function useAuroraSongEditor(
     }
     setFillingIndex(null);
     setBulkFillStatus(`完成：${filled} 首填入，${noMatch} 首未找到`);
-    setTimeout(() => setBulkFillStatus(null), 5000);
-  }, [songs, updateSong]);
+    bulkFillStatusTimerRef.current = setTimeout(() => {
+      bulkFillStatusTimerRef.current = null;
+      setBulkFillStatus(null);
+    }, 5000);
+  }, [songs, updateSong, clearBulkFillStatusTimer]);
 
   return {
     songs,
