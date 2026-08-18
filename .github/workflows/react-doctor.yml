@@ -1,0 +1,35 @@
+name: React Doctor
+
+on:
+  pull_request:
+    branches: [master]
+  push:
+    branches: [master]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: react-doctor-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  react-doctor:
+    name: React Doctor full scan
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+
+    steps:
+      - uses: actions/checkout@v7
+
+      # v2, pinned to the annotated tag's commit for reproducible CI execution.
+      - uses: millionco/react-doctor@01820bb4fd4d0a4aebcd8df2b2a143a098649cb2
+        with:
+          version: "0.9.12"
+          node-version: "22"
+          scope: full
+          blocking: warning
+          comment: false
+          review-comments: false
+          commit-status: false
