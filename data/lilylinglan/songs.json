@@ -1,5 +1,85 @@
 [
   {
+    "id": "song-b741daa4",
+    "workId": "work-b609d235-5983-47aa-88fa-2d62968ee0bc",
+    "title": "一首想不通的古風",
+    "originalArtist": "玄殤 & 貳嬸",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-08277ca0",
+        "streamId": "stream-2026-04-29",
+        "videoId": "g9C_PHb2vOg",
+        "timestamp": 4251,
+        "endTimestamp": 4491
+      }
+    ]
+  },
+  {
+    "id": "song-1fe99fb0",
+    "workId": "work-song-33145ad2",
+    "title": "一起去跑步",
+    "originalArtist": "宇宙人",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-e2c46b05",
+        "streamId": "stream-5ce19eb4",
+        "videoId": "B6jX2bLJ1Rc",
+        "timestamp": 438,
+        "endTimestamp": 743
+      }
+    ]
+  },
+  {
+    "id": "song-b3cdd100",
+    "workId": "work-5dabb55e-9b90-40d6-944e-d1e4b11e1f82",
+    "title": "千年之戀",
+    "originalArtist": "F.I.R.",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-f0f82088",
+        "streamId": "stream-2026-04-29",
+        "videoId": "g9C_PHb2vOg",
+        "timestamp": 2735,
+        "endTimestamp": 2976
+      }
+    ]
+  },
+  {
+    "id": "song-db618ade",
+    "workId": "work-a23ac4c4-0f94-4188-a317-a322e3ebf5b4",
+    "title": "小可愛與小領帶",
+    "originalArtist": "G.G 張思源",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-bfc24c6c",
+        "streamId": "stream-2026-04-29",
+        "videoId": "g9C_PHb2vOg",
+        "timestamp": 3674,
+        "endTimestamp": 3878
+      }
+    ]
+  },
+  {
+    "id": "song-4709cae9",
+    "workId": "work-song-2323",
+    "title": "不是因為天氣晴朗才愛你",
+    "originalArtist": "理想混蛋",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-0bcacf3f",
+        "streamId": "stream-5ce19eb4",
+        "videoId": "B6jX2bLJ1Rc",
+        "timestamp": 753,
+        "endTimestamp": 983
+      }
+    ]
+  },
+  {
     "id": "song-bfc20205",
     "workId": "work-2423c200-3bf0-4a2c-baa5-42012623a39a",
     "title": "今日重到蘇瀾橋",
@@ -12,6 +92,38 @@
         "videoId": "m0AypZ_piJk",
         "timestamp": 2893,
         "endTimestamp": 3172
+      }
+    ]
+  },
+  {
+    "id": "song-f7ee44fd",
+    "workId": "work-song-fcd9ed82",
+    "title": "月牙灣",
+    "originalArtist": "F.I.R.",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-4cdd491a",
+        "streamId": "stream-2026-04-29",
+        "videoId": "g9C_PHb2vOg",
+        "timestamp": 2980,
+        "endTimestamp": 3235
+      }
+    ]
+  },
+  {
+    "id": "song-094c2886",
+    "workId": "work-song-723",
+    "title": "水上燈",
+    "originalArtist": "Braska",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-17bd0279",
+        "streamId": "stream-5ce19eb4",
+        "videoId": "B6jX2bLJ1Rc",
+        "timestamp": 4759,
+        "endTimestamp": 5016
       }
     ]
   },
@@ -48,6 +160,22 @@
     ]
   },
   {
+    "id": "song-585f7bb6",
+    "workId": "work-0b6bae36-0884-4325-913d-c92f55e603c3",
+    "title": "有一天會盛開的花",
+    "originalArtist": "森森鈴蘭｜唱一小段",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-2e3c92e2",
+        "streamId": "stream-2026-04-29",
+        "videoId": "g9C_PHb2vOg",
+        "timestamp": 6350,
+        "endTimestamp": 6387
+      }
+    ]
+  },
+  {
     "id": "song-5cafe9dd",
     "workId": "work-song-1330",
     "title": "有一種悲傷",
@@ -60,6 +188,38 @@
         "videoId": "m0AypZ_piJk",
         "timestamp": 1793,
         "endTimestamp": 2021
+      }
+    ]
+  },
+  {
+    "id": "song-57629445",
+    "workId": "work-1f5ebbe4-96d9-43e2-8b4d-55d7b2088c6c",
+    "title": "伽藍經",
+    "originalArtist": "子彌",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-9dd64eef",
+        "streamId": "stream-2026-04-29",
+        "videoId": "g9C_PHb2vOg",
+        "timestamp": 694,
+        "endTimestamp": 915
+      }
+    ]
+  },
+  {
+    "id": "song-0ffae307",
+    "workId": "work-deaac898-9a42-41c2-9270-1ad1d3dc87c9",
+    "title": "何以歌",
+    "originalArtist": "Aki阿杰",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-65e4eb0b",
+        "streamId": "stream-2026-04-29",
+        "videoId": "g9C_PHb2vOg",
+        "timestamp": 408,
+        "endTimestamp": 678
       }
     ]
   },
@@ -80,6 +240,22 @@
     ]
   },
   {
+    "id": "song-1e1d5044",
+    "workId": "work-song-d180613f",
+    "title": "我把我的青春給你",
+    "originalArtist": "好樂團GoodBand",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-8907ff0c",
+        "streamId": "stream-5ce19eb4",
+        "videoId": "B6jX2bLJ1Rc",
+        "timestamp": 1478,
+        "endTimestamp": 1715
+      }
+    ]
+  },
+  {
     "id": "song-f482c733",
     "workId": "work-57bcc525-f9c2-416c-998e-05ff1618b8f5",
     "title": "我的世界",
@@ -92,6 +268,173 @@
         "videoId": "m0AypZ_piJk",
         "timestamp": 2510,
         "endTimestamp": 2681
+      }
+    ]
+  },
+  {
+    "id": "song-3127f11b",
+    "workId": "work-915a415a-2133-4f2a-a84b-1676033c8004",
+    "title": "我的悲傷是水做的",
+    "originalArtist": "洛天依",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-0a40605a",
+        "streamId": "stream-2026-04-29",
+        "videoId": "g9C_PHb2vOg",
+        "timestamp": 1018,
+        "endTimestamp": 1239
+      }
+    ]
+  },
+  {
+    "id": "song-29bf393c",
+    "workId": "work-df100257-fa4d-4e7b-9e83-f710c7784068",
+    "title": "我喜歡你",
+    "originalArtist": "芒果醬",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-3c76172a",
+        "streamId": "stream-5ce19eb4",
+        "videoId": "B6jX2bLJ1Rc",
+        "timestamp": 3520,
+        "endTimestamp": 3725
+      }
+    ]
+  },
+  {
+    "id": "song-8ba6bd8b",
+    "workId": "work-song-39636c3a",
+    "title": "李白",
+    "originalArtist": "李榮浩",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-1138300b",
+        "streamId": "stream-5ce19eb4",
+        "videoId": "B6jX2bLJ1Rc",
+        "timestamp": 2880,
+        "endTimestamp": 3235
+      }
+    ]
+  },
+  {
+    "id": "song-fed3e9a0",
+    "workId": "work-ed96a57c-e6b9-4502-8d58-0ebe896a408a",
+    "title": "相愛就是說了100次對不起",
+    "originalArtist": "Crispy脆樂團",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-c49d4a03",
+        "streamId": "stream-5ce19eb4",
+        "videoId": "B6jX2bLJ1Rc",
+        "timestamp": 2545,
+        "endTimestamp": 2806
+      },
+      {
+        "id": "p-9b392b25",
+        "streamId": "stream-2026-04-29",
+        "videoId": "g9C_PHb2vOg",
+        "timestamp": 1541,
+        "endTimestamp": 1802
+      }
+    ]
+  },
+  {
+    "id": "song-12485442",
+    "workId": "work-song-f3dcd1ab",
+    "title": "突然想起你",
+    "originalArtist": "蕭亞軒",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-baaab784",
+        "streamId": "stream-2026-04-29",
+        "videoId": "g9C_PHb2vOg",
+        "timestamp": 2446,
+        "endTimestamp": 2718
+      }
+    ]
+  },
+  {
+    "id": "song-c3b779df",
+    "workId": "work-song-59976ef5",
+    "title": "留給你的我從未",
+    "originalArtist": "甜約翰",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-8043d310",
+        "streamId": "stream-2026-04-29",
+        "videoId": "g9C_PHb2vOg",
+        "timestamp": 1812,
+        "endTimestamp": 2016
+      }
+    ]
+  },
+  {
+    "id": "song-a5f445fb",
+    "workId": "work-408ed7b0-f849-4299-b196-992f35de601c",
+    "title": "啊！美麗卡洛",
+    "originalArtist": "ChiliChill",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-23508b5f",
+        "streamId": "stream-2026-04-29",
+        "videoId": "g9C_PHb2vOg",
+        "timestamp": 1239,
+        "endTimestamp": 1466
+      }
+    ]
+  },
+  {
+    "id": "song-d9891aca",
+    "workId": "work-bcc58791-c3fb-453e-a6df-084d20e97be1",
+    "title": "控制狂",
+    "originalArtist": "蘇打綠",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-554d0d5b",
+        "streamId": "stream-2026-04-29",
+        "videoId": "g9C_PHb2vOg",
+        "timestamp": 2025,
+        "endTimestamp": 2272
+      }
+    ]
+  },
+  {
+    "id": "song-03a2b384",
+    "workId": "work-ae028626-e0f4-4f76-a031-633f785561d4",
+    "title": "崴孟三百天禮物",
+    "originalArtist": "崴崴孟孟",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-f27122bc",
+        "streamId": "stream-5ce19eb4",
+        "videoId": "B6jX2bLJ1Rc",
+        "timestamp": 6003,
+        "endTimestamp": 6234
+      }
+    ]
+  },
+  {
+    "id": "song-2b5d1acb",
+    "workId": "work-e5e74092-4fc7-4f71-9191-614c7d357086",
+    "title": "絲路",
+    "originalArtist": "梁靜茹",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-8fb3d32e",
+        "streamId": "stream-2026-04-29",
+        "videoId": "g9C_PHb2vOg",
+        "timestamp": 3238,
+        "endTimestamp": 3534
       }
     ]
   },
@@ -144,6 +487,22 @@
     ]
   },
   {
+    "id": "song-bea5b19d",
+    "workId": "work-8a9b6eb3-b5a7-4eda-a6aa-682d1023a154",
+    "title": "榮耀鋒芒",
+    "originalArtist": "祈Inory",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-bf04876e",
+        "streamId": "stream-5ce19eb4",
+        "videoId": "B6jX2bLJ1Rc",
+        "timestamp": 5448,
+        "endTimestamp": 5657
+      }
+    ]
+  },
+  {
     "id": "song-6a29488c",
     "workId": "work-b0da2214-a0e1-4e72-a194-c2c5365f7b62",
     "title": "緣分一道橋",
@@ -192,6 +551,54 @@
     ]
   },
   {
+    "id": "song-a22c4dc5",
+    "workId": "work-song-85692b2b",
+    "title": "離開的一路上",
+    "originalArtist": "理想混蛋",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-6c73926f",
+        "streamId": "stream-5ce19eb4",
+        "videoId": "B6jX2bLJ1Rc",
+        "timestamp": 1834,
+        "endTimestamp": 2085
+      }
+    ]
+  },
+  {
+    "id": "song-1f4d33a2",
+    "workId": "work-c181f242-6b39-4948-9d52-0b670241be4b",
+    "title": "辭·九門回憶",
+    "originalArtist": "冰幽 & 解憂草",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-46eb9305",
+        "streamId": "stream-5ce19eb4",
+        "videoId": "B6jX2bLJ1Rc",
+        "timestamp": 5068,
+        "endTimestamp": 5306
+      }
+    ]
+  },
+  {
+    "id": "song-6c9b5a9c",
+    "workId": "work-0bb703ae-6f82-41ba-8d5b-6c9930e851c2",
+    "title": "蠢貨",
+    "originalArtist": "喻言",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-813ac907",
+        "streamId": "stream-2026-04-29",
+        "videoId": "g9C_PHb2vOg",
+        "timestamp": 4032,
+        "endTimestamp": 4238
+      }
+    ]
+  },
+  {
     "id": "song-6b06132a",
     "workId": "work-0024e2b5-f0d9-4477-9948-802e0ef405be",
     "title": "驚蟄",
@@ -204,6 +611,150 @@
         "videoId": "m0AypZ_piJk",
         "timestamp": 4162,
         "endTimestamp": 4404
+      }
+    ]
+  },
+  {
+    "id": "song-9a1fa0ed",
+    "workId": "work-song-30045e03",
+    "title": "A Thousand Miles",
+    "originalArtist": "Vanessa Carlton",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-c3379564",
+        "streamId": "stream-5ce19eb4",
+        "videoId": "B6jX2bLJ1Rc",
+        "timestamp": 4357,
+        "endTimestamp": 4593
+      }
+    ]
+  },
+  {
+    "id": "song-2373ba52",
+    "workId": "work-6c21b6c8-979b-4610-984b-346adad08166",
+    "title": "Baby, I'm Jealous",
+    "originalArtist": "Bebe Rexha feat. Doja Cat",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-622dce90",
+        "streamId": "stream-2026-04-29",
+        "videoId": "g9C_PHb2vOg",
+        "timestamp": 4955,
+        "endTimestamp": 5128
+      }
+    ]
+  },
+  {
+    "id": "song-89a3949e",
+    "workId": "work-06521394-5ac9-428a-9947-de76c390ba50",
+    "title": "Bones",
+    "originalArtist": "Imagine Dragons",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-250d02ae",
+        "streamId": "stream-2026-04-29",
+        "videoId": "g9C_PHb2vOg",
+        "timestamp": 5148,
+        "endTimestamp": 5307
+      }
+    ]
+  },
+  {
+    "id": "song-db687ba8",
+    "workId": "work-6e0c8710-a1a3-4ec3-82a4-aaedf9b13534",
+    "title": "Funny",
+    "originalArtist": "Zedd & Jasmine Thompson",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-ae426813",
+        "streamId": "stream-2026-04-29",
+        "videoId": "g9C_PHb2vOg",
+        "timestamp": 5428,
+        "endTimestamp": 5650
+      }
+    ]
+  },
+  {
+    "id": "song-b3b11edb",
+    "workId": "work-920f92be-d3cf-4c8c-ae18-753a11934be7",
+    "title": "Go Higher",
+    "originalArtist": "HYBS",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-92403fcd",
+        "streamId": "stream-5ce19eb4",
+        "videoId": "B6jX2bLJ1Rc",
+        "timestamp": 3916,
+        "endTimestamp": 4112
+      }
+    ]
+  },
+  {
+    "id": "song-8ad7e255",
+    "workId": "work-song-1865",
+    "title": "Golden hour",
+    "originalArtist": "JVKE",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-3295e745",
+        "streamId": "stream-2026-04-29",
+        "videoId": "g9C_PHb2vOg",
+        "timestamp": 6084,
+        "endTimestamp": 6292
+      }
+    ]
+  },
+  {
+    "id": "song-ec778c1d",
+    "workId": "work-a8107692-8f64-43d3-b1da-aee55d24cac6",
+    "title": "Hope",
+    "originalArtist": "The Chainsmokers",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-04b3f821",
+        "streamId": "stream-2026-04-29",
+        "videoId": "g9C_PHb2vOg",
+        "timestamp": 5710,
+        "endTimestamp": 5885
+      }
+    ]
+  },
+  {
+    "id": "song-97f1ebef",
+    "workId": "work-song-3b1a26ea",
+    "title": "Letting Go",
+    "originalArtist": "蔡健雅",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-441c6964",
+        "streamId": "stream-5ce19eb4",
+        "videoId": "B6jX2bLJ1Rc",
+        "timestamp": 3242,
+        "endTimestamp": 3494
+      }
+    ]
+  },
+  {
+    "id": "song-42225245",
+    "workId": "work-song-b53a17b8",
+    "title": "Tip Toe",
+    "originalArtist": "HYBS",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-b45599cb",
+        "streamId": "stream-5ce19eb4",
+        "videoId": "B6jX2bLJ1Rc",
+        "timestamp": 4117,
+        "endTimestamp": 4340
       }
     ]
   }
