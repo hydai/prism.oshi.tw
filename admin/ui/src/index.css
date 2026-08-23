@@ -5,3 +5,94 @@
 body {
   min-height: 100vh;
 }
+
+/* ===== Prism design tokens (light values from app/globals.css) ===== */
+:root {
+  /* === Colors: Accent === */
+  --accent-pink: #EC4899;
+  --accent-pink-dark: #DB2777;
+  --accent-pink-light: #F472B6;
+  --accent-blue: #3B82F6;
+  --accent-blue-light: #60A5FA;
+  --accent-purple: #A855F7;
+
+  /* === Colors: Page Background === */
+  --bg-page-start: #FFF0F5;
+  --bg-page-mid: #F0F8FF;
+  --bg-page-end: #E6E6FA;
+
+  /* === Colors: Surface === */
+  --bg-surface: #FFFFFF;
+  --bg-surface-frosted: #FFFFFF99;
+  --bg-surface-glass: #FFFFFF66;
+  --bg-surface-muted: #FFFFFF80;
+
+  /* === Colors: Overlay === */
+  --bg-overlay: #FFFFFFCC;
+
+  /* === Colors: Accent Background === */
+  --bg-accent-pink: #FDF2F8;
+  --bg-accent-pink-muted: #FCE7F3;
+  --bg-accent-blue: #EFF6FF;
+  --bg-accent-blue-muted: #DBEAFE;
+
+  /* === Colors: Text === */
+  --text-primary: #1E293B;
+  --text-secondary: #64748B;
+  --text-tertiary: #94A3B8;
+  --text-muted: #CBD5E1;
+  --text-on-accent: #FFFFFF;
+
+  /* === Colors: Border === */
+  --border-default: #E2E8F0;
+  --border-glass: #FFFFFF66;
+  --border-table: #E2E8F040;
+  --border-accent-pink: #FBCFE8;
+  --border-accent-blue: #BFDBFE;
+
+  /* === Typography === */
+  --font-primary: var(--font-dm-sans, 'DM Sans'), sans-serif;
+  --font-size-xs: 10px;
+  --font-size-sm: 11px;
+  --font-size-base: 13px;
+  --font-size-md: 14px;
+  --font-size-lg: 15px;
+  --font-size-xl: 20px;
+  --font-size-2xl: 32px;
+  --font-size-3xl: 48px;
+  --font-size-display: 64px;
+
+  /* === Spacing === */
+  --space-1: 2px;
+  --space-2: 4px;
+  --space-3: 8px;
+  --space-4: 12px;
+  --space-5: 16px;
+  --space-6: 24px;
+  --space-7: 32px;
+  --space-8: 40px;
+
+  /* === Border Radii === */
+  --radius-xs: 6px;
+  --radius-sm: 8px;
+  --radius-md: 10px;
+  --radius-lg: 12px;
+  --radius-xl: 16px;
+  --radius-2xl: 20px;
+  --radius-3xl: 24px;
+  --radius-pill: 28px;
+  --radius-circle: 9999px;
+
+  /* === Icon Sizes === */
+  --icon-sm: 14px;
+  --icon-md: 16px;
+  --icon-lg: 20px;
+  --icon-xl: 28px;
+}
+
+/* ===== Prism page helpers for the review pages ===== */
+.prism-main { background: linear-gradient(135deg, var(--bg-page-start) 0%, var(--bg-page-mid) 50%, var(--bg-page-end) 100%); font-family: 'DM Sans', system-ui, -apple-system, 'Segoe UI', sans-serif; color: var(--text-primary); -webkit-font-smoothing: antialiased; }
+.prism-gradient { background: linear-gradient(135deg, var(--accent-pink-light), var(--accent-blue-light)); }
+.prism-gradient-text { background: linear-gradient(135deg, var(--accent-pink), var(--accent-blue)); -webkit-background-clip: text; background-clip: text; -webkit-text-fill-color: transparent; color: transparent; }
+.prism-shell-shadow { box-shadow: 0 25px 50px -12px rgba(224, 231, 255, 0.5); }
+@media (hover: hover) { .hover-row:hover { background: var(--bg-accent-pink); } }
