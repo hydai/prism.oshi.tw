@@ -47,20 +47,18 @@ function renderRow(sub: NovaSubmission): string {
   assert(SubmissionRow !== undefined, 'SubmissionRow is loaded');
   return renderToStaticMarkup(
     <table>
-      <tbody>
-        <SubmissionRow
-          sub={sub}
-          isCurator
-          expanded
-          onToggle={() => undefined}
-          rejectNote=""
-          onRejectNoteChange={() => undefined}
-          onAction={() => undefined}
-          onDelete={() => undefined}
-          onSave={() => undefined}
-          actionLoading={false}
-        />
-      </tbody>
+      <SubmissionRow
+        sub={sub}
+        isCurator
+        expanded
+        onToggle={() => undefined}
+        rejectNote=""
+        onRejectNoteChange={() => undefined}
+        onAction={() => undefined}
+        onDelete={() => undefined}
+        onSave={() => undefined}
+        actionLoading={false}
+      />
     </table>,
   );
 }
@@ -130,6 +128,8 @@ async function main(): Promise<void> {
   assert(valid.includes('href="https://x.com/safe"'), 'valid X URL renders as an href');
   assert(valid.includes('href="https://www.twitch.tv/safe"'), 'valid YouTube redirect to Twitch is unwrapped and linked');
   assert(valid.includes('tabindex="0"'), 'submission row is keyboard focusable');
+  // React 19 may prefix the markup with an image preload hint, so look for the table instead of anchoring at index 0.
+  assert(valid.includes('<table><tbody') && (valid.match(/<td /g) ?? []).length >= 8, 'submission rows are native table rows and cells');
   assert(valid.includes('aria-expanded="true"'), 'submission row exposes its expanded state');
   assert(valid.includes('aria-controls="nova-submission-details-sub-test"'), 'submission row identifies its details');
   assert(valid.includes('>Approve</button>'), 'pending curator action retains approve control');

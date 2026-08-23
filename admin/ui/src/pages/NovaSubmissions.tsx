@@ -3,9 +3,22 @@ import type { Dispatch } from 'react';
 import type { AuthUser, NovaSubmission, NovaStatus, BulkFetchSubscribersResponse } from '../../../shared/types';
 import { sanitizeNovaUrl } from '../../../shared/nova-url-safety';
 import { api } from '../api/client';
-import StatusBadge from '../components/StatusBadge';
+import { countByStatus, removeById, replaceById } from '../lib/status-totals';
 import { useSearchParams } from 'react-router-dom';
 import { finiteInputNumber } from '../lib/numeric-input';
+import { Avatar } from '../components/prism/Avatar';
+import { GradientButton, OutlineButton } from '../components/prism/Buttons';
+import { Chip } from '../components/prism/Chip';
+import { CircleButton } from '../components/prism/CircleButton';
+import { ColumnHeader } from '../components/prism/ColumnHeader';
+import { DetailField } from '../components/prism/DetailField';
+import { PrismInput, PrismTextarea } from '../components/prism/Fields';
+import { GlassCard } from '../components/prism/GlassCard';
+import { Icon } from '../components/prism/Icon';
+import { StatusPill } from '../components/prism/Pill';
+import { PrismPage } from '../components/prism/PrismPage';
+import { SearchInput } from '../components/prism/SearchInput';
+import { SectionLabel } from '../components/prism/SectionLabel';
 import {
   createSubmissionRowState,
   EDITABLE_FIELDS,
@@ -18,6 +31,15 @@ import type {
   SubmissionRowState,
 } from './nova-submission-row-state';
 
+const ROW_GRID = 'grid-cols-[40px_minmax(0,1fr)_minmax(0,1fr)_110px_120px_120px_128px_28px]';
+
+const STATUS_FILTERS: ReadonlyArray<{ value: '' | NovaStatus; label: string }> = [
+  { value: '', label: 'All' },
+  { value: 'pending', label: 'Pending' },
+  { value: 'approved', label: 'Approved' },
+  { value: 'rejected', label: 'Rejected' },
+];
+
 function isCanonicalUtcTimestamp(value: string | null): value is string {
   if (value === null || !/^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}\.\d{3}Z$/.test(value)) return false;
   const timestamp = Date.parse(value);
@@ -27,6 +49,8 @@ function isCanonicalUtcTimestamp(value: string | null): value is string {
 export default function NovaSubmissions({ user }: { user: AuthUser }) {
   const [initialParams] = useSearchParams();
   const [submissions, setSubmissions] = useState<NovaSubmission[]>([]);
+  // Unfiltered copy for the hero totals; kept in sync with the same by-id updates.
+  const [allSubmissions, setAllSubmissions] = useState<NovaSubmission[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [statusFilter, setStatusFilter] = useState<'' | NovaStatus>(() => {
@@ -44,9 +68,14 @@ export default function NovaSubmissions({ user }: { user: AuthUser }) {
 
   const fetchSubmissions = () => {
     setLoading(true);
-    api
-      .listNovaSubmissions({ status: statusFilter || undefined, search: search || undefined })
-      .then((res) => setSubmissions(res.data))
+    Promise.all([
+      api.listNovaSubmissions({ status: statusFilter || undefined, search: search || undefined }),
+      api.listNovaSubmissions(),
+    ])
+      .then(([res, all]) => {
+        setSubmissions(res.data);
+        setAllSubmissions(all.data);
+      })
       .catch((err: unknown) => setError(err instanceof Error ? err.message : 'Failed to load'))
       .finally(() => setLoading(false));
   };
@@ -63,7 +92,8 @@ export default function NovaSubmissions({ user }: { user: AuthUser }) {
         status,
         reviewer_note: status === 'rejected' ? rejectNote[id] : undefined,
       });
-      setSubmissions((prev) => prev.map((s) => (s.id === id ? updated : s)));
+      setSubmissions((prev) => replaceById(prev, updated));
+      setAllSubmissions((prev) => replaceById(prev, updated));
       setRejectNote((prev) => {
         const next = { ...prev };
         delete next[id];
@@ -81,7 +111,8 @@ export default function NovaSubmissions({ user }: { user: AuthUser }) {
     setActionLoading(sub.id);
     try {
       await api.deleteNovaSubmission(sub.id);
-      setSubmissions((prev) => prev.filter((s) => s.id !== sub.id));
+      setSubmissions((prev) => removeById(prev, sub.id));
+      setAllSubmissions((prev) => removeById(prev, sub.id));
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Delete failed');
     } finally {
@@ -90,7 +121,8 @@ export default function NovaSubmissions({ user }: { user: AuthUser }) {
   };
 
   const handleSave = (updated: NovaSubmission) => {
-    setSubmissions((prev) => prev.map((s) => (s.id === updated.id ? updated : s)));
+    setSubmissions((prev) => replaceById(prev, updated));
+    setAllSubmissions((prev) => replaceById(prev, updated));
   };
 
   const handleFetchAll = async () => {
@@ -108,98 +140,105 @@ export default function NovaSubmissions({ user }: { user: AuthUser }) {
   };
 
   const isCurator = user.role === 'curator';
+  const countOf = (status: NovaStatus) => countByStatus(allSubmissions, status);
 
   return (
-    <div>
-      <h2 className="text-xl font-semibold text-slate-800">Nova Submissions</h2>
-      <p className="mt-1 text-sm text-slate-500">Review VTuber submissions from the public Nova form.</p>
-
-      {/* Status filter + bulk actions */}
-      <div className="mt-4 flex items-center gap-3">
-        <select
-          aria-label="Filter submissions by status"
-          value={statusFilter}
-          onChange={(e) => setStatusFilter(e.target.value as '' | NovaStatus)}
-          className="rounded-md border border-slate-300 px-3 py-1.5 text-sm"
-        >
-          <option value="">All statuses</option>
-          <option value="pending">Pending</option>
-          <option value="approved">Approved</option>
-          <option value="rejected">Rejected</option>
-        </select>
-        <form
-          className="flex gap-2"
-          onSubmit={(event) => {
-            event.preventDefault();
-            fetchSubmissions();
-          }}
-        >
-          <input
-            type="search"
-            aria-label="Search submissions"
-            value={search}
-            onChange={(event) => setSearch(event.target.value)}
-            placeholder="Search ID, slug, channel..."
-            className="rounded-md border border-slate-300 px-3 py-1.5 text-sm"
-          />
-          <button type="submit" className="rounded bg-slate-200 px-3 py-1.5 text-xs font-medium text-slate-700">
-            Search
-          </button>
-        </form>
-        {isCurator && (
-          <button
-            disabled={fetchingAll || loading}
-            onClick={handleFetchAll}
-            className="rounded bg-indigo-600 px-3 py-1.5 text-xs font-medium text-white hover:bg-indigo-700 disabled:opacity-50 disabled:cursor-not-allowed"
+    <PrismPage
+      icon="nova"
+      badge="Submissions"
+      title="Nova"
+      description="Review VTuber submissions from the public Nova form."
+      count={`${allSubmissions.length} submissions`}
+      stats={[
+        { value: countOf('pending'), label: 'Pending' },
+        { value: countOf('approved'), label: 'Approved' },
+        { value: countOf('rejected'), label: 'Rejected' },
+      ]}
+      toolbar={
+        <>
+          <div className="flex items-center gap-1.5" role="group" aria-label="Filter submissions by status">
+            {STATUS_FILTERS.map((filter) => (
+              <Chip
+                key={filter.value}
+                active={statusFilter === filter.value}
+                onClick={() => setStatusFilter(filter.value)}
+              >
+                {filter.label}
+              </Chip>
+            ))}
+          </div>
+          <div className="flex-1" />
+          <form
+            onSubmit={(event) => {
+              event.preventDefault();
+              fetchSubmissions();
+            }}
           >
-            {fetchingAll ? 'Fetching...' : 'Fetch All Channel Info'}
-          </button>
-        )}
-      </div>
-
-      {/* Bulk fetch result summary */}
-      {fetchAllResult && (
-        <div className="mt-3 rounded-md border border-slate-200 bg-slate-50 p-3 text-sm">
-          <p className="font-medium text-slate-700">
-            Updated {fetchAllResult.updated}, Failed {fetchAllResult.failed}
-          </p>
-          {fetchAllResult.results.length > 0 && (
-            <details className="mt-2">
-              <summary className="cursor-pointer text-xs text-slate-500 hover:text-slate-700">
-                Show details ({fetchAllResult.results.length} streamers)
-              </summary>
-              <ul className="mt-1 space-y-1 text-xs">
-                {fetchAllResult.results.map((r) => (
-                  <li key={r.id} className={r.error ? 'text-red-600' : 'text-slate-600'}>
-                    {r.display_name}: {r.error ? r.error : `${r.subscriber_count}${r.avatar_url ? ' (avatar updated)' : ''}`}
-                  </li>
-                ))}
-              </ul>
-            </details>
+            <SearchInput
+              value={search}
+              onChange={setSearch}
+              placeholder="Search ID, slug, channel..."
+              label="Search submissions"
+            />
+          </form>
+          {isCurator && (
+            <GradientButton
+              icon="refresh"
+              disabled={fetchingAll || loading}
+              onClick={handleFetchAll}
+            >
+              {fetchingAll ? 'Fetching...' : 'Fetch All Channel Info'}
+            </GradientButton>
           )}
-        </div>
-      )}
+        </>
+      }
+    >
+      <div className="px-6 pb-6">
+        {/* Bulk fetch result summary */}
+        {fetchAllResult && (
+          <GlassCard className="mt-3 px-4 py-3 text-sm">
+            <p className="font-medium text-token-primary">
+              Updated {fetchAllResult.updated}, Failed {fetchAllResult.failed}
+            </p>
+            {fetchAllResult.results.length > 0 && (
+              <details className="mt-2">
+                <summary className="cursor-pointer text-xs text-token-secondary hover:text-token-primary">
+                  Show details ({fetchAllResult.results.length} streamers)
+                </summary>
+                <ul className="mt-1 space-y-1 text-xs">
+                  {fetchAllResult.results.map((r) => (
+                    <li key={r.id} className={r.error ? 'text-red-600' : 'text-token-secondary'}>
+                      {r.display_name}: {r.error ? r.error : `${r.subscriber_count}${r.avatar_url ? ' (avatar updated)' : ''}`}
+                    </li>
+                  ))}
+                </ul>
+              </details>
+            )}
+          </GlassCard>
+        )}
 
-      {error && <p className="mt-4 text-sm text-red-600">{error}</p>}
+        {error && <p className="mt-4 text-sm text-red-600">{error}</p>}
 
-      {loading ? (
-        <p className="mt-6 text-slate-500">Loading...</p>
-      ) : (
-        <div className="mt-4 overflow-x-auto rounded-lg border border-slate-200 bg-white">
-          <table className="w-full text-left text-sm">
-            <thead className="border-b border-slate-200 bg-slate-50 text-xs uppercase text-slate-500">
-              <tr>
-                <th className="px-4 py-3">Display Name</th>
-                <th className="px-4 py-3">Slug</th>
-                <th className="px-4 py-3">YouTube Channel</th>
-                <th className="px-4 py-3">Subscribers</th>
-                <th className="px-4 py-3">Status</th>
-                <th className="px-4 py-3">Submitted</th>
-                {isCurator && <th className="px-4 py-3">Actions</th>}
-              </tr>
-            </thead>
-            <tbody className="divide-y divide-slate-100">
-              {submissions.map((sub) => (
+        {loading ? (
+          <p className="py-6 text-center text-sm text-token-secondary">Loading...</p>
+        ) : (
+          <div className="overflow-x-auto">
+          <table aria-label="VTuber submissions" className="block min-w-[880px]">
+            <ColumnHeader
+              gridClassName={ROW_GRID}
+              sticky={false}
+              columns={[
+                { key: 'avatar', label: '' },
+                { key: 'vtuber', label: 'VTuber', className: 'pl-3' },
+                { key: 'channel', label: 'Channel', className: 'pl-3' },
+                { key: 'subscribers', label: 'Subscribers', className: 'pl-3' },
+                { key: 'status', label: 'Status', className: 'pl-3' },
+                { key: 'submitted', label: 'Submitted', className: 'pl-3' },
+                { key: 'actions', label: '' },
+                { key: 'toggle', label: '' },
+              ]}
+            />
+            {submissions.map((sub) => (
                 <SubmissionRow
                   key={sub.id}
                   sub={sub}
@@ -214,18 +253,18 @@ export default function NovaSubmissions({ user }: { user: AuthUser }) {
                   actionLoading={actionLoading === sub.id}
                 />
               ))}
-              {submissions.length === 0 && (
-                <tr>
-                  <td colSpan={isCurator ? 7 : 6} className="px-4 py-8 text-center text-slate-400">
-                    No submissions found.
-                  </td>
+            {submissions.length === 0 && (
+              <tbody className="block">
+                <tr className="block">
+                  <td colSpan={8} className="block px-4 py-8 text-center text-sm text-token-tertiary">No submissions found.</td>
                 </tr>
-              )}
-            </tbody>
+              </tbody>
+            )}
           </table>
-        </div>
-      )}
-    </div>
+          </div>
+        )}
+      </div>
+    </PrismPage>
   );
 }
 
@@ -362,7 +401,7 @@ export function SubmissionRow({
   );
 
   const youtubeChannelUrl = sanitizeNovaUrl(sub.youtube_channel_url, 'youtube');
-  const avatarUrl = expanded && !editing ? sanitizeNovaUrl(sub.avatar_url, 'image') : null;
+  const avatarUrl = sanitizeNovaUrl(sub.avatar_url, 'image');
   const socialLinks = expanded && !editing
     ? [
         { label: 'YouTube', url: sub.link_youtube, safeUrl: sanitizeNovaUrl(sub.link_youtube, 'youtube') },
@@ -373,10 +412,14 @@ export function SubmissionRow({
       ]
     : [];
 
+  const showReviewCard = isCurator && !editing;
+
   return (
-    <>
+    <tbody className={`mt-0.5 block rounded-radius-lg ${expanded ? 'bg-[#FCE7F320]' : ''}`}>
       <SubmissionSummaryRow
         sub={sub}
+        avatarUrl={avatarUrl}
+        youtubeChannelUrl={youtubeChannelUrl}
         isCurator={isCurator}
         expanded={expanded}
         onToggle={onToggle}
@@ -385,73 +428,141 @@ export function SubmissionRow({
         actionLoading={actionLoading}
       />
       {expanded && (
-        <tr id={`nova-submission-details-${sub.id}`} className="bg-slate-50">
-          <td colSpan={isCurator ? 7 : 6} className="px-6 py-4">
-            {isCurator && (
-              <SubmissionToolbar
+        <tr className="block">
+        <td
+          colSpan={8}
+          id={`nova-submission-details-${sub.id}`}
+          className={`grid gap-6 border-t border-border-token-table px-3 pb-3 pt-4 ${
+            showReviewCard ? 'grid-cols-[minmax(0,1fr)_360px]' : 'grid-cols-1'
+          }`}
+        >
+          {/* Left column: submission fields */}
+          <div className="flex min-w-0 flex-col gap-4">
+            <div className="flex items-center gap-4">
+              {!editing && <SubmissionAvatar sub={sub} safeUrl={avatarUrl} />}
+              <div className="min-w-0 flex-1">
+                <p className="text-xl font-bold leading-tight text-token-primary">{sub.display_name}</p>
+                <p className="mt-1 flex flex-wrap items-center gap-2 text-[13px] text-token-secondary">
+                  <span>{sub.brand_name || sub.slug}</span>
+                  {sub.group && (
+                    <>
+                      <span className="text-token-tertiary">·</span>
+                      <span>{sub.group}</span>
+                    </>
+                  )}
+                  <span className="inline-flex items-center gap-1 whitespace-nowrap rounded-radius-pill border border-border-token px-2 py-0.5 text-[10px] font-semibold leading-4 text-token-secondary">
+                    <Icon name="shield" size={11} />
+                    {channelVerified ? 'Verified' : 'Not verified'}
+                  </span>
+                </p>
+              </div>
+              {isCurator && (
+                <SubmissionToolbar
+                  sub={sub}
+                  state={{
+                    editing,
+                    saving,
+                    saveError,
+                    orderDraft,
+                    verifyingChannel,
+                    verificationError,
+                  }}
+                  channelVerified={channelVerified}
+                  onEdit={() => dispatch({ type: 'editStarted' })}
+                  onSave={handleSave}
+                  onCancel={handleCancel}
+                  onVerifyChannel={handleVerifyChannel}
+                />
+              )}
+            </div>
+
+            {editing ? (
+              <SubmissionEditor
                 sub={sub}
                 state={{
-                  editing,
-                  saving,
-                  saveError,
+                  draft,
+                  themeDraft,
+                  enabledDraft,
                   orderDraft,
-                  verifyingChannel,
-                  verificationError,
+                  fetchingSubscribers: fetchingSubs,
+                  fetchSubscribersError: fetchSubsError,
                 }}
+                dispatch={dispatch}
+                onFetchSubscribers={handleFetchSubscribers}
+              />
+            ) : (
+              <SubmissionView
+                sub={sub}
+                youtubeChannelUrl={youtubeChannelUrl}
                 channelVerified={channelVerified}
-                onEdit={() => dispatch({ type: 'editStarted' })}
-                onSave={handleSave}
-                onCancel={handleCancel}
-                onVerifyChannel={handleVerifyChannel}
+                socialLinks={socialLinks}
               />
             )}
+          </div>
 
-            <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
-              {/* Left column: submission fields */}
-              <div className="space-y-3">
-                {!editing && <SubmissionAvatar sub={sub} safeUrl={avatarUrl} />}
-
-                {editing ? (
-                  <SubmissionEditor
-                    sub={sub}
-                    state={{
-                      draft,
-                      themeDraft,
-                      enabledDraft,
-                      orderDraft,
-                      fetchingSubscribers: fetchingSubs,
-                      fetchSubscribersError: fetchSubsError,
-                    }}
-                    dispatch={dispatch}
-                    onFetchSubscribers={handleFetchSubscribers}
-                  />
-                ) : (
-                  <SubmissionView
-                    sub={sub}
-                    youtubeChannelUrl={youtubeChannelUrl}
-                    channelVerified={channelVerified}
-                    socialLinks={socialLinks}
-                  />
-                )}
-              </div>
-
-              {isCurator && sub.status === 'pending' && !editing && (
+          {/* Right column: review actions */}
+          {showReviewCard && (
+            <GlassCard className="flex flex-col gap-2.5 self-start p-4">
+              {sub.status === 'pending' ? (
                 <RejectNoteEditor
                   submissionId={sub.id}
                   value={rejectNote}
                   onChange={onRejectNoteChange}
                 />
+              ) : (
+                <SectionLabel>Review</SectionLabel>
               )}
-            </div>
-          </td>
+              <div className="flex items-center gap-2">
+                {sub.status === 'pending' ? (
+                  <>
+                    <GradientButton
+                      icon="check"
+                      disabled={actionLoading}
+                      onClick={() => onAction(sub.id, 'approved')}
+                    >
+                      Approve
+                    </GradientButton>
+                    <OutlineButton
+                      icon="x"
+                      tone="danger"
+                      disabled={actionLoading}
+                      onClick={() => onAction(sub.id, 'rejected')}
+                    >
+                      Reject
+                    </OutlineButton>
+                  </>
+                ) : (
+                  <OutlineButton
+                    icon="undo"
+                    disabled={actionLoading}
+                    onClick={() => onAction(sub.id, 'pending')}
+                  >
+                    Revert to Pending
+                  </OutlineButton>
+                )}
+                <div className="flex-1" />
+                <button
+                  type="button"
+                  disabled={actionLoading}
+                  onClick={() => onDelete(sub)}
+                  className="text-[11px] font-medium text-token-tertiary transition-colors hover:text-red-600 disabled:opacity-50"
+                >
+                  Delete
+                </button>
+              </div>
+            </GlassCard>
+          )}
+        </td>
         </tr>
       )}
-    </>
+    </tbody>
   );
 }
 
 function SubmissionSummaryRow({
   sub,
+  avatarUrl,
+  youtubeChannelUrl,
   isCurator,
   expanded,
   onToggle,
@@ -460,6 +571,8 @@ function SubmissionSummaryRow({
   actionLoading,
 }: {
   sub: NovaSubmission;
+  avatarUrl: string | null;
+  youtubeChannelUrl: string | null;
   isCurator: boolean;
   expanded: boolean;
   onToggle: () => void;
@@ -467,87 +580,82 @@ function SubmissionSummaryRow({
   onDelete: (sub: NovaSubmission) => void;
   actionLoading: boolean;
 }) {
-  const youtubeChannelUrl = sanitizeNovaUrl(sub.youtube_channel_url, 'youtube');
-
   return (
-    <tr
-      className="cursor-pointer hover:bg-slate-50 focus-visible:outline-2 focus-visible:outline-offset-[-2px] focus-visible:outline-blue-500"
-      onClick={onToggle}
-      onKeyDown={(event) => {
-        if (event.target !== event.currentTarget) return;
-        if (event.key !== 'Enter' && event.key !== ' ') return;
-        event.preventDefault();
-        onToggle();
-      }}
-      tabIndex={0}
-      aria-expanded={expanded}
-      aria-controls={`nova-submission-details-${sub.id}`}
-      aria-label={`${expanded ? '收合' : '展開'} ${sub.display_name}`}
-    >
-      <td className="px-4 py-3 font-medium text-slate-800">
-        <span className="mr-1 text-xs text-slate-400">{expanded ? '▼' : '▶'}</span>
-        {sub.display_name}
+    // The name cell is the accessible toggle control (keyboard focus, expanded
+    // state); the chevron is a mouse-only duplicate of it.
+    <tr className={`${ROW_GRID} hover-row grid items-center rounded-radius-lg px-3 py-2`}>
+      <td className="flex items-center p-0">
+        <Avatar src={avatarUrl} alt="" size={40} />
       </td>
-      <td className="px-4 py-3 font-mono text-xs text-slate-600">{sub.slug}</td>
-      <td className="px-4 py-3">
+      <td className="flex min-w-0 p-0">
+      <button
+        type="button"
+        tabIndex={0}
+        aria-expanded={expanded}
+        aria-controls={`nova-submission-details-${sub.id}`}
+        aria-label={`${expanded ? '收合' : '展開'} ${sub.display_name}`}
+        onClick={onToggle}
+        className="flex min-w-0 flex-col items-start gap-0.5 rounded-radius-sm pl-3 text-left focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent-pink"
+      >
+        <span
+          className={`max-w-full truncate text-[15px] font-bold leading-tight ${
+            expanded ? 'text-accent-pink-dark' : 'text-token-primary'
+          }`}
+        >
+          {sub.display_name}
+        </span>
+        <span className="font-mono text-[11px] text-token-secondary">{sub.slug}</span>
+      </button>
+      </td>
+      <td className="flex min-w-0 items-center gap-1.5 p-0 pl-3 text-[13px] text-token-secondary">
         {youtubeChannelUrl ? (
           <a
             href={youtubeChannelUrl}
             target="_blank"
             rel="noopener noreferrer"
-            className="text-blue-600 hover:underline"
-            onClick={(event) => event.stopPropagation()}
+            className="flex min-w-0 items-center gap-1.5 hover:text-accent-pink"
           >
-            {sub.brand_name || sub.youtube_channel_url}
+            <Icon name="youtube" size={14} className="text-[#FF0000]" />
+            <span className="truncate">{sub.brand_name || sub.youtube_channel_url}</span>
           </a>
         ) : (
-          <span className="text-slate-600">{sub.brand_name || sub.youtube_channel_url || '—'}</span>
+          <span className="truncate">{sub.brand_name || sub.youtube_channel_url || '—'}</span>
         )}
       </td>
-      <td className="px-4 py-3 text-slate-600">{sub.subscriber_count || '—'}</td>
-      <td className="px-4 py-3">
-        <StatusBadge status={sub.status} />
+      <td className={`p-0 pl-3 text-[13px] font-semibold ${sub.subscriber_count ? 'text-token-primary' : 'text-token-tertiary'}`}>
+        {sub.subscriber_count || '—'}
       </td>
-      <td className="px-4 py-3 text-slate-500">{sub.submitted_at}</td>
-      {isCurator && (
-        <td className="px-4 py-3" onClick={(event) => event.stopPropagation()}>
-          <div className="flex gap-1">
-            {sub.status === 'pending' ? (
-              <>
-                <button
-                  disabled={actionLoading}
-                  onClick={() => onAction(sub.id, 'approved')}
-                  className="rounded bg-green-600 px-2 py-1 text-xs text-white hover:bg-green-700 disabled:opacity-50"
-                >
-                  Approve
-                </button>
-                <button
-                  disabled={actionLoading}
-                  onClick={() => onAction(sub.id, 'rejected')}
-                  className="rounded bg-red-600 px-2 py-1 text-xs text-white hover:bg-red-700 disabled:opacity-50"
-                >
-                  Reject
-                </button>
-              </>
-            ) : (
-              <button
-                disabled={actionLoading}
-                onClick={() => onAction(sub.id, 'pending')}
-                className="rounded bg-amber-500 px-2 py-1 text-xs text-white hover:bg-amber-600 disabled:opacity-50"
-              >
-                Revert to Pending
-              </button>
-            )}
-            <button
-              disabled={actionLoading}
-              onClick={() => onDelete(sub)}
-              className="ml-2 rounded bg-red-800 px-2 py-1 text-xs text-white hover:bg-red-900 disabled:opacity-50"
-            >
-              Delete
-            </button>
-          </div>
-        </td>
-      )}
+      <td className="p-0 pl-3">
+        <StatusPill status={sub.status} />
+      </td>
+      <td className="p-0 pl-3 font-mono text-[11px] text-token-secondary">{sub.submitted_at}</td>
+      <td className="flex items-center justify-end gap-1.5 p-0">
+        {isCurator && !expanded && (
+          sub.status === 'pending' ? (
+            <>
+              <CircleButton label="Approve" icon="check" gradient disabled={actionLoading} onClick={() => onAction(sub.id, 'approved')} />
+              <CircleButton label="Reject" icon="x" disabled={actionLoading} onClick={() => onAction(sub.id, 'rejected')} />
+              <CircleButton label="Delete" icon="trash" danger disabled={actionLoading} onClick={() => onDelete(sub)} />
+            </>
+          ) : (
+            <>
+              <CircleButton label="Revert to Pending" icon="undo" disabled={actionLoading} onClick={() => onAction(sub.id, 'pending')} />
+              <CircleButton label="Delete" icon="trash" danger disabled={actionLoading} onClick={() => onDelete(sub)} />
+            </>
+          )
+        )}
+      </td>
+      <td className="flex justify-end p-0">
+        <button
+          type="button"
+          tabIndex={-1}
+          aria-hidden="true"
+          onClick={onToggle}
+          className="flex justify-end text-token-tertiary hover:text-accent-pink"
+        >
+          <Icon name={expanded ? 'chevronDown' : 'chevronRight'} size={20} />
+        </button>
+      </td>
     </tr>
   );
 }
@@ -589,40 +697,32 @@ function SubmissionToolbar({
   } = state;
 
   return (
-    <div className="mb-3 flex items-center gap-2">
+    <div className="flex flex-wrap items-center justify-end gap-2">
       {!editing ? (
         <>
-          <button
-            onClick={onEdit}
-            className="rounded bg-slate-700 px-3 py-1 text-xs font-medium text-white hover:bg-slate-800"
-          >
+          <OutlineButton icon="pencil" onClick={onEdit}>
             Edit
-          </button>
-          <button
-            type="button"
+          </OutlineButton>
+          <OutlineButton
+            icon="shield"
             disabled={verifyingChannel || !sub.youtube_channel_id || channelVerified}
             onClick={onVerifyChannel}
-            className="rounded bg-indigo-600 px-3 py-1 text-xs font-medium text-white hover:bg-indigo-700 disabled:cursor-not-allowed disabled:opacity-50"
           >
             {verifyingChannel ? 'Verifying...' : channelVerified ? 'Channel verified' : 'Verify channel'}
-          </button>
+          </OutlineButton>
         </>
       ) : (
         <>
-          <button
+          <GradientButton
+            icon="check"
             disabled={saving || orderDraft === undefined}
             onClick={onSave}
-            className="rounded bg-blue-600 px-3 py-1 text-xs font-medium text-white hover:bg-blue-700 disabled:opacity-50"
           >
             {saving ? 'Saving...' : 'Save'}
-          </button>
-          <button
-            disabled={saving}
-            onClick={onCancel}
-            className="rounded bg-slate-200 px-3 py-1 text-xs font-medium text-slate-700 hover:bg-slate-300 disabled:opacity-50"
-          >
+          </GradientButton>
+          <OutlineButton disabled={saving} onClick={onCancel}>
             Cancel
-          </button>
+          </OutlineButton>
         </>
       )}
       {saveError && <span className="text-xs text-red-600">{saveError}</span>}
@@ -638,19 +738,14 @@ function SubmissionAvatar({
   sub: NovaSubmission;
   safeUrl: string | null;
 }) {
-  if (!sub.avatar_url) return null;
+  if (!sub.avatar_url) return <Avatar src={null} alt="" size={64} />;
+
+  if (safeUrl) return <Avatar src={safeUrl} alt={sub.display_name} size={64} />;
 
   return (
-    <div>
-      {safeUrl ? (
-        <img
-          src={safeUrl}
-          alt={sub.display_name}
-          className="h-16 w-16 rounded-full border border-slate-200"
-        />
-      ) : (
-        <p className="text-xs text-slate-400 break-all">Invalid avatar URL: {sub.avatar_url}</p>
-      )}
+    <div className="flex items-center gap-3">
+      <Avatar src={null} alt="" size={64} />
+      <p className="max-w-[240px] break-all text-xs text-token-tertiary">Invalid avatar URL: {sub.avatar_url}</p>
     </div>
   );
 }
@@ -687,63 +782,64 @@ function SubmissionEditor({
 
   return (
     <>
-      {EDITABLE_FIELDS.map(({ key, label, multiline }) => (
-        <div key={key}>
-          <label
-            htmlFor={`nova-${sub.id}-${key}`}
-            className="text-xs font-medium uppercase text-slate-400"
-          >
-            {label}
-          </label>
-          {multiline ? (
-            <textarea
-              id={`nova-${sub.id}-${key}`}
-              value={draft[key]}
-              onChange={(event) => dispatch({
-                type: 'draftFieldChanged',
-                key,
-                value: event.target.value,
-              })}
-              rows={3}
-              className="mt-1 w-full rounded-md border border-slate-300 px-3 py-1.5 text-sm focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500"
-            />
-          ) : (
-            <div className={key === 'subscriber_count' ? 'mt-1 flex gap-2' : 'mt-1'}>
-              <input
+      <div className="grid grid-cols-2 gap-x-4 gap-y-3">
+        {EDITABLE_FIELDS.map(({ key, label, multiline }) => (
+          <div key={key} className={multiline ? 'col-span-2' : ''}>
+            <label
+              htmlFor={`nova-${sub.id}-${key}`}
+              className="block text-[10px] font-bold uppercase tracking-[0.1em] text-token-tertiary"
+            >
+              {label}
+            </label>
+            {multiline ? (
+              <PrismTextarea
                 id={`nova-${sub.id}-${key}`}
-                type="text"
                 value={draft[key]}
                 onChange={(event) => dispatch({
                   type: 'draftFieldChanged',
                   key,
                   value: event.target.value,
                 })}
-                className="w-full rounded-md border border-slate-300 px-3 py-1.5 text-sm focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500"
+                rows={3}
+                className="mt-1"
               />
-              {key === 'subscriber_count' && (
-                <button
-                  type="button"
-                  disabled={fetchingSubscribers || !sub.youtube_channel_id}
-                  onClick={onFetchSubscribers}
-                  title={!sub.youtube_channel_id ? 'Set YouTube Channel ID first' : 'Fetch subscriber count & avatar from YouTube'}
-                  className="shrink-0 rounded bg-indigo-600 px-3 py-1.5 text-xs font-medium text-white hover:bg-indigo-700 disabled:opacity-50 disabled:cursor-not-allowed"
-                >
-                  {fetchingSubscribers ? 'Fetching...' : 'Fetch'}
-                </button>
-              )}
-            </div>
-          )}
-          {key === 'subscriber_count' && fetchSubscribersError && (
-            <p className="mt-1 text-xs text-red-600">{fetchSubscribersError}</p>
-          )}
-        </div>
-      ))}
+            ) : (
+              <div className={key === 'subscriber_count' ? 'mt-1 flex gap-2' : 'mt-1'}>
+                <PrismInput
+                  id={`nova-${sub.id}-${key}`}
+                  type="text"
+                  value={draft[key]}
+                  onChange={(event) => dispatch({
+                    type: 'draftFieldChanged',
+                    key,
+                    value: event.target.value,
+                  })}
+                />
+                {key === 'subscriber_count' && (
+                  <GradientButton
+                    icon="refresh"
+                    className="shrink-0"
+                    disabled={fetchingSubscribers || !sub.youtube_channel_id}
+                    onClick={onFetchSubscribers}
+                    title={!sub.youtube_channel_id ? 'Set YouTube Channel ID first' : 'Fetch subscriber count & avatar from YouTube'}
+                  >
+                    {fetchingSubscribers ? 'Fetching...' : 'Fetch'}
+                  </GradientButton>
+                )}
+              </div>
+            )}
+            {key === 'subscriber_count' && fetchSubscribersError && (
+              <p className="mt-1 text-xs text-red-600">{fetchSubscribersError}</p>
+            )}
+          </div>
+        ))}
+      </div>
 
-      <div className="flex items-center gap-4">
+      <div className="flex flex-wrap items-center gap-4">
         <div className="flex items-center gap-2">
           <label
             htmlFor={`nova-enabled-${sub.id}`}
-            className="text-xs font-medium uppercase text-slate-400"
+            className="text-[10px] font-bold uppercase tracking-[0.1em] text-token-tertiary"
           >
             Enabled
           </label>
@@ -755,15 +851,20 @@ function SubmissionEditor({
               type: 'enabledChanged',
               enabled: event.target.checked,
             })}
-            className="h-4 w-4 rounded border-slate-300 text-blue-600 focus:ring-blue-500"
+            className="h-4 w-4 rounded border-border-token accent-accent-pink"
           />
-          <span className="text-xs text-slate-500">
+          <span className="text-xs text-token-secondary">
             {enabledDraft ? 'Visible on site' : 'Hidden from site'}
           </span>
         </div>
         <div className="flex items-center gap-2">
-          <label htmlFor={`nova-display-order-${sub.id}`} className="text-xs font-medium uppercase text-slate-400">Order</label>
-          <input
+          <label
+            htmlFor={`nova-display-order-${sub.id}`}
+            className="text-[10px] font-bold uppercase tracking-[0.1em] text-token-tertiary"
+          >
+            Order
+          </label>
+          <PrismInput
             id={`nova-display-order-${sub.id}`}
             type="number"
             value={orderDraft ?? ''}
@@ -774,21 +875,21 @@ function SubmissionEditor({
             aria-invalid={orderDraft === undefined}
             aria-describedby={orderDraft === undefined ? `nova-display-order-error-${sub.id}` : undefined}
             required
-            className="w-20 rounded-md border border-slate-300 px-2 py-1 text-sm focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500"
+            className="w-24"
           />
           {orderDraft === undefined ? (
             <span id={`nova-display-order-error-${sub.id}`} className="text-xs text-red-600">
               Enter a number
             </span>
           ) : (
-            <span className="text-xs text-slate-500">Lower = first</span>
+            <span className="text-xs text-token-secondary">Lower = first</span>
           )}
         </div>
       </div>
 
       <div>
-        <p className="text-xs font-medium uppercase text-slate-400">Theme Colors</p>
-        <div className="mt-1 grid grid-cols-2 gap-2">
+        <SectionLabel>Theme Colors</SectionLabel>
+        <div className="mt-2 grid grid-cols-2 gap-2">
           {THEME_KEYS.map((key) => (
             <div key={key} className="flex items-center gap-2">
               <input
@@ -800,11 +901,11 @@ function SubmissionEditor({
                   key,
                   value: event.target.value.toUpperCase(),
                 })}
-                className="h-7 w-7 cursor-pointer rounded border border-slate-300 p-0"
+                className="h-7 w-7 cursor-pointer rounded-radius-xs border border-border-token p-0"
               />
               <div className="min-w-0 flex-1">
-                <span className="block truncate text-xs text-slate-600">{key}</span>
-                <span className="block font-mono text-[10px] text-slate-400">{themeDraft[key]}</span>
+                <span className="block truncate text-xs text-token-secondary">{key}</span>
+                <span className="block font-mono text-[10px] text-token-tertiary">{themeDraft[key]}</span>
               </div>
             </div>
           ))}
@@ -833,35 +934,37 @@ function SubmissionView({
 }) {
   return (
     <>
-      <DetailField label="Brand Name" value={sub.brand_name} />
-      <DetailField label="Group" value={sub.group} />
-      <DetailField label="Enabled" value={sub.enabled === 1 ? 'Yes' : 'No'} />
-      <DetailField label="Display Order" value={String(sub.display_order ?? 0)} />
-      <DetailField label="YouTube Channel URL">
-        {youtubeChannelUrl ? (
-          <a
-            href={youtubeChannelUrl}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="text-sm text-blue-600 hover:underline break-all"
-          >
-            {sub.youtube_channel_url}
-          </a>
-        ) : (
-          <span className="text-sm text-slate-600 break-all">{sub.youtube_channel_url || '—'}</span>
-        )}
-      </DetailField>
-      <DetailField label="YouTube Channel ID" value={sub.youtube_channel_id} />
-      <DetailField
-        label="Channel verification"
-        value={channelVerified ? `Verified ${sub.youtube_channel_verified_at}` : 'Not verified'}
-      />
-      <DetailField label="Description" value={sub.description} />
-      <DetailField label="Subscriber Count" value={sub.subscriber_count} />
+      <div className="grid grid-cols-3 gap-x-4 gap-y-3">
+        <DetailField label="Brand Name" value={sub.brand_name} />
+        <DetailField label="Group" value={sub.group} />
+        <DetailField label="Enabled" value={sub.enabled === 1 ? 'Yes' : 'No'} />
+        <DetailField label="Display Order" value={String(sub.display_order ?? 0)} />
+        <DetailField label="YouTube Channel URL" className="col-span-2">
+          {youtubeChannelUrl ? (
+            <a
+              href={youtubeChannelUrl}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="break-all text-[13px] leading-normal text-accent-blue hover:text-accent-pink"
+            >
+              {sub.youtube_channel_url}
+            </a>
+          ) : (
+            <span className="break-all text-[13px] leading-normal text-token-secondary">{sub.youtube_channel_url || '—'}</span>
+          )}
+        </DetailField>
+        <DetailField label="YouTube Channel ID" value={sub.youtube_channel_id} mono />
+        <DetailField
+          label="Channel verification"
+          value={channelVerified ? `Verified ${sub.youtube_channel_verified_at}` : 'Not verified'}
+        />
+        <DetailField label="Subscriber Count" value={sub.subscriber_count} />
+        <DetailField label="Description" value={sub.description} className="col-span-3" />
+      </div>
 
       <div>
-        <p className="text-xs font-medium uppercase text-slate-400">Social Links</p>
-        <div className="mt-1 flex flex-wrap gap-2">
+        <SectionLabel>Social Links</SectionLabel>
+        <div className="mt-1.5 flex flex-wrap gap-1.5">
           {socialLinks.map((link) => (
             <span key={link.label}>
               {link.safeUrl ? (
@@ -869,19 +972,20 @@ function SubmissionView({
                   href={link.safeUrl}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="rounded-md bg-slate-200 px-2 py-1 text-xs text-slate-700 hover:bg-slate-300"
+                  className="inline-flex items-center gap-1 rounded-radius-pill border border-border-token-accent-blue bg-accent-bg-blue px-2.5 py-1 text-[11px] font-semibold leading-4 text-accent-blue hover:text-accent-pink"
                 >
+                  <Icon name="external" size={11} />
                   {link.label}
                 </a>
               ) : link.url ? (
                 <span
                   title={link.url}
-                  className="rounded-md bg-amber-100 px-2 py-1 text-xs text-amber-700"
+                  className="inline-flex items-center rounded-radius-pill border border-[#FDE68A] bg-[#FEF3C7] px-2.5 py-1 text-[11px] font-semibold leading-4 text-[#B45309]"
                 >
                   Invalid {link.label}
                 </span>
               ) : (
-                <span className="rounded-md bg-slate-100 px-2 py-1 text-xs text-slate-400 line-through">
+                <span className="inline-flex items-center rounded-radius-pill border border-border-token bg-[#F1F5F9] px-2.5 py-1 text-[11px] font-medium leading-4 text-token-muted line-through">
                   {link.label}
                 </span>
               )}
@@ -892,13 +996,13 @@ function SubmissionView({
 
       {sub.theme_json && (
         <div>
-          <p className="text-xs font-medium uppercase text-slate-400">Theme Colors</p>
-          <div className="mt-1 flex flex-wrap gap-1">
+          <SectionLabel>Theme Colors</SectionLabel>
+          <div className="mt-1.5 flex flex-wrap items-center gap-1">
             {Object.entries(parseThemeJson(sub.theme_json)).map(([key, color]) => (
               <div
                 key={key}
                 title={`${key}: ${color}`}
-                className="h-5 w-5 rounded border border-slate-200"
+                className="h-5 w-5 rounded-radius-circle border border-black/5 shadow-sm"
                 style={{ backgroundColor: color }}
               />
             ))}
@@ -906,8 +1010,10 @@ function SubmissionView({
         </div>
       )}
 
-      <DetailField label="Reviewed At" value={sub.reviewed_at ?? ''} />
-      <DetailField label="Reviewer Note" value={sub.reviewer_note} />
+      <div className="grid grid-cols-3 gap-x-4 gap-y-3">
+        <DetailField label="Reviewed At" value={sub.reviewed_at ?? ''} />
+        <DetailField label="Reviewer Note" value={sub.reviewer_note} className="col-span-2" />
+      </div>
     </>
   );
 }
@@ -925,31 +1031,18 @@ function RejectNoteEditor({
     <div>
       <label
         htmlFor={`nova-reject-note-${submissionId}`}
-        className="text-xs font-medium uppercase text-slate-400"
+        className="block text-[10px] font-bold uppercase tracking-[0.1em] text-token-tertiary"
       >
         Reviewer Note (optional, shown on reject)
       </label>
-      <textarea
+      <PrismTextarea
         id={`nova-reject-note-${submissionId}`}
         value={value}
         onChange={(event) => onChange(event.target.value)}
         placeholder="Reason for rejection..."
         rows={3}
-        className="mt-1 w-full rounded-md border border-slate-300 px-3 py-2 text-sm focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500"
+        className="mt-2"
       />
-    </div>
-  );
-}
-
-function DetailField({ label, value, children }: { label: string; value?: string; children?: React.ReactNode }) {
-  return (
-    <div>
-      <p className="text-xs font-medium uppercase text-slate-400">{label}</p>
-      {children ?? (
-        <p className={`mt-0.5 text-sm whitespace-pre-line ${value ? 'text-slate-700' : 'text-slate-400'}`}>
-          {value || '—'}
-        </p>
-      )}
     </div>
   );
 }
