@@ -1,6 +1,6 @@
 import { html, raw } from 'hono/html';
 import type { ApprovedStreamer } from './types';
-import { DARK_MODE_CSS, DARK_MODE_DETECT_SCRIPT, themeToggleHTML } from './theme';
+import { DARK_MODE_CSS, DARK_MODE_DETECT_SCRIPT, PRISM_CSS, SPARKLE_SVG, svgIcon, themeToggleHTML } from './theme';
 import { validateSlug } from './validate';
 
 /** Escape HTML special characters before inserting trusted markup with raw(). */
@@ -22,9 +22,14 @@ const VOD_SCRIPT = String.raw`
       var streamerSelect = form.querySelector('[name="streamer_slug"]');
       var urlCheck = document.getElementById('url-check');
       var submitBtn = document.getElementById('submit-btn');
+      var submitLabel = document.getElementById('submit-label');
       var resultDiv = document.getElementById('result');
       var songsTextarea = document.getElementById('songs-textarea');
       var songsPreview = document.getElementById('songs-preview');
+      var videoPreview = document.getElementById('video-preview');
+      var videoThumb = document.getElementById('video-preview-thumb');
+      var videoTitle = document.getElementById('video-preview-title');
+      var videoDate = document.getElementById('video-preview-date');
       var thumbnailUrl = '';
 
       // --- Inline parser (ported from lib/parse.ts) ---
@@ -104,50 +109,70 @@ const VOD_SCRIPT = String.raw`
         return result;
       }
 
+      // Every node is built with createElement/textContent: song names and artists are user text.
+      function el(tag, className, text) {
+        var node = document.createElement(tag);
+        if (className) node.className = className;
+        if (text !== undefined) node.textContent = text;
+        return node;
+      }
+
       function renderPreview(songs) {
-        if (!songs.length) { songsPreview.textContent = ''; return; }
-        var tbl = document.createElement('table');
-        tbl.className = 'songs-table';
-        var thead = document.createElement('thead');
-        var headRow = document.createElement('tr');
-        ['#', '歌名', '原唱', '開始', '結束'].forEach(function(t) {
-          var th = document.createElement('th');
-          th.textContent = t;
-          headRow.appendChild(th);
+        songsPreview.textContent = '';
+        if (!songs.length) return;
+
+        var head = el('div', 'songs-head');
+        head.appendChild(el('span', 'badge badge-pink', '已解析 ' + songs.length + ' 首'));
+        head.appendChild(el('span', 'songs-head-hint', '確認歌名、原唱與時間無誤後再提交'));
+        songsPreview.appendChild(head);
+
+        var cols = el('div', 'songs-cols');
+        ['#', '歌名 / 原唱', '開始', '結束'].forEach(function(label, i) {
+          cols.appendChild(el('div', 'section-label' + (i >= 2 ? ' right' : ''), label));
         });
-        thead.appendChild(headRow);
-        tbl.appendChild(thead);
-        var tbody = document.createElement('tbody');
+        songsPreview.appendChild(cols);
+
+        var list = el('div', 'prism-list');
         for (var i = 0; i < songs.length; i++) {
           var s = songs[i];
-          var row = document.createElement('tr');
-          var tdNum = document.createElement('td');
-          tdNum.textContent = String(i + 1);
-          row.appendChild(tdNum);
-          var tdName = document.createElement('td');
-          tdName.textContent = s.songName;
-          row.appendChild(tdName);
-          var tdArtist = document.createElement('td');
-          tdArtist.textContent = s.artist;
-          row.appendChild(tdArtist);
-          var tdStart = document.createElement('td');
-          tdStart.className = 'ts-col';
-          tdStart.textContent = s.startTimestamp;
-          row.appendChild(tdStart);
-          var tdEnd = document.createElement('td');
-          tdEnd.className = 'ts-col';
-          tdEnd.textContent = s.endTimestamp || '';
-          row.appendChild(tdEnd);
-          tbody.appendChild(row);
+          var row = el('div', 'prism-row song-row');
+          row.appendChild(el('span', 'mono mono-muted', String(i + 1)));
+          var text = el('div', 'cell cell-stack');
+          text.appendChild(el('div', 'song-title', s.songName));
+          text.appendChild(el('div', 'song-artist', s.artist || '—'));
+          row.appendChild(text);
+          row.appendChild(el('span', 'mono right', s.startTimestamp));
+          row.appendChild(el('span', 'mono mono-muted right', s.endTimestamp || '—'));
+          list.appendChild(row);
         }
-        tbl.appendChild(tbody);
-        songsPreview.textContent = '';
-        songsPreview.appendChild(tbl);
+        songsPreview.appendChild(list);
       }
 
       songsTextarea.addEventListener('input', function() {
         renderPreview(parseTextToSongs(this.value));
       });
+
+      // Fetched video card: thumbnail only from YouTube image hosts, text via textContent.
+      function showVideoPreview(info) {
+        var thumb = typeof info.thumbnail === 'string' ? info.thumbnail : '';
+        if (/^https:\/\/(i\.ytimg\.com|img\.youtube\.com)\//.test(thumb)) {
+          videoThumb.src = thumb;
+          videoThumb.style.display = '';
+        } else {
+          videoThumb.removeAttribute('src');
+          videoThumb.style.display = 'none';
+        }
+        videoTitle.textContent = info.title || '';
+        videoDate.textContent = info.date || '';
+        videoPreview.style.display = (info.title || thumb) ? '' : 'none';
+      }
+
+      function hideVideoPreview() {
+        videoThumb.removeAttribute('src');
+        videoTitle.textContent = '';
+        videoDate.textContent = '';
+        videoPreview.style.display = 'none';
+      }
 
       // On URL blur: duplicate check + auto-fetch video info
       var lastFetchedUrl = '';
@@ -166,25 +191,25 @@ const VOD_SCRIPT = String.raw`
           fetch('/vod/api/check?streamer_slug=' + encodeURIComponent(slug) + '&url=' + encoded)
             .then(function(r) { return r.json(); })
             .then(function(data) {
-              urlCheck.style.display = 'block';
+              urlCheck.style.display = '';
               if (data.inAdmin && data.adminStatus === 'approved') {
-                urlCheck.className = 'check-ok';
+                urlCheck.className = 'check-line check-ok';
                 urlCheck.textContent = '此 VOD 已收錄於歌單中，無需再提交';
               } else if (data.exists && data.hasApproved) {
-                urlCheck.className = 'check-exists';
+                urlCheck.className = 'check-line check-exists';
                 urlCheck.textContent = '此 VOD 已通過審核，無需重複提交';
               } else if (data.exists && data.pendingCount > 0) {
-                urlCheck.className = 'check-resubmit';
+                urlCheck.className = 'check-line check-resubmit';
                 urlCheck.textContent = '此 VOD 已有 ' + data.pendingCount + ' 筆提交（審核中），你仍可提交新版本';
               } else if (data.exists && data.rejectedCount > 0) {
-                urlCheck.className = 'check-exists';
+                urlCheck.className = 'check-line check-exists';
                 urlCheck.textContent = '此 VOD 先前的提交已被拒絕，歡迎重新提交修正版本';
               } else if (data.inAdmin && (data.adminStatus === 'pending' || data.adminStatus === 'extracted')) {
                 // Pipeline state alone does not mean a Nova submission exists.
                 urlCheck.style.display = 'none';
                 urlCheck.textContent = '';
               } else {
-                urlCheck.className = 'check-ok';
+                urlCheck.className = 'check-line check-ok';
                 urlCheck.textContent = '此 VOD 尚未被提交';
               }
             })
@@ -195,13 +220,16 @@ const VOD_SCRIPT = String.raw`
         if (url === lastFetchedUrl) return;
         lastFetchedUrl = url;
 
-        urlCheck.style.display = 'block';
-        urlCheck.className = 'check-loading';
+        urlCheck.style.display = '';
+        urlCheck.className = 'check-line check-loading';
         urlCheck.textContent = '正在取得影片資訊…';
 
+        var requestedUrl = url;
         fetch('/vod/api/video-info?url=' + encoded)
           .then(function(r) { return r.json(); })
           .then(function(info) {
+            // The field changed while this lookup was in flight (edited or re-submitted): drop the stale answer.
+            if (requestedUrl !== urlInput.value.trim()) return;
             if (info.title && !titleInput.value) {
               titleInput.value = info.title;
             }
@@ -211,6 +239,7 @@ const VOD_SCRIPT = String.raw`
             if (info.thumbnail) {
               thumbnailUrl = info.thumbnail;
             }
+            showVideoPreview(info);
           })
           .catch(function() {});
       });
@@ -251,7 +280,7 @@ const VOD_SCRIPT = String.raw`
         }
 
         submitBtn.disabled = true;
-        submitBtn.textContent = '提交中…';
+        submitLabel.textContent = '提交中…';
         resultDiv.style.display = 'none';
         resultDiv.className = '';
 
@@ -287,6 +316,7 @@ const VOD_SCRIPT = String.raw`
             songsTextarea.value = '';
             songsPreview.textContent = '';
             thumbnailUrl = '';
+            hideVideoPreview();
             if (window.turnstile) turnstile.reset();
           } else if (res.status === 409) {
             if (data.inAdmin && (data.adminStatus === 'pending' || data.adminStatus === 'extracted')) {
@@ -309,7 +339,7 @@ const VOD_SCRIPT = String.raw`
         } finally {
           resultDiv.style.display = resultDiv.textContent ? '' : 'none';
           submitBtn.disabled = false;
-          submitBtn.textContent = '提交 VOD';
+          submitLabel.textContent = '提交 VOD';
         }
       });
     })();
@@ -335,7 +365,7 @@ export function renderVodPage(siteKey: string, streamers: ApprovedStreamer[]) {
   <title>Prism Nova — VOD 提交</title>
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700;1,9..40,400&display=swap" rel="stylesheet" />
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700;0,9..40,900;1,9..40,400&display=swap" rel="stylesheet" />
   <script src="https://challenges.cloudflare.com/turnstile/v0/api.js" async defer></script>
   <style>
     :root {
@@ -362,258 +392,168 @@ export function renderVodPage(siteKey: string, streamers: ApprovedStreamer[]) {
     }
 
     ${raw(DARK_MODE_CSS)}
+    ${raw(PRISM_CSS)}
 
     * { box-sizing: border-box; margin: 0; padding: 0; }
     body {
-      font-family: 'DM Sans', sans-serif;
+      font-family: 'DM Sans', system-ui, -apple-system, 'Segoe UI', sans-serif;
       background: linear-gradient(135deg, var(--bg-page-start) 0%, var(--bg-page-mid) 50%, var(--bg-page-end) 100%);
       background-attachment: fixed;
       min-height: 100vh;
       color: var(--text-primary);
+      -webkit-font-smoothing: antialiased;
     }
 
-    .form-input, .form-select {
-      width: 100%;
-      padding: 10px 16px;
-      background: var(--bg-surface-frosted);
-      border: 1px solid var(--border-glass);
-      border-radius: var(--radius-lg);
-      font-family: inherit;
-      font-size: 14px;
-      color: var(--text-primary);
-      outline: none;
-      transition: border-color 0.2s, box-shadow 0.2s;
-    }
-    .form-input::placeholder { color: var(--text-tertiary); }
-    .form-input:focus, .form-select:focus {
-      border-color: var(--border-accent-pink);
-      box-shadow: 0 0 0 3px rgba(236, 72, 153, 0.1);
-    }
+    /* video fields left, fetched-video card right (one DOM card, re-flowed under the URL on mobile) */
+    .vod-form { padding: 24px 32px 32px; }
+    .vod-top { display: grid; grid-template-columns: minmax(0, 1fr) 300px; grid-template-rows: auto 1fr; gap: 18px 32px; }
+    .vod-col-a { grid-column: 1; grid-row: 1; }
+    .vod-col-b { grid-column: 1; grid-row: 2; }
+    .video-preview { grid-column: 2; grid-row: 1 / 3; }
+    .video-sticky { position: sticky; top: 24px; display: flex; flex-direction: column; gap: 8px; }
+    .video-card { display: flex; flex-direction: column; gap: 10px; padding: 12px; }
+    .video-thumb { width: 100%; aspect-ratio: 16 / 9; border-radius: var(--radius-lg); object-fit: cover; border: 1px solid var(--border-glass); box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1); background: var(--bg-surface-frosted); }
+    .video-text { display: flex; flex-direction: column; gap: 6px; min-width: 0; }
+    .video-title { font-size: 13px; font-weight: 700; line-height: 1.4; color: var(--text-primary); word-break: break-word; }
+    .video-title:empty { display: none; }
 
-    .form-label {
-      display: block;
-      font-size: 13px;
-      font-weight: 500;
-      color: var(--text-secondary);
-      margin-bottom: 6px;
-    }
-    .form-label .required, .section-label .required { color: var(--accent-pink); }
+    .songs-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 16px; align-items: start; }
+    .songs-textarea { min-height: 120px; }
+    .songs-preview { padding: 12px 8px 8px; min-height: 120px; }
+    .songs-preview:empty { display: flex; align-items: center; justify-content: center; padding: 12px; }
+    .songs-preview:empty::before { content: '貼上時間戳後，解析出的歌曲會顯示在這裡'; font-size: 12px; color: var(--text-tertiary); text-align: center; }
+    .songs-head { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; padding: 0 8px 8px; }
+    .songs-head-hint { font-size: 11px; color: var(--text-tertiary); }
+    .songs-cols, .song-row { display: grid; grid-template-columns: 24px minmax(0, 1fr) 60px 60px; gap: 0; align-items: center; }
+    .songs-cols { padding: 0 8px 6px; border-bottom: 1px solid var(--border-table); }
+    .songs-cols > :nth-child(2) { padding-left: 8px; }
+    .song-row { padding: 6px 8px; border-radius: 8px; }
+    .song-row .cell { padding-left: 8px; }
+    .song-title { font-size: 13px; font-weight: 700; color: var(--text-primary); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .song-artist { font-size: 11px; color: var(--text-secondary); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .right { text-align: right; }
+    .form-hint code { font-family: var(--font-mono); font-size: 11px; }
+    .link-pill svg, .btn-primary svg { flex-shrink: 0; }
 
-    .form-hint {
-      font-size: 11px;
-      color: var(--text-tertiary);
-      margin-top: 4px;
+    /* 800px, not 640px: below that the fields column drops under the 300px Turnstile widget. */
+    @media (max-width: 800px) {
+      .vod-form { padding: 8px 16px 24px; }
+      .vod-top { grid-template-columns: 1fr; grid-template-rows: none; gap: 18px; }
+      .vod-col-a, .vod-col-b, .video-preview { grid-column: auto; grid-row: auto; }
+      .video-sticky { position: static; }
+      .video-card { flex-direction: row; align-items: center; padding: 12px 14px; }
+      .video-thumb { width: 96px; height: 54px; aspect-ratio: auto; border-radius: 8px; flex-shrink: 0; box-shadow: 0 1px 4px rgba(0, 0, 0, 0.1); }
+      .video-title { display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
+      .songs-grid { grid-template-columns: 1fr; }
     }
-
-    .section-label {
-      font-size: 13px;
-      font-weight: 600;
-      color: var(--text-secondary);
-      margin-bottom: 12px;
-    }
-
-    .btn-submit {
-      width: 100%;
-      padding: 12px 24px;
-      border: none;
-      border-radius: var(--radius-lg);
-      background: linear-gradient(135deg, var(--accent-pink), var(--accent-blue));
-      color: white;
-      font-family: inherit;
-      font-size: 15px;
-      font-weight: 600;
-      cursor: pointer;
-      transition: opacity 0.2s, box-shadow 0.2s;
-      box-shadow: 0 4px 14px rgba(236, 72, 153, 0.25);
-    }
-    .btn-submit:hover { opacity: 0.92; box-shadow: 0 6px 20px rgba(236, 72, 153, 0.3); }
-    .btn-submit:disabled { opacity: 0.5; cursor: not-allowed; }
-
-    .btn-secondary {
-      padding: 8px 16px;
-      border: 1px solid var(--border-default);
-      border-radius: var(--radius-lg);
-      background: var(--bg-surface-frosted);
-      color: var(--text-secondary);
-      font-family: inherit;
-      font-size: 13px;
-      font-weight: 500;
-      cursor: pointer;
-      transition: background 0.2s, border-color 0.2s;
-    }
-    .songs-textarea {
-      width: 100%;
-      min-height: 120px;
-      padding: 12px 16px;
-      background: var(--bg-surface-frosted);
-      border: 1px solid var(--border-glass);
-      border-radius: var(--radius-lg);
-      font-family: 'DM Sans', monospace;
-      font-size: 13px;
-      color: var(--text-primary);
-      outline: none;
-      resize: vertical;
-      transition: border-color 0.2s, box-shadow 0.2s;
-      line-height: 1.6;
-    }
-    .songs-textarea::placeholder { color: var(--text-tertiary); }
-    .songs-textarea:focus {
-      border-color: var(--border-accent-pink);
-      box-shadow: 0 0 0 3px rgba(236, 72, 153, 0.1);
-    }
-
-    .songs-table {
-      width: 100%;
-      border-collapse: collapse;
-      font-size: 13px;
-      margin-top: 12px;
-    }
-    .songs-table th {
-      text-align: left;
-      font-weight: 600;
-      color: var(--text-secondary);
-      padding: 6px 10px;
-      border-bottom: 1px solid var(--border-default);
-      font-size: 12px;
-    }
-    .songs-table td {
-      padding: 6px 10px;
-      border-bottom: 1px solid var(--border-glass);
-      color: var(--text-primary);
-    }
-    .songs-table tr:last-child td { border-bottom: none; }
-    .songs-table .ts-col {
-      font-family: monospace;
-      font-size: 12px;
-      color: var(--text-secondary);
-      white-space: nowrap;
-    }
-
-    .cross-links {
-      display: flex;
-      justify-content: center;
-      gap: 16px;
-      margin-top: 16px;
-      font-size: 13px;
-    }
-    .cross-links a {
-      color: var(--accent-purple);
-      text-decoration: none;
-      transition: opacity 0.2s;
-    }
-    .cross-links a:hover { opacity: 0.7; }
   </style>
   <script>${raw(DARK_MODE_DETECT_SCRIPT)}</script>
 </head>
 <body>
 
-  <div style="max-width: 720px; margin: 0 auto; padding: 48px 16px;">
-    <!-- Header -->
-    <div style="text-align: center; margin-bottom: 32px; position: relative;">
-      <div style="display: flex; justify-content: center; align-items: center; margin-bottom: 8px;">
-        <div style="display: inline-flex; align-items: center; gap: 12px;">
-          <div style="
-            width: 40px; height: 40px; border-radius: var(--radius-lg);
-            background: linear-gradient(135deg, var(--accent-pink-light), var(--accent-blue-light));
-            display: flex; align-items: center; justify-content: center;
-          ">
-            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-              <circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="3"/>
-              <path d="M12 2a14.5 14.5 0 0 0 0 20 14.5 14.5 0 0 0 0-20"/>
-            </svg>
-          </div>
-          <span style="
-            font-size: 28px; font-weight: 700; letter-spacing: -0.5px;
-            background: linear-gradient(135deg, var(--accent-pink), var(--accent-blue));
-            -webkit-background-clip: text; -webkit-text-fill-color: transparent;
-            background-clip: text;
-          ">Prism Nova</span>
+  <div class="prism-page">
+    <div class="prism-shell">
+      <!-- Header -->
+      <div class="prism-hero">
+        <div class="prism-hero-tile">${raw(svgIcon('nova', 30))}</div>
+        <div class="prism-hero-stack">
+          <div class="prism-badge">${raw(SPARKLE_SVG)}提交歌回 VOD</div>
+          <h1 class="prism-title">Prism Nova</h1>
+          <p class="prism-desc">提交歌回 VOD，幫助我們建立歌曲時間戳</p>
         </div>
-        <div style="position: absolute; right: 0; top: 4px;">
-          ${raw(themeToggleHTML())}
-        </div>
+        <div class="prism-hero-actions">${raw(themeToggleHTML())}</div>
       </div>
-      <p style="color: var(--text-secondary); font-size: 14px;">
-        提交歌回 VOD，幫助我們建立歌曲時間戳
-      </p>
-    </div>
 
-    <!-- Form Card -->
-    <div style="
-      background: var(--bg-surface-glass);
-      backdrop-filter: blur(16px); -webkit-backdrop-filter: blur(16px);
-      border: 1px solid var(--border-glass);
-      border-radius: var(--radius-2xl);
-      padding: 32px;
-      box-shadow: 0 8px 32px rgba(0,0,0,0.06);
-    ">
-      <form id="vod-form" style="display: flex; flex-direction: column; gap: 20px;">
+      <form id="vod-form" class="form-stack vod-form">
+        <div class="vod-top">
+          <div class="vod-col-a form-stack">
+            <div class="form-section"><span class="section-label">影片</span></div>
 
-        <!-- Streamer Select -->
-        <div>
-          <label class="form-label">
-            VTuber <span class="required">*</span>
-          </label>
-          <select name="streamer_slug" required class="form-select">
-            <option value="">選擇 VTuber…</option>
-            ${raw(streamerSelectOptions)}
-          </select>
-        </div>
+            <!-- Streamer Select -->
+            <div>
+              <label class="form-label" for="f-streamer_slug">
+                VTuber <span class="required">*</span>
+              </label>
+              <div class="input-icon">${raw(svgIcon('users', 16))}<select id="f-streamer_slug" name="streamer_slug" required class="form-select">
+                <option value="">選擇 VTuber…</option>
+                ${raw(streamerSelectOptions)}
+              </select></div>
+            </div>
 
-        <!-- YouTube VOD URL -->
-        <div>
-          <label class="form-label">
-            YouTube VOD 網址 <span class="required">*</span>
-          </label>
-          <input type="url" name="video_url" required
-            placeholder="https://www.youtube.com/watch?v=..."
-            class="form-input" />
-          <div id="url-check" style="margin-top: 4px; font-size: 13px; display: none;"></div>
-        </div>
+            <!-- YouTube VOD URL -->
+            <div>
+              <label class="form-label" for="f-video_url">
+                YouTube VOD 網址 <span class="required">*</span>
+              </label>
+              <div class="input-icon">${raw(svgIcon('youtube', 16, 'color:#FF0000;'))}<input id="f-video_url" type="url" name="video_url" required
+                placeholder="https://www.youtube.com/watch?v=..."
+                class="form-input" /></div>
+              <div id="url-check" class="check-line" style="display: none;"></div>
+            </div>
+          </div>
 
-        <!-- Stream Title (auto-filled) -->
-        <div>
-          <label class="form-label">直播標題</label>
-          <input type="text" name="stream_title"
-            placeholder="會自動填入（可修改）"
-            class="form-input" />
-        </div>
+          <!-- Fetched video card (hidden until /vod/api/video-info answers) -->
+          <aside id="video-preview" class="video-preview" aria-label="已帶入影片" style="display: none;">
+            <div class="video-sticky">
+              <div class="section-label">已帶入影片</div>
+              <div class="glass-box video-card">
+                <img id="video-preview-thumb" class="video-thumb" alt="" style="display: none;" />
+                <div class="video-text">
+                  <div id="video-preview-title" class="video-title"></div>
+                  <div class="cell-meta">${raw(svgIcon('calendar', 12))}<span id="video-preview-date" class="mono"></span></div>
+                </div>
+              </div>
+              <p class="form-hint" style="margin-top: 0;">標題與日期已自動帶入左側欄位，可以直接修改。</p>
+            </div>
+          </aside>
 
-        <!-- Stream Date (auto-filled) -->
-        <div>
-          <label class="form-label">直播日期</label>
-          <input type="date" name="stream_date" class="form-input" />
-        </div>
+          <div class="vod-col-b form-stack">
+            <!-- Stream Title (auto-filled) -->
+            <div>
+              <label class="form-label" for="f-stream_title">直播標題</label>
+              <div class="input-icon">${raw(svgIcon('note', 16))}<input id="f-stream_title" type="text" name="stream_title"
+                placeholder="會自動填入（可修改）"
+                class="form-input" /></div>
+            </div>
 
-        <!-- Submitter Note -->
-        <div>
-          <label class="form-label">備註</label>
-          <input type="text" name="submitter_note"
-            placeholder="任何補充說明（選填）"
-            class="form-input" />
+            <div class="form-grid-2">
+              <!-- Stream Date (auto-filled) -->
+              <div>
+                <label class="form-label" for="f-stream_date">直播日期</label>
+                <div class="input-icon">${raw(svgIcon('calendar', 16))}<input id="f-stream_date" type="date" name="stream_date" class="form-input" /></div>
+              </div>
+
+              <!-- Submitter Note -->
+              <div>
+                <label class="form-label" for="f-submitter_note">備註</label>
+                <div class="input-icon">${raw(svgIcon('pencilLine', 16))}<input id="f-submitter_note" type="text" name="submitter_note"
+                  placeholder="任何補充說明（選填）"
+                  class="form-input" /></div>
+              </div>
+            </div>
+          </div>
         </div>
 
         <!-- Song Timestamps Section -->
-        <div style="border-top: 1px solid var(--border-glass); padding-top: 20px;">
-          <p class="section-label">歌曲時間戳 <span class="required">*</span></p>
-          <p class="form-hint" style="margin-bottom: 12px;">
+        <div class="form-section"><span class="section-label">歌曲時間戳</span></div>
+        <div>
+          <label class="form-label" for="songs-textarea">貼上時間戳 <span class="required">*</span></label>
+          <p class="form-hint" style="margin: -2px 0 8px;">
             貼上
-            <a href="https://aurora.oshi.tw" target="_blank" style="color: var(--accent-purple);">Aurora</a>
-            匯出的時間戳格式，或手動輸入。
+            <a href="https://aurora.oshi.tw" target="_blank" rel="noopener noreferrer">Aurora</a>
+            匯出的時間戳格式，或手動輸入；每行一首：<code>序號. 開始 ~ 結束 歌名 / 原唱</code>
           </p>
-          <textarea id="songs-textarea" class="songs-textarea" placeholder="01. 0:00:30 ~ 0:05:30 歌名 / 原唱&#10;02. 0:05:30 ~ 0:10:00 另一首歌 / 歌手"></textarea>
-          <div id="songs-preview"></div>
+          <div class="songs-grid">
+            <textarea id="songs-textarea" class="form-textarea mono songs-textarea" rows="12" placeholder="01. 0:00:30 ~ 0:05:30 歌名 / 原唱&#10;02. 0:05:30 ~ 0:10:00 另一首歌 / 歌手"></textarea>
+            <div id="songs-preview" class="glass-box songs-preview" aria-live="polite"></div>
+          </div>
         </div>
 
-        <!-- Turnstile -->
-        <div style="display: flex; justify-content: center;">
+        <!-- Turnstile + Submit -->
+        <div class="form-footer">
           <div class="cf-turnstile" data-sitekey="${siteKey}" data-theme="auto"></div>
+          <button type="submit" id="submit-btn" class="btn-primary"><span id="submit-label">提交 VOD</span>${raw(svgIcon('arrowRight', 16))}</button>
         </div>
-
-        <!-- Submit -->
-        <button type="submit" id="submit-btn" class="btn-submit">
-          提交 VOD
-        </button>
 
         <!-- Result message -->
         <div id="result" style="display: none; text-align: center; font-size: 13px; padding: 12px 16px; border-radius: var(--radius-lg);"></div>
@@ -621,19 +561,13 @@ export function renderVodPage(siteKey: string, streamers: ApprovedStreamer[]) {
     </div>
 
     <!-- Cross-links -->
-    <div class="cross-links">
-      <a href="/">推薦新的 VTuber</a>
-      <span style="color: var(--text-tertiary);">|</span>
-      <a href="/status">提交狀態</a>
-      <span style="color: var(--text-tertiary);">|</span>
-      <a href="https://aurora.oshi.tw" target="_blank">使用完整時間戳編輯器</a>
-      <span style="color: var(--text-tertiary);">|</span>
-      <a href="https://prism.oshi.tw" target="_blank">前往 Prism 歌單</a>
+    <div class="footer-links">
+      <a class="link-pill" href="/">${raw(svgIcon('plus', 14))}推薦新的 VTuber</a>
+      <a class="link-pill" href="/status">${raw(svgIcon('list', 14))}提交狀態</a>
+      <a class="link-pill" href="https://aurora.oshi.tw" target="_blank" rel="noopener noreferrer">${raw(svgIcon('pencil', 14))}使用完整時間戳編輯器</a>
+      <a class="link-pill" href="https://prism.oshi.tw" target="_blank" rel="noopener noreferrer">${raw(svgIcon('external', 14))}前往 Prism 歌單</a>
     </div>
-
-    <p style="text-align: center; font-size: 11px; color: var(--text-tertiary); margin-top: 16px;">
-      Prism &mdash; 為你喜愛的 VTuber 打造歌單頁面
-    </p>
+    <p class="footer-tagline">Prism &mdash; 為你喜愛的 VTuber 打造歌單頁面</p>
   </div>
 
   <script>${raw(VOD_SCRIPT)}</script>
