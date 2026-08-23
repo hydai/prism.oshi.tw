@@ -1,6 +1,16 @@
 import { useEffect, useState } from 'react';
 import type { AuthUser, CrystalTicket, CrystalTicketStatus, CrystalTicketType } from '../../../shared/types';
 import { api } from '../api/client';
+import { countByStatus, replaceById } from '../lib/status-totals';
+import { GradientButton, OutlineButton } from '../components/prism/Buttons';
+import { Chip } from '../components/prism/Chip';
+import { DetailField } from '../components/prism/DetailField';
+import { PrismTextarea } from '../components/prism/Fields';
+import { GlassCard } from '../components/prism/GlassCard';
+import { Icon, type IconName } from '../components/prism/Icon';
+import { Pill, StatusPill } from '../components/prism/Pill';
+import { PrismPage } from '../components/prism/PrismPage';
+import { SectionLabel } from '../components/prism/SectionLabel';
 
 const TYPE_LABELS: Record<CrystalTicketType, string> = {
   bug: 'Bug',
@@ -9,30 +19,29 @@ const TYPE_LABELS: Record<CrystalTicketType, string> = {
   other: 'Other',
 };
 
-const TYPE_COLORS: Record<CrystalTicketType, string> = {
-  bug: 'bg-red-100 text-red-700',
-  feat: 'bg-purple-100 text-purple-700',
-  ui: 'bg-blue-100 text-blue-700',
-  other: 'bg-slate-100 text-slate-700',
+// Tinted icon tile + coloured type word, as on the prism-styled Q&A page.
+const TYPE_STYLES: Record<CrystalTicketType, { icon: IconName; tile: string; text: string }> = {
+  bug: { icon: 'bug', tile: 'bg-[#FEE2E2] text-[#DC2626]', text: 'text-[#DC2626]' },
+  feat: { icon: 'lightbulb', tile: 'bg-[#F3E8FF] text-[#A855F7]', text: 'text-[#A855F7]' },
+  ui: { icon: 'layout', tile: 'bg-accent-bg-blue-muted text-accent-blue', text: 'text-accent-blue' },
+  other: { icon: 'message', tile: 'bg-[#F1F5F9] text-[#64748B]', text: 'text-token-secondary' },
 };
 
-const STATUS_LABELS: Record<CrystalTicketStatus, string> = {
-  pending: 'Pending',
-  replied: 'Replied',
-  closed: 'Closed',
-};
-
-const STATUS_COLORS: Record<CrystalTicketStatus, string> = {
-  pending: 'bg-yellow-100 text-yellow-700',
-  replied: 'bg-green-100 text-green-700',
-  closed: 'bg-slate-100 text-slate-500',
-};
+const STATUS_FILTERS = ['', 'pending', 'replied', 'closed'] as const;
+const TYPE_FILTERS = ['', 'bug', 'feat', 'ui', 'other'] as const;
 
 const STATUS_FILTER_LABEL_ID = 'crystal-ticket-status-filter-label';
 const TYPE_FILTER_LABEL_ID = 'crystal-ticket-type-filter-label';
 
+function statusFilterLabel(status: '' | CrystalTicketStatus): string {
+  if (!status) return 'All';
+  return status.charAt(0).toUpperCase() + status.slice(1);
+}
+
 export default function CrystalTickets({ user }: { user: AuthUser }) {
   const [tickets, setTickets] = useState<CrystalTicket[]>([]);
+  // Unfiltered copy for the hero totals; kept in sync with the same by-id updates.
+  const [allTickets, setAllTickets] = useState<CrystalTicket[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [statusFilter, setStatusFilter] = useState<'' | CrystalTicketStatus>('pending');
@@ -43,12 +52,17 @@ export default function CrystalTickets({ user }: { user: AuthUser }) {
 
   const fetchTickets = () => {
     setLoading(true);
-    api
-      .listCrystalTickets({
+    Promise.all([
+      api.listCrystalTickets({
         status: statusFilter || undefined,
         type: typeFilter || undefined,
+      }),
+      api.listCrystalTickets(),
+    ])
+      .then(([res, all]) => {
+        setTickets(res.data);
+        setAllTickets(all.data);
       })
-      .then((res) => setTickets(res.data))
       .catch((err: unknown) => setError(err instanceof Error ? err.message : 'Failed to load'))
       .finally(() => setLoading(false));
   };
@@ -64,7 +78,8 @@ export default function CrystalTickets({ user }: { user: AuthUser }) {
     setActionLoading(id);
     try {
       const updated = await api.replyCrystalTicket(id, text);
-      setTickets((prev) => prev.map((t) => (t.id === id ? updated : t)));
+      setTickets((prev) => replaceById(prev, updated));
+      setAllTickets((prev) => replaceById(prev, updated));
       setReplyText((prev) => {
         const next = { ...prev };
         delete next[id];
@@ -81,7 +96,8 @@ export default function CrystalTickets({ user }: { user: AuthUser }) {
     setActionLoading(id);
     try {
       const updated = await api.updateCrystalTicketStatus(id, status);
-      setTickets((prev) => prev.map((t) => (t.id === id ? updated : t)));
+      setTickets((prev) => replaceById(prev, updated));
+      setAllTickets((prev) => replaceById(prev, updated));
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Status update failed');
     } finally {
@@ -90,203 +106,187 @@ export default function CrystalTickets({ user }: { user: AuthUser }) {
   };
 
   const isCurator = user.role === 'curator';
+  const countOf = (status: CrystalTicketStatus) => countByStatus(allTickets, status);
 
   return (
-    <div>
-      <div className="mb-6 flex items-center justify-between">
-        <h1 className="text-2xl font-bold text-slate-800">Crystal Tickets</h1>
-      </div>
+    <PrismPage
+      icon="crystal"
+      badge="Feedback"
+      title="Crystal"
+      description="Bug reports and suggestions from the public Crystal form."
+      count={`${allTickets.length} tickets`}
+      stats={[
+        { value: countOf('pending'), label: 'Pending' },
+        { value: countOf('replied'), label: 'Replied' },
+        { value: countOf('closed'), label: 'Closed' },
+      ]}
+      toolbar={
+        <>
+          <div className="flex items-center gap-1.5" role="group" aria-labelledby={STATUS_FILTER_LABEL_ID}>
+            <span id={STATUS_FILTER_LABEL_ID} className="sr-only">Status:</span>
+            {STATUS_FILTERS.map((s) => (
+              <Chip key={s} active={statusFilter === s} onClick={() => setStatusFilter(s)}>
+                {statusFilterLabel(s)}
+              </Chip>
+            ))}
+          </div>
+          <div aria-hidden="true" className="h-5 w-px bg-border-token" />
+          <div className="flex items-center gap-1.5" role="group" aria-labelledby={TYPE_FILTER_LABEL_ID}>
+            <span id={TYPE_FILTER_LABEL_ID} className="sr-only">Type:</span>
+            {TYPE_FILTERS.map((t) => (
+              <Chip key={t} active={typeFilter === t} onClick={() => setTypeFilter(t)}>
+                {t ? TYPE_LABELS[t] : 'All types'}
+              </Chip>
+            ))}
+          </div>
+        </>
+      }
+    >
+      <div className="px-6 pb-6 pt-3">
+        {error && (
+          <div className="mb-4 rounded-radius-lg border border-[#FECACA] bg-[#FEF2F2] px-4 py-3 text-sm text-[#B91C1C]">
+            {error}
+          </div>
+        )}
 
-      {/* Filters */}
-      <div className="mb-4 flex flex-wrap gap-3">
-        <div
-          className="flex gap-1"
-          role="group"
-          aria-labelledby={STATUS_FILTER_LABEL_ID}
-        >
-          <span
-            id={STATUS_FILTER_LABEL_ID}
-            className="mr-1 self-center text-xs font-medium uppercase text-slate-500"
-          >
-            Status:
-          </span>
-          {(['', 'pending', 'replied', 'closed'] as const).map((s) => (
-            <button
-              key={s}
-              type="button"
-              aria-pressed={statusFilter === s}
-              onClick={() => setStatusFilter(s)}
-              className={`rounded-md px-3 py-1 text-xs font-medium transition-colors ${
-                statusFilter === s
-                  ? 'bg-slate-800 text-white'
-                  : 'bg-white text-slate-600 hover:bg-slate-100'
-              }`}
-            >
-              {s || 'All'}
-            </button>
-          ))}
-        </div>
-
-        <div
-          className="flex gap-1"
-          role="group"
-          aria-labelledby={TYPE_FILTER_LABEL_ID}
-        >
-          <span
-            id={TYPE_FILTER_LABEL_ID}
-            className="mr-1 self-center text-xs font-medium uppercase text-slate-500"
-          >
-            Type:
-          </span>
-          {(['', 'bug', 'feat', 'ui', 'other'] as const).map((t) => (
-            <button
-              key={t}
-              type="button"
-              aria-pressed={typeFilter === t}
-              onClick={() => setTypeFilter(t)}
-              className={`rounded-md px-3 py-1 text-xs font-medium transition-colors ${
-                typeFilter === t
-                  ? 'bg-slate-800 text-white'
-                  : 'bg-white text-slate-600 hover:bg-slate-100'
-              }`}
-            >
-              {t ? TYPE_LABELS[t] : 'All'}
-            </button>
-          ))}
-        </div>
-      </div>
-
-      {error && (
-        <div className="mb-4 rounded-md bg-red-50 px-4 py-3 text-sm text-red-700">{error}</div>
-      )}
-
-      {loading ? (
-        <p className="text-slate-500">Loading...</p>
-      ) : tickets.length === 0 ? (
-        <p className="text-slate-500">No tickets found.</p>
-      ) : (
-        <div className="space-y-2">
-          {tickets.map((ticket) => {
-            const isExpanded = expandedId === ticket.id;
-            return (
-              <div
-                key={ticket.id}
-                className="rounded-lg border border-slate-200 bg-white"
-              >
-                {/* Summary row */}
-                <button
-                  onClick={() => setExpandedId(isExpanded ? null : ticket.id)}
-                  className="flex w-full items-center gap-3 px-4 py-3 text-left hover:bg-slate-50"
-                >
-                  <span className={`inline-block rounded-full px-2 py-0.5 text-xs font-medium ${TYPE_COLORS[ticket.type]}`}>
-                    {TYPE_LABELS[ticket.type]}
-                  </span>
-                  <span className={`inline-block rounded-full px-2 py-0.5 text-xs font-medium ${STATUS_COLORS[ticket.status]}`}>
-                    {STATUS_LABELS[ticket.status]}
-                  </span>
-                  {ticket.is_public_reply_allowed ? (
-                    <span className="inline-block rounded-full bg-indigo-50 px-2 py-0.5 text-xs font-medium text-indigo-600">Public</span>
-                  ) : null}
-                  <span className="flex-1 truncate text-sm font-medium text-slate-800">
-                    {ticket.title}
-                  </span>
-                  <span className="text-xs text-slate-400">
-                    {ticket.nickname || 'anon'} · {ticket.submitted_at?.slice(0, 10)}
-                  </span>
-                  <svg
-                    className={`h-4 w-4 text-slate-400 transition-transform ${isExpanded ? 'rotate-180' : ''}`}
-                    fill="none" viewBox="0 0 24 24" stroke="currentColor"
+        {loading ? (
+          <p className="py-6 text-center text-sm text-token-secondary">Loading...</p>
+        ) : tickets.length === 0 ? (
+          <p className="py-6 text-center text-sm text-token-tertiary">No tickets found.</p>
+        ) : (
+          <div className="flex flex-col gap-0.5">
+            {tickets.map((ticket) => {
+              const isExpanded = expandedId === ticket.id;
+              const type = TYPE_STYLES[ticket.type];
+              const detailsId = `crystal-ticket-details-${ticket.id}`;
+              return (
+                <div key={ticket.id} className={`rounded-radius-lg ${isExpanded ? 'bg-[#FCE7F320]' : ''}`}>
+                  {/* Summary row */}
+                  <button
+                    type="button"
+                    onClick={() => setExpandedId(isExpanded ? null : ticket.id)}
+                    aria-expanded={isExpanded}
+                    aria-controls={detailsId}
+                    className="hover-row flex w-full items-center gap-3 rounded-radius-lg px-3 py-2.5 text-left"
                   >
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
-                  </svg>
-                </button>
+                    <span
+                      className={`flex h-8 w-8 shrink-0 items-center justify-center rounded-radius-sm ${type.tile}`}
+                    >
+                      <Icon name={type.icon} size={16} />
+                    </span>
+                    <span className="flex min-w-0 flex-1 flex-col gap-0.5">
+                      <span
+                        className={`truncate text-[15px] font-bold leading-tight ${
+                          isExpanded ? 'text-accent-pink-dark' : 'text-token-primary'
+                        }`}
+                      >
+                        {ticket.title}
+                      </span>
+                      <span className="flex flex-wrap items-center gap-x-1.5 text-[11px] text-token-secondary">
+                        <span className={`font-semibold ${type.text}`}>{TYPE_LABELS[ticket.type]}</span>
+                        <span className="text-token-tertiary">·</span>
+                        <span>{ticket.nickname || 'anon'}</span>
+                        <span className="text-token-tertiary">·</span>
+                        <span className="font-mono">{ticket.submitted_at?.slice(0, 10)}</span>
+                      </span>
+                    </span>
+                    <span className="flex shrink-0 items-center gap-2">
+                      {ticket.is_public_reply_allowed ? (
+                        <span className="inline-flex items-center gap-1 whitespace-nowrap rounded-radius-pill border border-border-token px-2 py-0.5 text-[10px] font-semibold leading-4 text-token-secondary">
+                          <Icon name="globe" size={11} />
+                          Public
+                        </span>
+                      ) : null}
+                      <StatusPill status={ticket.status} />
+                    </span>
+                    <span className="flex w-7 justify-end text-token-tertiary">
+                      <Icon name={isExpanded ? 'chevronDown' : 'chevronRight'} size={20} />
+                    </span>
+                  </button>
 
-                {/* Expanded detail */}
-                {isExpanded && (
-                  <div className="border-t border-slate-100 px-4 py-4">
-                    <div className="grid gap-4 sm:grid-cols-2">
-                      <div>
-                        <p className="mb-1 text-xs font-medium uppercase text-slate-400">ID</p>
-                        <p className="text-sm font-mono text-slate-600">{ticket.id}</p>
-                      </div>
-                      <div>
-                        <p className="mb-1 text-xs font-medium uppercase text-slate-400">Contact</p>
-                        <p className="text-sm text-slate-600">{ticket.contact || '—'}</p>
-                      </div>
-                      {ticket.context_url && (
-                        <div className="sm:col-span-2">
-                          <p className="mb-1 text-xs font-medium uppercase text-slate-400">Context URL</p>
-                          <p className="text-sm text-blue-600 break-all">{ticket.context_url}</p>
+                  {/* Expanded detail */}
+                  {isExpanded && (
+                    <div
+                      id={detailsId}
+                      className={`grid gap-6 border-t border-border-token-table px-3 pb-3 pt-4 ${
+                        isCurator ? 'grid-cols-1 lg:grid-cols-[minmax(0,1fr)_360px]' : 'grid-cols-1'
+                      }`}
+                    >
+                      <div className="flex min-w-0 flex-col gap-4">
+                        <div className="grid grid-cols-1 gap-x-4 gap-y-3 sm:grid-cols-3">
+                          <DetailField label="ID" value={ticket.id} mono />
+                          <DetailField label="Contact" value={ticket.contact} />
+                          <DetailField label="Submitted" value={ticket.submitted_at} />
+                          {ticket.context_url && (
+                            <DetailField label="Context URL" className="col-span-3">
+                              <p className="break-all text-[13px] leading-normal text-accent-blue">{ticket.context_url}</p>
+                            </DetailField>
+                          )}
                         </div>
-                      )}
-                    </div>
 
-                    <div className="mt-4">
-                      <p className="mb-1 text-xs font-medium uppercase text-slate-400">Description</p>
-                      <p className="whitespace-pre-wrap text-sm text-slate-700">{ticket.body}</p>
-                    </div>
+                        <DetailField label="Description">
+                          <p className="whitespace-pre-wrap text-[13px] leading-relaxed text-token-primary">{ticket.body}</p>
+                        </DetailField>
 
-                    {/* Existing reply */}
-                    {ticket.admin_reply && (
-                      <div className="mt-4 rounded-md border-l-4 border-purple-400 bg-purple-50 p-3">
-                        <p className="mb-1 text-xs font-medium text-purple-600">
-                          Reply · {ticket.replied_at?.slice(0, 10)}
-                        </p>
-                        <p className="whitespace-pre-wrap text-sm text-slate-700">{ticket.admin_reply}</p>
+                        {/* Existing reply */}
+                        {ticket.admin_reply && (
+                          <div className="flex flex-col gap-2 rounded-radius-lg border border-border-token-glass bg-surface-glass px-3.5 py-3">
+                            <div className="flex items-center gap-2">
+                              <Pill tone="pink">Reply</Pill>
+                              <span className="font-mono text-[11px] text-token-secondary">{ticket.replied_at?.slice(0, 10)}</span>
+                            </div>
+                            <p className="whitespace-pre-wrap text-[13px] leading-relaxed text-token-primary">{ticket.admin_reply}</p>
+                          </div>
+                        )}
                       </div>
-                    )}
 
-                    {/* Actions */}
-                    {isCurator && (
-                      <div className="mt-4 space-y-3">
-                        {/* Reply textarea */}
-                        <div>
-                          <textarea
-                            className="w-full rounded-md border border-slate-200 px-3 py-2 text-sm focus:border-purple-400 focus:outline-none"
-                            rows={3}
+                      {/* Actions */}
+                      {isCurator && (
+                        <GlassCard className="flex flex-col gap-2.5 self-start p-4">
+                          <SectionLabel>Reply</SectionLabel>
+                          <PrismTextarea
+                            rows={4}
                             placeholder={ticket.admin_reply ? 'Update reply...' : 'Write a reply...'}
                             value={replyText[ticket.id] ?? ''}
                             onChange={(e) => setReplyText((prev) => ({ ...prev, [ticket.id]: e.target.value }))}
                           />
-                          <button
-                            onClick={() => handleReply(ticket.id)}
-                            disabled={actionLoading === ticket.id || !replyText[ticket.id]?.trim()}
-                            className="mt-1 rounded-md bg-purple-600 px-4 py-1.5 text-xs font-medium text-white hover:bg-purple-700 disabled:opacity-50"
-                          >
-                            {actionLoading === ticket.id ? '...' : (ticket.admin_reply ? 'Update Reply' : 'Send Reply')}
-                          </button>
-                        </div>
-
-                        {/* Status buttons */}
-                        <div className="flex gap-2">
-                          {ticket.status !== 'closed' && (
-                            <button
-                              onClick={() => handleStatusChange(ticket.id, 'closed')}
-                              disabled={actionLoading === ticket.id}
-                              className="rounded-md bg-slate-600 px-3 py-1.5 text-xs font-medium text-white hover:bg-slate-700 disabled:opacity-50"
+                          <div className="flex items-center gap-2">
+                            <GradientButton
+                              icon="send"
+                              onClick={() => handleReply(ticket.id)}
+                              disabled={actionLoading === ticket.id || !replyText[ticket.id]?.trim()}
                             >
-                              Close
-                            </button>
-                          )}
-                          {ticket.status === 'closed' && (
-                            <button
-                              onClick={() => handleStatusChange(ticket.id, 'pending')}
-                              disabled={actionLoading === ticket.id}
-                              className="rounded-md bg-yellow-500 px-3 py-1.5 text-xs font-medium text-white hover:bg-yellow-600 disabled:opacity-50"
-                            >
-                              Reopen
-                            </button>
-                          )}
-                        </div>
-                      </div>
-                    )}
-                  </div>
-                )}
-              </div>
-            );
-          })}
-        </div>
-      )}
-    </div>
+                              {actionLoading === ticket.id ? '...' : (ticket.admin_reply ? 'Update Reply' : 'Send Reply')}
+                            </GradientButton>
+                            {ticket.status !== 'closed' && (
+                              <OutlineButton
+                                icon="check"
+                                onClick={() => handleStatusChange(ticket.id, 'closed')}
+                                disabled={actionLoading === ticket.id}
+                              >
+                                Close
+                              </OutlineButton>
+                            )}
+                            {ticket.status === 'closed' && (
+                              <OutlineButton
+                                icon="undo"
+                                onClick={() => handleStatusChange(ticket.id, 'pending')}
+                                disabled={actionLoading === ticket.id}
+                              >
+                                Reopen
+                              </OutlineButton>
+                            )}
+                          </div>
+                        </GlassCard>
+                      )}
+                    </div>
+                  )}
+                </div>
+              );
+            })}
+          </div>
+        )}
+      </div>
+    </PrismPage>
   );
 }

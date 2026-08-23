@@ -39,7 +39,7 @@ async function main(): Promise<void> {
   );
 
   assert(
-    buttonFor(html, 'pending').includes('aria-pressed="true"'),
+    buttonFor(html, 'Pending').includes('aria-pressed="true"'),
     'Pending is the default status filter',
   );
   assert(
