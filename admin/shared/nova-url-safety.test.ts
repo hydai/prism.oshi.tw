@@ -28,6 +28,10 @@ checkEqual(sanitizeNovaUrl('/relative', 'youtube'), null, 'rejects relative URLs
 checkEqual(sanitizeNovaUrl('https://youtube.com.evil.example/@unsafe', 'youtube'), null, 'rejects lookalike YouTube hosts');
 checkEqual(sanitizeNovaUrl('https://user:pass@youtube.com/@unsafe', 'youtube'), null, 'rejects embedded credentials');
 checkEqual(sanitizeNovaUrl('https://attacker.example/avatar.png', 'image'), null, 'rejects off-allowlist image hosts');
+checkEqual(sanitizeNovaUrl('https://i.ytimg.com/vi/pRy1JZ2jSi8/hqdefault.jpg', 'thumbnail'), 'https://i.ytimg.com/vi/pRy1JZ2jSi8/hqdefault.jpg', 'allows YouTube thumbnail hosts');
+checkEqual(sanitizeNovaUrl('https://img.youtube.com/vi/pRy1JZ2jSi8/0.jpg', 'thumbnail'), 'https://img.youtube.com/vi/pRy1JZ2jSi8/0.jpg', 'allows the legacy img.youtube.com thumbnail host');
+checkEqual(sanitizeNovaUrl('https://attacker.example/vi/pRy1JZ2jSi8/hqdefault.jpg', 'thumbnail'), null, 'rejects off-allowlist thumbnail hosts');
+checkEqual(sanitizeNovaUrl('http://i.ytimg.com/vi/pRy1JZ2jSi8/hqdefault.jpg', 'thumbnail'), null, 'rejects non-HTTPS thumbnail URLs');
 checkEqual(
   sanitizeNovaUrl('https://www.youtube.com/redirect?q=https%3A%2F%2Fevil.example', 'facebook'),
   null,

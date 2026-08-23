@@ -1,4 +1,4 @@
-export type NovaUrlProvider = 'youtube' | 'twitter' | 'facebook' | 'instagram' | 'twitch' | 'image';
+export type NovaUrlProvider = 'youtube' | 'twitter' | 'facebook' | 'instagram' | 'twitch' | 'image' | 'thumbnail';
 
 const allowedHosts: Record<NovaUrlProvider, ReadonlySet<string>> = {
   youtube: new Set(['youtube.com', 'm.youtube.com', 'youtu.be']),
@@ -7,6 +7,8 @@ const allowedHosts: Record<NovaUrlProvider, ReadonlySet<string>> = {
   instagram: new Set(['instagram.com']),
   twitch: new Set(['twitch.tv']),
   image: new Set(['yt3.ggpht.com', 'yt4.ggpht.com', 'yt3.googleusercontent.com', 'lh3.googleusercontent.com']),
+  // Video thumbnails (YouTube oEmbed / Data API): submitter-supplied, so only YouTube's image CDNs may load.
+  thumbnail: new Set(['i.ytimg.com', 'i1.ytimg.com', 'i2.ytimg.com', 'i3.ytimg.com', 'i4.ytimg.com', 'i9.ytimg.com', 'img.youtube.com']),
 };
 
 const youtubeRedirectHosts = new Set(['youtube.com', 'm.youtube.com']);
