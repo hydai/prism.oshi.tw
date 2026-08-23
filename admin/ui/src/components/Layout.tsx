@@ -1,11 +1,16 @@
-import { NavLink, useNavigate } from 'react-router-dom';
+import { NavLink, useLocation, useNavigate } from 'react-router-dom';
 import { useEffect, useEffectEvent, useId, useState, type ReactNode } from 'react';
 import type { AuthUser, StreamerInfo } from '../../../shared/types';
 import { api, getCurrentStreamer, setCurrentStreamer, onStreamerChange } from '../api/client';
 import { getVisibleNavItems } from '../lib/navigation';
 
+/** Routes rendered in the prism visual vocabulary (gradient page, glass shell). */
+const PRISM_STYLED_PATHS = new Set(['/nova', '/nova/vods', '/crystal']);
+
 export default function Layout({ user, children }: { user: AuthUser; children: ReactNode }) {
   const navigate = useNavigate();
+  const { pathname } = useLocation();
+  const prismStyled = PRISM_STYLED_PATHS.has(pathname);
   const [streamer, setStreamer] = useState(getCurrentStreamer);
   const [streamers, setStreamers] = useState<StreamerInfo[]>([]);
   const streamerSelectId = useId();
@@ -96,7 +101,15 @@ export default function Layout({ user, children }: { user: AuthUser; children: R
       </aside>
 
       {/* Main content */}
-      <main className="flex-1 overflow-y-auto bg-slate-50 p-6">{children}</main>
+      <main
+        className={
+          prismStyled
+            ? 'prism-main flex-1 overflow-y-auto'
+            : 'flex-1 overflow-y-auto bg-slate-50 p-6'
+        }
+      >
+        {children}
+      </main>
     </div>
   );
 }
