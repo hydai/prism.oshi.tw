@@ -29,25 +29,6 @@ html.dark {
 
 html.dark #result.success { background: rgba(22, 163, 74, 0.10); color: #6EE7B7; border-color: rgba(110, 231, 183, 0.20); }
 html.dark #result.error { background: rgba(220, 38, 38, 0.10); color: #FCA5A5; border-color: rgba(252, 165, 165, 0.20); }
-
-.type-badge { display: inline-block; padding: 2px 10px; border-radius: 20px; font-size: 12px; font-weight: 600; color: white; }
-.type-bug { background: #EF4444; }
-.type-feat { background: #8B5CF6; }
-.type-ui { background: #3B82F6; }
-.type-other { background: #64748B; }
-html.dark .type-bug { background: #F87171; }
-html.dark .type-feat { background: #C084FC; }
-html.dark .type-ui { background: #60A5FA; }
-html.dark .type-other { background: #9CA3AF; }
-
-.status-badge { display: inline-block; padding: 2px 10px; border-radius: 20px; font-size: 12px; font-weight: 500; }
-.status-replied { color: #059669; border: 1px solid rgba(5, 150, 105, 0.2); }
-.status-closed { color: #64748B; border: 1px solid rgba(100, 116, 139, 0.2); }
-html.dark .status-replied { color: #4ADE80; border-color: rgba(74, 222, 128, 0.2); }
-html.dark .status-closed { color: #9CA3AF; border-color: rgba(156, 163, 175, 0.2); }
-
-.admin-reply { padding: 16px; background: rgba(139, 92, 246, 0.06); border-radius: var(--radius-lg); border-left: 3px solid var(--accent-purple); }
-html.dark .admin-reply { background: rgba(192, 132, 252, 0.08); }
 `;
 
 export const DARK_MODE_DETECT_SCRIPT = `(function(){try{var t=localStorage.getItem('theme');var d=window.matchMedia('(prefers-color-scheme:dark)').matches;if(t==='dark'||(!t&&d))document.documentElement.classList.add('dark')}catch(e){}})()`;
