@@ -102,6 +102,12 @@ function reqInit(route: Route, email: string): RequestInit {
 // the data layer for any of them, including the read-only global catalog.
 const PROTECTED_ROUTES: Route[] = [
   { method: 'GET', path: '/api/works' },
+  { method: 'PUT', path: '/api/works/work-1/tags', body: { tags: ['genre:rock'] } },
+  {
+    method: 'POST',
+    path: '/api/works/tags/bulk',
+    body: { workIds: ['work-1'], addTags: ['genre:rock'], removeTags: [] },
+  },
   { method: 'GET', path: '/api/work-matches' },
   {
     method: 'POST',
@@ -127,6 +133,7 @@ const PROTECTED_ROUTES: Route[] = [
       note: 'Verified against official credits',
     },
   },
+  { method: 'PATCH', path: '/api/performances/perf-1/tags', body: { tags: ['language:ja'] } },
   { method: 'PATCH', path: '/api/performances/perf-1/timestamps', body: { timestamp: 999, endTimestamp: 1001 } },
   { method: 'PATCH', path: '/api/performances/perf-1/details', body: { title: 'Hacked', originalArtist: 'Hacker' } },
   { method: 'DELETE', path: '/api/performances/perf-1' },
@@ -271,6 +278,86 @@ async function testHarmonizerRejectsInvalidWorkMergeConfirmation(): Promise<void
   assertEqual(malformedDb.prepareCalls, 0, 'malformed confirmation is rejected before D1');
 }
 
+async function testWorkTagsRejectInvalidSelectionsBeforeD1(): Promise<void> {
+  const unknownDb = new RecordingD1();
+  const unknownResponse = await app.request(
+    '/api/works/work-1/tags',
+    reqInit({ method: 'PUT', path: '/api/works/work-1/tags', body: { tags: ['unknown:tag'] } }, CURATOR),
+    envFor(unknownDb),
+  );
+  assertEqual(unknownResponse.status, 400, 'unknown work tag is rejected');
+  assertEqual(unknownDb.prepareCalls, 0, 'unknown work tag is rejected before D1');
+
+  const renditionOnWorkDb = new RecordingD1();
+  const renditionOnWorkResponse = await app.request(
+    '/api/works/work-1/tags',
+    reqInit({ method: 'PUT', path: '/api/works/work-1/tags', body: { tags: ['language:ja'] } }, CURATOR),
+    envFor(renditionOnWorkDb),
+  );
+  assertEqual(renditionOnWorkResponse.status, 400, 'performance tag is rejected at work scope');
+  assertEqual(renditionOnWorkDb.prepareCalls, 0, 'wrong-scope work tag is rejected before D1');
+
+  const workOnRenditionDb = new RecordingD1();
+  const workOnRenditionResponse = await app.request(
+    '/api/performances/perf-1/tags',
+    reqInit({ method: 'PATCH', path: '/api/performances/perf-1/tags', body: { tags: ['genre:rock'] } }, CURATOR),
+    envFor(workOnRenditionDb),
+  );
+  assertEqual(workOnRenditionResponse.status, 400, 'work tag is rejected at performance scope');
+  assertEqual(workOnRenditionDb.prepareCalls, 0, 'wrong-scope performance tag is rejected before D1');
+
+  const conflictingDb = new RecordingD1();
+  const conflictingResponse = await app.request(
+    '/api/works/tags/bulk',
+    reqInit({
+      method: 'POST',
+      path: '/api/works/tags/bulk',
+      body: { workIds: ['work-1'], addTags: ['genre:rock'], removeTags: ['genre:rock'] },
+    }, CURATOR),
+    envFor(conflictingDb),
+  );
+  assertEqual(conflictingResponse.status, 400, 'bulk update cannot add and remove the same tag');
+  assertEqual(conflictingDb.prepareCalls, 0, 'conflicting bulk update is rejected before D1');
+}
+
+async function testSongCreationRejectsWorkTagsBeforeD1(): Promise<void> {
+  const contributorDb = new RecordingD1();
+  const contributorResponse = await app.request(
+    '/api/songs',
+    reqInit({
+      method: 'POST',
+      path: '/api/songs',
+      body: { title: 'Song', originalArtist: 'Artist', tags: ['genre:rock'] },
+    }, CONTRIBUTOR),
+    envFor(contributorDb),
+  );
+  assertEqual(contributorResponse.status, 403, 'contributor cannot submit work-scoped tags with a song');
+  const contributorBody = (await contributorResponse.json()) as { error: string };
+  assert(
+    contributorBody.error.includes('curator') && contributorBody.error.includes('Global Song Library'),
+    'contributor rejection directs work-tag edits to a curator in Global Song Library',
+  );
+  assertEqual(contributorDb.prepareCalls, 0, 'contributor work tags are rejected before D1');
+
+  const curatorDb = new RecordingD1();
+  const curatorResponse = await app.request(
+    '/api/songs',
+    reqInit({
+      method: 'POST',
+      path: '/api/songs',
+      body: { title: 'Song', originalArtist: 'Artist', tags: ['genre:rock'] },
+    }, CURATOR),
+    envFor(curatorDb),
+  );
+  assertEqual(curatorResponse.status, 400, 'curator must edit work tags through Global Song Library');
+  const curatorBody = (await curatorResponse.json()) as { error: string };
+  assert(
+    curatorBody.error.includes('Global Song Library'),
+    'curator rejection identifies the supported work-tag workflow',
+  );
+  assertEqual(curatorDb.prepareCalls, 0, 'curator work tags are rejected before D1 instead of being silently lost');
+}
+
 async function main(): Promise<void> {
   await testContributorStillAuthenticates();
   await testContributorRetainsReadOnlyStampAccess();
@@ -278,6 +365,8 @@ async function main(): Promise<void> {
   await testContributorBlockedFromStampMutations();
   await testVodExportMutationRequiresAuthenticityHeader();
   await testHarmonizerRejectsInvalidWorkMergeConfirmation();
+  await testWorkTagsRejectInvalidSelectionsBeforeD1();
+  await testSongCreationRejectsWorkTagsBeforeD1();
   console.log('✓ curator-only Admin routes and VOD export CSRF boundaries');
 }
 

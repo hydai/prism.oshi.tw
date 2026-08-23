@@ -2,28 +2,20 @@
 
 import { memo, useMemo } from 'react';
 import { Disc3, ChevronDown, ChevronRight } from 'lucide-react';
-import type { ArchivePerformance, ArchiveSong, ArchiveTrack } from '../types/archive';
 import SongVersionsList from './SongVersionsList';
+import { getTagLabel } from '../../lib/tags';
+import { areSongCardPropsEqual, visibleSongCardTags, type SongCardProps } from '../lib/song-card';
 
-interface SongCardProps {
-  song: ArchiveSong;
-  isExpanded: boolean;
-  onToggleExpand: (songId: string) => void;
-  onPlay: (track: ArchiveTrack) => void;
-  onAddToQueue: (track: ArchiveTrack) => void;
-  onAddToPlaylistSuccess: () => void;
-  isLiked: (performanceId: string) => boolean;
-  onToggleLike: (perf: ArchivePerformance, song: ArchiveSong) => void;
-  unavailableVideoIds: Set<string>;
-  streamerSlug: string;
-}
-
-function SongCardInner({ song, isExpanded, onToggleExpand, onPlay, onAddToQueue, onAddToPlaylistSuccess, isLiked, onToggleLike, unavailableVideoIds, streamerSlug }: SongCardProps) {
+function SongCardInner({ song, isExpanded, onToggleExpand, onPlay, onAddToQueue, onAddToPlaylistSuccess, isLiked, onToggleLike, unavailableVideoIds, streamerSlug, selectedTags }: SongCardProps) {
   const sortedPerformances = useMemo(
     () => isExpanded
       ? [...song.performances].sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime())
       : [],
     [isExpanded, song.performances]
+  );
+  const visibleTags = useMemo(
+    () => visibleSongCardTags(song.tags, selectedTags),
+    [song.tags, selectedTags],
   );
 
   return (
@@ -86,6 +78,34 @@ function SongCardInner({ song, isExpanded, onToggleExpand, onPlay, onAddToQueue,
               >
                 {song.performances.length} 個版本
               </span>
+              {visibleTags.shown.map((tag) => (
+                <span
+                  key={tag}
+                  className="font-medium"
+                  style={{
+                    fontSize: 'var(--font-size-xs)',
+                    color: 'var(--text-secondary)',
+                    background: 'var(--bg-surface-muted)',
+                    padding: 'var(--space-1) var(--space-2)',
+                    borderRadius: 'var(--radius-pill)',
+                  }}
+                >
+                  {getTagLabel(tag)}
+                </span>
+              ))}
+              {visibleTags.hidden > 0 && (
+                <span
+                  className="font-medium"
+                  title={song.tags.map(getTagLabel).join('、')}
+                  style={{
+                    fontSize: 'var(--font-size-xs)',
+                    color: 'var(--text-tertiary)',
+                    padding: 'var(--space-1) var(--space-2)',
+                  }}
+                >
+                  +{visibleTags.hidden}
+                </span>
+              )}
             </div>
           </div>
         </div>
@@ -118,18 +138,7 @@ function SongCardInner({ song, isExpanded, onToggleExpand, onPlay, onAddToQueue,
   );
 }
 
-const SongCard = memo(SongCardInner, (prev, next) => {
-  return (
-    prev.song.id === next.song.id &&
-    prev.isExpanded === next.isExpanded &&
-    prev.song.performances.length === next.song.performances.length &&
-    // Both have change-only identities: isLiked is useCallback'd on the liked
-    // set, unavailableVideoIds is replaced only when a video errors. Without
-    // these an already-rendered card kept stale hearts/disabled states.
-    prev.isLiked === next.isLiked &&
-    prev.unavailableVideoIds === next.unavailableVideoIds
-  );
-});
+const SongCard = memo(SongCardInner, areSongCardPropsEqual);
 
 SongCard.displayName = 'SongCard';
 

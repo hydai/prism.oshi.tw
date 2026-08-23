@@ -7,6 +7,9 @@ export interface ArchivePerformance {
   timestamp: number;
   endTimestamp?: number | null;
   note: string;
+  /** Originating local song tags, hydrated for rendition-scoped filtering. */
+  inheritedTags: string[];
+  tags: string[];
 }
 
 export interface ArchiveSong {
@@ -15,6 +18,8 @@ export interface ArchiveSong {
   workId?: string;
   title: string;
   originalArtist: string;
+  /** Local inherited layer; grouped songs contain the union across their members. */
+  inheritedTags: string[];
   tags: string[];
   performances: ArchivePerformance[];
   albumArtUrl?: string;
@@ -24,6 +29,7 @@ export interface FlattenedSong {
   id: string;
   title: string;
   originalArtist: string;
+  tags: string[];
   performanceId: string;
   streamId?: string;
   date: string;
@@ -33,6 +39,8 @@ export interface FlattenedSong {
   endTimestamp?: number;
   note: string;
   searchString: string;
+  // Tag labels/aliases are matched as whole terms, so they are kept out of searchString.
+  tagTerms: string[];
   year: number;
   albumArtUrl?: string;
 }

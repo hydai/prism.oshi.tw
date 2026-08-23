@@ -28,9 +28,11 @@ export interface PerformanceRow {
   timestamp: number;
   end_timestamp: number | null;
   note: string;
+  tags: string;
   status: Status;
   submitted_by: string | null;
   created_at: string;
+  updated_at: string;
 }
 
 export interface StreamRow {
@@ -72,9 +74,11 @@ export interface Performance {
   timestamp: number;
   endTimestamp: number | null;
   note: string;
+  tags: string[];
   status: Status;
   submittedBy: string | null;
   createdAt: string;
+  updatedAt: string;
 }
 
 export interface StreamCredit {
@@ -101,6 +105,7 @@ export interface Stream {
 export interface CreateSongBody {
   title: string;
   originalArtist: string;
+  /** Legacy performance-scoped input. Work tags must be edited in Global Song Library. */
   tags?: string[];
   performances?: CreatePerformanceBody[];
 }
@@ -108,7 +113,25 @@ export interface CreateSongBody {
 export interface UpdateSongBody {
   title?: string;
   originalArtist?: string;
-  tags?: string[];
+}
+
+export interface UpdateWorkTagsBody {
+  tags: string[];
+}
+
+export interface BulkUpdateWorkTagsBody {
+  workIds: string[];
+  addTags: string[];
+  removeTags: string[];
+}
+
+export interface WorkTagsUpdate {
+  id: string;
+  tags: string[];
+}
+
+export interface BulkUpdateWorkTagsResponse {
+  updated: WorkTagsUpdate[];
 }
 
 export interface CreatePerformanceBody {
@@ -120,6 +143,11 @@ export interface CreatePerformanceBody {
   timestamp: number;
   endTimestamp?: number | null;
   note?: string;
+  tags?: string[];
+}
+
+export interface UpdatePerformanceTagsBody {
+  tags: string[];
 }
 
 export interface CreateStreamBody {
@@ -173,6 +201,7 @@ export interface StampPerformance {
   timestamp: number;
   endTimestamp: number | null;
   note: string;
+  tags: string[];
   status: Status;
 }
 
@@ -182,6 +211,7 @@ export interface CreateStampPerformanceBody {
   timestamp: number;
   endTimestamp?: number | null;
   note?: string;
+  tags?: string[];
 }
 
 export interface UpdateTimestampsBody {

@@ -15,6 +15,7 @@ import { fileURLToPath } from 'node:url';
 
 import { syncStatePath, upsertEntry, type SyncStateEntry } from '../shared/sync-state.ts';
 import { assertValidSlug } from '../shared/slug.ts';
+import { mergeTagIds } from '../../lib/tags.ts';
 
 import { newStreamEmbed, newStreamsSummaryEmbed, type DiscordEmbed } from '../../admin/shared/discord.ts';
 import { enqueueAnnouncements, hashSources, loadAnnounceWebhook, type PendingBatch } from '../shared/announce.ts';
@@ -33,7 +34,8 @@ interface SongRow {
   work_id: string | null;
   title: string;
   original_artist: string;
-  tags: string; // JSON array
+  song_tags: string; // JSON array
+  work_tags: string | null; // JSON array; null for legacy unlinked rows
 }
 
 interface PerformanceRow {
@@ -46,6 +48,7 @@ interface PerformanceRow {
   timestamp: number;
   end_timestamp: number | null;
   note: string;
+  tags: string; // JSON array
 }
 
 interface StreamRow {
@@ -69,6 +72,8 @@ interface FanSitePerformance {
   timestamp: number;
   endTimestamp: number | null;
   note?: string;
+  /** Rendition-scope tags. Omitted when empty. */
+  tags?: string[];
 }
 
 interface FanSiteSong {
@@ -76,7 +81,8 @@ interface FanSiteSong {
   workId?: string;
   title: string;
   originalArtist: string;
-  tags: string[];
+  /** Tags inherited by every performance (work + legacy song layers). Omitted when empty. */
+  inheritedTags?: string[];
   performances: FanSitePerformance[];
 }
 
@@ -106,14 +112,16 @@ function queryD1<T>(sql: string): T[] {
 
 function buildSongs(streamerId: string): FanSiteSong[] {
   const songRows = queryD1<SongRow>(
-    `SELECT song.id, link.work_id, song.title, song.original_artist, song.tags
+    `SELECT song.id, link.work_id, song.title, song.original_artist,
+            song.tags AS song_tags, work.tags AS work_tags
      FROM songs AS song
      LEFT JOIN song_work_links AS link ON link.song_id = song.id
+     LEFT JOIN works AS work ON work.id = link.work_id
      WHERE song.streamer_id = '${streamerId}' AND song.status = 'approved'
      ORDER BY song.id`,
   );
   const perfRows = queryD1<PerformanceRow>(
-    `SELECT id, song_id, stream_id, date, stream_title, video_id, timestamp, end_timestamp, note FROM performances WHERE streamer_id = '${streamerId}' AND status = 'approved' ORDER BY date`,
+    `SELECT id, song_id, stream_id, date, stream_title, video_id, timestamp, end_timestamp, note, tags FROM performances WHERE streamer_id = '${streamerId}' AND status = 'approved' ORDER BY date`,
   );
 
   return assembleFanSiteSongs(songRows, perfRows);
@@ -131,13 +139,22 @@ export function assembleFanSiteSongs(
   }
 
   return songRows
-    .map((row) => ({
-      id: row.id,
-      ...(row.work_id ? { workId: row.work_id } : {}),
-      title: row.title,
-      originalArtist: row.original_artist,
-      tags: JSON.parse(row.tags) as string[],
-      performances: (perfsBySong.get(row.id) || [])
+    .map((row) => {
+      const performances = perfsBySong.get(row.id) || [];
+      const inheritedTags = mergeTagIds(
+        row.work_tags ? JSON.parse(row.work_tags) as string[] : [],
+        JSON.parse(row.song_tags) as string[],
+      );
+      return {
+        id: row.id,
+        ...(row.work_id ? { workId: row.work_id } : {}),
+        title: row.title,
+        originalArtist: row.original_artist,
+        // The effective union is derivable from inheritedTags plus the rendition tags, so
+        // hydrateSongs recomputes it rather than every visitor downloading it. Empty tag
+        // arrays are the common case and are omitted for the same reason.
+        ...(inheritedTags.length > 0 ? { inheritedTags } : {}),
+        performances: performances
         // Newest first — the canonical order the timeline consumes (dates come
         // from the DB rows; the slim output no longer carries them)
         .sort((a, b) => b.date.localeCompare(a.date))
@@ -148,8 +165,13 @@ export function assembleFanSiteSongs(
           timestamp: p.timestamp,
           endTimestamp: p.end_timestamp,
           ...(p.note ? { note: p.note } : {}),
+          ...(() => {
+            const tags = JSON.parse(p.tags) as string[];
+            return tags.length > 0 ? { tags } : {};
+          })(),
         })),
-    }))
+      };
+    })
     .sort((a, b) => a.title.localeCompare(b.title, 'zh-TW'));
 }
 
@@ -196,14 +218,15 @@ function querySnapshot(table: 'songs' | 'performances' | 'streams', streamerId: 
     // did not change.
     const rows = queryD1<SnapshotRow>(
       `SELECT
-         MAX(CASE
-           WHEN link.updated_at IS NULL THEN song.updated_at
-           WHEN song.updated_at IS NULL OR link.updated_at > song.updated_at THEN link.updated_at
-           ELSE song.updated_at
-         END) AS max_ts,
+         MAX(MAX(
+           COALESCE(song.updated_at, ''),
+           COALESCE(link.updated_at, ''),
+           COALESCE(work.updated_at, '')
+         )) AS max_ts,
          COUNT(*) AS cnt
        FROM songs AS song
        LEFT JOIN song_work_links AS link ON link.song_id = song.id
+       LEFT JOIN works AS work ON work.id = link.work_id
        WHERE song.streamer_id = '${streamerId}' AND song.status = 'approved'`,
     );
     return rows[0] ?? { max_ts: null, cnt: 0 };
@@ -350,6 +373,13 @@ async function main(): Promise<void> {
 
   console.log(`sync-data: exporting approved data for "${slug}"...`);
 
+  // Capture freshness before any export query. If D1 changes while the files are
+  // being assembled, sync:status will see a newer snapshot and keep the streamer
+  // stale instead of stamping stale JSON with the newer database timestamp.
+  const songsSnap = querySnapshot('songs', slug);
+  const perfsSnap = querySnapshot('performances', slug);
+  const streamsSnap = querySnapshot('streams', slug);
+
   const songs = buildSongs(slug);
   const streams = buildStreams(slug);
 
@@ -369,10 +399,6 @@ async function main(): Promise<void> {
 
   const totalPerfs = songs.reduce((sum, s) => sum + s.performances.length, 0);
   console.log(`  total: ${songs.length} songs, ${totalPerfs} performances, ${streams.length} streams`);
-
-  const songsSnap = querySnapshot('songs', slug);
-  const perfsSnap = querySnapshot('performances', slug);
-  const streamsSnap = querySnapshot('streams', slug);
 
   if (perfsSnap.cnt !== totalPerfs) {
     console.log(
