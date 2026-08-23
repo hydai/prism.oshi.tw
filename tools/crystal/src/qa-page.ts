@@ -1,12 +1,20 @@
 import { html, raw } from 'hono/html';
 import type { PublicTicketRow } from './types';
-import { DARK_MODE_CSS, DARK_MODE_DETECT_SCRIPT, themeToggleHTML } from './theme';
+import { DARK_MODE_CSS, DARK_MODE_DETECT_SCRIPT, PRISM_CSS, SPARKLE_SVG, svgIcon, themeToggleHTML } from './theme';
+import type { IconName } from './theme';
 
 const TYPE_LABELS: Record<string, string> = {
   bug: 'Bug',
   feat: '功能建議',
   ui: 'UI',
   other: '其他',
+};
+
+const TYPE_ICONS: Record<'bug' | 'feat' | 'ui' | 'other', IconName> = {
+  bug: 'bug',
+  feat: 'lightbulb',
+  ui: 'layout',
+  other: 'message',
 };
 
 // new Date(str) never throws — invalid input yields an Invalid Date whose
@@ -39,6 +47,9 @@ export function renderQaPage(tickets: PublicTicketRow[], total: number, page: nu
     return qs ? `/qa?${qs}` : '/qa';
   };
 
+  const chipLink = (href: string, label: string, active: boolean): string =>
+    `<a href="${href}" class="chip${active ? ' active' : ''}"${active ? ' aria-current="page"' : ''}>${label}</a>`;
+
   const ticketCards = tickets.map((t) => {
     // Escape every attacker-controlled field: the whole card is emitted via
     // raw(ticketCards) below, so nothing interpolated here is auto-escaped.
@@ -51,57 +62,50 @@ export function renderQaPage(tickets: PublicTicketRow[], total: number, page: nu
     const statusClass = t.status === 'replied' ? 'replied' : 'closed';
 
     return `
-      <div style="
-        background: var(--bg-surface-glass);
-        backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px);
-        border: 1px solid var(--border-glass);
-        border-radius: var(--radius-xl);
-        padding: 24px;
-        box-shadow: 0 4px 16px rgba(0,0,0,0.04);
-      ">
-        <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 12px; flex-wrap: wrap;">
-          <span class="type-badge type-${typeClass}">${typeLabel}</span>
-          <span class="status-badge status-${statusClass}">${statusLabel}</span>
-          <span style="font-size: 12px; color: var(--text-tertiary); margin-left: auto;">
-            ${nickname} · ${formatDate(t.submitted_at)}
-          </span>
-        </div>
-
-        <h3 style="font-size: 16px; font-weight: 600; margin-bottom: 8px; color: var(--text-primary);">
-          ${escapeHtml(t.title)}
-        </h3>
-        <p style="font-size: 14px; color: var(--text-secondary); margin-bottom: 16px; line-height: 1.6;">
-          ${escapeHtml(t.body)}
-        </p>
-
-        <div class="admin-reply">
-          <div style="font-size: 12px; font-weight: 600; color: var(--accent-purple); margin-bottom: 6px;">
-            官方回覆 · ${t.replied_at ? formatDate(t.replied_at) : ''}
+      <article class="glass-box qa-card">
+        <div class="qa-card-head">
+          <div class="type-tile type-${typeClass}">${svgIcon(TYPE_ICONS[typeClass as keyof typeof TYPE_ICONS], 16)}</div>
+          <div class="qa-card-text">
+            <h3 class="qa-card-title">${escapeHtml(t.title)}</h3>
+            <div class="cell-meta">
+              <span class="type-word type-word-${typeClass}">${typeLabel}</span>
+              <span class="dot">·</span>
+              <span>${nickname}</span>
+              <span class="dot">·</span>
+              <span class="mono">${formatDate(t.submitted_at)}</span>
+            </div>
           </div>
-          <p style="font-size: 14px; color: var(--text-primary); line-height: 1.6;">
-            ${escapeHtml(t.admin_reply)}
-          </p>
+          <div class="qa-card-status"><span class="badge badge-${statusClass}">${statusLabel}</span></div>
         </div>
-      </div>
+
+        <p class="qa-body">${escapeHtml(t.body)}</p>
+
+        <div class="glass-box qa-reply">
+          <div class="qa-reply-head">
+            <span class="badge badge-pink">官方回覆</span>
+            <span class="mono">${t.replied_at ? formatDate(t.replied_at) : ''}</span>
+          </div>
+          <div class="qa-reply-text">${escapeHtml(t.admin_reply)}</div>
+        </div>
+      </article>
     `;
   }).join('');
 
   const paginationLinks: string[] = [];
   for (let p = 1; p <= totalPages; p++) {
     const active = p === page;
-    paginationLinks.push(`
-      <a href="${buildHref({ type: typeFilter || undefined, page: p })}" style="
-        display: inline-flex; align-items: center; justify-content: center;
-        width: 36px; height: 36px; border-radius: var(--radius-lg);
-        font-size: 14px; font-weight: 500; text-decoration: none;
-        ${active
-          ? 'background: linear-gradient(135deg, var(--accent-purple), var(--accent-blue)); color: white;'
-          : 'background: var(--bg-surface-frosted); color: var(--text-secondary); border: 1px solid var(--border-glass);'
-        }
-        transition: opacity 0.2s;
-      ">${p}</a>
-    `);
+    paginationLinks.push(
+      `<a href="${buildHref({ type: typeFilter || undefined, page: p })}" class="page-link${active ? ' active' : ''}"${active ? ' aria-current="page"' : ''}>${p}</a>`,
+    );
   }
+
+  const typeChips = [
+    chipLink(buildHref({}), '全部', !typeFilter),
+    chipLink(buildHref({ type: 'bug' }), 'Bug', typeFilter === 'bug'),
+    chipLink(buildHref({ type: 'feat' }), '功能建議', typeFilter === 'feat'),
+    chipLink(buildHref({ type: 'ui' }), 'UI', typeFilter === 'ui'),
+    chipLink(buildHref({ type: 'other' }), '其他', typeFilter === 'other'),
+  ].join('');
 
   return html`<!doctype html>
 <html lang="zh-Hant">
@@ -112,9 +116,12 @@ export function renderQaPage(tickets: PublicTicketRow[], total: number, page: nu
   <script>${raw(DARK_MODE_DETECT_SCRIPT)}</script>
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700;1,9..40,400&display=swap" rel="stylesheet" />
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700;0,9..40,900;1,9..40,400&display=swap" rel="stylesheet" />
   <style>
     :root {
+      --accent-pink: #EC4899;
+      --accent-pink-dark: #DB2777;
+      --accent-pink-light: #F472B6;
       --accent-purple: #8B5CF6;
       --accent-purple-light: #A78BFA;
       --accent-blue: #3B82F6;
@@ -127,173 +134,129 @@ export function renderQaPage(tickets: PublicTicketRow[], total: number, page: nu
       --text-primary: #1E293B;
       --text-secondary: #64748B;
       --text-tertiary: #94A3B8;
+      --border-default: #E2E8F0;
       --border-glass: #FFFFFF66;
+      --border-accent-pink: #FBCFE8;
       --radius-lg: 12px;
       --radius-xl: 16px;
       --radius-2xl: 20px;
     }
 
     ${raw(DARK_MODE_CSS)}
+    ${raw(PRISM_CSS)}
 
     * { box-sizing: border-box; margin: 0; padding: 0; }
     body {
-      font-family: 'DM Sans', sans-serif;
+      font-family: 'DM Sans', system-ui, -apple-system, 'Segoe UI', sans-serif;
       background: linear-gradient(135deg, var(--bg-page-start) 0%, var(--bg-page-mid) 50%, var(--bg-page-end) 100%);
       background-attachment: fixed;
       min-height: 100vh;
       color: var(--text-primary);
+      -webkit-font-smoothing: antialiased;
     }
 
-    .qa-search-input {
-      width: 100%;
-      padding: 10px 16px 10px 40px;
-      background: var(--bg-surface-frosted);
-      border: 1px solid var(--border-glass);
-      border-radius: 999px;
-      font-family: inherit;
-      font-size: 14px;
-      color: var(--text-primary);
-      outline: none;
-      transition: border-color 0.2s, box-shadow 0.2s;
-    }
-    .qa-search-input::placeholder { color: var(--text-tertiary); }
-    .qa-search-input:focus {
-      border-color: var(--accent-purple);
-      box-shadow: 0 0 0 3px rgba(139, 92, 246, 0.1);
-    }
+    .qa-search { width: 280px; max-width: 100%; }
+    .qa-cards { display: flex; flex-direction: column; gap: 12px; padding: 16px 24px 24px; }
+    .qa-card { padding: 20px 24px; display: flex; flex-direction: column; gap: 12px; }
+    .qa-card-head { display: flex; align-items: flex-start; gap: 12px; }
+    .qa-card-text { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 4px; }
+    .qa-card-title { font-size: 15px; font-weight: 700; line-height: 1.3; color: var(--text-primary); }
+    .qa-card-status { flex-shrink: 0; }
+    .qa-body { margin: 0; font-size: 13px; line-height: 1.6; color: var(--text-secondary); }
+    .qa-reply { display: flex; flex-direction: column; gap: 6px; padding: 12px 14px; border-radius: var(--radius-lg); }
+    .qa-reply-head { display: flex; align-items: center; gap: 8px; }
+    .qa-reply-text { font-size: 13px; line-height: 1.6; color: var(--text-primary); }
+    .qa-empty { text-align: center; padding: 48px 16px; color: var(--text-tertiary); font-size: 14px; }
+    .qa-empty a { color: var(--accent-pink); font-weight: 600; font-size: 13px; text-decoration: none; }
 
-    .filter-bar {
-      display: flex;
-      gap: 8px;
-      flex-wrap: wrap;
-      justify-content: center;
-    }
-    .filter-btn {
-      padding: 6px 16px;
-      border: 1px solid var(--border-glass);
-      border-radius: 20px;
-      background: var(--bg-surface-frosted);
-      font-family: inherit;
-      font-size: 13px;
-      font-weight: 500;
-      color: var(--text-secondary);
-      cursor: pointer;
-      text-decoration: none;
-      transition: all 0.2s;
-    }
-    .filter-btn:hover { border-color: var(--accent-purple); color: var(--accent-purple); }
-    .filter-btn.active {
-      background: linear-gradient(135deg, var(--accent-purple), var(--accent-blue));
-      color: white;
-      border-color: transparent;
-    }
+    .type-tile { width: 32px; height: 32px; border-radius: 8px; flex-shrink: 0; display: flex; align-items: center; justify-content: center; }
+    .type-bug { background: #FEE2E2; color: #DC2626; }
+    .type-feat { background: #F3E8FF; color: #A855F7; }
+    .type-ui { background: var(--bg-accent-blue-muted); color: var(--accent-blue); }
+    .type-other { background: #F1F5F9; color: #64748B; }
+    html.dark .type-bug { background: rgba(248, 113, 113, 0.15); color: #FCA5A5; }
+    html.dark .type-feat { background: rgba(192, 132, 252, 0.15); color: #D8B4FE; }
+    html.dark .type-other { background: rgba(148, 163, 184, 0.15); color: #CBD5E1; }
+    .type-word { font-weight: 600; }
+    .type-word-bug { color: #DC2626; }
+    .type-word-feat { color: #A855F7; }
+    .type-word-ui { color: var(--accent-blue); }
+    .type-word-other { color: #64748B; }
+    html.dark .type-word-bug { color: #FCA5A5; }
+    html.dark .type-word-feat { color: #D8B4FE; }
+    html.dark .type-word-other { color: #CBD5E1; }
 
-    .cross-links {
-      display: flex;
-      justify-content: center;
-      gap: 16px;
-      margin-top: 16px;
-      font-size: 13px;
+    .page-links { display: flex; justify-content: center; gap: 6px; margin-top: 4px; }
+    .page-link { display: inline-flex; align-items: center; justify-content: center; width: 32px; height: 32px; border-radius: 9999px; font-size: 11px; font-weight: 600; text-decoration: none; background: var(--bg-surface-muted); color: var(--text-secondary); border: 1px solid var(--border-glass); transition: color 0.15s; }
+    .page-link:hover { color: var(--accent-pink); }
+    .page-link.active { background: var(--gradient-accent); color: #FFFFFF; border-color: transparent; box-shadow: 0 2px 8px rgba(244, 114, 182, 0.3); }
+
+    @media (max-width: 640px) {
+      .qa-search { width: 100%; }
+      .qa-cards { padding: 4px 16px 16px; gap: 10px; }
+      .qa-card { padding: 16px; }
     }
-    .cross-links a {
-      color: var(--accent-purple);
-      text-decoration: none;
-      transition: opacity 0.2s;
-    }
-    .cross-links a:hover { opacity: 0.7; }
   </style>
 </head>
 <body>
 
-  <div style="max-width: 720px; margin: 0 auto; padding: 48px 16px;">
-    <!-- Header -->
-    <div style="text-align: center; margin-bottom: 32px;">
-      <div style="display: flex; align-items: center; justify-content: center; gap: 12px; margin-bottom: 8px; position: relative;">
-        <div style="
-          width: 40px; height: 40px; border-radius: var(--radius-lg);
-          background: linear-gradient(135deg, var(--accent-purple-light), var(--accent-blue-light));
-          display: flex; align-items: center; justify-content: center;
-        ">
-          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-            <path d="M12 2L2 7l10 5 10-5-10-5z"/>
-            <path d="M2 17l10 5 10-5"/>
-            <path d="M2 12l10 5 10-5"/>
-          </svg>
+  <div class="prism-page prism-page-narrow">
+    <div class="prism-shell">
+      <!-- Header -->
+      <div class="prism-hero">
+        <div class="prism-hero-tile">${raw(svgIcon('crystal', 30))}</div>
+        <div class="prism-hero-stack">
+          <div class="prism-badge">${raw(SPARKLE_SVG)}Q&amp;A</div>
+          <h1 class="prism-title">Crystal Q&amp;A</h1>
+          <p class="prism-desc">已回覆的問題與建議 <span class="dot">·</span> <strong>${total} 則</strong></p>
         </div>
-        <span style="
-          font-size: 28px; font-weight: 700; letter-spacing: -0.5px;
-          background: linear-gradient(135deg, var(--accent-purple), var(--accent-blue));
-          -webkit-background-clip: text; -webkit-text-fill-color: transparent;
-          background-clip: text;
-        ">Crystal Q&A</span>
-        <div style="position: absolute; right: 0; top: 50%; transform: translateY(-50%);">
-          ${raw(themeToggleHTML())}
-        </div>
+        <div class="prism-hero-actions">${raw(themeToggleHTML())}</div>
       </div>
-      <p style="color: var(--text-secondary); font-size: 14px;">
-        已回覆的問題與建議
-      </p>
-    </div>
 
-    <!-- Search form (press Enter to submit) -->
-    <form method="get" action="/qa" style="margin-bottom: 16px;">
-      ${typeFilter ? raw(`<input type="hidden" name="type" value="${escapeHtml(typeFilter)}" />`) : ''}
-      <div style="position: relative;">
-        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="position: absolute; left: 14px; top: 50%; transform: translateY(-50%); color: var(--text-tertiary); pointer-events: none;">
-          <circle cx="11" cy="11" r="8"/>
-          <path d="m21 21-4.3-4.3"/>
-        </svg>
-        <input
-          type="text"
-          name="q"
-          value="${escapeHtml(q)}"
-          placeholder="搜尋問題…（按 Enter 搜尋）"
-          maxlength="100"
-          autocomplete="off"
-          class="qa-search-input"
-        />
+      <!-- Search (press Enter to submit) + type filter -->
+      <div class="prism-toolbar">
+        <form method="get" action="/qa" class="qa-search">
+          ${typeFilter ? raw(`<input type="hidden" name="type" value="${escapeHtml(typeFilter)}" />`) : ''}
+          <div class="input-icon">
+            ${raw(svgIcon('search', 16))}
+            <input
+              type="text"
+              name="q"
+              value="${escapeHtml(q)}"
+              placeholder="搜尋問題…（按 Enter 搜尋）"
+              maxlength="100"
+              autocomplete="off"
+              aria-label="搜尋問題"
+              class="form-input"
+            />
+          </div>
+        </form>
+        <div class="prism-toolbar-spacer"></div>
+        <nav class="chip-row" aria-label="問題類型篩選">${raw(typeChips)}</nav>
       </div>
-    </form>
 
-    <!-- Filter bar -->
-    <div class="filter-bar" style="margin-bottom: 24px;">
-      <a href="${buildHref({})}" class="filter-btn ${!typeFilter ? 'active' : ''}">全部</a>
-      <a href="${buildHref({ type: 'bug' })}" class="filter-btn ${typeFilter === 'bug' ? 'active' : ''}">Bug</a>
-      <a href="${buildHref({ type: 'feat' })}" class="filter-btn ${typeFilter === 'feat' ? 'active' : ''}">功能建議</a>
-      <a href="${buildHref({ type: 'ui' })}" class="filter-btn ${typeFilter === 'ui' ? 'active' : ''}">UI</a>
-      <a href="${buildHref({ type: 'other' })}" class="filter-btn ${typeFilter === 'other' ? 'active' : ''}">其他</a>
-    </div>
-
-    <!-- Tickets -->
-    <div style="display: flex; flex-direction: column; gap: 16px;">
-      ${tickets.length === 0
-        ? raw(q
-            ? `<div style="text-align: center; padding: 48px 16px; color: var(--text-tertiary); font-size: 14px;">
-                 找不到符合「${escapeHtml(q)}」的結果
-                 <div style="margin-top: 12px;">
-                   <a href="${buildHref({ type: typeFilter || undefined, includeQ: false })}" style="color: var(--accent-purple); text-decoration: none; font-size: 13px;">清除搜尋</a>
-                 </div>
-               </div>`
-            : `<div style="text-align: center; padding: 48px 16px; color: var(--text-tertiary); font-size: 14px;">目前還沒有已回覆的問題</div>`)
-        : raw(ticketCards)
-      }
-    </div>
-
-    <!-- Pagination -->
-    ${totalPages > 1 ? raw(`
-      <div style="display: flex; justify-content: center; gap: 6px; margin-top: 24px;">
-        ${paginationLinks.join('')}
+      <!-- Tickets -->
+      <div class="qa-cards">
+        ${tickets.length === 0
+          ? raw(q
+              ? `<div class="qa-empty">
+                   找不到符合「${escapeHtml(q)}」的結果
+                   <div style="margin-top: 12px;">
+                     <a href="${buildHref({ type: typeFilter || undefined, includeQ: false })}">清除搜尋</a>
+                   </div>
+                 </div>`
+              : `<div class="qa-empty">目前還沒有已回覆的問題</div>`)
+          : raw(ticketCards)
+        }
+        ${totalPages > 1 ? raw(`<div class="page-links">${paginationLinks.join('')}</div>`) : ''}
       </div>
-    `) : ''}
-
-    <div class="cross-links">
-      <a href="/">提交新回報</a>
-      <span style="color: var(--text-tertiary);">|</span>
-      <a href="https://prism.oshi.tw" target="_blank">前往 Prism 歌單</a>
     </div>
-    <p style="text-align: center; font-size: 11px; color: var(--text-tertiary); margin-top: 16px;">
-      Prism &mdash; 為你喜愛的 VTuber 打造歌單頁面
-    </p>
+
+    <div class="footer-links">
+      <a class="link-pill" href="/">${raw(svgIcon('message', 14))}提交新回報</a>
+      <a class="link-pill" href="https://prism.oshi.tw" target="_blank" rel="noopener noreferrer">${raw(svgIcon('external', 14))}前往 Prism 歌單</a>
+    </div>
+    <p class="footer-tagline">Prism &mdash; 為你喜愛的 VTuber 打造歌單頁面</p>
   </div>
 
 </body>

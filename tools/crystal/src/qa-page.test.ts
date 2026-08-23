@@ -100,4 +100,37 @@ test('formatDate returns a safe placeholder for invalid input', () => {
   assert.ok(!out.includes('NaN'), 'must never render NaN-NaN-NaN');
 });
 
+// ---- prism layout (chips, type tiles, pagination, empty states) ----
+
+test('renderQaPage marks the active type filter chip and keeps the other chips plain', () => {
+  const out = render([makeTicket()], 'feat');
+  assert.ok(out.includes('<a href="/qa?type=feat" class="chip active" aria-current="page">功能建議</a>'), 'active type chip carries active + aria-current');
+  assert.ok(out.includes('<a href="/qa" class="chip">全部</a>'), 'inactive chips stay plain');
+  assert.ok(out.includes('<a href="/qa?type=bug" class="chip">Bug</a>'), 'other type chips stay plain');
+});
+
+test('renderQaPage renders each ticket with a typed icon tile', () => {
+  const out = render([makeTicket({ type: 'bug' })]);
+  const tile = out.match(/<div class="type-tile type-bug"[^>]*>[\s\S]*?<\/div>/)?.[0] ?? '';
+  assert.ok(tile.includes('<svg'), 'bug tile contains an inline svg icon');
+  assert.ok(out.includes('<span class="badge badge-replied">已回覆</span>'), 'status renders as a prism pill');
+  assert.ok(out.includes('badge badge-pink">官方回覆</span>'), 'admin reply is labelled with the pink pill');
+});
+
+test('renderQaPage renders pagination circles with the current page marked', () => {
+  const out = String(renderQaPage([makeTicket()], 45, 2, 20, '', ''));
+  const links = out.match(/<a href="\/qa(\?page=\d+)?" class="page-link( active)?"[^>]*>\d<\/a>/g) ?? [];
+  assert.equal(links.length, 3, 'three page links for 45 tickets at 20 per page');
+  assert.ok(out.includes('<a href="/qa?page=2" class="page-link active" aria-current="page">2</a>'), 'current page is marked');
+  assert.ok(out.includes('<a href="/qa" class="page-link">1</a>'), 'first page link has no page param');
+});
+
+test('renderQaPage keeps the empty-state copy and the clear-search link', () => {
+  const none = render([]);
+  assert.ok(none.includes('目前還沒有已回覆的問題'), 'no-tickets message unchanged');
+  const miss = render([], 'ui', '找不到');
+  assert.ok(miss.includes('找不到符合「找不到」的結果'), 'no-results message unchanged');
+  assert.ok(miss.includes('href="/qa?type=ui"') && miss.includes('清除搜尋'), 'clear-search link keeps the type filter and drops q');
+});
+
 console.log('\nAll qa-page tests passed.');
