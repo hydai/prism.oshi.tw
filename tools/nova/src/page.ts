@@ -1,7 +1,20 @@
 import { html, raw } from 'hono/html';
-import { DARK_MODE_CSS, DARK_MODE_DETECT_SCRIPT, themeToggleHTML } from './theme';
+import { DARK_MODE_CSS, DARK_MODE_DETECT_SCRIPT, PRISM_CSS, SPARKLE_SVG, svgIcon, themeToggleHTML } from './theme';
+
+const SOCIAL_LINKS: Array<{ key: string; label: string; icon: Parameters<typeof svgIcon>[0]; brand: string }> = [
+  { key: 'youtube', label: 'YouTube', icon: 'youtube', brand: '#FF0000' },
+  { key: 'twitter', label: 'Twitter / X', icon: 'twitter', brand: '#1DA1F2' },
+  { key: 'facebook', label: 'Facebook', icon: 'facebook', brand: '#1877F2' },
+  { key: 'instagram', label: 'Instagram', icon: 'instagram', brand: '#E4405F' },
+  { key: 'twitch', label: 'Twitch', icon: 'twitch', brand: '#9146FF' },
+];
 
 export function renderPage(siteKey: string) {
+  const socialInputs = SOCIAL_LINKS.map(({ key, label, icon }) => `
+            <div class="input-icon">${svgIcon(icon, 16)}<input type="url" name="link_${key}" placeholder="${label}" aria-label="${label}" class="form-input" /></div>`).join('');
+  const previewSocials = SOCIAL_LINKS.map(({ key, icon, brand }) =>
+    `<span id="preview-social-${key}" class="preview-social" data-brand="${brand}">${svgIcon(icon, 16)}</span>`).join('');
+
   return html`<!doctype html>
 <html lang="zh-Hant">
 <head>
@@ -10,7 +23,7 @@ export function renderPage(siteKey: string) {
   <title>Prism Nova — VTuber 提交</title>
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700;1,9..40,400&display=swap" rel="stylesheet" />
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700;0,9..40,900;1,9..40,400&display=swap" rel="stylesheet" />
   <script src="https://challenges.cloudflare.com/turnstile/v0/api.js" async defer></script>
   <style>
     :root {
@@ -37,226 +50,183 @@ export function renderPage(siteKey: string) {
     }
 
     ${raw(DARK_MODE_CSS)}
+    ${raw(PRISM_CSS)}
 
     * { box-sizing: border-box; margin: 0; padding: 0; }
     body {
-      font-family: 'DM Sans', sans-serif;
+      font-family: 'DM Sans', system-ui, -apple-system, 'Segoe UI', sans-serif;
       background: linear-gradient(135deg, var(--bg-page-start) 0%, var(--bg-page-mid) 50%, var(--bg-page-end) 100%);
       background-attachment: fixed;
       min-height: 100vh;
       color: var(--text-primary);
+      -webkit-font-smoothing: antialiased;
     }
 
-    .form-input {
-      width: 100%;
-      padding: 10px 16px;
-      background: var(--bg-surface-frosted);
-      border: 1px solid var(--border-glass);
-      border-radius: var(--radius-lg);
-      font-family: inherit;
-      font-size: 14px;
-      color: var(--text-primary);
-      outline: none;
-      transition: border-color 0.2s, box-shadow 0.2s;
-    }
-    .form-input::placeholder { color: var(--text-tertiary); }
-    .form-input:focus {
-      border-color: var(--border-accent-pink);
-      box-shadow: 0 0 0 3px rgba(236, 72, 153, 0.1);
-    }
+    /* two-column form: fields left, live preview right (one DOM preview, re-flowed on mobile) */
+    .form-layout { display: grid; grid-template-columns: minmax(0, 1fr) 300px; grid-template-rows: auto 1fr; gap: 18px 32px; padding: 24px 32px 32px; }
+    .form-col-a { grid-column: 1; grid-row: 1; }
+    .form-col-b { grid-column: 1; grid-row: 2; }
+    .preview-col { grid-column: 2; grid-row: 1 / 3; }
+    .preview-sticky { position: sticky; top: 24px; display: flex; flex-direction: column; gap: 8px; }
+    .preview-card { display: flex; flex-direction: column; gap: 10px; padding: 20px; }
+    .preview-avatar { width: 96px; height: 96px; border-radius: var(--radius-xl); object-fit: cover; flex-shrink: 0; box-shadow: 0 1px 4px rgba(0, 0, 0, 0.1); background: var(--bg-surface-frosted); }
+    .preview-avatar.avatar-fallback { background: var(--gradient-accent); }
+    .preview-name { font-size: 20px; font-weight: 900; letter-spacing: -0.025em; line-height: 1.15; color: var(--text-primary); word-break: break-word; }
+    .preview-meta { font-size: 13px; color: var(--text-secondary); }
+    .preview-meta strong { font-weight: 600; color: var(--text-primary); }
+    .preview-meta .dot { color: var(--text-tertiary); }
+    .preview-desc { font-size: 13px; line-height: 1.5; color: var(--text-secondary); white-space: pre-line; word-break: break-word; }
+    .preview-desc:empty { display: none; }
+    .preview-socials { display: flex; align-items: center; gap: 10px; }
+    .preview-social { display: inline-flex; color: var(--text-muted); transition: color 0.15s; }
+    .preview-socials-note { font-size: 11px; color: var(--text-tertiary); }
+    .form-footer-note { font-size: 11px; color: var(--text-tertiary); }
+    .link-pill svg, .btn-primary svg { flex-shrink: 0; }
 
-    textarea.form-input { resize: none; }
-
-    .form-label {
-      display: block;
-      font-size: 13px;
-      font-weight: 500;
-      color: var(--text-secondary);
-      margin-bottom: 6px;
+    /* 800px, not 640px: below that the fields column drops under the 300px Turnstile widget. */
+    @media (max-width: 800px) {
+      .form-layout { grid-template-columns: 1fr; grid-template-rows: none; gap: 18px; padding: 8px 16px 24px; }
+      .form-col-a, .form-col-b, .preview-col { grid-column: auto; grid-row: auto; }
+      .preview-sticky { position: static; }
+      .preview-card { flex-direction: row; align-items: center; gap: 12px; padding: 12px 14px; }
+      .preview-card .prism-badge, .preview-card .preview-desc { display: none; }
+      .preview-avatar { width: 44px; height: 44px; border-radius: var(--radius-lg); }
+      .preview-text { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 2px; }
+      .preview-name { font-size: 15px; font-weight: 700; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+      .preview-meta { font-size: 11px; }
+      .preview-socials { margin-top: 4px; }
     }
-    .form-label .required { color: var(--accent-pink); }
-
-    .form-hint {
-      font-size: 11px;
-      color: var(--text-tertiary);
-      margin-top: 4px;
+    @media (min-width: 801px) {
+      .preview-text { display: contents; }
     }
-
-    .section-label {
-      font-size: 13px;
-      font-weight: 600;
-      color: var(--text-secondary);
-      margin-bottom: 12px;
-    }
-
-    .btn-submit {
-      width: 100%;
-      padding: 12px 24px;
-      border: none;
-      border-radius: var(--radius-lg);
-      background: linear-gradient(135deg, var(--accent-pink), var(--accent-blue));
-      color: white;
-      font-family: inherit;
-      font-size: 15px;
-      font-weight: 600;
-      cursor: pointer;
-      transition: opacity 0.2s, box-shadow 0.2s;
-      box-shadow: 0 4px 14px rgba(236, 72, 153, 0.25);
-    }
-    .btn-submit:hover { opacity: 0.92; box-shadow: 0 6px 20px rgba(236, 72, 153, 0.3); }
-    .btn-submit:disabled { opacity: 0.5; cursor: not-allowed; }
-
-    .cross-links {
-      display: flex;
-      justify-content: center;
-      gap: 16px;
-      margin-top: 16px;
-      font-size: 13px;
-    }
-    .cross-links a {
-      color: var(--accent-purple);
-      text-decoration: none;
-      transition: opacity 0.2s;
-    }
-    .cross-links a:hover { opacity: 0.7; }
   </style>
   <script>${raw(DARK_MODE_DETECT_SCRIPT)}</script>
 </head>
 <body>
 
-  <div style="max-width: 640px; margin: 0 auto; padding: 48px 16px;">
-    <!-- Header -->
-    <div style="text-align: center; margin-bottom: 32px; position: relative;">
-      <div style="display: flex; justify-content: center; align-items: center; margin-bottom: 8px;">
-        <div style="display: inline-flex; align-items: center; gap: 12px;">
-          <div style="
-            width: 40px; height: 40px; border-radius: var(--radius-lg);
-            background: linear-gradient(135deg, var(--accent-pink-light), var(--accent-blue-light));
-            display: flex; align-items: center; justify-content: center;
-          ">
-            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-              <circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="3"/>
-              <path d="M12 2a14.5 14.5 0 0 0 0 20 14.5 14.5 0 0 0 0-20"/>
-            </svg>
-          </div>
-          <span style="
-            font-size: 28px; font-weight: 700; letter-spacing: -0.5px;
-            background: linear-gradient(135deg, var(--accent-pink), var(--accent-blue));
-            -webkit-background-clip: text; -webkit-text-fill-color: transparent;
-            background-clip: text;
-          ">Prism Nova</span>
+  <div class="prism-page">
+    <div class="prism-shell">
+      <!-- Header -->
+      <div class="prism-hero">
+        <div class="prism-hero-tile">${raw(svgIcon('nova', 30))}</div>
+        <div class="prism-hero-stack">
+          <div class="prism-badge">${raw(SPARKLE_SVG)}推薦 VTuber</div>
+          <h1 class="prism-title">Prism Nova</h1>
+          <p class="prism-desc">提交你喜愛的 VTuber，讓我們為他／她建立 Prism 頁面</p>
         </div>
-        <div style="position: absolute; right: 0; top: 4px;">
-          ${raw(themeToggleHTML())}
-        </div>
+        <div class="prism-hero-actions">${raw(themeToggleHTML())}</div>
       </div>
-      <p style="color: var(--text-secondary); font-size: 14px;">
-        提交你喜愛的 VTuber，讓我們為他／她建立 Prism 頁面
-      </p>
-    </div>
 
-    <!-- Form Card -->
-    <div style="
-      background: var(--bg-surface-glass);
-      backdrop-filter: blur(16px); -webkit-backdrop-filter: blur(16px);
-      border: 1px solid var(--border-glass);
-      border-radius: var(--radius-2xl);
-      padding: 32px;
-      box-shadow: 0 8px 32px rgba(0,0,0,0.06);
-    ">
-      <form id="nova-form" style="display: flex; flex-direction: column; gap: 20px;">
+      <form id="nova-form" class="form-layout">
+        <div class="form-col-a form-stack">
+          <div class="form-section"><span class="section-label">頻道</span></div>
 
-        <!-- YouTube Channel URL -->
-        <div>
-          <label class="form-label">
-            YouTube 頻道網址 <span class="required">*</span>
-          </label>
-          <input type="url" name="youtube_channel_url" required
-            placeholder="https://www.youtube.com/@ChannelName"
-            class="form-input" />
-          <div id="url-check" style="margin-top: 4px; font-size: 13px; display: none;"></div>
-        </div>
+          <!-- YouTube Channel URL -->
+          <div>
+            <label class="form-label" for="f-youtube_channel_url">
+              YouTube 頻道網址 <span class="required">*</span>
+            </label>
+            <div class="input-icon">${raw(svgIcon('youtube', 16, 'color:#FF0000;'))}<input id="f-youtube_channel_url" type="url" name="youtube_channel_url" required
+              placeholder="https://www.youtube.com/@ChannelName"
+              class="form-input" /></div>
+            <div id="url-check" class="check-line" style="display: none;"></div>
+            <p class="form-hint">輸入後會自動帶入頻道名稱、頭像與 YouTube 連結，都可以再修改。</p>
+          </div>
 
-        <!-- Display Name -->
-        <div>
-          <label class="form-label">
-            顯示名稱 <span class="required">*</span>
-          </label>
-          <input type="text" name="display_name" required
-            placeholder="例：浠Mizuki"
-            class="form-input" />
-        </div>
+          <div class="form-grid-2">
+            <!-- Display Name -->
+            <div>
+              <label class="form-label" for="f-display_name">
+                顯示名稱 <span class="required">*</span>
+              </label>
+              <div class="input-icon">${raw(svgIcon('user', 16))}<input id="f-display_name" type="text" name="display_name" required
+                placeholder="例：浠Mizuki"
+                class="form-input" /></div>
+            </div>
 
-        <!-- Group -->
-        <div>
-          <label class="form-label">箱 / 所屬公司 / 個人勢</label>
-          <input type="text" name="group"
-            placeholder="例：個人勢、hololive"
-            class="form-input" />
-        </div>
-
-        <!-- Description -->
-        <div>
-          <label class="form-label">簡介</label>
-          <textarea name="description" rows="3"
-            placeholder="關於這位 VTuber 的簡短介紹…"
-            class="form-input"></textarea>
-        </div>
-
-        <!-- Avatar URL -->
-        <div>
-          <label class="form-label">頭像圖片網址</label>
-          <input type="url" name="avatar_url"
-            placeholder="https://..."
-            class="form-input" />
-        </div>
-
-        <!-- Subscriber Count -->
-        <div>
-          <label class="form-label">訂閱數</label>
-          <input type="text" name="subscriber_count"
-            placeholder="例：21.8萬"
-            class="form-input" />
-        </div>
-
-        <!-- Social Links -->
-        <div style="border-top: 1px solid var(--border-glass); padding-top: 20px;">
-          <p class="section-label">社群連結（選填）</p>
-          <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px;">
-            <input type="url" name="link_youtube" placeholder="YouTube" class="form-input" />
-            <input type="url" name="link_twitter" placeholder="Twitter / X" class="form-input" />
-            <input type="url" name="link_facebook" placeholder="Facebook" class="form-input" />
-            <input type="url" name="link_instagram" placeholder="Instagram" class="form-input" />
-            <input type="url" name="link_twitch" placeholder="Twitch" class="form-input" />
+            <!-- Group -->
+            <div>
+              <label class="form-label" for="f-group">箱 / 所屬公司 / 個人勢</label>
+              <div class="input-icon">${raw(svgIcon('building', 16))}<input id="f-group" type="text" name="group"
+                placeholder="例：個人勢、hololive"
+                class="form-input" /></div>
+            </div>
           </div>
         </div>
 
-        <!-- Turnstile -->
-        <div style="display: flex; justify-content: center;">
-          <div class="cf-turnstile" data-sitekey="${siteKey}" data-theme="auto"></div>
+        <!-- Live preview of the Prism page (desktop: sticky card; mobile: compact row under the channel fields) -->
+        <aside class="preview-col" aria-label="Prism 頁面預覽">
+          <div class="preview-sticky">
+            <div class="section-label">預覽</div>
+            <div class="glass-box preview-card">
+              <div class="preview-avatar-wrap" style="display: flex; flex-shrink: 0;">
+                <img id="preview-avatar" class="preview-avatar" alt="" style="display: none;" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'" />
+                <div id="preview-avatar-fallback" class="preview-avatar avatar-fallback" aria-hidden="true">${raw(SPARKLE_SVG.replace('width="12" height="12"', 'width="36" height="36"'))}</div>
+              </div>
+              <div class="preview-text">
+                <div class="prism-badge">${raw(SPARKLE_SVG)}VTuber</div>
+                <div id="preview-name" class="preview-name">—</div>
+                <div class="preview-meta"><span id="preview-group">—</span> <span class="dot">·</span> <strong id="preview-subs">—</strong> 訂閱者</div>
+                <div id="preview-desc" class="preview-desc"></div>
+                <div class="preview-socials">${raw(previewSocials)}</div>
+              </div>
+            </div>
+            <p class="form-hint" style="margin-top: 0;">審核通過後，Prism 首頁會以這個樣子呈現這位 VTuber。</p>
+          </div>
+        </aside>
+
+        <div class="form-col-b form-stack">
+          <div class="form-section"><span class="section-label">介紹</span></div>
+
+          <!-- Description -->
+          <div>
+            <label class="form-label" for="f-description">簡介</label>
+            <textarea id="f-description" name="description" rows="3"
+              placeholder="關於這位 VTuber 的簡短介紹…"
+              class="form-textarea"></textarea>
+          </div>
+
+          <div class="form-grid-2">
+            <!-- Avatar URL -->
+            <div>
+              <label class="form-label" for="f-avatar_url">頭像圖片網址</label>
+              <div class="input-icon">${raw(svgIcon('image', 16))}<input id="f-avatar_url" type="url" name="avatar_url"
+                placeholder="https://..."
+                class="form-input" /></div>
+            </div>
+
+            <!-- Subscriber Count -->
+            <div>
+              <label class="form-label" for="f-subscriber_count">訂閱數</label>
+              <div class="input-icon">${raw(svgIcon('users', 16))}<input id="f-subscriber_count" type="text" name="subscriber_count"
+                placeholder="例：21.8萬"
+                class="form-input" /></div>
+            </div>
+          </div>
+
+          <!-- Social Links -->
+          <div class="form-section"><span class="section-label">社群連結（選填）</span></div>
+          <div class="form-grid-2" style="gap: 12px;">${raw(socialInputs)}
+          </div>
+
+          <!-- Turnstile + Submit -->
+          <div class="form-footer">
+            <div class="cf-turnstile" data-sitekey="${siteKey}" data-theme="auto"></div>
+            <button type="submit" id="submit-btn" class="btn-primary"><span id="submit-label">提交</span>${raw(svgIcon('arrowRight', 16))}</button>
+          </div>
+
+          <!-- Result message -->
+          <div id="result" style="display: none; text-align: center; font-size: 13px; padding: 12px 16px; border-radius: var(--radius-lg);"></div>
         </div>
-
-        <!-- Submit -->
-        <button type="submit" id="submit-btn" class="btn-submit">
-          提交
-        </button>
-
-        <!-- Result message -->
-        <div id="result" style="display: none; text-align: center; font-size: 13px; padding: 12px 16px; border-radius: var(--radius-lg);"></div>
       </form>
     </div>
 
-    <div class="cross-links">
-      <a href="/vod">提交歌回 VOD</a>
-      <span style="color: var(--text-tertiary);">|</span>
-      <a href="/status">提交狀態</a>
-      <span style="color: var(--text-tertiary);">|</span>
-      <a href="https://prism.oshi.tw" target="_blank">前往 Prism 歌單</a>
+    <div class="footer-links">
+      <a class="link-pill" href="/vod">${raw(svgIcon('film', 14))}提交歌回 VOD</a>
+      <a class="link-pill" href="/status">${raw(svgIcon('list', 14))}提交狀態</a>
+      <a class="link-pill" href="https://prism.oshi.tw" target="_blank" rel="noopener noreferrer">${raw(svgIcon('external', 14))}前往 Prism 歌單</a>
     </div>
-
-    <p style="text-align: center; font-size: 11px; color: var(--text-tertiary); margin-top: 16px;">
-      Prism &mdash; 為你喜愛的 VTuber 打造歌單頁面
-    </p>
+    <p class="footer-tagline">Prism &mdash; 為你喜愛的 VTuber 打造歌單頁面</p>
   </div>
 
   <script>
@@ -264,12 +234,48 @@ export function renderPage(siteKey: string) {
       const form = document.getElementById('nova-form');
       const urlInput = form.querySelector('[name="youtube_channel_url"]');
       const nameInput = form.querySelector('[name="display_name"]');
+      const groupInput = form.querySelector('[name="group"]');
+      const descInput = form.querySelector('[name="description"]');
       const avatarInput = form.querySelector('[name="avatar_url"]');
+      const subsInput = form.querySelector('[name="subscriber_count"]');
       const linkYtInput = form.querySelector('[name="link_youtube"]');
       const urlCheck = document.getElementById('url-check');
       const submitBtn = document.getElementById('submit-btn');
+      const submitLabel = document.getElementById('submit-label');
       const resultDiv = document.getElementById('result');
       let nameManuallyEdited = false;
+
+      // --- Live preview: mirrors the form into the Prism-page card (textContent only, never HTML) ---
+      const previewAvatar = document.getElementById('preview-avatar');
+      const previewAvatarFallback = document.getElementById('preview-avatar-fallback');
+      const previewName = document.getElementById('preview-name');
+      const previewGroup = document.getElementById('preview-group');
+      const previewSubs = document.getElementById('preview-subs');
+      const previewDesc = document.getElementById('preview-desc');
+      const SOCIAL_KEYS = ['youtube', 'twitter', 'facebook', 'instagram', 'twitch'];
+      function syncPreview() {
+        previewName.textContent = nameInput.value.trim() || '—';
+        previewGroup.textContent = groupInput.value.trim() || '—';
+        previewSubs.textContent = subsInput.value.trim() || '—';
+        previewDesc.textContent = descInput.value.trim();
+        const avatar = avatarInput.value.trim();
+        if (/^https:\\/\\//.test(avatar)) {
+          previewAvatar.src = avatar;
+          previewAvatar.style.display = '';
+          previewAvatarFallback.style.display = 'none';
+        } else {
+          previewAvatar.removeAttribute('src');
+          previewAvatar.style.display = 'none';
+          previewAvatarFallback.style.display = 'flex';
+        }
+        SOCIAL_KEYS.forEach(function(key) {
+          const icon = document.getElementById('preview-social-' + key);
+          const value = form.querySelector('[name="link_' + key + '"]').value.trim();
+          icon.style.color = value ? icon.getAttribute('data-brand') : '';
+        });
+      }
+      form.addEventListener('input', syncPreview);
+      syncPreview();
 
       nameInput.addEventListener('input', function() {
         nameManuallyEdited = true;
@@ -290,15 +296,15 @@ export function renderPage(siteKey: string) {
         fetch('/api/check?url=' + encoded)
           .then(r => r.json())
           .then(data => {
-            urlCheck.style.display = 'block';
+            urlCheck.style.display = '';
             if (data.exists && data.canResubmit) {
-              urlCheck.className = 'check-resubmit';
+              urlCheck.className = 'check-line check-resubmit';
               urlCheck.textContent = '此頻道先前的提交被拒絕，你可以重新提交';
             } else if (data.exists) {
-              urlCheck.className = 'check-exists';
+              urlCheck.className = 'check-line check-exists';
               urlCheck.textContent = '此頻道已於 ' + data.submittedAt + ' 提交（狀態：' + data.status + '）';
             } else {
-              urlCheck.className = 'check-ok';
+              urlCheck.className = 'check-line check-ok';
               urlCheck.textContent = '此頻道尚未被提交';
             }
           })
@@ -307,14 +313,16 @@ export function renderPage(siteKey: string) {
         // Auto-fetch channel info (only once per URL)
         if (url === lastFetchedUrl) return;
         lastFetchedUrl = url;
-
-        urlCheck.style.display = 'block';
-        urlCheck.className = 'check-loading';
+        urlCheck.style.display = '';
+        urlCheck.className = 'check-line check-loading';
         urlCheck.textContent = '正在取得頻道資訊…';
 
+        const requestedUrl = url;
         fetch('/api/channel-info?url=' + encoded)
           .then(r => r.json())
           .then(info => {
+            // The field changed while this lookup was in flight (edited or re-submitted): drop the stale answer.
+            if (requestedUrl !== urlInput.value.trim()) return;
             if (info.displayName && !nameManuallyEdited) {
               nameInput.value = info.displayName;
             }
@@ -324,6 +332,7 @@ export function renderPage(siteKey: string) {
             if (!linkYtInput.value) {
               linkYtInput.value = url;
             }
+            syncPreview();
           })
           .catch(() => {});
       });
@@ -332,7 +341,7 @@ export function renderPage(siteKey: string) {
       form.addEventListener('submit', async function(e) {
         e.preventDefault();
         submitBtn.disabled = true;
-        submitBtn.textContent = '提交中…';
+        submitLabel.textContent = '提交中…';
         resultDiv.style.display = 'none';
         resultDiv.className = '';
 
@@ -370,6 +379,7 @@ export function renderPage(siteKey: string) {
               : '提交成功！ID: ' + data.id + '。感謝你的推薦！';
             form.reset();
             nameManuallyEdited = false;
+            syncPreview();
             if (window.turnstile) turnstile.reset();
           } else if (res.status === 409) {
             resultDiv.className = 'result-msg result-warning';
@@ -383,7 +393,8 @@ export function renderPage(siteKey: string) {
           resultDiv.textContent = '網路錯誤，請檢查連線後再試';
         } finally {
           submitBtn.disabled = false;
-          submitBtn.textContent = '提交';
+          submitLabel.textContent = '提交';
+          resultDiv.style.display = resultDiv.textContent ? '' : 'none';
         }
       });
     })();

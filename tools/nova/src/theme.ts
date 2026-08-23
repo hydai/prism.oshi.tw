@@ -156,8 +156,8 @@ export const PRISM_CSS = `
     .mono-muted { color: var(--text-tertiary); }
     .avatar { width: 40px; height: 40px; border-radius: var(--radius-md); object-fit: cover; flex-shrink: 0; box-shadow: 0 1px 4px rgba(0, 0, 0, 0.1); background: var(--bg-surface-frosted); }
     .avatar-lg { width: 48px; height: 48px; border-radius: var(--radius-lg); }
-    .avatar-fallback { display: flex; align-items: center; justify-content: center; background: var(--gradient-accent); color: #FFFFFF; }
     .thumb { width: 64px; height: 36px; border-radius: 6px; object-fit: cover; flex-shrink: 0; box-shadow: 0 1px 4px rgba(0, 0, 0, 0.1); background: var(--bg-surface-frosted); }
+    .avatar-fallback { display: flex; align-items: center; justify-content: center; background: var(--gradient-accent); color: #FFFFFF; }
 
     /* glass cards (SongCard anatomy) + collapsible group cards */
     .prism-card { background: var(--bg-surface-glass); border: 1px solid var(--border-glass); border-radius: var(--radius-xl); backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px); overflow: hidden; }
