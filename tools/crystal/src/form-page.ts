@@ -1,6 +1,33 @@
 import { html, raw } from 'hono/html';
-import { DARK_MODE_CSS, DARK_MODE_DETECT_SCRIPT, themeToggleHTML } from './theme';
+import { DARK_MODE_CSS, DARK_MODE_DETECT_SCRIPT, PRISM_CSS, SPARKLE_SVG, svgIcon, themeToggleHTML } from './theme';
 import { TICKET_FIELD_LIMITS } from './validate';
+
+// Discord brand mark — lucide ships no Discord icon. Path from Discord's official
+// brand assets (same as app/components/DiscordIcon.tsx on the prism site).
+const DISCORD_SVG = '<svg class="discord-mark" width="22" height="17" viewBox="0 0 127.14 96.36" fill="currentColor" aria-hidden="true"><path d="M107.7,8.07A105.15,105.15,0,0,0,81.47,0a72.06,72.06,0,0,0-3.36,6.83A97.68,97.68,0,0,0,49,6.83,72.37,72.37,0,0,0,45.64,0,105.89,105.89,0,0,0,19.39,8.09C2.79,32.65-1.71,56.6.54,80.21h0A105.73,105.73,0,0,0,32.71,96.36,77.7,77.7,0,0,0,39.6,85.25a68.42,68.42,0,0,1-10.85-5.18c.91-.66,1.8-1.34,2.66-2a75.57,75.57,0,0,0,64.32,0c.87.71,1.76,1.39,2.66,2a68.68,68.68,0,0,1-10.87,5.19,77,77,0,0,0,6.89,11.1A105.25,105.25,0,0,0,126.6,80.22h0C129.24,52.84,122.09,29.11,107.7,8.07ZM42.45,65.69C36.18,65.69,31,60,31,53s5-12.74,11.43-12.74S54,46,53.89,53,48.84,65.69,42.45,65.69Zm42.24,0C78.41,65.69,73.25,60,73.25,53s5-12.74,11.44-12.74S96.23,46,96.12,53,91.08,65.69,84.69,65.69Z"/></svg>';
+
+const TYPE_TILES = [
+  { type: 'bug', icon: 'bug', label: 'Bug 回報', hint: '功能壞掉或跑出錯誤' },
+  { type: 'feat', icon: 'lightbulb', label: '功能建議', hint: '想要的新功能' },
+  { type: 'ui', icon: 'layout', label: 'UI 問題', hint: '畫面或操作怪怪的' },
+  { type: 'other', icon: 'message', label: '其他', hint: '任何想說的' },
+] as const;
+
+function typeTileButtons(): string {
+  return TYPE_TILES.map(({ type, icon, label, hint }) => {
+    const active = type === 'bug';
+    return `<button type="button" class="type-btn${active ? ' active' : ''}" data-type="${type}" aria-pressed="${active ? 'true' : 'false'}">
+              <span class="type-tile type-${type}">${svgIcon(icon, 16)}</span>
+              <span class="type-btn-text"><span class="type-btn-label">${label}</span><span class="type-btn-hint">${hint}</span></span>
+            </button>`;
+  }).join('\n            ');
+}
+
+// Constant icon markup handed to the similar-tickets script (keyed by the
+// allow-listed type, so nothing user-controlled ever reaches innerHTML).
+function typeIconJson(): string {
+  return JSON.stringify(Object.fromEntries(TYPE_TILES.map(({ type, icon }) => [type, svgIcon(icon, 13)])));
+}
 
 export function renderFormPage(siteKey: string) {
   return html`<!doctype html>
@@ -11,12 +38,13 @@ export function renderFormPage(siteKey: string) {
   <title>Prism Crystal — 回報 / 建議</title>
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700;1,9..40,400&display=swap" rel="stylesheet" />
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700;0,9..40,900;1,9..40,400&display=swap" rel="stylesheet" />
   <script>${raw(DARK_MODE_DETECT_SCRIPT)}</script>
   <script src="https://challenges.cloudflare.com/turnstile/v0/api.js" async defer></script>
   <style>
     :root {
       --accent-pink: #EC4899;
+      --accent-pink-dark: #DB2777;
       --accent-pink-light: #F472B6;
       --accent-blue: #3B82F6;
       --accent-blue-light: #60A5FA;
@@ -32,6 +60,7 @@ export function renderFormPage(siteKey: string) {
       --text-tertiary: #94A3B8;
       --border-default: #E2E8F0;
       --border-glass: #FFFFFF66;
+      --border-accent-pink: #FBCFE8;
       --border-accent-purple: #DDD6FE;
       --radius-lg: 12px;
       --radius-xl: 16px;
@@ -39,288 +68,134 @@ export function renderFormPage(siteKey: string) {
     }
 
     ${raw(DARK_MODE_CSS)}
+    ${raw(PRISM_CSS)}
 
     * { box-sizing: border-box; margin: 0; padding: 0; }
     body {
-      font-family: 'DM Sans', sans-serif;
+      font-family: 'DM Sans', system-ui, -apple-system, 'Segoe UI', sans-serif;
       background: linear-gradient(135deg, var(--bg-page-start) 0%, var(--bg-page-mid) 50%, var(--bg-page-end) 100%);
       background-attachment: fixed;
       min-height: 100vh;
       color: var(--text-primary);
+      -webkit-font-smoothing: antialiased;
     }
 
-    .form-input {
-      width: 100%;
-      padding: 10px 16px;
-      background: var(--bg-surface-frosted);
-      border: 1px solid var(--border-glass);
-      border-radius: var(--radius-lg);
-      font-family: inherit;
-      font-size: 14px;
-      color: var(--text-primary);
-      outline: none;
-      transition: border-color 0.2s, box-shadow 0.2s;
-    }
-    .form-input::placeholder { color: var(--text-tertiary); }
-    .form-input:focus {
-      border-color: var(--border-accent-purple);
-      box-shadow: 0 0 0 3px rgba(139, 92, 246, 0.1);
-    }
-    textarea.form-input { resize: vertical; min-height: 100px; }
+    .crystal-form { padding: 24px 32px 32px; }
+    .sr-only { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0, 0, 0, 0); white-space: nowrap; border: 0; }
 
-    .form-label {
-      display: block;
-      font-size: 13px;
-      font-weight: 500;
-      color: var(--text-secondary);
-      margin-bottom: 6px;
-    }
-    .form-label .required { color: var(--accent-purple); }
-
-    .form-hint {
-      font-size: 11px;
-      color: var(--text-tertiary);
-      margin-top: 4px;
-    }
-
-    .btn-submit {
-      width: 100%;
-      padding: 12px 24px;
-      border: none;
-      border-radius: var(--radius-lg);
-      background: linear-gradient(135deg, var(--accent-purple), var(--accent-blue));
-      color: white;
-      font-family: inherit;
-      font-size: 15px;
-      font-weight: 600;
-      cursor: pointer;
-      transition: opacity 0.2s, box-shadow 0.2s;
-      box-shadow: 0 4px 14px rgba(139, 92, 246, 0.25);
-    }
-    .btn-submit:hover { opacity: 0.92; box-shadow: 0 6px 20px rgba(139, 92, 246, 0.3); }
-    .btn-submit:disabled { opacity: 0.5; cursor: not-allowed; }
-
-    .type-selector {
-      display: grid;
-      grid-template-columns: repeat(4, 1fr);
-      gap: 8px;
-    }
+    /* type selector tiles */
+    .type-tiles { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 8px; }
     .type-btn {
-      padding: 8px 12px;
-      border: 1px solid var(--border-glass);
-      border-radius: var(--radius-lg);
-      background: var(--bg-surface-frosted);
-      font-family: inherit;
-      font-size: 13px;
-      font-weight: 500;
-      color: var(--text-secondary);
-      cursor: pointer;
-      transition: all 0.2s;
-      text-align: center;
+      display: flex; flex-direction: column; align-items: flex-start; gap: 8px;
+      padding: 12px; border-radius: var(--radius-xl); text-align: left; cursor: pointer;
+      font-family: inherit; background: var(--bg-surface-glass); border: 1px solid var(--border-glass);
+      transition: border-color 0.15s, background 0.15s;
     }
-    .type-btn:hover { border-color: var(--border-accent-purple); }
+    .type-btn:hover { border-color: var(--border-accent-pink); }
+    .type-btn:focus-visible { outline: 2px solid var(--accent-pink); outline-offset: 2px; }
     .type-btn.active {
-      background: linear-gradient(135deg, var(--accent-purple), var(--accent-blue));
-      color: white;
-      border-color: transparent;
+      background: linear-gradient(135deg, var(--bg-accent-pink-muted), var(--bg-accent-blue-muted));
+      border-color: var(--border-accent-pink);
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.06);
     }
+    .type-btn-text { display: flex; flex-direction: column; gap: 2px; }
+    .type-btn-label { font-size: 13px; font-weight: 700; color: var(--text-primary); }
+    .type-btn.active .type-btn-label { color: var(--accent-pink-dark); }
+    .type-btn-hint { font-size: 11px; color: var(--text-secondary); }
+    .type-tile { width: 32px; height: 32px; border-radius: 8px; flex-shrink: 0; display: inline-flex; align-items: center; justify-content: center; }
+    .type-bug { background: #FEE2E2; color: #DC2626; }
+    .type-feat { background: #F3E8FF; color: #A855F7; }
+    .type-ui { background: var(--bg-accent-blue-muted); color: var(--accent-blue); }
+    .type-other { background: #F1F5F9; color: #64748B; }
+    html.dark .type-bug { background: rgba(248, 113, 113, 0.15); color: #FCA5A5; }
+    html.dark .type-feat { background: rgba(192, 132, 252, 0.15); color: #D8B4FE; }
+    html.dark .type-other { background: rgba(148, 163, 184, 0.15); color: #CBD5E1; }
 
-    .toggle-row {
-      display: flex;
-      align-items: center;
-      gap: 10px;
-      padding: 12px 16px;
-      background: var(--bg-surface-frosted);
-      border: 1px solid var(--border-glass);
-      border-radius: var(--radius-lg);
-      cursor: pointer;
-    }
-    .toggle-row input[type="checkbox"] {
-      width: 18px;
-      height: 18px;
-      accent-color: var(--accent-purple);
-      cursor: pointer;
-    }
-    .toggle-label {
-      font-size: 14px;
-      color: var(--text-primary);
-      user-select: none;
-    }
-    .toggle-hint {
-      font-size: 12px;
-      color: var(--text-tertiary);
-    }
-
-    .contact-field { transition: max-height 0.3s ease, opacity 0.3s ease; overflow: hidden; }
-    .contact-field.visible { max-height: 120px; opacity: 1; }
-    .contact-field.hidden { max-height: 0; opacity: 0; }
-
-    .discord-tip {
-      display: flex;
-      flex-wrap: wrap;
-      align-items: center;
-      justify-content: space-between;
-      gap: 8px 10px;
-      padding: 12px 16px;
-      background: var(--bg-surface-frosted);
-      border: 1px solid var(--border-glass);
-      border-radius: var(--radius-lg);
-      font-size: 12px;
-      color: var(--text-secondary);
-    }
-    .discord-tip a {
-      flex-shrink: 0;
-      color: var(--accent-purple);
-      font-weight: 600;
-      text-decoration: none;
-    }
-    .discord-tip a:hover { text-decoration: underline; }
-
-    #result {
-      margin-top: 16px;
-      padding: 12px 16px;
-      border-radius: var(--radius-lg);
-      font-size: 14px;
-      display: none;
-    }
-    #result.success { display: block; background: #ECFDF5; color: #065F46; border: 1px solid #A7F3D0; }
-    #result.error { display: block; background: #FEF2F2; color: #991B1B; border: 1px solid #FECACA; }
-
-    .cross-links {
-      display: flex;
-      justify-content: center;
-      gap: 16px;
-      margin-top: 16px;
-      font-size: 13px;
-    }
-    .cross-links a {
-      color: var(--accent-purple);
-      text-decoration: none;
-      transition: opacity 0.2s;
-    }
-    .cross-links a:hover { opacity: 0.7; }
-
-    .similar-panel {
-      margin-top: 10px;
-      padding: 12px;
-      background: var(--bg-surface-frosted);
-      border: 1px solid var(--border-glass);
-      border-radius: var(--radius-lg);
-    }
-    .similar-header {
-      display: flex;
-      align-items: center;
-      gap: 8px;
-      font-size: 12px;
-      color: var(--text-secondary);
-      margin-bottom: 8px;
-    }
-    .similar-header .similar-count { color: var(--text-tertiary); }
+    /* similar-tickets panel (filled by script) */
+    .similar-panel { margin-top: 8px; padding: 10px; border-radius: var(--radius-lg); }
+    .similar-header { display: flex; align-items: center; gap: 8px; padding: 0 4px 6px; font-size: 12px; font-weight: 600; color: var(--text-secondary); }
+    .similar-count { font-weight: 400; color: var(--text-tertiary); }
     .similar-dismiss {
-      margin-left: auto;
-      background: none;
-      border: none;
-      color: var(--text-tertiary);
-      cursor: pointer;
-      font-size: 11px;
-      font-family: inherit;
-      padding: 2px 6px;
-      border-radius: 4px;
+      margin-left: auto; background: none; border: none; color: var(--text-tertiary); cursor: pointer;
+      font-size: 11px; font-family: inherit; padding: 2px 6px; border-radius: 6px;
     }
     .similar-dismiss:hover { color: var(--text-secondary); background: rgba(0, 0, 0, 0.04); }
     html.dark .similar-dismiss:hover { background: rgba(255, 255, 255, 0.06); }
-    .similar-list {
-      display: flex;
-      flex-direction: column;
-      gap: 6px;
-    }
+    .similar-list { display: flex; flex-direction: column; gap: 2px; }
     .similar-item {
-      display: flex;
-      align-items: center;
-      gap: 8px;
-      padding: 8px 10px;
-      background: var(--bg-surface-glass);
-      border: 1px solid var(--border-glass);
-      border-radius: var(--radius-lg);
-      font-size: 13px;
-      color: var(--text-primary);
-      transition: border-color 0.15s;
+      display: flex; align-items: center; gap: 10px; padding: 6px 8px; border-radius: var(--radius-md);
+      font-size: 13px; font-weight: 500; color: var(--text-primary); transition: background-color 0.15s;
     }
+    .similar-item:hover { background: var(--bg-accent-pink); }
+    .similar-tile { width: 24px; height: 24px; border-radius: 6px; }
     .similar-link { text-decoration: none; color: inherit; display: block; }
-    .similar-link:hover .similar-item { border-color: var(--accent-purple); }
-    .similar-title {
-      flex: 1;
-      overflow: hidden;
-      text-overflow: ellipsis;
-      white-space: nowrap;
-    }
-    .status-pending { color: #D97706; border: 1px solid rgba(217, 119, 6, 0.25); }
-    html.dark .status-pending { color: #FBBF24; border-color: rgba(251, 191, 36, 0.25); }
+    .similar-title { flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 
-    @media (max-width: 480px) {
-      .type-selector { grid-template-columns: repeat(2, 1fr); }
+    /* reply mode switch (drives the hidden #public-toggle checkbox) */
+    .reply-mode { display: flex; align-items: center; gap: 4px; padding: 3px; border-radius: var(--radius-pill); background: var(--bg-surface-muted); border: 1px solid var(--border-glass); width: fit-content; }
+    .reply-mode-btn {
+      display: inline-flex; align-items: center; justify-content: center; gap: 6px; padding: 6px 14px;
+      border: 0; border-radius: var(--radius-pill); font-family: inherit; font-size: 12px; font-weight: 600;
+      cursor: pointer; white-space: nowrap; background: transparent; color: var(--text-secondary);
+    }
+    .reply-mode-btn[aria-pressed="true"] { background: var(--gradient-accent); color: #FFFFFF; box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -2px rgba(0, 0, 0, 0.1); }
+    .reply-mode-btn:focus-visible { outline: 2px solid var(--accent-pink); outline-offset: 2px; }
+    .reply-mode-wrap { display: flex; flex-direction: column; gap: 6px; }
+
+    .contact-field { transition: max-height 0.3s ease, opacity 0.3s ease; overflow: hidden; }
+    .contact-field.visible { max-height: 140px; opacity: 1; }
+    .contact-field.hidden { max-height: 0; opacity: 0; }
+
+    .discord-tip { display: flex; align-items: center; gap: 12px; padding: 12px 16px; border-radius: var(--radius-lg); font-size: 12px; line-height: 1.5; color: var(--text-secondary); }
+    .discord-tip > span { flex: 1; min-width: 160px; }
+    .discord-mark { color: #5865F2; flex-shrink: 0; }
+
+    #result { margin-top: 4px; padding: 12px 16px; border-radius: var(--radius-lg); font-size: 14px; display: none; }
+    #result.success { display: block; background: #ECFDF5; color: #065F46; border: 1px solid #A7F3D0; }
+    #result.error { display: block; background: #FEF2F2; color: #991B1B; border: 1px solid #FECACA; }
+
+    @media (max-width: 640px) {
+      .crystal-form { padding: 16px; }
+      .type-tiles { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+      .reply-mode { width: 100%; }
+      .reply-mode-btn { flex: 1; min-height: 44px; }
+      .discord-tip { flex-wrap: wrap; }
     }
   </style>
 </head>
 <body>
 
-  <div style="max-width: 640px; margin: 0 auto; padding: 48px 16px;">
-    <!-- Header -->
-    <div style="text-align: center; margin-bottom: 32px;">
-      <div style="display: flex; align-items: center; justify-content: center; gap: 12px; margin-bottom: 8px; position: relative;">
-        <div style="
-          width: 40px; height: 40px; border-radius: var(--radius-lg);
-          background: linear-gradient(135deg, var(--accent-purple-light), var(--accent-blue-light));
-          display: flex; align-items: center; justify-content: center;
-        ">
-          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-            <path d="M12 2L2 7l10 5 10-5-10-5z"/>
-            <path d="M2 17l10 5 10-5"/>
-            <path d="M2 12l10 5 10-5"/>
-          </svg>
+  <div class="prism-page prism-page-narrow">
+    <div class="prism-shell">
+      <!-- Header -->
+      <div class="prism-hero">
+        <div class="prism-hero-tile">${raw(svgIcon('crystal', 30))}</div>
+        <div class="prism-hero-stack">
+          <div class="prism-badge">${raw(SPARKLE_SVG)}回報與建議</div>
+          <h1 class="prism-title">Prism Crystal</h1>
+          <p class="prism-desc">回報問題或建議新功能，幫助我們讓 Prism 更好</p>
         </div>
-        <span style="
-          font-size: 28px; font-weight: 700; letter-spacing: -0.5px;
-          background: linear-gradient(135deg, var(--accent-purple), var(--accent-blue));
-          -webkit-background-clip: text; -webkit-text-fill-color: transparent;
-          background-clip: text;
-        ">Prism Crystal</span>
-        <div style="position: absolute; right: 0; top: 50%; transform: translateY(-50%);">
-          ${raw(themeToggleHTML())}
-        </div>
+        <div class="prism-hero-actions">${raw(themeToggleHTML())}</div>
       </div>
-      <p style="color: var(--text-secondary); font-size: 14px;">
-        回報問題或建議新功能，幫助我們讓 Prism 更好
-      </p>
-    </div>
 
-    <!-- Form Card -->
-    <div style="
-      background: var(--bg-surface-glass);
-      backdrop-filter: blur(16px); -webkit-backdrop-filter: blur(16px);
-      border: 1px solid var(--border-glass);
-      border-radius: var(--radius-2xl);
-      padding: 32px;
-      box-shadow: 0 8px 32px rgba(0,0,0,0.06);
-    ">
-      <form id="crystal-form" style="display: flex; flex-direction: column; gap: 20px;">
+      <form id="crystal-form" class="form-stack crystal-form">
 
         <!-- Type selector -->
         <div>
-          <label class="form-label">類型 <span class="required">*</span></label>
-          <div class="type-selector">
-            <button type="button" class="type-btn active" data-type="bug">Bug 回報</button>
-            <button type="button" class="type-btn" data-type="feat">功能建議</button>
-            <button type="button" class="type-btn" data-type="ui">UI 問題</button>
-            <button type="button" class="type-btn" data-type="other">其他</button>
+          <span class="form-label" id="type-label">類型 <span class="required">*</span></span>
+          <div class="type-tiles" role="group" aria-labelledby="type-label">
+            ${raw(typeTileButtons())}
           </div>
         </div>
 
         <!-- Title -->
         <div>
           <label class="form-label" for="title">標題 <span class="required">*</span></label>
-          <input type="text" id="title" class="form-input" placeholder="簡短描述問題或建議" maxlength="${TICKET_FIELD_LIMITS.title}" required />
-          <div id="similar-panel" class="similar-panel" style="display: none;">
+          <div class="input-icon">
+            ${raw(svgIcon('pencilLine', 16))}
+            <input type="text" id="title" class="form-input" placeholder="簡短描述問題或建議" maxlength="${TICKET_FIELD_LIMITS.title}" required />
+          </div>
+          <div id="similar-panel" class="glass-box similar-panel" style="display: none;">
             <div class="similar-header">
               <span>類似的既有回報</span>
               <span id="similar-count" class="similar-count"></span>
@@ -333,59 +208,62 @@ export function renderFormPage(siteKey: string) {
         <!-- Body -->
         <div>
           <label class="form-label" for="body">詳細描述 <span class="required">*</span></label>
-          <textarea id="body" class="form-input" rows="5" placeholder="請描述你遇到的問題或想要的功能…" maxlength="${TICKET_FIELD_LIMITS.body}" required></textarea>
+          <textarea id="body" class="form-textarea" rows="5" placeholder="請描述你遇到的問題或想要的功能…" maxlength="${TICKET_FIELD_LIMITS.body}" required></textarea>
         </div>
 
-        <!-- Nickname -->
-        <div>
-          <label class="form-label" for="nickname">暱稱</label>
-          <input type="text" id="nickname" class="form-input" placeholder="選填，Q&A 公開回覆時顯示" maxlength="${TICKET_FIELD_LIMITS.nickname}" />
-        </div>
-
-        <!-- Public reply toggle -->
-        <div>
-          <label class="toggle-row" for="public-toggle">
-            <input type="checkbox" id="public-toggle" checked />
-            <div>
-              <div class="toggle-label">允許公開回覆</div>
-              <div class="toggle-hint">勾選後你的問題與官方回覆將顯示在 Q&A 頁面</div>
-            </div>
-          </label>
+        <!-- Reply mode (public Q&A vs. private) -->
+        <div class="form-section"><span class="section-label">回覆方式</span></div>
+        <div class="reply-mode-wrap">
+          <div class="reply-mode" role="group" aria-label="回覆方式">
+            <button type="button" class="reply-mode-btn" data-reply-mode="public" aria-pressed="true">${raw(svgIcon('globe', 14))}公開在 Q&amp;A</button>
+            <button type="button" class="reply-mode-btn" data-reply-mode="private" aria-pressed="false">${raw(svgIcon('lock', 14))}私下回覆</button>
+          </div>
+          <input type="checkbox" id="public-toggle" class="sr-only" checked tabindex="-1" aria-hidden="true" />
+          <p class="form-hint" style="margin-top: 0;">你的問題與官方回覆會顯示在 Q&amp;A 頁面；選「私下回覆」會多出聯絡方式欄位（必填），只有管理員看得到。</p>
         </div>
 
         <!-- Contact (shown when public reply is NOT allowed) -->
         <div id="contact-wrapper" class="contact-field hidden">
           <label class="form-label" for="contact">聯絡方式 <span class="required">*</span></label>
-          <input type="text" id="contact" class="form-input" placeholder="Email / Discord / Twitter 等，讓我們能回覆你" maxlength="${TICKET_FIELD_LIMITS.contact}" />
+          <div class="input-icon">
+            ${raw(svgIcon('message', 16))}
+            <input type="text" id="contact" class="form-input" placeholder="Email / Discord / Twitter 等，讓我們能回覆你" maxlength="${TICKET_FIELD_LIMITS.contact}" />
+          </div>
           <p class="form-hint">不公開回覆時必須提供聯絡方式</p>
         </div>
 
-        <!-- Discord tip (always visible) -->
-        <div class="discord-tip">
-          <span>也可以加入我們的 Discord 伺服器，直接在伺服器裡討論與回覆。</span>
-          <a href="https://discord.gg/bUYva8q7Jr" target="_blank" rel="noopener noreferrer">加入 Discord ↗</a>
+        <!-- Nickname -->
+        <div>
+          <label class="form-label" for="nickname">暱稱</label>
+          <div class="input-icon">
+            ${raw(svgIcon('user', 16))}
+            <input type="text" id="nickname" class="form-input" placeholder="選填，Q&amp;A 公開回覆時顯示" maxlength="${TICKET_FIELD_LIMITS.nickname}" />
+          </div>
         </div>
 
-        <!-- Turnstile -->
-        <div class="cf-turnstile" data-sitekey="${siteKey}" data-theme="auto"></div>
+        <!-- Discord tip (always visible) -->
+        <div class="glass-box discord-tip">
+          ${raw(DISCORD_SVG)}
+          <span>也可以加入我們的 Discord 伺服器，直接在伺服器裡討論與回覆。</span>
+          <a class="link-pill" href="https://discord.gg/bUYva8q7Jr" target="_blank" rel="noopener noreferrer">加入 Discord ${raw(svgIcon('external', 12))}</a>
+        </div>
 
-        <!-- Submit -->
-        <button type="submit" class="btn-submit" id="submit-btn">送出回報</button>
+        <!-- Turnstile + Submit -->
+        <div class="form-footer">
+          <div class="cf-turnstile" data-sitekey="${siteKey}" data-theme="auto"></div>
+          <button type="submit" class="btn-primary" id="submit-btn">送出回報 ${raw(svgIcon('arrowRight', 16))}</button>
+        </div>
 
         <div id="result"></div>
       </form>
     </div>
 
-    <div class="cross-links">
-      <a href="/qa">查看 Q&A</a>
-      <span style="color: var(--text-tertiary);">|</span>
-      <a href="https://nova.oshi.tw" target="_blank">提議新 VTuber</a>
-      <span style="color: var(--text-tertiary);">|</span>
-      <a href="https://prism.oshi.tw" target="_blank">前往 Prism 歌單</a>
+    <div class="footer-links">
+      <a class="link-pill" href="/qa">${raw(svgIcon('message', 14))}查看 Q&amp;A</a>
+      <a class="link-pill" href="https://nova.oshi.tw" target="_blank" rel="noopener noreferrer">${raw(svgIcon('plus', 14))}提議新 VTuber</a>
+      <a class="link-pill" href="https://prism.oshi.tw" target="_blank" rel="noopener noreferrer">${raw(svgIcon('external', 14))}前往 Prism 歌單</a>
     </div>
-    <p style="text-align: center; font-size: 11px; color: var(--text-tertiary); margin-top: 16px;">
-      Prism &mdash; 為你喜愛的 VTuber 打造歌單頁面
-    </p>
+    <p class="footer-tagline">Prism &mdash; 為你喜愛的 VTuber 打造歌單頁面</p>
   </div>
 
   <script>
@@ -406,6 +284,8 @@ export function renderFormPage(siteKey: string) {
     const CJK_RE = /[\u3400-\u9fff\uf900-\ufaff]/;
     const VALID_TYPES = { bug: 'Bug', feat: '功能建議', ui: 'UI', other: '其他' };
     const VALID_STATUSES = { pending: '處理中', replied: '已回覆', closed: '已關閉' };
+    // Server-rendered constant icon markup per allow-listed type (never user data).
+    const TYPE_ICON_SVG = ${raw(typeIconJson())};
     let similarTimer = null;
     let similarAbort = null;
     let similarDismissed = false;
@@ -451,20 +331,22 @@ export function renderFormPage(siteKey: string) {
       const row = document.createElement('div');
       row.className = 'similar-item';
 
-      const typeBadge = document.createElement('span');
-      typeBadge.className = 'type-badge type-' + typeKey;
-      typeBadge.textContent = VALID_TYPES[typeKey];
-      row.appendChild(typeBadge);
-
-      const statusBadge = document.createElement('span');
-      statusBadge.className = 'status-badge status-' + statusKey;
-      statusBadge.textContent = VALID_STATUSES[statusKey];
-      row.appendChild(statusBadge);
+      const typeTile = document.createElement('span');
+      typeTile.className = 'type-tile similar-tile type-' + typeKey;
+      typeTile.title = VALID_TYPES[typeKey];
+      // Constant markup keyed by the allow-listed type — not user input.
+      typeTile.innerHTML = TYPE_ICON_SVG[typeKey] || '';
+      row.appendChild(typeTile);
 
       const titleSpan = document.createElement('span');
       titleSpan.className = 'similar-title';
       titleSpan.textContent = String(it.title ?? '');
       row.appendChild(titleSpan);
+
+      const statusBadge = document.createElement('span');
+      statusBadge.className = 'badge badge-' + statusKey;
+      statusBadge.textContent = VALID_STATUSES[statusKey];
+      row.appendChild(statusBadge);
 
       return { row, statusKey, title: titleSpan.textContent };
     }
@@ -496,11 +378,33 @@ export function renderFormPage(siteKey: string) {
     }
 
     // Type selector
+    function selectType(type) {
+      document.querySelectorAll('.type-btn').forEach(b => {
+        const active = b.dataset.type === type;
+        b.classList.toggle('active', active);
+        b.setAttribute('aria-pressed', active ? 'true' : 'false');
+      });
+      selectedType = type;
+    }
     document.querySelectorAll('.type-btn').forEach(btn => {
+      btn.addEventListener('click', () => selectType(btn.dataset.type));
+    });
+
+    // Reply mode switch → hidden checkbox (the submit payload reads publicToggle.checked)
+    function syncReplyMode() {
+      document.querySelectorAll('.reply-mode-btn').forEach(b => {
+        const pressed = (b.dataset.replyMode === 'public') === publicToggle.checked;
+        b.setAttribute('aria-pressed', pressed ? 'true' : 'false');
+      });
+    }
+    document.querySelectorAll('.reply-mode-btn').forEach(btn => {
       btn.addEventListener('click', () => {
-        document.querySelectorAll('.type-btn').forEach(b => b.classList.remove('active'));
-        btn.classList.add('active');
-        selectedType = btn.dataset.type;
+        const wantPublic = btn.dataset.replyMode === 'public';
+        if (publicToggle.checked !== wantPublic) {
+          publicToggle.checked = wantPublic;
+          publicToggle.dispatchEvent(new Event('change'));
+        }
+        syncReplyMode();
       });
     });
 
@@ -513,6 +417,7 @@ export function renderFormPage(siteKey: string) {
         contactWrapper.classList.remove('hidden');
         contactWrapper.classList.add('visible');
       }
+      syncReplyMode();
     });
 
     // Get context URL from ?ref= query param
@@ -560,12 +465,11 @@ export function renderFormPage(siteKey: string) {
           resultEl.className = 'success';
           form.reset();
           // Re-activate default type
-          document.querySelectorAll('.type-btn').forEach(b => b.classList.remove('active'));
-          document.querySelector('[data-type="bug"]').classList.add('active');
-          selectedType = 'bug';
-          // Reset contact visibility
+          selectType('bug');
+          // Reset contact visibility + reply mode (form.reset() restored the checkbox)
           contactWrapper.classList.remove('visible');
           contactWrapper.classList.add('hidden');
+          syncReplyMode();
           // Reset Turnstile
           if (window.turnstile) turnstile.reset();
         } else {
