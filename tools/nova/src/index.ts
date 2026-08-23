@@ -489,10 +489,10 @@ app.get('/status', async (c) => {
     ? (rawD as VodFilter)
     : 'all';
 
-  const vtuberSqlStatus = vtuberFilter === 'all' ? undefined : vtuberFilter;
-
+  // The page filters the VTuber list itself; the full set keeps VOD group names
+  // and avatars (and the section totals) intact under any filter.
   const [submissions, vodSubmissions, adminStreams] = await Promise.all([
-    listAllSubmissions(c.env.DB, vtuberSqlStatus),
+    listAllSubmissions(c.env.DB),
     listAllVodSubmissions(c.env.DB),
     listAdminStreams(c.env.ADMIN_DB),
   ]);
