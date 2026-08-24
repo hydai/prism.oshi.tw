@@ -662,7 +662,7 @@
       "description": "大家好 我是子午計畫所屬【沉珀Aetris】的璃Miri\n讓我待在你身邊守護你吧｡·* ✧˚",
       "avatarUrl": "https://yt3.ggpht.com/erJlmpAFYLgcsBlRl4nSKFV3B0lD1sk6ZlXp6JEWe_n9fWynvli9aAhiL-oFqIfXFkdcba7S3Q=s240-c-k-c0x00ffffff-no-rj",
       "brandName": "Miri",
-      "subscriberCount": "2.1萬",
+      "subscriberCount": "2.11萬",
       "group": "子午計畫",
       "socialLinks": {
         "youtube": "https://www.youtube.com/@%E7%92%83Miri_Channel",
@@ -670,6 +670,36 @@
         "facebook": "https://facebook.com/MiriAetris",
         "instagram": "https://instagram.com/miri_aetris",
         "twitch": "https://twitch.tv/miri_aetris"
+      },
+      "theme": {
+        "accentPrimary": "#EC4899",
+        "accentPrimaryDark": "#DB2777",
+        "accentPrimaryLight": "#F472B6",
+        "accentSecondary": "#3B82F6",
+        "accentSecondaryLight": "#60A5FA",
+        "bgPageStart": "#FFF0F5",
+        "bgPageMid": "#F0F8FF",
+        "bgPageEnd": "#E6E6FA",
+        "bgAccentPrimary": "#FDF2F8",
+        "bgAccentPrimaryMuted": "#FCE7F3",
+        "borderAccentPrimary": "#FBCFE8",
+        "borderAccentSecondary": "#BFDBFE"
+      },
+      "enabled": true
+    },
+    {
+      "slug": "mslin00",
+      "displayName": "Ms.林鈴",
+      "description": "台灣VTuber｜生活Vlog｜ASMR｜直播陪伴\n研究人間、陪伴你日常的鄰家惡魔系Vtuber\n\nやっほー安安，如果你孤單，來這邊坐坐吧₊⋆ ♡\n\n✦ Shorts 分享生活觀察\n✦ Vlog聊生活故事\n✦ ASMR哄你入眠\n✦ 每週二、四、日直播陪你聊天\n\n希望有一天，林鈴可以成為你每天生活裡，習慣聆聽的聲音。",
+      "avatarUrl": "https://yt3.ggpht.com/8AHsO3M2QVaLHJqIMcW43_Ye_aF5nwfKUUH8wg4KrE4ob8KdKf788njeYCGwEP4mumpdxXvsVAY=s240-c-k-c0x00ffffff-no-rj",
+      "brandName": "Ms.林鈴",
+      "subscriberCount": "2,760",
+      "group": "個人勢",
+      "socialLinks": {
+        "youtube": "https://www.youtube.com/@MsLin00",
+        "twitter": "https://x.com/MsLinlin0",
+        "instagram": "https://www.instagram.com/mslinlin0/",
+        "twitch": "https://www.twitch.tv/mslinlinlin"
       },
       "theme": {
         "accentPrimary": "#EC4899",
