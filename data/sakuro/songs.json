@@ -32,6 +32,22 @@
     ]
   },
   {
+    "id": "song-4658518c",
+    "workId": "work-b7eeac74-9ef5-4005-a544-81bf1ed251ff",
+    "title": "千分之一",
+    "originalArtist": "黃鴻升",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-88396a84",
+        "streamId": "stream-2025-08-02",
+        "videoId": "XlioyFAXBeo",
+        "timestamp": 578,
+        "endTimestamp": 791
+      }
+    ]
+  },
+  {
     "id": "song-89e706f8",
     "workId": "work-song-89e706f8",
     "title": "子午聖誕禮物",
@@ -218,6 +234,13 @@
         "videoId": "Ck-5ls8cwTQ",
         "timestamp": 546,
         "endTimestamp": 763
+      },
+      {
+        "id": "p-d7fbad42",
+        "streamId": "stream-2025-08-02",
+        "videoId": "XlioyFAXBeo",
+        "timestamp": 2350,
+        "endTimestamp": 2555
       }
     ]
   },
@@ -424,6 +447,13 @@
         "videoId": "SVEtS6mQFPY",
         "timestamp": 276,
         "endTimestamp": 541
+      },
+      {
+        "id": "p-4bafd9ba",
+        "streamId": "stream-2025-08-02",
+        "videoId": "XlioyFAXBeo",
+        "timestamp": 5822,
+        "endTimestamp": 6095
       }
     ]
   },
@@ -643,6 +673,22 @@
     ]
   },
   {
+    "id": "song-9aa8e0d5",
+    "workId": "work-b68ce6ad-3289-4c45-85b2-4c0d2919a37b",
+    "title": "接不接受",
+    "originalArtist": "河智昊",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-9bef3d93",
+        "streamId": "stream-2025-08-02",
+        "videoId": "XlioyFAXBeo",
+        "timestamp": 6504,
+        "endTimestamp": 6814
+      }
+    ]
+  },
+  {
     "id": "song-5011cdee",
     "workId": "work-song-2104",
     "title": "晚餐歌",
@@ -710,6 +756,38 @@
         "videoId": "U6oVkXmfrgI",
         "timestamp": 5428,
         "endTimestamp": 5637
+      }
+    ]
+  },
+  {
+    "id": "song-a5431008",
+    "workId": "work-song-96471ecf",
+    "title": "陪你Stay with you",
+    "originalArtist": "朔Sakuro",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-4fbbe3a8",
+        "streamId": "stream-2025-08-02",
+        "videoId": "XlioyFAXBeo",
+        "timestamp": 1662,
+        "endTimestamp": 1873
+      }
+    ]
+  },
+  {
+    "id": "song-23c9fba9",
+    "workId": "work-63cf3561-ef73-4212-b2f1-2da108da3472",
+    "title": "最長的電影",
+    "originalArtist": "周杰倫",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-ffb33f3a",
+        "streamId": "stream-2025-08-02",
+        "videoId": "XlioyFAXBeo",
+        "timestamp": 4461,
+        "endTimestamp": 4697
       }
     ]
   },
@@ -941,6 +1019,38 @@
         "videoId": "Mi9lEynnVbE",
         "timestamp": 6472,
         "endTimestamp": 6743
+      }
+    ]
+  },
+  {
+    "id": "song-c4850b6f",
+    "workId": "work-song-1709",
+    "title": "Beauty And A Beat",
+    "originalArtist": "Justin Bieber",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-8c7f30ac",
+        "streamId": "stream-2025-08-02",
+        "videoId": "XlioyFAXBeo",
+        "timestamp": 3210,
+        "endTimestamp": 3438
+      }
+    ]
+  },
+  {
+    "id": "song-a9630c6c",
+    "workId": "work-song-fb50c3c2",
+    "title": "beside you",
+    "originalArtist": "keshi",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-9b5f43da",
+        "streamId": "stream-2025-08-02",
+        "videoId": "XlioyFAXBeo",
+        "timestamp": 1163,
+        "endTimestamp": 1329
       }
     ]
   },
@@ -1426,6 +1536,22 @@
         "videoId": "CizYyIizGug",
         "timestamp": 660,
         "endTimestamp": 832
+      }
+    ]
+  },
+  {
+    "id": "song-2505e0c1",
+    "workId": "work-7759016c-2b30-4ee5-88c6-79c29dd497fe",
+    "title": "Say OK",
+    "originalArtist": "Vanessa Hudgens",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-1d727169",
+        "streamId": "stream-2025-08-02",
+        "videoId": "XlioyFAXBeo",
+        "timestamp": 5191,
+        "endTimestamp": 5413
       }
     ]
   },
