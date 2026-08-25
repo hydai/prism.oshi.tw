@@ -200,13 +200,13 @@
       "streamsCount": 307
     },
     "mslin00": {
-      "lastSyncedAt": null,
-      "maxSongUpdatedAt": null,
-      "maxPerfUpdatedAt": null,
-      "maxStreamUpdatedAt": null,
-      "songsCount": 0,
-      "performancesCount": 0,
-      "streamsCount": 0
+      "lastSyncedAt": "2026-08-25T16:15:07.805Z",
+      "maxSongUpdatedAt": "2026-08-25 16:11:14",
+      "maxPerfUpdatedAt": "2026-08-25 16:10:59",
+      "maxStreamUpdatedAt": "2026-08-25 16:10:59",
+      "songsCount": 6,
+      "performancesCount": 6,
+      "streamsCount": 1
     },
     "nagi": {
       "lastSyncedAt": "2026-08-05T04:03:37.963Z",
