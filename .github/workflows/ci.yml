@@ -64,9 +64,9 @@ jobs:
           - name: Aurora build
             path: tools/aurora
             command: npm run build
-          - name: Crystal worker typecheck
+          - name: Crystal worker check
             path: tools/crystal
-            command: npm run typecheck
+            command: npm run check
           - name: Nova worker check
             path: tools/nova
             command: npm run check
