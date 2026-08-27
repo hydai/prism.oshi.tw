@@ -222,7 +222,7 @@ export function renderQaPage(tickets: PublicTicketRow[], total: number, page: nu
             <input
               type="text"
               name="q"
-              value="${escapeHtml(q)}"
+              value="${q}"
               placeholder="搜尋問題…（按 Enter 搜尋）"
               maxlength="100"
               autocomplete="off"
