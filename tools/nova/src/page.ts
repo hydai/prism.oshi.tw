@@ -1,5 +1,6 @@
 import { html, raw } from 'hono/html';
 import { DARK_MODE_CSS, DARK_MODE_DETECT_SCRIPT, PRISM_CSS, SPARKLE_SVG, svgIcon, themeToggleHTML } from './theme';
+import { LINK_URL_LIMIT, SUBMISSION_FIELD_LIMITS } from './validate';
 
 const SOCIAL_LINKS: Array<{ key: string; label: string; icon: Parameters<typeof svgIcon>[0]; brand: string }> = [
   { key: 'youtube', label: 'YouTube', icon: 'youtube', brand: '#FF0000' },
@@ -11,7 +12,7 @@ const SOCIAL_LINKS: Array<{ key: string; label: string; icon: Parameters<typeof 
 
 export function renderPage(siteKey: string) {
   const socialInputs = SOCIAL_LINKS.map(({ key, label, icon }) => `
-            <div class="input-icon">${svgIcon(icon, 16)}<input type="url" name="link_${key}" placeholder="${label}" aria-label="${label}" class="form-input" /></div>`).join('');
+            <div class="input-icon">${svgIcon(icon, 16)}<input type="url" name="link_${key}" placeholder="${label}" aria-label="${label}" class="form-input" maxlength="${LINK_URL_LIMIT}" /></div>`).join('');
   const previewSocials = SOCIAL_LINKS.map(({ key, icon, brand }) =>
     `<span id="preview-social-${key}" class="preview-social" data-brand="${brand}">${svgIcon(icon, 16)}</span>`).join('');
 
@@ -128,7 +129,7 @@ export function renderPage(siteKey: string) {
             </label>
             <div class="input-icon">${raw(svgIcon('youtube', 16, 'color:#FF0000;'))}<input id="f-youtube_channel_url" type="url" name="youtube_channel_url" required
               placeholder="https://www.youtube.com/@ChannelName"
-              class="form-input" /></div>
+              class="form-input" maxlength="${SUBMISSION_FIELD_LIMITS.youtube_channel_url}" /></div>
             <div id="url-check" class="check-line" style="display: none;"></div>
             <p class="form-hint">輸入後會自動帶入頻道名稱、頭像與 YouTube 連結，都可以再修改。</p>
           </div>
@@ -141,7 +142,7 @@ export function renderPage(siteKey: string) {
               </label>
               <div class="input-icon">${raw(svgIcon('user', 16))}<input id="f-display_name" type="text" name="display_name" required
                 placeholder="例：浠Mizuki"
-                class="form-input" /></div>
+                class="form-input" maxlength="${SUBMISSION_FIELD_LIMITS.display_name}" /></div>
             </div>
 
             <!-- Group -->
@@ -149,7 +150,7 @@ export function renderPage(siteKey: string) {
               <label class="form-label" for="f-group">箱 / 所屬公司 / 個人勢</label>
               <div class="input-icon">${raw(svgIcon('building', 16))}<input id="f-group" type="text" name="group"
                 placeholder="例：個人勢、hololive"
-                class="form-input" /></div>
+                class="form-input" maxlength="${SUBMISSION_FIELD_LIMITS.group}" /></div>
             </div>
           </div>
         </div>
@@ -183,7 +184,7 @@ export function renderPage(siteKey: string) {
             <label class="form-label" for="f-description">簡介</label>
             <textarea id="f-description" name="description" rows="3"
               placeholder="關於這位 VTuber 的簡短介紹…"
-              class="form-textarea"></textarea>
+              class="form-textarea" maxlength="${SUBMISSION_FIELD_LIMITS.description}"></textarea>
           </div>
 
           <div class="form-grid-2">
@@ -192,7 +193,7 @@ export function renderPage(siteKey: string) {
               <label class="form-label" for="f-avatar_url">頭像圖片網址</label>
               <div class="input-icon">${raw(svgIcon('image', 16))}<input id="f-avatar_url" type="url" name="avatar_url"
                 placeholder="https://..."
-                class="form-input" /></div>
+                class="form-input" maxlength="${SUBMISSION_FIELD_LIMITS.avatar_url}" /></div>
             </div>
 
             <!-- Subscriber Count -->
@@ -200,7 +201,7 @@ export function renderPage(siteKey: string) {
               <label class="form-label" for="f-subscriber_count">訂閱數</label>
               <div class="input-icon">${raw(svgIcon('users', 16))}<input id="f-subscriber_count" type="text" name="subscriber_count"
                 placeholder="例：21.8萬"
-                class="form-input" /></div>
+                class="form-input" maxlength="${SUBMISSION_FIELD_LIMITS.subscriber_count}" /></div>
             </div>
           </div>
 

@@ -1,4 +1,5 @@
 import { renderPage } from './page';
+import { SUBMISSION_FIELD_LIMITS } from './validate';
 
 declare const process: { exitCode?: number };
 
@@ -22,6 +23,18 @@ function testKeepsEveryField(): void {
   assert(/name="display_name"[^>]*required/.test(html) || /required[^>]*name="display_name"/.test(html), 'display name stays required');
   assert(!/name="group"[^>]*required/.test(html), 'group stays optional');
   console.log('VTuber form keeps every field and required mark');
+}
+
+function hasMaxlength(name: string, limit: number): boolean {
+  return new RegExp(`name="${name}"[^>]*maxlength="${limit}"`).test(html)
+    || new RegExp(`maxlength="${limit}"[^>]*name="${name}"`).test(html);
+}
+
+function testFieldLimitsReachTheForm(): void {
+  for (const [name, limit] of Object.entries(SUBMISSION_FIELD_LIMITS)) {
+    assert(hasMaxlength(name, limit), `${name} input carries maxlength="${limit}"`);
+  }
+  console.log('VTuber form maxlength attributes match the server limits');
 }
 
 function testKeepsSubmissionPlumbing(): void {
@@ -61,6 +74,7 @@ function testPrismShell(): void {
 
 try {
   testKeepsEveryField();
+  testFieldLimitsReachTheForm();
   testKeepsSubmissionPlumbing();
   testRendersLivePreview();
   testPrismShell();

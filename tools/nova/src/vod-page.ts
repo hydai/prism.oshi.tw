@@ -1,7 +1,7 @@
 import { html, raw } from 'hono/html';
 import type { ApprovedStreamer } from './types';
 import { DARK_MODE_CSS, DARK_MODE_DETECT_SCRIPT, PRISM_CSS, SPARKLE_SVG, svgIcon, themeToggleHTML } from './theme';
-import { validateSlug } from './validate';
+import { VOD_FIELD_LIMITS, validateSlug } from './validate';
 
 /** Escape HTML special characters before inserting trusted markup with raw(). */
 function escapeHtml(value: string): string {
@@ -487,7 +487,7 @@ export function renderVodPage(siteKey: string, streamers: ApprovedStreamer[]) {
               </label>
               <div class="input-icon">${raw(svgIcon('youtube', 16, 'color:#FF0000;'))}<input id="f-video_url" type="url" name="video_url" required
                 placeholder="https://www.youtube.com/watch?v=..."
-                class="form-input" /></div>
+                class="form-input" maxlength="${VOD_FIELD_LIMITS.video_url}" /></div>
               <div id="url-check" class="check-line" style="display: none;"></div>
             </div>
           </div>
@@ -513,7 +513,7 @@ export function renderVodPage(siteKey: string, streamers: ApprovedStreamer[]) {
               <label class="form-label" for="f-stream_title">直播標題</label>
               <div class="input-icon">${raw(svgIcon('note', 16))}<input id="f-stream_title" type="text" name="stream_title"
                 placeholder="會自動填入（可修改）"
-                class="form-input" /></div>
+                class="form-input" maxlength="${VOD_FIELD_LIMITS.stream_title}" /></div>
             </div>
 
             <div class="form-grid-2">
@@ -528,7 +528,7 @@ export function renderVodPage(siteKey: string, streamers: ApprovedStreamer[]) {
                 <label class="form-label" for="f-submitter_note">備註</label>
                 <div class="input-icon">${raw(svgIcon('pencilLine', 16))}<input id="f-submitter_note" type="text" name="submitter_note"
                   placeholder="任何補充說明（選填）"
-                  class="form-input" /></div>
+                  class="form-input" maxlength="${VOD_FIELD_LIMITS.submitter_note}" /></div>
               </div>
             </div>
           </div>

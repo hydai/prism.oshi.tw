@@ -1,7 +1,17 @@
 import { Hono } from 'hono';
 import { cors } from 'hono/cors';
 import type { Bindings, SubmitBody, VodSubmitBody } from './types';
-import { normalizeYoutubeChannelUrl, validateRequired, parseYoutubeVideoUrl, parseTimestamp } from './validate';
+import {
+  MAX_VOD_SONGS,
+  SUBMISSION_FIELD_LIMITS,
+  VOD_FIELD_LIMITS,
+  VOD_SONG_FIELD_LIMITS,
+  normalizeYoutubeChannelUrl,
+  parseTimestamp,
+  parseYoutubeVideoUrl,
+  validateFieldLengths,
+  validateRequired,
+} from './validate';
 import { verifyTurnstile } from './turnstile';
 import { generateId, findByChannelUrl, insertSubmission, resetRejectedSubmission, listAllSubmissions } from './db';
 import { generateVodId, generateVodSongId, listApprovedStreamers, findApprovedVodByVideoId, countVodsByVideoId, insertVodSubmission, listAllVodSubmissions, listAdminStreams, checkAdminStreamExists } from './vod-db';
@@ -172,6 +182,11 @@ app.post('/api/submit', async (c) => {
   });
   if (errors.length > 0) {
     return c.json({ error: errors.join(', ') }, 400);
+  }
+
+  const lengthErrors = validateFieldLengths(body, SUBMISSION_FIELD_LIMITS);
+  if (lengthErrors.length > 0) {
+    return c.json({ error: lengthErrors.join(', ') }, 400);
   }
 
   // Verify Turnstile token
@@ -359,6 +374,25 @@ app.post('/vod/api/submit', async (c) => {
   const hasSong = Array.isArray(body.songs) && body.songs.some((s) => s?.song_title?.trim());
   if (!hasSong) {
     return c.json({ error: '請至少提供一首歌曲的時間戳' }, 400);
+  }
+
+  const lengthErrors = validateFieldLengths(body, VOD_FIELD_LIMITS);
+  if (lengthErrors.length > 0) {
+    return c.json({ error: lengthErrors.join(', ') }, 400);
+  }
+  const songs = body.songs ?? [];
+  if (songs.length > MAX_VOD_SONGS) {
+    return c.json({ error: `歌曲數量上限為 ${MAX_VOD_SONGS} 首` }, 400);
+  }
+  for (let i = 0; i < songs.length; i++) {
+    const song = songs[i];
+    if (!song || typeof song !== 'object') {
+      return c.json({ error: `第 ${i + 1} 首歌曲格式無效` }, 400);
+    }
+    const songErrors = validateFieldLengths(song, VOD_SONG_FIELD_LIMITS);
+    if (songErrors.length > 0) {
+      return c.json({ error: `第 ${i + 1} 首：${songErrors.join(', ')}` }, 400);
+    }
   }
 
   // Verify Turnstile token
