@@ -117,3 +117,61 @@ export function parseTimestamp(raw: string | number): number | null {
 
   return hours * 3600 + minutes * 60 + seconds;
 }
+
+// --- Server-side length caps (single source of truth; the forms derive maxlength from these) ---
+
+export const LINK_URL_LIMIT = 500;
+
+/** Streamer submission (`POST /api/submit`) — trimmed UTF-16 length, same unit as HTML maxlength. */
+export const SUBMISSION_FIELD_LIMITS = {
+  youtube_channel_url: LINK_URL_LIMIT,
+  display_name: 100,
+  group: 100,
+  description: 2000,
+  avatar_url: LINK_URL_LIMIT,
+  subscriber_count: 50,
+  link_youtube: LINK_URL_LIMIT,
+  link_twitter: LINK_URL_LIMIT,
+  link_facebook: LINK_URL_LIMIT,
+  link_instagram: LINK_URL_LIMIT,
+  link_twitch: LINK_URL_LIMIT,
+} as const;
+
+/** VOD submission (`POST /vod/api/submit`). stream_date is stored verbatim, so it gets a cap too. */
+export const VOD_FIELD_LIMITS = {
+  video_url: LINK_URL_LIMIT,
+  stream_title: 300,
+  stream_date: 32,
+  submitter_note: 500,
+  thumbnail_url: LINK_URL_LIMIT,
+} as const;
+
+export const VOD_SONG_FIELD_LIMITS = {
+  song_title: 200,
+  original_artist: 200,
+} as const;
+
+/** A multi-hour karaoke stream lands around 100 songs; 200 leaves headroom. */
+export const MAX_VOD_SONGS = 200;
+
+/**
+ * Length check on the trimmed value (= what gets stored). Missing (undefined/null)
+ * fields pass — required-ness is validateRequired's job. Non-string values are
+ * rejected so a JSON number never reaches .trim().
+ */
+export function validateFieldLengths(values: object, limits: Readonly<Record<string, number>>): string[] {
+  const record = values as Record<string, unknown>;
+  const errors: string[] = [];
+  for (const [field, limit] of Object.entries(limits)) {
+    const raw = record[field];
+    if (raw === undefined || raw === null) continue;
+    if (typeof raw !== 'string') {
+      errors.push(`${field} 必須是文字`);
+      continue;
+    }
+    if (raw.trim().length > limit) {
+      errors.push(`${field} 長度上限為 ${limit} 字`);
+    }
+  }
+  return errors;
+}

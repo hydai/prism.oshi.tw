@@ -1,5 +1,6 @@
 import { renderVodPage } from './vod-page';
 import type { ApprovedStreamer } from './types';
+import { VOD_FIELD_LIMITS } from './validate';
 
 declare const process: { exitCode?: number };
 
@@ -87,12 +88,26 @@ function testPrismFormStructure(): void {
   console.log('vod form keeps its structure on the prism shell');
 }
 
+// Note: unlike page.test.ts, this file has no single top-level `html` — every test
+// renders its own via render(streamers). This test follows that same pattern.
+function testVodFieldLimitsReachTheForm(): void {
+  const html = render([{ slug: 'mizuki', display_name: '浠Mizuki', avatar_url: '' }]);
+  for (const name of ['video_url', 'stream_title', 'submitter_note'] as const) {
+    const limit = VOD_FIELD_LIMITS[name];
+    const found = new RegExp(`name="${name}"[^>]*maxlength="${limit}"`).test(html)
+      || new RegExp(`maxlength="${limit}"[^>]*name="${name}"`).test(html);
+    assert(found, `${name} input carries maxlength="${limit}"`);
+  }
+  console.log('VOD form maxlength attributes match the server limits');
+}
+
 try {
   testEscapesStreamerOptionFields();
   testRendersValidStreamerSlug();
   testRejectsInvalidStreamerSlug();
   testHidesAdminProcessingMessage();
   testPrismFormStructure();
+  testVodFieldLimitsReachTheForm();
   console.log('vod-page.test: all passed');
 } catch (error) {
   console.error(error);
