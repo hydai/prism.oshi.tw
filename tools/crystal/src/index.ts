@@ -17,7 +17,16 @@ app.get('/', (c) => {
 // --- Submit ticket ---
 
 app.post('/api/submit', async (c) => {
-  const body = await c.req.json<SubmitTicketBody>();
+  let body: SubmitTicketBody;
+  try {
+    body = await c.req.json<SubmitTicketBody>();
+  } catch {
+    return c.json({ error: 'Invalid JSON body' }, 400);
+  }
+  // JSON.parse also accepts `null`, arrays and scalars — validateTicket expects an object.
+  if (body === null || typeof body !== 'object' || Array.isArray(body)) {
+    return c.json({ error: 'Invalid JSON body' }, 400);
+  }
 
   // Validate fields
   const validation = validateTicket(body);
