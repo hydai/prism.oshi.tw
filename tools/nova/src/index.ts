@@ -24,6 +24,17 @@ import {
   type VtuberFilter,
   type VodFilter,
 } from './status-page';
+import { sanitizeNovaUrl, type NovaUrlProvider } from '../../../admin/shared/nova-url-safety';
+
+// Public-form URL fields → the host allow-list each one must satisfy.
+const SUBMISSION_URL_FIELDS: ReadonlyArray<{ field: 'avatar_url' | 'link_youtube' | 'link_twitter' | 'link_facebook' | 'link_instagram' | 'link_twitch'; provider: NovaUrlProvider }> = [
+  { field: 'avatar_url', provider: 'image' },
+  { field: 'link_youtube', provider: 'youtube' },
+  { field: 'link_twitter', provider: 'twitter' },
+  { field: 'link_facebook', provider: 'facebook' },
+  { field: 'link_instagram', provider: 'instagram' },
+  { field: 'link_twitch', provider: 'twitch' },
+];
 
 /**
  * Fetch a video's title + thumbnail via oEmbed, and — only when an `apiKey` is
@@ -189,6 +200,18 @@ app.post('/api/submit', async (c) => {
     return c.json({ error: lengthErrors.join(', ') }, 400);
   }
 
+  // Reject bad URLs at ingest instead of letting sync-registry abort on them later.
+  const sanitizedUrls: Partial<Record<(typeof SUBMISSION_URL_FIELDS)[number]['field'], string>> = {};
+  for (const { field, provider } of SUBMISSION_URL_FIELDS) {
+    const raw = body[field]?.trim() ?? '';
+    if (!raw) continue;
+    const safe = sanitizeNovaUrl(raw, provider);
+    if (safe === null) {
+      return c.json({ error: `無效的連結：${field}` }, 400);
+    }
+    sanitizedUrls[field] = safe;
+  }
+
   // Verify Turnstile token
   if (!body.turnstile_token) {
     return c.json({ error: '請完成人機驗證' }, 400);
@@ -217,13 +240,13 @@ app.post('/api/submit', async (c) => {
     display_name: body.display_name.trim(),
     group: body.group?.trim() ?? '',
     description: body.description?.trim() ?? '',
-    avatar_url: body.avatar_url?.trim() ?? '',
+    avatar_url: sanitizedUrls.avatar_url ?? '',
     subscriber_count: body.subscriber_count?.trim() ?? '',
-    link_youtube: body.link_youtube?.trim() ?? '',
-    link_twitter: body.link_twitter?.trim() ?? '',
-    link_facebook: body.link_facebook?.trim() ?? '',
-    link_instagram: body.link_instagram?.trim() ?? '',
-    link_twitch: body.link_twitch?.trim() ?? '',
+    link_youtube: sanitizedUrls.link_youtube ?? '',
+    link_twitter: sanitizedUrls.link_twitter ?? '',
+    link_facebook: sanitizedUrls.link_facebook ?? '',
+    link_instagram: sanitizedUrls.link_instagram ?? '',
+    link_twitch: sanitizedUrls.link_twitch ?? '',
   };
 
   if (existing) {
@@ -497,6 +520,9 @@ app.post('/vod/api/submit', async (c) => {
       if (!thumbnailUrl) thumbnailUrl = info.thumbnail;
     } catch { /* auto-fill is best-effort */ }
   }
+
+  // Thumbnails are auto-filled from YouTube; a submitter-supplied one outside YouTube's CDNs is dropped.
+  thumbnailUrl = sanitizeNovaUrl(thumbnailUrl, 'thumbnail') ?? '';
 
   const id = generateVodId();
   await insertVodSubmission(c.env.DB, id, {

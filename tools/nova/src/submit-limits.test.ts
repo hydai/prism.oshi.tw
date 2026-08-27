@@ -82,11 +82,58 @@ async function testVodSubmitRejectsTooManySongs(): Promise<void> {
   assertEqual(json.error, `歌曲數量上限為 ${MAX_VOD_SONGS} 首`, 'the error states the cap');
 }
 
+async function testStreamerSubmitRejectsForeignSocialHost(): Promise<void> {
+  const res = await post('/api/submit', {
+    youtube_channel_url: 'https://www.youtube.com/@someone',
+    display_name: 'Someone',
+    link_twitter: 'https://evil.example/not-twitter',
+    turnstile_token: 'tok',
+  });
+  assertEqual(res.status, 400, 'a social link on a foreign host is a 400');
+  const json = (await res.json()) as { error?: string };
+  assertEqual(json.error, '無效的連結：link_twitter', 'the error names the offending field');
+}
+
+async function testStreamerSubmitRejectsNonHttpsAvatar(): Promise<void> {
+  const res = await post('/api/submit', {
+    youtube_channel_url: 'https://www.youtube.com/@someone',
+    display_name: 'Someone',
+    avatar_url: 'javascript:alert(1)',
+    turnstile_token: 'tok',
+  });
+  assertEqual(res.status, 400, 'a non-https avatar URL is a 400');
+  const json = (await res.json()) as { error?: string };
+  assertEqual(json.error, '無效的連結：avatar_url', 'the error names the offending field');
+}
+
+async function testStreamerSubmitAcceptsAllowedUrls(): Promise<void> {
+  const res = await post('/api/submit', {
+    youtube_channel_url: 'https://www.youtube.com/@someone',
+    display_name: 'Someone',
+    avatar_url: 'https://yt3.googleusercontent.com/abc',
+    link_youtube: 'https://www.youtube.com/@someone',
+    link_twitter: 'https://x.com/someone',
+    link_facebook: 'https://www.facebook.com/someone',
+    link_instagram: 'https://www.instagram.com/someone',
+    link_twitch: 'https://www.twitch.tv/someone',
+  });
+  assertEqual(res.status, 400, 'a fully valid body with no turnstile_token still gets a 400');
+  const json = (await res.json()) as { error?: string };
+  assertEqual(
+    json.error,
+    '請完成人機驗證',
+    'the body cleared validateRequired, the length caps, and the URL gate — only Turnstile is left',
+  );
+}
+
 async function main(): Promise<void> {
   try {
     await testStreamerSubmitRejectsOverLongField();
     await testVodSubmitRejectsOverLongTitle();
     await testVodSubmitRejectsTooManySongs();
+    await testStreamerSubmitRejectsForeignSocialHost();
+    await testStreamerSubmitRejectsNonHttpsAvatar();
+    await testStreamerSubmitAcceptsAllowedUrls();
     console.log('submit-limits.test: all passed');
   } finally {
     (globalThis as unknown as { fetch: typeof fetch }).fetch = realFetch;
