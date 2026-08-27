@@ -67,14 +67,23 @@ test('renderQaPage escapes a malicious ticket type label', () => {
   assert.ok(out.includes(XSS_ESCAPED), 'type label must be HTML-escaped');
 });
 
-// Reflected XSS: the search query is echoed back (search input value + the
-// "no results for «q»" message), both via raw(...). An attribute-breaking
-// payload must be escaped so it cannot start a new tag.
+// Reflected XSS: the search query is echoed back in the search input's value
+// attribute (escaped by the html`` template itself, not raw()) and in the
+// "no results for «q»" message (escaped by hand before going through raw()).
 test('renderQaPage escapes a reflected search query', () => {
   const reflected = '"><svg onload=alert(1)>';
   const out = render([], '', reflected);
   assert.ok(!out.includes('<svg onload=alert(1)>'), 'reflected query must NOT appear as raw markup');
   assert.ok(out.includes('&lt;svg onload=alert(1)&gt;'), 'reflected query must be HTML-escaped');
+});
+
+// The search <input value> sits inside the html`` template, which already
+// escapes interpolations. Escaping by hand as well double-encoded the query
+// (`a&b` came back as `a&amp;amp;b`).
+test('renderQaPage escapes the reflected search value exactly once', () => {
+  const out = render([], '', 'a&b"c');
+  assert.ok(out.includes('value="a&amp;b&quot;c"'), 'the search input echoes the query escaped once');
+  assert.ok(!out.includes('&amp;amp;'), 'the search input must not be double-escaped');
 });
 
 // Guard: normal rendering still works — benign nickname is shown verbatim and an
