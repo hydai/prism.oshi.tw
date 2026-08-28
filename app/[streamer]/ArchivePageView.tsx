@@ -1,6 +1,7 @@
 'use client';
 
-import { createContext, useContext } from 'react';
+import { createContext, useContext, useRef, type RefObject } from 'react';
+import { useVirtualizer, type Virtualizer } from '@tanstack/react-virtual';
 import Link from 'next/link';
 import {
   Search,
@@ -334,7 +335,7 @@ function MainContent() {
         <div className="absolute top-40 -left-20 w-72 h-72 bg-blue-300/20 rounded-full blur-3xl pointer-events-none"></div>
 
         {/* Scrollable area */}
-        <div ref={scrollContainerRef} className="flex-1 overflow-y-auto custom-scrollbar relative z-10 pt-14 lg:pt-0">
+        <div ref={scrollContainerRef} data-testid="archive-scroll-container" className="flex-1 overflow-y-auto custom-scrollbar relative z-10 pt-14 lg:pt-0">
 
           {/* Home tab content wrapper: always visible on desktop, only on home tab on mobile */}
           <div className={mobileTab !== 'home' ? 'hidden lg:block' : ''}>
@@ -1066,6 +1067,64 @@ function DesktopActionBar() {
 }
 
 
+function CatalogStatus({ loadState, loadData }: Pick<ArchivePageController, 'loadState' | 'loadData'>) {
+  if (loadState === 'error') {
+    return (
+      /* Song API Load Error State */
+      <div
+        data-testid="song-load-error"
+        className="flex flex-col items-center justify-center py-32 gap-6"
+        style={{ color: 'var(--text-secondary)' }}
+      >
+        <div
+          className="flex items-center justify-center w-16 h-16 rounded-full"
+          style={{ background: 'var(--bg-accent-pink-muted)' }}
+        >
+          <WifiOff className="w-8 h-8" style={{ color: 'var(--accent-pink)' }} />
+        </div>
+        <p
+          className="text-center font-medium max-w-sm"
+          style={{ color: 'var(--text-secondary)', fontSize: 'var(--font-size-base)', lineHeight: 1.6 }}
+        >
+          無法載入歌曲資料，請檢查網路連線後重新整理頁面
+        </p>
+        <button
+          data-testid="retry-button"
+          onClick={loadData}
+          className="font-semibold transition-opacity hover:opacity-90"
+          style={{
+            background: 'linear-gradient(135deg, var(--accent-pink-light), var(--accent-blue-light))',
+            borderRadius: 'var(--radius-pill)',
+            fontSize: 'var(--font-size-sm)',
+            padding: 'var(--space-3) var(--space-6)',
+            color: 'var(--text-on-accent)',
+          }}
+        >
+          重新整理
+        </button>
+      </div>
+    );
+  }
+
+  return (
+    /* Initial catalog loading skeleton — keeps the "no songs" empty
+       state from flashing while data is still in flight */
+    <div data-testid="catalog-loading" aria-busy="true" className="mt-2">
+      {Array.from({ length: 8 }, (_, i) => (
+        <div key={i} className="flex items-center gap-3 px-3 animate-pulse" style={{ height: 56 }}>
+          <div className="w-8" />
+          <div className="w-10 h-10 rounded" style={{ background: 'var(--border-table)', opacity: 0.5 }} />
+          <div className="flex-1 min-w-0">
+            <div className="h-3 rounded mb-2" style={{ background: 'var(--border-table)', width: '40%' }} />
+            <div className="h-3 rounded" style={{ background: 'var(--border-table)', width: '24%', opacity: 0.6 }} />
+          </div>
+        </div>
+      ))}
+    </div>
+  );
+}
+
+
 function SongCatalog() {
   const {
     flattenedSongs,
@@ -1073,25 +1132,36 @@ function SongCatalog() {
     loadState,
     loadData,
     viewMode,
-    songs,
-    hasActiveFilters,
-    clearAllFilters,
-    timelineListRef,
-    timelineVirtualizer,
-    currentTrackId,
-    unavailableVideoIds,
-    isLiked,
-    toggleLike,
-    handlePlayFromFlattened,
-    slug,
-    handleAddToQueue,
-    handleAddToPlaylistSuccess,
-    groupedListRef,
-    groupedVirtualizer,
-    expandedSongs,
-    toggleSongExpansion,
-    handlePlayFromGrouped,
+    mobileTab,
+    scrollContainerRef,
   } = useArchivePageView();
+
+  const isTimelineActive = viewMode === 'timeline' && mobileTab === 'home';
+  const isGroupedActive = viewMode === 'grouped' && mobileTab === 'home';
+
+  const timelineListRef = useRef<HTMLDivElement>(null);
+  const groupedListRef = useRef<HTMLDivElement>(null);
+
+  // Both virtualizers stay mounted here regardless of which view is showing —
+  // only the active one gets a live count. An inactive virtualizer with count
+  // 0 renders nothing. This keeps both instances (and their scroll offsets)
+  // alive across view-mode toggles instead of recreating one from scratch,
+  // which would otherwise reset the shared scroll container back to the top.
+  const timelineVirtualizer = useVirtualizer({
+    count: isTimelineActive ? flattenedSongs.length : 0,
+    getScrollElement: () => scrollContainerRef.current,
+    estimateSize: () => 56,
+    overscan: 15,
+    scrollMargin: timelineListRef.current?.offsetTop ?? 0,
+  });
+
+  const groupedVirtualizer = useVirtualizer({
+    count: isGroupedActive ? groupedSongs.length : 0,
+    getScrollElement: () => scrollContainerRef.current,
+    estimateSize: () => 96,
+    overscan: 10,
+    scrollMargin: groupedListRef.current?.offsetTop ?? 0,
+  });
 
   return (
     <>
@@ -1100,253 +1170,261 @@ function SongCatalog() {
             {/* Always-visible logical counts for E2E tests (virtual scrolling caps DOM nodes) */}
             <span data-testid="total-performance-count" className="sr-only">{flattenedSongs.length}</span>
             <span data-testid="total-song-card-count" className="sr-only">{groupedSongs.length}</span>
-            {loadState === 'error' ? (
-              /* Song API Load Error State */
-              <div
-                data-testid="song-load-error"
-                className="flex flex-col items-center justify-center py-32 gap-6"
-                style={{ color: 'var(--text-secondary)' }}
-              >
-                <div
-                  className="flex items-center justify-center w-16 h-16 rounded-full"
-                  style={{ background: 'var(--bg-accent-pink-muted)' }}
-                >
-                  <WifiOff className="w-8 h-8" style={{ color: 'var(--accent-pink)' }} />
-                </div>
-                <p
-                  className="text-center font-medium max-w-sm"
-                  style={{ color: 'var(--text-secondary)', fontSize: 'var(--font-size-base)', lineHeight: 1.6 }}
-                >
-                  無法載入歌曲資料，請檢查網路連線後重新整理頁面
-                </p>
-                <button
-                  data-testid="retry-button"
-                  onClick={loadData}
-                  className="font-semibold transition-opacity hover:opacity-90"
-                  style={{
-                    background: 'linear-gradient(135deg, var(--accent-pink-light), var(--accent-blue-light))',
-                    borderRadius: 'var(--radius-pill)',
-                    fontSize: 'var(--font-size-sm)',
-                    padding: 'var(--space-3) var(--space-6)',
-                    color: 'var(--text-on-accent)',
-                  }}
-                >
-                  重新整理
-                </button>
-              </div>
-            ) : loadState === 'loading' ? (
-              /* Initial catalog loading skeleton — keeps the "no songs" empty
-                 state from flashing while data is still in flight */
-              <div data-testid="catalog-loading" aria-busy="true" className="mt-2">
-                {Array.from({ length: 8 }, (_, i) => (
-                  <div key={i} className="flex items-center gap-3 px-3 animate-pulse" style={{ height: 56 }}>
-                    <div className="w-8" />
-                    <div className="w-10 h-10 rounded" style={{ background: 'var(--border-table)', opacity: 0.5 }} />
-                    <div className="flex-1 min-w-0">
-                      <div className="h-3 rounded mb-2" style={{ background: 'var(--border-table)', width: '40%' }} />
-                      <div className="h-3 rounded" style={{ background: 'var(--border-table)', width: '24%', opacity: 0.6 }} />
-                    </div>
-                  </div>
-                ))}
-              </div>
+            {loadState === 'error' || loadState === 'loading' ? (
+              <CatalogStatus loadState={loadState} loadData={loadData} />
             ) : viewMode === 'timeline' ? (
-              /* Timeline View */
-              <>
-                {/* SongTableHeader */}
-                <div
-                  className="grid grid-cols-[32px_40px_1fr_60px] lg:grid-cols-[32px_40px_2fr_2fr_100px_60px] gap-0 px-3 py-2 sticky top-[60px] lg:top-[88px] z-10"
-                  style={{
-                    borderBottom: '1px solid var(--border-table)',
-                    background: 'var(--bg-surface-frosted)',
-                    backdropFilter: 'blur(12px)',
-                    WebkitBackdropFilter: 'blur(12px)',
-                  }}
-                >
-                  <div
-                    className="flex items-center justify-center text-center font-bold uppercase tracking-wider"
-                    style={{ color: 'var(--text-tertiary)', fontSize: 'var(--font-size-xs)' }}
-                  >
-                    #
-                  </div>
-                  {/* Album art header spacer */}
-                  <div />
-                  <div
-                    className="flex items-center font-bold uppercase tracking-wider lg:pl-3"
-                    style={{ color: 'var(--text-tertiary)', fontSize: 'var(--font-size-xs)' }}
-                  >
-                    標題
-                  </div>
-                  <div
-                    className="hidden lg:flex items-center font-bold uppercase tracking-wider pl-3"
-                    style={{ color: 'var(--text-tertiary)', fontSize: 'var(--font-size-xs)' }}
-                  >
-                    出處直播
-                  </div>
-                  <div
-                    className="hidden lg:flex items-center font-bold uppercase tracking-wider pl-3"
-                    style={{ color: 'var(--text-tertiary)', fontSize: 'var(--font-size-xs)' }}
-                  >
-                    發布日期
-                  </div>
-                  <div
-                    className="flex items-center justify-center"
-                    style={{ color: 'var(--text-tertiary)' }}
-                  >
-                    <Clock style={{ width: 'var(--icon-sm)', height: 'var(--icon-sm)' }} />
-                  </div>
-                </div>
-
-                <div className="mt-1">
-                  {flattenedSongs.length === 0 ? (
-                    songs.length === 0 && !hasActiveFilters ? (
-                      <div className="py-20 text-center" data-testid="empty-catalog" style={{ color: 'var(--text-tertiary)' }}>
-                        <p className="text-lg font-medium" style={{ color: 'var(--text-secondary)' }}>目前尚無歌曲資料</p>
-                      </div>
-                    ) : (
-                      <div className="py-20 text-center" data-testid="empty-state" style={{ color: 'var(--text-tertiary)' }}>
-                        <p className="text-lg font-medium" style={{ color: 'var(--text-secondary)' }}>找不到符合條件的歌曲</p>
-                        {hasActiveFilters && (
-                          <button
-                            onClick={clearAllFilters}
-                            className="mt-3 text-sm font-medium underline underline-offset-2 transition-colors"
-                            style={{ color: 'var(--accent-pink)' }}
-                            data-testid="clear-filters-empty"
-                          >
-                            清除所有篩選條件
-                          </button>
-                        )}
-                      </div>
-                    )
-                  ) : (
-                    <div
-                      ref={timelineListRef}
-                      style={{
-                        height: `${timelineVirtualizer.getTotalSize()}px`,
-                        width: '100%',
-                        position: 'relative',
-                      }}
-                    >
-                      {timelineVirtualizer.getVirtualItems().map(virtualItem => {
-                        const song = flattenedSongs[virtualItem.index];
-                        return (
-                          <div
-                            key={`${song.id}-${song.performanceId}`}
-                            data-index={virtualItem.index}
-                            ref={timelineVirtualizer.measureElement}
-                            className="hover:z-10 focus-within:z-10"
-                            style={{
-                              position: 'absolute',
-                              top: 0,
-                              left: 0,
-                              width: '100%',
-                              transform: `translateY(${virtualItem.start - (timelineVirtualizer.options.scrollMargin ?? 0)}px)`,
-                            }}
-                          >
-                            <TimelineRow
-                              song={song}
-                              index={virtualItem.index}
-                              isCurrentlyPlaying={currentTrackId === song.performanceId}
-                              isUnavailable={unavailableVideoIds.has(song.videoId)}
-                              isLiked={isLiked(song.performanceId)}
-                              onToggleLike={() => toggleLike({
-                                performanceId: song.performanceId,
-                                songTitle: song.title,
-                                originalArtist: song.originalArtist,
-                                videoId: song.videoId,
-                                timestamp: song.timestamp,
-                                endTimestamp: song.endTimestamp,
-                                albumArtUrl: song.albumArtUrl,
-                              })}
-                              onPlay={handlePlayFromFlattened}
-                              streamerSlug={slug}
-                              onAddToQueue={handleAddToQueue}
-                              onAddToPlaylistSuccess={handleAddToPlaylistSuccess}
-                            />
-                          </div>
-                        );
-                      })}
-                    </div>
-                  )}
-                </div>
-              </>
+              <TimelineSongList virtualizer={timelineVirtualizer} listRef={timelineListRef} />
             ) : (
-              /* Grouped View */
-              <div className="mt-2">
-                {groupedSongs.length === 0 ? (
-                  songs.length === 0 && !hasActiveFilters ? (
-                    <div className="py-20 text-center" data-testid="empty-catalog" style={{ color: 'var(--text-tertiary)' }}>
-                      <p className="text-lg font-medium" style={{ color: 'var(--text-secondary)' }}>目前尚無歌曲資料</p>
-                    </div>
-                  ) : (
-                    <div className="py-20 text-center" data-testid="empty-state" style={{ color: 'var(--text-tertiary)' }}>
-                      <p className="text-lg font-medium" style={{ color: 'var(--text-secondary)' }}>找不到符合條件的歌曲</p>
-                      {hasActiveFilters && (
-                        <button
-                          onClick={clearAllFilters}
-                          className="mt-3 text-sm font-medium underline underline-offset-2 transition-colors"
-                          style={{ color: 'var(--accent-pink)' }}
-                          data-testid="clear-filters-empty"
-                        >
-                          清除所有篩選條件
-                        </button>
-                      )}
-                    </div>
-                  )
-                ) : (
-                  <div
-                    ref={groupedListRef}
-                    style={{
-                      height: `${groupedVirtualizer.getTotalSize()}px`,
-                      width: '100%',
-                      position: 'relative',
-                    }}
-                  >
-                    {groupedVirtualizer.getVirtualItems().map(virtualItem => {
-                      const song = groupedSongs[virtualItem.index];
-                      return (
-                        <div
-                          key={song.id}
-                          data-index={virtualItem.index}
-                          ref={groupedVirtualizer.measureElement}
-                          className="hover:z-10 focus-within:z-10"
-                          style={{
-                            position: 'absolute',
-                            top: 0,
-                            left: 0,
-                            width: '100%',
-                            transform: `translateY(${virtualItem.start - (groupedVirtualizer.options.scrollMargin ?? 0)}px)`,
-                            paddingBottom: '12px',
-                          }}
-                        >
-                          <SongCard
-                            song={song}
-                            isExpanded={expandedSongs.has(song.id)}
-                            onToggleExpand={toggleSongExpansion}
-                            onPlay={handlePlayFromGrouped}
-                            onAddToQueue={handleAddToQueue}
-                            onAddToPlaylistSuccess={handleAddToPlaylistSuccess}
-                            isLiked={isLiked}
-                            onToggleLike={(perf, s) => toggleLike({
-                              performanceId: perf.id,
-                              songTitle: s.title,
-                              originalArtist: s.originalArtist,
-                              videoId: perf.videoId,
-                              timestamp: perf.timestamp,
-                              endTimestamp: perf.endTimestamp ?? undefined,
-                              albumArtUrl: s.albumArtUrl,
-                            })}
-                            unavailableVideoIds={unavailableVideoIds}
-                            streamerSlug={slug}
-                          />
-                        </div>
-                      );
-                    })}
-                  </div>
-                )}
-              </div>
+              <GroupedSongList virtualizer={groupedVirtualizer} listRef={groupedListRef} />
             )}
           </div>
     </>
+  );
+}
+
+
+function TimelineSongList({
+  virtualizer,
+  listRef,
+}: {
+  virtualizer: Virtualizer<HTMLDivElement, Element>;
+  listRef: RefObject<HTMLDivElement | null>;
+}) {
+  const {
+    flattenedSongs,
+    songs,
+    hasActiveFilters,
+    clearAllFilters,
+    currentTrackId,
+    unavailableVideoIds,
+    isLiked,
+    toggleLike,
+    handlePlayFromFlattened,
+    slug,
+    handleAddToQueue,
+    handleAddToPlaylistSuccess,
+  } = useArchivePageView();
+
+  return (
+    <>
+      {/* SongTableHeader */}
+      <div
+        className="grid grid-cols-[32px_40px_1fr_60px] lg:grid-cols-[32px_40px_2fr_2fr_100px_60px] gap-0 px-3 py-2 sticky top-[60px] lg:top-[88px] z-10"
+        style={{
+          borderBottom: '1px solid var(--border-table)',
+          background: 'var(--bg-surface-frosted)',
+          backdropFilter: 'blur(12px)',
+          WebkitBackdropFilter: 'blur(12px)',
+        }}
+      >
+        <div
+          className="flex items-center justify-center text-center font-bold uppercase tracking-wider"
+          style={{ color: 'var(--text-tertiary)', fontSize: 'var(--font-size-xs)' }}
+        >
+          #
+        </div>
+        {/* Album art header spacer */}
+        <div />
+        <div
+          className="flex items-center font-bold uppercase tracking-wider lg:pl-3"
+          style={{ color: 'var(--text-tertiary)', fontSize: 'var(--font-size-xs)' }}
+        >
+          標題
+        </div>
+        <div
+          className="hidden lg:flex items-center font-bold uppercase tracking-wider pl-3"
+          style={{ color: 'var(--text-tertiary)', fontSize: 'var(--font-size-xs)' }}
+        >
+          出處直播
+        </div>
+        <div
+          className="hidden lg:flex items-center font-bold uppercase tracking-wider pl-3"
+          style={{ color: 'var(--text-tertiary)', fontSize: 'var(--font-size-xs)' }}
+        >
+          發布日期
+        </div>
+        <div
+          className="flex items-center justify-center"
+          style={{ color: 'var(--text-tertiary)' }}
+        >
+          <Clock style={{ width: 'var(--icon-sm)', height: 'var(--icon-sm)' }} />
+        </div>
+      </div>
+
+      <div className="mt-1">
+        {flattenedSongs.length === 0 ? (
+          songs.length === 0 && !hasActiveFilters ? (
+            <div className="py-20 text-center" data-testid="empty-catalog" style={{ color: 'var(--text-tertiary)' }}>
+              <p className="text-lg font-medium" style={{ color: 'var(--text-secondary)' }}>目前尚無歌曲資料</p>
+            </div>
+          ) : (
+            <div className="py-20 text-center" data-testid="empty-state" style={{ color: 'var(--text-tertiary)' }}>
+              <p className="text-lg font-medium" style={{ color: 'var(--text-secondary)' }}>找不到符合條件的歌曲</p>
+              {hasActiveFilters && (
+                <button
+                  onClick={clearAllFilters}
+                  className="mt-3 text-sm font-medium underline underline-offset-2 transition-colors"
+                  style={{ color: 'var(--accent-pink)' }}
+                  data-testid="clear-filters-empty"
+                >
+                  清除所有篩選條件
+                </button>
+              )}
+            </div>
+          )
+        ) : (
+          <div
+            ref={listRef}
+            style={{
+              height: `${virtualizer.getTotalSize()}px`,
+              width: '100%',
+              position: 'relative',
+            }}
+          >
+            {virtualizer.getVirtualItems().map(virtualItem => {
+              const song = flattenedSongs[virtualItem.index];
+              return (
+                <div
+                  key={`${song.id}-${song.performanceId}`}
+                  data-index={virtualItem.index}
+                  ref={virtualizer.measureElement}
+                  className="hover:z-10 focus-within:z-10"
+                  style={{
+                    position: 'absolute',
+                    top: 0,
+                    left: 0,
+                    width: '100%',
+                    transform: `translateY(${virtualItem.start - (virtualizer.options.scrollMargin ?? 0)}px)`,
+                  }}
+                >
+                  <TimelineRow
+                    song={song}
+                    index={virtualItem.index}
+                    isCurrentlyPlaying={currentTrackId === song.performanceId}
+                    isUnavailable={unavailableVideoIds.has(song.videoId)}
+                    isLiked={isLiked(song.performanceId)}
+                    onToggleLike={() => toggleLike({
+                      performanceId: song.performanceId,
+                      songTitle: song.title,
+                      originalArtist: song.originalArtist,
+                      videoId: song.videoId,
+                      timestamp: song.timestamp,
+                      endTimestamp: song.endTimestamp,
+                      albumArtUrl: song.albumArtUrl,
+                    })}
+                    onPlay={handlePlayFromFlattened}
+                    streamerSlug={slug}
+                    onAddToQueue={handleAddToQueue}
+                    onAddToPlaylistSuccess={handleAddToPlaylistSuccess}
+                  />
+                </div>
+              );
+            })}
+          </div>
+        )}
+      </div>
+    </>
+  );
+}
+
+
+function GroupedSongList({
+  virtualizer: groupedVirtualizer,
+  listRef: groupedListRef,
+}: {
+  virtualizer: Virtualizer<HTMLDivElement, Element>;
+  listRef: RefObject<HTMLDivElement | null>;
+}) {
+  const {
+    groupedSongs,
+    songs,
+    hasActiveFilters,
+    clearAllFilters,
+    unavailableVideoIds,
+    isLiked,
+    toggleLike,
+    handlePlayFromGrouped,
+    slug,
+    handleAddToQueue,
+    handleAddToPlaylistSuccess,
+    expandedSongs,
+    toggleSongExpansion,
+  } = useArchivePageView();
+
+  return (
+    <div className="mt-2">
+      {groupedSongs.length === 0 ? (
+        songs.length === 0 && !hasActiveFilters ? (
+          <div className="py-20 text-center" data-testid="empty-catalog" style={{ color: 'var(--text-tertiary)' }}>
+            <p className="text-lg font-medium" style={{ color: 'var(--text-secondary)' }}>目前尚無歌曲資料</p>
+          </div>
+        ) : (
+          <div className="py-20 text-center" data-testid="empty-state" style={{ color: 'var(--text-tertiary)' }}>
+            <p className="text-lg font-medium" style={{ color: 'var(--text-secondary)' }}>找不到符合條件的歌曲</p>
+            {hasActiveFilters && (
+              <button
+                onClick={clearAllFilters}
+                className="mt-3 text-sm font-medium underline underline-offset-2 transition-colors"
+                style={{ color: 'var(--accent-pink)' }}
+                data-testid="clear-filters-empty"
+              >
+                清除所有篩選條件
+              </button>
+            )}
+          </div>
+        )
+      ) : (
+        <div
+          ref={groupedListRef}
+          style={{
+            height: `${groupedVirtualizer.getTotalSize()}px`,
+            width: '100%',
+            position: 'relative',
+          }}
+        >
+          {groupedVirtualizer.getVirtualItems().map(virtualItem => {
+            const song = groupedSongs[virtualItem.index];
+            return (
+              <div
+                key={song.id}
+                data-index={virtualItem.index}
+                ref={groupedVirtualizer.measureElement}
+                className="hover:z-10 focus-within:z-10"
+                style={{
+                  position: 'absolute',
+                  top: 0,
+                  left: 0,
+                  width: '100%',
+                  transform: `translateY(${virtualItem.start - (groupedVirtualizer.options.scrollMargin ?? 0)}px)`,
+                  paddingBottom: '12px',
+                }}
+              >
+                <SongCard
+                  song={song}
+                  isExpanded={expandedSongs.has(song.id)}
+                  onToggleExpand={toggleSongExpansion}
+                  onPlay={handlePlayFromGrouped}
+                  onAddToQueue={handleAddToQueue}
+                  onAddToPlaylistSuccess={handleAddToPlaylistSuccess}
+                  isLiked={isLiked}
+                  onToggleLike={(perf, s) => toggleLike({
+                    performanceId: perf.id,
+                    songTitle: s.title,
+                    originalArtist: s.originalArtist,
+                    videoId: perf.videoId,
+                    timestamp: perf.timestamp,
+                    endTimestamp: perf.endTimestamp ?? undefined,
+                    albumArtUrl: s.albumArtUrl,
+                  })}
+                  unavailableVideoIds={unavailableVideoIds}
+                  streamerSlug={slug}
+                />
+              </div>
+            );
+          })}
+        </div>
+      )}
+    </div>
   );
 }
 
@@ -1360,13 +1438,21 @@ function MobileSearchTab() {
     setSelectedArtist,
     allArtists,
     flattenedSongs,
-    mobileSearchListRef,
-    mobileSearchVirtualizer,
+    scrollContainerRef,
     currentTrackId,
     unavailableVideoIds,
     handlePlayFromFlattened,
     slug,
   } = useArchivePageView();
+
+  const mobileSearchListRef = useRef<HTMLDivElement>(null);
+  const mobileSearchVirtualizer = useVirtualizer({
+    count: mobileTab === 'search' ? flattenedSongs.length : 0,
+    getScrollElement: () => scrollContainerRef.current,
+    estimateSize: () => 64,
+    overscan: 15,
+    scrollMargin: mobileSearchListRef.current?.offsetTop ?? 0,
+  });
 
   return (
     <>
