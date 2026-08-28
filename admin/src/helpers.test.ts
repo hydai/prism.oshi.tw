@@ -35,9 +35,31 @@ function paramContext(values: Record<string, string | undefined>) {
   };
 }
 
-assertEqual(getStreamerId(queryContext({})), 'mizuki', 'defaults missing streamer to mizuki');
-assertEqual(getStreamerId(queryContext({ streamer: '' })), 'mizuki', 'defaults empty streamer to mizuki');
 assertEqual(getStreamerId(queryContext({ streamer: 'nagi' })), 'nagi', 'returns provided streamer');
+
+async function testMissingOrInvalidStreamer(): Promise<void> {
+  for (const values of [{}, { streamer: '' }, { streamer: 'Not A Slug' }]) {
+    let streamerError: unknown;
+    try {
+      getStreamerId(queryContext(values));
+    } catch (error) {
+      streamerError = error;
+    }
+
+    if (!(streamerError instanceof HTTPException)) {
+      throw new Error(`getStreamerId(${JSON.stringify(values)}) should throw HTTPException — there is no default streamer`);
+    }
+
+    assertEqual(streamerError.status, 400, 'missing or invalid streamer should be HTTP 400');
+    const streamerResponse = streamerError.getResponse();
+    assertEqual(streamerResponse.status, 400, 'missing or invalid streamer response should be HTTP 400');
+    assertDeepEqual(
+      await streamerResponse.json(),
+      { error: 'Missing or invalid ?streamer= query parameter' },
+      'missing or invalid streamer response names the parameter',
+    );
+  }
+}
 
 assertEqual(getRouteParam(paramContext({ id: 'song-1' }), 'id'), 'song-1', 'returns route param');
 assertEqual(getRouteParam(paramContext({ id: '' }), 'id'), '', 'preserves empty route params');
@@ -140,6 +162,7 @@ console.log('✓ formatSubscriberCount');
 
 async function main(): Promise<void> {
   await testMissingRouteParam();
+  await testMissingOrInvalidStreamer();
   console.log('✓ admin route helpers');
 }
 

@@ -14,6 +14,7 @@ const noop = () => {};
 
 const selectedStream: StreamWithPending = {
   id: 'stream-current',
+  streamerId: 'mizuki',
   title: 'Current Karaoke Stream',
   date: '2026-08-17',
   videoId: 'video-current',

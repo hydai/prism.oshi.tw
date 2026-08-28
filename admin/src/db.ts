@@ -54,6 +54,7 @@ export function performanceFromRow(row: PerformanceRow): Performance {
 export function streamFromRow(row: StreamRow): Stream {
   return {
     id: row.id,
+    streamerId: row.streamer_id,
     title: row.title,
     date: row.date,
     videoId: row.video_id,
@@ -439,6 +440,19 @@ export async function listGlobalWorksPaginated(
   return { works, total, stats, page, pageSize };
 }
 
+/** Tenant check for routes that attach data to an existing song by id. */
+export async function songBelongsToStreamer(
+  db: D1Database,
+  id: string,
+  streamerId: string,
+): Promise<boolean> {
+  const row = await db
+    .prepare('SELECT id FROM songs WHERE id = ? AND streamer_id = ?')
+    .bind(id, streamerId)
+    .first<{ id: string }>();
+  return row !== null;
+}
+
 export async function getSongById(
   db: D1Database,
   id: string,
@@ -707,10 +721,11 @@ export async function listStreams(
 export async function getStreamById(
   db: D1Database,
   id: string,
+  streamerId: string,
 ): Promise<Stream | null> {
   const row = await db
-    .prepare('SELECT * FROM streams WHERE id = ?')
-    .bind(id)
+    .prepare('SELECT * FROM streams WHERE id = ? AND streamer_id = ?')
+    .bind(id, streamerId)
     .first<StreamRow>();
   return row ? streamFromRow(row) : null;
 }
@@ -760,6 +775,7 @@ export async function videoIdExists(
 export async function updateStream(
   db: D1Database,
   id: string,
+  streamerId: string,
   fields: { title?: string; date?: string; videoId?: string; youtubeUrl?: string },
 ): Promise<Stream | null> {
   const streamSets: string[] = [];
@@ -793,12 +809,12 @@ export async function updateStream(
     streamValues.push(fields.youtubeUrl);
   }
 
-  if (streamSets.length === 0) return getStreamById(db, id);
+  if (streamSets.length === 0) return getStreamById(db, id, streamerId);
 
   const statements = [
     db
-      .prepare(`UPDATE streams SET ${streamSets.join(', ')}, updated_at = datetime('now') WHERE id = ?`)
-      .bind(...streamValues, id),
+      .prepare(`UPDATE streams SET ${streamSets.join(', ')}, updated_at = datetime('now') WHERE id = ? AND streamer_id = ?`)
+      .bind(...streamValues, id, streamerId),
   ];
   if (perfSets.length > 0) {
     // Scoped by streamer_id as well: a performance that points at this stream but
@@ -812,7 +828,7 @@ export async function updateStream(
   }
   await db.batch(statements);
 
-  return getStreamById(db, id);
+  return getStreamById(db, id, streamerId);
 }
 
 export async function updateStreamStatus(
@@ -1110,8 +1126,9 @@ export async function deletePerformanceAndOrphanSong(
 export async function getStreamDetail(
   db: D1Database,
   streamId: string,
+  streamerId: string,
 ): Promise<StreamDetail | null> {
-  const stream = await getStreamById(db, streamId);
+  const stream = await getStreamById(db, streamId, streamerId);
   if (!stream) return null;
 
   const performances = await listPerformancesForStream(db, streamId);

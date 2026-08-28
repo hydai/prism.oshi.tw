@@ -566,6 +566,7 @@ async function testDashboardStatsBatchesIndependentReads(): Promise<void> {
   }];
   fakeDb.dashboardRecentStreamRows = [{
     id: 'stream-recent',
+    streamer_id: 'mizuki',
     title: 'Recent Stream',
     date: '2026-01-03',
     video_id: 'video-recent',
@@ -1120,7 +1121,7 @@ async function testUpdateStreamPropagatesCopiesToPerformances(): Promise<void> {
   // performances.stream_title/date/video_id are denormalized copies that the
   // fan-site export reads; editing a stream must move them in the same transaction.
   const fakeDb = new FakeD1Database(null);
-  await updateStream(fakeDb as unknown as D1Database, 'stream-2026-01-01', {
+  await updateStream(fakeDb as unknown as D1Database, 'stream-2026-01-01', 'mizuki', {
     videoId: 'newVideo',
     date: '2026-01-02',
   });
@@ -1140,7 +1141,7 @@ async function testUpdateStreamPropagatesCopiesToPerformances(): Promise<void> {
   assertEqual(perfUpdate?.params[3], 'mizuki', "performance update never crosses into another streamer's rows");
 
   const urlOnly = new FakeD1Database(null);
-  await updateStream(urlOnly as unknown as D1Database, 'stream-2026-01-01', {
+  await updateStream(urlOnly as unknown as D1Database, 'stream-2026-01-01', 'mizuki', {
     youtubeUrl: 'https://www.youtube.com/watch?v=newVideo',
   });
   assertEqual(urlOnly.batchStatements.length, 1, 'youtube_url has no performance copy, so only the stream row is updated');

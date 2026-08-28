@@ -35,6 +35,7 @@ export interface PerformanceRow {
 
 export interface StreamRow {
   id: string;
+  streamer_id: string;
   title: string;
   date: string;
   video_id: string;
@@ -85,6 +86,7 @@ export interface StreamCredit {
 
 export interface Stream {
   id: string;
+  streamerId: string;
   title: string;
   date: string;
   videoId: string;
@@ -114,9 +116,9 @@ export interface UpdateSongBody {
 export interface CreatePerformanceBody {
   songId: string;
   streamId: string;
-  date: string;
-  streamTitle: string;
-  videoId: string;
+  date?: string;
+  streamTitle?: string;
+  videoId?: string;
   timestamp: number;
   endTimestamp?: number | null;
   note?: string;
