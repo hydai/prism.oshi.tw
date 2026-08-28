@@ -1,7 +1,6 @@
 'use client';
 
 import { useState, useMemo, useEffect, useRef, useCallback } from 'react';
-import { useVirtualizer } from '@tanstack/react-virtual';
 import { useStreamer } from '../contexts/StreamerContext';
 import { usePlayer } from '../contexts/PlayerContext';
 import { usePlaylist } from '../contexts/PlaylistContext';
@@ -85,14 +84,6 @@ function useArchivePageController() {
     addToQueue(track);
     setToastMessage('已加入播放佇列');
   }, [addToQueue]);
-
-  const handlePlayAll = () => {
-    const tracks = viewMode === 'timeline'
-      ? followingTracksFromFlattened(flattenedSongs, -1, slug, unavailableVideoIds)
-      : followingTracksFromGrouped(groupedSongs, -1, slug, unavailableVideoIds);
-    if (tracks.length === 0) return;
-    playTrackWithQueue(tracks[0], tracks.slice(1));
-  };
 
   const handleAddToPlaylistSuccess = useCallback(() => {
     setToastMessage('已加入播放清單');
@@ -208,6 +199,15 @@ function useArchivePageController() {
   useEffect(() => { groupedSongsRef.current = groupedSongs; }, [groupedSongs]);
   useEffect(() => { unavailableVideoIdsRef.current = unavailableVideoIds; }, [unavailableVideoIds]);
 
+  // Declared after the memoized lists it closes over: a closure created before them defeats React Compiler memo preservation (react-hooks/preserve-manual-memoization).
+  const handlePlayAll = () => {
+    const tracks = viewMode === 'timeline'
+      ? followingTracksFromFlattened(flattenedSongs, -1, slug, unavailableVideoIds)
+      : followingTracksFromGrouped(groupedSongs, -1, slug, unavailableVideoIds);
+    if (tracks.length === 0) return;
+    playTrackWithQueue(tracks[0], tracks.slice(1));
+  };
+
   // Timeline view + mobile search both render flattenedSongs.
   const handlePlayFromFlattened = useCallback((track: ArchiveTrack) => {
     const list = flattenedSongsRef.current;
@@ -227,40 +227,8 @@ function useArchivePageController() {
     playTrackWithQueue(track, following);
   }, [slug, playTrackWithQueue]);
 
-  // Virtual scrolling refs and virtualizers
+  // The main scroll container — list sections attach their own virtualizers to it
   const scrollContainerRef = useRef<HTMLDivElement>(null);
-  const timelineListRef = useRef<HTMLDivElement>(null);
-  const groupedListRef = useRef<HTMLDivElement>(null);
-  const mobileSearchListRef = useRef<HTMLDivElement>(null);
-
-  // Only activate the virtualizer for the current view to avoid scroll conflicts
-  const isTimelineActive = viewMode === 'timeline' && mobileTab === 'home';
-  const isGroupedActive = viewMode === 'grouped' && mobileTab === 'home';
-  const isMobileSearchActive = mobileTab === 'search';
-
-  const timelineVirtualizer = useVirtualizer({
-    count: isTimelineActive ? flattenedSongs.length : 0,
-    getScrollElement: () => scrollContainerRef.current,
-    estimateSize: () => 56,
-    overscan: 15,
-    scrollMargin: timelineListRef.current?.offsetTop ?? 0,
-  });
-
-  const groupedVirtualizer = useVirtualizer({
-    count: isGroupedActive ? groupedSongs.length : 0,
-    getScrollElement: () => scrollContainerRef.current,
-    estimateSize: () => 96,
-    overscan: 10,
-    scrollMargin: groupedListRef.current?.offsetTop ?? 0,
-  });
-
-  const mobileSearchVirtualizer = useVirtualizer({
-    count: isMobileSearchActive ? flattenedSongs.length : 0,
-    getScrollElement: () => scrollContainerRef.current,
-    estimateSize: () => 64,
-    overscan: 15,
-    scrollMargin: mobileSearchListRef.current?.offsetTop ?? 0,
-  });
 
   return {
     streamerData,
@@ -317,12 +285,6 @@ function useArchivePageController() {
     handlePlayFromFlattened,
     handlePlayFromGrouped,
     scrollContainerRef,
-    timelineListRef,
-    groupedListRef,
-    mobileSearchListRef,
-    timelineVirtualizer,
-    groupedVirtualizer,
-    mobileSearchVirtualizer,
   };
 }
 

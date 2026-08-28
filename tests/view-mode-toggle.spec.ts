@@ -60,4 +60,21 @@ test.describe('archive view mode toggle', () => {
     await expect(page.getByTestId('mobile-view-mode-bar')).toBeHidden();
     await expect(page.getByTestId('view-toggle-timeline')).toBeVisible();
   });
+
+  test('keeps the scroll position when toggling view mode', async ({ page }) => {
+    await page.setViewportSize({ width: 1280, height: 900 });
+    await page.goto('/mizuki');
+
+    const countEl = page.getByTestId('total-performance-count');
+    await expect(countEl).not.toHaveText('0');
+
+    const scrollContainer = page.getByTestId('archive-scroll-container');
+    await scrollContainer.evaluate((element) => { element.scrollTop = 6000; });
+
+    await page.getByTestId('view-toggle-grouped').click();
+    await page.waitForTimeout(300);
+
+    const scrollTop = await scrollContainer.evaluate((element) => element.scrollTop);
+    expect(scrollTop).toBeGreaterThan(1000);
+  });
 });
