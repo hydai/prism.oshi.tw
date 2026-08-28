@@ -2,15 +2,15 @@
 
 import { memo, useMemo } from 'react';
 import { Disc3, ChevronDown, ChevronRight } from 'lucide-react';
-import type { ArchivePerformance, ArchiveSong, ArchiveTrack } from '../types/archive';
+import type { ArchivePerformance, ArchiveSong, PerformanceRef } from '../types/archive';
 import SongVersionsList from './SongVersionsList';
 
 interface SongCardProps {
   song: ArchiveSong;
   isExpanded: boolean;
   onToggleExpand: (songId: string) => void;
-  onPlay: (track: ArchiveTrack) => void;
-  onAddToQueue: (track: ArchiveTrack) => void;
+  onPlay: (track: PerformanceRef) => void;
+  onAddToQueue: (track: PerformanceRef) => void;
   onAddToPlaylistSuccess: () => void;
   isLiked: (performanceId: string) => boolean;
   onToggleLike: (perf: ArchivePerformance, song: ArchiveSong) => void;

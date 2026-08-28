@@ -9,6 +9,7 @@ import {
   getAllArtists,
   getAvailableYears,
   groupSongsByWorkId,
+  pickPerformanceRef,
   sortGroupedSongs,
   sortStreamsByNewest,
   trackFromFlattenedSong,
@@ -255,9 +256,9 @@ assert.deepEqual(
 );
 
 assert.deepEqual(trackFromFlattenedSong(flattened[0]!, "mizuki"), {
-  id: "perf-new",
+  performanceId: "perf-new",
   songId: "song-a",
-  title: "Beta Song",
+  songTitle: "Beta Song",
   originalArtist: "Zeta",
   videoId: "video-new",
   timestamp: 20,
@@ -265,27 +266,27 @@ assert.deepEqual(trackFromFlattenedSong(flattened[0]!, "mizuki"), {
   streamerSlug: "mizuki",
 });
 assert.deepEqual(trackFromPerformance(songs[0]!, songs[0]!.performances[0]!, "mizuki"), {
-  id: "perf-old",
+  performanceId: "perf-old",
   songId: "song-a",
-  title: "Beta Song",
+  songTitle: "Beta Song",
   originalArtist: "Zeta",
   videoId: "video-old",
   timestamp: 10,
-  endTimestamp: undefined,
+  endTimestamp: null,
   streamerSlug: "mizuki",
 });
 
 // followingTracksFromFlattened: 點擊處之後、依清單順序、排除 unavailable
 assert.deepEqual(
-  followingTracksFromFlattened(flattened, 0, "mizuki", new Set()).map((t) => t.id),
+  followingTracksFromFlattened(flattened, 0, "mizuki", new Set()).map((t) => t.performanceId),
   ["perf-no-stream", "perf-old"],
 );
 assert.deepEqual(
-  followingTracksFromFlattened(flattened, -1, "mizuki", new Set()).map((t) => t.id),
+  followingTracksFromFlattened(flattened, -1, "mizuki", new Set()).map((t) => t.performanceId),
   ["perf-new", "perf-no-stream", "perf-old"],
 );
 assert.deepEqual(
-  followingTracksFromFlattened(flattened, 0, "mizuki", new Set(["video-old"])).map((t) => t.id),
+  followingTracksFromFlattened(flattened, 0, "mizuki", new Set(["video-old"])).map((t) => t.performanceId),
   ["perf-no-stream"],
 );
 assert.deepEqual(
@@ -300,11 +301,11 @@ assert.equal(
 // followingTracksFromGrouped: 後續每首取最新演出；無演出的歌跳過；
 // 最新演出 unavailable → 整首排除（不 fallback 舊版本，與播放全部一致）
 assert.deepEqual(
-  followingTracksFromGrouped(grouped, 0, "mizuki", new Set()).map((t) => t.id),
+  followingTracksFromGrouped(grouped, 0, "mizuki", new Set()).map((t) => t.performanceId),
   ["perf-new"],
 );
 assert.deepEqual(
-  followingTracksFromGrouped(grouped, -1, "mizuki", new Set()).map((t) => t.id),
+  followingTracksFromGrouped(grouped, -1, "mizuki", new Set()).map((t) => t.performanceId),
   ["perf-no-stream", "perf-new"],
 );
 assert.deepEqual(followingTracksFromGrouped(grouped, 0, "mizuki", new Set(["video-new"])), []);
@@ -314,5 +315,29 @@ assert.deepEqual(
 );
 // 不可變動輸入陣列（內部 sort 必須複製）
 assert.deepEqual(grouped.map((song) => song.id), ["song-b", "song-a", "song-c"]);
+
+// pickPerformanceRef copies exactly the eight PerformanceRef fields
+const withExtras = {
+  performanceId: "perf-x",
+  songId: "song-x",
+  songTitle: "X",
+  originalArtist: "Y",
+  videoId: "vid",
+  timestamp: 5,
+  endTimestamp: null,
+  streamerSlug: "mizuki",
+  deleted: true,
+  queueEntryId: "q-1",
+};
+assert.deepEqual(pickPerformanceRef(withExtras), {
+  performanceId: "perf-x",
+  songId: "song-x",
+  songTitle: "X",
+  originalArtist: "Y",
+  videoId: "vid",
+  timestamp: 5,
+  endTimestamp: null,
+  streamerSlug: "mizuki",
+});
 
 console.log("✓ archive helpers");

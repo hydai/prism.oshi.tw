@@ -3,6 +3,7 @@
 import { memo } from 'react';
 import { Play } from 'lucide-react';
 import { formatTime } from '../lib/format';
+import type { PerformanceRef } from '../types/archive';
 
 interface MobileSearchRowProps {
   song: {
@@ -16,7 +17,7 @@ interface MobileSearchRowProps {
   };
   isCurrentlyPlaying: boolean;
   isUnavailable: boolean;
-  onPlay: (track: { id: string; songId: string; title: string; originalArtist: string; videoId: string; timestamp: number; endTimestamp?: number; streamerSlug: string }) => void;
+  onPlay: (track: PerformanceRef) => void;
   streamerSlug: string;
 }
 
@@ -37,13 +38,13 @@ function MobileSearchRowInner({ song, isCurrentlyPlaying, isUnavailable, onPlay,
         onClick={() => {
           if (!isUnavailable) {
             onPlay({
-              id: song.performanceId,
+              performanceId: song.performanceId,
               songId: song.id,
-              title: song.title,
+              songTitle: song.title,
               originalArtist: song.originalArtist,
               videoId: song.videoId,
               timestamp: song.timestamp,
-              endTimestamp: song.endTimestamp,
+              endTimestamp: song.endTimestamp ?? null,
               streamerSlug,
             });
           }

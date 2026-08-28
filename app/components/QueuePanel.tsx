@@ -103,14 +103,14 @@ const QueueRow = memo(function QueueRow({
 
       {/* Album Art — 40×40 */}
       <AlbumArt
-        alt={`${track.title} - ${track.originalArtist}`}
+        alt={`${track.songTitle} - ${track.originalArtist}`}
         size={40}
       />
 
       {/* Track Info */}
       <div className="flex-1 min-w-0">
         <div className="font-bold text-white truncate text-sm">
-          {track.title}
+          {track.songTitle}
         </div>
         <div className="text-xs text-white/60 truncate">
           {track.originalArtist}

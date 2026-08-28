@@ -42,14 +42,20 @@ export interface StreamSummary {
   videoId: string;
 }
 
-export interface ArchiveTrack {
-  id: string;
+/**
+ * The one in-memory currency for "a performance to play, like or save".
+ * Field names match the persisted formats (liked songs, recent plays,
+ * playlists, export files) so no disk migration is ever needed.
+ */
+export interface PerformanceRef {
+  performanceId: string;
+  /** May be a legacy placeholder equal to performanceId (entries saved before songId was stored); never use it for lookups without a performanceId fallback. */
   songId: string;
-  title: string;
+  songTitle: string;
   originalArtist: string;
   videoId: string;
   timestamp: number;
-  endTimestamp?: number;
+  endTimestamp: number | null;
   streamerSlug: string;
 }
 

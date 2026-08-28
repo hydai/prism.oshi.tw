@@ -21,20 +21,15 @@ import type {
   YouTubePlayerEventWithData,
   YouTubeReadyEvent,
 } from '../../lib/youtube-iframe';
+import type { PerformanceRef } from '../types/archive';
 
-export interface Track {
-  id: string;
-  songId: string;
-  title: string;
-  originalArtist: string;
-  videoId: string;
-  timestamp: number;
-  endTimestamp?: number;
+export type Track = PerformanceRef & {
+  /** Set by playlists whose performance no longer exists in the archive. */
   deleted?: boolean;
-  streamerSlug: string;
-}
+};
 
-export interface QueueEntry extends Track {
+export interface QueueEntry extends PerformanceRef {
+  deleted?: boolean;
   queueEntryId: string;
 }
 
@@ -534,7 +529,7 @@ function usePlayerController(): PlayerContextType {
   }, []);
 
   const addToAllTracks = useCallback((track: Track) => {
-    setAllTracks(prev => prev.some(t => t.id === track.id) ? prev : [...prev, track]);
+    setAllTracks(prev => prev.some(t => t.performanceId === track.performanceId) ? prev : [...prev, track]);
   }, []);
 
   // Play a track and REPLACE the whole queue with `following` — clicking a song
@@ -545,18 +540,18 @@ function usePlayerController(): PlayerContextType {
     // Covers fast clicks that land before the idle prefetch has run
     ensurePlayerApi();
     const prevTrack = currentTrackRef.current;
-    if (prevTrack && prevTrack.id !== track.id) {
+    if (prevTrack && prevTrack.performanceId !== track.performanceId) {
       setPlayHistory((prev) => [...prev, prevTrack].slice(-PLAY_HISTORY_LIMIT));
     }
     setCurrentTrack(track);
     timeStore.setTime(track.timestamp);
     setQueue(following.map(createQueueEntry));
     setAllTracks((prev) => {
-      const seen = new Set(prev.map((t) => t.id));
+      const seen = new Set(prev.map((t) => t.performanceId));
       const merged = [...prev];
       for (const t of [track, ...following]) {
-        if (!seen.has(t.id)) {
-          seen.add(t.id);
+        if (!seen.has(t.performanceId)) {
+          seen.add(t.performanceId);
           merged.push(t);
         }
       }

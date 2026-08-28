@@ -19,13 +19,13 @@ export default function LikedSongsPanel({ show, onClose, onToast }: LikedSongsPa
   const { slug } = useStreamer();
 
   const toTrack = (v: typeof likedSongs[0]): Track => ({
-    id: v.performanceId,
+    performanceId: v.performanceId,
     songId: v.performanceId,
-    title: v.songTitle,
+    songTitle: v.songTitle,
     originalArtist: v.originalArtist,
     videoId: v.videoId,
     timestamp: v.timestamp,
-    endTimestamp: v.endTimestamp,
+    endTimestamp: v.endTimestamp ?? null,
     streamerSlug: slug,
   });
 

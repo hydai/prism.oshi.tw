@@ -2,7 +2,7 @@
 
 import { usePlayer } from '../contexts/PlayerContext';
 
-function formatDuration(track: { timestamp: number; endTimestamp?: number }): string {
+function formatDuration(track: { timestamp: number; endTimestamp: number | null }): string {
   if (!track.endTimestamp) return '--:--';
   const secs = track.endTimestamp - track.timestamp;
   const m = Math.floor(secs / 60);
@@ -68,7 +68,7 @@ export default function UpNextSection() {
                 className="truncate"
                 style={{ fontSize: '15px', fontWeight: 700, color: 'var(--text-primary)' }}
               >
-                {track.title}
+                {track.songTitle}
               </div>
               <div
                 className="truncate"

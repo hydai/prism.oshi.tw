@@ -4,7 +4,7 @@ import { memo } from 'react';
 import { Play, Disc3, Plus, ExternalLink, Heart } from 'lucide-react';
 import AlbumArt from './AlbumArt';
 import AddToPlaylistDropdown from './AddToPlaylistDropdown';
-import type { ArchiveTrack, FlattenedSong } from '../types/archive';
+import type { FlattenedSong, PerformanceRef } from '../types/archive';
 import { formatTime } from '../lib/format';
 
 interface TimelineRowProps {
@@ -14,21 +14,21 @@ interface TimelineRowProps {
   isUnavailable: boolean;
   isLiked: boolean;
   onToggleLike: () => void;
-  onPlay: (track: ArchiveTrack) => void;
-  onAddToQueue: (track: ArchiveTrack) => void;
+  onPlay: (track: PerformanceRef) => void;
+  onAddToQueue: (track: PerformanceRef) => void;
   onAddToPlaylistSuccess: () => void;
   streamerSlug: string;
 }
 
 function TimelineRowInner({ song, index, isCurrentlyPlaying, isUnavailable, isLiked, onToggleLike, onPlay, onAddToQueue, onAddToPlaylistSuccess, streamerSlug }: TimelineRowProps) {
   const track = {
-    id: song.performanceId,
+    performanceId: song.performanceId,
     songId: song.id,
-    title: song.title,
+    songTitle: song.title,
     originalArtist: song.originalArtist,
     videoId: song.videoId,
     timestamp: song.timestamp,
-    endTimestamp: song.endTimestamp,
+    endTimestamp: song.endTimestamp ?? null,
     streamerSlug,
   };
 

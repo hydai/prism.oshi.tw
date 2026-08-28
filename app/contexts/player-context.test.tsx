@@ -30,7 +30,7 @@ function ContextProbe() {
 
   return (
     <output
-      data-current-track={player.currentTrack?.id ?? 'none'}
+      data-current-track={player.currentTrack?.performanceId ?? 'none'}
       data-is-playing={String(player.isPlaying)}
       data-is-player-ready={String(player.isPlayerReady)}
       data-errors={`${player.playerError ?? 'none'},${player.apiLoadError ?? 'none'}`}

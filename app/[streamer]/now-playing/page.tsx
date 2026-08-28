@@ -35,16 +35,16 @@ export default function NowPlayingPage() {
   const { likedCount, isLiked, toggleLike } = useLikedSongs();
   const { recentCount } = useRecentlyPlayed();
 
-  const liked = currentTrack ? isLiked(currentTrack.id) : false;
+  const liked = currentTrack ? isLiked(currentTrack.performanceId) : false;
   const handleToggleLike = () => {
     if (!currentTrack) return;
     toggleLike({
-      performanceId: currentTrack.id,
-      songTitle: currentTrack.title,
+      performanceId: currentTrack.performanceId,
+      songTitle: currentTrack.songTitle,
       originalArtist: currentTrack.originalArtist,
       videoId: currentTrack.videoId,
       timestamp: currentTrack.timestamp,
-      endTimestamp: currentTrack.endTimestamp,
+      endTimestamp: currentTrack.endTimestamp ?? undefined,
     });
   };
 
@@ -64,7 +64,7 @@ export default function NowPlayingPage() {
     const url = `https://www.youtube.com/watch?v=${currentTrack.videoId}&t=${Math.floor(currentTrack.timestamp)}`;
     if (navigator.share) {
       try {
-        await navigator.share({ title: `${currentTrack.title} - ${currentTrack.originalArtist}`, url });
+        await navigator.share({ title: `${currentTrack.songTitle} - ${currentTrack.originalArtist}`, url });
       } catch {
         // User cancelled share
       }
@@ -171,7 +171,7 @@ export default function NowPlayingPage() {
         <div className="flex-1 flex flex-col items-center justify-center" style={{ padding: '0 32px', gap: '24px' }}>
           {/* Album art */}
           <AlbumArt
-            alt={`${currentTrack.title} - ${currentTrack.originalArtist}`}
+            alt={`${currentTrack.songTitle} - ${currentTrack.originalArtist}`}
             size={320}
             borderRadius={32}
           />
@@ -182,7 +182,7 @@ export default function NowPlayingPage() {
               className="truncate"
               style={{ fontSize: '28px', fontWeight: 700, color: 'var(--text-primary)' }}
             >
-              {currentTrack.title}
+              {currentTrack.songTitle}
             </h1>
             <div className="flex items-center justify-center" style={{ gap: '6px', marginTop: '4px' }}>
               <span style={{ fontSize: '16px', color: 'var(--text-secondary)' }}>
@@ -245,7 +245,7 @@ export default function NowPlayingPage() {
       >
         {/* Album art */}
         <AlbumArt
-          alt={`${currentTrack.title} - ${currentTrack.originalArtist}`}
+          alt={`${currentTrack.songTitle} - ${currentTrack.originalArtist}`}
           size={400}
           borderRadius={24}
         />
@@ -253,7 +253,7 @@ export default function NowPlayingPage() {
         {/* Song info */}
         <div className="text-center">
           <h1 style={{ fontSize: '32px', fontWeight: 700, color: 'var(--text-primary)' }}>
-            {currentTrack.title}
+            {currentTrack.songTitle}
           </h1>
           <div className="flex items-center justify-center" style={{ gap: '6px', marginTop: '6px' }}>
             <span style={{ fontSize: '16px', color: 'var(--text-secondary)' }}>
