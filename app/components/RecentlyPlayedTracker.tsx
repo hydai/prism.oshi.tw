@@ -15,17 +15,17 @@ export default function RecentlyPlayedTracker() {
 
   useEffect(() => {
     if (!currentTrack) return;
-    if (currentTrack.id === lastRecordedId.current) return;
+    if (currentTrack.performanceId === lastRecordedId.current) return;
 
-    lastRecordedId.current = currentTrack.id;
+    lastRecordedId.current = currentTrack.performanceId;
 
     addRecentPlay({
-      performanceId: currentTrack.id,
-      songTitle: currentTrack.title,
+      performanceId: currentTrack.performanceId,
+      songTitle: currentTrack.songTitle,
       originalArtist: currentTrack.originalArtist,
       videoId: currentTrack.videoId,
       timestamp: currentTrack.timestamp,
-      endTimestamp: currentTrack.endTimestamp,
+      endTimestamp: currentTrack.endTimestamp ?? undefined,
     });
   }, [currentTrack, addRecentPlay]);
 

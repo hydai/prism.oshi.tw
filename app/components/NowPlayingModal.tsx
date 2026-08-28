@@ -37,16 +37,16 @@ export default function NowPlayingModal() {
 
   const { isLiked, toggleLike } = useLikedSongs();
 
-  const liked = currentTrack ? isLiked(currentTrack.id) : false;
+  const liked = currentTrack ? isLiked(currentTrack.performanceId) : false;
   const handleToggleLike = () => {
     if (!currentTrack) return;
     toggleLike({
-      performanceId: currentTrack.id,
-      songTitle: currentTrack.title,
+      performanceId: currentTrack.performanceId,
+      songTitle: currentTrack.songTitle,
       originalArtist: currentTrack.originalArtist,
       videoId: currentTrack.videoId,
       timestamp: currentTrack.timestamp,
-      endTimestamp: currentTrack.endTimestamp,
+      endTimestamp: currentTrack.endTimestamp ?? undefined,
     });
   };
 
@@ -108,14 +108,14 @@ export default function NowPlayingModal() {
           {/* Album Art — 300×300 centered */}
           <div className="flex justify-center mb-6">
             <AlbumArt
-              alt={`${currentTrack.title} - ${currentTrack.originalArtist}`}
+              alt={`${currentTrack.songTitle} - ${currentTrack.originalArtist}`}
               size={300}
             />
           </div>
 
           {/* Track Info */}
           <div className="mb-6 text-center">
-            <h3 className="text-2xl font-bold mb-2" style={{ color: 'var(--text-primary)' }}>{currentTrack.title}</h3>
+            <h3 className="text-2xl font-bold mb-2" style={{ color: 'var(--text-primary)' }}>{currentTrack.songTitle}</h3>
             <p className="text-lg" style={{ color: 'var(--text-secondary)' }}>{currentTrack.originalArtist}</p>
             <button
               onClick={handleToggleLike}
@@ -231,11 +231,11 @@ export default function NowPlayingModal() {
                     style={{ borderBottom: index < Math.min(queue.length, 5) - 1 ? '1px solid var(--border-default)' : undefined }}
                   >
                     <AlbumArt
-                      alt={`${track.title} - ${track.originalArtist}`}
+                      alt={`${track.songTitle} - ${track.originalArtist}`}
                       size={40}
                     />
                     <div className="min-w-0 flex-1">
-                      <div className="text-sm font-medium truncate" style={{ color: 'var(--text-primary)' }}>{track.title}</div>
+                      <div className="text-sm font-medium truncate" style={{ color: 'var(--text-primary)' }}>{track.songTitle}</div>
                       <div className="text-xs truncate" style={{ color: 'var(--text-secondary)' }}>{track.originalArtist}</div>
                     </div>
                   </div>

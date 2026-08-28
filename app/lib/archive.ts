@@ -1,8 +1,8 @@
 import type {
   ArchivePerformance,
   ArchiveSong,
-  ArchiveTrack,
   FlattenedSong,
+  PerformanceRef,
   StreamSummary,
 } from "../types/archive";
 
@@ -134,15 +134,28 @@ export function filterGroupedSongs(
   });
 }
 
-export function trackFromFlattenedSong(song: FlattenedSong, streamerSlug: string): ArchiveTrack {
+export function pickPerformanceRef(ref: PerformanceRef): PerformanceRef {
   return {
-    id: song.performanceId,
+    performanceId: ref.performanceId,
+    songId: ref.songId,
+    songTitle: ref.songTitle,
+    originalArtist: ref.originalArtist,
+    videoId: ref.videoId,
+    timestamp: ref.timestamp,
+    endTimestamp: ref.endTimestamp,
+    streamerSlug: ref.streamerSlug,
+  };
+}
+
+export function trackFromFlattenedSong(song: FlattenedSong, streamerSlug: string): PerformanceRef {
+  return {
+    performanceId: song.performanceId,
     songId: song.id,
-    title: song.title,
+    songTitle: song.title,
     originalArtist: song.originalArtist,
     videoId: song.videoId,
     timestamp: song.timestamp,
-    endTimestamp: song.endTimestamp,
+    endTimestamp: song.endTimestamp ?? null,
     streamerSlug,
   };
 }
@@ -151,15 +164,15 @@ export function trackFromPerformance(
   song: ArchiveSong,
   performance: ArchivePerformance,
   streamerSlug: string,
-): ArchiveTrack {
+): PerformanceRef {
   return {
-    id: performance.id,
+    performanceId: performance.id,
     songId: song.id,
-    title: song.title,
+    songTitle: song.title,
     originalArtist: song.originalArtist,
     videoId: performance.videoId,
     timestamp: performance.timestamp,
-    endTimestamp: performance.endTimestamp ?? undefined,
+    endTimestamp: performance.endTimestamp ?? null,
     streamerSlug,
   };
 }
@@ -178,8 +191,8 @@ export function followingTracksFromFlattened(
   clickedIndex: number,
   streamerSlug: string,
   unavailableVideoIds: Set<string>,
-): ArchiveTrack[] {
-  const tracks: ArchiveTrack[] = [];
+): PerformanceRef[] {
+  const tracks: PerformanceRef[] = [];
   for (const song of songs.slice(clickedIndex + 1)) {
     if (!unavailableVideoIds.has(song.videoId)) {
       tracks.push(trackFromFlattenedSong(song, streamerSlug));
@@ -196,7 +209,7 @@ export function followingTracksFromGrouped(
   clickedSongIndex: number,
   streamerSlug: string,
   unavailableVideoIds: Set<string>,
-): ArchiveTrack[] {
+): PerformanceRef[] {
   return songs.slice(clickedSongIndex + 1).flatMap((song) => {
     const latest = latestPerformance(song);
     if (!latest || unavailableVideoIds.has(latest.videoId)) return [];

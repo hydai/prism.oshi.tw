@@ -86,12 +86,12 @@ export default function DesktopMiniPlayer({
           className="flex flex-shrink-0 items-center gap-3 text-left"
           style={{ width: '280px' }}
           onClick={onOpenPlayer}
-          aria-label={`開啟正在播放：${currentTrack.title}`}
+          aria-label={`開啟正在播放：${currentTrack.songTitle}`}
           aria-describedby={playerError ? playerErrorId : undefined}
         >
           {/* Album cover thumbnail — 48×48 desktop */}
           <AlbumArt
-            alt={`${currentTrack.title} - ${currentTrack.originalArtist}`}
+            alt={`${currentTrack.songTitle} - ${currentTrack.originalArtist}`}
             size={48}
           />
 
@@ -101,7 +101,7 @@ export default function DesktopMiniPlayer({
               className="font-bold truncate"
               style={{ fontSize: 'var(--font-size-sm)', fontWeight: 500, color: 'var(--text-primary)' }}
             >
-              {currentTrack.title}
+              {currentTrack.songTitle}
             </div>
             {playerError ? (
               <div

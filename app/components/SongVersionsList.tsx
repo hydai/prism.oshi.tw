@@ -1,15 +1,15 @@
 'use client';
 
 import { ExternalLink, Heart, Play, Plus } from 'lucide-react';
-import type { ArchivePerformance, ArchiveSong, ArchiveTrack } from '../types/archive';
+import type { ArchivePerformance, ArchiveSong, PerformanceRef } from '../types/archive';
 import { formatTime } from '../lib/format';
 import AddToPlaylistDropdown from './AddToPlaylistDropdown';
 
 interface SongVersionsListProps {
   song: ArchiveSong;
   performances: ArchivePerformance[];
-  onPlay: (track: ArchiveTrack) => void;
-  onAddToQueue: (track: ArchiveTrack) => void;
+  onPlay: (track: PerformanceRef) => void;
+  onAddToQueue: (track: PerformanceRef) => void;
   onAddToPlaylistSuccess: () => void;
   isLiked: (performanceId: string) => boolean;
   onToggleLike: (performance: ArchivePerformance, song: ArchiveSong) => void;
@@ -57,13 +57,13 @@ export default function SongVersionsList({
               onClick={() => {
                 if (!unavailableVideoIds.has(performance.videoId)) {
                   onPlay({
-                    id: performance.id,
+                    performanceId: performance.id,
                     songId: song.id,
-                    title: song.title,
+                    songTitle: song.title,
                     originalArtist: song.originalArtist,
                     videoId: performance.videoId,
                     timestamp: performance.timestamp,
-                    endTimestamp: performance.endTimestamp ?? undefined,
+                    endTimestamp: performance.endTimestamp ?? null,
                     streamerSlug,
                   });
                 }
@@ -93,13 +93,13 @@ export default function SongVersionsList({
               onClick={() => {
                 if (!unavailableVideoIds.has(performance.videoId)) {
                   onPlay({
-                    id: performance.id,
+                    performanceId: performance.id,
                     songId: song.id,
-                    title: song.title,
+                    songTitle: song.title,
                     originalArtist: song.originalArtist,
                     videoId: performance.videoId,
                     timestamp: performance.timestamp,
-                    endTimestamp: performance.endTimestamp ?? undefined,
+                    endTimestamp: performance.endTimestamp ?? null,
                     streamerSlug,
                   });
                 }
@@ -174,13 +174,13 @@ export default function SongVersionsList({
             </button>
             <button
               onClick={() => onAddToQueue({
-                id: performance.id,
+                performanceId: performance.id,
                 songId: song.id,
-                title: song.title,
+                songTitle: song.title,
                 originalArtist: song.originalArtist,
                 videoId: performance.videoId,
                 timestamp: performance.timestamp,
-                endTimestamp: performance.endTimestamp ?? undefined,
+                endTimestamp: performance.endTimestamp ?? null,
                 streamerSlug,
               })}
               className="opacity-0 group-hover/version:opacity-100 transition-[opacity,transform] transform hover:scale-110"

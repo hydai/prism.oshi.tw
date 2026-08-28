@@ -31,13 +31,13 @@ export default function RecentlyPlayedPanel({ show, onClose, onToast }: Recently
   const { slug } = useStreamer();
 
   const toTrack = (r: typeof recentPlays[0]): Track => ({
-    id: r.performanceId,
+    performanceId: r.performanceId,
     songId: r.performanceId,
-    title: r.songTitle,
+    songTitle: r.songTitle,
     originalArtist: r.originalArtist,
     videoId: r.videoId,
     timestamp: r.timestamp,
-    endTimestamp: r.endTimestamp,
+    endTimestamp: r.endTimestamp ?? null,
     streamerSlug: slug,
   });
 

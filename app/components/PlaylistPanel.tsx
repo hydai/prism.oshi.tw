@@ -63,13 +63,13 @@ export default function PlaylistPanel({ show, onClose, songsData, onToast }: Pla
     if (playlist.versions.length === 0) return;
 
     const tracks: Track[] = playlist.versions.map(v => ({
-      id: v.performanceId,
+      performanceId: v.performanceId,
       songId: v.performanceId,
-      title: v.songTitle,
+      songTitle: v.songTitle,
       originalArtist: v.originalArtist,
       videoId: v.videoId,
       timestamp: v.timestamp,
-      endTimestamp: v.endTimestamp,
+      endTimestamp: v.endTimestamp ?? null,
       deleted: !checkVersionExists(v.performanceId),
       streamerSlug: v.streamerSlug,
     }));

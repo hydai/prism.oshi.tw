@@ -35,16 +35,16 @@ export default function MiniPlayer() {
   const pageSlug = pathname?.split('/')[1] || '';
   const isNowPlayingPage = pathname?.endsWith('/now-playing');
 
-  const liked = currentTrack ? isLiked(currentTrack.id) : false;
+  const liked = currentTrack ? isLiked(currentTrack.performanceId) : false;
   const handleToggleLike = () => {
     if (!currentTrack) return;
     toggleLike({
-      performanceId: currentTrack.id,
-      songTitle: currentTrack.title,
+      performanceId: currentTrack.performanceId,
+      songTitle: currentTrack.songTitle,
       originalArtist: currentTrack.originalArtist,
       videoId: currentTrack.videoId,
       timestamp: currentTrack.timestamp,
-      endTimestamp: currentTrack.endTimestamp,
+      endTimestamp: currentTrack.endTimestamp ?? undefined,
     });
   };
 
@@ -124,12 +124,12 @@ export default function MiniPlayer() {
             className="flex min-w-0 flex-1 items-center text-left"
             style={{ gap: '12px' }}
             onClick={() => setShowModal(true)}
-            aria-label={`開啟正在播放：${currentTrack.title}`}
+            aria-label={`開啟正在播放：${currentTrack.songTitle}`}
             aria-describedby={playerError ? playerErrorId : undefined}
           >
             {/* Cover thumbnail — 40×40 */}
             <AlbumArt
-              alt={`${currentTrack.title} - ${currentTrack.originalArtist}`}
+              alt={`${currentTrack.songTitle} - ${currentTrack.originalArtist}`}
               size={40}
             />
 
@@ -139,7 +139,7 @@ export default function MiniPlayer() {
                 className="truncate"
                 style={{ fontSize: '13px', fontWeight: 600, color: 'var(--text-primary)' }}
               >
-                {currentTrack.title}
+                {currentTrack.songTitle}
               </div>
               <div
                 className="truncate"

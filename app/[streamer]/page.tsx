@@ -21,10 +21,10 @@ import {
 import { loadArchiveData, type ArchiveLoadState } from '../lib/archive-loader';
 import type {
   ArchiveSong,
-  ArchiveTrack,
   ArchiveViewMode,
   FlattenedSong,
   MobileArchiveTab,
+  PerformanceRef,
   StreamSummary,
 } from '../types/archive';
 import ArchivePageView from './ArchivePageView';
@@ -75,12 +75,12 @@ function useArchivePageController() {
   }, [loadData]);
 
   const { currentTrack, playTrackWithQueue, addToQueue, apiLoadError, unavailableVideoIds, timestampWarning, clearTimestampWarning, skipNotification, clearSkipNotification, shuffleOn, toggleShuffle } = usePlayer();
-  const currentTrackId = currentTrack?.id ?? null;
+  const currentTrackId = currentTrack?.performanceId ?? null;
   const { playlists, storageError, clearStorageError } = usePlaylist();
   const { likedCount, isLiked, toggleLike } = useLikedSongs();
   const { recentCount } = useRecentlyPlayed();
 
-  const handleAddToQueue = useCallback((track: ArchiveTrack) => {
+  const handleAddToQueue = useCallback((track: PerformanceRef) => {
     addToQueue(track);
     setToastMessage('已加入播放佇列');
   }, [addToQueue]);
@@ -209,16 +209,16 @@ function useArchivePageController() {
   };
 
   // Timeline view + mobile search both render flattenedSongs.
-  const handlePlayFromFlattened = useCallback((track: ArchiveTrack) => {
+  const handlePlayFromFlattened = useCallback((track: PerformanceRef) => {
     const list = flattenedSongsRef.current;
-    const index = list.findIndex((s) => s.performanceId === track.id);
+    const index = list.findIndex((s) => s.performanceId === track.performanceId);
     const following = index === -1
       ? [] // clicked row no longer in the current list — play it alone
       : followingTracksFromFlattened(list, index, slug, unavailableVideoIdsRef.current);
     playTrackWithQueue(track, following);
   }, [slug, playTrackWithQueue]);
 
-  const handlePlayFromGrouped = useCallback((track: ArchiveTrack) => {
+  const handlePlayFromGrouped = useCallback((track: PerformanceRef) => {
     const list = groupedSongsRef.current;
     const index = list.findIndex((s) => s.id === track.songId);
     const following = index === -1
