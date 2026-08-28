@@ -100,7 +100,6 @@ export default function RecentlyPlayedPanel({ show, onClose, onToast }: Recently
                   data-testid="recently-played-item"
                 >
                   <AlbumArt
-                    src={entry.albumArtUrl}
                     alt={`${entry.songTitle} - ${entry.originalArtist}`}
                     size={40}
                   />

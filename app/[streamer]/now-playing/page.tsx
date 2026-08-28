@@ -172,7 +172,6 @@ export default function NowPlayingPage() {
         <div className="flex-1 flex flex-col items-center justify-center" style={{ padding: '0 32px', gap: '24px' }}>
           {/* Album art */}
           <AlbumArt
-            src={currentTrack.albumArtUrl}
             alt={`${currentTrack.title} - ${currentTrack.originalArtist}`}
             size={320}
             borderRadius={32}
@@ -247,7 +246,6 @@ export default function NowPlayingPage() {
       >
         {/* Album art */}
         <AlbumArt
-          src={currentTrack.albumArtUrl}
           alt={`${currentTrack.title} - ${currentTrack.originalArtist}`}
           size={400}
           borderRadius={24}

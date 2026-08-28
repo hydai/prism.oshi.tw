@@ -103,7 +103,6 @@ const QueueRow = memo(function QueueRow({
 
       {/* Album Art — 40×40 */}
       <AlbumArt
-        src={track.albumArtUrl}
         alt={`${track.title} - ${track.originalArtist}`}
         size={40}
       />

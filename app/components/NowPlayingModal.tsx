@@ -109,7 +109,6 @@ export default function NowPlayingModal() {
           {/* Album Art — 300×300 centered */}
           <div className="flex justify-center mb-6">
             <AlbumArt
-              src={currentTrack.albumArtUrl}
               alt={`${currentTrack.title} - ${currentTrack.originalArtist}`}
               size={300}
             />
@@ -233,7 +232,6 @@ export default function NowPlayingModal() {
                     style={{ borderBottom: index < Math.min(queue.length, 5) - 1 ? '1px solid var(--border-default)' : undefined }}
                   >
                     <AlbumArt
-                      src={track.albumArtUrl}
                       alt={`${track.title} - ${track.originalArtist}`}
                       size={40}
                     />

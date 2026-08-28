@@ -130,7 +130,6 @@ export default function MiniPlayer() {
           >
             {/* Cover thumbnail — 40×40 */}
             <AlbumArt
-              src={currentTrack.albumArtUrl}
               alt={`${currentTrack.title} - ${currentTrack.originalArtist}`}
               size={40}
             />

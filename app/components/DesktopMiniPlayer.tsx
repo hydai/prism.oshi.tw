@@ -91,7 +91,6 @@ export default function DesktopMiniPlayer({
         >
           {/* Album cover thumbnail — 48×48 desktop */}
           <AlbumArt
-            src={currentTrack.albumArtUrl}
             alt={`${currentTrack.title} - ${currentTrack.originalArtist}`}
             size={48}
           />
