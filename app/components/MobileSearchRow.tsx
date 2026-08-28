@@ -13,11 +13,10 @@ interface MobileSearchRowProps {
     videoId: string;
     timestamp: number;
     endTimestamp?: number;
-    albumArtUrl?: string;
   };
   isCurrentlyPlaying: boolean;
   isUnavailable: boolean;
-  onPlay: (track: { id: string; songId: string; title: string; originalArtist: string; videoId: string; timestamp: number; endTimestamp?: number; albumArtUrl?: string; streamerSlug: string }) => void;
+  onPlay: (track: { id: string; songId: string; title: string; originalArtist: string; videoId: string; timestamp: number; endTimestamp?: number; streamerSlug: string }) => void;
   streamerSlug: string;
 }
 
@@ -45,7 +44,6 @@ function MobileSearchRowInner({ song, isCurrentlyPlaying, isUnavailable, onPlay,
               videoId: song.videoId,
               timestamp: song.timestamp,
               endTimestamp: song.endTimestamp,
-              albumArtUrl: song.albumArtUrl,
               streamerSlug,
             });
           }

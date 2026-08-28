@@ -64,7 +64,6 @@ export default function SongVersionsList({
                     videoId: performance.videoId,
                     timestamp: performance.timestamp,
                     endTimestamp: performance.endTimestamp ?? undefined,
-                    albumArtUrl: song.albumArtUrl,
                     streamerSlug,
                   });
                 }
@@ -101,7 +100,6 @@ export default function SongVersionsList({
                     videoId: performance.videoId,
                     timestamp: performance.timestamp,
                     endTimestamp: performance.endTimestamp ?? undefined,
-                    albumArtUrl: song.albumArtUrl,
                     streamerSlug,
                   });
                 }
@@ -183,7 +181,6 @@ export default function SongVersionsList({
                 videoId: performance.videoId,
                 timestamp: performance.timestamp,
                 endTimestamp: performance.endTimestamp ?? undefined,
-                albumArtUrl: song.albumArtUrl,
                 streamerSlug,
               })}
               className="opacity-0 group-hover/version:opacity-100 transition-[opacity,transform] transform hover:scale-110"

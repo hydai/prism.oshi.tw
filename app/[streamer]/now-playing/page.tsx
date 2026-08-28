@@ -45,7 +45,6 @@ export default function NowPlayingPage() {
       videoId: currentTrack.videoId,
       timestamp: currentTrack.timestamp,
       endTimestamp: currentTrack.endTimestamp,
-      albumArtUrl: currentTrack.albumArtUrl,
     });
   };
 

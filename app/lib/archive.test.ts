@@ -22,7 +22,6 @@ const songs: ArchiveSong[] = [
     title: "Beta Song",
     originalArtist: "Zeta",
     tags: ["rock"],
-    albumArtUrl: "old-art",
     performances: [
       {
         id: "perf-old",
@@ -145,7 +144,6 @@ const workIdSongs: ArchiveSong[] = [
     title: "Shared Song (legacy spelling)",
     originalArtist: "Shared Artist",
     tags: ["acoustic"],
-    albumArtUrl: "shared-art",
     performances: [
       {
         id: "perf-shared-z",
@@ -204,7 +202,6 @@ const sharedWork = groupedByWorkId.find((song) => song.workId === "work-shared")
 assert.equal(groupedByWorkId.length, 4);
 assert.equal(sharedWork?.id, "song-shared-a");
 assert.equal(sharedWork?.title, "Shared Song");
-assert.equal(sharedWork?.albumArtUrl, "shared-art");
 assert.deepEqual(sharedWork?.tags, ["ballad", "acoustic"]);
 assert.deepEqual(
   sharedWork?.performances.map((performance) => performance.id),
@@ -265,7 +262,6 @@ assert.deepEqual(trackFromFlattenedSong(flattened[0]!, "mizuki"), {
   videoId: "video-new",
   timestamp: 20,
   endTimestamp: 50,
-  albumArtUrl: "old-art",
   streamerSlug: "mizuki",
 });
 assert.deepEqual(trackFromPerformance(songs[0]!, songs[0]!.performances[0]!, "mizuki"), {
@@ -276,7 +272,6 @@ assert.deepEqual(trackFromPerformance(songs[0]!, songs[0]!.performances[0]!, "mi
   videoId: "video-old",
   timestamp: 10,
   endTimestamp: undefined,
-  albumArtUrl: "old-art",
   streamerSlug: "mizuki",
 });
 
