@@ -3,6 +3,7 @@ import type { Dispatch } from 'react';
 import type { AuthUser, NovaSubmission, NovaStatus, BulkFetchSubscribersResponse } from '../../../shared/types';
 import { sanitizeNovaUrl } from '../../../shared/nova-url-safety';
 import { api } from '../api/client';
+import { useApiResource, errorMessage } from '../lib/apiResource';
 import { countByStatus, removeById, replaceById } from '../lib/status-totals';
 import { useSearchParams } from 'react-router-dom';
 import { finiteInputNumber } from '../lib/numeric-input';
@@ -48,11 +49,6 @@ function isCanonicalUtcTimestamp(value: string | null): value is string {
 
 export default function NovaSubmissions({ user }: { user: AuthUser }) {
   const [initialParams] = useSearchParams();
-  const [submissions, setSubmissions] = useState<NovaSubmission[]>([]);
-  // Unfiltered copy for the hero totals; kept in sync with the same by-id updates.
-  const [allSubmissions, setAllSubmissions] = useState<NovaSubmission[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
   const [statusFilter, setStatusFilter] = useState<'' | NovaStatus>(() => {
     const requested = initialParams.get('status');
     return requested === 'approved' || requested === 'rejected' || requested === 'pending'
@@ -63,27 +59,23 @@ export default function NovaSubmissions({ user }: { user: AuthUser }) {
   const [expandedId, setExpandedId] = useState<string | null>(null);
   const [rejectNote, setRejectNote] = useState<Record<string, string>>({});
   const [actionLoading, setActionLoading] = useState<string | null>(null);
+  const [actionError, setActionError] = useState<string | null>(null);
   const [fetchingAll, setFetchingAll] = useState(false);
   const [fetchAllResult, setFetchAllResult] = useState<BulkFetchSubscribersResponse | null>(null);
 
-  const fetchSubmissions = () => {
-    setLoading(true);
-    Promise.all([
-      api.listNovaSubmissions({ status: statusFilter || undefined, search: search || undefined }),
-      api.listNovaSubmissions(),
-    ])
-      .then(([res, all]) => {
-        setSubmissions(res.data);
-        setAllSubmissions(all.data);
-      })
-      .catch((err: unknown) => setError(err instanceof Error ? err.message : 'Failed to load'))
-      .finally(() => setLoading(false));
-  };
-
-  useEffect(() => {
-    fetchSubmissions();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [statusFilter]);
+  const list = useApiResource(
+    async () => {
+      const [res, all] = await Promise.all([
+        api.listNovaSubmissions({ status: statusFilter || undefined, search: search || undefined }),
+        api.listNovaSubmissions(),
+      ]);
+      return { submissions: res.data, allSubmissions: all.data };
+    },
+    [statusFilter],
+  );
+  const submissions = list.data?.submissions ?? [];
+  const allSubmissions = list.data?.allSubmissions ?? [];
+  const loading = list.loading;
 
   const handleAction = async (id: string, status: NovaStatus) => {
     setActionLoading(id);
@@ -92,15 +84,14 @@ export default function NovaSubmissions({ user }: { user: AuthUser }) {
         status,
         reviewer_note: status === 'rejected' ? rejectNote[id] : undefined,
       });
-      setSubmissions((prev) => replaceById(prev, updated));
-      setAllSubmissions((prev) => replaceById(prev, updated));
+      list.mutate(({ submissions, allSubmissions }) => ({ submissions: replaceById(submissions, updated), allSubmissions: replaceById(allSubmissions, updated) }));
       setRejectNote((prev) => {
         const next = { ...prev };
         delete next[id];
         return next;
       });
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Action failed');
+      setActionError(errorMessage(err, 'Action failed'));
     } finally {
       setActionLoading(null);
     }
@@ -111,18 +102,16 @@ export default function NovaSubmissions({ user }: { user: AuthUser }) {
     setActionLoading(sub.id);
     try {
       await api.deleteNovaSubmission(sub.id);
-      setSubmissions((prev) => removeById(prev, sub.id));
-      setAllSubmissions((prev) => removeById(prev, sub.id));
+      list.mutate(({ submissions, allSubmissions }) => ({ submissions: removeById(submissions, sub.id), allSubmissions: removeById(allSubmissions, sub.id) }));
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Delete failed');
+      setActionError(errorMessage(err, 'Delete failed'));
     } finally {
       setActionLoading(null);
     }
   };
 
   const handleSave = (updated: NovaSubmission) => {
-    setSubmissions((prev) => replaceById(prev, updated));
-    setAllSubmissions((prev) => replaceById(prev, updated));
+    list.mutate(({ submissions, allSubmissions }) => ({ submissions: replaceById(submissions, updated), allSubmissions: replaceById(allSubmissions, updated) }));
   };
 
   const handleFetchAll = async () => {
@@ -131,9 +120,9 @@ export default function NovaSubmissions({ user }: { user: AuthUser }) {
     try {
       const result = await api.fetchAllNovaSubscribers();
       setFetchAllResult(result);
-      fetchSubmissions();
+      list.reload();
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Bulk fetch failed');
+      setActionError(errorMessage(err, 'Bulk fetch failed'));
     } finally {
       setFetchingAll(false);
     }
@@ -171,7 +160,7 @@ export default function NovaSubmissions({ user }: { user: AuthUser }) {
           <form
             onSubmit={(event) => {
               event.preventDefault();
-              fetchSubmissions();
+              list.reload();
             }}
           >
             <SearchInput
@@ -217,7 +206,8 @@ export default function NovaSubmissions({ user }: { user: AuthUser }) {
           </GlassCard>
         )}
 
-        {error && <p className="mt-4 text-sm text-red-600">{error}</p>}
+        {list.error && <p className="mt-4 text-sm text-red-600">{list.error}</p>}
+        {actionError && <p className="mt-4 text-sm text-red-600">{actionError}</p>}
 
         {loading ? (
           <p className="py-6 text-center text-sm text-token-secondary">Loading...</p>

@@ -1,7 +1,8 @@
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 import { Link } from 'react-router-dom';
-import type { Song, AuthUser, Status } from '../../../shared/types';
+import type { AuthUser, Status } from '../../../shared/types';
 import { api } from '../api/client';
+import { useApiResource } from '../lib/apiResource';
 import StatusBadge from '../components/StatusBadge';
 
 type SortKey = 'title' | 'originalArtist' | 'status' | 'createdAt';
@@ -38,42 +39,30 @@ function SortHeader({
 }
 
 export default function SongsList({ user }: { user: AuthUser }) {
-  const [songs, setSongs] = useState<Song[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
   const [search, setSearch] = useState('');
   const [submittedSearch, setSubmittedSearch] = useState('');
   const [statusFilter, setStatusFilter] = useState<'' | Status>('');
   const [sortKey, setSortKey] = useState<SortKey>('createdAt');
   const [sortDir, setSortDir] = useState<SortDir>('desc');
   const [page, setPage] = useState(1);
-  const [total, setTotal] = useState(0);
-  const [totalPages, setTotalPages] = useState(0);
 
-  const fetchSongs = () => {
-    setLoading(true);
-    api
-      .listSongs({
+  const list = useApiResource(
+    () =>
+      api.listSongs({
         status: statusFilter || undefined,
         search: submittedSearch || undefined,
         page,
         pageSize: PAGE_SIZE,
         sortBy: sortKey,
         sortDir,
-      })
-      .then((res) => {
-        setSongs(res.data);
-        setTotal(res.total);
-        setTotalPages(res.totalPages);
-      })
-      .catch((err: unknown) => setError(err instanceof Error ? err.message : 'Failed to load'))
-      .finally(() => setLoading(false));
-  };
-
-  useEffect(() => {
-    fetchSongs();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [statusFilter, submittedSearch, page, sortKey, sortDir]);
+      }),
+    [statusFilter, submittedSearch, page, sortKey, sortDir],
+  );
+  const songs = list.data?.data ?? [];
+  const total = list.data?.total ?? 0;
+  const totalPages = list.data?.totalPages ?? 0;
+  const loading = list.loading;
+  const error = list.error;
 
   const handleSearch = (e: React.FormEvent) => {
     e.preventDefault();
@@ -99,7 +88,7 @@ export default function SongsList({ user }: { user: AuthUser }) {
   const handleStatus = async (id: string, status: Status) => {
     try {
       const updated = await api.updateSongStatus(id, { status });
-      setSongs((prev) => prev.map((s) => (s.id === id ? updated : s)));
+      list.mutate((res) => ({ ...res, data: res.data.map((s) => (s.id === id ? updated : s)) }));
     } catch {
       // Silently fail — user will see the unchanged state
     }

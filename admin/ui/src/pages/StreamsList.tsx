@@ -1,7 +1,8 @@
 import { useEffect, useState, useMemo } from 'react';
 import { Link, useSearchParams } from 'react-router-dom';
-import type { Stream, AuthUser, Status } from '../../../shared/types';
+import type { AuthUser, Status } from '../../../shared/types';
 import { api, getCurrentStreamer, setCurrentStreamer } from '../api/client';
+import { useApiResource } from '../lib/apiResource';
 import StatusBadge from '../components/StatusBadge';
 import { loadStreamsFilter, saveStreamsFilter, resolveYear } from '../lib/streamsFilter';
 
@@ -76,9 +77,6 @@ function SortHeader({
 export default function StreamsList({ user }: { user: AuthUser }) {
   const [initialParams] = useSearchParams();
   const requestedStreamer = initialParams.get('streamer');
-  const [streams, setStreams] = useState<Stream[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
   const [search, setSearch] = useState(() => initialParams.get('search') ?? '');
   const [statusFilter, setStatusFilter] = useState<'' | Status>(() => {
     const requested = initialParams.get('status');
@@ -90,28 +88,24 @@ export default function StreamsList({ user }: { user: AuthUser }) {
   const [sortKey, setSortKey] = useState<SortKey>('date');
   const [sortDir, setSortDir] = useState<SortDir>('desc');
 
-  const fetchStreams = () => {
-    setLoading(true);
-    api
-      .listStreams({
-        status: statusFilter || undefined,
-        search: search || undefined,
-      })
-      .then((res) => setStreams(res.data))
-      .catch((err: unknown) => setError(err instanceof Error ? err.message : 'Failed to load'))
-      .finally(() => setLoading(false));
-  };
-
   useEffect(() => {
     if (requestedStreamer && requestedStreamer !== getCurrentStreamer()) {
       setCurrentStreamer(requestedStreamer);
     }
   }, [requestedStreamer]);
 
-  useEffect(() => {
-    fetchStreams();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [statusFilter]);
+  const list = useApiResource(
+    () =>
+      api.listStreams({
+        status: statusFilter || undefined,
+        search: search || undefined,
+      }),
+    [statusFilter],
+  );
+  // Stable reference while loading, so the memos below don't recompute every render.
+  const streams = useMemo(() => list.data?.data ?? [], [list.data]);
+  const loading = list.loading;
+  const error = list.error;
 
   // Remember the filter choice across visits (single global key).
   useEffect(() => {
@@ -120,7 +114,7 @@ export default function StreamsList({ user }: { user: AuthUser }) {
 
   const handleSearch = (e: React.FormEvent) => {
     e.preventDefault();
-    fetchStreams();
+    list.reload();
   };
 
   // Extract unique years from stream dates for filter
@@ -164,7 +158,7 @@ export default function StreamsList({ user }: { user: AuthUser }) {
   const handleStatus = async (id: string, status: Status) => {
     try {
       const updated = await api.updateStreamStatus(id, { status });
-      setStreams((prev) => prev.map((s) => (s.id === id ? updated : s)));
+      list.mutate((res) => ({ ...res, data: res.data.map((s) => (s.id === id ? updated : s)) }));
     } catch {
       // unchanged state is visible
     }
@@ -173,7 +167,7 @@ export default function StreamsList({ user }: { user: AuthUser }) {
   const handleApprove = async (id: string) => {
     try {
       const updated = await api.updateStreamStatus(id, { status: 'approved' });
-      setStreams((prev) => prev.map((s) => (s.id === id ? updated : s)));
+      list.mutate((res) => ({ ...res, data: res.data.map((s) => (s.id === id ? updated : s)) }));
       const { songs, performances } = await api.approveAllForStream(id);
       if (songs > 0 || performances > 0) {
         window.alert(`Approved stream + ${songs} song(s) and ${performances} performance(s)`);
