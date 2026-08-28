@@ -1,6 +1,7 @@
-import { useEffect, useState } from 'react';
-import type { AuthUser, CrystalTicket, CrystalTicketStatus, CrystalTicketType } from '../../../shared/types';
+import { useState } from 'react';
+import type { AuthUser, CrystalTicketStatus, CrystalTicketType } from '../../../shared/types';
 import { api } from '../api/client';
+import { useApiResource, errorMessage } from '../lib/apiResource';
 import { countByStatus, replaceById } from '../lib/status-totals';
 import { GradientButton, OutlineButton } from '../components/prism/Buttons';
 import { Chip } from '../components/prism/Chip';
@@ -39,38 +40,29 @@ function statusFilterLabel(status: '' | CrystalTicketStatus): string {
 }
 
 export default function CrystalTickets({ user }: { user: AuthUser }) {
-  const [tickets, setTickets] = useState<CrystalTicket[]>([]);
-  // Unfiltered copy for the hero totals; kept in sync with the same by-id updates.
-  const [allTickets, setAllTickets] = useState<CrystalTicket[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
   const [statusFilter, setStatusFilter] = useState<'' | CrystalTicketStatus>('pending');
   const [typeFilter, setTypeFilter] = useState<'' | CrystalTicketType>('');
   const [expandedId, setExpandedId] = useState<string | null>(null);
   const [replyText, setReplyText] = useState<Record<string, string>>({});
   const [actionLoading, setActionLoading] = useState<string | null>(null);
+  const [actionError, setActionError] = useState<string | null>(null);
 
-  const fetchTickets = () => {
-    setLoading(true);
-    Promise.all([
-      api.listCrystalTickets({
-        status: statusFilter || undefined,
-        type: typeFilter || undefined,
-      }),
-      api.listCrystalTickets(),
-    ])
-      .then(([res, all]) => {
-        setTickets(res.data);
-        setAllTickets(all.data);
-      })
-      .catch((err: unknown) => setError(err instanceof Error ? err.message : 'Failed to load'))
-      .finally(() => setLoading(false));
-  };
-
-  useEffect(() => {
-    fetchTickets();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [statusFilter, typeFilter]);
+  const list = useApiResource(
+    async () => {
+      const [res, all] = await Promise.all([
+        api.listCrystalTickets({
+          status: statusFilter || undefined,
+          type: typeFilter || undefined,
+        }),
+        api.listCrystalTickets(),
+      ]);
+      return { tickets: res.data, allTickets: all.data };
+    },
+    [statusFilter, typeFilter],
+  );
+  const tickets = list.data?.tickets ?? [];
+  const allTickets = list.data?.allTickets ?? [];
+  const loading = list.loading;
 
   const handleReply = async (id: string) => {
     const text = replyText[id]?.trim();
@@ -78,15 +70,14 @@ export default function CrystalTickets({ user }: { user: AuthUser }) {
     setActionLoading(id);
     try {
       const updated = await api.replyCrystalTicket(id, text);
-      setTickets((prev) => replaceById(prev, updated));
-      setAllTickets((prev) => replaceById(prev, updated));
+      list.mutate(({ tickets, allTickets }) => ({ tickets: replaceById(tickets, updated), allTickets: replaceById(allTickets, updated) }));
       setReplyText((prev) => {
         const next = { ...prev };
         delete next[id];
         return next;
       });
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Reply failed');
+      setActionError(errorMessage(err, 'Reply failed'));
     } finally {
       setActionLoading(null);
     }
@@ -96,10 +87,9 @@ export default function CrystalTickets({ user }: { user: AuthUser }) {
     setActionLoading(id);
     try {
       const updated = await api.updateCrystalTicketStatus(id, status);
-      setTickets((prev) => replaceById(prev, updated));
-      setAllTickets((prev) => replaceById(prev, updated));
+      list.mutate(({ tickets, allTickets }) => ({ tickets: replaceById(tickets, updated), allTickets: replaceById(allTickets, updated) }));
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Status update failed');
+      setActionError(errorMessage(err, 'Status update failed'));
     } finally {
       setActionLoading(null);
     }
@@ -143,9 +133,14 @@ export default function CrystalTickets({ user }: { user: AuthUser }) {
       }
     >
       <div className="px-6 pb-6 pt-3">
-        {error && (
+        {list.error && (
           <div className="mb-4 rounded-radius-lg border border-[#FECACA] bg-[#FEF2F2] px-4 py-3 text-sm text-[#B91C1C]">
-            {error}
+            {list.error}
+          </div>
+        )}
+        {actionError && (
+          <div className="mb-4 rounded-radius-lg border border-[#FECACA] bg-[#FEF2F2] px-4 py-3 text-sm text-[#B91C1C]">
+            {actionError}
           </div>
         )}
 
