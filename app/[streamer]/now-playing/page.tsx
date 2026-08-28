@@ -7,6 +7,8 @@ import { useStreamer } from '../../contexts/StreamerContext';
 import { usePlayer, usePlaybackTime } from '../../contexts/PlayerContext';
 import { useLikedSongs } from '../../contexts/LikedSongsContext';
 import { useRecentlyPlayed } from '../../contexts/RecentlyPlayedContext';
+import { useCurrentTrackLike } from '../../lib/use-current-track-like';
+import { useTrackProgress } from '../../lib/use-track-progress';
 import AlbumArt from '../../components/AlbumArt';
 import NowPlayingControls from '../../components/NowPlayingControls';
 import ProgressBar from '../../components/ProgressBar';
@@ -21,36 +23,17 @@ import { formatTime } from '../../lib/format';
 export default function NowPlayingPage() {
   const router = useRouter();
   const { slug } = useStreamer();
-  const {
-    currentTrack,
-    isPlaying,
-    seekTo,
-  } = usePlayer();
-  const { trackCurrentTime, trackDuration } = usePlaybackTime();
+  const { currentTrack } = usePlayer();
+  const { trackCurrentTime } = usePlaybackTime();
 
   const [showLikedSongsPanel, setShowLikedSongsPanel] = useState(false);
   const [showRecentlyPlayedPanel, setShowRecentlyPlayedPanel] = useState(false);
   const [toastMessage, setToastMessage] = useState<string | null>(null);
   const hideToast = useCallback(() => setToastMessage(null), []);
-  const { likedCount, isLiked, toggleLike } = useLikedSongs();
+  const { likedCount } = useLikedSongs();
   const { recentCount } = useRecentlyPlayed();
-
-  const liked = currentTrack ? isLiked(currentTrack.performanceId) : false;
-  const handleToggleLike = () => {
-    if (!currentTrack) return;
-    toggleLike(currentTrack);
-  };
-
-  const hasKnownDuration = trackDuration != null && trackDuration > 0;
-  const progress = hasKnownDuration
-    ? (trackCurrentTime / trackDuration) * 100
-    : 0;
-  const clampedProgress = Math.min(100, Math.max(0, progress));
-
-  const handleSeek = (percentage: number) => {
-    if (!hasKnownDuration || !currentTrack) return;
-    seekTo(currentTrack.timestamp + trackDuration * percentage);
-  };
+  const { liked, toggleCurrentLike } = useCurrentTrackLike();
+  const { progress, handleSeek, knownDuration } = useTrackProgress();
 
   const handleShare = async () => {
     if (!currentTrack) return;
@@ -182,7 +165,7 @@ export default function NowPlayingPage() {
                 {currentTrack.originalArtist}
               </span>
               <button
-                onClick={handleToggleLike}
+                onClick={toggleCurrentLike}
                 className="transition-[color,transform] transform hover:scale-110"
                 aria-label={liked ? '取消喜愛' : '喜愛'}
                 data-testid="np-like-button"
@@ -196,12 +179,12 @@ export default function NowPlayingPage() {
           {/* Progress bar */}
           <div className="w-full" style={{ marginTop: '8px' }}>
             <ProgressBar
-              progress={clampedProgress}
+              progress={progress}
               onSeek={handleSeek}
               height={6}
               showTimestamps
               currentTime={formatTime(trackCurrentTime)}
-              totalTime={hasKnownDuration ? formatTime(trackDuration) : '--:--'}
+              totalTime={knownDuration != null ? formatTime(knownDuration) : '--:--'}
             />
           </div>
 
@@ -253,7 +236,7 @@ export default function NowPlayingPage() {
               {currentTrack.originalArtist}
             </span>
             <button
-              onClick={handleToggleLike}
+              onClick={toggleCurrentLike}
               className="transition-[color,transform] transform hover:scale-110"
               aria-label={liked ? '取消喜愛' : '喜愛'}
               data-testid="np-like-button-desktop"
@@ -267,12 +250,12 @@ export default function NowPlayingPage() {
         {/* Progress bar */}
         <div style={{ width: '400px' }}>
           <ProgressBar
-            progress={clampedProgress}
+            progress={progress}
             onSeek={handleSeek}
             height={4}
             showTimestamps
             currentTime={formatTime(trackCurrentTime)}
-            totalTime={hasKnownDuration ? formatTime(trackDuration) : '--:--'}
+            totalTime={knownDuration != null ? formatTime(knownDuration) : '--:--'}
           />
         </div>
 

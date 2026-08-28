@@ -4,7 +4,8 @@ import { useEffect, useId } from 'react';
 import { usePathname } from 'next/navigation';
 import { Play, Pause, ListMusic, Heart } from 'lucide-react';
 import { usePlayer, usePlaybackTime } from '../contexts/PlayerContext';
-import { useLikedSongs } from '../contexts/LikedSongsContext';
+import { useCurrentTrackLike } from '../lib/use-current-track-like';
+import { useTrackProgress } from '../lib/use-track-progress';
 import AlbumArt from './AlbumArt';
 import ProgressBar from './ProgressBar';
 import DesktopMiniPlayer from './DesktopMiniPlayer';
@@ -15,7 +16,6 @@ export default function MiniPlayer() {
     isPlaying,
     playerError,
     togglePlayPause,
-    seekTo,
     previous,
     next,
     setShowModal,
@@ -28,18 +28,13 @@ export default function MiniPlayer() {
   } = usePlayer();
 
   const { trackCurrentTime, trackDuration } = usePlaybackTime();
-  const { isLiked, toggleLike } = useLikedSongs();
+  const { liked, toggleCurrentLike } = useCurrentTrackLike();
+  const { hasKnownDuration, progress, handleSeek } = useTrackProgress();
   const playerErrorId = useId();
 
   const pathname = usePathname();
   const pageSlug = pathname?.split('/')[1] || '';
   const isNowPlayingPage = pathname?.endsWith('/now-playing');
-
-  const liked = currentTrack ? isLiked(currentTrack.performanceId) : false;
-  const handleToggleLike = () => {
-    if (!currentTrack) return;
-    toggleLike(currentTrack);
-  };
 
   // Keyboard navigation: Space for play/pause when player is active
   useEffect(() => {
@@ -60,18 +55,6 @@ export default function MiniPlayer() {
   }, [currentTrack, togglePlayPause]);
 
   if (!currentTrack) return null;
-
-  const hasKnownDuration = trackDuration != null && trackDuration > 0;
-  const progress = hasKnownDuration
-    ? (trackCurrentTime / trackDuration) * 100
-    : 0;
-
-  const clampedProgress = Math.min(100, Math.max(0, progress));
-
-  const handleSeek = (percentage: number) => {
-    if (!hasKnownDuration) return;
-    seekTo(currentTrack.timestamp + trackDuration * percentage);
-  };
 
   return (
     <div
@@ -100,7 +83,7 @@ export default function MiniPlayer() {
       >
         {/* Progress bar at top — 3px height, gradient fill */}
         <ProgressBar
-          progress={clampedProgress}
+          progress={progress}
           onSeek={handleSeek}
           disabled={!hasKnownDuration}
           height={3}
@@ -147,7 +130,7 @@ export default function MiniPlayer() {
           <button
             onClick={(e) => {
               e.stopPropagation();
-              handleToggleLike();
+              toggleCurrentLike();
             }}
             className="flex-shrink-0"
             aria-label={liked ? '取消喜愛' : '喜愛'}
@@ -218,10 +201,10 @@ export default function MiniPlayer() {
         shuffleOn={shuffleOn}
         trackCurrentTime={trackCurrentTime}
         trackDuration={trackDuration}
-        clampedProgress={clampedProgress}
+        clampedProgress={progress}
         hasKnownDuration={hasKnownDuration}
         onOpenPlayer={() => setShowModal(true)}
-        onToggleLike={handleToggleLike}
+        onToggleLike={toggleCurrentLike}
         onOpenQueue={() => setShowQueue(true)}
         onTogglePlayPause={togglePlayPause}
         onPrevious={previous}
