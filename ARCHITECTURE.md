@@ -11,12 +11,10 @@
 │  │ D1 Databases │───▶│ sync-*/*.ts │───▶│ ├─ registry.json        │   │
 │  │              │    │             │    │ ├─ mizuki/               │   │
 │  │ oshi-prism-db│    │ sync-data   │    │ │  ├─ songs.json        │   │
-│  │ oshi-prism-  │    │ sync-       │    │ │  ├─ streams.json      │   │
-│  │   nova       │    │  registry   │    │ │  └─ metadata/         │   │
-│  └──────────────┘    └─────────────┘    │ └─ gabu/                │   │
-│                                          │    ├─ songs.json        │   │
-│                                          │    ├─ streams.json      │   │
-│                                          │    └─ metadata/         │   │
+│  │ oshi-prism-  │    │ sync-       │    │ │  └─ streams.json      │   │
+│  │   nova       │    │  registry   │    │ └─ gabu/                │   │
+│  └──────────────┘    └─────────────┘    │    ├─ songs.json        │   │
+│                                          │    └─ streams.json      │   │
 │                                          └───────────┬──────────────┘   │
 │                                                      │                  │
 │                                                      ▼                  │
@@ -37,7 +35,6 @@
 │                      │  /api/registry         → Registry  │              │
 │                      │  /api/[streamer]/songs  → Song[]   │              │
 │                      │  /api/[streamer]/streams→ Stream[] │              │
-│                      │  /api/[streamer]/metadata→ Meta[]  │              │
 │                      └───────────────┬───────────────────┘              │
 │                                      │                                  │
 │                              next build (static export)                 │
@@ -173,19 +170,21 @@ app/[streamer]/page.tsx
 ## 5. Data Flow: Song to Playback
 
 ```
-data/{slug}/songs.json                    data/{slug}/metadata/
+data/{slug}/songs.json                    data/{slug}/streams.json
        │                                         │
        ▼                                         ▼
- /api/{slug}/songs ─────────────────── /api/{slug}/metadata
+ /api/{slug}/songs ──────────────────── /api/{slug}/streams
        │                                         │
        └──────────┬──────────────────────────────┘
-                  │  fetch() on mount
+                  │  fetch() on mount, in parallel
                   ▼
-         ┌────────────────┐
-         │  page.tsx       │
-         │  merge songs +  │
-         │  albumArtMap    │
-         └───────┬────────┘
+         ┌─────────────────────────────────────────────────┐
+         │  page.tsx                                       │
+         │  loadArchiveData()  (app/lib/archive-loader.ts) │
+         │  hydrateSongs(): joins streamTitle/date         │
+         │  from the stream record onto each performance   │
+         │  → ArchiveSong[]                                │
+         └───────┬─────────────────────────────────────────┘
                  │
       ┌──────────┼──────────────┐
       ▼          ▼              ▼

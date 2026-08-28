@@ -355,7 +355,6 @@ function scaffoldDataDirs(streamers: StreamerConfig[]): void {
       fs.mkdirSync(dir, { recursive: true });
       fs.writeFileSync(path.join(dir, 'songs.json'), '[]\n', 'utf-8');
       fs.writeFileSync(path.join(dir, 'streams.json'), '[]\n', 'utf-8');
-      fs.mkdirSync(path.join(dir, 'metadata'), { recursive: true });
     }
     if (seedIfMissing(ROOT, s.slug)) {
       console.log(`  seeded sync-state entry for ${s.slug}`);

@@ -51,11 +51,11 @@ app/
   [streamer]/       # Dynamic route per streamer
   components/       # UI components (MiniPlayer, SongCard, PlaylistPanel, etc.)
   contexts/         # React context providers (Player, Playlist, Liked, etc.)
-  api/              # Static API routes for songs, streams, metadata
+  api/              # Static API routes for songs and streams
 lib/                # Shared utilities, types, data loading
 data/
   registry.json     # Streamer configurations
-  {slug}/           # Per-streamer songs.json, streams.json, metadata/
+  {slug}/           # Per-streamer songs.json and streams.json
 admin/              # Cloudflare Workers admin dashboard
 tools/              # Data extraction and sync tools
 ```

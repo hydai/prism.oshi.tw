@@ -29,40 +29,6 @@ export interface Stream {
   youtubeUrl: string;
 }
 
-export interface SongMetadata {
-  songId: string;
-  fetchStatus: 'matched' | 'no_match' | 'error' | 'manual';
-  matchConfidence: 'exact' | 'fuzzy' | 'manual' | null;
-  albumArtUrl?: string;
-  albumArtUrls?: {
-    small: string;
-    medium: string;
-    big: string;
-    xl: string;
-  };
-  albumTitle?: string;
-  deezerTrackId?: number;    // Legacy (Deezer matches)
-  deezerArtistId?: number;   // Legacy (Deezer matches)
-  itunesTrackId?: number;
-  itunesCollectionId?: number;
-  trackDuration?: number;
-  fetchedAt: string;
-  lastError?: string;
-}
-
-export interface ArtistInfo {
-  normalizedArtist: string;
-  originalName: string;
-  deezerArtistId?: number;   // Legacy (Deezer matches)
-  itunesArtistId?: number;
-  pictureUrls?: {
-    medium: string;
-    big: string;
-    xl: string;
-  };
-  fetchedAt: string;
-}
-
 // --- Multi-streamer types ---
 
 export interface StreamerTheme {
