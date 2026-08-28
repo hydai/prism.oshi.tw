@@ -11,6 +11,7 @@ import {
   mergeSongs,
   SongMergeError,
   updateSong,
+  updateStream,
 } from './db';
 
 declare const process: { exitCode?: number };
@@ -1115,7 +1116,40 @@ async function testSharedSongsSurviveStreamMutations(): Promise<void> {
   );
 }
 
+async function testUpdateStreamPropagatesCopiesToPerformances(): Promise<void> {
+  // performances.stream_title/date/video_id are denormalized copies that the
+  // fan-site export reads; editing a stream must move them in the same transaction.
+  const fakeDb = new FakeD1Database(null);
+  await updateStream(fakeDb as unknown as D1Database, 'stream-2026-01-01', {
+    videoId: 'newVideo',
+    date: '2026-01-02',
+  });
+
+  assertEqual(fakeDb.batchCallCount, 1, 'a stream edit runs as one batch');
+  assertEqual(fakeDb.batchStatements.length, 2, 'a stream edit updates the stream row and its performance copies');
+  const [streamUpdate, perfUpdate] = fakeDb.batchStatements;
+  assert(/UPDATE\s+streams\s+SET\s+date = \?, video_id = \?/i.test(streamUpdate?.sql ?? ''), 'first statement updates the stream row');
+  assert(/UPDATE\s+performances\s+SET\s+date = \?, video_id = \?/i.test(perfUpdate?.sql ?? ''), 'second statement updates the performance copies');
+  assert(
+    /WHERE\s+stream_id = \? AND streamer_id = \?/i.test(perfUpdate?.sql ?? ''),
+    'performance copies are scoped to the edited stream AND its streamer',
+  );
+  assertEqual(perfUpdate?.params[0], '2026-01-02', 'performance date follows the stream');
+  assertEqual(perfUpdate?.params[1], 'newVideo', 'performance video_id follows the stream');
+  assertEqual(perfUpdate?.params[2], 'stream-2026-01-01', 'performance update targets the edited stream');
+  assertEqual(perfUpdate?.params[3], 'mizuki', "performance update never crosses into another streamer's rows");
+
+  const urlOnly = new FakeD1Database(null);
+  await updateStream(urlOnly as unknown as D1Database, 'stream-2026-01-01', {
+    youtubeUrl: 'https://www.youtube.com/watch?v=newVideo',
+  });
+  assertEqual(urlOnly.batchStatements.length, 1, 'youtube_url has no performance copy, so only the stream row is updated');
+
+  console.log('✓ stream edits propagate title/date/video_id to their performances');
+}
+
 async function main(): Promise<void> {
+  await testUpdateStreamPropagatesCopiesToPerformances();
   await testInsertPerformancesUsesOneBatch();
   await testVodImportPreservesExistingStream();
   await testVodImportCreatesNewStreamWhenAbsent();

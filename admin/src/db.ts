@@ -551,7 +551,7 @@ export async function updateSongStatus(
 
 // --- Performances ---
 
-interface PerformanceInsert {
+export interface PerformanceInsert {
   readonly id: string;
   readonly streamId: string;
   readonly date: string;
@@ -762,33 +762,55 @@ export async function updateStream(
   id: string,
   fields: { title?: string; date?: string; videoId?: string; youtubeUrl?: string },
 ): Promise<Stream | null> {
-  const sets: string[] = [];
-  const values: (string | number)[] = [];
+  const streamSets: string[] = [];
+  const streamValues: string[] = [];
+  // performances carry copies of title/date/video_id (schema.sql: performances.
+  // stream_title/date/video_id) and the fan-site export reads those copies, so
+  // they must change in the same transaction as the stream row.
+  const perfSets: string[] = [];
+  const perfValues: string[] = [];
 
   if (fields.title !== undefined) {
-    sets.push('title = ?');
-    values.push(fields.title);
+    streamSets.push('title = ?');
+    streamValues.push(fields.title);
+    perfSets.push('stream_title = ?');
+    perfValues.push(fields.title);
   }
   if (fields.date !== undefined) {
-    sets.push('date = ?');
-    values.push(fields.date);
+    streamSets.push('date = ?');
+    streamValues.push(fields.date);
+    perfSets.push('date = ?');
+    perfValues.push(fields.date);
   }
   if (fields.videoId !== undefined) {
-    sets.push('video_id = ?');
-    values.push(fields.videoId);
+    streamSets.push('video_id = ?');
+    streamValues.push(fields.videoId);
+    perfSets.push('video_id = ?');
+    perfValues.push(fields.videoId);
   }
   if (fields.youtubeUrl !== undefined) {
-    sets.push('youtube_url = ?');
-    values.push(fields.youtubeUrl);
+    streamSets.push('youtube_url = ?');
+    streamValues.push(fields.youtubeUrl);
   }
 
-  if (sets.length === 0) return getStreamById(db, id);
+  if (streamSets.length === 0) return getStreamById(db, id);
 
-  values.push(id);
-  await db
-    .prepare(`UPDATE streams SET ${sets.join(', ')}, updated_at = datetime('now') WHERE id = ?`)
-    .bind(...values)
-    .run();
+  const statements = [
+    db
+      .prepare(`UPDATE streams SET ${streamSets.join(', ')}, updated_at = datetime('now') WHERE id = ?`)
+      .bind(...streamValues, id),
+  ];
+  if (perfSets.length > 0) {
+    // Scoped by streamer_id as well: a performance that points at this stream but
+    // belongs to another streamer is a data-integrity anomaly for the drift report,
+    // never a write target of this streamer's edit.
+    statements.push(
+      db
+        .prepare(`UPDATE performances SET ${perfSets.join(', ')}, updated_at = datetime('now') WHERE stream_id = ? AND streamer_id = ?`)
+        .bind(...perfValues, id, streamerId),
+    );
+  }
+  await db.batch(statements);
 
   return getStreamById(db, id);
 }
