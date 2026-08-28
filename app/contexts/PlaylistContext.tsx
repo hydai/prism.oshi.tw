@@ -15,16 +15,11 @@ import {
   saveJsonToStorage,
   type StorageSaveResult,
 } from '../lib/playlist-storage';
+import type { PerformanceRef } from '../types/archive';
+import { normalizeStoredRef } from '../lib/normalize-performance-ref';
+import { pickPerformanceRef } from '../lib/archive';
 
-export interface PlaylistVersion {
-  performanceId: string;
-  songTitle: string;
-  originalArtist: string;
-  videoId: string;
-  timestamp: number;
-  endTimestamp?: number;
-  streamerSlug: string;
-}
+export type PlaylistVersion = PerformanceRef;
 
 export interface Playlist {
   id: string;
@@ -106,7 +101,7 @@ function buildEnvelope(playlists: Playlist[]): PlaylistExportEnvelope {
   };
 }
 
-function validateImport(data: unknown): { valid: true; playlists: Playlist[] } | { valid: false; error: string } {
+function validateImport(data: unknown, streamerSlug: string): { valid: true; playlists: Playlist[] } | { valid: false; error: string } {
   if (!data || typeof data !== 'object') {
     return { valid: false, error: '檔案格式無效' };
   }
@@ -139,8 +134,8 @@ function validateImport(data: unknown): { valid: true; playlists: Playlist[] } |
     ) {
       // For v1 imports, inject default streamerSlug into versions
       const versions = importVersion === 1
-        ? p.versions.map((version) => ({ ...version, streamerSlug: version.streamerSlug || 'mizuki' }))
-        : p.versions;
+        ? p.versions.flatMap((version) => { const ref = normalizeStoredRef(version, 'mizuki'); return ref ? [ref] : []; })
+        : p.versions.flatMap((version) => { const ref = normalizeStoredRef(version, streamerSlug); return ref ? [ref] : []; });
       validPlaylists.push({
         id: p.id,
         name: p.name,
@@ -200,7 +195,10 @@ export const PlaylistProvider = ({ streamerSlug, children }: { streamerSlug: str
         const parsed = JSON.parse(stored) as Partial<Playlist>[];
         const normalized = parsed.map((p) => ({
           ...p,
-          versions: dedupePlaylistVersions(p.versions ?? []),
+          versions: dedupePlaylistVersions((p.versions ?? []).flatMap((v) => {
+            const ref = normalizeStoredRef(v, streamerSlug);
+            return ref ? [ref] : [];
+          })),
           updatedAt: p.updatedAt || p.createdAt || Date.now(),
         })) as Playlist[];
         setPlaylists(normalized);
@@ -295,7 +293,7 @@ export const PlaylistProvider = ({ streamerSlug, children }: { streamerSlug: str
     const now = Date.now();
     const newPlaylists = playlists.map(p =>
       p.id === playlistId
-        ? { ...p, versions: [...p.versions, version], updatedAt: now }
+        ? { ...p, versions: [...p.versions, pickPerformanceRef(version)], updatedAt: now }
         : p
     );
 
@@ -356,7 +354,7 @@ export const PlaylistProvider = ({ streamerSlug, children }: { streamerSlug: str
         return { success: false, error: '無法匯入：檔案格式無效' };
       }
 
-      const result = validateImport(data);
+      const result = validateImport(data, streamerSlug);
       if (!result.valid) {
         return { success: false, error: `無法匯入：${result.error}` };
       }
@@ -399,7 +397,7 @@ export const PlaylistProvider = ({ streamerSlug, children }: { streamerSlug: str
     } catch {
       return { success: false, error: '無法匯入：檔案格式無效' };
     }
-  }, [playlists, saveToLocalStorage]);
+  }, [playlists, saveToLocalStorage, streamerSlug]);
 
   const value = useMemo<PlaylistContextType>(() => ({
     playlists,

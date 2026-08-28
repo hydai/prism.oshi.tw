@@ -38,14 +38,7 @@ export default function NowPlayingPage() {
   const liked = currentTrack ? isLiked(currentTrack.performanceId) : false;
   const handleToggleLike = () => {
     if (!currentTrack) return;
-    toggleLike({
-      performanceId: currentTrack.performanceId,
-      songTitle: currentTrack.songTitle,
-      originalArtist: currentTrack.originalArtist,
-      videoId: currentTrack.videoId,
-      timestamp: currentTrack.timestamp,
-      endTimestamp: currentTrack.endTimestamp ?? undefined,
-    });
+    toggleLike(currentTrack);
   };
 
   const hasKnownDuration = trackDuration != null && trackDuration > 0;

@@ -5,6 +5,7 @@ import { Play, Disc3, Plus, ExternalLink, Heart } from 'lucide-react';
 import AlbumArt from './AlbumArt';
 import AddToPlaylistDropdown from './AddToPlaylistDropdown';
 import type { FlattenedSong, PerformanceRef } from '../types/archive';
+import { trackFromFlattenedSong } from '../lib/archive';
 import { formatTime } from '../lib/format';
 
 interface TimelineRowProps {
@@ -13,7 +14,7 @@ interface TimelineRowProps {
   isCurrentlyPlaying: boolean;
   isUnavailable: boolean;
   isLiked: boolean;
-  onToggleLike: () => void;
+  onToggleLike: (ref: PerformanceRef) => void;
   onPlay: (track: PerformanceRef) => void;
   onAddToQueue: (track: PerformanceRef) => void;
   onAddToPlaylistSuccess: () => void;
@@ -21,17 +22,6 @@ interface TimelineRowProps {
 }
 
 function TimelineRowInner({ song, index, isCurrentlyPlaying, isUnavailable, isLiked, onToggleLike, onPlay, onAddToQueue, onAddToPlaylistSuccess, streamerSlug }: TimelineRowProps) {
-  const track = {
-    performanceId: song.performanceId,
-    songId: song.id,
-    songTitle: song.title,
-    originalArtist: song.originalArtist,
-    videoId: song.videoId,
-    timestamp: song.timestamp,
-    endTimestamp: song.endTimestamp ?? null,
-    streamerSlug,
-  };
-
   return (
     <div
       data-testid="performance-row"
@@ -83,7 +73,7 @@ function TimelineRowInner({ song, index, isCurrentlyPlaying, isUnavailable, isLi
           aria-label={`播放 ${song.title}`}
           onClick={() => {
             if (!isUnavailable) {
-              onPlay(track);
+              onPlay(trackFromFlattenedSong(song, streamerSlug));
             }
           }}
           disabled={isUnavailable}
@@ -118,7 +108,7 @@ function TimelineRowInner({ song, index, isCurrentlyPlaying, isUnavailable, isLi
         disabled={isUnavailable}
         data-testid="song-title-button"
         onClick={() => {
-          onPlay(track);
+          onPlay(trackFromFlattenedSong(song, streamerSlug));
         }}
       >
         <div className="flex flex-col gap-0.5">
@@ -182,7 +172,7 @@ function TimelineRowInner({ song, index, isCurrentlyPlaying, isUnavailable, isLi
         style={{ color: 'var(--text-secondary)' }}
       >
         <button
-          onClick={onToggleLike}
+          onClick={() => onToggleLike(trackFromFlattenedSong(song, streamerSlug))}
           className={`transition-[color,opacity,transform] transform hover:scale-110 ${isLiked ? '' : 'lg:opacity-0 lg:group-hover:opacity-100'}`}
           style={{
             background: 'var(--bg-surface)',
@@ -197,7 +187,7 @@ function TimelineRowInner({ song, index, isCurrentlyPlaying, isUnavailable, isLi
           <Heart className={`w-4 h-4 ${isLiked ? 'fill-current' : ''}`} />
         </button>
         <button
-          onClick={() => onAddToQueue(track)}
+          onClick={() => onAddToQueue(trackFromFlattenedSong(song, streamerSlug))}
           className="lg:opacity-0 lg:group-hover:opacity-100 transition-[opacity,transform] transform hover:scale-110"
           style={{
             background: 'var(--bg-surface)',
@@ -224,14 +214,7 @@ function TimelineRowInner({ song, index, isCurrentlyPlaying, isUnavailable, isLi
           }}
         >
           <AddToPlaylistDropdown
-            version={{
-              performanceId: song.performanceId,
-              songTitle: song.title,
-              originalArtist: song.originalArtist,
-              videoId: song.videoId,
-              timestamp: song.timestamp,
-              streamerSlug,
-            }}
+            version={trackFromFlattenedSong(song, streamerSlug)}
             onSuccess={onAddToPlaylistSuccess}
           />
         </div>

@@ -2,7 +2,7 @@
 
 import { memo, useMemo } from 'react';
 import { Disc3, ChevronDown, ChevronRight } from 'lucide-react';
-import type { ArchivePerformance, ArchiveSong, PerformanceRef } from '../types/archive';
+import type { ArchiveSong, PerformanceRef } from '../types/archive';
 import SongVersionsList from './SongVersionsList';
 
 interface SongCardProps {
@@ -13,7 +13,7 @@ interface SongCardProps {
   onAddToQueue: (track: PerformanceRef) => void;
   onAddToPlaylistSuccess: () => void;
   isLiked: (performanceId: string) => boolean;
-  onToggleLike: (perf: ArchivePerformance, song: ArchiveSong) => void;
+  onToggleLike: (ref: PerformanceRef) => void;
   unavailableVideoIds: Set<string>;
   streamerSlug: string;
 }

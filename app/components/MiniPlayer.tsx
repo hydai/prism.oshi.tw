@@ -38,14 +38,7 @@ export default function MiniPlayer() {
   const liked = currentTrack ? isLiked(currentTrack.performanceId) : false;
   const handleToggleLike = () => {
     if (!currentTrack) return;
-    toggleLike({
-      performanceId: currentTrack.performanceId,
-      songTitle: currentTrack.songTitle,
-      originalArtist: currentTrack.originalArtist,
-      videoId: currentTrack.videoId,
-      timestamp: currentTrack.timestamp,
-      endTimestamp: currentTrack.endTimestamp ?? undefined,
-    });
+    toggleLike(currentTrack);
   };
 
   // Keyboard navigation: Space for play/pause when player is active

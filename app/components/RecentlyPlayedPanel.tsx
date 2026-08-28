@@ -2,8 +2,7 @@
 
 import { Clock, Play, ListPlus, Trash2 } from 'lucide-react';
 import { useRecentlyPlayed } from '../contexts/RecentlyPlayedContext';
-import { usePlayer, type Track } from '../contexts/PlayerContext';
-import { useStreamer } from '../contexts/StreamerContext';
+import { usePlayer } from '../contexts/PlayerContext';
 import AlbumArt from './AlbumArt';
 import BottomSheet from './BottomSheet';
 
@@ -28,32 +27,18 @@ function formatRelativeTime(playedAt: number): string {
 export default function RecentlyPlayedPanel({ show, onClose, onToast }: RecentlyPlayedPanelProps) {
   const { recentPlays, clearHistory } = useRecentlyPlayed();
   const { playTrackWithQueue, addToQueue } = usePlayer();
-  const { slug } = useStreamer();
-
-  const toTrack = (r: typeof recentPlays[0]): Track => ({
-    performanceId: r.performanceId,
-    songId: r.performanceId,
-    songTitle: r.songTitle,
-    originalArtist: r.originalArtist,
-    videoId: r.videoId,
-    timestamp: r.timestamp,
-    endTimestamp: r.endTimestamp ?? null,
-    streamerSlug: slug,
-  });
 
   const handlePlayAll = () => {
     if (recentPlays.length === 0) return;
-    const tracks = recentPlays.map(toTrack);
-    playTrackWithQueue(tracks[0], tracks.slice(1));
+    playTrackWithQueue(recentPlays[0], recentPlays.slice(1));
   };
 
   const handlePlay = (index: number) => {
-    const tracks = recentPlays.map(toTrack);
-    playTrackWithQueue(tracks[index], tracks.slice(index + 1));
+    playTrackWithQueue(recentPlays[index], recentPlays.slice(index + 1));
   };
 
   const handleAddToQueue = (r: typeof recentPlays[0]) => {
-    addToQueue(toTrack(r));
+    addToQueue(r);
     onToast?.('已加入待播清單');
   };
 

@@ -2,8 +2,7 @@
 
 import { Heart, Play, ListPlus } from 'lucide-react';
 import { useLikedSongs } from '../contexts/LikedSongsContext';
-import { usePlayer, type Track } from '../contexts/PlayerContext';
-import { useStreamer } from '../contexts/StreamerContext';
+import { usePlayer } from '../contexts/PlayerContext';
 import AlbumArt from './AlbumArt';
 import BottomSheet from './BottomSheet';
 
@@ -16,32 +15,18 @@ interface LikedSongsPanelProps {
 export default function LikedSongsPanel({ show, onClose, onToast }: LikedSongsPanelProps) {
   const { likedSongs, toggleLike } = useLikedSongs();
   const { playTrackWithQueue, addToQueue } = usePlayer();
-  const { slug } = useStreamer();
-
-  const toTrack = (v: typeof likedSongs[0]): Track => ({
-    performanceId: v.performanceId,
-    songId: v.performanceId,
-    songTitle: v.songTitle,
-    originalArtist: v.originalArtist,
-    videoId: v.videoId,
-    timestamp: v.timestamp,
-    endTimestamp: v.endTimestamp ?? null,
-    streamerSlug: slug,
-  });
 
   const handlePlayAll = () => {
     if (likedSongs.length === 0) return;
-    const tracks = likedSongs.map(toTrack);
-    playTrackWithQueue(tracks[0], tracks.slice(1));
+    playTrackWithQueue(likedSongs[0], likedSongs.slice(1));
   };
 
   const handlePlay = (index: number) => {
-    const tracks = likedSongs.map(toTrack);
-    playTrackWithQueue(tracks[index], tracks.slice(index + 1));
+    playTrackWithQueue(likedSongs[index], likedSongs.slice(index + 1));
   };
 
   const handleAddToQueue = (v: typeof likedSongs[0]) => {
-    addToQueue(toTrack(v));
+    addToQueue(v);
     onToast?.('已加入待播清單');
   };
 
