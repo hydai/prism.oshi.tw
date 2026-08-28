@@ -1,7 +1,8 @@
-import { useEffect, useId, useState, type ReactNode } from 'react';
+import { useId, useState, type ReactNode } from 'react';
 import type { AuthUser, NovaVodSubmission, NovaVodSong, NovaStatus } from '../../../shared/types';
 import { api } from '../api/client';
 import { sanitizeNovaUrl } from '../../../shared/nova-url-safety';
+import { useApiResource, errorMessage } from '../lib/apiResource';
 import { countByStatus, removeById, replaceById } from '../lib/status-totals';
 import { Avatar } from '../components/prism/Avatar';
 import { GradientButton, OutlineButton } from '../components/prism/Buttons';
@@ -46,55 +47,51 @@ function formatTimestamp(seconds: number): string {
 }
 
 export default function NovaVodSubmissions({ user }: { user: AuthUser }) {
-  const [vods, setVods] = useState<NovaVodSubmission[]>([]);
-  // Unfiltered copy for the hero totals and the streamer filter options.
-  const [allVods, setAllVods] = useState<NovaVodSubmission[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
   const [statusFilter, setStatusFilter] = useState<'' | NovaStatus>('pending');
   const [streamerFilter, setStreamerFilter] = useState('');
   const [viewMode, setViewMode] = useState<VodViewMode>('grouped');
   const [groupOpen, setGroupOpen] = useState<Record<string, boolean>>({});
   const [expandedId, setExpandedId] = useState<string | null>(null);
-  const [expandedSongs, setExpandedSongs] = useState<NovaVodSong[]>([]);
+  // Keyed by VOD id so a slow detail response for A can never render under B.
+  const [expandedSongs, setExpandedSongs] = useState<Record<string, NovaVodSong[]>>({});
   const [rejectNote, setRejectNote] = useState<Record<string, string>>({});
   const [actionLoading, setActionLoading] = useState<string | null>(null);
+  // Load errors live in `list.error`; row actions get their own slot so one
+  // failed approval doesn't masquerade as a broken list.
+  const [actionError, setActionError] = useState<string | null>(null);
   const streamerFilterId = useId();
 
-  const fetchVods = () => {
-    setLoading(true);
-    Promise.all([
-      api.listNovaVods({
-        status: statusFilter || undefined,
-        streamer: streamerFilter || undefined,
-      }),
-      api.listNovaVods(),
-    ])
-      .then(([res, all]) => {
-        setVods(res.data);
-        setAllVods(all.data);
-      })
-      .catch((err: unknown) => setError(err instanceof Error ? err.message : 'Failed to load'))
-      .finally(() => setLoading(false));
-  };
-
-  useEffect(() => {
-    fetchVods();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [statusFilter, streamerFilter]);
+  // Filtered list for the table + unfiltered copy for the hero totals and the streamer options.
+  const list = useApiResource(
+    async () => {
+      const [res, all] = await Promise.all([
+        api.listNovaVods({
+          status: statusFilter || undefined,
+          streamer: streamerFilter || undefined,
+        }),
+        api.listNovaVods(),
+      ]);
+      return { vods: res.data, allVods: all.data };
+    },
+    [statusFilter, streamerFilter],
+  );
+  const vods = list.data?.vods ?? [];
+  const allVods = list.data?.allVods ?? [];
+  const loading = list.loading;
 
   const handleExpand = async (id: string) => {
     if (expandedId === id) {
       setExpandedId(null);
-      setExpandedSongs([]);
       return;
     }
     setExpandedId(id);
+    if (expandedSongs[id]) return; // already loaded
     try {
       const detail = await api.getNovaVod(id);
-      setExpandedSongs(detail.songs);
-    } catch {
-      setExpandedSongs([]);
+      setExpandedSongs((prev) => ({ ...prev, [id]: detail.songs }));
+    } catch (err) {
+      // Leave the id absent so re-expanding retries; tell the curator why it's empty.
+      setActionError(errorMessage(err, '無法載入歌曲清單'));
     }
   };
 
@@ -105,15 +102,14 @@ export default function NovaVodSubmissions({ user }: { user: AuthUser }) {
         status,
         reviewer_note: status === 'rejected' ? rejectNote[id] : undefined,
       });
-      setVods((prev) => replaceById(prev, updated));
-      setAllVods((prev) => replaceById(prev, updated));
+      list.mutate(({ vods, allVods }) => ({ vods: replaceById(vods, updated), allVods: replaceById(allVods, updated) }));
       setRejectNote((prev) => {
         const next = { ...prev };
         delete next[id];
         return next;
       });
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Action failed');
+      setActionError(errorMessage(err, 'Action failed'));
     } finally {
       setActionLoading(null);
     }
@@ -124,10 +120,9 @@ export default function NovaVodSubmissions({ user }: { user: AuthUser }) {
     setActionLoading(vod.id);
     try {
       await api.deleteNovaVod(vod.id);
-      setVods((prev) => removeById(prev, vod.id));
-      setAllVods((prev) => removeById(prev, vod.id));
+      list.mutate(({ vods, allVods }) => ({ vods: removeById(vods, vod.id), allVods: removeById(allVods, vod.id) }));
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Delete failed');
+      setActionError(errorMessage(err, 'Delete failed'));
     } finally {
       setActionLoading(null);
     }
@@ -147,7 +142,7 @@ export default function NovaVodSubmissions({ user }: { user: AuthUser }) {
       isCurator={isCurator}
       expanded={expandedId === vod.id}
       showStreamer={viewMode === 'timeline'}
-      songs={expandedId === vod.id ? expandedSongs : []}
+      songs={expandedId === vod.id ? (expandedSongs[vod.id] ?? []) : []}
       onToggle={() => handleExpand(vod.id)}
       rejectNote={rejectNote[vod.id] ?? ''}
       onRejectNoteChange={(val) => setRejectNote((prev) => ({ ...prev, [vod.id]: val }))}
@@ -213,7 +208,8 @@ export default function NovaVodSubmissions({ user }: { user: AuthUser }) {
       }
     >
       <div className="px-6 pb-6 pt-3">
-        {error && <p className="mb-4 text-sm text-red-600">{error}</p>}
+        {list.error && <p className="mb-4 text-sm text-red-600">{list.error}</p>}
+        {actionError && <p className="mb-4 text-sm text-red-600">{actionError}</p>}
 
         {loading ? (
           <p className="py-6 text-center text-sm text-token-secondary">Loading...</p>
