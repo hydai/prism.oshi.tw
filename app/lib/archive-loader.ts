@@ -1,5 +1,6 @@
 import { sortStreamsByNewest } from "./archive";
 import type { ArchiveSong, StreamSummary } from "../types/archive";
+import type { Song } from "../../lib/types";
 
 export type ArchiveLoadState = "loading" | "ready" | "error";
 
@@ -8,31 +9,11 @@ export interface ArchiveData {
   streams: StreamSummary[];
 }
 
-// Stored (exported) shape — performances carry no streamTitle/date (both are
-// derived from streams.json by streamId at load time) and omit empty notes.
-interface StoredPerformance {
-  id: string;
-  streamId: string;
-  videoId: string;
-  timestamp: number;
-  endTimestamp: number | null;
-  note?: string;
-}
-
-interface StoredSong {
-  id: string;
-  workId?: string;
-  title: string;
-  originalArtist: string;
-  tags: string[];
-  performances: StoredPerformance[];
-}
-
 // Deterministic fallback for a performance whose stream is missing from
 // streams.json (should not happen — the exporter joins the same tables)
 const ORPHAN_DATE = "1970-01-01";
 
-export function hydrateSongs(stored: StoredSong[], streams: StreamSummary[]): ArchiveSong[] {
+export function hydrateSongs(stored: Song[], streams: StreamSummary[]): ArchiveSong[] {
   const streamById = new Map(streams.map((s) => [s.id, s]));
   return stored.map((song) => ({
     ...song,
@@ -61,7 +42,7 @@ export async function loadArchiveData(
 
   const songsPromise = doFetch(`/api/${slug}/songs`, init).then((res) => {
     if (!res.ok) throw new Error("songs API error");
-    return res.json() as Promise<StoredSong[]>;
+    return res.json() as Promise<Song[]>;
   });
 
   const streamsPromise = doFetch(`/api/${slug}/streams`, init).then((res) => {
