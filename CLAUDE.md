@@ -43,7 +43,7 @@ The app serves multiple VTuber archives from a single codebase. Each streamer ha
 ### Data Flow
 
 1. **Static JSON files** in `data/` → loaded by `lib/data.ts` at build time
-2. **API routes** (`app/api/registry` + `app/api/[streamer]/{songs,streams,metadata}`) — all `force-static`, pre-rendered
+2. **API routes** (`app/api/[streamer]/{songs,streams,metadata}`) — all `force-static`, pre-rendered
 3. **Client components** fetch these API routes on mount, no server needed at runtime
 4. **Album art** comes from iTunes/Deezer metadata cached in `data/{slug}/metadata/`
 
