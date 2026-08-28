@@ -2,9 +2,10 @@
 
 import { useEffect, useState } from 'react';
 import { createPortal } from 'react-dom';
-import { X, Play, Pause, SkipBack, SkipForward, ChevronDown, Shuffle, Repeat, Repeat1, ListMusic, Heart } from 'lucide-react';
+import { Play, Pause, SkipBack, SkipForward, ChevronDown, Shuffle, Repeat, Repeat1, Heart } from 'lucide-react';
 import { usePlayer, usePlaybackTime } from '../contexts/PlayerContext';
-import { useLikedSongs } from '../contexts/LikedSongsContext';
+import { useCurrentTrackLike } from '../lib/use-current-track-like';
+import { useTrackProgress } from '../lib/use-track-progress';
 import AlbumArt from './AlbumArt';
 import VolumeControl from './VolumeControl';
 import ProgressBar from './ProgressBar';
@@ -21,7 +22,6 @@ export default function NowPlayingModal() {
     currentTrack,
     isPlaying,
     togglePlayPause,
-    seekTo,
     previous,
     next,
     showModal,
@@ -33,15 +33,9 @@ export default function NowPlayingModal() {
     queue,
     setShowQueue,
   } = usePlayer();
-  const { trackCurrentTime, trackDuration } = usePlaybackTime();
-
-  const { isLiked, toggleLike } = useLikedSongs();
-
-  const liked = currentTrack ? isLiked(currentTrack.performanceId) : false;
-  const handleToggleLike = () => {
-    if (!currentTrack) return;
-    toggleLike(currentTrack);
-  };
+  const { trackCurrentTime } = usePlaybackTime();
+  const { liked, toggleCurrentLike } = useCurrentTrackLike();
+  const { hasKnownDuration, progress, handleSeek, knownDuration } = useTrackProgress();
 
   // Keyboard navigation: Escape to close modal
   useEffect(() => {
@@ -56,16 +50,6 @@ export default function NowPlayingModal() {
   }, [showModal, setShowModal]);
 
   if (!showModal || !currentTrack) return null;
-
-  const hasKnownDuration = trackDuration != null && trackDuration > 0;
-  const progress = hasKnownDuration
-    ? (trackCurrentTime / trackDuration) * 100
-    : 0;
-
-  const handleSeek = (percentage: number) => {
-    if (!hasKnownDuration) return;
-    seekTo(currentTrack.timestamp + trackDuration * percentage);
-  };
 
   if (!mounted) return null;
 
@@ -111,7 +95,7 @@ export default function NowPlayingModal() {
             <h3 className="text-2xl font-bold mb-2" style={{ color: 'var(--text-primary)' }}>{currentTrack.songTitle}</h3>
             <p className="text-lg" style={{ color: 'var(--text-secondary)' }}>{currentTrack.originalArtist}</p>
             <button
-              onClick={handleToggleLike}
+              onClick={toggleCurrentLike}
               className="mt-3 transition-[color,transform] transform hover:scale-110"
               aria-label={liked ? '取消喜愛' : '喜愛'}
               data-testid="modal-like-button"
@@ -124,14 +108,14 @@ export default function NowPlayingModal() {
           {/* Progress Bar */}
           <div className="mb-4">
             <ProgressBar
-              progress={Math.min(100, Math.max(0, progress))}
+              progress={progress}
               onSeek={handleSeek}
               disabled={!hasKnownDuration}
               height={8}
             />
             <div className="flex justify-between text-xs mt-2 font-mono" style={{ color: 'var(--text-tertiary)' }}>
               <span>{formatTime(trackCurrentTime)}</span>
-              <span>{hasKnownDuration ? formatTime(trackDuration) : '--:--'}</span>
+              <span>{knownDuration != null ? formatTime(knownDuration) : '--:--'}</span>
             </div>
           </div>
 
