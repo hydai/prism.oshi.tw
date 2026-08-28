@@ -1,21 +1,59 @@
 'use client';
 
-import { useRef, useCallback, useEffect, useEffectEvent } from 'react';
+import { useRef, useCallback, useEffect, useEffectEvent, type ReactNode, type Ref } from 'react';
 import { createPortal } from 'react-dom';
 import { X } from 'lucide-react';
 import { useHydrated } from '../lib/use-hydrated';
+import { useIsDesktop } from '../lib/use-is-desktop';
 
 interface BottomSheetProps {
   show: boolean;
   onClose: () => void;
   title: string;
-  titleIcon?: React.ReactNode;
-  headerRight?: React.ReactNode;
-  children: React.ReactNode;
+  titleIcon?: ReactNode;
+  headerRight?: ReactNode;
+  children: ReactNode;
   desktopWidth?: number;
   testId?: string;
+  /** The scrollable content element — hand it to a virtualizer's getScrollElement. */
+  contentRef?: Ref<HTMLDivElement>;
 }
 
+function SheetHeader({
+  title,
+  titleIcon,
+  headerRight,
+  onClose,
+  className,
+}: {
+  title: string;
+  titleIcon?: ReactNode;
+  headerRight?: ReactNode;
+  onClose: () => void;
+  className: string;
+}) {
+  return (
+    <div className={`flex items-center justify-between border-b border-white/10 ${className}`}>
+      <div className="flex items-center gap-2">
+        {titleIcon}
+        <h2 className="text-white font-medium">{title}</h2>
+      </div>
+      <div className="flex items-center gap-2">
+        {headerRight}
+        <button
+          onClick={onClose}
+          className="text-white/80 hover:text-white transition-colors p-1"
+          aria-label="Close"
+        >
+          <X className="w-5 h-5" />
+        </button>
+      </div>
+    </div>
+  );
+}
+
+// One variant is rendered at a time (viewport-driven) so children mount once —
+// the old CSS-hidden twin doubled every panel's DOM and event handlers.
 export default function BottomSheet({
   show,
   onClose,
@@ -25,8 +63,10 @@ export default function BottomSheet({
   children,
   desktopWidth = 500,
   testId,
+  contentRef,
 }: BottomSheetProps) {
   const hydrated = useHydrated();
+  const isDesktop = useIsDesktop();
   const sheetRef = useRef<HTMLDivElement>(null);
   const dragStartY = useRef<number | null>(null);
   const currentTranslateY = useRef(0);
@@ -81,100 +121,58 @@ export default function BottomSheet({
         data-testid={testId ? `${testId}-backdrop` : undefined}
       />
 
-      {/* Mobile: Bottom Sheet */}
-      <div
-        ref={sheetRef}
-        className="lg:hidden fixed bottom-0 left-0 right-0 z-50 flex flex-col"
-        style={{
-          maxHeight: '85vh',
-          borderRadius: '20px 20px 0 0',
-          background: 'rgba(30, 30, 40, 0.95)',
-          backdropFilter: 'blur(20px)',
-          WebkitBackdropFilter: 'blur(20px)',
-          border: '1px solid rgba(255,255,255,0.1)',
-          borderBottom: 'none',
-          touchAction: 'none',
-        }}
-        data-testid={testId ? `${testId}-mobile` : undefined}
-      >
-        {/* Drag handle pill */}
+      {isDesktop ? (
+        /* Desktop: Side Panel */
         <div
-          className="flex justify-center pt-3 pb-1"
-          onTouchStart={handleTouchStart}
-          onTouchMove={handleTouchMove}
-          onTouchEnd={handleTouchEnd}
+          className="fixed right-0 top-0 h-full z-50 flex flex-col"
+          style={{
+            width: `${desktopWidth}px`,
+            background: 'rgba(30, 30, 40, 0.95)',
+            backdropFilter: 'blur(20px)',
+            WebkitBackdropFilter: 'blur(20px)',
+            borderLeft: '1px solid rgba(255,255,255,0.1)',
+          }}
+          onClick={(e) => e.stopPropagation()}
+          data-testid={testId}
         >
+          <SheetHeader title={title} titleIcon={titleIcon} headerRight={headerRight} onClose={onClose} className="p-4" />
+          <div ref={contentRef} className="flex-1 overflow-y-auto">
+            {children}
+          </div>
+        </div>
+      ) : (
+        /* Mobile: Bottom Sheet */
+        <div
+          ref={sheetRef}
+          className="fixed bottom-0 left-0 right-0 z-50 flex flex-col"
+          style={{
+            maxHeight: '85vh',
+            borderRadius: '20px 20px 0 0',
+            background: 'rgba(30, 30, 40, 0.95)',
+            backdropFilter: 'blur(20px)',
+            WebkitBackdropFilter: 'blur(20px)',
+            border: '1px solid rgba(255,255,255,0.1)',
+            borderBottom: 'none',
+            touchAction: 'none',
+          }}
+          data-testid={testId ? `${testId}-mobile` : undefined}
+        >
+          {/* Drag handle pill */}
           <div
-            style={{
-              width: '36px',
-              height: '4px',
-              borderRadius: '2px',
-              background: 'rgba(255,255,255,0.3)',
-            }}
-          />
-        </div>
-
-        {/* Header */}
-        <div className="flex items-center justify-between px-4 pb-3 border-b border-white/10">
-          <div className="flex items-center gap-2">
-            {titleIcon}
-            <h2 className="text-white font-medium">{title}</h2>
+            className="flex justify-center pt-3 pb-1"
+            onTouchStart={handleTouchStart}
+            onTouchMove={handleTouchMove}
+            onTouchEnd={handleTouchEnd}
+          >
+            <div style={{ width: '36px', height: '4px', borderRadius: '2px', background: 'rgba(255,255,255,0.3)' }} />
           </div>
-          <div className="flex items-center gap-2">
-            {headerRight}
-            <button
-              onClick={onClose}
-              className="text-white/80 hover:text-white transition-colors p-1"
-              aria-label="Close"
-            >
-              <X className="w-5 h-5" />
-            </button>
+          <SheetHeader title={title} titleIcon={titleIcon} headerRight={headerRight} onClose={onClose} className="px-4 pb-3" />
+          <div ref={contentRef} className="flex-1 overflow-y-auto" style={{ touchAction: 'pan-y' }}>
+            {children}
           </div>
         </div>
-
-        {/* Content */}
-        <div className="flex-1 overflow-y-auto" style={{ touchAction: 'pan-y' }}>
-          {children}
-        </div>
-      </div>
-
-      {/* Desktop: Side Panel */}
-      <div
-        className="hidden lg:flex fixed right-0 top-0 h-full z-50 flex-col"
-        style={{
-          width: `${desktopWidth}px`,
-          background: 'rgba(30, 30, 40, 0.95)',
-          backdropFilter: 'blur(20px)',
-          WebkitBackdropFilter: 'blur(20px)',
-          borderLeft: '1px solid rgba(255,255,255,0.1)',
-        }}
-        onClick={(e) => e.stopPropagation()}
-        data-testid={testId}
-      >
-        {/* Header */}
-        <div className="flex items-center justify-between p-4 border-b border-white/10">
-          <div className="flex items-center gap-2">
-            {titleIcon}
-            <h2 className="text-white font-medium">{title}</h2>
-          </div>
-          <div className="flex items-center gap-2">
-            {headerRight}
-            <button
-              onClick={onClose}
-              className="text-white/80 hover:text-white transition-colors"
-              aria-label="Close"
-            >
-              <X className="w-5 h-5" />
-            </button>
-          </div>
-        </div>
-
-        {/* Content */}
-        <div className="flex-1 overflow-y-auto">
-          {children}
-        </div>
-      </div>
+      )}
     </>,
-    document.body
+    document.body,
   );
 }
