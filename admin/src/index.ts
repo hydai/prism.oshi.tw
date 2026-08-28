@@ -6,6 +6,7 @@ import {
   listSongsPaginated,
   listGlobalWorksPaginated,
   getSongById,
+  songBelongsToStreamer,
   insertSong,
   updateSong,
   updateSongStatus,
@@ -13,6 +14,7 @@ import {
   listPerformances,
   insertPerformance,
   insertPerformances,
+  type PerformanceInsert,
   getPerformanceStatus as db_getPerformanceStatus,
   updatePerformanceStatus,
   generatePerformanceId,
@@ -488,30 +490,36 @@ app.post('/api/songs', async (c) => {
   if (!body.title || !body.originalArtist) {
     return c.json({ error: 'title and originalArtist are required' }, 400);
   }
+  const inline = body.performances ?? [];
+  if (inline.some((perf) => !perf.streamId || perf.timestamp === undefined)) {
+    return c.json({ error: 'Each performance requires streamId and timestamp' }, 400);
+  }
+
+  // Inline performances copy stream_title/date/video_id from the stream row, never
+  // from the body, and the streamer-scoped lookup rejects another streamer's stream.
+  const streamIds = [...new Set(inline.map((perf) => perf.streamId))];
+  const streams = await Promise.all(streamIds.map((streamId) => getStreamById(c.env.DB, streamId, streamerId)));
+  const streamsById = new Map(streams.flatMap((stream) => (stream ? [[stream.id, stream] as const] : [])));
+  const inserts: PerformanceInsert[] = [];
+  for (const perf of inline) {
+    const stream = streamsById.get(perf.streamId);
+    if (!stream) return c.json({ error: `Stream not found: ${perf.streamId}` }, 404);
+    inserts.push({
+      id: generatePerformanceId(),
+      streamId: stream.id,
+      date: stream.date,
+      streamTitle: stream.title,
+      videoId: stream.videoId,
+      timestamp: perf.timestamp,
+      endTimestamp: perf.endTimestamp ?? null,
+      note: perf.note ?? '',
+    });
+  }
 
   const user = c.get('user');
   const id = generateSongId();
   await insertSong(c.env.DB, streamerId, id, body.title, body.originalArtist, body.tags || [], user.email);
-
-  // If inline performances are provided, insert them too
-  if (body.performances && body.performances.length > 0) {
-    await insertPerformances(
-      c.env.DB,
-      streamerId,
-      id,
-      body.performances.map((perf) => ({
-        id: generatePerformanceId(),
-        streamId: perf.streamId,
-        date: perf.date,
-        streamTitle: perf.streamTitle,
-        videoId: perf.videoId,
-        timestamp: perf.timestamp,
-        endTimestamp: perf.endTimestamp ?? null,
-        note: perf.note ?? '',
-      })),
-      user.email,
-    );
-  }
+  await insertPerformances(c.env.DB, streamerId, id, inserts, user.email);
 
   const song = await getSongById(c.env.DB, id);
   return c.json(song, 201);
@@ -579,8 +587,16 @@ app.get('/api/performances', async (c) => {
 app.post('/api/performances', async (c) => {
   const streamerId = getStreamerId(c);
   const body = await c.req.json<CreatePerformanceBody>();
-  if (!body.songId || !body.streamId || !body.date || !body.streamTitle || !body.videoId || body.timestamp === undefined) {
-    return c.json({ error: 'songId, streamId, date, streamTitle, videoId, and timestamp are required' }, 400);
+  if (!body.songId || !body.streamId || body.timestamp === undefined) {
+    return c.json({ error: 'songId, streamId, and timestamp are required' }, 400);
+  }
+
+  const stream = await getStreamById(c.env.DB, body.streamId, streamerId);
+  if (!stream) return c.json({ error: 'Stream not found' }, 404);
+  // The FK only proves the song exists; the performance must not bind this streamer's
+  // stream to another streamer's song (stream-level bulk approve/delete would follow it).
+  if (!(await songBelongsToStreamer(c.env.DB, body.songId, streamerId))) {
+    return c.json({ error: 'Song not found' }, 404);
   }
 
   const user = c.get('user');
@@ -591,9 +607,9 @@ app.post('/api/performances', async (c) => {
     id,
     body.songId,
     body.streamId,
-    body.date,
-    body.streamTitle,
-    body.videoId,
+    stream.date,
+    stream.title,
+    stream.videoId,
     body.timestamp,
     body.endTimestamp ?? null,
     body.note ?? '',
@@ -664,6 +680,7 @@ app.post('/api/streams', async (c) => {
 });
 
 app.patch('/api/streams/:id/status', requireCurator, async (c) => {
+  const streamerId = getStreamerId(c);
   const id = getRouteParam(c, 'id');
   const body = await c.req.json<StatusUpdateBody>();
 
@@ -671,7 +688,7 @@ app.patch('/api/streams/:id/status', requireCurator, async (c) => {
     return c.json({ error: `Invalid status: ${body.status}` }, 400);
   }
 
-  const existing = await getStreamById(c.env.DB, id);
+  const existing = await getStreamById(c.env.DB, id, streamerId);
   if (!existing) return c.json({ error: 'Stream not found' }, 404);
 
   if (!isValidTransition(existing.status, body.status)) {
@@ -684,6 +701,7 @@ app.patch('/api/streams/:id/status', requireCurator, async (c) => {
 });
 
 app.patch('/api/streams/:id', requireCurator, async (c) => {
+  const streamerId = getStreamerId(c);
   const id = getRouteParam(c, 'id');
   const body = await c.req.json<UpdateStreamBody>();
 
@@ -695,10 +713,10 @@ app.patch('/api/streams/:id', requireCurator, async (c) => {
     return c.json({ error: 'Invalid date format, expected YYYY-MM-DD' }, 400);
   }
 
-  const existing = await getStreamById(c.env.DB, id);
+  const existing = await getStreamById(c.env.DB, id, streamerId);
   if (!existing) return c.json({ error: 'Stream not found' }, 404);
 
-  const updated = await updateStream(c.env.DB, id, {
+  const updated = await updateStream(c.env.DB, id, streamerId, {
     title: body.title,
     date: body.date,
     videoId: body.videoId,
@@ -724,7 +742,7 @@ app.post('/api/streams/:streamId/performances', async (c) => {
     return c.json({ error: 'title, originalArtist, and timestamp are required' }, 400);
   }
 
-  const stream = await getStreamById(c.env.DB, streamId);
+  const stream = await getStreamById(c.env.DB, streamId, streamerId);
   if (!stream) return c.json({ error: 'Stream not found' }, 404);
 
   const user = c.get('user');
@@ -748,8 +766,9 @@ app.post('/api/streams/:streamId/performances', async (c) => {
 
 // Bulk approve all pending songs + performances for a stream
 app.post('/api/streams/:streamId/approve-all', requireCurator, async (c) => {
+  const streamerId = getStreamerId(c);
   const streamId = getRouteParam(c, 'streamId');
-  const stream = await getStreamById(c.env.DB, streamId);
+  const stream = await getStreamById(c.env.DB, streamId, streamerId);
   if (!stream) return c.json({ error: 'Stream not found' }, 404);
 
   const user = c.get('user');
@@ -759,8 +778,9 @@ app.post('/api/streams/:streamId/approve-all', requireCurator, async (c) => {
 
 // Bulk unapprove all approved songs + performances for a stream
 app.post('/api/streams/:streamId/unapprove-all', requireCurator, async (c) => {
+  const streamerId = getStreamerId(c);
   const streamId = getRouteParam(c, 'streamId');
-  const stream = await getStreamById(c.env.DB, streamId);
+  const stream = await getStreamById(c.env.DB, streamId, streamerId);
   if (!stream) return c.json({ error: 'Stream not found' }, 404);
 
   const { songs, performances } = await bulkUnapproveStream(c.env.DB, streamId);
@@ -770,8 +790,9 @@ app.post('/api/streams/:streamId/unapprove-all', requireCurator, async (c) => {
 // Hard-delete a stream with all its performances and orphaned songs.
 // Approved (live) streams are blocked — unapprove first.
 app.delete('/api/streams/:id', requireCurator, async (c) => {
+  const streamerId = getStreamerId(c);
   const id = getRouteParam(c, 'id');
-  const stream = await getStreamById(c.env.DB, id);
+  const stream = await getStreamById(c.env.DB, id, streamerId);
   if (!stream) return c.json({ error: 'Stream not found' }, 404);
 
   if (!canHardDeleteStream(stream.status)) {
@@ -830,8 +851,9 @@ app.get('/api/stamp/stats', async (c) => {
 // --- Stream detail ---
 
 app.get('/api/streams/:streamId/detail', async (c) => {
+  const streamerId = getStreamerId(c);
   const streamId = getRouteParam(c, 'streamId');
-  const detail = await getStreamDetail(c.env.DB, streamId);
+  const detail = await getStreamDetail(c.env.DB, streamId, streamerId);
   if (!detail) return c.json({ error: 'Stream not found' }, 404);
   return c.json(detail);
 });
@@ -859,7 +881,7 @@ app.post('/api/streams/:streamId/paste-import', requireCurator, async (c) => {
     return c.json({ error: 'text is required' }, 400);
   }
 
-  const stream = await getStreamById(c.env.DB, streamId);
+  const stream = await getStreamById(c.env.DB, streamId, streamerId);
   if (!stream) return c.json({ error: 'Stream not found' }, 404);
 
   const parsed = parseTextToSongs(body.text);
@@ -905,7 +927,10 @@ app.post('/api/streams/:streamId/paste-import', requireCurator, async (c) => {
 // --- Stamp: clear all end timestamps ---
 
 app.delete('/api/streams/:streamId/end-timestamps', requireCurator, async (c) => {
+  const streamerId = getStreamerId(c);
   const streamId = getRouteParam(c, 'streamId');
+  const stream = await getStreamById(c.env.DB, streamId, streamerId);
+  if (!stream) return c.json({ error: 'Stream not found' }, 404);
   const cleared = await clearAllEndTimestamps(c.env.DB, streamId);
   return c.json({ ok: true, cleared });
 });
@@ -1182,12 +1207,13 @@ app.post('/api/pipeline/import-streams', requireCurator, async (c) => {
 // --- Pipeline: Extract timestamps from YouTube comments/description ---
 
 app.post('/api/pipeline/extract', requireCurator, async (c) => {
+  const streamerId = getStreamerId(c);
   const { streamId } = await c.req.json<{ streamId: string }>();
   if (!streamId) {
     return c.json({ error: 'streamId is required' }, 400);
   }
 
-  const stream = await getStreamById(c.env.DB, streamId);
+  const stream = await getStreamById(c.env.DB, streamId, streamerId);
   if (!stream) return c.json({ error: 'Stream not found' }, 404);
 
   const apiKey = c.env.YOUTUBE_API_KEY;
@@ -1272,7 +1298,7 @@ app.post('/api/pipeline/extract-import', requireCurator, async (c) => {
     return c.json({ error: 'streamId and songs are required' }, 400);
   }
 
-  const stream = await getStreamById(c.env.DB, body.streamId);
+  const stream = await getStreamById(c.env.DB, body.streamId, streamerId);
   if (!stream) return c.json({ error: 'Stream not found' }, 404);
 
   const existingPerfs = await listPerformancesForStream(c.env.DB, body.streamId);

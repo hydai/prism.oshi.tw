@@ -15,6 +15,7 @@ const noop = () => {};
 
 const detail: StreamDetail = {
   id: 'stream-current',
+  streamerId: 'mizuki',
   title: 'Test Karaoke Stream',
   date: '2026-08-17',
   videoId: 'video-current',

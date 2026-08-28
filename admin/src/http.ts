@@ -1,8 +1,25 @@
 import { HTTPException } from 'hono/http-exception';
+import { isValidStreamerSlug } from './vod-export/normalization';
 
-/** Extract streamer slug from ?streamer= query param, default 'mizuki'. */
+function jsonBadRequest(message: string): HTTPException {
+  return new HTTPException(400, {
+    res: new Response(JSON.stringify({ error: message }), {
+      status: 400,
+      headers: { 'Content-Type': 'application/json' },
+    }),
+  });
+}
+
+/**
+ * Streamer scope for every catalog route, from ?streamer=. Required — a missing
+ * or malformed value is a 400; there is deliberately no default streamer.
+ */
 export function getStreamerId(c: { req: { query: (key: string) => string | undefined } }): string {
-  return c.req.query('streamer') || 'mizuki';
+  const value = c.req.query('streamer');
+  if (!value || !isValidStreamerSlug(value)) {
+    throw jsonBadRequest('Missing or invalid ?streamer= query parameter');
+  }
+  return value;
 }
 
 export function getRouteParam(

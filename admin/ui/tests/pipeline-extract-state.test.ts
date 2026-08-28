@@ -13,6 +13,7 @@ import {
 
 const stream: Stream = {
   id: 'stream-1',
+  streamerId: 'mizuki',
   title: 'Test stream',
   date: '2026-08-16',
   videoId: 'video-1',
