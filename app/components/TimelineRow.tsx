@@ -107,7 +107,6 @@ function TimelineRowInner({ song, index, isCurrentlyPlaying, isUnavailable, isLi
       {/* Album art column */}
       <div className="flex items-center justify-center">
         <AlbumArt
-          src={song.albumArtUrl}
           alt={`${song.title} - ${song.originalArtist}`}
           size={32}
         />

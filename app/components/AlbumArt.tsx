@@ -1,44 +1,18 @@
-'use client';
-
-import { useState } from 'react';
 import { Music } from 'lucide-react';
 
 interface AlbumArtProps {
-  src?: string;
   alt: string;
   size: number;
   borderRadius?: number | string;
 }
 
-export default function AlbumArt({ src, alt, size, borderRadius }: AlbumArtProps) {
+// Pure placeholder: the archive has no artwork data (the metadata pipeline was
+// removed), so there is no image branch and no per-row state.
+export default function AlbumArt({ alt, size, borderRadius }: AlbumArtProps) {
   const radius = borderRadius != null
     ? (typeof borderRadius === 'number' ? `${borderRadius}px` : borderRadius)
     : 'var(--radius-sm)';
-  const [imgError, setImgError] = useState(false);
-  const [imgLoaded, setImgLoaded] = useState(false);
-
-  const showPlaceholder = !src || imgError;
-
-  const placeholderStyle: React.CSSProperties = {
-    width: `${size}px`,
-    height: `${size}px`,
-    borderRadius: radius,
-    background: 'linear-gradient(135deg, var(--accent-pink-light), var(--accent-blue-light))',
-    display: 'flex',
-    alignItems: 'center',
-    justifyContent: 'center',
-    flexShrink: 0,
-  };
-
   const iconSize = Math.round(size * 0.45);
-
-  if (showPlaceholder) {
-    return (
-      <div style={placeholderStyle} aria-label={alt}>
-        <Music style={{ width: `${iconSize}px`, height: `${iconSize}px`, color: 'white' }} />
-      </div>
-    );
-  }
 
   return (
     <div
@@ -46,45 +20,15 @@ export default function AlbumArt({ src, alt, size, borderRadius }: AlbumArtProps
         width: `${size}px`,
         height: `${size}px`,
         borderRadius: radius,
+        background: 'linear-gradient(135deg, var(--accent-pink-light), var(--accent-blue-light))',
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center',
         flexShrink: 0,
-        position: 'relative',
-        overflow: 'hidden',
       }}
+      aria-label={alt}
     >
-      {/* Placeholder shown while loading */}
-      {!imgLoaded && (
-        <div
-          style={{
-            position: 'absolute',
-            inset: 0,
-            background: 'linear-gradient(135deg, var(--accent-pink-light), var(--accent-blue-light))',
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-          }}
-        >
-          <Music style={{ width: `${iconSize}px`, height: `${iconSize}px`, color: 'white' }} />
-        </div>
-      )}
-      {/* Runtime iTunes artwork is source-sized; static export has no Next image optimizer. */}
-      {/* eslint-disable @next/next/no-img-element */}
-      {/* react-doctor-disable-next-line react-doctor/nextjs-no-img-element */}
-      <img
-        src={src}
-        alt={alt}
-        loading="lazy"
-        onError={() => setImgError(true)}
-        onLoad={() => setImgLoaded(true)}
-        style={{
-          width: `${size}px`,
-          height: `${size}px`,
-          objectFit: 'cover',
-          borderRadius: radius,
-          display: 'block',
-          opacity: imgLoaded ? 1 : 0,
-        }}
-      />
-      {/* eslint-enable @next/next/no-img-element */}
+      <Music style={{ width: `${iconSize}px`, height: `${iconSize}px`, color: 'white' }} />
     </div>
   );
 }

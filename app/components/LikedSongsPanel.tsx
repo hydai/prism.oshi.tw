@@ -71,7 +71,6 @@ export default function LikedSongsPanel({ show, onClose, onToast }: LikedSongsPa
                   data-testid="liked-song-item"
                 >
                   <AlbumArt
-                    src={version.albumArtUrl}
                     alt={`${version.songTitle} - ${version.originalArtist}`}
                     size={40}
                   />
