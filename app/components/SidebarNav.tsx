@@ -6,8 +6,6 @@ import {
   Disc3,
   Home as HomeIcon,
   Play,
-  LayoutList,
-  Sparkles,
   Heart,
   Clock,
   Plus,
@@ -155,24 +153,6 @@ export default function SidebarNav({
             <span className="flex-1">歌回 VOD 資料庫</span>
             <ExternalLink className="w-3.5 h-3.5 flex-shrink-0 opacity-60" />
           </a>
-
-          {/* Browse */}
-          <button
-            className={inactiveNavItemClass}
-            style={INACTIVE_NAV_STYLE}
-          >
-            <LayoutList className="w-4 h-4 flex-shrink-0" />
-            瀏覽
-          </button>
-
-          {/* Trending */}
-          <button
-            className={inactiveNavItemClass}
-            style={INACTIVE_NAV_STYLE}
-          >
-            <Sparkles className="w-4 h-4 flex-shrink-0" />
-            熱門
-          </button>
         </div>
 
         {/* ── 4. YOUR LIBRARY Section ── */}
