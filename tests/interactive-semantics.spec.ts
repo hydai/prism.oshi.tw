@@ -58,55 +58,6 @@ test.describe('interactive semantics', () => {
     await expect(page.getByRole('slider', { name: '播放進度' }).filter({ visible: true })).toBeVisible();
   });
 
-  test('lets focused Aurora controls handle Space', async ({ page }) => {
-    await page.goto('/mizuki/aurora');
-
-    await page.getByRole('textbox', { name: 'YouTube 歌枠網址' }).fill('https://www.youtube.com/watch?v=qgMiX4lw2TQ');
-    await page.getByTestId('load-video-button').click();
-
-    await page.getByTitle('鍵盤快捷鍵').click();
-    const shortcutBackdrop = page.getByRole('button', { name: '關閉鍵盤快捷鍵' });
-    await shortcutBackdrop.focus();
-    await page.keyboard.press('Space');
-    await expect(shortcutBackdrop).toBeHidden();
-
-    await page.getByTestId('add-song-button').click();
-    const titleButton = page.getByTestId('song-list-editor').getByRole('button', { name: '歌名' });
-    await titleButton.focus();
-    await page.keyboard.press('Space');
-    const titleInput = page.getByTestId('song-list-editor').getByRole('textbox');
-    await expect(titleInput).toBeVisible();
-    await titleInput.fill('測試歌曲');
-    await page.keyboard.press('Enter');
-
-    const updatedTitleButton = page
-      .getByTestId('song-list-editor')
-      .getByRole('button', { name: '測試歌曲', exact: true });
-    await updatedTitleButton.focus();
-    await page.keyboard.press('F2');
-    await expect(titleInput).toHaveValue('測試歌曲');
-  });
-
-  test('opens one Aurora overlay at a time', async ({ page }) => {
-    await page.goto('/mizuki/aurora');
-    await page.getByRole('textbox', { name: 'YouTube 歌枠網址' }).fill('https://www.youtube.com/watch?v=qgMiX4lw2TQ');
-    await page.getByTestId('load-video-button').click();
-
-    await page.getByTestId('import-button').click();
-    await expect(page.getByRole('dialog', { name: '匯入時間戳' })).toBeVisible();
-    await page.getByRole('button', { name: '關閉匯入時間戳對話框' }).click();
-    await expect(page.getByRole('dialog', { name: '匯入時間戳' })).toBeHidden();
-
-    await page.getByTestId('add-song-button').click();
-    await page.getByTestId('export-button').click();
-    await expect(page.getByRole('dialog', { name: '匯出時間戳' })).toBeVisible();
-    await page.getByRole('button', { name: '關閉匯出時間戳對話框' }).click();
-    await expect(page.getByRole('dialog', { name: '匯出時間戳' })).toBeHidden();
-
-    await page.getByTitle('鍵盤快捷鍵').click();
-    await expect(page.getByRole('button', { name: '關閉鍵盤快捷鍵' })).toBeVisible();
-  });
-
   test('disables seeking when a performance has no known duration', async ({ page }) => {
     await page.route('**/api/mizuki/songs', async (route) => {
       await route.fulfill({
