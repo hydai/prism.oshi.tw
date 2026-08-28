@@ -34,6 +34,7 @@ jobs:
       - run: npm run test:archive
       - run: npm run test:archive-loader
       - run: npm run test:playback-time-store
+      - run: npm run test:viewport-store
       - run: npm run test:player-context
       - run: npm run test:hydration
       - run: npm run test:format
