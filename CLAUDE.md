@@ -35,7 +35,7 @@ Data-pipeline & ops scripts run via `npm run` or slash commands — e.g. `sync:r
 
 The app serves multiple VTuber archives from a single codebase. Each streamer has:
 - Config entry in `data/registry.json` (slug, theme, social links)
-- Data directory at `data/{slug}/` with `songs.json`, `streams.json`, `metadata/`
+- Data directory at `data/{slug}/` with `songs.json` and `streams.json`
 - Dynamic route at `app/[streamer]/` with static generation via `generateStaticParams()`
 - Per-streamer CSS theme injected by `StreamerShell.tsx` onto `document.body`
 - Isolated localStorage keys: `prism_{slug}_playlists`, `prism_{slug}_liked_songs`
@@ -43,9 +43,8 @@ The app serves multiple VTuber archives from a single codebase. Each streamer ha
 ### Data Flow
 
 1. **Static JSON files** in `data/` → loaded by `lib/data.ts` at build time
-2. **API routes** (`app/api/[streamer]/{songs,streams,metadata}`) — all `force-static`, pre-rendered
+2. **API routes** (`app/api/[streamer]/{songs,streams}`) — all `force-static`, pre-rendered
 3. **Client components** fetch these API routes on mount, no server needed at runtime
-4. **Album art** comes from iTunes/Deezer metadata cached in `data/{slug}/metadata/`
 
 ### State Management (Context API)
 
@@ -66,7 +65,6 @@ Six contexts in `app/contexts/`, wired in two layers:
 - `Performance` → `{ streamId, videoId, timestamp, endTimestamp, ... }`
 - `Stream` → `{ id, title, date, videoId, youtubeUrl }`
 - `StreamerConfig` → `{ slug, displayName, theme, socialLinks, enabled, ... }`
-- `SongMetadata` → `{ albumArtUrl, trackDuration, itunesTrackId, fetchStatus, ... }`
 
 ### YouTube Integration
 
@@ -77,7 +75,7 @@ Hidden `<iframe>` controlled via YouTube IFrame API. Songs reference specific vi
 - `app/[streamer]/page.tsx` — main archive page (largest file, song browsing + timeline views)
 - `app/components/` — UI components (MiniPlayer, SongCard, PlaylistPanel, etc.)
 - `app/contexts/` — all React context providers
-- `lib/` — shared utilities (data loading, parsing, iTunes API, types)
+- `lib/` — shared utilities (data loading, parsing, types; `lib/itunes.ts` is used only by `tools/aurora`)
 - `data/` — static JSON data files per streamer
 - `admin/` — Cloudflare Workers admin dashboard + D1 database (`schema.sql`, `migrations/`, `seed.ts`); excluded from tsconfig
 - `tools/` — backend services & data pipeline (excluded from tsconfig): `nova` (submission worker), `crystal` (feedback worker), `aurora` (Cloudflare Pages song editor), `sync-{registry,data,stale,status}` (Nova DB → repo sync), `fetch-channel-info`, `inbox-status`, `shared`
