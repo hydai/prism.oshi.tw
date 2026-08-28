@@ -55,7 +55,7 @@ export function flattenSongs(songs: ArchiveSong[]): FlattenedSong[] {
         streamTitle: performance.streamTitle,
         videoId: performance.videoId,
         timestamp: performance.timestamp,
-        endTimestamp: performance.endTimestamp ?? undefined,
+        endTimestamp: performance.endTimestamp,
         note: performance.note,
         searchString: `${song.title} ${song.originalArtist} ${performance.streamTitle}`.toLowerCase(),
         year: performanceDate.getFullYear(),
@@ -155,7 +155,7 @@ export function trackFromFlattenedSong(song: FlattenedSong, streamerSlug: string
     originalArtist: song.originalArtist,
     videoId: song.videoId,
     timestamp: song.timestamp,
-    endTimestamp: song.endTimestamp ?? null,
+    endTimestamp: song.endTimestamp,
     streamerSlug,
   };
 }
@@ -172,7 +172,7 @@ export function trackFromPerformance(
     originalArtist: song.originalArtist,
     videoId: performance.videoId,
     timestamp: performance.timestamp,
-    endTimestamp: performance.endTimestamp ?? null,
+    endTimestamp: performance.endTimestamp,
     streamerSlug,
   };
 }

@@ -1,35 +1,19 @@
-export interface ArchivePerformance {
-  id: string;
-  streamId?: string;
-  date: string;
-  streamTitle: string;
-  videoId: string;
-  timestamp: number;
-  endTimestamp?: number | null;
-  note: string;
-}
+import type { Performance, Song } from "../../lib/types";
 
-export interface ArchiveSong {
-  id: string;
-  /** Cross-streamer composition identity. Older static exports may omit it. */
-  workId?: string;
-  title: string;
-  originalArtist: string;
-  tags: string[];
-  performances: ArchivePerformance[];
-}
+export type ArchivePerformance = Performance & { streamTitle: string; date: string; note: string };
+export type ArchiveSong = Omit<Song, "performances"> & { performances: ArchivePerformance[] };
 
 export interface FlattenedSong {
   id: string;
   title: string;
   originalArtist: string;
   performanceId: string;
-  streamId?: string;
+  streamId: string;
   date: string;
   streamTitle: string;
   videoId: string;
   timestamp: number;
-  endTimestamp?: number;
+  endTimestamp: number | null;
   note: string;
   searchString: string;
   year: number;

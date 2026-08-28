@@ -54,10 +54,12 @@ const songs: ArchiveSong[] = [
     performances: [
       {
         id: "perf-no-stream",
+        streamId: "stream-unlisted",
         date: "2024-06-15",
         streamTitle: "Unlisted Stream",
         videoId: "video-mid",
         timestamp: 30,
+        endTimestamp: null,
         note: "",
       },
     ],
@@ -105,8 +107,8 @@ assert.deepEqual(flattened.map((song) => song.performanceId), [
 assert.equal(flattened[0]?.searchString, "beta song zeta stream beta");
 assert.equal(flattened[0]?.year, 2025);
 assert.equal(flattened[0]?.endTimestamp, 50);
-assert.equal(flattened[1]?.streamId, undefined);
-assert.equal(flattened[2]?.endTimestamp, undefined);
+assert.equal(flattened[1]?.streamId, "stream-unlisted");
+assert.equal(flattened[2]?.endTimestamp, null);
 assert.equal("performances" in flattened[0]!, false);
 assert.equal("tags" in flattened[0]!, false);
 
@@ -148,10 +150,12 @@ const workIdSongs: ArchiveSong[] = [
     performances: [
       {
         id: "perf-shared-z",
+        streamId: "stream-shared-z",
         date: "2023-01-01",
         streamTitle: "Older performance",
         videoId: "video-shared-z",
         timestamp: 10,
+        endTimestamp: null,
         note: "",
       },
     ],
@@ -165,10 +169,12 @@ const workIdSongs: ArchiveSong[] = [
     performances: [
       {
         id: "perf-shared-a",
+        streamId: "stream-shared-a",
         date: "2025-01-01",
         streamTitle: "Newer performance",
         videoId: "video-shared-a",
         timestamp: 20,
+        endTimestamp: null,
         note: "",
       },
     ],
