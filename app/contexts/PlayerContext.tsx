@@ -31,7 +31,6 @@ export interface Track {
   timestamp: number;
   endTimestamp?: number;
   deleted?: boolean;
-  albumArtUrl?: string;
   streamerSlug: string;
 }
 

@@ -26,7 +26,6 @@ export default function RecentlyPlayedTracker() {
       videoId: currentTrack.videoId,
       timestamp: currentTrack.timestamp,
       endTimestamp: currentTrack.endTimestamp,
-      albumArtUrl: currentTrack.albumArtUrl,
     });
   }, [currentTrack, addRecentPlay]);
 

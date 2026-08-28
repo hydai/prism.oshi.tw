@@ -1310,7 +1310,6 @@ function TimelineSongList({
                       videoId: song.videoId,
                       timestamp: song.timestamp,
                       endTimestamp: song.endTimestamp,
-                      albumArtUrl: song.albumArtUrl,
                     })}
                     onPlay={handlePlayFromFlattened}
                     streamerSlug={slug}
@@ -1414,7 +1413,6 @@ function GroupedSongList({
                     videoId: perf.videoId,
                     timestamp: perf.timestamp,
                     endTimestamp: perf.endTimestamp ?? undefined,
-                    albumArtUrl: s.albumArtUrl,
                   })}
                   unavailableVideoIds={unavailableVideoIds}
                   streamerSlug={slug}

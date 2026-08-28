@@ -47,7 +47,6 @@ export default function NowPlayingModal() {
       videoId: currentTrack.videoId,
       timestamp: currentTrack.timestamp,
       endTimestamp: currentTrack.endTimestamp,
-      albumArtUrl: currentTrack.albumArtUrl,
     });
   };
 

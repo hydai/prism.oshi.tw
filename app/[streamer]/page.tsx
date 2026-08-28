@@ -50,7 +50,7 @@ function useArchivePageController() {
   const [loadState, setLoadState] = useState<ArchiveLoadState>('loading');
   const loadAbortRef = useRef<AbortController | null>(null);
 
-  // Load songs/streams/metadata in parallel — the retry button calls this again
+  // Load songs/streams in parallel — the retry button calls this again
   const loadData = useCallback(() => {
     loadAbortRef.current?.abort();
     const controller = new AbortController();

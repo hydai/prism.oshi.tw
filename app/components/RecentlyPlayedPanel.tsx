@@ -38,7 +38,6 @@ export default function RecentlyPlayedPanel({ show, onClose, onToast }: Recently
     videoId: r.videoId,
     timestamp: r.timestamp,
     endTimestamp: r.endTimestamp,
-    albumArtUrl: r.albumArtUrl,
     streamerSlug: slug,
   });
 

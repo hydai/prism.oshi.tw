@@ -17,7 +17,6 @@ export interface ArchiveSong {
   originalArtist: string;
   tags: string[];
   performances: ArchivePerformance[];
-  albumArtUrl?: string;
 }
 
 export interface FlattenedSong {
@@ -34,7 +33,6 @@ export interface FlattenedSong {
   note: string;
   searchString: string;
   year: number;
-  albumArtUrl?: string;
 }
 
 export interface StreamSummary {
@@ -52,7 +50,6 @@ export interface ArchiveTrack {
   videoId: string;
   timestamp: number;
   endTimestamp?: number;
-  albumArtUrl?: string;
   streamerSlug: string;
 }
 

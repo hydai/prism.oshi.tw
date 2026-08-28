@@ -29,7 +29,6 @@ function TimelineRowInner({ song, index, isCurrentlyPlaying, isUnavailable, isLi
     videoId: song.videoId,
     timestamp: song.timestamp,
     endTimestamp: song.endTimestamp,
-    albumArtUrl: song.albumArtUrl,
     streamerSlug,
   };
 

@@ -9,7 +9,6 @@ export interface LikedVersion {
   videoId: string;
   timestamp: number;
   endTimestamp?: number;
-  albumArtUrl?: string;
   likedAt: number;
 }
 

@@ -9,7 +9,6 @@ export interface RecentPlay {
   videoId: string;
   timestamp: number;
   endTimestamp?: number;
-  albumArtUrl?: string;
   playedAt: number;
 }
 

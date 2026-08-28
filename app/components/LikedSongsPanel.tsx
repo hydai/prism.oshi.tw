@@ -26,7 +26,6 @@ export default function LikedSongsPanel({ show, onClose, onToast }: LikedSongsPa
     videoId: v.videoId,
     timestamp: v.timestamp,
     endTimestamp: v.endTimestamp,
-    albumArtUrl: v.albumArtUrl,
     streamerSlug: slug,
   });
 

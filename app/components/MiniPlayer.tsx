@@ -45,7 +45,6 @@ export default function MiniPlayer() {
       videoId: currentTrack.videoId,
       timestamp: currentTrack.timestamp,
       endTimestamp: currentTrack.endTimestamp,
-      albumArtUrl: currentTrack.albumArtUrl,
     });
   };
 

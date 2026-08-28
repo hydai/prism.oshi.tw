@@ -49,7 +49,6 @@ export function flattenSongs(songs: ArchiveSong[]): FlattenedSong[] {
         id: song.id,
         title: song.title,
         originalArtist: song.originalArtist,
-        albumArtUrl: song.albumArtUrl,
         performanceId: performance.id,
         streamId: performance.streamId,
         date: performance.date,
@@ -103,14 +102,12 @@ export function groupSongsByWorkId(songs: ArchiveSong[]): ArchiveSong[] {
     const orderedMembers = [...members].sort((a, b) => a.id.localeCompare(b.id));
     const canonical = orderedMembers[0];
     const workId = canonical.workId?.trim();
-    const albumArtUrl = orderedMembers.find((song) => song.albumArtUrl)?.albumArtUrl;
 
     return {
       ...canonical,
       ...(workId ? { workId } : {}),
       tags: Array.from(new Set(orderedMembers.flatMap((song) => song.tags))),
       performances: orderedMembers.flatMap((song) => song.performances),
-      albumArtUrl,
     };
   });
 }
@@ -146,7 +143,6 @@ export function trackFromFlattenedSong(song: FlattenedSong, streamerSlug: string
     videoId: song.videoId,
     timestamp: song.timestamp,
     endTimestamp: song.endTimestamp,
-    albumArtUrl: song.albumArtUrl,
     streamerSlug,
   };
 }
@@ -164,7 +160,6 @@ export function trackFromPerformance(
     videoId: performance.videoId,
     timestamp: performance.timestamp,
     endTimestamp: performance.endTimestamp ?? undefined,
-    albumArtUrl: song.albumArtUrl,
     streamerSlug,
   };
 }
