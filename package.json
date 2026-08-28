@@ -17,6 +17,7 @@
     "test:hydration": "npx tsx app/components/hydration.test.tsx",
     "test:format": "npx tsx app/lib/format.test.ts",
     "test:playlist-storage": "npx tsx app/lib/playlist-storage.test.ts",
+    "test:normalize-performance-ref": "npx tsx app/lib/normalize-performance-ref.test.ts",
     "test:safe-links": "npx tsx lib/safe-links.test.ts",
     "test:youtube-iframe": "npx tsc --noEmit --pretty false --skipLibCheck --strict --target ES2017 --module esnext --moduleResolution bundler --lib dom,dom.iterable,esnext --types node lib/youtube-iframe.test.ts && npx tsx lib/youtube-iframe.test.ts",
     "test:aurora-nova": "npx tsx tools/aurora/tests/nova.test.ts",

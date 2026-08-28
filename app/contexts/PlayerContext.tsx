@@ -142,7 +142,7 @@ function usePlayerController(): PlayerContextType {
   const [showQueue, setShowQueue] = useState(false);
   const [repeatMode, setRepeatMode] = useState<RepeatMode>('off');
   const [shuffleOn, setShuffleOn] = useState(false);
-  // Repeat-all refill pool — deliberately uncapped: it is deduped by id and
+  // Repeat-all refill pool — deliberately uncapped: it is deduped by performanceId and
   // bounded by the number of distinct performances played this session
   const [allTracks, setAllTracks] = useState<Track[]>([]);
   const [volume, setVolumeState] = useState(75);

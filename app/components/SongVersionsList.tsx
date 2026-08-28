@@ -2,6 +2,7 @@
 
 import { ExternalLink, Heart, Play, Plus } from 'lucide-react';
 import type { ArchivePerformance, ArchiveSong, PerformanceRef } from '../types/archive';
+import { trackFromPerformance } from '../lib/archive';
 import { formatTime } from '../lib/format';
 import AddToPlaylistDropdown from './AddToPlaylistDropdown';
 
@@ -12,7 +13,7 @@ interface SongVersionsListProps {
   onAddToQueue: (track: PerformanceRef) => void;
   onAddToPlaylistSuccess: () => void;
   isLiked: (performanceId: string) => boolean;
-  onToggleLike: (performance: ArchivePerformance, song: ArchiveSong) => void;
+  onToggleLike: (ref: PerformanceRef) => void;
   unavailableVideoIds: Set<string>;
   streamerSlug: string;
 }
@@ -56,16 +57,7 @@ export default function SongVersionsList({
               aria-label={`播放 ${song.title}（${performance.date}）`}
               onClick={() => {
                 if (!unavailableVideoIds.has(performance.videoId)) {
-                  onPlay({
-                    performanceId: performance.id,
-                    songId: song.id,
-                    songTitle: song.title,
-                    originalArtist: song.originalArtist,
-                    videoId: performance.videoId,
-                    timestamp: performance.timestamp,
-                    endTimestamp: performance.endTimestamp ?? null,
-                    streamerSlug,
-                  });
+                  onPlay(trackFromPerformance(song, performance, streamerSlug));
                 }
               }}
               disabled={unavailableVideoIds.has(performance.videoId)}
@@ -92,16 +84,7 @@ export default function SongVersionsList({
               aria-label={`播放 ${song.title}（${performance.date}）`}
               onClick={() => {
                 if (!unavailableVideoIds.has(performance.videoId)) {
-                  onPlay({
-                    performanceId: performance.id,
-                    songId: song.id,
-                    songTitle: song.title,
-                    originalArtist: song.originalArtist,
-                    videoId: performance.videoId,
-                    timestamp: performance.timestamp,
-                    endTimestamp: performance.endTimestamp ?? null,
-                    streamerSlug,
-                  });
+                  onPlay(trackFromPerformance(song, performance, streamerSlug));
                 }
               }}
               disabled={unavailableVideoIds.has(performance.videoId)}
@@ -158,7 +141,7 @@ export default function SongVersionsList({
             style={{ color: 'var(--text-secondary)' }}
           >
             <button
-              onClick={() => onToggleLike(performance, song)}
+              onClick={() => onToggleLike(trackFromPerformance(song, performance, streamerSlug))}
               className={`transition-[color,opacity,transform] transform hover:scale-110 ${isLiked(performance.id) ? '' : 'opacity-0 group-hover/version:opacity-100'}`}
               style={{
                 background: 'var(--bg-surface)',
@@ -173,16 +156,7 @@ export default function SongVersionsList({
               <Heart className={`w-4 h-4 ${isLiked(performance.id) ? 'fill-current' : ''}`} />
             </button>
             <button
-              onClick={() => onAddToQueue({
-                performanceId: performance.id,
-                songId: song.id,
-                songTitle: song.title,
-                originalArtist: song.originalArtist,
-                videoId: performance.videoId,
-                timestamp: performance.timestamp,
-                endTimestamp: performance.endTimestamp ?? null,
-                streamerSlug,
-              })}
+              onClick={() => onAddToQueue(trackFromPerformance(song, performance, streamerSlug))}
               className="opacity-0 group-hover/version:opacity-100 transition-[opacity,transform] transform hover:scale-110"
               style={{
                 background: 'var(--bg-surface)',
@@ -213,14 +187,7 @@ export default function SongVersionsList({
               }}
             >
               <AddToPlaylistDropdown
-                version={{
-                  performanceId: performance.id,
-                  songTitle: song.title,
-                  originalArtist: song.originalArtist,
-                  videoId: performance.videoId,
-                  timestamp: performance.timestamp,
-                  streamerSlug,
-                }}
+                version={trackFromPerformance(song, performance, streamerSlug)}
                 onSuccess={onAddToPlaylistSuccess}
               />
             </div>

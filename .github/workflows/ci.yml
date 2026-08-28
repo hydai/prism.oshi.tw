@@ -39,6 +39,7 @@ jobs:
       - run: npm run test:hydration
       - run: npm run test:format
       - run: npm run test:playlist-storage
+      - run: npm run test:normalize-performance-ref
       - run: npm run test:safe-links
       - run: npm run test:youtube-iframe
       - run: npm run test:aurora-nova

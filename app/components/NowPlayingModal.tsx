@@ -40,14 +40,7 @@ export default function NowPlayingModal() {
   const liked = currentTrack ? isLiked(currentTrack.performanceId) : false;
   const handleToggleLike = () => {
     if (!currentTrack) return;
-    toggleLike({
-      performanceId: currentTrack.performanceId,
-      songTitle: currentTrack.songTitle,
-      originalArtist: currentTrack.originalArtist,
-      videoId: currentTrack.videoId,
-      timestamp: currentTrack.timestamp,
-      endTimestamp: currentTrack.endTimestamp ?? undefined,
-    });
+    toggleLike(currentTrack);
   };
 
   // Keyboard navigation: Escape to close modal

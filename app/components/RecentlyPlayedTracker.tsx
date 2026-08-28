@@ -19,14 +19,7 @@ export default function RecentlyPlayedTracker() {
 
     lastRecordedId.current = currentTrack.performanceId;
 
-    addRecentPlay({
-      performanceId: currentTrack.performanceId,
-      songTitle: currentTrack.songTitle,
-      originalArtist: currentTrack.originalArtist,
-      videoId: currentTrack.videoId,
-      timestamp: currentTrack.timestamp,
-      endTimestamp: currentTrack.endTimestamp ?? undefined,
-    });
+    addRecentPlay(currentTrack);
   }, [currentTrack, addRecentPlay]);
 
   return null;

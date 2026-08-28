@@ -59,20 +59,17 @@ export default function PlaylistPanel({ show, onClose, songsData, onToast }: Pla
     setDraggedOverIndex(null);
   };
 
+  // O(1) membership — a per-row nested scan over all songs × performances
+  // ran ~540k iterations per render on a 100-item playlist
+  const existingPerformanceIds = useMemo(
+    () => new Set(songsData.flatMap(song => song.performances.map(p => p.id))),
+    [songsData]
+  );
+
   const handlePlayPlaylist = (playlist: Playlist) => {
     if (playlist.versions.length === 0) return;
 
-    const tracks: Track[] = playlist.versions.map(v => ({
-      performanceId: v.performanceId,
-      songId: v.performanceId,
-      songTitle: v.songTitle,
-      originalArtist: v.originalArtist,
-      videoId: v.videoId,
-      timestamp: v.timestamp,
-      endTimestamp: v.endTimestamp ?? null,
-      deleted: !checkVersionExists(v.performanceId),
-      streamerSlug: v.streamerSlug,
-    }));
+    const tracks: Track[] = playlist.versions.map((v) => ({ ...v, deleted: !existingPerformanceIds.has(v.performanceId) }));
 
     const firstPlayable = tracks.find(t => !t.deleted);
     if (!firstPlayable) return;
@@ -99,15 +96,6 @@ export default function PlaylistPanel({ show, onClose, songsData, onToast }: Pla
       setSelectedPlaylistId(null);
     }
   };
-
-  // O(1) membership — a per-row nested scan over all songs × performances
-  // ran ~540k iterations per render on a 100-item playlist
-  const existingPerformanceIds = useMemo(
-    () => new Set(songsData.flatMap(song => song.performances.map(p => p.id))),
-    [songsData]
-  );
-  const checkVersionExists = (performanceId: string): boolean =>
-    existingPerformanceIds.has(performanceId);
 
   const handleImportFile = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -209,7 +197,7 @@ export default function PlaylistPanel({ show, onClose, songsData, onToast }: Pla
             playlist={selectedPlaylist}
             draggedIndex={draggedIndex}
             draggedOverIndex={draggedOverIndex}
-            versionExists={checkVersionExists}
+            versionExists={(performanceId) => existingPerformanceIds.has(performanceId)}
             onDragStart={handleDragStart}
             onDragOver={handleDragOver}
             onDrop={handleDrop}

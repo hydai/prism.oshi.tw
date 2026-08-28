@@ -1,21 +1,16 @@
 'use client';
 
 import { createContext, useContext, useState, useEffect, useCallback, useMemo, ReactNode } from 'react';
+import type { PerformanceRef } from '../types/archive';
+import { pickPerformanceRef } from '../lib/archive';
+import { normalizeStoredRef } from '../lib/normalize-performance-ref';
 
-export interface LikedVersion {
-  performanceId: string;
-  songTitle: string;
-  originalArtist: string;
-  videoId: string;
-  timestamp: number;
-  endTimestamp?: number;
-  likedAt: number;
-}
+export type LikedVersion = PerformanceRef & { likedAt: number };
 
 interface LikedSongsContextType {
   likedSongs: LikedVersion[];
   isLiked: (performanceId: string) => boolean;
-  toggleLike: (version: Omit<LikedVersion, 'likedAt'>) => void;
+  toggleLike: (version: PerformanceRef) => void;
   likedCount: number;
 }
 
@@ -73,7 +68,7 @@ export const LikedSongsProvider = ({ streamerSlug, children }: { streamerSlug: s
     [likedIds],
   );
 
-  const toggleLike = useCallback((version: Omit<LikedVersion, 'likedAt'>) => {
+  const toggleLike = useCallback((version: PerformanceRef) => {
     if (!localStorageSupported) return;
 
     // Compute outside the updater — updaters must stay pure (StrictMode
@@ -82,7 +77,7 @@ export const LikedSongsProvider = ({ streamerSlug, children }: { streamerSlug: s
       const exists = prev.some(s => s.performanceId === version.performanceId);
       return exists
         ? prev.filter(s => s.performanceId !== version.performanceId)
-        : [{ ...version, likedAt: Date.now() }, ...prev];
+        : [{ ...pickPerformanceRef(version), likedAt: Date.now() }, ...prev];
     });
   }, [localStorageSupported]);
 
@@ -92,7 +87,14 @@ export const LikedSongsProvider = ({ streamerSlug, children }: { streamerSlug: s
     try {
       const stored = localStorage.getItem(STORAGE_KEY);
       if (stored) {
-        setLikedSongs(JSON.parse(stored));
+        const parsed: unknown = JSON.parse(stored);
+        if (Array.isArray(parsed)) {
+          setLikedSongs(parsed.flatMap((entry) => {
+            const ref = normalizeStoredRef(entry, streamerSlug);
+            const likedAt = (entry as { likedAt?: unknown }).likedAt;
+            return ref && typeof likedAt === 'number' ? [{ ...ref, likedAt }] : [];
+          }));
+        }
       }
     } catch (error) {
       console.error('Failed to load liked songs from localStorage:', error);

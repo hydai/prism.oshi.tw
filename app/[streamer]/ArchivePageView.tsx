@@ -1303,14 +1303,7 @@ function TimelineSongList({
                     isCurrentlyPlaying={currentTrackId === song.performanceId}
                     isUnavailable={unavailableVideoIds.has(song.videoId)}
                     isLiked={isLiked(song.performanceId)}
-                    onToggleLike={() => toggleLike({
-                      performanceId: song.performanceId,
-                      songTitle: song.title,
-                      originalArtist: song.originalArtist,
-                      videoId: song.videoId,
-                      timestamp: song.timestamp,
-                      endTimestamp: song.endTimestamp,
-                    })}
+                    onToggleLike={toggleLike}
                     onPlay={handlePlayFromFlattened}
                     streamerSlug={slug}
                     onAddToQueue={handleAddToQueue}
@@ -1406,14 +1399,7 @@ function GroupedSongList({
                   onAddToQueue={handleAddToQueue}
                   onAddToPlaylistSuccess={handleAddToPlaylistSuccess}
                   isLiked={isLiked}
-                  onToggleLike={(perf, s) => toggleLike({
-                    performanceId: perf.id,
-                    songTitle: s.title,
-                    originalArtist: s.originalArtist,
-                    videoId: perf.videoId,
-                    timestamp: perf.timestamp,
-                    endTimestamp: perf.endTimestamp ?? undefined,
-                  })}
+                  onToggleLike={toggleLike}
                   unavailableVideoIds={unavailableVideoIds}
                   streamerSlug={slug}
                 />

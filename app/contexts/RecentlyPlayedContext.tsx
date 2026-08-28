@@ -1,20 +1,15 @@
 'use client';
 
 import { createContext, useContext, useState, useEffect, useCallback, useMemo, useRef, ReactNode } from 'react';
+import type { PerformanceRef } from '../types/archive';
+import { pickPerformanceRef } from '../lib/archive';
+import { normalizeStoredRef } from '../lib/normalize-performance-ref';
 
-export interface RecentPlay {
-  performanceId: string;
-  songTitle: string;
-  originalArtist: string;
-  videoId: string;
-  timestamp: number;
-  endTimestamp?: number;
-  playedAt: number;
-}
+export type RecentPlay = PerformanceRef & { playedAt: number };
 
 interface RecentlyPlayedContextType {
   recentPlays: RecentPlay[];
-  addRecentPlay: (play: Omit<RecentPlay, 'playedAt'>) => void;
+  addRecentPlay: (play: PerformanceRef) => void;
   clearHistory: () => void;
   recentCount: number;
 }
@@ -68,7 +63,14 @@ export const RecentlyPlayedProvider = ({ streamerSlug, children }: { streamerSlu
     try {
       const stored = localStorage.getItem(STORAGE_KEY);
       if (stored) {
-        setRecentPlays(JSON.parse(stored));
+        const parsed: unknown = JSON.parse(stored);
+        if (Array.isArray(parsed)) {
+          setRecentPlays(parsed.flatMap((entry) => {
+            const ref = normalizeStoredRef(entry, streamerSlug);
+            const playedAt = (entry as { playedAt?: unknown }).playedAt;
+            return ref && typeof playedAt === 'number' ? [{ ...ref, playedAt }] : [];
+          }));
+        }
       }
     } catch (error) {
       console.error('Failed to load recently played from localStorage:', error);
@@ -90,12 +92,12 @@ export const RecentlyPlayedProvider = ({ streamerSlug, children }: { streamerSlu
   const recentPlaysRef = useRef<RecentPlay[]>([]);
   useEffect(() => { recentPlaysRef.current = recentPlays; }, [recentPlays]);
 
-  const addRecentPlay = useCallback((play: Omit<RecentPlay, 'playedAt'>) => {
+  const addRecentPlay = useCallback((play: PerformanceRef) => {
     if (!localStorageSupported) return;
 
     // Dedup: remove old entry for same performanceId, prepend new
     const filtered = recentPlaysRef.current.filter(r => r.performanceId !== play.performanceId);
-    const newPlays = [{ ...play, playedAt: Date.now() }, ...filtered].slice(0, MAX_ENTRIES);
+    const newPlays = [{ ...pickPerformanceRef(play), playedAt: Date.now() }, ...filtered].slice(0, MAX_ENTRIES);
 
     const saved = saveToLocalStorage(newPlays);
     if (saved) {

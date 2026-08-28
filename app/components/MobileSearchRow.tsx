@@ -3,18 +3,11 @@
 import { memo } from 'react';
 import { Play } from 'lucide-react';
 import { formatTime } from '../lib/format';
-import type { PerformanceRef } from '../types/archive';
+import type { FlattenedSong, PerformanceRef } from '../types/archive';
+import { trackFromFlattenedSong } from '../lib/archive';
 
 interface MobileSearchRowProps {
-  song: {
-    id: string;
-    performanceId: string;
-    title: string;
-    originalArtist: string;
-    videoId: string;
-    timestamp: number;
-    endTimestamp?: number;
-  };
+  song: FlattenedSong;
   isCurrentlyPlaying: boolean;
   isUnavailable: boolean;
   onPlay: (track: PerformanceRef) => void;
@@ -37,16 +30,7 @@ function MobileSearchRowInner({ song, isCurrentlyPlaying, isUnavailable, onPlay,
         aria-label={`播放 ${song.title}`}
         onClick={() => {
           if (!isUnavailable) {
-            onPlay({
-              performanceId: song.performanceId,
-              songId: song.id,
-              songTitle: song.title,
-              originalArtist: song.originalArtist,
-              videoId: song.videoId,
-              timestamp: song.timestamp,
-              endTimestamp: song.endTimestamp ?? null,
-              streamerSlug,
-            });
+            onPlay(trackFromFlattenedSong(song, streamerSlug));
           }
         }}
         disabled={isUnavailable}
