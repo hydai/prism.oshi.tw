@@ -48,6 +48,14 @@ export function getLocalStorage(): Storage | null {
   }
 }
 
+export function getSessionStorage(): Storage | null {
+  try {
+    return typeof window === 'undefined' ? null : window.sessionStorage;
+  } catch {
+    return null;
+  }
+}
+
 const STORAGE_UNAVAILABLE = '您的瀏覽器不支援本機儲存';
 
 /**

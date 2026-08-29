@@ -34,7 +34,7 @@ test.describe('archive view mode toggle', () => {
 
     await expect(grouped).toHaveAttribute('aria-pressed', 'true');
     await expect(page.getByTestId('song-card').first()).toBeVisible();
-    await expect.poll(() => page.evaluate(() => sessionStorage.getItem('mizukiprism-view-mode'))).toBe('grouped');
+    await expect.poll(() => page.evaluate(() => JSON.parse(sessionStorage.getItem('prism_view_mode') ?? 'null'))).toBe('grouped');
 
     await page.reload();
 
