@@ -89,6 +89,13 @@ function useArchivePageController() {
     setToastMessage('已加入播放清單');
   }, []);
 
+  // toggleLike's write can fail (storage quota); surface that failure here
+  // since this is the only surface with a toast affordance for it.
+  const handleToggleLike = useCallback((ref: PerformanceRef) => {
+    const result = toggleLike(ref);
+    if (!result.success) setToastMessage(result.error);
+  }, [toggleLike]);
+
   // Show storage error toast
   useEffect(() => {
     if (storageError) {
@@ -267,7 +274,7 @@ function useArchivePageController() {
     playlists,
     likedCount,
     isLiked,
-    toggleLike,
+    toggleLike: handleToggleLike,
     recentCount,
     handleAddToQueue,
     handlePlayAll,
