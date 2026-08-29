@@ -1,8 +1,9 @@
 'use client';
 
-import { ReactNode, useEffect, useState } from 'react';
+import { ReactNode, useEffect, useSyncExternalStore } from 'react';
 import { StreamerConfig, StreamerTheme } from '../../lib/types';
 import { deriveDarkTheme } from '../../lib/theme-utils';
+import { htmlDarkClassStore } from '../lib/theme-store';
 import { StreamerProvider } from '../contexts/StreamerContext';
 import { PlayerProvider } from '../contexts/PlayerContext';
 import PerStreamerProviders from '../components/PerStreamerProviders';
@@ -40,19 +41,13 @@ export default function StreamerShell({
   config: StreamerConfig;
   children: ReactNode;
 }) {
-  const [isDark, setIsDark] = useState(false);
-
-  // Watch for dark mode changes on <html> element
-  useEffect(() => {
-    const html = document.documentElement;
-    setIsDark(html.classList.contains('dark'));
-
-    const observer = new MutationObserver(() => {
-      setIsDark(html.classList.contains('dark'));
-    });
-    observer.observe(html, { attributes: true, attributeFilter: ['class'] });
-    return () => observer.disconnect();
-  }, []);
+  // Dark-mode class on <html> is read from an external store instead of an
+  // effect+setState — ThemeToggle (and the inline boot script) own the toggle.
+  const isDark = useSyncExternalStore(
+    htmlDarkClassStore.subscribe,
+    htmlDarkClassStore.getSnapshot,
+    htmlDarkClassStore.getServerSnapshot,
+  );
 
   const cssVars = getThemeVars(config.theme, isDark);
 

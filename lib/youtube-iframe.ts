@@ -3,6 +3,8 @@ export interface YouTubePlayer {
   getCurrentTime: () => number;
   getDuration: () => number;
   getPlayerState: () => number;
+  /** Optional — the real IFrame API has it, but stubs (e.g. tests) may not. */
+  getVideoData?(): { video_id?: string };
   loadVideoById: (videoIdOrOptions: string | { videoId: string; startSeconds?: number }) => void;
   mute: () => void;
   pauseVideo: () => void;

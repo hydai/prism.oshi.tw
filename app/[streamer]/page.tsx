@@ -51,7 +51,6 @@ function useArchivePageController() {
   const setViewMode = useCallback((mode: ArchiveViewMode) => { viewModeStore.update(() => mode); }, [viewModeStore]);
   const [expandedSongs, setExpandedSongs] = useState<Set<string>>(new Set());
   const [toastMessage, setToastMessage] = useState<string | null>(null);
-  const hideToast = useCallback(() => setToastMessage(null), []);
   const [showPlaylistPanel, setShowPlaylistPanel] = useState(false);
   const [showLikedSongsPanel, setShowLikedSongsPanel] = useState(false);
   const [showRecentlyPlayedPanel, setShowRecentlyPlayedPanel] = useState(false);
@@ -61,12 +60,13 @@ function useArchivePageController() {
   const [loadState, setLoadState] = useState<ArchiveLoadState>('loading');
   const loadAbortRef = useRef<AbortController | null>(null);
 
-  // Load songs/streams in parallel — the retry button calls this again
+  // Load songs/streams in parallel. The initial state is already 'loading',
+  // so the mount effect below can call this with no synchronous setState of
+  // its own; the retry button goes through retryLoad, which sets it instead.
   const loadData = useCallback(() => {
     loadAbortRef.current?.abort();
     const controller = new AbortController();
     loadAbortRef.current = controller;
-    setLoadState('loading');
     loadArchiveData(slug, undefined, controller.signal)
       .then(({ songs: loadedSongs, streams: loadedStreams }) => {
         if (controller.signal.aborted) return;
@@ -79,6 +79,11 @@ function useArchivePageController() {
         setLoadState('error');
       });
   }, [slug]);
+
+  const retryLoad = useCallback(() => {
+    setLoadState('loading');
+    loadData();
+  }, [loadData]);
 
   useEffect(() => {
     loadData();
@@ -107,29 +112,21 @@ function useArchivePageController() {
     if (!result.success) setToastMessage(result.error);
   }, [toggleLike]);
 
-  // Show storage error toast
-  useEffect(() => {
-    if (storageError) {
-      setToastMessage(storageError);
-      clearStorageError();
-    }
-  }, [storageError, clearStorageError]);
-
-  // Show timestamp warning toast
-  useEffect(() => {
-    if (timestampWarning) {
-      setToastMessage(timestampWarning);
-      clearTimestampWarning();
-    }
-  }, [timestampWarning, clearTimestampWarning]);
-
-  // Show skip notification toast (deleted version skipped or playlist ended)
-  useEffect(() => {
-    if (skipNotification) {
-      setToastMessage(skipNotification);
-      clearSkipNotification();
-    }
-  }, [skipNotification, clearSkipNotification]);
+  // One-shot notifications from the contexts are shown directly; hiding the
+  // toast clears every source currently holding the visible text (same
+  // priority order as `toast` below), so a lower-priority notification with
+  // DIFFERENT text queued behind a visible one survives to show next, while
+  // same-text duplicates across sources are cleared together — showing the
+  // identical string twice in a row helps nobody.
+  const toast = toastMessage ?? storageError ?? timestampWarning ?? skipNotification;
+  const hideToast = useCallback(() => {
+    const visible = toastMessage ?? storageError ?? timestampWarning ?? skipNotification;
+    if (visible === null) return;
+    if (toastMessage === visible) setToastMessage(null);
+    if (storageError === visible) clearStorageError();
+    if (timestampWarning === visible) clearTimestampWarning();
+    if (skipNotification === visible) clearSkipNotification();
+  }, [toastMessage, storageError, timestampWarning, skipNotification, clearStorageError, clearTimestampWarning, clearSkipNotification]);
 
   const toggleSongExpansion = useCallback((songId: string) => {
     setExpandedSongs(prev => {
@@ -248,7 +245,7 @@ function useArchivePageController() {
     viewMode,
     setViewMode,
     expandedSongs,
-    toastMessage,
+    toastMessage: toast,
     setToastMessage,
     hideToast,
     showPlaylistPanel,
@@ -263,7 +260,7 @@ function useArchivePageController() {
     setMobileTab,
     songs,
     loadState,
-    loadData,
+    retryLoad,
     currentTrackId,
     apiLoadError,
     unavailableVideoIds,
