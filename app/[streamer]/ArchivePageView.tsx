@@ -1067,7 +1067,7 @@ function DesktopActionBar() {
 }
 
 
-function CatalogStatus({ loadState, loadData }: Pick<ArchivePageController, 'loadState' | 'loadData'>) {
+function CatalogStatus({ loadState, retryLoad }: Pick<ArchivePageController, 'loadState' | 'retryLoad'>) {
   if (loadState === 'error') {
     return (
       /* Song API Load Error State */
@@ -1090,7 +1090,7 @@ function CatalogStatus({ loadState, loadData }: Pick<ArchivePageController, 'loa
         </p>
         <button
           data-testid="retry-button"
-          onClick={loadData}
+          onClick={retryLoad}
           className="font-semibold transition-opacity hover:opacity-90"
           style={{
             background: 'linear-gradient(135deg, var(--accent-pink-light), var(--accent-blue-light))',
@@ -1130,7 +1130,7 @@ function SongCatalog() {
     flattenedSongs,
     groupedSongs,
     loadState,
-    loadData,
+    retryLoad,
     viewMode,
     mobileTab,
     scrollContainerRef,
@@ -1171,7 +1171,7 @@ function SongCatalog() {
             <span data-testid="total-performance-count" className="sr-only">{flattenedSongs.length}</span>
             <span data-testid="total-song-card-count" className="sr-only">{groupedSongs.length}</span>
             {loadState === 'error' || loadState === 'loading' ? (
-              <CatalogStatus loadState={loadState} loadData={loadData} />
+              <CatalogStatus loadState={loadState} retryLoad={retryLoad} />
             ) : viewMode === 'timeline' ? (
               <TimelineSongList virtualizer={timelineVirtualizer} listRef={timelineListRef} />
             ) : (

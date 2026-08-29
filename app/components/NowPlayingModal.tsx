@@ -1,23 +1,19 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useEffect } from 'react';
 import { createPortal } from 'react-dom';
 import { Play, Pause, SkipBack, SkipForward, ChevronDown, Shuffle, Repeat, Repeat1, Heart } from 'lucide-react';
 import { usePlayer, usePlaybackTime } from '../contexts/PlayerContext';
 import { useCurrentTrackLike } from '../lib/use-current-track-like';
 import { useTrackProgress } from '../lib/use-track-progress';
+import { useHydrated } from '../lib/use-hydrated';
 import AlbumArt from './AlbumArt';
 import VolumeControl from './VolumeControl';
 import ProgressBar from './ProgressBar';
 import { formatTime } from '../lib/format';
 
 export default function NowPlayingModal() {
-  const [mounted, setMounted] = useState(false);
-
-  useEffect(() => {
-    setMounted(true);
-    return () => setMounted(false);
-  }, []);
+  const mounted = useHydrated();
   const {
     currentTrack,
     isPlaying,

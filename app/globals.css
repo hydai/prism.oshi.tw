@@ -219,3 +219,8 @@ html.dark .custom-scrollbar::-webkit-scrollbar-thumb:hover {
   pointer-events: none !important;
   overflow: hidden !important;
 }
+
+@keyframes toast-in {
+  from { opacity: 0; transform: translateY(-1rem); }
+  to   { opacity: 1; transform: translateY(0); }
+}

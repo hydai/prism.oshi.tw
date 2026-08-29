@@ -127,9 +127,16 @@ function usePlayerController(): PlayerContextType {
   const [currentTrack, setCurrentTrack] = useState<Track | null>(null);
   const [isPlaying, setIsPlaying] = useState(false);
   const [isPlayerReady, setIsPlayerReady] = useState(false);
-  const [playerError, setPlayerError] = useState<string | null>(null);
+  // Which video id last errored — compared against the current track so the
+  // error clears itself on a track change, with no setState in the load effect.
+  const [erroredVideoId, setErroredVideoId] = useState<string | null>(null);
+  const playerError = currentTrack && erroredVideoId === currentTrack.videoId ? '此影片已無法播放' : null;
   const [apiLoadError, setApiLoadError] = useState<string | null>(null);
   const [unavailableVideoIds, setUnavailableVideoIds] = useState<Set<string>>(new Set());
+  // Duration of each loaded video, learned only from the player's own async
+  // onReady/onStateChange callbacks — lets a reused player validate a track's
+  // timestamp below without a synchronous read (and setState) in the load effect.
+  const [videoDurations, setVideoDurations] = useState<Map<string, number>>(new Map());
   const [timestampWarning, setTimestampWarning] = useState<string | null>(null);
   const [skipNotification, setSkipNotification] = useState<string | null>(null);
   // Lazy state initializer: built once per mount, never rebuilt (and no ref read during render).
@@ -175,6 +182,16 @@ function usePlayerController(): PlayerContextType {
   const allTracksRef = useRef<Track[]>([]);
   const volumeRef = useRef(75);
   const isMutedRef = useRef(false);
+  // Mirrors isPlaying — read inside the player-creation onReady handler so a
+  // pause pressed while the iframe API was still loading (togglePlayPause's
+  // early-return branch flips isPlaying but can't reach the player yet) is
+  // still honored once the player becomes available.
+  const isPlayingRef = useRef(false);
+  // Mirrors videoDurations state — read inside the player-load effect below so
+  // a newly-learned duration doesn't retrigger that effect (and re-seek/re-play
+  // whatever is already loaded); the reactive state itself drives the render-time
+  // timestamp check above, which does need to react to it.
+  const videoDurationsRef = useRef<Map<string, number>>(new Map());
   const queueEntryIdPrefix = useId();
   const nextQueueEntryId = useRef(0);
 
@@ -186,6 +203,24 @@ function usePlayerController(): PlayerContextType {
   const clearTimestampWarning = useCallback(() => setTimestampWarning(null), []);
   const clearSkipNotification = useCallback(() => setSkipNotification(null), []);
 
+  // Adjust state while rendering (React's documented alternative to copying a
+  // prop into state via an Effect): flag a too-long timestamp exactly once
+  // per track, as soon as its video's real duration is known, instead of a
+  // synchronous setState in the player-load effect below.
+  const currentTrackKey = currentTrack?.performanceId ?? null;
+  const [checkedTimestampKey, setCheckedTimestampKey] = useState<string | null>(null);
+  if (currentTrack && currentTrackKey !== checkedTimestampKey) {
+    const knownDuration = videoDurations.get(currentTrack.videoId);
+    // getDuration() reports 0 until YouTube's metadata finishes loading, so a
+    // cached 0 is not actually "known" yet — wait for a positive duration.
+    if (knownDuration !== undefined && knownDuration > 0) {
+      setCheckedTimestampKey(currentTrackKey);
+      if (currentTrack.timestamp > 0 && currentTrack.timestamp >= knownDuration) {
+        setTimestampWarning('時間戳可能有誤');
+      }
+    }
+  }
+
   // Keep refs in sync with state
   useEffect(() => { queueRef.current = queue; }, [queue]);
   useEffect(() => { currentTrackRef.current = currentTrack; }, [currentTrack]);
@@ -193,7 +228,9 @@ function usePlayerController(): PlayerContextType {
   useEffect(() => { shuffleOnRef.current = shuffleOn; }, [shuffleOn]);
   useEffect(() => { allTracksRef.current = allTracks; }, [allTracks]);
   useEffect(() => { volumeRef.current = volume; }, [volume]);
+  useEffect(() => { videoDurationsRef.current = videoDurations; }, [videoDurations]);
   useEffect(() => { isMutedRef.current = isMuted; }, [isMuted]);
+  useEffect(() => { isPlayingRef.current = isPlaying; }, [isPlaying]);
 
   const setVolume = useCallback((n: number) => {
     const clamped = Math.max(0, Math.min(100, n));
@@ -221,6 +258,24 @@ function usePlayerController(): PlayerContextType {
       }
     }
   }, [mutedStore]);
+
+  // Load the YouTube IFrame API on demand. Safe to call repeatedly — the
+  // loader caches an in-flight/successful load and a failed load is retried
+  // by the next call.
+  const ensurePlayerApi = useCallback(() => {
+    if (typeof window === 'undefined') return;
+    loadYouTubeIframeApi(window, document)
+      .then(() => {
+        setApiLoadError(null);
+        setIsPlayerReady(true);
+      })
+      .catch(() => {
+        setApiLoadError('播放器載入失敗，請重新整理頁面');
+        // Reset the optimistic isPlaying flip made by the caller — with the
+        // API blocked, nothing is actually going to play.
+        setIsPlaying(false);
+      });
+  }, []);
 
   // Advance to next non-deleted track in queue, skipping deleted ones.
   // Returns true if a non-deleted track was found and set as current, false if all remaining are deleted or queue is empty.
@@ -257,6 +312,10 @@ function usePlayerController(): PlayerContextType {
       return false;
     }
 
+    // Covers the auto-advance/polling path landing before the idle prefetch
+    // has run; idempotent, and its .catch resets isPlaying if it fails.
+    ensurePlayerApi();
+
     // Shuffle: pick random track from playable queue; otherwise take first
     let pickIndex: number;
     if (shuffleOnRef.current) {
@@ -283,24 +342,13 @@ function usePlayerController(): PlayerContextType {
       setSkipNotification('已跳過無法播放的版本');
     }
     setCurrentTrack(nextTrack);
+    // Optimistic: advancing is initiated here (a click, or the polling
+    // effect's end-of-track check), not guessed inside the player-load
+    // effect — onStateChange corrects it if playback doesn't actually start.
+    setIsPlaying(true);
     timeStore.setTime(nextTrack.timestamp);
     return true;
-  }, [createQueueEntry, timeStore]);
-
-  // Load the YouTube IFrame API on demand. Safe to call repeatedly — the
-  // loader caches an in-flight/successful load and a failed load is retried
-  // by the next call.
-  const ensurePlayerApi = useCallback(() => {
-    if (typeof window === 'undefined') return;
-    loadYouTubeIframeApi(window, document)
-      .then(() => {
-        setApiLoadError(null);
-        setIsPlayerReady(true);
-      })
-      .catch(() => {
-        setApiLoadError('播放器載入失敗，請重新整理頁面');
-      });
-  }, []);
+  }, [createQueueEntry, ensurePlayerApi, timeStore]);
 
   // Prefetch the YouTube API once the browser is idle so the first play is
   // instant, without competing with the initial page load for connections.
@@ -366,37 +414,48 @@ function usePlayerController(): PlayerContextType {
   useEffect(() => {
     if (!isPlayerReady || !currentTrack) return;
 
-    // Clear previous errors when starting new track
-    setPlayerError(null);
-
     const player = playerRef.current;
 
     // --- Reuse existing player ---
     if (player && loadedVideoIdRef.current) {
       if (currentTrack.videoId === loadedVideoIdRef.current) {
-        // Same VOD — just seek to the new timestamp
+        // Same VOD — seek to the new timestamp. A too-long timestamp is
+        // flagged reactively above from the cached video duration; onStateChange
+        // (bound when this player was created) reports the resulting isPlaying
+        // state once the seek's buffering settles, so neither needs a setState here.
         const videoDuration = player.getDuration?.() || 0;
         if (currentTrack.timestamp > 0 && videoDuration > 0 && currentTrack.timestamp >= videoDuration) {
           player.seekTo(0, true);
-          setTimestampWarning('時間戳可能有誤');
         } else {
           player.seekTo(currentTrack.timestamp, true);
         }
         player.setVolume(volumeRef.current);
         if (isMutedRef.current) { player.mute(); } else { player.unMute(); }
         player.playVideo();
-        setIsPlaying(true);
         return;
       } else {
-        // Different VOD — load new video without destroying the iframe
+        // Different VOD — load new video without destroying the iframe.
+        // onStateChange (bound when this player was created) reports the
+        // resulting isPlaying state and duration once loadVideoById settles.
+        // A too-long timestamp gets the same seekTo(0)-equivalent recovery as
+        // the same-VOD branch above, but only when this video's duration is
+        // already cached (we can't read it imperatively before it loads).
         loadedVideoIdRef.current = currentTrack.videoId;
+        const knownDuration = videoDurationsRef.current.get(currentTrack.videoId);
+        // A cached 0 means getDuration() hadn't loaded metadata yet when it was
+        // recorded, not a genuinely known (zero-length) duration — ignore it.
+        const startSeconds = knownDuration !== undefined
+          && knownDuration > 0
+          && currentTrack.timestamp > 0
+          && currentTrack.timestamp >= knownDuration
+          ? 0
+          : currentTrack.timestamp;
         player.loadVideoById({
           videoId: currentTrack.videoId,
-          startSeconds: currentTrack.timestamp,
+          startSeconds,
         });
         player.setVolume(volumeRef.current);
         if (isMutedRef.current) { player.mute(); } else { player.unMute(); }
-        setIsPlaying(true);
         return;
       }
     }
@@ -424,13 +483,32 @@ function usePlayerController(): PlayerContextType {
         onReady: (event: YouTubeReadyEvent) => {
           const videoDuration = event.target.getDuration();
           timeStore.setDuration(videoDuration);
+          // If the user picked a different track while this player was still
+          // becoming ready, the reuse effect above has already moved it on
+          // (loadedVideoIdRef.current + loadVideoById) — resolve which video
+          // is actually loaded so the duration is attributed to it, not to
+          // this callback's closed-over currentTrack.
+          const readyVideoId = event.target.getVideoData?.()?.video_id ?? loadedVideoIdRef.current;
+          // getDuration() can report 0 here if metadata hasn't loaded yet —
+          // only cache a real duration (mirrors the d > 0 guard in onStateChange
+          // below), so downstream consumers never treat 0 as "known".
+          if (videoDuration > 0 && readyVideoId) {
+            setVideoDurations(prev => new Map(prev).set(readyVideoId, videoDuration));
+          }
 
-          // Check if timestamp exceeds video length
-          if (currentTrack.timestamp > 0 && videoDuration > 0 && currentTrack.timestamp >= videoDuration) {
-            event.target.seekTo(0, true);
-            setTimestampWarning('時間戳可能有誤');
-          } else {
-            event.target.seekTo(currentTrack.timestamp, true);
+          // Only run the closure-based seek recovery when this callback's
+          // currentTrack is still the video that's actually loaded — otherwise
+          // the reuse effect already positioned the newer video and this would
+          // fight it with the stale track's timestamp.
+          if (readyVideoId === currentTrack.videoId) {
+            // Check if timestamp exceeds video length. The warning itself is owned
+            // by the render-time check above (fires once videoDurations reflects a
+            // real duration) — this only performs the seek-to-start recovery.
+            if (currentTrack.timestamp > 0 && videoDuration > 0 && currentTrack.timestamp >= videoDuration) {
+              event.target.seekTo(0, true);
+            } else {
+              event.target.seekTo(currentTrack.timestamp, true);
+            }
           }
 
           // Apply saved volume/mute settings to newly created player
@@ -443,6 +521,15 @@ function usePlayerController(): PlayerContextType {
 
           event.target.playVideo();
           setIsPlaying(true);
+
+          // The user pressed pause while the API was still loading (recorded
+          // via isPlayingRef by togglePlayPause's early-return branch) —
+          // autoplay above would otherwise override that intent. A transient
+          // PLAYING event may still fire before the PAUSED event below settles
+          // isPlaying back to false.
+          if (!isPlayingRef.current) {
+            event.target.pauseVideo?.();
+          }
         },
         onStateChange: (event: YouTubePlayerEventWithData<number>) => {
           // YT.PlayerState: PLAYING=1, PAUSED=2, ENDED=0
@@ -450,7 +537,18 @@ function usePlayerController(): PlayerContextType {
             setIsPlaying(true);
             // Update duration (needed after loadVideoById since onReady doesn't re-fire)
             const d = event.target.getDuration();
-            if (d > 0) timeStore.setDuration(d);
+            if (d > 0) {
+              timeStore.setDuration(d);
+              // Resolve which video this event actually describes — same as
+              // onReady above. A queued PLAYING event for the previous video
+              // can be delivered after loadedVideoIdRef.current has already
+              // moved on to the next one, which would otherwise cache the
+              // old video's duration under the new video's id.
+              const eventVideoId = event.target.getVideoData?.()?.video_id ?? loadedVideoIdRef.current;
+              if (eventVideoId) {
+                setVideoDurations(prev => (prev.get(eventVideoId) === d ? prev : new Map(prev).set(eventVideoId, d)));
+              }
+            }
           } else if (event.data === 2) {
             setIsPlaying(false);
           } else if (event.data === 0) {
@@ -478,7 +576,7 @@ function usePlayerController(): PlayerContextType {
           // 150: Same as 101 (owner restricted embedding)
           const errorVideoId = loadedVideoIdRef.current;
           if ([100, 101, 150].includes(event.data) && errorVideoId) {
-            setPlayerError('此影片已無法播放');
+            setErroredVideoId(errorVideoId);
             setUnavailableVideoIds(prev => new Set([...prev, errorVideoId]));
           }
         },
@@ -511,6 +609,10 @@ function usePlayerController(): PlayerContextType {
       setPlayHistory((prev) => [...prev, prevTrack].slice(-PLAY_HISTORY_LIMIT));
     }
     setCurrentTrack(track);
+    // Optimistic: this is the user's own click, not a guess made from an
+    // effect — the player-load effect's onStateChange corrects it if playback
+    // doesn't actually start.
+    setIsPlaying(true);
     timeStore.setTime(track.timestamp);
     setQueue(following.map(createQueueEntry));
     setAllTracks((prev) => {
@@ -527,7 +629,12 @@ function usePlayerController(): PlayerContextType {
   }, [createQueueEntry, ensurePlayerApi, timeStore]);
 
   const togglePlayPause = useCallback(() => {
-    if (!playerRef.current) return;
+    if (!playerRef.current) {
+      // The iframe API hasn't finished loading yet — still flip the intent so
+      // the control responds, and so onReady can honor a pause once ready.
+      setIsPlaying((prev) => !prev);
+      return;
+    }
 
     if (isPlaying) {
       playerRef.current.pauseVideo();
@@ -555,24 +662,29 @@ function usePlayerController(): PlayerContextType {
     } else {
       // Go to previous song in history
       if (playHistory.length > 0) {
+        // Idempotent; its .catch resets isPlaying if the API isn't available.
+        ensurePlayerApi();
         const prevTrack = playHistory[playHistory.length - 1];
         setPlayHistory((prev) => prev.slice(0, -1));
         setCurrentTrack(prevTrack);
+        // Optimistic: the user's own click, not a guess made from an effect —
+        // onStateChange corrects it if playback doesn't actually start.
+        setIsPlaying(true);
         timeStore.setTime(prevTrack.timestamp);
       }
     }
-  }, [currentTrack, playHistory, seekTo, timeStore]);
+  }, [currentTrack, ensurePlayerApi, playHistory, seekTo, timeStore]);
 
   const next = useCallback(() => {
     // User pressed next — always advance (ignore repeat-one)
     if (queue.length > 0 || repeatMode === 'all') {
       advanceSkippingDeleted(queue, currentTrack);
     } else {
-      // No queue, stop playback
-      if (playerRef.current) {
-        playerRef.current.pauseVideo();
-        setIsPlaying(false);
-      }
+      // No queue, stop playback. Reset the intent unconditionally: a Next
+      // pressed while the iframe API is still loading has no player yet, and
+      // a lingering optimistic isPlaying would make onReady start the track.
+      setIsPlaying(false);
+      playerRef.current?.pauseVideo();
     }
   }, [advanceSkippingDeleted, currentTrack, queue, repeatMode]);
 
