@@ -1,16 +1,18 @@
 'use client';
 
-import { createContext, useContext, useState, useEffect, useCallback, useMemo, useRef, ReactNode } from 'react';
+import { createContext, useContext, useCallback, useMemo, ReactNode } from 'react';
 import type { PerformanceRef } from '../types/archive';
 import { pickPerformanceRef } from '../lib/archive';
 import { normalizeStoredRef } from '../lib/normalize-performance-ref';
+import { createPersistedStore, usePersistedStore } from '../lib/persisted-store';
+import type { StorageSaveResult } from '../lib/playlist-storage';
 
 export type RecentPlay = PerformanceRef & { playedAt: number };
 
 interface RecentlyPlayedContextType {
   recentPlays: RecentPlay[];
   addRecentPlay: (play: PerformanceRef) => void;
-  clearHistory: () => void;
+  clearHistory: () => StorageSaveResult;
   recentCount: number;
 }
 
@@ -24,107 +26,43 @@ export const useRecentlyPlayed = () => {
   return context;
 };
 
-const LEGACY_STORAGE_KEY = 'mizukiprism_recently_played';
 const MAX_ENTRIES = 50;
 
-function isLocalStorageAvailable(): boolean {
-  try {
-    const testKey = '__prism_ls_test__';
-    localStorage.setItem(testKey, '1');
-    localStorage.removeItem(testKey);
-    return true;
-  } catch {
-    return false;
-  }
+function parseRecentPlays(raw: unknown, streamerSlug: string): RecentPlay[] {
+  if (!Array.isArray(raw)) return [];
+  return raw.flatMap((entry) => {
+    const ref = normalizeStoredRef(entry, streamerSlug);
+    const playedAt = (entry as { playedAt?: unknown } | null)?.playedAt;
+    return ref && typeof playedAt === 'number' ? [{ ...ref, playedAt }] : [];
+  });
 }
 
 export const RecentlyPlayedProvider = ({ streamerSlug, children }: { streamerSlug: string; children: ReactNode }) => {
-  const STORAGE_KEY = `prism_${streamerSlug}_recently_played`;
-  const [recentPlays, setRecentPlays] = useState<RecentPlay[]>([]);
-  const [localStorageSupported] = useState(() =>
-    typeof window !== 'undefined' ? isLocalStorageAvailable() : true
+  const store = useMemo(
+    () => createPersistedStore<RecentPlay[]>({
+      key: `prism_${streamerSlug}_recently_played`,
+      fallback: [],
+      parse: (raw) => parseRecentPlays(raw, streamerSlug),
+    }),
+    [streamerSlug],
   );
+  const recentPlays = usePersistedStore(store);
 
-  // Migrate legacy key for Mizuki users
-  useEffect(() => {
-    if (streamerSlug !== 'mizuki') return;
-    try {
-      const legacy = localStorage.getItem(LEGACY_STORAGE_KEY);
-      if (legacy && !localStorage.getItem(STORAGE_KEY)) {
-        localStorage.setItem(STORAGE_KEY, legacy);
-        localStorage.removeItem(LEGACY_STORAGE_KEY);
-      }
-    } catch {}
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
-
-  // Load from localStorage on mount
-  useEffect(() => {
-    try {
-      const stored = localStorage.getItem(STORAGE_KEY);
-      if (stored) {
-        const parsed: unknown = JSON.parse(stored);
-        if (Array.isArray(parsed)) {
-          setRecentPlays(parsed.flatMap((entry) => {
-            const ref = normalizeStoredRef(entry, streamerSlug);
-            const playedAt = (entry as { playedAt?: unknown }).playedAt;
-            return ref && typeof playedAt === 'number' ? [{ ...ref, playedAt }] : [];
-          }));
-        }
-      }
-    } catch (error) {
-      console.error('Failed to load recently played from localStorage:', error);
-    }
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
-
-  const saveToLocalStorage = useCallback((plays: RecentPlay[]): boolean => {
-    try {
-      localStorage.setItem(STORAGE_KEY, JSON.stringify(plays));
-      return true;
-    } catch {
-      return false;
-    }
-  }, [STORAGE_KEY]);
-
-  // Reads current plays from a ref (not the render closure) so two rapid
-  // calls in the same tick can't drop each other's entry
-  const recentPlaysRef = useRef<RecentPlay[]>([]);
-  useEffect(() => { recentPlaysRef.current = recentPlays; }, [recentPlays]);
-
+  // Functional update on the store's current value, so two rapid calls in
+  // the same tick can't drop each other's entry (no ref mirror needed).
   const addRecentPlay = useCallback((play: PerformanceRef) => {
-    if (!localStorageSupported) return;
+    store.update((prev) => {
+      const filtered = prev.filter((r) => r.performanceId !== play.performanceId);
+      return [{ ...pickPerformanceRef(play), playedAt: Date.now() }, ...filtered].slice(0, MAX_ENTRIES);
+    });
+  }, [store]);
 
-    // Dedup: remove old entry for same performanceId, prepend new
-    const filtered = recentPlaysRef.current.filter(r => r.performanceId !== play.performanceId);
-    const newPlays = [{ ...pickPerformanceRef(play), playedAt: Date.now() }, ...filtered].slice(0, MAX_ENTRIES);
-
-    const saved = saveToLocalStorage(newPlays);
-    if (saved) {
-      recentPlaysRef.current = newPlays;
-      setRecentPlays(newPlays);
-    }
-  }, [localStorageSupported, saveToLocalStorage]);
-
-  const clearHistory = useCallback(() => {
-    saveToLocalStorage([]);
-    recentPlaysRef.current = [];
-    setRecentPlays([]);
-  }, [saveToLocalStorage]);
+  const clearHistory = useCallback(() => { return store.update(() => []); }, [store]);
 
   const value = useMemo(
-    () => ({
-      recentPlays,
-      addRecentPlay,
-      clearHistory,
-      recentCount: recentPlays.length,
-    }),
+    () => ({ recentPlays, addRecentPlay, clearHistory, recentCount: recentPlays.length }),
     [recentPlays, addRecentPlay, clearHistory],
   );
 
-  return (
-    <RecentlyPlayedContext.Provider value={value}>
-      {children}
-    </RecentlyPlayedContext.Provider>
-  );
+  return <RecentlyPlayedContext.Provider value={value}>{children}</RecentlyPlayedContext.Provider>;
 };
