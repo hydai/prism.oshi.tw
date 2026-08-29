@@ -19,6 +19,7 @@ import {
   sortGroupedSongs,
 } from '../lib/archive';
 import { loadArchiveData, type ArchiveLoadState } from '../lib/archive-loader';
+import { createPersistedStore, usePersistedStore, getSessionStorage } from '../lib/persisted-store';
 import type {
   ArchiveSong,
   ArchiveViewMode,
@@ -37,7 +38,17 @@ function useArchivePageController() {
   const [selectedStreamId, setSelectedStreamId] = useState<string | null>(null);
   const [selectedArtist, setSelectedArtist] = useState<string | null>(null);
   const [selectedYears, setSelectedYears] = useState<Set<number>>(new Set());
-  const [viewMode, setViewMode] = useState<ArchiveViewMode>('timeline');
+  const viewModeStore = useMemo(() => createPersistedStore<ArchiveViewMode>({
+    key: 'prism_view_mode',
+    storage: getSessionStorage,
+    fallback: 'timeline',
+    parse: (raw) => (raw === 'grouped' ? 'grouped' : 'timeline'),
+    // Volatile UI setting: the toggle must keep working even when storage
+    // refuses the write.
+    persist: 'best-effort',
+  }), []);
+  const viewMode = usePersistedStore(viewModeStore);
+  const setViewMode = useCallback((mode: ArchiveViewMode) => { viewModeStore.update(() => mode); }, [viewModeStore]);
   const [expandedSongs, setExpandedSongs] = useState<Set<string>>(new Set());
   const [toastMessage, setToastMessage] = useState<string | null>(null);
   const hideToast = useCallback(() => setToastMessage(null), []);
@@ -119,19 +130,6 @@ function useArchivePageController() {
       clearSkipNotification();
     }
   }, [skipNotification, clearSkipNotification]);
-
-  // Load view preference from sessionStorage
-  useEffect(() => {
-    const savedView = sessionStorage.getItem('mizukiprism-view-mode');
-    if (savedView === 'timeline' || savedView === 'grouped') {
-      setViewMode(savedView);
-    }
-  }, []);
-
-  // Save view preference to sessionStorage
-  useEffect(() => {
-    sessionStorage.setItem('mizukiprism-view-mode', viewMode);
-  }, [viewMode]);
 
   const toggleSongExpansion = useCallback((songId: string) => {
     setExpandedSongs(prev => {
