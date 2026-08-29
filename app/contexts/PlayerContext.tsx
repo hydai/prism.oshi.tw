@@ -14,6 +14,7 @@ import {
   type ReactNode,
 } from 'react';
 import { createPlaybackTimeStore, type PlaybackTimeStore } from '../lib/playback-time-store';
+import { createPersistedStore, usePersistedStore } from '../lib/persisted-store';
 import { loadYouTubeIframeApi } from '../../lib/youtube-iframe';
 import type {
   YouTubeNamespace,
@@ -131,11 +132,8 @@ function usePlayerController(): PlayerContextType {
   const [unavailableVideoIds, setUnavailableVideoIds] = useState<Set<string>>(new Set());
   const [timestampWarning, setTimestampWarning] = useState<string | null>(null);
   const [skipNotification, setSkipNotification] = useState<string | null>(null);
-  const timeStoreRef = useRef<PlaybackTimeStore | null>(null);
-  if (timeStoreRef.current === null) {
-    timeStoreRef.current = createPlaybackTimeStore();
-  }
-  const timeStore = timeStoreRef.current;
+  // Lazy state initializer: built once per mount, never rebuilt (and no ref read during render).
+  const [timeStore] = useState(createPlaybackTimeStore);
   const [showModal, setShowModal] = useState(false);
   const [playHistory, setPlayHistory] = useState<Track[]>([]);
   const [queue, setQueue] = useState<QueueEntry[]>([]);
@@ -145,8 +143,26 @@ function usePlayerController(): PlayerContextType {
   // Repeat-all refill pool — deliberately uncapped: it is deduped by performanceId and
   // bounded by the number of distinct performances played this session
   const [allTracks, setAllTracks] = useState<Track[]>([]);
-  const [volume, setVolumeState] = useState(75);
-  const [isMuted, setIsMuted] = useState(false);
+  const volumeStore = useMemo(() => createPersistedStore<number>({
+    key: volumeKey,
+    fallback: 75,
+    parse: (raw) => {
+      const n = typeof raw === 'number' ? raw : Number(raw);
+      return Number.isFinite(n) && n >= 0 && n <= 100 ? n : 75;
+    },
+    // Volatile UI setting: keep the slider and the YouTube player's real
+    // volume moving together even when storage refuses the write.
+    persist: 'best-effort',
+  }), []);
+  const mutedStore = useMemo(() => createPersistedStore<boolean>({
+    key: mutedKey,
+    fallback: false,
+    parse: (raw) => raw === true || raw === 'true',
+    // Same as volumeStore: don't freeze the mute icon under a storage failure.
+    persist: 'best-effort',
+  }), []);
+  const volume = usePersistedStore(volumeStore);
+  const isMuted = usePersistedStore(mutedStore);
 
   const playerRef = useRef<YouTubePlayer | null>(null);
   const playerDivId = 'youtube-player';
@@ -179,72 +195,24 @@ function usePlayerController(): PlayerContextType {
   useEffect(() => { volumeRef.current = volume; }, [volume]);
   useEffect(() => { isMutedRef.current = isMuted; }, [isMuted]);
 
-  // Migrate legacy per-streamer volume/muted keys to global keys
-  useEffect(() => {
-    try {
-      if (localStorage.getItem(volumeKey) !== null) return; // already migrated
-      // Try legacy Mizuki key first, then per-streamer keys
-      const candidates = ['mizuki-volume', 'prism_mizuki_volume'];
-      for (const key of candidates) {
-        const val = localStorage.getItem(key);
-        if (val !== null) {
-          localStorage.setItem(volumeKey, val);
-          break;
-        }
-      }
-      const mutedCandidates = ['mizuki-muted', 'prism_mizuki_muted'];
-      for (const key of mutedCandidates) {
-        const val = localStorage.getItem(key);
-        if (val !== null) {
-          localStorage.setItem(mutedKey, val);
-          break;
-        }
-      }
-    } catch {}
-  }, []);
-
-  // Load volume/mute from localStorage on mount (SSR-safe)
-  useEffect(() => {
-    try {
-      const savedVolume = localStorage.getItem(volumeKey);
-      const savedMuted = localStorage.getItem(mutedKey);
-      if (savedVolume !== null) {
-        const v = Number(savedVolume);
-        if (!isNaN(v) && v >= 0 && v <= 100) {
-          setVolumeState(v);
-          volumeRef.current = v;
-        }
-      }
-      if (savedMuted !== null) {
-        const m = savedMuted === 'true';
-        setIsMuted(m);
-        isMutedRef.current = m;
-      }
-    } catch {
-      // localStorage unavailable — use session defaults
-    }
-  }, []);
-
   const setVolume = useCallback((n: number) => {
     const clamped = Math.max(0, Math.min(100, n));
-    setVolumeState(clamped);
+    volumeStore.update(() => clamped);
     if (playerRef.current && playerRef.current.setVolume) {
       playerRef.current.setVolume(clamped);
     }
     // Auto-unmute when dragging above 0 while muted
     if (clamped > 0 && isMutedRef.current) {
-      setIsMuted(false);
+      mutedStore.update(() => false);
       if (playerRef.current && playerRef.current.unMute) {
         playerRef.current.unMute();
       }
-      try { localStorage.setItem(mutedKey, 'false'); } catch {}
     }
-    try { localStorage.setItem(volumeKey, String(clamped)); } catch {}
-  }, [mutedKey, volumeKey]);
+  }, [mutedStore, volumeStore]);
 
   const toggleMute = useCallback(() => {
     const newMuted = !isMutedRef.current;
-    setIsMuted(newMuted);
+    mutedStore.update(() => newMuted);
     if (playerRef.current) {
       if (newMuted) {
         playerRef.current.mute?.();
@@ -252,8 +220,7 @@ function usePlayerController(): PlayerContextType {
         playerRef.current.unMute?.();
       }
     }
-    try { localStorage.setItem(mutedKey, String(newMuted)); } catch {}
-  }, [mutedKey]);
+  }, [mutedStore]);
 
   // Advance to next non-deleted track in queue, skipping deleted ones.
   // Returns true if a non-deleted track was found and set as current, false if all remaining are deleted or queue is empty.
