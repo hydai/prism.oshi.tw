@@ -3,7 +3,6 @@ import {
   dedupePlaylistVersions,
   getStorageSaveError,
   isStorageQuotaError,
-  migrateGlobalPlaylistsForStreamer,
   saveJsonToStorage,
   STORAGE_QUOTA_ERROR,
   STORAGE_SAVE_ERROR,
@@ -15,65 +14,6 @@ const duplicateVersions = [
   { performanceId: 'performance-1', title: 'duplicate occurrence' },
 ];
 assert.deepEqual(dedupePlaylistVersions(duplicateVersions), duplicateVersions.slice(0, 2));
-
-const globalPlaylists = [
-  {
-    id: 'mixed',
-    createdAt: 10,
-    updatedAt: 20,
-    versions: [
-      { performanceId: 'performance-1', streamerSlug: 'mizuki', title: 'first occurrence' },
-      { performanceId: 'performance-1', streamerSlug: 'mizuki', title: 'duplicate occurrence' },
-      { performanceId: 'performance-2', streamerSlug: 'gabu', title: 'other streamer' },
-    ],
-  },
-  {
-    id: 'excluded',
-    createdAt: 0,
-    updatedAt: 0,
-    versions: [
-      { performanceId: 'performance-3', streamerSlug: 'gabu', title: 'other streamer' },
-    ],
-  },
-  {
-    id: 'fallback-date',
-    createdAt: 0,
-    updatedAt: 0,
-    versions: [
-      { performanceId: 'performance-4', streamerSlug: 'mizuki', title: 'matching streamer' },
-    ],
-  },
-  {
-    id: 'empty',
-    createdAt: 30,
-    updatedAt: 40,
-    versions: [],
-  },
-];
-let fallbackNow = 100;
-assert.deepEqual(
-  migrateGlobalPlaylistsForStreamer(globalPlaylists, 'mizuki', () => fallbackNow++),
-  [
-    {
-      id: 'mixed',
-      createdAt: 10,
-      updatedAt: 20,
-      versions: [
-        { performanceId: 'performance-1', streamerSlug: 'mizuki', title: 'first occurrence' },
-      ],
-    },
-    {
-      id: 'fallback-date',
-      createdAt: 0,
-      updatedAt: 101,
-      versions: [
-        { performanceId: 'performance-4', streamerSlug: 'mizuki', title: 'matching streamer' },
-      ],
-    },
-  ],
-);
-assert.equal(fallbackNow, 102);
-assert.equal(globalPlaylists[0]?.versions.length, 3);
 
 type SetItemCall = [key: string, value: string];
 

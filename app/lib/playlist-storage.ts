@@ -14,43 +14,6 @@ export function dedupePlaylistVersions<T extends { performanceId: string }>(
   });
 }
 
-type MigratablePlaylistVersion = {
-  performanceId: string;
-  streamerSlug: string;
-};
-
-type MigratablePlaylist<TVersion extends MigratablePlaylistVersion> = {
-  versions: TVersion[];
-  createdAt: number;
-  updatedAt: number;
-};
-
-export function migrateGlobalPlaylistsForStreamer<
-  TVersion extends MigratablePlaylistVersion,
-  TPlaylist extends MigratablePlaylist<TVersion>,
->(
-  playlists: readonly TPlaylist[],
-  streamerSlug: string,
-  now: () => number = Date.now,
-): TPlaylist[] {
-  const migratedPlaylists: TPlaylist[] = [];
-
-  for (const playlist of playlists) {
-    const versions = dedupePlaylistVersions(
-      playlist.versions.filter((version) => version.streamerSlug === streamerSlug),
-    );
-    const migratedPlaylist = {
-      ...playlist,
-      versions,
-      updatedAt: playlist.updatedAt || playlist.createdAt || now(),
-    };
-
-    if (versions.length > 0) migratedPlaylists.push(migratedPlaylist);
-  }
-
-  return migratedPlaylists;
-}
-
 type StorageErrorShape = {
   name?: string;
   code?: number;

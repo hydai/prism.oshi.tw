@@ -4,20 +4,18 @@ import {
   createContext,
   useCallback,
   useContext,
-  useEffect,
   useMemo,
   useState,
   ReactNode,
 } from 'react';
 import {
   dedupePlaylistVersions,
-  migrateGlobalPlaylistsForStreamer,
-  saveJsonToStorage,
   type StorageSaveResult,
 } from '../lib/playlist-storage';
 import type { PerformanceRef } from '../types/archive';
 import { normalizeStoredRef } from '../lib/normalize-performance-ref';
 import { pickPerformanceRef } from '../lib/archive';
+import { createPersistedStore, usePersistedStore } from '../lib/persisted-store';
 
 export type PlaylistVersion = PerformanceRef;
 
@@ -61,19 +59,7 @@ export const usePlaylist = () => {
   return context;
 };
 
-const LEGACY_STORAGE_KEY = 'mizukiprism_playlists';
 const STORAGE_UNSUPPORTED_ERROR = '您的瀏覽器不支援本機儲存，播放清單功能無法使用';
-
-function isLocalStorageAvailable(): boolean {
-  try {
-    const testKey = '__prism_ls_test__';
-    localStorage.setItem(testKey, '1');
-    localStorage.removeItem(testKey);
-    return true;
-  } catch {
-    return false;
-  }
-}
 
 function formatDate(): string {
   const d = new Date();
@@ -153,183 +139,104 @@ function validateImport(data: unknown, streamerSlug: string): { valid: true; pla
   return { valid: true, playlists: validPlaylists };
 }
 
+function parsePlaylists(raw: unknown, streamerSlug: string): Playlist[] {
+  if (!Array.isArray(raw)) return [];
+  return raw.flatMap((item) => {
+    const p = item as Partial<Playlist> | null;
+    if (!p || typeof p.id !== 'string' || typeof p.name !== 'string') return [];
+    const versions = dedupePlaylistVersions((p.versions ?? []).flatMap((v) => {
+      const ref = normalizeStoredRef(v, streamerSlug);
+      return ref ? [ref] : [];
+    }));
+    const createdAt = typeof p.createdAt === 'number' ? p.createdAt : Date.now();
+    return [{ id: p.id, name: p.name, versions, createdAt, updatedAt: typeof p.updatedAt === 'number' ? p.updatedAt : createdAt }];
+  });
+}
+
+function newPlaylistId(): string {
+  const uuid = typeof crypto !== 'undefined' && typeof crypto.randomUUID === 'function'
+    ? crypto.randomUUID()
+    : `${Date.now().toString(36)}-${Math.random().toString(36).slice(2, 11)}`;
+  return `playlist-${uuid}`;
+}
+
 export const PlaylistProvider = ({ streamerSlug, children }: { streamerSlug: string; children: ReactNode }) => {
-  const STORAGE_KEY = `prism_${streamerSlug}_playlists`;
-  const [playlists, setPlaylists] = useState<Playlist[]>([]);
-  const [storageError, setStorageError] = useState<string | null>(null);
-  const [localStorageSupported] = useState(() =>
-    typeof window !== 'undefined' ? isLocalStorageAvailable() : true
+  const store = useMemo(
+    () => createPersistedStore<Playlist[]>({ key: `prism_${streamerSlug}_playlists`, fallback: [], parse: (raw) => parsePlaylists(raw, streamerSlug) }),
+    [streamerSlug],
   );
+  const playlists = usePersistedStore(store);
+  const [storageError, setStorageError] = useState<string | null>(null);
 
-  // Migrate from global key back to per-streamer key
-  useEffect(() => {
-    try {
-      if (localStorage.getItem(STORAGE_KEY) !== null) return; // already has per-streamer data
-      const GLOBAL_KEY = 'prism_playlists';
-      const globalData = localStorage.getItem(GLOBAL_KEY);
-      if (!globalData) {
-        // Also try legacy Mizuki key
-        if (streamerSlug === 'mizuki') {
-          const legacy = localStorage.getItem(LEGACY_STORAGE_KEY);
-          if (legacy) {
-            localStorage.setItem(STORAGE_KEY, legacy);
-          }
-        }
-        return;
-      }
-      // Keep global playlists that still have at least one version for this streamer.
-      const parsed = JSON.parse(globalData) as Playlist[];
-      const filtered = migrateGlobalPlaylistsForStreamer(parsed, streamerSlug);
-      if (filtered.length > 0) {
-        localStorage.setItem(STORAGE_KEY, JSON.stringify(filtered));
-      }
-    } catch {}
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
-
-  // Load playlists from localStorage on mount
-  useEffect(() => {
-    try {
-      const stored = localStorage.getItem(STORAGE_KEY);
-      if (stored) {
-        const parsed = JSON.parse(stored) as Partial<Playlist>[];
-        const normalized = parsed.map((p) => ({
-          ...p,
-          versions: dedupePlaylistVersions((p.versions ?? []).flatMap((v) => {
-            const ref = normalizeStoredRef(v, streamerSlug);
-            return ref ? [ref] : [];
-          })),
-          updatedAt: p.updatedAt || p.createdAt || Date.now(),
-        })) as Playlist[];
-        setPlaylists(normalized);
-      }
-    } catch (error) {
-      console.error('Failed to load playlists from localStorage:', error);
-    }
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
-
-  const saveToLocalStorage = useCallback((newPlaylists: Playlist[]): StorageSaveResult => {
-    const result = saveJsonToStorage(localStorage, STORAGE_KEY, newPlaylists);
-    if (result.success) {
-      setStorageError(null);
-    } else {
-      setStorageError(result.error);
-    }
+  // Every mutation goes through here: functional update, persisted before
+  // listeners fire, storage errors surfaced once.
+  const commit = useCallback((updater: (prev: Playlist[]) => Playlist[]): StorageSaveResult => {
+    const result = store.update(updater);
+    setStorageError(result.success ? null : result.error);
     return result;
-  }, [STORAGE_KEY]);
+  }, [store]);
 
-  const createPlaylist = useCallback((name: string): { success: boolean; error?: string } => {
-    if (!localStorageSupported) {
-      setStorageError(STORAGE_UNSUPPORTED_ERROR);
-      return { success: false, error: STORAGE_UNSUPPORTED_ERROR };
-    }
-
+  const createPlaylist = useCallback((name: string) => {
+    if (!store.available) { setStorageError(STORAGE_UNSUPPORTED_ERROR); return { success: false, error: STORAGE_UNSUPPORTED_ERROR }; }
     const trimmedName = name.trim();
-    if (!trimmedName) {
-      return { success: false, error: '播放清單名稱不可為空' };
-    }
-
+    if (!trimmedName) return { success: false, error: '播放清單名稱不可為空' };
     const now = Date.now();
-    const newPlaylist: Playlist = {
-      id: `playlist-${now}-${Math.random().toString(36).substr(2, 9)}`,
-      name: trimmedName,
-      versions: [],
-      createdAt: now,
-      updatedAt: now,
-    };
+    return commit((prev) => [...prev, { id: newPlaylistId(), name: trimmedName, versions: [], createdAt: now, updatedAt: now }]);
+  }, [store, commit]);
 
-    const newPlaylists = [...playlists, newPlaylist];
-    const saved = saveToLocalStorage(newPlaylists);
+  const deletePlaylist = useCallback((id: string) => { commit((prev) => prev.filter((p) => p.id !== id)); }, [commit]);
 
-    if (saved.success) {
-      setPlaylists(newPlaylists);
-      return { success: true };
-    }
-    return saved;
-  }, [localStorageSupported, playlists, saveToLocalStorage]);
-
-  const deletePlaylist = useCallback((id: string) => {
-    const newPlaylists = playlists.filter(p => p.id !== id);
-    saveToLocalStorage(newPlaylists);
-    setPlaylists(newPlaylists);
-  }, [playlists, saveToLocalStorage]);
-
-  const renamePlaylist = useCallback((id: string, newName: string): { success: boolean; error?: string } => {
+  const renamePlaylist = useCallback((id: string, newName: string) => {
     const trimmedName = newName.trim();
-    if (!trimmedName) {
-      return { success: false, error: '播放清單名稱不可為空' };
-    }
-
+    if (!trimmedName) return { success: false, error: '播放清單名稱不可為空' };
     const now = Date.now();
-    const newPlaylists = playlists.map(p =>
-      p.id === id ? { ...p, name: trimmedName, updatedAt: now } : p
-    );
+    return commit((prev) => prev.map((p) => (p.id === id ? { ...p, name: trimmedName, updatedAt: now } : p)));
+  }, [commit]);
 
-    const saved = saveToLocalStorage(newPlaylists);
-    if (saved.success) {
-      setPlaylists(newPlaylists);
-      return { success: true };
-    }
-    return saved;
-  }, [playlists, saveToLocalStorage]);
+  const addVersionToPlaylist = useCallback((playlistId: string, version: PlaylistVersion) => {
+    if (!store.available) { setStorageError(STORAGE_UNSUPPORTED_ERROR); return { success: false, error: STORAGE_UNSUPPORTED_ERROR }; }
 
-  const addVersionToPlaylist = useCallback((playlistId: string, version: PlaylistVersion): { success: boolean; error?: string } => {
-    if (!localStorageSupported) {
-      setStorageError(STORAGE_UNSUPPORTED_ERROR);
-      return { success: false, error: STORAGE_UNSUPPORTED_ERROR };
-    }
-
-    const playlist = playlists.find(p => p.id === playlistId);
+    // Validate against the store's live snapshot (not the `playlists` render
+    // closure) so this sees an add from earlier in the same tick. Nothing
+    // async runs between this read and the commit() below, so the updater
+    // it runs sees the exact same state — keeps the updater itself pure.
+    const current = store.getSnapshot();
+    const playlist = current.find((p) => p.id === playlistId);
     if (!playlist) {
       return { success: false, error: '播放清單不存在' };
     }
-
-    const exists = playlist.versions.some(v => v.performanceId === version.performanceId);
+    const exists = playlist.versions.some((v) => v.performanceId === version.performanceId);
     if (exists) {
       return { success: false, error: '此版本已在播放清單中' };
     }
 
     const now = Date.now();
-    const newPlaylists = playlists.map(p =>
+    return commit((prev) => prev.map((p) =>
       p.id === playlistId
         ? { ...p, versions: [...p.versions, pickPerformanceRef(version)], updatedAt: now }
         : p
-    );
-
-    const saved = saveToLocalStorage(newPlaylists);
-    if (saved.success) {
-      setPlaylists(newPlaylists);
-      return { success: true };
-    }
-    return saved;
-  }, [localStorageSupported, playlists, saveToLocalStorage]);
+    ));
+  }, [store, commit]);
 
   const removeVersionFromPlaylist = useCallback((playlistId: string, performanceId: string) => {
     const now = Date.now();
-    const newPlaylists = playlists.map(p =>
+    commit((prev) => prev.map((p) =>
       p.id === playlistId
-        ? { ...p, versions: p.versions.filter(v => v.performanceId !== performanceId), updatedAt: now }
+        ? { ...p, versions: p.versions.filter((v) => v.performanceId !== performanceId), updatedAt: now }
         : p
-    );
-    saveToLocalStorage(newPlaylists);
-    setPlaylists(newPlaylists);
-  }, [playlists, saveToLocalStorage]);
+    ));
+  }, [commit]);
 
   const reorderVersionsInPlaylist = useCallback((playlistId: string, fromIndex: number, toIndex: number) => {
     const now = Date.now();
-    const newPlaylists = playlists.map(p => {
-      if (p.id === playlistId) {
-        const newVersions = [...p.versions];
-        const [removed] = newVersions.splice(fromIndex, 1);
-        newVersions.splice(toIndex, 0, removed);
-        return { ...p, versions: newVersions, updatedAt: now };
-      }
-      return p;
-    });
-    saveToLocalStorage(newPlaylists);
-    setPlaylists(newPlaylists);
-  }, [playlists, saveToLocalStorage]);
+    commit((prev) => prev.map((p) => {
+      if (p.id !== playlistId) return p;
+      const newVersions = [...p.versions];
+      const [removed] = newVersions.splice(fromIndex, 1);
+      newVersions.splice(toIndex, 0, removed);
+      return { ...p, versions: newVersions, updatedAt: now };
+    }));
+  }, [commit]);
 
   const clearStorageError = useCallback(() => setStorageError(null), []);
 
@@ -360,44 +267,46 @@ export const PlaylistProvider = ({ streamerSlug, children }: { streamerSlug: str
       }
 
       const incoming = result.playlists;
-      const localMap = new Map(playlists.map(p => [p.id, p]));
-      const merged: Playlist[] = [...playlists];
+      const saved = commit((prev) => {
+        const localMap = new Map(prev.map(p => [p.id, p]));
+        const merged: Playlist[] = [...prev];
 
-      for (const imported of incoming) {
-        const existing = localMap.get(imported.id);
-        if (!existing) {
-          // No conflict — add directly
-          merged.push(imported);
-        } else if (imported.updatedAt > existing.updatedAt) {
-          // Imported is newer — replace existing, keep old as renamed copy
-          const idx = merged.findIndex(p => p.id === existing.id);
-          merged[idx] = imported;
-          merged.push({
-            ...existing,
-            id: `playlist-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
-            name: `${existing.name}（匯入）`,
-          });
-        } else {
-          // Existing is newer or same — keep existing, add imported as renamed copy
-          merged.push({
-            ...imported,
-            id: `playlist-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
-            name: `${imported.name}（匯入）`,
-          });
+        for (const imported of incoming) {
+          const existing = localMap.get(imported.id);
+          if (!existing) {
+            // No conflict — add directly
+            merged.push(imported);
+          } else if (imported.updatedAt > existing.updatedAt) {
+            // Imported is newer — replace existing, keep old as renamed copy
+            const idx = merged.findIndex(p => p.id === existing.id);
+            merged[idx] = imported;
+            merged.push({
+              ...existing,
+              id: newPlaylistId(),
+              name: `${existing.name}（匯入）`,
+            });
+          } else {
+            // Existing is newer or same — keep existing, add imported as renamed copy
+            merged.push({
+              ...imported,
+              id: newPlaylistId(),
+              name: `${imported.name}（匯入）`,
+            });
+          }
         }
-      }
 
-      const saved = saveToLocalStorage(merged);
+        return merged;
+      });
+
       if (!saved.success) {
         return saved;
       }
 
-      setPlaylists(merged);
       return { success: true, count: incoming.length };
     } catch {
       return { success: false, error: '無法匯入：檔案格式無效' };
     }
-  }, [playlists, saveToLocalStorage, streamerSlug]);
+  }, [commit, streamerSlug]);
 
   const value = useMemo<PlaylistContextType>(() => ({
     playlists,
