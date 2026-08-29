@@ -32,8 +32,15 @@ export default function NowPlayingPage() {
   const hideToast = useCallback(() => setToastMessage(null), []);
   const { likedCount } = useLikedSongs();
   const { recentCount } = useRecentlyPlayed();
-  const { liked, toggleCurrentLike } = useCurrentTrackLike();
+  const { liked, toggleCurrentLike: toggleCurrentLikeRaw } = useCurrentTrackLike();
   const { progress, handleSeek, knownDuration } = useTrackProgress();
+
+  // toggleCurrentLike's write can fail (storage quota); this page has a toast
+  // affordance, so surface the failure here.
+  const toggleCurrentLike = useCallback(() => {
+    const result = toggleCurrentLikeRaw();
+    if (result && !result.success) setToastMessage(result.error);
+  }, [toggleCurrentLikeRaw]);
 
   const handleShare = async () => {
     if (!currentTrack) return;

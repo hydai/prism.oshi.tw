@@ -1,16 +1,18 @@
 'use client';
 
-import { createContext, useContext, useState, useEffect, useCallback, useMemo, ReactNode } from 'react';
+import { createContext, useContext, useCallback, useMemo, ReactNode } from 'react';
 import type { PerformanceRef } from '../types/archive';
 import { pickPerformanceRef } from '../lib/archive';
 import { normalizeStoredRef } from '../lib/normalize-performance-ref';
+import { createPersistedStore, usePersistedStore } from '../lib/persisted-store';
+import type { StorageSaveResult } from '../lib/playlist-storage';
 
 export type LikedVersion = PerformanceRef & { likedAt: number };
 
 interface LikedSongsContextType {
   likedSongs: LikedVersion[];
   isLiked: (performanceId: string) => boolean;
-  toggleLike: (version: PerformanceRef) => void;
+  toggleLike: (version: PerformanceRef) => StorageSaveResult;
   likedCount: number;
 }
 
@@ -24,102 +26,44 @@ export const useLikedSongs = () => {
   return context;
 };
 
-const LEGACY_STORAGE_KEY = 'mizukiprism_liked_songs';
-
-function isLocalStorageAvailable(): boolean {
-  try {
-    const testKey = '__prism_ls_test__';
-    localStorage.setItem(testKey, '1');
-    localStorage.removeItem(testKey);
-    return true;
-  } catch {
-    return false;
-  }
+function parseLikedSongs(raw: unknown, streamerSlug: string): LikedVersion[] {
+  if (!Array.isArray(raw)) return [];
+  return raw.flatMap((entry) => {
+    const ref = normalizeStoredRef(entry, streamerSlug);
+    const likedAt = (entry as { likedAt?: unknown } | null)?.likedAt;
+    return ref && typeof likedAt === 'number' ? [{ ...ref, likedAt }] : [];
+  });
 }
 
 export const LikedSongsProvider = ({ streamerSlug, children }: { streamerSlug: string; children: ReactNode }) => {
-  const STORAGE_KEY = `prism_${streamerSlug}_liked_songs`;
-  const [likedSongs, setLikedSongs] = useState<LikedVersion[]>([]);
-  const [localStorageSupported] = useState(() =>
-    typeof window !== 'undefined' ? isLocalStorageAvailable() : true
+  // One store per storage key; re-created only if the slug changes.
+  const store = useMemo(
+    () => createPersistedStore<LikedVersion[]>({
+      key: `prism_${streamerSlug}_liked_songs`,
+      fallback: [],
+      parse: (raw) => parseLikedSongs(raw, streamerSlug),
+    }),
+    [streamerSlug],
   );
+  const likedSongs = usePersistedStore(store);
 
-  // Migrate legacy key for Mizuki users
-  useEffect(() => {
-    if (streamerSlug !== 'mizuki') return;
-    try {
-      const legacy = localStorage.getItem(LEGACY_STORAGE_KEY);
-      if (legacy && !localStorage.getItem(STORAGE_KEY)) {
-        localStorage.setItem(STORAGE_KEY, legacy);
-        localStorage.removeItem(LEGACY_STORAGE_KEY);
-      }
-    } catch {}
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
-
-  // O(1) lookups — isLiked is called for every visible row (several times per
-  // performance in expanded cards)
-  const likedIds = useMemo(
-    () => new Set(likedSongs.map(s => s.performanceId)),
-    [likedSongs],
-  );
-  const isLiked = useCallback(
-    (performanceId: string): boolean => likedIds.has(performanceId),
-    [likedIds],
-  );
+  // O(1) lookups — isLiked is called for every visible row.
+  const likedIds = useMemo(() => new Set(likedSongs.map((s) => s.performanceId)), [likedSongs]);
+  const isLiked = useCallback((performanceId: string) => likedIds.has(performanceId), [likedIds]);
 
   const toggleLike = useCallback((version: PerformanceRef) => {
-    if (!localStorageSupported) return;
-
-    // Compute outside the updater — updaters must stay pure (StrictMode
-    // invokes them twice, which double-wrote localStorage here before)
-    setLikedSongs(prev => {
-      const exists = prev.some(s => s.performanceId === version.performanceId);
+    return store.update((prev) => {
+      const exists = prev.some((s) => s.performanceId === version.performanceId);
       return exists
-        ? prev.filter(s => s.performanceId !== version.performanceId)
+        ? prev.filter((s) => s.performanceId !== version.performanceId)
         : [{ ...pickPerformanceRef(version), likedAt: Date.now() }, ...prev];
     });
-  }, [localStorageSupported]);
-
-  // Persist on change (skips the initial empty render via likedLoaded flag)
-  const [likedLoaded, setLikedLoaded] = useState(false);
-  useEffect(() => {
-    try {
-      const stored = localStorage.getItem(STORAGE_KEY);
-      if (stored) {
-        const parsed: unknown = JSON.parse(stored);
-        if (Array.isArray(parsed)) {
-          setLikedSongs(parsed.flatMap((entry) => {
-            const ref = normalizeStoredRef(entry, streamerSlug);
-            const likedAt = (entry as { likedAt?: unknown }).likedAt;
-            return ref && typeof likedAt === 'number' ? [{ ...ref, likedAt }] : [];
-          }));
-        }
-      }
-    } catch (error) {
-      console.error('Failed to load liked songs from localStorage:', error);
-    }
-    setLikedLoaded(true);
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
-  useEffect(() => {
-    if (!likedLoaded || !localStorageSupported) return;
-    try { localStorage.setItem(STORAGE_KEY, JSON.stringify(likedSongs)); } catch {}
-  }, [likedSongs, likedLoaded, localStorageSupported, STORAGE_KEY]);
+  }, [store]);
 
   const value = useMemo(
-    () => ({
-      likedSongs,
-      isLiked,
-      toggleLike,
-      likedCount: likedSongs.length,
-    }),
+    () => ({ likedSongs, isLiked, toggleLike, likedCount: likedSongs.length }),
     [likedSongs, isLiked, toggleLike],
   );
 
-  return (
-    <LikedSongsContext.Provider value={value}>
-      {children}
-    </LikedSongsContext.Provider>
-  );
+  return <LikedSongsContext.Provider value={value}>{children}</LikedSongsContext.Provider>;
 };
