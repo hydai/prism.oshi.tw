@@ -2,6 +2,7 @@
 
 import { Download, Edit2, ListMusic, Play, Trash2 } from 'lucide-react';
 import type { Playlist } from '../contexts/PlaylistContext';
+import PanelEmptyState from './PanelEmptyState';
 
 interface PlaylistListViewProps {
   playlists: Playlist[];
@@ -39,13 +40,7 @@ export default function PlaylistListView({
   onCancelDelete,
 }: PlaylistListViewProps) {
   if (playlists.length === 0) {
-    return (
-      <div className="flex flex-col items-center justify-center py-12 text-white/60">
-        <ListMusic className="w-16 h-16 mb-4" />
-        <p className="text-center">尚無播放清單</p>
-        <p className="text-sm text-center mt-2">點擊下方按鈕建立新的播放清單</p>
-      </div>
-    );
+    return <PanelEmptyState icon={ListMusic} title="尚無播放清單" hint="點擊下方按鈕建立新的播放清單" />;
   }
 
   return (

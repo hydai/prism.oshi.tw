@@ -6,6 +6,7 @@ import { usePlayerActions } from '../contexts/PlayerContext';
 import { formatRelativeTime } from '../lib/format';
 import AlbumArt from './AlbumArt';
 import BottomSheet from './BottomSheet';
+import PanelEmptyState from './PanelEmptyState';
 
 interface RecentlyPlayedPanelProps {
   show: boolean;
@@ -58,11 +59,7 @@ export default function RecentlyPlayedPanel({ show, onClose, onToast }: Recently
     >
       <div className="p-4">
         {recentPlays.length === 0 ? (
-          <div className="flex flex-col items-center justify-center py-12 text-white/60">
-            <Clock className="w-16 h-16 mb-4" />
-            <p className="text-center">尚無播放紀錄</p>
-            <p className="text-sm text-center mt-2">播放歌曲後會自動記錄在此</p>
-          </div>
+          <PanelEmptyState icon={Clock} title="尚無播放紀錄" hint="播放歌曲後會自動記錄在此" />
         ) : (
           <>
             <div className="space-y-2" data-testid="recently-played-list">

@@ -36,6 +36,7 @@ import MobileSearchRow from '../components/MobileSearchRow';
 import SearchBox from '../components/SearchBox';
 import ThemeToggle from '../components/ThemeToggle';
 import ViewModeToggle from '../components/ViewModeToggle';
+import CatalogEmptyState from '../components/CatalogEmptyState';
 import { useArchiveData } from './archive-data-context';
 import { useArchiveFilters } from './archive-filters-context';
 import { useArchiveUi } from './archive-ui-context';
@@ -1197,25 +1198,11 @@ function TimelineSongList({
 
       <div className="mt-1">
         {flattenedSongs.length === 0 ? (
-          songs.length === 0 && !hasActiveFilters ? (
-            <div className="py-20 text-center" data-testid="empty-catalog" style={{ color: 'var(--text-tertiary)' }}>
-              <p className="text-lg font-medium" style={{ color: 'var(--text-secondary)' }}>目前尚無歌曲資料</p>
-            </div>
-          ) : (
-            <div className="py-20 text-center" data-testid="empty-state" style={{ color: 'var(--text-tertiary)' }}>
-              <p className="text-lg font-medium" style={{ color: 'var(--text-secondary)' }}>找不到符合條件的歌曲</p>
-              {hasActiveFilters && (
-                <button
-                  onClick={clearAllFilters}
-                  className="mt-3 text-sm font-medium underline underline-offset-2 transition-colors"
-                  style={{ color: 'var(--accent-pink)' }}
-                  data-testid="clear-filters-empty"
-                >
-                  清除所有篩選條件
-                </button>
-              )}
-            </div>
-          )
+          <CatalogEmptyState
+            catalogEmpty={songs.length === 0 && !hasActiveFilters}
+            hasActiveFilters={hasActiveFilters}
+            onClearAllFilters={clearAllFilters}
+          />
         ) : (
           <div
             ref={listRef}
@@ -1281,25 +1268,11 @@ function GroupedSongList({
   return (
     <div className="mt-2">
       {groupedSongs.length === 0 ? (
-        songs.length === 0 && !hasActiveFilters ? (
-          <div className="py-20 text-center" data-testid="empty-catalog" style={{ color: 'var(--text-tertiary)' }}>
-            <p className="text-lg font-medium" style={{ color: 'var(--text-secondary)' }}>目前尚無歌曲資料</p>
-          </div>
-        ) : (
-          <div className="py-20 text-center" data-testid="empty-state" style={{ color: 'var(--text-tertiary)' }}>
-            <p className="text-lg font-medium" style={{ color: 'var(--text-secondary)' }}>找不到符合條件的歌曲</p>
-            {hasActiveFilters && (
-              <button
-                onClick={clearAllFilters}
-                className="mt-3 text-sm font-medium underline underline-offset-2 transition-colors"
-                style={{ color: 'var(--accent-pink)' }}
-                data-testid="clear-filters-empty"
-              >
-                清除所有篩選條件
-              </button>
-            )}
-          </div>
-        )
+        <CatalogEmptyState
+          catalogEmpty={songs.length === 0 && !hasActiveFilters}
+          hasActiveFilters={hasActiveFilters}
+          onClearAllFilters={clearAllFilters}
+        />
       ) : (
         <div
           ref={groupedListRef}
@@ -1695,6 +1668,13 @@ function MobileStreamsTab() {
 }
 
 
+const BOTTOM_NAV_ITEMS = [
+  { tab: 'home', icon: House, label: 'Home', testId: 'bottom-nav-home' },
+  { tab: 'search', icon: Search, label: 'Search', testId: 'bottom-nav-search' },
+  { tab: 'streams', icon: Radio, label: '歌枠', testId: 'bottom-nav-streams' },
+  { tab: 'library', icon: ListMusic, label: 'Library', testId: 'bottom-nav-library' },
+] as const;
+
 function MobileBottomNavigation() {
   const { mobileTab, setMobileTab } = useArchiveUi();
 
@@ -1712,106 +1692,32 @@ function MobileBottomNavigation() {
           borderTop: '1px solid var(--border-glass)',
         }}
       >
-        {/* Home */}
-        <button
-          data-testid="bottom-nav-home"
-          onClick={() => setMobileTab('home')}
-          className="flex flex-col items-center justify-start"
-          style={{ gap: '4px', flex: 1 }}
-        >
-          <House
-            style={{
-              width: '22px',
-              height: '22px',
-              color: mobileTab === 'home' ? 'var(--accent-pink)' : 'var(--text-tertiary)',
-            }}
-          />
-          <span
-            style={{
-              fontSize: '10px',
-              fontWeight: mobileTab === 'home' ? 700 : 500,
-              color: mobileTab === 'home' ? 'var(--accent-pink)' : 'var(--text-tertiary)',
-            }}
+        {BOTTOM_NAV_ITEMS.map(({ tab, icon: Icon, label, testId }) => (
+          <button
+            key={tab}
+            data-testid={testId}
+            onClick={() => setMobileTab(tab)}
+            className="flex flex-col items-center justify-start"
+            style={{ gap: '4px', flex: 1 }}
           >
-            Home
-          </span>
-        </button>
-
-        {/* Search */}
-        <button
-          data-testid="bottom-nav-search"
-          onClick={() => setMobileTab('search')}
-          className="flex flex-col items-center justify-start"
-          style={{ gap: '4px', flex: 1 }}
-        >
-          <Search
-            style={{
-              width: '22px',
-              height: '22px',
-              color: mobileTab === 'search' ? 'var(--accent-pink)' : 'var(--text-tertiary)',
-            }}
-          />
-          <span
-            style={{
-              fontSize: '10px',
-              fontWeight: mobileTab === 'search' ? 700 : 500,
-              color: mobileTab === 'search' ? 'var(--accent-pink)' : 'var(--text-tertiary)',
-            }}
-          >
-            Search
-          </span>
-        </button>
-
-        {/* Streams */}
-        <button
-          data-testid="bottom-nav-streams"
-          onClick={() => setMobileTab('streams')}
-          className="flex flex-col items-center justify-start"
-          style={{ gap: '4px', flex: 1 }}
-        >
-          <Radio
-            style={{
-              width: '22px',
-              height: '22px',
-              color: mobileTab === 'streams' ? 'var(--accent-pink)' : 'var(--text-tertiary)',
-            }}
-          />
-          <span
-            style={{
-              fontSize: '10px',
-              fontWeight: mobileTab === 'streams' ? 700 : 500,
-              color: mobileTab === 'streams' ? 'var(--accent-pink)' : 'var(--text-tertiary)',
-            }}
-          >
-            歌枠
-          </span>
-        </button>
-
-        {/* Library */}
-        <button
-          data-testid="bottom-nav-library"
-          onClick={() => setMobileTab('library')}
-          className="flex flex-col items-center justify-start"
-          style={{ gap: '4px', flex: 1 }}
-        >
-          <ListMusic
-            style={{
-              width: '22px',
-              height: '22px',
-              color: mobileTab === 'library' ? 'var(--accent-pink)' : 'var(--text-tertiary)',
-            }}
-          />
-          <span
-            style={{
-              fontSize: '10px',
-              fontWeight: mobileTab === 'library' ? 700 : 500,
-              color: mobileTab === 'library' ? 'var(--accent-pink)' : 'var(--text-tertiary)',
-            }}
-          >
-            Library
-          </span>
-        </button>
-
+            <Icon
+              style={{
+                width: '22px',
+                height: '22px',
+                color: mobileTab === tab ? 'var(--accent-pink)' : 'var(--text-tertiary)',
+              }}
+            />
+            <span
+              style={{
+                fontSize: '10px',
+                fontWeight: mobileTab === tab ? 700 : 500,
+                color: mobileTab === tab ? 'var(--accent-pink)' : 'var(--text-tertiary)',
+              }}
+            >
+              {label}
+            </span>
+          </button>
+        ))}
       </nav>
     </>
   );
