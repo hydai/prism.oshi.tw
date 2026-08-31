@@ -52,6 +52,8 @@ Six contexts in `app/contexts/`, wired in two layers:
 - **App-wide** (`GlobalProviders.tsx`, root layout): **FanAuthContext** — minimal auth placeholder
 - **Per-streamer** (`app/[streamer]/StreamerShell.tsx`): **StreamerContext** (read-only current streamer config) → **PlayerContext** (slice hooks over `app/lib/player-store.ts` — playback state, queue, shuffle/repeat, YouTube IFrame API control) → `PerStreamerProviders.tsx`, which nests **PlaylistContext** (CRUD playlists, JSON import/export), **LikedSongsContext**, **RecentlyPlayedContext** — each localStorage-backed and keyed by `streamerSlug`
 
+Archive-page state is page-scoped, not in `app/contexts/`: `app/[streamer]/page.tsx` composes **ArchiveDataProvider** → **ArchiveUiProvider** → **ArchiveFiltersProvider** (`archive-{data,ui,filters}-context.tsx`), and each section of `ArchivePageView.tsx` subscribes only to the slices it renders.
+
 ### Theme System
 
 - Global CSS variables defined in `app/globals.css` (~61 custom properties)
@@ -72,7 +74,7 @@ Hidden `<iframe>` controlled via YouTube IFrame API. Songs reference specific vi
 
 ## Key Directories
 
-- `app/[streamer]/page.tsx` — main archive page (largest file, song browsing + timeline views)
+- `app/[streamer]/page.tsx` — archive page composition root (nests the three `archive-*-context.tsx` providers); `ArchivePageView.tsx` renders the 16 sections (largest file, song browsing + timeline views)
 - `app/components/` — UI components (MiniPlayer, SongCard, PlaylistPanel, etc.)
 - `app/contexts/` — all React context providers
 - `lib/` — shared utilities (data loading, parsing, types; `lib/itunes.ts` is used only by `tools/aurora`)

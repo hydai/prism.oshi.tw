@@ -1,6 +1,6 @@
 'use client';
 
-import { createContext, useContext, useRef, type RefObject } from 'react';
+import { useRef, type RefObject } from 'react';
 import { useVirtualizer, type Virtualizer } from '@tanstack/react-virtual';
 import Link from 'next/link';
 import {
@@ -36,28 +36,57 @@ import MobileSearchRow from '../components/MobileSearchRow';
 import SearchBox from '../components/SearchBox';
 import ThemeToggle from '../components/ThemeToggle';
 import ViewModeToggle from '../components/ViewModeToggle';
-import type { ArchivePageController } from './page';
+import { useArchiveData } from './archive-data-context';
+import { useArchiveFilters } from './archive-filters-context';
+import { useArchiveUi } from './archive-ui-context';
+import { useStreamer } from '../contexts/StreamerContext';
+import { useCurrentTrack, usePlayerActions, usePlayerStatus, useTransport } from '../contexts/PlayerContext';
+import { usePlaylist } from '../contexts/PlaylistContext';
+import { useLikedSongs } from '../contexts/LikedSongsContext';
+import { useRecentlyPlayed } from '../contexts/RecentlyPlayedContext';
+import type { ArchiveLoadState } from '../lib/archive-loader';
 
-interface ArchivePageViewProps {
-  controller: ArchivePageController;
+/**
+ * TEMPORARY compatibility facade over the split providers, preserving the old
+ * controller shape so sections migrate one task later. Recomposes on any slice
+ * change — exactly the old god-controller behavior. Do not add call sites.
+ */
+function useArchivePageView() {
+  const { songs, loadState, retryLoad, allArtists, availableYears } = useArchiveData();
+  const filters = useArchiveFilters();
+  const ui = useArchiveUi();
+  const streamerData = useStreamer();
+  const currentTrack = useCurrentTrack();
+  const { apiLoadError, unavailableVideoIds } = usePlayerStatus();
+  const { shuffleOn } = useTransport();
+  const { toggleShuffle } = usePlayerActions();
+  const { playlists } = usePlaylist();
+  const { likedCount, isLiked } = useLikedSongs();
+  const { recentCount } = useRecentlyPlayed();
+  return {
+    ...filters,
+    ...ui,
+    streamerData,
+    slug: streamerData.slug,
+    songs,
+    loadState,
+    retryLoad,
+    allArtists,
+    availableYears,
+    currentTrackId: currentTrack?.performanceId ?? null,
+    apiLoadError,
+    unavailableVideoIds,
+    shuffleOn,
+    toggleShuffle,
+    playlists,
+    likedCount,
+    isLiked,
+    recentCount,
+  };
 }
 
-const ArchivePageContext = createContext<ArchivePageController | null>(null);
-
-function useArchivePageView(): ArchivePageController {
-  const controller = useContext(ArchivePageContext);
-  if (controller === null) {
-    throw new Error('Archive page sections must be rendered inside ArchivePageView');
-  }
-  return controller;
-}
-
-export default function ArchivePageView({ controller }: ArchivePageViewProps) {
-  return (
-    <ArchivePageContext.Provider value={controller}>
-      <ArchivePageChrome />
-    </ArchivePageContext.Provider>
-  );
+export default function ArchivePageView() {
+  return <ArchivePageChrome />;
 }
 
 function ArchivePageChrome() {
@@ -1067,7 +1096,7 @@ function DesktopActionBar() {
 }
 
 
-function CatalogStatus({ loadState, retryLoad }: Pick<ArchivePageController, 'loadState' | 'retryLoad'>) {
+function CatalogStatus({ loadState, retryLoad }: { loadState: ArchiveLoadState; retryLoad: () => void }) {
   if (loadState === 'error') {
     return (
       /* Song API Load Error State */
