@@ -15,6 +15,7 @@
     "test:persisted-store": "npx tsx app/lib/persisted-store.test.ts",
     "test:viewport-store": "npx tsx app/lib/viewport-store.test.ts",
     "test:player-context": "npx tsx app/contexts/player-context.test.tsx",
+    "test:player-store": "npx tsx app/lib/player-store.test.ts",
     "test:hydration": "npx tsx app/components/hydration.test.tsx",
     "test:format": "npx tsx app/lib/format.test.ts",
     "test:playlist-storage": "npx tsx app/lib/playlist-storage.test.ts",
