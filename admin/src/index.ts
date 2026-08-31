@@ -1,4 +1,4 @@
-import { Hono } from 'hono';
+import { Hono, type Context } from 'hono';
 import { requireApiRequestAuthenticity, requireAuth, requireCurator } from './auth';
 import { getRouteParam, getStreamerId } from './http';
 import { canHardDeleteStream, isValidTransition, shouldImportVod, VALID_STATUSES } from './status';
@@ -60,9 +60,44 @@ import { fetchItunesDuration } from './itunes';
 import { parseTextToSongs } from '../shared/parse';
 import { formatSubscriberCount } from '../shared/format';
 import { feedbackEmbedForSubmission, feedbackEmbedForVod, postDiscord } from '../shared/discord';
+import type { DiscordEmbed } from '../shared/discord';
 import { sanitizeNovaUrl, type NovaUrlProvider } from '../shared/nova-url-safety';
 import { discoverStreams, getVideoDetails, fetchComments, findCandidateComment, countTimestamps, fetchChannelInfo, verifyChannelId } from './youtube';
-import { refreshSubscriberCounts, type SubscriberRefreshRow } from './subscriber-refresh';
+import { refreshSubscriberCounts } from './subscriber-refresh';
+import {
+  listSubmissions,
+  getSubmissionById,
+  getSubmissionForUpdate,
+  getSubmissionChannelId,
+  getSubmissionStatus,
+  submissionExists,
+  deleteSubmission,
+  NOVA_SUBMISSION_EDITABLE_FIELDS,
+  type NovaEditableField,
+  updateSubmissionFields,
+  updateSubmissionStatus,
+  updateSubmissionVerification,
+  updateSubmissionSubscriberInfo,
+  listApprovedSubmissionsWithChannel,
+  listVods,
+  getVodById,
+  getVodStatus,
+  vodExists,
+  deleteVod,
+  listVodSongs,
+  updateVodStatus,
+  NOVA_VOD_EDITABLE_FIELDS,
+  type NovaVodEditableField,
+  updateVodFields,
+} from './nova-db';
+import {
+  listTickets,
+  getTicketById,
+  ticketExists,
+  replyToTicket,
+  updateTicketStatus,
+} from './crystal-db';
+import { NOVA_STATUSES, CRYSTAL_TICKET_STATUSES } from '../shared/types';
 import {
   downloadVodExportCandidate,
   generateVodExportPreviewApi,
@@ -118,9 +153,7 @@ import type {
   NovaSubmission,
   NovaStatus,
   NovaVodSubmission,
-  NovaVodSong,
   StreamerInfo,
-  CrystalTicket,
   CrystalTicketStatus,
   BulkFetchSubscribersResponse,
   GlobalWorksResponse,
@@ -338,6 +371,22 @@ function vodExportErrorResponse(error: unknown): Response {
       'Cache-Control': 'private, no-store',
     },
   });
+}
+
+// Nova submission/VOD status transitions both fire a best-effort Discord
+// notification, built by a different embed function per entity but posted
+// through this one waitUntil block (audit 4.3): a null embed (no real status
+// transition, or a transition that isn't approved/rejected) is a no-op.
+function notifyDiscordFeedback(
+  c: Context<{ Bindings: Bindings; Variables: Variables }>,
+  embed: DiscordEmbed | null,
+): void {
+  if (!embed) return;
+  c.executionCtx.waitUntil(
+    postDiscord(c.env.DISCORD_WEBHOOK_FEEDBACK, [embed]).catch((err) =>
+      console.error('discord feedback notify failed', err),
+    ),
+  );
 }
 
 const app = new Hono<{ Bindings: Bindings; Variables: Variables }>();
@@ -1447,27 +1496,8 @@ app.post('/api/harmonize/apply', requireCurator, async (c) => {
 app.get('/api/nova/submissions', requireCurator, async (c) => {
   const status = c.req.query('status');
   const search = c.req.query('search');
-  let query = 'SELECT * FROM submissions';
-  const conditions: string[] = [];
-  const binds: string[] = [];
-  if (status) {
-    conditions.push('status = ?');
-    binds.push(status);
-  }
-  if (search) {
-    conditions.push('(id LIKE ? OR slug LIKE ? OR display_name LIKE ? OR youtube_channel_id LIKE ?)');
-    const pattern = `%${search}%`;
-    binds.push(pattern, pattern, pattern, pattern);
-  }
-  if (conditions.length > 0) query += ` WHERE ${conditions.join(' AND ')}`;
-  query += ' ORDER BY submitted_at DESC';
-
-  const result = await c.env.NOVA_DB
-    .prepare(query)
-    .bind(...binds)
-    .all<NovaSubmission>();
-
-  return c.json({ data: result.results, total: result.results.length });
+  const data = await listSubmissions(c.env.NOVA_DB, { status, search });
+  return c.json({ data, total: data.length });
 });
 
 // POST /api/nova/submissions/fetch-all-subscribers — bulk fetch for all approved streamers
@@ -1478,9 +1508,7 @@ app.post('/api/nova/submissions/fetch-all-subscribers', requireCurator, async (c
     return c.json({ error: 'YOUTUBE_API_KEY not configured' }, 500);
   }
 
-  const { results: subs } = await c.env.NOVA_DB
-    .prepare("SELECT id, display_name, youtube_channel_id FROM submissions WHERE status = 'approved' AND youtube_channel_id != ''")
-    .all<SubscriberRefreshRow>();
+  const subs = await listApprovedSubmissionsWithChannel(c.env.NOVA_DB);
 
   const response = await refreshSubscriberCounts(c.env.NOVA_DB, apiKey, subs);
   return c.json<BulkFetchSubscribersResponse>(response);
@@ -1490,10 +1518,7 @@ app.post('/api/nova/submissions/fetch-all-subscribers', requireCurator, async (c
 // migrated ID without requiring a meaningless edit to that opaque value.
 app.post('/api/nova/submissions/:id/verify-youtube-channel', requireCurator, async (c) => {
   const id = getRouteParam(c, 'id');
-  const sub = await c.env.NOVA_DB
-    .prepare('SELECT id, youtube_channel_id FROM submissions WHERE id = ?')
-    .bind(id)
-    .first<{ id: string; youtube_channel_id: string }>();
+  const sub = await getSubmissionChannelId(c.env.NOVA_DB, id);
   if (!sub) return c.json({ error: 'Submission not found' }, 404);
   if (!sub.youtube_channel_id || sub.youtube_channel_id.trim().length === 0) {
     return c.json({ error: 'Set a YouTube channel ID before verification' }, 400);
@@ -1518,31 +1543,17 @@ app.post('/api/nova/submissions/:id/verify-youtube-channel', requireCurator, asy
   }
 
   const verifiedAt = new Date().toISOString();
-  const result = await c.env.NOVA_DB
-    .prepare(`
-      UPDATE submissions
-      SET youtube_channel_verified_id = ?, youtube_channel_verified_at = ?
-      WHERE id = ? AND youtube_channel_id = ?
-      RETURNING id
-    `)
-    .bind(verifiedId, verifiedAt, id, sub.youtube_channel_id)
-    .run<{ id: string }>();
-  if (result.results[0]?.id !== id) {
+  const ok = await updateSubmissionVerification(c.env.NOVA_DB, id, sub.youtube_channel_id, verifiedId, verifiedAt);
+  if (!ok) {
     return c.json({ error: 'YouTube channel ID changed during verification; retry the operation' }, 409);
   }
-  const updated = await c.env.NOVA_DB
-    .prepare('SELECT * FROM submissions WHERE id = ?')
-    .bind(id)
-    .first<NovaSubmission>();
+  const updated = await getSubmissionById(c.env.NOVA_DB, id);
   return c.json(updated);
 });
 
 app.get('/api/nova/submissions/:id', requireCurator, async (c) => {
   const id = getRouteParam(c, 'id');
-  const result = await c.env.NOVA_DB
-    .prepare('SELECT * FROM submissions WHERE id = ?')
-    .bind(id)
-    .first<NovaSubmission>();
+  const result = await getSubmissionById(c.env.NOVA_DB, id);
 
   if (!result) return c.json({ error: 'Submission not found' }, 404);
   return c.json(result);
@@ -1550,20 +1561,7 @@ app.get('/api/nova/submissions/:id', requireCurator, async (c) => {
 
 app.put('/api/nova/submissions/:id', requireCurator, async (c) => {
   const id = getRouteParam(c, 'id');
-  const existing = await c.env.NOVA_DB
-    .prepare(`
-      SELECT id, youtube_channel_id, youtube_channel_verified_id,
-             youtube_channel_verified_at
-      FROM submissions
-      WHERE id = ?
-    `)
-    .bind(id)
-    .first<{
-      id: string;
-      youtube_channel_id: string;
-      youtube_channel_verified_id: string | null;
-      youtube_channel_verified_at: string | null;
-    }>();
+  const existing = await getSubmissionForUpdate(c.env.NOVA_DB, id);
   if (!existing) return c.json({ error: 'Submission not found' }, 404);
 
   const parsedBody = await c.req.json<unknown>();
@@ -1612,49 +1610,23 @@ app.put('/api/nova/submissions/:id', requireCurator, async (c) => {
     }
   }
 
-  const fields: string[] = [];
-  const values: Array<string | number | null> = [];
-  const editable = [
-    'youtube_channel_url', 'youtube_channel_id', 'slug', 'brand_name', 'display_name', 'description',
-    'avatar_url', 'subscriber_count', 'link_youtube', 'link_twitter',
-    'link_facebook', 'link_instagram', 'link_twitch', 'reviewer_note',
-    'group', 'theme_json', 'enabled', 'display_order', 'external_url',
-  ] as const;
-
-  for (const key of editable) {
+  const fields: Partial<Record<NovaEditableField, string | number>> = {};
+  for (const key of NOVA_SUBMISSION_EDITABLE_FIELDS) {
     if (body[key] !== undefined) {
-      // Quote column name to handle SQL reserved words like "group"
-      fields.push(`"${key}" = ?`);
-      values.push(body[key] as string | number);
+      fields[key] = body[key] as string | number;
     }
   }
 
-  // Keep normalized URL in sync when youtube_channel_url changes
-  if (body.youtube_channel_url !== undefined) {
-    fields.push('"youtube_channel_url_normalized" = ?');
-    values.push(body.youtube_channel_url.trim().toLowerCase());
-  }
+  const verification = (verifiedChannelId !== undefined && channelVerifiedAt !== undefined)
+    ? { channelId: verifiedChannelId, verifiedAt: channelVerifiedAt }
+    : undefined;
 
-  if (verifiedChannelId !== undefined && channelVerifiedAt !== undefined) {
-    fields.push('"youtube_channel_verified_id" = ?', '"youtube_channel_verified_at" = ?');
-    values.push(verifiedChannelId, channelVerifiedAt);
-  }
-
-  if (fields.length === 0) {
+  const updatedAny = await updateSubmissionFields(c.env.NOVA_DB, id, fields, verification);
+  if (!updatedAny) {
     return c.json({ error: 'No fields to update' }, 400);
   }
 
-  values.push(id);
-  await c.env.NOVA_DB
-    .prepare(`UPDATE submissions SET ${fields.join(', ')} WHERE id = ?`)
-    .bind(...values)
-    .run();
-
-  const updated = await c.env.NOVA_DB
-    .prepare('SELECT * FROM submissions WHERE id = ?')
-    .bind(id)
-    .first<NovaSubmission>();
-
+  const updated = await getSubmissionById(c.env.NOVA_DB, id);
   return c.json(updated);
 });
 
@@ -1662,39 +1634,20 @@ app.patch('/api/nova/submissions/:id/status', requireCurator, async (c) => {
   const id = getRouteParam(c, 'id');
   const body = await c.req.json<{ status: NovaStatus; reviewer_note?: string }>();
 
-  const validStatuses = new Set<string>(['approved', 'rejected', 'pending']);
+  const validStatuses = new Set<string>(NOVA_STATUSES);
   if (!validStatuses.has(body.status)) {
     return c.json({ error: `Invalid status: ${body.status}. Must be 'approved', 'rejected', or 'pending'` }, 400);
   }
 
-  const existing = await c.env.NOVA_DB
-    .prepare('SELECT id, status FROM submissions WHERE id = ?')
-    .bind(id)
-    .first<{ id: string; status: string }>();
-
+  const existing = await getSubmissionStatus(c.env.NOVA_DB, id);
   if (!existing) return c.json({ error: 'Submission not found' }, 404);
 
-  const reviewedAt = body.status === 'pending' ? null : new Date().toISOString();
-  const reviewerNote = body.status === 'pending' ? null : (body.reviewer_note ?? '');
+  await updateSubmissionStatus(c.env.NOVA_DB, id, body.status, body.reviewer_note);
 
-  await c.env.NOVA_DB
-    .prepare('UPDATE submissions SET status = ?, reviewed_at = ?, reviewer_note = ? WHERE id = ?')
-    .bind(body.status, reviewedAt, reviewerNote, id)
-    .run();
-
-  const updated = await c.env.NOVA_DB
-    .prepare('SELECT * FROM submissions WHERE id = ?')
-    .bind(id)
-    .first<NovaSubmission>();
+  const updated = await getSubmissionById(c.env.NOVA_DB, id);
 
   const feedbackEmbed = updated ? feedbackEmbedForSubmission(existing.status, body.status, updated) : null;
-  if (feedbackEmbed) {
-    c.executionCtx.waitUntil(
-      postDiscord(c.env.DISCORD_WEBHOOK_FEEDBACK, [feedbackEmbed]).catch((err) =>
-        console.error('discord feedback notify failed', err),
-      ),
-    );
-  }
+  notifyDiscordFeedback(c, feedbackEmbed);
 
   return c.json(updated);
 });
@@ -1702,16 +1655,9 @@ app.patch('/api/nova/submissions/:id/status', requireCurator, async (c) => {
 // DELETE /api/nova/submissions/:id — permanently delete a streamer submission
 app.delete('/api/nova/submissions/:id', requireCurator, async (c) => {
   const id = getRouteParam(c, 'id');
-  const existing = await c.env.NOVA_DB
-    .prepare('SELECT id FROM submissions WHERE id = ?')
-    .bind(id)
-    .first();
-  if (!existing) return c.json({ error: 'Submission not found' }, 404);
+  if (!(await submissionExists(c.env.NOVA_DB, id))) return c.json({ error: 'Submission not found' }, 404);
 
-  await c.env.NOVA_DB
-    .prepare('DELETE FROM submissions WHERE id = ?')
-    .bind(id)
-    .run();
+  await deleteSubmission(c.env.NOVA_DB, id);
 
   return c.json({ ok: true });
 });
@@ -1720,10 +1666,7 @@ app.delete('/api/nova/submissions/:id', requireCurator, async (c) => {
 app.post('/api/nova/submissions/:id/fetch-subscribers', requireCurator, async (c) => {
   const id = getRouteParam(c, 'id');
 
-  const sub = await c.env.NOVA_DB
-    .prepare('SELECT id, youtube_channel_id FROM submissions WHERE id = ?')
-    .bind(id)
-    .first<{ id: string; youtube_channel_id: string }>();
+  const sub = await getSubmissionChannelId(c.env.NOVA_DB, id);
   if (!sub) return c.json({ error: 'Submission not found' }, 404);
   if (!sub.youtube_channel_id) {
     return c.json({ error: 'No youtube_channel_id set for this submission. Please add a channel ID first.' }, 400);
@@ -1752,24 +1695,17 @@ app.post('/api/nova/submissions/:id/fetch-subscribers', requireCurator, async (c
   const formatted = formatSubscriberCount(info.subscriberCount);
   const verifiedAt = new Date().toISOString();
 
-  const update = await c.env.NOVA_DB
-    .prepare(`
-      UPDATE submissions
-      SET subscriber_count = ?, avatar_url = ?,
-          youtube_channel_verified_id = ?, youtube_channel_verified_at = ?
-      WHERE id = ? AND youtube_channel_id = ?
-      RETURNING id
-    `)
-    .bind(formatted, info.avatarUrl, info.channelId, verifiedAt, id, sub.youtube_channel_id)
-    .run<{ id: string }>();
-  if (update.results[0]?.id !== id) {
+  const ok = await updateSubmissionSubscriberInfo(c.env.NOVA_DB, id, sub.youtube_channel_id, {
+    subscriberCount: formatted,
+    avatarUrl: info.avatarUrl,
+    verifiedChannelId: info.channelId,
+    verifiedAt,
+  });
+  if (!ok) {
     return c.json({ error: 'YouTube channel ID changed during refresh; retry the operation' }, 409);
   }
 
-  const updated = await c.env.NOVA_DB
-    .prepare('SELECT * FROM submissions WHERE id = ?')
-    .bind(id)
-    .first<NovaSubmission>();
+  const updated = await getSubmissionById(c.env.NOVA_DB, id);
 
   return c.json(updated);
 });
@@ -1779,80 +1715,39 @@ app.post('/api/nova/submissions/:id/fetch-subscribers', requireCurator, async (c
 app.get('/api/nova/vods', requireCurator, async (c) => {
   const status = c.req.query('status');
   const streamer = c.req.query('streamer');
-
-  let query = 'SELECT * FROM vod_submissions';
-  const conditions: string[] = [];
-  const binds: string[] = [];
-
-  if (status) {
-    conditions.push('status = ?');
-    binds.push(status);
-  }
-  if (streamer) {
-    conditions.push('streamer_slug = ?');
-    binds.push(streamer);
-  }
-
-  if (conditions.length > 0) {
-    query += ' WHERE ' + conditions.join(' AND ');
-  }
-  query += ' ORDER BY submitted_at DESC';
-
-  const result = await c.env.NOVA_DB
-    .prepare(query)
-    .bind(...binds)
-    .all<NovaVodSubmission>();
-
-  return c.json({ data: result.results, total: result.results.length });
+  const data = await listVods(c.env.NOVA_DB, { status, streamer });
+  return c.json({ data, total: data.length });
 });
 
 app.get('/api/nova/vods/:id', requireCurator, async (c) => {
   const id = getRouteParam(c, 'id');
-  const vod = await c.env.NOVA_DB
-    .prepare('SELECT * FROM vod_submissions WHERE id = ?')
-    .bind(id)
-    .first<NovaVodSubmission>();
+  const vod = await getVodById(c.env.NOVA_DB, id);
 
   if (!vod) return c.json({ error: 'VOD submission not found' }, 404);
 
-  const { results: songs } = await c.env.NOVA_DB
-    .prepare('SELECT * FROM vod_songs WHERE vod_submission_id = ? ORDER BY sort_order ASC')
-    .bind(id)
-    .all<NovaVodSong>();
+  const songs = await listVodSongs(c.env.NOVA_DB, id);
 
-  return c.json({ ...vod, songs: songs ?? [] });
+  return c.json({ ...vod, songs });
 });
 
 app.patch('/api/nova/vods/:id/status', requireCurator, async (c) => {
   const id = getRouteParam(c, 'id');
   const body = await c.req.json<{ status: NovaStatus; reviewer_note?: string }>();
 
-  const validStatuses = new Set<string>(['approved', 'rejected', 'pending']);
+  const validStatuses = new Set<string>(NOVA_STATUSES);
   if (!validStatuses.has(body.status)) {
     return c.json({ error: `Invalid status: ${body.status}. Must be 'approved', 'rejected', or 'pending'` }, 400);
   }
 
-  const existing = await c.env.NOVA_DB
-    .prepare('SELECT id, status FROM vod_submissions WHERE id = ?')
-    .bind(id)
-    .first<{ id: string; status: string }>();
+  const existing = await getVodStatus(c.env.NOVA_DB, id);
 
   if (!existing) return c.json({ error: 'VOD submission not found' }, 404);
 
-  const reviewedAt = body.status === 'pending' ? null : new Date().toISOString();
-  const reviewerNote = body.status === 'pending' ? null : (body.reviewer_note ?? '');
-
-  await c.env.NOVA_DB
-    .prepare('UPDATE vod_submissions SET status = ?, reviewed_at = ?, reviewer_note = ? WHERE id = ?')
-    .bind(body.status, reviewedAt, reviewerNote, id)
-    .run();
+  await updateVodStatus(c.env.NOVA_DB, id, body.status, body.reviewer_note);
 
   // Fetch the full updated row once and reuse it for the import gate, the Discord embed,
   // and the response — avoids a second identical SELECT * on vod_submissions.
-  const updated = await c.env.NOVA_DB
-    .prepare('SELECT * FROM vod_submissions WHERE id = ?')
-    .bind(id)
-    .first<NovaVodSubmission>();
+  const updated = await getVodById(c.env.NOVA_DB, id);
 
   // Import VOD songs into the admin DB as pending records when approved. The gate is
   // shouldImportVod, keyed on whether the video already exists in the admin DB
@@ -1864,10 +1759,7 @@ app.patch('/api/nova/vods/:id/status', requireCurator, async (c) => {
   // re-approval (common under this existence gate) costs no extra NOVA_DB read.
   if (body.status === 'approved' && updated) {
     if (shouldImportVod(body.status, await videoIdExists(c.env.DB, updated.video_id, updated.streamer_slug))) {
-      const { results: vodSongs } = await c.env.NOVA_DB
-        .prepare('SELECT * FROM vod_songs WHERE vod_submission_id = ? ORDER BY sort_order')
-        .bind(id)
-        .all<NovaVodSong>();
+      const vodSongs = await listVodSongs(c.env.NOVA_DB, id);
 
       if (vodSongs.length > 0) {
         const user = c.get('user');
@@ -1877,52 +1769,30 @@ app.patch('/api/nova/vods/:id/status', requireCurator, async (c) => {
   }
 
   const feedbackEmbed = updated ? feedbackEmbedForVod(existing.status, body.status, updated) : null;
-  if (feedbackEmbed) {
-    c.executionCtx.waitUntil(
-      postDiscord(c.env.DISCORD_WEBHOOK_FEEDBACK, [feedbackEmbed]).catch((err) =>
-        console.error('discord feedback notify failed', err),
-      ),
-    );
-  }
+  notifyDiscordFeedback(c, feedbackEmbed);
 
   return c.json(updated);
 });
 
 app.put('/api/nova/vods/:id', requireCurator, async (c) => {
   const id = getRouteParam(c, 'id');
-  const existing = await c.env.NOVA_DB
-    .prepare('SELECT id FROM vod_submissions WHERE id = ?')
-    .bind(id)
-    .first();
-  if (!existing) return c.json({ error: 'VOD submission not found' }, 404);
+  if (!(await vodExists(c.env.NOVA_DB, id))) return c.json({ error: 'VOD submission not found' }, 404);
 
   const body = await c.req.json<Partial<Pick<NovaVodSubmission, 'stream_title' | 'stream_date' | 'submitter_note' | 'reviewer_note'>>>();
 
-  const fields: string[] = [];
-  const values: string[] = [];
-  const editable = ['stream_title', 'stream_date', 'submitter_note', 'reviewer_note'] as const;
-
-  for (const key of editable) {
+  const fields: Partial<Record<NovaVodEditableField, string>> = {};
+  for (const key of NOVA_VOD_EDITABLE_FIELDS) {
     if (body[key] !== undefined) {
-      fields.push(`${key} = ?`);
-      values.push(body[key] as string);
+      fields[key] = body[key] as string;
     }
   }
 
-  if (fields.length === 0) {
+  const updatedAny = await updateVodFields(c.env.NOVA_DB, id, fields);
+  if (!updatedAny) {
     return c.json({ error: 'No fields to update' }, 400);
   }
 
-  values.push(id);
-  await c.env.NOVA_DB
-    .prepare(`UPDATE vod_submissions SET ${fields.join(', ')} WHERE id = ?`)
-    .bind(...values)
-    .run();
-
-  const updated = await c.env.NOVA_DB
-    .prepare('SELECT * FROM vod_submissions WHERE id = ?')
-    .bind(id)
-    .first<NovaVodSubmission>();
+  const updated = await getVodById(c.env.NOVA_DB, id);
 
   return c.json(updated);
 });
@@ -1930,16 +1800,9 @@ app.put('/api/nova/vods/:id', requireCurator, async (c) => {
 // DELETE /api/nova/vods/:id — permanently delete a VOD submission (cascades to vod_songs)
 app.delete('/api/nova/vods/:id', requireCurator, async (c) => {
   const id = getRouteParam(c, 'id');
-  const existing = await c.env.NOVA_DB
-    .prepare('SELECT id FROM vod_submissions WHERE id = ?')
-    .bind(id)
-    .first();
-  if (!existing) return c.json({ error: 'VOD submission not found' }, 404);
+  if (!(await vodExists(c.env.NOVA_DB, id))) return c.json({ error: 'VOD submission not found' }, 404);
 
-  await c.env.NOVA_DB
-    .prepare('DELETE FROM vod_submissions WHERE id = ?')
-    .bind(id)
-    .run();
+  await deleteVod(c.env.NOVA_DB, id);
 
   return c.json({ ok: true });
 });
@@ -1949,39 +1812,13 @@ app.delete('/api/nova/vods/:id', requireCurator, async (c) => {
 app.get('/api/crystal/tickets', requireCurator, async (c) => {
   const status = c.req.query('status');
   const type = c.req.query('type');
-
-  let query = 'SELECT * FROM tickets';
-  const conditions: string[] = [];
-  const binds: string[] = [];
-
-  if (status) {
-    conditions.push('status = ?');
-    binds.push(status);
-  }
-  if (type) {
-    conditions.push('type = ?');
-    binds.push(type);
-  }
-
-  if (conditions.length > 0) {
-    query += ' WHERE ' + conditions.join(' AND ');
-  }
-  query += ' ORDER BY submitted_at DESC';
-
-  const result = await c.env.CRYSTAL_DB
-    .prepare(query)
-    .bind(...binds)
-    .all<CrystalTicket>();
-
-  return c.json({ data: result.results, total: result.results.length });
+  const data = await listTickets(c.env.CRYSTAL_DB, { status, type });
+  return c.json({ data, total: data.length });
 });
 
 app.get('/api/crystal/tickets/:id', requireCurator, async (c) => {
   const id = getRouteParam(c, 'id');
-  const result = await c.env.CRYSTAL_DB
-    .prepare('SELECT * FROM tickets WHERE id = ?')
-    .bind(id)
-    .first<CrystalTicket>();
+  const result = await getTicketById(c.env.CRYSTAL_DB, id);
 
   if (!result) return c.json({ error: 'Ticket not found' }, 404);
   return c.json(result);
@@ -1995,22 +1832,11 @@ app.post('/api/crystal/tickets/:id/reply', requireCurator, async (c) => {
     return c.json({ error: 'admin_reply is required' }, 400);
   }
 
-  const existing = await c.env.CRYSTAL_DB
-    .prepare('SELECT id FROM tickets WHERE id = ?')
-    .bind(id)
-    .first();
+  if (!(await ticketExists(c.env.CRYSTAL_DB, id))) return c.json({ error: 'Ticket not found' }, 404);
 
-  if (!existing) return c.json({ error: 'Ticket not found' }, 404);
+  await replyToTicket(c.env.CRYSTAL_DB, id, body.admin_reply.trim());
 
-  await c.env.CRYSTAL_DB
-    .prepare('UPDATE tickets SET admin_reply = ?, status = ?, replied_at = ? WHERE id = ?')
-    .bind(body.admin_reply.trim(), 'replied', new Date().toISOString(), id)
-    .run();
-
-  const updated = await c.env.CRYSTAL_DB
-    .prepare('SELECT * FROM tickets WHERE id = ?')
-    .bind(id)
-    .first<CrystalTicket>();
+  const updated = await getTicketById(c.env.CRYSTAL_DB, id);
 
   return c.json(updated);
 });
@@ -2019,36 +1845,16 @@ app.patch('/api/crystal/tickets/:id/status', requireCurator, async (c) => {
   const id = getRouteParam(c, 'id');
   const body = await c.req.json<{ status: CrystalTicketStatus }>();
 
-  const validStatuses = new Set<string>(['pending', 'replied', 'closed']);
+  const validStatuses = new Set<string>(CRYSTAL_TICKET_STATUSES);
   if (!validStatuses.has(body.status)) {
     return c.json({ error: `Invalid status: ${body.status}` }, 400);
   }
 
-  const existing = await c.env.CRYSTAL_DB
-    .prepare('SELECT id FROM tickets WHERE id = ?')
-    .bind(id)
-    .first();
+  if (!(await ticketExists(c.env.CRYSTAL_DB, id))) return c.json({ error: 'Ticket not found' }, 404);
 
-  if (!existing) return c.json({ error: 'Ticket not found' }, 404);
+  await updateTicketStatus(c.env.CRYSTAL_DB, id, body.status);
 
-  const updates: string[] = ['status = ?'];
-  const values: string[] = [body.status];
-
-  if (body.status === 'closed') {
-    updates.push('closed_at = ?');
-    values.push(new Date().toISOString());
-  }
-
-  values.push(id);
-  await c.env.CRYSTAL_DB
-    .prepare(`UPDATE tickets SET ${updates.join(', ')} WHERE id = ?`)
-    .bind(...values)
-    .run();
-
-  const updated = await c.env.CRYSTAL_DB
-    .prepare('SELECT * FROM tickets WHERE id = ?')
-    .bind(id)
-    .first<CrystalTicket>();
+  const updated = await getTicketById(c.env.CRYSTAL_DB, id);
 
   return c.json(updated);
 });
