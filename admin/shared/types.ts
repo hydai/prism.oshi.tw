@@ -339,6 +339,12 @@ export interface DeleteStreamResponse {
 
 export type NovaStatus = 'pending' | 'approved' | 'rejected';
 
+// Single source of truth for valid Nova statuses, derived from the NovaStatus
+// union via `satisfies` so the two can never silently drift apart. Route-level
+// validation (`new Set(NOVA_STATUSES)`) and nova-db.ts's write-path guard both
+// read from this constant instead of hand-maintaining their own literal lists.
+export const NOVA_STATUSES = ['pending', 'approved', 'rejected'] as const satisfies readonly NovaStatus[];
+
 export interface NovaVodSubmission {
   id: string;
   streamer_slug: string;
@@ -415,6 +421,9 @@ export interface BulkFetchSubscribersResponse {
 
 export type CrystalTicketType = 'bug' | 'feat' | 'ui' | 'other';
 export type CrystalTicketStatus = 'pending' | 'replied' | 'closed';
+
+// Crystal twin of NOVA_STATUSES — see its comment above.
+export const CRYSTAL_TICKET_STATUSES = ['pending', 'replied', 'closed'] as const satisfies readonly CrystalTicketStatus[];
 
 export interface CrystalTicket {
   id: string;
