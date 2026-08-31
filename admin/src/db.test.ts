@@ -3,14 +3,18 @@ import {
   batchUpdateSongs,
   bulkUnapproveStream,
   createSongAndPerformance,
+  deletePerformanceAndOrphanSong,
   deleteStreamCascade,
   exportSongs,
+  findExistingStreamImportKeys,
   getDashboardStats,
+  getSongById,
   getSongSimilarityGroups,
   importVodToAdminDb,
   insertPerformance,
   insertPerformances,
   insertStream,
+  insertStreams,
   listGlobalWorksPaginated,
   mergeSongs,
   replaceStreamPerformances,
@@ -59,6 +63,9 @@ class FakeStatement {
     if (this.sql.includes('FROM streams WHERE video_id = ? AND streamer_id = ?')) {
       return this.fakeDb.existingStream as T | null;
     }
+    if (this.sql.includes('SELECT song_id FROM performances WHERE id = ?')) {
+      return (this.fakeDb.performanceSongId ? { song_id: this.fakeDb.performanceSongId } : null) as T | null;
+    }
     return null;
   }
 
@@ -106,6 +113,12 @@ class FakeD1Database {
   };
   dashboardRecentSongRows: unknown[] = [];
   dashboardRecentStreamRows: unknown[] = [];
+  performanceSongId: string | null = null;
+  songStillReferencedAfterDelete = false;
+  existingVideoIdRows: unknown[] = [];
+  existingStreamIdRows: unknown[] = [];
+  songByIdRow: unknown | null = null;
+  songByIdPerformanceRows: unknown[] = [];
 
   constructor(
     readonly existingStream: ExistingStream,
@@ -182,6 +195,21 @@ class FakeD1Database {
           results: this.exactSongId ? [{ id: this.exactSongId }] : [],
           meta: { changes: 0 },
         };
+      }
+      if (statement.sql.includes('NOT EXISTS (SELECT 1 FROM performances WHERE song_id = ?)')) {
+        return { results: [], meta: { changes: this.songStillReferencedAfterDelete ? 0 : 1 } };
+      }
+      if (statement.sql.includes('video_id IN (SELECT value FROM json_each(?))')) {
+        return { results: this.existingVideoIdRows, meta: { changes: 0 } };
+      }
+      if (statement.sql.includes('SELECT id FROM streams WHERE id IN (SELECT value FROM json_each(?))')) {
+        return { results: this.existingStreamIdRows, meta: { changes: 0 } };
+      }
+      if (statement.sql.includes('song_work_links AS link ON link.song_id = s.id') && statement.sql.includes('WHERE s.id = ?')) {
+        return { results: this.songByIdRow ? [this.songByIdRow] : [], meta: { changes: 0 } };
+      }
+      if (statement.sql.includes('FROM performances WHERE song_id = ? ORDER BY date DESC')) {
+        return { results: this.songByIdPerformanceRows, meta: { changes: 0 } };
       }
       const guardedParamCount = /merge_guard/i.test(statement.sql) ? 2 : 0;
       const changes = /UPDATE\s+performances/i.test(statement.sql)
@@ -1375,6 +1403,169 @@ async function testInsertStreamRoutesFieldsToTheirOwnColumns(): Promise<void> {
   assertEqual(insert.params[3], '2026-05-05', 'the date field lands in the date column, not swapped with title');
 }
 
+// --- Batch the round-trips (audit 4.2 / W3) ---
+
+// The import-streams route's preflight existence check is one D1 round trip
+// regardless of how many videos are being imported — a json_each-expanded IN for the
+// video ids and one for the candidate stream ids, both issued in a single db.batch.
+async function testFindExistingStreamImportKeysUsesOnePreflightBatch(): Promise<void> {
+  const fakeDb = new FakeD1Database(null);
+  fakeDb.existingVideoIdRows = [{ video_id: 'video-existing' }];
+  fakeDb.existingStreamIdRows = [{ id: 'stream-2026-01-01' }];
+
+  const result = await findExistingStreamImportKeys(
+    fakeDb as unknown as D1Database,
+    'alice',
+    ['video-existing', 'video-new-1', 'video-new-2'],
+    ['stream-2026-01-01', 'stream-2026-01-02', 'stream-2026-01-03'],
+  );
+
+  assertEqual(fakeDb.batchCallCount, 1, 'the preflight existence check is one D1 round trip regardless of video count');
+  assertEqual(fakeDb.batchStatements.length, 2, 'the preflight batch holds exactly the video-id and stream-id existence reads');
+  assert(
+    /video_id\s+IN\s*\(SELECT\s+value\s+FROM\s+json_each\(\?\)\)/i.test(fakeDb.batchStatements[0].sql),
+    'the video-id existence read expands the candidate list via json_each',
+  );
+  assert(
+    /streamer_id\s*=\s*\?/i.test(fakeDb.batchStatements[0].sql),
+    'the video-id existence read is scoped to the streamer',
+  );
+  assert(
+    /id\s+IN\s*\(SELECT\s+value\s+FROM\s+json_each\(\?\)\)/i.test(fakeDb.batchStatements[1].sql),
+    'the stream-id existence read expands the candidate id list via json_each',
+  );
+
+  assertEqual([...result.existingVideoIds].join(','), 'video-existing', 'existing video ids come back from the preflight read');
+  assertEqual([...result.existingStreamIds].join(','), 'stream-2026-01-01', 'colliding candidate stream ids come back from the preflight read');
+}
+
+async function testInsertStreamsUsesOneBatch(): Promise<void> {
+  const fakeDb = new FakeD1Database(null);
+  await insertStreams(fakeDb as unknown as D1Database, [
+    {
+      streamerId: 'alice',
+      id: 'stream-1',
+      title: 'One',
+      date: '2026-01-01',
+      videoId: 'video-1',
+      youtubeUrl: 'https://www.youtube.com/watch?v=video-1',
+      credit: '{}',
+      submittedBy: 'curator@example.com',
+    },
+    {
+      streamerId: 'alice',
+      id: 'stream-2',
+      title: 'Two',
+      date: '2026-01-02',
+      videoId: 'video-2',
+      youtubeUrl: 'https://www.youtube.com/watch?v=video-2',
+      credit: '{}',
+      submittedBy: 'curator@example.com',
+    },
+  ]);
+
+  assertEqual(fakeDb.batchCallCount, 1, 'importing multiple streams shares one D1 batch');
+  assertEqual(fakeDb.batchStatements.length, 2, 'one insert is prepared for each stream');
+  assert(
+    fakeDb.batchStatements.every((statement) => /INSERT\s+INTO\s+streams/i.test(statement.sql)),
+    'the batch contains only stream inserts',
+  );
+  assertEqual(fakeDb.batchStatements[0]?.params[0], 'stream-1', 'the first stream id is preserved');
+  assertEqual(fakeDb.batchStatements[1]?.params[0], 'stream-2', 'the second stream id is preserved');
+}
+
+// deletePerformanceAndOrphanSong becomes atomic: one read, then one batch of two
+// statements. The orphan-song delete's NOT EXISTS guard runs inside the SAME batch as
+// the performance delete, so there is no separate round trip — and no window — between
+// "performance gone" and "orphaned song gone."
+async function testDeletePerformanceAndOrphanSongIsAtomic(): Promise<void> {
+  const fakeDb = new FakeD1Database(null);
+  fakeDb.performanceSongId = 'song-orphan-check';
+
+  const deleted = await deletePerformanceAndOrphanSong(fakeDb as unknown as D1Database, 'perf-1');
+
+  assertEqual(deleted, true, 'deleting an existing performance reports success');
+  assertEqual(fakeDb.firstStatements.length, 1, 'looking up the owning song is the only read');
+  assertEqual(fakeDb.batchCallCount, 1, 'the performance delete and the orphan-song delete share one batch');
+  assertEqual(fakeDb.batchStatements.length, 2, 'the batch holds exactly the performance delete and the orphan-song delete');
+  assert(
+    /DELETE\s+FROM\s+performances\s+WHERE\s+id\s*=\s*\?/i.test(fakeDb.batchStatements[0].sql),
+    'the performance delete runs first',
+  );
+  assert(
+    /DELETE\s+FROM\s+songs\s+WHERE\s+id\s*=\s*\?\s+AND\s+NOT\s+EXISTS\s*\(\s*SELECT\s+1\s+FROM\s+performances\s+WHERE\s+song_id\s*=\s*\?\s*\)/i.test(
+      fakeDb.batchStatements[1].sql,
+    ),
+    'the orphan-song delete is conditioned on NOT EXISTS in the same statement, not a separate count read',
+  );
+  assertEqual(fakeDb.batchStatements[1].params[0], 'song-orphan-check', 'the orphan-song delete targets the owning song');
+  assertEqual(fakeDb.batchStatements[1].params[1], 'song-orphan-check', 'the NOT EXISTS guard checks the same song id');
+}
+
+// A song still referenced by another performance must survive — the NOT EXISTS guard
+// (simulated here via the fake's D1-side changes=0) is what keeps it alive, in the same
+// statement shape as the orphan case above.
+async function testDeletePerformanceAndOrphanSongSurvivesWhenSongStillReferenced(): Promise<void> {
+  const fakeDb = new FakeD1Database(null);
+  fakeDb.performanceSongId = 'song-still-referenced';
+  fakeDb.songStillReferencedAfterDelete = true;
+
+  const deleted = await deletePerformanceAndOrphanSong(fakeDb as unknown as D1Database, 'perf-1');
+
+  assertEqual(deleted, true, 'the performance delete still succeeds even when the song survives');
+  assertEqual(fakeDb.batchCallCount, 1, 'the same one-batch shape runs whether or not the song survives');
+  assertEqual(fakeDb.batchStatements.length, 2, 'the same two-statement batch runs whether or not the song survives');
+}
+
+async function testGetSongByIdUsesOneBatchForSongAndPerformances(): Promise<void> {
+  const fakeDb = new FakeD1Database(null);
+  fakeDb.songByIdRow = {
+    id: 'song-1',
+    work_id: 'work-1',
+    title: 'Song One',
+    original_artist: 'Artist One',
+    tags: '[]',
+    status: 'approved',
+    submitted_by: null,
+    reviewed_by: null,
+    created_at: '2026-01-01',
+    updated_at: '2026-01-02',
+  };
+  fakeDb.songByIdPerformanceRows = [{
+    id: 'perf-1',
+    streamer_id: 'alice',
+    song_id: 'song-1',
+    stream_id: 'stream-1',
+    date: '2026-01-01',
+    stream_title: 'Stream One',
+    video_id: 'video-1',
+    timestamp: 10,
+    end_timestamp: 20,
+    note: '',
+    status: 'approved',
+    submitted_by: null,
+    created_at: '2026-01-01',
+  }];
+
+  const song = await getSongById(fakeDb as unknown as D1Database, 'song-1');
+
+  assertEqual(fakeDb.batchCallCount, 1, 'fetching a song and its performances shares one D1 batch');
+  assertEqual(fakeDb.firstStatements.length, 0, 'getSongById no longer issues a separate .first() read');
+  assertEqual(fakeDb.allStatements.length, 0, 'getSongById no longer issues a separate .all() read');
+  if (!song) throw new Error('getSongById should return the song');
+  assertEqual(song.id, 'song-1', 'the song row is mapped');
+  assertEqual(song.workId, 'work-1', 'the linked work id is mapped');
+  const performances = song.performances ?? [];
+  assertEqual(performances.length, 1, 'the performances array is populated from the batched read');
+  assertEqual(performances[0]?.id, 'perf-1', 'the performance row is mapped');
+}
+
+async function testGetSongByIdReturnsNullWhenMissing(): Promise<void> {
+  const fakeDb = new FakeD1Database(null);
+  const song = await getSongById(fakeDb as unknown as D1Database, 'song-missing');
+  assertEqual(song, null, 'a missing song still returns null from the batched read');
+}
+
 async function main(): Promise<void> {
   await testUpdateStreamPropagatesCopiesToPerformances();
   await testInsertPerformancesUsesOneBatch();
@@ -1402,6 +1593,12 @@ async function main(): Promise<void> {
   await testReplaceStreamPerformancesRunsDeletesBeforeTheSharedCatalogPipeline();
   await testInsertPerformanceRoutesFieldsToTheirOwnColumns();
   await testInsertStreamRoutesFieldsToTheirOwnColumns();
+  await testFindExistingStreamImportKeysUsesOnePreflightBatch();
+  await testInsertStreamsUsesOneBatch();
+  await testDeletePerformanceAndOrphanSongIsAtomic();
+  await testDeletePerformanceAndOrphanSongSurvivesWhenSongStillReferenced();
+  await testGetSongByIdUsesOneBatchForSongAndPerformances();
+  await testGetSongByIdReturnsNullWhenMissing();
   console.log('✓ song imports reuse exact entities and merges preserve every performance');
 }
 

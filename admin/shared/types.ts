@@ -285,7 +285,8 @@ export interface ImportStreamsBody {
 
 export interface ImportStreamsResponse {
   created: number;
-  streamIds: string[];
+  imported: string[];
+  skippedExisting: string[];
 }
 
 export interface CandidateComment {

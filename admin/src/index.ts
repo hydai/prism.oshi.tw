@@ -21,6 +21,9 @@ import {
   listStreams,
   getStreamById,
   insertStream,
+  insertStreams,
+  type StreamInsert,
+  findExistingStreamImportKeys,
   updateStream,
   updateStreamStatus,
   generateStreamId,
@@ -1150,6 +1153,11 @@ app.post('/api/pipeline/import-streams', requireCurator, async (c) => {
   if (!body.videoIds || body.videoIds.length === 0) {
     return c.json({ error: 'videoIds is required' }, 400);
   }
+  // A repeated id would put two identical inserts into the batch below and fail
+  // the whole request on UNIQUE(streamer_id, video_id) — the preflight only knows
+  // DB state, not in-request repeats. The UI can't send duplicates; hand-crafted
+  // bodies can.
+  const videoIds = [...new Set(body.videoIds)];
 
   const apiKey = c.env.YOUTUBE_API_KEY;
   if (!apiKey) {
@@ -1158,28 +1166,49 @@ app.post('/api/pipeline/import-streams', requireCurator, async (c) => {
 
   let videos;
   try {
-    videos = await getVideoDetails(apiKey, body.videoIds);
+    videos = await getVideoDetails(apiKey, videoIds);
   } catch (err) {
     const msg = err instanceof Error ? err.message : 'Unknown YouTube API error';
     return c.json({ error: msg }, 502);
   }
 
   const user = c.get('user');
-  const streamIds: string[] = [];
   const db = c.env.DB;
 
+  // Deterministic date-based candidate id per video, computed up front so the
+  // existence preflight below can check both video ids and candidate stream ids in
+  // one round trip, before any row is written.
+  const candidateIdByVideoId = new Map(videos.map((v) => [v.videoId, generateStreamId(v.date)] as const));
+
   try {
+    const { existingVideoIds, existingStreamIds } = await findExistingStreamImportKeys(
+      db,
+      streamerId,
+      videos.map((v) => v.videoId),
+      [...candidateIdByVideoId.values()],
+    );
+
+    const imported: string[] = [];
+    const skippedExisting: string[] = [];
+    // Seeds with the DB's existing ids so a candidate colliding with an already-stored
+    // stream falls back too, then grows as candidates are claimed so two videos on the
+    // same date within this same request don't collide with each other either.
+    const usedStreamIds = new Set(existingStreamIds);
+    const streamsToInsert: StreamInsert[] = [];
+
     for (const v of videos) {
-      if (await videoIdExists(db, v.videoId, streamerId)) {
-        continue; // already imported, skip
+      if (existingVideoIds.has(v.videoId)) {
+        skippedExisting.push(v.videoId);
+        continue;
       }
 
-      let id = generateStreamId(v.date);
-      if (await streamIdExists(db, id)) {
+      let id = candidateIdByVideoId.get(v.videoId)!;
+      if (usedStreamIds.has(id)) {
         id = generateStreamIdFallback();
       }
+      usedStreamIds.add(id);
 
-      await insertStream(db, {
+      streamsToInsert.push({
         streamerId,
         id,
         title: v.title,
@@ -1189,15 +1218,18 @@ app.post('/api/pipeline/import-streams', requireCurator, async (c) => {
         credit: '{}',
         submittedBy: user.email,
       });
-
-      streamIds.push(id);
+      imported.push(id);
     }
+
+    // All-or-nothing: every stream insert lands in one batch, so a mid-import failure
+    // can no longer leave some streams imported and others silently dropped.
+    await insertStreams(db, streamsToInsert);
+
+    return c.json<ImportStreamsResponse>({ created: imported.length, imported, skippedExisting });
   } catch (err) {
     const msg = err instanceof Error ? err.message : 'Database error';
     return c.json({ error: `Failed to import streams: ${msg}` }, 500);
   }
-
-  return c.json<ImportStreamsResponse>({ created: streamIds.length, streamIds });
 });
 
 // --- Pipeline: Extract timestamps from YouTube comments/description ---

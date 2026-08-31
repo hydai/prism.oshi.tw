@@ -457,21 +457,19 @@ export async function getSongById(
   db: D1Database,
   id: string,
 ): Promise<Song | null> {
-  const row = await db
-    .prepare(`SELECT s.*, link.work_id
+  const [songResult, perfResult] = await db.batch([
+    db.prepare(`SELECT s.*, link.work_id
       FROM songs AS s
       LEFT JOIN song_work_links AS link ON link.song_id = s.id
-      WHERE s.id = ?`)
-    .bind(id)
-    .first<SongRow>();
+      WHERE s.id = ?`).bind(id),
+    db.prepare('SELECT * FROM performances WHERE song_id = ? ORDER BY date DESC').bind(id),
+  ]);
+
+  const row = songResult.results[0] as SongRow | undefined;
   if (!row) return null;
 
   const song = songFromRow(row);
-  const { results: perfRows } = await db
-    .prepare('SELECT * FROM performances WHERE song_id = ? ORDER BY date DESC')
-    .bind(id)
-    .all<PerformanceRow>();
-  song.performances = perfRows.map(performanceFromRow);
+  song.performances = (perfResult.results as PerformanceRow[]).map(performanceFromRow);
   return song;
 }
 
@@ -765,6 +763,43 @@ export async function insertStream(db: D1Database, input: StreamInsert): Promise
   await prepareStreamInsert(db, input).run();
 }
 
+export async function insertStreams(db: D1Database, streams: readonly StreamInsert[]): Promise<void> {
+  if (streams.length === 0) return;
+  await db.batch(streams.map((stream) => prepareStreamInsert(db, stream)));
+}
+
+// One preflight D1 round trip for an import-streams request of any size: which of the
+// candidate video ids are already imported for this streamer, and which of the
+// candidate (deterministic, date-based) stream ids already exist and would collide.
+export async function findExistingStreamImportKeys(
+  db: D1Database,
+  streamerId: string,
+  videoIds: readonly string[],
+  candidateStreamIds: readonly string[],
+): Promise<{ existingVideoIds: Set<string>; existingStreamIds: Set<string> }> {
+  if (videoIds.length === 0) {
+    return { existingVideoIds: new Set(), existingStreamIds: new Set() };
+  }
+
+  const [videoResult, idResult] = await db.batch<{ video_id?: string; id?: string }>([
+    db.prepare(
+      'SELECT video_id FROM streams WHERE streamer_id = ? AND video_id IN (SELECT value FROM json_each(?))',
+    ).bind(streamerId, JSON.stringify(videoIds)),
+    db.prepare(
+      'SELECT id FROM streams WHERE id IN (SELECT value FROM json_each(?))',
+    ).bind(JSON.stringify(candidateStreamIds)),
+  ]);
+
+  return {
+    existingVideoIds: new Set(
+      videoResult.results.map((row) => row.video_id).filter((videoId): videoId is string => !!videoId),
+    ),
+    existingStreamIds: new Set(
+      idResult.results.map((row) => row.id).filter((streamId): streamId is string => !!streamId),
+    ),
+  };
+}
+
 export async function streamIdExists(
   db: D1Database,
   id: string,
@@ -1038,7 +1073,8 @@ export interface CatalogWriteInput {
  * order — the work-ensure statements, the (single, shared) songs insert per new
  * identity, the song-to-work link statements, and finally a performance insert per
  * submitted song. Every catalog-writing entry point (createSongAndPerformance,
- * bulkCreatePerformances, importVodToAdminDb) builds its statement list from this.
+ * appendStreamPerformances / replaceStreamPerformances, importVodToAdminDb) builds
+ * its statement list from this.
  *
  * This does NOT call db.batch — the caller owns the batch so it can prepend its own
  * leading statements (replace-mode deletes, a new stream's insert) ahead of this
@@ -1192,16 +1228,17 @@ export async function deletePerformanceAndOrphanSong(
     .first<{ song_id: string }>();
   if (!row) return false;
 
-  await db.prepare('DELETE FROM performances WHERE id = ?').bind(id).run();
-
-  const countRow = await db
-    .prepare('SELECT COUNT(*) as cnt FROM performances WHERE song_id = ?')
-    .bind(row.song_id)
-    .first<{ cnt: number }>();
-
-  if (countRow && countRow.cnt === 0) {
-    await db.prepare('DELETE FROM songs WHERE id = ?').bind(row.song_id).run();
-  }
+  // One batch: the performance delete and the orphan-song delete commit together, so
+  // there is no round trip — and no partial-failure window — between them. The second
+  // statement's NOT EXISTS guard evaluates after the first statement's delete has
+  // already applied within the same batch, so it correctly sees zero remaining
+  // performances only when this was the song's last one.
+  await db.batch([
+    db.prepare('DELETE FROM performances WHERE id = ?').bind(id),
+    db
+      .prepare('DELETE FROM songs WHERE id = ? AND NOT EXISTS (SELECT 1 FROM performances WHERE song_id = ?)')
+      .bind(row.song_id, row.song_id),
+  ]);
 
   return true;
 }
