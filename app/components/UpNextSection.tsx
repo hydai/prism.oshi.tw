@@ -16,10 +16,10 @@ export default function UpNextSection() {
       style={{ width: '100%', maxWidth: '500px' }}
     >
       <h3
+        className="text-token-tertiary"
         style={{
           fontSize: '13px',
           fontWeight: 700,
-          color: 'var(--text-tertiary)',
           letterSpacing: '0.05em',
           textTransform: 'uppercase',
           marginBottom: '12px',
@@ -32,10 +32,9 @@ export default function UpNextSection() {
         {visibleItems.map((track, i) => (
           <div
             key={track.queueEntryId}
-            className="flex items-center"
+            className="flex items-center bg-surface-glass"
             style={{
               borderRadius: '12px',
-              background: 'var(--bg-surface-glass)',
               backdropFilter: 'blur(8px)',
               padding: '12px 16px',
               gap: '12px',
@@ -43,12 +42,12 @@ export default function UpNextSection() {
           >
             {/* Track number */}
             <span
+              className="text-token-tertiary"
               style={{
                 width: '32px',
                 flexShrink: 0,
                 fontSize: '14px',
                 fontWeight: 500,
-                color: 'var(--text-tertiary)',
                 textAlign: 'center',
               }}
             >
@@ -58,14 +57,14 @@ export default function UpNextSection() {
             {/* Title + Artist */}
             <div className="flex flex-col min-w-0 flex-1" style={{ gap: '2px' }}>
               <div
-                className="truncate"
-                style={{ fontSize: '15px', fontWeight: 700, color: 'var(--text-primary)' }}
+                className="truncate text-token-primary"
+                style={{ fontSize: '15px', fontWeight: 700 }}
               >
                 {track.songTitle}
               </div>
               <div
-                className="truncate"
-                style={{ fontSize: '13px', color: 'var(--text-secondary)' }}
+                className="truncate text-token-secondary"
+                style={{ fontSize: '13px' }}
               >
                 {track.originalArtist}
               </div>
@@ -73,12 +72,12 @@ export default function UpNextSection() {
 
             {/* Duration */}
             <span
+              className="text-token-secondary"
               style={{
                 width: '60px',
                 flexShrink: 0,
                 textAlign: 'right',
                 fontSize: '13px',
-                color: 'var(--text-secondary)',
                 fontFamily: 'monospace',
               }}
             >
@@ -90,11 +89,11 @@ export default function UpNextSection() {
 
       {queue.length > 5 && (
         <div
+          className="text-token-tertiary"
           style={{
             textAlign: 'center',
             marginTop: '8px',
             fontSize: '13px',
-            color: 'var(--text-tertiary)',
           }}
         >
           +{queue.length - 5} more

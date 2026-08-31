@@ -33,21 +33,13 @@ export default function SongVersionsList({
   return (
     <div
       data-testid="versions-list"
-      className="space-y-0.5 px-3 pb-3"
-      style={{
-        borderTop: '1px solid var(--border-table)',
-        paddingTop: 'var(--space-3)',
-      }}
+      className="space-y-0.5 px-3 pb-3 border-t border-t-border-token-table pt-token-3"
     >
       {performances.map((performance) => (
         <div
           key={performance.id}
           data-testid="version-row"
-          className="group/version hover-row grid grid-cols-[1fr_60px] lg:grid-cols-[32px_1fr_140px_60px] gap-0 items-center transition-colors"
-          style={{
-            borderRadius: 'var(--radius-lg)',
-            padding: 'var(--space-3) var(--space-4)',
-          }}
+          className="group/version hover-row grid grid-cols-[1fr_60px] lg:grid-cols-[32px_1fr_140px_60px] gap-0 items-center transition-colors rounded-radius-lg py-token-3 px-token-4"
         >
           <div
             className="hidden lg:flex items-center justify-center"
@@ -102,30 +94,20 @@ export default function SongVersionsList({
             <div className="min-w-0 flex-1 lg:flex-none">
               <div className="flex items-center gap-2 flex-wrap">
                 <span
-                  className="font-mono text-sm"
-                  style={{ color: 'var(--text-secondary)', fontSize: 'var(--font-size-sm)' }}
+                  className="font-mono text-token-secondary text-token-sm"
                 >
                   {performance.date}
                 </span>
                 {performance.note && (
                   <span
-                    className="inline-flex items-center border font-medium"
-                    style={{
-                      background: 'var(--bg-accent-blue-muted)',
-                      color: 'var(--accent-blue)',
-                      borderColor: 'var(--border-accent-blue)',
-                      borderRadius: 'var(--radius-pill)',
-                      fontSize: 'var(--font-size-xs)',
-                      padding: 'var(--space-1) var(--space-3)',
-                    }}
+                    className="inline-flex items-center border font-medium bg-accent-bg-blue-muted text-accent-blue border-border-token-accent-blue rounded-radius-pill text-token-xs py-token-1 px-token-3"
                   >
                     {performance.note}
                   </span>
                 )}
               </div>
               <p
-                className="truncate mt-0.5"
-                style={{ fontSize: 'var(--font-size-sm)', color: 'var(--text-secondary)' }}
+                className="truncate mt-0.5 text-token-sm text-token-secondary"
               >
                 {performance.streamTitle}
               </p>
@@ -133,23 +115,17 @@ export default function SongVersionsList({
           </div>
 
           <div
-            className="hidden lg:flex items-center min-w-0 pl-3"
-            style={{ color: 'var(--text-tertiary)', fontSize: 'var(--font-size-xs)' }}
+            className="hidden lg:flex items-center min-w-0 pl-3 text-token-tertiary text-token-xs"
           />
 
           <div
-            className="flex items-center justify-end gap-1.5"
-            style={{ color: 'var(--text-secondary)' }}
+            className="flex items-center justify-end gap-1.5 text-token-secondary"
           >
             <button
               onClick={() => onToggleLike(trackFromPerformance(song, performance, streamerSlug))}
-              className={`transition-[color,opacity,transform] transform hover:scale-110 ${isLiked(performance.id) ? '' : 'opacity-0 group-hover/version:opacity-100'}`}
+              className={`transition-[color,opacity,transform] transform hover:scale-110 bg-surface p-token-2 rounded-radius-circle ${isLiked(performance.id) ? 'text-accent-pink' : 'text-token-secondary opacity-0 group-hover/version:opacity-100'}`}
               style={{
-                background: 'var(--bg-surface)',
-                padding: 'var(--space-2)',
-                borderRadius: 'var(--radius-circle)',
                 boxShadow: '0 1px 4px rgba(0,0,0,0.1)',
-                color: isLiked(performance.id) ? 'var(--accent-pink)' : 'var(--text-secondary)',
               }}
               title={isLiked(performance.id) ? '取消喜愛' : '喜愛'}
               data-testid="like-button"
@@ -158,11 +134,8 @@ export default function SongVersionsList({
             </button>
             <button
               onClick={() => onAddToQueue(trackFromPerformance(song, performance, streamerSlug))}
-              className="opacity-0 group-hover/version:opacity-100 transition-[opacity,transform,color] transform hover:scale-110 text-token-secondary hover:text-accent-pink"
+              className="opacity-0 group-hover/version:opacity-100 transition-[opacity,transform,color] transform hover:scale-110 text-token-secondary hover:text-accent-pink bg-surface p-token-2 rounded-radius-circle"
               style={{
-                background: 'var(--bg-surface)',
-                padding: 'var(--space-2)',
-                borderRadius: 'var(--radius-circle)',
                 boxShadow: '0 1px 4px rgba(0,0,0,0.1)',
               }}
               title="加入佇列"
@@ -171,13 +144,9 @@ export default function SongVersionsList({
               <Plus className="w-4 h-4" />
             </button>
             <div
-              className="opacity-0 group-hover/version:opacity-100 transition-opacity"
+              className="opacity-0 group-hover/version:opacity-100 transition-opacity bg-surface p-token-2 rounded-radius-circle text-token-secondary"
               style={{
-                background: 'var(--bg-surface)',
-                padding: 'var(--space-2)',
-                borderRadius: 'var(--radius-circle)',
                 boxShadow: '0 1px 4px rgba(0,0,0,0.1)',
-                color: 'var(--text-secondary)',
               }}
             >
               <AddToPlaylistDropdown
@@ -191,11 +160,9 @@ export default function SongVersionsList({
               revealClassName="opacity-0 group-hover/version:opacity-100"
             />
             <span
-              className="font-mono text-right"
+              className="font-mono text-right text-token-sm text-token-secondary"
               style={{
                 minWidth: '40px',
-                fontSize: 'var(--font-size-sm)',
-                color: 'var(--text-secondary)',
               }}
             >
               {formatTime(performance.timestamp)}

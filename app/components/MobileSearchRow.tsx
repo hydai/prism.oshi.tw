@@ -18,11 +18,9 @@ function MobileSearchRowInner({ song, isCurrentlyPlaying, isUnavailable, onPlay,
   return (
     <div
       data-testid="performance-row"
-      className="flex items-center gap-3 transition-colors cursor-default"
+      className={`flex items-center gap-3 transition-colors cursor-default rounded-radius-lg ${isCurrentlyPlaying ? 'bg-accent-bg-pink-muted' : ''}`}
       style={{
-        borderRadius: 'var(--radius-lg)',
         padding: '12px 16px',
-        background: isCurrentlyPlaying ? 'var(--bg-accent-pink-muted)' : undefined,
       }}
     >
       <button
@@ -43,16 +41,16 @@ function MobileSearchRowInner({ song, isCurrentlyPlaying, isUnavailable, onPlay,
       </button>
       <div className="flex-1 min-w-0">
         <div
-          className="font-bold truncate"
-          style={{ fontSize: '15px', fontWeight: 600, color: isCurrentlyPlaying ? 'var(--accent-pink)' : 'var(--text-primary)' }}
+          className={`font-bold truncate ${isCurrentlyPlaying ? 'text-accent-pink' : 'text-token-primary'}`}
+          style={{ fontSize: '15px', fontWeight: 600 }}
         >
           {song.title}
         </div>
-        <div className="truncate" style={{ fontSize: '13px', color: 'var(--text-secondary)' }}>
+        <div className="truncate text-token-secondary" style={{ fontSize: '13px' }}>
           {song.originalArtist}
         </div>
       </div>
-      <span className="font-mono" style={{ fontSize: '13px', color: 'var(--text-secondary)', minWidth: '40px', textAlign: 'right' }}>
+      <span className="font-mono text-token-secondary" style={{ fontSize: '13px', minWidth: '40px', textAlign: 'right' }}>
         {formatTime(song.timestamp)}
       </span>
     </div>
