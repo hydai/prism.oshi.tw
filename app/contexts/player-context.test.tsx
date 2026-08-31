@@ -1,46 +1,64 @@
 import * as React from 'react';
 import { renderToStaticMarkup } from 'react-dom/server';
-import { PlayerProvider, usePlaybackTime, usePlayer } from './PlayerContext';
+import {
+  PlayerProvider,
+  useCurrentTrack,
+  useOverlays,
+  usePlaybackTime,
+  usePlayerActions,
+  usePlayerNotices,
+  usePlayerStatus,
+  useQueue,
+  useTransport,
+  useVolume,
+} from './PlayerContext';
 
 function assert(condition: boolean, message: string): asserts condition {
   if (!condition) throw new Error(message);
 }
 
 function ContextProbe() {
-  const player = usePlayer();
+  const actions = usePlayerActions();
+  const currentTrack = useCurrentTrack();
+  const queue = useQueue();
+  const { isPlaying, repeatMode, shuffleOn } = useTransport();
+  const { isPlayerReady, playerError, apiLoadError, unavailableVideoIds } = usePlayerStatus();
+  const { timestampWarning, skipNotification } = usePlayerNotices();
+  const { showModal, showQueue } = useOverlays();
+  const { volume, isMuted } = useVolume();
   const playback = usePlaybackTime();
   const actionsReady = [
-    player.clearTimestampWarning,
-    player.clearSkipNotification,
-    player.playTrackWithQueue,
-    player.togglePlayPause,
-    player.seekTo,
-    player.previous,
-    player.next,
-    player.setShowModal,
-    player.addToQueue,
-    player.removeFromQueue,
-    player.reorderQueue,
-    player.setShowQueue,
-    player.toggleRepeat,
-    player.toggleShuffle,
-    player.setVolume,
-    player.toggleMute,
+    actions.clearTimestampWarning,
+    actions.clearSkipNotification,
+    actions.playTrackWithQueue,
+    actions.togglePlayPause,
+    actions.seekTo,
+    actions.previous,
+    actions.next,
+    actions.setShowModal,
+    actions.addToQueue,
+    actions.removeFromQueue,
+    actions.reorderQueue,
+    actions.setShowQueue,
+    actions.toggleRepeat,
+    actions.toggleShuffle,
+    actions.setVolume,
+    actions.toggleMute,
+    actions.ensurePlayerApi,
   ].every((action) => typeof action === 'function');
 
   return (
     <output
-      data-current-track={player.currentTrack?.performanceId ?? 'none'}
-      data-is-playing={String(player.isPlaying)}
-      data-is-player-ready={String(player.isPlayerReady)}
-      data-errors={`${player.playerError ?? 'none'},${player.apiLoadError ?? 'none'}`}
-      data-unavailable-count={player.unavailableVideoIds.size}
-      data-notices={`${player.timestampWarning ?? 'none'},${player.skipNotification ?? 'none'}`}
-      data-queue-count={player.queue.length}
-      data-overlays={`${player.showModal},${player.showQueue}`}
-      data-modes={`${player.repeatMode},${player.shuffleOn}`}
-      data-volume={`${player.volume},${player.isMuted}`}
-      data-store-time={player.timeStore.getSnapshot().currentTime}
+      data-current-track={currentTrack?.performanceId ?? 'none'}
+      data-is-playing={String(isPlaying)}
+      data-is-player-ready={String(isPlayerReady)}
+      data-errors={`${playerError ?? 'none'},${apiLoadError ?? 'none'}`}
+      data-unavailable-count={unavailableVideoIds.size}
+      data-notices={`${timestampWarning ?? 'none'},${skipNotification ?? 'none'}`}
+      data-queue-count={queue.length}
+      data-overlays={`${showModal},${showQueue}`}
+      data-modes={`${repeatMode},${shuffleOn}`}
+      data-volume={`${volume},${isMuted}`}
       data-actions-ready={String(actionsReady)}
       data-playback={`${playback.currentTime},${playback.duration},${playback.trackCurrentTime},${playback.trackDuration ?? 'none'}`}
     >
@@ -65,7 +83,6 @@ assert(html.includes('data-queue-count="0"'), 'queue starts empty');
 assert(html.includes('data-overlays="false,false"'), 'player overlays start closed');
 assert(html.includes('data-modes="off,false"'), 'repeat and shuffle start disabled');
 assert(html.includes('data-volume="75,false"'), 'volume contract retains its session defaults');
-assert(html.includes('data-store-time="0"'), 'playback store starts at zero');
 assert(html.includes('data-actions-ready="true"'), 'all player actions remain available to consumers');
 assert(html.includes('data-playback="0,0,0,none"'), 'playback-time hook retains its initial snapshot');
 
