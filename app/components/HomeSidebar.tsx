@@ -39,11 +39,7 @@ export default function HomeSidebar({
         style={{ borderColor: 'var(--border-glass)' }}
       >
         <div
-          className="flex h-9 w-9 items-center justify-center rounded-radius-lg"
-          style={{
-            background:
-              'linear-gradient(135deg, var(--accent-pink-light), var(--accent-blue-light))',
-          }}
+          className="flex h-9 w-9 items-center justify-center rounded-radius-lg bg-accent-gradient"
         >
           <Disc3 className="h-5 w-5 text-white" />
         </div>
@@ -92,12 +88,10 @@ export default function HomeSidebar({
             <button
               key={group}
               onClick={() => onGroupChange(group)}
-              className="rounded-radius-lg px-3 py-2 text-left text-token-sm font-medium transition-colors"
+              className={`rounded-radius-lg px-3 py-2 text-left text-token-sm font-medium transition-colors ${isActive ? 'bg-accent-gradient-strong' : ''}`}
               style={
                 isActive
                   ? {
-                      background:
-                        'linear-gradient(135deg, var(--accent-pink), var(--accent-blue))',
                       color: 'white',
                     }
                   : { color: 'var(--text-secondary)' }
@@ -114,11 +108,7 @@ export default function HomeSidebar({
           href="https://nova.oshi.tw"
           target="_blank"
           rel="noopener noreferrer"
-          className="flex items-center justify-center gap-2 rounded-radius-lg px-4 py-2.5 text-token-sm font-semibold text-white transition-opacity hover:opacity-90"
-          style={{
-            background:
-              'linear-gradient(135deg, var(--accent-pink), var(--accent-blue))',
-          }}
+          className="flex items-center justify-center gap-2 rounded-radius-lg px-4 py-2.5 text-token-sm font-semibold text-white transition-opacity hover:opacity-90 bg-accent-gradient-strong"
         >
           <Plus className="h-4 w-4" />
           提議新 VTuber

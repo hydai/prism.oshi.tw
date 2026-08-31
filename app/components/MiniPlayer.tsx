@@ -152,12 +152,11 @@ export default function MiniPlayer() {
             <ListMusic style={{ width: '20px', height: '20px' }} />
             {queue.length > 0 && (
               <span
-                className="absolute -top-1 -right-1 flex items-center justify-center font-bold"
+                className="absolute -top-1 -right-1 flex items-center justify-center font-bold bg-accent-gradient"
                 style={{
                   width: '14px',
                   height: '14px',
                   borderRadius: 'var(--radius-circle)',
-                  background: 'linear-gradient(135deg, var(--accent-pink-light), var(--accent-blue-light))',
                   color: 'white',
                   fontSize: '9px',
                 }}

@@ -68,11 +68,7 @@ export default function HomePage() {
         >
           <div className="flex items-center gap-3">
             <div
-              className="flex h-9 w-9 items-center justify-center rounded-radius-lg"
-              style={{
-                background:
-                  'linear-gradient(135deg, var(--accent-pink-light), var(--accent-blue-light))',
-              }}
+              className="flex h-9 w-9 items-center justify-center rounded-radius-lg bg-accent-gradient"
             >
               <Disc3 className="h-5 w-5 text-white" />
             </div>
@@ -141,11 +137,7 @@ export default function HomePage() {
               href="https://nova.oshi.tw"
               target="_blank"
               rel="noopener noreferrer"
-              className="inline-flex items-center gap-2 rounded-radius-lg px-3 py-2 text-token-sm font-semibold text-white transition-opacity hover:opacity-90"
-              style={{
-                background:
-                  'linear-gradient(135deg, var(--accent-pink), var(--accent-blue))',
-              }}
+              className="inline-flex items-center gap-2 rounded-radius-lg px-3 py-2 text-token-sm font-semibold text-white transition-opacity hover:opacity-90 bg-accent-gradient-strong"
             >
               <Plus className="h-4 w-4" />
               <span className="hidden sm:inline">提議新 VTuber</span>
@@ -186,12 +178,10 @@ export default function HomePage() {
                 <button
                   key={group}
                   onClick={() => setSelectedGroup(group)}
-                  className="flex-shrink-0 rounded-radius-pill px-4 py-1.5 text-token-sm font-medium whitespace-nowrap transition-colors"
+                  className={`flex-shrink-0 rounded-radius-pill px-4 py-1.5 text-token-sm font-medium whitespace-nowrap transition-colors ${isActive ? 'bg-accent-gradient-strong' : ''}`}
                   style={
                     isActive
                       ? {
-                          background:
-                            'linear-gradient(135deg, var(--accent-pink), var(--accent-blue))',
                           color: 'white',
                         }
                       : {
@@ -282,11 +272,7 @@ function StreamerCard({ streamer }: { streamer: StreamerConfig }) {
           </p>
         </div>
         <div
-          className="flex h-8 w-8 flex-shrink-0 items-center justify-center rounded-full opacity-0 transition-opacity group-hover:opacity-100"
-          style={{
-            background:
-              'linear-gradient(135deg, var(--accent-pink), var(--accent-blue))',
-          }}
+          className="flex h-8 w-8 flex-shrink-0 items-center justify-center rounded-full opacity-0 transition-opacity group-hover:opacity-100 bg-accent-gradient-strong"
         >
           <Play className="h-3.5 w-3.5 text-white ml-0.5" />
         </div>

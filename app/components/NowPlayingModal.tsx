@@ -135,7 +135,7 @@ export default function NowPlayingModal() {
 
             <button
               onClick={togglePlayPause}
-              className="w-16 h-16 rounded-full bg-gradient-to-r from-pink-400 to-blue-400 text-white flex items-center justify-center shadow-2xl hover:brightness-110 transform hover:scale-105 transition-[filter,transform]"
+              className="w-16 h-16 rounded-full bg-accent-gradient text-white flex items-center justify-center shadow-2xl hover:brightness-110 transform hover:scale-105 transition-[filter,transform]"
               aria-label={isPlaying ? 'Pause' : 'Play'}
             >
               {isPlaying ? (

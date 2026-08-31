@@ -50,14 +50,13 @@ export default function NowPlayingControls({ size }: NowPlayingControlsProps) {
       {/* Play/Pause — gradient circle */}
       <button
         onClick={togglePlayPause}
-        className="flex items-center justify-center flex-shrink-0 transition-[filter,transform] hover:brightness-110 hover:scale-105"
+        className="flex items-center justify-center flex-shrink-0 transition-[filter,transform] hover:brightness-110 hover:scale-105 bg-accent-gradient"
         aria-label={isPlaying ? 'Pause' : 'Play'}
         data-testid="np-play-button"
         style={{
           width: `${playSize}px`,
           height: `${playSize}px`,
           borderRadius: '50%',
-          background: 'linear-gradient(135deg, var(--accent-pink-light), var(--accent-blue-light))',
           color: 'white',
           boxShadow: '0 8px 24px rgba(244, 114, 182, 0.3)',
         }}

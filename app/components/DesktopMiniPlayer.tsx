@@ -161,14 +161,13 @@ export default function DesktopMiniPlayer({
                 event.stopPropagation();
                 onTogglePlayPause();
               }}
-              className="flex items-center justify-center flex-shrink-0 transition-[filter] hover:brightness-110"
+              className="flex items-center justify-center flex-shrink-0 transition-[filter] hover:brightness-110 bg-accent-gradient"
               aria-label={isPlaying ? 'Pause' : 'Play'}
               data-testid="mini-player-play-button"
               style={{
                 width: '40px',
                 height: '40px',
                 borderRadius: 'var(--radius-circle)',
-                background: 'linear-gradient(135deg, var(--accent-pink-light), var(--accent-blue-light))',
                 color: 'white',
                 flexShrink: 0,
               }}
@@ -274,12 +273,11 @@ export default function DesktopMiniPlayer({
             <ListMusic style={{ width: '18px', height: '18px' }} />
             {queueLength > 0 && (
               <span
-                className="absolute -top-1 -right-1 flex items-center justify-center font-bold"
+                className="absolute -top-1 -right-1 flex items-center justify-center font-bold bg-accent-gradient"
                 style={{
                   width: '16px',
                   height: '16px',
                   borderRadius: 'var(--radius-circle)',
-                  background: 'linear-gradient(135deg, var(--accent-pink-light), var(--accent-blue-light))',
                   color: 'white',
                   fontSize: '10px',
                 }}

@@ -329,13 +329,12 @@ function MobileHero() {
           >
             {/* Avatar: 160×160 circle with gradient border and outer shadow */}
             <div
-              className="flex-shrink-0"
+              className="flex-shrink-0 bg-accent-gradient"
               style={{
                 width: '160px',
                 height: '160px',
                 borderRadius: 'var(--radius-xl)',
                 padding: '3px',
-                background: 'linear-gradient(135deg, var(--accent-pink-light), var(--accent-blue-light))',
                 boxShadow: '0 8px 32px rgba(244, 114, 182, 0.25)',
               }}
             >
@@ -359,7 +358,7 @@ function MobileHero() {
                     target.style.display = 'none';
                     const parent = target.parentElement;
                     if (parent) {
-                      parent.style.background = 'linear-gradient(135deg, var(--accent-pink-light), var(--accent-blue-light))';
+                      parent.classList.add('bg-accent-gradient');
                     }
                   }}
                 />
@@ -460,7 +459,7 @@ function DesktopHero() {
                   target.style.display = 'none';
                   const parent = target.parentElement;
                   if (parent) {
-                    parent.style.background = 'linear-gradient(135deg, var(--accent-pink-light), var(--accent-blue-light))';
+                    parent.classList.add('bg-accent-gradient');
                     parent.style.display = 'flex';
                     parent.style.alignItems = 'center';
                     parent.style.justifyContent = 'center';
@@ -580,11 +579,8 @@ function MobileHomeControls() {
             <button
               data-testid="mobile-shuffle-button"
               onClick={() => toggleShuffle()}
-              className="flex items-center justify-center flex-shrink-0 transition-[background,border-color,color,opacity] hover:opacity-90"
+              className={`flex items-center justify-center flex-shrink-0 transition-[background,border-color,color,opacity] hover:opacity-90 ${shuffleOn ? 'bg-accent-gradient' : 'bg-transparent'}`}
               style={{
-                background: shuffleOn
-                  ? 'linear-gradient(135deg, var(--accent-pink-light), var(--accent-blue-light))'
-                  : 'transparent',
                 border: shuffleOn ? 'none' : '2px solid var(--accent-pink-light)',
                 borderRadius: 'var(--radius-lg)',
                 padding: '12px 28px',
@@ -741,9 +737,8 @@ function DesktopActionBar() {
 
               {/* GradientButton — "播放全部" pill */}
               <button
-                className="font-semibold text-white flex items-center gap-1.5 transition-opacity hover:opacity-90 flex-shrink-0"
+                className="font-semibold text-white flex items-center gap-1.5 transition-opacity hover:opacity-90 flex-shrink-0 bg-accent-gradient"
                 style={{
-                  background: 'linear-gradient(135deg, var(--accent-pink-light), var(--accent-blue-light))',
                   borderRadius: 'var(--radius-pill)',
                   fontSize: 'var(--font-size-sm)',
                   padding: 'var(--space-3) var(--space-5)',
@@ -860,9 +855,8 @@ function CatalogStatus({ loadState, retryLoad }: { loadState: ArchiveLoadState; 
         <button
           data-testid="retry-button"
           onClick={retryLoad}
-          className="font-semibold transition-opacity hover:opacity-90"
+          className="font-semibold transition-opacity hover:opacity-90 bg-accent-gradient"
           style={{
-            background: 'linear-gradient(135deg, var(--accent-pink-light), var(--accent-blue-light))',
             borderRadius: 'var(--radius-pill)',
             fontSize: 'var(--font-size-sm)',
             padding: 'var(--space-3) var(--space-6)',
