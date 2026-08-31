@@ -91,78 +91,73 @@ app/layout.tsx (RootLayout)
 ## 3. Main Archive Page Component Dependencies
 
 ```
-app/[streamer]/page.tsx
+app/[streamer]/page.tsx  (composition root, ~18 lines)
 │
-├── CONTEXTS CONSUMED ─────────────────────────────────────┐
-│   useStreamer()        ← StreamerContext                  │
-│   usePlayer()         ← PlayerContext                    │
-│   usePlaylist()       ← PlaylistContext                  │
-│   useLikedSongs()     ← LikedSongsContext                │
-│   useRecentlyPlayed() ← RecentlyPlayedContext            │
-│                                                           │
-├── CHILD COMPONENTS ──────────────────────────────────────┤
-│                                                           │
-│   ┌─────────────┐  ┌──────────────────┐  ┌────────────┐ │
-│   │ SidebarNav  │  │  SongCard        │  │ TimelineRow│ │
-│   │             │  │  (grouped view)  │  │ (timeline) │ │
-│   │ useStreamer  │  │  ├─ AlbumArt     │  │ ├─ AlbumArt│ │
-│   │             │  │  └─ AddToPlaylist │  │ └─ AddTo.. │ │
-│   └─────────────┘  │     Dropdown     │  └────────────┘ │
-│                     └──────────────────┘                  │
-│   ┌───────────────┐  ┌──────────────────┐                │
-│   │ PlaylistPanel │  │ LikedSongsPanel  │                │
-│   │ ├─ usePlaylist│  │ ├─ useLikedSongs │                │
-│   │ ├─ usePlayer  │  │ ├─ usePlayer     │                │
-│   │ └─ BottomSheet│  │ └─ BottomSheet   │                │
-│   └───────────────┘  └──────────────────┘                │
-│   ┌─────────────────────┐  ┌──────────────────────────┐  │
-│   │ RecentlyPlayedPanel │  │ CreatePlaylistDialog     │  │
-│   │ ├─ useRecentlyPlayed│  │ └─ usePlaylist           │  │
-│   │ ├─ usePlayer        │  └──────────────────────────┘  │
-│   │ └─ BottomSheet      │                                │
-│   └─────────────────────┘  ┌───────────────┐             │
-│                             │ MobileSearchRow│             │
-│   ┌───────┐                │ (search input) │             │
-│   │ Toast │                └───────────────┘             │
-│   └───────┘                                              │
-└──────────────────────────────────────────────────────────┘
+└─▶ ArchiveDataProvider      archive-data-context.tsx: songs/streams fetch,
+    │                        loadState/retry, artists/years, unfiltered catalogs
+    └─▶ ArchiveUiProvider    archive-ui-context.tsx: view mode (session store),
+        │                    panels/dialog, mobile tab, toast chain, add/like handlers
+        └─▶ ArchiveFiltersProvider   archive-filters-context.tsx: search/stream/
+            │                        artist/year filters, filtered lists, play handlers
+            └─▶ ArchivePageView.tsx  (16 sections — the largest file)
+                │
+                │  Each section subscribes only to what it renders:
+                │    useArchiveData() / useArchiveUi() / useArchiveFilters()
+                │    useStreamer() · usePlaylist() · useLikedSongs() · useRecentlyPlayed()
+                │    useCurrentTrack() / usePlayerStatus() / useTransport() / usePlayerActions()
+                │
+                ├─▶ ArchiveSidebar · MobileTopBar · heroes · action bars
+                ├─▶ SongCatalog ─▶ TimelineSongList ─▶ TimelineRow (shallow memo)
+                │              └─▶ GroupedSongList ─▶ SongCard (shallow memo)
+                │                                     └─ AddToPlaylistDropdown
+                ├─▶ MobileSearchTab ─▶ MobileSearchRow (shallow memo)
+                ├─▶ MobileLibraryTab · MobileStreamsTab · MobileBottomNavigation
+                ├─▶ StatusOverlays (Toast + API-error banner)
+                └─▶ PlaylistOverlays ─▶ PlaylistPanel · LikedSongsPanel ·
+                                        RecentlyPlayedPanel · CreatePlaylistDialog
+                                        (each reads its own context + usePlayerActions)
 ```
 
 ## 4. Player System (YouTube Integration)
 
 ```
 ┌─────────────────────────────────────────────────────────────┐
-│                    PlayerContext.tsx                          │
+│        app/lib/player-store.ts — createPlayerStore()          │
+│        (framework-free: state, actions, and the engine)       │
 │                                                              │
-│  State:                    Methods:                          │
-│  ├─ currentTrack           ├─ playTrack(track)              │
-│  ├─ isPlaying              ├─ togglePlayPause()             │
-│  ├─ queue: Track[]         ├─ seekTo(seconds)               │
-│  ├─ repeatMode             ├─ previous() / next()           │
-│  ├─ shuffleOn              ├─ addToQueue() / removeFromQueue│
-│  ├─ volume / isMuted       ├─ toggleRepeat() / Shuffle()    │
-│  └─ showModal/showQueue    └─ setVolume() / toggleMute()    │
+│  State snapshot:             Actions:                        │
+│  ├─ currentTrack             ├─ playTrackWithQueue(t, next)  │
+│  ├─ isPlaying                ├─ togglePlayPause()            │
+│  ├─ queue: QueueEntry[]      ├─ seekTo(seconds)              │
+│  ├─ repeatMode / shuffleOn   ├─ previous() / next()          │
+│  ├─ playerError/apiLoadError ├─ addToQueue()/removeFromQueue │
+│  ├─ notices (timestamp/skip) ├─ toggleRepeat()/toggleShuffle │
+│  └─ showModal / showQueue    └─ setVolume() / toggleMute()   │
+│  (+ volumeStore / mutedStore / timeStore side stores)        │
 │                                                              │
 │  ┌──────────────────────────────────────────────────────┐   │
-│  │                YouTube IFrame API                     │   │
+│  │            YouTube IFrame API (in-store engine)       │   │
 │  │                                                       │   │
 │  │  1. Load <script> ──▶ onYouTubeIframeAPIReady        │   │
 │  │  2. new YT.Player("youtube-player", {...})            │   │
-│  │  3. playTrack() ──▶ loadVideoById(videoId, timestamp) │   │
+│  │     (target div wrapped so React never references     │   │
+│  │      the node YouTube replaces)                       │   │
+│  │  3. syncPlayer() ──▶ seekTo / loadVideoById           │   │
 │  │  4. Poll every 500ms:                                 │   │
-│  │     currentTime >= endTimestamp? ──▶ next()           │   │
-│  │     currentTime >= duration?     ──▶ ended            │   │
+│  │     currentTime >= endTimestamp? ──▶ advance          │   │
 │  └──────────────────────────────────────────────────────┘   │
 └───────────────────────────┬──────────────────────────────────┘
-                            │ usePlayer()
+                            │ PlayerContext.tsx slice hooks:
+                            │ useCurrentTrack / useQueue / useTransport /
+                            │ usePlayerStatus / usePlayerNotices / useOverlays /
+                            │ useVolume / usePlayerActions / usePlaybackTime
           ┌─────────────────┼─────────────────────┐
           │                 │                     │
           ▼                 ▼                     ▼
 ┌──────────────┐  ┌────────────────┐  ┌──────────────────┐
 │  MiniPlayer  │  │NowPlayingModal │  │   QueuePanel     │
 │              │  │                │  │                   │
-│ ├─AlbumArt   │  │ ├─ AlbumArt   │  │ ├─ drag-reorder  │
-│ ├─ProgressBar│  │ ├─ ProgressBar│  │ ├─ AlbumArt      │
+│ ├─ProgressBar│  │ ├─ ProgressBar│  │ ├─ drag-reorder  │
 │ └─VolumeCtrl │  │ └─ VolumeCtrl │  │ └─ BottomSheet   │
 └──────────────┘  └────────────────┘  └──────────────────┘
 ```
