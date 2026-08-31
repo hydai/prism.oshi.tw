@@ -1,10 +1,11 @@
 'use client';
 
-import { ExternalLink, Heart, Play, Plus } from 'lucide-react';
+import { Heart, Play, Plus } from 'lucide-react';
 import type { ArchivePerformance, ArchiveSong, PerformanceRef } from '../types/archive';
 import { trackFromPerformance } from '../lib/archive';
-import { formatTime, youtubeWatchUrl } from '../lib/format';
+import { formatTime } from '../lib/format';
 import AddToPlaylistDropdown from './AddToPlaylistDropdown';
+import YouTubeWatchLink from './YouTubeWatchLink';
 
 interface SongVersionsListProps {
   song: ArchiveSong;
@@ -191,30 +192,11 @@ export default function SongVersionsList({
                 onSuccess={onAddToPlaylistSuccess}
               />
             </div>
-            <a
-              href={youtubeWatchUrl(performance.videoId, performance.timestamp)}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="opacity-0 group-hover/version:opacity-100 transition-[opacity,transform] transform hover:scale-110"
-              style={{
-                background: 'var(--bg-surface)',
-                padding: 'var(--space-2)',
-                borderRadius: 'var(--radius-circle)',
-                boxShadow: '0 1px 4px rgba(0,0,0,0.1)',
-                color: 'var(--text-secondary)',
-                display: 'flex',
-                alignItems: 'center',
-              }}
-              title="在 YouTube 開啟"
-              onMouseEnter={(event) => {
-                event.currentTarget.style.color = '#FF0000';
-              }}
-              onMouseLeave={(event) => {
-                event.currentTarget.style.color = 'var(--text-secondary)';
-              }}
-            >
-              <ExternalLink className="w-4 h-4" />
-            </a>
+            <YouTubeWatchLink
+              videoId={performance.videoId}
+              timestamp={performance.timestamp}
+              revealClassName="opacity-0 group-hover/version:opacity-100"
+            />
             <span
               className="font-mono text-right"
               style={{
