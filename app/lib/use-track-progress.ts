@@ -1,11 +1,12 @@
 'use client';
 
 import { useCallback } from 'react';
-import { usePlayer, usePlaybackTime } from '../contexts/PlayerContext';
+import { useCurrentTrack, usePlayerActions, usePlaybackTime } from '../contexts/PlayerContext';
 
 /** Progress (0–100) of the current track and a percentage-based seek. */
 export function useTrackProgress() {
-  const { currentTrack, seekTo } = usePlayer();
+  const currentTrack = useCurrentTrack();
+  const { seekTo } = usePlayerActions();
   const { trackCurrentTime, trackDuration } = usePlaybackTime();
   const hasKnownDuration = trackDuration != null && trackDuration > 0;
   const progress = hasKnownDuration

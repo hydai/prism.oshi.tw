@@ -1,6 +1,6 @@
 'use client';
 
-import { usePlayer } from '../contexts/PlayerContext';
+import { useQueue } from '../contexts/PlayerContext';
 
 function formatDuration(track: { timestamp: number; endTimestamp: number | null }): string {
   if (!track.endTimestamp) return '--:--';
@@ -11,7 +11,7 @@ function formatDuration(track: { timestamp: number; endTimestamp: number | null 
 }
 
 export default function UpNextSection() {
-  const { queue } = usePlayer();
+  const queue = useQueue();
 
   if (queue.length === 0) return null;
 

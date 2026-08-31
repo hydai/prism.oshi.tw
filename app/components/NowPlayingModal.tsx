@@ -3,7 +3,14 @@
 import { useEffect } from 'react';
 import { createPortal } from 'react-dom';
 import { Play, Pause, SkipBack, SkipForward, ChevronDown, Shuffle, Repeat, Repeat1, Heart } from 'lucide-react';
-import { usePlayer, usePlaybackTime } from '../contexts/PlayerContext';
+import {
+  useCurrentTrack,
+  useOverlays,
+  usePlayerActions,
+  usePlaybackTime,
+  useQueue,
+  useTransport,
+} from '../contexts/PlayerContext';
 import { useCurrentTrackLike } from '../lib/use-current-track-like';
 import { useTrackProgress } from '../lib/use-track-progress';
 import { useHydrated } from '../lib/use-hydrated';
@@ -14,21 +21,11 @@ import { formatTime } from '../lib/format';
 
 export default function NowPlayingModal() {
   const mounted = useHydrated();
-  const {
-    currentTrack,
-    isPlaying,
-    togglePlayPause,
-    previous,
-    next,
-    showModal,
-    setShowModal,
-    repeatMode,
-    shuffleOn,
-    toggleRepeat,
-    toggleShuffle,
-    queue,
-    setShowQueue,
-  } = usePlayer();
+  const currentTrack = useCurrentTrack();
+  const { isPlaying, repeatMode, shuffleOn } = useTransport();
+  const { showModal } = useOverlays();
+  const queue = useQueue();
+  const { togglePlayPause, previous, next, setShowModal, toggleRepeat, toggleShuffle, setShowQueue } = usePlayerActions();
   const { trackCurrentTime } = usePlaybackTime();
   const { liked, toggleCurrentLike } = useCurrentTrackLike();
   const { hasKnownDuration, progress, handleSeek, knownDuration } = useTrackProgress();

@@ -142,34 +142,3 @@ export function usePlaybackTime() {
     currentTrack?.endTimestamp != null ? currentTrack.endTimestamp - currentTrack.timestamp : null;
   return { currentTime, duration, trackCurrentTime, trackDuration };
 }
-
-/**
- * TEMPORARY compatibility facade with the pre-store context shape, so every
- * consumer keeps compiling and behaving identically (whole-state subscription
- * = re-render on any change, exactly like the old context value). Deleted in
- * the consumer-migration task — do not add new call sites.
- */
-export function usePlayer() {
-  const store = usePlayerStoreHandle();
-  const s = useSyncExternalStore(store.subscribe, store.getSnapshot, store.getServerSnapshot);
-  const { volume, isMuted } = useVolume();
-  return {
-    currentTrack: s.currentTrack,
-    isPlaying: s.isPlaying,
-    isPlayerReady: s.isPlayerReady,
-    playerError: s.playerError,
-    apiLoadError: s.apiLoadError,
-    unavailableVideoIds: s.unavailableVideoIds,
-    timestampWarning: s.timestampWarning,
-    skipNotification: s.skipNotification,
-    showModal: s.showModal,
-    showQueue: s.showQueue,
-    queue: s.queue,
-    repeatMode: s.repeatMode,
-    shuffleOn: s.shuffleOn,
-    volume,
-    isMuted,
-    timeStore: store.timeStore,
-    ...store.actions,
-  };
-}

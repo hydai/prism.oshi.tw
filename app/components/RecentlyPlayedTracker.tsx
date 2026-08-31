@@ -1,7 +1,7 @@
 'use client';
 
 import { useEffect, useRef } from 'react';
-import { usePlayer } from '../contexts/PlayerContext';
+import { useCurrentTrack } from '../contexts/PlayerContext';
 import { useRecentlyPlayed } from '../contexts/RecentlyPlayedContext';
 
 /**
@@ -9,7 +9,7 @@ import { useRecentlyPlayed } from '../contexts/RecentlyPlayedContext';
  * by recording track changes via the context hook.
  */
 export default function RecentlyPlayedTracker() {
-  const { currentTrack } = usePlayer();
+  const currentTrack = useCurrentTrack();
   const { addRecentPlay } = useRecentlyPlayed();
   const lastRecordedId = useRef<string | null>(null);
 

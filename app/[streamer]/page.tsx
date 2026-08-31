@@ -2,7 +2,13 @@
 
 import { useState, useMemo, useEffect, useRef, useCallback } from 'react';
 import { useStreamer } from '../contexts/StreamerContext';
-import { usePlayer } from '../contexts/PlayerContext';
+import {
+  useCurrentTrack,
+  usePlayerActions,
+  usePlayerNotices,
+  usePlayerStatus,
+  useTransport,
+} from '../contexts/PlayerContext';
 import { usePlaylist } from '../contexts/PlaylistContext';
 import { useLikedSongs } from '../contexts/LikedSongsContext';
 import { useRecentlyPlayed } from '../contexts/RecentlyPlayedContext';
@@ -90,7 +96,11 @@ function useArchivePageController() {
     return () => loadAbortRef.current?.abort();
   }, [loadData]);
 
-  const { currentTrack, playTrackWithQueue, addToQueue, apiLoadError, unavailableVideoIds, timestampWarning, clearTimestampWarning, skipNotification, clearSkipNotification, shuffleOn, toggleShuffle } = usePlayer();
+  const currentTrack = useCurrentTrack();
+  const { playTrackWithQueue, addToQueue, clearTimestampWarning, clearSkipNotification, toggleShuffle } = usePlayerActions();
+  const { apiLoadError, unavailableVideoIds } = usePlayerStatus();
+  const { timestampWarning, skipNotification } = usePlayerNotices();
+  const { shuffleOn } = useTransport();
   const currentTrackId = currentTrack?.performanceId ?? null;
   const { playlists, storageError, clearStorageError } = usePlaylist();
   const { likedCount, isLiked, toggleLike } = useLikedSongs();
