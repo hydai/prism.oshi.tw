@@ -26,10 +26,8 @@ function TimelineRowInner({ song, index, isCurrentlyPlaying, isUnavailable, isLi
   return (
     <div
       data-testid="performance-row"
-      className="group hover-row grid grid-cols-[32px_40px_1fr_60px] lg:grid-cols-[32px_40px_2fr_2fr_100px_60px] gap-0 items-center transition-colors cursor-default"
+      className="group hover-row grid grid-cols-[32px_40px_1fr_60px] lg:grid-cols-[32px_40px_2fr_2fr_100px_60px] gap-0 items-center transition-colors cursor-default rounded-radius-lg py-token-3 px-token-4"
       style={{
-        borderRadius: 'var(--radius-lg)',
-        padding: 'var(--space-3) var(--space-4)',
         background: isCurrentlyPlaying
           ? '#FCE7F320'
           : undefined,
@@ -43,29 +41,25 @@ function TimelineRowInner({ song, index, isCurrentlyPlaying, isUnavailable, isLi
         {/* Mobile: play icon or spinning disc when playing */}
         {isCurrentlyPlaying ? (
           <Disc3
-            className="lg:hidden animate-spin"
+            className="lg:hidden animate-spin text-accent-pink [animation-duration:3s]"
             style={{
               width: '18px',
               height: '18px',
-              color: 'var(--accent-pink)',
-              animationDuration: '3s',
             }}
           />
         ) : (
           <Play
-            className="lg:hidden"
+            className="lg:hidden text-token-tertiary"
             style={{
               width: '14px',
               height: '14px',
-              color: 'var(--text-tertiary)',
               fill: 'currentColor',
             }}
           />
         )}
         {/* Desktop: number that fades on hover, replaced by play button */}
         <span
-          className="hidden lg:block group-hover:opacity-0 transition-opacity font-mono text-sm select-none"
-          style={{ color: 'var(--text-tertiary)' }}
+          className="hidden lg:block group-hover:opacity-0 transition-opacity font-mono text-sm select-none text-token-tertiary"
         >
           {index + 1}
         </span>
@@ -81,14 +75,9 @@ function TimelineRowInner({ song, index, isCurrentlyPlaying, isUnavailable, isLi
           data-testid="play-button"
           className={`hidden lg:flex absolute inset-0 items-center justify-center opacity-0 group-hover:opacity-100 transition-[color,opacity,transform] ${
             isUnavailable
-              ? 'cursor-not-allowed'
-              : 'transform hover:scale-110'
+              ? 'cursor-not-allowed text-token-muted'
+              : 'transform hover:scale-110 text-accent-pink'
           }`}
-          style={{
-            color: isUnavailable
-              ? 'var(--text-muted)'
-              : 'var(--accent-pink)',
-          }}
         >
           <Play className="w-4 h-4 fill-current" />
         </button>
@@ -115,35 +104,25 @@ function TimelineRowInner({ song, index, isCurrentlyPlaying, isUnavailable, isLi
         <div className="flex flex-col gap-0.5">
           <div className="flex items-center gap-1.5 min-w-0">
             <div
-              className="font-bold truncate"
+              className={`font-bold truncate ${isCurrentlyPlaying ? 'text-accent-pink-dark' : 'text-token-primary'}`}
               style={{
                 fontSize: '15px',
-                color: isCurrentlyPlaying ? 'var(--accent-pink-dark)' : 'var(--text-primary)',
               }}
             >
               {song.title}
             </div>
             {song.note && (
               <span
-                className="inline-flex items-center border font-medium flex-shrink-0"
-                style={{
-                  background: 'var(--bg-accent-blue-muted)',
-                  color: 'var(--accent-blue)',
-                  borderColor: 'var(--border-accent-blue)',
-                  borderRadius: 'var(--radius-pill)',
-                  fontSize: 'var(--font-size-xs)',
-                  padding: 'var(--space-1) var(--space-3)',
-                }}
+                className="inline-flex items-center border font-medium flex-shrink-0 bg-accent-bg-blue-muted text-accent-blue border-border-token-accent-blue rounded-radius-pill text-token-xs py-token-1 px-token-3"
               >
                 {song.note}
               </span>
             )}
           </div>
           <div
-            className="truncate"
+            className="truncate text-token-secondary"
             style={{
               fontSize: '13px',
-              color: 'var(--text-secondary)',
             }}
           >
             {song.originalArtist}
@@ -153,34 +132,27 @@ function TimelineRowInner({ song, index, isCurrentlyPlaying, isUnavailable, isLi
 
       {/* Stream title column (desktop only) */}
       <div
-        className="hidden lg:flex items-center min-w-0 pl-3"
-        style={{ color: 'var(--text-secondary)', fontSize: 'var(--font-size-sm)' }}
+        className="hidden lg:flex items-center min-w-0 pl-3 text-token-secondary text-token-sm"
       >
         <span className="truncate">{song.streamTitle}</span>
       </div>
 
       {/* Date column (desktop only) */}
       <div
-        className="hidden lg:flex items-center pl-3 font-mono"
-        style={{ color: 'var(--text-secondary)', fontSize: 'var(--font-size-sm)' }}
+        className="hidden lg:flex items-center pl-3 font-mono text-token-secondary text-token-sm"
       >
         {song.date}
       </div>
 
       {/* Duration / Actions column */}
       <div
-        className="flex items-center justify-end gap-1.5"
-        style={{ color: 'var(--text-secondary)' }}
+        className="flex items-center justify-end gap-1.5 text-token-secondary"
       >
         <button
           onClick={() => onToggleLike(trackFromFlattenedSong(song, streamerSlug))}
-          className={`transition-[color,opacity,transform] transform hover:scale-110 ${isLiked ? '' : 'lg:opacity-0 lg:group-hover:opacity-100'}`}
+          className={`transition-[color,opacity,transform] transform hover:scale-110 bg-surface p-token-2 rounded-radius-circle ${isLiked ? 'text-accent-pink' : 'text-token-secondary lg:opacity-0 lg:group-hover:opacity-100'}`}
           style={{
-            background: 'var(--bg-surface)',
-            padding: 'var(--space-2)',
-            borderRadius: 'var(--radius-circle)',
             boxShadow: '0 1px 4px rgba(0,0,0,0.1)',
-            color: isLiked ? 'var(--accent-pink)' : 'var(--text-secondary)',
           }}
           title={isLiked ? '取消喜愛' : '喜愛'}
           data-testid="like-button"
@@ -189,11 +161,8 @@ function TimelineRowInner({ song, index, isCurrentlyPlaying, isUnavailable, isLi
         </button>
         <button
           onClick={() => onAddToQueue(trackFromFlattenedSong(song, streamerSlug))}
-          className="lg:opacity-0 lg:group-hover:opacity-100 transition-[opacity,transform,color] transform hover:scale-110 text-token-secondary hover:text-accent-pink"
+          className="lg:opacity-0 lg:group-hover:opacity-100 transition-[opacity,transform,color] transform hover:scale-110 text-token-secondary hover:text-accent-pink bg-surface p-token-2 rounded-radius-circle"
           style={{
-            background: 'var(--bg-surface)',
-            padding: 'var(--space-2)',
-            borderRadius: 'var(--radius-circle)',
             boxShadow: '0 1px 4px rgba(0,0,0,0.1)',
           }}
           title="加入佇列"
@@ -202,13 +171,9 @@ function TimelineRowInner({ song, index, isCurrentlyPlaying, isUnavailable, isLi
           <Plus className="w-4 h-4" />
         </button>
         <div
-          className="lg:opacity-0 lg:group-hover:opacity-100 transition-opacity"
+          className="lg:opacity-0 lg:group-hover:opacity-100 transition-opacity bg-surface p-token-2 rounded-radius-circle text-token-secondary"
           style={{
-            background: 'var(--bg-surface)',
-            padding: 'var(--space-2)',
-            borderRadius: 'var(--radius-circle)',
             boxShadow: '0 1px 4px rgba(0,0,0,0.1)',
-            color: 'var(--text-secondary)',
           }}
         >
           <AddToPlaylistDropdown
@@ -222,11 +187,9 @@ function TimelineRowInner({ song, index, isCurrentlyPlaying, isUnavailable, isLi
           revealClassName="lg:opacity-0 lg:group-hover:opacity-100"
         />
         <span
-          className="font-mono text-right"
+          className="font-mono text-right text-token-sm text-token-secondary"
           style={{
             minWidth: '40px',
-            fontSize: 'var(--font-size-sm)',
-            color: 'var(--text-secondary)',
           }}
         >
           {formatTime(song.timestamp)}

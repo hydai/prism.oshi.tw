@@ -15,13 +15,9 @@ export default function YearChips({ years, selectedYears, onToggle, chipTestId, 
           key={year}
           data-testid={chipTestId}
           onClick={() => onToggle(year)}
-          className={`font-medium text-sm transition-colors${shrink ? ' flex-shrink-0' : ''}`}
+          className={`font-medium text-sm transition-colors rounded-radius-pill${shrink ? ' flex-shrink-0' : ''} ${selectedYears.has(year) ? 'bg-accent-bg-pink text-accent-pink' : 'bg-surface-glass border border-border-token-glass text-token-secondary'}`}
           style={{
-            borderRadius: 'var(--radius-pill)',
             padding: '4px 12px',
-            ...(selectedYears.has(year)
-              ? { background: 'var(--bg-accent-pink)', color: 'var(--accent-pink)' }
-              : { background: 'var(--bg-surface-glass)', border: '1px solid var(--border-glass)', color: 'var(--text-secondary)' }),
           }}
         >
           {year}

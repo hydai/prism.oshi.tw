@@ -23,14 +23,9 @@ export default function SocialLinkRow({ socialLinks }: { socialLinks: SocialLink
             href={href}
             target="_blank"
             rel="noopener noreferrer"
-            className="flex items-center gap-1.5 transition-opacity hover:opacity-80"
+            className="flex items-center gap-1.5 transition-opacity hover:opacity-80 bg-surface-glass border border-border-token-glass rounded-radius-pill text-token-secondary text-token-sm"
             style={{
-              background: 'var(--bg-surface-glass)',
-              border: '1px solid var(--border-glass)',
-              borderRadius: 'var(--radius-pill)',
               padding: '6px 14px 6px 10px',
-              color: 'var(--text-secondary)',
-              fontSize: 'var(--font-size-sm)',
               fontWeight: 600,
               backdropFilter: 'blur(8px)',
               WebkitBackdropFilter: 'blur(8px)',
