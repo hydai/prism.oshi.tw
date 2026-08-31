@@ -1,6 +1,8 @@
 import {
   batchUpdateSongs,
+  bulkCreatePerformances,
   bulkUnapproveStream,
+  createSongAndPerformance,
   deleteStreamCascade,
   exportSongs,
   getDashboardStats,
@@ -1149,6 +1151,135 @@ async function testUpdateStreamPropagatesCopiesToPerformances(): Promise<void> {
   console.log('✓ stream edits propagate title/date/video_id to their performances');
 }
 
+// --- One catalog write pipeline (prepareCatalogWrites) shared by all three
+// pipelines: createSongAndPerformance, bulkCreatePerformances, importVodToAdminDb ---
+
+type CatalogStatementKind =
+  | 'delete-songs'
+  | 'delete-performances'
+  | 'work'
+  | 'song'
+  | 'link'
+  | 'performance';
+
+function catalogStatementKind(statement: CapturedStatement): CatalogStatementKind | null {
+  if (/DELETE\s+FROM\s+songs/i.test(statement.sql)) return 'delete-songs';
+  if (/DELETE\s+FROM\s+performances/i.test(statement.sql)) return 'delete-performances';
+  if (/INSERT\s+INTO\s+works/i.test(statement.sql)) return 'work';
+  if (/INSERT\s+INTO\s+songs/i.test(statement.sql)) return 'song';
+  if (/INSERT\s+OR\s+IGNORE\s+INTO\s+song_work_links/i.test(statement.sql)) return 'link';
+  if (/INSERT\s+INTO\s+performances/i.test(statement.sql)) return 'performance';
+  return null;
+}
+
+function collectCatalogWriteSql(
+  fakeDb: FakeD1Database,
+  songSql: Set<string>,
+  perfSql: Set<string>,
+): void {
+  for (const statement of fakeDb.batchStatements) {
+    if (/INSERT\s+INTO\s+songs/i.test(statement.sql)) songSql.add(statement.sql);
+    if (/INSERT\s+INTO\s+performances/i.test(statement.sql)) perfSql.add(statement.sql);
+  }
+}
+
+async function testCreateSongAndPerformanceUsesSharedCatalogPipeline(): Promise<void> {
+  const fakeDb = new FakeD1Database(null);
+  const result = await createSongAndPerformance(
+    fakeDb as unknown as D1Database,
+    'alice',
+    'stream-1',
+    '2026-01-01',
+    'Stream One',
+    'video-1',
+    'Song A',
+    'Artist A',
+    10,
+    20,
+    'note-a',
+    'curator@example.com',
+  );
+
+  assert(typeof result.songId === 'string' && result.songId.length > 0, 'createSongAndPerformance returns a generated songId');
+  assert(typeof result.performanceId === 'string' && result.performanceId.length > 0, 'createSongAndPerformance returns a generated performanceId');
+
+  const kinds = fakeDb.batchStatements
+    .map(catalogStatementKind)
+    .filter((kind): kind is CatalogStatementKind => kind !== null);
+  assertEqual(
+    kinds.join(','),
+    'work,song,link,performance',
+    'createSongAndPerformance batches work, song, link, then performance in that order',
+  );
+}
+
+// The three catalog pipelines (createSongAndPerformance, bulkCreatePerformances,
+// importVodToAdminDb) must all write through the exact same songs-insert and
+// performances-insert SQL literal — prepareCatalogWrites' whole reason to exist.
+async function testAllCatalogPipelinesShareTheSameWriteLiterals(): Promise<void> {
+  const songSql = new Set<string>();
+  const perfSql = new Set<string>();
+
+  const createDb = new FakeD1Database(null);
+  await createSongAndPerformance(
+    createDb as unknown as D1Database,
+    'alice', 'stream-1', '2026-01-01', 'Stream One', 'video-1',
+    'Song A', 'Artist A', 10, 20, '', 'curator@example.com',
+  );
+  collectCatalogWriteSql(createDb, songSql, perfSql);
+
+  const bulkDb = new FakeD1Database(null);
+  await bulkCreatePerformances(
+    bulkDb as unknown as D1Database,
+    'alice', 'stream-1', '2026-01-01', 'Stream One', 'video-1',
+    [{ songName: 'Song B', artist: 'Artist B', startSeconds: 5, endSeconds: 15 }],
+    'curator@example.com',
+    false,
+  );
+  collectCatalogWriteSql(bulkDb, songSql, perfSql);
+
+  const vodDb = new FakeD1Database(null);
+  await importVodToAdminDb(
+    vodDb as unknown as D1Database,
+    {
+      streamer_slug: 'alice',
+      video_id: 'video-2',
+      video_url: 'https://www.youtube.com/watch?v=video-2',
+      stream_title: 'Stream Two',
+      stream_date: '2026-02-02',
+    },
+    [{ song_title: 'Song C', original_artist: 'Artist C', start_timestamp: 1, end_timestamp: 9 }],
+    'curator@example.com',
+  );
+  collectCatalogWriteSql(vodDb, songSql, perfSql);
+
+  assertEqual(songSql.size, 1, 'every catalog pipeline shares the exact same songs-insert SQL literal');
+  assertEqual(perfSql.size, 1, 'every catalog pipeline shares the exact same performances-insert SQL literal');
+}
+
+// bulkCreatePerformances' replace mode must delete the stream's existing rows
+// before the shared catalog pipeline (prepareCatalogWrites) runs — prepareCatalogWrites
+// never calls db.batch itself, so the caller-owned delete statements lead the batch.
+async function testReplacePathRunsDeletesBeforeTheSharedCatalogPipeline(): Promise<void> {
+  const fakeDb = new FakeD1Database(null);
+  await bulkCreatePerformances(
+    fakeDb as unknown as D1Database,
+    'alice', 'stream-1', '2026-01-01', 'Stream One', 'video-1',
+    [{ songName: 'Song R', artist: 'Artist R', startSeconds: 1, endSeconds: 2 }],
+    'curator@example.com',
+    true,
+  );
+
+  const kinds = fakeDb.batchStatements
+    .map(catalogStatementKind)
+    .filter((kind): kind is CatalogStatementKind => kind !== null);
+  assertEqual(
+    kinds.join(','),
+    'delete-songs,delete-performances,work,song,link,performance',
+    'replace mode deletes existing rows before the shared catalog pipeline writes new ones',
+  );
+}
+
 async function main(): Promise<void> {
   await testUpdateStreamPropagatesCopiesToPerformances();
   await testInsertPerformancesUsesOneBatch();
@@ -1170,6 +1301,9 @@ async function main(): Promise<void> {
   await testMergeSongsRejectsMissingOrCrossStreamerSource();
   await testMergeSongsRejectsDuplicateSourceIds();
   await testSharedSongsSurviveStreamMutations();
+  await testCreateSongAndPerformanceUsesSharedCatalogPipeline();
+  await testAllCatalogPipelinesShareTheSameWriteLiterals();
+  await testReplacePathRunsDeletesBeforeTheSharedCatalogPipeline();
   console.log('✓ song imports reuse exact entities and merges preserve every performance');
 }
 
