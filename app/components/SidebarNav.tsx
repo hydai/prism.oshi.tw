@@ -60,13 +60,7 @@ export default function SidebarNav({
 
   return (
     <aside
-      className="w-64 flex flex-col flex-shrink-0 hidden lg:flex shadow-sm z-20 overflow-hidden"
-      style={{
-        background: 'var(--bg-surface-frosted)',
-        backdropFilter: 'blur(12px)',
-        WebkitBackdropFilter: 'blur(12px)',
-        borderRight: '1px solid var(--border-glass)',
-      }}
+      className="w-64 flex flex-col flex-shrink-0 hidden lg:flex shadow-sm z-20 overflow-hidden bg-surface-frosted backdrop-blur-[12px] border-r border-r-border-token-glass"
     >
       {/* ── 1. Logo Area ── */}
       <div className="px-5 py-5 flex items-center gap-3 flex-shrink-0">
@@ -93,8 +87,8 @@ export default function SidebarNav({
         {/* ── 3. DISCOVER Section ── */}
         <div className="pt-2 pb-1">
           <div
-            className="px-3 py-1.5 mb-1 font-bold uppercase tracking-widest"
-            style={{ color: 'var(--text-tertiary)', fontSize: 'var(--font-size-xs)', letterSpacing: '0.1em' }}
+            className="px-3 py-1.5 mb-1 font-bold uppercase tracking-widest text-token-tertiary text-token-xs"
+            style={{ letterSpacing: '0.1em' }}
           >
             DISCOVER
           </div>
@@ -143,8 +137,8 @@ export default function SidebarNav({
         {/* ── 4. YOUR LIBRARY Section ── */}
         <div className="pt-2 pb-1">
           <div
-            className="px-3 py-1.5 mb-1 font-bold uppercase tracking-widest"
-            style={{ color: 'var(--text-tertiary)', fontSize: 'var(--font-size-xs)', letterSpacing: '0.1em' }}
+            className="px-3 py-1.5 mb-1 font-bold uppercase tracking-widest text-token-tertiary text-token-xs"
+            style={{ letterSpacing: '0.1em' }}
           >
             YOUR LIBRARY
           </div>
@@ -163,8 +157,7 @@ export default function SidebarNav({
             </span>
             {likedSongsCount > 0 && (
               <span
-                className="text-xs px-2 py-0.5 rounded-full font-medium"
-                style={{ background: 'var(--bg-accent-pink-muted)', color: 'var(--accent-pink)' }}
+                className="text-xs px-2 py-0.5 rounded-full font-medium bg-accent-bg-pink-muted text-accent-pink"
               >
                 {likedSongsCount}
               </span>
@@ -185,8 +178,7 @@ export default function SidebarNav({
             </span>
             {recentlyPlayedCount > 0 && (
               <span
-                className="text-xs px-2 py-0.5 rounded-full font-medium"
-                style={{ background: 'var(--bg-accent-pink-muted)', color: 'var(--accent-pink)' }}
+                className="text-xs px-2 py-0.5 rounded-full font-medium bg-accent-bg-pink-muted text-accent-pink"
               >
                 {recentlyPlayedCount}
               </span>
@@ -217,8 +209,7 @@ export default function SidebarNav({
                 查看播放清單
               </span>
               <span
-                className="text-xs px-2 py-0.5 rounded-full font-medium"
-                style={{ background: 'var(--bg-accent-pink-muted)', color: 'var(--accent-pink)' }}
+                className="text-xs px-2 py-0.5 rounded-full font-medium bg-accent-bg-pink-muted text-accent-pink"
               >
                 {playlistCount}
               </span>
@@ -232,10 +223,9 @@ export default function SidebarNav({
 
       {/* ── 5. Footer ── */}
       <div
-        className="flex-shrink-0 px-3 py-3 border-t"
-        style={{ borderTop: '1px solid var(--border-glass)' }}
+        className="flex-shrink-0 px-3 py-3 border-t border-t-border-token-glass"
       >
-        <p className="text-xs mt-2 text-center" style={{ color: 'var(--text-muted)' }}>
+        <p className="text-xs mt-2 text-center text-token-muted">
           Made with <Heart className="w-3 h-3 inline text-pink-400 fill-current" /> for {displayName}
         </p>
       </div>

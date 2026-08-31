@@ -28,15 +28,10 @@ export default function HomeSidebar({
 }: HomeSidebarProps) {
   return (
     <aside
-      className="hidden lg:flex w-[260px] flex-shrink-0 flex-col backdrop-blur-md border-r h-screen sticky top-0"
-      style={{
-        background: 'var(--bg-surface-glass)',
-        borderColor: 'var(--border-glass)',
-      }}
+      className="hidden lg:flex w-[260px] flex-shrink-0 flex-col backdrop-blur-md border-r h-screen sticky top-0 bg-surface-glass border-border-token-glass"
     >
       <div
-        className="flex items-center gap-3 px-5 py-5 border-b"
-        style={{ borderColor: 'var(--border-glass)' }}
+        className="flex items-center gap-3 px-5 py-5 border-b border-border-token-glass"
       >
         <div
           className="flex h-9 w-9 items-center justify-center rounded-radius-lg bg-accent-gradient"
@@ -44,8 +39,7 @@ export default function HomeSidebar({
           <Disc3 className="h-5 w-5 text-white" />
         </div>
         <span
-          className="text-token-xl font-bold tracking-tight"
-          style={{ color: 'var(--text-primary)' }}
+          className="text-token-xl font-bold tracking-tight text-token-primary"
         >
           Prism
         </span>
@@ -56,18 +50,13 @@ export default function HomeSidebar({
 
       <div className="px-4 py-3">
         <div
-          className="flex items-center gap-2 rounded-radius-lg px-3 py-2"
-          style={{
-            background: 'var(--bg-surface-frosted)',
-            border: '1px solid var(--border-glass)',
-          }}
+          className="flex items-center gap-2 rounded-radius-lg px-3 py-2 bg-surface-frosted border border-border-token-glass"
         >
           <label htmlFor="desktop-streamer-search" className="sr-only">
             搜尋 VTuber
           </label>
           <Search
-            className="h-4 w-4 flex-shrink-0"
-            style={{ color: 'var(--text-tertiary)' }}
+            className="h-4 w-4 flex-shrink-0 text-token-tertiary"
           />
           <input
             id="desktop-streamer-search"
@@ -75,8 +64,7 @@ export default function HomeSidebar({
             placeholder="搜尋 VTuber…"
             value={searchText}
             onChange={(event) => onSearchChange(event.target.value)}
-            className="w-full bg-transparent text-token-sm outline-none placeholder:text-token-tertiary"
-            style={{ color: 'var(--text-primary)' }}
+            className="w-full bg-transparent text-token-sm outline-none placeholder:text-token-tertiary text-token-primary"
           />
         </div>
       </div>
@@ -117,10 +105,9 @@ export default function HomeSidebar({
           href="https://vods.oshi.tw"
           target="_blank"
           rel="noopener noreferrer"
-          className="flex items-center justify-center gap-2 rounded-radius-lg px-4 py-2 text-token-sm font-semibold transition-opacity hover:opacity-90"
+          className="flex items-center justify-center gap-2 rounded-radius-lg px-4 py-2 text-token-sm font-semibold transition-opacity hover:opacity-90 text-token-secondary"
           style={{
             border: '1px solid var(--border-accent)',
-            color: 'var(--text-secondary)',
           }}
         >
           <Film className="h-4 w-4" />
@@ -130,10 +117,9 @@ export default function HomeSidebar({
           href="https://nova.oshi.tw/vod"
           target="_blank"
           rel="noopener noreferrer"
-          className="flex items-center justify-center gap-2 rounded-radius-lg px-4 py-2 text-token-sm font-semibold transition-opacity hover:opacity-90"
+          className="flex items-center justify-center gap-2 rounded-radius-lg px-4 py-2 text-token-sm font-semibold transition-opacity hover:opacity-90 text-token-secondary"
           style={{
             border: '1px solid var(--border-accent)',
-            color: 'var(--text-secondary)',
           }}
         >
           <Video className="h-4 w-4" />
@@ -143,10 +129,9 @@ export default function HomeSidebar({
           href="https://crystal.oshi.tw"
           target="_blank"
           rel="noopener noreferrer"
-          className="flex items-center justify-center gap-2 rounded-radius-lg px-4 py-2 text-token-sm font-semibold transition-opacity hover:opacity-90"
+          className="flex items-center justify-center gap-2 rounded-radius-lg px-4 py-2 text-token-sm font-semibold transition-opacity hover:opacity-90 text-token-secondary"
           style={{
             border: '1px solid var(--border-accent)',
-            color: 'var(--text-secondary)',
           }}
         >
           <MessageSquare className="h-4 w-4" />
@@ -156,10 +141,9 @@ export default function HomeSidebar({
           href="https://discord.gg/bUYva8q7Jr"
           target="_blank"
           rel="noopener noreferrer"
-          className="flex items-center justify-center gap-2 rounded-radius-lg px-4 py-2 text-token-sm font-semibold transition-opacity hover:opacity-90"
+          className="flex items-center justify-center gap-2 rounded-radius-lg px-4 py-2 text-token-sm font-semibold transition-opacity hover:opacity-90 text-token-secondary"
           style={{
             border: '1px solid var(--border-accent)',
-            color: 'var(--text-secondary)',
           }}
         >
           <DiscordIcon className="h-4 w-4" />
