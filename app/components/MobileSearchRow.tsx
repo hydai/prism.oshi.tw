@@ -60,13 +60,7 @@ function MobileSearchRowInner({ song, isCurrentlyPlaying, isUnavailable, onPlay,
   );
 }
 
-const MobileSearchRow = memo(MobileSearchRowInner, (prev, next) => {
-  return (
-    prev.song.performanceId === next.song.performanceId &&
-    prev.isCurrentlyPlaying === next.isCurrentlyPlaying &&
-    prev.isUnavailable === next.isUnavailable
-  );
-});
+const MobileSearchRow = memo(MobileSearchRowInner);
 
 MobileSearchRow.displayName = 'MobileSearchRow';
 

@@ -253,15 +253,7 @@ function TimelineRowInner({ song, index, isCurrentlyPlaying, isUnavailable, isLi
   );
 }
 
-const TimelineRow = memo(TimelineRowInner, (prev, next) => {
-  return (
-    prev.song.performanceId === next.song.performanceId &&
-    prev.index === next.index &&
-    prev.isCurrentlyPlaying === next.isCurrentlyPlaying &&
-    prev.isUnavailable === next.isUnavailable &&
-    prev.isLiked === next.isLiked
-  );
-});
+const TimelineRow = memo(TimelineRowInner);
 
 TimelineRow.displayName = 'TimelineRow';
 

@@ -4,16 +4,14 @@ import {
   createContext,
   useCallback,
   useContext,
-  useEffect,
   useMemo,
-  useRef,
   useState,
   type ReactNode,
 } from 'react';
 import { useStreamer } from '../contexts/StreamerContext';
 import { useArchiveData } from './archive-data-context';
 import { useArchiveUi } from './archive-ui-context';
-import { usePlayerActions, usePlayerStatus } from '../contexts/PlayerContext';
+import { usePlayerActions, usePlayerStore } from '../contexts/PlayerContext';
 import {
   filterFlattenedSongs,
   filterGroupedSongs,
@@ -58,7 +56,6 @@ export function ArchiveFiltersProvider({ children }: { children: ReactNode }) {
   const { streams, allFlattenedSongs, allGroupedSongs } = useArchiveData();
   const { viewMode } = useArchiveUi();
   const { playTrackWithQueue } = usePlayerActions();
-  const { unavailableVideoIds } = usePlayerStatus();
 
   const [debouncedSearch, setDebouncedSearch] = useState('');
   const [selectedStreamId, setSelectedStreamId] = useState<string | null>(null);
@@ -109,44 +106,37 @@ export function ArchiveFiltersProvider({ children }: { children: ReactNode }) {
     [allGroupedSongs, archiveFilters],
   );
 
-  // Click handlers below are passed to memoized rows whose comparators ignore
-  // onPlay — a row may invoke a stale closure. All mutable data therefore goes
-  // through refs so a stale handler still computes the queue from current data.
-  const flattenedSongsRef = useRef(flattenedSongs);
-  const groupedSongsRef = useRef(groupedSongs);
-  const unavailableVideoIdsRef = useRef(unavailableVideoIds);
-  useEffect(() => { flattenedSongsRef.current = flattenedSongs; }, [flattenedSongs]);
-  useEffect(() => { groupedSongsRef.current = groupedSongs; }, [groupedSongs]);
-  useEffect(() => { unavailableVideoIdsRef.current = unavailableVideoIds; }, [unavailableVideoIds]);
+  const playerStore = usePlayerStore();
 
-  // Inside a provider the context value is memoized, so unlike its previous
-  // life in the page controller this callback needs stable identity too.
   const handlePlayAll = useCallback(() => {
+    // Event handlers read volatile player state imperatively — fresh at click
+    // time, and no subscription churning the context value.
+    const unavailable = playerStore.getSnapshot().unavailableVideoIds;
     const tracks = viewMode === 'timeline'
-      ? followingTracksFromFlattened(flattenedSongs, -1, slug, unavailableVideoIds)
-      : followingTracksFromGrouped(groupedSongs, -1, slug, unavailableVideoIds);
+      ? followingTracksFromFlattened(flattenedSongs, -1, slug, unavailable)
+      : followingTracksFromGrouped(groupedSongs, -1, slug, unavailable);
     if (tracks.length === 0) return;
     playTrackWithQueue(tracks[0], tracks.slice(1));
-  }, [viewMode, flattenedSongs, groupedSongs, slug, unavailableVideoIds, playTrackWithQueue]);
+  }, [viewMode, flattenedSongs, groupedSongs, slug, playerStore, playTrackWithQueue]);
 
-  // Timeline view + mobile search both render flattenedSongs.
+  // Timeline view + mobile search both render flattenedSongs. Identity tracks
+  // the list: a row holding this handler re-renders exactly when the list
+  // (and therefore its own song prop) changed.
   const handlePlayFromFlattened = useCallback((track: PerformanceRef) => {
-    const list = flattenedSongsRef.current;
-    const index = list.findIndex((s) => s.performanceId === track.performanceId);
+    const index = flattenedSongs.findIndex((s) => s.performanceId === track.performanceId);
     const following = index === -1
       ? [] // clicked row no longer in the current list — play it alone
-      : followingTracksFromFlattened(list, index, slug, unavailableVideoIdsRef.current);
+      : followingTracksFromFlattened(flattenedSongs, index, slug, playerStore.getSnapshot().unavailableVideoIds);
     playTrackWithQueue(track, following);
-  }, [slug, playTrackWithQueue]);
+  }, [flattenedSongs, slug, playerStore, playTrackWithQueue]);
 
   const handlePlayFromGrouped = useCallback((track: PerformanceRef) => {
-    const list = groupedSongsRef.current;
-    const index = list.findIndex((s) => s.id === track.songId);
+    const index = groupedSongs.findIndex((s) => s.id === track.songId);
     const following = index === -1
       ? []
-      : followingTracksFromGrouped(list, index, slug, unavailableVideoIdsRef.current);
+      : followingTracksFromGrouped(groupedSongs, index, slug, playerStore.getSnapshot().unavailableVideoIds);
     playTrackWithQueue(track, following);
-  }, [slug, playTrackWithQueue]);
+  }, [groupedSongs, slug, playerStore, playTrackWithQueue]);
 
   const value = useMemo<ArchiveFiltersValue>(() => ({
     debouncedSearch,
