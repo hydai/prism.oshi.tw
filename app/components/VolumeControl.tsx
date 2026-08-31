@@ -26,11 +26,8 @@ export default function VolumeControl({ size = 'compact' }: VolumeControlProps) 
     <div className="flex items-center" style={{ gap: '8px' }}>
       <button
         onClick={toggleMute}
-        className="transition-colors flex-shrink-0"
+        className="transition-colors flex-shrink-0 text-token-tertiary hover:text-token-primary"
         aria-label={isMuted ? 'Unmute' : 'Mute'}
-        style={{ color: 'var(--text-tertiary)' }}
-        onMouseEnter={(e) => (e.currentTarget.style.color = 'var(--text-primary)')}
-        onMouseLeave={(e) => (e.currentTarget.style.color = 'var(--text-tertiary)')}
       >
         <VolumeIcon style={{ width: `${iconSize}px`, height: `${iconSize}px` }} />
       </button>

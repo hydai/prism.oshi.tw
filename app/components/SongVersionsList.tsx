@@ -109,10 +109,11 @@ export default function SongVersionsList({
                 </span>
                 {performance.note && (
                   <span
-                    className="inline-flex items-center border border-blue-200 text-blue-500 bg-blue-50 font-medium"
+                    className="inline-flex items-center border font-medium"
                     style={{
                       background: 'var(--bg-accent-blue-muted)',
                       color: 'var(--accent-blue)',
+                      borderColor: 'var(--border-accent-blue)',
                       borderRadius: 'var(--radius-pill)',
                       fontSize: 'var(--font-size-xs)',
                       padding: 'var(--space-1) var(--space-3)',
@@ -157,22 +158,15 @@ export default function SongVersionsList({
             </button>
             <button
               onClick={() => onAddToQueue(trackFromPerformance(song, performance, streamerSlug))}
-              className="opacity-0 group-hover/version:opacity-100 transition-[opacity,transform] transform hover:scale-110"
+              className="opacity-0 group-hover/version:opacity-100 transition-[opacity,transform,color] transform hover:scale-110 text-token-secondary hover:text-accent-pink"
               style={{
                 background: 'var(--bg-surface)',
                 padding: 'var(--space-2)',
                 borderRadius: 'var(--radius-circle)',
                 boxShadow: '0 1px 4px rgba(0,0,0,0.1)',
-                color: 'var(--text-secondary)',
               }}
               title="加入佇列"
               data-testid="add-to-queue"
-              onMouseEnter={(event) => {
-                event.currentTarget.style.color = 'var(--accent-pink)';
-              }}
-              onMouseLeave={(event) => {
-                event.currentTarget.style.color = 'var(--text-secondary)';
-              }}
             >
               <Plus className="w-4 h-4" />
             </button>

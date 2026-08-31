@@ -52,7 +52,7 @@ function ArchivePageChrome() {
   return (
     <>
       <StatusOverlays />
-      <div className="flex h-screen bg-gradient-to-br from-[#fff0f5] via-[#f0f8ff] to-[#e6e6fa] text-slate-600 font-sans selection:bg-pink-200 selection:text-pink-900 overflow-hidden" style={{ background: 'linear-gradient(135deg, var(--bg-page-start) 0%, var(--bg-page-mid) 50%, var(--bg-page-end) 100%)' }}>
+      <div className="flex h-screen text-slate-600 font-sans selection:bg-pink-200 selection:text-pink-900 overflow-hidden" style={{ background: 'linear-gradient(135deg, var(--bg-page-start) 0%, var(--bg-page-mid) 50%, var(--bg-page-end) 100%)' }}>
         <ArchiveSidebar />
         <MobileTopBar />
         <MainContent />
@@ -217,12 +217,11 @@ function ArchiveSidebar() {
               key={stream.id}
               data-testid="stream-filter-button"
               onClick={() => setSelectedStreamId(stream.id === selectedStreamId ? null : stream.id)}
-              className="w-full text-left px-3 py-2 rounded-radius-lg text-sm font-medium transition-colors hover:bg-surface-muted"
-              style={
+              className={`w-full text-left px-3 py-2 rounded-radius-lg text-sm font-medium transition-colors ${
                 selectedStreamId === stream.id
-                  ? { color: 'var(--accent-pink)', background: 'var(--bg-accent-pink)' }
-                  : { color: 'var(--text-secondary)', background: 'transparent' }
-              }
+                  ? 'text-accent-pink bg-accent-bg-pink'
+                  : 'text-token-secondary bg-transparent hover:bg-surface-muted'
+              }`}
             >
               <div className="truncate">{stream.title}</div>
               <div className="text-xs" style={{ color: 'var(--text-muted)' }}>{stream.date}</div>
@@ -283,7 +282,7 @@ function MainContent() {
   const { scrollContainerRef, mobileTab } = useArchiveUi();
 
   return (
-      <main className="flex-1 lg:m-3 lg:rounded-3xl overflow-hidden relative shadow-2xl shadow-indigo-100/50 bg-white/40 backdrop-blur-md border border-white/60 flex flex-col" style={{ background: 'var(--bg-surface-glass)', backdropFilter: 'blur(12px)', WebkitBackdropFilter: 'blur(12px)', border: '1px solid var(--border-glass)', borderRadius: 'var(--radius-3xl)' }}>
+      <main className="flex-1 lg:m-3 overflow-hidden relative shadow-2xl shadow-indigo-100/50 flex flex-col rounded-radius-3xl" style={{ background: 'var(--bg-surface-glass)', backdropFilter: 'blur(12px)', WebkitBackdropFilter: 'blur(12px)', border: '1px solid var(--border-glass)' }}>
 
         {/* Decorative glows */}
         <div className="absolute -top-20 -right-20 w-96 h-96 bg-pink-300/20 rounded-full blur-3xl pointer-events-none"></div>

@@ -52,9 +52,7 @@ export default function AddToPlaylistDropdown({ version, onSuccess }: AddToPlayl
           setShowDropdown(!showDropdown);
           setError('');
         }}
-        className="transition-colors p-1 hover:scale-110 transform"
-        onMouseEnter={(e) => { (e.currentTarget as HTMLElement).style.color = 'var(--accent-pink)'; }}
-        onMouseLeave={(e) => { (e.currentTarget as HTMLElement).style.color = ''; }}
+        className="transition-colors p-1 hover:scale-110 transform hover:text-accent-pink"
         title="加入播放清單"
         data-testid="add-to-playlist-button"
       >
