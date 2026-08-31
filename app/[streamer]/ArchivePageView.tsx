@@ -7,11 +7,6 @@ import {
   Search,
   Play,
   Shuffle,
-  Youtube,
-  Twitter,
-  Facebook,
-  Instagram,
-  Twitch,
   Sparkles,
   ListMusic,
   Clock,
@@ -37,6 +32,8 @@ import SearchBox from '../components/SearchBox';
 import ThemeToggle from '../components/ThemeToggle';
 import ViewModeToggle from '../components/ViewModeToggle';
 import CatalogEmptyState from '../components/CatalogEmptyState';
+import SocialLinkRow from '../components/SocialLinkRow';
+import YearChips from '../components/YearChips';
 import { useArchiveData } from './archive-data-context';
 import { useArchiveFilters } from './archive-filters-context';
 import { useArchiveUi } from './archive-ui-context';
@@ -192,23 +189,7 @@ function ArchiveSidebar() {
 
           {/* Year filter chips */}
           <div className="flex flex-wrap gap-1.5 px-1" data-testid="year-filter-sidebar">
-            {availableYears.map(year => (
-              <button
-                key={year}
-                data-testid="year-filter-chip"
-                onClick={() => toggleYear(year)}
-                className="font-medium text-sm transition-colors"
-                style={{
-                  borderRadius: 'var(--radius-pill)',
-                  padding: '4px 12px',
-                  ...(selectedYears.has(year)
-                    ? { background: 'var(--bg-accent-pink)', color: 'var(--accent-pink)' }
-                    : { background: 'var(--bg-surface-glass)', border: '1px solid var(--border-glass)', color: 'var(--text-secondary)' }),
-                }}
-              >
-                {year}
-              </button>
-            ))}
+            <YearChips years={availableYears} selectedYears={selectedYears} onToggle={toggleYear} chipTestId="year-filter-chip" />
           </div>
         </div>
 
@@ -581,116 +562,7 @@ function DesktopHero() {
 
               {/* Social Links Row */}
               <div className="flex items-center gap-2" style={{ marginTop: '4px' }}>
-                {streamerData.socialLinks.youtube && (
-                <a
-                  href={streamerData.socialLinks.youtube}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="flex items-center gap-1.5 transition-opacity hover:opacity-80"
-                  style={{
-                    background: 'var(--bg-surface-glass)',
-                    border: '1px solid var(--border-glass)',
-                    borderRadius: 'var(--radius-pill)',
-                    padding: '6px 14px 6px 10px',
-                    color: 'var(--text-secondary)',
-                    fontSize: 'var(--font-size-sm)',
-                    fontWeight: 600,
-                    backdropFilter: 'blur(8px)',
-                    WebkitBackdropFilter: 'blur(8px)',
-                  }}
-                >
-                  <Youtube className="w-4 h-4" style={{ color: '#FF0000' }} />
-                  YouTube
-                </a>
-                )}
-                {streamerData.socialLinks.twitter && (
-                <a
-                  href={streamerData.socialLinks.twitter}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="flex items-center gap-1.5 transition-opacity hover:opacity-80"
-                  style={{
-                    background: 'var(--bg-surface-glass)',
-                    border: '1px solid var(--border-glass)',
-                    borderRadius: 'var(--radius-pill)',
-                    padding: '6px 14px 6px 10px',
-                    color: 'var(--text-secondary)',
-                    fontSize: 'var(--font-size-sm)',
-                    fontWeight: 600,
-                    backdropFilter: 'blur(8px)',
-                    WebkitBackdropFilter: 'blur(8px)',
-                  }}
-                >
-                  <Twitter className="w-4 h-4" style={{ color: '#1DA1F2' }} />
-                  X
-                </a>
-                )}
-                {streamerData.socialLinks.facebook && (
-                <a
-                  href={streamerData.socialLinks.facebook}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="flex items-center gap-1.5 transition-opacity hover:opacity-80"
-                  style={{
-                    background: 'var(--bg-surface-glass)',
-                    border: '1px solid var(--border-glass)',
-                    borderRadius: 'var(--radius-pill)',
-                    padding: '6px 14px 6px 10px',
-                    color: 'var(--text-secondary)',
-                    fontSize: 'var(--font-size-sm)',
-                    fontWeight: 600,
-                    backdropFilter: 'blur(8px)',
-                    WebkitBackdropFilter: 'blur(8px)',
-                  }}
-                >
-                  <Facebook className="w-4 h-4" style={{ color: '#1877F2' }} />
-                  Facebook
-                </a>
-                )}
-                {streamerData.socialLinks.instagram && (
-                <a
-                  href={streamerData.socialLinks.instagram}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="flex items-center gap-1.5 transition-opacity hover:opacity-80"
-                  style={{
-                    background: 'var(--bg-surface-glass)',
-                    border: '1px solid var(--border-glass)',
-                    borderRadius: 'var(--radius-pill)',
-                    padding: '6px 14px 6px 10px',
-                    color: 'var(--text-secondary)',
-                    fontSize: 'var(--font-size-sm)',
-                    fontWeight: 600,
-                    backdropFilter: 'blur(8px)',
-                    WebkitBackdropFilter: 'blur(8px)',
-                  }}
-                >
-                  <Instagram className="w-4 h-4" style={{ color: '#E4405F' }} />
-                  Instagram
-                </a>
-                )}
-                {streamerData.socialLinks.twitch && (
-                <a
-                  href={streamerData.socialLinks.twitch}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="flex items-center gap-1.5 transition-opacity hover:opacity-80"
-                  style={{
-                    background: 'var(--bg-surface-glass)',
-                    border: '1px solid var(--border-glass)',
-                    borderRadius: 'var(--radius-pill)',
-                    padding: '6px 14px 6px 10px',
-                    color: 'var(--text-secondary)',
-                    fontSize: 'var(--font-size-sm)',
-                    fontWeight: 600,
-                    backdropFilter: 'blur(8px)',
-                    WebkitBackdropFilter: 'blur(8px)',
-                  }}
-                >
-                  <Twitch className="w-4 h-4" style={{ color: '#9146FF' }} />
-                  Twitch
-                </a>
-                )}
+                <SocialLinkRow socialLinks={streamerData.socialLinks} />
               </div>
             </div>
 
@@ -1589,23 +1461,7 @@ function MobileStreamsTab() {
 
               {/* Year filter chips */}
               <div className="flex gap-1.5 mb-4 overflow-x-auto" data-testid="mobile-streams-year-filter">
-                {availableYears.map(year => (
-                  <button
-                    key={year}
-                    data-testid="mobile-streams-year-chip"
-                    onClick={() => toggleYear(year)}
-                    className="font-medium text-sm transition-colors flex-shrink-0"
-                    style={{
-                      borderRadius: 'var(--radius-pill)',
-                      padding: '4px 12px',
-                      ...(selectedYears.has(year)
-                        ? { background: 'var(--bg-accent-pink)', color: 'var(--accent-pink)' }
-                        : { background: 'var(--bg-surface-glass)', border: '1px solid var(--border-glass)', color: 'var(--text-secondary)' }),
-                    }}
-                  >
-                    {year}
-                  </button>
-                ))}
+                <YearChips years={availableYears} selectedYears={selectedYears} onToggle={toggleYear} chipTestId="mobile-streams-year-chip" shrink />
                 {selectedYears.size > 0 && (
                   <button
                     onClick={clearYears}
