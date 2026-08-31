@@ -3,36 +3,22 @@
 import { useEffect, useSyncExternalStore } from 'react';
 import { Sun, Moon } from 'lucide-react';
 import { useHydrated } from '../lib/use-hydrated';
+import { htmlDarkClassStore } from '../lib/theme-store';
 
 type Theme = 'light' | 'dark';
 
-const THEME_CHANGE_EVENT = 'prism-theme-change';
-
-function getThemeSnapshot(): Theme {
-  return document.documentElement.classList.contains('dark') ? 'dark' : 'light';
-}
-
-function getServerThemeSnapshot(): Theme {
-  return 'light';
-}
-
-function subscribeToTheme(onStoreChange: () => void) {
-  window.addEventListener(THEME_CHANGE_EVENT, onStoreChange);
-  return () => window.removeEventListener(THEME_CHANGE_EVENT, onStoreChange);
-}
-
 function updateDocumentTheme(theme: Theme) {
   document.documentElement.classList.toggle('dark', theme === 'dark');
-  window.dispatchEvent(new Event(THEME_CHANGE_EVENT));
 }
 
 export default function ThemeToggle() {
   const hydrated = useHydrated();
-  const theme = useSyncExternalStore(
-    subscribeToTheme,
-    getThemeSnapshot,
-    getServerThemeSnapshot,
+  const isDark = useSyncExternalStore(
+    htmlDarkClassStore.subscribe,
+    htmlDarkClassStore.getSnapshot,
+    htmlDarkClassStore.getServerSnapshot,
   );
+  const theme: Theme = isDark ? 'dark' : 'light';
 
   useEffect(() => {
     // Follow system preference when no stored preference
@@ -48,6 +34,8 @@ export default function ThemeToggle() {
     return () => mq.removeEventListener('change', handler);
   }, []);
 
+  // Raw localStorage by design: the 'theme' key is the pre-hydration contract
+  // shared with the <head> boot script, not something the store abstracts over.
   const toggleTheme = () => {
     const next = theme === 'light' ? 'dark' : 'light';
     updateDocumentTheme(next);
