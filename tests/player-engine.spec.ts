@@ -1,61 +1,10 @@
 import { test, expect, type Page } from '@playwright/test';
+import { stubYouTubeIframeApi } from './helpers/fake-youtube';
 
 // Characterization suite for the playback engine. The YouTube IFrame API is
 // stubbed at the network layer so every player event is deterministic and no
 // real video ever loads. Written against the pre-store PlayerContext; the
 // createPlayerStore rewrite must keep every test green.
-
-const FAKE_IFRAME_API = `
-window.YT = {
-  Player: class FakeYtPlayer {
-    constructor(elementId, config) {
-      this.config = config;
-      this.videoId = config.videoId;
-      this.currentTime = (config.playerVars && config.playerVars.start) || 0;
-      this.duration = 36000;
-      this.volume = 100;
-      this.muted = false;
-      this.destroyed = false;
-      this.calls = [];
-      window.__ytPlayers = window.__ytPlayers || [];
-      window.__ytPlayers.push(this);
-      window.__ytLast = this;
-      setTimeout(() => {
-        if (this.config.events && this.config.events.onReady) {
-          this.config.events.onReady({ target: this });
-        }
-      }, 0);
-    }
-    log(name, args) { this.calls.push({ name, args: args || [] }); }
-    getDuration() { return this.duration; }
-    getCurrentTime() { return this.currentTime; }
-    getPlayerState() { return 1; }
-    getVideoData() { return { video_id: this.videoId }; }
-    playVideo() { this.log('playVideo'); this.fire(1); }
-    pauseVideo() { this.log('pauseVideo'); this.fire(2); }
-    seekTo(seconds) { this.log('seekTo', [seconds]); this.currentTime = seconds; }
-    loadVideoById(opts) {
-      this.log('loadVideoById', [opts]);
-      this.videoId = opts.videoId;
-      this.currentTime = opts.startSeconds || 0;
-      setTimeout(() => this.fire(1), 0);
-    }
-    setVolume(v) { this.log('setVolume', [v]); this.volume = v; }
-    mute() { this.muted = true; }
-    unMute() { this.muted = false; }
-    destroy() { this.destroyed = true; }
-    fire(data) {
-      const events = this.config.events;
-      if (events && events.onStateChange) events.onStateChange({ target: this, data });
-    }
-    fireError(code) {
-      const events = this.config.events;
-      if (events && events.onError) events.onError({ target: this, data: code });
-    }
-  },
-};
-if (window.onYouTubeIframeAPIReady) window.onYouTubeIframeAPIReady();
-`;
 
 interface FakePlayerView {
   videoId: string;
@@ -83,9 +32,7 @@ async function readLastPlayer(page: Page): Promise<FakePlayerView> {
 }
 
 async function startPlayAll(page: Page) {
-  await page.route('**/iframe_api*', (route) =>
-    route.fulfill({ contentType: 'application/javascript', body: FAKE_IFRAME_API }),
-  );
+  await stubYouTubeIframeApi(page);
   await page.setViewportSize({ width: 1280, height: 900 });
   await page.goto('/mizuki');
   await expect(page.getByTestId('total-performance-count')).not.toHaveText('0');

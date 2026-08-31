@@ -1,8 +1,10 @@
 import { test, expect } from '@playwright/test';
+import { stubYouTubeIframeApi } from './helpers/fake-youtube';
 
 // mizuki "play all" queues every performance (~5.4k). The panel must virtualize:
 // only a viewport's worth of rows may exist in the DOM, and only ONE sheet variant.
 test('queue panel virtualizes a full-catalog queue', async ({ page }) => {
+  await stubYouTubeIframeApi(page);
   await page.setViewportSize({ width: 1280, height: 900 });
   await page.goto('/mizuki');
 
@@ -24,6 +26,7 @@ test('queue panel virtualizes a full-catalog queue', async ({ page }) => {
 });
 
 test('queue panel resets scroll position when reopened', async ({ page }) => {
+  await stubYouTubeIframeApi(page);
   await page.setViewportSize({ width: 1280, height: 900 });
   await page.goto('/mizuki');
 
