@@ -46,45 +46,6 @@ import { useLikedSongs } from '../contexts/LikedSongsContext';
 import { useRecentlyPlayed } from '../contexts/RecentlyPlayedContext';
 import type { ArchiveLoadState } from '../lib/archive-loader';
 
-/**
- * TEMPORARY compatibility facade over the split providers, preserving the old
- * controller shape so sections migrate one task later. Recomposes on any slice
- * change — exactly the old god-controller behavior. Do not add call sites.
- */
-function useArchivePageView() {
-  const { songs, loadState, retryLoad, allArtists, availableYears } = useArchiveData();
-  const filters = useArchiveFilters();
-  const ui = useArchiveUi();
-  const streamerData = useStreamer();
-  const currentTrack = useCurrentTrack();
-  const { apiLoadError, unavailableVideoIds } = usePlayerStatus();
-  const { shuffleOn } = useTransport();
-  const { toggleShuffle } = usePlayerActions();
-  const { playlists } = usePlaylist();
-  const { likedCount, isLiked } = useLikedSongs();
-  const { recentCount } = useRecentlyPlayed();
-  return {
-    ...filters,
-    ...ui,
-    streamerData,
-    slug: streamerData.slug,
-    songs,
-    loadState,
-    retryLoad,
-    allArtists,
-    availableYears,
-    currentTrackId: currentTrack?.performanceId ?? null,
-    apiLoadError,
-    unavailableVideoIds,
-    shuffleOn,
-    toggleShuffle,
-    playlists,
-    likedCount,
-    isLiked,
-    recentCount,
-  };
-}
-
 export default function ArchivePageView() {
   return <ArchivePageChrome />;
 }
@@ -106,11 +67,8 @@ function ArchivePageChrome() {
 
 
 function StatusOverlays() {
-  const {
-    toastMessage,
-    hideToast,
-    apiLoadError,
-  } = useArchivePageView();
+  const { toastMessage, hideToast } = useArchiveUi();
+  const { apiLoadError } = usePlayerStatus();
 
   return (
     <>
@@ -131,27 +89,15 @@ function StatusOverlays() {
 
 function ArchiveSidebar() {
   const {
-    hasActiveFilters,
-    clearAllFilters,
-    setShowCreateDialog,
-    setShowPlaylistPanel,
-    playlists,
-    setShowLikedSongsPanel,
-    likedCount,
-    setShowRecentlyPlayedPanel,
-    recentCount,
-    debouncedSearch,
-    setDebouncedSearch,
-    selectedArtist,
-    setSelectedArtist,
-    allArtists,
-    availableYears,
-    toggleYear,
-    selectedYears,
-    filteredStreams,
-    setSelectedStreamId,
-    selectedStreamId,
-  } = useArchivePageView();
+    hasActiveFilters, clearAllFilters, debouncedSearch, setDebouncedSearch,
+    selectedArtist, setSelectedArtist, toggleYear, selectedYears,
+    filteredStreams, setSelectedStreamId, selectedStreamId,
+  } = useArchiveFilters();
+  const { setShowCreateDialog, setShowPlaylistPanel, setShowLikedSongsPanel, setShowRecentlyPlayedPanel } = useArchiveUi();
+  const { allArtists, availableYears } = useArchiveData();
+  const { playlists } = usePlaylist();
+  const { likedCount } = useLikedSongs();
+  const { recentCount } = useRecentlyPlayed();
 
   return (
     <>
@@ -308,10 +254,8 @@ function ArchiveSidebar() {
 
 
 function MobileTopBar() {
-  const {
-    streamerData,
-    slug,
-  } = useArchivePageView();
+  const streamerData = useStreamer();
+  const slug = streamerData.slug;
 
   return (
     <>
@@ -354,7 +298,7 @@ function MobileTopBar() {
 
 
 function MainContent() {
-  const { scrollContainerRef, mobileTab } = useArchivePageView();
+  const { scrollContainerRef, mobileTab } = useArchiveUi();
 
   return (
       <main className="flex-1 lg:m-3 lg:rounded-3xl overflow-hidden relative shadow-2xl shadow-indigo-100/50 bg-white/40 backdrop-blur-md border border-white/60 flex flex-col" style={{ background: 'var(--bg-surface-glass)', backdropFilter: 'blur(12px)', WebkitBackdropFilter: 'blur(12px)', border: '1px solid var(--border-glass)', borderRadius: 'var(--radius-3xl)' }}>
@@ -386,10 +330,8 @@ function MainContent() {
 
 
 function MobileHero() {
-  const {
-    streamerData,
-    flattenedSongs,
-  } = useArchivePageView();
+  const streamerData = useStreamer();
+  const { flattenedSongs } = useArchiveFilters();
 
   return (
     <>
@@ -512,10 +454,8 @@ function MobileHero() {
 
 
 function DesktopHero() {
-  const {
-    streamerData,
-    flattenedSongs,
-  } = useArchivePageView();
+  const streamerData = useStreamer();
+  const { flattenedSongs } = useArchiveFilters();
 
   return (
     <>
@@ -769,18 +709,12 @@ function DesktopHero() {
 
 
 function MobileHomeControls() {
-  const {
-    handlePlayAll,
-    toggleShuffle,
-    shuffleOn,
-    streamerData,
-    viewMode,
-    setViewMode,
-    clearYears,
-    selectedYears,
-    availableYears,
-    toggleYear,
-  } = useArchivePageView();
+  const { handlePlayAll, clearYears, selectedYears, toggleYear } = useArchiveFilters();
+  const { viewMode, setViewMode } = useArchiveUi();
+  const { availableYears } = useArchiveData();
+  const streamerData = useStreamer();
+  const { shuffleOn } = useTransport();
+  const { toggleShuffle } = usePlayerActions();
 
   return (
     <>
@@ -952,16 +886,10 @@ function MobileHomeControls() {
 
 
 function DesktopActionBar() {
-  const {
-    handlePlayAll,
-    streamerData,
-    viewMode,
-    setViewMode,
-    clearYears,
-    selectedYears,
-    availableYears,
-    toggleYear,
-  } = useArchivePageView();
+  const { handlePlayAll, clearYears, selectedYears, toggleYear } = useArchiveFilters();
+  const { viewMode, setViewMode } = useArchiveUi();
+  const { availableYears } = useArchiveData();
+  const streamerData = useStreamer();
 
   return (
     <>
@@ -1155,15 +1083,9 @@ function CatalogStatus({ loadState, retryLoad }: { loadState: ArchiveLoadState; 
 
 
 function SongCatalog() {
-  const {
-    flattenedSongs,
-    groupedSongs,
-    loadState,
-    retryLoad,
-    viewMode,
-    mobileTab,
-    scrollContainerRef,
-  } = useArchivePageView();
+  const { flattenedSongs, groupedSongs } = useArchiveFilters();
+  const { loadState, retryLoad } = useArchiveData();
+  const { viewMode, mobileTab, scrollContainerRef } = useArchiveUi();
 
   const isTimelineActive = viewMode === 'timeline' && mobileTab === 'home';
   const isGroupedActive = viewMode === 'grouped' && mobileTab === 'home';
@@ -1219,20 +1141,13 @@ function TimelineSongList({
   virtualizer: Virtualizer<HTMLDivElement, Element>;
   listRef: RefObject<HTMLDivElement | null>;
 }) {
-  const {
-    flattenedSongs,
-    songs,
-    hasActiveFilters,
-    clearAllFilters,
-    currentTrackId,
-    unavailableVideoIds,
-    isLiked,
-    toggleLike,
-    handlePlayFromFlattened,
-    slug,
-    handleAddToQueue,
-    handleAddToPlaylistSuccess,
-  } = useArchivePageView();
+  const { flattenedSongs, hasActiveFilters, clearAllFilters, handlePlayFromFlattened } = useArchiveFilters();
+  const { songs } = useArchiveData();
+  const { handleAddToQueue, handleAddToPlaylistSuccess, toggleLike } = useArchiveUi();
+  const { unavailableVideoIds } = usePlayerStatus();
+  const currentTrackId = useCurrentTrack()?.performanceId ?? null;
+  const { isLiked } = useLikedSongs();
+  const { slug } = useStreamer();
 
   return (
     <>
@@ -1356,21 +1271,12 @@ function GroupedSongList({
   virtualizer: Virtualizer<HTMLDivElement, Element>;
   listRef: RefObject<HTMLDivElement | null>;
 }) {
-  const {
-    groupedSongs,
-    songs,
-    hasActiveFilters,
-    clearAllFilters,
-    unavailableVideoIds,
-    isLiked,
-    toggleLike,
-    handlePlayFromGrouped,
-    slug,
-    handleAddToQueue,
-    handleAddToPlaylistSuccess,
-    expandedSongs,
-    toggleSongExpansion,
-  } = useArchivePageView();
+  const { groupedSongs, hasActiveFilters, clearAllFilters, handlePlayFromGrouped } = useArchiveFilters();
+  const { songs } = useArchiveData();
+  const { handleAddToQueue, handleAddToPlaylistSuccess, toggleLike, expandedSongs, toggleSongExpansion } = useArchiveUi();
+  const { unavailableVideoIds } = usePlayerStatus();
+  const { isLiked } = useLikedSongs();
+  const { slug } = useStreamer();
 
   return (
     <div className="mt-2">
@@ -1443,20 +1349,12 @@ function GroupedSongList({
 
 
 function MobileSearchTab() {
-  const {
-    mobileTab,
-    debouncedSearch,
-    setDebouncedSearch,
-    selectedArtist,
-    setSelectedArtist,
-    allArtists,
-    flattenedSongs,
-    scrollContainerRef,
-    currentTrackId,
-    unavailableVideoIds,
-    handlePlayFromFlattened,
-    slug,
-  } = useArchivePageView();
+  const { debouncedSearch, setDebouncedSearch, selectedArtist, setSelectedArtist, flattenedSongs, handlePlayFromFlattened } = useArchiveFilters();
+  const { mobileTab, scrollContainerRef } = useArchiveUi();
+  const { allArtists } = useArchiveData();
+  const { unavailableVideoIds } = usePlayerStatus();
+  const currentTrackId = useCurrentTrack()?.performanceId ?? null;
+  const { slug } = useStreamer();
 
   const mobileSearchListRef = useRef<HTMLDivElement>(null);
   const mobileSearchVirtualizer = useVirtualizer({
@@ -1579,16 +1477,10 @@ function MobileSearchTab() {
 
 
 function MobileLibraryTab() {
-  const {
-    mobileTab,
-    setShowLikedSongsPanel,
-    likedCount,
-    setShowRecentlyPlayedPanel,
-    recentCount,
-    setShowCreateDialog,
-    playlists,
-    setShowPlaylistPanel,
-  } = useArchivePageView();
+  const { mobileTab, setShowLikedSongsPanel, setShowRecentlyPlayedPanel, setShowCreateDialog, setShowPlaylistPanel } = useArchiveUi();
+  const { likedCount } = useLikedSongs();
+  const { recentCount } = useRecentlyPlayed();
+  const { playlists } = usePlaylist();
 
   return (
     <>
@@ -1708,16 +1600,9 @@ function MobileLibraryTab() {
 
 
 function MobileStreamsTab() {
-  const {
-    mobileTab,
-    availableYears,
-    toggleYear,
-    selectedYears,
-    clearYears,
-    setSelectedStreamId,
-    setMobileTab,
-    filteredStreams,
-  } = useArchivePageView();
+  const { toggleYear, selectedYears, clearYears, setSelectedStreamId, filteredStreams } = useArchiveFilters();
+  const { mobileTab, setMobileTab } = useArchiveUi();
+  const { availableYears } = useArchiveData();
 
   return (
     <>
@@ -1811,10 +1696,7 @@ function MobileStreamsTab() {
 
 
 function MobileBottomNavigation() {
-  const {
-    mobileTab,
-    setMobileTab,
-  } = useArchivePageView();
+  const { mobileTab, setMobileTab } = useArchiveUi();
 
   return (
     <>
@@ -1938,17 +1820,12 @@ function MobileBottomNavigation() {
 
 function PlaylistOverlays() {
   const {
-    showPlaylistPanel,
-    setShowPlaylistPanel,
-    songs,
-    setToastMessage,
-    showLikedSongsPanel,
-    setShowLikedSongsPanel,
-    showRecentlyPlayedPanel,
-    setShowRecentlyPlayedPanel,
-    showCreateDialog,
-    setShowCreateDialog,
-  } = useArchivePageView();
+    showPlaylistPanel, setShowPlaylistPanel, setToastMessage,
+    showLikedSongsPanel, setShowLikedSongsPanel,
+    showRecentlyPlayedPanel, setShowRecentlyPlayedPanel,
+    showCreateDialog, setShowCreateDialog,
+  } = useArchiveUi();
+  const { songs } = useArchiveData();
 
   return (
     <>
