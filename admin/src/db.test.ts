@@ -1,6 +1,6 @@
 import {
+  appendStreamPerformances,
   batchUpdateSongs,
-  bulkCreatePerformances,
   bulkUnapproveStream,
   createSongAndPerformance,
   deleteStreamCascade,
@@ -8,9 +8,12 @@ import {
   getDashboardStats,
   getSongSimilarityGroups,
   importVodToAdminDb,
+  insertPerformance,
   insertPerformances,
+  insertStream,
   listGlobalWorksPaginated,
   mergeSongs,
+  replaceStreamPerformances,
   SongMergeError,
   updateSong,
   updateStream,
@@ -77,6 +80,7 @@ class FakeStatement {
   }
 
   async run(): Promise<{ meta: { changes: number } }> {
+    this.fakeDb.runStatements.push({ sql: this.sql, params: this.params });
     return { meta: { changes: 1 } };
   }
 }
@@ -90,6 +94,7 @@ interface GlobalWorkFixture {
 class FakeD1Database {
   readonly firstStatements: CapturedStatement[] = [];
   readonly allStatements: CapturedStatement[] = [];
+  readonly runStatements: CapturedStatement[] = [];
   readonly batchStatements: CapturedStatement[] = [];
   batchCallCount = 0;
   mergeGuardValid = true;
@@ -1152,7 +1157,8 @@ async function testUpdateStreamPropagatesCopiesToPerformances(): Promise<void> {
 }
 
 // --- One catalog write pipeline (prepareCatalogWrites) shared by all three
-// pipelines: createSongAndPerformance, bulkCreatePerformances, importVodToAdminDb ---
+// pipelines: createSongAndPerformance, appendStreamPerformances /
+// replaceStreamPerformances, importVodToAdminDb ---
 
 type CatalogStatementKind =
   | 'delete-songs'
@@ -1185,20 +1191,19 @@ function collectCatalogWriteSql(
 
 async function testCreateSongAndPerformanceUsesSharedCatalogPipeline(): Promise<void> {
   const fakeDb = new FakeD1Database(null);
-  const result = await createSongAndPerformance(
-    fakeDb as unknown as D1Database,
-    'alice',
-    'stream-1',
-    '2026-01-01',
-    'Stream One',
-    'video-1',
-    'Song A',
-    'Artist A',
-    10,
-    20,
-    'note-a',
-    'curator@example.com',
-  );
+  const result = await createSongAndPerformance(fakeDb as unknown as D1Database, {
+    streamerId: 'alice',
+    streamId: 'stream-1',
+    date: '2026-01-01',
+    streamTitle: 'Stream One',
+    videoId: 'video-1',
+    title: 'Song A',
+    originalArtist: 'Artist A',
+    timestamp: 10,
+    endTimestamp: 20,
+    note: 'note-a',
+    submittedBy: 'curator@example.com',
+  });
 
   assert(typeof result.songId === 'string' && result.songId.length > 0, 'createSongAndPerformance returns a generated songId');
   assert(typeof result.performanceId === 'string' && result.performanceId.length > 0, 'createSongAndPerformance returns a generated performanceId');
@@ -1213,7 +1218,7 @@ async function testCreateSongAndPerformanceUsesSharedCatalogPipeline(): Promise<
   );
 }
 
-// The three catalog pipelines (createSongAndPerformance, bulkCreatePerformances,
+// The three catalog pipelines (createSongAndPerformance, appendStreamPerformances,
 // importVodToAdminDb) must all write through the exact same songs-insert and
 // performances-insert SQL literal — prepareCatalogWrites' whole reason to exist.
 async function testAllCatalogPipelinesShareTheSameWriteLiterals(): Promise<void> {
@@ -1221,21 +1226,31 @@ async function testAllCatalogPipelinesShareTheSameWriteLiterals(): Promise<void>
   const perfSql = new Set<string>();
 
   const createDb = new FakeD1Database(null);
-  await createSongAndPerformance(
-    createDb as unknown as D1Database,
-    'alice', 'stream-1', '2026-01-01', 'Stream One', 'video-1',
-    'Song A', 'Artist A', 10, 20, '', 'curator@example.com',
-  );
+  await createSongAndPerformance(createDb as unknown as D1Database, {
+    streamerId: 'alice',
+    streamId: 'stream-1',
+    date: '2026-01-01',
+    streamTitle: 'Stream One',
+    videoId: 'video-1',
+    title: 'Song A',
+    originalArtist: 'Artist A',
+    timestamp: 10,
+    endTimestamp: 20,
+    note: '',
+    submittedBy: 'curator@example.com',
+  });
   collectCatalogWriteSql(createDb, songSql, perfSql);
 
   const bulkDb = new FakeD1Database(null);
-  await bulkCreatePerformances(
-    bulkDb as unknown as D1Database,
-    'alice', 'stream-1', '2026-01-01', 'Stream One', 'video-1',
-    [{ songName: 'Song B', artist: 'Artist B', startSeconds: 5, endSeconds: 15 }],
-    'curator@example.com',
-    false,
-  );
+  await appendStreamPerformances(bulkDb as unknown as D1Database, {
+    streamerId: 'alice',
+    streamId: 'stream-1',
+    date: '2026-01-01',
+    streamTitle: 'Stream One',
+    videoId: 'video-1',
+    songs: [{ songName: 'Song B', artist: 'Artist B', startSeconds: 5, endSeconds: 15 }],
+    submittedBy: 'curator@example.com',
+  });
   collectCatalogWriteSql(bulkDb, songSql, perfSql);
 
   const vodDb = new FakeD1Database(null);
@@ -1257,18 +1272,41 @@ async function testAllCatalogPipelinesShareTheSameWriteLiterals(): Promise<void>
   assertEqual(perfSql.size, 1, 'every catalog pipeline shares the exact same performances-insert SQL literal');
 }
 
-// bulkCreatePerformances' replace mode must delete the stream's existing rows
-// before the shared catalog pipeline (prepareCatalogWrites) runs — prepareCatalogWrites
-// never calls db.batch itself, so the caller-owned delete statements lead the batch.
-async function testReplacePathRunsDeletesBeforeTheSharedCatalogPipeline(): Promise<void> {
+// appendStreamPerformances is additive only. The whole reason the old `replace: boolean`
+// flag became two named functions (audit W5) is so a caller can never accidentally
+// trigger the destructive delete path — appendStreamPerformances must be structurally
+// incapable of emitting a DELETE, not just default to false.
+async function testAppendStreamPerformancesEmitsNoDeletes(): Promise<void> {
   const fakeDb = new FakeD1Database(null);
-  await bulkCreatePerformances(
-    fakeDb as unknown as D1Database,
-    'alice', 'stream-1', '2026-01-01', 'Stream One', 'video-1',
-    [{ songName: 'Song R', artist: 'Artist R', startSeconds: 1, endSeconds: 2 }],
-    'curator@example.com',
-    true,
-  );
+  const result = await appendStreamPerformances(fakeDb as unknown as D1Database, {
+    streamerId: 'alice',
+    streamId: 'stream-1',
+    date: '2026-01-01',
+    streamTitle: 'Stream One',
+    videoId: 'video-1',
+    songs: [{ songName: 'Song X', artist: 'Artist X', startSeconds: 1, endSeconds: 2 }],
+    submittedBy: 'curator@example.com',
+  });
+
+  assertEqual(result.created, 1, 'appendStreamPerformances reports the created count');
+  const deletes = fakeDb.batchStatements.filter((statement) => /DELETE\s+FROM/i.test(statement.sql));
+  assertEqual(deletes.length, 0, 'appendStreamPerformances must never emit a DELETE statement');
+}
+
+// replaceStreamPerformances' delete statements must lead the shared catalog pipeline
+// (prepareCatalogWrites) — prepareCatalogWrites never calls db.batch itself, so the
+// caller-owned delete statements lead the batch.
+async function testReplaceStreamPerformancesRunsDeletesBeforeTheSharedCatalogPipeline(): Promise<void> {
+  const fakeDb = new FakeD1Database(null);
+  await replaceStreamPerformances(fakeDb as unknown as D1Database, {
+    streamerId: 'alice',
+    streamId: 'stream-1',
+    date: '2026-01-01',
+    streamTitle: 'Stream One',
+    videoId: 'video-1',
+    songs: [{ songName: 'Song R', artist: 'Artist R', startSeconds: 1, endSeconds: 2 }],
+    submittedBy: 'curator@example.com',
+  });
 
   const kinds = fakeDb.batchStatements
     .map(catalogStatementKind)
@@ -1276,8 +1314,65 @@ async function testReplacePathRunsDeletesBeforeTheSharedCatalogPipeline(): Promi
   assertEqual(
     kinds.join(','),
     'delete-songs,delete-performances,work,song,link,performance',
-    'replace mode deletes existing rows before the shared catalog pipeline writes new ones',
+    'replaceStreamPerformances deletes existing rows before the shared catalog pipeline writes new ones',
   );
+}
+
+// --- Object parameters close the positional-argument swap hole (audit W5) ---
+//
+// The old positional insertPerformance/insertStream/createSongAndPerformance argument
+// lists placed two same-typed strings (date, streamTitle/title) in adjacent slots with
+// no compiler check that a caller passed them in the right order. Object params close
+// that hole at compile time: a value only satisfies the parameter type under its own
+// property name, so there is no positional slot left to transpose by accident — every
+// call site in this repo had to move to the object form for `npm run check`'s
+// typecheck to pass (that is the compile-time proof; it cannot be expressed as a
+// runtime assertion). These tests prove the runtime half of the contract: naming the
+// fields correctly must route each value into its own SQL bind position, not a
+// neighbor's.
+
+async function testInsertPerformanceRoutesFieldsToTheirOwnColumns(): Promise<void> {
+  const fakeDb = new FakeD1Database(null);
+  await insertPerformance(fakeDb as unknown as D1Database, {
+    streamerId: 'alice',
+    id: 'perf-swap-check',
+    songId: 'song-swap-check',
+    streamId: 'stream-swap-check',
+    date: '2026-04-04',
+    streamTitle: 'Distinct Stream Title',
+    videoId: 'video-swap-check',
+    timestamp: 42,
+    endTimestamp: 99,
+    note: 'swap-check',
+    submittedBy: 'curator@example.com',
+  });
+
+  assertEqual(fakeDb.runStatements.length, 1, 'insertPerformance issues exactly one prepared statement');
+  const insert = fakeDb.runStatements[0];
+  assert(/INSERT\s+INTO\s+performances/i.test(insert.sql), 'insertPerformance emits a performances insert');
+  assertEqual(insert.params[PERF_DATE], '2026-04-04', 'the date field lands in the date column, not swapped with streamTitle');
+  assertEqual(insert.params[PERF_TITLE], 'Distinct Stream Title', 'the streamTitle field lands in the stream_title column, not swapped with date');
+}
+
+async function testInsertStreamRoutesFieldsToTheirOwnColumns(): Promise<void> {
+  const fakeDb = new FakeD1Database(null);
+  await insertStream(fakeDb as unknown as D1Database, {
+    streamerId: 'alice',
+    id: 'stream-swap-check',
+    title: 'Distinct Stream Title',
+    date: '2026-05-05',
+    videoId: 'video-swap-check',
+    youtubeUrl: 'https://www.youtube.com/watch?v=video-swap-check',
+    credit: '{}',
+    submittedBy: 'curator@example.com',
+  });
+
+  assertEqual(fakeDb.runStatements.length, 1, 'insertStream issues exactly one prepared statement');
+  const insert = fakeDb.runStatements[0];
+  assert(/INSERT\s+INTO\s+streams/i.test(insert.sql), 'insertStream emits a streams insert');
+  // streams columns, in bind order: 0 id, 1 streamer_id, 2 title, 3 date, 4 video_id, ...
+  assertEqual(insert.params[2], 'Distinct Stream Title', 'the title field lands in the title column, not swapped with date');
+  assertEqual(insert.params[3], '2026-05-05', 'the date field lands in the date column, not swapped with title');
 }
 
 async function main(): Promise<void> {
@@ -1303,7 +1398,10 @@ async function main(): Promise<void> {
   await testSharedSongsSurviveStreamMutations();
   await testCreateSongAndPerformanceUsesSharedCatalogPipeline();
   await testAllCatalogPipelinesShareTheSameWriteLiterals();
-  await testReplacePathRunsDeletesBeforeTheSharedCatalogPipeline();
+  await testAppendStreamPerformancesEmitsNoDeletes();
+  await testReplaceStreamPerformancesRunsDeletesBeforeTheSharedCatalogPipeline();
+  await testInsertPerformanceRoutesFieldsToTheirOwnColumns();
+  await testInsertStreamRoutesFieldsToTheirOwnColumns();
   console.log('✓ song imports reuse exact entities and merges preserve every performance');
 }
 
