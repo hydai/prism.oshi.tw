@@ -19,7 +19,7 @@ npx --yes --package react-doctor@0.9.12 -- react-doctor . --scope changed --base
 
 No environment variables required. All config lives in `data/registry.json` and CSS variables.
 
-Data-pipeline & ops scripts run via `npm run` or slash commands — e.g. `sync:registry`, `sync:data`, `sync:status`, `inbox:status`, `fetch:channel-info` (see Deployment). Unit tests run via `npm run test:*` (parse, archive, playlist-storage, youtube-iframe); CI (`.github/workflows/ci.yml`) runs them on push.
+Data-pipeline & ops scripts run via `npm run` or slash commands — e.g. `sync:registry`, `sync:data`, `sync:status`, `inbox:status`, `fetch:channel-info` (see Deployment). `npm test` runs every frontend unit suite (`lib/**`, `app/**` — Node test runner + tsx; new `*.test.ts(x)` files are auto-discovered, no wiring needed) plus `npm run test:youtube-iframe-types` for the iframe type-contract check; CI (`.github/workflows/ci.yml`) runs them on push.
 
 ## Tech Stack
 
@@ -96,7 +96,7 @@ Streamers are managed through the Nova admin backend, **not** by hand-editing fi
 
 Run before every commit and again before requesting review:
 
-1. `npm run lint` + the `npm run test:*` suites for what you touched (`.github/workflows/ci.yml` lists them); `npm run check` in `admin/` and `admin/ui/` when those changed.
+1. `npm run lint` + `npm test` (frontend suites); `npm run check` in `admin/` and `admin/ui/` when those changed.
 2. **React Doctor** — `.github/workflows/react-doctor.yml` runs `millionco/react-doctor` v0.9.12 with `scope: full` + `blocking: warning` on every PR to `master` and every `master` push. **Any warning fails the check; `master` baseline is 0 warnings.**
    - Dev loop: the `--scope changed --base master` command above (only new issues vs. `master`). To reproduce the CI report exactly: `--scope full --verbose`.
    - Findings are hypotheses: read the code at `file:line` (same npx prefix + `react-doctor why <file:line>` explains the rule) and fix the root cause — refactor, don't reach for config or suppressions.

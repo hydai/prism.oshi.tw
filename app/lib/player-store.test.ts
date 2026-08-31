@@ -154,7 +154,9 @@ async function startPlaying(h: Harness, current: Track, following: Track[] = [])
 // tsx transpiles this project's tests to CJS (no top-level `"type": "module"`
 // in package.json), which does not support top-level await — so, like
 // archive-loader.test.ts and youtube-iframe.test.ts, every block below runs
-// inside one async function instead of directly at module scope.
+// inside one async function instead of directly at module scope. The catch
+// below calls process.exit (not exitCode) so a rejection also hard-fails the
+// file under node --test.
 async function run() {
 
 // ---------------------------------------------------------------------------
@@ -703,5 +705,5 @@ console.log('✓ createPlayerStore behaves like the PlayerContext it replaces');
 
 run().catch((error) => {
   console.error(error);
-  process.exitCode = 1;
+  process.exit(1);
 });
