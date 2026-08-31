@@ -3,6 +3,7 @@
 import { Clock, Play, ListPlus, Trash2 } from 'lucide-react';
 import { useRecentlyPlayed } from '../contexts/RecentlyPlayedContext';
 import { usePlayerActions } from '../contexts/PlayerContext';
+import { formatRelativeTime } from '../lib/format';
 import AlbumArt from './AlbumArt';
 import BottomSheet from './BottomSheet';
 
@@ -10,18 +11,6 @@ interface RecentlyPlayedPanelProps {
   show: boolean;
   onClose: () => void;
   onToast?: (message: string) => void;
-}
-
-function formatRelativeTime(playedAt: number): string {
-  const diff = Date.now() - playedAt;
-  const minutes = Math.floor(diff / 60000);
-  if (minutes < 1) return '剛剛';
-  if (minutes < 60) return `${minutes} 分鐘前`;
-  const hours = Math.floor(minutes / 60);
-  if (hours < 24) return `${hours} 小時前`;
-  const days = Math.floor(hours / 24);
-  if (days < 7) return `${days} 天前`;
-  return `${Math.floor(days / 7)} 週前`;
 }
 
 export default function RecentlyPlayedPanel({ show, onClose, onToast }: RecentlyPlayedPanelProps) {
