@@ -6,7 +6,6 @@ import Link from 'next/link';
 import {
   Search,
   Shuffle,
-  Sparkles,
   ListMusic,
   Clock,
   Heart,
@@ -34,6 +33,7 @@ import CatalogEmptyState from '../components/CatalogEmptyState';
 import SocialLinkRow from '../components/SocialLinkRow';
 import YearChips from '../components/YearChips';
 import PlayAllIconButton from '../components/PlayAllIconButton';
+import VerifiedBadge from '../components/VerifiedBadge';
 import { useArchiveData } from './archive-data-context';
 import { useArchiveFilters } from './archive-filters-context';
 import { useArchiveUi } from './archive-ui-context';
@@ -367,23 +367,8 @@ function MobileHero() {
               </div>
             </div>
 
-            {/* Verified Badge: sparkles icon + "Verified Artist" */}
-            <div
-              className="flex items-center gap-1.5"
-              style={{
-                background: 'var(--bg-accent-pink)',
-                borderRadius: 'var(--radius-pill)',
-                padding: '4px 12px 4px 8px',
-                color: 'var(--accent-pink)',
-                fontSize: 'var(--font-size-xs)',
-                fontWeight: 700,
-                letterSpacing: '0.05em',
-                textTransform: 'uppercase',
-              }}
-            >
-              <Sparkles style={{ width: '12px', height: '12px' }} />
-              Verified Artist
-            </div>
+            {/* Verified Badge */}
+            <VerifiedBadge />
 
             {/* Streamer Name: fontSize 36, fontWeight 900, letterSpacing -0.5 */}
             <h1
@@ -494,24 +479,7 @@ function DesktopHero() {
               }}
             >
               {/* VerifiedBadge Component */}
-              <div
-                className="flex items-center gap-1.5 w-fit"
-                style={{
-                  background: 'var(--bg-accent-blue-muted)',
-                  color: 'var(--accent-blue)',
-                  borderRadius: 'var(--radius-pill)',
-                  padding: '4px 12px 4px 8px',
-                  fontSize: 'var(--font-size-xs)',
-                  fontWeight: 700,
-                  letterSpacing: '0.05em',
-                  textTransform: 'uppercase',
-                }}
-              >
-                <svg width="12" height="12" viewBox="0 0 12 12" fill="none" xmlns="http://www.w3.org/2000/svg">
-                  <path d="M6 0L7.545 4.455L12 6L7.545 7.545L6 12L4.455 7.545L0 6L4.455 4.455L6 0Z" fill="currentColor" />
-                </svg>
-                認證藝人
-              </div>
+              <VerifiedBadge />
 
               {/* Streamer Name */}
               <h1
