@@ -97,6 +97,10 @@ const config: Config = {
         "icon-lg": "var(--icon-lg)",
         "icon-xl": "var(--icon-xl)",
       },
+      backgroundImage: {
+        "accent-gradient": "linear-gradient(135deg, var(--accent-pink-light), var(--accent-blue-light))",
+        "accent-gradient-strong": "linear-gradient(135deg, var(--accent-pink), var(--accent-blue))",
+      },
     },
   },
   plugins: [],

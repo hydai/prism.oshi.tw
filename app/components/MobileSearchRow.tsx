@@ -34,9 +34,8 @@ function MobileSearchRowInner({ song, isCurrentlyPlaying, isUnavailable, onPlay,
           }
         }}
         disabled={isUnavailable}
-        className={`flex-shrink-0 w-10 h-10 flex items-center justify-center rounded-full ${isUnavailable ? 'opacity-40 cursor-not-allowed' : ''}`}
+        className={`flex-shrink-0 w-10 h-10 flex items-center justify-center rounded-full bg-accent-gradient ${isUnavailable ? 'opacity-40 cursor-not-allowed' : ''}`}
         style={{
-          background: 'linear-gradient(135deg, var(--accent-pink-light), var(--accent-blue-light))',
           color: 'white',
         }}
       >

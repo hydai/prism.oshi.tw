@@ -262,7 +262,7 @@ export default function QueuePanel() {
       onClose={() => setShowQueue(false)}
       title={`播放佇列 · ${queue.length} 首`}
       titleIcon={
-        <div className="w-8 h-8 rounded-full bg-gradient-to-r from-pink-400 to-blue-400 flex items-center justify-center">
+        <div className="w-8 h-8 rounded-full bg-accent-gradient flex items-center justify-center">
           <Music className="w-4 h-4 text-white" />
         </div>
       }

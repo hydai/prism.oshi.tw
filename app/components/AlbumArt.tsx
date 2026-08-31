@@ -16,11 +16,11 @@ export default function AlbumArt({ alt, size, borderRadius }: AlbumArtProps) {
 
   return (
     <div
+      className="bg-accent-gradient"
       style={{
         width: `${size}px`,
         height: `${size}px`,
         borderRadius: radius,
-        background: 'linear-gradient(135deg, var(--accent-pink-light), var(--accent-blue-light))',
         display: 'flex',
         alignItems: 'center',
         justifyContent: 'center',

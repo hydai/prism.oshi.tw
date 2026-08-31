@@ -6,12 +6,11 @@ export default function PlayAllIconButton({ onClick, testId }: { onClick: () => 
   return (
     <button
       data-testid={testId}
-      className="flex items-center justify-center flex-shrink-0 text-white transition-[filter,transform] hover:scale-105 hover:brightness-110"
+      className="flex items-center justify-center flex-shrink-0 text-white transition-[filter,transform] hover:scale-105 hover:brightness-110 bg-accent-gradient"
       style={{
         width: '48px',
         height: '48px',
         borderRadius: 'var(--radius-circle)',
-        background: 'linear-gradient(135deg, var(--accent-pink-light), var(--accent-blue-light))',
         boxShadow: '0 4px 16px rgba(244, 114, 182, 0.35)',
       }}
       title="播放全部"

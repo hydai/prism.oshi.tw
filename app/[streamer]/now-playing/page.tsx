@@ -79,12 +79,11 @@ export default function NowPlayingPage() {
       >
         <div className="text-center" style={{ padding: '32px' }}>
           <div
-            className="mx-auto mb-6 flex items-center justify-center"
+            className="mx-auto mb-6 flex items-center justify-center bg-accent-gradient"
             style={{
               width: '120px',
               height: '120px',
               borderRadius: '24px',
-              background: 'linear-gradient(135deg, var(--accent-pink-light), var(--accent-blue-light))',
             }}
           >
             <Music2 style={{ width: '48px', height: '48px', color: 'white' }} />

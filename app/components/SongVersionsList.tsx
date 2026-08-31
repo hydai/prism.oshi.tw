@@ -66,12 +66,12 @@ export default function SongVersionsList({
               className={`w-8 h-8 rounded-full text-white flex items-center justify-center opacity-0 group-hover/version:opacity-100 transition-[opacity,transform] flex-shrink-0 ${
                 unavailableVideoIds.has(performance.videoId)
                   ? 'cursor-not-allowed'
-                  : 'hover:scale-110'
+                  : 'hover:scale-110 bg-accent-gradient'
               }`}
               style={{
                 background: unavailableVideoIds.has(performance.videoId)
                   ? 'var(--text-muted)'
-                  : 'linear-gradient(135deg, var(--accent-pink-light), var(--accent-blue-light))',
+                  : undefined,
                 boxShadow: '0 2px 8px rgba(244, 114, 182, 0.3)',
               }}
             >
@@ -90,11 +90,10 @@ export default function SongVersionsList({
               }}
               disabled={unavailableVideoIds.has(performance.videoId)}
               data-testid="mobile-play-button"
-              className={`lg:hidden flex-shrink-0 w-11 h-11 flex items-center justify-center rounded-full ${
+              className={`lg:hidden flex-shrink-0 w-11 h-11 flex items-center justify-center rounded-full bg-accent-gradient ${
                 unavailableVideoIds.has(performance.videoId) ? 'cursor-not-allowed opacity-40' : ''
               }`}
               style={{
-                background: 'linear-gradient(135deg, var(--accent-pink-light), var(--accent-blue-light))',
                 color: 'white',
               }}
             >

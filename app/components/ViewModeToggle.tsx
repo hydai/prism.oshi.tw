@@ -52,7 +52,7 @@ export default function ViewModeToggle({
               fullWidth ? 'flex-1 justify-center' : ''
             } ${
               isActive
-                ? 'bg-gradient-to-r from-accent-pink-light to-accent-blue-light text-white shadow-md'
+                ? 'bg-accent-gradient text-white shadow-md'
                 : ''
             }`}
             style={{
