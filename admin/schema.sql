@@ -29,12 +29,19 @@ CREATE TABLE IF NOT EXISTS work_aliases (
 );
 
 -- Songs staging table
+-- NOTE (fresh-vs-migrated divergence, like migration 0001's updated_at note):
+-- tags carries a CHECK(json_valid(tags)) here for fresh databases, matching
+-- works.tags above. SQLite cannot ALTER TABLE ADD CHECK, and rebuilding the
+-- production songs table to retrofit one is not worth the risk now that
+-- parse.ts validates every write path (parseCreateSongBody/parseUpdateSongBody
+-- reject non-array/non-string tags before they ever reach D1) — so a migrated
+-- database relies on that write-time validation instead of a DB-level CHECK.
 CREATE TABLE IF NOT EXISTS songs (
   id TEXT PRIMARY KEY,
   streamer_id TEXT NOT NULL DEFAULT 'mizuki',
   title TEXT NOT NULL,
   original_artist TEXT NOT NULL,
-  tags TEXT DEFAULT '[]',  -- JSON array of strings
+  tags TEXT DEFAULT '[]' CHECK(json_valid(tags)),  -- JSON array of strings
   status TEXT DEFAULT 'pending' CHECK(status IN ('pending', 'approved', 'rejected', 'excluded', 'extracted')),
   submitted_by TEXT,
   reviewed_by TEXT,

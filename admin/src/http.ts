@@ -37,3 +37,24 @@ export function getRouteParam(
   }
   return value;
 }
+
+/**
+ * Parse the request body as JSON, translating a syntax failure into the
+ * 400 INVALID_JSON contract. Called INSIDE route handlers — after requireAuth,
+ * CSRF, and any requireCurator — so authorization outcomes (401/403) are never
+ * preempted by body syntax, and an internal JSON.parse SyntaxError (e.g. a row
+ * mapper decoding malformed persisted data) still reaches app.onError as a
+ * logged 500 instead of masquerading as a client error.
+ */
+export async function readJsonBody<T>(c: { req: { json: <U>() => Promise<U> } }): Promise<T> {
+  try {
+    return await c.req.json<T>();
+  } catch {
+    throw new HTTPException(400, {
+      res: new Response(JSON.stringify({ error: 'Invalid JSON body', code: 'INVALID_JSON' }), {
+        status: 400,
+        headers: { 'Content-Type': 'application/json' },
+      }),
+    });
+  }
+}

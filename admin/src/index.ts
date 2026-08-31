@@ -1,6 +1,7 @@
 import { Hono, type Context } from 'hono';
+import { HTTPException } from 'hono/http-exception';
 import { requireApiRequestAuthenticity, requireAuth, requireCurator } from './auth';
-import { getRouteParam, getStreamerId } from './http';
+import { getRouteParam, getStreamerId, readJsonBody } from './http';
 import { canHardDeleteStream, isValidTransition, shouldImportVod, VALID_STATUSES } from './status';
 import {
   listSongsPaginated,
@@ -36,6 +37,8 @@ import {
   listPerformancesForStream,
   createSongAndPerformance,
   updatePerformanceTimestamps,
+  getPerformanceTimestamps,
+  fillPerformanceDuration,
   updatePerformanceSongDetails,
   deletePerformanceAndOrphanSong,
   listStreamsWithPendingCounts,
@@ -106,6 +109,12 @@ import {
   parseCreateStreamBody,
   parseUpdateStreamBody,
   parseImportStreamsBody,
+  parseStatusUpdateBody,
+  parseExtractImportBody,
+  parsePasteImportBody,
+  parseHarmonizeApplyBody,
+  parsePipelineExtractBody,
+  parseCreateStampPerformanceBody,
   parseNovaSubmissionUpdateBody,
   type NovaSubmissionUpdateFields,
   parseNovaVodUpdateBody,
@@ -137,7 +146,6 @@ import {
 import type {
   AuthUser,
   StatusUpdateBody,
-  CreateStampPerformanceBody,
   FetchDurationResponse,
   PasteImportBody,
   PasteImportResponse,
@@ -381,6 +389,23 @@ function notifyDiscordFeedback(
 
 const app = new Hono<{ Bindings: Bindings; Variables: Variables }>();
 
+// Replaces Hono's default plain-text 500 with the { error, code } JSON
+// contract ui/src/api/client.ts already has to tolerate (client.ts:132-153
+// falls back to a plain-text error only because nothing better exists yet).
+// An HTTPException (getRouteParam/getStreamerId in http.ts) already carries
+// its own correct status and JSON body, so it's returned as-is; anything
+// else is an unexpected failure — the real error is logged server-side, but
+// only a generic message and code ever reach the client (no message/stack
+// leakage). vod-export routes never reach this: they normalize their own
+// errors in a try/catch before returning (vodExportErrorResponse).
+app.onError((err, c) => {
+  if (err instanceof HTTPException) {
+    return err.getResponse();
+  }
+  console.error('Unhandled error in admin API', err);
+  return c.json({ error: 'Internal server error', code: 'INTERNAL_ERROR' }, 500);
+});
+
 // All routes require authentication, and state-changing requests must carry an
 // app-issued authenticity header (CSRF defense). See admin/shared/csrf.ts.
 app.use('/api/*', requireAuth);
@@ -466,7 +491,7 @@ app.get('/api/work-matches', requireCurator, async (c) => {
 });
 
 app.post('/api/work-matches/review', requireCurator, async (c) => {
-  const body = parseWorkMatchReviewBody(await c.req.json<unknown>());
+  const body = parseWorkMatchReviewBody(await readJsonBody<unknown>(c));
   if (!body) return c.json({ error: 'Invalid global work review request' }, 400);
 
   try {
@@ -482,7 +507,7 @@ app.post('/api/work-matches/review', requireCurator, async (c) => {
 });
 
 app.post('/api/work-matches/merge', requireCurator, async (c) => {
-  const body = parseWorkMatchMergeBody(await c.req.json<unknown>());
+  const body = parseWorkMatchMergeBody(await readJsonBody<unknown>(c));
   if (!body) return c.json({ error: 'Invalid global work merge request' }, 400);
 
   try {
@@ -529,7 +554,7 @@ app.get('/api/songs/:id', async (c) => {
 
 app.post('/api/songs', async (c) => {
   const streamerId = getStreamerId(c);
-  const parsedBody = parseCreateSongBody(await c.req.json<unknown>());
+  const parsedBody = parseCreateSongBody(await readJsonBody<unknown>(c));
   if ('error' in parsedBody) return c.json({ error: parsedBody.error }, 400);
   const body = parsedBody;
   const inline = body.performances ?? [];
@@ -581,7 +606,7 @@ app.put('/api/songs/:id', async (c) => {
     }
   }
 
-  const parsedBody = parseUpdateSongBody(await c.req.json<unknown>());
+  const parsedBody = parseUpdateSongBody(await readJsonBody<unknown>(c));
   if ('error' in parsedBody) return c.json({ error: parsedBody.error }, 400);
   const body = parsedBody;
   await updateSong(c.env.DB, id, {
@@ -596,11 +621,8 @@ app.put('/api/songs/:id', async (c) => {
 
 app.patch('/api/songs/:id/status', requireCurator, async (c) => {
   const id = getRouteParam(c, 'id');
-  const body = await c.req.json<StatusUpdateBody>();
-
-  if (!VALID_STATUSES.has(body.status)) {
-    return c.json({ error: `Invalid status: ${body.status}` }, 400);
-  }
+  const body = parseStatusUpdateBody(await readJsonBody<unknown>(c), VALID_STATUSES);
+  if ('error' in body) return c.json({ error: body.error }, 400);
 
   const existing = await getSongById(c.env.DB, id);
   if (!existing) return c.json({ error: 'Song not found' }, 404);
@@ -627,7 +649,7 @@ app.get('/api/performances', async (c) => {
 
 app.post('/api/performances', async (c) => {
   const streamerId = getStreamerId(c);
-  const parsedBody = parseCreatePerformanceBody(await c.req.json<unknown>());
+  const parsedBody = parseCreatePerformanceBody(await readJsonBody<unknown>(c));
   if ('error' in parsedBody) return c.json({ error: parsedBody.error }, 400);
   const body = parsedBody;
 
@@ -660,11 +682,8 @@ app.post('/api/performances', async (c) => {
 
 app.patch('/api/performances/:id/status', requireCurator, async (c) => {
   const id = getRouteParam(c, 'id');
-  const body = await c.req.json<StatusUpdateBody>();
-
-  if (!VALID_STATUSES.has(body.status)) {
-    return c.json({ error: `Invalid status: ${body.status}` }, 400);
-  }
+  const body = parseStatusUpdateBody(await readJsonBody<unknown>(c), VALID_STATUSES);
+  if ('error' in body) return c.json({ error: body.error }, 400);
 
   // Get current status for transition check
   const current = await db_getPerformanceStatus(c.env.DB, id);
@@ -690,7 +709,7 @@ app.get('/api/streams', async (c) => {
 
 app.post('/api/streams', async (c) => {
   const streamerId = getStreamerId(c);
-  const parsedBody = parseCreateStreamBody(await c.req.json<unknown>());
+  const parsedBody = parseCreateStreamBody(await readJsonBody<unknown>(c));
   if ('error' in parsedBody) return c.json({ error: parsedBody.error }, 400);
   const body = parsedBody;
 
@@ -708,16 +727,27 @@ app.post('/api/streams', async (c) => {
     id = generateStreamIdFallback();
   }
 
-  await insertStream(c.env.DB, {
-    streamerId,
-    id,
-    title: body.title,
-    date: body.date,
-    videoId: body.videoId,
-    youtubeUrl: body.youtubeUrl,
-    credit: JSON.stringify(body.credit || {}),
-    submittedBy: user.email,
-  });
+  try {
+    await insertStream(c.env.DB, {
+      streamerId,
+      id,
+      title: body.title,
+      date: body.date,
+      videoId: body.videoId,
+      youtubeUrl: body.youtubeUrl,
+      credit: JSON.stringify(body.credit || {}),
+      submittedBy: user.email,
+    });
+  } catch (err) {
+    // Two concurrent creates can both pass the preflight above; the loser
+    // lands on UNIQUE(streamer_id, video_id) — same 409 contract, never a
+    // generic 500. Matched on the composite key so an unrelated PK collision
+    // still surfaces as the logged internal error it is.
+    if (err instanceof Error && err.message.includes('UNIQUE constraint failed') && err.message.includes('streams.video_id')) {
+      return c.json({ error: 'A stream with this video already exists', code: 'STREAM_EXISTS' }, 409);
+    }
+    throw err;
+  }
 
   return c.json({ id, status: 'pending' }, 201);
 });
@@ -725,11 +755,8 @@ app.post('/api/streams', async (c) => {
 app.patch('/api/streams/:id/status', requireCurator, async (c) => {
   const streamerId = getStreamerId(c);
   const id = getRouteParam(c, 'id');
-  const body = await c.req.json<StatusUpdateBody>();
-
-  if (!VALID_STATUSES.has(body.status)) {
-    return c.json({ error: `Invalid status: ${body.status}` }, 400);
-  }
+  const body = parseStatusUpdateBody(await readJsonBody<unknown>(c), VALID_STATUSES);
+  if ('error' in body) return c.json({ error: body.error }, 400);
 
   const existing = await getStreamById(c.env.DB, id, streamerId);
   if (!existing) return c.json({ error: 'Stream not found' }, 404);
@@ -746,7 +773,7 @@ app.patch('/api/streams/:id/status', requireCurator, async (c) => {
 app.patch('/api/streams/:id', requireCurator, async (c) => {
   const streamerId = getStreamerId(c);
   const id = getRouteParam(c, 'id');
-  const parsedBody = parseUpdateStreamBody(await c.req.json<unknown>());
+  const parsedBody = parseUpdateStreamBody(await readJsonBody<unknown>(c));
   if ('error' in parsedBody) return c.json({ error: parsedBody.error }, 400);
   const body = parsedBody;
 
@@ -774,10 +801,9 @@ app.get('/api/streams/:streamId/performances', async (c) => {
 app.post('/api/streams/:streamId/performances', async (c) => {
   const streamerId = getStreamerId(c);
   const streamId = getRouteParam(c, 'streamId');
-  const body = await c.req.json<CreateStampPerformanceBody>();
-  if (!body.title || !body.originalArtist || body.timestamp === undefined) {
-    return c.json({ error: 'title, originalArtist, and timestamp are required' }, 400);
-  }
+  const parsedBody = parseCreateStampPerformanceBody(await readJsonBody<unknown>(c));
+  if ('error' in parsedBody) return c.json({ error: parsedBody.error }, 400);
+  const body = parsedBody;
 
   const stream = await getStreamById(c.env.DB, streamId, streamerId);
   if (!stream) return c.json({ error: 'Stream not found' }, 404);
@@ -792,8 +818,8 @@ app.post('/api/streams/:streamId/performances', async (c) => {
     title: body.title,
     originalArtist: body.originalArtist,
     timestamp: body.timestamp,
-    endTimestamp: body.endTimestamp ?? null,
-    note: body.note ?? '',
+    endTimestamp: body.endTimestamp,
+    note: body.note,
     submittedBy: user.email,
   });
 
@@ -841,19 +867,41 @@ app.delete('/api/streams/:id', requireCurator, async (c) => {
 
 app.patch('/api/performances/:id/timestamps', requireCurator, async (c) => {
   const id = getRouteParam(c, 'id');
-  const parsedBody = parseUpdateTimestampsBody(await c.req.json<unknown>());
+  const parsedBody = parseUpdateTimestampsBody(await readJsonBody<unknown>(c));
   if ('error' in parsedBody) return c.json({ error: parsedBody.error }, 400);
+
+  // The stamp editor deliberately sends one-sided edits, so the end-after-start
+  // invariant must hold against the STORED counterpart. This pre-read gives the
+  // friendly 404/400 for the common case; the real gate is INSIDE the UPDATE's
+  // WHERE (updatePerformanceTimestamps), which re-merges against whatever is
+  // stored at write time — two overlapping one-sided edits can both pass this
+  // read but only a write leaving a valid range can land.
+  const current = await getPerformanceTimestamps(c.env.DB, id);
+  if (!current) return c.json({ error: 'Performance not found' }, 404);
+  const mergedStart = parsedBody.timestamp ?? current.timestamp;
+  const mergedEnd = parsedBody.endTimestamp !== undefined ? parsedBody.endTimestamp : current.endTimestamp;
+  if (mergedEnd !== null && mergedEnd <= mergedStart) {
+    return c.json({ error: 'endTimestamp must be greater than timestamp (including the stored value for one-sided edits)' }, 400);
+  }
+
   const updated = await updatePerformanceTimestamps(c.env.DB, id, {
     timestamp: parsedBody.timestamp,
     endTimestamp: parsedBody.endTimestamp,
   });
-  if (!updated) return c.json({ error: 'Performance not found' }, 404);
+  if (!updated) {
+    // The guarded UPDATE wrote nothing: either the row vanished, or a
+    // concurrent edit changed the counterpart so this write would have
+    // inverted the range.
+    const still = await getPerformanceTimestamps(c.env.DB, id);
+    if (!still) return c.json({ error: 'Performance not found' }, 404);
+    return c.json({ error: 'endTimestamp must be greater than timestamp (a concurrent edit changed the other bound — reload and retry)' }, 409);
+  }
   return c.json({ ok: true });
 });
 
 app.patch('/api/performances/:id/details', requireCurator, async (c) => {
   const id = getRouteParam(c, 'id');
-  const parsedBody = parseUpdateSongDetailsBody(await c.req.json<unknown>());
+  const parsedBody = parseUpdateSongDetailsBody(await readJsonBody<unknown>(c));
   if ('error' in parsedBody) return c.json({ error: parsedBody.error }, 400);
   const updated = await updatePerformanceSongDetails(c.env.DB, id, {
     title: parsedBody.title,
@@ -900,7 +948,7 @@ app.get('/api/streams/:streamId/detail', async (c) => {
 
 app.patch('/api/performances/:id/note', requireCurator, async (c) => {
   const id = getRouteParam(c, 'id');
-  const parsedBody = parseNoteBody(await c.req.json<unknown>());
+  const parsedBody = parseNoteBody(await readJsonBody<unknown>(c));
   if ('error' in parsedBody) return c.json({ error: parsedBody.error }, 400);
   const updated = await updatePerformanceNote(c.env.DB, id, parsedBody.note);
   if (!updated) return c.json({ error: 'Performance not found' }, 404);
@@ -912,10 +960,9 @@ app.patch('/api/performances/:id/note', requireCurator, async (c) => {
 app.post('/api/streams/:streamId/paste-import', requireCurator, async (c) => {
   const streamerId = getStreamerId(c);
   const streamId = getRouteParam(c, 'streamId');
-  const body = await c.req.json<PasteImportBody>();
-  if (!body.text || !body.text.trim()) {
-    return c.json({ error: 'text is required' }, 400);
-  }
+  const parsedPaste = parsePasteImportBody(await readJsonBody<unknown>(c));
+  if ('error' in parsedPaste) return c.json({ error: parsedPaste.error }, 400);
+  const body = parsedPaste;
 
   const stream = await getStreamById(c.env.DB, streamId, streamerId);
   if (!stream) return c.json({ error: 'Stream not found' }, 404);
@@ -984,8 +1031,17 @@ app.post('/api/performances/:id/fetch-duration', requireCurator, async (c) => {
 
   let endTimestamp: number | null = null;
   if (durationSec && perf.endTimestamp === null) {
-    endTimestamp = perf.timestamp + durationSec;
-    await updatePerformanceTimestamps(c.env.DB, id, { endTimestamp });
+    // The iTunes round-trip is slow, so the row may have changed since the
+    // read above. The database computes the end from the start that is
+    // current at write time and only fills a still-empty end; the response
+    // carries the value that was actually stored, never one computed off
+    // the stale read.
+    endTimestamp = await fillPerformanceDuration(c.env.DB, id, durationSec);
+    if (endTimestamp === null) {
+      const still = await getPerformanceTimestamps(c.env.DB, id);
+      if (!still) return c.json({ error: 'Performance not found' }, 404);
+      return c.json({ error: 'Fetched duration was not saved: an end timestamp was set while it was being fetched — reload and retry' }, 409);
+    }
   }
 
   const resp: FetchDurationResponse = {
@@ -1184,7 +1240,7 @@ app.post('/api/pipeline/discover', requireCurator, async (c) => {
 
 app.post('/api/pipeline/import-streams', requireCurator, async (c) => {
   const streamerId = getStreamerId(c);
-  const parsedBody = parseImportStreamsBody(await c.req.json<unknown>());
+  const parsedBody = parseImportStreamsBody(await readJsonBody<unknown>(c));
   if ('error' in parsedBody) return c.json({ error: parsedBody.error }, 400);
   // A repeated id would put two identical inserts into the batch below and fail
   // the whole request on UNIQUE(streamer_id, video_id) — the preflight only knows
@@ -1270,10 +1326,9 @@ app.post('/api/pipeline/import-streams', requireCurator, async (c) => {
 
 app.post('/api/pipeline/extract', requireCurator, async (c) => {
   const streamerId = getStreamerId(c);
-  const { streamId } = await c.req.json<{ streamId: string }>();
-  if (!streamId) {
-    return c.json({ error: 'streamId is required' }, 400);
-  }
+  const parsedBody = parsePipelineExtractBody(await readJsonBody<unknown>(c));
+  if ('error' in parsedBody) return c.json({ error: parsedBody.error }, 400);
+  const { streamId } = parsedBody;
 
   const stream = await getStreamById(c.env.DB, streamId, streamerId);
   if (!stream) return c.json({ error: 'Stream not found' }, 404);
@@ -1355,10 +1410,9 @@ app.post('/api/pipeline/extract', requireCurator, async (c) => {
 
 app.post('/api/pipeline/extract-import', requireCurator, async (c) => {
   const streamerId = getStreamerId(c);
-  const body = await c.req.json<ExtractImportBody>();
-  if (!body.streamId || !body.songs || body.songs.length === 0) {
-    return c.json({ error: 'streamId and songs are required' }, 400);
-  }
+  const parsedBody = parseExtractImportBody(await readJsonBody<unknown>(c));
+  if ('error' in parsedBody) return c.json({ error: parsedBody.error }, 400);
+  const body = parsedBody;
 
   const stream = await getStreamById(c.env.DB, body.streamId, streamerId);
   if (!stream) return c.json({ error: 'Stream not found' }, 404);
@@ -1434,7 +1488,7 @@ app.get('/api/harmonize/artists', requireCurator, async (c) => {
 });
 
 app.post('/api/harmonize/merge', requireCurator, async (c) => {
-  const body = parseHarmonizeMergeBody(await c.req.json<unknown>());
+  const body = parseHarmonizeMergeBody(await readJsonBody<unknown>(c));
   if (!body) return c.json({ error: 'Invalid Harmonizer merge request' }, 400);
 
   const streamerId = getStreamerId(c);
@@ -1467,10 +1521,8 @@ app.post('/api/harmonize/merge', requireCurator, async (c) => {
 });
 
 app.post('/api/harmonize/apply', requireCurator, async (c) => {
-  const body = await c.req.json<HarmonizeApplyBody>();
-  if (!body.updates || body.updates.length === 0) {
-    return c.json({ error: 'updates array is required' }, 400);
-  }
+  const body = parseHarmonizeApplyBody(await readJsonBody<unknown>(c));
+  if ('error' in body) return c.json({ error: body.error }, 400);
 
   const updated = await batchUpdateSongs(c.env.DB, body.updates, c.get('user').email);
   return c.json({ ok: true, updated });
@@ -1549,7 +1601,7 @@ app.put('/api/nova/submissions/:id', requireCurator, async (c) => {
   const existing = await getSubmissionForUpdate(c.env.NOVA_DB, id);
   if (!existing) return c.json({ error: 'Submission not found' }, 404);
 
-  const parsedBody = parseNovaSubmissionUpdateBody(await c.req.json<unknown>());
+  const parsedBody = parseNovaSubmissionUpdateBody(await readJsonBody<unknown>(c));
   if ('error' in parsedBody) {
     return c.json({ error: parsedBody.error }, 400);
   }
@@ -1617,17 +1669,13 @@ app.put('/api/nova/submissions/:id', requireCurator, async (c) => {
 
 app.patch('/api/nova/submissions/:id/status', requireCurator, async (c) => {
   const id = getRouteParam(c, 'id');
-  const body = await c.req.json<{ status: NovaStatus; reviewer_note?: string }>();
-
-  const validStatuses = new Set<string>(NOVA_STATUSES);
-  if (!validStatuses.has(body.status)) {
-    return c.json({ error: `Invalid status: ${body.status}. Must be 'approved', 'rejected', or 'pending'` }, 400);
-  }
+  const body = parseStatusUpdateBody(await readJsonBody<unknown>(c), NOVA_STATUSES);
+  if ('error' in body) return c.json({ error: body.error }, 400);
 
   const existing = await getSubmissionStatus(c.env.NOVA_DB, id);
   if (!existing) return c.json({ error: 'Submission not found' }, 404);
 
-  await updateSubmissionStatus(c.env.NOVA_DB, id, body.status, body.reviewer_note);
+  await updateSubmissionStatus(c.env.NOVA_DB, id, body.status, body.reviewerNote);
 
   const updated = await getSubmissionById(c.env.NOVA_DB, id);
 
@@ -1717,18 +1765,14 @@ app.get('/api/nova/vods/:id', requireCurator, async (c) => {
 
 app.patch('/api/nova/vods/:id/status', requireCurator, async (c) => {
   const id = getRouteParam(c, 'id');
-  const body = await c.req.json<{ status: NovaStatus; reviewer_note?: string }>();
-
-  const validStatuses = new Set<string>(NOVA_STATUSES);
-  if (!validStatuses.has(body.status)) {
-    return c.json({ error: `Invalid status: ${body.status}. Must be 'approved', 'rejected', or 'pending'` }, 400);
-  }
+  const body = parseStatusUpdateBody(await readJsonBody<unknown>(c), NOVA_STATUSES);
+  if ('error' in body) return c.json({ error: body.error }, 400);
 
   const existing = await getVodStatus(c.env.NOVA_DB, id);
 
   if (!existing) return c.json({ error: 'VOD submission not found' }, 404);
 
-  await updateVodStatus(c.env.NOVA_DB, id, body.status, body.reviewer_note);
+  await updateVodStatus(c.env.NOVA_DB, id, body.status, body.reviewerNote);
 
   // Fetch the full updated row once and reuse it for the import gate, the Discord embed,
   // and the response — avoids a second identical SELECT * on vod_submissions.
@@ -1763,7 +1807,7 @@ app.put('/api/nova/vods/:id', requireCurator, async (c) => {
   const id = getRouteParam(c, 'id');
   if (!(await vodExists(c.env.NOVA_DB, id))) return c.json({ error: 'VOD submission not found' }, 404);
 
-  const parsedBody = parseNovaVodUpdateBody(await c.req.json<unknown>());
+  const parsedBody = parseNovaVodUpdateBody(await readJsonBody<unknown>(c));
   if ('error' in parsedBody) return c.json({ error: parsedBody.error }, 400);
 
   const updatedAny = await updateVodFields(c.env.NOVA_DB, id, parsedBody);
@@ -1805,7 +1849,7 @@ app.get('/api/crystal/tickets/:id', requireCurator, async (c) => {
 
 app.post('/api/crystal/tickets/:id/reply', requireCurator, async (c) => {
   const id = getRouteParam(c, 'id');
-  const parsedBody = parseCrystalReplyBody(await c.req.json<unknown>());
+  const parsedBody = parseCrystalReplyBody(await readJsonBody<unknown>(c));
   if ('error' in parsedBody) return c.json({ error: parsedBody.error }, 400);
 
   if (!(await ticketExists(c.env.CRYSTAL_DB, id))) return c.json({ error: 'Ticket not found' }, 404);
@@ -1819,12 +1863,8 @@ app.post('/api/crystal/tickets/:id/reply', requireCurator, async (c) => {
 
 app.patch('/api/crystal/tickets/:id/status', requireCurator, async (c) => {
   const id = getRouteParam(c, 'id');
-  const body = await c.req.json<{ status: CrystalTicketStatus }>();
-
-  const validStatuses = new Set<string>(CRYSTAL_TICKET_STATUSES);
-  if (!validStatuses.has(body.status)) {
-    return c.json({ error: `Invalid status: ${body.status}` }, 400);
-  }
+  const body = parseStatusUpdateBody(await readJsonBody<unknown>(c), CRYSTAL_TICKET_STATUSES);
+  if ('error' in body) return c.json({ error: body.error }, 400);
 
   if (!(await ticketExists(c.env.CRYSTAL_DB, id))) return c.json({ error: 'Ticket not found' }, 404);
 

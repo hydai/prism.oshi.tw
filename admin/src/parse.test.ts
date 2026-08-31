@@ -12,6 +12,11 @@ import {
   parseUpdateStreamBody,
   parseUpdateTimestampsBody,
   parseCreateStampPerformanceBody,
+  parseStatusUpdateBody,
+  parseExtractImportBody,
+  parsePasteImportBody,
+  parseHarmonizeApplyBody,
+  parsePipelineExtractBody,
 } from './parse';
 
 declare const process: { exitCode?: number };
@@ -318,6 +323,9 @@ function testParseNovaSubmissionUpdateBodyRejectsMalformedShapes(): void {
   assertError(parseNovaSubmissionUpdateBody({ theme_json: '[1,2,3]' }), 'theme_json', 'a JSON array (not an object) in theme_json');
   assertError(parseNovaSubmissionUpdateBody({ theme_json: 5 }), 'theme_json', 'a numeric theme_json');
   assertError(parseNovaSubmissionUpdateBody({ slug: 5 }), 'slug', 'a numeric string field');
+  assertError(parseNovaSubmissionUpdateBody({ slug: 'Bad Slug' }), 'slug', 'a slug that fails isValidStreamerSlug (http.ts and sync-registry would reject it)');
+  assertError(parseNovaSubmissionUpdateBody({ slug: '' }), 'slug', 'an empty slug');
+  assertEqual(assertOk(parseNovaSubmissionUpdateBody({ slug: 'good-slug-2' }), 'a well-formed slug').slug, 'good-slug-2', 'a valid slug carries through');
   assertError(parseNovaSubmissionUpdateBody({ display_name: null }), 'display_name', 'a null string field');
 }
 
@@ -327,11 +335,25 @@ function testParseNovaVodUpdateBodyAcceptsWhatTheUiSends(): void {
   const parsed = assertOk(parseNovaVodUpdateBody({ stream_title: 'New Title', reviewer_note: 'looks good' }), 'a partial update');
   assertEqual(parsed.stream_title, 'New Title', 'stream_title carried through');
   assertOk(parseNovaVodUpdateBody({}), 'an empty object is valid (nova-db.ts owns the "no fields" 400)');
+  assertEqual(assertOk(parseNovaVodUpdateBody({ stream_date: '2026-01-02' }), 'a date-only stream_date').stream_date, '2026-01-02', 'a well-formed date carries through');
+  assertEqual(assertOk(parseNovaVodUpdateBody({ stream_date: '' }), 'the schema\'s empty-date sentinel').stream_date, '', 'and the empty sentinel is still accepted');
 }
 
 function testParseNovaVodUpdateBodyRejectsMalformedShapes(): void {
   assertError(parseNovaVodUpdateBody({ stream_title: 5 }), 'stream_title', 'a numeric stream_title');
   assertError(parseNovaVodUpdateBody({ stream_date: null }), 'stream_date', 'a null stream_date');
+  assertError(parseNovaVodUpdateBody({ stream_date: 'not-a-date' }), 'stream_date', 'a malformed non-empty stream_date (it would become the imported stream ID on approval)');
+  assertError(parseNovaVodUpdateBody({ stream_date: '2026/01/02' }), 'stream_date', 'a slash-separated date');
+}
+
+// --- parsePipelineExtractBody — mirrors the /api/pipeline/extract call ({ streamId }) ---
+
+function testParsePipelineExtractBodyRequiresAStreamId(): void {
+  assertEqual(assertOk(parsePipelineExtractBody({ streamId: 'stream-1' }), 'the extract payload').streamId, 'stream-1', 'streamId carries through');
+  assertError(parsePipelineExtractBody(null), 'object', 'a null body (previously a 500 on destructuring)');
+  assertError(parsePipelineExtractBody({}), 'streamId', 'a missing streamId');
+  assertError(parsePipelineExtractBody({ streamId: 7 }), 'streamId', 'a truthy non-string streamId (would reach the D1 binding)');
+  assertError(parsePipelineExtractBody({ streamId: '  ' }), 'streamId', 'a whitespace-only streamId');
 }
 
 // --- parseCrystalReplyBody — mirrors replyCrystalTicket(id, admin_reply) ---
@@ -372,10 +394,85 @@ function main(): void {
   testParseNovaSubmissionUpdateBodyRejectsMalformedShapes();
   testParseNovaVodUpdateBodyAcceptsWhatTheUiSends();
   testParseNovaVodUpdateBodyRejectsMalformedShapes();
+  testParsePipelineExtractBodyRequiresAStreamId();
   testParseCrystalReplyBodyAcceptsWhatTheUiSends();
   testParseCrystalReplyBodyRejectsMalformedShapes();
+  testParseStatusUpdateBodyCoversEveryStatusRoute();
+  testParseExtractImportBodyGuardsTheReplacePath();
+  testParseCreateStreamBodyEnforcesDateFormat();
+  testParsePasteImportBodyGuardsTheReplaceFlag();
+  testParseHarmonizeApplyBodyValidatesEveryUpdate();
 
   console.log('✓ parse.ts: every legacy route body is validated against what the UI sends and rejects malformed shapes by name');
+}
+
+function testParseStatusUpdateBodyCoversEveryStatusRoute(): void {
+  const NOVA = ['pending', 'approved', 'rejected'] as const;
+  const ok = assertOk(parseStatusUpdateBody({ status: 'approved', reviewer_note: 'n' }, NOVA), 'status + note');
+  assertEqual(ok.status, 'approved', 'status carried through');
+  assertEqual(ok.reviewerNote, 'n', 'reviewer_note carried through as reviewerNote');
+  assertEqual(assertOk(parseStatusUpdateBody({ status: 'pending' }, NOVA), 'status only').reviewerNote, undefined, 'note optional');
+  // null IS valid JSON — previously blew up on property access as a 500.
+  assertError(parseStatusUpdateBody(null, NOVA), 'object', 'a null body');
+  assertError(parseStatusUpdateBody({ status: 'nope' }, NOVA), 'status', 'a status outside the allow-list');
+  assertError(parseStatusUpdateBody({ status: 42 }, NOVA), 'status', 'a numeric status');
+  assertError(parseStatusUpdateBody({ status: 'approved', reviewer_note: 42 }, NOVA), 'reviewer_note', 'a numeric reviewer_note (previously coercible into the TEXT column)');
+  // A ReadonlySet allow-list (the catalog routes' VALID_STATUSES) works too.
+  assertOk(parseStatusUpdateBody({ status: 'approved' }, new Set(['approved'] as const)), 'Set-shaped allow-list');
+}
+
+function testParseExtractImportBodyGuardsTheReplacePath(): void {
+  const base = { streamId: 'stream-1', songs: [{ songName: 'S', artist: 'A', startSeconds: 10, endSeconds: 20 }] };
+  const ok = assertOk(parseExtractImportBody(base), 'the pipeline extract payload');
+  assertEqual(ok.replace, false, 'replace defaults to false (old body.replace ?? false)');
+  assertEqual(ok.songs[0].endSeconds, 20, 'endSeconds carried through');
+  assertEqual(
+    assertOk(parseExtractImportBody({ ...base, songs: [{ songName: 'S', artist: '', startSeconds: 0 }] }), 'empty artist + absent endSeconds stay legal (extraction data)').songs[0].endSeconds,
+    null,
+    'absent endSeconds defaults to null',
+  );
+  assertError(parseExtractImportBody({ ...base, songs: [] }), 'songs', 'an empty songs array');
+  assertError(parseExtractImportBody({ ...base, songs: [{ songName: 'S', artist: 'A', startSeconds: '10' }] }), 'startSeconds', 'a string startSeconds (previously reached SQLite as text under replace: true)');
+  assertError(parseExtractImportBody({ ...base, songs: [{ songName: 'S', artist: 'A', startSeconds: 10, endSeconds: -5 }] }), 'endSeconds', 'a negative endSeconds');
+  assertError(parseExtractImportBody({ ...base, songs: [{ songName: 'S', artist: 'A', startSeconds: 10, endSeconds: 10 }] }), 'endSeconds', 'a zero-duration entry');
+  assertError(parseExtractImportBody({ ...base, replace: 'yes' }), 'replace', 'a non-boolean replace');
+  assertError(parseExtractImportBody({ ...base, credit: 'invalid' }), 'credit', 'a junk credit (same validation as stream creation)');
+}
+
+function testParsePasteImportBodyGuardsTheReplaceFlag(): void {
+  const ok = assertOk(parsePasteImportBody({ text: '0:00 Song / Artist' }), 'text-only paste');
+  assertEqual(ok.replace, false, 'replace defaults to false');
+  assertEqual(assertOk(parsePasteImportBody({ text: 't', replace: true }), 'replace: true').replace, true, 'boolean replace carried through');
+  assertError(parsePasteImportBody({ replace: true }), 'text', 'missing text');
+  assertError(parsePasteImportBody({ text: '   ' }), 'text', 'whitespace-only text');
+  // "false" is truthy — it used to select the DESTRUCTIVE replace path.
+  assertError(parsePasteImportBody({ text: 't', replace: 'false' }), 'replace', 'a string replace flag');
+}
+
+function testParseHarmonizeApplyBodyValidatesEveryUpdate(): void {
+  const ok = assertOk(
+    parseHarmonizeApplyBody({ updates: [{ songId: 'song-1', title: 'Canonical', originalArtist: 'Artist' }] }),
+    'the harmonizer apply payload',
+  );
+  assertEqual(ok.updates[0].title, 'Canonical', 'title carried through');
+  assertOk(parseHarmonizeApplyBody({ updates: [{ songId: 'song-1' }] }), 'an update with no identity fields is a no-op entry but not malformed');
+  assertError(parseHarmonizeApplyBody({}), 'updates', 'missing updates');
+  assertError(parseHarmonizeApplyBody({ updates: [] }), 'updates', 'an empty updates array');
+  assertError(parseHarmonizeApplyBody({ updates: [null] }), 'updates[0]', 'a null entry (previously a 500 on property access)');
+  assertError(parseHarmonizeApplyBody({ updates: [{ title: 'T' }] }), 'songId', 'a missing songId');
+  assertError(parseHarmonizeApplyBody({ updates: [{ songId: 'song-1', title: 42 }] }), 'title', 'a numeric title (previously bound into songs AND works identity)');
+  assertError(parseHarmonizeApplyBody({ updates: [{ songId: 'song-1', originalArtist: '' }] }), 'originalArtist', 'an empty originalArtist');
+}
+
+function testParseCreateStreamBodyEnforcesDateFormat(): void {
+  // The id derives from this date (stream-YYYY-MM-DD) and it feeds sorting +
+  // exports — 'not-a-date' would mint id 'stream-not-a-date'.
+  assertError(
+    parseCreateStreamBody({ title: 't', date: 'not-a-date', videoId: 'v', youtubeUrl: 'u' }),
+    'date',
+    'a non-YYYY-MM-DD creation date',
+  );
+  assertOk(parseCreateStreamBody({ title: 't', date: '2026-01-01', videoId: 'v', youtubeUrl: 'u' }), 'a well-formed date still passes');
 }
 
 try {
