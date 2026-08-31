@@ -50,7 +50,7 @@ The app serves multiple VTuber archives from a single codebase. Each streamer ha
 
 Six contexts in `app/contexts/`, wired in two layers:
 - **App-wide** (`GlobalProviders.tsx`, root layout): **FanAuthContext** — minimal auth placeholder
-- **Per-streamer** (`app/[streamer]/StreamerShell.tsx`): **StreamerContext** (read-only current streamer config) → **PlayerContext** (playback state, queue, shuffle/repeat, YouTube IFrame API control) → `PerStreamerProviders.tsx`, which nests **PlaylistContext** (CRUD playlists, JSON import/export), **LikedSongsContext**, **RecentlyPlayedContext** — each localStorage-backed and keyed by `streamerSlug`
+- **Per-streamer** (`app/[streamer]/StreamerShell.tsx`): **StreamerContext** (read-only current streamer config) → **PlayerContext** (slice hooks over `app/lib/player-store.ts` — playback state, queue, shuffle/repeat, YouTube IFrame API control) → `PerStreamerProviders.tsx`, which nests **PlaylistContext** (CRUD playlists, JSON import/export), **LikedSongsContext**, **RecentlyPlayedContext** — each localStorage-backed and keyed by `streamerSlug`
 
 ### Theme System
 
