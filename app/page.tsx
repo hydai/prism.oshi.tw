@@ -60,11 +60,7 @@ export default function HomePage() {
       <main className="flex-1 min-w-0 flex flex-col">
         {/* Mobile header (below lg) */}
         <header
-          className="lg:hidden flex items-center justify-between px-4 py-4 border-b backdrop-blur-sm"
-          style={{
-            background: 'var(--bg-surface-glass)',
-            borderColor: 'var(--border-glass)',
-          }}
+          className="lg:hidden flex items-center justify-between px-4 py-4 border-b backdrop-blur-sm bg-surface-glass border-border-token-glass"
         >
           <div className="flex items-center gap-3">
             <div
@@ -73,8 +69,7 @@ export default function HomePage() {
               <Disc3 className="h-5 w-5 text-white" />
             </div>
             <span
-              className="text-token-xl font-bold tracking-tight"
-              style={{ color: 'var(--text-primary)' }}
+              className="text-token-xl font-bold tracking-tight text-token-primary"
             >
               Prism
             </span>
@@ -86,10 +81,9 @@ export default function HomePage() {
               target="_blank"
               rel="noopener noreferrer"
               aria-label="回報 / 建議"
-              className="inline-flex items-center gap-1 rounded-radius-lg px-2.5 py-2 text-token-sm font-semibold transition-opacity hover:opacity-90"
+              className="inline-flex items-center gap-1 rounded-radius-lg px-2.5 py-2 text-token-sm font-semibold transition-opacity hover:opacity-90 text-token-secondary"
               style={{
                 border: '1px solid var(--border-accent)',
-                color: 'var(--text-secondary)',
               }}
             >
               <MessageSquare className="h-4 w-4" />
@@ -99,10 +93,9 @@ export default function HomePage() {
               target="_blank"
               rel="noopener noreferrer"
               aria-label="Discord 伺服器"
-              className="inline-flex items-center gap-1 rounded-radius-lg px-2.5 py-2 text-token-sm font-semibold transition-opacity hover:opacity-90"
+              className="inline-flex items-center gap-1 rounded-radius-lg px-2.5 py-2 text-token-sm font-semibold transition-opacity hover:opacity-90 text-token-secondary"
               style={{
                 border: '1px solid var(--border-accent)',
-                color: 'var(--text-secondary)',
               }}
             >
               <DiscordIcon className="h-4 w-4" />
@@ -112,10 +105,9 @@ export default function HomePage() {
               target="_blank"
               rel="noopener noreferrer"
               aria-label="歌回 VOD 資料庫"
-              className="inline-flex items-center gap-1 rounded-radius-lg px-2.5 py-2 text-token-sm font-semibold transition-opacity hover:opacity-90"
+              className="inline-flex items-center gap-1 rounded-radius-lg px-2.5 py-2 text-token-sm font-semibold transition-opacity hover:opacity-90 text-token-secondary"
               style={{
                 border: '1px solid var(--border-accent)',
-                color: 'var(--text-secondary)',
               }}
             >
               <Film className="h-4 w-4" />
@@ -125,10 +117,9 @@ export default function HomePage() {
               target="_blank"
               rel="noopener noreferrer"
               aria-label="新增 VOD"
-              className="inline-flex items-center gap-1 rounded-radius-lg px-2.5 py-2 text-token-sm font-semibold transition-opacity hover:opacity-90"
+              className="inline-flex items-center gap-1 rounded-radius-lg px-2.5 py-2 text-token-sm font-semibold transition-opacity hover:opacity-90 text-token-secondary"
               style={{
                 border: '1px solid var(--border-accent)',
-                color: 'var(--text-secondary)',
               }}
             >
               <Video className="h-4 w-4" />
@@ -148,18 +139,13 @@ export default function HomePage() {
         {/* Mobile search + group chips (below lg) */}
         <div className="lg:hidden px-4 pt-4 space-y-3">
           <div
-            className="flex items-center gap-2 rounded-radius-lg px-3 py-2"
-            style={{
-              background: 'var(--bg-surface-frosted)',
-              border: '1px solid var(--border-glass)',
-            }}
+            className="flex items-center gap-2 rounded-radius-lg px-3 py-2 bg-surface-frosted border border-border-token-glass"
           >
             <label htmlFor="mobile-streamer-search" className="sr-only">
               搜尋 VTuber
             </label>
             <Search
-              className="h-4 w-4 flex-shrink-0"
-              style={{ color: 'var(--text-tertiary)' }}
+              className="h-4 w-4 flex-shrink-0 text-token-tertiary"
             />
             <input
               id="mobile-streamer-search"
@@ -167,8 +153,7 @@ export default function HomePage() {
               placeholder="搜尋 VTuber…"
               value={searchText}
               onChange={(e) => setSearchText(e.target.value)}
-              className="w-full bg-transparent text-token-sm outline-none placeholder:text-token-tertiary"
-              style={{ color: 'var(--text-primary)' }}
+              className="w-full bg-transparent text-token-sm outline-none placeholder:text-token-tertiary text-token-primary"
             />
           </div>
           <div className="flex gap-2 overflow-x-auto pb-1">
@@ -206,8 +191,7 @@ export default function HomePage() {
             ))}
             {filtered.length === 0 && (
               <p
-                className="text-token-sm py-8"
-                style={{ color: 'var(--text-tertiary)' }}
+                className="text-token-sm py-8 text-token-tertiary"
               >
                 找不到符合條件的 VTuber
               </p>
@@ -230,11 +214,9 @@ function StreamerCard({ streamer }: { streamer: StreamerConfig }) {
   return (
     <Wrapper
       {...linkProps}
-      className="group sm:flex-shrink-0 snap-start rounded-radius-xl overflow-hidden transition-[box-shadow,transform] duration-200 hover:scale-[1.03] hover:shadow-xl"
+      className="group sm:flex-shrink-0 snap-start rounded-radius-xl overflow-hidden transition-[box-shadow,transform] duration-200 hover:scale-[1.03] hover:shadow-xl bg-surface-frosted border border-border-token-glass"
       style={{
         minWidth: '240px',
-        background: 'var(--bg-surface-frosted)',
-        border: '1px solid var(--border-glass)',
         textDecoration: 'none',
         color: 'inherit',
       }}
@@ -259,14 +241,12 @@ function StreamerCard({ streamer }: { streamer: StreamerConfig }) {
       <div className="flex items-center justify-between px-4 py-3">
         <div className="min-w-0 flex-1">
           <p
-            className="truncate text-[15px] font-semibold"
-            style={{ color: 'var(--text-primary)' }}
+            className="truncate text-[15px] font-semibold text-token-primary"
           >
             {streamer.displayName}
           </p>
           <p
-            className="truncate text-[12px]"
-            style={{ color: 'var(--text-secondary)' }}
+            className="truncate text-[12px] text-token-secondary"
           >
             {streamer.group}
           </p>
