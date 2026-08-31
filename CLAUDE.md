@@ -12,7 +12,7 @@ Multi-streamer VTuber song archive platform. Users browse archived karaoke perfo
 npm run dev          # Dev server on localhost:3000
 npm run build        # Static export to out/
 npm run lint         # ESLint (next/core-web-vitals)
-npx playwright test  # E2E tests (requires dev server running on :3000)
+npx playwright test  # E2E tests (starts its own dev server on :3000 if one isn't already running, reuses yours if it is)
 npx --yes --package react-doctor@0.9.12 -- react-doctor . --scope changed --base master --blocking warning --yes --no-score
                      # React Doctor, same gate as CI (see Commit & Review SOP)
 ```
