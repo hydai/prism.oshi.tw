@@ -13,6 +13,7 @@ import {
 } from '../contexts/PlayerContext';
 import { useCurrentTrackLike } from '../lib/use-current-track-like';
 import { useTrackProgress } from '../lib/use-track-progress';
+import { useStreamer } from '../contexts/StreamerContext';
 import AlbumArt from './AlbumArt';
 import ProgressBar from './ProgressBar';
 import DesktopMiniPlayer from './DesktopMiniPlayer';
@@ -28,9 +29,9 @@ export default function MiniPlayer() {
   const { liked, toggleCurrentLike } = useCurrentTrackLike();
   const { hasKnownDuration, progress, handleSeek } = useTrackProgress();
   const playerErrorId = useId();
+  const pageSlug = useStreamer().slug;
 
   const pathname = usePathname();
-  const pageSlug = pathname?.split('/')[1] || '';
   const isNowPlayingPage = pathname?.endsWith('/now-playing');
 
   // Keyboard navigation: Space for play/pause when player is active
