@@ -3,6 +3,7 @@
 import type { DragEvent } from 'react';
 import { ChevronDown, ChevronUp, GripVertical, ListMusic, Play, Trash2 } from 'lucide-react';
 import type { Playlist } from '../contexts/PlaylistContext';
+import PanelEmptyState from './PanelEmptyState';
 
 interface PlaylistDetailsViewProps {
   playlist: Playlist;
@@ -32,13 +33,7 @@ export default function PlaylistDetailsView({
   onPlayAll,
 }: PlaylistDetailsViewProps) {
   if (playlist.versions.length === 0) {
-    return (
-      <div className="flex flex-col items-center justify-center py-12 text-white/60">
-        <ListMusic className="w-16 h-16 mb-4" />
-        <p className="text-center">此播放清單尚無歌曲</p>
-        <p className="text-sm text-center mt-2">從歌曲目錄中加入您喜歡的版本</p>
-      </div>
-    );
+    return <PanelEmptyState icon={ListMusic} title="此播放清單尚無歌曲" hint="從歌曲目錄中加入您喜歡的版本" />;
   }
 
   return (

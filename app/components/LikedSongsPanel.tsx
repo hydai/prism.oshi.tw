@@ -5,6 +5,7 @@ import { useLikedSongs } from '../contexts/LikedSongsContext';
 import { usePlayerActions } from '../contexts/PlayerContext';
 import AlbumArt from './AlbumArt';
 import BottomSheet from './BottomSheet';
+import PanelEmptyState from './PanelEmptyState';
 
 interface LikedSongsPanelProps {
   show: boolean;
@@ -40,11 +41,7 @@ export default function LikedSongsPanel({ show, onClose, onToast }: LikedSongsPa
     >
       <div className="p-4">
         {likedSongs.length === 0 ? (
-          <div className="flex flex-col items-center justify-center py-12 text-white/60">
-            <Heart className="w-16 h-16 mb-4" />
-            <p className="text-center">尚無喜愛的歌曲</p>
-            <p className="text-sm text-center mt-2">點擊愛心圖示來收藏喜歡的歌曲</p>
-          </div>
+          <PanelEmptyState icon={Heart} title="尚無喜愛的歌曲" hint="點擊愛心圖示來收藏喜歡的歌曲" />
         ) : (
           <>
             <div className="space-y-2" data-testid="liked-songs-list">
