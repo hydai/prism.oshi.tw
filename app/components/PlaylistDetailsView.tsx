@@ -1,9 +1,10 @@
 'use client';
 
 import type { DragEvent } from 'react';
-import { ChevronDown, ChevronUp, GripVertical, ListMusic, Play, Trash2 } from 'lucide-react';
+import { ChevronDown, ChevronUp, GripVertical, ListMusic, Trash2 } from 'lucide-react';
 import type { Playlist } from '../contexts/PlaylistContext';
 import PanelEmptyState from './PanelEmptyState';
+import PanelPlayAllButton from './PanelPlayAllButton';
 
 interface PlaylistDetailsViewProps {
   playlist: Playlist;
@@ -111,14 +112,7 @@ export default function PlaylistDetailsView({
       </div>
 
       <div className="mt-4">
-        <button
-          onClick={onPlayAll}
-          className="w-full py-3 bg-gradient-to-r from-pink-500 to-blue-500 hover:from-pink-600 hover:to-blue-600 text-white rounded-lg font-medium flex items-center justify-center gap-2"
-          data-testid="play-all-button"
-        >
-          <Play className="w-5 h-5 fill-current" />
-          播放全部
-        </button>
+        <PanelPlayAllButton onClick={onPlayAll} testId="play-all-button" />
       </div>
     </>
   );

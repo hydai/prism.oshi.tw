@@ -6,6 +6,7 @@ import { usePlayerActions } from '../contexts/PlayerContext';
 import AlbumArt from './AlbumArt';
 import BottomSheet from './BottomSheet';
 import PanelEmptyState from './PanelEmptyState';
+import PanelPlayAllButton from './PanelPlayAllButton';
 
 interface LikedSongsPanelProps {
   show: boolean;
@@ -95,14 +96,7 @@ export default function LikedSongsPanel({ show, onClose, onToast }: LikedSongsPa
 
             {/* Play all button */}
             <div className="mt-4">
-              <button
-                onClick={handlePlayAll}
-                className="w-full py-3 bg-gradient-to-r from-pink-500 to-blue-500 hover:from-pink-600 hover:to-blue-600 text-white rounded-lg font-medium flex items-center justify-center gap-2"
-                data-testid="play-all-liked-button"
-              >
-                <Play className="w-5 h-5 fill-current" />
-                播放全部
-              </button>
+              <PanelPlayAllButton onClick={handlePlayAll} testId="play-all-liked-button" />
             </div>
           </>
         )}

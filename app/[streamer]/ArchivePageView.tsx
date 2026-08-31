@@ -5,7 +5,6 @@ import { useVirtualizer, type Virtualizer } from '@tanstack/react-virtual';
 import Link from 'next/link';
 import {
   Search,
-  Play,
   Shuffle,
   Sparkles,
   ListMusic,
@@ -34,6 +33,7 @@ import ViewModeToggle from '../components/ViewModeToggle';
 import CatalogEmptyState from '../components/CatalogEmptyState';
 import SocialLinkRow from '../components/SocialLinkRow';
 import YearChips from '../components/YearChips';
+import PlayAllIconButton from '../components/PlayAllIconButton';
 import { useArchiveData } from './archive-data-context';
 import { useArchiveFilters } from './archive-filters-context';
 import { useArchiveUi } from './archive-ui-context';
@@ -606,22 +606,7 @@ function MobileHomeControls() {
             }}
           >
             {/* Play button: 48×48 circle, gradient fill (pink→blue) */}
-            <button
-              data-testid="mobile-play-all-button"
-              className="flex items-center justify-center flex-shrink-0 transition-transform hover:scale-105"
-              style={{
-                width: '48px',
-                height: '48px',
-                borderRadius: '50%',
-                background: 'linear-gradient(135deg, var(--accent-pink-light), var(--accent-blue-light))',
-                color: 'white',
-                boxShadow: '0 4px 16px rgba(244, 114, 182, 0.35)',
-              }}
-              title="播放全部"
-              onClick={handlePlayAll}
-            >
-              <Play className="w-5 h-5 fill-current" style={{ marginLeft: '2px' }} />
-            </button>
+            <PlayAllIconButton onClick={handlePlayAll} testId="mobile-play-all-button" />
 
             {/* Shuffle button: gradient fill when active, outline when off */}
             <button
@@ -784,21 +769,7 @@ function DesktopActionBar() {
             <div className="flex items-center gap-3 flex-shrink-0">
 
               {/* PlayButton — 48×48 circular gradient play button */}
-              <button
-                data-testid="desktop-play-all-button"
-                className="bg-gradient-to-r from-pink-400 to-blue-400 text-white flex items-center justify-center transition-[filter,transform] hover:scale-105 hover:brightness-110 flex-shrink-0"
-                style={{
-                  width: '48px',
-                  height: '48px',
-                  borderRadius: 'var(--radius-circle)',
-                  background: 'linear-gradient(135deg, var(--accent-pink-light), var(--accent-blue-light))',
-                  boxShadow: '0 4px 16px rgba(244, 114, 182, 0.35)',
-                }}
-                title="播放全部"
-                onClick={handlePlayAll}
-              >
-                <Play className="w-5 h-5 fill-current" style={{ marginLeft: '2px' }} />
-              </button>
+              <PlayAllIconButton onClick={handlePlayAll} testId="desktop-play-all-button" />
 
               {/* GradientButton — "播放全部" pill */}
               <button

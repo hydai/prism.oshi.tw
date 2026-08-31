@@ -7,6 +7,7 @@ import { formatRelativeTime } from '../lib/format';
 import AlbumArt from './AlbumArt';
 import BottomSheet from './BottomSheet';
 import PanelEmptyState from './PanelEmptyState';
+import PanelPlayAllButton from './PanelPlayAllButton';
 
 interface RecentlyPlayedPanelProps {
   show: boolean;
@@ -106,14 +107,7 @@ export default function RecentlyPlayedPanel({ show, onClose, onToast }: Recently
 
             {/* Play all button */}
             <div className="mt-4">
-              <button
-                onClick={handlePlayAll}
-                className="w-full py-3 bg-gradient-to-r from-pink-500 to-blue-500 hover:from-pink-600 hover:to-blue-600 text-white rounded-lg font-medium flex items-center justify-center gap-2"
-                data-testid="play-all-recent-button"
-              >
-                <Play className="w-5 h-5 fill-current" />
-                播放全部
-              </button>
+              <PanelPlayAllButton onClick={handlePlayAll} testId="play-all-recent-button" />
             </div>
           </>
         )}
