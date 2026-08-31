@@ -55,7 +55,7 @@ export function PlayerProvider({ children }: { children: ReactNode }) {
   return <PlayerStoreContext.Provider value={store}>{children}</PlayerStoreContext.Provider>;
 }
 
-function usePlayerStoreHandle(): PlayerStore {
+export function usePlayerStore(): PlayerStore {
   const store = useContext(PlayerStoreContext);
   if (!store) {
     throw new Error('player hooks must be used within a PlayerProvider');
@@ -67,7 +67,7 @@ function usePlayerStoreHandle(): PlayerStore {
 // stored in the snapshot (primitive or immutably-replaced reference) — never
 // construct objects here, or every render loops.
 function usePlayerField<T>(selector: (state: PlayerState) => T): T {
-  const store = usePlayerStoreHandle();
+  const store = usePlayerStore();
   return useSyncExternalStore(
     store.subscribe,
     () => selector(store.getSnapshot()),
@@ -77,7 +77,7 @@ function usePlayerField<T>(selector: (state: PlayerState) => T): T {
 
 /** Every player action. Stable identities — subscribing components never re-render from this hook. */
 export function usePlayerActions(): PlayerActions {
-  return usePlayerStoreHandle().actions;
+  return usePlayerStore().actions;
 }
 
 export function useCurrentTrack(): Track | null {
@@ -121,7 +121,7 @@ export function useOverlays(): { showModal: boolean; showQueue: boolean } {
 }
 
 export function useVolume(): { volume: number; isMuted: boolean } {
-  const store = usePlayerStoreHandle();
+  const store = usePlayerStore();
   const volume = usePersistedStore(store.volumeStore);
   const isMuted = usePersistedStore(store.mutedStore);
   return { volume, isMuted };
@@ -130,7 +130,7 @@ export function useVolume(): { volume: number; isMuted: boolean } {
 // Playback clock for components that display time/progress. Subscribing here
 // re-renders only those components on the 500ms tick.
 export function usePlaybackTime() {
-  const store = usePlayerStoreHandle();
+  const store = usePlayerStore();
   const currentTrack = useCurrentTrack();
   const { currentTime, duration } = useSyncExternalStore(
     store.timeStore.subscribe,

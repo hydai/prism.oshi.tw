@@ -118,18 +118,7 @@ function SongCardInner({ song, isExpanded, onToggleExpand, onPlay, onAddToQueue,
   );
 }
 
-const SongCard = memo(SongCardInner, (prev, next) => {
-  return (
-    prev.song.id === next.song.id &&
-    prev.isExpanded === next.isExpanded &&
-    prev.song.performances.length === next.song.performances.length &&
-    // Both have change-only identities: isLiked is useCallback'd on the liked
-    // set, unavailableVideoIds is replaced only when a video errors. Without
-    // these an already-rendered card kept stale hearts/disabled states.
-    prev.isLiked === next.isLiked &&
-    prev.unavailableVideoIds === next.unavailableVideoIds
-  );
-});
+const SongCard = memo(SongCardInner);
 
 SongCard.displayName = 'SongCard';
 
