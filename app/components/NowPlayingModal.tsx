@@ -53,20 +53,17 @@ export default function NowPlayingModal() {
       onClick={() => setShowModal(false)}
     >
       <div
-        className="backdrop-blur-xl rounded-3xl shadow-2xl max-w-4xl w-full max-h-[90vh] overflow-auto"
-        style={{ background: 'var(--bg-surface-frosted)' }}
+        className="backdrop-blur-xl rounded-3xl shadow-2xl max-w-4xl w-full max-h-[90vh] overflow-auto bg-surface-frosted"
         onClick={(e) => e.stopPropagation()}
       >
         {/* Header */}
         <div
-          className="sticky top-0 z-10 backdrop-blur-xl px-6 py-4 flex items-center justify-between"
-          style={{ background: 'var(--bg-surface-frosted)', borderBottom: '1px solid var(--border-default)' }}
+          className="sticky top-0 z-10 backdrop-blur-xl px-6 py-4 flex items-center justify-between bg-surface-frosted border-b border-b-border-token"
         >
-          <h2 className="text-lg font-bold" style={{ color: 'var(--text-primary)' }}>正在播放</h2>
+          <h2 className="text-lg font-bold text-token-primary">正在播放</h2>
           <button
             onClick={() => setShowModal(false)}
-            className="transition-colors p-2 rounded-full"
-            style={{ color: 'var(--text-tertiary)' }}
+            className="transition-colors p-2 rounded-full text-token-tertiary"
             aria-label="Minimize"
           >
             <ChevronDown className="w-6 h-6" />
@@ -85,14 +82,13 @@ export default function NowPlayingModal() {
 
           {/* Track Info */}
           <div className="mb-6 text-center">
-            <h3 className="text-2xl font-bold mb-2" style={{ color: 'var(--text-primary)' }}>{currentTrack.songTitle}</h3>
-            <p className="text-lg" style={{ color: 'var(--text-secondary)' }}>{currentTrack.originalArtist}</p>
+            <h3 className="text-2xl font-bold mb-2 text-token-primary">{currentTrack.songTitle}</h3>
+            <p className="text-lg text-token-secondary">{currentTrack.originalArtist}</p>
             <button
               onClick={toggleCurrentLike}
-              className="mt-3 transition-[color,transform] transform hover:scale-110"
+              className={`mt-3 transition-[color,transform] transform hover:scale-110 ${liked ? 'text-accent-pink' : 'text-token-tertiary'}`}
               aria-label={liked ? '取消喜愛' : '喜愛'}
               data-testid="modal-like-button"
-              style={{ color: liked ? 'var(--accent-pink)' : 'var(--text-tertiary)' }}
             >
               <Heart className={`w-6 h-6 ${liked ? 'fill-current' : ''}`} />
             </button>
@@ -106,7 +102,7 @@ export default function NowPlayingModal() {
               disabled={!hasKnownDuration}
               height={8}
             />
-            <div className="flex justify-between text-xs mt-2 font-mono" style={{ color: 'var(--text-tertiary)' }}>
+            <div className="flex justify-between text-xs mt-2 font-mono text-token-tertiary">
               <span>{formatTime(trackCurrentTime)}</span>
               <span>{knownDuration != null ? formatTime(knownDuration) : '--:--'}</span>
             </div>
@@ -116,18 +112,16 @@ export default function NowPlayingModal() {
           <div className="flex items-center justify-center gap-6 mt-8">
             <button
               onClick={toggleShuffle}
-              className="transition-[color,transform] transform hover:scale-110"
+              className={`transition-[color,transform] transform hover:scale-110 ${shuffleOn ? 'text-accent-pink' : ''}`}
               aria-label="Shuffle"
               data-testid="modal-shuffle-button"
-              style={{ color: shuffleOn ? 'var(--accent-pink)' : undefined }}
             >
-              <Shuffle className="w-6 h-6" style={shuffleOn ? undefined : { color: 'var(--text-tertiary)' }} />
+              <Shuffle className={`w-6 h-6 ${shuffleOn ? '' : 'text-token-tertiary'}`} />
             </button>
 
             <button
               onClick={previous}
-              className="transition-transform transform hover:scale-110"
-              style={{ color: 'var(--text-tertiary)' }}
+              className="transition-transform transform hover:scale-110 text-token-tertiary"
               aria-label="Previous"
             >
               <SkipBack className="w-8 h-8" />
@@ -147,8 +141,7 @@ export default function NowPlayingModal() {
 
             <button
               onClick={next}
-              className="transition-transform transform hover:scale-110"
-              style={{ color: 'var(--text-tertiary)' }}
+              className="transition-transform transform hover:scale-110 text-token-tertiary"
               aria-label="Next"
             >
               <SkipForward className="w-8 h-8" />
@@ -156,14 +149,13 @@ export default function NowPlayingModal() {
 
             <button
               onClick={toggleRepeat}
-              className="transition-[color,transform] transform hover:scale-110"
+              className={`transition-[color,transform] transform hover:scale-110 ${repeatMode !== 'off' ? 'text-accent-pink' : ''}`}
               aria-label="Repeat"
               data-testid="modal-repeat-button"
-              style={{ color: repeatMode !== 'off' ? 'var(--accent-pink)' : undefined }}
             >
               {repeatMode === 'one'
                 ? <Repeat1 className="w-6 h-6" />
-                : <Repeat className="w-6 h-6" style={repeatMode === 'off' ? { color: 'var(--text-tertiary)' } : undefined} />
+                : <Repeat className={`w-6 h-6 ${repeatMode === 'off' ? 'text-token-tertiary' : ''}`} />
               }
             </button>
           </div>
@@ -174,39 +166,37 @@ export default function NowPlayingModal() {
           </div>
 
           {/* Next Up — queue preview */}
-          <div className="mt-8 pt-6" style={{ borderTop: '1px solid var(--border-default)' }}>
+          <div className="mt-8 pt-6 border-t border-t-border-token">
             <div className="flex items-center justify-between mb-4">
-              <h4 className="text-sm font-semibold uppercase tracking-wider" style={{ color: 'var(--text-secondary)' }}>Next Up</h4>
+              <h4 className="text-sm font-semibold uppercase tracking-wider text-token-secondary">Next Up</h4>
               {queue.length > 0 && (
                 <button
                   onClick={() => {
                     setShowQueue(true);
                     setShowModal(false);
                   }}
-                  className="text-xs font-medium transition-colors hover:brightness-110"
-                  style={{ color: 'var(--accent-pink)' }}
+                  className="text-xs font-medium transition-colors hover:brightness-110 text-accent-pink"
                 >
                   查看完整佇列
                 </button>
               )}
             </div>
             {queue.length === 0 ? (
-              <p className="text-sm text-center py-4" style={{ color: 'var(--text-tertiary)' }}>佇列中沒有歌曲</p>
+              <p className="text-sm text-center py-4 text-token-tertiary">佇列中沒有歌曲</p>
             ) : (
               <div className="flex flex-col">
                 {queue.slice(0, 5).map((track, index) => (
                   <div
                     key={track.queueEntryId}
-                    className="flex items-center gap-3 py-2"
-                    style={{ borderBottom: index < Math.min(queue.length, 5) - 1 ? '1px solid var(--border-default)' : undefined }}
+                    className={`flex items-center gap-3 py-2 ${index < Math.min(queue.length, 5) - 1 ? 'border-b border-b-border-token' : ''}`}
                   >
                     <AlbumArt
                       alt={`${track.songTitle} - ${track.originalArtist}`}
                       size={40}
                     />
                     <div className="min-w-0 flex-1">
-                      <div className="text-sm font-medium truncate" style={{ color: 'var(--text-primary)' }}>{track.songTitle}</div>
-                      <div className="text-xs truncate" style={{ color: 'var(--text-secondary)' }}>{track.originalArtist}</div>
+                      <div className="text-sm font-medium truncate text-token-primary">{track.songTitle}</div>
+                      <div className="text-xs truncate text-token-secondary">{track.originalArtist}</div>
                     </div>
                   </div>
                 ))}

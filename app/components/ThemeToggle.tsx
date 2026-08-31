@@ -48,17 +48,13 @@ export default function ThemeToggle() {
     <button
       onClick={toggleTheme}
       aria-label={theme === 'light' ? 'Switch to dark mode' : 'Switch to light mode'}
-      className="transition-[background-color,border-color,color,transform] hover:scale-110 flex-shrink-0"
+      className="transition-[background-color,border-color,color,transform] hover:scale-110 flex-shrink-0 rounded-radius-circle bg-surface-muted text-token-secondary border border-border-token-glass"
       style={{
         width: 32,
         height: 32,
-        borderRadius: 'var(--radius-circle)',
-        background: 'var(--bg-surface-muted)',
         display: 'flex',
         alignItems: 'center',
         justifyContent: 'center',
-        color: 'var(--text-secondary)',
-        border: '1px solid var(--border-glass)',
         cursor: 'pointer',
       }}
     >

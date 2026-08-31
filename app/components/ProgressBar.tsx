@@ -85,10 +85,9 @@ export default function ProgressBar({
         aria-valuetext={disabled ? '歌曲時長不明，無法調整進度' : `${Math.round(clamped)}%`}
         onKeyDown={disabled ? undefined : handleKeyDown}
         ref={barRef}
-        className="focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--accent-pink-light)]"
+        className="focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--accent-pink-light)] bg-surface-muted"
         style={{
           height: `${height}px`,
-          background: 'var(--bg-surface-muted)',
           borderRadius: '16px 16px 0 0',
           overflow: 'hidden',
           touchAction: 'none',
@@ -122,11 +121,10 @@ export default function ProgressBar({
       aria-valuetext={disabled ? '歌曲時長不明，無法調整進度' : `${Math.round(clamped)}%`}
       onKeyDown={disabled ? undefined : handleKeyDown}
       ref={barRef}
-      className={`group relative flex-1 ${disabled ? 'cursor-default' : 'cursor-pointer'} focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--accent-pink-light)]`}
+      className={`group relative flex-1 ${disabled ? 'cursor-default' : 'cursor-pointer'} focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--accent-pink-light)] bg-surface-muted`}
       style={{
         height: `${height}px`,
         borderRadius: `${height / 2}px`,
-        background: 'var(--bg-surface-muted)',
         touchAction: 'none',
       }}
       onClick={disabled ? undefined : handleClick}
@@ -144,14 +142,13 @@ export default function ProgressBar({
       />
       {/* Scrubber dot — always visible on touch devices, hover-only on desktop */}
       <div
-        className="absolute top-1/2 -translate-y-1/2 opacity-0 group-hover:opacity-100 coarse-pointer:opacity-100 transition-opacity"
+        className="absolute top-1/2 -translate-y-1/2 opacity-0 group-hover:opacity-100 coarse-pointer:opacity-100 transition-opacity bg-surface"
         style={{
           left: `${clamped}%`,
           transform: 'translate(-50%, -50%)',
           width: `${height * 3}px`,
           height: `${height * 3}px`,
           borderRadius: '50%',
-          background: 'var(--bg-surface)',
           border: '2px solid var(--accent-pink-light)',
         }}
       />
@@ -162,15 +159,15 @@ export default function ProgressBar({
     return (
       <div className="flex items-center gap-2 w-full" style={{ maxWidth: variant === 'full' ? undefined : '480px' }}>
         <span
-          className="flex-shrink-0 font-mono"
-          style={{ fontSize: '13px', color: 'var(--text-tertiary)', minWidth: '36px', textAlign: 'right' }}
+          className="flex-shrink-0 font-mono text-token-tertiary"
+          style={{ fontSize: '13px', minWidth: '36px', textAlign: 'right' }}
         >
           {currentTime}
         </span>
         {bar}
         <span
-          className="flex-shrink-0 font-mono"
-          style={{ fontSize: '13px', color: 'var(--text-tertiary)', minWidth: '36px' }}
+          className="flex-shrink-0 font-mono text-token-tertiary"
+          style={{ fontSize: '13px', minWidth: '36px' }}
         >
           {totalTime}
         </span>

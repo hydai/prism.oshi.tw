@@ -68,14 +68,8 @@ export default function MiniPlayer() {
 
       {/* ── MOBILE MINI PLAYER (hidden on lg+) ── */}
       <div
-        className="lg:hidden"
+        className="lg:hidden bg-surface-frosted backdrop-blur-[12px] border-t border-t-border-token-glass border-l border-l-border-token-glass border-r border-r-border-token-glass"
         style={{
-          background: 'var(--bg-surface-frosted)',
-          backdropFilter: 'blur(12px)',
-          WebkitBackdropFilter: 'blur(12px)',
-          borderTop: '1px solid var(--border-glass)',
-          borderLeft: '1px solid var(--border-glass)',
-          borderRight: '1px solid var(--border-glass)',
           borderRadius: '16px 16px 0 0',
         }}
       >
@@ -110,14 +104,14 @@ export default function MiniPlayer() {
             {/* Song info — vertical, gap 2, fill remaining space */}
             <div className="flex min-w-0 flex-1 flex-col" style={{ gap: '2px' }}>
               <div
-                className="truncate"
-                style={{ fontSize: '13px', fontWeight: 600, color: 'var(--text-primary)' }}
+                className="truncate text-token-primary"
+                style={{ fontSize: '13px', fontWeight: 600 }}
               >
                 {currentTrack.songTitle}
               </div>
               <div
-                className="truncate"
-                style={{ fontSize: '11px', color: 'var(--text-secondary)' }}
+                className="truncate text-token-secondary"
+                style={{ fontSize: '11px' }}
               >
                 {currentTrack.originalArtist}
               </div>
@@ -130,10 +124,10 @@ export default function MiniPlayer() {
               e.stopPropagation();
               toggleCurrentLike();
             }}
-            className="flex-shrink-0"
+            className={`flex-shrink-0 ${liked ? 'text-accent-pink' : 'text-token-secondary'}`}
             aria-label={liked ? '取消喜愛' : '喜愛'}
             data-testid="mini-player-like-button-mobile"
-            style={{ color: liked ? 'var(--accent-pink)' : 'var(--text-secondary)', padding: '4px' }}
+            style={{ padding: '4px' }}
           >
             <Heart style={{ width: '20px', height: '20px' }} className={liked ? 'fill-current' : ''} />
           </button>
@@ -144,19 +138,18 @@ export default function MiniPlayer() {
               e.stopPropagation();
               setShowQueue(true);
             }}
-            className="flex-shrink-0 relative"
+            className="flex-shrink-0 relative text-token-secondary"
             aria-label="Open queue"
             data-testid="mini-player-queue-button-mobile"
-            style={{ color: 'var(--text-secondary)', padding: '4px' }}
+            style={{ padding: '4px' }}
           >
             <ListMusic style={{ width: '20px', height: '20px' }} />
             {queue.length > 0 && (
               <span
-                className="absolute -top-1 -right-1 flex items-center justify-center font-bold bg-accent-gradient"
+                className="absolute -top-1 -right-1 flex items-center justify-center font-bold bg-accent-gradient rounded-radius-circle"
                 style={{
                   width: '14px',
                   height: '14px',
-                  borderRadius: 'var(--radius-circle)',
                   color: 'white',
                   fontSize: '9px',
                 }}
@@ -172,10 +165,10 @@ export default function MiniPlayer() {
               e.stopPropagation();
               togglePlayPause();
             }}
-            className="flex-shrink-0"
+            className="flex-shrink-0 text-token-primary"
             aria-label={isPlaying ? '暫停' : '播放'}
             data-testid="mini-player-play-button-mobile"
-            style={{ color: 'var(--text-primary)', padding: '4px' }}
+            style={{ padding: '4px' }}
           >
             {isPlaying ? (
               <Pause style={{ width: '24px', height: '24px', fill: 'currentColor' }} />

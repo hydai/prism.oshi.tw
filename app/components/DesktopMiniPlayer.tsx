@@ -69,13 +69,9 @@ export default function DesktopMiniPlayer({
 }: DesktopMiniPlayerProps) {
   return (
     <div
-      className="hidden lg:block"
+      className="hidden lg:block bg-surface-frosted backdrop-blur-[12px] border-t border-t-border-token-glass"
       style={{
         height: '80px',
-        background: 'var(--bg-surface-frosted)',
-        backdropFilter: 'blur(12px)',
-        WebkitBackdropFilter: 'blur(12px)',
-        borderTop: '1px solid var(--border-glass)',
       }}
     >
       {/* 3-column layout */}
@@ -98,15 +94,14 @@ export default function DesktopMiniPlayer({
           {/* Track info */}
           <div className="min-w-0 flex-1">
             <div
-              className="font-bold truncate"
-              style={{ fontSize: 'var(--font-size-sm)', fontWeight: 500, color: 'var(--text-primary)' }}
+              className="font-bold truncate text-token-sm text-token-primary"
+              style={{ fontWeight: 500 }}
             >
               {currentTrack.songTitle}
             </div>
             {playerError ? (
               <div
-                className="flex items-center gap-1 truncate text-red-500"
-                style={{ fontSize: 'var(--font-size-xs)' }}
+                className="flex items-center gap-1 truncate text-red-500 text-token-xs"
                 data-testid="player-error-message"
                 aria-hidden="true"
               >
@@ -115,8 +110,7 @@ export default function DesktopMiniPlayer({
               </div>
             ) : (
               <div
-                className="truncate"
-                style={{ fontSize: 'var(--font-size-xs)', color: 'var(--text-secondary)' }}
+                className="truncate text-token-xs text-token-secondary"
               >
                 {currentTrack.originalArtist}
               </div>
@@ -132,14 +126,13 @@ export default function DesktopMiniPlayer({
           {/* Transport controls row */}
           <div className="flex items-center gap-4">
             <button
-              className={`transition-colors ${!shuffleOn ? 'hover-text-primary' : ''}`}
+              className={`transition-colors ${!shuffleOn ? 'hover-text-primary' : ''} ${shuffleOn ? 'text-accent-pink' : 'text-token-tertiary'}`}
               aria-label="Shuffle"
               data-testid="desktop-shuffle-button"
               onClick={(event) => {
                 event.stopPropagation();
                 onToggleShuffle();
               }}
-              style={{ color: shuffleOn ? 'var(--accent-pink)' : 'var(--text-tertiary)' }}
             >
               <Shuffle style={{ width: '16px', height: '16px' }} />
             </button>
@@ -149,9 +142,8 @@ export default function DesktopMiniPlayer({
                 event.stopPropagation();
                 onPrevious();
               }}
-              className="transition-colors hover-text-primary"
+              className="transition-colors hover-text-primary text-token-tertiary"
               aria-label="Previous"
-              style={{ color: 'var(--text-tertiary)' }}
             >
               <SkipBack style={{ width: '18px', height: '18px' }} />
             </button>
@@ -161,13 +153,12 @@ export default function DesktopMiniPlayer({
                 event.stopPropagation();
                 onTogglePlayPause();
               }}
-              className="flex items-center justify-center flex-shrink-0 transition-[filter] hover:brightness-110 bg-accent-gradient"
+              className="flex items-center justify-center flex-shrink-0 transition-[filter] hover:brightness-110 bg-accent-gradient rounded-radius-circle"
               aria-label={isPlaying ? 'Pause' : 'Play'}
               data-testid="mini-player-play-button"
               style={{
                 width: '40px',
                 height: '40px',
-                borderRadius: 'var(--radius-circle)',
                 color: 'white',
                 flexShrink: 0,
               }}
@@ -184,22 +175,20 @@ export default function DesktopMiniPlayer({
                 event.stopPropagation();
                 onNext();
               }}
-              className="transition-colors hover-text-primary"
+              className="transition-colors hover-text-primary text-token-tertiary"
               aria-label="Next"
-              style={{ color: 'var(--text-tertiary)' }}
             >
               <SkipForward style={{ width: '18px', height: '18px' }} />
             </button>
 
             <button
-              className={`transition-colors ${repeatMode === 'off' ? 'hover-text-primary' : ''}`}
+              className={`transition-colors ${repeatMode === 'off' ? 'hover-text-primary' : ''} ${repeatMode !== 'off' ? 'text-accent-pink' : 'text-token-tertiary'}`}
               aria-label="Repeat"
               data-testid="desktop-repeat-button"
               onClick={(event) => {
                 event.stopPropagation();
                 onToggleRepeat();
               }}
-              style={{ color: repeatMode !== 'off' ? 'var(--accent-pink)' : 'var(--text-tertiary)' }}
             >
               {repeatMode === 'one'
                 ? <Repeat1 style={{ width: '16px', height: '16px' }} />
@@ -211,8 +200,8 @@ export default function DesktopMiniPlayer({
           {/* Progress bar row */}
           <div className="flex items-center gap-2 w-full" style={{ maxWidth: '480px' }}>
             <span
-              className="flex-shrink-0 font-mono"
-              style={{ fontSize: 'var(--font-size-xs)', color: 'var(--text-tertiary)', minWidth: '32px', textAlign: 'right' }}
+              className="flex-shrink-0 font-mono text-token-xs text-token-tertiary"
+              style={{ minWidth: '32px', textAlign: 'right' }}
             >
               {formatTime(trackCurrentTime)}
             </span>
@@ -223,8 +212,8 @@ export default function DesktopMiniPlayer({
               height={4}
             />
             <span
-              className="flex-shrink-0 font-mono"
-              style={{ fontSize: 'var(--font-size-xs)', color: 'var(--text-tertiary)', minWidth: '32px' }}
+              className="flex-shrink-0 font-mono text-token-xs text-token-tertiary"
+              style={{ minWidth: '32px' }}
             >
               {hasKnownDuration && trackDuration != null ? formatTime(trackDuration) : '--:--'}
             </span>
@@ -239,10 +228,9 @@ export default function DesktopMiniPlayer({
           <Link
             href={pageSlug ? `/${pageSlug}/now-playing` : '#'}
             onClick={(event) => event.stopPropagation()}
-            className="transition-colors hover-text-primary"
+            className="transition-colors hover-text-primary text-token-tertiary"
             aria-label="Expand to full page"
             data-testid="expand-now-playing-button"
-            style={{ color: 'var(--text-tertiary)' }}
           >
             <Maximize2 style={{ width: '18px', height: '18px' }} />
           </Link>
@@ -252,10 +240,9 @@ export default function DesktopMiniPlayer({
               event.stopPropagation();
               onToggleLike();
             }}
-            className="transition-colors hover-text-primary"
+            className={`transition-colors hover-text-primary ${liked ? 'text-accent-pink' : 'text-token-tertiary'}`}
             aria-label={liked ? '取消喜愛' : '喜愛'}
             data-testid="mini-player-like-button"
-            style={{ color: liked ? 'var(--accent-pink)' : 'var(--text-tertiary)' }}
           >
             <Heart style={{ width: '18px', height: '18px' }} className={liked ? 'fill-current' : ''} />
           </button>
@@ -265,19 +252,17 @@ export default function DesktopMiniPlayer({
               event.stopPropagation();
               onOpenQueue();
             }}
-            className="relative transition-colors hover-text-primary"
+            className="relative transition-colors hover-text-primary text-token-tertiary"
             aria-label="Open queue"
             data-testid="queue-button"
-            style={{ color: 'var(--text-tertiary)' }}
           >
             <ListMusic style={{ width: '18px', height: '18px' }} />
             {queueLength > 0 && (
               <span
-                className="absolute -top-1 -right-1 flex items-center justify-center font-bold bg-accent-gradient"
+                className="absolute -top-1 -right-1 flex items-center justify-center font-bold bg-accent-gradient rounded-radius-circle"
                 style={{
                   width: '16px',
                   height: '16px',
-                  borderRadius: 'var(--radius-circle)',
                   color: 'white',
                   fontSize: '10px',
                 }}

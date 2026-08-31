@@ -29,12 +29,9 @@ export default function ViewModeToggle({
     <div
       role="group"
       aria-label="歌曲顯示方式"
-      className={`flex items-center gap-1 flex-shrink-0 ${fullWidth ? 'w-full' : ''}`}
+      className={`flex items-center gap-1 flex-shrink-0 bg-surface-muted rounded-radius-pill border border-border-token-glass ${fullWidth ? 'w-full' : ''}`}
       style={{
-        background: 'var(--bg-surface-muted)',
-        borderRadius: 'var(--radius-pill)',
         padding: '3px',
-        border: '1px solid var(--border-glass)',
       }}
     >
       {options.map(option => {
@@ -48,19 +45,15 @@ export default function ViewModeToggle({
             data-testid={`${testIdPrefix}-${option.value}`}
             aria-pressed={isActive}
             onClick={() => onChange(option.value)}
-            className={`flex items-center gap-1.5 font-semibold transition-[background,box-shadow,color] ${
-              fullWidth ? 'flex-1 justify-center' : ''
+            className={`flex items-center gap-1.5 font-semibold transition-[background,box-shadow,color] rounded-radius-pill text-token-sm py-token-2 ${
+              fullWidth ? 'flex-1 justify-center px-token-3' : 'px-token-4'
             } ${
               isActive
-                ? 'bg-accent-gradient text-white shadow-md'
-                : ''
+                ? 'bg-accent-gradient text-token-on-accent shadow-md'
+                : 'text-token-secondary'
             }`}
             style={{
-              borderRadius: 'var(--radius-pill)',
-              fontSize: 'var(--font-size-sm)',
-              padding: fullWidth ? 'var(--space-2) var(--space-3)' : 'var(--space-2) var(--space-4)',
               minHeight: fullWidth ? '44px' : undefined,
-              color: isActive ? 'var(--text-on-accent)' : 'var(--text-secondary)',
             }}
           >
             <Icon className="w-3.5 h-3.5" aria-hidden="true" />
