@@ -1,4 +1,5 @@
 import { test, expect } from '@playwright/test';
+import { stubYouTubeIframeApi } from './helpers/fake-youtube';
 
 test.describe('interactive semantics', () => {
   test('exposes names for public search, navigation, filter, and playback controls', async ({ page }) => {
@@ -46,6 +47,7 @@ test.describe('interactive semantics', () => {
   });
 
   test('plays a timeline row from its semantic title control', async ({ page }) => {
+    await stubYouTubeIframeApi(page);
     await page.setViewportSize({ width: 1280, height: 900 });
     await page.goto('/mizuki');
 
@@ -59,6 +61,7 @@ test.describe('interactive semantics', () => {
   });
 
   test('disables seeking when a performance has no known duration', async ({ page }) => {
+    await stubYouTubeIframeApi(page);
     await page.route('**/api/mizuki/songs', async (route) => {
       await route.fulfill({
         json: [{
