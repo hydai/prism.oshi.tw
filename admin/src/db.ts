@@ -676,6 +676,19 @@ export async function getPerformanceStatus(
   return row?.status ?? null;
 }
 
+// Current clip bounds — the timestamps route merges one-sided edits with these
+// so the end-after-start invariant holds against the STORED counterpart too.
+export async function getPerformanceTimestamps(
+  db: D1Database,
+  id: string,
+): Promise<{ timestamp: number; endTimestamp: number | null } | null> {
+  const row = await db
+    .prepare('SELECT timestamp, end_timestamp FROM performances WHERE id = ?')
+    .bind(id)
+    .first<{ timestamp: number; end_timestamp: number | null }>();
+  return row ? { timestamp: row.timestamp, endTimestamp: row.end_timestamp } : null;
+}
+
 export async function updatePerformanceStatus(
   db: D1Database,
   id: string,
@@ -1172,31 +1185,70 @@ export async function createSongAndPerformance(
   return { songId: catalog.songIds[0], performanceId: catalog.performanceIds[0] };
 }
 
+// The end-after-start invariant is enforced INSIDE the UPDATE's WHERE, merging
+// each incoming field with the stored counterpart — two overlapping one-sided
+// edits can both pass a read-before-write check, so the write itself must be
+// the gate. Returns false when the row is missing OR the merged pair would be
+// inverted (callers that pre-read can tell the two apart with a re-read).
 export async function updatePerformanceTimestamps(
   db: D1Database,
   id: string,
   fields: { timestamp?: number; endTimestamp?: number | null },
 ): Promise<boolean> {
-  const sets: string[] = [];
-  const values: (string | number | null)[] = [];
+  const hasTimestamp = fields.timestamp !== undefined;
+  const hasEnd = fields.endTimestamp !== undefined;
+  if (!hasTimestamp && !hasEnd) return false;
 
-  if (fields.timestamp !== undefined) {
-    sets.push('timestamp = ?');
-    values.push(fields.timestamp);
-  }
-  if (fields.endTimestamp !== undefined) {
-    sets.push('end_timestamp = ?');
-    values.push(fields.endTimestamp);
-  }
-
-  if (sets.length === 0) return false;
-  values.push(id);
+  const timestampFlag = hasTimestamp ? 1 : 0;
+  const timestampValue = fields.timestamp ?? null;
+  const endFlag = hasEnd ? 1 : 0;
+  const endValue = fields.endTimestamp ?? null;
 
   const result = await db
-    .prepare(`UPDATE performances SET ${sets.join(', ')}, updated_at = datetime('now') WHERE id = ?`)
-    .bind(...values)
+    .prepare(
+      `UPDATE performances SET
+         timestamp = CASE WHEN ? THEN ? ELSE timestamp END,
+         end_timestamp = CASE WHEN ? THEN ? ELSE end_timestamp END,
+         updated_at = datetime('now')
+       WHERE id = ?
+         AND (
+           (CASE WHEN ? THEN ? ELSE end_timestamp END) IS NULL
+           OR (CASE WHEN ? THEN ? ELSE end_timestamp END) > (CASE WHEN ? THEN ? ELSE timestamp END)
+         )`,
+    )
+    .bind(
+      timestampFlag, timestampValue,
+      endFlag, endValue,
+      id,
+      endFlag, endValue,
+      endFlag, endValue,
+      timestampFlag, timestampValue,
+    )
     .run();
   return result.meta.changes > 0;
+}
+
+// fetch-duration fills an EMPTY end with `start + duration`. The read that
+// produced the duration happened before a slow network call, so the database
+// computes the end from the start that is current at write time — a start
+// edit landing in between can neither invert the range nor leave a clip of
+// the wrong length — and only fills a still-empty end. Returns the stored
+// end, or null when nothing was written (row missing, or the end was no
+// longer empty). durationSec must be positive.
+export async function fillPerformanceDuration(
+  db: D1Database,
+  id: string,
+  durationSec: number,
+): Promise<number | null> {
+  const result = await db
+    .prepare(
+      `UPDATE performances SET end_timestamp = timestamp + ?, updated_at = datetime('now')
+       WHERE id = ? AND end_timestamp IS NULL
+       RETURNING end_timestamp`,
+    )
+    .bind(durationSec, id)
+    .run<{ end_timestamp: number }>();
+  return result.results[0]?.end_timestamp ?? null;
 }
 
 export async function updatePerformanceSongDetails(

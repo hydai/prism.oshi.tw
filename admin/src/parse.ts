@@ -14,6 +14,7 @@
 import type { NovaSubmission, NovaVodSubmission, StreamCredit } from '../shared/types';
 import { NOVA_SUBMISSION_EDITABLE_FIELDS, NOVA_VOD_EDITABLE_FIELDS } from './nova-db';
 import type { NovaEditableField, NovaVodEditableField } from './nova-db';
+import { isValidStreamerSlug } from './vod-export/normalization';
 
 function isUnknownRecord(value: unknown): value is Record<string, unknown> {
   return typeof value === 'object' && value !== null && !Array.isArray(value);
@@ -309,27 +310,14 @@ export function parseCreateStreamBody(value: unknown): CreateStreamBodyParsed | 
   if (typeof value.youtubeUrl !== 'string' || value.youtubeUrl.trim().length === 0) {
     return { error: REQUIRED_STREAM_FIELDS_ERROR };
   }
-
-  let credit: StreamCredit | undefined;
-  if (value.credit !== undefined) {
-    // The stored value is JSON.stringify'd whole and decoded by streamFromRow/
-    // exportStreams/the UI as an object with optional string fields — validate
-    // and rebuild it so junk shapes (and unknown keys) never reach the row.
-    if (!isUnknownRecord(value.credit)) {
-      return { error: 'Invalid credit: expected an object' };
-    }
-    const raw = value.credit;
-    for (const key of ['author', 'authorUrl', 'commentUrl'] as const) {
-      if (raw[key] !== undefined && typeof raw[key] !== 'string') {
-        return { error: `Invalid credit.${key}: expected a string` };
-      }
-    }
-    credit = {
-      ...(raw.author === undefined ? {} : { author: raw.author as string }),
-      ...(raw.authorUrl === undefined ? {} : { authorUrl: raw.authorUrl as string }),
-      ...(raw.commentUrl === undefined ? {} : { commentUrl: raw.commentUrl as string }),
-    };
+  // Stream ids derive from this date (stream-YYYY-MM-DD) and it feeds date
+  // sorting + exports — same format gate the update parser already enforces.
+  if (!STREAM_DATE_RE.test(value.date)) {
+    return { error: 'Invalid date format, expected YYYY-MM-DD' };
   }
+
+  const credit = parseStreamCreditValue(value.credit);
+  if (credit !== undefined && 'error' in credit) return credit;
 
   return {
     title: value.title,
@@ -337,6 +325,29 @@ export function parseCreateStreamBody(value: unknown): CreateStreamBodyParsed | 
     videoId: value.videoId,
     youtubeUrl: value.youtubeUrl,
     ...(credit === undefined ? {} : { credit }),
+  };
+}
+
+/**
+ * The stored credit is JSON.stringify'd whole and decoded by streamFromRow/
+ * exportStreams/the UI as an object with optional string fields — validate and
+ * rebuild it so junk shapes (and unknown keys) never reach the row. Returns
+ * undefined when the input is absent.
+ */
+function parseStreamCreditValue(value: unknown): StreamCredit | { error: string } | undefined {
+  if (value === undefined) return undefined;
+  if (!isUnknownRecord(value)) {
+    return { error: 'Invalid credit: expected an object' };
+  }
+  for (const key of ['author', 'authorUrl', 'commentUrl'] as const) {
+    if (value[key] !== undefined && typeof value[key] !== 'string') {
+      return { error: `Invalid credit.${key}: expected a string` };
+    }
+  }
+  return {
+    ...(value.author === undefined ? {} : { author: value.author as string }),
+    ...(value.authorUrl === undefined ? {} : { authorUrl: value.authorUrl as string }),
+    ...(value.commentUrl === undefined ? {} : { commentUrl: value.commentUrl as string }),
   };
 }
 
@@ -440,6 +451,15 @@ export function parseNovaSubmissionUpdateBody(value: unknown): NovaSubmissionUpd
         }
       }
       result.theme_json = raw;
+    } else if (key === 'slug') {
+      // The slug is the catalog's routing key: http.ts rejects requests whose
+      // ?streamer= fails isValidStreamerSlug, and sync-registry asserts the
+      // same invariant before publishing — a free-form edit must not be able
+      // to strand a streamer behind an unreachable slug.
+      if (typeof raw !== 'string' || !isValidStreamerSlug(raw)) {
+        return { error: 'Invalid slug: expected lowercase letters, digits and single hyphens (max 50 chars)' };
+      }
+      result.slug = raw;
     } else {
       if (typeof raw !== 'string') return { error: `Invalid ${key}: expected a string` };
       // NovaSubmission's per-field type is heterogeneous (mostly string, two
@@ -465,6 +485,12 @@ export function parseNovaVodUpdateBody(value: unknown): NovaVodUpdateFields | { 
     const raw = value[key];
     if (raw === undefined) continue;
     if (typeof raw !== 'string') return { error: `Invalid ${key}: expected a string` };
+    // On approval, stream_date becomes the imported stream's ID and date
+    // column (importVodToAdminDb). '' is the schema's own "unknown date"
+    // sentinel; anything else must be a date-only string.
+    if (key === 'stream_date' && raw !== '' && !STREAM_DATE_RE.test(raw)) {
+      return { error: 'Invalid stream_date: expected YYYY-MM-DD (or empty)' };
+    }
     result[key] = raw;
   }
 
@@ -478,4 +504,170 @@ export function parseCrystalReplyBody(value: unknown): { admin_reply: string } |
     return { error: 'admin_reply is required' };
   }
   return { admin_reply: value.admin_reply.trim() };
+}
+
+// --- Status updates (catalog, nova submissions/vods, crystal tickets) ---
+
+/**
+ * Every status route reads { status, reviewer_note? }. A syntactically valid
+ * non-object body (null, a number) previously blew up on property access and
+ * surfaced as a 500; a non-string reviewer_note could reach the TEXT column
+ * or fail D1 binding. The allowed list is the caller's own status constant.
+ */
+export function parseStatusUpdateBody<T extends string>(
+  value: unknown,
+  allowed: ReadonlyArray<T> | ReadonlySet<T>,
+): { status: T; reviewerNote?: string } | { error: string } {
+  if (!isUnknownRecord(value)) return { error: 'Request body must be an object' };
+  const allowedList = [...allowed];
+  if (typeof value.status !== 'string' || !(allowedList as readonly string[]).includes(value.status)) {
+    return { error: `Invalid status: must be one of ${allowedList.join(', ')}` };
+  }
+  if (value.reviewer_note !== undefined && typeof value.reviewer_note !== 'string') {
+    return { error: 'Invalid reviewer_note: expected a string' };
+  }
+  return {
+    status: value.status as T,
+    ...(value.reviewer_note === undefined ? {} : { reviewerNote: value.reviewer_note as string }),
+  };
+}
+
+// --- Stamp: paste-import ---
+
+export interface PasteImportBodyParsed {
+  text: string;
+  replace: boolean;
+}
+
+// POST /api/streams/:streamId/paste-import — `replace` selects the DESTRUCTIVE
+// path (deletes the stream's performances first), so a truthy non-boolean like
+// "false" must never be able to pick it.
+export function parsePasteImportBody(value: unknown): PasteImportBodyParsed | { error: string } {
+  if (!isUnknownRecord(value)) return { error: 'Request body must be an object' };
+  if (typeof value.text !== 'string' || value.text.trim().length === 0) {
+    return { error: 'text is required' };
+  }
+  if (value.replace !== undefined && typeof value.replace !== 'boolean') {
+    return { error: 'Invalid replace: expected a boolean' };
+  }
+  return { text: value.text, replace: value.replace === true };
+}
+
+// --- Harmonizer: apply ---
+
+export interface HarmonizeApplyUpdateParsed {
+  songId: string;
+  title?: string;
+  originalArtist?: string;
+}
+
+// POST /api/harmonize/apply — these values write into songs AND the global
+// works identity, so a numeric title must never reach the binds.
+export function parseHarmonizeApplyBody(value: unknown): { updates: HarmonizeApplyUpdateParsed[] } | { error: string } {
+  if (!isUnknownRecord(value)) return { error: 'Request body must be an object' };
+  if (!Array.isArray(value.updates) || value.updates.length === 0) {
+    return { error: 'updates array is required' };
+  }
+  const updates: HarmonizeApplyUpdateParsed[] = [];
+  for (let i = 0; i < value.updates.length; i++) {
+    const item: unknown = value.updates[i];
+    if (!isUnknownRecord(item)) return { error: `Invalid updates[${i}]: expected an object` };
+    if (typeof item.songId !== 'string' || item.songId.trim().length === 0) {
+      return { error: `Invalid updates[${i}].songId: expected a non-empty string` };
+    }
+    if (item.title !== undefined && (typeof item.title !== 'string' || item.title.trim().length === 0)) {
+      return { error: `Invalid updates[${i}].title: expected a non-empty string` };
+    }
+    if (item.originalArtist !== undefined && (typeof item.originalArtist !== 'string' || item.originalArtist.trim().length === 0)) {
+      return { error: `Invalid updates[${i}].originalArtist: expected a non-empty string` };
+    }
+    updates.push({
+      songId: item.songId,
+      ...(item.title === undefined ? {} : { title: item.title as string }),
+      ...(item.originalArtist === undefined ? {} : { originalArtist: item.originalArtist as string }),
+    });
+  }
+  return { updates };
+}
+
+// --- Pipeline: extract ---
+
+/**
+ * POST /api/pipeline/extract reads { streamId }. A syntactically valid
+ * non-object body (null) previously blew up on destructuring and surfaced as
+ * a 500; a truthy non-string streamId could reach the D1 binding.
+ */
+export function parsePipelineExtractBody(value: unknown): { streamId: string } | { error: string } {
+  if (!isUnknownRecord(value)) return { error: 'Request body must be an object' };
+  if (typeof value.streamId !== 'string' || value.streamId.trim().length === 0) {
+    return { error: 'streamId is required' };
+  }
+  return { streamId: value.streamId };
+}
+
+// --- Pipeline: extract-import ---
+
+export interface ExtractImportSongParsed {
+  songName: string;
+  artist: string;
+  startSeconds: number;
+  endSeconds: number | null;
+}
+
+export interface ExtractImportBodyParsed {
+  streamId: string;
+  songs: ExtractImportSongParsed[];
+  replace: boolean;
+  credit?: StreamCredit;
+}
+
+// POST /api/pipeline/extract-import — with replace: true this body REPLACES a
+// stream's whole catalog, so malformed song fields must never reach the batch
+// (SQLite's non-strict INTEGER columns would happily store text timestamps).
+export function parseExtractImportBody(value: unknown): ExtractImportBodyParsed | { error: string } {
+  if (!isUnknownRecord(value)) return { error: 'Request body must be an object' };
+  if (typeof value.streamId !== 'string' || value.streamId.trim().length === 0) {
+    return { error: 'Invalid streamId: expected a non-empty string' };
+  }
+  if (!Array.isArray(value.songs) || value.songs.length === 0) {
+    return { error: 'streamId and songs are required' };
+  }
+  if (value.replace !== undefined && typeof value.replace !== 'boolean') {
+    return { error: 'Invalid replace: expected a boolean' };
+  }
+  const songs: ExtractImportSongParsed[] = [];
+  for (let i = 0; i < value.songs.length; i++) {
+    const item: unknown = value.songs[i];
+    if (!isUnknownRecord(item)) return { error: `Invalid songs[${i}]: expected an object` };
+    if (typeof item.songName !== 'string' || item.songName.trim().length === 0) {
+      return { error: `Invalid songs[${i}].songName: expected a non-empty string` };
+    }
+    if (typeof item.artist !== 'string') {
+      return { error: `Invalid songs[${i}].artist: expected a string` };
+    }
+    if (!isFiniteNonNegativeNumber(item.startSeconds)) {
+      return { error: `Invalid songs[${i}].startSeconds: expected a finite number >= 0` };
+    }
+    if (
+      item.endSeconds !== undefined
+      && item.endSeconds !== null
+      && (!isFiniteNonNegativeNumber(item.endSeconds) || item.endSeconds <= item.startSeconds)
+    ) {
+      return { error: `Invalid songs[${i}].endSeconds: expected null or a finite number greater than startSeconds` };
+    }
+    songs.push({
+      songName: item.songName,
+      artist: item.artist,
+      startSeconds: item.startSeconds,
+      endSeconds: item.endSeconds === undefined ? null : (item.endSeconds as number | null),
+    });
+  }
+  const credit = parseStreamCreditValue(value.credit);
+  if (credit !== undefined && 'error' in credit) return credit;
+  return {
+    streamId: value.streamId,
+    songs,
+    replace: value.replace === true,
+    ...(credit === undefined ? {} : { credit }),
+  };
 }
