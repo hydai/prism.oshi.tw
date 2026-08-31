@@ -39,7 +39,8 @@ import {
   getStampStats,
   clearAllEndTimestamps,
   getPerformanceWithSong,
-  bulkCreatePerformances,
+  appendStreamPerformances,
+  replaceStreamPerformances,
   bulkApproveStream,
   bulkUnapproveStream,
   deleteStreamCascade,
@@ -601,20 +602,19 @@ app.post('/api/performances', async (c) => {
 
   const user = c.get('user');
   const id = generatePerformanceId();
-  await insertPerformance(
-    c.env.DB,
+  await insertPerformance(c.env.DB, {
     streamerId,
     id,
-    body.songId,
-    body.streamId,
-    stream.date,
-    stream.title,
-    stream.videoId,
-    body.timestamp,
-    body.endTimestamp ?? null,
-    body.note ?? '',
-    user.email,
-  );
+    songId: body.songId,
+    streamId: body.streamId,
+    date: stream.date,
+    streamTitle: stream.title,
+    videoId: stream.videoId,
+    timestamp: body.timestamp,
+    endTimestamp: body.endTimestamp ?? null,
+    note: body.note ?? '',
+    submittedBy: user.email,
+  });
 
   return c.json({ id, status: 'pending' }, 201);
 });
@@ -664,17 +664,16 @@ app.post('/api/streams', async (c) => {
     id = generateStreamIdFallback();
   }
 
-  await insertStream(
-    c.env.DB,
+  await insertStream(c.env.DB, {
     streamerId,
     id,
-    body.title,
-    body.date,
-    body.videoId,
-    body.youtubeUrl,
-    JSON.stringify(body.credit || {}),
-    user.email,
-  );
+    title: body.title,
+    date: body.date,
+    videoId: body.videoId,
+    youtubeUrl: body.youtubeUrl,
+    credit: JSON.stringify(body.credit || {}),
+    submittedBy: user.email,
+  });
 
   return c.json({ id, status: 'pending' }, 201);
 });
@@ -746,20 +745,19 @@ app.post('/api/streams/:streamId/performances', async (c) => {
   if (!stream) return c.json({ error: 'Stream not found' }, 404);
 
   const user = c.get('user');
-  const result = await createSongAndPerformance(
-    c.env.DB,
+  const result = await createSongAndPerformance(c.env.DB, {
     streamerId,
     streamId,
-    stream.date,
-    stream.title,
-    stream.videoId,
-    body.title,
-    body.originalArtist,
-    body.timestamp,
-    body.endTimestamp ?? null,
-    body.note ?? '',
-    user.email,
-  );
+    date: stream.date,
+    streamTitle: stream.title,
+    videoId: stream.videoId,
+    title: body.title,
+    originalArtist: body.originalArtist,
+    timestamp: body.timestamp,
+    endTimestamp: body.endTimestamp ?? null,
+    note: body.note ?? '',
+    submittedBy: user.email,
+  });
 
   return c.json(result, 201);
 });
@@ -903,17 +901,16 @@ app.post('/api/streams/:streamId/paste-import', requireCurator, async (c) => {
     endSeconds: s.endSeconds,
   }));
 
-  const { created } = await bulkCreatePerformances(
-    c.env.DB,
+  const importPerformances = body.replace ? replaceStreamPerformances : appendStreamPerformances;
+  const { created } = await importPerformances(c.env.DB, {
     streamerId,
     streamId,
-    stream.date,
-    stream.title,
-    stream.videoId,
+    date: stream.date,
+    streamTitle: stream.title,
+    videoId: stream.videoId,
     songs,
-    user.email,
-    body.replace ?? false,
-  );
+    submittedBy: user.email,
+  });
 
   return c.json<PasteImportResponse>({
     ok: true,
@@ -1182,17 +1179,16 @@ app.post('/api/pipeline/import-streams', requireCurator, async (c) => {
         id = generateStreamIdFallback();
       }
 
-      await insertStream(
-        db,
+      await insertStream(db, {
         streamerId,
         id,
-        v.title,
-        v.date,
-        v.videoId,
-        `https://www.youtube.com/watch?v=${v.videoId}`,
-        '{}',
-        user.email,
-      );
+        title: v.title,
+        date: v.date,
+        videoId: v.videoId,
+        youtubeUrl: `https://www.youtube.com/watch?v=${v.videoId}`,
+        credit: '{}',
+        submittedBy: user.email,
+      });
 
       streamIds.push(id);
     }
@@ -1319,17 +1315,16 @@ app.post('/api/pipeline/extract-import', requireCurator, async (c) => {
       .run();
   }
 
-  const { created } = await bulkCreatePerformances(
-    c.env.DB,
+  const importPerformances = body.replace ? replaceStreamPerformances : appendStreamPerformances;
+  const { created } = await importPerformances(c.env.DB, {
     streamerId,
-    body.streamId,
-    stream.date,
-    stream.title,
-    stream.videoId,
-    body.songs,
-    user.email,
-    body.replace ?? false,
-  );
+    streamId: body.streamId,
+    date: stream.date,
+    streamTitle: stream.title,
+    videoId: stream.videoId,
+    songs: body.songs,
+    submittedBy: user.email,
+  });
 
   return c.json<ExtractImportResponse>({ ok: true, created });
 });

@@ -644,30 +644,14 @@ export async function listPerformances(
   return results.map(performanceFromRow);
 }
 
-export async function insertPerformance(
-  db: D1Database,
-  streamerId: string,
-  id: string,
-  songId: string,
-  streamId: string,
-  date: string,
-  streamTitle: string,
-  videoId: string,
-  timestamp: number,
-  endTimestamp: number | null,
-  note: string,
-  submittedBy: string,
-): Promise<void> {
-  await preparePerformanceInsert(db, streamerId, songId, {
-    id,
-    streamId,
-    date,
-    streamTitle,
-    videoId,
-    timestamp,
-    endTimestamp,
-    note,
-  }, submittedBy).run();
+export interface PerformanceCreateInput extends PerformanceInsert {
+  readonly streamerId: string;
+  readonly songId: string;
+  readonly submittedBy: string;
+}
+
+export async function insertPerformance(db: D1Database, input: PerformanceCreateInput): Promise<void> {
+  await preparePerformanceInsert(db, input.streamerId, input.songId, input, input.submittedBy).run();
 }
 
 export async function insertPerformances(
@@ -746,23 +730,39 @@ export async function getStreamById(
   return row ? streamFromRow(row) : null;
 }
 
-export async function insertStream(
-  db: D1Database,
-  streamerId: string,
-  id: string,
-  title: string,
-  date: string,
-  videoId: string,
-  youtubeUrl: string,
-  credit: string,
-  submittedBy: string,
-): Promise<void> {
-  await db
+export interface StreamInsert {
+  readonly streamerId: string;
+  readonly id: string;
+  readonly title: string;
+  readonly date: string;
+  readonly videoId: string;
+  readonly youtubeUrl: string;
+  readonly credit: string;
+  readonly submittedBy: string;
+}
+
+// The single home of the 9-column streams INSERT literal. insertStream (one row) and
+// insertStreams (many rows, in one db.batch) both build on this prepared core.
+function prepareStreamInsert(db: D1Database, input: StreamInsert): D1PreparedStatement {
+  return db
     .prepare(
       'INSERT INTO streams (id, streamer_id, title, date, video_id, youtube_url, credit, status, submitted_by) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)',
     )
-    .bind(id, streamerId, title, date, videoId, youtubeUrl, credit, 'pending', submittedBy)
-    .run();
+    .bind(
+      input.id,
+      input.streamerId,
+      input.title,
+      input.date,
+      input.videoId,
+      input.youtubeUrl,
+      input.credit,
+      'pending',
+      input.submittedBy,
+    );
+}
+
+export async function insertStream(db: D1Database, input: StreamInsert): Promise<void> {
+  await prepareStreamInsert(db, input).run();
 }
 
 export async function streamIdExists(
@@ -1098,28 +1098,38 @@ async function prepareCatalogWrites(
   return { statements, songIds, performanceIds };
 }
 
+export interface CreateSongAndPerformanceInput {
+  readonly streamerId: string;
+  readonly streamId: string;
+  readonly date: string;
+  readonly streamTitle: string;
+  readonly videoId: string;
+  readonly title: string;
+  readonly originalArtist: string;
+  readonly timestamp: number;
+  readonly endTimestamp: number | null;
+  readonly note: string;
+  readonly submittedBy: string;
+}
+
 export async function createSongAndPerformance(
   db: D1Database,
-  streamerId: string,
-  streamId: string,
-  date: string,
-  streamTitle: string,
-  videoId: string,
-  title: string,
-  originalArtist: string,
-  timestamp: number,
-  endTimestamp: number | null,
-  note: string,
-  submittedBy: string,
+  input: CreateSongAndPerformanceInput,
 ): Promise<{ songId: string; performanceId: string }> {
   const catalog = await prepareCatalogWrites(db, {
-    streamerId,
-    streamId,
-    date,
-    streamTitle,
-    videoId,
-    songs: [{ title, originalArtist, timestamp, endTimestamp, note }],
-    submittedBy,
+    streamerId: input.streamerId,
+    streamId: input.streamId,
+    date: input.date,
+    streamTitle: input.streamTitle,
+    videoId: input.videoId,
+    songs: [{
+      title: input.title,
+      originalArtist: input.originalArtist,
+      timestamp: input.timestamp,
+      endTimestamp: input.endTimestamp,
+      note: input.note,
+    }],
+    submittedBy: input.submittedBy,
   });
   await db.batch(catalog.statements);
 
@@ -1224,64 +1234,83 @@ export async function updatePerformanceNote(
   return result.meta.changes > 0;
 }
 
-// --- Paste import: bulk create performances ---
+// --- Paste import / extract import: create performances for a stream ---
 
-export async function bulkCreatePerformances(
-  db: D1Database,
-  streamerId: string,
-  streamId: string,
-  date: string,
-  streamTitle: string,
-  videoId: string,
-  songs: Array<{
+export interface StreamPerformancesInput {
+  readonly streamerId: string;
+  readonly streamId: string;
+  readonly date: string;
+  readonly streamTitle: string;
+  readonly videoId: string;
+  readonly songs: ReadonlyArray<{
     songName: string;
     artist: string;
     startSeconds: number;
     endSeconds: number | null;
-  }>,
-  submittedBy: string,
-  replace: boolean,
-): Promise<{ created: number }> {
-  // Own leading statements: replace mode deletes the stream's existing rows before
-  // the shared catalog pipeline below writes the new ones. The orphan-song delete
-  // must run before the performances delete — it identifies orphans by counting this
-  // stream's current performances, which the second delete then removes.
-  const own: D1PreparedStatement[] = [];
-  if (replace) {
-    own.push(
-      db.prepare(
-        `DELETE FROM songs WHERE id IN (
-           SELECT p.song_id FROM performances p
-           WHERE p.stream_id = ?
-           GROUP BY p.song_id
-           HAVING COUNT(*) = (
-             SELECT COUNT(*) FROM performances p2 WHERE p2.song_id = p.song_id
-           )
-         )`,
-      ).bind(streamId),
-      db.prepare('DELETE FROM performances WHERE stream_id = ?').bind(streamId),
-    );
-  }
+  }>;
+  readonly submittedBy: string;
+}
 
+async function writeStreamPerformances(
+  db: D1Database,
+  input: StreamPerformancesInput,
+  own: D1PreparedStatement[],
+  excludeSongsOnlyInStreamId?: string,
+): Promise<{ created: number }> {
   const catalog = await prepareCatalogWrites(db, {
-    streamerId,
-    streamId,
-    date,
-    streamTitle,
-    videoId,
-    songs: songs.map((song) => ({
+    streamerId: input.streamerId,
+    streamId: input.streamId,
+    date: input.date,
+    streamTitle: input.streamTitle,
+    videoId: input.videoId,
+    songs: input.songs.map((song) => ({
       title: song.songName,
       originalArtist: song.artist || 'Unknown',
       timestamp: song.startSeconds,
       endTimestamp: song.endSeconds,
       note: '',
     })),
-    submittedBy,
-    excludeSongsOnlyInStreamId: replace ? streamId : undefined,
+    submittedBy: input.submittedBy,
+    excludeSongsOnlyInStreamId,
   });
 
   await db.batch([...own, ...catalog.statements]);
-  return { created: songs.length };
+  return { created: input.songs.length };
+}
+
+// Additive only — never deletes. The old `bulkCreatePerformances(..., replace: false)`
+// call shape made "don't delete anything" just a boolean default; a caller could not
+// see, from the call site alone, that this path never emits a DELETE.
+export async function appendStreamPerformances(
+  db: D1Database,
+  input: StreamPerformancesInput,
+): Promise<{ created: number }> {
+  return writeStreamPerformances(db, input, []);
+}
+
+// Destructive: replaces every existing performance (and any song orphaned by that
+// removal) for the stream before writing the submitted songs. Carries the old
+// `replace: true` branch's two DELETE statements verbatim. The orphan-song delete must
+// run before the performances delete — it identifies orphans by counting this stream's
+// current performances, which the second delete then removes.
+export async function replaceStreamPerformances(
+  db: D1Database,
+  input: StreamPerformancesInput,
+): Promise<{ created: number }> {
+  const own: D1PreparedStatement[] = [
+    db.prepare(
+      `DELETE FROM songs WHERE id IN (
+         SELECT p.song_id FROM performances p
+         WHERE p.stream_id = ?
+         GROUP BY p.song_id
+         HAVING COUNT(*) = (
+           SELECT COUNT(*) FROM performances p2 WHERE p2.song_id = p.song_id
+         )
+       )`,
+    ).bind(input.streamId),
+    db.prepare('DELETE FROM performances WHERE stream_id = ?').bind(input.streamId),
+  ];
+  return writeStreamPerformances(db, input, own, input.streamId);
 }
 
 // --- Import VOD submission into admin DB ---
@@ -1344,9 +1373,16 @@ export async function importVodToAdminDb(
     }
 
     own.push(
-      db.prepare(
-        'INSERT INTO streams (id, streamer_id, title, date, video_id, youtube_url, credit, status, submitted_by) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)',
-      ).bind(streamId, streamerId, vod.stream_title, vod.stream_date, vod.video_id, vod.video_url, '{}', 'pending', submittedBy),
+      prepareStreamInsert(db, {
+        id: streamId,
+        streamerId,
+        title: vod.stream_title,
+        date: vod.stream_date,
+        videoId: vod.video_id,
+        youtubeUrl: vod.video_url,
+        credit: '{}',
+        submittedBy,
+      }),
     );
   }
 
