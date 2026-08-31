@@ -37,6 +37,7 @@ jobs:
       - run: npm run test:persisted-store
       - run: npm run test:viewport-store
       - run: npm run test:player-context
+      - run: npm run test:player-store
       - run: npm run test:hydration
       - run: npm run test:format
       - run: npm run test:playlist-storage
