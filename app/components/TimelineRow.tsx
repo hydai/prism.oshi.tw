@@ -189,18 +189,15 @@ function TimelineRowInner({ song, index, isCurrentlyPlaying, isUnavailable, isLi
         </button>
         <button
           onClick={() => onAddToQueue(trackFromFlattenedSong(song, streamerSlug))}
-          className="lg:opacity-0 lg:group-hover:opacity-100 transition-[opacity,transform] transform hover:scale-110"
+          className="lg:opacity-0 lg:group-hover:opacity-100 transition-[opacity,transform,color] transform hover:scale-110 text-token-secondary hover:text-accent-pink"
           style={{
             background: 'var(--bg-surface)',
             padding: 'var(--space-2)',
             borderRadius: 'var(--radius-circle)',
             boxShadow: '0 1px 4px rgba(0,0,0,0.1)',
-            color: 'var(--text-secondary)',
           }}
           title="加入佇列"
           data-testid="add-to-queue"
-          onMouseEnter={(e) => { (e.currentTarget as HTMLElement).style.color = 'var(--accent-pink)'; }}
-          onMouseLeave={(e) => { (e.currentTarget as HTMLElement).style.color = 'var(--text-secondary)'; }}
         >
           <Plus className="w-4 h-4" />
         </button>
