@@ -29,10 +29,9 @@ export default function NowPlayingControls({ size }: NowPlayingControlsProps) {
       {/* Shuffle */}
       <button
         onClick={toggleShuffle}
-        className="transition-[color,transform] hover:scale-110"
+        className={`transition-[color,transform] hover:scale-110 ${shuffleOn ? 'text-accent-pink' : 'text-token-tertiary'}`}
         aria-label="Shuffle"
         data-testid="np-shuffle-button"
-        style={{ color: shuffleOn ? 'var(--accent-pink)' : 'var(--text-tertiary)' }}
       >
         <Shuffle style={{ width: `${shuffleSize}px`, height: `${shuffleSize}px` }} />
       </button>
@@ -40,9 +39,8 @@ export default function NowPlayingControls({ size }: NowPlayingControlsProps) {
       {/* Previous */}
       <button
         onClick={previous}
-        className="transition-transform hover:scale-110"
+        className="transition-transform hover:scale-110 text-token-primary"
         aria-label="Previous"
-        style={{ color: 'var(--text-primary)' }}
       >
         <SkipBack style={{ width: `${skipSize}px`, height: `${skipSize}px` }} />
       </button>
@@ -71,9 +69,8 @@ export default function NowPlayingControls({ size }: NowPlayingControlsProps) {
       {/* Next */}
       <button
         onClick={next}
-        className="transition-transform hover:scale-110"
+        className="transition-transform hover:scale-110 text-token-primary"
         aria-label="Next"
-        style={{ color: 'var(--text-primary)' }}
       >
         <SkipForward style={{ width: `${skipSize}px`, height: `${skipSize}px` }} />
       </button>
@@ -81,10 +78,9 @@ export default function NowPlayingControls({ size }: NowPlayingControlsProps) {
       {/* Repeat */}
       <button
         onClick={toggleRepeat}
-        className="transition-[color,transform] hover:scale-110"
+        className={`transition-[color,transform] hover:scale-110 ${repeatMode !== 'off' ? 'text-accent-pink' : 'text-token-tertiary'}`}
         aria-label="Repeat"
         data-testid="np-repeat-button"
-        style={{ color: repeatMode !== 'off' ? 'var(--accent-pink)' : 'var(--text-tertiary)' }}
       >
         {repeatMode === 'one' ? (
           <Repeat1 style={{ width: `${shuffleSize}px`, height: `${shuffleSize}px` }} />

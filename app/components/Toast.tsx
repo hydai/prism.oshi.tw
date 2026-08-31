@@ -48,13 +48,12 @@ function ToastBody({ message, onHide }: ToastBodyProps) {
       style={fading ? undefined : { animation: 'toast-in 300ms ease-out' }}
     >
       <div
-        className="backdrop-blur-xl shadow-2xl rounded-full px-6 py-3 flex items-center gap-3"
-        style={{ background: 'var(--bg-surface-frosted)', border: '1px solid var(--border-glass)' }}
+        className="backdrop-blur-xl shadow-2xl rounded-full px-6 py-3 flex items-center gap-3 bg-surface-frosted border border-border-token-glass"
       >
         <div className="w-6 h-6 rounded-full flex items-center justify-center flex-shrink-0 bg-accent-gradient">
           <CheckCircle className="w-4 h-4 text-white" />
         </div>
-        <span className="font-bold text-sm" style={{ color: 'var(--text-primary)' }}>{message}</span>
+        <span className="font-bold text-sm text-token-primary">{message}</span>
       </div>
     </div>
   );

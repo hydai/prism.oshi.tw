@@ -90,16 +90,17 @@ export default function NowPlayingPage() {
           </div>
           <p
             data-testid="now-playing-empty"
-            style={{ fontSize: '18px', color: 'var(--text-secondary)', marginBottom: '16px' }}
+            className="text-token-secondary"
+            style={{ fontSize: '18px', marginBottom: '16px' }}
           >
             目前沒有播放中的歌曲
           </p>
           <Link
             href={`/${slug}`}
+            className="text-accent-pink"
             style={{
               fontSize: '15px',
               fontWeight: 600,
-              color: 'var(--accent-pink)',
               textDecoration: 'none',
             }}
           >
@@ -138,11 +139,12 @@ export default function NowPlayingPage() {
             onClick={() => router.back()}
             aria-label="Back"
             data-testid="np-back-button"
-            style={{ color: 'var(--text-primary)', padding: '4px' }}
+            className="text-token-primary"
+            style={{ padding: '4px' }}
           >
             <ChevronDown style={{ width: '28px', height: '28px' }} />
           </button>
-          <span style={{ fontSize: '16px', fontWeight: 600, color: 'var(--text-primary)' }}>
+          <span className="text-token-primary" style={{ fontSize: '16px', fontWeight: 600 }}>
             Now Playing
           </span>
           {/* Spacer to keep title centered */}
@@ -161,21 +163,21 @@ export default function NowPlayingPage() {
           {/* Song info */}
           <div className="text-center w-full" style={{ marginTop: '8px' }}>
             <h1
-              className="truncate"
-              style={{ fontSize: '28px', fontWeight: 700, color: 'var(--text-primary)' }}
+              className="truncate text-token-primary"
+              style={{ fontSize: '28px', fontWeight: 700 }}
             >
               {currentTrack.songTitle}
             </h1>
             <div className="flex items-center justify-center" style={{ gap: '6px', marginTop: '4px' }}>
-              <span style={{ fontSize: '16px', color: 'var(--text-secondary)' }}>
+              <span className="text-token-secondary" style={{ fontSize: '16px' }}>
                 {currentTrack.originalArtist}
               </span>
               <button
                 onClick={toggleCurrentLike}
-                className="transition-[color,transform] transform hover:scale-110"
+                className={`transition-[color,transform] transform hover:scale-110 ${liked ? 'text-accent-pink' : 'text-token-tertiary'}`}
                 aria-label={liked ? '取消喜愛' : '喜愛'}
                 data-testid="np-like-button"
-                style={{ color: liked ? 'var(--accent-pink)' : 'var(--text-tertiary)', padding: '4px' }}
+                style={{ padding: '4px' }}
               >
                 <Heart style={{ width: '22px', height: '22px' }} className={liked ? 'fill-current' : ''} />
               </button>
@@ -201,12 +203,11 @@ export default function NowPlayingPage() {
           <div className="flex items-center justify-end w-full" style={{ marginTop: '16px', padding: '0 16px' }}>
             <button
               onClick={handleShare}
-              className="flex items-center transition-colors"
+              className="flex items-center transition-colors text-token-secondary"
               style={{
                 gap: '6px',
                 fontSize: '14px',
                 fontWeight: 500,
-                color: 'var(--text-secondary)',
                 padding: '8px 12px',
                 borderRadius: '8px',
               }}
@@ -234,19 +235,19 @@ export default function NowPlayingPage() {
 
         {/* Song info */}
         <div className="text-center">
-          <h1 style={{ fontSize: '32px', fontWeight: 700, color: 'var(--text-primary)' }}>
+          <h1 className="text-token-primary" style={{ fontSize: '32px', fontWeight: 700 }}>
             {currentTrack.songTitle}
           </h1>
           <div className="flex items-center justify-center" style={{ gap: '6px', marginTop: '6px' }}>
-            <span style={{ fontSize: '16px', color: 'var(--text-secondary)' }}>
+            <span className="text-token-secondary" style={{ fontSize: '16px' }}>
               {currentTrack.originalArtist}
             </span>
             <button
               onClick={toggleCurrentLike}
-              className="transition-[color,transform] transform hover:scale-110"
+              className={`transition-[color,transform] transform hover:scale-110 ${liked ? 'text-accent-pink' : 'text-token-tertiary'}`}
               aria-label={liked ? '取消喜愛' : '喜愛'}
               data-testid="np-like-button-desktop"
-              style={{ color: liked ? 'var(--accent-pink)' : 'var(--text-tertiary)', padding: '4px' }}
+              style={{ padding: '4px' }}
             >
               <Heart style={{ width: '24px', height: '24px' }} className={liked ? 'fill-current' : ''} />
             </button>

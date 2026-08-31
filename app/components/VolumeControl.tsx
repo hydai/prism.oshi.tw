@@ -38,11 +38,10 @@ export default function VolumeControl({ size = 'compact' }: VolumeControlProps) 
           max="100"
           value={displayVolume}
           onChange={(e) => setVolume(Number(e.target.value))}
-          className="w-full"
+          className="w-full rounded-radius-pill"
           aria-label="Volume slider"
           style={{
             height: '4px',
-            borderRadius: 'var(--radius-pill)',
             appearance: 'none',
             WebkitAppearance: 'none',
             background: `linear-gradient(90deg, var(--accent-pink-light) ${displayVolume}%, var(--bg-surface-muted) ${displayVolume}%)`,
