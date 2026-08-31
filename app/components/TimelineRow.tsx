@@ -1,12 +1,13 @@
 'use client';
 
 import { memo } from 'react';
-import { Play, Disc3, Plus, ExternalLink, Heart } from 'lucide-react';
+import { Play, Disc3, Plus, Heart } from 'lucide-react';
 import AlbumArt from './AlbumArt';
 import AddToPlaylistDropdown from './AddToPlaylistDropdown';
+import YouTubeWatchLink from './YouTubeWatchLink';
 import type { FlattenedSong, PerformanceRef } from '../types/archive';
 import { trackFromFlattenedSong } from '../lib/archive';
-import { formatTime, youtubeWatchUrl } from '../lib/format';
+import { formatTime } from '../lib/format';
 
 interface TimelineRowProps {
   song: FlattenedSong;
@@ -218,26 +219,11 @@ function TimelineRowInner({ song, index, isCurrentlyPlaying, isUnavailable, isLi
             onSuccess={onAddToPlaylistSuccess}
           />
         </div>
-        <a
-          href={youtubeWatchUrl(song.videoId, song.timestamp)}
-          target="_blank"
-          rel="noopener noreferrer"
-          className="lg:opacity-0 lg:group-hover:opacity-100 transition-[opacity,transform] transform hover:scale-110"
-          style={{
-            background: 'var(--bg-surface)',
-            padding: 'var(--space-2)',
-            borderRadius: 'var(--radius-circle)',
-            boxShadow: '0 1px 4px rgba(0,0,0,0.1)',
-            color: 'var(--text-secondary)',
-            display: 'flex',
-            alignItems: 'center',
-          }}
-          title="在 YouTube 開啟"
-          onMouseEnter={(e) => { (e.currentTarget as HTMLElement).style.color = '#FF0000'; }}
-          onMouseLeave={(e) => { (e.currentTarget as HTMLElement).style.color = 'var(--text-secondary)'; }}
-        >
-          <ExternalLink className="w-4 h-4" />
-        </a>
+        <YouTubeWatchLink
+          videoId={song.videoId}
+          timestamp={song.timestamp}
+          revealClassName="lg:opacity-0 lg:group-hover:opacity-100"
+        />
         <span
           className="font-mono text-right"
           style={{
