@@ -3,7 +3,7 @@
 import { useState, useMemo, useRef } from 'react';
 import { Download, ListMusic, Upload } from 'lucide-react';
 import { usePlaylist, type Playlist } from '../contexts/PlaylistContext';
-import { usePlayer, type Track } from '../contexts/PlayerContext';
+import { usePlayerActions, type Track } from '../contexts/PlayerContext';
 import type { ArchiveSong } from '../types/archive';
 import BottomSheet from './BottomSheet';
 import PlaylistDetailsView from './PlaylistDetailsView';
@@ -27,7 +27,7 @@ export default function PlaylistPanel({ show, onClose, songsData, onToast }: Pla
   const importInputRef = useRef<HTMLInputElement>(null);
 
   const { playlists, deletePlaylist, renamePlaylist, removeVersionFromPlaylist, reorderVersionsInPlaylist, exportAll, exportSingle, importPlaylists } = usePlaylist();
-  const { playTrackWithQueue } = usePlayer();
+  const { playTrackWithQueue } = usePlayerActions();
 
   const selectedPlaylist = useMemo(
     () => playlists.find(p => p.id === selectedPlaylistId) ?? null,

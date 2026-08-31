@@ -1,14 +1,15 @@
 'use client';
 
 import { Volume2, Volume1, VolumeX } from 'lucide-react';
-import { usePlayer } from '../contexts/PlayerContext';
+import { usePlayerActions, useVolume } from '../contexts/PlayerContext';
 
 interface VolumeControlProps {
   size?: 'compact' | 'full';
 }
 
 export default function VolumeControl({ size = 'compact' }: VolumeControlProps) {
-  const { volume, isMuted, setVolume, toggleMute } = usePlayer();
+  const { volume, isMuted } = useVolume();
+  const { setVolume, toggleMute } = usePlayerActions();
 
   const sliderWidth = size === 'compact' ? '80px' : '120px';
   const iconSize = size === 'compact' ? 18 : 22;

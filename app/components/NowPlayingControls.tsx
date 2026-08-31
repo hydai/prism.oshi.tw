@@ -1,7 +1,7 @@
 'use client';
 
 import { Play, Pause, SkipBack, SkipForward, Shuffle, Repeat, Repeat1 } from 'lucide-react';
-import { usePlayer } from '../contexts/PlayerContext';
+import { usePlayerActions, useTransport } from '../contexts/PlayerContext';
 import VolumeControl from './VolumeControl';
 
 interface NowPlayingControlsProps {
@@ -9,16 +9,8 @@ interface NowPlayingControlsProps {
 }
 
 export default function NowPlayingControls({ size }: NowPlayingControlsProps) {
-  const {
-    isPlaying,
-    togglePlayPause,
-    previous,
-    next,
-    repeatMode,
-    shuffleOn,
-    toggleRepeat,
-    toggleShuffle,
-  } = usePlayer();
+  const { isPlaying, repeatMode, shuffleOn } = useTransport();
+  const { togglePlayPause, previous, next, toggleRepeat, toggleShuffle } = usePlayerActions();
 
   const isMobile = size === 'mobile';
   const shuffleSize = isMobile ? 22 : 20;

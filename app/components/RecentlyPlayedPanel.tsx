@@ -2,7 +2,7 @@
 
 import { Clock, Play, ListPlus, Trash2 } from 'lucide-react';
 import { useRecentlyPlayed } from '../contexts/RecentlyPlayedContext';
-import { usePlayer } from '../contexts/PlayerContext';
+import { usePlayerActions } from '../contexts/PlayerContext';
 import AlbumArt from './AlbumArt';
 import BottomSheet from './BottomSheet';
 
@@ -26,7 +26,7 @@ function formatRelativeTime(playedAt: number): string {
 
 export default function RecentlyPlayedPanel({ show, onClose, onToast }: RecentlyPlayedPanelProps) {
   const { recentPlays, clearHistory } = useRecentlyPlayed();
-  const { playTrackWithQueue, addToQueue } = usePlayer();
+  const { playTrackWithQueue, addToQueue } = usePlayerActions();
 
   const handlePlayAll = () => {
     if (recentPlays.length === 0) return;

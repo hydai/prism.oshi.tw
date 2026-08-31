@@ -3,7 +3,14 @@
 import { useEffect, useId } from 'react';
 import { usePathname } from 'next/navigation';
 import { Play, Pause, ListMusic, Heart } from 'lucide-react';
-import { usePlayer, usePlaybackTime } from '../contexts/PlayerContext';
+import {
+  useCurrentTrack,
+  usePlayerActions,
+  usePlayerStatus,
+  usePlaybackTime,
+  useQueue,
+  useTransport,
+} from '../contexts/PlayerContext';
 import { useCurrentTrackLike } from '../lib/use-current-track-like';
 import { useTrackProgress } from '../lib/use-track-progress';
 import AlbumArt from './AlbumArt';
@@ -11,21 +18,11 @@ import ProgressBar from './ProgressBar';
 import DesktopMiniPlayer from './DesktopMiniPlayer';
 
 export default function MiniPlayer() {
-  const {
-    currentTrack,
-    isPlaying,
-    playerError,
-    togglePlayPause,
-    previous,
-    next,
-    setShowModal,
-    queue,
-    setShowQueue,
-    repeatMode,
-    shuffleOn,
-    toggleRepeat,
-    toggleShuffle,
-  } = usePlayer();
+  const currentTrack = useCurrentTrack();
+  const { isPlaying, repeatMode, shuffleOn } = useTransport();
+  const { playerError } = usePlayerStatus();
+  const queue = useQueue();
+  const { togglePlayPause, previous, next, toggleRepeat, toggleShuffle, setShowModal, setShowQueue } = usePlayerActions();
 
   const { trackCurrentTime, trackDuration } = usePlaybackTime();
   const { liked, toggleCurrentLike } = useCurrentTrackLike();

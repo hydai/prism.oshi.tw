@@ -3,7 +3,7 @@
 import { memo, useCallback, useRef, useState, type DragEvent } from 'react';
 import { useVirtualizer } from '@tanstack/react-virtual';
 import { X, GripVertical, Music, ChevronUp, ChevronDown } from 'lucide-react';
-import { usePlayer, type QueueEntry } from '../contexts/PlayerContext';
+import { useOverlays, usePlayerActions, useQueue, type QueueEntry } from '../contexts/PlayerContext';
 import AlbumArt from './AlbumArt';
 import BottomSheet from './BottomSheet';
 
@@ -211,7 +211,9 @@ function QueueList({
 }
 
 export default function QueuePanel() {
-  const { queue, removeFromQueue, reorderQueue, showQueue, setShowQueue } = usePlayer();
+  const queue = useQueue();
+  const { showQueue } = useOverlays();
+  const { removeFromQueue, reorderQueue, setShowQueue } = usePlayerActions();
   const [draggedIndex, setDraggedIndex] = useState<number | null>(null);
   const [draggedOverIndex, setDraggedOverIndex] = useState<number | null>(null);
   // Drag handlers read the dragged index from a ref so their identity stays

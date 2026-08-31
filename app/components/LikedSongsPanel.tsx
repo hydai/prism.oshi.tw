@@ -2,7 +2,7 @@
 
 import { Heart, Play, ListPlus } from 'lucide-react';
 import { useLikedSongs } from '../contexts/LikedSongsContext';
-import { usePlayer } from '../contexts/PlayerContext';
+import { usePlayerActions } from '../contexts/PlayerContext';
 import AlbumArt from './AlbumArt';
 import BottomSheet from './BottomSheet';
 
@@ -14,7 +14,7 @@ interface LikedSongsPanelProps {
 
 export default function LikedSongsPanel({ show, onClose, onToast }: LikedSongsPanelProps) {
   const { likedSongs, toggleLike } = useLikedSongs();
-  const { playTrackWithQueue, addToQueue } = usePlayer();
+  const { playTrackWithQueue, addToQueue } = usePlayerActions();
 
   const handlePlayAll = () => {
     if (likedSongs.length === 0) return;

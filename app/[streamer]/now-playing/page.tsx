@@ -4,7 +4,7 @@ import { useCallback, useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { ChevronDown, Music2, Share2, Heart } from 'lucide-react';
 import { useStreamer } from '../../contexts/StreamerContext';
-import { usePlayer, usePlaybackTime } from '../../contexts/PlayerContext';
+import { useCurrentTrack, usePlaybackTime } from '../../contexts/PlayerContext';
 import { useLikedSongs } from '../../contexts/LikedSongsContext';
 import { useRecentlyPlayed } from '../../contexts/RecentlyPlayedContext';
 import { useCurrentTrackLike } from '../../lib/use-current-track-like';
@@ -23,7 +23,7 @@ import { formatTime } from '../../lib/format';
 export default function NowPlayingPage() {
   const router = useRouter();
   const { slug } = useStreamer();
-  const { currentTrack } = usePlayer();
+  const currentTrack = useCurrentTrack();
   const { trackCurrentTime } = usePlaybackTime();
 
   const [showLikedSongsPanel, setShowLikedSongsPanel] = useState(false);
