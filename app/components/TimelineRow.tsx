@@ -6,7 +6,7 @@ import AlbumArt from './AlbumArt';
 import AddToPlaylistDropdown from './AddToPlaylistDropdown';
 import type { FlattenedSong, PerformanceRef } from '../types/archive';
 import { trackFromFlattenedSong } from '../lib/archive';
-import { formatTime } from '../lib/format';
+import { formatTime, youtubeWatchUrl } from '../lib/format';
 
 interface TimelineRowProps {
   song: FlattenedSong;
@@ -219,7 +219,7 @@ function TimelineRowInner({ song, index, isCurrentlyPlaying, isUnavailable, isLi
           />
         </div>
         <a
-          href={`https://www.youtube.com/watch?v=${song.videoId}&t=${song.timestamp}s`}
+          href={youtubeWatchUrl(song.videoId, song.timestamp)}
           target="_blank"
           rel="noopener noreferrer"
           className="lg:opacity-0 lg:group-hover:opacity-100 transition-[opacity,transform] transform hover:scale-110"

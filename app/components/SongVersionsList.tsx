@@ -3,7 +3,7 @@
 import { ExternalLink, Heart, Play, Plus } from 'lucide-react';
 import type { ArchivePerformance, ArchiveSong, PerformanceRef } from '../types/archive';
 import { trackFromPerformance } from '../lib/archive';
-import { formatTime } from '../lib/format';
+import { formatTime, youtubeWatchUrl } from '../lib/format';
 import AddToPlaylistDropdown from './AddToPlaylistDropdown';
 
 interface SongVersionsListProps {
@@ -192,7 +192,7 @@ export default function SongVersionsList({
               />
             </div>
             <a
-              href={`https://www.youtube.com/watch?v=${performance.videoId}&t=${performance.timestamp}s`}
+              href={youtubeWatchUrl(performance.videoId, performance.timestamp)}
               target="_blank"
               rel="noopener noreferrer"
               className="opacity-0 group-hover/version:opacity-100 transition-[opacity,transform] transform hover:scale-110"

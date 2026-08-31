@@ -18,7 +18,7 @@ import LikedSongsPanel from '../../components/LikedSongsPanel';
 import RecentlyPlayedPanel from '../../components/RecentlyPlayedPanel';
 import Toast from '../../components/Toast';
 import Link from 'next/link';
-import { formatTime } from '../../lib/format';
+import { formatTime, youtubeWatchUrl } from '../../lib/format';
 
 export default function NowPlayingPage() {
   const router = useRouter();
@@ -44,7 +44,7 @@ export default function NowPlayingPage() {
 
   const handleShare = async () => {
     if (!currentTrack) return;
-    const url = `https://www.youtube.com/watch?v=${currentTrack.videoId}&t=${Math.floor(currentTrack.timestamp)}`;
+    const url = youtubeWatchUrl(currentTrack.videoId, currentTrack.timestamp);
     if (navigator.share) {
       try {
         await navigator.share({ title: `${currentTrack.songTitle} - ${currentTrack.originalArtist}`, url });

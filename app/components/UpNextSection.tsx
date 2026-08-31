@@ -1,14 +1,7 @@
 'use client';
 
 import { useQueue } from '../contexts/PlayerContext';
-
-function formatDuration(track: { timestamp: number; endTimestamp: number | null }): string {
-  if (!track.endTimestamp) return '--:--';
-  const secs = track.endTimestamp - track.timestamp;
-  const m = Math.floor(secs / 60);
-  const s = Math.floor(secs % 60);
-  return `${m}:${s.toString().padStart(2, '0')}`;
-}
+import { formatDuration } from '../lib/format';
 
 export default function UpNextSection() {
   const queue = useQueue();
