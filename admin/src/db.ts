@@ -475,6 +475,25 @@ export async function getSongById(
   return song;
 }
 
+// The single home of the 7-column songs INSERT literal. Every catalog write path —
+// this direct insertSong call and the three pipelines behind prepareCatalogWrites —
+// shares this one prepared statement so the literal can never drift out of sync.
+function prepareSongInsert(
+  db: D1Database,
+  streamerId: string,
+  songId: string,
+  title: string,
+  originalArtist: string,
+  tags: string[],
+  submittedBy: string,
+): D1PreparedStatement {
+  return db
+    .prepare(
+      'INSERT INTO songs (id, streamer_id, title, original_artist, tags, status, submitted_by) VALUES (?, ?, ?, ?, ?, ?, ?)',
+    )
+    .bind(songId, streamerId, title, originalArtist, JSON.stringify(tags), 'pending', submittedBy);
+}
+
 export async function insertSong(
   db: D1Database,
   streamerId: string,
@@ -485,12 +504,9 @@ export async function insertSong(
   submittedBy: string,
 ): Promise<void> {
   const workId = generateWorkId();
-  const tagsJson = JSON.stringify(tags);
   await db.batch([
-    prepareEnsureExactWork(db, workId, title, originalArtist, tagsJson),
-    db.prepare(
-      'INSERT INTO songs (id, streamer_id, title, original_artist, tags, status, submitted_by) VALUES (?, ?, ?, ?, ?, ?, ?)',
-    ).bind(id, streamerId, title, originalArtist, tagsJson, 'pending', submittedBy),
+    prepareEnsureExactWork(db, workId, title, originalArtist, JSON.stringify(tags)),
+    prepareSongInsert(db, streamerId, id, title, originalArtist, tags, submittedBy),
     prepareLinkSongToExactWork(db, id, title, originalArtist, 'import_exact', submittedBy),
   ]);
 }
@@ -998,6 +1014,90 @@ async function resolveExactSongIds(
   };
 }
 
+export interface CatalogSongInput {
+  readonly title: string;
+  readonly originalArtist: string;
+  readonly timestamp: number;
+  readonly endTimestamp: number | null;
+  readonly note: string;
+}
+
+export interface CatalogWriteInput {
+  readonly streamerId: string;
+  readonly streamId: string;
+  readonly date: string;
+  readonly streamTitle: string;
+  readonly videoId: string;
+  readonly songs: readonly CatalogSongInput[];
+  readonly submittedBy: string;
+  readonly excludeSongsOnlyInStreamId?: string;
+}
+
+/**
+ * The one catalog write pipeline: resolve exact song identities, then build — in
+ * order — the work-ensure statements, the (single, shared) songs insert per new
+ * identity, the song-to-work link statements, and finally a performance insert per
+ * submitted song. Every catalog-writing entry point (createSongAndPerformance,
+ * bulkCreatePerformances, importVodToAdminDb) builds its statement list from this.
+ *
+ * This does NOT call db.batch — the caller owns the batch so it can prepend its own
+ * leading statements (replace-mode deletes, a new stream's insert) ahead of this
+ * pipeline's statements, or append more after, and commit everything as one write.
+ */
+async function prepareCatalogWrites(
+  db: D1Database,
+  input: CatalogWriteInput,
+): Promise<{ statements: D1PreparedStatement[]; songIds: string[]; performanceIds: string[] }> {
+  const identities = input.songs.map((song) => ({
+    title: song.title,
+    originalArtist: song.originalArtist || 'Unknown',
+  }));
+  const { songIds, newSongs, workCandidates, songLinks } = await resolveExactSongIds(
+    db,
+    input.streamerId,
+    identities,
+    input.excludeSongsOnlyInStreamId,
+  );
+
+  const statements: D1PreparedStatement[] = workCandidates.map((work) =>
+    prepareEnsureExactWork(db, work.id, work.title, work.originalArtist),
+  );
+
+  statements.push(...newSongs.map((song) =>
+    prepareSongInsert(db, input.streamerId, song.id, song.title, song.originalArtist, [], input.submittedBy),
+  ));
+
+  statements.push(...songLinks.map((link) =>
+    prepareLinkSongToExactWork(
+      db,
+      link.songId,
+      link.title,
+      link.originalArtist,
+      'import_exact',
+      input.submittedBy,
+    ),
+  ));
+
+  const performanceIds: string[] = [];
+  input.songs.forEach((song, index) => {
+    const songId = songIds[index];
+    const perfId = generatePerformanceId();
+    performanceIds.push(perfId);
+    statements.push(preparePerformanceInsert(db, input.streamerId, songId, {
+      id: perfId,
+      streamId: input.streamId,
+      date: input.date,
+      streamTitle: input.streamTitle,
+      videoId: input.videoId,
+      timestamp: song.timestamp,
+      endTimestamp: song.endTimestamp,
+      note: song.note,
+    }, input.submittedBy));
+  });
+
+  return { statements, songIds, performanceIds };
+}
+
 export async function createSongAndPerformance(
   db: D1Database,
   streamerId: string,
@@ -1012,43 +1112,18 @@ export async function createSongAndPerformance(
   note: string,
   submittedBy: string,
 ): Promise<{ songId: string; performanceId: string }> {
-  const { songIds, newSongs, workCandidates, songLinks } = await resolveExactSongIds(db, streamerId, [
-    { title, originalArtist },
-  ]);
-  const songId = songIds[0];
-  const perfId = generatePerformanceId();
+  const catalog = await prepareCatalogWrites(db, {
+    streamerId,
+    streamId,
+    date,
+    streamTitle,
+    videoId,
+    songs: [{ title, originalArtist, timestamp, endTimestamp, note }],
+    submittedBy,
+  });
+  await db.batch(catalog.statements);
 
-  const statements: D1PreparedStatement[] = workCandidates.map((work) =>
-    prepareEnsureExactWork(db, work.id, work.title, work.originalArtist),
-  );
-  statements.push(...newSongs.map((song) =>
-    db
-      .prepare(
-        'INSERT INTO songs (id, streamer_id, title, original_artist, tags, status, submitted_by) VALUES (?, ?, ?, ?, ?, ?, ?)',
-      )
-      .bind(song.id, streamerId, song.title, song.originalArtist, '[]', 'pending', submittedBy),
-  ));
-  statements.push(...songLinks.map((link) =>
-    prepareLinkSongToExactWork(
-      db,
-      link.songId,
-      link.title,
-      link.originalArtist,
-      'import_exact',
-      submittedBy,
-    ),
-  ));
-  statements.push(
-    db
-      .prepare(
-        `INSERT INTO performances (id, streamer_id, song_id, stream_id, date, stream_title, video_id, timestamp, end_timestamp, note, status, submitted_by)
-         VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
-      )
-      .bind(perfId, streamerId, songId, streamId, date, streamTitle, videoId, timestamp, endTimestamp, note, 'pending', submittedBy),
-  );
-  await db.batch(statements);
-
-  return { songId, performanceId: perfId };
+  return { songId: catalog.songIds[0], performanceId: catalog.performanceIds[0] };
 }
 
 export async function updatePerformanceTimestamps(
@@ -1167,22 +1242,13 @@ export async function bulkCreatePerformances(
   submittedBy: string,
   replace: boolean,
 ): Promise<{ created: number }> {
-  const identities = songs.map((song) => ({
-    title: song.songName,
-    originalArtist: song.artist || 'Unknown',
-  }));
-  const { songIds, newSongs, workCandidates, songLinks } = await resolveExactSongIds(
-    db,
-    streamerId,
-    identities,
-    replace ? streamId : undefined,
-  );
-  const stmts: D1PreparedStatement[] = workCandidates.map((work) =>
-    prepareEnsureExactWork(db, work.id, work.title, work.originalArtist),
-  );
-
+  // Own leading statements: replace mode deletes the stream's existing rows before
+  // the shared catalog pipeline below writes the new ones. The orphan-song delete
+  // must run before the performances delete — it identifies orphans by counting this
+  // stream's current performances, which the second delete then removes.
+  const own: D1PreparedStatement[] = [];
   if (replace) {
-    stmts.push(
+    own.push(
       db.prepare(
         `DELETE FROM songs WHERE id IN (
            SELECT p.song_id FROM performances p
@@ -1193,46 +1259,28 @@ export async function bulkCreatePerformances(
            )
          )`,
       ).bind(streamId),
-    );
-    stmts.push(
       db.prepare('DELETE FROM performances WHERE stream_id = ?').bind(streamId),
     );
   }
 
-  for (const song of newSongs) {
-    stmts.push(
-      db.prepare(
-        'INSERT INTO songs (id, streamer_id, title, original_artist, tags, status, submitted_by) VALUES (?, ?, ?, ?, ?, ?, ?)',
-      ).bind(song.id, streamerId, song.title, song.originalArtist, '[]', 'pending', submittedBy),
-    );
-  }
-
-  for (const link of songLinks) {
-    stmts.push(
-      prepareLinkSongToExactWork(
-        db,
-        link.songId,
-        link.title,
-        link.originalArtist,
-        'import_exact',
-        submittedBy,
-      ),
-    );
-  }
-
-  songs.forEach((song, index) => {
-    const songId = songIds[index];
-    const perfId = generatePerformanceId();
-
-    stmts.push(
-      db.prepare(
-        `INSERT INTO performances (id, streamer_id, song_id, stream_id, date, stream_title, video_id, timestamp, end_timestamp, note, status, submitted_by)
-         VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
-      ).bind(perfId, streamerId, songId, streamId, date, streamTitle, videoId, song.startSeconds, song.endSeconds, '', 'pending', submittedBy),
-    );
+  const catalog = await prepareCatalogWrites(db, {
+    streamerId,
+    streamId,
+    date,
+    streamTitle,
+    videoId,
+    songs: songs.map((song) => ({
+      title: song.songName,
+      originalArtist: song.artist || 'Unknown',
+      timestamp: song.startSeconds,
+      endTimestamp: song.endSeconds,
+      note: '',
+    })),
+    submittedBy,
+    excludeSongsOnlyInStreamId: replace ? streamId : undefined,
   });
 
-  await db.batch(stmts);
+  await db.batch([...own, ...catalog.statements]);
   return { created: songs.length };
 }
 
@@ -1274,7 +1322,10 @@ export async function importVodToAdminDb(
   let streamTitle = vod.stream_title;
   let streamDate = vod.stream_date;
 
-  const stmts: D1PreparedStatement[] = [];
+  // Own leading statement: a freshly created stream's insert leads the shared catalog
+  // pipeline below. Reusing an existing stream leaves the stream row untouched, so
+  // there is no leading statement on that path.
+  const own: D1PreparedStatement[] = [];
 
   if (existingStream) {
     // Append the submitted songs as pending records against the existing stream; leave
@@ -1292,60 +1343,30 @@ export async function importVodToAdminDb(
       streamId = generateStreamIdFallback();
     }
 
-    stmts.push(
+    own.push(
       db.prepare(
         'INSERT INTO streams (id, streamer_id, title, date, video_id, youtube_url, credit, status, submitted_by) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)',
       ).bind(streamId, streamerId, vod.stream_title, vod.stream_date, vod.video_id, vod.video_url, '{}', 'pending', submittedBy),
     );
   }
 
-  const identities = vodSongs.map((song) => ({
-    title: song.song_title,
-    originalArtist: song.original_artist || 'Unknown',
-  }));
-  const { songIds, newSongs, workCandidates, songLinks } = await resolveExactSongIds(
-    db,
+  const catalog = await prepareCatalogWrites(db, {
     streamerId,
-    identities,
-  );
-
-  for (const work of workCandidates) {
-    stmts.push(prepareEnsureExactWork(db, work.id, work.title, work.originalArtist));
-  }
-
-  for (const song of newSongs) {
-    stmts.push(
-      db.prepare(
-        'INSERT INTO songs (id, streamer_id, title, original_artist, tags, status, submitted_by) VALUES (?, ?, ?, ?, ?, ?, ?)',
-      ).bind(song.id, streamerId, song.title, song.originalArtist, '[]', 'pending', submittedBy),
-    );
-  }
-
-  for (const link of songLinks) {
-    stmts.push(
-      prepareLinkSongToExactWork(
-        db,
-        link.songId,
-        link.title,
-        link.originalArtist,
-        'import_exact',
-        submittedBy,
-      ),
-    );
-  }
-
-  vodSongs.forEach((song, index) => {
-    const songId = songIds[index];
-    const perfId = generatePerformanceId();
-
-    stmts.push(
-      db.prepare(
-        `INSERT INTO performances (id, streamer_id, song_id, stream_id, date, stream_title, video_id, timestamp, end_timestamp, note, status, submitted_by)
-         VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
-      ).bind(perfId, streamerId, songId, streamId, streamDate, streamTitle, vod.video_id, song.start_timestamp, song.end_timestamp, '', 'pending', submittedBy),
-    );
+    streamId,
+    date: streamDate,
+    streamTitle,
+    videoId: vod.video_id,
+    songs: vodSongs.map((song) => ({
+      title: song.song_title,
+      originalArtist: song.original_artist || 'Unknown',
+      timestamp: song.start_timestamp,
+      endTimestamp: song.end_timestamp,
+      note: '',
+    })),
+    submittedBy,
   });
 
+  const stmts = [...own, ...catalog.statements];
   if (stmts.length > 0) {
     await db.batch(stmts);
   }
