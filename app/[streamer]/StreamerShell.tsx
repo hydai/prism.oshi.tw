@@ -1,6 +1,6 @@
 'use client';
 
-import { ReactNode, useEffect, useSyncExternalStore } from 'react';
+import { ReactNode, useEffect, useMemo, useSyncExternalStore } from 'react';
 import { StreamerConfig, StreamerTheme } from '../../lib/types';
 import { deriveDarkTheme } from '../../lib/theme-utils';
 import { htmlDarkClassStore } from '../lib/theme-store';
@@ -49,21 +49,22 @@ export default function StreamerShell({
     htmlDarkClassStore.getServerSnapshot,
   );
 
-  const cssVars = getThemeVars(config.theme, isDark);
+  const cssVars = useMemo(() => getThemeVars(config.theme, isDark), [config.theme, isDark]);
 
-  // Broadcast theme CSS vars to document.body so fixed-position elements
-  // (MiniPlayer, QueuePanel, NowPlayingModal) inherit the current page's theme
+  // Broadcast the SAME vars to document.body: the portaled surfaces
+  // (NowPlayingModal, every BottomSheet panel) render outside this div and
+  // can't inherit them; the div's inline copy covers first paint and the
+  // in-tree subtree before this effect runs.
   useEffect(() => {
-    const vars = getThemeVars(config.theme, isDark);
-    for (const [key, value] of Object.entries(vars)) {
+    for (const [key, value] of Object.entries(cssVars)) {
       document.body.style.setProperty(key, value);
     }
     return () => {
-      for (const key of Object.keys(vars)) {
+      for (const key of Object.keys(cssVars)) {
         document.body.style.removeProperty(key);
       }
     };
-  }, [config.theme, isDark]);
+  }, [cssVars]);
 
   return (
     <div style={cssVars as React.CSSProperties}>
