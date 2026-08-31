@@ -122,18 +122,13 @@ function ArchiveSidebar() {
               icon={
                 <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
                   <Search
-                    className="w-4 h-4 transition-colors"
-                    style={{ color: 'var(--text-tertiary)' }}
+                    className="w-4 h-4 transition-colors text-token-tertiary"
                   />
                 </div>
               }
-              inputClassName="w-full font-medium py-2.5 pl-9 pr-4 outline-none transition-colors text-base"
+              inputClassName="w-full font-medium py-2.5 pl-9 pr-4 outline-none transition-colors text-base bg-surface-glass border border-border-token-glass rounded-radius-pill text-token-primary"
               inputStyle={{
-                background: 'var(--bg-surface-glass)',
                 backdropFilter: 'blur(8px)',
-                border: '1px solid var(--border-glass)',
-                borderRadius: 'var(--radius-pill)',
-                color: 'var(--text-primary)',
               }}
             />
           </div>
@@ -142,16 +137,15 @@ function ArchiveSidebar() {
         {/* ── Filters Section ── */}
         <div className="pt-2 pb-1">
           <div
-            className="px-3 py-1.5 mb-1 font-bold uppercase tracking-widest flex items-center gap-2"
-            style={{ color: 'var(--text-tertiary)', fontSize: 'var(--font-size-xs)', letterSpacing: '0.1em' }}
+            className="px-3 py-1.5 mb-1 font-bold uppercase tracking-widest flex items-center gap-2 text-token-tertiary text-token-xs"
+            style={{ letterSpacing: '0.1em' }}
           >
             <SlidersHorizontal className="w-3 h-3" />
             篩選條件
             {hasActiveFilters && (
               <button
                 onClick={clearAllFilters}
-                className="ml-auto text-xs font-medium transition-colors"
-                style={{ color: 'var(--accent-pink)', fontSize: 'var(--font-size-xs)' }}
+                className="ml-auto font-medium transition-colors text-accent-pink text-token-xs"
                 data-testid="clear-all-filters"
               >
                 清除全部
@@ -168,13 +162,7 @@ function ArchiveSidebar() {
               id="artist-filter"
               value={selectedArtist ?? ''}
               onChange={(e) => setSelectedArtist(e.target.value || null)}
-              className="w-full font-medium py-2 px-3 outline-none appearance-none text-sm cursor-pointer transition-colors"
-              style={{
-                background: 'var(--bg-surface-glass)',
-                border: '1px solid var(--border-glass)',
-                borderRadius: 'var(--radius-lg)',
-                color: 'var(--text-secondary)',
-              }}
+              className="w-full font-medium py-2 px-3 outline-none appearance-none text-sm cursor-pointer transition-colors bg-surface-glass border border-border-token-glass rounded-radius-lg text-token-secondary"
               data-testid="artist-filter"
             >
               <option value="">全部歌手</option>
@@ -183,7 +171,7 @@ function ArchiveSidebar() {
               ))}
             </select>
             <div className="absolute inset-y-0 right-0 pr-4 flex items-center pointer-events-none">
-              <ChevronDown className="w-3.5 h-3.5" style={{ color: 'var(--text-tertiary)' }} />
+              <ChevronDown className="w-3.5 h-3.5 text-token-tertiary" />
             </div>
           </div>
 
@@ -196,19 +184,18 @@ function ArchiveSidebar() {
         {/* ── Stream Playlists Section ── */}
         <div className="pt-2 pb-2">
           <div
-            className="px-3 py-1.5 mb-1 font-bold uppercase tracking-widest"
-            style={{ color: 'var(--text-tertiary)', fontSize: 'var(--font-size-xs)', letterSpacing: '0.1em' }}
+            className="px-3 py-1.5 mb-1 font-bold uppercase tracking-widest text-token-tertiary text-token-xs"
+            style={{ letterSpacing: '0.1em' }}
           >
             歌枠回放{selectedYears.size > 0 && ` (${Array.from(selectedYears).sort().join(', ')})`}
           </div>
           <button
             onClick={() => setSelectedStreamId(null)}
-            className="w-full text-left px-3 py-2 rounded-radius-lg text-sm font-medium transition-colors"
-            style={
+            className={`w-full text-left px-3 py-2 rounded-radius-lg text-sm font-medium transition-colors ${
               selectedStreamId === null
-                ? { color: 'var(--accent-pink)', background: 'var(--bg-accent-pink)' }
-                : { color: 'var(--text-secondary)', background: 'transparent' }
-            }
+                ? 'text-accent-pink bg-accent-bg-pink'
+                : 'text-token-secondary bg-transparent'
+            }`}
           >
             全部歌曲
           </button>
@@ -224,7 +211,7 @@ function ArchiveSidebar() {
               }`}
             >
               <div className="truncate">{stream.title}</div>
-              <div className="text-xs" style={{ color: 'var(--text-muted)' }}>{stream.date}</div>
+              <div className="text-xs text-token-muted">{stream.date}</div>
             </button>
           ))}
         </div>
@@ -243,19 +230,16 @@ function MobileTopBar() {
       {/* Mobile TopBar — 56px + safe area, fixed top, mobile only */}
       <div
         data-testid="mobile-topbar"
-        className="lg:hidden fixed top-0 left-0 right-0 z-50 flex items-center justify-between"
+        className="lg:hidden fixed top-0 left-0 right-0 z-50 flex items-center justify-between bg-surface-frosted backdrop-blur-[12px] border-b border-b-border-token-glass"
         style={{
           height: '56px',
           padding: 'var(--safe-area-top) 20px 0 20px',
-          background: 'var(--bg-surface-frosted)',
-          backdropFilter: 'blur(12px)',
-          WebkitBackdropFilter: 'blur(12px)',
-          borderBottom: '1px solid var(--border-glass)',
         }}
       >
         <Link
           href="/"
-          style={{ fontSize: '14px', fontWeight: 600, color: 'var(--text-secondary)', textDecoration: 'none' }}
+          className="text-token-secondary"
+          style={{ fontSize: '14px', fontWeight: 600, textDecoration: 'none' }}
         >
           {streamerData.displayName}
         </Link>
@@ -265,8 +249,7 @@ function MobileTopBar() {
             target="_blank"
             rel="noopener noreferrer"
             aria-label="歌回 VOD 資料庫"
-            className="inline-flex items-center"
-            style={{ color: 'var(--text-secondary)' }}
+            className="inline-flex items-center text-token-secondary"
           >
             <Film style={{ width: '20px', height: '20px' }} />
           </a>
@@ -282,7 +265,7 @@ function MainContent() {
   const { scrollContainerRef, mobileTab } = useArchiveUi();
 
   return (
-      <main className="flex-1 lg:m-3 overflow-hidden relative shadow-2xl shadow-indigo-100/50 flex flex-col rounded-radius-3xl" style={{ background: 'var(--bg-surface-glass)', backdropFilter: 'blur(12px)', WebkitBackdropFilter: 'blur(12px)', border: '1px solid var(--border-glass)' }}>
+      <main className="flex-1 lg:m-3 overflow-hidden relative shadow-2xl shadow-indigo-100/50 flex flex-col rounded-radius-3xl bg-surface-glass backdrop-blur-[12px] border border-border-token-glass">
 
         {/* Decorative glows */}
         <div className="absolute -top-20 -right-20 w-96 h-96 bg-pink-300/20 rounded-full blur-3xl pointer-events-none"></div>
@@ -319,29 +302,27 @@ function MobileHero() {
           {/* Mobile Hero Section (§3.4.9.3) — vertical layout, mobile only */}
           <header
             data-testid="mobile-hero"
-            className="lg:hidden flex flex-col items-center flex-shrink-0"
+            className="lg:hidden flex flex-col items-center flex-shrink-0 border-b border-b-border-token-glass"
             style={{
               padding: '16px 24px 24px 24px',
-              borderBottom: '1px solid var(--border-glass)',
               gap: '12px',
             }}
           >
             {/* Avatar: 160×160 circle with gradient border and outer shadow */}
             <div
-              className="flex-shrink-0 bg-accent-gradient"
+              className="flex-shrink-0 bg-accent-gradient rounded-radius-xl"
               style={{
                 width: '160px',
                 height: '160px',
-                borderRadius: 'var(--radius-xl)',
                 padding: '3px',
                 boxShadow: '0 8px 32px rgba(244, 114, 182, 0.25)',
               }}
             >
               <div
+                className="rounded-radius-xl"
                 style={{
                   width: '100%',
                   height: '100%',
-                  borderRadius: 'var(--radius-xl)',
                   overflow: 'hidden',
                 }}
               >
@@ -370,11 +351,11 @@ function MobileHero() {
 
             {/* Streamer Name: fontSize 36, fontWeight 900, letterSpacing -0.5 */}
             <h1
+              className="text-token-primary"
               style={{
                 fontSize: '36px',
                 fontWeight: 900,
                 letterSpacing: '-0.5px',
-                color: 'var(--text-primary)',
                 lineHeight: 1.1,
                 textAlign: 'center',
                 margin: 0,
@@ -385,9 +366,9 @@ function MobileHero() {
 
             {/* Description: streamerData.description · {songCount} 首歌曲, fontSize 13, centered */}
             <p
+              className="text-token-secondary"
               style={{
                 fontSize: '13px',
-                color: 'var(--text-secondary)',
                 textAlign: 'center',
                 lineHeight: 1.5,
                 margin: 0,
@@ -395,16 +376,16 @@ function MobileHero() {
             >
               {streamerData.description}
               {' '}
-              <span style={{ color: 'var(--text-tertiary)' }}>·</span>
+              <span className="text-token-tertiary">·</span>
               {' '}
               <span style={{ fontWeight: 600 }}>{flattenedSongs.length} 首歌曲</span>
             </p>
 
             {/* Stats row: subscriberCount */}
             <p
+              className="text-token-secondary"
               style={{
                 fontSize: '13px',
-                color: 'var(--text-secondary)',
                 textAlign: 'center',
                 lineHeight: 1.5,
                 margin: 0,
@@ -426,21 +407,18 @@ function DesktopHero() {
     <>
           {/* Hero Section - Streamer Profile (~280px height) — desktop only */}
           <header
-            className="relative hidden lg:flex items-center gap-8 overflow-hidden flex-shrink-0"
+            className="relative hidden lg:flex items-center gap-8 overflow-hidden flex-shrink-0 border-b border-b-border-token-glass"
             style={{
               minHeight: '280px',
               padding: '40px 40px 0 40px',
-              borderBottom: '1px solid var(--border-glass)',
             }}
           >
             {/* Left: Avatar */}
             <div
-              className="flex-shrink-0 overflow-hidden"
+              className="flex-shrink-0 overflow-hidden rounded-radius-xl border border-border-token-glass"
               style={{
                 width: '180px',
                 height: '180px',
-                borderRadius: 'var(--radius-xl)',
-                border: '1px solid var(--border-glass)',
                 boxShadow: '0 8px 32px rgba(0,0,0,0.1)',
                 alignSelf: 'flex-end',
                 marginBottom: '40px',
@@ -481,11 +459,9 @@ function DesktopHero() {
 
               {/* Streamer Name */}
               <h1
-                className="tracking-tight leading-none"
+                className="tracking-tight leading-none text-token-3xl text-token-primary"
                 style={{
-                  fontSize: 'var(--font-size-3xl)',
                   fontWeight: 900,
-                  color: 'var(--text-primary)',
                   lineHeight: 1.1,
                 }}
               >
@@ -494,9 +470,8 @@ function DesktopHero() {
 
               {/* Description / Stats Text */}
               <p
+                className="text-token-secondary text-token-base"
                 style={{
-                  color: 'var(--text-secondary)',
-                  fontSize: 'var(--font-size-base)',
                   maxWidth: '480px',
                   lineHeight: 1.5,
                   margin: '2px 0',
@@ -504,23 +479,24 @@ function DesktopHero() {
               >
                 {streamerData.description}
                 {' '}
-                <span style={{ color: 'var(--text-tertiary)' }}>·</span>
+                <span className="text-token-tertiary">·</span>
                 {' '}
                 <span style={{ fontWeight: 600 }}>{flattenedSongs.length} 首歌曲</span>
               </p>
 
               {/* Statistics Row: Followers */}
               <div
-                className="flex items-center gap-6"
-                style={{ fontSize: 'var(--font-size-base)', marginTop: '4px' }}
+                className="flex items-center gap-6 text-token-base"
+                style={{ marginTop: '4px' }}
               >
                 <div className="flex items-center gap-1.5">
                   <span
-                    style={{ fontWeight: 700, color: 'var(--text-primary)', fontSize: 'var(--font-size-xl)' }}
+                    className="text-token-primary text-token-xl"
+                    style={{ fontWeight: 700 }}
                   >
                     {streamerData.subscriberCount}
                   </span>
-                  <span style={{ color: 'var(--text-secondary)', fontSize: 'var(--font-size-sm)' }}>
+                  <span className="text-token-secondary text-token-sm">
                     訂閱者
                   </span>
                 </div>
@@ -560,15 +536,12 @@ function MobileHomeControls() {
           {/* Mobile Action Bar (§3.4.9.4) — horizontal layout, mobile only */}
           <div
             data-testid="mobile-action-bar"
-            className="lg:hidden flex items-center flex-shrink-0"
+            className="lg:hidden flex items-center flex-shrink-0 backdrop-blur-[12px] border-b border-b-border-token-glass"
             style={{
               padding: '0 20px',
               gap: '12px',
               minHeight: '64px',
               background: 'var(--bg-overlay)',
-              backdropFilter: 'blur(12px)',
-              WebkitBackdropFilter: 'blur(12px)',
-              borderBottom: '1px solid var(--border-glass)',
             }}
           >
             {/* Play button: 48×48 circle, gradient fill (pink→blue) */}
@@ -578,10 +551,9 @@ function MobileHomeControls() {
             <button
               data-testid="mobile-shuffle-button"
               onClick={() => toggleShuffle()}
-              className={`flex items-center justify-center flex-shrink-0 transition-[background,border-color,color,opacity] hover:opacity-90 ${shuffleOn ? 'bg-accent-gradient' : 'bg-transparent'}`}
+              className={`flex items-center justify-center flex-shrink-0 transition-[background,border-color,color,opacity] hover:opacity-90 rounded-radius-lg ${shuffleOn ? 'bg-accent-gradient' : 'bg-transparent'}`}
               style={{
                 border: shuffleOn ? 'none' : '2px solid var(--accent-pink-light)',
-                borderRadius: 'var(--radius-lg)',
                 padding: '12px 28px',
                 color: shuffleOn ? 'white' : 'var(--accent-pink)',
               }}
@@ -599,14 +571,10 @@ function MobileHomeControls() {
                 target="_blank"
                 rel="noopener noreferrer"
                 data-testid="mobile-follow-button"
-                className="flex items-center justify-center flex-shrink-0 font-semibold transition-opacity hover:opacity-80"
+                className="flex items-center justify-center flex-shrink-0 font-semibold transition-opacity hover:opacity-80 border border-border-token text-token-secondary text-token-sm bg-transparent"
                 style={{
-                  border: '1px solid var(--border-default)',
                   borderRadius: '20px',
                   padding: '8px 24px',
-                  color: 'var(--text-secondary)',
-                  fontSize: 'var(--font-size-sm)',
-                  background: 'transparent',
                 }}
               >
                 追蹤
@@ -617,10 +585,9 @@ function MobileHomeControls() {
           {/* Mobile View Mode Toggle — full-width touch target, scrolls with page */}
           <div
             data-testid="mobile-view-mode-bar"
-            className="lg:hidden flex items-center flex-shrink-0 px-5 py-3"
+            className="lg:hidden flex items-center flex-shrink-0 px-5 py-3 border-b border-b-border-token-glass"
             style={{
               background: 'var(--bg-overlay)',
-              borderBottom: '1px solid var(--border-glass)',
             }}
           >
             <ViewModeToggle
@@ -634,39 +601,23 @@ function MobileHomeControls() {
           {/* Mobile Year Filter Scroll — horizontal scrolling row, mobile only */}
           <div
             data-testid="mobile-stream-scroll"
-            className="lg:hidden flex items-center flex-shrink-0 sticky top-0 z-[15]"
+            className="lg:hidden flex items-center flex-shrink-0 sticky top-0 z-[15] border-b border-b-border-token-glass bg-surface-frosted backdrop-blur-[12px]"
             style={{
               padding: '12px 20px',
               gap: '8px',
               overflowX: 'auto',
               scrollbarWidth: 'none',
               msOverflowStyle: 'none',
-              borderBottom: '1px solid var(--border-glass)',
-              background: 'var(--bg-surface-frosted)',
-              backdropFilter: 'blur(12px)',
-              WebkitBackdropFilter: 'blur(12px)',
             }}
           >
             {/* All years chip */}
             <button
               onClick={clearYears}
-              className="flex-shrink-0 font-medium transition-colors"
+              className={`flex-shrink-0 font-medium transition-colors text-token-sm ${selectedYears.size === 0 ? 'bg-accent-bg-pink border border-border-token-accent-pink text-accent-pink' : 'bg-transparent text-token-secondary'}`}
               style={{
                 height: '36px',
                 borderRadius: '12px',
                 padding: '0 16px',
-                fontSize: 'var(--font-size-sm)',
-                ...(selectedYears.size === 0
-                  ? {
-                      background: 'var(--bg-accent-pink)',
-                      border: '1px solid var(--border-accent-pink)',
-                      color: 'var(--accent-pink)',
-                    }
-                  : {
-                      background: 'transparent',
-                      border: 'none',
-                      color: 'var(--text-secondary)',
-                    }),
               }}
             >
               全部
@@ -676,24 +627,12 @@ function MobileHomeControls() {
                 key={year}
                 data-testid="year-filter-chip"
                 onClick={() => toggleYear(year)}
-                className="flex-shrink-0 font-medium transition-colors"
+                className={`flex-shrink-0 font-medium transition-colors text-token-sm ${selectedYears.has(year) ? 'bg-accent-bg-pink border border-border-token-accent-pink text-accent-pink' : 'bg-transparent text-token-secondary'}`}
                 style={{
                   height: '36px',
                   borderRadius: '12px',
                   padding: '0 16px',
-                  fontSize: 'var(--font-size-sm)',
                   whiteSpace: 'nowrap',
-                  ...(selectedYears.has(year)
-                    ? {
-                        background: 'var(--bg-accent-pink)',
-                        border: '1px solid var(--border-accent-pink)',
-                        color: 'var(--accent-pink)',
-                      }
-                    : {
-                        background: 'transparent',
-                        border: 'none',
-                        color: 'var(--text-secondary)',
-                      }),
                 }}
               >
                 {year}
@@ -716,13 +655,9 @@ function DesktopActionBar() {
     <>
           {/* Action Bar — desktop only */}
           <div
-            className="hidden lg:flex sticky top-0 z-20 px-6 items-center gap-3 flex-wrap"
+            className="hidden lg:flex sticky top-0 z-20 px-6 items-center gap-3 flex-wrap backdrop-blur-[12px] border-t border-t-border-token-glass border-b border-b-border-token-glass"
             style={{
               background: 'var(--bg-overlay)',
-              backdropFilter: 'blur(12px)',
-              WebkitBackdropFilter: 'blur(12px)',
-              borderTop: '1px solid var(--border-glass)',
-              borderBottom: '1px solid var(--border-glass)',
               minHeight: '64px',
               paddingTop: '10px',
               paddingBottom: '10px',
@@ -736,13 +671,7 @@ function DesktopActionBar() {
 
               {/* GradientButton — "播放全部" pill */}
               <button
-                className="font-semibold text-white flex items-center gap-1.5 transition-opacity hover:opacity-90 flex-shrink-0 bg-accent-gradient"
-                style={{
-                  borderRadius: 'var(--radius-pill)',
-                  fontSize: 'var(--font-size-sm)',
-                  padding: 'var(--space-3) var(--space-5)',
-                  color: 'var(--text-on-accent)',
-                }}
+                className="font-semibold flex items-center gap-1.5 transition-opacity hover:opacity-90 flex-shrink-0 bg-accent-gradient rounded-radius-pill text-token-sm py-token-3 px-token-5 text-token-on-accent"
                 onClick={handlePlayAll}
               >
                 播放全部
@@ -753,15 +682,7 @@ function DesktopActionBar() {
                   href={streamerData.socialLinks.youtube}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="font-semibold flex items-center gap-1.5 transition-opacity hover:opacity-80 flex-shrink-0"
-                  style={{
-                    background: 'transparent',
-                    border: '1px solid var(--border-default)',
-                    borderRadius: 'var(--radius-pill)',
-                    fontSize: 'var(--font-size-sm)',
-                    padding: 'var(--space-3) var(--space-5)',
-                    color: 'var(--text-secondary)',
-                  }}
+                  className="font-semibold flex items-center gap-1.5 transition-opacity hover:opacity-80 flex-shrink-0 bg-transparent border border-border-token rounded-radius-pill text-token-sm py-token-3 px-token-5 text-token-secondary"
                 >
                   追蹤
                 </a>
@@ -779,21 +700,7 @@ function DesktopActionBar() {
               {/* "全部" chip */}
               <button
                 onClick={clearYears}
-                className="font-medium transition-colors"
-                style={{
-                  borderRadius: 'var(--radius-pill)',
-                  fontSize: 'var(--font-size-sm)',
-                  padding: 'var(--space-2) var(--space-4)',
-                  ...(selectedYears.size === 0
-                    ? {
-                        background: 'linear-gradient(135deg, var(--accent-pink-light), var(--accent-blue-light))',
-                        color: 'var(--text-on-accent)',
-                      }
-                    : {
-                        background: 'var(--bg-surface-muted)',
-                        color: 'var(--text-secondary)',
-                      }),
-                }}
+                className={`font-medium transition-colors rounded-radius-pill text-token-sm py-token-2 px-token-4 ${selectedYears.size === 0 ? 'bg-accent-gradient text-token-on-accent' : 'bg-surface-muted text-token-secondary'}`}
               >
                 全部
               </button>
@@ -802,21 +709,7 @@ function DesktopActionBar() {
                   key={year}
                   data-testid="year-filter-chip"
                   onClick={() => toggleYear(year)}
-                  className="font-medium transition-colors"
-                  style={{
-                    borderRadius: 'var(--radius-pill)',
-                    fontSize: 'var(--font-size-sm)',
-                    padding: 'var(--space-2) var(--space-4)',
-                    ...(selectedYears.has(year)
-                      ? {
-                          background: 'linear-gradient(135deg, var(--accent-pink-light), var(--accent-blue-light))',
-                          color: 'var(--text-on-accent)',
-                        }
-                      : {
-                          background: 'var(--bg-surface-muted)',
-                          color: 'var(--text-secondary)',
-                        }),
-                  }}
+                  className={`font-medium transition-colors rounded-radius-pill text-token-sm py-token-2 px-token-4 ${selectedYears.has(year) ? 'bg-accent-gradient text-token-on-accent' : 'bg-surface-muted text-token-secondary'}`}
                 >
                   {year}
                 </button>
@@ -836,31 +729,23 @@ function CatalogStatus({ loadState, retryLoad }: { loadState: ArchiveLoadState; 
       /* Song API Load Error State */
       <div
         data-testid="song-load-error"
-        className="flex flex-col items-center justify-center py-32 gap-6"
-        style={{ color: 'var(--text-secondary)' }}
+        className="flex flex-col items-center justify-center py-32 gap-6 text-token-secondary"
       >
         <div
-          className="flex items-center justify-center w-16 h-16 rounded-full"
-          style={{ background: 'var(--bg-accent-pink-muted)' }}
+          className="flex items-center justify-center w-16 h-16 rounded-full bg-accent-bg-pink-muted"
         >
-          <WifiOff className="w-8 h-8" style={{ color: 'var(--accent-pink)' }} />
+          <WifiOff className="w-8 h-8 text-accent-pink" />
         </div>
         <p
-          className="text-center font-medium max-w-sm"
-          style={{ color: 'var(--text-secondary)', fontSize: 'var(--font-size-base)', lineHeight: 1.6 }}
+          className="text-center font-medium max-w-sm text-token-secondary text-token-base"
+          style={{ lineHeight: 1.6 }}
         >
           無法載入歌曲資料，請檢查網路連線後重新整理頁面
         </p>
         <button
           data-testid="retry-button"
           onClick={retryLoad}
-          className="font-semibold transition-opacity hover:opacity-90 bg-accent-gradient"
-          style={{
-            borderRadius: 'var(--radius-pill)',
-            fontSize: 'var(--font-size-sm)',
-            padding: 'var(--space-3) var(--space-6)',
-            color: 'var(--text-on-accent)',
-          }}
+          className="font-semibold transition-opacity hover:opacity-90 bg-accent-gradient rounded-radius-pill text-token-sm py-token-3 px-token-6 text-token-on-accent"
         >
           重新整理
         </button>
@@ -958,45 +843,34 @@ function TimelineSongList({
     <>
       {/* SongTableHeader */}
       <div
-        className="grid grid-cols-[32px_40px_1fr_60px] lg:grid-cols-[32px_40px_2fr_2fr_100px_60px] gap-0 px-3 py-2 sticky top-[60px] lg:top-[88px] z-10"
-        style={{
-          borderBottom: '1px solid var(--border-table)',
-          background: 'var(--bg-surface-frosted)',
-          backdropFilter: 'blur(12px)',
-          WebkitBackdropFilter: 'blur(12px)',
-        }}
+        className="grid grid-cols-[32px_40px_1fr_60px] lg:grid-cols-[32px_40px_2fr_2fr_100px_60px] gap-0 px-3 py-2 sticky top-[60px] lg:top-[88px] z-10 border-b border-b-border-token-table bg-surface-frosted backdrop-blur-[12px]"
       >
         <div
-          className="flex items-center justify-center text-center font-bold uppercase tracking-wider"
-          style={{ color: 'var(--text-tertiary)', fontSize: 'var(--font-size-xs)' }}
+          className="flex items-center justify-center text-center font-bold uppercase tracking-wider text-token-tertiary text-token-xs"
         >
           #
         </div>
         {/* Album art header spacer */}
         <div />
         <div
-          className="flex items-center font-bold uppercase tracking-wider lg:pl-3"
-          style={{ color: 'var(--text-tertiary)', fontSize: 'var(--font-size-xs)' }}
+          className="flex items-center font-bold uppercase tracking-wider lg:pl-3 text-token-tertiary text-token-xs"
         >
           標題
         </div>
         <div
-          className="hidden lg:flex items-center font-bold uppercase tracking-wider pl-3"
-          style={{ color: 'var(--text-tertiary)', fontSize: 'var(--font-size-xs)' }}
+          className="hidden lg:flex items-center font-bold uppercase tracking-wider pl-3 text-token-tertiary text-token-xs"
         >
           出處直播
         </div>
         <div
-          className="hidden lg:flex items-center font-bold uppercase tracking-wider pl-3"
-          style={{ color: 'var(--text-tertiary)', fontSize: 'var(--font-size-xs)' }}
+          className="hidden lg:flex items-center font-bold uppercase tracking-wider pl-3 text-token-tertiary text-token-xs"
         >
           發布日期
         </div>
         <div
-          className="flex items-center justify-center"
-          style={{ color: 'var(--text-tertiary)' }}
+          className="flex items-center justify-center text-token-tertiary"
         >
-          <Clock style={{ width: 'var(--icon-sm)', height: 'var(--icon-sm)' }} />
+          <Clock className="w-icon-sm h-icon-sm" />
         </div>
       </div>
 
@@ -1159,16 +1033,11 @@ function MobileSearchTab() {
                 containerClassName="relative mb-4"
                 icon={
                   <Search
-                    className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4"
-                    style={{ color: 'var(--text-tertiary)' }}
+                    className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-token-tertiary"
                   />
                 }
-                inputClassName="w-full py-3 pl-10 pr-4 text-base outline-none"
+                inputClassName="w-full py-3 pl-10 pr-4 text-base outline-none bg-surface-glass border border-border-token-glass rounded-radius-pill text-token-primary"
                 inputStyle={{
-                  background: 'var(--bg-surface-glass)',
-                  border: '1px solid var(--border-glass)',
-                  borderRadius: 'var(--radius-pill)',
-                  color: 'var(--text-primary)',
                   backdropFilter: 'blur(8px)',
                 }}
                 inputTestId="mobile-search-input"
@@ -1183,13 +1052,7 @@ function MobileSearchTab() {
                   id="mobile-artist-filter"
                   value={selectedArtist ?? ''}
                   onChange={(e) => setSelectedArtist(e.target.value || null)}
-                  className="w-full font-medium py-2 px-3 outline-none appearance-none text-sm cursor-pointer"
-                  style={{
-                    background: 'var(--bg-surface-glass)',
-                    border: '1px solid var(--border-glass)',
-                    borderRadius: 'var(--radius-lg)',
-                    color: 'var(--text-secondary)',
-                  }}
+                  className="w-full font-medium py-2 px-3 outline-none appearance-none text-sm cursor-pointer bg-surface-glass border border-border-token-glass rounded-radius-lg text-token-secondary"
                   data-testid="mobile-artist-filter"
                 >
                   <option value="">全部歌手</option>
@@ -1198,14 +1061,14 @@ function MobileSearchTab() {
                   ))}
                 </select>
                 <div className="absolute inset-y-0 right-0 pr-4 flex items-center pointer-events-none">
-                  <ChevronDown className="w-3.5 h-3.5" style={{ color: 'var(--text-tertiary)' }} />
+                  <ChevronDown className="w-3.5 h-3.5 text-token-tertiary" />
                 </div>
               </div>
               {/* Search results */}
               <div>
                 {flattenedSongs.length === 0 ? (
-                  <div className="py-16 text-center" style={{ color: 'var(--text-tertiary)' }}>
-                    <p className="text-base font-medium" style={{ color: 'var(--text-secondary)' }}>找不到符合條件的歌曲</p>
+                  <div className="py-16 text-center text-token-tertiary">
+                    <p className="text-base font-medium text-token-secondary">找不到符合條件的歌曲</p>
                   </div>
                 ) : (
                   <div
@@ -1268,28 +1131,21 @@ function MobileLibraryTab() {
               data-testid="mobile-library-tab"
             >
               <div className="mb-4">
-                <h2 className="text-lg font-bold mb-3" style={{ color: 'var(--text-primary)' }}>你的音樂庫</h2>
+                <h2 className="text-lg font-bold mb-3 text-token-primary">你的音樂庫</h2>
 
                 {/* Liked Songs */}
                 <button
                   onClick={() => setShowLikedSongsPanel(true)}
-                  className="w-full flex items-center justify-between px-4 py-3 rounded-radius-lg font-medium text-sm transition-colors mb-2"
-                  style={{
-                    background: 'var(--bg-surface-glass)',
-                    border: '1px solid var(--border-glass)',
-                    color: 'var(--text-secondary)',
-                    borderRadius: 'var(--radius-lg)',
-                  }}
+                  className="w-full flex items-center justify-between px-4 py-3 rounded-radius-lg font-medium text-sm transition-colors mb-2 bg-surface-glass border border-border-token-glass text-token-secondary"
                   data-testid="mobile-liked-songs-button"
                 >
                   <span className="flex items-center gap-3">
-                    <Heart className="w-4 h-4 flex-shrink-0" style={{ color: 'var(--accent-pink)' }} />
+                    <Heart className="w-4 h-4 flex-shrink-0 text-accent-pink" />
                     喜愛的歌曲
                   </span>
                   {likedCount > 0 && (
                     <span
-                      className="text-xs px-2 py-0.5 rounded-full font-medium"
-                      style={{ background: 'var(--bg-accent-pink-muted)', color: 'var(--accent-pink)' }}
+                      className="text-xs px-2 py-0.5 rounded-full font-medium bg-accent-bg-pink-muted text-accent-pink"
                     >
                       {likedCount}
                     </span>
@@ -1299,23 +1155,16 @@ function MobileLibraryTab() {
                 {/* Recently Played */}
                 <button
                   onClick={() => setShowRecentlyPlayedPanel(true)}
-                  className="w-full flex items-center justify-between px-4 py-3 rounded-radius-lg font-medium text-sm transition-colors mb-2"
-                  style={{
-                    background: 'var(--bg-surface-glass)',
-                    border: '1px solid var(--border-glass)',
-                    color: 'var(--text-secondary)',
-                    borderRadius: 'var(--radius-lg)',
-                  }}
+                  className="w-full flex items-center justify-between px-4 py-3 rounded-radius-lg font-medium text-sm transition-colors mb-2 bg-surface-glass border border-border-token-glass text-token-secondary"
                   data-testid="mobile-recently-played-button"
                 >
                   <span className="flex items-center gap-3">
-                    <Clock className="w-4 h-4 flex-shrink-0" style={{ color: 'var(--accent-pink)' }} />
+                    <Clock className="w-4 h-4 flex-shrink-0 text-accent-pink" />
                     最近播放
                   </span>
                   {recentCount > 0 && (
                     <span
-                      className="text-xs px-2 py-0.5 rounded-full font-medium"
-                      style={{ background: 'var(--bg-accent-pink-muted)', color: 'var(--accent-pink)' }}
+                      className="text-xs px-2 py-0.5 rounded-full font-medium bg-accent-bg-pink-muted text-accent-pink"
                     >
                       {recentCount}
                     </span>
@@ -1325,16 +1174,10 @@ function MobileLibraryTab() {
                 {/* Create Playlist */}
                 <button
                   onClick={() => setShowCreateDialog(true)}
-                  className="w-full flex items-center gap-3 px-4 py-3 rounded-radius-lg font-medium text-sm transition-colors"
-                  style={{
-                    background: 'var(--bg-surface-glass)',
-                    border: '1px solid var(--border-glass)',
-                    color: 'var(--text-secondary)',
-                    borderRadius: 'var(--radius-lg)',
-                  }}
+                  className="w-full flex items-center gap-3 px-4 py-3 rounded-radius-lg font-medium text-sm transition-colors bg-surface-glass border border-border-token-glass text-token-secondary"
                   data-testid="mobile-create-playlist-button"
                 >
-                  <Plus className="w-4 h-4 flex-shrink-0" style={{ color: 'var(--accent-pink)' }} />
+                  <Plus className="w-4 h-4 flex-shrink-0 text-accent-pink" />
                   建立新播放清單
                 </button>
               </div>
@@ -1342,30 +1185,23 @@ function MobileLibraryTab() {
                 <div>
                   <button
                     onClick={() => setShowPlaylistPanel(true)}
-                    className="w-full flex items-center justify-between px-4 py-3 rounded-radius-lg font-medium text-sm transition-colors mb-2"
-                    style={{
-                      background: 'var(--bg-surface-glass)',
-                      border: '1px solid var(--border-glass)',
-                      color: 'var(--text-secondary)',
-                      borderRadius: 'var(--radius-lg)',
-                    }}
+                    className="w-full flex items-center justify-between px-4 py-3 rounded-radius-lg font-medium text-sm transition-colors mb-2 bg-surface-glass border border-border-token-glass text-token-secondary"
                     data-testid="mobile-view-playlists-button"
                   >
                     <span className="flex items-center gap-3">
-                      <ListMusic className="w-4 h-4 flex-shrink-0" style={{ color: 'var(--accent-pink)' }} />
+                      <ListMusic className="w-4 h-4 flex-shrink-0 text-accent-pink" />
                       查看播放清單
                     </span>
                     <span
-                      className="text-xs px-2 py-0.5 rounded-full font-medium"
-                      style={{ background: 'var(--bg-accent-pink-muted)', color: 'var(--accent-pink)' }}
+                      className="text-xs px-2 py-0.5 rounded-full font-medium bg-accent-bg-pink-muted text-accent-pink"
                     >
                       {playlists.length}
                     </span>
                   </button>
                 </div>
               ) : (
-                <div className="py-16 text-center" style={{ color: 'var(--text-tertiary)' }}>
-                  <p className="text-base" style={{ color: 'var(--text-secondary)' }}>尚無播放清單，立即建立一個吧！</p>
+                <div className="py-16 text-center text-token-tertiary">
+                  <p className="text-base text-token-secondary">尚無播放清單，立即建立一個吧！</p>
                 </div>
               )}
             </div>
@@ -1389,7 +1225,7 @@ function MobileStreamsTab() {
               className="lg:hidden flex-1 px-4 pt-4 pb-32"
               data-testid="mobile-streams-tab"
             >
-              <h2 className="text-lg font-bold mb-3" style={{ color: 'var(--text-primary)' }}>歌枠回放</h2>
+              <h2 className="text-lg font-bold mb-3 text-token-primary">歌枠回放</h2>
 
               {/* Year filter chips */}
               <div className="flex gap-1.5 mb-4 overflow-x-auto" data-testid="mobile-streams-year-filter">
@@ -1397,11 +1233,9 @@ function MobileStreamsTab() {
                 {selectedYears.size > 0 && (
                   <button
                     onClick={clearYears}
-                    className="font-medium text-xs transition-colors flex-shrink-0"
+                    className="font-medium text-xs transition-colors flex-shrink-0 rounded-radius-pill text-token-tertiary"
                     style={{
-                      borderRadius: 'var(--radius-pill)',
                       padding: '4px 10px',
-                      color: 'var(--text-tertiary)',
                     }}
                   >
                     清除
@@ -1412,13 +1246,7 @@ function MobileStreamsTab() {
               {/* All songs button */}
               <button
                 onClick={() => { setSelectedStreamId(null); setMobileTab('home'); }}
-                className="w-full text-left px-4 py-3 rounded-radius-lg text-sm font-medium transition-colors mb-2"
-                style={{
-                  background: 'var(--bg-surface-glass)',
-                  border: '1px solid var(--border-glass)',
-                  color: 'var(--text-secondary)',
-                  borderRadius: 'var(--radius-lg)',
-                }}
+                className="w-full text-left px-4 py-3 rounded-radius-lg text-sm font-medium transition-colors mb-2 bg-surface-glass border border-border-token-glass text-token-secondary"
                 data-testid="mobile-streams-all-songs"
               >
                 全部歌曲
@@ -1426,8 +1254,8 @@ function MobileStreamsTab() {
 
               {/* Stream list */}
               {filteredStreams.length === 0 ? (
-                <div className="py-16 text-center" style={{ color: 'var(--text-tertiary)' }}>
-                  <p className="text-base" style={{ color: 'var(--text-secondary)' }}>沒有符合條件的歌枠</p>
+                <div className="py-16 text-center text-token-tertiary">
+                  <p className="text-base text-token-secondary">沒有符合條件的歌枠</p>
                 </div>
               ) : (
                 <div className="flex flex-col gap-2">
@@ -1436,15 +1264,10 @@ function MobileStreamsTab() {
                       key={stream.id}
                       data-testid="mobile-stream-card"
                       onClick={() => { setSelectedStreamId(stream.id); setMobileTab('home'); }}
-                      className="w-full text-left px-4 py-3 rounded-radius-lg transition-colors"
-                      style={{
-                        background: 'var(--bg-surface-glass)',
-                        border: '1px solid var(--border-glass)',
-                        borderRadius: 'var(--radius-lg)',
-                      }}
+                      className="w-full text-left px-4 py-3 rounded-radius-lg transition-colors bg-surface-glass border border-border-token-glass"
                     >
-                      <div className="text-sm font-medium truncate" style={{ color: 'var(--text-primary)' }}>{stream.title}</div>
-                      <div className="text-xs mt-0.5" style={{ color: 'var(--text-muted)' }}>{stream.date}</div>
+                      <div className="text-sm font-medium truncate text-token-primary">{stream.title}</div>
+                      <div className="text-xs mt-0.5 text-token-muted">{stream.date}</div>
                     </button>
                   ))}
                 </div>
@@ -1471,13 +1294,9 @@ function MobileBottomNavigation() {
       {/* Mobile BottomNav — 64px + safe area, fixed bottom, mobile only */}
       <nav
         data-testid="mobile-bottom-nav"
-        className="lg:hidden fixed bottom-0 left-0 right-0 z-[70] flex items-start justify-around"
+        className="lg:hidden fixed bottom-0 left-0 right-0 z-[70] flex items-start justify-around bg-surface-frosted backdrop-blur-[12px] border-t border-t-border-token-glass"
         style={{
           padding: '8px 0 calc(16px + var(--safe-area-bottom)) 0',
-          background: 'var(--bg-surface-frosted)',
-          backdropFilter: 'blur(12px)',
-          WebkitBackdropFilter: 'blur(12px)',
-          borderTop: '1px solid var(--border-glass)',
         }}
       >
         {BOTTOM_NAV_ITEMS.map(({ tab, icon: Icon, label, testId }) => (
@@ -1489,17 +1308,17 @@ function MobileBottomNavigation() {
             style={{ gap: '4px', flex: 1 }}
           >
             <Icon
+              className={mobileTab === tab ? 'text-accent-pink' : 'text-token-tertiary'}
               style={{
                 width: '22px',
                 height: '22px',
-                color: mobileTab === tab ? 'var(--accent-pink)' : 'var(--text-tertiary)',
               }}
             />
             <span
+              className={mobileTab === tab ? 'text-accent-pink' : 'text-token-tertiary'}
               style={{
                 fontSize: '10px',
                 fontWeight: mobileTab === tab ? 700 : 500,
-                color: mobileTab === tab ? 'var(--accent-pink)' : 'var(--text-tertiary)',
               }}
             >
               {label}
