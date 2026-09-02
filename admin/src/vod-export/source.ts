@@ -1,4 +1,5 @@
 import { VOD_EXPORT_LIMITS, VOD_EXPORT_SCHEMA_VERSION } from './constants';
+import { assertWithinCapacity } from './limits';
 import { utf8ByteLength } from './normalization';
 import type {
   ExportSourcePerformance,
@@ -9,17 +10,6 @@ import type {
 } from './types';
 
 const TRIGGER_SCHEMA_VERSION = 1;
-
-// D1 rejects an individual bound TEXT/BLOB value above 2,000,000 bytes. Keep
-// packed scope values below that platform limit and bind an unusually large
-// individual slug directly. The fixed-width byte-length framing avoids JSON's
-// potentially 6x escaping expansion for invalid source slugs.
-const D1_MAX_BOUND_VALUE_BYTES = 2_000_000;
-const STREAMER_SCOPE_BLOB_TARGET_BYTES = 1_900_000;
-const STREAMER_SCOPE_LENGTH_PREFIX_BYTES = 8;
-const D1_MAX_BOUND_PARAMETERS = 100;
-const DB_SOURCE_LIMIT_BOUND_PARAMETERS = 5;
-const textEncoder = new TextEncoder();
 
 const ADMIN_REVISION_TRIGGERS = [
   'vod_export_streams_insert_revision',
@@ -126,17 +116,9 @@ interface AdminStatsRow {
   relationship_finding_count: number | string | null;
 }
 
-interface StreamerScopeBinding {
-  kind: 'blob' | 'direct' | 'fragment';
-  value: Uint8Array | string;
-  fragmentGroup?: number;
-  fragmentPart?: number;
-  fragmentLast?: number;
-}
-
 interface StreamerScope {
   cteSql: string;
-  bindings: readonly (Uint8Array | string)[];
+  binding: string;
 }
 
 const STATE_SQL = `
@@ -413,183 +395,23 @@ function dbPerformanceRowsSql(scopeCte: string): string {
   `;
 }
 
+/**
+ * Scopes the admin source read to the approved streamer slugs with one bound
+ * JSON array. D-020.2 caps the scope at 500 slugs, so its serialized form is
+ * tens of KB; a scope whose escaped length would not fit one D1 bound value is
+ * refused as a capacity failure rather than split across bindings.
+ */
 function buildStreamerScope(streamerIds: readonly string[]): StreamerScope {
-  const encodedBindings: StreamerScopeBinding[] = [];
-  let pendingPayload: Uint8Array | null = null;
-  let pendingBytes = 0;
-  let fragmentGroup = 0;
-
-  const flushBlob = (): void => {
-    if (pendingPayload === null || pendingBytes === 0) return;
-    const payload = pendingBytes === pendingPayload.byteLength
-      ? pendingPayload
-      : pendingPayload.slice(0, pendingBytes);
-    encodedBindings.push({ kind: 'blob', value: payload });
-    pendingPayload = null;
-    pendingBytes = 0;
-  };
-
-  for (const streamerId of streamerIds) {
-    const valueByteLength = utf8ByteLength(streamerId);
-
-    if (valueByteLength > D1_MAX_BOUND_VALUE_BYTES) {
-      flushBlob();
-      const chunks = splitUtf8Text(streamerId, STREAMER_SCOPE_BLOB_TARGET_BYTES);
-      const lastPart = chunks.length - 1;
-      for (let part = 0; part < chunks.length; part += 1) {
-        const chunk = chunks[part];
-        if (chunk === undefined) continue;
-        encodedBindings.push({
-          kind: 'fragment',
-          value: chunk,
-          fragmentGroup,
-          fragmentPart: part,
-          fragmentLast: lastPart,
-        });
-      }
-      fragmentGroup += 1;
-      continue;
-    }
-
-    const lengthText = String(valueByteLength).padStart(
-      STREAMER_SCOPE_LENGTH_PREFIX_BYTES,
-      '0',
-    );
-    if (lengthText.length !== STREAMER_SCOPE_LENGTH_PREFIX_BYTES) {
-      throw new VodExportSourceError(
-        'EXPORT_SOURCE_GUARD_MISMATCH',
-        'A streamer scope key cannot be framed safely',
-        503,
-      );
-    }
-    const entryByteLength = STREAMER_SCOPE_LENGTH_PREFIX_BYTES + valueByteLength;
-
-    // The framing bytes can push an otherwise legal D1 string over the BLOB
-    // limit. Bind that one original string directly instead.
-    if (entryByteLength > STREAMER_SCOPE_BLOB_TARGET_BYTES) {
-      flushBlob();
-      encodedBindings.push({ kind: 'direct', value: streamerId });
-      continue;
-    }
-    if (pendingBytes + entryByteLength > STREAMER_SCOPE_BLOB_TARGET_BYTES) flushBlob();
-    if (pendingPayload === null) pendingPayload = new Uint8Array(STREAMER_SCOPE_BLOB_TARGET_BYTES);
-    for (let index = 0; index < lengthText.length; index += 1) {
-      pendingPayload[pendingBytes + index] = lengthText.charCodeAt(index);
-    }
-    pendingBytes += STREAMER_SCOPE_LENGTH_PREFIX_BYTES;
-    const encoded = textEncoder.encodeInto(streamerId, pendingPayload.subarray(pendingBytes));
-    if (encoded.read !== streamerId.length || encoded.written !== valueByteLength) {
-      throw new VodExportSourceError(
-        'EXPORT_SOURCE_GUARD_MISMATCH',
-        'A streamer scope key could not be encoded exactly',
-        503,
-      );
-    }
-    pendingBytes += encoded.written;
-  }
-  flushBlob();
-
-  if (encodedBindings.length + DB_SOURCE_LIMIT_BOUND_PARAMETERS > D1_MAX_BOUND_PARAMETERS) {
-    throw new VodExportSourceError(
-      'EXPORT_SOURCE_GUARD_MISMATCH',
-      'Streamer scope requires too many D1 bound parameters',
-      503,
-    );
-  }
-
-  const sourceSelects = encodedBindings.length === 0
-    ? ['SELECT NULL AS payload, NULL AS direct_value, NULL AS fragment_group, NULL AS fragment_part, NULL AS fragment_last, NULL AS fragment_value WHERE 0']
-    : encodedBindings.map((binding) => {
-      if (binding.kind === 'blob') {
-        return 'SELECT CAST(? AS BLOB) AS payload, NULL AS direct_value, NULL AS fragment_group, NULL AS fragment_part, NULL AS fragment_last, NULL AS fragment_value';
-      }
-      if (binding.kind === 'direct') {
-        return 'SELECT NULL AS payload, CAST(? AS TEXT) AS direct_value, NULL AS fragment_group, NULL AS fragment_part, NULL AS fragment_last, NULL AS fragment_value';
-      }
-      return `SELECT NULL AS payload, NULL AS direct_value, ${binding.fragmentGroup ?? 0} AS fragment_group, ${binding.fragmentPart ?? 0} AS fragment_part, ${binding.fragmentLast ?? 0} AS fragment_last, CAST(? AS TEXT) AS fragment_value`;
-    });
-  const byteLength = (expression: string): string =>
-    `CAST(CAST(substr(${expression}, 1, ${STREAMER_SCOPE_LENGTH_PREFIX_BYTES}) AS TEXT) AS INTEGER)`;
-  const firstLength = byteLength('payload');
-  const nextLength = byteLength('rest');
-
+  const binding = JSON.stringify(streamerIds);
+  assertWithinCapacity('d1JsonBindingBytes', utf8ByteLength(binding));
   return {
     cteSql: `
-      WITH RECURSIVE
-      scope_sources(payload, direct_value, fragment_group, fragment_part, fragment_last, fragment_value) AS (
-        ${sourceSelects.join('\n        UNION ALL\n        ')}
-      ),
-      decoded_scope(streamer_id, rest) AS (
-        SELECT
-          CAST(substr(payload, ${STREAMER_SCOPE_LENGTH_PREFIX_BYTES + 1}, ${firstLength}) AS TEXT),
-          substr(payload, ${STREAMER_SCOPE_LENGTH_PREFIX_BYTES + 1} + ${firstLength})
-        FROM scope_sources
-        WHERE payload IS NOT NULL AND length(payload) >= ${STREAMER_SCOPE_LENGTH_PREFIX_BYTES}
-        UNION ALL
-        SELECT
-          CAST(substr(rest, ${STREAMER_SCOPE_LENGTH_PREFIX_BYTES + 1}, ${nextLength}) AS TEXT),
-          substr(rest, ${STREAMER_SCOPE_LENGTH_PREFIX_BYTES + 1} + ${nextLength})
-        FROM decoded_scope
-        WHERE length(rest) >= ${STREAMER_SCOPE_LENGTH_PREFIX_BYTES}
-      ),
-      assembled_fragments(fragment_group, fragment_part, fragment_last, streamer_id) AS (
-        SELECT fragment_group, fragment_part, fragment_last, fragment_value
-        FROM scope_sources
-        WHERE fragment_part = 0
-        UNION ALL
-        SELECT
-          assembled.fragment_group,
-          next.fragment_part,
-          assembled.fragment_last,
-          assembled.streamer_id || next.fragment_value
-        FROM assembled_fragments assembled
-        JOIN scope_sources next
-          ON next.fragment_group = assembled.fragment_group
-          AND next.fragment_part = assembled.fragment_part + 1
-        WHERE assembled.fragment_part < assembled.fragment_last
-      ),
-      selected_streamers(streamer_id) AS (
-        SELECT streamer_id FROM decoded_scope
-        UNION ALL
-        SELECT direct_value FROM scope_sources WHERE direct_value IS NOT NULL
-        UNION ALL
-        SELECT streamer_id FROM assembled_fragments WHERE fragment_part = fragment_last
+      WITH selected_streamers(streamer_id) AS (
+        SELECT value FROM json_each(?)
       )
     `,
-    bindings: encodedBindings.map((binding) => binding.value),
+    binding,
   };
-}
-
-function splitUtf8Text(value: string, maxBytes: number): string[] {
-  const chunks: string[] = [];
-  let chunkStart = 0;
-  let chunkBytes = 0;
-  for (let index = 0; index < value.length; index += 1) {
-    const first = value.charCodeAt(index);
-    let scalarBytes: number;
-    let width = 1;
-    if (first <= 0x7f) scalarBytes = 1;
-    else if (first <= 0x7ff) scalarBytes = 2;
-    else if (first >= 0xd800 && first <= 0xdbff) {
-      const second = value.charCodeAt(index + 1);
-      if (second >= 0xdc00 && second <= 0xdfff) {
-        scalarBytes = 4;
-        width = 2;
-      } else {
-        scalarBytes = 3;
-      }
-    } else scalarBytes = 3;
-
-    if (chunkBytes + scalarBytes > maxBytes) {
-      chunks.push(value.slice(chunkStart, index));
-      chunkStart = index;
-      chunkBytes = 0;
-    }
-    chunkBytes += scalarBytes;
-    if (width === 2) index += 1;
-  }
-  chunks.push(value.slice(chunkStart));
-  return chunks;
 }
 
 function numberFromAggregate(value: number | string | null, field: string): number {
@@ -790,7 +612,7 @@ async function readAdminSource(
   const streamerScope = buildStreamerScope(streamerIds);
   const session = db.withSession('first-primary');
   const boundedRows = (sql: string): D1PreparedStatement => session.prepare(sql).bind(
-    ...streamerScope.bindings,
+    streamerScope.binding,
     VOD_EXPORT_LIMITS.sourceRows,
     remainingTextBytes,
     VOD_EXPORT_LIMITS.vods,
@@ -800,7 +622,7 @@ async function readAdminSource(
   const results = await session.batch<unknown>([
     session.prepare(STATE_SQL),
     session.prepare(triggerGuardSql(ADMIN_REVISION_TRIGGERS)),
-    session.prepare(dbStatsSql(streamerScope.cteSql)).bind(...streamerScope.bindings),
+    session.prepare(dbStatsSql(streamerScope.cteSql)).bind(streamerScope.binding),
     boundedRows(dbVodRowsSql(streamerScope.cteSql)),
     boundedRows(dbSongRowsSql(streamerScope.cteSql)),
     boundedRows(dbPerformanceRowsSql(streamerScope.cteSql)),

@@ -1,10 +1,8 @@
-import { VOD_EXPORT_LIMITS } from './constants';
+import { D1_JSON_BINDING_MAX_BYTES, VOD_EXPORT_LIMITS } from './constants';
 import {
   assertApiFindingsCapacity,
-  forEachD1LookupBinding,
-  packedLookupSql,
+  d1JsonLookupPlan,
   repairPathForFinding,
-  type D1LookupBinding,
   type VodExportFindingApi,
 } from './api';
 import { ExportLimitExceededError } from './limits';
@@ -20,80 +18,60 @@ function equal<T>(actual: T, expected: T, message: string): void {
   if (actual !== expected) throw new Error(`${message}: expected ${String(expected)}, got ${String(actual)}`);
 }
 
-const decoder = new TextDecoder();
-
-function decodePackedBinding(binding: Uint8Array): string[] {
-  const payloadBytes = Number(decoder.decode(binding.subarray(0, 8)));
-  assert(Number.isSafeInteger(payloadBytes), 'packed lookup has a numeric payload length');
-  assert(payloadBytes >= 0 && payloadBytes <= binding.byteLength - 8, 'packed payload fits its binding');
-  const decoded: string[] = [];
-  let offset = 8;
-  const end = offset + payloadBytes;
-  while (offset < end) {
-    const valueBytes = Number(decoder.decode(binding.subarray(offset, offset + 8)));
-    assert(Number.isSafeInteger(valueBytes), 'packed lookup has a numeric entry length');
-    offset += 8;
-    assert(valueBytes >= 0 && offset + valueBytes <= end, 'packed entry fits its payload');
-    decoded.push(decoder.decode(binding.subarray(offset, offset + valueBytes)));
-    offset += valueBytes;
-  }
-  equal(offset, end, 'packed lookup consumes its exact payload');
-  return decoded;
-}
-
-async function testD1LookupBindingsAreBounded(): Promise<void> {
+async function testFindingsLookupBindsOneJsonArray(): Promise<void> {
+  // The private repair-path lookup used a packed BLOB frame decoded by a
+  // WITH RECURSIVE CTE from 6254dc4 ("perf(vod-export): bound synchronous preview
+  // memory"); the 2026-08 anti-pattern audit collapsed it back onto json_each, the
+  // same mechanism db.ts already uses. At most 5,000 finding-derived IDs reach this
+  // lookup, so ordinary UUID identities serialize to a few hundred KB; an identity
+  // set that would not fit one bound value is refused by D1_JSON_BINDING_MAX_BYTES
+  // rather than split across frames (vod-export-spec.md D-016.2).
   const values = Array.from(
-    { length: 5_000 },
-    (_, index) => `${'\u0000'.repeat(395)}${String(index).padStart(5, '0')}`,
+    { length: VOD_EXPORT_LIMITS.findings },
+    (_, index) => `0f8b1c2d-4e5a-4b6c-8d9e-${String(index).padStart(12, '0')}`,
   );
-  const legacy = JSON.stringify(values);
-  assert(utf8ByteLength(legacy) > 2_000_000, 'fixture exceeds D1 single-value limit');
+  values[1] = '繁體中文😀-lookup';
+  values[2] = 'quote"and\\backslash';
+  const plan = d1JsonLookupPlan('songs', 'id', 'hex(id)', values);
+  equal(
+    plan.sql,
+    'SELECT hex(id) FROM songs WHERE id IN (SELECT value FROM json_each(?))',
+    'the lookup expands one bound JSON array',
+  );
+  equal(plan.sql.split('?').length - 1, 1, 'the lookup binds exactly one parameter');
+  equal(JSON.stringify(JSON.parse(plan.binding)), JSON.stringify(values),
+    'the JSON binding round-trips every lookup identity exactly');
+  const bindingBytes = utf8ByteLength(plan.binding);
+  assert(bindingBytes < 500_000, '5,000 UUID-shaped identities stay a few hundred KB');
+  assert(bindingBytes <= D1_JSON_BINDING_MAX_BYTES, 'lookup binding stays under its guard');
 
-  values[1] = '繁體中文😀\u0000lookup';
-  const sqlTargets = [values[1], values[4_700], values[4_999]].filter(
-    (value): value is string => value !== undefined,
-  );
-  const sqlMatches = new Set<string>();
-  const decoded: string[] = [];
-  const stats = await forEachD1LookupBinding(values, async (binding: D1LookupBinding) => {
-    assert(binding.kind === 'packed', 'ordinary lookup values use packed bindings');
-    assert(binding.value.byteLength <= 1_900_008, 'packed lookup binding stays below its safety target');
-    decoded.push(...decodePackedBinding(binding.value));
-    for (const match of await executePackedLookupInSqlite(binding.value, sqlTargets)) sqlMatches.add(match);
-  });
-  assert(stats.packedBindings > 1, 'large lookup is split into multiple bindings');
-  equal(stats.directBindings, 0, 'ordinary lookup values need no direct bindings');
-  equal(stats.skippedValues, 0, 'ordinary lookup values are not skipped');
-  equal(decoded.length, values.length, 'binding chunks preserve every lookup value');
-  for (let index = 0; index < values.length; index += 1) {
-    equal(decoded[index], values[index], `binding value ${index} round-trips exactly`);
-  }
-  for (let index = 0; index < sqlTargets.length; index += 1) {
-    const target = sqlTargets[index];
-    assert(target !== undefined && sqlMatches.has(target), `production packed SQL preserves target ${index}`);
+  const targets = [values[1], values[4_999]].filter((value): value is string => value !== undefined);
+  const matched = await executeJsonLookupInSqlite(plan, targets);
+  for (let index = 0; index < targets.length; index += 1) {
+    assert(matched.includes(targets[index] ?? ''), `production lookup SQL selects target ${index}`);
   }
 }
 
-async function executePackedLookupInSqlite(
-  binding: Uint8Array,
+async function executeJsonLookupInSqlite(
+  plan: { sql: string; binding: string },
   targets: readonly string[],
 ): Promise<string[]> {
-  const schema = targets
-    .map((target) => `INSERT INTO songs(id) VALUES(CAST(X'${hex(new TextEncoder().encode(target))}' AS TEXT));`)
+  const encode = new TextEncoder();
+  const seed = targets
+    .map((target) => `INSERT INTO songs(id) VALUES(CAST(X'${hex(encode.encode(target))}' AS TEXT));`)
     .join('\n');
-  const sql = packedLookupSql('songs', 'id', 'hex(id)')
-    .replace('?', `X'${hex(binding)}'`);
+  const sql = plan.sql.replace('?', `'${plan.binding.replace(/'/g, "''")}'`);
   // @ts-expect-error The Worker project intentionally omits Node ambient types;
   // this test-only dynamic import uses the repository's sqlite3 CLI.
   const { spawnSync } = await import('node:child_process');
   const execution = spawnSync('sqlite3', ['-batch', '-bail', ':memory:'], {
-    input: `CREATE TABLE songs(id TEXT PRIMARY KEY);\n${schema}\n${sql};`,
+    input: `CREATE TABLE songs(id TEXT PRIMARY KEY);\n${seed}\n${sql};`,
     encoding: 'utf8',
   });
   if (execution.status !== 0) {
-    throw new Error(`Packed D1 lookup SQL failed in sqlite3: ${String(execution.stderr)}`);
+    throw new Error(`JSON D1 lookup SQL failed in sqlite3: ${String(execution.stderr)}`);
   }
-  const byHex = new Map(targets.map((target) => [hex(new TextEncoder().encode(target)), target]));
+  const byHex = new Map(targets.map((target) => [hex(encode.encode(target)), target]));
   return String(execution.stdout)
     .trim()
     .split('\n')
@@ -108,24 +86,26 @@ function hex(bytes: Uint8Array): string {
   return result;
 }
 
-async function testLargeLookupUsesDirectBinding(): Promise<void> {
-  const large = 'x'.repeat(1_950_000);
-  let received: string | number | undefined;
-  const stats = await forEachD1LookupBinding([large], async (binding) => {
-    assert(binding.kind === 'direct', 'near-limit identity uses a direct equality binding');
-    received = binding.value;
-  });
-  equal(stats.packedBindings, 0, 'oversized packed representation is not bound as a packed BLOB');
-  equal(stats.directBindings, 1, 'raw value below D1 limit uses direct equality');
-  equal(received, large, 'direct binding preserves the exact lookup identity');
-  equal(stats.skippedValues, 0, 'bindable raw identity is not skipped');
-
-  const skipped = await forEachD1LookupBinding(['x'.repeat(2_000_001)], async () => {
-    throw new Error('identity above the D1 limit must not be bound');
-  });
-  equal(skipped.packedBindings, 0, 'over-limit identity is not packed');
-  equal(skipped.directBindings, 0, 'over-limit identity is not directly bound');
-  equal(skipped.skippedValues, 1, 'over-limit optional repair identity is skipped safely');
+function testOversizedLookupIsRefused(): void {
+  const oversized = Array.from({ length: 20 }, () => 'x'.repeat(100_000));
+  const expectedBytes = utf8ByteLength(JSON.stringify(oversized));
+  assert(expectedBytes > D1_JSON_BINDING_MAX_BYTES, 'fixture exceeds the D1 binding guard');
+  let rejected: unknown;
+  try {
+    d1JsonLookupPlan('songs', 'id', 'hex(id)', oversized);
+  } catch (error) {
+    rejected = error;
+  }
+  assert(
+    rejected instanceof ExportLimitExceededError
+      && rejected.code === 'EXPORT_LIMIT_EXCEEDED'
+      && rejected.httpStatus === 422
+      && rejected.diagnostic.resource === 'd1JsonBindingBytes'
+      && rejected.diagnostic.actual === expectedBytes
+      && rejected.diagnostic.limit === D1_JSON_BINDING_MAX_BYTES
+      && rejected.diagnostic.state === 'exceeded',
+    'an unbindable identity set is refused with an honest diagnostic',
+  );
 }
 
 function testDecoratedFindingsAreRemeasured(): void {
@@ -240,8 +220,8 @@ function testRelationshipFindingsOpenPrivateRepairRecords(): void {
 }
 
 async function main(): Promise<void> {
-  await testD1LookupBindingsAreBounded();
-  await testLargeLookupUsesDirectBinding();
+  await testFindingsLookupBindsOneJsonArray();
+  testOversizedLookupIsRefused();
   testDecoratedFindingsAreRemeasured();
   testRelationshipFindingsOpenPrivateRepairRecords();
   console.log('✓ VOD export API lookup and decorated-findings capacity guards');

@@ -8,7 +8,7 @@ import {
 } from './candidate';
 import { CanonicalJsonError } from './canonical-json';
 import { VodExportControlError } from './control';
-import { capacityDiagnostic, ExportLimitExceededError } from './limits';
+import { assertWithinCapacity, capacityDiagnostic, ExportLimitExceededError } from './limits';
 import { VOD_EXPORT_LIMITS } from './constants';
 import { findingJsonByteLength } from './findings';
 import { VodExportMaintenanceError } from './maintenance';
@@ -430,22 +430,16 @@ async function findingsForApi(
       submissionIds.add(finding.details.submissionId);
     }
   }
-  const lookupWorkspace = createD1LookupWorkspace();
-  // Each lookup must consume the shared reusable buffer before the next one mutates it;
-  // allocating one maximum-size workspace per lookup would break the export memory budget.
+  // Each lookup binds one JSON array of up to D1_JSON_BINDING_MAX_BYTES; running
+  // them in sequence keeps a single such binding and its rows alive at a time,
+  // which is what holds this decoration inside the preview memory budget.
   // react-doctor-disable-next-line react-doctor/async-parallel
-  const performances = await lookupPerformanceRepairRows(
-    bindings.DB, [...performanceIds], lookupWorkspace,
-  );
+  const performances = await lookupPerformanceRepairRows(bindings.DB, [...performanceIds]);
   // react-doctor-disable-next-line react-doctor/server-sequential-independent-await
-  const songs = await lookupSongRepairRows(bindings.DB, [...songIds], lookupWorkspace);
-  const streams = await lookupVodRepairRows(
-    bindings.DB, [...vodIds], [...vodStreamIds], lookupWorkspace,
-  );
+  const songs = await lookupSongRepairRows(bindings.DB, [...songIds]);
+  const streams = await lookupVodRepairRows(bindings.DB, [...vodIds], [...vodStreamIds]);
   // react-doctor-disable-next-line react-doctor/server-sequential-independent-await
-  const submissions = await lookupStreamerRepairRows(
-    bindings.NOVA_DB, [...submissionIds], lookupWorkspace,
-  );
+  const submissions = await lookupStreamerRepairRows(bindings.NOVA_DB, [...submissionIds]);
   const performanceById = new Map(performances
     .filter((row): row is { id: string; row_id: number } => typeof row.id === 'string')
     .map((row) => [row.id, Number(row.row_id)]));
@@ -472,51 +466,21 @@ async function findingsForApi(
   return decorated;
 }
 
-// A smaller reusable frame costs a few more curator-only D1 reads at the
-// diagnostic ceiling, but preserves enough isolate headroom for the response
-// stream and the 10 MiB candidate bytes to coexist safely.
-const D1_LOOKUP_PAYLOAD_TARGET_BYTES = 512_000;
-const D1_MAX_BOUND_VALUE_BYTES = 2_000_000;
-const D1_LOOKUP_LENGTH_PREFIX_BYTES = 8;
-const d1LookupTextEncoder = new TextEncoder();
-
-export interface D1LookupBindingStats {
-  packedBindings: number;
-  directBindings: number;
-  skippedValues: number;
-}
-
-export interface D1LookupWorkspace {
-  buffer: Uint8Array;
-}
-
-export type D1LookupBinding =
-  | { kind: 'packed'; value: Uint8Array }
-  | { kind: 'direct'; value: string | number };
-
-function createD1LookupWorkspace(): D1LookupWorkspace {
-  return {
-    buffer: new Uint8Array(D1_LOOKUP_LENGTH_PREFIX_BYTES + D1_LOOKUP_PAYLOAD_TARGET_BYTES),
-  };
-}
-
 async function lookupPerformanceRepairRows(
   db: D1Database,
   ids: readonly string[],
-  workspace: D1LookupWorkspace,
 ): Promise<Array<{ id: string | null; row_id: number }>> {
   return lookupRepairRows<{ id: string | null; row_id: number }>(
-    db, 'performances', 'id', 'id, rowid AS row_id', ids, workspace,
+    db, 'performances', 'id', 'id, rowid AS row_id', ids,
   );
 }
 
 async function lookupSongRepairRows(
   db: D1Database,
   ids: readonly string[],
-  workspace: D1LookupWorkspace,
 ): Promise<Array<{ id: string | null; row_id: number }>> {
   return lookupRepairRows<{ id: string | null; row_id: number }>(
-    db, 'songs', 'id', 'id, rowid AS row_id', ids, workspace,
+    db, 'songs', 'id', 'id, rowid AS row_id', ids,
   );
 }
 
@@ -524,135 +488,63 @@ async function lookupVodRepairRows(
   db: D1Database,
   videoIds: readonly string[],
   streamIds: readonly string[],
-  workspace: D1LookupWorkspace,
 ): Promise<Array<{ row_id: number; id: string; streamer_id: string; video_id: string }>> {
   type VodRepairRow = { row_id: number; id: string; streamer_id: string; video_id: string };
   const columns = 'rowid AS row_id, id, streamer_id, video_id';
   return [
-    ...await lookupRepairRows<VodRepairRow>(db, 'streams', 'video_id', columns, videoIds, workspace),
-    ...await lookupRepairRows<VodRepairRow>(db, 'streams', 'id', columns, streamIds, workspace),
+    ...await lookupRepairRows<VodRepairRow>(db, 'streams', 'video_id', columns, videoIds),
+    ...await lookupRepairRows<VodRepairRow>(db, 'streams', 'id', columns, streamIds),
   ];
 }
 
 async function lookupStreamerRepairRows(
   db: D1Database,
   submissionIds: readonly string[],
-  workspace: D1LookupWorkspace,
 ): Promise<Array<{ row_id: number; id: string }>> {
   return lookupRepairRows<{ row_id: number; id: string }>(
-    db, 'submissions', 'id', 'rowid AS row_id, id', submissionIds, workspace,
+    db, 'submissions', 'id', 'rowid AS row_id, id', submissionIds,
   );
 }
 
 async function lookupRepairRows<T>(
   db: D1Database,
-  table: 'performances' | 'songs' | 'streams' | 'submissions',
-  column: 'id' | 'video_id',
+  table: D1LookupTable,
+  column: D1LookupColumn,
   columns: string,
-  values: readonly (string | number)[],
-  workspace: D1LookupWorkspace,
+  values: readonly string[],
 ): Promise<T[]> {
-  const rows: T[] = [];
-  await forEachD1LookupBinding(values, async (binding) => {
-    const sql = binding.kind === 'packed'
-      ? packedLookupSql(table, column, columns)
-      : `SELECT ${columns} FROM ${table} WHERE ${column} = ?`;
-    const result = await db.prepare(sql).bind(binding.value).all<T>();
-    rows.push(...result.results);
-  }, workspace);
-  return rows;
+  if (values.length === 0) return [];
+  const plan = d1JsonLookupPlan(table, column, columns, values);
+  const result = await db.prepare(plan.sql).bind(plan.binding).all<T>();
+  return [...result.results];
 }
 
-export function packedLookupSql(
-  table: string,
-  column: string,
+export type D1LookupTable = 'performances' | 'songs' | 'streams' | 'submissions';
+export type D1LookupColumn = 'id' | 'video_id';
+
+export interface D1LookupPlan {
+  sql: string;
+  binding: string;
+}
+
+/**
+ * Expands a bounded identity list through one bound JSON array. At most 5,000
+ * finding-derived IDs reach this lookup; an identity set whose escaped length
+ * would not fit one D1 bound value is refused as a capacity failure rather than
+ * packed into frames the query would have to reassemble.
+ */
+export function d1JsonLookupPlan(
+  table: D1LookupTable,
+  column: D1LookupColumn,
   columns: string,
-): string {
-  return `
-    WITH RECURSIVE
-    bound(raw) AS (SELECT CAST(? AS BLOB)),
-    packed(payload) AS (
-      SELECT substr(
-        raw,
-        ${D1_LOOKUP_LENGTH_PREFIX_BYTES + 1},
-        CAST(CAST(substr(raw, 1, ${D1_LOOKUP_LENGTH_PREFIX_BYTES}) AS TEXT) AS INTEGER)
-      )
-      FROM bound
-    ),
-    decoded(value, rest) AS (
-      SELECT
-        CAST(substr(payload, ${D1_LOOKUP_LENGTH_PREFIX_BYTES + 1}, CAST(CAST(substr(payload, 1, ${D1_LOOKUP_LENGTH_PREFIX_BYTES}) AS TEXT) AS INTEGER)) AS TEXT),
-        substr(payload, ${D1_LOOKUP_LENGTH_PREFIX_BYTES + 1} + CAST(CAST(substr(payload, 1, ${D1_LOOKUP_LENGTH_PREFIX_BYTES}) AS TEXT) AS INTEGER))
-      FROM packed
-      WHERE length(payload) >= ${D1_LOOKUP_LENGTH_PREFIX_BYTES}
-      UNION ALL
-      SELECT
-        CAST(substr(rest, ${D1_LOOKUP_LENGTH_PREFIX_BYTES + 1}, CAST(CAST(substr(rest, 1, ${D1_LOOKUP_LENGTH_PREFIX_BYTES}) AS TEXT) AS INTEGER)) AS TEXT),
-        substr(rest, ${D1_LOOKUP_LENGTH_PREFIX_BYTES + 1} + CAST(CAST(substr(rest, 1, ${D1_LOOKUP_LENGTH_PREFIX_BYTES}) AS TEXT) AS INTEGER))
-      FROM decoded
-      WHERE length(rest) >= ${D1_LOOKUP_LENGTH_PREFIX_BYTES}
-    )
-    SELECT ${columns}
-    FROM ${table}
-    WHERE ${column} IN (SELECT value FROM decoded)
-  `;
-}
-
-/** Reuses one bounded buffer; consumers must finish reading it before resolving. */
-export async function forEachD1LookupBinding(
-  values: readonly (string | number)[],
-  consume: (binding: D1LookupBinding) => Promise<void>,
-  workspace: D1LookupWorkspace = createD1LookupWorkspace(),
-): Promise<D1LookupBindingStats> {
-  let packedBindings = 0;
-  let directBindings = 0;
-  let skippedValues = 0;
-  let payloadBytes = 0;
-
-  const flush = async (): Promise<void> => {
-    if (payloadBytes === 0) return;
-    const lengthText = String(payloadBytes).padStart(D1_LOOKUP_LENGTH_PREFIX_BYTES, '0');
-    for (let index = 0; index < lengthText.length; index += 1) {
-      workspace.buffer[index] = lengthText.charCodeAt(index);
-    }
-    await consume({ kind: 'packed', value: workspace.buffer });
-    packedBindings += 1;
-    payloadBytes = 0;
+  values: readonly string[],
+): D1LookupPlan {
+  const binding = JSON.stringify(values);
+  assertWithinCapacity('d1JsonBindingBytes', utf8ByteLength(binding));
+  return {
+    sql: `SELECT ${columns} FROM ${table} WHERE ${column} IN (SELECT value FROM json_each(?))`,
+    binding,
   };
-
-  for (const value of values) {
-    const textValue = String(value);
-    const valueBytes = utf8ByteLength(textValue);
-    const entryBytes = D1_LOOKUP_LENGTH_PREFIX_BYTES + valueBytes;
-    if (entryBytes > D1_LOOKUP_PAYLOAD_TARGET_BYTES) {
-      // Flushes and consumes must finish before the shared buffer and counters are reused.
-      // react-doctor-disable-next-line react-doctor/async-await-in-loop
-      await flush();
-      if (valueBytes <= D1_MAX_BOUND_VALUE_BYTES) {
-        await consume({ kind: 'direct', value });
-        directBindings += 1;
-      } else {
-        skippedValues += 1;
-      }
-      continue;
-    }
-    if (payloadBytes + entryBytes > D1_LOOKUP_PAYLOAD_TARGET_BYTES) await flush();
-    const entryOffset = D1_LOOKUP_LENGTH_PREFIX_BYTES + payloadBytes;
-    const entryLength = String(valueBytes).padStart(D1_LOOKUP_LENGTH_PREFIX_BYTES, '0');
-    for (let index = 0; index < entryLength.length; index += 1) {
-      workspace.buffer[entryOffset + index] = entryLength.charCodeAt(index);
-    }
-    const encoded = d1LookupTextEncoder.encodeInto(
-      textValue,
-      workspace.buffer.subarray(entryOffset + D1_LOOKUP_LENGTH_PREFIX_BYTES),
-    );
-    if (encoded.read !== textValue.length || encoded.written !== valueBytes) {
-      throw new TypeError('D1 lookup identity could not be encoded exactly');
-    }
-    payloadBytes += entryBytes;
-  }
-  await flush();
-  return { packedBindings, directBindings, skippedValues };
 }
 
 function withApiFindingsCapacity(

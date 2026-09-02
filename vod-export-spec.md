@@ -2922,6 +2922,21 @@ Decision: one generation attempt performs these steps:
 4. Through fresh `first-primary` sessions, read both revisions again.
 5. Store a candidate only if both ending revisions equal their starting values.
 
+Step 2's `DB` batch is scoped to the approved streamer identities read from
+`NOVA_DB`, and the private preview decorates findings with repair paths through
+the same kind of identity lookup. Both bind that identity list as exactly one
+JSON array parameter expanded by `json_each`, never as one bound parameter per
+value, a packed binary frame, or a value split across bindings and reassembled
+inside the query. Bounded inputs make one parameter sufficient: D-020.2 caps a
+scope at 500 streamer slugs and D-020.3 caps findings at 5,000, so an ordinary
+payload is tens to hundreds of kilobytes. Before binding, compare the serialized
+UTF-8 length — JSON escaping included, because escaping can multiply an invalid
+identity's length several times over — against a fixed 1,900,000-byte ceiling
+below D1's 2,000,000-byte limit for a single bound value. A payload above that
+ceiling is an operation-level `EXPORT_LIMIT_EXCEEDED` capacity failure with HTTP
+422 and safe numeric actual/limit diagnostics, exactly as D-020.2 requires. It
+is never truncated, split, or silently reassembled.
+
 The private candidate fingerprint contains both D1 database IDs, both decimal
 revision strings, `schemaVersion`, and the deployment ID from a required
 Workers Version Metadata binding as its exporter build ID. A deployment that

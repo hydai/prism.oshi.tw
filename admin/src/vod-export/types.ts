@@ -247,7 +247,8 @@ export type CapacityResource =
   | 'performances'
   | 'snapshotBytes'
   | 'findings'
-  | 'findingsBytes';
+  | 'findingsBytes'
+  | 'd1JsonBindingBytes';
 
 export type CapacityState = 'ok' | 'warning' | 'exceeded';
 
