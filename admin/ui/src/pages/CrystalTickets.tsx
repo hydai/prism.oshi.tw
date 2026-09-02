@@ -2,7 +2,8 @@ import { useMemo, useState } from 'react';
 import type { AuthUser, CrystalTicket, CrystalTicketStatus, CrystalTicketType } from '../../../shared/types';
 import { api } from '../api/client';
 import { useApiResource, errorMessage } from '../lib/apiResource';
-import { countByStatus, matchesFilter, replaceById } from '../lib/status-totals';
+import { NO_RECENT_ACTIONS, visibleTickets } from '../lib/review-lists';
+import { countByStatus, replaceById } from '../lib/status-totals';
 import { GradientButton, OutlineButton } from '../components/prism/Buttons';
 import { DetailField } from '../components/prism/DetailField';
 import { PrismTextarea } from '../components/prism/Fields';
@@ -49,6 +50,7 @@ const TYPE_FILTER_LABEL_ID = 'crystal-ticket-type-filter-label';
 export default function CrystalTickets({ user }: { user: AuthUser }) {
   const [statusFilter, setStatusFilter] = useState<'' | CrystalTicketStatus>('pending');
   const [typeFilter, setTypeFilter] = useState<'' | CrystalTicketType>('');
+  const [justActed, setJustActed] = useState<ReadonlySet<string>>(NO_RECENT_ACTIONS);
   const [expandedId, setExpandedId] = useState<string | null>(null);
   const [actionLoading, setActionLoading] = useState<string | null>(null);
   const [actionError, setActionError] = useState<string | null>(null);
@@ -59,12 +61,21 @@ export default function CrystalTickets({ user }: { user: AuthUser }) {
   // Stable reference while loading, so the filter memo doesn't recompute every render.
   const allTickets = useMemo(() => list.data ?? [], [list.data]);
   const tickets = useMemo(
-    () => allTickets.filter(
-      (ticket) => matchesFilter(ticket.status, statusFilter) && matchesFilter(ticket.type, typeFilter),
-    ),
-    [allTickets, statusFilter, typeFilter],
+    () => visibleTickets(allTickets, { status: statusFilter, type: typeFilter, justActed }),
+    [allTickets, statusFilter, typeFilter, justActed],
   );
   const loading = list.loading;
+
+  // A new filter is a new question: the rows held over from the last action go.
+  const changeStatusFilter = (status: '' | CrystalTicketStatus) => {
+    setStatusFilter(status);
+    setJustActed(NO_RECENT_ACTIONS);
+  };
+  const changeTypeFilter = (type: '' | CrystalTicketType) => {
+    setTypeFilter(type);
+    setJustActed(NO_RECENT_ACTIONS);
+  };
+  const keepVisible = (id: string) => setJustActed((prev) => new Set(prev).add(id));
 
   /** Resolves true once the row may clear the draft it just sent. */
   const handleReply = async (id: string, text: string): Promise<boolean> => {
@@ -73,6 +84,7 @@ export default function CrystalTickets({ user }: { user: AuthUser }) {
     try {
       const updated = await api.replyCrystalTicket(id, text);
       list.mutate((tickets) => replaceById(tickets, updated));
+      keepVisible(id);
       return true;
     } catch (err) {
       setActionError(errorMessage(err, 'Reply failed'));
@@ -88,6 +100,7 @@ export default function CrystalTickets({ user }: { user: AuthUser }) {
     try {
       const updated = await api.updateCrystalTicketStatus(id, status);
       list.mutate((tickets) => replaceById(tickets, updated));
+      keepVisible(id);
     } catch (err) {
       setActionError(errorMessage(err, 'Status update failed'));
     } finally {
@@ -115,7 +128,7 @@ export default function CrystalTickets({ user }: { user: AuthUser }) {
           <StatusFilterBar
             options={STATUS_FILTERS}
             value={statusFilter}
-            onChange={setStatusFilter}
+            onChange={changeStatusFilter}
             labelledBy={STATUS_FILTER_LABEL_ID}
             heading={<span id={STATUS_FILTER_LABEL_ID} className="sr-only">Status:</span>}
           />
@@ -123,7 +136,7 @@ export default function CrystalTickets({ user }: { user: AuthUser }) {
           <StatusFilterBar
             options={TYPE_FILTERS}
             value={typeFilter}
-            onChange={setTypeFilter}
+            onChange={changeTypeFilter}
             labelledBy={TYPE_FILTER_LABEL_ID}
             heading={<span id={TYPE_FILTER_LABEL_ID} className="sr-only">Type:</span>}
           />

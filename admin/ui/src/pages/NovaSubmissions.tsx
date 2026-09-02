@@ -4,7 +4,8 @@ import type { AuthUser, NovaSubmission, NovaStatus, BulkFetchSubscribersResponse
 import { sanitizeNovaUrl } from '../../../shared/nova-url-safety';
 import { api } from '../api/client';
 import { useApiResource, errorMessage } from '../lib/apiResource';
-import { countByStatus, matchesFilter, matchesSearch, removeById, replaceById } from '../lib/status-totals';
+import { NO_RECENT_ACTIONS, visibleSubmissions } from '../lib/review-lists';
+import { countByStatus, removeById, replaceById } from '../lib/status-totals';
 import { useSearchParams } from 'react-router-dom';
 import { finiteInputNumber } from '../lib/numeric-input';
 import { Avatar } from '../components/prism/Avatar';
@@ -52,6 +53,7 @@ export default function NovaSubmissions({ user }: { user: AuthUser }) {
   const [search, setSearch] = useState(() => initialParams.get('search') ?? '');
   // The typed term only narrows the table once the search form is submitted.
   const [appliedSearch, setAppliedSearch] = useState(() => initialParams.get('search') ?? '');
+  const [justActed, setJustActed] = useState<ReadonlySet<string>>(NO_RECENT_ACTIONS);
   const [expandedId, setExpandedId] = useState<string | null>(null);
   const [actionLoading, setActionLoading] = useState<string | null>(null);
   const [actionError, setActionError] = useState<string | null>(null);
@@ -64,13 +66,26 @@ export default function NovaSubmissions({ user }: { user: AuthUser }) {
   // Stable reference while loading, so the filter memo doesn't recompute every render.
   const allSubmissions = useMemo(() => list.data ?? [], [list.data]);
   const submissions = useMemo(
-    () => allSubmissions.filter(
-      (sub) => matchesFilter(sub.status, statusFilter)
-        && matchesSearch([sub.id, sub.slug, sub.display_name, sub.youtube_channel_id], appliedSearch),
-    ),
-    [allSubmissions, statusFilter, appliedSearch],
+    () => visibleSubmissions(allSubmissions, { status: statusFilter, search: appliedSearch, justActed }),
+    [allSubmissions, statusFilter, appliedSearch, justActed],
   );
   const loading = list.loading;
+
+  // A new question — another filter, another search, a fresh load — drops the
+  // rows that were only being held over from the last action.
+  const changeStatusFilter = (status: '' | NovaStatus) => {
+    setStatusFilter(status);
+    setJustActed(NO_RECENT_ACTIONS);
+  };
+  const applySearch = () => {
+    setAppliedSearch(search);
+    setJustActed(NO_RECENT_ACTIONS);
+  };
+  const reload = () => {
+    setJustActed(NO_RECENT_ACTIONS);
+    list.reload();
+  };
+  const keepVisible = (id: string) => setJustActed((prev) => new Set(prev).add(id));
 
   /** Resolves true once the row may clear the note it just submitted. */
   const handleAction = async (id: string, status: NovaStatus, rejectNote: string): Promise<boolean> => {
@@ -82,6 +97,7 @@ export default function NovaSubmissions({ user }: { user: AuthUser }) {
         reviewer_note: status === 'rejected' ? rejectNote : undefined,
       });
       list.mutate((submissions) => replaceById(submissions, updated));
+      keepVisible(id);
       return true;
     } catch (err) {
       setActionError(errorMessage(err, 'Action failed'));
@@ -116,7 +132,7 @@ export default function NovaSubmissions({ user }: { user: AuthUser }) {
     try {
       const result = await api.fetchAllNovaSubscribers();
       setFetchAllResult(result);
-      list.reload();
+      reload();
     } catch (err) {
       setActionError(errorMessage(err, 'Bulk fetch failed'));
     } finally {
@@ -144,14 +160,14 @@ export default function NovaSubmissions({ user }: { user: AuthUser }) {
           <StatusFilterBar
             options={NOVA_STATUS_FILTERS}
             value={statusFilter}
-            onChange={setStatusFilter}
+            onChange={changeStatusFilter}
             label="Filter submissions by status"
           />
           <div className="flex-1" />
           <form
             onSubmit={(event) => {
               event.preventDefault();
-              setAppliedSearch(search);
+              applySearch();
             }}
           >
             <SearchInput
