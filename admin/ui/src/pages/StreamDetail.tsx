@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef, useCallback, useMemo } from 'react';
-import { useParams, useNavigate, Link, useSearchParams } from 'react-router-dom';
+import { useParams, useNavigate, Link } from 'react-router-dom';
 import type { AuthUser, StreamDetail as StreamDetailType, StampPerformance, Status, Stream } from '../../../shared/types';
 import { api } from '../api/client';
 import StatusBadge from '../components/StatusBadge';
@@ -18,6 +18,7 @@ import { useEditorShortcuts } from '../hooks/useEditorShortcuts';
 import { useFetchAllDurations } from '../hooks/useFetchAllDurations';
 import { usePerformances } from '../hooks/usePerformances';
 import { usePlayerClock } from '../hooks/usePlayerClock';
+import { useSearchParamState } from '../hooks/useSearchParamState';
 import { formatTimestamp } from '../lib/format-timestamp';
 
 // --- Inline Date Edit ---
@@ -58,8 +59,8 @@ type EditingField =
 
 function useStreamDetailController(user: AuthUser) {
   const { id: streamId } = useParams<{ id: string }>();
-  const [initialParams] = useSearchParams();
-  const requestedPerformanceId = initialParams.get('performance');
+  // Deep-link target: the page opens on it and never writes it back.
+  const [requestedPerformanceId] = useSearchParamState('performance', '');
   const navigate = useNavigate();
   const [detail, setDetail] = useState<StreamDetailType | null>(null);
   const [loading, setLoading] = useState(true);

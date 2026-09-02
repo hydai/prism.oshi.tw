@@ -17,8 +17,8 @@ import { useFetchAllDurations } from '../hooks/useFetchAllDurations';
 import { usePerformances } from '../hooks/usePerformances';
 import { usePlayerClock } from '../hooks/usePlayerClock';
 import { useStreamPicker } from '../hooks/useStreamPicker';
+import { useSearchParamState } from '../hooks/useSearchParamState';
 import { formatTimestamp } from '../lib/format-timestamp';
-import { useSearchParams } from 'react-router-dom';
 
 // --- Main component ---
 
@@ -28,9 +28,9 @@ interface EditingField {
 }
 
 function useStampEditorController(user: AuthUser) {
-  const [initialParams] = useSearchParams();
-  const requestedStreamId = initialParams.get('stream');
-  const requestedPerformanceId = initialParams.get('performance');
+  // Deep-link targets: the editor opens on them and never writes them back.
+  const [requestedStreamId] = useSearchParamState('stream', '');
+  const [requestedPerformanceId] = useSearchParamState('performance', '');
 
   // Performance state
   const [performances, setPerformances] = useState<StampPerformance[]>([]);
