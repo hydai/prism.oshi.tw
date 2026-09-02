@@ -4,56 +4,15 @@ import type { AuthUser } from '../../shared/types';
 import { api } from './api/client';
 import Layout from './components/Layout';
 import { useCurrentStreamer } from './hooks/useCurrentStreamer';
-import Dashboard from './pages/Dashboard';
-import SongsList from './pages/SongsList';
-import GlobalWorks from './pages/GlobalWorks';
-import GlobalWorkReview from './pages/GlobalWorkReview';
-import SongDetail from './pages/SongDetail';
-import StreamsList from './pages/StreamsList';
-import SubmitSong from './pages/SubmitSong';
-import SubmitStream from './pages/SubmitStream';
-import StampEditor from './pages/StampEditor';
-import StreamDetailPage from './pages/StreamDetail';
-import Pipeline from './pages/Pipeline';
-import Harmonizer from './pages/Harmonizer';
-import NovaSubmissions from './pages/NovaSubmissions';
-import NovaVodSubmissions from './pages/NovaVodSubmissions';
-import CrystalTickets from './pages/CrystalTickets';
-import VodExport from './pages/VodExport';
-import VodExportRepair from './pages/VodExportRepair';
+import { ADMIN_ROUTES, routeElement } from './lib/routes';
 
-function RoutedPages({ user }: { user: AuthUser }) {
+/** The routed pages, straight from the manifest — nothing to keep in sync here. */
+export function AppRoutes({ user }: { user: AuthUser }) {
   return (
     <Routes>
-      <Route path="/" element={<Dashboard />} />
-      <Route path="/songs" element={<SongsList user={user} />} />
-      <Route
-        path="/works"
-        element={user.role === 'curator' ? <GlobalWorks /> : <Navigate to="/" replace />}
-      />
-      <Route
-        path="/works/review"
-        element={user.role === 'curator' ? <GlobalWorkReview /> : <Navigate to="/" replace />}
-      />
-      <Route path="/songs/:id" element={<SongDetail user={user} />} />
-      <Route path="/streams" element={<StreamsList user={user} />} />
-      <Route path="/streams/:id" element={<StreamDetailPage user={user} />} />
-      <Route path="/submit/song" element={<SubmitSong />} />
-      <Route path="/submit/stream" element={<SubmitStream />} />
-      <Route path="/stamp" element={<StampEditor user={user} />} />
-      <Route path="/pipeline" element={<Pipeline />} />
-      <Route path="/harmonizer" element={<Harmonizer />} />
-      <Route path="/nova" element={<NovaSubmissions user={user} />} />
-      <Route path="/nova/vods" element={<NovaVodSubmissions user={user} />} />
-      <Route path="/crystal" element={<CrystalTickets user={user} />} />
-      <Route
-        path="/vod-export"
-        element={user.role === 'curator' ? <VodExport user={user} /> : <Navigate to="/" replace />}
-      />
-      <Route
-        path="/vod-export/repair/:entity/:rowId"
-        element={user.role === 'curator' ? <VodExportRepair user={user} /> : <Navigate to="/" replace />}
-      />
+      {ADMIN_ROUTES.map((route) => (
+        <Route key={route.path} path={route.path} element={routeElement(route, user)} />
+      ))}
       <Route path="*" element={<Navigate to="/" replace />} />
     </Routes>
   );
@@ -65,7 +24,7 @@ function RoutedPages({ user }: { user: AuthUser }) {
  * them, instead of leaving a page showing the streamer you just left.
  */
 export function StreamerScopedRoutes({ streamer, user }: { streamer: string; user: AuthUser }) {
-  return <RoutedPages key={streamer} user={user} />;
+  return <AppRoutes key={streamer} user={user} />;
 }
 
 export default function App() {
