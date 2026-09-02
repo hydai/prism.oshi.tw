@@ -12,6 +12,11 @@ import type {
 } from '../shared/types';
 import { normalizeForMatching } from '../shared/normalize';
 import { UnionFind } from '../shared/union-find';
+import {
+  guardedStatement,
+  prepareMergeGuardCleanup,
+  prepareMergeGuardInsert,
+} from './guard';
 
 const WORK_MATCH_ALGORITHM = 'tier-a-v1';
 const WORK_MATCH_GUARD_ACTOR = 'system:global-work-review-guard';
@@ -606,27 +611,6 @@ export async function reviewWorkMatchCandidate(
   }
 }
 
-function guardedWorkMergeStatement(
-  db: D1Database,
-  guardToken: string,
-  canonicalWorkId: string,
-  sql: string,
-  bindings: unknown[] = [],
-): D1PreparedStatement {
-  return db.prepare(
-    `WITH work_merge_guard(valid) AS (
-       SELECT EXISTS (
-         SELECT 1
-         FROM work_aliases
-         WHERE source_work_id = ?
-           AND canonical_work_id = ?
-           AND merged_by = '${WORK_MATCH_GUARD_ACTOR}'
-       )
-     )
-     ${sql}`,
-  ).bind(guardToken, canonicalWorkId, ...bindings);
-}
-
 export async function mergeWorkMatchCandidate(
   db: D1Database,
   body: WorkMatchMergeBody,
@@ -696,14 +680,34 @@ export async function mergeWorkMatchCandidate(
     mergeSnapshots.flatMap((work) => work.songIds.map((songId) => [songId, work.id])),
   ));
   const mergedTags = [...new Set(mergeSnapshots.flatMap((work) => work.tags))];
-  const guardToken = `work-match-guard-${crypto.randomUUID()}`;
+  // One random token per merge. It also identifies this merge's durable audit
+  // row, so it keeps its descriptive prefix.
+  const guard = {
+    guardToken: `work-match-guard-${crypto.randomUUID()}`,
+    canonicalId: canonical.id,
+    actor: WORK_MATCH_GUARD_ACTOR,
+  };
   const guarded = (sql: string, bindings: unknown[] = []): D1PreparedStatement => (
-    guardedWorkMergeStatement(db, guardToken, canonical.id, sql, bindings)
+    guardedStatement(db, guard, sql, bindings)
   );
 
   const statements: D1PreparedStatement[] = [
-    db.prepare(
-      `WITH expected_work_state(
+    prepareMergeGuardInsert(db, {
+      ...guard,
+      validityCte: {
+        bindings: [
+          expectedWorkState,
+          expectedLinks,
+          scan.revision,
+          body.expectedReviewVersion,
+          body.candidateKey,
+          body.fingerprint,
+          body.expectedReviewVersion,
+          body.candidateKey,
+          body.fingerprint,
+          body.expectedReviewVersion,
+        ],
+        sql: `WITH expected_work_state(
          work_id, title, original_artist, tags, updated_at
        ) AS (
          SELECT key,
@@ -754,35 +758,14 @@ export async function mergeWorkMatchCandidate(
                  AND review_version = ?
              ))
            )
-       )
-       INSERT INTO work_aliases (
-         source_work_id, canonical_work_id, source_title,
-         source_original_artist, source_tags, merged_by
-       )
-       SELECT ?, ?, '__work_match_guard__', '__work_match_guard__', '[]', ?
-       FROM merge_guard
-       WHERE valid
-       RETURNING 1 AS valid`,
-    ).bind(
-      expectedWorkState,
-      expectedLinks,
-      scan.revision,
-      body.expectedReviewVersion,
-      body.candidateKey,
-      body.fingerprint,
-      body.expectedReviewVersion,
-      body.candidateKey,
-      body.fingerprint,
-      body.expectedReviewVersion,
-      guardToken,
-      canonical.id,
-      WORK_MATCH_GUARD_ACTOR,
-    ),
+       )`,
+      },
+    }),
     guarded(
       `UPDATE work_aliases
        SET canonical_work_id = ?
        WHERE canonical_work_id IN (${sourcePlaceholders})
-         AND (SELECT valid FROM work_merge_guard)`,
+         AND (SELECT valid FROM merge_guard)`,
       [canonical.id, ...sourceWorkIds],
     ),
     guarded(
@@ -794,7 +777,7 @@ export async function mergeWorkMatchCandidate(
               source.original_artist, source.tags, ?
        FROM works AS source
        WHERE source.id IN (${sourcePlaceholders})
-         AND (SELECT valid FROM work_merge_guard)`,
+         AND (SELECT valid FROM merge_guard)`,
       [canonical.id, mergedBy, ...sourceWorkIds],
     ),
     guarded(
@@ -803,10 +786,10 @@ export async function mergeWorkMatchCandidate(
          canonical_work_id, source_work_ids, note, merged_by, merged_at
        )
        SELECT ?, ?, ?, ?, ?, ?, ?, ?, ?, datetime('now')
-       FROM work_merge_guard
+       FROM merge_guard
        WHERE valid`,
       [
-        guardToken,
+        guard.guardToken,
         body.candidateKey,
         body.fingerprint,
         scan.revision,
@@ -826,14 +809,14 @@ export async function mergeWorkMatchCandidate(
        SET work_id = ?, link_method = 'manual', linked_by = ?,
            updated_at = datetime('now')
        WHERE work_id IN (${sourcePlaceholders})
-         AND (SELECT valid FROM work_merge_guard)`,
+         AND (SELECT valid FROM merge_guard)`,
       [canonical.id, mergedBy, ...sourceWorkIds],
     ),
     guarded(
       `UPDATE works
        SET tags = ?, updated_at = datetime('now')
        WHERE id = ?
-         AND (SELECT valid FROM work_merge_guard)`,
+         AND (SELECT valid FROM merge_guard)`,
       [JSON.stringify(mergedTags), canonical.id],
     ),
   );
@@ -843,20 +826,15 @@ export async function mergeWorkMatchCandidate(
     guarded(
       `DELETE FROM works
        WHERE id IN (${sourcePlaceholders})
-         AND (SELECT valid FROM work_merge_guard)`,
+         AND (SELECT valid FROM merge_guard)`,
       sourceWorkIds,
     ),
-    db.prepare(
-      `DELETE FROM work_aliases
-       WHERE source_work_id = ?
-         AND canonical_work_id = ?
-         AND merged_by = ?`,
-    ).bind(guardToken, canonical.id, WORK_MATCH_GUARD_ACTOR),
+    prepareMergeGuardCleanup(db, guard.guardToken),
   );
 
   const results = await db.batch(statements);
-  const guard = results[0]?.results[0] as { valid?: number | boolean } | undefined;
-  if (guard?.valid !== 1 && guard?.valid !== true) {
+  const guardResult = results[0]?.results[0] as { valid?: number | boolean } | undefined;
+  if (guardResult?.valid !== 1 && guardResult?.valid !== true) {
     throw new WorkMatchError(
       'work_match_stale',
       'The global work catalog changed during confirmation; refresh and retry',

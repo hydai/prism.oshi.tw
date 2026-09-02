@@ -129,7 +129,7 @@ class FakeD1 {
           meta: { changes: this.mergeGuardValid ? 1 : 0 },
         };
       }
-      if (!this.mergeGuardValid && /work_merge_guard/i.test(statement.sql)) {
+      if (!this.mergeGuardValid && /merge_guard/i.test(statement.sql)) {
         return { results: [], meta: { changes: 0 } };
       }
       if (/UPDATE\s+song_work_links/i.test(statement.sql)) {

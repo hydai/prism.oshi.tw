@@ -52,9 +52,11 @@ export function getWorkMergePlan(
   };
 }
 
+/** `revision` is the catalog revision the scan these items came from reported. */
 export function buildWorkAwareMergeRequest(
   items: HarmonizeSongEntry[],
   canonicalSongId: string,
+  revision: number,
 ): HarmonizeMergeBody | null {
   const batch = getWorkAwareMergeBatch(items, canonicalSongId);
   const plan = getWorkMergePlan(batch.items, canonicalSongId);
@@ -66,6 +68,7 @@ export function buildWorkAwareMergeRequest(
   return {
     canonicalSongId,
     sourceSongIds,
+    revision,
     ...(plan.requiresGlobalMerge
       ? {
           workMergeConfirmation: {

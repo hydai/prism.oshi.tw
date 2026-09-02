@@ -6,7 +6,7 @@
   "scripts": {
     "dev": "vite",
     "build": "tsc -b && vite build",
-    "check": "npm run test:api-resource && npm run test:numeric-input && npm run test:youtube-embed && npm run test:crystal-tickets && npm run test:pipeline-extract-state && npm run test:work-review && npm run test:nova-links && npm run test:stream-detail && npm run test:stamp-editor && npm run test:vod-export && npm run test:prism-components && npm run test:nova-vod-groups && npm run test:nova-vod-row && npm run test:status-totals && npm run build",
+    "check": "npm run test:api-resource && npm run test:numeric-input && npm run test:youtube-embed && npm run test:crystal-tickets && npm run test:pipeline-extract-state && npm run test:work-review && npm run test:nova-links && npm run test:stream-detail && npm run test:stamp-editor && npm run test:vod-export && npm run test:prism-components && npm run test:nova-vod-groups && npm run test:nova-vod-row && npm run test:status-totals && npm run test:harmonizer-work-id && npm run build",
     "test:api-resource": "npx tsx tests/api-resource.test.ts",
     "test:prism-components": "npx tsx tests/prism-components.test.tsx",
     "test:nova-vod-groups": "npx tsx tests/nova-vod-groups.test.ts",
