@@ -15,8 +15,9 @@ import { api, ApiError } from '../api/client';
 import type {
   VodExportCandidate,
   VodExportCapacityDiagnostic,
+  VodExportCapacityResource,
   VodExportCounts,
-  VodExportFinding,
+  VodExportFindingApi,
   VodExportFindingSeverity,
   VodExportPublication,
   VodExportStatusResponse,
@@ -181,17 +182,25 @@ export function CurrentPublicationPanel({
   );
 }
 
+/**
+ * Every resource the worker can report, so adding one to the shared
+ * `CapacityResource` union fails this build until it has a name a curator reads.
+ */
+const CAPACITY_LABELS: Readonly<Record<VodExportCapacityResource, string>> = {
+  sourceRows: 'Source rows',
+  sourceTextBytes: 'Source text',
+  streamers: 'Exported streamers',
+  vods: 'Exported VODs',
+  performances: 'Exported performances',
+  snapshotBytes: 'Snapshot bytes',
+  findings: 'Findings',
+  findingsBytes: 'Findings response',
+  d1JsonBindingBytes: 'D1 query payload',
+};
+
+/** Diagnostics come off the wire, so an unrecognised resource still renders. */
 function capacityLabel(resource: string): string {
-  const labels: Record<string, string> = {
-    sourceRows: 'Source rows',
-    sourceTextBytes: 'Source text',
-    streamers: 'Exported streamers',
-    vods: 'Exported VODs',
-    performances: 'Exported performances',
-    snapshotBytes: 'Snapshot bytes',
-    findings: 'Findings',
-    findingsBytes: 'Findings response',
-  };
+  const labels: Readonly<Record<string, string>> = CAPACITY_LABELS;
   return labels[resource] ?? resource;
 }
 
@@ -232,7 +241,7 @@ export function CapacityPanel({ diagnostics }: { diagnostics: VodExportCapacityD
   );
 }
 
-function FindingCard({ finding }: { finding: VodExportFinding }) {
+function FindingCard({ finding }: { finding: VodExportFindingApi }) {
   const repairPath = safeRepairPath(finding.repairPath);
   const details = finding.details ? Object.entries(finding.details) : [];
   const isError = finding.severity === 'error';
@@ -263,45 +272,42 @@ function FindingCard({ finding }: { finding: VodExportFinding }) {
         )}
       </div>
 
-      {(finding.streamerSlug || finding.entityType || finding.entityId || finding.field || details.length > 0) && (
-        <dl className="mt-3 flex flex-wrap gap-x-5 gap-y-1 border-t border-slate-100 pt-3 text-xs">
-          {finding.streamerSlug && (
-            <div className="flex gap-1">
-              <dt className="text-slate-500">Streamer:</dt>
-              <dd className="font-mono text-slate-700">{finding.streamerSlug}</dd>
-            </div>
-          )}
-          {finding.entityType && (
-            <div className="flex gap-1">
-              <dt className="text-slate-500">Entity:</dt>
-              <dd className="text-slate-700">{finding.entityType}</dd>
-            </div>
-          )}
-          {finding.entityId && (
-            <div className="flex min-w-0 gap-1">
-              <dt className="shrink-0 text-slate-500">ID:</dt>
-              <dd className="break-all font-mono text-slate-700">{finding.entityId}</dd>
-            </div>
-          )}
-          {finding.field && (
-            <div className="flex gap-1">
-              <dt className="text-slate-500">Field:</dt>
-              <dd className="font-mono text-slate-700">{finding.field}</dd>
-            </div>
-          )}
-          {details.map(([key, value]) => (
-            <div key={key} className="flex gap-1">
-              <dt className="text-slate-500">{key}:</dt>
-              <dd className="font-mono text-slate-700">{String(value)}</dd>
-            </div>
-          ))}
-        </dl>
-      )}
+      {/* Every finding names the entity it is about; the rest of the row is optional. */}
+      <dl className="mt-3 flex flex-wrap gap-x-5 gap-y-1 border-t border-slate-100 pt-3 text-xs">
+        {finding.streamerSlug && (
+          <div className="flex gap-1">
+            <dt className="text-slate-500">Streamer:</dt>
+            <dd className="font-mono text-slate-700">{finding.streamerSlug}</dd>
+          </div>
+        )}
+        <div className="flex gap-1">
+          <dt className="text-slate-500">Entity:</dt>
+          <dd className="text-slate-700">{finding.entityType}</dd>
+        </div>
+        {finding.entityId && (
+          <div className="flex min-w-0 gap-1">
+            <dt className="shrink-0 text-slate-500">ID:</dt>
+            <dd className="break-all font-mono text-slate-700">{finding.entityId}</dd>
+          </div>
+        )}
+        {finding.field && (
+          <div className="flex gap-1">
+            <dt className="text-slate-500">Field:</dt>
+            <dd className="font-mono text-slate-700">{finding.field}</dd>
+          </div>
+        )}
+        {details.map(([key, value]) => (
+          <div key={key} className="flex gap-1">
+            <dt className="text-slate-500">{key}:</dt>
+            <dd className="font-mono text-slate-700">{String(value)}</dd>
+          </div>
+        ))}
+      </dl>
     </li>
   );
 }
 
-export function FindingsPanel({ findings }: { findings: VodExportFinding[] }) {
+export function FindingsPanel({ findings }: { findings: VodExportFindingApi[] }) {
   const [severityFilter, setSeverityFilter] = useState<SeverityFilter>('all');
   const [streamerFilter, setStreamerFilter] = useState('');
   const streamers = useMemo(
@@ -849,7 +855,7 @@ function PreviewReview({
   downloading: boolean;
   checkingCandidate: boolean;
   previewLoaded: boolean;
-  findings: VodExportFinding[];
+  findings: VodExportFindingApi[];
   publishButtonRef: RefObject<HTMLButtonElement | null>;
   onDownload: () => void;
   onPublish: () => void;
@@ -1178,11 +1184,11 @@ export default function VodExport({ user }: { user: AuthUser }) {
   );
 }
 
-function findingKey(finding: VodExportFinding): string {
+function findingKey(finding: VodExportFindingApi): string {
   return [
     finding.code,
     finding.streamerSlug ?? '',
-    finding.entityType ?? '',
+    finding.entityType,
     finding.entityId ?? '',
     finding.field ?? '',
     JSON.stringify(finding.details ?? {}),

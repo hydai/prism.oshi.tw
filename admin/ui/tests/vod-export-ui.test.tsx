@@ -341,6 +341,22 @@ async function main(): Promise<void> {
   );
   assert(warningCapacity.includes('80%'), 'capacity indicator appears at the confirmed threshold');
 
+  // Every capacity resource the worker can report has a human label, including the
+  // D1 binding limit that only shows up inside an EXPORT_LIMIT_EXCEEDED diagnostic.
+  const bindingCapacity = renderToStaticMarkup(
+    <CapacityPanel
+      diagnostics={[{
+        resource: 'd1JsonBindingBytes',
+        actual: 1_900_001,
+        limit: 1_900_000,
+        ratio: 1,
+        state: 'exceeded',
+      }]}
+    />,
+  );
+  assert(bindingCapacity.includes('D1 query payload'), 'the D1 binding limit reads as a human label');
+  assert(!bindingCapacity.includes('d1JsonBindingBytes'), 'no capacity resource falls back to its raw key');
+
   const dialogHtml = renderToStaticMarkup(
     <PublishConfirmationDialog
       candidate={candidate}

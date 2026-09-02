@@ -1,6 +1,12 @@
 import { useEffect, useMemo, useReducer, useState } from 'react';
 import type { Dispatch } from 'react';
-import type { AuthUser, NovaSubmission, NovaStatus, BulkFetchSubscribersResponse } from '../../../shared/types';
+import type {
+  AuthUser,
+  BulkFetchSubscribersResponse,
+  NovaStatus,
+  NovaSubmission,
+  NovaSubmissionUpdateBody,
+} from '../../../shared/types';
 import { sanitizeNovaUrl } from '../../../shared/nova-url-safety';
 import { api } from '../api/client';
 import { useApiResource, errorMessage } from '../lib/apiResource';
@@ -64,7 +70,8 @@ export default function NovaSubmissions({ user }: { user: AuthUser }) {
   const [fetchAllResult, setFetchAllResult] = useState<BulkFetchSubscribersResponse | null>(null);
 
   // One unfiltered load feeds both the table and the hero totals; status and
-  // search narrow it here rather than costing a second request per keystroke.
+  // search narrow it here rather than costing a second request per chip click or
+  // search submit.
   const list = useApiResource(async () => (await api.listNovaSubmissions()).data, []);
   // Stable reference while loading, so the filter memo doesn't recompute every render.
   const allSubmissions = useMemo(() => list.data ?? [], [list.data]);
@@ -321,7 +328,7 @@ export function SubmissionRow({
     dispatch({ type: 'saveStarted' });
     try {
       // Only send fields that actually changed
-      const changes: Record<string, string | number> = {};
+      const changes: NovaSubmissionUpdateBody = {};
       for (const { key } of EDITABLE_FIELDS) {
         if (draft[key] !== (sub[key] ?? '')) {
           changes[key] = draft[key];

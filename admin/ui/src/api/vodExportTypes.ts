@@ -1,8 +1,22 @@
-export interface VodExportCounts {
-  streamers: number;
-  vods: number;
-  performances: number;
-}
+/**
+ * Everything the worker sends is described once in `admin/shared/vod-export-types`;
+ * this file only names those shapes for the UI and adds the response envelopes the
+ * pages read. A finding always arrives in its API form — validation output plus the
+ * server-resolved repair path — so that is the only finding type the pages see.
+ */
+export type {
+  CapacityDiagnostic as VodExportCapacityDiagnostic,
+  CapacityResource as VodExportCapacityResource,
+  FindingSeverity as VodExportFindingSeverity,
+  VodExportCounts,
+  VodExportFindingApi,
+} from '../../../shared/vod-export-types';
+
+import type {
+  CapacityDiagnostic,
+  VodExportCounts,
+  VodExportFindingApi,
+} from '../../../shared/vod-export-types';
 
 export interface VodExportPublication {
   schemaVersion: string;
@@ -11,35 +25,6 @@ export interface VodExportPublication {
   publishedAt: string;
   uncompressedBytes: number;
   counts: VodExportCounts;
-}
-
-export type VodExportFindingSeverity = 'error' | 'warning';
-export type VodExportFindingEntity = 'streamer' | 'vod' | 'song' | 'performance';
-
-export interface VodExportFinding {
-  code: string;
-  severity: VodExportFindingSeverity;
-  message: string;
-  streamerSlug?: string;
-  entityType?: VodExportFindingEntity;
-  entityId?: string;
-  field?: string;
-  details?: Record<string, string | number | boolean>;
-  /**
-   * Optional server-resolved Admin path for D-013.10. The page accepts only a
-   * relative in-app path and never builds a destination from finding values.
-   */
-  repairPath?: string;
-}
-
-export type VodExportCapacityState = 'ok' | 'warning' | 'exceeded';
-
-export interface VodExportCapacityDiagnostic {
-  resource: string;
-  actual: number;
-  limit: number;
-  ratio: number;
-  state: VodExportCapacityState;
 }
 
 export type VodExportCandidateState = 'ready' | 'stale' | 'expired' | 'already_published';
@@ -66,9 +51,9 @@ export interface VodExportStatusResponse {
 
 export interface VodExportPreviewResponse {
   canPublish: boolean;
-  findings: VodExportFinding[];
+  findings: VodExportFindingApi[];
   candidate: VodExportCandidate | null;
-  capacity: VodExportCapacityDiagnostic[];
+  capacity: CapacityDiagnostic[];
 }
 
 export type VodExportCandidateResponse = VodExportPreviewResponse;

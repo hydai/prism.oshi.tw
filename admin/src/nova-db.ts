@@ -4,9 +4,20 @@
 // FakeD1 in nova-db.test.ts. Extracted from index.ts (audit 4.3 / W6) so this
 // SQL has a test seam instead of living inline inside route handlers.
 
-import { NOVA_STATUSES } from '../shared/types';
+import {
+  NOVA_STATUSES,
+  NOVA_SUBMISSION_EDITABLE_FIELDS,
+  NOVA_VOD_EDITABLE_FIELDS,
+} from '../shared/types';
 import type { NovaStatus, NovaSubmission, NovaVodSubmission, NovaVodSong } from '../shared/types';
+import type { NovaEditableField, NovaVodEditableField } from '../shared/types';
 import type { SubscriberRefreshRow } from './subscriber-refresh';
+
+// The PUT /:id allow-lists live in shared/types.ts, next to the row types, so
+// the Admin UI can type its request bodies against the same list this file's
+// UPDATE walks. Re-exported here because the write path is what callers reach for.
+export { NOVA_SUBMISSION_EDITABLE_FIELDS, NOVA_VOD_EDITABLE_FIELDS };
+export type { NovaEditableField, NovaVodEditableField };
 
 import { buildStatusFilterQuery } from './query-filters';
 
@@ -96,18 +107,6 @@ export async function submissionExists(db: D1Database, id: string): Promise<bool
 export async function deleteSubmission(db: D1Database, id: string): Promise<void> {
   await db.prepare('DELETE FROM submissions WHERE id = ?').bind(id).run();
 }
-
-// The PUT /:id allow-list: every submissions column a curator can set through
-// a request body. `NovaEditableField` is derived from it with `as const` so
-// the type and the runtime list can never drift apart.
-export const NOVA_SUBMISSION_EDITABLE_FIELDS = [
-  'youtube_channel_url', 'youtube_channel_id', 'slug', 'brand_name', 'display_name', 'description',
-  'avatar_url', 'subscriber_count', 'link_youtube', 'link_twitter',
-  'link_facebook', 'link_instagram', 'link_twitch', 'reviewer_note',
-  'group', 'theme_json', 'enabled', 'display_order', 'external_url',
-] as const;
-
-export type NovaEditableField = typeof NOVA_SUBMISSION_EDITABLE_FIELDS[number];
 
 export interface NovaSubmissionVerificationUpdate {
   channelId: string | null;
@@ -301,10 +300,6 @@ export async function updateVodStatus(
     .bind(status, reviewedAt, note, id)
     .run();
 }
-
-export const NOVA_VOD_EDITABLE_FIELDS = ['stream_title', 'stream_date', 'submitter_note', 'reviewer_note'] as const;
-
-export type NovaVodEditableField = typeof NOVA_VOD_EDITABLE_FIELDS[number];
 
 /** PUT /:id's dynamic UPDATE. Same "false means nothing to set" contract as updateSubmissionFields. */
 export async function updateVodFields(

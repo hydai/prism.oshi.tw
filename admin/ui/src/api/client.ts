@@ -29,9 +29,11 @@ import type {
   BulkApproveResponse,
   DeleteStreamResponse,
   NovaSubmission,
+  NovaSubmissionUpdateBody,
   NovaStatus,
   NovaVodSubmission,
   NovaVodSong,
+  NovaVodUpdateBody,
   StreamerInfo,
   CrystalTicket,
   CrystalTicketStatus,
@@ -460,7 +462,7 @@ export const api = {
     );
   },
 
-  updateNovaSubmission: (id: string, body: Record<string, string | number>) =>
+  updateNovaSubmission: (id: string, body: NovaSubmissionUpdateBody) =>
     request<NovaSubmission>(`/api/nova/submissions/${id}`, {
       method: 'PUT',
       body: JSON.stringify(body),
@@ -514,7 +516,7 @@ export const api = {
       body: JSON.stringify(body),
     }),
 
-  updateNovaVod: (id: string, body: Record<string, string>) =>
+  updateNovaVod: (id: string, body: NovaVodUpdateBody) =>
     request<NovaVodSubmission>(`/api/nova/vods/${id}`, {
       method: 'PUT',
       body: JSON.stringify(body),
