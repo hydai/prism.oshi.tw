@@ -13,6 +13,6 @@
     "lib": ["ES2022"],
     "types": ["@cloudflare/workers-types"]
   },
-  "include": ["src/**/*.ts"],
+  "include": ["src/**/*.ts", "../shared/web/**/*.ts"],
   "exclude": ["node_modules"]
 }
