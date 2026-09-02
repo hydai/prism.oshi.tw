@@ -9,6 +9,9 @@ function assert(condition: boolean, message: string): asserts condition {
   if (!condition) throw new Error(message);
 }
 
+/** Catalog revision the scan under test reported. */
+const SCANNED_REVISION = 41;
+
 function installLocalStorage(): void {
   const storage = new Map<string, string>([['prism_admin_streamer', 'alice']]);
   const stub: Storage = {
@@ -63,11 +66,15 @@ async function main(): Promise<void> {
   const sameWorkPlan = getWorkMergePlan(sameWorkSongs, 'canonical');
   assert(!sameWorkPlan.requiresGlobalMerge, 'same workId stays a streamer-local song merge');
   assert(sameWorkPlan.sourceWorkIds.length === 0, 'same workId has no global source work to retire');
-  const sameWorkRequest = buildWorkAwareMergeRequest(sameWorkSongs, 'canonical');
+  const sameWorkRequest = buildWorkAwareMergeRequest(sameWorkSongs, 'canonical', SCANNED_REVISION);
   assert(sameWorkRequest !== null, 'linked same-work songs produce a merge request');
   assert(
     sameWorkRequest.workMergeConfirmation === undefined,
     'same-work request carries no global-work authorization',
+  );
+  assert(
+    sameWorkRequest.revision === SCANNED_REVISION,
+    'every merge request is bound to the revision its scan reported',
   );
 
   const crossWorkSongs = [
@@ -82,7 +89,7 @@ async function main(): Promise<void> {
     crossWorkPlan.sourceWorkIds.join('|') === 'work-two',
     'multiple local sources on one work retire that global work only once',
   );
-  const crossWorkRequest = buildWorkAwareMergeRequest(crossWorkSongs, 'canonical');
+  const crossWorkRequest = buildWorkAwareMergeRequest(crossWorkSongs, 'canonical', SCANNED_REVISION);
   assert(crossWorkRequest !== null, 'linked cross-work songs produce a merge request');
   assert(
     crossWorkRequest.workMergeConfirmation?.canonicalWorkId === 'work-one',
@@ -104,7 +111,7 @@ async function main(): Promise<void> {
       index === 50 ? 'work-deferred' : 'work-large-source',
     )),
   ];
-  const oversizedRequest = buildWorkAwareMergeRequest(oversizedSongs, 'large-canonical');
+  const oversizedRequest = buildWorkAwareMergeRequest(oversizedSongs, 'large-canonical', SCANNED_REVISION);
   assert(oversizedRequest !== null, 'oversized linked groups still produce an actionable batch');
   assert(
     oversizedRequest.sourceSongIds.length === HARMONIZE_MERGE_SOURCE_LIMIT,
@@ -127,7 +134,7 @@ async function main(): Promise<void> {
   const unlinkedPlan = getWorkMergePlan(unlinkedSongs, 'canonical');
   assert(unlinkedPlan.missingSongIds.join('|') === 'unlinked', 'missing workId is surfaced by song ID');
   assert(
-    buildWorkAwareMergeRequest(unlinkedSongs, 'canonical') === null,
+    buildWorkAwareMergeRequest(unlinkedSongs, 'canonical', SCANNED_REVISION) === null,
     'UI fails closed instead of sending an unlinked merge',
   );
 

@@ -280,7 +280,10 @@ assert_sql 'SELECT COUNT(*) FROM pragma_foreign_key_check;' '0' 'foreign keys af
 # Exercise the transaction-local guard shape used by Harmonizer merges. Stale
 # reviewed song or work metadata must leave every guarded mutation as a no-op;
 # a current reviewed state must keep authorizing later statements even after
-# the bridge itself changes.
+# the bridge itself changes. The guard token lives in merge_guards (0008), so
+# this simulation needs that table.
+sqlite3 "$tmp_db" < migrations/0008_merge_guards.sql
+
 sqlite3 "$tmp_db" <<'SQL'
 PRAGMA foreign_keys = ON;
 INSERT INTO works (id, title, original_artist, tags)
@@ -347,13 +350,8 @@ merge_guard(valid) AS (
   JOIN works AS guarded_work
     ON guarded_work.id = expected.work_id
 )
-INSERT INTO work_aliases (
-  source_work_id, canonical_work_id, source_title,
-  source_original_artist, source_tags, merged_by
-)
-SELECT 'merge-guard-stale-song-source', 'merge-guard-stale-song-canonical',
-       '__merge_guard__', '__merge_guard__', '[]',
-       'system:harmonizer-merge-guard'
+INSERT INTO merge_guards (guard_token, canonical_id, actor)
+SELECT 'merge-guard-stale-song', 'song-a', 'system:harmonizer-merge-guard'
 FROM merge_guard
 WHERE valid
 RETURNING 1 AS valid;
@@ -361,10 +359,10 @@ RETURNING 1 AS valid;
 WITH merge_guard(valid) AS (
   SELECT EXISTS (
     SELECT 1
-    FROM work_aliases
-    WHERE source_work_id = 'merge-guard-stale-song-source'
-      AND canonical_work_id = 'merge-guard-stale-song-canonical'
-      AND merged_by = 'system:harmonizer-merge-guard'
+    FROM merge_guards
+    WHERE guard_token = 'merge-guard-stale-song'
+      AND canonical_id = 'song-a'
+      AND actor = 'system:harmonizer-merge-guard'
   )
 )
 UPDATE songs
@@ -375,20 +373,17 @@ WHERE id = 'song-a'
 WITH merge_guard(valid) AS (
   SELECT EXISTS (
     SELECT 1
-    FROM work_aliases
-    WHERE source_work_id = 'merge-guard-stale-song-source'
-      AND canonical_work_id = 'merge-guard-stale-song-canonical'
-      AND merged_by = 'system:harmonizer-merge-guard'
+    FROM merge_guards
+    WHERE guard_token = 'merge-guard-stale-song'
+      AND canonical_id = 'song-a'
+      AND actor = 'system:harmonizer-merge-guard'
   )
 )
 DELETE FROM songs
 WHERE id = 'song-guard-source'
   AND (SELECT valid FROM merge_guard);
 
-DELETE FROM work_aliases
-WHERE source_work_id = 'merge-guard-stale-song-source'
-  AND canonical_work_id = 'merge-guard-stale-song-canonical'
-  AND merged_by = 'system:harmonizer-merge-guard';
+DELETE FROM merge_guards WHERE guard_token = 'merge-guard-stale-song';
 COMMIT;
 SQL
 
@@ -443,13 +438,8 @@ merge_guard(valid) AS (
   JOIN works AS guarded_work
     ON guarded_work.id = expected.work_id
 )
-INSERT INTO work_aliases (
-  source_work_id, canonical_work_id, source_title,
-  source_original_artist, source_tags, merged_by
-)
-SELECT 'merge-guard-stale-source', 'merge-guard-stale-canonical',
-       '__merge_guard__', '__merge_guard__', '[]',
-       'system:harmonizer-merge-guard'
+INSERT INTO merge_guards (guard_token, canonical_id, actor)
+SELECT 'merge-guard-stale-work', 'work-song-a', 'system:harmonizer-merge-guard'
 FROM merge_guard
 WHERE valid
 RETURNING 1 AS valid;
@@ -457,10 +447,10 @@ RETURNING 1 AS valid;
 WITH merge_guard(valid) AS (
   SELECT EXISTS (
     SELECT 1
-    FROM work_aliases
-    WHERE source_work_id = 'merge-guard-stale-source'
-      AND canonical_work_id = 'merge-guard-stale-canonical'
-      AND merged_by = 'system:harmonizer-merge-guard'
+    FROM merge_guards
+    WHERE guard_token = 'merge-guard-stale-work'
+      AND canonical_id = 'work-song-a'
+      AND actor = 'system:harmonizer-merge-guard'
   )
 )
 UPDATE song_work_links
@@ -471,20 +461,17 @@ WHERE work_id = 'work-guard-source'
 WITH merge_guard(valid) AS (
   SELECT EXISTS (
     SELECT 1
-    FROM work_aliases
-    WHERE source_work_id = 'merge-guard-stale-source'
-      AND canonical_work_id = 'merge-guard-stale-canonical'
-      AND merged_by = 'system:harmonizer-merge-guard'
+    FROM merge_guards
+    WHERE guard_token = 'merge-guard-stale-work'
+      AND canonical_id = 'work-song-a'
+      AND actor = 'system:harmonizer-merge-guard'
   )
 )
 DELETE FROM works
 WHERE id = 'work-guard-source'
   AND (SELECT valid FROM merge_guard);
 
-DELETE FROM work_aliases
-WHERE source_work_id = 'merge-guard-stale-source'
-  AND canonical_work_id = 'merge-guard-stale-canonical'
-  AND merged_by = 'system:harmonizer-merge-guard';
+DELETE FROM merge_guards WHERE guard_token = 'merge-guard-stale-work';
 COMMIT;
 SQL
 
@@ -539,13 +526,8 @@ merge_guard(valid) AS (
   JOIN works AS guarded_work
     ON guarded_work.id = expected.work_id
 )
-INSERT INTO work_aliases (
-  source_work_id, canonical_work_id, source_title,
-  source_original_artist, source_tags, merged_by
-)
-SELECT 'merge-guard-valid-source', 'merge-guard-valid-canonical',
-       '__merge_guard__', '__merge_guard__', '[]',
-       'system:harmonizer-merge-guard'
+INSERT INTO merge_guards (guard_token, canonical_id, actor)
+SELECT 'merge-guard-valid', 'work-song-a', 'system:harmonizer-merge-guard'
 FROM merge_guard
 WHERE valid
 RETURNING 1 AS valid;
@@ -553,10 +535,10 @@ RETURNING 1 AS valid;
 WITH merge_guard(valid) AS (
   SELECT EXISTS (
     SELECT 1
-    FROM work_aliases
-    WHERE source_work_id = 'merge-guard-valid-source'
-      AND canonical_work_id = 'merge-guard-valid-canonical'
-      AND merged_by = 'system:harmonizer-merge-guard'
+    FROM merge_guards
+    WHERE guard_token = 'merge-guard-valid'
+      AND canonical_id = 'work-song-a'
+      AND actor = 'system:harmonizer-merge-guard'
   )
 )
 UPDATE song_work_links
@@ -567,26 +549,24 @@ WHERE work_id = 'work-guard-source'
 WITH merge_guard(valid) AS (
   SELECT EXISTS (
     SELECT 1
-    FROM work_aliases
-    WHERE source_work_id = 'merge-guard-valid-source'
-      AND canonical_work_id = 'merge-guard-valid-canonical'
-      AND merged_by = 'system:harmonizer-merge-guard'
+    FROM merge_guards
+    WHERE guard_token = 'merge-guard-valid'
+      AND canonical_id = 'work-song-a'
+      AND actor = 'system:harmonizer-merge-guard'
   )
 )
 DELETE FROM works
 WHERE id = 'work-guard-source'
   AND (SELECT valid FROM merge_guard);
 
-DELETE FROM work_aliases
-WHERE source_work_id = 'merge-guard-valid-source'
-  AND canonical_work_id = 'merge-guard-valid-canonical'
-  AND merged_by = 'system:harmonizer-merge-guard';
+DELETE FROM merge_guards WHERE guard_token = 'merge-guard-valid';
 COMMIT;
 SQL
 
 assert_sql "SELECT work_id FROM song_work_links WHERE song_id = 'song-guard-source';" 'work-song-a' 'valid transaction guard survives its own bridge mutation'
 assert_sql "SELECT COUNT(*) FROM works WHERE id = 'work-guard-source';" '0' 'valid transaction guard authorizes source work deletion'
-assert_sql "SELECT COUNT(*) FROM work_aliases WHERE merged_by = 'system:harmonizer-merge-guard';" '0' 'transaction guard leaves no persistent alias row'
+assert_sql 'SELECT COUNT(*) FROM merge_guards;' '0' 'transaction guard leaves no persistent guard row'
+assert_sql "SELECT COUNT(*) FROM work_aliases WHERE merged_by = 'system:harmonizer-merge-guard';" '0' 'guard state never reaches the alias domain table'
 assert_sql 'PRAGMA integrity_check;' 'ok' 'SQLite integrity after transaction guard'
 assert_sql 'SELECT COUNT(*) FROM pragma_foreign_key_check;' '0' 'foreign keys after transaction guard'
 

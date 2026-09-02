@@ -238,6 +238,9 @@ function parseHarmonizeMergeBody(value: unknown): HarmonizeMergeBody | null {
   if (
     typeof body.canonicalSongId !== 'string'
     || body.canonicalSongId.trim().length === 0
+    || typeof body.revision !== 'number'
+    || !Number.isSafeInteger(body.revision)
+    || body.revision < 0
     || !Array.isArray(body.sourceSongIds)
     || body.sourceSongIds.length === 0
     || !body.sourceSongIds.every(
@@ -273,6 +276,7 @@ function parseHarmonizeMergeBody(value: unknown): HarmonizeMergeBody | null {
   return {
     canonicalSongId: body.canonicalSongId.trim(),
     sourceSongIds: body.sourceSongIds.map((id) => id.trim()),
+    revision: body.revision,
     ...(workMergeConfirmation === undefined ? {} : { workMergeConfirmation }),
   };
 }
@@ -1456,7 +1460,7 @@ app.get('/api/harmonize/songs', requireCurator, async (c) => {
   const mode = (c.req.query('mode') || 'exact') as HarmonizeMatchType;
   const threshold = parseFloat(c.req.query('threshold') || '0.85');
 
-  const groups = await getSongSimilarityGroups(c.env.DB, streamerId, mode, threshold);
+  const { groups, revision } = await getSongSimilarityGroups(c.env.DB, streamerId, mode, threshold);
   const affectedSongs = groups.reduce((sum, g) => sum + g.items.length, 0);
 
   return c.json<HarmonizeSongsResponse>({
@@ -1466,6 +1470,7 @@ app.get('/api/harmonize/songs', requireCurator, async (c) => {
       groupCount: groups.length,
       affectedSongs,
     },
+    revision,
   });
 });
 
@@ -1500,6 +1505,7 @@ app.post('/api/harmonize/merge', requireCurator, async (c) => {
       body.canonicalSongId,
       body.sourceSongIds,
       user.email,
+      body.revision,
       body.workMergeConfirmation,
     );
     return c.json<HarmonizeMergeResponse>({ ok: true, ...result });

@@ -50,6 +50,13 @@ type ExistingStream = { id: string; title: string; date: string } | null;
 
 type CapturedStatement = { sql: string; params: unknown[] };
 
+/** The catalog revision every merge fixture is reviewed against. */
+const SCANNED_REVISION = 41;
+/** Bind position of the scanned revision inside the song merge guard insert. */
+const SONG_MERGE_GUARD_REVISION_INDEX = 3;
+/** What the merge's own trigger bumps leave behind, read at the batch tail. */
+const REVISION_AFTER_MERGE = SCANNED_REVISION + 4;
+
 class FakeStatement {
   params: unknown[] = [];
 
@@ -110,6 +117,8 @@ class FakeD1Database {
   readonly batchStatements: CapturedStatement[] = [];
   batchCallCount = 0;
   mergeGuardValid = true;
+  workMatchRevision = SCANNED_REVISION;
+  revisionAfterMerge = REVISION_AFTER_MERGE;
   streamPerformanceCount = 0;
   dashboardStatusRows: Record<'songs' | 'streams' | 'performances', unknown[]> = {
     songs: [],
@@ -152,7 +161,30 @@ class FakeD1Database {
       ];
     }
 
-    return statements.map((statement) => {
+    // The merge guard is only written when its bound revision still matches
+    // the catalog, exactly as the SQL fence does inside D1.
+    const guardStatement = statements[0];
+    const revisionFenceHolds = guardStatement === undefined
+      || !/work_match_state/i.test(guardStatement.sql)
+      || guardStatement.params[SONG_MERGE_GUARD_REVISION_INDEX] === this.workMatchRevision;
+    const mergeGuardValid = this.mergeGuardValid && revisionFenceHolds;
+
+    return statements.map((statement, index) => {
+      if (statement.sql.startsWith('SELECT revision FROM work_match_state')) {
+        // A merge bumps the catalog revision through its own triggers, so the
+        // read at the tail of a merge batch answers with the post-merge value.
+        const isBatchTail = statements.length > 1 && index === statements.length - 1;
+        return {
+          results: [{ revision: isBatchTail ? this.revisionAfterMerge : this.workMatchRevision }],
+          meta: { changes: 0 },
+        };
+      }
+      if (
+        statement.sql.includes('AS perf_count')
+        && statement.sql.includes('LEFT JOIN song_work_links')
+      ) {
+        return { results: this.harmonizerRows, meta: { changes: 0 } };
+      }
       if (statement.sql.includes('SELECT COUNT(*) AS cnt FROM performances WHERE stream_id = ?')) {
         return {
           results: [{ cnt: this.streamPerformanceCount }],
@@ -188,11 +220,11 @@ class FakeD1Database {
       }
       if (/RETURNING\s+1\s+AS\s+valid/i.test(statement.sql)) {
         return {
-          results: this.mergeGuardValid ? [{ valid: 1 }] : [],
-          meta: { changes: this.mergeGuardValid ? 1 : 0 },
+          results: mergeGuardValid ? [{ valid: 1 }] : [],
+          meta: { changes: mergeGuardValid ? 1 : 0 },
         };
       }
-      if (!this.mergeGuardValid && /merge_guard/i.test(statement.sql)) {
+      if (!mergeGuardValid && /merge_guard/i.test(statement.sql)) {
         return { results: [], meta: { changes: 0 } };
       }
       if (statement.sql.includes('SELECT s.id') && statement.sql.includes('s.original_artist = ?')) {
@@ -216,7 +248,7 @@ class FakeD1Database {
       if (statement.sql.includes('FROM performances WHERE song_id = ? ORDER BY date DESC')) {
         return { results: this.songByIdPerformanceRows, meta: { changes: 0 } };
       }
-      const guardedParamCount = /merge_guard/i.test(statement.sql) ? 2 : 0;
+      const guardedParamCount = /merge_guard/i.test(statement.sql) ? 3 : 0;
       const changes = /UPDATE\s+performances/i.test(statement.sql)
         ? 3
         : /DELETE\s+FROM\s+songs/i.test(statement.sql)
@@ -693,13 +725,15 @@ async function testHarmonizerScanUsesAndExposesWorkIds(): Promise<void> {
     row('same-title-b', 'work-three', 'shared title', 3),
   ]);
 
-  const groups = await getSongSimilarityGroups(
+  const { groups, revision } = await getSongSimilarityGroups(
     fakeDb as unknown as D1Database,
     'alice',
     'exact',
     0.85,
   );
 
+  assertEqual(fakeDb.batchCallCount, 1, 'the scan reads its songs and catalog revision in one batch');
+  assertEqual(revision, SCANNED_REVISION, 'the scan reports the revision a later merge must send back');
   assertEqual(groups.length, 2, 'work identity and normalized title each form a review group');
   const workGroup = groups.find((group) => group.matchType === 'work_id');
   if (!workGroup) throw new Error('same workId songs should form a work_id group');
@@ -729,6 +763,7 @@ async function testMergeSongsPreservesPerformances(): Promise<void> {
     'song-canonical',
     ['song-source-1', 'song-source-2'],
     'curator@example.com',
+    SCANNED_REVISION,
   );
 
   assertEqual(result.mergedSongs, 2, 'both source song rows are deleted');
@@ -781,6 +816,7 @@ async function testMergeSongsRequiresExplicitGlobalWorkConfirmation(): Promise<v
       'song-canonical',
       ['song-source'],
       'curator@example.com',
+      SCANNED_REVISION,
     );
   } catch (error) {
     caught = error;
@@ -817,6 +853,7 @@ async function testMergeSongsMergesGlobalWorksAcrossVtubers(): Promise<void> {
     'song-canonical',
     ['song-source-1', 'song-source-2', 'song-source-3'],
     'curator@example.com',
+    SCANNED_REVISION,
     {
       canonicalWorkId: 'work-canonical',
       sourceWorkIds: ['work-third', 'work-source'],
@@ -889,7 +926,9 @@ async function testMergeSongsMergesGlobalWorksAcrossVtubers(): Promise<void> {
     statementIndex(/UPDATE\s+song_work_links/i) < statementIndex(/DELETE\s+FROM\s+works/i),
     'every VTuber song bridge moves before the source work is deleted',
   );
-  assert(fakeDb.batchStatements.length <= 12, 'set-based global merge stays within a small D1 batch');
+  // Guard insert + set-based mutations + guard cleanup + the post-merge
+  // revision read: a constant, independent of how many songs or works merge.
+  assert(fakeDb.batchStatements.length <= 13, 'set-based global merge stays within a small D1 batch');
 }
 
 async function testMergeSongsRevalidatesReviewedStateInsideBatch(): Promise<void> {
@@ -913,6 +952,7 @@ async function testMergeSongsRevalidatesReviewedStateInsideBatch(): Promise<void
       'song-canonical',
       ['song-source'],
       'curator@example.com',
+      SCANNED_REVISION,
       {
         canonicalWorkId: 'work-canonical',
         sourceWorkIds: ['work-source'],
@@ -971,7 +1011,7 @@ async function testMergeSongsRevalidatesReviewedStateInsideBatch(): Promise<void
     '["source-reviewed"]',
     'guard binds every reviewed source work tag set',
   );
-  const mutations = fakeDb.batchStatements.slice(1, -1);
+  const mutations = fakeDb.batchStatements.slice(1, -2);
   assert(mutations.length > 0, 'the guarded merge still prepares its mutation set');
   assert(
     mutations.every((statement) => (
@@ -981,8 +1021,98 @@ async function testMergeSongsRevalidatesReviewedStateInsideBatch(): Promise<void
     'every merge mutation is conditional on the same transaction-time song-and-work-state guard',
   );
   assert(
-    /DELETE\s+FROM\s+work_aliases/i.test(fakeDb.batchStatements.at(-1)?.sql ?? ''),
+    /DELETE\s+FROM\s+merge_guards\s+WHERE\s+guard_token\s*=\s*\?/i
+      .test(fakeDb.batchStatements.at(-2)?.sql ?? ''),
     'the transaction removes its short-lived guard token after the merge',
+  );
+}
+
+async function testMergeSongsFencesOnTheScannedCatalogRevision(): Promise<void> {
+  const rows = () => [
+    mergeRow('song-canonical', 'approved', '["canonical"]'),
+    mergeRow('song-source', 'approved', '["source"]'),
+  ];
+
+  const staleDb = new FakeD1Database(null, null, rows());
+  let caught: unknown;
+  try {
+    await mergeSongs(
+      staleDb as unknown as D1Database,
+      'alice',
+      'song-canonical',
+      ['song-source'],
+      'curator@example.com',
+      SCANNED_REVISION - 1,
+    );
+  } catch (error) {
+    caught = error;
+  }
+
+  assert(caught instanceof SongMergeError, 'a catalog write since the scan fails the merge closed');
+  assertEqual(
+    (caught as SongMergeError).code,
+    'work_merge_stale',
+    'a stale scan revision reuses the existing merge conflict code',
+  );
+  const staleGuard = staleDb.batchStatements[0];
+  assert(
+    /\(SELECT\s+revision\s+FROM\s+work_match_state\s+WHERE\s+id\s*=\s*1\)\s*=\s*\?/i
+      .test(staleGuard?.sql ?? ''),
+    'the guard insert fences on the catalog revision the scan displayed',
+  );
+  assertEqual(
+    staleGuard?.params[SONG_MERGE_GUARD_REVISION_INDEX],
+    SCANNED_REVISION - 1,
+    'the guard binds the revision the caller reviewed, not a re-read one',
+  );
+
+  const currentDb = new FakeD1Database(null, null, rows());
+  const result = await mergeSongs(
+    currentDb as unknown as D1Database,
+    'alice',
+    'song-canonical',
+    ['song-source'],
+    'curator@example.com',
+    SCANNED_REVISION,
+  );
+
+  assertEqual(result.mergedSongs, 1, 'the current scan revision authorizes the merge');
+  assertEqual(
+    result.revision,
+    REVISION_AFTER_MERGE,
+    'the merge reports the catalog revision it left behind, not the one it was fenced on',
+  );
+  assert(
+    currentDb.batchStatements.at(-1)?.sql.startsWith('SELECT revision FROM work_match_state') === true,
+    'the batch tail reads the post-merge revision inside the same transaction',
+  );
+  assert(
+    /DELETE\s+FROM\s+merge_guards\s+WHERE\s+guard_token\s*=\s*\?/i
+      .test(currentDb.batchStatements.at(-2)?.sql ?? ''),
+    'the guard cleanup stays the last mutating statement, right before that read',
+  );
+  const guardInsert = currentDb.batchStatements[0];
+  assert(
+    /INSERT\s+INTO\s+merge_guards\s*\(\s*guard_token,\s*canonical_id,\s*actor\s*\)/i
+      .test(guardInsert?.sql ?? ''),
+    'the guard token is written to the dedicated merge_guards table',
+  );
+  assertEqual(
+    guardInsert?.params.at(-2),
+    'song-canonical',
+    'the guard row records the real canonical song id',
+  );
+  assertEqual(
+    guardInsert?.params.at(-1),
+    'system:harmonizer-merge-guard',
+    'the guard row records the song merge actor',
+  );
+  assert(
+    !currentDb.batchStatements.some((statement) => (
+      /INSERT\s+INTO\s+work_aliases/i.test(statement.sql)
+      || /__merge_guard__/.test(statement.sql)
+    )),
+    'a same-work merge writes no guard sentinel into work_aliases',
   );
 }
 
@@ -1000,6 +1130,7 @@ async function testMergeSongsRejectsStaleWorkConfirmation(): Promise<void> {
       'song-canonical',
       ['song-source'],
       'curator@example.com',
+      SCANNED_REVISION,
       {
         canonicalWorkId: 'work-canonical',
         sourceWorkIds: ['work-source-reviewed'],
@@ -1030,6 +1161,7 @@ async function testMergeSongsRejectsStaleWorkConfirmation(): Promise<void> {
       'song-canonical',
       ['song-source'],
       'curator@example.com',
+      SCANNED_REVISION,
       {
         canonicalWorkId: 'work-canonical-reviewed',
         sourceWorkIds: ['work-source'],
@@ -1062,6 +1194,7 @@ async function testMergeSongsRejectsUnlinkedWork(): Promise<void> {
       'song-canonical',
       ['song-unlinked'],
       'curator@example.com',
+      SCANNED_REVISION,
       {
         canonicalWorkId: 'work-shared',
         sourceWorkIds: ['work-unlinked'],
@@ -1089,6 +1222,7 @@ async function testMergeSongsRejectsMissingOrCrossStreamerSource(): Promise<void
       'song-canonical',
       ['song-from-another-streamer'],
       'curator@example.com',
+      SCANNED_REVISION,
     );
   } catch (error) {
     caught = error;
@@ -1113,6 +1247,7 @@ async function testMergeSongsRejectsDuplicateSourceIds(): Promise<void> {
       'song-canonical',
       ['song-source', 'song-source'],
       'curator@example.com',
+      SCANNED_REVISION,
     );
   } catch (error) {
     caught = error;
@@ -1628,6 +1763,7 @@ async function main(): Promise<void> {
   await testMergeSongsRequiresExplicitGlobalWorkConfirmation();
   await testMergeSongsMergesGlobalWorksAcrossVtubers();
   await testMergeSongsRevalidatesReviewedStateInsideBatch();
+  await testMergeSongsFencesOnTheScannedCatalogRevision();
   await testMergeSongsRejectsStaleWorkConfirmation();
   await testMergeSongsRejectsUnlinkedWork();
   await testMergeSongsRejectsMissingOrCrossStreamerSource();

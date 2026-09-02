@@ -16,6 +16,12 @@ import type {
   GlobalWorkStats,
   HarmonizeWorkMergeConfirmation,
 } from '../shared/types';
+import {
+  guardedStatement,
+  prepareMergeGuardCleanup,
+  prepareMergeGuardInsert,
+} from './guard';
+import type { MergeGuardValidityCte } from './guard';
 
 // --- Row → API type mappers ---
 
@@ -1853,22 +1859,34 @@ interface SongWithPerfCount {
   perf_count: number;
 }
 
+/**
+ * Scan one streamer's songs for merge candidates. The catalog revision is read
+ * in the same batch as the songs, so the caller can bind a later merge to the
+ * exact snapshot the curator reviewed.
+ */
 export async function getSongSimilarityGroups(
   db: D1Database,
   streamerId: string,
   mode: HarmonizeMatchType,
   threshold: number,
-): Promise<SimilarityGroup<HarmonizeSongEntry>[]> {
-  const { results } = await db
-    .prepare(
+): Promise<{ groups: SimilarityGroup<HarmonizeSongEntry>[]; revision: number }> {
+  const [stateResult, songResult] = await db.batch([
+    db.prepare('SELECT revision FROM work_match_state WHERE id = 1'),
+    db.prepare(
       `SELECT s.id, link.work_id, s.title, s.original_artist, s.status, s.created_at,
               (SELECT COUNT(*) FROM performances p WHERE p.song_id = s.id) AS perf_count
        FROM songs s
        LEFT JOIN song_work_links AS link ON link.song_id = s.id
        WHERE s.streamer_id = ?`,
-    )
-    .bind(streamerId)
-    .all<SongWithPerfCount>();
+    ).bind(streamerId),
+  ]);
+
+  const state = stateResult.results[0] as { revision?: number | string } | undefined;
+  const revision = Number(state?.revision);
+  if (!Number.isSafeInteger(revision) || revision < 0) {
+    throw new Error('Global work review state is missing or invalid; apply migration 0006');
+  }
+  const results = songResult.results as unknown as SongWithPerfCount[];
 
   const entries: HarmonizeSongEntry[] = results.map((r) => ({
     id: r.id,
@@ -1956,7 +1974,7 @@ export async function getSongSimilarityGroups(
 
   // Sort by group size descending
   result.sort((a, b) => b.items.length - a.items.length);
-  return result;
+  return { groups: result, revision };
 }
 
 export async function getArtistSimilarityGroups(
@@ -2079,6 +2097,8 @@ export interface MergeSongsResult {
   movedPerformances: number;
   mergedWorks: number;
   relinkedSongs: number;
+  /** Catalog revision this merge left behind; bind the next merge to it. */
+  revision: number;
 }
 
 const MERGED_STATUS_PRIORITY: Status[] = [
@@ -2102,24 +2122,27 @@ function parseSongTags(tags: string): string[] {
 
 const SONG_MERGE_GUARD_ACTOR = 'system:harmonizer-merge-guard';
 
-// D1 exposes atomic batches but no interactive transaction callback. The first
-// statement writes this short-lived token only when every selected song still
-// has its reviewed metadata and work link and, for a cross-work merge, every
-// affected work still has its reviewed tags. Every business mutation checks
-// the token, and the final statement removes it before the batch commits, so
-// stale batches are entirely no-op without exposing guard state outside the
-// transaction.
-function prepareSongMergeGuard(
-  db: D1Database,
+// Everything a song merge was reviewed against, re-checked inside the batch
+// (see guard.ts for how the token is written, consulted, and retired): the
+// catalog revision the Harmonizer scan displayed, every selected song's
+// reviewed metadata and work link and, for a cross-work merge, every affected
+// work's reviewed tags.
+function songMergeGuardValidityCte(
   expectedLinksJson: string,
   expectedSongStateJson: string,
   expectedWorkStateJson: string,
+  revision: number,
   streamerId: string,
-  guardSourceId: string,
-  guardCanonicalId: string,
-): D1PreparedStatement {
-  return db.prepare(
-    `WITH expected_links(song_id, work_id) AS (
+): MergeGuardValidityCte {
+  return {
+    bindings: [
+      expectedLinksJson,
+      expectedSongStateJson,
+      expectedWorkStateJson,
+      revision,
+      streamerId,
+    ],
+    sql: `WITH expected_links(song_id, work_id) AS (
        SELECT key, value
        FROM json_each(?)
      ),
@@ -2139,7 +2162,8 @@ function prepareSongMergeGuard(
        FROM json_each(?)
      ),
      merge_guard(valid) AS (
-       SELECT COUNT(*) = (SELECT COUNT(*) FROM expected_links)
+       SELECT (SELECT revision FROM work_match_state WHERE id = 1) = ?
+          AND COUNT(*) = (SELECT COUNT(*) FROM expected_links)
           AND (
             SELECT COUNT(*)
             FROM expected_work_state AS expected_work
@@ -2163,45 +2187,8 @@ function prepareSongMergeGuard(
         AND guarded_link.work_id = expected.work_id
        JOIN works AS guarded_work
          ON guarded_work.id = expected.work_id
-     )
-     INSERT INTO work_aliases (
-       source_work_id, canonical_work_id, source_title,
-       source_original_artist, source_tags, merged_by
-     )
-     SELECT ?, ?, '__merge_guard__', '__merge_guard__', '[]', ?
-     FROM merge_guard
-     WHERE valid
-     RETURNING 1 AS valid`,
-  ).bind(
-    expectedLinksJson,
-    expectedSongStateJson,
-    expectedWorkStateJson,
-    streamerId,
-    guardSourceId,
-    guardCanonicalId,
-    SONG_MERGE_GUARD_ACTOR,
-  );
-}
-
-function prepareGuardedSongMergeMutation(
-  db: D1Database,
-  guardSourceId: string,
-  guardCanonicalId: string,
-  sql: string,
-  bindings: unknown[] = [],
-): D1PreparedStatement {
-  return db.prepare(
-    `WITH merge_guard(valid) AS (
-       SELECT EXISTS (
-         SELECT 1
-         FROM work_aliases
-         WHERE source_work_id = ?
-           AND canonical_work_id = ?
-           AND merged_by = '${SONG_MERGE_GUARD_ACTOR}'
-       )
-     )
-     ${sql}`,
-  ).bind(guardSourceId, guardCanonicalId, ...bindings);
+     )`,
+  };
 }
 
 /**
@@ -2209,6 +2196,10 @@ function prepareGuardedSongMergeMutation(
  * Performances are repointed, source rows are snapshotted in song_aliases,
  * and no performance rows are deleted. When explicitly authorized, distinct
  * global works are also snapshotted, flattened, and repointed site-wide.
+ *
+ * `revision` is the `work_match_state` revision the Harmonizer scan that
+ * produced this request displayed; any catalog write since then fails the
+ * merge closed with `work_merge_stale`.
  */
 export async function mergeSongs(
   db: D1Database,
@@ -2216,6 +2207,7 @@ export async function mergeSongs(
   canonicalSongId: string,
   sourceSongIds: string[],
   mergedBy: string,
+  revision: number,
   workMergeConfirmation?: HarmonizeWorkMergeConfirmation,
 ): Promise<MergeSongsResult> {
   const uniqueSourceIds = [...new Set(sourceSongIds)];
@@ -2345,27 +2337,25 @@ export async function mergeSongs(
       [canonicalWorkId, canonical.work_tags!],
       ...[...sourceWorks.entries()].map(([workId, row]) => [workId, row.work_tags!]),
     ]));
-  const guardSourceId = `merge-guard-source-${crypto.randomUUID()}`;
-  const guardCanonicalId = `merge-guard-canonical-${crypto.randomUUID()}`;
+  const guard = {
+    guardToken: crypto.randomUUID(),
+    canonicalId: canonicalSongId,
+    actor: SONG_MERGE_GUARD_ACTOR,
+  };
   const guarded = (sql: string, bindings: unknown[] = []): D1PreparedStatement => (
-    prepareGuardedSongMergeMutation(
-      db,
-      guardSourceId,
-      guardCanonicalId,
-      sql,
-      bindings,
-    )
+    guardedStatement(db, guard, sql, bindings)
   );
   const statements: D1PreparedStatement[] = [
-    prepareSongMergeGuard(
-      db,
-      expectedLinksJson,
-      expectedSongStateJson,
-      expectedWorkStateJson,
-      streamerId,
-      guardSourceId,
-      guardCanonicalId,
-    ),
+    prepareMergeGuardInsert(db, {
+      ...guard,
+      validityCte: songMergeGuardValidityCte(
+        expectedLinksJson,
+        expectedSongStateJson,
+        expectedWorkStateJson,
+        revision,
+        streamerId,
+      ),
+    }),
     guarded(
       `UPDATE song_aliases
        SET canonical_song_id = ?
@@ -2490,14 +2480,13 @@ export async function mergeSongs(
     );
   }
 
-  statements.push(
-    db.prepare(
-      `DELETE FROM work_aliases
-       WHERE source_work_id = ?
-         AND canonical_work_id = ?
-         AND merged_by = ?`,
-    ).bind(guardSourceId, guardCanonicalId, SONG_MERGE_GUARD_ACTOR),
-  );
+  // The cleanup is the last mutating statement; the read that follows it is in
+  // the same batch, so the revision handed back cannot miss a write that
+  // landed between this merge and a caller's next one. A scan therefore stays
+  // usable for several merges while still detecting anyone else's edit.
+  statements.push(prepareMergeGuardCleanup(db, guard.guardToken));
+  const revisionIndex = statements.length;
+  statements.push(db.prepare('SELECT revision FROM work_match_state WHERE id = 1'));
 
   const batchResults = await db.batch(statements);
   const mergeGuard = batchResults[0]?.results[0] as { valid?: number | boolean } | undefined;
@@ -2507,6 +2496,11 @@ export async function mergeSongs(
       'Selected song or global work data changed after review; scan again before merging',
     );
   }
+  const state = batchResults[revisionIndex]?.results[0] as { revision?: number | string } | undefined;
+  const revisionAfterMerge = Number(state?.revision);
+  if (!Number.isSafeInteger(revisionAfterMerge) || revisionAfterMerge < 0) {
+    throw new Error('Global work review state is missing or invalid; apply migration 0006');
+  }
   return {
     canonicalSongId,
     canonicalWorkId,
@@ -2514,6 +2508,7 @@ export async function mergeSongs(
     movedPerformances: batchResults[performanceUpdateIndex].meta.changes,
     mergedWorks: workDeleteIndex === null ? 0 : batchResults[workDeleteIndex].meta.changes,
     relinkedSongs: workRelinkIndex === null ? 0 : batchResults[workRelinkIndex].meta.changes,
+    revision: revisionAfterMerge,
   };
 }
 

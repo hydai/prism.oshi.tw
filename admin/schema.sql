@@ -28,6 +28,18 @@ CREATE TABLE IF NOT EXISTS work_aliases (
   CHECK(source_work_id <> canonical_work_id)
 );
 
+-- Short-lived merge authorization tokens. D1 exposes atomic batches but no
+-- interactive transaction callback, so a merge writes one row here only when
+-- every reviewed expectation still holds, gates each business mutation on it,
+-- and deletes it as the last mutating statement of the same batch. A committed merge
+-- therefore leaves this table empty; guard state never touches domain tables.
+CREATE TABLE IF NOT EXISTS merge_guards (
+  guard_token TEXT PRIMARY KEY,
+  canonical_id TEXT NOT NULL,
+  actor TEXT NOT NULL,
+  created_at TEXT NOT NULL DEFAULT (datetime('now'))
+);
+
 -- Songs staging table
 -- NOTE (fresh-vs-migrated divergence, like migration 0001's updated_at note):
 -- tags carries a CHECK(json_valid(tags)) here for fresh databases, matching

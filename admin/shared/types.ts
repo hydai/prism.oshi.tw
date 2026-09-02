@@ -473,6 +473,8 @@ export interface SimilarityGroup<T> {
 export interface HarmonizeSongsResponse {
   groups: SimilarityGroup<HarmonizeSongEntry>[];
   stats: { totalSongs: number; groupCount: number; affectedSongs: number };
+  /** Catalog revision this scan saw; a merge must send it back unchanged. */
+  revision: number;
 }
 
 export interface HarmonizeArtistsResponse {
@@ -492,6 +494,8 @@ export interface HarmonizeWorkMergeConfirmation {
 export interface HarmonizeMergeBody {
   canonicalSongId: string;
   sourceSongIds: string[];
+  /** The `revision` of the scan this merge was reviewed against. */
+  revision: number;
   workMergeConfirmation?: HarmonizeWorkMergeConfirmation;
 }
 
@@ -503,6 +507,8 @@ export interface HarmonizeMergeResponse {
   movedPerformances: number;
   mergedWorks: number;
   relinkedSongs: number;
+  /** Catalog revision this merge left behind; send it with the next merge. */
+  revision: number;
 }
 
 // --- Global song library ---
