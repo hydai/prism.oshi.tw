@@ -5,51 +5,22 @@ import type {
   SimilarityGroup,
 } from '../../../../shared/types';
 import { api } from '../../api/client';
+import { useHarmonizeScan } from '../../hooks/useHarmonizeScan';
 import { matchTypeClasses } from '../../lib/harmonizer-presentation';
-import { finiteInputNumber, isNumberInRange } from '../../lib/numeric-input';
+import { finiteInputNumber } from '../../lib/numeric-input';
 
 export default function SimilarArtistsTab() {
-  const [groups, setGroups] = useState<SimilarityGroup<HarmonizeArtistEntry>[]>([]);
-  const [stats, setStats] = useState<{ totalArtists: number; groupCount: number; affectedEntries: number } | null>(null);
-  const [mode, setMode] = useState<HarmonizeMatchType>('exact');
-  const [threshold, setThreshold] = useState<number | undefined>(0.85);
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState<string | null>(null);
-  // Track canonical artist name per group
-  const [canonicals, setCanonicals] = useState<Map<string, string>>(new Map());
-  const [expanded, setExpanded] = useState<Set<string>>(new Set());
+  const {
+    groups, stats, mode, setMode, threshold, setThreshold, thresholdIsValid,
+    loading, error, setError, canonicals, setCanonical, expanded, toggleExpanded,
+    scan: handleScan, dropGroup, clearGroups,
+  } = useHarmonizeScan<HarmonizeArtistEntry, { totalArtists: number; groupCount: number; affectedEntries: number }>(
+    (request) => api.harmonizeArtists(request),
+    // Pre-fill with most-used variant
+    (items) => items.reduce((a, b) => (b.songCount > a.songCount ? b : a)).originalArtist,
+  );
   const [applying, setApplying] = useState<Set<string>>(new Set());
   const [applyingAll, setApplyingAll] = useState(false);
-  const thresholdIsValid = isNumberInRange(threshold, 0.5, 1);
-
-  const handleScan = async () => {
-    if (mode === 'fuzzy' && !thresholdIsValid) return;
-
-    setLoading(true);
-    setError(null);
-    try {
-      const res = await api.harmonizeArtists({
-        mode,
-        threshold: mode === 'fuzzy' ? threshold : undefined,
-      });
-      setGroups(res.groups);
-      setStats(res.stats);
-      const newCanonicals = new Map<string, string>();
-      const newExpanded = new Set<string>();
-      for (const group of res.groups) {
-        // Pre-fill with most-used variant
-        const best = group.items.reduce((a, b) => (b.songCount > a.songCount ? b : a));
-        newCanonicals.set(group.normalizedKey, best.originalArtist);
-        newExpanded.add(group.normalizedKey);
-      }
-      setCanonicals(newCanonicals);
-      setExpanded(newExpanded);
-    } catch (err) {
-      setError(err instanceof Error ? err.message : 'Failed to scan');
-    } finally {
-      setLoading(false);
-    }
-  };
 
   const handleApplyGroup = async (group: SimilarityGroup<HarmonizeArtistEntry>) => {
     const canonicalName = canonicals.get(group.normalizedKey);
@@ -69,7 +40,7 @@ export default function SimilarArtistsTab() {
     setApplying((prev) => new Set(prev).add(group.normalizedKey));
     try {
       await api.harmonizeApply({ updates });
-      setGroups((prev) => prev.filter((g) => g.normalizedKey !== group.normalizedKey));
+      dropGroup(group.normalizedKey);
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Failed to apply');
     } finally {
@@ -99,22 +70,13 @@ export default function SimilarArtistsTab() {
       }
       if (allUpdates.length > 0) {
         await api.harmonizeApply({ updates: allUpdates });
-        setGroups([]);
+        clearGroups();
       }
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Failed to apply all');
     } finally {
       setApplyingAll(false);
     }
-  };
-
-  const toggleExpanded = (key: string) => {
-    setExpanded((prev) => {
-      const next = new Set(prev);
-      if (next.has(key)) next.delete(key);
-      else next.add(key);
-      return next;
-    });
   };
 
   return (
@@ -221,7 +183,7 @@ export default function SimilarArtistsTab() {
                       type="text"
                       value={canonicalName}
                       onChange={(e) =>
-                        setCanonicals((prev) => new Map(prev).set(group.normalizedKey, e.target.value))
+                        setCanonical(group.normalizedKey, e.target.value)
                       }
                       className="flex-1 rounded-md border border-slate-300 px-2 py-1.5 text-sm"
                     />
@@ -242,9 +204,7 @@ export default function SimilarArtistsTab() {
                             <td className="py-1.5">
                               <button
                                 onClick={() =>
-                                  setCanonicals((prev) =>
-                                    new Map(prev).set(group.normalizedKey, item.originalArtist),
-                                  )
+                                  setCanonical(group.normalizedKey, item.originalArtist)
                                 }
                                 className="text-left hover:text-blue-600"
                                 title="Use this as canonical"

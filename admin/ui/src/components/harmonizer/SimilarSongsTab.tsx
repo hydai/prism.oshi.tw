@@ -5,62 +5,34 @@ import type {
   SimilarityGroup,
 } from '../../../../shared/types';
 import { api } from '../../api/client';
+import { useHarmonizeScan } from '../../hooks/useHarmonizeScan';
 import {
   buildWorkAwareMergeRequest,
   getWorkAwareMergeBatch,
   getWorkMergePlan,
 } from '../../lib/harmonizer-work-merge';
 import { mergeConfirmationMessage } from '../../lib/harmonizer-presentation';
-import { finiteInputNumber, isNumberInRange } from '../../lib/numeric-input';
+import { finiteInputNumber } from '../../lib/numeric-input';
 import SimilarSongGroupCard from './SimilarSongGroupCard';
 
 export default function SimilarSongsTab() {
-  const [groups, setGroups] = useState<SimilarityGroup<HarmonizeSongEntry>[]>([]);
-  const [stats, setStats] = useState<{ totalSongs: number; groupCount: number; affectedSongs: number } | null>(null);
   // Catalog revision of the displayed scan, sent with every merge. Read only
   // by the merge handler, so a ref rather than render-triggering state.
   const scannedRevision = useRef<number | null>(null);
-  const [mode, setMode] = useState<HarmonizeMatchType>('exact');
-  const [threshold, setThreshold] = useState<number | undefined>(0.85);
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState<string | null>(null);
-  // Track canonical song per group (key = normalizedKey)
-  const [canonicals, setCanonicals] = useState<Map<string, string>>(new Map());
-  // Track expanded groups
-  const [expanded, setExpanded] = useState<Set<string>>(new Set());
+  const {
+    groups, stats, mode, setMode, threshold, setThreshold, thresholdIsValid,
+    loading, error, setError, canonicals, setCanonical, expanded, toggleExpanded,
+    scan: handleScan, dropGroup,
+  } = useHarmonizeScan<HarmonizeSongEntry, { totalSongs: number; groupCount: number; affectedSongs: number }>(
+    async (request) => {
+      const res = await api.harmonizeSongs(request);
+      scannedRevision.current = res.revision;
+      return res;
+    },
+    (items) => pickBestCanonical(items).id,
+  );
   // Track applying state per group
   const [applying, setApplying] = useState<Set<string>>(new Set());
-  const thresholdIsValid = isNumberInRange(threshold, 0.5, 1);
-
-  const handleScan = async () => {
-    if (mode === 'fuzzy' && !thresholdIsValid) return;
-
-    setLoading(true);
-    setError(null);
-    try {
-      const res = await api.harmonizeSongs({
-        mode,
-        threshold: mode === 'fuzzy' ? threshold : undefined,
-      });
-      setGroups(res.groups);
-      setStats(res.stats);
-      scannedRevision.current = res.revision;
-      // Auto-select canonical: song with most performances or approved status
-      const newCanonicals = new Map<string, string>();
-      const newExpanded = new Set<string>();
-      for (const group of res.groups) {
-        const best = pickBestCanonical(group.items);
-        newCanonicals.set(group.normalizedKey, best.id);
-        newExpanded.add(group.normalizedKey);
-      }
-      setCanonicals(newCanonicals);
-      setExpanded(newExpanded);
-    } catch (err) {
-      setError(err instanceof Error ? err.message : 'Failed to scan');
-    } finally {
-      setLoading(false);
-    }
-  };
 
   const handleApplyGroup = async (group: SimilarityGroup<HarmonizeSongEntry>) => {
     const canonicalId = canonicals.get(group.normalizedKey);
@@ -95,7 +67,7 @@ export default function SimilarSongsTab() {
       // the same scan stay mergeable; anyone else's edit still fails closed.
       scannedRevision.current = merged.revision;
       // Remove this group from state
-      setGroups((prev) => prev.filter((g) => g.normalizedKey !== group.normalizedKey));
+      dropGroup(group.normalizedKey);
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Failed to merge');
     } finally {
@@ -105,15 +77,6 @@ export default function SimilarSongsTab() {
         return next;
       });
     }
-  };
-
-  const toggleExpanded = (key: string) => {
-    setExpanded((prev) => {
-      const next = new Set(prev);
-      if (next.has(key)) next.delete(key);
-      else next.add(key);
-      return next;
-    });
   };
 
   return (
@@ -184,9 +147,7 @@ export default function SimilarSongsTab() {
             isApplying={applying.has(group.normalizedKey)}
             mergePending={applying.size > 0}
             onToggle={() => toggleExpanded(group.normalizedKey)}
-            onSelectCanonical={(songId) =>
-              setCanonicals((prev) => new Map(prev).set(group.normalizedKey, songId))
-            }
+            onSelectCanonical={(songId) => setCanonical(group.normalizedKey, songId)}
             onMerge={() => handleApplyGroup(group)}
           />
         ))}
