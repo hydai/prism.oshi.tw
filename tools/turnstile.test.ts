@@ -1,12 +1,12 @@
 import assert from 'node:assert/strict';
 import { verifyTurnstile as verifyNovaTurnstile } from './nova/src/turnstile';
 import { verifyTurnstile as verifyCrystalTurnstile } from './crystal/src/turnstile';
+import { verifyTurnstile as verifySharedTurnstile } from './shared/web/turnstile';
 
-type VerifyTurnstile = typeof verifyNovaTurnstile;
+type VerifyTurnstile = typeof verifySharedTurnstile;
 
 const implementations: Array<[name: string, verify: VerifyTurnstile]> = [
-  ['Nova', verifyNovaTurnstile],
-  ['Crystal', verifyCrystalTurnstile],
+  ['Turnstile (shared)', verifySharedTurnstile],
 ];
 
 function jsonResponse(body: unknown, status = 200): Response {
@@ -17,6 +17,17 @@ function jsonResponse(body: unknown, status = 200): Response {
 }
 
 async function main(): Promise<void> {
+  assert.equal(
+    verifyNovaTurnstile,
+    verifySharedTurnstile,
+    'Nova re-exports the shared verifyTurnstile function object',
+  );
+  assert.equal(
+    verifyCrystalTurnstile,
+    verifySharedTurnstile,
+    'Crystal re-exports the shared verifyTurnstile function object',
+  );
+
   for (const [name, verify] of implementations) {
     const requests: Array<{ input: RequestInfo | URL; init?: RequestInit }> = [];
     const successFetch: typeof fetch = async (input, init) => {
