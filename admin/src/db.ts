@@ -599,8 +599,8 @@ function preparePerformanceInsert(
 ): D1PreparedStatement {
   return db
     .prepare(
-      `INSERT INTO performances (id, streamer_id, song_id, stream_id, date, stream_title, video_id, timestamp, end_timestamp, note, status, submitted_by)
-       VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+      `INSERT INTO performances (id, streamer_id, song_id, stream_id, date, stream_title, video_id, timestamp, end_timestamp, note, status, submitted_by, updated_at)
+       VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, datetime('now'))`,
     )
     .bind(
       performance.id,
@@ -752,12 +752,14 @@ export interface StreamInsert {
   readonly submittedBy: string;
 }
 
-// The single home of the 9-column streams INSERT literal. insertStream (one row) and
+// The single home of the streams INSERT literal (updated_at is set in SQL so migrated
+// tables without a column DEFAULT never receive NULL). insertStream (one row) and
 // insertStreams (many rows, in one db.batch) both build on this prepared core.
 function prepareStreamInsert(db: D1Database, input: StreamInsert): D1PreparedStatement {
   return db
     .prepare(
-      'INSERT INTO streams (id, streamer_id, title, date, video_id, youtube_url, credit, status, submitted_by) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)',
+      `INSERT INTO streams (id, streamer_id, title, date, video_id, youtube_url, credit, status, submitted_by, updated_at)
+       VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, datetime('now'))`,
     )
     .bind(
       input.id,

@@ -1380,6 +1380,12 @@ async function testInsertPerformanceRoutesFieldsToTheirOwnColumns(): Promise<voi
   assert(/INSERT\s+INTO\s+performances/i.test(insert.sql), 'insertPerformance emits a performances insert');
   assertEqual(insert.params[PERF_DATE], '2026-04-04', 'the date field lands in the date column, not swapped with streamTitle');
   assertEqual(insert.params[PERF_TITLE], 'Distinct Stream Title', 'the streamTitle field lands in the stream_title column, not swapped with date');
+  // Migrated production tables have no column DEFAULT for updated_at (SQLite's
+  // ALTER TABLE ADD COLUMN cannot carry a non-constant one), so every insert
+  // must set it explicitly in SQL — matching the schema DEFAULT's format —
+  // rather than leaving it to a JS timestamp or an absent column.
+  assert(insert.sql.includes('updated_at'), 'insertPerformance names the updated_at column');
+  assert(insert.sql.includes("datetime('now')"), "insertPerformance sets updated_at via SQL datetime('now'), not a bound JS timestamp");
 }
 
 async function testInsertStreamRoutesFieldsToTheirOwnColumns(): Promise<void> {
@@ -1401,6 +1407,12 @@ async function testInsertStreamRoutesFieldsToTheirOwnColumns(): Promise<void> {
   // streams columns, in bind order: 0 id, 1 streamer_id, 2 title, 3 date, 4 video_id, ...
   assertEqual(insert.params[2], 'Distinct Stream Title', 'the title field lands in the title column, not swapped with date');
   assertEqual(insert.params[3], '2026-05-05', 'the date field lands in the date column, not swapped with title');
+  // Migrated production tables have no column DEFAULT for updated_at (SQLite's
+  // ALTER TABLE ADD COLUMN cannot carry a non-constant one), so every insert
+  // must set it explicitly in SQL — matching the schema DEFAULT's format —
+  // rather than leaving it to a JS timestamp or an absent column.
+  assert(insert.sql.includes('updated_at'), 'insertStream names the updated_at column');
+  assert(insert.sql.includes("datetime('now')"), "insertStream sets updated_at via SQL datetime('now'), not a bound JS timestamp");
 }
 
 // --- Batch the round-trips (audit 4.2 / W3) ---

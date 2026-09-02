@@ -188,6 +188,7 @@ CREATE INDEX IF NOT EXISTS idx_songs_streamer_status ON songs(streamer_id, statu
 CREATE INDEX IF NOT EXISTS idx_songs_streamer_title_artist ON songs(streamer_id, title, original_artist);
 CREATE INDEX IF NOT EXISTS idx_works_title_artist ON works(title, original_artist);
 CREATE INDEX IF NOT EXISTS idx_work_aliases_canonical ON work_aliases(canonical_work_id);
+CREATE INDEX IF NOT EXISTS idx_work_aliases_source ON work_aliases(source_title, source_original_artist);
 CREATE INDEX IF NOT EXISTS idx_song_aliases_canonical ON song_aliases(canonical_song_id);
 CREATE INDEX IF NOT EXISTS idx_song_aliases_streamer ON song_aliases(streamer_id);
 CREATE INDEX IF NOT EXISTS idx_song_work_links_work ON song_work_links(work_id);
