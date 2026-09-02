@@ -165,7 +165,7 @@ function useStampEditorController(user: AuthUser) {
     async (perfId: string, idx: number) => {
       const perf = performances[idx];
       if (!perf) return;
-      if (!confirm(`Delete #${idx + 1} ${perf.title}?`)) return;
+      if (!window.confirm(`Delete #${idx + 1} ${perf.title}?`)) return;
 
       try {
         await api.deletePerformance(perfId);
@@ -237,7 +237,7 @@ function useStampEditorController(user: AuthUser) {
       showToast('No pending performances to approve');
       return;
     }
-    if (!confirm(`Approve all ${pendingCount} pending songs & performances for this stream?`)) return;
+    if (!window.confirm(`Approve all ${pendingCount} pending songs & performances for this stream?`)) return;
 
     try {
       const { songs, performances: perfs } = await api.approveAllForStream(selectedStreamId);

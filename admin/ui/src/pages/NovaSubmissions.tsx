@@ -9,9 +9,9 @@ import { useSearchParams } from 'react-router-dom';
 import { finiteInputNumber } from '../lib/numeric-input';
 import { Avatar } from '../components/prism/Avatar';
 import { GradientButton, OutlineButton } from '../components/prism/Buttons';
-import { Chip } from '../components/prism/Chip';
 import { CircleButton } from '../components/prism/CircleButton';
 import { ColumnHeader } from '../components/prism/ColumnHeader';
+import { StatusFilterBar } from '../components/StatusFilterBar';
 import { DetailField } from '../components/prism/DetailField';
 import { PrismInput, PrismTextarea } from '../components/prism/Fields';
 import { GlassCard } from '../components/prism/GlassCard';
@@ -20,6 +20,7 @@ import { StatusPill } from '../components/prism/Pill';
 import { PrismPage } from '../components/prism/PrismPage';
 import { SearchInput } from '../components/prism/SearchInput';
 import { SectionLabel } from '../components/prism/SectionLabel';
+import { NOVA_STATUS_FILTERS } from './nova-status-filters';
 import {
   createSubmissionRowState,
   EDITABLE_FIELDS,
@@ -33,13 +34,6 @@ import type {
 } from './nova-submission-row-state';
 
 const ROW_GRID = 'grid-cols-[40px_minmax(0,1fr)_minmax(0,1fr)_110px_120px_120px_128px_28px]';
-
-const STATUS_FILTERS: ReadonlyArray<{ value: '' | NovaStatus; label: string }> = [
-  { value: '', label: 'All' },
-  { value: 'pending', label: 'Pending' },
-  { value: 'approved', label: 'Approved' },
-  { value: 'rejected', label: 'Rejected' },
-];
 
 function isCanonicalUtcTimestamp(value: string | null): value is string {
   if (value === null || !/^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}\.\d{3}Z$/.test(value)) return false;
@@ -150,17 +144,12 @@ export default function NovaSubmissions({ user }: { user: AuthUser }) {
       ]}
       toolbar={
         <>
-          <div className="flex items-center gap-1.5" role="group" aria-label="Filter submissions by status">
-            {STATUS_FILTERS.map((filter) => (
-              <Chip
-                key={filter.value}
-                active={statusFilter === filter.value}
-                onClick={() => setStatusFilter(filter.value)}
-              >
-                {filter.label}
-              </Chip>
-            ))}
-          </div>
+          <StatusFilterBar
+            options={NOVA_STATUS_FILTERS}
+            value={statusFilter}
+            onChange={setStatusFilter}
+            label="Filter submissions by status"
+          />
           <div className="flex-1" />
           <form
             onSubmit={(event) => {

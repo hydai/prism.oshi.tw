@@ -4,46 +4,19 @@ import type { AuthUser, Status } from '../../../shared/types';
 import { api } from '../api/client';
 import { useApiResource } from '../lib/apiResource';
 import StatusBadge from '../components/StatusBadge';
+import { Pagination } from '../components/Pagination';
+import { SortHeader, type SortDirection } from '../components/SortHeader';
 
 type SortKey = 'title' | 'originalArtist' | 'status' | 'createdAt';
-type SortDir = 'asc' | 'desc';
 
 const PAGE_SIZE = 50;
-
-function SortHeader({
-  label,
-  field,
-  activeField,
-  direction,
-  onSort,
-}: {
-  label: string;
-  field: SortKey;
-  activeField: SortKey;
-  direction: SortDir;
-  onSort: (field: SortKey) => void;
-}) {
-  const active = activeField === field;
-
-  return (
-    <th scope="col" aria-sort={active ? (direction === 'asc' ? 'ascending' : 'descending') : 'none'}>
-      <button
-        type="button"
-        className="w-full cursor-pointer select-none px-4 py-3 text-left hover:text-slate-700"
-        onClick={() => onSort(field)}
-      >
-        {label} {active ? (direction === 'asc' ? '↑' : '↓') : ''}
-      </button>
-    </th>
-  );
-}
 
 export default function SongsList({ user }: { user: AuthUser }) {
   const [search, setSearch] = useState('');
   const [submittedSearch, setSubmittedSearch] = useState('');
   const [statusFilter, setStatusFilter] = useState<'' | Status>('');
   const [sortKey, setSortKey] = useState<SortKey>('createdAt');
-  const [sortDir, setSortDir] = useState<SortDir>('desc');
+  const [sortDir, setSortDir] = useState<SortDirection>('desc');
   const [page, setPage] = useState(1);
 
   const list = useApiResource(
@@ -218,33 +191,14 @@ export default function SongsList({ user }: { user: AuthUser }) {
             </table>
           </div>
 
-          {/* Pagination controls */}
-          {totalPages > 0 && (
-            <div className="mt-4 flex items-center justify-between text-sm text-slate-600">
-              <span>
-                Showing {startItem}–{endItem} of {total}
-              </span>
-              <div className="flex items-center gap-2">
-                <button
-                  onClick={() => setPage((p) => Math.max(1, p - 1))}
-                  disabled={page <= 1}
-                  className="rounded-md border border-slate-300 px-3 py-1.5 text-sm font-medium hover:bg-slate-100 disabled:cursor-not-allowed disabled:opacity-40"
-                >
-                  Previous
-                </button>
-                <span>
-                  Page {page} of {totalPages}
-                </span>
-                <button
-                  onClick={() => setPage((p) => Math.min(totalPages, p + 1))}
-                  disabled={page >= totalPages}
-                  className="rounded-md border border-slate-300 px-3 py-1.5 text-sm font-medium hover:bg-slate-100 disabled:cursor-not-allowed disabled:opacity-40"
-                >
-                  Next
-                </button>
-              </div>
-            </div>
-          )}
+          <Pagination
+            page={page}
+            totalPages={totalPages}
+            total={total}
+            shown={{ start: startItem, end: endItem }}
+            onPrev={() => setPage((p) => Math.max(1, p - 1))}
+            onNext={() => setPage((p) => Math.min(totalPages, p + 1))}
+          />
         </>
       )}
     </div>

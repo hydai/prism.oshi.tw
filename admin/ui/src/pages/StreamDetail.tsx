@@ -239,7 +239,7 @@ function useStreamDetailController(user: AuthUser) {
 
   // --- Delete performance ---
   const handleDelete = useCallback(async (perf: StampPerformance) => {
-    if (!confirm(`Delete "${perf.title}"?`)) return;
+    if (!window.confirm(`Delete "${perf.title}"?`)) return;
     try {
       await api.deletePerformance(perf.id);
       await loadDetail();
@@ -264,7 +264,7 @@ function useStreamDetailController(user: AuthUser) {
   const handleApproveAll = useCallback(async () => {
     if (!streamId || !detail) return;
     const pendingCount = detail.performances.filter((p) => p.status !== 'approved').length;
-    if (!confirm(`Approve all ${pendingCount} pending performances?`)) return;
+    if (!window.confirm(`Approve all ${pendingCount} pending performances?`)) return;
     try {
       const result = await api.approveAllForStream(streamId);
       await loadDetail();
@@ -278,7 +278,7 @@ function useStreamDetailController(user: AuthUser) {
   const handleUnapproveAll = useCallback(async () => {
     if (!streamId || !detail) return;
     const approvedCount = detail.performances.filter((p) => p.status === 'approved').length;
-    if (!confirm(`Unapprove all ${approvedCount} approved performances?`)) return;
+    if (!window.confirm(`Unapprove all ${approvedCount} approved performances?`)) return;
     try {
       const result = await api.unapproveAllForStream(streamId);
       await loadDetail();
@@ -292,7 +292,7 @@ function useStreamDetailController(user: AuthUser) {
   const handleDeleteStream = useCallback(async () => {
     if (!streamId || !detail) return;
     const perfCount = detail.performances.length;
-    if (!confirm(`Delete stream "${detail.title}" with ${perfCount} performances and their orphaned songs? This cannot be undone.`)) return;
+    if (!window.confirm(`Delete stream "${detail.title}" with ${perfCount} performances and their orphaned songs? This cannot be undone.`)) return;
     try {
       const result = await api.deleteStream(streamId);
       showToast(`Deleted stream (${result.songs} songs, ${result.performances} performances)`);
