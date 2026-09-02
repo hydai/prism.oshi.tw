@@ -5,6 +5,8 @@ import type { Stream, StreamDetail } from '../../shared/types';
 import { StreamDetailView } from '../src/pages/StreamDetail';
 import type { StreamDetailController } from '../src/pages/StreamDetail';
 import type { YouTubePlayerHandle } from '../src/components/YouTubePlayer';
+import { InlineEdit } from '../src/components/stamp/InlineEdit';
+import { handleInlineEditKeyDown } from '../src/lib/inline-edit';
 
 function assert(condition: boolean, message: string): asserts condition {
   if (!condition) throw new Error(message);
@@ -133,4 +135,82 @@ assert(loadingHtml.includes('Loading...'), 'loading state remains intact');
 const errorHtml = renderView({ error: 'Unable to load stream', detail: null });
 assert(errorHtml.includes('Unable to load stream'), 'error state remains intact');
 
-console.log('✓ StreamDetail view retains navigation, controls, rows, and access boundaries');
+const addModalHtml = renderView({ showAddModal: true });
+assert(addModalHtml.includes('Song title *'), 'add-song modal remains wired to page state');
+
+const pasteModalHtml = renderView({ showPasteImport: true });
+assert(pasteModalHtml.includes('Paste a timestamp list'), 'paste-import modal remains wired to page state');
+assert(
+  pasteModalHtml.includes('Replace existing performances') && !pasteModalHtml.includes('delete current songs first'),
+  'StreamDetail keeps its own replace-mode wording after the modal is shared',
+);
+assert(!pasteModalHtml.includes('7:20 Third Song'), 'StreamDetail keeps its two-line paste example');
+
+// --- Inline edit: StreamDetail still saves a field that was emptied ---
+
+function commitInlineEdit(text: string, value: string, allowEmpty: boolean): { saved: string[]; cancels: number } {
+  const saved: string[] = [];
+  let cancels = 0;
+  handleInlineEditKeyDown(
+    { key: 'Enter', preventDefault: noop },
+    { text, value, allowEmpty, onSave: (val) => saved.push(val), onCancel: () => { cancels += 1; } },
+  );
+  return { saved, cancels };
+}
+
+const clearedNote = commitInlineEdit('   ', 'opening song', true);
+assert(clearedNote.saved.length === 1 && clearedNote.saved[0] === '', 'emptying a StreamDetail field saves the empty value');
+
+const alreadyEmpty = commitInlineEdit('', '', true);
+assert(alreadyEmpty.saved.length === 0 && alreadyEmpty.cancels === 1, 'an already-empty field cancels');
+
+// The `allowEmpty` opt-in lives at the call site, so walk the rendered tree of the page's own
+// performance table and take the exact props it hands the shared component.
+interface InlineEditCallProps {
+  value: string;
+  allowEmpty?: boolean;
+  onSave: (val: string) => void;
+  onCancel: () => void;
+}
+
+function inlineEditProps(tree: React.ReactNode, componentName: string): InlineEditCallProps[] {
+  const seen: React.ReactElement[] = [];
+  const walk = (node: React.ReactNode): void => {
+    if (Array.isArray(node)) {
+      for (const child of node) walk(child);
+      return;
+    }
+    if (!React.isValidElement(node)) return;
+    seen.push(node);
+    walk((node.props as { children?: React.ReactNode }).children);
+  };
+
+  walk(tree);
+  const host = seen.find((element) => (element.type as { name?: string }).name === componentName);
+  assert(host !== undefined, `${componentName} renders inside the page view`);
+  seen.length = 0;
+  walk((host.type as (props: unknown) => React.ReactNode)(host.props));
+  return seen.filter((element) => element.type === InlineEdit).map((element) => element.props as InlineEditCallProps);
+}
+
+const savedNotes: string[] = [];
+const editedTable = StreamDetailView({
+  controller: {
+    ...controller,
+    editingField: { type: 'perf', perfId: 'performance-one', field: 'note' },
+    handleSave: async (perfId, field, value) => { savedNotes.push(`${perfId}:${field}:${value}`); },
+  },
+});
+const detailInlineEdits = inlineEditProps(editedTable, 'PerformanceTable');
+assert(detailInlineEdits.length === 1, 'the edited performance row renders one shared InlineEdit');
+assert(detailInlineEdits[0]?.allowEmpty === true, 'StreamDetail rows opt into empty saves');
+
+// Drive the props the page actually handed the shared component: clearing a note must still save it.
+const noteRow = detailInlineEdits[0]!;
+handleInlineEditKeyDown({ key: 'Enter', preventDefault: noop }, { ...noteRow, text: '   ' });
+assert(
+  savedNotes.join() === 'performance-one:note:',
+  'a StreamDetail row left empty saves the blank value through the page callback',
+);
+
+console.log('✓ StreamDetail retains navigation, controls, rows, access boundaries, and its shared stamp components');
