@@ -4,14 +4,12 @@ import type { AuthUser, StreamerInfo } from '../../../shared/types';
 import { api, getCurrentStreamer, setCurrentStreamer } from '../api/client';
 import { useCurrentStreamer } from '../hooks/useCurrentStreamer';
 import { getVisibleNavItems } from '../lib/navigation';
-
-/** Routes rendered in the prism visual vocabulary (gradient page, glass shell). */
-const PRISM_STYLED_PATHS = new Set(['/nova', '/nova/vods', '/crystal']);
+import { usesPrismShell } from '../lib/routes';
 
 export default function Layout({ user, children }: { user: AuthUser; children: ReactNode }) {
   const navigate = useNavigate();
   const { pathname } = useLocation();
-  const prismStyled = PRISM_STYLED_PATHS.has(pathname);
+  const prismStyled = usesPrismShell(pathname);
   const streamer = useCurrentStreamer();
   const [streamers, setStreamers] = useState<StreamerInfo[]>([]);
   const streamerSelectId = useId();

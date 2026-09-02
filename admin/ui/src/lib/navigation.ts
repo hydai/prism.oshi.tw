@@ -1,37 +1,22 @@
 import type { AuthUser } from '../../../shared/types';
+import { ADMIN_ROUTES } from './routes';
 
 interface NavigationItem {
   to: string;
   label: string;
 }
 
-interface ConfiguredNavigationItem extends NavigationItem {
-  curatorOnly?: boolean;
-}
-
-const navItems: readonly ConfiguredNavigationItem[] = [
-  { to: '/', label: 'Dashboard' },
-  { to: '/songs', label: 'Songs' },
-  { to: '/works', label: 'Global Library', curatorOnly: true },
-  { to: '/works/review', label: 'Work Review', curatorOnly: true },
-  { to: '/streams', label: 'Streams' },
-  { to: '/submit/song', label: 'Submit Song' },
-  { to: '/submit/stream', label: 'Submit Stream' },
-  { to: '/stamp', label: 'Stamp Editor' },
-  { to: '/pipeline', label: 'Pipeline' },
-  { to: '/harmonizer', label: 'Harmonizer' },
-  { to: '/nova', label: 'Nova' },
-  { to: '/nova/vods', label: 'Nova VODs' },
-  { to: '/crystal', label: 'Crystal' },
-  { to: '/vod-export', label: 'VOD Export', curatorOnly: true },
-];
-
+/**
+ * The sidebar, read off the route manifest: a route with a label is listed, in
+ * manifest order, and a curator-only one only for curators. A link can never
+ * point at a route that does not exist.
+ */
 export function getVisibleNavItems(user: AuthUser): NavigationItem[] {
   const visibleItems: NavigationItem[] = [];
 
-  for (const { to, label, curatorOnly } of navItems) {
-    if (!curatorOnly || user.role === 'curator') {
-      visibleItems.push({ to, label });
+  for (const { path, label, curatorOnly } of ADMIN_ROUTES) {
+    if (label !== undefined && (!curatorOnly || user.role === 'curator')) {
+      visibleItems.push({ to: path, label });
     }
   }
 
