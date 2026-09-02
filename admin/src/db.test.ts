@@ -7,6 +7,11 @@ import {
   deleteStreamCascade,
   exportSongs,
   findExistingStreamImportKeys,
+  generatePerformanceId,
+  generateSongId,
+  generateStreamId,
+  generateStreamIdFallback,
+  generateWorkId,
   getDashboardStats,
   getSongById,
   getSongSimilarityGroups,
@@ -1578,6 +1583,35 @@ async function testGetSongByIdReturnsNullWhenMissing(): Promise<void> {
   assertEqual(song, null, 'a missing song still returns null from the batched read');
 }
 
+// --- Every generated entity id carries a full UUID (audit decision 5) ---
+
+function testGeneratedEntityIdsCarryFullUuids(): void {
+  const songId = generateSongId();
+  const performanceId = generatePerformanceId();
+  const streamFallbackId = generateStreamIdFallback();
+  const workId = generateWorkId();
+
+  assert(/^song-[0-9a-f-]{36}$/.test(songId), `song ids keep the whole UUID: ${songId}`);
+  assert(/^p-[0-9a-f-]{36}$/.test(performanceId), `performance ids keep the whole UUID: ${performanceId}`);
+  assert(
+    /^stream-[0-9a-f-]{36}$/.test(streamFallbackId),
+    `stream fallback ids keep the whole UUID: ${streamFallbackId}`,
+  );
+  assert(/^work-[0-9a-f-]{36}$/.test(workId), `work ids are unchanged: ${workId}`);
+
+  assert(generateSongId() !== generateSongId(), 'song ids are unique per call');
+  assert(generatePerformanceId() !== generatePerformanceId(), 'performance ids are unique per call');
+  assert(generateStreamIdFallback() !== generateStreamIdFallback(), 'stream fallback ids are unique per call');
+}
+
+function testDateBasedStreamIdIsUnchanged(): void {
+  assertEqual(generateStreamId('2026-08-31'), 'stream-2026-08-31', 'the primary stream id stays date-derived');
+  assert(
+    !/^stream-[0-9a-f-]{36}$/.test(generateStreamId('2026-08-31')),
+    'the date-based stream id is not a UUID id',
+  );
+}
+
 async function main(): Promise<void> {
   await testUpdateStreamPropagatesCopiesToPerformances();
   await testInsertPerformancesUsesOneBatch();
@@ -1611,6 +1645,8 @@ async function main(): Promise<void> {
   await testDeletePerformanceAndOrphanSongSurvivesWhenSongStillReferenced();
   await testGetSongByIdUsesOneBatchForSongAndPerformances();
   await testGetSongByIdReturnsNullWhenMissing();
+  testGeneratedEntityIdsCarryFullUuids();
+  testDateBasedStreamIdIsUnchanged();
   console.log('✓ song imports reuse exact entities and merges preserve every performance');
 }
 

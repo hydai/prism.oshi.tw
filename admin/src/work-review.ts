@@ -11,6 +11,7 @@ import type {
   WorkMatchStats,
 } from '../shared/types';
 import { normalizeForMatching } from '../shared/normalize';
+import { UnionFind } from '../shared/union-find';
 
 const WORK_MATCH_ALGORITHM = 'tier-a-v1';
 const WORK_MATCH_GUARD_ACTOR = 'system:global-work-review-guard';
@@ -203,24 +204,7 @@ async function buildInternalCandidates(
   catalogRevision = 0,
 ): Promise<InternalCandidate[]> {
   const works = snapshotsFromRows(rows);
-  const parent = works.map((_, index) => index);
-
-  const find = (index: number): number => {
-    let root = index;
-    while (parent[root] !== root) root = parent[root]!;
-    while (parent[index] !== index) {
-      const next = parent[index]!;
-      parent[index] = root;
-      index = next;
-    }
-    return root;
-  };
-
-  const union = (left: number, right: number): void => {
-    const leftRoot = find(left);
-    const rightRoot = find(right);
-    if (leftRoot !== rightRoot) parent[rightRoot] = leftRoot;
-  };
+  const workComponents = new UnionFind(works.length);
 
   const edges: Array<{ left: number; right: number; reason: WorkMatchReason }> = [];
   const addEdges = (
@@ -250,7 +234,7 @@ async function buildInternalCandidates(
             || skipPair?.(left, right)
           ) continue;
           edges.push({ left: leftIndex, right: rightIndex, reason });
-          union(leftIndex, rightIndex);
+          workComponents.union(leftIndex, rightIndex);
         }
       }
     }
@@ -285,7 +269,7 @@ async function buildInternalCandidates(
 
   const components = new Map<number, number[]>();
   works.forEach((_, index) => {
-    const root = find(index);
+    const root = workComponents.find(index);
     const component = components.get(root);
     if (component) component.push(index);
     else components.set(root, [index]);

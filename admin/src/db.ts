@@ -69,26 +69,32 @@ export function streamFromRow(row: StreamRow): Stream {
 
 // --- ID generation ---
 
+// Every generated id keeps the whole UUID. The old eight-hex-character suffix
+// was a 32-bit id space: by the birthday bound ~1.18 * sqrt(2^32) ≈ 77k ids
+// sharing a prefix reach even odds of a duplicate, and these ids are primary
+// keys inserted with no uniqueness retry. Existing short ids stay valid —
+// nothing reads an id's shape.
+
 export function generateSongId(): string {
-  return `song-${crypto.randomUUID().slice(0, 8)}`;
+  return `song-${crypto.randomUUID()}`;
 }
 
 export function generateWorkId(): string {
-  // Global IDs live across every streamer, so retain the full UUID instead of
-  // the shorter local-entity suffixes used by songs and performances.
   return `work-${crypto.randomUUID()}`;
 }
 
 export function generatePerformanceId(): string {
-  return `p-${crypto.randomUUID().slice(0, 8)}`;
+  return `p-${crypto.randomUUID()}`;
 }
 
+/** Primary stream id: date-derived so one broadcast maps to one row. */
 export function generateStreamId(date: string): string {
   return `stream-${date}`;
 }
 
+/** Used only when a stream arrives without a usable date. */
 export function generateStreamIdFallback(): string {
-  return `stream-${crypto.randomUUID().slice(0, 8)}`;
+  return `stream-${crypto.randomUUID()}`;
 }
 
 type WorkLinkMethod = 'migration_exact' | 'import_exact' | 'manual';
@@ -1703,7 +1709,9 @@ export async function getPerformanceWithSong(
 // --- Stats ---
 
 import type { StatusCounts, HarmonizeSongEntry, HarmonizeArtistEntry, SimilarityGroup, HarmonizeMatchType } from '../shared/types';
-import { normalizeForMatching, normalizeAggressive, similarityScore } from '../shared/normalize';
+import { normalizeForMatching, normalizeAggressive } from '../shared/normalize';
+import { unionSimilarKeys } from '../shared/fuzzy-grouping';
+import { UnionFind } from '../shared/union-find';
 
 interface StatusCountRow {
   status: string;
@@ -1875,14 +1883,7 @@ export async function getSongSimilarityGroups(
   // Pass 1: build connected components from either authoritative work IDs or
   // conservative title normalization. This keeps same-work local duplicates
   // discoverable even when their display text has drifted significantly.
-  const parent = entries.map((_, index) => index);
-  function findEntry(index: number): number {
-    if (parent[index] !== index) parent[index] = findEntry(parent[index]);
-    return parent[index];
-  }
-  function unionEntries(left: number, right: number): void {
-    parent[findEntry(left)] = findEntry(right);
-  }
+  const exactComponents = new UnionFind(entries.length);
 
   const firstByTitle = new Map<string, number>();
   const firstByWork = new Map<string, number>();
@@ -1890,18 +1891,18 @@ export async function getSongSimilarityGroups(
     const titleKey = normalizeForMatching(entry.title);
     const titleMatch = firstByTitle.get(titleKey);
     if (titleMatch === undefined) firstByTitle.set(titleKey, index);
-    else unionEntries(index, titleMatch);
+    else exactComponents.union(index, titleMatch);
 
     if (entry.workId) {
       const workMatch = firstByWork.get(entry.workId);
       if (workMatch === undefined) firstByWork.set(entry.workId, index);
-      else unionEntries(index, workMatch);
+      else exactComponents.union(index, workMatch);
     }
   });
 
   const exactGroups = new Map<number, HarmonizeSongEntry[]>();
   entries.forEach((entry, index) => {
-    const root = findEntry(index);
+    const root = exactComponents.find(index);
     const group = exactGroups.get(root);
     if (group) group.push(entry);
     else exactGroups.set(root, [entry]);
@@ -1932,29 +1933,12 @@ export async function getSongSimilarityGroups(
       normalized: normalizeAggressive(e.title),
     }));
 
-    // Union-find for merging fuzzy pairs
-    const parent = new Map<number, number>();
-    function find(i: number): number {
-      if (!parent.has(i)) parent.set(i, i);
-      if (parent.get(i) !== i) parent.set(i, find(parent.get(i)!));
-      return parent.get(i)!;
-    }
-    function union(i: number, j: number) {
-      parent.set(find(i), find(j));
-    }
-
-    for (let i = 0; i < aggressiveKeys.length; i++) {
-      for (let j = i + 1; j < aggressiveKeys.length; j++) {
-        const score = similarityScore(aggressiveKeys[i].normalized, aggressiveKeys[j].normalized);
-        if (score >= threshold) {
-          union(i, j);
-        }
-      }
-    }
+    const fuzzyComponents = new UnionFind(aggressiveKeys.length);
+    unionSimilarKeys(aggressiveKeys.map((k) => k.normalized), threshold, fuzzyComponents);
 
     const fuzzyGroups = new Map<number, HarmonizeSongEntry[]>();
     for (let i = 0; i < aggressiveKeys.length; i++) {
-      const root = find(i);
+      const root = fuzzyComponents.find(i);
       const group = fuzzyGroups.get(root);
       if (group) group.push(aggressiveKeys[i].entry);
       else fuzzyGroups.set(root, [aggressiveKeys[i].entry]);
@@ -2032,28 +2016,12 @@ export async function getArtistSimilarityGroups(
       normalized: normalizeAggressive(e.originalArtist),
     }));
 
-    const parent = new Map<number, number>();
-    function find(i: number): number {
-      if (!parent.has(i)) parent.set(i, i);
-      if (parent.get(i) !== i) parent.set(i, find(parent.get(i)!));
-      return parent.get(i)!;
-    }
-    function union(i: number, j: number) {
-      parent.set(find(i), find(j));
-    }
-
-    for (let i = 0; i < aggressiveKeys.length; i++) {
-      for (let j = i + 1; j < aggressiveKeys.length; j++) {
-        const score = similarityScore(aggressiveKeys[i].normalized, aggressiveKeys[j].normalized);
-        if (score >= threshold) {
-          union(i, j);
-        }
-      }
-    }
+    const fuzzyComponents = new UnionFind(aggressiveKeys.length);
+    unionSimilarKeys(aggressiveKeys.map((k) => k.normalized), threshold, fuzzyComponents);
 
     const fuzzyGroups = new Map<number, HarmonizeArtistEntry[]>();
     for (let i = 0; i < aggressiveKeys.length; i++) {
-      const root = find(i);
+      const root = fuzzyComponents.find(i);
       const group = fuzzyGroups.get(root);
       if (group) group.push(aggressiveKeys[i].entry);
       else fuzzyGroups.set(root, [aggressiveKeys[i].entry]);
