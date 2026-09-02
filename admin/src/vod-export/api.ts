@@ -3,28 +3,20 @@ import {
   deleteCandidateById,
   getCandidate,
   readAndVerifyCandidateBytes,
-  VodExportCandidateError,
   type VodExportCandidateMetadata,
 } from './candidate';
 import { CanonicalJsonError } from './canonical-json';
-import { VodExportControlError } from './control';
+import { VodExportError } from './errors';
 import { assertWithinCapacity, capacityDiagnostic, ExportLimitExceededError } from './limits';
 import { VOD_EXPORT_LIMITS } from './constants';
 import { findingJsonByteLength } from './findings';
-import { VodExportMaintenanceError } from './maintenance';
 import {
   readCurrentManifest,
   stableCandidateState,
-  VodExportPublicationError,
   type VodExportPublicationBindings,
 } from './publication';
-import { VodExportR2Error } from './r2';
 import { generateVodExportPreview, VodExportServiceError } from './service';
-import {
-  readCurrentSourceFingerprint,
-  sourceFingerprintsEqual,
-  VodExportSourceError,
-} from './source';
+import { readCurrentSourceFingerprint, sourceFingerprintsEqual } from './source';
 import { jsonStringByteLength, utf8ByteLength } from './normalization';
 import { createCompactJsonStream } from './json-stream';
 import type { CapacityDiagnostic, VodExportFinding } from './types';
@@ -133,12 +125,9 @@ export interface VodExportStreamerRepairRecord {
   status: string | null;
 }
 
-export class VodExportRepairError extends Error {
-  readonly code = 'VOD_EXPORT_REPAIR_RECORD_NOT_FOUND' as const;
-  readonly status = 404 as const;
-
+export class VodExportRepairError extends VodExportError<'VOD_EXPORT_REPAIR_RECORD_NOT_FOUND'> {
   constructor() {
-    super('VOD export source record not found');
+    super('VOD_EXPORT_REPAIR_RECORD_NOT_FOUND', 'VOD export source record not found', 404);
     this.name = 'VodExportRepairError';
   }
 }
@@ -223,21 +212,17 @@ export async function downloadVodExportCandidate(
 }
 
 export function normalizeVodExportError(error: unknown): VodExportHttpError {
+  // Only a service-layer capacity refusal publishes its capacity numbers. The
+  // source layer raises EXPORT_LIMIT_EXCEEDED with the same `details` shape,
+  // but that one reaches the client bare unless service.ts re-raised it — see
+  // the oracle in routes.test.ts, which pins both.
   if (error instanceof VodExportServiceError) {
     const diagnostics = error.code === 'EXPORT_LIMIT_EXCEEDED'
       ? diagnosticFromDetails(error.details)
       : undefined;
     return knownError(error.status, error.code, error.message, diagnostics);
   }
-  if (
-    error instanceof VodExportCandidateError
-    || error instanceof VodExportControlError
-    || error instanceof VodExportPublicationError
-    || error instanceof VodExportSourceError
-    || error instanceof VodExportR2Error
-    || error instanceof VodExportMaintenanceError
-    || error instanceof VodExportRepairError
-  ) {
+  if (error instanceof VodExportError) {
     return knownError(error.status, error.code, error.message);
   }
   if (error instanceof ExportLimitExceededError) {
@@ -251,6 +236,24 @@ export function normalizeVodExportError(error: unknown): VodExportHttpError {
     error: error instanceof Error ? error.message : 'Unknown error',
   }));
   return knownError(500, 'VOD_EXPORT_INTERNAL_ERROR', 'The VOD export operation failed unexpectedly');
+}
+
+/**
+ * The vod-export HTTP error contract as a Response — what routes.ts's single
+ * `.onError` returns, and what the per-route try/catch it replaced used to
+ * return. `private, no-store` is stamped on the response itself rather than
+ * left to the sub-app's cache-control middleware, so an error body can never be
+ * cached even if the middleware is reordered or skipped.
+ */
+export function vodExportErrorResponse(error: unknown): Response {
+  const normalized = normalizeVodExportError(error);
+  return new Response(JSON.stringify(normalized.body), {
+    status: normalized.status,
+    headers: {
+      'Content-Type': 'application/json; charset=utf-8',
+      'Cache-Control': 'private, no-store',
+    },
+  });
 }
 
 export async function getVodExportRepairRecord(

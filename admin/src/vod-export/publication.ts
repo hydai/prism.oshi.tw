@@ -33,6 +33,8 @@ import {
   type PublicationPreparedSlot,
   type SourceEquivalenceCheckpoint,
 } from './control';
+import { VodExportError } from './errors';
+import { isCanonicalTimestamp, SHA256_PATTERN } from './guards';
 import {
   PUBLIC_MANIFEST_HTTP_METADATA,
   PUBLIC_SNAPSHOT_HTTP_METADATA,
@@ -139,21 +141,19 @@ interface PublicationResolutionInput {
   checkpoint?: SourceEquivalenceCheckpoint;
 }
 
-export class VodExportPublicationError extends Error {
-  constructor(
-    readonly code:
-      | 'CANDIDATE_STALE'
-      | 'PUBLIC_ARTIFACT_INVALID'
-      | 'PUBLICATION_CONFLICT'
-      | 'PUBLICATION_RECONCILIATION_REQUIRED'
-      | 'CONTROL_RECOVERY_CONFIRMATION_REQUIRED'
-      | 'CONTROL_RECOVERY_STATE_CHANGED'
-      | 'CONTROL_RECOVERY_TOO_EARLY'
-      | 'EXPORTER_BUILD_ID_MISSING',
-    message: string,
-    readonly status: number,
-  ) {
-    super(message);
+export type VodExportPublicationErrorCode =
+  | 'CANDIDATE_STALE'
+  | 'PUBLIC_ARTIFACT_INVALID'
+  | 'PUBLICATION_CONFLICT'
+  | 'PUBLICATION_RECONCILIATION_REQUIRED'
+  | 'CONTROL_RECOVERY_CONFIRMATION_REQUIRED'
+  | 'CONTROL_RECOVERY_STATE_CHANGED'
+  | 'CONTROL_RECOVERY_TOO_EARLY'
+  | 'EXPORTER_BUILD_ID_MISSING';
+
+export class VodExportPublicationError extends VodExportError<VodExportPublicationErrorCode> {
+  constructor(code: VodExportPublicationErrorCode, message: string, status: number) {
+    super(code, message, status);
     this.name = 'VodExportPublicationError';
   }
 }
@@ -1099,7 +1099,7 @@ function parseStoredCheckpoint(value: string | null): SourceEquivalenceCheckpoin
   const fingerprint = checkpoint.fingerprint;
   if (
     typeof checkpoint.manifestSha256 !== 'string'
-    || !/^[0-9a-f]{64}$/.test(checkpoint.manifestSha256)
+    || !SHA256_PATTERN.test(checkpoint.manifestSha256)
     || typeof checkpoint.verifiedAt !== 'string'
     || !isCanonicalTimestamp(checkpoint.verifiedAt)
     || fingerprint === null
@@ -1538,13 +1538,6 @@ function resolutionCodeForError(error: unknown): string {
     || error instanceof VodExportCandidateError
   ) return error.code;
   return 'PRE_COMMIT_OPERATION_FAILED';
-}
-
-function isCanonicalTimestamp(value: unknown): value is string {
-  return typeof value === 'string'
-    && /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}\.\d{3}Z$/.test(value)
-    && Number.isFinite(Date.parse(value))
-    && new Date(Date.parse(value)).toISOString() === value;
 }
 
 function artifactError(message: string): VodExportPublicationError {

@@ -5,7 +5,9 @@ import {
   VOD_EXPORT_SCHEMA_VERSION,
 } from './constants';
 import { sha256Hex, snapshotUrlForHash } from './canonical-json';
+import { VodExportError } from './errors';
 import { createFinding } from './findings';
+import { hasExactKeys, isCanonicalTimestamp, isSourceFingerprint, SHA256_PATTERN } from './guards';
 import { capacityDiagnostic } from './limits';
 import {
   PRIVATE_JSON_HTTP_METADATA,
@@ -65,17 +67,15 @@ export interface StoredVodExportCandidate {
   metadataEtag: string;
 }
 
-export class VodExportCandidateError extends Error {
-  constructor(
-    readonly code:
-      | 'CANDIDATE_NOT_FOUND'
-      | 'CANDIDATE_EXPIRED'
-      | 'CANDIDATE_CORRUPT'
-      | 'CANDIDATE_COLLISION',
-    message: string,
-    readonly status: number,
-  ) {
-    super(message);
+export type VodExportCandidateErrorCode =
+  | 'CANDIDATE_NOT_FOUND'
+  | 'CANDIDATE_EXPIRED'
+  | 'CANDIDATE_CORRUPT'
+  | 'CANDIDATE_COLLISION';
+
+export class VodExportCandidateError extends VodExportError<VodExportCandidateErrorCode> {
+  constructor(code: VodExportCandidateErrorCode, message: string, status: number) {
+    super(code, message, status);
     this.name = 'VodExportCandidateError';
   }
 }
@@ -226,7 +226,7 @@ function isCandidateMetadata(value: unknown): value is VodExportCandidateMetadat
     && isCanonicalTimestamp(record.generatedAt)
     && isCanonicalTimestamp(record.expiresAt)
     && typeof record.sha256 === 'string'
-    && /^[0-9a-f]{64}$/.test(record.sha256)
+    && SHA256_PATTERN.test(record.sha256)
     && isNonNegativeSafeInteger(record.uncompressedBytes)
     && isCounts(record.counts)
     && isNonNegativeSafeInteger(record.warningCount)
@@ -237,13 +237,6 @@ function isCandidateMetadata(value: unknown): value is VodExportCandidateMetadat
     && record.downloadFilename === `vod-export-v${VOD_EXPORT_MAJOR}-${record.sha256}.json`
     && isSourceFingerprint(record.sourceFingerprint)
     && Date.parse(record.expiresAt) - Date.parse(record.generatedAt) === CANDIDATE_LIFETIME_MS;
-}
-
-function isCanonicalTimestamp(value: unknown): value is string {
-  return typeof value === 'string'
-    && /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}\.\d{3}Z$/.test(value)
-    && Number.isFinite(Date.parse(value))
-    && new Date(Date.parse(value)).toISOString() === value;
 }
 
 function isNonNegativeSafeInteger(value: unknown): value is number {
@@ -257,30 +250,6 @@ function isCounts(value: unknown): value is VodExportCounts {
     && isNonNegativeSafeInteger(record.streamers)
     && isNonNegativeSafeInteger(record.vods)
     && isNonNegativeSafeInteger(record.performances);
-}
-
-function isSourceFingerprint(value: unknown): value is VodExportSourceFingerprint {
-  if (value === null || typeof value !== 'object' || Array.isArray(value)) return false;
-  const record = value as Record<string, unknown>;
-  return hasExactKeys(record, [
-    'dbId',
-    'dbRevision',
-    'novaDbId',
-    'novaRevision',
-    'schemaVersion',
-    'exporterBuildId',
-  ])
-    && typeof record.dbId === 'string'
-    && record.dbId.length > 0
-    && typeof record.dbRevision === 'string'
-    && /^(0|[1-9][0-9]*)$/.test(record.dbRevision)
-    && typeof record.novaDbId === 'string'
-    && record.novaDbId.length > 0
-    && typeof record.novaRevision === 'string'
-    && /^(0|[1-9][0-9]*)$/.test(record.novaRevision)
-    && record.schemaVersion === VOD_EXPORT_SCHEMA_VERSION
-    && typeof record.exporterBuildId === 'string'
-    && record.exporterBuildId.length > 0;
 }
 
 export function candidateDownloadHeaders(candidate: VodExportCandidateMetadata): Headers {
@@ -360,10 +329,6 @@ function isCapacityResource(value: unknown): value is CapacityResource {
     || value === 'snapshotBytes'
     || value === 'findings'
     || value === 'findingsBytes';
-}
-
-function hasExactKeys(record: Record<string, unknown>, keys: readonly string[]): boolean {
-  return Object.keys(record).length === keys.length && keys.every((key) => Object.hasOwn(record, key));
 }
 
 function hasOnlyKeys(record: Record<string, unknown>, keys: ReadonlySet<string>): boolean {

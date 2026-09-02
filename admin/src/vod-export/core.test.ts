@@ -1,24 +1,23 @@
 import {
-  FindingCollector,
-  ExportLimitExceededError,
-  VOD_EXPORT_SCHEMA_VERSION,
-  assertWithinCapacity,
-  buildVodExportSnapshot,
   canonicalSnapshotByteLength,
-  compareUtf8Ordinal,
-  countExportRelevantSourceTextBytes,
   createOrderedSnapshotArtifact,
   createSnapshotArtifact,
+  serializeCanonicalManifest,
+  serializeCanonicalSnapshot,
+  serializeCanonicalString,
+} from './canonical-json';
+import { VOD_EXPORT_SCHEMA_VERSION } from './constants';
+import { FindingCollector, serializeValidationResult } from './findings';
+import { assertWithinCapacity, countExportRelevantSourceTextBytes, ExportLimitExceededError } from './limits';
+import {
+  compareUtf8Ordinal,
   isValidDateOnly,
   jsonStringByteLength,
   normalizeDisplayText,
   parseSqliteInteger,
-  serializeCanonicalManifest,
-  serializeCanonicalSnapshot,
-  serializeCanonicalString,
-  serializeValidationResult,
   validateOptionalSafeUrl,
-} from './index';
+} from './normalization';
+import { buildVodExportSnapshot } from './validation';
 import type {
   ExportSourcePerformance,
   ExportSourceSong,

@@ -1,5 +1,13 @@
 import { VOD_EXPORT_SCHEMA_VERSION } from './constants';
 import { serializeCanonicalManifest, snapshotUrlForHash } from './canonical-json';
+import { VodExportError } from './errors';
+import {
+  hasExactKeys,
+  isCanonicalTimestamp,
+  isNonEmptyString,
+  isSourceFingerprint,
+  SHA256_PATTERN,
+} from './guards';
 import { createJsonObject, getJsonObject, replaceJsonObject } from './r2';
 import type { VodExportSourceFingerprint } from './source';
 import type { VodExportManifest } from './types';
@@ -9,7 +17,6 @@ export const PUBLICATION_CONTROL_KEY = 'publication-control/v1.json';
 
 const CONTROL_OBJECT_LIMIT = 1_000_000;
 const UUID_V4_PATTERN = /^[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/;
-const SHA256_PATTERN = /^[0-9a-f]{64}$/;
 const textDecoder = new TextDecoder('utf-8', { fatal: true, ignoreBOM: true });
 
 export interface SourceEquivalenceCheckpoint {
@@ -93,18 +100,21 @@ export interface OwnedPublicationControl {
   etag: string;
 }
 
-export class VodExportControlError extends Error {
+export type VodExportControlErrorCode =
+  | 'EXPORT_GENERATION_IN_PROGRESS'
+  | 'PUBLICATION_IN_PROGRESS'
+  | 'CONTROL_STATE_INVALID'
+  | 'CONTROL_OWNERSHIP_LOST';
+
+export class VodExportControlError extends VodExportError<VodExportControlErrorCode> {
   constructor(
-    readonly code:
-      | 'EXPORT_GENERATION_IN_PROGRESS'
-      | 'PUBLICATION_IN_PROGRESS'
-      | 'CONTROL_STATE_INVALID'
-      | 'CONTROL_OWNERSHIP_LOST',
+    code: VodExportControlErrorCode,
     message: string,
-    readonly status: number,
+    status: number,
+    // Operator-facing only: the HTTP contract never emits it.
     readonly unresolvedSince?: string,
   ) {
-    super(message);
+    super(code, message, status);
     this.name = 'VodExportControlError';
   }
 }
@@ -647,13 +657,6 @@ function checkpointsEqual(
   return JSON.stringify(left) === JSON.stringify(right);
 }
 
-function isCanonicalTimestamp(value: unknown): value is string {
-  return typeof value === 'string'
-    && /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}\.\d{3}Z$/.test(value)
-    && Number.isFinite(Date.parse(value))
-    && new Date(Date.parse(value)).toISOString() === value;
-}
-
 function isPreparedAudit(value: unknown, candidateId: unknown): value is PreparedPublicationAudit {
   if (value === null || typeof value !== 'object' || Array.isArray(value)) return false;
   const record = value as Record<string, unknown>;
@@ -681,22 +684,6 @@ function isPreparedAudit(value: unknown, candidateId: unknown): value is Prepare
     && isCanonicalTimestamp(record.publishedAt);
 }
 
-function isSourceFingerprint(value: unknown): value is VodExportSourceFingerprint {
-  if (value === null || typeof value !== 'object' || Array.isArray(value)) return false;
-  const record = value as Record<string, unknown>;
-  return hasExactKeys(record, [
-    'dbId', 'dbRevision', 'novaDbId', 'novaRevision', 'schemaVersion', 'exporterBuildId',
-  ])
-    && isNonEmptyString(record.dbId)
-    && typeof record.dbRevision === 'string'
-    && /^(0|[1-9][0-9]*)$/.test(record.dbRevision)
-    && isNonEmptyString(record.novaDbId)
-    && typeof record.novaRevision === 'string'
-    && /^(0|[1-9][0-9]*)$/.test(record.novaRevision)
-    && record.schemaVersion === VOD_EXPORT_SCHEMA_VERSION
-    && isNonEmptyString(record.exporterBuildId);
-}
-
 function parseCanonicalControlManifest(value: string): VodExportManifest | null {
   try {
     const parsed = JSON.parse(value) as VodExportManifest;
@@ -711,16 +698,8 @@ function isUuidV4(value: unknown): value is string {
   return typeof value === 'string' && UUID_V4_PATTERN.test(value);
 }
 
-function isNonEmptyString(value: unknown): value is string {
-  return typeof value === 'string' && value.length > 0;
-}
-
 function isNonNegativeSafeInteger(value: unknown): value is number {
   return typeof value === 'number' && Number.isSafeInteger(value) && value >= 0;
-}
-
-function hasExactKeys(record: Record<string, unknown>, keys: readonly string[]): boolean {
-  return Object.keys(record).length === keys.length && keys.every((key) => Object.hasOwn(record, key));
 }
 
 function hasRequiredAndOptionalKeys(

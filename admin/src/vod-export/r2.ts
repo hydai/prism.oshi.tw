@@ -3,6 +3,7 @@ import {
   VOD_EXPORT_MANIFEST_CACHE_CONTROL,
   VOD_EXPORT_SNAPSHOT_CACHE_CONTROL,
 } from './constants';
+import { VodExportError } from './errors';
 
 const textDecoder = new TextDecoder('utf-8', { fatal: true, ignoreBOM: true });
 
@@ -30,13 +31,9 @@ export type VodExportR2ErrorCode =
   | 'R2_OBJECT_CHECKSUM_MISMATCH'
   | 'R2_PRECONDITION_FAILED';
 
-export class VodExportR2Error extends Error {
-  constructor(
-    readonly code: VodExportR2ErrorCode,
-    message: string,
-    readonly status = 503,
-  ) {
-    super(message);
+export class VodExportR2Error extends VodExportError<VodExportR2ErrorCode> {
+  constructor(code: VodExportR2ErrorCode, message: string, status = 503) {
+    super(code, message, status);
     this.name = 'VodExportR2Error';
   }
 }
