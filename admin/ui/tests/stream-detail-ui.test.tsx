@@ -78,7 +78,6 @@ const controller: StreamDetailController = {
   setShowPasteImport: noop,
   playerRef: React.createRef<YouTubePlayerHandle>(),
   playerBoxRef: React.createRef<HTMLDivElement>(),
-  currentTime: 90,
   selectedIndex: 0,
   setSelectedIndex: noop,
   showAddModal: false,

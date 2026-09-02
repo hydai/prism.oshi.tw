@@ -1,3 +1,5 @@
+import { usePlayerClockTime } from '../hooks/usePlayerClock';
+
 interface PillPerformance {
   title: string;
   timestamp: number;
@@ -5,7 +7,6 @@ interface PillPerformance {
 }
 
 interface Props {
-  currentTime: number;
   perf: PillPerformance | null;
   /** When provided, the pill is a button (e.g. scroll back to the player). */
   onClick?: () => void;
@@ -23,7 +24,9 @@ function formatTimestamp(sec: number): string {
 const baseClass =
   'fixed bottom-4 right-4 z-30 rounded-lg border border-slate-200 bg-white px-4 py-3 text-left shadow-lg';
 
-export function FloatingPlaybackPill({ currentTime, perf, onClick }: Props) {
+/** Subscribes to the shared clock itself: a tick re-renders the pill, never the page behind it. */
+export function FloatingPlaybackPill({ perf, onClick }: Props) {
+  const currentTime = usePlayerClockTime();
   const content = (
     <>
       <div className="flex items-center gap-2">

@@ -86,7 +86,6 @@ const controller: StampEditorController = {
   fetchLog: [],
   clearFetchLog: noop,
   playerRef: React.createRef<YouTubePlayerHandle>(),
-  currentTime: 90,
   selectedStream,
   streamYears: ['2026', '2025'],
   filteredStreams: [selectedStream, olderStream],
