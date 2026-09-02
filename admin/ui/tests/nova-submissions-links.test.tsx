@@ -1,6 +1,7 @@
 import * as React from 'react';
 import { renderToStaticMarkup } from 'react-dom/server';
 import type { NovaSubmission, NovaStatus } from '../../shared/types';
+import { createRowDrafts } from '../src/hooks/useRowDrafts';
 
 type SubmissionRowComponent = typeof import('../src/pages/NovaSubmissions').SubmissionRow;
 
@@ -52,6 +53,7 @@ function renderRow(sub: NovaSubmission): string {
         isCurator
         expanded
         onToggle={() => undefined}
+        drafts={createRowDrafts()}
         onAction={async () => true}
         onDelete={() => undefined}
         onSave={() => undefined}

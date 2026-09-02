@@ -2,6 +2,7 @@ import { useId, useMemo, useState, type ReactNode } from 'react';
 import type { AuthUser, NovaVodSubmission, NovaVodSong, NovaStatus } from '../../../shared/types';
 import { api } from '../api/client';
 import { sanitizeNovaUrl } from '../../../shared/nova-url-safety';
+import { useRowDrafts, type RowDrafts } from '../hooks/useRowDrafts';
 import { useApiResource, errorMessage } from '../lib/apiResource';
 import { formatTimestamp } from '../lib/format-timestamp';
 import { NO_RECENT_ACTIONS, visibleVods } from '../lib/review-lists';
@@ -47,6 +48,9 @@ export default function NovaVodSubmissions({ user }: { user: AuthUser }) {
   // failed approval doesn't masquerade as a broken list.
   const [actionError, setActionError] = useState<string | null>(null);
   const streamerFilterId = useId();
+  // Rejection notes outlive their rows, which unmount on group collapse, on the
+  // view-mode toggle and on a filter change.
+  const rejectNotes = useRowDrafts();
 
   // One unfiltered load feeds the table, the hero totals and the streamer options;
   // the two filters narrow it here instead of costing a second request.
@@ -98,6 +102,7 @@ export default function NovaVodSubmissions({ user }: { user: AuthUser }) {
       });
       list.mutate((vods) => replaceById(vods, updated));
       keepVisible(id);
+      rejectNotes.clear(id);
       return true;
     } catch (err) {
       setActionError(errorMessage(err, 'Action failed'));
@@ -114,6 +119,7 @@ export default function NovaVodSubmissions({ user }: { user: AuthUser }) {
     try {
       await api.deleteNovaVod(vod.id);
       list.mutate((vods) => removeById(vods, vod.id));
+      rejectNotes.clear(vod.id);
     } catch (err) {
       setActionError(errorMessage(err, 'Delete failed'));
     } finally {
@@ -137,6 +143,7 @@ export default function NovaVodSubmissions({ user }: { user: AuthUser }) {
       showStreamer={viewMode === 'timeline'}
       songs={expandedId === vod.id ? (expandedSongs[vod.id] ?? []) : []}
       onToggle={() => handleExpand(vod.id)}
+      drafts={rejectNotes}
       onAction={handleAction}
       onDelete={handleDelete}
       actionLoading={actionLoading === vod.id}
@@ -288,6 +295,7 @@ export function VodRow({
   showStreamer = false,
   songs,
   onToggle,
+  drafts,
   onAction,
   onDelete,
   actionLoading,
@@ -299,13 +307,15 @@ export function VodRow({
   showStreamer?: boolean;
   songs: NovaVodSong[];
   onToggle: () => void;
+  /** The page's note store: this row seeds from it and writes back to it. */
+  drafts: RowDrafts;
   /** Resolves true when the review landed, so the row may drop its note. */
   onAction: (id: string, status: NovaStatus, rejectNote: string) => Promise<boolean>;
   onDelete: (vod: NovaVodSubmission) => void;
   actionLoading: boolean;
 }) {
   // The note being written belongs to this row: typing it re-renders one VOD, not the inbox.
-  const [rejectNote, setRejectNote] = useState('');
+  const [rejectNote, setRejectNote] = useState(() => drafts.read(vod.id));
   const rejectNoteId = useId();
   const detailsId = `nova-vod-details-${vod.id}`;
   const showReviewCard = isCurator;
@@ -486,7 +496,10 @@ export function VodRow({
                   <PrismTextarea
                     id={rejectNoteId}
                     value={rejectNote}
-                    onChange={(e) => setRejectNote(e.target.value)}
+                    onChange={(e) => {
+                      drafts.write(vod.id, e.target.value);
+                      setRejectNote(e.target.value);
+                    }}
                     placeholder="Reason for rejection..."
                     rows={3}
                     className="mt-2"

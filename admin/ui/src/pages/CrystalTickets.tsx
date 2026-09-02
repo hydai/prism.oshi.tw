@@ -1,6 +1,7 @@
 import { useMemo, useState } from 'react';
 import type { AuthUser, CrystalTicket, CrystalTicketStatus, CrystalTicketType } from '../../../shared/types';
 import { api } from '../api/client';
+import { useRowDrafts, type RowDrafts } from '../hooks/useRowDrafts';
 import { useApiResource, errorMessage } from '../lib/apiResource';
 import { NO_RECENT_ACTIONS, visibleTickets } from '../lib/review-lists';
 import { countByStatus, replaceById } from '../lib/status-totals';
@@ -54,6 +55,8 @@ export default function CrystalTickets({ user }: { user: AuthUser }) {
   const [expandedId, setExpandedId] = useState<string | null>(null);
   const [actionLoading, setActionLoading] = useState<string | null>(null);
   const [actionError, setActionError] = useState<string | null>(null);
+  // Reply drafts outlive their rows, which unmount on a filter change or a reload.
+  const replyDrafts = useRowDrafts();
 
   // One unfiltered load feeds both the table and the hero totals; the filters
   // are chips, not a reason to ask the server for the same rows again.
@@ -85,6 +88,7 @@ export default function CrystalTickets({ user }: { user: AuthUser }) {
       const updated = await api.replyCrystalTicket(id, text);
       list.mutate((tickets) => replaceById(tickets, updated));
       keepVisible(id);
+      replyDrafts.clear(id);
       return true;
     } catch (err) {
       setActionError(errorMessage(err, 'Reply failed'));
@@ -169,6 +173,7 @@ export default function CrystalTickets({ user }: { user: AuthUser }) {
                 expanded={expandedId === ticket.id}
                 actionLoading={actionLoading === ticket.id}
                 onToggle={() => setExpandedId(expandedId === ticket.id ? null : ticket.id)}
+                drafts={replyDrafts}
                 onReply={handleReply}
                 onStatusChange={handleStatusChange}
               />
@@ -182,8 +187,9 @@ export default function CrystalTickets({ user }: { user: AuthUser }) {
 
 /**
  * One ticket: its summary row and, while expanded, its detail and reply
- * editor. The reply draft lives here — typing re-renders this ticket rather
- * than the inbox, and collapsing the row keeps what has been written.
+ * editor. The reply draft is local — typing re-renders this ticket rather than
+ * the inbox — and is seeded from, and written through to, the page's store, so
+ * it survives the row unmounting.
  */
 export function TicketRow({
   ticket,
@@ -191,6 +197,7 @@ export function TicketRow({
   expanded,
   actionLoading,
   onToggle,
+  drafts,
   onReply,
   onStatusChange,
 }: {
@@ -199,11 +206,13 @@ export function TicketRow({
   expanded: boolean;
   actionLoading: boolean;
   onToggle: () => void;
+  /** The page's draft store: this row seeds from it and writes back to it. */
+  drafts: RowDrafts;
   /** Resolves true when the reply landed, so the row may clear its draft. */
   onReply: (id: string, text: string) => Promise<boolean>;
   onStatusChange: (id: string, status: CrystalTicketStatus) => void;
 }) {
-  const [replyText, setReplyText] = useState('');
+  const [replyText, setReplyText] = useState(() => drafts.read(ticket.id));
   const type = TYPE_STYLES[ticket.type];
   const detailsId = `crystal-ticket-details-${ticket.id}`;
 
@@ -302,7 +311,10 @@ export function TicketRow({
                 rows={4}
                 placeholder={ticket.admin_reply ? 'Update reply...' : 'Write a reply...'}
                 value={replyText}
-                onChange={(e) => setReplyText(e.target.value)}
+                onChange={(e) => {
+                  drafts.write(ticket.id, e.target.value);
+                  setReplyText(e.target.value);
+                }}
               />
               <div className="flex items-center gap-2">
                 <GradientButton icon="send" onClick={send} disabled={actionLoading || !replyText.trim()}>

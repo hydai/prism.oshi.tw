@@ -78,10 +78,11 @@ export interface SubmissionRowState {
 
 export function createSubmissionRowState(
   submission: NovaSubmission,
+  rejectNote = '',
 ): SubmissionRowState {
   return {
     editing: false,
-    rejectNote: '',
+    rejectNote,
     draft: buildSubmissionDraft(submission),
     themeDraft: parseThemeJson(submission.theme_json),
     enabledDraft: submission.enabled === 1,
