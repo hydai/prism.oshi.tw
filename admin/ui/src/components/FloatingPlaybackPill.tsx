@@ -1,4 +1,5 @@
 import { usePlayerClockTime } from '../hooks/usePlayerClock';
+import { formatTimestamp } from '../lib/format-timestamp';
 
 interface PillPerformance {
   title: string;
@@ -10,15 +11,6 @@ interface Props {
   perf: PillPerformance | null;
   /** When provided, the pill is a button (e.g. scroll back to the player). */
   onClick?: () => void;
-}
-
-function formatTimestamp(sec: number): string {
-  const total = Math.floor(sec);
-  const h = Math.floor(total / 3600);
-  const m = Math.floor((total % 3600) / 60);
-  const s = total % 60;
-  if (h > 0) return `${h}:${String(m).padStart(2, '0')}:${String(s).padStart(2, '0')}`;
-  return `${m}:${String(s).padStart(2, '0')}`;
 }
 
 const baseClass =

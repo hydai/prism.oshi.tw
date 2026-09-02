@@ -3,6 +3,7 @@ import type { AuthUser, NovaVodSubmission, NovaVodSong, NovaStatus } from '../..
 import { api } from '../api/client';
 import { sanitizeNovaUrl } from '../../../shared/nova-url-safety';
 import { useApiResource, errorMessage } from '../lib/apiResource';
+import { formatTimestamp } from '../lib/format-timestamp';
 import { countByStatus, matchesFilter, removeById, replaceById } from '../lib/status-totals';
 import { Avatar } from '../components/prism/Avatar';
 import { GradientButton, OutlineButton } from '../components/prism/Buttons';
@@ -36,15 +37,6 @@ const STATUS_FILTERS: ReadonlyArray<{ value: '' | NovaStatus; label: string }> =
   { value: 'approved', label: 'Approved' },
   { value: 'rejected', label: 'Rejected' },
 ];
-
-function formatTimestamp(seconds: number): string {
-  const h = Math.floor(seconds / 3600);
-  const m = Math.floor((seconds % 3600) / 60);
-  const s = seconds % 60;
-  return h > 0
-    ? `${h}:${String(m).padStart(2, '0')}:${String(s).padStart(2, '0')}`
-    : `${m}:${String(s).padStart(2, '0')}`;
-}
 
 export default function NovaVodSubmissions({ user }: { user: AuthUser }) {
   const [statusFilter, setStatusFilter] = useState<'' | NovaStatus>('pending');
