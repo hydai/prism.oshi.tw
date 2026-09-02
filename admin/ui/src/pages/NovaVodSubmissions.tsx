@@ -4,7 +4,8 @@ import { api } from '../api/client';
 import { sanitizeNovaUrl } from '../../../shared/nova-url-safety';
 import { useApiResource, errorMessage } from '../lib/apiResource';
 import { formatTimestamp } from '../lib/format-timestamp';
-import { countByStatus, matchesFilter, removeById, replaceById } from '../lib/status-totals';
+import { NO_RECENT_ACTIONS, visibleVods } from '../lib/review-lists';
+import { countByStatus, removeById, replaceById } from '../lib/status-totals';
 import { Avatar } from '../components/prism/Avatar';
 import { GradientButton, OutlineButton } from '../components/prism/Buttons';
 import { CircleButton } from '../components/prism/CircleButton';
@@ -35,6 +36,7 @@ const ROW_COLUMNS = [
 export default function NovaVodSubmissions({ user }: { user: AuthUser }) {
   const [statusFilter, setStatusFilter] = useState<'' | NovaStatus>('pending');
   const [streamerFilter, setStreamerFilter] = useState('');
+  const [justActed, setJustActed] = useState<ReadonlySet<string>>(NO_RECENT_ACTIONS);
   const [viewMode, setViewMode] = useState<VodViewMode>('grouped');
   const [groupOpen, setGroupOpen] = useState<Record<string, boolean>>({});
   const [expandedId, setExpandedId] = useState<string | null>(null);
@@ -52,12 +54,21 @@ export default function NovaVodSubmissions({ user }: { user: AuthUser }) {
   // Stable reference while loading, so the filter memo doesn't recompute every render.
   const allVods = useMemo(() => list.data ?? [], [list.data]);
   const vods = useMemo(
-    () => allVods.filter(
-      (vod) => matchesFilter(vod.status, statusFilter) && matchesFilter(vod.streamer_slug, streamerFilter),
-    ),
-    [allVods, statusFilter, streamerFilter],
+    () => visibleVods(allVods, { status: statusFilter, streamer: streamerFilter, justActed }),
+    [allVods, statusFilter, streamerFilter, justActed],
   );
   const loading = list.loading;
+
+  // A new filter is a new question: the rows held over from the last action go.
+  const changeStatusFilter = (status: '' | NovaStatus) => {
+    setStatusFilter(status);
+    setJustActed(NO_RECENT_ACTIONS);
+  };
+  const changeStreamerFilter = (streamer: string) => {
+    setStreamerFilter(streamer);
+    setJustActed(NO_RECENT_ACTIONS);
+  };
+  const keepVisible = (id: string) => setJustActed((prev) => new Set(prev).add(id));
 
   const handleExpand = async (id: string) => {
     setActionError(null);
@@ -86,6 +97,7 @@ export default function NovaVodSubmissions({ user }: { user: AuthUser }) {
         reviewer_note: status === 'rejected' ? rejectNote : undefined,
       });
       list.mutate((vods) => replaceById(vods, updated));
+      keepVisible(id);
       return true;
     } catch (err) {
       setActionError(errorMessage(err, 'Action failed'));
@@ -152,7 +164,7 @@ export default function NovaVodSubmissions({ user }: { user: AuthUser }) {
           <StatusFilterBar
             options={NOVA_STATUS_FILTERS}
             value={statusFilter}
-            onChange={setStatusFilter}
+            onChange={changeStatusFilter}
             label="Filter VOD submissions by status"
           />
           <div aria-hidden="true" className="h-5 w-px bg-border-token" />
@@ -171,7 +183,7 @@ export default function NovaVodSubmissions({ user }: { user: AuthUser }) {
           <PrismSelect
             id={streamerFilterId}
             value={streamerFilter}
-            onChange={(e) => setStreamerFilter(e.target.value)}
+            onChange={(e) => changeStreamerFilter(e.target.value)}
           >
             <option value="">All streamers</option>
             {uniqueStreamers.map((s) => (
