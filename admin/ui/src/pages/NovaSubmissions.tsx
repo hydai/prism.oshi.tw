@@ -12,6 +12,7 @@ import { api } from '../api/client';
 import { useApiResource, errorMessage } from '../lib/apiResource';
 import { NO_RECENT_ACTIONS, visibleSubmissions } from '../lib/review-lists';
 import { countByStatus, removeById, replaceById } from '../lib/status-totals';
+import { useRowDrafts, type RowDrafts } from '../hooks/useRowDrafts';
 import { useSearchParamState } from '../hooks/useSearchParamState';
 import { finiteInputNumber } from '../lib/numeric-input';
 import { Avatar } from '../components/prism/Avatar';
@@ -68,6 +69,8 @@ export default function NovaSubmissions({ user }: { user: AuthUser }) {
   const [actionError, setActionError] = useState<string | null>(null);
   const [fetchingAll, setFetchingAll] = useState(false);
   const [fetchAllResult, setFetchAllResult] = useState<BulkFetchSubscribersResponse | null>(null);
+  // Rejection notes outlive their rows, which unmount on a filter change or a reload.
+  const rejectNotes = useRowDrafts();
 
   // One unfiltered load feeds both the table and the hero totals; status and
   // search narrow it here rather than costing a second request per chip click or
@@ -108,6 +111,7 @@ export default function NovaSubmissions({ user }: { user: AuthUser }) {
       });
       list.mutate((submissions) => replaceById(submissions, updated));
       keepVisible(id);
+      rejectNotes.clear(id);
       return true;
     } catch (err) {
       setActionError(errorMessage(err, 'Action failed'));
@@ -124,6 +128,7 @@ export default function NovaSubmissions({ user }: { user: AuthUser }) {
     try {
       await api.deleteNovaSubmission(sub.id);
       list.mutate((submissions) => removeById(submissions, sub.id));
+      rejectNotes.clear(sub.id);
     } catch (err) {
       setActionError(errorMessage(err, 'Delete failed'));
     } finally {
@@ -252,6 +257,7 @@ export default function NovaSubmissions({ user }: { user: AuthUser }) {
                   isCurator={isCurator}
                   expanded={expandedId === sub.id}
                   onToggle={() => setExpandedId(expandedId === sub.id ? null : sub.id)}
+                  drafts={rejectNotes}
                   onAction={handleAction}
                   onDelete={handleDelete}
                   onSave={handleSave}
@@ -278,6 +284,7 @@ export function SubmissionRow({
   isCurator,
   expanded,
   onToggle,
+  drafts,
   onAction,
   onDelete,
   onSave,
@@ -287,6 +294,8 @@ export function SubmissionRow({
   isCurator: boolean;
   expanded: boolean;
   onToggle: () => void;
+  /** The page's note store: this row seeds from it and writes back to it. */
+  drafts: RowDrafts;
   /** Resolves true when the review landed, so the row may drop its note. */
   onAction: (id: string, status: NovaStatus, rejectNote: string) => Promise<boolean>;
   onDelete: (sub: NovaSubmission) => void;
@@ -306,7 +315,11 @@ export function SubmissionRow({
     fetchSubscribersError: fetchSubsError,
     verifyingChannel,
     verificationError,
-  }, dispatch] = useReducer(submissionRowReducer, sub, createSubmissionRowState);
+  }, dispatch] = useReducer(
+    submissionRowReducer,
+    sub,
+    (submission) => createSubmissionRowState(submission, drafts.read(submission.id)),
+  );
 
   // Reset draft when submission changes (e.g. after save or status change)
   useEffect(() => {
@@ -511,60 +524,74 @@ export function SubmissionRow({
 
           {/* Right column: review actions */}
           {showReviewCard && (
-            <GlassCard className="flex flex-col gap-2.5 self-start p-4">
-              {sub.status === 'pending' ? (
-                <RejectNoteEditor
-                  submissionId={sub.id}
-                  value={rejectNote}
-                  onChange={(value) => dispatch({ type: 'rejectNoteChanged', value })}
-                />
-              ) : (
-                <SectionLabel>Review</SectionLabel>
-              )}
-              <div className="flex items-center gap-2">
-                {sub.status === 'pending' ? (
-                  <>
-                    <GradientButton
-                      icon="check"
-                      disabled={actionLoading}
-                      onClick={() => review('approved')}
-                    >
-                      Approve
-                    </GradientButton>
-                    <OutlineButton
-                      icon="x"
-                      tone="danger"
-                      disabled={actionLoading}
-                      onClick={() => review('rejected')}
-                    >
-                      Reject
-                    </OutlineButton>
-                  </>
-                ) : (
-                  <OutlineButton
-                    icon="undo"
-                    disabled={actionLoading}
-                    onClick={() => review('pending')}
-                  >
-                    Revert to Pending
-                  </OutlineButton>
-                )}
-                <div className="flex-1" />
-                <button
-                  type="button"
-                  disabled={actionLoading}
-                  onClick={() => onDelete(sub)}
-                  className="text-[11px] font-medium text-token-tertiary transition-colors hover:text-red-600 disabled:opacity-50"
-                >
-                  Delete
-                </button>
-              </div>
-            </GlassCard>
+            <SubmissionReviewCard
+              sub={sub}
+              rejectNote={rejectNote}
+              onNoteChange={(value) => {
+                drafts.write(sub.id, value);
+                dispatch({ type: 'rejectNoteChanged', value });
+              }}
+              onReview={review}
+              onDelete={onDelete}
+              actionLoading={actionLoading}
+            />
           )}
         </td>
         </tr>
       )}
     </tbody>
+  );
+}
+
+/** The curator's side of an expanded row: the rejection note and what to do with it. */
+function SubmissionReviewCard({
+  sub,
+  rejectNote,
+  onNoteChange,
+  onReview,
+  onDelete,
+  actionLoading,
+}: {
+  sub: NovaSubmission;
+  rejectNote: string;
+  onNoteChange: (value: string) => void;
+  onReview: (status: NovaStatus) => void;
+  onDelete: (sub: NovaSubmission) => void;
+  actionLoading: boolean;
+}) {
+  return (
+    <GlassCard className="flex flex-col gap-2.5 self-start p-4">
+      {sub.status === 'pending' ? (
+        <RejectNoteEditor submissionId={sub.id} value={rejectNote} onChange={onNoteChange} />
+      ) : (
+        <SectionLabel>Review</SectionLabel>
+      )}
+      <div className="flex items-center gap-2">
+        {sub.status === 'pending' ? (
+          <>
+            <GradientButton icon="check" disabled={actionLoading} onClick={() => onReview('approved')}>
+              Approve
+            </GradientButton>
+            <OutlineButton icon="x" tone="danger" disabled={actionLoading} onClick={() => onReview('rejected')}>
+              Reject
+            </OutlineButton>
+          </>
+        ) : (
+          <OutlineButton icon="undo" disabled={actionLoading} onClick={() => onReview('pending')}>
+            Revert to Pending
+          </OutlineButton>
+        )}
+        <div className="flex-1" />
+        <button
+          type="button"
+          disabled={actionLoading}
+          onClick={() => onDelete(sub)}
+          className="text-[11px] font-medium text-token-tertiary transition-colors hover:text-red-600 disabled:opacity-50"
+        >
+          Delete
+        </button>
+      </div>
+    </GlassCard>
   );
 }
 

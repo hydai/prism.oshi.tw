@@ -1,6 +1,7 @@
 import * as React from 'react';
 import { renderToStaticMarkup } from 'react-dom/server';
 import type { NovaVodSubmission } from '../../shared/types';
+import { createRowDrafts } from '../src/hooks/useRowDrafts';
 
 function assert(condition: boolean, message: string): asserts condition {
   if (!condition) {
@@ -38,6 +39,7 @@ async function main(): Promise<void> {
           showStreamer={opts.showStreamer ?? false}
           songs={[]}
           onToggle={() => undefined}
+          drafts={createRowDrafts()}
           onAction={async () => true}
           onDelete={() => undefined}
           actionLoading={false}
