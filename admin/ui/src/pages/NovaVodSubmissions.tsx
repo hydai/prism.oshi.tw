@@ -80,6 +80,7 @@ export default function NovaVodSubmissions({ user }: { user: AuthUser }) {
   const loading = list.loading;
 
   const handleExpand = async (id: string) => {
+    setActionError(null);
     if (expandedId === id) {
       setExpandedId(null);
       return;
@@ -97,6 +98,7 @@ export default function NovaVodSubmissions({ user }: { user: AuthUser }) {
 
   const handleAction = async (id: string, status: NovaStatus) => {
     setActionLoading(id);
+    setActionError(null);
     try {
       const updated = await api.updateNovaVodStatus(id, {
         status,
@@ -118,6 +120,7 @@ export default function NovaVodSubmissions({ user }: { user: AuthUser }) {
   const handleDelete = async (vod: NovaVodSubmission) => {
     if (!window.confirm(`Permanently delete VOD submission "${vod.id}" (${vod.stream_title || vod.video_id})? This cannot be undone.`)) return;
     setActionLoading(vod.id);
+    setActionError(null);
     try {
       await api.deleteNovaVod(vod.id);
       list.mutate(({ vods, allVods }) => ({ vods: removeById(vods, vod.id), allVods: removeById(allVods, vod.id) }));

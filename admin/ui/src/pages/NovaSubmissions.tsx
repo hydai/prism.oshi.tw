@@ -79,6 +79,7 @@ export default function NovaSubmissions({ user }: { user: AuthUser }) {
 
   const handleAction = async (id: string, status: NovaStatus) => {
     setActionLoading(id);
+    setActionError(null);
     try {
       const updated = await api.updateNovaStatus(id, {
         status,
@@ -100,6 +101,7 @@ export default function NovaSubmissions({ user }: { user: AuthUser }) {
   const handleDelete = async (sub: NovaSubmission) => {
     if (!window.confirm(`Permanently delete submission "${sub.id}" (${sub.display_name})? This cannot be undone.`)) return;
     setActionLoading(sub.id);
+    setActionError(null);
     try {
       await api.deleteNovaSubmission(sub.id);
       list.mutate(({ submissions, allSubmissions }) => ({ submissions: removeById(submissions, sub.id), allSubmissions: removeById(allSubmissions, sub.id) }));
@@ -117,6 +119,7 @@ export default function NovaSubmissions({ user }: { user: AuthUser }) {
   const handleFetchAll = async () => {
     setFetchingAll(true);
     setFetchAllResult(null);
+    setActionError(null);
     try {
       const result = await api.fetchAllNovaSubscribers();
       setFetchAllResult(result);

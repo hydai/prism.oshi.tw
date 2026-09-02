@@ -68,6 +68,7 @@ export default function CrystalTickets({ user }: { user: AuthUser }) {
     const text = replyText[id]?.trim();
     if (!text) return;
     setActionLoading(id);
+    setActionError(null);
     try {
       const updated = await api.replyCrystalTicket(id, text);
       list.mutate(({ tickets, allTickets }) => ({ tickets: replaceById(tickets, updated), allTickets: replaceById(allTickets, updated) }));
@@ -85,6 +86,7 @@ export default function CrystalTickets({ user }: { user: AuthUser }) {
 
   const handleStatusChange = async (id: string, status: CrystalTicketStatus) => {
     setActionLoading(id);
+    setActionError(null);
     try {
       const updated = await api.updateCrystalTicketStatus(id, status);
       list.mutate(({ tickets, allTickets }) => ({ tickets: replaceById(tickets, updated), allTickets: replaceById(allTickets, updated) }));
