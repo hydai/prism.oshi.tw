@@ -52,9 +52,7 @@ function renderRow(sub: NovaSubmission): string {
         isCurator
         expanded
         onToggle={() => undefined}
-        rejectNote=""
-        onRejectNoteChange={() => undefined}
-        onAction={() => undefined}
+        onAction={async () => true}
         onDelete={() => undefined}
         onSave={() => undefined}
         actionLoading={false}

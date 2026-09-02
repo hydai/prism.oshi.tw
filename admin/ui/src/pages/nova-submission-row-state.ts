@@ -62,6 +62,8 @@ export function buildSubmissionDraft(
 
 export interface SubmissionRowState {
   editing: boolean;
+  /** Rejection note being written for this row; only this row re-renders as it is typed. */
+  rejectNote: string;
   draft: Record<EditableKey, string>;
   themeDraft: ThemeColors;
   enabledDraft: boolean;
@@ -79,6 +81,7 @@ export function createSubmissionRowState(
 ): SubmissionRowState {
   return {
     editing: false,
+    rejectNote: '',
     draft: buildSubmissionDraft(submission),
     themeDraft: parseThemeJson(submission.theme_json),
     enabledDraft: submission.enabled === 1,
@@ -95,6 +98,8 @@ export function createSubmissionRowState(
 export type SubmissionRowAction =
   | { type: 'submissionChanged'; submission: NovaSubmission }
   | { type: 'editStarted' }
+  | { type: 'rejectNoteChanged'; value: string }
+  | { type: 'rejectNoteCleared' }
   | { type: 'editCancelled'; submission: NovaSubmission }
   | { type: 'draftFieldChanged'; key: EditableKey; value: string }
   | { type: 'themeColorChanged'; key: keyof ThemeColors; value: string }
@@ -139,6 +144,10 @@ export function submissionRowReducer(
       return resetDrafts(state, action.submission);
     case 'editStarted':
       return { ...state, editing: true };
+    case 'rejectNoteChanged':
+      return { ...state, rejectNote: action.value };
+    case 'rejectNoteCleared':
+      return { ...state, rejectNote: '' };
     case 'editCancelled':
       return {
         ...resetDrafts(state, action.submission),

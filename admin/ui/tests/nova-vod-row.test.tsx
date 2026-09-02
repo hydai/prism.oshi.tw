@@ -38,9 +38,7 @@ async function main(): Promise<void> {
           showStreamer={opts.showStreamer ?? false}
           songs={[]}
           onToggle={() => undefined}
-          rejectNote=""
-          onRejectNoteChange={() => undefined}
-          onAction={() => undefined}
+          onAction={async () => true}
           onDelete={() => undefined}
           actionLoading={false}
         />
