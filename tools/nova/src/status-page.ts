@@ -1,16 +1,7 @@
 import { html, raw } from 'hono/html';
 import type { SubmissionSummary, VodSubmissionSummary, AdminStreamSummary } from './types';
 import { DARK_MODE_CSS, DARK_MODE_DETECT_SCRIPT, PRISM_CSS, SPARKLE_SVG, svgIcon, themeToggleHTML } from './theme';
-
-/** Escape HTML special characters in user-provided strings. */
-function esc(s: string): string {
-  return s
-    .replace(/&/g, '&amp;')
-    .replace(/</g, '&lt;')
-    .replace(/>/g, '&gt;')
-    .replace(/"/g, '&quot;')
-    .replace(/'/g, '&#39;');
-}
+import { escapeHtml as esc } from '../../shared/web/html';
 
 function statusBadge(status: string): string {
   const labels: Record<string, string> = { pending: '審核中', approved: '已通過', rejected: '已拒絕', admin_done: '已收錄' };

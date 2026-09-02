@@ -2,16 +2,7 @@ import { html, raw } from 'hono/html';
 import type { ApprovedStreamer } from './types';
 import { DARK_MODE_CSS, DARK_MODE_DETECT_SCRIPT, PRISM_CSS, SPARKLE_SVG, svgIcon, themeToggleHTML } from './theme';
 import { VOD_FIELD_LIMITS, validateSlug } from './validate';
-
-/** Escape HTML special characters before inserting trusted markup with raw(). */
-function escapeHtml(value: string): string {
-  return value
-    .replace(/&/g, '&amp;')
-    .replace(/</g, '&lt;')
-    .replace(/>/g, '&gt;')
-    .replace(/"/g, '&quot;')
-    .replace(/'/g, '&#39;');
-}
+import { escapeHtml } from '../../shared/web/html';
 
 const VOD_SCRIPT = String.raw`
     (function() {
