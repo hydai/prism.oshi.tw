@@ -1,17 +1,21 @@
-import { useState, useEffect, useEffectEvent, useRef, useCallback, useMemo } from 'react';
+import { useState, useEffect, useRef, useCallback, useMemo } from 'react';
 import { useParams, useNavigate, Link, useSearchParams } from 'react-router-dom';
 import type { AuthUser, StreamDetail as StreamDetailType, StampPerformance, Status, Stream } from '../../../shared/types';
 import { api } from '../api/client';
 import StatusBadge from '../components/StatusBadge';
 import { YouTubePlayer } from '../components/YouTubePlayer';
 import type { YouTubePlayerHandle } from '../components/YouTubePlayer';
-import { parseTextToSongs, formatSongList, parsedSongKey } from '../../../shared/parse';
-import { fetchItunesDuration, summarizeDurationOutcome } from '../lib/itunes';
-import { runWithLoadingState } from '../lib/loadingState';
-import type { OutcomeTone } from '../lib/itunes';
+import { formatSongList } from '../../../shared/parse';
 import { FetchLogPanel } from '../components/FetchLogPanel';
-import type { FetchLogEntry } from '../components/FetchLogPanel';
 import { FloatingPlaybackPill } from '../components/FloatingPlaybackPill';
+import { Toast } from '../components/stamp/Toast';
+import { InlineEdit } from '../components/stamp/InlineEdit';
+import { AddSongModal } from '../components/stamp/AddSongModal';
+import { PasteImportModal } from '../components/stamp/PasteImportModal';
+import { useToast } from '../hooks/useToast';
+import { useFetchLog } from '../hooks/useFetchLog';
+import { useEditorShortcuts } from '../hooks/useEditorShortcuts';
+import { useFetchAllDurations } from '../hooks/useFetchAllDurations';
 
 // --- Helpers ---
 
@@ -22,61 +26,6 @@ function formatTimestamp(sec: number): string {
   const s = total % 60;
   if (h > 0) return `${h}:${String(m).padStart(2, '0')}:${String(s).padStart(2, '0')}`;
   return `${m}:${String(s).padStart(2, '0')}`;
-}
-
-// --- Toast ---
-
-interface ToastState { message: string; isError: boolean; key: number }
-
-function Toast({ toast }: { toast: ToastState | null }) {
-  const [visible, setVisible] = useState(false);
-  const timerRef = useRef<ReturnType<typeof setTimeout>>(undefined);
-
-  useEffect(() => {
-    if (!toast) return;
-    setVisible(true);
-    clearTimeout(timerRef.current);
-    timerRef.current = setTimeout(() => setVisible(false), 2000);
-    return () => clearTimeout(timerRef.current);
-  }, [toast]);
-
-  if (!toast || !visible) return null;
-  return (
-    <div className={`fixed bottom-6 left-1/2 z-50 -translate-x-1/2 rounded-lg px-4 py-2 text-sm font-medium shadow-lg ${toast.isError ? 'bg-red-600 text-white' : 'bg-slate-800 text-white'}`}>
-      {toast.message}
-    </div>
-  );
-}
-
-// --- Inline Edit ---
-
-function InlineEdit({ value, placeholder, onSave, onCancel }: {
-  value: string; placeholder?: string;
-  onSave: (val: string) => void; onCancel: () => void;
-}) {
-  const [text, setText] = useState(value);
-  const inputRef = useRef<HTMLInputElement>(null);
-
-  useEffect(() => { inputRef.current?.focus(); inputRef.current?.select(); }, []);
-
-  const commit = () => {
-    const trimmed = text.trim();
-    if (trimmed !== value) onSave(trimmed);
-    else onCancel();
-  };
-
-  return (
-    <input
-      ref={inputRef} type="text" value={text} placeholder={placeholder}
-      onChange={(e) => setText(e.target.value)}
-      onKeyDown={(e) => {
-        if (e.key === 'Enter') { e.preventDefault(); commit(); }
-        if (e.key === 'Escape') { e.preventDefault(); onCancel(); }
-      }}
-      onBlur={onCancel}
-      className="w-full rounded border border-blue-400 px-1.5 py-0.5 text-sm focus:outline-none focus:ring-1 focus:ring-blue-500"
-    />
-  );
 }
 
 // --- Inline Date Edit ---
@@ -109,136 +58,6 @@ function InlineDateEdit({ value, label, onSave, onCancel }: {
   );
 }
 
-// --- Add Song Modal ---
-
-function AddSongModal({ onSubmit, onCancel }: {
-  onSubmit: (title: string, artist: string) => void;
-  onCancel: () => void;
-}) {
-  const [title, setTitle] = useState('');
-  const [artist, setArtist] = useState('');
-  const inputRef = useRef<HTMLInputElement>(null);
-
-  useEffect(() => { inputRef.current?.focus(); }, []);
-
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!title.trim()) return;
-    onSubmit(title.trim(), artist.trim());
-  };
-
-  return (
-    <div className="fixed inset-0 z-40 flex items-center justify-center bg-black/40">
-      <form onSubmit={handleSubmit} className="w-full max-w-sm rounded-lg bg-white p-6 shadow-xl">
-        <h3 className="text-lg font-semibold text-slate-800">Add Song</h3>
-        <div className="mt-4 space-y-3">
-          <input ref={inputRef} type="text" aria-label="Song title" placeholder="Song title *" value={title}
-            onChange={(e) => setTitle(e.target.value)}
-            className="w-full rounded-md border border-slate-300 px-3 py-2 text-sm focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500"
-            required />
-          <input type="text" aria-label="Original artist" placeholder="Original artist" value={artist}
-            onChange={(e) => setArtist(e.target.value)}
-            className="w-full rounded-md border border-slate-300 px-3 py-2 text-sm focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500" />
-        </div>
-        <div className="mt-5 flex justify-end gap-2">
-          <button type="button" onClick={onCancel}
-            className="rounded-md px-3 py-1.5 text-sm text-slate-600 hover:bg-slate-100">Cancel</button>
-          <button type="submit"
-            className="rounded-md bg-blue-600 px-4 py-1.5 text-sm font-medium text-white hover:bg-blue-700">Add</button>
-        </div>
-      </form>
-    </div>
-  );
-}
-
-// --- Paste Import Modal ---
-
-function PasteImportModal({ streamId, hasExisting, onDone, onCancel }: {
-  streamId: string; hasExisting: boolean;
-  onDone: (result: { created: number; replaced: boolean }) => void;
-  onCancel: () => void;
-}) {
-  const [text, setText] = useState('');
-  const [replaceMode, setReplaceMode] = useState(false);
-  const [importing, setImporting] = useState(false);
-  const [error, setError] = useState<string | null>(null);
-  const textareaRef = useRef<HTMLTextAreaElement>(null);
-
-  useEffect(() => { textareaRef.current?.focus(); }, []);
-
-  const preview = (() => parseTextToSongs(text))();
-
-  const handleImport = async () => {
-    if (preview.length === 0) return;
-    setImporting(true); setError(null);
-    try {
-      const result = await api.pasteImport(streamId, { text, replace: replaceMode });
-      if (!result.ok) { setError(result.errors.join(', ') || 'Import failed'); setImporting(false); return; }
-      onDone({ created: result.created, replaced: result.replaced });
-    } catch (err: unknown) {
-      setError(err instanceof Error ? err.message : 'Import failed'); setImporting(false);
-    }
-  };
-
-  return (
-    <div className="fixed inset-0 z-40 flex items-center justify-center bg-black/40">
-      <div className="flex w-full max-w-2xl flex-col rounded-lg bg-white shadow-xl" style={{ maxHeight: '85vh' }}>
-        <div className="border-b border-slate-200 px-6 py-4">
-          <h3 className="text-lg font-semibold text-slate-800">Paste Import</h3>
-          <p className="mt-1 text-sm text-slate-500">Paste a timestamp list (e.g. &quot;5:30 Song Name - Artist&quot;)</p>
-        </div>
-        <div className="flex-1 overflow-y-auto px-6 py-4">
-          <textarea ref={textareaRef} aria-label="Paste a timestamp list" value={text} onChange={(e) => setText(e.target.value)}
-            placeholder={`0:00 Song Title / Artist Name\n3:45 Another Song - Another Artist`}
-            className="h-40 w-full rounded-md border border-slate-300 px-3 py-2 font-mono text-sm focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500"
-          />
-          {hasExisting && (
-            <label className="mt-3 flex items-center gap-2 text-sm text-slate-600">
-              <input type="checkbox" checked={replaceMode} onChange={(e) => setReplaceMode(e.target.checked)} className="rounded border-slate-300" />
-              Replace existing performances
-            </label>
-          )}
-          {preview.length > 0 && (
-            <div className="mt-4">
-              <h4 className="text-sm font-medium text-slate-700">Preview ({preview.length} songs)</h4>
-              <div className="mt-2 max-h-48 overflow-y-auto rounded-md border border-slate-200">
-                <table className="w-full text-left text-sm">
-                  <thead className="sticky top-0 border-b border-slate-200 bg-slate-50 text-xs uppercase text-slate-500">
-                    <tr>
-                      <th className="px-3 py-2">#</th><th className="px-3 py-2">Start</th>
-                      <th className="px-3 py-2">End</th><th className="px-3 py-2">Title</th>
-                      <th className="px-3 py-2">Artist</th>
-                    </tr>
-                  </thead>
-                  <tbody className="divide-y divide-slate-100">
-                    {preview.map((song, i) => (
-                      <tr key={parsedSongKey(song)} className="hover:bg-slate-50">
-                        <td className="px-3 py-1.5 text-slate-400">{i + 1}</td>
-                        <td className="px-3 py-1.5 font-mono text-xs">{song.startTimestamp}</td>
-                        <td className="px-3 py-1.5 font-mono text-xs text-slate-400">{song.endTimestamp ?? '—'}</td>
-                        <td className="px-3 py-1.5 font-medium text-slate-800">{song.songName}</td>
-                        <td className="px-3 py-1.5 text-slate-500">{song.artist || '—'}</td>
-                      </tr>
-                    ))}
-                  </tbody>
-                </table>
-              </div>
-            </div>
-          )}
-          {error && <p className="mt-3 text-sm text-red-600">{error}</p>}
-        </div>
-        <div className="flex justify-end gap-2 border-t border-slate-200 px-6 py-4">
-          <button onClick={onCancel} className="rounded-md px-3 py-1.5 text-sm text-slate-600 hover:bg-slate-100" disabled={importing}>Cancel</button>
-          <button onClick={handleImport} disabled={preview.length === 0 || importing}
-            className="rounded-md bg-blue-600 px-4 py-1.5 text-sm font-medium text-white hover:bg-blue-700 disabled:opacity-50">
-            {importing ? 'Importing...' : `Import ${preview.length} Songs`}
-          </button>
-        </div>
-      </div>
-    </div>
-  );
-}
-
 // --- Main component ---
 
 type EditingField =
@@ -253,10 +72,8 @@ function useStreamDetailController(user: AuthUser) {
   const [detail, setDetail] = useState<StreamDetailType | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const [toast, setToast] = useState<ToastState | null>(null);
   const [editingField, setEditingField] = useState<EditingField | null>(null);
   const [showPasteImport, setShowPasteImport] = useState(false);
-  const toastKeyRef = useRef(0);
   const playerRef = useRef<YouTubePlayerHandle>(null);
   const playerBoxRef = useRef<HTMLDivElement>(null);
   const [currentTime, setCurrentTime] = useState(0);
@@ -265,21 +82,11 @@ function useStreamDetailController(user: AuthUser) {
   const [allStreams, setAllStreams] = useState<Stream[]>([]);
   const [selectedIndex, setSelectedIndex] = useState(-1);
   const [showAddModal, setShowAddModal] = useState(false);
-  const [isFetchingAll, setIsFetchingAll] = useState(false);
-  const [fetchLog, setFetchLog] = useState<FetchLogEntry[]>([]);
-  const fetchLogKeyRef = useRef(0);
 
   const isCurator = user.role === 'curator';
 
-  const showToast = useCallback((message: string, isError = false) => {
-    toastKeyRef.current += 1;
-    setToast({ message, isError, key: toastKeyRef.current });
-  }, []);
-
-  const appendFetchLog = useCallback((title: string, tone: OutcomeTone, text: string) => {
-    fetchLogKeyRef.current += 1;
-    setFetchLog((prev) => [{ key: fetchLogKeyRef.current, title, tone, text }, ...prev]);
-  }, []);
+  const { toast, showToast } = useToast();
+  const { fetchLog, appendFetchLog, clearFetchLog } = useFetchLog();
 
   // --- Poll current playback time ---
   useEffect(() => {
@@ -597,113 +404,6 @@ function useStreamDetailController(user: AuthUser) {
     }
   }, [streamId, showToast]);
 
-  const fetchDuration = useCallback(async () => {
-    if (selectedIndex < 0 || !detail) return;
-    if (isFetchingAll) {
-      showToast('Batch fetch in progress — wait for it to finish', true);
-      return;
-    }
-    const perf = detail.performances[selectedIndex];
-    if (!perf) return;
-    if (perf.endTimestamp !== null) {
-      showToast(`${perf.title}: already has end timestamp`);
-      return;
-    }
-
-    showToast(`Fetching duration for ${perf.title}...`);
-    const outcome = await fetchItunesDuration(perf.originalArtist, perf.title);
-    const summary = summarizeDurationOutcome(outcome);
-    appendFetchLog(perf.title, summary.tone, summary.text);
-
-    if (outcome.status !== 'found') {
-      showToast(`${perf.title}: ${summary.text}`, true);
-      return;
-    }
-
-    const endTimestamp = perf.timestamp + outcome.durationSec;
-    try {
-      await api.updatePerformanceTimestamps(perf.id, { endTimestamp });
-      updatePerformance(selectedIndex, { endTimestamp });
-      showToast(`${perf.title}: ${outcome.durationSec}s (${outcome.matchConfidence})`);
-    } catch (err: unknown) {
-      const msg = err instanceof Error ? err.message : 'Failed to save end timestamp';
-      appendFetchLog(perf.title, 'error', `Found ${outcome.durationSec}s but saving failed: ${msg}`);
-      showToast(msg, true);
-    }
-  }, [detail, selectedIndex, isFetchingAll, showToast, updatePerformance, appendFetchLog]);
-
-  const fetchAllDurations = useCallback(async () => {
-    if (isFetchingAll || !detail) return;
-    const missing = detail.performances
-      .map((p, i) => ({ perf: p, index: i }))
-      .filter(({ perf }) => perf.endTimestamp === null);
-    if (missing.length === 0) {
-      showToast('All songs already have end timestamps');
-      return;
-    }
-
-    try {
-      await runWithLoadingState(setIsFetchingAll, async () => {
-        let fetched = 0;
-        let noMatch = 0;
-        let errors = 0;
-        let consecutiveErrors = 0;
-        let aborted = false;
-
-        for (let i = 0; i < missing.length; i++) {
-          const { perf, index } = missing[i]!;
-          showToast(`Fetching ${i + 1}/${missing.length}: ${perf.title}...`);
-
-          const outcome = await fetchItunesDuration(perf.originalArtist, perf.title);
-          const summary = summarizeDurationOutcome(outcome);
-          appendFetchLog(perf.title, summary.tone, summary.text);
-
-          if (outcome.status === 'found') {
-            consecutiveErrors = 0;
-            const endTimestamp = perf.timestamp + outcome.durationSec;
-            try {
-              await api.updatePerformanceTimestamps(perf.id, { endTimestamp });
-              updatePerformance(index, { endTimestamp });
-              fetched++;
-            } catch (err: unknown) {
-              errors++;
-              const msg = err instanceof Error ? err.message : 'unknown error';
-              appendFetchLog(perf.title, 'error', `Found ${outcome.durationSec}s but saving failed: ${msg}`);
-            }
-          } else if (outcome.status === 'no-match') {
-            consecutiveErrors = 0;
-            noMatch++;
-          } else if (outcome.status === 'rate-limited') {
-            aborted = true;
-            appendFetchLog(perf.title, 'error',
-              `Batch stopped at ${i + 1}/${missing.length} — wait ${outcome.retryAfterSec ?? '~60'}s, then press F to fetch the remaining songs.`);
-            break;
-          } else {
-            errors++;
-            consecutiveErrors++;
-            if (consecutiveErrors >= 3) {
-              aborted = true;
-              appendFetchLog(perf.title, 'error',
-                `Batch stopped at ${i + 1}/${missing.length} after 3 consecutive request failures — likely a network issue or Apple rate limiting this IP. Wait ~1 min, then press F to fetch the remaining songs.`);
-              break;
-            }
-          }
-        }
-
-        showToast(
-          aborted
-            ? `Stopped by iTunes errors — ${fetched} saved before stopping, see fetch log`
-            : `Fetched ${fetched}/${missing.length}, ${noMatch} no match, ${errors} errors — see fetch log`,
-          aborted,
-        );
-      });
-    } catch (err: unknown) {
-      const message = err instanceof Error ? err.message : 'unknown error';
-      appendFetchLog('Batch duration fetch', 'error', `Batch stopped unexpectedly: ${message}`);
-      showToast(`Batch duration fetch failed: ${message}`, true);
-    }
-  }, [detail, isFetchingAll, showToast, updatePerformance, appendFetchLog]);
-
   const handleAddSong = useCallback(async (title: string, artist: string) => {
     if (!streamId || !playerRef.current) return;
     const timestamp = Math.floor(playerRef.current.getCurrentTime());
@@ -722,44 +422,39 @@ function useStreamDetailController(user: AuthUser) {
     }
   }, [streamId, loadDetail, showToast]);
 
-  // --- Keyboard shortcuts ---
-  const handleShortcutKeyDown = useEffectEvent((e: KeyboardEvent) => {
-    const target = e.target as HTMLElement;
-    if (target.tagName === 'INPUT' || target.tagName === 'TEXTAREA') return;
-    if (showAddModal || showPasteImport) return;
+  // --- iTunes duration lookup ---
+  const saveEndTimestamp = useCallback(async (index: number, perf: StampPerformance, endTimestamp: number) => {
+    await api.updatePerformanceTimestamps(perf.id, { endTimestamp });
+    updatePerformance(index, { endTimestamp });
+  }, [updatePerformance]);
 
-    switch (e.key) {
-      case 'm': markEndTimestamp(); break;
-      case 't': markStartTimestamp(); break;
-      case 's': seekToStart(); break;
-      case 'e': seekToEnd(5); break;
-      case 'E': seekToEnd(0); break;
-      case 'n': selectNext(); break;
-      case 'p': selectPrev(); break;
-      case 'c': copyVodUrl(); break;
-      case 'f': fetchDuration(); break;
-      case 'F': fetchAllDurations(); break;
-      case 'x': exportSongList(); break;
-      case 'i': if (streamId) setShowPasteImport(true); break;
-      case 'ArrowLeft':
-        if (playerRef.current) {
-          e.preventDefault();
-          playerRef.current.seekTo(playerRef.current.getCurrentTime() - 5);
-        }
-        break;
-      case 'ArrowRight':
-        if (playerRef.current) {
-          e.preventDefault();
-          playerRef.current.seekTo(playerRef.current.getCurrentTime() + 5);
-        }
-        break;
-    }
+  const { fetchDuration, fetchAllDurations } = useFetchAllDurations({
+    performances: detail ? detail.performances : null,
+    selectedIndex,
+    showToast,
+    appendFetchLog,
+    saveEndTimestamp,
   });
 
-  useEffect(() => {
-    document.addEventListener('keydown', handleShortcutKeyDown);
-    return () => document.removeEventListener('keydown', handleShortcutKeyDown);
-  }, []);
+  // --- Keyboard shortcuts ---
+  useEditorShortcuts(
+    {
+      markEndTimestamp,
+      markStartTimestamp,
+      seekToStart,
+      seekToEnd,
+      selectNext,
+      selectPrev,
+      copyVideoUrl: copyVodUrl,
+      fetchDuration,
+      fetchAllDurations,
+      exportSongList,
+      openPasteImport: () => {
+        if (streamId) setShowPasteImport(true);
+      },
+    },
+    { playerRef, disabled: showAddModal || showPasteImport },
+  );
 
   // --- Derived values ---
   const unstampedCount = detail ? detail.performances.filter(p => p.endTimestamp === null).length : 0;
@@ -782,7 +477,7 @@ function useStreamDetailController(user: AuthUser) {
     showAddModal,
     setShowAddModal,
     fetchLog,
-    clearFetchLog: () => setFetchLog([]),
+    clearFetchLog,
     isCurator,
     prevStream,
     nextStream,
@@ -879,7 +574,7 @@ export function StreamDetailView({ controller }: { controller: StreamDetailContr
           <div>
             <h2 className="text-xl font-semibold text-slate-800">
               {editingField?.type === 'stream' && editingField.field === 'title' ? (
-                <InlineEdit value={detail.title} onSave={(v) => handleStreamSave('title', v)} onCancel={() => setEditingField(null)} />
+                <InlineEdit allowEmpty value={detail.title} onSave={(v) => handleStreamSave('title', v)} onCancel={() => setEditingField(null)} />
               ) : (
                 <span className={isCurator ? 'cursor-text' : ''} onDoubleClick={() => { if (isCurator) setEditingField({ type: 'stream', field: 'title' }); }} title={isCurator ? 'Double-click to edit' : undefined}>
                   {detail.title}
@@ -1055,6 +750,8 @@ export function StreamDetailView({ controller }: { controller: StreamDetailContr
         <PasteImportModal
           streamId={streamId}
           hasExisting={detail.performances.length > 0}
+          example={'0:00 Song Title / Artist Name\n3:45 Another Song - Another Artist'}
+          replaceLabel="Replace existing performances"
           onDone={handlePasteImportDone}
           onCancel={() => setShowPasteImport(false)}
         />
@@ -1111,7 +808,7 @@ function PerformanceTable({ controller }: { controller: StreamDetailController }
 
                 <td className="px-4 py-3">
                   {editingField?.type === 'perf' && editingField.perfId === perf.id && editingField.field === 'title' ? (
-                    <InlineEdit value={perf.title} onSave={(v) => handleSave(perf.id, 'title', v)} onCancel={() => setEditingField(null)} />
+                    <InlineEdit allowEmpty value={perf.title} onSave={(v) => handleSave(perf.id, 'title', v)} onCancel={() => setEditingField(null)} />
                   ) : (
                     <span className="cursor-text font-medium text-slate-800" onDoubleClick={(e) => { e.stopPropagation(); setEditingField({ type: 'perf', perfId: perf.id, field: 'title' }); }} title="Double-click to edit">
                       {perf.title}
@@ -1121,7 +818,7 @@ function PerformanceTable({ controller }: { controller: StreamDetailController }
 
                 <td className="px-4 py-3">
                   {editingField?.type === 'perf' && editingField.perfId === perf.id && editingField.field === 'artist' ? (
-                    <InlineEdit value={perf.originalArtist} placeholder="add artist" onSave={(v) => handleSave(perf.id, 'artist', v)} onCancel={() => setEditingField(null)} />
+                    <InlineEdit allowEmpty value={perf.originalArtist} placeholder="add artist" onSave={(v) => handleSave(perf.id, 'artist', v)} onCancel={() => setEditingField(null)} />
                   ) : (
                     <span className={`cursor-text ${perf.originalArtist ? 'text-slate-600' : 'italic text-slate-400'}`}
                       onDoubleClick={(e) => { e.stopPropagation(); setEditingField({ type: 'perf', perfId: perf.id, field: 'artist' }); }} title="Double-click to edit">
@@ -1153,7 +850,7 @@ function PerformanceTable({ controller }: { controller: StreamDetailController }
 
                 <td className="max-w-48 px-4 py-3">
                   {editingField?.type === 'perf' && editingField.perfId === perf.id && editingField.field === 'note' ? (
-                    <InlineEdit value={perf.note} placeholder="add note" onSave={(v) => handleSave(perf.id, 'note', v)} onCancel={() => setEditingField(null)} />
+                    <InlineEdit allowEmpty value={perf.note} placeholder="add note" onSave={(v) => handleSave(perf.id, 'note', v)} onCancel={() => setEditingField(null)} />
                   ) : (
                     <span className={`cursor-text truncate text-xs ${perf.note ? 'text-slate-600' : 'italic text-slate-400'}`}
                       onDoubleClick={(e) => { e.stopPropagation(); setEditingField({ type: 'perf', perfId: perf.id, field: 'note' }); }} title="Double-click to edit note">
