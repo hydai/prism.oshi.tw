@@ -1,5 +1,6 @@
 import { html, raw } from 'hono/html';
-import { DARK_MODE_CSS, DARK_MODE_DETECT_SCRIPT, PRISM_CSS, SPARKLE_SVG, svgIcon, themeToggleHTML } from './theme';
+import { pageShell } from '../../shared/web/page-shell';
+import { DARK_MODE_CSS, SPARKLE_SVG, svgIcon, themeToggleHTML } from './theme';
 import { LINK_URL_LIMIT, SUBMISSION_FIELD_LIMITS } from './validate';
 
 const SOCIAL_LINKS: Array<{ key: string; label: string; icon: Parameters<typeof svgIcon>[0]; brand: string }> = [
@@ -10,60 +11,7 @@ const SOCIAL_LINKS: Array<{ key: string; label: string; icon: Parameters<typeof 
   { key: 'twitch', label: 'Twitch', icon: 'twitch', brand: '#9146FF' },
 ];
 
-export function renderPage(siteKey: string) {
-  const socialInputs = SOCIAL_LINKS.map(({ key, label, icon }) => `
-            <div class="input-icon">${svgIcon(icon, 16)}<input type="url" name="link_${key}" placeholder="${label}" aria-label="${label}" class="form-input" maxlength="${LINK_URL_LIMIT}" /></div>`).join('');
-  const previewSocials = SOCIAL_LINKS.map(({ key, icon, brand }) =>
-    `<span id="preview-social-${key}" class="preview-social" data-brand="${brand}">${svgIcon(icon, 16)}</span>`).join('');
-
-  return html`<!doctype html>
-<html lang="zh-Hant">
-<head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Prism Nova — VTuber 提交</title>
-  <link rel="preconnect" href="https://fonts.googleapis.com" />
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700;0,9..40,900;1,9..40,400&display=swap" rel="stylesheet" />
-  <script src="https://challenges.cloudflare.com/turnstile/v0/api.js" async defer></script>
-  <style>
-    :root {
-      --accent-pink: #EC4899;
-      --accent-pink-dark: #DB2777;
-      --accent-pink-light: #F472B6;
-      --accent-blue: #3B82F6;
-      --accent-blue-light: #60A5FA;
-      --accent-purple: #8B5CF6;
-      --bg-page-start: #FFF0F5;
-      --bg-page-mid: #F0F8FF;
-      --bg-page-end: #E6E6FA;
-      --bg-surface-glass: #FFFFFF66;
-      --bg-surface-frosted: #FFFFFF99;
-      --text-primary: #1E293B;
-      --text-secondary: #64748B;
-      --text-tertiary: #94A3B8;
-      --border-default: #E2E8F0;
-      --border-glass: #FFFFFF66;
-      --border-accent-pink: #FBCFE8;
-      --radius-lg: 12px;
-      --radius-xl: 16px;
-      --radius-2xl: 20px;
-    }
-
-    ${raw(DARK_MODE_CSS)}
-    ${raw(PRISM_CSS)}
-
-    * { box-sizing: border-box; margin: 0; padding: 0; }
-    body {
-      font-family: 'DM Sans', system-ui, -apple-system, 'Segoe UI', sans-serif;
-      background: linear-gradient(135deg, var(--bg-page-start) 0%, var(--bg-page-mid) 50%, var(--bg-page-end) 100%);
-      background-attachment: fixed;
-      min-height: 100vh;
-      color: var(--text-primary);
-      -webkit-font-smoothing: antialiased;
-    }
-
-    /* two-column form: fields left, live preview right (one DOM preview, re-flowed on mobile) */
+const PAGE_CSS = `    /* two-column form: fields left, live preview right (one DOM preview, re-flowed on mobile) */
     .form-layout { display: grid; grid-template-columns: minmax(0, 1fr) 300px; grid-template-rows: auto 1fr; gap: 18px 32px; padding: 24px 32px 32px; }
     .form-col-a { grid-column: 1; grid-row: 1; }
     .form-col-b { grid-column: 1; grid-row: 2; }
@@ -100,137 +48,9 @@ export function renderPage(siteKey: string) {
     @media (min-width: 801px) {
       .preview-text { display: contents; }
     }
-  </style>
-  <script>${raw(DARK_MODE_DETECT_SCRIPT)}</script>
-</head>
-<body>
+`;
 
-  <div class="prism-page">
-    <div class="prism-shell">
-      <!-- Header -->
-      <div class="prism-hero">
-        <div class="prism-hero-tile">${raw(svgIcon('nova', 30))}</div>
-        <div class="prism-hero-stack">
-          <div class="prism-badge">${raw(SPARKLE_SVG)}推薦 VTuber</div>
-          <h1 class="prism-title">Prism Nova</h1>
-          <p class="prism-desc">提交你喜愛的 VTuber，讓我們為他／她建立 Prism 頁面</p>
-        </div>
-        <div class="prism-hero-actions">${raw(themeToggleHTML())}</div>
-      </div>
-
-      <form id="nova-form" class="form-layout">
-        <div class="form-col-a form-stack">
-          <div class="form-section"><span class="section-label">頻道</span></div>
-
-          <!-- YouTube Channel URL -->
-          <div>
-            <label class="form-label" for="f-youtube_channel_url">
-              YouTube 頻道網址 <span class="required">*</span>
-            </label>
-            <div class="input-icon">${raw(svgIcon('youtube', 16, 'color:#FF0000;'))}<input id="f-youtube_channel_url" type="url" name="youtube_channel_url" required
-              placeholder="https://www.youtube.com/@ChannelName"
-              class="form-input" maxlength="${SUBMISSION_FIELD_LIMITS.youtube_channel_url}" /></div>
-            <div id="url-check" class="check-line" style="display: none;"></div>
-            <p class="form-hint">輸入後會自動帶入頻道名稱、頭像與 YouTube 連結，都可以再修改。</p>
-          </div>
-
-          <div class="form-grid-2">
-            <!-- Display Name -->
-            <div>
-              <label class="form-label" for="f-display_name">
-                顯示名稱 <span class="required">*</span>
-              </label>
-              <div class="input-icon">${raw(svgIcon('user', 16))}<input id="f-display_name" type="text" name="display_name" required
-                placeholder="例：浠Mizuki"
-                class="form-input" maxlength="${SUBMISSION_FIELD_LIMITS.display_name}" /></div>
-            </div>
-
-            <!-- Group -->
-            <div>
-              <label class="form-label" for="f-group">箱 / 所屬公司 / 個人勢</label>
-              <div class="input-icon">${raw(svgIcon('building', 16))}<input id="f-group" type="text" name="group"
-                placeholder="例：個人勢、hololive"
-                class="form-input" maxlength="${SUBMISSION_FIELD_LIMITS.group}" /></div>
-            </div>
-          </div>
-        </div>
-
-        <!-- Live preview of the Prism page (desktop: sticky card; mobile: compact row under the channel fields) -->
-        <aside class="preview-col" aria-label="Prism 頁面預覽">
-          <div class="preview-sticky">
-            <div class="section-label">預覽</div>
-            <div class="glass-box preview-card">
-              <div class="preview-avatar-wrap" style="display: flex; flex-shrink: 0;">
-                <img id="preview-avatar" class="preview-avatar" alt="" style="display: none;" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'" />
-                <div id="preview-avatar-fallback" class="preview-avatar avatar-fallback" aria-hidden="true">${raw(SPARKLE_SVG.replace('width="12" height="12"', 'width="36" height="36"'))}</div>
-              </div>
-              <div class="preview-text">
-                <div class="prism-badge">${raw(SPARKLE_SVG)}VTuber</div>
-                <div id="preview-name" class="preview-name">—</div>
-                <div class="preview-meta"><span id="preview-group">—</span> <span class="dot">·</span> <strong id="preview-subs">—</strong> 訂閱者</div>
-                <div id="preview-desc" class="preview-desc"></div>
-                <div class="preview-socials">${raw(previewSocials)}</div>
-              </div>
-            </div>
-            <p class="form-hint" style="margin-top: 0;">審核通過後，Prism 首頁會以這個樣子呈現這位 VTuber。</p>
-          </div>
-        </aside>
-
-        <div class="form-col-b form-stack">
-          <div class="form-section"><span class="section-label">介紹</span></div>
-
-          <!-- Description -->
-          <div>
-            <label class="form-label" for="f-description">簡介</label>
-            <textarea id="f-description" name="description" rows="3"
-              placeholder="關於這位 VTuber 的簡短介紹…"
-              class="form-textarea" maxlength="${SUBMISSION_FIELD_LIMITS.description}"></textarea>
-          </div>
-
-          <div class="form-grid-2">
-            <!-- Avatar URL -->
-            <div>
-              <label class="form-label" for="f-avatar_url">頭像圖片網址</label>
-              <div class="input-icon">${raw(svgIcon('image', 16))}<input id="f-avatar_url" type="url" name="avatar_url"
-                placeholder="https://..."
-                class="form-input" maxlength="${SUBMISSION_FIELD_LIMITS.avatar_url}" /></div>
-            </div>
-
-            <!-- Subscriber Count -->
-            <div>
-              <label class="form-label" for="f-subscriber_count">訂閱數</label>
-              <div class="input-icon">${raw(svgIcon('users', 16))}<input id="f-subscriber_count" type="text" name="subscriber_count"
-                placeholder="例：21.8萬"
-                class="form-input" maxlength="${SUBMISSION_FIELD_LIMITS.subscriber_count}" /></div>
-            </div>
-          </div>
-
-          <!-- Social Links -->
-          <div class="form-section"><span class="section-label">社群連結（選填）</span></div>
-          <div class="form-grid-2" style="gap: 12px;">${raw(socialInputs)}
-          </div>
-
-          <!-- Turnstile + Submit -->
-          <div class="form-footer">
-            <div class="cf-turnstile" data-sitekey="${siteKey}" data-theme="auto"></div>
-            <button type="submit" id="submit-btn" class="btn-primary"><span id="submit-label">提交</span>${raw(svgIcon('arrowRight', 16))}</button>
-          </div>
-
-          <!-- Result message -->
-          <div id="result" style="display: none; text-align: center; font-size: 13px; padding: 12px 16px; border-radius: var(--radius-lg);"></div>
-        </div>
-      </form>
-    </div>
-
-    <div class="footer-links">
-      <a class="link-pill" href="/vod">${raw(svgIcon('film', 14))}提交歌回 VOD</a>
-      <a class="link-pill" href="/status">${raw(svgIcon('list', 14))}提交狀態</a>
-      <a class="link-pill" href="https://prism.oshi.tw" target="_blank" rel="noopener noreferrer">${raw(svgIcon('external', 14))}前往 Prism 歌單</a>
-    </div>
-    <p class="footer-tagline">Prism &mdash; 為你喜愛的 VTuber 打造歌單頁面</p>
-  </div>
-
-  <script>
+const PAGE_SCRIPT = `
     (function() {
       const form = document.getElementById('nova-form');
       const urlInput = form.querySelector('[name="youtube_channel_url"]');
@@ -399,7 +219,142 @@ export function renderPage(siteKey: string) {
         }
       });
     })();
-  </script>
-</body>
-</html>`;
+  `;
+
+export function renderPage(siteKey: string) {
+  const socialInputs = SOCIAL_LINKS.map(({ key, label, icon }) => `
+            <div class="input-icon">${svgIcon(icon, 16)}<input type="url" name="link_${key}" placeholder="${label}" aria-label="${label}" class="form-input" maxlength="${LINK_URL_LIMIT}" /></div>`).join('');
+  const previewSocials = SOCIAL_LINKS.map(({ key, icon, brand }) =>
+    `<span id="preview-social-${key}" class="preview-social" data-brand="${brand}">${svgIcon(icon, 16)}</span>`).join('');
+
+  const hero = String(html`      <div class="prism-hero">
+        <div class="prism-hero-tile">${raw(svgIcon('nova', 30))}</div>
+        <div class="prism-hero-stack">
+          <div class="prism-badge">${raw(SPARKLE_SVG)}推薦 VTuber</div>
+          <h1 class="prism-title">Prism Nova</h1>
+          <p class="prism-desc">提交你喜愛的 VTuber，讓我們為他／她建立 Prism 頁面</p>
+        </div>
+        <div class="prism-hero-actions">${raw(themeToggleHTML())}</div>
+      </div>`);
+
+  const body = String(html`      <form id="nova-form" class="form-layout">
+        <div class="form-col-a form-stack">
+          <div class="form-section"><span class="section-label">頻道</span></div>
+
+          <!-- YouTube Channel URL -->
+          <div>
+            <label class="form-label" for="f-youtube_channel_url">
+              YouTube 頻道網址 <span class="required">*</span>
+            </label>
+            <div class="input-icon">${raw(svgIcon('youtube', 16, 'color:#FF0000;'))}<input id="f-youtube_channel_url" type="url" name="youtube_channel_url" required
+              placeholder="https://www.youtube.com/@ChannelName"
+              class="form-input" maxlength="${SUBMISSION_FIELD_LIMITS.youtube_channel_url}" /></div>
+            <div id="url-check" class="check-line" style="display: none;"></div>
+            <p class="form-hint">輸入後會自動帶入頻道名稱、頭像與 YouTube 連結，都可以再修改。</p>
+          </div>
+
+          <div class="form-grid-2">
+            <!-- Display Name -->
+            <div>
+              <label class="form-label" for="f-display_name">
+                顯示名稱 <span class="required">*</span>
+              </label>
+              <div class="input-icon">${raw(svgIcon('user', 16))}<input id="f-display_name" type="text" name="display_name" required
+                placeholder="例：浠Mizuki"
+                class="form-input" maxlength="${SUBMISSION_FIELD_LIMITS.display_name}" /></div>
+            </div>
+
+            <!-- Group -->
+            <div>
+              <label class="form-label" for="f-group">箱 / 所屬公司 / 個人勢</label>
+              <div class="input-icon">${raw(svgIcon('building', 16))}<input id="f-group" type="text" name="group"
+                placeholder="例：個人勢、hololive"
+                class="form-input" maxlength="${SUBMISSION_FIELD_LIMITS.group}" /></div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Live preview of the Prism page (desktop: sticky card; mobile: compact row under the channel fields) -->
+        <aside class="preview-col" aria-label="Prism 頁面預覽">
+          <div class="preview-sticky">
+            <div class="section-label">預覽</div>
+            <div class="glass-box preview-card">
+              <div class="preview-avatar-wrap" style="display: flex; flex-shrink: 0;">
+                <img id="preview-avatar" class="preview-avatar" alt="" style="display: none;" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'" />
+                <div id="preview-avatar-fallback" class="preview-avatar avatar-fallback" aria-hidden="true">${raw(SPARKLE_SVG.replace('width="12" height="12"', 'width="36" height="36"'))}</div>
+              </div>
+              <div class="preview-text">
+                <div class="prism-badge">${raw(SPARKLE_SVG)}VTuber</div>
+                <div id="preview-name" class="preview-name">—</div>
+                <div class="preview-meta"><span id="preview-group">—</span> <span class="dot">·</span> <strong id="preview-subs">—</strong> 訂閱者</div>
+                <div id="preview-desc" class="preview-desc"></div>
+                <div class="preview-socials">${raw(previewSocials)}</div>
+              </div>
+            </div>
+            <p class="form-hint" style="margin-top: 0;">審核通過後，Prism 首頁會以這個樣子呈現這位 VTuber。</p>
+          </div>
+        </aside>
+
+        <div class="form-col-b form-stack">
+          <div class="form-section"><span class="section-label">介紹</span></div>
+
+          <!-- Description -->
+          <div>
+            <label class="form-label" for="f-description">簡介</label>
+            <textarea id="f-description" name="description" rows="3"
+              placeholder="關於這位 VTuber 的簡短介紹…"
+              class="form-textarea" maxlength="${SUBMISSION_FIELD_LIMITS.description}"></textarea>
+          </div>
+
+          <div class="form-grid-2">
+            <!-- Avatar URL -->
+            <div>
+              <label class="form-label" for="f-avatar_url">頭像圖片網址</label>
+              <div class="input-icon">${raw(svgIcon('image', 16))}<input id="f-avatar_url" type="url" name="avatar_url"
+                placeholder="https://..."
+                class="form-input" maxlength="${SUBMISSION_FIELD_LIMITS.avatar_url}" /></div>
+            </div>
+
+            <!-- Subscriber Count -->
+            <div>
+              <label class="form-label" for="f-subscriber_count">訂閱數</label>
+              <div class="input-icon">${raw(svgIcon('users', 16))}<input id="f-subscriber_count" type="text" name="subscriber_count"
+                placeholder="例：21.8萬"
+                class="form-input" maxlength="${SUBMISSION_FIELD_LIMITS.subscriber_count}" /></div>
+            </div>
+          </div>
+
+          <!-- Social Links -->
+          <div class="form-section"><span class="section-label">社群連結（選填）</span></div>
+          <div class="form-grid-2" style="gap: 12px;">${raw(socialInputs)}
+          </div>
+
+          <!-- Turnstile + Submit -->
+          <div class="form-footer">
+            <div class="cf-turnstile" data-sitekey="${siteKey}" data-theme="auto"></div>
+            <button type="submit" id="submit-btn" class="btn-primary"><span id="submit-label">提交</span>${raw(svgIcon('arrowRight', 16))}</button>
+          </div>
+
+          <!-- Result message -->
+          <div id="result" style="display: none; text-align: center; font-size: 13px; padding: 12px 16px; border-radius: var(--radius-lg);"></div>
+        </div>
+      </form>`);
+
+  const footer = String(html`    <div class="footer-links">
+      <a class="link-pill" href="/vod">${raw(svgIcon('film', 14))}提交歌回 VOD</a>
+      <a class="link-pill" href="/status">${raw(svgIcon('list', 14))}提交狀態</a>
+      <a class="link-pill" href="https://prism.oshi.tw" target="_blank" rel="noopener noreferrer">${raw(svgIcon('external', 14))}前往 Prism 歌單</a>
+    </div>
+    <p class="footer-tagline">Prism &mdash; 為你喜愛的 VTuber 打造歌單頁面</p>`);
+
+  return raw(pageShell({
+    title: 'Prism Nova — VTuber 提交',
+    turnstileLoader: true,
+    darkCss: DARK_MODE_CSS,
+    pageCss: PAGE_CSS,
+    hero,
+    body,
+    footer,
+    script: PAGE_SCRIPT,
+  }));
 }

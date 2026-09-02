@@ -1,7 +1,31 @@
 import { html, raw } from 'hono/html';
 import type { SubmissionSummary, VodSubmissionSummary, AdminStreamSummary } from './types';
-import { DARK_MODE_CSS, DARK_MODE_DETECT_SCRIPT, PRISM_CSS, SPARKLE_SVG, svgIcon, themeToggleHTML } from './theme';
+import { DARK_MODE_CSS, SPARKLE_SVG, svgIcon, themeToggleHTML } from './theme';
 import { escapeHtml as esc } from '../../shared/web/html';
+import { pageShell } from '../../shared/web/page-shell';
+
+const PAGE_CSS = `    .vt-row { grid-template-columns: 40px minmax(0, 1fr) 160px 140px 140px; }
+    .vod-row { grid-template-columns: 64px minmax(0, 1fr) 80px 110px 140px 140px; }
+    .vt-list { padding: 0 24px 8px; }
+    .vt-list .prism-list { margin-top: 4px; }
+    .vod-row .thumb { align-self: center; }
+
+    .empty-msg {
+      text-align: center;
+      padding: 32px 16px;
+      color: var(--text-tertiary);
+      font-size: 14px;
+    }
+    .empty-link { color: var(--accent-pink); text-decoration: none; font-size: 13px; font-weight: 600; }
+
+    @media (max-width: 640px) {
+      .vt-row { grid-template-columns: 40px minmax(0, 1fr); padding: 10px 12px; }
+      .vod-row { grid-template-columns: 56px minmax(0, 1fr); }
+      .vod-row .thumb { width: 56px; height: 32px; }
+      .vt-list { padding: 0 16px 8px; }
+      .prism-card-body { padding: 6px 4px 8px; }
+    }
+`;
 
 function statusBadge(status: string): string {
   const labels: Record<string, string> = { pending: '審核中', approved: '已通過', rejected: '已拒絕', admin_done: '已收錄' };
@@ -277,81 +301,7 @@ export function renderStatusPage(
   ];
   if (adminDoneCount > 0) vodSummary.push([adminDoneCount, '已收錄']);
 
-  return html`<!doctype html>
-<html lang="zh-Hant">
-<head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Prism Nova — 提交狀態</title>
-  <link rel="preconnect" href="https://fonts.googleapis.com" />
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700;0,9..40,900;1,9..40,400&display=swap" rel="stylesheet" />
-  <style>
-    :root {
-      --accent-pink: #EC4899;
-      --accent-pink-dark: #DB2777;
-      --accent-pink-light: #F472B6;
-      --accent-blue: #3B82F6;
-      --accent-blue-light: #60A5FA;
-      --accent-purple: #8B5CF6;
-      --bg-page-start: #FFF0F5;
-      --bg-page-mid: #F0F8FF;
-      --bg-page-end: #E6E6FA;
-      --bg-surface-glass: #FFFFFF66;
-      --bg-surface-frosted: #FFFFFF99;
-      --text-primary: #1E293B;
-      --text-secondary: #64748B;
-      --text-tertiary: #94A3B8;
-      --border-default: #E2E8F0;
-      --border-glass: #FFFFFF66;
-      --border-accent-pink: #FBCFE8;
-      --radius-lg: 12px;
-      --radius-xl: 16px;
-      --radius-2xl: 20px;
-    }
-
-    ${raw(DARK_MODE_CSS)}
-    ${raw(PRISM_CSS)}
-
-    * { box-sizing: border-box; margin: 0; padding: 0; }
-    body {
-      font-family: 'DM Sans', system-ui, -apple-system, 'Segoe UI', sans-serif;
-      background: linear-gradient(135deg, var(--bg-page-start) 0%, var(--bg-page-mid) 50%, var(--bg-page-end) 100%);
-      background-attachment: fixed;
-      min-height: 100vh;
-      color: var(--text-primary);
-      -webkit-font-smoothing: antialiased;
-    }
-
-    .vt-row { grid-template-columns: 40px minmax(0, 1fr) 160px 140px 140px; }
-    .vod-row { grid-template-columns: 64px minmax(0, 1fr) 80px 110px 140px 140px; }
-    .vt-list { padding: 0 24px 8px; }
-    .vt-list .prism-list { margin-top: 4px; }
-    .vod-row .thumb { align-self: center; }
-
-    .empty-msg {
-      text-align: center;
-      padding: 32px 16px;
-      color: var(--text-tertiary);
-      font-size: 14px;
-    }
-    .empty-link { color: var(--accent-pink); text-decoration: none; font-size: 13px; font-weight: 600; }
-
-    @media (max-width: 640px) {
-      .vt-row { grid-template-columns: 40px minmax(0, 1fr); padding: 10px 12px; }
-      .vod-row { grid-template-columns: 56px minmax(0, 1fr); }
-      .vod-row .thumb { width: 56px; height: 32px; }
-      .vt-list { padding: 0 16px 8px; }
-      .prism-card-body { padding: 6px 4px 8px; }
-    }
-  </style>
-  <script>${raw(DARK_MODE_DETECT_SCRIPT)}</script>
-</head>
-<body>
-  <div class="prism-page">
-    <div class="prism-shell">
-      <!-- Header -->
-      <div class="prism-hero">
+  const hero = String(html`      <div class="prism-hero">
         <div class="prism-hero-tile">${raw(svgIcon('nova', 30))}</div>
         <div class="prism-hero-stack">
           <div class="prism-badge">${raw(SPARKLE_SVG)}提交狀態</div>
@@ -359,9 +309,9 @@ export function renderStatusPage(
           <p class="prism-desc">提交狀態總覽 <span class="dot">·</span> <strong>${submissions.length} 位 VTuber、${totalVodCount} 場 VOD</strong></p>
         </div>
         <div class="prism-hero-actions">${raw(themeToggleHTML())}</div>
-      </div>
+      </div>`);
 
-      <!-- VTuber Submissions -->
+  const body = String(html`      <!-- VTuber Submissions -->
       <div class="prism-section">
         <span class="prism-section-title">VTuber 提交</span>
         <span class="badge badge-pink">${submissions.length} 筆</span>
@@ -403,17 +353,22 @@ export function renderStatusPage(
       </div>
       <div class="prism-card-stack">
         ${vodVisibleCount > 0 ? raw(vodSections) : raw(vodEmpty)}
-      </div>
-    </div>
+      </div>`);
 
-    <!-- Cross-links -->
+  const footer = String(html`    <!-- Cross-links -->
     <div class="footer-links">
       <a class="link-pill" href="/">${raw(svgIcon('plus', 14))}推薦新的 VTuber</a>
       <a class="link-pill" href="/vod">${raw(svgIcon('film', 14))}提交歌回 VOD</a>
       <a class="link-pill" href="https://prism.oshi.tw" target="_blank" rel="noopener noreferrer">${raw(svgIcon('external', 14))}前往 Prism 歌單</a>
     </div>
-    <p class="footer-tagline">Prism &mdash; 為你喜愛的 VTuber 打造歌單頁面</p>
-  </div>
-</body>
-</html>`;
+    <p class="footer-tagline">Prism &mdash; 為你喜愛的 VTuber 打造歌單頁面</p>`);
+
+  return raw(pageShell({
+    title: 'Prism Nova — 提交狀態',
+    darkCss: DARK_MODE_CSS,
+    pageCss: PAGE_CSS,
+    hero,
+    body,
+    footer,
+  }));
 }

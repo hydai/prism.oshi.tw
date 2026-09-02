@@ -1,6 +1,7 @@
 import { html, raw } from 'hono/html';
-import { DARK_MODE_CSS, DARK_MODE_DETECT_SCRIPT, PRISM_CSS, SPARKLE_SVG, svgIcon, themeToggleHTML } from './theme';
+import { DARK_MODE_CSS, SPARKLE_SVG, svgIcon, themeToggleHTML } from './theme';
 import { TICKET_FIELD_LIMITS } from './validate';
+import { pageShell } from '../../shared/web/page-shell';
 
 // Discord brand mark — lucide ships no Discord icon. Path from Discord's official
 // brand assets (same as app/components/DiscordIcon.tsx on the prism site).
@@ -29,58 +30,7 @@ function typeIconJson(): string {
   return JSON.stringify(Object.fromEntries(TYPE_TILES.map(({ type, icon }) => [type, svgIcon(icon, 13)])));
 }
 
-export function renderFormPage(siteKey: string) {
-  return html`<!doctype html>
-<html lang="zh-Hant">
-<head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Prism Crystal — 回報 / 建議</title>
-  <link rel="preconnect" href="https://fonts.googleapis.com" />
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700;0,9..40,900;1,9..40,400&display=swap" rel="stylesheet" />
-  <script>${raw(DARK_MODE_DETECT_SCRIPT)}</script>
-  <script src="https://challenges.cloudflare.com/turnstile/v0/api.js" async defer></script>
-  <style>
-    :root {
-      --accent-pink: #EC4899;
-      --accent-pink-dark: #DB2777;
-      --accent-pink-light: #F472B6;
-      --accent-blue: #3B82F6;
-      --accent-blue-light: #60A5FA;
-      --accent-purple: #8B5CF6;
-      --accent-purple-light: #A78BFA;
-      --bg-page-start: #FFF0F5;
-      --bg-page-mid: #F0F8FF;
-      --bg-page-end: #E6E6FA;
-      --bg-surface-glass: #FFFFFF66;
-      --bg-surface-frosted: #FFFFFF99;
-      --text-primary: #1E293B;
-      --text-secondary: #64748B;
-      --text-tertiary: #94A3B8;
-      --border-default: #E2E8F0;
-      --border-glass: #FFFFFF66;
-      --border-accent-pink: #FBCFE8;
-      --border-accent-purple: #DDD6FE;
-      --radius-lg: 12px;
-      --radius-xl: 16px;
-      --radius-2xl: 20px;
-    }
-
-    ${raw(DARK_MODE_CSS)}
-    ${raw(PRISM_CSS)}
-
-    * { box-sizing: border-box; margin: 0; padding: 0; }
-    body {
-      font-family: 'DM Sans', system-ui, -apple-system, 'Segoe UI', sans-serif;
-      background: linear-gradient(135deg, var(--bg-page-start) 0%, var(--bg-page-mid) 50%, var(--bg-page-end) 100%);
-      background-attachment: fixed;
-      min-height: 100vh;
-      color: var(--text-primary);
-      -webkit-font-smoothing: antialiased;
-    }
-
-    .crystal-form { padding: 24px 32px 32px; }
+const PAGE_CSS = `    .crystal-form { padding: 24px 32px 32px; }
     .sr-only { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0, 0, 0, 0); white-space: nowrap; border: 0; }
 
     /* type selector tiles */
@@ -161,112 +111,9 @@ export function renderFormPage(siteKey: string) {
       .reply-mode-btn { flex: 1; min-height: 44px; }
       .discord-tip { flex-wrap: wrap; }
     }
-  </style>
-</head>
-<body>
+`;
 
-  <div class="prism-page prism-page-narrow">
-    <div class="prism-shell">
-      <!-- Header -->
-      <div class="prism-hero">
-        <div class="prism-hero-tile">${raw(svgIcon('crystal', 30))}</div>
-        <div class="prism-hero-stack">
-          <div class="prism-badge">${raw(SPARKLE_SVG)}回報與建議</div>
-          <h1 class="prism-title">Prism Crystal</h1>
-          <p class="prism-desc">回報問題或建議新功能，幫助我們讓 Prism 更好</p>
-        </div>
-        <div class="prism-hero-actions">${raw(themeToggleHTML())}</div>
-      </div>
-
-      <form id="crystal-form" class="form-stack crystal-form">
-
-        <!-- Type selector -->
-        <div>
-          <span class="form-label" id="type-label">類型 <span class="required">*</span></span>
-          <div class="type-tiles" role="group" aria-labelledby="type-label">
-            ${raw(typeTileButtons())}
-          </div>
-        </div>
-
-        <!-- Title -->
-        <div>
-          <label class="form-label" for="title">標題 <span class="required">*</span></label>
-          <div class="input-icon">
-            ${raw(svgIcon('pencilLine', 16))}
-            <input type="text" id="title" class="form-input" placeholder="簡短描述問題或建議" maxlength="${TICKET_FIELD_LIMITS.title}" required />
-          </div>
-          <div id="similar-panel" class="glass-box similar-panel" style="display: none;">
-            <div class="similar-header">
-              <span>類似的既有回報</span>
-              <span id="similar-count" class="similar-count"></span>
-              <button type="button" id="similar-dismiss" class="similar-dismiss" aria-label="隱藏類似回報">隱藏</button>
-            </div>
-            <div id="similar-list" class="similar-list"></div>
-          </div>
-        </div>
-
-        <!-- Body -->
-        <div>
-          <label class="form-label" for="body">詳細描述 <span class="required">*</span></label>
-          <textarea id="body" class="form-textarea" rows="5" placeholder="請描述你遇到的問題或想要的功能…" maxlength="${TICKET_FIELD_LIMITS.body}" required></textarea>
-        </div>
-
-        <!-- Reply mode (public Q&A vs. private) -->
-        <div class="form-section"><span class="section-label">回覆方式</span></div>
-        <div class="reply-mode-wrap">
-          <div class="reply-mode" role="group" aria-label="回覆方式">
-            <button type="button" class="reply-mode-btn" data-reply-mode="public" aria-pressed="true">${raw(svgIcon('globe', 14))}公開在 Q&amp;A</button>
-            <button type="button" class="reply-mode-btn" data-reply-mode="private" aria-pressed="false">${raw(svgIcon('lock', 14))}私下回覆</button>
-          </div>
-          <input type="checkbox" id="public-toggle" class="sr-only" checked tabindex="-1" aria-hidden="true" />
-          <p class="form-hint" style="margin-top: 0;">你的問題與官方回覆會顯示在 Q&amp;A 頁面；選「私下回覆」會多出聯絡方式欄位（必填），只有管理員看得到。</p>
-        </div>
-
-        <!-- Contact (shown when public reply is NOT allowed) -->
-        <div id="contact-wrapper" class="contact-field hidden">
-          <label class="form-label" for="contact">聯絡方式 <span class="required">*</span></label>
-          <div class="input-icon">
-            ${raw(svgIcon('message', 16))}
-            <input type="text" id="contact" class="form-input" placeholder="Email / Discord / Twitter 等，讓我們能回覆你" maxlength="${TICKET_FIELD_LIMITS.contact}" />
-          </div>
-          <p class="form-hint">不公開回覆時必須提供聯絡方式</p>
-        </div>
-
-        <!-- Nickname -->
-        <div>
-          <label class="form-label" for="nickname">暱稱</label>
-          <div class="input-icon">
-            ${raw(svgIcon('user', 16))}
-            <input type="text" id="nickname" class="form-input" placeholder="選填，Q&amp;A 公開回覆時顯示" maxlength="${TICKET_FIELD_LIMITS.nickname}" />
-          </div>
-        </div>
-
-        <!-- Discord tip (always visible) -->
-        <div class="glass-box discord-tip">
-          ${raw(DISCORD_SVG)}
-          <span>也可以加入我們的 Discord 伺服器，直接在伺服器裡討論與回覆。</span>
-          <a class="link-pill" href="https://discord.gg/bUYva8q7Jr" target="_blank" rel="noopener noreferrer">加入 Discord ${raw(svgIcon('external', 12))}</a>
-        </div>
-
-        <!-- Turnstile + Submit -->
-        <div class="form-footer">
-          <div class="cf-turnstile" data-sitekey="${siteKey}" data-theme="auto"></div>
-          <button type="submit" class="btn-primary" id="submit-btn">送出回報 ${raw(svgIcon('arrowRight', 16))}</button>
-        </div>
-
-        <div id="result"></div>
-      </form>
-    </div>
-
-    <div class="footer-links">
-      <a class="link-pill" href="/qa">${raw(svgIcon('message', 14))}查看 Q&amp;A</a>
-      <a class="link-pill" href="https://nova.oshi.tw" target="_blank" rel="noopener noreferrer">${raw(svgIcon('plus', 14))}提議新 VTuber</a>
-      <a class="link-pill" href="https://prism.oshi.tw" target="_blank" rel="noopener noreferrer">${raw(svgIcon('external', 14))}前往 Prism 歌單</a>
-    </div>
-    <p class="footer-tagline">Prism &mdash; 為你喜愛的 VTuber 打造歌單頁面</p>
-  </div>
-
-  <script>
+const FORM_SCRIPT = `
     const form = document.getElementById('crystal-form');
     const resultEl = document.getElementById('result');
     const submitBtn = document.getElementById('submit-btn');
@@ -285,7 +132,7 @@ export function renderFormPage(siteKey: string) {
     const VALID_TYPES = { bug: 'Bug', feat: '功能建議', ui: 'UI', other: '其他' };
     const VALID_STATUSES = { pending: '處理中', replied: '已回覆', closed: '已關閉' };
     // Server-rendered constant icon markup per allow-listed type (never user data).
-    const TYPE_ICON_SVG = ${raw(typeIconJson())};
+    const TYPE_ICON_SVG = ${typeIconJson()};
     let similarTimer = null;
     let similarAbort = null;
     let similarDismissed = false;
@@ -484,7 +331,114 @@ export function renderFormPage(siteKey: string) {
         submitBtn.disabled = false;
       }
     });
-  </script>
-</body>
-</html>`;
+  `;
+
+export function renderFormPage(siteKey: string) {
+  const hero = String(html`      <div class="prism-hero">
+        <div class="prism-hero-tile">${raw(svgIcon('crystal', 30))}</div>
+        <div class="prism-hero-stack">
+          <div class="prism-badge">${raw(SPARKLE_SVG)}回報與建議</div>
+          <h1 class="prism-title">Prism Crystal</h1>
+          <p class="prism-desc">回報問題或建議新功能，幫助我們讓 Prism 更好</p>
+        </div>
+        <div class="prism-hero-actions">${raw(themeToggleHTML())}</div>
+      </div>`);
+
+  const body = String(html`      <form id="crystal-form" class="form-stack crystal-form">
+
+        <!-- Type selector -->
+        <div>
+          <span class="form-label" id="type-label">類型 <span class="required">*</span></span>
+          <div class="type-tiles" role="group" aria-labelledby="type-label">
+            ${raw(typeTileButtons())}
+          </div>
+        </div>
+
+        <!-- Title -->
+        <div>
+          <label class="form-label" for="title">標題 <span class="required">*</span></label>
+          <div class="input-icon">
+            ${raw(svgIcon('pencilLine', 16))}
+            <input type="text" id="title" class="form-input" placeholder="簡短描述問題或建議" maxlength="${TICKET_FIELD_LIMITS.title}" required />
+          </div>
+          <div id="similar-panel" class="glass-box similar-panel" style="display: none;">
+            <div class="similar-header">
+              <span>類似的既有回報</span>
+              <span id="similar-count" class="similar-count"></span>
+              <button type="button" id="similar-dismiss" class="similar-dismiss" aria-label="隱藏類似回報">隱藏</button>
+            </div>
+            <div id="similar-list" class="similar-list"></div>
+          </div>
+        </div>
+
+        <!-- Body -->
+        <div>
+          <label class="form-label" for="body">詳細描述 <span class="required">*</span></label>
+          <textarea id="body" class="form-textarea" rows="5" placeholder="請描述你遇到的問題或想要的功能…" maxlength="${TICKET_FIELD_LIMITS.body}" required></textarea>
+        </div>
+
+        <!-- Reply mode (public Q&A vs. private) -->
+        <div class="form-section"><span class="section-label">回覆方式</span></div>
+        <div class="reply-mode-wrap">
+          <div class="reply-mode" role="group" aria-label="回覆方式">
+            <button type="button" class="reply-mode-btn" data-reply-mode="public" aria-pressed="true">${raw(svgIcon('globe', 14))}公開在 Q&amp;A</button>
+            <button type="button" class="reply-mode-btn" data-reply-mode="private" aria-pressed="false">${raw(svgIcon('lock', 14))}私下回覆</button>
+          </div>
+          <input type="checkbox" id="public-toggle" class="sr-only" checked tabindex="-1" aria-hidden="true" />
+          <p class="form-hint" style="margin-top: 0;">你的問題與官方回覆會顯示在 Q&amp;A 頁面；選「私下回覆」會多出聯絡方式欄位（必填），只有管理員看得到。</p>
+        </div>
+
+        <!-- Contact (shown when public reply is NOT allowed) -->
+        <div id="contact-wrapper" class="contact-field hidden">
+          <label class="form-label" for="contact">聯絡方式 <span class="required">*</span></label>
+          <div class="input-icon">
+            ${raw(svgIcon('message', 16))}
+            <input type="text" id="contact" class="form-input" placeholder="Email / Discord / Twitter 等，讓我們能回覆你" maxlength="${TICKET_FIELD_LIMITS.contact}" />
+          </div>
+          <p class="form-hint">不公開回覆時必須提供聯絡方式</p>
+        </div>
+
+        <!-- Nickname -->
+        <div>
+          <label class="form-label" for="nickname">暱稱</label>
+          <div class="input-icon">
+            ${raw(svgIcon('user', 16))}
+            <input type="text" id="nickname" class="form-input" placeholder="選填，Q&amp;A 公開回覆時顯示" maxlength="${TICKET_FIELD_LIMITS.nickname}" />
+          </div>
+        </div>
+
+        <!-- Discord tip (always visible) -->
+        <div class="glass-box discord-tip">
+          ${raw(DISCORD_SVG)}
+          <span>也可以加入我們的 Discord 伺服器，直接在伺服器裡討論與回覆。</span>
+          <a class="link-pill" href="https://discord.gg/bUYva8q7Jr" target="_blank" rel="noopener noreferrer">加入 Discord ${raw(svgIcon('external', 12))}</a>
+        </div>
+
+        <!-- Turnstile + Submit -->
+        <div class="form-footer">
+          <div class="cf-turnstile" data-sitekey="${siteKey}" data-theme="auto"></div>
+          <button type="submit" class="btn-primary" id="submit-btn">送出回報 ${raw(svgIcon('arrowRight', 16))}</button>
+        </div>
+
+        <div id="result"></div>
+      </form>`);
+
+  const footer = String(html`    <div class="footer-links">
+      <a class="link-pill" href="/qa">${raw(svgIcon('message', 14))}查看 Q&amp;A</a>
+      <a class="link-pill" href="https://nova.oshi.tw" target="_blank" rel="noopener noreferrer">${raw(svgIcon('plus', 14))}提議新 VTuber</a>
+      <a class="link-pill" href="https://prism.oshi.tw" target="_blank" rel="noopener noreferrer">${raw(svgIcon('external', 14))}前往 Prism 歌單</a>
+    </div>
+    <p class="footer-tagline">Prism &mdash; 為你喜愛的 VTuber 打造歌單頁面</p>`);
+
+  return raw(pageShell({
+    title: 'Prism Crystal — 回報 / 建議',
+    narrow: true,
+    turnstileLoader: true,
+    darkCss: DARK_MODE_CSS,
+    pageCss: PAGE_CSS,
+    hero,
+    body,
+    footer,
+    script: FORM_SCRIPT,
+  }));
 }
