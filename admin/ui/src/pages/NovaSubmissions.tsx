@@ -1,10 +1,10 @@
-import { useEffect, useReducer, useState } from 'react';
+import { useEffect, useMemo, useReducer, useState } from 'react';
 import type { Dispatch } from 'react';
 import type { AuthUser, NovaSubmission, NovaStatus, BulkFetchSubscribersResponse } from '../../../shared/types';
 import { sanitizeNovaUrl } from '../../../shared/nova-url-safety';
 import { api } from '../api/client';
 import { useApiResource, errorMessage } from '../lib/apiResource';
-import { countByStatus, removeById, replaceById } from '../lib/status-totals';
+import { countByStatus, matchesFilter, matchesSearch, removeById, replaceById } from '../lib/status-totals';
 import { useSearchParams } from 'react-router-dom';
 import { finiteInputNumber } from '../lib/numeric-input';
 import { Avatar } from '../components/prism/Avatar';
@@ -56,6 +56,8 @@ export default function NovaSubmissions({ user }: { user: AuthUser }) {
       : 'pending';
   });
   const [search, setSearch] = useState(() => initialParams.get('search') ?? '');
+  // The typed term only narrows the table once the search form is submitted.
+  const [appliedSearch, setAppliedSearch] = useState(() => initialParams.get('search') ?? '');
   const [expandedId, setExpandedId] = useState<string | null>(null);
   const [rejectNote, setRejectNote] = useState<Record<string, string>>({});
   const [actionLoading, setActionLoading] = useState<string | null>(null);
@@ -63,18 +65,18 @@ export default function NovaSubmissions({ user }: { user: AuthUser }) {
   const [fetchingAll, setFetchingAll] = useState(false);
   const [fetchAllResult, setFetchAllResult] = useState<BulkFetchSubscribersResponse | null>(null);
 
-  const list = useApiResource(
-    async () => {
-      const [res, all] = await Promise.all([
-        api.listNovaSubmissions({ status: statusFilter || undefined, search: search || undefined }),
-        api.listNovaSubmissions(),
-      ]);
-      return { submissions: res.data, allSubmissions: all.data };
-    },
-    [statusFilter],
+  // One unfiltered load feeds both the table and the hero totals; status and
+  // search narrow it here rather than costing a second request per keystroke.
+  const list = useApiResource(async () => (await api.listNovaSubmissions()).data, []);
+  // Stable reference while loading, so the filter memo doesn't recompute every render.
+  const allSubmissions = useMemo(() => list.data ?? [], [list.data]);
+  const submissions = useMemo(
+    () => allSubmissions.filter(
+      (sub) => matchesFilter(sub.status, statusFilter)
+        && matchesSearch([sub.id, sub.slug, sub.display_name, sub.youtube_channel_id], appliedSearch),
+    ),
+    [allSubmissions, statusFilter, appliedSearch],
   );
-  const submissions = list.data?.submissions ?? [];
-  const allSubmissions = list.data?.allSubmissions ?? [];
   const loading = list.loading;
 
   const handleAction = async (id: string, status: NovaStatus) => {
@@ -85,7 +87,7 @@ export default function NovaSubmissions({ user }: { user: AuthUser }) {
         status,
         reviewer_note: status === 'rejected' ? rejectNote[id] : undefined,
       });
-      list.mutate(({ submissions, allSubmissions }) => ({ submissions: replaceById(submissions, updated), allSubmissions: replaceById(allSubmissions, updated) }));
+      list.mutate((submissions) => replaceById(submissions, updated));
       setRejectNote((prev) => {
         const next = { ...prev };
         delete next[id];
@@ -104,7 +106,7 @@ export default function NovaSubmissions({ user }: { user: AuthUser }) {
     setActionError(null);
     try {
       await api.deleteNovaSubmission(sub.id);
-      list.mutate(({ submissions, allSubmissions }) => ({ submissions: removeById(submissions, sub.id), allSubmissions: removeById(allSubmissions, sub.id) }));
+      list.mutate((submissions) => removeById(submissions, sub.id));
     } catch (err) {
       setActionError(errorMessage(err, 'Delete failed'));
     } finally {
@@ -113,7 +115,7 @@ export default function NovaSubmissions({ user }: { user: AuthUser }) {
   };
 
   const handleSave = (updated: NovaSubmission) => {
-    list.mutate(({ submissions, allSubmissions }) => ({ submissions: replaceById(submissions, updated), allSubmissions: replaceById(allSubmissions, updated) }));
+    list.mutate((submissions) => replaceById(submissions, updated));
   };
 
   const handleFetchAll = async () => {
@@ -163,7 +165,7 @@ export default function NovaSubmissions({ user }: { user: AuthUser }) {
           <form
             onSubmit={(event) => {
               event.preventDefault();
-              list.reload();
+              setAppliedSearch(search);
             }}
           >
             <SearchInput

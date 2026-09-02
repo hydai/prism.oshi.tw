@@ -1,9 +1,9 @@
-import { useId, useState, type ReactNode } from 'react';
+import { useId, useMemo, useState, type ReactNode } from 'react';
 import type { AuthUser, NovaVodSubmission, NovaVodSong, NovaStatus } from '../../../shared/types';
 import { api } from '../api/client';
 import { sanitizeNovaUrl } from '../../../shared/nova-url-safety';
 import { useApiResource, errorMessage } from '../lib/apiResource';
-import { countByStatus, removeById, replaceById } from '../lib/status-totals';
+import { countByStatus, matchesFilter, removeById, replaceById } from '../lib/status-totals';
 import { Avatar } from '../components/prism/Avatar';
 import { GradientButton, OutlineButton } from '../components/prism/Buttons';
 import { Chip } from '../components/prism/Chip';
@@ -61,22 +61,17 @@ export default function NovaVodSubmissions({ user }: { user: AuthUser }) {
   const [actionError, setActionError] = useState<string | null>(null);
   const streamerFilterId = useId();
 
-  // Filtered list for the table + unfiltered copy for the hero totals and the streamer options.
-  const list = useApiResource(
-    async () => {
-      const [res, all] = await Promise.all([
-        api.listNovaVods({
-          status: statusFilter || undefined,
-          streamer: streamerFilter || undefined,
-        }),
-        api.listNovaVods(),
-      ]);
-      return { vods: res.data, allVods: all.data };
-    },
-    [statusFilter, streamerFilter],
+  // One unfiltered load feeds the table, the hero totals and the streamer options;
+  // the two filters narrow it here instead of costing a second request.
+  const list = useApiResource(async () => (await api.listNovaVods()).data, []);
+  // Stable reference while loading, so the filter memo doesn't recompute every render.
+  const allVods = useMemo(() => list.data ?? [], [list.data]);
+  const vods = useMemo(
+    () => allVods.filter(
+      (vod) => matchesFilter(vod.status, statusFilter) && matchesFilter(vod.streamer_slug, streamerFilter),
+    ),
+    [allVods, statusFilter, streamerFilter],
   );
-  const vods = list.data?.vods ?? [];
-  const allVods = list.data?.allVods ?? [];
   const loading = list.loading;
 
   const handleExpand = async (id: string) => {
@@ -104,7 +99,7 @@ export default function NovaVodSubmissions({ user }: { user: AuthUser }) {
         status,
         reviewer_note: status === 'rejected' ? rejectNote[id] : undefined,
       });
-      list.mutate(({ vods, allVods }) => ({ vods: replaceById(vods, updated), allVods: replaceById(allVods, updated) }));
+      list.mutate((vods) => replaceById(vods, updated));
       setRejectNote((prev) => {
         const next = { ...prev };
         delete next[id];
@@ -123,7 +118,7 @@ export default function NovaVodSubmissions({ user }: { user: AuthUser }) {
     setActionError(null);
     try {
       await api.deleteNovaVod(vod.id);
-      list.mutate(({ vods, allVods }) => ({ vods: removeById(vods, vod.id), allVods: removeById(allVods, vod.id) }));
+      list.mutate((vods) => removeById(vods, vod.id));
     } catch (err) {
       setActionError(errorMessage(err, 'Delete failed'));
     } finally {
