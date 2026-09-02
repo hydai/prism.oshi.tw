@@ -5,9 +5,9 @@ import { api } from '../api/client';
 import StatusBadge from '../components/StatusBadge';
 import { YouTubePlayer } from '../components/YouTubePlayer';
 import type { YouTubePlayerHandle } from '../components/YouTubePlayer';
-import { formatSongList } from '../../../shared/parse';
 import { FetchLogPanel } from '../components/FetchLogPanel';
 import { FloatingPlaybackPill } from '../components/FloatingPlaybackPill';
+import { PlaybackTime } from '../components/PlaybackTime';
 import { Toast } from '../components/stamp/Toast';
 import { InlineEdit } from '../components/stamp/InlineEdit';
 import { AddSongModal } from '../components/stamp/AddSongModal';
@@ -16,6 +16,8 @@ import { useToast } from '../hooks/useToast';
 import { useFetchLog } from '../hooks/useFetchLog';
 import { useEditorShortcuts } from '../hooks/useEditorShortcuts';
 import { useFetchAllDurations } from '../hooks/useFetchAllDurations';
+import { usePerformances } from '../hooks/usePerformances';
+import { usePlayerClock } from '../hooks/usePlayerClock';
 
 // --- Helpers ---
 
@@ -76,7 +78,8 @@ function useStreamDetailController(user: AuthUser) {
   const [showPasteImport, setShowPasteImport] = useState(false);
   const playerRef = useRef<YouTubePlayerHandle>(null);
   const playerBoxRef = useRef<HTMLDivElement>(null);
-  const [currentTime, setCurrentTime] = useState(0);
+  // The playback clock lives in an external store: only the pill and the readout hear its ticks.
+  usePlayerClock(playerRef);
 
   // --- New state for navigation & stamp features ---
   const [allStreams, setAllStreams] = useState<Stream[]>([]);
@@ -87,15 +90,6 @@ function useStreamDetailController(user: AuthUser) {
 
   const { toast, showToast } = useToast();
   const { fetchLog, appendFetchLog, clearFetchLog } = useFetchLog();
-
-  // --- Poll current playback time ---
-  useEffect(() => {
-    const interval = setInterval(() => {
-      const t = playerRef.current?.getCurrentTime() ?? 0;
-      setCurrentTime(t);
-    }, 500);
-    return () => clearInterval(interval);
-  }, []);
 
   // --- Fetch all streams for prev/next navigation ---
   useEffect(() => {
@@ -159,13 +153,47 @@ function useStreamDetailController(user: AuthUser) {
     return () => window.cancelAnimationFrame(frame);
   }, [detail, requestedPerformanceId]);
 
-  // --- Optimistic update helper ---
-  const updatePerformance = useCallback((index: number, updates: Partial<StampPerformance>) => {
+  // --- Optimistic update helpers ---
+  const patchRow = useCallback((index: number, updates: Partial<StampPerformance>) => {
     setDetail(prev => prev ? {
       ...prev,
       performances: prev.performances.map((p, i) => i === index ? { ...p, ...updates } : p),
     } : prev);
   }, []);
+
+  const patchAllRows = useCallback((updates: Partial<StampPerformance>) => {
+    setDetail(prev => prev ? {
+      ...prev,
+      performances: prev.performances.map(p => ({ ...p, ...updates })),
+    } : prev);
+  }, []);
+
+  const closeAddModal = useCallback(() => setShowAddModal(false), []);
+
+  const {
+    markEndTimestamp,
+    markStartTimestamp,
+    seekToStart,
+    seekToEnd,
+    selectNext,
+    selectPrev,
+    clearEndTimestamp,
+    clearAllEndTimestamps,
+    addSong,
+    saveEndTimestamp,
+    exportSongList,
+  } = usePerformances({
+    streamId,
+    performances: detail ? detail.performances : null,
+    selectedIndex,
+    setSelectedIndex,
+    playerRef,
+    showToast,
+    patchRow,
+    patchAllRows,
+    reload: loadDetail,
+    onSongCreated: closeAddModal,
+  });
 
   // --- Status action ---
   const handleStreamStatus = useCallback(async (status: Status) => {
@@ -301,133 +329,7 @@ function useStreamDetailController(user: AuthUser) {
     );
   }, [detail, showToast]);
 
-  // --- Export song list ---
-  const exportSongList = useCallback(() => {
-    if (!detail || detail.performances.length === 0) return;
-    const text = formatSongList(detail.performances);
-    navigator.clipboard.writeText(text).then(
-      () => showToast('Copied song list to clipboard'),
-      () => showToast('Failed to copy', true),
-    );
-  }, [detail, showToast]);
-
-  // --- Stamp editor actions ---
-
-  const markEndTimestamp = useCallback(async () => {
-    if (selectedIndex < 0 || !detail || !playerRef.current) return;
-    const perf = detail.performances[selectedIndex];
-    if (!perf) return;
-    const currentTime = Math.floor(playerRef.current.getCurrentTime());
-
-    try {
-      await api.updatePerformanceTimestamps(perf.id, { endTimestamp: currentTime });
-      updatePerformance(selectedIndex, { endTimestamp: currentTime });
-      showToast(`Marked ${perf.title} \u2192 ${formatTimestamp(currentTime)}`);
-
-      // Auto-advance to next unstamped
-      const nextIdx = detail.performances.findIndex(
-        (p, i) => i > selectedIndex && p.endTimestamp === null,
-      );
-      if (nextIdx >= 0) setSelectedIndex(nextIdx);
-    } catch (err: unknown) {
-      showToast(err instanceof Error ? err.message : 'Failed to mark timestamp', true);
-    }
-  }, [detail, selectedIndex, showToast, updatePerformance]);
-
-  const markStartTimestamp = useCallback(async () => {
-    if (selectedIndex < 0 || !detail || !playerRef.current) return;
-    const perf = detail.performances[selectedIndex];
-    if (!perf) return;
-    const currentTime = Math.floor(playerRef.current.getCurrentTime());
-
-    try {
-      await api.updatePerformanceTimestamps(perf.id, { timestamp: currentTime });
-      updatePerformance(selectedIndex, { timestamp: currentTime });
-      showToast(`Start ${perf.title} \u2192 ${formatTimestamp(currentTime)}`);
-    } catch (err: unknown) {
-      showToast(err instanceof Error ? err.message : 'Failed to mark start', true);
-    }
-  }, [detail, selectedIndex, showToast, updatePerformance]);
-
-  const seekToStart = useCallback(() => {
-    if (selectedIndex < 0 || !detail || !playerRef.current) return;
-    const perf = detail.performances[selectedIndex];
-    if (!perf) return;
-    playerRef.current.seekTo(perf.timestamp);
-    showToast(`Seek start → ${formatTimestamp(perf.timestamp)}`);
-  }, [detail, selectedIndex, showToast]);
-
-  const seekToEnd = useCallback((offsetSeconds: number) => {
-    if (selectedIndex < 0 || !detail || !playerRef.current) return;
-    const perf = detail.performances[selectedIndex];
-    if (!perf?.endTimestamp) return;
-    const target = Math.max(0, perf.endTimestamp - offsetSeconds);
-    playerRef.current.seekTo(target);
-    showToast(
-      offsetSeconds > 0
-        ? `Seek end -${offsetSeconds}s → ${formatTimestamp(target)} (end ${formatTimestamp(perf.endTimestamp)})`
-        : `Seek end → ${formatTimestamp(perf.endTimestamp)}`
-    );
-  }, [detail, selectedIndex, showToast]);
-
-  const selectNext = useCallback(() => {
-    if (!detail || detail.performances.length === 0) return;
-    setSelectedIndex(i => Math.min(i + 1, detail.performances.length - 1));
-  }, [detail]);
-
-  const selectPrev = useCallback(() => {
-    setSelectedIndex(i => Math.max(i - 1, 0));
-  }, []);
-
-  const clearEndTimestamp = useCallback(async (perfId: string, idx: number) => {
-    try {
-      await api.updatePerformanceTimestamps(perfId, { endTimestamp: null });
-      updatePerformance(idx, { endTimestamp: null });
-      showToast('Cleared end timestamp');
-    } catch (err: unknown) {
-      showToast(err instanceof Error ? err.message : 'Failed to clear', true);
-    }
-  }, [showToast, updatePerformance]);
-
-  const clearAllEndTimestamps = useCallback(async () => {
-    if (!streamId) return;
-    if (!confirm('Clear ALL end timestamps for this stream?')) return;
-    try {
-      const { cleared } = await api.clearAllEndTimestamps(streamId);
-      setDetail(prev => prev ? {
-        ...prev,
-        performances: prev.performances.map(p => ({ ...p, endTimestamp: null })),
-      } : prev);
-      showToast(`Cleared ${cleared} end timestamps`);
-    } catch (err: unknown) {
-      showToast(err instanceof Error ? err.message : 'Failed to clear', true);
-    }
-  }, [streamId, showToast]);
-
-  const handleAddSong = useCallback(async (title: string, artist: string) => {
-    if (!streamId || !playerRef.current) return;
-    const timestamp = Math.floor(playerRef.current.getCurrentTime());
-
-    try {
-      await api.createStampPerformance(streamId, {
-        title,
-        originalArtist: artist || 'Unknown',
-        timestamp,
-      });
-      setShowAddModal(false);
-      await loadDetail();
-      showToast(`Added ${title} at ${formatTimestamp(timestamp)}`);
-    } catch (err: unknown) {
-      showToast(err instanceof Error ? err.message : 'Failed to add song', true);
-    }
-  }, [streamId, loadDetail, showToast]);
-
   // --- iTunes duration lookup ---
-  const saveEndTimestamp = useCallback(async (index: number, perf: StampPerformance, endTimestamp: number) => {
-    await api.updatePerformanceTimestamps(perf.id, { endTimestamp });
-    updatePerformance(index, { endTimestamp });
-  }, [updatePerformance]);
-
   const { fetchDuration, fetchAllDurations } = useFetchAllDurations({
     performances: detail ? detail.performances : null,
     selectedIndex,
@@ -471,7 +373,6 @@ function useStreamDetailController(user: AuthUser) {
     setShowPasteImport,
     playerRef,
     playerBoxRef,
-    currentTime,
     selectedIndex,
     setSelectedIndex,
     showAddModal,
@@ -495,7 +396,7 @@ function useStreamDetailController(user: AuthUser) {
     handleUnapproveAll,
     clearEndTimestamp,
     clearAllEndTimestamps,
-    handleAddSong,
+    handleAddSong: addSong,
   };
 }
 
@@ -514,7 +415,6 @@ export function StreamDetailView({ controller }: { controller: StreamDetailContr
     setShowPasteImport,
     playerRef,
     playerBoxRef,
-    currentTime,
     selectedIndex,
     showAddModal,
     setShowAddModal,
@@ -635,16 +535,13 @@ export function StreamDetailView({ controller }: { controller: StreamDetailContr
 
         {/* Current playback time */}
         <div className="mt-2 flex items-center gap-2 text-sm">
-          <span className="font-mono text-lg font-semibold text-slate-800">
-            {formatTimestamp(currentTime)}
-          </span>
+          <PlaybackTime className="font-mono text-lg font-semibold text-slate-800" />
           <span className="text-slate-400">current</span>
         </div>
       </div>
 
       {/* Floating playback time pill (always visible; click scrolls back to the player) */}
       <FloatingPlaybackPill
-        currentTime={currentTime}
         perf={selectedIndex >= 0 ? detail.performances[selectedIndex] ?? null : null}
         onClick={() => playerBoxRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' })}
       />
