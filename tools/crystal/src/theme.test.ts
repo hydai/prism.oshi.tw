@@ -1,6 +1,6 @@
 import * as assert from 'node:assert/strict';
 
-import { PRISM_CSS, svgIcon, SPARKLE_SVG } from './theme';
+import { DARK_MODE_CSS, DARK_MODE_DETECT_SCRIPT, DARK_MODE_VARS_CSS, PRISM_CSS, svgIcon, SPARKLE_SVG, themeToggleHTML } from './theme';
 
 function test(name: string, fn: () => void): void {
   try {
@@ -46,6 +46,20 @@ test('svgIcon returns an empty string for unknown icon names', () => {
 test('SPARKLE_SVG is the prism badge sparkle', () => {
   assert.ok(SPARKLE_SVG.startsWith('<svg') && SPARKLE_SVG.includes('viewBox="0 0 12 12"'), 'sparkle is a 12px glyph');
   assert.ok(SPARKLE_SVG.includes('aria-hidden="true"'), 'sparkle is decorative');
+});
+
+test("DARK_MODE_CSS is the shared variables plus Crystal's own #result override", () => {
+  assert.ok(DARK_MODE_CSS.startsWith(DARK_MODE_VARS_CSS), 'it opens with the shared html.dark variables');
+  assert.ok(DARK_MODE_CSS.includes('html.dark #result.success'), 'the dark half of the result box stays here');
+  assert.ok(DARK_MODE_CSS.includes('html.dark #result.error'), 'both result states are covered');
+  assert.ok(!DARK_MODE_CSS.includes('--accent-purple-light'), 'the never-consumed purple-light var is gone');
+  assert.ok(!DARK_MODE_CSS.includes('--border-accent-purple'), 'the never-consumed purple border var is gone');
+  assert.ok(!DARK_MODE_CSS.includes('.result-msg'), "Nova's result banner never leaked into Crystal");
+});
+
+test('the shared theme module is re-exported so pages keep importing ./theme', () => {
+  assert.ok(DARK_MODE_DETECT_SCRIPT.includes("classList.add('dark')"), 'the shared detect script is re-exported');
+  assert.ok(themeToggleHTML().includes('id="theme-icon-moon"'), 'the shared theme toggle is re-exported');
 });
 
 console.log('\nAll theme tests passed.');

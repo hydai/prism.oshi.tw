@@ -1,0 +1,105 @@
+import {
+  DARK_MODE_DETECT_SCRIPT,
+  DARK_MODE_VARS_CSS,
+  ICON_PATHS,
+  PRISM_CSS,
+  SPARKLE_SVG,
+  svgIcon,
+  themeToggleHTML,
+  type IconName,
+} from './theme';
+
+declare const process: { exitCode?: number };
+
+function assert(condition: boolean, message: string): void {
+  if (!condition) {
+    throw new Error(message);
+  }
+}
+
+function testDarkModeVarsAreGenericOnly(): void {
+  assert(DARK_MODE_VARS_CSS.includes('html.dark {'), 'DARK_MODE_VARS_CSS opens the html.dark block');
+  assert(DARK_MODE_VARS_CSS.includes('color-scheme: dark;'), 'DARK_MODE_VARS_CSS sets the dark color scheme');
+  assert(DARK_MODE_VARS_CSS.includes('--accent-pink:'), 'DARK_MODE_VARS_CSS overrides the pink accent');
+  assert(DARK_MODE_VARS_CSS.includes('--text-primary:'), 'DARK_MODE_VARS_CSS overrides the primary text colour');
+
+  // Worker-local widget CSS must stay in the worker that renders the widget.
+  assert(!DARK_MODE_VARS_CSS.includes('.result-msg'), "Nova's result banner CSS stays in Nova");
+  assert(!DARK_MODE_VARS_CSS.includes('.check-ok'), "Nova's duplicate-check CSS stays in Nova");
+  assert(!DARK_MODE_VARS_CSS.includes('#result'), "Crystal's #result override stays in Crystal");
+  assert(!DARK_MODE_VARS_CSS.includes('.btn-secondary'), 'the dead .btn-secondary rule is gone');
+  assert(!DARK_MODE_VARS_CSS.includes('--accent-purple-light'), 'the never-consumed purple-light var is gone');
+  assert(!DARK_MODE_VARS_CSS.includes('--border-accent-purple'), 'the never-consumed purple border var is gone');
+  console.log('DARK_MODE_VARS_CSS carries only the generic html.dark variables');
+}
+
+function testPrismCssCarriesTheSharedVocabulary(): void {
+  for (const selector of [
+    '.prism-page-narrow',
+    '.prism-shell',
+    '.prism-hero',
+    '.prism-toolbar',
+    '.chip.active',
+    '.badge-admin_done',
+    '.prism-card',
+    '.btn-primary',
+    '.form-input',
+    '@media (max-width: 640px)',
+  ]) {
+    assert(PRISM_CSS.includes(selector), `PRISM_CSS must define ${selector}`);
+  }
+  // Nova's rule order is the one that survived the merge: .thumb before
+  // .avatar-fallback, so a thumbnail with the fallback class keeps its size.
+  assert(
+    PRISM_CSS.indexOf('.thumb {') < PRISM_CSS.indexOf('.avatar-fallback {'),
+    '.thumb is declared before .avatar-fallback',
+  );
+  console.log('PRISM_CSS carries the shared prism vocabulary in Nova order');
+}
+
+function testThemeToggleMarkup(): void {
+  const html = themeToggleHTML();
+  assert(html.includes('<button'), 'themeToggleHTML renders a <button>');
+  assert(html.includes('id="theme-toggle"'), 'the toggle button keeps its id');
+  assert(html.includes('aria-label="Toggle dark mode"'), 'the icon-only button is labelled');
+  assert(html.includes('id="theme-icon-moon"'), 'the moon icon uses the theme-icon-moon id');
+  assert(html.includes('id="theme-icon-sun"'), 'the sun icon uses the theme-icon-sun id');
+  assert(html.includes("getElementById('theme-icon-moon')"), 'the inline script targets the moon id it renders');
+  assert(html.includes("getElementById('theme-icon-sun')"), 'the inline script targets the sun id it renders');
+  assert(html.includes("localStorage.setItem('theme'"), 'clicking the toggle persists the choice');
+  console.log('themeToggleHTML renders one labelled button whose script matches its ids');
+}
+
+function testDetectScript(): void {
+  assert(DARK_MODE_DETECT_SCRIPT.includes("localStorage.getItem('theme')"), 'the detector reads the stored choice');
+  assert(
+    DARK_MODE_DETECT_SCRIPT.includes("matchMedia('(prefers-color-scheme:dark)')"),
+    'the detector falls back to the OS preference',
+  );
+  assert(DARK_MODE_DETECT_SCRIPT.includes("classList.add('dark')"), 'the detector sets html.dark before first paint');
+  assert(!DARK_MODE_DETECT_SCRIPT.includes('<script'), 'the detector is script body only; callers wrap it');
+  console.log('DARK_MODE_DETECT_SCRIPT is the shared pre-paint detector');
+}
+
+function testIcons(): void {
+  const svg = svgIcon('nova', 30);
+  assert(svg.startsWith('<svg') && svg.includes('width="30"') && svg.includes('height="30"'), 'svgIcon sizes the icon');
+  assert(svg.includes('aria-hidden="true"'), 'svgIcon icons are decorative');
+  assert(svg.includes('stroke="currentColor"'), 'svgIcon icons inherit the text colour');
+  assert(svgIcon('not-an-icon' as unknown as IconName) === '', 'unknown icon names render nothing');
+  assert(Object.keys(ICON_PATHS).length > 0 && 'crystal' in ICON_PATHS, 'ICON_PATHS carries the shared icon set');
+  assert(SPARKLE_SVG.includes('viewBox="0 0 12 12"'), 'sparkle glyph is the 12-grid star');
+  console.log('svgIcon / ICON_PATHS / SPARKLE_SVG render the shared icon set');
+}
+
+try {
+  testDarkModeVarsAreGenericOnly();
+  testPrismCssCarriesTheSharedVocabulary();
+  testThemeToggleMarkup();
+  testDetectScript();
+  testIcons();
+  console.log('theme.test: all passed');
+} catch (error) {
+  console.error(error);
+  process.exitCode = 1;
+}
