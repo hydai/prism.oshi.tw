@@ -185,7 +185,7 @@ function PasteImportModal({ streamId, hasExisting, onDone, onCancel }: {
       <div className="flex w-full max-w-2xl flex-col rounded-lg bg-white shadow-xl" style={{ maxHeight: '85vh' }}>
         <div className="border-b border-slate-200 px-6 py-4">
           <h3 className="text-lg font-semibold text-slate-800">Paste Import</h3>
-          <p className="mt-1 text-sm text-slate-500">Paste a timestamp list (e.g. "5:30 Song Name - Artist")</p>
+          <p className="mt-1 text-sm text-slate-500">Paste a timestamp list (e.g. &quot;5:30 Song Name - Artist&quot;)</p>
         </div>
         <div className="flex-1 overflow-y-auto px-6 py-4">
           <textarea ref={textareaRef} aria-label="Paste a timestamp list" value={text} onChange={(e) => setText(e.target.value)}

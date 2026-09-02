@@ -74,8 +74,8 @@ export default function App() {
         <Route path="/submit/song" element={<SubmitSong />} />
         <Route path="/submit/stream" element={<SubmitStream />} />
         <Route path="/stamp" element={<StampEditor user={user} />} />
-        <Route path="/pipeline" element={<Pipeline user={user} />} />
-        <Route path="/harmonizer" element={<Harmonizer user={user} />} />
+        <Route path="/pipeline" element={<Pipeline />} />
+        <Route path="/harmonizer" element={<Harmonizer />} />
         <Route path="/nova" element={<NovaSubmissions user={user} />} />
         <Route path="/nova/vods" element={<NovaVodSubmissions user={user} />} />
         <Route path="/crystal" element={<CrystalTickets user={user} />} />
