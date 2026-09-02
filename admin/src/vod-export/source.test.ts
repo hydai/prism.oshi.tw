@@ -1,4 +1,5 @@
-import { VOD_EXPORT_LIMITS } from './constants';
+import { D1_JSON_BINDING_MAX_BYTES, VOD_EXPORT_LIMITS } from './constants';
+import { ExportLimitExceededError } from './limits';
 import { readVodExportSource, VodExportSourceError } from './source';
 import { buildVodExportSnapshot } from './validation';
 import type {
@@ -11,7 +12,6 @@ import type {
 declare const process: { exitCode?: number };
 
 const encoder = new TextEncoder();
-const decoder = new TextDecoder();
 
 const ADMIN_TRIGGERS = [
   'vod_export_streams_insert_revision',
@@ -96,7 +96,7 @@ class FakeDatabase {
   sourceStatements(): FakeStatementView[] {
     const statements = this.sessions
       .flatMap((session) => session.statements)
-      .filter((candidate) => candidate.sql.includes('WITH RECURSIVE'));
+      .filter((candidate) => candidate.sql.includes('selected_streamers'));
     if (statements.length === 0) throw new Error('Admin source queries were not prepared');
     return statements;
   }
@@ -230,28 +230,10 @@ function sourceTextBytes(rows: readonly NovaRow[]): number {
   }, 0), 0);
 }
 
-function decodeScopeValues(values: readonly unknown[]): string[] {
-  const decoded: string[] = [];
-  for (const value of values) {
-    if (typeof value === 'string') {
-      assert(encoder.encode(value).byteLength <= 2_000_000, 'direct scope binding stays within D1 limit');
-      decoded.push(value);
-      continue;
-    }
-    assert(value instanceof Uint8Array, 'scope uses only strings or BLOB views');
-    assert(value.byteLength <= 1_900_000, 'packed scope BLOB stays below D1 limit');
-    let offset = 0;
-    while (offset < value.byteLength) {
-      const lengthText = decoder.decode(value.subarray(offset, offset + 8));
-      assert(/^\d{8}$/.test(lengthText), 'scope BLOB has an eight-digit length prefix');
-      const byteLength = Number(lengthText);
-      offset += 8;
-      decoded.push(decoder.decode(value.subarray(offset, offset + byteLength)));
-      offset += byteLength;
-    }
-    assert(offset === value.byteLength, 'scope BLOB framing consumes the exact payload');
-  }
-  return decoded;
+function scopeBinding(values: readonly unknown[]): string {
+  const binding = values[0];
+  assert(typeof binding === 'string', 'the streamer scope is one bound TEXT value');
+  return binding;
 }
 
 function bindSqlForSqlite(sql: string, values: readonly unknown[]): string {
@@ -291,16 +273,15 @@ function deepEqual(actual: unknown, expected: unknown, message: string): void {
 }
 
 async function testBoundedStreamerScope(): Promise<void> {
-  const escapedSlugs = Array.from(
-    { length: 400 },
-    (_, index) => `${'\u0000'.repeat(1_000)}${index}`,
+  const slugs = Array.from(
+    { length: VOD_EXPORT_LIMITS.streamers },
+    (_, index) => `streamer-${String(index).padStart(3, '0')}`,
   );
-  const largeDirectSlug = 'z'.repeat(1_900_001);
-  const rows = [...escapedSlugs, largeDirectSlug].map((slug, index) => novaRow(index, slug));
+  slugs[0] = 'quote"and\\backslash';
+  slugs[1] = '繁體中文😀-streamer';
+  const rows = slugs.map((slug, index) => novaRow(index, slug));
   const novaBytes = sourceTextBytes(rows);
   assert(novaBytes < VOD_EXPORT_LIMITS.sourceTextBytes, 'scope regression fixture stays below 16 MiB');
-  assert(encoder.encode(JSON.stringify(rows.map((row) => row.slug))).byteLength > 2_000_000,
-    'legacy single JSON scope would exceed the D1 bound-value limit');
 
   const nova = new FakeDatabase('nova', rows, [], novaBytes);
   const admin = new FakeDatabase('admin', [], [{
@@ -334,50 +315,68 @@ async function testBoundedStreamerScope(): Promise<void> {
   equal(sourceStatements.length, 4, 'DB source uses stats plus three narrow row queries');
   const statement = sourceStatements[1];
   assert(statement !== undefined, 'bounded VOD source query exists');
-  assert(statement.sql.includes('WITH RECURSIVE'), 'scope is decoded inside the one transactional source query');
-  assert(!statement.sql.includes('json_each'), 'scope no longer uses a single JSON binding');
+  // Commit 6254dc4 ("perf(vod-export): bound synchronous preview memory") replaced
+  // this json_each binding with a packed BLOB frame plus a WITH RECURSIVE decoder;
+  // the 2026-08 anti-pattern audit reversed that trade because the frame's stated
+  // rationale never applied here. A D-020.2 scope holds at most 500 slugs, so its
+  // JSON array is tens of KB — two orders of magnitude below the 1.9 MB frame the
+  // packed protocol was sized for — and cannot reproduce that memory problem. A
+  // scope that could is refused outright by the D1_JSON_BINDING_MAX_BYTES preflight
+  // instead of being split and reassembled in SQL (vod-export-spec.md D-016.2).
+  assert(statement.sql.includes('json_each(?)'), 'scope expands one bound JSON array');
+  assert(!statement.sql.includes('WITH RECURSIVE'), 'scope needs no recursive reassembly');
   assert(statement.sql.includes("COALESCE(id, '')"), 'DB preflight null-coalesces nullable IDs');
   assert(statement.sql.includes("COALESCE(status, '')"), 'DB preflight null-coalesces nullable statuses');
   assert(statement.values.length <= 100, 'scope plus capacity guards stay within D1 parameter limit');
   const scopeValues = statement.values.slice(0, -5);
-  const decoded = decodeScopeValues(scopeValues);
-  equal(decoded.length, rows.length, 'scope contains each deduplicated streamer once');
-  const decodedSet = new Set(decoded);
-  for (const row of rows) assert(decodedSet.has(row.slug), 'packed/direct scope round-trips every slug exactly');
-  assert(scopeValues.some((value) => typeof value === 'string'), 'near-limit individual slug uses direct binding');
-  assert(scopeValues.some((value) => value instanceof Uint8Array), 'ordinary slugs use compact BLOB framing');
+  equal(scopeValues.length, 1, 'the whole streamer scope is one bound parameter');
+  const binding = scopeBinding(scopeValues);
+  const bindingBytes = encoder.encode(binding).byteLength;
+  assert(bindingBytes < 100_000, 'a maximum 500-slug scope serializes to tens of KB');
+  assert(bindingBytes <= D1_JSON_BINDING_MAX_BYTES, 'scope binding stays under its guard');
+  deepEqual(JSON.parse(binding), slugs, 'the JSON scope round-trips every slug exactly');
   for (const session of [...nova.sessions, ...admin.sessions]) {
     equal(session.constraint, 'first-primary', 'every source session is primary-anchored');
   }
 }
 
-async function testOversizedStreamerScopeIsFragmented(): Promise<void> {
-  const oversizedSlug = '\ud800\u0800'.repeat(350_001);
-  const rows = [novaRow(1, oversizedSlug)];
+async function testOversizedStreamerScopeIsRefused(): Promise<void> {
+  // JSON escaping, not the raw slug length, decides whether a scope can be bound:
+  // this TAB-filled slug is 1,000,000 raw UTF-8 bytes — under the guard — but
+  // serializes to twice that. The guard therefore measures the serialized bytes.
+  const escapedSlug = String.fromCharCode(9).repeat(1_000_000);
+  const rows = [novaRow(1, escapedSlug)];
+  const expectedBytes = encoder.encode(JSON.stringify([escapedSlug])).byteLength;
+  assert(
+    encoder.encode(escapedSlug).byteLength < D1_JSON_BINDING_MAX_BYTES,
+    'the raw slug alone would pass a naive length check',
+  );
+  assert(expectedBytes > D1_JSON_BINDING_MAX_BYTES, 'its serialized scope exceeds the binding guard');
   const nova = new FakeDatabase('nova', rows, [], sourceTextBytes(rows));
-  const admin = new FakeDatabase('admin', [], [{
-    row_kind: 'stats', source_rows: 0, loaded_source_rows: 0, source_text_bytes: 0,
-    row_id: null, entity_id: null, streamer_id: null, title: null, secondary_text: null,
-    relation_id: null, stream_id: null, start_storage_class: null, start_decimal_text: null,
-    end_storage_class: null, end_decimal_text: null, status: null,
-  }]);
+  const admin = new FakeDatabase('admin', [], []);
 
-  await readVodExportSource({
-    DB: admin.asDatabase(),
-    NOVA_DB: nova.asDatabase(),
-    VOD_EXPORT_DB_ID: 'admin-db-id',
-    VOD_EXPORT_NOVA_DB_ID: 'nova-db-id',
-  }, 'test-build-id');
-
-  const statement = admin.sourceStatements()[0];
-  assert(statement !== undefined, 'fragmented scope statement exists');
-  assert(statement.sql.includes('assembled_fragments'), 'oversized scope is reconstructed inside SQL');
-  const fragments = statement.values.filter((value): value is string => typeof value === 'string');
-  assert(fragments.length > 1, 'oversized scope key is split across multiple bindings');
-  for (const fragment of fragments) {
-    assert(encoder.encode(fragment).byteLength <= 1_900_000, 'each scope fragment stays below its D1 target');
+  let rejected: unknown;
+  try {
+    await readVodExportSource({
+      DB: admin.asDatabase(),
+      NOVA_DB: nova.asDatabase(),
+      VOD_EXPORT_DB_ID: 'admin-db-id',
+      VOD_EXPORT_NOVA_DB_ID: 'nova-db-id',
+    }, 'test-build-id');
+  } catch (error) {
+    rejected = error;
   }
-  equal(fragments.join(''), oversizedSlug, 'scope fragments preserve the exact invalid slug for relationship checks');
+  assert(
+    rejected instanceof ExportLimitExceededError
+      && rejected.code === 'EXPORT_LIMIT_EXCEEDED'
+      && rejected.httpStatus === 422
+      && rejected.diagnostic.resource === 'd1JsonBindingBytes'
+      && rejected.diagnostic.actual === expectedBytes
+      && rejected.diagnostic.limit === D1_JSON_BINDING_MAX_BYTES
+      && rejected.diagnostic.state === 'exceeded',
+    'an unbindable scope is refused with an honest diagnostic instead of SQL reassembly',
+  );
+  equal(admin.sessions.length, 0, 'the refusal happens before the admin source read opens a session');
 }
 
 async function testEmptyStreamerScopeHasValidCteShape(): Promise<void> {
@@ -396,10 +395,8 @@ async function testEmptyStreamerScopeHasValidCteShape(): Promise<void> {
   }, 'test-build-id');
   const statement = admin.sourceStatements()[0];
   assert(statement !== undefined, 'empty scope statement exists');
-  assert(
-    statement.sql.includes('NULL AS fragment_value WHERE 0'),
-    'empty scope source SELECT supplies all six declared CTE columns',
-  );
+  assert(statement.sql.includes('json_each(?)'), 'an empty scope needs no special-cased SELECT');
+  deepEqual(JSON.parse(scopeBinding(statement.values)), [], 'an empty scope binds an empty JSON array');
 }
 
 async function testAdminOutputPreflightLimits(): Promise<void> {
@@ -627,7 +624,7 @@ function assertSelectiveAdapterMatchesCoreSemantics(): void {
 
 async function main(): Promise<void> {
   await testBoundedStreamerScope();
-  await testOversizedStreamerScopeIsFragmented();
+  await testOversizedStreamerScopeIsRefused();
   await testEmptyStreamerScopeHasValidCteShape();
   await testAdminOutputPreflightLimits();
   await testCombinedAdminSourceMapping();

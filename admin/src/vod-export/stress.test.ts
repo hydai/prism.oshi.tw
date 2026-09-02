@@ -1,12 +1,12 @@
 import { canonicalSnapshotByteLength, createOrderedSnapshotArtifact } from './canonical-json';
 import {
   assertApiFindingsCapacity,
-  forEachD1LookupBinding,
+  d1JsonLookupPlan,
   vodExportPreviewApiResponse,
   type VodExportFindingApi,
 } from './api';
-import { VOD_EXPORT_LIMITS } from './constants';
-import { countExportRelevantSourceTextBytes } from './limits';
+import { D1_JSON_BINDING_MAX_BYTES, VOD_EXPORT_LIMITS } from './constants';
+import { countExportRelevantSourceTextBytes, ExportLimitExceededError } from './limits';
 import { jsonStringByteLength, utf8ByteLength } from './normalization';
 import { buildOwnedVodExportSnapshot, buildVodExportSnapshot } from './validation';
 import type {
@@ -333,15 +333,35 @@ async function main(): Promise<void> {
   forceGc();
   samples.push(sampleMemory('candidate-r2-handoff'));
 
-  const lookupStats = await forEachD1LookupBinding(
-    findings.map((finding) => finding.entityId ?? ''),
-    async (binding) => {
-      if (binding.kind === 'packed') {
-        assert(binding.value.byteLength <= 1_900_008, 'lookup buffer remains below the D1 value limit');
-      }
-    },
+  // One bound JSON array is the only multi-value lookup mechanism, so the size
+  // guard — not a packed frame — is what bounds this phase. This fixture pads song
+  // IDs until the findings response saturates its 4 MiB limit, so its identity set
+  // is refused outright; the largest bindable prefix is the phase's worst case.
+  const lookupIds = findings.map((finding) => finding.entityId ?? '');
+  let lookupRejection: unknown;
+  try {
+    d1JsonLookupPlan('songs', 'id', 'id, rowid AS row_id', lookupIds);
+  } catch (error) {
+    lookupRejection = error;
+  }
+  assert(
+    lookupRejection instanceof ExportLimitExceededError
+      && lookupRejection.diagnostic.resource === 'd1JsonBindingBytes',
+    'a repair-path identity set past the guard is refused, never split into frames',
   );
-  assert(lookupStats.skippedValues === 0, 'all warning repair IDs remain bindable');
+  const bindableIds: string[] = [];
+  let bindableBytes = 2;
+  for (const id of lookupIds) {
+    const entryBytes = jsonStringByteLength(id) + 1;
+    if (bindableBytes + entryBytes > D1_JSON_BINDING_MAX_BYTES) break;
+    bindableBytes += entryBytes;
+    bindableIds.push(id);
+  }
+  const lookupPlan = d1JsonLookupPlan('songs', 'id', 'id, rowid AS row_id', bindableIds);
+  assert(
+    utf8ByteLength(lookupPlan.binding) <= D1_JSON_BINDING_MAX_BYTES,
+    'the worst bindable lookup stays below the D1 value limit',
+  );
   samples.push(sampleMemory('api-lookup-plan-transient'));
 
   const apiFindings = findings as VodExportFindingApi[];
