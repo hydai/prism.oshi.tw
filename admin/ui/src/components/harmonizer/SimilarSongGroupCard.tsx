@@ -2,7 +2,7 @@ import { HARMONIZE_MERGE_SOURCE_LIMIT } from '../../../../shared/types';
 import type { HarmonizeSongEntry, SimilarityGroup } from '../../../../shared/types';
 import { getWorkAwareMergeBatch, getWorkMergePlan } from '../../lib/harmonizer-work-merge';
 import { matchTypeClasses } from '../../lib/harmonizer-presentation';
-import StatusBadge from './StatusBadge';
+import StatusBadge from '../StatusBadge';
 import WorkIdBadge from './WorkIdBadge';
 import WorkMergeNotice from './WorkMergeNotice';
 

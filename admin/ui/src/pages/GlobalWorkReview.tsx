@@ -6,6 +6,7 @@ import type {
 } from '../../../shared/types';
 import { api } from '../api/client';
 import WorkMatchCandidateCard from '../components/WorkMatchCandidateCard';
+import { Pagination } from '../components/Pagination';
 import { candidateReviewStateKey } from '../lib/global-work-review';
 import { initialWorkReviewState, workReviewReducer } from './work-review-state';
 
@@ -286,34 +287,19 @@ export default function GlobalWorkReview() {
         </div>
       )}
 
-      {totalPages > 0 && (
-        <div className="mt-5 flex items-center justify-between text-sm text-slate-600">
-          <span>Showing {startItem}–{endItem} of {total}</span>
-          <div className="flex items-center gap-2">
-            <button
-              type="button"
-              onClick={() => {
-                dispatch({ type: 'previousPageRequested' });
-              }}
-              disabled={queueBusy || page <= 1}
-              className="rounded-md border border-slate-300 px-3 py-1.5 hover:bg-slate-100 disabled:opacity-40"
-            >
-              Previous
-            </button>
-            <span>Page {page} of {totalPages}</span>
-            <button
-              type="button"
-              onClick={() => {
-                dispatch({ type: 'nextPageRequested' });
-              }}
-              disabled={queueBusy || page >= totalPages}
-              className="rounded-md border border-slate-300 px-3 py-1.5 hover:bg-slate-100 disabled:opacity-40"
-            >
-              Next
-            </button>
-          </div>
-        </div>
-      )}
+      <Pagination
+        page={page}
+        totalPages={totalPages}
+        total={total}
+        shown={{ start: startItem, end: endItem }}
+        onPrev={() => {
+          dispatch({ type: 'previousPageRequested' });
+        }}
+        onNext={() => {
+          dispatch({ type: 'nextPageRequested' });
+        }}
+        disabled={queueBusy}
+      />
     </div>
   );
 }

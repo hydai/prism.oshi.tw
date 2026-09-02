@@ -4,13 +4,14 @@ import type { AuthUser, Status } from '../../../shared/types';
 import { api, getCurrentStreamer, setCurrentStreamer } from '../api/client';
 import { useApiResource } from '../lib/apiResource';
 import StatusBadge from '../components/StatusBadge';
+import { SortHeader, type SortDirection } from '../components/SortHeader';
+import { FilterPill, StatusFilterBar, type StatusFilterOption } from '../components/StatusFilterBar';
 import { loadStreamsFilter, saveStreamsFilter, resolveYear } from '../lib/streamsFilter';
 
 type SortKey = 'title' | 'date' | 'status' | 'createdAt';
-type SortDir = 'asc' | 'desc';
 
 /** Status filter pills — the active pill is filled in that status's own color. */
-const STATUS_FILTERS: { value: '' | Status; label: string; activeClass: string }[] = [
+const STATUS_FILTERS: ReadonlyArray<StatusFilterOption<'' | Status>> = [
   { value: '', label: 'All', activeClass: 'border-blue-600 bg-blue-600 text-white' },
   { value: 'pending', label: 'Pending', activeClass: 'border-yellow-500 bg-yellow-500 text-white' },
   { value: 'approved', label: 'Approved', activeClass: 'border-green-600 bg-green-600 text-white' },
@@ -20,59 +21,7 @@ const STATUS_FILTERS: { value: '' | Status; label: string; activeClass: string }
 ];
 
 const YEAR_ACTIVE_CLASS = 'border-blue-600 bg-blue-600 text-white';
-
-function FilterPill({
-  active,
-  activeClass,
-  onClick,
-  children,
-}: {
-  active: boolean;
-  activeClass: string;
-  onClick: () => void;
-  children: React.ReactNode;
-}) {
-  return (
-    <button
-      type="button"
-      onClick={onClick}
-      aria-pressed={active}
-      className={`rounded-full border px-3 py-1 text-xs font-medium transition-colors ${
-        active ? activeClass : 'border-slate-300 bg-white text-slate-600 hover:bg-slate-50'
-      }`}
-    >
-      {children}
-    </button>
-  );
-}
-
-function SortHeader({
-  label,
-  field,
-  activeField,
-  direction,
-  onSort,
-}: {
-  label: string;
-  field: SortKey;
-  activeField: SortKey;
-  direction: SortDir;
-  onSort: (field: SortKey) => void;
-}) {
-  const active = activeField === field;
-
-  return (
-    <th scope="col" aria-sort={active ? (direction === 'asc' ? 'ascending' : 'descending') : 'none'}>
-      <button
-        type="button"
-        className="w-full cursor-pointer select-none px-4 py-3 text-left hover:text-slate-700"
-        onClick={() => onSort(field)}
-      >
-        {label} {active ? (direction === 'asc' ? '↑' : '↓') : ''}
-      </button>
-    </th>
-  );
-}
+const STATUS_FILTER_LABEL_ID = 'streams-status-filter-label';
 
 export default function StreamsList({ user }: { user: AuthUser }) {
   const [initialParams] = useSearchParams();
@@ -86,7 +35,7 @@ export default function StreamsList({ user }: { user: AuthUser }) {
   });
   const [yearFilter, setYearFilter] = useState<string>(() => loadStreamsFilter().year);
   const [sortKey, setSortKey] = useState<SortKey>('date');
-  const [sortDir, setSortDir] = useState<SortDir>('desc');
+  const [sortDir, setSortDir] = useState<SortDirection>('desc');
 
   useEffect(() => {
     if (requestedStreamer && requestedStreamer !== getCurrentStreamer()) {
@@ -216,21 +165,21 @@ export default function StreamsList({ user }: { user: AuthUser }) {
         </form>
 
         {/* Status filter pills */}
-        <div className="flex flex-wrap items-center gap-2">
-          <span className="w-12 shrink-0 text-xs font-semibold uppercase tracking-wider text-slate-400">
-            Status
-          </span>
-          {STATUS_FILTERS.map((f) => (
-            <FilterPill
-              key={f.value || 'all'}
-              active={statusFilter === f.value}
-              activeClass={f.activeClass}
-              onClick={() => setStatusFilter(f.value)}
+        <StatusFilterBar
+          options={STATUS_FILTERS}
+          value={statusFilter}
+          onChange={setStatusFilter}
+          labelledBy={STATUS_FILTER_LABEL_ID}
+          className="flex-wrap gap-2"
+          heading={
+            <span
+              id={STATUS_FILTER_LABEL_ID}
+              className="w-12 shrink-0 text-xs font-semibold uppercase tracking-wider text-slate-400"
             >
-              {f.label}
-            </FilterPill>
-          ))}
-        </div>
+              Status
+            </span>
+          }
+        />
 
         {/* Year filter pills */}
         {years.length > 1 && (

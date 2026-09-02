@@ -4,7 +4,6 @@ import { api } from '../api/client';
 import { useApiResource, errorMessage } from '../lib/apiResource';
 import { countByStatus, matchesFilter, replaceById } from '../lib/status-totals';
 import { GradientButton, OutlineButton } from '../components/prism/Buttons';
-import { Chip } from '../components/prism/Chip';
 import { DetailField } from '../components/prism/DetailField';
 import { PrismTextarea } from '../components/prism/Fields';
 import { GlassCard } from '../components/prism/GlassCard';
@@ -12,6 +11,7 @@ import { Icon, type IconName } from '../components/prism/Icon';
 import { Pill, StatusPill } from '../components/prism/Pill';
 import { PrismPage } from '../components/prism/PrismPage';
 import { SectionLabel } from '../components/prism/SectionLabel';
+import { StatusFilterBar, type StatusFilterOption } from '../components/StatusFilterBar';
 
 const TYPE_LABELS: Record<CrystalTicketType, string> = {
   bug: 'Bug',
@@ -28,16 +28,23 @@ const TYPE_STYLES: Record<CrystalTicketType, { icon: IconName; tile: string; tex
   other: { icon: 'message', tile: 'bg-[#F1F5F9] text-[#64748B]', text: 'text-token-secondary' },
 };
 
-const STATUS_FILTERS = ['', 'pending', 'replied', 'closed'] as const;
-const TYPE_FILTERS = ['', 'bug', 'feat', 'ui', 'other'] as const;
+const STATUS_FILTERS: ReadonlyArray<StatusFilterOption<'' | CrystalTicketStatus>> = [
+  { value: '', label: 'All' },
+  { value: 'pending', label: 'Pending' },
+  { value: 'replied', label: 'Replied' },
+  { value: 'closed', label: 'Closed' },
+];
+
+const TYPE_FILTERS: ReadonlyArray<StatusFilterOption<'' | CrystalTicketType>> = [
+  { value: '', label: 'All types' },
+  { value: 'bug', label: TYPE_LABELS.bug },
+  { value: 'feat', label: TYPE_LABELS.feat },
+  { value: 'ui', label: TYPE_LABELS.ui },
+  { value: 'other', label: TYPE_LABELS.other },
+];
 
 const STATUS_FILTER_LABEL_ID = 'crystal-ticket-status-filter-label';
 const TYPE_FILTER_LABEL_ID = 'crystal-ticket-type-filter-label';
-
-function statusFilterLabel(status: '' | CrystalTicketStatus): string {
-  if (!status) return 'All';
-  return status.charAt(0).toUpperCase() + status.slice(1);
-}
 
 export default function CrystalTickets({ user }: { user: AuthUser }) {
   const [statusFilter, setStatusFilter] = useState<'' | CrystalTicketStatus>('pending');
@@ -110,23 +117,21 @@ export default function CrystalTickets({ user }: { user: AuthUser }) {
       ]}
       toolbar={
         <>
-          <div className="flex items-center gap-1.5" role="group" aria-labelledby={STATUS_FILTER_LABEL_ID}>
-            <span id={STATUS_FILTER_LABEL_ID} className="sr-only">Status:</span>
-            {STATUS_FILTERS.map((s) => (
-              <Chip key={s} active={statusFilter === s} onClick={() => setStatusFilter(s)}>
-                {statusFilterLabel(s)}
-              </Chip>
-            ))}
-          </div>
+          <StatusFilterBar
+            options={STATUS_FILTERS}
+            value={statusFilter}
+            onChange={setStatusFilter}
+            labelledBy={STATUS_FILTER_LABEL_ID}
+            heading={<span id={STATUS_FILTER_LABEL_ID} className="sr-only">Status:</span>}
+          />
           <div aria-hidden="true" className="h-5 w-px bg-border-token" />
-          <div className="flex items-center gap-1.5" role="group" aria-labelledby={TYPE_FILTER_LABEL_ID}>
-            <span id={TYPE_FILTER_LABEL_ID} className="sr-only">Type:</span>
-            {TYPE_FILTERS.map((t) => (
-              <Chip key={t} active={typeFilter === t} onClick={() => setTypeFilter(t)}>
-                {t ? TYPE_LABELS[t] : 'All types'}
-              </Chip>
-            ))}
-          </div>
+          <StatusFilterBar
+            options={TYPE_FILTERS}
+            value={typeFilter}
+            onChange={setTypeFilter}
+            labelledBy={TYPE_FILTER_LABEL_ID}
+            heading={<span id={TYPE_FILTER_LABEL_ID} className="sr-only">Type:</span>}
+          />
         </>
       }
     >

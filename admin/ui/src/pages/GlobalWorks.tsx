@@ -1,6 +1,8 @@
 import { useEffect, useState, type FormEvent } from 'react';
 import type { GlobalWorkStats, GlobalWorkSummary } from '../../../shared/types';
 import { api } from '../api/client';
+import { Pagination } from '../components/Pagination';
+import { SortHeader, type SortDirection } from '../components/SortHeader';
 
 type SortKey =
   | 'title'
@@ -9,7 +11,6 @@ type SortKey =
   | 'songCount'
   | 'performanceCount'
   | 'updatedAt';
-type SortDir = 'asc' | 'desc';
 
 const PAGE_SIZE = 50;
 const EMPTY_STATS: GlobalWorkStats = {
@@ -20,37 +21,6 @@ const EMPTY_STATS: GlobalWorkStats = {
   unlinkedSongs: 0,
 };
 
-export function SortHeader({
-  label,
-  field,
-  activeField,
-  sortDir,
-  onSort,
-}: {
-  label: string;
-  field: SortKey;
-  activeField: SortKey;
-  sortDir: SortDir;
-  onSort: (field: SortKey) => void;
-}) {
-  const isActive = activeField === field;
-  return (
-    <th
-      className="px-4 py-3"
-      aria-sort={isActive ? (sortDir === 'asc' ? 'ascending' : 'descending') : undefined}
-    >
-      <button
-        type="button"
-        className="flex w-full cursor-pointer select-none items-center gap-1 text-left hover:text-slate-700 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500"
-        onClick={() => onSort(field)}
-      >
-        <span>{label}</span>
-        {isActive && <span aria-hidden="true">{sortDir === 'asc' ? '↑' : '↓'}</span>}
-      </button>
-    </th>
-  );
-}
-
 export default function GlobalWorks() {
   const [works, setWorks] = useState<GlobalWorkSummary[]>([]);
   const [stats, setStats] = useState<GlobalWorkStats>(EMPTY_STATS);
@@ -60,7 +30,7 @@ export default function GlobalWorks() {
   const [submittedSearch, setSubmittedSearch] = useState('');
   const [sharedOnly, setSharedOnly] = useState(false);
   const [sortKey, setSortKey] = useState<SortKey>('performanceCount');
-  const [sortDir, setSortDir] = useState<SortDir>('desc');
+  const [sortDir, setSortDir] = useState<SortDirection>('desc');
   const [page, setPage] = useState(1);
   const [total, setTotal] = useState(0);
   const [totalPages, setTotalPages] = useState(0);
@@ -202,35 +172,35 @@ export default function GlobalWorks() {
                     label="Title"
                     field="title"
                     activeField={sortKey}
-                    sortDir={sortDir}
+                    direction={sortDir}
                     onSort={toggleSort}
                   />
                   <SortHeader
                     label="Original artist"
                     field="originalArtist"
                     activeField={sortKey}
-                    sortDir={sortDir}
+                    direction={sortDir}
                     onSort={toggleSort}
                   />
                   <SortHeader
                     label="VTubers"
                     field="streamerCount"
                     activeField={sortKey}
-                    sortDir={sortDir}
+                    direction={sortDir}
                     onSort={toggleSort}
                   />
                   <SortHeader
                     label="Local songs"
                     field="songCount"
                     activeField={sortKey}
-                    sortDir={sortDir}
+                    direction={sortDir}
                     onSort={toggleSort}
                   />
                   <SortHeader
                     label="Performances"
                     field="performanceCount"
                     activeField={sortKey}
-                    sortDir={sortDir}
+                    direction={sortDir}
                     onSort={toggleSort}
                   />
                   <th className="px-4 py-3">Work ID</th>
@@ -277,28 +247,14 @@ export default function GlobalWorks() {
             </table>
           </div>
 
-          {totalPages > 0 && (
-            <div className="mt-4 flex items-center justify-between text-sm text-slate-600">
-              <span>Showing {startItem}–{endItem} of {total}</span>
-              <div className="flex items-center gap-2">
-                <button
-                  onClick={() => setPage((current) => Math.max(1, current - 1))}
-                  disabled={page <= 1}
-                  className="rounded-md border border-slate-300 px-3 py-1.5 font-medium hover:bg-slate-100 disabled:cursor-not-allowed disabled:opacity-40"
-                >
-                  Previous
-                </button>
-                <span>Page {page} of {totalPages}</span>
-                <button
-                  onClick={() => setPage((current) => Math.min(totalPages, current + 1))}
-                  disabled={page >= totalPages}
-                  className="rounded-md border border-slate-300 px-3 py-1.5 font-medium hover:bg-slate-100 disabled:cursor-not-allowed disabled:opacity-40"
-                >
-                  Next
-                </button>
-              </div>
-            </div>
-          )}
+          <Pagination
+            page={page}
+            totalPages={totalPages}
+            total={total}
+            shown={{ start: startItem, end: endItem }}
+            onPrev={() => setPage((current) => Math.max(1, current - 1))}
+            onNext={() => setPage((current) => Math.min(totalPages, current + 1))}
+          />
         </>
       )}
     </div>

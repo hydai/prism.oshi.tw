@@ -7,7 +7,6 @@ import { formatTimestamp } from '../lib/format-timestamp';
 import { countByStatus, matchesFilter, removeById, replaceById } from '../lib/status-totals';
 import { Avatar } from '../components/prism/Avatar';
 import { GradientButton, OutlineButton } from '../components/prism/Buttons';
-import { Chip } from '../components/prism/Chip';
 import { CircleButton } from '../components/prism/CircleButton';
 import { ColumnHeader } from '../components/prism/ColumnHeader';
 import { DetailField } from '../components/prism/DetailField';
@@ -18,7 +17,9 @@ import { Pill, StatusPill } from '../components/prism/Pill';
 import { PrismPage } from '../components/prism/PrismPage';
 import { SectionLabel } from '../components/prism/SectionLabel';
 import { Segmented } from '../components/prism/Segmented';
+import { StatusFilterBar } from '../components/StatusFilterBar';
 import { groupVodsByStreamer, type VodGroup, type VodViewMode } from '../lib/nova-vod-groups';
+import { NOVA_STATUS_FILTERS } from './nova-status-filters';
 
 const ROW_GRID = 'grid-cols-[64px_minmax(0,1fr)_100px_110px_120px_128px_28px]';
 const ROW_COLUMNS = [
@@ -29,13 +30,6 @@ const ROW_COLUMNS = [
   { key: 'submitted', label: 'Submitted', className: 'pl-3' },
   { key: 'actions', label: '' },
   { key: 'toggle', label: '' },
-];
-
-const STATUS_FILTERS: ReadonlyArray<{ value: '' | NovaStatus; label: string }> = [
-  { value: '', label: 'All' },
-  { value: 'pending', label: 'Pending' },
-  { value: 'approved', label: 'Approved' },
-  { value: 'rejected', label: 'Rejected' },
 ];
 
 export default function NovaVodSubmissions({ user }: { user: AuthUser }) {
@@ -160,17 +154,12 @@ export default function NovaVodSubmissions({ user }: { user: AuthUser }) {
       ]}
       toolbar={
         <>
-          <div className="flex items-center gap-1.5" role="group" aria-label="Filter VOD submissions by status">
-            {STATUS_FILTERS.map((filter) => (
-              <Chip
-                key={filter.value}
-                active={statusFilter === filter.value}
-                onClick={() => setStatusFilter(filter.value)}
-              >
-                {filter.label}
-              </Chip>
-            ))}
-          </div>
+          <StatusFilterBar
+            options={NOVA_STATUS_FILTERS}
+            value={statusFilter}
+            onChange={setStatusFilter}
+            label="Filter VOD submissions by status"
+          />
           <div aria-hidden="true" className="h-5 w-px bg-border-token" />
           <Segmented
             label="View"

@@ -62,7 +62,8 @@ async function main(): Promise<void> {
 
   const { api } = await import('../src/api/client');
   const { getVisibleNavItems } = await import('../src/lib/navigation');
-  const { default: GlobalWorks, SortHeader } = await import('../src/pages/GlobalWorks');
+  const { default: GlobalWorks } = await import('../src/pages/GlobalWorks');
+  const { SortHeader } = await import('../src/components/SortHeader');
 
   await api.listGlobalWorks({ search: 'Shared', sharedOnly: true, page: 1 });
   assert(requestedUrl.startsWith('/api/works?'), 'global library uses the global works endpoint');
@@ -94,7 +95,7 @@ async function main(): Promise<void> {
             label="Title"
             field="title"
             activeField="title"
-            sortDir="asc"
+            direction="asc"
             onSort={() => undefined}
           />
         </tr>
