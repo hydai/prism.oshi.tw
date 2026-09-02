@@ -40,7 +40,6 @@ export default function NovaVodSubmissions({ user }: { user: AuthUser }) {
   const [expandedId, setExpandedId] = useState<string | null>(null);
   // Keyed by VOD id so a slow detail response for A can never render under B.
   const [expandedSongs, setExpandedSongs] = useState<Record<string, NovaVodSong[]>>({});
-  const [rejectNote, setRejectNote] = useState<Record<string, string>>({});
   const [actionLoading, setActionLoading] = useState<string | null>(null);
   // Load errors live in `list.error`; row actions get their own slot so one
   // failed approval doesn't masquerade as a broken list.
@@ -77,22 +76,20 @@ export default function NovaVodSubmissions({ user }: { user: AuthUser }) {
     }
   };
 
-  const handleAction = async (id: string, status: NovaStatus) => {
+  /** Resolves true once the row may clear the note it just submitted. */
+  const handleAction = async (id: string, status: NovaStatus, rejectNote: string): Promise<boolean> => {
     setActionLoading(id);
     setActionError(null);
     try {
       const updated = await api.updateNovaVodStatus(id, {
         status,
-        reviewer_note: status === 'rejected' ? rejectNote[id] : undefined,
+        reviewer_note: status === 'rejected' ? rejectNote : undefined,
       });
       list.mutate((vods) => replaceById(vods, updated));
-      setRejectNote((prev) => {
-        const next = { ...prev };
-        delete next[id];
-        return next;
-      });
+      return true;
     } catch (err) {
       setActionError(errorMessage(err, 'Action failed'));
+      return false;
     } finally {
       setActionLoading(null);
     }
@@ -128,8 +125,6 @@ export default function NovaVodSubmissions({ user }: { user: AuthUser }) {
       showStreamer={viewMode === 'timeline'}
       songs={expandedId === vod.id ? (expandedSongs[vod.id] ?? []) : []}
       onToggle={() => handleExpand(vod.id)}
-      rejectNote={rejectNote[vod.id] ?? ''}
-      onRejectNoteChange={(val) => setRejectNote((prev) => ({ ...prev, [vod.id]: val }))}
       onAction={handleAction}
       onDelete={handleDelete}
       actionLoading={actionLoading === vod.id}
@@ -281,8 +276,6 @@ export function VodRow({
   showStreamer = false,
   songs,
   onToggle,
-  rejectNote,
-  onRejectNoteChange,
   onAction,
   onDelete,
   actionLoading,
@@ -294,15 +287,19 @@ export function VodRow({
   showStreamer?: boolean;
   songs: NovaVodSong[];
   onToggle: () => void;
-  rejectNote: string;
-  onRejectNoteChange: (val: string) => void;
-  onAction: (id: string, status: NovaStatus) => void;
+  /** Resolves true when the review landed, so the row may drop its note. */
+  onAction: (id: string, status: NovaStatus, rejectNote: string) => Promise<boolean>;
   onDelete: (vod: NovaVodSubmission) => void;
   actionLoading: boolean;
 }) {
+  // The note being written belongs to this row: typing it re-renders one VOD, not the inbox.
+  const [rejectNote, setRejectNote] = useState('');
   const rejectNoteId = useId();
   const detailsId = `nova-vod-details-${vod.id}`;
   const showReviewCard = isCurator;
+  const review = async (status: NovaStatus) => {
+    if (await onAction(vod.id, status, rejectNote)) setRejectNote('');
+  };
   // Submitter-supplied: only YouTube's image CDNs may load in the curator's browser.
   const thumbnailUrl = sanitizeNovaUrl(vod.thumbnail_url, 'thumbnail');
 
@@ -364,13 +361,13 @@ export function VodRow({
           {isCurator && !expanded && (
             vod.status === 'pending' ? (
               <>
-                <CircleButton label="Approve" icon="check" gradient disabled={actionLoading} onClick={() => onAction(vod.id, 'approved')} />
-                <CircleButton label="Reject" icon="x" disabled={actionLoading} onClick={() => onAction(vod.id, 'rejected')} />
+                <CircleButton label="Approve" icon="check" gradient disabled={actionLoading} onClick={() => review('approved')} />
+                <CircleButton label="Reject" icon="x" disabled={actionLoading} onClick={() => review('rejected')} />
                 <CircleButton label="Delete" icon="trash" danger disabled={actionLoading} onClick={() => onDelete(vod)} />
               </>
             ) : (
               <>
-                <CircleButton label="Revert to Pending" icon="undo" disabled={actionLoading} onClick={() => onAction(vod.id, 'pending')} />
+                <CircleButton label="Revert to Pending" icon="undo" disabled={actionLoading} onClick={() => review('pending')} />
                 <CircleButton label="Delete" icon="trash" danger disabled={actionLoading} onClick={() => onDelete(vod)} />
               </>
             )
@@ -477,7 +474,7 @@ export function VodRow({
                   <PrismTextarea
                     id={rejectNoteId}
                     value={rejectNote}
-                    onChange={(e) => onRejectNoteChange(e.target.value)}
+                    onChange={(e) => setRejectNote(e.target.value)}
                     placeholder="Reason for rejection..."
                     rows={3}
                     className="mt-2"
@@ -489,15 +486,15 @@ export function VodRow({
               <div className="flex items-center gap-2">
                 {vod.status === 'pending' ? (
                   <>
-                    <GradientButton icon="check" disabled={actionLoading} onClick={() => onAction(vod.id, 'approved')}>
+                    <GradientButton icon="check" disabled={actionLoading} onClick={() => review('approved')}>
                       Approve
                     </GradientButton>
-                    <OutlineButton icon="x" tone="danger" disabled={actionLoading} onClick={() => onAction(vod.id, 'rejected')}>
+                    <OutlineButton icon="x" tone="danger" disabled={actionLoading} onClick={() => review('rejected')}>
                       Reject
                     </OutlineButton>
                   </>
                 ) : (
-                  <OutlineButton icon="undo" disabled={actionLoading} onClick={() => onAction(vod.id, 'pending')}>
+                  <OutlineButton icon="undo" disabled={actionLoading} onClick={() => review('pending')}>
                     Revert to Pending
                   </OutlineButton>
                 )}

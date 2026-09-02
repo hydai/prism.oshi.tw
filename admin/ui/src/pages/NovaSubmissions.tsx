@@ -53,7 +53,6 @@ export default function NovaSubmissions({ user }: { user: AuthUser }) {
   // The typed term only narrows the table once the search form is submitted.
   const [appliedSearch, setAppliedSearch] = useState(() => initialParams.get('search') ?? '');
   const [expandedId, setExpandedId] = useState<string | null>(null);
-  const [rejectNote, setRejectNote] = useState<Record<string, string>>({});
   const [actionLoading, setActionLoading] = useState<string | null>(null);
   const [actionError, setActionError] = useState<string | null>(null);
   const [fetchingAll, setFetchingAll] = useState(false);
@@ -73,22 +72,20 @@ export default function NovaSubmissions({ user }: { user: AuthUser }) {
   );
   const loading = list.loading;
 
-  const handleAction = async (id: string, status: NovaStatus) => {
+  /** Resolves true once the row may clear the note it just submitted. */
+  const handleAction = async (id: string, status: NovaStatus, rejectNote: string): Promise<boolean> => {
     setActionLoading(id);
     setActionError(null);
     try {
       const updated = await api.updateNovaStatus(id, {
         status,
-        reviewer_note: status === 'rejected' ? rejectNote[id] : undefined,
+        reviewer_note: status === 'rejected' ? rejectNote : undefined,
       });
       list.mutate((submissions) => replaceById(submissions, updated));
-      setRejectNote((prev) => {
-        const next = { ...prev };
-        delete next[id];
-        return next;
-      });
+      return true;
     } catch (err) {
       setActionError(errorMessage(err, 'Action failed'));
+      return false;
     } finally {
       setActionLoading(null);
     }
@@ -229,8 +226,6 @@ export default function NovaSubmissions({ user }: { user: AuthUser }) {
                   isCurator={isCurator}
                   expanded={expandedId === sub.id}
                   onToggle={() => setExpandedId(expandedId === sub.id ? null : sub.id)}
-                  rejectNote={rejectNote[sub.id] ?? ''}
-                  onRejectNoteChange={(val) => setRejectNote((prev) => ({ ...prev, [sub.id]: val }))}
                   onAction={handleAction}
                   onDelete={handleDelete}
                   onSave={handleSave}
@@ -257,8 +252,6 @@ export function SubmissionRow({
   isCurator,
   expanded,
   onToggle,
-  rejectNote,
-  onRejectNoteChange,
   onAction,
   onDelete,
   onSave,
@@ -268,15 +261,15 @@ export function SubmissionRow({
   isCurator: boolean;
   expanded: boolean;
   onToggle: () => void;
-  rejectNote: string;
-  onRejectNoteChange: (val: string) => void;
-  onAction: (id: string, status: NovaStatus) => void;
+  /** Resolves true when the review landed, so the row may drop its note. */
+  onAction: (id: string, status: NovaStatus, rejectNote: string) => Promise<boolean>;
   onDelete: (sub: NovaSubmission) => void;
   onSave: (updated: NovaSubmission) => void;
   actionLoading: boolean;
 }) {
   const [{
     editing,
+    rejectNote,
     draft,
     themeDraft,
     enabledDraft,
@@ -293,6 +286,12 @@ export function SubmissionRow({
   useEffect(() => {
     dispatch({ type: 'submissionChanged', submission: sub });
   }, [sub]);
+
+  const review = async (status: NovaStatus) => {
+    if (await onAction(sub.id, status, rejectNote)) {
+      dispatch({ type: 'rejectNoteCleared' });
+    }
+  };
 
   const handleSave = async () => {
     if (orderDraft === undefined) {
@@ -407,7 +406,7 @@ export function SubmissionRow({
         isCurator={isCurator}
         expanded={expanded}
         onToggle={onToggle}
-        onAction={onAction}
+        onReview={review}
         onDelete={onDelete}
         actionLoading={actionLoading}
       />
@@ -491,7 +490,7 @@ export function SubmissionRow({
                 <RejectNoteEditor
                   submissionId={sub.id}
                   value={rejectNote}
-                  onChange={onRejectNoteChange}
+                  onChange={(value) => dispatch({ type: 'rejectNoteChanged', value })}
                 />
               ) : (
                 <SectionLabel>Review</SectionLabel>
@@ -502,7 +501,7 @@ export function SubmissionRow({
                     <GradientButton
                       icon="check"
                       disabled={actionLoading}
-                      onClick={() => onAction(sub.id, 'approved')}
+                      onClick={() => review('approved')}
                     >
                       Approve
                     </GradientButton>
@@ -510,7 +509,7 @@ export function SubmissionRow({
                       icon="x"
                       tone="danger"
                       disabled={actionLoading}
-                      onClick={() => onAction(sub.id, 'rejected')}
+                      onClick={() => review('rejected')}
                     >
                       Reject
                     </OutlineButton>
@@ -519,7 +518,7 @@ export function SubmissionRow({
                   <OutlineButton
                     icon="undo"
                     disabled={actionLoading}
-                    onClick={() => onAction(sub.id, 'pending')}
+                    onClick={() => review('pending')}
                   >
                     Revert to Pending
                   </OutlineButton>
@@ -550,7 +549,7 @@ function SubmissionSummaryRow({
   isCurator,
   expanded,
   onToggle,
-  onAction,
+  onReview,
   onDelete,
   actionLoading,
 }: {
@@ -560,7 +559,7 @@ function SubmissionSummaryRow({
   isCurator: boolean;
   expanded: boolean;
   onToggle: () => void;
-  onAction: (id: string, status: NovaStatus) => void;
+  onReview: (status: NovaStatus) => void;
   onDelete: (sub: NovaSubmission) => void;
   actionLoading: boolean;
 }) {
@@ -617,13 +616,13 @@ function SubmissionSummaryRow({
         {isCurator && !expanded && (
           sub.status === 'pending' ? (
             <>
-              <CircleButton label="Approve" icon="check" gradient disabled={actionLoading} onClick={() => onAction(sub.id, 'approved')} />
-              <CircleButton label="Reject" icon="x" disabled={actionLoading} onClick={() => onAction(sub.id, 'rejected')} />
+              <CircleButton label="Approve" icon="check" gradient disabled={actionLoading} onClick={() => onReview('approved')} />
+              <CircleButton label="Reject" icon="x" disabled={actionLoading} onClick={() => onReview('rejected')} />
               <CircleButton label="Delete" icon="trash" danger disabled={actionLoading} onClick={() => onDelete(sub)} />
             </>
           ) : (
             <>
-              <CircleButton label="Revert to Pending" icon="undo" disabled={actionLoading} onClick={() => onAction(sub.id, 'pending')} />
+              <CircleButton label="Revert to Pending" icon="undo" disabled={actionLoading} onClick={() => onReview('pending')} />
               <CircleButton label="Delete" icon="trash" danger disabled={actionLoading} onClick={() => onDelete(sub)} />
             </>
           )
