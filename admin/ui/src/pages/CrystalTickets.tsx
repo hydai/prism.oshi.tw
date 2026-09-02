@@ -1,8 +1,8 @@
-import { useState } from 'react';
+import { useMemo, useState } from 'react';
 import type { AuthUser, CrystalTicketStatus, CrystalTicketType } from '../../../shared/types';
 import { api } from '../api/client';
 import { useApiResource, errorMessage } from '../lib/apiResource';
-import { countByStatus, replaceById } from '../lib/status-totals';
+import { countByStatus, matchesFilter, replaceById } from '../lib/status-totals';
 import { GradientButton, OutlineButton } from '../components/prism/Buttons';
 import { Chip } from '../components/prism/Chip';
 import { DetailField } from '../components/prism/DetailField';
@@ -47,21 +47,17 @@ export default function CrystalTickets({ user }: { user: AuthUser }) {
   const [actionLoading, setActionLoading] = useState<string | null>(null);
   const [actionError, setActionError] = useState<string | null>(null);
 
-  const list = useApiResource(
-    async () => {
-      const [res, all] = await Promise.all([
-        api.listCrystalTickets({
-          status: statusFilter || undefined,
-          type: typeFilter || undefined,
-        }),
-        api.listCrystalTickets(),
-      ]);
-      return { tickets: res.data, allTickets: all.data };
-    },
-    [statusFilter, typeFilter],
+  // One unfiltered load feeds both the table and the hero totals; the filters
+  // are chips, not a reason to ask the server for the same rows again.
+  const list = useApiResource(async () => (await api.listCrystalTickets()).data, []);
+  // Stable reference while loading, so the filter memo doesn't recompute every render.
+  const allTickets = useMemo(() => list.data ?? [], [list.data]);
+  const tickets = useMemo(
+    () => allTickets.filter(
+      (ticket) => matchesFilter(ticket.status, statusFilter) && matchesFilter(ticket.type, typeFilter),
+    ),
+    [allTickets, statusFilter, typeFilter],
   );
-  const tickets = list.data?.tickets ?? [];
-  const allTickets = list.data?.allTickets ?? [];
   const loading = list.loading;
 
   const handleReply = async (id: string) => {
@@ -71,7 +67,7 @@ export default function CrystalTickets({ user }: { user: AuthUser }) {
     setActionError(null);
     try {
       const updated = await api.replyCrystalTicket(id, text);
-      list.mutate(({ tickets, allTickets }) => ({ tickets: replaceById(tickets, updated), allTickets: replaceById(allTickets, updated) }));
+      list.mutate((tickets) => replaceById(tickets, updated));
       setReplyText((prev) => {
         const next = { ...prev };
         delete next[id];
@@ -89,7 +85,7 @@ export default function CrystalTickets({ user }: { user: AuthUser }) {
     setActionError(null);
     try {
       const updated = await api.updateCrystalTicketStatus(id, status);
-      list.mutate(({ tickets, allTickets }) => ({ tickets: replaceById(tickets, updated), allTickets: replaceById(allTickets, updated) }));
+      list.mutate((tickets) => replaceById(tickets, updated));
     } catch (err) {
       setActionError(errorMessage(err, 'Status update failed'));
     } finally {
