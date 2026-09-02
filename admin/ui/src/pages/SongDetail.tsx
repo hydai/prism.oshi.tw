@@ -4,6 +4,7 @@ import type { Song, AuthUser, UpdateSongBody } from '../../../shared/types';
 import { api } from '../api/client';
 import StatusBadge from '../components/StatusBadge';
 import YouTubeEmbed from '../components/YouTubeEmbed';
+import { formatTimestamp } from '../lib/format-timestamp';
 
 export default function SongDetail({ user }: { user: AuthUser }) {
   const { id } = useParams<{ id: string }>();
@@ -217,10 +218,4 @@ export default function SongDetail({ user }: { user: AuthUser }) {
       </div>
     </div>
   );
-}
-
-function formatTimestamp(seconds: number): string {
-  const m = Math.floor(seconds / 60);
-  const s = seconds % 60;
-  return `${m}:${String(s).padStart(2, '0')}`;
 }

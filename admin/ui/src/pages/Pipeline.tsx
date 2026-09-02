@@ -7,21 +7,12 @@ import type {
 } from '../../../shared/types';
 import { parseTextToSongs } from '../../../shared/parse';
 import { api, ApiError } from '../api/client';
+import { formatTimestamp } from '../lib/format-timestamp';
 import {
   extractReducer,
   initialExtractState,
   type EditableParsedSong,
 } from './pipeline-extract-state';
-
-// --- Helpers ---
-
-function formatTimestamp(seconds: number): string {
-  const h = Math.floor(seconds / 3600);
-  const m = Math.floor((seconds % 3600) / 60);
-  const s = seconds % 60;
-  if (h) return `${h}:${String(m).padStart(2, '0')}:${String(s).padStart(2, '0')}`;
-  return `${m}:${String(s).padStart(2, '0')}`;
-}
 
 // --- Discover Tab ---
 
