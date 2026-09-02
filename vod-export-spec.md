@@ -2583,6 +2583,11 @@ serializer order:
 - performance: `performanceId`, `songId`, `title`, `originalArtist`,
   `startSeconds`, `endSeconds`.
 
+Implementation note: the exporter realizes this order by rebuilding every object
+as a fresh plain object whose property assignment order is the order above, so
+the input graph's own key order can never reach the bytes. Absent `socialLinks`
+providers are omitted by never assigning them, not by writing `undefined`.
+
 #### D-014.4 — Non-ASCII JSON characters
 
 - Status: **Confirmed**
@@ -2604,7 +2609,23 @@ Canonical JSON integers use ordinary base-10 digits with no leading plus sign,
 leading zero, fractional part, exponent, or negative zero. All public numeric
 values must first pass their non-negative JavaScript-safe-integer checks. The
 implementation uses one tested canonical serializer for both hashing and
-storage; generic HTML-safe or locale-sensitive serializers are forbidden.
+storage; HTML-safe, JavaScript-source-safe, and locale-sensitive serializers are
+forbidden, because they escape `<`, `&`, U+2028, or U+2029.
+
+Implementation note (`admin/src/vod-export/canonical-json.ts`): the canonical
+serializer validates first and then delegates byte production to
+`JSON.stringify` over plain objects whose property assignment order is the
+D-014.3 order, encoded with `TextEncoder`. ECMAScript's well-formed
+`JSON.stringify` already implements every escaping, direct-non-ASCII, and
+integer-spelling rule above exactly, so the serializer adds only what
+`JSON.stringify` cannot express: the fixed property order, and rejection of
+input the contract forbids — non-string values in string slots, `undefined` or
+`null` in slots that require a string, unpaired surrogates, unknown properties,
+`-0`, and non-safe integers. The snapshot is stringified one streamer at a time
+into a pre-sized buffer, which is the identical byte sequence and keeps the
+D-011 `snapshotBytes` limit a pre-allocation check. Byte identity across this
+serializer's own history is pinned by SHA-256 goldens in
+`admin/src/vod-export/canonical-differential.test.ts`.
 
 #### D-014.5 — Snapshot hash, path, and download filename
 

@@ -1,17 +1,18 @@
 /**
- * Differential proof: the hand-rolled canonical writer versus `JSON.stringify`.
+ * Regression harness for the canonical serializer's published byte identity.
  *
  * A published snapshot's SHA-256 *is* its R2 object key, its public URL, and the
  * consumer contract, so no byte of `canonical-json.ts` output may ever change.
- * This suite is the evidence for whether that writer could be replaced by
- * `JSON.stringify` over an explicitly re-keyed object graph: every fixture below
- * exercises the writer's *byte-production* rules (escaping, direct non-ASCII,
- * integer spelling, key order, key omission) and asserts the two paths agree
- * byte-for-byte and hash-for-hash.
+ * This suite was originally the differential proof that the hand-rolled byte
+ * writer could be replaced by `JSON.stringify` over an explicitly re-keyed
+ * object graph; the writer is gone, and the suite now holds the survivor to the
+ * goldens recorded from it. Every fixture below exercises a *byte-production*
+ * rule (escaping, direct non-ASCII, integer spelling, key order, key omission).
  *
- * `canonicalizeSnapshotObject()` is deliberately small and explicit: it is the
- * prototype of a replacement orderer, so its property assignment order is the
- * writer's hardcoded emission order from `writeOwnedSnapshotTokens()`.
+ * `canonicalizeSnapshotObject()` is deliberately small and explicit and is kept
+ * as an independent second opinion: it re-keys a snapshot by hand and its
+ * whole-graph `JSON.stringify` must equal the production encoder's chunked
+ * output byte-for-byte, on top of the pinned goldens.
  *
  * Every special character is built from numeric code points via `chars()` so
  * the fixtures state exactly which scalar they exercise and no editor, patch,
@@ -186,8 +187,9 @@ function equalBytes(writerBytes: Uint8Array, stringifyBytes: Uint8Array, message
 }
 
 // ---------------------------------------------------------------------------
-// The re-keyer: prototype of a replacement orderer. Property assignment order
-// mirrors `writeOwnedSnapshotTokens()` exactly.
+// The re-keyer: an independent second opinion, written by hand here rather than
+// imported, so a change to the production orderer's property assignment order
+// shows up as a byte mismatch instead of moving both sides at once.
 // ---------------------------------------------------------------------------
 
 function canonicalizeSocialLinksObject(socialLinks: VodExportSocialLinks): Record<string, string> {
@@ -608,15 +610,14 @@ function byteRuleSnapshot(): VodExportSnapshot {
 }
 
 // ---------------------------------------------------------------------------
-// Goldens, computed with the hand-rolled writer while it still exists.
+// Goldens, computed with the hand-rolled byte writer before it was deleted.
 //
-// These anchor the suite against degrading into a tautology. Today the two
-// sides of the differential are independent implementations, so their agreement
-// is evidence. If the writer is ever replaced by `JSON.stringify`, both sides
-// collapse into the same implementation and would agree on *any* bytes at all.
-// A SHA-256 pinned from today's writer keeps the published artifact identity
-// nailed down across that change, because the hash is the R2 object key and the
-// public consumer contract.
+// They anchor the suite against degrading into a tautology. Both sides now
+// reach `JSON.stringify`, so their agreement alone would hold for *any* bytes;
+// these hashes are the independent evidence that the published artifact
+// identity never moved, because the hash is the R2 object key and the public
+// consumer contract. Never edit a golden to make a test pass: a mismatch means
+// the serializer changed the published bytes.
 // ---------------------------------------------------------------------------
 
 const BUILT_SNAPSHOT_BYTES = 936;
