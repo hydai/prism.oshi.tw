@@ -13,7 +13,7 @@
     "test:aurora-nova": "npx tsx tools/aurora/tests/nova.test.ts",
     "test:browser-storage": "npx tsx tools/browser-storage.test.ts && npx tsx admin/ui/tests/streams-filter.test.ts",
     "test:turnstile": "npx tsx tools/turnstile.test.ts",
-    "test:shared-web": "npx tsx tools/shared/web/html.test.ts",
+    "test:shared-web": "npx tsx tools/shared/web/html.test.ts && npx tsx tools/shared/web/theme.test.ts",
     "test:deploy-workflow-permissions": "npx tsx tools/deploy-workflow-permissions.test.ts",
     "inbox:status": "npx tsx tools/inbox-status/status.ts",
     "inbox:status:test": "npx tsx tools/inbox-status/status.test.ts",
