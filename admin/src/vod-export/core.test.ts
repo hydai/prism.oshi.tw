@@ -25,8 +25,10 @@ import type {
   ExportSourceStreamer,
   ExportSourceVod,
   SqliteIntegerSource,
+  VodExportPerformance,
   VodExportSnapshot,
   VodExportSourceData,
+  VodExportStreamer,
 } from './types';
 
 declare const process: { exitCode?: number };
@@ -60,6 +62,24 @@ function expectThrows(fn: () => unknown, predicate: (error: unknown) => boolean,
     thrown = error;
   }
   assert(predicate(thrown), message);
+}
+
+async function expectRejects(
+  fn: () => Promise<unknown>,
+  predicate: (error: unknown) => boolean,
+  message: string,
+): Promise<void> {
+  let thrown: unknown;
+  try {
+    await fn();
+  } catch (error) {
+    thrown = error;
+  }
+  assert(predicate(thrown), message);
+}
+
+function isCanonicalJsonError(error: unknown): boolean {
+  return error instanceof Error && error.name === 'CanonicalJsonError';
 }
 
 function integer(value: number): SqliteIntegerSource {
@@ -249,6 +269,114 @@ function testCanonicalString(): void {
     (error) => error instanceof Error && error.name === 'CanonicalJsonError',
     'canonical serializer rejects unpaired surrogates',
   );
+}
+
+function guardSnapshot(): VodExportSnapshot {
+  return {
+    schemaVersion: VOD_EXPORT_SCHEMA_VERSION,
+    streamers: [{
+      slug: 'alpha',
+      displayName: 'Alpha',
+      youtubeChannelId: 'channel-alpha',
+      avatarUrl: 'https://yt3.ggpht.com/avatar=s240',
+      group: null,
+      socialLinks: { youtube: 'https://www.youtube.com/@alpha' },
+      vods: [{
+        title: 'First VOD',
+        date: '2026-07-10',
+        videoId: 'AAAAAAAAAAA',
+        performances: [{
+          performanceId: 'performance-1',
+          songId: 'song-1',
+          title: 'Song',
+          originalArtist: null,
+          startSeconds: 0,
+          endSeconds: 1,
+        }],
+      }],
+    }],
+  };
+}
+
+function firstStreamer(snapshot: VodExportSnapshot): VodExportStreamer {
+  const streamer = snapshot.streamers[0];
+  assert(streamer !== undefined, 'guard fixture has a streamer');
+  return streamer;
+}
+
+function firstPerformance(snapshot: VodExportSnapshot): VodExportPerformance {
+  const vod = firstStreamer(snapshot).vods[0];
+  assert(vod !== undefined, 'guard fixture has a VOD');
+  const performance = vod.performances[0];
+  assert(performance !== undefined, 'guard fixture has a performance');
+  return performance;
+}
+
+/**
+ * Type-invalid input must be rejected, never serialized. A bare
+ * `JSON.stringify` publishes `42` for a numeric title, drops an `undefined`
+ * property, and emits `null` for a null social link — all of which would be a
+ * different published artifact, silently. The guards run on the strict path and
+ * on the owned generation fast path, which skips the exact-key shape pass and
+ * therefore depends on them alone.
+ */
+async function testCanonicalTypeGuards(): Promise<void> {
+  const cases: { name: string; corrupt: (snapshot: VodExportSnapshot) => void }[] = [
+    {
+      name: 'a numeric performance title',
+      corrupt: (snapshot) => {
+        firstPerformance(snapshot).title = 42 as unknown as string;
+      },
+    },
+    {
+      name: 'an undefined avatarUrl',
+      corrupt: (snapshot) => {
+        firstStreamer(snapshot).avatarUrl = undefined as unknown as null;
+      },
+    },
+    {
+      name: 'a null socialLinks provider',
+      corrupt: (snapshot) => {
+        firstStreamer(snapshot).socialLinks.youtube = null as unknown as string;
+      },
+    },
+    {
+      // The old owned fast path dropped unknown providers silently; every path
+      // now refuses them so a provider outside SOCIAL_PROVIDERS can never be
+      // published or vanish without a trace.
+      name: 'an unknown socialLinks provider',
+      corrupt: (snapshot) => {
+        (firstStreamer(snapshot).socialLinks as Record<string, string>).myspace = 'https://example.com/x';
+      },
+    },
+  ];
+
+  for (const testCase of cases) {
+    const strict = guardSnapshot();
+    testCase.corrupt(strict);
+    expectThrows(
+      () => serializeCanonicalSnapshot(strict),
+      isCanonicalJsonError,
+      `strict canonical serialization rejects ${testCase.name}`,
+    );
+    expectThrows(
+      () => canonicalSnapshotByteLength(strict),
+      isCanonicalJsonError,
+      `canonical preflight rejects ${testCase.name}`,
+    );
+
+    const owned = guardSnapshot();
+    testCase.corrupt(owned);
+    await expectRejects(
+      () => createOrderedSnapshotArtifact(owned),
+      isCanonicalJsonError,
+      `owned canonical serialization rejects ${testCase.name}`,
+    );
+  }
+
+  equal(JSON.stringify({ title: 42 }), '{"title":42}', 'JSON.stringify would publish a numeric title');
+  equal(JSON.stringify({ avatarUrl: undefined }), '{}', 'JSON.stringify would drop an undefined avatarUrl');
+  equal(JSON.stringify({ youtube: null }), '{"youtube":null}', 'JSON.stringify would publish a null social link');
 }
 
 async function testValidBuildAndArtifact(): Promise<void> {
@@ -601,6 +729,7 @@ function testFindingAndCapacityHelpers(): void {
 async function main(): Promise<void> {
   testNormalization();
   testCanonicalString();
+  await testCanonicalTypeGuards();
   await testValidBuildAndArtifact();
   testBlockingValidation();
   testFindingAndCapacityHelpers();
