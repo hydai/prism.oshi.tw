@@ -1,6 +1,5 @@
 import { useEffect, useId, useReducer, useRef, useState } from 'react';
 import type {
-  AuthUser,
   CandidateComment,
   DiscoveredStream,
   PasteImportParsedSong,
@@ -569,7 +568,7 @@ const PIPELINE_TABS: { key: Tab; label: string }[] = [
   { key: 'extract', label: 'Extract' },
 ];
 
-export default function Pipeline({ user: _user }: { user: AuthUser }) {
+export default function Pipeline() {
   const [activeTab, setActiveTab] = useState<Tab>('discover');
 
   return (

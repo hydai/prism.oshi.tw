@@ -1,11 +1,10 @@
 import { useState } from 'react';
-import type { AuthUser } from '../../../shared/types';
 import SimilarArtistsTab from '../components/harmonizer/SimilarArtistsTab';
 import SimilarSongsTab from '../components/harmonizer/SimilarSongsTab';
 
 type Tab = 'songs' | 'artists';
 
-export default function Harmonizer({ user: _user }: { user: AuthUser }) {
+export default function Harmonizer() {
   const [tab, setTab] = useState<Tab>('songs');
 
   return (

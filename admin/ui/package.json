@@ -6,7 +6,8 @@
   "scripts": {
     "dev": "vite",
     "build": "tsc -b && vite build",
-    "check": "npm run test:api-resource && npm run test:numeric-input && npm run test:youtube-embed && npm run test:crystal-tickets && npm run test:pipeline-extract-state && npm run test:work-review && npm run test:nova-links && npm run test:stream-detail && npm run test:stamp-editor && npm run test:vod-export && npm run test:prism-components && npm run test:nova-vod-groups && npm run test:nova-vod-row && npm run test:status-totals && npm run test:harmonizer-work-id && npm run build",
+    "lint": "eslint src tests",
+    "check": "npm run lint && npm run test:api-resource && npm run test:numeric-input && npm run test:youtube-embed && npm run test:crystal-tickets && npm run test:pipeline-extract-state && npm run test:work-review && npm run test:nova-links && npm run test:stream-detail && npm run test:stamp-editor && npm run test:vod-export && npm run test:prism-components && npm run test:nova-vod-groups && npm run test:nova-vod-row && npm run test:status-totals && npm run test:harmonizer-work-id && npm run test:streams-filter && npm run test:streams-render && npm run test:global-works && npm run test:loading-state && npm run build",
     "test:api-resource": "npx tsx tests/api-resource.test.ts",
     "test:prism-components": "npx tsx tests/prism-components.test.tsx",
     "test:nova-vod-groups": "npx tsx tests/nova-vod-groups.test.ts",
@@ -35,14 +36,20 @@
   },
   "devDependencies": {
     "@babel/core": "^7.29.7",
+    "@eslint/js": "^9.39.5",
     "@types/react": "^19.2.15",
     "@types/react-dom": "^19.2.3",
     "@vitejs/plugin-react": "^4.7.0",
     "autoprefixer": "^10.5.0",
+    "eslint": "^9.39.5",
+    "eslint-plugin-react": "^7.37.5",
+    "eslint-plugin-react-hooks": "^6.1.1",
+    "globals": "^17.12.0",
     "postcss": "^8.5.15",
     "tailwindcss": "^3.4.19",
     "tsx": "^4.22.4",
     "typescript": "^5.9.3",
+    "typescript-eslint": "^8.69.0",
     "vite": "^6.4.3"
   }
 }
