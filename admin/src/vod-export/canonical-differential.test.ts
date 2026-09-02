@@ -19,18 +19,17 @@
  * or normalization pass can silently rewrite them.
  */
 import {
-  SOCIAL_PROVIDERS,
-  VOD_EXPORT_SCHEMA_VERSION,
-  buildVodExportSnapshot,
   canonicalSnapshotByteLength,
   createOrderedSnapshotArtifact,
   createSnapshotArtifact,
-  orderSnapshot,
   serializeCanonicalManifest,
   serializeCanonicalSnapshot,
   sha256Hex,
   snapshotUrlForHash,
-} from './index';
+} from './canonical-json';
+import { SOCIAL_PROVIDERS, VOD_EXPORT_SCHEMA_VERSION } from './constants';
+import { orderSnapshot } from './ordering';
+import { buildVodExportSnapshot } from './validation';
 import type {
   ExportSourcePerformance,
   ExportSourceSong,

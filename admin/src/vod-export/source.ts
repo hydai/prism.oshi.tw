@@ -1,4 +1,5 @@
 import { VOD_EXPORT_LIMITS, VOD_EXPORT_SCHEMA_VERSION } from './constants';
+import { VodExportError } from './errors';
 import { assertWithinCapacity } from './limits';
 import { utf8ByteLength } from './normalization';
 import type {
@@ -59,14 +60,14 @@ export type VodExportSourceErrorCode =
   | 'EXPORT_SOURCE_ROW_ID_INVALID'
   | 'EXPORT_LIMIT_EXCEEDED';
 
-export class VodExportSourceError extends Error {
+export class VodExportSourceError extends VodExportError<VodExportSourceErrorCode> {
   constructor(
-    readonly code: VodExportSourceErrorCode,
+    code: VodExportSourceErrorCode,
     message: string,
-    readonly status: number,
-    readonly details?: Readonly<Record<string, string | number>>,
+    status: number,
+    details?: Readonly<Record<string, string | number>>,
   ) {
-    super(message);
+    super(code, message, status, details);
     this.name = 'VodExportSourceError';
   }
 }

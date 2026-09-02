@@ -1,6 +1,7 @@
 import { createOrderedSnapshotArtifact } from './canonical-json';
 import { storeCandidate, type VodExportCandidateMetadata } from './candidate';
 import { acquireGenerationControl, releaseGenerationControl } from './control';
+import { VodExportError } from './errors';
 import { ExportLimitExceededError } from './limits';
 import {
   readCurrentSourceFingerprint,
@@ -26,14 +27,16 @@ export interface VodExportPreviewResult {
   candidate?: VodExportCandidateMetadata;
 }
 
-export class VodExportServiceError extends Error {
+export type VodExportServiceErrorCode = 'SOURCE_CHANGED_DURING_GENERATION' | 'EXPORT_LIMIT_EXCEEDED';
+
+export class VodExportServiceError extends VodExportError<VodExportServiceErrorCode> {
   constructor(
-    readonly code: 'SOURCE_CHANGED_DURING_GENERATION' | 'EXPORT_LIMIT_EXCEEDED',
+    code: VodExportServiceErrorCode,
     message: string,
-    readonly status: number,
-    readonly details?: Readonly<Record<string, string | number>>,
+    status: number,
+    details?: Readonly<Record<string, string | number>>,
   ) {
-    super(message);
+    super(code, message, status, details);
     this.name = 'VodExportServiceError';
   }
 }

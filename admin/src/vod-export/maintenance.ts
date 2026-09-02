@@ -4,8 +4,13 @@ import {
   VOD_EXPORT_SNAPSHOT_PREFIX,
 } from './constants';
 import { acquirePublicationControl, releasePublicationControl } from './control';
+import { VodExportError } from './errors';
+import { SHA256_HEX_SOURCE } from './guards';
 
-const SNAPSHOT_KEY_PATTERN = /^vod\/v1\/snapshots\/([0-9a-f]{64})\.json$/;
+// Composed from the one SHA-256 definition rather than re-spelling its hex run.
+const SNAPSHOT_KEY_PATTERN = new RegExp(
+  `^${VOD_EXPORT_SNAPSHOT_PREFIX}(${SHA256_HEX_SOURCE})\\.json$`,
+);
 const UNREFERENCED_RETENTION_MS = 400 * 24 * 60 * 60 * 1000;
 const LIST_LIMIT = 1_000;
 const D1_BATCH_SIZE = 50;
@@ -33,12 +38,9 @@ export interface VodExportMaintenanceResult {
   storageReviewRequired: boolean;
 }
 
-export class VodExportMaintenanceError extends Error {
-  readonly code = 'VOD_EXPORT_MAINTENANCE_FAILED' as const;
-  readonly status = 503 as const;
-
+export class VodExportMaintenanceError extends VodExportError<'VOD_EXPORT_MAINTENANCE_FAILED'> {
   constructor(message: string) {
-    super(message);
+    super('VOD_EXPORT_MAINTENANCE_FAILED', message, 503);
     this.name = 'VodExportMaintenanceError';
   }
 }

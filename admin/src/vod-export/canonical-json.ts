@@ -5,6 +5,7 @@ import {
   VOD_EXPORT_SCHEMA_VERSION,
   VOD_EXPORT_SNAPSHOT_PREFIX,
 } from './constants';
+import { isCanonicalTimestamp, SHA256_PATTERN } from './guards';
 import { assertWithinCapacity, measureEmittedCapacity } from './limits';
 import { hasValidUnicodeScalars, utf8ByteLength } from './normalization';
 import { orderSnapshot } from './ordering';
@@ -42,8 +43,6 @@ import type {
  * so this file may never change the published artifact identity.
  */
 
-const SHA256_PATTERN = /^[0-9a-f]{64}$/;
-const PUBLISHED_AT_PATTERN = /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}\.\d{3}Z$/;
 const textEncoder = new TextEncoder();
 const MANIFEST_KEYS: ReadonlySet<string> = new Set([
   'schemaVersion',
@@ -113,7 +112,7 @@ export function serializeCanonicalManifest(
   if (manifest.snapshotUrl !== expectedSnapshotUrl) {
     throw new CanonicalJsonError('manifest.snapshotUrl does not match its sha256 and configured public origin');
   }
-  if (!isExactPublishedAt(manifest.publishedAt)) {
+  if (!isCanonicalTimestamp(manifest.publishedAt)) {
     throw new CanonicalJsonError('manifest.publishedAt must be an exact UTC timestamp with three fractional digits');
   }
   assertCanonicalInteger(manifest.uncompressedBytes, 'manifest.uncompressedBytes', false);
@@ -476,12 +475,6 @@ function assertSha256(value: string): void {
   if (typeof value !== 'string' || !SHA256_PATTERN.test(value)) {
     throw new CanonicalJsonError('sha256 must be exactly 64 lowercase hexadecimal characters');
   }
-}
-
-function isExactPublishedAt(value: string): boolean {
-  if (typeof value !== 'string' || !PUBLISHED_AT_PATTERN.test(value)) return false;
-  const timestamp = Date.parse(value);
-  return Number.isFinite(timestamp) && new Date(timestamp).toISOString() === value;
 }
 
 function normalizePublicOrigin(value: string): string {

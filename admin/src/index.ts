@@ -120,23 +120,8 @@ import {
   parseNovaVodUpdateBody,
   parseCrystalReplyBody,
 } from './parse';
-import {
-  downloadVodExportCandidate,
-  generateVodExportPreviewApi,
-  getVodExportCandidateApi,
-  getVodExportRepairRecord,
-  normalizeVodExportError,
-  vodExportPreviewApiResponse,
-} from './vod-export/api';
-import {
-  getVodExportStatus,
-  inspectVodExportControlRecoveryState,
-  manuallyRecoverVodExportControl,
-  publishVodExportCandidate,
-  reconcileVodExportPublication,
-  requireExporterBuildId,
-} from './vod-export/publication';
-import { runVodExportMaintenance } from './vod-export/maintenance';
+import { isCanonicalTimestamp } from './vod-export/guards';
+import vodExportRoutes from './vod-export/routes';
 import {
   listWorkMatchCandidates,
   mergeWorkMatchCandidate,
@@ -350,29 +335,17 @@ function parseWorkMatchMergeBody(value: unknown): WorkMatchMergeBody | null {
   };
 }
 
+// A stored verification counts only when it names the CURRENT channel ID and
+// carries the exact `Date#toISOString` spelling — the same shape/round-trip
+// pair the vod-export readers apply to their persisted timestamps, so it reuses
+// that guard rather than re-deriving it.
 function hasCurrentChannelVerification(value: {
   youtube_channel_id: string;
   youtube_channel_verified_id: string | null;
   youtube_channel_verified_at: string | null;
 }): boolean {
-  if (
-    value.youtube_channel_verified_id !== value.youtube_channel_id
-    || value.youtube_channel_verified_at === null
-    || !/^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}\.\d{3}Z$/.test(value.youtube_channel_verified_at)
-  ) return false;
-  const parsed = Date.parse(value.youtube_channel_verified_at);
-  return Number.isFinite(parsed) && new Date(parsed).toISOString() === value.youtube_channel_verified_at;
-}
-
-function vodExportErrorResponse(error: unknown): Response {
-  const normalized = normalizeVodExportError(error);
-  return new Response(JSON.stringify(normalized.body), {
-    status: normalized.status,
-    headers: {
-      'Content-Type': 'application/json; charset=utf-8',
-      'Cache-Control': 'private, no-store',
-    },
-  });
+  return value.youtube_channel_verified_id === value.youtube_channel_id
+    && isCanonicalTimestamp(value.youtube_channel_verified_at);
 }
 
 // Nova submission/VOD status transitions both fire a best-effort Discord
@@ -400,8 +373,9 @@ const app = new Hono<{ Bindings: Bindings; Variables: Variables }>();
 // its own correct status and JSON body, so it's returned as-is; anything
 // else is an unexpected failure — the real error is logged server-side, but
 // only a generic message and code ever reach the client (no message/stack
-// leakage). vod-export routes never reach this: they normalize their own
-// errors in a try/catch before returning (vodExportErrorResponse).
+// leakage). vod-export routes never reach this: the mounted sub-app
+// (vod-export/routes.ts) carries its own .onError, which Hono copies onto its
+// routes at mount time.
 app.onError((err, c) => {
   if (err instanceof HTTPException) {
     return err.getResponse();
@@ -1072,116 +1046,10 @@ app.get('/api/export/streams', requireCurator, async (c) => {
 });
 
 // --- VOD snapshot publication workflow (all operations remain curator-only) ---
+// The sub-app owns its own error contract and cache-control middleware; see
+// vod-export/routes.ts.
 
-app.use('/api/vod-export/*', async (c, next) => {
-  await next();
-  c.header('Cache-Control', 'private, no-store');
-});
-
-app.get('/api/vod-export/status', requireCurator, async (c) => {
-  try {
-    const buildId = requireExporterBuildId(c.env.CF_VERSION_METADATA);
-    return c.json(await getVodExportStatus(c.env, buildId));
-  } catch (error) {
-    return vodExportErrorResponse(error);
-  }
-});
-
-app.post('/api/vod-export/preview', requireCurator, async (c) => {
-  try {
-    const buildId = requireExporterBuildId(c.env.CF_VERSION_METADATA);
-    return vodExportPreviewApiResponse(await generateVodExportPreviewApi(c.env, buildId));
-  } catch (error) {
-    return vodExportErrorResponse(error);
-  }
-});
-
-app.get('/api/vod-export/candidates/:id/download', requireCurator, async (c) => {
-  try {
-    return await downloadVodExportCandidate(c.env, getRouteParam(c, 'id'));
-  } catch (error) {
-    return vodExportErrorResponse(error);
-  }
-});
-
-app.get('/api/vod-export/candidates/:id', requireCurator, async (c) => {
-  try {
-    const buildId = requireExporterBuildId(c.env.CF_VERSION_METADATA);
-    return vodExportPreviewApiResponse(
-      await getVodExportCandidateApi(c.env, getRouteParam(c, 'id'), buildId),
-    );
-  } catch (error) {
-    return vodExportErrorResponse(error);
-  }
-});
-
-app.get('/api/vod-export/repair/:entity/:rowId', requireCurator, async (c) => {
-  try {
-    const entity = getRouteParam(c, 'entity');
-    if (entity !== 'performance' && entity !== 'song' && entity !== 'vod' && entity !== 'streamer') {
-      return c.json({ error: 'Repair record not found', code: 'VOD_EXPORT_REPAIR_RECORD_NOT_FOUND' }, 404);
-    }
-    const rowIdText = getRouteParam(c, 'rowId');
-    if (!/^[1-9][0-9]*$/.test(rowIdText)) {
-      return c.json({ error: 'Repair record not found', code: 'VOD_EXPORT_REPAIR_RECORD_NOT_FOUND' }, 404);
-    }
-    return c.json(await getVodExportRepairRecord(c.env, entity, Number(rowIdText)));
-  } catch (error) {
-    return vodExportErrorResponse(error);
-  }
-});
-
-app.post('/api/vod-export/candidates/:id/publish', requireCurator, async (c) => {
-  try {
-    const buildId = requireExporterBuildId(c.env.CF_VERSION_METADATA);
-    const result = await publishVodExportCandidate(
-      c.env,
-      getRouteParam(c, 'id'),
-      buildId,
-      c.get('user').email,
-    );
-    return c.json(result);
-  } catch (error) {
-    return vodExportErrorResponse(error);
-  }
-});
-
-app.post('/api/vod-export/reconcile', requireCurator, async (c) => {
-  try {
-    return c.json(await reconcileVodExportPublication(c.env));
-  } catch (error) {
-    return vodExportErrorResponse(error);
-  }
-});
-
-app.get('/api/vod-export/control-recovery', requireCurator, async (c) => {
-  try {
-    return c.json(await inspectVodExportControlRecoveryState(c.env.VOD_EXPORT_PRIVATE));
-  } catch (error) {
-    return vodExportErrorResponse(error);
-  }
-});
-
-app.post('/api/vod-export/control-recovery', requireCurator, async (c) => {
-  try {
-    const body = await c.req.json<unknown>().catch(() => null);
-    return c.json(await manuallyRecoverVodExportControl(
-      c.env,
-      body,
-      c.get('user').email,
-    ));
-  } catch (error) {
-    return vodExportErrorResponse(error);
-  }
-});
-
-app.post('/api/vod-export/maintenance', requireCurator, async (c) => {
-  try {
-    return c.json(await runVodExportMaintenance(c.env));
-  } catch (error) {
-    return vodExportErrorResponse(error);
-  }
-});
+app.route('/api/vod-export', vodExportRoutes);
 
 // --- Pipeline: Discover streams from YouTube ---
 
