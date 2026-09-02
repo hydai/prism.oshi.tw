@@ -2,6 +2,7 @@ import { html, raw } from 'hono/html';
 import type { PublicTicketRow } from './types';
 import { DARK_MODE_CSS, DARK_MODE_DETECT_SCRIPT, PRISM_CSS, SPARKLE_SVG, svgIcon, themeToggleHTML } from './theme';
 import type { IconName } from './theme';
+import { escapeHtml, nl2br } from '../../shared/web/html';
 
 const TYPE_LABELS: Record<string, string> = {
   bug: 'Bug',
@@ -24,15 +25,6 @@ export function formatDate(iso: string): string {
   const d = new Date(iso);
   if (Number.isNaN(d.getTime())) return '';
   return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
-}
-
-function escapeHtml(s: string): string {
-  return s
-    .replace(/&/g, '&amp;')
-    .replace(/</g, '&lt;')
-    .replace(/>/g, '&gt;')
-    .replace(/"/g, '&quot;')
-    .replace(/\n/g, '<br/>');
 }
 
 export function renderQaPage(tickets: PublicTicketRow[], total: number, page: number, limit: number, typeFilter: string, q: string) {
@@ -78,14 +70,14 @@ export function renderQaPage(tickets: PublicTicketRow[], total: number, page: nu
           <div class="qa-card-status"><span class="badge badge-${statusClass}">${statusLabel}</span></div>
         </div>
 
-        <p class="qa-body">${escapeHtml(t.body)}</p>
+        <p class="qa-body">${nl2br(escapeHtml(t.body))}</p>
 
         <div class="glass-box qa-reply">
           <div class="qa-reply-head">
             <span class="badge badge-pink">官方回覆</span>
             <span class="mono">${t.replied_at ? formatDate(t.replied_at) : ''}</span>
           </div>
-          <div class="qa-reply-text">${escapeHtml(t.admin_reply)}</div>
+          <div class="qa-reply-text">${nl2br(escapeHtml(t.admin_reply))}</div>
         </div>
       </article>
     `;

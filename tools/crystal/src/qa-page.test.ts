@@ -93,6 +93,18 @@ test('renderQaPage renders a benign nickname and falls back to 匿名', () => {
   assert.ok(render([makeTicket({ nickname: '' })]).includes('匿名'), 'empty nickname falls back to 匿名');
 });
 
+// escapeHtml/nl2br moved to tools/shared/web/html.ts (shared with Nova). This
+// pins the two behaviors that must survive that move: the body still composes
+// nl2br(escapeHtml(...)) so a newline still renders <br/>, and — the sanctioned
+// output delta from the shared escapeHtml's wider (Nova) character set — a
+// title containing a single quote now also renders it as &#39; (invisible in
+// browsers; Crystal's old local escapeHtml did not escape ').
+test('renderQaPage renders a newline in the body as <br/> and escapes a single quote in the title', () => {
+  const out = render([makeTicket({ body: 'line one\nline two', title: "it's a bug" })]);
+  assert.ok(out.includes('line one<br/>line two'), 'ticket body newline still renders as <br/>');
+  assert.ok(out.includes('it&#39;s a bug'), "title's single quote is escaped as &#39;");
+});
+
 // formatDate: a valid ISO timestamp formats to YYYY-MM-DD (UTC, per the TZ pin
 // above). Refs #26.
 test('formatDate formats a valid ISO timestamp as YYYY-MM-DD', () => {
