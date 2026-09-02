@@ -1,7 +1,8 @@
 import { useEffect, useState, useMemo } from 'react';
-import { Link, useSearchParams } from 'react-router-dom';
+import { Link } from 'react-router-dom';
 import type { AuthUser, Status } from '../../../shared/types';
 import { api, getCurrentStreamer, setCurrentStreamer } from '../api/client';
+import { useSearchParamState } from '../hooks/useSearchParamState';
 import { useApiResource } from '../lib/apiResource';
 import StatusBadge from '../components/StatusBadge';
 import { SortHeader, type SortDirection } from '../components/SortHeader';
@@ -23,17 +24,23 @@ const STATUS_FILTERS: ReadonlyArray<StatusFilterOption<'' | Status>> = [
 const YEAR_ACTIVE_CLASS = 'border-blue-600 bg-blue-600 text-white';
 const STATUS_FILTER_LABEL_ID = 'streams-status-filter-label';
 
+function isStatusFilter(value: string): value is '' | Status {
+  return STATUS_FILTERS.some((option) => option.value === value);
+}
+
 export default function StreamsList({ user }: { user: AuthUser }) {
-  const [initialParams] = useSearchParams();
-  const requestedStreamer = initialParams.get('streamer');
-  const [search, setSearch] = useState(() => initialParams.get('search') ?? '');
-  const [statusFilter, setStatusFilter] = useState<'' | Status>(() => {
-    const requested = initialParams.get('status');
-    return STATUS_FILTERS.some((item) => item.value === requested)
-      ? requested as '' | Status
-      : loadStreamsFilter().status;
-  });
-  const [yearFilter, setYearFilter] = useState<string>(() => loadStreamsFilter().year);
+  const [requestedStreamer] = useSearchParamState('streamer', '');
+  // Storage is only the fallback for what the URL does not say, so it is read once.
+  const [rememberedFilter] = useState(loadStreamsFilter);
+  const [statusFilter, setStatusFilter] = useSearchParamState<'' | Status>(
+    'status',
+    rememberedFilter.status,
+    { validate: isStatusFilter },
+  );
+  const [submittedSearch, setSubmittedSearch] = useSearchParamState('search', '');
+  // The typed term only narrows the table once the search form is submitted.
+  const [search, setSearch] = useState(submittedSearch);
+  const [yearFilter, setYearFilter] = useState<string>(rememberedFilter.year);
   const [sortKey, setSortKey] = useState<SortKey>('date');
   const [sortDir, setSortDir] = useState<SortDirection>('desc');
 
@@ -63,6 +70,7 @@ export default function StreamsList({ user }: { user: AuthUser }) {
 
   const handleSearch = (e: React.FormEvent) => {
     e.preventDefault();
+    setSubmittedSearch(search);
     list.reload();
   };
 

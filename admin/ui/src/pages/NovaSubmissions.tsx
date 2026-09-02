@@ -6,7 +6,7 @@ import { api } from '../api/client';
 import { useApiResource, errorMessage } from '../lib/apiResource';
 import { NO_RECENT_ACTIONS, visibleSubmissions } from '../lib/review-lists';
 import { countByStatus, removeById, replaceById } from '../lib/status-totals';
-import { useSearchParams } from 'react-router-dom';
+import { useSearchParamState } from '../hooks/useSearchParamState';
 import { finiteInputNumber } from '../lib/numeric-input';
 import { Avatar } from '../components/prism/Avatar';
 import { GradientButton, OutlineButton } from '../components/prism/Buttons';
@@ -36,6 +36,11 @@ import type {
 
 const ROW_GRID = 'grid-cols-[40px_minmax(0,1fr)_minmax(0,1fr)_110px_120px_120px_128px_28px]';
 
+/** The status filter values this inbox understands — anything else is not a filter. */
+function isNovaStatusFilter(value: string): value is '' | NovaStatus {
+  return NOVA_STATUS_FILTERS.some((option) => option.value === value);
+}
+
 function isCanonicalUtcTimestamp(value: string | null): value is string {
   if (value === null || !/^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}\.\d{3}Z$/.test(value)) return false;
   const timestamp = Date.parse(value);
@@ -43,16 +48,14 @@ function isCanonicalUtcTimestamp(value: string | null): value is string {
 }
 
 export default function NovaSubmissions({ user }: { user: AuthUser }) {
-  const [initialParams] = useSearchParams();
-  const [statusFilter, setStatusFilter] = useState<'' | NovaStatus>(() => {
-    const requested = initialParams.get('status');
-    return requested === 'approved' || requested === 'rejected' || requested === 'pending'
-      ? requested
-      : 'pending';
-  });
-  const [search, setSearch] = useState(() => initialParams.get('search') ?? '');
+  const [statusFilter, setStatusFilter] = useSearchParamState<'' | NovaStatus>(
+    'status',
+    'pending',
+    { validate: isNovaStatusFilter },
+  );
   // The typed term only narrows the table once the search form is submitted.
-  const [appliedSearch, setAppliedSearch] = useState(() => initialParams.get('search') ?? '');
+  const [appliedSearch, setAppliedSearch] = useSearchParamState('search', '');
+  const [search, setSearch] = useState(appliedSearch);
   const [justActed, setJustActed] = useState<ReadonlySet<string>>(NO_RECENT_ACTIONS);
   const [expandedId, setExpandedId] = useState<string | null>(null);
   const [actionLoading, setActionLoading] = useState<string | null>(null);
