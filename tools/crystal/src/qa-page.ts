@@ -1,8 +1,52 @@
 import { html, raw } from 'hono/html';
 import type { PublicTicketRow } from './types';
-import { DARK_MODE_CSS, DARK_MODE_DETECT_SCRIPT, PRISM_CSS, SPARKLE_SVG, svgIcon, themeToggleHTML } from './theme';
+import { DARK_MODE_CSS, SPARKLE_SVG, svgIcon, themeToggleHTML } from './theme';
 import type { IconName } from './theme';
 import { escapeHtml, nl2br } from '../../shared/web/html';
+import { pageShell } from '../../shared/web/page-shell';
+
+const PAGE_CSS = `    .qa-search { width: 280px; max-width: 100%; }
+    .qa-cards { display: flex; flex-direction: column; gap: 12px; padding: 16px 24px 24px; }
+    .qa-card { padding: 20px 24px; display: flex; flex-direction: column; gap: 12px; }
+    .qa-card-head { display: flex; align-items: flex-start; gap: 12px; }
+    .qa-card-text { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 4px; }
+    .qa-card-title { font-size: 15px; font-weight: 700; line-height: 1.3; color: var(--text-primary); }
+    .qa-card-status { flex-shrink: 0; }
+    .qa-body { margin: 0; font-size: 13px; line-height: 1.6; color: var(--text-secondary); }
+    .qa-reply { display: flex; flex-direction: column; gap: 6px; padding: 12px 14px; border-radius: var(--radius-lg); }
+    .qa-reply-head { display: flex; align-items: center; gap: 8px; }
+    .qa-reply-text { font-size: 13px; line-height: 1.6; color: var(--text-primary); }
+    .qa-empty { text-align: center; padding: 48px 16px; color: var(--text-tertiary); font-size: 14px; }
+    .qa-empty a { color: var(--accent-pink); font-weight: 600; font-size: 13px; text-decoration: none; }
+
+    .type-tile { width: 32px; height: 32px; border-radius: 8px; flex-shrink: 0; display: flex; align-items: center; justify-content: center; }
+    .type-bug { background: #FEE2E2; color: #DC2626; }
+    .type-feat { background: #F3E8FF; color: #A855F7; }
+    .type-ui { background: var(--bg-accent-blue-muted); color: var(--accent-blue); }
+    .type-other { background: #F1F5F9; color: #64748B; }
+    html.dark .type-bug { background: rgba(248, 113, 113, 0.15); color: #FCA5A5; }
+    html.dark .type-feat { background: rgba(192, 132, 252, 0.15); color: #D8B4FE; }
+    html.dark .type-other { background: rgba(148, 163, 184, 0.15); color: #CBD5E1; }
+    .type-word { font-weight: 600; }
+    .type-word-bug { color: #DC2626; }
+    .type-word-feat { color: #A855F7; }
+    .type-word-ui { color: var(--accent-blue); }
+    .type-word-other { color: #64748B; }
+    html.dark .type-word-bug { color: #FCA5A5; }
+    html.dark .type-word-feat { color: #D8B4FE; }
+    html.dark .type-word-other { color: #CBD5E1; }
+
+    .page-links { display: flex; justify-content: center; gap: 6px; margin-top: 4px; }
+    .page-link { display: inline-flex; align-items: center; justify-content: center; width: 32px; height: 32px; border-radius: 9999px; font-size: 11px; font-weight: 600; text-decoration: none; background: var(--bg-surface-muted); color: var(--text-secondary); border: 1px solid var(--border-glass); transition: color 0.15s; }
+    .page-link:hover { color: var(--accent-pink); }
+    .page-link.active { background: var(--gradient-accent); color: #FFFFFF; border-color: transparent; box-shadow: 0 2px 8px rgba(244, 114, 182, 0.3); }
+
+    @media (max-width: 640px) {
+      .qa-search { width: 100%; }
+      .qa-cards { padding: 4px 16px 16px; gap: 10px; }
+      .qa-card { padding: 16px; }
+    }
+`;
 
 const TYPE_LABELS: Record<string, string> = {
   bug: 'Bug',
@@ -99,103 +143,7 @@ export function renderQaPage(tickets: PublicTicketRow[], total: number, page: nu
     chipLink(buildHref({ type: 'other' }), '其他', typeFilter === 'other'),
   ].join('');
 
-  return html`<!doctype html>
-<html lang="zh-Hant">
-<head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Prism Crystal — Q&A</title>
-  <script>${raw(DARK_MODE_DETECT_SCRIPT)}</script>
-  <link rel="preconnect" href="https://fonts.googleapis.com" />
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700;0,9..40,900;1,9..40,400&display=swap" rel="stylesheet" />
-  <style>
-    :root {
-      --accent-pink: #EC4899;
-      --accent-pink-dark: #DB2777;
-      --accent-pink-light: #F472B6;
-      --accent-purple: #8B5CF6;
-      --accent-purple-light: #A78BFA;
-      --accent-blue: #3B82F6;
-      --accent-blue-light: #60A5FA;
-      --bg-page-start: #FFF0F5;
-      --bg-page-mid: #F0F8FF;
-      --bg-page-end: #E6E6FA;
-      --bg-surface-glass: #FFFFFF66;
-      --bg-surface-frosted: #FFFFFF99;
-      --text-primary: #1E293B;
-      --text-secondary: #64748B;
-      --text-tertiary: #94A3B8;
-      --border-default: #E2E8F0;
-      --border-glass: #FFFFFF66;
-      --border-accent-pink: #FBCFE8;
-      --radius-lg: 12px;
-      --radius-xl: 16px;
-      --radius-2xl: 20px;
-    }
-
-    ${raw(DARK_MODE_CSS)}
-    ${raw(PRISM_CSS)}
-
-    * { box-sizing: border-box; margin: 0; padding: 0; }
-    body {
-      font-family: 'DM Sans', system-ui, -apple-system, 'Segoe UI', sans-serif;
-      background: linear-gradient(135deg, var(--bg-page-start) 0%, var(--bg-page-mid) 50%, var(--bg-page-end) 100%);
-      background-attachment: fixed;
-      min-height: 100vh;
-      color: var(--text-primary);
-      -webkit-font-smoothing: antialiased;
-    }
-
-    .qa-search { width: 280px; max-width: 100%; }
-    .qa-cards { display: flex; flex-direction: column; gap: 12px; padding: 16px 24px 24px; }
-    .qa-card { padding: 20px 24px; display: flex; flex-direction: column; gap: 12px; }
-    .qa-card-head { display: flex; align-items: flex-start; gap: 12px; }
-    .qa-card-text { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 4px; }
-    .qa-card-title { font-size: 15px; font-weight: 700; line-height: 1.3; color: var(--text-primary); }
-    .qa-card-status { flex-shrink: 0; }
-    .qa-body { margin: 0; font-size: 13px; line-height: 1.6; color: var(--text-secondary); }
-    .qa-reply { display: flex; flex-direction: column; gap: 6px; padding: 12px 14px; border-radius: var(--radius-lg); }
-    .qa-reply-head { display: flex; align-items: center; gap: 8px; }
-    .qa-reply-text { font-size: 13px; line-height: 1.6; color: var(--text-primary); }
-    .qa-empty { text-align: center; padding: 48px 16px; color: var(--text-tertiary); font-size: 14px; }
-    .qa-empty a { color: var(--accent-pink); font-weight: 600; font-size: 13px; text-decoration: none; }
-
-    .type-tile { width: 32px; height: 32px; border-radius: 8px; flex-shrink: 0; display: flex; align-items: center; justify-content: center; }
-    .type-bug { background: #FEE2E2; color: #DC2626; }
-    .type-feat { background: #F3E8FF; color: #A855F7; }
-    .type-ui { background: var(--bg-accent-blue-muted); color: var(--accent-blue); }
-    .type-other { background: #F1F5F9; color: #64748B; }
-    html.dark .type-bug { background: rgba(248, 113, 113, 0.15); color: #FCA5A5; }
-    html.dark .type-feat { background: rgba(192, 132, 252, 0.15); color: #D8B4FE; }
-    html.dark .type-other { background: rgba(148, 163, 184, 0.15); color: #CBD5E1; }
-    .type-word { font-weight: 600; }
-    .type-word-bug { color: #DC2626; }
-    .type-word-feat { color: #A855F7; }
-    .type-word-ui { color: var(--accent-blue); }
-    .type-word-other { color: #64748B; }
-    html.dark .type-word-bug { color: #FCA5A5; }
-    html.dark .type-word-feat { color: #D8B4FE; }
-    html.dark .type-word-other { color: #CBD5E1; }
-
-    .page-links { display: flex; justify-content: center; gap: 6px; margin-top: 4px; }
-    .page-link { display: inline-flex; align-items: center; justify-content: center; width: 32px; height: 32px; border-radius: 9999px; font-size: 11px; font-weight: 600; text-decoration: none; background: var(--bg-surface-muted); color: var(--text-secondary); border: 1px solid var(--border-glass); transition: color 0.15s; }
-    .page-link:hover { color: var(--accent-pink); }
-    .page-link.active { background: var(--gradient-accent); color: #FFFFFF; border-color: transparent; box-shadow: 0 2px 8px rgba(244, 114, 182, 0.3); }
-
-    @media (max-width: 640px) {
-      .qa-search { width: 100%; }
-      .qa-cards { padding: 4px 16px 16px; gap: 10px; }
-      .qa-card { padding: 16px; }
-    }
-  </style>
-</head>
-<body>
-
-  <div class="prism-page prism-page-narrow">
-    <div class="prism-shell">
-      <!-- Header -->
-      <div class="prism-hero">
+  const hero = String(html`      <div class="prism-hero">
         <div class="prism-hero-tile">${raw(svgIcon('crystal', 30))}</div>
         <div class="prism-hero-stack">
           <div class="prism-badge">${raw(SPARKLE_SVG)}Q&amp;A</div>
@@ -203,9 +151,9 @@ export function renderQaPage(tickets: PublicTicketRow[], total: number, page: nu
           <p class="prism-desc">已回覆的問題與建議 <span class="dot">·</span> <strong>${total} 則</strong></p>
         </div>
         <div class="prism-hero-actions">${raw(themeToggleHTML())}</div>
-      </div>
+      </div>`);
 
-      <!-- Search (press Enter to submit) + type filter -->
+  const body = String(html`      <!-- Search (press Enter to submit) + type filter -->
       <div class="prism-toolbar">
         <form method="get" action="/qa" class="qa-search">
           ${typeFilter ? raw(`<input type="hidden" name="type" value="${escapeHtml(typeFilter)}" />`) : ''}
@@ -241,16 +189,21 @@ export function renderQaPage(tickets: PublicTicketRow[], total: number, page: nu
           : raw(ticketCards)
         }
         ${totalPages > 1 ? raw(`<div class="page-links">${paginationLinks.join('')}</div>`) : ''}
-      </div>
-    </div>
+      </div>`);
 
-    <div class="footer-links">
+  const footer = String(html`    <div class="footer-links">
       <a class="link-pill" href="/">${raw(svgIcon('message', 14))}提交新回報</a>
       <a class="link-pill" href="https://prism.oshi.tw" target="_blank" rel="noopener noreferrer">${raw(svgIcon('external', 14))}前往 Prism 歌單</a>
     </div>
-    <p class="footer-tagline">Prism &mdash; 為你喜愛的 VTuber 打造歌單頁面</p>
-  </div>
+    <p class="footer-tagline">Prism &mdash; 為你喜愛的 VTuber 打造歌單頁面</p>`);
 
-</body>
-</html>`;
+  return raw(pageShell({
+    title: 'Prism Crystal — Q&A',
+    narrow: true,
+    darkCss: DARK_MODE_CSS,
+    pageCss: PAGE_CSS,
+    hero,
+    body,
+    footer,
+  }));
 }

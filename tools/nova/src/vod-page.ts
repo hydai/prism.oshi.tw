@@ -1,8 +1,53 @@
 import { html, raw } from 'hono/html';
 import type { ApprovedStreamer } from './types';
-import { DARK_MODE_CSS, DARK_MODE_DETECT_SCRIPT, PRISM_CSS, SPARKLE_SVG, svgIcon, themeToggleHTML } from './theme';
+import { DARK_MODE_CSS, SPARKLE_SVG, svgIcon, themeToggleHTML } from './theme';
 import { VOD_FIELD_LIMITS, validateSlug } from './validate';
 import { escapeHtml } from '../../shared/web/html';
+import { pageShell } from '../../shared/web/page-shell';
+
+const PAGE_CSS = `    /* video fields left, fetched-video card right (one DOM card, re-flowed under the URL on mobile) */
+    .vod-form { padding: 24px 32px 32px; }
+    .vod-top { display: grid; grid-template-columns: minmax(0, 1fr) 300px; grid-template-rows: auto 1fr; gap: 18px 32px; }
+    .vod-col-a { grid-column: 1; grid-row: 1; }
+    .vod-col-b { grid-column: 1; grid-row: 2; }
+    .video-preview { grid-column: 2; grid-row: 1 / 3; }
+    .video-sticky { position: sticky; top: 24px; display: flex; flex-direction: column; gap: 8px; }
+    .video-card { display: flex; flex-direction: column; gap: 10px; padding: 12px; }
+    .video-thumb { width: 100%; aspect-ratio: 16 / 9; border-radius: var(--radius-lg); object-fit: cover; border: 1px solid var(--border-glass); box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1); background: var(--bg-surface-frosted); }
+    .video-text { display: flex; flex-direction: column; gap: 6px; min-width: 0; }
+    .video-title { font-size: 13px; font-weight: 700; line-height: 1.4; color: var(--text-primary); word-break: break-word; }
+    .video-title:empty { display: none; }
+
+    .songs-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 16px; align-items: start; }
+    .songs-textarea { min-height: 120px; }
+    .songs-preview { padding: 12px 8px 8px; min-height: 120px; }
+    .songs-preview:empty { display: flex; align-items: center; justify-content: center; padding: 12px; }
+    .songs-preview:empty::before { content: '貼上時間戳後，解析出的歌曲會顯示在這裡'; font-size: 12px; color: var(--text-tertiary); text-align: center; }
+    .songs-head { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; padding: 0 8px 8px; }
+    .songs-head-hint { font-size: 11px; color: var(--text-tertiary); }
+    .songs-cols, .song-row { display: grid; grid-template-columns: 24px minmax(0, 1fr) 60px 60px; gap: 0; align-items: center; }
+    .songs-cols { padding: 0 8px 6px; border-bottom: 1px solid var(--border-table); }
+    .songs-cols > :nth-child(2) { padding-left: 8px; }
+    .song-row { padding: 6px 8px; border-radius: 8px; }
+    .song-row .cell { padding-left: 8px; }
+    .song-title { font-size: 13px; font-weight: 700; color: var(--text-primary); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .song-artist { font-size: 11px; color: var(--text-secondary); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .right { text-align: right; }
+    .form-hint code { font-family: var(--font-mono); font-size: 11px; }
+    .link-pill svg, .btn-primary svg { flex-shrink: 0; }
+
+    /* 800px, not 640px: below that the fields column drops under the 300px Turnstile widget. */
+    @media (max-width: 800px) {
+      .vod-form { padding: 8px 16px 24px; }
+      .vod-top { grid-template-columns: 1fr; grid-template-rows: none; gap: 18px; }
+      .vod-col-a, .vod-col-b, .video-preview { grid-column: auto; grid-row: auto; }
+      .video-sticky { position: static; }
+      .video-card { flex-direction: row; align-items: center; padding: 12px 14px; }
+      .video-thumb { width: 96px; height: 54px; aspect-ratio: auto; border-radius: 8px; flex-shrink: 0; box-shadow: 0 1px 4px rgba(0, 0, 0, 0.1); }
+      .video-title { display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
+      .songs-grid { grid-template-columns: 1fr; }
+    }
+`;
 
 const VOD_SCRIPT = String.raw`
     (function() {
@@ -348,104 +393,7 @@ export function renderVodPage(siteKey: string, streamers: ApprovedStreamer[]) {
   const streamerSelectOptions = streamerOptions.join('')
     || '<option value="" disabled>暫無可選 VTuber（請聯繫管理員）</option>';
 
-  return html`<!doctype html>
-<html lang="zh-Hant">
-<head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Prism Nova — VOD 提交</title>
-  <link rel="preconnect" href="https://fonts.googleapis.com" />
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700;0,9..40,900;1,9..40,400&display=swap" rel="stylesheet" />
-  <script src="https://challenges.cloudflare.com/turnstile/v0/api.js" async defer></script>
-  <style>
-    :root {
-      --accent-pink: #EC4899;
-      --accent-pink-dark: #DB2777;
-      --accent-pink-light: #F472B6;
-      --accent-blue: #3B82F6;
-      --accent-blue-light: #60A5FA;
-      --accent-purple: #8B5CF6;
-      --bg-page-start: #FFF0F5;
-      --bg-page-mid: #F0F8FF;
-      --bg-page-end: #E6E6FA;
-      --bg-surface-glass: #FFFFFF66;
-      --bg-surface-frosted: #FFFFFF99;
-      --text-primary: #1E293B;
-      --text-secondary: #64748B;
-      --text-tertiary: #94A3B8;
-      --border-default: #E2E8F0;
-      --border-glass: #FFFFFF66;
-      --border-accent-pink: #FBCFE8;
-      --radius-lg: 12px;
-      --radius-xl: 16px;
-      --radius-2xl: 20px;
-    }
-
-    ${raw(DARK_MODE_CSS)}
-    ${raw(PRISM_CSS)}
-
-    * { box-sizing: border-box; margin: 0; padding: 0; }
-    body {
-      font-family: 'DM Sans', system-ui, -apple-system, 'Segoe UI', sans-serif;
-      background: linear-gradient(135deg, var(--bg-page-start) 0%, var(--bg-page-mid) 50%, var(--bg-page-end) 100%);
-      background-attachment: fixed;
-      min-height: 100vh;
-      color: var(--text-primary);
-      -webkit-font-smoothing: antialiased;
-    }
-
-    /* video fields left, fetched-video card right (one DOM card, re-flowed under the URL on mobile) */
-    .vod-form { padding: 24px 32px 32px; }
-    .vod-top { display: grid; grid-template-columns: minmax(0, 1fr) 300px; grid-template-rows: auto 1fr; gap: 18px 32px; }
-    .vod-col-a { grid-column: 1; grid-row: 1; }
-    .vod-col-b { grid-column: 1; grid-row: 2; }
-    .video-preview { grid-column: 2; grid-row: 1 / 3; }
-    .video-sticky { position: sticky; top: 24px; display: flex; flex-direction: column; gap: 8px; }
-    .video-card { display: flex; flex-direction: column; gap: 10px; padding: 12px; }
-    .video-thumb { width: 100%; aspect-ratio: 16 / 9; border-radius: var(--radius-lg); object-fit: cover; border: 1px solid var(--border-glass); box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1); background: var(--bg-surface-frosted); }
-    .video-text { display: flex; flex-direction: column; gap: 6px; min-width: 0; }
-    .video-title { font-size: 13px; font-weight: 700; line-height: 1.4; color: var(--text-primary); word-break: break-word; }
-    .video-title:empty { display: none; }
-
-    .songs-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 16px; align-items: start; }
-    .songs-textarea { min-height: 120px; }
-    .songs-preview { padding: 12px 8px 8px; min-height: 120px; }
-    .songs-preview:empty { display: flex; align-items: center; justify-content: center; padding: 12px; }
-    .songs-preview:empty::before { content: '貼上時間戳後，解析出的歌曲會顯示在這裡'; font-size: 12px; color: var(--text-tertiary); text-align: center; }
-    .songs-head { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; padding: 0 8px 8px; }
-    .songs-head-hint { font-size: 11px; color: var(--text-tertiary); }
-    .songs-cols, .song-row { display: grid; grid-template-columns: 24px minmax(0, 1fr) 60px 60px; gap: 0; align-items: center; }
-    .songs-cols { padding: 0 8px 6px; border-bottom: 1px solid var(--border-table); }
-    .songs-cols > :nth-child(2) { padding-left: 8px; }
-    .song-row { padding: 6px 8px; border-radius: 8px; }
-    .song-row .cell { padding-left: 8px; }
-    .song-title { font-size: 13px; font-weight: 700; color: var(--text-primary); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-    .song-artist { font-size: 11px; color: var(--text-secondary); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-    .right { text-align: right; }
-    .form-hint code { font-family: var(--font-mono); font-size: 11px; }
-    .link-pill svg, .btn-primary svg { flex-shrink: 0; }
-
-    /* 800px, not 640px: below that the fields column drops under the 300px Turnstile widget. */
-    @media (max-width: 800px) {
-      .vod-form { padding: 8px 16px 24px; }
-      .vod-top { grid-template-columns: 1fr; grid-template-rows: none; gap: 18px; }
-      .vod-col-a, .vod-col-b, .video-preview { grid-column: auto; grid-row: auto; }
-      .video-sticky { position: static; }
-      .video-card { flex-direction: row; align-items: center; padding: 12px 14px; }
-      .video-thumb { width: 96px; height: 54px; aspect-ratio: auto; border-radius: 8px; flex-shrink: 0; box-shadow: 0 1px 4px rgba(0, 0, 0, 0.1); }
-      .video-title { display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
-      .songs-grid { grid-template-columns: 1fr; }
-    }
-  </style>
-  <script>${raw(DARK_MODE_DETECT_SCRIPT)}</script>
-</head>
-<body>
-
-  <div class="prism-page">
-    <div class="prism-shell">
-      <!-- Header -->
-      <div class="prism-hero">
+  const hero = String(html`      <div class="prism-hero">
         <div class="prism-hero-tile">${raw(svgIcon('nova', 30))}</div>
         <div class="prism-hero-stack">
           <div class="prism-badge">${raw(SPARKLE_SVG)}提交歌回 VOD</div>
@@ -453,9 +401,9 @@ export function renderVodPage(siteKey: string, streamers: ApprovedStreamer[]) {
           <p class="prism-desc">提交歌回 VOD，幫助我們建立歌曲時間戳</p>
         </div>
         <div class="prism-hero-actions">${raw(themeToggleHTML())}</div>
-      </div>
+      </div>`);
 
-      <form id="vod-form" class="form-stack vod-form">
+  const body = String(html`      <form id="vod-form" class="form-stack vod-form">
         <div class="vod-top">
           <div class="vod-col-a form-stack">
             <div class="form-section"><span class="section-label">影片</span></div>
@@ -548,20 +496,25 @@ export function renderVodPage(siteKey: string, streamers: ApprovedStreamer[]) {
 
         <!-- Result message -->
         <div id="result" style="display: none; text-align: center; font-size: 13px; padding: 12px 16px; border-radius: var(--radius-lg);"></div>
-      </form>
-    </div>
+      </form>`);
 
-    <!-- Cross-links -->
+  const footer = String(html`    <!-- Cross-links -->
     <div class="footer-links">
       <a class="link-pill" href="/">${raw(svgIcon('plus', 14))}推薦新的 VTuber</a>
       <a class="link-pill" href="/status">${raw(svgIcon('list', 14))}提交狀態</a>
       <a class="link-pill" href="https://aurora.oshi.tw" target="_blank" rel="noopener noreferrer">${raw(svgIcon('pencil', 14))}使用完整時間戳編輯器</a>
       <a class="link-pill" href="https://prism.oshi.tw" target="_blank" rel="noopener noreferrer">${raw(svgIcon('external', 14))}前往 Prism 歌單</a>
     </div>
-    <p class="footer-tagline">Prism &mdash; 為你喜愛的 VTuber 打造歌單頁面</p>
-  </div>
+    <p class="footer-tagline">Prism &mdash; 為你喜愛的 VTuber 打造歌單頁面</p>`);
 
-  <script>${raw(VOD_SCRIPT)}</script>
-</body>
-</html>`;
+  return raw(pageShell({
+    title: 'Prism Nova — VOD 提交',
+    turnstileLoader: true,
+    darkCss: DARK_MODE_CSS,
+    pageCss: PAGE_CSS,
+    hero,
+    body,
+    footer,
+    script: VOD_SCRIPT,
+  }));
 }
