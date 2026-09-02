@@ -3,6 +3,7 @@ import { useEffect, useState } from 'react';
 import type { AuthUser } from '../../shared/types';
 import { api } from './api/client';
 import Layout from './components/Layout';
+import { useCurrentStreamer } from './hooks/useCurrentStreamer';
 import Dashboard from './pages/Dashboard';
 import SongsList from './pages/SongsList';
 import GlobalWorks from './pages/GlobalWorks';
@@ -21,10 +22,57 @@ import CrystalTickets from './pages/CrystalTickets';
 import VodExport from './pages/VodExport';
 import VodExportRepair from './pages/VodExportRepair';
 
+function RoutedPages({ user }: { user: AuthUser }) {
+  return (
+    <Routes>
+      <Route path="/" element={<Dashboard />} />
+      <Route path="/songs" element={<SongsList user={user} />} />
+      <Route
+        path="/works"
+        element={user.role === 'curator' ? <GlobalWorks /> : <Navigate to="/" replace />}
+      />
+      <Route
+        path="/works/review"
+        element={user.role === 'curator' ? <GlobalWorkReview /> : <Navigate to="/" replace />}
+      />
+      <Route path="/songs/:id" element={<SongDetail user={user} />} />
+      <Route path="/streams" element={<StreamsList user={user} />} />
+      <Route path="/streams/:id" element={<StreamDetailPage user={user} />} />
+      <Route path="/submit/song" element={<SubmitSong />} />
+      <Route path="/submit/stream" element={<SubmitStream />} />
+      <Route path="/stamp" element={<StampEditor user={user} />} />
+      <Route path="/pipeline" element={<Pipeline />} />
+      <Route path="/harmonizer" element={<Harmonizer />} />
+      <Route path="/nova" element={<NovaSubmissions user={user} />} />
+      <Route path="/nova/vods" element={<NovaVodSubmissions user={user} />} />
+      <Route path="/crystal" element={<CrystalTickets user={user} />} />
+      <Route
+        path="/vod-export"
+        element={user.role === 'curator' ? <VodExport user={user} /> : <Navigate to="/" replace />}
+      />
+      <Route
+        path="/vod-export/repair/:entity/:rowId"
+        element={user.role === 'curator' ? <VodExportRepair user={user} /> : <Navigate to="/" replace />}
+      />
+      <Route path="*" element={<Navigate to="/" replace />} />
+    </Routes>
+  );
+}
+
+/**
+ * Every page loads its streamer's data once, when it mounts. Keying the routed
+ * subtree by the selection therefore makes a streamer switch replace all of
+ * them, instead of leaving a page showing the streamer you just left.
+ */
+export function StreamerScopedRoutes({ streamer, user }: { streamer: string; user: AuthUser }) {
+  return <RoutedPages key={streamer} user={user} />;
+}
+
 export default function App() {
   const [user, setUser] = useState<AuthUser | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const streamer = useCurrentStreamer();
 
   useEffect(() => {
     api
@@ -57,38 +105,7 @@ export default function App() {
 
   return (
     <Layout user={user}>
-      <Routes>
-        <Route path="/" element={<Dashboard />} />
-        <Route path="/songs" element={<SongsList user={user} />} />
-        <Route
-          path="/works"
-          element={user.role === 'curator' ? <GlobalWorks /> : <Navigate to="/" replace />}
-        />
-        <Route
-          path="/works/review"
-          element={user.role === 'curator' ? <GlobalWorkReview /> : <Navigate to="/" replace />}
-        />
-        <Route path="/songs/:id" element={<SongDetail user={user} />} />
-        <Route path="/streams" element={<StreamsList user={user} />} />
-        <Route path="/streams/:id" element={<StreamDetailPage user={user} />} />
-        <Route path="/submit/song" element={<SubmitSong />} />
-        <Route path="/submit/stream" element={<SubmitStream />} />
-        <Route path="/stamp" element={<StampEditor user={user} />} />
-        <Route path="/pipeline" element={<Pipeline />} />
-        <Route path="/harmonizer" element={<Harmonizer />} />
-        <Route path="/nova" element={<NovaSubmissions user={user} />} />
-        <Route path="/nova/vods" element={<NovaVodSubmissions user={user} />} />
-        <Route path="/crystal" element={<CrystalTickets user={user} />} />
-        <Route
-          path="/vod-export"
-          element={user.role === 'curator' ? <VodExport user={user} /> : <Navigate to="/" replace />}
-        />
-        <Route
-          path="/vod-export/repair/:entity/:rowId"
-          element={user.role === 'curator' ? <VodExportRepair user={user} /> : <Navigate to="/" replace />}
-        />
-        <Route path="*" element={<Navigate to="/" replace />} />
-      </Routes>
+      <StreamerScopedRoutes streamer={streamer} user={user} />
     </Layout>
   );
 }

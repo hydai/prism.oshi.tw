@@ -1,7 +1,8 @@
 import { NavLink, useLocation, useNavigate } from 'react-router-dom';
 import { useEffect, useEffectEvent, useId, useState, type ReactNode } from 'react';
 import type { AuthUser, StreamerInfo } from '../../../shared/types';
-import { api, getCurrentStreamer, setCurrentStreamer, onStreamerChange } from '../api/client';
+import { api, getCurrentStreamer, setCurrentStreamer } from '../api/client';
+import { useCurrentStreamer } from '../hooks/useCurrentStreamer';
 import { getVisibleNavItems } from '../lib/navigation';
 
 /** Routes rendered in the prism visual vocabulary (gradient page, glass shell). */
@@ -11,12 +12,10 @@ export default function Layout({ user, children }: { user: AuthUser; children: R
   const navigate = useNavigate();
   const { pathname } = useLocation();
   const prismStyled = PRISM_STYLED_PATHS.has(pathname);
-  const [streamer, setStreamer] = useState(getCurrentStreamer);
+  const streamer = useCurrentStreamer();
   const [streamers, setStreamers] = useState<StreamerInfo[]>([]);
   const streamerSelectId = useId();
   const navigateToDashboard = useEffectEvent(() => navigate('/'));
-
-  useEffect(() => onStreamerChange(setStreamer), []);
 
   useEffect(() => {
     api.listStreamers()

@@ -7,7 +7,7 @@
     "dev": "vite",
     "build": "tsc -b && vite build",
     "lint": "eslint src tests",
-    "check": "npm run lint && npm run test:api-resource && npm run test:numeric-input && npm run test:youtube-embed && npm run test:crystal-tickets && npm run test:pipeline-extract-state && npm run test:work-review && npm run test:nova-links && npm run test:stream-detail && npm run test:stamp-editor && npm run test:player-clock && npm run test:player-clock-isolation && npm run test:vod-export && npm run test:prism-components && npm run test:nova-vod-groups && npm run test:nova-vod-row && npm run test:status-totals && npm run test:row-action-errors && npm run test:review-list-filters && npm run test:format-timestamp && npm run test:table-shells && npm run test:row-drafts && npm run test:harmonize-scan && npm run test:harmonizer-work-id && npm run test:streams-filter && npm run test:streams-render && npm run test:global-works && npm run test:loading-state && npm run test:search-param-state && npm run build",
+    "check": "npm run lint && npm run test:api-resource && npm run test:numeric-input && npm run test:youtube-embed && npm run test:crystal-tickets && npm run test:pipeline-extract-state && npm run test:work-review && npm run test:nova-links && npm run test:stream-detail && npm run test:stamp-editor && npm run test:player-clock && npm run test:player-clock-isolation && npm run test:vod-export && npm run test:prism-components && npm run test:nova-vod-groups && npm run test:nova-vod-row && npm run test:status-totals && npm run test:row-action-errors && npm run test:review-list-filters && npm run test:format-timestamp && npm run test:table-shells && npm run test:row-drafts && npm run test:harmonize-scan && npm run test:harmonizer-work-id && npm run test:streams-filter && npm run test:streams-render && npm run test:global-works && npm run test:loading-state && npm run test:search-param-state && npm run test:streamer-store && npm run build",
     "test:api-resource": "npx tsx tests/api-resource.test.ts",
     "test:prism-components": "npx tsx tests/prism-components.test.tsx",
     "test:nova-vod-groups": "npx tsx tests/nova-vod-groups.test.ts",
@@ -36,7 +36,8 @@
     "test:table-shells": "npx tsx tests/table-shells.test.tsx",
     "test:row-drafts": "npx tsx tests/row-drafts.test.tsx",
     "test:harmonize-scan": "npx tsx tests/harmonize-scan.test.tsx",
-    "test:search-param-state": "npx tsx tests/search-param-state.test.tsx"
+    "test:search-param-state": "npx tsx tests/search-param-state.test.tsx",
+    "test:streamer-store": "npx tsx tests/streamer-store.test.tsx"
   },
   "dependencies": {
     "react": "^19.2.6",
