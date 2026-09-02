@@ -88,6 +88,14 @@ export function getCurrentStreamer(): string {
   return _currentStreamer;
 }
 
+/**
+ * `useSyncExternalStore` wants a server snapshot; a render outside the browser
+ * simply reads the same module value, which is the storage-free default there.
+ */
+export function getStreamerServerSnapshot(): string {
+  return _currentStreamer;
+}
+
 export function setCurrentStreamer(slug: string): void {
   _currentStreamer = slug;
   try {
