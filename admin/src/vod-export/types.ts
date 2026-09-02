@@ -1,5 +1,30 @@
 import type { SocialProvider } from './constants';
 
+/**
+ * Every shape the Admin UI also sees lives in `admin/shared/vod-export-types`
+ * and is re-exported here, so the worker and the UI cannot describe the same
+ * JSON differently.
+ */
+export type {
+  CapacityDiagnostic,
+  CapacityResource,
+  CapacityState,
+  FindingCode,
+  FindingDetails,
+  FindingEntityType,
+  FindingSeverity,
+  PublicFindingField,
+  VodExportCounts,
+  VodExportFinding,
+  VodExportFindingApi,
+} from '../../shared/vod-export-types';
+
+import type {
+  CapacityDiagnostic,
+  VodExportCounts,
+  VodExportFinding,
+} from '../../shared/vod-export-types';
+
 export type SourceApprovalStatus = 'pending' | 'approved' | 'rejected' | 'excluded' | 'extracted' | string;
 
 /**
@@ -143,12 +168,6 @@ export interface VodExportSnapshot {
   streamers: VodExportStreamer[];
 }
 
-export interface VodExportCounts {
-  streamers: number;
-  vods: number;
-  performances: number;
-}
-
 export interface VodExportManifest {
   schemaVersion: '1.0.0';
   snapshotUrl: string;
@@ -158,106 +177,9 @@ export interface VodExportManifest {
   counts: VodExportCounts;
 }
 
-export type FindingSeverity = 'error' | 'warning';
-export type FindingEntityType = 'streamer' | 'vod' | 'song' | 'performance';
-
-export type FindingCode =
-  | 'MISSING_STREAMER_SLUG'
-  | 'INVALID_STREAMER_SLUG'
-  | 'DUPLICATE_STREAMER_SLUG'
-  | 'MISSING_DISPLAY_NAME'
-  | 'MISSING_YOUTUBE_CHANNEL_ID'
-  | 'UNVERIFIED_YOUTUBE_CHANNEL_ID'
-  | 'DUPLICATE_YOUTUBE_CHANNEL_ID'
-  | 'MISSING_VOD_RELATION'
-  | 'MISSING_SONG_RELATION'
-  | 'VOD_STREAMER_MISMATCH'
-  | 'SONG_STREAMER_MISMATCH'
-  | 'MISSING_VIDEO_ID'
-  | 'INVALID_VIDEO_ID'
-  | 'DUPLICATE_VOD_VIDEO_ID'
-  | 'MISSING_VOD_TITLE'
-  | 'MISSING_VOD_DATE'
-  | 'INVALID_VOD_DATE'
-  | 'MISSING_SONG_ID'
-  | 'MISSING_SONG_TITLE'
-  | 'MISSING_PERFORMANCE_ID'
-  | 'INVALID_UNICODE_TEXT'
-  | 'MISSING_START_SECONDS'
-  | 'INVALID_START_SECONDS'
-  | 'MISSING_END_SECONDS'
-  | 'INVALID_END_SECONDS'
-  | 'INVALID_END_RANGE'
-  | 'UNSAFE_AVATAR_URL'
-  | 'UNSAFE_SOCIAL_LINK'
-  | 'MISSING_ORIGINAL_ARTIST';
-
-export type PublicFindingField =
-  | 'slug'
-  | 'displayName'
-  | 'youtubeChannelId'
-  | 'avatarUrl'
-  | 'group'
-  | 'socialLinks'
-  | 'videoId'
-  | 'title'
-  | 'date'
-  | 'songId'
-  | 'performanceId'
-  | 'originalArtist'
-  | 'startSeconds'
-  | 'endSeconds';
-
-export interface FindingDetails {
-  submissionId?: string;
-  streamId?: string;
-  rowId?: number;
-  duplicateCount?: number;
-  startSeconds?: number;
-  endSeconds?: number;
-  affectedPerformanceCount?: number;
-  youtube?: boolean;
-  twitter?: boolean;
-  facebook?: boolean;
-  instagram?: boolean;
-  twitch?: boolean;
-}
-
-export interface VodExportFinding {
-  code: FindingCode;
-  severity: FindingSeverity;
-  message: string;
-  streamerSlug?: string;
-  entityType: FindingEntityType;
-  entityId?: string;
-  field?: PublicFindingField;
-  details?: FindingDetails;
-}
-
 export interface VodExportValidationResult {
   canPublish: boolean;
   findings: VodExportFinding[];
-}
-
-export type CapacityResource =
-  | 'sourceRows'
-  | 'sourceTextBytes'
-  | 'streamers'
-  | 'vods'
-  | 'performances'
-  | 'snapshotBytes'
-  | 'findings'
-  | 'findingsBytes'
-  | 'd1JsonBindingBytes';
-
-export type CapacityState = 'ok' | 'warning' | 'exceeded';
-
-export interface CapacityDiagnostic {
-  resource: CapacityResource;
-  actual: number;
-  limit: number;
-  ratio: number;
-  state: CapacityState;
 }
 
 export interface VodExportBuildResult extends VodExportValidationResult {

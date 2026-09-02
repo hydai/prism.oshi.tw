@@ -19,7 +19,7 @@ import { generateVodExportPreview, VodExportServiceError } from './service';
 import { readCurrentSourceFingerprint, sourceFingerprintsEqual } from './source';
 import { jsonStringByteLength, utf8ByteLength } from './normalization';
 import { createCompactJsonStream } from './json-stream';
-import type { CapacityDiagnostic, VodExportFinding } from './types';
+import type { CapacityDiagnostic, VodExportFinding, VodExportFindingApi } from './types';
 
 export type VodExportCandidateApiState = 'ready' | 'stale' | 'expired' | 'already_published';
 
@@ -34,9 +34,8 @@ export interface VodExportCandidateApi {
   state?: VodExportCandidateApiState;
 }
 
-export interface VodExportFindingApi extends VodExportFinding {
-  repairPath?: string;
-}
+/** The response shape the Admin UI reads; declared with the other shared DTOs. */
+export type { VodExportFindingApi } from './types';
 
 export interface VodExportPreviewApiResult {
   canPublish: boolean;

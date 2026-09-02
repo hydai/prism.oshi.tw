@@ -1,7 +1,7 @@
 import type {
   VodExportCandidate,
   VodExportCapacityDiagnostic,
-  VodExportFinding,
+  VodExportFindingApi,
   VodExportPreviewResponse,
   VodExportPublishResponse,
   VodExportReconcileResponse,
@@ -24,7 +24,7 @@ export interface VodExportPageState {
   candidate: VodExportCandidate | null;
   candidateState: CandidateLocalState;
   canPublish: boolean;
-  findings: VodExportFinding[];
+  findings: VodExportFindingApi[];
   capacity: VodExportCapacityDiagnostic[];
   previewLoaded: boolean;
   generating: boolean;

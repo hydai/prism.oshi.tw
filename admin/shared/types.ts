@@ -370,6 +370,19 @@ export interface NovaVodSong {
   sort_order: number;
 }
 
+// The PUT /:id allow-lists: every column a curator may set through a request
+// body. They live beside the row types so the Admin UI types its request bodies
+// from the same list the worker's UPDATE walks — the write path (nova-db.ts)
+// and the parser (parse.ts) import these, they are not copies.
+export const NOVA_VOD_EDITABLE_FIELDS = [
+  'stream_title', 'stream_date', 'submitter_note', 'reviewer_note',
+] as const satisfies readonly (keyof NovaVodSubmission)[];
+
+export type NovaVodEditableField = typeof NOVA_VOD_EDITABLE_FIELDS[number];
+
+/** Body of `PUT /api/nova/vods/:id` — any subset of the editable columns. */
+export type NovaVodUpdateBody = Partial<Record<NovaVodEditableField, string>>;
+
 export interface NovaSubmission {
   id: string;
   youtube_channel_url: string;
@@ -397,6 +410,18 @@ export interface NovaSubmission {
   reviewed_at: string | null;
   reviewer_note: string;
 }
+
+export const NOVA_SUBMISSION_EDITABLE_FIELDS = [
+  'youtube_channel_url', 'youtube_channel_id', 'slug', 'brand_name', 'display_name', 'description',
+  'avatar_url', 'subscriber_count', 'link_youtube', 'link_twitter',
+  'link_facebook', 'link_instagram', 'link_twitch', 'reviewer_note',
+  'group', 'theme_json', 'enabled', 'display_order', 'external_url',
+] as const satisfies readonly (keyof NovaSubmission)[];
+
+export type NovaEditableField = typeof NOVA_SUBMISSION_EDITABLE_FIELDS[number];
+
+/** Body of `PUT /api/nova/submissions/:id` — any subset of the editable columns. */
+export type NovaSubmissionUpdateBody = Partial<Record<NovaEditableField, string | number>>;
 
 export interface StreamerInfo {
   slug: string;
