@@ -5,6 +5,7 @@ import { validateTicket } from './validate';
 import { verifyTurnstile } from './turnstile';
 import { renderFormPage } from './form-page';
 import { renderQaPage } from './qa-page';
+import { parseJsonBody } from '../../shared/web/json-body';
 
 const app = new Hono<{ Bindings: Bindings }>();
 
@@ -17,16 +18,11 @@ app.get('/', (c) => {
 // --- Submit ticket ---
 
 app.post('/api/submit', async (c) => {
-  let body: SubmitTicketBody;
-  try {
-    body = await c.req.json<SubmitTicketBody>();
-  } catch {
+  const parsedBody = await parseJsonBody<SubmitTicketBody>(c.req);
+  if (!parsedBody.ok) {
     return c.json({ error: 'Invalid JSON body' }, 400);
   }
-  // JSON.parse also accepts `null`, arrays and scalars — validateTicket expects an object.
-  if (body === null || typeof body !== 'object' || Array.isArray(body)) {
-    return c.json({ error: 'Invalid JSON body' }, 400);
-  }
+  const body = parsedBody.body;
 
   // Validate fields
   const validation = validateTicket(body);

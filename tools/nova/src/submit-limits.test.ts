@@ -106,6 +106,19 @@ async function testStreamerSubmitRejectsNonHttpsAvatar(): Promise<void> {
   assertEqual(json.error, '無效的連結：avatar_url', 'the error names the offending field');
 }
 
+async function testStreamerSubmitRejectsArrayBody(): Promise<void> {
+  // Sanctioned delta from the shared parseJsonBody guard: a JSON array body now
+  // 400s here directly instead of falling through to field validation.
+  const res = await app.request(
+    '/api/submit',
+    { method: 'POST', headers: { 'content-type': 'application/json' }, body: JSON.stringify([]) },
+    env(),
+  );
+  assertEqual(res.status, 400, 'an array body is a 400');
+  const json = (await res.json()) as { error?: string };
+  assertEqual(json.error, 'Invalid JSON body', 'the error matches the malformed-JSON message');
+}
+
 async function testStreamerSubmitAcceptsAllowedUrls(): Promise<void> {
   const res = await post('/api/submit', {
     youtube_channel_url: 'https://www.youtube.com/@someone',
@@ -133,6 +146,7 @@ async function main(): Promise<void> {
     await testVodSubmitRejectsTooManySongs();
     await testStreamerSubmitRejectsForeignSocialHost();
     await testStreamerSubmitRejectsNonHttpsAvatar();
+    await testStreamerSubmitRejectsArrayBody();
     await testStreamerSubmitAcceptsAllowedUrls();
     console.log('submit-limits.test: all passed');
   } finally {

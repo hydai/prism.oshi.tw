@@ -26,6 +26,7 @@ import {
 } from './status-page';
 import { sanitizeNovaUrl, type NovaUrlProvider } from '../../../admin/shared/nova-url-safety';
 import { ALLOWED_ORIGINS, isTrustedRequest } from './origins';
+import { parseJsonBody } from '../../shared/web/json-body';
 
 // Public-form URL fields → the host allow-list each one must satisfy.
 const SUBMISSION_URL_FIELDS: ReadonlyArray<{ field: 'avatar_url' | 'link_youtube' | 'link_twitter' | 'link_facebook' | 'link_instagram' | 'link_twitch'; provider: NovaUrlProvider }> = [
@@ -174,12 +175,11 @@ app.get('/api/channel-info', async (c) => {
 
 // POST /api/submit — Process a new submission
 app.post('/api/submit', async (c) => {
-  let body: SubmitBody;
-  try {
-    body = await c.req.json<SubmitBody>();
-  } catch {
+  const parsedBody = await parseJsonBody<SubmitBody>(c.req);
+  if (!parsedBody.ok) {
     return c.json({ error: 'Invalid JSON body' }, 400);
   }
+  const body = parsedBody.body;
 
   // Validate required fields
   const errors = validateRequired({
@@ -364,12 +364,11 @@ app.get('/vod/api/video-info', async (c) => {
 
 // POST /vod/api/submit — Process a new VOD submission
 app.post('/vod/api/submit', async (c) => {
-  let body: VodSubmitBody & { thumbnail_url?: string };
-  try {
-    body = await c.req.json();
-  } catch {
+  const parsedBody = await parseJsonBody<VodSubmitBody & { thumbnail_url?: string }>(c.req);
+  if (!parsedBody.ok) {
     return c.json({ error: 'Invalid JSON body' }, 400);
   }
+  const body = parsedBody.body;
 
   // Validate required fields
   const errors = validateRequired({
