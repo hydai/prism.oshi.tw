@@ -9,6 +9,10 @@
  * Deliberately framework-free: it returns a plain string and imports nothing
  * but its siblings, so `tools/shared` needs no node_modules of its own. Hono
  * callers wrap the result in `raw()`.
+ *
+ * An optional per-request `nonce` is stamped on every inline `<script>`/
+ * `<style>` tag the shell emits, so a caller enforcing a CSP can allow-list
+ * that one value instead of `unsafe-inline`. See `PageShellParts.nonce`.
  */
 import { escapeHtml } from './html';
 import { DARK_MODE_DETECT_SCRIPT, PRISM_CSS } from './theme';
@@ -61,9 +65,6 @@ const BASE_RESET_CSS = `    * { box-sizing: border-box; margin: 0; padding: 0; }
  */
 export const LIGHT_THEME_CSS = LIGHT_PALETTE_CSS + BASE_RESET_CSS;
 
-/** The dark-mode class is set before first paint, so the script must run before the stylesheets. */
-const DETECT_SCRIPT_TAG = `  <script>${DARK_MODE_DETECT_SCRIPT}</script>`;
-
 /**
  * Every slot is an already-rendered HTML string. Pass synchronous fragments only:
  * `String(html\`…\`)` of a fragment that interpolates a Promise yields the text
@@ -96,6 +97,15 @@ export interface PageShellParts {
   footer: string;
   /** Body of the trailing `<script>`, emitted just before `</body>`. Omit for a script-free page. */
   script?: string;
+  /**
+   * CSP nonce stamped on every inline `<script>`/`<style>` tag this shell
+   * emits: the head detect script, the Turnstile loader, the `<style>`
+   * block, and the trailing script. Optional so callers can adopt it
+   * incrementally — omit it and the output is byte-identical to a shell
+   * with no CSP at all. An empty string throws rather than silently
+   * producing an un-nonced tag.
+   */
+  nonce?: string;
 }
 
 /**
@@ -105,13 +115,24 @@ export interface PageShellParts {
  * palette, the worker's dark overrides, PRISM_CSS, the reset/body rule, then
  * the page's own CSS last so it wins. `darkCss` and `PRISM_CSS` both open with
  * a newline, which is why their interpolations sit behind a bare indent.
+ *
+ * `nonce` (see `PageShellParts.nonce`) is resolved once into `nonceAttr`
+ * below and that single value is reused at all four inline-tag sites, so
+ * there is exactly one place that decides what the attribute looks like.
  */
 export function pageShell(parts: PageShellParts): string {
+  if (parts.nonce === '') {
+    throw new Error('pageShell: nonce must be non-empty when given');
+  }
+  const nonceAttr = parts.nonce === undefined ? '' : ` nonce="${escapeHtml(parts.nonce)}"`;
+
   const narrowClass = parts.narrow ? ' prism-page-narrow' : '';
+  // The dark-mode class is set before first paint, so the script must run before the stylesheets.
+  const detectScriptTag = `  <script${nonceAttr}>${DARK_MODE_DETECT_SCRIPT}</script>`;
   const turnstile = parts.turnstileLoader
-    ? '\n  <script src="https://challenges.cloudflare.com/turnstile/v0/api.js" async defer></script>'
+    ? `\n  <script${nonceAttr} src="https://challenges.cloudflare.com/turnstile/v0/api.js" async defer></script>`
     : '';
-  const script = parts.script === undefined ? '' : `\n\n  <script>${parts.script}</script>`;
+  const script = parts.script === undefined ? '' : `\n\n  <script${nonceAttr}>${parts.script}</script>`;
 
   return `<!doctype html>
 <html lang="zh-Hant">
@@ -119,11 +140,11 @@ export function pageShell(parts: PageShellParts): string {
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>${escapeHtml(parts.title)}</title>
-${DETECT_SCRIPT_TAG}
+${detectScriptTag}
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700;0,9..40,900;1,9..40,400&display=swap" rel="stylesheet" />${turnstile}
-  <style>
+  <style${nonceAttr}>
 ${LIGHT_PALETTE_CSS}
     ${parts.darkCss}
     ${PRISM_CSS}
