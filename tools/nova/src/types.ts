@@ -4,6 +4,14 @@ export type Bindings = {
   TURNSTILE_SITE_KEY: string;
   TURNSTILE_SECRET_KEY: string;
   YOUTUBE_API_KEY: string;
+  /**
+   * Origin the channel-page scrape fetches from. Unset everywhere but the tests
+   * — production falls back to `https://www.youtube.com`. It exists so
+   * `channel-info.workerd.test.ts` can point the scrape at a local fixture
+   * server instead of reaching YouTube. Only the origin is swapped; the path
+   * still comes from the validated canonical channel URL.
+   */
+  YOUTUBE_ORIGIN?: string;
 };
 
 export type SubmissionStatus = 'pending' | 'approved' | 'rejected';

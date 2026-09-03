@@ -1,0 +1,14 @@
+{
+  // Nova's tests are the only files here allowed to see Node's ambient globals:
+  // channel-info.workerd.test.ts boots the worker under workerd and needs
+  // node:http for its fixture server. Keeping "node" out of tsconfig.json means
+  // worker source that reaches for `Buffer` or `process.env` still fails the
+  // typecheck — there is no nodejs_compat flag on this worker, so it would only
+  // have failed at runtime.
+  "extends": "./tsconfig.json",
+  "compilerOptions": {
+    "types": ["@cloudflare/workers-types", "node"]
+  },
+  "include": ["src/**/*.test.ts"],
+  "exclude": ["node_modules"]
+}

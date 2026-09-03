@@ -13,6 +13,7 @@ import {
   validateFieldLengths,
   validateRequired,
 } from './validate';
+import { extractChannelMeta } from './channel-meta';
 import { verifyTurnstile } from './turnstile';
 import { generateId, findByChannelUrl, insertSubmission, resetRejectedSubmission, listAllSubmissions } from './db';
 import { generateVodId, generateVodSongId, listApprovedStreamers, findApprovedVodByVideoId, countVodsByVideoId, insertVodSubmission, listAllVodSubmissions, listAdminStreams, checkAdminStreamExists } from './vod-db';
@@ -170,22 +171,20 @@ app.get('/api/channel-info', async (c) => {
   }
 
   try {
-    const res = await fetch(result.canonical, {
+    // Rebuild the upstream URL so the origin — and only the origin — is
+    // overridable: the path and query still come from the canonical URL that
+    // normalizeYoutubeChannelUrl just validated. YOUTUBE_ORIGIN is unset in
+    // production (this resolves to https://www.youtube.com); the workerd test
+    // sets it to a local fixture server.
+    const canonical = new URL(result.canonical);
+    const upstream = new URL(canonical.pathname + canonical.search, c.env.YOUTUBE_ORIGIN ?? 'https://www.youtube.com');
+    const res = await fetch(upstream.toString(), {
       headers: { 'Accept-Language': 'zh-TW,zh;q=0.9,en;q=0.8' },
     });
     if (!res.ok) {
       return c.json({ error: 'Failed to fetch channel page' }, 502);
     }
-    const pageHtml = await res.text();
-
-    // Extract og:title and og:image from meta tags
-    const titleMatch = pageHtml.match(/<meta\s+property="og:title"\s+content="([^"]*)"/i)
-      ?? pageHtml.match(/<meta\s+content="([^"]*)"\s+property="og:title"/i);
-    const imageMatch = pageHtml.match(/<meta\s+property="og:image"\s+content="([^"]*)"/i)
-      ?? pageHtml.match(/<meta\s+content="([^"]*)"\s+property="og:image"/i);
-
-    const displayName = titleMatch?.[1] ?? '';
-    const avatarUrl = imageMatch?.[1] ?? '';
+    const { title: displayName, image: avatarUrl } = await extractChannelMeta(res);
 
     return c.json({ displayName, avatarUrl });
   } catch {
