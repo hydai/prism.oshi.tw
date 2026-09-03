@@ -1,4 +1,5 @@
-import { useState, useEffect, useRef, useCallback } from 'react';
+import { memo, useState, useEffect, useRef, useCallback } from 'react';
+import type { Dispatch, SetStateAction } from 'react';
 import type { AuthUser, StreamWithPending, StampPerformance, StampStats } from '../../../shared/types';
 import { api } from '../api/client';
 import { YouTubePlayer } from '../components/YouTubePlayer';
@@ -328,6 +329,10 @@ export function StampEditorView({ controller }: { controller: StampEditorControl
     selectedStreamId,
     performances,
     selectedIndex,
+    setSelectedIndex,
+    editingField,
+    setEditingField,
+    loading,
     toast,
     showAddModal,
     setShowAddModal,
@@ -341,8 +346,11 @@ export function StampEditorView({ controller }: { controller: StampEditorControl
     streamYears,
     filteredStreams,
     selectStream,
+    clearEndTimestamp,
+    deletePerformance,
     handleAddSong,
     handlePasteImportDone,
+    handleInlineEditSave,
     exportSongList,
     clearAllEndTimestampsAction,
     approveAllAction,
@@ -541,7 +549,17 @@ export function StampEditorView({ controller }: { controller: StampEditorControl
               </div>
             </div>
 
-            <SongList controller={controller} />
+            <SongList
+              performances={performances}
+              loading={loading}
+              selectedIndex={selectedIndex}
+              setSelectedIndex={setSelectedIndex}
+              editingField={editingField}
+              setEditingField={setEditingField}
+              onInlineEditSave={handleInlineEditSave}
+              onClearEndTimestamp={clearEndTimestamp}
+              onDelete={deletePerformance}
+            />
           </>
         )}
       </div>
@@ -570,19 +588,36 @@ export function StampEditorView({ controller }: { controller: StampEditorControl
   );
 }
 
-function SongList({ controller }: { controller: StampEditorController }) {
-  const {
-    performances,
-    loading,
-    selectedIndex,
-    setSelectedIndex,
-    editingField,
-    setEditingField,
-    handleInlineEditSave,
-    clearEndTimestamp,
-    deletePerformance,
-  } = controller;
+interface SongListProps {
+  performances: StampPerformance[];
+  loading: boolean;
+  selectedIndex: number;
+  setSelectedIndex: Dispatch<SetStateAction<number>>;
+  editingField: EditingField | null;
+  setEditingField: Dispatch<SetStateAction<EditingField | null>>;
+  onInlineEditSave: (index: number, field: 'title' | 'artist', value: string) => void;
+  onClearEndTimestamp: (perfId: string, index: number) => void;
+  onDelete: (perfId: string, index: number) => void;
+}
 
+/**
+ * The rows, memoized. The page state around this list — the stream search, the year filter, the
+ * modals, the toast, the fetch log — changes far more often than the rows themselves, and taking
+ * the whole controller as one prop re-rendered every row on each of those. These props are the
+ * list's own data plus callbacks the controller keeps referentially stable, so an unrelated page
+ * change now stops at this boundary (`tests/song-table-memo.test.tsx` counts it).
+ */
+const SongList = memo(function SongList({
+  performances,
+  loading,
+  selectedIndex,
+  setSelectedIndex,
+  editingField,
+  setEditingField,
+  onInlineEditSave,
+  onClearEndTimestamp,
+  onDelete,
+}: SongListProps) {
   return (
     <div className="flex-1 overflow-y-auto rounded-lg border border-slate-200 bg-white">
       {loading ? (
@@ -619,7 +654,7 @@ function SongList({ controller }: { controller: StampEditorController }) {
                 {editingField?.index === i && editingField.field === 'title' ? (
                   <InlineEdit
                     value={perf.title}
-                    onSave={(val) => handleInlineEditSave(i, 'title', val)}
+                    onSave={(val) => onInlineEditSave(i, 'title', val)}
                     onCancel={() => setEditingField(null)}
                   />
                 ) : (
@@ -645,7 +680,7 @@ function SongList({ controller }: { controller: StampEditorController }) {
                   <InlineEdit
                     value={perf.originalArtist}
                     placeholder="add artist"
-                    onSave={(val) => handleInlineEditSave(i, 'artist', val)}
+                    onSave={(val) => onInlineEditSave(i, 'artist', val)}
                     onCancel={() => setEditingField(null)}
                   />
                 ) : (
@@ -695,7 +730,7 @@ function SongList({ controller }: { controller: StampEditorController }) {
                 <button
                   onClick={(e) => {
                     e.stopPropagation();
-                    clearEndTimestamp(perf.id, i);
+                    onClearEndTimestamp(perf.id, i);
                   }}
                   className="flex-shrink-0 rounded p-0.5 text-slate-400 hover:bg-slate-200 hover:text-slate-600"
                   title="Clear end timestamp"
@@ -707,7 +742,7 @@ function SongList({ controller }: { controller: StampEditorController }) {
               <button
                 onClick={(e) => {
                   e.stopPropagation();
-                  deletePerformance(perf.id, i);
+                  onDelete(perf.id, i);
                 }}
                 className="flex-shrink-0 rounded p-0.5 text-slate-400 hover:bg-red-100 hover:text-red-600"
                 title="Delete song"
@@ -720,7 +755,7 @@ function SongList({ controller }: { controller: StampEditorController }) {
       )}
     </div>
   );
-}
+});
 
 export default function StampEditor({ user }: { user: AuthUser }) {
   const controller = useStampEditorController(user);

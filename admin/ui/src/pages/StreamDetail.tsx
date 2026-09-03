@@ -1,4 +1,5 @@
-import { useState, useEffect, useRef, useCallback, useMemo } from 'react';
+import { memo, useState, useEffect, useRef, useCallback, useMemo } from 'react';
+import type { Dispatch, RefObject, SetStateAction } from 'react';
 import { useParams, useNavigate, Link } from 'react-router-dom';
 import type { AuthUser, StreamDetail as StreamDetailType, StampPerformance, Status, Stream } from '../../../shared/types';
 import { api } from '../api/client';
@@ -56,6 +57,9 @@ function InlineDateEdit({ value, label, onSave, onCancel }: {
 type EditingField =
   | { type: 'perf'; perfId: string; field: 'title' | 'artist' | 'note' }
   | { type: 'stream'; field: 'title' | 'date' };
+
+/** The one variant PerformanceTable's rows ever read — see the memo boundary below. */
+type PerfEditingField = Extract<EditingField, { type: 'perf' }>;
 
 function useStreamDetailController(user: AuthUser) {
   const { id: streamId } = useParams<{ id: string }>();
@@ -407,6 +411,7 @@ export function StreamDetailView({ controller }: { controller: StreamDetailContr
     playerRef,
     playerBoxRef,
     selectedIndex,
+    setSelectedIndex,
     showAddModal,
     setShowAddModal,
     fetchLog,
@@ -421,8 +426,12 @@ export function StreamDetailView({ controller }: { controller: StreamDetailContr
     handlePasteImportDone,
     copyVodUrl,
     exportSongList,
+    handleSave,
+    handleDelete,
+    handlePerformanceStatus,
     handleApproveAll,
     handleUnapproveAll,
+    clearEndTimestamp,
     clearAllEndTimestamps,
     handleAddSong,
   } = controller;
@@ -626,7 +635,19 @@ export function StreamDetailView({ controller }: { controller: StreamDetailContr
         </div>
       </div>
 
-      <PerformanceTable controller={controller} />
+      <PerformanceTable
+        performances={detail.performances}
+        editingField={editingField?.type === 'perf' ? editingField : null}
+        setEditingField={setEditingField}
+        playerRef={playerRef}
+        selectedIndex={selectedIndex}
+        setSelectedIndex={setSelectedIndex}
+        isCurator={isCurator}
+        onSave={handleSave}
+        onDelete={handleDelete}
+        onPerformanceStatus={handlePerformanceStatus}
+        onClearEndTimestamp={clearEndTimestamp}
+      />
 
       {/* Add Song Modal */}
       {showAddModal && (
@@ -650,26 +671,45 @@ export function StreamDetailView({ controller }: { controller: StreamDetailContr
   );
 }
 
-function PerformanceTable({ controller }: { controller: StreamDetailController }) {
-  const {
-    detail,
-    editingField,
-    setEditingField,
-    playerRef,
-    selectedIndex,
-    setSelectedIndex,
-    isCurator,
-    handleSave,
-    handleDelete,
-    handlePerformanceStatus,
-    clearEndTimestamp,
-  } = controller;
+interface PerformanceTableProps {
+  performances: StampPerformance[];
+  editingField: PerfEditingField | null;
+  setEditingField: Dispatch<SetStateAction<EditingField | null>>;
+  playerRef: RefObject<YouTubePlayerHandle | null>;
+  selectedIndex: number;
+  setSelectedIndex: Dispatch<SetStateAction<number>>;
+  isCurator: boolean;
+  onSave: (perfId: string, field: 'title' | 'artist' | 'note', value: string) => void;
+  onDelete: (perf: StampPerformance) => void;
+  onPerformanceStatus: (perfId: string, status: Status) => void;
+  onClearEndTimestamp: (perfId: string, index: number) => void;
+}
 
-  if (!detail) return null;
-
+/**
+ * The rows, memoized. The page state around this table — the modals, the toast, the fetch log, the
+ * stream's own header edits — changes far more often than the rows themselves, and taking the whole
+ * controller as one prop re-rendered every row on each of those. These props are the table's own
+ * data plus callbacks the controller keeps referentially stable; editingField in particular is
+ * narrowed to the table's own 'perf' variant (or the referentially stable `null` literal), so
+ * double-clicking the stream's own title or date no longer changes this prop at all. An unrelated
+ * page change now stops at this boundary (`tests/song-table-memo.test.tsx` counts it).
+ */
+const PerformanceTable = memo(function PerformanceTable({
+  performances,
+  editingField,
+  setEditingField,
+  playerRef,
+  selectedIndex,
+  setSelectedIndex,
+  isCurator,
+  onSave,
+  onDelete,
+  onPerformanceStatus,
+  onClearEndTimestamp,
+}: PerformanceTableProps) {
   return (
     <div className="mt-3 overflow-x-auto rounded-lg border border-slate-200 bg-white">
-      {detail.performances.length === 0 ? (
+      {performances.length === 0 ? (
         <div className="p-6 text-center text-sm text-slate-400">No performances in this stream.</div>
       ) : (
         <table className="w-full text-left text-sm">
@@ -686,7 +726,7 @@ function PerformanceTable({ controller }: { controller: StreamDetailController }
             </tr>
           </thead>
           <tbody className="divide-y divide-slate-100">
-            {detail.performances.map((perf, i) => (
+            {performances.map((perf, i) => (
               <tr key={perf.id} id={`performance-row-${perf.id}`}
                 onClick={() => { setSelectedIndex(i); setEditingField(null); }}
                 className={`cursor-pointer transition-colors hover:bg-slate-50 ${
@@ -696,7 +736,7 @@ function PerformanceTable({ controller }: { controller: StreamDetailController }
 
                 <td className="px-4 py-3">
                   {editingField?.type === 'perf' && editingField.perfId === perf.id && editingField.field === 'title' ? (
-                    <InlineEdit value={perf.title} onSave={(v) => handleSave(perf.id, 'title', v)} onCancel={() => setEditingField(null)} />
+                    <InlineEdit value={perf.title} onSave={(v) => onSave(perf.id, 'title', v)} onCancel={() => setEditingField(null)} />
                   ) : (
                     <span className="cursor-text font-medium text-slate-800" onDoubleClick={(e) => { e.stopPropagation(); setEditingField({ type: 'perf', perfId: perf.id, field: 'title' }); }} title="Double-click to edit">
                       {perf.title}
@@ -706,7 +746,7 @@ function PerformanceTable({ controller }: { controller: StreamDetailController }
 
                 <td className="px-4 py-3">
                   {editingField?.type === 'perf' && editingField.perfId === perf.id && editingField.field === 'artist' ? (
-                    <InlineEdit allowEmpty value={perf.originalArtist} placeholder="add artist" onSave={(v) => handleSave(perf.id, 'artist', v)} onCancel={() => setEditingField(null)} />
+                    <InlineEdit allowEmpty value={perf.originalArtist} placeholder="add artist" onSave={(v) => onSave(perf.id, 'artist', v)} onCancel={() => setEditingField(null)} />
                   ) : (
                     <span className={`cursor-text ${perf.originalArtist ? 'text-slate-600' : 'italic text-slate-400'}`}
                       onDoubleClick={(e) => { e.stopPropagation(); setEditingField({ type: 'perf', perfId: perf.id, field: 'artist' }); }} title="Double-click to edit">
@@ -727,7 +767,7 @@ function PerformanceTable({ controller }: { controller: StreamDetailController }
                         <button onClick={(e) => { e.stopPropagation(); playerRef.current?.seekTo(Math.max(0, perf.endTimestamp! - (e.shiftKey ? 0 : 5))); }} className="hover:underline" title="Seek end -5s (Shift+click: exact end)">
                           {formatTimestamp(perf.endTimestamp)}
                         </button>
-                        <button onClick={(e) => { e.stopPropagation(); clearEndTimestamp(perf.id, i); }}
+                        <button onClick={(e) => { e.stopPropagation(); onClearEndTimestamp(perf.id, i); }}
                           className="rounded p-0.5 text-slate-400 hover:bg-slate-200 hover:text-slate-600" title="Clear end timestamp">
                           &#x21BA;
                         </button>
@@ -738,7 +778,7 @@ function PerformanceTable({ controller }: { controller: StreamDetailController }
 
                 <td className="max-w-48 px-4 py-3">
                   {editingField?.type === 'perf' && editingField.perfId === perf.id && editingField.field === 'note' ? (
-                    <InlineEdit allowEmpty value={perf.note} placeholder="add note" onSave={(v) => handleSave(perf.id, 'note', v)} onCancel={() => setEditingField(null)} />
+                    <InlineEdit allowEmpty value={perf.note} placeholder="add note" onSave={(v) => onSave(perf.id, 'note', v)} onCancel={() => setEditingField(null)} />
                   ) : (
                     <span className={`cursor-text truncate text-xs ${perf.note ? 'text-slate-600' : 'italic text-slate-400'}`}
                       onDoubleClick={(e) => { e.stopPropagation(); setEditingField({ type: 'perf', perfId: perf.id, field: 'note' }); }} title="Double-click to edit note">
@@ -752,18 +792,18 @@ function PerformanceTable({ controller }: { controller: StreamDetailController }
                 <td className="px-4 py-3">
                   <div className="flex items-center gap-1">
                     {isCurator && perf.status !== 'approved' && (
-                      <button onClick={(e) => { e.stopPropagation(); handlePerformanceStatus(perf.id, 'approved'); }}
+                      <button onClick={(e) => { e.stopPropagation(); onPerformanceStatus(perf.id, 'approved'); }}
                         className="rounded px-1.5 py-0.5 text-xs text-green-600 hover:bg-green-100" title="Approve">
                         &#x2713;
                       </button>
                     )}
                     {isCurator && perf.status === 'approved' && (
-                      <button onClick={(e) => { e.stopPropagation(); handlePerformanceStatus(perf.id, 'pending'); }}
+                      <button onClick={(e) => { e.stopPropagation(); onPerformanceStatus(perf.id, 'pending'); }}
                         className="rounded px-1.5 py-0.5 text-xs text-yellow-600 hover:bg-yellow-100" title="Unapprove">
                         &#x21A9;
                       </button>
                     )}
-                    <button onClick={(e) => { e.stopPropagation(); handleDelete(perf); }}
+                    <button onClick={(e) => { e.stopPropagation(); onDelete(perf); }}
                       className="rounded p-1 text-slate-400 hover:bg-red-100 hover:text-red-600" title="Delete">
                       &times;
                     </button>
@@ -776,7 +816,7 @@ function PerformanceTable({ controller }: { controller: StreamDetailController }
       )}
     </div>
   );
-}
+});
 
 export default function StreamDetail({ user }: { user: AuthUser }) {
   const controller = useStreamDetailController(user);
