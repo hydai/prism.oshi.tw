@@ -54,6 +54,7 @@ const detail: StreamDetail = {
 function adjacentStream(id: string, date: string): Stream {
   return {
     id,
+    streamerId: 'mizuki',
     title: id,
     date,
     videoId: `${id}-video`,

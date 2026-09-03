@@ -1,5 +1,4 @@
 import { existsSync } from 'node:fs';
-import * as React from 'react';
 import { renderToStaticMarkup } from 'react-dom/server';
 import type { HarmonizeSongEntry, SimilarityGroup } from '../../shared/types';
 import { Pagination } from '../src/components/Pagination';

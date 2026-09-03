@@ -1,5 +1,4 @@
 import assert from 'node:assert/strict';
-import * as React from 'react';
 import { renderToStaticMarkup } from 'react-dom/server';
 import YouTubeEmbed from '../src/components/YouTubeEmbed';
 

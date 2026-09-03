@@ -1,10 +1,9 @@
-import * as React from 'react';
 import { renderToStaticMarkup } from 'react-dom/server';
 import { MemoryRouter } from 'react-router-dom';
 import type { AuthUser } from '../../shared/types';
 import type {
   VodExportCandidate,
-  VodExportFinding,
+  VodExportFindingApi,
   VodExportPublication,
 } from '../src/api/vodExportTypes';
 
@@ -289,7 +288,7 @@ async function main(): Promise<void> {
   assert(publicationHtml.includes('2026-07-11T12:35:10.123Z'), 'current publication renders exact UTC time');
   assert(publicationHtml.includes('8,534'), 'current publication renders performance count');
 
-  const findings: VodExportFinding[] = [
+  const findings: VodExportFindingApi[] = [
     {
       code: 'MISSING_END_SECONDS',
       severity: 'error',

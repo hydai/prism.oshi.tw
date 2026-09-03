@@ -1,0 +1,11 @@
+{
+  "extends": "./tsconfig.json",
+  "compilerOptions": {
+    "noEmit": true,
+    "jsx": "react-jsx",
+    // Base tsconfig.json's `lib` stops at ES2020; a test uses `Array.prototype.at` (ES2022),
+    // which is real at runtime (Node 22) but otherwise unknown to the type checker here.
+    "lib": ["ES2022", "DOM", "DOM.Iterable"]
+  },
+  "include": ["tests", "src", "../shared"]
+}

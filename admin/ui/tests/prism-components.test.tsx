@@ -1,4 +1,3 @@
-import * as React from 'react';
 import { renderToStaticMarkup } from 'react-dom/server';
 
 function assert(condition: boolean, message: string): asserts condition {

@@ -31,11 +31,16 @@ export default defineConfig([
     },
   },
   {
-    // Vite compiles `src` with the automatic runtime (tsconfig `jsx: "react-jsx"`), so no
-    // `React` import is needed here. `tests` is deliberately excluded: it sits outside the
-    // tsconfig `include`, so tsx compiles it with the classic `React.createElement` runtime
-    // and each test's `React` import is load-bearing.
-    files: ['src/**/*.{ts,tsx}'],
+    // `tsx`/esbuild apply a tsconfig's compiler options only to files that config's
+    // `include` actually covers, not just the nearest tsconfig.json by directory. `src` is
+    // covered by this directory's tsconfig.json (`jsx: "react-jsx"`), so Vite and `tsc -b`
+    // both compile it with the automatic runtime. `tests/` is outside that `include`
+    // (["src", "../shared"]), so every `test:*` script in package.json passes
+    // `--tsconfig tsconfig.tests.json` explicitly — that config's `include` does cover
+    // `tests/` and also sets `jsx: "react-jsx"`, so tests type-check *and* run under the
+    // same automatic runtime as `src`. Neither directory needs a `React` import for JSX
+    // alone anymore.
+    files: ['src/**/*.{ts,tsx}', 'tests/**/*.{ts,tsx}'],
     extends: [react.configs.flat['jsx-runtime']],
   },
 ]);

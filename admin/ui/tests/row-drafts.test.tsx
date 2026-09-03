@@ -1,5 +1,4 @@
 import { readFileSync } from 'node:fs';
-import * as React from 'react';
 import { renderToStaticMarkup } from 'react-dom/server';
 import type { CrystalTicket, NovaSubmission } from '../../shared/types';
 import { createRowDrafts, type RowDrafts } from '../src/hooks/useRowDrafts';
@@ -158,7 +157,7 @@ const renderVod = (drafts: RowDrafts) =>
           video_url: 'https://www.youtube.com/watch?v=pRy1JZ2jSi8',
           stream_title: 'Karaoke',
           stream_date: '2026-08-22',
-          thumbnail_url: null,
+          thumbnail_url: '',
           submitter_note: '',
           status: 'pending',
           submitted_at: '2026-08-22 23:10',
