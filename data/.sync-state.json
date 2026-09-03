@@ -191,11 +191,11 @@
       "streamsCount": 0
     },
     "mizuki": {
-      "lastSyncedAt": "2026-08-23T04:01:38.859Z",
-      "maxSongUpdatedAt": "2026-08-22 18:01:25",
-      "maxPerfUpdatedAt": "2026-08-22 18:01:25",
+      "lastSyncedAt": "2026-09-03T04:02:43.290Z",
+      "maxSongUpdatedAt": "2026-09-02 09:31:36",
+      "maxPerfUpdatedAt": "2026-09-02 09:31:36",
       "maxStreamUpdatedAt": "2026-08-22 16:56:56",
-      "songsCount": 2384,
+      "songsCount": 2380,
       "performancesCount": 5456,
       "streamsCount": 307
     },
