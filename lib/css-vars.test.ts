@@ -90,7 +90,7 @@ for (const file of scannedFiles) {
 assert.deepEqual(
   missing,
   [],
-  `var(--name) reference(s) under app/** with no matching definition:\n${missing
+  `var(--name) reference(s) under app/** and tailwind.config.ts with no matching definition:\n${missing
     .map((m) => `  ${m.name}  (${m.file})`)
     .join('\n')}`,
 );
