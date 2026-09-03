@@ -36,12 +36,14 @@ async function main(): Promise<void> {
   ]);
 
   assert(groups.length === 2, 'one group per streamer');
-  assert(groups[0].slug === 'b' && groups[1].slug === 'a', 'groups are ordered by their newest submission first');
+  const [first, second] = groups;
+  assert(first !== undefined && second !== undefined, 'both groups are present');
+  assert(first.slug === 'b' && second.slug === 'a', 'groups are ordered by their newest submission first');
   assert(
-    groups[1].vods.map((v) => v.id).join(',') === 'a1,a2',
+    second.vods.map((v) => v.id).join(',') === 'a1,a2',
     'submissions keep their incoming order inside a group',
   );
-  assert(groups[0].pendingCount === 1 && groups[1].pendingCount === 1, 'pending counts only count pending submissions');
+  assert(first.pendingCount === 1 && second.pendingCount === 1, 'pending counts only count pending submissions');
 
   console.log('✓ Nova VOD submissions group by streamer with newest groups first');
 }

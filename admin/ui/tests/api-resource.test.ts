@@ -69,7 +69,11 @@ async function main(): Promise<void> {
   assert.equal(pendingSeq.hasPending(), false, 'nothing is pending right after invalidation');
   doomed.resolve('stale snapshot');
   await doomedLoad;
-  assert.deepEqual(invalidated, [], 'an invalidated load never applies its result');
+  // Pin the expected-array type argument: `deepEqual` (aliased to `deepStrictEqual` under
+  // `node:assert/strict`) is typed `asserts actual is T`, and an untyped `[]` infers `T` as
+  // `never[]` — narrowing `invalidated` to `never[]` for the rest of this scope and breaking
+  // the `.push(r)` two lines below.
+  assert.deepEqual<unknown[]>(invalidated, [], 'an invalidated load never applies its result');
   await loadCurrent(pendingSeq, async () => 'fresh', (r) => invalidated.push(r));
   assert.deepEqual(invalidated, [{ ok: true, data: 'fresh' }], 'the replacement load applies normally');
 

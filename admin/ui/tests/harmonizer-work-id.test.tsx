@@ -1,4 +1,3 @@
-import * as React from 'react';
 import { renderToStaticMarkup } from 'react-dom/server';
 import {
   HARMONIZE_MERGE_SOURCE_LIMIT,

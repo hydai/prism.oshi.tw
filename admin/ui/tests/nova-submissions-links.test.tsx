@@ -1,4 +1,3 @@
-import * as React from 'react';
 import { renderToStaticMarkup } from 'react-dom/server';
 import type { NovaSubmission, NovaStatus } from '../../shared/types';
 import { createRowDrafts } from '../src/hooks/useRowDrafts';

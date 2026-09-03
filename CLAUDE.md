@@ -96,7 +96,7 @@ Streamers are managed through the Nova admin backend, **not** by hand-editing fi
 
 Run before every commit and again before requesting review:
 
-1. `npm run lint` + `npm test` (frontend suites); `npm run check` in `admin/` and `admin/ui/` when those changed.
+1. `npm run lint` + `npm test` (frontend suites); `npm run check` in `admin/` and `admin/ui/` when those changed. `admin/ui` test files must be run through their `npm run test:<name>` scripts (they pass `--tsconfig tsconfig.tests.json`) — a bare `npx tsx tests/<file>` compiles with the classic JSX runtime and fails with `React is not defined`.
 2. **React Doctor** — `.github/workflows/react-doctor.yml` runs `millionco/react-doctor` v0.9.12 with `scope: full` + `blocking: warning` on every PR to `master` and every `master` push. **Any warning fails the check; `master` baseline is 0 warnings.**
    - Dev loop: the `--scope changed --base master` command above (only new issues vs. `master`). To reproduce the CI report exactly: `--scope full --verbose`.
    - Findings are hypotheses: read the code at `file:line` (same npx prefix + `react-doctor why <file:line>` explains the rule) and fix the root cause — refactor, don't reach for config or suppressions.
