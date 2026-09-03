@@ -1,4 +1,5 @@
 import { Hono } from 'hono';
+import { secureHeaders } from 'hono/secure-headers';
 import type { Bindings, SubmitTicketBody } from './types';
 import { generateId, insertTicket, listPublicReplied, searchTickets } from './db';
 import { validateTicket } from './validate';
@@ -8,6 +9,13 @@ import { renderQaPage } from './qa-page';
 import { parseJsonBody } from '../../shared/web/json-body';
 
 const app = new Hono<{ Bindings: Bindings }>();
+
+// Security headers (Hono defaults: X-Frame-Options SAMEORIGIN, Referrer-Policy
+// no-referrer, X-Content-Type-Options nosniff, Strict-Transport-Security,
+// Cross-Origin-Opener-Policy, etc.). No Content-Security-Policy yet — every page
+// here ships inline <script>/<style> with no nonce infrastructure; see the
+// inline-content inventory in docs/superpowers/plans/2026-09-03-phase5c-worker-hardening.md.
+app.use('*', secureHeaders());
 
 // --- Form page ---
 

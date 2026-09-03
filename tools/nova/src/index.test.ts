@@ -170,6 +170,27 @@ async function testChannelInfoGateAllowsSameOriginRequests(): Promise<void> {
   console.log('✓ /api/channel-info gate allows same-origin requests through');
 }
 
+async function testChannelInfoGateAcceptsRefererOnly(): Promise<void> {
+  installMockFetch();
+  try {
+    // What a browser without Fetch Metadata (Safari/iOS ≤ 16.3, Firefox < 90,
+    // Chrome < 76) sends from the form page: no Sec-Fetch-Site, and no Origin
+    // either because it is a same-origin GET. The Referer is the only signal, and
+    // Referrer-Policy: same-origin is what keeps it from being suppressed. As
+    // above, the 502 (not 403) proves the gate let the request through.
+    const res = await app.request(
+      'https://nova.oshi.tw/api/channel-info?url=' + encodeURIComponent('https://www.youtube.com/@example'),
+      { headers: { Referer: 'https://nova.oshi.tw/' } },
+      makeEnv(),
+    );
+    assertEqual(res.status, 502, 'a Referer-only same-origin request clears the gate');
+    assertEqual(fetchCalls.length, 1, 'and reaches the channel-page fetch');
+  } finally {
+    restoreFetch();
+  }
+  console.log('✓ /api/channel-info gate accepts a Referer-only same-origin request');
+}
+
 // === VOD submit: a timeline is mandatory =====================================
 async function testSubmitRequiresTimeline(): Promise<void> {
   installMockFetch();
@@ -211,6 +232,83 @@ async function testSubmitRequiresTimeline(): Promise<void> {
   console.log('✓ /vod/api/submit requires at least one song timestamp');
 }
 
+// === Security headers: Hono defaults on a page route and an API route, with
+// NO Content-Security-Policy (T7.2, headers half — CSP itself is deferred; see
+// docs/superpowers/plans/2026-09-03-phase5c-worker-hardening.md). ===
+function makeCheckDb(): D1Database {
+  return {
+    prepare() {
+      return {
+        bind() {
+          return { first: async () => null };
+        },
+      };
+    },
+  } as unknown as D1Database;
+}
+
+function assertSecureHeaders(res: Response, label: string): void {
+  assertEqual(res.headers.get('x-frame-options'), 'SAMEORIGIN', `${label}: x-frame-options`);
+  assertEqual(res.headers.get('x-content-type-options'), 'nosniff', `${label}: x-content-type-options`);
+  // Not Hono's `no-referrer` default: that would suppress the same-origin Referer
+  // the auto-fill gate falls back to on browsers without Fetch Metadata.
+  assertEqual(res.headers.get('referrer-policy'), 'same-origin', `${label}: referrer-policy`);
+  assert(!!res.headers.get('strict-transport-security'), `${label}: strict-transport-security is present`);
+  assertEqual(res.headers.get('content-security-policy'), null, `${label}: no content-security-policy (CSP is deferred)`);
+}
+
+async function testSecurityHeadersOnPageRoute(): Promise<void> {
+  installMockFetch();
+  try {
+    const res = await app.request('/', {}, makeEnv({ TURNSTILE_SITE_KEY: 'test-site-key' }));
+    assertEqual(res.status, 200, 'GET / succeeds');
+    assertSecureHeaders(res, 'GET /');
+  } finally {
+    restoreFetch();
+  }
+  console.log('✓ GET / carries the security headers (same-origin referrer policy), no CSP');
+}
+
+async function testSecurityHeadersOnApiRoute(): Promise<void> {
+  installMockFetch();
+  try {
+    const res = await app.request(
+      '/api/check?url=' + encodeURIComponent('https://www.youtube.com/@example'),
+      {},
+      makeEnv({ DB: makeCheckDb() }),
+    );
+    assertEqual(res.status, 200, 'GET /api/check succeeds');
+    assertSecureHeaders(res, 'GET /api/check');
+  } finally {
+    restoreFetch();
+  }
+  console.log('✓ GET /api/check carries the security headers (same-origin referrer policy), no CSP');
+}
+
+async function testSecurityHeadersOnCorsPreflight(): Promise<void> {
+  // Hono's cors() answers a preflight itself without calling the next middleware, so
+  // secureHeaders() must be registered BEFORE it or preflight responses miss the set.
+  const res = await app.request(
+    '/vod/api/submit',
+    {
+      method: 'OPTIONS',
+      headers: {
+        Origin: 'https://aurora.oshi.tw',
+        'Access-Control-Request-Method': 'POST',
+      },
+    },
+    makeEnv(),
+  );
+  assertEqual(res.status, 204, 'OPTIONS /vod/api/submit preflight succeeds');
+  assertEqual(
+    res.headers.get('access-control-allow-origin'),
+    'https://aurora.oshi.tw',
+    'preflight: cors still answers for an allowed origin',
+  );
+  assertSecureHeaders(res, 'OPTIONS /vod/api/submit');
+  console.log('✓ a CORS preflight carries the security headers too');
+}
+
 async function main(): Promise<void> {
   await testHelperWithKeyUsesDataApi();
   await testHelperWithoutKeySkipsDataApi();
@@ -218,7 +316,11 @@ async function main(): Promise<void> {
   await testGateStillRejectsForeignRequests();
   await testChannelInfoGateRejectsForeignRequests();
   await testChannelInfoGateAllowsSameOriginRequests();
+  await testChannelInfoGateAcceptsRefererOnly();
   await testSubmitRequiresTimeline();
+  await testSecurityHeadersOnPageRoute();
+  await testSecurityHeadersOnApiRoute();
+  await testSecurityHeadersOnCorsPreflight();
   console.log('✓ nova video-info quota-drain guards');
 }
 
