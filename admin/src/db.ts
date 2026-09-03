@@ -2191,6 +2191,16 @@ function songMergeGuardValidityCte(
   };
 }
 
+export interface MergeSongsInput {
+  readonly db: D1Database;
+  readonly streamerId: string;
+  readonly canonicalSongId: string;
+  readonly sourceSongIds: readonly string[];
+  readonly mergedBy: string;
+  readonly revision: number;
+  readonly workMergeConfirmation?: HarmonizeWorkMergeConfirmation;
+}
+
 /**
  * Atomically merge explicit source song entities into one canonical song.
  * Performances are repointed, source rows are snapshotted in song_aliases,
@@ -2201,15 +2211,15 @@ function songMergeGuardValidityCte(
  * produced this request displayed; any catalog write since then fails the
  * merge closed with `work_merge_stale`.
  */
-export async function mergeSongs(
-  db: D1Database,
-  streamerId: string,
-  canonicalSongId: string,
-  sourceSongIds: string[],
-  mergedBy: string,
-  revision: number,
-  workMergeConfirmation?: HarmonizeWorkMergeConfirmation,
-): Promise<MergeSongsResult> {
+export async function mergeSongs({
+  db,
+  streamerId,
+  canonicalSongId,
+  sourceSongIds,
+  mergedBy,
+  revision,
+  workMergeConfirmation,
+}: MergeSongsInput): Promise<MergeSongsResult> {
   const uniqueSourceIds = [...new Set(sourceSongIds)];
   if (!canonicalSongId || uniqueSourceIds.length === 0) {
     throw new SongMergeError('invalid_request', 'A canonical song and at least one source song are required');
