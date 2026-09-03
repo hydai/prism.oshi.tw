@@ -1,5 +1,6 @@
 import { Hono } from 'hono';
 import { cors } from 'hono/cors';
+import { secureHeaders } from 'hono/secure-headers';
 import type { Bindings, SubmitBody, VodSubmitBody } from './types';
 import {
   MAX_VOD_SONGS,
@@ -94,6 +95,25 @@ export async function fetchYoutubeVideoInfo(videoId: string, apiKey?: string): P
 }
 
 const app = new Hono<{ Bindings: Bindings }>();
+
+// Security headers (Hono defaults: X-Frame-Options SAMEORIGIN, X-Content-Type-Options
+// nosniff, Strict-Transport-Security, Cross-Origin-Opener-Policy, etc.). Registered
+// BEFORE cors(): Hono's cors answers a preflight OPTIONS itself without calling the
+// next middleware, so anything registered after it never reaches those responses.
+//
+// Referrer-Policy is the one default we override. Hono's `no-referrer` suppresses
+// the Referer on *every* request a page makes, same-origin included — and the form
+// pages' auto-fill calls (page.ts, vod-page.ts) are same-origin GET fetches, which
+// carry no Origin either. That leaves Sec-Fetch-Site as isTrustedRequest's only
+// signal, so browsers without Fetch Metadata (Safari/iOS ≤ 16.3, Firefox < 90,
+// Chrome < 76) would get a 403 on their own pages' auto-fill. `same-origin` sends
+// nothing to any other origin — the leak protection is intact — while restoring the
+// Referer the gate's third branch exists for.
+//
+// No Content-Security-Policy yet — every page here ships inline <script>/<style>
+// with no nonce infrastructure; see the inline-content inventory in
+// docs/superpowers/plans/2026-09-03-phase5c-worker-hardening.md.
+app.use('*', secureHeaders({ referrerPolicy: 'same-origin' }));
 
 // CORS for VOD API routes (allow Aurora cross-origin)
 app.use(
