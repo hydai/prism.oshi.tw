@@ -9,6 +9,7 @@ import type {
   ExportSourceVod,
   OwnedVodExportSourceData,
 } from './types';
+import type { Bindings } from '../env';
 
 const TRIGGER_SCHEMA_VERSION = 1;
 
@@ -30,12 +31,8 @@ const NOVA_REVISION_TRIGGERS = [
   'vod_export_submissions_update_revision',
 ] as const;
 
-export interface VodExportSourceBindings {
-  DB: D1Database;
-  NOVA_DB: D1Database;
-  VOD_EXPORT_DB_ID: string;
-  VOD_EXPORT_NOVA_DB_ID: string;
-}
+/** The bindings the source layer reads — a slice of the worker's one `Bindings`. */
+export type VodExportSourceBindings = Pick<Bindings, 'DB' | 'NOVA_DB' | 'VOD_EXPORT_DB_ID' | 'VOD_EXPORT_NOVA_DB_ID'>;
 
 export interface VodExportSourceFingerprint {
   dbId: string;

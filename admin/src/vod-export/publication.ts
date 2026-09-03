@@ -49,6 +49,7 @@ import {
   type VodExportSourceBindings,
   type VodExportSourceFingerprint,
 } from './source';
+import type { Bindings } from '../env';
 import {
   hasValidUnicodeScalars,
   isBlankText,
@@ -69,10 +70,8 @@ const RESOLUTION_RETENTION_MS = 30 * 24 * 60 * 60 * 1_000;
 export const VOD_EXPORT_MANUAL_RECOVERY_CONFIRMATION = 'I CONFIRM THE OWNER INVOCATION HAS TERMINATED';
 const textDecoder = new TextDecoder('utf-8', { fatal: true, ignoreBOM: true });
 
-export interface VodExportPublicationBindings extends VodExportSourceBindings {
-  VOD_EXPORT_PUBLIC: R2Bucket;
-  VOD_EXPORT_PRIVATE: R2Bucket;
-}
+export type VodExportPublicationBindings = VodExportSourceBindings &
+  Pick<Bindings, 'VOD_EXPORT_PUBLIC' | 'VOD_EXPORT_PRIVATE'>;
 
 export interface CurrentVodExportManifest {
   manifest: VodExportManifest;
