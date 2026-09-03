@@ -577,7 +577,7 @@ export async function updateSong(
 export async function updateSongStatus(
   db: D1Database,
   id: string,
-  status: string,
+  status: Status,
   reviewedBy: string,
 ): Promise<boolean> {
   const result = await db
@@ -680,11 +680,11 @@ export async function insertPerformances(
 export async function getPerformanceStatus(
   db: D1Database,
   id: string,
-): Promise<string | null> {
+): Promise<Status | null> {
   const row = await db
     .prepare('SELECT status FROM performances WHERE id = ?')
     .bind(id)
-    .first<{ status: string }>();
+    .first<{ status: Status }>();
   return row?.status ?? null;
 }
 
@@ -704,7 +704,7 @@ export async function getPerformanceTimestamps(
 export async function updatePerformanceStatus(
   db: D1Database,
   id: string,
-  status: string,
+  status: Status,
 ): Promise<boolean> {
   const result = await db
     .prepare("UPDATE performances SET status = ?, updated_at = datetime('now') WHERE id = ?")
@@ -912,7 +912,7 @@ export async function updateStream(
 export async function updateStreamStatus(
   db: D1Database,
   id: string,
-  status: string,
+  status: Status,
   reviewedBy: string,
 ): Promise<boolean> {
   const result = await db
@@ -1720,7 +1720,7 @@ import { unionSimilarKeys } from '../shared/fuzzy-grouping';
 import { UnionFind } from '../shared/union-find';
 
 interface StatusCountRow {
-  status: string;
+  status: Status;
   count: number;
 }
 
@@ -1737,8 +1737,10 @@ function prepareStatusCount(
 function statusCountsFromRows(rows: StatusCountRow[]): StatusCounts {
   const counts: StatusCounts = { pending: 0, approved: 0, rejected: 0, excluded: 0, extracted: 0 };
   for (const row of rows) {
+    // The schema's CHECK constraint is what makes StatusCountRow.status a
+    // Status; the membership test stays as the belt for a row that predates it.
     if (row.status in counts) {
-      counts[row.status as keyof StatusCounts] = row.count;
+      counts[row.status] = row.count;
     }
   }
   return counts;
