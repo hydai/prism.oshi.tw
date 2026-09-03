@@ -232,9 +232,8 @@ async function testSubmitRequiresTimeline(): Promise<void> {
   console.log('✓ /vod/api/submit requires at least one song timestamp');
 }
 
-// === Security headers: Hono defaults on a page route and an API route, with
-// NO Content-Security-Policy (T7.2, headers half — CSP itself is deferred; see
-// docs/superpowers/plans/2026-09-03-phase5c-worker-hardening.md). ===
+// === Security headers: Hono defaults plus the Content-Security-Policy, on a page
+// route, an API route and a CORS preflight. ===
 function makeCheckDb(): D1Database {
   return {
     prepare() {
@@ -247,6 +246,50 @@ function makeCheckDb(): D1Database {
   } as unknown as D1Database;
 }
 
+/** One directive's value out of a policy string, '' when the directive is absent. */
+function cspDirective(csp: string, name: string): string {
+  const match = new RegExp(`(?:^|; )${name} ([^;]*)`).exec(csp);
+  return match ? match[1] : '';
+}
+
+function assertCsp(res: Response, label: string): void {
+  const csp = res.headers.get('content-security-policy') ?? '';
+  assert(csp.length > 0, `${label}: content-security-policy is present`);
+  assertEqual(cspDirective(csp, 'default-src'), "'self'", `${label}: default-src`);
+  assertEqual(cspDirective(csp, 'base-uri'), "'self'", `${label}: base-uri`);
+  assertEqual(cspDirective(csp, 'object-src'), "'none'", `${label}: object-src`);
+  assertEqual(cspDirective(csp, 'frame-ancestors'), "'self'", `${label}: frame-ancestors`);
+  assertEqual(cspDirective(csp, 'form-action'), "'self'", `${label}: form-action`);
+  assertEqual(cspDirective(csp, 'connect-src'), "'self'", `${label}: connect-src`);
+  // Inline script and style run by nonce only.
+  const scriptSrc = cspDirective(csp, 'script-src');
+  assert(scriptSrc.startsWith("'nonce-"), `${label}: script-src is nonce-based (${scriptSrc})`);
+  assert(cspDirective(csp, 'style-src').startsWith("'nonce-"), `${label}: style-src is nonce-based`);
+  // 'unsafe-inline' is allowed on style-src-attr and nowhere else: on any of these
+  // three it would hand every injected string back the run of the page.
+  for (const directive of ['script-src', 'style-src', 'default-src']) {
+    assert(
+      !cspDirective(csp, directive).includes("'unsafe-inline'"),
+      `${label}: ${directive} must never allow 'unsafe-inline' (${cspDirective(csp, directive)})`,
+    );
+  }
+  assertEqual(cspDirective(csp, 'style-src-attr'), "'unsafe-inline'", `${label}: style-src-attr`);
+  // Turnstile loads its own script and renders in its own iframe.
+  assert(scriptSrc.includes('https://challenges.cloudflare.com'), `${label}: script-src allows Turnstile`);
+  // 'self' is there for what Cloudflare's edge appends to every HTML response: Bot
+  // Fight Mode's JavaScript-detections bootstrap loads
+  // /cdn-cgi/challenge-platform/scripts/jsd/main.js from this origin. Drop it and
+  // that script dies on every production page load — nothing local would notice.
+  assert(scriptSrc.includes("'self'"), `${label}: script-src allows this origin (${scriptSrc})`);
+  assertEqual(cspDirective(csp, 'frame-src'), 'https://challenges.cloudflare.com', `${label}: frame-src`);
+  // Images: the same YouTube CDNs the submit routes accept, plus the data: URI the
+  // shared .form-select chevron is drawn with.
+  const imgSrc = cspDirective(csp, 'img-src');
+  for (const source of ["'self'", 'data:', 'https://i.ytimg.com', 'https://yt3.googleusercontent.com', 'https://yt3.ggpht.com']) {
+    assert(imgSrc.includes(source), `${label}: img-src allows ${source} (${imgSrc})`);
+  }
+}
+
 function assertSecureHeaders(res: Response, label: string): void {
   assertEqual(res.headers.get('x-frame-options'), 'SAMEORIGIN', `${label}: x-frame-options`);
   assertEqual(res.headers.get('x-content-type-options'), 'nosniff', `${label}: x-content-type-options`);
@@ -254,7 +297,38 @@ function assertSecureHeaders(res: Response, label: string): void {
   // the auto-fill gate falls back to on browsers without Fetch Metadata.
   assertEqual(res.headers.get('referrer-policy'), 'same-origin', `${label}: referrer-policy`);
   assert(!!res.headers.get('strict-transport-security'), `${label}: strict-transport-security is present`);
-  assertEqual(res.headers.get('content-security-policy'), null, `${label}: no content-security-policy (CSP is deferred)`);
+  assertCsp(res, label);
+}
+
+/** The nonce the response's own policy allows. */
+function headerNonce(res: Response, label: string): string {
+  const match = /'nonce-([^']+)'/.exec(res.headers.get('content-security-policy') ?? '');
+  assert(match !== null, `${label}: the policy carries a nonce`);
+  return match![1];
+}
+
+/**
+ * Every inline `<script>`/`<style>` in the document is stamped with the one nonce
+ * the header allows, and no inline event-handler attribute survives anywhere.
+ */
+function assertDocumentNonce(body: string, nonce: string, label: string): void {
+  const inlineTags = body.match(/<(?:script|style)(?:\s[^>]*)?>/g) ?? [];
+  assert(inlineTags.length >= 3, `${label}: the page still ships its inline tags (found ${inlineTags.length})`);
+  for (const tag of inlineTags) {
+    assert(tag.includes(`nonce="${nonce}"`), `${label}: inline tag carries the header's nonce — ${tag.slice(0, 60)}`);
+  }
+  const stamped = new Set(Array.from(body.matchAll(/nonce="([^"]*)"/g), (m) => m[1]));
+  assertEqual(stamped.size, 1, `${label}: the whole document uses exactly one nonce value`);
+  assert(stamped.has(nonce), `${label}: the document's nonce is the header's`);
+  assert(!/ on[a-z]+="/.test(body), `${label}: no inline event-handler attribute survives`);
+}
+
+async function assertRouteNonce(path: string, env: Bindings, label: string): Promise<string> {
+  const res = await app.request(path, {}, env);
+  assertEqual(res.status, 200, `${label}: renders`);
+  const nonce = headerNonce(res, label);
+  assertDocumentNonce(await res.text(), nonce, label);
+  return nonce;
 }
 
 async function testSecurityHeadersOnPageRoute(): Promise<void> {
@@ -266,7 +340,7 @@ async function testSecurityHeadersOnPageRoute(): Promise<void> {
   } finally {
     restoreFetch();
   }
-  console.log('✓ GET / carries the security headers (same-origin referrer policy), no CSP');
+  console.log('✓ GET / carries the security headers (same-origin referrer policy) and the CSP');
 }
 
 async function testSecurityHeadersOnApiRoute(): Promise<void> {
@@ -282,7 +356,36 @@ async function testSecurityHeadersOnApiRoute(): Promise<void> {
   } finally {
     restoreFetch();
   }
-  console.log('✓ GET /api/check carries the security headers (same-origin referrer policy), no CSP');
+  console.log('✓ GET /api/check carries the security headers (same-origin referrer policy) and the CSP');
+}
+
+// === Per-request nonces: the header allows exactly what the document stamps ===
+async function testPageScriptsCarryTheHeaderNonce(): Promise<void> {
+  installMockFetch();
+  try {
+    await assertRouteNonce('/', makeEnv({ TURNSTILE_SITE_KEY: 'test-site-key' }), 'GET /');
+    await assertRouteNonce(
+      '/vod',
+      makeEnv({ TURNSTILE_SITE_KEY: 'test-site-key', DB: makeCountingDb().db }),
+      'GET /vod',
+    );
+  } finally {
+    restoreFetch();
+  }
+  console.log('✓ GET / and GET /vod stamp the header nonce on every inline tag');
+}
+
+async function testNonceDiffersPerRequest(): Promise<void> {
+  installMockFetch();
+  try {
+    const env = makeEnv({ TURNSTILE_SITE_KEY: 'test-site-key' });
+    const first = await assertRouteNonce('/', env, 'GET / (first)');
+    const second = await assertRouteNonce('/', env, 'GET / (second)');
+    assert(first !== second, 'each request gets its own nonce (a fixed one would be worthless)');
+  } finally {
+    restoreFetch();
+  }
+  console.log('✓ every request gets a fresh nonce');
 }
 
 async function testSecurityHeadersOnCorsPreflight(): Promise<void> {
@@ -377,7 +480,11 @@ async function testStatusIsServedFromTheEdgeCache(): Promise<void> {
     assertEqual(hit.status, 200, 'GET /status (hit) renders');
     assertEqual(hit.headers.get('x-status-cache'), 'HIT', 'an unknown query string collapses onto the cached entry');
     assertEqual(reads(), 3, 'a hit performs no D1 read');
-    assertEqual(await hit.text(), await miss.text(), 'the hit serves the stored body');
+    assertEqual(
+      (await hit.text()).replaceAll(headerNonce(hit, 'hit'), headerNonce(miss, 'miss')),
+      await miss.text(),
+      "the hit serves the stored body, differing only in this request's nonce",
+    );
     assertSecureHeaders(hit, 'GET /status (hit)');
 
     const third = makeExecutionCtx();
@@ -389,6 +496,77 @@ async function testStatusIsServedFromTheEdgeCache(): Promise<void> {
     removeFakeCaches();
   }
   console.log('✓ GET /status is served from the edge cache; unknown query strings cannot bust it');
+}
+
+/**
+ * The cached copy was rendered with the *storing* request's nonce, while
+ * secureHeaders() stamps every response — hits included — with a fresh one.
+ * Served verbatim, a hit's scripts would be blocked, so the hit path rewrites the
+ * stored nonce into the one its own header allows.
+ */
+async function testStatusCacheHitRewritesTheNonce(): Promise<void> {
+  installFakeCaches();
+  const nova = makeCountingDb();
+  const admin = makeCountingDb();
+  const env = makeEnv({ DB: nova.db, ADMIN_DB: admin.db });
+  try {
+    const first = makeExecutionCtx();
+    const miss = await app.request('/status', {}, env, first.ctx);
+    await first.settled();
+    const missNonce = headerNonce(miss, 'GET /status (miss)');
+    assertDocumentNonce(await miss.text(), missNonce, 'GET /status (miss)');
+    assertEqual(miss.headers.get('x-status-nonce'), null, 'only the stored copy carries the nonce marker');
+
+    const second = makeExecutionCtx();
+    const hit = await app.request('/status', {}, env, second.ctx);
+    await second.settled();
+    assertEqual(hit.headers.get('x-status-cache'), 'HIT', 'the second request is a hit');
+    const hitNonce = headerNonce(hit, 'GET /status (hit)');
+    assert(hitNonce !== missNonce, 'the hit is stamped with its own fresh nonce');
+    assertDocumentNonce(await hit.text(), hitNonce, 'GET /status (hit)');
+    assertEqual(hit.headers.get('x-status-nonce'), null, 'the bookkeeping header never reaches the client');
+  } finally {
+    removeFakeCaches();
+  }
+  console.log('✓ a cached /status body is rewritten to the nonce its own header allows');
+}
+
+/**
+ * A copy stored before this rule shipped (or one that lost the marker) carries no
+ * X-Status-Nonce, so there is nothing to rewrite its body's nonce *from* — served
+ * as-is its inline tags would be dropped by the browser. The handler re-renders
+ * instead. This is the path every /status request takes for the first ≤ 60 s
+ * after a deploy (the stored copies live at most `max-age=60`), and it is the
+ * easiest condition to "simplify" away into a bare `if (hit)` later.
+ */
+async function testStatusLegacyCachedCopyIsReRendered(): Promise<void> {
+  const caches = installFakeCaches();
+  const nova = makeCountingDb();
+  const admin = makeCountingDb();
+  const env = makeEnv({ DB: nova.db, ADMIN_DB: admin.db });
+  const reads = (): number => nova.reads() + admin.reads();
+  const stale = '<!DOCTYPE html><html><body><script nonce="STALE"></script></body></html>';
+  try {
+    // Seeded exactly as the pre-rule miss path left it: a rendered page, no marker.
+    await caches.default.put(
+      new Request('http://localhost/status?vtuber=all&vod=all'),
+      new Response(stale, { headers: { 'Content-Type': 'text/html; charset=UTF-8', 'X-Status-Cache': 'MISS' } }),
+    );
+
+    const ctx = makeExecutionCtx();
+    const res = await app.request('/status', {}, env, ctx.ctx);
+    await ctx.settled();
+    assertEqual(res.status, 200, 'GET /status renders');
+    assertEqual(res.headers.get('x-status-cache'), 'MISS', 'a stored copy without the marker is re-rendered');
+    assertEqual(reads(), 3, 'the re-render performs the three table reads');
+    assertEqual(res.headers.get('x-status-nonce'), null, 'the bookkeeping header never reaches the client');
+    const body = await res.text();
+    assert(!body.includes('STALE'), 'the copy whose scripts are already dead is not served');
+    assertDocumentNonce(body, headerNonce(res, 'GET /status (legacy copy)'), 'GET /status (legacy copy)');
+  } finally {
+    removeFakeCaches();
+  }
+  console.log('✓ a cached /status copy without the nonce marker is re-rendered, not served with dead scripts');
 }
 
 async function main(): Promise<void> {
@@ -403,7 +581,11 @@ async function main(): Promise<void> {
   await testSecurityHeadersOnPageRoute();
   await testSecurityHeadersOnApiRoute();
   await testSecurityHeadersOnCorsPreflight();
+  await testPageScriptsCarryTheHeaderNonce();
+  await testNonceDiffersPerRequest();
   await testStatusIsServedFromTheEdgeCache();
+  await testStatusCacheHitRewritesTheNonce();
+  await testStatusLegacyCachedCopyIsReRendered();
   console.log('✓ nova video-info quota-drain guards');
 }
 

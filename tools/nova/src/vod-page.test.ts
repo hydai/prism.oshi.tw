@@ -10,8 +10,10 @@ function assert(condition: boolean, message: string): void {
   }
 }
 
+const NONCE = 'test-nonce-value';
+
 function render(streamers: ApprovedStreamer[]): string {
-  return String(renderVodPage('test-site-key', streamers));
+  return String(renderVodPage('test-site-key', streamers, NONCE));
 }
 
 function testEscapesStreamerOptionFields(): void {
@@ -88,6 +90,17 @@ function testPrismFormStructure(): void {
   console.log('vod form keeps its structure on the prism shell');
 }
 
+function testCarriesTheNonce(): void {
+  const html = render([{ slug: 'mizuki', display_name: '浠Mizuki', avatar_url: '' }]);
+  const inlineTags = html.match(/<(?:script|style)(?:\s[^>]*)?>/g) ?? [];
+  assert(inlineTags.length >= 3, `page still ships its inline tags (found ${inlineTags.length})`);
+  for (const tag of inlineTags) {
+    assert(tag.includes(`nonce="${NONCE}"`), `inline tag carries the nonce — ${tag.slice(0, 60)}`);
+  }
+  assert(!/ on[a-z]+="/.test(html), 'no inline event-handler attribute survives (the CSP blocks them)');
+  console.log('VOD form stamps the nonce on every inline tag');
+}
+
 // Note: unlike page.test.ts, this file has no single top-level `html` — every test
 // renders its own via render(streamers). This test follows that same pattern.
 function testVodFieldLimitsReachTheForm(): void {
@@ -107,6 +120,7 @@ try {
   testRejectsInvalidStreamerSlug();
   testHidesAdminProcessingMessage();
   testPrismFormStructure();
+  testCarriesTheNonce();
   testVodFieldLimitsReachTheForm();
   console.log('vod-page.test: all passed');
 } catch (error) {

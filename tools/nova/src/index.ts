@@ -1,6 +1,6 @@
-import { Hono } from 'hono';
+import { Hono, type Context } from 'hono';
 import { cors } from 'hono/cors';
-import { secureHeaders } from 'hono/secure-headers';
+import { NONCE, secureHeaders, type SecureHeadersVariables } from 'hono/secure-headers';
 import type { Bindings, SubmitBody, VodSubmitBody } from './types';
 import {
   MAX_VOD_SONGS,
@@ -26,7 +26,7 @@ import {
   type VtuberFilter,
   type VodFilter,
 } from './status-page';
-import { sanitizeNovaUrl, type NovaUrlProvider } from '../../../admin/shared/nova-url-safety';
+import { NOVA_IMAGE_HOSTS, sanitizeNovaUrl, type NovaUrlProvider } from '../../../admin/shared/nova-url-safety';
 import { ALLOWED_ORIGINS, isTrustedRequest } from './origins';
 import { parseJsonBody } from '../../shared/web/json-body';
 
@@ -95,7 +95,25 @@ export async function fetchYoutubeVideoInfo(videoId: string, apiKey?: string): P
   return { title, thumbnail, date };
 }
 
-const app = new Hono<{ Bindings: Bindings }>();
+/** `Variables` carries `secureHeadersNonce`, the per-request CSP nonce (see requireNonce). */
+type AppEnv = { Bindings: Bindings; Variables: SecureHeadersVariables };
+
+const app = new Hono<AppEnv>();
+
+/**
+ * This request's CSP nonce, for the page handlers to stamp on their inline tags.
+ *
+ * `secureHeaders()` below is registered on `*` and generates the nonce while
+ * building the policy — before any route handler runs — so a missing value means
+ * the middleware was bypassed and the page would render script the browser then
+ * refuses to run. That is a wiring bug, not a request the user can cause, so it
+ * throws (a 500) instead of silently shipping a dead page.
+ */
+function requireNonce(c: Context<AppEnv>): string {
+  const nonce = c.get('secureHeadersNonce');
+  if (!nonce) throw new Error('secureHeaders did not run before this handler');
+  return nonce;
+}
 
 // Security headers (Hono defaults: X-Frame-Options SAMEORIGIN, X-Content-Type-Options
 // nosniff, Strict-Transport-Security, Cross-Origin-Opener-Policy, etc.). Registered
@@ -111,10 +129,57 @@ const app = new Hono<{ Bindings: Bindings }>();
 // nothing to any other origin — the leak protection is intact — while restoring the
 // Referer the gate's third branch exists for.
 //
-// No Content-Security-Policy yet — every page here ships inline <script>/<style>
-// with no nonce infrastructure; see the inline-content inventory in
-// docs/superpowers/plans/2026-09-03-phase5c-worker-hardening.md.
-app.use('*', secureHeaders({ referrerPolicy: 'same-origin' }));
+// Content-Security-Policy. Inline scripts and styles exist only where the shared
+// page shell and theme toggle emit them, and both stamp this request's nonce
+// (NONCE makes Hono generate one before the route runs; handlers read it via
+// requireNonce). Turnstile is allowed by host — its loader script and the iframe
+// it renders in — and is documented to carry the nonce from its own script tag
+// over to what it injects; the browser proof before deploy is what confirms that,
+// and if it ever stops holding the fix is a 'sha256-…' hash of the style it
+// injects (or restoring that nonce propagation), never 'unsafe-inline': a host in
+// style-src admits external stylesheets only, never an inline <style> or a
+// style="…" attribute.
+//
+// Cloudflare's Bot Fight Mode injects an inline JavaScript-detections bootstrap
+// into every HTML response at the edge (verified on both live hosts 2026-09-04).
+// Cloudflare stamps this header's nonce onto the scripts it injects by parsing the
+// CSP response header, and the bootstrap then loads
+// /cdn-cgi/challenge-platform/scripts/jsd/main.js from our own origin — which is
+// why 'self' is in script-src, as Cloudflare's docs require. 'self' cannot turn a
+// JSON route into a script source: secureHeaders' X-Content-Type-Options: nosniff
+// makes the browser refuse a non-JavaScript MIME type for a script. Web Analytics
+// is not enabled on either host; if it ever is, script-src needs
+// https://static.cloudflareinsights.com and connect-src https://cloudflareinsights.com.
+//
+// Images come from the same host list the submit routes enforce, plus data: for
+// the shared .form-select chevron, which PRISM_CSS draws with an inline SVG URI.
+// Style *attributes* are allowed (the svgIcon/sparkle helpers and the per-row
+// fallback tiles are full of them): an attribute cannot run script, and every
+// value interpolated into one is escaped. style-src-attr is a
+// CSP3 directive, so browsers that predate it (Safari < 15.4, Firefox < 116) ignore
+// it and apply the nonce-only style-src to style="…" instead, dropping those
+// attributes — cosmetic on this site (a duplicated avatar tile, a visible
+// broken-preview icon) and accepted, because the alternative, 'unsafe-inline' in
+// style-src, would defeat the policy for every browser to spare those. Report-only
+// was skipped deliberately — five pages, a browser proof before deploy, and
+// `wrangler rollback` as the undo.
+app.use('*', secureHeaders({
+  referrerPolicy: 'same-origin',
+  contentSecurityPolicy: {
+    defaultSrc: ["'self'"],
+    baseUri: ["'self'"],
+    objectSrc: ["'none'"],
+    frameAncestors: ["'self'"],
+    formAction: ["'self'"],
+    scriptSrc: [NONCE, "'self'", 'https://challenges.cloudflare.com'],
+    styleSrc: [NONCE, "'self'", 'https://fonts.googleapis.com'],
+    styleSrcAttr: ["'unsafe-inline'"],
+    fontSrc: ['https://fonts.gstatic.com'],
+    imgSrc: ["'self'", 'data:', ...NOVA_IMAGE_HOSTS.map((host) => `https://${host}`)],
+    connectSrc: ["'self'"],
+    frameSrc: ['https://challenges.cloudflare.com'],
+  },
+}));
 
 // CORS for VOD API routes (allow Aurora cross-origin)
 app.use(
@@ -124,7 +189,7 @@ app.use(
 
 // GET / — Serve the submission form
 app.get('/', (c) => {
-  return c.html(renderPage(c.env.TURNSTILE_SITE_KEY));
+  return c.html(renderPage(c.env.TURNSTILE_SITE_KEY, requireNonce(c)));
 });
 
 // GET /api/check — Duplicate check by YouTube channel URL
@@ -297,7 +362,7 @@ app.post('/api/submit', async (c) => {
 // GET /vod — Serve the VOD submission form
 app.get('/vod', async (c) => {
   const streamers = await listApprovedStreamers(c.env.DB);
-  return c.html(renderVodPage(c.env.TURNSTILE_SITE_KEY, streamers));
+  return c.html(renderVodPage(c.env.TURNSTILE_SITE_KEY, streamers, requireNonce(c)));
 });
 
 // GET /vod/api/streamers — Return approved streamers as JSON (for Aurora cross-origin)
@@ -569,14 +634,28 @@ app.get('/status', async (c) => {
     vod: ((VOD_FILTERS as readonly string[]).includes(rawD) ? rawD : 'all') as VodFilter,
   };
 
+  const nonce = requireNonce(c);
   const cache = caches.default;
   const key = statusCacheKey(c.req.url, filters);
   const hit = await cache.match(key);
-  if (hit) {
+  // The stored copy was rendered with the *storing* request's nonce, which the
+  // miss path recorded in X-Status-Nonce, while secureHeaders() stamps a fresh
+  // nonce on every response — hits included. Served verbatim, a hit's inline tags
+  // would carry a nonce its own policy does not allow and the browser would drop
+  // them, so the stored nonce is rewritten into this request's. The nonce is 16
+  // random bytes in base64 — 22 characters plus '==' padding — so colliding with
+  // page content is not a realistic concern, and a same-length replace over one
+  // document costs far less than the three D1 reads this cache exists to avoid.
+  // A copy without the header predates
+  // this rule (or lost it): re-render rather than serve a page whose scripts are
+  // already dead.
+  const storedNonce = hit?.headers.get('X-Status-Nonce');
+  if (hit && storedNonce) {
     // A cached Response has immutable headers: copy it so secureHeaders() can
     // stamp its set and the marker can flip to HIT.
-    const res = new Response(hit.body, hit);
+    const res = new Response((await hit.text()).replaceAll(storedNonce, nonce), hit);
     res.headers.set('X-Status-Cache', 'HIT');
+    res.headers.delete('X-Status-Nonce');
     return res;
   }
 
@@ -589,8 +668,11 @@ app.get('/status', async (c) => {
   ]);
   c.header('Cache-Control', `public, max-age=${STATUS_CACHE_TTL_SECONDS}`);
   c.header('X-Status-Cache', 'MISS');
-  const res = await c.html(renderStatusPage(submissions, vodSubmissions, adminStreams, filters));
-  c.executionCtx.waitUntil(cache.put(key, res.clone()));
+  const res = await c.html(renderStatusPage(submissions, vodSubmissions, adminStreams, filters, nonce));
+  // Only the stored copy carries the nonce marker; the client's response does not.
+  const stored = res.clone();
+  stored.headers.set('X-Status-Nonce', nonce);
+  c.executionCtx.waitUntil(cache.put(key, stored));
   return res;
 });
 

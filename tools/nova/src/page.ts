@@ -99,6 +99,14 @@ const PAGE_SCRIPT = `
           icon.style.color = value ? icon.getAttribute('data-brand') : '';
         });
       }
+      // The CSP forbids inline handlers, so the avatar's broken-image fallback is
+      // wired here. The image starts hidden with no src, so it cannot fail before
+      // this runs; syncPreview() below is what first gives it one.
+      previewAvatar.addEventListener('error', function() {
+        previewAvatar.style.display = 'none';
+        previewAvatarFallback.style.display = 'flex';
+      });
+
       form.addEventListener('input', syncPreview);
       syncPreview();
 
@@ -225,7 +233,7 @@ const PAGE_SCRIPT = `
     })();
   `;
 
-export function renderPage(siteKey: string) {
+export function renderPage(siteKey: string, nonce: string) {
   const socialInputs = SOCIAL_LINKS.map(({ key, label, icon }) => `
             <div class="input-icon">${svgIcon(icon, 16)}<input type="url" name="link_${key}" placeholder="${label}" aria-label="${label}" class="form-input" maxlength="${LINK_URL_LIMIT}" /></div>`).join('');
   const previewSocials = SOCIAL_LINKS.map(({ key, icon, brand }) =>
@@ -238,7 +246,7 @@ export function renderPage(siteKey: string) {
           <h1 class="prism-title">Prism Nova</h1>
           <p class="prism-desc">提交你喜愛的 VTuber，讓我們為他／她建立 Prism 頁面</p>
         </div>
-        <div class="prism-hero-actions">${raw(themeToggleHTML())}</div>
+        <div class="prism-hero-actions">${raw(themeToggleHTML(nonce))}</div>
       </div>`);
 
   const body = String(html`      <form id="nova-form" class="form-layout">
@@ -284,7 +292,7 @@ export function renderPage(siteKey: string) {
             <div class="section-label">預覽</div>
             <div class="glass-box preview-card">
               <div class="preview-avatar-wrap" style="display: flex; flex-shrink: 0;">
-                <img id="preview-avatar" class="preview-avatar" alt="" style="display: none;" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'" />
+                <img id="preview-avatar" class="preview-avatar" alt="" style="display: none;" data-fallback />
                 <div id="preview-avatar-fallback" class="preview-avatar avatar-fallback" aria-hidden="true">${raw(SPARKLE_SVG.replace('width="12" height="12"', 'width="36" height="36"'))}</div>
               </div>
               <div class="preview-text">
@@ -360,5 +368,6 @@ export function renderPage(siteKey: string) {
     body,
     footer,
     script: PAGE_SCRIPT,
+    nonce,
   }));
 }

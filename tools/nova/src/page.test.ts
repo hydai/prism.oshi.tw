@@ -9,7 +9,8 @@ function assert(condition: boolean, message: string): void {
   }
 }
 
-const html = String(renderPage('test-site-key'));
+const NONCE = 'test-nonce-value';
+const html = String(renderPage('test-site-key', NONCE));
 
 function testKeepsEveryField(): void {
   const fields = [
@@ -64,6 +65,23 @@ function testRendersLivePreview(): void {
   console.log('VTuber form renders the live preview card');
 }
 
+function testCarriesTheNonce(): void {
+  const inlineTags = html.match(/<(?:script|style)(?:\s[^>]*)?>/g) ?? [];
+  assert(inlineTags.length >= 3, `page still ships its inline tags (found ${inlineTags.length})`);
+  for (const tag of inlineTags) {
+    assert(tag.includes(`nonce="${NONCE}"`), `inline tag carries the nonce — ${tag.slice(0, 60)}`);
+  }
+  console.log('VTuber form stamps the nonce on every inline tag');
+}
+
+function testAvatarFallbackIsScripted(): void {
+  assert(!/ on[a-z]+="/.test(html), 'no inline event-handler attribute survives (the CSP blocks them)');
+  assert(/<img id="preview-avatar"[^>]*data-fallback/.test(html), 'the preview avatar is marked data-fallback');
+  assert(html.includes("previewAvatar.addEventListener('error'"), 'the avatar fallback is wired as a listener');
+  assert(html.includes("previewAvatarFallback.style.display = 'flex'"), 'the listener reveals the gradient tile');
+  console.log('VTuber form falls back to the gradient tile from a listener, not onerror');
+}
+
 function testPrismShell(): void {
   assert(html.includes('class="prism-shell"'), 'page uses the prism glass shell');
   assert(html.includes('class="prism-badge"') && html.includes('推薦 VTuber'), 'hero badge names the form');
@@ -77,6 +95,8 @@ try {
   testFieldLimitsReachTheForm();
   testKeepsSubmissionPlumbing();
   testRendersLivePreview();
+  testCarriesTheNonce();
+  testAvatarFallbackIsScripted();
   testPrismShell();
   console.log('page.test: all passed');
 } catch (error) {
