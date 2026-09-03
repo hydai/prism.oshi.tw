@@ -1,4 +1,8 @@
-export type NovaUrlProvider = 'youtube' | 'twitter' | 'facebook' | 'instagram' | 'twitch' | 'image' | 'thumbnail';
+import type { SocialProvider } from '../../lib/social-providers';
+
+// Every social provider a streamer profile links to, plus the two image kinds
+// Nova validates that are not profile links.
+export type NovaUrlProvider = SocialProvider | 'image' | 'thumbnail';
 
 const allowedHosts: Record<NovaUrlProvider, ReadonlySet<string>> = {
   youtube: new Set(['youtube.com', 'm.youtube.com', 'youtu.be']),

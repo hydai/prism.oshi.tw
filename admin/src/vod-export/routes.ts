@@ -20,7 +20,7 @@
 import { Hono } from 'hono';
 import { requireCurator } from '../auth';
 import { getRouteParam } from '../http';
-import type { AuthUser } from '../../shared/types';
+import type { AppEnv } from '../env';
 import {
   downloadVodExportCandidate,
   generateVodExportPreviewApi,
@@ -37,19 +37,13 @@ import {
   publishVodExportCandidate,
   reconcileVodExportPublication,
   requireExporterBuildId,
-  type VodExportPublicationBindings,
 } from './publication';
 
-type Bindings = VodExportPublicationBindings & {
-  CURATOR_EMAILS: string;
-  CF_VERSION_METADATA: WorkerVersionMetadata;
-};
-
-type Variables = {
-  user: AuthUser;
-};
-
-const vodExportRoutes = new Hono<{ Bindings: Bindings; Variables: Variables }>();
+// The sub-app runs on the Worker's one binding type (src/env.ts). Every handler
+// below hands `c.env` to a publication/maintenance function that declares the
+// narrower slice it needs, so those call sites — not a second shape declared
+// here — are what proves the mounted Env carries what this workflow reads.
+const vodExportRoutes = new Hono<AppEnv>();
 
 vodExportRoutes.use('*', async (c, next) => {
   await next();

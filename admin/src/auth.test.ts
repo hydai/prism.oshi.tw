@@ -1,16 +1,9 @@
 import { Hono } from 'hono';
 import { requireApiRequestAuthenticity } from './auth';
 import { REQUEST_AUTHENTICITY_HEADER, REQUEST_AUTHENTICITY_VALUE } from '../shared/csrf';
-import type { AuthUser } from '../shared/types';
+import type { AppEnv } from './env';
 
 declare const process: { exitCode?: number };
-
-type Bindings = {
-  DB: D1Database;
-  CURATOR_EMAILS: string;
-  DEV_AUTH_EMAIL?: string;
-};
-type Variables = { user: AuthUser };
 
 // app.request() with a bare path builds an http://localhost/... URL,
 // so the request "origin" the middleware compares against is this:
@@ -22,8 +15,8 @@ function assertEqual<T>(actual: T, expected: T, message: string): void {
   }
 }
 
-function buildApp(): Hono<{ Bindings: Bindings; Variables: Variables }> {
-  const app = new Hono<{ Bindings: Bindings; Variables: Variables }>();
+function buildApp(): Hono<AppEnv> {
+  const app = new Hono<AppEnv>();
   app.use('/api/*', requireApiRequestAuthenticity);
   app.get('/api/probe', (c) => c.json({ ok: true }));
   app.post('/api/probe', (c) => c.json({ ok: true }));
