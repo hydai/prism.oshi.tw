@@ -6,7 +6,7 @@
     "dev": "npx wrangler@latest dev",
     "deploy": "npx wrangler@latest deploy",
     "db:create": "npx wrangler@latest d1 create oshi-prism-nova",
-    "db:migrate": "npx wrangler@latest d1 execute oshi-prism-nova --file=schema.sql",
+    "db:migrate": "npx wrangler@latest d1 execute oshi-prism-nova --remote --file=schema.sql",
     "db:migrate:local": "npx wrangler@latest d1 execute oshi-prism-nova --local --file=schema.sql",
     "typecheck": "tsc --noEmit -p tsconfig.json && tsc --noEmit -p tsconfig.test.json",
     "test:origins": "npx tsx src/origins.test.ts",

@@ -1,4 +1,4 @@
-const NOVA_ORIGIN = 'https://nova.oshi.tw';
+export const NOVA_ORIGIN = 'https://nova.oshi.tw';
 
 export interface StreamerOption {
   slug: string;

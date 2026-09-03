@@ -43,6 +43,27 @@ add the NOVA verification columns to an existing `submissions` table. After the
 incremental migrations have succeeded, re-running either bootstrap schema is
 safe, but it must not be used to skip or baseline migration history.
 
+The `tools/nova` and `tools/crystal` `db:migrate` scripts now pass `--remote`
+explicitly. Previously they passed neither `--remote` nor `--local`, which
+wrangler resolves to local — so `db:migrate` silently did nothing to
+production. `db:migrate` is still a fresh-database bootstrap only; it is not
+how schema changes reach an already-provisioned database. Schema changes ship
+as the per-file migrations described in this section, applied with
+`d1 execute --remote` (or, once a worker's `d1_migrations` table is confirmed
+to match its migrations directory, `wrangler d1 migrations apply --remote`).
+
+Unlike Crystal's and Admin's `schema.sql`, which contain only
+`CREATE … IF NOT EXISTS` and singleton-state rows, `tools/nova/schema.sql`
+also carries two `INSERT OR IGNORE INTO submissions` seed rows (`seed-mizuki`,
+`seed-gabu`, both `status='approved'`, `enabled=1`). Now that `db:migrate`
+really targets `oshi-prism-nova`, it is therefore not a pure no-op: those
+inserts are no-ops only while rows with those ids (or the same normalized
+channel URL) still exist, so deleting one and re-running `db:migrate` would
+resurrect a bootstrap-era streamer as approved/enabled for the next
+`/sync-registry` to publish — treat `db:migrate` against `oshi-prism-nova` as
+bootstrap-only for that reason. Moving those seeds into a separate seed
+script, out of `schema.sql`, is the follow-up.
+
 First record Time Travel information for both databases:
 
 ```sh
