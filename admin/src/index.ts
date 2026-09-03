@@ -65,7 +65,7 @@ import { formatSubscriberCount } from '../shared/format';
 import { feedbackEmbedForSubmission, feedbackEmbedForVod, postDiscord } from '../shared/discord';
 import type { DiscordEmbed } from '../shared/discord';
 import { sanitizeNovaUrl, type NovaUrlProvider } from '../shared/nova-url-safety';
-import { discoverStreams, getVideoDetails, fetchComments, findCandidateComment, countTimestamps, fetchChannelInfo, verifyChannelId } from './youtube';
+import { discoverStreams, getVideoDetails, fetchComments, findCandidateComment, countTimestamps, fetchChannelInfo, verifyChannelId, YouTubeApiError } from './youtube';
 import { refreshSubscriberCounts } from './subscriber-refresh';
 import {
   listSubmissions,
@@ -1197,11 +1197,29 @@ app.post('/api/pipeline/extract', requireCurator, async (c) => {
   try {
     comments = await fetchComments(apiKey, stream.videoId);
   } catch (err) {
-    // If quota exceeded, propagate; otherwise fall through to description
-    if (err instanceof Error && err.message.includes('quota')) {
-      return c.json({ error: err.message }, 429);
+    // commentsDisabled never reaches this catch — fetchComments already turns
+    // it into an empty comment list. Everything else reaching here is a real
+    // failure, and this log is the only place its detail survives the mapping
+    // below — never drop it.
+    console.error(
+      err instanceof YouTubeApiError
+        ? `extract: comments stage failed (reason: ${err.reason}, status: ${err.status})`
+        : 'extract: comments stage failed',
+      err,
+    );
+    if (err instanceof YouTubeApiError) {
+      // A spent quota is the one failure worth reporting as "try again
+      // tomorrow" — the same request succeeds once the day's units reset.
+      if (err.reason === 'quota') {
+        return c.json({ error: err.message }, 429);
+      }
+      // A rejected key, a referrer restriction, an upstream 5xx: none of
+      // these are fixed by waiting, and silently falling through to the
+      // description used to hide exactly that from the curator.
+      return c.json({ error: err.message, reason: err.reason }, 502);
     }
-    // Comments disabled or other error — fall through
+    // A non-YouTubeApiError failure (e.g. a network error) falls through to
+    // the description stage as before.
   }
 
   const candidate = findCandidateComment(comments);
@@ -1246,7 +1264,13 @@ app.post('/api/pipeline/extract', requireCurator, async (c) => {
         credit: null,
       });
     }
-  } catch {
+  } catch (err) {
+    if (err instanceof YouTubeApiError) {
+      if (err.reason === 'quota') {
+        return c.json({ error: err.message }, 429);
+      }
+      return c.json({ error: err.message, reason: err.reason }, 502);
+    }
     // Fall through to "no timestamps found"
   }
 

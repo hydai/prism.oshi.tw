@@ -114,6 +114,83 @@ export interface CandidateComment {
   isPinned: boolean;
 }
 
+// --- Errors ---
+
+/**
+ * Why a YouTube call failed, in the terms a caller can act on:
+ *
+ *   quota            — the day's units are spent; the same call works tomorrow.
+ *   commentsDisabled — this video has comments off; not a failure to report.
+ *   forbidden        — any other 403: a rejected key, a referrer restriction,
+ *                      a private resource. Waiting fixes none of them.
+ *   other            — a non-403 (404, 5xx, an upstream hiccup).
+ */
+export type YouTubeApiErrorReason = 'quota' | 'commentsDisabled' | 'forbidden' | 'other';
+
+/**
+ * A non-ok YouTube Data API response. The reason travels WITH the error so
+ * callers stop having to read it back out of the message text — which is how a
+ * rejected key came to be reported to curators as an exhausted quota.
+ */
+export class YouTubeApiError extends Error {
+  readonly status: number;
+  readonly reason: YouTubeApiErrorReason;
+
+  constructor(status: number, reason: YouTubeApiErrorReason, message: string) {
+    super(message);
+    this.name = 'YouTubeApiError';
+    this.status = status;
+    this.reason = reason;
+  }
+}
+
+// The 403 reasons that mean "spent budget" rather than "not allowed".
+const QUOTA_REASONS = ['quotaExceeded', 'dailyLimitExceeded', 'rateLimitExceeded', 'userRateLimitExceeded'];
+
+/**
+ * The reasons in an error body, or null when the body is not the API's
+ * documented `{ error: { errors: [{ reason }] } }` shape — an HTML error page
+ * from a proxy, say, which the caller then matches as raw text instead.
+ */
+function parseErrorReasons(body: string): string[] | null {
+  let parsed: unknown;
+  try {
+    parsed = JSON.parse(body);
+  } catch {
+    return null;
+  }
+  const errors = (parsed as { error?: { errors?: unknown } } | null)?.error?.errors;
+  if (!Array.isArray(errors)) return null;
+  return errors.flatMap((entry) => {
+    const reason = (entry as { reason?: unknown } | null)?.reason;
+    return typeof reason === 'string' ? [reason] : [];
+  });
+}
+
+/**
+ * commentsDisabled is tested first because it is the one 403 a caller recovers
+ * from rather than reports, and that ordering is what fetchComments has always
+ * done.
+ */
+function classifyYouTubeError(status: number, body: string): YouTubeApiErrorReason {
+  // The API answers a spent quota with 403 in the documented cases below, but
+  // an upstream proxy or the bare HTTP semantics can also answer 429 — that
+  // status means "spent budget" on its own, whatever the body says.
+  if (status === 429) return 'quota';
+  if (status !== 403) return 'other';
+  const reasons = parseErrorReasons(body);
+  const hasReason = (reason: string): boolean =>
+    reasons === null ? body.includes(reason) : reasons.includes(reason);
+
+  if (hasReason('commentsDisabled')) return 'commentsDisabled';
+  if (QUOTA_REASONS.some(hasReason)) return 'quota';
+  return 'forbidden';
+}
+
+function youTubeApiError(status: number, body: string, message: string): YouTubeApiError {
+  return new YouTubeApiError(status, classifyYouTubeError(status, body), message);
+}
+
 // --- Helpers ---
 
 /** Wrap fetch with Referer header to satisfy API key HTTP referrer restrictions. */
@@ -173,7 +250,7 @@ export async function discoverStreams(
     const res = await ytFetch(url.toString());
     if (!res.ok) {
       const body = await res.text();
-      throw new Error(`YouTube playlistItems.list failed (${res.status}): ${body}`);
+      throw youTubeApiError(res.status, body, `YouTube playlistItems.list failed (${res.status}): ${body}`);
     }
 
     const data = (await res.json()) as PlaylistItemsResponse;
@@ -236,7 +313,7 @@ async function fetchVideoDetailBatch(
   const res = await ytFetch(url.toString());
   if (!res.ok) {
     const body = await res.text();
-    throw new Error(`YouTube videos.list failed (${res.status}): ${body}`);
+    throw youTubeApiError(res.status, body, `YouTube videos.list failed (${res.status}): ${body}`);
   }
 
   const data = (await res.json()) as VideosResponse;
@@ -268,14 +345,19 @@ export async function fetchComments(
 
   const res = await ytFetch(url.toString());
   if (!res.ok) {
-    // Comments disabled returns 403
-    if (res.status === 403) {
-      const body = await res.text();
-      if (body.includes('commentsDisabled')) return [];
-      throw new Error(`YouTube API quota exceeded or forbidden: ${body}`);
-    }
     const body = await res.text();
-    throw new Error(`YouTube commentThreads.list failed (${res.status}): ${body}`);
+    const error = youTubeApiError(
+      res.status,
+      body,
+      // A 403 is either a spent quota or a refusal; the reason on the error says
+      // which, and this text stays as the pipeline UI has always shown it.
+      res.status === 403
+        ? `YouTube API quota exceeded or forbidden: ${body}`
+        : `YouTube commentThreads.list failed (${res.status}): ${body}`,
+    );
+    // A video with comments switched off is not a failure — it just has none.
+    if (error.reason === 'commentsDisabled') return [];
+    throw error;
   }
 
   const data = (await res.json()) as CommentThreadsResponse;
@@ -352,7 +434,7 @@ export async function fetchChannelInfos(
   const res = await ytFetch(url.toString());
   if (!res.ok) {
     const body = await res.text();
-    throw new Error(`YouTube channels.list failed (${res.status}): ${body}`);
+    throw youTubeApiError(res.status, body, `YouTube channels.list failed (${res.status}): ${body}`);
   }
 
   const data = (await res.json()) as ChannelResponse;
@@ -383,7 +465,11 @@ export async function verifyChannelId(
 
   const res = await ytFetch(url.toString());
   if (!res.ok) {
-    throw new Error(`YouTube channels.list verification failed (${res.status})`);
+    // The body is read to classify the failure, never to report it: this call
+    // carries a curator-entered channel ID, so upstream diagnostics stay out of
+    // the message.
+    const body = await res.text();
+    throw youTubeApiError(res.status, body, `YouTube channels.list verification failed (${res.status})`);
   }
   const data = (await res.json()) as ChannelResponse;
   const returnedId = data.items?.[0]?.id;
