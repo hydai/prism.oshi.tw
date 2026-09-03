@@ -7,7 +7,13 @@ import {
 import { sha256Hex, snapshotUrlForHash } from './canonical-json';
 import { VodExportError } from './errors';
 import { createFinding } from './findings';
-import { hasExactKeys, isCanonicalTimestamp, isSourceFingerprint, SHA256_PATTERN } from './guards';
+import {
+  hasExactKeys,
+  isCanonicalTimestamp,
+  isNonNegativeSafeInteger,
+  isSourceFingerprint,
+  SHA256_PATTERN,
+} from './guards';
 import { capacityDiagnostic } from './limits';
 import {
   PRIVATE_JSON_HTTP_METADATA,
@@ -237,10 +243,6 @@ function isCandidateMetadata(value: unknown): value is VodExportCandidateMetadat
     && record.downloadFilename === `vod-export-v${VOD_EXPORT_MAJOR}-${record.sha256}.json`
     && isSourceFingerprint(record.sourceFingerprint)
     && Date.parse(record.expiresAt) - Date.parse(record.generatedAt) === CANDIDATE_LIFETIME_MS;
-}
-
-function isNonNegativeSafeInteger(value: unknown): value is number {
-  return typeof value === 'number' && Number.isSafeInteger(value) && value >= 0;
 }
 
 function isCounts(value: unknown): value is VodExportCounts {

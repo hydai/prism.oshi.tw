@@ -5,6 +5,7 @@ import {
   hasExactKeys,
   isCanonicalTimestamp,
   isNonEmptyString,
+  isNonNegativeSafeInteger,
   isSourceFingerprint,
   SHA256_PATTERN,
 } from './guards';
@@ -696,10 +697,6 @@ function parseCanonicalControlManifest(value: string): VodExportManifest | null 
 
 function isUuidV4(value: unknown): value is string {
   return typeof value === 'string' && UUID_V4_PATTERN.test(value);
-}
-
-function isNonNegativeSafeInteger(value: unknown): value is number {
-  return typeof value === 'number' && Number.isSafeInteger(value) && value >= 0;
 }
 
 function hasRequiredAndOptionalKeys(
