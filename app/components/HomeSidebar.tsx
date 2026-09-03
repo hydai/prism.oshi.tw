@@ -105,10 +105,7 @@ export default function HomeSidebar({
           href="https://vods.oshi.tw"
           target="_blank"
           rel="noopener noreferrer"
-          className="flex items-center justify-center gap-2 rounded-radius-lg px-4 py-2 text-token-sm font-semibold transition-opacity hover:opacity-90 text-token-secondary"
-          style={{
-            border: '1px solid var(--border-accent)',
-          }}
+          className="flex items-center justify-center gap-2 rounded-radius-lg px-4 py-2 text-token-sm font-semibold transition-opacity hover:opacity-90 text-token-secondary border border-border-token"
         >
           <Film className="h-4 w-4" />
           歌回 VOD 資料庫
@@ -117,10 +114,7 @@ export default function HomeSidebar({
           href="https://nova.oshi.tw/vod"
           target="_blank"
           rel="noopener noreferrer"
-          className="flex items-center justify-center gap-2 rounded-radius-lg px-4 py-2 text-token-sm font-semibold transition-opacity hover:opacity-90 text-token-secondary"
-          style={{
-            border: '1px solid var(--border-accent)',
-          }}
+          className="flex items-center justify-center gap-2 rounded-radius-lg px-4 py-2 text-token-sm font-semibold transition-opacity hover:opacity-90 text-token-secondary border border-border-token"
         >
           <Video className="h-4 w-4" />
           新增 VOD
@@ -129,10 +123,7 @@ export default function HomeSidebar({
           href="https://crystal.oshi.tw"
           target="_blank"
           rel="noopener noreferrer"
-          className="flex items-center justify-center gap-2 rounded-radius-lg px-4 py-2 text-token-sm font-semibold transition-opacity hover:opacity-90 text-token-secondary"
-          style={{
-            border: '1px solid var(--border-accent)',
-          }}
+          className="flex items-center justify-center gap-2 rounded-radius-lg px-4 py-2 text-token-sm font-semibold transition-opacity hover:opacity-90 text-token-secondary border border-border-token"
         >
           <MessageSquare className="h-4 w-4" />
           回報 / 建議
@@ -141,10 +132,7 @@ export default function HomeSidebar({
           href="https://discord.gg/bUYva8q7Jr"
           target="_blank"
           rel="noopener noreferrer"
-          className="flex items-center justify-center gap-2 rounded-radius-lg px-4 py-2 text-token-sm font-semibold transition-opacity hover:opacity-90 text-token-secondary"
-          style={{
-            border: '1px solid var(--border-accent)',
-          }}
+          className="flex items-center justify-center gap-2 rounded-radius-lg px-4 py-2 text-token-sm font-semibold transition-opacity hover:opacity-90 text-token-secondary border border-border-token"
         >
           <DiscordIcon className="h-4 w-4" />
           Discord 伺服器

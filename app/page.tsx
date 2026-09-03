@@ -81,10 +81,7 @@ export default function HomePage() {
               target="_blank"
               rel="noopener noreferrer"
               aria-label="回報 / 建議"
-              className="inline-flex items-center gap-1 rounded-radius-lg px-2.5 py-2 text-token-sm font-semibold transition-opacity hover:opacity-90 text-token-secondary"
-              style={{
-                border: '1px solid var(--border-accent)',
-              }}
+              className="inline-flex items-center gap-1 rounded-radius-lg px-2.5 py-2 text-token-sm font-semibold transition-opacity hover:opacity-90 text-token-secondary border border-border-token"
             >
               <MessageSquare className="h-4 w-4" />
             </a>
@@ -93,10 +90,7 @@ export default function HomePage() {
               target="_blank"
               rel="noopener noreferrer"
               aria-label="Discord 伺服器"
-              className="inline-flex items-center gap-1 rounded-radius-lg px-2.5 py-2 text-token-sm font-semibold transition-opacity hover:opacity-90 text-token-secondary"
-              style={{
-                border: '1px solid var(--border-accent)',
-              }}
+              className="inline-flex items-center gap-1 rounded-radius-lg px-2.5 py-2 text-token-sm font-semibold transition-opacity hover:opacity-90 text-token-secondary border border-border-token"
             >
               <DiscordIcon className="h-4 w-4" />
             </a>
@@ -105,10 +99,7 @@ export default function HomePage() {
               target="_blank"
               rel="noopener noreferrer"
               aria-label="歌回 VOD 資料庫"
-              className="inline-flex items-center gap-1 rounded-radius-lg px-2.5 py-2 text-token-sm font-semibold transition-opacity hover:opacity-90 text-token-secondary"
-              style={{
-                border: '1px solid var(--border-accent)',
-              }}
+              className="inline-flex items-center gap-1 rounded-radius-lg px-2.5 py-2 text-token-sm font-semibold transition-opacity hover:opacity-90 text-token-secondary border border-border-token"
             >
               <Film className="h-4 w-4" />
             </a>
@@ -117,10 +108,7 @@ export default function HomePage() {
               target="_blank"
               rel="noopener noreferrer"
               aria-label="新增 VOD"
-              className="inline-flex items-center gap-1 rounded-radius-lg px-2.5 py-2 text-token-sm font-semibold transition-opacity hover:opacity-90 text-token-secondary"
-              style={{
-                border: '1px solid var(--border-accent)',
-              }}
+              className="inline-flex items-center gap-1 rounded-radius-lg px-2.5 py-2 text-token-sm font-semibold transition-opacity hover:opacity-90 text-token-secondary border border-border-token"
             >
               <Video className="h-4 w-4" />
             </a>
