@@ -15,6 +15,7 @@ import { sanitizeExternalUrl } from '../../lib/safe-links.ts';
 import type { SocialLinkKey, SocialLinks, StreamerConfig, StreamerTheme } from '../../lib/types.ts';
 import { sanitizeNovaUrl, type NovaUrlProvider } from '../../admin/shared/nova-url-safety.ts';
 import { isMain, readJsonOr, repoRoot } from '../shared/cli.ts';
+import { DEFAULT_THEME_SLUG } from '../shared/config.ts';
 import { queryD1 } from '../shared/d1.ts';
 import { assertValidSlug } from '../shared/slug.ts';
 import { seedIfMissing } from '../shared/sync-state.ts';
@@ -330,13 +331,13 @@ async function main(): Promise<void> {
   const oldStreamers = readExistingStreamers();
   const streamers = rows.map(rowToConfig);
 
-  // Fall back to mizuki's theme for streamers with all-#000000 placeholder themes
-  const mizuki = streamers.find((s) => s.slug === 'mizuki');
-  if (mizuki) {
+  // Fall back to the default theme donor's theme for streamers with all-#000000 placeholder themes
+  const themeDonor = streamers.find((s) => s.slug === DEFAULT_THEME_SLUG);
+  if (themeDonor) {
     for (const s of streamers) {
-      if (s.slug !== 'mizuki' && isAllBlackTheme(s.theme)) {
-        console.log(`  ⚠ ${s.slug} has placeholder theme (all #000000), using mizuki theme as default`);
-        s.theme = { ...mizuki.theme };
+      if (s.slug !== DEFAULT_THEME_SLUG && isAllBlackTheme(s.theme)) {
+        console.log(`  ⚠ ${s.slug} has placeholder theme (all #000000), using ${DEFAULT_THEME_SLUG} theme as default`);
+        s.theme = { ...themeDonor.theme };
       }
     }
   }

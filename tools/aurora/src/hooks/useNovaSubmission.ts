@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
 import type { AuroraSong } from '../components/SongListEditor';
-import { loadNovaVideoDate } from '../lib/nova';
+import { loadNovaVideoDate, NOVA_ORIGIN } from '../lib/nova';
 
 interface UseNovaSubmissionOptions {
   selectedStreamer: string;
@@ -117,7 +117,7 @@ export function useNovaSubmission({
         });
       }
 
-      const response = await fetch('https://nova.oshi.tw/vod/api/submit', {
+      const response = await fetch(`${NOVA_ORIGIN}/vod/api/submit`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
