@@ -8,10 +8,10 @@
  * local JSON files may be out of date.
  */
 
-import { execFileSync } from 'node:child_process';
 import * as fs from 'node:fs';
 import * as path from 'node:path';
 
+import { queryD1 } from '../shared/d1.ts';
 import { readSyncState, EMPTY_ENTRY, type SyncStateEntry } from '../shared/sync-state.ts';
 import { assertValidSlug } from '../shared/slug.ts';
 
@@ -73,15 +73,8 @@ export const AGG_SQL = `
     FROM streams WHERE status = 'approved' GROUP BY streamer_id
 `.trim();
 
-function queryAdminD1(root: string): AggRow[] {
-  const adminDir = path.resolve(root, 'admin');
-  const raw = execFileSync(
-    'npx',
-    ['wrangler@latest', 'd1', 'execute', 'oshi-prism-db', '--remote', '--json', `--command=${AGG_SQL}`],
-    { cwd: adminDir, encoding: 'utf-8', maxBuffer: 10 * 1024 * 1024 },
-  );
-  const parsed = JSON.parse(raw);
-  return (parsed[0]?.results ?? []) as AggRow[];
+function queryAdminD1(): AggRow[] {
+  return queryD1<AggRow>('admin', AGG_SQL);
 }
 
 export function readRegistry(root: string): StreamerRegistryEntry[] {
@@ -130,7 +123,7 @@ function classify(state: SyncStateEntry, db: DbSnapshot): Freshness {
 export function detectAll(root: string): StreamerStatus[] {
   const registry = readRegistry(root);
   const stateFile = readSyncState(root);
-  const aggRows = queryAdminD1(root);
+  const aggRows = queryAdminD1();
 
   const dbByStreamer = new Map<string, DbSnapshot>();
   for (const row of aggRows) {
