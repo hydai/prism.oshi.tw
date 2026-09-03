@@ -7,6 +7,7 @@
  * worker's theme.ts, which composes DARK_MODE_VARS_CSS with its own rules and
  * re-exports everything below so page modules keep importing `./theme`.
  */
+import { escapeHtml } from './html';
 
 export { DARK_MODE_DETECT_SCRIPT } from '../../../lib/theme-detect-script';
 
@@ -271,8 +272,20 @@ export function svgIcon(name: IconName, size = 16, extraStyle = ''): string {
 /** The 4-point sparkle used by prism's badge pill. */
 export const SPARKLE_SVG = '<svg width="12" height="12" viewBox="0 0 12 12" fill="currentColor" aria-hidden="true" style="flex-shrink:0"><path d="M6 0L7.545 4.455L12 6L7.545 7.545L6 12L4.455 7.545L0 6L4.455 4.455L6 0Z"/></svg>';
 
-/** Returns HTML for a theme toggle button with moon/sun SVG icons and inline JS. */
-export function themeToggleHTML(): string {
+/**
+ * Returns HTML for a theme toggle button with moon/sun SVG icons and inline JS.
+ *
+ * `nonce`, when given, is stamped on the inline `<script>` (the same
+ * `nonceAttr` rule as `pageShell`: undefined omits the attribute entirely,
+ * an empty string throws). Omit it and the output is byte-identical to a
+ * toggle with no CSP at all.
+ */
+export function themeToggleHTML(nonce?: string): string {
+  if (nonce === '') {
+    throw new Error('themeToggleHTML: nonce must be non-empty when given');
+  }
+  const nonceAttr = nonce === undefined ? '' : ` nonce="${escapeHtml(nonce)}"`;
+
   return `<button id="theme-toggle" aria-label="Toggle dark mode" style="
     width: 32px; height: 32px; border-radius: 50%; border: 1px solid var(--border-glass);
     background: var(--bg-surface-glass); cursor: pointer; display: flex; align-items: center;
@@ -289,7 +302,7 @@ export function themeToggleHTML(): string {
       <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/>
     </svg>
   </button>
-  <script>
+  <script${nonceAttr}>
   (function(){
     var moon = document.getElementById('theme-icon-moon');
     var sun = document.getElementById('theme-icon-sun');
