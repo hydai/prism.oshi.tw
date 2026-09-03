@@ -14,7 +14,8 @@
     "sync-*/**/*.ts",
     "inbox-status/**/*.ts",
     "fetch-channel-info/**/*.ts",
-    "announce-flush/**/*.ts"
+    "announce-flush/**/*.ts",
+    "csp-browser-check.ts"
   ],
   "exclude": ["nova", "crystal", "aurora", "**/node_modules"]
 }
