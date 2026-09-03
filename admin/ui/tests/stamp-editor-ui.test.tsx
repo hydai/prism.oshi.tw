@@ -185,6 +185,18 @@ interface InlineEditCallProps {
   onCancel: () => void;
 }
 
+/**
+ * `memo(Component)` is an object whose `.type` is the function, so a walker that reads `type.name`
+ * or calls `type(props)` has to see through it — otherwise it silently stops matching the moment a
+ * component is memoized.
+ */
+type RenderFunction = ((props: unknown) => React.ReactNode) & { name?: string };
+
+function componentOf(type: React.ReactElement['type']): RenderFunction {
+  const memoized = type as { $$typeof?: symbol; type?: unknown };
+  return (memoized.$$typeof === Symbol.for('react.memo') ? memoized.type : type) as RenderFunction;
+}
+
 function inlineEditProps(tree: React.ReactNode, componentName: string): InlineEditCallProps[] {
   const seen: React.ReactElement[] = [];
   const walk = (node: React.ReactNode): void => {
@@ -198,10 +210,10 @@ function inlineEditProps(tree: React.ReactNode, componentName: string): InlineEd
   };
 
   walk(tree);
-  const host = seen.find((element) => (element.type as { name?: string }).name === componentName);
+  const host = seen.find((element) => componentOf(element.type).name === componentName);
   assert(host !== undefined, `${componentName} renders inside the page view`);
   seen.length = 0;
-  walk((host.type as (props: unknown) => React.ReactNode)(host.props));
+  walk(componentOf(host.type)(host.props));
   return seen.filter((element) => element.type === InlineEdit).map((element) => element.props as InlineEditCallProps);
 }
 
