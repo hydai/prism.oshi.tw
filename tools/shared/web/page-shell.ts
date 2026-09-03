@@ -10,9 +10,11 @@
  * but its siblings, so `tools/shared` needs no node_modules of its own. Hono
  * callers wrap the result in `raw()`.
  *
- * An optional per-request `nonce` is stamped on every inline `<script>`/
- * `<style>` tag the shell emits, so a caller enforcing a CSP can allow-list
- * that one value instead of `unsafe-inline`. See `PageShellParts.nonce`.
+ * A required per-request `nonce` is stamped on every inline `<script>`/
+ * `<style>` tag the shell emits, so the caller's Content-Security-Policy can
+ * allow-list that one value instead of `unsafe-inline`. Both Nova and Crystal
+ * enforce a CSP, so there is no caller left that renders without one — see
+ * `PageShellParts.nonce`.
  */
 import { escapeHtml } from './html';
 import { DARK_MODE_DETECT_SCRIPT, PRISM_CSS } from './theme';
@@ -100,12 +102,11 @@ export interface PageShellParts {
   /**
    * CSP nonce stamped on every inline `<script>`/`<style>` tag this shell
    * emits: the head detect script, the Turnstile loader, the `<style>`
-   * block, and the trailing script. Optional so callers can adopt it
-   * incrementally — omit it and the output is byte-identical to a shell
-   * with no CSP at all. An empty string throws rather than silently
-   * producing an un-nonced tag.
+   * block, and the trailing script. Required — every caller runs behind a
+   * Content-Security-Policy now. An empty string throws rather than
+   * silently producing an un-nonced tag.
    */
-  nonce?: string;
+  nonce: string;
 }
 
 /**
@@ -124,7 +125,7 @@ export function pageShell(parts: PageShellParts): string {
   if (parts.nonce === '') {
     throw new Error('pageShell: nonce must be non-empty when given');
   }
-  const nonceAttr = parts.nonce === undefined ? '' : ` nonce="${escapeHtml(parts.nonce)}"`;
+  const nonceAttr = ` nonce="${escapeHtml(parts.nonce)}"`;
 
   const narrowClass = parts.narrow ? ' prism-page-narrow' : '';
   // The dark-mode class is set before first paint, so the script must run before the stylesheets.

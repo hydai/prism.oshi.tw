@@ -37,10 +37,12 @@ function makeTicket(overrides: Partial<TicketRow> = {}): TicketRow {
   };
 }
 
+const NONCE = 'test-nonce-value';
+
 // Render to a plain string. renderQaPage returns a Hono HtmlEscapedString
 // (sync here, since every interpolation is sync); String() yields the markup.
 function render(tickets: TicketRow[], typeFilter = '', q = ''): string {
-  return String(renderQaPage(tickets, tickets.length, 1, 20, typeFilter, q));
+  return String(renderQaPage(tickets, tickets.length, 1, 20, typeFilter, q, NONCE));
 }
 
 const XSS = '<img src=x onerror=alert(document.domain)>';
@@ -139,7 +141,7 @@ test('renderQaPage renders each ticket with a typed icon tile', () => {
 });
 
 test('renderQaPage renders pagination circles with the current page marked', () => {
-  const out = String(renderQaPage([makeTicket()], 45, 2, 20, '', ''));
+  const out = String(renderQaPage([makeTicket()], 45, 2, 20, '', '', NONCE));
   const links = out.match(/<a href="\/qa(\?page=\d+)?" class="page-link( active)?"[^>]*>\d<\/a>/g) ?? [];
   assert.equal(links.length, 3, 'three page links for 45 tickets at 20 per page');
   assert.ok(out.includes('<a href="/qa?page=2" class="page-link active" aria-current="page">2</a>'), 'current page is marked');
@@ -152,6 +154,16 @@ test('renderQaPage keeps the empty-state copy and the clear-search link', () => 
   const miss = render([], 'ui', '找不到');
   assert.ok(miss.includes('找不到符合「找不到」的結果'), 'no-results message unchanged');
   assert.ok(miss.includes('href="/qa?type=ui"') && miss.includes('清除搜尋'), 'clear-search link keeps the type filter and drops q');
+});
+
+test('every inline script/style tag carries the given nonce', () => {
+  const out = render([makeTicket()]);
+  const inlineTags = out.match(/<(?:script|style)(?:\s[^>]*)?>/g) ?? [];
+  assert.ok(inlineTags.length >= 3, `the page still ships its inline tags (found ${inlineTags.length})`);
+  for (const tag of inlineTags) {
+    assert.ok(tag.includes(`nonce="${NONCE}"`), `inline tag carries the nonce — ${tag.slice(0, 60)}`);
+  }
+  assert.ok(!/ on[a-z]+="/.test(out), 'no inline event-handler attribute survives');
 });
 
 console.log('\nAll qa-page tests passed.');

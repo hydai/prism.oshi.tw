@@ -13,7 +13,8 @@ function test(name: string, fn: () => void): void {
   }
 }
 
-const html = String(renderFormPage('test-site-key'));
+const NONCE = 'test-nonce-value';
+const html = String(renderFormPage('test-site-key', NONCE));
 
 function attrOf(id: string): string {
   return html.match(new RegExp(`<[a-z]+[^>]*\\bid="${id}"[^>]*>`))?.[0] ?? '';
@@ -73,6 +74,15 @@ test('Turnstile widget receives the site key and the submit label survives', () 
   assert.ok(html.includes('class="cf-turnstile" data-sitekey="test-site-key"'), 'turnstile site key');
   assert.ok(html.includes('送出回報'), 'submit label');
   assert.ok(html.includes('href="/qa"') && html.includes('查看 Q&amp;A'), 'Q&A cross-link');
+});
+
+test('every inline script/style tag carries the given nonce', () => {
+  const inlineTags = html.match(/<(?:script|style)(?:\s[^>]*)?>/g) ?? [];
+  assert.ok(inlineTags.length >= 3, `the page still ships its inline tags (found ${inlineTags.length})`);
+  for (const tag of inlineTags) {
+    assert.ok(tag.includes(`nonce="${NONCE}"`), `inline tag carries the nonce — ${tag.slice(0, 60)}`);
+  }
+  assert.ok(!/ on[a-z]+="/.test(html), 'no inline event-handler attribute survives');
 });
 
 console.log('\nAll form-page tests passed.');

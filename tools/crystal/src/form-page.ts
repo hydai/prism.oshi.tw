@@ -333,7 +333,7 @@ const FORM_SCRIPT = `
     });
   `;
 
-export function renderFormPage(siteKey: string) {
+export function renderFormPage(siteKey: string, nonce: string) {
   const hero = String(html`      <div class="prism-hero">
         <div class="prism-hero-tile">${raw(svgIcon('crystal', 30))}</div>
         <div class="prism-hero-stack">
@@ -341,7 +341,7 @@ export function renderFormPage(siteKey: string) {
           <h1 class="prism-title">Prism Crystal</h1>
           <p class="prism-desc">回報問題或建議新功能，幫助我們讓 Prism 更好</p>
         </div>
-        <div class="prism-hero-actions">${raw(themeToggleHTML())}</div>
+        <div class="prism-hero-actions">${raw(themeToggleHTML(nonce))}</div>
       </div>`);
 
   const body = String(html`      <form id="crystal-form" class="form-stack crystal-form">
@@ -440,5 +440,6 @@ export function renderFormPage(siteKey: string) {
     body,
     footer,
     script: FORM_SCRIPT,
+    nonce,
   }));
 }
