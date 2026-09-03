@@ -32,12 +32,8 @@ export const VOD_EXPORT_LIMITS = {
 
 export const VOD_EXPORT_CAPACITY_WARNING_RATIO = 0.8;
 
-export const SOCIAL_PROVIDERS = [
-  'youtube',
-  'twitter',
-  'facebook',
-  'instagram',
-  'twitch',
-] as const;
-
-export type SocialProvider = (typeof SOCIAL_PROVIDERS)[number];
+// The export's social providers ARE the site's social providers — re-exported
+// under the names this module's importers already use. The canonical JSON emits
+// socialLinks in this array's order, so the list must never fork from lib/.
+export { SOCIAL_PROVIDERS } from '../../../lib/social-providers';
+export type { SocialProvider } from '../../../lib/social-providers';

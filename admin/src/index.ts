@@ -128,8 +128,8 @@ import {
   reviewWorkMatchCandidate,
   WorkMatchError,
 } from './work-review';
+import type { AppEnv } from './env';
 import type {
-  AuthUser,
   StatusUpdateBody,
   FetchDurationResponse,
   PasteImportBody,
@@ -159,24 +159,6 @@ import type {
   WorkMatchMergeBody,
   WorkMatchReviewBody,
 } from '../shared/types';
-
-type Bindings = {
-  DB: D1Database;
-  NOVA_DB: D1Database;
-  CRYSTAL_DB: D1Database;
-  CURATOR_EMAILS: string;
-  YOUTUBE_API_KEY: string;
-  DISCORD_WEBHOOK_FEEDBACK?: string; // optional: feature no-ops when the secret is unset
-  VOD_EXPORT_PUBLIC: R2Bucket;
-  VOD_EXPORT_PRIVATE: R2Bucket;
-  VOD_EXPORT_DB_ID: string;
-  VOD_EXPORT_NOVA_DB_ID: string;
-  CF_VERSION_METADATA: WorkerVersionMetadata;
-};
-
-type Variables = {
-  user: AuthUser;
-};
 
 const novaUrlFields = [
   ['youtube_channel_url', 'youtube'],
@@ -353,7 +335,7 @@ function hasCurrentChannelVerification(value: {
 // through this one waitUntil block (audit 4.3): a null embed (no real status
 // transition, or a transition that isn't approved/rejected) is a no-op.
 function notifyDiscordFeedback(
-  c: Context<{ Bindings: Bindings; Variables: Variables }>,
+  c: Context<AppEnv>,
   embed: DiscordEmbed | null,
 ): void {
   if (!embed) return;
@@ -364,7 +346,7 @@ function notifyDiscordFeedback(
   );
 }
 
-const app = new Hono<{ Bindings: Bindings; Variables: Variables }>();
+const app = new Hono<AppEnv>();
 
 // Replaces Hono's default plain-text 500 with the { error, code } JSON
 // contract ui/src/api/client.ts already has to tolerate (client.ts:132-153

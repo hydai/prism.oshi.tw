@@ -1,3 +1,5 @@
+import type { SocialProvider } from './social-providers';
+
 // Stored (exported) performance — `date` and `streamTitle` are intentionally
 // absent: the fan site derives both from the stream record (join by streamId)
 // at load time. See app/lib/archive-loader.ts hydrateSongs().
@@ -46,7 +48,8 @@ export interface StreamerTheme {
   borderAccentSecondary: string;
 }
 
-export type SocialLinkKey = 'youtube' | 'twitter' | 'facebook' | 'instagram' | 'twitch';
+/** The fan site's name for a social provider; the list itself lives in ./social-providers. */
+export type SocialLinkKey = SocialProvider;
 export type SocialLinks = Partial<Record<SocialLinkKey, string>>;
 
 export interface StreamerConfig {

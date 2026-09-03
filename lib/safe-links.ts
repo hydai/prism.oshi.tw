@@ -1,6 +1,5 @@
+import { SOCIAL_PROVIDERS } from './social-providers';
 import type { Registry, SocialLinkKey, SocialLinks, StreamerConfig } from './types';
-
-const socialLinkKeys = ['youtube', 'twitter', 'facebook', 'instagram', 'twitch'] as const satisfies readonly SocialLinkKey[];
 
 const allowedSocialHosts: Record<SocialLinkKey, ReadonlySet<string>> = {
   youtube: new Set(['youtube.com', 'youtu.be', 'm.youtube.com']),
@@ -14,7 +13,7 @@ const allowedSocialHosts: Record<SocialLinkKey, ReadonlySet<string>> = {
 // against the platform allowlist (covers both the desktop and mobile host).
 const youtubeRedirectHosts = new Set(['youtube.com', 'm.youtube.com']);
 
-const socialLinkKeySet = new Set<string>(socialLinkKeys);
+const socialLinkKeySet = new Set<string>(SOCIAL_PROVIDERS);
 
 function parseHttpUrl(
   rawUrl: string | undefined,

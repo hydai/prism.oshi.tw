@@ -1783,7 +1783,46 @@ export async function getDashboardStats(db: D1Database, streamerId: string) {
 
 // --- Export helpers (fan-site format) ---
 
-export async function exportSongs(db: D1Database, streamerId: string) {
+/**
+ * One performance as `GET /api/export/songs` puts it on the wire.
+ *
+ * `date` and `streamTitle` are here BY DESIGN even though the fan site's stored
+ * shape (`lib/types.ts` `Performance`) omits them — that file says so in as many
+ * words, because the site joins each performance to its stream at load time and
+ * `tools/sync-data` writes the slimmer form straight from D1, never through this
+ * endpoint. This is the legacy compatibility export: it has no in-repo caller,
+ * so its only consumers are outside this repository and neither field may be
+ * dropped without that being a deliberate breaking change. The type exists to
+ * make the difference from `lib/types.ts` a documented decision instead of a
+ * shape that drifted.
+ */
+export interface ExportedPerformance {
+  id: string;
+  streamId: string;
+  date: string;
+  streamTitle: string;
+  videoId: string;
+  timestamp: number;
+  endTimestamp: number | null;
+  note: string;
+}
+
+/**
+ * One song as `GET /api/export/songs` puts it on the wire — `lib/types.ts`
+ * `Song` with the export-only performance shape above. `workId` is omitted
+ * entirely (not `null`) for a song with no linked work, so the exported JSON
+ * matches what the fan site's optional `workId` expects.
+ */
+export interface ExportedSong {
+  id: string;
+  workId?: string;
+  title: string;
+  originalArtist: string;
+  tags: string[];
+  performances: ExportedPerformance[];
+}
+
+export async function exportSongs(db: D1Database, streamerId: string): Promise<ExportedSong[]> {
   const [songResult, performanceResult] = await db.batch([
     db
       .prepare(`SELECT song.*, link.work_id

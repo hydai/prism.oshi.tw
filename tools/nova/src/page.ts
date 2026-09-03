@@ -2,8 +2,12 @@ import { html, raw } from 'hono/html';
 import { pageShell } from '../../shared/web/page-shell';
 import { DARK_MODE_CSS, SPARKLE_SVG, svgIcon, themeToggleHTML } from './theme';
 import { LINK_URL_LIMIT, SUBMISSION_FIELD_LIMITS } from './validate';
+import { SOCIAL_PROVIDERS, type SocialProvider } from '../../../lib/social-providers';
 
-const SOCIAL_LINKS: Array<{ key: string; label: string; icon: Parameters<typeof svgIcon>[0]; brand: string }> = [
+// Presentation for each provider in lib/social-providers.ts. `key` is typed
+// against that list, so a platform this form knows about but the rest of the
+// stack does not cannot compile.
+const SOCIAL_LINKS: Array<{ key: SocialProvider; label: string; icon: Parameters<typeof svgIcon>[0]; brand: string }> = [
   { key: 'youtube', label: 'YouTube', icon: 'youtube', brand: '#FF0000' },
   { key: 'twitter', label: 'Twitter / X', icon: 'twitter', brand: '#1DA1F2' },
   { key: 'facebook', label: 'Facebook', icon: 'facebook', brand: '#1877F2' },
@@ -73,7 +77,7 @@ const PAGE_SCRIPT = `
       const previewGroup = document.getElementById('preview-group');
       const previewSubs = document.getElementById('preview-subs');
       const previewDesc = document.getElementById('preview-desc');
-      const SOCIAL_KEYS = ['youtube', 'twitter', 'facebook', 'instagram', 'twitch'];
+      const SOCIAL_KEYS = ${JSON.stringify(SOCIAL_PROVIDERS)};
       function syncPreview() {
         previewName.textContent = nameInput.value.trim() || '—';
         previewGroup.textContent = groupInput.value.trim() || '—';
