@@ -4,7 +4,6 @@ import {
   buildReport,
   exitCodeForReport,
   formatReport,
-  parseWranglerResults,
   PENDING_CRYSTAL_SQL,
   PENDING_STREAMERS_SQL,
   PENDING_VODS_SQL,
@@ -23,17 +22,6 @@ function test(name: string, fn: () => void): void {
     throw err;
   }
 }
-
-test('parseWranglerResults returns the first result set rows', () => {
-  const raw = JSON.stringify([
-    {
-      results: [{ id: 'row-1' }, { id: 'row-2' }],
-      success: true,
-    },
-  ]);
-
-  assert.deepEqual(parseWranglerResults<{ id: string }>(raw), [{ id: 'row-1' }, { id: 'row-2' }]);
-});
 
 test('buildReport combines Nova and Crystal counts by inbox', () => {
   const counts: StatusCountRow[] = [

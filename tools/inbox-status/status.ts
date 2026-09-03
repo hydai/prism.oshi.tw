@@ -9,14 +9,8 @@
  * pending rows. The command is read-only and only queries Cloudflare D1.
  */
 
-import { execFileSync } from 'node:child_process';
-import * as path from 'node:path';
-
-import { isMain, repoRoot } from '../shared/cli.ts';
-
-const ROOT = repoRoot();
-const NOVA_DIR = path.resolve(ROOT, 'tools/nova');
-const CRYSTAL_DIR = path.resolve(ROOT, 'tools/crystal');
+import { isMain } from '../shared/cli.ts';
+import { queryD1 } from '../shared/d1.ts';
 
 export type InboxName = 'streamer' | 'vod' | 'crystal';
 
@@ -167,25 +161,6 @@ const LATEST_CRYSTAL_SQL = `
    ORDER BY submitted_at DESC
    LIMIT 3
 `.trim();
-
-export function parseWranglerResults<T>(raw: string): T[] {
-  const parsed = JSON.parse(raw) as Array<{ results?: T[]; success?: boolean; error?: string }>;
-  const first = parsed[0];
-  if (!first) return [];
-  if (first.success === false) {
-    throw new Error(first.error || 'wrangler d1 execute failed');
-  }
-  return first.results ?? [];
-}
-
-function queryD1<T>(cwd: string, databaseName: string, sql: string): T[] {
-  const raw = execFileSync(
-    'npx',
-    ['wrangler@latest', 'd1', 'execute', databaseName, '--remote', '--json', `--command=${sql}`],
-    { cwd, encoding: 'utf-8', maxBuffer: 10 * 1024 * 1024 },
-  );
-  return parseWranglerResults<T>(raw);
-}
 
 function createEmptySummary(inbox: InboxName): InboxSummary {
   return {
@@ -373,17 +348,17 @@ export function exitCodeForReport(report: InboxReport): 0 | 1 {
 }
 
 export function fetchReport(): InboxReport {
-  const novaCounts = queryD1<StatusCountRow>(NOVA_DIR, 'oshi-prism-nova', NOVA_COUNTS_SQL);
-  const crystalCounts = queryD1<StatusCountRow>(CRYSTAL_DIR, 'oshi-crystal', CRYSTAL_COUNTS_SQL);
+  const novaCounts = queryD1<StatusCountRow>('nova', NOVA_COUNTS_SQL);
+  const crystalCounts = queryD1<StatusCountRow>('crystal', CRYSTAL_COUNTS_SQL);
 
   return buildReport({
     counts: [...novaCounts, ...crystalCounts],
-    pendingStreamers: queryD1<StreamerSubmissionRow>(NOVA_DIR, 'oshi-prism-nova', PENDING_STREAMERS_SQL),
-    pendingVods: queryD1<VodSubmissionRow>(NOVA_DIR, 'oshi-prism-nova', PENDING_VODS_SQL),
-    pendingCrystalTickets: queryD1<CrystalTicketRow>(CRYSTAL_DIR, 'oshi-crystal', PENDING_CRYSTAL_SQL),
-    latestStreamers: queryD1<StreamerSubmissionRow>(NOVA_DIR, 'oshi-prism-nova', LATEST_STREAMERS_SQL),
-    latestVods: queryD1<VodSubmissionRow>(NOVA_DIR, 'oshi-prism-nova', LATEST_VODS_SQL),
-    latestCrystalTickets: queryD1<CrystalTicketRow>(CRYSTAL_DIR, 'oshi-crystal', LATEST_CRYSTAL_SQL),
+    pendingStreamers: queryD1<StreamerSubmissionRow>('nova', PENDING_STREAMERS_SQL),
+    pendingVods: queryD1<VodSubmissionRow>('nova', PENDING_VODS_SQL),
+    pendingCrystalTickets: queryD1<CrystalTicketRow>('crystal', PENDING_CRYSTAL_SQL),
+    latestStreamers: queryD1<StreamerSubmissionRow>('nova', LATEST_STREAMERS_SQL),
+    latestVods: queryD1<VodSubmissionRow>('nova', LATEST_VODS_SQL),
+    latestCrystalTickets: queryD1<CrystalTicketRow>('crystal', LATEST_CRYSTAL_SQL),
   });
 }
 
