@@ -450,17 +450,10 @@ export const api = {
     }),
 
   // Nova submissions
-  listNovaSubmissions: (params?: { status?: string; search?: string }) => {
-    const sp = new URLSearchParams();
-    if (params?.status) sp.set('status', params.status);
-    if (params?.search) sp.set('search', params.search);
-    const qs = sp.toString();
-    return request<ListResponse<NovaSubmission>>(
-      `/api/nova/submissions${qs ? `?${qs}` : ''}`,
-      undefined,
-      { skipStreamer: true },
-    );
-  },
+  listNovaSubmissions: () =>
+    request<ListResponse<NovaSubmission>>('/api/nova/submissions', undefined, {
+      skipStreamer: true,
+    }),
 
   updateNovaSubmission: (id: string, body: NovaSubmissionUpdateBody) =>
     request<NovaSubmission>(`/api/nova/submissions/${id}`, {
@@ -495,17 +488,10 @@ export const api = {
     }),
 
   // Nova VOD submissions
-  listNovaVods: (params?: { status?: string; streamer?: string }) => {
-    const sp = new URLSearchParams();
-    if (params?.status) sp.set('status', params.status);
-    if (params?.streamer) sp.set('streamer', params.streamer);
-    const qs = sp.toString();
-    return request<ListResponse<NovaVodSubmission>>(
-      `/api/nova/vods${qs ? `?${qs}` : ''}`,
-      undefined,
-      { skipStreamer: true },
-    );
-  },
+  listNovaVods: () =>
+    request<ListResponse<NovaVodSubmission>>('/api/nova/vods', undefined, {
+      skipStreamer: true,
+    }),
 
   getNovaVod: (id: string) =>
     request<NovaVodSubmission & { songs: NovaVodSong[] }>(`/api/nova/vods/${id}`),
@@ -528,17 +514,10 @@ export const api = {
     }),
 
   // Crystal tickets
-  listCrystalTickets: (params?: { status?: string; type?: string }) => {
-    const sp = new URLSearchParams();
-    if (params?.status) sp.set('status', params.status);
-    if (params?.type) sp.set('type', params.type);
-    const qs = sp.toString();
-    return request<ListResponse<CrystalTicket>>(
-      `/api/crystal/tickets${qs ? `?${qs}` : ''}`,
-      undefined,
-      { skipStreamer: true },
-    );
-  },
+  listCrystalTickets: () =>
+    request<ListResponse<CrystalTicket>>('/api/crystal/tickets', undefined, {
+      skipStreamer: true,
+    }),
 
   getCrystalTicket: (id: string) =>
     request<CrystalTicket>(`/api/crystal/tickets/${id}`),
