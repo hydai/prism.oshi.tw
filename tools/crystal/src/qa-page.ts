@@ -71,7 +71,7 @@ export function formatDate(iso: string): string {
   return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
 }
 
-export function renderQaPage(tickets: PublicTicketRow[], total: number, page: number, limit: number, typeFilter: string, q: string) {
+export function renderQaPage(tickets: PublicTicketRow[], total: number, page: number, limit: number, typeFilter: string, q: string, nonce: string) {
   const totalPages = Math.ceil(total / limit);
 
   const buildHref = (opts: { type?: string; page?: number; includeQ?: boolean }) => {
@@ -150,7 +150,7 @@ export function renderQaPage(tickets: PublicTicketRow[], total: number, page: nu
           <h1 class="prism-title">Crystal Q&amp;A</h1>
           <p class="prism-desc">已回覆的問題與建議 <span class="dot">·</span> <strong>${total} 則</strong></p>
         </div>
-        <div class="prism-hero-actions">${raw(themeToggleHTML())}</div>
+        <div class="prism-hero-actions">${raw(themeToggleHTML(nonce))}</div>
       </div>`);
 
   const body = String(html`      <!-- Search (press Enter to submit) + type filter -->
@@ -205,5 +205,6 @@ export function renderQaPage(tickets: PublicTicketRow[], total: number, page: nu
     hero,
     body,
     footer,
+    nonce,
   }));
 }

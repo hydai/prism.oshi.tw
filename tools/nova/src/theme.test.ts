@@ -31,7 +31,7 @@ try {
 
   // The shared module is re-exported, so pages keep importing from './theme'.
   assert(DARK_MODE_DETECT_SCRIPT.includes("classList.add('dark')"), 'the shared detect script is re-exported');
-  assert(themeToggleHTML().includes('id="theme-icon-moon"'), 'the shared theme toggle is re-exported');
+  assert(themeToggleHTML('test-nonce-value').includes('id="theme-icon-moon"'), 'the shared theme toggle is re-exported');
 
   console.log('theme.test: all passed');
 } catch (error) {

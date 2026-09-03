@@ -59,7 +59,7 @@ test("DARK_MODE_CSS is the shared variables plus Crystal's own #result override"
 
 test('the shared theme module is re-exported so pages keep importing ./theme', () => {
   assert.ok(DARK_MODE_DETECT_SCRIPT.includes("classList.add('dark')"), 'the shared detect script is re-exported');
-  assert.ok(themeToggleHTML().includes('id="theme-icon-moon"'), 'the shared theme toggle is re-exported');
+  assert.ok(themeToggleHTML('test-nonce-value').includes('id="theme-icon-moon"'), 'the shared theme toggle is re-exported');
 });
 
 console.log('\nAll theme tests passed.');

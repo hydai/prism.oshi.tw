@@ -6,6 +6,11 @@
  * result banner and duplicate-check lines, Crystal's #result box) stays in that
  * worker's theme.ts, which composes DARK_MODE_VARS_CSS with its own rules and
  * re-exports everything below so page modules keep importing `./theme`.
+ *
+ * `themeToggleHTML()` takes a required per-request CSP nonce — both Nova and
+ * Crystal enforce a Content-Security-Policy, so there is no caller left that
+ * renders without one. See its own doc comment and `PageShellParts.nonce` in
+ * `./page-shell`.
  */
 import { escapeHtml } from './html';
 
@@ -275,16 +280,15 @@ export const SPARKLE_SVG = '<svg width="12" height="12" viewBox="0 0 12 12" fill
 /**
  * Returns HTML for a theme toggle button with moon/sun SVG icons and inline JS.
  *
- * `nonce`, when given, is stamped on the inline `<script>` (the same
- * `nonceAttr` rule as `pageShell`: undefined omits the attribute entirely,
- * an empty string throws). Omit it and the output is byte-identical to a
- * toggle with no CSP at all.
+ * `nonce` is stamped on the inline `<script>` (the same `nonceAttr` rule as
+ * `pageShell`): an empty string throws rather than silently producing an
+ * un-nonced tag.
  */
-export function themeToggleHTML(nonce?: string): string {
+export function themeToggleHTML(nonce: string): string {
   if (nonce === '') {
     throw new Error('themeToggleHTML: nonce must be non-empty when given');
   }
-  const nonceAttr = nonce === undefined ? '' : ` nonce="${escapeHtml(nonce)}"`;
+  const nonceAttr = ` nonce="${escapeHtml(nonce)}"`;
 
   return `<button id="theme-toggle" aria-label="Toggle dark mode" style="
     width: 32px; height: 32px; border-radius: 50%; border: 1px solid var(--border-glass);
