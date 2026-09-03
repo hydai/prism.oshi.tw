@@ -221,6 +221,8 @@ const REASON_CASES: Array<{ status: number; body: string; reason: YouTubeApiErro
   { status: 403, body: apiErrorBody('dailyLimitExceeded', 403), reason: 'quota' },
   { status: 403, body: apiErrorBody('rateLimitExceeded', 403), reason: 'quota' },
   { status: 403, body: 'quotaExceeded — a proxy error page without a JSON body', reason: 'quota' },
+  { status: 403, body: apiErrorBody('userRateLimitExceeded', 403), reason: 'quota' },
+  { status: 429, body: 'Too Many Requests', reason: 'quota' },
   { status: 403, body: apiErrorBody('forbidden', 403), reason: 'forbidden' },
   { status: 403, body: 'a referrer-restricted key rejected without a JSON body', reason: 'forbidden' },
   { status: 404, body: apiErrorBody('videoNotFound', 404), reason: 'other' },
