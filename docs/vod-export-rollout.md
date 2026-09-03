@@ -52,17 +52,19 @@ as the per-file migrations described in this section, applied with
 `d1 execute --remote` (or, once a worker's `d1_migrations` table is confirmed
 to match its migrations directory, `wrangler d1 migrations apply --remote`).
 
-Unlike Crystal's and Admin's `schema.sql`, which contain only
-`CREATE … IF NOT EXISTS` and singleton-state rows, `tools/nova/schema.sql`
-also carries two `INSERT OR IGNORE INTO submissions` seed rows (`seed-mizuki`,
-`seed-gabu`, both `status='approved'`, `enabled=1`). Now that `db:migrate`
-really targets `oshi-prism-nova`, it is therefore not a pure no-op: those
-inserts are no-ops only while rows with those ids (or the same normalized
-channel URL) still exist, so deleting one and re-running `db:migrate` would
-resurrect a bootstrap-era streamer as approved/enabled for the next
-`/sync-registry` to publish — treat `db:migrate` against `oshi-prism-nova` as
-bootstrap-only for that reason. Moving those seeds into a separate seed
-script, out of `schema.sql`, is the follow-up.
+Like Crystal's and Admin's `schema.sql`, `tools/nova/schema.sql` now contains
+only `CREATE … IF NOT EXISTS` and singleton-state rows, so `db:migrate` and
+`db:migrate:local` are idempotent on an already-provisioned `oshi-prism-nova`.
+The two demo-streamer rows (`seed-mizuki`, `seed-gabu`, both
+`status='approved'`, `enabled=1`) that `schema.sql` used to seed now live in
+`tools/nova/seed.sql`, for local development databases only — apply with
+`npm run db:seed:local` (`d1 execute oshi-prism-nova --local
+--file=seed.sql`). Never run `seed.sql` against production: `oshi-prism-nova`
+already holds both rows through `migrations/0003_seed_existing_streamers.sql`
+and `migrations/0011_reseed_streamers.sql`. `db:migrate` remains a
+fresh-database bootstrap only, not a migration mechanism — schema changes to
+an already-provisioned database still ship as the per-file migrations
+described above.
 
 First record Time Travel information for both databases:
 
