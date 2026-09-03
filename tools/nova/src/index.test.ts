@@ -132,6 +132,44 @@ async function testGateStillRejectsForeignRequests(): Promise<void> {
   console.log('✓ same-origin gate still rejects foreign requests');
 }
 
+// === /api/channel-info gate: same origin/allowed-origin check as video-info ==
+async function testChannelInfoGateRejectsForeignRequests(): Promise<void> {
+  installMockFetch();
+  try {
+    // Same foreign-request shape as testGateStillRejectsForeignRequests: a real Host
+    // header (Cloudflare sets it) with no same-origin / allowed-origin signal.
+    const res = await app.request(
+      '/api/channel-info?url=' + encodeURIComponent('https://www.youtube.com/@example'),
+      { headers: { Host: 'nova.oshi.tw' } },
+      makeEnv(),
+    );
+    assertEqual(res.status, 403, 'foreign request to /api/channel-info is forbidden');
+    assertEqual(fetchCalls.length, 0, 'forbidden request performs no outbound fetch at all');
+  } finally {
+    restoreFetch();
+  }
+  console.log('✓ /api/channel-info gate rejects foreign requests');
+}
+
+async function testChannelInfoGateAllowsSameOriginRequests(): Promise<void> {
+  installMockFetch();
+  try {
+    // Same-origin clears the gate and reaches the channel-page fetch, which the
+    // shared mock fails (404, since the URL matches neither OEMBED nor DATA_API)
+    // — the 502 (not 403) proves the gate let the request through.
+    const res = await app.request(
+      '/api/channel-info?url=' + encodeURIComponent('https://www.youtube.com/@example'),
+      { headers: SAME_ORIGIN },
+      makeEnv(),
+    );
+    assertEqual(res.status, 502, 'same-origin request clears the gate and reaches the (failing) upstream fetch');
+    assertEqual(fetchCalls.length, 1, 'same-origin request performs exactly the channel-page fetch');
+  } finally {
+    restoreFetch();
+  }
+  console.log('✓ /api/channel-info gate allows same-origin requests through');
+}
+
 // === VOD submit: a timeline is mandatory =====================================
 async function testSubmitRequiresTimeline(): Promise<void> {
   installMockFetch();
@@ -178,6 +216,8 @@ async function main(): Promise<void> {
   await testHelperWithoutKeySkipsDataApi();
   await testPublicRouteDoesNotSpendQuota();
   await testGateStillRejectsForeignRequests();
+  await testChannelInfoGateRejectsForeignRequests();
+  await testChannelInfoGateAllowsSameOriginRequests();
   await testSubmitRequiresTimeline();
   console.log('✓ nova video-info quota-drain guards');
 }

@@ -49,6 +49,10 @@ app.post('/api/submit', async (c) => {
   return c.json({ id }, 201);
 });
 
+// No origin/CORS gate on the GET routes below (deliberate, not an oversight): they
+// serve public Q&A data anyone may read. The only write route above (POST
+// /api/submit) is Turnstile-gated instead — the right control for a write, not a read.
+
 // --- Q&A page (HTML) ---
 
 app.get('/qa', async (c) => {

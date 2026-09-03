@@ -25,6 +25,7 @@ import {
   type VodFilter,
 } from './status-page';
 import { sanitizeNovaUrl, type NovaUrlProvider } from '../../../admin/shared/nova-url-safety';
+import { ALLOWED_ORIGINS, isTrustedRequest } from './origins';
 
 // Public-form URL fields → the host allow-list each one must satisfy.
 const SUBMISSION_URL_FIELDS: ReadonlyArray<{ field: 'avatar_url' | 'link_youtube' | 'link_twitter' | 'link_facebook' | 'link_instagram' | 'link_twitch'; provider: NovaUrlProvider }> = [
@@ -96,7 +97,7 @@ const app = new Hono<{ Bindings: Bindings }>();
 // CORS for VOD API routes (allow Aurora cross-origin)
 app.use(
   '/vod/api/*',
-  cors({ origin: ['https://aurora.oshi.tw', 'https://oshi-prism-aurora.pages.dev'], allowMethods: ['GET', 'POST', 'OPTIONS'] }),
+  cors({ origin: [...ALLOWED_ORIGINS], allowMethods: ['GET', 'POST', 'OPTIONS'] }),
 );
 
 // GET / — Serve the submission form
@@ -130,16 +131,10 @@ app.get('/api/check', async (c) => {
 });
 
 // GET /api/channel-info — Fetch channel name + avatar from YouTube
-// Protected: only same-origin requests from the form page (Sec-Fetch-Site or Referer)
+// Protected by isTrustedRequest: same-origin per Sec-Fetch-Site, or an Origin /
+// Referer whose parsed origin is this worker's own or one of ALLOWED_ORIGINS.
 app.get('/api/channel-info', async (c) => {
-  const secFetchSite = c.req.header('Sec-Fetch-Site');
-  const referer = c.req.header('Referer') ?? '';
-  const host = c.req.header('Host') ?? '';
-
-  // Allow same-origin browser fetches; block external/curl requests
-  const isSameOrigin = secFetchSite === 'same-origin'
-    || referer.includes(host);
-  if (!isSameOrigin) {
+  if (!isTrustedRequest(c.req.raw)) {
     return c.json({ error: 'Forbidden' }, 403);
   }
 
@@ -341,15 +336,7 @@ app.get('/vod/api/check', async (c) => {
 // GET /vod/api/video-info — Public preview: returns video title + thumbnail only.
 // Intentionally does NOT use YOUTUBE_API_KEY (see the fetchYoutubeVideoInfo call below).
 app.get('/vod/api/video-info', async (c) => {
-  const secFetchSite = c.req.header('Sec-Fetch-Site');
-  const referer = c.req.header('Referer') ?? '';
-  const origin = c.req.header('Origin') ?? '';
-  const host = c.req.header('Host') ?? '';
-
-  const allowedOrigins = ['https://aurora.oshi.tw', 'https://oshi-prism-aurora.pages.dev'];
-  const isSameOrigin = secFetchSite === 'same-origin' || referer.includes(host);
-  const isAllowedCrossOrigin = allowedOrigins.some((o) => origin === o || referer.startsWith(o));
-  if (!isSameOrigin && !isAllowedCrossOrigin) {
+  if (!isTrustedRequest(c.req.raw)) {
     return c.json({ error: 'Forbidden' }, 403);
   }
 
