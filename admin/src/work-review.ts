@@ -17,10 +17,10 @@ import {
   prepareMergeGuardCleanup,
   prepareMergeGuardInsert,
 } from './guard';
+import { SHA256_PATTERN } from './vod-export/guards';
 
 const WORK_MATCH_ALGORITHM = 'tier-a-v1';
 const WORK_MATCH_GUARD_ACTOR = 'system:global-work-review-guard';
-const HEX_64 = /^[0-9a-f]{64}$/;
 const LETTER_OR_NUMBER = /[\p{L}\p{N}]/u;
 const LATIN_CHARACTER = /\p{Script=Latin}/u;
 const COMBINING_MARK = /\p{M}/u;
@@ -474,7 +474,7 @@ function sameStringSet(left: string[], right: string[]): boolean {
 }
 
 function validateHash(value: string): boolean {
-  return HEX_64.test(value);
+  return SHA256_PATTERN.test(value);
 }
 
 async function resolveCurrentCandidate(

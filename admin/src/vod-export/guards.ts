@@ -5,8 +5,9 @@
  * These validators decide whether bytes written by an earlier build are still
  * trustworthy, so they must answer identically everywhere. They previously
  * lived as per-module copies — three `isCanonicalTimestamp`, two `hasExactKeys`,
- * two `isSourceFingerprint`, two `/^[0-9a-f]{64}$/` literals — which is exactly
- * the shape a divergence hides in. `guards.test.ts` states their edge cases.
+ * two `isSourceFingerprint`, two `isNonNegativeSafeInteger`, two
+ * `/^[0-9a-f]{64}$/` literals — which is exactly the shape a divergence hides
+ * in. `guards.test.ts` states their edge cases.
  */
 import { VOD_EXPORT_SCHEMA_VERSION } from './constants';
 import type { VodExportSourceFingerprint } from './source';
@@ -44,6 +45,10 @@ export function hasExactKeys(record: Record<string, unknown>, keys: readonly str
 
 export function isNonEmptyString(value: unknown): value is string {
   return typeof value === 'string' && value.length > 0;
+}
+
+export function isNonNegativeSafeInteger(value: unknown): value is number {
+  return typeof value === 'number' && Number.isSafeInteger(value) && value >= 0;
 }
 
 /**

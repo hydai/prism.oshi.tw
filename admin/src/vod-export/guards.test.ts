@@ -2,16 +2,18 @@
  * The structural guards every vod-export persisted-state reader shares.
  *
  * These used to exist as three byte-identical `isCanonicalTimestamp` copies,
- * two `hasExactKeys` copies, two `isSourceFingerprint` variants and two
- * hand-written `/^[0-9a-f]{64}$/` literals. Each copy was reachable only
- * through the module that held it, so none of them had a direct test; this
- * suite is the one place their edge cases are stated.
+ * two `hasExactKeys` copies, two `isSourceFingerprint` variants, two
+ * `isNonNegativeSafeInteger` copies, and two hand-written `/^[0-9a-f]{64}$/`
+ * literals. Each copy was reachable only through the module that held it, so
+ * none of them had a direct test; this suite is the one place their edge
+ * cases are stated.
  */
 import { VOD_EXPORT_SCHEMA_VERSION } from './constants';
 import {
   hasExactKeys,
   isCanonicalTimestamp,
   isNonEmptyString,
+  isNonNegativeSafeInteger,
   isSourceFingerprint,
   SHA256_HEX_SOURCE,
   SHA256_PATTERN,
@@ -157,6 +159,36 @@ function testSha256Pattern(): void {
   );
 }
 
+function testNonNegativeSafeInteger(): void {
+  const accepted: Array<[number, string]> = [
+    [0, 'zero is non-negative'],
+    // Object.is(-0, 0) is false, but the predicate only checks `>= 0` and
+    // `Number.isSafeInteger`, and both are true for -0 — so -0 is accepted,
+    // identically to the two copies this predicate replaces.
+    [-0, 'negative zero passes both isSafeInteger and >= 0, so it is accepted like the copies it replaces'],
+    [42, 'an ordinary positive safe integer is accepted'],
+    [Number.MAX_SAFE_INTEGER, 'the largest safe integer is accepted'],
+  ];
+  for (const [value, message] of accepted) {
+    equal(isNonNegativeSafeInteger(value), true, message);
+  }
+
+  const rejected: Array<[unknown, string]> = [
+    [-1, 'a negative integer is rejected'],
+    [1.5, 'a non-integer is rejected'],
+    [Number.MAX_SAFE_INTEGER + 1, 'one past the largest safe integer is rejected'],
+    ['42', 'a numeric string is never coerced'],
+    [null, 'null is not a number'],
+    [undefined, 'undefined is not a number'],
+    [NaN, 'NaN is not a safe integer'],
+    [Infinity, 'Infinity is not a safe integer'],
+    [-Infinity, 'negative Infinity is not a safe integer'],
+  ];
+  for (const [value, message] of rejected) {
+    equal(isNonNegativeSafeInteger(value), false, message);
+  }
+}
+
 function main(): void {
   testCanonicalTimestampAccepts();
   testCanonicalTimestampRejects();
@@ -164,6 +196,7 @@ function main(): void {
   testSourceFingerprint();
   testNonEmptyString();
   testSha256Pattern();
+  testNonNegativeSafeInteger();
   console.log('✓ VOD export shared structural guards');
 }
 

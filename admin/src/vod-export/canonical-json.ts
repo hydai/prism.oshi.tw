@@ -266,11 +266,6 @@ export function serializeCanonicalString(value: string): string {
   return JSON.stringify(canonicalString(value, 'Canonical JSON string value'));
 }
 
-/** The canonical spelling of one JSON integer value. */
-export function serializeCanonicalInteger(value: number): string {
-  return String(canonicalInteger(value, 'JSON integer'));
-}
-
 // ---------------------------------------------------------------------------
 // Ordered plain objects: property assignment order IS the D-014.3 emission
 // order, so `JSON.stringify` cannot depend on how the input was assembled.
