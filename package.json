@@ -28,6 +28,7 @@
     "test:cli": "npx tsx tools/shared/cli.test.ts",
     "test:d1": "npx tsx tools/shared/d1.test.ts",
     "typecheck:tools": "tsc -p tools/tsconfig.json",
+    "check:csp-browser": "npx tsx tools/csp-browser-check.ts",
     "sync:registry:test": "npx tsx tools/sync-registry/sync.test.ts",
     "sync:data:test": "npx tsx tools/sync-data/sync.test.ts",
     "sync:status:test": "npx tsx tools/sync-status/detect.test.ts",
