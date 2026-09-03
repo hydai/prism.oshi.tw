@@ -23,7 +23,7 @@ INSERT OR IGNORE INTO submissions (
   'MizukiPrism',
   '浠Mizuki',
   '歌勢Vtuber，一隻愛吃的薩摩...北極狐，牛奶和義大利麵是她最愛的食物！',
-  'https://prd.resource-api.lit.link/images/creator/b2256589-be4b-4ef0-b9e5-e0d3386cbdea/2d4326f7-a395-424f-8288-cb7215ebef1c.png',
+  'https://yt3.ggpht.com/nKjTxjZ2sRN7LFXx_Jr62M_hW0Y0dK3AFjkWpED_wTUCxg6RAchLvSDYuKp3T-yALXo9ozuZtw=s240-c-k-c0x00ffffff-no-rj',
   '21.8萬',
   'https://www.youtube.com/c/%E6%B5%A0MizukiChannel',
   'https://x.com/MizukiVtuberTW',
