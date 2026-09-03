@@ -8,11 +8,11 @@
  * Writes songs.json and streams.json in the fan-site format.
  */
 
-import { execFileSync } from 'node:child_process';
 import * as fs from 'node:fs';
 import * as path from 'node:path';
 
 import { isMain, readJsonOr, repoRoot } from '../shared/cli.ts';
+import { queryD1 } from '../shared/d1.ts';
 import { syncStatePath, upsertEntry, type SyncStateEntry } from '../shared/sync-state.ts';
 import { assertValidSlug } from '../shared/slug.ts';
 
@@ -22,7 +22,6 @@ import { enqueueAnnouncements, hashSources, loadAnnounceWebhook, type PendingBat
 // --- Paths ---
 
 const ROOT = repoRoot();
-const ADMIN_DIR = path.resolve(ROOT, 'admin');
 
 // --- DB row types ---
 
@@ -87,23 +86,11 @@ interface FanSiteStream {
   credit?: Record<string, unknown>;
 }
 
-// --- Query D1 ---
-
-function queryD1<T>(sql: string): T[] {
-  const raw = execFileSync(
-    'npx',
-    ['wrangler@latest', 'd1', 'execute', 'oshi-prism-db', '--remote', '--json', `--command=${sql}`],
-    { cwd: ADMIN_DIR, encoding: 'utf-8', maxBuffer: 10 * 1024 * 1024 },
-  );
-
-  const parsed = JSON.parse(raw);
-  return (parsed[0]?.results ?? []) as T[];
-}
-
 // --- Build fan-site songs.json ---
 
 function buildSongs(streamerId: string): FanSiteSong[] {
   const songRows = queryD1<SongRow>(
+    'admin',
     `SELECT song.id, link.work_id, song.title, song.original_artist, song.tags
      FROM songs AS song
      LEFT JOIN song_work_links AS link ON link.song_id = song.id
@@ -111,6 +98,7 @@ function buildSongs(streamerId: string): FanSiteSong[] {
      ORDER BY song.id`,
   );
   const perfRows = queryD1<PerformanceRow>(
+    'admin',
     `SELECT id, song_id, stream_id, date, stream_title, video_id, timestamp, end_timestamp, note FROM performances WHERE streamer_id = '${streamerId}' AND status = 'approved' ORDER BY date`,
   );
 
@@ -155,6 +143,7 @@ export function assembleFanSiteSongs(
 
 function buildStreams(streamerId: string): FanSiteStream[] {
   const rows = queryD1<StreamRow>(
+    'admin',
     `SELECT id, title, date, video_id, youtube_url, credit FROM streams WHERE streamer_id = '${streamerId}' AND status = 'approved' ORDER BY date DESC`,
   );
 
@@ -193,6 +182,7 @@ function querySnapshot(table: 'songs' | 'performances' | 'streams', streamerId: 
     // that streamer's static export stale even when the local song row itself
     // did not change.
     const rows = queryD1<SnapshotRow>(
+      'admin',
       `SELECT
          MAX(CASE
            WHEN link.updated_at IS NULL THEN song.updated_at
@@ -208,6 +198,7 @@ function querySnapshot(table: 'songs' | 'performances' | 'streams', streamerId: 
   }
 
   const rows = queryD1<SnapshotRow>(
+    'admin',
     `SELECT MAX(updated_at) AS max_ts, COUNT(*) AS cnt FROM ${table} WHERE streamer_id = '${streamerId}' AND status = 'approved'`,
   );
   return rows[0] ?? { max_ts: null, cnt: 0 };
