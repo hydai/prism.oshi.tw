@@ -11,8 +11,8 @@
 import { execFileSync } from 'node:child_process';
 import * as fs from 'node:fs';
 import * as path from 'node:path';
-import { fileURLToPath } from 'node:url';
 
+import { isMain, readJsonOr, repoRoot } from '../shared/cli.ts';
 import { syncStatePath, upsertEntry, type SyncStateEntry } from '../shared/sync-state.ts';
 import { assertValidSlug } from '../shared/slug.ts';
 
@@ -21,9 +21,7 @@ import { enqueueAnnouncements, hashSources, loadAnnounceWebhook, type PendingBat
 
 // --- Paths ---
 
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = path.dirname(__filename);
-const ROOT = path.resolve(__dirname, '../..');
+const ROOT = repoRoot();
 const ADMIN_DIR = path.resolve(ROOT, 'admin');
 
 // --- DB row types ---
@@ -252,28 +250,22 @@ export function streamsToAnnounce(
 }
 
 function readExistingSongs(songsPath: string): FanSiteSong[] {
-  let raw: string;
-  try {
-    raw = fs.readFileSync(songsPath, 'utf-8');
-  } catch (err) {
-    if ((err as { code?: string }).code === 'ENOENT') return [];
-    throw err; // corrupt/unreadable songs.json is an operator problem — fail loud rather than announce from a bogus baseline
-  }
-  return JSON.parse(raw) as FanSiteSong[];
+  // corrupt/unreadable songs.json is an operator problem — readJsonOr rethrows on
+  // anything but ENOENT, so we fail loud rather than announce from a bogus baseline
+  return readJsonOr<FanSiteSong[]>(songsPath, []);
 }
 
 function readExistingStreams(streamsPath: string): FanSiteStream[] {
-  let raw: string;
-  try {
-    raw = fs.readFileSync(streamsPath, 'utf-8');
-  } catch (err) {
-    if ((err as { code?: string }).code === 'ENOENT') return [];
-    throw err; // corrupt/unreadable streams.json is an operator problem — fail loud rather than announce from a bogus baseline
-  }
-  return JSON.parse(raw) as FanSiteStream[];
+  // corrupt/unreadable streams.json is an operator problem — readJsonOr rethrows on
+  // anything but ENOENT, so we fail loud rather than announce from a bogus baseline
+  return readJsonOr<FanSiteStream[]>(streamsPath, []);
 }
 
 function streamerDisplayName(slug: string): string {
+  // Unlike readExistingSongs/readExistingStreams above, this is a best-effort lookup
+  // for a Discord embed's display text only — any failure (missing/corrupt registry,
+  // unknown slug) falls back to the slug itself rather than aborting the sync, so it
+  // keeps its own catch-all instead of readJsonOr's ENOENT-only fallback.
   try {
     const parsed = JSON.parse(fs.readFileSync(path.resolve(ROOT, 'data/registry.json'), 'utf-8')) as {
       streamers?: Array<{ slug: string; displayName: string }>;
@@ -399,12 +391,7 @@ async function main(): Promise<void> {
   console.log('sync-data: done.');
 }
 
-function isMainScript(): boolean {
-  const entry = process.argv[1] ?? '';
-  return entry.endsWith('tools/sync-data/sync.ts') || entry.endsWith('tools/sync-data/sync.js');
-}
-
-if (isMainScript()) {
+if (isMain(import.meta.url)) {
   main().catch((err: unknown) => {
     console.error(err);
     process.exit(1);

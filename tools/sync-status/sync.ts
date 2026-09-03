@@ -9,14 +9,10 @@
  * Lets shell scripts and CI gate on it.
  */
 
-import * as path from 'node:path';
-import { fileURLToPath } from 'node:url';
-
+import { isMain, repoRoot } from '../shared/cli.ts';
 import { detectAll, staleSlugs, type StreamerStatus } from './detect.ts';
 
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = path.dirname(__filename);
-const ROOT = path.resolve(__dirname, '../..');
+const ROOT = repoRoot();
 
 function fmtTs(ts: string | null): string {
   if (!ts) return '-';
@@ -75,4 +71,6 @@ function main(): void {
   process.exit(1);
 }
 
-main();
+if (isMain(import.meta.url)) {
+  main();
+}

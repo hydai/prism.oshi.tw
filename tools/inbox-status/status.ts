@@ -12,7 +12,9 @@
 import { execFileSync } from 'node:child_process';
 import * as path from 'node:path';
 
-const ROOT = process.cwd();
+import { isMain, repoRoot } from '../shared/cli.ts';
+
+const ROOT = repoRoot();
 const NOVA_DIR = path.resolve(ROOT, 'tools/nova');
 const CRYSTAL_DIR = path.resolve(ROOT, 'tools/crystal');
 
@@ -392,11 +394,6 @@ export function main(): void {
   process.exit(exitCodeForReport(report));
 }
 
-function isMainScript(): boolean {
-  const entry = process.argv[1] ?? '';
-  return entry.endsWith('tools/inbox-status/status.ts') || entry.endsWith('tools/inbox-status/status.js');
-}
-
-if (isMainScript()) {
+if (isMain(import.meta.url)) {
   main();
 }
