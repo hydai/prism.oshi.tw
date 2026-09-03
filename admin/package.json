@@ -9,7 +9,6 @@
     "db:create": "npx wrangler@latest d1 create oshi-prism-db",
     "db:migrate": "npx wrangler@latest d1 execute oshi-prism-db --remote --file=schema.sql",
     "db:migrate:local": "npx wrangler@latest d1 execute oshi-prism-db --local --file=schema.sql",
-    "db:seed:local": "npx tsx seed.ts --local",
     "types": "npx wrangler@latest types --config=wrangler.toml --include-runtime=false --strict-vars=false",
     "typecheck": "tsc --noEmit",
     "test:helpers": "npx tsx src/helpers.test.ts",
