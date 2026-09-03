@@ -8,13 +8,13 @@
  * Runs wrangler from tools/nova/ where wrangler.toml binds oshi-prism-nova.
  */
 
-import { execFileSync } from 'node:child_process';
 import * as fs from 'node:fs';
 import * as path from 'node:path';
 
 import { sanitizeExternalUrl } from '../../lib/safe-links.ts';
 import { sanitizeNovaUrl, type NovaUrlProvider } from '../../admin/shared/nova-url-safety.ts';
 import { isMain, readJsonOr, repoRoot } from '../shared/cli.ts';
+import { queryD1 } from '../shared/d1.ts';
 import { assertValidSlug } from '../shared/slug.ts';
 import { seedIfMissing } from '../shared/sync-state.ts';
 
@@ -24,7 +24,6 @@ import { enqueueAnnouncements, hashSources, loadAnnounceWebhook, type PendingBat
 // --- Paths ---
 
 const ROOT = repoRoot();
-const NOVA_DIR = path.resolve(ROOT, 'tools/nova');
 const REGISTRY_PATH = path.resolve(ROOT, 'data/registry.json');
 const SLUGS_PATH = path.resolve(ROOT, 'lib/streamer-slugs.ts');
 
@@ -98,16 +97,7 @@ function queryNovaDb(): SubmissionRow[] {
     "FROM submissions WHERE status = 'approved' AND enabled = 1 ORDER BY display_order, slug",
   ].join(' ');
 
-  const raw = execFileSync(
-    'npx',
-    ['wrangler@latest', 'd1', 'execute', 'oshi-prism-nova', '--remote', '--json', `--command=${sql}`],
-    { cwd: NOVA_DIR, encoding: 'utf-8', maxBuffer: 10 * 1024 * 1024 },
-  );
-
-  const parsed = JSON.parse(raw);
-  // wrangler d1 --json returns an array; the first element has .results
-  const results: SubmissionRow[] = parsed[0]?.results ?? [];
-  return results;
+  return queryD1<SubmissionRow>('nova', sql);
 }
 
 // --- Transform DB row → registry config ---
