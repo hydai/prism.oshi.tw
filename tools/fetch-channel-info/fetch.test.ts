@@ -7,7 +7,6 @@ import {
   APPROVED_WITH_CHANNEL_SQL,
   buildUpdateSql,
   formatSummary,
-  parseDevVarYoutubeKey,
   parseWranglerResults,
   toSqlStringLiteral,
   writeSqlToPrivateTempFile,
@@ -32,32 +31,6 @@ test('parseWranglerResults returns the first result set rows', () => {
 
 test('parseWranglerResults returns an empty array when there are no results', () => {
   assert.deepEqual(parseWranglerResults('[]'), []);
-});
-
-// --- parseDevVarYoutubeKey ---
-
-test('parseDevVarYoutubeKey extracts the key value', () => {
-  assert.equal(parseDevVarYoutubeKey('YOUTUBE_API_KEY=abc123\n'), 'abc123');
-});
-
-test('parseDevVarYoutubeKey returns null when the key is absent', () => {
-  assert.equal(parseDevVarYoutubeKey('DEV_AUTH_EMAIL=me@example.com\n'), null);
-});
-
-test('parseDevVarYoutubeKey ignores commented lines', () => {
-  assert.equal(parseDevVarYoutubeKey('# YOUTUBE_API_KEY=commented\nYOUTUBE_API_KEY=real\n'), 'real');
-});
-
-test('parseDevVarYoutubeKey trims whitespace around key and value', () => {
-  assert.equal(parseDevVarYoutubeKey('YOUTUBE_API_KEY =  spaced  \n'), 'spaced');
-});
-
-test('parseDevVarYoutubeKey strips surrounding quotes', () => {
-  assert.equal(parseDevVarYoutubeKey('YOUTUBE_API_KEY="quoted"\n'), 'quoted');
-});
-
-test('parseDevVarYoutubeKey treats an empty value as null', () => {
-  assert.equal(parseDevVarYoutubeKey('YOUTUBE_API_KEY=\n'), null);
 });
 
 // --- toSqlStringLiteral ---

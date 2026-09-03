@@ -13,14 +13,12 @@
 
 import { execFileSync } from 'node:child_process';
 import * as path from 'node:path';
-import { fileURLToPath } from 'node:url';
 
+import { isMain, repoRoot } from '../shared/cli.ts';
 import { detectAll, staleSlugs } from '../sync-status/detect.ts';
 import { assertValidSlug } from '../shared/slug.ts';
 
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = path.dirname(__filename);
-const ROOT = path.resolve(__dirname, '../..');
+const ROOT = repoRoot();
 const SYNC_DATA = path.resolve(ROOT, 'tools/sync-data/sync.ts');
 
 function runSyncData(slug: string): void {
@@ -55,4 +53,6 @@ function main(): void {
   console.log(`\n✓ synced ${stale.length} streamer(s). Review \`git status\` and commit.`);
 }
 
-main();
+if (isMain(import.meta.url)) {
+  main();
+}

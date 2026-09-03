@@ -14,17 +14,15 @@ import { execFileSync } from 'node:child_process';
 import * as fs from 'node:fs';
 import * as os from 'node:os';
 import * as path from 'node:path';
-import { fileURLToPath } from 'node:url';
 
 import { formatSubscriberCount } from '../../admin/shared/format.ts';
 import type { BulkFetchSubscribersResponse, BulkFetchSubscribersResult } from '../../admin/shared/types.ts';
 import { fetchChannelInfo } from '../../admin/src/youtube.ts';
+import { isMain, loadSecret, repoRoot } from '../shared/cli.ts';
 
 // --- Paths ---
 
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = path.dirname(__filename);
-const ROOT = path.resolve(__dirname, '../..');
+const ROOT = repoRoot();
 const NOVA_DIR = path.resolve(ROOT, 'tools/nova');
 const DEV_VARS_PATH = path.resolve(ROOT, 'admin/.dev.vars');
 
@@ -47,24 +45,6 @@ interface ApprovedRow {
 export function parseWranglerResults<T>(raw: string): T[] {
   const parsed = JSON.parse(raw);
   return parsed[0]?.results ?? [];
-}
-
-/** Extract YOUTUBE_API_KEY from .dev.vars content; null if absent or empty. */
-export function parseDevVarYoutubeKey(content: string): string | null {
-  for (const line of content.split('\n')) {
-    const trimmed = line.trim();
-    if (!trimmed || trimmed.startsWith('#')) continue;
-    const eq = trimmed.indexOf('=');
-    if (eq === -1) continue;
-    if (trimmed.slice(0, eq).trim() !== 'YOUTUBE_API_KEY') continue;
-    let value = trimmed.slice(eq + 1).trim();
-    const quoted =
-      value.length >= 2 &&
-      ((value.startsWith('"') && value.endsWith('"')) || (value.startsWith("'") && value.endsWith("'")));
-    if (quoted) value = value.slice(1, -1);
-    return value === '' ? null : value;
-  }
-  return null;
 }
 
 /** Quote and escape a value as a SQLite string literal. */
@@ -136,11 +116,10 @@ export function writeSqlToPrivateTempFile(sql: string): { dir: string; file: str
 }
 
 export async function main(): Promise<void> {
-  if (!fs.existsSync(DEV_VARS_PATH)) {
-    console.error(`ERROR: ${DEV_VARS_PATH} not found. Add a line "YOUTUBE_API_KEY=<your key>".`);
-    process.exit(1);
-  }
-  const apiKey = parseDevVarYoutubeKey(fs.readFileSync(DEV_VARS_PATH, 'utf-8'));
+  // loadSecret checks process.env.YOUTUBE_API_KEY first (sanctioned delta — previously
+  // only the file was read), then DEV_VARS_PATH if it exists; undefined covers both
+  // "file missing" and "key missing from an existing file", so one message covers both.
+  const apiKey = loadSecret('YOUTUBE_API_KEY', { devVarsPath: DEV_VARS_PATH });
   if (!apiKey) {
     console.error('ERROR: YOUTUBE_API_KEY not found in admin/.dev.vars. Add a line "YOUTUBE_API_KEY=<your key>".');
     process.exit(1);
@@ -208,12 +187,7 @@ export async function main(): Promise<void> {
   console.log(formatSummary({ updated, failed, results }));
 }
 
-function isMainScript(): boolean {
-  const entry = process.argv[1] ?? '';
-  return entry.endsWith('tools/fetch-channel-info/fetch.ts') || entry.endsWith('tools/fetch-channel-info/fetch.js');
-}
-
-if (isMainScript()) {
+if (isMain(import.meta.url)) {
   main().catch((err: unknown) => {
     console.error(err);
     process.exit(1);

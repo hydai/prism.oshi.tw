@@ -3,7 +3,7 @@ import * as fs from 'node:fs';
 import * as os from 'node:os';
 import * as path from 'node:path';
 
-import { clearPendingAnnouncements, deriveLiveKey, enqueueAnnouncements, hashSources, parseDevVar, partitionByLiveness, readPendingBatches, remainingBatchesAfter, writePendingBatches } from './announce.ts';
+import { clearPendingAnnouncements, deriveLiveKey, enqueueAnnouncements, hashSources, partitionByLiveness, readPendingBatches, remainingBatchesAfter, writePendingBatches } from './announce.ts';
 
 function test(name: string, fn: () => void): void {
   try {
@@ -14,26 +14,6 @@ function test(name: string, fn: () => void): void {
     throw err;
   }
 }
-
-test('parseDevVar extracts the value', () => {
-  assert.equal(parseDevVar('DISCORD_WEBHOOK_ANNOUNCE=https://x/y\n', 'DISCORD_WEBHOOK_ANNOUNCE'), 'https://x/y');
-});
-
-test('parseDevVar returns null when the key is absent', () => {
-  assert.equal(parseDevVar('OTHER=1\n', 'DISCORD_WEBHOOK_ANNOUNCE'), null);
-});
-
-test('parseDevVar ignores commented lines', () => {
-  assert.equal(parseDevVar('# DISCORD_WEBHOOK_ANNOUNCE=nope\nDISCORD_WEBHOOK_ANNOUNCE=real\n', 'DISCORD_WEBHOOK_ANNOUNCE'), 'real');
-});
-
-test('parseDevVar strips surrounding quotes', () => {
-  assert.equal(parseDevVar('DISCORD_WEBHOOK_ANNOUNCE="https://x/y"\n', 'DISCORD_WEBHOOK_ANNOUNCE'), 'https://x/y');
-});
-
-test('parseDevVar treats an empty value as null', () => {
-  assert.equal(parseDevVar('DISCORD_WEBHOOK_ANNOUNCE=\n', 'DISCORD_WEBHOOK_ANNOUNCE'), null);
-});
 
 test('deriveLiveKey: stream embed → videoId; streamer embed → link; aggregate → null', () => {
   assert.equal(deriveLiveKey({ title: 's', url: 'https://youtu.be/KfadSsRBCi8' }), 'KfadSsRBCi8');

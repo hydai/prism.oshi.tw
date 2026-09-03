@@ -11,10 +11,10 @@
 import { execFileSync } from 'node:child_process';
 import * as fs from 'node:fs';
 import * as path from 'node:path';
-import { fileURLToPath } from 'node:url';
 
 import { sanitizeExternalUrl } from '../../lib/safe-links.ts';
 import { sanitizeNovaUrl, type NovaUrlProvider } from '../../admin/shared/nova-url-safety.ts';
+import { isMain, readJsonOr, repoRoot } from '../shared/cli.ts';
 import { assertValidSlug } from '../shared/slug.ts';
 import { seedIfMissing } from '../shared/sync-state.ts';
 
@@ -23,9 +23,7 @@ import { enqueueAnnouncements, hashSources, loadAnnounceWebhook, type PendingBat
 
 // --- Paths ---
 
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = path.dirname(__filename);
-const ROOT = path.resolve(__dirname, '../..');
+const ROOT = repoRoot();
 const NOVA_DIR = path.resolve(ROOT, 'tools/nova');
 const REGISTRY_PATH = path.resolve(ROOT, 'data/registry.json');
 const SLUGS_PATH = path.resolve(ROOT, 'lib/streamer-slugs.ts');
@@ -262,14 +260,10 @@ export function diffStreamers(oldStreamers: StreamerConfig[], newStreamers: Stre
 }
 
 function readExistingStreamers(): StreamerConfig[] {
-  let raw: string;
-  try {
-    raw = fs.readFileSync(REGISTRY_PATH, 'utf-8');
-  } catch (err) {
-    if ((err as { code?: string }).code === 'ENOENT') return [];
-    throw err; // a present-but-unreadable registry is an operator problem — fail loud, don't announce from a bogus baseline
-  }
-  const parsed = JSON.parse(raw) as { streamers?: StreamerConfig[] };
+  // A present-but-unreadable/corrupt registry is an operator problem — readJsonOr
+  // rethrows on anything but ENOENT, so we fail loud rather than announce from a
+  // bogus baseline.
+  const parsed = readJsonOr<{ streamers?: StreamerConfig[] }>(REGISTRY_PATH, {});
   return parsed.streamers ?? [];
 }
 
@@ -399,12 +393,7 @@ async function main(): Promise<void> {
   console.log('sync-registry: done.');
 }
 
-function isMainScript(): boolean {
-  const entry = process.argv[1] ?? '';
-  return entry.endsWith('tools/sync-registry/sync.ts') || entry.endsWith('tools/sync-registry/sync.js');
-}
-
-if (isMainScript()) {
+if (isMain(import.meta.url)) {
   main().catch((err: unknown) => {
     console.error(err);
     process.exit(1);

@@ -11,13 +11,12 @@
  */
 
 import { execFileSync } from 'node:child_process';
-import * as path from 'node:path';
-import { fileURLToPath } from 'node:url';
 
 import { batchEmbeds, postDiscord } from '../../admin/shared/discord.ts';
 import { loadAnnounceWebhook, partitionByLiveness, readPendingBatches, remainingBatchesAfter, writePendingBatches } from '../shared/announce.ts';
+import { isMain, repoRoot } from '../shared/cli.ts';
 
-const REPO_ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '../..');
+const REPO_ROOT = repoRoot();
 
 /** Read a file as it exists on origin/master (post-push). Throws when absent ⇒ treated as not-live.
  *  stderr is silenced: a missing path is an expected, handled case (the throw is the signal). */
@@ -108,12 +107,7 @@ async function main(): Promise<void> {
   console.log(`announce-flush: posted ${posted} announcement embed(s) to the fan channel.`);
 }
 
-function isMainScript(): boolean {
-  const entry = process.argv[1] ?? '';
-  return entry.endsWith('tools/announce-flush/flush.ts') || entry.endsWith('tools/announce-flush/flush.js');
-}
-
-if (isMainScript()) {
+if (isMain(import.meta.url)) {
   main().catch((err: unknown) => {
     console.error(err);
     process.exit(1);
