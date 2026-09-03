@@ -14,6 +14,7 @@ import * as path from 'node:path';
 import { queryD1 } from '../shared/d1.ts';
 import { readSyncState, EMPTY_ENTRY, type SyncStateEntry } from '../shared/sync-state.ts';
 import { assertValidSlug } from '../shared/slug.ts';
+import { LATEST_UPDATED_AT_SQL } from '../shared/sync-sql.ts';
 
 export interface StreamerRegistryEntry {
   slug: string;
@@ -55,11 +56,7 @@ interface AggRow {
 
 export const AGG_SQL = `
   SELECT song.streamer_id, 'songs' AS source,
-         MAX(CASE
-           WHEN link.updated_at IS NULL THEN song.updated_at
-           WHEN song.updated_at IS NULL OR link.updated_at > song.updated_at THEN link.updated_at
-           ELSE song.updated_at
-         END) AS max_ts,
+         ${LATEST_UPDATED_AT_SQL},
          COUNT(*) AS cnt
     FROM songs AS song
     LEFT JOIN song_work_links AS link ON link.song_id = song.id

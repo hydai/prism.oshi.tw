@@ -15,6 +15,7 @@ import { isMain, readJsonOr, repoRoot } from '../shared/cli.ts';
 import { queryD1 } from '../shared/d1.ts';
 import { syncStatePath, upsertEntry, type SyncStateEntry } from '../shared/sync-state.ts';
 import { assertValidSlug } from '../shared/slug.ts';
+import { LATEST_UPDATED_AT_SQL } from '../shared/sync-sql.ts';
 
 import { newStreamEmbed, newStreamsSummaryEmbed, type DiscordEmbed } from '../../admin/shared/discord.ts';
 import { enqueueAnnouncements, hashSources, loadAnnounceWebhook, type PendingBatch } from '../shared/announce.ts';
@@ -184,11 +185,7 @@ function querySnapshot(table: 'songs' | 'performances' | 'streams', streamerId: 
     const rows = queryD1<SnapshotRow>(
       'admin',
       `SELECT
-         MAX(CASE
-           WHEN link.updated_at IS NULL THEN song.updated_at
-           WHEN song.updated_at IS NULL OR link.updated_at > song.updated_at THEN link.updated_at
-           ELSE song.updated_at
-         END) AS max_ts,
+         ${LATEST_UPDATED_AT_SQL},
          COUNT(*) AS cnt
        FROM songs AS song
        LEFT JOIN song_work_links AS link ON link.song_id = song.id

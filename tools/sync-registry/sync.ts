@@ -12,6 +12,7 @@ import * as fs from 'node:fs';
 import * as path from 'node:path';
 
 import { sanitizeExternalUrl } from '../../lib/safe-links.ts';
+import type { SocialLinkKey, SocialLinks, StreamerConfig, StreamerTheme } from '../../lib/types.ts';
 import { sanitizeNovaUrl, type NovaUrlProvider } from '../../admin/shared/nova-url-safety.ts';
 import { isMain, readJsonOr, repoRoot } from '../shared/cli.ts';
 import { queryD1 } from '../shared/d1.ts';
@@ -49,43 +50,11 @@ export interface SubmissionRow {
 }
 
 // --- Registry types (match data/registry.json) ---
-
-interface SocialLinks {
-  youtube?: string;
-  twitter?: string;
-  facebook?: string;
-  instagram?: string;
-  twitch?: string;
-}
-
-interface ThemeColors {
-  accentPrimary: string;
-  accentPrimaryDark: string;
-  accentPrimaryLight: string;
-  accentSecondary: string;
-  accentSecondaryLight: string;
-  bgPageStart: string;
-  bgPageMid: string;
-  bgPageEnd: string;
-  bgAccentPrimary: string;
-  bgAccentPrimaryMuted: string;
-  borderAccentPrimary: string;
-  borderAccentSecondary: string;
-}
-
-interface StreamerConfig {
-  slug: string;
-  displayName: string;
-  description: string;
-  avatarUrl: string;
-  brandName: string;
-  subscriberCount: string;
-  group: string;
-  socialLinks: SocialLinks;
-  theme: ThemeColors;
-  externalUrl?: string;
-  enabled: boolean;
-}
+//
+// SocialLinks, StreamerTheme, StreamerConfig, and SocialLinkKey are the
+// frontend's own types (lib/types.ts) — imported above rather than
+// re-declared here, since they describe the exact shape this script writes
+// to data/registry.json.
 
 // --- Query Nova D1 ---
 
@@ -101,8 +70,6 @@ function queryNovaDb(): SubmissionRow[] {
 }
 
 // --- Transform DB row → registry config ---
-
-type SocialLinkKey = keyof SocialLinks;
 
 const SOCIAL_LINK_FIELDS = [
   ['youtube', 'link_youtube', 'youtube'],
@@ -125,7 +92,7 @@ const THEME_COLOR_KEYS = [
   'bgAccentPrimaryMuted',
   'borderAccentPrimary',
   'borderAccentSecondary',
-] as const satisfies ReadonlyArray<keyof ThemeColors>;
+] as const satisfies ReadonlyArray<keyof StreamerTheme>;
 
 const THEME_COLOR_RE = /^#[0-9a-fA-F]{6}$/;
 
@@ -167,11 +134,11 @@ function buildSocialLinks(row: SubmissionRow): SocialLinks {
   return links;
 }
 
-function isAllBlackTheme(theme: ThemeColors): boolean {
+function isAllBlackTheme(theme: StreamerTheme): boolean {
   return Object.values(theme).every((v) => v === '#000000');
 }
 
-function parseTheme(row: SubmissionRow): ThemeColors {
+function parseTheme(row: SubmissionRow): StreamerTheme {
   if (!row.theme_json) {
     throw new Error(`Streamer "${row.slug}" has empty theme_json — curator must set theme colors before sync.`);
   }
@@ -186,8 +153,8 @@ function parseTheme(row: SubmissionRow): ThemeColors {
     throw new Error(`Streamer "${row.slug}" has invalid theme_json: expected an object.`);
   }
 
-  const theme = parsed as Partial<Record<keyof ThemeColors, unknown>>;
-  const sanitized: Partial<ThemeColors> = {};
+  const theme = parsed as Partial<Record<keyof StreamerTheme, unknown>>;
+  const sanitized: Partial<StreamerTheme> = {};
   for (const key of THEME_COLOR_KEYS) {
     const value = theme[key];
     if (typeof value !== 'string' || !THEME_COLOR_RE.test(value)) {
@@ -196,7 +163,7 @@ function parseTheme(row: SubmissionRow): ThemeColors {
     sanitized[key] = value;
   }
 
-  return sanitized as ThemeColors;
+  return sanitized as StreamerTheme;
 }
 
 export function rowToConfig(row: SubmissionRow): StreamerConfig {
