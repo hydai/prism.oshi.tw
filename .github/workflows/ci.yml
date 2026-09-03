@@ -38,6 +38,9 @@ jobs:
       - run: npm run test:shared-web
       - run: npm run test:deploy-workflow-permissions
       - run: npm run inbox:status:test
+      - run: npm run typecheck:tools
+      - run: npm run test:d1
+      - run: npm run test:cli
       - run: npm run build
 
   package-checks:
