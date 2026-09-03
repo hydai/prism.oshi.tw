@@ -111,20 +111,20 @@ const FIXTURES: Fixture[] = [
   },
   {
     path: '/@fixture-entities',
-    note: 'HTML entities + quotes + CJK in the title, and an entity-escaped & in the image URL — entities are NOT decoded',
+    note: 'named + numeric character references, quotes and CJK in the title, and an escaped & in the image URL',
     html: channelPage(
       [
-        '<meta property="og:title" content="ミズキ &amp; Prism &quot;歌枠&quot; 頻道">',
-        '<meta property="og:image" content="https://yt3.googleusercontent.com/entities?sz=900&amp;v=2">',
+        '<meta property="og:title" content="ミズキ &amp; Prism &quot;歌枠&quot; &#39;25 &#x9332;&#30011;">',
+        '<meta property="og:image" content="https://yt3.googleusercontent.com/entities?sz=900&amp;v=2&#38;t=1">',
       ].join('\n'),
     ),
-    // Pinned as-is, encoded: lol-html (workerd's HTML parser) hands `getAttribute()`
-    // the *raw* attribute source, so character references survive — byte-identical to
-    // what the regexes returned. A channel actually named "R&B" therefore still
-    // auto-fills the form as "R&amp;B"; decoding is a separate behaviour fix, not
-    // part of this parser swap. Non-ASCII is passed through intact either way.
-    expectedDisplayName: 'ミズキ &amp; Prism &quot;歌枠&quot; 頻道',
-    expectedAvatarUrl: 'https://yt3.googleusercontent.com/entities?sz=900&amp;v=2',
+    // Neither the old regexes nor workerd's `getAttribute()` decode anything — both
+    // hand back the raw attribute source — so `extractChannelMeta` decodes on the way
+    // out. This is the end-to-end proof of that: a channel named `R&B` must reach the
+    // form as `R&B`, and an avatar URL must get real query separators back.
+    // decodeHtmlEntities' own edge cases live in channel-meta.test.ts.
+    expectedDisplayName: 'ミズキ & Prism "歌枠" \'25 録画',
+    expectedAvatarUrl: 'https://yt3.googleusercontent.com/entities?sz=900&v=2&t=1',
   },
   {
     path: '/@fixture-extra-attrs',
