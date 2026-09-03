@@ -4,8 +4,10 @@
  *
  * Mirrors the admin "Fetch All Channel Info" button without the UI. Reuses the worker's
  * fetchChannelInfo() and formatSubscriberCount(), reads YOUTUBE_API_KEY from admin/.dev.vars,
- * and reads/writes the production Nova D1 via `wrangler ... --remote` (run from tools/nova/,
- * the same pattern as sync-registry).
+ * and reads and writes Nova D1 (run from tools/nova/, the same pattern as sync-registry)
+ * through the shared D1 mode in tools/shared/d1.ts — the read (queryD1) and the write
+ * (executeD1File) both default to `--remote`; PRISM_D1_LOCAL=1 sends both to the local
+ * database together.
  *
  * Usage: npx tsx tools/fetch-channel-info/fetch.ts
  */
@@ -19,6 +21,7 @@ import { formatSubscriberCount } from '../../admin/shared/format.ts';
 import type { BulkFetchSubscribersResponse, BulkFetchSubscribersResult } from '../../admin/shared/types.ts';
 import { fetchChannelInfo } from '../../admin/src/youtube.ts';
 import { isMain, loadSecret, repoRoot } from '../shared/cli.ts';
+import { d1ModeFlag, queryD1 } from '../shared/d1.ts';
 
 // --- Paths ---
 
@@ -40,12 +43,6 @@ interface ApprovedRow {
 }
 
 // --- Pure helpers (unit-tested in fetch.test.ts) ---
-
-/** wrangler d1 --json returns an array whose first element holds the result rows. */
-export function parseWranglerResults<T>(raw: string): T[] {
-  const parsed = JSON.parse(raw);
-  return parsed[0]?.results ?? [];
-}
 
 /** Quote and escape a value as a SQLite string literal. */
 export function toSqlStringLiteral(value: string): string {
@@ -80,17 +77,12 @@ export function formatSummary(response: BulkFetchSubscribersResponse): string {
 
 // --- I/O ---
 
-function queryD1<T>(sql: string): T[] {
-  const raw = execFileSync('npx', ['wrangler@latest', 'd1', 'execute', NOVA_DB, '--remote', '--json', `--command=${sql}`], {
-    cwd: NOVA_DIR,
-    encoding: 'utf-8',
-    maxBuffer: 10 * 1024 * 1024,
-  });
-  return parseWranglerResults<T>(raw);
+export function executeD1FileArgs(filePath: string): string[] {
+  return ['wrangler@latest', 'd1', 'execute', NOVA_DB, d1ModeFlag(), `--file=${filePath}`];
 }
 
 function executeD1File(filePath: string): void {
-  execFileSync('npx', ['wrangler@latest', 'd1', 'execute', NOVA_DB, '--remote', `--file=${filePath}`], {
+  execFileSync('npx', executeD1FileArgs(filePath), {
     cwd: NOVA_DIR,
     encoding: 'utf-8',
     maxBuffer: 10 * 1024 * 1024,
@@ -128,7 +120,7 @@ export async function main(): Promise<void> {
   console.log('fetch-channel-info: querying approved streamers from Nova D1...');
   let rows: ApprovedRow[];
   try {
-    rows = queryD1<ApprovedRow>(APPROVED_WITH_CHANNEL_SQL);
+    rows = queryD1<ApprovedRow>('nova', APPROVED_WITH_CHANNEL_SQL);
   } catch (err) {
     console.error('ERROR: failed to query Nova D1. Is wrangler authenticated? Run `npx wrangler@latest login`.');
     console.error(err instanceof Error ? err.message : String(err));
