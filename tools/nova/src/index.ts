@@ -543,16 +543,42 @@ app.post('/vod/api/submit', async (c) => {
   return c.json({ id }, 201);
 });
 
+// Edge cache for GET /status (Workers Cache API). Each render performs three
+// full-table reads — two on DB, one on ADMIN_DB — and D1's daily row-read budget
+// is shared by every database on the account, so an ungated flood on this public
+// page could starve the admin dashboard too. One stored copy per validated
+// (vtuber, vod) pair per colo, refreshed every STATUS_CACHE_TTL_SECONDS. The key is
+// built from the VALIDATED filters, so unknown query strings collapse onto the
+// same entry instead of busting it. Cloudflare only honours the Cache API on
+// custom domains — nova.oshi.tw is one; on workers.dev every request is a miss.
+const STATUS_CACHE_TTL_SECONDS = 60;
+
+function statusCacheKey(requestUrl: string, filters: { vtuber: VtuberFilter; vod: VodFilter }): Request {
+  const key = new URL('/status', requestUrl);
+  key.searchParams.set('vtuber', filters.vtuber);
+  key.searchParams.set('vod', filters.vod);
+  return new Request(key.toString(), { method: 'GET' });
+}
+
 // GET /status — Public submission status overview
 app.get('/status', async (c) => {
   const rawV = c.req.query('vtuber') ?? 'all';
   const rawD = c.req.query('vod') ?? 'all';
-  const vtuberFilter: VtuberFilter = (VTUBER_FILTERS as readonly string[]).includes(rawV)
-    ? (rawV as VtuberFilter)
-    : 'all';
-  const vodFilter: VodFilter = (VOD_FILTERS as readonly string[]).includes(rawD)
-    ? (rawD as VodFilter)
-    : 'all';
+  const filters = {
+    vtuber: ((VTUBER_FILTERS as readonly string[]).includes(rawV) ? rawV : 'all') as VtuberFilter,
+    vod: ((VOD_FILTERS as readonly string[]).includes(rawD) ? rawD : 'all') as VodFilter,
+  };
+
+  const cache = caches.default;
+  const key = statusCacheKey(c.req.url, filters);
+  const hit = await cache.match(key);
+  if (hit) {
+    // A cached Response has immutable headers: copy it so secureHeaders() can
+    // stamp its set and the marker can flip to HIT.
+    const res = new Response(hit.body, hit);
+    res.headers.set('X-Status-Cache', 'HIT');
+    return res;
+  }
 
   // The page filters the VTuber list itself; the full set keeps VOD group names
   // and avatars (and the section totals) intact under any filter.
@@ -561,10 +587,11 @@ app.get('/status', async (c) => {
     listAllVodSubmissions(c.env.DB),
     listAdminStreams(c.env.ADMIN_DB),
   ]);
-  return c.html(renderStatusPage(submissions, vodSubmissions, adminStreams, {
-    vtuber: vtuberFilter,
-    vod: vodFilter,
-  }));
+  c.header('Cache-Control', `public, max-age=${STATUS_CACHE_TTL_SECONDS}`);
+  c.header('X-Status-Cache', 'MISS');
+  const res = await c.html(renderStatusPage(submissions, vodSubmissions, adminStreams, filters));
+  c.executionCtx.waitUntil(cache.put(key, res.clone()));
+  return res;
 });
 
 export default app;

@@ -309,6 +309,88 @@ async function testSecurityHeadersOnCorsPreflight(): Promise<void> {
   console.log('✓ a CORS preflight carries the security headers too');
 }
 
+// === /status edge cache: one round of D1 reads per (filters, colo, TTL) =====
+type FakeCaches = {
+  default: { match(req: Request): Promise<Response | undefined>; put(req: Request, res: Response): Promise<void> };
+  keys: string[];
+};
+
+function installFakeCaches(): FakeCaches {
+  const store = new Map<string, Response>();
+  const fake: FakeCaches = {
+    keys: [],
+    default: {
+      async match(req) {
+        const hit = store.get(req.url);
+        return hit ? hit.clone() : undefined;
+      },
+      async put(req, res) {
+        fake.keys.push(req.url);
+        store.set(req.url, res);
+      },
+    },
+  };
+  (globalThis as unknown as { caches: unknown }).caches = fake;
+  return fake;
+}
+
+function removeFakeCaches(): void {
+  delete (globalThis as unknown as { caches?: unknown }).caches;
+}
+
+function makeCountingDb(): { db: D1Database; reads: () => number } {
+  let count = 0;
+  const stmt = { bind: () => stmt, all: async () => ({ results: [] }), first: async () => null };
+  const db = { prepare() { count += 1; return stmt; } } as unknown as D1Database;
+  return { db, reads: () => count };
+}
+
+function makeExecutionCtx(): { ctx: ExecutionContext; settled: () => Promise<void> } {
+  const pending: Promise<unknown>[] = [];
+  const ctx = {
+    waitUntil(p: Promise<unknown>) { pending.push(p); },
+    passThroughOnException() {},
+  } as unknown as ExecutionContext;
+  return { ctx, settled: async () => { await Promise.all(pending); } };
+}
+
+async function testStatusIsServedFromTheEdgeCache(): Promise<void> {
+  const caches = installFakeCaches();
+  const nova = makeCountingDb();
+  const admin = makeCountingDb();
+  const env = makeEnv({ DB: nova.db, ADMIN_DB: admin.db });
+  const reads = (): number => nova.reads() + admin.reads();
+  try {
+    const first = makeExecutionCtx();
+    const miss = await app.request('/status', {}, env, first.ctx);
+    await first.settled();
+    assertEqual(miss.status, 200, 'GET /status renders');
+    assertEqual(miss.headers.get('x-status-cache'), 'MISS', 'the first request is a miss');
+    assertEqual(miss.headers.get('cache-control'), 'public, max-age=60', 'the copy is stored for 60 s');
+    assertEqual(reads(), 3, 'a miss performs the three table reads');
+    assertEqual(caches.keys[0], 'http://localhost/status?vtuber=all&vod=all', 'the key carries the validated filters');
+    assertSecureHeaders(miss, 'GET /status (miss)');
+
+    const second = makeExecutionCtx();
+    const hit = await app.request('/status?vtuber=nonsense&x=1', {}, env, second.ctx);
+    await second.settled();
+    assertEqual(hit.status, 200, 'GET /status (hit) renders');
+    assertEqual(hit.headers.get('x-status-cache'), 'HIT', 'an unknown query string collapses onto the cached entry');
+    assertEqual(reads(), 3, 'a hit performs no D1 read');
+    assertEqual(await hit.text(), await miss.text(), 'the hit serves the stored body');
+    assertSecureHeaders(hit, 'GET /status (hit)');
+
+    const third = makeExecutionCtx();
+    const other = await app.request('/status?vtuber=pending', {}, env, third.ctx);
+    await third.settled();
+    assertEqual(other.headers.get('x-status-cache'), 'MISS', 'a different validated filter is its own entry');
+    assertEqual(caches.keys[1], 'http://localhost/status?vtuber=pending&vod=all', 'validated filters vary the key');
+  } finally {
+    removeFakeCaches();
+  }
+  console.log('✓ GET /status is served from the edge cache; unknown query strings cannot bust it');
+}
+
 async function main(): Promise<void> {
   await testHelperWithKeyUsesDataApi();
   await testHelperWithoutKeySkipsDataApi();
@@ -321,6 +403,7 @@ async function main(): Promise<void> {
   await testSecurityHeadersOnPageRoute();
   await testSecurityHeadersOnApiRoute();
   await testSecurityHeadersOnCorsPreflight();
+  await testStatusIsServedFromTheEdgeCache();
   console.log('✓ nova video-info quota-drain guards');
 }
 
