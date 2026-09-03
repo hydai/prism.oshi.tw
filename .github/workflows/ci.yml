@@ -38,6 +38,12 @@ jobs:
       - run: npm run test:shared-web
       - run: npm run test:deploy-workflow-permissions
       - run: npm run inbox:status:test
+      - run: npm run sync:registry:test
+      - run: npm run sync:data:test
+      - run: npm run sync:status:test
+      - run: npm run fetch:channel-info:test
+      - run: npm run test:announce
+      - run: npm run test:slug
       - run: npm run typecheck:tools
       - run: npm run test:d1
       - run: npm run test:cli

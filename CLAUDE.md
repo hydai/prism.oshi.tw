@@ -19,7 +19,7 @@ npx --yes --package react-doctor@0.9.12 -- react-doctor . --scope changed --base
 
 No environment variables required. All config lives in `data/registry.json` and CSS variables.
 
-Data-pipeline & ops scripts run via `npm run` or slash commands — e.g. `sync:registry`, `sync:data`, `sync:status`, `inbox:status`, `fetch:channel-info` (see Deployment). `npm test` runs every frontend unit suite (`lib/**`, `app/**` — Node test runner + tsx; new `*.test.ts(x)` files are auto-discovered, no wiring needed) plus `npm run test:youtube-iframe-types` for the iframe type-contract check; CI (`.github/workflows/ci.yml`) runs them on push.
+Data-pipeline & ops scripts run via `npm run` or slash commands — e.g. `sync:registry`, `sync:data`, `sync:status`, `inbox:status`, `fetch:channel-info` (see Deployment). `npm test` runs every frontend unit suite (`lib/**`, `app/**` — Node test runner + tsx; new `*.test.ts(x)` files are auto-discovered, no wiring needed) plus `npm run test:youtube-iframe-types` for the iframe type-contract check; CI (`.github/workflows/ci.yml`) runs them on push. `npm run typecheck:tools` type-checks `tools/**` via `tools/tsconfig.json`; it and the tool test suites — `test:d1`, `test:cli`, `test:announce`, `test:slug`, `sync:registry:test`, `sync:data:test`, `sync:status:test`, `fetch:channel-info:test`, `inbox:status:test` — also run in CI's root job.
 
 ## Tech Stack
 
@@ -80,7 +80,7 @@ Hidden `<iframe>` controlled via YouTube IFrame API. Songs reference specific vi
 - `lib/` — shared utilities (data loading, parsing, types; `lib/itunes.ts` is used only by `tools/aurora`)
 - `data/` — static JSON data files per streamer
 - `admin/` — Cloudflare Workers admin dashboard + D1 database (`schema.sql`, `migrations/`, `seed.ts`); excluded from tsconfig
-- `tools/` — backend services & data pipeline (excluded from tsconfig): `nova` (submission worker), `crystal` (feedback worker), `aurora` (Cloudflare Pages song editor), `sync-{registry,data,stale,status}` (Nova DB → repo sync), `fetch-channel-info`, `inbox-status`, `shared`
+- `tools/` — backend services & data pipeline (excluded from the root tsconfig; has its own `tools/tsconfig.json`, though the `nova`/`crystal`/`aurora` sub-projects keep their own): `nova` (submission worker), `crystal` (feedback worker), `aurora` (Cloudflare Pages song editor), `sync-{registry,data,stale,status}` (Nova DB → repo sync), `fetch-channel-info`, `inbox-status`, `shared`
 
 ## Adding a New Streamer
 
