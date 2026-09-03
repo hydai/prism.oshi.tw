@@ -1367,15 +1367,15 @@ app.post('/api/harmonize/merge', requireCurator, async (c) => {
   const streamerId = getStreamerId(c);
   const user = c.get('user');
   try {
-    const result = await mergeSongs(
-      c.env.DB,
+    const result = await mergeSongs({
+      db: c.env.DB,
       streamerId,
-      body.canonicalSongId,
-      body.sourceSongIds,
-      user.email,
-      body.revision,
-      body.workMergeConfirmation,
-    );
+      canonicalSongId: body.canonicalSongId,
+      sourceSongIds: body.sourceSongIds,
+      mergedBy: user.email,
+      revision: body.revision,
+      workMergeConfirmation: body.workMergeConfirmation,
+    });
     return c.json<HarmonizeMergeResponse>({ ok: true, ...result });
   } catch (error) {
     if (error instanceof SongMergeError) {

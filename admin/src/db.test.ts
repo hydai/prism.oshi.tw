@@ -757,14 +757,14 @@ async function testMergeSongsPreservesPerformances(): Promise<void> {
     mergeRow('song-source-2', 'approved', '[]', { artist: 'Cover Artist' }),
   ]);
 
-  const result = await mergeSongs(
-    fakeDb as unknown as D1Database,
-    'alice',
-    'song-canonical',
-    ['song-source-1', 'song-source-2'],
-    'curator@example.com',
-    SCANNED_REVISION,
-  );
+  const result = await mergeSongs({
+    db: fakeDb as unknown as D1Database,
+    streamerId: 'alice',
+    canonicalSongId: 'song-canonical',
+    sourceSongIds: ['song-source-1', 'song-source-2'],
+    mergedBy: 'curator@example.com',
+    revision: SCANNED_REVISION,
+  });
 
   assertEqual(result.mergedSongs, 2, 'both source song rows are deleted');
   assertEqual(result.movedPerformances, 3, 'all source performances are repointed');
@@ -810,14 +810,14 @@ async function testMergeSongsRequiresExplicitGlobalWorkConfirmation(): Promise<v
 
   let caught: unknown;
   try {
-    await mergeSongs(
-      fakeDb as unknown as D1Database,
-      'alice',
-      'song-canonical',
-      ['song-source'],
-      'curator@example.com',
-      SCANNED_REVISION,
-    );
+    await mergeSongs({
+      db: fakeDb as unknown as D1Database,
+      streamerId: 'alice',
+      canonicalSongId: 'song-canonical',
+      sourceSongIds: ['song-source'],
+      mergedBy: 'curator@example.com',
+      revision: SCANNED_REVISION,
+    });
   } catch (error) {
     caught = error;
   }
@@ -847,18 +847,18 @@ async function testMergeSongsMergesGlobalWorksAcrossVtubers(): Promise<void> {
     }),
   ]);
 
-  const result = await mergeSongs(
-    fakeDb as unknown as D1Database,
-    'alice',
-    'song-canonical',
-    ['song-source-1', 'song-source-2', 'song-source-3'],
-    'curator@example.com',
-    SCANNED_REVISION,
-    {
+  const result = await mergeSongs({
+    db: fakeDb as unknown as D1Database,
+    streamerId: 'alice',
+    canonicalSongId: 'song-canonical',
+    sourceSongIds: ['song-source-1', 'song-source-2', 'song-source-3'],
+    mergedBy: 'curator@example.com',
+    revision: SCANNED_REVISION,
+    workMergeConfirmation: {
       canonicalWorkId: 'work-canonical',
       sourceWorkIds: ['work-third', 'work-source'],
     },
-  );
+  });
 
   assertEqual(result.canonicalWorkId, 'work-canonical', 'selected canonical song controls the global work direction');
   assertEqual(result.mergedSongs, 3, 'all selected local source songs are merged');
@@ -946,18 +946,18 @@ async function testMergeSongsRevalidatesReviewedStateInsideBatch(): Promise<void
 
   let caught: unknown;
   try {
-    await mergeSongs(
-      fakeDb as unknown as D1Database,
-      'alice',
-      'song-canonical',
-      ['song-source'],
-      'curator@example.com',
-      SCANNED_REVISION,
-      {
+    await mergeSongs({
+      db: fakeDb as unknown as D1Database,
+      streamerId: 'alice',
+      canonicalSongId: 'song-canonical',
+      sourceSongIds: ['song-source'],
+      mergedBy: 'curator@example.com',
+      revision: SCANNED_REVISION,
+      workMergeConfirmation: {
         canonicalWorkId: 'work-canonical',
         sourceWorkIds: ['work-source'],
       },
-    );
+    });
   } catch (error) {
     caught = error;
   }
@@ -1036,14 +1036,14 @@ async function testMergeSongsFencesOnTheScannedCatalogRevision(): Promise<void> 
   const staleDb = new FakeD1Database(null, null, rows());
   let caught: unknown;
   try {
-    await mergeSongs(
-      staleDb as unknown as D1Database,
-      'alice',
-      'song-canonical',
-      ['song-source'],
-      'curator@example.com',
-      SCANNED_REVISION - 1,
-    );
+    await mergeSongs({
+      db: staleDb as unknown as D1Database,
+      streamerId: 'alice',
+      canonicalSongId: 'song-canonical',
+      sourceSongIds: ['song-source'],
+      mergedBy: 'curator@example.com',
+      revision: SCANNED_REVISION - 1,
+    });
   } catch (error) {
     caught = error;
   }
@@ -1067,14 +1067,14 @@ async function testMergeSongsFencesOnTheScannedCatalogRevision(): Promise<void> 
   );
 
   const currentDb = new FakeD1Database(null, null, rows());
-  const result = await mergeSongs(
-    currentDb as unknown as D1Database,
-    'alice',
-    'song-canonical',
-    ['song-source'],
-    'curator@example.com',
-    SCANNED_REVISION,
-  );
+  const result = await mergeSongs({
+    db: currentDb as unknown as D1Database,
+    streamerId: 'alice',
+    canonicalSongId: 'song-canonical',
+    sourceSongIds: ['song-source'],
+    mergedBy: 'curator@example.com',
+    revision: SCANNED_REVISION,
+  });
 
   assertEqual(result.mergedSongs, 1, 'the current scan revision authorizes the merge');
   assertEqual(
@@ -1124,18 +1124,18 @@ async function testMergeSongsRejectsStaleWorkConfirmation(): Promise<void> {
 
   let sourceChangedError: unknown;
   try {
-    await mergeSongs(
-      sourceChangedDb as unknown as D1Database,
-      'alice',
-      'song-canonical',
-      ['song-source'],
-      'curator@example.com',
-      SCANNED_REVISION,
-      {
+    await mergeSongs({
+      db: sourceChangedDb as unknown as D1Database,
+      streamerId: 'alice',
+      canonicalSongId: 'song-canonical',
+      sourceSongIds: ['song-source'],
+      mergedBy: 'curator@example.com',
+      revision: SCANNED_REVISION,
+      workMergeConfirmation: {
         canonicalWorkId: 'work-canonical',
         sourceWorkIds: ['work-source-reviewed'],
       },
-    );
+    });
   } catch (error) {
     sourceChangedError = error;
   }
@@ -1155,18 +1155,18 @@ async function testMergeSongsRejectsStaleWorkConfirmation(): Promise<void> {
 
   let canonicalChangedError: unknown;
   try {
-    await mergeSongs(
-      canonicalChangedDb as unknown as D1Database,
-      'alice',
-      'song-canonical',
-      ['song-source'],
-      'curator@example.com',
-      SCANNED_REVISION,
-      {
+    await mergeSongs({
+      db: canonicalChangedDb as unknown as D1Database,
+      streamerId: 'alice',
+      canonicalSongId: 'song-canonical',
+      sourceSongIds: ['song-source'],
+      mergedBy: 'curator@example.com',
+      revision: SCANNED_REVISION,
+      workMergeConfirmation: {
         canonicalWorkId: 'work-canonical-reviewed',
         sourceWorkIds: ['work-source'],
       },
-    );
+    });
   } catch (error) {
     canonicalChangedError = error;
   }
@@ -1188,18 +1188,18 @@ async function testMergeSongsRejectsUnlinkedWork(): Promise<void> {
 
   let caught: unknown;
   try {
-    await mergeSongs(
-      fakeDb as unknown as D1Database,
-      'alice',
-      'song-canonical',
-      ['song-unlinked'],
-      'curator@example.com',
-      SCANNED_REVISION,
-      {
+    await mergeSongs({
+      db: fakeDb as unknown as D1Database,
+      streamerId: 'alice',
+      canonicalSongId: 'song-canonical',
+      sourceSongIds: ['song-unlinked'],
+      mergedBy: 'curator@example.com',
+      revision: SCANNED_REVISION,
+      workMergeConfirmation: {
         canonicalWorkId: 'work-shared',
         sourceWorkIds: ['work-unlinked'],
       },
-    );
+    });
   } catch (error) {
     caught = error;
   }
@@ -1216,14 +1216,14 @@ async function testMergeSongsRejectsMissingOrCrossStreamerSource(): Promise<void
 
   let caught: unknown;
   try {
-    await mergeSongs(
-      fakeDb as unknown as D1Database,
-      'alice',
-      'song-canonical',
-      ['song-from-another-streamer'],
-      'curator@example.com',
-      SCANNED_REVISION,
-    );
+    await mergeSongs({
+      db: fakeDb as unknown as D1Database,
+      streamerId: 'alice',
+      canonicalSongId: 'song-canonical',
+      sourceSongIds: ['song-from-another-streamer'],
+      mergedBy: 'curator@example.com',
+      revision: SCANNED_REVISION,
+    });
   } catch (error) {
     caught = error;
   }
@@ -1241,14 +1241,14 @@ async function testMergeSongsRejectsDuplicateSourceIds(): Promise<void> {
 
   let caught: unknown;
   try {
-    await mergeSongs(
-      fakeDb as unknown as D1Database,
-      'alice',
-      'song-canonical',
-      ['song-source', 'song-source'],
-      'curator@example.com',
-      SCANNED_REVISION,
-    );
+    await mergeSongs({
+      db: fakeDb as unknown as D1Database,
+      streamerId: 'alice',
+      canonicalSongId: 'song-canonical',
+      sourceSongIds: ['song-source', 'song-source'],
+      mergedBy: 'curator@example.com',
+      revision: SCANNED_REVISION,
+    });
   } catch (error) {
     caught = error;
   }
