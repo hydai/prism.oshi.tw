@@ -32,6 +32,10 @@ checkEqual(sanitizeNovaUrl('https://i.ytimg.com/vi/pRy1JZ2jSi8/hqdefault.jpg', '
 checkEqual(sanitizeNovaUrl('https://img.youtube.com/vi/pRy1JZ2jSi8/0.jpg', 'thumbnail'), 'https://img.youtube.com/vi/pRy1JZ2jSi8/0.jpg', 'allows the legacy img.youtube.com thumbnail host');
 checkEqual(sanitizeNovaUrl('https://attacker.example/vi/pRy1JZ2jSi8/hqdefault.jpg', 'thumbnail'), null, 'rejects off-allowlist thumbnail hosts');
 checkEqual(sanitizeNovaUrl('http://i.ytimg.com/vi/pRy1JZ2jSi8/hqdefault.jpg', 'thumbnail'), null, 'rejects non-HTTPS thumbnail URLs');
+checkEqual(sanitizeNovaUrl('https://www.yt3.ggpht.com/avatar=s240', 'image'), null, 'rejects the www alias of an avatar host: img-src lists the bare host only');
+checkEqual(sanitizeNovaUrl('https://yt3.ggpht.com:8443/avatar=s240', 'image'), null, 'rejects an explicit port on an avatar host: a CSP host source covers only the default port');
+checkEqual(sanitizeNovaUrl('https://www.i.ytimg.com/vi/pRy1JZ2jSi8/hqdefault.jpg', 'thumbnail'), null, 'rejects the www alias of a thumbnail host');
+checkEqual(sanitizeNovaUrl('https://i.ytimg.com:443/vi/pRy1JZ2jSi8/hqdefault.jpg', 'thumbnail'), 'https://i.ytimg.com/vi/pRy1JZ2jSi8/hqdefault.jpg', 'the default port is elided by the URL parser, so it is not an explicit port');
 checkEqual(
   sanitizeNovaUrl('https://www.youtube.com/redirect?q=https%3A%2F%2Fevil.example', 'facebook'),
   null,

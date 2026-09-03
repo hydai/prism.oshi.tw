@@ -110,8 +110,10 @@ const adminStreams: AdminStreamSummary[] = [
   },
 ];
 
+const NONCE = 'test-nonce-value';
+
 function render(filters: { vtuber: 'all' | 'pending' | 'approved' | 'rejected'; vod: 'all' | 'pending' | 'approved' | 'rejected' | 'admin_done' } = { vtuber: 'all', vod: 'all' }): string {
-  return String(renderStatusPage(submissions, vods, adminStreams, filters));
+  return String(renderStatusPage(submissions, vods, adminStreams, filters, NONCE));
 }
 
 function testEscapesUserContent(): void {
@@ -146,7 +148,7 @@ function testGroupedVodCards(): void {
 }
 
 function testPendingCountUsesEffectiveStatus(): void {
-  const html = String(renderStatusPage(submissions, vodsWithImportedPending, adminStreams, { vtuber: 'all', vod: 'all' }));
+  const html = String(renderStatusPage(submissions, vodsWithImportedPending, adminStreams, { vtuber: 'all', vod: 'all' }, NONCE));
   const card = html.slice(html.indexOf('<details class="prism-card vod-group" open>'), html.indexOf('</details>'));
   assert(card.includes('<span class="badge badge-pending">1 審核中</span>'), 'a pending VOD already imported by admin is not counted as 審核中');
   const rows = card.split('class="prism-row vod-row"').slice(1);
@@ -156,7 +158,7 @@ function testPendingCountUsesEffectiveStatus(): void {
 }
 
 function testVodIdentitySurvivesVtuberFilter(): void {
-  const html = String(renderStatusPage(submissions, vods, adminStreams, { vtuber: 'rejected', vod: 'all' }));
+  const html = String(renderStatusPage(submissions, vods, adminStreams, { vtuber: 'rejected', vod: 'all' }, NONCE));
   assert(!html.includes('<div class="cell-title">浠Mizuki</div>\n            <span class="mono">mizuki</span>\n            <div class="cell-meta only-mobile">'), 'VTuber list only shows rejected submissions');
   assert(html.includes('src="https://yt3.ggpht.com/avatar=s96"'), 'VOD group keeps the streamer avatar even when the VTuber filter hides that submission');
   assert(html.includes('<div class="cell-title">浠Mizuki</div>'), 'VOD group keeps the display name even when the VTuber filter hides that submission');
@@ -170,8 +172,28 @@ function testRejectionReason(): void {
   console.log('status page shows rejection reasons');
 }
 
+function testCarriesTheNonce(): void {
+  const html = render();
+  const inlineTags = html.match(/<(?:script|style)(?:\s[^>]*)?>/g) ?? [];
+  assert(inlineTags.length >= 3, `page still ships its inline tags (found ${inlineTags.length})`);
+  for (const tag of inlineTags) {
+    assert(tag.includes(`nonce="${NONCE}"`), `inline tag carries the nonce — ${tag.slice(0, 60)}`);
+  }
+  console.log('status page stamps the nonce on every inline tag');
+}
+
+function testImageFallbacksAreScripted(): void {
+  const html = render();
+  assert(!/ on[a-z]+="/.test(html), 'no inline event-handler attribute survives (the CSP blocks them)');
+  assert(/<img class="avatar[^>]*data-fallback/.test(html), 'avatars are marked data-fallback');
+  assert(/<img class="thumb"[^>]*data-fallback/.test(html), 'thumbnails are marked data-fallback');
+  assert(html.includes("addEventListener('error'"), 'one delegated listener replaces the per-row handlers');
+  assert(html.includes('dataset.fallback'), 'the listener only touches images that opted in');
+  console.log('status page falls back to gradient tiles from one delegated listener');
+}
+
 function testEmptyState(): void {
-  const html = String(renderStatusPage([], [], [], { vtuber: 'rejected', vod: 'all' }));
+  const html = String(renderStatusPage([], [], [], { vtuber: 'rejected', vod: 'all' }, NONCE));
   assert(html.includes('沒有符合「已拒絕」的 VTuber 提交'), 'filtered empty state keeps its text');
   assert(html.includes('href="/status"') && html.includes('清除篩選'), 'empty state links back to the unfiltered page');
   assert(html.includes('尚無 VOD 提交紀錄'), 'unfiltered empty VOD section keeps its text');
@@ -185,6 +207,8 @@ try {
   testRejectionReason();
   testPendingCountUsesEffectiveStatus();
   testVodIdentitySurvivesVtuberFilter();
+  testCarriesTheNonce();
+  testImageFallbacksAreScripted();
   testEmptyState();
   console.log('status-page.test: all passed');
 } catch (error) {

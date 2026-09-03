@@ -15,6 +15,20 @@ const allowedHosts: Record<NovaUrlProvider, ReadonlySet<string>> = {
   thumbnail: new Set(['i.ytimg.com', 'i1.ytimg.com', 'i2.ytimg.com', 'i3.ytimg.com', 'i4.ytimg.com', 'i9.ytimg.com', 'img.youtube.com']),
 };
 
+/**
+ * Every host an `<img>` on a Nova page may load from: the avatar CDNs plus the
+ * video-thumbnail CDNs, which is exactly what `sanitizeNovaUrl()` admits for those
+ * two providers — matched exactly (no `www.` alias, no explicit port), so every
+ * stored image URL is one these host sources match: a CSP host source covers only
+ * that host on its default port. Derived from `allowedHosts` rather than restated,
+ * so the workers' Content-Security-Policy `img-src` and this sanitizer cannot drift
+ * apart — widening one widens the other.
+ */
+export const NOVA_IMAGE_HOSTS: readonly string[] = [
+  ...allowedHosts.image,
+  ...allowedHosts.thumbnail,
+];
+
 const youtubeRedirectHosts = new Set(['youtube.com', 'm.youtube.com']);
 
 function normalizeHostname(hostname: string): string {
@@ -53,8 +67,13 @@ export function sanitizeNovaUrl(rawUrl: string | null | undefined, provider: Nov
   const effectiveUrl = provider === 'image' ? parsedUrl : getEffectiveSocialUrl(parsedUrl);
   if (!effectiveUrl) return null;
 
-  const host = normalizeHostname(effectiveUrl.hostname);
+  // Image kinds are matched exactly — no `www.` alias, no explicit port — because the
+  // workers' `img-src` is derived from the same sets and a CSP host source admits
+  // only that host on its default port; a stored variant would render as a broken image.
+  const isImageKind = provider === 'image' || provider === 'thumbnail';
+  const host = isImageKind ? effectiveUrl.hostname : normalizeHostname(effectiveUrl.hostname);
   if (!allowedHosts[provider].has(host)) return null;
+  if (isImageKind && effectiveUrl.port !== '') return null;
 
   return effectiveUrl.href;
 }

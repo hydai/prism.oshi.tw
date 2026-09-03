@@ -62,19 +62,54 @@ const STATUS_LABELS: Record<string, string> = {
 
 const YOUTUBE_VIDEO_ID = /^[A-Za-z0-9_-]{11}$/;
 
-/** Avatar image with the prism gradient fallback tile when the URL is empty or fails to load. */
+/**
+ * Avatar image with the prism gradient fallback tile when the URL is empty or
+ * fails to load. `data-fallback` opts the image into FALLBACK_SCRIPT below, which
+ * does what an inline `onerror` used to — the CSP forbids inline handlers.
+ */
 function avatarHtml(url: string, extraClass = ''): string {
   const fallback = `<div class="avatar avatar-fallback ${extraClass}" aria-hidden="true"${url ? ' style="display:none"' : ''}>${SPARKLE_SVG}</div>`;
   if (!url) return fallback;
-  return `<img class="avatar ${extraClass}" src="${esc(url)}" alt="" loading="lazy" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'">${fallback}`;
+  return `<img class="avatar ${extraClass}" src="${esc(url)}" alt="" loading="lazy" data-fallback>${fallback}`;
 }
 
 /** YouTube thumbnail for well-formed video ids; gradient tile otherwise. */
 function thumbHtml(videoId: string): string {
   const fallback = `<div class="thumb avatar-fallback" aria-hidden="true"${YOUTUBE_VIDEO_ID.test(videoId) ? ' style="display:none"' : ''}>${svgIcon('film', 14)}</div>`;
   if (!YOUTUBE_VIDEO_ID.test(videoId)) return fallback;
-  return `<img class="thumb" src="https://i.ytimg.com/vi/${videoId}/mqdefault.jpg" alt="" loading="lazy" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'">${fallback}`;
+  return `<img class="thumb" src="https://i.ytimg.com/vi/${videoId}/mqdefault.jpg" alt="" loading="lazy" data-fallback>${fallback}`;
 }
+
+/**
+ * The broken-image fallback for every `data-fallback` image on the page: hide the
+ * image, reveal the gradient tile that follows it. One delegated listener instead
+ * of one handler per row — `error` does not bubble, but it does reach a listener
+ * registered on the document in the capture phase.
+ *
+ * The sweep matters as much as the listener: this script runs at the end of the
+ * body, so images that already failed while the document was parsing fired their
+ * error before it existed. `complete && naturalWidth === 0` is exactly that set.
+ *
+ * Writing to element.style is a CSSOM write, which `style-src` does not govern.
+ */
+const FALLBACK_SCRIPT = `
+    (function() {
+      function showFallback(img) {
+        img.style.display = 'none';
+        var next = img.nextElementSibling;
+        if (next) next.style.display = 'flex';
+      }
+      document.addEventListener('error', function(e) {
+        var target = e.target;
+        if (target instanceof HTMLImageElement && target.dataset.fallback !== undefined) {
+          showFallback(target);
+        }
+      }, true);
+      document.querySelectorAll('img[data-fallback]').forEach(function(img) {
+        if (img.complete && img.naturalWidth === 0) showFallback(img);
+      });
+    })();
+  `;
 
 function monoCell(value: string, muted = false): string {
   return `<span class="mono${muted ? ' mono-muted' : ''}">${esc(value)}</span>`;
@@ -91,6 +126,7 @@ export function renderStatusPage(
   vodSubmissions: VodSubmissionSummary[],
   adminStreams: AdminStreamSummary[],
   filters: { vtuber: VtuberFilter; vod: VodFilter },
+  nonce: string,
 ): ReturnType<typeof html> {
   // URL builder: preserves the other section's filter when one axis changes.
   const buildHref = (opts: { vtuber?: VtuberFilter; vod?: VodFilter }): string => {
@@ -308,7 +344,7 @@ export function renderStatusPage(
           <h1 class="prism-title">Prism Nova</h1>
           <p class="prism-desc">提交狀態總覽 <span class="dot">·</span> <strong>${submissions.length} 位 VTuber、${totalVodCount} 場 VOD</strong></p>
         </div>
-        <div class="prism-hero-actions">${raw(themeToggleHTML())}</div>
+        <div class="prism-hero-actions">${raw(themeToggleHTML(nonce))}</div>
       </div>`);
 
   const body = String(html`      <!-- VTuber Submissions -->
@@ -370,5 +406,7 @@ export function renderStatusPage(
     hero,
     body,
     footer,
+    script: FALLBACK_SCRIPT,
+    nonce,
   }));
 }

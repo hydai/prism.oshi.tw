@@ -381,7 +381,7 @@ const VOD_SCRIPT = String.raw`
     })();
 `;
 
-export function renderVodPage(siteKey: string, streamers: ApprovedStreamer[]) {
+export function renderVodPage(siteKey: string, streamers: ApprovedStreamer[], nonce: string) {
   const streamerOptions: string[] = [];
   for (const streamer of streamers) {
     if (validateSlug(streamer.slug)) {
@@ -400,7 +400,7 @@ export function renderVodPage(siteKey: string, streamers: ApprovedStreamer[]) {
           <h1 class="prism-title">Prism Nova</h1>
           <p class="prism-desc">提交歌回 VOD，幫助我們建立歌曲時間戳</p>
         </div>
-        <div class="prism-hero-actions">${raw(themeToggleHTML())}</div>
+        <div class="prism-hero-actions">${raw(themeToggleHTML(nonce))}</div>
       </div>`);
 
   const body = String(html`      <form id="vod-form" class="form-stack vod-form">
@@ -516,5 +516,6 @@ export function renderVodPage(siteKey: string, streamers: ApprovedStreamer[]) {
     body,
     footer,
     script: VOD_SCRIPT,
+    nonce,
   }));
 }
