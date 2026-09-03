@@ -6,8 +6,8 @@ import * as path from 'node:path';
 import {
   APPROVED_WITH_CHANNEL_SQL,
   buildUpdateSql,
+  executeD1FileArgs,
   formatSummary,
-  parseWranglerResults,
   toSqlStringLiteral,
   writeSqlToPrivateTempFile,
 } from './fetch';
@@ -22,16 +22,29 @@ function test(name: string, fn: () => void): void {
   }
 }
 
-// --- parseWranglerResults ---
+function withEnv(key: string, value: string | undefined, fn: () => void): void {
+  const original = process.env[key];
+  if (value === undefined) delete process.env[key];
+  else process.env[key] = value;
+  try {
+    fn();
+  } finally {
+    if (original === undefined) delete process.env[key];
+    else process.env[key] = original;
+  }
+}
 
-test('parseWranglerResults returns the first result set rows', () => {
-  const raw = JSON.stringify([{ results: [{ id: 'a' }, { id: 'b' }], success: true }]);
-  assert.deepEqual(parseWranglerResults<{ id: string }>(raw), [{ id: 'a' }, { id: 'b' }]);
-});
-
-test('parseWranglerResults returns an empty array when there are no results', () => {
-  assert.deepEqual(parseWranglerResults('[]'), []);
-});
+/** Stub console.error for the duration of `fn` — executeD1FileArgs's underlying
+ *  d1ModeFlag() prints a stderr notice when PRISM_D1_LOCAL=1 decides the mode. */
+function withStubbedConsoleError(fn: () => void): void {
+  const original = console.error;
+  console.error = () => {};
+  try {
+    fn();
+  } finally {
+    console.error = original;
+  }
+}
 
 // --- toSqlStringLiteral ---
 
@@ -98,6 +111,33 @@ test('approved-with-channel query selects approved rows that have a channel id',
   assert.match(APPROVED_WITH_CHANNEL_SQL, /status\s*=\s*'approved'/i);
   assert.match(APPROVED_WITH_CHANNEL_SQL, /youtube_channel_id\s*!=\s*''/i);
   assert.doesNotMatch(APPROVED_WITH_CHANNEL_SQL, /\bLIMIT\b/i);
+});
+
+// --- executeD1FileArgs (the write path must follow the shared D1 mode) ---
+//
+// This is the argument vector for the privileged write to Nova D1 (see
+// writeSqlToPrivateTempFile below). It must track PRISM_D1_LOCAL=1 the same
+// way queryD1 does — otherwise a local-mode run reads streamer/channel ids
+// from a local database and then writes to production D1 with them.
+
+test('executeD1FileArgs targets --remote by default (PRISM_D1_LOCAL unset)', () => {
+  withEnv('PRISM_D1_LOCAL', undefined, () => {
+    const args = executeD1FileArgs('/tmp/x.sql');
+    assert.ok(args.includes('--remote'), 'should include --remote');
+    assert.ok(!args.includes('--local'), 'should not include --local');
+    assert.ok(args.includes('--file=/tmp/x.sql'), 'should include the file flag');
+    assert.ok(args.includes('oshi-prism-nova'), 'should target the Nova D1 database');
+  });
+});
+
+test('executeD1FileArgs targets --local when PRISM_D1_LOCAL=1', () => {
+  withEnv('PRISM_D1_LOCAL', '1', () => {
+    withStubbedConsoleError(() => {
+      const args = executeD1FileArgs('/tmp/x.sql');
+      assert.ok(args.includes('--local'), 'should include --local');
+      assert.ok(!args.includes('--remote'), 'should not include --remote');
+    });
+  });
 });
 
 // --- writeSqlToPrivateTempFile (temp-file race hardening) ---
