@@ -172,7 +172,9 @@ interface InlineEditCallProps {
   onCancel: () => void;
 }
 
-function inlineEditProps(tree: React.ReactNode, componentName: string): InlineEditCallProps[] {
+// `componentName` narrows the walk to one sub-component's render output (e.g. the performance
+// table); omit it to read InlineEdits that StreamDetailView renders directly, like the stream title.
+function inlineEditProps(tree: React.ReactNode, componentName?: string): InlineEditCallProps[] {
   const seen: React.ReactElement[] = [];
   const walk = (node: React.ReactNode): void => {
     if (Array.isArray(node)) {
@@ -185,10 +187,12 @@ function inlineEditProps(tree: React.ReactNode, componentName: string): InlineEd
   };
 
   walk(tree);
-  const host = seen.find((element) => (element.type as { name?: string }).name === componentName);
-  assert(host !== undefined, `${componentName} renders inside the page view`);
-  seen.length = 0;
-  walk((host.type as (props: unknown) => React.ReactNode)(host.props));
+  if (componentName !== undefined) {
+    const host = seen.find((element) => (element.type as { name?: string }).name === componentName);
+    assert(host !== undefined, `${componentName} renders inside the page view`);
+    seen.length = 0;
+    walk((host.type as (props: unknown) => React.ReactNode)(host.props));
+  }
   return seen.filter((element) => element.type === InlineEdit).map((element) => element.props as InlineEditCallProps);
 }
 
@@ -211,5 +215,58 @@ assert(
   savedNotes.join() === 'performance-one:note:',
   'a StreamDetail row left empty saves the blank value through the page callback',
 );
+
+// --- Inline edit: the two title sites no longer opt into empty saves ---
+//
+// Clearing a stream or performance title used to round-trip a `''` the server rejected with 400.
+// The prop assertion pins the JSX no longer passing `allowEmpty`; driving the real extracted
+// callbacks through the key handler pins the resulting behavior (cancel, not a rejected save).
+
+const savedStreamTitles: string[] = [];
+let streamTitleCancelled = false;
+const streamTitleTree = StreamDetailView({
+  controller: {
+    ...controller,
+    editingField: { type: 'stream', field: 'title' },
+    handleStreamSave: async (field, value) => { savedStreamTitles.push(`${field}:${value}`); },
+    setEditingField: () => { streamTitleCancelled = true; },
+  },
+});
+const streamTitleEdits = inlineEditProps(streamTitleTree);
+assert(streamTitleEdits.length === 1, 'the stream title renders one shared InlineEdit while editing');
+assert(streamTitleEdits[0]?.allowEmpty === undefined, 'stream title no longer opts into empty saves');
+handleInlineEditKeyDown({ key: 'Enter', preventDefault: noop }, { ...streamTitleEdits[0]!, text: '   ' });
+assert(savedStreamTitles.length === 0, 'clearing the stream title no longer saves the empty value');
+assert(streamTitleCancelled, 'clearing the stream title cancels the edit instead of saving');
+
+const savedPerfTitles: string[] = [];
+let perfTitleCancelled = false;
+const perfTitleTree = StreamDetailView({
+  controller: {
+    ...controller,
+    editingField: { type: 'perf', perfId: 'performance-one', field: 'title' },
+    handleSave: async (perfId, field, value) => { savedPerfTitles.push(`${perfId}:${field}:${value}`); },
+    setEditingField: () => { perfTitleCancelled = true; },
+  },
+});
+const perfTitleEdits = inlineEditProps(perfTitleTree, 'PerformanceTable');
+assert(perfTitleEdits.length === 1, 'the edited performance title row renders one shared InlineEdit');
+assert(perfTitleEdits[0]?.allowEmpty === undefined, 'performance title no longer opts into empty saves');
+handleInlineEditKeyDown({ key: 'Enter', preventDefault: noop }, { ...perfTitleEdits[0]!, text: '   ' });
+assert(savedPerfTitles.length === 0, 'clearing a performance title no longer saves the empty value');
+assert(perfTitleCancelled, 'clearing a performance title cancels the edit instead of saving');
+
+// --- Artist keeps its empty-save opt-in (unchanged); the prop assertion is the pin here since
+// the save-behavior path is already exercised above for note, an identical opted-in field. ---
+
+const artistTree = StreamDetailView({
+  controller: {
+    ...controller,
+    editingField: { type: 'perf', perfId: 'performance-one', field: 'artist' },
+  },
+});
+const artistEdits = inlineEditProps(artistTree, 'PerformanceTable');
+assert(artistEdits.length === 1, 'the edited performance artist row renders one shared InlineEdit');
+assert(artistEdits[0]?.allowEmpty === true, 'artist keeps its empty-save opt-in');
 
 console.log('✓ StreamDetail retains navigation, controls, rows, access boundaries, and its shared stamp components');

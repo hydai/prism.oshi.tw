@@ -465,7 +465,7 @@ export function StreamDetailView({ controller }: { controller: StreamDetailContr
           <div>
             <h2 className="text-xl font-semibold text-slate-800">
               {editingField?.type === 'stream' && editingField.field === 'title' ? (
-                <InlineEdit allowEmpty value={detail.title} onSave={(v) => handleStreamSave('title', v)} onCancel={() => setEditingField(null)} />
+                <InlineEdit value={detail.title} onSave={(v) => handleStreamSave('title', v)} onCancel={() => setEditingField(null)} />
               ) : (
                 <span className={isCurator ? 'cursor-text' : ''} onDoubleClick={() => { if (isCurator) setEditingField({ type: 'stream', field: 'title' }); }} title={isCurator ? 'Double-click to edit' : undefined}>
                   {detail.title}
@@ -696,7 +696,7 @@ function PerformanceTable({ controller }: { controller: StreamDetailController }
 
                 <td className="px-4 py-3">
                   {editingField?.type === 'perf' && editingField.perfId === perf.id && editingField.field === 'title' ? (
-                    <InlineEdit allowEmpty value={perf.title} onSave={(v) => handleSave(perf.id, 'title', v)} onCancel={() => setEditingField(null)} />
+                    <InlineEdit value={perf.title} onSave={(v) => handleSave(perf.id, 'title', v)} onCancel={() => setEditingField(null)} />
                   ) : (
                     <span className="cursor-text font-medium text-slate-800" onDoubleClick={(e) => { e.stopPropagation(); setEditingField({ type: 'perf', perfId: perf.id, field: 'title' }); }} title="Double-click to edit">
                       {perf.title}
