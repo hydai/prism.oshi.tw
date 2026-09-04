@@ -1,9 +1,15 @@
 import * as React from 'react';
+import { act } from 'react';
+import { createRoot } from 'react-dom/client';
 import { renderToStaticMarkup } from 'react-dom/server';
-import type { StampPerformance, StreamWithPending } from '../../shared/types';
+import { Window } from 'happy-dom';
+import type { HTMLElement as DomElement } from 'happy-dom';
+import { MemoryRouter } from 'react-router-dom';
+import type { AuthUser, ListResponse, StampPerformance, StampStats, StreamWithPending } from '../../shared/types';
 import type { YouTubePlayerHandle } from '../src/components/YouTubePlayer';
 import { StampEditorView } from '../src/pages/StampEditor';
 import type { StampEditorController } from '../src/pages/StampEditor';
+import StampEditorPage from '../src/pages/StampEditor';
 import { InlineEdit } from '../src/components/stamp/InlineEdit';
 import { handleInlineEditKeyDown } from '../src/lib/inline-edit';
 import { handleEditorShortcut } from '../src/hooks/useEditorShortcuts';
@@ -303,3 +309,291 @@ for (const key of shortcutKeys) {
 assert(fired.length === 0 && seeked.length === 2, 'an open modal disables every editor shortcut');
 
 console.log('✓ StampEditor retains filters, controls, song rows, access boundaries, and its shared stamp components');
+
+// --- Deep-link selection: the requested stream and performance are picked from inside the async
+// loaders (the stream fetch's success handler, then `loadPerformances`'s own), never from an
+// effect that re-derives selection from other state on every change.
+//
+// This drives the real controller — `useStampEditorController`, `useStreamPicker`,
+// `loadPerformances` — against fake fetches in a live DOM, the same technique
+// `tests/song-table-memo.test.tsx` uses to mount these editors for real.
+
+const deepLinkWin = new Window({
+  url: 'http://localhost/',
+  // The editor mounts a YouTube player, which appends the IFrame API script tag; nothing here
+  // needs that script, and fetching it would reach the network.
+  settings: { disableJavaScriptFileLoading: true, disableCSSFileLoading: true },
+});
+
+for (const [name, value] of Object.entries({
+  window: deepLinkWin,
+  document: deepLinkWin.document,
+  navigator: deepLinkWin.navigator,
+  HTMLElement: deepLinkWin.HTMLElement,
+  Element: deepLinkWin.Element,
+  Node: deepLinkWin.Node,
+  Event: deepLinkWin.Event,
+  MouseEvent: deepLinkWin.MouseEvent,
+  IS_REACT_ACT_ENVIRONMENT: true,
+})) {
+  // Node's own `navigator` global is getter-only, so plain assignment is not enough.
+  Object.defineProperty(globalThis, name, { value, configurable: true, writable: true });
+}
+
+function stubDeepLinkFetch(handle: (pathname: string) => unknown): void {
+  const fetchStub: typeof fetch = async (input) => {
+    const { pathname } = new URL(String(input), 'http://localhost/');
+    const payload = handle(pathname);
+    if (payload === undefined) throw new Error(`unstubbed request: ${pathname}`);
+    return { ok: true, status: 200, json: () => Promise.resolve(payload) } as unknown as Response;
+  };
+  Object.defineProperty(globalThis, 'fetch', { value: fetchStub, configurable: true, writable: true });
+}
+
+type DeepLinkContainer = DomElement;
+
+/** Lets React finish the load → select → load chain the editor runs on mount. */
+async function settleDeepLink(): Promise<void> {
+  for (let i = 0; i < 8; i += 1) {
+    await act(async () => {
+      await Promise.resolve();
+    });
+  }
+}
+
+async function mountDeepLinkPage(
+  element: React.ReactElement,
+  options: { strict?: boolean } = {},
+): Promise<{ container: DeepLinkContainer; unmount: () => Promise<void> }> {
+  const container = deepLinkWin.document.createElement('div');
+  deepLinkWin.document.body.appendChild(container);
+  const root = createRoot(container as unknown as HTMLElement);
+  const tree = options.strict ? React.createElement(React.StrictMode, null, element) : element;
+  await act(async () => {
+    root.render(tree);
+  });
+  await settleDeepLink();
+  return {
+    container,
+    unmount: async () => {
+      await act(async () => {
+        root.unmount();
+      });
+      container.remove();
+    },
+  };
+}
+
+async function clickDeepLink(node: { click: () => void } | null | undefined, what: string): Promise<void> {
+  assert(node !== null && node !== undefined, `the page renders ${what}`);
+  await act(async () => {
+    node.click();
+  });
+  await settleDeepLink();
+}
+
+async function clickDeepLinkSelector(container: DeepLinkContainer, selector: string, what: string): Promise<void> {
+  await clickDeepLink(container.querySelector<DomElement>(selector), what);
+}
+
+/** Sidebar stream entries have no stable selector; a button naming the stream's title finds one. */
+function findButtonContaining(container: DeepLinkContainer, text: string): DomElement | undefined {
+  return [...container.querySelectorAll<DomElement>('button')].find((candidate) =>
+    candidate.textContent.includes(text),
+  );
+}
+
+async function clickButtonContaining(container: DeepLinkContainer, text: string): Promise<void> {
+  await clickDeepLink(findButtonContaining(container, text), `a button naming ${text}`);
+}
+
+function isPressed(container: DeepLinkContainer, selector: string): boolean {
+  return container.querySelector<DomElement>(selector)?.getAttribute('aria-pressed') === 'true';
+}
+
+const deepLinkCurator: AuthUser = { email: 'curator@example.com', role: 'curator' };
+
+const deepLinkStreamA: StreamWithPending = {
+  id: 'stream-deep-a',
+  streamerId: 'mizuki',
+  title: 'Deep Link Stream Alpha',
+  date: '2026-08-20',
+  videoId: 'video-deep-a',
+  youtubeUrl: 'https://www.youtube.com/watch?v=video-deep-a',
+  credit: {},
+  status: 'pending',
+  submittedBy: null,
+  reviewedBy: null,
+  createdAt: '2026-08-20T00:00:00.000Z',
+  pendingCount: 3,
+};
+
+const deepLinkStreamB: StreamWithPending = {
+  ...deepLinkStreamA,
+  id: 'stream-deep-b',
+  title: 'Deep Link Stream Beta',
+  date: '2026-08-19',
+  videoId: 'video-deep-b',
+  youtubeUrl: 'https://www.youtube.com/watch?v=video-deep-b',
+};
+
+const deepLinkPerformances: StampPerformance[] = [
+  {
+    id: 'perf-deep-1',
+    songId: 'song-deep-1',
+    title: 'Deep Link Song One',
+    originalArtist: 'Artist One',
+    timestamp: 10,
+    endTimestamp: 100,
+    note: '',
+    status: 'pending',
+  },
+  {
+    id: 'perf-deep-2',
+    songId: 'song-deep-2',
+    title: 'Deep Link Song Two',
+    originalArtist: 'Artist Two',
+    timestamp: 110,
+    endTimestamp: 200,
+    note: '',
+    status: 'pending',
+  },
+  {
+    id: 'perf-deep-3',
+    songId: 'song-deep-3',
+    title: 'Deep Link Song Three',
+    originalArtist: 'Artist Three',
+    timestamp: 210,
+    endTimestamp: null,
+    note: '',
+    status: 'pending',
+  },
+];
+
+stubDeepLinkFetch((pathname) => {
+  if (pathname === '/api/stamp/stats') return { total: 3, filled: 2, remaining: 1 } satisfies StampStats;
+  if (pathname === '/api/stamp/streams') {
+    return { data: [deepLinkStreamA, deepLinkStreamB], total: 2 } satisfies ListResponse<StreamWithPending>;
+  }
+  if (pathname === `/api/streams/${deepLinkStreamA.id}/performances`) {
+    // A fresh array each load, as the real API is: ids/order persist across a reload.
+    return {
+      data: [...deepLinkPerformances],
+      total: deepLinkPerformances.length,
+    } satisfies ListResponse<StampPerformance>;
+  }
+  return undefined;
+});
+
+// `?stream=&performance=` is StampEditor's deep link: it opens on the requested stream and song.
+const deepLinkPage = await mountDeepLinkPage(
+  <MemoryRouter initialEntries={[`/stamp?stream=${deepLinkStreamA.id}&performance=perf-deep-3`]}>
+    <StampEditorPage user={deepLinkCurator} />
+  </MemoryRouter>,
+);
+
+assert(
+  !deepLinkPage.container.innerHTML.includes('Select a stream to start stamping'),
+  'the deep-linked stream replaces the empty-selection placeholder',
+);
+assert(
+  findButtonContaining(deepLinkPage.container, deepLinkStreamA.title)?.getAttribute('aria-pressed') === 'true',
+  'a ?stream deep link selects the requested stream once the stream list loads',
+);
+assert(
+  isPressed(deepLinkPage.container, '[title="Select song 3"]'),
+  'a ?performance deep link selects the requested performance once its stream\'s performances load',
+);
+
+// A later user pick, then a reload of the same (deep-linked) stream: the reload must not snap the
+// selection back to the deep-linked performance. The effect this replaced re-derived the selected
+// index from `performances`/`requestedStreamId`/`selectedStreamId` on every change, so it fired
+// again on every reload of the requested stream, forever — this is what "selected once" fixes.
+await clickDeepLinkSelector(deepLinkPage.container, '[title="Select song 2"]', 'song row 2');
+assert(isPressed(deepLinkPage.container, '[title="Select song 2"]'), 'the user pick took effect');
+
+// Re-picking the already-open stream reloads its performances into a new array.
+await clickButtonContaining(deepLinkPage.container, deepLinkStreamA.title);
+assert(
+  !isPressed(deepLinkPage.container, '[title="Select song 3"]'),
+  'reloading the deep-linked stream must not re-select the deep-linked performance over a later user pick',
+);
+assert(
+  isPressed(deepLinkPage.container, '[title="Select song 1"]'),
+  'a reload of a stream whose deep-linked performance was already applied falls back to the '
+    + 'ordinary default (the first row), the same as any other reload',
+);
+
+await deepLinkPage.unmount();
+
+// --- The same deep link, under `<StrictMode>` (the tree `src/main.tsx:8` renders in dev). React
+// double-invokes the mount effect; without a cancellation guard the first resolution consumes
+// `requestedPerformanceAppliedRef` and the second — which always resolves after it — resets the
+// deep-linked pick back to row 0, while `loadPerformances` (and so the performances endpoint) runs
+// twice instead of once.
+
+let strictPerformancesFetchCount = 0;
+stubDeepLinkFetch((pathname) => {
+  if (pathname === '/api/stamp/stats') return { total: 3, filled: 2, remaining: 1 } satisfies StampStats;
+  if (pathname === '/api/stamp/streams') {
+    return { data: [deepLinkStreamA, deepLinkStreamB], total: 2 } satisfies ListResponse<StreamWithPending>;
+  }
+  if (pathname === `/api/streams/${deepLinkStreamA.id}/performances`) {
+    strictPerformancesFetchCount += 1;
+    return {
+      data: [...deepLinkPerformances],
+      total: deepLinkPerformances.length,
+    } satisfies ListResponse<StampPerformance>;
+  }
+  return undefined;
+});
+
+const strictDeepLinkPage = await mountDeepLinkPage(
+  <MemoryRouter initialEntries={[`/stamp?stream=${deepLinkStreamA.id}&performance=perf-deep-3`]}>
+    <StampEditorPage user={deepLinkCurator} />
+  </MemoryRouter>,
+  { strict: true },
+);
+
+assert(
+  isPressed(strictDeepLinkPage.container, '[title="Select song 3"]'),
+  'under StrictMode, a ?performance deep link still selects the requested performance once its '
+    + "stream's performances load",
+);
+const strictFetchCount = strictPerformancesFetchCount;
+assert(
+  strictFetchCount === 1,
+  `under StrictMode, the performances endpoint is fetched exactly once (was ${strictFetchCount})`,
+);
+
+await strictDeepLinkPage.unmount();
+
+console.log(
+  "✓ StampEditor's deep-link mount chain is cancellable: StrictMode's double effect still "
+    + 'selects the requested performance from a single performances fetch',
+);
+
+// --- Without query params, nothing is auto-selected: the editor waits for a manual pick ---
+
+const noQueryPage = await mountDeepLinkPage(
+  <MemoryRouter initialEntries={['/stamp']}>
+    <StampEditorPage user={deepLinkCurator} />
+  </MemoryRouter>,
+);
+assert(
+  noQueryPage.container.innerHTML.includes('Select a stream to start stamping'),
+  'with no ?stream param, no stream is auto-selected and the empty-selection placeholder stays',
+);
+assert(
+  findButtonContaining(noQueryPage.container, deepLinkStreamA.title)?.getAttribute('aria-pressed') !== 'true'
+    && findButtonContaining(noQueryPage.container, deepLinkStreamB.title)?.getAttribute('aria-pressed') !== 'true',
+  'with no ?stream param, neither stream is pressed in the sidebar',
+);
+
+await noQueryPage.unmount();
+await deepLinkWin.happyDOM.close();
+
+console.log(
+  '✓ StampEditor selects a ?stream&performance deep link once from inside its loaders, never '
+    + 're-applies it on a later reload, and leaves selection alone with no query params',
+);
