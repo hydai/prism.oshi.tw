@@ -53,7 +53,6 @@ export default function VodExportRepair({ user }: { user: AuthUser }) {
   const params = useParams<{ entity: string; rowId: string }>();
   const [record, setRecord] = useState<VodExportRepairRecord | null>(null);
   const [error, setError] = useState<string | null>(null);
-  const [loading, setLoading] = useState(true);
   const entity = params.entity === 'performance'
     || params.entity === 'song'
     || params.entity === 'vod'
@@ -61,10 +60,14 @@ export default function VodExportRepair({ user }: { user: AuthUser }) {
     ? params.entity
     : null;
   const rowId = /^(?:[1-9][0-9]*)$/.test(params.rowId ?? '') ? Number(params.rowId) : null;
+  // Mirrors the effect's own guard below: a request that guard would reject never has
+  // anything to load, so `loading` starts false for it instead of flipping there a
+  // moment after mount.
+  const isValidRequest = user.role === 'curator' && entity !== null && rowId !== null && Number.isSafeInteger(rowId);
+  const [loading, setLoading] = useState(() => isValidRequest);
 
   useEffect(() => {
     if (user.role !== 'curator' || entity === null || rowId === null || !Number.isSafeInteger(rowId)) {
-      setLoading(false);
       return;
     }
     let active = true;
