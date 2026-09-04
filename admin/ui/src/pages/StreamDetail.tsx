@@ -1,12 +1,13 @@
 import { memo, useState, useEffect, useRef, useCallback, useMemo } from 'react';
 import type { Dispatch, RefObject, SetStateAction } from 'react';
 import { useParams, useNavigate, Link } from 'react-router-dom';
-import type { AuthUser, StreamDetail as StreamDetailType, StampPerformance, Status, Stream } from '../../../shared/types';
+import type { AuthUser, StampPerformance, Status, Stream } from '../../../shared/types';
 import { api } from '../api/client';
 import StatusBadge from '../components/StatusBadge';
 import { YouTubePlayer } from '../components/YouTubePlayer';
 import type { YouTubePlayerHandle } from '../components/YouTubePlayer';
 import { FetchLogPanel } from '../components/FetchLogPanel';
+import type { FetchLogEntry } from '../components/FetchLogPanel';
 import { FloatingPlaybackPill } from '../components/FloatingPlaybackPill';
 import { PlaybackTime } from '../components/PlaybackTime';
 import { Toast } from '../components/stamp/Toast';
@@ -14,12 +15,15 @@ import { InlineEdit } from '../components/stamp/InlineEdit';
 import { AddSongModal } from '../components/stamp/AddSongModal';
 import { PasteImportModal } from '../components/stamp/PasteImportModal';
 import { useToast } from '../hooks/useToast';
+import type { ShowToast } from '../hooks/useToast';
 import { useFetchLog } from '../hooks/useFetchLog';
+import type { AppendFetchLog } from '../hooks/useFetchLog';
 import { useEditorShortcuts } from '../hooks/useEditorShortcuts';
 import { useFetchAllDurations } from '../hooks/useFetchAllDurations';
 import { usePerformances } from '../hooks/usePerformances';
 import { usePlayerClock } from '../hooks/usePlayerClock';
 import { useSearchParamState } from '../hooks/useSearchParamState';
+import { useApiResource } from '../lib/apiResource';
 import { formatTimestamp } from '../lib/format-timestamp';
 
 // --- Inline Date Edit ---
@@ -61,82 +65,82 @@ type EditingField =
 /** The one variant PerformanceTable's rows ever read — see the memo boundary below. */
 type PerfEditingField = Extract<EditingField, { type: 'perf' }>;
 
-function useStreamDetailController(user: AuthUser) {
-  const { id: streamId } = useParams<{ id: string }>();
+/**
+ * What the shell at the bottom of this file owns and hands to the per-stream component below it:
+ * everything that has to outlive a move from one stream to the next. Everything else — the row
+ * selection, the modals, the field being edited, the stream's own detail — belongs to one stream
+ * and is born and buried with the keyed component that holds it.
+ */
+interface StreamPageProps {
+  user: AuthUser;
+  streamId: string;
+  prevStream: Stream | null;
+  nextStream: Stream | null;
+  showToast: ShowToast;
+  fetchLog: FetchLogEntry[];
+  appendFetchLog: AppendFetchLog;
+  clearFetchLog: () => void;
+}
+
+function useStreamDetailController({
+  user,
+  streamId,
+  prevStream,
+  nextStream,
+  showToast,
+  fetchLog,
+  appendFetchLog,
+  clearFetchLog,
+}: StreamPageProps) {
   // Deep-link target: the page opens on it and never writes it back.
   const [requestedPerformanceId] = useSearchParamState('performance', '');
   const navigate = useNavigate();
-  const [detail, setDetail] = useState<StreamDetailType | null>(null);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
   const [editingField, setEditingField] = useState<EditingField | null>(null);
   const [showPasteImport, setShowPasteImport] = useState(false);
+  const [showAddModal, setShowAddModal] = useState(false);
+  // The row the curator picked, once they have picked one; `null` until then. See `selectedIndex`.
+  const [userSelectedIndex, setUserSelectedIndex] = useState<number | null>(null);
   const playerRef = useRef<YouTubePlayerHandle>(null);
   const playerBoxRef = useRef<HTMLDivElement>(null);
   // The playback clock lives in an external store: only the pill and the readout hear its ticks.
   usePlayerClock(playerRef);
 
-  // --- New state for navigation & stamp features ---
-  const [allStreams, setAllStreams] = useState<Stream[]>([]);
-  const [selectedIndex, setSelectedIndex] = useState(-1);
-  const [showAddModal, setShowAddModal] = useState(false);
-
   const isCurator = user.role === 'curator';
 
-  const { toast, showToast } = useToast();
-  const { fetchLog, appendFetchLog, clearFetchLog } = useFetchLog();
+  // This stream's detail: fetched on mount, re-fetched by `reloadDetail()`, patched in place by
+  // `mutateDetail`. The component is keyed by the stream id, so `[streamId]` never moves under it.
+  const {
+    data: detail,
+    loading,
+    error,
+    reload: reloadDetail,
+    mutate: mutateDetail,
+  } = useApiResource(() => api.getStreamDetail(streamId), [streamId]);
 
-  // --- Fetch all streams for prev/next navigation ---
-  useEffect(() => {
-    api.listStreams().then(({ data }) => {
-      const sorted = [...data].sort((a, b) => b.date.localeCompare(a.date));
-      setAllStreams(sorted);
-    }).catch(() => {});
-  }, []);
-
-  // --- Derive prev/next streams ---
-  const { prevStream, nextStream } = useMemo(() => {
-    if (!streamId || allStreams.length === 0) return { prevStream: null, nextStream: null };
-    const idx = allStreams.findIndex(s => s.id === streamId);
-    if (idx < 0) return { prevStream: null, nextStream: null };
-    return {
-      prevStream: idx > 0 ? allStreams[idx - 1] : null,
-      nextStream: idx < allStreams.length - 1 ? allStreams[idx + 1] : null,
-    };
-  }, [streamId, allStreams]);
-
-  // --- Reset UI state on stream change ---
-  useEffect(() => {
-    setSelectedIndex(-1);
-    setShowAddModal(false);
-    setShowPasteImport(false);
-    setEditingField(null);
-    setError(null);
-  }, [streamId]);
-
-  const loadDetail = useCallback(async () => {
-    if (!streamId) return;
-    setLoading(true);
-    try {
-      const d = await api.getStreamDetail(streamId);
-      setDetail(d);
-      setSelectedIndex(prev => {
-        if (d.performances.length === 0) return -1;
-        if (requestedPerformanceId) {
-          const requestedIndex = d.performances.findIndex((performance) => performance.id === requestedPerformanceId);
-          if (requestedIndex >= 0) return requestedIndex;
-        }
-        if (prev < 0) return 0;
-        return Math.min(prev, d.performances.length - 1);
-      });
-    } catch (err: unknown) {
-      setError(err instanceof Error ? err.message : 'Failed to load stream');
-    } finally {
-      setLoading(false);
+  // --- The selected row, derived ---
+  //
+  // A freshly opened stream starts on the deep-linked row, or on its first row; from the moment the
+  // curator picks a row, their pick is the answer. Nothing writes the selection after a fetch: the
+  // rows and the pick together already say which row is selected, so a reload can no longer snap
+  // the selection back to the deep-linked row over a later choice.
+  const selectedIndex = useMemo(() => {
+    const performances = detail?.performances;
+    if (!performances || performances.length === 0) return -1;
+    // A pick that outlived the row it named (a delete, a re-import) is clamped, not lost.
+    if (userSelectedIndex !== null) return Math.max(0, Math.min(userSelectedIndex, performances.length - 1));
+    if (requestedPerformanceId) {
+      const requestedIndex = performances.findIndex((performance) => performance.id === requestedPerformanceId);
+      if (requestedIndex >= 0) return requestedIndex;
     }
-  }, [requestedPerformanceId, streamId]);
+    return 0;
+  }, [detail, requestedPerformanceId, userSelectedIndex]);
 
-  useEffect(() => { loadDetail(); }, [loadDetail]);
+  // The table and `usePerformances` drive the selection through a plain setState signature, but the
+  // state behind it holds only an explicit pick — so an updater is resolved against the index on
+  // screen right now (`selectNext`/`selectPrev` step from what the curator can see).
+  const setSelectedIndex = useCallback<Dispatch<SetStateAction<number>>>((action) => {
+    setUserSelectedIndex(typeof action === 'function' ? action(selectedIndex) : action);
+  }, [selectedIndex]);
 
   useEffect(() => {
     if (!detail || !requestedPerformanceId) return;
@@ -150,20 +154,25 @@ function useStreamDetailController(user: AuthUser) {
 
   // --- Optimistic update helpers ---
   const patchRow = useCallback((index: number, updates: Partial<StampPerformance>) => {
-    setDetail(prev => prev ? {
+    mutateDetail(prev => ({
       ...prev,
       performances: prev.performances.map((p, i) => i === index ? { ...p, ...updates } : p),
-    } : prev);
-  }, []);
+    }));
+  }, [mutateDetail]);
 
   const patchAllRows = useCallback((updates: Partial<StampPerformance>) => {
-    setDetail(prev => prev ? {
+    mutateDetail(prev => ({
       ...prev,
       performances: prev.performances.map(p => ({ ...p, ...updates })),
-    } : prev);
-  }, []);
+    }));
+  }, [mutateDetail]);
 
   const closeAddModal = useCallback(() => setShowAddModal(false), []);
+
+  // `usePerformances` awaits the reload it is handed — both editors report only once their rows are
+  // back. A `useApiResource` reload is a request, not a round trip: the fetch it schedules runs in
+  // an effect, so there is nothing left here to await.
+  const reload = useCallback(async () => { reloadDetail(); }, [reloadDetail]);
 
   const {
     markEndTimestamp,
@@ -186,13 +195,13 @@ function useStreamDetailController(user: AuthUser) {
     showToast,
     patchRow,
     patchAllRows,
-    reload: loadDetail,
+    reload,
     onSongCreated: closeAddModal,
   });
 
   // --- Status action ---
   const handleStreamStatus = useCallback(async (status: Status) => {
-    if (!streamId || !detail) return;
+    if (!detail) return;
     try {
       await api.updateStreamStatus(streamId, { status });
       // Approving a stream cascades to its songs/performances, matching the Streams
@@ -201,29 +210,28 @@ function useStreamDetailController(user: AuthUser) {
       // songs added after the stream was already approved.
       if (status === 'approved') {
         const result = await api.approveAllForStream(streamId);
-        await loadDetail();
+        reloadDetail();
         showToast(`Stream approved · ${result.songs} song(s), ${result.performances} performance(s)`);
       } else {
-        setDetail((prev) => prev ? { ...prev, status } : prev);
+        mutateDetail((prev) => ({ ...prev, status }));
         showToast(`Stream ${status}`);
       }
     } catch (err: unknown) {
       showToast(err instanceof Error ? err.message : 'Failed to update status', true);
     }
-  }, [streamId, detail, loadDetail, showToast]);
+  }, [streamId, detail, reloadDetail, mutateDetail, showToast]);
 
   // --- Stream metadata inline edit save ---
   const handleStreamSave = useCallback(async (field: 'title' | 'date', value: string) => {
-    if (!streamId) return;
     setEditingField(null);
     try {
       await api.updateStream(streamId, { [field]: value });
-      await loadDetail();
+      reloadDetail();
       showToast(`Updated stream ${field}`);
     } catch (err: unknown) {
       showToast(err instanceof Error ? err.message : 'Failed to update', true);
     }
-  }, [streamId, loadDetail, showToast]);
+  }, [streamId, reloadDetail, showToast]);
 
   // --- Inline edit save ---
   const handleSave = useCallback(async (perfId: string, field: 'title' | 'artist' | 'note', value: string) => {
@@ -235,67 +243,67 @@ function useStreamDetailController(user: AuthUser) {
         const body = field === 'title' ? { title: value } : { originalArtist: value };
         await api.updatePerformanceDetails(perfId, body);
       }
-      await loadDetail();
+      reloadDetail();
       showToast(`Updated ${field}`);
     } catch (err: unknown) {
       showToast(err instanceof Error ? err.message : 'Failed to update', true);
     }
-  }, [loadDetail, showToast]);
+  }, [reloadDetail, showToast]);
 
   // --- Delete performance ---
   const handleDelete = useCallback(async (perf: StampPerformance) => {
     if (!window.confirm(`Delete "${perf.title}"?`)) return;
     try {
       await api.deletePerformance(perf.id);
-      await loadDetail();
+      reloadDetail();
       showToast(`Deleted ${perf.title}`);
     } catch (err: unknown) {
       showToast(err instanceof Error ? err.message : 'Failed to delete', true);
     }
-  }, [loadDetail, showToast]);
+  }, [reloadDetail, showToast]);
 
   // --- Performance status ---
   const handlePerformanceStatus = useCallback(async (perfId: string, status: Status) => {
     try {
       await api.updatePerformanceStatus(perfId, status);
-      await loadDetail();
+      reloadDetail();
       showToast(`Performance ${status}`);
     } catch (err: unknown) {
       showToast(err instanceof Error ? err.message : 'Failed to update status', true);
     }
-  }, [loadDetail, showToast]);
+  }, [reloadDetail, showToast]);
 
   // --- Bulk approve all ---
   const handleApproveAll = useCallback(async () => {
-    if (!streamId || !detail) return;
+    if (!detail) return;
     const pendingCount = detail.performances.filter((p) => p.status !== 'approved').length;
     if (!window.confirm(`Approve all ${pendingCount} pending performances?`)) return;
     try {
       const result = await api.approveAllForStream(streamId);
-      await loadDetail();
+      reloadDetail();
       showToast(`Approved ${result.songs} songs, ${result.performances} performances`);
     } catch (err: unknown) {
       showToast(err instanceof Error ? err.message : 'Failed to approve all', true);
     }
-  }, [streamId, detail, loadDetail, showToast]);
+  }, [streamId, detail, reloadDetail, showToast]);
 
   // --- Bulk unapprove all ---
   const handleUnapproveAll = useCallback(async () => {
-    if (!streamId || !detail) return;
+    if (!detail) return;
     const approvedCount = detail.performances.filter((p) => p.status === 'approved').length;
     if (!window.confirm(`Unapprove all ${approvedCount} approved performances?`)) return;
     try {
       const result = await api.unapproveAllForStream(streamId);
-      await loadDetail();
+      reloadDetail();
       showToast(`Unapproved ${result.songs} songs, ${result.performances} performances`);
     } catch (err: unknown) {
       showToast(err instanceof Error ? err.message : 'Failed to unapprove all', true);
     }
-  }, [streamId, detail, loadDetail, showToast]);
+  }, [streamId, detail, reloadDetail, showToast]);
 
   // --- Hard-delete stream (blocked server-side for approved streams) ---
   const handleDeleteStream = useCallback(async () => {
-    if (!streamId || !detail) return;
+    if (!detail) return;
     const perfCount = detail.performances.length;
     if (!window.confirm(`Delete stream "${detail.title}" with ${perfCount} performances and their orphaned songs? This cannot be undone.`)) return;
     try {
@@ -310,9 +318,9 @@ function useStreamDetailController(user: AuthUser) {
   // --- Paste import done ---
   const handlePasteImportDone = useCallback(async (result: { created: number; replaced: boolean }) => {
     setShowPasteImport(false);
-    await loadDetail();
+    reloadDetail();
     showToast(`Imported ${result.created} songs${result.replaced ? ' (replaced)' : ''}`);
-  }, [loadDetail, showToast]);
+  }, [reloadDetail, showToast]);
 
   // --- Copy full VOD URL ---
   const copyVodUrl = useCallback(() => {
@@ -346,9 +354,7 @@ function useStreamDetailController(user: AuthUser) {
       fetchDuration,
       fetchAllDurations,
       exportSongList,
-      openPasteImport: () => {
-        if (streamId) setShowPasteImport(true);
-      },
+      openPasteImport: () => setShowPasteImport(true),
     },
     { playerRef, disabled: showAddModal || showPasteImport },
   );
@@ -361,7 +367,6 @@ function useStreamDetailController(user: AuthUser) {
     detail,
     loading,
     error,
-    toast,
     editingField,
     setEditingField,
     showPasteImport,
@@ -403,7 +408,6 @@ export function StreamDetailView({ controller }: { controller: StreamDetailContr
     detail,
     loading,
     error,
-    toast,
     editingField,
     setEditingField,
     showPasteImport,
@@ -655,7 +659,7 @@ export function StreamDetailView({ controller }: { controller: StreamDetailContr
       )}
 
       {/* Paste Import Modal */}
-      {showPasteImport && streamId && (
+      {showPasteImport && (
         <PasteImportModal
           streamId={streamId}
           hasExisting={detail.performances.length > 0}
@@ -665,8 +669,6 @@ export function StreamDetailView({ controller }: { controller: StreamDetailContr
           onCancel={() => setShowPasteImport(false)}
         />
       )}
-
-      <Toast toast={toast} />
     </div>
   );
 }
@@ -818,7 +820,65 @@ const PerformanceTable = memo(function PerformanceTable({
   );
 });
 
-export default function StreamDetail({ user }: { user: AuthUser }) {
-  const controller = useStreamDetailController(user);
+/**
+ * One stream's page. Keyed by the stream id below, so moving to the next stream unmounts this and
+ * mounts a fresh one: the selection, the modals, the field being edited and the stream's own
+ * detail all start over because they never existed for the new stream, with no effect reaching
+ * back to reset them one by one.
+ */
+function StreamDetailForStream(props: StreamPageProps) {
+  const controller = useStreamDetailController(props);
   return <StreamDetailView controller={controller} />;
+}
+
+export default function StreamDetail({ user }: { user: AuthUser }) {
+  const { id: streamId } = useParams<{ id: string }>();
+  // Everything below is what outlives a move between streams: the stream list the prev/next links
+  // read, the toast bubble, and the iTunes fetch log.
+  const [allStreams, setAllStreams] = useState<Stream[]>([]);
+  const { toast, showToast } = useToast();
+  const { fetchLog, appendFetchLog, clearFetchLog } = useFetchLog();
+
+  // --- Fetch all streams for prev/next navigation ---
+  useEffect(() => {
+    api.listStreams().then(({ data }) => {
+      const sorted = [...data].sort((a, b) => b.date.localeCompare(a.date));
+      setAllStreams(sorted);
+    }).catch(() => {});
+  }, []);
+
+  // --- Derive prev/next streams ---
+  const { prevStream, nextStream } = useMemo(() => {
+    if (!streamId || allStreams.length === 0) return { prevStream: null, nextStream: null };
+    const idx = allStreams.findIndex(s => s.id === streamId);
+    if (idx < 0) return { prevStream: null, nextStream: null };
+    return {
+      prevStream: allStreams[idx - 1] ?? null,
+      nextStream: allStreams[idx + 1] ?? null,
+    };
+  }, [streamId, allStreams]);
+
+  return (
+    <>
+      {/* `/streams/:id` always carries an id; this is what narrows it for the page below. */}
+      {streamId === undefined ? (
+        <div className="text-red-600">Stream not found</div>
+      ) : (
+        <StreamDetailForStream
+          key={streamId}
+          user={user}
+          streamId={streamId}
+          prevStream={prevStream}
+          nextStream={nextStream}
+          showToast={showToast}
+          fetchLog={fetchLog}
+          appendFetchLog={appendFetchLog}
+          clearFetchLog={clearFetchLog}
+        />
+      )}
+      {/* Outside the keyed boundary: a toast raised on one stream stays up, and keeps its own 2s
+          clock, while the next stream loads. */}
+      <Toast toast={toast} />
+    </>
+  );
 }
