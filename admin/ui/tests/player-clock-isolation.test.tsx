@@ -149,7 +149,6 @@ const detailController: StreamDetailController = {
   detail,
   loading: false,
   error: null,
-  toast: null,
   editingField: null,
   setEditingField: noop,
   showPasteImport: false,

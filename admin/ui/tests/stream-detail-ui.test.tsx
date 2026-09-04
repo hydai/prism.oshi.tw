@@ -1,8 +1,13 @@
 import * as React from 'react';
+import { act } from 'react';
+import { createRoot } from 'react-dom/client';
 import { renderToStaticMarkup } from 'react-dom/server';
-import { MemoryRouter } from 'react-router-dom';
-import type { Stream, StreamDetail } from '../../shared/types';
+import { Window } from 'happy-dom';
+import type { HTMLElement as DomElement } from 'happy-dom';
+import { MemoryRouter, Route, Routes } from 'react-router-dom';
+import type { AuthUser, ListResponse, StampPerformance, Stream, StreamDetail } from '../../shared/types';
 import { StreamDetailView } from '../src/pages/StreamDetail';
+import StreamDetailPage from '../src/pages/StreamDetail';
 import type { StreamDetailController } from '../src/pages/StreamDetail';
 import type { YouTubePlayerHandle } from '../src/components/YouTubePlayer';
 import { InlineEdit } from '../src/components/stamp/InlineEdit';
@@ -72,7 +77,6 @@ const controller: StreamDetailController = {
   detail,
   loading: false,
   error: null,
-  toast: null,
   editingField: null,
   setEditingField: noop,
   showPasteImport: false,
@@ -283,3 +287,234 @@ assert(artistEdits.length === 1, 'the edited performance artist row renders one 
 assert(artistEdits[0]?.allowEmpty === true, 'artist keeps its empty-save opt-in');
 
 console.log('✓ StreamDetail retains navigation, controls, rows, access boundaries, and its shared stamp components');
+
+// --- Moving from one stream to the next ---
+//
+// Everything above renders the view against a hand-built controller. What follows mounts the whole
+// page — the shell, the per-stream component it keys by the stream id, and the real controller hook
+// — against fake fetches in a live DOM, the way `tests/song-table-memo.test.tsx` and
+// `tests/stamp-editor-ui.test.tsx` mount these editors. That is the only way to test what a
+// navigation does: which state dies with the stream it belonged to, and which outlives it.
+
+const navWin = new Window({
+  url: 'http://localhost/',
+  // The page mounts a YouTube player, which appends the IFrame API script tag; nothing here needs
+  // that script, and fetching it would reach the network.
+  settings: { disableJavaScriptFileLoading: true, disableCSSFileLoading: true },
+});
+
+for (const [name, value] of Object.entries({
+  window: navWin,
+  document: navWin.document,
+  navigator: navWin.navigator,
+  HTMLElement: navWin.HTMLElement,
+  Element: navWin.Element,
+  Node: navWin.Node,
+  Event: navWin.Event,
+  MouseEvent: navWin.MouseEvent,
+  IS_REACT_ACT_ENVIRONMENT: true,
+})) {
+  // Node's own `navigator` global is getter-only, so plain assignment is not enough.
+  Object.defineProperty(globalThis, name, { value, configurable: true, writable: true });
+}
+
+const curator: AuthUser = { email: 'curator@example.com', role: 'curator' };
+
+function navStream(id: string, title: string, date: string): Stream {
+  return {
+    id,
+    streamerId: 'mizuki',
+    title,
+    date,
+    videoId: `${id}-video`,
+    youtubeUrl: `https://www.youtube.com/watch?v=${id}-video`,
+    credit: {},
+    status: 'pending',
+    submittedBy: null,
+    reviewedBy: null,
+    createdAt: '2026-08-20T00:00:00.000Z',
+  };
+}
+
+function navPerformance(id: string, title: string, timestamp: number): StampPerformance {
+  return {
+    id,
+    songId: `${id}-song`,
+    title,
+    originalArtist: 'Nav Artist',
+    timestamp,
+    endTimestamp: null,
+    note: '',
+    status: 'pending',
+  };
+}
+
+const streamAlpha = navStream('stream-nav-a', 'Nav Stream Alpha', '2026-08-20');
+const streamBeta = navStream('stream-nav-b', 'Nav Stream Beta', '2026-08-19');
+
+const alphaRows = [
+  navPerformance('perf-nav-a1', 'Alpha Song One', 10),
+  navPerformance('perf-nav-a2', 'Alpha Song Two', 110),
+  navPerformance('perf-nav-a3', 'Alpha Song Three', 210),
+];
+const betaRows = [
+  navPerformance('perf-nav-b1', 'Beta Song One', 20),
+  navPerformance('perf-nav-b2', 'Beta Song Two', 220),
+];
+
+const detailAlpha: StreamDetail = { ...streamAlpha, performances: alphaRows };
+const detailBeta: StreamDetail = { ...streamBeta, performances: betaRows };
+
+/** Every request the page makes, in order — the proof of what a navigation refetches. */
+const navRequests: string[] = [];
+
+function countRequests(pathname: string): number {
+  return navRequests.filter((seen) => seen === pathname).length;
+}
+
+// Beta's detail is held until the test releases it, which puts the page deterministically in the
+// window this refactor is about: the next stream requested, nothing of it on screen yet.
+let releaseBetaDetail = (): void => {};
+const betaDetailHeld = new Promise<void>((resolve) => { releaseBetaDetail = () => resolve(); });
+
+const navFetch: typeof fetch = async (input) => {
+  const { pathname } = new URL(String(input), 'http://localhost/');
+  navRequests.push(pathname);
+  if (pathname === `/api/streams/${streamBeta.id}/detail`) await betaDetailHeld;
+  const payload = ((): unknown => {
+    // Newest first, as the real list endpoint is: Alpha has no previous stream, Beta follows it.
+    if (pathname === '/api/streams') return { data: [streamAlpha, streamBeta], total: 2 } satisfies ListResponse<Stream>;
+    // A fresh array each load, as the real API is: the row ids and their order persist.
+    if (pathname === `/api/streams/${streamAlpha.id}/detail`) return { ...detailAlpha, performances: [...alphaRows] };
+    if (pathname === `/api/streams/${streamBeta.id}/detail`) return { ...detailBeta, performances: [...betaRows] };
+    if (pathname === `/api/streams/${streamAlpha.id}/status`) return { ...streamAlpha, status: 'excluded' };
+    if (pathname === '/api/performances/perf-nav-a2/status') return { ok: true };
+    return undefined;
+  })();
+  if (payload === undefined) throw new Error(`unstubbed request: ${pathname}`);
+  return { ok: true, status: 200, json: () => Promise.resolve(payload) } as unknown as Response;
+};
+Object.defineProperty(globalThis, 'fetch', { value: navFetch, configurable: true, writable: true });
+
+/** Lets React finish the load → render chain the page runs on mount and after every write. */
+async function settle(): Promise<void> {
+  for (let i = 0; i < 8; i += 1) {
+    await act(async () => {
+      await Promise.resolve();
+    });
+  }
+}
+
+async function clickNode(node: { click: () => void } | null | undefined, what: string): Promise<void> {
+  assert(node !== null && node !== undefined, `the page renders ${what}`);
+  await act(async () => {
+    node.click();
+  });
+  await settle();
+}
+
+async function clickSelector(container: DomElement, selector: string, what: string): Promise<void> {
+  await clickNode(container.querySelector<DomElement>(selector), what);
+}
+
+async function clickButtonNamed(container: DomElement, label: string): Promise<void> {
+  const button = [...container.querySelectorAll<DomElement>('button')].find(
+    (candidate) => candidate.textContent.trim() === label,
+  );
+  await clickNode(button, `a ${label} button`);
+}
+
+/** The selected row is the one carrying the highlight the table paints on it. */
+function rowIsSelected(container: DomElement, performanceId: string): boolean {
+  return container
+    .querySelector<DomElement>(`#performance-row-${performanceId}`)
+    ?.getAttribute('class')
+    ?.includes('bg-blue-50') === true;
+}
+
+const navContainer = navWin.document.createElement('div');
+navWin.document.body.appendChild(navContainer);
+const navRoot = createRoot(navContainer as unknown as HTMLElement);
+await act(async () => {
+  navRoot.render(
+    // `?performance=` is the page's deep link: it opens on that row of the stream in the path.
+    <MemoryRouter initialEntries={[`/streams/${streamAlpha.id}?performance=perf-nav-a3`]}>
+      <Routes>
+        <Route path="/streams/:id" element={<StreamDetailPage user={curator} />} />
+      </Routes>
+    </MemoryRouter>,
+  );
+});
+await settle();
+
+assert(navContainer.innerHTML.includes('Nav Stream Alpha'), 'the page loads the stream in the path');
+assert(rowIsSelected(navContainer, 'perf-nav-a3'), 'a ?performance deep link selects the requested row once its stream loads');
+
+// The pick the curator makes outranks the deep link from then on, reload included. The post-fetch
+// write this replaced re-applied `?performance` on *every* load of the stream, so any reload —
+// approving a row, saving a title, a paste import — snapped the selection back off their choice.
+await clickSelector(navContainer, '#performance-row-perf-nav-a2', 'the second performance row');
+assert(rowIsSelected(navContainer, 'perf-nav-a2'), 'clicking a row selects it');
+
+await clickSelector(navContainer, '#performance-row-perf-nav-a2 [title="Approve"]', 'the row approve button');
+const alphaDetailFetches = countRequests(`/api/streams/${streamAlpha.id}/detail`);
+assert(alphaDetailFetches === 2, `approving a row reloads the stream detail (saw ${alphaDetailFetches} loads)`);
+assert(
+  rowIsSelected(navContainer, 'perf-nav-a2') && !rowIsSelected(navContainer, 'perf-nav-a3'),
+  'a reload keeps the row the curator picked instead of snapping back to the deep-linked row',
+);
+
+// State raised on Alpha: a toast, and an open modal. One belongs to the page, the other to Alpha.
+await clickButtonNamed(navContainer, 'Exclude');
+assert(navContainer.innerHTML.includes('Stream excluded'), 'a stream status change raises its toast');
+await clickButtonNamed(navContainer, '+ Add Song');
+assert(navContainer.innerHTML.includes('Song title *'), 'the add-song modal opens on the stream being viewed');
+
+// --- Navigate to the next stream, through the link the stream list feeds ---
+
+// Beta's detail is still held here, so this is the moment the page has left one stream and has
+// nothing of the next: the page's own toast has to survive it. The state that resets per stream
+// used to be reset by an effect on a page that never unmounted, which meant the page went to its
+// loading branch — taking the toast off screen with it, and restarting its clock on the way back.
+const nextLink = navContainer.querySelector<DomElement>(`a[href="/streams/${streamBeta.id}"]`);
+assert(nextLink !== null, 'the page renders the next-stream link');
+await act(async () => {
+  nextLink.click();
+});
+assert(navContainer.innerHTML.includes('Loading...'), 'the next stream is still loading while its detail is held');
+assert(
+  navContainer.innerHTML.includes('Stream excluded'),
+  'a toast raised on one stream stays up while the next stream loads',
+);
+
+releaseBetaDetail();
+await settle();
+
+assert(navContainer.innerHTML.includes('Nav Stream Beta'), 'the next stream renders after the navigation');
+const betaDetailFetches = countRequests(`/api/streams/${streamBeta.id}/detail`);
+assert(betaDetailFetches === 1, `the next stream is fetched on arrival (saw ${betaDetailFetches} loads)`);
+
+// Born with the stream, so buried with it: the modal, and the selection.
+assert(!navContainer.innerHTML.includes('Song title *'), 'the add-song modal does not follow the curator to the next stream');
+assert(
+  rowIsSelected(navContainer, 'perf-nav-b1') && !rowIsSelected(navContainer, 'perf-nav-b2'),
+  'the next stream starts on its own first row, not on the index picked in the last one',
+);
+assert(!navContainer.innerHTML.includes('Alpha Song'), 'no row of the previous stream is left on screen');
+
+// Older than either stream, so it outlives both: the toast, and the stream list behind prev/next.
+assert(navContainer.innerHTML.includes('Stream excluded'), 'the toast is still up once the next stream has rendered');
+const streamListFetches = countRequests('/api/streams');
+assert(streamListFetches === 1, `the stream list is fetched once for the page, not once per stream (saw ${streamListFetches})`);
+assert(
+  navContainer.querySelector(`a[href="/streams/${streamAlpha.id}"]`) !== null,
+  'prev/next navigation still works after the move, from the stream list fetched on the first stream',
+);
+
+await act(async () => {
+  navRoot.unmount();
+});
+navContainer.remove();
+await navWin.happyDOM.close();
+
+console.log('✓ StreamDetail starts each stream fresh, keeps the toast and the stream list across the move, and lets a pick outrank the deep link');
