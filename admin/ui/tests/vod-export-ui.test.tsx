@@ -1,3 +1,6 @@
+import { Window } from 'happy-dom';
+import { act, createRef } from 'react';
+import { createRoot } from 'react-dom/client';
 import { renderToStaticMarkup } from 'react-dom/server';
 import { MemoryRouter } from 'react-router-dom';
 import type { AuthUser } from '../../shared/types';
@@ -40,6 +43,7 @@ async function main(): Promise<void> {
   installLocalStorage();
 
   const {
+    CandidatePanel,
     CapacityPanel,
     CurrentPublicationPanel,
     default: VodExport,
@@ -385,7 +389,136 @@ async function main(): Promise<void> {
     'stable-identical confirmation does not claim the public manifest will change',
   );
 
+  // F9: the expired badge must derive from the page's ticking `now` state, not a fresh
+  // `Date.now()` read taken during the card's render. A candidate that expires in 2099 makes
+  // the real wall-clock reading (whatever "now" happens to be when this suite runs) always
+  // read as not-yet-expired, so only an injected `now` past that deadline can flip the badge.
+  // This is the natural RED for the pre-fix component: it read `Date.now()` directly and
+  // ignored its `now` prop entirely, so it showed "Ready" on both sides of the assertion below.
+  const distantCandidate: VodExportCandidate = { ...candidate, expiresAt: '2099-01-01T00:00:00.000Z' };
+  const badgePublishButtonRef = createRef<HTMLButtonElement>();
+  const beforeDeadlineHtml = renderToStaticMarkup(
+    <CandidatePanel
+      candidate={distantCandidate}
+      localState="ready"
+      canPublish
+      disabledReason={null}
+      downloading={false}
+      checking={false}
+      onDownload={() => undefined}
+      onPublish={() => undefined}
+      onCopied={() => undefined}
+      publishButtonRef={badgePublishButtonRef}
+      now={Date.parse('2098-01-01T00:00:00.000Z')}
+    />,
+  );
+  assert(beforeDeadlineHtml.includes('Ready'), 'a candidate reads as ready while the injected clock sits before its deadline');
+  assert(!beforeDeadlineHtml.includes('Expired'), 'a candidate not yet expired by the injected clock never shows the expired badge');
+
+  const afterDeadlineHtml = renderToStaticMarkup(
+    <CandidatePanel
+      candidate={distantCandidate}
+      localState="ready"
+      canPublish
+      disabledReason={null}
+      downloading={false}
+      checking={false}
+      onDownload={() => undefined}
+      onPublish={() => undefined}
+      onCopied={() => undefined}
+      publishButtonRef={badgePublishButtonRef}
+      now={Date.parse('2099-06-01T00:00:00.000Z')}
+    />,
+  );
+  assert(
+    afterDeadlineHtml.includes('Expired'),
+    'the expired badge follows the injected clock once it passes the deadline, even though the real clock is nowhere near it',
+  );
+
   console.log('✓ VOD Export UI enforces curator visibility and renders guarded publication states');
+
+  // F10: PublishConfirmationDialog must resolve its focus-return target from the ref's
+  // `.current` inside its own effect/close handler, not from a value read during the parent's
+  // render. A live DOM is required here because static markup cannot observe focus.
+  const focusWin = new Window({
+    url: 'http://localhost/',
+    settings: { disableJavaScriptFileLoading: true, disableCSSFileLoading: true },
+  });
+  for (const [name, value] of Object.entries({
+    window: focusWin,
+    document: focusWin.document,
+    navigator: focusWin.navigator,
+    HTMLElement: focusWin.HTMLElement,
+    Element: focusWin.Element,
+    Node: focusWin.Node,
+    Event: focusWin.Event,
+    IS_REACT_ACT_ENVIRONMENT: true,
+  })) {
+    // Node's own `navigator` global is getter-only, so plain assignment is not enough.
+    Object.defineProperty(globalThis, name, { value, configurable: true, writable: true });
+  }
+
+  const decoyButton = focusWin.document.createElement('button');
+  focusWin.document.body.appendChild(decoyButton);
+  decoyButton.focus();
+  const activeElementBeforeOpen = focusWin.document.activeElement;
+  assert(activeElementBeforeOpen === decoyButton, 'a decoy element holds focus before the dialog is exercised');
+
+  const dialogContainer = focusWin.document.createElement('div');
+  focusWin.document.body.appendChild(dialogContainer);
+  const dialogRoot = createRoot(dialogContainer as unknown as HTMLElement);
+  const returnFocusRef = createRef<HTMLButtonElement>();
+
+  await act(async () => {
+    dialogRoot.render(
+      <>
+        <button ref={returnFocusRef} type="button">Publish</button>
+        <PublishConfirmationDialog
+          candidate={candidate}
+          warningCount={1}
+          publishing={false}
+          returnFocusElement={returnFocusRef}
+          onCancel={() => undefined}
+          onConfirm={() => undefined}
+        />
+      </>,
+    );
+  });
+
+  assert(returnFocusRef.current !== null, 'the harness Publish button mounts with its ref attached');
+  // `returnFocusRef` is typed against the ambient DOM lib (as `PublishConfirmationDialog`'s own
+  // prop type is), while `focusWin.document.activeElement` is typed against happy-dom's own
+  // parallel element hierarchy; TS considers the two object types structurally disjoint and
+  // rejects a direct `===`/`!==` between them (TS2367) even though both are the same node at
+  // runtime. The `unknown` cast opts back into a plain reference-identity check.
+  const activeElementAfterOpen = focusWin.document.activeElement as unknown;
+  assert(
+    activeElementAfterOpen !== returnFocusRef.current,
+    'opening the dialog does not itself move focus to the return target',
+  );
+
+  const cancelButton = [...dialogContainer.querySelectorAll('button')].find(
+    (element) => element.textContent.trim() === 'Cancel',
+  );
+  assert(cancelButton !== undefined, 'the dialog renders a Cancel button');
+  await act(async () => {
+    cancelButton.click();
+  });
+
+  const activeElementAfterClose = focusWin.document.activeElement as unknown;
+  assert(
+    activeElementAfterClose === returnFocusRef.current,
+    'closing the dialog focuses the ref target, resolved inside the effect/close handler rather than during the parent render',
+  );
+
+  await act(async () => {
+    dialogRoot.unmount();
+  });
+  dialogContainer.remove();
+  decoyButton.remove();
+  await focusWin.happyDOM.close();
+
+  console.log('✓ PublishConfirmationDialog resolves its focus-return target inside an effect, not during render');
 }
 
 await main();
