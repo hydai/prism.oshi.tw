@@ -1,7 +1,10 @@
 import { readFileSync } from 'node:fs';
+import { Window } from 'happy-dom';
+import { act, useEffect } from 'react';
+import { createRoot } from 'react-dom/client';
 import { renderToStaticMarkup } from 'react-dom/server';
 import type { CrystalTicket, NovaSubmission } from '../../shared/types';
-import { createRowDrafts, type RowDrafts } from '../src/hooks/useRowDrafts';
+import { createRowDrafts, useRowDrafts, type RowDrafts } from '../src/hooks/useRowDrafts';
 import {
   createSubmissionRowState,
   submissionRowReducer,
@@ -241,3 +244,93 @@ assert(
 );
 
 console.log('✓ row drafts live in the row that owns them, and outlive its mount');
+
+// --- The page's store: one per mount, the same one across re-renders, gone with the page ---
+//
+// The rows above take the store as a prop; only mounting the page shows where it comes
+// from. It lives in lazy state whose setter is never called, so a keystroke can neither
+// swap it nor re-render the page around the row.
+
+const win = new Window({
+  url: 'http://localhost/',
+  settings: { disableJavaScriptFileLoading: true, disableCSSFileLoading: true },
+});
+
+for (const [name, value] of Object.entries({
+  window: win,
+  document: win.document,
+  navigator: win.navigator,
+  HTMLElement: win.HTMLElement,
+  Element: win.Element,
+  Node: win.Node,
+  Event: win.Event,
+  IS_REACT_ACT_ENVIRONMENT: true,
+})) {
+  // Node's own `navigator` global is getter-only, so plain assignment is not enough.
+  Object.defineProperty(globalThis, name, { value, configurable: true, writable: true });
+}
+
+/** One entry per commit, recorded from an effect so the render body stays pure. */
+const stores: RowDrafts[] = [];
+
+function DraftsProbe({ tick }: { tick: number }) {
+  const drafts = useRowDrafts();
+  useEffect(() => {
+    stores.push(drafts);
+  });
+  return <output>{tick}</output>;
+}
+
+function storeAt(index: number): RowDrafts {
+  const store = stores[index];
+  assert(store !== undefined, `the page committed at least ${index + 1} time(s)`);
+  return store;
+}
+
+const container = win.document.createElement('div');
+win.document.body.appendChild(container);
+const page = createRoot(container as unknown as HTMLElement);
+
+await act(async () => {
+  page.render(<DraftsProbe tick={1} />);
+});
+// Read into a local before asserting: `assert` narrows what it is handed, and narrowing
+// `stores.length` to `1` would make the next count comparison a type error.
+const commitsOnMount = stores.length;
+assert(commitsOnMount === 1, 'mounting the page builds its draft store');
+const mounted = storeAt(0);
+mounted.write('sub-1', 'Half-typed note');
+
+// A re-render — a filter change, a toast, any parent state — must not swap the store out.
+await act(async () => {
+  page.render(<DraftsProbe tick={2} />);
+});
+const commitsAfterRerender = stores.length;
+assert(commitsAfterRerender === 2, 'the page re-rendered');
+assert(storeAt(1) === mounted, 'a re-render keeps the very same store');
+assert(mounted.read('sub-1') === 'Half-typed note', 'the draft survives the re-render');
+
+// Leaving the page and coming back is a new page: half-typed notes do not follow it.
+await act(async () => {
+  page.unmount();
+});
+container.remove();
+
+const revisitedContainer = win.document.createElement('div');
+win.document.body.appendChild(revisitedContainer);
+const revisited = createRoot(revisitedContainer as unknown as HTMLElement);
+
+await act(async () => {
+  revisited.render(<DraftsProbe tick={1} />);
+});
+const remounted = storeAt(2);
+assert(remounted !== mounted, 'a remounted page starts with its own store');
+assert(remounted.read('sub-1') === '', "the closed page's drafts do not come back with it");
+
+await act(async () => {
+  revisited.unmount();
+});
+revisitedContainer.remove();
+await win.happyDOM.close();
+
+console.log('✓ one draft store per page mount, the same one across its re-renders');
