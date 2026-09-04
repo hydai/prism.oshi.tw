@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useState } from 'react';
 
 export interface ToastState {
   message: string;
@@ -8,18 +8,24 @@ export interface ToastState {
 
 /** Transient status line for the stamping pages; `key` re-triggers it for a repeated message. */
 export function Toast({ toast }: { toast: ToastState | null }) {
-  const [visible, setVisible] = useState(false);
-  const timerRef = useRef<ReturnType<typeof setTimeout>>(undefined);
+  if (!toast) return null;
+  return <ToastBubble key={toast.key} toast={toast} />;
+}
+
+/**
+ * One toast's whole lifetime: visible from its first frame, and hidden 2s later. Keyed by the
+ * outer `Toast` on `toast.key`, so a new toast unmounts this instance outright — the cleanup
+ * below clears its timer, and the fresh instance that replaces it starts its own.
+ */
+function ToastBubble({ toast }: { toast: ToastState }) {
+  const [visible, setVisible] = useState(true);
 
   useEffect(() => {
-    if (!toast) return;
-    setVisible(true);
-    clearTimeout(timerRef.current);
-    timerRef.current = setTimeout(() => setVisible(false), 2000);
-    return () => clearTimeout(timerRef.current);
-  }, [toast]);
+    const timer = setTimeout(() => setVisible(false), 2000);
+    return () => clearTimeout(timer);
+  }, []);
 
-  if (!toast || !visible) return null;
+  if (!visible) return null;
 
   return (
     <div
