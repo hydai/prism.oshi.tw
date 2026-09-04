@@ -14,9 +14,10 @@ export default defineConfig([
       js.configs.recommended,
       tseslint.configs.recommended,
       react.configs.flat.recommended,
-      // `recommended` is the hooks ruleset (rules-of-hooks + exhaustive-deps) and understands
-      // `useEffectEvent`; `recommended-latest` is the React Compiler suite, a separate adoption.
-      reactHooks.configs.recommended,
+      // `recommended-latest` is the React Compiler rule set (rules-of-hooks + exhaustive-deps
+      // plus set-state-in-effect, refs, purity, etc.). It's on; a new finding gets fixed at
+      // its root cause, not suppressed.
+      reactHooks.configs.flat['recommended-latest'],
     ],
     languageOptions: {
       ecmaVersion: 2022,
