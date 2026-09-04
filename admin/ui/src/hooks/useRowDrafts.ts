@@ -1,4 +1,4 @@
-import { useRef } from 'react';
+import { useState } from 'react';
 
 /**
  * The text a curator is part-way through typing into one row — a rejection note,
@@ -36,9 +36,13 @@ export function createRowDrafts(): RowDrafts {
   };
 }
 
-/** A ref, not state: writing a draft must never re-render the page around the row. */
+/**
+ * The page's store, mutated in place and never replaced: writing a draft must never
+ * re-render the page around the row. A lazy state initializer builds it once per
+ * mount — the identity is stable for the component's life and the setter is never
+ * called, so no write to a draft can schedule a render.
+ */
 export function useRowDrafts(): RowDrafts {
-  const drafts = useRef<RowDrafts | null>(null);
-  drafts.current ??= createRowDrafts();
-  return drafts.current;
+  const [drafts] = useState(createRowDrafts);
+  return drafts;
 }
