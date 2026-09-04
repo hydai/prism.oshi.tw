@@ -1,8 +1,9 @@
-import { useEffect, useState, type FormEvent } from 'react';
-import type { GlobalWorkStats, GlobalWorkSummary } from '../../../shared/types';
+import { useState, type FormEvent } from 'react';
+import type { GlobalWorkStats } from '../../../shared/types';
 import { api } from '../api/client';
 import { Pagination } from '../components/Pagination';
 import { SortHeader, type SortDirection } from '../components/SortHeader';
+import { useApiResource } from '../lib/apiResource';
 
 type SortKey =
   | 'title'
@@ -22,49 +23,28 @@ const EMPTY_STATS: GlobalWorkStats = {
 };
 
 export default function GlobalWorks() {
-  const [works, setWorks] = useState<GlobalWorkSummary[]>([]);
-  const [stats, setStats] = useState<GlobalWorkStats>(EMPTY_STATS);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
   const [search, setSearch] = useState('');
   const [submittedSearch, setSubmittedSearch] = useState('');
   const [sharedOnly, setSharedOnly] = useState(false);
   const [sortKey, setSortKey] = useState<SortKey>('performanceCount');
   const [sortDir, setSortDir] = useState<SortDirection>('desc');
   const [page, setPage] = useState(1);
-  const [total, setTotal] = useState(0);
-  const [totalPages, setTotalPages] = useState(0);
 
-  useEffect(() => {
-    let active = true;
-    setLoading(true);
-    setError(null);
-    api.listGlobalWorks({
+  const { data, loading, error } = useApiResource(
+    () => api.listGlobalWorks({
       search: submittedSearch || undefined,
       sharedOnly,
       page,
       pageSize: PAGE_SIZE,
       sortBy: sortKey,
       sortDir,
-    })
-      .then((response) => {
-        if (!active) return;
-        setWorks(response.data);
-        setStats(response.stats);
-        setTotal(response.total);
-        setTotalPages(response.totalPages);
-      })
-      .catch((err: unknown) => {
-        if (active) setError(err instanceof Error ? err.message : 'Failed to load global library');
-      })
-      .finally(() => {
-        if (active) setLoading(false);
-      });
-
-    return () => {
-      active = false;
-    };
-  }, [submittedSearch, sharedOnly, page, sortKey, sortDir]);
+    }),
+    [submittedSearch, sharedOnly, page, sortKey, sortDir],
+  );
+  const works = data?.data ?? [];
+  const stats = data?.stats ?? EMPTY_STATS;
+  const total = data?.total ?? 0;
+  const totalPages = data?.totalPages ?? 0;
 
   const submitSearch = (event: FormEvent) => {
     event.preventDefault();
