@@ -53,8 +53,39 @@ function useStampEditorController(user: AuthUser) {
   const { toast, showToast } = useToast();
   const { fetchLog, appendFetchLog, clearFetchLog } = useFetchLog();
 
+  // --- Load performances when stream changes ---
+  // Consumed the first time the requested stream's performances load, so a later reload of that
+  // stream (a paste import, approve-all, or just re-picking it) never snaps the selection back to
+  // the deep-linked performance and overrides whatever the user has since selected.
+  const requestedPerformanceAppliedRef = useRef(false);
+
+  const loadPerformances = useCallback(
+    async (streamId: string) => {
+      setLoading(true);
+      try {
+        const { data } = await api.listStreamPerformances(streamId);
+        setPerformances(data);
+        let nextIndex = data.length > 0 ? 0 : -1;
+        if (
+          !requestedPerformanceAppliedRef.current
+          && requestedPerformanceId
+          && streamId === requestedStreamId
+        ) {
+          requestedPerformanceAppliedRef.current = true;
+          const requestedIndex = data.findIndex((performance) => performance.id === requestedPerformanceId);
+          if (requestedIndex >= 0) nextIndex = requestedIndex;
+        }
+        setSelectedIndex(nextIndex);
+      } catch (err: unknown) {
+        showToast(err instanceof Error ? err.message : 'Failed to load performances', true);
+      } finally {
+        setLoading(false);
+      }
+    },
+    [showToast, requestedPerformanceId, requestedStreamId],
+  );
+
   const {
-    streams,
     reloadStreams,
     streamSearch,
     setStreamSearch,
@@ -82,23 +113,6 @@ function useStampEditorController(user: AuthUser) {
     reloadStreams();
   }, [loadStats, reloadStreams]);
 
-  // --- Load performances when stream changes ---
-  const loadPerformances = useCallback(
-    async (streamId: string) => {
-      setLoading(true);
-      try {
-        const { data } = await api.listStreamPerformances(streamId);
-        setPerformances(data);
-        setSelectedIndex(data.length > 0 ? 0 : -1);
-      } catch (err: unknown) {
-        showToast(err instanceof Error ? err.message : 'Failed to load performances', true);
-      } finally {
-        setLoading(false);
-      }
-    },
-    [showToast],
-  );
-
   const selectStream = useCallback(
     (stream: StreamWithPending) => {
       selectStreamId(stream.id);
@@ -108,17 +122,34 @@ function useStampEditorController(user: AuthUser) {
     [selectStreamId, loadPerformances],
   );
 
+  // --- Load the stream list, then — once, if the URL asked for a stream — select it and load
+  // its performances. Chaining onto this same fetch (rather than a second effect reacting to
+  // `streams`) means there is no extra render, and nothing here hands a setter to another hook to
+  // call from inside its own effect: it is this controller's own load, run in the order it
+  // actually happens. `active` guards the chain against StrictMode's dev-only double effect: both
+  // invocations call `reloadStreams()`, but the first invocation's cleanup flips its own `active`
+  // to false before either promise settles, so only the second (live) chain ever reaches
+  // `requestedPerformanceAppliedRef` — without the guard both chains raced to consume it, and
+  // whichever resolved second always reset the deep-linked pick back to row 0.
   useEffect(() => {
-    if (!requestedStreamId || selectedStreamId !== null) return;
-    const requested = streams.find((stream) => stream.id === requestedStreamId);
-    if (requested) selectStream(requested);
-  }, [requestedStreamId, selectedStreamId, selectStream, streams]);
-
-  useEffect(() => {
-    if (!requestedPerformanceId || selectedStreamId !== requestedStreamId) return;
-    const index = performances.findIndex((performance) => performance.id === requestedPerformanceId);
-    if (index >= 0) setSelectedIndex(index);
-  }, [performances, requestedPerformanceId, requestedStreamId, selectedStreamId]);
+    let active = true;
+    reloadStreams()
+      .then((loaded) => {
+        if (!active || !requestedStreamId) return;
+        const requested = loaded.find((stream) => stream.id === requestedStreamId);
+        if (requested) {
+          selectStreamId(requested.id);
+          loadPerformances(requested.id);
+        }
+      })
+      .catch((err: unknown) => {
+        if (!active) return;
+        showToast(err instanceof Error ? err.message : 'Failed to load streams', true);
+      });
+    return () => {
+      active = false;
+    };
+  }, [reloadStreams, requestedStreamId, selectStreamId, loadPerformances, showToast]);
 
   // --- Actions ---
 

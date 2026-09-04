@@ -1,12 +1,17 @@
-import { useCallback, useEffect, useMemo, useState } from 'react';
+import { useCallback, useMemo, useState } from 'react';
 import type { Dispatch, SetStateAction } from 'react';
 import type { StreamWithPending } from '../../../shared/types';
 import { api } from '../api/client';
 
 export interface StreamPicker {
   streams: StreamWithPending[];
-  /** Re-reads the sidebar, whose per-stream badges count the songs still to stamp. */
-  reloadStreams: () => void;
+  /**
+   * Re-reads the sidebar, whose per-stream badges count the songs still to stamp. Resolves with
+   * the freshly loaded list, so a caller that needs to act on the load (StampEditor selecting a
+   * deep-linked stream once it appears) can chain onto this same fetch instead of watching
+   * `streams` for the change from an effect of its own.
+   */
+  reloadStreams: () => Promise<StreamWithPending[]>;
   streamSearch: string;
   setStreamSearch: Dispatch<SetStateAction<string>>;
   streamYearFilter: string;
@@ -18,7 +23,14 @@ export interface StreamPicker {
   filteredStreams: StreamWithPending[];
 }
 
-/** The stamp editor's stream sidebar: the list, its search/year filters, and the current pick. */
+/**
+ * The stamp editor's stream sidebar: the list, its search/year filters, and the current pick.
+ *
+ * Nothing here fetches on its own — the caller triggers `reloadStreams` (on mount, and whenever
+ * it needs a fresh list), the same shape `usePerformances`'s callers already use for their own
+ * loads. That keeps this hook a plain picker with no opinion on deep links or anything else a
+ * caller might want to do once a load lands.
+ */
 export function useStreamPicker(): StreamPicker {
   const [streams, setStreams] = useState<StreamWithPending[]>([]);
   const [streamSearch, setStreamSearch] = useState('');
@@ -26,12 +38,11 @@ export function useStreamPicker(): StreamPicker {
   const [selectedStreamId, setSelectedStreamId] = useState<string | null>(null);
 
   const reloadStreams = useCallback(() => {
-    api.listStampStreams().then(({ data }) => setStreams(data));
+    return api.listStampStreams().then(({ data }) => {
+      setStreams(data);
+      return data;
+    });
   }, []);
-
-  useEffect(() => {
-    reloadStreams();
-  }, [reloadStreams]);
 
   const selectStreamId = useCallback((streamId: string) => {
     setSelectedStreamId(streamId);
