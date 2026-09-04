@@ -410,7 +410,7 @@ export function FindingsPanel({ findings }: { findings: VodExportFindingApi[] })
   );
 }
 
-function CandidatePanel({
+export function CandidatePanel({
   candidate,
   localState,
   canPublish,
@@ -421,6 +421,7 @@ function CandidatePanel({
   onPublish,
   onCopied,
   publishButtonRef,
+  now,
 }: {
   candidate: VodExportCandidate;
   localState: CandidateLocalState;
@@ -432,9 +433,10 @@ function CandidatePanel({
   onPublish: () => void;
   onCopied: () => void;
   publishButtonRef: RefObject<HTMLButtonElement | null>;
+  now: number;
 }) {
   const expiresAt = Date.parse(candidate.expiresAt);
-  const expired = candidate.state === 'expired' || !Number.isFinite(expiresAt) || expiresAt <= Date.now();
+  const expired = candidate.state === 'expired' || !Number.isFinite(expiresAt) || expiresAt <= now;
   const alreadyPublished = localState === 'already_published' || candidate.state === 'already_published';
 
   return (
@@ -551,29 +553,29 @@ export function PublishConfirmationDialog({
   warningCount: number;
   publishing: boolean;
   unchanged?: boolean;
-  returnFocusElement?: HTMLElement | null;
+  returnFocusElement?: RefObject<HTMLElement | null>;
   onCancel: () => void;
   onConfirm: () => void;
 }) {
   const dialogRef = useRef<HTMLDialogElement>(null);
-  const returnFocusRef = useRef<HTMLElement | null>(null);
+  const previouslyFocusedRef = useRef<HTMLElement | null>(null);
 
   useEffect(() => {
     const dialog = dialogRef.current;
     if (!dialog) return undefined;
 
-    returnFocusRef.current = returnFocusElement
+    previouslyFocusedRef.current = returnFocusElement?.current
       ?? (document.activeElement instanceof HTMLElement ? document.activeElement : null);
     dialog.showModal();
     return () => {
       if (dialog.open) dialog.close();
-      if (returnFocusRef.current?.isConnected) returnFocusRef.current.focus();
+      if (previouslyFocusedRef.current?.isConnected) previouslyFocusedRef.current.focus();
     };
   }, [returnFocusElement]);
 
   const closeDialog = () => {
     dialogRef.current?.close();
-    if (returnFocusRef.current?.isConnected) returnFocusRef.current.focus();
+    if (previouslyFocusedRef.current?.isConnected) previouslyFocusedRef.current.focus();
     onCancel();
   };
 
@@ -843,6 +845,7 @@ function PreviewReview({
   previewLoaded,
   findings,
   publishButtonRef,
+  now,
   onDownload,
   onPublish,
   onCopied,
@@ -857,6 +860,7 @@ function PreviewReview({
   previewLoaded: boolean;
   findings: VodExportFindingApi[];
   publishButtonRef: RefObject<HTMLButtonElement | null>;
+  now: number;
   onDownload: () => void;
   onPublish: () => void;
   onCopied: () => void;
@@ -877,6 +881,7 @@ function PreviewReview({
           onPublish={onPublish}
           onCopied={onCopied}
           publishButtonRef={publishButtonRef}
+          now={now}
         />
       )}
 
@@ -1164,6 +1169,7 @@ export default function VodExport({ user }: { user: AuthUser }) {
         previewLoaded={previewLoaded}
         findings={findings}
         publishButtonRef={publishButtonRef}
+        now={now}
         onDownload={download}
         onPublish={confirmCurrentCandidate}
         onCopied={notifyCopied}
@@ -1175,7 +1181,7 @@ export default function VodExport({ user }: { user: AuthUser }) {
           warningCount={warningCount}
           publishing={publishing}
           unchanged={candidateState === 'already_published' || candidate.state === 'already_published'}
-          returnFocusElement={publishButtonRef.current}
+          returnFocusElement={publishButtonRef}
           onCancel={() => dispatch({ type: 'confirmationCancelled' })}
           onConfirm={publish}
         />
