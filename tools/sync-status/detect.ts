@@ -27,6 +27,7 @@ export interface RegistryFile {
 }
 
 export interface DbSnapshot {
+  exportRevision?: number;
   maxSongUpdatedAt: string | null;
   maxPerfUpdatedAt: string | null;
   maxStreamUpdatedAt: string | null;
@@ -49,7 +50,7 @@ export interface StreamerStatus {
 
 interface AggRow {
   streamer_id: string;
-  source: 'songs' | 'performances' | 'streams';
+  source: 'songs' | 'performances' | 'streams' | 'revision';
   max_ts: string | null;
   cnt: number;
 }
@@ -68,6 +69,8 @@ export const AGG_SQL = `
   UNION ALL
   SELECT streamer_id, 'streams' AS source, MAX(updated_at) AS max_ts, COUNT(*) AS cnt
     FROM streams WHERE status = 'approved' GROUP BY streamer_id
+  UNION ALL
+  SELECT streamer_id, 'revision' AS source, NULL AS max_ts, revision AS cnt FROM fan_export_revisions
 `.trim();
 
 function queryAdminD1(): AggRow[] {
@@ -91,6 +94,7 @@ export function readRegistry(root: string): StreamerRegistryEntry[] {
 
 function emptySnapshot(): DbSnapshot {
   return {
+    exportRevision: 0,
     maxSongUpdatedAt: null,
     maxPerfUpdatedAt: null,
     maxStreamUpdatedAt: null,
@@ -100,13 +104,14 @@ function emptySnapshot(): DbSnapshot {
   };
 }
 
-function classify(state: SyncStateEntry, db: DbSnapshot): Freshness {
+export function classify(state: SyncStateEntry, db: DbSnapshot): Freshness {
   const neverSynced = state.lastSyncedAt === null;
   const dbHasData = db.songsCount > 0 || db.performancesCount > 0 || db.streamsCount > 0;
 
   if (neverSynced) return dbHasData ? 'never' : 'fresh';
 
   const changed =
+    state.exportRevision !== db.exportRevision ||
     state.maxSongUpdatedAt !== db.maxSongUpdatedAt ||
     state.maxPerfUpdatedAt !== db.maxPerfUpdatedAt ||
     state.maxStreamUpdatedAt !== db.maxStreamUpdatedAt ||
@@ -134,6 +139,8 @@ export function detectAll(root: string): StreamerStatus[] {
     } else if (row.source === 'streams') {
       snap.maxStreamUpdatedAt = row.max_ts;
       snap.streamsCount = row.cnt;
+    } else if (row.source === 'revision') {
+      snap.exportRevision = row.cnt;
     }
     dbByStreamer.set(row.streamer_id, snap);
   }

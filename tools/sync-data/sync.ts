@@ -89,23 +89,6 @@ interface FanSiteStream {
 
 // --- Build fan-site songs.json ---
 
-function buildSongs(streamerId: string): FanSiteSong[] {
-  const songRows = queryD1<SongRow>(
-    'admin',
-    `SELECT song.id, link.work_id, song.title, song.original_artist, song.tags
-     FROM songs AS song
-     LEFT JOIN song_work_links AS link ON link.song_id = song.id
-     WHERE song.streamer_id = '${streamerId}' AND song.status = 'approved'
-     ORDER BY song.id`,
-  );
-  const perfRows = queryD1<PerformanceRow>(
-    'admin',
-    `SELECT id, song_id, stream_id, date, stream_title, video_id, timestamp, end_timestamp, note FROM performances WHERE streamer_id = '${streamerId}' AND status = 'approved' ORDER BY date`,
-  );
-
-  return assembleFanSiteSongs(songRows, perfRows);
-}
-
 export function assembleFanSiteSongs(
   songRows: SongRow[],
   perfRows: PerformanceRow[],
@@ -142,12 +125,7 @@ export function assembleFanSiteSongs(
 
 // --- Build fan-site streams.json ---
 
-function buildStreams(streamerId: string): FanSiteStream[] {
-  const rows = queryD1<StreamRow>(
-    'admin',
-    `SELECT id, title, date, video_id, youtube_url, credit FROM streams WHERE streamer_id = '${streamerId}' AND status = 'approved' ORDER BY date DESC`,
-  );
-
+function assembleFanSiteStreams(rows: StreamRow[]): FanSiteStream[] {
   return rows.map((row) => {
     const credit = JSON.parse(row.credit);
     const stream: FanSiteStream = {
@@ -164,41 +142,89 @@ function buildStreams(streamerId: string): FanSiteStream[] {
   });
 }
 
-// --- Query snapshot per table (max updated_at + count of approved rows) ---
-//
-// Counts come from the DB directly, not from the in-memory buildSongs/buildStreams
-// output, so they always match what sync-status compares against. Orphan rows
-// (approved performance pointing at a non-approved song) are counted in the DB
-// but dropped by buildSongs — storing the DB count keeps detection consistent.
+// One SELECT is one SQLite read snapshot. UNION ALL streams one small JSON
+// record per row (not a multi-megabyte json_group_array cell), and includes the
+// exact freshness metadata for those rows before any local file is written.
+export interface ExportRow { kind: string; payload: string }
+interface SnapshotRow { max_ts: string | null; cnt: number }
 
-interface SnapshotRow {
-  max_ts: string | null;
-  cnt: number;
+export function buildExportSql(streamerId: string): string {
+  assertValidSlug(streamerId);
+  return `
+    SELECT 'song' AS kind, json_object(
+      'id', song.id, 'work_id', link.work_id, 'title', song.title,
+      'original_artist', song.original_artist, 'tags', song.tags
+    ) AS payload
+    FROM songs AS song LEFT JOIN song_work_links AS link ON link.song_id = song.id
+    WHERE song.streamer_id = '${streamerId}' AND song.status = 'approved'
+    UNION ALL
+    SELECT 'performance', json_object(
+      'id', id, 'song_id', song_id, 'stream_id', stream_id, 'date', date,
+      'stream_title', stream_title, 'video_id', video_id, 'timestamp', timestamp,
+      'end_timestamp', end_timestamp, 'note', note
+    ) FROM performances WHERE streamer_id = '${streamerId}' AND status = 'approved'
+    UNION ALL
+    SELECT 'stream', json_object(
+      'id', id, 'title', title, 'date', date, 'video_id', video_id,
+      'youtube_url', youtube_url, 'credit', credit
+    ) FROM streams WHERE streamer_id = '${streamerId}' AND status = 'approved'
+    UNION ALL
+    SELECT 'songs-snapshot', json_object('max_ts', max_ts, 'cnt', cnt) FROM (
+      SELECT ${LATEST_UPDATED_AT_SQL}, COUNT(*) AS cnt
+      FROM songs AS song LEFT JOIN song_work_links AS link ON link.song_id = song.id
+      WHERE song.streamer_id = '${streamerId}' AND song.status = 'approved'
+    )
+    UNION ALL
+    SELECT 'performances-snapshot', json_object('max_ts', MAX(updated_at), 'cnt', COUNT(*))
+      FROM performances WHERE streamer_id = '${streamerId}' AND status = 'approved'
+    UNION ALL
+    SELECT 'streams-snapshot', json_object('max_ts', MAX(updated_at), 'cnt', COUNT(*))
+      FROM streams WHERE streamer_id = '${streamerId}' AND status = 'approved'
+    UNION ALL
+    SELECT 'revision-snapshot', json_object('cnt', COALESCE((
+      SELECT revision FROM fan_export_revisions WHERE streamer_id = '${streamerId}'
+    ), 0), 'max_ts', NULL)`;
 }
 
-function querySnapshot(table: 'songs' | 'performances' | 'streams', streamerId: string): SnapshotRow {
-  if (table === 'songs') {
-    // songs.json now also depends on the global bridge. Including the link
-    // timestamp makes the initial backfill (and any future manual relink) mark
-    // that streamer's static export stale even when the local song row itself
-    // did not change.
-    const rows = queryD1<SnapshotRow>(
-      'admin',
-      `SELECT
-         ${LATEST_UPDATED_AT_SQL},
-         COUNT(*) AS cnt
-       FROM songs AS song
-       LEFT JOIN song_work_links AS link ON link.song_id = song.id
-       WHERE song.streamer_id = '${streamerId}' AND song.status = 'approved'`,
-    );
-    return rows[0] ?? { max_ts: null, cnt: 0 };
+export function readFanSiteExport(
+  streamerId: string,
+  query: (sql: string) => ExportRow[] = sql => queryD1<ExportRow>('admin', sql),
+) {
+  const rows = query(buildExportSql(streamerId));
+  const songRows: SongRow[] = [];
+  const perfRows: PerformanceRow[] = [];
+  const streamRows: StreamRow[] = [];
+  const snapshots = new Map<string, SnapshotRow>();
+  for (const row of rows) {
+    const payload = JSON.parse(row.payload);
+    switch (row.kind) {
+      case 'song': songRows.push(payload as SongRow); break;
+      case 'performance': perfRows.push(payload as PerformanceRow); break;
+      case 'stream': streamRows.push(payload as StreamRow); break;
+      case 'songs-snapshot':
+      case 'performances-snapshot':
+      case 'revision-snapshot':
+      case 'streams-snapshot': snapshots.set(row.kind, payload as SnapshotRow); break;
+      default: throw new Error(`Unknown export record: ${row.kind}`);
+    }
   }
-
-  const rows = queryD1<SnapshotRow>(
-    'admin',
-    `SELECT MAX(updated_at) AS max_ts, COUNT(*) AS cnt FROM ${table} WHERE streamer_id = '${streamerId}' AND status = 'approved'`,
-  );
-  return rows[0] ?? { max_ts: null, cnt: 0 };
+  const snapshot = (kind: string): SnapshotRow => {
+    const row = snapshots.get(kind);
+    if (!row) throw new Error(`Export missing ${kind}`);
+    return row;
+  };
+  // Stable ordering across SQLite query plans, including equal-date rows.
+  songRows.sort((a, b) => a.id.localeCompare(b.id));
+  perfRows.sort((a, b) => a.date.localeCompare(b.date) || a.id.localeCompare(b.id));
+  streamRows.sort((a, b) => b.date.localeCompare(a.date) || a.id.localeCompare(b.id));
+  return {
+    songs: assembleFanSiteSongs(songRows, perfRows),
+    streams: assembleFanSiteStreams(streamRows),
+    songsSnap: snapshot('songs-snapshot'),
+    perfsSnap: snapshot('performances-snapshot'),
+    streamsSnap: snapshot('streams-snapshot'),
+    exportRevision: snapshot('revision-snapshot').cnt,
+  };
 }
 
 // --- Announce diff (publish-time, fan channel) ---
@@ -330,8 +356,7 @@ async function main(): Promise<void> {
 
   console.log(`sync-data: exporting approved data for "${slug}"...`);
 
-  const songs = buildSongs(slug);
-  const streams = buildStreams(slug);
+  const { songs, streams, songsSnap, perfsSnap, streamsSnap, exportRevision } = readFanSiteExport(slug);
 
   const songsPath = path.join(dataDir, 'songs.json');
   const streamsPath = path.join(dataDir, 'streams.json');
@@ -350,10 +375,6 @@ async function main(): Promise<void> {
   const totalPerfs = songs.reduce((sum, s) => sum + s.performances.length, 0);
   console.log(`  total: ${songs.length} songs, ${totalPerfs} performances, ${streams.length} streams`);
 
-  const songsSnap = querySnapshot('songs', slug);
-  const perfsSnap = querySnapshot('performances', slug);
-  const streamsSnap = querySnapshot('streams', slug);
-
   if (perfsSnap.cnt !== totalPerfs) {
     console.log(
       `  ⚠ ${perfsSnap.cnt - totalPerfs} approved performance(s) reference a non-approved song (orphan); excluded from songs.json`,
@@ -361,6 +382,7 @@ async function main(): Promise<void> {
   }
 
   const entry: SyncStateEntry = {
+    exportRevision,
     lastSyncedAt: new Date().toISOString(),
     maxSongUpdatedAt: songsSnap.max_ts,
     maxPerfUpdatedAt: perfsSnap.max_ts,

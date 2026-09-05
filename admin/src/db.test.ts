@@ -170,6 +170,10 @@ class FakeD1Database {
     const mergeGuardValid = this.mergeGuardValid && revisionFenceHolds;
 
     return statements.map((statement, index) => {
+      if (statement.sql.includes('RETURNING id, song_id')) {
+        const rows = JSON.parse(String(statement.params[0])) as Array<{ performanceId: string; songId: string }>;
+        return { results: rows.map(row => ({ id: row.performanceId, song_id: this.exactSongId ?? row.songId })), meta: { changes: rows.length } };
+      }
       if (statement.sql.startsWith('SELECT revision FROM work_match_state')) {
         // A merge bumps the catalog revision through its own triggers, so the
         // read at the tail of a merge batch answers with the post-merge value.
@@ -371,10 +375,10 @@ async function testVodImportPreservesExistingStream(): Promise<void> {
   if (!performanceInsert) {
     throw new Error('duplicate import should insert a pending performance');
   }
-  assertEqual(performanceInsert.params[PERF_STREAM_ID], 'stream-existing', 'pending performance should link to the existing stream');
-  assertEqual(performanceInsert.params[PERF_DATE], '2026-01-01', 'pending performance should keep the existing stream date');
-  assertEqual(performanceInsert.params[PERF_TITLE], 'Curated Existing Title', 'pending performance should keep the existing stream title');
-  assertEqual(performanceInsert.params[PERF_STATUS], 'pending', 'imported performance must stay pending for curator review');
+  assertEqual(catalogPerformanceParams(performanceInsert)[PERF_STREAM_ID], 'stream-existing', 'pending performance should link to the existing stream');
+  assertEqual(catalogPerformanceParams(performanceInsert)[PERF_DATE], '2026-01-01', 'pending performance should keep the existing stream date');
+  assertEqual(catalogPerformanceParams(performanceInsert)[PERF_TITLE], 'Curated Existing Title', 'pending performance should keep the existing stream title');
+  assertEqual(catalogPerformanceParams(performanceInsert)[PERF_STATUS], 'pending', 'imported performance must stay pending for curator review');
 }
 
 // The normal path (video not yet in admin) must keep working: create the stream and
@@ -421,9 +425,9 @@ async function testVodImportCreatesNewStreamWhenAbsent(): Promise<void> {
   if (!performanceInsert) {
     throw new Error('fresh import should insert a pending performance');
   }
-  assertEqual(performanceInsert.params[PERF_DATE], '2026-03-03', 'fresh performance should use the submitted date');
-  assertEqual(performanceInsert.params[PERF_TITLE], 'Brand New Stream', 'fresh performance should use the submitted title');
-  assertEqual(performanceInsert.params[PERF_STATUS], 'pending', 'fresh performance must stay pending for curator review');
+  assertEqual(catalogPerformanceParams(performanceInsert)[PERF_DATE], '2026-03-03', 'fresh performance should use the submitted date');
+  assertEqual(catalogPerformanceParams(performanceInsert)[PERF_TITLE], 'Brand New Stream', 'fresh performance should use the submitted title');
+  assertEqual(catalogPerformanceParams(performanceInsert)[PERF_STATUS], 'pending', 'fresh performance must stay pending for curator review');
 }
 
 async function testVodImportReusesExactSong(): Promise<void> {
@@ -453,7 +457,8 @@ async function testVodImportReusesExactSong(): Promise<void> {
   const songInserts = fakeDb.batchStatements.filter((statement) =>
     /INSERT\s+INTO\s+songs/i.test(statement.sql),
   );
-  assertEqual(songInserts.length, 0, 'an exact existing song must be reused instead of duplicated');
+  assertEqual(songInserts.length, 1, 'song creation is guarded inside the write transaction');
+  assert(/WHERE NOT EXISTS/.test(songInserts[0].sql), 'an existing identity suppresses the insert');
 
   const workInserts = fakeDb.batchStatements.filter((statement) =>
     /INSERT\s+INTO\s+works/i.test(statement.sql),
@@ -480,7 +485,7 @@ async function testVodImportReusesExactSong(): Promise<void> {
     /INSERT\s+INTO\s+performances/i.test(statement.sql),
   );
   if (!performanceInsert) throw new Error('reused song should still receive a new performance');
-  assertEqual(performanceInsert.params[PERF_SONG_ID], 'song-canonical', 'new performance links to exact canonical song');
+  assert(/resolved.resolved_song_id/.test(performanceInsert.sql), 'performance uses the identity resolved inside the transaction');
 }
 
 async function testSongIdentityEditRelinksGlobalWorkAtomically(): Promise<void> {
@@ -577,6 +582,7 @@ async function testGlobalWorksListAggregatesAcrossStreamers(): Promise<void> {
 
   const countQuery = fakeDb.batchStatements[0];
   const dataQuery = fakeDb.batchStatements[1];
+  assert(!/JOIN performances/i.test(countQuery.sql), 'count query never expands performance rows');
   assert(/WHERE\s+streamer_count\s+>\s+1/i.test(countQuery.sql), 'shared-only filter is applied after aggregation');
   assert(/ORDER\s+BY\s+streamer_count\s+ASC/i.test(dataQuery.sql), 'sort column is selected from the safe allowlist');
   assert(/instr\s*\(\s*lower\(work\.title\)/i.test(dataQuery.sql), 'title search avoids D1 LIKE pattern limits');
@@ -1790,3 +1796,10 @@ main().catch((error: unknown) => {
   console.error(error);
   process.exitCode = 1;
 });
+
+/** Decode the set-based import payload; standalone inserts keep positional binds. */
+function catalogPerformanceParams(statement: CapturedStatement): unknown[] {
+  const [row] = JSON.parse(String(statement.params[0]));
+  return [row.performanceId, row.streamerId, row.songId, row.streamId, row.date, row.streamTitle,
+    row.videoId, row.timestamp, row.endTimestamp, row.note, 'pending', row.submittedBy];
+}

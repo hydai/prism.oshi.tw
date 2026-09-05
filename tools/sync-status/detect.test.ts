@@ -3,7 +3,8 @@ import * as fs from 'node:fs';
 import * as os from 'node:os';
 import * as path from 'node:path';
 
-import { AGG_SQL, readRegistry, type StreamerRegistryEntry } from './detect.ts';
+import { AGG_SQL, classify, readRegistry, type StreamerRegistryEntry } from './detect.ts';
+import { EMPTY_ENTRY } from '../shared/sync-state.ts';
 
 function test(name: string, fn: () => void): void {
   try {
@@ -67,3 +68,11 @@ test('readRegistry throws on a non-string slug in a tampered registry instead of
 });
 
 console.log('detect.test: all passed');
+
+test('revisions detect same-second edits and upgrade legacy sync stamps', () => {
+  const state = { ...EMPTY_ENTRY, lastSyncedAt: '2026-01-01', songsCount: 1, exportRevision: 5 };
+  assert.equal(classify(state, state), 'fresh');
+  assert.equal(classify(state, { ...state, exportRevision: 6 }), 'stale', 'same counts/timestamps with a new revision are stale');
+  const { exportRevision: _, ...legacy } = state;
+  assert.equal(classify(legacy, state), 'stale', 'legacy exports must acquire a revision by syncing once');
+});
