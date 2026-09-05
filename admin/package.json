@@ -18,7 +18,7 @@
     "test:union-find": "npx tsx shared/union-find.test.ts",
     "test:fuzzy-grouping": "npx tsx shared/fuzzy-grouping.test.ts",
     "test:guard": "npx tsx src/guard.test.ts",
-    "test:db": "npx tsx src/db.test.ts",
+    "test:db": "tsc -p tsconfig.sqlite-tests.json && npx tsx src/db.test.ts && node --import tsx tests/catalog-sqlite.test.ts && node --import tsx tests/export-revision.test.ts",
     "test:nova-db": "npx tsx src/nova-db.test.ts",
     "test:crystal-db": "npx tsx src/crystal-db.test.ts",
     "test:parse-bodies": "npx tsx src/parse.test.ts",

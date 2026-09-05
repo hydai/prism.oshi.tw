@@ -27,6 +27,8 @@ import * as fs from 'node:fs';
 import * as path from 'node:path';
 
 export interface SyncStateEntry {
+  /** Absent in legacy stamps; the next sync upgrades them without changing file version. */
+  exportRevision?: number;
   lastSyncedAt: string | null;
   maxSongUpdatedAt: string | null;
   maxPerfUpdatedAt: string | null;

@@ -1,5 +1,6 @@
 import * as assert from 'node:assert/strict';
 import { execFileSync } from 'node:child_process';
+import { readFileSync } from 'node:fs';
 import * as path from 'node:path';
 import { fileURLToPath } from 'node:url';
 
@@ -8,6 +9,8 @@ import {
   dataAnnouncementBatch,
   songCountsByStream,
   streamsToAnnounce,
+  readFanSiteExport,
+  type ExportRow,
 } from './sync.ts';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
@@ -186,3 +189,31 @@ test('sync-data CLI rejects a SQL-injection slug with a clear error (before any 
 });
 
 console.log('sync-data.test: all passed');
+
+test('export rows and sync stamp come from one SQL snapshot, including notes/credits/work links', () => {
+  const schema = readFileSync(new URL('../../admin/schema.sql', import.meta.url), 'utf8');
+  const fixture = `
+    INSERT INTO works (id,title,original_artist) VALUES ('work','Song','Artist');
+    INSERT INTO songs (id,streamer_id,title,original_artist,status,updated_at) VALUES ('song','alice','Song','Artist','approved','2026-01-01');
+    INSERT INTO song_work_links (song_id,work_id,link_method,linked_by,updated_at) VALUES ('song','work','import_exact','curator','2026-01-02');
+    INSERT INTO streams (id,streamer_id,title,date,video_id,youtube_url,credit,status,updated_at) VALUES ('stream','alice','Stream','2026-01-01','video','https://example.com','{"editor":"credit"}','approved','2026-01-03');
+    INSERT INTO performances (id,streamer_id,song_id,stream_id,date,stream_title,video_id,timestamp,note,status,updated_at) VALUES ('performance','alice','song','stream','2026-01-01','Stream','video',10,'encore','approved','2026-01-04');
+  `;
+  let queries = 0;
+  const result = readFanSiteExport('alice', sql => {
+    queries++;
+    const rows = JSON.parse(execFileSync('sqlite3', ['-json', ':memory:'], { input: schema + fixture + sql, encoding: 'utf8' })) as ExportRow[];
+    // A later DB write may happen here, but there must be no subsequent query
+    // that would stamp the older exported records with that newer metadata.
+    return rows;
+  });
+  assert.equal(queries, 1);
+  assert.ok(result.exportRevision > 0, 'revision is read in the same statement as exported data');
+  assert.equal(result.songs[0].workId, 'work');
+  assert.equal(result.songs[0].performances[0].note, 'encore');
+  assert.deepEqual(result.streams[0].credit, { editor: 'credit' });
+  assert.deepEqual(result.songsSnap, { max_ts: '2026-01-02', cnt: 1 });
+  assert.deepEqual(result.perfsSnap, { max_ts: '2026-01-04', cnt: 1 });
+  assert.deepEqual(result.streamsSnap, { max_ts: '2026-01-03', cnt: 1 });
+  assert.throws(() => readFanSiteExport('alice', () => []), /missing.*snapshot/, 'missing metadata aborts before writes');
+});

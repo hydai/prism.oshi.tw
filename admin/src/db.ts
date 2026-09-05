@@ -330,6 +330,11 @@ const GLOBAL_WORK_SORT_COLUMN_MAP: Record<string, string> = {
   updatedAt: 'updated_at',
 };
 
+// Non-authoritative, bounded derived cache: one entry per live D1 binding.
+// The SQL below validates its revision INSIDE the same batch as the page. A
+// cold isolate or changed catalog simply recomputes; correctness needs no hit.
+const globalWorkStatsCache = new WeakMap<D1Database, { revision: number; stats: GlobalWorkStats }>();
+
 export async function listGlobalWorksPaginated(
   db: D1Database,
   opts: {
@@ -387,7 +392,16 @@ export async function listGlobalWorksPaginated(
     )`;
 
   const countStatement = db
-    .prepare(`${rollupSql}
+    // Counting/filtering work identities needs no performance rows. In
+    // particular, do not multiply songs by performances just to COUNT works.
+    .prepare(`WITH work_rollup AS (
+      SELECT work.id, COUNT(DISTINCT song.streamer_id) AS streamer_count
+      FROM works AS work
+      JOIN song_work_links AS link ON link.work_id = work.id
+      JOIN songs AS song ON song.id = link.song_id
+      ${searchWhere}
+      GROUP BY work.id
+    )
       SELECT COUNT(*) AS count FROM work_rollup ${sharedWhere}`)
     .bind(...searchBinds);
   const dataStatement = db
@@ -397,6 +411,7 @@ export async function listGlobalWorksPaginated(
       ORDER BY ${sortCol} ${sortDir}, title ASC, original_artist ASC, id ASC
       LIMIT ? OFFSET ?`)
     .bind(...searchBinds, pageSize, offset);
+  const cachedStats = globalWorkStatsCache.get(db);
   const statsStatement = db.prepare(`
     WITH active_works AS (
       SELECT
@@ -406,7 +421,7 @@ export async function listGlobalWorksPaginated(
       JOIN songs AS song ON song.id = link.song_id
       GROUP BY link.work_id
     )
-    SELECT
+    SELECT revision,
       (SELECT COUNT(*) FROM active_works) AS total_works,
       (SELECT COUNT(*) FROM active_works WHERE streamer_count > 1) AS shared_works,
       (SELECT COUNT(*) FROM song_work_links) AS linked_songs,
@@ -420,7 +435,9 @@ export async function listGlobalWorksPaginated(
         FROM songs AS song
         LEFT JOIN song_work_links AS link ON link.song_id = song.id
         WHERE link.song_id IS NULL
-      ) AS unlinked_songs`);
+      ) AS unlinked_songs
+    FROM (SELECT COALESCE((SELECT revision FROM work_match_state WHERE id = 1), -1) AS revision)
+    WHERE revision <> ?`).bind(cachedStats?.revision ?? -1);
 
   const [countResult, dataResult, statsResult] = await db.batch([
     countStatement,
@@ -440,14 +457,19 @@ export async function listGlobalWorksPaginated(
     createdAt: row.created_at,
     updatedAt: row.updated_at,
   }));
-  const statsRow = statsResult.results[0] as GlobalWorkStatsRow | undefined;
-  const stats: GlobalWorkStats = {
+  const statsRow = statsResult.results[0] as (GlobalWorkStatsRow & { revision: number }) | undefined;
+  if (statsRow?.revision === -1) throw new Error('Global work statistics revision is missing');
+  if (!statsRow && !cachedStats) throw new Error('Global work statistics revision is missing');
+  const stats: GlobalWorkStats = statsRow ? {
     totalWorks: statsRow?.total_works ?? 0,
     sharedWorks: statsRow?.shared_works ?? 0,
     linkedSongs: statsRow?.linked_songs ?? 0,
     linkedPerformances: statsRow?.linked_performances ?? 0,
     unlinkedSongs: statsRow?.unlinked_songs ?? 0,
-  };
+  } : cachedStats!.stats;
+  if (statsRow && Number.isSafeInteger(statsRow.revision)) {
+    globalWorkStatsCache.set(db, { revision: statsRow.revision, stats });
+  }
 
   return { works, total, stats, page, pageSize };
 }
@@ -485,9 +507,8 @@ export async function getSongById(
   return song;
 }
 
-// The single home of the 7-column songs INSERT literal. Every catalog write path —
-// this direct insertSong call and the three pipelines behind prepareCatalogWrites —
-// shares this one prepared statement so the literal can never drift out of sync.
+// Standalone inserts keep their positional contract. Bulk catalog imports use
+// the set-based, transactional identity resolution in prepareCatalogWrites.
 function prepareSongInsert(
   db: D1Database,
   streamerId: string,
@@ -965,117 +986,6 @@ export async function listPerformancesForStream(
   return results.map(stampPerformanceFromRow);
 }
 
-interface ExactSongIdentity {
-  title: string;
-  originalArtist: string;
-}
-
-interface NewExactSong extends ExactSongIdentity {
-  id: string;
-}
-
-interface ExactWorkCandidate extends ExactSongIdentity {
-  id: string;
-}
-
-interface ExactSongLink extends ExactSongIdentity {
-  songId: string;
-}
-
-function exactSongIdentityKey(identity: ExactSongIdentity): string {
-  return JSON.stringify([identity.title, identity.originalArtist]);
-}
-
-/**
- * Resolve exact title + original-artist matches before adding performances.
- * Approved/pending songs are reusable catalog entities; rejected/excluded rows
- * deliberately do not absorb a fresh submission. Duplicate identities within
- * one import share the same generated song ID.
- */
-async function resolveExactSongIds(
-  db: D1Database,
-  streamerId: string,
-  identities: ExactSongIdentity[],
-  excludeSongsOnlyInStreamId?: string,
-): Promise<{
-  songIds: string[];
-  newSongs: NewExactSong[];
-  workCandidates: ExactWorkCandidate[];
-  songLinks: ExactSongLink[];
-}> {
-  const uniqueByKey = new Map<string, ExactSongIdentity>();
-  for (const identity of identities) {
-    uniqueByKey.set(exactSongIdentityKey(identity), identity);
-  }
-
-  const unique = [...uniqueByKey.entries()];
-  const existingByKey = new Map<string, string>();
-  const LOOKUP_CHUNK_SIZE = 50;
-
-  for (let offset = 0; offset < unique.length; offset += LOOKUP_CHUNK_SIZE) {
-    const chunk = unique.slice(offset, offset + LOOKUP_CHUNK_SIZE);
-    const statements = chunk.map(([, identity]) => {
-      let sql = `SELECT s.id
-        FROM songs AS s
-        WHERE s.streamer_id = ?
-          AND s.title = ?
-          AND s.original_artist = ?
-          AND s.status IN ('approved', 'pending')`;
-      const binds: string[] = [streamerId, identity.title, identity.originalArtist];
-
-      if (excludeSongsOnlyInStreamId !== undefined) {
-        sql += `
-          AND EXISTS (
-            SELECT 1 FROM performances AS p
-            WHERE p.song_id = s.id AND p.stream_id <> ?
-          )`;
-        binds.push(excludeSongsOnlyInStreamId);
-      }
-
-      sql += `
-        ORDER BY
-          CASE s.status WHEN 'approved' THEN 0 ELSE 1 END,
-          s.created_at ASC,
-          s.id ASC
-        LIMIT 1`;
-      return db.prepare(sql).bind(...binds);
-    });
-
-    // D1 executes one query at a time per database, so parallel chunk calls only queue.
-    // react-doctor-disable-next-line react-doctor/async-await-in-loop
-    const results = await db.batch<{ id: string }>(statements);
-    results.forEach((result, index) => {
-      const row = result.results[0];
-      if (row) existingByKey.set(chunk[index][0], row.id);
-    });
-  }
-
-  const assignedByKey = new Map(existingByKey);
-  const newSongs: NewExactSong[] = [];
-  for (const [key, identity] of unique) {
-    if (assignedByKey.has(key)) continue;
-    const song: NewExactSong = { ...identity, id: generateSongId() };
-    assignedByKey.set(key, song.id);
-    newSongs.push(song);
-  }
-
-  const workCandidates: ExactWorkCandidate[] = unique.map(([, identity]) => ({
-    ...identity,
-    id: generateWorkId(),
-  }));
-  const songLinks: ExactSongLink[] = unique.map(([key, identity]) => ({
-    ...identity,
-    songId: assignedByKey.get(key)!,
-  }));
-
-  return {
-    songIds: identities.map((identity) => assignedByKey.get(exactSongIdentityKey(identity))!),
-    newSongs,
-    workCandidates,
-    songLinks,
-  };
-}
-
 export interface CatalogSongInput {
   readonly title: string;
   readonly originalArtist: string;
@@ -1096,69 +1006,100 @@ export interface CatalogWriteInput {
 }
 
 /**
- * The one catalog write pipeline: resolve exact song identities, then build — in
- * order — the work-ensure statements, the (single, shared) songs insert per new
- * identity, the song-to-work link statements, and finally a performance insert per
- * submitted song. Every catalog-writing entry point (createSongAndPerformance,
- * appendStreamPerformances / replaceStreamPerformances, importVodToAdminDb) builds
- * its statement list from this.
- *
- * This does NOT call db.batch — the caller owns the batch so it can prepend its own
- * leading statements (replace-mode deletes, a new stream's insert) ahead of this
- * pipeline's statements, or append more after, and commit everything as one write.
+ * Resolve identities INSIDE the caller's write transaction. The same four
+ * set-based statements handle one song or a whole import; no pre-read IDs can
+ * become stale between lookup and insert. Existing curated duplicates remain
+ * legal, and approved/oldest/id still chooses the canonical local song.
  */
-async function prepareCatalogWrites(
+function prepareCatalogWrites(
   db: D1Database,
   input: CatalogWriteInput,
-): Promise<{ statements: D1PreparedStatement[]; songIds: string[]; performanceIds: string[] }> {
-  const identities = input.songs.map((song) => ({
-    title: song.title,
-    originalArtist: song.originalArtist || 'Unknown',
-  }));
-  const { songIds, newSongs, workCandidates, songLinks } = await resolveExactSongIds(
-    db,
-    input.streamerId,
-    identities,
-    input.excludeSongsOnlyInStreamId,
-  );
-
-  const statements: D1PreparedStatement[] = workCandidates.map((work) =>
-    prepareEnsureExactWork(db, work.id, work.title, work.originalArtist),
-  );
-
-  statements.push(...newSongs.map((song) =>
-    prepareSongInsert(db, input.streamerId, song.id, song.title, song.originalArtist, [], input.submittedBy),
-  ));
-
-  statements.push(...songLinks.map((link) =>
-    prepareLinkSongToExactWork(
-      db,
-      link.songId,
-      link.title,
-      link.originalArtist,
-      'import_exact',
-      input.submittedBy,
-    ),
-  ));
-
-  const performanceIds: string[] = [];
-  input.songs.forEach((song, index) => {
-    const songId = songIds[index];
-    const perfId = generatePerformanceId();
-    performanceIds.push(perfId);
-    statements.push(preparePerformanceInsert(db, input.streamerId, songId, {
-      id: perfId,
-      streamId: input.streamId,
-      date: input.date,
-      streamTitle: input.streamTitle,
-      videoId: input.videoId,
-      timestamp: song.timestamp,
-      endTimestamp: song.endTimestamp,
-      note: song.note,
-    }, input.submittedBy));
+): { statements: D1PreparedStatement[] } {
+  const identities = new Map<string, { songId: string; workId: string }>();
+  const rows = input.songs.map((song) => {
+    const originalArtist = song.originalArtist || 'Unknown';
+    const key = JSON.stringify([song.title, originalArtist]);
+    let identity = identities.get(key);
+    if (!identity) {
+      identity = { songId: generateSongId(), workId: generateWorkId() };
+      identities.set(key, identity);
+    }
+    return {
+      ...song, ...identity, originalArtist,
+      performanceId: generatePerformanceId(),
+      streamerId: input.streamerId, streamId: input.streamId,
+      date: input.date, streamTitle: input.streamTitle, videoId: input.videoId,
+      submittedBy: input.submittedBy,
+      excludeStreamId: input.excludeSongsOnlyInStreamId ?? null,
+    };
   });
-
-  return { statements, songIds, performanceIds };
+  if (rows.length === 0) return { statements: [] };
+  const payload = JSON.stringify(rows);
+  const entries = `WITH entries AS (
+    SELECT
+      value ->> '$.songId' AS song_id, value ->> '$.workId' AS work_id,
+      value ->> '$.title' AS title, value ->> '$.originalArtist' AS original_artist,
+      value ->> '$.streamerId' AS streamer_id, value ->> '$.submittedBy' AS submitted_by,
+      value ->> '$.excludeStreamId' AS exclude_stream_id,
+      value ->> '$.performanceId' AS performance_id, value ->> '$.streamId' AS stream_id,
+      value ->> '$.date' AS date, value ->> '$.streamTitle' AS stream_title,
+      value ->> '$.videoId' AS video_id, value ->> '$.timestamp' AS timestamp,
+      value ->> '$.endTimestamp' AS end_timestamp, value ->> '$.note' AS note
+    FROM json_each(?)
+  ), identities AS (
+    SELECT DISTINCT song_id, work_id, title, original_artist, streamer_id, submitted_by, exclude_stream_id
+    FROM entries
+  )`;
+  const matchingSong = `SELECT s.id FROM songs AS s
+    WHERE s.streamer_id = item.streamer_id
+      AND s.title = item.title AND s.original_artist = item.original_artist
+      AND s.status IN ('approved', 'pending')
+      AND (item.exclude_stream_id IS NULL OR s.id = item.song_id OR EXISTS (
+        SELECT 1 FROM performances AS p WHERE p.song_id = s.id AND p.stream_id <> item.exclude_stream_id
+      ))
+    ORDER BY CASE s.status WHEN 'approved' THEN 0 ELSE 1 END, s.created_at ASC, s.id ASC
+    LIMIT 1`;
+  const resolved = `${entries}, resolved AS (
+    SELECT item.*, (${matchingSong}) AS resolved_song_id FROM identities AS item
+  )`;
+  const statements = [
+    db.prepare(`${entries}
+      INSERT INTO works (id, title, original_artist, tags)
+      SELECT work_id, title, original_artist, '[]' FROM identities AS item
+      WHERE NOT EXISTS (
+        SELECT 1 FROM work_aliases AS alias JOIN works AS canonical_work
+          ON canonical_work.id = alias.canonical_work_id
+        WHERE alias.source_title = item.title AND alias.source_original_artist = item.original_artist
+      )
+      ON CONFLICT(title, original_artist) DO NOTHING`).bind(payload),
+    db.prepare(`${entries}
+      INSERT INTO songs (id, streamer_id, title, original_artist, tags, status, submitted_by)
+      SELECT song_id, streamer_id, title, original_artist, '[]', 'pending', submitted_by
+      FROM identities AS item WHERE NOT EXISTS (${matchingSong})`).bind(payload),
+    db.prepare(`${resolved}
+      INSERT OR IGNORE INTO song_work_links (song_id, work_id, link_method, linked_by)
+      SELECT resolved_song_id, (
+        SELECT work_id FROM (
+          SELECT alias.canonical_work_id AS work_id, 0 AS resolution_order
+          FROM work_aliases AS alias JOIN works AS canonical_work
+            ON canonical_work.id = alias.canonical_work_id
+          WHERE alias.source_title = item.title AND alias.source_original_artist = item.original_artist
+          UNION ALL
+          SELECT work.id AS work_id, 1 AS resolution_order FROM works AS work
+          WHERE work.title = item.title AND work.original_artist = item.original_artist
+          ORDER BY resolution_order LIMIT 1
+        )
+      ), 'import_exact', submitted_by FROM resolved AS item`).bind(payload),
+    db.prepare(`${resolved}
+      INSERT INTO performances (id, streamer_id, song_id, stream_id, date, stream_title, video_id,
+        timestamp, end_timestamp, note, status, submitted_by, updated_at)
+      SELECT entry.performance_id, entry.streamer_id, resolved.resolved_song_id, entry.stream_id,
+        entry.date, entry.stream_title, entry.video_id, entry.timestamp, entry.end_timestamp,
+        entry.note, 'pending', entry.submitted_by, datetime('now')
+      FROM entries AS entry JOIN resolved ON resolved.song_id = entry.song_id
+      RETURNING id, song_id`).bind(payload),
+  ];
+  return { statements };
 }
 
 export interface CreateSongAndPerformanceInput {
@@ -1179,7 +1120,7 @@ export async function createSongAndPerformance(
   db: D1Database,
   input: CreateSongAndPerformanceInput,
 ): Promise<{ songId: string; performanceId: string }> {
-  const catalog = await prepareCatalogWrites(db, {
+  const catalog = prepareCatalogWrites(db, {
     streamerId: input.streamerId,
     streamId: input.streamId,
     date: input.date,
@@ -1194,9 +1135,10 @@ export async function createSongAndPerformance(
     }],
     submittedBy: input.submittedBy,
   });
-  await db.batch(catalog.statements);
-
-  return { songId: catalog.songIds[0], performanceId: catalog.performanceIds[0] };
+  const results = await db.batch<{ id: string; song_id: string }>(catalog.statements);
+  const inserted = results.at(-1)?.results[0];
+  if (!inserted) throw new Error('Catalog insert did not return a performance');
+  return { songId: inserted.song_id, performanceId: inserted.id };
 }
 
 // The end-after-start invariant is enforced INSIDE the UPDATE's WHERE, merging
@@ -1360,7 +1302,7 @@ async function writeStreamPerformances(
   own: D1PreparedStatement[],
   excludeSongsOnlyInStreamId?: string,
 ): Promise<{ created: number }> {
-  const catalog = await prepareCatalogWrites(db, {
+  const catalog = prepareCatalogWrites(db, {
     streamerId: input.streamerId,
     streamId: input.streamId,
     date: input.date,
@@ -1377,7 +1319,8 @@ async function writeStreamPerformances(
     excludeSongsOnlyInStreamId,
   });
 
-  await db.batch([...own, ...catalog.statements]);
+  const statements = [...own, ...catalog.statements];
+  if (statements.length > 0) await db.batch(statements);
   return { created: input.songs.length };
 }
 
@@ -1489,7 +1432,7 @@ export async function importVodToAdminDb(
     );
   }
 
-  const catalog = await prepareCatalogWrites(db, {
+  const catalog = prepareCatalogWrites(db, {
     streamerId,
     streamId,
     date: streamDate,
