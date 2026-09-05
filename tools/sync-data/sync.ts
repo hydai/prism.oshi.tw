@@ -89,10 +89,24 @@ interface FanSiteStream {
 
 // --- Build fan-site songs.json ---
 
+// Only break ties with published order. Current DB titles/dates still decide
+// the primary order; removed records never come back from the local baseline.
+// Previously unseen IDs follow existing ties in deterministic ID order.
+function publishedOrder(previous: { id: string }[]) {
+  const positions = new Map(previous.map((row, index) => [row.id, index]));
+  return (a: { id: string }, b: { id: string }): number =>
+    (positions.get(a.id) ?? Number.MAX_SAFE_INTEGER) -
+      (positions.get(b.id) ?? Number.MAX_SAFE_INTEGER) || a.id.localeCompare(b.id);
+}
+
 export function assembleFanSiteSongs(
   songRows: SongRow[],
   perfRows: PerformanceRow[],
+  previousSongs: FanSiteSong[] = [],
 ): FanSiteSong[] {
+  const songTieOrder = publishedOrder(previousSongs);
+  const performanceTieOrders = new Map(previousSongs.map((song) => [song.id, publishedOrder(song.performances)]));
+  const newPerformanceOrder = publishedOrder([]);
   const perfsBySong = new Map<string, PerformanceRow[]>();
   for (const p of perfRows) {
     const list = perfsBySong.get(p.song_id) || [];
@@ -110,7 +124,8 @@ export function assembleFanSiteSongs(
       performances: (perfsBySong.get(row.id) || [])
         // Newest first — the canonical order the timeline consumes (dates come
         // from the DB rows; the slim output no longer carries them)
-        .sort((a, b) => b.date.localeCompare(a.date))
+        .sort((a, b) => b.date.localeCompare(a.date) ||
+          (performanceTieOrders.get(row.id) ?? newPerformanceOrder)(a, b))
         .map((p) => ({
           id: p.id,
           streamId: p.stream_id,
@@ -120,7 +135,7 @@ export function assembleFanSiteSongs(
           ...(p.note ? { note: p.note } : {}),
         })),
     }))
-    .sort((a, b) => a.title.localeCompare(b.title, 'zh-TW'));
+    .sort((a, b) => a.title.localeCompare(b.title, 'zh-TW') || songTieOrder(a, b));
 }
 
 // --- Build fan-site streams.json ---
@@ -145,12 +160,15 @@ function assembleFanSiteStreams(rows: StreamRow[]): FanSiteStream[] {
 // One SELECT is one SQLite read snapshot. UNION ALL streams one small JSON
 // record per row (not a multi-megabyte json_group_array cell), and includes the
 // exact freshness metadata for those rows before any local file is written.
+// D1 permits at most five compound SELECT terms at one level. Keep the three
+// data terms and four snapshot terms nested, still in one read statement.
 export interface ExportRow { kind: string; payload: string }
 interface SnapshotRow { max_ts: string | null; cnt: number }
 
 export function buildExportSql(streamerId: string): string {
   assertValidSlug(streamerId);
   return `
+    SELECT * FROM (
     SELECT 'song' AS kind, json_object(
       'id', song.id, 'work_id', link.work_id, 'title', song.title,
       'original_artist', song.original_artist, 'tags', song.tags
@@ -168,7 +186,9 @@ export function buildExportSql(streamerId: string): string {
       'id', id, 'title', title, 'date', date, 'video_id', video_id,
       'youtube_url', youtube_url, 'credit', credit
     ) FROM streams WHERE streamer_id = '${streamerId}' AND status = 'approved'
+    )
     UNION ALL
+    SELECT * FROM (
     SELECT 'songs-snapshot', json_object('max_ts', max_ts, 'cnt', cnt) FROM (
       SELECT ${LATEST_UPDATED_AT_SQL}, COUNT(*) AS cnt
       FROM songs AS song LEFT JOIN song_work_links AS link ON link.song_id = song.id
@@ -183,12 +203,14 @@ export function buildExportSql(streamerId: string): string {
     UNION ALL
     SELECT 'revision-snapshot', json_object('cnt', COALESCE((
       SELECT revision FROM fan_export_revisions WHERE streamer_id = '${streamerId}'
-    ), 0), 'max_ts', NULL)`;
+    ), 0), 'max_ts', NULL)
+    )`;
 }
 
 export function readFanSiteExport(
   streamerId: string,
   query: (sql: string) => ExportRow[] = sql => queryD1<ExportRow>('admin', sql),
+  previous: { songs: FanSiteSong[]; streams: FanSiteStream[] } = { songs: [], streams: [] },
 ) {
   const rows = query(buildExportSql(streamerId));
   const songRows: SongRow[] = [];
@@ -213,12 +235,12 @@ export function readFanSiteExport(
     if (!row) throw new Error(`Export missing ${kind}`);
     return row;
   };
-  // Stable ordering across SQLite query plans, including equal-date rows.
-  songRows.sort((a, b) => a.id.localeCompare(b.id));
-  perfRows.sort((a, b) => a.date.localeCompare(b.date) || a.id.localeCompare(b.id));
-  streamRows.sort((a, b) => b.date.localeCompare(a.date) || a.id.localeCompare(b.id));
+  // Equal-date versions affect the fan site's default playback selection.
+  // Preserve published ties instead of replacing them with arbitrary ID order.
+  const streamTieOrder = publishedOrder(previous.streams);
+  streamRows.sort((a, b) => b.date.localeCompare(a.date) || streamTieOrder(a, b));
   return {
-    songs: assembleFanSiteSongs(songRows, perfRows),
+    songs: assembleFanSiteSongs(songRows, perfRows, previous.songs),
     streams: assembleFanSiteStreams(streamRows),
     songsSnap: snapshot('songs-snapshot'),
     perfsSnap: snapshot('performances-snapshot'),
@@ -356,8 +378,6 @@ async function main(): Promise<void> {
 
   console.log(`sync-data: exporting approved data for "${slug}"...`);
 
-  const { songs, streams, songsSnap, perfsSnap, streamsSnap, exportRevision } = readFanSiteExport(slug);
-
   const songsPath = path.join(dataDir, 'songs.json');
   const streamsPath = path.join(dataDir, 'streams.json');
 
@@ -365,6 +385,9 @@ async function main(): Promise<void> {
   // streams becoming "published with songs" for the first time (the announce trigger).
   const oldSongs = readExistingSongs(songsPath);
   const oldStreams = readExistingStreams(streamsPath);
+
+  const { songs, streams, songsSnap, perfsSnap, streamsSnap, exportRevision } =
+    readFanSiteExport(slug, undefined, { songs: oldSongs, streams: oldStreams });
 
   fs.writeFileSync(songsPath, JSON.stringify(songs, null, 2) + '\n', 'utf-8');
   fs.writeFileSync(streamsPath, JSON.stringify(streams, null, 2) + '\n', 'utf-8');
