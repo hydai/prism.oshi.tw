@@ -591,6 +591,58 @@ assert(
 );
 
 await noQueryPage.unmount();
+
+// Resolve requests in reverse order: the selected stream owns the table even
+// when the previous stream's response arrives last.
+const pendingLoads = new Map<string, (value: unknown) => void>();
+stubDeepLinkFetch((pathname) => {
+  if (pathname === '/api/streamers') return [{ slug: 'mizuki', displayName: 'Mizuki' }];
+  if (pathname === '/api/stamp/streams') return { data: [deepLinkStreamA, deepLinkStreamB], total: 2 };
+  if (pathname.endsWith('/performances')) {
+    return new Promise((resolve) => pendingLoads.set(pathname, resolve));
+  }
+  return [];
+});
+const racePage = await mountDeepLinkPage(
+  <MemoryRouter initialEntries={['/stamp']}><StampEditorPage user={deepLinkCurator} /></MemoryRouter>,
+);
+await clickButtonContaining(racePage.container, deepLinkStreamA.title);
+await clickButtonContaining(racePage.container, deepLinkStreamB.title);
+const finishLoad = async (streamId: string, title: string) => {
+  const resolve = pendingLoads.get(`/api/streams/${streamId}/performances`);
+  assert(!!resolve, `a request is pending for ${streamId}`);
+  await act(async () => resolve({ data: [{ ...deepLinkPerformances[0], id: streamId, title }], total: 1 }));
+  await settleDeepLink();
+};
+await finishLoad(deepLinkStreamB.id, 'Current Beta Song');
+await finishLoad(deepLinkStreamA.id, 'Obsolete Alpha Song');
+assert(racePage.container.textContent.includes('Current Beta Song'), 'latest selection keeps its songs');
+assert(!racePage.container.textContent.includes('Obsolete Alpha Song'), 'obsolete load cannot overwrite the table');
+await racePage.unmount();
+
+// A timestamp save can finish after its row was deleted. The next row now
+// occupies index zero, but it must keep its own end timestamp.
+let finishTimestamp!: (value: unknown) => void;
+stubDeepLinkFetch((pathname) => {
+  if (pathname === '/api/stamp/stats') return { total: 2, filled: 2, remaining: 0 };
+  if (pathname === '/api/stamp/streams') return { data: [deepLinkStreamA], total: 1 };
+  if (pathname.endsWith('/performances')) return { data: deepLinkPerformances.slice(0, 2), total: 2 };
+  if (pathname.endsWith('/timestamps')) return new Promise(resolve => { finishTimestamp = resolve; });
+  if (pathname === '/api/performances/perf-deep-1') return { ok: true };
+  return undefined;
+});
+Object.defineProperty(deepLinkWin, 'confirm', { value: () => true, configurable: true });
+const mutationPage = await mountDeepLinkPage(
+  <MemoryRouter initialEntries={[`/stamp?stream=${deepLinkStreamA.id}`]}><StampEditorPage user={deepLinkCurator} /></MemoryRouter>,
+);
+await clickDeepLinkSelector(mutationPage.container, 'button[title="Clear end timestamp"]', 'clear first timestamp');
+await clickDeepLinkSelector(mutationPage.container, 'button[title="Delete song"]', 'delete first row');
+await act(async () => finishTimestamp({ ok: true }));
+await settleDeepLink();
+assert(!mutationPage.container.textContent.includes('Deep Link Song One'), 'deleted row stays deleted');
+assert(mutationPage.container.textContent.includes('Deep Link Song Two'), 'remaining row stays visible');
+assert(mutationPage.container.querySelectorAll('button[title="Clear end timestamp"]').length === 1, 'late save cannot clear the next row');
+await mutationPage.unmount();
 await deepLinkWin.happyDOM.close();
 
 console.log(

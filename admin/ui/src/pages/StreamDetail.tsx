@@ -153,10 +153,10 @@ function useStreamDetailController({
   }, [detail, requestedPerformanceId]);
 
   // --- Optimistic update helpers ---
-  const patchRow = useCallback((index: number, updates: Partial<StampPerformance>) => {
+  const patchRow = useCallback((id: string, updates: Partial<StampPerformance>) => {
     mutateDetail(prev => ({
       ...prev,
-      performances: prev.performances.map((p, i) => i === index ? { ...p, ...updates } : p),
+      performances: prev.performances.map((p) => p.id === id ? { ...p, ...updates } : p),
     }));
   }, [mutateDetail]);
 

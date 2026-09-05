@@ -4,6 +4,8 @@ import { fetchItunesDuration, summarizeDurationOutcome } from '../lib/itunes';
 import { runWithLoadingState } from '../lib/loadingState';
 import type { AppendFetchLog } from './useFetchLog';
 import type { ShowToast } from './useToast';
+import { useAsyncScope } from './useAsyncScope';
+import type { CaptureScope } from '../../../../lib/async-scope';
 
 export interface UseFetchAllDurationsOptions {
   /** `null` while the page has no loaded performances — both actions stay inert. */
@@ -15,6 +17,7 @@ export interface UseFetchAllDurationsOptions {
   saveEndTimestamp: (index: number, performance: StampPerformance, endTimestamp: number) => Promise<void>;
   /** Optional per-page refresh once saves have landed (StampEditor reloads its stamp counters). */
   onRefresh?: () => void;
+  captureScope?: CaptureScope;
 }
 
 /**
@@ -29,11 +32,18 @@ export function useFetchAllDurations({
   appendFetchLog,
   saveEndTimestamp,
   onRefresh,
+  captureScope,
 }: UseFetchAllDurationsOptions): {
   fetchDuration: () => Promise<void>;
   fetchAllDurations: () => Promise<void>;
 } {
   const [isFetchingAll, setIsFetchingAll] = useState(false);
+  const lifetime = useAsyncScope();
+  const capture = useCallback(() => {
+    const alive = lifetime.capture();
+    const selected = captureScope?.();
+    return () => alive() && (selected?.() ?? true);
+  }, [lifetime, captureScope]);
 
   const fetchDuration = useCallback(async () => {
     if (selectedIndex < 0 || !performances) return;
@@ -49,7 +59,9 @@ export function useFetchAllDurations({
     }
 
     showToast(`Fetching duration for ${perf.title}...`);
+    const isCurrent = capture();
     const outcome = await fetchItunesDuration(perf.originalArtist, perf.title);
+    if (!isCurrent()) return;
     const summary = summarizeDurationOutcome(outcome);
     appendFetchLog(perf.title, summary.tone, summary.text);
 
@@ -61,14 +73,16 @@ export function useFetchAllDurations({
     const endTimestamp = perf.timestamp + outcome.durationSec;
     try {
       await saveEndTimestamp(selectedIndex, perf, endTimestamp);
+      if (!isCurrent()) return;
       showToast(`${perf.title}: ${outcome.durationSec}s (${outcome.matchConfidence})`);
       onRefresh?.();
     } catch (err: unknown) {
+      if (!isCurrent()) return;
       const msg = err instanceof Error ? err.message : 'Failed to save end timestamp';
       appendFetchLog(perf.title, 'error', `Found ${outcome.durationSec}s but saving failed: ${msg}`);
       showToast(msg, true);
     }
-  }, [performances, selectedIndex, isFetchingAll, showToast, appendFetchLog, saveEndTimestamp, onRefresh]);
+  }, [performances, selectedIndex, isFetchingAll, showToast, appendFetchLog, saveEndTimestamp, onRefresh, capture]);
 
   const fetchAllDurations = useCallback(async () => {
     if (isFetchingAll || !performances) return;
@@ -80,6 +94,7 @@ export function useFetchAllDurations({
       return;
     }
 
+    const isCurrent = capture();
     try {
       await runWithLoadingState(setIsFetchingAll, async () => {
         let fetched = 0;
@@ -89,10 +104,12 @@ export function useFetchAllDurations({
         let aborted = false;
 
         for (let i = 0; i < missing.length; i++) {
+          if (!isCurrent()) return;
           const { perf, index } = missing[i]!;
           showToast(`Fetching ${i + 1}/${missing.length}: ${perf.title}...`);
 
           const outcome = await fetchItunesDuration(perf.originalArtist, perf.title);
+          if (!isCurrent()) return;
           const summary = summarizeDurationOutcome(outcome);
           appendFetchLog(perf.title, summary.tone, summary.text);
 
@@ -101,8 +118,10 @@ export function useFetchAllDurations({
             const endTimestamp = perf.timestamp + outcome.durationSec;
             try {
               await saveEndTimestamp(index, perf, endTimestamp);
+              if (!isCurrent()) return;
               fetched++;
             } catch (err: unknown) {
+              if (!isCurrent()) return;
               errors++;
               const msg = err instanceof Error ? err.message : 'unknown error';
               appendFetchLog(perf.title, 'error', `Found ${outcome.durationSec}s but saving failed: ${msg}`);
@@ -127,6 +146,7 @@ export function useFetchAllDurations({
           }
         }
 
+        if (!isCurrent()) return;
         showToast(
           aborted
             ? `Stopped by iTunes errors — ${fetched} saved before stopping, see fetch log`
@@ -135,13 +155,14 @@ export function useFetchAllDurations({
         );
       });
     } catch (err: unknown) {
+      if (!isCurrent()) return;
       const message = err instanceof Error ? err.message : 'unknown error';
       appendFetchLog('Batch duration fetch', 'error', `Batch stopped unexpectedly: ${message}`);
       showToast(`Batch duration fetch failed: ${message}`, true);
     } finally {
-      onRefresh?.();
+      if (isCurrent()) onRefresh?.();
     }
-  }, [performances, isFetchingAll, showToast, appendFetchLog, saveEndTimestamp, onRefresh]);
+  }, [performances, isFetchingAll, showToast, appendFetchLog, saveEndTimestamp, onRefresh, capture]);
 
   return { fetchDuration, fetchAllDurations };
 }

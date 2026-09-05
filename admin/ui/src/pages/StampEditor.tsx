@@ -19,6 +19,8 @@ import { usePerformances } from '../hooks/usePerformances';
 import { usePlayerClock } from '../hooks/usePlayerClock';
 import { useStreamPicker } from '../hooks/useStreamPicker';
 import { useSearchParamState } from '../hooks/useSearchParamState';
+import { useAsyncScope } from '../hooks/useAsyncScope';
+import { createRequestSequencer } from '../lib/apiResource';
 import { formatTimestamp } from '../lib/format-timestamp';
 
 // --- Main component ---
@@ -29,13 +31,17 @@ interface EditingField {
 }
 
 function useStampEditorController(user: AuthUser) {
+  const scope = useAsyncScope();
+  const [loads] = useState(createRequestSequencer);
+  const selectedStreamRef = useRef<string | null>(null);
   // Deep-link targets: the editor opens on them and never writes them back.
   const [requestedStreamId] = useSearchParamState('stream', '');
   const [requestedPerformanceId] = useSearchParamState('performance', '');
 
   // Performance state
   const [performances, setPerformances] = useState<StampPerformance[]>([]);
-  const [selectedIndex, setSelectedIndex] = useState(-1);
+  const [selectedRowIndex, setSelectedIndex] = useState(-1);
+  const selectedIndex = performances.length === 0 ? -1 : Math.min(selectedRowIndex, performances.length - 1);
 
   // UI state
   const [showAddModal, setShowAddModal] = useState(false);
@@ -61,9 +67,13 @@ function useStampEditorController(user: AuthUser) {
 
   const loadPerformances = useCallback(
     async (streamId: string) => {
+      if (streamId !== selectedStreamRef.current) return;
+      const isCurrent = scope.capture();
+      const requestId = loads.next();
       setLoading(true);
       try {
         const { data } = await api.listStreamPerformances(streamId);
+        if (!isCurrent() || !loads.isCurrent(requestId)) return;
         setPerformances(data);
         let nextIndex = data.length > 0 ? 0 : -1;
         if (
@@ -77,12 +87,16 @@ function useStampEditorController(user: AuthUser) {
         }
         setSelectedIndex(nextIndex);
       } catch (err: unknown) {
+        if (!isCurrent() || !loads.isCurrent(requestId)) return;
         showToast(err instanceof Error ? err.message : 'Failed to load performances', true);
       } finally {
-        setLoading(false);
+        loads.settle(requestId);
+        // An obsolete finally must not reset a newer request's loading flag.
+        // react-doctor-disable-next-line react-doctor/no-loading-flag-reset-outside-finally
+        if (isCurrent() && loads.isCurrent(requestId)) setLoading(false);
       }
     },
-    [showToast, requestedPerformanceId, requestedStreamId],
+    [showToast, requestedPerformanceId, requestedStreamId, scope, loads],
   );
 
   const {
@@ -115,11 +129,17 @@ function useStampEditorController(user: AuthUser) {
 
   const selectStream = useCallback(
     (stream: StreamWithPending) => {
+      scope.invalidate();
+      selectedStreamRef.current = stream.id;
       selectStreamId(stream.id);
+      setPerformances([]);
+      setSelectedIndex(-1);
       setEditingField(null);
+      setShowAddModal(false);
+      setShowPasteImport(false);
       loadPerformances(stream.id);
     },
-    [selectStreamId, loadPerformances],
+    [selectStreamId, loadPerformances, scope],
   );
 
   // --- Load the stream list, then — once, if the URL asked for a stream — select it and load
@@ -133,13 +153,13 @@ function useStampEditorController(user: AuthUser) {
   // whichever resolved second always reset the deep-linked pick back to row 0.
   useEffect(() => {
     let active = true;
+    const isCurrent = scope.capture();
     reloadStreams()
       .then((loaded) => {
-        if (!active || !requestedStreamId) return;
+        if (!active || !isCurrent() || !requestedStreamId) return;
         const requested = loaded.find((stream) => stream.id === requestedStreamId);
         if (requested) {
-          selectStreamId(requested.id);
-          loadPerformances(requested.id);
+          selectStream(requested);
         }
       })
       .catch((err: unknown) => {
@@ -149,12 +169,12 @@ function useStampEditorController(user: AuthUser) {
     return () => {
       active = false;
     };
-  }, [reloadStreams, requestedStreamId, selectStreamId, loadPerformances, showToast]);
+  }, [reloadStreams, requestedStreamId, selectStream, showToast, scope]);
 
   // --- Actions ---
 
-  const patchRow = useCallback((index: number, updates: Partial<StampPerformance>) => {
-    setPerformances((prev) => prev.map((p, i) => (i === index ? { ...p, ...updates } : p)));
+  const patchRow = useCallback((id: string, updates: Partial<StampPerformance>) => {
+    setPerformances((prev) => prev.map((p) => (p.id === id ? { ...p, ...updates } : p)));
   }, []);
 
   const patchAllRows = useCallback((updates: Partial<StampPerformance>) => {
@@ -191,6 +211,7 @@ function useStampEditorController(user: AuthUser) {
     reload,
     onCountsChanged: refreshStampCounts,
     onSongCreated: closeAddModal,
+    captureScope: scope.capture,
   });
 
   const deletePerformance = useCallback(
@@ -198,38 +219,35 @@ function useStampEditorController(user: AuthUser) {
       const perf = performances[idx];
       if (!perf) return;
       if (!window.confirm(`Delete #${idx + 1} ${perf.title}?`)) return;
-
+      const isCurrent = scope.capture();
       try {
         await api.deletePerformance(perfId);
-        const newPerfs = performances.filter((_, i) => i !== idx);
-        setPerformances(newPerfs);
-
-        if (newPerfs.length === 0) {
-          setSelectedIndex(-1);
-        } else if (idx >= newPerfs.length) {
-          setSelectedIndex(newPerfs.length - 1);
-        } else {
-          setSelectedIndex(idx);
-        }
+        if (!isCurrent()) return;
+        setPerformances((prev) => prev.filter((p) => p.id !== perfId));
+        setSelectedIndex((prev) => prev > idx ? prev - 1 : prev);
         showToast(`Deleted ${perf.title}`);
         refreshStampCounts();
       } catch (err: unknown) {
+        if (!isCurrent()) return;
         showToast(err instanceof Error ? err.message : 'Failed to delete', true);
       }
     },
-    [performances, showToast, refreshStampCounts],
+    [performances, showToast, refreshStampCounts, scope],
   );
 
   const handlePasteImportDone = useCallback(
     async (result: { created: number; replaced: boolean }) => {
+      if (selectedStreamId !== selectedStreamRef.current) return;
+      const isCurrent = scope.capture();
       setShowPasteImport(false);
       await reload();
+      if (!isCurrent()) return;
       showToast(
         `Imported ${result.created} songs${result.replaced ? ' (replaced existing)' : ''}`,
       );
       refreshStampCounts();
     },
-    [reload, showToast, refreshStampCounts],
+    [reload, showToast, refreshStampCounts, selectedStreamId, scope],
   );
 
   const handleInlineEditSave = useCallback(
@@ -237,18 +255,20 @@ function useStampEditorController(user: AuthUser) {
       const perf = performances[index];
       if (!perf) return;
       setEditingField(null);
-
+      const isCurrent = scope.capture();
       try {
         const body =
           field === 'title' ? { title: value } : { originalArtist: value };
         await api.updatePerformanceDetails(perf.id, body);
-        patchRow(index, body);
+        if (!isCurrent()) return;
+        patchRow(perf.id, body);
         showToast(`Updated ${field}`);
       } catch (err: unknown) {
+        if (!isCurrent()) return;
         showToast(err instanceof Error ? err.message : 'Failed to update', true);
       }
     },
-    [performances, showToast, patchRow],
+    [performances, showToast, patchRow, scope],
   );
 
   // --- Copy full VOD URL ---
@@ -270,16 +290,18 @@ function useStampEditorController(user: AuthUser) {
       return;
     }
     if (!window.confirm(`Approve all ${pendingCount} pending songs & performances for this stream?`)) return;
-
+    const isCurrent = scope.capture();
     try {
       const { songs, performances: perfs } = await api.approveAllForStream(selectedStreamId);
+      if (!isCurrent()) return;
       showToast(`Approved ${songs} songs, ${perfs} performances`);
       loadPerformances(selectedStreamId);
       refreshStampCounts();
     } catch (err: unknown) {
+      if (!isCurrent()) return;
       showToast(err instanceof Error ? err.message : 'Failed to approve', true);
     }
-  }, [selectedStreamId, performances, showToast, loadPerformances, refreshStampCounts]);
+  }, [selectedStreamId, performances, showToast, loadPerformances, refreshStampCounts, scope]);
 
   // --- Fetch durations from iTunes (Steps 5 & 6) ---
   const { fetchDuration, fetchAllDurations } = useFetchAllDurations({
@@ -289,6 +311,7 @@ function useStampEditorController(user: AuthUser) {
     appendFetchLog,
     saveEndTimestamp,
     onRefresh: refreshStampCounts,
+    captureScope: scope.capture,
   });
 
   // --- Keyboard shortcuts ---
