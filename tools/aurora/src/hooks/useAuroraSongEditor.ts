@@ -3,6 +3,8 @@ import type { ParsedSong } from '../lib/parse';
 import { fetchItunesDuration } from '../lib/itunes';
 import type { AuroraSong } from '../components/SongListEditor';
 import type { YouTubeEmbedHandle } from '../components/YouTubeEmbed';
+import { createAsyncScope } from '../../../../lib/async-scope';
+import { applyDuration } from '../lib/duration-update';
 
 function loadSession(videoId: string): AuroraSong[] {
   try {
@@ -20,10 +22,13 @@ function saveSession(videoId: string, songs: AuroraSong[]) {
 export function useAuroraSongEditor(
   videoId: string | null,
   playerRef: RefObject<YouTubeEmbedHandle | null>,
+  lookupDuration = fetchItunesDuration,
 ) {
   const [songs, setSongs] = useState<AuroraSong[]>([]);
   const [selectedIndex, setSelectedIndex] = useState<number | null>(null);
-  const [fillingIndex, setFillingIndex] = useState<number | null>(null);
+  const [fillingSongId, setFillingSongId] = useState<string | null>(null);
+  const fillingIndex = fillingSongId === null ? null : songs.findIndex((song) => song.id === fillingSongId);
+  const [scope] = useState(createAsyncScope);
   const [bulkFillStatus, setBulkFillStatus] = useState<string | null>(null);
   const pendingSaveRef = useRef<{ videoId: string; songs: AuroraSong[] } | null>(null);
   const bulkFillStatusTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
@@ -35,6 +40,14 @@ export function useAuroraSongEditor(
   }, []);
 
   useEffect(() => clearBulkFillStatusTimer, [clearBulkFillStatusTimer]);
+  useEffect(() => () => scope.invalidate(), [scope]);
+
+  const cancelDurationLookup = useCallback(() => {
+    scope.invalidate();
+    clearBulkFillStatusTimer();
+    setFillingSongId(null);
+    setBulkFillStatus(null);
+  }, [scope, clearBulkFillStatusTimer]);
 
   useEffect(() => {
     if (!videoId) return;
@@ -57,6 +70,7 @@ export function useAuroraSongEditor(
   }, []);
 
   const loadVideoSession = useCallback((nextVideoId: string) => {
+    cancelDurationLookup();
     const pendingSave = pendingSaveRef.current;
     if (pendingSave) {
       saveSession(pendingSave.videoId, pendingSave.songs);
@@ -66,7 +80,7 @@ export function useAuroraSongEditor(
     const saved = loadSession(nextVideoId);
     setSongs(saved);
     setSelectedIndex(saved.length > 0 ? 0 : null);
-  }, []);
+  }, [cancelDurationLookup]);
 
   const addSong = useCallback(() => {
     const currentTime = playerRef.current?.getCurrentTime() ?? 0;
@@ -120,6 +134,7 @@ export function useAuroraSongEditor(
     }));
 
     if (mode === 'replace') {
+      cancelDurationLookup();
       updateSongs(() => importedSongs);
       setSelectedIndex(importedSongs.length > 0 ? 0 : null);
       return;
@@ -128,13 +143,14 @@ export function useAuroraSongEditor(
     updateSongs((previous) => [...previous, ...importedSongs]);
     const lastIndex = songs.length + importedSongs.length - 1;
     setSelectedIndex(lastIndex >= 0 ? lastIndex : null);
-  }, [songs.length, updateSongs]);
+  }, [songs.length, updateSongs, cancelDurationLookup]);
 
   const clearSongs = useCallback(() => {
     if (!window.confirm('確定要清除所有歌曲嗎？此操作無法復原。')) return;
+    cancelDurationLookup();
     updateSongs(() => []);
     setSelectedIndex(null);
-  }, [updateSongs]);
+  }, [updateSongs, cancelDurationLookup]);
 
   const seekTo = useCallback((seconds: number) => {
     playerRef.current?.seekTo(seconds);
@@ -178,16 +194,17 @@ export function useAuroraSongEditor(
   const fillDuration = useCallback(async (index: number) => {
     const song = songs[index];
     if (!song || !song.name) return;
-    setFillingIndex(index);
+    const isCurrent = scope.capture();
+    setFillingSongId(song.id);
     try {
-      const { durationSec } = await fetchItunesDuration(song.artist, song.name);
-      if (durationSec !== null) {
-        updateSong(index, { endSeconds: song.startSeconds + durationSec });
+      const { durationSec } = await lookupDuration(song.artist, song.name);
+      if (isCurrent() && durationSec !== null) {
+        updateSongs((previous) => isCurrent() ? applyDuration(previous, song, durationSec) : previous);
       }
     } finally {
-      setFillingIndex(null);
+      if (isCurrent()) setFillingSongId(null);
     }
-  }, [songs, updateSong]);
+  }, [songs, updateSongs, scope, lookupDuration]);
 
   const fillAllDurations = useCallback(async () => {
     const targets: { song: AuroraSong; index: number }[] = [];
@@ -197,19 +214,22 @@ export function useAuroraSongEditor(
     }
     if (targets.length === 0) return;
     clearBulkFillStatusTimer();
+    const isCurrent = scope.capture();
 
     let filled = 0;
     let noMatch = 0;
     for (let targetIndex = 0; targetIndex < targets.length; targetIndex++) {
-      const { song, index } = targets[targetIndex]!;
-      setFillingIndex(index);
+      if (!isCurrent()) return;
+      const { song } = targets[targetIndex]!;
+      setFillingSongId(song.id);
       setBulkFillStatus(`填入中 ${targetIndex + 1}/${targets.length}...`);
       try {
         // The shared iTunes limiter is stateful; preserve its three-second request spacing.
         // react-doctor-disable-next-line react-doctor/async-await-in-loop
-        const { durationSec } = await fetchItunesDuration(song.artist, song.name);
+        const { durationSec } = await lookupDuration(song.artist, song.name);
+        if (!isCurrent()) return;
         if (durationSec !== null) {
-          updateSong(index, { endSeconds: song.startSeconds + durationSec });
+          updateSongs((previous) => isCurrent() ? applyDuration(previous, song, durationSec) : previous);
           filled++;
         } else {
           noMatch++;
@@ -218,13 +238,14 @@ export function useAuroraSongEditor(
         noMatch++;
       }
     }
-    setFillingIndex(null);
+    if (!isCurrent()) return;
+    setFillingSongId(null);
     setBulkFillStatus(`完成：${filled} 首填入，${noMatch} 首未找到`);
     bulkFillStatusTimerRef.current = setTimeout(() => {
       bulkFillStatusTimerRef.current = null;
       setBulkFillStatus(null);
     }, 5000);
-  }, [songs, updateSong, clearBulkFillStatusTimer]);
+  }, [songs, updateSongs, clearBulkFillStatusTimer, scope, lookupDuration]);
 
   return {
     songs,

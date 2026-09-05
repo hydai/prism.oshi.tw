@@ -6,6 +6,8 @@ import { api } from '../api/client';
 import { formatTimestamp } from '../lib/format-timestamp';
 import type { YouTubePlayerHandle } from '../components/YouTubePlayer';
 import type { ShowToast } from './useToast';
+import { useAsyncScope } from './useAsyncScope';
+import type { CaptureScope } from '../../../../lib/async-scope';
 
 export interface UsePerformancesOptions {
   /** The stream being stamped; empty until a page has one. */
@@ -17,7 +19,7 @@ export interface UsePerformancesOptions {
   playerRef: RefObject<YouTubePlayerHandle | null>;
   showToast: ShowToast;
   /** Folds one row's update into the page's own state, with no round trip. */
-  patchRow: (index: number, updates: Partial<StampPerformance>) => void;
+  patchRow: (id: string, updates: Partial<StampPerformance>) => void;
   /** The same, for every row at once. */
   patchAllRows: (updates: Partial<StampPerformance>) => void;
   /** Re-reads the page's own source of truth after a write that changed the row set. */
@@ -26,6 +28,7 @@ export interface UsePerformancesOptions {
   onCountsChanged?: () => void;
   /** Fires the moment a song is created, before the reload — the pages close their modal here. */
   onSongCreated?: () => void;
+  captureScope?: CaptureScope;
 }
 
 /** Every stamping action both editors perform on a stream's performances. */
@@ -64,27 +67,36 @@ export function usePerformances({
   reload,
   onCountsChanged,
   onSongCreated,
+  captureScope,
 }: UsePerformancesOptions): PerformanceActions {
+  const lifetime = useAsyncScope();
+  const capture = useCallback(() => {
+    const alive = lifetime.capture();
+    const selected = captureScope?.();
+    return () => alive() && (selected?.() ?? true);
+  }, [lifetime, captureScope]);
   const markEndTimestamp = useCallback(async () => {
     const player = playerRef.current;
     if (selectedIndex < 0 || !performances || !player) return;
     const perf = performances[selectedIndex];
     if (!perf) return;
     const currentTime = Math.floor(player.getCurrentTime());
-
+    const isCurrent = capture();
     try {
       await api.updatePerformanceTimestamps(perf.id, { endTimestamp: currentTime });
-      patchRow(selectedIndex, { endTimestamp: currentTime });
+      if (!isCurrent()) return;
+      patchRow(perf.id, { endTimestamp: currentTime });
       showToast(`Marked ${perf.title} → ${formatTimestamp(currentTime)}`);
       onCountsChanged?.();
 
       // Auto-advance to next unstamped
       const nextIdx = performances.findIndex((p, i) => i > selectedIndex && p.endTimestamp === null);
-      if (nextIdx >= 0) setSelectedIndex(nextIdx);
+      if (nextIdx >= 0) setSelectedIndex((current) => current === selectedIndex ? nextIdx : current);
     } catch (err: unknown) {
+      if (!isCurrent()) return;
       showToast(err instanceof Error ? err.message : 'Failed to mark timestamp', true);
     }
-  }, [performances, selectedIndex, setSelectedIndex, playerRef, showToast, patchRow, onCountsChanged]);
+  }, [performances, selectedIndex, setSelectedIndex, playerRef, showToast, patchRow, onCountsChanged, capture]);
 
   const markStartTimestamp = useCallback(async () => {
     const player = playerRef.current;
@@ -92,15 +104,17 @@ export function usePerformances({
     const perf = performances[selectedIndex];
     if (!perf) return;
     const currentTime = Math.floor(player.getCurrentTime());
-
+    const isCurrent = capture();
     try {
       await api.updatePerformanceTimestamps(perf.id, { timestamp: currentTime });
-      patchRow(selectedIndex, { timestamp: currentTime });
+      if (!isCurrent()) return;
+      patchRow(perf.id, { timestamp: currentTime });
       showToast(`Start ${perf.title} → ${formatTimestamp(currentTime)}`);
     } catch (err: unknown) {
+      if (!isCurrent()) return;
       showToast(err instanceof Error ? err.message : 'Failed to mark start', true);
     }
-  }, [performances, selectedIndex, playerRef, showToast, patchRow]);
+  }, [performances, selectedIndex, playerRef, showToast, patchRow, capture]);
 
   const seekToStart = useCallback(() => {
     const player = playerRef.current;
@@ -136,62 +150,71 @@ export function usePerformances({
   }, [setSelectedIndex]);
 
   const clearEndTimestamp = useCallback(
-    async (perfId: string, index: number) => {
+    async (perfId: string) => {
+      const isCurrent = capture();
       try {
         await api.updatePerformanceTimestamps(perfId, { endTimestamp: null });
-        patchRow(index, { endTimestamp: null });
+        if (!isCurrent()) return;
+        patchRow(perfId, { endTimestamp: null });
         showToast('Cleared end timestamp');
         onCountsChanged?.();
       } catch (err: unknown) {
+        if (!isCurrent()) return;
         showToast(err instanceof Error ? err.message : 'Failed to clear', true);
       }
     },
-    [showToast, patchRow, onCountsChanged],
+    [showToast, patchRow, onCountsChanged, capture],
   );
 
   const clearAllEndTimestamps = useCallback(async () => {
     if (!streamId) return;
     if (!confirm('Clear ALL end timestamps for this stream?')) return;
-
+    const isCurrent = capture();
     try {
       const { cleared } = await api.clearAllEndTimestamps(streamId);
+      if (!isCurrent()) return;
       patchAllRows({ endTimestamp: null });
       showToast(`Cleared ${cleared} end timestamps`);
       onCountsChanged?.();
     } catch (err: unknown) {
+      if (!isCurrent()) return;
       showToast(err instanceof Error ? err.message : 'Failed to clear', true);
     }
-  }, [streamId, showToast, patchAllRows, onCountsChanged]);
+  }, [streamId, showToast, patchAllRows, onCountsChanged, capture]);
 
   const addSong = useCallback(
     async (title: string, artist: string) => {
       const player = playerRef.current;
       if (!streamId || !player) return;
       const timestamp = Math.floor(player.getCurrentTime());
-
+      const isCurrent = capture();
       try {
         await api.createStampPerformance(streamId, {
           title,
           originalArtist: artist || 'Unknown',
           timestamp,
         });
+        if (!isCurrent()) return;
         onSongCreated?.();
         await reload();
+        if (!isCurrent()) return;
         showToast(`Added ${title} at ${formatTimestamp(timestamp)}`);
         onCountsChanged?.();
       } catch (err: unknown) {
+        if (!isCurrent()) return;
         showToast(err instanceof Error ? err.message : 'Failed to add song', true);
       }
     },
-    [streamId, playerRef, reload, showToast, onCountsChanged, onSongCreated],
+    [streamId, playerRef, reload, showToast, onCountsChanged, onSongCreated, capture],
   );
 
   const saveEndTimestamp = useCallback(
-    async (index: number, performance: StampPerformance, endTimestamp: number) => {
+    async (_index: number, performance: StampPerformance, endTimestamp: number) => {
+      const isCurrent = capture();
       await api.updatePerformanceTimestamps(performance.id, { endTimestamp });
-      patchRow(index, { endTimestamp });
+      if (isCurrent()) patchRow(performance.id, { endTimestamp });
     },
-    [patchRow],
+    [patchRow, capture],
   );
 
   const exportSongList = useCallback(() => {

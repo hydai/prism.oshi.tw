@@ -63,9 +63,9 @@ jobs:
           - name: Admin UI check
             path: admin/ui
             command: npm run check
-          - name: Aurora build
+          - name: Aurora check
             path: tools/aurora
-            command: npm run build
+            command: npm run check
           - name: Crystal worker check
             path: tools/crystal
             command: npm run check
