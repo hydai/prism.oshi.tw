@@ -1,4 +1,5 @@
-import { renderToStaticMarkup } from 'react-dom/server';
+import { renderToStaticMarkup, renderToReadableStream } from 'react-dom/server';
+import type { ReactElement } from 'react';
 import { MemoryRouter } from 'react-router-dom';
 import type { AuthUser } from '../../shared/types';
 
@@ -142,7 +143,7 @@ async function main(): Promise<void> {
   // --- A curator-only route renders nothing at all for a contributor ---
 
   for (const { url, marker } of CURATOR_ROUTE_PROBES) {
-    const allowed = renderToStaticMarkup(
+    const allowed = await renderLoadedPage(
       <MemoryRouter initialEntries={[url]}>
         <AppRoutes user={curator} />
       </MemoryRouter>,
@@ -179,3 +180,9 @@ async function main(): Promise<void> {
 }
 
 await main();
+
+async function renderLoadedPage(element: ReactElement): Promise<string> {
+  const stream = await renderToReadableStream(element);
+  await stream.allReady;
+  return new Response(stream).text();
+}
