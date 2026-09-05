@@ -19,6 +19,7 @@ export interface PersistedStoreOptions<T> {
   persist?: 'required' | 'best-effort';
   /** Injectable cross-tab serialization and event source for deterministic tests. */
   locks?: Pick<LockManager, 'request'> | null;
+  /** null disables external refreshes, including on UI resubscription. */
   events?: Pick<Window, 'addEventListener' | 'removeEventListener'> | null;
 }
 
@@ -135,7 +136,8 @@ export function createPersistedStore<T>(options: PersistedStoreOptions<T>): Pers
         events?.addEventListener('storage', refresh);
         // Catch a write between construction/render and subscribing, or while
         // nobody was subscribed. useSyncExternalStore rechecks after subscribe.
-        if (!dirty) { snapshot = load(); loaded = true; }
+        // Explicitly tab-local stores must keep their loaded active state.
+        if (!dirty && (options.events !== null || !loaded)) { snapshot = load(); loaded = true; }
       }
       listeners.add(listener);
       return () => {

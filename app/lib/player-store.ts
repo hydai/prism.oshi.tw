@@ -170,6 +170,9 @@ export function createPlayerStore(deps: PlayerStoreDeps = {}): PlayerStore {
     // Volatile UI setting: keep the slider and the YouTube player's real
     // volume moving together even when storage refuses the write.
     persist: 'best-effort',
+    // An active player owns its audio settings; storage is only the initial
+    // preference for new players, not a cross-tab control channel.
+    events: null,
   });
   const mutedStore = createPersistedStore<boolean>({
     key: 'prism_muted',
@@ -177,6 +180,7 @@ export function createPlayerStore(deps: PlayerStoreDeps = {}): PlayerStore {
     parse: (raw) => raw === true || raw === 'true',
     // Same as volumeStore: don't freeze the mute icon under a storage failure.
     persist: 'best-effort',
+    events: null,
   });
 
   function setState(patch: Partial<PlayerState>): void {

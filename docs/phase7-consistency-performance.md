@@ -28,6 +28,8 @@ measurements. Additional route chunks are downloaded when their page is opened.
   update other tabs. On browsers without Web Locks, re-reading before each write still
   prevents stale sequential overwrites but cannot guarantee simultaneous-tab exclusion.
   Refresh older open tabs after rollout: old clients do not participate in these locks.
+- Active-player volume and mute remain tab-local so the controls reflect that player's
+  actual audio; newly created players still read the saved preferences from storage.
 - Catalog imports resolve exact local identities inside the write batch. Approved rows
   win over pending ones; aliases remain authoritative, and intentionally existing local
   duplicates are not constrained or automatically merged. A failed replace rolls back
