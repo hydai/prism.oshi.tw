@@ -81,8 +81,8 @@ export default function LikedSongsPanel({ show, onClose, onToast }: LikedSongsPa
                     </button>
                   </div>
                   <button
-                    onClick={() => {
-                      const result = toggleLike(version);
+                    onClick={async () => {
+                      const result = await toggleLike(version);
                       if (!result.success) onToast?.(result.error);
                     }}
                     className="text-pink-400 hover:text-pink-300 flex-shrink-0 p-1"

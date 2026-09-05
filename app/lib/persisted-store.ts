@@ -17,6 +17,9 @@ export interface PersistedStoreOptions<T> {
    * on a storage failure is worse than not persisting.
    */
   persist?: 'required' | 'best-effort';
+  /** Injectable cross-tab serialization and event source for deterministic tests. */
+  locks?: Pick<LockManager, 'request'> | null;
+  events?: Pick<Window, 'addEventListener' | 'removeEventListener'> | null;
 }
 
 export interface PersistedStore<T> {
@@ -25,6 +28,7 @@ export interface PersistedStore<T> {
   subscribe: (listener: () => void) => () => void;
   available: boolean;
   update: (updater: (prev: T) => T) => StorageSaveResult;
+  updateExclusive: (updater: (prev: T) => T, validate?: (prev: T) => string | undefined) => Promise<StorageSaveResult>;
 }
 
 const PROBE_KEY = '__prism_ls_test__';
@@ -76,6 +80,9 @@ export function createPersistedStore<T>(options: PersistedStoreOptions<T>): Pers
   // that includes it — isn't mistaken for "not loaded" and reloaded forever.
   let snapshot: T = fallback;
   let loaded = false;
+  let dirty = false;
+  const events = options.events === undefined ? (typeof window === 'undefined' ? null : window) : options.events;
+  const locks = options.locks === undefined ? (typeof navigator === 'undefined' ? null : navigator.locks) : options.locks;
 
   const load = (): T => {
     if (!storage) return fallback;
@@ -85,6 +92,32 @@ export function createPersistedStore<T>(options: PersistedStoreOptions<T>): Pers
     } catch {
       return fallback;
     }
+  };
+
+  const notify = () => { for (const listener of listeners) listener(); };
+  const refresh = (event: StorageEvent) => {
+    if (event.storageArea !== storage || (event.key !== key && event.key !== null)) return;
+    snapshot = load();
+    loaded = true;
+    dirty = false;
+    notify();
+  };
+  const update = (updater: (prev: T) => T, validate?: (prev: T) => string | undefined): StorageSaveResult => {
+    // A render snapshot is not a write base: another tab may have committed
+    // since our last storage event. Preserve best-effort unsaved UI state only.
+    const current = dirty ? snapshot : load();
+    const error = validate?.(current);
+    if (error) return { success: false, error };
+    const next = updater(current);
+    const saved: StorageSaveResult = storage
+      ? saveJsonToStorage(storage, key, serialize(next))
+      : { success: false, error: STORAGE_UNAVAILABLE };
+    if (!saved.success && persist === 'required') return saved;
+    snapshot = next;
+    loaded = true;
+    dirty = !saved.success;
+    notify();
+    return saved;
   };
 
   return {
@@ -98,20 +131,29 @@ export function createPersistedStore<T>(options: PersistedStoreOptions<T>): Pers
       return snapshot;
     },
     subscribe: (listener) => {
+      if (listeners.size === 0) {
+        events?.addEventListener('storage', refresh);
+        // Catch a write between construction/render and subscribing, or while
+        // nobody was subscribed. useSyncExternalStore rechecks after subscribe.
+        if (!dirty) { snapshot = load(); loaded = true; }
+      }
       listeners.add(listener);
-      return () => listeners.delete(listener);
+      return () => {
+        listeners.delete(listener);
+        if (listeners.size === 0) events?.removeEventListener('storage', refresh);
+      };
     },
-    update: (updater) => {
-      const current = loaded ? snapshot : load();
-      const next = updater(current);
-      const saved: StorageSaveResult = storage
-        ? saveJsonToStorage(storage, key, serialize(next))
-        : { success: false, error: STORAGE_UNAVAILABLE };
-      if (!saved.success && persist === 'required') return saved;
-      snapshot = next;
-      loaded = true;
-      for (const listener of listeners) listener();
-      return saved;
+    update,
+    updateExclusive: async (updater, validate) => {
+      try {
+        // Evergreen browsers on HTTPS provide Web Locks. Older/non-secure
+        // clients still re-read before writing, but cannot guarantee exclusion.
+        return locks
+          ? await locks.request(`prism:storage:${key}`, () => update(updater, validate))
+          : update(updater, validate);
+      } catch {
+        return { success: false, error: STORAGE_UNAVAILABLE };
+      }
     },
   };
 }

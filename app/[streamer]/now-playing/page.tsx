@@ -37,8 +37,8 @@ export default function NowPlayingPage() {
 
   // toggleCurrentLike's write can fail (storage quota); this page has a toast
   // affordance, so surface the failure here.
-  const toggleCurrentLike = useCallback(() => {
-    const result = toggleCurrentLikeRaw();
+  const toggleCurrentLike = useCallback(async () => {
+    const result = await toggleCurrentLikeRaw();
     if (result && !result.success) setToastMessage(result.error);
   }, [toggleCurrentLikeRaw]);
 

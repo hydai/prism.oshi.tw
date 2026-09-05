@@ -78,8 +78,8 @@ export default function PlaylistPanel({ show, onClose, songsData, onToast }: Pla
     playTrackWithQueue(firstPlayable, tracks.slice(firstPlayableIndex + 1));
   };
 
-  const handleRename = (playlistId: string) => {
-    const result = renamePlaylist(playlistId, editName);
+  const handleRename = async (playlistId: string) => {
+    const result = await renamePlaylist(playlistId, editName);
     if (result.success) {
       setEditingPlaylistId(null);
       setEditName('');

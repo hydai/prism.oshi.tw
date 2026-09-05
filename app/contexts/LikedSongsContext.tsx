@@ -12,7 +12,7 @@ export type LikedVersion = PerformanceRef & { likedAt: number };
 interface LikedSongsContextType {
   likedSongs: LikedVersion[];
   isLiked: (performanceId: string) => boolean;
-  toggleLike: (version: PerformanceRef) => StorageSaveResult;
+  toggleLike: (version: PerformanceRef) => Promise<StorageSaveResult>;
   likedCount: number;
 }
 
@@ -52,7 +52,7 @@ export const LikedSongsProvider = ({ streamerSlug, children }: { streamerSlug: s
   const isLiked = useCallback((performanceId: string) => likedIds.has(performanceId), [likedIds]);
 
   const toggleLike = useCallback((version: PerformanceRef) => {
-    return store.update((prev) => {
+    return store.updateExclusive((prev) => {
       const exists = prev.some((s) => s.performanceId === version.performanceId);
       return exists
         ? prev.filter((s) => s.performanceId !== version.performanceId)

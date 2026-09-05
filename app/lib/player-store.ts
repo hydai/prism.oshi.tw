@@ -141,7 +141,8 @@ export function createPlayerStore(deps: PlayerStoreDeps = {}): PlayerStore {
   let player: YouTubePlayer | null = null;
   let loadedVideoId: string | null = null;
   let erroredVideoId: string | null = null;
-  let playHistory: Track[] = [];
+  let playHistory: { track: Track; rotatedEntryId?: string }[] = [];
+  const forwardEntryIds = new Set<string>();
   // Repeat-all refill pool — deliberately uncapped: deduped by performanceId and
   // bounded by the number of distinct performances played this session.
   const allTracks: Track[] = [];
@@ -192,8 +193,8 @@ export function createPlayerStore(deps: PlayerStoreDeps = {}): PlayerStore {
     return { ...track, queueEntryId: `q-${queueEntrySeq++}` };
   }
 
-  function pushHistory(track: Track): void {
-    playHistory = [...playHistory, track].slice(-PLAY_HISTORY_LIMIT);
+  function pushHistory(track: Track, rotatedEntryId?: string): void {
+    playHistory = [...playHistory, { track, rotatedEntryId }].slice(-PLAY_HISTORY_LIMIT);
   }
 
   function addAllTracks(tracks: Track[]): void {
@@ -473,16 +474,21 @@ export function createPlayerStore(deps: PlayerStoreDeps = {}): PlayerStore {
     // has run; idempotent, and its .catch resets isPlaying if it fails.
     ensurePlayerApi();
 
-    const pickIndex = state.shuffleOn ? Math.floor(Math.random() * playable.length) : 0;
+    const forwardIndex = playable.findIndex((entry) => forwardEntryIds.has(entry.queueEntryId));
+    const pickIndex = forwardIndex >= 0 ? forwardIndex : state.shuffleOn ? Math.floor(Math.random() * playable.length) : 0;
     const nextTrack = playable[pickIndex];
+    forwardEntryIds.delete(nextTrack.queueEntryId);
     const actualIndex = remainingQueue.indexOf(nextTrack);
     const newQueue = [...remainingQueue];
     newQueue.splice(actualIndex, 1);
     // Repeat-all: rotate the finished track to the end of the queue.
+    let rotatedEntryId: string | undefined;
     if (state.repeatMode === 'all' && fromTrack && !fromTrack.deleted) {
-      newQueue.push(createQueueEntry(fromTrack));
+      const rotated = createQueueEntry(fromTrack);
+      rotatedEntryId = rotated.queueEntryId;
+      newQueue.push(rotated);
     }
-    if (fromTrack) pushHistory(fromTrack);
+    if (fromTrack) pushHistory(fromTrack, rotatedEntryId);
     timeStore.setTime(nextTrack.timestamp);
     setState({
       queue: newQueue,
@@ -503,6 +509,7 @@ export function createPlayerStore(deps: PlayerStoreDeps = {}): PlayerStore {
     // Play a track and REPLACE the whole queue with `following` — clicking a
     // song in any list establishes that list as the new playback context.
     playTrackWithQueue(track, following) {
+      forwardEntryIds.clear();
       // Covers fast clicks that land before the idle prefetch has run.
       ensurePlayerApi();
       const prevTrack = state.currentTrack;
@@ -556,10 +563,16 @@ export function createPlayerStore(deps: PlayerStoreDeps = {}): PlayerStore {
       if (playHistory.length === 0) return;
       // Idempotent; its .catch resets isPlaying if the API isn't available.
       ensurePlayerApi();
-      const prevTrack = playHistory[playHistory.length - 1];
+      const { track: prevTrack, rotatedEntryId } = playHistory[playHistory.length - 1];
       playHistory = playHistory.slice(0, -1);
+      const forward = createQueueEntry(track);
+      forwardEntryIds.add(forward.queueEntryId);
       timeStore.setTime(prevTrack.timestamp);
       setState({
+        // Undo only the repeat-all rotation made by this transition, not an
+        // intentional duplicate the user queued. Next retraces this step even
+        // with shuffle enabled, then returns to normal queue selection.
+        queue: [forward, ...state.queue.filter((entry) => entry.queueEntryId !== rotatedEntryId)],
         currentTrack: prevTrack,
         isPlaying: true,
         playerError: playerErrorFor(prevTrack),
@@ -587,10 +600,14 @@ export function createPlayerStore(deps: PlayerStoreDeps = {}): PlayerStore {
     },
 
     removeFromQueue(index) {
+      const entry = state.queue[index];
+      if (entry) forwardEntryIds.delete(entry.queueEntryId);
       setState({ queue: state.queue.filter((_, i) => i !== index) });
     },
 
     reorderQueue(fromIndex, toIndex) {
+      if (!state.queue[fromIndex] || !state.queue[toIndex]) return;
+      forwardEntryIds.clear();
       const newQueue = [...state.queue];
       const [removed] = newQueue.splice(fromIndex, 1);
       newQueue.splice(toIndex, 0, removed);

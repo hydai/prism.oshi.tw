@@ -21,8 +21,8 @@ export default function CreatePlaylistDialog({ onClose, onSuccess }: CreatePlayl
     inputRef.current?.focus();
   }, []);
 
-  const handleCreate = () => {
-    const result = createPlaylist(name);
+  const handleCreate = async () => {
+    const result = await createPlaylist(name);
     if (result.success) {
       onSuccess?.();
       onClose();

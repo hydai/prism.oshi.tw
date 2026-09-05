@@ -33,8 +33,8 @@ export default function RecentlyPlayedPanel({ show, onClose, onToast }: Recently
     onToast?.('已加入待播清單');
   };
 
-  const handleClearAll = () => {
-    const result = clearHistory();
+  const handleClearAll = async () => {
+    const result = await clearHistory();
     onToast?.(result.success ? '播放紀錄已清除' : result.error);
   };
 

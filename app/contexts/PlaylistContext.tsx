@@ -36,10 +36,10 @@ export interface PlaylistExportEnvelope {
 
 interface PlaylistContextType {
   playlists: Playlist[];
-  createPlaylist: (name: string) => { success: boolean; error?: string };
+  createPlaylist: (name: string) => Promise<{ success: boolean; error?: string }>;
   deletePlaylist: (id: string) => void;
-  renamePlaylist: (id: string, newName: string) => { success: boolean; error?: string };
-  addVersionToPlaylist: (playlistId: string, version: PlaylistVersion) => { success: boolean; error?: string };
+  renamePlaylist: (id: string, newName: string) => Promise<{ success: boolean; error?: string }>;
+  addVersionToPlaylist: (playlistId: string, version: PlaylistVersion) => Promise<{ success: boolean; error?: string }>;
   removeVersionFromPlaylist: (playlistId: string, performanceId: string) => void;
   reorderVersionsInPlaylist: (playlistId: string, fromIndex: number, toIndex: number) => void;
   storageError: string | null;
@@ -170,13 +170,13 @@ export const PlaylistProvider = ({ streamerSlug, children }: { streamerSlug: str
 
   // Every mutation goes through here: functional update, persisted before
   // listeners fire, storage errors surfaced once.
-  const commit = useCallback((updater: (prev: Playlist[]) => Playlist[]): StorageSaveResult => {
-    const result = store.update(updater);
+  const commit = useCallback(async (updater: (prev: Playlist[]) => Playlist[], validate?: (prev: Playlist[]) => string | undefined): Promise<StorageSaveResult> => {
+    const result = await store.updateExclusive(updater, validate);
     setStorageError(result.success ? null : result.error);
     return result;
   }, [store]);
 
-  const createPlaylist = useCallback((name: string) => {
+  const createPlaylist = useCallback(async (name: string) => {
     if (!store.available) { setStorageError(STORAGE_UNSUPPORTED_ERROR); return { success: false, error: STORAGE_UNSUPPORTED_ERROR }; }
     const trimmedName = name.trim();
     if (!trimmedName) return { success: false, error: '播放清單名稱不可為空' };
@@ -186,36 +186,27 @@ export const PlaylistProvider = ({ streamerSlug, children }: { streamerSlug: str
 
   const deletePlaylist = useCallback((id: string) => { commit((prev) => prev.filter((p) => p.id !== id)); }, [commit]);
 
-  const renamePlaylist = useCallback((id: string, newName: string) => {
+  const renamePlaylist = useCallback(async (id: string, newName: string) => {
     const trimmedName = newName.trim();
     if (!trimmedName) return { success: false, error: '播放清單名稱不可為空' };
     const now = Date.now();
     return commit((prev) => prev.map((p) => (p.id === id ? { ...p, name: trimmedName, updatedAt: now } : p)));
   }, [commit]);
 
-  const addVersionToPlaylist = useCallback((playlistId: string, version: PlaylistVersion) => {
+  const addVersionToPlaylist = useCallback(async (playlistId: string, version: PlaylistVersion) => {
     if (!store.available) { setStorageError(STORAGE_UNSUPPORTED_ERROR); return { success: false, error: STORAGE_UNSUPPORTED_ERROR }; }
-
-    // Validate against the store's live snapshot (not the `playlists` render
-    // closure) so this sees an add from earlier in the same tick. Nothing
-    // async runs between this read and the commit() below, so the updater
-    // it runs sees the exact same state — keeps the updater itself pure.
-    const current = store.getSnapshot();
-    const playlist = current.find((p) => p.id === playlistId);
-    if (!playlist) {
-      return { success: false, error: '播放清單不存在' };
-    }
-    const exists = playlist.versions.some((v) => v.performanceId === version.performanceId);
-    if (exists) {
-      return { success: false, error: '此版本已在播放清單中' };
-    }
 
     const now = Date.now();
     return commit((prev) => prev.map((p) =>
       p.id === playlistId
         ? { ...p, versions: [...p.versions, pickPerformanceRef(version)], updatedAt: now }
         : p
-    ));
+    ), (prev) => {
+      const playlist = prev.find((p) => p.id === playlistId);
+      if (!playlist) return '播放清單不存在';
+      if (playlist.versions.some((v) => v.performanceId === version.performanceId)) return '此版本已在播放清單中';
+      return undefined;
+    });
   }, [store, commit]);
 
   const removeVersionFromPlaylist = useCallback((playlistId: string, performanceId: string) => {
@@ -228,15 +219,22 @@ export const PlaylistProvider = ({ streamerSlug, children }: { streamerSlug: str
   }, [commit]);
 
   const reorderVersionsInPlaylist = useCallback((playlistId: string, fromIndex: number, toIndex: number) => {
+    const versions = store.getSnapshot().find((p) => p.id === playlistId)?.versions;
+    const sourceId = versions?.[fromIndex]?.performanceId;
+    const targetId = versions?.[toIndex]?.performanceId;
+    if (!sourceId || !targetId) return;
     const now = Date.now();
-    commit((prev) => prev.map((p) => {
+    void commit((prev) => prev.map((p) => {
       if (p.id !== playlistId) return p;
+      const from = p.versions.findIndex((v) => v.performanceId === sourceId);
+      const to = p.versions.findIndex((v) => v.performanceId === targetId);
+      if (from < 0 || to < 0) return p;
       const newVersions = [...p.versions];
-      const [removed] = newVersions.splice(fromIndex, 1);
-      newVersions.splice(toIndex, 0, removed);
+      const [removed] = newVersions.splice(from, 1);
+      newVersions.splice(to, 0, removed);
       return { ...p, versions: newVersions, updatedAt: now };
     }));
-  }, [commit]);
+  }, [store, commit]);
 
   const clearStorageError = useCallback(() => setStorageError(null), []);
 
@@ -267,7 +265,7 @@ export const PlaylistProvider = ({ streamerSlug, children }: { streamerSlug: str
       }
 
       const incoming = result.playlists;
-      const saved = commit((prev) => {
+      const saved = await commit((prev) => {
         const localMap = new Map(prev.map(p => [p.id, p]));
         const merged: Playlist[] = [...prev];
 

@@ -93,8 +93,8 @@ export function ArchiveUiProvider({ children }: { children: ReactNode }) {
 
   // toggleLike's write can fail (storage quota); surface that failure here
   // since this is the only surface with a toast affordance for it.
-  const handleToggleLike = useCallback((ref: PerformanceRef) => {
-    const result = toggleLike(ref);
+  const handleToggleLike = useCallback(async (ref: PerformanceRef) => {
+    const result = await toggleLike(ref);
     if (!result.success) setToastMessage(result.error);
   }, [toggleLike]);
 
