@@ -1,23 +1,24 @@
 import { Navigate } from 'react-router-dom';
-import type { ReactElement } from 'react';
+import { lazy, Suspense, type ReactElement } from 'react';
+import { PageBoundary } from '../components/PageBoundary';
 import type { AuthUser } from '../../../shared/types';
-import CrystalTickets from '../pages/CrystalTickets';
-import Dashboard from '../pages/Dashboard';
-import GlobalWorkReview from '../pages/GlobalWorkReview';
-import GlobalWorks from '../pages/GlobalWorks';
-import Harmonizer from '../pages/Harmonizer';
-import NovaSubmissions from '../pages/NovaSubmissions';
-import NovaVodSubmissions from '../pages/NovaVodSubmissions';
-import Pipeline from '../pages/Pipeline';
-import SongDetail from '../pages/SongDetail';
-import SongsList from '../pages/SongsList';
-import StampEditor from '../pages/StampEditor';
-import StreamDetailPage from '../pages/StreamDetail';
-import StreamsList from '../pages/StreamsList';
-import SubmitSong from '../pages/SubmitSong';
-import SubmitStream from '../pages/SubmitStream';
-import VodExport from '../pages/VodExport';
-import VodExportRepair from '../pages/VodExportRepair';
+const CrystalTickets = lazy(() => import('../pages/CrystalTickets'));
+const Dashboard = lazy(() => import('../pages/Dashboard'));
+const GlobalWorkReview = lazy(() => import('../pages/GlobalWorkReview'));
+const GlobalWorks = lazy(() => import('../pages/GlobalWorks'));
+const Harmonizer = lazy(() => import('../pages/Harmonizer'));
+const NovaSubmissions = lazy(() => import('../pages/NovaSubmissions'));
+const NovaVodSubmissions = lazy(() => import('../pages/NovaVodSubmissions'));
+const Pipeline = lazy(() => import('../pages/Pipeline'));
+const SongDetail = lazy(() => import('../pages/SongDetail'));
+const SongsList = lazy(() => import('../pages/SongsList'));
+const StampEditor = lazy(() => import('../pages/StampEditor'));
+const StreamDetailPage = lazy(() => import('../pages/StreamDetail'));
+const StreamsList = lazy(() => import('../pages/StreamsList'));
+const SubmitSong = lazy(() => import('../pages/SubmitSong'));
+const SubmitStream = lazy(() => import('../pages/SubmitStream'));
+const VodExport = lazy(() => import('../pages/VodExport'));
+const VodExportRepair = lazy(() => import('../pages/VodExportRepair'));
 
 export interface AdminRoute {
   /** Path as react-router matches it. */
@@ -73,7 +74,13 @@ function RequireCurator({ user, children }: { user: AuthUser; children: ReactEle
 
 /** The page element for one manifest entry, gated when the entry says so. */
 export function routeElement(route: AdminRoute, user: AuthUser): ReactElement {
-  const page = route.render(user);
+  const page = (
+    <PageBoundary key={route.path}>
+      <Suspense fallback={<p role="status" className="p-6 text-slate-500">Loading page...</p>}>
+        {route.render(user)}
+      </Suspense>
+    </PageBoundary>
+  );
   return route.curatorOnly ? <RequireCurator user={user}>{page}</RequireCurator> : page;
 }
 
