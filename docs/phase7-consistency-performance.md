@@ -43,6 +43,28 @@ measurements. Additional route chunks are downloaded when their page is opened.
   changes do not invalidate the published export. The revision and JSON source rows are
   read together, with one JSON cell per record rather than one oversized aggregate cell.
 
+### Export compatibility follow-up
+
+Production D1 rejects a compound SELECT with more than five terms at one level.
+The original seven-term export passed desktop SQLite tests but failed against D1.
+The exporter now nests the three data terms and four snapshot terms inside one
+statement, retaining a single read snapshot and one small JSON cell per record.
+The regression test explicitly sets SQLite's `compound_select` limit to 5.
+
+Re-exporting must not change which same-day performance the fan site picks for
+playback. The CLI reads the published JSON before exporting and uses its ID order
+only to break equal-title song and equal-date performance/stream ties. Current DB
+values remain authoritative: edits, newer dates, removals and moved performances
+are not masked. Unseen IDs follow existing ties in deterministic ID order. Preserve
+the committed JSON when syncing; deleting it also discards the published tie order.
+Tests exercise the real fan-site playback helper and repeated exports.
+
+On 2026-09-05, all 37 stale streamers were re-exported with the fixed CLI against
+production D1 using read-only queries. All 74 songs/streams JSON files were
+byte-identical (5,409 songs, 9,070 performances, 593 streams); only `exportRevision`
+and `lastSyncedAt` changed in the sync stamps. The resulting checkout reported
+40 fresh, 0 stale. No database writes or fan announcements were performed.
+
 ## Rollout
 
 No production database or deployment is changed by opening this PR.

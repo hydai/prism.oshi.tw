@@ -12,6 +12,8 @@ import {
   readFanSiteExport,
   type ExportRow,
 } from './sync.ts';
+import { hydrateSongs } from '../../app/lib/archive-loader.ts';
+import { followingTracksFromGrouped } from '../../app/lib/archive.ts';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
@@ -188,9 +190,7 @@ test('sync-data CLI rejects a SQL-injection slug with a clear error (before any 
   assert.ok(threw, 'expected sync-data to exit non-zero for a malicious slug');
 });
 
-console.log('sync-data.test: all passed');
-
-test('export rows and sync stamp come from one SQL snapshot, including notes/credits/work links', () => {
+test('export rows and sync stamp share one snapshot within the production D1 compound SELECT limit', () => {
   const schema = readFileSync(new URL('../../admin/schema.sql', import.meta.url), 'utf8');
   const fixture = `
     INSERT INTO works (id,title,original_artist) VALUES ('work','Song','Artist');
@@ -202,7 +202,13 @@ test('export rows and sync stamp come from one SQL snapshot, including notes/cre
   let queries = 0;
   const result = readFanSiteExport('alice', sql => {
     queries++;
-    const rows = JSON.parse(execFileSync('sqlite3', ['-json', ':memory:'], { input: schema + fixture + sql, encoding: 'utf8' })) as ExportRow[];
+    // Reproduce D1's runtime limit, not the desktop SQLite default of 500.
+    // The CLI prints the configured limit before the JSON result.
+    const output = execFileSync('sqlite3', ['-bail', '-json', ':memory:'], {
+      input: '.limit compound_select 5\n' + schema + fixture + sql,
+      encoding: 'utf8',
+    });
+    const rows = JSON.parse(output.replace(/^\s*compound_select\s+5\r?\n/, '')) as ExportRow[];
     // A later DB write may happen here, but there must be no subsequent query
     // that would stamp the older exported records with that newer metadata.
     return rows;
@@ -217,3 +223,67 @@ test('export rows and sync stamp come from one SQL snapshot, including notes/cre
   assert.deepEqual(result.streamsSnap, { max_ts: '2026-01-03', cnt: 1 });
   assert.throws(() => readFanSiteExport('alice', () => []), /missing.*snapshot/, 'missing metadata aborts before writes');
 });
+
+test('published same-date versions keep their playback priority, while new data stays authoritative', () => {
+  const makeSong = (id: string, title = 'Song') => ({ id, title, work_id: null, original_artist: 'Artist', tags: '[]' });
+  const makePerf = (id: string, date = '2026-01-01', songId = 'song') => ({
+    id, song_id: songId, stream_id: 'stream', date, stream_title: 'Stream', video_id: 'video',
+    timestamp: id === 'p-z' ? 10 : 20, end_timestamp: null, note: '',
+  });
+  const oldSongs = assembleFanSiteSongs([makeSong('song')], [makePerf('p-z')]);
+  // A newer import of the same song on the same day must not replace the
+  // previously-published default simply because its ID sorts earlier.
+  oldSongs[0].performances.push({ ...oldSongs[0].performances[0], id: 'p-a', timestamp: 20 });
+  const baseline = JSON.stringify(oldSongs);
+  const rows = [makePerf('p-a'), { ...makePerf('p-z'), note: 'updated note' }];
+  const songs = assembleFanSiteSongs([makeSong('song')], rows, oldSongs);
+  assert.deepEqual(songs[0].performances.map(p => p.id), ['p-z', 'p-a']);
+  assert.equal(songs[0].performances[0].note, 'updated note', 'only order comes from the baseline');
+  assert.equal(JSON.stringify(oldSongs), baseline, 'sorting never mutates published input');
+  const streams = [{ ...streamA, id: 'stream', date: '2026-01-01' }];
+  const tracks = (s: typeof songs) => followingTracksFromGrouped(hydrateSongs(s, streams), -1, 'alice', new Set());
+  assert.deepEqual(tracks(songs), tracks(oldSongs), 'the actual fan-site playback selection is unchanged');
+
+  const changed = assembleFanSiteSongs([makeSong('song', 'Renamed')], [
+    makePerf('p-new', '2026-02-01'), makePerf('p-0'), makePerf('p-z'), makePerf('p-a'),
+  ], oldSongs);
+  assert.equal(changed[0].title, 'Renamed');
+  assert.deepEqual(changed[0].performances.map(p => p.id), ['p-new', 'p-z', 'p-a', 'p-0'],
+    'newer dates take precedence, unseen ties follow published ones');
+  const dateEdited = assembleFanSiteSongs([makeSong('song')], [makePerf('p-z'), makePerf('p-a', '2026-03-01')], oldSongs);
+  assert.deepEqual(dateEdited[0].performances.map(p => p.id), ['p-a', 'p-z'], 'date edits override old order');
+  const removed = assembleFanSiteSongs([makeSong('song')], [makePerf('p-a')], oldSongs);
+  assert.deepEqual(removed[0].performances.map(p => p.id), ['p-a'], 'removed versions are never restored');
+  const moved = assembleFanSiteSongs([makeSong('song'), makeSong('other')], [makePerf('p-z', '2026-01-01', 'other')], oldSongs);
+  assert.equal(moved.find(s => s.id === 'song')!.performances.length, 0, 'old membership is not retained');
+  assert.equal(moved.find(s => s.id === 'other')!.performances[0].id, 'p-z');
+});
+
+test('same-title songs and same-date streams preserve published ties, independently of query order', () => {
+  const makeSong = (id: string, title = 'Same') => ({ id, title, work_id: null, original_artist: '', tags: '[]' });
+  const oldSongs = [song('z', []), song('a', []), song('deleted', [])];
+  const songs = assembleFanSiteSongs([makeSong('new'), makeSong('a'), makeSong('z')], [], oldSongs);
+  assert.deepEqual(songs.map(s => s.id), ['z', 'a', 'new']);
+  const renamed = assembleFanSiteSongs([makeSong('a', 'AAA'), makeSong('z', 'ZZZ')], [], oldSongs);
+  assert.deepEqual(renamed.map(s => s.id), ['a', 'z'], 'current titles override published order');
+  const firstExport = assembleFanSiteSongs([makeSong('z'), makeSong('a')], []);
+  assert.deepEqual(firstExport.map(s => s.id), ['a', 'z'], 'new archives have deterministic ties');
+
+  const streamRow = (id: string, date = '2026-01-01'): ExportRow => ({
+    kind: 'stream', payload: JSON.stringify({ id, title: id, date, video_id: id, youtube_url: id, credit: '{}' }),
+  });
+  const snapshots: ExportRow[] = ['songs', 'performances', 'streams', 'revision'].map(kind => ({
+    kind: `${kind}-snapshot`, payload: JSON.stringify({ cnt: 0, max_ts: null }),
+  }));
+  const rows = [streamRow('a'), streamRow('new'), streamRow('z'), streamRow('newest', '2026-02-01'), ...snapshots];
+  const previous = { songs: [], streams: [mkStream('z', 'z'), mkStream('a', 'a'), mkStream('deleted', 'deleted')] };
+  const output = readFanSiteExport('alice', () => rows, previous);
+  assert.deepEqual(output.streams.map(s => s.id), ['newest', 'z', 'a', 'new']);
+  assert.deepEqual(readFanSiteExport('alice', () => [...rows].reverse(), previous), output,
+    'SQLite query-plan order cannot change the export');
+  const repeat = readFanSiteExport('alice', () => rows, output);
+  assert.deepEqual(repeat, output, 're-exporting is order-idempotent');
+  assert.deepEqual(readFanSiteExport('alice', () => rows).streams.map(s => s.id), ['newest', 'a', 'new', 'z']);
+});
+
+console.log('sync-data.test: all passed');
