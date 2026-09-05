@@ -10,7 +10,7 @@ export function useCurrentTrackLike() {
   const currentTrack = useCurrentTrack();
   const { isLiked, toggleLike } = useLikedSongs();
   const liked = currentTrack ? isLiked(currentTrack.performanceId) : false;
-  const toggleCurrentLike = useCallback((): StorageSaveResult | undefined => {
+  const toggleCurrentLike = useCallback(async (): Promise<StorageSaveResult | undefined> => {
     if (!currentTrack) return undefined;
     return toggleLike(currentTrack);
   }, [currentTrack, toggleLike]);

@@ -33,8 +33,8 @@ export default function AddToPlaylistDropdown({ version, onSuccess }: AddToPlayl
     };
   }, [showDropdown]);
 
-  const handleAddToPlaylist = (playlistId: string) => {
-    const result = addVersionToPlaylist(playlistId, version);
+  const handleAddToPlaylist = async (playlistId: string) => {
+    const result = await addVersionToPlaylist(playlistId, version);
     if (result.success) {
       onSuccess?.();
       setShowDropdown(false);

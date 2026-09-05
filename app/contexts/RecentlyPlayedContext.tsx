@@ -12,7 +12,7 @@ export type RecentPlay = PerformanceRef & { playedAt: number };
 interface RecentlyPlayedContextType {
   recentPlays: RecentPlay[];
   addRecentPlay: (play: PerformanceRef) => void;
-  clearHistory: () => StorageSaveResult;
+  clearHistory: () => Promise<StorageSaveResult>;
   recentCount: number;
 }
 
@@ -51,13 +51,13 @@ export const RecentlyPlayedProvider = ({ streamerSlug, children }: { streamerSlu
   // Functional update on the store's current value, so two rapid calls in
   // the same tick can't drop each other's entry (no ref mirror needed).
   const addRecentPlay = useCallback((play: PerformanceRef) => {
-    store.update((prev) => {
+    store.updateExclusive((prev) => {
       const filtered = prev.filter((r) => r.performanceId !== play.performanceId);
       return [{ ...pickPerformanceRef(play), playedAt: Date.now() }, ...filtered].slice(0, MAX_ENTRIES);
     });
   }, [store]);
 
-  const clearHistory = useCallback(() => { return store.update(() => []); }, [store]);
+  const clearHistory = useCallback(() => { return store.updateExclusive(() => []); }, [store]);
 
   const value = useMemo(
     () => ({ recentPlays, addRecentPlay, clearHistory, recentCount: recentPlays.length }),

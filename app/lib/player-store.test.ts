@@ -158,6 +158,20 @@ async function startPlaying(h: Harness, current: Track, following: Track[] = [])
 // below calls process.exit (not exitCode) so a rejection also hard-fails the
 // file under node --test.
 async function run() {
+  for (const shuffle of [false, true]) {
+    const h = createHarness();
+    await startPlaying(h, track('a'), [track('b'), track('c')]);
+    h.store.actions.toggleRepeat();
+    h.store.actions.next();
+    if (shuffle) h.store.actions.toggleShuffle();
+    h.store.actions.previous();
+    assert.equal(h.store.getSnapshot().currentTrack?.performanceId, 'a');
+    assert.deepEqual(h.store.getSnapshot().queue.map(t => t.performanceId), ['b', 'c'], 'previous undoes repeat rotation without duplicating a');
+    h.store.actions.next();
+    assert.equal(h.store.getSnapshot().currentTrack?.performanceId, 'b', 'next retraces previous even in shuffle');
+    assert.equal(new Set(h.store.getSnapshot().queue.map(t => t.queueEntryId)).size, h.store.getSnapshot().queue.length);
+    h.store.destroy();
+  }
 
 // ---------------------------------------------------------------------------
 // 1. Initial snapshot + server snapshot identity

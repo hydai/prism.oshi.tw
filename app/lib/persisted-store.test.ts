@@ -1,4 +1,5 @@
 import assert from 'node:assert/strict';
+import { test } from 'node:test';
 import { createPersistedStore } from './persisted-store';
 import { STORAGE_QUOTA_ERROR } from './playlist-storage';
 
@@ -93,3 +94,52 @@ const parseNumbers = (raw: unknown): number[] =>
 }
 
 console.log('✓ persisted store loads lazily, updates functionally and persists before notifying');
+
+test('two stores preserve each other\'s writes and serialize concurrent validation', async () => {
+  const storage = memoryStorage();
+  let tail = Promise.resolve();
+  const locks = { request: (_name: string, callback: () => unknown) => {
+    const result = tail.then(callback);
+    tail = result.then(() => undefined);
+    return result;
+  } } as Pick<LockManager, 'request'>;
+  const create = () => createPersistedStore<number[]>({ key: 'nums', storage: () => storage, fallback: [], parse: parseNumbers, locks });
+  const a = create();
+  const b = create();
+  a.getSnapshot(); b.getSnapshot();
+  a.update(prev => [...prev, 1]);
+  b.update(prev => [...prev, 2]);
+  assert.deepEqual(b.getSnapshot(), [1, 2], 'sequential writes never use the stale render snapshot');
+  const validate = (prev: number[]) => prev.includes(3) ? 'duplicate' : undefined;
+  const results = await Promise.all([
+    a.updateExclusive(prev => [...prev, 3], validate),
+    b.updateExclusive(prev => [...prev, 3], validate),
+  ]);
+  assert.deepEqual(results, [{ success: true }, { success: false, error: 'duplicate' }]);
+  assert.equal(storage.getItem('nums'), '[1,2,3]');
+});
+
+test('storage events refresh subscribed snapshots and release listeners on unsubscribe', () => {
+  const storage = memoryStorage({ nums: '[1]' });
+  const handlers = new Set<(event: StorageEvent) => void>();
+  const events = {
+    addEventListener: (_: string, handler: (event: StorageEvent) => void) => handlers.add(handler),
+    removeEventListener: (_: string, handler: (event: StorageEvent) => void) => handlers.delete(handler),
+  } as Pick<Window, 'addEventListener' | 'removeEventListener'>;
+  const store = createPersistedStore({ key: 'nums', storage: () => storage, fallback: [], parse: parseNumbers, events });
+  let notifications = 0;
+  const unsubscribe = store.subscribe(() => { notifications++; });
+  storage.setItem('nums', '[2]');
+  const dispatch = (key: string | null, storageArea: Storage = storage) => {
+    for (const handler of handlers) handler({ key, storageArea } as StorageEvent);
+  };
+  dispatch('unrelated');
+  dispatch('nums', memoryStorage());
+  assert.equal(notifications, 0);
+  dispatch('nums');
+  assert.deepEqual(store.getSnapshot(), [2]);
+  storage.clear(); dispatch(null);
+  assert.deepEqual(store.getSnapshot(), [], 'clear in another tab resets the snapshot');
+  unsubscribe();
+  assert.equal(handlers.size, 0);
+});
