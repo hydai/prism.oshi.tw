@@ -500,6 +500,71 @@ async function run() {
 }
 
 // ---------------------------------------------------------------------------
+// 13a. Other tabs must not change the audio UI without changing this player.
+// ---------------------------------------------------------------------------
+{
+  const previousWindow = Object.getOwnPropertyDescriptor(globalThis, 'window');
+  const values = new Map([['prism_volume', '25'], ['prism_muted', 'false']]);
+  const storage: Storage = {
+    get length() { return values.size; },
+    clear: () => values.clear(),
+    getItem: key => values.get(key) ?? null,
+    key: index => [...values.keys()][index] ?? null,
+    removeItem: key => { values.delete(key); },
+    setItem: (key, value) => { values.set(key, value); },
+  };
+  const handlers = new Set<(event: StorageEvent) => void>();
+  Object.defineProperty(globalThis, 'window', { configurable: true, value: {
+    localStorage: storage,
+    location: { origin: 'http://localhost' },
+    addEventListener: (_: string, handler: (event: StorageEvent) => void) => handlers.add(handler),
+    removeEventListener: (_: string, handler: (event: StorageEvent) => void) => handlers.delete(handler),
+  } });
+  const h = createHarness();
+  let unsubscribeVolume = h.store.volumeStore.subscribe(() => {});
+  let unsubscribeMute = h.store.mutedStore.subscribe(() => {});
+  try {
+    const player = await startPlaying(h, track('audio-tab'));
+    assert.deepEqual(player.callsOf('setVolume').at(-1), [25]);
+    const callsBefore = player.calls.length;
+    storage.setItem('prism_volume', '80');
+    storage.setItem('prism_muted', 'true');
+    for (const key of ['prism_volume', 'prism_muted']) {
+      for (const handler of handlers) handler({ key, storageArea: storage } as StorageEvent);
+    }
+    assert.equal(h.store.volumeStore.getSnapshot(), 25, 'active-tab volume stays in sync with its player');
+    assert.equal(h.store.mutedStore.getSnapshot(), false, 'another tab cannot silently change the mute icon');
+    assert.equal(player.calls.length, callsBefore, 'another tab does not change active audio');
+
+    unsubscribeVolume(); unsubscribeMute();
+    unsubscribeVolume = h.store.volumeStore.subscribe(() => {});
+    unsubscribeMute = h.store.mutedStore.subscribe(() => {});
+    assert.equal(h.store.volumeStore.getSnapshot(), 25, 'UI resubscription preserves active audio settings');
+    assert.equal(h.store.mutedStore.getSnapshot(), false);
+
+    const fresh = createPlayerStore();
+    assert.equal(fresh.volumeStore.getSnapshot(), 80, 'a new player still loads the saved preference');
+    assert.equal(fresh.mutedStore.getSnapshot(), true);
+    fresh.destroy();
+
+    h.store.actions.setVolume(30);
+    h.store.actions.toggleMute();
+    assert.equal(h.store.volumeStore.getSnapshot(), 30);
+    assert.equal(h.store.mutedStore.getSnapshot(), true);
+    assert.deepEqual(player.callsOf('setVolume').at(-1), [30]);
+    assert.equal(player.callNames().at(-1), 'mute');
+    assert.equal(storage.getItem('prism_volume'), '30');
+    assert.equal(storage.getItem('prism_muted'), 'true');
+    console.log('✓ active audio stays tab-local while new players load persisted preferences');
+  } finally {
+    unsubscribeVolume(); unsubscribeMute();
+    h.store.destroy();
+    if (previousWindow) Object.defineProperty(globalThis, 'window', previousWindow);
+    else Reflect.deleteProperty(globalThis, 'window');
+  }
+}
+
+// ---------------------------------------------------------------------------
 // 14. Queue editing: add (with session-pool dedupe), remove, reorder
 // ---------------------------------------------------------------------------
 {
