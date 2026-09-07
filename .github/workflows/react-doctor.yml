@@ -24,7 +24,7 @@ jobs:
       - uses: actions/checkout@v7
 
       # v2, pinned to the annotated tag's commit for reproducible CI execution.
-      - uses: millionco/react-doctor@01820bb4fd4d0a4aebcd8df2b2a143a098649cb2
+      - uses: millionco/react-doctor@013f7373f91a3b9e68bd1dc7d4d354f4b041b117
         with:
           version: "0.9.12"
           node-version: "22"
