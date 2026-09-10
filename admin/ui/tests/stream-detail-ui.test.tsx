@@ -41,6 +41,7 @@ const detail: StreamDetail = {
       timestamp: 65,
       endTimestamp: 245,
       note: 'opening song',
+      tags: [],
       status: 'pending',
     },
     {
@@ -50,7 +51,7 @@ const detail: StreamDetail = {
       originalArtist: '',
       timestamp: 3700,
       endTimestamp: null,
-      note: '',
+      note: '', tags: [],
       status: 'approved',
     },
   ],
@@ -344,7 +345,7 @@ function navPerformance(id: string, title: string, timestamp: number): StampPerf
     originalArtist: 'Nav Artist',
     timestamp,
     endTimestamp: null,
-    note: '',
+    note: '', tags: [],
     status: 'pending',
   };
 }

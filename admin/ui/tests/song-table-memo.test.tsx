@@ -85,6 +85,7 @@ function countingRows(counter: RenderCounter): StampPerformance[] {
       timestamp: 65,
       endTimestamp: 245,
       note: 'opening song',
+      tags: [],
       status: 'pending',
     },
     {
@@ -97,7 +98,7 @@ function countingRows(counter: RenderCounter): StampPerformance[] {
       },
       timestamp: 3700,
       endTimestamp: null,
-      note: '',
+      note: '', tags: [],
       status: 'approved',
     },
   ];

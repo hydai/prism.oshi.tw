@@ -323,10 +323,10 @@ async function testWorkTagsRejectInvalidSelectionsBeforeD1(): Promise<void> {
 async function testSongCreationRejectsWorkTagsBeforeD1(): Promise<void> {
   const contributorDb = new RecordingD1();
   const contributorResponse = await app.request(
-    '/api/songs',
+    '/api/songs?streamer=mizuki',
     reqInit({
       method: 'POST',
-      path: '/api/songs',
+      path: '/api/songs?streamer=mizuki',
       body: { title: 'Song', originalArtist: 'Artist', tags: ['genre:rock'] },
     }, CONTRIBUTOR),
     envFor(contributorDb),
@@ -341,10 +341,10 @@ async function testSongCreationRejectsWorkTagsBeforeD1(): Promise<void> {
 
   const curatorDb = new RecordingD1();
   const curatorResponse = await app.request(
-    '/api/songs',
+    '/api/songs?streamer=mizuki',
     reqInit({
       method: 'POST',
-      path: '/api/songs',
+      path: '/api/songs?streamer=mizuki',
       body: { title: 'Song', originalArtist: 'Artist', tags: ['genre:rock'] },
     }, CURATOR),
     envFor(curatorDb),

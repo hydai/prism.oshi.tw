@@ -21,13 +21,13 @@ union of every effective performance
 Do not edit generated `data/*/songs.json` files to assign tags by hand. D1 is the
 authoritative source after the initial rollout, and `sync:data` exports curator
 changes to the static files. The versioned `data/tag-catalog.json` and migration
-0008 are frozen records of the one-time seed; catalog tooling never overlays those
+0011 are frozen records of the one-time seed; catalog tooling never overlays those
 assignments onto a D1 export.
 
 ## Initial catalog
 
 The repository ships conservative initial assignments in `data/tag-catalog.json`,
-rendered into migration 0008. They are a seed for D1, not static site data: the
+rendered into migration 0011. They are a seed for D1, not static site data: the
 assignments reach the fan site only after the migrations are applied and `sync:data`
 regenerates the streamer files (see [Initial rollout](#initial-rollout)).
 Classification uses, in descending confidence:
@@ -51,13 +51,13 @@ The classifier and frozen artifacts have separate checks:
 npm run test:tag-catalog
 ```
 
-`tags:check` validates the committed catalog records and confirms migration 0008
+`tags:check` validates the committed catalog records and confirms migration 0011
 was rendered from exactly those records. It deliberately does not read or rewrite
 `data/*/songs.json`, so removing or replacing a seeded tag in Admin remains
 authoritative after `sync:data`.
 
 `npm run tags:seed:build` is an explicit seed-authoring command retained for a new
-pre-rollout seed. It rebuilds only `data/tag-catalog.json` and migration 0008 from
+pre-rollout seed. It rebuilds only `data/tag-catalog.json` and migration 0011 from
 the current static snapshot; it never changes streamer song files. Do not run it
 as part of normal curator, sync, or CI workflows.
 
@@ -87,15 +87,18 @@ The API rejects controlled IDs written at the wrong scope.
 5. Run `npm run sync:stale` (or `npm run sync:data -- <slug>`) and commit the
    regenerated static data.
 
-Changing a global work advances `works.updated_at`. Freshness detection includes
-that timestamp, so every affected streamer is marked stale and receives the new
-effective tags on the next sync.
+Changing a global work advances `works.updated_at` and the export revision of
+every linked approved streamer. Freshness detection includes both, including
+multiple edits in one second, so affected streamers receive the new tags on sync.
 
 ## Initial rollout
 
 D1 is the source of truth for tags. `data/*/songs.json` carries no tag data until
 `sync:data` regenerates it from D1, so the fan-site tag panel stays hidden — the page
 gates it on `tagCounts.size > 0` — until the last step lands.
+
+The latest master migrations through 0009 must already be applied. Migration
+0010 extends its `fan_export_revisions` tracking to shared work tags.
 
 The order below is a constraint, not a preference:
 
@@ -104,17 +107,17 @@ cd admin
 npx wrangler@latest d1 time-travel info oshi-prism-db          # 1. record the bookmark
 
 npx wrangler@latest d1 execute oshi-prism-db --remote \
-  --file=migrations/0007_add_performance_tags.sql              # 2. storage + scope repair
+  --file=migrations/0010_add_performance_tags.sql              # 2. storage + scope repair
 
 npm run deploy                                                 # 3. Worker
 
 npx wrangler@latest d1 execute oshi-prism-db --remote \
-  --file=migrations/0008_seed_initial_tags.sql                 # 4. seed
+  --file=migrations/0011_seed_initial_tags.sql                 # 4. seed
 
 cd .. && npm run sync:data -- <slug>                           # 5. regenerate static data
 ```
 
-**0007 must precede the deploy.** The Worker names `performances.tags` in its INSERT
+**0010 must precede the deploy.** The Worker names `performances.tags` in its INSERT
 and SELECT statements and in `PATCH /api/performances/:id/tags`, so deploying it
 against an unmigrated database fails with `no such column: tags` the first time a
 performance is written.
@@ -122,18 +125,18 @@ performance is written.
 **Do not curate between steps 2 and 3.** The previously deployed Worker still writes
 the legacy layer: `PUT /api/songs/:id` forwards `body.tags` into `songs.tags`, and its
 `prepareEnsureWorkForSongUpdate` copies `songs.tags` into the work it creates for a
-renamed song. Either one re-introduces the out-of-scope IDs that 0007 has just moved
-down, and 0007 is not meant to be re-run — its `ALTER TABLE` is one-shot, and the
+renamed song. Either one re-introduces the out-of-scope IDs that 0010 has just moved
+down, and 0010 is not meant to be re-run — its `ALTER TABLE` is one-shot, and the
 recovery procedure is in the migration header. Keep this window short.
 
-**0008 is a commitment.** It unions the seed into existing tags and never removes
+**0011 is a commitment.** It unions the seed into existing tags and never removes
 anything, and its header forbids reapplying it once curators own the data. Applying it
 gives up the ability to correct the seed: if the classifier changes afterwards,
 already-seeded rows can only be fixed by hand. Apply it only when
 `data/tag-catalog.json` is final, and retry it only while still completing this
 rollout, before handing tag ownership to curators.
 
-Migration 0007 adds the storage column and moves any controlled language/style IDs
+Migration 0010 adds the storage column and moves any controlled language/style IDs
 already present on songs or works down to their linked performances. It leaves them in
 place when a song or work has no performance to receive them — demoting them there
 would delete them outright — and TagPicker surfaces those leftovers so a curator can

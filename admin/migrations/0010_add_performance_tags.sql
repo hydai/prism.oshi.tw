@@ -3,7 +3,7 @@
 -- style IDs that may already have been written to songs/works by older Admin code.
 --
 -- Apply against remote D1 (from admin/ directory):
---   npx wrangler@latest d1 execute oshi-prism-db --remote --file=migrations/0007_add_performance_tags.sql
+--   npx wrangler@latest d1 execute oshi-prism-db --remote --file=migrations/0010_add_performance_tags.sql
 --
 -- `songs.tags` is nullable and carries no json_valid CHECK (schema.sql), so every
 -- read of it is guarded here; an unguarded json_each() aborts the whole file on a
@@ -18,12 +18,12 @@
 ALTER TABLE performances
   ADD COLUMN tags TEXT NOT NULL DEFAULT '[]' CHECK(json_valid(tags));
 
-DROP TABLE IF EXISTS _performance_tag_ids_0007;
-CREATE TABLE _performance_tag_ids_0007 (
+DROP TABLE IF EXISTS _performance_tag_ids_0010;
+CREATE TABLE _performance_tag_ids_0010 (
   id TEXT PRIMARY KEY
 );
 
-INSERT INTO _performance_tag_ids_0007 (id) VALUES
+INSERT INTO _performance_tag_ids_0010 (id) VALUES
   ('language:zh'),
   ('language:en'),
   ('language:ja'),
@@ -47,7 +47,7 @@ SET tags = (
       JOIN json_each(
         CASE WHEN json_valid(song.tags) THEN song.tags ELSE '[]' END
       ) AS song_tag
-      JOIN _performance_tag_ids_0007 AS allowed ON allowed.id = song_tag.value
+      JOIN _performance_tag_ids_0010 AS allowed ON allowed.id = song_tag.value
       WHERE song.id = performances.song_id
 
       UNION ALL
@@ -56,7 +56,7 @@ SET tags = (
       FROM song_work_links AS link
       JOIN works AS work ON work.id = link.work_id
       JOIN json_each(work.tags) AS work_tag
-      JOIN _performance_tag_ids_0007 AS allowed ON allowed.id = work_tag.value
+      JOIN _performance_tag_ids_0010 AS allowed ON allowed.id = work_tag.value
       WHERE link.song_id = performances.song_id
     )
     ORDER BY value
@@ -69,7 +69,7 @@ WHERE EXISTS (
   JOIN json_each(
     CASE WHEN json_valid(song.tags) THEN song.tags ELSE '[]' END
   ) AS song_tag
-  JOIN _performance_tag_ids_0007 AS allowed ON allowed.id = song_tag.value
+  JOIN _performance_tag_ids_0010 AS allowed ON allowed.id = song_tag.value
   WHERE song.id = performances.song_id
 )
 OR EXISTS (
@@ -77,7 +77,7 @@ OR EXISTS (
   FROM song_work_links AS link
   JOIN works AS work ON work.id = link.work_id
   JOIN json_each(work.tags) AS work_tag
-  JOIN _performance_tag_ids_0007 AS allowed ON allowed.id = work_tag.value
+  JOIN _performance_tag_ids_0010 AS allowed ON allowed.id = work_tag.value
   WHERE link.song_id = performances.song_id
 );
 
@@ -91,7 +91,7 @@ SET tags = (
     FROM json_each(
       CASE WHEN json_valid(songs.tags) THEN songs.tags ELSE '[]' END
     )
-    WHERE value NOT IN (SELECT id FROM _performance_tag_ids_0007)
+    WHERE value NOT IN (SELECT id FROM _performance_tag_ids_0010)
     ORDER BY value
   )
 ),
@@ -101,7 +101,7 @@ WHERE EXISTS (
   FROM json_each(
     CASE WHEN json_valid(songs.tags) THEN songs.tags ELSE '[]' END
   ) AS song_tag
-  JOIN _performance_tag_ids_0007 AS moved ON moved.id = song_tag.value
+  JOIN _performance_tag_ids_0010 AS moved ON moved.id = song_tag.value
 )
 AND EXISTS (
   SELECT 1
@@ -115,7 +115,7 @@ SET tags = (
   FROM (
     SELECT value
     FROM json_each(works.tags)
-    WHERE value NOT IN (SELECT id FROM _performance_tag_ids_0007)
+    WHERE value NOT IN (SELECT id FROM _performance_tag_ids_0010)
     ORDER BY value
   )
 ),
@@ -123,7 +123,7 @@ updated_at = datetime('now')
 WHERE EXISTS (
   SELECT 1
   FROM json_each(works.tags) AS work_tag
-  JOIN _performance_tag_ids_0007 AS removed ON removed.id = work_tag.value
+  JOIN _performance_tag_ids_0010 AS removed ON removed.id = work_tag.value
 )
 AND EXISTS (
   SELECT 1
@@ -132,4 +132,17 @@ AND EXISTS (
   WHERE link.work_id = works.id
 );
 
-DROP TABLE _performance_tag_ids_0007;
+DROP TABLE _performance_tag_ids_0010;
+
+-- Shared work tag edits invalidate every linked approved streamer's export,
+-- including multiple edits within the same second. Requires migration 0009.
+CREATE TRIGGER IF NOT EXISTS fan_export_work_tags_update
+AFTER UPDATE OF tags ON works
+FOR EACH ROW WHEN OLD.tags IS NOT NEW.tags
+BEGIN
+  INSERT INTO fan_export_revisions (streamer_id, revision)
+  SELECT DISTINCT song.streamer_id, 1
+  FROM songs AS song JOIN song_work_links AS link ON link.song_id = song.id
+  WHERE link.work_id = NEW.id AND song.status = 'approved'
+  ON CONFLICT(streamer_id) DO UPDATE SET revision = revision + 1;
+END;

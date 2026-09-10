@@ -52,7 +52,10 @@ class FakeD1 {
   }
 
   async batch(statements: FakeStatement[]): Promise<Array<{ results: unknown[]; meta: { changes: number } }>> {
-    return statements.map(() => ({ results: [], meta: { changes: 1 } }));
+    return statements.map(statement => ({
+      results: statement.sql.includes('FROM songs AS s') ? [SONG_ROW] : [],
+      meta: { changes: 1 },
+    }));
   }
 }
 

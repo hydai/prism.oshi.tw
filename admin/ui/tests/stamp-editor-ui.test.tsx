@@ -55,7 +55,7 @@ const performances: StampPerformance[] = [
     originalArtist: 'First Artist',
     timestamp: 65,
     endTimestamp: 245,
-    note: '',
+    note: '', tags: [],
     status: 'pending',
   },
   {
@@ -65,7 +65,7 @@ const performances: StampPerformance[] = [
     originalArtist: '',
     timestamp: 3700,
     endTimestamp: null,
-    note: '',
+    note: '', tags: [],
     status: 'approved',
   },
 ];
@@ -445,7 +445,7 @@ const deepLinkPerformances: StampPerformance[] = [
     originalArtist: 'Artist One',
     timestamp: 10,
     endTimestamp: 100,
-    note: '',
+    note: '', tags: [],
     status: 'pending',
   },
   {
@@ -455,7 +455,7 @@ const deepLinkPerformances: StampPerformance[] = [
     originalArtist: 'Artist Two',
     timestamp: 110,
     endTimestamp: 200,
-    note: '',
+    note: '', tags: [],
     status: 'pending',
   },
   {
@@ -465,7 +465,7 @@ const deepLinkPerformances: StampPerformance[] = [
     originalArtist: 'Artist Three',
     timestamp: 210,
     endTimestamp: null,
-    note: '',
+    note: '', tags: [],
     status: 'pending',
   },
 ];

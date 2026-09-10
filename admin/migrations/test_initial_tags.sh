@@ -14,9 +14,12 @@ CREATE TABLE works (
 -- CHECK, so the migration must tolerate NULL and malformed rows.
 CREATE TABLE songs (
   id TEXT PRIMARY KEY,
+  streamer_id TEXT DEFAULT 'fixture',
+  status TEXT DEFAULT 'approved',
   tags TEXT DEFAULT '[]',
   updated_at TEXT NOT NULL
 );
+CREATE TABLE fan_export_revisions (streamer_id TEXT PRIMARY KEY, revision INTEGER NOT NULL);
 CREATE TABLE performances (
   id TEXT PRIMARY KEY,
   song_id TEXT NOT NULL,
@@ -33,7 +36,7 @@ INSERT INTO works VALUES
   ('work-leaked', '["language:ko","legacy:work-leak"]', '2000-01-01'),
   ('work-noperf', '["language:ko","legacy:work-noperf"]', '2000-01-01'),
   ('unrelated-work', '["legacy:untouched"]', '2000-01-01');
-INSERT INTO songs VALUES
+INSERT INTO songs (id, tags, updated_at) VALUES
   ('song-2072', '["language:ja","style:parody","legacy:song"]', '2000-01-01'),
   ('song-work-leak', '[]', '2000-01-01'),
   ('song-noperf', '["language:ja","style:duet","legacy:song-noperf"]', '2000-01-01'),
@@ -53,20 +56,20 @@ INSERT INTO song_work_links VALUES
   ('song-noperf', 'work-noperf');
 SQL
 
-sqlite3 "$tmp_db" < migrations/0007_add_performance_tags.sql
+sqlite3 "$tmp_db" < migrations/0010_add_performance_tags.sql
 
 # An interrupted rollout is retried by skipping the one-shot ALTER and re-running
 # the remainder, so everything below it must be re-runnable.
 sed '/^ALTER TABLE performances$/,/^  ADD COLUMN tags .*;$/d' \
-  migrations/0007_add_performance_tags.sql > "$tmp_db.retry.sql"
+  migrations/0010_add_performance_tags.sql > "$tmp_db.retry.sql"
 if grep -q '^ *ADD COLUMN' "$tmp_db.retry.sql"; then
   echo 'FAIL: could not strip the ALTER statement for the retry check' >&2
   exit 1
 fi
 sqlite3 "$tmp_db" < "$tmp_db.retry.sql"
 
-sqlite3 "$tmp_db" < migrations/0008_seed_initial_tags.sql
-sqlite3 "$tmp_db" < migrations/0008_seed_initial_tags.sql
+sqlite3 "$tmp_db" < migrations/0011_seed_initial_tags.sql
+sqlite3 "$tmp_db" < migrations/0011_seed_initial_tags.sql
 
 assert_sql() {
   sql="$1"
@@ -101,8 +104,8 @@ assert_sql "SELECT tags FROM songs WHERE id = 'song-bad-json';" 'not json at all
 assert_sql "SELECT tags FROM performances WHERE id = 'p-bad-json';" '[]' 'a performance under malformed song tags stays untagged'
 assert_sql "SELECT COALESCE(tags, 'NULL') FROM songs WHERE id = 'song-null-tags';" 'NULL' 'null song tags are left untouched'
 assert_sql "SELECT tags FROM performances WHERE id = 'p-null-tags';" '[]' 'a performance under null song tags stays untagged'
-assert_sql "SELECT COUNT(*) FROM sqlite_master WHERE name = '_performance_tag_ids_0007';" '0' 'scope migration staging table is removed'
-assert_sql "SELECT COUNT(*) FROM sqlite_master WHERE name = '_tag_catalog_seed_0008';" '0' 'catalog staging table is removed'
+assert_sql "SELECT COUNT(*) FROM sqlite_master WHERE name = '_performance_tag_ids_0010';" '0' 'scope migration staging table is removed'
+assert_sql "SELECT COUNT(*) FROM sqlite_master WHERE name = '_tag_catalog_seed_0011';" '0' 'catalog staging table is removed'
 assert_sql 'SELECT COUNT(*) FROM works WHERE NOT json_valid(tags);' '0' 'work tags remain valid JSON'
 assert_sql "SELECT COUNT(*) FROM songs WHERE NOT json_valid(tags) AND id <> 'song-bad-json';" '0' 'song tags remain valid JSON'
 assert_sql 'SELECT COUNT(*) FROM performances WHERE NOT json_valid(tags);' '0' 'performance tags remain valid JSON'

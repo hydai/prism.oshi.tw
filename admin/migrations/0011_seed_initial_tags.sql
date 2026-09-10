@@ -5,15 +5,15 @@
 -- Do not reapply it after curator ownership begins; doing so would restore tags
 -- that a curator intentionally removed.
 
-DROP TABLE IF EXISTS _tag_catalog_seed_0008;
-CREATE TABLE _tag_catalog_seed_0008 (
+DROP TABLE IF EXISTS _tag_catalog_seed_0011;
+CREATE TABLE _tag_catalog_seed_0011 (
   scope TEXT NOT NULL CHECK(scope IN ('work', 'performance')),
   id TEXT NOT NULL,
   tags TEXT NOT NULL CHECK(json_valid(tags)),
   PRIMARY KEY (scope, id)
 );
 
-INSERT INTO _tag_catalog_seed_0008 (scope, id, tags) VALUES
+INSERT INTO _tag_catalog_seed_0011 (scope, id, tags) VALUES
   ('work', 'work-e523479a-a4d4-4bfb-b95b-0fad153ae996', '["genre:pop"]'),
   ('work', 'work-edbbc4ac-adc4-4ae2-9fdf-2caccd7c53bc', '["source:vocaloid"]'),
   ('work', 'work-song-00364f82', '["source:vocaloid"]'),
@@ -215,7 +215,7 @@ INSERT INTO _tag_catalog_seed_0008 (scope, id, tags) VALUES
   ('work', 'work-song-1332', '["genre:pop"]'),
   ('work', 'work-song-1334', '["genre:pop"]');
 
-INSERT INTO _tag_catalog_seed_0008 (scope, id, tags) VALUES
+INSERT INTO _tag_catalog_seed_0011 (scope, id, tags) VALUES
   ('work', 'work-song-1335', '["genre:pop","genre:folk"]'),
   ('work', 'work-song-1338', '["genre:pop","genre:rock"]'),
   ('work', 'work-song-1339', '["genre:pop"]'),
@@ -417,7 +417,7 @@ INSERT INTO _tag_catalog_seed_0008 (scope, id, tags) VALUES
   ('work', 'work-song-2011', '["genre:rock"]'),
   ('work', 'work-song-2014', '["genre:pop"]');
 
-INSERT INTO _tag_catalog_seed_0008 (scope, id, tags) VALUES
+INSERT INTO _tag_catalog_seed_0011 (scope, id, tags) VALUES
   ('work', 'work-song-2016', '["source:original"]'),
   ('work', 'work-song-2018', '["genre:pop","source:vocaloid"]'),
   ('work', 'work-song-202', '["genre:pop"]'),
@@ -619,7 +619,7 @@ INSERT INTO _tag_catalog_seed_0008 (scope, id, tags) VALUES
   ('work', 'work-song-2607', '["source:vocaloid"]'),
   ('work', 'work-song-26109c93', '["genre:pop"]');
 
-INSERT INTO _tag_catalog_seed_0008 (scope, id, tags) VALUES
+INSERT INTO _tag_catalog_seed_0011 (scope, id, tags) VALUES
   ('work', 'work-song-2616', '["genre:pop"]'),
   ('work', 'work-song-262e7090', '["genre:pop"]'),
   ('work', 'work-song-2632', '["genre:pop","source:vocaloid"]'),
@@ -821,7 +821,7 @@ INSERT INTO _tag_catalog_seed_0008 (scope, id, tags) VALUES
   ('work', 'work-song-38ff5f8b', '["genre:pop","genre:folk"]'),
   ('work', 'work-song-394', '["genre:pop"]');
 
-INSERT INTO _tag_catalog_seed_0008 (scope, id, tags) VALUES
+INSERT INTO _tag_catalog_seed_0011 (scope, id, tags) VALUES
   ('work', 'work-song-39406a32', '["genre:pop"]'),
   ('work', 'work-song-395', '["genre:pop"]'),
   ('work', 'work-song-39636c3a', '["genre:pop"]'),
@@ -1023,7 +1023,7 @@ INSERT INTO _tag_catalog_seed_0008 (scope, id, tags) VALUES
   ('work', 'work-song-671', '["genre:pop"]'),
   ('work', 'work-song-672', '["genre:pop"]');
 
-INSERT INTO _tag_catalog_seed_0008 (scope, id, tags) VALUES
+INSERT INTO _tag_catalog_seed_0011 (scope, id, tags) VALUES
   ('work', 'work-song-673', '["genre:pop"]'),
   ('work', 'work-song-678', '["source:vocaloid"]'),
   ('work', 'work-song-679', '["genre:pop","source:vocaloid"]'),
@@ -1225,7 +1225,7 @@ INSERT INTO _tag_catalog_seed_0008 (scope, id, tags) VALUES
   ('work', 'work-song-972', '["genre:pop","source:vocaloid"]'),
   ('work', 'work-song-973', '["genre:pop","source:vocaloid"]');
 
-INSERT INTO _tag_catalog_seed_0008 (scope, id, tags) VALUES
+INSERT INTO _tag_catalog_seed_0011 (scope, id, tags) VALUES
   ('work', 'work-song-975', '["genre:pop","source:vocaloid"]'),
   ('work', 'work-song-976', '["genre:pop","source:vocaloid"]'),
   ('work', 'work-song-97618aea', '["genre:pop","genre:rock"]'),
@@ -1427,7 +1427,7 @@ INSERT INTO _tag_catalog_seed_0008 (scope, id, tags) VALUES
   ('work', 'work-song-f637a748', '["genre:rock"]'),
   ('work', 'work-song-f82706dc', '["genre:rock"]');
 
-INSERT INTO _tag_catalog_seed_0008 (scope, id, tags) VALUES
+INSERT INTO _tag_catalog_seed_0011 (scope, id, tags) VALUES
   ('work', 'work-song-f848c123', '["genre:pop"]'),
   ('work', 'work-song-f8bb484d', '["source:vocaloid"]'),
   ('work', 'work-song-f8c30adf', '["genre:pop"]'),
@@ -1446,7 +1446,7 @@ INSERT INTO _tag_catalog_seed_0008 (scope, id, tags) VALUES
   ('work', 'work-song-ffce0558', '["source:vocaloid"]'),
   ('work', 'work-song-fff3233e', '["genre:pop"]');
 
-INSERT INTO _tag_catalog_seed_0008 (scope, id, tags) VALUES
+INSERT INTO _tag_catalog_seed_0011 (scope, id, tags) VALUES
   ('performance', 'p-00386211', '["language:ja"]'),
   ('performance', 'p-003f966f', '["language:ja"]'),
   ('performance', 'p-004885a4', '["language:en"]'),
@@ -1648,7 +1648,7 @@ INSERT INTO _tag_catalog_seed_0008 (scope, id, tags) VALUES
   ('performance', 'p-162634c8', '["language:ko"]'),
   ('performance', 'p-164bcd1c', '["language:zh"]');
 
-INSERT INTO _tag_catalog_seed_0008 (scope, id, tags) VALUES
+INSERT INTO _tag_catalog_seed_0011 (scope, id, tags) VALUES
   ('performance', 'p-1684c3d4', '["language:ja"]'),
   ('performance', 'p-1690de3e', '["language:ja"]'),
   ('performance', 'p-16acd7bc', '["language:zh"]'),
@@ -1850,7 +1850,7 @@ INSERT INTO _tag_catalog_seed_0008 (scope, id, tags) VALUES
   ('performance', 'p-2b5385f6', '["language:en"]'),
   ('performance', 'p-2b5b43f6', '["language:ja"]');
 
-INSERT INTO _tag_catalog_seed_0008 (scope, id, tags) VALUES
+INSERT INTO _tag_catalog_seed_0011 (scope, id, tags) VALUES
   ('performance', 'p-2b8ac660', '["language:zh"]'),
   ('performance', 'p-2ba659a3', '["language:ja"]'),
   ('performance', 'p-2ba97493', '["language:ja"]'),
@@ -2052,7 +2052,7 @@ INSERT INTO _tag_catalog_seed_0008 (scope, id, tags) VALUES
   ('performance', 'p-3d9d2416', '["language:zh"]'),
   ('performance', 'p-3dcec9ce', '["language:ja"]');
 
-INSERT INTO _tag_catalog_seed_0008 (scope, id, tags) VALUES
+INSERT INTO _tag_catalog_seed_0011 (scope, id, tags) VALUES
   ('performance', 'p-3decb071', '["language:zh"]'),
   ('performance', 'p-3e2872e5', '["language:zh"]'),
   ('performance', 'p-3e345762', '["language:ja"]'),
@@ -2254,7 +2254,7 @@ INSERT INTO _tag_catalog_seed_0008 (scope, id, tags) VALUES
   ('performance', 'p-52f9c7a6', '["language:zh"]'),
   ('performance', 'p-52ffb80a', '["language:ja"]');
 
-INSERT INTO _tag_catalog_seed_0008 (scope, id, tags) VALUES
+INSERT INTO _tag_catalog_seed_0011 (scope, id, tags) VALUES
   ('performance', 'p-5300f850', '["language:zh"]'),
   ('performance', 'p-5316b455', '["language:ja"]'),
   ('performance', 'p-53379ff4', '["language:zh"]'),
@@ -2456,7 +2456,7 @@ INSERT INTO _tag_catalog_seed_0008 (scope, id, tags) VALUES
   ('performance', 'p-6744bc98', '["language:ja"]'),
   ('performance', 'p-67564e39', '["language:en"]');
 
-INSERT INTO _tag_catalog_seed_0008 (scope, id, tags) VALUES
+INSERT INTO _tag_catalog_seed_0011 (scope, id, tags) VALUES
   ('performance', 'p-67691395', '["language:zh"]'),
   ('performance', 'p-6774e0f3', '["language:zh"]'),
   ('performance', 'p-677875dd', '["language:ja"]'),
@@ -2658,7 +2658,7 @@ INSERT INTO _tag_catalog_seed_0008 (scope, id, tags) VALUES
   ('performance', 'p-7e622f16', '["language:en"]'),
   ('performance', 'p-7e7bfb5b', '["language:ja","style:a-cappella"]');
 
-INSERT INTO _tag_catalog_seed_0008 (scope, id, tags) VALUES
+INSERT INTO _tag_catalog_seed_0011 (scope, id, tags) VALUES
   ('performance', 'p-7e7ee978', '["language:ja"]'),
   ('performance', 'p-7e8af90a', '["language:ja"]'),
   ('performance', 'p-7e922a54', '["language:zh"]'),
@@ -2860,7 +2860,7 @@ INSERT INTO _tag_catalog_seed_0008 (scope, id, tags) VALUES
   ('performance', 'p-90b83d9c', '["language:zh"]'),
   ('performance', 'p-90bbf812', '["language:ja"]');
 
-INSERT INTO _tag_catalog_seed_0008 (scope, id, tags) VALUES
+INSERT INTO _tag_catalog_seed_0011 (scope, id, tags) VALUES
   ('performance', 'p-90c2281e', '["language:ja"]'),
   ('performance', 'p-90e255c1', '["language:zh"]'),
   ('performance', 'p-90eccc52', '["language:ja"]'),
@@ -3062,7 +3062,7 @@ INSERT INTO _tag_catalog_seed_0008 (scope, id, tags) VALUES
   ('performance', 'p-a46d806c', '["language:ja"]'),
   ('performance', 'p-a483cea1', '["language:en"]');
 
-INSERT INTO _tag_catalog_seed_0008 (scope, id, tags) VALUES
+INSERT INTO _tag_catalog_seed_0011 (scope, id, tags) VALUES
   ('performance', 'p-a48fe460', '["language:en"]'),
   ('performance', 'p-a49ad57c', '["language:ko"]'),
   ('performance', 'p-a4c381cb', '["language:ja"]'),
@@ -3264,7 +3264,7 @@ INSERT INTO _tag_catalog_seed_0008 (scope, id, tags) VALUES
   ('performance', 'p-ba8f4c83', '["language:en"]'),
   ('performance', 'p-baa6eba1', '["language:zh"]');
 
-INSERT INTO _tag_catalog_seed_0008 (scope, id, tags) VALUES
+INSERT INTO _tag_catalog_seed_0011 (scope, id, tags) VALUES
   ('performance', 'p-bacc254c', '["language:en"]'),
   ('performance', 'p-bae6ff10', '["language:ja"]'),
   ('performance', 'p-bae8cbd7', '["language:zh"]'),
@@ -3466,7 +3466,7 @@ INSERT INTO _tag_catalog_seed_0008 (scope, id, tags) VALUES
   ('performance', 'p-d06658b1', '["language:zh"]'),
   ('performance', 'p-d06c40b9', '["language:ja"]');
 
-INSERT INTO _tag_catalog_seed_0008 (scope, id, tags) VALUES
+INSERT INTO _tag_catalog_seed_0011 (scope, id, tags) VALUES
   ('performance', 'p-d073cee5', '["language:ja"]'),
   ('performance', 'p-d0aaf752', '["language:zh"]'),
   ('performance', 'p-d0ba9955', '["language:ja"]'),
@@ -3668,7 +3668,7 @@ INSERT INTO _tag_catalog_seed_0008 (scope, id, tags) VALUES
   ('performance', 'p-e49aa711', '["language:ko"]'),
   ('performance', 'p-e49ae393', '["language:zh"]');
 
-INSERT INTO _tag_catalog_seed_0008 (scope, id, tags) VALUES
+INSERT INTO _tag_catalog_seed_0011 (scope, id, tags) VALUES
   ('performance', 'p-e4a626c8', '["language:ja"]'),
   ('performance', 'p-e4c932e7', '["language:ja"]'),
   ('performance', 'p-e4d39b45', '["language:ko"]'),
@@ -3870,7 +3870,7 @@ INSERT INTO _tag_catalog_seed_0008 (scope, id, tags) VALUES
   ('performance', 'p-fb3fdd70', '["language:zh"]'),
   ('performance', 'p-fb49385c', '["language:ja"]');
 
-INSERT INTO _tag_catalog_seed_0008 (scope, id, tags) VALUES
+INSERT INTO _tag_catalog_seed_0011 (scope, id, tags) VALUES
   ('performance', 'p-fb555441', '["language:ja"]'),
   ('performance', 'p-fb5dc37c', '["language:en"]'),
   ('performance', 'p-fb609ff3', '["language:ja"]'),
@@ -4072,7 +4072,7 @@ INSERT INTO _tag_catalog_seed_0008 (scope, id, tags) VALUES
   ('performance', 'p1099-2', '["language:ja"]'),
   ('performance', 'p1099-3', '["language:ja"]');
 
-INSERT INTO _tag_catalog_seed_0008 (scope, id, tags) VALUES
+INSERT INTO _tag_catalog_seed_0011 (scope, id, tags) VALUES
   ('performance', 'p11-1', '["language:ja"]'),
   ('performance', 'p11-2', '["language:ja"]'),
   ('performance', 'p11-3', '["language:ja"]'),
@@ -4274,7 +4274,7 @@ INSERT INTO _tag_catalog_seed_0008 (scope, id, tags) VALUES
   ('performance', 'p1217-4', '["language:ja"]'),
   ('performance', 'p1218-1', '["language:en"]');
 
-INSERT INTO _tag_catalog_seed_0008 (scope, id, tags) VALUES
+INSERT INTO _tag_catalog_seed_0011 (scope, id, tags) VALUES
   ('performance', 'p1218-2', '["language:en"]'),
   ('performance', 'p1218-3', '["language:en"]'),
   ('performance', 'p1218-4', '["language:en"]'),
@@ -4476,7 +4476,7 @@ INSERT INTO _tag_catalog_seed_0008 (scope, id, tags) VALUES
   ('performance', 'p1355-1', '["language:en"]'),
   ('performance', 'p1355-2', '["language:en"]');
 
-INSERT INTO _tag_catalog_seed_0008 (scope, id, tags) VALUES
+INSERT INTO _tag_catalog_seed_0011 (scope, id, tags) VALUES
   ('performance', 'p1356-1', '["language:en"]'),
   ('performance', 'p1357-1', '["language:en"]'),
   ('performance', 'p1357-2', '["language:en"]'),
@@ -4678,7 +4678,7 @@ INSERT INTO _tag_catalog_seed_0008 (scope, id, tags) VALUES
   ('performance', 'p1499-1', '["language:ja"]'),
   ('performance', 'p15-1', '["language:zh"]');
 
-INSERT INTO _tag_catalog_seed_0008 (scope, id, tags) VALUES
+INSERT INTO _tag_catalog_seed_0011 (scope, id, tags) VALUES
   ('performance', 'p15-2', '["language:zh"]'),
   ('performance', 'p15-3', '["language:zh"]'),
   ('performance', 'p1502-1', '["language:ja"]'),
@@ -4880,7 +4880,7 @@ INSERT INTO _tag_catalog_seed_0008 (scope, id, tags) VALUES
   ('performance', 'p1662-1', '["language:zh"]'),
   ('performance', 'p1662-2', '["language:zh"]');
 
-INSERT INTO _tag_catalog_seed_0008 (scope, id, tags) VALUES
+INSERT INTO _tag_catalog_seed_0011 (scope, id, tags) VALUES
   ('performance', 'p1663-1', '["language:ja"]'),
   ('performance', 'p1663-2', '["language:ja"]'),
   ('performance', 'p1664-1', '["language:ja"]'),
@@ -5082,7 +5082,7 @@ INSERT INTO _tag_catalog_seed_0008 (scope, id, tags) VALUES
   ('performance', 'p1834-2', '["language:en"]'),
   ('performance', 'p1834-3', '["language:en"]');
 
-INSERT INTO _tag_catalog_seed_0008 (scope, id, tags) VALUES
+INSERT INTO _tag_catalog_seed_0011 (scope, id, tags) VALUES
   ('performance', 'p1834-4', '["language:en"]'),
   ('performance', 'p1835-1', '["language:ja"]'),
   ('performance', 'p1835-2', '["language:ja"]'),
@@ -5284,7 +5284,7 @@ INSERT INTO _tag_catalog_seed_0008 (scope, id, tags) VALUES
   ('performance', 'p201-1', '["language:ja"]'),
   ('performance', 'p201-2', '["language:ja"]');
 
-INSERT INTO _tag_catalog_seed_0008 (scope, id, tags) VALUES
+INSERT INTO _tag_catalog_seed_0011 (scope, id, tags) VALUES
   ('performance', 'p2010-1', '["language:zh"]'),
   ('performance', 'p2011-1', '["language:ja"]'),
   ('performance', 'p2013-1', '["language:ja"]'),
@@ -5486,7 +5486,7 @@ INSERT INTO _tag_catalog_seed_0008 (scope, id, tags) VALUES
   ('performance', 'p2140-1', '["language:ja"]'),
   ('performance', 'p2141-1', '["language:zh"]');
 
-INSERT INTO _tag_catalog_seed_0008 (scope, id, tags) VALUES
+INSERT INTO _tag_catalog_seed_0011 (scope, id, tags) VALUES
   ('performance', 'p2141-2', '["language:zh"]'),
   ('performance', 'p2143-1', '["language:zh"]'),
   ('performance', 'p2146-1', '["language:ja"]'),
@@ -5688,7 +5688,7 @@ INSERT INTO _tag_catalog_seed_0008 (scope, id, tags) VALUES
   ('performance', 'p2310-1', '["language:en"]'),
   ('performance', 'p2310-2', '["language:en"]');
 
-INSERT INTO _tag_catalog_seed_0008 (scope, id, tags) VALUES
+INSERT INTO _tag_catalog_seed_0011 (scope, id, tags) VALUES
   ('performance', 'p2312-1', '["language:ja"]'),
   ('performance', 'p2313-1', '["language:ja"]'),
   ('performance', 'p2315-1', '["language:ja"]'),
@@ -5890,7 +5890,7 @@ INSERT INTO _tag_catalog_seed_0008 (scope, id, tags) VALUES
   ('performance', 'p2463-1', '["language:zh"]'),
   ('performance', 'p2463-2', '["language:zh"]');
 
-INSERT INTO _tag_catalog_seed_0008 (scope, id, tags) VALUES
+INSERT INTO _tag_catalog_seed_0011 (scope, id, tags) VALUES
   ('performance', 'p2464-1', '["language:ja"]'),
   ('performance', 'p2464-2', '["language:ja"]'),
   ('performance', 'p2465-1', '["language:en"]'),
@@ -6092,7 +6092,7 @@ INSERT INTO _tag_catalog_seed_0008 (scope, id, tags) VALUES
   ('performance', 'p265-2', '["language:ja"]'),
   ('performance', 'p265-3', '["language:ja"]');
 
-INSERT INTO _tag_catalog_seed_0008 (scope, id, tags) VALUES
+INSERT INTO _tag_catalog_seed_0011 (scope, id, tags) VALUES
   ('performance', 'p265-4', '["language:ja"]'),
   ('performance', 'p2650-1', '["language:en"]'),
   ('performance', 'p2652-1', '["language:ja"]'),
@@ -6294,7 +6294,7 @@ INSERT INTO _tag_catalog_seed_0008 (scope, id, tags) VALUES
   ('performance', 'p2886-1', '["language:ja"]'),
   ('performance', 'p2887-1', '["language:ja"]');
 
-INSERT INTO _tag_catalog_seed_0008 (scope, id, tags) VALUES
+INSERT INTO _tag_catalog_seed_0011 (scope, id, tags) VALUES
   ('performance', 'p2888-1', '["language:ja"]'),
   ('performance', 'p2889-1', '["language:ja"]'),
   ('performance', 'p2890-1', '["language:ja"]'),
@@ -6496,7 +6496,7 @@ INSERT INTO _tag_catalog_seed_0008 (scope, id, tags) VALUES
   ('performance', 'p3121-1', '["language:zh"]'),
   ('performance', 'p3122-1', '["language:en"]');
 
-INSERT INTO _tag_catalog_seed_0008 (scope, id, tags) VALUES
+INSERT INTO _tag_catalog_seed_0011 (scope, id, tags) VALUES
   ('performance', 'p3123-1', '["language:en"]'),
   ('performance', 'p3124-1', '["language:zh"]'),
   ('performance', 'p3125-1', '["language:ja"]'),
@@ -6698,7 +6698,7 @@ INSERT INTO _tag_catalog_seed_0008 (scope, id, tags) VALUES
   ('performance', 'p395-3', '["language:zh"]'),
   ('performance', 'p396-1', '["language:ja"]');
 
-INSERT INTO _tag_catalog_seed_0008 (scope, id, tags) VALUES
+INSERT INTO _tag_catalog_seed_0011 (scope, id, tags) VALUES
   ('performance', 'p396-2', '["language:ja"]'),
   ('performance', 'p396-3', '["language:ja"]'),
   ('performance', 'p396-4', '["language:ja"]'),
@@ -6900,7 +6900,7 @@ INSERT INTO _tag_catalog_seed_0008 (scope, id, tags) VALUES
   ('performance', 'p500-1', '["language:zh"]'),
   ('performance', 'p500-2', '["language:zh"]');
 
-INSERT INTO _tag_catalog_seed_0008 (scope, id, tags) VALUES
+INSERT INTO _tag_catalog_seed_0011 (scope, id, tags) VALUES
   ('performance', 'p501-1', '["language:en"]'),
   ('performance', 'p504-1', '["language:zh"]'),
   ('performance', 'p504-2', '["language:zh"]'),
@@ -7102,7 +7102,7 @@ INSERT INTO _tag_catalog_seed_0008 (scope, id, tags) VALUES
   ('performance', 'p613-1', '["language:en"]'),
   ('performance', 'p615-1', '["language:ja"]');
 
-INSERT INTO _tag_catalog_seed_0008 (scope, id, tags) VALUES
+INSERT INTO _tag_catalog_seed_0011 (scope, id, tags) VALUES
   ('performance', 'p616-1', '["language:ja"]'),
   ('performance', 'p617-1', '["language:ja"]'),
   ('performance', 'p618-1', '["language:ja"]'),
@@ -7304,7 +7304,7 @@ INSERT INTO _tag_catalog_seed_0008 (scope, id, tags) VALUES
   ('performance', 'p739-1', '["language:ja"]'),
   ('performance', 'p739-2', '["language:ja"]');
 
-INSERT INTO _tag_catalog_seed_0008 (scope, id, tags) VALUES
+INSERT INTO _tag_catalog_seed_0011 (scope, id, tags) VALUES
   ('performance', 'p74-1', '["language:zh"]'),
   ('performance', 'p740-1', '["language:ja"]'),
   ('performance', 'p740-2', '["language:ja"]'),
@@ -7506,7 +7506,7 @@ INSERT INTO _tag_catalog_seed_0008 (scope, id, tags) VALUES
   ('performance', 'p862-6', '["language:ja"]'),
   ('performance', 'p862-7', '["language:ja"]');
 
-INSERT INTO _tag_catalog_seed_0008 (scope, id, tags) VALUES
+INSERT INTO _tag_catalog_seed_0011 (scope, id, tags) VALUES
   ('performance', 'p862-8', '["language:ja"]'),
   ('performance', 'p863-1', '["language:ja"]'),
   ('performance', 'p863-2', '["language:ja"]'),
@@ -7708,7 +7708,7 @@ INSERT INTO _tag_catalog_seed_0008 (scope, id, tags) VALUES
   ('performance', 'p975-4', '["language:ja"]'),
   ('performance', 'p976-1', '["language:ja"]');
 
-INSERT INTO _tag_catalog_seed_0008 (scope, id, tags) VALUES
+INSERT INTO _tag_catalog_seed_0011 (scope, id, tags) VALUES
   ('performance', 'p976-2', '["language:ja"]'),
   ('performance', 'p976-3', '["language:ja"]'),
   ('performance', 'p977-1', '["language:ja"]'),
@@ -7769,7 +7769,7 @@ SET tags = (
       UNION ALL
       SELECT value FROM json_each((
         SELECT seed.tags
-        FROM _tag_catalog_seed_0008 AS seed
+        FROM _tag_catalog_seed_0011 AS seed
         WHERE seed.scope = 'work' AND seed.id = works.id
       ))
     )
@@ -7778,7 +7778,7 @@ SET tags = (
 ),
 updated_at = datetime('now')
 WHERE EXISTS (
-  SELECT 1 FROM _tag_catalog_seed_0008 AS seed
+  SELECT 1 FROM _tag_catalog_seed_0011 AS seed
   WHERE seed.scope = 'work' AND seed.id = works.id
 );
 
@@ -7794,7 +7794,7 @@ SET tags = (
       UNION ALL
       SELECT value FROM json_each((
         SELECT seed.tags
-        FROM _tag_catalog_seed_0008 AS seed
+        FROM _tag_catalog_seed_0011 AS seed
         WHERE seed.scope = 'performance' AND seed.id = performances.id
       ))
     )
@@ -7803,8 +7803,8 @@ SET tags = (
 ),
 updated_at = datetime('now')
 WHERE EXISTS (
-  SELECT 1 FROM _tag_catalog_seed_0008 AS seed
+  SELECT 1 FROM _tag_catalog_seed_0011 AS seed
   WHERE seed.scope = 'performance' AND seed.id = performances.id
 );
 
-DROP TABLE _tag_catalog_seed_0008;
+DROP TABLE _tag_catalog_seed_0011;

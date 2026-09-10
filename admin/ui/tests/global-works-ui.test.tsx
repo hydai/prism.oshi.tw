@@ -87,13 +87,13 @@ async function main(): Promise<void> {
   assert(requestedUrl.includes('tag=genre%3Arock'), 'global library can filter by a stable tag ID');
 
   await api.updateWorkTags('work-1', { tags: ['genre:rock'] });
-  assert(requestedUrl === '/api/works/work-1/tags', 'single work tag update stays global');
-  assert(requestedInit?.method === 'PUT', 'single work tag update uses PUT');
+  assert(String(requestedUrl) === '/api/works/work-1/tags', 'single work tag update stays global');
+  assert(String(requestedInit?.method) === 'PUT', 'single work tag update uses PUT');
   assert(String(requestedInit?.body).includes('genre:rock'), 'single work tag update sends stable IDs');
 
   await api.bulkUpdateWorkTags({ workIds: ['work-1'], addTags: ['genre:rock'], removeTags: [] });
-  assert(requestedUrl === '/api/works/tags/bulk', 'bulk work tag update stays global');
-  assert(requestedInit?.method === 'POST', 'bulk work tag update uses POST');
+  assert(String(requestedUrl) === '/api/works/tags/bulk', 'bulk work tag update stays global');
+  assert(String(requestedInit?.method) === 'POST', 'bulk work tag update uses POST');
   assert(pageAfterReload(3, 2) === 2, 'tag updates clamp a page that no longer exists');
   assert(pageAfterReload(1, 0) === 1, 'an empty filtered result stays on page one');
 

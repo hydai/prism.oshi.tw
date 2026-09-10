@@ -1,5 +1,5 @@
 import { effectiveSongTags } from '../src/lib/songTags';
-import type { Song } from '../../shared/types';
+import type { Song, Performance } from '../../shared/types';
 
 function assert(condition: boolean, message: string): asserts condition {
   if (!condition) throw new Error(message);
@@ -24,20 +24,28 @@ function song(overrides: Partial<Song> = {}): Song {
     createdAt: '2026-01-01',
     updatedAt: '2026-01-01',
     ...overrides,
-  } as Song;
+  };
+}
+
+function performance(id: string, tags: string[]): Performance {
+  return {
+    id, songId: 'song-1', streamId: 'stream-1', date: '2026-01-01', streamTitle: 'Stream',
+    videoId: 'video-1', timestamp: 0, endTimestamp: null, note: '', tags,
+    status: 'approved', submittedBy: null, createdAt: '2026-01-01', updatedAt: '2026-01-01',
+  };
 }
 
 // songs.tags is dead storage on this branch: insertSong writes '[]', updateSong no longer
-// accepts the field, and migration 0007 strips IDs out of it. Reading it means the page
+// accepts the field, and migration 0010 strips IDs out of it. Reading it means the page
 // shows an empty tag list no matter how the song is actually tagged.
 function testReadsRenditionTagsRatherThanTheDeadColumn(): void {
   const subject = song({
     tags: [],
     performances: [
-      { id: 'p1', tags: ['language:ja', 'style:duet'] },
-      { id: 'p2', tags: ['language:ja'] },
+      performance('p1', ['language:ja', 'style:duet']),
+      performance('p2', ['language:ja']),
     ],
-  } as Partial<Song>);
+  });
 
   assertDeepEqual(
     effectiveSongTags(subject),
@@ -49,8 +57,8 @@ function testReadsRenditionTagsRatherThanTheDeadColumn(): void {
 function testIgnoresTheLegacySongColumn(): void {
   const subject = song({
     tags: ['genre:pop'],
-    performances: [{ id: 'p1', tags: [] }],
-  } as Partial<Song>);
+    performances: [performance('p1', [])],
+  });
 
   assertDeepEqual(
     effectiveSongTags(subject),

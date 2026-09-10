@@ -9,7 +9,7 @@ const migration = readFileSync(new URL('../migrations/0009_fan_export_revisions.
 assert.ok(readFileSync(new URL('../schema.sql', import.meta.url), 'utf8').includes(migration.trim()), 'fresh schema and migration must carry identical revision rules');
 sql.exec(migration);
 sql.exec(migration);
-assert.equal(sql.prepare("SELECT COUNT(*) AS n FROM sqlite_master WHERE type = 'trigger' AND name LIKE 'fan_export_%'").get()!.n, 12);
+assert.equal(sql.prepare("SELECT COUNT(*) AS n FROM sqlite_master WHERE type = 'trigger' AND name LIKE 'fan_export_%'").get()!.n, 13);
 sql.exec(`
   INSERT INTO songs (id,streamer_id,title,original_artist,status) VALUES ('song','alice','Song','Artist','approved');
   INSERT INTO works (id,title,original_artist) VALUES ('work','Song','Artist'), ('other','Other','Artist');
@@ -25,6 +25,12 @@ function advances(statement: string) {
 }
 // None of these edits changes an updated_at value; timestamps/counts alone
 // cannot prove freshness, but every field exported to the fan site is covered.
+advances("UPDATE works SET tags = '[\"genre:rock\"]' WHERE id = 'work'");
+advances("UPDATE works SET tags = '[\"genre:pop\"]' WHERE id = 'work'");
+const beforeUnlinkedWork = revision();
+sql.exec("UPDATE works SET tags = '[\"genre:rock\"]' WHERE id = 'other'");
+assert.equal(revision(), beforeUnlinkedWork, 'unlinked work tags do not dirty this archive');
+advances("UPDATE performances SET tags = '[\"language:ja\"]' WHERE id = 'perf'");
 advances("UPDATE performances SET note = 'encore' WHERE id = 'perf'");
 advances("UPDATE streams SET credit = '{\"author\":\"curator\"}' WHERE id = 'stream'");
 advances("UPDATE song_work_links SET work_id = 'other' WHERE song_id = 'song'");

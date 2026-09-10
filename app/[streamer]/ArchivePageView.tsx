@@ -951,7 +951,7 @@ function GroupedSongList({
   virtualizer: Virtualizer<HTMLDivElement, Element>;
   listRef: RefObject<HTMLDivElement | null>;
 }) {
-  const { groupedSongs, hasActiveFilters, clearAllFilters, handlePlayFromGrouped } = useArchiveFilters();
+  const { groupedSongs, hasActiveFilters, clearAllFilters, handlePlayFromGrouped, selectedTags } = useArchiveFilters();
   const { songs } = useArchiveData();
   const { handleAddToQueue, handleAddToPlaylistSuccess, toggleLike, expandedSongs, toggleSongExpansion } = useArchiveUi();
   const { unavailableVideoIds } = usePlayerStatus();
@@ -993,6 +993,7 @@ function GroupedSongList({
                 }}
               >
                 <SongCard
+                  selectedTags={selectedTags}
                   song={song}
                   isExpanded={expandedSongs.has(song.id)}
                   onToggleExpand={toggleSongExpansion}
@@ -1129,7 +1130,6 @@ function MobileSearchTab() {
                         >
                           <MobileSearchRow
                             song={song}
-                        selectedTags={selectedTags}
                             isCurrentlyPlaying={currentTrackId === song.performanceId}
                             isUnavailable={unavailableVideoIds.has(song.videoId)}
                             onPlay={handlePlayFromFlattened}

@@ -783,6 +783,8 @@ console.log("✓ archive helpers");
       performances: [
         {
           id: "perf-order-a",
+          streamId: "stream-order-a",
+          endTimestamp: null,
           date: "2024-01-01",
           streamTitle: "Ordering Stream",
           videoId: "video-order-a",
@@ -803,6 +805,8 @@ console.log("✓ archive helpers");
       performances: [
         {
           id: "perf-order-b",
+          streamId: "stream-order-b",
+          endTimestamp: null,
           date: "2024-01-02",
           streamTitle: "Ordering Stream",
           videoId: "video-order-b",

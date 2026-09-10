@@ -71,11 +71,13 @@ async function main() {
   assert.equal(aliasDb.sqlite.prepare('SELECT work_id FROM song_work_links').get()!.work_id, 'canonical');
 
   const replaceDb = fixture();
-  const original = await createSongAndPerformance(replaceDb.binding, submission);
+  const original = await createSongAndPerformance(replaceDb.binding, { ...submission, tags: ['language:ja', 'style:duet'] });
+  assert.equal(replaceDb.sqlite.prepare('SELECT tags FROM performances').get()!.tags, '["language:ja","style:duet"]');
   await replaceStreamPerformances(replaceDb.binding, { ...submission, songs });
   assert.equal(count(replaceDb, 'songs'), 1);
   assert.equal(count(replaceDb, 'performances'), 1);
   assert.notEqual(replaceDb.sqlite.prepare('SELECT id FROM songs').get()!.id, original.songId, 'replace does not reuse the just-deleted orphan');
+  assert.equal(replaceDb.sqlite.prepare('SELECT tags FROM performances').get()!.tags, '["language:ja","style:duet"]', 'rendition annotations survive the new catalog write pipeline and replacement IDs');
   // A database failure after the leading deletes rolls back the whole import.
   replaceDb.sqlite.exec("CREATE TRIGGER fail_import BEFORE INSERT ON performances BEGIN SELECT RAISE(ABORT, 'test rollback'); END");
   await assert.rejects(replaceStreamPerformances(replaceDb.binding, { ...submission, songs }), /test rollback/);

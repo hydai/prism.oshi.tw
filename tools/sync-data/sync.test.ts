@@ -218,7 +218,7 @@ test('sync-data CLI rejects a SQL-injection slug with a clear error (before any 
 test('export rows and sync stamp share one snapshot within the production D1 compound SELECT limit', () => {
   const schema = readFileSync(new URL('../../admin/schema.sql', import.meta.url), 'utf8');
   const fixture = `
-    INSERT INTO works (id,title,original_artist) VALUES ('work','Song','Artist');
+    INSERT INTO works (id,title,original_artist,tags,updated_at) VALUES ('work','Song','Artist','["genre:rock"]','2026-01-05');
     INSERT INTO songs (id,streamer_id,title,original_artist,status,updated_at) VALUES ('song','alice','Song','Artist','approved','2026-01-01');
     INSERT INTO song_work_links (song_id,work_id,link_method,linked_by,updated_at) VALUES ('song','work','import_exact','curator','2026-01-02');
     INSERT INTO streams (id,streamer_id,title,date,video_id,youtube_url,credit,status,updated_at) VALUES ('stream','alice','Stream','2026-01-01','video','https://example.com','{"editor":"credit"}','approved','2026-01-03');
@@ -241,19 +241,20 @@ test('export rows and sync stamp share one snapshot within the production D1 com
   assert.equal(queries, 1);
   assert.ok(result.exportRevision > 0, 'revision is read in the same statement as exported data');
   assert.equal(result.songs[0].workId, 'work');
+  assert.deepEqual(result.songs[0].inheritedTags, ['genre:rock']);
   assert.equal(result.songs[0].performances[0].note, 'encore');
   assert.deepEqual(result.streams[0].credit, { editor: 'credit' });
-  assert.deepEqual(result.songsSnap, { max_ts: '2026-01-02', cnt: 1 });
+  assert.deepEqual(result.songsSnap, { max_ts: '2026-01-05', cnt: 1 });
   assert.deepEqual(result.perfsSnap, { max_ts: '2026-01-04', cnt: 1 });
   assert.deepEqual(result.streamsSnap, { max_ts: '2026-01-03', cnt: 1 });
   assert.throws(() => readFanSiteExport('alice', () => []), /missing.*snapshot/, 'missing metadata aborts before writes');
 });
 
 test('published same-date versions keep their playback priority, while new data stays authoritative', () => {
-  const makeSong = (id: string, title = 'Song') => ({ id, title, work_id: null, original_artist: 'Artist', tags: '[]' });
+  const makeSong = (id: string, title = 'Song') => ({ id, title, work_id: null, original_artist: 'Artist', song_tags: '[]', work_tags: null });
   const makePerf = (id: string, date = '2026-01-01', songId = 'song') => ({
     id, song_id: songId, stream_id: 'stream', date, stream_title: 'Stream', video_id: 'video',
-    timestamp: id === 'p-z' ? 10 : 20, end_timestamp: null, note: '',
+    timestamp: id === 'p-z' ? 10 : 20, end_timestamp: null, note: '', tags: '[]',
   });
   const oldSongs = assembleFanSiteSongs([makeSong('song')], [makePerf('p-z')]);
   // A newer import of the same song on the same day must not replace the
@@ -285,7 +286,7 @@ test('published same-date versions keep their playback priority, while new data 
 });
 
 test('same-title songs and same-date streams preserve published ties, independently of query order', () => {
-  const makeSong = (id: string, title = 'Same') => ({ id, title, work_id: null, original_artist: '', tags: '[]' });
+  const makeSong = (id: string, title = 'Same') => ({ id, title, work_id: null, original_artist: '', song_tags: '[]', work_tags: null });
   const oldSongs = [song('z', []), song('a', []), song('deleted', [])];
   const songs = assembleFanSiteSongs([makeSong('new'), makeSong('a'), makeSong('z')], [], oldSongs);
   assert.deepEqual(songs.map(s => s.id), ['z', 'a', 'new']);

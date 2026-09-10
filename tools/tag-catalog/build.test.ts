@@ -54,7 +54,7 @@ test('artifact checks ignore curator-owned synced song tags', () => {
   try {
     const catalog = seedCatalog();
     const catalogPath = path.join(root, 'tag-catalog.json');
-    const migrationPath = path.join(root, '0008_seed_initial_tags.sql');
+    const migrationPath = path.join(root, '0011_seed_initial_tags.sql');
     const songsPath = path.join(root, 'songs.json');
     fs.writeFileSync(catalogPath, `${JSON.stringify(catalog, null, 2)}\n`);
     fs.writeFileSync(migrationPath, renderMigration(catalog.works, catalog.performances));
@@ -76,7 +76,7 @@ test('artifact checks reject a migration that differs from the frozen catalog', 
   try {
     const catalog = seedCatalog();
     const catalogPath = path.join(root, 'tag-catalog.json');
-    const migrationPath = path.join(root, '0008_seed_initial_tags.sql');
+    const migrationPath = path.join(root, '0011_seed_initial_tags.sql');
     fs.writeFileSync(catalogPath, `${JSON.stringify(catalog, null, 2)}\n`);
     fs.writeFileSync(migrationPath, '-- stale migration\n');
 
@@ -96,7 +96,7 @@ test('artifact checks reject tags stored at the wrong scope', () => {
     catalog.works[0].tags = ['language:ja'];
     catalog.works[0].evidence = { 'language:ja': 'Wrong scope' };
     const catalogPath = path.join(root, 'tag-catalog.json');
-    const migrationPath = path.join(root, '0008_seed_initial_tags.sql');
+    const migrationPath = path.join(root, '0011_seed_initial_tags.sql');
     fs.writeFileSync(catalogPath, `${JSON.stringify(catalog, null, 2)}\n`);
     fs.writeFileSync(migrationPath, renderMigration(catalog.works, catalog.performances));
 

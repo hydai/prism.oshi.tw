@@ -74,8 +74,8 @@ const ROOT = path.resolve(__dirname, '../..');
 const DATA_DIR = path.resolve(ROOT, 'data');
 const APPLE_METADATA = path.resolve(__dirname, 'apple-artist-metadata.json');
 const OUTPUT = path.resolve(DATA_DIR, 'tag-catalog.json');
-const MIGRATION_OUTPUT = path.resolve(ROOT, 'admin/migrations/0008_seed_initial_tags.sql');
-const SEED_TABLE = '_tag_catalog_seed_0008';
+const MIGRATION_OUTPUT = path.resolve(ROOT, 'admin/migrations/0011_seed_initial_tags.sql');
+const SEED_TABLE = '_tag_catalog_seed_0011';
 
 function readAppleMetadata(): AppleMetadata {
   if (!fs.existsSync(APPLE_METADATA)) return { fetchedAt: new Date(0).toISOString(), lookups: [] };

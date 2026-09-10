@@ -56,6 +56,7 @@ const performances: StampPerformance[] = [
     timestamp: 65,
     endTimestamp: 245,
     note: 'opening song',
+    tags: [],
     status: 'pending',
   },
   {
@@ -65,7 +66,7 @@ const performances: StampPerformance[] = [
     originalArtist: '',
     timestamp: 3700,
     endTimestamp: null,
-    note: '',
+    note: '', tags: [],
     status: 'approved',
   },
 ];

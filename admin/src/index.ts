@@ -598,22 +598,6 @@ app.post('/api/songs', async (c) => {
   const streamIds = [...new Set(inline.map((perf) => perf.streamId))];
   const streams = await Promise.all(streamIds.map((streamId) => getStreamById(c.env.DB, streamId, streamerId)));
   const streamsById = new Map(streams.flatMap((stream) => (stream ? [[stream.id, stream] as const] : [])));
-  const inserts: PerformanceInsert[] = [];
-  for (const perf of inline) {
-    const stream = streamsById.get(perf.streamId);
-    if (!stream) return c.json({ error: `Stream not found: ${perf.streamId}` }, 404);
-    inserts.push({
-      id: generatePerformanceId(),
-      streamId: stream.id,
-      date: stream.date,
-      streamTitle: stream.title,
-      videoId: stream.videoId,
-      timestamp: perf.timestamp,
-      endTimestamp: perf.endTimestamp ?? null,
-      note: perf.note ?? '',
-    });
-  }
-
   const tagSelection = validateTagSelection(body.tags ?? []);
   if (!tagSelection.ok) return c.json({ error: tagSelection.error }, 400);
   const workTags = filterTagIdsByScope(tagSelection.tags, 'work');
@@ -637,6 +621,22 @@ app.post('/api/songs', async (c) => {
     const selection = validateTagSelectionForScope(performance.tags ?? [], 'performance');
     if (!selection.ok) return c.json({ error: selection.error }, 400);
     performanceTags.push(mergeTagIds(legacyPerformanceTags, selection.tags));
+  }
+
+  const inserts: PerformanceInsert[] = [];
+  for (const perf of inline) {
+    const stream = streamsById.get(perf.streamId);
+    if (!stream) return c.json({ error: `Stream not found: ${perf.streamId}` }, 404);
+    inserts.push({
+      id: generatePerformanceId(),
+      streamId: stream.id,
+      date: stream.date,
+      streamTitle: stream.title,
+      videoId: stream.videoId,
+      timestamp: perf.timestamp,
+      endTimestamp: perf.endTimestamp ?? null,
+      note: perf.note ?? '',
+    });
   }
 
   const user = c.get('user');
