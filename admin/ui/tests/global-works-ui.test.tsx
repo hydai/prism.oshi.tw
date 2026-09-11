@@ -89,6 +89,8 @@ async function main(): Promise<void> {
   assert(html.includes('Global Song Library'), 'global library page renders its heading');
   assert(html.includes('Shared by multiple VTubers only'), 'global library page renders its cross-streamer filter');
   assert(html.includes('Unlinked songs'), 'global library page renders its coverage warning card');
+  assert(html.includes('未標語言'), 'global library page renders the untagged-language filter');
+  assert(html.includes('All tags'), 'global library page renders the tag filter select');
 
   const sortHeaderHtml = renderToStaticMarkup(
     <table>
@@ -130,7 +132,10 @@ function work(overrides: Partial<GlobalWorkSummary> = {}): GlobalWorkSummary {
 
 interface PendingFetch {
   url: string;
+  method: string;
+  body: string | null;
   respond: (body: unknown) => void;
+  respondWith: (status: number, body: unknown) => void;
 }
 
 /** Every load the page has started, in order; the test resolves each one explicitly. */
@@ -140,14 +145,18 @@ function stubQueuedFetch(): void {
   Object.defineProperty(globalThis, 'fetch', {
     configurable: true,
     writable: true,
-    value: (input: RequestInfo | URL) =>
+    value: (input: RequestInfo | URL, init?: RequestInit) =>
       new Promise<Response>((resolve) => {
+        const respondWith = (status: number, body: unknown) => resolve(new Response(JSON.stringify(body), {
+          status,
+          headers: { 'Content-Type': 'application/json' },
+        }));
         pendingFetches.push({
           url: String(input),
-          respond: (body: unknown) => resolve(new Response(JSON.stringify(body), {
-            status: 200,
-            headers: { 'Content-Type': 'application/json' },
-          })),
+          method: init?.method ?? 'GET',
+          body: typeof init?.body === 'string' ? init.body : null,
+          respond: (body: unknown) => respondWith(200, body),
+          respondWith,
         });
       }),
   });
@@ -238,7 +247,7 @@ async function globalWorksLoadsThroughTheHook(): Promise<void> {
   assert(!pendingAt(0).url.includes('search='), 'no search term is sent before one is submitted');
 
   const firstPage: GlobalWorksResponse = {
-    data: [work()],
+    data: [work({ tags: ['language:ja'] })],
     total: 120,
     page: 1,
     pageSize: 50,
@@ -252,6 +261,14 @@ async function globalWorksLoadsThroughTheHook(): Promise<void> {
 
   assert(!container.innerHTML.includes('Loading...'), 'the first response ends the loading state');
   assert(container.innerHTML.includes('Work One'), 'the first page of works renders');
+  // Scoped to the table body: the tag filter `<select>` also renders every dictionary
+  // label (as its options) on every render, so an unscoped `container.innerHTML` check
+  // would stay green even if the row's own tag chip were deleted.
+  assert(
+    container.querySelector<DomElement>('tbody')!.innerHTML.includes('日文歌'),
+    'work tags render with their dictionary labels',
+  );
+  assert(container.innerHTML.includes('Edit tags'), 'each row offers a tag editor');
   assert(container.innerHTML.includes('120'), 'the stats card renders the resolved total');
   assert(container.innerHTML.includes('Showing 1') && container.innerHTML.includes('of 120'), 'pagination reflects the resolved total');
   assert(container.innerHTML.includes('Page 1 of 3'), 'pagination reflects the resolved page count');
@@ -300,6 +317,65 @@ async function globalWorksLoadsThroughTheHook(): Promise<void> {
     commitsAfterSecondLoad === commitsAfterNextClick + 1,
     'the second response ends its load in exactly one more commit too',
   );
+
+  const rowCheckbox = container.querySelector<DomElement>('input[aria-label="Select Work Two"]');
+  assert(rowCheckbox !== null, 'each row renders a selection checkbox');
+  await act(async () => { rowCheckbox.click(); });
+  assert(container.innerHTML.includes('已選擇 1 個作品'), 'selecting a row shows the batch editor');
+  assert(container.innerHTML.includes('加入所選標籤'), 'the batch editor offers add');
+  assert(container.innerHTML.includes('移除所選標籤'), 'the batch editor offers remove');
+
+  const editButton = [...container.querySelectorAll<DomElement>('button')].find(
+    (button) => button.textContent.trim() === 'Edit tags',
+  );
+  assert(editButton !== undefined, 'the row exposes its Edit tags button');
+  await act(async () => { editButton.click(); });
+  // The batch bar opened by the row-selection click above already renders a TagPicker of
+  // its own, so an unscoped presence check would already be green before this click — only
+  // a count distinguishes "still just the batch bar's" from "plus the inline editor's".
+  const tagPickerCount = container.querySelectorAll('[data-testid="tag-picker"]').length;
+  assert(tagPickerCount === 2, 'editing a row opens a second tag picker inline, alongside the batch editor\'s');
+  assert(container.innerHTML.includes('Save tags'), 'the inline editor offers Save');
+
+  // Saving sends the row's updatedAt the editor was opened with as `expectedUpdatedAt`; a
+  // 409 means someone else changed the work meanwhile — the page says so and reloads
+  // instead of overwriting.
+  const saveButton = [...container.querySelectorAll<DomElement>('button')].find(
+    (button) => button.textContent.trim() === 'Save tags',
+  );
+  assert(saveButton !== undefined, 'the inline editor renders its Save button');
+  await act(async () => { saveButton.click(); });
+  await settle();
+  assert(pendingAt(2).method === 'PUT' && pendingAt(2).url.endsWith('/api/works/work-2/tags'), 'saving PUTs the row\'s tags');
+  assert(JSON.parse(pendingAt(2).body ?? '{}').expectedUpdatedAt === work().updatedAt, 'the save carries the updatedAt the editor was opened with');
+  await act(async () => {
+    pendingAt(2).respondWith(409, { error: 'Work tags changed since they were loaded', tags: ['language:ja'] });
+  });
+  await settle();
+  assert(container.innerHTML.includes('剛被其他人修改'), 'a conflict is explained to the curator');
+  assert(pendingAt(3).url.includes('page=2'), 'a conflict reloads the current page');
+  await act(async () => {
+    pendingAt(3).respond(secondPage);
+  });
+  await settle();
+  assert(!container.innerHTML.includes('Save tags'), 'the editor is closed after the reload');
+
+  // A page change starts a new query: the batch bar must vanish at once — the previous
+  // rows are still on screen while the replacement loads, and they must not stay
+  // actionable — and it must stay gone once the new page has landed.
+  const previousButton = [...container.querySelectorAll<DomElement>('button')].find(
+    (button) => button.textContent.trim() === 'Previous',
+  );
+  assert(previousButton !== undefined, 'pagination renders a Previous button on page 2');
+  await act(async () => { previousButton.click(); });
+  assert(container.innerHTML.includes('Loading...'), 'moving back starts a load');
+  assert(!container.innerHTML.includes('已選擇'), 'the selection from the previous result set is not actionable while the new page loads');
+  await act(async () => {
+    pendingAt(4).respond(firstPage);
+  });
+  await settle();
+  assert(container.innerHTML.includes('Work One'), 'the first page renders again');
+  assert(!container.innerHTML.includes('已選擇'), 'no selection carries over to the new result set');
 
   await act(async () => {
     root.unmount();
