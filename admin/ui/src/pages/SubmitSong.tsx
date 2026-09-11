@@ -29,7 +29,6 @@ export default function SubmitSong() {
   const formId = useId();
   const [title, setTitle] = useState('');
   const [originalArtist, setOriginalArtist] = useState('');
-  const [tags, setTags] = useState('');
   const [performances, setPerformances] = useState<PerformanceForm[]>([]);
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -79,16 +78,9 @@ export default function SubmitSong() {
       });
     }
 
-    const normalizedTags: string[] = [];
-    for (const tag of tags.split(',')) {
-      const normalizedTag = tag.trim();
-      if (normalizedTag) normalizedTags.push(normalizedTag);
-    }
-
     const body: CreateSongBody = {
       title: title.trim(),
       originalArtist: originalArtist.trim(),
-      tags: normalizedTags,
       performances: perfBodies.length > 0 ? perfBodies : undefined,
     };
 
@@ -134,20 +126,6 @@ export default function SubmitSong() {
             onChange={(e) => setOriginalArtist(e.target.value)}
             className="mt-1 w-full rounded-md border border-slate-300 px-3 py-2 text-sm focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500"
             required
-          />
-        </div>
-
-        <div>
-          <label htmlFor={`${formId}-tags`} className="block text-sm font-medium text-slate-700">
-            Tags
-          </label>
-          <input
-            id={`${formId}-tags`}
-            type="text"
-            value={tags}
-            onChange={(e) => setTags(e.target.value)}
-            placeholder="Comma-separated, e.g. J-Pop, anime"
-            className="mt-1 w-full rounded-md border border-slate-300 px-3 py-2 text-sm focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500"
           />
         </div>
 
