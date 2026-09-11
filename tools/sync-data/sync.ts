@@ -19,6 +19,7 @@ import { LATEST_UPDATED_AT_SQL } from '../shared/sync-sql.ts';
 
 import { newStreamEmbed, newStreamsSummaryEmbed, type DiscordEmbed } from '../../admin/shared/discord.ts';
 import { enqueueAnnouncements, hashSources, loadAnnounceWebhook, type PendingBatch } from '../shared/announce.ts';
+import { normalizeTags } from '../../lib/tags.ts';
 
 // --- Paths ---
 
@@ -31,7 +32,7 @@ interface SongRow {
   work_id: string | null;
   title: string;
   original_artist: string;
-  tags: string; // JSON array
+  work_tags: string | null; // JSON array; null for unlinked rows
 }
 
 interface PerformanceRow {
@@ -120,7 +121,7 @@ export function assembleFanSiteSongs(
       ...(row.work_id ? { workId: row.work_id } : {}),
       title: row.title,
       originalArtist: row.original_artist,
-      tags: JSON.parse(row.tags) as string[],
+      tags: row.work_tags ? normalizeTags(JSON.parse(row.work_tags) as string[]) : [],
       performances: (perfsBySong.get(row.id) || [])
         // Newest first — the canonical order the timeline consumes (dates come
         // from the DB rows; the slim output no longer carries them)
@@ -171,9 +172,10 @@ export function buildExportSql(streamerId: string): string {
     SELECT * FROM (
     SELECT 'song' AS kind, json_object(
       'id', song.id, 'work_id', link.work_id, 'title', song.title,
-      'original_artist', song.original_artist, 'tags', song.tags
+      'original_artist', song.original_artist, 'work_tags', work.tags
     ) AS payload
     FROM songs AS song LEFT JOIN song_work_links AS link ON link.song_id = song.id
+      LEFT JOIN works AS work ON work.id = link.work_id
     WHERE song.streamer_id = '${streamerId}' AND song.status = 'approved'
     UNION ALL
     SELECT 'performance', json_object(
@@ -192,6 +194,7 @@ export function buildExportSql(streamerId: string): string {
     SELECT 'songs-snapshot', json_object('max_ts', max_ts, 'cnt', cnt) FROM (
       SELECT ${LATEST_UPDATED_AT_SQL}, COUNT(*) AS cnt
       FROM songs AS song LEFT JOIN song_work_links AS link ON link.song_id = song.id
+        LEFT JOIN works AS work ON work.id = link.work_id
       WHERE song.streamer_id = '${streamerId}' AND song.status = 'approved'
     )
     UNION ALL
