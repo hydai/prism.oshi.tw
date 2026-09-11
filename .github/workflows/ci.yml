@@ -42,6 +42,7 @@ jobs:
       - run: npm run sync:data:test
       - run: npm run sync:status:test
       - run: npm run fetch:channel-info:test
+      - run: npm run tags:fill:test
       - run: npm run test:announce
       - run: npm run test:slug
       - run: npm run typecheck:tools
