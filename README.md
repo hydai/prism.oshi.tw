@@ -70,6 +70,13 @@ Streamers are managed through the Nova admin backend, **not** by hand-editing fi
 3. `npm run sync:data -- <slug>` — exports that streamer's approved songs/streams to `data/<slug>/`
 4. Commit & push → GitHub Actions rebuilds and deploys
 
+## Managing Song Tags
+
+Tags are curated per shared work in the Admin Global Library and exported by
+`sync:data`; `npm run tags:fill` fills empty language/source tags from titles,
+artists and streamer identity without ever overwriting a curated value. See
+[`docs/tag-system.md`](docs/tag-system.md).
+
 ## License
 
 [MIT](LICENSE)
