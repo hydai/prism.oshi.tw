@@ -7,6 +7,7 @@ export interface FlattenedSong {
   id: string;
   title: string;
   originalArtist: string;
+  tags: string[];
   performanceId: string;
   streamId: string;
   date: string;

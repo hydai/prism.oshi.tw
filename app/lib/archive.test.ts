@@ -7,6 +7,7 @@ import {
   followingTracksFromFlattened,
   followingTracksFromGrouped,
   getAllArtists,
+  getAvailableTags,
   getAvailableYears,
   groupSongsByWorkId,
   pickPerformanceRef,
@@ -22,7 +23,7 @@ const songs: ArchiveSong[] = [
     id: "song-a",
     title: "Beta Song",
     originalArtist: "Zeta",
-    tags: ["rock"],
+    tags: ["language:ja"],
     performances: [
       {
         id: "perf-old",
@@ -110,7 +111,7 @@ assert.equal(flattened[0]?.endTimestamp, 50);
 assert.equal(flattened[1]?.streamId, "stream-unlisted");
 assert.equal(flattened[2]?.endTimestamp, null);
 assert.equal("performances" in flattened[0]!, false);
-assert.equal("tags" in flattened[0]!, false);
+assert.deepEqual(flattened[0]?.tags, ["language:ja"], "flattened rows carry the song tags");
 
 assert.deepEqual(
   filterFlattenedSongs(flattened, {
@@ -118,6 +119,7 @@ assert.deepEqual(
     selectedStreamId: "stream-2025",
     selectedArtist: "Zeta",
     selectedYears: new Set([2025]),
+    selectedTags: new Set<string>(),
   }).map((song) => song.performanceId),
   ["perf-new"],
 );
@@ -127,6 +129,7 @@ assert.deepEqual(
     selectedStreamId: null,
     selectedArtist: null,
     selectedYears: new Set(),
+    selectedTags: new Set<string>(),
   }).map((song) => song.performanceId),
   ["perf-no-stream"],
 );
@@ -136,6 +139,7 @@ assert.deepEqual(
     selectedStreamId: "missing",
     selectedArtist: null,
     selectedYears: new Set(),
+    selectedTags: new Set<string>(),
   }),
   [],
 );
@@ -209,7 +213,7 @@ const sharedWork = groupedByWorkId.find((song) => song.workId === "work-shared")
 assert.equal(groupedByWorkId.length, 4);
 assert.equal(sharedWork?.id, "song-shared-a");
 assert.equal(sharedWork?.title, "Shared Song");
-assert.deepEqual(sharedWork?.tags, ["ballad", "acoustic"]);
+assert.deepEqual(sharedWork?.tags, ["acoustic", "ballad"]);
 assert.deepEqual(
   sharedWork?.performances.map((performance) => performance.id),
   ["perf-shared-a", "perf-shared-z"],
@@ -230,6 +234,7 @@ assert.deepEqual(
     selectedStreamId: null,
     selectedArtist: null,
     selectedYears: new Set(),
+    selectedTags: new Set<string>(),
   }),
   [],
 );
@@ -239,6 +244,7 @@ assert.deepEqual(
     selectedStreamId: "stream-2023",
     selectedArtist: null,
     selectedYears: new Set(),
+    selectedTags: new Set<string>(),
   }).map((song) => song.id),
   ["song-a"],
 );
@@ -248,6 +254,7 @@ assert.deepEqual(
     selectedStreamId: null,
     selectedArtist: "Zeta",
     selectedYears: new Set([2024]),
+    selectedTags: new Set<string>(),
   }),
   [],
 );
@@ -257,6 +264,7 @@ assert.deepEqual(
     selectedStreamId: null,
     selectedArtist: "Zeta",
     selectedYears: new Set([2025]),
+    selectedTags: new Set<string>(),
   }).map((song) => song.id),
   ["song-a"],
 );
@@ -345,5 +353,48 @@ assert.deepEqual(pickPerformanceRef(withExtras), {
   endTimestamp: null,
   streamerSlug: "mizuki",
 });
+
+// --- tag filters ---
+const perfAt = (id: string, date: string) => ({
+  id,
+  streamId: `stream-${date}`,
+  date,
+  streamTitle: "Stream",
+  videoId: `video-${id}`,
+  timestamp: 0,
+  endTimestamp: null,
+  note: "",
+});
+const tagged: ArchiveSong[] = [
+  { id: "t-ja", title: "JA", originalArtist: "A", tags: ["language:ja"], performances: [perfAt("t-ja-1", "2025-01-01")] },
+  { id: "t-ja-voc", title: "JA VOC", originalArtist: "A", tags: ["language:ja", "source:vocaloid"], performances: [perfAt("t-ja-voc-1", "2024-01-01")] },
+  { id: "t-zh", title: "ZH", originalArtist: "B", tags: ["language:zh"], performances: [perfAt("t-zh-1", "2025-01-01")] },
+  { id: "t-none", title: "NONE", originalArtist: "B", tags: [], performances: [perfAt("t-none-1", "2025-01-01")] },
+];
+const noFilters = { search: "", selectedStreamId: null, selectedArtist: null, selectedYears: new Set<number>() };
+const withTags = (...ids: string[]) => ({ ...noFilters, selectedTags: new Set(ids) });
+
+assert.deepEqual(getAvailableTags(tagged), ["language:zh", "language:ja", "source:vocaloid"], "dictionary order, present tags only");
+assert.deepEqual(getAvailableTags([tagged[3]!]), []);
+
+const taggedFlat = flattenSongs(tagged);
+assert.deepEqual(filterFlattenedSongs(taggedFlat, withTags()).map((s) => s.id), ["t-ja", "t-zh", "t-none", "t-ja-voc"], "no selection keeps every row");
+assert.deepEqual(filterFlattenedSongs(taggedFlat, withTags("language:ja")).map((s) => s.id), ["t-ja", "t-ja-voc"]);
+assert.deepEqual(filterFlattenedSongs(taggedFlat, withTags("language:ja", "language:zh")).map((s) => s.id), ["t-ja", "t-zh", "t-ja-voc"], "OR inside a category");
+assert.deepEqual(filterFlattenedSongs(taggedFlat, withTags("language:ja", "source:vocaloid")).map((s) => s.id), ["t-ja-voc"], "AND across categories");
+assert.deepEqual(
+  filterFlattenedSongs(taggedFlat, { ...withTags("language:ja"), selectedYears: new Set([2025]) }).map((s) => s.id),
+  ["t-ja"],
+  "tags combine with the year filter",
+);
+
+const taggedGrouped = sortGroupedSongs(groupSongsByWorkId(tagged));
+assert.deepEqual(filterGroupedSongs(taggedGrouped, withTags("language:ja")).map((s) => s.id), ["t-ja", "t-ja-voc"]);
+assert.deepEqual(filterGroupedSongs(taggedGrouped, withTags("language:zh", "source:vocaloid")).map((s) => s.id), [], "an impossible combination yields no songs");
+assert.deepEqual(
+  filterGroupedSongs(taggedGrouped, { ...withTags("language:ja"), selectedArtist: "A", search: "voc" }).map((s) => s.id),
+  ["t-ja-voc"],
+  "tags combine with search and artist",
+);
 
 console.log("✓ archive helpers");

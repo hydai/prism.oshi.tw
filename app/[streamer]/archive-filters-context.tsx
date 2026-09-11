@@ -31,6 +31,9 @@ interface ArchiveFiltersValue {
   selectedYears: Set<number>;
   toggleYear: (year: number) => void;
   clearYears: () => void;
+  selectedTags: Set<string>;
+  toggleTag: (tagId: string) => void;
+  clearTags: () => void;
   hasActiveFilters: boolean;
   clearAllFilters: () => void;
   filteredStreams: StreamSummary[];
@@ -62,6 +65,18 @@ export function ArchiveFiltersProvider({ children }: { children: ReactNode }) {
   const [selectedArtist, setSelectedArtist] = useState<string | null>(null);
   const [selectedYears, setSelectedYears] = useState<Set<number>>(new Set());
 
+  const [selectedTags, setSelectedTags] = useState<Set<string>>(new Set());
+
+  const toggleTag = useCallback((tagId: string) => {
+    setSelectedTags(prev => {
+      const next = new Set(prev);
+      if (next.has(tagId)) next.delete(tagId); else next.add(tagId);
+      return next;
+    });
+  }, []);
+
+  const clearTags = useCallback(() => setSelectedTags(new Set()), []);
+
   const filteredStreams = useMemo(
     () => filterStreamsByYears(streams, selectedYears),
     [streams, selectedYears],
@@ -81,13 +96,14 @@ export function ArchiveFiltersProvider({ children }: { children: ReactNode }) {
     setSelectedStreamId(null);
   }, []);
 
-  const hasActiveFilters = debouncedSearch !== '' || selectedStreamId !== null || selectedArtist !== null || selectedYears.size > 0;
+  const hasActiveFilters = debouncedSearch !== '' || selectedStreamId !== null || selectedArtist !== null || selectedYears.size > 0 || selectedTags.size > 0;
 
   const clearAllFilters = useCallback(() => {
     setDebouncedSearch('');
     setSelectedStreamId(null);
     setSelectedArtist(null);
     setSelectedYears(new Set());
+    setSelectedTags(new Set());
   }, []);
 
   const archiveFilters = useMemo(() => ({
@@ -95,7 +111,8 @@ export function ArchiveFiltersProvider({ children }: { children: ReactNode }) {
     selectedStreamId,
     selectedArtist,
     selectedYears,
-  }), [debouncedSearch, selectedStreamId, selectedArtist, selectedYears]);
+    selectedTags,
+  }), [debouncedSearch, selectedStreamId, selectedArtist, selectedYears, selectedTags]);
 
   const flattenedSongs: FlattenedSong[] = useMemo(
     () => filterFlattenedSongs(allFlattenedSongs, archiveFilters),
@@ -148,6 +165,9 @@ export function ArchiveFiltersProvider({ children }: { children: ReactNode }) {
     selectedYears,
     toggleYear,
     clearYears,
+    selectedTags,
+    toggleTag,
+    clearTags,
     hasActiveFilters,
     clearAllFilters,
     filteredStreams,
@@ -163,6 +183,9 @@ export function ArchiveFiltersProvider({ children }: { children: ReactNode }) {
     selectedYears,
     toggleYear,
     clearYears,
+    selectedTags,
+    toggleTag,
+    clearTags,
     hasActiveFilters,
     clearAllFilters,
     filteredStreams,

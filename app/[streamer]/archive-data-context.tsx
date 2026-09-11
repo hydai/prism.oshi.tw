@@ -14,6 +14,7 @@ import { useStreamer } from '../contexts/StreamerContext';
 import {
   flattenSongs,
   getAllArtists,
+  getAvailableTags,
   getAvailableYears,
   groupSongsByWorkId,
   sortGroupedSongs,
@@ -28,6 +29,7 @@ interface ArchiveDataValue {
   retryLoad: () => void;
   allArtists: string[];
   availableYears: number[];
+  availableTags: string[];
   /** Unfiltered catalogs — consumed by ArchiveFiltersProvider, not by sections. */
   allFlattenedSongs: FlattenedSong[];
   allGroupedSongs: ArchiveSong[];
@@ -82,12 +84,13 @@ export function ArchiveDataProvider({ children }: { children: ReactNode }) {
 
   const allArtists = useMemo(() => getAllArtists(songs), [songs]);
   const availableYears = useMemo(() => getAvailableYears(streams), [streams]);
+  const availableTags = useMemo(() => getAvailableTags(songs), [songs]);
   const allFlattenedSongs = useMemo(() => flattenSongs(songs), [songs]);
   const allGroupedSongs = useMemo(() => sortGroupedSongs(groupSongsByWorkId(songs)), [songs]);
 
   const value = useMemo<ArchiveDataValue>(
-    () => ({ songs, streams, loadState, retryLoad, allArtists, availableYears, allFlattenedSongs, allGroupedSongs }),
-    [songs, streams, loadState, retryLoad, allArtists, availableYears, allFlattenedSongs, allGroupedSongs],
+    () => ({ songs, streams, loadState, retryLoad, allArtists, availableYears, availableTags, allFlattenedSongs, allGroupedSongs }),
+    [songs, streams, loadState, retryLoad, allArtists, availableYears, availableTags, allFlattenedSongs, allGroupedSongs],
   );
 
   return <ArchiveDataContext.Provider value={value}>{children}</ArchiveDataContext.Provider>;

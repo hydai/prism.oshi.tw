@@ -5,12 +5,14 @@ import type {
   PerformanceRef,
   StreamSummary,
 } from "../types/archive";
+import { TAG_DEFINITIONS, matchesTags, normalizeTags } from "../../lib/tags";
 
-interface ArchiveFilters {
+export interface ArchiveFilters {
   search: string;
   selectedStreamId: string | null;
   selectedArtist: string | null;
   selectedYears: Set<number>;
+  selectedTags: Set<string>;
 }
 
 export function sortStreamsByNewest(streams: StreamSummary[]): StreamSummary[] {
@@ -32,6 +34,13 @@ export function getAvailableYears(streams: StreamSummary[]): number[] {
   return Array.from(years).sort((a, b) => b - a);
 }
 
+/** Tags at least one song carries, in dictionary order — the chips a streamer's page offers. */
+export function getAvailableTags(songs: ArchiveSong[]): string[] {
+  const present = new Set<string>();
+  songs.forEach((song) => song.tags.forEach((tag) => present.add(tag)));
+  return TAG_DEFINITIONS.flatMap((tag) => (present.has(tag.id) ? [tag.id] : []));
+}
+
 export function filterStreamsByYears(
   streams: StreamSummary[],
   selectedYears: Set<number>,
@@ -49,6 +58,7 @@ export function flattenSongs(songs: ArchiveSong[]): FlattenedSong[] {
         id: song.id,
         title: song.title,
         originalArtist: song.originalArtist,
+        tags: song.tags,
         performanceId: performance.id,
         streamId: performance.streamId,
         date: performance.date,
@@ -78,7 +88,8 @@ export function filterFlattenedSongs(
     const matchesStream = filters.selectedStreamId ? song.streamId === filters.selectedStreamId : true;
     const matchesArtist = filters.selectedArtist ? song.originalArtist === filters.selectedArtist : true;
     const matchesYear = filters.selectedYears.size > 0 ? filters.selectedYears.has(song.year) : true;
-    return matchesSearch && matchesStream && matchesArtist && matchesYear;
+    const matchesTag = matchesTags(song.tags, filters.selectedTags);
+    return matchesSearch && matchesStream && matchesArtist && matchesYear && matchesTag;
   });
 }
 
@@ -106,7 +117,7 @@ export function groupSongsByWorkId(songs: ArchiveSong[]): ArchiveSong[] {
     return {
       ...canonical,
       ...(workId ? { workId } : {}),
-      tags: Array.from(new Set(orderedMembers.flatMap((song) => song.tags))),
+      tags: normalizeTags(orderedMembers.flatMap((song) => song.tags)),
       performances: orderedMembers.flatMap((song) => song.performances),
     };
   });
@@ -130,7 +141,8 @@ export function filterGroupedSongs(
     const matchesYear = filters.selectedYears.size > 0
       ? song.performances.some((performance) => filters.selectedYears.has(new Date(performance.date).getFullYear()))
       : true;
-    return matchesSearch && matchesStream && matchesArtist && matchesYear;
+    const matchesTag = matchesTags(song.tags, filters.selectedTags);
+    return matchesSearch && matchesStream && matchesArtist && matchesYear && matchesTag;
   });
 }
 
