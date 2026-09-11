@@ -98,7 +98,7 @@ Streamers are managed through the Nova admin backend, **not** by hand-editing fi
 
 Run before every commit and again before requesting review:
 
-1. `npm run lint` + `npm test` (frontend suites); `npm run check` in `admin/` and `admin/ui/` when those changed. `admin/ui` test files must be run through their `npm run test:<name>` scripts (they pass `--tsconfig tsconfig.tests.json`) — a bare `npx tsx tests/<file>` compiles with the classic JSX runtime and fails with `React is not defined`.
+1. `npm run lint` + `npm test` (frontend suites); `npm run check` in `admin/` and `admin/ui/` when those changed. `admin/ui` test files must be run through their `npm run test:<name>` scripts (they pass `--tsconfig tsconfig.tests.json`) — a bare `npx tsx tests/<file>` compiles with the classic JSX runtime and fails with `React is not defined`. The fan site's type gate is `npm run build` (what CI runs); a bare `npx tsc --noEmit` at the root currently fails on `tests/view-mode-toggle.spec.ts` and `tests/vods-links.spec.ts` because `externalUrl` is absent from `data/registry.json`'s inferred type since the registry sync — do not treat that as a gate (delete this note once those specs are fixed).
 2. **React Doctor** — `.github/workflows/react-doctor.yml` runs `millionco/react-doctor` v0.9.12 with `scope: full` + `blocking: warning` on every PR to `master` and every `master` push. **Any warning fails the check; `master` baseline is 0 warnings.**
    - Dev loop: the `--scope changed --base master` command above (only new issues vs. `master`). **Before every push run the `--scope full` command** — it is what CI runs, and cross-file rules such as `deslop/unused-export` (an exported symbol nothing imports) can only fire there; a `--scope changed` run reporting 0 issues proves nothing about them (PR #176's first CI run failed exactly this way). Add `--verbose` to reproduce the CI report line for line.
    - Findings are hypotheses: read the code at `file:line` (same npx prefix + `react-doctor why <file:line>` explains the rule) and fix the root cause — refactor, don't reach for config or suppressions.
@@ -106,6 +106,7 @@ Run before every commit and again before requesting review:
    - Findings in commits of your own unmerged branch get folded into the originating commit (fixup + autosquash), not a trailing "fix doctor" commit.
    - Gotcha: local full scans also read gitignored dirs such as `ds-bundle/` (Claude Design output) — ignore findings outside tracked files.
 3. Land only when lint, tests, and the React Doctor **full scan** are all green locally; then check the PR's **React Doctor** and **CI** checks after pushing.
+4. Folding a fix into its originating commit on an unmerged branch: `git commit --fixup=<sha>` then `git rebase --autosquash <base>` — git ≥ 2.44 runs it non-interactively (the Claude Code shell has no `-i`); the rewritten commits are re-signed, so verify with `git log --format='%h %G? %s' <base>..HEAD`, and an already-pushed PR branch then needs `git push --force-with-lease`.
 
 ## Deployment
 
