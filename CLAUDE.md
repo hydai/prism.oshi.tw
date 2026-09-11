@@ -14,7 +14,9 @@ npm run build        # Static export to out/
 npm run lint         # ESLint (next/core-web-vitals)
 npx playwright test  # E2E tests (starts its own dev server on :3000 if one isn't already running, reuses yours if it is)
 npx --yes --package react-doctor@0.9.12 -- react-doctor . --scope changed --base master --blocking warning --yes --no-score
-                     # React Doctor, same gate as CI (see Commit & Review SOP)
+                     # React Doctor dev loop (new issues vs. master only)
+npx --yes --package react-doctor@0.9.12 -- react-doctor . --scope full --blocking warning --yes --no-score
+                     # React Doctor, the actual CI gate — REQUIRED before every push (see Commit & Review SOP)
 ```
 
 No environment variables required. All config lives in `data/registry.json` and CSS variables.
@@ -98,12 +100,12 @@ Run before every commit and again before requesting review:
 
 1. `npm run lint` + `npm test` (frontend suites); `npm run check` in `admin/` and `admin/ui/` when those changed. `admin/ui` test files must be run through their `npm run test:<name>` scripts (they pass `--tsconfig tsconfig.tests.json`) — a bare `npx tsx tests/<file>` compiles with the classic JSX runtime and fails with `React is not defined`.
 2. **React Doctor** — `.github/workflows/react-doctor.yml` runs `millionco/react-doctor` v0.9.12 with `scope: full` + `blocking: warning` on every PR to `master` and every `master` push. **Any warning fails the check; `master` baseline is 0 warnings.**
-   - Dev loop: the `--scope changed --base master` command above (only new issues vs. `master`). To reproduce the CI report exactly: `--scope full --verbose`.
+   - Dev loop: the `--scope changed --base master` command above (only new issues vs. `master`). **Before every push run the `--scope full` command** — it is what CI runs, and cross-file rules such as `deslop/unused-export` (an exported symbol nothing imports) can only fire there; a `--scope changed` run reporting 0 issues proves nothing about them (PR #176's first CI run failed exactly this way). Add `--verbose` to reproduce the CI report line for line.
    - Findings are hypotheses: read the code at `file:line` (same npx prefix + `react-doctor why <file:line>` explains the rule) and fix the root cause — refactor, don't reach for config or suppressions.
    - Only when the pattern is deliberate (e.g. sequential awaits for D1 serialization or rate limiting, `<img>` in a static export), keep it but annotate: a one-line *why* comment directly followed by `// react-doctor-disable-next-line react-doctor/<rule>` (JSX: `{/* ... */}`) on the offending line — see commits #136 / #137. No blanket `doctor.config.*` ignores.
    - Findings in commits of your own unmerged branch get folded into the originating commit (fixup + autosquash), not a trailing "fix doctor" commit.
    - Gotcha: local full scans also read gitignored dirs such as `ds-bundle/` (Claude Design output) — ignore findings outside tracked files.
-3. Land only when lint, tests, and React Doctor are all green locally; then check the PR's **React Doctor** and **CI** checks after pushing.
+3. Land only when lint, tests, and the React Doctor **full scan** are all green locally; then check the PR's **React Doctor** and **CI** checks after pushing.
 
 ## Deployment
 
