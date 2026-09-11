@@ -5,11 +5,16 @@ import { SQLiteD1 } from './sqlite-d1';
 
 const db = new SQLiteD1();
 const sql = db.sqlite;
+const schemaText = readFileSync(new URL('../schema.sql', import.meta.url), 'utf8');
 const migration = readFileSync(new URL('../migrations/0009_fan_export_revisions.sql', import.meta.url), 'utf8');
-assert.ok(readFileSync(new URL('../schema.sql', import.meta.url), 'utf8').includes(migration.trim()), 'fresh schema and migration must carry identical revision rules');
+const migration0010 = readFileSync(new URL('../migrations/0010_fan_export_works_update.sql', import.meta.url), 'utf8');
+assert.ok(schemaText.includes(migration.trim()), 'fresh schema and migration must carry identical revision rules');
+assert.ok(schemaText.includes(migration0010.trim()), 'fresh schema and migration 0010 must carry the identical works trigger');
 sql.exec(migration);
 sql.exec(migration);
-assert.equal(sql.prepare("SELECT COUNT(*) AS n FROM sqlite_master WHERE type = 'trigger' AND name LIKE 'fan_export_%'").get()!.n, 12);
+sql.exec(migration0010);
+sql.exec(migration0010);
+assert.equal(sql.prepare("SELECT COUNT(*) AS n FROM sqlite_master WHERE type = 'trigger' AND name LIKE 'fan_export_%'").get()!.n, 13);
 sql.exec(`
   INSERT INTO songs (id,streamer_id,title,original_artist,status) VALUES ('song','alice','Song','Artist','approved');
   INSERT INTO works (id,title,original_artist) VALUES ('work','Song','Artist'), ('other','Other','Artist');
@@ -23,6 +28,12 @@ function advances(statement: string) {
   sql.exec(statement);
   assert.ok(revision() > before, statement);
 }
+advances("UPDATE works SET tags = '[\"language:ja\"]' WHERE id = 'work'");
+const afterWorkTags = revision();
+sql.exec("UPDATE works SET tags = tags WHERE id = 'work'");
+assert.equal(revision(), afterWorkTags, 'rewriting identical work tags does not dirty exports');
+sql.exec("UPDATE works SET tags = '[\"language:ko\"]' WHERE id = 'other'");
+assert.equal(revision(), afterWorkTags, 'a work with no linked approved song dirties no tenant');
 // None of these edits changes an updated_at value; timestamps/counts alone
 // cannot prove freshness, but every field exported to the fan site is covered.
 advances("UPDATE performances SET note = 'encore' WHERE id = 'perf'");
@@ -49,4 +60,4 @@ legacy.sqlite.exec("DROP TABLE fan_export_revisions; INSERT INTO songs (id,strea
 legacy.sqlite.exec(migration);
 assert.equal(legacy.sqlite.prepare("SELECT revision FROM fan_export_revisions WHERE streamer_id = 'legacy-streamer'").get()!.revision, 1);
 legacy.sqlite.close();
-console.log('✓ export revisions cover same-second metadata edits, links, deletes, tenant moves and idempotent migration');
+console.log('✓ export revisions cover same-second metadata edits, work tags, links, deletes, tenant moves and idempotent migration');
