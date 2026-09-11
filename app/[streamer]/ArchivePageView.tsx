@@ -32,6 +32,7 @@ import ViewModeToggle from '../components/ViewModeToggle';
 import CatalogEmptyState from '../components/CatalogEmptyState';
 import SocialLinkRow from '../components/SocialLinkRow';
 import YearChips from '../components/YearChips';
+import TagChips from '../components/TagChips';
 import PlayAllIconButton from '../components/PlayAllIconButton';
 import VerifiedBadge from '../components/VerifiedBadge';
 import { useArchiveData } from './archive-data-context';
@@ -90,9 +91,10 @@ function ArchiveSidebar() {
     hasActiveFilters, clearAllFilters, debouncedSearch, setDebouncedSearch,
     selectedArtist, setSelectedArtist, toggleYear, selectedYears,
     filteredStreams, setSelectedStreamId, selectedStreamId,
+    selectedTags, toggleTag,
   } = useArchiveFilters();
   const { setShowCreateDialog, setShowPlaylistPanel, setShowLikedSongsPanel, setShowRecentlyPlayedPanel } = useArchiveUi();
-  const { allArtists, availableYears } = useArchiveData();
+  const { allArtists, availableYears, availableTags } = useArchiveData();
   const { playlists } = usePlaylist();
   const { likedCount } = useLikedSongs();
   const { recentCount } = useRecentlyPlayed();
@@ -179,6 +181,12 @@ function ArchiveSidebar() {
           <div className="flex flex-wrap gap-1.5 px-1" data-testid="year-filter-sidebar">
             <YearChips years={availableYears} selectedYears={selectedYears} onToggle={toggleYear} chipTestId="year-filter-chip" />
           </div>
+
+          {availableTags.length > 0 && (
+            <div className="px-1 mt-3" data-testid="tag-filter-sidebar">
+              <TagChips tags={availableTags} selectedTags={selectedTags} onToggle={toggleTag} chipTestId="tag-filter-chip" />
+            </div>
+          )}
         </div>
 
         {/* ── Stream Playlists Section ── */}
@@ -1000,9 +1008,9 @@ function GroupedSongList({
 
 
 function MobileSearchTab() {
-  const { debouncedSearch, setDebouncedSearch, selectedArtist, setSelectedArtist, flattenedSongs, handlePlayFromFlattened } = useArchiveFilters();
+  const { debouncedSearch, setDebouncedSearch, selectedArtist, setSelectedArtist, flattenedSongs, handlePlayFromFlattened, selectedTags, toggleTag } = useArchiveFilters();
   const { mobileTab, scrollContainerRef } = useArchiveUi();
-  const { allArtists } = useArchiveData();
+  const { allArtists, availableTags } = useArchiveData();
   const { unavailableVideoIds } = usePlayerStatus();
   const currentTrackId = useCurrentTrack()?.performanceId ?? null;
   const { slug } = useStreamer();
@@ -1064,6 +1072,11 @@ function MobileSearchTab() {
                   <ChevronDown className="w-3.5 h-3.5 text-token-tertiary" />
                 </div>
               </div>
+              {availableTags.length > 0 && (
+                <div className="mb-3" data-testid="tag-filter-mobile">
+                  <TagChips tags={availableTags} selectedTags={selectedTags} onToggle={toggleTag} chipTestId="mobile-tag-filter-chip" />
+                </div>
+              )}
               {/* Search results */}
               <div>
                 {flattenedSongs.length === 0 ? (
