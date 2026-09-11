@@ -542,7 +542,7 @@ app.post('/api/songs', async (c) => {
 
   const user = c.get('user');
   const id = generateSongId();
-  await insertSong(c.env.DB, streamerId, id, body.title, body.originalArtist, body.tags || [], user.email);
+  await insertSong(c.env.DB, streamerId, id, body.title, body.originalArtist, user.email);
   await insertPerformances(c.env.DB, streamerId, id, inserts, user.email);
 
   const song = await getSongById(c.env.DB, id);
@@ -572,7 +572,6 @@ app.put('/api/songs/:id', async (c) => {
   await updateSong(c.env.DB, id, {
     title: body.title,
     originalArtist: body.originalArtist,
-    tags: body.tags,
   }, user.email);
 
   const updated = await getSongById(c.env.DB, id);

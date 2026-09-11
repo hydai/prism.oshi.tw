@@ -103,14 +103,12 @@ export interface Stream {
 export interface CreateSongBody {
   title: string;
   originalArtist: string;
-  tags?: string[];
   performances?: CreatePerformanceBody[];
 }
 
 export interface UpdateSongBody {
   title?: string;
   originalArtist?: string;
-  tags?: string[];
 }
 
 export interface CreatePerformanceBody {

@@ -20,10 +20,6 @@ function isUnknownRecord(value: unknown): value is Record<string, unknown> {
   return typeof value === 'object' && value !== null && !Array.isArray(value);
 }
 
-function isStringArray(value: unknown): value is string[] {
-  return Array.isArray(value) && value.every((item) => typeof item === 'string');
-}
-
 function isFiniteNonNegativeNumber(value: unknown): value is number {
   return typeof value === 'number' && Number.isFinite(value) && value >= 0;
 }
@@ -40,7 +36,6 @@ export interface CreateSongPerformanceParsed {
 export interface CreateSongBodyParsed {
   title: string;
   originalArtist: string;
-  tags?: string[];
   performances?: CreateSongPerformanceParsed[];
 }
 
@@ -90,9 +85,6 @@ export function parseCreateSongBody(value: unknown): CreateSongBodyParsed | { er
   if (typeof value.originalArtist !== 'string' || value.originalArtist.trim().length === 0) {
     return { error: 'Invalid originalArtist: expected a non-empty string' };
   }
-  if (value.tags !== undefined && !isStringArray(value.tags)) {
-    return { error: 'Invalid tags: expected an array of strings' };
-  }
 
   let performances: CreateSongPerformanceParsed[] | undefined;
   if (value.performances !== undefined) {
@@ -104,7 +96,6 @@ export function parseCreateSongBody(value: unknown): CreateSongBodyParsed | { er
   return {
     title: value.title,
     originalArtist: value.originalArtist,
-    ...(value.tags === undefined ? {} : { tags: value.tags as string[] }),
     ...(performances === undefined ? {} : { performances }),
   };
 }
@@ -112,7 +103,6 @@ export function parseCreateSongBody(value: unknown): CreateSongBodyParsed | { er
 export interface UpdateSongBodyParsed {
   title?: string;
   originalArtist?: string;
-  tags?: string[];
 }
 
 export function parseUpdateSongBody(value: unknown): UpdateSongBodyParsed | { error: string } {
@@ -126,14 +116,10 @@ export function parseUpdateSongBody(value: unknown): UpdateSongBodyParsed | { er
   ) {
     return { error: 'Invalid originalArtist: expected a non-empty string' };
   }
-  if (value.tags !== undefined && !isStringArray(value.tags)) {
-    return { error: 'Invalid tags: expected an array of strings' };
-  }
 
   return {
     ...(value.title === undefined ? {} : { title: value.title as string }),
     ...(value.originalArtist === undefined ? {} : { originalArtist: value.originalArtist as string }),
-    ...(value.tags === undefined ? {} : { tags: value.tags as string[] }),
   };
 }
 

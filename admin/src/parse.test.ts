@@ -58,7 +58,6 @@ function testParseCreateSongBodyAcceptsWhatSubmitSongSends(): void {
   const parsed = assertOk(parseCreateSongBody({
     title: 'My Song',
     originalArtist: 'Some Artist',
-    tags: ['cover', 'utaite'],
     performances: [
       {
         songId: '',
@@ -73,12 +72,11 @@ function testParseCreateSongBodyAcceptsWhatSubmitSongSends(): void {
     ],
   }), 'happy path matching SubmitSong.tsx');
   assertEqual(parsed.title, 'My Song', 'title carried through');
-  assertEqual(parsed.tags?.join(','), 'cover,utaite', 'tags carried through');
   assertEqual(parsed.performances?.length, 1, 'one inline performance');
   assertEqual(parsed.performances?.[0]?.streamId, 'stream-1', 'streamId kept');
   assertEqual(Object.keys(parsed.performances?.[0] ?? {}).includes('date'), false, 'unrecognized fields (date/streamTitle/videoId/songId) are dropped, not merely ignored');
 
-  const minimal = assertOk(parseCreateSongBody({ title: 'T', originalArtist: 'A', tags: [] }), 'minimal body with no performances');
+  const minimal = assertOk(parseCreateSongBody({ title: 'T', originalArtist: 'A' }), 'minimal body with no performances');
   assertEqual(minimal.performances, undefined, 'performances stays absent when the body omits it');
 }
 
@@ -87,8 +85,7 @@ function testParseCreateSongBodyRejectsMalformedShapes(): void {
   assertError(parseCreateSongBody({ originalArtist: 'A' }), 'title', 'missing title');
   assertError(parseCreateSongBody({ title: '   ', originalArtist: 'A' }), 'title', 'whitespace-only title');
   assertError(parseCreateSongBody({ title: 'T' }), 'originalArtist', 'missing originalArtist');
-  assertError(parseCreateSongBody({ title: 'T', originalArtist: 'A', tags: 'pop' }), 'tags', 'tags as a bare string instead of string[] (the W7 tags gap)');
-  assertError(parseCreateSongBody({ title: 'T', originalArtist: 'A', tags: ['ok', 5] }), 'tags', 'a non-string tag member');
+  assertEqual('tags' in assertOk(parseCreateSongBody({ title: 'T', originalArtist: 'A', tags: ['legacy'] }), 'legacy tags key'), false, 'a legacy tags key is dropped, never forwarded (tags live on works now)');
   assertError(parseCreateSongBody({ title: 'T', originalArtist: 'A', performances: 'nope' }), 'performances', 'performances not an array');
   assertError(parseCreateSongBody({ title: 'T', originalArtist: 'A', performances: [{ timestamp: 1 }] }), 'streamId', 'a performance missing streamId');
   assertError(parseCreateSongBody({ title: 'T', originalArtist: 'A', performances: [{ streamId: 's', timestamp: '5' }] }), 'timestamp', 'a string timestamp (the W7 timestamp gap)');
@@ -102,9 +99,8 @@ function testParseCreateSongBodyRejectsMalformedShapes(): void {
 // --- parseUpdateSongBody — mirrors ui/src/pages/SongDetail.tsx's editForm ---
 
 function testParseUpdateSongBodyAcceptsWhatSongDetailSends(): void {
-  const parsed = assertOk(parseUpdateSongBody({ title: 'New', originalArtist: 'Artist', tags: ['a', 'b'] }), 'SongDetail always sends all three fields');
+  const parsed = assertOk(parseUpdateSongBody({ title: 'New', originalArtist: 'Artist' }), 'SongDetail always sends all three fields');
   assertEqual(parsed.title, 'New', 'title carried through');
-  assertEqual(parsed.tags?.join(','), 'a,b', 'tags carried through');
 
   const partial = assertOk(parseUpdateSongBody({ title: 'Only title' }), 'a partial body is still valid');
   assertEqual(partial.originalArtist, undefined, 'absent fields stay absent');
@@ -114,7 +110,7 @@ function testParseUpdateSongBodyRejectsMalformedShapes(): void {
   assertError(parseUpdateSongBody([]), 'object', 'an array body');
   assertError(parseUpdateSongBody({ title: 5 }), 'title', 'a numeric title');
   assertError(parseUpdateSongBody({ originalArtist: '' }), 'originalArtist', 'an empty originalArtist');
-  assertError(parseUpdateSongBody({ tags: [1, 2] }), 'tags', 'tags with numeric members');
+  assertEqual('tags' in assertOk(parseUpdateSongBody({ title: 'T', tags: ['legacy'] }), 'legacy tags key'), false, 'a legacy tags key is dropped on update too');
 }
 
 // --- parseCreatePerformanceBody — POST /api/performances (no current UI caller; validated per audit W7 spec) ---

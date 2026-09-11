@@ -500,6 +500,11 @@ async function testSongIdentityEditRelinksGlobalWorkAtomically(): Promise<void> 
   assertEqual(fakeDb.batchStatements.length, 3, 'identity edit uses one ordered three-statement batch');
   assert(/INSERT\s+INTO\s+works/i.test(fakeDb.batchStatements[0].sql), 'destination global work is ensured first');
   assert(
+    /FROM\s+song_work_links\s+AS\s+link\s+JOIN\s+works\s+AS\s+current_work/i.test(fakeDb.batchStatements[0].sql),
+    'a retitled song carries its current work tags to a freshly created work',
+  );
+  assert(!/song\.tags/i.test(fakeDb.batchStatements[0].sql), 'the retired songs.tags column is never read');
+  assert(
     /NOT\s+EXISTS[\s\S]+FROM\s+work_aliases[\s\S]+JOIN\s+works/i.test(fakeDb.batchStatements[0].sql),
     'identity edit does not recreate a retired work identity',
   );
@@ -605,14 +610,16 @@ async function testFanSiteExportOmitsNullWorkIds(): Promise<void> {
     updated_at: '2026-01-02',
   };
   const fakeDb = new FakeD1Database(null, null, [], null, [
-    { ...baseSong, id: 'song-linked', work_id: 'work-shared', title: 'Linked Song' },
-    { ...baseSong, id: 'song-unlinked', work_id: null, title: 'Unlinked Song' },
+    { ...baseSong, id: 'song-linked', work_id: 'work-shared', title: 'Linked Song', work_tags: '["source:vocaloid","language:ja"]' },
+    { ...baseSong, id: 'song-unlinked', work_id: null, title: 'Unlinked Song', work_tags: null },
   ]);
 
   const songs = await exportSongs(fakeDb as unknown as D1Database, 'alice');
 
   assertEqual(songs[0].workId, 'work-shared', 'linked fan-site song exports its global work ID');
   assert(!Object.prototype.hasOwnProperty.call(songs[1], 'workId'), 'unlinked fan-site song omits workId instead of exporting null');
+  assertEqual(songs[0].tags.join('|'), 'language:ja|source:vocaloid', 'fan-site tags come from the linked work, normalized');
+  assertEqual(songs[1].tags.length, 0, 'an unlinked song exports no tags');
   assertEqual(fakeDb.allStatements.length, 0, 'fan-site export avoids separate D1 read calls');
   assertEqual(fakeDb.batchStatements.length, 2, 'fan-site export fetches songs and performances in one batch');
 }
@@ -910,7 +917,7 @@ async function testMergeSongsMergesGlobalWorksAcrossVtubers(): Promise<void> {
   if (!workUpdate) throw new Error('canonical work tags should be updated');
   assertEqual(
     workUpdate.params.at(-2),
-    '["canonical-work","source-work","third-work","canonical-local","source-local","third-local"]',
+    '["canonical-local","canonical-work","source-local","source-work","third-local","third-work"]',
     'canonical work preserves global and local tags from every merged identity',
   );
   assert(
