@@ -599,6 +599,19 @@ async function testGlobalWorksListAggregatesAcrossStreamers(): Promise<void> {
   assertEqual(dataQuery.params[3], 25, 'second-page offset is bound');
 }
 
+async function testGlobalWorksListFiltersByTagAndUntagged(): Promise<void> {
+  const fakeDb = new FakeD1Database(null, null, [], {
+    count: 0,
+    rows: [],
+    stats: { total_works: 0, shared_works: 0, linked_songs: 0, linked_performances: 0, unlinked_songs: 0 },
+  });
+  await listGlobalWorksPaginated(fakeDb as unknown as D1Database, { tag: 'source:vocaloid', untaggedOnly: true });
+  const dataQuery = fakeDb.batchStatements[1];
+  assert(/EXISTS \(SELECT 1 FROM json_each\(work\.tags\) WHERE json_each\.value = \?\)/.test(dataQuery.sql), 'tag filter matches a JSON array element');
+  assert(/NOT EXISTS \(SELECT 1 FROM json_each\(work\.tags\) WHERE json_each\.value LIKE 'language:%'\)/.test(dataQuery.sql), 'untagged means no language tag');
+  assertEqual(dataQuery.params[0], 'source:vocaloid', 'tag filter is bound, not interpolated');
+}
+
 async function testFanSiteExportOmitsNullWorkIds(): Promise<void> {
   const baseSong = {
     original_artist: 'Original Artist',
@@ -919,6 +932,10 @@ async function testMergeSongsMergesGlobalWorksAcrossVtubers(): Promise<void> {
     workUpdate.params.at(-2),
     '["canonical-local","canonical-work","source-local","source-work","third-local","third-work"]',
     'canonical work preserves global and local tags from every merged identity',
+  );
+  assert(
+    /updated_at\s*=\s*strftime\('%Y-%m-%d %H:%M:%f',\s*'now'\)/i.test(workUpdate.sql),
+    'merged work tags move the millisecond optimistic-lock token like every other tag write',
   );
   assert(
     fakeDb.batchStatements.some((statement) => /DELETE\s+FROM\s+works/i.test(statement.sql)),
@@ -1769,6 +1786,7 @@ async function main(): Promise<void> {
   await testSongIdentityEditRelinksGlobalWorkAtomically();
   await testHarmonizerArtistUpdatesRelinkEveryEditedSong();
   await testGlobalWorksListAggregatesAcrossStreamers();
+  await testGlobalWorksListFiltersByTagAndUntagged();
   await testFanSiteExportOmitsNullWorkIds();
   await testDashboardStatsBatchesIndependentReads();
   await testHarmonizerScanUsesAndExposesWorkIds();

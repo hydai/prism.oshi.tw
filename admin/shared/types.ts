@@ -561,6 +561,33 @@ export interface GlobalWorksResponse extends PaginatedResponse<GlobalWorkSummary
   stats: GlobalWorkStats;
 }
 
+export interface UpdateWorkTagsBody {
+  tags: string[];
+  /**
+   * The work's `updatedAt` the editor was opened with; when present the save is refused
+   * (409) if the row changed since. A revision token rather than the tags themselves, so
+   * a row still carrying a legacy ID can be cleaned up instead of being unsaveable.
+   */
+  expectedUpdatedAt?: string;
+}
+
+export interface BulkUpdateWorkTagsBody {
+  workIds: string[];
+  add: string[];
+  remove: string[];
+}
+
+export interface WorkTagsResult {
+  id: string;
+  tags: string[];
+}
+
+export interface BulkUpdateWorkTagsResponse {
+  updated: WorkTagsResult[];
+  /** Works whose tags changed between the read and the write; nothing was written to them. */
+  skipped: string[];
+}
+
 // --- Global work duplicate review ---
 
 export const GLOBAL_WORK_MERGE_SOURCE_LIMIT = 50;

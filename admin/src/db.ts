@@ -341,6 +341,8 @@ export async function listGlobalWorksPaginated(
   opts: {
     search?: string;
     sharedOnly?: boolean;
+    tag?: string;
+    untaggedOnly?: boolean;
     page?: number;
     pageSize?: number;
     sortBy?: string;
@@ -361,13 +363,22 @@ export async function listGlobalWorksPaginated(
   const sortCol = GLOBAL_WORK_SORT_COLUMN_MAP[opts.sortBy ?? ''] ?? 'performance_count';
   const sortDir = opts.sortDir === 'asc' ? 'ASC' : 'DESC';
 
-  const searchWhere = opts.search
-    ? `WHERE instr(lower(work.title), lower(?)) > 0
-       OR instr(lower(work.original_artist), lower(?)) > 0`
-    : '';
-  const searchBinds = opts.search
-    ? [opts.search, opts.search]
-    : [];
+  const sourceConditions: string[] = [];
+  const searchBinds: string[] = [];
+  if (opts.search) {
+    sourceConditions.push(`(instr(lower(work.title), lower(?)) > 0
+       OR instr(lower(work.original_artist), lower(?)) > 0)`);
+    searchBinds.push(opts.search, opts.search);
+  }
+  if (opts.tag) {
+    sourceConditions.push('EXISTS (SELECT 1 FROM json_each(work.tags) WHERE json_each.value = ?)');
+    searchBinds.push(opts.tag);
+  }
+  if (opts.untaggedOnly) {
+    // "Untagged" means no language yet — language is the field the fill script and curators complete.
+    sourceConditions.push("NOT EXISTS (SELECT 1 FROM json_each(work.tags) WHERE json_each.value LIKE 'language:%')");
+  }
+  const searchWhere = sourceConditions.length > 0 ? `WHERE ${sourceConditions.join(' AND ')}` : '';
   const sharedWhere = opts.sharedOnly ? 'WHERE streamer_count > 1' : '';
   const rollupSql = `
     WITH work_rollup AS (
@@ -486,6 +497,111 @@ export async function songBelongsToStreamer(
     .bind(id, streamerId)
     .first<{ id: string }>();
   return row !== null;
+}
+
+// Every writer of works.tags (single/bulk edits, the Harmonizer merges, tags:fill) stamps
+// updated_at with millisecond precision. The value doubles as the optimistic-lock token
+// the Global Library sends back, and datetime('now') would let a second, stale save within
+// the same second still match a baseline taken from a second-precision write; a fresh
+// sub-second stamp can never equal that baseline.
+export const TAG_WRITE_STAMP = "strftime('%Y-%m-%d %H:%M:%f', 'now')";
+
+export type WorkTagsWriteResult =
+  | { status: 'updated' }
+  | { status: 'missing' }
+  | { status: 'conflict'; currentTags: string[] };
+
+/**
+ * Replace one work's tags. With `expectedUpdatedAt` (the row's `updated_at` the editor was
+ * opened with) the write is conditional on the row not having changed since, so two
+ * curators editing the same work cannot silently overwrite each other: the later save
+ * comes back as a conflict carrying the current tags instead of winning. The token is
+ * the timestamp, not the tags, so a row still holding a legacy ID can be cleaned up.
+ */
+export async function updateWorkTags(
+  db: D1Database,
+  workId: string,
+  tags: string[],
+  expectedUpdatedAt?: string,
+): Promise<WorkTagsWriteResult> {
+  const nextJson = JSON.stringify(normalizeTags(tags));
+  const statement = expectedUpdatedAt === undefined
+    ? db.prepare(`UPDATE works SET tags = ?, updated_at = ${TAG_WRITE_STAMP} WHERE id = ?`)
+      .bind(nextJson, workId)
+    : db.prepare(`UPDATE works SET tags = ?, updated_at = ${TAG_WRITE_STAMP} WHERE id = ? AND updated_at = ?`)
+      .bind(nextJson, workId, expectedUpdatedAt);
+  const result = await statement.run();
+  if (result.meta.changes > 0) return { status: 'updated' };
+  const row = await db.prepare('SELECT tags FROM works WHERE id = ?').bind(workId).first<{ tags: string }>();
+  if (!row) return { status: 'missing' };
+  return { status: 'conflict', currentTags: parseSongTags(row.tags) };
+}
+
+export interface BulkWorkTagsOutcome {
+  /** Every requested work whose write applied (or needed no write), in request order. */
+  updated: Array<{ id: string; tags: string[] }>;
+  /** Works whose stored tags changed between the read and the write; left untouched. */
+  skipped: string[];
+}
+
+/**
+ * Add/remove a tag delta on up to 100 works in one atomic batch. Returns null —
+ * and writes nothing — when any requested work does not exist. Each UPDATE is
+ * guarded by the exact tags text that was read, so a row another curator edited in
+ * between is skipped and reported rather than overwritten; see docs/tag-system.md.
+ */
+export async function bulkUpdateWorkTags(
+  db: D1Database,
+  workIds: string[],
+  add: string[],
+  remove: string[],
+): Promise<BulkWorkTagsOutcome | null> {
+  const placeholders = workIds.map(() => '?').join(', ');
+  const { results } = await db
+    .prepare(`SELECT id, tags FROM works WHERE id IN (${placeholders})`)
+    .bind(...workIds)
+    .all<{ id: string; tags: string }>();
+  const rowsById = new Map(results.map((row) => [row.id, row]));
+  if (rowsById.size !== workIds.length) return null;
+
+  const removed = new Set(remove);
+  // Every requested row gets one statement in the batch: a guarded UPDATE when the delta
+  // changes it, otherwise a guarded SELECT that only re-checks the row still holds what
+  // was read — so a row someone flipped in between is reported as skipped either way,
+  // and a no-op row never has its updated_at bumped.
+  const checks: Array<{ id: string; kind: 'write' | 'verify'; statement: D1PreparedStatement }> = [];
+  const planned: Array<{ id: string; tags: string[] }> = [];
+  for (const id of workIds) {
+    const row = rowsById.get(id)!;
+    const current = parseSongTags(row.tags);
+    const next = normalizeTags([...current.filter((tag) => !removed.has(tag)), ...add]);
+    planned.push({ id, tags: next });
+    if (JSON.stringify(next) !== JSON.stringify(normalizeTags(current))) {
+      checks.push({
+        id,
+        kind: 'write',
+        statement: db.prepare(`UPDATE works SET tags = ?, updated_at = ${TAG_WRITE_STAMP} WHERE id = ? AND tags = ?`)
+          .bind(JSON.stringify(next), id, row.tags),
+      });
+    } else {
+      checks.push({
+        id,
+        kind: 'verify',
+        statement: db.prepare('SELECT 1 AS ok FROM works WHERE id = ? AND tags = ?').bind(id, row.tags),
+      });
+    }
+  }
+  const skipped = new Set<string>();
+  const outcomes = await db.batch(checks.map((check) => check.statement));
+  outcomes.forEach((outcome, index) => {
+    const check = checks[index];
+    const held = check.kind === 'write' ? outcome.meta.changes > 0 : outcome.results.length > 0;
+    if (!held) skipped.add(check.id);
+  });
+  return {
+    updated: planned.filter((entry) => !skipped.has(entry.id)),
+    skipped: workIds.filter((id) => skipped.has(id)),
+  };
 }
 
 export async function getSongById(
@@ -2453,7 +2569,7 @@ export async function mergeSongs({
     statements.push(
       guarded(
         `UPDATE works
-         SET tags = ?, updated_at = datetime('now')
+         SET tags = ?, updated_at = ${TAG_WRITE_STAMP}
          WHERE id = ?
            AND (SELECT valid FROM merge_guard)`,
         [JSON.stringify(workTags), canonicalWorkId],
