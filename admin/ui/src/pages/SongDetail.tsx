@@ -21,7 +21,7 @@ export default function SongDetail({ user }: { user: AuthUser }) {
       .getSong(id)
       .then((s) => {
         setSong(s);
-        setEditForm({ title: s.title, originalArtist: s.originalArtist, tags: s.tags });
+        setEditForm({ title: s.title, originalArtist: s.originalArtist });
       })
       .catch((err: unknown) => setError(err instanceof Error ? err.message : 'Failed to load song'))
       .finally(() => setLoading(false));
@@ -84,22 +84,6 @@ export default function SongDetail({ user }: { user: AuthUser }) {
                   placeholder="Original artist"
                   className="w-full rounded border border-slate-300 px-3 py-1.5 text-sm focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500"
                 />
-                <input
-                  type="text"
-                  aria-label="Tags, comma-separated"
-                  value={editForm.tags?.join(', ') ?? ''}
-                  onChange={(e) =>
-                    setEditForm((f) => ({
-                      ...f,
-                      tags: e.target.value
-                        .split(',')
-                        .map((t) => t.trim())
-                        .filter(Boolean),
-                    }))
-                  }
-                  placeholder="Tags (comma-separated)"
-                  className="w-full rounded border border-slate-300 px-3 py-1.5 text-sm focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500"
-                />
                 <div className="flex gap-2">
                   <button
                     onClick={handleSave}
@@ -120,13 +104,6 @@ export default function SongDetail({ user }: { user: AuthUser }) {
               <>
                 <h2 className="text-xl font-semibold text-slate-800">{song.title}</h2>
                 <p className="mt-1 text-slate-600">{song.originalArtist}</p>
-                <div className="mt-2 flex flex-wrap gap-1">
-                  {song.tags.map((t) => (
-                    <span key={t} className="rounded bg-slate-100 px-2 py-0.5 text-xs text-slate-600">
-                      {t}
-                    </span>
-                  ))}
-                </div>
               </>
             )}
           </div>
