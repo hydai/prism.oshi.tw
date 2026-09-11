@@ -12,6 +12,7 @@ import type {
 } from '../shared/types';
 import { normalizeForMatching } from '../shared/normalize';
 import { UnionFind } from '../shared/union-find';
+import { TAG_WRITE_STAMP } from './db';
 import {
   guardedStatement,
   prepareMergeGuardCleanup,
@@ -814,7 +815,7 @@ export async function mergeWorkMatchCandidate(
     ),
     guarded(
       `UPDATE works
-       SET tags = ?, updated_at = datetime('now')
+       SET tags = ?, updated_at = ${TAG_WRITE_STAMP}
        WHERE id = ?
          AND (SELECT valid FROM merge_guard)`,
       [JSON.stringify(mergedTags), canonical.id],

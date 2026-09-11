@@ -8,6 +8,8 @@ import {
   listGlobalWorksPaginated,
   getSongById,
   songBelongsToStreamer,
+  updateWorkTags,
+  bulkUpdateWorkTags,
   insertSong,
   updateSong,
   updateSongStatus,
@@ -59,6 +61,7 @@ import {
   mergeSongs,
   SongMergeError,
 } from './db';
+import { isKnownTagId, validateTags } from '../../lib/tags';
 import { fetchItunesDuration } from './itunes';
 import { parseTextToSongs } from '../shared/parse';
 import { formatSubscriberCount } from '../shared/format';
@@ -154,6 +157,10 @@ import type {
   CrystalTicketStatus,
   BulkFetchSubscribersResponse,
   GlobalWorksResponse,
+  UpdateWorkTagsBody,
+  BulkUpdateWorkTagsBody,
+  WorkTagsResult,
+  BulkUpdateWorkTagsResponse,
   WorkMatchCandidatesResponse,
   WorkMatchFilter,
   WorkMatchMergeBody,
@@ -403,10 +410,16 @@ app.get('/api/works', requireCurator, async (c) => {
   const sortDir = c.req.query('sortDir') as 'asc' | 'desc' | undefined;
   const sharedOnlyValue = c.req.query('sharedOnly');
   const sharedOnly = sharedOnlyValue === 'true' || sharedOnlyValue === '1';
+  const tag = c.req.query('tag')?.trim() || undefined;
+  if (tag !== undefined && !isKnownTagId(tag)) return c.json({ error: 'Unknown tag filter' }, 400);
+  const untaggedValue = c.req.query('untaggedOnly');
+  const untaggedOnly = untaggedValue === 'true' || untaggedValue === '1';
 
   const result = await listGlobalWorksPaginated(c.env.DB, {
     search,
     sharedOnly,
+    tag,
+    untaggedOnly,
     page,
     pageSize,
     sortBy,
@@ -420,6 +433,55 @@ app.get('/api/works', requireCurator, async (c) => {
     totalPages: Math.ceil(result.total / result.pageSize),
     stats: result.stats,
   };
+  return c.json(response);
+});
+
+app.put('/api/works/:id/tags', requireCurator, async (c) => {
+  const id = getRouteParam(c, 'id');
+  const body = await readJsonBody<Partial<UpdateWorkTagsBody> | null>(c);
+  const selection = validateTags(body?.tags);
+  if (!selection.ok) return c.json({ error: selection.error }, 400);
+  const expectedUpdatedAt = body?.expectedUpdatedAt;
+  if (expectedUpdatedAt !== undefined && (typeof expectedUpdatedAt !== 'string' || expectedUpdatedAt === '')) {
+    return c.json({ error: 'expectedUpdatedAt must be a non-empty string' }, 400);
+  }
+
+  const outcome = await updateWorkTags(c.env.DB, id, selection.tags, expectedUpdatedAt);
+  if (outcome.status === 'missing') return c.json({ error: 'Work not found' }, 404);
+  if (outcome.status === 'conflict') {
+    return c.json({ error: 'Work tags changed since they were loaded', tags: outcome.currentTags }, 409);
+  }
+  const response: WorkTagsResult = { id, tags: selection.tags };
+  return c.json(response);
+});
+
+app.post('/api/works/tags/bulk', requireCurator, async (c) => {
+  const body = await readJsonBody<Partial<BulkUpdateWorkTagsBody> | null>(c);
+  const workIds = body?.workIds;
+  if (!Array.isArray(workIds) || workIds.length === 0 || workIds.length > 100) {
+    return c.json({ error: 'workIds must contain between 1 and 100 IDs' }, 400);
+  }
+  if (workIds.some((workId) => typeof workId !== 'string' || workId.trim() === '')) {
+    return c.json({ error: 'every work ID must be a non-empty string' }, 400);
+  }
+  if (new Set(workIds).size !== workIds.length) {
+    return c.json({ error: 'workIds must not contain duplicates' }, 400);
+  }
+  const add = validateTags(body?.add ?? []);
+  if (!add.ok) return c.json({ error: `add: ${add.error}` }, 400);
+  const remove = validateTags(body?.remove ?? []);
+  if (!remove.ok) return c.json({ error: `remove: ${remove.error}` }, 400);
+  if (add.tags.length === 0 && remove.tags.length === 0) {
+    return c.json({ error: 'at least one tag must be added or removed' }, 400);
+  }
+  const removed = new Set(remove.tags);
+  if (add.tags.some((tag) => removed.has(tag))) {
+    return c.json({ error: 'the same tag cannot be both added and removed' }, 400);
+  }
+
+  const outcome = await bulkUpdateWorkTags(c.env.DB, workIds, add.tags, remove.tags);
+  if (!outcome) return c.json({ error: 'One or more works were not found' }, 404);
+  const response: BulkUpdateWorkTagsResponse = { updated: outcome.updated, skipped: outcome.skipped };
   return c.json(response);
 });
 

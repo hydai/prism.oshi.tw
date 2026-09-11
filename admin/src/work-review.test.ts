@@ -327,6 +327,12 @@ async function testGlobalWorkMergePreservesLocalEntities(): Promise<void> {
   assert(audit.params.includes('Verified official source'), 'merge audit preserves the trimmed curator note');
   assert(/UPDATE\s+song_work_links/i.test(sql), 'local songs are repointed through the bridge');
   assert(/DELETE\s+FROM\s+works/i.test(sql), 'only source work identities are deleted');
+  const canonicalTagWrite = fakeDb.mergeStatements.find((statement) => /UPDATE\s+works\s+SET\s+tags/i.test(statement.sql));
+  assert(canonicalTagWrite, 'merged tags are written to the canonical work');
+  assert(
+    /updated_at\s*=\s*strftime\('%Y-%m-%d %H:%M:%f',\s*'now'\)/i.test(canonicalTagWrite.sql),
+    'merged work tags move the millisecond optimistic-lock token like every other tag write',
+  );
   assert(!/DELETE\s+FROM\s+songs/i.test(sql), 'global merge never deletes a song');
   assert(!/UPDATE\s+performances/i.test(sql), 'global merge never changes a performance');
   assert(!/DELETE\s+FROM\s+performances/i.test(sql), 'global merge never deletes a performance');

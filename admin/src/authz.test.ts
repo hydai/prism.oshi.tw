@@ -102,6 +102,8 @@ function reqInit(route: Route, email: string): RequestInit {
 // the data layer for any of them, including the read-only global catalog.
 const PROTECTED_ROUTES: Route[] = [
   { method: 'GET', path: '/api/works' },
+  { method: 'PUT', path: '/api/works/work-1/tags', body: { tags: ['language:ja'] } },
+  { method: 'POST', path: '/api/works/tags/bulk', body: { workIds: ['work-1'], add: ['language:ja'], remove: [] } },
   { method: 'GET', path: '/api/work-matches' },
   {
     method: 'POST',
