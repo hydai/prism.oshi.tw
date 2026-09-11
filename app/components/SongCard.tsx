@@ -4,6 +4,7 @@ import { memo, useMemo } from 'react';
 import { Disc3, ChevronDown, ChevronRight } from 'lucide-react';
 import type { ArchiveSong, PerformanceRef } from '../types/archive';
 import SongVersionsList from './SongVersionsList';
+import { getTagLabel } from '../../lib/tags';
 
 interface SongCardProps {
   song: ArchiveSong;
@@ -64,12 +65,21 @@ function SongCardInner({ song, isExpanded, onToggleExpand, onPlay, onAddToQueue,
             >
               {song.originalArtist}
             </p>
-            <div className="flex items-center gap-2 mt-2">
+            <div className="flex flex-wrap items-center gap-2 mt-2">
               <span
                 className="font-bold text-token-xs text-accent-pink bg-accent-bg-pink-muted py-token-1 px-token-3 rounded-radius-pill border border-border-token-accent-pink"
               >
                 {song.performances.length} 個版本
               </span>
+              {song.tags.map((tag) => (
+                <span
+                  key={tag}
+                  data-testid="song-card-tag"
+                  className="font-medium text-token-xs text-token-secondary bg-surface-glass border border-border-token-glass py-token-1 px-token-3 rounded-radius-pill"
+                >
+                  {getTagLabel(tag)}
+                </span>
+              ))}
             </div>
           </div>
         </div>
