@@ -1,4 +1,5 @@
 import { HARMONIZE_MERGE_SOURCE_LIMIT } from '../shared/types';
+import { normalizeTags } from '../../lib/tags';
 import type {
   Song,
   SongRow,
@@ -166,7 +167,6 @@ function prepareEnsureWorkForSongUpdate(
   songId: string,
   title: string | undefined,
   originalArtist: string | undefined,
-  tags: string[] | undefined,
 ): D1PreparedStatement {
   return db.prepare(
     `INSERT INTO works (id, title, original_artist, tags)
@@ -174,7 +174,14 @@ function prepareEnsureWorkForSongUpdate(
      FROM (
        SELECT COALESCE(?, song.title) AS title,
               COALESCE(?, song.original_artist) AS original_artist,
-              COALESCE(?, song.tags) AS tags
+              -- A retitled song moves to a fresh work; its curated work tags move with it.
+              -- songs.tags is retired (always '[]'), so it is never read here.
+              COALESCE((
+                SELECT current_work.tags
+                FROM song_work_links AS link
+                JOIN works AS current_work ON current_work.id = link.work_id
+                WHERE link.song_id = song.id
+              ), '[]') AS tags
        FROM songs AS song
        WHERE song.id = ?
      ) AS identity
@@ -187,13 +194,7 @@ function prepareEnsureWorkForSongUpdate(
          AND alias.source_original_artist = identity.original_artist
      )
      ON CONFLICT(title, original_artist) DO NOTHING`,
-  ).bind(
-    candidateWorkId,
-    title ?? null,
-    originalArtist ?? null,
-    tags === undefined ? null : JSON.stringify(tags),
-    songId,
-  );
+  ).bind(candidateWorkId, title ?? null, originalArtist ?? null, songId);
 }
 
 function prepareRelinkSongToExactWork(
@@ -515,14 +516,13 @@ function prepareSongInsert(
   songId: string,
   title: string,
   originalArtist: string,
-  tags: string[],
   submittedBy: string,
 ): D1PreparedStatement {
   return db
     .prepare(
       'INSERT INTO songs (id, streamer_id, title, original_artist, tags, status, submitted_by) VALUES (?, ?, ?, ?, ?, ?, ?)',
     )
-    .bind(songId, streamerId, title, originalArtist, JSON.stringify(tags), 'pending', submittedBy);
+    .bind(songId, streamerId, title, originalArtist, '[]', 'pending', submittedBy);
 }
 
 export async function insertSong(
@@ -531,13 +531,12 @@ export async function insertSong(
   id: string,
   title: string,
   originalArtist: string,
-  tags: string[],
   submittedBy: string,
 ): Promise<void> {
   const workId = generateWorkId();
   await db.batch([
-    prepareEnsureExactWork(db, workId, title, originalArtist, JSON.stringify(tags)),
-    prepareSongInsert(db, streamerId, id, title, originalArtist, tags, submittedBy),
+    prepareEnsureExactWork(db, workId, title, originalArtist),
+    prepareSongInsert(db, streamerId, id, title, originalArtist, submittedBy),
     prepareLinkSongToExactWork(db, id, title, originalArtist, 'import_exact', submittedBy),
   ]);
 }
@@ -545,7 +544,7 @@ export async function insertSong(
 export async function updateSong(
   db: D1Database,
   id: string,
-  fields: { title?: string; originalArtist?: string; tags?: string[] },
+  fields: { title?: string; originalArtist?: string },
   updatedBy = 'system:song-update',
 ): Promise<void> {
   const sets: string[] = [];
@@ -558,10 +557,6 @@ export async function updateSong(
   if (fields.originalArtist !== undefined) {
     sets.push('original_artist = ?');
     values.push(fields.originalArtist);
-  }
-  if (fields.tags !== undefined) {
-    sets.push('tags = ?');
-    values.push(JSON.stringify(fields.tags));
   }
 
   if (sets.length === 0) return;
@@ -588,7 +583,6 @@ export async function updateSong(
       id,
       fields.title,
       fields.originalArtist,
-      fields.tags,
     ),
     updateStatement,
     prepareRelinkSongToExactWork(db, id, updatedBy),
@@ -1741,6 +1735,8 @@ export async function getDashboardStats(db: D1Database, streamerId: string) {
  * make the difference from `lib/types.ts` a documented decision instead of a
  * shape that drifted.
  */
+interface ExportSongRow extends SongRow { work_tags: string | null }
+
 export interface ExportedPerformance {
   id: string;
   streamId: string;
@@ -1770,9 +1766,10 @@ export interface ExportedSong {
 export async function exportSongs(db: D1Database, streamerId: string): Promise<ExportedSong[]> {
   const [songResult, performanceResult] = await db.batch([
     db
-      .prepare(`SELECT song.*, link.work_id
+      .prepare(`SELECT song.*, link.work_id, work.tags AS work_tags
         FROM songs AS song
         LEFT JOIN song_work_links AS link ON link.song_id = song.id
+        LEFT JOIN works AS work ON work.id = link.work_id
         WHERE song.streamer_id = ? AND song.status = 'approved'
         ORDER BY song.title`)
       .bind(streamerId),
@@ -1780,7 +1777,7 @@ export async function exportSongs(db: D1Database, streamerId: string): Promise<E
       .prepare("SELECT * FROM performances WHERE streamer_id = ? AND status = 'approved' ORDER BY date")
       .bind(streamerId),
   ]);
-  const songRows = songResult.results as SongRow[];
+  const songRows = songResult.results as ExportSongRow[];
   const perfRows = performanceResult.results as PerformanceRow[];
 
   const perfsBySong = new Map<string, PerformanceRow[]>();
@@ -1795,7 +1792,7 @@ export async function exportSongs(db: D1Database, streamerId: string): Promise<E
     ...(row.work_id ? { workId: row.work_id } : {}),
     title: row.title,
     originalArtist: row.original_artist,
-    tags: JSON.parse(row.tags) as string[],
+    tags: row.work_tags ? normalizeTags(parseSongTags(row.work_tags)) : [],
     performances: (perfsBySong.get(row.id) || []).map((p) => ({
       id: p.id,
       streamId: p.stream_id,
@@ -2448,11 +2445,11 @@ export async function mergeSongs({
       ),
     );
 
-    const workTags = [...new Set([
+    const workTags = normalizeTags([
       ...parseSongTags(canonical.work_tags!),
       ...[...sourceWorks.values()].flatMap((row) => parseSongTags(row.work_tags!)),
       ...tags,
-    ])];
+    ]);
     statements.push(
       guarded(
         `UPDATE works
@@ -2548,7 +2545,6 @@ export async function batchUpdateSongs(
           u.songId,
           u.title,
           u.originalArtist,
-          undefined,
         ),
       );
       updateStatementIndexes.push(stmts.length);
