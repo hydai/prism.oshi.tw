@@ -36,7 +36,8 @@ test('readRegistry returns the enabled streamers for a valid registry', () => {
 
 test('song freshness includes global work-link updates', () => {
   assert.match(AGG_SQL, /LEFT JOIN song_work_links AS link ON link\.song_id = song\.id/);
-  assert.match(AGG_SQL, /link\.updated_at > song\.updated_at/);
+  assert.match(AGG_SQL, /LEFT JOIN works AS work ON work\.id = link\.work_id/);
+  assert.match(AGG_SQL, /work\.updated_at/);
 });
 
 test('readRegistry throws (fail-closed) on an enabled malicious slug, naming it and the source', () => {

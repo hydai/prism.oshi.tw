@@ -61,6 +61,7 @@ export const AGG_SQL = `
          COUNT(*) AS cnt
     FROM songs AS song
     LEFT JOIN song_work_links AS link ON link.song_id = song.id
+    LEFT JOIN works AS work ON work.id = link.work_id
     WHERE song.status = 'approved'
     GROUP BY song.streamer_id
   UNION ALL

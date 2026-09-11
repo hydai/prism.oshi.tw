@@ -57,8 +57,8 @@ test('songCountsByStream counts distinct songs per stream (two performances of o
 test('assembleFanSiteSongs exports the shared work ID without replacing local song IDs', () => {
   const songs = assembleFanSiteSongs(
     [
-      { id: 'alice-local', work_id: 'work-shared', title: 'Song', original_artist: 'Artist', tags: '[]' },
-      { id: 'legacy-local', work_id: null, title: 'Legacy', original_artist: 'Artist', tags: '["tag"]' },
+      { id: 'alice-local', work_id: 'work-shared', title: 'Song', original_artist: 'Artist', work_tags: '["source:vocaloid","language:ja"]' },
+      { id: 'legacy-local', work_id: null, title: 'Legacy', original_artist: 'Artist', work_tags: null },
     ],
     [],
   );
@@ -67,11 +67,13 @@ test('assembleFanSiteSongs exports the shared work ID without replacing local so
   const legacy = songs.find((s) => s.id === 'legacy-local')!;
   assert.equal(linked.workId, 'work-shared');
   assert.equal('workId' in legacy, false, 'unlinked legacy rows stay backward compatible');
+  assert.deepEqual(linked.tags, ['language:ja', 'source:vocaloid'], 'tags come from the work column, normalized');
+  assert.deepEqual(legacy.tags, [], 'no work means an empty array, never a missing field');
 });
 
 test('assembleFanSiteSongs emits slim performances without stream-derived fields', () => {
   const songs = assembleFanSiteSongs(
-    [{ id: 'song1', work_id: null, title: 'Song', original_artist: 'Artist', tags: '[]' }],
+    [{ id: 'song1', work_id: null, title: 'Song', original_artist: 'Artist', work_tags: null }],
     [{ id: 'p1', song_id: 'song1', stream_id: 's1', date: '2024-01-01', stream_title: 'Stream night', video_id: 'v1', timestamp: 10, end_timestamp: 99, note: '' }],
   );
   const p = songs[0].performances[0];
@@ -83,7 +85,7 @@ test('assembleFanSiteSongs emits slim performances without stream-derived fields
 
 test('assembleFanSiteSongs keeps non-empty notes', () => {
   const songs = assembleFanSiteSongs(
-    [{ id: 'song1', work_id: null, title: 'Song', original_artist: 'Artist', tags: '[]' }],
+    [{ id: 'song1', work_id: null, title: 'Song', original_artist: 'Artist', work_tags: null }],
     [{ id: 'p1', song_id: 'song1', stream_id: 's1', date: '2024-01-01', stream_title: '', video_id: 'v1', timestamp: 0, end_timestamp: null, note: 'encore' }],
   );
   assert.equal(songs[0].performances[0].note, 'encore');
@@ -92,8 +94,8 @@ test('assembleFanSiteSongs keeps non-empty notes', () => {
 test('assembleFanSiteSongs sorts songs by zh-TW title and performances newest-first', () => {
   const songs = assembleFanSiteSongs(
     [
-      { id: 'turtle', work_id: null, title: '龜', original_artist: '', tags: '[]' },
-      { id: 'one', work_id: null, title: '一', original_artist: '', tags: '[]' },
+      { id: 'turtle', work_id: null, title: '龜', original_artist: '', work_tags: null },
+      { id: 'one', work_id: null, title: '一', original_artist: '', work_tags: null },
     ],
     [
       { id: 'p-old', song_id: 'one', stream_id: 's1', date: '2023-05-01', stream_title: '', video_id: 'v1', timestamp: 0, end_timestamp: null, note: '' },
@@ -193,7 +195,7 @@ test('sync-data CLI rejects a SQL-injection slug with a clear error (before any 
 test('export rows and sync stamp share one snapshot within the production D1 compound SELECT limit', () => {
   const schema = readFileSync(new URL('../../admin/schema.sql', import.meta.url), 'utf8');
   const fixture = `
-    INSERT INTO works (id,title,original_artist) VALUES ('work','Song','Artist');
+    INSERT INTO works (id,title,original_artist,tags,updated_at) VALUES ('work','Song','Artist','["source:vocaloid","language:ja"]','2026-01-05');
     INSERT INTO songs (id,streamer_id,title,original_artist,status,updated_at) VALUES ('song','alice','Song','Artist','approved','2026-01-01');
     INSERT INTO song_work_links (song_id,work_id,link_method,linked_by,updated_at) VALUES ('song','work','import_exact','curator','2026-01-02');
     INSERT INTO streams (id,streamer_id,title,date,video_id,youtube_url,credit,status,updated_at) VALUES ('stream','alice','Stream','2026-01-01','video','https://example.com','{"editor":"credit"}','approved','2026-01-03');
@@ -216,16 +218,17 @@ test('export rows and sync stamp share one snapshot within the production D1 com
   assert.equal(queries, 1);
   assert.ok(result.exportRevision > 0, 'revision is read in the same statement as exported data');
   assert.equal(result.songs[0].workId, 'work');
+  assert.deepEqual(result.songs[0].tags, ['language:ja', 'source:vocaloid']);
   assert.equal(result.songs[0].performances[0].note, 'encore');
   assert.deepEqual(result.streams[0].credit, { editor: 'credit' });
-  assert.deepEqual(result.songsSnap, { max_ts: '2026-01-02', cnt: 1 });
+  assert.deepEqual(result.songsSnap, { max_ts: '2026-01-05', cnt: 1 });
   assert.deepEqual(result.perfsSnap, { max_ts: '2026-01-04', cnt: 1 });
   assert.deepEqual(result.streamsSnap, { max_ts: '2026-01-03', cnt: 1 });
   assert.throws(() => readFanSiteExport('alice', () => []), /missing.*snapshot/, 'missing metadata aborts before writes');
 });
 
 test('published same-date versions keep their playback priority, while new data stays authoritative', () => {
-  const makeSong = (id: string, title = 'Song') => ({ id, title, work_id: null, original_artist: 'Artist', tags: '[]' });
+  const makeSong = (id: string, title = 'Song') => ({ id, title, work_id: null, original_artist: 'Artist', work_tags: null });
   const makePerf = (id: string, date = '2026-01-01', songId = 'song') => ({
     id, song_id: songId, stream_id: 'stream', date, stream_title: 'Stream', video_id: 'video',
     timestamp: id === 'p-z' ? 10 : 20, end_timestamp: null, note: '',
@@ -260,7 +263,7 @@ test('published same-date versions keep their playback priority, while new data 
 });
 
 test('same-title songs and same-date streams preserve published ties, independently of query order', () => {
-  const makeSong = (id: string, title = 'Same') => ({ id, title, work_id: null, original_artist: '', tags: '[]' });
+  const makeSong = (id: string, title = 'Same') => ({ id, title, work_id: null, original_artist: '', work_tags: null });
   const oldSongs = [song('z', []), song('a', []), song('deleted', [])];
   const songs = assembleFanSiteSongs([makeSong('new'), makeSong('a'), makeSong('z')], [], oldSongs);
   assert.deepEqual(songs.map(s => s.id), ['z', 'a', 'new']);
