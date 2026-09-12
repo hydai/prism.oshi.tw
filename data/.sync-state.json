@@ -12,9 +12,9 @@
       "streamsCount": 24
     },
     "gabu": {
-      "exportRevision": 29,
-      "lastSyncedAt": "2026-09-12T07:49:51.957Z",
-      "maxSongUpdatedAt": "2026-09-12 07:31:34.429",
+      "exportRevision": 31,
+      "lastSyncedAt": "2026-09-12T09:41:11.394Z",
+      "maxSongUpdatedAt": "2026-09-12 09:40:01",
       "maxPerfUpdatedAt": "2026-03-04 15:43:04",
       "maxStreamUpdatedAt": "2026-03-04 15:43:04",
       "songsCount": 31,
@@ -209,9 +209,9 @@
       "streamsCount": 0
     },
     "mizuki": {
-      "exportRevision": 1393,
-      "lastSyncedAt": "2026-09-12T07:49:50.614Z",
-      "maxSongUpdatedAt": "2026-09-12 07:49:19.435",
+      "exportRevision": 1403,
+      "lastSyncedAt": "2026-09-12T09:41:10.148Z",
+      "maxSongUpdatedAt": "2026-09-12 09:40:01",
       "maxPerfUpdatedAt": "2026-09-02 09:31:36",
       "maxStreamUpdatedAt": "2026-08-22 16:56:56",
       "songsCount": 2380,
