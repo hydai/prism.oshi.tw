@@ -52,7 +52,9 @@
     "workId": "work-song-3b557e22",
     "title": "小夜子",
     "originalArtist": "みきとP",
-    "tags": [],
+    "tags": [
+      "language:ja"
+    ],
     "performances": [
       {
         "id": "p-501fb576",
@@ -68,7 +70,9 @@
     "workId": "work-song-2522",
     "title": "小情歌",
     "originalArtist": "蘇打綠",
-    "tags": [],
+    "tags": [
+      "language:zh"
+    ],
     "performances": [
       {
         "id": "p-0608e498",
@@ -100,7 +104,9 @@
     "workId": "work-song-6bae41e2",
     "title": "心訊 Heart Signal",
     "originalArtist": "煦Hiyori",
-    "tags": [],
+    "tags": [
+      "source:original"
+    ],
     "performances": [
       {
         "id": "p-412b453f",
@@ -148,7 +154,9 @@
     "workId": "work-9f34a354-2755-4564-8126-03464089d035",
     "title": "可愛くてごめん",
     "originalArtist": "HoneyWorks feat. かぴ",
-    "tags": [],
+    "tags": [
+      "language:ja"
+    ],
     "performances": [
       {
         "id": "p-d1657dec",
@@ -180,7 +188,9 @@
     "workId": "work-song-957ec9af",
     "title": "失戀無罪",
     "originalArtist": "A-Lin",
-    "tags": [],
+    "tags": [
+      "language:zh"
+    ],
     "performances": [
       {
         "id": "p-0a8e13f7",
@@ -196,7 +206,9 @@
     "workId": "work-song-64401784",
     "title": "母系社會",
     "originalArtist": "張惠妹",
-    "tags": [],
+    "tags": [
+      "language:zh"
+    ],
     "performances": [
       {
         "id": "p-11e1bae6",
@@ -212,7 +224,9 @@
     "workId": "work-song-14c9e056",
     "title": "她說",
     "originalArtist": "林俊傑",
-    "tags": [],
+    "tags": [
+      "language:zh"
+    ],
     "performances": [
       {
         "id": "p-b8478ac8",
@@ -228,7 +242,9 @@
     "workId": "work-song-778",
     "title": "好きだから。",
     "originalArtist": "ユイカ",
-    "tags": [],
+    "tags": [
+      "language:ja"
+    ],
     "performances": [
       {
         "id": "p-ab8da46f",
@@ -260,7 +276,9 @@
     "workId": "work-song-1330",
     "title": "有一種悲傷",
     "originalArtist": "A-Lin",
-    "tags": [],
+    "tags": [
+      "language:zh"
+    ],
     "performances": [
       {
         "id": "p-58f42af1",
@@ -292,7 +310,9 @@
     "workId": "work-song-100",
     "title": "血腥愛情故事",
     "originalArtist": "張惠妹",
-    "tags": [],
+    "tags": [
+      "language:zh"
+    ],
     "performances": [
       {
         "id": "p-96ab57e4",
@@ -308,7 +328,9 @@
     "workId": "work-song-f551ea18",
     "title": "你是不是有點動心",
     "originalArtist": "吳卓源",
-    "tags": [],
+    "tags": [
+      "language:zh"
+    ],
     "performances": [
       {
         "id": "p-0c35eaf2",
@@ -324,7 +346,9 @@
     "workId": "work-song-51ba5087",
     "title": "我多喜歡你，你會知道",
     "originalArtist": "王俊琪",
-    "tags": [],
+    "tags": [
+      "language:zh"
+    ],
     "performances": [
       {
         "id": "p-60c5a01d",
@@ -356,7 +380,9 @@
     "workId": "work-song-546",
     "title": "我還年輕 我還年輕",
     "originalArtist": "老王樂隊",
-    "tags": [],
+    "tags": [
+      "language:zh"
+    ],
     "performances": [
       {
         "id": "p-b566bb9d",
@@ -404,7 +430,9 @@
     "workId": "work-song-3b3acc95",
     "title": "夜撫でるメノウ",
     "originalArtist": "Ayase",
-    "tags": [],
+    "tags": [
+      "language:ja"
+    ],
     "performances": [
       {
         "id": "p-1fcbee2d",
@@ -420,7 +448,9 @@
     "workId": "work-song-006cfcd3",
     "title": "怪物",
     "originalArtist": "YOASOBI",
-    "tags": [],
+    "tags": [
+      "language:ja"
+    ],
     "performances": [
       {
         "id": "p-239f2ca6",
@@ -452,7 +482,9 @@
     "workId": "work-song-e3d53199",
     "title": "勇氣",
     "originalArtist": "梁靜茹",
-    "tags": [],
+    "tags": [
+      "language:zh"
+    ],
     "performances": [
       {
         "id": "p-379ca81a",
@@ -500,7 +532,9 @@
     "workId": "work-1862c072-743f-4b0a-921d-50d3b421fa60",
     "title": "革命道中 - On The Way",
     "originalArtist": "アイナ・ジ・エンド",
-    "tags": [],
+    "tags": [
+      "language:ja"
+    ],
     "performances": [
       {
         "id": "p-9f282c2f",
@@ -564,7 +598,9 @@
     "workId": "work-song-1289",
     "title": "恋愛サーキュレーション",
     "originalArtist": "花澤香菜",
-    "tags": [],
+    "tags": [
+      "language:ja"
+    ],
     "performances": [
       {
         "id": "p-528c66b9",
@@ -587,7 +623,9 @@
     "workId": "work-song-07fb1c70",
     "title": "残酷な天使のテーゼ",
     "originalArtist": "高橋洋子",
-    "tags": [],
+    "tags": [
+      "language:ja"
+    ],
     "performances": [
       {
         "id": "p-adf13d22",
@@ -603,7 +641,9 @@
     "workId": "work-song-04752c37",
     "title": "迷醉 Sangria",
     "originalArtist": "朔Sakuro",
-    "tags": [],
+    "tags": [
+      "source:original"
+    ],
     "performances": [
       {
         "id": "p-14684d6d",
@@ -651,7 +691,9 @@
     "workId": "work-song-1398",
     "title": "寄り酔い",
     "originalArtist": "和ぬか",
-    "tags": [],
+    "tags": [
+      "language:ja"
+    ],
     "performances": [
       {
         "id": "p-06b3c0af",
@@ -674,7 +716,9 @@
     "workId": "work-song-7390ebf3",
     "title": "強風オールバック",
     "originalArtist": "Yukopi feat. 歌愛ユキ",
-    "tags": [],
+    "tags": [
+      "language:ja"
+    ],
     "performances": [
       {
         "id": "p-ac2f4437",
@@ -690,7 +734,9 @@
     "workId": "work-song-1058",
     "title": "悪魔の子",
     "originalArtist": "ヒグチアイ",
-    "tags": [],
+    "tags": [
+      "language:ja"
+    ],
     "performances": [
       {
         "id": "p-1c76cb4d",
@@ -722,7 +768,9 @@
     "workId": "work-song-013c53cd",
     "title": "晩餐歌",
     "originalArtist": "tuki.",
-    "tags": [],
+    "tags": [
+      "language:ja"
+    ],
     "performances": [
       {
         "id": "p-6fcff8f6",
@@ -738,7 +786,10 @@
     "workId": "work-7677f772-7b68-4e66-918f-67d2d8e51eff",
     "title": "酔いどれ知らず",
     "originalArtist": "Kanaria feat. GUMI",
-    "tags": [],
+    "tags": [
+      "language:ja",
+      "source:vocaloid"
+    ],
     "performances": [
       {
         "id": "p-c502c24b",
@@ -754,7 +805,9 @@
     "workId": "work-song-5d8444e2",
     "title": "喜歡你",
     "originalArtist": "陳潔儀",
-    "tags": [],
+    "tags": [
+      "language:zh"
+    ],
     "performances": [
       {
         "id": "p-9cc78e93",
@@ -770,7 +823,9 @@
     "workId": "work-song-7592ff4b",
     "title": "無樂不作",
     "originalArtist": "范逸臣",
-    "tags": [],
+    "tags": [
+      "language:zh"
+    ],
     "performances": [
       {
         "id": "p-ba54c620",
@@ -786,7 +841,9 @@
     "workId": "work-song-2dae12e8",
     "title": "給我一首歌的時間",
     "originalArtist": "周杰倫",
-    "tags": [],
+    "tags": [
+      "language:zh"
+    ],
     "performances": [
       {
         "id": "p-a1f12902",
@@ -802,7 +859,9 @@
     "workId": "work-song-077e91b8",
     "title": "買你",
     "originalArtist": "魏如萱",
-    "tags": [],
+    "tags": [
+      "language:zh"
+    ],
     "performances": [
       {
         "id": "p-73a1d1ee",
@@ -898,7 +957,9 @@
     "workId": "work-song-479",
     "title": "群青",
     "originalArtist": "YOASOBI",
-    "tags": [],
+    "tags": [
+      "language:ja"
+    ],
     "performances": [
       {
         "id": "p-e33dd282",
@@ -914,7 +975,9 @@
     "workId": "work-song-c2b6954f",
     "title": "說愛你",
     "originalArtist": "蔡依林",
-    "tags": [],
+    "tags": [
+      "language:zh"
+    ],
     "performances": [
       {
         "id": "p-30c81b20",
@@ -930,7 +993,9 @@
     "workId": "work-song-2ccade11",
     "title": "踊",
     "originalArtist": "Ado",
-    "tags": [],
+    "tags": [
+      "language:ja"
+    ],
     "performances": [
       {
         "id": "p-b77aced0",
@@ -962,7 +1027,9 @@
     "workId": "work-song-308",
     "title": "寶貝",
     "originalArtist": "張懸",
-    "tags": [],
+    "tags": [
+      "language:zh"
+    ],
     "performances": [
       {
         "id": "p-321ec77a",
@@ -1122,7 +1189,10 @@
     "workId": "work-song-74baa9d8",
     "title": "flos",
     "originalArtist": "R Sound Design feat. 初音ミク",
-    "tags": [],
+    "tags": [
+      "language:ja",
+      "source:vocaloid"
+    ],
     "performances": [
       {
         "id": "p-20218857",
@@ -1170,7 +1240,9 @@
     "workId": "work-song-edf196f8",
     "title": "IDOL",
     "originalArtist": "YOASOBI",
-    "tags": [],
+    "tags": [
+      "language:ja"
+    ],
     "performances": [
       {
         "id": "p-855477ea",
@@ -1186,7 +1258,9 @@
     "workId": "work-song-53a8a024",
     "title": "IRIS OUT",
     "originalArtist": "米津玄師",
-    "tags": [],
+    "tags": [
+      "language:ja"
+    ],
     "performances": [
       {
         "id": "p-7c9f7594",
@@ -1202,7 +1276,9 @@
     "workId": "work-58dc032b-c29c-45bf-9a7f-457bc7730a04",
     "title": "KING",
     "originalArtist": "Kanaria feat. GUMI",
-    "tags": [],
+    "tags": [
+      "source:vocaloid"
+    ],
     "performances": [
       {
         "id": "p-da125a88",
@@ -1410,7 +1486,9 @@
     "workId": "work-song-174ec6fe",
     "title": "うっせぇわ",
     "originalArtist": "Ado",
-    "tags": [],
+    "tags": [
+      "language:ja"
+    ],
     "performances": [
       {
         "id": "p-68ed3462",
@@ -1426,7 +1504,9 @@
     "workId": "work-c863a20d-329d-4d78-8754-c94460eb40c9",
     "title": "エウテルペ",
     "originalArtist": "EGOIST (chelly)",
-    "tags": [],
+    "tags": [
+      "language:ja"
+    ],
     "performances": [
       {
         "id": "p-7cbc6862",
@@ -1442,7 +1522,9 @@
     "workId": "work-song-2f998b9e",
     "title": "ギラギラ",
     "originalArtist": "Ado",
-    "tags": [],
+    "tags": [
+      "language:ja"
+    ],
     "performances": [
       {
         "id": "p-25268887",
@@ -1458,7 +1540,9 @@
     "workId": "work-song-2ea03c71",
     "title": "シルエット",
     "originalArtist": "KANA-BOON",
-    "tags": [],
+    "tags": [
+      "language:ja"
+    ],
     "performances": [
       {
         "id": "p-845257a0",
@@ -1474,7 +1558,10 @@
     "workId": "work-b0b54324-e1cd-494f-8b08-a34e06742b68",
     "title": "チェリーポップ",
     "originalArtist": "DECO*27 feat. 初音ミク",
-    "tags": [],
+    "tags": [
+      "language:ja",
+      "source:vocaloid"
+    ],
     "performances": [
       {
         "id": "p-fb93f2f3",
@@ -1490,7 +1577,9 @@
     "workId": "work-song-2658",
     "title": "ちゅ、多様性。",
     "originalArtist": "ano",
-    "tags": [],
+    "tags": [
+      "language:ja"
+    ],
     "performances": [
       {
         "id": "p-3301fbe9",
@@ -1506,7 +1595,9 @@
     "workId": "work-song-1503",
     "title": "ほろよい",
     "originalArtist": "さんひ",
-    "tags": [],
+    "tags": [
+      "language:ja"
+    ],
     "performances": [
       {
         "id": "p-3701b7f7",
@@ -1522,7 +1613,9 @@
     "workId": "work-song-263",
     "title": "モエチャッカファイア",
     "originalArtist": "弌誠",
-    "tags": [],
+    "tags": [
+      "language:ja"
+    ],
     "performances": [
       {
         "id": "p-dc06232b",
@@ -1538,7 +1631,9 @@
     "workId": "work-song-0c224a90",
     "title": "リードコントロール",
     "originalArtist": "なるみや",
-    "tags": [],
+    "tags": [
+      "language:ja"
+    ],
     "performances": [
       {
         "id": "p-d79c93c3",
@@ -1554,7 +1649,10 @@
     "workId": "work-song-3a255c8d",
     "title": "ワールドイズマイン",
     "originalArtist": "supercell feat. 初音ミク",
-    "tags": [],
+    "tags": [
+      "language:ja",
+      "source:vocaloid"
+    ],
     "performances": [
       {
         "id": "p-32534671",
