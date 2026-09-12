@@ -48,7 +48,9 @@
     "workId": "work-song-29176ab5",
     "title": "水星記",
     "originalArtist": "郭頂",
-    "tags": [],
+    "tags": [
+      "language:zh"
+    ],
     "performances": [
       {
         "id": "p-f7b7bc92",
@@ -482,7 +484,9 @@
     "workId": "work-song-1709",
     "title": "Beauty and a Beat",
     "originalArtist": "Justin Bieber",
-    "tags": [],
+    "tags": [
+      "language:en"
+    ],
     "performances": [
       {
         "id": "p-765c079b",
@@ -615,7 +619,9 @@
     "workId": "work-song-1283",
     "title": "Love Yourself",
     "originalArtist": "Justin Bieber",
-    "tags": [],
+    "tags": [
+      "language:en"
+    ],
     "performances": [
       {
         "id": "p-26666bbd",
