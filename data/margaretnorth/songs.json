@@ -351,7 +351,9 @@
     "workId": "work-song-301",
     "title": "特務J",
     "originalArtist": "蔡依林",
-    "tags": [],
+    "tags": [
+      "language:zh"
+    ],
     "performances": [
       {
         "id": "p-57da0f06",
@@ -401,7 +403,9 @@
     "workId": "work-song-1238",
     "title": "詩人漫步",
     "originalArtist": "蔡依林",
-    "tags": [],
+    "tags": [
+      "language:zh"
+    ],
     "performances": [
       {
         "id": "p-d76328ca",
