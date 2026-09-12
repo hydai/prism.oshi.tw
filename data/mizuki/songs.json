@@ -247,7 +247,9 @@
     "workId": "work-1b0370a5-f52c-47df-a769-d60a60265afb",
     "title": "+Matter",
     "originalArtist": "ONE OK ROCK",
-    "tags": [],
+    "tags": [
+      "language:en"
+    ],
     "performances": [
       {
         "id": "p-2bf42509",
@@ -408,7 +410,9 @@
     "workId": "work-song-2328",
     "title": "22",
     "originalArtist": "Taylor Swift",
-    "tags": [],
+    "tags": [
+      "language:en"
+    ],
     "performances": [
       {
         "id": "p-a6d66ec7",
@@ -616,7 +620,7 @@
     "title": "3时12分",
     "originalArtist": "TAKU INOUE-星街すいせい",
     "tags": [
-      "language:zh"
+      "language:ja"
     ],
     "performances": [
       {
@@ -826,7 +830,9 @@
     "workId": "work-song-2745",
     "title": "一律建議分手吧",
     "originalArtist": "王心凌",
-    "tags": [],
+    "tags": [
+      "language:zh"
+    ],
     "performances": [
       {
         "id": "p2745-1",
@@ -1954,7 +1960,9 @@
     "workId": "work-song-2389",
     "title": "大眠",
     "originalArtist": "王心凌",
-    "tags": [],
+    "tags": [
+      "language:zh"
+    ],
     "performances": [
       {
         "id": "p-10b603b4",
@@ -2108,7 +2116,9 @@
     "workId": "work-song-1237",
     "title": "大藝術家",
     "originalArtist": "蔡依林",
-    "tags": [],
+    "tags": [
+      "language:zh"
+    ],
     "performances": [
       {
         "id": "p2624-1",
@@ -3429,7 +3439,9 @@
     "workId": "work-song-1427",
     "title": "天使的指紋",
     "originalArtist": "孫燕姿",
-    "tags": [],
+    "tags": [
+      "language:zh"
+    ],
     "performances": [
       {
         "id": "p1427-1",
@@ -3470,7 +3482,9 @@
     "workId": "work-song-415",
     "title": "天黑黑",
     "originalArtist": "孫燕姿",
-    "tags": [],
+    "tags": [
+      "language:zh"
+    ],
     "performances": [
       {
         "id": "p-ad71d020",
@@ -3508,7 +3522,7 @@
     "title": "天樂",
     "originalArtist": "鏡音リン",
     "tags": [
-      "language:zh",
+      "language:ja",
       "source:vocaloid"
     ],
     "performances": [
@@ -3527,7 +3541,7 @@
     "title": "天樂",
     "originalArtist": "ゆうゆ",
     "tags": [
-      "language:zh"
+      "language:ja"
     ],
     "performances": [
       {
@@ -4069,7 +4083,9 @@
     "workId": "work-song-15",
     "title": "日不落",
     "originalArtist": "蔡依林",
-    "tags": [],
+    "tags": [
+      "language:zh"
+    ],
     "performances": [
       {
         "id": "p15-1",
@@ -4159,7 +4175,9 @@
     "workId": "work-song-0d85b82c",
     "title": "月光",
     "originalArtist": "王心凌",
-    "tags": [],
+    "tags": [
+      "language:zh"
+    ],
     "performances": [
       {
         "id": "p3030-1",
@@ -4434,7 +4452,9 @@
     "workId": "work-song-29176ab5",
     "title": "水星記",
     "originalArtist": "郭頂",
-    "tags": [],
+    "tags": [
+      "language:zh"
+    ],
     "performances": [
       {
         "id": "p530-3",
@@ -8904,7 +8924,9 @@
     "workId": "work-song-1844",
     "title": "你的行李",
     "originalArtist": "謝震廷",
-    "tags": [],
+    "tags": [
+      "language:zh"
+    ],
     "performances": [
       {
         "id": "p1895-2",
@@ -9319,7 +9341,9 @@
     "workId": "work-song-531",
     "title": "克卜勒",
     "originalArtist": "孫燕姿",
-    "tags": [],
+    "tags": [
+      "language:zh"
+    ],
     "performances": [
       {
         "id": "p531-3",
@@ -9948,7 +9972,9 @@
     "workId": "work-song-17",
     "title": "完全感覚Dreamer",
     "originalArtist": "ONE OK ROCK",
-    "tags": [],
+    "tags": [
+      "language:ja"
+    ],
     "performances": [
       {
         "id": "p17-1",
@@ -10099,7 +10125,9 @@
     "workId": "work-song-817",
     "title": "我",
     "originalArtist": "蔡依林",
-    "tags": [],
+    "tags": [
+      "language:zh"
+    ],
     "performances": [
       {
         "id": "p817-1",
@@ -10788,7 +10816,9 @@
     "workId": "work-song-2478",
     "title": "我懷念的",
     "originalArtist": "孫燕姿",
-    "tags": [],
+    "tags": [
+      "language:zh"
+    ],
     "performances": [
       {
         "id": "p2478-1",
@@ -12704,7 +12734,9 @@
     "workId": "work-song-388",
     "title": "怪美的",
     "originalArtist": "蔡依林",
-    "tags": [],
+    "tags": [
+      "language:zh"
+    ],
     "performances": [
       {
         "id": "p388-3",
@@ -12981,7 +13013,9 @@
     "workId": "work-song-2282",
     "title": "招牌動作",
     "originalArtist": "蔡依林",
-    "tags": [],
+    "tags": [
+      "language:zh"
+    ],
     "performances": [
       {
         "id": "p2282-1",
@@ -13448,7 +13482,9 @@
     "workId": "work-song-2023",
     "title": "玫瑰少年",
     "originalArtist": "蔡依林",
-    "tags": [],
+    "tags": [
+      "language:zh"
+    ],
     "performances": [
       {
         "id": "p-3cbd9a45",
@@ -13992,7 +14028,9 @@
     "workId": "work-song-1322",
     "title": "雨愛",
     "originalArtist": "楊丞琳",
-    "tags": [],
+    "tags": [
+      "language:zh"
+    ],
     "performances": [
       {
         "id": "p1322-7",
@@ -15222,7 +15260,9 @@
     "workId": "work-song-2087",
     "title": "星願",
     "originalArtist": "王心凌",
-    "tags": [],
+    "tags": [
+      "language:zh"
+    ],
     "performances": [
       {
         "id": "p3144-1",
@@ -17648,7 +17688,9 @@
     "workId": "work-song-2985",
     "title": "桃源恋歌",
     "originalArtist": "GARNiDELiA",
-    "tags": [],
+    "tags": [
+      "language:ja"
+    ],
     "performances": [
       {
         "id": "p-4591f582",
@@ -18234,7 +18276,9 @@
     "workId": "work-song-301",
     "title": "特務J",
     "originalArtist": "蔡依林",
-    "tags": [],
+    "tags": [
+      "language:zh"
+    ],
     "performances": [
       {
         "id": "p301-1",
@@ -19273,7 +19317,9 @@
     "workId": "work-song-1294",
     "title": "逆光",
     "originalArtist": "孫燕姿",
-    "tags": [],
+    "tags": [
+      "language:zh"
+    ],
     "performances": [
       {
         "id": "p1294-2",
@@ -21840,7 +21886,9 @@
     "workId": "work-song-195",
     "title": "魚仔",
     "originalArtist": "盧廣仲",
-    "tags": [],
+    "tags": [
+      "language:zh"
+    ],
     "performances": [
       {
         "id": "p195-1",
@@ -22158,7 +22206,9 @@
     "workId": "work-song-753c615b",
     "title": "斑馬，斑馬",
     "originalArtist": "宋冬野",
-    "tags": [],
+    "tags": [
+      "language:zh"
+    ],
     "performances": [
       {
         "id": "p-7baaf50f",
@@ -22174,7 +22224,9 @@
     "workId": "work-song-753c615b",
     "title": "斑馬斑馬",
     "originalArtist": "宋冬野",
-    "tags": [],
+    "tags": [
+      "language:zh"
+    ],
     "performances": [
       {
         "id": "p939-2",
@@ -23573,7 +23625,9 @@
     "workId": "work-song-4fc49677",
     "title": "愛你",
     "originalArtist": "王心凌",
-    "tags": [],
+    "tags": [
+      "language:zh"
+    ],
     "performances": [
       {
         "id": "p504-2",
@@ -24156,7 +24210,7 @@
     "title": "新寶島",
     "originalArtist": "サカナクション",
     "tags": [
-      "language:zh"
+      "language:ja"
     ],
     "performances": [
       {
@@ -24297,7 +24351,9 @@
     "workId": "work-song-1396",
     "title": "極楽浄土",
     "originalArtist": "GARNiDELiA",
-    "tags": [],
+    "tags": [
+      "language:ja"
+    ],
     "performances": [
       {
         "id": "p1396-1",
@@ -24314,7 +24370,7 @@
     "title": "極樂淨土",
     "originalArtist": "GARNiDELiA",
     "tags": [
-      "language:zh"
+      "language:ja"
     ],
     "performances": [
       {
@@ -24539,7 +24595,9 @@
     "workId": "work-song-1561",
     "title": "當你",
     "originalArtist": "王心凌",
-    "tags": [],
+    "tags": [
+      "language:zh"
+    ],
     "performances": [
       {
         "id": "p1561-1",
@@ -24969,7 +25027,9 @@
     "workId": "work-song-1238",
     "title": "詩人漫步",
     "originalArtist": "蔡依林",
-    "tags": [],
+    "tags": [
+      "language:zh"
+    ],
     "performances": [
       {
         "id": "p1238-2",
@@ -25054,7 +25114,9 @@
     "workId": "work-song-07107cd7",
     "title": "路過人間",
     "originalArtist": "郁可唯",
-    "tags": [],
+    "tags": [
+      "language:zh"
+    ],
     "performances": [
       {
         "id": "p1812-4",
@@ -25123,7 +25185,9 @@
     "workId": "work-song-601",
     "title": "遇見",
     "originalArtist": "孫燕姿 Sun Yan-Zi",
-    "tags": [],
+    "tags": [
+      "language:zh"
+    ],
     "performances": [
       {
         "id": "p601-1",
@@ -25139,7 +25203,9 @@
     "workId": "work-song-0c430370",
     "title": "遇見",
     "originalArtist": "孫燕姿",
-    "tags": [],
+    "tags": [
+      "language:zh"
+    ],
     "performances": [
       {
         "id": "p819-2",
@@ -25162,7 +25228,9 @@
     "workId": "work-song-48",
     "title": "遇見 Encounter",
     "originalArtist": "孫燕姿 Sun Yan-Zi",
-    "tags": [],
+    "tags": [
+      "language:zh"
+    ],
     "performances": [
       {
         "id": "p48-1",
@@ -26131,7 +26199,9 @@
     "workId": "work-song-1818",
     "title": "漂浮群島",
     "originalArtist": "孫燕姿",
-    "tags": [],
+    "tags": [
+      "language:zh"
+    ],
     "performances": [
       {
         "id": "p1818-1",
@@ -26323,7 +26393,9 @@
     "workId": "work-song-1252",
     "title": "綠光",
     "originalArtist": "孫燕姿",
-    "tags": [],
+    "tags": [
+      "language:zh"
+    ],
     "performances": [
       {
         "id": "p1252-2",
@@ -26553,7 +26625,9 @@
     "workId": "work-song-1193",
     "title": "劈你的雷正在路上",
     "originalArtist": "王心凌",
-    "tags": [],
+    "tags": [
+      "language:zh"
+    ],
     "performances": [
       {
         "id": "p1193-2",
@@ -27708,7 +27782,9 @@
     "workId": "work-song-521",
     "title": "濕了分寸",
     "originalArtist": "謝震廷 Eli Hsieh",
-    "tags": [],
+    "tags": [
+      "language:zh"
+    ],
     "performances": [
       {
         "id": "p-41774aa0",
@@ -29756,7 +29832,9 @@
     "workId": "work-song-0f4d0182",
     "title": "Always Remember Us This Way",
     "originalArtist": "Lady Gaga",
-    "tags": [],
+    "tags": [
+      "language:en"
+    ],
     "performances": [
       {
         "id": "p-45ebbaa6",
@@ -29889,7 +29967,9 @@
     "workId": "work-song-2163",
     "title": "Anti-Hreo",
     "originalArtist": "Taylor Swift",
-    "tags": [],
+    "tags": [
+      "language:en"
+    ],
     "performances": [
       {
         "id": "p2163-1",
@@ -30093,7 +30173,9 @@
     "workId": "work-song-3122",
     "title": "Babe",
     "originalArtist": "Taylor Swift",
-    "tags": [],
+    "tags": [
+      "language:en"
+    ],
     "performances": [
       {
         "id": "p3122-1",
@@ -30132,7 +30214,9 @@
     "workId": "work-song-3119",
     "title": "Baby",
     "originalArtist": "Justin Bieber",
-    "tags": [],
+    "tags": [
+      "language:en"
+    ],
     "performances": [
       {
         "id": "p3119-1",
@@ -30164,7 +30248,9 @@
     "workId": "work-song-2180",
     "title": "Back To December",
     "originalArtist": "Taylor Swift",
-    "tags": [],
+    "tags": [
+      "language:en"
+    ],
     "performances": [
       {
         "id": "p2581-1",
@@ -30336,7 +30422,9 @@
     "workId": "work-song-519",
     "title": "Bad Romance",
     "originalArtist": "Lady Gaga",
-    "tags": [],
+    "tags": [
+      "language:en"
+    ],
     "performances": [
       {
         "id": "p1783-1",
@@ -30382,7 +30470,9 @@
     "workId": "work-song-614",
     "title": "Bang Bang",
     "originalArtist": "Jessie J-Ariana Grande-Nicki Minaj",
-    "tags": [],
+    "tags": [
+      "language:en"
+    ],
     "performances": [
       {
         "id": "p2726-2",
@@ -30532,7 +30622,9 @@
     "workId": "work-song-1709",
     "title": "Beauty And A Beat",
     "originalArtist": "Justin Bieber",
-    "tags": [],
+    "tags": [
+      "language:en"
+    ],
     "performances": [
       {
         "id": "p2369-1",
@@ -30571,7 +30663,9 @@
     "workId": "work-song-3135",
     "title": "Beauty and the Beast",
     "originalArtist": "Ariana Grande & John Legend",
-    "tags": [],
+    "tags": [
+      "language:en"
+    ],
     "performances": [
       {
         "id": "p3135-1",
@@ -30839,7 +30933,9 @@
     "workId": "work-song-1834",
     "title": "Blank Space",
     "originalArtist": "Taylor Swift",
-    "tags": [],
+    "tags": [
+      "language:en"
+    ],
     "performances": [
       {
         "id": "p1834-4",
@@ -31325,7 +31421,10 @@
     "workId": "work-song-727",
     "title": "C.h.a.o.s.m.y.t.h.",
     "originalArtist": "ONE OK ROCK",
-    "tags": [],
+    "tags": [
+      "language:ja",
+      "language:en"
+    ],
     "performances": [
       {
         "id": "p727-2",
@@ -31886,7 +31985,9 @@
     "workId": "work-song-2182",
     "title": "champagne problems",
     "originalArtist": "Taylor Swift",
-    "tags": [],
+    "tags": [
+      "language:en"
+    ],
     "performances": [
       {
         "id": "p2182-2",
@@ -31976,7 +32077,10 @@
     "workId": "work-song-1440",
     "title": "Change",
     "originalArtist": "ONE OK ROCK",
-    "tags": [],
+    "tags": [
+      "language:ja",
+      "language:en"
+    ],
     "performances": [
       {
         "id": "p1440-1",
@@ -32194,7 +32298,9 @@
     "workId": "work-song-330",
     "title": "Christmas Tree Farm",
     "originalArtist": "Taylor Swift",
-    "tags": [],
+    "tags": [
+      "language:en"
+    ],
     "performances": [
       {
         "id": "p330-1",
@@ -32309,7 +32415,10 @@
     "workId": "work-song-655",
     "title": "Clock Strikes",
     "originalArtist": "ONE OK ROCK",
-    "tags": [],
+    "tags": [
+      "language:ja",
+      "language:en"
+    ],
     "performances": [
       {
         "id": "p655-2",
@@ -32690,7 +32799,9 @@
     "workId": "work-song-2165",
     "title": "Cruel Summer",
     "originalArtist": "Taylor Swift",
-    "tags": [],
+    "tags": [
+      "language:en"
+    ],
     "performances": [
       {
         "id": "p-8a3e1ee9",
@@ -32865,7 +32976,9 @@
     "workId": "work-song-12",
     "title": "Dangerous Woman",
     "originalArtist": "Ariana Grande",
-    "tags": [],
+    "tags": [
+      "language:en"
+    ],
     "performances": [
       {
         "id": "p12-2",
@@ -33090,7 +33203,9 @@
     "workId": "work-song-2407",
     "title": "Daylight",
     "originalArtist": "Taylor Swift",
-    "tags": [],
+    "tags": [
+      "language:en"
+    ],
     "performances": [
       {
         "id": "p-89ca05b3",
@@ -33285,7 +33400,9 @@
     "workId": "work-song-1643",
     "title": "Dear John",
     "originalArtist": "Taylor Swift",
-    "tags": [],
+    "tags": [
+      "language:en"
+    ],
     "performances": [
       {
         "id": "p3123-1",
@@ -33315,7 +33432,10 @@
     "workId": "work-song-555",
     "title": "Decision",
     "originalArtist": "ONE OK ROCK",
-    "tags": [],
+    "tags": [
+      "language:ja",
+      "language:en"
+    ],
     "performances": [
       {
         "id": "p555-4",
@@ -33368,7 +33488,10 @@
     "workId": "work-song-1265",
     "title": "Deeper Deeper",
     "originalArtist": "ONE OK ROCK",
-    "tags": [],
+    "tags": [
+      "language:ja",
+      "language:en"
+    ],
     "performances": [
       {
         "id": "p1265-2",
@@ -33428,7 +33551,9 @@
     "workId": "work-song-2833",
     "title": "Delicate",
     "originalArtist": "Taylor Swift",
-    "tags": [],
+    "tags": [
+      "language:en"
+    ],
     "performances": [
       {
         "id": "p2833-2",
@@ -33562,7 +33687,9 @@
     "workId": "work-song-d74113d8",
     "title": "Die With A Smile",
     "originalArtist": "Lady Gaga & Bruno Mars",
-    "tags": [],
+    "tags": [
+      "language:en"
+    ],
     "performances": [
       {
         "id": "p-5d8b4f65",
@@ -34074,7 +34201,9 @@
     "workId": "work-song-2020",
     "title": "Enchanted",
     "originalArtist": "Taylor Swift",
-    "tags": [],
+    "tags": [
+      "language:en"
+    ],
     "performances": [
       {
         "id": "p2020-3",
@@ -34584,7 +34713,10 @@
     "workId": "work-song-1358",
     "title": "Fight the night",
     "originalArtist": "ONE OK ROCK",
-    "tags": [],
+    "tags": [
+      "language:ja",
+      "language:en"
+    ],
     "performances": [
       {
         "id": "p1358-1",
@@ -34600,7 +34732,10 @@
     "workId": "work-song-1358",
     "title": "Fight The Night",
     "originalArtist": "ONE OK ROCK",
-    "tags": [],
+    "tags": [
+      "language:ja",
+      "language:en"
+    ],
     "performances": [
       {
         "id": "p-84228139",
@@ -35687,7 +35822,9 @@
     "workId": "work-song-264",
     "title": "GODS",
     "originalArtist": "NewJeans",
-    "tags": [],
+    "tags": [
+      "language:en"
+    ],
     "performances": [
       {
         "id": "p264-4",
@@ -35865,7 +36002,10 @@
     "workId": "work-song-564",
     "title": "Good Goodbye",
     "originalArtist": "ONE OK ROCK",
-    "tags": [],
+    "tags": [
+      "language:ja",
+      "language:en"
+    ],
     "performances": [
       {
         "id": "p564-3",
@@ -36228,7 +36368,10 @@
     "workId": "work-song-565",
     "title": "Heartache",
     "originalArtist": "ONE OK ROCK",
-    "tags": [],
+    "tags": [
+      "language:ja",
+      "language:en"
+    ],
     "performances": [
       {
         "id": "p-3850a75d",
@@ -36637,7 +36780,9 @@
     "workId": "work-song-2838",
     "title": "Honey",
     "originalArtist": "王心凌",
-    "tags": [],
+    "tags": [
+      "language:zh"
+    ],
     "performances": [
       {
         "id": "p2838-2",
@@ -36660,7 +36805,9 @@
     "workId": "work-song-3118",
     "title": "Honey",
     "originalArtist": "Taylor Swift",
-    "tags": [],
+    "tags": [
+      "language:en"
+    ],
     "performances": [
       {
         "id": "p3118-1",
@@ -36780,7 +36927,9 @@
     "workId": "work-song-2648",
     "title": "Hype Boy (City Pop remix)",
     "originalArtist": "NewJeans",
-    "tags": [],
+    "tags": [
+      "language:ko"
+    ],
     "performances": [
       {
         "id": "p2648-1",
@@ -36904,7 +37053,9 @@
     "workId": "work-song-2164",
     "title": "I Forgot That You Existed",
     "originalArtist": "Taylor Swift",
-    "tags": [],
+    "tags": [
+      "language:en"
+    ],
     "performances": [
       {
         "id": "p2523-1",
@@ -36959,7 +37110,9 @@
     "workId": "work-song-2176",
     "title": "I Knew You Were Trouble",
     "originalArtist": "Taylor Swift",
-    "tags": [],
+    "tags": [
+      "language:en"
+    ],
     "performances": [
       {
         "id": "p2176-1",
@@ -37190,7 +37343,10 @@
     "workId": "work-song-1436",
     "title": "I was King",
     "originalArtist": "ONE OK ROCK",
-    "tags": [],
+    "tags": [
+      "language:ja",
+      "language:en"
+    ],
     "performances": [
       {
         "id": "p1436-1",
@@ -37275,7 +37431,9 @@
     "workId": "work-song-e24d46b9",
     "title": "I'll Never Love Again",
     "originalArtist": "Lady Gaga",
-    "tags": [],
+    "tags": [
+      "language:en"
+    ],
     "performances": [
       {
         "id": "p-5292b367",
@@ -37314,7 +37472,9 @@
     "workId": "work-song-2925",
     "title": "I'm not yours",
     "originalArtist": "蔡依林 feat.安室奈美惠",
-    "tags": [],
+    "tags": [
+      "language:zh"
+    ],
     "performances": [
       {
         "id": "p-374f82e8",
@@ -37625,7 +37785,9 @@
     "workId": "work-song-2166",
     "title": "Innocent",
     "originalArtist": "Taylor Swift",
-    "tags": [],
+    "tags": [
+      "language:en"
+    ],
     "performances": [
       {
         "id": "p2166-1",
@@ -38444,7 +38606,9 @@
     "workId": "work-song-38ff5f8b",
     "title": "Last Christmas Love Story",
     "originalArtist": "Taylor Swift",
-    "tags": [],
+    "tags": [
+      "language:en"
+    ],
     "performances": [
       {
         "id": "p-e9bf7872",
@@ -38460,7 +38624,10 @@
     "workId": "work-song-283",
     "title": "Last Dance",
     "originalArtist": "ONE OK ROCK",
-    "tags": [],
+    "tags": [
+      "language:ja",
+      "language:en"
+    ],
     "performances": [
       {
         "id": "p283-1",
@@ -38525,7 +38692,9 @@
     "workId": "work-song-2759",
     "title": "Lavender Haze",
     "originalArtist": "Taylor Swift",
-    "tags": [],
+    "tags": [
+      "language:en"
+    ],
     "performances": [
       {
         "id": "p2759-1",
@@ -38860,7 +39029,10 @@
     "workId": "work-song-1439",
     "title": "Liar",
     "originalArtist": "ONE OK ROCK",
-    "tags": [],
+    "tags": [
+      "language:ja",
+      "language:en"
+    ],
     "performances": [
       {
         "id": "p1439-2",
@@ -39126,7 +39298,9 @@
     "workId": "work-song-2167",
     "title": "Long Live",
     "originalArtist": "Taylor Swift",
-    "tags": [],
+    "tags": [
+      "language:en"
+    ],
     "performances": [
       {
         "id": "p2752-1",
@@ -39149,7 +39323,9 @@
     "workId": "work-song-2179",
     "title": "Look What You Made Me Do",
     "originalArtist": "Taylor Swift",
-    "tags": [],
+    "tags": [
+      "language:en"
+    ],
     "performances": [
       {
         "id": "p2179-1",
@@ -39454,7 +39630,9 @@
     "workId": "work-song-1140",
     "title": "Love Story",
     "originalArtist": "Taylor Swift",
-    "tags": [],
+    "tags": [
+      "language:en"
+    ],
     "performances": [
       {
         "id": "p1140-4",
@@ -39505,7 +39683,9 @@
     "workId": "work-song-1283",
     "title": "Love Yourself",
     "originalArtist": "Justin Bieber",
-    "tags": [],
+    "tags": [
+      "language:en"
+    ],
     "performances": [
       {
         "id": "p-e5dc533f",
@@ -39602,7 +39782,9 @@
     "workId": "work-song-1082",
     "title": "Lover",
     "originalArtist": "Taylor Swift",
-    "tags": [],
+    "tags": [
+      "language:en"
+    ],
     "performances": [
       {
         "id": "p341-1",
@@ -40296,7 +40478,10 @@
     "workId": "work-song-1437",
     "title": "Memories",
     "originalArtist": "ONE OK ROCK",
-    "tags": [],
+    "tags": [
+      "language:ja",
+      "language:en"
+    ],
     "performances": [
       {
         "id": "p1437-1",
@@ -40417,7 +40602,10 @@
     "workId": "work-song-1438",
     "title": "Mighty Long Fall",
     "originalArtist": "ONE OK ROCK",
-    "tags": [],
+    "tags": [
+      "language:ja",
+      "language:en"
+    ],
     "performances": [
       {
         "id": "p1438-1",
@@ -41486,7 +41674,10 @@
     "workId": "work-song-1441",
     "title": "Nobody's Home",
     "originalArtist": "ONE OK ROCK",
-    "tags": [],
+    "tags": [
+      "language:ja",
+      "language:en"
+    ],
     "performances": [
       {
         "id": "p1441-2",
@@ -41578,7 +41769,10 @@
     "workId": "work-song-1443",
     "title": "Notes'n'Words",
     "originalArtist": "ONE OK ROCK",
-    "tags": [],
+    "tags": [
+      "language:ja",
+      "language:en"
+    ],
     "performances": [
       {
         "id": "p3064-1",
@@ -41974,7 +42168,10 @@
     "workId": "work-song-1442",
     "title": "One Way Ticket",
     "originalArtist": "ONE OK ROCK",
-    "tags": [],
+    "tags": [
+      "language:ja",
+      "language:en"
+    ],
     "performances": [
       {
         "id": "p-adaa9068",
@@ -42450,7 +42647,9 @@
     "workId": "work-song-1342",
     "title": "Paparazzi",
     "originalArtist": "Lady Gaga",
-    "tags": [],
+    "tags": [
+      "language:en"
+    ],
     "performances": [
       {
         "id": "p1342-1",
@@ -42466,7 +42665,9 @@
     "workId": "work-song-1817",
     "title": "Paper Rings",
     "originalArtist": "Taylor Swift",
-    "tags": [],
+    "tags": [
+      "language:en"
+    ],
     "performances": [
       {
         "id": "p-42d4a0fd",
@@ -42924,7 +43125,9 @@
     "workId": "work-song-29cb5949",
     "title": "PLAY我呸",
     "originalArtist": "蔡依林",
-    "tags": [],
+    "tags": [
+      "language:zh"
+    ],
     "performances": [
       {
         "id": "p1161-3",
@@ -43016,7 +43219,9 @@
     "workId": "work-song-520",
     "title": "Poker Face",
     "originalArtist": "Lady Gaga",
-    "tags": [],
+    "tags": [
+      "language:en"
+    ],
     "performances": [
       {
         "id": "p520-2",
@@ -43481,7 +43686,9 @@
     "workId": "work-song-2241",
     "title": "Rain On Me",
     "originalArtist": "Lady Gaga & Ariana Grande",
-    "tags": [],
+    "tags": [
+      "language:en"
+    ],
     "performances": [
       {
         "id": "p3165-1",
@@ -43751,7 +43958,10 @@
     "workId": "work-song-1434",
     "title": "Re:make",
     "originalArtist": "ONE OK ROCK",
-    "tags": [],
+    "tags": [
+      "language:ja",
+      "language:en"
+    ],
     "performances": [
       {
         "id": "p1434-1",
@@ -43817,7 +44027,9 @@
     "workId": "work-song-1923",
     "title": "Red",
     "originalArtist": "Taylor Swift",
-    "tags": [],
+    "tags": [
+      "language:en"
+    ],
     "performances": [
       {
         "id": "p-b1dcce62",
@@ -44540,7 +44752,9 @@
     "workId": "work-song-1178",
     "title": "Safe & Sound",
     "originalArtist": "Taylor Swift",
-    "tags": [],
+    "tags": [
+      "language:en"
+    ],
     "performances": [
       {
         "id": "p1178-5",
@@ -44683,7 +44897,9 @@
     "workId": "work-song-1958",
     "title": "Santa, Can't You Hear Me",
     "originalArtist": "Kelly Clarkson & Ariana Grande",
-    "tags": [],
+    "tags": [
+      "language:en"
+    ],
     "performances": [
       {
         "id": "p1958-3",
@@ -45084,7 +45300,9 @@
     "workId": "work-song-1576",
     "title": "Shake It Off",
     "originalArtist": "Taylor Swift",
-    "tags": [],
+    "tags": [
+      "language:en"
+    ],
     "performances": [
       {
         "id": "p1576-2",
@@ -45160,7 +45378,9 @@
     "workId": "work-song-0b7e62b4",
     "title": "Shallow",
     "originalArtist": "Lady Gaga & Bradley Cooper",
-    "tags": [],
+    "tags": [
+      "language:en"
+    ],
     "performances": [
       {
         "id": "p-8ad028f9",
@@ -45919,7 +46139,9 @@
     "workId": "work-song-2600",
     "title": "Snow On The Beach",
     "originalArtist": "Taylor Swift",
-    "tags": [],
+    "tags": [
+      "language:en"
+    ],
     "performances": [
       {
         "id": "p2600-1",
@@ -46367,7 +46589,10 @@
     "workId": "work-song-24",
     "title": "Stand Out Fit In",
     "originalArtist": "ONE OK ROCK",
-    "tags": [],
+    "tags": [
+      "language:ja",
+      "language:en"
+    ],
     "performances": [
       {
         "id": "p24-1",
@@ -46587,7 +46812,9 @@
     "workId": "work-song-3140",
     "title": "Starlight",
     "originalArtist": "Taylor Swift",
-    "tags": [],
+    "tags": [
+      "language:en"
+    ],
     "performances": [
       {
         "id": "p3140-1",
@@ -46791,7 +47018,9 @@
     "workId": "work-song-256",
     "title": "STAY",
     "originalArtist": "The Kid LAROI & Justin Bieber",
-    "tags": [],
+    "tags": [
+      "language:en"
+    ],
     "performances": [
       {
         "id": "p256-1",
@@ -46979,7 +47208,9 @@
     "workId": "work-song-2161",
     "title": "Style",
     "originalArtist": "Taylor Swift",
-    "tags": [],
+    "tags": [
+      "language:en"
+    ],
     "performances": [
       {
         "id": "p2161-1",
@@ -47046,7 +47277,9 @@
     "workId": "work-song-2839",
     "title": "SUGAR HIGH",
     "originalArtist": "王心凌",
-    "tags": [],
+    "tags": [
+      "language:zh"
+    ],
     "performances": [
       {
         "id": "p2839-1",
@@ -47871,7 +48104,10 @@
     "workId": "work-song-1433",
     "title": "The Beginning",
     "originalArtist": "ONE OK ROCK",
-    "tags": [],
+    "tags": [
+      "language:ja",
+      "language:en"
+    ],
     "performances": [
       {
         "id": "p-3b8b6b0a",
@@ -48016,7 +48252,9 @@
     "workId": "work-song-3132",
     "title": "The Life of a Showgirl",
     "originalArtist": "Taylor Swift",
-    "tags": [],
+    "tags": [
+      "language:en"
+    ],
     "performances": [
       {
         "id": "p-a7596de0",
@@ -48076,7 +48314,10 @@
     "workId": "work-song-1435",
     "title": "The Way Back",
     "originalArtist": "ONE OK ROCK",
-    "tags": [],
+    "tags": [
+      "language:ja",
+      "language:en"
+    ],
     "performances": [
       {
         "id": "p1435-1",
@@ -48092,7 +48333,9 @@
     "workId": "work-song-2172",
     "title": "The Way I Loved You",
     "originalArtist": "Taylor Swift",
-    "tags": [],
+    "tags": [
+      "language:en"
+    ],
     "performances": [
       {
         "id": "p2172-1",
@@ -48657,7 +48900,9 @@
     "workId": "work-song-8032f3b7",
     "title": "Tropical Therapy",
     "originalArtist": "ONE OK ROCK",
-    "tags": [],
+    "tags": [
+      "language:en"
+    ],
     "performances": [
       {
         "id": "p-293f45b8",
@@ -48788,7 +49033,9 @@
     "workId": "work-song-2503",
     "title": "TT",
     "originalArtist": "TWICE",
-    "tags": [],
+    "tags": [
+      "language:ko"
+    ],
     "performances": [
       {
         "id": "p2503-1",
@@ -49567,7 +49814,10 @@
     "workId": "work-song-554",
     "title": "Wasted Nights",
     "originalArtist": "ONE OK ROCK",
-    "tags": [],
+    "tags": [
+      "language:ja",
+      "language:en"
+    ],
     "performances": [
       {
         "id": "p2345-1",
@@ -49664,7 +49914,10 @@
     "workId": "work-song-214f4bf5",
     "title": "We are",
     "originalArtist": "ONE OK ROCK",
-    "tags": [],
+    "tags": [
+      "language:ja",
+      "language:en"
+    ],
     "performances": [
       {
         "id": "p-c55b068d",
@@ -49708,7 +49961,9 @@
     "workId": "work-song-1975",
     "title": "We Are Never Ever Getting Back Together",
     "originalArtist": "Taylor Swift",
-    "tags": [],
+    "tags": [
+      "language:en"
+    ],
     "performances": [
       {
         "id": "p2171-1",
@@ -49853,7 +50108,9 @@
     "workId": "work-song-2702",
     "title": "What is Love?",
     "originalArtist": "TWICE",
-    "tags": [],
+    "tags": [
+      "language:ko"
+    ],
     "performances": [
       {
         "id": "p2702-1",
@@ -50025,7 +50282,10 @@
     "workId": "work-song-11f89711",
     "title": "Wherever you are",
     "originalArtist": "ONE OK ROCK",
-    "tags": [],
+    "tags": [
+      "language:ja",
+      "language:en"
+    ],
     "performances": [
       {
         "id": "p-6d7da279",
@@ -50179,7 +50439,9 @@
     "workId": "work-song-2085",
     "title": "Wildest Dreams",
     "originalArtist": "Taylor Swift",
-    "tags": [],
+    "tags": [
+      "language:en"
+    ],
     "performances": [
       {
         "id": "p2494-1",
@@ -50575,7 +50837,9 @@
     "workId": "work-song-1150",
     "title": "You Belong With Me",
     "originalArtist": "Taylor Swift",
-    "tags": [],
+    "tags": [
+      "language:en"
+    ],
     "performances": [
       {
         "id": "p-3f1935f6",
