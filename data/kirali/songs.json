@@ -68,7 +68,9 @@
     "workId": "work-song-298",
     "title": "失落沙洲",
     "originalArtist": "徐佳瑩",
-    "tags": [],
+    "tags": [
+      "language:zh"
+    ],
     "performances": [
       {
         "id": "p-8e78c8cc",
@@ -84,7 +86,10 @@
     "workId": "work-song-3160",
     "title": "平凡裡不平凡 ExtraOrdinary",
     "originalArtist": "煌Kirali",
-    "tags": [],
+    "tags": [
+      "language:zh",
+      "source:original"
+    ],
     "performances": [
       {
         "id": "p-dab23ae6",
@@ -100,7 +105,9 @@
     "workId": "work-song-224",
     "title": "她來聽我的演唱會",
     "originalArtist": "張學友",
-    "tags": [],
+    "tags": [
+      "language:zh"
+    ],
     "performances": [
       {
         "id": "p-a8ec1766",
@@ -132,7 +139,9 @@
     "workId": "work-song-9d48f080",
     "title": "忘記擁抱",
     "originalArtist": "A-Lin",
-    "tags": [],
+    "tags": [
+      "language:zh"
+    ],
     "performances": [
       {
         "id": "p-59e97717",
@@ -148,7 +157,9 @@
     "workId": "work-song-3ed41eca",
     "title": "我好想你",
     "originalArtist": "蘇打綠",
-    "tags": [],
+    "tags": [
+      "language:zh"
+    ],
     "performances": [
       {
         "id": "p-ea9203a7",
@@ -196,7 +207,9 @@
     "workId": "work-song-cf251784",
     "title": "幸福在歌唱",
     "originalArtist": "A-Lin",
-    "tags": [],
+    "tags": [
+      "language:zh"
+    ],
     "performances": [
       {
         "id": "p-b67fd95f",
@@ -212,7 +225,9 @@
     "workId": "work-song-3328ab62",
     "title": "空白格",
     "originalArtist": "蔡健雅",
-    "tags": [],
+    "tags": [
+      "language:zh"
+    ],
     "performances": [
       {
         "id": "p-8c647e33",
@@ -276,7 +291,9 @@
     "workId": "work-song-2362",
     "title": "記得",
     "originalArtist": "張惠妹",
-    "tags": [],
+    "tags": [
+      "language:zh"
+    ],
     "performances": [
       {
         "id": "p-373abeea",
@@ -308,7 +325,9 @@
     "workId": "work-song-818",
     "title": "這世界那麼多人",
     "originalArtist": "莫文蔚",
-    "tags": [],
+    "tags": [
+      "language:zh"
+    ],
     "performances": [
       {
         "id": "p-361c0337",
@@ -324,7 +343,9 @@
     "workId": "work-song-96471ecf",
     "title": "陪你 Stay with you",
     "originalArtist": "朔Sakuro",
-    "tags": [],
+    "tags": [
+      "source:original"
+    ],
     "performances": [
       {
         "id": "p-0e6b89b9",
@@ -356,7 +377,9 @@
     "workId": "work-song-5d8444e2",
     "title": "喜歡你",
     "originalArtist": "陳潔儀",
-    "tags": [],
+    "tags": [
+      "language:zh"
+    ],
     "performances": [
       {
         "id": "p-1969e277",
@@ -372,7 +395,9 @@
     "workId": "work-song-cf349de5",
     "title": "無與倫比的美麗",
     "originalArtist": "蘇打綠",
-    "tags": [],
+    "tags": [
+      "language:zh"
+    ],
     "performances": [
       {
         "id": "p-fb3fdd70",
@@ -388,7 +413,9 @@
     "workId": "work-song-baec0e1b",
     "title": "越過山丘",
     "originalArtist": "楊宗緯",
-    "tags": [],
+    "tags": [
+      "language:zh"
+    ],
     "performances": [
       {
         "id": "p-1f530d24",
@@ -404,7 +431,10 @@
     "workId": "work-song-bc17f0a3",
     "title": "愛你的心情 My Love Story",
     "originalArtist": "煌Kirali",
-    "tags": [],
+    "tags": [
+      "language:zh",
+      "source:original"
+    ],
     "performances": [
       {
         "id": "p-9ee670bf",
@@ -452,7 +482,9 @@
     "workId": "work-song-182c508f",
     "title": "僕らだけの等身大",
     "originalArtist": "Goose house",
-    "tags": [],
+    "tags": [
+      "language:ja"
+    ],
     "performances": [
       {
         "id": "p-0580138f",
@@ -484,7 +516,9 @@
     "workId": "work-song-6034bb5e",
     "title": "還是要幸福",
     "originalArtist": "田馥甄",
-    "tags": [],
+    "tags": [
+      "language:zh"
+    ],
     "performances": [
       {
         "id": "p-88dc63cc",
@@ -644,7 +678,9 @@
     "workId": "work-song-0a4553d9",
     "title": "Love wins all",
     "originalArtist": "IU",
-    "tags": [],
+    "tags": [
+      "language:ko"
+    ],
     "performances": [
       {
         "id": "p-b917c5e0",
