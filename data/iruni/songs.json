@@ -56,7 +56,9 @@
     "workId": "work-song-1322",
     "title": "雨愛",
     "originalArtist": "楊丞琳",
-    "tags": [],
+    "tags": [
+      "language:zh"
+    ],
     "performances": [
       {
         "id": "p-4827cabc",
@@ -72,7 +74,9 @@
     "workId": "work-273129b5-d23b-429a-8508-5a3ce3a3dede",
     "title": "許願池的希臘少女",
     "originalArtist": "蔡依林",
-    "tags": [],
+    "tags": [
+      "language:zh"
+    ],
     "performances": [
       {
         "id": "p-b154fe97",
@@ -181,7 +185,9 @@
     "workId": "work-song-2838",
     "title": "Honey",
     "originalArtist": "王心凌",
-    "tags": [],
+    "tags": [
+      "language:zh"
+    ],
     "performances": [
       {
         "id": "p-dec4d737",
