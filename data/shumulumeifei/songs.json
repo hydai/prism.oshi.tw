@@ -36,7 +36,9 @@
     "workId": "work-59a55fc8-066c-4c76-8d60-e635b882ff33",
     "title": "本色",
     "originalArtist": "洛天依",
-    "tags": [],
+    "tags": [
+      "source:vocaloid"
+    ],
     "performances": [
       {
         "id": "p-95f20c49",
