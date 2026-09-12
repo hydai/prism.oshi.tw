@@ -276,7 +276,9 @@
     "workId": "work-song-1322",
     "title": "雨愛",
     "originalArtist": "楊丞琳",
-    "tags": [],
+    "tags": [
+      "language:zh"
+    ],
     "performances": [
       {
         "id": "p-a75121f7",
@@ -310,7 +312,9 @@
     "workId": "work-song-44681e7b",
     "title": "倒帶",
     "originalArtist": "蔡依林",
-    "tags": [],
+    "tags": [
+      "language:zh"
+    ],
     "performances": [
       {
         "id": "p-0141bfbf",
@@ -444,7 +448,9 @@
     "workId": "work-song-d0c9e1e1",
     "title": "第一天",
     "originalArtist": "孫燕姿",
-    "tags": [],
+    "tags": [
+      "language:zh"
+    ],
     "performances": [
       {
         "id": "p-34413123",
@@ -524,7 +530,9 @@
     "workId": "work-song-4fc49677",
     "title": "愛你",
     "originalArtist": "王心凌",
-    "tags": [],
+    "tags": [
+      "language:zh"
+    ],
     "performances": [
       {
         "id": "p-4d429dc5",
@@ -574,7 +582,9 @@
     "workId": "work-song-07107cd7",
     "title": "路過人間",
     "originalArtist": "郁可唯",
-    "tags": [],
+    "tags": [
+      "language:zh"
+    ],
     "performances": [
       {
         "id": "p-2e8875d2",
@@ -660,7 +670,9 @@
     "workId": "work-22f9e8b2-8245-48c3-a233-5e93844a97f2",
     "title": "變成陌生人",
     "originalArtist": "王心凌",
-    "tags": [],
+    "tags": [
+      "language:zh"
+    ],
     "performances": [
       {
         "id": "p-e6c70093",
@@ -676,7 +688,9 @@
     "workId": "work-song-0f4d0182",
     "title": "Always Remember Us This Way",
     "originalArtist": "Lady Gaga",
-    "tags": [],
+    "tags": [
+      "language:en"
+    ],
     "performances": [
       {
         "id": "p-7ad2187e",
@@ -772,7 +786,9 @@
     "workId": "work-song-11784c12",
     "title": "Knock Knock",
     "originalArtist": "TWICE",
-    "tags": [],
+    "tags": [
+      "language:ko"
+    ],
     "performances": [
       {
         "id": "p-ec715a0f",
@@ -822,7 +838,9 @@
     "workId": "work-song-1140",
     "title": "Love Story",
     "originalArtist": "Taylor Swift",
-    "tags": [],
+    "tags": [
+      "language:en"
+    ],
     "performances": [
       {
         "id": "p-54625ecc",
@@ -890,7 +908,9 @@
     "workId": "work-song-996d1983",
     "title": "Stuck with U",
     "originalArtist": "Ariana Grande & Justin Bieber",
-    "tags": [],
+    "tags": [
+      "language:en"
+    ],
     "performances": [
       {
         "id": "p-31dbcc90",
@@ -940,7 +960,9 @@
     "workId": "work-song-2503",
     "title": "TT",
     "originalArtist": "TWICE",
-    "tags": [],
+    "tags": [
+      "language:ko"
+    ],
     "performances": [
       {
         "id": "p-af5af788",
@@ -956,7 +978,9 @@
     "workId": "work-song-7c2dd8f9",
     "title": "TT (可愛玥&煦ver)",
     "originalArtist": "TWICE",
-    "tags": [],
+    "tags": [
+      "language:ko"
+    ],
     "performances": [
       {
         "id": "p-731c4984",
