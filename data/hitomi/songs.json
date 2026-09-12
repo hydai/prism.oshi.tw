@@ -466,7 +466,9 @@
     "workId": "work-song-1322",
     "title": "雨愛",
     "originalArtist": "楊丞琳",
-    "tags": [],
+    "tags": [
+      "language:zh"
+    ],
     "performances": [
       {
         "id": "p-90e255c1",
@@ -941,7 +943,9 @@
     "workId": "work-song-1561",
     "title": "當你",
     "originalArtist": "王心凌",
-    "tags": [],
+    "tags": [
+      "language:zh"
+    ],
     "performances": [
       {
         "id": "p-eba2aeef",
@@ -1141,7 +1145,9 @@
     "workId": "work-song-12",
     "title": "Dangerous Woman",
     "originalArtist": "Ariana Grande",
-    "tags": [],
+    "tags": [
+      "language:en"
+    ],
     "performances": [
       {
         "id": "p-f2f74dc4",
