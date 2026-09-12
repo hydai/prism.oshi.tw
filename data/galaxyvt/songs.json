@@ -20,7 +20,9 @@
     "workId": "work-d89ec160-13ab-460e-8749-3f1762beabe0",
     "title": "中國老總",
     "originalArtist": "閩南狼PYC",
-    "tags": [],
+    "tags": [
+      "language:zh"
+    ],
     "performances": [
       {
         "id": "p-28a37acf",
@@ -68,7 +70,9 @@
     "workId": "work-song-835562f5",
     "title": "夜に駆ける",
     "originalArtist": "YOASOBI",
-    "tags": [],
+    "tags": [
+      "language:ja"
+    ],
     "performances": [
       {
         "id": "p-dc7d2840",
@@ -84,7 +88,9 @@
     "workId": "work-song-006cfcd3",
     "title": "怪物",
     "originalArtist": "YOASOBI",
-    "tags": [],
+    "tags": [
+      "language:ja"
+    ],
     "performances": [
       {
         "id": "p-a256175f",
@@ -116,7 +122,9 @@
     "workId": "work-74502b63-e6e0-4a8d-9dea-689dca8b340e",
     "title": "等你下課",
     "originalArtist": "周杰倫",
-    "tags": [],
+    "tags": [
+      "language:zh"
+    ],
     "performances": [
       {
         "id": "p-8805893b",
@@ -180,7 +188,9 @@
     "workId": "work-song-479",
     "title": "群青",
     "originalArtist": "YOASOBI",
-    "tags": [],
+    "tags": [
+      "language:ja"
+    ],
     "performances": [
       {
         "id": "p-38259dd8",
@@ -196,7 +206,9 @@
     "workId": "work-song-3148",
     "title": "優しい彗星",
     "originalArtist": "YOASOBI",
-    "tags": [],
+    "tags": [
+      "language:ja"
+    ],
     "performances": [
       {
         "id": "p-daac3947",
@@ -292,7 +304,9 @@
     "workId": "work-58dc032b-c29c-45bf-9a7f-457bc7730a04",
     "title": "KING",
     "originalArtist": "Kanaria feat. GUMI",
-    "tags": [],
+    "tags": [
+      "source:vocaloid"
+    ],
     "performances": [
       {
         "id": "p-7d29042b",
@@ -340,7 +354,9 @@
     "workId": "work-7732dafb-4fdd-408f-9a79-856f5f8a13ee",
     "title": "あの夢をなぞって",
     "originalArtist": "YOASOBI",
-    "tags": [],
+    "tags": [
+      "language:ja"
+    ],
     "performances": [
       {
         "id": "p-5206547e",
@@ -356,7 +372,9 @@
     "workId": "work-song-222",
     "title": "アンコール",
     "originalArtist": "YOASOBI",
-    "tags": [],
+    "tags": [
+      "language:ja"
+    ],
     "performances": [
       {
         "id": "p-d5b2a439",
@@ -372,7 +390,9 @@
     "workId": "work-song-174ec6fe",
     "title": "うっせぇわ",
     "originalArtist": "Ado",
-    "tags": [],
+    "tags": [
+      "language:ja"
+    ],
     "performances": [
       {
         "id": "p-385d1522",
@@ -388,7 +408,9 @@
     "workId": "work-song-74b50405",
     "title": "たぶん",
     "originalArtist": "YOASOBI",
-    "tags": [],
+    "tags": [
+      "language:ja"
+    ],
     "performances": [
       {
         "id": "p-4f7ede4e",
@@ -404,7 +426,9 @@
     "workId": "work-c2688e50-a377-4bfe-88ca-bebc3c97b9c8",
     "title": "ハルカ",
     "originalArtist": "YOASOBI",
-    "tags": [],
+    "tags": [
+      "language:ja"
+    ],
     "performances": [
       {
         "id": "p-6801ed86",
@@ -420,7 +444,9 @@
     "workId": "work-song-41a32f28",
     "title": "ハルジオン",
     "originalArtist": "YOASOBI",
-    "tags": [],
+    "tags": [
+      "language:ja"
+    ],
     "performances": [
       {
         "id": "p-9ffeb987",
@@ -436,7 +462,9 @@
     "workId": "work-fb87556d-7c3a-4653-8e5e-f11492cd5f62",
     "title": "もう少しだけ",
     "originalArtist": "YOASOBI",
-    "tags": [],
+    "tags": [
+      "language:ja"
+    ],
     "performances": [
       {
         "id": "p-3f0dea2f",
