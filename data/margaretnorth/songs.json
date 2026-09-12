@@ -4,7 +4,9 @@
     "workId": "work-96db56dd-8df2-4927-8377-338d5910a43b",
     "title": "一百個不喜歡你的方法",
     "originalArtist": "房東的貓",
-    "tags": [],
+    "tags": [
+      "language:zh"
+    ],
     "performances": [
       {
         "id": "p-41b13bc4",
@@ -36,7 +38,9 @@
     "workId": "work-1d1c6718-4529-460e-a40f-8c255b0d53e5",
     "title": "不被允許的平庸",
     "originalArtist": "瑪格麗特・諾爾絲",
-    "tags": [],
+    "tags": [
+      "source:original"
+    ],
     "performances": [
       {
         "id": "p-1d111365",
@@ -68,7 +72,9 @@
     "workId": "work-song-7d18e0cf",
     "title": "少女變成了一隻甲蟲",
     "originalArtist": "吾橋有水",
-    "tags": [],
+    "tags": [
+      "language:zh"
+    ],
     "performances": [
       {
         "id": "p-2d35ea72",
@@ -84,7 +90,9 @@
     "workId": "work-8dd7320c-f019-4911-bedb-77ccf2521fa7",
     "title": "月色奇遇",
     "originalArtist": "瑪格麗特・諾爾絲",
-    "tags": [],
+    "tags": [
+      "source:original"
+    ],
     "performances": [
       {
         "id": "p-8fe9ac53",
@@ -100,7 +108,9 @@
     "workId": "work-9f34a354-2755-4564-8126-03464089d035",
     "title": "可愛くてごめん",
     "originalArtist": "HoneyWorks feat. かぴ",
-    "tags": [],
+    "tags": [
+      "language:ja"
+    ],
     "performances": [
       {
         "id": "p-a9a5443e",
@@ -116,7 +126,9 @@
     "workId": "work-767855b8-cf13-48fb-a91f-c9aeb54b879b",
     "title": "可愛くてごめん",
     "originalArtist": "ちゅーたん（CV：早見沙織）",
-    "tags": [],
+    "tags": [
+      "language:ja"
+    ],
     "performances": [
       {
         "id": "p-f02d9afe",
@@ -164,7 +176,9 @@
     "workId": "work-song-b22649fb",
     "title": "我們的愛",
     "originalArtist": "F.I.R. 飛兒樂團",
-    "tags": [],
+    "tags": [
+      "language:zh"
+    ],
     "performances": [
       {
         "id": "p-42b1c7f4",
@@ -180,7 +194,9 @@
     "workId": "work-song-1345",
     "title": "我當你空氣",
     "originalArtist": "旺福",
-    "tags": [],
+    "tags": [
+      "language:zh"
+    ],
     "performances": [
       {
         "id": "p-5b74bbe5",
@@ -228,7 +244,9 @@
     "workId": "work-song-15b9ec3b",
     "title": "孤獨的總和",
     "originalArtist": "吳汶芳",
-    "tags": [],
+    "tags": [
+      "language:zh"
+    ],
     "performances": [
       {
         "id": "p-9b8f6b1e",
@@ -283,7 +301,9 @@
     "workId": "work-song-6dc769fc",
     "title": "星の消えた夜に",
     "originalArtist": "Aimer",
-    "tags": [],
+    "tags": [
+      "language:ja"
+    ],
     "performances": [
       {
         "id": "p-88168578",
@@ -363,7 +383,9 @@
     "workId": "work-song-2ae06379",
     "title": "會呼吸的痛",
     "originalArtist": "梁靜茹",
-    "tags": [],
+    "tags": [
+      "language:zh"
+    ],
     "performances": [
       {
         "id": "p-66d79813",
@@ -427,7 +449,9 @@
     "workId": "work-song-05752dc2",
     "title": "與浪之間",
     "originalArtist": "Vast & Hazy",
-    "tags": [],
+    "tags": [
+      "language:zh"
+    ],
     "performances": [
       {
         "id": "p-f755691b",
@@ -443,7 +467,10 @@
     "workId": "work-17fa117c-617e-4223-84c2-8f5bb4afdbd0",
     "title": "蜜月アン・ドゥ・トロワ",
     "originalArtist": "DATEKEN feat. 鏡音リン",
-    "tags": [],
+    "tags": [
+      "language:ja",
+      "source:vocaloid"
+    ],
     "performances": [
       {
         "id": "p-8390b94d",
@@ -459,7 +486,9 @@
     "workId": "work-c09eb3d5-c0d7-4ee4-9b7b-da2dc189b81f",
     "title": "親親",
     "originalArtist": "梁靜茹",
-    "tags": [],
+    "tags": [
+      "language:zh"
+    ],
     "performances": [
       {
         "id": "p-c72c906f",
