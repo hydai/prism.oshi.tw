@@ -72,7 +72,9 @@
     "workId": "work-song-415",
     "title": "天黑黑",
     "originalArtist": "孫燕姿",
-    "tags": [],
+    "tags": [
+      "language:zh"
+    ],
     "performances": [
       {
         "id": "p-82490d34",
