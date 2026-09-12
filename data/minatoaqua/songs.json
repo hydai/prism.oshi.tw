@@ -4,7 +4,10 @@
     "workId": "work-song-a0302d99",
     "title": "少女レイ",
     "originalArtist": "みきとP feat. 初音ミク",
-    "tags": [],
+    "tags": [
+      "language:ja",
+      "source:vocaloid"
+    ],
     "performances": [
       {
         "id": "p-3133d4c5",
@@ -20,7 +23,9 @@
     "workId": "work-song-2070",
     "title": "変わらないもの",
     "originalArtist": "奥華子",
-    "tags": [],
+    "tags": [
+      "language:ja"
+    ],
     "performances": [
       {
         "id": "p-9742df41",
@@ -36,7 +41,9 @@
     "workId": "work-b1e4745f-2a82-4e77-b336-78b2812e6c3c",
     "title": "桃色片想い",
     "originalArtist": "松浦亜弥",
-    "tags": [],
+    "tags": [
+      "language:ja"
+    ],
     "performances": [
       {
         "id": "p-ed78ef2e",
@@ -52,7 +59,9 @@
     "workId": "work-song-479",
     "title": "群青",
     "originalArtist": "YOASOBI",
-    "tags": [],
+    "tags": [
+      "language:ja"
+    ],
     "performances": [
       {
         "id": "p-4c75e83f",
@@ -68,7 +77,9 @@
     "workId": "work-a3fa0822-1426-4960-b495-b5d78f371245",
     "title": "夢見る空へ",
     "originalArtist": "湊あくあ",
-    "tags": [],
+    "tags": [
+      "language:ja"
+    ],
     "performances": [
       {
         "id": "p-99725c05",
@@ -116,7 +127,9 @@
     "workId": "work-f5df26ca-db07-475d-ad45-5785aa9fcd6c",
     "title": "Shiny Smily Story",
     "originalArtist": "hololive IDOL PROJECT",
-    "tags": [],
+    "tags": [
+      "language:ja"
+    ],
     "performances": [
       {
         "id": "p-ef5e865a",
@@ -132,7 +145,9 @@
     "workId": "work-4e96fbff-fc8d-42bb-96fb-0d3b7fa4dcfe",
     "title": "Ubiquitous dB",
     "originalArtist": "ユナ（CV：神田沙也加）",
-    "tags": [],
+    "tags": [
+      "language:ja"
+    ],
     "performances": [
       {
         "id": "p-4cae2e88",
@@ -148,7 +163,9 @@
     "workId": "work-baf580b5-f595-46b4-a420-9ee03b02b8eb",
     "title": "uni-birth",
     "originalArtist": "湊あくあ",
-    "tags": [],
+    "tags": [
+      "language:ja"
+    ],
     "performances": [
       {
         "id": "p-b6c96371",
@@ -164,7 +181,9 @@
     "workId": "work-cd42b19d-b5bd-457e-91ce-260b0bb2ce5d",
     "title": "アイマイモコ",
     "originalArtist": "水瀬いのり",
-    "tags": [],
+    "tags": [
+      "language:ja"
+    ],
     "performances": [
       {
         "id": "p-494a2df9",
@@ -180,7 +199,9 @@
     "workId": "work-0856c4b6-70a6-46d1-8533-a55950123e39",
     "title": "あすいろClearSky",
     "originalArtist": "hololive IDOL PROJECT",
-    "tags": [],
+    "tags": [
+      "language:ja"
+    ],
     "performances": [
       {
         "id": "p-e8286766",
@@ -196,7 +217,9 @@
     "workId": "work-336e3851-6655-4a99-89cf-689bfd3518b6",
     "title": "きらきら",
     "originalArtist": "湊あくあ",
-    "tags": [],
+    "tags": [
+      "language:ja"
+    ],
     "performances": [
       {
         "id": "p-6ec60b17",
@@ -212,7 +235,9 @@
     "workId": "work-36011d7c-b88b-4f30-a3e3-e8873c80c453",
     "title": "キラメキライダー☆",
     "originalArtist": "hololive IDOL PROJECT",
-    "tags": [],
+    "tags": [
+      "language:ja"
+    ],
     "performances": [
       {
         "id": "p-a09529d7",
@@ -228,7 +253,9 @@
     "workId": "work-song-bdf1203c",
     "title": "シルシ",
     "originalArtist": "LiSA",
-    "tags": [],
+    "tags": [
+      "language:ja"
+    ],
     "performances": [
       {
         "id": "p-f85af75c",
@@ -244,7 +271,9 @@
     "workId": "work-song-568",
     "title": "スパークル",
     "originalArtist": "RADWIMPS",
-    "tags": [],
+    "tags": [
+      "language:ja"
+    ],
     "performances": [
       {
         "id": "p-d476956d",
@@ -260,7 +289,9 @@
     "workId": "work-d5440e48-dab4-4e3a-abeb-d65f88ae61dd",
     "title": "ひまわりの約束",
     "originalArtist": "秦基博",
-    "tags": [],
+    "tags": [
+      "language:ja"
+    ],
     "performances": [
       {
         "id": "p-d65b3727",
@@ -276,7 +307,9 @@
     "workId": "work-1426a764-5027-4f7f-a060-861601afaa42",
     "title": "ファンサ",
     "originalArtist": "mona（CV：夏川椎菜）（1:13:06 あくあビーム！）",
-    "tags": [],
+    "tags": [
+      "language:ja"
+    ],
     "performances": [
       {
         "id": "p-75c0d3af",
@@ -292,7 +325,9 @@
     "workId": "work-1e4af6c3-3227-4577-897a-93f7b71a23d8",
     "title": "ヨーコソ！Sweet Carnival！",
     "originalArtist": "湊あくあ",
-    "tags": [],
+    "tags": [
+      "language:ja"
+    ],
     "performances": [
       {
         "id": "p-324c57a5",
