@@ -4,7 +4,10 @@
     "workId": "work-567f5616-b672-44d1-8a1a-2aab780b53d7",
     "title": "小夜子",
     "originalArtist": "初音ミク",
-    "tags": [],
+    "tags": [
+      "language:ja",
+      "source:vocaloid"
+    ],
     "performances": [
       {
         "id": "p-9bcfd166",
@@ -20,7 +23,9 @@
     "workId": "work-08d8e92d-b5af-4c5c-98c0-3987805b187b",
     "title": "愛し子よ",
     "originalArtist": "Rurutia",
-    "tags": [],
+    "tags": [
+      "language:ja"
+    ],
     "performances": [
       {
         "id": "p-fed5d6f4",
@@ -52,7 +57,9 @@
     "workId": "work-4c12bba5-5881-42ea-ad29-7991f9ed0b31",
     "title": "KING",
     "originalArtist": "Gumi",
-    "tags": [],
+    "tags": [
+      "source:vocaloid"
+    ],
     "performances": [
       {
         "id": "p-7a340c95",
@@ -68,7 +75,9 @@
     "workId": "work-song-167",
     "title": "Unravel",
     "originalArtist": "TK from 凛として時雨",
-    "tags": [],
+    "tags": [
+      "language:ja"
+    ],
     "performances": [
       {
         "id": "p-ab40a2fb",
@@ -84,7 +93,9 @@
     "workId": "work-d7129222-a295-413c-bc0b-e9162b95a0d0",
     "title": "インキャインパルス",
     "originalArtist": "本田華子（CV：木野日菜）, 奧莉薇（CV：長江里加）, 野村香純（CV：小原好美） feat. Ikepy & KSKN",
-    "tags": [],
+    "tags": [
+      "language:ja"
+    ],
     "performances": [
       {
         "id": "p-e5c8d059",
