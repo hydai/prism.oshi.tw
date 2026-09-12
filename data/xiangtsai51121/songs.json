@@ -116,7 +116,9 @@
     "workId": "work-f611314f-80fb-41a4-9178-c0cb9b4e6e79",
     "title": "再會啦心愛的無緣的人",
     "originalArtist": "江蕙",
-    "tags": [],
+    "tags": [
+      "language:zh"
+    ],
     "performances": [
       {
         "id": "p-59bb43a0",
@@ -148,7 +150,9 @@
     "workId": "work-song-15b9d7de",
     "title": "年輪說",
     "originalArtist": "楊丞琳",
-    "tags": [],
+    "tags": [
+      "language:zh"
+    ],
     "performances": [
       {
         "id": "p-5f91b767",
@@ -164,7 +168,9 @@
     "workId": "work-80e1c96e-eb6a-453d-b169-6ffa17aec539",
     "title": "次回予告",
     "originalArtist": "キタニタツヤ",
-    "tags": [],
+    "tags": [
+      "language:ja"
+    ],
     "performances": [
       {
         "id": "p-d21b019f",
@@ -180,7 +186,9 @@
     "workId": "work-20bd9149-f6b1-4206-a2b7-df3fd4da3b14",
     "title": "死ぬな！（練習）",
     "originalArtist": "こっちのけんと",
-    "tags": [],
+    "tags": [
+      "language:ja"
+    ],
     "performances": [
       {
         "id": "p-f3c114ae",
@@ -283,7 +291,9 @@
     "workId": "work-song-fd4a929e",
     "title": "含淚跳恰恰",
     "originalArtist": "謝金燕",
-    "tags": [],
+    "tags": [
+      "language:zh"
+    ],
     "performances": [
       {
         "id": "p-05190c67",
@@ -299,7 +309,9 @@
     "workId": "work-c7f5efcf-8b00-4c76-ad9e-0fc63576303d",
     "title": "我的心裡只有你沒有他",
     "originalArtist": "黃小琥",
-    "tags": [],
+    "tags": [
+      "language:zh"
+    ],
     "performances": [
       {
         "id": "p-1e4971de",
@@ -315,7 +327,9 @@
     "workId": "work-59dce3ba-aaf2-436c-9820-de10ccab4042",
     "title": "我的心裡只有你沒有他（搖保健食品版）",
     "originalArtist": "黃小琥",
-    "tags": [],
+    "tags": [
+      "language:zh"
+    ],
     "performances": [
       {
         "id": "p-7b10398d",
@@ -347,7 +361,9 @@
     "workId": "work-song-546",
     "title": "我還年輕我還年輕",
     "originalArtist": "老王樂隊",
-    "tags": [],
+    "tags": [
+      "language:zh"
+    ],
     "performances": [
       {
         "id": "p-03afe4b7",
@@ -498,7 +514,9 @@
     "workId": "work-song-6dc769fc",
     "title": "星の消えた夜に",
     "originalArtist": "Aimer",
-    "tags": [],
+    "tags": [
+      "language:ja"
+    ],
     "performances": [
       {
         "id": "p-83e45bd9",
@@ -610,7 +628,9 @@
     "workId": "work-song-4aaebd44",
     "title": "家後",
     "originalArtist": "江蕙",
-    "tags": [],
+    "tags": [
+      "language:zh"
+    ],
     "performances": [
       {
         "id": "p-be488b9d",
@@ -738,7 +758,9 @@
     "workId": "work-song-2104",
     "title": "晚餐歌",
     "originalArtist": "tuki.",
-    "tags": [],
+    "tags": [
+      "language:ja"
+    ],
     "performances": [
       {
         "id": "p-0e960556",
@@ -754,7 +776,9 @@
     "workId": "work-22457d03-6d8f-443c-a9ba-2479a3ba16a9",
     "title": "第三惑星",
     "originalArtist": "tuki.",
-    "tags": [],
+    "tags": [
+      "language:ja"
+    ],
     "performances": [
       {
         "id": "p-89cb43a4",
@@ -770,7 +794,9 @@
     "workId": "work-25f0b9ec-dff7-4f49-a045-30f80083ab8e",
     "title": "酔いどれ知らず",
     "originalArtist": "Unknown",
-    "tags": [],
+    "tags": [
+      "language:ja"
+    ],
     "performances": [
       {
         "id": "p-670ea13c",
@@ -802,7 +828,9 @@
     "workId": "work-f36f04d6-7d4a-44c1-b14e-156f8076bfeb",
     "title": "最後一次哭",
     "originalArtist": "曾沛慈",
-    "tags": [],
+    "tags": [
+      "language:zh"
+    ],
     "performances": [
       {
         "id": "p-10f4fc0b",
@@ -818,7 +846,9 @@
     "workId": "work-song-66ebee9f",
     "title": "晴る",
     "originalArtist": "Unknown",
-    "tags": [],
+    "tags": [
+      "language:ja"
+    ],
     "performances": [
       {
         "id": "p-d3eb447a",
@@ -834,7 +864,9 @@
     "workId": "work-b1031aca-b1f9-4d51-8bf7-2c0a4b0fd0b5",
     "title": "無人熟識",
     "originalArtist": "江蕙",
-    "tags": [],
+    "tags": [
+      "language:zh"
+    ],
     "performances": [
       {
         "id": "p-cd64b65e",
@@ -898,7 +930,9 @@
     "workId": "work-a3a54033-f961-4f03-a08f-7fe29b70f429",
     "title": "傷心的人別聽慢歌",
     "originalArtist": "五月天",
-    "tags": [],
+    "tags": [
+      "language:zh"
+    ],
     "performances": [
       {
         "id": "p-729f1108",
@@ -994,7 +1028,9 @@
     "workId": "work-song-b21ceebc",
     "title": "落雨聲",
     "originalArtist": "江蕙",
-    "tags": [],
+    "tags": [
+      "language:zh"
+    ],
     "performances": [
       {
         "id": "p-3d5465f9",
@@ -1129,7 +1165,9 @@
     "workId": "work-song-cd845dcf",
     "title": "蒲公英的約定",
     "originalArtist": "周杰倫",
-    "tags": [],
+    "tags": [
+      "language:zh"
+    ],
     "performances": [
       {
         "id": "p-caa631e2",
@@ -1161,7 +1199,9 @@
     "workId": "work-9149487d-a63f-43c3-8007-009b2413cb9a",
     "title": "壊レタ世界ノ歌",
     "originalArtist": "Unknown",
-    "tags": [],
+    "tags": [
+      "language:ja"
+    ],
     "performances": [
       {
         "id": "p-c4f43ca0",
@@ -1177,7 +1217,9 @@
     "workId": "work-song-b19adb74",
     "title": "燕尾蝶",
     "originalArtist": "梁靜茹",
-    "tags": [],
+    "tags": [
+      "language:zh"
+    ],
     "performances": [
       {
         "id": "p-1840b676",
@@ -1209,7 +1251,9 @@
     "workId": "work-0d0627bc-896d-4766-8364-1054e8fe7d03",
     "title": "歡喜就好",
     "originalArtist": "陳雷",
-    "tags": [],
+    "tags": [
+      "language:zh"
+    ],
     "performances": [
       {
         "id": "p-90c31d2f",
@@ -2009,7 +2053,9 @@
     "workId": "work-92a94e60-638a-4d99-8abf-0c9144552f57",
     "title": "あぶく",
     "originalArtist": "Unknown",
-    "tags": [],
+    "tags": [
+      "language:ja"
+    ],
     "performances": [
       {
         "id": "p-3dbadd85",
@@ -2025,7 +2071,9 @@
     "workId": "work-5b9b7617-b7e0-4d96-9d13-64889dab63f0",
     "title": "ないものねだり",
     "originalArtist": "Unknown",
-    "tags": [],
+    "tags": [
+      "language:ja"
+    ],
     "performances": [
       {
         "id": "p-02317608",
@@ -2041,7 +2089,9 @@
     "workId": "work-song-9",
     "title": "はいよろこんで",
     "originalArtist": "こっちのけんと",
-    "tags": [],
+    "tags": [
+      "language:ja"
+    ],
     "performances": [
       {
         "id": "p-c32fc665",
@@ -2057,7 +2107,9 @@
     "workId": "work-6162e4c5-28fa-4f82-86a3-17dc6e8acc48",
     "title": "ブルーバード",
     "originalArtist": "Unknown",
-    "tags": [],
+    "tags": [
+      "language:ja"
+    ],
     "performances": [
       {
         "id": "p-c9c69247",
