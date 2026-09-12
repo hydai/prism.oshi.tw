@@ -4,7 +4,9 @@
     "workId": "work-song-2389",
     "title": "大眠",
     "originalArtist": "王心凌",
-    "tags": [],
+    "tags": [
+      "language:zh"
+    ],
     "performances": [
       {
         "id": "p-7e4cb8cb",
@@ -52,7 +54,9 @@
     "workId": "work-b35e5cdb-9d37-4766-9618-fccb26a8d1db",
     "title": "不哭",
     "originalArtist": "王心凌",
-    "tags": [],
+    "tags": [
+      "language:zh"
+    ],
     "performances": [
       {
         "id": "p-9e13fbc6",
@@ -418,7 +422,9 @@
     "workId": "work-song-2023",
     "title": "玫瑰少年",
     "originalArtist": "蔡依林",
-    "tags": [],
+    "tags": [
+      "language:zh"
+    ],
     "performances": [
       {
         "id": "p-ee57d2d2",
@@ -1069,7 +1075,9 @@
     "workId": "work-song-07107cd7",
     "title": "路過人間",
     "originalArtist": "郁可唯",
-    "tags": [],
+    "tags": [
+      "language:zh"
+    ],
     "performances": [
       {
         "id": "p-b70a1ac0",
@@ -1285,7 +1293,9 @@
     "workId": "work-05ff6535-8a06-44d5-97ee-2028dcf221b3",
     "title": "Applause",
     "originalArtist": "Lady Gaga",
-    "tags": [],
+    "tags": [
+      "language:en"
+    ],
     "performances": [
       {
         "id": "p-d956086a",
@@ -1349,7 +1359,9 @@
     "workId": "work-song-1834",
     "title": "Blank Space",
     "originalArtist": "Taylor Swift",
-    "tags": [],
+    "tags": [
+      "language:en"
+    ],
     "performances": [
       {
         "id": "p-0e94abf4",
@@ -1525,7 +1537,9 @@
     "workId": "work-7c3b6df8-cb51-489c-a5f4-40ef89a3ed80",
     "title": "Disco Heaven",
     "originalArtist": "Lady Gaga",
-    "tags": [],
+    "tags": [
+      "language:en"
+    ],
     "performances": [
       {
         "id": "p-c6a670ee",
@@ -1685,7 +1699,9 @@
     "workId": "work-song-2176",
     "title": "I Knew You Were Trouble",
     "originalArtist": "Taylor Swift",
-    "tags": [],
+    "tags": [
+      "language:en"
+    ],
     "performances": [
       {
         "id": "p-a8e465d8",
@@ -1797,7 +1813,9 @@
     "workId": "work-song-1140",
     "title": "Love Story",
     "originalArtist": "Taylor Swift",
-    "tags": [],
+    "tags": [
+      "language:en"
+    ],
     "performances": [
       {
         "id": "p-e7203a38",
@@ -1813,7 +1831,9 @@
     "workId": "work-song-1283",
     "title": "Love Yourself",
     "originalArtist": "Justin Bieber",
-    "tags": [],
+    "tags": [
+      "language:en"
+    ],
     "performances": [
       {
         "id": "p-3d78a030",
