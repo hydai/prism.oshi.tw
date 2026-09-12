@@ -443,7 +443,9 @@
     "workId": "work-song-0d85b82c",
     "title": "月光",
     "originalArtist": "王心凌",
-    "tags": [],
+    "tags": [
+      "language:zh"
+    ],
     "performances": [
       {
         "id": "p-e475a784",
@@ -477,7 +479,9 @@
     "workId": "work-song-29176ab5",
     "title": "水星記",
     "originalArtist": "郭頂",
-    "tags": [],
+    "tags": [
+      "language:zh"
+    ],
     "performances": [
       {
         "id": "p-5730080b",
@@ -1535,7 +1539,9 @@
     "workId": "work-song-1322",
     "title": "雨愛",
     "originalArtist": "楊丞琳",
-    "tags": [],
+    "tags": [
+      "language:zh"
+    ],
     "performances": [
       {
         "id": "p-e5b6289a",
@@ -2111,7 +2117,9 @@
     "workId": "work-song-eb753e6f",
     "title": "匿名的好友",
     "originalArtist": "楊丞琳",
-    "tags": [],
+    "tags": [
+      "language:zh"
+    ],
     "performances": [
       {
         "id": "p-b57230d9",
@@ -2363,7 +2371,9 @@
     "workId": "work-song-195",
     "title": "魚仔",
     "originalArtist": "盧廣仲",
-    "tags": [],
+    "tags": [
+      "language:zh"
+    ],
     "performances": [
       {
         "id": "p-3d9d2416",
@@ -2445,7 +2455,9 @@
     "workId": "work-song-753c615b",
     "title": "斑馬，斑馬",
     "originalArtist": "宋冬野",
-    "tags": [],
+    "tags": [
+      "language:zh"
+    ],
     "performances": [
       {
         "id": "p-6481d229",
@@ -2461,7 +2473,9 @@
     "workId": "work-song-753c615b",
     "title": "斑馬斑馬",
     "originalArtist": "宋冬野",
-    "tags": [],
+    "tags": [
+      "language:zh"
+    ],
     "performances": [
       {
         "id": "p-cfad687c",
@@ -2647,7 +2661,9 @@
     "workId": "work-song-4fc49677",
     "title": "愛你",
     "originalArtist": "王心凌",
-    "tags": [],
+    "tags": [
+      "language:zh"
+    ],
     "performances": [
       {
         "id": "p-3fe8578f",
@@ -2738,7 +2754,9 @@
     "workId": "work-song-1561",
     "title": "當你",
     "originalArtist": "王心凌",
-    "tags": [],
+    "tags": [
+      "language:zh"
+    ],
     "performances": [
       {
         "id": "p-8562d650",
@@ -4236,7 +4254,10 @@
     "workId": "work-song-11f89711",
     "title": "Wherever You Are",
     "originalArtist": "ONE OK ROCK",
-    "tags": [],
+    "tags": [
+      "language:ja",
+      "language:en"
+    ],
     "performances": [
       {
         "id": "p-4443d3d2",
