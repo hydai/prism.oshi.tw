@@ -4,7 +4,9 @@
     "workId": "work-song-3ddb4896",
     "title": "小さな恋のうた",
     "originalArtist": "MONGOL800",
-    "tags": [],
+    "tags": [
+      "language:ja"
+    ],
     "performances": [
       {
         "id": "p-4a9e4b78",
@@ -20,7 +22,9 @@
     "workId": "work-song-778",
     "title": "好きだから。",
     "originalArtist": "『ユイカ』",
-    "tags": [],
+    "tags": [
+      "language:ja"
+    ],
     "performances": [
       {
         "id": "p-6c72f9f9",
@@ -52,7 +56,9 @@
     "workId": "work-song-14702476",
     "title": "高嶺の花子さん",
     "originalArtist": "back number",
-    "tags": [],
+    "tags": [
+      "language:ja"
+    ],
     "performances": [
       {
         "id": "p-4d7f9c55",
@@ -84,7 +90,9 @@
     "workId": "work-song-064dceaa",
     "title": "カタオモイ",
     "originalArtist": "Aimer",
-    "tags": [],
+    "tags": [
+      "language:ja"
+    ],
     "performances": [
       {
         "id": "p-6a823c9f",
@@ -100,7 +108,9 @@
     "workId": "work-song-1704",
     "title": "ライラック",
     "originalArtist": "美波",
-    "tags": [],
+    "tags": [
+      "language:ja"
+    ],
     "performances": [
       {
         "id": "p-bd94f5d5",
