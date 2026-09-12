@@ -20,7 +20,9 @@
     "workId": "work-song-cc9cb19a",
     "title": "28 Reasons",
     "originalArtist": "Seul Gi (슬기)",
-    "tags": [],
+    "tags": [
+      "language:ko"
+    ],
     "performances": [
       {
         "id": "p-b0172553",
@@ -52,7 +54,9 @@
     "workId": "work-song-f086b39f",
     "title": "一萬次悲傷",
     "originalArtist": "逃跑計劃",
-    "tags": [],
+    "tags": [
+      "language:zh"
+    ],
     "performances": [
       {
         "id": "p-a0cc0fdf",
@@ -100,7 +104,9 @@
     "workId": "work-song-97618aea",
     "title": "又三郎",
     "originalArtist": "ヨルシカ",
-    "tags": [],
+    "tags": [
+      "language:ja"
+    ],
     "performances": [
       {
         "id": "p-c63b1256",
@@ -123,7 +129,9 @@
     "workId": "work-song-6a5eecc1",
     "title": "千鳥",
     "originalArtist": "ヨルシカ",
-    "tags": [],
+    "tags": [
+      "language:ja"
+    ],
     "performances": [
       {
         "id": "p-6f15e694",
@@ -139,7 +147,9 @@
     "workId": "work-song-7f8b0c64",
     "title": "小心翻閱",
     "originalArtist": "孫盛希",
-    "tags": [],
+    "tags": [
+      "language:zh"
+    ],
     "performances": [
       {
         "id": "p-77ef1fdb",
@@ -178,7 +188,9 @@
     "workId": "work-song-a9a4ba26",
     "title": "小幸運",
     "originalArtist": "田馥甄",
-    "tags": [],
+    "tags": [
+      "language:zh"
+    ],
     "performances": [
       {
         "id": "p-8c2c3f5a",
@@ -194,7 +206,9 @@
     "workId": "work-song-4f120c43",
     "title": "不在一起就不會分開",
     "originalArtist": "洪佩瑜",
-    "tags": [],
+    "tags": [
+      "language:zh"
+    ],
     "performances": [
       {
         "id": "p-1063d588",
@@ -217,7 +231,9 @@
     "workId": "work-song-68455697",
     "title": "不醉不會",
     "originalArtist": "田馥甄",
-    "tags": [],
+    "tags": [
+      "language:zh"
+    ],
     "performances": [
       {
         "id": "p-49e1b9fd",
@@ -265,7 +281,9 @@
     "workId": "work-song-162",
     "title": "月亮代表我的心",
     "originalArtist": "鄧麗君",
-    "tags": [],
+    "tags": [
+      "language:ja"
+    ],
     "performances": [
       {
         "id": "p-35b9399a",
@@ -281,7 +299,9 @@
     "workId": "work-song-527f3af4",
     "title": "火星人",
     "originalArtist": "ヨルシカ",
-    "tags": [],
+    "tags": [
+      "language:ja"
+    ],
     "performances": [
       {
         "id": "p-c16acdb8",
@@ -304,7 +324,9 @@
     "workId": "work-song-0a6a397b",
     "title": "他們說我是沒有用的年輕人",
     "originalArtist": "好樂團",
-    "tags": [],
+    "tags": [
+      "language:zh"
+    ],
     "performances": [
       {
         "id": "p-178f2665",
@@ -320,7 +342,9 @@
     "workId": "work-song-957ec9af",
     "title": "失戀無罪",
     "originalArtist": "A-Lin",
-    "tags": [],
+    "tags": [
+      "language:zh"
+    ],
     "performances": [
       {
         "id": "p-a340a28e",
@@ -359,7 +383,9 @@
     "workId": "work-song-64401784",
     "title": "母系社會",
     "originalArtist": "AMIT",
-    "tags": [],
+    "tags": [
+      "language:zh"
+    ],
     "performances": [
       {
         "id": "p-c359c7e4",
@@ -375,7 +401,9 @@
     "workId": "work-song-acf5c382",
     "title": "再見的時候",
     "originalArtist": "洪佩瑜",
-    "tags": [],
+    "tags": [
+      "language:zh"
+    ],
     "performances": [
       {
         "id": "p-0fc814c3",
@@ -391,7 +419,9 @@
     "workId": "work-song-28ee375f",
     "title": "地球儀",
     "originalArtist": "米津玄師",
-    "tags": [],
+    "tags": [
+      "language:ja"
+    ],
     "performances": [
       {
         "id": "p-c7ea6020",
@@ -407,7 +437,9 @@
     "workId": "work-song-15b9d7de",
     "title": "年輪說",
     "originalArtist": "楊丞琳",
-    "tags": [],
+    "tags": [
+      "language:zh"
+    ],
     "performances": [
       {
         "id": "p-efa1f44a",
@@ -423,7 +455,9 @@
     "workId": "work-song-1330",
     "title": "有一種悲傷",
     "originalArtist": "A-Lin",
-    "tags": [],
+    "tags": [
+      "language:zh"
+    ],
     "performances": [
       {
         "id": "p-07ea23d4",
@@ -446,7 +480,9 @@
     "workId": "work-song-038c4c1b",
     "title": "有一種悲傷 A Kind of Sorrow",
     "originalArtist": "A-Lin",
-    "tags": [],
+    "tags": [
+      "language:zh"
+    ],
     "performances": [
       {
         "id": "p-8093f138",
@@ -462,7 +498,9 @@
     "workId": "work-song-21093bc9",
     "title": "死ぬのがいいわ 鋼琴ver",
     "originalArtist": "Fujii Kaze",
-    "tags": [],
+    "tags": [
+      "language:ja"
+    ],
     "performances": [
       {
         "id": "p-d28a3356",
@@ -478,7 +516,9 @@
     "workId": "work-song-100",
     "title": "血腥愛情故事",
     "originalArtist": "張惠妹",
-    "tags": [],
+    "tags": [
+      "language:zh"
+    ],
     "performances": [
       {
         "id": "p-9824cef6",
@@ -494,7 +534,9 @@
     "workId": "work-song-100",
     "title": "血腥愛情故事",
     "originalArtist": "AMIT",
-    "tags": [],
+    "tags": [
+      "language:zh"
+    ],
     "performances": [
       {
         "id": "p-214064c8",
@@ -542,7 +584,9 @@
     "workId": "work-song-4ccf9b6e",
     "title": "別找我麻煩",
     "originalArtist": "蔡健雅",
-    "tags": [],
+    "tags": [
+      "language:zh"
+    ],
     "performances": [
       {
         "id": "p-44fb6043",
@@ -574,7 +618,9 @@
     "workId": "work-song-2b37b7c2",
     "title": "君をのせて",
     "originalArtist": "井上あずみ",
-    "tags": [],
+    "tags": [
+      "language:ja"
+    ],
     "performances": [
       {
         "id": "p-1db6029d",
@@ -590,7 +636,9 @@
     "workId": "work-song-307",
     "title": "忘れじの言の葉",
     "originalArtist": "未来古代楽団 ft.安次嶺希和子",
-    "tags": [],
+    "tags": [
+      "language:ja"
+    ],
     "performances": [
       {
         "id": "p-71347f63",
@@ -606,7 +654,9 @@
     "workId": "work-song-761ff713",
     "title": "我的存在就是愛你",
     "originalArtist": "張惠妹",
-    "tags": [],
+    "tags": [
+      "language:zh"
+    ],
     "performances": [
       {
         "id": "p-8d7d7dd2",
@@ -622,7 +672,9 @@
     "workId": "work-song-1745",
     "title": "我要我們在一起",
     "originalArtist": "范曉萱",
-    "tags": [],
+    "tags": [
+      "language:zh"
+    ],
     "performances": [
       {
         "id": "p-95dc7f48",
@@ -638,7 +690,9 @@
     "workId": "work-song-cfe636a1",
     "title": "我這個人 (玥姐solo)",
     "originalArtist": "艾怡良",
-    "tags": [],
+    "tags": [
+      "language:zh"
+    ],
     "performances": [
       {
         "id": "p-142e968b",
@@ -654,7 +708,9 @@
     "workId": "work-song-7bbfd1ba",
     "title": "身騎白馬",
     "originalArtist": "徐佳瑩",
-    "tags": [],
+    "tags": [
+      "language:zh"
+    ],
     "performances": [
       {
         "id": "p-fc1156fe",
@@ -725,7 +781,9 @@
     "workId": "work-song-325af048",
     "title": "怪天氣",
     "originalArtist": "YELLOW黃宣 & 9m88",
-    "tags": [],
+    "tags": [
+      "language:zh"
+    ],
     "performances": [
       {
         "id": "p-6774e0f3",
@@ -755,7 +813,9 @@
     "workId": "work-song-3defc6e4",
     "title": "怪天氣",
     "originalArtist": "黃宣",
-    "tags": [],
+    "tags": [
+      "language:zh"
+    ],
     "performances": [
       {
         "id": "p-b069bd71",
@@ -771,7 +831,9 @@
     "workId": "work-song-006cfcd3",
     "title": "怪物",
     "originalArtist": "YOASOBI",
-    "tags": [],
+    "tags": [
+      "language:ja"
+    ],
     "performances": [
       {
         "id": "p-1280a16a",
@@ -787,7 +849,9 @@
     "workId": "work-song-f28de13c",
     "title": "怪獸",
     "originalArtist": "サカナクション",
-    "tags": [],
+    "tags": [
+      "language:ja"
+    ],
     "performances": [
       {
         "id": "p-62d0ee94",
@@ -835,7 +899,9 @@
     "workId": "work-song-1815",
     "title": "花に亡霊",
     "originalArtist": "ヨルシカ",
-    "tags": [],
+    "tags": [
+      "language:ja"
+    ],
     "performances": [
       {
         "id": "p-28e53ee0",
@@ -867,7 +933,9 @@
     "workId": "work-song-f609fd5a",
     "title": "雨不停。流",
     "originalArtist": "孫盛希",
-    "tags": [],
+    "tags": [
+      "language:zh"
+    ],
     "performances": [
       {
         "id": "p-2182ff1b",
@@ -883,7 +951,9 @@
     "workId": "work-song-61c7b060",
     "title": "故梦 (玥姐solo)",
     "originalArtist": "双笙",
-    "tags": [],
+    "tags": [
+      "language:zh"
+    ],
     "performances": [
       {
         "id": "p-6ccb6272",
@@ -899,7 +969,9 @@
     "workId": "work-song-01e4d52b",
     "title": "是什麼讓我遇見這樣的你",
     "originalArtist": "Ann白安",
-    "tags": [],
+    "tags": [
+      "language:zh"
+    ],
     "performances": [
       {
         "id": "p-0d04f85e",
@@ -931,7 +1003,9 @@
     "workId": "work-song-2ca5447e",
     "title": "革命道中",
     "originalArtist": "アイナ・ジ・エンド",
-    "tags": [],
+    "tags": [
+      "language:ja"
+    ],
     "performances": [
       {
         "id": "p-9839969c",
@@ -954,7 +1028,9 @@
     "workId": "work-song-f7937c1c",
     "title": "桜色の夢",
     "originalArtist": "Ending Theme",
-    "tags": [],
+    "tags": [
+      "language:ja"
+    ],
     "performances": [
       {
         "id": "p-bc4d7432",
@@ -970,7 +1046,9 @@
     "workId": "work-song-07fb1c70",
     "title": "残酷な天使のテーゼ",
     "originalArtist": "高橋洋子",
-    "tags": [],
+    "tags": [
+      "language:ja"
+    ],
     "performances": [
       {
         "id": "p-33463183",
@@ -986,7 +1064,9 @@
     "workId": "work-song-31e43d12",
     "title": "浪漫體質",
     "originalArtist": "王彙筑",
-    "tags": [],
+    "tags": [
+      "language:zh"
+    ],
     "performances": [
       {
         "id": "p-9f52947f",
@@ -1018,7 +1098,9 @@
     "workId": "work-song-1058",
     "title": "悪魔の子",
     "originalArtist": "ヒグチアイ",
-    "tags": [],
+    "tags": [
+      "language:ja"
+    ],
     "performances": [
       {
         "id": "p-9f742085",
@@ -1034,7 +1116,9 @@
     "workId": "work-song-145b7854",
     "title": "情緒廢物",
     "originalArtist": "玥Itsuki",
-    "tags": [],
+    "tags": [
+      "source:original"
+    ],
     "performances": [
       {
         "id": "p-333eed53",
@@ -1073,7 +1157,9 @@
     "workId": "work-song-3dcb2bc4",
     "title": "這該死的拘執佮愛",
     "originalArtist": "珂拉琪 Collage",
-    "tags": [],
+    "tags": [
+      "language:zh"
+    ],
     "performances": [
       {
         "id": "p-f316d132",
@@ -1089,7 +1175,10 @@
     "workId": "work-song-01548993",
     "title": "陰陽怪氣 Holy Moly",
     "originalArtist": "玥Itsuki",
-    "tags": [],
+    "tags": [
+      "language:zh",
+      "source:original"
+    ],
     "performances": [
       {
         "id": "p-b1c8417d",
@@ -1183,7 +1272,9 @@
     "workId": "work-song-09aaca44",
     "title": "晴る",
     "originalArtist": "ヨルシカ",
-    "tags": [],
+    "tags": [
+      "language:ja"
+    ],
     "performances": [
       {
         "id": "p-20bff017",
@@ -1206,7 +1297,9 @@
     "workId": "work-song-083016e6",
     "title": "暁の車",
     "originalArtist": "FictionJunction YUUKA",
-    "tags": [],
+    "tags": [
+      "language:ja"
+    ],
     "performances": [
       {
         "id": "p-90528a54",
@@ -1222,7 +1315,9 @@
     "workId": "work-song-d973fcad",
     "title": "無慣例的早晨",
     "originalArtist": "洪佩瑜",
-    "tags": [],
+    "tags": [
+      "language:zh"
+    ],
     "performances": [
       {
         "id": "p-64829314",
@@ -1261,7 +1356,9 @@
     "workId": "work-song-30",
     "title": "給我一個理由忘記",
     "originalArtist": "A-Lin",
-    "tags": [],
+    "tags": [
+      "language:zh"
+    ],
     "performances": [
       {
         "id": "p-4fb58b13",
@@ -1277,7 +1374,9 @@
     "workId": "work-song-741adaff",
     "title": "開 Still Moving",
     "originalArtist": "洪佩瑜",
-    "tags": [],
+    "tags": [
+      "language:zh"
+    ],
     "performances": [
       {
         "id": "p-3f1f5207",
@@ -1293,7 +1392,9 @@
     "workId": "work-song-107365c4",
     "title": "新時代",
     "originalArtist": "Ado",
-    "tags": [],
+    "tags": [
+      "language:ja"
+    ],
     "performances": [
       {
         "id": "p-b0961bfd",
@@ -1437,7 +1538,9 @@
     "workId": "work-song-9ebb0f88",
     "title": "管它什麼",
     "originalArtist": "劉戀",
-    "tags": [],
+    "tags": [
+      "language:zh"
+    ],
     "performances": [
       {
         "id": "p-155e30b4",
@@ -1453,7 +1556,9 @@
     "workId": "work-song-05752dc2",
     "title": "與浪之間",
     "originalArtist": "Vast & Hazy",
-    "tags": [],
+    "tags": [
+      "language:zh"
+    ],
     "performances": [
       {
         "id": "p-5473c2b6",
@@ -1492,7 +1597,9 @@
     "workId": "work-song-155c023b",
     "title": "踮起腳尖愛",
     "originalArtist": "洪佩瑜",
-    "tags": [],
+    "tags": [
+      "language:zh"
+    ],
     "performances": [
       {
         "id": "p-1259d58a",
@@ -1508,7 +1615,9 @@
     "workId": "work-song-5c73219c",
     "title": "總有一顆屬於你的星球",
     "originalArtist": "告五人 & Solar",
-    "tags": [],
+    "tags": [
+      "language:zh"
+    ],
     "performances": [
       {
         "id": "p-6bc209c2",
@@ -1524,7 +1633,9 @@
     "workId": "work-song-2843575f",
     "title": "聲聲慢",
     "originalArtist": "鄧福如 AFÜ",
-    "tags": [],
+    "tags": [
+      "language:zh"
+    ],
     "performances": [
       {
         "id": "p-eabb498b",
@@ -1540,7 +1651,9 @@
     "workId": "work-song-23cc221a",
     "title": "關鍵詞",
     "originalArtist": "林俊傑",
-    "tags": [],
+    "tags": [
+      "language:zh"
+    ],
     "performances": [
       {
         "id": "p-7d90f619",
@@ -1556,7 +1669,9 @@
     "workId": "work-song-79e1ae1f",
     "title": "懸日",
     "originalArtist": "田馥甄",
-    "tags": [],
+    "tags": [
+      "language:zh"
+    ],
     "performances": [
       {
         "id": "p-c54bb854",
@@ -1572,7 +1687,9 @@
     "workId": "work-song-06b388bd",
     "title": "聽見下雨的聲音",
     "originalArtist": "周杰倫",
-    "tags": [],
+    "tags": [
+      "language:zh"
+    ],
     "performances": [
       {
         "id": "p-298335f5",
@@ -1867,7 +1984,9 @@
     "workId": "work-song-b14ffd93",
     "title": "Blind to you",
     "originalArtist": "Aimer",
-    "tags": [],
+    "tags": [
+      "language:ja"
+    ],
     "performances": [
       {
         "id": "p-f6fe9236",
@@ -1915,7 +2034,9 @@
     "workId": "work-song-9f149f1f",
     "title": "Broken World",
     "originalArtist": "孫盛希",
-    "tags": [],
+    "tags": [
+      "language:zh"
+    ],
     "performances": [
       {
         "id": "p-33c504e2",
@@ -2201,7 +2322,9 @@
     "workId": "work-song-173054da",
     "title": "eight(에잇) 鋼琴ver",
     "originalArtist": "IU",
-    "tags": [],
+    "tags": [
+      "language:ko"
+    ],
     "performances": [
       {
         "id": "p-69fd130d",
@@ -2304,7 +2427,9 @@
     "workId": "work-song-83c7cc70",
     "title": "Four Seasons",
     "originalArtist": "TAEYEON (태연)",
-    "tags": [],
+    "tags": [
+      "language:ko"
+    ],
     "performances": [
       {
         "id": "p-9834f129",
@@ -2375,7 +2500,9 @@
     "workId": "work-song-05d3050a",
     "title": "Galaxy (우주를 줄게)",
     "originalArtist": "臉紅的思春期 (볼빨간 사춘기)",
-    "tags": [],
+    "tags": [
+      "language:ko"
+    ],
     "performances": [
       {
         "id": "p-ead35f57",
@@ -2661,7 +2788,9 @@
     "workId": "work-song-832eeab4",
     "title": "INVU",
     "originalArtist": "TAEYEON (태연)",
-    "tags": [],
+    "tags": [
+      "language:ko"
+    ],
     "performances": [
       {
         "id": "p-ca6906f1",
@@ -2677,7 +2806,9 @@
     "workId": "work-song-53a8a024",
     "title": "IRIS OUT",
     "originalArtist": "米津玄師",
-    "tags": [],
+    "tags": [
+      "language:ja"
+    ],
     "performances": [
       {
         "id": "p-3788926b",
@@ -2709,7 +2840,9 @@
     "workId": "work-song-362",
     "title": "JANE DOE",
     "originalArtist": "米津玄師＆宇多田ヒカル",
-    "tags": [],
+    "tags": [
+      "language:ja"
+    ],
     "performances": [
       {
         "id": "p-f18c8177",
@@ -2789,7 +2922,9 @@
     "workId": "work-song-62339c56",
     "title": "LILAC",
     "originalArtist": "IU",
-    "tags": [],
+    "tags": [
+      "language:ko"
+    ],
     "performances": [
       {
         "id": "p-c5487ad1",
@@ -3020,7 +3155,9 @@
     "workId": "work-song-268949e6",
     "title": "Ninelie",
     "originalArtist": "Aimer",
-    "tags": [],
+    "tags": [
+      "language:ja"
+    ],
     "performances": [
       {
         "id": "p-22072ed5",
@@ -3258,7 +3395,9 @@
     "workId": "work-song-791de5ef",
     "title": "Say My Name",
     "originalArtist": "미연 (MIYEON)",
-    "tags": [],
+    "tags": [
+      "language:ko"
+    ],
     "performances": [
       {
         "id": "p-2f5c6eb1",
@@ -3407,7 +3546,9 @@
     "workId": "work-song-c6a07c1b",
     "title": "Stay With Me",
     "originalArtist": "松原みき",
-    "tags": [],
+    "tags": [
+      "language:ja"
+    ],
     "performances": [
       {
         "id": "p-8b317662",
@@ -3638,7 +3779,10 @@
     "workId": "work-song-1ad5d9a4",
     "title": "Tell Your World",
     "originalArtist": "初音ミク",
-    "tags": [],
+    "tags": [
+      "language:ja",
+      "source:vocaloid"
+    ],
     "performances": [
       {
         "id": "p-280987ef",
@@ -3853,7 +3997,10 @@
     "workId": "work-song-61cb242b",
     "title": "Wake up!",
     "originalArtist": "煌Kirali",
-    "tags": [],
+    "tags": [
+      "language:zh",
+      "source:original"
+    ],
     "performances": [
       {
         "id": "p-f9f9eba5",
@@ -4020,7 +4167,9 @@
     "workId": "work-song-eb40c0bd",
     "title": "보여줄게",
     "originalArtist": "에일리",
-    "tags": [],
+    "tags": [
+      "language:ko"
+    ],
     "performances": [
       {
         "id": "p-31645149",
@@ -4036,7 +4185,9 @@
     "workId": "work-song-222",
     "title": "アンコール",
     "originalArtist": "YOASOBI",
-    "tags": [],
+    "tags": [
+      "language:ja"
+    ],
     "performances": [
       {
         "id": "p-39a93033",
@@ -4052,7 +4203,9 @@
     "workId": "work-song-1539",
     "title": "いけないボーダーライン",
     "originalArtist": "ワルキューレ",
-    "tags": [],
+    "tags": [
+      "language:ja"
+    ],
     "performances": [
       {
         "id": "p-4976854d",
@@ -4068,7 +4221,9 @@
     "workId": "work-song-0c7b9a02",
     "title": "いのちの名前",
     "originalArtist": "木村弓",
-    "tags": [],
+    "tags": [
+      "language:ja"
+    ],
     "performances": [
       {
         "id": "p-5f534ace",
@@ -4091,7 +4246,9 @@
     "workId": "work-song-1f83ef1b",
     "title": "うたたね",
     "originalArtist": "Leina",
-    "tags": [],
+    "tags": [
+      "language:ja"
+    ],
     "performances": [
       {
         "id": "p-75384010",
@@ -4107,7 +4264,9 @@
     "workId": "work-song-0e7f7016",
     "title": "カントリー・ロード",
     "originalArtist": "本名陽子",
-    "tags": [],
+    "tags": [
+      "language:ja"
+    ],
     "performances": [
       {
         "id": "p-fd1bf51e",
@@ -4130,7 +4289,9 @@
     "workId": "work-song-1562",
     "title": "すずめ (feat. 十明)",
     "originalArtist": "RADWIMPS",
-    "tags": [],
+    "tags": [
+      "language:ja"
+    ],
     "performances": [
       {
         "id": "p-270c18df",
@@ -4146,7 +4307,9 @@
     "workId": "work-song-123",
     "title": "テルーの唄",
     "originalArtist": "手嶌葵",
-    "tags": [],
+    "tags": [
+      "language:ja"
+    ],
     "performances": [
       {
         "id": "p-19f95bbe",
@@ -4162,7 +4325,9 @@
     "workId": "work-song-15084c9d",
     "title": "ドライフラワー (Ure ver)",
     "originalArtist": "優里",
-    "tags": [],
+    "tags": [
+      "language:ja"
+    ],
     "performances": [
       {
         "id": "p-c366964e",
@@ -4178,7 +4343,9 @@
     "workId": "work-song-d7121a80",
     "title": "ばかみたい",
     "originalArtist": "黒田崇矢",
-    "tags": [],
+    "tags": [
+      "language:ja"
+    ],
     "performances": [
       {
         "id": "p-435b395b",
@@ -4194,7 +4361,9 @@
     "workId": "work-song-41a32f28",
     "title": "ハルジオン",
     "originalArtist": "YOASOBI",
-    "tags": [],
+    "tags": [
+      "language:ja"
+    ],
     "performances": [
       {
         "id": "p-69022f45",
@@ -4210,7 +4379,9 @@
     "workId": "work-song-193abdba",
     "title": "フクロウ ～フクロウが知らせる客が来たと～",
     "originalArtist": "Kokia",
-    "tags": [],
+    "tags": [
+      "language:ja"
+    ],
     "performances": [
       {
         "id": "p-ca9b6aa3",
@@ -4226,7 +4397,9 @@
     "workId": "work-song-925888f1",
     "title": "リセット",
     "originalArtist": "平原綾香",
-    "tags": [],
+    "tags": [
+      "language:ja"
+    ],
     "performances": [
       {
         "id": "p-5833da55",
