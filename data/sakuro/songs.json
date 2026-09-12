@@ -1060,7 +1060,9 @@
     "workId": "work-song-2180",
     "title": "Back To December",
     "originalArtist": "Taylor Swift",
-    "tags": [],
+    "tags": [
+      "language:en"
+    ],
     "performances": [
       {
         "id": "p-8644d439",
@@ -1076,7 +1078,9 @@
     "workId": "work-song-1709",
     "title": "Beauty And A Beat",
     "originalArtist": "Justin Bieber",
-    "tags": [],
+    "tags": [
+      "language:en"
+    ],
     "performances": [
       {
         "id": "p-8c7f30ac",
@@ -1188,7 +1192,9 @@
     "workId": "work-song-59508475",
     "title": "Eenie Meenie",
     "originalArtist": "Sean Kingston & Justin Bieber",
-    "tags": [],
+    "tags": [
+      "language:en"
+    ],
     "performances": [
       {
         "id": "p-cc3506bf",
@@ -1508,7 +1514,9 @@
     "workId": "work-song-1283",
     "title": "Love Yourself",
     "originalArtist": "Justin Bieber",
-    "tags": [],
+    "tags": [
+      "language:en"
+    ],
     "performances": [
       {
         "id": "p-a8c351b8",
@@ -1540,7 +1548,9 @@
     "workId": "work-song-a271993d",
     "title": "Mistletoe",
     "originalArtist": "Justin Bieber",
-    "tags": [],
+    "tags": [
+      "language:en"
+    ],
     "performances": [
       {
         "id": "p-b46c75d3",
@@ -1707,7 +1717,9 @@
     "workId": "work-song-256",
     "title": "STAY",
     "originalArtist": "The Kid LAROI, Justin Bieber",
-    "tags": [],
+    "tags": [
+      "language:en"
+    ],
     "performances": [
       {
         "id": "p-a48fe460",
