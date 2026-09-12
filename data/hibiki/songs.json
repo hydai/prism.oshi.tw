@@ -170,7 +170,9 @@
     "workId": "work-song-1283",
     "title": "Love Yourself",
     "originalArtist": "Justin Bieber",
-    "tags": [],
+    "tags": [
+      "language:en"
+    ],
     "performances": [
       {
         "id": "p-f5117917",
@@ -186,7 +188,9 @@
     "workId": "work-92b15447-8d33-4005-9293-59ae265d2741",
     "title": "Speechless",
     "originalArtist": "Lady Gaga",
-    "tags": [],
+    "tags": [
+      "language:en"
+    ],
     "performances": [
       {
         "id": "p-55d3f422",
