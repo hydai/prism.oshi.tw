@@ -4,7 +4,9 @@
     "workId": "work-song-a9a4ba26",
     "title": "小幸運",
     "originalArtist": "田馥甄",
-    "tags": [],
+    "tags": [
+      "language:zh"
+    ],
     "performances": [
       {
         "id": "p-b802bb74",
@@ -20,7 +22,9 @@
     "workId": "work-0711e4c9-7bc2-428c-a286-ec18b7405e97",
     "title": "你為什麼說謊",
     "originalArtist": "丁噹",
-    "tags": [],
+    "tags": [
+      "language:zh"
+    ],
     "performances": [
       {
         "id": "p-96341e8b",
@@ -84,7 +88,9 @@
     "workId": "work-song-2cd92dcf",
     "title": "暖暖",
     "originalArtist": "梁靜茹",
-    "tags": [],
+    "tags": [
+      "language:zh"
+    ],
     "performances": [
       {
         "id": "p-b771079f",
@@ -116,7 +122,9 @@
     "workId": "work-9c8bba93-9863-4e5f-acb5-1dba62d4819a",
     "title": "靠近一點點",
     "originalArtist": "梁心頤",
-    "tags": [],
+    "tags": [
+      "language:zh"
+    ],
     "performances": [
       {
         "id": "p-5853ab89",
@@ -132,7 +140,9 @@
     "workId": "work-song-308",
     "title": "寶貝",
     "originalArtist": "張懸",
-    "tags": [],
+    "tags": [
+      "language:zh"
+    ],
     "performances": [
       {
         "id": "p-ab8ee322",
