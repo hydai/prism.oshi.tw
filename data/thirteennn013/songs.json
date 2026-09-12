@@ -40,7 +40,9 @@
     "workId": "work-song-17",
     "title": "完全感覚Dreamer",
     "originalArtist": "ONE OK ROCK",
-    "tags": [],
+    "tags": [
+      "language:ja"
+    ],
     "performances": [
       {
         "id": "p-15ff0d62",
@@ -285,7 +287,10 @@
     "workId": "work-song-f637a748",
     "title": "Save yourself",
     "originalArtist": "ONE OK ROCK",
-    "tags": [],
+    "tags": [
+      "language:ja",
+      "language:en"
+    ],
     "performances": [
       {
         "id": "p-6fd77db7",
@@ -301,7 +306,10 @@
     "workId": "work-song-1433",
     "title": "The Beginning",
     "originalArtist": "ONE OK ROCK",
-    "tags": [],
+    "tags": [
+      "language:ja",
+      "language:en"
+    ],
     "performances": [
       {
         "id": "p-e2a07fcd",
