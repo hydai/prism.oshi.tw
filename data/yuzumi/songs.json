@@ -20,7 +20,9 @@
     "workId": "work-0821a1af-1383-4cc3-bba0-53383be1c5b0",
     "title": "星屑ビーナス（清唱）",
     "originalArtist": "Aimer",
-    "tags": [],
+    "tags": [
+      "language:ja"
+    ],
     "performances": [
       {
         "id": "p-a8745dfc",
@@ -36,7 +38,9 @@
     "workId": "work-song-1398",
     "title": "寄り酔い",
     "originalArtist": "和ぬか",
-    "tags": [],
+    "tags": [
+      "language:ja"
+    ],
     "performances": [
       {
         "id": "p-27d2f32f",
@@ -52,7 +56,9 @@
     "workId": "work-c217f2ca-108a-46f8-a1da-459c09a1630c",
     "title": "粛聖!! ロリ神レクイエム☆ (EX)（清唱一小段）",
     "originalArtist": "しぐれうい",
-    "tags": [],
+    "tags": [
+      "language:ja"
+    ],
     "performances": [
       {
         "id": "p-ff437755",
@@ -68,7 +74,9 @@
     "workId": "work-song-2ae06379",
     "title": "會呼吸的痛",
     "originalArtist": "梁靜茹",
-    "tags": [],
+    "tags": [
+      "language:zh"
+    ],
     "performances": [
       {
         "id": "p-950b12d1",
@@ -84,7 +92,9 @@
     "workId": "work-song-1153",
     "title": "慢慢喜歡你",
     "originalArtist": "莫文蔚",
-    "tags": [],
+    "tags": [
+      "language:zh"
+    ],
     "performances": [
       {
         "id": "p-a7155fc9",
@@ -100,7 +110,9 @@
     "workId": "work-7ed53601-6e9d-4375-83b2-cd9cd0e44927",
     "title": "漫夜（清唱）",
     "originalArtist": "澪Rei",
-    "tags": [],
+    "tags": [
+      "source:original"
+    ],
     "performances": [
       {
         "id": "p-261e6a3d",
@@ -116,7 +128,9 @@
     "workId": "work-55d7798a-bb4e-4c1a-919a-252f18e064fd",
     "title": "踊（清唱）",
     "originalArtist": "Ado",
-    "tags": [],
+    "tags": [
+      "language:ja"
+    ],
     "performances": [
       {
         "id": "p-ecfa4be7",
@@ -164,7 +178,9 @@
     "workId": "work-song-14d54c87",
     "title": "アイドル",
     "originalArtist": "YOASOBI",
-    "tags": [],
+    "tags": [
+      "language:ja"
+    ],
     "performances": [
       {
         "id": "p-13ee25c6",
@@ -180,7 +196,9 @@
     "workId": "work-50f3e751-9b3a-4ac1-8671-1f45d98f9893",
     "title": "アイドル（清唱）",
     "originalArtist": "YOASOBI",
-    "tags": [],
+    "tags": [
+      "language:ja"
+    ],
     "performances": [
       {
         "id": "p-97694116",
@@ -196,7 +214,9 @@
     "workId": "work-b8bb94aa-57b7-49c0-802c-60b1c71907a9",
     "title": "ほろよい（清唱）",
     "originalArtist": "さんひ",
-    "tags": [],
+    "tags": [
+      "language:ja"
+    ],
     "performances": [
       {
         "id": "p-73a2fcd9",
