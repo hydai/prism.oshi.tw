@@ -206,7 +206,9 @@
     "workId": "work-song-1322",
     "title": "雨愛",
     "originalArtist": "楊丞琳",
-    "tags": [],
+    "tags": [
+      "language:zh"
+    ],
     "performances": [
       {
         "id": "p-8daca7f6",
@@ -304,7 +306,9 @@
     "workId": "work-song-f1629572",
     "title": "馬德里不思議",
     "originalArtist": "蔡依林",
-    "tags": [],
+    "tags": [
+      "language:zh"
+    ],
     "performances": [
       {
         "id": "p-5f8e7030",
