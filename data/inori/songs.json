@@ -1758,7 +1758,10 @@
     "workId": "work-song-1433",
     "title": "The Beginning",
     "originalArtist": "ONE OK ROCK",
-    "tags": [],
+    "tags": [
+      "language:ja",
+      "language:en"
+    ],
     "performances": [
       {
         "id": "p-b5340c31",
