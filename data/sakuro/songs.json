@@ -20,7 +20,9 @@
     "workId": "work-song-77a7f7ef",
     "title": "一點點",
     "originalArtist": "周杰倫 (Jay Chou)",
-    "tags": [],
+    "tags": [
+      "language:zh"
+    ],
     "performances": [
       {
         "id": "p-8a7e7c6b",
@@ -116,7 +118,9 @@
     "workId": "work-song-4f120c43",
     "title": "不在一起就不會分開",
     "originalArtist": "洪佩瑜",
-    "tags": [],
+    "tags": [
+      "language:zh"
+    ],
     "performances": [
       {
         "id": "p-c0617506",
@@ -132,7 +136,9 @@
     "workId": "work-song-9792b1ec",
     "title": "不是因為天氣晴朗才愛你",
     "originalArtist": "理想混蛋 (Bestards)",
-    "tags": [],
+    "tags": [
+      "language:zh"
+    ],
     "performances": [
       {
         "id": "p-ca3577af",
@@ -155,7 +161,9 @@
     "workId": "work-song-f9996600",
     "title": "手語",
     "originalArtist": "周杰倫 (Jay Chou)",
-    "tags": [],
+    "tags": [
+      "language:zh"
+    ],
     "performances": [
       {
         "id": "p-d2b2d89b",
@@ -171,7 +179,9 @@
     "workId": "work-song-0c85e008",
     "title": "只有副歌的新歌",
     "originalArtist": "朔Sakuro",
-    "tags": [],
+    "tags": [
+      "source:original"
+    ],
     "performances": [
       {
         "id": "p-845b7e89",
@@ -194,7 +204,10 @@
     "workId": "work-song-7c26681e",
     "title": "叮叮噹 最喜歡你啦",
     "originalArtist": "朔Sakuro",
-    "tags": [],
+    "tags": [
+      "language:zh",
+      "source:original"
+    ],
     "performances": [
       {
         "id": "p-cb705198",
@@ -265,7 +278,9 @@
     "workId": "work-song-1c5908cc",
     "title": "在夜裡跳舞",
     "originalArtist": "單依純",
-    "tags": [],
+    "tags": [
+      "language:zh"
+    ],
     "performances": [
       {
         "id": "p-ca569242",
@@ -313,7 +328,9 @@
     "workId": "work-song-f551ea18",
     "title": "你是不是有點動心",
     "originalArtist": "吳卓源",
-    "tags": [],
+    "tags": [
+      "language:zh"
+    ],
     "performances": [
       {
         "id": "p-eeb958be",
@@ -393,7 +410,9 @@
     "workId": "work-song-1557",
     "title": "我喜歡你",
     "originalArtist": "洪安妮",
-    "tags": [],
+    "tags": [
+      "language:zh"
+    ],
     "performances": [
       {
         "id": "p-824ea389",
@@ -423,7 +442,9 @@
     "workId": "work-song-e7af3336",
     "title": "我當你空氣",
     "originalArtist": "旺福 (Wonfu)",
-    "tags": [],
+    "tags": [
+      "language:zh"
+    ],
     "performances": [
       {
         "id": "p-ec7cf293",
@@ -439,7 +460,9 @@
     "workId": "work-song-39636c3a",
     "title": "李白",
     "originalArtist": "李榮浩",
-    "tags": [],
+    "tags": [
+      "language:zh"
+    ],
     "performances": [
       {
         "id": "p-2e87ce0f",
@@ -478,7 +501,9 @@
     "workId": "work-song-f0c1603e",
     "title": "走了嗎",
     "originalArtist": "袁惟仁",
-    "tags": [],
+    "tags": [
+      "language:zh"
+    ],
     "performances": [
       {
         "id": "p-37c6db30",
@@ -565,7 +590,9 @@
     "workId": "work-song-83b0e5ff",
     "title": "信號 Signal",
     "originalArtist": "汐Seki",
-    "tags": [],
+    "tags": [
+      "source:original"
+    ],
     "performances": [
       {
         "id": "p-2bdb75ef",
@@ -597,7 +624,9 @@
     "workId": "work-song-0a53aeb7",
     "title": "星屑ビーナス",
     "originalArtist": "Aimer",
-    "tags": [],
+    "tags": [
+      "language:ja"
+    ],
     "performances": [
       {
         "id": "p-75d7e5a8",
@@ -629,7 +658,9 @@
     "workId": "work-song-02cf3ebd",
     "title": "夏夢",
     "originalArtist": "汐Seki",
-    "tags": [],
+    "tags": [
+      "source:original"
+    ],
     "performances": [
       {
         "id": "p-082af233",
@@ -645,7 +676,9 @@
     "workId": "work-song-04752c37",
     "title": "迷醉 Sangria",
     "originalArtist": "朔Sakuro",
-    "tags": [],
+    "tags": [
+      "source:original"
+    ],
     "performances": [
       {
         "id": "p-378b4ed5",
@@ -661,7 +694,9 @@
     "workId": "work-song-13d5137c",
     "title": "偽顔",
     "originalArtist": "yama",
-    "tags": [],
+    "tags": [
+      "language:ja"
+    ],
     "performances": [
       {
         "id": "p-90c2281e",
@@ -693,7 +728,9 @@
     "workId": "work-song-2104",
     "title": "晚餐歌",
     "originalArtist": "tuki.",
-    "tags": [],
+    "tags": [
+      "language:ja"
+    ],
     "performances": [
       {
         "id": "p-40758575",
@@ -748,7 +785,9 @@
     "workId": "work-song-96471ecf",
     "title": "陪你 Stay with you",
     "originalArtist": "朔Sakuro",
-    "tags": [],
+    "tags": [
+      "source:original"
+    ],
     "performances": [
       {
         "id": "p-80c46ccd",
@@ -764,7 +803,9 @@
     "workId": "work-song-96471ecf",
     "title": "陪你Stay with you",
     "originalArtist": "朔Sakuro",
-    "tags": [],
+    "tags": [
+      "source:original"
+    ],
     "performances": [
       {
         "id": "p-4fbbe3a8",
@@ -780,7 +821,9 @@
     "workId": "work-63cf3561-ef73-4212-b2f1-2da108da3472",
     "title": "最長的電影",
     "originalArtist": "周杰倫",
-    "tags": [],
+    "tags": [
+      "language:zh"
+    ],
     "performances": [
       {
         "id": "p-ffb33f3a",
@@ -812,7 +855,9 @@
     "workId": "work-song-841cc60e",
     "title": "等你下課",
     "originalArtist": "周杰倫 (Jay Chou)",
-    "tags": [],
+    "tags": [
+      "language:zh"
+    ],
     "performances": [
       {
         "id": "p-81ae9e6d",
@@ -860,7 +905,9 @@
     "workId": "work-song-57dbf3ae",
     "title": "愛♡スクリーム！",
     "originalArtist": "AiScReam",
-    "tags": [],
+    "tags": [
+      "language:ja"
+    ],
     "performances": [
       {
         "id": "p-04da797f",
@@ -931,7 +978,9 @@
     "workId": "work-song-155c023b",
     "title": "踮起腳尖愛",
     "originalArtist": "洪佩瑜",
-    "tags": [],
+    "tags": [
+      "language:zh"
+    ],
     "performances": [
       {
         "id": "p-a23eedb8",
@@ -1283,7 +1332,9 @@
     "workId": "work-song-dd3aef43",
     "title": "HEAVEN",
     "originalArtist": "Ailee (에일리)",
-    "tags": [],
+    "tags": [
+      "language:ko"
+    ],
     "performances": [
       {
         "id": "p-0d772a4c",
@@ -1768,7 +1819,9 @@
     "workId": "work-song-7c14294c",
     "title": "널 사랑하지 않아",
     "originalArtist": "Urban Zakapa (어반 자카파)",
-    "tags": [],
+    "tags": [
+      "language:ko"
+    ],
     "performances": [
       {
         "id": "p-eb2b04ad",
@@ -1784,7 +1837,9 @@
     "workId": "work-song-28534ae4",
     "title": "ドライフラワー",
     "originalArtist": "優里",
-    "tags": [],
+    "tags": [
+      "language:ja"
+    ],
     "performances": [
       {
         "id": "p-d3e99dc4",
@@ -1807,7 +1862,9 @@
     "workId": "work-song-2697",
     "title": "ハレンチ",
     "originalArtist": "ちゃんみな",
-    "tags": [],
+    "tags": [
+      "language:ja"
+    ],
     "performances": [
       {
         "id": "p-c11f8832",
@@ -1837,7 +1894,9 @@
     "workId": "work-song-13e927d3",
     "title": "ベテルギウス",
     "originalArtist": "優里",
-    "tags": [],
+    "tags": [
+      "language:ja"
+    ],
     "performances": [
       {
         "id": "p-f625a05c",
@@ -1853,7 +1912,9 @@
     "workId": "work-song-58150868",
     "title": "ユキコイ",
     "originalArtist": "當山みれい",
-    "tags": [],
+    "tags": [
+      "language:ja"
+    ],
     "performances": [
       {
         "id": "p-003f966f",
