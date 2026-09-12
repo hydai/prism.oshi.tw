@@ -20,7 +20,9 @@
     "workId": "work-song-1724a8eb",
     "title": "小酒窩",
     "originalArtist": "林俊傑",
-    "tags": [],
+    "tags": [
+      "language:zh"
+    ],
     "performances": [
       {
         "id": "p-5259e0d9",
@@ -36,7 +38,9 @@
     "workId": "work-song-6bae41e2",
     "title": "心訊 Heart Signal",
     "originalArtist": "煦Hiyori",
-    "tags": [],
+    "tags": [
+      "source:original"
+    ],
     "performances": [
       {
         "id": "p-640cb750",
@@ -84,7 +88,9 @@
     "workId": "work-ab3e09b0-6631-4ebc-8d6f-ed4547cc43ba",
     "title": "江南",
     "originalArtist": "林俊傑",
-    "tags": [],
+    "tags": [
+      "language:zh"
+    ],
     "performances": [
       {
         "id": "p-63ff1a1f",
@@ -100,7 +106,9 @@
     "workId": "work-song-8a6dc748",
     "title": "至少還有你",
     "originalArtist": "林憶蓮",
-    "tags": [],
+    "tags": [
+      "language:zh"
+    ],
     "performances": [
       {
         "id": "p-95094adb",
@@ -116,7 +124,9 @@
     "workId": "work-song-100",
     "title": "血腥愛情故事",
     "originalArtist": "張惠妹",
-    "tags": [],
+    "tags": [
+      "language:zh"
+    ],
     "performances": [
       {
         "id": "p-8e11bbac",
@@ -132,7 +142,9 @@
     "workId": "work-song-9d48f080",
     "title": "忘記擁抱",
     "originalArtist": "A-Lin",
-    "tags": [],
+    "tags": [
+      "language:zh"
+    ],
     "performances": [
       {
         "id": "p-d6242915",
@@ -148,7 +160,9 @@
     "workId": "work-song-350",
     "title": "我的歌聲裡",
     "originalArtist": "曲婉婷",
-    "tags": [],
+    "tags": [
+      "language:zh"
+    ],
     "performances": [
       {
         "id": "p-a58fb408",
@@ -212,7 +226,9 @@
     "workId": "work-song-006cfcd3",
     "title": "怪物",
     "originalArtist": "YOASOBI",
-    "tags": [],
+    "tags": [
+      "language:ja"
+    ],
     "performances": [
       {
         "id": "p-eb03d8e9",
@@ -276,7 +292,9 @@
     "workId": "work-song-768aea11",
     "title": "背對背擁抱",
     "originalArtist": "林俊傑",
-    "tags": [],
+    "tags": [
+      "language:zh"
+    ],
     "performances": [
       {
         "id": "p-c7f7f91c",
@@ -340,7 +358,9 @@
     "workId": "work-song-295",
     "title": "荒唐",
     "originalArtist": "A-Lin",
-    "tags": [],
+    "tags": [
+      "language:zh"
+    ],
     "performances": [
       {
         "id": "p-44abffc3",
@@ -372,7 +392,9 @@
     "workId": "work-song-f14c523a",
     "title": "情歌",
     "originalArtist": "梁靜茹",
-    "tags": [],
+    "tags": [
+      "language:zh"
+    ],
     "performances": [
       {
         "id": "p-f9976331",
@@ -388,7 +410,9 @@
     "workId": "work-song-9d3e2dda",
     "title": "梁山伯與茱麗葉",
     "originalArtist": "卓文萱 Genie Chuo&曹格 Gary Chaw",
-    "tags": [],
+    "tags": [
+      "language:zh"
+    ],
     "performances": [
       {
         "id": "p-b23a793a",
@@ -532,7 +556,9 @@
     "workId": "work-song-2681",
     "title": "煦日 Apricity",
     "originalArtist": "澪Rei",
-    "tags": [],
+    "tags": [
+      "source:original"
+    ],
     "performances": [
       {
         "id": "p-c8cf798c",
@@ -564,7 +590,9 @@
     "workId": "work-song-876e85ad",
     "title": "道聽塗說",
     "originalArtist": "林芯儀",
-    "tags": [],
+    "tags": [
+      "language:zh"
+    ],
     "performances": [
       {
         "id": "p-2e21064e",
@@ -580,7 +608,9 @@
     "workId": "work-song-1153",
     "title": "慢慢喜歡你",
     "originalArtist": "莫文蔚",
-    "tags": [],
+    "tags": [
+      "language:zh"
+    ],
     "performances": [
       {
         "id": "p-66bf2c2b",
@@ -596,7 +626,9 @@
     "workId": "work-song-c2b6954f",
     "title": "說愛你",
     "originalArtist": "蔡依林",
-    "tags": [],
+    "tags": [
+      "language:zh"
+    ],
     "performances": [
       {
         "id": "p-026ea45e",
@@ -756,7 +788,9 @@
     "workId": "work-song-3b1a26ea",
     "title": "Letting Go",
     "originalArtist": "蔡健雅",
-    "tags": [],
+    "tags": [
+      "language:zh"
+    ],
     "performances": [
       {
         "id": "p-27deed98",
@@ -804,7 +838,9 @@
     "workId": "work-song-7321184c",
     "title": "overdrive challenge",
     "originalArtist": "ザ・チェインスモーカーズ",
-    "tags": [],
+    "tags": [
+      "language:ja"
+    ],
     "performances": [
       {
         "id": "p-fbd80483",
@@ -836,7 +872,9 @@
     "workId": "work-song-9f31dcc6",
     "title": "Some(썸 탈꺼야)",
     "originalArtist": "BOL4(볼빨간사춘기)",
-    "tags": [],
+    "tags": [
+      "language:ko"
+    ],
     "performances": [
       {
         "id": "p-e007b6ac",
@@ -884,7 +922,9 @@
     "workId": "work-song-fdc50feb",
     "title": "Travel(여행)",
     "originalArtist": "BOL4(볼빨간사춘기)",
-    "tags": [],
+    "tags": [
+      "language:ko"
+    ],
     "performances": [
       {
         "id": "p-971d3eaa",
