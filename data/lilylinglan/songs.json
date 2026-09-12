@@ -36,7 +36,9 @@
     "workId": "work-5dabb55e-9b90-40d6-944e-d1e4b11e1f82",
     "title": "千年之戀",
     "originalArtist": "F.I.R.",
-    "tags": [],
+    "tags": [
+      "language:zh"
+    ],
     "performances": [
       {
         "id": "p-f0f82088",
@@ -52,7 +54,9 @@
     "workId": "work-a23ac4c4-0f94-4188-a317-a322e3ebf5b4",
     "title": "小可愛與小領帶",
     "originalArtist": "G.G 張思源",
-    "tags": [],
+    "tags": [
+      "language:zh"
+    ],
     "performances": [
       {
         "id": "p-bfc24c6c",
@@ -68,7 +72,9 @@
     "workId": "work-song-2323",
     "title": "不是因為天氣晴朗才愛你",
     "originalArtist": "理想混蛋",
-    "tags": [],
+    "tags": [
+      "language:zh"
+    ],
     "performances": [
       {
         "id": "p-0bcacf3f",
@@ -132,7 +138,9 @@
     "workId": "work-2a57046f-c9b9-4b9f-a4ed-6908512a7b09",
     "title": "光著我的腳ㄚ子",
     "originalArtist": "戴佩妮",
-    "tags": [],
+    "tags": [
+      "language:zh"
+    ],
     "performances": [
       {
         "id": "p-a2590b28",
@@ -148,7 +156,9 @@
     "workId": "work-song-7614103f",
     "title": "在我們的星球眼淚不超過三秒",
     "originalArtist": "鄧福如",
-    "tags": [],
+    "tags": [
+      "language:zh"
+    ],
     "performances": [
       {
         "id": "p-185d8a4f",
@@ -164,7 +174,9 @@
     "workId": "work-0b6bae36-0884-4325-913d-c92f55e603c3",
     "title": "有一天會盛開的花",
     "originalArtist": "森森鈴蘭｜唱一小段",
-    "tags": [],
+    "tags": [
+      "language:zh"
+    ],
     "performances": [
       {
         "id": "p-2e3c92e2",
@@ -180,7 +192,9 @@
     "workId": "work-song-1330",
     "title": "有一種悲傷",
     "originalArtist": "A-Lin",
-    "tags": [],
+    "tags": [
+      "language:zh"
+    ],
     "performances": [
       {
         "id": "p-67df077d",
@@ -276,7 +290,9 @@
     "workId": "work-915a415a-2133-4f2a-a84b-1676033c8004",
     "title": "我的悲傷是水做的",
     "originalArtist": "洛天依",
-    "tags": [],
+    "tags": [
+      "source:vocaloid"
+    ],
     "performances": [
       {
         "id": "p-0a40605a",
@@ -292,7 +308,9 @@
     "workId": "work-df100257-fa4d-4e7b-9e83-f710c7784068",
     "title": "我喜歡你",
     "originalArtist": "芒果醬",
-    "tags": [],
+    "tags": [
+      "language:zh"
+    ],
     "performances": [
       {
         "id": "p-3c76172a",
@@ -308,7 +326,9 @@
     "workId": "work-song-39636c3a",
     "title": "李白",
     "originalArtist": "李榮浩",
-    "tags": [],
+    "tags": [
+      "language:zh"
+    ],
     "performances": [
       {
         "id": "p-1138300b",
@@ -324,7 +344,9 @@
     "workId": "work-ed96a57c-e6b9-4502-8d58-0ebe896a408a",
     "title": "相愛就是說了100次對不起",
     "originalArtist": "Crispy脆樂團",
-    "tags": [],
+    "tags": [
+      "language:zh"
+    ],
     "performances": [
       {
         "id": "p-c49d4a03",
@@ -363,7 +385,9 @@
     "workId": "work-song-59976ef5",
     "title": "留給你的我從未",
     "originalArtist": "甜約翰",
-    "tags": [],
+    "tags": [
+      "language:zh"
+    ],
     "performances": [
       {
         "id": "p-8043d310",
@@ -395,7 +419,9 @@
     "workId": "work-bcc58791-c3fb-453e-a6df-084d20e97be1",
     "title": "控制狂",
     "originalArtist": "蘇打綠",
-    "tags": [],
+    "tags": [
+      "language:zh"
+    ],
     "performances": [
       {
         "id": "p-554d0d5b",
@@ -427,7 +453,9 @@
     "workId": "work-e5e74092-4fc7-4f71-9191-614c7d357086",
     "title": "絲路",
     "originalArtist": "梁靜茹",
-    "tags": [],
+    "tags": [
+      "language:zh"
+    ],
     "performances": [
       {
         "id": "p-8fb3d32e",
@@ -731,7 +759,9 @@
     "workId": "work-song-3b1a26ea",
     "title": "Letting Go",
     "originalArtist": "蔡健雅",
-    "tags": [],
+    "tags": [
+      "language:zh"
+    ],
     "performances": [
       {
         "id": "p-441c6964",
