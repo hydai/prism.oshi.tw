@@ -52,7 +52,9 @@
     "workId": "work-song-679e37a8",
     "title": "半句再見",
     "originalArtist": "孫燕姿",
-    "tags": [],
+    "tags": [
+      "language:zh"
+    ],
     "performances": [
       {
         "id": "p-d6defacc",
