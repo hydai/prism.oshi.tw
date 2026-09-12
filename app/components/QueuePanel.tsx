@@ -1,7 +1,7 @@
 'use client';
 
 import { memo, useCallback, useRef, useState, type DragEvent } from 'react';
-import { useVirtualizer } from '@tanstack/react-virtual';
+import { useVirtualRows } from '../lib/use-virtual-rows';
 import { X, GripVertical, Music, ChevronUp, ChevronDown } from 'lucide-react';
 import { useOverlays, usePlayerActions, useQueue, type QueueEntry } from '../contexts/PlayerContext';
 import AlbumArt from './AlbumArt';
@@ -158,7 +158,7 @@ function QueueList({
   onMove,
   onRemove,
 }: QueueListProps) {
-  const virtualizer = useVirtualizer({
+  const rows = useVirtualRows({
     count: queue.length,
     getScrollElement: () => contentEl,
     estimateSize: () => 72,
@@ -169,8 +169,8 @@ function QueueList({
 
   return (
     <div className="px-4">
-      <div style={{ height: `${virtualizer.getTotalSize()}px`, width: '100%', position: 'relative' }}>
-        {virtualizer.getVirtualItems().map((item) => {
+      <div style={{ height: `${rows.totalSize}px`, width: '100%', position: 'relative' }}>
+        {rows.items.map((item) => {
           const track = queue[item.index];
           // Named `rowPosition` (not `position`) to stay unambiguous next to the
           // wrapper's own CSS `position: 'absolute'` below.
@@ -180,7 +180,7 @@ function QueueList({
             <div
               key={track.queueEntryId}
               data-index={item.index}
-              ref={virtualizer.measureElement}
+              ref={rows.measureElement}
               style={{
                 position: 'absolute',
                 top: 0,

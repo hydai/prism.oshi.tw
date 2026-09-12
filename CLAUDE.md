@@ -28,7 +28,7 @@ Data-pipeline & ops scripts run via `npm run` or slash commands — e.g. `sync:r
 - **Next.js 16** (App Router, `output: "export"` — static HTML only, no SSR)
 - **React 19**, **TypeScript 5.9** (strict mode)
 - **Tailwind CSS 3.4** with CSS variable-backed design tokens
-- **@tanstack/react-virtual** for virtualized song lists
+- **@tanstack/virtual-core** for virtualized song lists, via `app/lib/use-virtual-rows.ts` (value snapshots through `useSyncExternalStore`; don't reintroduce `@tanstack/react-virtual`'s `useVirtualizer` — it trips `react-hooks/incompatible-library`)
 - Path alias: `@/*` maps to project root
 
 ## Architecture
