@@ -4,7 +4,9 @@
     "workId": "work-song-58af4c18",
     "title": "一個人還是想著一個人",
     "originalArtist": "曾沛慈",
-    "tags": [],
+    "tags": [
+      "language:zh"
+    ],
     "performances": [
       {
         "id": "p-3556de41",
@@ -20,7 +22,9 @@
     "workId": "work-cafb3a27-6cc6-4e40-aad3-0ac89fdd2042",
     "title": "不過失去了一點點",
     "originalArtist": "曾沛慈",
-    "tags": [],
+    "tags": [
+      "language:zh"
+    ],
     "performances": [
       {
         "id": "p-8dea0d1a",
@@ -100,7 +104,9 @@
     "workId": "work-a88c065e-3009-48e4-9c16-33e074a9259c",
     "title": "響念 Missing 抒情版",
     "originalArtist": "響Hibiki",
-    "tags": [],
+    "tags": [
+      "source:original"
+    ],
     "performances": [
       {
         "id": "p-12af046f",
