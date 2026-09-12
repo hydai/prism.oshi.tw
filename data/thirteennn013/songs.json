@@ -4,7 +4,9 @@
     "workId": "work-song-1217",
     "title": "丸の内サディスティック",
     "originalArtist": "椎名林檎",
-    "tags": [],
+    "tags": [
+      "language:ja"
+    ],
     "performances": [
       {
         "id": "p-ebc9aadf",
@@ -20,7 +22,9 @@
     "workId": "work-song-2bb8d010",
     "title": "六等星の夜",
     "originalArtist": "Aimer",
-    "tags": [],
+    "tags": [
+      "language:ja"
+    ],
     "performances": [
       {
         "id": "p-025d3344",
@@ -52,7 +56,9 @@
     "workId": "work-song-1f98c249",
     "title": "美人",
     "originalArtist": "ちゃんみな",
-    "tags": [],
+    "tags": [
+      "language:ja"
+    ],
     "performances": [
       {
         "id": "p-2c22211b",
@@ -68,7 +74,9 @@
     "workId": "work-song-2ca5447e",
     "title": "革命道中",
     "originalArtist": "アイナ・ジ・エンド",
-    "tags": [],
+    "tags": [
+      "language:ja"
+    ],
     "performances": [
       {
         "id": "p-bb5d2f73",
@@ -84,7 +92,9 @@
     "workId": "work-song-114c348c",
     "title": "逢いたくていま",
     "originalArtist": "MISIA",
-    "tags": [],
+    "tags": [
+      "language:ja"
+    ],
     "performances": [
       {
         "id": "p-fd251b40",
@@ -116,7 +126,9 @@
     "workId": "work-song-2986",
     "title": "罪と罰",
     "originalArtist": "椎名林檎",
-    "tags": [],
+    "tags": [
+      "language:ja"
+    ],
     "performances": [
       {
         "id": "p-a224d8f3",
@@ -132,7 +144,9 @@
     "workId": "work-song-2",
     "title": "僕が死のうと思ったのは",
     "originalArtist": "中島美嘉",
-    "tags": [],
+    "tags": [
+      "language:ja"
+    ],
     "performances": [
       {
         "id": "p-a2510abb",
@@ -148,7 +162,9 @@
     "workId": "work-song-2ccade11",
     "title": "踊",
     "originalArtist": "Ado",
-    "tags": [],
+    "tags": [
+      "language:ja"
+    ],
     "performances": [
       {
         "id": "p-dfad20f0",
@@ -164,7 +180,9 @@
     "workId": "work-song-aeda2a44",
     "title": "擱淺",
     "originalArtist": "周杰倫",
-    "tags": [],
+    "tags": [
+      "language:zh"
+    ],
     "performances": [
       {
         "id": "p-9a656987",
@@ -180,7 +198,10 @@
     "workId": "work-song-74baa9d8",
     "title": "flos",
     "originalArtist": "R Sound Design feat. 初音ミク",
-    "tags": [],
+    "tags": [
+      "language:ja",
+      "source:vocaloid"
+    ],
     "performances": [
       {
         "id": "p-93e6e940",
@@ -228,7 +249,9 @@
     "workId": "work-song-024be7af",
     "title": "Kick back",
     "originalArtist": "米津玄師",
-    "tags": [],
+    "tags": [
+      "language:ja"
+    ],
     "performances": [
       {
         "id": "p-d0ba9955",
@@ -244,7 +267,9 @@
     "workId": "work-song-471",
     "title": "KING",
     "originalArtist": "Kanaria",
-    "tags": [],
+    "tags": [
+      "language:ja"
+    ],
     "performances": [
       {
         "id": "p-3154d959",
@@ -292,7 +317,9 @@
     "workId": "work-9d347322-1103-4a96-b2fe-97009bd5eeef",
     "title": "あなたに出会わなければ ～夏雪冬花～",
     "originalArtist": "Aimer",
-    "tags": [],
+    "tags": [
+      "language:ja"
+    ],
     "performances": [
       {
         "id": "p-24aa1a36",
@@ -308,7 +335,9 @@
     "workId": "work-d4bfbd0c-ca1c-4403-82be-40cb9decffc0",
     "title": "いけないボーダーライン",
     "originalArtist": "ワルキューレ（feat. 13醬）",
-    "tags": [],
+    "tags": [
+      "language:ja"
+    ],
     "performances": [
       {
         "id": "p-4a0b8be0",
@@ -324,7 +353,9 @@
     "workId": "work-song-44",
     "title": "エンヴィーベイビー",
     "originalArtist": "Kanaria",
-    "tags": [],
+    "tags": [
+      "language:ja"
+    ],
     "performances": [
       {
         "id": "p-54e69f7d",
@@ -340,7 +371,9 @@
     "workId": "work-song-2022",
     "title": "ダーリン",
     "originalArtist": "須田景凪",
-    "tags": [],
+    "tags": [
+      "language:ja"
+    ],
     "performances": [
       {
         "id": "p-24f3fc2c",
