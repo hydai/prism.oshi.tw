@@ -74,7 +74,10 @@
     "workId": "work-song-11f89711",
     "title": "Wherever You Are",
     "originalArtist": "ONE OK ROCK",
-    "tags": [],
+    "tags": [
+      "language:ja",
+      "language:en"
+    ],
     "performances": [
       {
         "id": "p-689effc3",
