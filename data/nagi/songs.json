@@ -105,7 +105,10 @@
     "workId": "work-song-7f52a0bf",
     "title": "05. Mighty Long Fall",
     "originalArtist": "ONE OK ROCK",
-    "tags": [],
+    "tags": [
+      "language:ja",
+      "language:en"
+    ],
     "performances": [
       {
         "id": "p-23764d5d",
@@ -283,7 +286,9 @@
     "workId": "work-song-c01cd4ce",
     "title": "15. 逆光",
     "originalArtist": "孫燕姿",
-    "tags": [],
+    "tags": [
+      "language:zh"
+    ],
     "performances": [
       {
         "id": "p-ebe3a5de",
@@ -370,7 +375,7 @@
     "title": "天樂",
     "originalArtist": "ゆうゆ feat. 鏡音リン",
     "tags": [
-      "language:zh",
+      "language:ja",
       "source:vocaloid"
     ],
     "performances": [
@@ -1732,7 +1737,9 @@
     "workId": "work-song-0c430370",
     "title": "遇見",
     "originalArtist": "孫燕姿",
-    "tags": [],
+    "tags": [
+      "language:zh"
+    ],
     "performances": [
       {
         "id": "p-5ac3051d",
@@ -2023,7 +2030,9 @@
     "workId": "work-song-3135",
     "title": "Beauty and the Beast",
     "originalArtist": "Ariana Grande & John Legend",
-    "tags": [],
+    "tags": [
+      "language:en"
+    ],
     "performances": [
       {
         "id": "p-66fc8321",
@@ -2259,7 +2268,10 @@
     "workId": "work-song-02b960f0",
     "title": "Cry Out",
     "originalArtist": "ONE OK ROCK",
-    "tags": [],
+    "tags": [
+      "language:ja",
+      "language:en"
+    ],
     "performances": [
       {
         "id": "p-8dae1787",
@@ -2307,7 +2319,9 @@
     "workId": "work-song-d74113d8",
     "title": "Die with a Smile",
     "originalArtist": "Lady Gaga & Bruno Mars",
-    "tags": [],
+    "tags": [
+      "language:en"
+    ],
     "performances": [
       {
         "id": "p-4b8fea68",
@@ -2323,7 +2337,9 @@
     "workId": "work-song-4ec7244e",
     "title": "Ditto",
     "originalArtist": "NewJeans",
-    "tags": [],
+    "tags": [
+      "language:ko"
+    ],
     "performances": [
       {
         "id": "p-4008185a",
@@ -2469,7 +2485,9 @@
     "workId": "work-song-edd17b30",
     "title": "GODS",
     "originalArtist": "League of Legends & NewJeans",
-    "tags": [],
+    "tags": [
+      "language:ko"
+    ],
     "performances": [
       {
         "id": "p-e3ce7d15",
@@ -2877,7 +2895,9 @@
     "workId": "work-song-1140",
     "title": "Love Story",
     "originalArtist": "Taylor Swift",
-    "tags": [],
+    "tags": [
+      "language:en"
+    ],
     "performances": [
       {
         "id": "p-653df9ac",
@@ -2986,7 +3006,10 @@
     "workId": "work-song-1438",
     "title": "Mighty Long Fall",
     "originalArtist": "ONE OK ROCK",
-    "tags": [],
+    "tags": [
+      "language:ja",
+      "language:en"
+    ],
     "performances": [
       {
         "id": "p-f739edde",
@@ -3674,7 +3697,10 @@
     "workId": "work-song-214f4bf5",
     "title": "We Are",
     "originalArtist": "ONE OK ROCK",
-    "tags": [],
+    "tags": [
+      "language:ja",
+      "language:en"
+    ],
     "performances": [
       {
         "id": "p-dfefac12",
