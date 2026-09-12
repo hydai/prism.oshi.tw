@@ -52,7 +52,9 @@
     "workId": "work-song-35b5457c",
     "title": "何度明日が来ようとも（オリ曲）",
     "originalArtist": "Unknown",
-    "tags": [],
+    "tags": [
+      "language:ja"
+    ],
     "performances": [
       {
         "id": "p-9a1db23f",
@@ -68,7 +70,9 @@
     "workId": "work-song-9ee20c06",
     "title": "君をのせて（井上あずみ）",
     "originalArtist": "Unknown",
-    "tags": [],
+    "tags": [
+      "language:ja"
+    ],
     "performances": [
       {
         "id": "p-712c0ae6",
@@ -100,7 +104,9 @@
     "workId": "work-song-e8cf212e",
     "title": "私は最強（Ado）",
     "originalArtist": "Unknown",
-    "tags": [],
+    "tags": [
+      "language:ja"
+    ],
     "performances": [
       {
         "id": "p-8047c64a",
@@ -116,7 +122,9 @@
     "workId": "work-song-cc397301",
     "title": "夜明けと蛍（n-buna）",
     "originalArtist": "Unknown",
-    "tags": [],
+    "tags": [
+      "language:ja"
+    ],
     "performances": [
       {
         "id": "p-a5ad418a",
@@ -132,7 +140,9 @@
     "workId": "work-song-2ff26c66",
     "title": "怪獣の花唄（Vaundy）",
     "originalArtist": "Unknown",
-    "tags": [],
+    "tags": [
+      "language:ja"
+    ],
     "performances": [
       {
         "id": "p-a035ea2e",
@@ -148,7 +158,9 @@
     "workId": "work-song-40fba02d",
     "title": "東京フラッシュ（Vaundy）",
     "originalArtist": "Unknown",
-    "tags": [],
+    "tags": [
+      "language:ja"
+    ],
     "performances": [
       {
         "id": "p-2b00aa2f",
@@ -164,7 +176,9 @@
     "workId": "work-song-566d9d2f",
     "title": "花に亡霊（ヨルシカ）",
     "originalArtist": "Unknown",
-    "tags": [],
+    "tags": [
+      "language:ja"
+    ],
     "performances": [
       {
         "id": "p-376a45fd",
@@ -180,7 +194,9 @@
     "workId": "work-song-99b3ca08",
     "title": "雨とカプチーノ（ヨルシカ）",
     "originalArtist": "Unknown",
-    "tags": [],
+    "tags": [
+      "language:ja"
+    ],
     "performances": [
       {
         "id": "p-6dee2702",
@@ -196,7 +212,9 @@
     "workId": "work-song-d46e5f95",
     "title": "星座になれたら（結束バンド）",
     "originalArtist": "Unknown",
-    "tags": [],
+    "tags": [
+      "language:ja"
+    ],
     "performances": [
       {
         "id": "p-dcc62eb1",
@@ -212,7 +230,9 @@
     "workId": "work-song-f6115bd0",
     "title": "春よ、来い（松任谷由実）",
     "originalArtist": "Unknown",
-    "tags": [],
+    "tags": [
+      "language:ja"
+    ],
     "performances": [
       {
         "id": "p-2fc6e2f2",
@@ -228,7 +248,9 @@
     "workId": "work-song-8ac356a4",
     "title": "春を告げる（yama）",
     "originalArtist": "Unknown",
-    "tags": [],
+    "tags": [
+      "language:ja"
+    ],
     "performances": [
       {
         "id": "p-dffd6807",
@@ -244,7 +266,9 @@
     "workId": "work-song-86c980e7",
     "title": "若者のすべて（フジファブリック）",
     "originalArtist": "Unknown",
-    "tags": [],
+    "tags": [
+      "language:ja"
+    ],
     "performances": [
       {
         "id": "p-7b30493c",
@@ -260,7 +284,9 @@
     "workId": "work-song-c435d1ff",
     "title": "風になる（つじあやの）",
     "originalArtist": "Unknown",
-    "tags": [],
+    "tags": [
+      "language:ja"
+    ],
     "performances": [
       {
         "id": "p-8c5a6201",
@@ -276,7 +302,9 @@
     "workId": "work-song-92e3eb5e",
     "title": "風を食む（ヨルシカ）",
     "originalArtist": "Unknown",
-    "tags": [],
+    "tags": [
+      "language:ja"
+    ],
     "performances": [
       {
         "id": "p-01058a13",
@@ -308,7 +336,9 @@
     "workId": "work-song-22362d18",
     "title": "弱虫モンブラン（DECO*27）",
     "originalArtist": "Unknown",
-    "tags": [],
+    "tags": [
+      "language:ja"
+    ],
     "performances": [
       {
         "id": "p-5d50ff6a",
@@ -324,7 +354,9 @@
     "workId": "work-song-90eb0af0",
     "title": "恋愛サーキュレーション（千石撫子[花澤香菜]）",
     "originalArtist": "Unknown",
-    "tags": [],
+    "tags": [
+      "language:ja"
+    ],
     "performances": [
       {
         "id": "p-34167e2b",
@@ -340,7 +372,9 @@
     "workId": "work-song-f00391d8",
     "title": "旅立ちの日に（合唱）",
     "originalArtist": "Unknown",
-    "tags": [],
+    "tags": [
+      "language:ja"
+    ],
     "performances": [
       {
         "id": "p-00b55b23",
@@ -356,7 +390,9 @@
     "workId": "work-song-13f70dfe",
     "title": "時には昔の話を（加藤登紀子）",
     "originalArtist": "Unknown",
-    "tags": [],
+    "tags": [
+      "language:ja"
+    ],
     "performances": [
       {
         "id": "p-0fc7e3fe",
@@ -393,7 +429,9 @@
     "workId": "work-song-3bf612c6",
     "title": "残酷な天使のテーゼ（高橋洋子）",
     "originalArtist": "Unknown",
-    "tags": [],
+    "tags": [
+      "language:ja"
+    ],
     "performances": [
       {
         "id": "p-448521f2",
@@ -425,7 +463,9 @@
     "workId": "work-song-339dcf09",
     "title": "崖の上のポニョ（藤岡藤巻と大橋のぞみ）",
     "originalArtist": "Unknown",
-    "tags": [],
+    "tags": [
+      "language:ja"
+    ],
     "performances": [
       {
         "id": "p-d66d0517",
@@ -441,7 +481,9 @@
     "workId": "work-song-b237c03d",
     "title": "強風オールバック（ゆこぴ）",
     "originalArtist": "Unknown",
-    "tags": [],
+    "tags": [
+      "language:ja"
+    ],
     "performances": [
       {
         "id": "p-d594f232",
@@ -473,7 +515,9 @@
     "workId": "work-song-ea8b9a89",
     "title": "鳥の詩（Lia）",
     "originalArtist": "Unknown",
-    "tags": [],
+    "tags": [
+      "language:ja"
+    ],
     "performances": [
       {
         "id": "p-a7b575ba",
@@ -489,7 +533,9 @@
     "workId": "work-song-354ca38b",
     "title": "踊り子（Vaundy）",
     "originalArtist": "Unknown",
-    "tags": [],
+    "tags": [
+      "language:ja"
+    ],
     "performances": [
       {
         "id": "p-8b5fa8b8",
@@ -512,7 +558,9 @@
     "workId": "work-song-b49b4e1e",
     "title": "魂のルフラン（高橋洋子）",
     "originalArtist": "Unknown",
-    "tags": [],
+    "tags": [
+      "language:ja"
+    ],
     "performances": [
       {
         "id": "p-0e095b99",
@@ -718,7 +766,9 @@
     "workId": "work-song-4d59391e",
     "title": "アイネクライネ（米津玄師）",
     "originalArtist": "Unknown",
-    "tags": [],
+    "tags": [
+      "language:ja"
+    ],
     "performances": [
       {
         "id": "p-aa164101",
@@ -734,7 +784,9 @@
     "workId": "work-song-60d2f4b3",
     "title": "あのバンド（結束バンド）",
     "originalArtist": "Unknown",
-    "tags": [],
+    "tags": [
+      "language:ja"
+    ],
     "performances": [
       {
         "id": "p-cc62e37b",
@@ -750,7 +802,9 @@
     "workId": "work-song-f59226f9",
     "title": "アンインストール（石川智晶）",
     "originalArtist": "Unknown",
-    "tags": [],
+    "tags": [
+      "language:ja"
+    ],
     "performances": [
       {
         "id": "p-a4e2c407",
@@ -766,7 +820,9 @@
     "workId": "work-song-a3cd7e9a",
     "title": "いつも何度でも（木村弓）",
     "originalArtist": "Unknown",
-    "tags": [],
+    "tags": [
+      "language:ja"
+    ],
     "performances": [
       {
         "id": "p-71fbb3b4",
@@ -782,7 +838,9 @@
     "workId": "work-song-be5d0535",
     "title": "いのちの名前",
     "originalArtist": "Unknown",
-    "tags": [],
+    "tags": [
+      "language:ja"
+    ],
     "performances": [
       {
         "id": "p-a615b44e",
@@ -798,7 +856,9 @@
     "workId": "work-song-c0d5afed",
     "title": "ウィーアー!（きただにひろし）",
     "originalArtist": "Unknown",
-    "tags": [],
+    "tags": [
+      "language:ja"
+    ],
     "performances": [
       {
         "id": "p-f8f7b753",
@@ -814,7 +874,9 @@
     "workId": "work-song-1b47aafa",
     "title": "からくりピエロ（40mP）",
     "originalArtist": "Unknown",
-    "tags": [],
+    "tags": [
+      "language:ja"
+    ],
     "performances": [
       {
         "id": "p-50b6b7a5",
@@ -830,7 +892,9 @@
     "workId": "work-song-ba9c0f6f",
     "title": "カントリーロード（本名陽子）",
     "originalArtist": "Unknown",
-    "tags": [],
+    "tags": [
+      "language:ja"
+    ],
     "performances": [
       {
         "id": "p-aa1a2bfe",
@@ -846,7 +910,9 @@
     "workId": "work-song-144e6c10",
     "title": "ギターと孤独と蒼い惑星（結束バンド）",
     "originalArtist": "Unknown",
-    "tags": [],
+    "tags": [
+      "language:ja"
+    ],
     "performances": [
       {
         "id": "p-fb555441",
@@ -862,7 +928,9 @@
     "workId": "work-song-590b80da",
     "title": "シリョクケンサ（40mP）",
     "originalArtist": "Unknown",
-    "tags": [],
+    "tags": [
+      "language:ja"
+    ],
     "performances": [
       {
         "id": "p-83aee117",
@@ -878,7 +946,9 @@
     "workId": "work-song-1d2ccfcd",
     "title": "なごり雪（イルカ）",
     "originalArtist": "Unknown",
-    "tags": [],
+    "tags": [
+      "language:ja"
+    ],
     "performances": [
       {
         "id": "p-37d7e906",
@@ -901,7 +971,9 @@
     "workId": "work-song-7ec012b1",
     "title": "ニャースのうた（ニャース[犬山犬子]）",
     "originalArtist": "Unknown",
-    "tags": [],
+    "tags": [
+      "language:ja"
+    ],
     "performances": [
       {
         "id": "p-7cf52418",
@@ -917,7 +989,9 @@
     "workId": "work-song-1ce845c7",
     "title": "ノーダウト（Official髭男dism）",
     "originalArtist": "Unknown",
-    "tags": [],
+    "tags": [
+      "language:ja"
+    ],
     "performances": [
       {
         "id": "p-e2eee52e",
@@ -933,7 +1007,9 @@
     "workId": "work-song-20c0a64c",
     "title": "ヒカリヘ（Miwa）",
     "originalArtist": "Unknown",
-    "tags": [],
+    "tags": [
+      "language:ja"
+    ],
     "performances": [
       {
         "id": "p-080ae6b0",
@@ -956,7 +1032,9 @@
     "workId": "work-song-6d2fbdcb",
     "title": "ひまわりの約束（秦基博）",
     "originalArtist": "Unknown",
-    "tags": [],
+    "tags": [
+      "language:ja"
+    ],
     "performances": [
       {
         "id": "p-a28ac99b",
@@ -972,7 +1050,9 @@
     "workId": "work-song-145e683b",
     "title": "フクロウ（KOKIA）",
     "originalArtist": "Unknown",
-    "tags": [],
+    "tags": [
+      "language:ja"
+    ],
     "performances": [
       {
         "id": "p-fb14ccfc",
@@ -988,7 +1068,9 @@
     "workId": "work-song-f76d8af1",
     "title": "ふでペン ～ボールペン～（放課後ティータイム）",
     "originalArtist": "Unknown",
-    "tags": [],
+    "tags": [
+      "language:ja"
+    ],
     "performances": [
       {
         "id": "p-6744bc98",
@@ -1004,7 +1086,9 @@
     "workId": "work-song-cf16ed1c",
     "title": "プロポーズ（なと",
     "originalArtist": "Unknown",
-    "tags": [],
+    "tags": [
+      "language:ja"
+    ],
     "performances": [
       {
         "id": "p-d06c40b9",
@@ -1020,7 +1104,9 @@
     "workId": "work-song-9923179b",
     "title": "プロポーズ（なとり）",
     "originalArtist": "Unknown",
-    "tags": [],
+    "tags": [
+      "language:ja"
+    ],
     "performances": [
       {
         "id": "p-14858b21",
@@ -1036,7 +1122,9 @@
     "workId": "work-song-40419569",
     "title": "へび（ヨルシカ）",
     "originalArtist": "Unknown",
-    "tags": [],
+    "tags": [
+      "language:ja"
+    ],
     "performances": [
       {
         "id": "p-4f6f1fc1",
@@ -1052,7 +1140,9 @@
     "workId": "work-song-7d50d417",
     "title": "ミカヅキ（さユり）",
     "originalArtist": "Unknown",
-    "tags": [],
+    "tags": [
+      "language:ja"
+    ],
     "performances": [
       {
         "id": "p-2d0492e4",
@@ -1068,7 +1158,9 @@
     "workId": "work-song-eb33dfaa",
     "title": "ムーンライト伝説（DALI）",
     "originalArtist": "Unknown",
-    "tags": [],
+    "tags": [
+      "language:ja"
+    ],
     "performances": [
       {
         "id": "p-9233c7fa",
@@ -1084,7 +1176,9 @@
     "workId": "work-song-361c6fba",
     "title": "めぐる季節（井上あずみ）",
     "originalArtist": "Unknown",
-    "tags": [],
+    "tags": [
+      "language:ja"
+    ],
     "performances": [
       {
         "id": "p-7bb8b78e",
@@ -1100,7 +1194,9 @@
     "workId": "work-song-3590ea5e",
     "title": "もののけ姫（米良美一）",
     "originalArtist": "Unknown",
-    "tags": [],
+    "tags": [
+      "language:ja"
+    ],
     "performances": [
       {
         "id": "p-637a33c8",
@@ -1116,7 +1212,9 @@
     "workId": "work-song-4e75660f",
     "title": "ルージュの伝言（荒井由実）",
     "originalArtist": "Unknown",
-    "tags": [],
+    "tags": [
+      "language:ja"
+    ],
     "performances": [
       {
         "id": "p-e06589e5",
@@ -1139,7 +1237,9 @@
     "workId": "work-song-9943a30b",
     "title": "わたしの恋はホッチキス（放課後ティータイム）",
     "originalArtist": "Unknown",
-    "tags": [],
+    "tags": [
+      "language:ja"
+    ],
     "performances": [
       {
         "id": "p-fc0f16a3",
