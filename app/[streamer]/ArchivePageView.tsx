@@ -1,7 +1,7 @@
 'use client';
 
 import { useRef, type RefObject } from 'react';
-import { useVirtualizer, type Virtualizer } from '@tanstack/react-virtual';
+import { useVirtualRows, type VirtualRows } from '../lib/use-virtual-rows';
 import Link from 'next/link';
 import {
   Search,
@@ -796,20 +796,20 @@ function SongCatalog() {
   // 0 renders nothing. This keeps both instances (and their scroll offsets)
   // alive across view-mode toggles instead of recreating one from scratch,
   // which would otherwise reset the shared scroll container back to the top.
-  const timelineVirtualizer = useVirtualizer({
+  const timelineRows = useVirtualRows({
     count: isTimelineActive ? flattenedSongs.length : 0,
     getScrollElement: () => scrollContainerRef.current,
     estimateSize: () => 56,
     overscan: 15,
-    scrollMargin: timelineListRef.current?.offsetTop ?? 0,
+    getListElement: () => timelineListRef.current,
   });
 
-  const groupedVirtualizer = useVirtualizer({
+  const groupedRows = useVirtualRows({
     count: isGroupedActive ? groupedSongs.length : 0,
     getScrollElement: () => scrollContainerRef.current,
     estimateSize: () => 96,
     overscan: 10,
-    scrollMargin: groupedListRef.current?.offsetTop ?? 0,
+    getListElement: () => groupedListRef.current,
   });
 
   return (
@@ -822,9 +822,9 @@ function SongCatalog() {
             {loadState === 'error' || loadState === 'loading' ? (
               <CatalogStatus loadState={loadState} retryLoad={retryLoad} />
             ) : viewMode === 'timeline' ? (
-              <TimelineSongList virtualizer={timelineVirtualizer} listRef={timelineListRef} />
+              <TimelineSongList rows={timelineRows} listRef={timelineListRef} />
             ) : (
-              <GroupedSongList virtualizer={groupedVirtualizer} listRef={groupedListRef} />
+              <GroupedSongList rows={groupedRows} listRef={groupedListRef} />
             )}
           </div>
     </>
@@ -833,10 +833,10 @@ function SongCatalog() {
 
 
 function TimelineSongList({
-  virtualizer,
+  rows,
   listRef,
 }: {
-  virtualizer: Virtualizer<HTMLDivElement, Element>;
+  rows: VirtualRows;
   listRef: RefObject<HTMLDivElement | null>;
 }) {
   const { flattenedSongs, hasActiveFilters, clearAllFilters, handlePlayFromFlattened } = useArchiveFilters();
@@ -893,25 +893,25 @@ function TimelineSongList({
           <div
             ref={listRef}
             style={{
-              height: `${virtualizer.getTotalSize()}px`,
+              height: `${rows.totalSize}px`,
               width: '100%',
               position: 'relative',
             }}
           >
-            {virtualizer.getVirtualItems().map(virtualItem => {
+            {rows.items.map(virtualItem => {
               const song = flattenedSongs[virtualItem.index];
               return (
                 <div
                   key={`${song.id}-${song.performanceId}`}
                   data-index={virtualItem.index}
-                  ref={virtualizer.measureElement}
+                  ref={rows.measureElement}
                   className="hover:z-10 focus-within:z-10"
                   style={{
                     position: 'absolute',
                     top: 0,
                     left: 0,
                     width: '100%',
-                    transform: `translateY(${virtualItem.start - (virtualizer.options.scrollMargin ?? 0)}px)`,
+                    transform: `translateY(${virtualItem.start - rows.scrollMargin}px)`,
                   }}
                 >
                   <TimelineRow
@@ -938,10 +938,10 @@ function TimelineSongList({
 
 
 function GroupedSongList({
-  virtualizer: groupedVirtualizer,
+  rows: groupedRows,
   listRef: groupedListRef,
 }: {
-  virtualizer: Virtualizer<HTMLDivElement, Element>;
+  rows: VirtualRows;
   listRef: RefObject<HTMLDivElement | null>;
 }) {
   const { groupedSongs, hasActiveFilters, clearAllFilters, handlePlayFromGrouped } = useArchiveFilters();
@@ -963,25 +963,25 @@ function GroupedSongList({
         <div
           ref={groupedListRef}
           style={{
-            height: `${groupedVirtualizer.getTotalSize()}px`,
+            height: `${groupedRows.totalSize}px`,
             width: '100%',
             position: 'relative',
           }}
         >
-          {groupedVirtualizer.getVirtualItems().map(virtualItem => {
+          {groupedRows.items.map(virtualItem => {
             const song = groupedSongs[virtualItem.index];
             return (
               <div
                 key={song.id}
                 data-index={virtualItem.index}
-                ref={groupedVirtualizer.measureElement}
+                ref={groupedRows.measureElement}
                 className="hover:z-10 focus-within:z-10"
                 style={{
                   position: 'absolute',
                   top: 0,
                   left: 0,
                   width: '100%',
-                  transform: `translateY(${virtualItem.start - (groupedVirtualizer.options.scrollMargin ?? 0)}px)`,
+                  transform: `translateY(${virtualItem.start - groupedRows.scrollMargin}px)`,
                   paddingBottom: '12px',
                 }}
               >
@@ -1016,12 +1016,12 @@ function MobileSearchTab() {
   const { slug } = useStreamer();
 
   const mobileSearchListRef = useRef<HTMLDivElement>(null);
-  const mobileSearchVirtualizer = useVirtualizer({
+  const mobileSearchRows = useVirtualRows({
     count: mobileTab === 'search' ? flattenedSongs.length : 0,
     getScrollElement: () => scrollContainerRef.current,
     estimateSize: () => 64,
     overscan: 15,
-    scrollMargin: mobileSearchListRef.current?.offsetTop ?? 0,
+    getListElement: () => mobileSearchListRef.current,
   });
 
   return (
@@ -1087,25 +1087,25 @@ function MobileSearchTab() {
                   <div
                     ref={mobileSearchListRef}
                     style={{
-                      height: `${mobileSearchVirtualizer.getTotalSize()}px`,
+                      height: `${mobileSearchRows.totalSize}px`,
                       width: '100%',
                       position: 'relative',
                     }}
                   >
-                    {mobileSearchVirtualizer.getVirtualItems().map(virtualItem => {
+                    {mobileSearchRows.items.map(virtualItem => {
                       const song = flattenedSongs[virtualItem.index];
                       return (
                         <div
                           key={`search-${song.id}-${song.performanceId}`}
                           data-index={virtualItem.index}
-                          ref={mobileSearchVirtualizer.measureElement}
+                          ref={mobileSearchRows.measureElement}
                           className="hover:z-10 focus-within:z-10"
                           style={{
                             position: 'absolute',
                             top: 0,
                             left: 0,
                             width: '100%',
-                            transform: `translateY(${virtualItem.start - (mobileSearchVirtualizer.options.scrollMargin ?? 0)}px)`,
+                            transform: `translateY(${virtualItem.start - mobileSearchRows.scrollMargin}px)`,
                           }}
                         >
                           <MobileSearchRow

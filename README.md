@@ -23,7 +23,7 @@ Prism currently archives **33** VTuber streamers. See [`data/registry.json`](dat
 - **React 19**
 - **TypeScript 5.9** (strict mode)
 - **Tailwind CSS 3.4**
-- **@tanstack/react-virtual** for virtualized lists
+- **@tanstack/virtual-core** for virtualized lists (wrapped by `app/lib/use-virtual-rows.ts`)
 
 ## Getting Started
 
