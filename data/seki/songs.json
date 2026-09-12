@@ -469,7 +469,9 @@
     "workId": "work-song-47e7ff59",
     "title": "一個人",
     "originalArtist": "蔡依林",
-    "tags": [],
+    "tags": [
+      "language:zh"
+    ],
     "performances": [
       {
         "id": "p-acca0617",
@@ -913,7 +915,9 @@
     "workId": "work-song-2687d79f",
     "title": "大眠",
     "originalArtist": "王心凌 Cyndi Wang",
-    "tags": [],
+    "tags": [
+      "language:zh"
+    ],
     "performances": [
       {
         "id": "p-d26fe1db",
@@ -929,7 +933,9 @@
     "workId": "work-song-2389",
     "title": "大眠",
     "originalArtist": "王心凌",
-    "tags": [],
+    "tags": [
+      "language:zh"
+    ],
     "performances": [
       {
         "id": "p-ee022acd",
@@ -1593,7 +1599,9 @@
     "workId": "work-song-415",
     "title": "天黑黑",
     "originalArtist": "孫燕姿",
-    "tags": [],
+    "tags": [
+      "language:zh"
+    ],
     "performances": [
       {
         "id": "p-4d4a3f76",
@@ -1707,7 +1715,9 @@
     "workId": "work-song-2e70ce0c",
     "title": "心引力",
     "originalArtist": "王俊凱 & 蔡依林",
-    "tags": [],
+    "tags": [
+      "language:zh"
+    ],
     "performances": [
       {
         "id": "p-29251523",
@@ -1871,7 +1881,9 @@
     "workId": "work-song-0d85b82c",
     "title": "月光",
     "originalArtist": "王心凌",
-    "tags": [],
+    "tags": [
+      "language:zh"
+    ],
     "performances": [
       {
         "id": "p-f043bdcd",
@@ -1955,7 +1967,9 @@
     "workId": "work-song-29176ab5",
     "title": "水星記",
     "originalArtist": "郭頂",
-    "tags": [],
+    "tags": [
+      "language:zh"
+    ],
     "performances": [
       {
         "id": "p-3a24644f",
@@ -2261,7 +2275,9 @@
     "workId": "work-song-679e37a8",
     "title": "半句再見",
     "originalArtist": "孫燕姿",
-    "tags": [],
+    "tags": [
+      "language:zh"
+    ],
     "performances": [
       {
         "id": "p-98d40fb9",
@@ -3703,7 +3719,9 @@
     "workId": "work-song-1844",
     "title": "你的行李",
     "originalArtist": "謝震廷",
-    "tags": [],
+    "tags": [
+      "language:zh"
+    ],
     "performances": [
       {
         "id": "p-713ed25c",
@@ -3889,7 +3907,9 @@
     "workId": "work-song-531",
     "title": "克卜勒",
     "originalArtist": "孫燕姿",
-    "tags": [],
+    "tags": [
+      "language:zh"
+    ],
     "performances": [
       {
         "id": "p-0a7519cd",
@@ -3987,7 +4007,9 @@
     "workId": "work-song-53c0d22b",
     "title": "妥協",
     "originalArtist": "蔡依林",
-    "tags": [],
+    "tags": [
+      "language:zh"
+    ],
     "performances": [
       {
         "id": "p-f3d82748",
@@ -4100,7 +4122,9 @@
     "workId": "work-song-4811f5a7",
     "title": "我不難過",
     "originalArtist": "孫燕姿",
-    "tags": [],
+    "tags": [
+      "language:zh"
+    ],
     "performances": [
       {
         "id": "p-9da0655a",
@@ -4549,7 +4573,9 @@
     "workId": "work-song-2478",
     "title": "我懷念的",
     "originalArtist": "孫燕姿",
-    "tags": [],
+    "tags": [
+      "language:zh"
+    ],
     "performances": [
       {
         "id": "p-4126fa12",
@@ -5870,7 +5896,9 @@
     "workId": "work-song-a3d6e11d",
     "title": "雨天",
     "originalArtist": "孫燕姿",
-    "tags": [],
+    "tags": [
+      "language:zh"
+    ],
     "performances": [
       {
         "id": "p-5b9d0a33",
@@ -5909,7 +5937,9 @@
     "workId": "work-song-be1d06a7",
     "title": "雨愛 2009《海派甜心》",
     "originalArtist": "楊丞琳",
-    "tags": [],
+    "tags": [
+      "language:zh"
+    ],
     "performances": [
       {
         "id": "p-3737e891",
@@ -6411,7 +6441,9 @@
     "workId": "work-song-587fcabf",
     "title": "看我72變",
     "originalArtist": "蔡依林",
-    "tags": [],
+    "tags": [
+      "language:zh"
+    ],
     "performances": [
       {
         "id": "p-6456ceb0",
@@ -6860,7 +6892,9 @@
     "workId": "work-song-44681e7b",
     "title": "倒帶",
     "originalArtist": "蔡依林",
-    "tags": [],
+    "tags": [
+      "language:zh"
+    ],
     "performances": [
       {
         "id": "p-75a1891e",
@@ -7600,7 +7634,9 @@
     "workId": "work-song-32a791fc",
     "title": "缺氧",
     "originalArtist": "楊丞琳",
-    "tags": [],
+    "tags": [
+      "language:zh"
+    ],
     "performances": [
       {
         "id": "p-353b3676",
@@ -8229,7 +8265,9 @@
     "workId": "work-song-615d3373",
     "title": "帶我走 2008《不良笑花》",
     "originalArtist": "楊丞琳",
-    "tags": [],
+    "tags": [
+      "language:zh"
+    ],
     "performances": [
       {
         "id": "p-5d406354",
@@ -8724,7 +8762,9 @@
     "workId": "work-song-195",
     "title": "魚仔",
     "originalArtist": "盧廣仲",
-    "tags": [],
+    "tags": [
+      "language:zh"
+    ],
     "performances": [
       {
         "id": "p-6026d604",
@@ -9148,7 +9188,9 @@
     "workId": "work-song-753c615b",
     "title": "斑馬斑馬",
     "originalArtist": "宋冬野",
-    "tags": [],
+    "tags": [
+      "language:zh"
+    ],
     "performances": [
       {
         "id": "p-f547e720",
@@ -10193,7 +10235,9 @@
     "workId": "work-song-4fc49677",
     "title": "愛你",
     "originalArtist": "王心凌",
-    "tags": [],
+    "tags": [
+      "language:zh"
+    ],
     "performances": [
       {
         "id": "p-f3bf0025",
@@ -10261,7 +10305,9 @@
     "workId": "work-song-3fe5e1f8",
     "title": "愛的天國 2004《天國的嫁衣》",
     "originalArtist": "王心凌",
-    "tags": [],
+    "tags": [
+      "language:zh"
+    ],
     "performances": [
       {
         "id": "p-cef12149",
@@ -10345,7 +10391,9 @@
     "workId": "work-song-f44e30ce",
     "title": "愛情36計",
     "originalArtist": "蔡依林",
-    "tags": [],
+    "tags": [
+      "language:zh"
+    ],
     "performances": [
       {
         "id": "p-ef711eb5",
@@ -10723,7 +10771,9 @@
     "workId": "work-song-e272ad72",
     "title": "當冬夜漸暖",
     "originalArtist": "孫燕姿",
-    "tags": [],
+    "tags": [
+      "language:zh"
+    ],
     "performances": [
       {
         "id": "p-d37935e1",
@@ -10739,7 +10789,9 @@
     "workId": "work-song-1561",
     "title": "當你",
     "originalArtist": "王心凌",
-    "tags": [],
+    "tags": [
+      "language:zh"
+    ],
     "performances": [
       {
         "id": "p-c2a6228a",
@@ -10930,7 +10982,9 @@
     "workId": "work-song-07107cd7",
     "title": "路過人間",
     "originalArtist": "郁可唯",
-    "tags": [],
+    "tags": [
+      "language:zh"
+    ],
     "performances": [
       {
         "id": "p-127b4ef3",
@@ -11001,7 +11055,9 @@
     "workId": "work-song-0c430370",
     "title": "遇見",
     "originalArtist": "孫燕姿",
-    "tags": [],
+    "tags": [
+      "language:zh"
+    ],
     "performances": [
       {
         "id": "p-d151b6dd",
@@ -11611,7 +11667,9 @@
     "workId": "work-song-a1cd84b7",
     "title": "舞孃",
     "originalArtist": "蔡依林",
-    "tags": [],
+    "tags": [
+      "language:zh"
+    ],
     "performances": [
       {
         "id": "p-ee68c561",
@@ -12485,7 +12543,9 @@
     "workId": "work-song-3620fe6d",
     "title": "曖昧",
     "originalArtist": "楊丞琳",
-    "tags": [],
+    "tags": [
+      "language:zh"
+    ],
     "performances": [
       {
         "id": "p-e49ae393",
@@ -12501,7 +12561,9 @@
     "workId": "work-song-521",
     "title": "濕了分寸",
     "originalArtist": "謝震廷",
-    "tags": [],
+    "tags": [
+      "language:zh"
+    ],
     "performances": [
       {
         "id": "p-26fbf6b9",
@@ -12524,7 +12586,9 @@
     "workId": "work-song-521",
     "title": "濕了分寸",
     "originalArtist": "謝震廷 Eli Hsieh",
-    "tags": [],
+    "tags": [
+      "language:zh"
+    ],
     "performances": [
       {
         "id": "p-1c0f382c",
@@ -12704,7 +12768,9 @@
     "workId": "work-song-4fd79695",
     "title": "騎士精神",
     "originalArtist": "蔡依林",
-    "tags": [],
+    "tags": [
+      "language:zh"
+    ],
     "performances": [
       {
         "id": "p-a11e3125",
@@ -13257,7 +13323,9 @@
     "workId": "work-song-36b58319",
     "title": "Alcohol Free",
     "originalArtist": "TWICE",
-    "tags": [],
+    "tags": [
+      "language:ko"
+    ],
     "performances": [
       {
         "id": "p-fdc9877c",
@@ -13273,7 +13341,9 @@
     "workId": "work-song-36b58319",
     "title": "Alcohol-Free",
     "originalArtist": "TWICE",
-    "tags": [],
+    "tags": [
+      "language:ko"
+    ],
     "performances": [
       {
         "id": "p-249e1cc8",
@@ -13544,7 +13614,9 @@
     "workId": "work-song-3119",
     "title": "Baby",
     "originalArtist": "Justin Bieber",
-    "tags": [],
+    "tags": [
+      "language:en"
+    ],
     "performances": [
       {
         "id": "p-ebe0cc30",
@@ -13821,7 +13893,9 @@
     "workId": "work-song-d1e66ca7",
     "title": "Boyfriend",
     "originalArtist": "Justin Bieber",
-    "tags": [],
+    "tags": [
+      "language:en"
+    ],
     "performances": [
       {
         "id": "p-a67b6dbe",
@@ -13853,7 +13927,9 @@
     "workId": "work-song-42c4ed95",
     "title": "Bubble Gum",
     "originalArtist": "NewJeans",
-    "tags": [],
+    "tags": [
+      "language:ko"
+    ],
     "performances": [
       {
         "id": "p-8021fe56",
@@ -14461,7 +14537,9 @@
     "workId": "work-song-d74113d8",
     "title": "Die with a Smile",
     "originalArtist": "Lady Gaga & Bruno Mars",
-    "tags": [],
+    "tags": [
+      "language:en"
+    ],
     "performances": [
       {
         "id": "p-888ede30",
@@ -14507,7 +14585,9 @@
     "workId": "work-song-4ec7244e",
     "title": "Ditto",
     "originalArtist": "NewJeans",
-    "tags": [],
+    "tags": [
+      "language:ko"
+    ],
     "performances": [
       {
         "id": "p-9b80eeca",
@@ -14530,7 +14610,9 @@
     "workId": "work-song-29fed31d",
     "title": "DIVE",
     "originalArtist": "TWICE",
-    "tags": [],
+    "tags": [
+      "language:ja"
+    ],
     "performances": [
       {
         "id": "p-d638f6d6",
@@ -14859,7 +14941,9 @@
     "workId": "work-song-a5e59796",
     "title": "Feel Special",
     "originalArtist": "TWICE",
-    "tags": [],
+    "tags": [
+      "language:ko"
+    ],
     "performances": [
       {
         "id": "p-d32da99c",
@@ -14875,7 +14959,9 @@
     "workId": "work-song-52e50d21",
     "title": "Feel Special (piano ver.)",
     "originalArtist": "TWICE",
-    "tags": [],
+    "tags": [
+      "language:ko"
+    ],
     "performances": [
       {
         "id": "p-075aa16b",
@@ -15609,7 +15695,9 @@
     "workId": "work-song-0ba6de74",
     "title": "How Sweet",
     "originalArtist": "NewJeans",
-    "tags": [],
+    "tags": [
+      "language:ko"
+    ],
     "performances": [
       {
         "id": "p-cd1f9ef7",
@@ -15671,7 +15759,9 @@
     "workId": "work-song-2338cdd2",
     "title": "Hype Boy",
     "originalArtist": "NewJeans",
-    "tags": [],
+    "tags": [
+      "language:ko"
+    ],
     "performances": [
       {
         "id": "p-f9f82b0f",
@@ -15723,7 +15813,9 @@
     "workId": "work-song-5ed5c25d",
     "title": "I Can't Stop Me",
     "originalArtist": "TWICE",
-    "tags": [],
+    "tags": [
+      "language:ko"
+    ],
     "performances": [
       {
         "id": "p-7c1a6b0a",
@@ -16749,7 +16841,9 @@
     "workId": "work-song-429a1742",
     "title": "Like OOH-AHH",
     "originalArtist": "TWICE",
-    "tags": [],
+    "tags": [
+      "language:ko"
+    ],
     "performances": [
       {
         "id": "p-add0d4cf",
@@ -16961,7 +17055,9 @@
     "workId": "work-song-1283",
     "title": "Love Yourself",
     "originalArtist": "Justin Bieber",
-    "tags": [],
+    "tags": [
+      "language:en"
+    ],
     "performances": [
       {
         "id": "p-73193cac",
@@ -17354,7 +17450,9 @@
     "workId": "work-song-74b07298",
     "title": "MOONLIGHT SUNRISE",
     "originalArtist": "TWICE",
-    "tags": [],
+    "tags": [
+      "language:en"
+    ],
     "performances": [
       {
         "id": "p-53a617fb",
@@ -17393,7 +17491,9 @@
     "workId": "work-song-652a8e11",
     "title": "Mr. Q",
     "originalArtist": "蔡依林",
-    "tags": [],
+    "tags": [
+      "language:zh"
+    ],
     "performances": [
       {
         "id": "p-03813359",
@@ -17457,7 +17557,9 @@
     "workId": "work-song-601c6a8b",
     "title": "New Jeans",
     "originalArtist": "NewJeans",
-    "tags": [],
+    "tags": [
+      "language:ko"
+    ],
     "performances": [
       {
         "id": "p-87efc688",
@@ -17681,7 +17783,9 @@
     "workId": "work-song-42bf7137",
     "title": "OMG",
     "originalArtist": "NewJeans",
-    "tags": [],
+    "tags": [
+      "language:ko"
+    ],
     "performances": [
       {
         "id": "p-6b44a9e7",
@@ -17991,7 +18095,9 @@
     "workId": "work-song-6dc0058e",
     "title": "Peaches (Acoustic ver.)",
     "originalArtist": "Justin Bieber",
-    "tags": [],
+    "tags": [
+      "language:en"
+    ],
     "performances": [
       {
         "id": "p-f739b9e6",
@@ -18130,7 +18236,9 @@
     "workId": "work-song-29cb5949",
     "title": "Play我呸",
     "originalArtist": "蔡依林",
-    "tags": [],
+    "tags": [
+      "language:zh"
+    ],
     "performances": [
       {
         "id": "p-f1a2c697",
@@ -18500,7 +18608,9 @@
     "workId": "work-song-41e0886e",
     "title": "Run Away",
     "originalArtist": "Tzuyu(TWICE)",
-    "tags": [],
+    "tags": [
+      "language:ko"
+    ],
     "performances": [
       {
         "id": "p-14978452",
@@ -18682,7 +18792,9 @@
     "workId": "work-song-105ea145",
     "title": "SexyBack",
     "originalArtist": "Justin Timberlake ( 賈斯汀 )",
-    "tags": [],
+    "tags": [
+      "language:en"
+    ],
     "performances": [
       {
         "id": "p-a7771345",
@@ -18698,7 +18810,9 @@
     "workId": "work-song-0b7e62b4",
     "title": "Shallow",
     "originalArtist": "Lady Gaga & Bradley Cooper",
-    "tags": [],
+    "tags": [
+      "language:en"
+    ],
     "performances": [
       {
         "id": "p-1eef50f6",
@@ -19128,7 +19242,9 @@
     "workId": "work-song-a1371cdd",
     "title": "STAY",
     "originalArtist": "Justin Bieber",
-    "tags": [],
+    "tags": [
+      "language:en"
+    ],
     "performances": [
       {
         "id": "p-d1ebbcb0",
@@ -19251,7 +19367,9 @@
     "workId": "work-song-3f56ef53",
     "title": "Supernatural",
     "originalArtist": "NewJeans",
-    "tags": [],
+    "tags": [
+      "language:ja"
+    ],
     "performances": [
       {
         "id": "p-73d2e466",
