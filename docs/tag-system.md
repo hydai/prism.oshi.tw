@@ -27,8 +27,9 @@ search tab) only appear once a streamer has at least one tagged song.
    curator changed in between — including one whose delta looked like a no-op — is
    skipped (never overwritten) and reported; reload and apply again for those.
 3. *未標語言* + sort by performances finds the most-played works without a
-   language. Tagging one work per frequent original artist is enough: the fill
-   command propagates it to that artist's other works.
+   language. Tag at least two works per frequent original artist with the same
+   language: the fill propagates only from two or more agreeing works (L3's 2 / 75%
+   rule), so a single seed does nothing.
 4. Editing a work's tags invalidates any in-flight Harmonizer merge preview of
    that work (the merge guard's intent) and marks every linked streamer stale
    for `sync:status` / `sync:stale`.
@@ -70,7 +71,7 @@ reappear in the next preview. Anime and game are curator-only.
 1. Record a Time Travel bookmark, apply `admin/migrations/0010_fan_export_works_update.sql` (requires 0009, which production already has; SQLite accepts a trigger against a missing table, so a wrong order would only surface as a 500 on the first tag write).
 2. Deploy the admin worker (`/deploy-admin`).
 3. `npm run tags:fill`, review, then `npm run tags:fill -- --apply`.
-4. Tag one work per frequent artist in the Global Library, run the fill again.
+4. Tag two works per frequent artist (same language) in the Global Library, run the fill again.
 5. `/sync-stale`, commit, push.
 
 The site can be deployed at any point: without tag data the chip rows are hidden.
