@@ -883,7 +883,9 @@
     "workId": "work-song-1d52eb7c",
     "title": "玫瑰少年",
     "originalArtist": "蔡依林 Jolin Tsai",
-    "tags": [],
+    "tags": [
+      "language:zh"
+    ],
     "performances": [
       {
         "id": "p-6cac2631",
@@ -1201,7 +1203,9 @@
     "workId": "work-song-195",
     "title": "魚仔",
     "originalArtist": "盧廣仲",
-    "tags": [],
+    "tags": [
+      "language:zh"
+    ],
     "performances": [
       {
         "id": "p-dfc98167",
@@ -1249,7 +1253,9 @@
     "workId": "work-song-753c615b",
     "title": "斑馬斑馬",
     "originalArtist": "宋冬野",
-    "tags": [],
+    "tags": [
+      "language:zh"
+    ],
     "performances": [
       {
         "id": "p-46c2d286",
@@ -1410,7 +1416,9 @@
     "workId": "work-song-1396",
     "title": "極楽浄土",
     "originalArtist": "GARNiDELiA",
-    "tags": [],
+    "tags": [
+      "language:ja"
+    ],
     "performances": [
       {
         "id": "p-2cc24ba0",
@@ -1442,7 +1450,9 @@
     "workId": "work-song-07107cd7",
     "title": "路過人間",
     "originalArtist": "郁可唯",
-    "tags": [],
+    "tags": [
+      "language:zh"
+    ],
     "performances": [
       {
         "id": "p-2df3477f",
@@ -1769,7 +1779,9 @@
     "workId": "work-song-36b58319",
     "title": "Alcohol-Free",
     "originalArtist": "TWICE",
-    "tags": [],
+    "tags": [
+      "language:ko"
+    ],
     "performances": [
       {
         "id": "p-5c5c258d",
@@ -1785,7 +1797,9 @@
     "workId": "work-song-0f4d0182",
     "title": "Always Remember Us This Way",
     "originalArtist": "Lady Gaga",
-    "tags": [],
+    "tags": [
+      "language:en"
+    ],
     "performances": [
       {
         "id": "p-c16dbbb3",
@@ -2052,7 +2066,9 @@
     "workId": "work-song-42c4ed95",
     "title": "Bubble Gum",
     "originalArtist": "NewJeans",
-    "tags": [],
+    "tags": [
+      "language:ko"
+    ],
     "performances": [
       {
         "id": "p-e942957e",
@@ -2100,7 +2116,9 @@
     "workId": "work-song-d42f056c",
     "title": "Cool With You",
     "originalArtist": "NewJeans",
-    "tags": [],
+    "tags": [
+      "language:ko"
+    ],
     "performances": [
       {
         "id": "p-41dc300e",
@@ -2148,7 +2166,9 @@
     "workId": "work-song-12",
     "title": "Dangerous Woman",
     "originalArtist": "Ariana Grande",
-    "tags": [],
+    "tags": [
+      "language:en"
+    ],
     "performances": [
       {
         "id": "p-952c8d3f",
@@ -2196,7 +2216,9 @@
     "workId": "work-song-d74113d8",
     "title": "Die With A Smile",
     "originalArtist": "Lady Gaga, Bruno Mars",
-    "tags": [],
+    "tags": [
+      "language:en"
+    ],
     "performances": [
       {
         "id": "p-b8c9895a",
@@ -2219,7 +2241,9 @@
     "workId": "work-song-c7929255",
     "title": "Disease",
     "originalArtist": "Lady Gaga",
-    "tags": [],
+    "tags": [
+      "language:en"
+    ],
     "performances": [
       {
         "id": "p-020fbef1",
@@ -2251,7 +2275,9 @@
     "workId": "work-song-4ec7244e",
     "title": "Ditto",
     "originalArtist": "NewJeans",
-    "tags": [],
+    "tags": [
+      "language:ko"
+    ],
     "performances": [
       {
         "id": "p-89e076d3",
@@ -2379,7 +2405,9 @@
     "workId": "work-song-8375b82a",
     "title": "ETA",
     "originalArtist": "NewJeans",
-    "tags": [],
+    "tags": [
+      "language:ko"
+    ],
     "performances": [
       {
         "id": "p-d678a10c",
@@ -2395,7 +2423,9 @@
     "workId": "work-song-1cf181c5",
     "title": "Fish Love",
     "originalArtist": "蔡依林",
-    "tags": [],
+    "tags": [
+      "language:zh"
+    ],
     "performances": [
       {
         "id": "p-954c8b92",
@@ -2534,7 +2564,9 @@
     "workId": "work-song-264",
     "title": "GODS",
     "originalArtist": "NewJeans",
-    "tags": [],
+    "tags": [
+      "language:en"
+    ],
     "performances": [
       {
         "id": "p-b966bc36",
@@ -2614,7 +2646,9 @@
     "workId": "work-song-0ba6de74",
     "title": "How Sweet",
     "originalArtist": "NewJeans",
-    "tags": [],
+    "tags": [
+      "language:ko"
+    ],
     "performances": [
       {
         "id": "p-a9b25da3",
@@ -2669,7 +2703,9 @@
     "workId": "work-song-2338cdd2",
     "title": "Hype Boy",
     "originalArtist": "NewJeans",
-    "tags": [],
+    "tags": [
+      "language:ko"
+    ],
     "performances": [
       {
         "id": "p-17fd4801",
@@ -3059,7 +3095,9 @@
     "workId": "work-song-23297824",
     "title": "Million Reasons (Piano ver.)",
     "originalArtist": "Lady Gaga",
-    "tags": [],
+    "tags": [
+      "language:en"
+    ],
     "performances": [
       {
         "id": "p-8bf44d06",
@@ -3189,7 +3227,9 @@
     "workId": "work-song-42bf7137",
     "title": "OMG",
     "originalArtist": "NewJeans",
-    "tags": [],
+    "tags": [
+      "language:ko"
+    ],
     "performances": [
       {
         "id": "p-e49aa711",
@@ -3619,7 +3659,9 @@
     "workId": "work-song-2161",
     "title": "Style",
     "originalArtist": "Taylor Swift",
-    "tags": [],
+    "tags": [
+      "language:en"
+    ],
     "performances": [
       {
         "id": "p-bacc254c",
@@ -3651,7 +3693,9 @@
     "workId": "work-song-aee429a9",
     "title": "Super Shy",
     "originalArtist": "NewJeans",
-    "tags": [],
+    "tags": [
+      "language:ko"
+    ],
     "performances": [
       {
         "id": "p-ea902f01",
@@ -3667,7 +3711,9 @@
     "workId": "work-song-3f56ef53",
     "title": "Supernatural",
     "originalArtist": "NewJeans",
-    "tags": [],
+    "tags": [
+      "language:ja"
+    ],
     "performances": [
       {
         "id": "p-933f26ef",
@@ -3933,7 +3979,9 @@
     "workId": "work-song-2503",
     "title": "TT",
     "originalArtist": "TWICE",
-    "tags": [],
+    "tags": [
+      "language:ko"
+    ],
     "performances": [
       {
         "id": "p-f8825e94",
@@ -3949,7 +3997,9 @@
     "workId": "work-song-7c2dd8f9",
     "title": "TT (可愛玥&煦ver)",
     "originalArtist": "TWICE",
-    "tags": [],
+    "tags": [
+      "language:ko"
+    ],
     "performances": [
       {
         "id": "p-9b985e0c",
