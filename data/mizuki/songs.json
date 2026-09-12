@@ -3518,9 +3518,9 @@
   },
   {
     "id": "song-2090",
-    "workId": "work-song-2090",
+    "workId": "work-song-4649fd60",
     "title": "天樂",
-    "originalArtist": "鏡音リン",
+    "originalArtist": "ゆうゆ feat. 鏡音リン",
     "tags": [
       "language:ja",
       "source:vocaloid"
@@ -3537,11 +3537,12 @@
   },
   {
     "id": "song-803",
-    "workId": "work-song-803",
+    "workId": "work-song-4649fd60",
     "title": "天樂",
-    "originalArtist": "ゆうゆ",
+    "originalArtist": "ゆうゆ feat. 鏡音リン",
     "tags": [
-      "language:ja"
+      "language:ja",
+      "source:vocaloid"
     ],
     "performances": [
       {
@@ -24144,10 +24145,12 @@
   },
   {
     "id": "song-2781",
-    "workId": "work-song-2781",
+    "workId": "work-song-1077",
     "title": "新宝島",
-    "originalArtist": "魚韻",
-    "tags": [],
+    "originalArtist": "サカナクション",
+    "tags": [
+      "language:ja"
+    ],
     "performances": [
       {
         "id": "p2781-1",
@@ -24155,6 +24158,31 @@
         "videoId": "bTbqEJt-cE8",
         "timestamp": 20248,
         "endTimestamp": 20554
+      }
+    ]
+  },
+  {
+    "id": "song-731",
+    "workId": "work-song-1077",
+    "title": "新宝島",
+    "originalArtist": "サカナクション",
+    "tags": [
+      "language:ja"
+    ],
+    "performances": [
+      {
+        "id": "p731-2",
+        "streamId": "stream-2022-03-25",
+        "videoId": "kCGHzhncYmA",
+        "timestamp": 3534,
+        "endTimestamp": 3840
+      },
+      {
+        "id": "p731-1",
+        "streamId": "stream-2022-03-20",
+        "videoId": "qfSIq225Wvo",
+        "timestamp": 4672,
+        "endTimestamp": 4978
       }
     ]
   },
@@ -24201,31 +24229,6 @@
         "videoId": "npGCiM0lgmk",
         "timestamp": 2512,
         "endTimestamp": 2740
-      }
-    ]
-  },
-  {
-    "id": "song-731",
-    "workId": "work-song-731",
-    "title": "新寶島",
-    "originalArtist": "サカナクション",
-    "tags": [
-      "language:ja"
-    ],
-    "performances": [
-      {
-        "id": "p731-2",
-        "streamId": "stream-2022-03-25",
-        "videoId": "kCGHzhncYmA",
-        "timestamp": 3534,
-        "endTimestamp": 3840
-      },
-      {
-        "id": "p731-1",
-        "streamId": "stream-2022-03-20",
-        "videoId": "qfSIq225Wvo",
-        "timestamp": 4672,
-        "endTimestamp": 4978
       }
     ]
   },
@@ -24366,8 +24369,8 @@
   },
   {
     "id": "song-3aaa70ce",
-    "workId": "work-song-3aaa70ce",
-    "title": "極樂淨土",
+    "workId": "work-song-1396",
+    "title": "極楽浄土",
     "originalArtist": "GARNiDELiA",
     "tags": [
       "language:ja"
