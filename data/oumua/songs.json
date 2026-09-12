@@ -20,7 +20,9 @@
     "workId": "work-song-1fed704d",
     "title": "私は雨",
     "originalArtist": "25時、ナイトコードで。",
-    "tags": [],
+    "tags": [
+      "language:ja"
+    ],
     "performances": [
       {
         "id": "p-a719c459",
@@ -36,7 +38,9 @@
     "workId": "work-song-84429954",
     "title": "見ル見エル",
     "originalArtist": "未来古代楽団 feat. 安次嶺希和子",
-    "tags": [],
+    "tags": [
+      "language:ja"
+    ],
     "performances": [
       {
         "id": "p-c9cd566e",
@@ -52,7 +56,9 @@
     "workId": "work-song-6dc769fc",
     "title": "星の消えた夜に",
     "originalArtist": "Aimer",
-    "tags": [],
+    "tags": [
+      "language:ja"
+    ],
     "performances": [
       {
         "id": "p-1ffb2798",
@@ -100,7 +106,9 @@
     "workId": "work-song-33e2f24d",
     "title": "歌よ",
     "originalArtist": "Belle",
-    "tags": [],
+    "tags": [
+      "language:ja"
+    ],
     "performances": [
       {
         "id": "p-144eb5c8",
@@ -116,7 +124,9 @@
     "workId": "work-song-e1516aa3",
     "title": "蜜月アン・ドゥ・トロワ",
     "originalArtist": "DATEKEN",
-    "tags": [],
+    "tags": [
+      "language:ja"
+    ],
     "performances": [
       {
         "id": "p-c4674960",
@@ -132,7 +142,9 @@
     "workId": "work-song-466892a4",
     "title": "銀の旧約",
     "originalArtist": "未来古代楽団",
-    "tags": [],
+    "tags": [
+      "language:ja"
+    ],
     "performances": [
       {
         "id": "p-1c48a22f",
@@ -148,7 +160,9 @@
     "workId": "work-song-099c64d0",
     "title": "醒めない夢の微睡みの",
     "originalArtist": "未来古代楽団 feat. Lucia",
-    "tags": [],
+    "tags": [
+      "language:ja"
+    ],
     "performances": [
       {
         "id": "p-337fd8eb",
@@ -196,7 +210,9 @@
     "workId": "work-song-0ed1e3da",
     "title": "mimizuqu",
     "originalArtist": "sasakure. UK feat.ダズビー",
-    "tags": [],
+    "tags": [
+      "language:ja"
+    ],
     "performances": [
       {
         "id": "p-fc9b0b1d",
@@ -212,7 +228,9 @@
     "workId": "work-song-268949e6",
     "title": "ninelie",
     "originalArtist": "Aimer",
-    "tags": [],
+    "tags": [
+      "language:ja"
+    ],
     "performances": [
       {
         "id": "p-3964a82a",
@@ -228,7 +246,9 @@
     "workId": "work-song-268949e6",
     "title": "Ninelie",
     "originalArtist": "Aimer",
-    "tags": [],
+    "tags": [
+      "language:ja"
+    ],
     "performances": [
       {
         "id": "p-6682a536",
@@ -244,7 +264,9 @@
     "workId": "work-song-f18d44e4",
     "title": "ここにいる",
     "originalArtist": "Aiobahn & rionos",
-    "tags": [],
+    "tags": [
+      "language:ja"
+    ],
     "performances": [
       {
         "id": "p-803cab0d",
@@ -260,7 +282,9 @@
     "workId": "work-song-5b51f17e",
     "title": "シニカルナイトブラン",
     "originalArtist": "霧山 一(CV.梅原裕一郎)×宇和島 麒平(CV.森嶋秀太)",
-    "tags": [],
+    "tags": [
+      "language:ja"
+    ],
     "performances": [
       {
         "id": "p-81ab9c9b",
@@ -276,7 +300,9 @@
     "workId": "work-song-5524c14a",
     "title": "ターミナルセンター",
     "originalArtist": "春野",
-    "tags": [],
+    "tags": [
+      "language:ja"
+    ],
     "performances": [
       {
         "id": "p-dc274a39",
@@ -292,7 +318,9 @@
     "workId": "work-song-a5ab7ea2",
     "title": "ハシタイロ",
     "originalArtist": "rionos",
-    "tags": [],
+    "tags": [
+      "language:ja"
+    ],
     "performances": [
       {
         "id": "p-d6e6ae28",
@@ -308,7 +336,9 @@
     "workId": "work-song-ea4bd25d",
     "title": "ユメミ",
     "originalArtist": "r-906",
-    "tags": [],
+    "tags": [
+      "language:ja"
+    ],
     "performances": [
       {
         "id": "p-6dbfa3a9",
@@ -324,7 +354,9 @@
     "workId": "work-song-8190c8db",
     "title": "ラグトレン（不准剪）",
     "originalArtist": "かいりきベア",
-    "tags": [],
+    "tags": [
+      "language:ja"
+    ],
     "performances": [
       {
         "id": "p-78c73611",
@@ -340,7 +372,9 @@
     "workId": "work-song-3af82b9b",
     "title": "ルーマー",
     "originalArtist": "ポリスピカデリー",
-    "tags": [],
+    "tags": [
+      "language:ja"
+    ],
     "performances": [
       {
         "id": "p-5a8cecfa",
