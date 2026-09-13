@@ -40,7 +40,7 @@ The app serves multiple VTuber archives from a single codebase. Each streamer ha
 - Data directory at `data/{slug}/` with `songs.json` and `streams.json`
 - Dynamic route at `app/[streamer]/` with static generation via `generateStaticParams()`
 - Per-streamer CSS theme injected by `StreamerShell.tsx` onto `document.body`
-- Isolated localStorage keys: `prism_{slug}_playlists`, `prism_{slug}_liked_songs`
+- Isolated localStorage keys: `prism_{slug}_playlists`, `prism_{slug}_liked_songs`, `prism_{slug}_recently_played` — identity rules and the live/missing/unknown resolution are in `docs/saved-playback-identity.md`
 
 ### Data Flow
 
