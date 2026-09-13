@@ -11,11 +11,12 @@ import type {
 import type { PerformanceRef } from '../types/archive';
 
 export type Track = PerformanceRef & {
-  /** Set by playlists whose performance no longer exists in the archive. */
+  /** Set by any saved-item consumer (playlists, likes, recents) whose performance is missing from the loaded catalog. */
   deleted?: boolean;
 };
 
 export interface QueueEntry extends PerformanceRef {
+  /** See Track.deleted — the queue only renders it; advance logic skips it. */
   deleted?: boolean;
   queueEntryId: string;
 }
