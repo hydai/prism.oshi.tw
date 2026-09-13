@@ -8,31 +8,19 @@ import {
   useState,
   ReactNode,
 } from 'react';
-import {
-  dedupePlaylistVersions,
-  type StorageSaveResult,
-} from '../lib/playlist-storage';
-import type { PerformanceRef } from '../types/archive';
-import { normalizeStoredRef } from '../lib/normalize-performance-ref';
+import { type StorageSaveResult } from '../lib/playlist-storage';
 import { pickPerformanceRef } from '../lib/archive';
 import { createPersistedStore, usePersistedStore } from '../lib/persisted-store';
+import {
+  buildEnvelope,
+  parsePlaylists,
+  validateImport,
+  type Playlist,
+  type PlaylistExportEnvelope,
+  type PlaylistVersion,
+} from '../lib/playlist-envelope';
 
-export type PlaylistVersion = PerformanceRef;
-
-export interface Playlist {
-  id: string;
-  name: string;
-  versions: PlaylistVersion[];
-  createdAt: number;
-  updatedAt: number;
-}
-
-export interface PlaylistExportEnvelope {
-  version: 1 | 2;
-  exportedAt: string;
-  source: 'Prism';
-  playlists: Playlist[];
-}
+export type { Playlist, PlaylistVersion } from '../lib/playlist-envelope';
 
 interface PlaylistContextType {
   playlists: Playlist[];
@@ -76,81 +64,6 @@ function downloadJson(data: PlaylistExportEnvelope, filename: string) {
   a.click();
   document.body.removeChild(a);
   URL.revokeObjectURL(url);
-}
-
-function buildEnvelope(playlists: Playlist[]): PlaylistExportEnvelope {
-  return {
-    version: 2,
-    exportedAt: new Date().toISOString(),
-    source: 'Prism',
-    playlists,
-  };
-}
-
-function validateImport(data: unknown, streamerSlug: string): { valid: true; playlists: Playlist[] } | { valid: false; error: string } {
-  if (!data || typeof data !== 'object') {
-    return { valid: false, error: '檔案格式無效' };
-  }
-
-  const envelope = data as Record<string, unknown>;
-
-  if (envelope.source !== 'Prism' && envelope.source !== 'MizukiPrism') {
-    return { valid: false, error: '非 Prism 匯出檔案' };
-  }
-
-  if (envelope.version !== 1 && envelope.version !== 2) {
-    return { valid: false, error: '檔案版本不支援' };
-  }
-
-  const importVersion = envelope.version as 1 | 2;
-
-  if (!Array.isArray(envelope.playlists) || envelope.playlists.length === 0) {
-    return { valid: false, error: '檔案不含播放清單' };
-  }
-
-  const validPlaylists: Playlist[] = [];
-  for (const item of envelope.playlists as unknown[]) {
-    const p = item as Partial<Playlist>;
-    if (
-      typeof p.id === 'string' &&
-      typeof p.name === 'string' &&
-      Array.isArray(p.versions) &&
-      typeof p.createdAt === 'number' &&
-      typeof p.updatedAt === 'number'
-    ) {
-      // For v1 imports, inject default streamerSlug into versions
-      const versions = importVersion === 1
-        ? p.versions.flatMap((version) => { const ref = normalizeStoredRef(version, 'mizuki'); return ref ? [ref] : []; })
-        : p.versions.flatMap((version) => { const ref = normalizeStoredRef(version, streamerSlug); return ref ? [ref] : []; });
-      validPlaylists.push({
-        id: p.id,
-        name: p.name,
-        versions: dedupePlaylistVersions(versions),
-        createdAt: p.createdAt,
-        updatedAt: p.updatedAt,
-      });
-    }
-  }
-
-  if (validPlaylists.length === 0) {
-    return { valid: false, error: '檔案不含有效的播放清單' };
-  }
-
-  return { valid: true, playlists: validPlaylists };
-}
-
-function parsePlaylists(raw: unknown, streamerSlug: string): Playlist[] {
-  if (!Array.isArray(raw)) return [];
-  return raw.flatMap((item) => {
-    const p = item as Partial<Playlist> | null;
-    if (!p || typeof p.id !== 'string' || typeof p.name !== 'string') return [];
-    const versions = dedupePlaylistVersions((p.versions ?? []).flatMap((v) => {
-      const ref = normalizeStoredRef(v, streamerSlug);
-      return ref ? [ref] : [];
-    }));
-    const createdAt = typeof p.createdAt === 'number' ? p.createdAt : Date.now();
-    return [{ id: p.id, name: p.name, versions, createdAt, updatedAt: typeof p.updatedAt === 'number' ? p.updatedAt : createdAt }];
-  });
 }
 
 function newPlaylistId(): string {
