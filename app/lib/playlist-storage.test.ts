@@ -15,6 +15,14 @@ const duplicateVersions = [
 ];
 assert.deepEqual(dedupePlaylistVersions(duplicateVersions), duplicateVersions.slice(0, 2));
 
+// Same workId, different performanceId → two entries; workId is never identity.
+const sameWork = [
+  { performanceId: 'performance-1', workId: 'work-1' },
+  { performanceId: 'performance-2', workId: 'work-1' },
+  { performanceId: 'performance-1', workId: 'work-1' },
+];
+assert.deepEqual(dedupePlaylistVersions(sameWork), sameWork.slice(0, 2));
+
 type SetItemCall = [key: string, value: string];
 
 function memoryStorage(calls: SetItemCall[]): Pick<Storage, 'setItem'> {

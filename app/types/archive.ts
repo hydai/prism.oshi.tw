@@ -5,6 +5,8 @@ export type ArchiveSong = Omit<Song, "performances"> & { performances: ArchivePe
 
 export interface FlattenedSong {
   id: string;
+  /** Composition identity copied from the song; absent on legacy exports. Grouping only — never a lookup key. */
+  workId?: string;
   title: string;
   originalArtist: string;
   tags: string[];
@@ -31,11 +33,18 @@ export interface StreamSummary {
  * The one in-memory currency for "a performance to play, like or save".
  * Field names match the persisted formats (liked songs, recent plays,
  * playlists, export files) so no disk migration is ever needed.
+ *
+ * Identity is `performanceId` alone. `songId`/`workId` are advisory grouping
+ * metadata; title, artist, video and timestamps are a snapshot that only
+ * matters when the loaded catalog cannot resolve the performance
+ * (app/lib/saved-refs.ts, docs/saved-playback-identity.md).
  */
 export interface PerformanceRef {
   performanceId: string;
-  /** May be a legacy placeholder equal to performanceId (entries saved before songId was stored); never use it for lookups without a performanceId fallback. */
+  /** The song id the UI held when the ref was built: in the grouped view the work group's canonical member; on entries saved before songId was stored a placeholder equal to performanceId. Never use it for lookups. */
   songId: string;
+  /** Composition identity from the catalog; absent on entries saved before it was stored. Never a lookup key. */
+  workId?: string;
   songTitle: string;
   originalArtist: string;
   videoId: string;
