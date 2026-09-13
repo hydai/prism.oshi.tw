@@ -20,6 +20,7 @@ import {
   sortGroupedSongs,
 } from '../lib/archive';
 import { loadArchiveData, type ArchiveLoadState } from '../lib/archive-loader';
+import { buildPerformanceIndex, type PerformanceIndex } from '../lib/saved-refs';
 import type { ArchiveSong, FlattenedSong, StreamSummary } from '../types/archive';
 
 interface ArchiveDataValue {
@@ -33,6 +34,13 @@ interface ArchiveDataValue {
   /** Unfiltered catalogs — consumed by ArchiveFiltersProvider, not by sections. */
   allFlattenedSongs: FlattenedSong[];
   allGroupedSongs: ArchiveSong[];
+  /**
+   * performanceId → owning song + performance. `null` until the catalog is
+   * ready (loading/error), so saved items are never judged against an empty
+   * catalog. Stage 2 sharding must keep this null until every performance
+   * shard has arrived.
+   */
+  performanceIndex: PerformanceIndex | null;
 }
 
 const ArchiveDataContext = createContext<ArchiveDataValue | null>(null);
@@ -87,10 +95,14 @@ export function ArchiveDataProvider({ children }: { children: ReactNode }) {
   const availableTags = useMemo(() => getAvailableTags(songs), [songs]);
   const allFlattenedSongs = useMemo(() => flattenSongs(songs), [songs]);
   const allGroupedSongs = useMemo(() => sortGroupedSongs(groupSongsByWorkId(songs)), [songs]);
+  const performanceIndex = useMemo(
+    () => (loadState === 'ready' ? buildPerformanceIndex(songs) : null),
+    [songs, loadState],
+  );
 
   const value = useMemo<ArchiveDataValue>(
-    () => ({ songs, streams, loadState, retryLoad, allArtists, availableYears, availableTags, allFlattenedSongs, allGroupedSongs }),
-    [songs, streams, loadState, retryLoad, allArtists, availableYears, availableTags, allFlattenedSongs, allGroupedSongs],
+    () => ({ songs, streams, loadState, retryLoad, allArtists, availableYears, availableTags, allFlattenedSongs, allGroupedSongs, performanceIndex }),
+    [songs, streams, loadState, retryLoad, allArtists, availableYears, availableTags, allFlattenedSongs, allGroupedSongs, performanceIndex],
   );
 
   return <ArchiveDataContext.Provider value={value}>{children}</ArchiveDataContext.Provider>;

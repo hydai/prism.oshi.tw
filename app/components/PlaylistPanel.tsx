@@ -3,8 +3,8 @@
 import { useState, useMemo, useRef } from 'react';
 import { Download, ListMusic, Upload } from 'lucide-react';
 import { usePlaylist, type Playlist } from '../contexts/PlaylistContext';
-import { usePlayerActions, type Track } from '../contexts/PlayerContext';
-import type { ArchiveSong } from '../types/archive';
+import { usePlayerActions } from '../contexts/PlayerContext';
+import { playableQueue, resolveSavedRefs, type PerformanceIndex, type ResolvedRef } from '../lib/saved-refs';
 import BottomSheet from './BottomSheet';
 import PlaylistDetailsView from './PlaylistDetailsView';
 import PlaylistListView from './PlaylistListView';
@@ -12,11 +12,12 @@ import PlaylistListView from './PlaylistListView';
 interface PlaylistPanelProps {
   show: boolean;
   onClose: () => void;
-  songsData: ArchiveSong[];
+  /** null while the catalog is loading or failed — nothing is marked missing then. */
+  performanceIndex: PerformanceIndex | null;
   onToast?: (message: string) => void;
 }
 
-export default function PlaylistPanel({ show, onClose, songsData, onToast }: PlaylistPanelProps) {
+export default function PlaylistPanel({ show, onClose, performanceIndex, onToast }: PlaylistPanelProps) {
   const [selectedPlaylistId, setSelectedPlaylistId] = useState<string | null>(null);
   const [draggedIndex, setDraggedIndex] = useState<number | null>(null);
   const [draggedOverIndex, setDraggedOverIndex] = useState<number | null>(null);
@@ -59,23 +60,17 @@ export default function PlaylistPanel({ show, onClose, songsData, onToast }: Pla
     setDraggedOverIndex(null);
   };
 
-  // O(1) membership — a per-row nested scan over all songs × performances
-  // ran ~540k iterations per render on a 100-item playlist
-  const existingPerformanceIds = useMemo(
-    () => new Set(songsData.flatMap(song => song.performances.map(p => p.id))),
-    [songsData]
+  // Resolved once per (playlist, catalog): live titles/timestamps, and a
+  // 'missing' verdict only against a loaded catalog.
+  const resolvedVersions = useMemo<ResolvedRef[]>(
+    () => (selectedPlaylist ? resolveSavedRefs(selectedPlaylist.versions, performanceIndex) : []),
+    [selectedPlaylist, performanceIndex],
   );
 
   const handlePlayPlaylist = (playlist: Playlist) => {
-    if (playlist.versions.length === 0) return;
-
-    const tracks: Track[] = playlist.versions.map((v) => ({ ...v, deleted: !existingPerformanceIds.has(v.performanceId) }));
-
-    const firstPlayable = tracks.find(t => !t.deleted);
-    if (!firstPlayable) return;
-
-    const firstPlayableIndex = tracks.indexOf(firstPlayable);
-    playTrackWithQueue(firstPlayable, tracks.slice(firstPlayableIndex + 1));
+    const queue = playableQueue(resolveSavedRefs(playlist.versions, performanceIndex));
+    if (!queue) return;
+    playTrackWithQueue(queue.first, queue.following);
   };
 
   const handleRename = async (playlistId: string) => {
@@ -194,10 +189,9 @@ export default function PlaylistPanel({ show, onClose, songsData, onToast }: Pla
           />
         ) : (
           <PlaylistDetailsView
-            playlist={selectedPlaylist}
+            versions={resolvedVersions}
             draggedIndex={draggedIndex}
             draggedOverIndex={draggedOverIndex}
-            versionExists={(performanceId) => existingPerformanceIds.has(performanceId)}
             onDragStart={handleDragStart}
             onDragOver={handleDragOver}
             onDrop={handleDrop}
