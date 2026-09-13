@@ -290,6 +290,49 @@ assert.deepEqual(trackFromPerformance(songs[0]!, songs[0]!.performances[0]!, "mi
   streamerSlug: "mizuki",
 });
 
+// workId travels from the catalog into flattened rows and refs — and only
+// when the song has one, so legacy rows/refs keep their exact shape.
+const workSong: ArchiveSong = {
+  id: "song-w",
+  workId: "work-w",
+  title: "Work Song",
+  originalArtist: "W",
+  tags: [],
+  performances: [
+    {
+      id: "perf-w",
+      streamId: "stream-2025",
+      date: "2025-02-01",
+      streamTitle: "Stream W",
+      videoId: "video-w",
+      timestamp: 1,
+      endTimestamp: null,
+      note: "",
+    },
+  ],
+};
+const workFlat = flattenSongs([workSong]);
+assert.equal(workFlat[0]?.workId, "work-w", "flattened rows carry workId");
+assert.equal("workId" in flattened[0]!, false, "no workId key when the song has none");
+const workRef = {
+  performanceId: "perf-w",
+  songId: "song-w",
+  workId: "work-w",
+  songTitle: "Work Song",
+  originalArtist: "W",
+  videoId: "video-w",
+  timestamp: 1,
+  endTimestamp: null,
+  streamerSlug: "mizuki",
+};
+assert.deepEqual(trackFromFlattenedSong(workFlat[0]!, "mizuki"), workRef);
+assert.deepEqual(trackFromPerformance(workSong, workSong.performances[0]!, "mizuki"), workRef);
+assert.equal(
+  "workId" in trackFromPerformance(songs[0]!, songs[0]!.performances[0]!, "mizuki"),
+  false,
+  "refs built from a song without workId have no workId key",
+);
+
 // followingTracksFromFlattened: 點擊處之後、依清單順序、排除 unavailable
 assert.deepEqual(
   followingTracksFromFlattened(flattened, 0, "mizuki", new Set()).map((t) => t.performanceId),
@@ -330,7 +373,7 @@ assert.deepEqual(
 // 不可變動輸入陣列（內部 sort 必須複製）
 assert.deepEqual(grouped.map((song) => song.id), ["song-b", "song-a", "song-c"]);
 
-// pickPerformanceRef copies exactly the eight PerformanceRef fields
+// pickPerformanceRef copies the eight PerformanceRef fields, plus workId when present
 const withExtras = {
   performanceId: "perf-x",
   songId: "song-x",
@@ -353,6 +396,19 @@ assert.deepEqual(pickPerformanceRef(withExtras), {
   endTimestamp: null,
   streamerSlug: "mizuki",
 });
+const withWorkId = { ...withExtras, workId: "work-x" };
+assert.deepEqual(pickPerformanceRef(withWorkId), {
+  performanceId: "perf-x",
+  songId: "song-x",
+  workId: "work-x",
+  songTitle: "X",
+  originalArtist: "Y",
+  videoId: "vid",
+  timestamp: 5,
+  endTimestamp: null,
+  streamerSlug: "mizuki",
+});
+assert.equal("workId" in pickPerformanceRef(withExtras), false, "no workId key when the ref has none");
 
 // --- tag filters ---
 const perfAt = (id: string, date: string) => ({

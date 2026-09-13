@@ -56,6 +56,7 @@ export function flattenSongs(songs: ArchiveSong[]): FlattenedSong[] {
       const performanceDate = new Date(performance.date);
       result.push({
         id: song.id,
+        ...(song.workId ? { workId: song.workId } : {}),
         title: song.title,
         originalArtist: song.originalArtist,
         tags: song.tags,
@@ -150,6 +151,7 @@ export function pickPerformanceRef(ref: PerformanceRef): PerformanceRef {
   return {
     performanceId: ref.performanceId,
     songId: ref.songId,
+    ...(ref.workId ? { workId: ref.workId } : {}),
     songTitle: ref.songTitle,
     originalArtist: ref.originalArtist,
     videoId: ref.videoId,
@@ -163,6 +165,7 @@ export function trackFromFlattenedSong(song: FlattenedSong, streamerSlug: string
   return {
     performanceId: song.performanceId,
     songId: song.id,
+    ...(song.workId ? { workId: song.workId } : {}),
     songTitle: song.title,
     originalArtist: song.originalArtist,
     videoId: song.videoId,
@@ -180,6 +183,7 @@ export function trackFromPerformance(
   return {
     performanceId: performance.id,
     songId: song.id,
+    ...(song.workId ? { workId: song.workId } : {}),
     songTitle: song.title,
     originalArtist: song.originalArtist,
     videoId: performance.videoId,

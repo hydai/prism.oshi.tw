@@ -34,6 +34,16 @@ const current = {
 };
 assert.deepEqual(normalizeStoredRef(current, 'mizuki'), { ...current });
 
+// workId is optional metadata: kept when present, never required, never a
+// substitute for performanceId.
+assert.deepEqual(normalizeStoredRef({ ...current, workId: 'work-2' }, 'mizuki'), { ...current, workId: 'work-2' });
+assert.equal('workId' in normalizeStoredRef(current, 'mizuki')!, false, 'no workId key when the entry has none');
+assert.equal(
+  normalizeStoredRef({ workId: 'work-2', songTitle: 'S', videoId: 'v', timestamp: 1 }, 'mizuki'),
+  null,
+  'an entry with workId but no performanceId is still rejected',
+);
+
 // Garbage is rejected rather than turned into a broken track.
 assert.equal(normalizeStoredRef(null, 'mizuki'), null);
 assert.equal(normalizeStoredRef({ songTitle: 'no id' }, 'mizuki'), null);
