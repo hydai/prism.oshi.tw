@@ -1365,11 +1365,13 @@ function PlaylistOverlays() {
       <LikedSongsPanel
         show={showLikedSongsPanel}
         onClose={() => setShowLikedSongsPanel(false)}
+        performanceIndex={performanceIndex}
         onToast={setToastMessage}
       />
       <RecentlyPlayedPanel
         show={showRecentlyPlayedPanel}
         onClose={() => setShowRecentlyPlayedPanel(false)}
+        performanceIndex={performanceIndex}
         onToast={setToastMessage}
       />
       {showCreateDialog && (

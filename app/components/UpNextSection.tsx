@@ -68,6 +68,11 @@ export default function UpNextSection() {
               >
                 {track.originalArtist}
               </div>
+              {track.deleted && (
+                <div className="truncate text-red-400" style={{ fontSize: '12px' }}>
+                  此版本已無法播放
+                </div>
+              )}
             </div>
 
             {/* Duration */}

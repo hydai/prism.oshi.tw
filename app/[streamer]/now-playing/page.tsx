@@ -274,14 +274,17 @@ export default function NowPlayingPage() {
       </main>
 
       <Toast message={toastMessage} onHide={hideToast} />
+      {/* No catalog on this page: saved entries resolve as 'unknown' (snapshot, no marker). */}
       <LikedSongsPanel
         show={showLikedSongsPanel}
         onClose={() => setShowLikedSongsPanel(false)}
+        performanceIndex={null}
         onToast={setToastMessage}
       />
       <RecentlyPlayedPanel
         show={showRecentlyPlayedPanel}
         onClose={() => setShowRecentlyPlayedPanel(false)}
+        performanceIndex={null}
         onToast={setToastMessage}
       />
     </div>

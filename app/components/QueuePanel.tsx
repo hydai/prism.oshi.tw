@@ -115,6 +115,11 @@ const QueueRow = memo(function QueueRow({
         <div className="text-xs text-white/60 truncate">
           {track.originalArtist}
         </div>
+        {track.deleted && (
+          <div className="text-red-400 text-xs truncate" data-testid="deleted-version-marker">
+            此版本已無法播放
+          </div>
+        )}
       </div>
 
       {/* Remove Button */}
