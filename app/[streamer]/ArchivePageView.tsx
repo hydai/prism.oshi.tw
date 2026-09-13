@@ -1351,7 +1351,7 @@ function PlaylistOverlays() {
     showRecentlyPlayedPanel, setShowRecentlyPlayedPanel,
     showCreateDialog, setShowCreateDialog,
   } = useArchiveUi();
-  const { songs } = useArchiveData();
+  const { performanceIndex } = useArchiveData();
 
   return (
     <>
@@ -1359,7 +1359,7 @@ function PlaylistOverlays() {
       <PlaylistPanel
         show={showPlaylistPanel}
         onClose={() => setShowPlaylistPanel(false)}
-        songsData={songs}
+        performanceIndex={performanceIndex}
         onToast={setToastMessage}
       />
       <LikedSongsPanel

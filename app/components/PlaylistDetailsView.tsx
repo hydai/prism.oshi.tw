@@ -2,15 +2,15 @@
 
 import type { DragEvent } from 'react';
 import { ChevronDown, ChevronUp, GripVertical, ListMusic, Trash2 } from 'lucide-react';
-import type { Playlist } from '../contexts/PlaylistContext';
+import type { ResolvedRef } from '../lib/saved-refs';
 import PanelEmptyState from './PanelEmptyState';
 import PanelPlayAllButton from './PanelPlayAllButton';
 
 interface PlaylistDetailsViewProps {
-  playlist: Playlist;
+  /** The playlist's entries resolved against the loaded catalog (app/lib/saved-refs.ts). */
+  versions: ResolvedRef[];
   draggedIndex: number | null;
   draggedOverIndex: number | null;
-  versionExists: (performanceId: string) => boolean;
   onDragStart: (event: DragEvent, index: number) => void;
   onDragOver: (event: DragEvent, index: number) => void;
   onDrop: (event: DragEvent, index: number) => void;
@@ -21,10 +21,9 @@ interface PlaylistDetailsViewProps {
 }
 
 export default function PlaylistDetailsView({
-  playlist,
+  versions,
   draggedIndex,
   draggedOverIndex,
-  versionExists,
   onDragStart,
   onDragOver,
   onDrop,
@@ -33,21 +32,21 @@ export default function PlaylistDetailsView({
   onRemoveVersion,
   onPlayAll,
 }: PlaylistDetailsViewProps) {
-  if (playlist.versions.length === 0) {
+  if (versions.length === 0) {
     return <PanelEmptyState icon={ListMusic} title="此播放清單尚無歌曲" hint="從歌曲目錄中加入您喜歡的版本" />;
   }
 
   return (
     <>
       <div className="space-y-2" data-testid="playlist-versions">
-        {playlist.versions.map((version, index) => {
-          const exists = versionExists(version.performanceId);
+        {versions.map(({ ref, status }, index) => {
+          const missing = status === 'missing';
           const isDragging = draggedIndex === index;
           const isDraggedOver = draggedOverIndex === index;
 
           return (
             <div
-              key={version.performanceId}
+              key={ref.performanceId}
               draggable
               onDragStart={(event) => onDragStart(event, index)}
               onDragOver={(event) => onDragOver(event, index)}
@@ -78,7 +77,7 @@ export default function PlaylistDetailsView({
                 </button>
                 <button
                   onClick={() => onMoveVersion(index, index + 1)}
-                  disabled={index === playlist.versions.length - 1}
+                  disabled={index === versions.length - 1}
                   className="text-white/40 hover:text-white/80 disabled:opacity-30 p-0.5"
                   aria-label="Move down"
                 >
@@ -87,19 +86,19 @@ export default function PlaylistDetailsView({
               </div>
               <div className="flex-1 min-w-0">
                 <div className="text-white font-medium truncate">
-                  {version.songTitle}
+                  {ref.songTitle}
                 </div>
                 <div className="text-white/60 text-sm truncate">
-                  {version.originalArtist}
+                  {ref.originalArtist}
                 </div>
-                {!exists && (
+                {missing && (
                   <div className="text-red-400 text-xs mt-1" data-testid="deleted-version-marker">
                     此版本已無法播放
                   </div>
                 )}
               </div>
               <button
-                onClick={() => onRemoveVersion(version.performanceId)}
+                onClick={() => onRemoveVersion(ref.performanceId)}
                 className="text-white/30 hover:text-red-400 transition-colors flex-shrink-0"
                 title="移除"
                 data-testid="remove-version-button"
