@@ -9,7 +9,7 @@
     "start": "next start",
     "lint": "eslint .",
     "test": "node --import tsx --test \"lib/**/*.test.ts\" \"app/**/*.test.ts\" \"app/**/*.test.tsx\"",
-    "test:youtube-iframe-types": "npx tsc --noEmit --pretty false --skipLibCheck --strict --target ES2017 --module esnext --moduleResolution bundler --lib dom,dom.iterable,esnext --types node lib/youtube-iframe.test.ts",
+    "test:youtube-iframe-types": "npx tsc -p tsconfig.youtube-iframe.json --pretty false",
     "test:aurora-nova": "npx tsx tools/aurora/tests/nova.test.ts",
     "test:browser-storage": "npx tsx tools/browser-storage.test.ts && npx tsx admin/ui/tests/streams-filter.test.ts",
     "test:turnstile": "npx tsx tools/turnstile.test.ts",
