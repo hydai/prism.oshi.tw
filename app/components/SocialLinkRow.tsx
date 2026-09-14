@@ -1,20 +1,20 @@
 'use client';
 
-import { Facebook, Instagram, Twitch, Twitter, Youtube, type LucideIcon } from 'lucide-react';
+import { BrandIcon, type BrandIconName } from './BrandIcon';
 import type { SocialLinks } from '../../lib/types';
 
-const PLATFORMS: { key: keyof SocialLinks; icon: LucideIcon; color: string; label: string }[] = [
-  { key: 'youtube', icon: Youtube, color: '#FF0000', label: 'YouTube' },
-  { key: 'twitter', icon: Twitter, color: '#1DA1F2', label: 'X' },
-  { key: 'facebook', icon: Facebook, color: '#1877F2', label: 'Facebook' },
-  { key: 'instagram', icon: Instagram, color: '#E4405F', label: 'Instagram' },
-  { key: 'twitch', icon: Twitch, color: '#9146FF', label: 'Twitch' },
+const PLATFORMS: { key: keyof SocialLinks; icon: BrandIconName; color: string; label: string }[] = [
+  { key: 'youtube', icon: 'youtube', color: '#FF0000', label: 'YouTube' },
+  { key: 'twitter', icon: 'x', color: 'currentColor', label: 'X' },
+  { key: 'facebook', icon: 'facebook', color: '#1877F2', label: 'Facebook' },
+  { key: 'instagram', icon: 'instagram', color: '#E4405F', label: 'Instagram' },
+  { key: 'twitch', icon: 'twitch', color: '#9146FF', label: 'Twitch' },
 ];
 
 export default function SocialLinkRow({ socialLinks }: { socialLinks: SocialLinks }) {
   return (
     <>
-      {PLATFORMS.map(({ key, icon: Icon, color, label }) => {
+      {PLATFORMS.map(({ key, icon, color, label }) => {
         const href = socialLinks[key];
         if (!href) return null;
         return (
@@ -31,7 +31,7 @@ export default function SocialLinkRow({ socialLinks }: { socialLinks: SocialLink
               WebkitBackdropFilter: 'blur(8px)',
             }}
           >
-            <Icon className="w-4 h-4" style={{ color }} />
+            <BrandIcon name={icon} className="w-4 h-4" style={{ color }} />
             {label}
           </a>
         );
