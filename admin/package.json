@@ -57,11 +57,11 @@
     "hono": "^4.12.29"
   },
   "devDependencies": {
-    "@cloudflare/workers-types": "^5.20260711.1",
-    "@types/node": "^26.1.1",
+    "@cloudflare/workers-types": "^5.20260911.1",
+    "@types/node": "^26.5.1",
     "ajv": "^8.20.0",
     "ajv-formats": "^3.0.1",
-    "tsx": "^4.22.3",
+    "tsx": "^4.23.13",
     "typescript": "^5.9.3"
   }
 }
