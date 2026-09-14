@@ -8,3 +8,62 @@ updates:
       time: "09:00"
       timezone: Asia/Taipei
     open-pull-requests-limit: 5
+
+  # npm: two entries with identical settings, split only by the Tailwind major ignore.
+  # Dependabot runs each entry per directory, so every directory gets its own grouped
+  # PR. Version updates only bump direct dependencies; advisories in transitive
+  # packages still need Dependabot alerts (repo Settings → Code security) or
+  # `npm audit` in each of these directories.
+
+  # The fan site and admin UI stay on Tailwind 3.4 by design (v4 rewrites the token
+  # layer), so Tailwind majors are ignored here and only here.
+  - package-ecosystem: npm
+    directories:
+      - /
+      - /admin/ui
+    schedule:
+      interval: weekly
+      day: monday
+      time: "09:00"
+      timezone: Asia/Taipei
+    open-pull-requests-limit: 5
+    # These are apps, not libraries: raise the package.json minimum, never widen the range.
+    versioning-strategy: increase
+    commit-message:
+      prefix: chore
+      include: scope
+    groups:
+      # Minor and patch bumps land as one PR per directory; majors stay separate PRs.
+      minor-and-patch:
+        applies-to: version-updates
+        update-types:
+          - minor
+          - patch
+    ignore:
+      - dependency-name: tailwindcss
+        update-types:
+          - version-update:semver-major
+
+  # The Workers and Aurora (already on Tailwind 4) take every major as its own PR.
+  - package-ecosystem: npm
+    directories:
+      - /admin
+      - /tools/nova
+      - /tools/crystal
+      - /tools/aurora
+    schedule:
+      interval: weekly
+      day: monday
+      time: "09:00"
+      timezone: Asia/Taipei
+    open-pull-requests-limit: 5
+    versioning-strategy: increase
+    commit-message:
+      prefix: chore
+      include: scope
+    groups:
+      minor-and-patch:
+        applies-to: version-updates
+        update-types:
+          - minor
+          - patch
