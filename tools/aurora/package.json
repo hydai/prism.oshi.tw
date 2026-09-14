@@ -22,7 +22,7 @@
     "happy-dom": "20.14.3",
     "tailwindcss": "^4.3.0",
     "tsx": "4.23.13",
-    "typescript": "^5.9.3",
+    "typescript": "^7.0.2",
     "vite": "^6.4.2"
   }
 }
