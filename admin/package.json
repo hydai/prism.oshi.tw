@@ -46,7 +46,7 @@
     "test:vod-export-publication": "npx tsx src/vod-export/publication.test.ts",
     "test:vod-export-maintenance": "npx tsx src/vod-export/maintenance.test.ts",
     "test:vod-export-stress": "node --expose-gc --import tsx src/vod-export/stress.test.ts",
-    "typecheck:vod-export-docs": "npx tsc --noEmit --pretty false --strict --skipLibCheck --target ES2022 --module esnext --moduleResolution bundler --lib ES2022,DOM --types node scripts/vod-export-docs.ts scripts/vod-export-docs.test.ts",
+    "typecheck:vod-export-docs": "npx tsc -p tsconfig.vod-export-docs.json --pretty false",
     "test:vod-export-docs": "npm run typecheck:vod-export-docs && npx tsx scripts/vod-export-docs.test.ts",
     "verify:vod-export-docs": "npx tsx scripts/vod-export-docs.ts verify-public",
     "publish:vod-export-docs": "npx tsx scripts/vod-export-docs.ts publish",
