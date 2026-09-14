@@ -1,7 +1,7 @@
 import { test, expect } from '@playwright/test';
-import registry from '../data/registry.json';
+import { getRegistry } from '../lib/registry';
 
-const streamer = registry.streamers.find((s) => s.enabled && !s.externalUrl)!;
+const streamer = getRegistry().streamers.find((s) => s.enabled && !s.externalUrl)!;
 const VODS_HOME = 'https://vods.oshi.tw';
 
 test.describe('landing page vods links', () => {

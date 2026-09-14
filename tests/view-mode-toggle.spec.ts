@@ -1,7 +1,7 @@
 import { test, expect } from '@playwright/test';
-import registry from '../data/registry.json';
+import { getRegistry } from '../lib/registry';
 
-const streamer = registry.streamers.find((entry) => entry.enabled && !entry.externalUrl)!;
+const streamer = getRegistry().streamers.find((entry) => entry.enabled && !entry.externalUrl)!;
 const STREAMER_PATH = `/${streamer.slug}`;
 
 test.describe('archive view mode toggle', () => {
