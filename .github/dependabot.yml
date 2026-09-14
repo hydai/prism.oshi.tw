@@ -14,6 +14,11 @@ updates:
   # spans every directory listed. Version updates only bump direct dependencies;
   # advisories in transitive packages still need Dependabot alerts (repo Settings →
   # Code security) or `npm audit` in each of these directories.
+  #
+  # TypeScript is pinned to one major across all six packages (6.0.x today) and eslint
+  # 10 is blocked by eslint-config-next and eslint-plugin-react, so both majors are
+  # ignored everywhere. Lift the ignores together once typescript-eslint accepts TS 7
+  # and the lint stack supports eslint 10, then bump every package in one PR.
 
   # The fan site and admin UI stay on Tailwind 3.4 by design (v4 rewrites the token
   # layer), so Tailwind majors are ignored here and only here.
@@ -52,8 +57,14 @@ updates:
       - dependency-name: tailwindcss
         update-types:
           - version-update:semver-major
+      - dependency-name: typescript
+        update-types:
+          - version-update:semver-major
+      - dependency-name: eslint
+        update-types:
+          - version-update:semver-major
 
-  # The Workers and Aurora (already on Tailwind 4) take every major as its own PR.
+  # The Workers and Aurora (already on Tailwind 4) take every other major as its own PR.
   - package-ecosystem: npm
     directories:
       - /admin
@@ -83,3 +94,10 @@ updates:
           - "@vitejs/*"
         update-types:
           - major
+    ignore:
+      - dependency-name: typescript
+        update-types:
+          - version-update:semver-major
+      - dependency-name: eslint
+        update-types:
+          - version-update:semver-major
