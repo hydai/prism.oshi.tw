@@ -795,18 +795,7 @@
         "videoId": "U6oVkXmfrgI",
         "timestamp": 5428,
         "endTimestamp": 5637
-      }
-    ]
-  },
-  {
-    "id": "song-a5431008",
-    "workId": "work-song-96471ecf",
-    "title": "陪你Stay with you",
-    "originalArtist": "朔Sakuro",
-    "tags": [
-      "source:original"
-    ],
-    "performances": [
+      },
       {
         "id": "p-4fbbe3a8",
         "streamId": "stream-2025-08-02",
@@ -1352,22 +1341,6 @@
     ]
   },
   {
-    "id": "song-4b278a33",
-    "workId": "work-song-3922bd1b",
-    "title": "Heavenly days",
-    "originalArtist": "新垣結衣",
-    "tags": [],
-    "performances": [
-      {
-        "id": "p-a2f15068",
-        "streamId": "stream-2026-01-25",
-        "videoId": "OrwsCyMKewY",
-        "timestamp": 4648,
-        "endTimestamp": 4919
-      }
-    ]
-  },
-  {
     "id": "song-3922bd1b",
     "workId": "work-song-3922bd1b",
     "title": "Heavenly Days",
@@ -1380,6 +1353,13 @@
         "videoId": "Hmeugi8WS9k",
         "timestamp": 1126,
         "endTimestamp": 1395
+      },
+      {
+        "id": "p-a2f15068",
+        "streamId": "stream-2026-01-25",
+        "videoId": "OrwsCyMKewY",
+        "timestamp": 4648,
+        "endTimestamp": 4919
       }
     ]
   },
@@ -1400,12 +1380,19 @@
     ]
   },
   {
-    "id": "song-69c96a4e",
+    "id": "song-c281c91c",
     "workId": "work-song-1508",
-    "title": "I love you 3000",
+    "title": "I Love You 3000",
     "originalArtist": "Stephanie Poetri",
     "tags": [],
     "performances": [
+      {
+        "id": "p-247c3e12",
+        "streamId": "stream-e0f35849",
+        "videoId": "0xT5uHGGMC0",
+        "timestamp": 8181,
+        "endTimestamp": 8500
+      },
       {
         "id": "p-43b7fca3",
         "streamId": "stream-2026-01-25",
@@ -1419,22 +1406,6 @@
         "videoId": "SVEtS6mQFPY",
         "timestamp": 4829,
         "endTimestamp": 5038
-      }
-    ]
-  },
-  {
-    "id": "song-c281c91c",
-    "workId": "work-song-1508",
-    "title": "I Love You 3000",
-    "originalArtist": "Stephanie Poetri",
-    "tags": [],
-    "performances": [
-      {
-        "id": "p-247c3e12",
-        "streamId": "stream-e0f35849",
-        "videoId": "0xT5uHGGMC0",
-        "timestamp": 8181,
-        "endTimestamp": 8500
       },
       {
         "id": "p-4d821b9d",
