@@ -809,27 +809,18 @@
     "tags": [],
     "performances": [
       {
-        "id": "p-9519bfbf",
-        "streamId": "stream-2026-04-27",
-        "videoId": "ELxjiBbpB_E",
-        "timestamp": 9051,
-        "endTimestamp": 9297
-      }
-    ]
-  },
-  {
-    "id": "song-bb040da5",
-    "workId": "work-song-486",
-    "title": "狂乱Hey Kids!!",
-    "originalArtist": "THE ORAL CIGARETTES",
-    "tags": [],
-    "performances": [
-      {
         "id": "p-cdfdb7c2",
         "streamId": "stream-2026-06-24",
         "videoId": "mLSIBfQWqB4",
         "timestamp": 6668,
         "endTimestamp": 6915
+      },
+      {
+        "id": "p-9519bfbf",
+        "streamId": "stream-2026-04-27",
+        "videoId": "ELxjiBbpB_E",
+        "timestamp": 9051,
+        "endTimestamp": 9297
       }
     ]
   },
@@ -1058,27 +1049,18 @@
     "tags": [],
     "performances": [
       {
-        "id": "p-d1a36716",
-        "streamId": "stream-2026-06-07",
-        "videoId": "v_eExjuwC9Y",
-        "timestamp": 13117,
-        "endTimestamp": 13367
-      }
-    ]
-  },
-  {
-    "id": "song-48fd1eb4",
-    "workId": "work-song-48fd1eb4",
-    "title": "泡沫",
-    "originalArtist": "鄧紫棋",
-    "tags": [],
-    "performances": [
-      {
         "id": "p-9e8ccbb1",
         "streamId": "stream-2026-06-19",
         "videoId": "AMTtoZy_LbM",
         "timestamp": 10571,
         "endTimestamp": 10826
+      },
+      {
+        "id": "p-d1a36716",
+        "streamId": "stream-2026-06-07",
+        "videoId": "v_eExjuwC9Y",
+        "timestamp": 13117,
+        "endTimestamp": 13367
       }
     ]
   },
@@ -2695,9 +2677,9 @@
     ]
   },
   {
-    "id": "song-d3cd5169",
+    "id": "song-b2687f13",
     "workId": "work-song-553",
-    "title": "It's My Life",
+    "title": "It’s My Life",
     "originalArtist": "Bon Jovi",
     "tags": [],
     "performances": [
@@ -2707,16 +2689,7 @@
         "videoId": "wqPu1pSz314",
         "timestamp": 9953,
         "endTimestamp": 10178
-      }
-    ]
-  },
-  {
-    "id": "song-b2687f13",
-    "workId": "work-song-553",
-    "title": "It’s My Life",
-    "originalArtist": "Bon Jovi",
-    "tags": [],
-    "performances": [
+      },
       {
         "id": "p-854aba0f",
         "streamId": "stream-2026-03-31",
@@ -2759,18 +2732,7 @@
         "videoId": "mLSIBfQWqB4",
         "timestamp": 9082,
         "endTimestamp": 9274
-      }
-    ]
-  },
-  {
-    "id": "song-76382757",
-    "workId": "work-song-024be7af",
-    "title": "KICKBACK",
-    "originalArtist": "米津玄師",
-    "tags": [
-      "language:ja"
-    ],
-    "performances": [
+      },
       {
         "id": "p-e3745f1a",
         "streamId": "stream-2026-05-31",
@@ -4004,18 +3966,7 @@
         "videoId": "Q3qcyO9t3TQ",
         "timestamp": 9328,
         "endTimestamp": 9575
-      }
-    ]
-  },
-  {
-    "id": "song-72c226b9",
-    "workId": "work-song-527f0185",
-    "title": "エメラルドシティ",
-    "originalArtist": "TOKOTOKO(西沢さんP) feat. MAYU",
-    "tags": [
-      "language:ja"
-    ],
-    "performances": [
+      },
       {
         "id": "p-a36697a8",
         "streamId": "stream-2026-05-01",
@@ -4138,24 +4089,6 @@
     ]
   },
   {
-    "id": "song-bad72e35",
-    "workId": "work-song-1010",
-    "title": "ゴーストルール",
-    "originalArtist": "DECO*27",
-    "tags": [
-      "language:ja"
-    ],
-    "performances": [
-      {
-        "id": "p-86366e03",
-        "streamId": "stream-2026-03-31",
-        "videoId": "eluS2DmhMfY",
-        "timestamp": 1377,
-        "endTimestamp": 1583
-      }
-    ]
-  },
-  {
     "id": "song-dd6972dd",
     "workId": "work-song-44832315",
     "title": "ゴーストルール",
@@ -4178,6 +4111,13 @@
         "videoId": "za32QvQAIsA",
         "timestamp": 3500,
         "endTimestamp": 3706
+      },
+      {
+        "id": "p-86366e03",
+        "streamId": "stream-2026-03-31",
+        "videoId": "eluS2DmhMfY",
+        "timestamp": 1377,
+        "endTimestamp": 1583
       }
     ]
   },
@@ -4473,18 +4413,7 @@
         "videoId": "N90ZTiqxTIw",
         "timestamp": 5836,
         "endTimestamp": 6080
-      }
-    ]
-  },
-  {
-    "id": "song-776f1dc7",
-    "workId": "work-song-776f1dc7",
-    "title": "ファンサ",
-    "originalArtist": "mona",
-    "tags": [
-      "language:ja"
-    ],
-    "performances": [
+      },
       {
         "id": "p-dd325c39",
         "streamId": "stream-2026-03-31",
