@@ -10887,7 +10887,7 @@
   },
   {
     "id": "song-2662",
-    "workId": "work-song-1d73ad7a",
+    "workId": "work-song-7a477d24",
     "title": "求救訊號",
     "originalArtist": "Vast & Hazy",
     "tags": [],
@@ -14482,7 +14482,7 @@
   },
   {
     "id": "song-834",
-    "workId": "work-song-834",
+    "workId": "work-song-2070",
     "title": "変わらないもの",
     "originalArtist": "奧華子",
     "tags": [
@@ -16110,7 +16110,9 @@
     "workId": "work-song-a4f5995e",
     "title": "突然好想你",
     "originalArtist": "Mayday五月天",
-    "tags": [],
+    "tags": [
+      "language:zh"
+    ],
     "performances": [
       {
         "id": "p1072-1",
@@ -16123,7 +16125,7 @@
   },
   {
     "id": "song-3017",
-    "workId": "work-song-3017",
+    "workId": "work-song-a4f5995e",
     "title": "突然好想你",
     "originalArtist": "五月天",
     "tags": [
@@ -35134,7 +35136,7 @@
   },
   {
     "id": "song-947",
-    "workId": "work-song-22b832dc",
+    "workId": "work-song-1540",
     "title": "Fly Me To The Moon",
     "originalArtist": "Bart Howard",
     "tags": [],
@@ -35741,10 +35743,13 @@
   },
   {
     "id": "song-365",
-    "workId": "work-song-003f49b9",
+    "workId": "work-song-9f411950",
     "title": "glow",
     "originalArtist": "keeno",
-    "tags": [],
+    "tags": [
+      "language:ja",
+      "source:vocaloid"
+    ],
     "performances": [
       {
         "id": "p365-1",
@@ -54730,11 +54735,12 @@
   },
   {
     "id": "song-1010",
-    "workId": "work-song-1010",
+    "workId": "work-song-44832315",
     "title": "ゴーストルール",
     "originalArtist": "DECO*27",
     "tags": [
-      "language:ja"
+      "language:ja",
+      "source:vocaloid"
     ],
     "performances": [
       {
