@@ -238,18 +238,7 @@
         "videoId": "dIbmmCyNTQo",
         "timestamp": 3815,
         "endTimestamp": 4075
-      }
-    ]
-  },
-  {
-    "id": "song-c836120c",
-    "workId": "work-song-268949e6",
-    "title": "Ninelie",
-    "originalArtist": "Aimer",
-    "tags": [
-      "language:ja"
-    ],
-    "performances": [
+      },
       {
         "id": "p-6682a536",
         "streamId": "stream-bc671d48",
