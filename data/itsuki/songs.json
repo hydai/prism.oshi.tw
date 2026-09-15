@@ -512,10 +512,10 @@
     ]
   },
   {
-    "id": "song-2c7d9e83",
+    "id": "song-7a5ff03f",
     "workId": "work-song-100",
     "title": "血腥愛情故事",
-    "originalArtist": "張惠妹",
+    "originalArtist": "AMIT",
     "tags": [
       "language:zh"
     ],
@@ -526,18 +526,7 @@
         "videoId": "OwNrtFg5Y1Q",
         "timestamp": 3890,
         "endTimestamp": 4149
-      }
-    ]
-  },
-  {
-    "id": "song-7a5ff03f",
-    "workId": "work-song-100",
-    "title": "血腥愛情故事",
-    "originalArtist": "AMIT",
-    "tags": [
-      "language:zh"
-    ],
-    "performances": [
+      },
       {
         "id": "p-214064c8",
         "streamId": "stream-68f7a474",
@@ -805,18 +794,7 @@
         "videoId": "GZzsCcNsMBw",
         "timestamp": 6410,
         "endTimestamp": 6665
-      }
-    ]
-  },
-  {
-    "id": "song-8c459bd4",
-    "workId": "work-song-3defc6e4",
-    "title": "怪天氣",
-    "originalArtist": "黃宣",
-    "tags": [
-      "language:zh"
-    ],
-    "performances": [
+      },
       {
         "id": "p-b069bd71",
         "streamId": "stream-2024-12-16",
@@ -2032,22 +2010,6 @@
     "workId": "work-song-149ed80d",
     "title": "Broken World",
     "originalArtist": "孫盛希 Shi Shi",
-    "tags": [],
-    "performances": [
-      {
-        "id": "p-822c5163",
-        "streamId": "stream-2026-01-19",
-        "videoId": "yfWcdOXraqw",
-        "timestamp": 8861,
-        "endTimestamp": 9010
-      }
-    ]
-  },
-  {
-    "id": "song-9f149f1f",
-    "workId": "work-song-9f149f1f",
-    "title": "Broken World",
-    "originalArtist": "孫盛希",
     "tags": [
       "language:zh"
     ],
@@ -2058,6 +2020,13 @@
         "videoId": "KEKRbzfJTAU",
         "timestamp": 2709,
         "endTimestamp": 2859
+      },
+      {
+        "id": "p-822c5163",
+        "streamId": "stream-2026-01-19",
+        "videoId": "yfWcdOXraqw",
+        "timestamp": 8861,
+        "endTimestamp": 9010
       }
     ]
   },
@@ -2610,22 +2579,6 @@
     ]
   },
   {
-    "id": "song-03a93493",
-    "workId": "work-song-03a93493",
-    "title": "Hey Girl",
-    "originalArtist": "小男孩樂團",
-    "tags": [],
-    "performances": [
-      {
-        "id": "p-cd748716",
-        "streamId": "stream-2024-12-14",
-        "videoId": "wRZSj5cHzqI",
-        "timestamp": 6717,
-        "endTimestamp": 6947
-      }
-    ]
-  },
-  {
     "id": "song-d2ed82b6",
     "workId": "work-song-d2ed82b6",
     "title": "Hey Girl",
@@ -2638,6 +2591,13 @@
         "videoId": "7mSLMi2CrJM",
         "timestamp": 3323,
         "endTimestamp": 3566
+      },
+      {
+        "id": "p-cd748716",
+        "streamId": "stream-2024-12-14",
+        "videoId": "wRZSj5cHzqI",
+        "timestamp": 6717,
+        "endTimestamp": 6947
       }
     ]
   },
