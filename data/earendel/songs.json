@@ -312,10 +312,10 @@
     ]
   },
   {
-    "id": "song-0747ef0f",
+    "id": "song-9ad30382",
     "workId": "work-song-48d85db1",
     "title": "天ノ弱",
-    "originalArtist": "164 feat.GUMI",
+    "originalArtist": "164 feat. GUMI",
     "tags": [
       "language:ja",
       "source:vocaloid"
@@ -380,19 +380,7 @@
         "videoId": "ZsObrmIQLGk",
         "timestamp": 9843,
         "endTimestamp": 10123
-      }
-    ]
-  },
-  {
-    "id": "song-fb144ba9",
-    "workId": "work-song-fb144ba9",
-    "title": "少女レイ",
-    "originalArtist": "みきとP-初音ミク",
-    "tags": [
-      "language:ja",
-      "source:vocaloid"
-    ],
-    "performances": [
+      },
       {
         "id": "p-9d73691e",
         "streamId": "stream-8c4cf2a6",
@@ -833,10 +821,10 @@
     ]
   },
   {
-    "id": "song-ce70e9cd",
-    "workId": "work-song-ce70e9cd",
+    "id": "song-ee6b94f4",
+    "workId": "work-song-6271c269",
     "title": "你的行李",
-    "originalArtist": "謝震廷 & 徐靖玟",
+    "originalArtist": "謝震廷 feat. 徐靖玟",
     "tags": [],
     "performances": [
       {
@@ -845,16 +833,7 @@
         "videoId": "q3B24mwXF2k",
         "timestamp": 6475,
         "endTimestamp": 6731
-      }
-    ]
-  },
-  {
-    "id": "song-ee6b94f4",
-    "workId": "work-song-6271c269",
-    "title": "你的行李",
-    "originalArtist": "謝震廷 feat. 徐靖玟",
-    "tags": [],
-    "performances": [
+      },
       {
         "id": "p-adef09e9",
         "streamId": "stream-2026-04-06",
@@ -1158,22 +1137,6 @@
     ]
   },
   {
-    "id": "song-2362239e",
-    "workId": "work-song-1d73ad7a",
-    "title": "求救訊號",
-    "originalArtist": "Vast & Hazy",
-    "tags": [],
-    "performances": [
-      {
-        "id": "p-8929c53a",
-        "streamId": "stream-2026-03-09",
-        "videoId": "IVfl4IDi0co",
-        "timestamp": 8559,
-        "endTimestamp": 8817
-      }
-    ]
-  },
-  {
     "id": "song-7a477d24",
     "workId": "work-song-7a477d24",
     "title": "求救訊號",
@@ -1200,6 +1163,13 @@
         "videoId": "zlRzb3iDgn4",
         "timestamp": 7395,
         "endTimestamp": 7653
+      },
+      {
+        "id": "p-8929c53a",
+        "streamId": "stream-2026-03-09",
+        "videoId": "IVfl4IDi0co",
+        "timestamp": 8559,
+        "endTimestamp": 8817
       }
     ]
   },
@@ -1695,29 +1665,18 @@
     ],
     "performances": [
       {
-        "id": "p-4b7ec29d",
-        "streamId": "stream-c85e01e7",
-        "videoId": "dJ4z3FliynU",
-        "timestamp": 4610,
-        "endTimestamp": 4862
-      }
-    ]
-  },
-  {
-    "id": "song-d6da959f",
-    "workId": "work-song-d6da959f",
-    "title": "星降る海",
-    "originalArtist": "月見ヤチヨ(CV.早見沙織)",
-    "tags": [
-      "language:ja"
-    ],
-    "performances": [
-      {
         "id": "p-4afc57d3",
         "streamId": "stream-2026-05-29",
         "videoId": "IVlHQ7Xn-pQ",
         "timestamp": 2597,
         "endTimestamp": 2846
+      },
+      {
+        "id": "p-4b7ec29d",
+        "streamId": "stream-c85e01e7",
+        "videoId": "dJ4z3FliynU",
+        "timestamp": 4610,
+        "endTimestamp": 4862
       }
     ]
   },
@@ -2224,6 +2183,13 @@
     ],
     "performances": [
       {
+        "id": "p-30710e75",
+        "streamId": "stream-2026-07-20",
+        "videoId": "Xdx0F-cmyW4",
+        "timestamp": 7223,
+        "endTimestamp": 7461
+      },
+      {
         "id": "p-dffdb4bb",
         "streamId": "stream-2026-03-30",
         "videoId": "2iZkLT5vemI",
@@ -2236,24 +2202,6 @@
         "videoId": "IVfl4IDi0co",
         "timestamp": 7437,
         "endTimestamp": 7720
-      }
-    ]
-  },
-  {
-    "id": "song-7218d3ae",
-    "workId": "work-53ca7997-2bc1-4afc-9444-38d8fc667e6e",
-    "title": "這是你期盼的長大嗎",
-    "originalArtist": "張齊山ZQS",
-    "tags": [
-      "language:zh"
-    ],
-    "performances": [
-      {
-        "id": "p-30710e75",
-        "streamId": "stream-2026-07-20",
-        "videoId": "Xdx0F-cmyW4",
-        "timestamp": 7223,
-        "endTimestamp": 7461
       }
     ]
   },
@@ -2451,9 +2399,9 @@
     ]
   },
   {
-    "id": "song-12fdd707",
+    "id": "song-7e8a1423",
     "workId": "work-song-753c615b",
-    "title": "斑馬，斑馬",
+    "title": "斑馬斑馬",
     "originalArtist": "宋冬野",
     "tags": [
       "language:zh"
@@ -2465,18 +2413,7 @@
         "videoId": "WTPx_GgMKs8",
         "timestamp": 12195,
         "endTimestamp": 12448
-      }
-    ]
-  },
-  {
-    "id": "song-7e8a1423",
-    "workId": "work-song-753c615b",
-    "title": "斑馬斑馬",
-    "originalArtist": "宋冬野",
-    "tags": [
-      "language:zh"
-    ],
-    "performances": [
+      },
       {
         "id": "p-cfad687c",
         "streamId": "stream-daaf4871",
@@ -3992,10 +3929,10 @@
     ]
   },
   {
-    "id": "song-1966aff6",
+    "id": "song-d222e5cf",
     "workId": "work-song-d222e5cf",
     "title": "ray",
-    "originalArtist": "かぐや（CV：夏吉ゆうこ）& 月見ヤチヨ（CV：早見沙織）",
+    "originalArtist": "かぐや(CV.夏吉ゆうこ) & 月見ヤチヨ(CV.早見沙織)",
     "tags": [
       "language:ja"
     ],
@@ -4006,58 +3943,13 @@
         "videoId": "QEUFU9f3Opg",
         "timestamp": 2305,
         "endTimestamp": 2607
-      }
-    ]
-  },
-  {
-    "id": "song-d222e5cf",
-    "workId": "work-song-d222e5cf",
-    "title": "ray",
-    "originalArtist": "かぐや(CV.夏吉ゆうこ) & 月見ヤチヨ(CV.早見沙織)",
-    "tags": [
-      "language:ja"
-    ],
-    "performances": [
+      },
       {
         "id": "p-b86db86a",
         "streamId": "stream-e5230a57",
         "videoId": "xQ5TCl3JnXs",
         "timestamp": 8081,
         "endTimestamp": 8383
-      }
-    ]
-  },
-  {
-    "id": "song-004ca1ca",
-    "workId": "work-song-004ca1ca",
-    "title": "Remember",
-    "originalArtist": "月見ヤチヨ(CV.早見沙織)",
-    "tags": [
-      "language:ja"
-    ],
-    "performances": [
-      {
-        "id": "p-85d0050d",
-        "streamId": "stream-2026-05-29",
-        "videoId": "IVlHQ7Xn-pQ",
-        "timestamp": 1585,
-        "endTimestamp": 1815
-      }
-    ]
-  },
-  {
-    "id": "song-da6fbf74",
-    "workId": "work-song-da6fbf74",
-    "title": "Remember",
-    "originalArtist": "月見乜于彐（CV.早見沙織)",
-    "tags": [],
-    "performances": [
-      {
-        "id": "p-86e9c8b3",
-        "streamId": "stream-2026-04-03",
-        "videoId": "KzjBXLsjzU4",
-        "timestamp": 5095,
-        "endTimestamp": 5328
       }
     ]
   },
@@ -4070,6 +3962,20 @@
       "language:ja"
     ],
     "performances": [
+      {
+        "id": "p-85d0050d",
+        "streamId": "stream-2026-05-29",
+        "videoId": "IVlHQ7Xn-pQ",
+        "timestamp": 1585,
+        "endTimestamp": 1815
+      },
+      {
+        "id": "p-86e9c8b3",
+        "streamId": "stream-2026-04-03",
+        "videoId": "KzjBXLsjzU4",
+        "timestamp": 5095,
+        "endTimestamp": 5328
+      },
       {
         "id": "p-c14e0deb",
         "streamId": "stream-c85e01e7",
@@ -4163,19 +4069,7 @@
         "videoId": "WTPx_GgMKs8",
         "timestamp": 8814,
         "endTimestamp": 9112
-      }
-    ]
-  },
-  {
-    "id": "song-8fe994c9",
-    "workId": "work-song-09d6ea68",
-    "title": "Starduster",
-    "originalArtist": "ジミーサムＰ feat. 初音ミク",
-    "tags": [
-      "language:ja",
-      "source:vocaloid"
-    ],
-    "performances": [
+      },
       {
         "id": "p-ed7e6747",
         "streamId": "stream-2026-03-09",
@@ -4748,24 +4642,6 @@
     ]
   },
   {
-    "id": "song-312b20de",
-    "workId": "work-song-312b20de",
-    "title": "ファンサ",
-    "originalArtist": "mona(CV:夏川椎菜)[HoneyWorks]",
-    "tags": [
-      "language:ja"
-    ],
-    "performances": [
-      {
-        "id": "p-0fab3302",
-        "streamId": "stream-daaf4871",
-        "videoId": "GsG6hS5bOsA",
-        "timestamp": 4245,
-        "endTimestamp": 4495
-      }
-    ]
-  },
-  {
     "id": "song-d8d0c81f",
     "workId": "work-song-8cb605dc",
     "title": "ファンサ",
@@ -4780,6 +4656,13 @@
         "videoId": "xQ5TCl3JnXs",
         "timestamp": 6194,
         "endTimestamp": 6443
+      },
+      {
+        "id": "p-0fab3302",
+        "streamId": "stream-daaf4871",
+        "videoId": "GsG6hS5bOsA",
+        "timestamp": 4245,
+        "endTimestamp": 4495
       }
     ]
   },
