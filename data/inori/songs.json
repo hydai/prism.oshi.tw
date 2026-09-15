@@ -1648,10 +1648,13 @@
   },
   {
     "id": "song-1ead5d24",
-    "workId": "work-song-003f49b9",
+    "workId": "work-song-9f411950",
     "title": "glow",
     "originalArtist": "keeno",
-    "tags": [],
+    "tags": [
+      "language:ja",
+      "source:vocaloid"
+    ],
     "performances": [
       {
         "id": "p-e49ccd34",
