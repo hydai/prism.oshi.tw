@@ -160,14 +160,14 @@
       "streamsCount": 2
     },
     "lilylinglan": {
-      "exportRevision": 16,
-      "lastSyncedAt": "2026-09-12T05:05:22.170Z",
-      "maxSongUpdatedAt": "2026-09-12 05:04:00.307",
-      "maxPerfUpdatedAt": "2026-08-18 11:49:02",
-      "maxStreamUpdatedAt": "2026-08-18 11:49:02",
-      "songsCount": 47,
-      "performancesCount": 48,
-      "streamsCount": 3
+      "exportRevision": 85,
+      "lastSyncedAt": "2026-09-16T04:02:21.359Z",
+      "maxSongUpdatedAt": "2026-09-16 02:59:52.930",
+      "maxPerfUpdatedAt": "2026-09-16 02:59:24",
+      "maxStreamUpdatedAt": "2026-09-16 02:59:23",
+      "songsCount": 79,
+      "performancesCount": 82,
+      "streamsCount": 5
     },
     "margaretnorth": {
       "exportRevision": 18,
