@@ -1,6 +1,15 @@
 {
   "version": 1,
   "streamers": {
+    "cesium": {
+      "lastSyncedAt": null,
+      "maxSongUpdatedAt": null,
+      "maxPerfUpdatedAt": null,
+      "maxStreamUpdatedAt": null,
+      "songsCount": 0,
+      "performancesCount": 0,
+      "streamsCount": 0
+    },
     "earendel": {
       "exportRevision": 206,
       "lastSyncedAt": "2026-09-15T04:03:36.207Z",
