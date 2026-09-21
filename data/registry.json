@@ -122,6 +122,35 @@
       "enabled": true
     },
     {
+      "slug": "cesium",
+      "displayName": "Cesium ch. 瑟思安",
+      "description": "⚛︎ 𝘗𝘢𝘳𝘢≠𝘥𝘰𝘹 ∞ 𝘚𝘤𝘩𝘳ö𝘥𝘪𝘯𝘨𝘦𝘳'𝘴 𝘊𝘢𝘵 ∞ 𝘚𝘱𝘳𝘪𝘯𝘨𝘧𝘪𝘴𝘩 ⚛︎ \n\n在逃貓貓，你能觀察得到真實的我嗎/•᷅‎‎•᷄\\୭\n\n☆－:+:－:+:－:+:－:+:－:+:－:+:－☆ \n\n⏀ 企業合作、問題反應 ▿ Springfish@spring-fish.com\n⏀ 連動邀請、工商需求 ▿ bd@spring-fish.com\n⏀ 隸屬 ▿ 春魚創意股份有限公司 https://www.youtube.com/@Springfish\n　 　　  Para≠dox ∞ 五律悖反 https://www.youtube.com/@Paradox.2026\n\n☆－:+:－:+:－:+:－:+:－:+:－:+:－☆",
+      "avatarUrl": "https://yt3.ggpht.com/CHagvIdGIibjvhMODhCf1jTfVOdaTHWAboktdNnBOV8Xv1gS36Cds4Ww0h681dDwceZJcebqlfU=s240-c-k-c0x00ffffff-no-rj",
+      "brandName": "Cesium ch. 瑟思安",
+      "subscriberCount": "4.48萬",
+      "group": "春魚創意",
+      "socialLinks": {
+        "youtube": "https://www.youtube.com/@Cesium.Paradox",
+        "twitter": "https://x.com/Cesium_paradox",
+        "instagram": "https://www.instagram.com/cesium_paradox"
+      },
+      "theme": {
+        "accentPrimary": "#EC4899",
+        "accentPrimaryDark": "#DB2777",
+        "accentPrimaryLight": "#F472B6",
+        "accentSecondary": "#3B82F6",
+        "accentSecondaryLight": "#60A5FA",
+        "bgPageStart": "#FFF0F5",
+        "bgPageMid": "#F0F8FF",
+        "bgPageEnd": "#E6E6FA",
+        "bgAccentPrimary": "#FDF2F8",
+        "bgAccentPrimaryMuted": "#FCE7F3",
+        "borderAccentPrimary": "#FBCFE8",
+        "borderAccentSecondary": "#BFDBFE"
+      },
+      "enabled": true
+    },
+    {
       "slug": "galaxyvt",
       "displayName": "銀河 Galaxy",
       "description": "歌系個人勢💙",
@@ -212,7 +241,7 @@
       "description": "神秘企業的大小姐，在學大學生，討厭被束縛於既定的規則與期待。表面上自由散漫，實則敏銳聰穎，對遊戲情有獨鍾，在因緣際會下而加入了子午學院，雖然平時都說著要帥跟厲害，但總是會出錯(pon)，關鍵時候都會發生很多好笑的事情\n\n接觸到電腦遊戲後對於fps非常感興趣，我要在戰場上擊敗全部的人!! 成為新世界的王",
       "avatarUrl": "https://yt3.ggpht.com/eliPbYNsaF-msdif5klvF8XXT63uD1TiZO1gOtSbG_0himBaB55zRRsQA_6gaDbEuP-OKIwfikk=s240-c-k-c0x00ffffff-no-rj",
       "brandName": "Hitomi",
-      "subscriberCount": "5.04萬",
+      "subscriberCount": "5.05萬",
       "group": "子午計畫",
       "socialLinks": {
         "youtube": "https://www.youtube.com/@%E5%AE%9FHitomi",
@@ -274,7 +303,7 @@
       "description": "大家好！我是子午計畫所屬【沉珀Aetris】ㄉ莓ichii :3\n被你發現啦၄၃ꪔ̤̮",
       "avatarUrl": "https://yt3.ggpht.com/Ul6_CHAY2_-ANy3DZEmROcMdfIuxA8EJFKChOtHN6aWFUVGsgT-uMTbJNTNHQi8MPtEpE8WkZw=s240-c-k-c0x00ffffff-no-rj",
       "brandName": "Ichii",
-      "subscriberCount": "3.38萬",
+      "subscriberCount": "3.39萬",
       "group": "子午計畫",
       "socialLinks": {
         "youtube": "https://www.youtube.com/@%E8%8E%93Ichii_Channel",
@@ -365,7 +394,7 @@
       "description": "大家好呀 ^⦁᎑-^ ੭ 我是子午計畫所屬【沉珀Aetris】的宓Iseri\n想成為你的光芒照亮你 ☽ ·* ✧˚",
       "avatarUrl": "https://yt3.ggpht.com/qIWSkH0lIeZrldrVX-VKRJtMyDYFHKXMfwcrwVbKnODCUpn2TiTs8iiGx7UAcYS_Kw4ivtyh=s240-c-k-c0x00ffffff-no-rj",
       "brandName": "Iseri",
-      "subscriberCount": "3.16萬",
+      "subscriberCount": "3.17萬",
       "group": "子午計畫",
       "socialLinks": {
         "youtube": "https://www.youtube.com/@%E5%AE%93Iseri_Channel",
@@ -662,7 +691,7 @@
       "description": "大家好 我是子午計畫所屬【沉珀Aetris】的璃Miri\n讓我待在你身邊守護你吧｡·* ✧˚",
       "avatarUrl": "https://yt3.ggpht.com/erJlmpAFYLgcsBlRl4nSKFV3B0lD1sk6ZlXp6JEWe_n9fWynvli9aAhiL-oFqIfXFkdcba7S3Q=s240-c-k-c0x00ffffff-no-rj",
       "brandName": "Miri",
-      "subscriberCount": "2.9萬",
+      "subscriberCount": "2.92萬",
       "group": "子午計畫",
       "socialLinks": {
         "youtube": "https://www.youtube.com/@%E7%92%83Miri_Channel",
