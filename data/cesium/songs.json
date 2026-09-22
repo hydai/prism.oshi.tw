@@ -1,1 +1,3338 @@
-[]
+[
+  {
+    "id": "song-fb725980-1c5a-4e8a-93f2-377ddf17f090",
+    "workId": "work-ff50b243-2f87-4934-8003-7ee1ce822c97",
+    "title": "5ma之歌",
+    "originalArtist": "冰霧 Eisnebel",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-81e2cef5-c2c8-40e3-b7ed-9bd2038cd0de",
+        "streamId": "stream-2026-08-05",
+        "videoId": "VCrVYOabRXQ",
+        "timestamp": 4889,
+        "endTimestamp": 4940
+      }
+    ]
+  },
+  {
+    "id": "song-796a90fb-7e52-40d0-ac6d-46079b0b8b02",
+    "workId": "work-song-86d1488e",
+    "title": "一個人想著一個人",
+    "originalArtist": "曾沛慈",
+    "tags": [
+      "language:zh"
+    ],
+    "performances": [
+      {
+        "id": "p-1f927a5b-4f8d-49b1-a2f7-5c119673f682",
+        "streamId": "stream-f8c42ed9-4ff2-41d5-8b10-715506bc2a91",
+        "videoId": "iCGCoCtbdS0",
+        "timestamp": 1570,
+        "endTimestamp": 1808
+      }
+    ]
+  },
+  {
+    "id": "song-207f6d7d-7ad2-4205-af45-007026fc8a01",
+    "workId": "work-e5616e67-97c3-415c-8565-5a84c7b11479",
+    "title": "一笑江湖",
+    "originalArtist": "聞人聽書",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-daf3629d-4cd6-4084-aa8c-1e58f24f4925",
+        "streamId": "stream-2026-08-25",
+        "videoId": "w9XHL_J8_kc",
+        "timestamp": 4968,
+        "endTimestamp": 5152
+      }
+    ]
+  },
+  {
+    "id": "song-d66e2271-29a7-4ba8-a09d-54602eae5e2a",
+    "workId": "work-ecc77b08-bb0b-44b7-8978-fe0bc9b51366",
+    "title": "一笑傾城",
+    "originalArtist": "汪蘇瀧",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-45c7c689-b5ab-4e34-92ea-597ac660f0a7",
+        "streamId": "stream-2026-08-05",
+        "videoId": "VCrVYOabRXQ",
+        "timestamp": 4245,
+        "endTimestamp": 4473
+      },
+      {
+        "id": "p-969be420-d916-4411-ab64-604df9dbb050",
+        "streamId": "stream-f8c42ed9-4ff2-41d5-8b10-715506bc2a91",
+        "videoId": "iCGCoCtbdS0",
+        "timestamp": 6156,
+        "endTimestamp": 6384
+      }
+    ]
+  },
+  {
+    "id": "song-3d0d8f67-7843-487b-a142-2203bb79125f",
+    "workId": "work-fcef3367-c637-4be0-8e7a-76029bb402d6",
+    "title": "九九八十一",
+    "originalArtist": "樂正綾&洛天依",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-44606660-9b8b-499a-9e60-5e2d730591d2",
+        "streamId": "stream-2026-09-16",
+        "videoId": "8YAimZj5Mrw",
+        "timestamp": 6058,
+        "endTimestamp": 6340
+      }
+    ]
+  },
+  {
+    "id": "song-b633a6a8-d472-4982-9b07-aa76f5320237",
+    "workId": "work-song-1310",
+    "title": "九張機",
+    "originalArtist": "葉炫清",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-8dafe7a3-ccf7-441d-8463-a8a3522929b4",
+        "streamId": "stream-2026-09-20",
+        "videoId": "dP12QYzbzMA",
+        "timestamp": 4483,
+        "endTimestamp": 4699
+      },
+      {
+        "id": "p-6156c417-af13-4903-9023-aa9d8b123f43",
+        "streamId": "stream-513734c2-9b80-4ddb-a8b5-7076b1966370",
+        "videoId": "wwif9y3U65I",
+        "timestamp": 530,
+        "endTimestamp": 738
+      }
+    ]
+  },
+  {
+    "id": "song-d4f9f5c9-cf7f-4c96-938e-c943ccaf35f6",
+    "workId": "work-song-b4768f5e",
+    "title": "人間不值得",
+    "originalArtist": "黃詩扶",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-be083389-46a6-4aa4-9df6-cf273b09e745",
+        "streamId": "stream-2026-08-05",
+        "videoId": "VCrVYOabRXQ",
+        "timestamp": 8133,
+        "endTimestamp": 8411
+      }
+    ]
+  },
+  {
+    "id": "song-d9a76c3a-9acb-4cc5-83b1-7fa9553dfdcc",
+    "workId": "work-4e757072-7edc-4d0d-8427-f828f8e94dd3",
+    "title": "十二鎮魂歌",
+    "originalArtist": "星塵",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-6740e616-e1c7-4938-b281-70d2a38b11a5",
+        "streamId": "stream-2026-09-16",
+        "videoId": "8YAimZj5Mrw",
+        "timestamp": 5171,
+        "endTimestamp": 5363
+      }
+    ]
+  },
+  {
+    "id": "song-3e96d1e6-bd4d-433a-a8b1-1f806c6dd4f8",
+    "workId": "work-9e1a8849-b4ba-4fb6-913d-082dc9316169",
+    "title": "十年人間",
+    "originalArtist": "李常超",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-12aec6a4-e324-4bf0-b6a4-dbb9c2079b41",
+        "streamId": "stream-2026-09-09",
+        "videoId": "_4yrs9aGUA8",
+        "timestamp": 1326,
+        "endTimestamp": 1536
+      }
+    ]
+  },
+  {
+    "id": "song-8987b338-cc0b-4cd1-99e7-4f2ffd76d6a6",
+    "workId": "work-song-86a9c22d",
+    "title": "三寸天堂",
+    "originalArtist": "嚴藝丹",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-800c24e6-6f68-40fe-a8f6-ba3e9d15e576",
+        "streamId": "stream-513734c2-9b80-4ddb-a8b5-7076b1966370",
+        "videoId": "wwif9y3U65I",
+        "timestamp": 2964,
+        "endTimestamp": 3246
+      }
+    ]
+  },
+  {
+    "id": "song-4b4d9246-3f4f-4be9-9db7-20f4f434c00d",
+    "workId": "work-f1836637-193c-46b4-840e-fc40444104f1",
+    "title": "三寸天堂(速度 -0.4 → +0、Key -3)",
+    "originalArtist": "嚴藝丹",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-43cd63b3-fe5d-45ab-ba93-83b7f4b86e7a",
+        "streamId": "stream-2026-09-20",
+        "videoId": "dP12QYzbzMA",
+        "timestamp": 1386,
+        "endTimestamp": 1757
+      }
+    ]
+  },
+  {
+    "id": "song-e7f583b8-674c-47ef-b4ac-30184fac65f9",
+    "workId": "work-35fad6f0-7357-430d-8af0-c5b238620336",
+    "title": "三拜紅塵涼",
+    "originalArtist": "尹昔眠",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-b28ba864-a3ee-40dd-9a58-2d9d13c188b5",
+        "streamId": "stream-2026-06-10",
+        "videoId": "cKzrbehaWUU",
+        "timestamp": 3203,
+        "endTimestamp": 3376
+      }
+    ]
+  },
+  {
+    "id": "song-cd46a7f5-2452-4540-88e8-6e3fbcc60c77",
+    "workId": "work-05a8a916-cb69-4934-b543-f68705636238",
+    "title": "三過門",
+    "originalArtist": "黃詩扶",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-e4ecd7de-ad3b-48f6-9e8b-7fb2a7a71cf4",
+        "streamId": "stream-b791bdb9-7f5a-43fa-8602-77bfa9746e3a",
+        "videoId": "Xwupr-SRT38",
+        "timestamp": 3021,
+        "endTimestamp": 3212
+      }
+    ]
+  },
+  {
+    "id": "song-1e71f816-c871-4259-beb4-90270b220051",
+    "workId": "work-19ac1cc7-9ab9-4da7-bb8d-a264f4cb8d9c",
+    "title": "千秋迭夢",
+    "originalArtist": "霍尊",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-86a9a262-534c-4ea4-aa5b-0e6de078df44",
+        "streamId": "stream-2026-09-16",
+        "videoId": "8YAimZj5Mrw",
+        "timestamp": 751,
+        "endTimestamp": 975
+      }
+    ]
+  },
+  {
+    "id": "song-a322221d-f427-4330-9cf8-b880ec983eba",
+    "workId": "work-song-204",
+    "title": "大魚",
+    "originalArtist": "周深",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-3665ed2a-dc5d-4845-9757-828589f0612a",
+        "streamId": "stream-2026-08-19",
+        "videoId": "WKEO0RdBBig",
+        "timestamp": 5860,
+        "endTimestamp": 6189
+      }
+    ]
+  },
+  {
+    "id": "song-2c3300d3-4fe0-4a42-aadf-adbea34eb2c1",
+    "workId": "work-3b087335-e839-43e0-9a04-0ea1a27ca8cf",
+    "title": "女孩你為何墊腳尖",
+    "originalArtist": "雙笙",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-b8bbd7ed-dec5-47f5-af73-eaadd5e6c6bb",
+        "streamId": "stream-2026-08-05",
+        "videoId": "VCrVYOabRXQ",
+        "timestamp": 1932,
+        "endTimestamp": 2223
+      }
+    ]
+  },
+  {
+    "id": "song-8f18e44e-c25d-40ce-9c46-eb8796cd84e3",
+    "workId": "work-song-1312",
+    "title": "小丑的品格",
+    "originalArtist": "泠鳶yousa",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-00203f82-581d-4426-86ac-38324a00f53a",
+        "streamId": "stream-2026-07-22",
+        "videoId": "jAQvF5wMGws",
+        "timestamp": 3131,
+        "endTimestamp": 3395
+      },
+      {
+        "id": "p-3f8a63f4-cb61-4711-9e2d-516fbef5fc2d",
+        "streamId": "stream-b791bdb9-7f5a-43fa-8602-77bfa9746e3a",
+        "videoId": "Xwupr-SRT38",
+        "timestamp": 749,
+        "endTimestamp": 1012
+      }
+    ]
+  },
+  {
+    "id": "song-19e3d2ef-230a-4923-80e4-d9ded1dbe06b",
+    "workId": "work-song-a9a4ba26",
+    "title": "小幸運",
+    "originalArtist": "田馥甄",
+    "tags": [
+      "language:zh"
+    ],
+    "performances": [
+      {
+        "id": "p-27f7163a-5b03-4024-9109-7d098eda265c",
+        "streamId": "stream-f8c42ed9-4ff2-41d5-8b10-715506bc2a91",
+        "videoId": "iCGCoCtbdS0",
+        "timestamp": 4443,
+        "endTimestamp": 4703
+      }
+    ]
+  },
+  {
+    "id": "song-f564e4f9-fb85-4951-8612-eb9bae671e47",
+    "workId": "work-ff57b063-cd78-421b-ab20-6052eb2f4efd",
+    "title": "小幸運(速度 -0.3、Key -2)",
+    "originalArtist": "田馥甄",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-5cdaf115-6754-4b49-ba28-dfefc7485165",
+        "streamId": "stream-2026-09-20",
+        "videoId": "dP12QYzbzMA",
+        "timestamp": 5714,
+        "endTimestamp": 6083
+      }
+    ]
+  },
+  {
+    "id": "song-066f3487-2630-4891-9e32-662dda5c41ac",
+    "workId": "work-d5ade28a-55ca-46be-ad69-1f15dfb5b4ba",
+    "title": "山有木兮",
+    "originalArtist": "倫桑",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-02b410fa-902f-41ba-ad4f-249675aacbfb",
+        "streamId": "stream-2026-07-22",
+        "videoId": "jAQvF5wMGws",
+        "timestamp": 5417,
+        "endTimestamp": 5658
+      },
+      {
+        "id": "p-1a31ad37-39c8-4432-b219-84ce706b3183",
+        "streamId": "stream-f9857413-9717-46ed-8bf5-abc9d9af362f",
+        "videoId": "-iBV9Be21mA",
+        "timestamp": 5196,
+        "endTimestamp": 5437
+      }
+    ]
+  },
+  {
+    "id": "song-55c8ecdc-6f17-4382-ab55-1fb46969ab9c",
+    "workId": "work-bed6bf8a-ee3c-4ed8-a37b-741ed20addcb",
+    "title": "山河令",
+    "originalArtist": "星塵",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-bfa4b846-fe32-4221-9fe1-85f00a8a5d77",
+        "streamId": "stream-f8223f85-ac1f-4e8e-8368-28ebf02db798",
+        "videoId": "VFztLHJb_EU",
+        "timestamp": 6049,
+        "endTimestamp": 6264
+      }
+    ]
+  },
+  {
+    "id": "song-6d792ff1-0aae-41c3-b8af-ea956d8aabaf",
+    "workId": "work-song-bf727142",
+    "title": "不老夢",
+    "originalArtist": "銀臨",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-8219232d-1efb-424e-99cb-863549680b35",
+        "streamId": "stream-2026-08-05",
+        "videoId": "VCrVYOabRXQ",
+        "timestamp": 8963,
+        "endTimestamp": 9215
+      }
+    ]
+  },
+  {
+    "id": "song-55e02590-ed7c-4309-98c1-264745d1cd31",
+    "workId": "work-song-2323",
+    "title": "不是因為天氣晴朗才愛你",
+    "originalArtist": "理想混蛋",
+    "tags": [
+      "language:zh"
+    ],
+    "performances": [
+      {
+        "id": "p-fb91fa86-d6c5-4602-94ff-0eee6204bcbc",
+        "streamId": "stream-b791bdb9-7f5a-43fa-8602-77bfa9746e3a",
+        "videoId": "Xwupr-SRT38",
+        "timestamp": 3512,
+        "endTimestamp": 3741
+      }
+    ]
+  },
+  {
+    "id": "song-f81526b9-34dc-4b43-ab81-7c24dfdcb82b",
+    "workId": "work-fe00b9b6-420f-4766-a1f7-4eac3a75f058",
+    "title": "不染",
+    "originalArtist": "毛不易",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-1c29fdad-3c8b-4c86-aaaa-ef6d41fa3c68",
+        "streamId": "stream-513734c2-9b80-4ddb-a8b5-7076b1966370",
+        "videoId": "wwif9y3U65I",
+        "timestamp": 6245,
+        "endTimestamp": 6572
+      },
+      {
+        "id": "p-195928ab-a62f-40f6-8214-25bd6ea6e455",
+        "streamId": "stream-2026-06-10",
+        "videoId": "cKzrbehaWUU",
+        "timestamp": 1122,
+        "endTimestamp": 1447
+      }
+    ]
+  },
+  {
+    "id": "song-285b6a36-c04c-4256-9b46-760236e9dc01",
+    "workId": "work-28904cac-3e0d-490a-9367-1b0f09800575",
+    "title": "不羨明月知",
+    "originalArtist": "樂正龍牙&言和",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-31c3e685-3891-4c37-93c0-9399abdad94a",
+        "streamId": "stream-2026-07-08",
+        "videoId": "n7o5ukvaAiY",
+        "timestamp": 4866,
+        "endTimestamp": 5139
+      }
+    ]
+  },
+  {
+    "id": "song-b320cf18-d3b6-4154-bef2-48338e0802e2",
+    "workId": "work-1c532464-c855-4777-8218-a5edc4bc9055",
+    "title": "不謂俠",
+    "originalArtist": "蕭憶情Alex",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-7f4dd1f8-d718-47f0-8b8d-5478e53aebb1",
+        "streamId": "stream-2026-09-16",
+        "videoId": "8YAimZj5Mrw",
+        "timestamp": 3390,
+        "endTimestamp": 3650
+      }
+    ]
+  },
+  {
+    "id": "song-9c7436c4-7126-4682-ba26-9c145ec768ee",
+    "workId": "work-2613fe2e-e15a-41ee-9a04-569ec0fd696a",
+    "title": "予君書",
+    "originalArtist": "阿YueYue",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-e7cd1346-7c3e-40de-a73e-e1423b4b40d4",
+        "streamId": "stream-2026-08-19",
+        "videoId": "WKEO0RdBBig",
+        "timestamp": 1615,
+        "endTimestamp": 1816
+      }
+    ]
+  },
+  {
+    "id": "song-0ce3f87f-1a63-4195-b6ed-c1345e8a586c",
+    "workId": "work-b276e17a-d779-45b4-a992-a1e6c337b222",
+    "title": "天行九歌",
+    "originalArtist": "霍尊",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-8c92b8a1-bc5b-4736-84cb-a4babd9a3096",
+        "streamId": "stream-2026-07-08",
+        "videoId": "n7o5ukvaAiY",
+        "timestamp": 348,
+        "endTimestamp": 575
+      }
+    ]
+  },
+  {
+    "id": "song-ced5a6c3-2f39-48db-8da0-b46bba82b79d",
+    "workId": "work-song-48d85db1",
+    "title": "天ノ弱",
+    "originalArtist": "164 feat.GUMI",
+    "tags": [
+      "language:ja",
+      "source:vocaloid"
+    ],
+    "performances": [
+      {
+        "id": "p-8432fb4d-b7cf-4ba6-aa3d-f99c6237bd3a",
+        "streamId": "stream-f8c42ed9-4ff2-41d5-8b10-715506bc2a91",
+        "videoId": "iCGCoCtbdS0",
+        "timestamp": 557,
+        "endTimestamp": 808
+      },
+      {
+        "id": "p-524fc1ef-4275-4d16-8c58-2c17b5b42c29",
+        "streamId": "stream-2026-06-17",
+        "videoId": "UaUF0j7Pmy4",
+        "timestamp": 4064,
+        "endTimestamp": 4310
+      }
+    ]
+  },
+  {
+    "id": "song-17484993-2992-47a2-838d-407225c49cf5",
+    "workId": "work-ff7a1ab7-6bca-4b26-bc7f-cd6dc73576cb",
+    "title": "心上秋",
+    "originalArtist": "星塵",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-6c3d74fd-459f-4aaf-a56f-b255e2535c58",
+        "streamId": "stream-f8223f85-ac1f-4e8e-8368-28ebf02db798",
+        "videoId": "VFztLHJb_EU",
+        "timestamp": 1237,
+        "endTimestamp": 1441
+      }
+    ]
+  },
+  {
+    "id": "song-a126a645-adaf-4f94-ae9b-d1be9d53f0b1",
+    "workId": "work-76e4e6aa-3158-4856-9913-2563e3fb764f",
+    "title": "心若為城",
+    "originalArtist": "CRITTY",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-6eccbb39-31ca-4e86-8d9a-6beabb5314b6",
+        "streamId": "stream-f9857413-9717-46ed-8bf5-abc9d9af362f",
+        "videoId": "-iBV9Be21mA",
+        "timestamp": 4645,
+        "endTimestamp": 4901
+      }
+    ]
+  },
+  {
+    "id": "song-34df6b2b-ab1d-46cd-a41c-064a0b8350d8",
+    "workId": "work-song-67fd5711",
+    "title": "手掌心",
+    "originalArtist": "丁噹",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-ca7367ec-3b24-4cb2-9a9f-13e2fe8b8118",
+        "streamId": "stream-513734c2-9b80-4ddb-a8b5-7076b1966370",
+        "videoId": "wwif9y3U65I",
+        "timestamp": 5504,
+        "endTimestamp": 5757
+      },
+      {
+        "id": "p-9536ad54-ba64-47f3-aeb8-bfd2179f41ed",
+        "streamId": "stream-2026-08-05",
+        "videoId": "VCrVYOabRXQ",
+        "timestamp": 6203,
+        "endTimestamp": 6457
+      }
+    ]
+  },
+  {
+    "id": "song-744b9423-4a03-4aea-a6eb-3dd112792e9d",
+    "workId": "work-4d0b7cc4-63ab-4fb3-92ad-596bb367b911",
+    "title": "月出",
+    "originalArtist": "雙笙",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-2ba89117-4eaa-4ef0-b1a3-0f0daca93997",
+        "streamId": "stream-2026-09-16",
+        "videoId": "8YAimZj5Mrw",
+        "timestamp": 2516,
+        "endTimestamp": 2749
+      }
+    ]
+  },
+  {
+    "id": "song-1cc3e403-dbbb-4ab2-be0f-f3b01ef0526f",
+    "workId": "work-5ffb3c2b-93ec-4433-aca0-f8a77c24f959",
+    "title": "木蘭行",
+    "originalArtist": "蒼穹",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-53797d16-1d27-49e8-a131-2d95938a8fbe",
+        "streamId": "stream-f8223f85-ac1f-4e8e-8368-28ebf02db798",
+        "videoId": "VFztLHJb_EU",
+        "timestamp": 2129,
+        "endTimestamp": 2334
+      }
+    ]
+  },
+  {
+    "id": "song-962f99dd-4499-48bc-af6f-415569a317ab",
+    "workId": "work-33b307c3-bf36-4339-810c-40218503ebd6",
+    "title": "世末歌者",
+    "originalArtist": "樂正綾",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-45611f55-81ed-4359-a1cb-33f0bb709e2c",
+        "streamId": "stream-2026-08-25",
+        "videoId": "w9XHL_J8_kc",
+        "timestamp": 1090,
+        "endTimestamp": 1343
+      }
+    ]
+  },
+  {
+    "id": "song-6d531605-d733-4a46-b791-26c3a2992cad",
+    "workId": "work-ba6dd44c-f12e-44fa-85f0-b716da7e47bd",
+    "title": "出航",
+    "originalArtist": "STU48",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-dfa3cfbf-d4be-467f-ab01-edbe96e23ca8",
+        "streamId": "stream-f8c42ed9-4ff2-41d5-8b10-715506bc2a91",
+        "videoId": "iCGCoCtbdS0",
+        "timestamp": 1075,
+        "endTimestamp": 1357
+      }
+    ]
+  },
+  {
+    "id": "song-4b888b0d-83e0-4b22-9e8a-d9b84557a182",
+    "workId": "work-618430bd-35bf-480d-bb24-b3a970af6c0e",
+    "title": "四萬秋",
+    "originalArtist": "國風堂&黃詩扶",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-83241ff8-1364-46ef-b5ab-4b7309558b23",
+        "streamId": "stream-8e950518-f22d-49f9-b20e-67eff2af5210",
+        "videoId": "f69M8rbw2Cc",
+        "timestamp": 264,
+        "endTimestamp": 437
+      }
+    ]
+  },
+  {
+    "id": "song-2c7606bf-f49b-4ba8-b874-fadea99c4acd",
+    "workId": "work-8bc2501a-9608-49a9-993a-b5531fff5b02",
+    "title": "失春",
+    "originalArtist": "雙笙",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-2d6fec0d-7eea-4e56-93a8-1dc700b2872c",
+        "streamId": "stream-2026-07-08",
+        "videoId": "n7o5ukvaAiY",
+        "timestamp": 4433,
+        "endTimestamp": 4680
+      }
+    ]
+  },
+  {
+    "id": "song-e63969a5-3f54-4275-9d3f-1b3b344cdc95",
+    "workId": "work-song-159",
+    "title": "左手指月",
+    "originalArtist": "薩頂頂",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-50e27872-c7c3-4c58-b6e7-dead5f7f5a93",
+        "streamId": "stream-2026-09-09",
+        "videoId": "_4yrs9aGUA8",
+        "timestamp": 6403,
+        "endTimestamp": 6619
+      }
+    ]
+  },
+  {
+    "id": "song-cf87b500-3011-4b8f-9931-e52b37932035",
+    "workId": "work-song-bc47609e",
+    "title": "必巡",
+    "originalArtist": "曾瑋中",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-859e39d3-d912-41a7-ac70-f37608263fdf",
+        "streamId": "stream-2026-07-22",
+        "videoId": "jAQvF5wMGws",
+        "timestamp": 362,
+        "endTimestamp": 622
+      },
+      {
+        "id": "p-ccc39d49-f859-47ec-9d53-66af127c7875",
+        "streamId": "stream-acceb6ce-b95c-44d7-8642-ed95fab8c930",
+        "videoId": "P0O4oAf4jso",
+        "timestamp": 3659,
+        "endTimestamp": 3919
+      }
+    ]
+  },
+  {
+    "id": "song-6f8709f2-50bc-4e05-896c-21851c646662",
+    "workId": "work-song-0fd1d32e",
+    "title": "打上花火",
+    "originalArtist": "DAOKO & 米津玄師",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-cf3771bf-813a-49f1-aff4-e75121114741",
+        "streamId": "stream-f8c42ed9-4ff2-41d5-8b10-715506bc2a91",
+        "videoId": "iCGCoCtbdS0",
+        "timestamp": 3781,
+        "endTimestamp": 4065
+      }
+    ]
+  },
+  {
+    "id": "song-b37ffedd-a6c2-4ea0-bc0d-ae5d6353fa0d",
+    "workId": "work-song-c1956df6",
+    "title": "白鴿",
+    "originalArtist": "你的上好佳",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-e57a9d77-9c2d-4ad5-9065-3e9801fef08a",
+        "streamId": "stream-2026-08-05",
+        "videoId": "VCrVYOabRXQ",
+        "timestamp": 3499,
+        "endTimestamp": 3703
+      }
+    ]
+  },
+  {
+    "id": "song-bee8e4fd-909c-48c2-8f2d-b702a41d02fa",
+    "workId": "work-9a6f3ef4-48c2-4541-818f-88609fd70e91",
+    "title": "白鴿(中間降速度 -0.1)",
+    "originalArtist": "你的上好佳",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-fc980a3e-4734-463b-9ea4-594ffa4c9d0c",
+        "streamId": "stream-2026-09-20",
+        "videoId": "dP12QYzbzMA",
+        "timestamp": 5043,
+        "endTimestamp": 5220
+      }
+    ]
+  },
+  {
+    "id": "song-060f956a-ac88-4a0c-b60e-c710391673f7",
+    "workId": "work-b518f147-0d6e-4f39-9a7f-d6a474dc0ffa",
+    "title": "石楠小札",
+    "originalArtist": "蔡翊昇",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-746b8b46-5822-42b1-b327-4ca446174428",
+        "streamId": "stream-2026-09-09",
+        "videoId": "_4yrs9aGUA8",
+        "timestamp": 3537,
+        "endTimestamp": 3783
+      },
+      {
+        "id": "p-07ec3d5d-909f-4745-80c7-5bb3a729859f",
+        "streamId": "stream-f9857413-9717-46ed-8bf5-abc9d9af362f",
+        "videoId": "-iBV9Be21mA",
+        "timestamp": 2957,
+        "endTimestamp": 3202
+      }
+    ]
+  },
+  {
+    "id": "song-069b0b02-9d16-4ab8-a3d7-b8312e08e23f",
+    "workId": "work-65aa03a6-9bdf-45a5-8782-0529d19b19d4",
+    "title": "多情岸",
+    "originalArtist": "洛天依",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-2a177c4f-d526-4f91-8980-63af3a605fbd",
+        "streamId": "stream-f8223f85-ac1f-4e8e-8368-28ebf02db798",
+        "videoId": "VFztLHJb_EU",
+        "timestamp": 4960,
+        "endTimestamp": 5250
+      }
+    ]
+  },
+  {
+    "id": "song-280f3a3c-3783-4f81-8359-feb8f1c12ef0",
+    "workId": "work-42a2f700-b0f1-422e-ad89-c03229c964c7",
+    "title": "多情岸",
+    "originalArtist": "忘川風華錄",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-649ea3d1-87b0-455f-855b-97c41fecab2a",
+        "streamId": "stream-8e950518-f22d-49f9-b20e-67eff2af5210",
+        "videoId": "f69M8rbw2Cc",
+        "timestamp": 3462,
+        "endTimestamp": 3751
+      }
+    ]
+  },
+  {
+    "id": "song-01268e9d-9966-4623-8e6b-138342c11fbb",
+    "workId": "work-858c2d88-cc1e-4f0b-bd5f-6da08218dbd7",
+    "title": "好字唯之",
+    "originalArtist": "海伊",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-cf43a605-460c-466a-8479-d6e7a62f1432",
+        "streamId": "stream-f8223f85-ac1f-4e8e-8368-28ebf02db798",
+        "videoId": "VFztLHJb_EU",
+        "timestamp": 5602,
+        "endTimestamp": 5807
+      }
+    ]
+  },
+  {
+    "id": "song-7f79b163-6276-45be-9963-6c8e5c763b4c",
+    "workId": "work-492cc721-4c3a-4e46-836e-a109d02c87a4",
+    "title": "如見青山",
+    "originalArtist": "心華",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-99fe7aff-0aea-487f-9de7-7302a6796e05",
+        "streamId": "stream-f8223f85-ac1f-4e8e-8368-28ebf02db798",
+        "videoId": "VFztLHJb_EU",
+        "timestamp": 4045,
+        "endTimestamp": 4247
+      }
+    ]
+  },
+  {
+    "id": "song-edb2f4e4-409b-40cb-919d-3ba7fee66069",
+    "workId": "work-b031b334-66b5-4942-b270-19b313f3c940",
+    "title": "如是我聞",
+    "originalArtist": "Winky詩",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-69909718-5223-434f-a246-97fa06ec64d4",
+        "streamId": "stream-2026-08-25",
+        "videoId": "w9XHL_J8_kc",
+        "timestamp": 2076,
+        "endTimestamp": 2353
+      }
+    ]
+  },
+  {
+    "id": "song-7d54869e-f6a7-44a1-bc44-0e6afef155e8",
+    "workId": "work-af724ef0-d9a4-4231-9ca3-678c6a661eda",
+    "title": "如寄",
+    "originalArtist": "蕭憶情",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-d2086846-c4aa-41cb-a6b0-a8ce9011a5d7",
+        "streamId": "stream-2026-07-22",
+        "videoId": "jAQvF5wMGws",
+        "timestamp": 4854,
+        "endTimestamp": 5128
+      }
+    ]
+  },
+  {
+    "id": "song-c21e3800-9d30-4889-8ff1-9284241d6294",
+    "workId": "work-d8f2a92d-ae0d-4a8d-9415-aa322e8ed671",
+    "title": "如寄",
+    "originalArtist": "蕭憶情Alex",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-ea770eaf-7008-4fe7-a3fb-66ebf7da2601",
+        "streamId": "stream-8e950518-f22d-49f9-b20e-67eff2af5210",
+        "videoId": "f69M8rbw2Cc",
+        "timestamp": 2297,
+        "endTimestamp": 2568
+      }
+    ]
+  },
+  {
+    "id": "song-b49d94a8-cade-42fd-8661-486581a63ca7",
+    "workId": "work-18db9393-d660-438e-b37b-1750e516c134",
+    "title": "妄語人間",
+    "originalArtist": "星塵infinity",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-b12188d0-ba48-4e4e-9fec-598eb0868999",
+        "streamId": "stream-2026-09-09",
+        "videoId": "_4yrs9aGUA8",
+        "timestamp": 755,
+        "endTimestamp": 959
+      }
+    ]
+  },
+  {
+    "id": "song-41f4613d-4031-41e4-bfb3-dbd0eb867d55",
+    "workId": "work-2c41cee2-7087-4444-a34f-79e4dd1e03e6",
+    "title": "伶人",
+    "originalArtist": "排骨教主",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-e2ec5072-313c-4870-8cfb-68b03a6db986",
+        "streamId": "stream-2026-09-16",
+        "videoId": "8YAimZj5Mrw",
+        "timestamp": 196,
+        "endTimestamp": 414
+      }
+    ]
+  },
+  {
+    "id": "song-ff70c597-1d4b-4d22-b9fd-81aec42a3b38",
+    "workId": "work-e84e7e0f-23de-493d-b924-efba9194636e",
+    "title": "何以歌",
+    "originalArtist": "Aki阿傑",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-8c661f72-3785-47ce-818b-80a1430dc700",
+        "streamId": "stream-97b2edd0-d63d-48e8-936c-c7c7624334ad",
+        "videoId": "Mp1x5ZY-gd0",
+        "timestamp": 3542,
+        "endTimestamp": 3810
+      }
+    ]
+  },
+  {
+    "id": "song-8a890ac8-c2fa-4fe3-8a74-e597681a6488",
+    "workId": "work-f092d504-f918-4806-914a-a749cae0afea",
+    "title": "何必詩債換酒錢",
+    "originalArtist": "黃詩扶",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-59ef5862-dd85-4231-b625-422d57144d74",
+        "streamId": "stream-5e5e42d5-9115-45c5-b00f-1b23652d0f8d",
+        "videoId": "aaM-FVAB4uk",
+        "timestamp": 1310,
+        "endTimestamp": 1544
+      }
+    ]
+  },
+  {
+    "id": "song-5a3bb36a-1869-48c4-851a-95c564fe382c",
+    "workId": "work-song-fd4a929e",
+    "title": "含淚跳恰恰",
+    "originalArtist": "謝金燕",
+    "tags": [
+      "language:zh"
+    ],
+    "performances": [
+      {
+        "id": "p-29784779-2f11-48d9-90ae-64e71eedb7ba",
+        "streamId": "stream-2026-07-22",
+        "videoId": "jAQvF5wMGws",
+        "timestamp": 4491,
+        "endTimestamp": 4693
+      },
+      {
+        "id": "p-d4df0c13-0375-4471-acbb-a753f8cfbe79",
+        "streamId": "stream-acceb6ce-b95c-44d7-8642-ed95fab8c930",
+        "videoId": "P0O4oAf4jso",
+        "timestamp": 739,
+        "endTimestamp": 940
+      }
+    ]
+  },
+  {
+    "id": "song-a5496101-a113-4f84-ac7e-74dc52702e79",
+    "workId": "work-ce8aa5c3-a6d7-4f9e-a31d-f8aa1295feb6",
+    "title": "志明與春嬌",
+    "originalArtist": "五月天",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-838b44e4-b993-42f8-af46-15c0ea19460c",
+        "streamId": "stream-acceb6ce-b95c-44d7-8642-ed95fab8c930",
+        "videoId": "P0O4oAf4jso",
+        "timestamp": 3184,
+        "endTimestamp": 3434
+      }
+    ]
+  },
+  {
+    "id": "song-975e29aa-6247-4866-b763-4e8bf9219943",
+    "workId": "work-c8d11397-f252-4c72-9ae7-eb9c81a7de3f",
+    "title": "忘憂曲",
+    "originalArtist": "夏銅子",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-9817dd3f-3671-4f2d-a7f9-18398eb19655",
+        "streamId": "stream-2026-08-25",
+        "videoId": "w9XHL_J8_kc",
+        "timestamp": 3526,
+        "endTimestamp": 3746
+      }
+    ]
+  },
+  {
+    "id": "song-d509861f-dcd3-4789-92ba-da9d964ce89a",
+    "workId": "work-song-0b948d3f",
+    "title": "忘れじの言の葉",
+    "originalArtist": "安次嶺希和子",
+    "tags": [
+      "language:ja"
+    ],
+    "performances": [
+      {
+        "id": "p-c10e00df-958d-478e-889d-7b5d97338e17",
+        "streamId": "stream-2026-06-17",
+        "videoId": "UaUF0j7Pmy4",
+        "timestamp": 2044,
+        "endTimestamp": 2278
+      },
+      {
+        "id": "p-2cdc005c-2be7-4fbd-bb1f-117b18c04d44",
+        "streamId": "stream-b791bdb9-7f5a-43fa-8602-77bfa9746e3a",
+        "videoId": "Xwupr-SRT38",
+        "timestamp": 1607,
+        "endTimestamp": 1840
+      }
+    ]
+  },
+  {
+    "id": "song-5b26609a-6e98-4527-80b8-a5be922f059d",
+    "workId": "work-5af00027-27c6-4c31-8adc-952b3f8c0e3d",
+    "title": "我不信你不慚愧",
+    "originalArtist": "耳朵便利店",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-5a6824f1-6178-40b8-9570-5fd3bb52a576",
+        "streamId": "stream-2026-08-05",
+        "videoId": "VCrVYOabRXQ",
+        "timestamp": 3855,
+        "endTimestamp": 4015
+      }
+    ]
+  },
+  {
+    "id": "song-0b739651-c040-40e6-bfca-79b892c4bae0",
+    "workId": "work-a9bb5aba-501e-4f82-86b7-fb5cb6c6a597",
+    "title": "我不信你不慚愧(速度 -0.3)",
+    "originalArtist": "耳朵便利店",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-d60f7b72-8cfc-4174-bd98-b826642539b0",
+        "streamId": "stream-2026-09-20",
+        "videoId": "dP12QYzbzMA",
+        "timestamp": 688,
+        "endTimestamp": 916
+      }
+    ]
+  },
+  {
+    "id": "song-1616944b-0f03-4559-a608-15037567ba9e",
+    "workId": "work-song-4b1477dd",
+    "title": "我的一個道姑朋友",
+    "originalArtist": "Lon",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-1add7f8f-d8ce-4c9b-b99e-f15a5528e9d8",
+        "streamId": "stream-2026-09-09",
+        "videoId": "_4yrs9aGUA8",
+        "timestamp": 2190,
+        "endTimestamp": 2470
+      }
+    ]
+  },
+  {
+    "id": "song-63539b38-5b8d-4d2d-b2bc-5478502f0810",
+    "workId": "work-df100257-fa4d-4e7b-9e83-f710c7784068",
+    "title": "我喜歡你",
+    "originalArtist": "芒果醬",
+    "tags": [
+      "language:zh"
+    ],
+    "performances": [
+      {
+        "id": "p-48bb1c41-0526-4884-a487-b734a596cceb",
+        "streamId": "stream-2026-08-05",
+        "videoId": "VCrVYOabRXQ",
+        "timestamp": 7622,
+        "endTimestamp": 7827
+      }
+    ]
+  },
+  {
+    "id": "song-cfafe97b-f8b2-4fc2-a00b-8ce07f9dfead",
+    "workId": "work-377ab835-b0e8-4f61-b5df-d6cab87780ad",
+    "title": "沈園外",
+    "originalArtist": "阿YueYue&戾格",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-722c3b7d-7cab-4697-9934-aa3971d61a8f",
+        "streamId": "stream-2026-09-16",
+        "videoId": "8YAimZj5Mrw",
+        "timestamp": 1505,
+        "endTimestamp": 1725
+      }
+    ]
+  },
+  {
+    "id": "song-005f7e12-29b4-4a15-b391-6c473e33f47d",
+    "workId": "work-b77430b8-393b-4d60-bf3d-0763b8161831",
+    "title": "芊芊",
+    "originalArtist": "回音哥",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-7539b8fb-64d0-4062-86d4-129d0e3dee79",
+        "streamId": "stream-f9857413-9717-46ed-8bf5-abc9d9af362f",
+        "videoId": "-iBV9Be21mA",
+        "timestamp": 2083,
+        "endTimestamp": 2320
+      }
+    ]
+  },
+  {
+    "id": "song-c5e11766-cf79-4e00-9a08-edaddd7c30ed",
+    "workId": "work-song-a7997b7e",
+    "title": "赤伶",
+    "originalArtist": "等什麼君",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-827ed52b-5ba6-44db-adfd-d11063b8dc0a",
+        "streamId": "stream-2026-08-05",
+        "videoId": "VCrVYOabRXQ",
+        "timestamp": 5052,
+        "endTimestamp": 5316
+      },
+      {
+        "id": "p-9d98df38-ea02-4a03-bb1d-50fa8be76a48",
+        "streamId": "stream-8e950518-f22d-49f9-b20e-67eff2af5210",
+        "videoId": "f69M8rbw2Cc",
+        "timestamp": 550,
+        "endTimestamp": 808
+      }
+    ]
+  },
+  {
+    "id": "song-cc6168d3-c037-4313-808c-8d1a1d84ac60",
+    "workId": "work-78b1b311-efc3-422b-b77a-851ac4b38222",
+    "title": "兩小無猜",
+    "originalArtist": "洛少爺xAkira明",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-13e041d3-1e13-4cdd-ab3d-c184ca1efb1b",
+        "streamId": "stream-2026-08-19",
+        "videoId": "WKEO0RdBBig",
+        "timestamp": 1204,
+        "endTimestamp": 1375
+      }
+    ]
+  },
+  {
+    "id": "song-f645eb57-fea6-4f21-9066-0bb2cdf7922a",
+    "workId": "work-710fdd46-368c-49e7-8df0-0c834ef715e6",
+    "title": "兩小無猜(速度 +0.3、Key -2)",
+    "originalArtist": "洛少爺xAkira明",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-5ab25cae-571c-4ff4-9abc-889374cb9a2d",
+        "streamId": "stream-2026-09-20",
+        "videoId": "dP12QYzbzMA",
+        "timestamp": 1047,
+        "endTimestamp": 1178
+      }
+    ]
+  },
+  {
+    "id": "song-81a019ef-f00f-44a7-949e-9de74d84912c",
+    "workId": "work-64a374e3-8ab1-48c7-9d8e-4f8c560935c3",
+    "title": "夜色不語",
+    "originalArtist": "蘭音Reine",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-b0a6b03c-165e-4e46-a5f6-3648317c074f",
+        "streamId": "stream-2026-08-05",
+        "videoId": "VCrVYOabRXQ",
+        "timestamp": 693,
+        "endTimestamp": 840
+      }
+    ]
+  },
+  {
+    "id": "song-41b28fc0-0cd7-4c4b-9650-499f2384f16c",
+    "workId": "work-song-baaff013",
+    "title": "明月天涯",
+    "originalArtist": "五音Jw",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-c708737c-2417-4f4a-8d3e-ee905f16ef93",
+        "streamId": "stream-2026-07-22",
+        "videoId": "jAQvF5wMGws",
+        "timestamp": 2174,
+        "endTimestamp": 2382
+      },
+      {
+        "id": "p-d8f16962-d11b-413e-a2e4-423e37c5ba22",
+        "streamId": "stream-f9857413-9717-46ed-8bf5-abc9d9af362f",
+        "videoId": "-iBV9Be21mA",
+        "timestamp": 3865,
+        "endTimestamp": 4099
+      }
+    ]
+  },
+  {
+    "id": "song-86ed6a02-8535-41b8-8428-6f6e79941cc7",
+    "workId": "work-1f55f9d7-a0e9-4847-a76f-f8d8d1e64d28",
+    "title": "明朝散發弄扁舟",
+    "originalArtist": "排骨教主&玄觴",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-501d8163-5903-4c39-8877-16424b41b6eb",
+        "streamId": "stream-2026-08-25",
+        "videoId": "w9XHL_J8_kc",
+        "timestamp": 549,
+        "endTimestamp": 794
+      }
+    ]
+  },
+  {
+    "id": "song-7295413a-a64e-480c-b7a3-d12f47e45fd2",
+    "workId": "work-f0b49a1a-f770-4bfb-b5df-29d2987ae7ea",
+    "title": "易水訣",
+    "originalArtist": "樂正綾&洛天依",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-c01a104e-088c-4d66-a505-ed761597b47a",
+        "streamId": "stream-f8223f85-ac1f-4e8e-8368-28ebf02db798",
+        "videoId": "VFztLHJb_EU",
+        "timestamp": 3459,
+        "endTimestamp": 3736
+      }
+    ]
+  },
+  {
+    "id": "song-d6253992-5a38-4431-9bd5-193095951688",
+    "workId": "work-9db1f328-d470-40f6-a523-62f2a1f0a5c8",
+    "title": "易安難安",
+    "originalArtist": "赤羽",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-8c876311-e362-4f3b-bea4-d825033453ae",
+        "streamId": "stream-2026-07-22",
+        "videoId": "jAQvF5wMGws",
+        "timestamp": 4077,
+        "endTimestamp": 4310
+      },
+      {
+        "id": "p-f98df036-d3ee-4551-ac1d-9733bb32d0d5",
+        "streamId": "stream-f8223f85-ac1f-4e8e-8368-28ebf02db798",
+        "videoId": "VFztLHJb_EU",
+        "timestamp": 2885,
+        "endTimestamp": 3115
+      }
+    ]
+  },
+  {
+    "id": "song-5418d283-1127-4f4b-8d7f-061d2850efd3",
+    "workId": "work-ca06ac77-681a-42e7-b6c4-5ee6b677ac97",
+    "title": "東風志",
+    "originalArtist": "銀臨&慕寒",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-39a3747d-df9a-4dc8-a75e-628f20f4c3b1",
+        "streamId": "stream-f9857413-9717-46ed-8bf5-abc9d9af362f",
+        "videoId": "-iBV9Be21mA",
+        "timestamp": 5837,
+        "endTimestamp": 6101
+      }
+    ]
+  },
+  {
+    "id": "song-3a659ce3-9438-45d0-84a9-ba396ef97a8d",
+    "workId": "work-84011550-1fbf-4d3d-accd-4e41f412300a",
+    "title": "枕邊童話",
+    "originalArtist": "傲七爺&小田音樂社",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-91ade6bc-edee-40cc-88c8-eb765a10412c",
+        "streamId": "stream-2026-08-05",
+        "videoId": "VCrVYOabRXQ",
+        "timestamp": 1609,
+        "endTimestamp": 1798
+      }
+    ]
+  },
+  {
+    "id": "song-30ecf80d-cd95-4a80-b4e6-cc97d972610f",
+    "workId": "work-25eca86f-d6e0-4a3d-96b1-0ab88d70253b",
+    "title": "知否知否",
+    "originalArtist": "胡夏&郁可唯",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-155dfd6c-25b7-494a-8bcd-5667e200bbf1",
+        "streamId": "stream-513734c2-9b80-4ddb-a8b5-7076b1966370",
+        "videoId": "wwif9y3U65I",
+        "timestamp": 4183,
+        "endTimestamp": 4455
+      }
+    ]
+  },
+  {
+    "id": "song-cc9a8928-7eb4-4904-90c8-fcf3137a45da",
+    "workId": "work-208c668d-c911-4039-b922-4462ccb3406a",
+    "title": "花亦山",
+    "originalArtist": "音闕詩聽&趙方婧",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-e7ff5954-2a9a-4d32-9656-19f3df411344",
+        "streamId": "stream-97b2edd0-d63d-48e8-936c-c7c7624334ad",
+        "videoId": "Mp1x5ZY-gd0",
+        "timestamp": 2357,
+        "endTimestamp": 2550
+      }
+    ]
+  },
+  {
+    "id": "song-1a4715aa-08de-4a70-8cce-7c7c3366e4e6",
+    "workId": "work-25e2ad6d-954e-46bf-a92e-a10a21acaeed",
+    "title": "芳華慢",
+    "originalArtist": "封茗囧菌",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-e911f7d6-4585-43b7-bb57-38c493efd027",
+        "streamId": "stream-97b2edd0-d63d-48e8-936c-c7c7624334ad",
+        "videoId": "Mp1x5ZY-gd0",
+        "timestamp": 1894,
+        "endTimestamp": 2101
+      }
+    ]
+  },
+  {
+    "id": "song-b8672484-726c-4bb2-a2a9-317abdc52b50",
+    "workId": "work-1beebd93-7da7-4a76-ba4b-6db99d124361",
+    "title": "金陵謠",
+    "originalArtist": "銀臨",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-a5e4c1c2-3eb5-4db4-9545-f5ca88530c47",
+        "streamId": "stream-2026-07-08",
+        "videoId": "n7o5ukvaAiY",
+        "timestamp": 769,
+        "endTimestamp": 1056
+      }
+    ]
+  },
+  {
+    "id": "song-c378ec34-f93a-4281-a8f8-fd1e4cd8ccc0",
+    "workId": "work-98c95c2b-dea0-4e5c-bd92-b0c5ef0ae210",
+    "title": "青鸞",
+    "originalArtist": "不才",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-7f0eb8e8-c09f-4c8e-9f21-61568f410bba",
+        "streamId": "stream-2026-07-22",
+        "videoId": "jAQvF5wMGws",
+        "timestamp": 3621,
+        "endTimestamp": 3894
+      },
+      {
+        "id": "p-72131bbc-55df-40bf-9bde-c0367ed81fd6",
+        "streamId": "stream-2026-06-10",
+        "videoId": "cKzrbehaWUU",
+        "timestamp": 4235,
+        "endTimestamp": 4532
+      }
+    ]
+  },
+  {
+    "id": "song-d09a2759-5aa9-4ab8-ab3e-d80a9e3df9f1",
+    "workId": "work-e7e8efab-d291-4ae2-b948-b809b2ebb24c",
+    "title": "怎嘆",
+    "originalArtist": "鄭魚",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-914e8180-3640-4c20-8e8f-7c53950e9376",
+        "streamId": "stream-2026-08-25",
+        "videoId": "w9XHL_J8_kc",
+        "timestamp": 6474,
+        "endTimestamp": 6681
+      }
+    ]
+  },
+  {
+    "id": "song-4d7eb7c8-2c46-4211-a166-89cacaae6385",
+    "workId": "work-c7431677-a58f-4377-baec-56446b086375",
+    "title": "故人故事",
+    "originalArtist": "雲之泣",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-45c5f02d-c805-4bcf-b97d-2431708bc617",
+        "streamId": "stream-97b2edd0-d63d-48e8-936c-c7c7624334ad",
+        "videoId": "Mp1x5ZY-gd0",
+        "timestamp": 4639,
+        "endTimestamp": 4864
+      }
+    ]
+  },
+  {
+    "id": "song-16f159a1-dbe7-4b36-bf66-4916252d5aeb",
+    "workId": "work-acc34a42-2d09-4476-bf56-90c5000f8190",
+    "title": "故人嘆",
+    "originalArtist": "吳瓊",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-5137db77-fb59-4b65-9a93-9915d5127068",
+        "streamId": "stream-f9857413-9717-46ed-8bf5-abc9d9af362f",
+        "videoId": "-iBV9Be21mA",
+        "timestamp": 3405,
+        "endTimestamp": 3729
+      }
+    ]
+  },
+  {
+    "id": "song-3b056cf7-24ec-478e-841d-834295fdf627",
+    "workId": "work-471b29aa-a5fb-4585-83a5-cc0e7dbb0983",
+    "title": "故夢",
+    "originalArtist": "橙翼",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-a3506d49-864f-4a7b-bce9-7f05bf8671e3",
+        "streamId": "stream-2026-07-08",
+        "videoId": "n7o5ukvaAiY",
+        "timestamp": 1304,
+        "endTimestamp": 1582
+      }
+    ]
+  },
+  {
+    "id": "song-1c9e4238-a01f-49a8-bf00-3def61827897",
+    "workId": "work-4ba3fe3e-fbd0-42b4-bb76-f250a93473ca",
+    "title": "星河嘆",
+    "originalArtist": "黃齡",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-26aa74bb-673a-4f6e-8763-70d2f0449e73",
+        "streamId": "stream-513734c2-9b80-4ddb-a8b5-7076b1966370",
+        "videoId": "wwif9y3U65I",
+        "timestamp": 1003,
+        "endTimestamp": 1262
+      }
+    ]
+  },
+  {
+    "id": "song-ce5264b9-e6df-49e2-8a67-9126d4db04de",
+    "workId": "work-dcceed51-34d1-4ad0-a59f-96569a028d7b",
+    "title": "春庭雪",
+    "originalArtist": "等什麼君",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-62d6ea5c-4afc-49a7-ae3c-a559d9de9cee",
+        "streamId": "stream-97b2edd0-d63d-48e8-936c-c7c7624334ad",
+        "videoId": "Mp1x5ZY-gd0",
+        "timestamp": 4191,
+        "endTimestamp": 4426
+      }
+    ]
+  },
+  {
+    "id": "song-6232a2ba-981b-447a-985b-2c57300d6ff6",
+    "workId": "work-3bcba07f-09c5-4615-bfbb-24acb74b742c",
+    "title": "洛陽夜雨",
+    "originalArtist": "HITA",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-0ecdf8f3-a351-42ea-b429-470971dfa800",
+        "streamId": "stream-2026-08-25",
+        "videoId": "w9XHL_J8_kc",
+        "timestamp": 4057,
+        "endTimestamp": 4324
+      }
+    ]
+  },
+  {
+    "id": "song-253781fa-ed92-4c74-9734-ab73a182e13d",
+    "workId": "work-ee9a5446-3e60-412a-bf3b-f6e035c302a1",
+    "title": "洛陽舊事",
+    "originalArtist": "不才&葉聰明",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-ad0e5eb5-829c-44dd-88ab-1d11bd444932",
+        "streamId": "stream-2026-08-19",
+        "videoId": "WKEO0RdBBig",
+        "timestamp": 6452,
+        "endTimestamp": 6691
+      }
+    ]
+  },
+  {
+    "id": "song-db617b99-807e-4db5-96da-25fd3754f743",
+    "workId": "work-2bae3069-c29c-4c51-9ff1-f21c8204ee56",
+    "title": "洛陽懷",
+    "originalArtist": "洛天依",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-659b8c4f-c9c9-448d-91f0-4428fae3a6da",
+        "streamId": "stream-2026-08-19",
+        "videoId": "WKEO0RdBBig",
+        "timestamp": 4980,
+        "endTimestamp": 5191
+      }
+    ]
+  },
+  {
+    "id": "song-7ea885db-8ea6-4acc-aa9c-fb5efd46e1bd",
+    "workId": "work-song-2555",
+    "title": "流光記",
+    "originalArtist": "銀臨",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-17ad1de8-9e59-4fc1-a868-e237ba38c528",
+        "streamId": "stream-2026-08-19",
+        "videoId": "WKEO0RdBBig",
+        "timestamp": 3820,
+        "endTimestamp": 4097
+      }
+    ]
+  },
+  {
+    "id": "song-29fbb106-8e1f-4b50-963b-d5eb85701046",
+    "workId": "work-add5f7fb-b043-4149-a247-c8495fb09155",
+    "title": "珍惜",
+    "originalArtist": "李宇春",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-4103f3d6-23c8-47ce-8899-e2f52ab236c1",
+        "streamId": "stream-513734c2-9b80-4ddb-a8b5-7076b1966370",
+        "videoId": "wwif9y3U65I",
+        "timestamp": 3555,
+        "endTimestamp": 3847
+      }
+    ]
+  },
+  {
+    "id": "song-46e5aace-44e5-40fa-bd6e-59ab9f17d862",
+    "workId": "work-a366643a-c438-494d-8a58-99f85a0e50a6",
+    "title": "眉間雪",
+    "originalArtist": "晴愔",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-10439e5b-672d-497c-b86c-cdf6b6eec383",
+        "streamId": "stream-2026-06-10",
+        "videoId": "cKzrbehaWUU",
+        "timestamp": 2140,
+        "endTimestamp": 2449
+      }
+    ]
+  },
+  {
+    "id": "song-ec2fd071-fd94-4bc8-88ce-e49b32e86ca8",
+    "workId": "work-4e8b4ed0-a556-43c3-8f74-73be33ba9929",
+    "title": "紅妝",
+    "originalArtist": "排骨教主",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-2bc581ca-a525-4053-a8e1-480a4951bda6",
+        "streamId": "stream-2026-08-19",
+        "videoId": "WKEO0RdBBig",
+        "timestamp": 4408,
+        "endTimestamp": 4637
+      }
+    ]
+  },
+  {
+    "id": "song-92fb8519-c80b-447b-9d9a-72da5e1f8d14",
+    "workId": "work-song-711",
+    "title": "紅昭願",
+    "originalArtist": "音闕詩聽",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-a627ccfb-958b-475b-85de-a45da1e3e5ef",
+        "streamId": "stream-2026-09-16",
+        "videoId": "8YAimZj5Mrw",
+        "timestamp": 3041,
+        "endTimestamp": 3210
+      }
+    ]
+  },
+  {
+    "id": "song-2d97218d-2ad7-4918-8264-77b5e7fcbb16",
+    "workId": "work-2ca6eea2-693a-42fa-8601-3ed478b6391f",
+    "title": "紅顏舊",
+    "originalArtist": "劉濤",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-177bbae8-390f-4144-a214-db46e032c11f",
+        "streamId": "stream-2026-09-20",
+        "videoId": "dP12QYzbzMA",
+        "timestamp": 3595,
+        "endTimestamp": 3817
+      },
+      {
+        "id": "p-b8719d10-018c-4658-8431-85f623dd1ee0",
+        "streamId": "stream-f9857413-9717-46ed-8bf5-abc9d9af362f",
+        "videoId": "-iBV9Be21mA",
+        "timestamp": 971,
+        "endTimestamp": 1188
+      }
+    ]
+  },
+  {
+    "id": "song-e20acef2-9f41-45d8-8a03-f363e8d0a113",
+    "workId": "work-f8f1f7f6-0631-4131-b768-a46cb7966311",
+    "title": "迢迢",
+    "originalArtist": "黃詩扶",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-2fecd051-7246-4c0f-a262-d607f2de56bc",
+        "streamId": "stream-2026-08-19",
+        "videoId": "WKEO0RdBBig",
+        "timestamp": 2019,
+        "endTimestamp": 2260
+      }
+    ]
+  },
+  {
+    "id": "song-0895da2f-8082-4bd9-8700-0ca7d9ba4cab",
+    "workId": "work-856f7f92-90d4-4f4e-972c-78e73a8432a2",
+    "title": "風催雨",
+    "originalArtist": "李袁杰",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-2ebf82a1-c254-4bde-9835-a6612fa19f81",
+        "streamId": "stream-2026-09-16",
+        "videoId": "8YAimZj5Mrw",
+        "timestamp": 4750,
+        "endTimestamp": 4923
+      }
+    ]
+  },
+  {
+    "id": "song-6afd3725-6769-4b0b-9193-b85e27404b96",
+    "workId": "work-2804748e-6f43-4b85-8ee6-b5d5bb979828",
+    "title": "風催雨",
+    "originalArtist": "灼夭",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-41779330-ecfa-410a-b989-3b6a39982cf9",
+        "streamId": "stream-b791bdb9-7f5a-43fa-8602-77bfa9746e3a",
+        "videoId": "Xwupr-SRT38",
+        "timestamp": 2084,
+        "endTimestamp": 2257
+      }
+    ]
+  },
+  {
+    "id": "song-1a9786a4-96d0-4e06-95de-e79524299256",
+    "workId": "work-4cb522cd-7b4a-4e4a-8a85-366ebad90a25",
+    "title": "風緣",
+    "originalArtist": "雙笙",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-5a14b009-465a-4ba9-b394-6b2f6bb98b4b",
+        "streamId": "stream-2026-09-16",
+        "videoId": "8YAimZj5Mrw",
+        "timestamp": 1909,
+        "endTimestamp": 2165
+      }
+    ]
+  },
+  {
+    "id": "song-f512f910-657d-4938-b2a7-81ae08801517",
+    "workId": "work-song-44681e7b",
+    "title": "倒帶",
+    "originalArtist": "蔡依林",
+    "tags": [
+      "language:zh"
+    ],
+    "performances": [
+      {
+        "id": "p-2534d3c7-e50b-49c7-8fcd-2baf5c432645",
+        "streamId": "stream-f8c42ed9-4ff2-41d5-8b10-715506bc2a91",
+        "videoId": "iCGCoCtbdS0",
+        "timestamp": 2621,
+        "endTimestamp": 2870
+      }
+    ]
+  },
+  {
+    "id": "song-ee819c56-a0c9-4449-9b65-5803f55bd7be",
+    "workId": "work-song-a0ec4a75",
+    "title": "家家酒",
+    "originalArtist": "家家",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-735174f5-2d94-4da3-99a5-7f2ced637738",
+        "streamId": "stream-f8c42ed9-4ff2-41d5-8b10-715506bc2a91",
+        "videoId": "iCGCoCtbdS0",
+        "timestamp": 2061,
+        "endTimestamp": 2327
+      }
+    ]
+  },
+  {
+    "id": "song-421c5374-01d7-4dd1-949a-c4eaf0624eac",
+    "workId": "work-ca1d83c4-5975-4025-b7c4-b237df4c9f12",
+    "title": "弱水三千",
+    "originalArtist": "石頭",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-57936efc-c053-49eb-85ed-e20d4abeae41",
+        "streamId": "stream-2026-09-20",
+        "videoId": "dP12QYzbzMA",
+        "timestamp": 7481,
+        "endTimestamp": 7694
+      },
+      {
+        "id": "p-f9bc5b00-f82f-4c0b-992f-a3428eaef3d6",
+        "streamId": "stream-2026-07-22",
+        "videoId": "jAQvF5wMGws",
+        "timestamp": 5862,
+        "endTimestamp": 6118
+      },
+      {
+        "id": "p-6a8b240c-8043-4974-b33d-3558cf8ef4f8",
+        "streamId": "stream-f9857413-9717-46ed-8bf5-abc9d9af362f",
+        "videoId": "-iBV9Be21mA",
+        "timestamp": 446,
+        "endTimestamp": 702
+      }
+    ]
+  },
+  {
+    "id": "song-8c1f5fde-441d-4d43-8a6d-dea3d089921a",
+    "workId": "work-song-e1a57fe7",
+    "title": "桃花諾",
+    "originalArtist": "鄧紫棋",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-3894fc47-fb63-4661-b25d-7d81a0f28bab",
+        "streamId": "stream-f9857413-9717-46ed-8bf5-abc9d9af362f",
+        "videoId": "-iBV9Be21mA",
+        "timestamp": 6672,
+        "endTimestamp": 6886
+      }
+    ]
+  },
+  {
+    "id": "song-33e11b5c-4081-42e2-a81d-e3febfd86853",
+    "workId": "work-e49f35a3-e67b-41d5-90b2-6f86e16b50a9",
+    "title": "浮白",
+    "originalArtist": "花粥&王胜娚",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-6ec5bf4a-b773-44ae-a574-be6c6eee2775",
+        "streamId": "stream-2026-07-08",
+        "videoId": "n7o5ukvaAiY",
+        "timestamp": 3724,
+        "endTimestamp": 3944
+      }
+    ]
+  },
+  {
+    "id": "song-0ac024d1-39a7-40b1-9f11-3278c4da4ce0",
+    "workId": "work-845aa69d-ac47-47e2-8c02-3f387f3ef1c2",
+    "title": "烟雨行舟",
+    "originalArtist": "倫桑",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-ecd1abbd-e821-44b5-a30c-00a4bb6a1e97",
+        "streamId": "stream-2026-08-25",
+        "videoId": "w9XHL_J8_kc",
+        "timestamp": 4653,
+        "endTimestamp": 4846
+      }
+    ]
+  },
+  {
+    "id": "song-1e5b35d7-5576-4377-985f-c925cc69e74c",
+    "workId": "work-f8b69ba4-1072-4c60-b5fc-7eafdd7664a8",
+    "title": "神秘恩典",
+    "originalArtist": "執素兮&醋醋",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-14abb993-5960-4b28-9ca3-525d9d1931e9",
+        "streamId": "stream-2026-08-05",
+        "videoId": "VCrVYOabRXQ",
+        "timestamp": 984,
+        "endTimestamp": 1185
+      }
+    ]
+  },
+  {
+    "id": "song-142015d0-4b78-4206-aabf-df06b787a371",
+    "workId": "work-song-3050",
+    "title": "純白",
+    "originalArtist": "雙笙",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-9824d736-cd09-4854-8533-9235583e82b1",
+        "streamId": "stream-2026-08-05",
+        "videoId": "VCrVYOabRXQ",
+        "timestamp": 2819,
+        "endTimestamp": 3129
+      }
+    ]
+  },
+  {
+    "id": "song-50f80e1a-2665-4ca9-80d9-05dd5dcbc902",
+    "workId": "work-94448326-1770-4df4-9c4a-b2846031642f",
+    "title": "胭脂妝",
+    "originalArtist": "樹屋女孩",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-81ec24ab-bdac-4e08-bb9a-2e57d1ed0b42",
+        "streamId": "stream-2026-08-19",
+        "videoId": "WKEO0RdBBig",
+        "timestamp": 435,
+        "endTimestamp": 741
+      }
+    ]
+  },
+  {
+    "id": "song-b947632d-0837-49c1-a334-c25342c409b0",
+    "workId": "work-song-2142",
+    "title": "追光者",
+    "originalArtist": "岑寧兒",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-3e919ad5-5e9c-498a-ac39-6de359223e4a",
+        "streamId": "stream-2026-08-25",
+        "videoId": "w9XHL_J8_kc",
+        "timestamp": 5428,
+        "endTimestamp": 5622
+      },
+      {
+        "id": "p-ccf4a52b-d63b-4471-a481-14e77d0ad35a",
+        "streamId": "stream-f8c42ed9-4ff2-41d5-8b10-715506bc2a91",
+        "videoId": "iCGCoCtbdS0",
+        "timestamp": 3190,
+        "endTimestamp": 3421
+      }
+    ]
+  },
+  {
+    "id": "song-639604f3-4ac2-4025-8ac9-0684b4f0f341",
+    "workId": "work-song-03a0f792",
+    "title": "追追追",
+    "originalArtist": "黃妃",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-d5d94f6a-09ad-4afd-8f71-bf1b1668bc20",
+        "streamId": "stream-acceb6ce-b95c-44d7-8642-ed95fab8c930",
+        "videoId": "P0O4oAf4jso",
+        "timestamp": 4057,
+        "endTimestamp": 4338
+      }
+    ]
+  },
+  {
+    "id": "song-01690f2c-f550-4939-a577-0e88024aec10",
+    "workId": "work-b9924bd9-7e86-4d51-8d5b-29a7a8aa7bd9",
+    "title": "馬步謠",
+    "originalArtist": "雙笙",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-daf80126-7619-4dec-bb00-490558a79baa",
+        "streamId": "stream-2026-09-09",
+        "videoId": "_4yrs9aGUA8",
+        "timestamp": 3937,
+        "endTimestamp": 4207
+      }
+    ]
+  },
+  {
+    "id": "song-a0c66f91-0c71-496a-bdc1-b740f3a0a852",
+    "workId": "work-7f449cc7-ed6e-4f46-9505-134a838e33dd",
+    "title": "參商",
+    "originalArtist": "不才",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-9e6202dc-a510-4d67-9afa-bdfea042b383",
+        "streamId": "stream-8e950518-f22d-49f9-b20e-67eff2af5210",
+        "videoId": "f69M8rbw2Cc",
+        "timestamp": 2752,
+        "endTimestamp": 3030
+      }
+    ]
+  },
+  {
+    "id": "song-e25f0abf-d150-4875-8d40-3c050786ba71",
+    "workId": "work-7715a189-5660-43d4-9805-9f64be734bb1",
+    "title": "堂梨煎雪",
+    "originalArtist": "銀臨",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-7b7c4d2b-70d2-4055-b635-29e21a151109",
+        "streamId": "stream-2026-09-16",
+        "videoId": "8YAimZj5Mrw",
+        "timestamp": 4232,
+        "endTimestamp": 4471
+      }
+    ]
+  },
+  {
+    "id": "song-0ae00c7f-527b-48fa-93c9-0d81931f173f",
+    "workId": "work-51d9231c-9438-4ba3-a23e-c7f316b6f9df",
+    "title": "將進酒",
+    "originalArtist": "佑可貓",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-23917121-f131-4e8a-b417-dfc002bc9a04",
+        "streamId": "stream-2026-09-16",
+        "videoId": "8YAimZj5Mrw",
+        "timestamp": 5516,
+        "endTimestamp": 5779
+      }
+    ]
+  },
+  {
+    "id": "song-fcecb7ff-ece4-4ca4-ab34-e00d825387d4",
+    "workId": "work-04dd553a-f78d-46e6-972d-b67d56b645a5",
+    "title": "情人劫",
+    "originalArtist": "老狼",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-b33a571b-25e1-4eb3-9238-21a6a045223e",
+        "streamId": "stream-2026-08-19",
+        "videoId": "WKEO0RdBBig",
+        "timestamp": 844,
+        "endTimestamp": 1037
+      }
+    ]
+  },
+  {
+    "id": "song-5ec6640d-258d-4a08-bfa6-35d0ff66659f",
+    "workId": "work-b30a6789-5068-4b43-bdb0-8c0b618af7f2",
+    "title": "情字難",
+    "originalArtist": "糯米Nomi",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-c7c783cd-7bc5-40c3-86e8-f6bc323b8b49",
+        "streamId": "stream-97b2edd0-d63d-48e8-936c-c7c7624334ad",
+        "videoId": "Mp1x5ZY-gd0",
+        "timestamp": 2894,
+        "endTimestamp": 3182
+      }
+    ]
+  },
+  {
+    "id": "song-929f6c15-1c0e-435f-84f0-6bd2dc2e16fa",
+    "workId": "work-c3055052-9e11-4315-aceb-13aafa5a87d1",
+    "title": "情字難(Key -1)",
+    "originalArtist": "糯米Nomi",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-7213c71c-4727-4ce9-b4ef-d995d6c8e240",
+        "streamId": "stream-2026-09-20",
+        "videoId": "dP12QYzbzMA",
+        "timestamp": 8418,
+        "endTimestamp": 8706
+      }
+    ]
+  },
+  {
+    "id": "song-eace1e0e-0ecb-4fb8-a218-32b6f98ea6a9",
+    "workId": "work-e48344f5-c1a3-47ba-bc5d-b3b60a82be1e",
+    "title": "探梅記",
+    "originalArtist": "狐妖",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-21506e80-0f14-4c04-98e2-3e9a5817867a",
+        "streamId": "stream-97b2edd0-d63d-48e8-936c-c7c7624334ad",
+        "videoId": "Mp1x5ZY-gd0",
+        "timestamp": 731,
+        "endTimestamp": 980
+      },
+      {
+        "id": "p-52ed74a8-72d8-402b-b3b0-6e33ab17a3e6",
+        "streamId": "stream-8e950518-f22d-49f9-b20e-67eff2af5210",
+        "videoId": "f69M8rbw2Cc",
+        "timestamp": 1435,
+        "endTimestamp": 1682
+      }
+    ]
+  },
+  {
+    "id": "song-8bba0ebc-ffb8-4737-ba80-babd7a55db2f",
+    "workId": "work-7de94836-9fae-4174-a215-389e5d97432a",
+    "title": "探梅記(速度 +1.6、Key +3)",
+    "originalArtist": "狐妖",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-95e641de-fda4-4823-bc00-68921ac61223",
+        "streamId": "stream-2026-09-20",
+        "videoId": "dP12QYzbzMA",
+        "timestamp": 6583,
+        "endTimestamp": 6738
+      }
+    ]
+  },
+  {
+    "id": "song-7d82a39d-380e-4a2d-8cf5-9e37b66ac8b4",
+    "workId": "work-1e9dd5c2-5b5e-404f-8a3b-59c250e8e064",
+    "title": "探窗",
+    "originalArtist": "國風新語&汐音社&浮生夢",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-5ae48ee1-cace-449b-bf0f-8c95198c7cc2",
+        "streamId": "stream-8e950518-f22d-49f9-b20e-67eff2af5210",
+        "videoId": "f69M8rbw2Cc",
+        "timestamp": 3875,
+        "endTimestamp": 4088
+      }
+    ]
+  },
+  {
+    "id": "song-cde9a3ad-c3bf-4c6d-82da-802279c4be0a",
+    "workId": "work-30f52e34-0529-4365-9733-ce3cf5841859",
+    "title": "探窗",
+    "originalArtist": "利勝",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-0a3cd17d-341a-4d38-932b-c0609bfac144",
+        "streamId": "stream-2026-07-22",
+        "videoId": "jAQvF5wMGws",
+        "timestamp": 955,
+        "endTimestamp": 1171
+      }
+    ]
+  },
+  {
+    "id": "song-e33af499-ccad-4f0b-abd5-820aa45b99d1",
+    "workId": "work-85e78d28-13c1-48e3-9487-aa9e428a5331",
+    "title": "晚夜微雨問海棠",
+    "originalArtist": "鏡予歌&陳亦洺&喧笑",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-fb6c4954-4f20-41e6-8346-0f498bdda2f7",
+        "streamId": "stream-2026-09-09",
+        "videoId": "_4yrs9aGUA8",
+        "timestamp": 4572,
+        "endTimestamp": 4849
+      }
+    ]
+  },
+  {
+    "id": "song-6bd516db-6512-40f3-bd10-eb0a80b65830",
+    "workId": "work-song-2104",
+    "title": "晚餐歌",
+    "originalArtist": "tuki.",
+    "tags": [
+      "language:ja"
+    ],
+    "performances": [
+      {
+        "id": "p-a33854d8-d78b-4fbe-8e18-02cb477eb6a6",
+        "streamId": "stream-2026-08-05",
+        "videoId": "VCrVYOabRXQ",
+        "timestamp": 5719,
+        "endTimestamp": 5934
+      },
+      {
+        "id": "p-ed5692bc-8c1f-4e9e-848d-f0f946347d1d",
+        "streamId": "stream-f8c42ed9-4ff2-41d5-8b10-715506bc2a91",
+        "videoId": "iCGCoCtbdS0",
+        "timestamp": 4890,
+        "endTimestamp": 5106
+      },
+      {
+        "id": "p-84a34408-6ef9-406d-8d75-4e050adeae31",
+        "streamId": "stream-b791bdb9-7f5a-43fa-8602-77bfa9746e3a",
+        "videoId": "Xwupr-SRT38",
+        "timestamp": 5460,
+        "endTimestamp": 5675
+      }
+    ]
+  },
+  {
+    "id": "song-aa6c1632-c5d3-4c17-a39a-d2d507b07af3",
+    "workId": "work-song-2882",
+    "title": "牽絲戲",
+    "originalArtist": "銀臨&Aki阿杰",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-1eef1688-c85f-4bcf-8267-f4b5c0062010",
+        "streamId": "stream-2026-08-05",
+        "videoId": "VCrVYOabRXQ",
+        "timestamp": 7011,
+        "endTimestamp": 7247
+      },
+      {
+        "id": "p-54ef01c1-a623-427d-8d3f-e54f265f1259",
+        "streamId": "stream-5e5e42d5-9115-45c5-b00f-1b23652d0f8d",
+        "videoId": "aaM-FVAB4uk",
+        "timestamp": 1554,
+        "endTimestamp": 1790
+      }
+    ]
+  },
+  {
+    "id": "song-42ce2a09-5320-4169-9b98-c6d94649cf87",
+    "workId": "work-39ad9e22-75f0-4759-b613-d934f00258fc",
+    "title": "牽絲戲(速度 +2.0、Key +2)",
+    "originalArtist": "銀臨&Aki阿杰",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-faeaf76f-bea2-4d53-8e8c-8cbb89a98d3d",
+        "streamId": "stream-2026-09-20",
+        "videoId": "dP12QYzbzMA",
+        "timestamp": 2695,
+        "endTimestamp": 2813
+      }
+    ]
+  },
+  {
+    "id": "song-638ebd07-33a5-4455-be5a-df815fc491c5",
+    "workId": "work-dfbf7a1e-a3ec-4758-bc0a-68c3448e26dc",
+    "title": "皎然記",
+    "originalArtist": "司夏",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-1ac27bd3-8553-491d-b0a3-a92d27713721",
+        "streamId": "stream-2026-09-09",
+        "videoId": "_4yrs9aGUA8",
+        "timestamp": 3123,
+        "endTimestamp": 3335
+      }
+    ]
+  },
+  {
+    "id": "song-d3c64239-730b-4ffc-9bef-e6eec3edecca",
+    "workId": "work-53b01a88-e777-4042-8951-58843a2356ac",
+    "title": "第三十八年夏至",
+    "originalArtist": "河圖",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-f5e222ca-6c7a-42e9-a5e9-c6e4211fa8dd",
+        "streamId": "stream-2026-06-10",
+        "videoId": "cKzrbehaWUU",
+        "timestamp": 1690,
+        "endTimestamp": 1946
+      }
+    ]
+  },
+  {
+    "id": "song-5250c5aa-0629-457e-90e5-d9aea27357b0",
+    "workId": "work-1eb3702e-c51c-4bdc-9cbb-fad960c7d4f2",
+    "title": "第幾個我",
+    "originalArtist": "封茗囧菌",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-b9edae1d-1faf-4906-ac4e-e3bf58714882",
+        "streamId": "stream-2026-08-05",
+        "videoId": "VCrVYOabRXQ",
+        "timestamp": 292,
+        "endTimestamp": 492
+      }
+    ]
+  },
+  {
+    "id": "song-9cbc5ce9-43bc-4727-81c5-867696cc5e52",
+    "workId": "work-song-1295",
+    "title": "酔いどれ知らず",
+    "originalArtist": "Kanaria",
+    "tags": [
+      "language:ja"
+    ],
+    "performances": [
+      {
+        "id": "p-08802129-73f9-43b1-801f-4911ef44df22",
+        "streamId": "stream-5e5e42d5-9115-45c5-b00f-1b23652d0f8d",
+        "videoId": "aaM-FVAB4uk",
+        "timestamp": 2320,
+        "endTimestamp": 2453
+      }
+    ]
+  },
+  {
+    "id": "song-efdf38f7-94b1-4caa-8012-d4d5e44f746f",
+    "workId": "work-c9875e66-413a-4f4a-b03a-02687911dce3",
+    "title": "酔いどれ知らず",
+    "originalArtist": "GUMI",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-f44d115d-e4ea-4d57-9132-395cd15fbb49",
+        "streamId": "stream-2026-06-17",
+        "videoId": "UaUF0j7Pmy4",
+        "timestamp": 1731,
+        "endTimestamp": 1865
+      }
+    ]
+  },
+  {
+    "id": "song-8b87bb3e-3177-40da-b282-609145958f8b",
+    "workId": "work-4953c7a7-a70c-44b9-a49c-89920860be2d",
+    "title": "雪白與玫瑰紅",
+    "originalArtist": "黃詩扶&藍心羽",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-d6e6d664-e13b-4964-81ac-9c8781edd19f",
+        "streamId": "stream-2026-08-05",
+        "videoId": "VCrVYOabRXQ",
+        "timestamp": 2408,
+        "endTimestamp": 2617
+      }
+    ]
+  },
+  {
+    "id": "song-1b92b198-3fd8-4133-a50f-befee31714c1",
+    "workId": "work-song-73ded5c3",
+    "title": "雪落下的聲音",
+    "originalArtist": "陸虎",
+    "tags": [
+      "language:zh"
+    ],
+    "performances": [
+      {
+        "id": "p-914528f0-8acd-4b3c-b887-7bfaa2f6ce60",
+        "streamId": "stream-513734c2-9b80-4ddb-a8b5-7076b1966370",
+        "videoId": "wwif9y3U65I",
+        "timestamp": 4893,
+        "endTimestamp": 5190
+      }
+    ]
+  },
+  {
+    "id": "song-4d87cd18-a304-4571-9931-7da6ecd64507",
+    "workId": "work-e526eaae-2646-44e7-8ec0-e26d957aa55e",
+    "title": "傀",
+    "originalArtist": "陳嘉樺",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-39f2f66d-3d82-4dcf-bbb4-ef50248f0f7c",
+        "streamId": "stream-2026-09-20",
+        "videoId": "dP12QYzbzMA",
+        "timestamp": 9797,
+        "endTimestamp": 10021
+      },
+      {
+        "id": "p-8a1b1ead-7701-469c-950c-7091b087506a",
+        "streamId": "stream-2026-09-09",
+        "videoId": "_4yrs9aGUA8",
+        "timestamp": 2665,
+        "endTimestamp": 2889
+      }
+    ]
+  },
+  {
+    "id": "song-b96ae625-5b8a-49f8-8fcf-c8726f6bb1f8",
+    "workId": "work-64282d2d-453d-4234-9caa-4f98dd98bae3",
+    "title": "單向箭頭",
+    "originalArtist": "雙笙",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-9031c4cf-7921-41c3-b799-031f5ed8df4c",
+        "streamId": "stream-2026-08-25",
+        "videoId": "w9XHL_J8_kc",
+        "timestamp": 2985,
+        "endTimestamp": 3237
+      }
+    ]
+  },
+  {
+    "id": "song-1135a8b3-c0ca-4564-bfa4-67b1efaad382",
+    "workId": "work-653f75d3-745b-4371-8fa0-f3d6557bf8a3",
+    "title": "尋常歌",
+    "originalArtist": "不才",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-a60b7fb6-7d5e-44f1-937f-46ff11c41252",
+        "streamId": "stream-2026-06-10",
+        "videoId": "cKzrbehaWUU",
+        "timestamp": 4853,
+        "endTimestamp": 5142
+      }
+    ]
+  },
+  {
+    "id": "song-5a77a95a-47e6-4ea0-99b6-54b69d212f81",
+    "workId": "work-988a57c9-2123-41b6-a57d-14b8b30930ab",
+    "title": "棲鳳",
+    "originalArtist": "星塵",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-b92fa8c7-e453-4154-aa43-7f8c39635dc1",
+        "streamId": "stream-f8223f85-ac1f-4e8e-8368-28ebf02db798",
+        "videoId": "VFztLHJb_EU",
+        "timestamp": 4541,
+        "endTimestamp": 4748
+      },
+      {
+        "id": "p-514189b7-96f9-4956-b32c-1ebbdf4cd8dc",
+        "streamId": "stream-b791bdb9-7f5a-43fa-8602-77bfa9746e3a",
+        "videoId": "Xwupr-SRT38",
+        "timestamp": 1241,
+        "endTimestamp": 1445
+      }
+    ]
+  },
+  {
+    "id": "song-bb004733-6c66-4fbe-9635-eb8e067230f7",
+    "workId": "work-1bdb4392-e085-4115-bd93-2a16754d7896",
+    "title": "琴師",
+    "originalArtist": "音頻怪物",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-95788638-fdeb-455d-8e2e-c11da108b3c2",
+        "streamId": "stream-2026-07-08",
+        "videoId": "n7o5ukvaAiY",
+        "timestamp": 2847,
+        "endTimestamp": 3148
+      },
+      {
+        "id": "p-ce684213-9078-427c-9009-8244c5245563",
+        "streamId": "stream-b791bdb9-7f5a-43fa-8602-77bfa9746e3a",
+        "videoId": "Xwupr-SRT38",
+        "timestamp": 4056,
+        "endTimestamp": 4357
+      }
+    ]
+  },
+  {
+    "id": "song-9e59bd27-111d-4ca8-8dfd-f81faacb2e60",
+    "workId": "work-c44bc147-924a-4ab0-bc6b-350d2c12d682",
+    "title": "畫地為牢",
+    "originalArtist": "葉裡&雲の泣",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-fd6eba7c-e0ed-4999-80b3-7da99381eb55",
+        "streamId": "stream-f9857413-9717-46ed-8bf5-abc9d9af362f",
+        "videoId": "-iBV9Be21mA",
+        "timestamp": 1446,
+        "endTimestamp": 1804
+      }
+    ]
+  },
+  {
+    "id": "song-b50f09ff-200c-4408-95e1-dee61ec404d7",
+    "workId": "work-7e0763eb-d8bc-4f37-863b-7fdc195327ba",
+    "title": "盜將行",
+    "originalArtist": "花粥&馬雨陽",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-32222d01-2468-4e64-b82b-a2d3e26f7e97",
+        "streamId": "stream-2026-07-08",
+        "videoId": "n7o5ukvaAiY",
+        "timestamp": 3301,
+        "endTimestamp": 3494
+      }
+    ]
+  },
+  {
+    "id": "song-abf83e00-3383-4dea-b105-d1c41a095a78",
+    "workId": "work-a1e43fe5-7460-4f54-8f1b-c61be9a6aaef",
+    "title": "菁華浮夢",
+    "originalArtist": "Winky詩",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-7f2ad60d-3df5-4bf4-912a-4f41256d9979",
+        "streamId": "stream-f9857413-9717-46ed-8bf5-abc9d9af362f",
+        "videoId": "-iBV9Be21mA",
+        "timestamp": 4256,
+        "endTimestamp": 4523
+      }
+    ]
+  },
+  {
+    "id": "song-24a72147-f3b6-4e95-86b8-93cec457336a",
+    "workId": "work-cce90c70-ef83-43fc-8924-3f5f7b1e9c8d",
+    "title": "雅俗共賞",
+    "originalArtist": "許嵩",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-736dac3a-c17d-40a5-887e-5637427bd868",
+        "streamId": "stream-2026-08-05",
+        "videoId": "VCrVYOabRXQ",
+        "timestamp": 9479,
+        "endTimestamp": 9725
+      }
+    ]
+  },
+  {
+    "id": "song-8a1b08c1-3013-4b5e-8ddb-dd25b2c18b7b",
+    "workId": "work-b2a83b1c-00ba-4da3-9902-3036feecb293",
+    "title": "愛拼才會贏",
+    "originalArtist": "葉啟田",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-76bd7193-bbdb-4595-92d9-a04cae704e2c",
+        "streamId": "stream-acceb6ce-b95c-44d7-8642-ed95fab8c930",
+        "videoId": "P0O4oAf4jso",
+        "timestamp": 1771,
+        "endTimestamp": 1989
+      }
+    ]
+  },
+  {
+    "id": "song-0c9038e3-63e2-4576-bf84-13d693ae9a2a",
+    "workId": "work-song-83390f22",
+    "title": "愛情的騙子我問你",
+    "originalArtist": "陳小雲",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-2121fd8c-de19-4bb1-b523-f6ead4fbb0f8",
+        "streamId": "stream-acceb6ce-b95c-44d7-8642-ed95fab8c930",
+        "videoId": "P0O4oAf4jso",
+        "timestamp": 282,
+        "endTimestamp": 547
+      }
+    ]
+  },
+  {
+    "id": "song-56409dfe-a153-47f2-884e-a538e1da0677",
+    "workId": "work-08629c9b-a8ad-4403-8d95-3566afee081c",
+    "title": "愛情恰恰",
+    "originalArtist": "羅又華&陳小雲",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-d9fcb091-26f7-431e-b24f-a67997b4cf09",
+        "streamId": "stream-acceb6ce-b95c-44d7-8642-ed95fab8c930",
+        "videoId": "P0O4oAf4jso",
+        "timestamp": 2314,
+        "endTimestamp": 2558
+      }
+    ]
+  },
+  {
+    "id": "song-5cde9396-2e4d-4570-908b-12d61b6dc27c",
+    "workId": "work-song-6ef32a4a",
+    "title": "愛殤",
+    "originalArtist": "小時姑娘",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-53abce73-1659-413c-853b-86643c37e5d7",
+        "streamId": "stream-513734c2-9b80-4ddb-a8b5-7076b1966370",
+        "videoId": "wwif9y3U65I",
+        "timestamp": 2103,
+        "endTimestamp": 2401
+      }
+    ]
+  },
+  {
+    "id": "song-9f87c7fd-ed15-41a0-9130-16d0a0662a6f",
+    "workId": "work-29141ca2-acce-4a79-be96-7a69058f577c",
+    "title": "楚歌起",
+    "originalArtist": "黃詩扶",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-f9c26ce6-d110-4750-a344-b1c25997d331",
+        "streamId": "stream-2026-09-16",
+        "videoId": "8YAimZj5Mrw",
+        "timestamp": 3846,
+        "endTimestamp": 4138
+      }
+    ]
+  },
+  {
+    "id": "song-9bbcaa19-2afa-4b00-8c65-5247199e34fc",
+    "workId": "work-3e942d2d-9396-4b16-bb9d-5078eddce355",
+    "title": "落花",
+    "originalArtist": "林心如",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-75b3eb2b-530b-4710-ab8e-d6039a3221b9",
+        "streamId": "stream-513734c2-9b80-4ddb-a8b5-7076b1966370",
+        "videoId": "wwif9y3U65I",
+        "timestamp": 2618,
+        "endTimestamp": 2809
+      }
+    ]
+  },
+  {
+    "id": "song-60bf4c8b-26d2-4078-92fb-dd572a330fc9",
+    "workId": "work-b9784248-9a84-4abe-b04e-36e2953dfdae",
+    "title": "葬花詞",
+    "originalArtist": "黃詩扶",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-fc0093a4-3fe1-4426-a19f-6b729f6f1fc5",
+        "streamId": "stream-2026-07-08",
+        "videoId": "n7o5ukvaAiY",
+        "timestamp": 2411,
+        "endTimestamp": 2711
+      }
+    ]
+  },
+  {
+    "id": "song-04810be9-cb1e-43bd-b0a9-fbc672fcb6de",
+    "workId": "work-14b38ad3-8c97-4f5e-a12f-3c2b74186ada",
+    "title": "虞兮嘆",
+    "originalArtist": "聞人聽書",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-43b2e2f4-0898-4b20-8358-59f83e76817e",
+        "streamId": "stream-97b2edd0-d63d-48e8-936c-c7c7624334ad",
+        "videoId": "Mp1x5ZY-gd0",
+        "timestamp": 356,
+        "endTimestamp": 557
+      }
+    ]
+  },
+  {
+    "id": "song-792bd7cc-21cf-4e29-b425-d986d344bc8c",
+    "workId": "work-song-07107cd7",
+    "title": "路過人間",
+    "originalArtist": "郁可唯",
+    "tags": [
+      "language:zh"
+    ],
+    "performances": [
+      {
+        "id": "p-b15feee1-6938-40c0-b1ba-6f74a32176a0",
+        "streamId": "stream-2026-07-22",
+        "videoId": "jAQvF5wMGws",
+        "timestamp": 2568,
+        "endTimestamp": 2812
+      },
+      {
+        "id": "p-95b92ca0-ce17-4e7d-989b-5c08106fb1ed",
+        "streamId": "stream-2026-07-08",
+        "videoId": "n7o5ukvaAiY",
+        "timestamp": 5412,
+        "endTimestamp": 5655
+      }
+    ]
+  },
+  {
+    "id": "song-b0ba14e3-a8e2-41cd-8864-04871cedbe9f",
+    "workId": "work-song-0c430370",
+    "title": "遇見",
+    "originalArtist": "孫燕姿",
+    "tags": [
+      "language:zh"
+    ],
+    "performances": [
+      {
+        "id": "p-84f36ac9-b4d4-4c43-8c0b-4b745e2c98c1",
+        "streamId": "stream-2026-09-20",
+        "videoId": "dP12QYzbzMA",
+        "timestamp": 3184,
+        "endTimestamp": 3389
+      },
+      {
+        "id": "p-f94341f9-e44e-47c8-b53c-c3fc118cce6c",
+        "streamId": "stream-b791bdb9-7f5a-43fa-8602-77bfa9746e3a",
+        "videoId": "Xwupr-SRT38",
+        "timestamp": 2524,
+        "endTimestamp": 2715
+      }
+    ]
+  },
+  {
+    "id": "song-921bd9ce-b680-425a-829b-2def127ef68d",
+    "workId": "work-ec9fb7f6-407e-41fb-93e0-62e4d3626d7e",
+    "title": "隔煙水",
+    "originalArtist": "晃兒",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-8330f8bc-8a02-42d1-bb34-1c13363ad559",
+        "streamId": "stream-b791bdb9-7f5a-43fa-8602-77bfa9746e3a",
+        "videoId": "Xwupr-SRT38",
+        "timestamp": 322,
+        "endTimestamp": 570
+      }
+    ]
+  },
+  {
+    "id": "song-0ae543f0-aa21-4859-bbb1-6252a7ad0ad4",
+    "workId": "work-5b6cf783-42a5-451f-8936-d8acb29c5643",
+    "title": "嘆雲兮",
+    "originalArtist": "鞠婧禕",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-5f737a2b-be03-4a47-be43-c016d3297035",
+        "streamId": "stream-2026-06-10",
+        "videoId": "cKzrbehaWUU",
+        "timestamp": 5235,
+        "endTimestamp": 5514
+      }
+    ]
+  },
+  {
+    "id": "song-784d7ce8-114f-43b7-9c1a-0599453c7d3c",
+    "workId": "work-f39b9227-bf6f-465b-b885-1de0b2c7eb40",
+    "title": "夢望斷",
+    "originalArtist": "Winky詩",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-bf0a640f-821a-4aa8-b6fb-9599add95606",
+        "streamId": "stream-2026-07-22",
+        "videoId": "jAQvF5wMGws",
+        "timestamp": 1444,
+        "endTimestamp": 1748
+      },
+      {
+        "id": "p-4530dd5b-bc38-4e1a-a919-252ae7a291fe",
+        "streamId": "stream-2026-07-08",
+        "videoId": "n7o5ukvaAiY",
+        "timestamp": 1817,
+        "endTimestamp": 2118
+      }
+    ]
+  },
+  {
+    "id": "song-76beff14-09a9-441c-a31e-3ef99efb5f86",
+    "workId": "work-4f0bbc0d-a680-4cd7-a12a-ee58f8d4e146",
+    "title": "對酒",
+    "originalArtist": "KBShinya",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-b0debfea-311a-4259-af80-b8f2785f5607",
+        "streamId": "stream-2026-09-09",
+        "videoId": "_4yrs9aGUA8",
+        "timestamp": 1605,
+        "endTimestamp": 1793
+      }
+    ]
+  },
+  {
+    "id": "song-1d0283aa-272a-4e84-89d4-a611d3f50d37",
+    "workId": "work-3d390b40-13c2-4637-99d2-96674f0e1b21",
+    "title": "綺雲澤",
+    "originalArtist": "星塵&海伊",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-8803268a-1ded-437d-93fc-710ec02f01a4",
+        "streamId": "stream-2026-06-10",
+        "videoId": "cKzrbehaWUU",
+        "timestamp": 3674,
+        "endTimestamp": 3912
+      }
+    ]
+  },
+  {
+    "id": "song-e2bc546d-5778-4e76-9ca0-fe912f59b3b4",
+    "workId": "work-20b09efb-3b74-48f8-8089-df77228c271f",
+    "title": "腐草為螢",
+    "originalArtist": "銀臨",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-62c50092-1de4-4907-abba-ac3c9f1945dc",
+        "streamId": "stream-f9857413-9717-46ed-8bf5-abc9d9af362f",
+        "videoId": "-iBV9Be21mA",
+        "timestamp": 2475,
+        "endTimestamp": 2744
+      }
+    ]
+  },
+  {
+    "id": "song-eee8fa85-361a-4ce1-9043-55ef2db5a5d8",
+    "workId": "work-4928ba65-2e77-4980-b810-bec2246d9aeb",
+    "title": "與妻書",
+    "originalArtist": "國風堂&倫桑",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-e3323b33-736b-4af1-add5-066b81f7c545",
+        "streamId": "stream-2026-08-25",
+        "videoId": "w9XHL_J8_kc",
+        "timestamp": 2729,
+        "endTimestamp": 2922
+      }
+    ]
+  },
+  {
+    "id": "song-51325e86-f6ea-4080-a95f-bccf8636401b",
+    "workId": "work-5f14b711-f731-4948-a5ac-b2ab4b571416",
+    "title": "舞女",
+    "originalArtist": "陳小雲",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-23ad87a3-960b-4399-96db-81a4aa8b5577",
+        "streamId": "stream-acceb6ce-b95c-44d7-8642-ed95fab8c930",
+        "videoId": "P0O4oAf4jso",
+        "timestamp": 2764,
+        "endTimestamp": 2973
+      }
+    ]
+  },
+  {
+    "id": "song-99a5a80e-7f7f-4690-a840-2ae1a272ec12",
+    "workId": "work-song-e1516aa3",
+    "title": "蜜月アン・ドゥ・トロワ",
+    "originalArtist": "DATEKEN",
+    "tags": [
+      "language:ja"
+    ],
+    "performances": [
+      {
+        "id": "p-85442c42-078a-4f97-b27a-5fc4edea13d4",
+        "streamId": "stream-2026-06-17",
+        "videoId": "UaUF0j7Pmy4",
+        "timestamp": 3404,
+        "endTimestamp": 3648
+      }
+    ]
+  },
+  {
+    "id": "song-3ce3baf3-2fc2-4e9e-9128-0e086ceebede",
+    "workId": "work-61365323-861b-4871-881f-e9f51d058817",
+    "title": "遠方",
+    "originalArtist": "星塵",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-78621f0e-eb3f-454c-bbbc-769005779024",
+        "streamId": "stream-f8223f85-ac1f-4e8e-8368-28ebf02db798",
+        "videoId": "VFztLHJb_EU",
+        "timestamp": 795,
+        "endTimestamp": 1047
+      }
+    ]
+  },
+  {
+    "id": "song-f069c88e-85e6-488d-b252-b8792a81332f",
+    "workId": "work-2d6b89ed-1075-4e04-ba0a-f8bee962f86a",
+    "title": "遠方",
+    "originalArtist": "忘川風華錄",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-9c3221d6-0f47-400d-ac93-1c3fffb08e60",
+        "streamId": "stream-8e950518-f22d-49f9-b20e-67eff2af5210",
+        "videoId": "f69M8rbw2Cc",
+        "timestamp": 985,
+        "endTimestamp": 1235
+      }
+    ]
+  },
+  {
+    "id": "song-d8dce4bf-1046-4890-b969-a610a8de277d",
+    "workId": "work-95188ed4-d837-4c64-b581-b08c27f68e3c",
+    "title": "遠方(Key -1 → +0)",
+    "originalArtist": "忘川風華錄",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-2469aace-289f-42f8-ac61-72ba540e192b",
+        "streamId": "stream-2026-09-20",
+        "videoId": "dP12QYzbzMA",
+        "timestamp": 9238,
+        "endTimestamp": 9490
+      }
+    ]
+  },
+  {
+    "id": "song-b59746e1-1c88-4016-921b-5e2e90801a8e",
+    "workId": "work-song-0e7932c2",
+    "title": "廣寒宮",
+    "originalArtist": "丸子呦",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-dce63520-2bde-47ca-af44-7a5c2b953410",
+        "streamId": "stream-2026-06-10",
+        "videoId": "cKzrbehaWUU",
+        "timestamp": 2623,
+        "endTimestamp": 2831
+      }
+    ]
+  },
+  {
+    "id": "song-c844236f-a721-4cd1-8c4d-a4f40aeec1bd",
+    "workId": "work-c88a5b36-d47a-4405-be2b-3068f6404e5d",
+    "title": "慕夏",
+    "originalArtist": "等什麼君",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-0e1bef6f-a168-4c14-bd5d-51a61a9d0d20",
+        "streamId": "stream-2026-08-19",
+        "videoId": "WKEO0RdBBig",
+        "timestamp": 2984,
+        "endTimestamp": 3148
+      }
+    ]
+  },
+  {
+    "id": "song-8b5b639a-2a16-4f0f-a0a7-7819016f893d",
+    "workId": "work-73f1619f-db9a-4866-9286-33b09ad03a9c",
+    "title": "樂遊記",
+    "originalArtist": "銀臨&徐夢圓",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-7644a8e9-b774-44f5-99bc-c76e24ae0710",
+        "streamId": "stream-8e950518-f22d-49f9-b20e-67eff2af5210",
+        "videoId": "f69M8rbw2Cc",
+        "timestamp": 1842,
+        "endTimestamp": 2073
+      }
+    ]
+  },
+  {
+    "id": "song-924ba3e2-3a1b-4343-9c40-9100f1b5b728",
+    "workId": "work-516441a2-d7a3-432d-8a43-6d9ef3d0cd3c",
+    "title": "燕無歇",
+    "originalArtist": "蔣雪兒",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-038a0615-96f3-4428-8780-b332b0dd2bad",
+        "streamId": "stream-2026-08-05",
+        "videoId": "VCrVYOabRXQ",
+        "timestamp": 8550,
+        "endTimestamp": 8748
+      }
+    ]
+  },
+  {
+    "id": "song-d76d697e-ed3b-433c-8704-2b74e6d363c2",
+    "workId": "work-dbf2871f-68ee-463b-9ce4-8c18ca224432",
+    "title": "錦繡人間",
+    "originalArtist": "HITA",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-99d2382d-8105-499b-af3e-5cafbc7f8505",
+        "streamId": "stream-2026-08-25",
+        "videoId": "w9XHL_J8_kc",
+        "timestamp": 1621,
+        "endTimestamp": 1769
+      }
+    ]
+  },
+  {
+    "id": "song-0d434aeb-320d-4c18-ad2b-1b3b42ac31a2",
+    "workId": "work-song-cf02543f",
+    "title": "錦鯉抄",
+    "originalArtist": "銀臨",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-a90b4d54-ef00-4a96-b5a5-ac77d0e3129b",
+        "streamId": "stream-2026-06-10",
+        "videoId": "cKzrbehaWUU",
+        "timestamp": 310,
+        "endTimestamp": 550
+      }
+    ]
+  },
+  {
+    "id": "song-d66b1c1c-b830-42c1-bd9f-234186f023e6",
+    "workId": "work-8d05a7e9-d6c0-4bb7-a242-084fcf96cd6c",
+    "title": "靜悄悄",
+    "originalArtist": "陳泫孝",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-bf349589-a07b-4b2b-a7f9-b690e4d50da6",
+        "streamId": "stream-2026-08-25",
+        "videoId": "w9XHL_J8_kc",
+        "timestamp": 4467,
+        "endTimestamp": 4620
+      }
+    ]
+  },
+  {
+    "id": "song-049a39b5-cae6-4ec9-9657-eeafbac2554f",
+    "workId": "work-5ebf3fc2-ff47-426d-ab0a-6cdb4296ffda",
+    "title": "鴛鴦戲",
+    "originalArtist": "黃齡",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-85d9386c-db7b-41cf-930b-e6badee53832",
+        "streamId": "stream-2026-08-19",
+        "videoId": "WKEO0RdBBig",
+        "timestamp": 2521,
+        "endTimestamp": 2730
+      }
+    ]
+  },
+  {
+    "id": "song-c985ae43-fb45-466b-acf8-5390cdda53e3",
+    "workId": "work-adaf6bf6-d082-4af2-9229-f0ffdb7b6e19",
+    "title": "戲文說",
+    "originalArtist": "祥嘞嘞&叫寶寶",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-9c44d204-61c9-43cb-a996-2a02f0b1cc2a",
+        "streamId": "stream-2026-06-10",
+        "videoId": "cKzrbehaWUU",
+        "timestamp": 758,
+        "endTimestamp": 916
+      }
+    ]
+  },
+  {
+    "id": "song-0e3a5a90-07c4-4768-900d-3f14fb51e0d2",
+    "workId": "work-6338c519-b295-460d-b075-0f9370472012",
+    "title": "繁花",
+    "originalArtist": "董貞",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-20ab4484-bf55-445c-b7e5-9f6969bd138f",
+        "streamId": "stream-513734c2-9b80-4ddb-a8b5-7076b1966370",
+        "videoId": "wwif9y3U65I",
+        "timestamp": 1582,
+        "endTimestamp": 1800
+      }
+    ]
+  },
+  {
+    "id": "song-a5ea09f8-d3cb-485c-a272-89903a2a548e",
+    "workId": "work-3091b003-f943-423f-ab7a-46f8f338e78b",
+    "title": "繁花(速度 +0.1、Key +1)",
+    "originalArtist": "董貞",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-56c32093-fec1-40ab-8389-78502e803ced",
+        "streamId": "stream-2026-09-20",
+        "videoId": "dP12QYzbzMA",
+        "timestamp": 3992,
+        "endTimestamp": 4190
+      }
+    ]
+  },
+  {
+    "id": "song-2ebc8481-bc18-4b1a-b913-c8d29d0d3c75",
+    "workId": "work-song-2143",
+    "title": "隱形的翅膀",
+    "originalArtist": "張韶涵",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-ebba5dc5-8e05-47a4-9a1b-968230d3f793",
+        "streamId": "stream-2026-08-05",
+        "videoId": "VCrVYOabRXQ",
+        "timestamp": 6679,
+        "endTimestamp": 6898
+      },
+      {
+        "id": "p-48c6ea98-fbe4-4c38-be3d-68688d1395eb",
+        "streamId": "stream-2026-07-08",
+        "videoId": "n7o5ukvaAiY",
+        "timestamp": 5740,
+        "endTimestamp": 5959
+      }
+    ]
+  },
+  {
+    "id": "song-ebcf2c4f-7d9f-43fd-bbe1-206f44977a40",
+    "workId": "work-697f195e-6f4f-453a-be95-def54944fc73",
+    "title": "霜雪千年",
+    "originalArtist": "洛天依&樂正綾",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-87ff3333-423b-409f-9f20-c5a7642ca0e8",
+        "streamId": "stream-2026-08-19",
+        "videoId": "WKEO0RdBBig",
+        "timestamp": 5332,
+        "endTimestamp": 5570
+      }
+    ]
+  },
+  {
+    "id": "song-b97fbf78-9661-49ed-a393-20aefe4f863d",
+    "workId": "work-song-1978",
+    "title": "簪花人間",
+    "originalArtist": "星塵",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-515fcbd1-0725-4d3d-97d3-b93d0a90fd0c",
+        "streamId": "stream-2026-08-19",
+        "videoId": "WKEO0RdBBig",
+        "timestamp": 3357,
+        "endTimestamp": 3614
+      },
+      {
+        "id": "p-3675cc05-31e7-4ada-a568-0d3631b88329",
+        "streamId": "stream-f8223f85-ac1f-4e8e-8368-28ebf02db798",
+        "videoId": "VFztLHJb_EU",
+        "timestamp": 304,
+        "endTimestamp": 559
+      }
+    ]
+  },
+  {
+    "id": "song-8b8ca56f-c5c6-49d9-a6e0-e71a49d1051b",
+    "workId": "work-ab107041-ae8b-4d6d-925a-0ecabffbbeed",
+    "title": "舊夢一場",
+    "originalArtist": "阿悠悠",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-07793504-a1a8-420a-9ea8-27bcbd74e68f",
+        "streamId": "stream-2026-09-20",
+        "videoId": "dP12QYzbzMA",
+        "timestamp": 7865,
+        "endTimestamp": 8035
+      }
+    ]
+  },
+  {
+    "id": "song-4fd7055c-5c41-4f1b-9796-0d73a33916e3",
+    "workId": "work-56587663-8110-4063-b01f-5a0f399dad23",
+    "title": "離人仇",
+    "originalArtist": "李袁杰",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-58cb2bdb-b8c1-47dc-9aea-c4288dc6209a",
+        "streamId": "stream-2026-09-09",
+        "videoId": "_4yrs9aGUA8",
+        "timestamp": 5897,
+        "endTimestamp": 6115
+      }
+    ]
+  },
+  {
+    "id": "song-facd9b2b-e9ca-450c-af00-7f1ff6b7260f",
+    "workId": "work-07f37dd4-d5df-4bfe-b69d-24564b0fbc3f",
+    "title": "離島之歌",
+    "originalArtist": "東山奈央",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-323dd1fc-4224-41b3-acf4-ac9920d9d1b9",
+        "streamId": "stream-2026-06-17",
+        "videoId": "UaUF0j7Pmy4",
+        "timestamp": 4778,
+        "endTimestamp": 4997
+      }
+    ]
+  },
+  {
+    "id": "song-02cd45f2-c9aa-47ac-9134-d2d3a4f164d3",
+    "workId": "work-b736b8b0-f563-4d36-b7c5-81c53ae28a16",
+    "title": "辭九門回憶",
+    "originalArtist": "等什麼君",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-5afd6766-5dee-4b46-9ab7-fc63612bf4a1",
+        "streamId": "stream-2026-09-09",
+        "videoId": "_4yrs9aGUA8",
+        "timestamp": 5416,
+        "endTimestamp": 5633
+      }
+    ]
+  },
+  {
+    "id": "song-b641a9ce-4660-4160-9870-ef4c8e8aea82",
+    "workId": "work-08e1d9d2-0840-4ace-aa48-d1c5ce97540a",
+    "title": "魑魅魍魎",
+    "originalArtist": "茶理理",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-9af4055d-332a-4e0e-bc20-6b4f0f8a677a",
+        "streamId": "stream-2026-09-09",
+        "videoId": "_4yrs9aGUA8",
+        "timestamp": 5006,
+        "endTimestamp": 5211
+      }
+    ]
+  },
+  {
+    "id": "song-a07ccbed-de89-47c0-9eba-30fe17e4ce14",
+    "workId": "work-32076345-d2b6-427c-a51c-a14918a514fd",
+    "title": "驚鵲",
+    "originalArtist": "三無&Hanser",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-8fe06686-bfd9-4360-82a3-6af8ef97da88",
+        "streamId": "stream-2026-08-25",
+        "videoId": "w9XHL_J8_kc",
+        "timestamp": 6108,
+        "endTimestamp": 6298
+      },
+      {
+        "id": "p-c4ac02b1-9f73-4d2d-8481-4f51a1b39aab",
+        "streamId": "stream-f8223f85-ac1f-4e8e-8368-28ebf02db798",
+        "videoId": "VFztLHJb_EU",
+        "timestamp": 1731,
+        "endTimestamp": 1944
+      }
+    ]
+  },
+  {
+    "id": "song-3bc7792e-1739-4624-b42c-b7d116813546",
+    "workId": "work-f66aa9d2-4202-4e84-804d-6143b923ae55",
+    "title": "靈秀",
+    "originalArtist": "雙笙",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-0bc5032d-757c-4c33-bc91-cd90d80cf85e",
+        "streamId": "stream-97b2edd0-d63d-48e8-936c-c7c7624334ad",
+        "videoId": "Mp1x5ZY-gd0",
+        "timestamp": 1294,
+        "endTimestamp": 1563
+      }
+    ]
+  },
+  {
+    "id": "song-f68d34f6-4e30-4c20-b33d-f1fb17c974a4",
+    "workId": "work-song-8ef9c4cb",
+    "title": "NIGHT DANCER",
+    "originalArtist": "imase",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-6d24b2d5-20aa-4666-a8d2-f305355e91cd",
+        "streamId": "stream-2026-06-17",
+        "videoId": "UaUF0j7Pmy4",
+        "timestamp": 777,
+        "endTimestamp": 988
+      },
+      {
+        "id": "p-29fe9c45-453f-4d5d-813f-b2010dd1b007",
+        "streamId": "stream-5e5e42d5-9115-45c5-b00f-1b23652d0f8d",
+        "videoId": "aaM-FVAB4uk",
+        "timestamp": 3165,
+        "endTimestamp": 3374
+      }
+    ]
+  },
+  {
+    "id": "song-abe2ab26-a272-4f09-8c59-6a9014c3ef8f",
+    "workId": "work-9372c3ea-c74f-49d9-9535-889947a97f35",
+    "title": "Time Machine",
+    "originalArtist": "mj apanay feat. aren park",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-f82c2dee-0f5f-468c-83e3-39f9ee6d0e1d",
+        "streamId": "stream-2026-07-08",
+        "videoId": "n7o5ukvaAiY",
+        "timestamp": 6172,
+        "endTimestamp": 6402
+      }
+    ]
+  },
+  {
+    "id": "song-cf834054-4e78-4bf0-affe-36d3eb0d2553",
+    "workId": "work-song-44",
+    "title": "エンヴィーベイビー",
+    "originalArtist": "Kanaria",
+    "tags": [
+      "language:ja"
+    ],
+    "performances": [
+      {
+        "id": "p-b7e0deed-b756-43eb-8af4-969bc180cc5b",
+        "streamId": "stream-2026-06-17",
+        "videoId": "UaUF0j7Pmy4",
+        "timestamp": 2645,
+        "endTimestamp": 2780
+      }
+    ]
+  },
+  {
+    "id": "song-aa9a8219-45f4-4994-8dd7-1dbd1c966346",
+    "workId": "work-94acf065-4135-4312-90c1-2216ddd2262f",
+    "title": "ツギハギスタッカート",
+    "originalArtist": "とあ feat.初音未來",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-9fe4a328-8af9-43a9-afaa-1cc3843df945",
+        "streamId": "stream-2026-06-17",
+        "videoId": "UaUF0j7Pmy4",
+        "timestamp": 312,
+        "endTimestamp": 555
+      }
+    ]
+  },
+  {
+    "id": "song-53f615e9-d1e7-40db-9ae3-5e5eb80a4ce2",
+    "workId": "work-be32fd55-d9e9-4828-8b8f-e9dc7e8cedf5",
+    "title": "みずいろの雨",
+    "originalArtist": "八神純子",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-655cb678-7597-4c21-942a-18a5e82fcafa",
+        "streamId": "stream-2026-06-17",
+        "videoId": "UaUF0j7Pmy4",
+        "timestamp": 3068,
+        "endTimestamp": 3240
+      }
+    ]
+  },
+  {
+    "id": "song-5005f4a4-9c6c-49fe-84e7-a520e89f7cf7",
+    "workId": "work-song-0c224a90",
+    "title": "リードコントロール",
+    "originalArtist": "なるみや",
+    "tags": [
+      "language:ja"
+    ],
+    "performances": [
+      {
+        "id": "p-97730c62-9ca0-4721-9be2-976d80ae1c97",
+        "streamId": "stream-5e5e42d5-9115-45c5-b00f-1b23652d0f8d",
+        "videoId": "aaM-FVAB4uk",
+        "timestamp": 252,
+        "endTimestamp": 394
+      }
+    ]
+  },
+  {
+    "id": "song-9b59660d-3e3e-4014-ab30-fe4a671605f5",
+    "workId": "work-9e3126e8-d632-4e6b-89a1-2a9b4166b9d9",
+    "title": "リードコントロール(Key +3)",
+    "originalArtist": "なるみや",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-2883583f-7ca7-478a-ba4e-f94dba233552",
+        "streamId": "stream-2026-09-20",
+        "videoId": "dP12QYzbzMA",
+        "timestamp": 2036,
+        "endTimestamp": 2177
+      }
+    ]
+  },
+  {
+    "id": "song-4f95da6b-0015-46a2-9712-90c2fdedecbf",
+    "workId": "work-cc9c10c0-5e19-4cb7-89be-2ce040ab1978",
+    "title": "リ一ドコントロール",
+    "originalArtist": "なるみや",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-ff0df071-8d05-458d-ae0f-10e4a14d2a9e",
+        "streamId": "stream-2026-06-17",
+        "videoId": "UaUF0j7Pmy4",
+        "timestamp": 1317,
+        "endTimestamp": 1460
+      }
+    ]
+  }
+]
