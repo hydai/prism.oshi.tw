@@ -272,6 +272,22 @@
     ]
   },
   {
+    "id": "song-f29055f7-9bbe-4883-be9c-470d956a3e33",
+    "workId": "work-5425b1b8-d5b4-4400-8a11-c793b146f183",
+    "title": "小小",
+    "originalArtist": "容祖兒",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-9ba9c253-b463-4564-90e6-ccc4b2084fb7",
+        "streamId": "stream-2026-09-23",
+        "videoId": "LIi33QOdVg8",
+        "timestamp": 4687,
+        "endTimestamp": 4946
+      }
+    ]
+  },
+  {
     "id": "song-8f18e44e-c25d-40ce-9c46-eb8796cd84e3",
     "workId": "work-song-1312",
     "title": "小丑的品格",
@@ -368,6 +384,22 @@
     ]
   },
   {
+    "id": "song-94bb51ed-0d0a-45ce-9f5f-acd32dc1f8e1",
+    "workId": "work-57a58c5d-3e51-4671-a1f5-ae3cdb735673",
+    "title": "不成詩",
+    "originalArtist": "雙笙",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-c245eeda-623b-4014-9f48-d223744801cc",
+        "streamId": "stream-2026-09-23",
+        "videoId": "LIi33QOdVg8",
+        "timestamp": 6197,
+        "endTimestamp": 6485
+      }
+    ]
+  },
+  {
     "id": "song-6d792ff1-0aae-41c3-b8af-ea956d8aabaf",
     "workId": "work-song-bf727142",
     "title": "不老夢",
@@ -392,6 +424,13 @@
       "language:zh"
     ],
     "performances": [
+      {
+        "id": "p-677f3c35-1f09-4268-a80b-49dcbe591962",
+        "streamId": "stream-2026-09-23",
+        "videoId": "LIi33QOdVg8",
+        "timestamp": 2576,
+        "endTimestamp": 2805
+      },
       {
         "id": "p-fb91fa86-d6c5-4602-94ff-0eee6204bcbc",
         "streamId": "stream-b791bdb9-7f5a-43fa-8602-77bfa9746e3a",
@@ -453,6 +492,22 @@
         "videoId": "8YAimZj5Mrw",
         "timestamp": 3390,
         "endTimestamp": 3650
+      }
+    ]
+  },
+  {
+    "id": "song-e53fd305-7633-4ae6-8f78-ea288df9d7c5",
+    "workId": "work-3595c9ee-5301-4ee1-a67c-1a9e3f88b353",
+    "title": "予你成歌",
+    "originalArtist": "葉洛洛",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-0444df8d-1f84-4316-9b51-a43089207f81",
+        "streamId": "stream-2026-09-23",
+        "videoId": "LIi33QOdVg8",
+        "timestamp": 3566,
+        "endTimestamp": 3844
       }
     ]
   },
@@ -1100,6 +1155,22 @@
     ]
   },
   {
+    "id": "song-a6d68688-81fb-4021-a7ae-487629223d2b",
+    "workId": "work-94cffbfc-6bcb-4bf3-b059-6f93f40a3e2a",
+    "title": "每一片落葉都知你名姓",
+    "originalArtist": "西瓜JUN",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-45a488df-df36-4b80-a4a4-c0947a74058d",
+        "streamId": "stream-2026-09-23",
+        "videoId": "LIi33QOdVg8",
+        "timestamp": 4305,
+        "endTimestamp": 4494
+      }
+    ]
+  },
+  {
     "id": "song-cfafe97b-f8b2-4fc2-a00b-8ce07f9dfead",
     "workId": "work-377ab835-b0e8-4f61-b5df-d6cab87780ad",
     "title": "沈園外",
@@ -1139,6 +1210,13 @@
     "tags": [],
     "performances": [
       {
+        "id": "p-c2ee869e-cc73-4bd1-83dd-1a04422a161c",
+        "streamId": "stream-2026-09-23",
+        "videoId": "LIi33QOdVg8",
+        "timestamp": 6563,
+        "endTimestamp": 6823
+      },
+      {
         "id": "p-827ed52b-5ba6-44db-adfd-d11063b8dc0a",
         "streamId": "stream-2026-08-05",
         "videoId": "VCrVYOabRXQ",
@@ -1151,6 +1229,22 @@
         "videoId": "f69M8rbw2Cc",
         "timestamp": 550,
         "endTimestamp": 808
+      }
+    ]
+  },
+  {
+    "id": "song-1e6feb0d-59a2-471e-80f9-3743e8775e14",
+    "workId": "work-b418d818-d08b-4b34-a90f-744b83584f4b",
+    "title": "使一顆心免於哀傷",
+    "originalArtist": "Chevy",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-8764e651-60e3-4a23-bc3b-141472b9668a",
+        "streamId": "stream-2026-09-23",
+        "videoId": "LIi33QOdVg8",
+        "timestamp": 3193,
+        "endTimestamp": 3391
       }
     ]
   },
@@ -1400,6 +1494,24 @@
     ]
   },
   {
+    "id": "song-0f8f0174-e29e-43ba-87c7-f5950760d30c",
+    "workId": "work-song-e3d53199",
+    "title": "勇氣",
+    "originalArtist": "梁靜茹",
+    "tags": [
+      "language:zh"
+    ],
+    "performances": [
+      {
+        "id": "p-a18f3a61-5d04-4d01-9222-6dd5f372c35e",
+        "streamId": "stream-2026-09-23",
+        "videoId": "LIi33QOdVg8",
+        "timestamp": 1171,
+        "endTimestamp": 1405
+      }
+    ]
+  },
+  {
     "id": "song-d09a2759-5aa9-4ab8-ab3e-d80a9e3df9f1",
     "workId": "work-e7e8efab-d291-4ae2-b948-b809b2ebb24c",
     "title": "怎嘆",
@@ -1444,6 +1556,22 @@
         "videoId": "-iBV9Be21mA",
         "timestamp": 3405,
         "endTimestamp": 3729
+      }
+    ]
+  },
+  {
+    "id": "song-d3cab67b-e40a-4098-8a4d-f43128b18822",
+    "workId": "work-2017bd9a-ffd0-43dc-9848-f53005883cdc",
+    "title": "故園縈夢",
+    "originalArtist": "第五人格",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-b9784a72-9211-4c35-85f2-ed255f1aea33",
+        "streamId": "stream-2026-09-23",
+        "videoId": "LIi33QOdVg8",
+        "timestamp": 5414,
+        "endTimestamp": 5737
       }
     ]
   },
@@ -2509,6 +2637,24 @@
     ]
   },
   {
+    "id": "song-b1abc077-19af-497c-aab9-1158a463f8c6",
+    "workId": "work-song-4f86e34d",
+    "title": "愛情轉移",
+    "originalArtist": "陳奕迅",
+    "tags": [
+      "language:zh"
+    ],
+    "performances": [
+      {
+        "id": "p-3e38eb10-f116-49ba-9723-23c8f998b8aa",
+        "streamId": "stream-2026-09-23",
+        "videoId": "LIi33QOdVg8",
+        "timestamp": 708,
+        "endTimestamp": 960
+      }
+    ]
+  },
+  {
     "id": "song-5cde9396-2e4d-4570-908b-12d61b6dc27c",
     "workId": "work-song-6ef32a4a",
     "title": "愛殤",
@@ -3142,6 +3288,24 @@
     ]
   },
   {
+    "id": "song-22428ab9-1d4c-4c22-8059-97a6029f7912",
+    "workId": "work-song-23cc221a",
+    "title": "關鍵詞",
+    "originalArtist": "林俊傑",
+    "tags": [
+      "language:zh"
+    ],
+    "performances": [
+      {
+        "id": "p-8f4c9668-215b-48a9-b5c5-1d27dddcd1a6",
+        "streamId": "stream-2026-09-23",
+        "videoId": "LIi33QOdVg8",
+        "timestamp": 5151,
+        "endTimestamp": 5353
+      }
+    ]
+  },
+  {
     "id": "song-b641a9ce-4660-4160-9870-ef4c8e8aea82",
     "workId": "work-08e1d9d2-0840-4ace-aa48-d1c5ce97540a",
     "title": "魑魅魍魎",
@@ -3260,6 +3424,13 @@
     "originalArtist": "とあ feat.初音未來",
     "tags": [],
     "performances": [
+      {
+        "id": "p-f2d46849-693e-4391-b83d-1f7f429cd60b",
+        "streamId": "stream-2026-09-23",
+        "videoId": "LIi33QOdVg8",
+        "timestamp": 1963,
+        "endTimestamp": 2206
+      },
       {
         "id": "p-9fe4a328-8af9-43a9-afaa-1cc3843df945",
         "streamId": "stream-2026-06-17",
