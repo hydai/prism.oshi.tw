@@ -1,6 +1,8 @@
 import { Navigate } from 'react-router-dom';
 import { lazy, Suspense, type ReactElement } from 'react';
 import { PageBoundary } from '../components/PageBoundary';
+import { Skeleton } from '../components/ui/Display';
+import type { IconName } from '../components/ui/Icon';
 import type { AuthUser } from '../../../shared/types';
 const CrystalTickets = lazy(() => import('../pages/CrystalTickets'));
 const Dashboard = lazy(() => import('../pages/Dashboard'));
@@ -20,6 +22,18 @@ const SubmitStream = lazy(() => import('../pages/SubmitStream'));
 const VodExport = lazy(() => import('../pages/VodExport'));
 const VodExportRepair = lazy(() => import('../pages/VodExportRepair'));
 
+/** A sidebar section, in the order it is presented. */
+export type NavGroupId = 'overview' | 'catalog' | 'timestamps' | 'library' | 'inbox' | 'publish';
+
+export const NAV_GROUPS: readonly { id: NavGroupId; label: string }[] = [
+  { id: 'overview', label: 'Overview' },
+  { id: 'catalog', label: 'Catalog' },
+  { id: 'timestamps', label: 'Timestamps' },
+  { id: 'library', label: 'Library' },
+  { id: 'inbox', label: 'Inbox' },
+  { id: 'publish', label: 'Publish' },
+];
+
 export interface AdminRoute {
   /** Path as react-router matches it. */
   path: string;
@@ -29,37 +43,93 @@ export interface AdminRoute {
   label?: string;
   /** Curator-only: a contributor is sent back to the dashboard. */
   curatorOnly?: boolean;
-  /** Rendered in the prism visual vocabulary (gradient page, glass shell). */
-  prismShell?: boolean;
+  /** Sidebar section this route belongs to. A route without one is not in the grouped nav. */
+  group?: NavGroupId;
+  /** Icon for the sidebar entry / "+ New" menu entry. */
+  icon?: IconName;
+  /** Lists this route in the "+ New" menu. */
+  newMenu?: { description: string; icon: IconName };
+  /** Which shell renders this page: the new prism studio frame or the legacy slate layout. Defaults to 'legacy'. */
+  frame?: 'studio' | 'legacy';
 }
 
 /**
- * Every page of the Admin, described once. The routes, the sidebar order, who
- * may open what and which pages wear the prism shell used to be four lists that
- * had to be edited together; they are all read from this one now.
+ * Every page of the Admin, described once. The routes, the sidebar groups,
+ * the "+ New" menu and who may open what used to be lists that had to be
+ * edited together; they are all read from this one now.
  */
 export const ADMIN_ROUTES: readonly AdminRoute[] = [
-  { path: '/', label: 'Dashboard', render: () => <Dashboard /> },
-  { path: '/songs', label: 'Songs', render: (user) => <SongsList user={user} /> },
-  { path: '/works', label: 'Global Library', curatorOnly: true, render: () => <GlobalWorks /> },
-  { path: '/works/review', label: 'Work Review', curatorOnly: true, render: () => <GlobalWorkReview /> },
+  { path: '/', label: 'Dashboard', group: 'overview', icon: 'dashboard', render: () => <Dashboard /> },
+  { path: '/songs', label: 'Songs', group: 'catalog', icon: 'music', render: (user) => <SongsList user={user} /> },
   { path: '/songs/:id', render: (user) => <SongDetail user={user} /> },
-  { path: '/streams', label: 'Streams', render: (user) => <StreamsList user={user} /> },
+  {
+    path: '/streams',
+    label: 'Streams',
+    group: 'catalog',
+    icon: 'radio',
+    render: (user) => <StreamsList user={user} />,
+  },
   { path: '/streams/:id', render: (user) => <StreamDetailPage user={user} /> },
-  { path: '/submit/song', label: 'Submit Song', render: () => <SubmitSong /> },
-  { path: '/submit/stream', label: 'Submit Stream', render: () => <SubmitStream /> },
-  { path: '/stamp', label: 'Stamp Editor', render: (user) => <StampEditor user={user} /> },
-  { path: '/pipeline', label: 'Pipeline', render: () => <Pipeline /> },
-  { path: '/harmonizer', label: 'Harmonizer', render: () => <Harmonizer /> },
-  { path: '/nova', label: 'Nova', prismShell: true, render: (user) => <NovaSubmissions user={user} /> },
+  {
+    path: '/stamp',
+    label: 'Stamp Editor',
+    group: 'timestamps',
+    icon: 'timer',
+    render: (user) => <StampEditor user={user} />,
+  },
+  { path: '/pipeline', label: 'Pipeline', group: 'timestamps', icon: 'workflow', render: () => <Pipeline /> },
+  {
+    path: '/works',
+    label: 'Global Library',
+    curatorOnly: true,
+    group: 'library',
+    icon: 'library',
+    render: () => <GlobalWorks />,
+  },
+  {
+    path: '/works/review',
+    label: 'Work Review',
+    curatorOnly: true,
+    group: 'library',
+    icon: 'gitCompare',
+    render: () => <GlobalWorkReview />,
+  },
+  { path: '/harmonizer', label: 'Harmonizer', group: 'library', icon: 'merge', render: () => <Harmonizer /> },
+  { path: '/nova', label: 'Nova', group: 'inbox', icon: 'nova', render: (user) => <NovaSubmissions user={user} /> },
   {
     path: '/nova/vods',
     label: 'Nova VODs',
-    prismShell: true,
+    group: 'inbox',
+    icon: 'film',
     render: (user) => <NovaVodSubmissions user={user} />,
   },
-  { path: '/crystal', label: 'Crystal', prismShell: true, render: (user) => <CrystalTickets user={user} /> },
-  { path: '/vod-export', label: 'VOD Export', curatorOnly: true, render: (user) => <VodExport user={user} /> },
+  {
+    path: '/crystal',
+    label: 'Crystal',
+    group: 'inbox',
+    icon: 'crystal',
+    render: (user) => <CrystalTickets user={user} />,
+  },
+  {
+    path: '/submit/song',
+    label: 'Submit Song',
+    newMenu: { description: 'Title, artist and optional performances', icon: 'music' },
+    render: () => <SubmitSong />,
+  },
+  {
+    path: '/submit/stream',
+    label: 'Submit Stream',
+    newMenu: { description: 'Paste a YouTube URL; the ID fills itself in', icon: 'radio' },
+    render: () => <SubmitStream />,
+  },
+  {
+    path: '/vod-export',
+    label: 'VOD Export',
+    curatorOnly: true,
+    group: 'publish',
+    icon: 'package',
+    render: (user) => <VodExport user={user} />,
+  },
   {
     path: '/vod-export/repair/:entity/:rowId',
     curatorOnly: true,
@@ -76,19 +146,10 @@ function RequireCurator({ user, children }: { user: AuthUser; children: ReactEle
 export function routeElement(route: AdminRoute, user: AuthUser): ReactElement {
   const page = (
     <PageBoundary key={route.path}>
-      <Suspense fallback={<p role="status" className="p-6 text-slate-500">Loading page...</p>}>
+      <Suspense fallback={<Skeleton rows={6} label="Loading page..." />}>
         {route.render(user)}
       </Suspense>
     </PageBoundary>
   );
   return route.curatorOnly ? <RequireCurator user={user}>{page}</RequireCurator> : page;
-}
-
-const PRISM_SHELL_PATHS = new Set(
-  ADMIN_ROUTES.flatMap((route) => (route.prismShell ? [route.path] : [])),
-);
-
-/** Whether the shell around this path is the prism one rather than the slate default. */
-export function usesPrismShell(pathname: string): boolean {
-  return PRISM_SHELL_PATHS.has(pathname);
 }
