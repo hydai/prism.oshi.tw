@@ -121,6 +121,9 @@ const TOKENS: Array<{ name: string; light: string; dark: string }> = [
   // unlike every other token above.
   { name: 'tooltip-bg', light: '#1E1B2E', dark: '#F1F5F9' },
   { name: 'tooltip-fg', light: '#FFFFFF', dark: '#1E1B2E' },
+  // Scrim behind the dialog and the drawer (task 6, ruling R17): not in the spec table; the value
+  // both scrims in the approved mockup 2 use.
+  { name: 'scrim', light: 'rgba(30,27,46,.28)', dark: 'rgba(0,0,0,.5)' },
 ];
 
 /** Spec §4.1 status tones — all 7 × {bg, fg, line}, copied verbatim. */
@@ -338,6 +341,7 @@ async function main(): Promise<void> {
   const tooltip = colors.tooltip as Record<string, unknown> | undefined;
   assert(tooltip?.bg === 'var(--tooltip-bg)', 'colors.tooltip.bg maps to var(--tooltip-bg)');
   assert(tooltip?.fg === 'var(--tooltip-fg)', 'colors.tooltip.fg maps to var(--tooltip-fg)');
+  assert(colors.scrim === 'var(--scrim)', 'colors.scrim maps to var(--scrim)');
 
   const backgroundImage = config.theme?.extend?.backgroundImage ?? {};
   assert(backgroundImage.canvas === 'var(--canvas)', 'backgroundImage.canvas maps to var(--canvas)');

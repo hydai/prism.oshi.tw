@@ -51,6 +51,7 @@ export default {
           bg: 'var(--tooltip-bg)',
           fg: 'var(--tooltip-fg)',
         },
+        scrim: 'var(--scrim)',
         accent: {
           pink: 'var(--accent-pink)',
           'pink-dark': 'var(--accent-pink-dark)',
