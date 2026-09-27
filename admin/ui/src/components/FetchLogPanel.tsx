@@ -1,4 +1,5 @@
 import type { OutcomeTone } from '../../../shared/itunes';
+import { Icon, type IconName } from './ui/Icon';
 
 export interface FetchLogEntry {
   key: number;
@@ -7,10 +8,10 @@ export interface FetchLogEntry {
   text: string;
 }
 
-const TONE_STYLES: Record<OutcomeTone, { row: string; icon: string }> = {
-  success: { row: 'text-green-700', icon: '✓' },
-  warning: { row: 'text-amber-700', icon: '△' },
-  error: { row: 'text-red-700', icon: '✕' },
+const TONE_STYLES: Record<OutcomeTone, { row: string; icon: IconName }> = {
+  success: { row: 'text-tone-ok-fg', icon: 'check' },
+  warning: { row: 'text-tone-warn-fg', icon: 'alert' },
+  error: { row: 'text-tone-danger-fg', icon: 'x' },
 };
 
 export function FetchLogPanel({ entries, onClear }: {
@@ -20,25 +21,26 @@ export function FetchLogPanel({ entries, onClear }: {
   if (entries.length === 0) return null;
 
   return (
-    <div className="mt-3 rounded-lg border border-slate-200 bg-white">
-      <div className="flex items-center justify-between border-b border-slate-100 px-3 py-1.5">
-        <span className="text-xs font-medium text-slate-600">
+    <div className="mt-3 rounded-radius-lg border border-field-line bg-field">
+      <div className="flex items-center justify-between border-b border-line-soft px-3 py-1.5">
+        <span className="text-meta font-medium text-fg-muted">
           iTunes fetch log ({entries.length})
         </span>
         <button
+          type="button"
           onClick={onClear}
-          className="rounded bg-slate-100 px-2 py-0.5 text-xs text-slate-600 hover:bg-slate-200"
+          className="rounded-radius-pill border border-field-line px-2.5 py-0.5 text-meta font-medium text-fg-muted hover:text-fg"
         >
           Clear
         </button>
       </div>
-      <ul className="max-h-44 overflow-y-auto px-3 py-1.5 text-xs">
+      <ul className="max-h-44 overflow-y-auto px-3 py-1.5 text-meta">
         {entries.map((e) => (
-          <li key={e.key} className={`flex gap-1.5 py-0.5 ${TONE_STYLES[e.tone].row}`}>
-            <span className="shrink-0">{TONE_STYLES[e.tone].icon}</span>
+          <li key={e.key} className={`flex items-center gap-1.5 py-0.5 ${TONE_STYLES[e.tone].row}`}>
+            <Icon name={TONE_STYLES[e.tone].icon} size={12} className="shrink-0" />
             <span className="min-w-0">
               <span className="font-medium">{e.title}</span>
-              <span className="text-slate-400"> — </span>
+              <span className="text-fg-subtle"> — </span>
               {e.text}
             </span>
           </li>

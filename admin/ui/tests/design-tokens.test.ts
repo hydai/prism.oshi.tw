@@ -119,6 +119,9 @@ const TOKENS: Array<{ name: string; light: string; dark: string }> = [
   },
   { name: 'danger-solid', light: '#E11D48', dark: '#E11D48' },
   { name: 'focus-ring', light: '0 0 0 3px rgba(236,72,153,.3)', dark: '0 0 0 3px rgba(244,114,182,.4)' },
+  // The "hot" border (a slot recording, with no end timestamp yet) — pink, distinct from the
+  // focus ring so a real :focus-visible stays visible on top of it.
+  { name: 'hot-line', light: '#F9A8D4', dark: 'rgba(244,114,182,.55)' },
   // Tooltip surface (task 2 fix round 1, ruling R10): deliberately theme-invariant in
   // direction (always a dark chip in light mode, always a light chip in dark mode),
   // unlike every other token above.
