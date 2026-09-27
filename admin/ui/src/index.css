@@ -4,6 +4,7 @@
 
 body {
   min-height: 100vh;
+  background: #F7F6FB;
 }
 
 /* ===== Prism design tokens (light values from app/globals.css) ===== */
@@ -96,3 +97,181 @@ body {
 .prism-gradient-text { background: linear-gradient(135deg, var(--accent-pink), var(--accent-blue)); -webkit-background-clip: text; background-clip: text; -webkit-text-fill-color: transparent; color: transparent; }
 .prism-shell-shadow { box-shadow: 0 25px 50px -12px rgba(224, 231, 255, 0.5); }
 @media (hover: hover) { .hover-row:hover { background: var(--bg-accent-pink); } }
+
+/* ===== Prism Studio design tokens (spec §4.1) — light values ===== */
+:root {
+  --canvas: linear-gradient(135deg, #FFF0F5 0%, #F0F8FF 50%, #E6E6FA 100%);
+  --blob-1: rgba(249,168,212,.55);
+  --blob-2: rgba(147,197,253,.5);
+  --blob-3: rgba(196,181,253,.35);
+  --glass-sidebar: rgba(255,255,255,.5);
+  --glass-header: rgba(255,255,255,.42);
+  --glass-card: rgba(255,255,255,.62);
+  --glass-pop: rgba(255,255,255,.9);
+  --glass-edge: rgba(255,255,255,.8);
+  --field: rgba(255,255,255,.72);
+  --field-line: rgba(203,213,225,.7);
+  --line-soft: rgba(148,163,184,.16);
+  --track: rgba(148,163,184,.16);
+  --fg: #1E293B;
+  /* Darker than spec §4.1's #64748B / #94A3B8, which miss WCAG AA (4.5:1) on the canvas and the
+     glass: tests/design-tokens.test.ts computes both against every surface they sit on. */
+  --fg-muted: #475569;
+  --fg-subtle: #56657B;
+  --accent-gradient: linear-gradient(135deg, #F472B6, #60A5FA);
+  --accent-fg: #DB2777;
+  --selected-bg: rgba(252,231,243,.85);
+  --nav-active-bg: rgba(255,255,255,.88);
+  --nav-active-fg: #DB2777;
+  --nav-active-icon: #EC4899;
+  --nav-bar-glow: none;
+  --shadow-card: 0 10px 36px -14px rgba(99,102,241,.25);
+  --shadow-pop: 0 20px 50px -18px rgba(30,27,46,.45);
+  --shadow-primary: 0 4px 14px rgba(244,114,182,.35);
+  --danger-solid: #E11D48;
+  --focus-ring: 0 0 0 3px rgba(236,72,153,.3);
+
+  --tone-ok-bg: #D1FAE5;
+  --tone-ok-fg: #047857;
+  --tone-ok-line: #A7F3D0;
+  --tone-warn-bg: #FEF3C7;
+  --tone-warn-fg: #B45309;
+  --tone-warn-line: #FDE68A;
+  --tone-danger-bg: #FEE2E2;
+  --tone-danger-fg: #B91C1C;
+  --tone-danger-line: #FECACA;
+  --tone-info-bg: #DBEAFE;
+  --tone-info-fg: #2563EB;
+  --tone-info-line: #BFDBFE;
+  --tone-neutral-bg: #F1F5F9;
+  --tone-neutral-fg: #64748B;
+  --tone-neutral-line: #E2E8F0;
+  --tone-violet-bg: #F5F3FF;
+  --tone-violet-fg: #6D28D9;
+  --tone-violet-line: #DDD6FE;
+  --tone-teal-bg: #CCFBF1;
+  --tone-teal-fg: #0F766E;
+  --tone-teal-line: #99F6E4;
+}
+
+/* ===== Prism Studio design tokens (spec §4.1) — dark values ===== */
+html.dark {
+  --canvas: #0D0A17;
+  --blob-1: rgba(236,72,153,.28);
+  --blob-2: rgba(59,130,246,.24);
+  --blob-3: rgba(139,92,246,.18);
+  --glass-sidebar: rgba(18,14,32,.55);
+  --glass-header: rgba(13,10,23,.45);
+  --glass-card: rgba(28,23,48,.58);
+  --glass-pop: rgba(36,30,60,.9);
+  --glass-edge: rgba(255,255,255,.08);
+  --field: rgba(255,255,255,.05);
+  --field-line: rgba(255,255,255,.12);
+  --line-soft: rgba(255,255,255,.055);
+  --track: rgba(255,255,255,.08);
+  --fg: #F1F5F9;
+  /* Lighter than spec §4.1's #A7A4BA / #716E88: --fg-subtle needs 4.5:1 on the lightest surfaces
+     here (the popover glass, a field on a selected row), and --fg-muted stays a step above it. */
+  --fg-muted: #C2BFD3;
+  --fg-subtle: #A7A4BA;
+  --accent-gradient: linear-gradient(135deg, #F472B6, #60A5FA);
+  --accent-fg: #F9A8D4;
+  --selected-bg: rgba(244,114,182,.12);
+  --nav-active-bg: rgba(255,255,255,.08);
+  --nav-active-fg: #FFFFFF;
+  --nav-active-icon: #F9A8D4;
+  --nav-bar-glow: 0 0 12px rgba(244,114,182,.75);
+  --shadow-card: 0 14px 36px -16px rgba(0,0,0,.8);
+  --shadow-pop: 0 20px 50px -18px rgba(0,0,0,.6);
+  --shadow-primary: 0 0 0 1px rgba(255,255,255,.08), 0 6px 22px rgba(236,72,153,.45);
+  --danger-solid: #E11D48;
+  --focus-ring: 0 0 0 3px rgba(244,114,182,.4);
+
+  --tone-ok-bg: rgba(16,185,129,.14);
+  --tone-ok-fg: #6EE7B7;
+  --tone-ok-line: rgba(16,185,129,.3);
+  --tone-warn-bg: rgba(245,158,11,.14);
+  --tone-warn-fg: #FBBF24;
+  --tone-warn-line: rgba(245,158,11,.3);
+  --tone-danger-bg: rgba(239,68,68,.14);
+  --tone-danger-fg: #FCA5A5;
+  --tone-danger-line: rgba(239,68,68,.3);
+  --tone-info-bg: rgba(96,165,250,.15);
+  --tone-info-fg: #93C5FD;
+  --tone-info-line: rgba(96,165,250,.3);
+  --tone-neutral-bg: rgba(255,255,255,.06);
+  --tone-neutral-fg: #A7A4BA;
+  --tone-neutral-line: rgba(255,255,255,.1);
+  --tone-violet-bg: rgba(139,92,246,.14);
+  --tone-violet-fg: #C4B5FD;
+  --tone-violet-line: rgba(139,92,246,.3);
+  --tone-teal-bg: rgba(20,184,166,.14);
+  --tone-teal-fg: #5EEAD4;
+  --tone-teal-line: rgba(20,184,166,.3);
+}
+
+html.dark body {
+  background: #0D0A17;
+}
+
+/* ===== Prism Studio glass surfaces (spec §4.1 / §4.2) ===== */
+@layer components {
+  .glass-sidebar {
+    background: var(--glass-sidebar);
+    border: 1px solid var(--glass-edge);
+    backdrop-filter: blur(18px) saturate(1.2);
+  }
+
+  .glass-header {
+    background: var(--glass-header);
+    border: 1px solid var(--glass-edge);
+    backdrop-filter: blur(14px);
+  }
+
+  .glass-card {
+    background: var(--glass-card);
+    border: 1px solid var(--glass-edge);
+    backdrop-filter: blur(16px) saturate(1.3);
+  }
+
+  .glass-pop {
+    background: var(--glass-pop);
+    border: 1px solid var(--glass-edge);
+    backdrop-filter: blur(18px);
+  }
+}
+
+/* backdrop-filter has no effect in this browser: raise the glass alpha so text on it stays readable (spec §4.2). */
+@supports not (backdrop-filter: blur(1px)) {
+  :root {
+    --glass-sidebar: rgba(255,255,255,.92);
+    --glass-header: rgba(255,255,255,.92);
+    --glass-card: rgba(255,255,255,.92);
+    --glass-pop: rgba(255,255,255,.92);
+  }
+
+  html.dark {
+    --glass-sidebar: rgba(18,14,32,.9);
+    --glass-header: rgba(13,10,23,.9);
+    --glass-card: rgba(28,23,48,.9);
+    --glass-pop: rgba(36,30,60,.9);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    transition-duration: 0.01ms !important;
+    animation-duration: 0.01ms !important;
+    /* One run, then stop: a looping animation (animate-spin, animate-pulse) would otherwise keep
+       its infinite iteration count and restart every 0.01 ms. */
+    animation-iteration-count: 1 !important;
+    scroll-behavior: auto !important;
+  }
+}
+
+:where(a, button, input, select, textarea, summary, [tabindex]):focus-visible {
+  outline: none;
+  box-shadow: var(--focus-ring);
+}
