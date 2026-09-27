@@ -167,16 +167,17 @@ async function clickButton(container: Container, label: string): Promise<void> {
   await click(button, `a ${label} button`);
 }
 
-/** Sidebar entries and icon buttons have no plain text label; a title or a fragment finds them. */
+/** Icon buttons and row controls have no plain text label; an aria-label or a title finds them. */
 async function clickBySelector(container: Container, selector: string, what: string): Promise<void> {
   await click(container.querySelector<DomElement>(selector), what);
 }
 
-async function clickButtonContaining(container: Container, text: string): Promise<void> {
-  const button = [...container.querySelectorAll('button')].find((candidate) =>
+/** A stream in the stamp editor's picker: the listbox option naming its title (always mounted). */
+async function clickOptionContaining(container: Container, text: string): Promise<void> {
+  const option = [...container.querySelectorAll<DomElement>('[role="option"]')].find((candidate) =>
     candidate.textContent.includes(text),
   );
-  await click(button, `a button naming ${text}`);
+  await click(option, `a stream option naming ${text}`);
 }
 
 /**
@@ -246,7 +247,7 @@ await probeTable({
   counter: stampCounter,
   container: stampPage.container,
   unrelatedChange: async () => {
-    await clickButton(stampPage.container, 'Paste Import');
+    await clickBySelector(stampPage.container, 'button[aria-label="Paste Import"]', 'the Paste Import button');
     assert(
       stampPage.container.innerHTML.includes('Paste a timestamp list'),
       'StampEditor SongList: the paste-import modal really opened',
@@ -258,7 +259,7 @@ await probeTable({
     );
   },
   selectionChange: async () => {
-    await clickButton(stampPage.container, '#2');
+    await clickBySelector(stampPage.container, '[title="Select song 2"]', 'song row 2');
     const rowTwo = stampPage.container.querySelector<DomElement>('[title="Select song 2"]');
     assert(
       rowTwo?.getAttribute('aria-pressed') === 'true',
@@ -267,7 +268,7 @@ await probeTable({
   },
   rowSetChange: async () => {
     // Re-picking the open stream reloads its performances into a new array.
-    await clickButtonContaining(stampPage.container, stream.title);
+    await clickOptionContaining(stampPage.container, stream.title);
   },
 });
 

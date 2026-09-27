@@ -32,7 +32,9 @@ export function InlineEdit({
       onChange={(e) => setText(e.target.value)}
       onKeyDown={(e) => handleInlineEditKeyDown(e, { text, value, allowEmpty, onSave, onCancel })}
       onBlur={onCancel}
-      className="w-full rounded border border-blue-400 px-1.5 py-0.5 text-sm focus:outline-none focus:ring-1 focus:ring-blue-500"
+      // Studio tokens, so it reads in the rebuilt Stamp Editor rows in either theme; inside
+      // StreamDetail's LegacyFrame the same tokens resolve to their light values.
+      className="w-full rounded-radius-xs border border-accent-fg bg-field px-1.5 py-0.5 text-sm text-fg placeholder:text-fg-subtle focus:outline-none focus-visible:shadow-focus"
     />
   );
 }
