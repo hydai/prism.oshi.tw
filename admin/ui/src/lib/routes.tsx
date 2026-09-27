@@ -1,6 +1,7 @@
 import { Navigate } from 'react-router-dom';
 import { lazy, Suspense, type ReactElement } from 'react';
 import { PageBoundary } from '../components/PageBoundary';
+import { LegacyFrame } from '../components/shell/LegacyFrame';
 import { Skeleton } from '../components/ui/Display';
 import type { IconName } from '../components/ui/Icon';
 import type { AuthUser } from '../../../shared/types';
@@ -142,14 +143,22 @@ function RequireCurator({ user, children }: { user: AuthUser; children: ReactEle
   return user.role === 'curator' ? children : <Navigate to="/" replace />;
 }
 
-/** The page element for one manifest entry, gated when the entry says so. */
+/**
+ * The page element for one manifest entry, gated when the entry says so. A page not yet rebuilt
+ * for the studio renders in `LegacyFrame`, inside the gate, so a redirected contributor gets
+ * nothing at all; a `frame: 'studio'` page fills `<main>` itself — so while it loads, its skeleton
+ * brings the page gutter the frame would otherwise give it.
+ */
 export function routeElement(route: AdminRoute, user: AuthUser): ReactElement {
-  const page = (
+  const studio = route.frame === 'studio';
+  const skeleton = <Skeleton rows={6} label="Loading page..." />;
+  const boundary = (
     <PageBoundary key={route.path}>
-      <Suspense fallback={<Skeleton rows={6} label="Loading page..." />}>
+      <Suspense fallback={studio ? <div className="p-4 lg:px-5">{skeleton}</div> : skeleton}>
         {route.render(user)}
       </Suspense>
     </PageBoundary>
   );
+  const page = studio ? boundary : <LegacyFrame>{boundary}</LegacyFrame>;
   return route.curatorOnly ? <RequireCurator user={user}>{page}</RequireCurator> : page;
 }

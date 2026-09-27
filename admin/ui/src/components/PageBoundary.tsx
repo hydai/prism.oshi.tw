@@ -1,4 +1,6 @@
 import { Component, type ReactNode } from 'react';
+import { Button } from './ui/Button';
+import { EmptyState } from './ui/Display';
 
 /** A failed/lost chunk should leave navigation usable and offer recovery. */
 export class PageBoundary extends Component<{ children: ReactNode }, { failed: boolean }> {
@@ -7,9 +9,17 @@ export class PageBoundary extends Component<{ children: ReactNode }, { failed: b
   render() {
     if (!this.state.failed) return this.props.children;
     return (
-      <div role="alert" className="p-6 text-slate-700">
-        <p>This page could not load. Reload to get the latest version.</p>
-        <button type="button" className="mt-3 rounded bg-slate-200 px-3 py-2" onClick={() => window.location.reload()}>Reload</button>
+      <div role="alert">
+        <EmptyState
+          icon="alert"
+          title="This page could not load."
+          body="Reload to get the latest version."
+          action={
+            <Button variant="primary" onClick={() => window.location.reload()}>
+              Reload
+            </Button>
+          }
+        />
       </div>
     );
   }

@@ -61,15 +61,20 @@ function returnFocusToTrigger(panel: HTMLElement | null, trigger: HTMLElement | 
  * own. The panel is always rendered, `hidden` while closed, and carries `data-overlay-open` while
  * open, which the editor shortcut guard looks for. Opening focuses the panel's first focusable
  * element. Escape, a pointerdown outside and focus moving outside close it; closing returns focus
- * to the trigger unless the user already moved it elsewhere.
+ * to the trigger unless the user already moved it elsewhere. `className` is appended to the
+ * wrapper (`relative inline-flex`) — e.g. `w-full` for a trigger that spans its container. With
+ * `anchor="container"` the wrapper is not positioned, so the panel opens from, and aligns to, the
+ * nearest positioned ancestor instead of the trigger (a small button at the end of a wide row).
  */
 export function Popover({
   kind,
   label,
   side = 'bottom',
   align = 'start',
+  anchor = 'trigger',
   open,
   onOpenChange,
+  className,
   trigger,
   children,
 }: {
@@ -78,8 +83,10 @@ export function Popover({
   /** Below the trigger by default; `top` opens upward, for a trigger at the bottom of the viewport (a bulk bar). */
   side?: 'bottom' | 'top';
   align?: 'start' | 'end';
+  anchor?: 'trigger' | 'container';
   open?: boolean;
   onOpenChange?: (open: boolean) => void;
+  className?: string;
   trigger: (props: {
     open: boolean;
     triggerProps: {
@@ -162,8 +169,14 @@ export function Popover({
     }
   }, [isOpen]);
 
+  const wrapperClasses = anchor === 'container' ? 'inline-flex' : 'relative inline-flex';
+
   return (
-    <div ref={wrapperRef} className="relative inline-flex" onKeyDown={handleKeyDown}>
+    <div
+      ref={wrapperRef}
+      className={className ? `${wrapperClasses} ${className}` : wrapperClasses}
+      onKeyDown={handleKeyDown}
+    >
       {trigger({
         open: isOpen,
         triggerProps: {

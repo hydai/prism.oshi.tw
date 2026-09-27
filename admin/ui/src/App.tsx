@@ -3,6 +3,10 @@ import { useEffect, useState } from 'react';
 import type { AuthUser } from '../../shared/types';
 import { api } from './api/client';
 import Layout from './components/Layout';
+import { ConfirmProvider } from './components/ui/confirm';
+import { EmptyState, Skeleton } from './components/ui/Display';
+import { ThemeProvider } from './components/ui/theme';
+import { ToastProvider } from './components/ui/toast';
 import { useCurrentStreamer } from './hooks/useCurrentStreamer';
 import { ADMIN_ROUTES, routeElement } from './lib/routes';
 
@@ -27,7 +31,8 @@ export function StreamerScopedRoutes({ streamer, user }: { streamer: string; use
   return <AppRoutes key={streamer} user={user} />;
 }
 
-export default function App() {
+/** Who is signed in decides what renders: a skeleton while asking, the reason if nobody is. */
+function AuthGate() {
   const [user, setUser] = useState<AuthUser | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -45,19 +50,18 @@ export default function App() {
 
   if (loading) {
     return (
-      <div className="flex h-screen items-center justify-center">
-        <div className="text-slate-500">Loading...</div>
+      <div className="flex min-h-screen items-center justify-center p-4">
+        <div className="w-64">
+          <Skeleton rows={3} />
+        </div>
       </div>
     );
   }
 
   if (error || !user) {
     return (
-      <div className="flex h-screen items-center justify-center">
-        <div className="text-center">
-          <h1 className="text-xl font-semibold text-slate-800">Authentication Required</h1>
-          <p className="mt-2 text-slate-500">{error ?? 'Unable to verify identity.'}</p>
-        </div>
+      <div className="flex min-h-screen items-center justify-center p-4">
+        <EmptyState icon="lock" title="Authentication Required" body={error ?? 'Unable to verify identity.'} />
       </div>
     );
   }
@@ -66,5 +70,17 @@ export default function App() {
     <Layout user={user}>
       <StreamerScopedRoutes streamer={streamer} user={user} />
     </Layout>
+  );
+}
+
+export default function App() {
+  return (
+    <ThemeProvider>
+      <ToastProvider>
+        <ConfirmProvider>
+          <AuthGate />
+        </ConfirmProvider>
+      </ToastProvider>
+    </ThemeProvider>
   );
 }

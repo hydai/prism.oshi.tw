@@ -138,6 +138,226 @@ async function main(): Promise<void> {
   const newButton = renderToStaticMarkup(<IconButton label="New" icon="plus" tooltipSide="bottom" />);
   assert(tooltipClasses(newButton).includes('top-full'), "IconButton's tooltipSide reaches its tooltip");
 
+  // --- Tooltip, WCAG 1.4.13 hoverable: the pointer can move onto the chip without it closing ---
+
+  assert(!aboveTip.includes('pointer-events-none'), 'the chip takes the pointer: no pointer-events-none');
+  assert(
+    aboveTip.includes('before:absolute') && aboveTip.includes('before:inset-x-0') && aboveTip.includes('before:top-full') && aboveTip.includes('before:h-2'),
+    'a chip above its target bridges the 8 px gap below it with a transparent ::before strip',
+  );
+  assert(
+    belowTip.includes('before:bottom-full') && belowTip.includes('before:h-2') && !belowTip.includes('before:top-full'),
+    'a chip below its target bridges the gap above it instead',
+  );
+  assert(
+    aboveTip.includes('invisible') && aboveTip.includes('group-hover/tip:visible') && aboveTip.includes('group-focus-within/tip:visible'),
+    'a hidden chip is visibility:hidden, not just transparent, so it never catches the pointer',
+  );
+  assert(
+    aboveTip.includes('transition-[opacity,visibility]') && aboveTip.includes('delay-[400ms]'),
+    'the chip still shows after 400 ms, its visibility moving with its opacity',
+  );
+
+  // --- Tooltip, live: Escape dismisses it (WCAG 1.4.13), and it shows again on the next hover or focus ---
+
+  {
+    const { act } = await import('react');
+    const { click, installDom, mount, press } = await import('./helpers/dom');
+    const { Popover } = await import('../src/components/ui/Popover');
+    const { Drawer } = await import('../src/components/shell/Drawer');
+    const { handleInlineEditKeyDown } = await import('../src/lib/inline-edit');
+    installDom();
+
+    /** Whether the chip may show: hidden only while its group is neither hovered nor focused, or once dismissed. */
+    const mayShow = (tip: Element): boolean =>
+      tip.classList.contains('group-hover/tip:visible') && tip.classList.contains('group-focus-within/tip:visible');
+    const hover = (target: Element) =>
+      act(async () => {
+        target.dispatchEvent(new MouseEvent('mouseover', { bubbles: true, relatedTarget: null }));
+      });
+    const unhover = (target: Element, to: Element) =>
+      act(async () => {
+        target.dispatchEvent(new MouseEvent('mouseout', { bubbles: true, relatedTarget: to }));
+      });
+
+    // The enclosing popover or dialog, as far as Escape goes: it hears every keydown that reaches it.
+    const outerKeys: string[] = [];
+    const live = await mount(
+      <div onKeyDown={(event) => outerKeys.push(event.key)}>
+        <IconButton label="Delete song" icon="trash" />
+        <button type="button">Elsewhere</button>
+      </div>,
+    );
+    const trigger = live.container.querySelector<HTMLButtonElement>('button[aria-label="Delete song"]');
+    const elsewhere = live.container.querySelector<HTMLButtonElement>('button:not([aria-label])');
+    const tip = trigger?.parentElement?.querySelector('[role="tooltip"]');
+    assert(trigger !== null && elsewhere !== null && tip != null, 'the live IconButton renders its trigger and tooltip');
+
+    const untouched = await press(elsewhere, 'Escape');
+    assert(!untouched.defaultPrevented, 'before any hover or focus, Escape passes through');
+    outerKeys.length = 0;
+
+    // happy-dom has no :focus-within; focus inside the group/tip wrapper is what shows the chip.
+    await act(async () => trigger.focus());
+    assert(trigger.parentElement?.contains(document.activeElement) === true && mayShow(tip), 'focusing the trigger shows the tooltip');
+
+    const dismissing = await press(trigger, 'Escape');
+    assert(dismissing.defaultPrevented, 'Escape on a showing tooltip is cancelled');
+    assert(!mayShow(tip), 'Escape hides the tooltip');
+    assert(document.activeElement === trigger, 'dismissing leaves focus on the trigger');
+    assert(outerKeys.length === 0, 'the dismissing Escape stops at the tooltip, so an enclosing popover or dialog stays open');
+
+    const second = await press(trigger, 'Escape');
+    assert(!second.defaultPrevented, 'a second Escape passes through untouched');
+    assert(outerKeys.join() === 'Escape', 'the second Escape reaches the enclosing popover or dialog');
+
+    await act(async () => trigger.blur());
+    await act(async () => trigger.focus());
+    assert(mayShow(tip), 'blur and refocus show the tooltip again');
+
+    for (const [what, init] of [
+      ['isComposing', { isComposing: true }],
+      ['keyCode 229', { keyCode: 229 }],
+    ] as const) {
+      const ime = await press(trigger, 'Escape', init);
+      assert(!ime.defaultPrevented && mayShow(tip), `an Escape that cancels an IME conversion (${what}) leaves the tooltip alone`);
+    }
+
+    // Shown by hover alone, nothing focused: Escape hides it, yet the event is not the tooltip's to take.
+    await act(async () => trigger.blur());
+    await hover(trigger);
+    assert(document.activeElement === document.body && mayShow(tip), 'hovering shows the tooltip while nothing has focus');
+    const bodyEscape = await press(document.body, 'Escape');
+    assert(!bodyEscape.defaultPrevented && !mayShow(tip), 'Escape hides a hovered tooltip without cancelling the event');
+    await unhover(trigger, elsewhere);
+
+    // Hovered while a control that ignores Escape has focus: the tooltip hides, the key goes on.
+    await act(async () => elsewhere.focus());
+    await hover(trigger);
+    assert(mayShow(tip), 'the next hover shows the tooltip again');
+    outerKeys.length = 0;
+    const hoverDismiss = await press(elsewhere, 'Escape');
+    assert(!hoverDismiss.defaultPrevented && !mayShow(tip), 'Escape dismisses a hovered tooltip while focus is elsewhere, without cancelling it');
+    assert(outerKeys.join() === 'Escape', 'that Escape still reaches the enclosing popover or dialog: a hovered tooltip never takes it');
+    assert(document.activeElement === elsewhere, 'dismissing a hovered tooltip leaves focus where it was');
+    await unhover(trigger, elsewhere);
+    await hover(trigger);
+    assert(mayShow(tip), 'the next hover shows the tooltip again');
+
+    // Still inside its 400 ms show delay the chip is visibility:hidden: nothing to dismiss yet.
+    const delayed = document.createElement('style');
+    delayed.textContent = '[role="tooltip"] { visibility: hidden; }';
+    document.head.appendChild(delayed);
+    const early = await press(elsewhere, 'Escape');
+    assert(!early.defaultPrevented && mayShow(tip), 'an Escape before the chip is on screen passes through');
+    delayed.remove();
+
+    await unhover(trigger, elsewhere);
+    const idle = await press(elsewhere, 'Escape');
+    assert(!idle.defaultPrevented, 'with the tooltip neither hovered nor focused, Escape passes through');
+
+    await live.unmount();
+
+    /** The chip inside `trigger`'s Tooltip wrapper. */
+    const chipOf = (trigger: Element | null): Element => {
+      const found = trigger?.parentElement?.querySelector('[role="tooltip"]');
+      assert(found != null, `${trigger?.getAttribute('aria-label') ?? 'the trigger'} has a tooltip`);
+      return found;
+    };
+
+    // A hovered tooltip leaves the focused control's Escape alone: a song-title inline edit still cancels.
+    {
+      const cancels: string[] = [];
+      const editing = await mount(
+        <div>
+          <input
+            aria-label="Song title"
+            defaultValue="Lemon"
+            onKeyDown={(event) =>
+              handleInlineEditKeyDown(event, { text: 'Lemon', value: 'Lemon', onSave: () => undefined, onCancel: () => cancels.push('cancel') })
+            }
+          />
+          <IconButton label="Delete song" icon="trash" />
+        </div>,
+      );
+      const input = editing.container.querySelector('input');
+      const deleteButton = editing.container.querySelector('button[aria-label="Delete song"]');
+      const deleteTip = chipOf(deleteButton);
+      assert(input !== null && deleteButton !== null, 'the inline edit and its row button render');
+      await act(async () => input.focus());
+      await hover(deleteButton);
+      assert(mayShow(deleteTip), 'hovering the row button shows its tooltip while the edit has focus');
+      await press(input, 'Escape');
+      assert(cancels.join() === 'cancel', 'the first Escape reaches the inline edit, which cancels');
+      assert(mayShow(deleteTip), 'the hovered tooltip leaves an Escape the focused control handled alone');
+      await editing.unmount();
+    }
+
+    // Focus on the trigger inside a drawer: the first Escape hides only the tooltip, the second closes the drawer.
+    {
+      const drawerCloses: string[] = [];
+      const drawer = await mount(
+        <Drawer open onClose={() => drawerCloses.push('close')} returnFocusRef={{ current: null }}>
+          <IconButton label="Close navigation" icon="x" />
+        </Drawer>,
+      );
+      const closeButton = drawer.container.querySelector<HTMLButtonElement>('button[aria-label="Close navigation"]');
+      const closeTip = chipOf(closeButton);
+      assert(closeButton !== null, 'the drawer renders its close button');
+      await act(async () => closeButton.focus());
+      const first = await press(closeButton, 'Escape');
+      assert(first.defaultPrevented && !mayShow(closeTip) && drawerCloses.length === 0, 'in a drawer, the first Escape hides only the focused tooltip');
+      await press(closeButton, 'Escape');
+      assert(drawerCloses.join() === 'close', 'the second Escape closes the drawer');
+      await drawer.unmount();
+    }
+
+    // Focus on a tooltip's trigger inside an open popover: the same, one Escape each.
+    {
+      const popover = await mount(
+        <Popover kind="dialog" label="Song actions" trigger={({ triggerProps }) => <button {...triggerProps}>Song actions</button>}>
+          <IconButton label="Delete song" icon="trash" />
+        </Popover>,
+      );
+      const opener = popover.container.querySelector<HTMLButtonElement>('button[aria-haspopup]');
+      await click(opener, 'the popover trigger');
+      const inner = popover.container.querySelector<HTMLButtonElement>('button[aria-label="Delete song"]');
+      const innerTip = chipOf(inner);
+      const panel = popover.container.querySelector('[role="dialog"]');
+      assert(opener !== null && panel !== null && document.activeElement === inner, 'opening the popover focuses the button inside it');
+      const first = await press(inner, 'Escape');
+      assert(first.defaultPrevented && !mayShow(innerTip) && panel.hasAttribute('data-overlay-open'), 'in a popover, the first Escape hides only the focused tooltip');
+      await press(inner, 'Escape');
+      assert(!panel.hasAttribute('data-overlay-open') && document.activeElement === opener, 'the second Escape closes the popover');
+      await popover.unmount();
+    }
+
+    // Shown by hover on a popover's trigger while focus is in the open panel: the first Escape closes the popover.
+    {
+      const menu = await mount(
+        <Popover
+          kind="dialog"
+          label="More song actions"
+          trigger={({ triggerProps }) => <IconButton {...triggerProps} label="More song actions" icon="more" />}
+        >
+          <button type="button">Rename</button>
+        </Popover>,
+      );
+      const moreButton = menu.container.querySelector<HTMLButtonElement>('button[aria-label="More song actions"]');
+      const moreTip = chipOf(moreButton);
+      assert(moreButton !== null, 'the popover renders its More song actions trigger');
+      await click(moreButton, 'the More song actions trigger');
+      const rename = menu.container.querySelector<HTMLButtonElement>('[role="dialog"] button');
+      const panel = menu.container.querySelector('[role="dialog"]');
+      assert(rename !== null && panel !== null && document.activeElement === rename, 'opening the popover moves focus into its panel');
+      await hover(moreButton);
+      assert(mayShow(moreTip), "hovering the popover's trigger shows its tooltip while focus is in the panel");
+      await press(rename, 'Escape');
+      assert(!panel.hasAttribute('data-overlay-open'), "the first Escape closes the popover: the trigger's hovered tooltip does not take it");
+      await menu.unmount();
+    }
+  }
+
   // --- IconButton size="xs": the 21 px chip of a compact toggle group, with a 12 px icon ---
 
   const chip = renderToStaticMarkup(<IconButton label="Light" icon="sun" size="xs" />);
@@ -629,6 +849,7 @@ async function main(): Promise<void> {
   for (const [host, surface, blur] of [
     ['.glass-pop-host', '--glass-pop', 'blur(18px)'],
     ['.glass-header-host', '--glass-header', 'blur(14px)'],
+    ['.glass-sidebar-host', '--glass-sidebar', 'blur(18px) saturate(1.2)'],
   ] as const) {
     assert(!new RegExp(`\\${host} *\\{`).test(css), `${host} itself has no rule of its own, so no backdrop-filter`);
     const layer = ruleBody(`${host}::before`);
@@ -636,9 +857,9 @@ async function main(): Promise<void> {
       assert(layer.includes(declaration), `${host}::before sets ${declaration}`);
     }
   }
-  const sharedLayer = /\.glass-pop-host::before, \.glass-header-host::before \{([^}]*)\}/.exec(css)?.[1] ?? '';
+  const sharedLayer = /\.glass-pop-host::before, \.glass-header-host::before, \.glass-sidebar-host::before \{([^}]*)\}/.exec(css)?.[1] ?? '';
   for (const declaration of ["content: '';", 'position: absolute;', 'inset: 0;', 'z-index: -1;', 'border-radius: inherit;']) {
-    assert(sharedLayer.includes(declaration), `both host layers set ${declaration}`);
+    assert(sharedLayer.includes(declaration), `all three host layers set ${declaration}`);
   }
   assert(headerTag.includes('min-h-[62px]'), 'PageHeader is at least 62px by default');
   assert(!headerTag.includes(' h-[62px]'), "R30: height is a minimum, not a fixed height that could clip wrapped content");

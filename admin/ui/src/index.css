@@ -98,7 +98,10 @@ body {
 .prism-shell-shadow { box-shadow: 0 25px 50px -12px rgba(224, 231, 255, 0.5); }
 @media (hover: hover) { .hover-row:hover { background: var(--bg-accent-pink); } }
 
-/* ===== Prism Studio design tokens (spec §4.1) — light values ===== */
+/* ===== Prism Studio design tokens (spec §4.1) — light values =====
+   `.legacy-frame` (components/shell/LegacyFrame.tsx) takes every one of them too: a page not yet
+   rebuilt for the studio keeps its light look inside the frame while <html> is dark. */
+.legacy-frame,
 :root {
   --canvas: linear-gradient(135deg, #FFF0F5 0%, #F0F8FF 50%, #E6E6FA 100%);
   --blob-1: rgba(249,168,212,.55);
@@ -165,6 +168,14 @@ body {
   /* Scrim behind the modal dialog and the mobile drawer: not in the spec table; the value both
      scrims in the approved mockup 2 use. Task 6, ruling R17. */
   --scrim: rgba(30,27,46,.28);
+
+  /* Streamer avatars (spec §6.3 "deterministic gradient"): mockup 2's `.ava` .. `.ava.a5`, picked
+     per slug by components/shell/avatar.ts. The same in both themes. */
+  --avatar-1: linear-gradient(135deg, #F9A8D4, #93C5FD);
+  --avatar-2: linear-gradient(135deg, #FDBA74, #F472B6);
+  --avatar-3: linear-gradient(135deg, #93C5FD, #A78BFA);
+  --avatar-4: linear-gradient(135deg, #6EE7B7, #60A5FA);
+  --avatar-5: linear-gradient(135deg, #C4B5FD, #F9A8D4);
 }
 
 /* ===== Prism Studio design tokens (spec §4.1) — dark values ===== */
@@ -227,6 +238,12 @@ html.dark {
   --tooltip-fg: #1E1B2E;
 
   --scrim: rgba(0,0,0,.5);
+
+  --avatar-1: linear-gradient(135deg, #F9A8D4, #93C5FD);
+  --avatar-2: linear-gradient(135deg, #FDBA74, #F472B6);
+  --avatar-3: linear-gradient(135deg, #93C5FD, #A78BFA);
+  --avatar-4: linear-gradient(135deg, #6EE7B7, #60A5FA);
+  --avatar-5: linear-gradient(135deg, #C4B5FD, #F9A8D4);
 }
 
 html.dark body {
@@ -259,13 +276,15 @@ html.dark body {
     backdrop-filter: blur(18px);
   }
 
-  /* Host variants, for a glass bar that holds a popover (the bulk bar, the page header). An element
-     with backdrop-filter is a backdrop root: a blurred panel inside it samples only the host, so
-     page text would read crisp through the panel. These paint the same glass on a ::before layer,
-     which leaves the host itself unfiltered. The host must be positioned with a z-index — a
-     stacking context — so the z-index: -1 layer stays inside it, behind its content. */
+  /* Host variants, for a glass bar that holds a popover (the bulk bar, the page header, the
+     sidebar, the phone top bar). An element with backdrop-filter is a backdrop root: a blurred
+     panel inside it samples only the host, so page text would read crisp through the panel. These
+     paint the same glass on a ::before layer, which leaves the host itself unfiltered. The host
+     must be positioned with a z-index — a stacking context — so the z-index: -1 layer stays inside
+     it, behind its content. */
   .glass-pop-host::before,
-  .glass-header-host::before {
+  .glass-header-host::before,
+  .glass-sidebar-host::before {
     content: '';
     position: absolute;
     inset: 0;
@@ -284,10 +303,17 @@ html.dark body {
     border: 1px solid var(--glass-edge);
     backdrop-filter: blur(14px);
   }
+
+  .glass-sidebar-host::before {
+    background: var(--glass-sidebar);
+    border: 1px solid var(--glass-edge);
+    backdrop-filter: blur(18px) saturate(1.2);
+  }
 }
 
 /* backdrop-filter has no effect in this browser: raise the glass alpha so text on it stays readable (spec §4.2). */
 @supports not (backdrop-filter: blur(1px)) {
+  .legacy-frame,
   :root {
     --glass-sidebar: rgba(255,255,255,.92);
     --glass-header: rgba(255,255,255,.92);
@@ -301,6 +327,18 @@ html.dark body {
     --glass-card: rgba(28,23,48,.9);
     --glass-pop: rgba(36,30,60,.9);
   }
+}
+
+/* ===== Legacy frame (components/shell/LegacyFrame.tsx) =====
+   The light card the not-yet-rebuilt pages render in, inside the studio shell: their slate classes
+   look exactly as they did on the old grey <main>, in either theme. */
+.legacy-frame {
+  color-scheme: light;
+  background: #F8FAFC;
+  color: #0F172A;
+  border-radius: 18px;
+  padding: 24px;
+  margin: 16px;
 }
 
 @media (prefers-reduced-motion: reduce) {

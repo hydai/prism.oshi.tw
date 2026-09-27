@@ -58,6 +58,19 @@ export default {
           fg: 'var(--tooltip-fg)',
         },
         scrim: 'var(--scrim)',
+        // The glass shell: the hairline glass surfaces draw, the sidebar's current item and the
+        // canvas discs behind everything (spec §4.1 --glass-edge, --nav-active-*, --blob-*).
+        'glass-edge': 'var(--glass-edge)',
+        'nav-active': {
+          bg: 'var(--nav-active-bg)',
+          fg: 'var(--nav-active-fg)',
+          icon: 'var(--nav-active-icon)',
+        },
+        blob: {
+          1: 'var(--blob-1)',
+          2: 'var(--blob-2)',
+          3: 'var(--blob-3)',
+        },
         accent: {
           pink: 'var(--accent-pink)',
           'pink-dark': 'var(--accent-pink-dark)',
@@ -100,6 +113,11 @@ export default {
       backgroundImage: {
         canvas: 'var(--canvas)',
         accent: 'var(--accent-gradient)',
+        'avatar-1': 'var(--avatar-1)',
+        'avatar-2': 'var(--avatar-2)',
+        'avatar-3': 'var(--avatar-3)',
+        'avatar-4': 'var(--avatar-4)',
+        'avatar-5': 'var(--avatar-5)',
       },
       boxShadow: {
         card: 'var(--shadow-card)',
