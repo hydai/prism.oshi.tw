@@ -158,6 +158,10 @@ body {
      low-contrast text-on-background in one theme. Task 2 fix round 1, ruling R10. */
   --tooltip-bg: #1E1B2E;
   --tooltip-fg: #FFFFFF;
+
+  /* Scrim behind the modal dialog and the mobile drawer: not in the spec table; the value both
+     scrims in the approved mockup 2 use. Task 6, ruling R17. */
+  --scrim: rgba(30,27,46,.28);
 }
 
 /* ===== Prism Studio design tokens (spec §4.1) — dark values ===== */
@@ -217,6 +221,8 @@ html.dark {
 
   --tooltip-bg: #F1F5F9;
   --tooltip-fg: #1E1B2E;
+
+  --scrim: rgba(0,0,0,.5);
 }
 
 html.dark body {
