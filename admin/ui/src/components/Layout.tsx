@@ -1,15 +1,12 @@
-import { NavLink, useLocation, useNavigate } from 'react-router-dom';
+import { NavLink, useNavigate } from 'react-router-dom';
 import { useEffect, useEffectEvent, useId, useState, type ReactNode } from 'react';
 import type { AuthUser, StreamerInfo } from '../../../shared/types';
 import { api, getCurrentStreamer, setCurrentStreamer } from '../api/client';
 import { useCurrentStreamer } from '../hooks/useCurrentStreamer';
 import { getVisibleNavItems } from '../lib/navigation';
-import { usesPrismShell } from '../lib/routes';
 
 export default function Layout({ user, children }: { user: AuthUser; children: ReactNode }) {
   const navigate = useNavigate();
-  const { pathname } = useLocation();
-  const prismStyled = usesPrismShell(pathname);
   const streamer = useCurrentStreamer();
   const [streamers, setStreamers] = useState<StreamerInfo[]>([]);
   const streamerSelectId = useId();
@@ -98,15 +95,7 @@ export default function Layout({ user, children }: { user: AuthUser; children: R
       </aside>
 
       {/* Main content */}
-      <main
-        className={
-          prismStyled
-            ? 'prism-main flex-1 overflow-y-auto'
-            : 'flex-1 overflow-y-auto bg-slate-50 p-6'
-        }
-      >
-        {children}
-      </main>
+      <main className="flex-1 overflow-y-auto bg-slate-50 p-6">{children}</main>
     </div>
   );
 }

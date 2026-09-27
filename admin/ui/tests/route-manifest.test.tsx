@@ -60,13 +60,11 @@ const ROUTED_PATHS = [
 const CURATOR_NAV = [
   ['/', 'Dashboard'],
   ['/songs', 'Songs'],
-  ['/works', 'Global Library'],
-  ['/works/review', 'Work Review'],
   ['/streams', 'Streams'],
-  ['/submit/song', 'Submit Song'],
-  ['/submit/stream', 'Submit Stream'],
   ['/stamp', 'Stamp Editor'],
   ['/pipeline', 'Pipeline'],
+  ['/works', 'Global Library'],
+  ['/works/review', 'Work Review'],
   ['/harmonizer', 'Harmonizer'],
   ['/nova', 'Nova'],
   ['/nova/vods', 'Nova VODs'],
@@ -77,8 +75,11 @@ const CURATOR_NAV = [
 /** Oracle: the curator-only entries — hidden from the sidebar and blocked at the route. */
 const CURATOR_ONLY_PATHS = ['/works', '/works/review', '/vod-export', '/vod-export/repair/:entity/:rowId'];
 
-/** Oracle: Layout's PRISM_STYLED_PATHS. */
-const PRISM_SHELL_PATHS = ['/nova', '/nova/vods', '/crystal'];
+/** Oracle: the "+ New" menu — routes that can be created from it, in order. */
+const NEW_MENU = [
+  ['/submit/song', 'Submit Song'],
+  ['/submit/stream', 'Submit Stream'],
+];
 
 /** A concrete URL per curator-only route, and a string only that page renders. */
 const CURATOR_ROUTE_PROBES = [
@@ -91,8 +92,8 @@ const CURATOR_ROUTE_PROBES = [
 async function main(): Promise<void> {
   installLocalStorage();
 
-  const { ADMIN_ROUTES, usesPrismShell } = await import('../src/lib/routes');
-  const { getVisibleNavItems } = await import('../src/lib/navigation');
+  const { ADMIN_ROUTES } = await import('../src/lib/routes');
+  const { getNewMenuItems, getVisibleNavItems } = await import('../src/lib/navigation');
   const { AppRoutes } = await import('../src/App');
 
   const curator: AuthUser = { email: 'curator@example.com', role: 'curator' };
@@ -131,14 +132,18 @@ async function main(): Promise<void> {
     'contributors see the same navigation minus the curator-only entries',
   );
 
-  // --- So is the prism shell ---
+  // --- The "+ New" menu lists what can be created, for both roles ---
 
-  for (const path of PRISM_SHELL_PATHS) {
-    assert(usesPrismShell(path), `${path} keeps the prism shell`);
-  }
-  for (const path of paths.filter((candidate) => !PRISM_SHELL_PATHS.includes(candidate))) {
-    assert(!usesPrismShell(path), `${path} keeps the default shell`);
-  }
+  const curatorNewMenu = getNewMenuItems(curator);
+  assert(
+    JSON.stringify(curatorNewMenu.map((item) => [item.to, item.label])) === JSON.stringify(NEW_MENU),
+    'curators see the "+ New" menu entries, in order',
+  );
+  const contributorNewMenu = getNewMenuItems(contributor);
+  assert(
+    JSON.stringify(contributorNewMenu.map((item) => [item.to, item.label])) === JSON.stringify(NEW_MENU),
+    'contributors see the same "+ New" menu: neither submit route is curator-only',
+  );
 
   // --- A curator-only route renders nothing at all for a contributor ---
 
@@ -176,7 +181,7 @@ async function main(): Promise<void> {
   );
   assert(unknown === '', 'an unknown path redirects instead of rendering a page');
 
-  console.log('✓ one manifest drives the routes, the sidebar and the prism shell');
+  console.log('✓ one manifest drives the routes, the grouped sidebar and the + New menu');
 }
 
 await main();
