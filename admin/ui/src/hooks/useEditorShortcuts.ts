@@ -1,6 +1,7 @@
 import { useEffect, useEffectEvent } from 'react';
 import type { RefObject } from 'react';
 import type { YouTubePlayerHandle } from '../components/YouTubePlayer';
+import { isOverlayOpen } from '../lib/overlay';
 
 /** One handler per stamping action; the keys they answer to are this module's business. */
 export interface EditorShortcutHandlers {
@@ -15,6 +16,8 @@ export interface EditorShortcutHandlers {
   fetchAllDurations: () => void;
   exportSongList: () => void;
   openPasteImport: () => void;
+  /** Bound to `?`; optional so a page that has not wired up `ShortcutSheet` yet just ignores the key. */
+  openShortcuts?: () => void;
 }
 
 export interface EditorShortcutOptions {
@@ -40,6 +43,9 @@ export function handleEditorShortcut(
   const target = event.target as HTMLElement | null;
   if (target?.tagName === 'INPUT' || target?.tagName === 'TEXTAREA') return;
   if (disabled) return;
+  // A dialog (ShortcutSheet, a confirm), an open Popover panel or the mobile Drawer owns the
+  // keyboard while it is open — never a page-level `disabled` flag the caller has to remember to set.
+  if (isOverlayOpen()) return;
 
   switch (event.key) {
     case 'm':
@@ -77,6 +83,9 @@ export function handleEditorShortcut(
       break;
     case 'i':
       handlers.openPasteImport();
+      break;
+    case '?':
+      handlers.openShortcuts?.();
       break;
     case 'ArrowLeft':
     case 'ArrowRight': {

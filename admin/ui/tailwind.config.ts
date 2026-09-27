@@ -44,6 +44,7 @@ export default {
         'thead-bg': 'var(--thead-bg)',
         selected: 'var(--selected-bg)',
         'danger-solid': 'var(--danger-solid)',
+        'hot-line': 'var(--hot-line)',
         tone: {
           ok: { bg: 'var(--tone-ok-bg)', fg: 'var(--tone-ok-fg)', line: 'var(--tone-ok-line)' },
           warn: { bg: 'var(--tone-warn-bg)', fg: 'var(--tone-warn-fg)', line: 'var(--tone-warn-line)' },

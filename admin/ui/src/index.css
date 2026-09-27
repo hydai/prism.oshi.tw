@@ -136,6 +136,9 @@ body {
   --shadow-primary: 0 4px 14px rgba(244,114,182,.35);
   --danger-solid: #E11D48;
   --focus-ring: 0 0 0 3px rgba(236,72,153,.3);
+  /* The "recording"/hot border (e.g. the End slot while it has no end timestamp yet): pink, not
+     the focus ring's colour — a static state and a real :focus-visible must stay distinguishable. */
+  --hot-line: #F9A8D4;
 
   --tone-ok-bg: #D1FAE5;
   --tone-ok-fg: #047857;
@@ -211,6 +214,7 @@ html.dark {
   --shadow-primary: 0 0 0 1px rgba(255,255,255,.08), 0 6px 22px rgba(236,72,153,.45);
   --danger-solid: #E11D48;
   --focus-ring: 0 0 0 3px rgba(244,114,182,.4);
+  --hot-line: rgba(244,114,182,.55);
 
   --tone-ok-bg: rgba(16,185,129,.14);
   --tone-ok-fg: #6EE7B7;
