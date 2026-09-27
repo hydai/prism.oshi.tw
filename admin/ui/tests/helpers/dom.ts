@@ -109,12 +109,12 @@ export async function pointerDown(target: EventTarget): Promise<void> {
 }
 
 /**
- * Replaces a (React-controlled) input's text with `value` the way typing does, then settles.
- * React keeps its own copy of a controlled input's value on the node; writing through the
+ * Replaces a (React-controlled) input's or textarea's text with `value` the way typing does, then
+ * settles. React keeps its own copy of a controlled field's value on the node; writing through the
  * prototype's `value` setter changes the DOM value without touching that copy, so the `input`
  * event reads as a real edit and fires onChange.
  */
-export async function typeInto(input: HTMLInputElement, value: string): Promise<void> {
+export async function typeInto(input: HTMLInputElement | HTMLTextAreaElement, value: string): Promise<void> {
   let setValue: ((next: string) => void) | undefined;
   for (let proto: object | null = Object.getPrototypeOf(input); proto && !setValue; proto = Object.getPrototypeOf(proto)) {
     setValue = Object.getOwnPropertyDescriptor(proto, 'value')?.set;

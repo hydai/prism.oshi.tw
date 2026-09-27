@@ -1,0 +1,523 @@
+import { act, useEffect, useState, type ReactNode } from 'react';
+import { MemoryRouter } from 'react-router-dom';
+import type { AuthUser, CrystalTicket, NovaSubmission, NovaVodSubmission } from '../../shared/types';
+import { InboxCountsProvider, useInboxCounts, type InboxCounts } from '../src/components/shell/InboxCounts';
+import { click, installDom, mount, settle, typeInto } from './helpers/dom';
+
+function assert(condition: boolean, message: string): asserts condition {
+  if (!condition) {
+    throw new Error(message);
+  }
+}
+
+// --- Fixtures (only `status` varies per test; every other field is filler matching the shape
+// tests/nova-vod-row.test.tsx and tests/nova-submissions-links.test.tsx already use for these
+// types) ---
+
+function novaSubmission(overrides: Partial<NovaSubmission> = {}): NovaSubmission {
+  return {
+    id: 'sub-1',
+    youtube_channel_url: 'https://www.youtube.com/@safe',
+    youtube_channel_id: 'UC123',
+    youtube_channel_verified_id: null,
+    youtube_channel_verified_at: null,
+    slug: 'safe',
+    brand_name: 'Safe Brand',
+    display_name: 'Safe Streamer',
+    description: '',
+    avatar_url: '',
+    subscriber_count: '',
+    link_youtube: '',
+    link_twitter: '',
+    link_facebook: '',
+    link_instagram: '',
+    link_twitch: '',
+    group: '',
+    enabled: 1,
+    display_order: 0,
+    theme_json: '',
+    external_url: '',
+    status: 'pending',
+    submitted_at: '2026-06-17T00:00:00Z',
+    reviewed_at: null,
+    reviewer_note: '',
+    ...overrides,
+  };
+}
+
+function novaVod(overrides: Partial<NovaVodSubmission> = {}): NovaVodSubmission {
+  return {
+    id: 'vod-1',
+    streamer_slug: 'mizuki',
+    video_id: 'pRy1JZ2jSi8',
+    video_url: 'https://www.youtube.com/watch?v=pRy1JZ2jSi8',
+    stream_title: 'Stream',
+    stream_date: '2026-08-22',
+    thumbnail_url: 'https://i.ytimg.com/vi/pRy1JZ2jSi8/hqdefault.jpg',
+    submitter_note: '',
+    status: 'pending',
+    submitted_at: '2026-08-22 23:10',
+    reviewed_at: null,
+    reviewer_note: '',
+    ...overrides,
+  };
+}
+
+function crystalTicket(overrides: Partial<CrystalTicket> = {}): CrystalTicket {
+  return {
+    id: 't-1',
+    type: 'bug',
+    title: 'Ticket',
+    body: '',
+    nickname: '',
+    contact: '',
+    is_public_reply_allowed: 0,
+    context_url: '',
+    status: 'pending',
+    admin_reply: '',
+    replied_at: null,
+    submitted_at: '2026-09-01T00:00:00Z',
+    closed_at: null,
+    ...overrides,
+  };
+}
+
+// --- fetch stub: a status + JSON body per request — a list GET by its URL, a mutation by its
+// method and path — reconfigurable between scenarios, plus a log of every URL requested so a test
+// can prove exactly how many new requests `refresh()` issued ---
+
+// Marks a stub as a bodyless error response (see `setEmptyErrorResponse`) rather than a JSON body.
+const EMPTY_BODY = Symbol('empty-body');
+
+interface StubResponse {
+  status: number;
+  body: unknown;
+}
+
+const NOVA_URL = '/api/nova/submissions';
+const VODS_URL = '/api/nova/vods';
+const CRYSTAL_URL = '/api/crystal/tickets';
+
+const responses = new Map<string, StubResponse>();
+let requestLog: string[] = [];
+
+function setResponse(url: string, status: number, body: unknown): void {
+  responses.set(url, { status, body });
+}
+
+/**
+ * A bodyless error response with an empty `statusText` — real for HTTP/2 through Cloudflare, and
+ * exactly what `responseError()`'s `body || res.statusText` fallback turns into an empty-string
+ * `ApiError.message` (client.ts): no JSON to parse, so `error` reads as `''` rather than some
+ * human-readable text.
+ */
+function setEmptyErrorResponse(url: string, status: number): void {
+  responses.set(url, { status, body: EMPTY_BODY });
+}
+
+/** A mutation's response, keyed by method and path: the client appends `?streamer=` to its URL. */
+function setMutationResponse(method: 'PATCH' | 'POST' | 'DELETE', path: string, body: unknown): void {
+  responses.set(`${method} ${path}`, { status: 200, body });
+}
+
+function callsTo(url: string): number {
+  return requestLog.filter((entry) => entry === url).length;
+}
+
+function installFetchStub(): void {
+  Object.defineProperty(globalThis, 'fetch', {
+    configurable: true,
+    writable: true,
+    value: async (input: RequestInfo | URL, init?: RequestInit): Promise<Response> => {
+      const url = String(input);
+      requestLog.push(url);
+      const method = init?.method ?? 'GET';
+      const key = method === 'GET' ? url : `${method} ${url.split('?')[0]}`;
+      const stub = responses.get(key);
+      assert(stub !== undefined, `a stubbed response is configured for ${key}`);
+      if (stub.body === EMPTY_BODY) {
+        return new Response(null, { status: stub.status, statusText: '' });
+      }
+      return new Response(JSON.stringify(stub.body), {
+        status: stub.status,
+        headers: { 'Content-Type': 'application/json' },
+      });
+    },
+  });
+}
+
+type Snapshot = ReturnType<typeof useInboxCounts>;
+
+/** Calls `useInboxCounts()` and reports every render via an effect with no dependency array — the
+ * caller counts its own `onRender` invocations, mirroring tests/ui-toast.test.tsx's ToastProbe. */
+function InboxProbe({ onRender }: { onRender: (snapshot: Snapshot) => void }) {
+  const counts = useInboxCounts();
+  useEffect(() => {
+    onRender(counts);
+  });
+  return null;
+}
+
+/** Its own "Re-render" button, independent of any inbox-count state — mirrors ToastHarness. */
+function InboxHarness({ onRender }: { onRender: (snapshot: Snapshot) => void }) {
+  const [renders, setRenders] = useState(0);
+  return (
+    <>
+      <button type="button" id="rerender" onClick={() => setRenders((count) => count + 1)}>
+        Re-render ({renders})
+      </button>
+      <InboxCountsProvider>
+        <InboxProbe onRender={onRender} />
+      </InboxCountsProvider>
+    </>
+  );
+}
+
+const CURATOR: AuthUser = { email: 'curator@example.com', role: 'curator' };
+
+/** Mounts an inbox page beside a probe, inside the provider — and a router, since the Nova page
+ * keeps its filters in the URL — the way Layout wraps every page. */
+async function mountPage(page: ReactNode): Promise<{ container: HTMLElement; unmount: () => Promise<void>; counts: () => Snapshot }> {
+  let latestCounts: Snapshot | undefined;
+  const mounted = await mount(
+    <MemoryRouter>
+      <InboxCountsProvider>
+        <InboxProbe onRender={(snapshot) => { latestCounts = snapshot; }} />
+        {page}
+      </InboxCountsProvider>
+    </MemoryRouter>,
+  );
+  await settle();
+  return {
+    ...mounted,
+    counts: () => {
+      assert(latestCounts !== undefined, 'the probe has rendered at least once');
+      return latestCounts;
+    },
+  };
+}
+
+/** The table row whose expand toggle names `name` (a Nova display name or a VOD title). */
+function rowOf(container: HTMLElement, name: string): HTMLElement {
+  const row = container.querySelector(`button[aria-label="展開 ${name}"]`)?.closest('tr');
+  assert(row !== null && row !== undefined, `the table renders a row for ${name}`);
+  return row;
+}
+
+/** The first button in `scope` whose accessible name — aria-label, else its text — is `name`. */
+function buttonNamed(scope: HTMLElement, name: string): HTMLButtonElement | undefined {
+  return Array.from(scope.querySelectorAll('button')).find(
+    (button) => (button.getAttribute('aria-label') ?? button.textContent?.trim()) === name,
+  );
+}
+
+async function main(): Promise<void> {
+  installDom();
+  installFetchStub();
+
+  // --- Outside a provider: every count reads null and refresh() is a no-op that does not throw ---
+
+  let outsideSnapshot: Snapshot | undefined;
+  const outside = await mount(<InboxProbe onRender={(snapshot) => { outsideSnapshot = snapshot; }} />);
+  assert(outsideSnapshot !== undefined, 'the probe rendered outside a provider');
+  const outsideValue = outsideSnapshot;
+  const outsideCounts: InboxCounts = outsideValue;
+  assert(
+    outsideCounts.nova === null && outsideCounts.vods === null && outsideCounts.crystal === null,
+    'outside a provider every count reads null',
+  );
+  await act(async () => { outsideValue.refresh(); });
+  await settle();
+  assert(outsideValue.nova === null, 'refresh outside a provider is a no-op, not a throw');
+  await outside.unmount();
+  console.log('✓ outside a provider, useInboxCounts() returns null counts and a no-op refresh');
+
+  // --- In-provider pre-resolution state: a different code path from OUTSIDE_PROVIDER_VALUE above
+  // — this is useApiResource's own "nothing has resolved yet" derivation. `mount()` settles
+  // internally, so the first commit is captured via the probe's first `onRender` call (which fires
+  // within `mount()`'s initial `act()`, before its own `settle()` gives any fetch a chance to
+  // resolve), not by reading state after `mount()` returns. ---
+
+  requestLog = [];
+  setResponse(NOVA_URL, 200, { data: [novaSubmission({ id: 'n1', status: 'pending' })], total: 1 });
+  setResponse(VODS_URL, 200, { data: [], total: 0 });
+  setResponse(CRYSTAL_URL, 200, { data: [], total: 0 });
+
+  let firstCommitSnapshot: Snapshot | undefined;
+  const preResolution = await mount(
+    <InboxCountsProvider>
+      <InboxProbe
+        onRender={(snapshot) => {
+          if (firstCommitSnapshot === undefined) firstCommitSnapshot = snapshot;
+        }}
+      />
+    </InboxCountsProvider>,
+  );
+  assert(firstCommitSnapshot !== undefined, 'the probe committed at least once');
+  assert(
+    firstCommitSnapshot.nova === null && firstCommitSnapshot.vods === null && firstCommitSnapshot.crystal === null,
+    'immediately after the first commit, before any list has resolved, every count reads null',
+  );
+  await settle();
+  await preResolution.unmount();
+  console.log('✓ in a provider, every count reads null until its list resolves for the first time');
+
+  // --- Partial failure at first load: Crystal 500, VODs 403, Nova still succeeds; no throw ---
+
+  requestLog = [];
+  setResponse(NOVA_URL, 200, {
+    data: [novaSubmission({ id: 'n1', status: 'pending' }), novaSubmission({ id: 'n2', status: 'pending' }), novaSubmission({ id: 'n3', status: 'approved' })],
+    total: 3,
+  });
+  setResponse(VODS_URL, 403, { error: 'Forbidden' });
+  setResponse(CRYSTAL_URL, 500, { error: 'Internal Server Error' });
+
+  let partialSnapshot: Snapshot | undefined;
+  let partialThrew = false;
+  try {
+    const partial = await mount(
+      <InboxCountsProvider>
+        <InboxProbe onRender={(snapshot) => { partialSnapshot = snapshot; }} />
+      </InboxCountsProvider>,
+    );
+    await settle();
+    await partial.unmount();
+  } catch {
+    partialThrew = true;
+  }
+  assert(!partialThrew, 'a 500 from Crystal and a 403 from VODs do not throw');
+  assert(partialSnapshot !== undefined, 'the probe rendered despite two of three lists failing');
+  const partialValue = partialSnapshot;
+  assert(partialValue.nova === 2, 'the list that succeeded still reports its pending count');
+  assert(partialValue.vods === null, 'a 403 (a contributor on a curator-only list) reads as unknown, not a throw');
+  assert(partialValue.crystal === null, 'a 500 reads as unknown, not a throw');
+  console.log('✓ a partial inbox failure nulls only the failed lists and never throws');
+
+  // --- Happy path, stable identity, refresh(), and the stale-data trap — threaded through one
+  // mount so the object-identity comparisons stay easy to follow ---
+
+  requestLog = [];
+  setResponse(NOVA_URL, 200, {
+    data: [novaSubmission({ id: 'n1', status: 'pending' }), novaSubmission({ id: 'n2', status: 'pending' }), novaSubmission({ id: 'n3', status: 'approved' })],
+    total: 3,
+  });
+  setResponse(VODS_URL, 200, { data: [novaVod({ id: 'v1', status: 'pending' })], total: 1 });
+  setResponse(CRYSTAL_URL, 200, { data: [], total: 0 });
+
+  let renderCalls = 0;
+  let latest: Snapshot | undefined;
+  const harness = await mount(
+    <InboxHarness
+      onRender={(snapshot) => {
+        renderCalls += 1;
+        latest = snapshot;
+      }}
+    />,
+  );
+  await settle();
+
+  function current(): Snapshot {
+    assert(latest !== undefined, 'the probe has rendered at least once');
+    return latest;
+  }
+
+  assert(current().nova === 2, 'Nova: two pending out of three submissions');
+  assert(current().vods === 1, 'VODs: the one pending submission');
+  assert(current().crystal === 0, 'Crystal: no pending tickets');
+  assert(callsTo(NOVA_URL) === 1 && callsTo(VODS_URL) === 1 && callsTo(CRYSTAL_URL) === 1, 'mount starts exactly one request per list');
+  console.log('✓ InboxCountsProvider computes each pending count from a live mount');
+
+  const stableValue = current();
+  const callsBeforeRerender = renderCalls;
+
+  const rerenderButton = harness.container.querySelector<HTMLButtonElement>('#rerender');
+  assert(rerenderButton !== null, 'the harness renders its own re-render button');
+  await click(rerenderButton, 'the harness re-render button');
+  assert(renderCalls > callsBeforeRerender, 'the harness re-rendering does re-render the probe (a real signal, not a stuck assertion)');
+  assert(current() === stableValue, 'the context value keeps its identity across an unrelated re-render, with every count unchanged');
+  console.log('✓ useInboxCounts() keeps a stable identity while nova/vods/crystal/refresh are unchanged');
+
+  // Nova now fails; vods/crystal keep succeeding. refresh() must (a) issue exactly one new
+  // request per list and (b) turn ONLY nova back to null — not keep showing 2 (the stale-data
+  // trap: useApiResource keeps a failed reload's previous `data` on screen, so deriving a count
+  // from `data` before checking `error` would leave the old number on screen).
+  setResponse(NOVA_URL, 500, { error: 'Internal Server Error' });
+  await act(async () => { current().refresh(); });
+  await settle();
+
+  assert(callsTo(NOVA_URL) === 2 && callsTo(VODS_URL) === 2 && callsTo(CRYSTAL_URL) === 2, 'refresh() issues exactly one new request per list');
+  assert(current().nova === null, 'a refresh that fails after a successful load turns that count back to null, not the stale 2');
+  assert(current().vods === 1 && current().crystal === 0, 'the two lists that kept succeeding still report their real counts');
+  assert(current() !== stableValue, 'a real count change produces a new context value');
+  console.log('✓ refresh() reloads all three lists and a failed reload nulls only the list that failed');
+
+  // refresh('vods') — what the VOD inbox page calls after an action — reloads that list only.
+  setResponse(VODS_URL, 200, { data: [novaVod({ id: 'v1', status: 'approved' })], total: 1 });
+  await act(async () => { current().refresh('vods'); });
+  await settle();
+
+  assert(callsTo(VODS_URL) === 3, "refresh('vods') issues one new VODs request");
+  assert(callsTo(NOVA_URL) === 2 && callsTo(CRYSTAL_URL) === 2, "refresh('vods') requests neither Nova nor Crystal");
+  assert(current().vods === 0, 'the VODs count follows the reloaded list');
+  assert(current().nova === null && current().crystal === 0, 'the other two counts are untouched');
+  console.log('✓ refresh(name) reloads only the named inbox');
+
+  await harness.unmount();
+
+  // --- The stale-data trap's empty-message edge case: a bodyless error response with an empty
+  // statusText (real for HTTP/2 through Cloudflare) makes responseError() produce an ApiError
+  // whose message is '' — `if (resource.error)` would read that as falsy and fall through to the
+  // still-present stale `data`, so the fix must check `resource.error !== null` instead. ---
+
+  requestLog = [];
+  setResponse(NOVA_URL, 200, {
+    data: [novaSubmission({ id: 'n1', status: 'pending' }), novaSubmission({ id: 'n2', status: 'pending' })],
+    total: 2,
+  });
+  setResponse(VODS_URL, 200, { data: [], total: 0 });
+  setResponse(CRYSTAL_URL, 200, { data: [], total: 0 });
+
+  let emptyErrorRenders = 0;
+  let emptyErrorLatest: Snapshot | undefined;
+  const emptyErrorHarness = await mount(
+    <InboxCountsProvider>
+      <InboxProbe
+        onRender={(snapshot) => {
+          emptyErrorRenders += 1;
+          emptyErrorLatest = snapshot;
+        }}
+      />
+    </InboxCountsProvider>,
+  );
+  await settle();
+
+  function currentEmptyError(): Snapshot {
+    assert(emptyErrorLatest !== undefined, 'the probe has rendered at least once');
+    return emptyErrorLatest;
+  }
+
+  assert(currentEmptyError().nova === 2, 'Nova succeeds first, establishing a count that must not go stale');
+  const rendersBeforeEmptyError = emptyErrorRenders;
+
+  setEmptyErrorResponse(NOVA_URL, 500);
+  await act(async () => { currentEmptyError().refresh(); });
+  await settle();
+
+  assert(emptyErrorRenders > rendersBeforeEmptyError, 'the refresh does re-render the probe (a real signal, not a stuck assertion)');
+  assert(currentEmptyError().nova === null, 'an error with an empty message still nulls the count, not the stale 2');
+
+  await emptyErrorHarness.unmount();
+  console.log('✓ a bodyless error response with an empty statusText still nulls the count');
+
+  // --- The inbox pages keep their badge current: every action that can change a pending count
+  // reloads that inbox's list for the badge — once, and no other inbox's — so the count follows
+  // the server instead of keeping its mount-time value until a full reload ---
+
+  const { default: NovaSubmissions } = await import('../src/pages/NovaSubmissions');
+  const { default: NovaVodSubmissions } = await import('../src/pages/NovaVodSubmissions');
+  const { default: CrystalTickets } = await import('../src/pages/CrystalTickets');
+  // The Nova and VOD deletes still ask through window.confirm.
+  window.confirm = () => true;
+
+  // Nova: approve one, delete the other, then "Fetch All Channel Info" reloads a list that has
+  // gained a new submission since.
+  requestLog = [];
+  setResponse(NOVA_URL, 200, {
+    data: [novaSubmission({ id: 'n1', display_name: 'Alpha' }), novaSubmission({ id: 'n2', display_name: 'Beta' })],
+    total: 2,
+  });
+  setResponse(VODS_URL, 200, { data: [], total: 0 });
+  setResponse(CRYSTAL_URL, 200, { data: [], total: 0 });
+  const novaPage = await mountPage(<NovaSubmissions user={CURATOR} />);
+  assert(novaPage.counts().nova === 2, 'Nova: the badge starts at two pending');
+  assert(callsTo(NOVA_URL) === 2, 'the badge and the page each load the Nova list once');
+
+  const alphaApproved = novaSubmission({ id: 'n1', display_name: 'Alpha', status: 'approved' });
+  setMutationResponse('PATCH', '/api/nova/submissions/n1/status', alphaApproved);
+  setResponse(NOVA_URL, 200, { data: [alphaApproved, novaSubmission({ id: 'n2', display_name: 'Beta' })], total: 2 });
+  await click(buttonNamed(rowOf(novaPage.container, 'Alpha'), 'Approve'), "Alpha's Approve button");
+  assert(callsTo(NOVA_URL) === 3, 'an approval reloads the Nova list for the badge, once');
+  assert(novaPage.counts().nova === 1, 'Nova: the badge drops to one after an approval');
+
+  setMutationResponse('DELETE', '/api/nova/submissions/n2', { ok: true });
+  setResponse(NOVA_URL, 200, { data: [alphaApproved], total: 1 });
+  await click(buttonNamed(rowOf(novaPage.container, 'Beta'), 'Delete'), "Beta's Delete button");
+  assert(callsTo(NOVA_URL) === 4, 'a delete reloads the Nova list for the badge, once');
+  assert(novaPage.counts().nova === 0, 'Nova: the badge drops to zero after deleting the last pending one');
+
+  setMutationResponse('POST', '/api/nova/submissions/fetch-all-subscribers', { updated: 0, failed: 0, results: [] });
+  setResponse(NOVA_URL, 200, { data: [alphaApproved, novaSubmission({ id: 'n3', display_name: 'Gamma' })], total: 2 });
+  await click(buttonNamed(novaPage.container, 'Fetch All Channel Info'), 'the Fetch All Channel Info button');
+  assert(callsTo(NOVA_URL) === 6, "the page's own reload refetches both its list and the badge's");
+  assert(novaPage.counts().nova === 1, 'Nova: the badge picks up the submission that reload brought in');
+  assert(callsTo(VODS_URL) === 1 && callsTo(CRYSTAL_URL) === 1, 'no Nova action reloads another inbox');
+  await novaPage.unmount();
+  console.log('✓ the Nova inbox reloads its badge after an approval, a delete and its own reload');
+
+  // Nova VODs: approve one, delete the other.
+  requestLog = [];
+  setResponse(NOVA_URL, 200, { data: [], total: 0 });
+  setResponse(VODS_URL, 200, {
+    data: [novaVod({ id: 'v1', stream_title: 'Stream A' }), novaVod({ id: 'v2', stream_title: 'Stream B' })],
+    total: 2,
+  });
+  setResponse(CRYSTAL_URL, 200, { data: [], total: 0 });
+  const vodPage = await mountPage(<NovaVodSubmissions user={CURATOR} />);
+  assert(vodPage.counts().vods === 2, 'VODs: the badge starts at two pending');
+
+  const streamAApproved = novaVod({ id: 'v1', stream_title: 'Stream A', status: 'approved' });
+  setMutationResponse('PATCH', '/api/nova/vods/v1/status', streamAApproved);
+  setResponse(VODS_URL, 200, { data: [streamAApproved, novaVod({ id: 'v2', stream_title: 'Stream B' })], total: 2 });
+  await click(buttonNamed(rowOf(vodPage.container, 'Stream A'), 'Approve'), "Stream A's Approve button");
+  assert(callsTo(VODS_URL) === 3, 'an approval reloads the VODs list for the badge, once');
+  assert(vodPage.counts().vods === 1, 'VODs: the badge drops to one after an approval');
+
+  setMutationResponse('DELETE', '/api/nova/vods/v2', { ok: true });
+  setResponse(VODS_URL, 200, { data: [streamAApproved], total: 1 });
+  await click(buttonNamed(rowOf(vodPage.container, 'Stream B'), 'Delete'), "Stream B's Delete button");
+  assert(callsTo(VODS_URL) === 4, 'a delete reloads the VODs list for the badge, once');
+  assert(vodPage.counts().vods === 0, 'VODs: the badge drops to zero after deleting the last pending one');
+  assert(callsTo(NOVA_URL) === 1 && callsTo(CRYSTAL_URL) === 1, 'no VOD action reloads another inbox');
+  await vodPage.unmount();
+  console.log('✓ the Nova VOD inbox reloads its badge after an approval and a delete');
+
+  // Crystal: a reply marks its ticket replied (the worker's replyToTicket); Close closes the other.
+  requestLog = [];
+  setResponse(NOVA_URL, 200, { data: [], total: 0 });
+  setResponse(VODS_URL, 200, { data: [], total: 0 });
+  setResponse(CRYSTAL_URL, 200, {
+    data: [crystalTicket({ id: 't1', title: 'Ticket A' }), crystalTicket({ id: 't2', title: 'Ticket B' })],
+    total: 2,
+  });
+  const crystalPage = await mountPage(<CrystalTickets user={CURATOR} />);
+  assert(crystalPage.counts().crystal === 2, 'Crystal: the badge starts at two pending');
+  const summaryOf = (title: string) =>
+    Array.from(crystalPage.container.querySelectorAll<HTMLButtonElement>('button[aria-expanded]')).find((button) =>
+      button.textContent?.includes(title),
+    );
+
+  const ticketAReplied = crystalTicket({ id: 't1', title: 'Ticket A', status: 'replied', admin_reply: 'Thanks!' });
+  setMutationResponse('POST', '/api/crystal/tickets/t1/reply', ticketAReplied);
+  setResponse(CRYSTAL_URL, 200, { data: [ticketAReplied, crystalTicket({ id: 't2', title: 'Ticket B' })], total: 2 });
+  await click(summaryOf('Ticket A'), "Ticket A's summary row");
+  const replyBox = crystalPage.container.querySelector('textarea');
+  assert(replyBox !== null, 'the expanded ticket has a reply box');
+  await typeInto(replyBox, 'Thanks!');
+  await click(buttonNamed(crystalPage.container, 'Send Reply'), 'the Send Reply button');
+  assert(callsTo(CRYSTAL_URL) === 3, 'a reply reloads the Crystal list for the badge, once');
+  assert(crystalPage.counts().crystal === 1, 'Crystal: the badge drops to one after a reply');
+
+  const ticketBClosed = crystalTicket({ id: 't2', title: 'Ticket B', status: 'closed' });
+  setMutationResponse('PATCH', '/api/crystal/tickets/t2/status', ticketBClosed);
+  setResponse(CRYSTAL_URL, 200, { data: [ticketAReplied, ticketBClosed], total: 2 });
+  await click(summaryOf('Ticket B'), "Ticket B's summary row");
+  await click(buttonNamed(crystalPage.container, 'Close'), 'the Close button');
+  assert(callsTo(CRYSTAL_URL) === 4, 'a status change reloads the Crystal list for the badge, once');
+  assert(crystalPage.counts().crystal === 0, 'Crystal: the badge drops to zero after closing the last pending one');
+  assert(callsTo(NOVA_URL) === 1 && callsTo(VODS_URL) === 1, 'no Crystal action reloads another inbox');
+  await crystalPage.unmount();
+  console.log('✓ the Crystal inbox reloads its badge after a reply and a status change');
+}
+
+await main();
+console.log('✓ inbox counts: pending totals for Nova, Nova VODs and Crystal, with silent failures, kept current by their pages');

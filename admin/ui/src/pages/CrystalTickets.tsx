@@ -13,6 +13,7 @@ import { Icon, type IconName } from '../components/prism/Icon';
 import { Pill, StatusPill } from '../components/prism/Pill';
 import { PrismPage } from '../components/prism/PrismPage';
 import { SectionLabel } from '../components/prism/SectionLabel';
+import { useInboxCounts } from '../components/shell/InboxCounts';
 import { StatusFilterBar, type StatusFilterOption } from '../components/StatusFilterBar';
 
 const TYPE_LABELS: Record<CrystalTicketType, string> = {
@@ -61,6 +62,8 @@ export default function CrystalTickets({ user }: { user: AuthUser }) {
   // One unfiltered load feeds both the table and the hero totals; the filters
   // are chips, not a reason to ask the server for the same rows again.
   const list = useApiResource(async () => (await api.listCrystalTickets()).data, []);
+  // The sidebar's pending badge loads this list separately: every change here reloads it too.
+  const { refresh: refreshInboxCounts } = useInboxCounts();
   // Stable reference while loading, so the filter memo doesn't recompute every render.
   const allTickets = useMemo(() => list.data ?? [], [list.data]);
   const tickets = useMemo(
@@ -87,6 +90,7 @@ export default function CrystalTickets({ user }: { user: AuthUser }) {
     try {
       const updated = await api.replyCrystalTicket(id, text);
       list.mutate((tickets) => replaceById(tickets, updated));
+      refreshInboxCounts('crystal');
       keepVisible(id);
       replyDrafts.clear(id);
       return true;
@@ -104,6 +108,7 @@ export default function CrystalTickets({ user }: { user: AuthUser }) {
     try {
       const updated = await api.updateCrystalTicketStatus(id, status);
       list.mutate((tickets) => replaceById(tickets, updated));
+      refreshInboxCounts('crystal');
       keepVisible(id);
     } catch (err) {
       setActionError(errorMessage(err, 'Status update failed'));
