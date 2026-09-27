@@ -47,6 +47,10 @@ export default {
           violet: { bg: 'var(--tone-violet-bg)', fg: 'var(--tone-violet-fg)', line: 'var(--tone-violet-line)' },
           teal: { bg: 'var(--tone-teal-bg)', fg: 'var(--tone-teal-fg)', line: 'var(--tone-teal-line)' },
         },
+        tooltip: {
+          bg: 'var(--tooltip-bg)',
+          fg: 'var(--tooltip-fg)',
+        },
         accent: {
           pink: 'var(--accent-pink)',
           'pink-dark': 'var(--accent-pink-dark)',

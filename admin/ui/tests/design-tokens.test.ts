@@ -116,6 +116,11 @@ const TOKENS: Array<{ name: string; light: string; dark: string }> = [
   },
   { name: 'danger-solid', light: '#E11D48', dark: '#E11D48' },
   { name: 'focus-ring', light: '0 0 0 3px rgba(236,72,153,.3)', dark: '0 0 0 3px rgba(244,114,182,.4)' },
+  // Tooltip surface (task 2 fix round 1, ruling R10): deliberately theme-invariant in
+  // direction (always a dark chip in light mode, always a light chip in dark mode),
+  // unlike every other token above.
+  { name: 'tooltip-bg', light: '#1E1B2E', dark: '#F1F5F9' },
+  { name: 'tooltip-fg', light: '#FFFFFF', dark: '#1E1B2E' },
 ];
 
 /** Spec §4.1 status tones — all 7 × {bg, fg, line}, copied verbatim. */
@@ -329,6 +334,10 @@ async function main(): Promise<void> {
       assert(tone?.[t.name]?.[key] === expected, `colors.tone.${t.name}.${key} maps to ${expected}`);
     }
   }
+
+  const tooltip = colors.tooltip as Record<string, unknown> | undefined;
+  assert(tooltip?.bg === 'var(--tooltip-bg)', 'colors.tooltip.bg maps to var(--tooltip-bg)');
+  assert(tooltip?.fg === 'var(--tooltip-fg)', 'colors.tooltip.fg maps to var(--tooltip-fg)');
 
   const backgroundImage = config.theme?.extend?.backgroundImage ?? {};
   assert(backgroundImage.canvas === 'var(--canvas)', 'backgroundImage.canvas maps to var(--canvas)');
