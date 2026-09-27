@@ -19,6 +19,7 @@ import { Avatar } from '../components/prism/Avatar';
 import { GradientButton, OutlineButton } from '../components/prism/Buttons';
 import { CircleButton } from '../components/prism/CircleButton';
 import { ColumnHeader } from '../components/prism/ColumnHeader';
+import { useInboxCounts } from '../components/shell/InboxCounts';
 import { StatusFilterBar } from '../components/StatusFilterBar';
 import { DetailField } from '../components/prism/DetailField';
 import { PrismInput, PrismTextarea } from '../components/prism/Fields';
@@ -76,6 +77,8 @@ export default function NovaSubmissions({ user }: { user: AuthUser }) {
   // search narrow it here rather than costing a second request per chip click or
   // search submit.
   const list = useApiResource(async () => (await api.listNovaSubmissions()).data, []);
+  // The sidebar's pending badge loads this list separately: every change here reloads it too.
+  const { refresh: refreshInboxCounts } = useInboxCounts();
   // Stable reference while loading, so the filter memo doesn't recompute every render.
   const allSubmissions = useMemo(() => list.data ?? [], [list.data]);
   const submissions = useMemo(
@@ -97,6 +100,7 @@ export default function NovaSubmissions({ user }: { user: AuthUser }) {
   const reload = () => {
     setJustActed(NO_RECENT_ACTIONS);
     list.reload();
+    refreshInboxCounts('nova');
   };
   const keepVisible = (id: string) => setJustActed((prev) => new Set(prev).add(id));
 
@@ -110,6 +114,7 @@ export default function NovaSubmissions({ user }: { user: AuthUser }) {
         reviewer_note: status === 'rejected' ? rejectNote : undefined,
       });
       list.mutate((submissions) => replaceById(submissions, updated));
+      refreshInboxCounts('nova');
       keepVisible(id);
       rejectNotes.clear(id);
       return true;
@@ -128,6 +133,7 @@ export default function NovaSubmissions({ user }: { user: AuthUser }) {
     try {
       await api.deleteNovaSubmission(sub.id);
       list.mutate((submissions) => removeById(submissions, sub.id));
+      refreshInboxCounts('nova');
       rejectNotes.clear(sub.id);
     } catch (err) {
       setActionError(errorMessage(err, 'Delete failed'));

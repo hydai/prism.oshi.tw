@@ -19,6 +19,7 @@ import { Pill, StatusPill } from '../components/prism/Pill';
 import { PrismPage } from '../components/prism/PrismPage';
 import { SectionLabel } from '../components/prism/SectionLabel';
 import { Segmented } from '../components/prism/Segmented';
+import { useInboxCounts } from '../components/shell/InboxCounts';
 import { StatusFilterBar } from '../components/StatusFilterBar';
 import { groupVodsByStreamer, type VodGroup, type VodViewMode } from '../lib/nova-vod-groups';
 import { NOVA_STATUS_FILTERS } from './nova-status-filters';
@@ -55,6 +56,8 @@ export default function NovaVodSubmissions({ user }: { user: AuthUser }) {
   // One unfiltered load feeds the table, the hero totals and the streamer options;
   // the two filters narrow it here instead of costing a second request.
   const list = useApiResource(async () => (await api.listNovaVods()).data, []);
+  // The sidebar's pending badge loads this list separately: every change here reloads it too.
+  const { refresh: refreshInboxCounts } = useInboxCounts();
   // Stable reference while loading, so the filter memo doesn't recompute every render.
   const allVods = useMemo(() => list.data ?? [], [list.data]);
   const vods = useMemo(
@@ -101,6 +104,7 @@ export default function NovaVodSubmissions({ user }: { user: AuthUser }) {
         reviewer_note: status === 'rejected' ? rejectNote : undefined,
       });
       list.mutate((vods) => replaceById(vods, updated));
+      refreshInboxCounts('vods');
       keepVisible(id);
       rejectNotes.clear(id);
       return true;
@@ -119,6 +123,7 @@ export default function NovaVodSubmissions({ user }: { user: AuthUser }) {
     try {
       await api.deleteNovaVod(vod.id);
       list.mutate((vods) => removeById(vods, vod.id));
+      refreshInboxCounts('vods');
       rejectNotes.clear(vod.id);
     } catch (err) {
       setActionError(errorMessage(err, 'Delete failed'));
