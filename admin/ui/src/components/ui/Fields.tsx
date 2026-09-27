@@ -1,17 +1,28 @@
-import { useId, type InputHTMLAttributes, type SelectHTMLAttributes, type TextareaHTMLAttributes } from 'react';
+import { useId, type InputHTMLAttributes, type Ref, type SelectHTMLAttributes, type TextareaHTMLAttributes } from 'react';
 import { Icon } from './Icon';
 
 const FIELD_CLASSES =
   'w-full rounded-[14px] border border-field-line bg-field px-3 py-2 text-token-sm text-fg placeholder:text-fg-subtle disabled:cursor-not-allowed disabled:opacity-50';
 
-/** A styled native text input; every native `<input>` prop passes through (spec §5). */
-export function TextInput({ className, type = 'text', ...rest }: InputHTMLAttributes<HTMLInputElement>) {
-  return <input {...rest} type={type} className={className ? `${FIELD_CLASSES} ${className}` : FIELD_CLASSES} />;
+/** A styled native text input; every native `<input>` prop, plus `ref` (React 19 ref-as-prop, R4), passes through (spec §5). */
+export function TextInput({
+  ref,
+  className,
+  type = 'text',
+  ...rest
+}: InputHTMLAttributes<HTMLInputElement> & { ref?: Ref<HTMLInputElement> }) {
+  return (
+    <input {...rest} ref={ref} type={type} className={className ? `${FIELD_CLASSES} ${className}` : FIELD_CLASSES} />
+  );
 }
 
-/** A styled native textarea; every native `<textarea>` prop passes through (spec §5). */
-export function Textarea({ className, ...rest }: TextareaHTMLAttributes<HTMLTextAreaElement>) {
-  return <textarea {...rest} className={className ? `${FIELD_CLASSES} ${className}` : FIELD_CLASSES} />;
+/** A styled native textarea; every native `<textarea>` prop, plus `ref`, passes through (spec §5). */
+export function Textarea({
+  ref,
+  className,
+  ...rest
+}: TextareaHTMLAttributes<HTMLTextAreaElement> & { ref?: Ref<HTMLTextAreaElement> }) {
+  return <textarea {...rest} ref={ref} className={className ? `${FIELD_CLASSES} ${className}` : FIELD_CLASSES} />;
 }
 
 /** A styled native select with a trailing chevron; every native `<select>` prop passes through (spec §5). */

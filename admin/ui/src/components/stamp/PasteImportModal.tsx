@@ -1,6 +1,9 @@
 import { useEffect, useMemo, useRef, useState } from 'react';
 import { api } from '../../api/client';
 import { parseTextToSongs, parsedSongKey } from '../../../../shared/parse';
+import { Button } from '../ui/Button';
+import { Dialog } from '../ui/Dialog';
+import { Checkbox, Textarea } from '../ui/Fields';
 
 const DEFAULT_EXAMPLE = '0:00 Song Title / Artist Name\n3:45 Another Song - Another Artist\n7:20 Third Song';
 const DEFAULT_REPLACE_LABEL = 'Replace existing performances (delete current songs first)';
@@ -59,96 +62,80 @@ export function PasteImportModal({
   };
 
   return (
-    <div className="fixed inset-0 z-40 flex items-center justify-center bg-black/40">
-      <div className="flex w-full max-w-2xl flex-col rounded-lg bg-white shadow-xl" style={{ maxHeight: '85vh' }}>
-        <div className="border-b border-slate-200 px-6 py-4">
-          <h3 className="text-lg font-semibold text-slate-800">Paste Import</h3>
-          <p className="mt-1 text-sm text-slate-500">
-            Paste a timestamp list (e.g. &quot;5:30 Song Name - Artist&quot;)
-          </p>
-        </div>
-
-        <div className="flex-1 overflow-y-auto px-6 py-4">
-          <textarea
-            ref={textareaRef}
-            aria-label="Paste a timestamp list"
-            value={text}
-            onChange={(e) => setText(e.target.value)}
-            placeholder={example}
-            className="h-40 w-full rounded-md border border-slate-300 px-3 py-2 font-mono text-sm focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500"
-          />
-
-          {hasExisting && (
-            <label className="mt-3 flex items-center gap-2 text-sm text-slate-600">
-              <input
-                type="checkbox"
-                checked={replaceMode}
-                onChange={(e) => setReplaceMode(e.target.checked)}
-                className="rounded border-slate-300"
-              />
-              {replaceLabel}
-            </label>
-          )}
-
-          {/* Preview table */}
-          {preview.length > 0 && (
-            <div className="mt-4">
-              <h4 className="text-sm font-medium text-slate-700">
-                Preview ({preview.length} songs)
-              </h4>
-              <div className="mt-2 max-h-48 overflow-y-auto rounded-md border border-slate-200">
-                <table className="w-full text-left text-sm">
-                  <thead className="sticky top-0 border-b border-slate-200 bg-slate-50 text-xs uppercase text-slate-500">
-                    <tr>
-                      <th className="px-3 py-2">#</th>
-                      <th className="px-3 py-2">Start</th>
-                      <th className="px-3 py-2">End</th>
-                      <th className="px-3 py-2">Title</th>
-                      <th className="px-3 py-2">Artist</th>
-                    </tr>
-                  </thead>
-                  <tbody className="divide-y divide-slate-100">
-                    {preview.map((song, i) => (
-                      <tr key={parsedSongKey(song)} className="hover:bg-slate-50">
-                        <td className="px-3 py-1.5 text-slate-400">{i + 1}</td>
-                        <td className="px-3 py-1.5 font-mono text-xs">{song.startTimestamp}</td>
-                        <td className="px-3 py-1.5 font-mono text-xs text-slate-400">
-                          {song.endTimestamp ?? '—'}
-                        </td>
-                        <td className="px-3 py-1.5 font-medium text-slate-800">{song.songName}</td>
-                        <td className="px-3 py-1.5 text-slate-500">{song.artist || '—'}</td>
-                      </tr>
-                    ))}
-                  </tbody>
-                </table>
-              </div>
-            </div>
-          )}
-
-          {error && (
-            <p className="mt-3 text-sm text-red-600">{error}</p>
-          )}
-        </div>
-
-        <div className="flex justify-end gap-2 border-t border-slate-200 px-6 py-4">
-          <button
-            type="button"
-            onClick={onCancel}
-            className="rounded-md px-3 py-1.5 text-sm text-slate-600 hover:bg-slate-100"
-            disabled={importing}
-          >
+    <Dialog
+      open
+      // Escape raises the native `cancel` unconditionally (dismissible only gates backdrop clicks), so
+      // without this guard it would bypass the Cancel button's own `disabled={importing}` and abandon
+      // an in-flight import: the parent's onDone still fires when it resolves, or the failure is
+      // silently dropped. Once the import settles, Escape/Cancel close the modal as normal.
+      onClose={() => {
+        if (!importing) onCancel();
+      }}
+      title="Paste Import"
+      description={'Paste a timestamp list (e.g. "5:30 Song Name - Artist")'}
+      dismissible={false}
+      size="lg"
+      footer={
+        <>
+          <Button variant="secondary" onClick={onCancel} disabled={importing}>
             Cancel
-          </button>
-          <button
-            type="button"
-            onClick={handleImport}
-            disabled={preview.length === 0 || importing}
-            className="rounded-md bg-blue-600 px-4 py-1.5 text-sm font-medium text-white hover:bg-blue-700 disabled:opacity-50"
-          >
+          </Button>
+          <Button variant="primary" onClick={handleImport} disabled={preview.length === 0 || importing}>
             {importing ? 'Importing...' : `Import ${preview.length} Songs`}
-          </button>
-        </div>
+          </Button>
+        </>
+      }
+    >
+      <div className="space-y-3">
+        <Textarea
+          ref={textareaRef}
+          aria-label="Paste a timestamp list"
+          value={text}
+          onChange={(e) => setText(e.target.value)}
+          placeholder={example}
+          className="h-40 font-mono"
+        />
+
+        {hasExisting && (
+          <Checkbox checked={replaceMode} onChange={setReplaceMode} label={replaceLabel} visibleLabel />
+        )}
+
+        {preview.length > 0 && (
+          <div>
+            <h4 className="text-token-sm font-medium text-fg">
+              Preview ({preview.length} songs)
+            </h4>
+            <div className="mt-2 max-h-48 overflow-y-auto rounded-radius-lg border border-field-line bg-field">
+              <table className="w-full text-left text-token-sm">
+                <thead className="sticky top-0 border-b border-line-soft bg-field">
+                  <tr className="text-2xs font-bold uppercase tracking-[0.12em] text-fg-subtle">
+                    <th className="px-3 py-2">#</th>
+                    <th className="px-3 py-2">Start</th>
+                    <th className="px-3 py-2">End</th>
+                    <th className="px-3 py-2">Title</th>
+                    <th className="px-3 py-2">Artist</th>
+                  </tr>
+                </thead>
+                <tbody className="divide-y divide-line-soft">
+                  {preview.map((song, i) => (
+                    <tr key={parsedSongKey(song)} className="hover:bg-tone-neutral-bg">
+                      <td className="px-3 py-1.5 text-fg-subtle">{i + 1}</td>
+                      <td className="px-3 py-1.5 font-mono text-token-xs">{song.startTimestamp}</td>
+                      <td className="px-3 py-1.5 font-mono text-token-xs text-fg-subtle">
+                        {song.endTimestamp ?? '—'}
+                      </td>
+                      <td className="px-3 py-1.5 font-medium text-fg">{song.songName}</td>
+                      <td className="px-3 py-1.5 text-fg-muted">{song.artist || '—'}</td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          </div>
+        )}
+
+        {error && <p className="text-token-sm text-tone-danger-fg">{error}</p>}
       </div>
-    </div>
+    </Dialog>
   );
 }
