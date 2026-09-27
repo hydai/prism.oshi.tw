@@ -152,6 +152,12 @@ body {
   --tone-teal-bg: #CCFBF1;
   --tone-teal-fg: #0F766E;
   --tone-teal-line: #99F6E4;
+
+  /* Tooltip surface: deliberately NOT derived from --fg/--glass-pop/etc — every one
+     of those flips polarity between themes, which would flip the tooltip to
+     low-contrast text-on-background in one theme. Task 2 fix round 1, ruling R10. */
+  --tooltip-bg: #1E1B2E;
+  --tooltip-fg: #FFFFFF;
 }
 
 /* ===== Prism Studio design tokens (spec §4.1) — dark values ===== */
@@ -208,6 +214,9 @@ html.dark {
   --tone-teal-bg: rgba(20,184,166,.14);
   --tone-teal-fg: #5EEAD4;
   --tone-teal-line: rgba(20,184,166,.3);
+
+  --tooltip-bg: #F1F5F9;
+  --tooltip-fg: #1E1B2E;
 }
 
 html.dark body {
