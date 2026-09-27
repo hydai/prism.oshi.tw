@@ -108,6 +108,9 @@ body {
   --glass-header: rgba(255,255,255,.42);
   --glass-card: rgba(255,255,255,.62);
   --glass-pop: rgba(255,255,255,.9);
+  /* The sticky table head: --glass-pop's colour, near-opaque — it has no blur, so rows scrolling
+     under it must not read through. */
+  --thead-bg: rgba(255,255,255,.97);
   --glass-edge: rgba(255,255,255,.8);
   --field: rgba(255,255,255,.72);
   --field-line: rgba(203,213,225,.7);
@@ -174,6 +177,7 @@ html.dark {
   --glass-header: rgba(13,10,23,.45);
   --glass-card: rgba(28,23,48,.58);
   --glass-pop: rgba(36,30,60,.9);
+  --thead-bg: rgba(36,30,60,.97);
   --glass-edge: rgba(255,255,255,.08);
   --field: rgba(255,255,255,.05);
   --field-line: rgba(255,255,255,.12);
@@ -253,6 +257,32 @@ html.dark body {
     background: var(--glass-pop);
     border: 1px solid var(--glass-edge);
     backdrop-filter: blur(18px);
+  }
+
+  /* Host variants, for a glass bar that holds a popover (the bulk bar, the page header). An element
+     with backdrop-filter is a backdrop root: a blurred panel inside it samples only the host, so
+     page text would read crisp through the panel. These paint the same glass on a ::before layer,
+     which leaves the host itself unfiltered. The host must be positioned with a z-index — a
+     stacking context — so the z-index: -1 layer stays inside it, behind its content. */
+  .glass-pop-host::before,
+  .glass-header-host::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    z-index: -1;
+    border-radius: inherit;
+  }
+
+  .glass-pop-host::before {
+    background: var(--glass-pop);
+    border: 1px solid var(--glass-edge);
+    backdrop-filter: blur(18px);
+  }
+
+  .glass-header-host::before {
+    background: var(--glass-header);
+    border: 1px solid var(--glass-edge);
+    backdrop-filter: blur(14px);
   }
 }
 

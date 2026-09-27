@@ -133,8 +133,26 @@ function ToastItem({ toast, onDismiss }: { toast: ToastRecord; onDismiss: (id: n
 // when both actually hold a toast (see the conditional class below). z-50 is only a fallback for
 // when the Popover API (and so the top layer) is unavailable; a shown popover's own top-layer
 // stacking ignores z-index entirely.
+//
+// R23: while a BulkBar (ui/BulkBar.tsx) is mounted it marks `document.documentElement` with
+// `data-bulk-bar=""` and publishes the bar's own measured height as `--bulk-bar-h`, and this
+// section lifts clear of it under that attribute — otherwise a toast would show up underneath the
+// bulk bar's own fixed pill. The arbitrary variant reads as "when this element is a descendant of
+// html[data-bulk-bar]", which is trivially true of every element once the attribute is set (`html`
+// is an ancestor of everything in the document) — this section itself renders inline wherever
+// `ToastProvider` is mounted, not necessarily as a direct child of `<body>` (M8 correction).
+//
+// R23b: the lift is `calc(var(--bulk-bar-h) + 22px + 16px)`, not a static 84px — a wrapped BulkBar
+// (its own `max-lg:flex-wrap`) can be taller than the one-line pill the static value assumed. The
+// 22px is the bar's own `bottom-[22px]` offset and the 16px is breathing room above it; both are
+// duplicated here as literals because CSS can't reference another file's Tailwind arbitrary value —
+// if BulkBar's bottom offset ever changes, update it here too.
+//
+// R33: at ≥1024px the section also recentres on the content pane, matching BulkBar — see the
+// `lg:` classes below and BulkBar.tsx's own comment for the 112px (half of Task 11's 224px
+// sidebar) derivation.
 const SECTION_CLASSES =
-  'fixed inset-x-0 top-auto bottom-4 z-50 my-0 mx-auto w-[calc(100%_-_2rem)] max-w-sm border-0 bg-transparent p-0 text-fg overflow-visible pointer-events-none flex flex-col';
+  'fixed inset-x-0 top-auto bottom-4 [html[data-bulk-bar]_&]:bottom-[calc(var(--bulk-bar-h)_+_22px_+_16px)] z-50 my-0 mx-auto w-[calc(100%_-_2rem)] max-w-sm border-0 bg-transparent p-0 text-fg overflow-visible pointer-events-none flex flex-col lg:right-auto lg:left-[calc(50%_+_112px)] lg:-translate-x-1/2';
 const LIST_CLASSES = 'flex flex-col gap-2.5 list-none p-0 m-0';
 
 function Notifications({ toasts, onDismiss }: { toasts: ToastRecord[]; onDismiss: (id: number) => void }) {

@@ -52,6 +52,9 @@ async function main(): Promise<void> {
   const { Chip, Segmented } = await import('../src/components/ui/Toggles');
   const { TextInput, Textarea, Select, SearchInput, Checkbox, Radio } = await import('../src/components/ui/Fields');
   const { GlassCard, StatTile, Kbd, ProgressBar, EmptyState, Skeleton } = await import('../src/components/ui/Display');
+  const { PageHeader } = await import('../src/components/ui/PageHeader');
+  const { BulkBar } = await import('../src/components/ui/BulkBar');
+  const { Table, THead, SortHeader, HeadCell, TableEmptyRow } = await import('../src/components/ui/Table');
 
   // --- Button ---
 
@@ -409,6 +412,298 @@ async function main(): Promise<void> {
   console.log(
     '✓ ui kit: Pill, StatusPill, Chip, Segmented, GlassCard, StatTile, Kbd, ProgressBar, EmptyState, Skeleton and the field components render accessible, token-only markup',
   );
+
+  // --- SortHeader: aria-sort on the <th>, a chevron only (and rotated only for asc) on the active column ---
+
+  const sortHeaderMarkup = (activeField: 'title' | 'date', direction: 'asc' | 'desc', align?: 'start' | 'end') =>
+    renderToStaticMarkup(
+      <table>
+        <thead>
+          <tr>
+            <SortHeader
+              label="Title"
+              field="title"
+              activeField={activeField}
+              direction={direction}
+              onSort={() => undefined}
+              align={align}
+            />
+          </tr>
+        </thead>
+      </table>,
+    );
+
+  const sortAsc = sortHeaderMarkup('title', 'asc');
+  assert(sortAsc.includes('scope="col"'), 'SortHeader renders a column header');
+  assert(sortAsc.includes('aria-sort="ascending"'), 'the active ascending column announces its direction');
+  assert(sortAsc.includes('<button type="button"'), 'the column head is a keyboard-reachable button');
+  assert(sortAsc.includes('<svg'), 'the active column renders a chevron icon');
+  assert(sortAsc.includes('aria-hidden="true"'), 'the chevron stays out of the accessible name');
+  assert(sortAsc.includes('rotate-180'), 'ascending rotates the chevron to point up (decision 3)');
+  assert(
+    sortAsc.includes('shadow-[inset_0_-1px_0_var(--line-soft)]'),
+    "the row-bottom line is an inset shadow, not a border, so it survives THead's sticky + the table's border-collapse (M1)",
+  );
+  assert(!sortAsc.includes('border-b'), 'M1: no border-b — border-collapse + sticky can make it vanish');
+
+  const sortDesc = sortHeaderMarkup('title', 'desc');
+  assert(sortDesc.includes('aria-sort="descending"'), 'the active descending column announces its direction');
+  assert(sortDesc.includes('<svg'), 'the active descending column still renders a chevron');
+  assert(!sortDesc.includes('rotate-180'), 'descending keeps the chevron in its default (unrotated) orientation');
+
+  const sortInactive = sortHeaderMarkup('date', 'asc');
+  assert(sortInactive.includes('aria-sort="none"'), 'an unsorted column says so rather than staying silent');
+  assert(!sortInactive.includes('<svg'), 'an unsorted column renders no chevron at all (only the active column does)');
+
+  // I2: align="end" right-aligns both the <th> (text-right) and the button's own flex content
+  // (justify-end) — text-right alone would not affect a flex button's internal alignment.
+  const sortEndAligned = sortHeaderMarkup('title', 'asc', 'end');
+  assert(sortEndAligned.includes('text-right'), 'align="end" puts text-right on the <th>');
+  assert(sortEndAligned.includes('justify-end'), "align=\"end\" puts justify-end on the button, since it's flex");
+  const sortStartAligned = sortHeaderMarkup('title', 'asc', 'start');
+  assert(!sortStartAligned.includes('justify-end'), 'align="start" (the default) renders no justify-end');
+
+  console.log('✓ ui kit: SortHeader keeps aria-sort on the <th>, an inset-shadow row line, a chevron rotated for ascending only on the active column, and an optional end alignment');
+
+  // --- HeadCell: a plain (non-sortable) column head sharing SortHeader's look (I2) ---
+
+  const headCellMarkup = renderToStaticMarkup(
+    <table>
+      <thead>
+        <tr>
+          <HeadCell>Tags</HeadCell>
+        </tr>
+      </thead>
+    </table>,
+  );
+  assert(headCellMarkup.includes('scope="col"'), 'HeadCell renders a column header');
+  assert(headCellMarkup.includes('>Tags<'), 'HeadCell renders its children');
+  assert(headCellMarkup.includes('text-fg-subtle'), 'a plain HeadCell uses the inactive (fg-subtle) colour, same as an unsorted SortHeader column');
+  assert(
+    headCellMarkup.includes('shadow-[inset_0_-1px_0_var(--line-soft)]'),
+    'HeadCell shares the same inset-shadow row line as SortHeader (M1)',
+  );
+  assert(headCellMarkup.includes('text-left'), 'HeadCell aligns start by default');
+
+  const headCellEnd = renderToStaticMarkup(
+    <table>
+      <thead>
+        <tr>
+          <HeadCell align="end">Songs</HeadCell>
+        </tr>
+      </thead>
+    </table>,
+  );
+  assert(headCellEnd.includes('text-right'), 'HeadCell align="end" right-aligns the <th>');
+
+  console.log('✓ ui kit: HeadCell renders a plain column head in the same look as SortHeader, with an optional end alignment');
+
+  // --- Table / THead / TableEmptyRow: the horizontal-scroll wrapper, sticky opaque head, empty row ---
+
+  const tableMarkup = renderToStaticMarkup(
+    <Table>
+      <THead>
+        <tr>
+          <th scope="col">Title</th>
+        </tr>
+      </THead>
+      <tbody>
+        <TableEmptyRow colSpan={1}>No songs match your filters</TableEmptyRow>
+      </tbody>
+    </Table>,
+  );
+  assert(
+    tableMarkup.includes('max-xl:overflow-x-auto'),
+    'Table only scrolls horizontally below 1280px (spec §9, R31 — amends the original 1024px threshold)',
+  );
+  assert(!tableMarkup.includes('max-lg:overflow-x-auto'), 'R31: the old 1024px threshold is gone, not just supplemented');
+  assert(tableMarkup.includes('<table'), 'Table renders a real <table> element');
+
+  const theadTag = /<thead[^>]*>/.exec(tableMarkup)?.[0];
+  assert(theadTag !== undefined, 'THead renders a <thead>');
+  assert(theadTag.includes('z-10'), "THead sits under the PageHeader's z-20");
+  assert(
+    theadTag.includes('bg-thead-bg') && !theadTag.includes('bg-glass-pop'),
+    'THead paints the near-opaque --thead-bg surface, so scrolled rows do not read through it (90 % glass-pop let them)',
+  );
+  assert(!theadTag.includes('backdrop-blur'), 'THead carries no blur — sticky table heads are not on the §4.2 blur list');
+  const theadClasses = (/class="([^"]*)"/.exec(theadTag)?.[1] ?? '').split(' ');
+  assert(
+    theadClasses.includes('xl:sticky') && theadClasses.includes('xl:top-[62px]')
+      && !theadClasses.includes('sticky') && !theadClasses.includes('top-[62px]'),
+    "R31: THead sticks only from 1280px up — below that the Table wrapper scrolls horizontally, and a head sticky inside it would sit 62px down, over the first rows",
+  );
+
+  assert(tableMarkup.includes('>No songs match your filters<'), 'TableEmptyRow renders its children');
+  assert(tableMarkup.includes('colSpan="1"'), 'TableEmptyRow passes colSpan through to the <td>');
+
+  console.log('✓ ui kit: Table scrolls horizontally only below 1280px, THead sticks from 1280px up, opaque with no blur, TableEmptyRow renders a spanning row');
+
+  // --- BulkBar: a labelled, fixed glass-pop region with the given countLabel, a divider, then children ---
+
+  const bulkBarMarkup = renderToStaticMarkup(
+    <BulkBar
+      countLabel={
+        <span>
+          已選擇 <b>1</b> 個作品
+        </span>
+      }
+    >
+      <button type="button">加入所選標籤</button>
+    </BulkBar>,
+  );
+  const bulkBarTag = /<div[^>]*role="region"[^>]*>/.exec(bulkBarMarkup)?.[0];
+  assert(bulkBarTag !== undefined, 'BulkBar renders a role="region" container');
+  assert(bulkBarTag.includes('aria-label="Bulk actions"'), 'BulkBar names itself for assistive tech');
+  assert(bulkBarTag.includes('fixed'), 'BulkBar is fixed to the viewport');
+  assert(bulkBarTag.includes('z-30'), 'BulkBar paints above the standard z-20 PageHeader');
+  const bulkBarClasses = (/class="([^"]*)"/.exec(bulkBarTag)?.[1] ?? '').split(' ');
+  assert(
+    bulkBarClasses.includes('glass-pop-host') && !bulkBarClasses.includes('glass-pop'),
+    'BulkBar wears the glass-pop surface (spec §4.1) as its host variant, painted on a ::before layer, so a popover it opens can blur the page',
+  );
+  assert(bulkBarTag.includes('max-lg:flex-wrap'), 'R23b: below 1024px the bar wraps instead of spilling off-screen');
+  assert(bulkBarTag.includes('max-lg:rounded-radius-xl'), 'R23b: a wrapped (non-pill) bar takes a non-pill radius');
+  assert(
+    bulkBarTag.includes('lg:left-[calc(50%_+_112px)]'),
+    'R33: at >=1024px the bar centres on the content pane (half of the 224px sidebar), not the viewport',
+  );
+  assert(bulkBarMarkup.includes('已選擇 <b>1</b> 個作品'), "BulkBar renders its countLabel verbatim, including the caller's own markup");
+  assert(bulkBarMarkup.includes('加入所選標籤'), 'BulkBar renders its children');
+
+  console.log('✓ ui kit: BulkBar is a labelled, fixed glass-pop region that wraps below 1024px and centres on the content pane above it');
+
+  // --- PageHeader: sticky glass bar, crumb + <h1> title, optional 76px meta row, children, actions ---
+
+  const pageHeaderMarkup = renderToStaticMarkup(<PageHeader crumb="LIBRARY" title="Global Song Library" />);
+  assert(pageHeaderMarkup.includes('<h1'), 'PageHeader renders its title in an <h1>');
+  assert(pageHeaderMarkup.includes('LIBRARY'), 'PageHeader renders its crumb');
+  assert(pageHeaderMarkup.includes('Global Song Library'), 'PageHeader renders its title text');
+  assert(!pageHeaderMarkup.includes('mt-1 flex flex-wrap'), 'no meta row renders when meta is omitted');
+
+  // Below lg the MobileTopBar already shows the page title, so the crumb + <h1> would repeat it.
+  // `max-lg:sr-only`, never `hidden`: the text stays in the accessibility tree, just not painted.
+  const crumbClasses = (/<div class="([^"]*)">LIBRARY<\/div>/.exec(pageHeaderMarkup)?.[1] ?? '').split(' ');
+  assert(crumbClasses.join(' ') !== '', 'PageHeader renders the crumb in its own element');
+  assert(
+    crumbClasses.includes('max-lg:sr-only') && !crumbClasses.includes('hidden'),
+    'the crumb is visually hidden below lg via sr-only, not hidden, since the MobileTopBar already shows the title there',
+  );
+  const titleClasses = (/<h1 class="([^"]*)">Global Song Library<\/h1>/.exec(pageHeaderMarkup)?.[1] ?? '').split(' ');
+  assert(titleClasses.join(' ') !== '', 'PageHeader renders the title in its own <h1>');
+  assert(
+    titleClasses.includes('max-lg:sr-only') && !titleClasses.includes('hidden'),
+    'the <h1> title is visually hidden below lg via sr-only, not hidden, so it stays in the accessibility tree',
+  );
+
+  const headerTag = /<header[^>]*>/.exec(pageHeaderMarkup)?.[0];
+  assert(headerTag !== undefined, 'PageHeader renders a <header> element');
+  const headerClasses = (tag: string) => (/class="([^"]*)"/.exec(tag)?.[1] ?? '').split(' ');
+  // From lg up the bar sticks to the top of <main>. Below lg it scrolls away with the page — on a
+  // phone only the mobile top bar stays pinned — while `relative z-20` still lifts it, and a picker
+  // panel opened from it, above the cards that follow.
+  assert(
+    ['relative', 'lg:sticky', 'lg:top-0'].every((name) => headerClasses(headerTag).includes(name))
+      && !headerClasses(headerTag).includes('sticky')
+      && !headerClasses(headerTag).includes('top-0'),
+    'PageHeader sticks to the top of <main> from lg up and scrolls away with the page below it',
+  );
+  assert(headerTag.includes('z-20'), 'PageHeader paints above later glass cards (each their own stacking context)');
+  assert(
+    headerClasses(headerTag).includes('glass-header-host') && !headerClasses(headerTag).includes('glass-header'),
+    'PageHeader wears the glass-header surface as its host variant (on a ::before layer), so its picker panel can blur the page',
+  );
+  assert(
+    headerClasses(headerTag).includes('before:border-x-0') && headerClasses(headerTag).includes('before:border-t-0'),
+    'M6: the glass layer draws all 4 sides; the approved .hdr is a bottom hairline only',
+  );
+
+  // The host variants (src/index.css): the glass — surface, edge and blur — sits on a ::before
+  // layer behind the host's content, and the host carries no backdrop-filter of its own, since an
+  // element with one is a backdrop root that a nested popover panel could not see past.
+  const { readFileSync } = await import('node:fs');
+  const css = readFileSync(new URL('../src/index.css', import.meta.url), 'utf8').replace(/\s+/g, ' ');
+  // The body of the rule whose whole selector is `selector` (it follows the previous rule's `}`).
+  const ruleBody = (selector: string) =>
+    new RegExp(`\\} *${selector.replace(/[.:]/g, (c) => `\\${c}`)} *\\{([^}]*)\\}`).exec(css)?.[1] ?? '';
+  for (const [host, surface, blur] of [
+    ['.glass-pop-host', '--glass-pop', 'blur(18px)'],
+    ['.glass-header-host', '--glass-header', 'blur(14px)'],
+  ] as const) {
+    assert(!new RegExp(`\\${host} *\\{`).test(css), `${host} itself has no rule of its own, so no backdrop-filter`);
+    const layer = ruleBody(`${host}::before`);
+    for (const declaration of [`background: var(${surface});`, 'border: 1px solid var(--glass-edge);', `backdrop-filter: ${blur};`]) {
+      assert(layer.includes(declaration), `${host}::before sets ${declaration}`);
+    }
+  }
+  const sharedLayer = /\.glass-pop-host::before, \.glass-header-host::before \{([^}]*)\}/.exec(css)?.[1] ?? '';
+  for (const declaration of ["content: '';", 'position: absolute;', 'inset: 0;', 'z-index: -1;', 'border-radius: inherit;']) {
+    assert(sharedLayer.includes(declaration), `both host layers set ${declaration}`);
+  }
+  assert(headerTag.includes('min-h-[62px]'), 'PageHeader is at least 62px by default');
+  assert(!headerTag.includes(' h-[62px]'), "R30: height is a minimum, not a fixed height that could clip wrapped content");
+  assert(headerTag.includes('flex-wrap'), 'R30: the header wraps whatever does not fit on one line, at any width — not only below a single breakpoint');
+
+  const tallHeaderMarkup = renderToStaticMarkup(<PageHeader crumb="TIMESTAMPS" title="Stream Detail" tall />);
+  const tallHeaderTag = /<header[^>]*>/.exec(tallHeaderMarkup)?.[0];
+  assert(tallHeaderTag !== undefined && tallHeaderTag.includes('min-h-[76px]'), 'PageHeader is at least 76px when tall');
+  // Below 1280px the rows get 6px above and below (the bar may wrap there, and THead only sticks
+  // from 1280px up). From 1280px there is no vertical padding at all, so a one-row bar — even a
+  // title block with a meta row, ~55px — is exactly its 62 / 76px minimum, the height THead's
+  // sticky `top-[62px]` counts on.
+  for (const [variant, tag] of [['default', headerTag], ['tall', tallHeaderTag]] as const) {
+    const verticalPadding = headerClasses(tag).filter((name) => /(^|:)(p|py|pt|pb)-/.test(name));
+    assert(
+      verticalPadding.join(' ') === 'max-xl:py-1.5',
+      `the ${variant} PageHeader pads its rows only below 1280px (found: ${verticalPadding.join(' ') || 'none'})`,
+    );
+  }
+
+  const metaMarkup = renderToStaticMarkup(
+    <PageHeader crumb="TIMESTAMPS" title="Stream Detail" meta={<span>2026-09-27</span>} />,
+  );
+  assert(metaMarkup.includes('2026-09-27'), 'PageHeader renders meta when given');
+  assert(
+    metaMarkup.includes('text-meta text-fg-muted'),
+    'M3: the meta row is the spec §4.3 10.5px meta scale, not full-size text that could overflow the bar',
+  );
+
+  const childrenMarkup = renderToStaticMarkup(
+    <PageHeader crumb="TIMESTAMPS" title="Stamp Editor">
+      <button type="button">Pick a stream</button>
+    </PageHeader>,
+  );
+  assert(childrenMarkup.includes('Pick a stream'), 'PageHeader renders children between the title and actions');
+
+  const actionsMarkup = renderToStaticMarkup(
+    <PageHeader crumb="LIBRARY" title="Global Song Library" actions={<button type="button">Review duplicates</button>} />,
+  );
+  assert(actionsMarkup.includes('Review duplicates'), 'PageHeader renders actions');
+
+  console.log(
+    '✓ ui kit: PageHeader is a bottom-hairline-only glass header, sticky from lg up and padded only below 1280px, with a crumb, <h1> title, optional meta row, children and actions, wrapping to fit at any width (R30)',
+  );
+
+  // --- no output anywhere above (Task 8) uses the raw Tailwind palette ---
+
+  const allTask8Markup =
+    sortAsc +
+    sortDesc +
+    sortInactive +
+    sortEndAligned +
+    sortStartAligned +
+    headCellMarkup +
+    headCellEnd +
+    tableMarkup +
+    bulkBarMarkup +
+    pageHeaderMarkup +
+    tallHeaderMarkup +
+    metaMarkup +
+    childrenMarkup +
+    actionsMarkup;
+  assert(!NO_RAW_PALETTE.test(allTask8Markup), 'Task 8 markup uses no raw palette colours');
+
+  console.log('✓ ui kit Task 8: no raw Tailwind palette classes anywhere in PageHeader, BulkBar or the table pieces');
 }
 
 await main();

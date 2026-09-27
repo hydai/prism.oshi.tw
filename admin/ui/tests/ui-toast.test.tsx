@@ -187,6 +187,12 @@ async function main(): Promise<void> {
   assert(ssrSectionTag !== undefined, 'SSR: the section tag is present');
   assert(ssrSectionTag.includes('pointer-events-none'), 'SSR: the empty section is pointer-events-none');
   assert(!/\bgap-2\.5\b/.test(ssrSectionTag), 'SSR: the section itself carries no gap — an empty list must not still add one');
+  // From 1024px the stack centres on the content pane beside the 224px sidebar, like the bulk bar.
+  const sectionClasses = (/class="([^"]*)"/.exec(ssrSectionTag)?.[1] ?? '').split(' ');
+  assert(
+    ['lg:right-auto', 'lg:left-[calc(50%_+_112px)]', 'lg:-translate-x-1/2'].every((name) => sectionClasses.includes(name)),
+    'SSR: at >=1024px the section centres on the content pane (left: 50% + half the 224px sidebar)',
+  );
   assert(!NO_RAW_PALETTE.test(ssr), 'ToastProvider uses no raw Tailwind palette classes');
 
   console.log('✓ SSR: ToastProvider renders its children and an always-present, labelled Notifications popover with both live regions');
