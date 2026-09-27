@@ -85,6 +85,9 @@ const TOKENS: Array<{ name: string; light: string; dark: string }> = [
   { name: 'glass-header', light: 'rgba(255,255,255,.42)', dark: 'rgba(13,10,23,.45)' },
   { name: 'glass-card', light: 'rgba(255,255,255,.62)', dark: 'rgba(28,23,48,.58)' },
   { name: 'glass-pop', light: 'rgba(255,255,255,.9)', dark: 'rgba(36,30,60,.9)' },
+  // The sticky table head (not in the spec table): --glass-pop's colours near-opaque, since it has
+  // no blur and scrolled rows must not read through it.
+  { name: 'thead-bg', light: 'rgba(255,255,255,.97)', dark: 'rgba(36,30,60,.97)' },
   { name: 'glass-edge', light: 'rgba(255,255,255,.8)', dark: 'rgba(255,255,255,.08)' },
   { name: 'field', light: 'rgba(255,255,255,.72)', dark: 'rgba(255,255,255,.05)' },
   { name: 'field-line', light: 'rgba(203,213,225,.7)', dark: 'rgba(255,255,255,.12)' },
@@ -329,6 +332,7 @@ async function main(): Promise<void> {
   assert(colors.track === 'var(--track)', 'colors.track maps to var(--track)');
   assert(colors.selected === 'var(--selected-bg)', 'colors.selected maps to var(--selected-bg)');
   assert(colors['danger-solid'] === 'var(--danger-solid)', "colors['danger-solid'] maps to var(--danger-solid)");
+  assert(colors['thead-bg'] === 'var(--thead-bg)', "colors['thead-bg'] maps to var(--thead-bg)");
 
   const tone = colors.tone as Record<string, Record<string, unknown>> | undefined;
   for (const t of TONES) {

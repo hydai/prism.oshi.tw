@@ -36,6 +36,12 @@ export default {
         },
         'line-soft': 'var(--line-soft)',
         track: 'var(--track)',
+        // Plain (non-blurred) surfaces as bare colour utilities — `.glass-pop` (src/index.css) also
+        // adds a border and backdrop-filter. `glass-pop` is the popover surface itself; `thead-bg`
+        // is the sticky table head's near-opaque version of it: a head has no blur (not on the §4.2
+        // list), so rows scrolling under it must not read through.
+        'glass-pop': 'var(--glass-pop)',
+        'thead-bg': 'var(--thead-bg)',
         selected: 'var(--selected-bg)',
         'danger-solid': 'var(--danger-solid)',
         tone: {
