@@ -76,6 +76,7 @@ export const ADMIN_ROUTES: readonly AdminRoute[] = [
     label: 'Stamp Editor',
     group: 'timestamps',
     icon: 'timer',
+    frame: 'studio',
     render: (user) => <StampEditor user={user} />,
   },
   { path: '/pipeline', label: 'Pipeline', group: 'timestamps', icon: 'workflow', render: () => <Pipeline /> },

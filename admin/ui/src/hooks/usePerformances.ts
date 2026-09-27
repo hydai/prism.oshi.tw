@@ -5,6 +5,7 @@ import { formatSongList } from '../../../shared/parse';
 import { api } from '../api/client';
 import { formatTimestamp } from '../lib/format-timestamp';
 import type { YouTubePlayerHandle } from '../components/YouTubePlayer';
+import { windowConfirm, type ConfirmFn } from '../components/ui/confirm-core';
 import type { ShowToast } from './useToast';
 import { useAsyncScope } from './useAsyncScope';
 import type { CaptureScope } from '../../../../lib/async-scope';
@@ -29,6 +30,8 @@ export interface UsePerformancesOptions {
   /** Fires the moment a song is created, before the reload — the pages close their modal here. */
   onSongCreated?: () => void;
   captureScope?: CaptureScope;
+  /** Asks before a bulk clear: the page's `useConfirm()`; defaults to the native dialog. */
+  confirm?: ConfirmFn;
 }
 
 /** Every stamping action both editors perform on a stream's performances. */
@@ -68,6 +71,7 @@ export function usePerformances({
   onCountsChanged,
   onSongCreated,
   captureScope,
+  confirm = windowConfirm,
 }: UsePerformancesOptions): PerformanceActions {
   const lifetime = useAsyncScope();
   const capture = useCallback(() => {
@@ -168,8 +172,14 @@ export function usePerformances({
 
   const clearAllEndTimestamps = useCallback(async () => {
     if (!streamId) return;
-    if (!confirm('Clear ALL end timestamps for this stream?')) return;
+    // Captured before asking: a stream switched while the dialog was up must not be cleared.
     const isCurrent = capture();
+    const confirmed = await confirm({
+      title: 'Clear ALL end timestamps for this stream?',
+      confirmLabel: 'Clear all',
+      tone: 'danger',
+    });
+    if (!confirmed || !isCurrent()) return;
     try {
       const { cleared } = await api.clearAllEndTimestamps(streamId);
       if (!isCurrent()) return;
@@ -180,7 +190,7 @@ export function usePerformances({
       if (!isCurrent()) return;
       showToast(err instanceof Error ? err.message : 'Failed to clear', true);
     }
-  }, [streamId, showToast, patchAllRows, onCountsChanged, capture]);
+  }, [streamId, showToast, patchAllRows, onCountsChanged, capture, confirm]);
 
   const addSong = useCallback(
     async (title: string, artist: string) => {
