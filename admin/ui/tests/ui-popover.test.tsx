@@ -212,6 +212,45 @@ async function main(): Promise<void> {
 
   console.log('✓ SSR: a closed Popover renders its hidden panel and aria-expanded="false"; Menu items are in the markup');
 
+  // --- className: appended to the wrapper, whose own classes stay `relative inline-flex` ---
+
+  const plainWrapper = renderToStaticMarkup(
+    <Popover kind="menu" label="Plain" trigger={({ triggerProps }) => <button {...triggerProps}>Plain</button>}>
+      <p>Panel</p>
+    </Popover>,
+  );
+  assert(plainWrapper.startsWith('<div class="relative inline-flex">'), 'without className the wrapper is exactly `relative inline-flex`');
+  const stretchedWrapper = renderToStaticMarkup(
+    <Popover
+      kind="listbox"
+      label="Streamer"
+      className="w-full"
+      trigger={({ triggerProps }) => <button {...triggerProps}>Streamer</button>}
+    >
+      <p>Panel</p>
+    </Popover>,
+  );
+  assert(
+    stretchedWrapper.startsWith('<div class="relative inline-flex w-full">'),
+    'className is appended after the wrapper classes, so a trigger can stretch to full width',
+  );
+  const containerAnchored = renderToStaticMarkup(
+    <Popover
+      kind="menu"
+      label="New"
+      anchor="container"
+      trigger={({ triggerProps }) => <button {...triggerProps}>New</button>}
+    >
+      <p>Panel</p>
+    </Popover>,
+  );
+  assert(
+    containerAnchored.startsWith('<div class="inline-flex">'),
+    'anchor="container" leaves the wrapper unpositioned, so the panel hangs from the nearest positioned ancestor',
+  );
+
+  console.log('✓ SSR: Popover appends an optional className to its wrapper, and anchor="container" drops its positioning');
+
   // --- Live: open, focus into the panel, Escape, outside pointerdown, focus leaving ---
 
   installDom();

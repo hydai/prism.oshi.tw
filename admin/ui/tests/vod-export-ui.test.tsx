@@ -58,16 +58,16 @@ async function main(): Promise<void> {
     createVodExportPageState,
     vodExportPageReducer,
   } = await import('../src/pages/vod-export-state');
-  const { getVisibleNavItems } = await import('../src/lib/navigation');
+  const { getNavGroups } = await import('../src/lib/navigation');
 
   const curator: AuthUser = { email: 'curator@example.com', role: 'curator' };
   const contributor: AuthUser = { email: 'contributor@example.com', role: 'contributor' };
   assert(
-    getVisibleNavItems(curator).some((item) => item.to === '/vod-export'),
+    getNavGroups(curator).flatMap((group) => group.items).some((item) => item.to === '/vod-export'),
     'curators see the VOD Export navigation entry',
   );
   assert(
-    !getVisibleNavItems(contributor).some((item) => item.to === '/vod-export'),
+    !getNavGroups(contributor).flatMap((group) => group.items).some((item) => item.to === '/vod-export'),
     'contributors do not see the VOD Export navigation entry',
   );
 

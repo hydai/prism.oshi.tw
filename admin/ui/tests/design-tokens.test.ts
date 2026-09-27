@@ -127,6 +127,13 @@ const TOKENS: Array<{ name: string; light: string; dark: string }> = [
   // Scrim behind the dialog and the drawer (task 6, ruling R17): not in the spec table; the value
   // both scrims in the approved mockup 2 use.
   { name: 'scrim', light: 'rgba(30,27,46,.28)', dark: 'rgba(0,0,0,.5)' },
+  // Streamer avatar gradients (spec §6.3 "deterministic gradient"): mockup 2's `.ava` .. `.ava.a5`,
+  // the same in both themes.
+  { name: 'avatar-1', light: 'linear-gradient(135deg, #F9A8D4, #93C5FD)', dark: 'linear-gradient(135deg, #F9A8D4, #93C5FD)' },
+  { name: 'avatar-2', light: 'linear-gradient(135deg, #FDBA74, #F472B6)', dark: 'linear-gradient(135deg, #FDBA74, #F472B6)' },
+  { name: 'avatar-3', light: 'linear-gradient(135deg, #93C5FD, #A78BFA)', dark: 'linear-gradient(135deg, #93C5FD, #A78BFA)' },
+  { name: 'avatar-4', light: 'linear-gradient(135deg, #6EE7B7, #60A5FA)', dark: 'linear-gradient(135deg, #6EE7B7, #60A5FA)' },
+  { name: 'avatar-5', light: 'linear-gradient(135deg, #C4B5FD, #F9A8D4)', dark: 'linear-gradient(135deg, #C4B5FD, #F9A8D4)' },
 ];
 
 /** Spec §4.1 status tones — all 7 × {bg, fg, line}, copied verbatim. */
@@ -350,6 +357,12 @@ async function main(): Promise<void> {
   const backgroundImage = config.theme?.extend?.backgroundImage ?? {};
   assert(backgroundImage.canvas === 'var(--canvas)', 'backgroundImage.canvas maps to var(--canvas)');
   assert(backgroundImage.accent === 'var(--accent-gradient)', 'backgroundImage.accent maps to var(--accent-gradient)');
+  for (let index = 1; index <= 5; index += 1) {
+    assert(
+      backgroundImage[`avatar-${index}`] === `var(--avatar-${index})`,
+      `backgroundImage['avatar-${index}'] maps to var(--avatar-${index})`,
+    );
+  }
 
   const boxShadow = config.theme?.extend?.boxShadow ?? {};
   assert(boxShadow.card === 'var(--shadow-card)', 'boxShadow.card maps to var(--shadow-card)');

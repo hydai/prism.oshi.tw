@@ -64,7 +64,7 @@ async function main(): Promise<void> {
   });
 
   const { api } = await import('../src/api/client');
-  const { getVisibleNavItems } = await import('../src/lib/navigation');
+  const { getNavGroups } = await import('../src/lib/navigation');
   const { default: GlobalWorks } = await import('../src/pages/GlobalWorks');
   const { SortHeader } = await import('../src/components/SortHeader');
 
@@ -77,11 +77,11 @@ async function main(): Promise<void> {
   const curator: AuthUser = { email: 'curator@example.com', role: 'curator' };
   const contributor: AuthUser = { email: 'contributor@example.com', role: 'contributor' };
   assert(
-    getVisibleNavItems(curator).some((item) => item.to === '/works'),
+    getNavGroups(curator).flatMap((group) => group.items).some((item) => item.to === '/works'),
     'curators see the Global Library navigation entry',
   );
   assert(
-    !getVisibleNavItems(contributor).some((item) => item.to === '/works'),
+    !getNavGroups(contributor).flatMap((group) => group.items).some((item) => item.to === '/works'),
     'contributors do not see the Global Library navigation entry',
   );
 

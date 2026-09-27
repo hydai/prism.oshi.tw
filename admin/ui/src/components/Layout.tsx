@@ -1,101 +1,80 @@
-import { NavLink, useNavigate } from 'react-router-dom';
-import { useEffect, useEffectEvent, useId, useState, type ReactNode } from 'react';
-import type { AuthUser, StreamerInfo } from '../../../shared/types';
-import { api, getCurrentStreamer, setCurrentStreamer } from '../api/client';
-import { useCurrentStreamer } from '../hooks/useCurrentStreamer';
-import { getVisibleNavItems } from '../lib/navigation';
+import { useEffect, useRef, useState, type ReactNode } from 'react';
+import { useLocation } from 'react-router-dom';
+import type { AuthUser } from '../../../shared/types';
+import { CanvasBackground } from './shell/CanvasBackground';
+import { Drawer } from './shell/Drawer';
+import { InboxCountsProvider } from './shell/InboxCounts';
+import { MobileTopBar } from './shell/MobileTopBar';
+import { Sidebar } from './shell/Sidebar';
+import { StreamersProvider } from './shell/Streamers';
 
+/** Tailwind's `lg`: from here up the sidebar is an `<aside>`, below it the top bar and the drawer. */
+const SIDEBAR_QUERY = '(min-width: 1024px)';
+
+/**
+ * The glass shell: the prism canvas, the sidebar (a 224 px `<aside>` from 1024 px up; below that
+ * the top bar and the drawer) and `<main>`, the one scroll container. Nothing between `<main>` and
+ * a page blurs, transforms or filters, so a page's fixed layers (the bulk bar) stay on the
+ * viewport and its sticky ones (the page header) stick to `<main>`. The sidebar sits above the
+ * page's sticky header (z-20) so its popovers can open over the page.
+ *
+ * The sidebar's glass is `.glass-sidebar-host` (src/index.css): the glass-sidebar surface on a
+ * `::before` layer, so the `<aside>` itself has no `backdrop-filter` and is not the backdrop root
+ * of the streamer switcher / New menu panels it opens — their blur reaches the page behind them.
+ * `before:border-y-0 before:border-l-0`: the layer draws a border on all four sides, but the
+ * sidebar sits at the page edge and only shows its right one.
+ */
 export default function Layout({ user, children }: { user: AuthUser; children: ReactNode }) {
-  const navigate = useNavigate();
-  const streamer = useCurrentStreamer();
-  const [streamers, setStreamers] = useState<StreamerInfo[]>([]);
-  const streamerSelectId = useId();
-  const navigateToDashboard = useEffectEvent(() => navigate('/'));
+  const location = useLocation();
+  const menuButtonRef = useRef<HTMLButtonElement>(null);
+  const asideRef = useRef<HTMLElement>(null);
+  const [drawerOpen, setDrawerOpen] = useState(false);
+  // Any navigation closes the drawer: a link in it, the streamer switcher falling back to a list,
+  // the dashboard fallback, the browser's Back button. Adjusted while rendering, not in an effect.
+  const [drawerLocationKey, setDrawerLocationKey] = useState(location.key);
+  if (drawerLocationKey !== location.key) {
+    setDrawerLocationKey(location.key);
+    setDrawerOpen(false);
+  }
+  const closeDrawer = () => setDrawerOpen(false);
 
+  // Widened past the breakpoint with the drawer open: the sidebar takes over. Focus moves to its
+  // current link first — the top bar's menu button, where closing would send it, is hidden now.
   useEffect(() => {
-    api.listStreamers()
-      .then((res) => {
-        setStreamers(res.data);
-        // Auto-correct if stored streamer is not in the approved list
-        const first = res.data[0];
-        if (first && !res.data.some((s) => s.slug === getCurrentStreamer())) {
-          setCurrentStreamer(first.slug);
-          navigateToDashboard();
-        }
-      })
-      .catch(() => {
-        // Fallback: keep current localStorage value
-      });
-  }, []);
+    if (!drawerOpen) return undefined;
+    const media = window.matchMedia(SIDEBAR_QUERY);
+    const handleChange = (event: MediaQueryListEvent) => {
+      if (!event.matches) return;
+      const aside = asideRef.current;
+      (aside?.querySelector<HTMLElement>('a[aria-current="page"]') ?? aside?.querySelector<HTMLElement>('a[href]'))?.focus();
+      setDrawerOpen(false);
+    };
+    media.addEventListener('change', handleChange);
+    return () => media.removeEventListener('change', handleChange);
+  }, [drawerOpen]);
 
   return (
-    <div className="flex h-screen">
-      {/* Sidebar */}
-      <aside className="flex w-60 flex-shrink-0 flex-col border-r border-slate-200 bg-slate-900 text-white">
-        {/* Header */}
-        <div className="border-b border-slate-700 p-4">
-          <h1 className="text-lg font-bold tracking-tight">Prism</h1>
-          <p className="text-sm text-slate-400">Admin</p>
-        </div>
-
-        {/* Streamer selector */}
-        <div className="border-b border-slate-700 px-4 py-3">
-          <label
-            htmlFor={streamerSelectId}
-            className="mb-1 block text-xs font-medium uppercase tracking-wider text-slate-500"
+    <InboxCountsProvider>
+      <StreamersProvider>
+        {/* 100dvh where supported, so a phone's browser bars never cover the end of <main>. (A
+            plain `h-screen h-dvh` would not do: Tailwind emits .h-dvh before .h-screen.) */}
+        <div className="isolate flex h-screen supports-[height:100dvh]:h-dvh">
+          <CanvasBackground />
+          <aside
+            ref={asideRef}
+            className="glass-sidebar-host relative z-[25] hidden w-[224px] shrink-0 flex-col before:border-y-0 before:border-l-0 lg:flex"
           >
-            Streamer
-          </label>
-          <select
-            id={streamerSelectId}
-            value={streamer}
-            onChange={(e) => {
-              setCurrentStreamer(e.target.value);
-              navigate('/');
-            }}
-            className="w-full rounded-md border border-slate-600 bg-slate-800 px-2 py-1.5 text-sm text-white focus:border-blue-500 focus:outline-none"
-          >
-            {streamers.length > 0 ? (
-              streamers.map((s) => (
-                <option key={s.slug} value={s.slug}>
-                  {s.displayName}
-                </option>
-              ))
-            ) : (
-              <option value={streamer}>{streamer}</option>
-            )}
-          </select>
+            <Sidebar user={user} />
+          </aside>
+          <div className="flex min-w-0 flex-1 flex-col">
+            <MobileTopBar menuOpen={drawerOpen} onOpenMenu={() => setDrawerOpen(true)} menuButtonRef={menuButtonRef} />
+            <main className="min-h-0 min-w-0 flex-1 overflow-y-auto">{children}</main>
+          </div>
+          <Drawer open={drawerOpen} onClose={closeDrawer} returnFocusRef={menuButtonRef}>
+            <Sidebar user={user} onNavigate={closeDrawer} onClose={closeDrawer} />
+          </Drawer>
         </div>
-
-        {/* Nav */}
-        <nav className="flex-1 space-y-1 p-3">
-          {getVisibleNavItems(user).map(({ to, label }) => (
-            <NavLink
-              key={to}
-              to={to}
-              end={to === '/'}
-              className={({ isActive }) =>
-                `block rounded-md px-3 py-2 text-sm font-medium transition-colors ${
-                  isActive
-                    ? 'bg-slate-700 text-white'
-                    : 'text-slate-300 hover:bg-slate-800 hover:text-white'
-                }`
-              }
-            >
-              {label}
-            </NavLink>
-          ))}
-        </nav>
-
-        {/* User info */}
-        <div className="border-t border-slate-700 p-4">
-          <p className="truncate text-sm text-slate-300">{user.email}</p>
-          <p className="mt-0.5 text-xs capitalize text-slate-500">{user.role}</p>
-        </div>
-      </aside>
-
-      {/* Main content */}
-      <main className="flex-1 overflow-y-auto bg-slate-50 p-6">{children}</main>
-    </div>
+      </StreamersProvider>
+    </InboxCountsProvider>
   );
 }

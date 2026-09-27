@@ -3,13 +3,16 @@ import type { AuthUser } from '../../../shared/types';
 import type { IconName } from '../components/ui/Icon';
 import { ADMIN_ROUTES, NAV_GROUPS, type AdminRoute, type NavGroupId } from './routes';
 
-interface NavigationItem {
+export interface NavGroupItem {
   to: string;
   label: string;
-}
-
-interface NavGroupItem extends NavigationItem {
   icon: IconName;
+  /**
+   * Current only on this exact path: `/`, and a path another listed item nests under
+   * (`/works` next to `/works/review`), so a parent never lights up with its child. Every other
+   * item stays current on its detail pages (`/streams` on `/streams/:id`).
+   */
+  end: boolean;
 }
 
 interface NavGroup {
@@ -18,7 +21,10 @@ interface NavGroup {
   items: NavGroupItem[];
 }
 
-interface NewMenuItem extends NavGroupItem {
+interface NewMenuItem {
+  to: string;
+  label: string;
+  icon: IconName;
   description: string;
 }
 
@@ -33,13 +39,20 @@ function isVisible(route: AdminRoute, user: AuthUser): boolean {
  * open. A section with nothing visible in it is dropped.
  */
 export function getNavGroups(user: AuthUser): NavGroup[] {
-  const groups: NavGroup[] = [];
+  const listed: Array<{ group: NavGroupId; to: string; label: string; icon: IconName }> = [];
+  for (const route of ADMIN_ROUTES) {
+    if (route.group !== undefined && route.label !== undefined && route.icon !== undefined && isVisible(route, user)) {
+      listed.push({ group: route.group, to: route.path, label: route.label, icon: route.icon });
+    }
+  }
+  const hasNestedItem = (to: string) => listed.some((item) => item.to.startsWith(`${to}/`));
 
+  const groups: NavGroup[] = [];
   for (const { id, label } of NAV_GROUPS) {
     const items: NavGroupItem[] = [];
-    for (const route of ADMIN_ROUTES) {
-      if (route.group === id && route.label !== undefined && route.icon !== undefined && isVisible(route, user)) {
-        items.push({ to: route.path, label: route.label, icon: route.icon });
+    for (const item of listed) {
+      if (item.group === id) {
+        items.push({ to: item.to, label: item.label, icon: item.icon, end: item.to === '/' || hasNestedItem(item.to) });
       }
     }
     if (items.length > 0) {
@@ -48,15 +61,6 @@ export function getNavGroups(user: AuthUser): NavGroup[] {
   }
 
   return groups;
-}
-
-/**
- * The sidebar, flattened: a route with a `group` is listed, grouped in
- * `NAV_GROUPS` order and in manifest order within a group, curator filter as
- * today. A link can never point at a route that does not exist.
- */
-export function getVisibleNavItems(user: AuthUser): NavigationItem[] {
-  return getNavGroups(user).flatMap((group) => group.items.map(({ to, label }) => ({ to, label })));
 }
 
 /** The "+ New" menu: every route that can be created from it, in manifest order. */

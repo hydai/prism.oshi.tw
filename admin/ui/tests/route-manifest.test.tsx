@@ -93,7 +93,7 @@ async function main(): Promise<void> {
   installLocalStorage();
 
   const { ADMIN_ROUTES } = await import('../src/lib/routes');
-  const { getNewMenuItems, getVisibleNavItems } = await import('../src/lib/navigation');
+  const { getNavGroups, getNewMenuItems } = await import('../src/lib/navigation');
   const { AppRoutes } = await import('../src/App');
 
   const curator: AuthUser = { email: 'curator@example.com', role: 'curator' };
@@ -116,7 +116,7 @@ async function main(): Promise<void> {
 
   // --- The sidebar is derived from it, and every label leads somewhere ---
 
-  const curatorNav = getVisibleNavItems(curator);
+  const curatorNav = getNavGroups(curator).flatMap((group) => group.items);
   assert(
     JSON.stringify(curatorNav.map((item) => [item.to, item.label])) === JSON.stringify(CURATOR_NAV),
     'curators see the same navigation, in the same order',
@@ -125,7 +125,7 @@ async function main(): Promise<void> {
     assert(paths.includes(item.to), `navigation entry ${item.to} has a route`);
   }
 
-  const contributorNav = getVisibleNavItems(contributor);
+  const contributorNav = getNavGroups(contributor).flatMap((group) => group.items);
   const contributorExpected = CURATOR_NAV.filter(([to]) => !CURATOR_ONLY_PATHS.includes(to as string));
   assert(
     JSON.stringify(contributorNav.map((item) => [item.to, item.label])) === JSON.stringify(contributorExpected),
