@@ -1,6 +1,32 @@
 <!doctype html>
 <html lang="en">
   <head>
+    <script>
+      (function () {
+        try {
+          var KEY = 'prism_admin_theme';
+          var pref = 'system';
+          try {
+            var stored = localStorage.getItem(KEY);
+            if (stored === 'light' || stored === 'dark' || stored === 'system') {
+              pref = stored;
+            }
+          } catch (e) {}
+          var prefersDark = false;
+          try {
+            prefersDark = matchMedia('(prefers-color-scheme: dark)').matches;
+          } catch (e) {}
+          var resolved = pref === 'system' ? (prefersDark ? 'dark' : 'light') : pref;
+          var root = document.documentElement;
+          if (resolved === 'dark') {
+            root.classList.add('dark');
+          } else {
+            root.classList.remove('dark');
+          }
+          root.style.colorScheme = resolved;
+        } catch (e) {}
+      })();
+    </script>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Prism Admin</title>
