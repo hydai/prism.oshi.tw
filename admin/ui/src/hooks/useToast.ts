@@ -1,17 +1,7 @@
-import { useCallback, useRef, useState } from 'react';
-import type { ToastState } from '../components/stamp/Toast';
-
+/**
+ * The stamping pages' toast signature: `(message, isError?)`. `ui/toast.tsx`'s `useShowToast()`
+ * returns a function with this same shape, so every call site written against it needs no change.
+ * The hook that used to live here (paired with the legacy `components/stamp/Toast.tsx` bubble) is
+ * gone — Stream Detail was its last caller, and it now renders through the kit's `ToastProvider`.
+ */
 export type ShowToast = (message: string, isError?: boolean) => void;
-
-/** Toast state for the stamping pages: the key counter makes a repeated message re-appear. */
-export function useToast(): { toast: ToastState | null; showToast: ShowToast } {
-  const [toast, setToast] = useState<ToastState | null>(null);
-  const toastKeyRef = useRef(0);
-
-  const showToast = useCallback((message: string, isError = false) => {
-    toastKeyRef.current += 1;
-    setToast({ message, isError, key: toastKeyRef.current });
-  }, []);
-
-  return { toast, showToast };
-}

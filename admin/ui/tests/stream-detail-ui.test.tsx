@@ -1,21 +1,35 @@
+import { readFileSync } from 'node:fs';
 import * as React from 'react';
 import { act } from 'react';
 import { createRoot } from 'react-dom/client';
 import { renderToStaticMarkup } from 'react-dom/server';
 import { Window } from 'happy-dom';
 import type { HTMLElement as DomElement } from 'happy-dom';
-import { MemoryRouter, Route, Routes } from 'react-router-dom';
+import { MemoryRouter, Route, Routes, useLocation } from 'react-router-dom';
 import type { AuthUser, ListResponse, StampPerformance, Stream, StreamDetail } from '../../shared/types';
 import { StreamDetailView } from '../src/pages/StreamDetail';
 import StreamDetailPage from '../src/pages/StreamDetail';
 import type { StreamDetailController } from '../src/pages/StreamDetail';
 import type { YouTubePlayerHandle } from '../src/components/YouTubePlayer';
 import { InlineEdit } from '../src/components/stamp/InlineEdit';
+import { ConfirmProvider } from '../src/components/ui/confirm';
+import { ToastProvider } from '../src/components/ui/toast';
 import { handleInlineEditKeyDown } from '../src/lib/inline-edit';
 
 function assert(condition: boolean, message: string): asserts condition {
   if (!condition) throw new Error(message);
 }
+
+// --- Source: the legacy window.confirm and the legacy toast bubble are gone ---
+
+const streamDetailSource = readFileSync(new URL('../src/pages/StreamDetail.tsx', import.meta.url), 'utf8');
+assert(!streamDetailSource.includes('window.confirm'), 'StreamDetail no longer calls window.confirm directly');
+assert(
+  !streamDetailSource.includes("from '../components/stamp/Toast'"),
+  'StreamDetail no longer imports the legacy Toast bubble',
+);
+
+console.log('✓ StreamDetail no longer references window.confirm or the legacy Toast bubble in its source');
 
 const asyncNoop = async () => {};
 const noop = () => {};
@@ -365,11 +379,17 @@ const betaRows = [
 const detailAlpha: StreamDetail = { ...streamAlpha, performances: alphaRows };
 const detailBeta: StreamDetail = { ...streamBeta, performances: betaRows };
 
-/** Every request the page makes, in order — the proof of what a navigation refetches. */
-const navRequests: string[] = [];
+/** Every request the page makes, in order, with its method — the proof of what a navigation
+ * refetches, and (for the delete-stream dialog below) that Cancel sends nothing while confirming
+ * sends exactly one DELETE. */
+const navRequests: Array<{ method: string; pathname: string }> = [];
 
 function countRequests(pathname: string): number {
-  return navRequests.filter((seen) => seen === pathname).length;
+  return navRequests.filter((seen) => seen.pathname === pathname).length;
+}
+
+function countRequestsWithMethod(method: string, pathname: string): number {
+  return navRequests.filter((seen) => seen.method === method && seen.pathname === pathname).length;
 }
 
 // Beta's detail is held until the test releases it, which puts the page deterministically in the
@@ -377,9 +397,10 @@ function countRequests(pathname: string): number {
 let releaseBetaDetail = (): void => {};
 const betaDetailHeld = new Promise<void>((resolve) => { releaseBetaDetail = () => resolve(); });
 
-const navFetch: typeof fetch = async (input) => {
+const navFetch: typeof fetch = async (input, init) => {
   const { pathname } = new URL(String(input), 'http://localhost/');
-  navRequests.push(pathname);
+  const method = init?.method ?? 'GET';
+  navRequests.push({ method, pathname });
   if (pathname === `/api/streams/${streamBeta.id}/detail`) await betaDetailHeld;
   const payload = ((): unknown => {
     // Newest first, as the real list endpoint is: Alpha has no previous stream, Beta follows it.
@@ -389,9 +410,10 @@ const navFetch: typeof fetch = async (input) => {
     if (pathname === `/api/streams/${streamBeta.id}/detail`) return { ...detailBeta, performances: [...betaRows] };
     if (pathname === `/api/streams/${streamAlpha.id}/status`) return { ...streamAlpha, status: 'excluded' };
     if (pathname === '/api/performances/perf-nav-a2/status') return { ok: true };
+    if (method === 'DELETE' && pathname === `/api/streams/${streamAlpha.id}`) return { ok: true, songs: 0, performances: 3 };
     return undefined;
   })();
-  if (payload === undefined) throw new Error(`unstubbed request: ${pathname}`);
+  if (payload === undefined) throw new Error(`unstubbed request: ${method} ${pathname}`);
   return { ok: true, status: 200, json: () => Promise.resolve(payload) } as unknown as Response;
 };
 Object.defineProperty(globalThis, 'fetch', { value: navFetch, configurable: true, writable: true });
@@ -437,12 +459,18 @@ navWin.document.body.appendChild(navContainer);
 const navRoot = createRoot(navContainer as unknown as HTMLElement);
 await act(async () => {
   navRoot.render(
-    // `?performance=` is the page's deep link: it opens on that row of the stream in the path.
-    <MemoryRouter initialEntries={[`/streams/${streamAlpha.id}?performance=perf-nav-a3`]}>
-      <Routes>
-        <Route path="/streams/:id" element={<StreamDetailPage user={curator} />} />
-      </Routes>
-    </MemoryRouter>,
+    // The toast now renders from ToastProvider, and confirms route through ConfirmProvider — the
+    // same nesting App.tsx mounts around every page.
+    <ToastProvider>
+      <ConfirmProvider>
+        {/* `?performance=` is the page's deep link: it opens on that row of the stream in the path. */}
+        <MemoryRouter initialEntries={[`/streams/${streamAlpha.id}?performance=perf-nav-a3`]}>
+          <Routes>
+            <Route path="/streams/:id" element={<StreamDetailPage user={curator} />} />
+          </Routes>
+        </MemoryRouter>
+      </ConfirmProvider>
+    </ToastProvider>,
   );
 });
 await settle();
@@ -511,10 +539,82 @@ assert(
   'prev/next navigation still works after the move, from the stream list fetched on the first stream',
 );
 
+console.log('✓ StreamDetail starts each stream fresh, keeps the toast and the stream list across the move, and lets a pick outrank the deep link');
+
+// --- Delete stream: the header action confirms through the kit dialog, not window.confirm ---
+//
+// A second root in the same window, served by the same navFetch: the flow above has since moved
+// on to Beta, and confirming a delete here navigates away — which must not reach into that flow's
+// own assertions, so this gets its own fresh mount, back on Alpha.
+
+/** Renders only the path: enough to prove a confirmed delete navigated to /streams. */
+function StreamsListProbe() {
+  const location = useLocation();
+  return <output id="streams-list-location">{location.pathname}</output>;
+}
+
+const deleteContainer = navWin.document.createElement('div');
+navWin.document.body.appendChild(deleteContainer);
+const deleteRoot = createRoot(deleteContainer as unknown as HTMLElement);
+await act(async () => {
+  deleteRoot.render(
+    <ToastProvider>
+      <ConfirmProvider>
+        <MemoryRouter initialEntries={[`/streams/${streamAlpha.id}`]}>
+          <Routes>
+            <Route path="/streams/:id" element={<StreamDetailPage user={curator} />} />
+            <Route path="/streams" element={<StreamsListProbe />} />
+          </Routes>
+        </MemoryRouter>
+      </ConfirmProvider>
+    </ToastProvider>,
+  );
+});
+await settle();
+assert(deleteContainer.innerHTML.includes('Nav Stream Alpha'), 'the delete-stream mount loads Alpha fresh');
+
+await clickButtonNamed(deleteContainer, 'Delete stream');
+const deleteDialog = deleteContainer.querySelector<DomElement>('dialog[open]');
+assert(deleteDialog !== null, 'Delete stream opens a confirm dialog');
+assert(
+  deleteDialog.textContent.includes('Delete stream "Nav Stream Alpha"?'),
+  'the confirm dialog is titled with the stream being deleted',
+);
+
+const cancelButton = [...deleteDialog.querySelectorAll<DomElement>('button')].find(
+  (candidate) => candidate.textContent.trim() === 'Cancel',
+);
+await clickNode(cancelButton, 'the dialog’s Cancel button');
+assert(countRequestsWithMethod('DELETE', `/api/streams/${streamAlpha.id}`) === 0, 'Cancel sends no DELETE');
+assert(deleteContainer.querySelector('dialog[open]') === null, 'Cancel closes the dialog');
+
+await clickButtonNamed(deleteContainer, 'Delete stream');
+const reopenedDialog = deleteContainer.querySelector<DomElement>('dialog[open]');
+assert(reopenedDialog !== null, 'Delete stream re-opens the confirm dialog');
+// The header button and the dialog's own confirm button share the label "Delete stream" — scoped
+// to the open dialog, so this clicks the confirm button and not the header button behind it.
+const confirmDeleteButton = [...reopenedDialog.querySelectorAll<DomElement>('button')].find(
+  (candidate) => candidate.textContent.trim() === 'Delete stream',
+);
+await clickNode(confirmDeleteButton, 'the dialog’s own Delete stream button');
+assert(
+  countRequestsWithMethod('DELETE', `/api/streams/${streamAlpha.id}`) === 1,
+  'confirming sends exactly one DELETE',
+);
+assert(
+  deleteContainer.querySelector('#streams-list-location')?.textContent === '/streams',
+  'confirming navigates to /streams',
+);
+
+await act(async () => {
+  deleteRoot.unmount();
+});
+deleteContainer.remove();
+
 await act(async () => {
   navRoot.unmount();
 });
 navContainer.remove();
 await navWin.happyDOM.close();
 
-console.log('✓ StreamDetail starts each stream fresh, keeps the toast and the stream list across the move, and lets a pick outrank the deep link');
+console.log('✓ Delete stream confirms through the kit dialog: Cancel sends no DELETE, confirming sends exactly one and leaves the router at /streams');
