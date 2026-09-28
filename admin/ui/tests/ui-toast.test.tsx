@@ -2,15 +2,13 @@ import { act, StrictMode, useEffect, useState, type ComponentProps } from 'react
 import { renderToStaticMarkup } from 'react-dom/server';
 import { click, installDom, mount, settle } from './helpers/dom';
 import { ToastProvider, useShowToast, useToast } from '../src/components/ui/toast';
+import { NO_RAW_PALETTE } from './helpers/palette';
 
 function assert(condition: boolean, message: string): asserts condition {
   if (!condition) {
     throw new Error(message);
   }
 }
-
-/** Spec §4.1: colours only through the token utilities, never the raw Tailwind palette. */
-const NO_RAW_PALETTE = /\b(bg|text|border)-(slate|gray|blue|green|red|amber|yellow)-\d/;
 
 // The `timers` shape `ToastProvider` takes, derived from its own prop type rather than
 // redeclared, so the two can never drift apart.

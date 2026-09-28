@@ -3,15 +3,13 @@ import { renderToStaticMarkup } from 'react-dom/server';
 import { click, installDom, mount, pointerDown, press, settle, typeInto } from './helpers/dom';
 import { Menu, Popover, type MenuItem } from '../src/components/ui/Popover';
 import { SearchableList } from '../src/components/ui/SearchableList';
+import { NO_RAW_PALETTE } from './helpers/palette';
 
 function assert(condition: boolean, message: string): asserts condition {
   if (!condition) {
     throw new Error(message);
   }
 }
-
-/** Spec §4.1: colours only through the token utilities, never the raw Tailwind palette. */
-const NO_RAW_PALETTE = /\b(bg|text|border)-(slate|gray|blue|green|red|amber|yellow)-\d/;
 
 /**
  * Review Focus 4: a 120-character stream title mixing CJK and emoji. Built and cut in code

@@ -4,6 +4,7 @@ import { renderToStaticMarkup } from 'react-dom/server';
 import { MemoryRouter, Route, Routes, useLocation, useNavigate } from 'react-router-dom';
 import type { AuthUser, StreamerInfo } from '../../shared/types';
 import { click, installDom, mount, press, settle, typeInto } from './helpers/dom';
+import { NO_RAW_PALETTE } from './helpers/palette';
 
 function assert(condition: boolean, message: string): asserts condition {
   if (!condition) {
@@ -36,9 +37,6 @@ function installLocalStorage(): void {
 
   Object.defineProperty(globalThis, 'localStorage', { value: stub, configurable: true });
 }
-
-/** Spec §4.1: colours only through the token utilities, never the raw Tailwind palette. */
-const NO_RAW_PALETTE = /\b(bg|text|border)-(slate|gray|blue|green|red|amber|yellow)-\d/;
 
 const GROUP_LABELS = ['Overview', 'Catalog', 'Timestamps', 'Library', 'Inbox', 'Publish'];
 

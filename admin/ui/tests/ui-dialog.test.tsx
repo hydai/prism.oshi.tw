@@ -5,15 +5,13 @@ import { Dialog } from '../src/components/ui/Dialog';
 import { ConfirmProvider, useConfirm } from '../src/components/ui/confirm';
 import { windowConfirm, type ConfirmFn, type ConfirmOptions } from '../src/components/ui/confirm-core';
 import { Menu, Popover } from '../src/components/ui/Popover';
+import { NO_RAW_PALETTE } from './helpers/palette';
 
 function assert(condition: boolean, message: string): asserts condition {
   if (!condition) {
     throw new Error(message);
   }
 }
-
-/** Spec §4.1: colours only through the token utilities, never the raw Tailwind palette. */
-const NO_RAW_PALETTE = /\b(bg|text|border)-(slate|gray|blue|green|red|amber|yellow)-\d/;
 
 const DELETE_SONG: ConfirmOptions = {
   title: 'Delete #10 秒針を噛む?',
