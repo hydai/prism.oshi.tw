@@ -70,7 +70,7 @@ export const ADMIN_ROUTES: readonly AdminRoute[] = [
     icon: 'radio',
     render: (user) => <StreamsList user={user} />,
   },
-  { path: '/streams/:id', render: (user) => <StreamDetailPage user={user} /> },
+  { path: '/streams/:id', frame: 'studio', render: (user) => <StreamDetailPage user={user} /> },
   {
     path: '/stamp',
     label: 'Stamp Editor',

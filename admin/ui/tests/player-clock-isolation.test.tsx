@@ -196,6 +196,9 @@ const detailController: StreamDetailController = {
   seekToStart: noop,
   seekToEnd: noop,
   seekTo: noop,
+  isNarrow: false,
+  navigate: noop,
+  pageRef: React.createRef<HTMLDivElement>(),
 };
 
 // --- Helpers ---

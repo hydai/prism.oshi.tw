@@ -1,3 +1,4 @@
+import { deepStrictEqual } from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
 import * as React from 'react';
 import { act } from 'react';
@@ -6,15 +7,19 @@ import { renderToStaticMarkup } from 'react-dom/server';
 import { Window } from 'happy-dom';
 import type { HTMLElement as DomElement } from 'happy-dom';
 import { MemoryRouter, Route, Routes, useLocation } from 'react-router-dom';
-import type { AuthUser, ListResponse, StampPerformance, Stream, StreamDetail } from '../../shared/types';
+import type { AuthUser, ListResponse, StampPerformance, Status, Stream, StreamDetail } from '../../shared/types';
 import { StreamDetailView } from '../src/pages/StreamDetail';
 import StreamDetailPage from '../src/pages/StreamDetail';
 import type { StreamDetailController } from '../src/pages/StreamDetail';
+import { performanceReviewMark, performanceStatusAction, streamStatusActions } from '../src/pages/stream-detail-actions';
 import type { YouTubePlayerHandle } from '../src/components/YouTubePlayer';
 import { InlineEdit } from '../src/components/stamp/InlineEdit';
+import { Button } from '../src/components/ui/Button';
 import { ConfirmProvider } from '../src/components/ui/confirm';
+import { Menu, Popover, type MenuItem } from '../src/components/ui/Popover';
 import { ToastProvider } from '../src/components/ui/toast';
 import { handleInlineEditKeyDown } from '../src/lib/inline-edit';
+import { typeInto } from './helpers/dom';
 import { NO_RAW_PALETTE } from './helpers/palette';
 
 function assert(condition: boolean, message: string): asserts condition {
@@ -31,6 +36,101 @@ assert(
 );
 
 console.log('✓ StreamDetail no longer references window.confirm or the legacy Toast bubble in its source');
+
+// --- streamStatusActions: the header's primary action, its ⋯ menu and Delete stream, per status ---
+//
+// Written out as literals, not derived from the function: this table is the spec (§8.3) the
+// header is checked against, status by status, further down.
+
+const STATUSES: Status[] = ['pending', 'extracted', 'rejected', 'approved', 'excluded'];
+
+const EXPECTED_ACTIONS: Record<Status, ReturnType<typeof streamStatusActions>> = {
+  pending: {
+    primary: { label: 'Approve stream', status: 'approved' },
+    menu: [
+      { label: 'Reject', status: 'rejected' },
+      { label: 'Exclude', status: 'excluded' },
+    ],
+    canDelete: true,
+  },
+  extracted: {
+    primary: { label: 'Approve stream', status: 'approved' },
+    menu: [
+      { label: 'Reject', status: 'rejected' },
+      { label: 'Exclude', status: 'excluded' },
+    ],
+    canDelete: true,
+  },
+  rejected: {
+    primary: { label: 'Restore', status: 'pending' },
+    menu: [{ label: 'Exclude', status: 'excluded' }],
+    canDelete: true,
+  },
+  approved: {
+    primary: { label: 'Unapprove', status: 'pending' },
+    menu: [],
+    canDelete: false,
+  },
+  excluded: {
+    primary: { label: 'Restore', status: 'pending' },
+    menu: [],
+    canDelete: true,
+  },
+};
+
+for (const status of STATUSES) {
+  deepStrictEqual(
+    streamStatusActions(status),
+    EXPECTED_ACTIONS[status],
+    `streamStatusActions('${status}') gives the header's primary action, menu and delete rule for that status`,
+  );
+}
+assert(!streamStatusActions('approved').canDelete, 'Delete stream is never offered for an approved stream (the worker refuses it)');
+
+// The status changes the worker accepts from each status (`ALLOWED_TRANSITIONS`, admin/src/status.ts),
+// copied as literals: a change it refuses answers 400, so the header must never offer one.
+const WORKER_ALLOWS: Record<Status, Status[]> = {
+  pending: ['approved', 'rejected', 'excluded', 'extracted'],
+  extracted: ['approved', 'rejected', 'excluded', 'pending'],
+  approved: ['extracted', 'pending'],
+  rejected: ['pending', 'excluded'],
+  excluded: ['pending'],
+};
+for (const status of STATUSES) {
+  const { primary, menu } = streamStatusActions(status);
+  for (const action of [...(primary ? [primary] : []), ...menu]) {
+    assert(
+      WORKER_ALLOWS[status].includes(action.status),
+      `${status}: "${action.label}" is a change the worker accepts (${status} → ${action.status})`,
+    );
+  }
+}
+// A status this build does not know yet: nothing is offered rather than a guess.
+deepStrictEqual(
+  streamStatusActions('archived' as Status),
+  { primary: null, menu: [], canDelete: false },
+  'an unknown status offers no primary action, no menu and no delete',
+);
+
+console.log('✓ streamStatusActions: the primary action, the ⋯ menu and Delete stream for all five statuses');
+
+// performanceStatusAction reads the very same worker transitions: a row's own action is always one
+// the worker accepts from that row's status.
+for (const status of STATUSES) {
+  const action = performanceStatusAction(status);
+  assert(action !== null, `performanceStatusAction('${status}') offers an action`);
+  assert(
+    WORKER_ALLOWS[status].includes(action.status),
+    `${status}: performanceStatusAction offers "${action.label}" (${status} → ${action.status}), a change the worker accepts`,
+  );
+}
+deepStrictEqual(
+  performanceStatusAction('archived' as Status),
+  null,
+  'performanceStatusAction offers nothing for a status this build does not know yet',
+);
+
+console.log('✓ performanceStatusAction: the row action for all five statuses is a change the worker accepts; an unknown status offers none');
 
 const asyncNoop = async () => {};
 const noop = () => {};
@@ -129,6 +229,9 @@ const controller: StreamDetailController = {
   seekToStart: noop,
   seekToEnd: noop,
   seekTo: noop,
+  isNarrow: false,
+  navigate: noop,
+  pageRef: React.createRef<HTMLDivElement>(),
 };
 
 function renderView(overrides: Partial<StreamDetailController> = {}): string {
@@ -163,7 +266,7 @@ assert(!contributorHtml.includes('Delete stream'), 'contributors do not see stre
 
 const occurrences = (text: string, needle: string) => text.split(needle).length - 1;
 
-assert(html.includes('1 to review'), 'the header counts the rows still to review (status other than approved)');
+assert(html.includes('1 to review'), 'the header counts the rows a curator can still approve (pending and extracted)');
 assert(
   html.includes('aria-label="Approve performance"') && html.includes('aria-label="Unapprove performance"'),
   'a curator gets the row approve action on a pending row and unapprove on an approved one',
@@ -186,6 +289,99 @@ assert(
   html.includes('>Approved</span>') && html.includes('>Pending review</span>'),
   'each row names its review state for assistive technology',
 );
+
+// Review Focus 2: a fixture row per status renders its own review-state mark and
+// offers exactly the action performanceStatusAction gives that status — never Approve on a
+// rejected or excluded row, which the worker refuses.
+function perfFixture(id: string, status: Status): StampPerformance {
+  return {
+    id,
+    songId: `${id}-song`,
+    title: `Song ${status}`,
+    originalArtist: '',
+    timestamp: 0,
+    endTimestamp: null,
+    note: '',
+    status,
+  };
+}
+const REVIEW_WORD: Record<Status, string> = {
+  pending: 'Pending review',
+  extracted: 'Extracted',
+  approved: 'Approved',
+  rejected: 'Rejected',
+  excluded: 'Excluded',
+};
+const ROW_ACTION_LABELS = ['Approve performance', 'Unapprove performance', 'Restore performance'];
+const reviewHtml = renderView({
+  detail: { ...detail, performances: STATUSES.map((status) => perfFixture(`perf-review-${status}`, status)) },
+});
+/** `performanceId`'s own `<td>` contents, in column order (#, Song, Start, End, Review, Actions). */
+function rowCells(markup: string, performanceId: string): string[] {
+  const row = new RegExp(`<tr[^>]*id="performance-row-${performanceId}"[^>]*>(.*?)</tr>`, 's').exec(markup)?.[1] ?? '';
+  return [...row.matchAll(/<td[^>]*>(.*?)<\/td>/gs)].map((cell) => cell[1] ?? '');
+}
+for (const status of STATUSES) {
+  const id = `perf-review-${status}`;
+  const cells = rowCells(reviewHtml, id);
+  const reviewCell = cells[4] ?? '';
+  const actionsCell = cells[5] ?? '';
+  assert(reviewCell !== '', `the ${status} fixture row renders a review-state cell`);
+  assert(reviewCell.includes(`>${REVIEW_WORD[status]}</span>`), `a ${status} row's sr-only text reads "${REVIEW_WORD[status]}"`);
+  assert(
+    reviewCell.includes(`title="${REVIEW_WORD[status]}"`),
+    `a ${status} row's mark also carries a plain title "${REVIEW_WORD[status]}" for mouse users`,
+  );
+  assert(
+    !reviewCell.includes('tabindex') && !reviewCell.includes('<button'),
+    `a ${status} row's review mark takes no tab stop of its own`,
+  );
+  const expectedLabel = performanceStatusAction(status)?.label ?? null;
+  const offeredLabels = ROW_ACTION_LABELS.filter((label) => actionsCell.includes(`aria-label="${label}"`));
+  assert(
+    offeredLabels.join(',') === (expectedLabel ?? ''),
+    `a ${status} row offers exactly "${expectedLabel}" (saw ${offeredLabels.join(', ') || 'nothing'})`,
+  );
+}
+deepStrictEqual(
+  performanceReviewMark('archived' as Status),
+  { kind: 'pending', word: 'Pending review' },
+  'performanceReviewMark falls back to the pending mark for a status this build does not know yet',
+);
+
+console.log(
+  '✓ Each review status renders its own sr-only word and title, and offers exactly the row action performanceStatusAction gives it',
+);
+
+// The "to review" pill and Approve All follow what the row action can actually do, not every
+// status short of approved.
+const rejectedOnlyHtml = renderView({
+  detail: { ...detail, performances: [perfFixture('perf-rejected-only', 'rejected')] },
+  unstampedCount: 0,
+});
+assert(
+  !rejectedOnlyHtml.includes('to review'),
+  'a stream with only a rejected row shows no "to review" pill: Approve All could act on none of it',
+);
+assert(
+  !rejectedOnlyHtml.includes('Approve All'),
+  'a stream with only a rejected row shows no Approve All: it would approve nothing',
+);
+
+const pendingAndExtractedHtml = renderView({
+  detail: {
+    ...detail,
+    performances: [perfFixture('perf-mix-pending', 'pending'), perfFixture('perf-mix-extracted', 'extracted')],
+  },
+  unstampedCount: 0,
+});
+assert(pendingAndExtractedHtml.includes('2 to review'), 'the "to review" pill counts pending and extracted rows together');
+assert(pendingAndExtractedHtml.includes('Approve All'), 'Approve All shows while at least one row is pending');
+
+console.log(
+  '✓ The "to review" pill and Approve All count only the rows a curator can act on: none for a rejected-only stream, pending and extracted together for the pill',
+);
+
 assert(
   /<span[^>]*title="opening song\nDouble-click to edit note"[^>]*>[^<]*opening song<\/span>/.test(html),
   'the note line renders "opening song" with the double-click-to-edit hint',
@@ -264,8 +460,268 @@ assert(loadingHtml.includes('Loading...'), 'loading state remains intact');
 const errorHtml = renderView({ error: 'Unable to load stream', detail: null });
 assert(errorHtml.includes('Unable to load stream'), 'error state remains intact');
 
-// --- No raw palette in what this page has rebuilt: the workbench grid, the floating pill, and the
-// loading and error states. The stream header above the grid is still the legacy slate markup. ---
+// --- The stream header: crumb, title, prev / next, the meta row, and the status-driven actions ---
+
+const markupWin = new Window();
+
+/** Parses server-rendered markup into a detached element, to query it the way the page's DOM is. */
+function parse(markup: string): DomElement {
+  const host = markupWin.document.createElement('div');
+  host.innerHTML = markup;
+  return host;
+}
+
+function headerOf(markup: string): DomElement {
+  const header = parse(markup).querySelector<DomElement>('header');
+  assert(header !== null, 'the view opens with its page header');
+  return header;
+}
+
+function textOf(element: DomElement): string {
+  return element.textContent.trim();
+}
+
+/** The header's own buttons (the ⋯ menu's items aside), by their visible text. */
+function headerButtonLabels(header: DomElement): string[] {
+  return [...header.querySelectorAll<DomElement>('button')]
+    .filter((button) => button.getAttribute('role') !== 'menuitem')
+    .map(textOf);
+}
+
+/** The More stream actions menu: its items in order, and whether its panel is closed. */
+function streamMenu(header: DomElement): { items: string[]; closed: boolean } | null {
+  const menu = header.querySelector<DomElement>('[role="menu"][aria-label="More stream actions"]');
+  if (menu === null) return null;
+  return {
+    items: [...menu.querySelectorAll<DomElement>('[role="menuitem"]')].map(textOf),
+    closed: menu.parentElement?.hasAttribute('hidden') === true,
+  };
+}
+
+const header = headerOf(html);
+const crumb = header.querySelector<DomElement>('a[href="/streams"]');
+assert(crumb !== null && textOf(crumb) === 'Catalog / Streams', 'the crumb reads "Catalog / Streams" and links back to the stream list');
+const heading = header.querySelector<DomElement>('h1');
+assert(heading !== null && textOf(heading) === 'Test Karaoke Stream', 'the <h1> is the stream title');
+
+const openLink = header.querySelector<DomElement>('a[href="/stamp?stream=stream-current"]');
+assert(
+  openLink !== null && textOf(openLink) === 'Open in Stamp Editor',
+  'Open in Stamp Editor opens the Stamp Editor on this very stream (/stamp?stream=<id>)',
+);
+
+// The list is newest first: the previous stream is the newer one.
+for (const [label, href] of [
+  ['Newer stream · 2026-08-18', '/streams/stream-newer'],
+  ['Older stream · 2026-08-16', '/streams/stream-older'],
+] as const) {
+  const link = header.querySelector<DomElement>(`a[href="${href}"]`);
+  assert(link !== null && link.getAttribute('aria-label') === label, `the ${href} link is named "${label}"`);
+  const tip = link.parentElement?.querySelector<DomElement>('[role="tooltip"]');
+  assert(tip !== null && tip !== undefined && textOf(tip) === label, `the ${href} link's tooltip reads "${label}"`);
+}
+
+const videoLink = header.querySelector<DomElement>('a[href="https://www.youtube.com/watch?v=video-current"]');
+assert(
+  videoLink !== null
+    && textOf(videoLink) === 'video-current'
+    && videoLink.getAttribute('target') === '_blank'
+    && videoLink.getAttribute('rel') === 'noopener noreferrer',
+  'the video ID opens the VOD in a new tab',
+);
+assert(textOf(header).includes('Credit — Timestamp Curator'), 'the meta row credits the timestamp author');
+const uncreditedHeader = headerOf(renderView({ detail: { ...detail, credit: {} } }));
+assert(
+  textOf(uncreditedHeader).includes('Credit —') && !textOf(uncreditedHeader).includes('Timestamp Curator'),
+  'a stream with no credit reads "Credit —"',
+);
+assert(
+  headerButtonLabels(header).includes('Copy URL') && headerButtonLabels(header).includes('Edit'),
+  'a curator gets Copy URL and Edit in the meta row',
+);
+
+// Review Focus 1: every status gets exactly its primary action, and its ⋯ menu the rest, with
+// Delete stream last — and never for an approved stream.
+for (const status of STATUSES) {
+  const expected = EXPECTED_ACTIONS[status];
+  assert(expected.primary !== null, `${status} has a primary action`);
+  const markup = renderView({ detail: { ...detail, status } });
+  const statusHeader = headerOf(markup);
+  const primaryLabel = expected.primary.label;
+  assert(
+    headerButtonLabels(statusHeader).filter((label) => label === primaryLabel).length === 1,
+    `${status}: the header's one primary action is "${primaryLabel}"`,
+  );
+  const expectedItems = [...expected.menu.map((action) => action.label), ...(expected.canDelete ? ['Delete stream'] : [])];
+  const menu = streamMenu(statusHeader);
+  if (expectedItems.length === 0) {
+    // Never an empty menu: with nothing to hold, there is no ⋯ at all.
+    assert(
+      menu === null && statusHeader.querySelector('button[aria-label="More stream actions"]') === null,
+      `${status}: with nothing to put in it, the header has no ⋯ menu`,
+    );
+  } else {
+    assert(menu !== null && menu.closed, `${status}: the ⋯ menu is rendered in its closed panel`);
+    assert(
+      menu.items.join(' | ') === expectedItems.join(' | '),
+      `${status}: the ⋯ menu offers ${expectedItems.join(', ')} (got ${menu.items.join(', ') || 'nothing'})`,
+    );
+  }
+  assert(
+    !headerButtonLabels(statusHeader).some((label) => expectedItems.includes(label)),
+    `${status}: the menu's actions are not also header buttons`,
+  );
+  assert(
+    markup.includes('Delete stream') === expected.canDelete,
+    `${status}: Delete stream is ${expected.canDelete ? 'offered' : 'offered nowhere'}`,
+  );
+}
+
+// A contributor: the Open link, and none of the curator's controls.
+const contributorHeader = headerOf(contributorHtml);
+assert(
+  contributorHeader.querySelector('a[href="/stamp?stream=stream-current"]') !== null,
+  'a contributor keeps Open in Stamp Editor',
+);
+assert(!contributorHtml.includes('More stream actions'), 'a contributor gets no ⋯ menu');
+assert(
+  !headerButtonLabels(contributorHeader).some((label) => ['Approve stream', 'Unapprove', 'Restore'].includes(label)),
+  'a contributor gets no primary status action',
+);
+assert(
+  headerButtonLabels(contributorHeader).includes('Copy URL') && !headerButtonLabels(contributorHeader).includes('Edit'),
+  'a contributor keeps Copy URL, without Edit',
+);
+
+// Below 640px the header's own actions fold into the ⋯ menu, first, in the order they stood.
+const narrowHtml = renderView({ isNarrow: true });
+const narrowHeader = headerOf(narrowHtml);
+const narrowMenu = streamMenu(narrowHeader);
+assert(narrowHeader.querySelector('a[href^="/stamp"]') === null, 'below 640px the Open in Stamp Editor link leaves the header');
+assert(
+  occurrences(narrowHtml, 'Open in Stamp Editor') === 1 && narrowMenu !== null && narrowMenu.items[0] === 'Open in Stamp Editor',
+  'below 640px Open in Stamp Editor appears only as the first ⋯ menu item',
+);
+assert(
+  narrowMenu.items.join(' | ') === 'Open in Stamp Editor | Approve stream | Reject | Exclude | Delete stream',
+  `below 640px the menu leads with Open in Stamp Editor and the primary action (got ${narrowMenu.items.join(', ')})`,
+);
+assert(!headerButtonLabels(narrowHeader).includes('Approve stream'), 'below 640px the primary action leaves the header');
+// An approved stream has no ⋯ from 640px (its menu is empty), but below it the ⋯ still holds the
+// header's own two actions.
+const narrowApprovedMenu = streamMenu(headerOf(renderView({ isNarrow: true, detail: { ...detail, status: 'approved' } })));
+assert(
+  narrowApprovedMenu !== null && narrowApprovedMenu.items.join(' | ') === 'Open in Stamp Editor | Unapprove',
+  `below 640px an approved stream's ⋯ holds Open in Stamp Editor and Unapprove (got ${narrowApprovedMenu?.items.join(', ')})`,
+);
+
+/** The header row `element` sits in: below 640px each row of the header spans it (`max-sm:w-full`). */
+function headerRowOf(element: { parentElement: { closest(selector: string): unknown } | null } | null): unknown {
+  return element?.parentElement?.closest('[class~="max-sm:w-full"]') ?? null;
+}
+// Below 640px the ⋯ ends the prev / next row instead of taking a row of its own; wider, it stays
+// with the other actions.
+const narrowMore = narrowHeader.querySelector<DomElement>('button[aria-label="More stream actions"]');
+const narrowNeighbourRow = headerRowOf(narrowHeader.querySelector<DomElement>('a[href="/streams/stream-newer"]'));
+assert(
+  narrowNeighbourRow !== null && headerRowOf(narrowMore) === narrowNeighbourRow,
+  'below 640px the ⋯ shares the prev / next row',
+);
+const narrowMoreEnd = narrowMore?.closest('[class~="ml-auto"]') ?? null;
+assert(
+  narrowMoreEnd !== null && headerRowOf(narrowMoreEnd) === narrowNeighbourRow,
+  'below 640px the ⋯ sits at the far end of that row',
+);
+assert(
+  headerRowOf(header.querySelector<DomElement>('button[aria-label="More stream actions"]'))
+    !== headerRowOf(header.querySelector<DomElement>('a[href="/streams/stream-newer"]')),
+  'from 640px the ⋯ stays with the header actions',
+);
+
+// A contributor has no ⋯ to fold into: below 640px their one action, Open in Stamp Editor, ends the
+// prev / next row as an icon link like those, where a curator's ⋯ sits, rather than taking a row of
+// its own. From 640px it stays the text link among the header actions.
+const narrowContributorHtml = renderView({ isCurator: false, isNarrow: true });
+const narrowContributorHeader = headerOf(narrowContributorHtml);
+const narrowStampLinks = [...narrowContributorHeader.querySelectorAll<DomElement>('a[href^="/stamp"]')];
+const narrowStampLink = narrowStampLinks[0];
+assert(
+  narrowStampLinks.length === 1 && narrowStampLink?.getAttribute('href') === '/stamp?stream=stream-current',
+  `below 640px a contributor's header links to the Stamp Editor once, on this very stream (got ${narrowStampLinks.length})`,
+);
+assert(
+  narrowStampLink.getAttribute('aria-label') === 'Open in Stamp Editor' && textOf(narrowStampLink) === '',
+  `as an icon-only link named Open in Stamp Editor, not a text link (got "${textOf(narrowStampLink)}")`,
+);
+const narrowStampTip = narrowStampLink.parentElement?.querySelector<DomElement>('[role="tooltip"]');
+assert(
+  narrowStampTip !== null && narrowStampTip !== undefined && textOf(narrowStampTip) === 'Open in Stamp Editor',
+  'its tooltip reads Open in Stamp Editor',
+);
+const narrowContributorNewer = narrowContributorHeader.querySelector<DomElement>('a[href="/streams/stream-newer"]');
+assert(
+  narrowContributorNewer !== null && narrowStampLink.getAttribute('class') === narrowContributorNewer.getAttribute('class'),
+  'it is styled like the prev / next links',
+);
+const narrowContributorRow = headerRowOf(narrowContributorNewer);
+const narrowStampEnd = narrowStampLink.closest('[class~="ml-auto"]');
+assert(
+  narrowContributorRow !== null
+    && headerRowOf(narrowStampLink) === narrowContributorRow
+    && narrowStampEnd !== null
+    && headerRowOf(narrowStampEnd) === narrowContributorRow,
+  "it ends the prev / next row, where a curator's ⋯ sits",
+);
+assert(!narrowContributorHtml.includes('More stream actions'), 'and a contributor still gets no ⋯');
+/** The rows a header stacks below 640px: one per part, since each spans the header (`max-sm:w-full`). */
+function narrowHeaderRows(narrow: DomElement): number {
+  const parts = [...narrow.children];
+  assert(
+    parts.every((part) => (part.getAttribute('class') ?? '').split(' ').includes('max-sm:w-full')),
+    'below 640px each part of the header spans a row of its own',
+  );
+  return parts.length;
+}
+assert(
+  narrowHeaderRows(narrowContributorHeader) === 2 && narrowHeaderRows(narrowHeader) === 2,
+  `below 640px a contributor's header stacks the title block and the prev / next row, as a curator's does: no row for the link (got ${narrowHeaderRows(narrowContributorHeader)} rows)`,
+);
+const wideStampLink = contributorHeader.querySelector<DomElement>('a[href="/stamp?stream=stream-current"]');
+assert(
+  wideStampLink !== null
+    && textOf(wideStampLink) === 'Open in Stamp Editor'
+    && !wideStampLink.hasAttribute('aria-label')
+    && headerRowOf(wideStampLink) !== headerRowOf(contributorHeader.querySelector<DomElement>('a[href="/streams/stream-newer"]')),
+  'from 640px a contributor keeps the text link, with the header actions',
+);
+
+// Review Focus 5: a 120-character CJK + emoji title, cut in code points so no surrogate pair splits.
+const LONG_TITLE = Array.from('【歌枠】週六晚上唱歌給你聽✨土曜の夜は歌とともにゆっくりお休み🎤初見さん大歓迎🎵'.repeat(4))
+  .slice(0, 120)
+  .join('');
+assert(Array.from(LONG_TITLE).length === 120, 'the long title fixture is 120 characters');
+const longHeading = headerOf(renderView({ detail: { ...detail, title: LONG_TITLE } })).querySelector<DomElement>('h1');
+const longTitleSpan = longHeading?.querySelector<DomElement>('span[title]');
+assert(
+  longTitleSpan !== null && longTitleSpan !== undefined && longTitleSpan.getAttribute('title') === LONG_TITLE,
+  'a 120-character title keeps its full text in the title span’s title attribute',
+);
+assert(textOf(longTitleSpan) === LONG_TITLE, 'the title span holds the whole title; CSS cuts it, not the markup');
+assert(
+  (longHeading?.getAttribute('class') ?? '').split(/\s+/).includes('truncate'),
+  'the <h1> truncates a long title on one line',
+);
+const untitledHeading = headerOf(renderView({ detail: { ...detail, title: '' } })).querySelector<DomElement>('h1');
+assert(untitledHeading !== null && textOf(untitledHeading) === 'video-current', 'an untitled stream is named by its video ID');
+
+// Double-clicking the date chip swaps it for a date field.
+const dateEditHtml = renderView({ editingField: { type: 'stream', field: 'date' } });
+const dateField = headerOf(dateEditHtml).querySelector<DomElement>('input[type="date"][aria-label="Stream date"]');
+assert(dateField !== null && dateField.getAttribute('value') === '2026-08-17', 'editing the date shows a date field holding the stream date');
+
+console.log('✓ the stream header: crumb, title, prev / next, meta row, and the actions for every status, audience and width');
+
+// --- No raw palette anywhere in the view: the header on its own, strictly, and the whole page ---
 
 /**
  * The raw classes the shared WorkbenchCard keeps on purpose (tests/workbench.test.tsx pins each one
@@ -281,20 +737,27 @@ function withoutKeptClasses(markup: string, kept: RegExp[]): string {
   });
 }
 
-const paletteWin = new Window();
-const paletteHost = paletteWin.document.createElement('div');
-paletteHost.innerHTML = html;
-const workbenchGrid = paletteHost.querySelector('table[aria-label="Performances"]')?.closest('.grid');
-assert(workbenchGrid !== null && workbenchGrid !== undefined, 'the view renders the performance table inside its workbench grid');
-assert(
-  !NO_RAW_PALETTE.test(withoutKeptClasses(workbenchGrid.outerHTML, WORKBENCH_KEPT_CLASSES)),
-  'the workbench grid (workbench card, performances card, table) uses no raw palette classes',
-);
-const floatingPill = paletteHost.querySelector('[title="Back to player"]');
-assert(floatingPill !== null && !NO_RAW_PALETTE.test(floatingPill.outerHTML), 'the floating playback pill uses no raw palette classes');
+const paletteCases: Array<[string, string]> = [
+  ['a curator', html],
+  ['a contributor', contributorHtml],
+  ['below 640px', narrowHtml],
+  ['a contributor below 640px', narrowContributorHtml],
+  ['the title being edited', renderView({ editingField: { type: 'stream', field: 'title' } })],
+  ['the date being edited', dateEditHtml],
+  ['performance rows across every review status', reviewHtml],
+  ...STATUSES.map((status): [string, string] => [`a ${status} stream`, renderView({ detail: { ...detail, status } })]),
+];
+for (const [what, markup] of paletteCases) {
+  assert(!NO_RAW_PALETTE.test(headerOf(markup).outerHTML), `${what}: the header uses no raw palette classes`);
+  assert(
+    !NO_RAW_PALETTE.test(withoutKeptClasses(markup, WORKBENCH_KEPT_CLASSES)),
+    `${what}: the whole view (header, workbench, performances, floating pill) uses no raw palette classes`,
+  );
+}
 assert(!NO_RAW_PALETTE.test(loadingHtml), 'the loading state uses no raw palette classes');
 assert(!NO_RAW_PALETTE.test(errorHtml), 'the error state uses no raw palette classes');
-await paletteWin.happyDOM.close();
+assert(!NO_RAW_PALETTE.test(streamDetailSource), 'StreamDetail.tsx names no raw palette class, in any branch');
+await markupWin.happyDOM.close();
 
 const addModalHtml = renderView({ showAddModal: true });
 assert(addModalHtml.includes('Song title *'), 'add-song modal remains wired to page state');
@@ -346,28 +809,39 @@ function componentOf(type: React.ReactElement['type']): RenderFunction {
   return (memoized.$$typeof === Symbol.for('react.memo') ? memoized.type : type) as RenderFunction;
 }
 
-// `componentName` narrows the walk to one sub-component's render output (e.g. the performance
-// table); omit it to read InlineEdits that StreamDetailView renders directly, like the stream title.
-function inlineEditProps(tree: React.ReactNode, componentName?: string): InlineEditCallProps[] {
-  const seen: React.ReactElement[] = [];
-  const walk = (node: React.ReactNode): void => {
-    if (Array.isArray(node)) {
-      for (const child of node) walk(child);
-      return;
-    }
-    if (!React.isValidElement(node)) return;
-    seen.push(node);
-    walk((node.props as { children?: React.ReactNode }).children);
-  };
-
-  walk(tree);
-  if (componentName !== undefined) {
-    const host = seen.find((element) => componentOf(element.type).name === componentName);
-    assert(host !== undefined, `${componentName} renders inside the page view`);
-    seen.length = 0;
-    walk(componentOf(host.type)(host.props));
+/**
+ * Every element in a rendered tree. It follows each element-valued prop, not `children` alone —
+ * the stream title reaches the page through PageHeader's `title`, its date through `meta`, its
+ * actions through `actions` — the way stamp-editor-ui's `elementsIn` does. It does not render
+ * sub-components or call render props.
+ */
+function elementsIn(node: React.ReactNode, found: React.ReactElement[] = []): React.ReactElement[] {
+  if (Array.isArray(node)) {
+    for (const child of node) elementsIn(child, found);
+    return found;
   }
-  return seen.filter((element) => element.type === InlineEdit).map((element) => element.props as InlineEditCallProps);
+  if (!React.isValidElement(node)) return found;
+  found.push(node);
+  for (const value of Object.values(node.props as Record<string, unknown>)) {
+    if (Array.isArray(value) || React.isValidElement(value)) elementsIn(value as React.ReactNode, found);
+  }
+  return found;
+}
+
+/** What the `componentName` element in `tree` renders — its props exactly as the page handed them. */
+function renderOf(tree: React.ReactNode, componentName: string): React.ReactNode {
+  const host = elementsIn(tree).find((element) => componentOf(element.type).name === componentName);
+  assert(host !== undefined, `${componentName} renders inside the page view`);
+  return componentOf(host.type)(host.props);
+}
+
+// `componentName` narrows the walk to one sub-component's render output: the performance table
+// for the row editors, the stream header for the title editor (which reaches the page through
+// PageHeader's `title`).
+function inlineEditProps(tree: React.ReactNode, componentName: string): InlineEditCallProps[] {
+  return elementsIn(renderOf(tree, componentName))
+    .filter((element) => element.type === InlineEdit)
+    .map((element) => element.props as InlineEditCallProps);
 }
 
 const savedNotes: string[] = [];
@@ -406,7 +880,7 @@ const streamTitleTree = StreamDetailView({
     setEditingField: () => { streamTitleCancelled = true; },
   },
 });
-const streamTitleEdits = inlineEditProps(streamTitleTree);
+const streamTitleEdits = inlineEditProps(streamTitleTree, 'StreamHeader');
 assert(streamTitleEdits.length === 1, 'the stream title renders one shared InlineEdit while editing');
 assert(streamTitleEdits[0]?.allowEmpty === undefined, 'stream title no longer opts into empty saves');
 handleInlineEditKeyDown({ key: 'Enter', preventDefault: noop }, { ...streamTitleEdits[0]!, text: '   ' });
@@ -443,6 +917,79 @@ const artistEdits = inlineEditProps(artistTree, 'PerformanceTable');
 assert(artistEdits.length === 1, 'the edited performance artist row renders one shared InlineEdit');
 assert(artistEdits[0]?.allowEmpty === true, 'artist keeps its empty-save opt-in');
 
+// --- The header's controls reach the controller ---
+//
+// The walk renders the page's StreamHeader. The ⋯ menu's items live in the Popover's render prop,
+// so it calls that too (with a no-op close) to reach the Menu and the exact items it is handed.
+
+/** The items the More stream actions menu is handed. */
+function streamMenuItemsIn(tree: React.ReactNode): MenuItem[] {
+  const popover = elementsIn(renderOf(tree, 'StreamHeader')).find(
+    (element) => element.type === Popover && (element.props as { label?: string }).label === 'More stream actions',
+  );
+  assert(popover !== undefined, 'the header renders the More stream actions popover');
+  const menu = (popover.props as { children: (close: () => void) => React.ReactNode }).children(noop);
+  assert(React.isValidElement(menu) && menu.type === Menu, 'the More stream actions popover holds a Menu');
+  return (menu.props as { items: MenuItem[] }).items;
+}
+
+function buttonNamed(tree: React.ReactNode, label: string): { onClick: () => void } {
+  const button = elementsIn(renderOf(tree, 'StreamHeader')).find(
+    (element) => element.type === Button && (element.props as { children?: unknown }).children === label,
+  );
+  assert(button !== undefined, `the header renders a ${label} button`);
+  return button.props as { onClick: () => void };
+}
+
+const actionCalls: string[] = [];
+const recordingController: StreamDetailController = {
+  ...controller,
+  handleStreamStatus: async (status) => { actionCalls.push(`status:${status}`); },
+  handleDeleteStream: async () => { actionCalls.push('delete'); },
+  setEditingField: (next) => { actionCalls.push(`edit:${JSON.stringify(next)}`); },
+  navigate: ((to: unknown) => { actionCalls.push(`navigate:${String(to)}`); }) as StreamDetailController['navigate'],
+};
+
+const wideTree = StreamDetailView({ controller: recordingController });
+const wideItems = streamMenuItemsIn(wideTree);
+assert(
+  wideItems.map((item) => item.label).join(' | ') === 'Reject | Exclude | Delete stream',
+  `a pending stream's menu is Reject, Exclude, Delete stream (got ${wideItems.map((item) => item.label).join(', ')})`,
+);
+assert(wideItems[wideItems.length - 1]?.tone === 'danger', 'Delete stream is the last item, in the danger tone');
+for (const item of wideItems) item.onSelect();
+assert(
+  actionCalls.join() === 'status:rejected,status:excluded,delete',
+  `the menu items set their own status and Delete stream asks to delete (saw ${actionCalls.join(', ')})`,
+);
+
+actionCalls.length = 0;
+buttonNamed(wideTree, 'Approve stream').onClick();
+buttonNamed(wideTree, 'Edit').onClick();
+assert(
+  actionCalls.join() === 'status:approved,edit:{"type":"stream","field":"title"}',
+  `the primary action approves the stream and Edit opens the title editor (saw ${actionCalls.join(', ')})`,
+);
+
+// A rejected stream is restored to pending first (the worker refuses rejected → approved), and
+// then offers Approve stream as usual.
+actionCalls.length = 0;
+buttonNamed(StreamDetailView({ controller: { ...recordingController, detail: { ...detail, status: 'rejected' } } }), 'Restore').onClick();
+assert(actionCalls.join() === 'status:pending', `a rejected stream's Restore sets it pending (saw ${actionCalls.join(', ')})`);
+
+actionCalls.length = 0;
+const narrowItems = streamMenuItemsIn(StreamDetailView({ controller: { ...recordingController, isNarrow: true } }));
+assert(
+  narrowItems.map((item) => item.label).join(' | ') === 'Open in Stamp Editor | Approve stream | Reject | Exclude | Delete stream',
+  'below 640px the menu leads with the two header actions it took in',
+);
+narrowItems[0]?.onSelect();
+narrowItems[1]?.onSelect();
+assert(
+  actionCalls.join() === 'navigate:/stamp?stream=stream-current,status:approved',
+  `below 640px the menu's Open in Stamp Editor goes where the link did, and its primary approves (saw ${actionCalls.join(', ')})`,
+);
+
 console.log('✓ StreamDetail retains navigation, controls, rows, access boundaries, and its shared stamp components');
 
 // --- Moving from one stream to the next ---
@@ -469,6 +1016,7 @@ for (const [name, value] of Object.entries({
   Node: navWin.Node,
   Event: navWin.Event,
   MouseEvent: navWin.MouseEvent,
+  KeyboardEvent: navWin.KeyboardEvent,
   IS_REACT_ACT_ENVIRONMENT: true,
 })) {
   // Node's own `navigator` global is getter-only, so plain assignment is not enough.
@@ -493,7 +1041,7 @@ function navStream(id: string, title: string, date: string): Stream {
   };
 }
 
-function navPerformance(id: string, title: string, timestamp: number): StampPerformance {
+function navPerformance(id: string, title: string, timestamp: number, status: Status = 'pending'): StampPerformance {
   return {
     id,
     songId: `${id}-song`,
@@ -502,17 +1050,21 @@ function navPerformance(id: string, title: string, timestamp: number): StampPerf
     timestamp,
     endTimestamp: null,
     note: '',
-    status: 'pending',
+    status,
   };
 }
 
 const streamAlpha = navStream('stream-nav-a', 'Nav Stream Alpha', '2026-08-20');
 const streamBeta = navStream('stream-nav-b', 'Nav Stream Beta', '2026-08-19');
 
+// a4 (rejected) and a5 (extracted) back the Restore-performance and Approve-All-confirm coverage
+// near the end of this file — neither disturbs the pending a1–a3 rows the flow above clicks through.
 const alphaRows = [
   navPerformance('perf-nav-a1', 'Alpha Song One', 10),
   navPerformance('perf-nav-a2', 'Alpha Song Two', 110),
   navPerformance('perf-nav-a3', 'Alpha Song Three', 210),
+  navPerformance('perf-nav-a4', 'Alpha Song Four', 310, 'rejected'),
+  navPerformance('perf-nav-a5', 'Alpha Song Five', 410, 'extracted'),
 ];
 const betaRows = [
   navPerformance('perf-nav-b1', 'Beta Song One', 20),
@@ -522,10 +1074,11 @@ const betaRows = [
 const detailAlpha: StreamDetail = { ...streamAlpha, performances: alphaRows };
 const detailBeta: StreamDetail = { ...streamBeta, performances: betaRows };
 
-/** Every request the page makes, in order, with its method — the proof of what a navigation
- * refetches, and (for the delete-stream dialog below) that Cancel sends nothing while confirming
- * sends exactly one DELETE. */
-const navRequests: Array<{ method: string; pathname: string }> = [];
+/** Every request the page makes, in order, with its method and (parsed) body — the proof of what a
+ * navigation refetches, that Cancel sends nothing while confirming sends exactly one DELETE (the
+ * delete-stream dialog below), and what a status PATCH actually asks for (Restore performance,
+ * near the end of this file). */
+const navRequests: Array<{ method: string; pathname: string; body: unknown }> = [];
 
 function countRequests(pathname: string): number {
   return navRequests.filter((seen) => seen.pathname === pathname).length;
@@ -546,7 +1099,7 @@ let failNextAlphaDetail = false;
 const navFetch: typeof fetch = async (input, init) => {
   const { pathname } = new URL(String(input), 'http://localhost/');
   const method = init?.method ?? 'GET';
-  navRequests.push({ method, pathname });
+  navRequests.push({ method, pathname, body: typeof init?.body === 'string' ? JSON.parse(init.body) : null });
   if (pathname === `/api/streams/${streamBeta.id}/detail`) await betaDetailHeld;
   if (pathname === `/api/streams/${streamAlpha.id}/detail` && failNextAlphaDetail) {
     failNextAlphaDetail = false;
@@ -565,6 +1118,7 @@ const navFetch: typeof fetch = async (input, init) => {
     if (pathname === `/api/streams/${streamBeta.id}/detail`) return { ...detailBeta, performances: [...betaRows] };
     if (pathname === `/api/streams/${streamAlpha.id}/status`) return { ...streamAlpha, status: 'excluded' };
     if (pathname === '/api/performances/perf-nav-a2/status') return { ok: true };
+    if (pathname === '/api/performances/perf-nav-a4/status') return { ok: true };
     if (method === 'DELETE' && pathname === `/api/streams/${streamAlpha.id}`) return { ok: true, songs: 0, performances: 3 };
     return undefined;
   })();
@@ -594,11 +1148,18 @@ async function clickSelector(container: DomElement, selector: string, what: stri
   await clickNode(container.querySelector<DomElement>(selector), what);
 }
 
-async function clickButtonNamed(container: DomElement, label: string): Promise<void> {
-  const button = [...container.querySelectorAll<DomElement>('button')].find(
+/** Opens the header's ⋯ menu and chooses `label` there, where the stream status actions live. */
+async function chooseStreamAction(container: DomElement, label: string): Promise<void> {
+  await clickSelector(container, 'button[aria-label="More stream actions"]', 'the More stream actions button');
+  const menu = container.querySelector<DomElement>('[role="menu"][aria-label="More stream actions"]');
+  assert(
+    menu !== null && menu.parentElement?.hasAttribute('hidden') === false,
+    'the More stream actions button opens its menu',
+  );
+  const item = [...menu.querySelectorAll<DomElement>('[role="menuitem"]')].find(
     (candidate) => candidate.textContent.trim() === label,
   );
-  await clickNode(button, `a ${label} button`);
+  await clickNode(item, `a ${label} menu item`);
 }
 
 /** The selected row is the one carrying the highlight the table paints on it. */
@@ -659,7 +1220,7 @@ assert(
 );
 
 // State raised on Alpha: a toast, and an open modal. One belongs to the page, the other to Alpha.
-await clickButtonNamed(navContainer, 'Exclude');
+await chooseStreamAction(navContainer, 'Exclude');
 assert(navContainer.innerHTML.includes('Stream excluded'), 'a stream status change raises its toast');
 await clickSelector(navContainer, 'button[aria-label="Add Song"]', 'the Add Song button');
 assert(navContainer.innerHTML.includes('Song title *'), 'the add-song modal opens on the stream being viewed');
@@ -707,7 +1268,7 @@ assert(
 
 console.log('✓ StreamDetail starts each stream fresh, keeps the toast and the stream list across the move, and lets a pick outrank the deep link');
 
-// --- Delete stream: the header action confirms through the kit dialog, not window.confirm ---
+// --- Delete stream: the ⋯ menu's last item confirms through the kit dialog, not window.confirm ---
 //
 // A second root in the same window, served by the same navFetch: the flow above has since moved
 // on to Beta, and confirming a delete here navigates away — which must not reach into that flow's
@@ -739,7 +1300,7 @@ await act(async () => {
 await settle();
 assert(deleteContainer.innerHTML.includes('Nav Stream Alpha'), 'the delete-stream mount loads Alpha fresh');
 
-await clickButtonNamed(deleteContainer, 'Delete stream');
+await chooseStreamAction(deleteContainer, 'Delete stream');
 const deleteDialog = deleteContainer.querySelector<DomElement>('dialog[open]');
 assert(deleteDialog !== null, 'Delete stream opens a confirm dialog');
 assert(
@@ -754,11 +1315,11 @@ await clickNode(cancelButton, 'the dialog’s Cancel button');
 assert(countRequestsWithMethod('DELETE', `/api/streams/${streamAlpha.id}`) === 0, 'Cancel sends no DELETE');
 assert(deleteContainer.querySelector('dialog[open]') === null, 'Cancel closes the dialog');
 
-await clickButtonNamed(deleteContainer, 'Delete stream');
+await chooseStreamAction(deleteContainer, 'Delete stream');
 const reopenedDialog = deleteContainer.querySelector<DomElement>('dialog[open]');
 assert(reopenedDialog !== null, 'Delete stream re-opens the confirm dialog');
-// The header button and the dialog's own confirm button share the label "Delete stream" — scoped
-// to the open dialog, so this clicks the confirm button and not the header button behind it.
+// The menu item and the dialog's own confirm button share the label "Delete stream" — scoped to
+// the open dialog, so this clicks the confirm button and not the menu item behind it.
 const confirmDeleteButton = [...reopenedDialog.querySelectorAll<DomElement>('button')].find(
   (candidate) => candidate.textContent.trim() === 'Delete stream',
 );
@@ -950,6 +1511,158 @@ assert(
 await controlsHarness.unmount();
 
 console.log("✓ Clicks inside an open editor or on a row's controls never select the row or close the editor; Edit note opens the note editor");
+
+// --- The stream date field: Enter saves and Escape cancels — but never mid-composition ---
+//
+// An IME keystroke (typing a zh-TW or ja title elsewhere, a conversion still open) announces
+// itself with `isComposing`, or with keyCode 229 on Safari's committing Enter.
+
+const dateCalls: string[] = [];
+
+async function mountDateField(): Promise<{ input: DomElement; unmount: () => Promise<void> }> {
+  const container = navWin.document.createElement('div');
+  navWin.document.body.appendChild(container);
+  const root = createRoot(container as unknown as HTMLElement);
+  await act(async () => {
+    root.render(
+      <MemoryRouter>
+        <StreamDetailView
+          controller={{
+            ...controller,
+            editingField: { type: 'stream', field: 'date' },
+            handleStreamSave: async (field, value) => { dateCalls.push(`save:${field}:${value}`); },
+            setEditingField: (next) => { dateCalls.push(`edit:${JSON.stringify(next)}`); },
+          }}
+        />
+      </MemoryRouter>,
+    );
+  });
+  const input = container.querySelector<DomElement>('input[aria-label="Stream date"]');
+  assert(input !== null, 'the date field renders while the date is edited');
+  return {
+    input,
+    unmount: async () => {
+      await act(async () => {
+        root.unmount();
+      });
+      container.remove();
+    },
+  };
+}
+
+/** A cancelable, bubbling keydown at `target`, as a key press sends one. */
+async function keyDown(target: DomElement, init: KeyboardEventInit): Promise<void> {
+  const element = target as unknown as HTMLElement;
+  await act(async () => {
+    element.dispatchEvent(new KeyboardEvent('keydown', { bubbles: true, cancelable: true, ...init }));
+  });
+}
+
+const IME_KEYDOWNS: ReadonlyArray<readonly [string, KeyboardEventInit]> = [
+  ['isComposing', { isComposing: true }],
+  ['keyCode 229', { keyCode: 229 }],
+];
+
+const savedDateField = await mountDateField();
+// React has the typed date by the next key event at the latest (this suite loads react-dom before
+// its DOM, so React reads a field's value on key events rather than on `input`). The IME keys below
+// must neither save it nor cancel the edit; the plain Enter after them saves it.
+await typeInto(savedDateField.input as unknown as HTMLInputElement, '2026-08-20');
+for (const key of ['Enter', 'Escape']) {
+  for (const [how, init] of IME_KEYDOWNS) {
+    await keyDown(savedDateField.input, { key, ...init });
+    assert(dateCalls.length === 0, `an IME ${key} (${how}) in the date field neither saves nor cancels (saw ${dateCalls.join(', ')})`);
+  }
+}
+await keyDown(savedDateField.input, { key: 'Enter' });
+assert(dateCalls.join() === 'save:date:2026-08-20', `Enter saves the new date (saw ${dateCalls.join(', ') || 'nothing'})`);
+await savedDateField.unmount();
+
+dateCalls.length = 0;
+const cancelledDateField = await mountDateField();
+await keyDown(cancelledDateField.input, { key: 'Escape' });
+assert(dateCalls.join() === 'edit:null', `Escape cancels the date edit (saw ${dateCalls.join(', ') || 'nothing'})`);
+await cancelledDateField.unmount();
+
+console.log('✓ The stream date field saves on Enter and cancels on Escape, and ignores both while an IME is composing');
+
+// --- Live: a rejected row's Restore PATCHes it back to pending; Approve All's confirm names
+// only the rows bulkApproveStream actually touches ---
+//
+// Alpha's a4 (rejected) and a5 (extracted) back this: a1–a3 stay pending, so "to review" reads 4
+// (a1, a2, a3 pending, plus a5 extracted) while Approve All's own count is 3 — pending only, all
+// bulkApproveStream (admin/src/db.ts) ever touches.
+
+const alphaMixContainer = navWin.document.createElement('div');
+navWin.document.body.appendChild(alphaMixContainer);
+const alphaMixRoot = createRoot(alphaMixContainer as unknown as HTMLElement);
+await act(async () => {
+  alphaMixRoot.render(
+    <ToastProvider>
+      <ConfirmProvider>
+        <MemoryRouter initialEntries={[`/streams/${streamAlpha.id}`]}>
+          <Routes>
+            <Route path="/streams/:id" element={<StreamDetailPage user={curator} />} />
+          </Routes>
+        </MemoryRouter>
+      </ConfirmProvider>
+    </ToastProvider>,
+  );
+});
+await settle();
+assert(alphaMixContainer.innerHTML.includes('Alpha Song Five'), 'this mount loads Alpha fresh, the extracted row included');
+assert(
+  alphaMixContainer.innerHTML.includes('4 to review'),
+  'the "to review" pill counts the pending rows together with the extracted one, not the rejected one',
+);
+assert(
+  alphaMixContainer.querySelector('#performance-row-perf-nav-a4 [aria-label="Restore performance"]') !== null,
+  'a rejected row offers Restore performance, not Approve',
+);
+assert(
+  alphaMixContainer.querySelector('#performance-row-perf-nav-a4 [aria-label="Approve performance"]') === null,
+  'a rejected row never offers Approve performance: the worker refuses that transition',
+);
+
+const alphaMixApproveAllButton = [...alphaMixContainer.querySelectorAll<DomElement>('button')].find(
+  (candidate) => candidate.textContent.trim() === 'Approve All',
+);
+await clickNode(alphaMixApproveAllButton, 'the Approve All button');
+const alphaMixApproveAllDialog = alphaMixContainer.querySelector<DomElement>('dialog[open]');
+assert(alphaMixApproveAllDialog !== null, 'Approve All opens a confirm dialog');
+assert(
+  alphaMixApproveAllDialog.textContent.includes('Approve all 3 pending performances?'),
+  `Approve All's confirm names only the rows it can approve, the 3 pending ones (got "${alphaMixApproveAllDialog.textContent}")`,
+);
+const alphaMixApproveAllCancel = [...alphaMixApproveAllDialog.querySelectorAll<DomElement>('button')].find(
+  (candidate) => candidate.textContent.trim() === 'Cancel',
+);
+await clickNode(alphaMixApproveAllCancel, 'the confirm dialog’s Cancel button');
+assert(
+  countRequestsWithMethod('POST', `/api/streams/${streamAlpha.id}/approve-all`) === 0,
+  'Cancel sends no approve-all request',
+);
+
+await clickSelector(alphaMixContainer, '#performance-row-perf-nav-a4 [aria-label="Restore performance"]', 'the row restore button');
+const restoreRequests = navRequests.filter((seen) => seen.pathname === '/api/performances/perf-nav-a4/status');
+assert(
+  restoreRequests.length === 1 && restoreRequests[0]?.method === 'PATCH',
+  `Restore performance sends exactly one PATCH to its status endpoint (saw ${restoreRequests.length})`,
+);
+deepStrictEqual(
+  restoreRequests[0]?.body,
+  { status: 'pending' },
+  'Restore performance PATCHes { status: "pending" }, the only transition the worker allows from rejected',
+);
+
+await act(async () => {
+  alphaMixRoot.unmount();
+});
+alphaMixContainer.remove();
+
+console.log(
+  '✓ A rejected row offers Restore, not Approve, and PATCHes it to pending; Approve All’s confirm names only the pending rows it acts on',
+);
 
 await act(async () => {
   navRoot.unmount();

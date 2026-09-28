@@ -1,9 +1,8 @@
-import { memo, useState, useEffect, useRef, useCallback, useMemo } from 'react';
+import { memo, useState, useEffect, useLayoutEffect, useRef, useCallback, useMemo } from 'react';
 import type { Dispatch, RefObject, SetStateAction } from 'react';
 import { useParams, useNavigate, Link } from 'react-router-dom';
 import type { AuthUser, StampPerformance, Status, Stream } from '../../../shared/types';
 import { api } from '../api/client';
-import StatusBadge from '../components/StatusBadge';
 import type { YouTubePlayerHandle } from '../components/YouTubePlayer';
 import type { FetchLogEntry } from '../components/FetchLogPanel';
 import { FloatingPlaybackPill } from '../components/FloatingPlaybackPill';
@@ -11,12 +10,17 @@ import { InlineEdit } from '../components/stamp/InlineEdit';
 import { AddSongModal } from '../components/stamp/AddSongModal';
 import { PasteImportModal } from '../components/stamp/PasteImportModal';
 import { Button, IconButton } from '../components/ui/Button';
+import { buttonClasses } from '../components/ui/button-classes';
 import { useConfirm } from '../components/ui/confirm';
 import { EmptyState, GlassCard, Skeleton } from '../components/ui/Display';
+import { TextInput } from '../components/ui/Fields';
 import { Icon } from '../components/ui/Icon';
-import { Pill } from '../components/ui/Pill';
+import { isImeKeyDown } from '../components/ui/keyboard';
+import { PageHeader } from '../components/ui/PageHeader';
+import { Pill, StatusPill } from '../components/ui/Pill';
 import { Menu, Popover, type MenuItem } from '../components/ui/Popover';
 import { useShowToast } from '../components/ui/toast';
+import { Tooltip } from '../components/ui/Tooltip';
 import { ShortcutSheet } from '../components/workbench/ShortcutHints';
 import { WorkbenchCard } from '../components/workbench/WorkbenchCard';
 import type { ShowToast } from '../hooks/useToast';
@@ -24,14 +28,23 @@ import { useFetchLog } from '../hooks/useFetchLog';
 import type { AppendFetchLog } from '../hooks/useFetchLog';
 import { END_PREVIEW_SECONDS, useEditorShortcuts } from '../hooks/useEditorShortcuts';
 import { useFetchAllDurations } from '../hooks/useFetchAllDurations';
+import { useMediaQuery } from '../hooks/useMediaQuery';
 import { usePerformances } from '../hooks/usePerformances';
 import { usePlayerClock } from '../hooks/usePlayerClock';
 import { useSearchParamState } from '../hooks/useSearchParamState';
 import { useApiResource } from '../lib/apiResource';
 import { formatTimestamp } from '../lib/format-timestamp';
+import { performanceReviewMark, performanceStatusAction, streamStatusActions } from './stream-detail-actions';
 
 // --- Inline Date Edit ---
 
+/**
+ * The stream date's editor, in the header's meta row: the kit's text field as a native date input.
+ * Enter or blur saves a changed date (an unchanged or cleared one cancels), Escape cancels — and
+ * neither key counts while an IME is composing. The field spans its container, so a span gives it
+ * a date's width: a percentage-wide input adds nothing to the meta row's own width, which would
+ * then wrap around it.
+ */
 function InlineDateEdit({ value, label, onSave, onCancel }: {
   value: string; label: string;
   onSave: (val: string) => void; onCancel: () => void;
@@ -47,16 +60,18 @@ function InlineDateEdit({ value, label, onSave, onCancel }: {
   };
 
   return (
-    <input
-      ref={inputRef} type="date" aria-label={label} value={date}
-      onChange={(e) => setDate(e.target.value)}
-      onKeyDown={(e) => {
-        if (e.key === 'Enter') { e.preventDefault(); commit(); }
-        if (e.key === 'Escape') { e.preventDefault(); onCancel(); }
-      }}
-      onBlur={commit}
-      className="rounded border border-blue-400 px-1.5 py-0.5 text-sm focus:outline-none focus:ring-1 focus:ring-blue-500"
-    />
+    <span className="inline-flex w-[10rem] shrink-0">
+      <TextInput
+        ref={inputRef} type="date" aria-label={label} value={date}
+        onChange={(e) => setDate(e.target.value)}
+        onKeyDown={(e) => {
+          if (isImeKeyDown(e)) return;
+          if (e.key === 'Enter') { e.preventDefault(); commit(); }
+          if (e.key === 'Escape') { e.preventDefault(); onCancel(); }
+        }}
+        onBlur={commit}
+      />
+    </span>
   );
 }
 
@@ -110,6 +125,9 @@ function useStreamDetailController({
   // The playback clock lives in an external store: only the pill and the readout hear its ticks.
   usePlayerClock(playerRef);
   const confirm = useConfirm();
+  // Below 640px the header's actions fold into its ⋯ menu (spec §9).
+  const isNarrow = useMediaQuery('(max-width: 639px)');
+  const pageRef = useRef<HTMLDivElement>(null);
 
   const isCurator = user.role === 'curator';
 
@@ -122,6 +140,26 @@ function useStreamDetailController({
     reload: reloadDetail,
     mutate: mutateDetail,
   } = useApiResource(() => api.getStreamDetail(streamId), [streamId]);
+
+  // --- The sticky header's height, for the sticky workbench column below it ---
+  //
+  // No fixed offset would do: a long title or a narrow window wraps the header onto two or three
+  // rows. So the page root keeps `--stream-header-h` at the header's height — measured once the root
+  // is on screen (it renders once the detail has loaded), then on every resize of the header.
+  // Without ResizeObserver the column falls back to the header's 76px minimum.
+  const pageShown = detail !== null;
+  useLayoutEffect(() => {
+    const page = pageRef.current;
+    const header = page?.firstElementChild;
+    if (!page || !header || typeof ResizeObserver === 'undefined') return undefined;
+    const publish = () => {
+      page.style.setProperty('--stream-header-h', `${Math.ceil(header.getBoundingClientRect().height)}px`);
+    };
+    publish();
+    const observer = new ResizeObserver(publish);
+    observer.observe(header);
+    return () => observer.disconnect();
+  }, [pageShown]);
 
   // --- The selected row, derived ---
   //
@@ -295,7 +333,9 @@ function useStreamDetailController({
   // --- Bulk approve all ---
   const handleApproveAll = useCallback(async () => {
     if (!detail) return;
-    const pendingCount = detail.performances.filter((p) => p.status !== 'approved').length;
+    // Only pending performances: bulkApproveStream (admin/src/db.ts) never touches extracted,
+    // rejected or excluded rows, so the confirm must name the narrower count it actually acts on.
+    const pendingCount = detail.performances.filter((p) => p.status === 'pending').length;
     const confirmed = await confirm({
       title: `Approve all ${pendingCount} pending performances?`,
       confirmLabel: 'Approve all',
@@ -438,6 +478,9 @@ function useStreamDetailController({
     seekToStart,
     seekToEnd,
     seekTo,
+    isNarrow,
+    navigate,
+    pageRef,
   };
 }
 
@@ -445,6 +488,210 @@ export type StreamDetailController = ReturnType<typeof useStreamDetailController
 
 /** The icon buttons that sit on glass: the mockup's round, outlined `.ib` (as in the Stamp Editor). */
 const OUTLINED_ICON_BUTTON = 'border border-field-line bg-field';
+
+/**
+ * A link styled as an icon-only button: the kit's small secondary button in a fixed 32px circle, the
+ * size of the Stamp Editor's Newer / Older buttons. The small size's side padding stays (a smaller
+ * padding class would lose to it in the stylesheet); in a box this narrow, flex centring shares the
+ * icon's overflow evenly, so the icon still sits in the middle.
+ */
+const ICON_LINK = `${buttonClasses({ variant: 'secondary', size: 'sm' })} h-8 w-8`;
+
+/**
+ * One of the header's prev / next links to a neighbouring stream: its label and tooltip carry the
+ * stream's date. The stream list is newest first, so the previous stream is the newer one.
+ */
+function NeighbourLink({ stream, direction }: { stream: Stream; direction: 'Newer' | 'Older' }) {
+  const label = `${direction} stream · ${stream.date}`;
+  return (
+    <Tooltip label={label} side="bottom">
+      <Link to={`/streams/${stream.id}`} aria-label={label} className={ICON_LINK}>
+        <Icon name={direction === 'Newer' ? 'chevronLeft' : 'chevronRight'} size={16} />
+      </Link>
+    </Tooltip>
+  );
+}
+
+/**
+ * The page header (spec §8.3). The crumb leads back to Streams; the title, which a curator renames
+ * by double-clicking it or with Edit, is cut to one line with its full text in `title`; prev / next
+ * sit beside it; the meta row carries the date (double-click to edit), status, video ID, Copy URL,
+ * credit and Edit. The actions: Open in Stamp Editor, the status-driven primary action and a ⋯ menu
+ * with the rest, Delete stream last; below 640px the first two fold into that menu, and the ⋯ moves
+ * to the end of the prev / next row. A contributor gets the Open link alone, which below 640px moves
+ * there too, as an icon link. Hook-free, like the view it is part of.
+ */
+function StreamHeader({
+  controller,
+  detail,
+}: {
+  controller: StreamDetailController;
+  detail: NonNullable<StreamDetailController['detail']>;
+}) {
+  const {
+    streamId,
+    editingField,
+    setEditingField,
+    isCurator,
+    isNarrow,
+    navigate,
+    prevStream,
+    nextStream,
+    handleStreamStatus,
+    handleStreamSave,
+    handleDeleteStream,
+    copyVodUrl,
+  } = controller;
+
+  const editingStream = editingField?.type === 'stream' ? editingField.field : null;
+  const stampEditorPath = `/stamp?stream=${encodeURIComponent(streamId)}`;
+  const { primary, menu: statusMenu, canDelete } = streamStatusActions(detail.status);
+  // A curator's ⋯ menu. Below 640px it takes in the header's own two actions first, in the order
+  // they stood; then the status changes the primary action leaves; Delete stream always last.
+  const streamMenuItems: MenuItem[] = [
+    ...(isNarrow ? [{ label: 'Open in Stamp Editor', onSelect: () => navigate(stampEditorPath) }] : []),
+    ...(isNarrow && primary ? [{ label: primary.label, onSelect: () => handleStreamStatus(primary.status) }] : []),
+    ...statusMenu.map((action) => ({ label: action.label, onSelect: () => handleStreamStatus(action.status) })),
+    ...(canDelete ? [{ label: 'Delete stream', tone: 'danger' as const, onSelect: handleDeleteStream }] : []),
+  ];
+  const openInStampEditor = (
+    <Link to={stampEditorPath} className={buttonClasses({ variant: 'secondary', size: 'sm' })}>
+      <Icon name="timer" size={14} />
+      Open in Stamp Editor
+    </Link>
+  );
+  // Below 640px the header's one action joins the prev / next links' row, at its far end, rather
+  // than taking a row of its own: a curator's ⋯ (its menu opens towards the free space), or a
+  // contributor's Open in Stamp Editor as an icon link like those. With nothing to hold (an
+  // approved stream from 640px), there is no ⋯: never an empty menu.
+  const streamMenu =
+    isCurator && streamMenuItems.length > 0 ? (
+      <Popover
+        kind="menu"
+        label="More stream actions"
+        align="end"
+        className={isNarrow ? 'ml-auto' : undefined}
+        trigger={({ triggerProps }) => (
+          <IconButton
+            {...triggerProps}
+            label="More stream actions"
+            icon="more"
+            tooltipSide="bottom"
+            className={OUTLINED_ICON_BUTTON}
+          />
+        )}
+      >
+        {(close) => <Menu items={streamMenuItems} onDone={close} />}
+      </Popover>
+    ) : null;
+  const neighbours =
+    prevStream || nextStream ? (
+      <>
+        {prevStream ? <NeighbourLink stream={prevStream} direction="Newer" /> : null}
+        {nextStream ? <NeighbourLink stream={nextStream} direction="Older" /> : null}
+      </>
+    ) : null;
+  // A contributor's Open in Stamp Editor below 640px. The row's own child takes `ml-auto`: the
+  // tooltip wraps the link.
+  const stampEditorIconLink = (
+    <span className="ml-auto flex">
+      <Tooltip label="Open in Stamp Editor" side="bottom">
+        <Link to={stampEditorPath} aria-label="Open in Stamp Editor" className={ICON_LINK}>
+          <Icon name="timer" size={16} />
+        </Link>
+      </Tooltip>
+    </span>
+  );
+  const narrowAction = isNarrow ? (isCurator ? streamMenu : stampEditorIconLink) : null;
+
+  return (
+    <PageHeader
+      tall
+      recordTitle
+      crumb={
+        <Link to="/streams" className="rounded-radius-xs transition-colors hover:text-accent-fg">
+          Catalog / Streams
+        </Link>
+      }
+      title={
+        editingStream === 'title' ? (
+          <InlineEdit value={detail.title} onSave={(v) => handleStreamSave('title', v)} onCancel={() => setEditingField(null)} />
+        ) : (
+          <span
+            title={detail.title}
+            className={isCurator ? 'cursor-text' : undefined}
+            onDoubleClick={isCurator ? () => setEditingField({ type: 'stream', field: 'title' }) : undefined}
+          >
+            {detail.title || detail.videoId}
+          </span>
+        )
+      }
+      meta={
+        <>
+          {editingStream === 'date' ? (
+            <InlineDateEdit value={detail.date} label="Stream date" onSave={(v) => handleStreamSave('date', v)} onCancel={() => setEditingField(null)} />
+          ) : (
+            <span
+              className={`inline-flex shrink-0${isCurator ? ' cursor-text' : ''}`}
+              onDoubleClick={isCurator ? () => setEditingField({ type: 'stream', field: 'date' }) : undefined}
+              title={isCurator ? 'Double-click to edit' : undefined}
+            >
+              <Pill tone="neutral" className="shrink-0">
+                {detail.date}
+              </Pill>
+            </span>
+          )}
+          <StatusPill status={detail.status} />
+          <a
+            href={`https://www.youtube.com/watch?v=${detail.videoId}`}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="inline-flex items-center gap-1 rounded-radius-xs font-mono transition-colors hover:text-accent-fg"
+          >
+            {detail.videoId}
+            <Icon name="arrowUpRight" size={12} />
+          </a>
+          <Button variant="ghost" size="sm" icon="copy" onClick={copyVodUrl}>
+            Copy URL
+          </Button>
+          <span>{detail.credit.author ? `Credit — ${detail.credit.author}` : 'Credit —'}</span>
+          {isCurator ? (
+            <Button variant="ghost" size="sm" icon="pencil" onClick={() => setEditingField({ type: 'stream', field: 'title' })}>
+              Edit
+            </Button>
+          ) : null}
+        </>
+      }
+      actions={
+        isNarrow ? null : isCurator ? (
+          <>
+            {openInStampEditor}
+            {primary ? (
+              <Button
+                variant="primary"
+                size="sm"
+                icon={primary.status === 'approved' ? 'check' : 'undo'}
+                onClick={() => handleStreamStatus(primary.status)}
+              >
+                {primary.label}
+              </Button>
+            ) : null}
+            {streamMenu}
+          </>
+        ) : (
+          openInStampEditor
+        )
+      }
+    >
+      {neighbours || narrowAction ? (
+        <>
+          {neighbours}
+          {narrowAction}
+        </>
+      ) : null}
+    </PageHeader>
+  );
+}
 
 export function StreamDetailView({ controller }: { controller: StreamDetailController }) {
   const {
@@ -467,14 +714,8 @@ export function StreamDetailView({ controller }: { controller: StreamDetailContr
     fetchLog,
     clearFetchLog,
     isCurator,
-    prevStream,
-    nextStream,
     unstampedCount,
-    handleStreamStatus,
-    handleStreamSave,
-    handleDeleteStream,
     handlePasteImportDone,
-    copyVodUrl,
     exportSongList,
     handleSave,
     handleDelete,
@@ -489,22 +730,33 @@ export function StreamDetailView({ controller }: { controller: StreamDetailContr
     seekToStart,
     seekToEnd,
     seekTo,
+    pageRef,
   } = controller;
 
   // Only a stream with nothing on screen yet shows the skeleton or the error card. A reload keeps
   // the last rows up, and with them the workbench and its player, so a row approve or a save never
-  // restarts the video; a reload that fails says so in a note above the body instead.
+  // restarts the video; a reload that fails says so in a note above the body instead. The studio
+  // frame gives the page no card, so both bring the page gutter themselves.
   if (!detail) {
-    if (loading) return <Skeleton rows={6} />;
     return (
-      <GlassCard>
-        <EmptyState icon="alert" title={error ?? 'Stream not found'} />
-      </GlassCard>
+      <div className="p-4 lg:px-5">
+        {loading ? (
+          <Skeleton rows={6} />
+        ) : (
+          <GlassCard>
+            <EmptyState icon="alert" title={error ?? 'Stream not found'} />
+          </GlassCard>
+        )}
+      </div>
     );
   }
 
   const performances = detail.performances;
-  const toReviewCount = performances.filter((p) => p.status !== 'approved').length;
+  // What a curator can still act on: the pill counts every row performanceStatusAction would
+  // approve (pending and extracted — one source of truth with the row's own button, below).
+  // Approve All acts on pending rows alone, all bulkApproveStream (admin/src/db.ts) ever touches.
+  const toReviewCount = performances.filter((p) => performanceStatusAction(p.status)?.status === 'approved').length;
+  const pendingCount = performances.filter((p) => p.status === 'pending').length;
   const performanceMenuItems: MenuItem[] = [
     ...(isCurator && performances.some((p) => p.status === 'approved')
       ? [{ label: 'Unapprove All', onSelect: handleUnapproveAll }]
@@ -514,116 +766,35 @@ export function StreamDetailView({ controller }: { controller: StreamDetailContr
   ];
 
   return (
-    <div>
-      {/* Breadcrumb with prev/next navigation */}
-      <div className="mb-4 flex items-center justify-between text-sm">
-        <div className="w-40">
-          {prevStream && (
-            <Link to={`/streams/${prevStream.id}`}
-              className="inline-flex items-center gap-1 rounded-md px-2 py-1 text-slate-500 hover:bg-slate-100 hover:text-slate-700">
-              <span>&larr;</span>
-              <span>{prevStream.date}</span>
-            </Link>
-          )}
-        </div>
-        <div className="text-slate-500">
-          <Link to="/streams" className="text-blue-600 hover:underline">Streams</Link>
-          <span className="mx-2">/</span>
-          <span className="text-slate-700">{detail.title || detail.videoId}</span>
-        </div>
-        <div className="flex w-40 justify-end">
-          {nextStream && (
-            <Link to={`/streams/${nextStream.id}`}
-              className="inline-flex items-center gap-1 rounded-md px-2 py-1 text-slate-500 hover:bg-slate-100 hover:text-slate-700">
-              <span>{nextStream.date}</span>
-              <span>&rarr;</span>
-            </Link>
-          )}
-        </div>
-      </div>
-
-      {/* Stream header */}
-      <div className="rounded-lg border border-slate-200 bg-white p-5">
-        <div className="flex items-start justify-between">
-          <div>
-            <h2 className="text-xl font-semibold text-slate-800">
-              {editingField?.type === 'stream' && editingField.field === 'title' ? (
-                <InlineEdit value={detail.title} onSave={(v) => handleStreamSave('title', v)} onCancel={() => setEditingField(null)} />
-              ) : (
-                <span className={isCurator ? 'cursor-text' : ''} onDoubleClick={() => { if (isCurator) setEditingField({ type: 'stream', field: 'title' }); }} title={isCurator ? 'Double-click to edit' : undefined}>
-                  {detail.title}
-                </span>
-              )}
-            </h2>
-            <div className="mt-1 flex flex-wrap items-center gap-3 text-sm text-slate-500">
-              {editingField?.type === 'stream' && editingField.field === 'date' ? (
-                <InlineDateEdit value={detail.date} label="Stream date" onSave={(v) => handleStreamSave('date', v)} onCancel={() => setEditingField(null)} />
-              ) : (
-                <span className={isCurator ? 'cursor-text' : ''} onDoubleClick={() => { if (isCurator) setEditingField({ type: 'stream', field: 'date' }); }} title={isCurator ? 'Double-click to edit' : undefined}>
-                  {detail.date}
-                </span>
-              )}
-              <a href={`https://www.youtube.com/watch?v=${detail.videoId}`} target="_blank" rel="noopener noreferrer" className="text-blue-600 hover:underline">
-                {detail.videoId}
-              </a>
-              <button onClick={copyVodUrl} className="rounded bg-slate-100 px-2 py-0.5 text-xs text-slate-600 hover:bg-slate-200">
-                Copy URL
-              </button>
-              <StatusBadge status={detail.status} />
-            </div>
-            {detail.credit.author && (
-              <p className="mt-1 text-xs text-slate-400">
-                Credit: {detail.credit.author}
-              </p>
-            )}
-          </div>
-          <div className="flex flex-wrap items-center gap-2">
-            <Link to="/stamp" className="rounded-md bg-slate-200 px-3 py-1 text-sm font-medium text-slate-700 hover:bg-slate-300">
-              Open in Stamp Editor
-            </Link>
-            {isCurator && (
-              <>
-                {(detail.status === 'pending' || detail.status === 'extracted') && (
-                  <>
-                    <button onClick={() => handleStreamStatus('approved')} className="rounded bg-green-600 px-3 py-1.5 text-sm text-white hover:bg-green-700">Approve</button>
-                    <button onClick={() => handleStreamStatus('rejected')} className="rounded bg-red-600 px-3 py-1.5 text-sm text-white hover:bg-red-700">Reject</button>
-                  </>
-                )}
-                {detail.status === 'approved' && (
-                  <button onClick={() => handleStreamStatus('pending')} className="rounded bg-yellow-500 px-3 py-1.5 text-sm text-white hover:bg-yellow-600">Unapprove</button>
-                )}
-                {detail.status !== 'excluded' && (
-                  <button onClick={() => handleStreamStatus('excluded')} className="rounded bg-slate-500 px-3 py-1.5 text-sm text-white hover:bg-slate-600">Exclude</button>
-                )}
-                {detail.status === 'excluded' && (
-                  <button onClick={() => handleStreamStatus('pending')} className="rounded bg-blue-500 px-3 py-1.5 text-sm text-white hover:bg-blue-600">Restore</button>
-                )}
-                {/* Hard delete is blocked for approved streams — unapprove first */}
-                {detail.status !== 'approved' && (
-                  <button onClick={handleDeleteStream} className="rounded bg-red-800 px-3 py-1.5 text-sm text-white hover:bg-red-900">Delete stream</button>
-                )}
-              </>
-            )}
-          </div>
-        </div>
-      </div>
+    // The page fills <main> itself (the studio frame). `overflow-x-clip`: the centred tooltip of a
+    // header button at the far end reaches past <main>'s edge and would otherwise scroll the page
+    // sideways; clip, unlike hidden, leaves the sticky header and the sticky column working. The
+    // header is the root's first child: the controller measures it there (`--stream-header-h`).
+    <div ref={pageRef} className="flex flex-col overflow-x-clip">
+      <StreamHeader controller={controller} detail={detail} />
 
       {/* A reload that failed: the rows below are the last ones that loaded. */}
       {error ? (
         <p
           role="alert"
-          className="mt-4 rounded-radius-lg border border-tone-danger-line bg-tone-danger-bg px-3 py-2 text-token-sm text-tone-danger-fg"
+          className="mx-4 mt-4 rounded-radius-lg border border-tone-danger-line bg-tone-danger-bg px-3 py-2 text-token-sm text-tone-danger-fg lg:mx-5"
         >
           {error}
         </p>
       ) : null}
 
-      {/* The Stamp Editor's workbench beside the performances. Below lg the two stack, and the extra
-          bottom padding lets the last rows scroll clear of the fixed pill. */}
-      <div className="mt-4 grid grid-cols-1 gap-4 max-lg:pb-32 lg:grid-cols-[minmax(0,1.3fr)_minmax(0,1fr)]">
+      {/* The Stamp Editor's workbench beside the performances, in the page gutter, split 1.2 : 1 as in
+          the mockup: from about 1440 px the performances' head then fits one row. Below lg the two
+          stack, and the extra bottom padding lets the last rows scroll clear of the fixed pill. */}
+      <div className="grid grid-cols-1 gap-4 p-4 max-lg:pb-32 lg:grid-cols-[minmax(0,1.2fr)_minmax(0,1fr)] lg:px-5 lg:pb-[18px]">
         {/* The desktop player column is sticky, so the workbench stays on screen however long the
-            table runs; a viewport too short for the whole card scrolls the card, not the page. */}
-        <div ref={playerBoxRef} className="min-w-0 lg:sticky lg:top-4 lg:flex lg:max-h-[calc(100vh-2rem)] lg:flex-col lg:self-start">
+            table runs. It stops 16px below the sticky header, whose height the page root publishes
+            (it grows when the header wraps), and a viewport too short for the whole card scrolls
+            the card, not the page. */}
+        <div
+          ref={playerBoxRef}
+          className="min-w-0 lg:sticky lg:top-[calc(var(--stream-header-h,76px)_+_1rem)] lg:flex lg:max-h-[calc(100vh_-_var(--stream-header-h,76px)_-_2rem)] lg:flex-col lg:self-start"
+        >
           <WorkbenchCard
             playerRef={playerRef}
             videoId={detail.videoId}
@@ -665,7 +836,7 @@ export function StreamDetailView({ controller }: { controller: StreamDetailContr
               ) : null}
             </div>
             <div className="ml-auto flex min-h-[30px] items-center gap-1">
-              {isCurator && toReviewCount > 0 ? (
+              {isCurator && pendingCount > 0 ? (
                 <Button size="sm" onClick={handleApproveAll}>
                   <Icon name="check" size={14} className="max-xl:hidden" />
                   Approve All
@@ -863,11 +1034,12 @@ const PerformanceTable = memo(function PerformanceTable({
             const selected = i === selectedIndex;
             const editing = editingField?.perfId === perf.id ? editingField.field : null;
             const actionsShown = selected || editing !== null;
-            const approved = perf.status === 'approved';
+            const reviewMark = performanceReviewMark(perf.status);
+            const statusAction = isCurator ? performanceStatusAction(perf.status) : null;
             const end = perf.endTimestamp;
             const last = i === lastIndex;
-            // Edit note and Delete for everyone; Approve or Unapprove for a curator; Clear end once stamped.
-            const actionCount = 2 + (isCurator ? 1 : 0) + (end !== null ? 1 : 0);
+            // Edit note and Delete for everyone; the row's one status action for a curator; Clear end once stamped.
+            const actionCount = 2 + (statusAction ? 1 : 0) + (end !== null ? 1 : 0);
             const startEditing = (field: PerfEditingField['field']) => {
               setEditingField({ type: 'perf', perfId: perf.id, field });
             };
@@ -998,15 +1170,18 @@ const PerformanceTable = memo(function PerformanceTable({
                   )}
                 </td>
 
-                {/* Review state: a check once approved, a hollow ring while pending. */}
+                {/* Review state: a check once approved, a hollow ring while pending, a small toned
+                    icon otherwise (extracted, rejected, excluded) — the same tone as StatusPill's. */}
                 <td className={`px-1.5 pt-3.5 align-top${last ? ' lg:rounded-br-[18px]' : ''}`}>
-                  <div className="flex h-4 items-center justify-center">
-                    {approved ? (
+                  <div className="flex h-4 items-center justify-center" title={reviewMark.word}>
+                    {reviewMark.kind === 'approved' ? (
                       <Icon name="check" size={14} className="text-tone-ok-fg" />
-                    ) : (
+                    ) : reviewMark.kind === 'pending' ? (
                       <span aria-hidden="true" className="h-3 w-3 rounded-full border-2 border-tone-warn-fg" />
+                    ) : (
+                      <Icon name={reviewMark.icon} size={14} className={reviewMark.className} />
                     )}
-                    <span className="sr-only">{approved ? 'Approved' : 'Pending review'}</span>
+                    <span className="sr-only">{reviewMark.word}</span>
                   </div>
                 </td>
 
@@ -1016,31 +1191,18 @@ const PerformanceTable = memo(function PerformanceTable({
                       actionsShown ? ROW_ACTIONS_SHOWN : ROW_ACTIONS_ON_DEMAND
                     }`}
                   >
-                    {isCurator ? (
-                      approved ? (
-                        <IconButton
-                          label="Unapprove performance"
-                          icon="undo"
-                          size="sm"
-                          tooltipSide="bottom"
-                          onClick={(event) => {
-                            event.stopPropagation();
-                            onPerformanceStatus(perf.id, 'pending');
-                          }}
-                        />
-                      ) : (
-                        <IconButton
-                          label="Approve performance"
-                          icon="check"
-                          tone="ok"
-                          size="sm"
-                          tooltipSide="bottom"
-                          onClick={(event) => {
-                            event.stopPropagation();
-                            onPerformanceStatus(perf.id, 'approved');
-                          }}
-                        />
-                      )
+                    {statusAction ? (
+                      <IconButton
+                        label={statusAction.label}
+                        icon={statusAction.icon}
+                        tone={statusAction.status === 'approved' ? 'ok' : 'default'}
+                        size="sm"
+                        tooltipSide="bottom"
+                        onClick={(event) => {
+                          event.stopPropagation();
+                          onPerformanceStatus(perf.id, statusAction.status);
+                        }}
+                      />
                     ) : null}
                     {end !== null ? (
                       <IconButton
@@ -1132,7 +1294,11 @@ export default function StreamDetail({ user }: { user: AuthUser }) {
     <>
       {/* `/streams/:id` always carries an id; this is what narrows it for the page below. */}
       {streamId === undefined ? (
-        <div className="text-red-600">Stream not found</div>
+        <div className="p-4 lg:px-5">
+          <GlassCard>
+            <EmptyState icon="alert" title="Stream not found" />
+          </GlassCard>
+        </div>
       ) : (
         <StreamDetailForStream
           key={streamId}
