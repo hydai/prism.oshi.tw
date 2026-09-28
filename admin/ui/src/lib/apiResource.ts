@@ -38,7 +38,8 @@ export function createRequestSequencer(): RequestSequencer {
 }
 
 export function errorMessage(err: unknown, fallback: string): string {
-  return err instanceof Error ? err.message : fallback;
+  if (!(err instanceof Error)) return fallback;
+  return err.message.trim() === '' ? fallback : err.message;
 }
 
 export type LoadResult<T> = { ok: true; data: T } | { ok: false; error: string };
