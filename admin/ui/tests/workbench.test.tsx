@@ -8,6 +8,7 @@ import { TimelineStrip } from '../src/components/workbench/TimelineStrip';
 import { StampConsole } from '../src/components/workbench/StampConsole';
 import { ShortcutHints, ShortcutSheet } from '../src/components/workbench/ShortcutHints';
 import { PlayerPanel } from '../src/components/workbench/PlayerPanel';
+import { WorkbenchCard } from '../src/components/workbench/WorkbenchCard';
 import { isOverlayOpen } from '../src/lib/overlay';
 import { handleEditorShortcut } from '../src/hooks/useEditorShortcuts';
 import type { EditorShortcutEvent, EditorShortcutHandlers } from '../src/hooks/useEditorShortcuts';
@@ -528,4 +529,48 @@ function keyCaps(html: string): string[] {
   assert(empty === '', 'an empty log still renders nothing');
 
   console.log('✓ FetchLogPanel renders Icon (check/alert/x) instead of unicode glyphs, with token colours');
+}
+
+// --- WorkbenchCard: the shared left card (PlayerPanel, TimelineStrip, StampConsole,
+// ShortcutHints, and the fetch log's <details> only once entries exist) ---
+
+{
+  const rows: StampPerformance[] = [
+    { id: 'p1', songId: 's1', title: 'First Song', originalArtist: 'A', timestamp: 65, endTimestamp: 245, note: '', status: 'pending' },
+    { id: 'p2', songId: 's2', title: 'Second Song', originalArtist: '', timestamp: 3700, endTimestamp: null, note: '', status: 'approved' },
+  ];
+  const playerRef: RefObject<YouTubePlayerHandle | null> = { current: null };
+  const cardProps = {
+    playerRef,
+    videoId: 'abc123',
+    rows,
+    selectedIndex: 1,
+    onSeek: noop,
+    onSetStart: noop,
+    onMarkEnd: noop,
+    onSeekStart: noop,
+    seekToEnd: noop,
+    onOpenShortcuts: noop,
+    onClearFetchLog: noop,
+  };
+
+  const html = renderToStaticMarkup(<WorkbenchCard {...cardProps} fetchLog={[]} />);
+  assert(html.includes('aria-label="Stream timeline"'), 'WorkbenchCard renders the TimelineStrip');
+  // StampConsole renders before ShortcutHints in the card, so its four key caps come first.
+  assert(keyCaps(html).slice(0, 4).join(' ') === 't s m e', 'WorkbenchCard renders the StampConsole key caps (t s m e)');
+  assert(html.includes('all shortcuts'), 'WorkbenchCard renders the ShortcutHints row');
+  assert(!html.includes('<details'), 'with no fetch-log entries, WorkbenchCard renders no <details> disclosure');
+  // PlayerPanel embeds YouTubePlayer's bg-black letterbox, so both kept-class sets apply here.
+  assert(
+    !NO_RAW_PALETTE.test(withoutKeptClasses(html, [...STAMP_CONSOLE_KEPT_CLASSES, ...PLAYER_PANEL_KEPT_CLASSES])),
+    'WorkbenchCard uses no raw Tailwind palette classes beyond the StampConsole and PlayerPanel kept classes',
+  );
+
+  const withLogHtml = renderToStaticMarkup(
+    <WorkbenchCard {...cardProps} fetchLog={[{ key: 1, title: 'Song A', tone: 'success', text: '3:20' }]} />,
+  );
+  assert(withLogHtml.includes('<details'), 'with a fetch-log entry, WorkbenchCard renders the <details> disclosure');
+  assert(withLogHtml.includes('iTunes fetch log (1)'), 'the disclosure names the entry count');
+
+  console.log('✓ WorkbenchCard composes PlayerPanel, TimelineStrip, StampConsole and ShortcutHints, and shows the fetch log only once it has entries');
 }
