@@ -289,7 +289,7 @@ function WorkRow({ work, selected, onSelectedChange, onEdit }: WorkRowProps) {
   const hiddenTags = work.tags.slice(visibleTags.length);
 
   return (
-    <tr className={`h-11 border-b border-line-soft transition-colors ${selected ? 'bg-selected' : 'hover:bg-field'}`}>
+    <tr className={`h-11 border-b border-line-soft transition-colors ${selected ? 'bg-selected' : 'hover:bg-row-hover'}`}>
       <td className={`${FIRST_CELL_X} py-2`}>
         {/* A flex box, so the inline label does not sit on the text baseline above the row's middle. */}
         <div className="flex">

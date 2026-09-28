@@ -172,7 +172,7 @@ function StampingList({ streams }: { streams: StreamWithPending[] }) {
           <li key={stream.id} className="border-b border-line-soft last:border-b-0">
             <Link
               to={`/stamp?stream=${encodeURIComponent(stream.id)}`}
-              className="grid h-9 grid-cols-[auto_minmax(0,1fr)_auto_14px] items-center gap-2.5 rounded-radius-sm text-[12px] transition-colors hover:bg-field focus-visible:outline-none focus-visible:shadow-focus"
+              className="grid h-9 grid-cols-[auto_minmax(0,1fr)_auto_14px] items-center gap-2.5 rounded-radius-sm text-[12px] transition-colors hover:bg-row-hover focus-visible:outline-none focus-visible:shadow-focus"
             >
               {/* The full date from 640 px, MM-DD on a phone. */}
               <Pill tone="neutral" className="tabular-nums">
@@ -243,7 +243,7 @@ function RecentSubmissions({ items, now }: { items: (Song | Stream)[]; now: numb
                 if (event.target instanceof Element && event.target.closest('a')) return;
                 navigate(href);
               }}
-              className="h-11 cursor-pointer border-b border-line-soft transition-colors last:border-b-0 hover:bg-field"
+              className="h-11 cursor-pointer border-b border-line-soft transition-colors last:border-b-0 hover:bg-row-hover"
             >
               <td className={FIRST_CELL_X}>
                 <Icon name={isSong ? 'music' : 'radio'} size={14} className="text-fg-subtle" />

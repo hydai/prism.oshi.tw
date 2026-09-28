@@ -110,7 +110,7 @@ interface DiscoverRowProps {
 function DiscoverRow({ stream, selected, onSelectedChange }: DiscoverRowProps) {
   const name = stream.title || stream.videoId;
   return (
-    <tr className={`h-[50px] border-b border-line-soft transition-colors ${selected ? 'bg-selected' : 'hover:bg-field'}`}>
+    <tr className={`h-[50px] border-b border-line-soft transition-colors ${selected ? 'bg-selected' : 'hover:bg-row-hover'}`}>
       <td className={`${FIRST_CELL_X} py-1.5`}>
         {stream.isNew ? (
           // A flex box, so the inline label does not sit on the text baseline above the row's middle.

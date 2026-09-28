@@ -127,6 +127,10 @@ body {
   --accent-gradient: linear-gradient(135deg, #F472B6, #60A5FA);
   --accent-fg: #DB2777;
   --selected-bg: rgba(252,231,243,.85);
+  /* A hovered row on glass (a card, the sidebar): not in the spec table. --field there is white on
+     white, 1.03–1.05:1; this slate tint moves a row at rest by at least 1.10:1 on every backdrop
+     (tests/design-tokens.test.ts), and stays grey beside the pink --selected-bg. */
+  --row-hover: rgba(148,163,184,.15);
   --nav-active-bg: rgba(255,255,255,.88);
   --nav-active-fg: #DB2777;
   --nav-active-icon: #EC4899;
@@ -209,6 +213,7 @@ html.dark {
   --accent-gradient: linear-gradient(135deg, #F472B6, #60A5FA);
   --accent-fg: #F9A8D4;
   --selected-bg: rgba(244,114,182,.12);
+  --row-hover: rgba(255,255,255,.05);
   --nav-active-bg: rgba(255,255,255,.08);
   --nav-active-fg: #FFFFFF;
   --nav-active-icon: #F9A8D4;

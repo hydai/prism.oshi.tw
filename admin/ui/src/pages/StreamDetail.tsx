@@ -1059,7 +1059,7 @@ const PerformanceTable = memo(function PerformanceTable({
                   setEditingField(null);
                 }}
                 className={`group h-11 cursor-pointer border-b border-line-soft transition-colors last:border-b-0 ${
-                  selected ? 'bg-selected shadow-[inset_3px_0_0_var(--nav-active-icon)]' : 'hover:bg-field'
+                  selected ? 'bg-selected shadow-[inset_3px_0_0_var(--nav-active-icon)]' : 'hover:bg-row-hover'
                 }`}
               >
                 <td className={`pl-3.5 pr-1.5 pt-3.5 align-top font-mono text-meta text-fg-subtle${last ? ' rounded-bl-[18px]' : ''}`}>

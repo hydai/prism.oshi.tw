@@ -13,7 +13,7 @@ const GROUP_LABEL_CLASSES = 'px-2.5 pb-1 pt-[11px] text-2xs font-bold uppercase 
 
 const LINK_CLASSES =
   'relative flex h-[29px] items-center gap-[9px] rounded-[10px] px-2.5 text-[12.5px] transition-colors focus-visible:outline-none focus-visible:shadow-focus';
-const IDLE_LINK_CLASSES = 'font-medium text-fg-muted hover:bg-field hover:text-fg';
+const IDLE_LINK_CLASSES = 'font-medium text-fg-muted hover:bg-row-hover hover:text-fg';
 // The accent bar sits in the nav's 10 px gutter, at the sidebar's inner edge (mockup `.it.on::before`).
 const CURRENT_LINK_CLASSES =
   'bg-nav-active-bg font-[650] text-nav-active-fg before:absolute before:-left-2.5 before:bottom-1.5 before:top-1.5 before:w-[3px] before:rounded-r-[3px] before:bg-accent before:[box-shadow:var(--nav-bar-glow)]';
