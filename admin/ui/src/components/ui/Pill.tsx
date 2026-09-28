@@ -1,6 +1,7 @@
 import type { ReactNode } from 'react';
+import { capitalizeStatus, statusTone, type Tone } from './pill-core';
 
-export type Tone = 'ok' | 'warn' | 'danger' | 'info' | 'neutral' | 'violet' | 'teal';
+export type { Tone } from './pill-core';
 
 const TONE_CLASSES: Record<Tone, string> = {
   ok: 'bg-tone-ok-bg text-tone-ok-fg border-tone-ok-line',
@@ -26,28 +27,12 @@ export function Pill({
   return <span className={classes}>{children}</span>;
 }
 
-type KnownStatus = 'approved' | 'replied' | 'pending' | 'rejected' | 'closed' | 'excluded' | 'extracted';
-
-const STATUS_TONE: Record<KnownStatus, Tone> = {
-  approved: 'ok',
-  replied: 'ok',
-  pending: 'warn',
-  rejected: 'danger',
-  closed: 'neutral',
-  excluded: 'neutral',
-  extracted: 'teal',
-};
-
-function capitalize(value: string): string {
-  return value.length === 0 ? value : value.charAt(0).toUpperCase() + value.slice(1);
-}
-
 /** Maps every Status, Nova and Crystal status string to a tone (spec §5); unknown statuses fall back to neutral. */
 export function StatusPill({ status }: { status: string }) {
-  const tone = (STATUS_TONE as Record<string, Tone>)[status] ?? 'neutral';
+  const tone = statusTone(status);
   return (
     <Pill tone={tone} className={status === 'excluded' ? 'line-through' : undefined}>
-      {capitalize(status)}
+      {capitalizeStatus(status)}
     </Pill>
   );
 }
