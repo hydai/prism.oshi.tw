@@ -4,21 +4,25 @@ import { useParams, useNavigate, Link } from 'react-router-dom';
 import type { AuthUser, StampPerformance, Status, Stream } from '../../../shared/types';
 import { api } from '../api/client';
 import StatusBadge from '../components/StatusBadge';
-import { YouTubePlayer } from '../components/YouTubePlayer';
 import type { YouTubePlayerHandle } from '../components/YouTubePlayer';
-import { FetchLogPanel } from '../components/FetchLogPanel';
 import type { FetchLogEntry } from '../components/FetchLogPanel';
 import { FloatingPlaybackPill } from '../components/FloatingPlaybackPill';
-import { PlaybackTime } from '../components/PlaybackTime';
 import { InlineEdit } from '../components/stamp/InlineEdit';
 import { AddSongModal } from '../components/stamp/AddSongModal';
 import { PasteImportModal } from '../components/stamp/PasteImportModal';
+import { Button, IconButton } from '../components/ui/Button';
 import { useConfirm } from '../components/ui/confirm';
+import { EmptyState, GlassCard, Skeleton } from '../components/ui/Display';
+import { Icon } from '../components/ui/Icon';
+import { Pill } from '../components/ui/Pill';
+import { Menu, Popover, type MenuItem } from '../components/ui/Popover';
 import { useShowToast } from '../components/ui/toast';
+import { ShortcutSheet } from '../components/workbench/ShortcutHints';
+import { WorkbenchCard } from '../components/workbench/WorkbenchCard';
 import type { ShowToast } from '../hooks/useToast';
 import { useFetchLog } from '../hooks/useFetchLog';
 import type { AppendFetchLog } from '../hooks/useFetchLog';
-import { useEditorShortcuts } from '../hooks/useEditorShortcuts';
+import { END_PREVIEW_SECONDS, useEditorShortcuts } from '../hooks/useEditorShortcuts';
 import { useFetchAllDurations } from '../hooks/useFetchAllDurations';
 import { usePerformances } from '../hooks/usePerformances';
 import { usePlayerClock } from '../hooks/usePlayerClock';
@@ -98,6 +102,7 @@ function useStreamDetailController({
   const [editingField, setEditingField] = useState<EditingField | null>(null);
   const [showPasteImport, setShowPasteImport] = useState(false);
   const [showAddModal, setShowAddModal] = useState(false);
+  const [shortcutsOpen, setShortcutsOpen] = useState(false);
   // The row the curator picked, once they have picked one; `null` until then. See `selectedIndex`.
   const [userSelectedIndex, setUserSelectedIndex] = useState<number | null>(null);
   const playerRef = useRef<YouTubePlayerHandle>(null);
@@ -174,6 +179,11 @@ function useStreamDetailController({
   // back. A `useApiResource` reload is a request, not a round trip: the fetch it schedules runs in
   // an effect, so there is nothing left here to await.
   const reload = useCallback(async () => { reloadDetail(); }, [reloadDetail]);
+
+  /** Timeline clicks: the player as it is when the click lands, not as it was at render. */
+  const seekTo = useCallback((seconds: number) => {
+    playerRef.current?.seekTo(seconds);
+  }, []);
 
   const {
     markEndTimestamp,
@@ -378,8 +388,9 @@ function useStreamDetailController({
       fetchAllDurations,
       exportSongList,
       openPasteImport: () => setShowPasteImport(true),
+      openShortcuts: () => setShortcutsOpen(true),
     },
-    { playerRef, disabled: showAddModal || showPasteImport },
+    { playerRef, disabled: showAddModal || showPasteImport || shortcutsOpen },
   );
 
   // --- Derived values ---
@@ -400,6 +411,8 @@ function useStreamDetailController({
     setSelectedIndex,
     showAddModal,
     setShowAddModal,
+    shortcutsOpen,
+    setShortcutsOpen,
     fetchLog,
     clearFetchLog,
     isCurator,
@@ -420,10 +433,18 @@ function useStreamDetailController({
     clearEndTimestamp,
     clearAllEndTimestamps,
     handleAddSong: addSong,
+    markStartTimestamp,
+    markEndTimestamp,
+    seekToStart,
+    seekToEnd,
+    seekTo,
   };
 }
 
 export type StreamDetailController = ReturnType<typeof useStreamDetailController>;
+
+/** The icon buttons that sit on glass: the mockup's round, outlined `.ib` (as in the Stamp Editor). */
+const OUTLINED_ICON_BUTTON = 'border border-field-line bg-field';
 
 export function StreamDetailView({ controller }: { controller: StreamDetailController }) {
   const {
@@ -441,6 +462,8 @@ export function StreamDetailView({ controller }: { controller: StreamDetailContr
     setSelectedIndex,
     showAddModal,
     setShowAddModal,
+    shortcutsOpen,
+    setShortcutsOpen,
     fetchLog,
     clearFetchLog,
     isCurator,
@@ -461,10 +484,34 @@ export function StreamDetailView({ controller }: { controller: StreamDetailContr
     clearEndTimestamp,
     clearAllEndTimestamps,
     handleAddSong,
+    markStartTimestamp,
+    markEndTimestamp,
+    seekToStart,
+    seekToEnd,
+    seekTo,
   } = controller;
 
-  if (loading) return <div className="text-slate-500">Loading...</div>;
-  if (error || !detail) return <div className="text-red-600">{error ?? 'Stream not found'}</div>;
+  // Only a stream with nothing on screen yet shows the skeleton or the error card. A reload keeps
+  // the last rows up, and with them the workbench and its player, so a row approve or a save never
+  // restarts the video; a reload that fails says so in a note above the body instead.
+  if (!detail) {
+    if (loading) return <Skeleton rows={6} />;
+    return (
+      <GlassCard>
+        <EmptyState icon="alert" title={error ?? 'Stream not found'} />
+      </GlassCard>
+    );
+  }
+
+  const performances = detail.performances;
+  const toReviewCount = performances.filter((p) => p.status !== 'approved').length;
+  const performanceMenuItems: MenuItem[] = [
+    ...(isCurator && performances.some((p) => p.status === 'approved')
+      ? [{ label: 'Unapprove All', onSelect: handleUnapproveAll }]
+      : []),
+    { label: 'Clear All', tone: 'danger', onSelect: clearAllEndTimestamps },
+    { label: 'Export', disabled: performances.length === 0, onSelect: exportSongList },
+  ];
 
   return (
     <div>
@@ -530,150 +577,153 @@ export function StreamDetailView({ controller }: { controller: StreamDetailContr
               </p>
             )}
           </div>
-          {isCurator && (
-            <div className="flex flex-wrap gap-2">
-              {(detail.status === 'pending' || detail.status === 'extracted') && (
-                <>
-                  <button onClick={() => handleStreamStatus('approved')} className="rounded bg-green-600 px-3 py-1.5 text-sm text-white hover:bg-green-700">Approve</button>
-                  <button onClick={() => handleStreamStatus('rejected')} className="rounded bg-red-600 px-3 py-1.5 text-sm text-white hover:bg-red-700">Reject</button>
-                </>
-              )}
-              {detail.status === 'approved' && (
-                <button onClick={() => handleStreamStatus('pending')} className="rounded bg-yellow-500 px-3 py-1.5 text-sm text-white hover:bg-yellow-600">Unapprove</button>
-              )}
-              {detail.status !== 'excluded' && (
-                <button onClick={() => handleStreamStatus('excluded')} className="rounded bg-slate-500 px-3 py-1.5 text-sm text-white hover:bg-slate-600">Exclude</button>
-              )}
-              {detail.status === 'excluded' && (
-                <button onClick={() => handleStreamStatus('pending')} className="rounded bg-blue-500 px-3 py-1.5 text-sm text-white hover:bg-blue-600">Restore</button>
-              )}
-              {/* Hard delete is blocked for approved streams — unapprove first */}
-              {detail.status !== 'approved' && (
-                <button onClick={handleDeleteStream} className="rounded bg-red-800 px-3 py-1.5 text-sm text-white hover:bg-red-900">Delete stream</button>
-              )}
+          <div className="flex flex-wrap items-center gap-2">
+            <Link to="/stamp" className="rounded-md bg-slate-200 px-3 py-1 text-sm font-medium text-slate-700 hover:bg-slate-300">
+              Open in Stamp Editor
+            </Link>
+            {isCurator && (
+              <>
+                {(detail.status === 'pending' || detail.status === 'extracted') && (
+                  <>
+                    <button onClick={() => handleStreamStatus('approved')} className="rounded bg-green-600 px-3 py-1.5 text-sm text-white hover:bg-green-700">Approve</button>
+                    <button onClick={() => handleStreamStatus('rejected')} className="rounded bg-red-600 px-3 py-1.5 text-sm text-white hover:bg-red-700">Reject</button>
+                  </>
+                )}
+                {detail.status === 'approved' && (
+                  <button onClick={() => handleStreamStatus('pending')} className="rounded bg-yellow-500 px-3 py-1.5 text-sm text-white hover:bg-yellow-600">Unapprove</button>
+                )}
+                {detail.status !== 'excluded' && (
+                  <button onClick={() => handleStreamStatus('excluded')} className="rounded bg-slate-500 px-3 py-1.5 text-sm text-white hover:bg-slate-600">Exclude</button>
+                )}
+                {detail.status === 'excluded' && (
+                  <button onClick={() => handleStreamStatus('pending')} className="rounded bg-blue-500 px-3 py-1.5 text-sm text-white hover:bg-blue-600">Restore</button>
+                )}
+                {/* Hard delete is blocked for approved streams — unapprove first */}
+                {detail.status !== 'approved' && (
+                  <button onClick={handleDeleteStream} className="rounded bg-red-800 px-3 py-1.5 text-sm text-white hover:bg-red-900">Delete stream</button>
+                )}
+              </>
+            )}
+          </div>
+        </div>
+      </div>
+
+      {/* A reload that failed: the rows below are the last ones that loaded. */}
+      {error ? (
+        <p
+          role="alert"
+          className="mt-4 rounded-radius-lg border border-tone-danger-line bg-tone-danger-bg px-3 py-2 text-token-sm text-tone-danger-fg"
+        >
+          {error}
+        </p>
+      ) : null}
+
+      {/* The Stamp Editor's workbench beside the performances. Below lg the two stack, and the extra
+          bottom padding lets the last rows scroll clear of the fixed pill. */}
+      <div className="mt-4 grid grid-cols-1 gap-4 max-lg:pb-32 lg:grid-cols-[minmax(0,1.3fr)_minmax(0,1fr)]">
+        {/* The desktop player column is sticky, so the workbench stays on screen however long the
+            table runs; a viewport too short for the whole card scrolls the card, not the page. */}
+        <div ref={playerBoxRef} className="min-w-0 lg:sticky lg:top-4 lg:flex lg:max-h-[calc(100vh-2rem)] lg:flex-col lg:self-start">
+          <WorkbenchCard
+            playerRef={playerRef}
+            videoId={detail.videoId}
+            rows={performances}
+            selectedIndex={selectedIndex}
+            onSeek={seekTo}
+            onSetStart={markStartTimestamp}
+            onMarkEnd={markEndTimestamp}
+            onSeekStart={seekToStart}
+            seekToEnd={seekToEnd}
+            onOpenShortcuts={() => setShortcutsOpen(true)}
+            fetchLog={fetchLog}
+            onClearFetchLog={clearFetchLog}
+          />
+        </div>
+
+        {/* The performances. It hugs its rows (the last one rounds the card's bottom corners), and has
+            no overflow of its own: the More menu opens over the rows, or past a short card. */}
+        <GlassCard padding="none" className="min-w-0 lg:self-start">
+          {/* The title with its count and the actions share the first line; the pills join them where
+              the card has room (the mockup's one 48 px row, 1440 px wide) and wrap under the title where
+              it has not. From xl the title's block grows beside the actions and wraps the pills inside
+              itself; below xl the card is too narrow for one row anyway, so the block steps aside
+              (`contents`) and the pills take a full line of their own under the first. Approve All is
+              secondary, as in the mockup: the header's Approve stream is the page's one gradient
+              action. Below xl it drops its icon: at 1024 px the card is 338 px, and the title, its
+              count and the four actions need 326 px with the icon, 306 without. */}
+          <div className="flex min-h-12 flex-wrap items-start gap-x-2 gap-y-1 border-b border-line-soft py-2 pl-3.5 pr-3">
+            <div className="contents xl:flex xl:min-w-0 xl:flex-1 xl:basis-[7.5rem] xl:flex-wrap xl:items-center xl:gap-x-2 xl:gap-y-1">
+              <div className="flex min-h-[30px] items-center gap-2">
+                <h2 className="text-[14px] font-bold text-fg">Performances</h2>
+                <span className="text-[11px] font-semibold text-fg-subtle">{performances.length}</span>
+              </div>
+              {unstampedCount > 0 || toReviewCount > 0 ? (
+                <div className="order-last flex basis-full flex-wrap items-center gap-2 xl:order-none xl:basis-auto">
+                  {unstampedCount > 0 ? <Pill tone="warn">{unstampedCount} unstamped</Pill> : null}
+                  {toReviewCount > 0 ? <Pill tone="neutral">{toReviewCount} to review</Pill> : null}
+                </div>
+              ) : null}
             </div>
-          )}
-        </div>
+            <div className="ml-auto flex min-h-[30px] items-center gap-1">
+              {isCurator && toReviewCount > 0 ? (
+                <Button size="sm" onClick={handleApproveAll}>
+                  <Icon name="check" size={14} className="max-xl:hidden" />
+                  Approve All
+                </Button>
+              ) : null}
+              <IconButton
+                label="Paste Import"
+                icon="clipboardPaste"
+                size="sm"
+                className={OUTLINED_ICON_BUTTON}
+                onClick={() => setShowPasteImport(true)}
+              />
+              <IconButton
+                label="Add Song"
+                icon="plus"
+                size="sm"
+                className={OUTLINED_ICON_BUTTON}
+                onClick={() => setShowAddModal(true)}
+              />
+              <Popover
+                kind="menu"
+                label="More performance actions"
+                align="end"
+                trigger={({ triggerProps }) => (
+                  <IconButton
+                    {...triggerProps}
+                    label="More performance actions"
+                    icon="more"
+                    size="sm"
+                    className={OUTLINED_ICON_BUTTON}
+                  />
+                )}
+              >
+                {(close) => <Menu items={performanceMenuItems} onDone={close} />}
+              </Popover>
+            </div>
+          </div>
+          <PerformanceTable
+            performances={performances}
+            editingField={editingField?.type === 'perf' ? editingField : null}
+            setEditingField={setEditingField}
+            playerRef={playerRef}
+            selectedIndex={selectedIndex}
+            setSelectedIndex={setSelectedIndex}
+            isCurator={isCurator}
+            onSave={handleSave}
+            onDelete={handleDelete}
+            onPerformanceStatus={handlePerformanceStatus}
+            onClearEndTimestamp={clearEndTimestamp}
+          />
+        </GlassCard>
       </div>
 
-      {/* YouTube Player */}
-      <div className="mt-4" ref={playerBoxRef}>
-        <YouTubePlayer ref={playerRef} videoId={detail.videoId} />
-
-        {/* Current playback time */}
-        <div className="mt-2 flex items-center gap-2 text-sm">
-          <PlaybackTime className="font-mono text-lg font-semibold text-slate-800" />
-          <span className="text-slate-400">current</span>
-        </div>
-      </div>
-
-      {/* Floating playback time pill (always visible; click scrolls back to the player) */}
+      {/* The player scrolls away below lg; at lg its column is sticky. A click scrolls back to it. */}
       <FloatingPlaybackPill
-        perf={selectedIndex >= 0 ? detail.performances[selectedIndex] ?? null : null}
+        className="lg:hidden"
+        perf={selectedIndex >= 0 ? performances[selectedIndex] ?? null : null}
         onClick={() => playerBoxRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' })}
-      />
-
-      {/* Keyboard shortcut hints */}
-      <div className="mt-3 flex flex-wrap gap-x-4 gap-y-1 text-xs text-slate-400">
-        <span>
-          <kbd className="rounded border border-slate-300 bg-slate-100 px-1 font-mono">m</kbd>{' '}Mark end
-        </span>
-        <span>
-          <kbd className="rounded border border-slate-300 bg-slate-100 px-1 font-mono">t</kbd>{' '}Set start
-        </span>
-        <span>
-          <kbd className="rounded border border-slate-300 bg-slate-100 px-1 font-mono">s</kbd>{' '}Seek start
-        </span>
-        <span>
-          <kbd className="rounded border border-slate-300 bg-slate-100 px-1 font-mono">e</kbd>/
-          <kbd className="rounded border border-slate-300 bg-slate-100 px-1 font-mono">E</kbd>{' '}Seek end &minus;5s/exact
-        </span>
-        <span>
-          <kbd className="rounded border border-slate-300 bg-slate-100 px-1 font-mono">n</kbd>/
-          <kbd className="rounded border border-slate-300 bg-slate-100 px-1 font-mono">p</kbd>{' '}Next/prev
-        </span>
-        <span>
-          <kbd className="rounded border border-slate-300 bg-slate-100 px-1 font-mono">c</kbd>{' '}Copy URL
-        </span>
-        <span>
-          <kbd className="rounded border border-slate-300 bg-slate-100 px-1 font-mono">f</kbd>/
-          <kbd className="rounded border border-slate-300 bg-slate-100 px-1 font-mono">F</kbd>{' '}Fetch/all durations
-        </span>
-        <span>
-          <kbd className="rounded border border-slate-300 bg-slate-100 px-1 font-mono">x</kbd>{' '}Export
-        </span>
-        <span>
-          <kbd className="rounded border border-slate-300 bg-slate-100 px-1 font-mono">i</kbd>{' '}Paste import
-        </span>
-        <span>
-          <kbd className="rounded border border-slate-300 bg-slate-100 px-1 font-mono">&larr;</kbd>/
-          <kbd className="rounded border border-slate-300 bg-slate-100 px-1 font-mono">&rarr;</kbd>{' '}Seek &plusmn;5s
-        </span>
-      </div>
-
-      {/* iTunes duration fetch log */}
-      <FetchLogPanel entries={fetchLog} onClear={clearFetchLog} />
-
-      {/* Performances header */}
-      <div className="mt-6 flex items-center justify-between">
-        <div className="flex items-center gap-2">
-          <h3 className="text-lg font-semibold text-slate-800">
-            Performances ({detail.performances.length})
-          </h3>
-          {unstampedCount > 0 && (
-            <span className="rounded-full bg-amber-100 px-2 py-0.5 text-xs font-semibold text-amber-700">
-              {unstampedCount} unstamped
-            </span>
-          )}
-        </div>
-        <div className="flex gap-2">
-          {isCurator && detail.performances.some((p) => p.status !== 'approved') && (
-            <button onClick={handleApproveAll}
-              className="rounded-md bg-green-600 px-3 py-1 text-sm font-medium text-white hover:bg-green-700">
-              Approve All
-            </button>
-          )}
-          {isCurator && detail.performances.some((p) => p.status === 'approved') && (
-            <button onClick={handleUnapproveAll}
-              className="rounded-md bg-amber-500 px-3 py-1 text-sm font-medium text-white hover:bg-amber-600">
-              Unapprove All
-            </button>
-          )}
-          <button onClick={() => setShowAddModal(true)}
-            className="rounded-md bg-blue-600 px-3 py-1 text-sm font-medium text-white hover:bg-blue-700">
-            + Add Song
-          </button>
-          <button onClick={clearAllEndTimestamps}
-            className="rounded-md border border-slate-300 px-3 py-1 text-sm font-medium text-slate-600 hover:bg-slate-100">
-            Clear All
-          </button>
-          <button onClick={exportSongList}
-            disabled={detail.performances.length === 0}
-            className="rounded-md border border-slate-300 px-3 py-1 text-sm font-medium text-slate-600 hover:bg-slate-100 disabled:opacity-50">
-            Export
-          </button>
-          <button onClick={() => setShowPasteImport(true)}
-            className="rounded-md border border-blue-600 px-3 py-1 text-sm font-medium text-blue-600 hover:bg-blue-50">
-            Paste Import
-          </button>
-          <Link to="/stamp" className="rounded-md bg-slate-200 px-3 py-1 text-sm font-medium text-slate-700 hover:bg-slate-300">
-            Open in Stamp Editor
-          </Link>
-        </div>
-      </div>
-
-      <PerformanceTable
-        performances={detail.performances}
-        editingField={editingField?.type === 'perf' ? editingField : null}
-        setEditingField={setEditingField}
-        playerRef={playerRef}
-        selectedIndex={selectedIndex}
-        setSelectedIndex={setSelectedIndex}
-        isCurator={isCurator}
-        onSave={handleSave}
-        onDelete={handleDelete}
-        onPerformanceStatus={handlePerformanceStatus}
-        onClearEndTimestamp={clearEndTimestamp}
       />
 
       {/* Add Song Modal */}
@@ -685,13 +735,15 @@ export function StreamDetailView({ controller }: { controller: StreamDetailContr
       {showPasteImport && (
         <PasteImportModal
           streamId={streamId}
-          hasExisting={detail.performances.length > 0}
+          hasExisting={performances.length > 0}
           example={'0:00 Song Title / Artist Name\n3:45 Another Song - Another Artist'}
           replaceLabel="Replace existing performances"
           onDone={handlePasteImportDone}
           onCancel={() => setShowPasteImport(false)}
         />
       )}
+
+      <ShortcutSheet open={shortcutsOpen} onClose={() => setShortcutsOpen(false)} />
     </div>
   );
 }
@@ -711,6 +763,44 @@ interface PerformanceTableProps {
 }
 
 /**
+ * At lg the Actions column takes no width: every row's actions float, anchored on that zero-width
+ * last cell and set 144 px to its left — the Start, End and Review columns of the `colgroup` below
+ * (58 + 58 + 28 px) — so they end where the Song cell ends: over or under the song, never over the
+ * seek buttons.
+ */
+const ROW_ACTIONS_AT_LG = 'lg:absolute lg:right-[144px] lg:h-fit';
+
+/**
+ * At lg the actions of a row that is neither selected nor being edited show on demand: centred on
+ * the row, on a pill over the end of its song, while the row is hovered or holds focus. They turn
+ * transparent, never `display: none`, so Tab still reaches them and a closing confirm dialog can
+ * hand focus back to the button that opened it — as in the Stamp Editor's song list.
+ */
+const ROW_ACTIONS_ON_DEMAND =
+  'lg:inset-y-0 lg:my-auto lg:pointer-events-none lg:rounded-radius-pill lg:border lg:border-glass-edge lg:bg-glass-pop lg:p-0.5 lg:opacity-0 lg:shadow-pop lg:group-focus-within:pointer-events-auto lg:group-focus-within:opacity-100 lg:group-hover:pointer-events-auto lg:group-hover:opacity-100';
+
+/**
+ * The selected row and the row being edited keep their actions on screen, and never at the song's
+ * expense. Below xl, where the Song column is narrow, they sit on a line of their own under the
+ * song, at the foot of the row, which grows by that line (`ROW_ACTIONS_LINE`). From xl they sit
+ * centred at the end of the song, which stops short of them (`ROW_ACTIONS_ROOM`).
+ */
+const ROW_ACTIONS_SHOWN = 'lg:bottom-1.5 xl:inset-y-0 xl:my-auto';
+
+/** Below xl, the Song cell's room for that line: 28 px buttons, 6 px off the row's foot, 4 px under the song. */
+const ROW_ACTIONS_LINE = 'lg:max-xl:pb-[38px]';
+
+/**
+ * From xl, the room at the end of the Song cell, by how many actions the row shows: two to four
+ * 28 px buttons 2 px apart, and a 6 px margin.
+ */
+const ROW_ACTIONS_ROOM: Record<number, string> = {
+  2: 'xl:pr-[64px]',
+  3: 'xl:pr-[94px]',
+  4: 'xl:pr-[124px]',
+};
+
+/**
  * The rows, memoized. The page state around this table — the modals, the toast, the fetch log, the
  * stream's own header edits — changes far more often than the rows themselves, and taking the whole
  * controller as one prop re-rendered every row on each of those. These props are the table's own
@@ -718,6 +808,13 @@ interface PerformanceTableProps {
  * narrowed to the table's own 'perf' variant (or the referentially stable `null` literal), so
  * double-clicking the stream's own title or date no longer changes this prop at all. An unrelated
  * page change now stops at this boundary (`tests/song-table-memo.test.tsx` counts it).
+ *
+ * One `<table>`, one `<tbody>`; the column heads are for assistive technology only. Row actions show
+ * on hover, on keyboard focus inside the row and on the selected row at lg, and always below it (no
+ * hover there), where the table keeps a minimum width and scrolls sideways inside its card. Their
+ * tooltips open downwards, clear of the card's header. The cells beside the song sit at the top of
+ * the row, where a 44 px row would centre them, so a row grown by an actions line or an editor
+ * keeps its number, timestamps and review mark level with the song.
  */
 const PerformanceTable = memo(function PerformanceTable({
   performances,
@@ -732,113 +829,259 @@ const PerformanceTable = memo(function PerformanceTable({
   onPerformanceStatus,
   onClearEndTimestamp,
 }: PerformanceTableProps) {
-  return (
-    <div className="mt-3 overflow-x-auto rounded-lg border border-slate-200 bg-white">
-      {performances.length === 0 ? (
-        <div className="p-6 text-center text-sm text-slate-400">No performances in this stream.</div>
-      ) : (
-        <table className="w-full text-left text-sm">
-          <thead className="border-b border-slate-200 bg-slate-50 text-xs uppercase text-slate-500">
-            <tr>
-              <th className="px-4 py-3">#</th>
-              <th className="px-4 py-3">Title</th>
-              <th className="px-4 py-3">Artist</th>
-              <th className="px-4 py-3">Start</th>
-              <th className="px-4 py-3">End</th>
-              <th className="px-4 py-3">Note</th>
-              <th className="px-4 py-3">Status</th>
-              <th className="px-4 py-3">Actions</th>
-            </tr>
-          </thead>
-          <tbody className="divide-y divide-slate-100">
-            {performances.map((perf, i) => (
-              <tr key={perf.id} id={`performance-row-${perf.id}`}
-                onClick={() => { setSelectedIndex(i); setEditingField(null); }}
-                className={`cursor-pointer transition-colors hover:bg-slate-50 ${
-                  i === selectedIndex ? 'border-l-2 border-l-blue-500 bg-blue-50' : ''
-                }`}>
-                <td className="px-4 py-3 text-slate-400">{i + 1}</td>
+  if (performances.length === 0) {
+    return <p className="px-4 py-10 text-center text-token-sm text-fg-muted">No performances in this stream.</p>;
+  }
 
-                <td className="px-4 py-3">
-                  {editingField?.type === 'perf' && editingField.perfId === perf.id && editingField.field === 'title' ? (
-                    <InlineEdit value={perf.title} onSave={(v) => onSave(perf.id, 'title', v)} onCancel={() => setEditingField(null)} />
+  const lastIndex = performances.length - 1;
+
+  return (
+    // Below lg the overflow clips the rows to the card's corners; at lg there is none, so nothing
+    // clips the actions' tooltips, and the last row's outer cells round its background instead.
+    <div className="rounded-b-[18px] max-lg:overflow-x-auto max-lg:overflow-y-hidden">
+      <table aria-label="Performances" className="w-full table-fixed text-[12px] max-lg:min-w-[34rem]">
+        <colgroup>
+          <col className="w-10" />
+          <col />
+          <col className="w-[58px]" />
+          <col className="w-[58px]" />
+          <col className="w-7" />
+          <col className="w-[136px] lg:w-0" />
+        </colgroup>
+        <thead className="sr-only">
+          <tr>
+            <th scope="col">#</th>
+            <th scope="col">Song</th>
+            <th scope="col">Start</th>
+            <th scope="col">End</th>
+            <th scope="col">Review</th>
+            <th scope="col">Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          {performances.map((perf, i) => {
+            const selected = i === selectedIndex;
+            const editing = editingField?.perfId === perf.id ? editingField.field : null;
+            const actionsShown = selected || editing !== null;
+            const approved = perf.status === 'approved';
+            const end = perf.endTimestamp;
+            const last = i === lastIndex;
+            // Edit note and Delete for everyone; Approve or Unapprove for a curator; Clear end once stamped.
+            const actionCount = 2 + (isCurator ? 1 : 0) + (end !== null ? 1 : 0);
+            const startEditing = (field: PerfEditingField['field']) => {
+              setEditingField({ type: 'perf', perfId: perf.id, field });
+            };
+            return (
+              <tr
+                key={perf.id}
+                id={`performance-row-${perf.id}`}
+                onClick={(event) => {
+                  // A click inside an open inline editor places the caret: it belongs to the editor,
+                  // and must not select the row or close the edit (the row's controls stop theirs).
+                  if ((event.target as HTMLElement).tagName === 'INPUT') return;
+                  setSelectedIndex(i);
+                  setEditingField(null);
+                }}
+                className={`group h-11 cursor-pointer border-b border-line-soft transition-colors last:border-b-0 ${
+                  selected ? 'bg-selected shadow-[inset_3px_0_0_var(--nav-active-icon)]' : 'hover:bg-field'
+                }`}
+              >
+                <td className={`pl-3.5 pr-1.5 pt-3.5 align-top font-mono text-meta text-fg-subtle${last ? ' rounded-bl-[18px]' : ''}`}>
+                  {i + 1}
+                </td>
+
+                <td
+                  className={`px-1.5 py-1 align-top${
+                    actionsShown ? ` ${ROW_ACTIONS_LINE} ${ROW_ACTIONS_ROOM[actionCount] ?? ''}` : ''
+                  }`}
+                >
+                  {editing === 'title' ? (
+                    <InlineEdit
+                      value={perf.title}
+                      onSave={(value) => onSave(perf.id, 'title', value)}
+                      onCancel={() => setEditingField(null)}
+                    />
                   ) : (
-                    <span className="cursor-text font-medium text-slate-800" onDoubleClick={(e) => { e.stopPropagation(); setEditingField({ type: 'perf', perfId: perf.id, field: 'title' }); }} title="Double-click to edit">
+                    <span
+                      className="block cursor-text truncate font-[650] leading-4 text-fg"
+                      onDoubleClick={(event) => {
+                        event.stopPropagation();
+                        startEditing('title');
+                      }}
+                      title={`${perf.title}\nDouble-click to edit`}
+                    >
                       {perf.title}
                     </span>
                   )}
+                  {/* The second line: the artist, then the note when there is one. Each cut text keeps its
+                      full words in its tooltip. Alone, the artist has the line; with a note after it, it
+                      shrinks, to 70 % at most, so a long artist never hides the note entirely. */}
+                  <div className="mt-0.5 flex min-w-0 items-center gap-1 text-[11px] leading-4">
+                    {editing === 'artist' ? (
+                      <span className="min-w-0 flex-1">
+                        <InlineEdit
+                          allowEmpty
+                          value={perf.originalArtist}
+                          placeholder="add artist"
+                          onSave={(value) => onSave(perf.id, 'artist', value)}
+                          onCancel={() => setEditingField(null)}
+                        />
+                      </span>
+                    ) : (
+                      <span
+                        className={`cursor-text truncate ${
+                          editing === 'note' || perf.note ? 'min-w-0 max-w-[70%] shrink' : 'max-w-full shrink-0'
+                        } ${perf.originalArtist ? 'text-fg-muted' : 'italic text-fg-subtle'}`}
+                        onDoubleClick={(event) => {
+                          event.stopPropagation();
+                          startEditing('artist');
+                        }}
+                        title={`${perf.originalArtist || 'add artist'}\nDouble-click to edit`}
+                      >
+                        {perf.originalArtist || 'add artist'}
+                      </span>
+                    )}
+                    {editing === 'note' ? (
+                      <span className="min-w-0 flex-1">
+                        <InlineEdit
+                          allowEmpty
+                          value={perf.note}
+                          placeholder="add note"
+                          onSave={(value) => onSave(perf.id, 'note', value)}
+                          onCancel={() => setEditingField(null)}
+                        />
+                      </span>
+                    ) : perf.note ? (
+                      <span
+                        className="min-w-0 cursor-text truncate text-fg-muted"
+                        onDoubleClick={(event) => {
+                          event.stopPropagation();
+                          startEditing('note');
+                        }}
+                        title={`${perf.note}\nDouble-click to edit note`}
+                      >
+                        {` · ${perf.note}`}
+                      </span>
+                    ) : null}
+                  </div>
                 </td>
 
-                <td className="px-4 py-3">
-                  {editingField?.type === 'perf' && editingField.perfId === perf.id && editingField.field === 'artist' ? (
-                    <InlineEdit allowEmpty value={perf.originalArtist} placeholder="add artist" onSave={(v) => onSave(perf.id, 'artist', v)} onCancel={() => setEditingField(null)} />
-                  ) : (
-                    <span className={`cursor-text ${perf.originalArtist ? 'text-slate-600' : 'italic text-slate-400'}`}
-                      onDoubleClick={(e) => { e.stopPropagation(); setEditingField({ type: 'perf', perfId: perf.id, field: 'artist' }); }} title="Double-click to edit">
-                      {perf.originalArtist || 'add artist'}
-                    </span>
-                  )}
-                </td>
-
-                <td className="px-4 py-3 font-mono text-xs">
-                  <button onClick={(e) => { e.stopPropagation(); playerRef.current?.seekTo(perf.timestamp); }} className="text-blue-600 hover:underline" title="Seek to start">
+                <td className="px-1.5 pt-3.5 text-right align-top">
+                  <button
+                    type="button"
+                    onClick={(event) => {
+                      event.stopPropagation();
+                      playerRef.current?.seekTo(perf.timestamp);
+                    }}
+                    className="rounded-radius-xs font-mono text-[11px] text-fg-muted transition-colors hover:text-accent-fg"
+                    title="Seek to start"
+                  >
                     {formatTimestamp(perf.timestamp)}
                   </button>
                 </td>
-                <td className={`px-4 py-3 font-mono text-xs ${perf.endTimestamp !== null ? 'text-green-600' : 'text-slate-300'}`}>
-                  <span className="inline-flex items-center gap-1">
-                    {perf.endTimestamp !== null ? (
-                      <>
-                        <button onClick={(e) => { e.stopPropagation(); playerRef.current?.seekTo(Math.max(0, perf.endTimestamp! - (e.shiftKey ? 0 : 5))); }} className="hover:underline" title="Seek end -5s (Shift+click: exact end)">
-                          {formatTimestamp(perf.endTimestamp)}
-                        </button>
-                        <button onClick={(e) => { e.stopPropagation(); onClearEndTimestamp(perf.id, i); }}
-                          className="rounded p-0.5 text-slate-400 hover:bg-slate-200 hover:text-slate-600" title="Clear end timestamp">
-                          &#x21BA;
-                        </button>
-                      </>
-                    ) : '—'}
-                  </span>
-                </td>
 
-                <td className="max-w-48 px-4 py-3">
-                  {editingField?.type === 'perf' && editingField.perfId === perf.id && editingField.field === 'note' ? (
-                    <InlineEdit allowEmpty value={perf.note} placeholder="add note" onSave={(v) => onSave(perf.id, 'note', v)} onCancel={() => setEditingField(null)} />
+                <td className="px-1.5 pt-3.5 text-right align-top">
+                  {end !== null ? (
+                    <button
+                      type="button"
+                      onClick={(event) => {
+                        event.stopPropagation();
+                        playerRef.current?.seekTo(Math.max(0, end - (event.shiftKey ? 0 : END_PREVIEW_SECONDS)));
+                      }}
+                      className="rounded-radius-xs font-mono text-[11px] text-fg-muted transition-colors hover:text-accent-fg"
+                      title={`Seek end -${END_PREVIEW_SECONDS}s (Shift+click: exact end)`}
+                    >
+                      {formatTimestamp(end)}
+                    </button>
                   ) : (
-                    <span className={`cursor-text truncate text-xs ${perf.note ? 'text-slate-600' : 'italic text-slate-400'}`}
-                      onDoubleClick={(e) => { e.stopPropagation(); setEditingField({ type: 'perf', perfId: perf.id, field: 'note' }); }} title="Double-click to edit note">
-                      {perf.note || 'add note'}
-                    </span>
+                    <span className="font-mono text-[11px] text-tone-warn-fg">—</span>
                   )}
                 </td>
 
-                <td className="px-4 py-3"><StatusBadge status={perf.status} /></td>
+                {/* Review state: a check once approved, a hollow ring while pending. */}
+                <td className={`px-1.5 pt-3.5 align-top${last ? ' lg:rounded-br-[18px]' : ''}`}>
+                  <div className="flex h-4 items-center justify-center">
+                    {approved ? (
+                      <Icon name="check" size={14} className="text-tone-ok-fg" />
+                    ) : (
+                      <span aria-hidden="true" className="h-3 w-3 rounded-full border-2 border-tone-warn-fg" />
+                    )}
+                    <span className="sr-only">{approved ? 'Approved' : 'Pending review'}</span>
+                  </div>
+                </td>
 
-                <td className="px-4 py-3">
-                  <div className="flex items-center gap-1">
-                    {isCurator && perf.status !== 'approved' && (
-                      <button onClick={(e) => { e.stopPropagation(); onPerformanceStatus(perf.id, 'approved'); }}
-                        className="rounded px-1.5 py-0.5 text-xs text-green-600 hover:bg-green-100" title="Approve">
-                        &#x2713;
-                      </button>
-                    )}
-                    {isCurator && perf.status === 'approved' && (
-                      <button onClick={(e) => { e.stopPropagation(); onPerformanceStatus(perf.id, 'pending'); }}
-                        className="rounded px-1.5 py-0.5 text-xs text-yellow-600 hover:bg-yellow-100" title="Unapprove">
-                        &#x21A9;
-                      </button>
-                    )}
-                    <button onClick={(e) => { e.stopPropagation(); onDelete(perf); }}
-                      className="rounded p-1 text-slate-400 hover:bg-red-100 hover:text-red-600" title="Delete">
-                      &times;
-                    </button>
+                <td className="pl-1.5 pr-3 pt-2 align-top lg:relative lg:p-0">
+                  <div
+                    className={`flex items-center justify-end gap-0.5 ${ROW_ACTIONS_AT_LG} ${
+                      actionsShown ? ROW_ACTIONS_SHOWN : ROW_ACTIONS_ON_DEMAND
+                    }`}
+                  >
+                    {isCurator ? (
+                      approved ? (
+                        <IconButton
+                          label="Unapprove performance"
+                          icon="undo"
+                          size="sm"
+                          tooltipSide="bottom"
+                          onClick={(event) => {
+                            event.stopPropagation();
+                            onPerformanceStatus(perf.id, 'pending');
+                          }}
+                        />
+                      ) : (
+                        <IconButton
+                          label="Approve performance"
+                          icon="check"
+                          tone="ok"
+                          size="sm"
+                          tooltipSide="bottom"
+                          onClick={(event) => {
+                            event.stopPropagation();
+                            onPerformanceStatus(perf.id, 'approved');
+                          }}
+                        />
+                      )
+                    ) : null}
+                    {end !== null ? (
+                      <IconButton
+                        label="Clear end timestamp"
+                        icon="x"
+                        size="sm"
+                        tooltipSide="bottom"
+                        onClick={(event) => {
+                          event.stopPropagation();
+                          onClearEndTimestamp(perf.id, i);
+                        }}
+                      />
+                    ) : null}
+                    <IconButton
+                      label="Edit note"
+                      icon="fileText"
+                      size="sm"
+                      tooltipSide="bottom"
+                      onClick={(event) => {
+                        event.stopPropagation();
+                        startEditing('note');
+                      }}
+                    />
+                    <IconButton
+                      label="Delete performance"
+                      icon="trash"
+                      tone="danger"
+                      size="sm"
+                      tooltipSide="bottom"
+                      onClick={(event) => {
+                        event.stopPropagation();
+                        onDelete(perf);
+                      }}
+                    />
                   </div>
                 </td>
               </tr>
-            ))}
-          </tbody>
-        </table>
-      )}
+            );
+          })}
+        </tbody>
+      </table>
     </div>
   );
 });
