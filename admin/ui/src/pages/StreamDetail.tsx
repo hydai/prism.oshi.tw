@@ -10,11 +10,11 @@ import { FetchLogPanel } from '../components/FetchLogPanel';
 import type { FetchLogEntry } from '../components/FetchLogPanel';
 import { FloatingPlaybackPill } from '../components/FloatingPlaybackPill';
 import { PlaybackTime } from '../components/PlaybackTime';
-import { Toast } from '../components/stamp/Toast';
 import { InlineEdit } from '../components/stamp/InlineEdit';
 import { AddSongModal } from '../components/stamp/AddSongModal';
 import { PasteImportModal } from '../components/stamp/PasteImportModal';
-import { useToast } from '../hooks/useToast';
+import { useConfirm } from '../components/ui/confirm';
+import { useShowToast } from '../components/ui/toast';
 import type { ShowToast } from '../hooks/useToast';
 import { useFetchLog } from '../hooks/useFetchLog';
 import type { AppendFetchLog } from '../hooks/useFetchLog';
@@ -104,6 +104,7 @@ function useStreamDetailController({
   const playerBoxRef = useRef<HTMLDivElement>(null);
   // The playback clock lives in an external store: only the pill and the readout hear its ticks.
   usePlayerClock(playerRef);
+  const confirm = useConfirm();
 
   const isCurator = user.role === 'curator';
 
@@ -197,6 +198,7 @@ function useStreamDetailController({
     patchAllRows,
     reload,
     onSongCreated: closeAddModal,
+    confirm,
   });
 
   // --- Status action ---
@@ -252,7 +254,14 @@ function useStreamDetailController({
 
   // --- Delete performance ---
   const handleDelete = useCallback(async (perf: StampPerformance) => {
-    if (!window.confirm(`Delete "${perf.title}"?`)) return;
+    const index = detail ? detail.performances.findIndex((p) => p.id === perf.id) : -1;
+    const confirmed = await confirm({
+      title: `Delete #${index + 1} ${perf.title}?`,
+      body: 'The performance is removed from this stream. This can’t be undone.',
+      confirmLabel: 'Delete',
+      tone: 'danger',
+    });
+    if (!confirmed) return;
     try {
       await api.deletePerformance(perf.id);
       reloadDetail();
@@ -260,7 +269,7 @@ function useStreamDetailController({
     } catch (err: unknown) {
       showToast(err instanceof Error ? err.message : 'Failed to delete', true);
     }
-  }, [reloadDetail, showToast]);
+  }, [detail, confirm, reloadDetail, showToast]);
 
   // --- Performance status ---
   const handlePerformanceStatus = useCallback(async (perfId: string, status: Status) => {
@@ -277,7 +286,11 @@ function useStreamDetailController({
   const handleApproveAll = useCallback(async () => {
     if (!detail) return;
     const pendingCount = detail.performances.filter((p) => p.status !== 'approved').length;
-    if (!window.confirm(`Approve all ${pendingCount} pending performances?`)) return;
+    const confirmed = await confirm({
+      title: `Approve all ${pendingCount} pending performances?`,
+      confirmLabel: 'Approve all',
+    });
+    if (!confirmed) return;
     try {
       const result = await api.approveAllForStream(streamId);
       reloadDetail();
@@ -285,13 +298,17 @@ function useStreamDetailController({
     } catch (err: unknown) {
       showToast(err instanceof Error ? err.message : 'Failed to approve all', true);
     }
-  }, [streamId, detail, reloadDetail, showToast]);
+  }, [streamId, detail, confirm, reloadDetail, showToast]);
 
   // --- Bulk unapprove all ---
   const handleUnapproveAll = useCallback(async () => {
     if (!detail) return;
     const approvedCount = detail.performances.filter((p) => p.status === 'approved').length;
-    if (!window.confirm(`Unapprove all ${approvedCount} approved performances?`)) return;
+    const confirmed = await confirm({
+      title: `Unapprove all ${approvedCount} approved performances?`,
+      confirmLabel: 'Unapprove all',
+    });
+    if (!confirmed) return;
     try {
       const result = await api.unapproveAllForStream(streamId);
       reloadDetail();
@@ -299,13 +316,19 @@ function useStreamDetailController({
     } catch (err: unknown) {
       showToast(err instanceof Error ? err.message : 'Failed to unapprove all', true);
     }
-  }, [streamId, detail, reloadDetail, showToast]);
+  }, [streamId, detail, confirm, reloadDetail, showToast]);
 
   // --- Hard-delete stream (blocked server-side for approved streams) ---
   const handleDeleteStream = useCallback(async () => {
     if (!detail) return;
     const perfCount = detail.performances.length;
-    if (!window.confirm(`Delete stream "${detail.title}" with ${perfCount} performances and their orphaned songs? This cannot be undone.`)) return;
+    const confirmed = await confirm({
+      title: `Delete stream "${detail.title}"?`,
+      body: `Its ${perfCount} performances and their orphaned songs are deleted too. This cannot be undone.`,
+      confirmLabel: 'Delete stream',
+      tone: 'danger',
+    });
+    if (!confirmed) return;
     try {
       const result = await api.deleteStream(streamId);
       showToast(`Deleted stream (${result.songs} songs, ${result.performances} performances)`);
@@ -313,7 +336,7 @@ function useStreamDetailController({
     } catch (err: unknown) {
       showToast(err instanceof Error ? err.message : 'Failed to delete stream', true);
     }
-  }, [streamId, detail, navigate, showToast]);
+  }, [streamId, detail, confirm, navigate, showToast]);
 
   // --- Paste import done ---
   const handlePasteImportDone = useCallback(async (result: { created: number; replaced: boolean }) => {
@@ -834,9 +857,9 @@ function StreamDetailForStream(props: StreamPageProps) {
 export default function StreamDetail({ user }: { user: AuthUser }) {
   const { id: streamId } = useParams<{ id: string }>();
   // Everything below is what outlives a move between streams: the stream list the prev/next links
-  // read, the toast bubble, and the iTunes fetch log.
+  // read, the toast, and the iTunes fetch log.
   const [allStreams, setAllStreams] = useState<Stream[]>([]);
-  const { toast, showToast } = useToast();
+  const showToast = useShowToast();
   const { fetchLog, appendFetchLog, clearFetchLog } = useFetchLog();
 
   // --- Fetch all streams for prev/next navigation ---
@@ -844,7 +867,11 @@ export default function StreamDetail({ user }: { user: AuthUser }) {
     api.listStreams().then(({ data }) => {
       const sorted = [...data].sort((a, b) => b.date.localeCompare(a.date));
       setAllStreams(sorted);
-    }).catch(() => {});
+    }).catch(() => {
+      // Left silent on purpose: this list only feeds the prev/next links below, so a failed load
+      // simply leaves both hidden rather than raising a toast for a page still usable without them
+      // (spec §7).
+    });
   }, []);
 
   // --- Derive prev/next streams ---
@@ -876,9 +903,6 @@ export default function StreamDetail({ user }: { user: AuthUser }) {
           clearFetchLog={clearFetchLog}
         />
       )}
-      {/* Outside the keyed boundary: a toast raised on one stream stays up, and keeps its own 2s
-          clock, while the next stream loads. */}
-      <Toast toast={toast} />
     </>
   );
 }
