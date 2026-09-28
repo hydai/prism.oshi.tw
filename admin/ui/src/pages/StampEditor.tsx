@@ -3,7 +3,6 @@ import type { Dispatch, SetStateAction } from 'react';
 import type { AuthUser, StreamWithPending, StampPerformance, StampStats } from '../../../shared/types';
 import { api } from '../api/client';
 import type { YouTubePlayerHandle } from '../components/YouTubePlayer';
-import { FetchLogPanel } from '../components/FetchLogPanel';
 import { FloatingPlaybackPill } from '../components/FloatingPlaybackPill';
 import { InlineEdit } from '../components/stamp/InlineEdit';
 import { AddSongModal } from '../components/stamp/AddSongModal';
@@ -17,10 +16,8 @@ import { PageHeader } from '../components/ui/PageHeader';
 import { Pill } from '../components/ui/Pill';
 import { Menu, Popover, type MenuItem } from '../components/ui/Popover';
 import { useShowToast } from '../components/ui/toast';
-import { PlayerPanel } from '../components/workbench/PlayerPanel';
-import { ShortcutHints, ShortcutSheet } from '../components/workbench/ShortcutHints';
-import { StampConsole } from '../components/workbench/StampConsole';
-import { TimelineStrip } from '../components/workbench/TimelineStrip';
+import { ShortcutSheet } from '../components/workbench/ShortcutHints';
+import { WorkbenchCard } from '../components/workbench/WorkbenchCard';
 import { useFetchLog } from '../hooks/useFetchLog';
 import { useEditorShortcuts } from '../hooks/useEditorShortcuts';
 import { useFetchAllDurations } from '../hooks/useFetchAllDurations';
@@ -38,9 +35,6 @@ interface EditingField {
   index: number;
   field: 'title' | 'artist';
 }
-
-/** How far before the end the console's End "Seek" lands: the `e` key its Kbd names. */
-const END_PREVIEW_SECONDS = 5;
 
 /** The icon buttons that sit on glass: the mockup's round, outlined `.ib`. */
 const OUTLINED_ICON_BUTTON = 'border border-field-line bg-field';
@@ -608,33 +602,20 @@ export function StampEditorView({ controller }: { controller: StampEditorControl
           <div className="grid grid-cols-1 gap-4 p-4 max-lg:pb-32 lg:min-h-0 lg:flex-1 lg:grid-cols-[minmax(0,1.3fr)_minmax(0,1fr)] lg:grid-rows-[minmax(0,1fr)] lg:px-5 lg:pb-[18px]">
             {/* The workbench. Clips the player's corners to the card; at lg it scrolls itself if the
                 viewport is too short, so the page never does. */}
-            <GlassCard padding="none" className="flex flex-col overflow-hidden lg:min-h-0 lg:overflow-y-auto">
-              <PlayerPanel playerRef={playerRef} videoId={selectedStream?.videoId} />
-              <TimelineStrip rows={performances} selectedIndex={selectedIndex} onSeek={seekTo} />
-              <StampConsole
-                performance={selectedPerformance}
-                index={selectedIndex}
-                onSetStart={markStartTimestamp}
-                onMarkEnd={markEndTimestamp}
-                onSeekStart={seekToStart}
-                onSeekEnd={() => seekToEnd(END_PREVIEW_SECONDS)}
-              />
-              {/* Keyboard-shortcut hints mean nothing without a physical keyboard; hidden below
-                  640px, same as the header's "Keyboard shortcuts" button. `mt-auto` moves to this
-                  wrapper so the row still sticks to the card's bottom edge at >=640px once
-                  ShortcutHints sits one level deeper (its own `mt-auto` is then a no-op). */}
-              <div className="mt-auto max-sm:hidden">
-                <ShortcutHints onOpenSheet={() => setShortcutsOpen(true)} />
-              </div>
-              {fetchLog.length > 0 ? (
-                <details className="shrink-0 border-t border-line-soft px-3.5 py-2.5">
-                  <summary className="cursor-pointer select-none rounded-radius-xs text-meta font-semibold text-fg-muted">
-                    iTunes fetch log ({fetchLog.length})
-                  </summary>
-                  <FetchLogPanel entries={fetchLog} onClear={clearFetchLog} />
-                </details>
-              ) : null}
-            </GlassCard>
+            <WorkbenchCard
+              playerRef={playerRef}
+              videoId={selectedStream?.videoId}
+              rows={performances}
+              selectedIndex={selectedIndex}
+              onSeek={seekTo}
+              onSetStart={markStartTimestamp}
+              onMarkEnd={markEndTimestamp}
+              onSeekStart={seekToStart}
+              seekToEnd={seekToEnd}
+              onOpenShortcuts={() => setShortcutsOpen(true)}
+              fetchLog={fetchLog}
+              onClearFetchLog={clearFetchLog}
+            />
 
             {/* The song list. No overflow of its own: the More menu opens over the rows. */}
             <GlassCard padding="none" className="flex flex-col lg:min-h-0">

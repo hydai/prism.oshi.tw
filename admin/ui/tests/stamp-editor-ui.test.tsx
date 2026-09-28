@@ -12,6 +12,7 @@ import type { StampEditorController } from '../src/pages/StampEditor';
 import StampEditorPage from '../src/pages/StampEditor';
 import { InlineEdit } from '../src/components/stamp/InlineEdit';
 import { StampConsole } from '../src/components/workbench/StampConsole';
+import { WorkbenchCard } from '../src/components/workbench/WorkbenchCard';
 import { handleInlineEditKeyDown } from '../src/lib/inline-edit';
 import { handleEditorShortcut } from '../src/hooks/useEditorShortcuts';
 import type { EditorShortcutEvent, EditorShortcutHandlers } from '../src/hooks/useEditorShortcuts';
@@ -238,13 +239,18 @@ assert(chooseStream !== undefined, 'the empty state offers a "Choose a stream" b
 assert(pickerOpenRequests.length === 1 && pickerOpenRequests[0] === true, '"Choose a stream" opens the stream picker');
 
 // The console's End-slot Seek is the `e` shortcut's 5 s preview, as its label and key cap say
-// (tests/workbench.test.tsx pins those) — not the exact-end `E`.
+// (tests/workbench.test.tsx pins those) — not the exact-end `E`. StampConsole now renders inside
+// the shared WorkbenchCard, so this walks StampEditorView's tree to the WorkbenchCard element,
+// renders that component to reach its own StampConsole element, then fires onSeekEnd.
 const seekEndOffsets: number[] = [];
 const consoleTree = StampEditorView({
   controller: { ...controller, seekToEnd: (offsetSeconds) => { seekEndOffsets.push(offsetSeconds); } },
 });
-const stampConsole = elementsIn(consoleTree).find((element) => element.type === StampConsole);
-assert(stampConsole !== undefined, 'the view renders the StampConsole');
+const workbenchCardElement = elementsIn(consoleTree).find((element) => element.type === WorkbenchCard);
+assert(workbenchCardElement !== undefined, 'the view renders the WorkbenchCard');
+const workbenchCardTree = componentOf(workbenchCardElement.type)(workbenchCardElement.props);
+const stampConsole = elementsIn(workbenchCardTree).find((element) => element.type === StampConsole);
+assert(stampConsole !== undefined, 'the WorkbenchCard renders the StampConsole');
 (stampConsole.props as { onSeekEnd: () => void }).onSeekEnd();
 assert(seekEndOffsets.join() === '5', `the console's End-slot Seek seeks 5 s before the end, got offsets [${seekEndOffsets.join()}]`);
 

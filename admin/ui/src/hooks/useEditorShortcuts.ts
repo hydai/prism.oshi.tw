@@ -35,6 +35,9 @@ export interface EditorShortcutEvent {
 
 const SEEK_STEP_SECONDS = 5;
 
+/** How far before the end the console's End "Seek" lands: the `e` key its Kbd names. */
+export const END_PREVIEW_SECONDS = 5;
+
 export function handleEditorShortcut(
   event: EditorShortcutEvent,
   handlers: EditorShortcutHandlers,
@@ -58,7 +61,7 @@ export function handleEditorShortcut(
       handlers.seekToStart();
       break;
     case 'e':
-      handlers.seekToEnd(SEEK_STEP_SECONDS);
+      handlers.seekToEnd(END_PREVIEW_SECONDS);
       break;
     case 'E':
       handlers.seekToEnd(0);
