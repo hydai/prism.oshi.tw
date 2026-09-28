@@ -34,25 +34,39 @@ function isVisible(route: AdminRoute, user: AuthUser): boolean {
 }
 
 /**
+ * The routes the sidebar lists (those with a group, a label and an icon), in manifest order, each
+ * with its `end`; only those `user` may open when a user is given.
+ */
+function listedItems(user?: AuthUser): Array<NavGroupItem & { group: NavGroupId }> {
+  const listed: Array<{ group: NavGroupId; to: string; label: string; icon: IconName }> = [];
+  for (const route of ADMIN_ROUTES) {
+    if (
+      route.group !== undefined
+      && route.label !== undefined
+      && route.icon !== undefined
+      && (user === undefined || isVisible(route, user))
+    ) {
+      listed.push({ group: route.group, to: route.path, label: route.label, icon: route.icon });
+    }
+  }
+  const hasNestedItem = (to: string) => listed.some((item) => item.to.startsWith(`${to}/`));
+  return listed.map((item) => ({ ...item, end: item.to === '/' || hasNestedItem(item.to) }));
+}
+
+/**
  * The sidebar, grouped: each `NAV_GROUPS` section in order, holding the
  * routes that declare it, in manifest order, filtered to what `user` may
  * open. A section with nothing visible in it is dropped.
  */
 export function getNavGroups(user: AuthUser): NavGroup[] {
-  const listed: Array<{ group: NavGroupId; to: string; label: string; icon: IconName }> = [];
-  for (const route of ADMIN_ROUTES) {
-    if (route.group !== undefined && route.label !== undefined && route.icon !== undefined && isVisible(route, user)) {
-      listed.push({ group: route.group, to: route.path, label: route.label, icon: route.icon });
-    }
-  }
-  const hasNestedItem = (to: string) => listed.some((item) => item.to.startsWith(`${to}/`));
+  const listed = listedItems(user);
 
   const groups: NavGroup[] = [];
   for (const { id, label } of NAV_GROUPS) {
     const items: NavGroupItem[] = [];
     for (const item of listed) {
       if (item.group === id) {
-        items.push({ to: item.to, label: item.label, icon: item.icon, end: item.to === '/' || hasNestedItem(item.to) });
+        items.push({ to: item.to, label: item.label, icon: item.icon, end: item.end });
       }
     }
     if (items.length > 0) {
@@ -61,6 +75,15 @@ export function getNavGroups(user: AuthUser): NavGroup[] {
   }
 
   return groups;
+}
+
+/**
+ * The label of the listed route the sidebar marks current at `pathname` — NavLink's rule: its own
+ * path, or, unless `end`, a path below it — so a detail page with no label of its own
+ * (`/streams/:id`) is named by its section (Streams). `undefined` when no listed route is current.
+ */
+export function currentNavLabel(pathname: string): string | undefined {
+  return listedItems().find((item) => pathname === item.to || (!item.end && pathname.startsWith(`${item.to}/`)))?.label;
 }
 
 /** The "+ New" menu: every route that can be created from it, in manifest order. */
