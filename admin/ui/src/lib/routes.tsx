@@ -79,7 +79,14 @@ export const ADMIN_ROUTES: readonly AdminRoute[] = [
     frame: 'studio',
     render: (user) => <StampEditor user={user} />,
   },
-  { path: '/pipeline', label: 'Pipeline', group: 'timestamps', icon: 'workflow', render: () => <Pipeline /> },
+  {
+    path: '/pipeline',
+    label: 'Pipeline',
+    group: 'timestamps',
+    icon: 'workflow',
+    frame: 'studio',
+    render: () => <Pipeline />,
+  },
   {
     path: '/works',
     label: 'Global Library',

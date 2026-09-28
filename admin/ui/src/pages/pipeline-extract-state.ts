@@ -11,6 +11,8 @@ export interface ExtractState {
   selectedStreamId: string;
   loading: boolean;
   loadingStreams: boolean;
+  /** Why the ready-to-extract list failed to load; `null` while it loads and once it has loaded. */
+  streamsError: string | null;
   error: string | null;
   extractResult: ExtractResponse | null;
   editedSongs: EditableParsedSong[];
@@ -23,6 +25,7 @@ export const initialExtractState: ExtractState = {
   selectedStreamId: '',
   loading: false,
   loadingStreams: true,
+  streamsError: null,
   error: null,
   extractResult: null,
   editedSongs: [],
@@ -33,6 +36,8 @@ export const initialExtractState: ExtractState = {
 export type ExtractAction =
   | { type: 'streamsLoaded'; streams: Stream[] }
   | { type: 'streamsLoadingFinished' }
+  | { type: 'streamsFailed'; error: string }
+  | { type: 'streamsRequested' }
   | { type: 'extractStarted'; streamId: string }
   | {
       type: 'extractSucceeded';
@@ -64,10 +69,20 @@ export function extractReducer(state: ExtractState, action: ExtractAction): Extr
       return {
         ...state,
         streams: action.streams,
-        selectedStreamId: action.streams[0]?.id ?? state.selectedStreamId,
+        // A list that loads is no failure any more, whatever asked for it: the reload after a
+        // Discover import comes without a `streamsRequested`.
+        streamsError: null,
+        // Only the first load picks a stream. A reload (after an import adds streams) keeps the
+        // one the curator is on, even if it has left the list: an extract in progress imports to
+        // `selectedStreamId`, so moving it would send the edited songs to another stream.
+        selectedStreamId: state.selectedStreamId || (action.streams[0]?.id ?? ''),
       };
     case 'streamsLoadingFinished':
       return { ...state, loadingStreams: false };
+    case 'streamsFailed':
+      return { ...state, loadingStreams: false, streamsError: action.error };
+    case 'streamsRequested':
+      return { ...state, loadingStreams: true, streamsError: null };
     case 'extractStarted':
       return {
         ...state,

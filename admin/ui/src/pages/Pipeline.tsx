@@ -1,4 +1,5 @@
-import { useEffect, useId, useReducer, useRef, useState } from 'react';
+import { useCallback, useEffect, useId, useReducer, useRef, useState, type Dispatch, type ReactNode } from 'react';
+import { Link } from 'react-router-dom';
 import type {
   CandidateComment,
   DiscoveredStream,
@@ -6,170 +7,427 @@ import type {
   StreamCredit,
 } from '../../../shared/types';
 import { parseTextToSongs } from '../../../shared/parse';
-import { api, ApiError } from '../api/client';
+import { api, ApiError, getCurrentStreamer } from '../api/client';
+import { useCurrentStreamerName } from '../components/shell/Streamers';
+import { BulkBar } from '../components/ui/BulkBar';
+import { Button } from '../components/ui/Button';
+import { EmptyState, GlassCard } from '../components/ui/Display';
+import { Checkbox } from '../components/ui/Fields';
+import { Icon } from '../components/ui/Icon';
+import { PageHeader } from '../components/ui/PageHeader';
+import { Pill } from '../components/ui/Pill';
+import { HeadCell, Table, TableEmptyRow, THead } from '../components/ui/Table';
+import { CELL_X, FIRST_CELL_X, LAST_CELL_X } from '../components/ui/table-cells';
+import { Chip, Segmented } from '../components/ui/Toggles';
+import { useToast } from '../components/ui/toast';
+import { useNow } from '../hooks/useNow';
+import { errorMessage } from '../lib/apiResource';
+import { formatRelative } from '../lib/dates';
 import { formatTimestamp } from '../lib/format-timestamp';
+import {
+  inPrismLabel,
+  newStreamIds,
+  summarizeDiscovered,
+  visibleDiscovered,
+  type DiscoverFilter,
+} from './pipeline-discover';
 import {
   extractReducer,
   initialExtractState,
   type EditableParsedSong,
+  type ExtractAction,
+  type ExtractState,
 } from './pipeline-extract-state';
 
-// --- Discover Tab ---
+// --- Discover ---
 
-function DiscoverTab() {
+const NO_SELECTION: ReadonlySet<string> = new Set();
+/** Select, thumbnail, video, date, status. */
+const DISCOVER_COLUMNS = 5;
+
+/** A failed scan, inline above the results. */
+function DangerNote({ children }: { children: ReactNode }) {
+  return (
+    <p
+      role="alert"
+      className="rounded-radius-lg border border-tone-danger-line bg-tone-danger-bg px-3 py-2 text-token-sm text-tone-danger-fg"
+    >
+      {children}
+    </p>
+  );
+}
+
+/**
+ * The Discover step's state and handlers. The page holds them rather than the step, so a trip to
+ * Extract keeps the scan, the filter and the selection. `onImported` runs after a successful import.
+ */
+function useDiscover(onImported: () => void) {
+  const toast = useToast();
+  const streamerName = useCurrentStreamerName();
   const [streams, setStreams] = useState<DiscoveredStream[]>([]);
   const [loading, setLoading] = useState(false);
   const [importing, setImporting] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const [selected, setSelected] = useState<Set<string>>(new Set());
-  const [importResult, setImportResult] = useState<string | null>(null);
+  const [selected, setSelected] = useState<ReadonlySet<string>>(NO_SELECTION);
+  const [filter, setFilter] = useState<DiscoverFilter>('new');
+  /** When the last scan succeeded; `null` until one has. */
+  const [lastRunAt, setLastRunAt] = useState<number | null>(null);
+  // Whether the page is still up: a streamer switch remounts it, and the curator can leave while an
+  // import is in flight. The import still reports; only a page still here reloads and scans after it.
+  const mounted = useRef(false);
 
-  const handleDiscover = async () => {
+  useEffect(() => {
+    mounted.current = true;
+    return () => {
+      mounted.current = false;
+    };
+  }, []);
+
+  // Every scan — the first, Discover again, and the one after an import — starts from the same
+  // place: the New filter when it found anything new (All otherwise), and every new video selected.
+  const run = async () => {
     setLoading(true);
     setError(null);
-    setImportResult(null);
     try {
       const res = await api.discoverStreams();
       setStreams(res.streams);
-      // Pre-select new streams
-      const newStreamIds = new Set<string>();
-      for (const stream of res.streams) {
-        if (stream.isNew) newStreamIds.add(stream.videoId);
-      }
-      setSelected(newStreamIds);
+      setSelected(newStreamIds(res.streams));
+      setFilter(summarizeDiscovered(res.streams).fresh > 0 ? 'new' : 'all');
+      setLastRunAt(Date.now());
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Failed to discover streams');
+      setError(errorMessage(err, 'Failed to discover streams'));
     } finally {
       setLoading(false);
     }
   };
 
-  const toggleSelect = (videoId: string) => {
-    setSelected((prev) => {
-      const next = new Set(prev);
-      if (next.has(videoId)) next.delete(videoId);
-      else next.add(videoId);
+  // Retry sends the same videos again: the import skips any that are in Prism by then.
+  const importStreams = async (videoIds: string[]) => {
+    if (videoIds.length === 0) return;
+    // The streamer these videos belong to: the one the client names as this request goes out. The
+    // failure toast lives above the streamer-keyed pages and outlasts a switch, and the client
+    // names whoever is current when a request is sent, so a Retry checks it is still this one.
+    const streamer = getCurrentStreamer();
+    setImporting(true);
+    try {
+      const res = await api.importStreams({ videoIds });
+      toast.success(`Imported ${res.created} stream(s)`);
+      setSelected(NO_SELECTION);
+    } catch (err) {
+      const retry = () => {
+        if (getCurrentStreamer() === streamer) {
+          void importStreams(videoIds);
+          return;
+        }
+        // Refused, not dropped: back on the import's streamer, this Retry sends it.
+        toast.error(`Switch back to ${streamerName} to retry this import`, {
+          action: { label: 'Retry', onClick: retry },
+        });
+      };
+      toast.error('Couldn’t import streams', {
+        detail: errorMessage(err, 'Failed to import'),
+        action: { label: 'Retry', onClick: retry },
+      });
+      return;
+    } finally {
+      setImporting(false);
+    }
+    // A scan spends YouTube quota: none for a page that has gone.
+    if (!mounted.current) return;
+    // The imported streams are pending ones: the Extract step's list. Then scan again, so the
+    // imported videos show as In Prism.
+    onImported();
+    await run();
+  };
+
+  const setStreamSelected = (videoId: string, checked: boolean) => {
+    setSelected((current) => {
+      const next = new Set(current);
+      if (checked) next.add(videoId);
+      else next.delete(videoId);
       return next;
     });
   };
 
-  const toggleAll = () => {
-    const newStreams = streams.filter((s) => s.isNew);
-    if (selected.size === newStreams.length) {
-      setSelected(new Set());
-    } else {
-      setSelected(new Set(newStreams.map((s) => s.videoId)));
-    }
+  return {
+    streams,
+    loading,
+    importing,
+    error,
+    selected,
+    filter,
+    lastRunAt,
+    run,
+    setFilter,
+    setStreamSelected,
+    /** Every new video, whether the filter shows it or not — or none. */
+    setAllNewSelected: (all: boolean) => setSelected(all ? newStreamIds(streams) : NO_SELECTION),
+    clearSelection: () => setSelected(NO_SELECTION),
+    importSelected: () => importStreams([...selected]),
   };
+}
 
-  const handleImport = async () => {
-    if (selected.size === 0) return;
-    setImporting(true);
-    setError(null);
-    try {
-      const res = await api.importStreams({ videoIds: [...selected] });
-      setImportResult(`Imported ${res.created} stream(s)`);
-      // Re-run discover to update badges
-      const updated = await api.discoverStreams();
-      setStreams(updated.streams);
-      setSelected(new Set());
-    } catch (err) {
-      setError(err instanceof Error ? err.message : 'Failed to import');
-    } finally {
-      setImporting(false);
-    }
-  };
+type DiscoverController = ReturnType<typeof useDiscover>;
 
-  const newCount = streams.filter((s) => s.isNew).length;
+/** `Scanned …`: its own component, so the 30 s tick re-renders this text and nothing else. */
+function ScannedAgo({ at }: { at: number }) {
+  const now = useNow(30_000);
+  return <>Scanned {formatRelative(at, now)}</>;
+}
+
+function ScanStat({ value, label }: { value: number; label: string }) {
+  return (
+    <span className="whitespace-nowrap text-[12px] text-fg-muted">
+      <b className="font-[750] text-fg">{value}</b> {label}
+    </span>
+  );
+}
+
+interface ScanSummaryProps {
+  lastRunAt: number;
+  counts: { total: number; fresh: number; existing: number };
+  filter: DiscoverFilter;
+  onFilterChange: (filter: DiscoverFilter) => void;
+}
+
+/** The strip above the table: when the channel was scanned, what the scan found, and the filter chips. */
+function ScanSummary({ lastRunAt, counts, filter, onFilterChange }: ScanSummaryProps) {
+  return (
+    <GlassCard padding="none" className="flex flex-wrap items-center gap-x-2.5 gap-y-2 px-3.5 py-2.5">
+      <span className="flex items-center gap-1.5 whitespace-nowrap text-[12px] text-fg-muted">
+        <Icon name="check" size={14} className="text-tone-ok-fg" />
+        <ScannedAgo at={lastRunAt} />
+      </span>
+      <span aria-hidden="true" className="h-4 w-px bg-field-line" />
+      <ScanStat value={counts.total} label="videos found" />
+      <ScanStat value={counts.fresh} label="new" />
+      <ScanStat value={counts.existing} label="already in Prism" />
+      <div role="group" aria-label="Filter videos" className="flex flex-wrap items-center gap-2 sm:ml-auto">
+        <Chip active={filter === 'new'} count={counts.fresh} onClick={() => onFilterChange('new')}>
+          New
+        </Chip>
+        <Chip active={filter === 'existing'} count={counts.existing} onClick={() => onFilterChange('existing')}>
+          Already in Prism
+        </Chip>
+        <Chip active={filter === 'all'} count={counts.total} onClick={() => onFilterChange('all')}>
+          All
+        </Chip>
+      </div>
+    </GlassCard>
+  );
+}
+
+interface DiscoverRowProps {
+  stream: DiscoveredStream;
+  selected: boolean;
+  onSelectedChange: (selected: boolean) => void;
+}
+
+/** One video: a checkbox when it is new, thumbnail, title and video ID, date, and where it stands. */
+function DiscoverRow({ stream, selected, onSelectedChange }: DiscoverRowProps) {
+  const name = stream.title || stream.videoId;
+  return (
+    <tr className={`h-[50px] border-b border-line-soft transition-colors ${selected ? 'bg-selected' : 'hover:bg-field'}`}>
+      <td className={`${FIRST_CELL_X} py-1.5`}>
+        {stream.isNew ? (
+          // A flex box, so the inline label does not sit on the text baseline above the row's middle.
+          <div className="flex">
+            <Checkbox label={`Select stream ${name}`} checked={selected} onChange={onSelectedChange} />
+          </div>
+        ) : null}
+      </td>
+      <td className={`${CELL_X} py-1.5`}>
+        {/* Decorative: the title and the video ID beside it carry the meaning. */}
+        <img
+          src={`https://i.ytimg.com/vi/${stream.videoId}/mqdefault.jpg`}
+          alt=""
+          width={64}
+          height={36}
+          loading="lazy"
+          className="block h-9 w-16 rounded-radius-sm bg-track object-cover"
+        />
+      </td>
+      <td className={`${CELL_X} py-1.5`}>
+        <div title={stream.title} className="truncate font-semibold text-fg">
+          {stream.title}
+        </div>
+        <a
+          href={`https://www.youtube.com/watch?v=${stream.videoId}`}
+          target="_blank"
+          rel="noopener noreferrer"
+          className="rounded-radius-xs font-mono text-meta text-fg-subtle hover:text-accent-fg hover:underline focus-visible:outline-none focus-visible:shadow-focus"
+        >
+          {stream.videoId}
+        </a>
+      </td>
+      <td className={`${CELL_X} whitespace-nowrap py-1.5 text-fg-muted`}>{stream.date}</td>
+      <td className={`${LAST_CELL_X} py-1.5`}>
+        {stream.isNew ? (
+          <Pill tone="info">New</Pill>
+        ) : (
+          <div className="flex items-center gap-2">
+            <Pill tone="neutral">{inPrismLabel(stream)}</Pill>
+            {stream.existingStreamId ? (
+              <Link
+                to={`/streams/${stream.existingStreamId}`}
+                className="inline-flex items-center gap-0.5 rounded-radius-xs text-[11px] font-[650] text-accent-fg hover:underline focus-visible:outline-none focus-visible:shadow-focus"
+              >
+                Open
+                <span className="sr-only"> {name}</span>
+                <Icon name="chevronRight" size={12} />
+              </Link>
+            ) : null}
+          </div>
+        )}
+      </td>
+    </tr>
+  );
+}
+
+interface DiscoverTableProps {
+  streams: DiscoveredStream[];
+  selected: ReadonlySet<string>;
+  /** False when the scan found nothing new: Select all has nothing to select. */
+  hasNew: boolean;
+  allNewSelected: boolean;
+  /** Checked: select every new video, the ones the filter hides too. Unchecked: select none. */
+  onAllNewSelectedChange: (all: boolean) => void;
+  onSelectedChange: (videoId: string, selected: boolean) => void;
+}
+
+/**
+ * The scanned videos under the current filter, in a glass card. Fixed layout: from 1280 px it fits
+ * the card and a long title is cut short (full text in `title`); below that it keeps a minimum
+ * width and scrolls inside the card. The card clips with `overflow-clip`, which unlike hidden/auto
+ * is no scroll container, so the sticky head keeps tracking `<main>`.
+ */
+function DiscoverTable({
+  streams,
+  selected,
+  hasNew,
+  allNewSelected,
+  onAllNewSelectedChange,
+  onSelectedChange,
+}: DiscoverTableProps) {
+  return (
+    <GlassCard padding="none" className="overflow-clip">
+      <Table className="table-fixed text-[12px] max-xl:min-w-[640px]">
+        {/* The status column holds the longest pill, `In Prism · Extracted`, and Open on one line. */}
+        <colgroup>
+          <col className="w-[38px]" />
+          <col className="w-[76px]" />
+          <col />
+          <col className="w-[92px]" />
+          <col className="w-[190px]" />
+        </colgroup>
+        <THead>
+          <tr>
+            <HeadCell className={FIRST_CELL_X}>
+              <div className="flex">
+                <Checkbox
+                  label="Select all new streams"
+                  checked={allNewSelected}
+                  disabled={!hasNew}
+                  onChange={onAllNewSelectedChange}
+                />
+              </div>
+            </HeadCell>
+            <HeadCell className={CELL_X}>
+              <span className="sr-only">Thumbnail</span>
+            </HeadCell>
+            <HeadCell className={CELL_X}>Video</HeadCell>
+            <HeadCell className={CELL_X}>Date</HeadCell>
+            <HeadCell className={LAST_CELL_X}>Status</HeadCell>
+          </tr>
+        </THead>
+        <tbody>
+          {streams.map((stream) => (
+            <DiscoverRow
+              key={stream.videoId}
+              stream={stream}
+              selected={selected.has(stream.videoId)}
+              onSelectedChange={(checked) => onSelectedChange(stream.videoId, checked)}
+            />
+          ))}
+          {streams.length === 0 ? (
+            <TableEmptyRow colSpan={DISCOVER_COLUMNS}>No videos under this filter.</TableEmptyRow>
+          ) : null}
+        </tbody>
+      </Table>
+    </GlassCard>
+  );
+}
+
+/**
+ * Step 1: scan the streamer's channel, then import the new videos as pending streams. `hidden`
+ * hides the step without unmounting it. Its bulk bar is `fixed`, so it leaves with the step
+ * instead: mounted, it would keep marking `<html>` (the toast lift, the page padding) under Extract.
+ */
+function DiscoverStep({ hidden, discover }: { hidden: boolean; discover: DiscoverController }) {
+  const streamerName = useCurrentStreamerName();
+  const { streams, loading, importing, error, selected, filter, lastRunAt } = discover;
+  const counts = summarizeDiscovered(streams);
+  const allNewSelected = counts.fresh > 0 && streams.every((stream) => !stream.isNew || selected.has(stream.videoId));
 
   return (
-    <div>
-      <div className="flex items-center gap-3">
-        <button
-          onClick={handleDiscover}
-          disabled={loading}
-          className="rounded-md bg-blue-600 px-4 py-2 text-sm font-medium text-white hover:bg-blue-700 disabled:opacity-50"
-        >
-          {loading ? 'Discovering...' : 'Discover Streams'}
-        </button>
-        {streams.length > 0 && (
-          <button
-            onClick={handleImport}
-            disabled={importing || selected.size === 0}
-            className="rounded-md bg-green-600 px-4 py-2 text-sm font-medium text-white hover:bg-green-700 disabled:opacity-50"
-          >
-            {importing ? 'Importing...' : `Import Selected (${selected.size})`}
-          </button>
+    <section aria-label="Discover" hidden={hidden}>
+      {/* While the bulk bar is up, the end of the step scrolls clear of it (BulkBar publishes its height). */}
+      <div className="flex flex-col gap-3 p-4 lg:px-5 lg:pb-[18px] [html[data-bulk-bar]_&]:pb-[calc(var(--bulk-bar-h)_+_22px_+_16px)]">
+        {error ? <DangerNote>{error}</DangerNote> : null}
+
+        {lastRunAt === null ? (
+          <GlassCard>
+            <EmptyState
+              icon="workflow"
+              title="Find new karaoke streams"
+              body={`Scans ${streamerName}'s YouTube channel for karaoke streams.`}
+              action={
+                <Button variant="primary" busy={loading} onClick={() => void discover.run()}>
+                  Discover streams
+                </Button>
+              }
+            />
+          </GlassCard>
+        ) : streams.length === 0 ? (
+          <GlassCard>
+            <EmptyState
+              icon="workflow"
+              title="No videos found"
+              body="Nothing on the channel looks like a karaoke stream yet."
+            />
+          </GlassCard>
+        ) : (
+          <>
+            <ScanSummary lastRunAt={lastRunAt} counts={counts} filter={filter} onFilterChange={discover.setFilter} />
+            <DiscoverTable
+              streams={visibleDiscovered(streams, filter)}
+              selected={selected}
+              hasNew={counts.fresh > 0}
+              allNewSelected={allNewSelected}
+              onAllNewSelectedChange={discover.setAllNewSelected}
+              onSelectedChange={discover.setStreamSelected}
+            />
+          </>
         )}
       </div>
 
-      {error && <p className="mt-3 text-sm text-red-600">{error}</p>}
-      {importResult && <p className="mt-3 text-sm text-green-600">{importResult}</p>}
-
-      {streams.length > 0 && (
-        <div className="mt-4 overflow-x-auto rounded-lg border border-slate-200 bg-white">
-          <table className="w-full text-left text-sm">
-            <thead className="border-b border-slate-200 bg-slate-50 text-xs uppercase text-slate-500">
-              <tr>
-                <th className="px-4 py-3">
-                  <input
-                    type="checkbox" aria-label="Select all new streams"
-                    checked={selected.size === newCount && newCount > 0}
-                    onChange={toggleAll}
-                    className="rounded"
-                  />
-                </th>
-                <th className="px-4 py-3">Title</th>
-                <th className="px-4 py-3">Date</th>
-                <th className="px-4 py-3">Status</th>
-                <th className="px-4 py-3">Video ID</th>
-              </tr>
-            </thead>
-            <tbody className="divide-y divide-slate-100">
-              {streams.map((s) => (
-                <tr key={s.videoId} className="hover:bg-slate-50">
-                  <td className="px-4 py-3">
-                    {s.isNew ? (
-                      <input
-                        type="checkbox" aria-label={`Select stream ${s.title || s.videoId}`}
-                        checked={selected.has(s.videoId)}
-                        onChange={() => toggleSelect(s.videoId)}
-                        className="rounded"
-                      />
-                    ) : (
-                      <span className="text-slate-300">-</span>
-                    )}
-                  </td>
-                  <td className="px-4 py-3 font-medium">{s.title}</td>
-                  <td className="px-4 py-3 text-slate-600">{s.date}</td>
-                  <td className="px-4 py-3">
-                    {s.isNew ? (
-                      <span className="inline-flex rounded-full bg-emerald-100 px-2 py-0.5 text-xs font-medium text-emerald-700">
-                        NEW
-                      </span>
-                    ) : (
-                      <span className="inline-flex rounded-full bg-slate-100 px-2 py-0.5 text-xs font-medium text-slate-600">
-                        {s.existingStatus?.toUpperCase() ?? 'EXISTING'}
-                      </span>
-                    )}
-                  </td>
-                  <td className="px-4 py-3">
-                    <a
-                      href={`https://www.youtube.com/watch?v=${s.videoId}`}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="text-blue-600 hover:underline"
-                    >
-                      {s.videoId}
-                    </a>
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
-      )}
-    </div>
+      {!hidden && selected.size > 0 ? (
+        <BulkBar countLabel={`已選 ${selected.size} 部新影片`}>
+          <Button
+            variant="primary"
+            size="sm"
+            icon="download"
+            busy={importing}
+            onClick={() => void discover.importSelected()}
+          >
+            Import as pending streams
+          </Button>
+          <Button variant="ghost" size="sm" onClick={discover.clearSelection}>
+            Clear
+          </Button>
+        </BulkBar>
+      ) : null}
+    </section>
   );
 }
 
@@ -248,7 +506,63 @@ function CandidateCard({
   );
 }
 
-// --- Extract Tab ---
+// --- Extract ---
+
+/** The Extract step's state. The page holds it, so a trip to Discover keeps the extract and its edits. */
+interface ExtractController {
+  state: ExtractState;
+  dispatch: Dispatch<ExtractAction>;
+  /** Loads the ready-to-extract list again after a failed load. */
+  retryStreams: () => void;
+}
+
+/** Loads the streams waiting for extraction. A retired request (`isCurrent()` false) dispatches nothing. */
+function loadReadyStreams(dispatch: Dispatch<ExtractAction>, isCurrent: () => boolean): void {
+  api.listStreams({ status: 'pending' }).then(
+    (res) => {
+      if (!isCurrent()) return;
+      dispatch({ type: 'streamsLoaded', streams: res.data });
+      dispatch({ type: 'streamsLoadingFinished' });
+    },
+    (err: unknown) => {
+      if (isCurrent()) dispatch({ type: 'streamsFailed', error: errorMessage(err, 'Failed to load streams') });
+    },
+  );
+}
+
+/**
+ * The Extract step's state, which the page holds like Discover's. The ready-to-extract list loads
+ * on mount and again after Discover imports streams (they arrive pending: what the list holds).
+ */
+function useExtract(): ExtractController & { reloadStreams: () => void } {
+  const [state, dispatch] = useReducer(extractReducer, initialExtractState);
+  // Numbers the list requests: a response applies only while its number is still the latest.
+  // Unmounting bumps it too (StrictMode's rehearsal included), retiring whatever is in flight.
+  const latestRequest = useRef(0);
+
+  const reloadStreams = useCallback(() => {
+    latestRequest.current += 1;
+    const request = latestRequest.current;
+    loadReadyStreams(dispatch, () => latestRequest.current === request);
+  }, []);
+
+  useEffect(() => {
+    reloadStreams();
+    return () => {
+      latestRequest.current += 1;
+    };
+  }, [reloadStreams]);
+
+  return {
+    state,
+    dispatch,
+    retryStreams: () => {
+      dispatch({ type: 'streamsRequested' });
+      reloadStreams();
+    },
+    reloadStreams,
+  };
+}
 
 function useIdentifySongs() {
   const songIdPrefix = useId();
@@ -261,8 +575,9 @@ function useIdentifySongs() {
     }));
 }
 
-function ExtractTab() {
-  const [state, dispatch] = useReducer(extractReducer, initialExtractState);
+/** Step 2: find a stream's timestamp list, edit the parsed songs and import them. `hidden` hides it without unmounting it. */
+function ExtractStep({ hidden, extract }: { hidden: boolean; extract: ExtractController }) {
+  const { state, dispatch } = extract;
   const {
     streams,
     selectedStreamId,
@@ -276,17 +591,6 @@ function ExtractTab() {
   } = state;
   const creditRef = useRef<StreamCredit | null>(null);
   const identifySongs = useIdentifySongs();
-
-  // Fetch streams needing extraction (status = pending)
-  useEffect(() => {
-    api
-      .listStreams({ status: 'pending' })
-      .then((res) => {
-        dispatch({ type: 'streamsLoaded', streams: res.data });
-      })
-      .catch(() => {})
-      .finally(() => dispatch({ type: 'streamsLoadingFinished' }));
-  }, []);
 
   const handleExtract = async (streamId?: string) => {
     const id = streamId ?? selectedStreamId;
@@ -364,7 +668,9 @@ function ExtractTab() {
   };
 
   return (
-    <div>
+    // Padding only, no display utility: one would outrank the `hidden` attribute's display: none.
+    // The studio frame gives the page no gutter, so the step brings its own.
+    <section aria-label="Extract" hidden={hidden} className="p-4 lg:px-5">
       {/* Two-column layout: stream table (left) + candidates panel (right) */}
       <div className="flex gap-4">
         {/* Left column: Stream selector table */}
@@ -546,51 +852,55 @@ function ExtractTab() {
           </table>
         </div>
       )}
-    </div>
+    </section>
   );
 }
 
 // --- Pipeline Page ---
 
-type Tab = 'discover' | 'extract';
-
-const PIPELINE_TABS: { key: Tab; label: string }[] = [
-  { key: 'discover', label: 'Discover' },
-  { key: 'extract', label: 'Extract' },
-];
-
+/**
+ * Discover, then Extract: two steps in the header, both mounted at all times — the inactive one is
+ * only `hidden` — and the page holds both steps' state, so switching never loses a scan, a
+ * selection or an extract in progress. The streams ready for extraction load on mount, so the
+ * Extract step counts them in the header before it is ever opened, and again after each import.
+ */
 export default function Pipeline() {
-  const [activeTab, setActiveTab] = useState<Tab>('discover');
+  const [step, setStep] = useState<'discover' | 'extract'>('discover');
+  const extract = useExtract();
+  const discover = useDiscover(extract.reloadStreams);
+  const { loadingStreams, streamsError, streams: readyStreams } = extract.state;
+  const readyCount = !loadingStreams && streamsError === null ? readyStreams.length : undefined;
 
   return (
-    <div>
-      <h2 className="text-xl font-semibold text-slate-800">Pipeline</h2>
-      <p className="mt-1 text-sm text-slate-500">
-        Discover karaoke streams from YouTube and extract song timestamps.
-      </p>
+    // No blur, transform or filter on this root (the bulk bar is `fixed` to the viewport), and no
+    // overflow either: the sticky header and table head track <main>.
+    <div className="flex flex-col">
+      <PageHeader
+        crumb="TIMESTAMPS"
+        title="Pipeline"
+        actions={
+          step === 'discover' ? (
+            <Button variant="primary" icon="refresh" busy={discover.loading} onClick={() => void discover.run()}>
+              {discover.lastRunAt === null ? 'Discover streams' : 'Discover again'}
+            </Button>
+          ) : (
+            <span className="text-token-sm text-fg-muted">Finds timestamp lists in comments and descriptions</span>
+          )
+        }
+      >
+        <Segmented
+          label="Pipeline steps"
+          value={step}
+          onChange={setStep}
+          options={[
+            { value: 'discover', label: 'Discover', step: 1 },
+            { value: 'extract', label: 'Extract', step: 2, count: readyCount },
+          ]}
+        />
+      </PageHeader>
 
-      {/* Tab bar */}
-      <div className="mt-4 flex border-b border-slate-200">
-        {PIPELINE_TABS.map((tab) => (
-          <button
-            key={tab.key}
-            onClick={() => setActiveTab(tab.key)}
-            className={`px-4 py-2 text-sm font-medium transition-colors ${
-              activeTab === tab.key
-                ? 'border-b-2 border-blue-600 text-blue-600'
-                : 'text-slate-500 hover:text-slate-700'
-            }`}
-          >
-            {tab.label}
-          </button>
-        ))}
-      </div>
-
-      {/* Tab content */}
-      <div className="mt-4">
-        {activeTab === 'discover' && <DiscoverTab />}
-        {activeTab === 'extract' && <ExtractTab />}
-      </div>
+      <DiscoverStep hidden={step !== 'discover'} discover={discover} />
+      <ExtractStep hidden={step !== 'extract'} extract={extract} />
     </div>
   );
 }
