@@ -139,13 +139,18 @@ const TOKENS: Array<{ name: string; light: string; dark: string }> = [
   { name: 'avatar-5', light: 'linear-gradient(135deg, #C4B5FD, #F9A8D4)', dark: 'linear-gradient(135deg, #C4B5FD, #F9A8D4)' },
 ];
 
-/** Spec §4.1 status tones — all 7 × {bg, fg, line}, copied verbatim. */
+/**
+ * Spec §4.1 status tones — all 7 × {bg, fg, line}, copied verbatim, except light info/neutral fg:
+ * the spec's #2563EB / #64748B miss WCAG AA (4.5:1) on their own pill background (4.24:1 /
+ * 4.34:1). Darker, same hue, reaches it. The contrast check below holds every tone's fg to 4.5:1
+ * on every surface a pill sits on.
+ */
 const TONES: Tone[] = [
   { name: 'ok', light: { bg: '#D1FAE5', fg: '#047857', line: '#A7F3D0' }, dark: { bg: 'rgba(16,185,129,.14)', fg: '#6EE7B7', line: 'rgba(16,185,129,.3)' } },
   { name: 'warn', light: { bg: '#FEF3C7', fg: '#B45309', line: '#FDE68A' }, dark: { bg: 'rgba(245,158,11,.14)', fg: '#FBBF24', line: 'rgba(245,158,11,.3)' } },
   { name: 'danger', light: { bg: '#FEE2E2', fg: '#B91C1C', line: '#FECACA' }, dark: { bg: 'rgba(239,68,68,.14)', fg: '#FCA5A5', line: 'rgba(239,68,68,.3)' } },
-  { name: 'info', light: { bg: '#DBEAFE', fg: '#2563EB', line: '#BFDBFE' }, dark: { bg: 'rgba(96,165,250,.15)', fg: '#93C5FD', line: 'rgba(96,165,250,.3)' } },
-  { name: 'neutral', light: { bg: '#F1F5F9', fg: '#64748B', line: '#E2E8F0' }, dark: { bg: 'rgba(255,255,255,.06)', fg: '#A7A4BA', line: 'rgba(255,255,255,.1)' } },
+  { name: 'info', light: { bg: '#DBEAFE', fg: '#195BEA', line: '#BFDBFE' }, dark: { bg: 'rgba(96,165,250,.15)', fg: '#93C5FD', line: 'rgba(96,165,250,.3)' } },
+  { name: 'neutral', light: { bg: '#F1F5F9', fg: '#606F85', line: '#E2E8F0' }, dark: { bg: 'rgba(255,255,255,.06)', fg: '#A7A4BA', line: 'rgba(255,255,255,.1)' } },
   { name: 'violet', light: { bg: '#F5F3FF', fg: '#6D28D9', line: '#DDD6FE' }, dark: { bg: 'rgba(139,92,246,.14)', fg: '#C4B5FD', line: 'rgba(139,92,246,.3)' } },
   { name: 'teal', light: { bg: '#CCFBF1', fg: '#0F766E', line: '#99F6E4' }, dark: { bg: 'rgba(20,184,166,.14)', fg: '#5EEAD4', line: 'rgba(20,184,166,.3)' } },
 ];
@@ -254,6 +259,7 @@ async function main(): Promise<void> {
   // --- --fg-muted and --fg-subtle reach WCAG AA (4.5:1) on every surface they sit on ---
 
   const lowest: string[] = [];
+  const toneLowest: string[] = [];
   for (const [theme, declarations] of [
     ['light', light],
     ['dark', dark],
@@ -297,10 +303,41 @@ async function main(): Promise<void> {
       fg !== undefined && muted !== undefined && subtle !== undefined && fg > muted && muted > subtle,
       `${theme}: --fg stands out more than --fg-muted, and --fg-muted more than --fg-subtle`,
     );
+
+    // --- Every tone's pill text reaches WCAG AA (4.5:1) on its own pill background ---
+
+    // A pill sits directly on the canvas/blob backdrops, or on one of the glass surfaces laid
+    // over them (the sidebar, the header, a card, a popover). In light the tone's `-bg` is opaque,
+    // so compositing it over any of these collapses to the plain fg-on-bg ratio; in dark the
+    // translucent `-bg` composites over whatever backdrop shows through.
+    const pillBackdrops = [
+      backdrops,
+      ...(['glass-sidebar', 'glass-header', 'glass-card', 'glass-pop'] as const).map((glass) =>
+        lay(backdrops, [glass]),
+      ),
+    ].flat();
+    let worstTone = { name: '', ratio: Infinity };
+    for (const tone of TONES) {
+      const bgValue = colours(`tone-${tone.name}-bg`);
+      const fgValue = declared(`tone-${tone.name}-fg`);
+      const text = parseColour(fgValue);
+      const pillSurfaces = pillBackdrops.flatMap((base) => bgValue.map((bg) => over(bg, base)));
+      const worst = Math.min(...pillSurfaces.map((surface) => contrastRatio(text, surface)));
+      assert(
+        worst >= 4.5,
+        `${theme} tone ${tone.name} fg ${fgValue} reaches 4.5:1 on its own pill background (lowest ${worst.toFixed(2)}:1)`,
+      );
+      if (worst < worstTone.ratio) worstTone = { name: tone.name, ratio: worst };
+    }
+    toneLowest.push(`${theme} ${worstTone.name} ${worstTone.ratio.toFixed(2)}:1`);
   }
 
   console.log(
     `✓ --fg-muted and --fg-subtle reach WCAG AA on the canvas and every surface on it, below --fg in that order (lowest: ${lowest.join(', ')})`,
+  );
+
+  console.log(
+    `✓ every tone's pill text reaches WCAG AA (4.5:1) on its own pill background (lowest: ${toneLowest.join(', ')})`,
   );
 
   // --- Reduced motion: every animation runs once, near-instantly, and stops — a looping one
