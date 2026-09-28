@@ -1,13 +1,11 @@
 import { renderToStaticMarkup } from 'react-dom/server';
+import { NO_RAW_PALETTE } from './helpers/palette';
 
 function assert(condition: boolean, message: string): asserts condition {
   if (!condition) {
     throw new Error(message);
   }
 }
-
-/** Spec §4.1: colours only through the token utilities, never the raw Tailwind palette. */
-const NO_RAW_PALETTE = /\b(bg|text|border)-(slate|gray|blue|green|red|amber|yellow)-\d/;
 
 /** The icons Task 2 adds on top of the set `components/prism/Icon.tsx` already had. */
 const NEW_ICON_NAMES = [

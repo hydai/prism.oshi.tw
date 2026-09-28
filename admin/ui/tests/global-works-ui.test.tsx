@@ -5,13 +5,11 @@ import { MemoryRouter } from 'react-router-dom';
 import { Window } from 'happy-dom';
 import type { HTMLElement as DomElement } from 'happy-dom';
 import type { AuthUser, GlobalWorkSummary, GlobalWorksResponse } from '../../shared/types';
+import { NO_RAW_PALETTE } from './helpers/palette';
 
 function assert(condition: boolean, message: string): asserts condition {
   if (!condition) throw new Error(message);
 }
-
-/** Spec §4.1: colours only through the token utilities, never the raw Tailwind palette. */
-const NO_RAW_PALETTE = /\b(bg|text|border)-(slate|gray|blue|green|red|amber|yellow)-\d/;
 
 function installLocalStorage(): void {
   const storage = new Map<string, string>([['prism_admin_streamer', 'mizuki']]);

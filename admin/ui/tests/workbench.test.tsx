@@ -17,6 +17,7 @@ import { FloatingPlaybackPill } from '../src/components/FloatingPlaybackPill';
 import { FetchLogPanel } from '../src/components/FetchLogPanel';
 import type { FetchLogEntry } from '../src/components/FetchLogPanel';
 import { installDom, mount } from './helpers/dom';
+import { NO_RAW_PALETTE } from './helpers/palette';
 
 function assert(condition: boolean, message: string): asserts condition {
   if (!condition) {
@@ -24,11 +25,25 @@ function assert(condition: boolean, message: string): asserts condition {
   }
 }
 
-/** Spec §4.1: colours only through the token utilities, never the raw Tailwind palette. */
-const NO_RAW_PALETTE = /\b(bg|text|border)-(slate|gray|blue|green|red|amber|yellow)-\d/;
-
 function occurrences(html: string, needle: string): number {
   return html.split(needle).length - 1;
+}
+
+/**
+ * The raw black / white classes the workbench keeps on purpose, each scoped to the one block that
+ * actually renders it, so any other raw class — including either of these appearing somewhere it
+ * should not — still fails the shared check: the key cap on the accent-gradient action
+ * (translucent white on the gradient, pinned in the StampConsole block), and YouTubePlayer's black
+ * letterbox, which predates the studio and is embedded by PlayerPanel.
+ */
+const STAMP_CONSOLE_KEPT_CLASSES = [/kbd\]:bg-white\/20$/, /kbd\]:border-white\/35$/];
+const PLAYER_PANEL_KEPT_CLASSES = [/^bg-black$/];
+
+function withoutKeptClasses(html: string, kept: RegExp[]): string {
+  return html.replace(/class="([^"]*)"/g, (_match, classes: string) => {
+    const remaining = classes.split(' ').filter((name) => !kept.some((pattern) => pattern.test(name)));
+    return `class="${remaining.join(' ')}"`;
+  });
 }
 
 const noop = () => {};
@@ -353,7 +368,7 @@ function keyCaps(html: string): string[] {
   assert(html.includes('Set start'), 'the Start slot\'s Set action is fully named for assistive tech ("Set start")');
   assert(occurrences(html, '0:07') === 1, 'the clock text (one of the page\'s two readouts) appears exactly once inside StampConsole');
   assert(html.includes('#6') && html.includes('オレンジ'), 'the Now slot shows the 1-based song number and the title');
-  assert(!NO_RAW_PALETTE.test(html), 'StampConsole uses no raw Tailwind palette classes');
+  assert(!NO_RAW_PALETTE.test(withoutKeptClasses(html, STAMP_CONSOLE_KEPT_CLASSES)), 'StampConsole uses no raw Tailwind palette classes beyond its on-gradient key cap');
 
   // This fixture's End slot is "hot" (open, no end timestamp yet): pink, not amber, and no
   // decorative shadow-focus reuse (spec match, fix round 1).
@@ -462,7 +477,7 @@ function keyCaps(html: string): string[] {
   const outerClass = /^<div class="([^"]*)"/.exec(html)?.[1] ?? '';
   assert(outerClass.split(' ').includes('relative'), 'PlayerPanel provides its own relative positioning host');
   assert(!outerClass.includes('aspect-video'), "PlayerPanel's own wrapper does not redeclare aspect-video");
-  assert(!NO_RAW_PALETTE.test(html), 'PlayerPanel uses no raw Tailwind palette classes');
+  assert(!NO_RAW_PALETTE.test(withoutKeptClasses(html, PLAYER_PANEL_KEPT_CLASSES)), "PlayerPanel uses no raw Tailwind palette classes beyond YouTubePlayer's letterbox");
 
   const withoutVideo = renderToStaticMarkup(<PlayerPanel playerRef={ref} videoId={undefined} />);
   assert(
