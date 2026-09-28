@@ -43,6 +43,8 @@ export default {
         'glass-pop': 'var(--glass-pop)',
         'thead-bg': 'var(--thead-bg)',
         selected: 'var(--selected-bg)',
+        // A hovered row on glass: a card's table or list rows, the sidebar's links.
+        'row-hover': 'var(--row-hover)',
         'danger-solid': 'var(--danger-solid)',
         'hot-line': 'var(--hot-line)',
         tone: {

@@ -762,7 +762,7 @@ const SongList = memo(function SongList({
               <li
                 key={perf.id}
                 className={`group grid min-h-[34px] grid-cols-[20px_minmax(0,1fr)_54px_54px] items-center gap-2 border-b border-line-soft px-3.5 text-[12px] transition-colors last:rounded-b-[18px] last:border-b-0 lg:grid-cols-[24px_minmax(0,1fr)_58px_58px_16px] ${
-                  selected ? 'bg-selected shadow-[inset_3px_0_0_var(--nav-active-icon)]' : 'hover:bg-field'
+                  selected ? 'bg-selected shadow-[inset_3px_0_0_var(--nav-active-icon)]' : 'hover:bg-row-hover'
                 }`}
               >
                 <button

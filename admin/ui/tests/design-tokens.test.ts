@@ -106,6 +106,8 @@ const TOKENS: Array<{ name: string; light: string; dark: string }> = [
   },
   { name: 'accent-fg', light: '#DB2777', dark: '#F9A8D4' },
   { name: 'selected-bg', light: 'rgba(252,231,243,.85)', dark: 'rgba(244,114,182,.12)' },
+  // A row's hover on a glass card (not in the spec table): --field was white on white there.
+  { name: 'row-hover', light: 'rgba(148,163,184,.15)', dark: 'rgba(255,255,255,.05)' },
   { name: 'nav-active-bg', light: 'rgba(255,255,255,.88)', dark: 'rgba(255,255,255,.08)' },
   { name: 'nav-active-fg', light: '#DB2777', dark: '#FFFFFF' },
   { name: 'nav-active-icon', light: '#EC4899', dark: '#F9A8D4' },
@@ -165,6 +167,7 @@ type SurfaceToken =
   | 'glass-pop'
   | 'field'
   | 'selected-bg'
+  | 'row-hover'
   | 'thead-bg'
   | 'tone-neutral-bg'
   | 'scrim';
@@ -260,6 +263,7 @@ async function main(): Promise<void> {
 
   const lowest: string[] = [];
   const toneLowest: string[] = [];
+  const rowHoverLowest: string[] = [];
   for (const [theme, declarations] of [
     ['light', light],
     ['dark', dark],
@@ -304,6 +308,17 @@ async function main(): Promise<void> {
       `${theme}: --fg stands out more than --fg-muted, and --fg-muted more than --fg-subtle`,
     );
 
+    // --- A hovered row on a glass card, and in the sidebar, is told from one at rest ---
+
+    const rowRests = [...lay(backdrops, ['glass-card']), ...lay(backdrops, ['glass-sidebar'])];
+    const rowHover = Math.min(
+      ...rowRests.flatMap((rest) => colours('row-hover').map((hover) => contrastRatio(rest, over(hover, rest)))),
+    );
+    if (theme === 'light') {
+      assert(rowHover >= 1.1, `light --row-hover changes a row on glass by at least 1.10:1 (lowest ${rowHover.toFixed(3)}:1)`);
+    }
+    rowHoverLowest.push(`${theme} ${rowHover.toFixed(3)}:1`);
+
     // --- Every tone's pill text reaches WCAG AA (4.5:1) on its own pill background ---
 
     // A pill sits directly on the canvas/blob backdrops, or on one of the glass surfaces laid
@@ -339,6 +354,8 @@ async function main(): Promise<void> {
   console.log(
     `✓ every tone's pill text reaches WCAG AA (4.5:1) on its own pill background (lowest: ${toneLowest.join(', ')})`,
   );
+
+  console.log(`✓ --row-hover sets a hovered row on glass apart from one at rest (lowest: ${rowHoverLowest.join(', ')})`);
 
   // --- Reduced motion: every animation runs once, near-instantly, and stops — a looping one
   // (animate-spin, animate-pulse) must not keep its infinite iteration count ---
@@ -378,6 +395,7 @@ async function main(): Promise<void> {
   assert(colors['line-soft'] === 'var(--line-soft)', "colors['line-soft'] maps to var(--line-soft)");
   assert(colors.track === 'var(--track)', 'colors.track maps to var(--track)');
   assert(colors.selected === 'var(--selected-bg)', 'colors.selected maps to var(--selected-bg)');
+  assert(colors['row-hover'] === 'var(--row-hover)', "colors['row-hover'] maps to var(--row-hover)");
   assert(colors['danger-solid'] === 'var(--danger-solid)', "colors['danger-solid'] maps to var(--danger-solid)");
   assert(colors['thead-bg'] === 'var(--thead-bg)', "colors['thead-bg'] maps to var(--thead-bg)");
 

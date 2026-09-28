@@ -143,7 +143,7 @@ function ReadyList({ streams, loading, error, currentId, busy, onExtract, onRetr
                 aria-disabled={busy ? 'true' : undefined}
                 onClick={() => onExtract(stream)}
                 className={`flex w-full items-start gap-2.5 px-3.5 py-2.5 text-left text-[12px] transition-colors focus-visible:shadow-[inset_0_0_0_2px_var(--accent-fg)] aria-disabled:cursor-progress ${
-                  current ? 'bg-selected shadow-[inset_3px_0_0_var(--nav-active-icon)]' : 'hover:bg-field'
+                  current ? 'bg-selected shadow-[inset_3px_0_0_var(--nav-active-icon)]' : 'hover:bg-row-hover'
                 }`}
               >
                 {/* Tabular digits, as the Dashboard's date chip asks for, so every date is as wide and
