@@ -14,6 +14,7 @@ import { PageHeader } from '../components/ui/PageHeader';
 import { Pill, type Tone } from '../components/ui/Pill';
 import { Popover } from '../components/ui/Popover';
 import { HeadCell, SortHeader, Table, TableEmptyRow, THead, type SortDirection } from '../components/ui/Table';
+import { CELL_X, FIRST_CELL_X, LAST_CELL_X } from '../components/ui/table-cells';
 import { Chip } from '../components/ui/Toggles';
 import { useToast } from '../components/ui/toast';
 import { getTagLabel, tagsByCategory } from '../../../../lib/tags';
@@ -58,17 +59,6 @@ const EMPTY_STATS: GlobalWorkStats = {
   linkedPerformances: 0,
   unlinkedSongs: 0,
 };
-
-/**
- * Cell padding for heads and cells alike: 12 px between columns and 16 px at the ends of a row, the
- * rhythm of the approved table (mockup `.mk .th, .mk .tr`: `gap: 12px; padding: 0 16px`). Side
- * utilities on purpose: the kit's head cells carry `px-4`, and Tailwind emits every `pl-*` / `pr-*`
- * rule after the `px-*` ones, so these win. With nine columns, `px-4` alone spends 288 px of a
- * ~1000 px table on padding at 1280 px.
- */
-const CELL_X = 'pl-1.5 pr-1.5';
-const FIRST_CELL_X = 'pl-4 pr-1.5';
-const LAST_CELL_X = 'pl-1.5 pr-4';
 
 const VTUBER_CHIP =
   'max-w-full truncate rounded-radius-pill border border-field-line bg-field px-[7px] py-0.5 text-meta font-medium';

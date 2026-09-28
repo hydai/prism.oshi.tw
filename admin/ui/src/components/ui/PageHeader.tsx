@@ -33,26 +33,40 @@ export function PageHeader({
   actions,
   children,
   tall = false,
+  recordTitle = false,
 }: {
-  crumb: string;
+  crumb: ReactNode;
   title: ReactNode;
   meta?: ReactNode;
   actions?: ReactNode;
   children?: ReactNode;
   tall?: boolean;
+  /** A record's own page (Stream Detail): the crumb + <h1> name that record, so they stay visible
+   *  below 1024px too instead of repeating the MobileTopBar's generic page title. The title block
+   *  also takes what the first row leaves (`flex-1`), so a long record title truncates beside
+   *  `children` and `actions` — the mockup's `.titlecol` — instead of pushing them onto a row of
+   *  their own. It claims 20rem first (`basis-[20rem]`, which the stylesheet emits after
+   *  `flex-1`): where that and the actions don't fit on one row, the actions wrap below the title
+   *  instead of squeezing it. */
+  recordTitle?: boolean;
 }) {
+  // Below 1024px the MobileTopBar already shows the page title, so this crumb + <h1> would repeat
+  // it (mockup 3's phone Stamp Editor showed "Stamp Editor" twice) — `max-lg:sr-only`, not `hidden`:
+  // the page must keep exactly one <h1>, just not a visible, duplicate one. `recordTitle` pages name
+  // a specific record rather than the page itself, so that repeat is the record's own title, which
+  // the MobileTopBar does not show — there, both stay visible at every width instead.
+  const crumbClasses = `text-2xs font-bold uppercase tracking-[0.12em] text-fg-subtle${recordTitle ? '' : ' max-lg:sr-only'}`;
+  const titleClasses = `truncate text-[18px] font-[750] leading-[1.15] tracking-[-0.01em] text-fg${recordTitle ? '' : ' max-lg:sr-only'}`;
+
   return (
     <header
       className={`glass-header-host relative z-20 flex flex-wrap items-center gap-3 px-5 before:border-x-0 before:border-t-0 max-xl:py-1.5 lg:sticky lg:top-0 ${
         tall ? 'min-h-[76px]' : 'min-h-[62px]'
       }`}
     >
-      <div className="min-w-0 max-sm:w-full">
-        {/* Below 1024px the MobileTopBar already shows the page title, so this crumb + <h1> would
-            repeat it (mockup 3's phone Stamp Editor showed "Stamp Editor" twice). `max-lg:sr-only`,
-            not `hidden`: the page must keep exactly one <h1>, just not a visible, duplicate one. */}
-        <div className="text-2xs font-bold uppercase tracking-[0.12em] text-fg-subtle max-lg:sr-only">{crumb}</div>
-        <h1 className="truncate text-[18px] font-[750] leading-[1.15] tracking-[-0.01em] text-fg max-lg:sr-only">{title}</h1>
+      <div className={recordTitle ? 'min-w-0 flex-1 basis-[20rem] max-sm:w-full' : 'min-w-0 max-sm:w-full'}>
+        <div className={crumbClasses}>{crumb}</div>
+        <h1 className={titleClasses}>{title}</h1>
         {meta ? (
           <div className="mt-1 flex flex-wrap items-center gap-2 text-meta text-fg-muted">{meta}</div>
         ) : null}
