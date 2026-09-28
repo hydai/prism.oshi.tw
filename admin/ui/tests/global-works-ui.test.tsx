@@ -3,7 +3,7 @@ import { createRoot } from 'react-dom/client';
 import { renderToStaticMarkup } from 'react-dom/server';
 import { MemoryRouter } from 'react-router-dom';
 import { Window } from 'happy-dom';
-import type { HTMLElement as DomElement } from 'happy-dom';
+import type { HTMLElement as DomElement, HTMLSelectElement as DomSelectElement } from 'happy-dom';
 import type { AuthUser, GlobalWorkSummary, GlobalWorksResponse } from '../../shared/types';
 import { NO_RAW_PALETTE } from './helpers/palette';
 
@@ -176,6 +176,19 @@ function pendingAt(index: number): PendingFetch {
 }
 
 /**
+ * `act`-wrapped microtask flushes — enough rounds for a fetch's `.then()` chain and the
+ * resulting re-render to fully settle before the next assertion reads the DOM. Shared by every
+ * live-mount function below (`globalWorksLoadsThroughTheHook`, `allWorksChipAndSortSummary`).
+ */
+async function settle(): Promise<void> {
+  for (let i = 0; i < 4; i += 1) {
+    await act(async () => {
+      await Promise.resolve();
+    });
+  }
+}
+
+/**
  * Mounts the real page against a live DOM (the way `tests/stream-detail-ui.test.tsx` mounts
  * StreamDetail) to pin what `renderToStaticMarkup` above cannot see: the migration from a
  * hand-rolled fetch effect onto `useApiResource` must still start one load on mount, still
@@ -207,14 +220,6 @@ async function globalWorksLoadsThroughTheHook(): Promise<void> {
 
   const { default: GlobalWorks } = await import('../src/pages/GlobalWorks');
   const { ToastProvider } = await import('../src/components/ui/toast');
-
-  async function settle(): Promise<void> {
-    for (let i = 0; i < 4; i += 1) {
-      await act(async () => {
-        await Promise.resolve();
-      });
-    }
-  }
 
   // Every commit of the page, mount included: a hand-rolled effect that writes `loading`
   // itself (the pre-fix `GlobalWorks`) resolves a load in two commits — one where the data
@@ -545,5 +550,231 @@ async function globalWorksLoadsThroughTheHook(): Promise<void> {
   console.log('✓ Global Library loads and refetches through useApiResource with no extra render');
 }
 
+/**
+ * The `All works` chip and the sort summary next to it: its own fresh mount and its own fetch
+ * queue (reset up front) so these indices never shift `globalWorksLoadsThroughTheHook`'s
+ * `pendingAt` calls above.
+ */
+async function allWorksChipAndSortSummary(): Promise<void> {
+  installLocalStorage();
+  pendingFetches.length = 0;
+  stubQueuedFetch();
+
+  const win = new Window({
+    url: 'http://localhost/',
+    settings: { disableJavaScriptFileLoading: true, disableCSSFileLoading: true },
+  });
+  for (const [name, value] of Object.entries({
+    window: win,
+    document: win.document,
+    navigator: win.navigator,
+    HTMLElement: win.HTMLElement,
+    Element: win.Element,
+    Node: win.Node,
+    Event: win.Event,
+    IS_REACT_ACT_ENVIRONMENT: true,
+  })) {
+    Object.defineProperty(globalThis, name, { value, configurable: true, writable: true });
+  }
+
+  const { default: GlobalWorks } = await import('../src/pages/GlobalWorks');
+  const { ToastProvider } = await import('../src/components/ui/toast');
+
+  const container = win.document.createElement('div');
+  win.document.body.appendChild(container);
+  const root = createRoot(container as unknown as HTMLElement);
+
+  await act(async () => {
+    root.render(
+      <MemoryRouter>
+        <ToastProvider>
+          <GlobalWorks />
+        </ToastProvider>
+      </MemoryRouter>,
+    );
+  });
+
+  // Row content is irrelevant here — the same fixture is reused for every response until the
+  // zero-total one at the very end, and every action in between resets `page` to 1, so
+  // `total: 120` keeps the range reading "1–50 of 120" throughout.
+  const response: GlobalWorksResponse = {
+    data: [],
+    total: 120,
+    page: 1,
+    pageSize: 50,
+    totalPages: 3,
+    stats: { totalWorks: 120, sharedWorks: 4, linkedSongs: 300, linkedPerformances: 900, unlinkedSongs: 2 },
+  };
+  await act(async () => {
+    pendingAt(0).respond(response);
+  });
+  await settle();
+
+  function chip(label: string): DomElement {
+    const found = [...container.querySelectorAll<DomElement>('button[aria-pressed]')].find(
+      (button) => button.textContent.trim() === label,
+    );
+    assert(found !== undefined, `a chip labelled "${label}" renders`);
+    return found;
+  }
+  function summary(): string {
+    const el = container.querySelector<DomElement>('.ml-auto.text-token-sm.text-fg-muted');
+    assert(el !== null, 'the sort summary renders');
+    return el.textContent;
+  }
+  function tagSelect(): DomSelectElement {
+    const found = container.querySelector<DomSelectElement>('select[aria-label="Filter global works by tag"]');
+    assert(found !== null, 'the tag filter select renders');
+    return found;
+  }
+  /**
+   * Sets a (React-controlled) `<select>`'s value the way picking an option does, then settles.
+   * React keeps its own copy of a controlled field's value on the node (`tests/helpers/dom.ts`'s
+   * `typeInto` has the same note for text inputs); writing through the prototype's `value` setter
+   * changes the DOM value without touching that copy, so the `change` event reads as a real pick
+   * and fires onChange.
+   */
+  async function selectOption(select: DomSelectElement, value: string): Promise<void> {
+    let setValue: ((next: string) => void) | undefined;
+    for (let proto: object | null = Object.getPrototypeOf(select); proto && !setValue; proto = Object.getPrototypeOf(proto)) {
+      setValue = Object.getOwnPropertyDescriptor(proto, 'value')?.set;
+    }
+    // Cast to the ambient DOM type for the dispatch itself: happy-dom's own `Event` type (what
+    // its `dispatchEvent` expects) isn't what `new Event(...)` resolves to under this ambient-DOM
+    // tsconfig — `tests/stream-detail-ui.test.tsx`'s `keyDown` does the same for the same reason.
+    const element = select as unknown as HTMLSelectElement;
+    await act(async () => {
+      if (setValue) setValue.call(select, value);
+      else element.value = value;
+      element.dispatchEvent(new Event('change', { bubbles: true }));
+    });
+    await settle();
+  }
+  /** Re-queried on every call: the Title header's button unmounts and remounts with the rest of
+   *  `WorksTable` each time a filter/sort/page change starts a fresh, loading, request. */
+  function titleButton(): DomElement {
+    const found = [...container.querySelectorAll<DomElement>('th button')].find(
+      (button) => button.textContent.trim() === 'Title',
+    );
+    assert(found !== undefined, 'the Title column header renders');
+    return found;
+  }
+  /** The Title header's own `aria-sort`, asserted to actually hold a direction. The summary's
+   *  direction word is always checked against this, never against a hard-coded literal, so a
+   *  wrong pairing between the header and the summary would still be caught. */
+  function titleDirection(): 'ascending' | 'descending' {
+    const th = [...container.querySelectorAll<DomElement>('th[aria-sort]')].find(
+      (cell) => cell.textContent.trim() === 'Title',
+    );
+    assert(th !== undefined, 'the Title header renders with an aria-sort attribute');
+    const value = th.getAttribute('aria-sort');
+    assert(value === 'ascending' || value === 'descending', `the Title header's aria-sort names a direction (found: ${value})`);
+    return value;
+  }
+
+  assert(chip('All works').getAttribute('aria-pressed') === 'true', 'the All works chip is pressed on load');
+  assert(
+    summary() === 'Sorted by Performances, descending · 1–50 of 120',
+    `the summary names the default sort and the range on load (found: ${summary()})`,
+  );
+  // What a screen reader reads: the separator is hidden from it, its spaces are not (and, as a
+  // screen reader does, runs of whitespace read as one).
+  const spokenSummary = container.querySelector<DomElement>('.ml-auto.text-token-sm.text-fg-muted')?.cloneNode(true) as DomElement | undefined;
+  for (const hidden of spokenSummary?.querySelectorAll<DomElement>('[aria-hidden="true"]') ?? []) hidden.remove();
+  const spoken = (spokenSummary?.textContent ?? '').replace(/\s+/g, ' ');
+  assert(
+    spoken === 'Sorted by Performances, descending 1–50 of 120',
+    `assistive technology reads the summary with a space where the separator was (found: ${spoken})`,
+  );
+
+  // A tag chosen in the <select> is a separate control that All works must leave alone —
+  // chosen before the toggles below so the later All-works click has one active to check.
+  await selectOption(tagSelect(), 'language:ja');
+  await act(async () => { pendingAt(1).respond(response); });
+  await settle();
+  assert(pendingAt(1).url.includes('tag=language%3Aja'), 'choosing a tag requests it');
+
+  // Turning on the shared-only filter alone already un-presses All works.
+  await act(async () => { chip('Shared by multiple VTubers only').click(); });
+  assert(chip('All works').getAttribute('aria-pressed') === 'false', 'All works un-presses once the shared filter alone is active');
+  await act(async () => { pendingAt(2).respond(response); });
+  await settle();
+
+  // Turning on the second toggle too: both are now pressed, All works stays un-pressed.
+  await act(async () => { chip('未標語言').click(); });
+  await act(async () => { pendingAt(3).respond(response); });
+  await settle();
+  assert(chip('Shared by multiple VTubers only').getAttribute('aria-pressed') === 'true', 'the shared filter is pressed');
+  assert(chip('未標語言').getAttribute('aria-pressed') === 'true', 'the untagged filter is pressed');
+  assert(chip('All works').getAttribute('aria-pressed') === 'false', 'All works stays un-pressed with both filters active');
+
+  // Drive the page away from 1 before clicking All works: otherwise "the request asks for page
+  // 1" would hold even if `onAllWorks` never reset the page, since it would never have left 1.
+  const nextButton = [...container.querySelectorAll<DomElement>('button')].find(
+    (button) => button.textContent.trim() === 'Next',
+  );
+  assert(nextButton !== undefined, 'pagination renders a Next button');
+  await act(async () => { nextButton.click(); });
+  await act(async () => { pendingAt(4).respond(response); });
+  await settle();
+  assert(pendingAt(4).url.includes('page=2'), 'moving to the next page requests it');
+
+  // All works clears both toggles and the page in one click, but leaves the tag filter (both
+  // the <select>'s own value and the next request) alone.
+  await act(async () => { chip('All works').click(); });
+  assert(chip('All works').getAttribute('aria-pressed') === 'true', 'clicking All works re-presses it');
+  assert(chip('Shared by multiple VTubers only').getAttribute('aria-pressed') === 'false', 'All works un-presses the shared filter');
+  assert(chip('未標語言').getAttribute('aria-pressed') === 'false', 'All works un-presses the untagged filter');
+  assert(tagSelect().value === 'language:ja', "the All works click leaves the tag select's value unchanged");
+  assert(!pendingAt(5).url.includes('sharedOnly'), 'the All works request drops the shared filter');
+  assert(!pendingAt(5).url.includes('untaggedOnly'), 'the All works request drops the untagged filter');
+  assert(pendingAt(5).url.includes('page=1'), 'the All works request asks for page 1, having actually moved off it');
+  assert(pendingAt(5).url.includes('tag=language%3Aja'), 'the All works request still carries the tag filter');
+  await act(async () => { pendingAt(5).respond(response); });
+  await settle();
+
+  // The summary names whichever column is sorted, matching that header's own aria-sort.
+  await act(async () => { titleButton().click(); });
+  await act(async () => { pendingAt(6).respond(response); });
+  await settle();
+  const firstDirection = titleDirection();
+  assert(firstDirection === 'ascending', 'sorting by Title for the first time sorts ascending');
+  assert(
+    summary() === `Sorted by Title, ${firstDirection} · 1–50 of 120`,
+    `the summary names the active sort, matching the header's own direction (found: ${summary()})`,
+  );
+
+  // With no results, the summary still names the sort but adds neither the separator nor a
+  // range. Clicking the already-active Title header again flips its direction — exercising a
+  // second, different direction word too — and gives a natural second request to answer with a
+  // zero-total response.
+  const zeroTotal: GlobalWorksResponse = {
+    data: [],
+    total: 0,
+    page: 1,
+    pageSize: 50,
+    totalPages: 0,
+    stats: { totalWorks: 0, sharedWorks: 0, linkedSongs: 0, linkedPerformances: 0, unlinkedSongs: 0 },
+  };
+  await act(async () => { titleButton().click(); });
+  await act(async () => { pendingAt(7).respond(zeroTotal); });
+  await settle();
+  const secondDirection = titleDirection();
+  assert(secondDirection === 'descending', 'clicking the already-active Title header again flips its direction');
+  assert(
+    summary() === `Sorted by Title, ${secondDirection}`,
+    `with no results the summary names the sort with no separator or range (found: ${summary()})`,
+  );
+
+  await act(async () => {
+    root.unmount();
+  });
+  container.remove();
+  await win.happyDOM.close();
+
+  console.log('✓ Global Library names the active filter and sort next to the range');
+}
+
 await main();
 await globalWorksLoadsThroughTheHook();
+await allWorksChipAndSortSummary();
