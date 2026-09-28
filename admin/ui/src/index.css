@@ -150,10 +150,14 @@ body {
   --tone-danger-fg: #B91C1C;
   --tone-danger-line: #FECACA;
   --tone-info-bg: #DBEAFE;
-  --tone-info-fg: #2563EB;
+  /* Darker than spec §4.1's #2563EB, same hue: that value misses WCAG AA (4.5:1) on this pill's
+     own background (4.24:1); this reaches 4.62:1. */
+  --tone-info-fg: #195BEA;
   --tone-info-line: #BFDBFE;
   --tone-neutral-bg: #F1F5F9;
-  --tone-neutral-fg: #64748B;
+  /* Darker than spec §4.1's #64748B, same hue: that value misses WCAG AA (4.5:1) on this pill's
+     own background (4.34:1); this reaches 4.66:1. */
+  --tone-neutral-fg: #606F85;
   --tone-neutral-line: #E2E8F0;
   --tone-violet-bg: #F5F3FF;
   --tone-violet-fg: #6D28D9;
