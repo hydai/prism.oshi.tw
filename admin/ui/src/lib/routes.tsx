@@ -60,7 +60,14 @@ export interface AdminRoute {
  * edited together; they are all read from this one now.
  */
 export const ADMIN_ROUTES: readonly AdminRoute[] = [
-  { path: '/', label: 'Dashboard', group: 'overview', icon: 'dashboard', render: () => <Dashboard /> },
+  {
+    path: '/',
+    label: 'Dashboard',
+    group: 'overview',
+    icon: 'dashboard',
+    frame: 'studio',
+    render: (user) => <Dashboard user={user} />,
+  },
   { path: '/songs', label: 'Songs', group: 'catalog', icon: 'music', render: (user) => <SongsList user={user} /> },
   { path: '/songs/:id', render: (user) => <SongDetail user={user} /> },
   {
