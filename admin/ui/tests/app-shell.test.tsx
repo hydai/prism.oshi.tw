@@ -392,10 +392,20 @@ async function main(): Promise<void> {
       `SSR ${url}: the ${label} link is the current one`,
     );
   }
-  const detailTopBar = parse(ssrShell('/streams/abc', curator))
-    .querySelector('button[aria-label="Open navigation"]')
-    ?.closest('header');
-  assert(textOf(detailTopBar).includes('Prism Admin'), 'an unlabelled route titles the top bar "Prism Admin"');
+  // The phone's top bar names the page: by its own manifest label, or on a detail page that has
+  // none, by the section the sidebar marks current there. A path nothing names reads Prism Admin.
+  for (const [url, title] of [
+    ['/streams/abc', 'Streams'],
+    ['/songs/song-1', 'Songs'],
+    ['/vod-export/repair/song/12', 'VOD Export'],
+    ['/works/review', 'Work Review'],
+    ['/nowhere', 'Prism Admin'],
+  ] as const) {
+    const topBarTitle = textOf(
+      parse(ssrShell(url, curator)).querySelector('button[aria-label="Open navigation"]')?.closest('header')?.querySelector('p'),
+    );
+    assert(topBarTitle === title, `SSR ${url}: the top bar reads ${title} (got "${topBarTitle}")`);
+  }
 
   console.log('✓ SSR: contributor filtering, and exactly one current nav link on nested routes');
 

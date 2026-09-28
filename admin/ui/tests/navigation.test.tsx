@@ -46,7 +46,7 @@ const LIST_ROUTE_CASES: [string, string][] = [
 ];
 
 async function main(): Promise<void> {
-  const { getNavGroups, listRouteFor, matchAdminRoute } = await import('../src/lib/navigation');
+  const { currentNavLabel, getNavGroups, listRouteFor, matchAdminRoute } = await import('../src/lib/navigation');
 
   const curator: AuthUser = { email: 'curator@example.com', role: 'curator' };
   const contributor: AuthUser = { email: 'contributor@example.com', role: 'contributor' };
@@ -90,7 +90,22 @@ async function main(): Promise<void> {
   assert(matchAdminRoute('/streams/abc')?.path === '/streams/:id', 'a detail path matches its manifest entry');
   assert(matchAdminRoute('/nope') === undefined, 'an unrouted path matches nothing');
 
-  console.log('✓ grouped navigation, list-route collapsing and route matching');
+  // --- currentNavLabel: the listed route the sidebar marks current, as NavLink does ---
+
+  for (const [pathname, expected] of [
+    ['/streams/abc', 'Streams'],
+    ['/songs/song-1', 'Songs'],
+    ['/vod-export/repair/song/12', 'VOD Export'],
+    ['/works', 'Global Library'],
+    ['/works/review', 'Work Review'],
+    ['/', 'Dashboard'],
+    ['/nope', undefined],
+    ['/streamsx', undefined],
+  ] as const) {
+    assert(currentNavLabel(pathname) === expected, `currentNavLabel(${pathname}) is ${expected}`);
+  }
+
+  console.log('✓ grouped navigation, list-route collapsing, route matching and the current section');
 }
 
 await main();
