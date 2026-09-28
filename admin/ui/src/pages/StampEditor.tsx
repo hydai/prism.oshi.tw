@@ -839,7 +839,7 @@ const SongList = memo(function SongList({
                     {perf.endTimestamp !== null && (
                       <IconButton
                         label="Clear end timestamp"
-                        icon="undo"
+                        icon="x"
                         size="sm"
                         tooltipSide="bottom"
                         onClick={(e) => {

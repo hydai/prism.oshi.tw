@@ -303,7 +303,7 @@ await probeTable({
   counter: detailCounter,
   container: detailPage.container,
   unrelatedChange: async () => {
-    await clickButton(detailPage.container, 'Paste Import');
+    await clickBySelector(detailPage.container, 'button[aria-label="Paste Import"]', 'the Paste Import button');
     assert(
       detailPage.container.innerHTML.includes('Paste a timestamp list'),
       'StreamDetail PerformanceTable: the paste-import modal really opened',
@@ -319,14 +319,14 @@ await probeTable({
     const rowTwo = detailPage.container.querySelector<DomElement>('#performance-row-performance-two');
     const rowOne = detailPage.container.querySelector<DomElement>('#performance-row-performance-one');
     assert(
-      rowTwo?.getAttribute('class')?.includes('bg-blue-50') === true
-        && rowOne?.getAttribute('class')?.includes('bg-blue-50') === false,
+      rowTwo?.getAttribute('class')?.includes('bg-selected') === true
+        && rowOne?.getAttribute('class')?.includes('bg-selected') === false,
       'StreamDetail PerformanceTable: the clicked row really became the selected one',
     );
   },
   rowSetChange: async () => {
     // Unapproving a row writes, then reloads the stream detail into a new performances array.
-    await clickBySelector(detailPage.container, '[title="Unapprove"]', 'the row unapprove button');
+    await clickBySelector(detailPage.container, '[aria-label="Unapprove performance"]', 'the row unapprove button');
   },
 });
 

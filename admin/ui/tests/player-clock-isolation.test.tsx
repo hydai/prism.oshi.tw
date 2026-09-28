@@ -169,6 +169,8 @@ const detailController: StreamDetailController = {
   setSelectedIndex: noop,
   showAddModal: false,
   setShowAddModal: noop,
+  shortcutsOpen: false,
+  setShortcutsOpen: noop,
   fetchLog: [],
   clearFetchLog: noop,
   isCurator: true,
@@ -189,6 +191,11 @@ const detailController: StreamDetailController = {
   clearEndTimestamp: asyncNoop,
   clearAllEndTimestamps: asyncNoop,
   handleAddSong: asyncNoop,
+  markStartTimestamp: asyncNoop,
+  markEndTimestamp: asyncNoop,
+  seekToStart: noop,
+  seekToEnd: noop,
+  seekTo: noop,
 };
 
 // --- Helpers ---
