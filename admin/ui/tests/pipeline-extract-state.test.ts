@@ -140,3 +140,72 @@ assert.equal(state.loading, false, 'failed extraction stops loading');
 assert.equal(state.error, 'Extraction failed', 'failed extraction records the error');
 
 console.log('✓ Pipeline extract state transitions remain atomic');
+
+// --- The ready-to-extract list: a failed load, and the retry that follows it ---
+
+assert.equal(initialExtractState.streamsError, null, 'the ready list starts without a load error');
+assert.equal(initialExtractState.loadingStreams, true, 'the ready list starts loading, so the page dispatches nothing before its first response');
+
+let listState = extractReducer(
+  { ...initialExtractState, error: 'Extraction failed' },
+  { type: 'streamsFailed', error: 'Streams are unavailable' },
+);
+assert.equal(listState.loadingStreams, false, 'a failed load stops the loading indicator');
+assert.equal(listState.streamsError, 'Streams are unavailable', 'a failed load records its error');
+assert.deepEqual(listState.streams, [], 'a failed load lists no streams');
+assert.equal(listState.error, 'Extraction failed', 'a failed list load leaves the extract error alone');
+
+listState = extractReducer(listState, { type: 'streamsRequested' });
+assert.equal(listState.loadingStreams, true, 'a retry shows the loading indicator again');
+assert.equal(listState.streamsError, null, 'a retry clears the previous load error');
+assert.equal(listState.error, 'Extraction failed', 'a retry leaves the extract error alone');
+
+listState = extractReducer(listState, { type: 'streamsLoaded', streams: [stream] });
+listState = extractReducer(listState, { type: 'streamsLoadingFinished' });
+assert.deepEqual(listState.streams, [stream], 'a retry that succeeds lists the streams');
+assert.equal(listState.loadingStreams, false, 'a retry that succeeds stops the loading indicator');
+assert.equal(listState.streamsError, null, 'a retry that succeeds shows no load error');
+
+// The reload after a Discover import dispatches no `streamsRequested`: a list that loads clears the
+// failure before it all the same.
+listState = extractReducer(listState, { type: 'streamsFailed', error: 'Streams are unavailable' });
+listState = extractReducer(listState, { type: 'streamsLoaded', streams: [stream] });
+assert.equal(listState.streamsError, null, 'a list that loads clears an earlier failure, with no retry in between');
+
+console.log('✓ Pipeline ready list: a failed load records its error and a retry clears it');
+
+// --- A reload keeps the stream the curator is on: an extract in progress imports to it ---
+
+const streamTwo: Stream = { ...stream, id: 'stream-2', videoId: 'video-2', title: 'Second stream' };
+const streamThree: Stream = { ...stream, id: 'stream-3', videoId: 'video-3', title: 'Third stream' };
+
+let reloadState = extractReducer(initialExtractState, { type: 'streamsLoaded', streams: [stream, streamTwo] });
+reloadState = extractReducer(reloadState, { type: 'streamsLoadingFinished' });
+reloadState = extractReducer(reloadState, { type: 'extractStarted', streamId: streamTwo.id });
+reloadState = extractReducer(reloadState, {
+  type: 'extractSucceeded',
+  result: extractResult,
+  editedSongs: [editableSong],
+});
+
+// A Discover import adds a stream to the list, which then reloads.
+reloadState = extractReducer(reloadState, { type: 'streamsLoaded', streams: [streamThree, stream, streamTwo] });
+assert.deepEqual(reloadState.streams, [streamThree, stream, streamTwo], 'a reload lists the new streams');
+assert.equal(reloadState.selectedStreamId, streamTwo.id, 'a reload keeps the selected stream while it is still listed');
+assert.equal(reloadState.extractResult, extractResult, 'a reload leaves the extract in progress alone');
+assert.deepEqual(reloadState.editedSongs, [editableSong], 'a reload leaves the edited songs alone');
+
+reloadState = extractReducer(reloadState, { type: 'streamsLoaded', streams: [streamThree] });
+assert.equal(
+  reloadState.selectedStreamId,
+  streamTwo.id,
+  'a reload keeps the selection even once its stream has left the list: the songs being edited still belong to it',
+);
+
+assert.equal(
+  extractReducer(initialExtractState, { type: 'streamsLoaded', streams: [] }).selectedStreamId,
+  '',
+  'a first load with no streams selects none',
+);
+
+console.log('✓ Pipeline ready list: a reload keeps the selected stream, so an extract in progress imports where it came from');
