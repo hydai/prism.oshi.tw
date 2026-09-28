@@ -1,9 +1,21 @@
-import { Fragment, useRef, useState, type FormEvent } from 'react';
+import { Fragment, useRef, useState, type FormEvent, type ReactNode } from 'react';
+import { Link } from 'react-router-dom';
 import type { GlobalWorkStats, GlobalWorkSummary } from '../../../shared/types';
 import { api, ApiError } from '../api/client';
 import { Pagination } from '../components/Pagination';
-import { SortHeader, type SortDirection } from '../components/SortHeader';
 import TagPicker from '../components/TagPicker';
+import { BulkBar } from '../components/ui/BulkBar';
+import { Button, IconButton } from '../components/ui/Button';
+import { buttonClasses } from '../components/ui/button-classes';
+import { GlassCard, Skeleton, StatTile } from '../components/ui/Display';
+import { Checkbox, SearchInput, Select } from '../components/ui/Fields';
+import { Icon } from '../components/ui/Icon';
+import { PageHeader } from '../components/ui/PageHeader';
+import { Pill, type Tone } from '../components/ui/Pill';
+import { Popover } from '../components/ui/Popover';
+import { HeadCell, SortHeader, Table, TableEmptyRow, THead, type SortDirection } from '../components/ui/Table';
+import { Chip } from '../components/ui/Toggles';
+import { useToast } from '../components/ui/toast';
 import { getTagLabel, tagsByCategory } from '../../../../lib/tags';
 import { useApiResource } from '../lib/apiResource';
 
@@ -16,6 +28,28 @@ type SortKey =
   | 'updatedAt';
 
 const PAGE_SIZE = 50;
+/** Select, title, artist, VTubers, local songs, performances, tags, work ID, actions. */
+const COLUMN_COUNT = 9;
+/**
+ * VTuber chips a row shows before folding the rest into `+N`. Three fit the column on one line
+ * from 1280 px — but only when they are short enough: real data (data/{slug}/songs.json) had rows
+ * at 1280px whose first three slugs (e.g. "earendel", "hibiki", "margaretnorth") all ellipsized
+ * instead. There is no way to measure rendered text width outside the browser, so this is a length
+ * heuristic, not a pixel-exact one — tuned in Chromium against that data: three chips whose own
+ * characters total at most WIDE_STREAMER_CHARS, otherwise two, still folding the rest into the same
+ * `+N`.
+ */
+const WIDE_STREAMER_CHARS = 17;
+
+function visibleStreamerCount(streamerIds: string[]): number {
+  const firstThreeChars = streamerIds.slice(0, 3).reduce((total, id) => total + id.length, 0);
+  return firstThreeChars <= WIDE_STREAMER_CHARS ? 3 : 2;
+}
+/**
+ * Tag pills that fit the column: two — a language and a source, all a work carries today. With
+ * more, `+N` takes the second pill's place, since two pills and a `+N` would not fit.
+ */
+const VISIBLE_TAGS = 2;
 const EMPTY_SELECTION: ReadonlySet<string> = new Set();
 const EMPTY_STATS: GlobalWorkStats = {
   totalWorks: 0,
@@ -25,119 +59,146 @@ const EMPTY_STATS: GlobalWorkStats = {
   unlinkedSongs: 0,
 };
 
-interface StatsCardsProps {
-  stats: GlobalWorkStats;
+/**
+ * Cell padding for heads and cells alike: 12 px between columns and 16 px at the ends of a row, the
+ * rhythm of the approved table (mockup `.mk .th, .mk .tr`: `gap: 12px; padding: 0 16px`). Side
+ * utilities on purpose: the kit's head cells carry `px-4`, and Tailwind emits every `pl-*` / `pr-*`
+ * rule after the `px-*` ones, so these win. With nine columns, `px-4` alone spends 288 px of a
+ * ~1000 px table on padding at 1280 px.
+ */
+const CELL_X = 'pl-1.5 pr-1.5';
+const FIRST_CELL_X = 'pl-4 pr-1.5';
+const LAST_CELL_X = 'pl-1.5 pr-4';
+
+const VTUBER_CHIP =
+  'max-w-full truncate rounded-radius-pill border border-field-line bg-field px-[7px] py-0.5 text-meta font-medium';
+
+/**
+ * A chip cell's single line (the approved 44 px rows): never wraps, and a chip that still does not
+ * fit gives way — the visible ones shrink with an ellipsis, the `+N` chip never does.
+ */
+const CHIP_ROW = 'flex min-w-0 flex-nowrap gap-1 overflow-hidden';
+
+/** Language tags read as info, source tags as violet; an ID outside the dictionary stays neutral. */
+function tagTone(tag: string): Tone {
+  if (tag.startsWith('language:')) return 'info';
+  if (tag.startsWith('source:')) return 'violet';
+  return 'neutral';
 }
 
-/** The five summary cards above the filters: totals, sharing, linkage, and the unlinked-songs warning. */
-function StatsCards({ stats }: StatsCardsProps) {
-  const cards = [
-    { label: 'Global works', value: stats.totalWorks },
-    { label: 'Shared by VTubers', value: stats.sharedWorks },
-    { label: 'Linked local songs', value: stats.linkedSongs },
-    { label: 'Linked performances', value: stats.linkedPerformances },
-    { label: 'Unlinked songs', value: stats.unlinkedSongs, warning: stats.unlinkedSongs > 0 },
-  ];
-
+/**
+ * What a chip cell leaves out: a `+N` chip (`children`) naming the items in its tooltip, and the
+ * same items in an sr-only list, since a screen reader gets no tooltip.
+ */
+function MoreItems({ items, children }: { items: string[]; children: ReactNode }) {
+  if (items.length === 0) return null;
   return (
-    <div className="mt-5 grid gap-3 sm:grid-cols-2 xl:grid-cols-5">
-      {cards.map((card) => (
-        <div
-          key={card.label}
-          className={`rounded-lg border bg-white px-4 py-3 ${
-            card.warning ? 'border-amber-300' : 'border-slate-200'
-          }`}
-        >
-          <p className="text-xs font-medium uppercase tracking-wide text-slate-500">{card.label}</p>
-          <p className={`mt-1 text-2xl font-semibold ${card.warning ? 'text-amber-700' : 'text-slate-800'}`}>
-            {card.value.toLocaleString()}
-          </p>
-        </div>
-      ))}
+    <>
+      <span aria-hidden="true" title={items.join(', ')} className="flex shrink-0">
+        {children}
+      </span>
+      <ul className="sr-only">
+        {items.map((item) => (
+          <li key={item}>{item}</li>
+        ))}
+      </ul>
+    </>
+  );
+}
+
+/** A failed load or save, inline above the table. */
+function DangerNote({ children }: { children: ReactNode }) {
+  return (
+    <p
+      role="alert"
+      className="rounded-radius-lg border border-tone-danger-line bg-tone-danger-bg px-3 py-2 text-token-sm text-tone-danger-fg"
+    >
+      {children}
+    </p>
+  );
+}
+
+interface StatTilesProps {
+  stats: GlobalWorkStats;
+  /** False until the first response: the zeros shown meanwhile must not claim "all linked". */
+  loaded: boolean;
+}
+
+/** The five summary tiles above the filters: totals, sharing, linkage, and the unlinked-songs warning. */
+function StatTiles({ stats, loaded }: StatTilesProps) {
+  const unlinked = stats.unlinkedSongs;
+  return (
+    <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 xl:grid-cols-5">
+      <StatTile label="Global works" value={stats.totalWorks.toLocaleString()} />
+      <StatTile label="Shared by VTubers" value={stats.sharedWorks.toLocaleString()} />
+      <StatTile label="Linked local songs" value={stats.linkedSongs.toLocaleString()} />
+      <StatTile label="Linked performances" value={stats.linkedPerformances.toLocaleString()} />
+      <StatTile
+        label="Unlinked songs"
+        value={unlinked.toLocaleString()}
+        tone={unlinked > 0 ? 'warn' : undefined}
+        hint={loaded && unlinked === 0 ? <span className="text-tone-ok-fg">all linked</span> : undefined}
+      />
     </div>
   );
 }
 
 interface FilterBarProps {
-  search: string;
-  onSearchChange: (value: string) => void;
-  onSubmitSearch: (event: FormEvent) => void;
   sharedOnly: boolean;
   onSharedOnlyChange: (value: boolean) => void;
-  tagFilter: string;
-  onTagFilterChange: (value: string) => void;
   untaggedOnly: boolean;
   onUntaggedOnlyChange: (value: boolean) => void;
+  tagFilter: string;
+  onTagFilterChange: (value: string) => void;
+  shown: { start: number; end: number };
+  total: number;
 }
 
-/** Search box, the two boolean checkboxes, and the tag-dictionary `<select>`. */
+/** The two filter chips, the tag-dictionary `<select>` and the range of works on screen. */
 function FilterBar({
-  search,
-  onSearchChange,
-  onSubmitSearch,
   sharedOnly,
   onSharedOnlyChange,
-  tagFilter,
-  onTagFilterChange,
   untaggedOnly,
   onUntaggedOnlyChange,
+  tagFilter,
+  onTagFilterChange,
+  shown,
+  total,
 }: FilterBarProps) {
   return (
-    <div className="mt-5 flex flex-wrap items-center gap-3">
-      <form onSubmit={onSubmitSearch} className="flex gap-2">
-        <input
-          type="search"
-          aria-label="Search title or original artist"
-          placeholder="Search title or original artist..."
-          value={search}
-          onChange={(event) => onSearchChange(event.target.value)}
-          className="w-72 rounded-md border border-slate-300 px-3 py-1.5 text-sm focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500"
-        />
-        <button
-          type="submit"
-          className="rounded-md bg-slate-200 px-3 py-1.5 text-sm font-medium text-slate-700 hover:bg-slate-300"
-        >
-          Search
-        </button>
-      </form>
-      <label className="flex cursor-pointer items-center gap-2 text-sm text-slate-700">
-        <input
-          type="checkbox"
-          checked={sharedOnly}
-          onChange={(event) => onSharedOnlyChange(event.target.checked)}
-          className="h-4 w-4 rounded border-slate-300 text-blue-600"
-        />
+    <div className="flex flex-wrap items-center gap-2">
+      <Chip active={sharedOnly} onClick={() => onSharedOnlyChange(!sharedOnly)}>
         Shared by multiple VTubers only
-      </label>
-      <select
-        aria-label="Filter global works by tag"
-        value={tagFilter}
-        onChange={(event) => onTagFilterChange(event.target.value)}
-        className="rounded-md border border-slate-300 px-3 py-1.5 text-sm"
-      >
-        <option value="">All tags</option>
-        {tagsByCategory().map(({ category, tags }) => (
-          <optgroup key={category.id} label={category.label}>
-            {tags.map((tag) => (
-              <option key={tag.id} value={tag.id}>{tag.label}</option>
-            ))}
-          </optgroup>
-        ))}
-      </select>
-      <label className="flex cursor-pointer items-center gap-2 text-sm text-slate-700">
-        <input
-          type="checkbox"
-          checked={untaggedOnly}
-          onChange={(event) => onUntaggedOnlyChange(event.target.checked)}
-          className="h-4 w-4 rounded border-slate-300 text-blue-600"
-        />
+      </Chip>
+      <Chip active={untaggedOnly} onClick={() => onUntaggedOnlyChange(!untaggedOnly)}>
         未標語言
-      </label>
+      </Chip>
+      <div className="w-40">
+        <Select
+          aria-label="Filter global works by tag"
+          value={tagFilter}
+          onChange={(event) => onTagFilterChange(event.target.value)}
+        >
+          <option value="">All tags</option>
+          {tagsByCategory().map(({ category, tags }) => (
+            <optgroup key={category.id} label={category.label}>
+              {tags.map((tag) => (
+                <option key={tag.id} value={tag.id}>{tag.label}</option>
+              ))}
+            </optgroup>
+          ))}
+        </Select>
+      </div>
+      {total > 0 ? (
+        <span className="ml-auto text-token-sm text-fg-muted">
+          {shown.start}–{shown.end} of {total}
+        </span>
+      ) : null}
     </div>
   );
 }
 
-interface BulkTagEditorProps {
+interface BulkTagBarProps {
   selectedCount: number;
   batchTags: string[];
   saving: boolean;
@@ -146,105 +207,118 @@ interface BulkTagEditorProps {
   onApply: (mode: 'add' | 'remove') => void;
 }
 
-/** The bar that appears once at least one row on the page is selected: pick tags, add or remove them across the selection. */
-function BulkTagEditor({
-  selectedCount,
-  batchTags,
-  saving,
-  onBatchTagsChange,
-  onClear,
-  onApply,
-}: BulkTagEditorProps) {
+/**
+ * The floating bar shown while rows on the page are selected: pick tags in its popover (opening
+ * upward, hung from the bar so it stays on screen at phone widths), then add or remove them
+ * across the selection. The picker stays mounted inside the closed popover.
+ */
+function BulkTagBar({ selectedCount, batchTags, saving, onBatchTagsChange, onClear, onApply }: BulkTagBarProps) {
   return (
-    <div className="mt-4 rounded-lg border border-blue-200 bg-blue-50 p-4" data-testid="bulk-tag-editor">
-      <div className="mb-3 flex flex-wrap items-center justify-between gap-2">
-        <div>
-          <h3 className="text-sm font-semibold text-slate-800">批次編輯共用標籤</h3>
-          <p className="text-xs text-slate-500">已選擇 {selectedCount} 個作品</p>
+    <BulkBar countLabel={`已選擇 ${selectedCount} 個作品`}>
+      <Popover
+        kind="dialog"
+        label="批次編輯共用標籤"
+        side="top"
+        anchor="container"
+        trigger={({ triggerProps }) => (
+          <Button {...triggerProps} size="sm">
+            批次編輯共用標籤 ({batchTags.length})
+          </Button>
+        )}
+      >
+        <div className="p-2">
+          <TagPicker value={batchTags} onChange={onBatchTagsChange} disabled={saving} />
         </div>
-        <button
-          type="button"
-          onClick={onClear}
-          className="text-xs text-slate-600 hover:underline"
-        >
-          取消選取
-        </button>
-      </div>
-      <TagPicker value={batchTags} onChange={onBatchTagsChange} disabled={saving} />
-      <div className="mt-3 flex gap-2">
-        <button
-          type="button"
-          disabled={saving || batchTags.length === 0}
-          onClick={() => onApply('add')}
-          className="rounded bg-blue-600 px-3 py-1.5 text-sm text-white disabled:opacity-50"
-        >
-          加入所選標籤
-        </button>
-        <button
-          type="button"
-          disabled={saving || batchTags.length === 0}
-          onClick={() => onApply('remove')}
-          className="rounded border border-red-300 bg-white px-3 py-1.5 text-sm text-red-700 disabled:opacity-50"
-        >
-          移除所選標籤
-        </button>
-      </div>
-    </div>
+      </Popover>
+      <Button
+        variant="primary"
+        size="sm"
+        icon="plus"
+        disabled={saving || batchTags.length === 0}
+        onClick={() => onApply('add')}
+      >
+        加入所選標籤
+      </Button>
+      <Button size="sm" icon="minus" disabled={saving || batchTags.length === 0} onClick={() => onApply('remove')}>
+        移除所選標籤
+      </Button>
+      <Button variant="ghost" size="sm" icon="x" onClick={onClear}>
+        取消選取
+      </Button>
+    </BulkBar>
   );
 }
 
 interface WorkRowProps {
   work: GlobalWorkSummary;
   selected: boolean;
-  onToggleSelected: () => void;
+  onSelectedChange: (selected: boolean) => void;
   onEdit: () => void;
 }
 
-/** One work's row: selection checkbox, title + tag chips, artist, streamer pills, counts, id, and the Edit tags action. */
-function WorkRow({ work, selected, onToggleSelected, onEdit }: WorkRowProps) {
+/** One work's row: selection, title, artist, VTuber chips, counts, tag pills, work ID and the Edit tags action. */
+function WorkRow({ work, selected, onSelectedChange, onEdit }: WorkRowProps) {
+  const streamerChipCount = visibleStreamerCount(work.streamerIds);
+  const visibleStreamers = work.streamerIds.slice(0, streamerChipCount);
+  const hiddenStreamers = work.streamerIds.slice(streamerChipCount);
+  const visibleTags = work.tags.length > VISIBLE_TAGS ? work.tags.slice(0, VISIBLE_TAGS - 1) : work.tags;
+  const hiddenTags = work.tags.slice(visibleTags.length);
+
   return (
-    <tr className="align-top hover:bg-slate-50">
-      <td className="px-4 py-3">
-        <input
-          type="checkbox"
-          aria-label={`Select ${work.title}`}
-          checked={selected}
-          onChange={onToggleSelected}
-        />
+    <tr className={`h-11 border-b border-line-soft transition-colors ${selected ? 'bg-selected' : 'hover:bg-field'}`}>
+      <td className={`${FIRST_CELL_X} py-2`}>
+        {/* A flex box, so the inline label does not sit on the text baseline above the row's middle. */}
+        <div className="flex">
+          <Checkbox label={`Select ${work.title}`} checked={selected} onChange={onSelectedChange} />
+        </div>
       </td>
-      <td className="px-4 py-3">
-        <div className="font-medium text-slate-800">{work.title}</div>
-        {work.tags.length > 0 && (
-          <div className="mt-1 flex flex-wrap gap-1">
-            {work.tags.map((tag) => (
-              <span key={tag} className="rounded bg-slate-100 px-1.5 py-0.5 text-xs text-slate-500">
-                {getTagLabel(tag)}
-              </span>
-            ))}
-          </div>
-        )}
+      <td className={`${CELL_X} py-2`}>
+        <div title={work.title} className="truncate font-[650] text-fg">
+          {work.title}
+        </div>
       </td>
-      <td className="px-4 py-3 text-slate-600">{work.originalArtist}</td>
-      <td className="px-4 py-3">
-        <div className="flex max-w-xs flex-wrap gap-1">
-          {work.streamerIds.map((streamerId) => (
-            <span key={streamerId} className="rounded-full bg-blue-50 px-2 py-0.5 text-xs text-blue-700">
+      <td className={`${CELL_X} py-2`}>
+        <div title={work.originalArtist} className="truncate text-fg-muted">
+          {work.originalArtist}
+        </div>
+      </td>
+      <td className={`${CELL_X} py-2`}>
+        <div className={`${CHIP_ROW} justify-end`}>
+          {visibleStreamers.map((streamerId) => (
+            <span key={streamerId} title={streamerId} className={`${VTUBER_CHIP} text-fg-muted`}>
               {streamerId}
             </span>
           ))}
+          <MoreItems items={hiddenStreamers}>
+            <span className={`${VTUBER_CHIP} text-fg-subtle`}>+{hiddenStreamers.length}</span>
+          </MoreItems>
         </div>
       </td>
-      <td className="px-4 py-3 tabular-nums text-slate-600">{work.songCount}</td>
-      <td className="px-4 py-3 tabular-nums text-slate-600">{work.performanceCount}</td>
-      <td className="px-4 py-3 font-mono text-xs text-slate-400">{work.id}</td>
-      <td className="px-4 py-3">
-        <button
-          type="button"
-          onClick={onEdit}
-          className="whitespace-nowrap rounded border border-slate-300 px-2 py-1 text-xs text-slate-700 hover:bg-slate-100"
-        >
-          Edit tags
-        </button>
+      <td className={`${CELL_X} py-2 text-right font-[650] tabular-nums text-fg`}>{work.songCount}</td>
+      <td className={`${CELL_X} py-2 text-right font-[650] tabular-nums text-fg`}>{work.performanceCount}</td>
+      <td className={`${CELL_X} py-2`}>
+        {work.tags.length > 0 ? (
+          <div className={CHIP_ROW}>
+            {visibleTags.map((tag) => (
+              <Pill key={tag} tone={tagTone(tag)} className="min-w-0">
+                <span title={getTagLabel(tag)} className="truncate">
+                  {getTagLabel(tag)}
+                </span>
+              </Pill>
+            ))}
+            <MoreItems items={hiddenTags.map(getTagLabel)}>
+              <Pill tone="neutral">+{hiddenTags.length}</Pill>
+            </MoreItems>
+          </div>
+        ) : null}
+      </td>
+      <td className={`${CELL_X} py-2`}>
+        <div title={work.id} className="truncate font-mono text-meta text-fg-subtle">
+          {work.id}
+        </div>
+      </td>
+      <td className={`${LAST_CELL_X} py-2 text-right`}>
+        <IconButton label="Edit tags" icon="pencil" size="sm" onClick={onEdit} />
       </td>
     </tr>
   );
@@ -259,33 +333,23 @@ interface WorkEditorRowProps {
   onCancel: () => void;
 }
 
-/** The inline editor row a work's "Edit tags" button opens: full-width TagPicker plus Save/Cancel. */
+/** The inline editor row a work's Edit tags button opens: full-width TagPicker plus Save/Cancel. */
 function WorkEditorRow({ work, editTags, saving, onEditTagsChange, onSave, onCancel }: WorkEditorRowProps) {
   return (
-    <tr>
-      <td colSpan={8} className="bg-slate-50 px-6 py-4">
+    <tr className="border-b border-line-soft bg-field">
+      <td colSpan={COLUMN_COUNT} className="px-4 py-4">
         <div className="mb-3">
-          <h3 className="text-sm font-semibold text-slate-800">{work.title} — 共用作品標籤</h3>
-          <p className="text-xs text-slate-500">會套用到所有連結此 Work ID 的 VTuber 歌曲。</p>
+          <h2 className="break-words text-[13.5px] font-bold text-fg">{work.title} — 共用作品標籤</h2>
+          <p className="text-meta text-fg-muted">會套用到所有連結此 Work ID 的 VTuber 歌曲。</p>
         </div>
         <TagPicker value={editTags} onChange={onEditTagsChange} disabled={saving} />
         <div className="mt-3 flex gap-2">
-          <button
-            type="button"
-            disabled={saving}
-            onClick={onSave}
-            className="rounded bg-blue-600 px-3 py-1.5 text-sm text-white disabled:opacity-50"
-          >
+          <Button variant="primary" size="sm" busy={saving} onClick={onSave}>
             {saving ? 'Saving...' : 'Save tags'}
-          </button>
-          <button
-            type="button"
-            disabled={saving}
-            onClick={onCancel}
-            className="rounded bg-slate-200 px-3 py-1.5 text-sm text-slate-700"
-          >
+          </Button>
+          <Button size="sm" disabled={saving} onClick={onCancel}>
             Cancel
-          </button>
+          </Button>
         </div>
       </td>
     </tr>
@@ -295,13 +359,14 @@ function WorkEditorRow({ work, editTags, saving, onEditTagsChange, onSave, onCan
 interface WorksTableProps {
   works: GlobalWorkSummary[];
   selectedIds: ReadonlySet<string>;
+  allSelected: boolean;
   editingId: string | null;
   editTags: string[];
   saving: boolean;
   sortKey: SortKey;
   sortDir: SortDirection;
   onSort: (field: SortKey) => void;
-  onToggleSelected: (id: string) => void;
+  onSelectedChange: (id: string, selected: boolean) => void;
   onTogglePageSelection: () => void;
   onEdit: (work: GlobalWorkSummary) => void;
   onEditTagsChange: (tags: string[]) => void;
@@ -309,85 +374,80 @@ interface WorksTableProps {
   onCancel: () => void;
 }
 
-/** The sortable results table: header row, one `WorkRow` (+ `WorkEditorRow` while editing) per work, and the empty state. */
+/**
+ * The sortable results table in its glass card. Fixed layout: at 1280 px and up it fits the card,
+ * the title, artist and work ID cut short (full text in `title`) and the chip cells on one line,
+ * so every row is the approved 44 px and the sticky head keeps tracking `<main>`; below that it
+ * keeps a minimum width and scrolls inside the card. The card clips with `overflow-clip`, which
+ * unlike hidden/auto is no scroll container.
+ */
 function WorksTable({
   works,
   selectedIds,
+  allSelected,
   editingId,
   editTags,
   saving,
   sortKey,
   sortDir,
   onSort,
-  onToggleSelected,
+  onSelectedChange,
   onTogglePageSelection,
   onEdit,
   onEditTagsChange,
   onSave,
   onCancel,
 }: WorksTableProps) {
-  // Selection is per page: IDs that are not on the current page are ignored everywhere.
-  const selectedOnPage = works.filter((work) => selectedIds.has(work.id));
+  const sortProps = { activeField: sortKey, direction: sortDir, onSort, className: CELL_X };
 
   return (
-    <div className="mt-4 overflow-x-auto rounded-lg border border-slate-200 bg-white">
-      <table className="w-full text-left text-sm">
-        <thead className="border-b border-slate-200 bg-slate-50 text-xs uppercase text-slate-500">
+    <GlassCard padding="none" className="overflow-clip">
+      <Table className="table-fixed text-[12px] max-xl:min-w-[1000px]">
+        {/* Every column holds its head plus the sort chevron (whichever column is sorted). At the
+            table's 1000 px minimum, VTubers still fits its chips (three short ones, or two when
+            they run long) and `+N`, and tags two pills; the title takes the rest, and a long work
+            ID is cut short (full text in `title`). */}
+        <colgroup>
+          <col className="w-[38px]" />
+          <col />
+          <col className="w-[12.5%]" />
+          <col className="w-[20%]" />
+          <col className="w-[110px]" />
+          <col className="w-[122px]" />
+          <col className="w-[12.5%]" />
+          <col className="w-[120px]" />
+          <col className="w-[52px]" />
+        </colgroup>
+        <THead>
           <tr>
-            <th className="w-10 px-4 py-3">
-              <input
-                type="checkbox"
-                aria-label="Select all works on this page"
-                checked={works.length > 0 && selectedOnPage.length === works.length}
-                onChange={onTogglePageSelection}
-              />
-            </th>
-            <SortHeader
-              label="Title"
-              field="title"
-              activeField={sortKey}
-              direction={sortDir}
-              onSort={onSort}
-            />
-            <SortHeader
-              label="Original artist"
-              field="originalArtist"
-              activeField={sortKey}
-              direction={sortDir}
-              onSort={onSort}
-            />
-            <SortHeader
-              label="VTubers"
-              field="streamerCount"
-              activeField={sortKey}
-              direction={sortDir}
-              onSort={onSort}
-            />
-            <SortHeader
-              label="Local songs"
-              field="songCount"
-              activeField={sortKey}
-              direction={sortDir}
-              onSort={onSort}
-            />
-            <SortHeader
-              label="Performances"
-              field="performanceCount"
-              activeField={sortKey}
-              direction={sortDir}
-              onSort={onSort}
-            />
-            <th className="px-4 py-3">Work ID</th>
-            <th className="px-4 py-3">Actions</th>
+            <HeadCell className={FIRST_CELL_X}>
+              <div className="flex">
+                <Checkbox
+                  label="Select all works on this page"
+                  checked={allSelected}
+                  onChange={onTogglePageSelection}
+                />
+              </div>
+            </HeadCell>
+            <SortHeader label="Title" field="title" {...sortProps} />
+            <SortHeader label="Original artist" field="originalArtist" {...sortProps} />
+            <SortHeader label="VTubers" field="streamerCount" align="end" {...sortProps} />
+            <SortHeader label="Local songs" field="songCount" align="end" {...sortProps} />
+            <SortHeader label="Performances" field="performanceCount" align="end" {...sortProps} />
+            <HeadCell className={CELL_X}>Tags</HeadCell>
+            <HeadCell className={CELL_X}>Work ID</HeadCell>
+            <HeadCell className={LAST_CELL_X}>
+              <span className="sr-only">Actions</span>
+            </HeadCell>
           </tr>
-        </thead>
-        <tbody className="divide-y divide-slate-100">
+        </THead>
+        <tbody>
           {works.map((work) => (
             <Fragment key={work.id}>
               <WorkRow
                 work={work}
                 selected={selectedIds.has(work.id)}
-                onToggleSelected={() => onToggleSelected(work.id)}
+                onSelectedChange={(selected) => onSelectedChange(work.id, selected)}
                 onEdit={() => onEdit(work)}
               />
               {editingId === work.id && (
@@ -402,20 +462,15 @@ function WorksTable({
               )}
             </Fragment>
           ))}
-          {works.length === 0 && (
-            <tr>
-              <td colSpan={8} className="px-4 py-10 text-center text-slate-400">
-                No global works found.
-              </td>
-            </tr>
-          )}
+          {works.length === 0 && <TableEmptyRow colSpan={COLUMN_COUNT}>No global works found.</TableEmptyRow>}
         </tbody>
-      </table>
-    </div>
+      </Table>
+    </GlassCard>
   );
 }
 
 export default function GlobalWorks() {
+  const toast = useToast();
   const [search, setSearch] = useState('');
   const [submittedSearch, setSubmittedSearch] = useState('');
   const [sharedOnly, setSharedOnly] = useState(false);
@@ -426,8 +481,9 @@ export default function GlobalWorks() {
   const [page, setPage] = useState(1);
   // Selection belongs to one query. Any change of page, filter, search or sort starts a
   // fresh one, so the batch bar can never act on rows of a result set the curator has
-  // already navigated away from — useApiResource keeps the old rows on screen while the
-  // replacement load is in flight, and those rows must not stay actionable.
+  // already navigated away from — while the replacement load is in flight, useApiResource
+  // still holds the old rows (the table shows a Skeleton meanwhile), and the batch bar,
+  // which reads them, must not keep acting on them.
   const queryKey = JSON.stringify([submittedSearch, sharedOnly, tagFilter, untaggedOnly, page, sortKey, sortDir]);
   const [selection, setSelection] = useState<{ queryKey: string; ids: ReadonlySet<string> }>({ queryKey, ids: EMPTY_SELECTION });
   const selectedIds = selection.queryKey === queryKey ? selection.ids : EMPTY_SELECTION;
@@ -461,6 +517,7 @@ export default function GlobalWorks() {
   const totalPages = data?.totalPages ?? 0;
   // Selection is per page: IDs that are not on the current page are ignored everywhere.
   const selectedOnPage = works.filter((work) => selectedIds.has(work.id));
+  const allSelected = works.length > 0 && selectedOnPage.length === works.length;
 
   const submitSearch = (event: FormEvent) => {
     event.preventDefault();
@@ -478,15 +535,15 @@ export default function GlobalWorks() {
     }
   };
 
-  const toggleSelected = (id: string) => {
+  const setWorkSelected = (id: string, selected: boolean) => {
     const next = new Set(selectedIds);
-    if (next.has(id)) next.delete(id);
-    else next.add(id);
+    if (selected) next.add(id);
+    else next.delete(id);
     setSelectedIds(next);
   };
 
   const togglePageSelection = () => {
-    setSelectedIds(selectedOnPage.length === works.length ? new Set() : new Set(works.map((work) => work.id)));
+    setSelectedIds(allSelected ? new Set() : new Set(works.map((work) => work.id)));
   };
 
   const startEditing = (work: GlobalWorkSummary) => {
@@ -509,6 +566,7 @@ export default function GlobalWorks() {
     try {
       await api.updateWorkTags(editingId, { tags: editTags, expectedUpdatedAt: editBaseline.current });
       reloadAfterWrite();
+      toast.success('Tags saved');
     } catch (err: unknown) {
       if (err instanceof ApiError && err.status === 409) {
         setSaveError('這個作品的標籤剛被其他人修改，未儲存；已重新載入，請再試一次');
@@ -536,6 +594,7 @@ export default function GlobalWorks() {
       }
       setBatchTags([]);
       reloadAfterWrite();
+      if (result.updated.length > 0) toast.success(`Tags updated on ${result.updated.length} works`);
     } catch (err: unknown) {
       setSaveError(err instanceof Error ? err.message : 'Failed to update work tags');
     } finally {
@@ -547,52 +606,97 @@ export default function GlobalWorks() {
   const endItem = Math.min(page * PAGE_SIZE, total);
 
   return (
-    <div>
-      <div>
-        <div className="flex flex-wrap items-start justify-between gap-3">
+    // No blur, transform or filter on this root or its wrappers (the bulk bar below is `fixed` to the
+    // viewport), and no overflow either: the sticky header and table head track <main>.
+    <div className="flex flex-col">
+      <PageHeader
+        crumb="LIBRARY"
+        title="Global Song Library"
+        meta="One composition identity shared by streamer-local songs and their performances."
+        actions={
+          <Link to="/works/review" className={buttonClasses({ variant: 'secondary' })}>
+            <Icon name="gitCompare" size={14} />
+            Review duplicates
+          </Link>
+        }
+      >
+        <form role="search" onSubmit={submitSearch} className="flex min-w-0 flex-1 items-center gap-2">
+          <SearchInput
+            label="Search title or original artist"
+            placeholder="Search title or original artist..."
+            value={search}
+            onChange={setSearch}
+            className="min-w-0 flex-1 sm:w-[260px] sm:flex-none"
+          />
+          <Button type="submit">Search</Button>
+        </form>
+      </PageHeader>
+
+      {/* While the bulk bar is up, the end of the page scrolls clear of it (BulkBar publishes its height). */}
+      <div className="flex flex-col gap-3 p-4 lg:px-5 lg:pb-[18px] [html[data-bulk-bar]_&]:pb-[calc(var(--bulk-bar-h)_+_22px_+_16px)]">
+        <StatTiles stats={stats} loaded={data !== null} />
+
+        <FilterBar
+          sharedOnly={sharedOnly}
+          onSharedOnlyChange={(value) => {
+            setPage(1);
+            setSharedOnly(value);
+          }}
+          untaggedOnly={untaggedOnly}
+          onUntaggedOnlyChange={(value) => {
+            setPage(1);
+            setUntaggedOnly(value);
+          }}
+          tagFilter={tagFilter}
+          onTagFilterChange={(value) => {
+            setPage(1);
+            setTagFilter(value);
+          }}
+          shown={{ start: startItem, end: endItem }}
+          total={total}
+        />
+
+        {error && <DangerNote>{error}</DangerNote>}
+        {saveError && <DangerNote>{saveError}</DangerNote>}
+
+        {loading ? (
+          <GlassCard>
+            <Skeleton rows={8} />
+          </GlassCard>
+        ) : (
           <div>
-            <h2 className="text-xl font-semibold text-slate-800">Global Song Library</h2>
-            <p className="mt-1 text-sm text-slate-500">
-              One composition identity shared by streamer-local songs and their performances.
-            </p>
+            <WorksTable
+              works={works}
+              selectedIds={selectedIds}
+              allSelected={allSelected}
+              editingId={editingId}
+              editTags={editTags}
+              saving={saving}
+              sortKey={sortKey}
+              sortDir={sortDir}
+              onSort={toggleSort}
+              onSelectedChange={setWorkSelected}
+              onTogglePageSelection={togglePageSelection}
+              onEdit={startEditing}
+              onEditTagsChange={setEditTags}
+              onSave={saveWorkTags}
+              onCancel={() => setEditingId(null)}
+            />
+
+            <Pagination
+              page={page}
+              totalPages={totalPages}
+              total={total}
+              shown={{ start: startItem, end: endItem }}
+              onPrev={() => setPage((current) => Math.max(1, current - 1))}
+              onNext={() => setPage((current) => Math.min(totalPages, current + 1))}
+            />
           </div>
-          <a
-            href="/works/review"
-            className="rounded-md bg-slate-800 px-3 py-1.5 text-sm font-medium text-white hover:bg-slate-900"
-          >
-            Review possible duplicates
-          </a>
-        </div>
+        )}
       </div>
 
-      <StatsCards stats={stats} />
-
-      <FilterBar
-        search={search}
-        onSearchChange={setSearch}
-        onSubmitSearch={submitSearch}
-        sharedOnly={sharedOnly}
-        onSharedOnlyChange={(value) => {
-          setPage(1);
-          setSharedOnly(value);
-        }}
-        tagFilter={tagFilter}
-        onTagFilterChange={(value) => {
-          setPage(1);
-          setTagFilter(value);
-        }}
-        untaggedOnly={untaggedOnly}
-        onUntaggedOnlyChange={(value) => {
-          setPage(1);
-          setUntaggedOnly(value);
-        }}
-      />
-
-      {error && <p className="mt-4 text-sm text-red-600">{error}</p>}
-      {saveError && <p className="mt-4 text-sm text-red-600">{saveError}</p>}
-
       {selectedOnPage.length > 0 && (
-        <BulkTagEditor
+        <BulkTagBar
           selectedCount={selectedOnPage.length}
           batchTags={batchTags}
           saving={saving}
@@ -600,38 +704,6 @@ export default function GlobalWorks() {
           onClear={() => setSelectedIds(new Set())}
           onApply={applyBatch}
         />
-      )}
-
-      {loading ? (
-        <p className="mt-6 text-slate-500">Loading...</p>
-      ) : (
-        <>
-          <WorksTable
-            works={works}
-            selectedIds={selectedIds}
-            editingId={editingId}
-            editTags={editTags}
-            saving={saving}
-            sortKey={sortKey}
-            sortDir={sortDir}
-            onSort={toggleSort}
-            onToggleSelected={toggleSelected}
-            onTogglePageSelection={togglePageSelection}
-            onEdit={startEditing}
-            onEditTagsChange={setEditTags}
-            onSave={saveWorkTags}
-            onCancel={() => setEditingId(null)}
-          />
-
-          <Pagination
-            page={page}
-            totalPages={totalPages}
-            total={total}
-            shown={{ start: startItem, end: endItem }}
-            onPrev={() => setPage((current) => Math.max(1, current - 1))}
-            onNext={() => setPage((current) => Math.min(totalPages, current + 1))}
-          />
-        </>
       )}
     </div>
   );

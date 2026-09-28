@@ -23,10 +23,10 @@ export default function TagPicker({ value, onChange, disabled = false }: TagPick
   };
 
   return (
-    <div className="space-y-2" data-testid="tag-picker">
+    <div className="space-y-2.5" data-testid="tag-picker">
       {tagsByCategory().map(({ category, tags }) => (
         <fieldset key={category.id}>
-          <legend className="mb-1 text-xs font-semibold uppercase tracking-wide text-slate-500">
+          <legend className="mb-1.5 text-2xs font-bold uppercase tracking-[0.12em] text-fg-subtle">
             {category.label}
           </legend>
           <div className="flex flex-wrap gap-1.5">
@@ -40,10 +40,10 @@ export default function TagPicker({ value, onChange, disabled = false }: TagPick
                   disabled={disabled}
                   onClick={() => toggle(tag.id)}
                   data-testid={`tag-option-${tag.id.replace(':', '-')}`}
-                  className={`rounded-full border px-2.5 py-1 text-xs font-medium transition-colors disabled:cursor-not-allowed disabled:opacity-50 ${
+                  className={`whitespace-nowrap rounded-radius-pill border px-2.5 py-1 text-token-sm font-semibold transition-colors focus-visible:outline-none focus-visible:shadow-focus disabled:cursor-not-allowed disabled:opacity-50 ${
                     isSelected
-                      ? 'border-blue-600 bg-blue-600 text-white'
-                      : 'border-slate-300 bg-white text-slate-700 hover:border-blue-400'
+                      ? 'border-transparent bg-accent text-white'
+                      : 'border-field-line bg-field text-fg-muted enabled:hover:text-fg'
                   }`}
                 >
                   {tag.label}

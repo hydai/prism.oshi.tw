@@ -1,5 +1,4 @@
-const BUTTON_CLASS =
-  'rounded-md border border-slate-300 px-3 py-1.5 font-medium hover:bg-slate-100 disabled:cursor-not-allowed disabled:opacity-40';
+import { Button } from './ui/Button';
 
 /**
  * Footer for the server-paged lists: which rows are on screen, which page they
@@ -28,16 +27,16 @@ export function Pagination({
   if (totalPages <= 0) return null;
 
   return (
-    <div className="mt-4 flex items-center justify-between text-sm text-slate-600">
+    <div className="mt-4 flex flex-wrap items-center justify-between gap-2 text-token-sm text-fg-muted">
       <span>Showing {shown.start}–{shown.end} of {total}</span>
       <div className="flex items-center gap-2">
-        <button type="button" onClick={onPrev} disabled={disabled || page <= 1} className={BUTTON_CLASS}>
+        <Button size="sm" onClick={onPrev} disabled={disabled || page <= 1}>
           Previous
-        </button>
+        </Button>
         <span>Page {page} of {totalPages}</span>
-        <button type="button" onClick={onNext} disabled={disabled || page >= totalPages} className={BUTTON_CLASS}>
+        <Button size="sm" onClick={onNext} disabled={disabled || page >= totalPages}>
           Next
-        </button>
+        </Button>
       </div>
     </div>
   );

@@ -1,6 +1,7 @@
 import { act, Profiler } from 'react';
 import { createRoot } from 'react-dom/client';
 import { renderToStaticMarkup } from 'react-dom/server';
+import { MemoryRouter } from 'react-router-dom';
 import { Window } from 'happy-dom';
 import type { HTMLElement as DomElement } from 'happy-dom';
 import type { AuthUser, GlobalWorkSummary, GlobalWorksResponse } from '../../shared/types';
@@ -8,6 +9,9 @@ import type { AuthUser, GlobalWorkSummary, GlobalWorksResponse } from '../../sha
 function assert(condition: boolean, message: string): asserts condition {
   if (!condition) throw new Error(message);
 }
+
+/** Spec §4.1: colours only through the token utilities, never the raw Tailwind palette. */
+const NO_RAW_PALETTE = /\b(bg|text|border)-(slate|gray|blue|green|red|amber|yellow)-\d/;
 
 function installLocalStorage(): void {
   const storage = new Map<string, string>([['prism_admin_streamer', 'mizuki']]);
@@ -85,7 +89,12 @@ async function main(): Promise<void> {
     'contributors do not see the Global Library navigation entry',
   );
 
-  const html = renderToStaticMarkup(<GlobalWorks />);
+  // In a router: the page's "Review duplicates" link is a react-router Link.
+  const html = renderToStaticMarkup(
+    <MemoryRouter>
+      <GlobalWorks />
+    </MemoryRouter>,
+  );
   assert(html.includes('Global Song Library'), 'global library page renders its heading');
   assert(html.includes('Shared by multiple VTubers only'), 'global library page renders its cross-streamer filter');
   assert(html.includes('Unlinked songs'), 'global library page renders its coverage warning card');
@@ -199,6 +208,7 @@ async function globalWorksLoadsThroughTheHook(): Promise<void> {
   }
 
   const { default: GlobalWorks } = await import('../src/pages/GlobalWorks');
+  const { ToastProvider } = await import('../src/components/ui/toast');
 
   async function settle(): Promise<void> {
     for (let i = 0; i < 4; i += 1) {
@@ -223,14 +233,20 @@ async function globalWorksLoadsThroughTheHook(): Promise<void> {
 
   await act(async () => {
     root.render(
-      <Profiler id="global-works" onRender={() => { commitCount += 1; }}>
-        <GlobalWorks />
-      </Profiler>,
+      <MemoryRouter>
+        {/* Outside the Profiler: the provider's value never changes, so the counts below stay the page's own. */}
+        <ToastProvider>
+          <Profiler id="global-works" onRender={() => { commitCount += 1; }}>
+            <GlobalWorks />
+          </Profiler>
+        </ToastProvider>
+      </MemoryRouter>,
     );
   });
 
   assert(container.innerHTML.includes('Loading...'), 'the page starts in its loading state');
   assert(!container.innerHTML.includes('Work One'), 'no row renders before the first response');
+  assert(!container.innerHTML.includes('all linked'), 'the placeholder zeros shown before the first response do not claim "all linked"');
   // Read into a local before asserting: `assert` narrows what it is handed, and reusing
   // `pendingFetches.length`/`commitCount` directly across assertions with different expected
   // values later would make one of those comparisons a type error.
@@ -247,7 +263,23 @@ async function globalWorksLoadsThroughTheHook(): Promise<void> {
   assert(!pendingAt(0).url.includes('search='), 'no search term is sent before one is submitted');
 
   const firstPage: GlobalWorksResponse = {
-    data: [work({ tags: ['language:ja'] })],
+    data: [
+      work({ tags: ['language:ja'] }),
+      work({
+        id: 'work-many',
+        title: 'Work Many',
+        streamerIds: ['alpha', 'bravo', 'charlie', 'delta', 'echo'],
+        streamerCount: 5,
+        tags: ['language:zh', 'language:ja', 'language:en', 'source:vocaloid'],
+      }),
+      work({ id: 'work-pair', title: 'Work Pair', tags: ['language:ja', 'source:vocaloid'] }),
+      work({
+        id: 'work-wide',
+        title: 'Work Wide Names',
+        streamerIds: ['earendel', 'hibiki', 'margaretnorth', 'mizuki'],
+        streamerCount: 4,
+      }),
+    ],
     total: 120,
     page: 1,
     pageSize: 50,
@@ -270,6 +302,84 @@ async function globalWorksLoadsThroughTheHook(): Promise<void> {
   );
   assert(container.innerHTML.includes('Edit tags'), 'each row offers a tag editor');
   assert(container.innerHTML.includes('120'), 'the stats card renders the resolved total');
+  // The tile is the parent of its label; the fixture reports 2 unlinked songs.
+  const unlinkedTile = [...container.querySelectorAll<DomElement>('*')].find(
+    (element) => element.textContent === 'Unlinked songs',
+  )?.parentElement;
+  assert(unlinkedTile !== null && unlinkedTile !== undefined, 'the Unlinked songs tile renders');
+  assert(
+    unlinkedTile.innerHTML.includes('text-tone-warn-fg') && unlinkedTile.textContent.includes('2'),
+    'the Unlinked songs tile warns while songs are still unlinked',
+  );
+  assert(!container.innerHTML.includes('all linked'), 'no "all linked" while songs are still unlinked');
+
+  // One line per row: the VTuber and tag cells never wrap. They show the first few chips; the
+  // rest fold into a `+N` chip that names them in its tooltip, and in an sr-only list.
+  const manyRow = [...container.querySelectorAll<DomElement>('tbody tr')].find((row) => row.textContent.includes('Work Many'));
+  assert(manyRow !== undefined, 'the work with five VTubers and four tags renders');
+  // Three VTuber chips fit before `+N`; two tag pills fit, so with more tags `+N` takes the second's place.
+  const chipCells = [
+    { name: 'VTuber', index: 3, visible: ['alpha', 'bravo', 'charlie'], hidden: ['delta', 'echo'] },
+    { name: 'tag', index: 6, visible: ['中文歌'], hidden: ['日文歌', '英文歌', 'Vocaloid'] },
+  ];
+  for (const cell of chipCells) {
+    const box = manyRow.children[cell.index]?.firstElementChild as DomElement | null | undefined;
+    assert(box !== null && box !== undefined, `the ${cell.name} cell holds a chip box`);
+    const classes = (box.getAttribute('class') ?? '').split(/\s+/);
+    assert(
+      ['flex-nowrap', 'overflow-hidden', 'min-w-0'].every((name) => classes.includes(name)) && !classes.includes('flex-wrap'),
+      `the ${cell.name} chips stay on one line (found: ${classes.join(' ')})`,
+    );
+    const shown = [...box.children].filter((child) => child.getAttribute('aria-hidden') !== 'true' && child.tagName !== 'UL');
+    assert(
+      shown.map((child) => child.textContent.trim()).join('|') === cell.visible.join('|'),
+      `the ${cell.name} cell shows ${cell.visible.join(', ')} (found: ${shown.map((child) => child.textContent.trim()).join(', ')})`,
+    );
+    const more = [...box.children].find((child) => child.getAttribute('aria-hidden') === 'true');
+    assert(
+      more !== undefined && more.textContent.trim() === `+${cell.hidden.length}` && more.getAttribute('title') === cell.hidden.join(', '),
+      `the ${cell.name} cell folds the rest into +${cell.hidden.length}, named in its title`,
+    );
+    const srList = box.querySelector('ul.sr-only');
+    assert(
+      srList !== null && [...srList.querySelectorAll('li')].map((item) => item.textContent).join('|') === cell.hidden.join('|'),
+      `a screen reader gets the ${cell.name}s the chip leaves out as a list`,
+    );
+  }
+  const pairRow = [...container.querySelectorAll<DomElement>('tbody tr')].find((row) => row.textContent.includes('Work Pair'));
+  const pairTags = pairRow?.children[6]?.firstElementChild;
+  assert(
+    pairTags !== null && pairTags !== undefined && pairTags.textContent === '日文歌Vocaloid'
+      && pairTags.querySelector('[aria-hidden="true"]') === null && pairTags.querySelector('ul') === null,
+    'a work with two tags shows both, with no +N',
+  );
+
+  // Otherwise — the first three slugs' own characters running past the cutoff — the cell folds to
+  // two chips before `+N` instead of three: the same real slugs that ellipsized all three in
+  // Chromium at 1280px (data/{slug}/songs.json): "earendel", "hibiki", "margaretnorth".
+  const wideRow = [...container.querySelectorAll<DomElement>('tbody tr')].find((row) => row.textContent.includes('Work Wide Names'));
+  assert(wideRow !== undefined, 'the work with four long VTuber slugs renders');
+  const wideBox = wideRow.children[3]?.firstElementChild as DomElement | null | undefined;
+  assert(wideBox !== null && wideBox !== undefined, 'the wide-slug VTuber cell holds a chip box');
+  const wideShown = [...wideBox.children]
+    .filter((child) => child.getAttribute('aria-hidden') !== 'true' && child.tagName !== 'UL')
+    .map((child) => child.textContent.trim());
+  assert(
+    wideShown.join('|') === 'earendel|hibiki',
+    `three long VTuber slugs would ellipsize at 1280px, so the cell folds to two (found: ${wideShown.join(', ')})`,
+  );
+  const wideMore = [...wideBox.children].find((child) => child.getAttribute('aria-hidden') === 'true');
+  assert(
+    wideMore !== undefined && wideMore.textContent.trim() === '+2' && wideMore.getAttribute('title') === 'margaretnorth, mizuki',
+    'the rest still fold into +N, named in its title, when the cell has dropped to two chips',
+  );
+  const wideSrList = wideBox.querySelector('ul.sr-only');
+  assert(
+    wideSrList !== null && [...wideSrList.querySelectorAll('li')].map((item) => item.textContent).join('|') === 'margaretnorth|mizuki',
+    'a screen reader still gets the dropped VTubers as a list',
+  );
+
+  assert(!NO_RAW_PALETTE.test(container.innerHTML), 'the loaded page uses no raw Tailwind palette classes');
   assert(container.innerHTML.includes('Showing 1') && container.innerHTML.includes('of 120'), 'pagination reflects the resolved total');
   assert(container.innerHTML.includes('Page 1 of 3'), 'pagination reflects the resolved page count');
   const commitsAfterFirstLoad = commitCount;
@@ -303,6 +413,7 @@ async function globalWorksLoadsThroughTheHook(): Promise<void> {
     ...firstPage,
     data: [work({ id: 'work-2', title: 'Work Two' })],
     page: 2,
+    stats: { ...firstPage.stats, unlinkedSongs: 0 },
   };
   await act(async () => {
     pendingAt(1).respond(secondPage);
@@ -310,6 +421,7 @@ async function globalWorksLoadsThroughTheHook(): Promise<void> {
   await settle();
 
   assert(container.innerHTML.includes('Work Two'), 'the second page of works renders');
+  assert(container.innerHTML.includes('all linked'), 'once the stats report 0 unlinked songs, the tile says "all linked"');
   assert(!container.innerHTML.includes('Work One'), 'the previous page no longer renders once the new page has loaded');
   assert(container.innerHTML.includes('Page 2 of 3'), 'pagination reflects the new page');
   const commitsAfterSecondLoad = commitCount;
@@ -325,10 +437,8 @@ async function globalWorksLoadsThroughTheHook(): Promise<void> {
   assert(container.innerHTML.includes('加入所選標籤'), 'the batch editor offers add');
   assert(container.innerHTML.includes('移除所選標籤'), 'the batch editor offers remove');
 
-  const editButton = [...container.querySelectorAll<DomElement>('button')].find(
-    (button) => button.textContent.trim() === 'Edit tags',
-  );
-  assert(editButton !== undefined, 'the row exposes its Edit tags button');
+  const editButton = container.querySelector<DomElement>('button[aria-label="Edit tags"]');
+  assert(editButton !== null, 'the row exposes its Edit tags button');
   await act(async () => { editButton.click(); });
   // The batch bar opened by the row-selection click above already renders a TagPicker of
   // its own, so an unscoped presence check would already be green before this click — only
@@ -336,6 +446,14 @@ async function globalWorksLoadsThroughTheHook(): Promise<void> {
   const tagPickerCount = container.querySelectorAll('[data-testid="tag-picker"]').length;
   assert(tagPickerCount === 2, 'editing a row opens a second tag picker inline, alongside the batch editor\'s');
   assert(container.innerHTML.includes('Save tags'), 'the inline editor offers Save');
+  assert(
+    (container.querySelector<DomElement>('tbody h2')?.textContent ?? '').includes('共用作品標籤') && container.querySelector('tbody h3') === null,
+    'the inline editor is titled by an <h2>, the level under the page <h1>',
+  );
+  assert(
+    !NO_RAW_PALETTE.test(container.innerHTML),
+    'the bulk bar, its tag popover and the inline editor use no raw Tailwind palette classes',
+  );
 
   // Saving sends the row's updatedAt the editor was opened with as `expectedUpdatedAt`; a
   // 409 means someone else changed the work meanwhile — the page says so and reloads
@@ -361,8 +479,8 @@ async function globalWorksLoadsThroughTheHook(): Promise<void> {
   assert(!container.innerHTML.includes('Save tags'), 'the editor is closed after the reload');
 
   // A page change starts a new query: the batch bar must vanish at once — the previous
-  // rows are still on screen while the replacement loads, and they must not stay
-  // actionable — and it must stay gone once the new page has landed.
+  // rows are still loaded while the replacement loads (a skeleton shows instead), and they
+  // must not stay actionable — and it must stay gone once the new page has landed.
   const previousButton = [...container.querySelectorAll<DomElement>('button')].find(
     (button) => button.textContent.trim() === 'Previous',
   );
@@ -376,6 +494,49 @@ async function globalWorksLoadsThroughTheHook(): Promise<void> {
   await settle();
   assert(container.innerHTML.includes('Work One'), 'the first page renders again');
   assert(!container.innerHTML.includes('已選擇'), 'no selection carries over to the new result set');
+
+  // A save and a batch apply each confirm themselves with a toast.
+  const notifications = () => container.querySelector<DomElement>('section[aria-label="Notifications"]')?.textContent ?? '';
+  const editFirst = container.querySelector<DomElement>('button[aria-label="Edit tags"]');
+  assert(editFirst !== null, 'the first row exposes its Edit tags button');
+  await act(async () => { editFirst.click(); });
+  const saveFirst = [...container.querySelectorAll<DomElement>('button')].find((button) => button.textContent.trim() === 'Save tags');
+  assert(saveFirst !== undefined, 'the inline editor renders its Save button again');
+  await act(async () => { saveFirst.click(); });
+  await settle();
+  assert(pendingAt(5).method === 'PUT' && pendingAt(5).url.endsWith('/api/works/work-1/tags'), "saving PUTs the first row's tags");
+  await act(async () => {
+    pendingAt(5).respond({ id: 'work-1', tags: ['language:ja'] });
+  });
+  await settle();
+  assert(notifications().includes('Tags saved'), 'a successful save says "Tags saved"');
+  await act(async () => {
+    pendingAt(6).respond(firstPage);
+  });
+  await settle();
+
+  const selectFirst = container.querySelector<DomElement>('input[aria-label="Select Work One"]');
+  assert(selectFirst !== null, 'the first row renders its selection checkbox');
+  await act(async () => { selectFirst.click(); });
+  const batchJapanese = container.querySelector<DomElement>('[aria-label="Bulk actions"] [data-testid="tag-option-language-ja"]');
+  assert(batchJapanese !== null, "the batch bar's tag picker offers 日文歌");
+  await act(async () => { batchJapanese.click(); });
+  const addToSelection = [...container.querySelectorAll<DomElement>('[aria-label="Bulk actions"] button')].find((button) =>
+    button.textContent.includes('加入所選標籤'),
+  );
+  assert(addToSelection !== undefined, 'the batch bar offers add');
+  await act(async () => { addToSelection.click(); });
+  await settle();
+  assert(pendingAt(7).method === 'POST' && pendingAt(7).url.endsWith('/api/works/tags/bulk'), 'the batch POSTs to the bulk endpoint');
+  await act(async () => {
+    pendingAt(7).respond({ updated: [{ id: 'work-1', tags: ['language:ja'] }], skipped: [] });
+  });
+  await settle();
+  assert(notifications().includes('Tags updated on 1 works'), 'a batch apply says how many works it updated');
+  await act(async () => {
+    pendingAt(8).respond(firstPage);
+  });
+  await settle();
 
   await act(async () => {
     root.unmount();
