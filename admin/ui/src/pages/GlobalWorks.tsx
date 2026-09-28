@@ -28,6 +28,20 @@ type SortKey =
   | 'performanceCount'
   | 'updatedAt';
 
+/**
+ * The filter bar's sort summary names the active column by this label. `updatedAt` has no
+ * `SortHeader` and cannot be reached from the UI today, but the record stays exhaustive over
+ * `SortKey` rather than partial.
+ */
+const SORT_LABELS: Record<SortKey, string> = {
+  title: 'Title',
+  originalArtist: 'Original artist',
+  streamerCount: 'VTubers',
+  songCount: 'Local songs',
+  performanceCount: 'Performances',
+  updatedAt: 'Last updated',
+};
+
 const PAGE_SIZE = 50;
 /** Select, title, artist, VTubers, local songs, performances, tags, work ID, actions. */
 const COLUMN_COUNT = 9;
@@ -140,11 +154,17 @@ interface FilterBarProps {
   onUntaggedOnlyChange: (value: boolean) => void;
   tagFilter: string;
   onTagFilterChange: (value: string) => void;
+  onAllWorks: () => void;
+  sortLabel: string;
+  sortDir: SortDirection;
   shown: { start: number; end: number };
   total: number;
 }
 
-/** The two filter chips, the tag-dictionary `<select>` and the range of works on screen. */
+/**
+ * The `All works` chip, the two filter chips, the tag-dictionary `<select>`, and — on the right —
+ * which column the table is sorted by and the range of works on screen.
+ */
 function FilterBar({
   sharedOnly,
   onSharedOnlyChange,
@@ -152,11 +172,17 @@ function FilterBar({
   onUntaggedOnlyChange,
   tagFilter,
   onTagFilterChange,
+  onAllWorks,
+  sortLabel,
+  sortDir,
   shown,
   total,
 }: FilterBarProps) {
   return (
     <div className="flex flex-wrap items-center gap-2">
+      <Chip active={!sharedOnly && !untaggedOnly} onClick={onAllWorks}>
+        All works
+      </Chip>
       <Chip active={sharedOnly} onClick={() => onSharedOnlyChange(!sharedOnly)}>
         Shared by multiple VTubers only
       </Chip>
@@ -179,11 +205,19 @@ function FilterBar({
           ))}
         </Select>
       </div>
-      {total > 0 ? (
-        <span className="ml-auto text-token-sm text-fg-muted">
-          {shown.start}–{shown.end} of {total}
-        </span>
-      ) : null}
+      <span className="ml-auto text-token-sm text-fg-muted">
+        {`Sorted by ${sortLabel}, ${sortDir === 'asc' ? 'ascending' : 'descending'}`}
+        {/* The dot is hidden from assistive technology; the spaces around it are not, so the range
+            is read as a word of its own. */}
+        {total > 0 ? (
+          <>
+            {' '}
+            <span aria-hidden="true">·</span>
+            {' '}
+            {shown.start}–{shown.end} of {total}
+          </>
+        ) : null}
+      </span>
     </div>
   );
 }
@@ -642,6 +676,13 @@ export default function GlobalWorks() {
             setPage(1);
             setTagFilter(value);
           }}
+          onAllWorks={() => {
+            setPage(1);
+            setSharedOnly(false);
+            setUntaggedOnly(false);
+          }}
+          sortLabel={SORT_LABELS[sortKey]}
+          sortDir={sortDir}
           shown={{ start: startItem, end: endItem }}
           total={total}
         />
