@@ -86,6 +86,7 @@ export const ADMIN_ROUTES: readonly AdminRoute[] = [
     curatorOnly: true,
     group: 'library',
     icon: 'library',
+    frame: 'studio',
     render: () => <GlobalWorks />,
   },
   {
