@@ -471,6 +471,31 @@ async function main(): Promise<void> {
   assert(segmentedPressed.length === 1, 'Segmented has exactly one aria-pressed="true"');
   assert(/<span[^>]*>12<\/span>/.test(segmented), 'Segmented renders an option count');
 
+  // --- Segmented: an optional step marker (Pipeline's "1 Discover" / "2 Extract") ---
+
+  const segmentedWithStep = renderToStaticMarkup(
+    <Segmented
+      value="extract"
+      onChange={() => {}}
+      label="Pipeline stage"
+      options={[
+        { value: 'discover', label: 'Discover', step: 1 },
+        { value: 'extract', label: 'Extract', step: 2, count: 12 },
+      ]}
+    />,
+  );
+  assert(segmentedWithStep.includes('aria-hidden="true"'), 'a Segmented option with a step renders its marker aria-hidden');
+  assert(segmentedWithStep.includes('>1<'), "Discover's step marker renders its number");
+  assert(segmentedWithStep.includes('>2<'), "Extract's step marker renders its number");
+  assert(
+    segmentedWithStep.includes('border-current') && segmentedWithStep.includes('rounded-full'),
+    'the step marker is a circle outlined in the current text colour, so it reads on both an active and inactive segment',
+  );
+  assert(
+    segmentedWithStep.indexOf('>2<') < segmentedWithStep.indexOf('>Extract<'),
+    'the step marker renders before its label',
+  );
+
   // --- GlassCard / StatTile / Kbd / ProgressBar / EmptyState / Skeleton ---
 
   const glassCard = renderToStaticMarkup(<GlassCard>Body</GlassCard>);
@@ -608,6 +633,7 @@ async function main(): Promise<void> {
     chipInactive +
     chipWithCount +
     segmented +
+    segmentedWithStep +
     glassCard +
     glassSection +
     statTile +
@@ -757,6 +783,15 @@ async function main(): Promise<void> {
 
   console.log('✓ ui kit: Table scrolls horizontally only below 1280px, THead sticks from 1280px up, opaque with no blur, TableEmptyRow renders a spanning row');
 
+  // --- table-cells: the shared column padding GlobalWorks (and later Pipeline/Dashboard) import ---
+
+  const { CELL_X, FIRST_CELL_X, LAST_CELL_X } = await import('../src/components/ui/table-cells');
+  assert(CELL_X === 'pl-1.5 pr-1.5', 'CELL_X is the shared interior column padding');
+  assert(FIRST_CELL_X === 'pl-4 pr-1.5', 'FIRST_CELL_X is the shared first-column padding');
+  assert(LAST_CELL_X === 'pl-1.5 pr-4', 'LAST_CELL_X is the shared last-column padding');
+
+  console.log('✓ ui kit: table-cells exports the shared CELL_X / FIRST_CELL_X / LAST_CELL_X column padding');
+
   // --- BulkBar: a labelled, fixed glass-pop region with the given countLabel, a divider, then children ---
 
   const bulkBarMarkup = renderToStaticMarkup(
@@ -899,6 +934,51 @@ async function main(): Promise<void> {
   );
   assert(actionsMarkup.includes('Review duplicates'), 'PageHeader renders actions');
 
+  // --- PageHeader: crumb accepts a ReactNode, and recordTitle keeps it (and the <h1>) visible below lg ---
+
+  const crumbNodeMarkup = renderToStaticMarkup(
+    <PageHeader crumb={<a href="/streams">Catalog / Streams</a>} title="Stream Detail" />,
+  );
+  assert(
+    /<a href="\/streams">Catalog \/ Streams<\/a>/.test(crumbNodeMarkup),
+    'PageHeader renders a ReactNode crumb (not just a string) verbatim',
+  );
+
+  const recordTitleMarkup = renderToStaticMarkup(
+    <PageHeader crumb="TIMESTAMPS" title="Stream Detail" recordTitle />,
+  );
+  const recordCrumbClasses = (/<div class="([^"]*)">TIMESTAMPS<\/div>/.exec(recordTitleMarkup)?.[1] ?? '').split(' ');
+  assert(recordCrumbClasses.join(' ') !== '', 'recordTitle still renders the crumb in its own element');
+  assert(!recordCrumbClasses.includes('max-lg:sr-only'), "recordTitle drops the crumb's max-lg:sr-only");
+  const recordTitleH1Classes = (/<h1 class="([^"]*)">Stream Detail<\/h1>/.exec(recordTitleMarkup)?.[1] ?? '').split(' ');
+  assert(recordTitleH1Classes.join(' ') !== '', 'recordTitle still renders the title in its own <h1>');
+  assert(!recordTitleH1Classes.includes('max-lg:sr-only'), "recordTitle drops the <h1>'s max-lg:sr-only");
+  assert(recordTitleH1Classes.includes('truncate'), 'recordTitle keeps the <h1> truncating an overlong title');
+
+  // A record's title block takes what the first row leaves (flex-1, still min-w-0), so a long title
+  // truncates beside the header's children and actions instead of pushing them onto a second row —
+  // the mockup's `.titlecol`. Its 20rem basis is the floor it claims first: on a row too narrow for
+  // that beside the actions, the actions wrap below the title rather than squeezing it. The default
+  // block keeps sizing to its content, class for class.
+  const titleBlockClasses = (markup: string): string[] =>
+    (/<header[^>]*><div class="([^"]*)">/.exec(markup)?.[1] ?? '').split(' ');
+  const recordTitleBlock = titleBlockClasses(recordTitleMarkup);
+  assert(
+    recordTitleBlock.includes('flex-1') && recordTitleBlock.includes('basis-[20rem]') && recordTitleBlock.includes('min-w-0'),
+    `recordTitle's title block claims 20rem, fills the rest of the row and may shrink below its content (got "${recordTitleBlock.join(' ')}")`,
+  );
+  for (const [variant, markup] of [
+    ['default', pageHeaderMarkup],
+    ['tall', tallHeaderMarkup],
+  ] as const) {
+    const block = titleBlockClasses(markup).join(' ');
+    assert(block === 'min-w-0 max-sm:w-full', `the ${variant} title block is unchanged, sized to its content (got "${block}")`);
+  }
+
+  // Without recordTitle (the default, tested above via `pageHeaderMarkup`), the crumb and <h1> keep
+  // max-lg:sr-only — proven by the untouched assertions on `crumbClasses` / `titleClasses` earlier,
+  // so today's byte-for-byte output for every other page is unaffected by this change.
+
   console.log(
     '✓ ui kit: PageHeader is a bottom-hairline-only glass header, sticky from lg up and padded only below 1280px, with a crumb, <h1> title, optional meta row, children and actions, wrapping to fit at any width (R30)',
   );
@@ -919,10 +999,124 @@ async function main(): Promise<void> {
     tallHeaderMarkup +
     metaMarkup +
     childrenMarkup +
-    actionsMarkup;
+    actionsMarkup +
+    crumbNodeMarkup +
+    recordTitleMarkup;
   assert(!NO_RAW_PALETTE.test(allTask8Markup), 'Task 8 markup uses no raw palette colours');
 
   console.log('✓ ui kit Task 8: no raw Tailwind palette classes anywhere in PageHeader, BulkBar or the table pieces');
+
+  // --- useMediaQuery: useSyncExternalStore over window.matchMedia, read fresh at subscribe/snapshot time ---
+
+  {
+    const { act } = await import('react');
+    const { mount, settle } = await import('./helpers/dom');
+    const { useMediaQuery } = await import('../src/hooks/useMediaQuery');
+
+    function Probe({ query }: { query: string }) {
+      return <span>{useMediaQuery(query) ? 'true' : 'false'}</span>;
+    }
+
+    let matches = false;
+    let listener: (() => void) | undefined;
+    let addCalls = 0;
+    let removeCalls = 0;
+    const originalMatchMedia = window.matchMedia;
+    window.matchMedia = ((query: string) => ({
+      matches,
+      media: query,
+      addEventListener: (_type: string, cb: () => void) => {
+        addCalls += 1;
+        listener = cb;
+      },
+      removeEventListener: (_type: string, cb: () => void) => {
+        if (listener === cb) {
+          removeCalls += 1;
+          listener = undefined;
+        }
+      },
+    })) as unknown as typeof window.matchMedia;
+
+    const probe = await mount(<Probe query="(max-width: 640px)" />);
+    const initialText = probe.container.textContent;
+    assert(initialText === 'false', "useMediaQuery starts from window.matchMedia(query)'s current matches");
+    assert(addCalls === 1, 'mounting subscribes exactly one change listener');
+
+    matches = true;
+    await act(async () => {
+      listener?.();
+    });
+    await settle();
+    const updatedText = probe.container.textContent;
+    assert(updatedText === 'true', "firing the stubbed listener re-renders with matchMedia's new matches value");
+
+    await probe.unmount();
+    assert(removeCalls === 1, 'unmounting removes the change listener it subscribed');
+
+    window.matchMedia = undefined as unknown as typeof window.matchMedia;
+    const noMatchMedia = await mount(<Probe query="(max-width: 640px)" />);
+    assert(noMatchMedia.container.textContent === 'false', 'with no window.matchMedia at all, useMediaQuery reads false');
+    await noMatchMedia.unmount();
+
+    window.matchMedia = originalMatchMedia;
+
+    console.log('✓ useMediaQuery: subscribes to window.matchMedia(query) via useSyncExternalStore, false with no matchMedia');
+  }
+
+  // --- useNow: a lazy Date.now() state, refreshed by one window.setInterval started in an effect ---
+
+  {
+    const { act } = await import('react');
+    const { mount, settle } = await import('./helpers/dom');
+    const { useNow } = await import('../src/hooks/useNow');
+
+    function NowProbe({ intervalMs }: { intervalMs: number }) {
+      return <span>{useNow(intervalMs)}</span>;
+    }
+
+    const originalSetInterval = window.setInterval;
+    const originalClearInterval = window.clearInterval;
+    const originalDateNow = Date.now;
+    const scheduled: { id: number; ms: number; cb: () => void }[] = [];
+    const cleared: number[] = [];
+    let nextId = 1;
+    window.setInterval = ((cb: () => void, ms?: number) => {
+      const id = nextId;
+      nextId += 1;
+      scheduled.push({ id, ms: ms ?? 0, cb });
+      return id;
+    }) as unknown as typeof window.setInterval;
+    window.clearInterval = ((id?: number) => {
+      if (typeof id === 'number') cleared.push(id);
+    }) as unknown as typeof window.clearInterval;
+
+    const fixedNow = 1_700_000_000_000;
+    Date.now = () => fixedNow;
+
+    const probe = await mount(<NowProbe intervalMs={30_000} />);
+    assert(scheduled.length === 1, 'useNow starts exactly one interval');
+    assert(scheduled[0]?.ms === 30_000, 'the interval runs every intervalMs (30000)');
+    assert(probe.container.textContent === String(fixedNow), 'useNow starts from Date.now() (a lazy initializer, not read again during render)');
+
+    Date.now = () => fixedNow + 30_000;
+    await act(async () => {
+      scheduled[0]?.cb();
+    });
+    await settle();
+    assert(
+      probe.container.textContent === String(fixedNow + 30_000),
+      'the recorded interval callback refreshes the value from a fresh Date.now()',
+    );
+
+    await probe.unmount();
+    assert(scheduled[0] !== undefined && cleared.includes(scheduled[0].id), 'unmounting clears the interval useNow started');
+
+    Date.now = originalDateNow;
+    window.setInterval = originalSetInterval;
+    window.clearInterval = originalClearInterval;
+
+    console.log('✓ useNow: one window.setInterval started on mount and cleared on unmount, ticking a lazily-initialized Date.now()');
+  }
 }
 
 await main();
