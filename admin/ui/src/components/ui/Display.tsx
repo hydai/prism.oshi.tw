@@ -1,4 +1,4 @@
-import type { ReactNode } from 'react';
+import type { ReactNode, Ref } from 'react';
 import { Icon, type IconName } from './Icon';
 import type { Tone } from './Pill';
 
@@ -8,21 +8,36 @@ const PADDING_CLASSES: Record<'none' | 'sm' | 'md', string> = {
   md: 'p-4',
 };
 
-/** The frosted-glass card surface (spec §4.1 `--glass-card`, §4.3 18px card radius, `shadow-card`). */
+/**
+ * The frosted-glass card surface (spec §4.1 `--glass-card`, §4.3 18px card radius, `shadow-card`).
+ * `ref` (React 19 ref-as-prop) reaches the card's own element, a `div` unless `as` says otherwise.
+ * `tabIndex` / `aria-label` pass through for a card a page must be able to focus programmatically
+ * (e.g. the Stamp Editor's player box, which its floating pill hands focus to).
+ */
 export function GlassCard({
+  ref,
   as: Component = 'div',
   padding = 'md',
   className,
+  tabIndex,
+  'aria-label': ariaLabel,
   children,
 }: {
+  ref?: Ref<HTMLDivElement>;
   as?: 'div' | 'section' | 'aside';
   padding?: 'none' | 'sm' | 'md';
   className?: string;
+  tabIndex?: number;
+  'aria-label'?: string;
   children: ReactNode;
 }) {
   const paddingClass = PADDING_CLASSES[padding];
   const classes = `glass-card rounded-[18px] shadow-card${paddingClass ? ` ${paddingClass}` : ''}${className ? ` ${className}` : ''}`;
-  return <Component className={classes}>{children}</Component>;
+  return (
+    <Component ref={ref} tabIndex={tabIndex} aria-label={ariaLabel} className={classes}>
+      {children}
+    </Component>
+  );
 }
 
 const TONE_TEXT_CLASSES: Record<Tone, string> = {

@@ -16,6 +16,7 @@ import { WorkbenchCard } from '../src/components/workbench/WorkbenchCard';
 import { handleInlineEditKeyDown } from '../src/lib/inline-edit';
 import { handleEditorShortcut } from '../src/hooks/useEditorShortcuts';
 import type { EditorShortcutEvent, EditorShortcutHandlers } from '../src/hooks/useEditorShortcuts';
+import { installIntersectionObserverStub } from './helpers/dom';
 
 function assert(condition: boolean, message: string): asserts condition {
   if (!condition) throw new Error(message);
@@ -98,6 +99,7 @@ const controller: StampEditorController = {
   fetchLog: [],
   clearFetchLog: noop,
   playerRef: React.createRef<YouTubePlayerHandle>(),
+  playerBoxRef: React.createRef<HTMLDivElement>(),
   selectedStream,
   streamYears: ['2026', '2025'],
   filteredStreams: [selectedStream, olderStream],
@@ -889,6 +891,47 @@ console.log(
   '✓ StampEditor live: a failing stats load reads "Stats unavailable"; Delete, Approve All and Clear All ask '
     + 'with their exact titles; Newer / Older step through the filtered list and stop at its ends',
 );
+
+// --- The floating playback pill watches the Stamp Editor's own player box: the workbench card ---
+
+stubDeepLinkFetch((pathname) => {
+  if (pathname === '/api/stamp/stats') return { total: 3, filled: 2, remaining: 1 } satisfies StampStats;
+  if (pathname === '/api/stamp/streams') return { data: [deepLinkStreamA], total: 1 } satisfies ListResponse<StreamWithPending>;
+  if (pathname === `/api/streams/${deepLinkStreamA.id}/performances`) {
+    return { data: [...deepLinkPerformances], total: deepLinkPerformances.length } satisfies ListResponse<StampPerformance>;
+  }
+  return undefined;
+});
+const observerStub = installIntersectionObserverStub();
+const pillPage = await mountDeepLinkPage(
+  <MemoryRouter initialEntries={[`/stamp?stream=${deepLinkStreamA.id}`]}>
+    <StampEditorPage user={deepLinkCurator} />
+  </MemoryRouter>,
+);
+/** The fixed pill: a plain surface here, with no click of its own. */
+const pillOf = () => pillPage.container.querySelector<DomElement>('[class*="fixed bottom-4 right-4"]');
+const pillIsHidden = () =>
+  (pillOf()?.getAttribute('class') ?? '').split(' ').includes('invisible') && pillOf()?.getAttribute('aria-hidden') === 'true';
+const watchers = observerStub.observers.filter((observer) => observer.observed.length > 0 && !observer.disconnected);
+const watchedCard = watchers[0]?.observed[0] as DomElement | undefined;
+assert(
+  watchers.length === 1 && watchedCard?.querySelector('[aria-label="Stream timeline"]') !== null && watchedCard?.querySelector('.aspect-video') !== null,
+  "the pill watches the Stamp Editor's player box: the workbench card, player and timeline included",
+);
+assert(pillOf() !== null && pillIsHidden(), 'while the workbench is on screen, the pill is hidden, still mounted');
+await act(async () => {
+  watchers[0]?.report(false);
+});
+assert(!pillIsHidden(), 'once the workbench scrolls out of view, the pill shows');
+await act(async () => {
+  watchers[0]?.report(true);
+});
+assert(pillIsHidden(), 'and hides again when it comes back');
+await pillPage.unmount();
+assert(watchers[0]?.disconnected === true, 'leaving the page disconnects the observer');
+observerStub.restore();
+
+console.log('✓ StampEditor live: the floating pill shows only once the workbench has scrolled out of view');
 
 await deepLinkWin.happyDOM.close();
 

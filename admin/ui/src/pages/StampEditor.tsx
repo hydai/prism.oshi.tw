@@ -75,6 +75,8 @@ function useStampEditorController(user: AuthUser) {
   const [statsUnavailable, setStatsUnavailable] = useState(false);
 
   const playerRef = useRef<YouTubePlayerHandle>(null);
+  // The workbench card: the floating pill shows only once it has scrolled out of view.
+  const playerBoxRef = useRef<HTMLDivElement>(null);
   // The playback clock lives in an external store: only the pill and the readout hear its ticks.
   usePlayerClock(playerRef);
 
@@ -427,6 +429,7 @@ function useStampEditorController(user: AuthUser) {
     fetchLog,
     clearFetchLog,
     playerRef,
+    playerBoxRef,
     selectedStream,
     streamYears,
     filteredStreams,
@@ -477,6 +480,7 @@ export function StampEditorView({ controller }: { controller: StampEditorControl
     fetchLog,
     clearFetchLog,
     playerRef,
+    playerBoxRef,
     selectedStream,
     streamYears,
     filteredStreams,
@@ -603,6 +607,9 @@ export function StampEditorView({ controller }: { controller: StampEditorControl
             {/* The workbench. Clips the player's corners to the card; at lg it scrolls itself if the
                 viewport is too short, so the page never does. */}
             <WorkbenchCard
+              ref={playerBoxRef}
+              tabIndex={-1}
+              aria-label="Player"
               playerRef={playerRef}
               videoId={selectedStream?.videoId}
               rows={performances}
@@ -670,8 +677,9 @@ export function StampEditorView({ controller }: { controller: StampEditorControl
             </GlassCard>
           </div>
 
-          {/* The player scrolls away below lg; at lg the workbench never leaves the viewport. */}
-          <FloatingPlaybackPill className="lg:hidden" perf={selectedPerformance} />
+          {/* The player scrolls away below lg, and the pill shows once the workbench has; at lg the
+              workbench never leaves the viewport. */}
+          <FloatingPlaybackPill className="lg:hidden" perf={selectedPerformance} playerBox={playerBoxRef} />
         </>
       )}
 

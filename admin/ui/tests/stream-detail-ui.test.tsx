@@ -19,7 +19,7 @@ import { ConfirmProvider } from '../src/components/ui/confirm';
 import { Menu, Popover, type MenuItem } from '../src/components/ui/Popover';
 import { ToastProvider } from '../src/components/ui/toast';
 import { handleInlineEditKeyDown } from '../src/lib/inline-edit';
-import { typeInto } from './helpers/dom';
+import { installIntersectionObserverStub, typeInto } from './helpers/dom';
 import { NO_RAW_PALETTE } from './helpers/palette';
 
 function assert(condition: boolean, message: string): asserts condition {
@@ -1400,6 +1400,104 @@ await act(async () => {
 reloadContainer.remove();
 
 console.log('✓ A reload keeps the workbench and its player mounted; a failed one keeps the rows and says why in a note');
+
+// --- The floating playback pill: shown only once the player box has scrolled out of view ---
+//
+// Every mount above ran with no IntersectionObserver (Node has none), where the pill stays shown
+// as it always was. With one, the pill watches the player box and hides — `invisible` and
+// `aria-hidden`, still mounted, so its clock is still one of the page's two — while any of the
+// box is on screen, which is where its clock and the End slot's Seek button sit.
+
+/** The fixed pill (a button here: a click scrolls back to the player). */
+function pillIn(container: DomElement): DomElement | null {
+  return container.querySelector<DomElement>('button[title="Back to player"]');
+}
+function pillHidden(pill: DomElement | null): boolean {
+  return (pill?.getAttribute('class') ?? '').split(' ').includes('invisible') && pill?.getAttribute('aria-hidden') === 'true';
+}
+
+const pillContainer = navWin.document.createElement('div');
+navWin.document.body.appendChild(pillContainer);
+const pillRoot = createRoot(pillContainer as unknown as HTMLElement);
+const pillMount = (
+  <ToastProvider>
+    <ConfirmProvider>
+      <MemoryRouter initialEntries={[`/streams/${streamAlpha.id}`]}>
+        <Routes>
+          <Route path="/streams/:id" element={<StreamDetailPage user={curator} />} />
+        </Routes>
+      </MemoryRouter>
+    </ConfirmProvider>
+  </ToastProvider>
+);
+await act(async () => {
+  pillRoot.render(pillMount);
+});
+await settle();
+const pillWithoutObserver = pillIn(pillContainer);
+assert(pillWithoutObserver !== null && !pillHidden(pillWithoutObserver), 'with no IntersectionObserver the pill is shown, as before');
+await act(async () => {
+  pillRoot.unmount();
+});
+pillContainer.remove();
+
+const observerStub = installIntersectionObserverStub();
+const watchedContainer = navWin.document.createElement('div');
+navWin.document.body.appendChild(watchedContainer);
+const watchedRoot = createRoot(watchedContainer as unknown as HTMLElement);
+await act(async () => {
+  watchedRoot.render(pillMount);
+});
+await settle();
+const watchers = observerStub.observers.filter((observer) => observer.observed.length > 0 && !observer.disconnected);
+const watchedBox = watchers[0]?.observed[0] as DomElement | undefined;
+assert(
+  watchers.length === 1 && watchedBox?.querySelector('[aria-label="Stream timeline"]') !== null && watchedBox?.querySelector('.aspect-video') !== null,
+  'the pill watches the player box: the workbench column, player and timeline included',
+);
+const watchedPill = pillIn(watchedContainer);
+assert(watchedPill !== null && pillHidden(watchedPill), 'while the player box is on screen, the pill is hidden');
+assert(
+  watchedPill.isConnected && /\d+:\d{2}/.test(watchedPill.textContent),
+  'hidden, not unmounted: the pill and its clock stay on the page',
+);
+await act(async () => {
+  watchers[0]?.report(false);
+});
+assert(!pillHidden(pillIn(watchedContainer)), 'once the player box scrolls out of view, the pill shows');
+assert(pillIn(watchedContainer) === watchedPill, 'the same element: the pill is shown, not mounted');
+await act(async () => {
+  watchers[0]?.report(true);
+});
+assert(pillHidden(pillIn(watchedContainer)), 'and hides again when the player box comes back');
+
+// Keyboard focus: while the pill is shown (the box out of view) and has the focus, the box
+// scrolling back into view must hand the focus to the box itself, not drop it to <body> when the
+// pill goes `invisible` + `aria-hidden`.
+await act(async () => {
+  watchers[0]?.report(false);
+});
+assert(!pillHidden(pillIn(watchedContainer)), 'shown again, so the keyboard can reach it');
+pillIn(watchedContainer)?.focus();
+assert(navWin.document.activeElement === pillIn(watchedContainer), 'the pill takes the focus');
+await act(async () => {
+  watchers[0]?.report(true);
+});
+const focusedAfterHiding = navWin.document.activeElement;
+assert(
+  focusedAfterHiding === watchedBox,
+  `hiding a focused pill hands the focus to the player box (got ${focusedAfterHiding?.outerHTML.slice(0, 80)})`,
+);
+assert(pillHidden(pillIn(watchedContainer)), 'the pill itself is hidden');
+
+await act(async () => {
+  watchedRoot.unmount();
+});
+watchedContainer.remove();
+assert(watchers[0]?.disconnected === true, 'leaving the page disconnects the observer');
+observerStub.restore();
+
+console.log('✓ The floating pill shows only once the player box has scrolled out of view, and stays mounted while hidden');
 
 // --- Clicks inside a row ---
 //
