@@ -31,9 +31,8 @@ const OUTSIDE_PROVIDER_VALUE: InboxCountsValue = {
  * checked before `data`: `useApiResource` keeps a failed reload's previous data on screen (so an
  * already-loaded page doesn't blank out), which would otherwise make a refresh that fails after an
  * earlier success keep reporting the stale count instead of falling back to unknown. The check is
- * `!== null`, not truthiness: an `ApiError` can carry an empty message (`responseError()` in
- * client.ts falls back to `res.statusText`, which is `''` for a bodyless HTTP/2 response), and a
- * truthy check would read that empty string as "no error" and fall through to the stale count.
+ * `!== null`, not truthiness, because the error slot is `null` exactly when the last load
+ * succeeded — that identity is what should decide the count, not whatever the message says.
  */
 function pendingCount<T extends { status: string }>(resource: ApiResource<ListResponse<T>>): number | null {
   if (resource.error !== null) return null;

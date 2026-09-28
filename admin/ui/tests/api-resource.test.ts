@@ -9,6 +9,7 @@ import {
   useApiResource,
   type ApiResource,
 } from '../src/lib/apiResource';
+import { api, ApiError } from '../src/api/client';
 
 function deferred<T>() {
   let resolve!: (value: T) => void;
@@ -18,6 +19,17 @@ function deferred<T>() {
     reject = rej;
   });
   return { promise, resolve, reject };
+}
+
+/** Awaits `promise`, asserts it rejected with an `ApiError`, and hands that error back. */
+async function expectApiError(promise: Promise<unknown>): Promise<ApiError> {
+  try {
+    await promise;
+  } catch (err) {
+    assert.ok(err instanceof ApiError, `expected an ApiError, got ${String(err)}`);
+    return err as ApiError;
+  }
+  throw new Error('expected the request to reject');
 }
 
 async function main(): Promise<void> {
@@ -50,6 +62,41 @@ async function main(): Promise<void> {
 
   assert.equal(errorMessage(new Error('x'), 'fallback'), 'x');
   assert.equal(errorMessage('not an error', 'fallback'), 'fallback');
+  assert.equal(errorMessage(new Error(''), 'fallback'), 'fallback');
+  assert.equal(errorMessage(new Error('   '), 'fallback'), 'fallback');
+
+  // `responseError()` (client.ts) never leaves an `ApiError.message` blank: a bodyless response
+  // (real for HTTP/2 through Cloudflare, where `statusText` is also empty) and a JSON body whose
+  // `error` string is empty both fall back to a status-coded message. A real message still passes
+  // through unchanged.
+  const originalFetch = globalThis.fetch;
+  try {
+    globalThis.fetch = async () => new Response(null, { status: 500, statusText: '' });
+    const bodyless = await expectApiError(api.stats());
+    assert.equal(bodyless.status, 500);
+    assert.equal(bodyless.message, 'Request failed (HTTP 500)');
+
+    globalThis.fetch = async () =>
+      new Response(JSON.stringify({ error: '' }), {
+        status: 500,
+        headers: { 'Content-Type': 'application/json' },
+      });
+    const emptyJsonError = await expectApiError(api.stats());
+    assert.equal(emptyJsonError.status, 500);
+    assert.equal(emptyJsonError.message, 'Request failed (HTTP 500)');
+
+    globalThis.fetch = async () =>
+      new Response(JSON.stringify({ error: 'Nope' }), {
+        status: 500,
+        headers: { 'Content-Type': 'application/json' },
+      });
+    const realError = await expectApiError(api.stats());
+    assert.equal(realError.status, 500);
+    assert.equal(realError.message, 'Nope');
+  } finally {
+    globalThis.fetch = originalFetch;
+  }
+  console.log('✓ responseError() never leaves an ApiError message blank, and a real message passes through unchanged');
 
   // `hasPending` answers "would a result still be applied?" — it tracks only the
   // newest request, so `mutate` can supersede an in-flight load (which read the

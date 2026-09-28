@@ -163,6 +163,12 @@ async function responseError(res: Response): Promise<ApiError> {
     // The existing APIs are also allowed to return a plain-text error.
   }
 
+  // A blank message — no body and an empty `statusText` (real for a bodyless HTTP/2 response
+  // through Cloudflare), a whitespace-only plain-text body, or a JSON `error` of `""`/whitespace —
+  // would otherwise reach the UI as an empty error. Fall back to a status-coded message; a real
+  // message is kept exactly as received.
+  if (message.trim() === '') message = `Request failed (HTTP ${res.status})`;
+
   return new ApiError(res.status, message, code, diagnostics);
 }
 

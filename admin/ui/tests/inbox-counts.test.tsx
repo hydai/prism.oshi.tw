@@ -106,10 +106,10 @@ function setResponse(url: string, status: number, body: unknown): void {
 }
 
 /**
- * A bodyless error response with an empty `statusText` — real for HTTP/2 through Cloudflare, and
- * exactly what `responseError()`'s `body || res.statusText` fallback turns into an empty-string
- * `ApiError.message` (client.ts): no JSON to parse, so `error` reads as `''` rather than some
- * human-readable text.
+ * A bodyless error response with an empty `statusText` — real for HTTP/2 through Cloudflare. No
+ * body and no `statusText` to fall back to, and no JSON to parse either, so `responseError()`
+ * (client.ts) resolves its blank message to the status-coded fallback: the resulting
+ * `ApiError.message` is `Request failed (HTTP ${status})`, never `''`.
  */
 function setEmptyErrorResponse(url: string, status: number): void {
   responses.set(url, { status, body: EMPTY_BODY });
@@ -364,10 +364,11 @@ async function main(): Promise<void> {
 
   await harness.unmount();
 
-  // --- The stale-data trap's empty-message edge case: a bodyless error response with an empty
-  // statusText (real for HTTP/2 through Cloudflare) makes responseError() produce an ApiError
-  // whose message is '' — `if (resource.error)` would read that as falsy and fall through to the
-  // still-present stale `data`, so the fix must check `resource.error !== null` instead. ---
+  // --- The stale-data trap, exercised with a bodyless error response: no body and an empty
+  // statusText (real for HTTP/2 through Cloudflare) leave responseError() (client.ts) nothing to
+  // fall back to, so it resolves to the status-coded message — 'Request failed (HTTP 500)', never
+  // ''. The count must still read null here: pendingCount() checks `resource.error !== null`, not
+  // truthiness, because the error slot is null exactly when the last load succeeded. ---
 
   requestLog = [];
   setResponse(NOVA_URL, 200, {
@@ -404,7 +405,7 @@ async function main(): Promise<void> {
   await settle();
 
   assert(emptyErrorRenders > rendersBeforeEmptyError, 'the refresh does re-render the probe (a real signal, not a stuck assertion)');
-  assert(currentEmptyError().nova === null, 'an error with an empty message still nulls the count, not the stale 2');
+  assert(currentEmptyError().nova === null, 'a bodyless error response still nulls the count, not the stale 2');
 
   await emptyErrorHarness.unmount();
   console.log('✓ a bodyless error response with an empty statusText still nulls the count');
