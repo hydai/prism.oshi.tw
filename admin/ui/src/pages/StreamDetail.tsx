@@ -793,7 +793,9 @@ export function StreamDetailView({ controller }: { controller: StreamDetailContr
             the card, not the page. */}
         <div
           ref={playerBoxRef}
-          className="min-w-0 lg:sticky lg:top-[calc(var(--stream-header-h,76px)_+_1rem)] lg:flex lg:max-h-[calc(100vh_-_var(--stream-header-h,76px)_-_2rem)] lg:flex-col lg:self-start"
+          tabIndex={-1}
+          aria-label="Player"
+          className="min-w-0 rounded-[18px] focus-visible:outline-none focus-visible:shadow-focus lg:sticky lg:top-[calc(var(--stream-header-h,76px)_+_1rem)] lg:flex lg:max-h-[calc(100vh_-_var(--stream-header-h,76px)_-_2rem)] lg:flex-col lg:self-start"
         >
           <WorkbenchCard
             playerRef={playerRef}
@@ -890,10 +892,12 @@ export function StreamDetailView({ controller }: { controller: StreamDetailContr
         </GlassCard>
       </div>
 
-      {/* The player scrolls away below lg; at lg its column is sticky. A click scrolls back to it. */}
+      {/* The player scrolls away below lg, and the pill shows once its column has; at lg the column is
+          sticky. A click scrolls back to it. */}
       <FloatingPlaybackPill
         className="lg:hidden"
         perf={selectedIndex >= 0 ? performances[selectedIndex] ?? null : null}
+        playerBox={playerBoxRef}
         onClick={() => playerBoxRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' })}
       />
 

@@ -42,6 +42,68 @@ export function installDom(url: string = 'http://localhost/'): Window {
   return win;
 }
 
+/** One observer made through `installIntersectionObserverStub`'s global. */
+export interface StubObserver {
+  observed: Element[];
+  disconnected: boolean;
+  /** Calls the observer back, as a scroll would: one entry per observed element. */
+  report: (isIntersecting: boolean) => void;
+}
+
+/**
+ * Installs a controllable `IntersectionObserver` as the global one (happy-dom's never calls back,
+ * and Node has none): each observer the page makes is recorded in `observers`, and reports only
+ * when a test calls its `report`. `restore()` puts back whatever the global was.
+ */
+export function installIntersectionObserverStub(): { observers: StubObserver[]; restore: () => void } {
+  const observers: StubObserver[] = [];
+  const previous = Object.getOwnPropertyDescriptor(globalThis, 'IntersectionObserver');
+  class StubIntersectionObserver {
+    private readonly stub: StubObserver;
+
+    constructor(callback: IntersectionObserverCallback) {
+      const stub: StubObserver = {
+        observed: [],
+        disconnected: false,
+        report: (isIntersecting) => {
+          const entries = stub.observed.map((target) => ({ isIntersecting, target }) as IntersectionObserverEntry);
+          callback(entries, this as unknown as IntersectionObserver);
+        },
+      };
+      this.stub = stub;
+      observers.push(stub);
+    }
+
+    observe(target: Element): void {
+      this.stub.observed.push(target);
+    }
+
+    unobserve(target: Element): void {
+      this.stub.observed = this.stub.observed.filter((observed) => observed !== target);
+    }
+
+    disconnect(): void {
+      this.stub.disconnected = true;
+    }
+
+    takeRecords(): IntersectionObserverEntry[] {
+      return [];
+    }
+  }
+  Object.defineProperty(globalThis, 'IntersectionObserver', {
+    value: StubIntersectionObserver,
+    configurable: true,
+    writable: true,
+  });
+  return {
+    observers,
+    restore: () => {
+      if (previous) Object.defineProperty(globalThis, 'IntersectionObserver', previous);
+      else delete (globalThis as { IntersectionObserver?: unknown }).IntersectionObserver;
+    },
+  };
+}
+
 /** `act`-wrapped microtask flushes — enough rounds for a load → state → effect chain to settle. */
 export async function settle(rounds: number = 8): Promise<void> {
   for (let i = 0; i < rounds; i += 1) {

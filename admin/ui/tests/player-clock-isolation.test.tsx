@@ -134,6 +134,7 @@ const stampController: StampEditorController = {
   fetchLog: [],
   clearFetchLog: noop,
   playerRef,
+  playerBoxRef: React.createRef<HTMLDivElement>(),
   selectedStream: stream,
   streamYears: ['2026', '2025'],
   filteredStreams: [stream],
