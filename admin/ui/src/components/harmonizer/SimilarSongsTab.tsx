@@ -1,123 +1,36 @@
-import { useRef, useState, type ReactNode } from 'react';
+import { useRef, useState } from 'react';
 import { createPortal } from 'react-dom';
-import type {
-  HarmonizeMatchType,
-  HarmonizeSongEntry,
-  SimilarityGroup,
-} from '../../../../shared/types';
+import type { HarmonizeSongEntry, SimilarityGroup } from '../../../../shared/types';
 import { api } from '../../api/client';
-import { useHarmonizeScan, type HarmonizeScan } from '../../hooks/useHarmonizeScan';
+import { useHarmonizeScan } from '../../hooks/useHarmonizeScan';
 import { errorMessage } from '../../lib/apiResource';
-import { useNow } from '../../hooks/useNow';
-import { formatRelative } from '../../lib/dates';
 import {
   buildWorkAwareMergeRequest,
   getWorkAwareMergeBatch,
   getWorkMergePlan,
 } from '../../lib/harmonizer-work-merge';
-import { matchTypePill, mergeActionLabel, mergeConfirmationMessage } from '../../lib/harmonizer-presentation';
-import { finiteInputNumber } from '../../lib/numeric-input';
+import { counted, matchTypePill, mergeActionLabel, mergeConfirmationMessage } from '../../lib/harmonizer-presentation';
 import { Button } from '../ui/Button';
 import { useConfirm } from '../ui/confirm';
 import { EmptyState, GlassCard } from '../ui/Display';
-import { TextInput } from '../ui/Fields';
 import { Note } from '../ui/Note';
 import { Pill } from '../ui/Pill';
 import { QueueLayout } from '../ui/QueueLayout';
 import { nextQueueKey } from '../ui/queue';
 import { useToast } from '../ui/toast';
-import { Segmented } from '../ui/Toggles';
+import ScanControls from './ScanControls';
 import SimilarSongGroupCard from './SimilarSongGroupCard';
 
 type SongScanStats = { totalSongs: number; groupCount: number; affectedSongs: number };
 type SongGroup = SimilarityGroup<HarmonizeSongEntry>;
 
-const MODES: { value: HarmonizeMatchType; label: string }[] = [
-  { value: 'exact', label: 'Exact' },
-  { value: 'fuzzy', label: 'Fuzzy' },
-];
-
 const groupKeyOf = (group: SongGroup): string => group.normalizedKey;
-
-/** "1 group", "4 groups". */
-function counted(count: number, one: string, many: string): string {
-  return `${count} ${count === 1 ? one : many}`;
-}
 
 /** Whether merging `group` into `canonicalId` merges global works too: the list row's "Global merge". */
 function needsGlobalMerge(group: SongGroup, canonicalId: string | undefined): boolean {
   if (canonicalId === undefined) return false;
   const batch = getWorkAwareMergeBatch(group.items, canonicalId);
   return getWorkMergePlan(batch.items, canonicalId).requiresGlobalMerge;
-}
-
-/** `scanned …`: its own component, so the 30 s tick re-renders this text and nothing else. */
-function ScannedAgo({ at }: { at: number }) {
-  const now = useNow(30_000);
-  return <>scanned {formatRelative(at, now)}</>;
-}
-
-/**
- * What the tab puts in the page header while it is active: the last scan's summary, the match mode,
- * the fuzzy threshold (a number field, so J and K pressed there stay keystrokes, never queue moves)
- * and Scan.
- */
-function ScanControls({
-  scan,
-  scanned,
-  summary,
-  onScan,
-}: {
-  scan: Pick<
-    HarmonizeScan<HarmonizeSongEntry, SongScanStats>,
-    'mode' | 'setMode' | 'threshold' | 'setThreshold' | 'thresholdIsValid' | 'loading'
-  >;
-  scanned: boolean;
-  summary: ReactNode;
-  onScan: () => void;
-}) {
-  const { mode, setMode, threshold, setThreshold, thresholdIsValid, loading } = scan;
-  return (
-    <>
-      {summary ? <span className="text-token-sm text-fg-muted">{summary}</span> : null}
-      <Segmented label="Match mode" value={mode} onChange={setMode} options={MODES} />
-      {mode === 'fuzzy' ? (
-        <span className="flex items-center gap-1.5">
-          <label htmlFor="song-harmonizer-threshold" className="text-token-sm font-semibold text-fg-muted">
-            Threshold
-          </label>
-          <span className="inline-flex w-20">
-            <TextInput
-              id="song-harmonizer-threshold"
-              type="number"
-              min="0.5"
-              max="1"
-              step="0.05"
-              value={threshold ?? ''}
-              onChange={(event) => setThreshold(finiteInputNumber(event.currentTarget.valueAsNumber))}
-              aria-invalid={!thresholdIsValid}
-              aria-describedby={!thresholdIsValid ? 'song-harmonizer-threshold-error' : undefined}
-              required
-            />
-          </span>
-          {!thresholdIsValid ? (
-            <span id="song-harmonizer-threshold-error" className="text-token-sm font-semibold text-tone-danger-fg">
-              Enter 0.5–1
-            </span>
-          ) : null}
-        </span>
-      ) : null}
-      <Button
-        variant="primary"
-        icon="refresh"
-        busy={loading}
-        disabled={mode === 'fuzzy' && !thresholdIsValid}
-        onClick={onScan}
-      >
-        {loading ? 'Scanning...' : scanned ? 'Scan again' : 'Scan'}
-      </Button>
-    </>
-  );
 }
 
 /** A list row: the group key, then its variant count, its match type and whether it merges global works. */
@@ -258,18 +171,22 @@ export default function SimilarSongsTab({
   };
 
   const scanned = stats !== null;
-  const summary = stats !== null && scannedAt !== null ? (
-    <>
-      {`${counted(stats.affectedSongs, 'song', 'songs')} in ${counted(stats.groupCount, 'group', 'groups')} · `}
-      <ScannedAgo at={scannedAt} />
-    </>
-  ) : null;
+  const summary = stats === null
+    ? null
+    : `${counted(stats.affectedSongs, 'song', 'songs')} in ${counted(stats.groupCount, 'group', 'groups')}`;
 
   return (
     <div className="flex flex-col gap-3.5">
       {active && controlsSlot
         ? createPortal(
-            <ScanControls scan={scanState} scanned={scanned} summary={summary} onScan={() => void handleScan()} />,
+            <ScanControls
+              scan={scanState}
+              thresholdId="song-harmonizer-threshold"
+              scanned={scanned}
+              summary={summary}
+              scannedAt={scannedAt}
+              onScan={() => void handleScan()}
+            />,
             controlsSlot,
           )
         : null}

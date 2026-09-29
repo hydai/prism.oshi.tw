@@ -8,6 +8,7 @@ import { Note } from '../ui/Note';
 import { Pill, StatusPill } from '../ui/Pill';
 import { HeadCell, Table, THead } from '../ui/Table';
 import { CELL_X, FIRST_CELL_X, LAST_CELL_X } from '../ui/table-cells';
+import Rewritten from './Rewritten';
 import WorkIdBadge from './WorkIdBadge';
 import WorkMergeNotice from './WorkMergeNotice';
 
@@ -30,16 +31,6 @@ interface SimilarSongGroupCardProps {
 
 /** The detail header's previous / next buttons: the mockup's round, outlined `.ib`. */
 const OUTLINED_ICON_BUTTON = 'border border-field-line bg-field';
-
-/** A value the merge rewrites: the variant's own struck through, the canonical one after it. */
-function Rewritten({ from, to }: { from: string; to: string | null }) {
-  return (
-    <>
-      <span className="text-fg-subtle line-through">{from}</span>
-      {to === null ? null : <span className="ml-1.5 font-semibold text-accent-fg">{to}</span>}
-    </>
-  );
-}
 
 /** One variant of the group: the USE radio, its title and artist against the canonical's, work ID, status, performances. */
 function VariantRow({
