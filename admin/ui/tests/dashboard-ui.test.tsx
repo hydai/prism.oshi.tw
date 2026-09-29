@@ -178,9 +178,10 @@ assert(
 );
 
 assert(inboxTotal({ nova: null, vods: null, crystal: null }) === null, 'inboxTotal is null while every count is unknown');
-assert(inboxTotal({ nova: 2, vods: null, crystal: 3 }) === 5, 'inboxTotal sums the counts it knows');
+assert(inboxTotal({ nova: 2, vods: null, crystal: 3 }) === null, 'inboxTotal is null while any count is unknown: never a partial sum');
 assert(inboxTotal({ nova: 2, vods: 1, crystal: 2 }) === 5, 'inboxTotal sums all three');
-assert(inboxTotal({ nova: 0, vods: 0, crystal: null }) === 0, 'known zeros are a total of 0, not unknown');
+assert(inboxTotal({ nova: 0, vods: 0, crystal: null }) === null, 'known zeros beside an unknown count are no total either');
+assert(inboxTotal({ nova: 0, vods: 0, crystal: 0 }) === 0, 'known zeros are a total of 0, not unknown');
 
 const songsSegments = catalogSegments(STATS.songs);
 assert(
@@ -428,6 +429,13 @@ function subOf(cardNode: HTMLElement): string {
 /** A failed card's value: the first part of its value row (a Retry icon and its tooltip follow). */
 function failedValueOf(cardNode: HTMLElement): string {
   return textOf(cardNode.children[1]?.firstElementChild);
+}
+
+/** The Inbox card's chips, each as `href=text`. */
+function inboxChips(container: HTMLElement): string {
+  return [...card(container, 'Inbox').querySelectorAll<HTMLAnchorElement>('a')]
+    .map((chip) => `${chip.getAttribute('href')}=${textOf(chip)}`)
+    .join('|');
 }
 
 function retryButton(root: ParentNode, label: string): HTMLButtonElement | null {
@@ -1097,6 +1105,146 @@ async function main(): Promise<void> {
   await refreshing.unmount();
 
   console.log('✓ Dashboard: Refresh of a currently-failed card shows no stale value while it reruns, and keeps its own focus');
+
+  // --- The Inbox card over the shell's three inbox lists: loading while a count is still owed and
+  // failed while a list failed — never a partial total — with a Retry of the failed lists alone
+  // that follows the page's retry rules; its chips show every known count throughout ---
+
+  // One list still loading: a skeleton, no partial total, and the chips show what is known.
+  resetStub();
+  const releaseCrystal = holdNext('crystal');
+  const inboxLoading = await mount(page(CURATOR));
+  const loadingInbox = card(inboxLoading.container, 'Inbox');
+  assert(
+    (loadingInbox.children[1]?.querySelector('[role="status"]') ?? null) !== null && !textOf(loadingInbox).includes('waiting'),
+    `while one inbox is still loading, the card shows a skeleton and no partial total (got "${textOf(loadingInbox)}")`,
+  );
+  assert(
+    inboxChips(inboxLoading.container) === '/nova=Nova 2|/nova/vods=VODs 1|/crystal=Crystal —',
+    `the chips show the counts known so far, — for the one still owed (got ${inboxChips(inboxLoading.container)})`,
+  );
+  await act(async () => {
+    releaseCrystal();
+  });
+  await settle();
+  assert(valueOf(card(inboxLoading.container, 'Inbox')) === '5 waiting', 'once all three are in, the card totals them');
+  await inboxLoading.unmount();
+
+  // One list failing: the card fails, with its own Retry and no total; the chips keep what is known.
+  resetStub({ vods: FAILURE });
+  const inboxDown = await mount(page(CURATOR));
+  const downInbox = card(inboxDown.container, 'Inbox');
+  assert(
+    failedValueOf(downInbox) === '—' && !textOf(downInbox).includes('waiting'),
+    `a failed inbox fails the card: — and no total (got "${textOf(downInbox)}")`,
+  );
+  assert(
+    JSON.stringify(retryButtons(inboxDown.container)) === JSON.stringify(['Retry Inbox']),
+    `the Inbox card offers Retry Inbox, and nothing else does (got ${JSON.stringify(retryButtons(inboxDown.container))})`,
+  );
+  assert(
+    inboxChips(inboxDown.container) === '/nova=Nova 2|/nova/vods=VODs —|/crystal=Crystal 2',
+    `the chips keep the counts they know (got ${inboxChips(inboxDown.container)})`,
+  );
+  calls = [];
+  replies.vods = ok(inboxList(1, 0));
+  await click(retryButton(downInbox, 'Retry Inbox'), 'Retry Inbox');
+  assert(calledEndpoints() === 'vods', `Retry Inbox reloads the failed list only (got ${calledEndpoints()})`);
+  assert(valueOf(card(inboxDown.container, 'Inbox')) === '5 waiting', 'the list loads again, and the card totals all three');
+  await inboxDown.unmount();
+
+  // A Retry in flight after a failed Refresh: no stale count while it runs — neither the total nor
+  // the chip — and its Retry stays, busy and focused; on landing the first chip takes the focus.
+  resetStub();
+  const inboxRetrying = await mount(page(CURATOR));
+  const ir = inboxRetrying.container;
+  replies.vods = FAILURE;
+  await click(buttonNamed(pageHeader(ir), 'Refresh'), 'Refresh');
+  const inboxRetry = retryButton(card(ir, 'Inbox'), 'Retry Inbox');
+  assert(inboxRetry !== null, 'a Refresh that fails one inbox after a good load fails the card, with Retry');
+  replies.vods = ok(inboxList(3, 0));
+  const releaseVods = holdNext('vods');
+  await act(async () => {
+    inboxRetry.focus();
+  });
+  await click(inboxRetry, 'Retry Inbox');
+  const heldInbox = card(ir, 'Inbox');
+  assert(
+    failedValueOf(heldInbox) === '—' && !textOf(heldInbox).includes('waiting'),
+    `while the retried list loads, the card shows — and no total (got "${textOf(heldInbox)}")`,
+  );
+  assert(
+    inboxChips(ir) === '/nova=Nova 2|/nova/vods=VODs —|/crystal=Crystal 2',
+    `nor its chip the count it had before it failed (got ${inboxChips(ir)})`,
+  );
+  assert(
+    inboxRetry.isConnected && heldInbox.contains(inboxRetry) && inboxRetry.getAttribute('aria-disabled') === 'true',
+    'its Retry stays, busy',
+  );
+  assert(document.activeElement === inboxRetry, 'and keeps the focus');
+  calls = [];
+  await click(inboxRetry, 'the busy Retry Inbox');
+  assert(calls.length === 0, `a click on the busy Retry sends nothing (got ${calledEndpoints()})`);
+  await act(async () => {
+    releaseVods();
+  });
+  await settle();
+  assert(valueOf(card(ir, 'Inbox')) === '7 waiting', `the retried list lands: the card totals all three (got "${valueOf(card(ir, 'Inbox'))}")`);
+  assert(inboxChips(ir) === '/nova=Nova 2|/nova/vods=VODs 3|/crystal=Crystal 2', 'with the new count on its chip');
+  assert(
+    document.activeElement === card(ir, 'Inbox').querySelector('a[href="/nova"]'),
+    `and the focus moves from Retry to the card's first chip (got ${document.activeElement?.outerHTML.slice(0, 80)})`,
+  );
+
+  // A retry that fails again: Retry is back to itself, and keeps the focus.
+  replies.vods = FAILURE;
+  await click(buttonNamed(pageHeader(ir), 'Refresh'), 'Refresh');
+  const inboxRetryAgain = retryButton(card(ir, 'Inbox'), 'Retry Inbox');
+  assert(inboxRetryAgain !== null, 'the card failed again');
+  const releaseVodsFailure = holdNext('vods');
+  await act(async () => {
+    inboxRetryAgain.focus();
+  });
+  await click(inboxRetryAgain, 'Retry Inbox');
+  await act(async () => {
+    releaseVodsFailure();
+  });
+  await settle();
+  assert(failedValueOf(card(ir, 'Inbox')) === '—', 'a retried list that fails leaves the card failed');
+  assert(
+    inboxRetryAgain.isConnected && inboxRetryAgain.getAttribute('aria-disabled') === null && document.activeElement === inboxRetryAgain,
+    'with its Retry ready again, and still focused',
+  );
+
+  // A Refresh while the card is failed: the same treatment, and the focus stays on Refresh.
+  const inboxRefresh = buttonNamed(pageHeader(ir), 'Refresh');
+  assert(inboxRefresh !== undefined, 'the header offers Refresh');
+  replies.vods = ok(inboxList(4, 0));
+  const releaseRefreshVods = holdNext('vods');
+  await act(async () => {
+    inboxRefresh.focus();
+  });
+  await click(inboxRefresh, 'Refresh');
+  const refreshingInbox = card(ir, 'Inbox');
+  assert(
+    failedValueOf(refreshingInbox) === '—' && !textOf(refreshingInbox).includes('waiting') && inboxChips(ir).includes('VODs —'),
+    `while Refresh reloads the failed list, the card shows no stale count (got "${textOf(refreshingInbox)}")`,
+  );
+  assert(
+    inboxRetryAgain.isConnected && refreshingInbox.contains(inboxRetryAgain) && inboxRetryAgain.getAttribute('aria-disabled') === 'true',
+    "its Retry stays, busy, while Refresh's reload runs",
+  );
+  assert(document.activeElement === inboxRefresh, 'focus stays on Refresh');
+  await act(async () => {
+    releaseRefreshVods();
+  });
+  await settle();
+  assert(valueOf(card(ir, 'Inbox')) === '8 waiting', `once it lands, the card totals all three (got "${valueOf(card(ir, 'Inbox'))}")`);
+  assert(document.activeElement === inboxRefresh, 'and the focus is still on Refresh');
+  assert(unexpected.length === 0, `no unstubbed request (${unexpected.join(', ')})`);
+  await inboxRetrying.unmount();
+
+  console.log('✓ Dashboard: the Inbox card loads and fails with its three lists — never a partial total — and its Retry follows the page’s rules');
 
   // --- A contributor: no curator-only request, and no curator-only card ---
 

@@ -39,10 +39,10 @@ export function oldestPendingDate(streams: Stream[]): string | null {
   return oldest;
 }
 
-/** The sum of the inbox counts that are known, or `null` while none of the three is. */
+/** The sum of the three inbox counts, or `null` while any of them is unknown: never a partial sum. */
 export function inboxTotal(counts: InboxCounts): number | null {
-  const known = [counts.nova, counts.vods, counts.crystal].filter((count): count is number => count !== null);
-  return known.length === 0 ? null : known.reduce((sum, count) => sum + count, 0);
+  if (counts.nova === null || counts.vods === null || counts.crystal === null) return null;
+  return counts.nova + counts.vods + counts.crystal;
 }
 
 /** The catalog's statuses in bar and legend order, each in its spec §4.1 tone. */
