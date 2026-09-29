@@ -428,6 +428,11 @@ function subOf(cardNode: HTMLElement): string {
   return textOf(cardNode.children[2]);
 }
 
+/** The classes of a card's icon tile, the first thing in its heading row. */
+function tileClassesOf(cardNode: HTMLElement): string[] {
+  return (cardNode.firstElementChild?.firstElementChild?.className ?? '').split(' ');
+}
+
 /** A failed card's value: the first part of its value row (a Retry icon and its tooltip follow). */
 function failedValueOf(cardNode: HTMLElement): string {
   return textOf(cardNode.children[1]?.firstElementChild);
@@ -598,6 +603,28 @@ async function main(): Promise<void> {
     `VOD export says when it was last published (got "${subOf(vodCard)}")`,
   );
   assert(retryButtons(container).length === 0, 'nothing failed, so nothing offers Retry');
+
+  // The icon tiles: To stamp's is the accent gradient under a white icon and no other card's is;
+  // Streams to review keeps its warn tint.
+  const stampTile = tileClassesOf(toStamp);
+  assert(
+    ['border-transparent', 'bg-accent', 'text-white'].every((name) => stampTile.includes(name)),
+    `To stamp's icon tile is the accent gradient under a white icon (got "${stampTile.join(' ')}")`,
+  );
+  assert(
+    !stampTile.some((name) => name.includes('tone-')),
+    `and the accent replaces its warn tint (got "${stampTile.join(' ')}")`,
+  );
+  assert(
+    JSON.stringify(cards.map((cardNode) => tileClassesOf(cardNode).includes('bg-accent'))) ===
+      JSON.stringify([true, false, false, false, false]),
+    'To stamp is the only card with the accent tile',
+  );
+  const reviewTile = tileClassesOf(toReview);
+  assert(
+    ['border-tone-warn-line', 'bg-tone-warn-bg', 'text-tone-warn-fg'].every((name) => reviewTile.includes(name)),
+    `Streams to review keeps its warn tile (got "${reviewTile.join(' ')}")`,
+  );
 
   // A sub-line cut short (five cards at 1280 px) keeps its whole text in `title`. To stamp's keeps
   // each count whole, so a phone breaks it between them and never leaves "done" alone on a line.

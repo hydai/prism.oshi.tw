@@ -538,7 +538,7 @@ export default function Dashboard({ user }: { user: AuthUser }) {
               <AttentionCard
                 to="/stamp"
                 icon="timer"
-                tone="warn"
+                tone="accent"
                 title="To stamp"
                 state={shown('stampStats')}
                 value={stampCounts?.remaining.toLocaleString()}
