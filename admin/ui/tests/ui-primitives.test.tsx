@@ -40,6 +40,17 @@ const NEW_ICON_NAMES = [
   'arrowUpRight',
 ] as const;
 
+/** Every status tone, in the order `pill-core` declares them. */
+const TONES = ['ok', 'warn', 'danger', 'info', 'neutral', 'violet', 'teal'] as const;
+
+/**
+ * `<ProgressBar value={9} max={16} label="Stamped" />` exactly as it rendered before the bar took a
+ * `tone` — captured from the component at that commit, so a bar with no tone can be compared
+ * byte for byte.
+ */
+const PROGRESS_BAR_MARKUP =
+  '<div role="progressbar" aria-valuenow="9" aria-valuemin="0" aria-valuemax="16" aria-label="Stamped" class="h-1.5 w-full overflow-hidden rounded-radius-pill bg-track"><div class="h-full rounded-radius-pill bg-accent transition-[width]" style="width:56.25%"></div></div>';
+
 async function main(): Promise<void> {
   const { Button, IconButton } = await import('../src/components/ui/Button');
   const { Tooltip } = await import('../src/components/ui/Tooltip');
@@ -476,6 +487,20 @@ async function main(): Promise<void> {
   assert(pill.includes('rounded-radius-pill'), 'Pill uses the full pill radius');
   assert(pill.includes('font-bold'), 'Pill text is 700 weight');
 
+  // --- TONE_BOX_CLASS: the one tone → box classes map that Pill, the dashboard tile and Note share ---
+
+  const { TONE_BOX_CLASS } = await import('../src/components/ui/pill-core');
+  for (const tone of TONES) {
+    assert(
+      TONE_BOX_CLASS[tone] === `bg-tone-${tone}-bg text-tone-${tone}-fg border-tone-${tone}-line`,
+      `TONE_BOX_CLASS.${tone} is the tone's background, text and border utilities`,
+    );
+    assert(
+      renderToStaticMarkup(<Pill tone={tone}>Live</Pill>).includes(TONE_BOX_CLASS[tone]),
+      `a ${tone} Pill wears TONE_BOX_CLASS.${tone}`,
+    );
+  }
+
   const STATUS_CASES: { status: string; tone: string; label: string; strike?: boolean }[] = [
     { status: 'approved', tone: 'ok', label: 'Approved' },
     { status: 'replied', tone: 'ok', label: 'Replied' },
@@ -579,6 +604,31 @@ async function main(): Promise<void> {
     'the step marker renders before its label',
   );
 
+  // --- Segmented: `disabled` disables every option button (Work Review while a decision is in flight) ---
+
+  const segmentedOptions = [
+    { value: 'exact', label: 'Exact' },
+    { value: 'fuzzy', label: 'Fuzzy', count: 12 },
+  ];
+  const segmentedDisabled = renderToStaticMarkup(
+    <Segmented value="exact" onChange={() => {}} label="Match mode" options={segmentedOptions} disabled />,
+  );
+  assert(
+    (segmentedDisabled.match(/<button[^>]*\sdisabled=""/g) ?? []).length === 2,
+    'a disabled Segmented disables every option button, the pressed one included',
+  );
+  assert(
+    (segmentedDisabled.match(/aria-pressed="true"/g) ?? []).length === 1,
+    'a disabled Segmented still shows which option is pressed',
+  );
+  assert(!segmented.includes('disabled=""'), 'a Segmented with no `disabled` leaves its buttons enabled');
+  assert(
+    !renderToStaticMarkup(
+      <Segmented value="exact" onChange={() => {}} label="Match mode" options={segmentedOptions} disabled={false} />,
+    ).includes('disabled=""'),
+    '`disabled={false}` leaves the buttons enabled',
+  );
+
   // --- GlassCard / StatTile / Kbd / ProgressBar / EmptyState / Skeleton ---
 
   const glassCard = renderToStaticMarkup(<GlassCard>Body</GlassCard>);
@@ -620,6 +670,28 @@ async function main(): Promise<void> {
   assert(progress.includes('aria-valuemax="16"'), 'ProgressBar exposes aria-valuemax');
   assert(progress.includes('aria-label="Stamped"'), 'ProgressBar exposes aria-label');
   assert(progress.includes('bg-track'), 'ProgressBar track uses the track token');
+  assert(
+    progress === PROGRESS_BAR_MARKUP,
+    'a ProgressBar with no tone renders exactly the markup it rendered before tones existed',
+  );
+  const progressAccent = renderToStaticMarkup(<ProgressBar value={9} max={16} label="Stamped" tone="accent" />);
+  assert(progressAccent === PROGRESS_BAR_MARKUP, 'tone="accent" is the default: the same markup, byte for byte');
+  const progressWarn = renderToStaticMarkup(<ProgressBar value={9} max={16} label="Stamped" tone="warn" />);
+  const progressDanger = renderToStaticMarkup(<ProgressBar value={9} max={16} label="Stamped" tone="danger" />);
+  assert(
+    progressWarn.includes('bg-tone-warn-fg') && !progressWarn.includes('bg-accent'),
+    'tone="warn" fills the bar with the warn foreground instead of the accent gradient',
+  );
+  assert(
+    progressDanger.includes('bg-tone-danger-fg') && !progressDanger.includes('bg-accent'),
+    'tone="danger" fills the bar with the danger foreground instead of the accent gradient',
+  );
+  assert(
+    progressDanger === PROGRESS_BAR_MARKUP.replace('bg-accent', 'bg-tone-danger-fg') &&
+      progressWarn === PROGRESS_BAR_MARKUP.replace('bg-accent', 'bg-tone-warn-fg'),
+    'a tone changes only the fill colour: the meter, its values and its width are the same',
+  );
+  assert(!NO_RAW_PALETTE.test(progressAccent + progressWarn + progressDanger), 'a toned ProgressBar uses no raw palette colours');
 
   const emptyState = renderToStaticMarkup(
     <EmptyState icon="library" title="Find duplicate songs" body="Scan now" action={<span>Scan</span>} />,
@@ -638,6 +710,137 @@ async function main(): Promise<void> {
 
   const skeletonLabeled = renderToStaticMarkup(<Skeleton rows={1} label="Loading songs…" />);
   assert(skeletonLabeled.includes('>Loading songs…<'), 'Skeleton accepts a custom label');
+
+  // --- Note: a toned, bordered message box with an optional leading icon and bold title ---
+
+  const { Note } = await import('../src/components/ui/Note');
+
+  let allNoteMarkup = '';
+  for (const tone of TONES) {
+    const toned = renderToStaticMarkup(<Note tone={tone}>Body</Note>);
+    allNoteMarkup += toned;
+    assert(toned.includes(TONE_BOX_CLASS[tone]), `a ${tone} Note wears TONE_BOX_CLASS.${tone}`);
+  }
+
+  const plainNote = renderToStaticMarkup(<Note tone="info">Body</Note>);
+  allNoteMarkup += plainNote;
+  const plainNoteClasses = (/class="([^"]*)"/.exec(plainNote)?.[1] ?? '').split(' ');
+  for (const token of ['border', 'rounded-radius-lg', 'text-[11.5px]']) {
+    assert(plainNoteClasses.includes(token), `a Note uses ${token}`);
+  }
+  assert(plainNote.includes('>Body<'), 'a Note renders its children');
+  assert(!/\srole=/.test(plainNote), 'a Note with no role is plain text, not a live region');
+  assert(!plainNote.includes('<svg') && !/<b[\s>]/.test(plainNote), 'a Note without an icon or a title renders neither');
+
+  const alertNote = renderToStaticMarkup(
+    <Note tone="danger" role="alert">
+      Publish failed
+    </Note>,
+  );
+  const statusNote = renderToStaticMarkup(
+    <Note tone="ok" role="status">
+      Copied
+    </Note>,
+  );
+  allNoteMarkup += alertNote + statusNote;
+  assert(/^<div[^>]*role="alert"/.test(alertNote), 'a Note passes role="alert" to its box');
+  assert(/^<div[^>]*role="status"/.test(statusNote), 'a Note passes role="status" to its box');
+
+  const titledNote = renderToStaticMarkup(
+    <Note tone="warn" icon="alert" title="Global work merge required." className="mb-3">
+      Keeps the canonical work.
+    </Note>,
+  );
+  allNoteMarkup += titledNote;
+  assert(/<b[^>]*>Global work merge required\.<\/b>/.test(titledNote), 'a Note title is bold');
+  assert(
+    titledNote.includes('</b> Keeps the canonical work.'),
+    'the title runs into the children on one line, as the mockup writes "Title. Body…"',
+  );
+  assert(
+    titledNote.indexOf('<svg') !== -1 && titledNote.indexOf('<svg') < titledNote.indexOf('Global work merge required.'),
+    'the icon leads the text',
+  );
+  assert(/<svg[^>]*aria-hidden="true"/.test(titledNote), "a Note's icon is decorative");
+  assert((/^<div[^>]*class="([^"]*)"/.exec(titledNote)?.[1] ?? '').split(' ').includes('mb-3'), 'a Note appends its className');
+  assert(!NO_RAW_PALETTE.test(allNoteMarkup), 'Note markup uses no raw palette colours');
+
+  console.log('✓ ui kit: Note wears its tone from TONE_BOX_CLASS, passes role, and leads with an optional icon and bold title');
+
+  // --- Stepper: a labelled <ol> of steps in a glass card ---
+
+  const { Stepper } = await import('../src/components/ui/Stepper');
+
+  /** The icon's inner markup, so a step can be checked for the glyph without depending on its size. */
+  const glyph = (name: 'check' | 'lock'): string =>
+    /<svg[^>]*>(.*)<\/svg>/.exec(renderToStaticMarkup(<Icon name={name} />))?.[1] ?? '';
+  const textOfMarkup = (markup: string): string => markup.replace(/<[^>]*>/g, '');
+
+  const stepper = renderToStaticMarkup(
+    <Stepper
+      label="Publication workflow"
+      steps={[
+        { title: 'Generate preview', detail: 'Done · 2 minutes ago', state: 'done' },
+        { title: 'Review findings', detail: '11 errors block publishing', state: 'current' },
+        { title: 'Confirm and publish', detail: 'Unlocks when no errors remain', state: 'locked' },
+        { title: 'Announce', state: 'upcoming' },
+      ]}
+    />,
+  );
+  assert(stepper.includes('glass-card'), 'Stepper sits in a GlassCard');
+  const stepperList = /<ol[^>]*>/.exec(stepper)?.[0] ?? '';
+  assert(stepperList.includes('aria-label="Publication workflow"'), 'the <ol> carries the Stepper label');
+  const stepperListClasses = (/class="([^"]*)"/.exec(stepperList)?.[1] ?? '').split(' ');
+  assert(
+    stepperListClasses.includes('grid') &&
+      stepperListClasses.includes('sm:grid-flow-col') &&
+      stepperListClasses.includes('sm:auto-cols-fr'),
+    'the steps stack below 640 px and share equal columns from it, whatever their number',
+  );
+  const stepItems = stepper
+    .split('<li')
+    .slice(1)
+    .map((item) => `<li${item}`);
+  assert(stepItems.length === 4, 'Stepper renders one <li> per step');
+  assert((stepper.match(/aria-current="step"/g) ?? []).length === 1, 'exactly one step is aria-current="step"');
+  const [doneItem = '', currentItem = '', lockedItem = '', upcomingItem = ''] = stepItems;
+  assert(currentItem.includes('aria-current="step"'), 'the current step carries aria-current="step"');
+  assert(
+    currentItem.includes('bg-selected') && [doneItem, lockedItem, upcomingItem].every((item) => !item.includes('bg-selected')),
+    'only the current step is tinted',
+  );
+  assert(
+    !doneItem.includes('border-line-soft') &&
+      [currentItem, lockedItem, upcomingItem].every(
+        (item) => item.includes('border-t border-line-soft') && item.includes('sm:border-l') && item.includes('sm:border-t-0'),
+      ),
+    'every step after the first is set off by a hairline: on its top edge when stacked, its left edge in columns',
+  );
+
+  assert(textOfMarkup(doneItem) === 'Generate previewDone · 2 minutes ago', 'a done step shows its title and detail, no number');
+  assert(doneItem.includes(glyph('check')), 'a done step shows a check');
+  assert(doneItem.includes(TONE_BOX_CLASS.ok), 'a done step marker is ok-toned');
+  assert(!doneItem.includes('bg-accent'), 'a done step marker is not the accent gradient');
+
+  assert(textOfMarkup(currentItem) === '2Review findings11 errors block publishing', 'the current step shows its number, title and detail');
+  assert(currentItem.includes('bg-accent') && currentItem.includes('text-white'), 'the current step marker is the accent gradient under white text');
+  assert(!currentItem.includes('<svg'), 'the current step marker holds its number, not an icon');
+
+  assert(textOfMarkup(lockedItem) === 'Confirm and publishUnlocks when no errors remain', 'a locked step shows a lock in place of its number');
+  assert(lockedItem.includes(glyph('lock')), 'a locked step shows a lock');
+  assert(lockedItem.includes('border-field-line'), 'a locked step marker is an outline');
+  assert(!lockedItem.includes('bg-accent') && !lockedItem.includes(TONE_BOX_CLASS.ok), 'a locked step marker is neither current nor done');
+
+  assert(textOfMarkup(upcomingItem) === '4Announce', 'an upcoming step shows its number, and no detail when it has none');
+  assert(upcomingItem.includes('border-field-line'), 'an upcoming step marker is an outline');
+  assert(!upcomingItem.includes('<svg'), 'an upcoming step marker holds its number, not an icon');
+  assert(!upcomingItem.includes('aria-current'), 'an upcoming step is not the current one');
+
+  const stepperNoCurrent = renderToStaticMarkup(<Stepper label="Steps" steps={[{ title: 'Only step', state: 'done' }]} />);
+  assert(!stepperNoCurrent.includes('aria-current'), 'with no current step, none is marked');
+  assert(!NO_RAW_PALETTE.test(stepper + stepperNoCurrent), 'Stepper markup uses no raw palette colours');
+
+  console.log('✓ ui kit: Stepper is a labelled ordered list with one current step, and a check, number or lock marker per state');
 
   // --- Fields ---
 

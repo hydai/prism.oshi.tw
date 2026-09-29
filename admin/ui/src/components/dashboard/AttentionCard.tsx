@@ -3,18 +3,7 @@ import { Link } from 'react-router-dom';
 import { IconButton } from '../ui/Button';
 import { Skeleton } from '../ui/Display';
 import { Icon, type IconName } from '../ui/Icon';
-import type { Tone } from '../ui/Pill';
-
-/** The icon tile's tint: the tone's badge colours (spec §4.1), so it reads in either theme. */
-const TILE_TONE_CLASSES: Record<Tone, string> = {
-  ok: 'border-tone-ok-line bg-tone-ok-bg text-tone-ok-fg',
-  warn: 'border-tone-warn-line bg-tone-warn-bg text-tone-warn-fg',
-  danger: 'border-tone-danger-line bg-tone-danger-bg text-tone-danger-fg',
-  info: 'border-tone-info-line bg-tone-info-bg text-tone-info-fg',
-  neutral: 'border-tone-neutral-line bg-tone-neutral-bg text-tone-neutral-fg',
-  violet: 'border-tone-violet-line bg-tone-violet-bg text-tone-violet-fg',
-  teal: 'border-tone-teal-line bg-tone-teal-bg text-tone-teal-fg',
-};
+import { TONE_BOX_CLASS, type Tone } from '../ui/pill-core';
 
 /**
  * The accent tile: the primary button's gradient under a white icon, the same in either theme. The
@@ -102,7 +91,7 @@ export function AttentionCard({
   const heading = (
     <div className="flex min-h-[26px] items-center gap-2">
       <span
-        className={`flex h-[26px] w-[26px] shrink-0 items-center justify-center rounded-radius-sm border ${tone === 'accent' ? ACCENT_TILE_CLASSES : TILE_TONE_CLASSES[tone]}`}
+        className={`flex h-[26px] w-[26px] shrink-0 items-center justify-center rounded-radius-sm border ${tone === 'accent' ? ACCENT_TILE_CLASSES : TONE_BOX_CLASS[tone]}`}
       >
         <Icon name={icon} size={14} />
       </span>

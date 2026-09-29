@@ -37,20 +37,30 @@ function hasContent(node: ReactNode): boolean {
   return node !== undefined && node !== null && typeof node !== 'boolean' && node !== '';
 }
 
-/** Focuses the element that had focus before the dialog opened, if it is still in the document. */
-function returnFocus(openerRef: RefObject<HTMLElement | null>): void {
+/**
+ * Focuses the element the owner named (`preferred`), or — with none named, or none left in the
+ * document — the element that had focus before the dialog opened, if that is still in the document.
+ */
+function restoreFocus(
+  openerRef: RefObject<HTMLElement | null>,
+  preferred: RefObject<HTMLElement | null> | undefined,
+): void {
   const opener = openerRef.current;
   openerRef.current = null;
-  if (opener?.isConnected) opener.focus();
+  const named = preferred?.current;
+  const target = named?.isConnected ? named : opener;
+  if (target?.isConnected) target.focus();
 }
 
 /**
  * A modal on the native `<dialog>`: `showModal()` / `close()` follow `open`, so the browser supplies
  * the top layer and makes the page behind it inert. Escape (the `cancel` event) and — when
  * `dismissible` — a click on the backdrop ask the owner to close through `onClose`; the dialog stays
- * open until `open` turns false. Closing returns focus to the element focused before it opened. An
- * optional `icon` sits above the title, outside the title and description that name the dialog. The
- * header and footer stay pinned; only the body (`children`) scrolls once the panel hits its height cap.
+ * open until `open` turns false. Closing returns focus to the element focused before it opened, or
+ * to `returnFocus.current` when the owner names another (the ref is read as the dialog closes; an
+ * empty ref, or an element no longer in the page, leaves the opener to take the focus). An optional
+ * `icon` sits above the title, outside the title and description that name the dialog. The header
+ * and footer stay pinned; only the body (`children`) scrolls once the panel hits its height cap.
  */
 export function Dialog({
   open,
@@ -62,6 +72,7 @@ export function Dialog({
   footer,
   dismissible = true,
   size = 'md',
+  returnFocus,
 }: {
   open: boolean;
   onClose: () => void;
@@ -72,13 +83,24 @@ export function Dialog({
   footer?: ReactNode;
   dismissible?: boolean;
   size?: DialogSize;
+  returnFocus?: RefObject<HTMLElement | null>;
 }) {
   const titleId = useId();
   const descriptionId = useId();
   const dialogRef = useRef<HTMLDialogElement>(null);
   const openerRef = useRef<HTMLElement | null>(null);
+  // True from `showModal()` until focus has been handed back: a dialog that never opened (mounted
+  // closed, or unmounted closed) must not move focus, least of all to a named `returnFocus` target.
+  const shownRef = useRef(false);
   const pressedBackdropRef = useRef(false);
   const requestClose = useEffectEvent(() => onClose());
+  // An effect event, so `returnFocus` is read as the dialog closes and never sits in the open
+  // effect's dependencies: a ref object made anew on every render would close and reopen the dialog.
+  const giveFocusBack = useEffectEvent(() => {
+    if (!shownRef.current) return;
+    shownRef.current = false;
+    restoreFocus(openerRef, returnFocus);
+  });
   const described = hasContent(description);
   const hasChildren = hasContent(children);
   const hasFooter = hasContent(footer);
@@ -91,7 +113,7 @@ export function Dialog({
       // Just closed by the cleanup below, in this commit's mutation phase. Focus goes back from here, the
       // layout phase: right after the mutation phase React re-focuses whatever had focus before the
       // commit (a button still inside the dialog), which would undo a move made in the cleanup.
-      returnFocus(openerRef);
+      giveFocusBack();
       return undefined;
     }
 
@@ -100,6 +122,7 @@ export function Dialog({
     const doc = dialog.ownerDocument;
     const active = doc.activeElement;
     openerRef.current = active instanceof HTMLElement && active !== doc.body ? active : null;
+    shownRef.current = true;
     dialog.showModal();
 
     // Escape: the owner decides; the dialog stays open until `open` turns false.
@@ -126,7 +149,7 @@ export function Dialog({
   // Unmounted while open (an owner that renders the dialog only while it shows): no `open={false}`
   // commit will follow, so the unmount hands focus back — after the cleanup above has closed it. React's
   // post-mutation re-focus cannot undo this one: the element that had focus leaves with the dialog.
-  useLayoutEffect(() => () => returnFocus(openerRef), []);
+  useLayoutEffect(() => () => giveFocusBack(), []);
 
   const handlePointerDown = (event: ReactPointerEvent<HTMLDialogElement>) => {
     pressedBackdropRef.current = event.target === event.currentTarget;

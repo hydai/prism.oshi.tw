@@ -2,8 +2,8 @@ export type Tone = 'ok' | 'warn' | 'danger' | 'info' | 'neutral' | 'violet' | 't
 
 /**
  * The tone's foreground-only utility: a status mark with no badge box of its own (Stream Detail's
- * review-state icon) colours just its glyph. `Pill`'s own `TONE_CLASSES` adds the background and
- * border for the badge shape; both stay literal per-tone strings (spec §4.1) — a template
+ * review-state icon) colours just its glyph. `TONE_BOX_CLASS` adds the background and border for
+ * the badge shape; both stay literal per-tone strings (spec §4.1) — a template
  * `text-tone-${tone}-fg` compiles to no CSS, the same trap as an opacity modifier on a token colour.
  */
 export const TONE_TEXT_CLASS: Record<Tone, string> = {
@@ -14,6 +14,20 @@ export const TONE_TEXT_CLASS: Record<Tone, string> = {
   neutral: 'text-tone-neutral-fg',
   violet: 'text-tone-violet-fg',
   teal: 'text-tone-teal-fg',
+};
+
+/**
+ * The tone's box utilities: background, text and border colours together, the shape a `Pill`, a
+ * `Note` and the icon tile of a dashboard card all wear. The one map, so the three can never drift.
+ */
+export const TONE_BOX_CLASS: Record<Tone, string> = {
+  ok: 'bg-tone-ok-bg text-tone-ok-fg border-tone-ok-line',
+  warn: 'bg-tone-warn-bg text-tone-warn-fg border-tone-warn-line',
+  danger: 'bg-tone-danger-bg text-tone-danger-fg border-tone-danger-line',
+  info: 'bg-tone-info-bg text-tone-info-fg border-tone-info-line',
+  neutral: 'bg-tone-neutral-bg text-tone-neutral-fg border-tone-neutral-line',
+  violet: 'bg-tone-violet-bg text-tone-violet-fg border-tone-violet-line',
+  teal: 'bg-tone-teal-bg text-tone-teal-fg border-tone-teal-line',
 };
 
 type KnownStatus = 'approved' | 'replied' | 'pending' | 'rejected' | 'closed' | 'excluded' | 'extracted';

@@ -31,6 +31,7 @@ export function Segmented<T extends string>({
   onChange,
   options,
   label,
+  disabled,
 }: {
   value: T;
   onChange: (value: T) => void;
@@ -39,6 +40,8 @@ export function Segmented<T extends string>({
    *  label (and count). */
   options: { value: T; label: string; count?: number; icon?: IconName; step?: number }[];
   label: string;
+  /** Disables every option button (a page that must not switch view while a request is in flight). */
+  disabled?: boolean;
 }) {
   return (
     <div
@@ -53,9 +56,10 @@ export function Segmented<T extends string>({
             key={option.value}
             type="button"
             aria-pressed={isActive}
+            disabled={disabled}
             onClick={() => onChange(option.value)}
-            className={`inline-flex items-center gap-1.5 whitespace-nowrap rounded-radius-pill px-3 py-1.5 text-token-sm font-semibold transition-colors focus-visible:outline-none focus-visible:shadow-focus ${
-              isActive ? 'bg-accent text-white shadow-primary' : 'text-fg-muted hover:text-fg'
+            className={`inline-flex items-center gap-1.5 whitespace-nowrap rounded-radius-pill px-3 py-1.5 text-token-sm font-semibold transition-colors disabled:cursor-not-allowed disabled:opacity-50 focus-visible:outline-none focus-visible:shadow-focus ${
+              isActive ? 'bg-accent text-white shadow-primary' : 'text-fg-muted enabled:hover:text-fg'
             }`}
           >
             {option.step !== undefined ? (

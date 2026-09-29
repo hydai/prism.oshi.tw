@@ -1,4 +1,4 @@
-import { act, StrictMode, useEffect, useState } from 'react';
+import { act, createRef, StrictMode, useEffect, useState, type RefObject } from 'react';
 import { renderToStaticMarkup } from 'react-dom/server';
 import { click, installDom, mount, pointerDown, settle } from './helpers/dom';
 import { Dialog } from '../src/components/ui/Dialog';
@@ -167,6 +167,58 @@ function SheetHost() {
   );
 }
 
+/**
+ * A Dialog opened from `#opener` and closed with `#cancel`, next to two other buttons. `returnFocus` is
+ * what the Dialog is told to hand focus back to (nothing by default); `targetRef` is attached to
+ * `#target`. Kept mounted with `open` flipping, or — `mountWhileOpen` — rendered only while it shows.
+ */
+function ReturnFocusHost({
+  returnFocus,
+  targetRef,
+  mountWhileOpen = false,
+}: {
+  returnFocus?: RefObject<HTMLElement | null>;
+  targetRef?: RefObject<HTMLButtonElement | null>;
+  mountWhileOpen?: boolean;
+}) {
+  const [open, setOpen] = useState(false);
+  const dialog = (
+    <Dialog
+      open={mountWhileOpen || open}
+      onClose={() => setOpen(false)}
+      title="Publish"
+      returnFocus={returnFocus}
+      footer={
+        <button type="button" id="cancel" onClick={() => setOpen(false)}>
+          Cancel
+        </button>
+      }
+    >
+      <p>Body</p>
+    </Dialog>
+  );
+  return (
+    <>
+      <button type="button" id="opener" onClick={() => setOpen(true)}>
+        Open
+      </button>
+      <button type="button" id="target" ref={targetRef}>
+        Target
+      </button>
+      <button type="button" id="other">
+        Other
+      </button>
+      {mountWhileOpen ? (open ? dialog : null) : dialog}
+    </>
+  );
+}
+
+function buttonById(root: ParentNode, id: string): HTMLButtonElement {
+  const button = root.querySelector<HTMLButtonElement>(`#${id}`);
+  assert(button !== null, `the host renders #${id}`);
+  return button;
+}
+
 async function main(): Promise<void> {
   // --- SSR: native <dialog>, labelled and described; React never renders `open` ---
 
@@ -230,6 +282,11 @@ async function main(): Promise<void> {
   assert(addSongTag.includes('max-w-sm'), 'size="sm" is the confirm width');
   const plain = renderToStaticMarkup(<Dialog open={false} onClose={() => {}} title="Publish" />);
   assert(/^<dialog[^>]*max-w-lg/.test(plain), 'the default size is md');
+  assert(
+    renderToStaticMarkup(<Dialog open={false} onClose={() => {}} title="Publish" returnFocus={{ current: null }} />) ===
+      plain,
+    'returnFocus is no DOM attribute: naming a return target changes no markup',
+  );
 
   console.log('✓ SSR: Dialog is a labelled, described native <dialog> with the glass look; React never sets open');
 
@@ -367,6 +424,55 @@ async function main(): Promise<void> {
   assert(activeElement() === ask, 'after a backdrop click, focus is back on the probe button');
 
   console.log('✓ Dialog: default tone focuses the confirm button; only a press and click on the backdrop dismisses');
+
+  // An `icon` picks the glyph in a danger confirm's tile (the Harmonizer's song merge draws the kit's merge
+  // icon, not a trash can) and changes nothing else: the tile is still red, focus still starts on Cancel,
+  // the backdrop still does not dismiss it. Without an icon the tile is the trash can; a default-tone
+  // confirm draws no tile at all, icon or not.
+  const TRASH_GLYPH = 'svg path[d="M3 6h18"]';
+  const MERGE_GLYPH = 'svg path[d="m8 6 4-4 4 4"]';
+  nextOptions = { title: 'Merge 3 songs?', confirmLabel: 'Merge songs', tone: 'danger', icon: 'merge' };
+  await focusAndClick(ask, 'the probe button');
+  const mergeTile = referencedBy(dialog, 'aria-labelledby').previousElementSibling;
+  assert(
+    mergeTile !== null && mergeTile.getAttribute('aria-hidden') === 'true',
+    'a danger confirm with an icon still shows its decorative tile',
+  );
+  for (const token of ['h-9', 'w-9', 'rounded-[11px]', 'bg-danger-solid', 'text-white', 'mb-2.5']) {
+    assert(mergeTile.classList.contains(token), `the tile with an icon keeps ${token}`);
+  }
+  assert(mergeTile.querySelector(MERGE_GLYPH) !== null, 'the tile holds the kit merge icon');
+  assert(mergeTile.querySelector(TRASH_GLYPH) === null, 'and not the trash can');
+  assert(activeElement() === buttonNamed(dialog, 'Cancel'), 'focus still starts on Cancel');
+  assert(buttonNamed(dialog, 'Merge songs').className.includes('bg-danger-solid'), 'the confirm button is still the danger one');
+  await pointerDown(dialog);
+  await click(dialog, 'the backdrop');
+  assert(dialog.hasAttribute('open') && lastOutcome() === 'pending', 'the backdrop still does not dismiss it');
+  await click(buttonNamed(dialog, 'Cancel'), 'the Cancel button');
+  assert(lastOutcome() === 'false' && !dialog.hasAttribute('open'), 'Cancel answers it false');
+
+  nextOptions = DELETE_SONG;
+  await focusAndClick(ask, 'the probe button');
+  const trashTile = referencedBy(dialog, 'aria-labelledby').previousElementSibling;
+  assert(
+    trashTile !== null && trashTile.querySelector(TRASH_GLYPH) !== null && trashTile.querySelector(MERGE_GLYPH) === null,
+    'a danger confirm without an icon still draws the trash can, not the merge icon',
+  );
+  await click(buttonNamed(dialog, 'Cancel'), 'the Cancel button');
+  assert(lastOutcome() === 'false' && !dialog.hasAttribute('open'), 'Cancel answers it false');
+
+  nextOptions = { ...APPROVE_ALL, icon: 'merge' };
+  await focusAndClick(ask, 'the probe button');
+  assert(
+    referencedBy(dialog, 'aria-labelledby').previousElementSibling === null,
+    'a default-tone confirm shows no tile, whatever its icon',
+  );
+  assert(activeElement() === buttonNamed(dialog, 'Approve all'), 'and still starts on its confirm button');
+  await pointerDown(dialog);
+  await click(dialog, 'the backdrop');
+  assert(lastOutcome() === 'false' && !dialog.hasAttribute('open'), 'and its backdrop still dismisses it');
+
+  console.log('✓ ConfirmProvider: an icon picks the danger tile\'s glyph (the trash can by default) and nothing else; a default-tone confirm has no tile');
 
   // R19: a confirm() while another is pending resolves the pending one false, then shows the new one.
   nextOptions = { title: 'Publish this snapshot?', confirmLabel: 'Publish' };
@@ -535,6 +641,104 @@ async function main(): Promise<void> {
 
   console.log('✓ Dialog: a dialog kept mounted reopens, and closing it returns focus past the button that closed it');
   console.log('✓ R48: the <dialog> caps its height and never scrolls itself; only its body does, with the header and footer pinned outside it');
+
+  // --- returnFocus: closing hands focus to the element the owner names, not the one focused at open ---
+
+  // Kept mounted, `open` flipping: the opener held focus when the dialog opened, the target is elsewhere.
+  const namedTarget = createRef<HTMLButtonElement>();
+  const named = await mount(<ReturnFocusHost targetRef={namedTarget} returnFocus={namedTarget} />);
+  const namedDialog = named.container.querySelector('dialog');
+  assert(namedDialog !== null && namedTarget.current !== null, 'the host renders its dialog and attaches the target ref');
+  for (const round of ['first', 'second']) {
+    await focusAndClick(buttonById(named.container, 'opener'), 'the opener');
+    assert(namedDialog.hasAttribute('open'), `the dialog opens (${round} time)`);
+    assert(activeElement() !== namedTarget.current, 'opening the dialog does not itself move focus to the return target');
+    await focusAndClick(buttonById(named.container, 'cancel'), 'the Cancel button');
+    assert(!namedDialog.hasAttribute('open'), `Cancel closes the dialog (${round} time)`);
+    assert(
+      activeElement() === namedTarget.current,
+      `with returnFocus, closing lands focus on that element, not on the opener that held it at open (${round} time)`,
+    );
+  }
+  await named.unmount();
+
+  // Without returnFocus the very same host hands focus back to the opener, as before.
+  const unnamed = await mount(<ReturnFocusHost />);
+  await focusAndClick(buttonById(unnamed.container, 'opener'), 'the opener');
+  await focusAndClick(buttonById(unnamed.container, 'cancel'), 'the Cancel button');
+  assert(
+    activeElement() === buttonById(unnamed.container, 'opener'),
+    'without returnFocus, closing still returns focus to the element focused at open',
+  );
+  await unnamed.unmount();
+
+  // Rendered only while it shows — in StrictMode as in the app, and outside it: the unmount path takes the target too.
+  for (const strict of [true, false]) {
+    const where = strict ? 'in StrictMode' : 'outside StrictMode';
+    const modalTarget = createRef<HTMLButtonElement>();
+    const host = <ReturnFocusHost mountWhileOpen targetRef={modalTarget} returnFocus={modalTarget} />;
+    const whileOpen = await mount(strict ? <StrictMode>{host}</StrictMode> : host);
+    assert(whileOpen.container.querySelector('dialog') === null, `the dialog is not rendered while closed (${where})`);
+    await focusAndClick(buttonById(whileOpen.container, 'opener'), 'the opener');
+    assert(
+      whileOpen.container.querySelector('dialog')?.hasAttribute('open') === true,
+      `the dialog shows once opened (${where})`,
+    );
+    await focusAndClick(buttonById(whileOpen.container, 'cancel'), 'the Cancel button');
+    assert(whileOpen.container.querySelector('dialog') === null, `the owner unmounted the dialog (${where})`);
+    assert(
+      activeElement() === modalTarget.current,
+      `a Dialog unmounted while open hands focus to its returnFocus target too (${where})`,
+    );
+    await whileOpen.unmount();
+  }
+
+  // The ref is read when the dialog closes: a target that changed while it was open is the one that counts.
+  const movingTarget = createRef<HTMLButtonElement>();
+  const moving = await mount(<ReturnFocusHost returnFocus={movingTarget} />);
+  movingTarget.current = buttonById(moving.container, 'target');
+  await focusAndClick(buttonById(moving.container, 'opener'), 'the opener');
+  movingTarget.current = buttonById(moving.container, 'other');
+  await focusAndClick(buttonById(moving.container, 'cancel'), 'the Cancel button');
+  assert(
+    activeElement() === buttonById(moving.container, 'other'),
+    'returnFocus.current is read when the dialog closes, not when it opened',
+  );
+  await moving.unmount();
+
+  // A returnFocus that names nothing (or an element that has left the page) falls back to the opener.
+  const emptyTarget = createRef<HTMLButtonElement>();
+  const empty = await mount(<ReturnFocusHost returnFocus={emptyTarget} />);
+  await focusAndClick(buttonById(empty.container, 'opener'), 'the opener');
+  await focusAndClick(buttonById(empty.container, 'cancel'), 'the Cancel button');
+  assert(
+    activeElement() === buttonById(empty.container, 'opener'),
+    'an empty returnFocus ref falls back to the element focused at open',
+  );
+  const detached = document.createElement('button');
+  emptyTarget.current = detached;
+  await focusAndClick(buttonById(empty.container, 'opener'), 'the opener');
+  await focusAndClick(buttonById(empty.container, 'cancel'), 'the Cancel button');
+  assert(
+    activeElement() === buttonById(empty.container, 'opener'),
+    'a returnFocus element that is no longer in the document falls back to the element focused at open',
+  );
+  await empty.unmount();
+
+  // Never opened: a returnFocus target is not focused on mount, on unmount, or by anything but a close.
+  const bystander = document.createElement('button');
+  document.body.appendChild(bystander);
+  bystander.focus();
+  const idleTarget = createRef<HTMLButtonElement>();
+  const idle = await mount(<ReturnFocusHost targetRef={idleTarget} returnFocus={idleTarget} />);
+  assert(activeElement() === bystander, 'a closed Dialog with returnFocus does not take focus when it mounts');
+  await idle.unmount();
+  assert(activeElement() === bystander, 'nor when it unmounts without ever having been open');
+  bystander.remove();
+
+  console.log(
+    '✓ Dialog returnFocus: closing (or unmounting while open) focuses the named element, read at close time; no target falls back to the opener; a closed dialog never takes focus',
+  );
 
   // --- Outside a provider: window.confirm with the title ---
 

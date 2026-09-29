@@ -87,8 +87,30 @@ export function Kbd({ children }: { children: ReactNode }) {
   );
 }
 
-/** A determinate progress meter (spec §5). */
-export function ProgressBar({ value, max, label }: { value: number; max: number; label: string }) {
+type ProgressTone = 'accent' | 'warn' | 'danger';
+
+/** The fill of each tone; literal strings, since a template `bg-tone-${tone}-fg` compiles to no CSS. */
+const PROGRESS_FILL_CLASSES: Record<ProgressTone, string> = {
+  accent: 'bg-accent',
+  warn: 'bg-tone-warn-fg',
+  danger: 'bg-tone-danger-fg',
+};
+
+/**
+ * A determinate progress meter (spec §5). `tone` colours the fill: the accent gradient by default,
+ * or a solid warn / danger for a meter that is near or past a limit.
+ */
+export function ProgressBar({
+  value,
+  max,
+  label,
+  tone = 'accent',
+}: {
+  value: number;
+  max: number;
+  label: string;
+  tone?: ProgressTone;
+}) {
   const percent = max > 0 ? Math.min(100, Math.max(0, (value / max) * 100)) : 0;
   return (
     <div
@@ -99,7 +121,10 @@ export function ProgressBar({ value, max, label }: { value: number; max: number;
       aria-label={label}
       className="h-1.5 w-full overflow-hidden rounded-radius-pill bg-track"
     >
-      <div className="h-full rounded-radius-pill bg-accent transition-[width]" style={{ width: `${percent}%` }} />
+      <div
+        className={`h-full rounded-radius-pill ${PROGRESS_FILL_CLASSES[tone]} transition-[width]`}
+        style={{ width: `${percent}%` }}
+      />
     </div>
   );
 }
