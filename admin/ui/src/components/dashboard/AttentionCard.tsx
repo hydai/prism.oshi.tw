@@ -16,6 +16,12 @@ const TILE_TONE_CLASSES: Record<Tone, string> = {
   teal: 'border-tone-teal-line bg-tone-teal-bg text-tone-teal-fg',
 };
 
+/**
+ * The accent tile: the primary button's gradient under a white icon, the same in either theme. The
+ * border stays, transparent, so the tile keeps the size of the toned ones.
+ */
+const ACCENT_TILE_CLASSES = 'border-transparent bg-accent text-white';
+
 /** The glass card (the kit's `GlassCard` surface), laid out as the mockup's `.ac`. */
 const CARD_CLASSES = 'glass-card flex h-full min-w-0 flex-col gap-1.5 rounded-[18px] px-3.5 py-3 shadow-card';
 
@@ -23,9 +29,10 @@ const CARD_CLASSES = 'glass-card flex h-full min-w-0 flex-col gap-1.5 rounded-[1
 const VALUE_CLASSES = 'min-h-[25px] text-[24px] font-[800] leading-[1.05] tracking-[-0.02em] max-sm:text-[22px]';
 
 /**
- * One "Needs attention" card (spec §8.1, mockup `.ac`): a toned icon tile and the title, then the
- * value with its unit, a sub-line and `children` (the Inbox card's chips, which show in every state:
- * they say what each of its loads knows so far). It loads and fails on its own:
+ * One "Needs attention" card (spec §8.1, mockup `.ac`): an icon tile, toned or (`tone="accent"`) in
+ * the accent gradient, and the title, then the value with its unit, a sub-line and `children` (the
+ * Inbox card's chips, which show in every state: they say what each of its loads knows so far). It
+ * loads and fails on its own:
  * - loading: a skeleton bar where the value goes;
  * - error: a plain card with `—` and, beside it, a Retry icon (`Retry {title}`) that calls
  *   `onRetry`. Beside the value rather than in the corner: the kit tooltip centres on its button,
@@ -56,7 +63,7 @@ export function AttentionCard({
 }: {
   to?: string;
   icon: IconName;
-  tone: Tone;
+  tone: Tone | 'accent';
   title: string;
   shortTitle?: string;
   state: 'loading' | 'error' | 'retrying' | 'ready';
@@ -95,7 +102,7 @@ export function AttentionCard({
   const heading = (
     <div className="flex min-h-[26px] items-center gap-2">
       <span
-        className={`flex h-[26px] w-[26px] shrink-0 items-center justify-center rounded-radius-sm border ${TILE_TONE_CLASSES[tone]}`}
+        className={`flex h-[26px] w-[26px] shrink-0 items-center justify-center rounded-radius-sm border ${tone === 'accent' ? ACCENT_TILE_CLASSES : TILE_TONE_CLASSES[tone]}`}
       >
         <Icon name={icon} size={14} />
       </span>
