@@ -996,6 +996,132 @@ async function main(): Promise<void> {
 
   console.log('✓ Pipeline Discover: scan, filter, pre-selected new rows, import with Retry; steps keep their state');
 
+  // --- No scan while an import runs, and a failed import's Retry waits for a running scan ---
+
+  calls = [];
+  unexpected = [];
+  readyReply = ok({ data: READY, total: READY.length } satisfies ListResponse<Stream>);
+  const racing = await mount(page());
+  const rc = racing.container;
+  /** Every control on the page that scans the channel. */
+  const scanControls = () =>
+    [...rc.querySelectorAll<HTMLButtonElement>('button')].filter((button) =>
+      ['Discover streams', 'Discover again'].includes(textOf(button).trim()),
+    );
+  discoverReplies.push(scan(DISCOVERED));
+  await click(buttonNamed(stepSection(rc, 'Discover'), 'Discover streams'), 'Discover streams');
+  assert(checkedNewRows(rc).join(',') === NEW_IDS.join(','), 'a scan pre-selects the three new videos');
+
+  // An import ends with a scan of its own: until then, nothing scans.
+  const releaseRacingImport = holdNextImport();
+  importReplies.push(imported(NEW_IDS));
+  discoverReplies.push(scan(AFTER_IMPORT));
+  await click(buttonNamed(bulkBar(rc), 'Import as pending streams'), 'Import as pending streams');
+  const scansDuringImport = discoverRequests();
+  assert(
+    scanControls().length > 0
+      && scanControls().every((button) => button.disabled && button.getAttribute('aria-busy') === null),
+    'while an import runs, every scan control is disabled (not busy: no scan runs)',
+  );
+  await click(buttonNamed(pageHeader(rc), 'Discover again'), 'Discover again, while the import runs');
+  assert(discoverRequests() === scansDuringImport, 'a click on it scans nothing');
+  await act(async () => {
+    releaseRacingImport();
+  });
+  await settle();
+  assert(discoverRequests() === scansDuringImport + 1, 'the import ends with its own scan');
+  assert(statusPill(rows(rc)[0]) === 'In Prism · Pending', 'which shows the imported videos in Prism');
+  assert(scanControls().every((button) => !button.disabled), 'and the scan controls are back');
+
+  // The bulk bar's Import already refuses while a scan runs; a failed import's Retry lives in a
+  // toast, outside the step, and must refuse the same way: nothing sends while a scan is running,
+  // and the toast goes on offering Retry for once the scan is done.
+  discoverReplies.push(scan(DISCOVERED));
+  await click(buttonNamed(pageHeader(rc), 'Discover again'), 'Discover again');
+  importReplies.push({ status: 500, body: { error: 'D1 is busy' } });
+  await click(buttonNamed(bulkBar(rc), 'Import as pending streams'), 'Import as pending streams');
+  assert(notifications(rc).includes('Couldn’t import streams'), 'the import fails, and its toast offers Retry');
+
+  const releaseScanDuringRetry = holdNextDiscover();
+  discoverReplies.push(scan(DISCOVERED));
+  await click(buttonNamed(pageHeader(rc), 'Discover again'), 'Discover again');
+  const importsBeforeRetry = requests('POST', '/api/pipeline/import-streams').length;
+  const scansBeforeRetry = discoverRequests();
+  await click(
+    buttonNamed(rc.querySelector('section[aria-label="Notifications"]'), 'Retry'),
+    "the toast's Retry, while the scan runs",
+  );
+  assert(
+    requests('POST', '/api/pipeline/import-streams').length === importsBeforeRetry,
+    'Retry while a scan runs sends no import',
+  );
+  assert(discoverRequests() === scansBeforeRetry, 'and scans nothing extra either');
+  assert(!notifications(rc).includes('Couldn’t import streams'), 'Retry dismisses the failed-import toast');
+  assert(
+    notifications(rc).includes('Wait for the scan to finish, then retry'),
+    'it refuses instead, and says why',
+  );
+
+  await act(async () => {
+    releaseScanDuringRetry();
+  });
+  await settle();
+  assert(discoverRequests() === scansBeforeRetry, 'the held scan lands on its own; nothing new was sent for it to');
+
+  importReplies.push(imported(NEW_IDS));
+  discoverReplies.push(scan(AFTER_IMPORT));
+  await click(
+    buttonNamed(rc.querySelector('section[aria-label="Notifications"]'), 'Retry'),
+    'Retry, once the scan is done',
+  );
+  assert(
+    requests('POST', '/api/pipeline/import-streams').length === importsBeforeRetry + 1,
+    'once no scan is running, Retry sends the import',
+  );
+  assert(!notifications(rc).includes('Wait for the scan to finish'), 'Retry dismisses its own refusal');
+  assert(discoverRequests() === scansBeforeRetry + 1, 'and the import ends with a scan of its own');
+  assert(
+    statusPill(rows(rc)[0]) === 'In Prism · Pending' && bulkBar(rc) === null,
+    'the imported videos read In Prism, and nothing is selected',
+  );
+  assert(unexpected.length === 0, `no unstubbed request (${unexpected.join(', ')})`);
+  await racing.unmount();
+
+  console.log("✓ Pipeline Discover: a failed import's Retry refuses while a scan runs, and sends once it is done");
+
+  // --- Nothing imports while a scan runs: its answer replaces the rows and the selection ---
+
+  calls = [];
+  unexpected = [];
+  const scanning = await mount(page());
+  const sc = scanning.container;
+  discoverReplies.push(scan(DISCOVERED));
+  await click(buttonNamed(stepSection(sc, 'Discover'), 'Discover streams'), 'Discover streams');
+  const releaseRescan = holdNextDiscover();
+  discoverReplies.push(scan(DISCOVERED));
+  await click(buttonNamed(pageHeader(sc), 'Discover again'), 'Discover again');
+  const importWhileScanning = buttonNamed(bulkBar(sc), 'Import as pending streams');
+  assert(
+    textOf(bulkBar(sc)).includes('已選 3 部新影片')
+      && importWhileScanning?.disabled === true
+      && importWhileScanning.getAttribute('aria-busy') === null,
+    'while a scan runs, the bulk bar stays with its selection, and its Import is disabled (not busy: no import runs)',
+  );
+  await click(importWhileScanning, 'Import as pending streams, while the scan runs');
+  assert(requests('POST', '/api/pipeline/import-streams').length === 0, 'a click on it imports nothing');
+  await act(async () => {
+    releaseRescan();
+  });
+  await settle();
+  assert(
+    buttonNamed(bulkBar(sc), 'Import as pending streams')?.disabled === false,
+    'once the scan is back, Import is too',
+  );
+  assert(unexpected.length === 0, `no unstubbed request (${unexpected.join(', ')})`);
+  await scanning.unmount();
+
+  console.log('✓ Pipeline Discover: nothing imports while a scan runs');
+
   // --- Failures: no count on Extract when its list fails; a failed scan says why, inline ---
 
   calls = [];

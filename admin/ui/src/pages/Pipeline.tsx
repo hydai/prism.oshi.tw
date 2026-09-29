@@ -24,7 +24,8 @@ function useDiscover(onImported: () => void): DiscoverController {
   const toast = useToast();
   const streamerName = useCurrentStreamerName();
   const [streams, setStreams] = useState<DiscoveredStream[]>([]);
-  const [loading, setLoading] = useState(false);
+  /** The scan the page waits for (the latest one started) until it ends; `null` while none runs. */
+  const [runningScan, setRunningScan] = useState<number | null>(null);
   const [importing, setImporting] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [selected, setSelected] = useState<ReadonlySet<string>>(NO_SELECTION);
@@ -34,6 +35,16 @@ function useDiscover(onImported: () => void): DiscoverController {
   // Whether the page is still up: a streamer switch remounts it, and the curator can leave while an
   // import is in flight. The import still reports; only a page still here reloads and scans after it.
   const mounted = useRef(false);
+  // Numbers the scans: an answer applies only while no newer scan has started, the one an import
+  // ends with included. The controls already keep a scan and an import apart (a failed import's
+  // toast Retry waits for a running scan too), so this is the safety net: an older answer back last
+  // would mark the imported videos new again and select them.
+  const latestScan = useRef(0);
+  // The running scan's live value, for the failed-import toast's Retry: that callback outlives
+  // every render it was created in, so it cannot read `runningScan` state (a stale render's copy)
+  // and must read this instead. Kept in sync at the same two points `run` sets `runningScan` itself,
+  // not through an effect (an effect body cannot setState/mutate synchronously on every render).
+  const runningScanRef = useRef<number | null>(null);
 
   useEffect(() => {
     mounted.current = true;
@@ -45,18 +56,25 @@ function useDiscover(onImported: () => void): DiscoverController {
   // Every scan — the first, Discover again, and the one after an import — starts from the same
   // place: the New filter when it found anything new (All otherwise), and every new video selected.
   const run = async () => {
-    setLoading(true);
+    latestScan.current += 1;
+    const scan = latestScan.current;
+    const isLatest = () => latestScan.current === scan;
+    setRunningScan(scan);
+    runningScanRef.current = scan;
     setError(null);
     try {
       const res = await api.discoverStreams();
+      if (!isLatest()) return;
       setStreams(res.streams);
       setSelected(newStreamIds(res.streams));
       setFilter(summarizeDiscovered(res.streams).fresh > 0 ? 'new' : 'all');
       setLastRunAt(Date.now());
     } catch (err) {
-      setError(errorMessage(err, 'Failed to discover streams'));
+      if (isLatest()) setError(errorMessage(err, 'Failed to discover streams'));
     } finally {
-      setLoading(false);
+      // Every scan ends its own wait, and only its own: a newer scan's stays until that one ends.
+      setRunningScan((running) => (running === scan ? null : running));
+      if (runningScanRef.current === scan) runningScanRef.current = null;
     }
   };
 
@@ -74,6 +92,14 @@ function useDiscover(onImported: () => void): DiscoverController {
       setSelected(NO_SELECTION);
     } catch (err) {
       const retry = () => {
+        if (runningScanRef.current !== null) {
+          // Refused, not dropped: a scan's answer is about to replace these rows and the
+          // selection out from under an import landing at the same time.
+          toast.error('Wait for the scan to finish, then retry', {
+            action: { label: 'Retry', onClick: retry },
+          });
+          return;
+        }
         if (getCurrentStreamer() === streamer) {
           void importStreams(videoIds);
           return;
@@ -110,7 +136,7 @@ function useDiscover(onImported: () => void): DiscoverController {
 
   return {
     streams,
-    loading,
+    loading: runningScan !== null,
     importing,
     error,
     selected,
@@ -200,7 +226,14 @@ export default function Pipeline() {
         title="Pipeline"
         actions={
           step === 'discover' ? (
-            <Button variant="primary" icon="refresh" busy={discover.loading} onClick={() => void discover.run()}>
+            // An import ends with a scan of its own: none starts here while one runs.
+            <Button
+              variant="primary"
+              icon="refresh"
+              busy={discover.loading}
+              disabled={discover.importing}
+              onClick={() => void discover.run()}
+            >
               {discover.lastRunAt === null ? 'Discover streams' : 'Discover again'}
             </Button>
           ) : (
