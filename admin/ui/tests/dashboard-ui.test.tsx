@@ -1255,16 +1255,27 @@ async function main(): Promise<void> {
     calledEndpoints() === exactly(CONTRIBUTOR_ENDPOINTS),
     `a contributor's page never asks for /api/work-matches or /api/vod-export/status (got ${calledEndpoints()})`,
   );
+  // The worker serves the three inbox lists to curators alone: a contributor's Inbox card could only
+  // ever fail, so a contributor gets To stamp and Streams to review, and nothing else.
   const contributorCards = attentionCards(contributor.container);
-  assert(contributorCards.length === 3, `a contributor sees three cards (got ${contributorCards.length})`);
+  assert(contributorCards.length === 2, `a contributor sees two cards (got ${contributorCards.length})`);
   assert(
-    findCard(contributor.container, 'Duplicate candidates') === undefined && findCard(contributor.container, 'VOD export') === undefined,
-    'neither curator-only card renders for a contributor',
+    ['To stamp', 'Streams to review'].every((title, index) => {
+      const cardNode = contributorCards[index];
+      return cardNode !== undefined && hasTitle(cardNode, title);
+    }),
+    "a contributor's two cards are To stamp and Streams to review",
   );
-  const grid = sectionOf(contributor.container, 'Needs attention').querySelector('ul');
   assert(
-    grid !== null && grid.className.includes('lg:grid-cols-3') && !grid.className.includes('xl:grid-cols-5'),
-    "a contributor's three cards share one row from lg",
+    findCard(contributor.container, 'Inbox') === undefined
+      && findCard(contributor.container, 'Duplicate candidates') === undefined
+      && findCard(contributor.container, 'VOD export') === undefined,
+    'no curator-only card renders for a contributor: Inbox, Duplicate candidates, VOD export',
+  );
+  const gridClasses = (sectionOf(contributor.container, 'Needs attention').querySelector('ul')?.className ?? '').split(' ');
+  assert(
+    gridClasses.includes('grid-cols-2') && !gridClasses.some((name) => /^(sm|md|lg|xl|2xl):grid-cols-/.test(name)),
+    `a contributor's two cards share one row at every width, with no empty third column (got "${gridClasses.join(' ')}")`,
   );
   calls = [];
   await click(buttonNamed(pageHeader(contributor.container), 'Refresh'), 'Refresh');
