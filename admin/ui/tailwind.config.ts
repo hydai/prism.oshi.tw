@@ -56,6 +56,14 @@ export default {
           violet: { bg: 'var(--tone-violet-bg)', fg: 'var(--tone-violet-fg)', line: 'var(--tone-violet-line)' },
           teal: { bg: 'var(--tone-teal-bg)', fg: 'var(--tone-teal-fg)', line: 'var(--tone-teal-line)' },
         },
+        // The catalog bars' fills (`bg-chart-<tone>`), one per status tone the catalog draws.
+        chart: {
+          ok: 'var(--chart-ok)',
+          warn: 'var(--chart-warn)',
+          danger: 'var(--chart-danger)',
+          neutral: 'var(--chart-neutral)',
+          teal: 'var(--chart-teal)',
+        },
         tooltip: {
           bg: 'var(--tooltip-bg)',
           fg: 'var(--tooltip-fg)',

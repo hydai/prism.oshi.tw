@@ -170,6 +170,15 @@ body {
   --tone-teal-fg: #0F766E;
   --tone-teal-line: #99F6E4;
 
+  /* The catalog bars' fills (Dashboard): lighter than the tones' text colours, which are darkened to
+     read as text. A bar is a fill, not text, so no text-contrast floor applies to it — the counts
+     stay in the page's text and in each bar's accessible name. */
+  --chart-ok: #34D399;
+  --chart-warn: #FBBF24;
+  --chart-danger: #F87171;
+  --chart-neutral: #CBD5E1;
+  --chart-teal: #2DD4BF;
+
   /* Tooltip surface: deliberately NOT derived from --fg/--glass-pop/etc — every one
      of those flips polarity between themes, which would flip the tooltip to
      low-contrast text-on-background in one theme. Task 2 fix round 1, ruling R10. */
@@ -246,6 +255,13 @@ html.dark {
   --tone-teal-bg: rgba(20,184,166,.14);
   --tone-teal-fg: #5EEAD4;
   --tone-teal-line: rgba(20,184,166,.3);
+
+  /* The tones' text colours, as the bars were filled before these tokens. */
+  --chart-ok: #6EE7B7;
+  --chart-warn: #FBBF24;
+  --chart-danger: #FCA5A5;
+  --chart-neutral: #A7A4BA;
+  --chart-teal: #5EEAD4;
 
   --tooltip-bg: #F1F5F9;
   --tooltip-fg: #1E1B2E;

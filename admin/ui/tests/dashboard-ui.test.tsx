@@ -663,14 +663,14 @@ async function main(): Promise<void> {
   const songsBar = bars[0];
   assert(songsBar !== undefined, 'the catalog has a Songs bar');
   const songParts = [...songsBar.querySelectorAll<HTMLElement>('[title]')].map(
-    (part) => `${part.getAttribute('title')}|${part.style.width}|${part.className.includes('bg-tone-ok-fg') || part.className.includes('bg-tone-warn-fg')}`,
+    (part) => `${part.getAttribute('title')}|${part.style.width}|${part.className.includes('bg-chart-ok') || part.className.includes('bg-chart-warn')}`,
   );
   assert(
     songParts.join(',') === `Approved: ${n(2390)}|99.67%|true,Pending: 8|0.33%|true`,
-    `each part of a bar is a tone fill as wide as its share, titled with its count (got ${songParts.join(',')})`,
+    `each part of a bar is a chart fill as wide as its share, titled with its count (got ${songParts.join(',')})`,
   );
   const performanceFills = [...(bars[2]?.querySelectorAll<HTMLElement>('[title]') ?? [])].map((part) =>
-    ['ok', 'warn', 'danger', 'neutral', 'teal'].find((tone) => part.className.includes(`bg-tone-${tone}-fg`)),
+    ['ok', 'warn', 'danger', 'neutral', 'teal'].find((tone) => part.className.includes(`bg-chart-${tone}`)),
   );
   assert(
     performanceFills.join(',') === 'ok,warn,danger,neutral,teal',
@@ -680,6 +680,21 @@ async function main(): Promise<void> {
   assert(
     legend.join(',') === 'Approved,Pending,Rejected,Excluded,Extracted',
     `the legend lists the five statuses (got ${legend.join(',')})`,
+  );
+  // The legend's dots fill like the bars, in the same order; nothing in either takes a tone's text
+  // colour, which would compete with the chart fill for the same background.
+  const legendDots = [...catalog.querySelectorAll('li > span')].map((dot) =>
+    dot.className.split(' ').find((name) => name.startsWith('bg-')),
+  );
+  assert(
+    legendDots.join(',') === 'bg-chart-ok,bg-chart-warn,bg-chart-danger,bg-chart-neutral,bg-chart-teal',
+    `each legend dot is its status's chart fill (got ${legendDots.join(',')})`,
+  );
+  const fills = [...catalog.querySelectorAll<HTMLElement>('[role="img"] [title], li > span')];
+  assert(fills.length === 14, `the catalog has nine bar parts and five legend dots (got ${fills.length})`);
+  assert(
+    fills.every((fill) => !fill.className.includes('bg-tone-')),
+    'no bar part or legend dot fills with a tone colour',
   );
 
   // Continue stamping.

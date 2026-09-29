@@ -45,8 +45,11 @@ export function inboxTotal(counts: InboxCounts): number | null {
   return counts.nova + counts.vods + counts.crystal;
 }
 
+/** The tones a catalog status takes: the ones the bars have a chart fill for (`--chart-*`). */
+export type CatalogTone = Extract<Tone, 'ok' | 'warn' | 'danger' | 'neutral' | 'teal'>;
+
 /** The catalog's statuses in bar and legend order, each in its spec §4.1 tone. */
-export const CATALOG_STATUSES: readonly { key: keyof StatusCounts; label: string; tone: Tone }[] = [
+export const CATALOG_STATUSES: readonly { key: keyof StatusCounts; label: string; tone: CatalogTone }[] = [
   { key: 'approved', label: 'Approved', tone: 'ok' },
   { key: 'pending', label: 'Pending', tone: 'warn' },
   { key: 'rejected', label: 'Rejected', tone: 'danger' },
@@ -57,7 +60,7 @@ export const CATALOG_STATUSES: readonly { key: keyof StatusCounts; label: string
 interface CatalogSegment {
   key: keyof StatusCounts;
   label: string;
-  tone: Tone;
+  tone: CatalogTone;
   value: number;
   /** Share of the total in percent, with two decimals. */
   pct: number;
