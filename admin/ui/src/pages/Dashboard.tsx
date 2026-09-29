@@ -111,7 +111,8 @@ function InboxChip({ to, label, count }: { to: string; label: string; count: num
 /**
  * The Inbox card over the shell's three inbox lists, in `state` like the other cards: its total once
  * all three counts are known, and a chip linking to each inbox in every state, `—` while its count
- * is unknown.
+ * is unknown. A curator's only: the worker serves the inbox lists to curators alone, so a
+ * contributor's card could only ever fail.
  */
 function InboxCard({ state, counts, onRetry }: { state: ShownState; counts: InboxCounts; onRetry: () => void }) {
   return (
@@ -332,11 +333,12 @@ function UpdatedAgo({ at }: { at: number }) {
 }
 
 /**
- * What needs attention today (spec §8.1): five cards — To stamp, Streams to review, Inbox, and for
- * a curator Duplicate candidates and VOD export — each loading and failing on its own; the catalog
+ * What needs attention today (spec §8.1): To stamp and Streams to review, and for a curator the
+ * Inbox, Duplicate candidates and VOD export, each card loading and failing on its own; the catalog
  * as stacked bars; the streams to continue stamping; the newest submissions. Six loads of its own
  * and the shell's three inbox lists, each failure with its own Retry; Refresh reloads all nine. A
- * contributor's page never asks for the curator-only data.
+ * contributor gets no curator-only card, and the page never asks for its own curator-only data (the
+ * inbox lists are the shell's).
  */
 export default function Dashboard({ user }: { user: AuthUser }) {
   const isCurator = user.role === 'curator';
@@ -529,7 +531,9 @@ export default function Dashboard({ user }: { user: AuthUser }) {
       <div className="flex flex-col gap-3 p-4 lg:px-5 lg:pb-[18px]">
         <section className="flex flex-col gap-3">
           <h2 className="text-2xs font-bold uppercase tracking-[0.12em] text-fg-subtle">Needs attention</h2>
-          <ul className={`grid grid-cols-2 gap-3 lg:grid-cols-3${isCurator ? ' xl:grid-cols-5' : ''}`}>
+          {/* A curator's five cards: two to a row on a phone, three from lg, all five in one row from
+              xl. A contributor's two share one row at every width, with no empty third column. */}
+          <ul className={`grid grid-cols-2 gap-3${isCurator ? ' lg:grid-cols-3 xl:grid-cols-5' : ''}`}>
             <li className="min-w-0">
               <AttentionCard
                 to="/stamp"
@@ -557,11 +561,11 @@ export default function Dashboard({ user }: { user: AuthUser }) {
                 onRetry={retryReview}
               />
             </li>
-            <li className="min-w-0">
-              <InboxCard state={inboxState} counts={inboxCounts} onRetry={() => retry(['nova', 'vods', 'crystal'])} />
-            </li>
             {isCurator ? (
               <>
+                <li className="min-w-0">
+                  <InboxCard state={inboxState} counts={inboxCounts} onRetry={() => retry(['nova', 'vods', 'crystal'])} />
+                </li>
                 <li className="min-w-0">
                   <AttentionCard
                     to="/works/review"
