@@ -109,6 +109,7 @@ export const ADMIN_ROUTES: readonly AdminRoute[] = [
     curatorOnly: true,
     group: 'library',
     icon: 'gitCompare',
+    frame: 'studio',
     render: () => <GlobalWorkReview />,
   },
   { path: '/harmonizer', label: 'Harmonizer', group: 'library', icon: 'merge', render: () => <Harmonizer /> },
