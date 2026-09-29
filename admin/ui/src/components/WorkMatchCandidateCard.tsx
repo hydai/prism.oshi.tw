@@ -3,7 +3,13 @@ import type {
   WorkMatchDecision,
   WorkMatchReason,
 } from '../../../shared/types';
-import { selectMergeSourceWorkIds } from '../lib/global-work-review';
+import { decisionPill, selectMergeSourceWorkIds } from '../lib/global-work-review';
+import { Button } from './ui/Button';
+import { GlassCard } from './ui/Display';
+import { Textarea } from './ui/Fields';
+import { Icon } from './ui/Icon';
+import { Note } from './ui/Note';
+import { Pill, type Tone } from './ui/Pill';
 
 const REASON_LABELS: Record<WorkMatchReason, string> = {
   case_width_whitespace: 'Case / width / whitespace',
@@ -11,10 +17,32 @@ const REASON_LABELS: Record<WorkMatchReason, string> = {
   diacritic_variant: 'Latin diacritic variant',
 };
 
-function decisionLabel(decision: WorkMatchDecision | null): string {
-  if (decision === 'not_duplicate') return 'Not duplicate';
-  if (decision === 'needs_research') return 'Needs research';
-  return 'Pending review';
+/** The mockup's `.dlabel`: a small uppercase section label. */
+const SECTION_LABEL = 'text-2xs font-bold uppercase tracking-[0.1em] text-fg-subtle';
+
+/** A bold count and its noun, singular for one. */
+function Counted({ count, one, many }: { count: number; one: string; many: string }) {
+  return (
+    <>
+      <b className="font-bold text-fg">{count}</b> {count === 1 ? one : many}
+    </>
+  );
+}
+
+/**
+ * One info pill per Tier A reason: the card's top row, and each row of the review queue's list
+ * (neutral, through `tone`, on a row decided in this view).
+ */
+export function ReasonPills({ reasons, tone = 'info' }: { reasons: readonly WorkMatchReason[]; tone?: Tone }) {
+  return (
+    <>
+      {reasons.map((reason) => (
+        <Pill key={reason} tone={tone}>
+          {REASON_LABELS[reason]}
+        </Pill>
+      ))}
+    </>
+  );
 }
 
 export function MergeImpact({
@@ -48,22 +76,22 @@ export function MergeImpact({
   const resultingTags = [...new Set(selectedWorks.flatMap((work) => work.tags))];
   const addedTags = resultingTags.filter((tag) => !canonicalTags.has(tag));
   return (
-    <div className="rounded-md border border-amber-300 bg-amber-50 p-3 text-sm text-amber-950">
-      <p className="font-semibold">Site-wide identity change</p>
+    <Note tone="warn" icon="alert" title="Site-wide identity change">
       <p className="mt-1">
         This retires {sourceWorkIds.length} work ID(s) while keeping{' '}
         {selectedSongs} local song record(s) across {selectedStreamers.size} VTuber(s).
         Source song-to-work links are repointed to the surviving identity.
       </p>
       <p className="mt-1">
-        Canonical tags after merge: {resultingTags.length > 0 ? resultingTags.join(', ') : 'none'}.
+        {/* One text run: the tag union reads as one sentence wherever the page's text is searched. */}
+        {`Canonical tags after merge: ${resultingTags.length > 0 ? resultingTags.join(', ') : 'none'}.`}
         {addedTags.length > 0 ? ` Adds: ${addedTags.join(', ')}.` : ' No tags are added.'}
       </p>
-      <p className="mt-1 font-medium">
+      <p className="mt-1 font-semibold">
         All {selectedPerformances} performances and their performance IDs are preserved.
         No song or performance row is deleted.
       </p>
-    </div>
+    </Note>
   );
 }
 
@@ -71,7 +99,12 @@ interface WorkMatchCandidateCardProps {
   candidate: WorkMatchCandidate;
   selectedCanonicalWorkId: string;
   note: string;
+  /** The queue is busy (a decision, a merge or a re-read is running, or the last re-read failed):
+   *  every decision and merge button waits. */
   queueBusy: boolean;
+  /** This candidate's own decision or merge is saving: its identity choice and its note freeze too.
+   *  While only the queue is busy they stay editable, so the curator can go on typing the next
+   *  row's note while the page re-reads. */
   acting: boolean;
   isConfirming: boolean;
   onCanonicalChange: (workId: string) => void;
@@ -82,6 +115,12 @@ interface WorkMatchCandidateCardProps {
   onSaveDecision: (decision: WorkMatchDecision) => void;
 }
 
+/**
+ * The review queue's detail for one candidate (spec §8.6, the mockup's `.det`): its pills and key,
+ * the summary, the "Keep which work identity?" radio cards, the follow-up and deferred-batch notes,
+ * the review note and the actions. "Review merge impact" opens the second step in place: the
+ * `MergeImpact`, the IDs kept and retired, and "Confirm global work merge".
+ */
 export default function WorkMatchCandidateCard({
   candidate,
   selectedCanonicalWorkId,
@@ -98,168 +137,166 @@ export default function WorkMatchCandidateCard({
 }: WorkMatchCandidateCardProps) {
   const sourceWorkIds = selectMergeSourceWorkIds(candidate, selectedCanonicalWorkId);
   const deferredSourceCount = candidate.works.length - 1 - sourceWorkIds.length;
+  const review = decisionPill(candidate.decision);
 
   return (
-    <section className="rounded-lg border border-slate-200 bg-white p-5 shadow-sm">
-      <div className="flex flex-wrap items-start justify-between gap-3">
-        <div>
-          <div className="flex flex-wrap items-center gap-2">
-            <span className="rounded-full bg-emerald-100 px-2 py-0.5 text-xs font-semibold text-emerald-800">
-              High confidence
-            </span>
-            <span className="rounded-full bg-slate-100 px-2 py-0.5 text-xs text-slate-600">
-              {decisionLabel(candidate.decision)}
-            </span>
-            {candidate.reasons.map((reason) => (
-              <span key={reason} className="rounded-full bg-blue-50 px-2 py-0.5 text-xs text-blue-700">
-                {REASON_LABELS[reason]}
-              </span>
-            ))}
-          </div>
-          <p className="mt-2 text-sm text-slate-600">
-            {candidate.works.length} work IDs · {candidate.songCount} local songs ·{' '}
-            {candidate.performanceCount} performances · {candidate.streamerCount} VTubers
-          </p>
-        </div>
-        <code className="text-xs text-slate-400" title={candidate.candidateKey}>
+    <GlassCard
+      as="section"
+      aria-label="Selected candidate"
+      padding="none"
+      className="flex flex-col gap-3 px-[18px] py-3.5"
+    >
+      <div className="flex flex-wrap items-center gap-1.5">
+        <Pill tone="ok">High confidence</Pill>
+        <Pill tone={review.tone}>{review.label}</Pill>
+        <ReasonPills reasons={candidate.reasons} />
+        <code className="ml-auto font-mono text-meta text-fg-subtle" title={candidate.candidateKey}>
           {candidate.candidateKey.slice(0, 12)}
         </code>
       </div>
 
-      <fieldset className="mt-4 overflow-hidden rounded-md border border-slate-200">
+      <p className="text-[12px] text-fg-muted">
+        <Counted count={candidate.works.length} one="work ID" many="work IDs" />
+        {' · '}
+        <Counted count={candidate.songCount} one="local song" many="local songs" />
+        {' · '}
+        <Counted count={candidate.performanceCount} one="performance" many="performances" />
+        {' · '}
+        <Counted count={candidate.streamerCount} one="VTuber" many="VTubers" />
+      </p>
+
+      <fieldset className="flex min-w-0 flex-col gap-2">
         <legend className="sr-only">Choose the canonical global work</legend>
-        {candidate.works.map((work) => (
-          <label
-            key={work.id}
-            className={`grid cursor-pointer gap-3 border-b border-slate-100 p-3 last:border-b-0 md:grid-cols-[auto_minmax(0,1fr)_auto] ${
-              selectedCanonicalWorkId === work.id ? 'bg-blue-50' : 'hover:bg-slate-50'
-            }`}
-          >
-            <input
-              type="radio"
-              name={`canonical-${candidate.candidateKey}`}
-              value={work.id}
-              checked={selectedCanonicalWorkId === work.id}
-              disabled={queueBusy}
-              onChange={() => onCanonicalChange(work.id)}
-              className="mt-1 h-4 w-4 border-slate-300 text-blue-600"
-            />
-            <div className="min-w-0">
-              <div className="flex flex-wrap items-center gap-2">
-                <span className="font-medium text-slate-800">{work.title}</span>
-                <span className="text-slate-500">— {work.originalArtist}</span>
-                {work.id === candidate.suggestedCanonicalWorkId && (
-                  <span className="rounded bg-blue-100 px-1.5 py-0.5 text-xs font-medium text-blue-700">
-                    Suggested by usage
-                  </span>
-                )}
-              </div>
-              <p className="mt-1 break-all font-mono text-xs text-slate-400">{work.id}</p>
-              <div className="mt-1 flex flex-wrap gap-1">
-                {work.streamerIds.map((streamerId) => (
-                  <span key={streamerId} className="rounded bg-slate-100 px-1.5 py-0.5 text-xs text-slate-600">
-                    {streamerId}
-                  </span>
-                ))}
-              </div>
-            </div>
-            <div className="text-right text-xs tabular-nums text-slate-500">
-              <p>{work.songCount} songs</p>
-              <p>{work.performanceCount} performances</p>
-              {work.pendingSongCount > 0 && (
-                <p className="text-amber-700">{work.pendingSongCount} pending</p>
-              )}
-            </div>
-          </label>
-        ))}
+        {/* The legend names the group for assistive tech; this is its visible twin. */}
+        <p aria-hidden="true" className={SECTION_LABEL}>
+          Keep which work identity?
+        </p>
+        {candidate.works.map((work) => {
+          const chosen = selectedCanonicalWorkId === work.id;
+          return (
+            <label
+              key={work.id}
+              className={`grid cursor-pointer grid-cols-[18px_minmax(0,1fr)_auto] items-start gap-2.5 rounded-[14px] border px-3 py-2.5 transition-colors ${
+                chosen ? 'border-hot-line bg-selected' : 'border-field-line bg-field hover:bg-row-hover'
+              }`}
+            >
+              <input
+                type="radio"
+                name={`canonical-${candidate.candidateKey}`}
+                value={work.id}
+                checked={chosen}
+                disabled={acting}
+                onChange={() => onCanonicalChange(work.id)}
+                className="mt-0.5 h-4 w-4 appearance-none rounded-full border border-field-line bg-field checked:border-4 checked:border-accent-fg focus-visible:outline-none focus-visible:shadow-focus disabled:cursor-not-allowed"
+              />
+              <span className="min-w-0">
+                <span className="flex flex-wrap items-center gap-x-1.5 gap-y-1">
+                  <span className="text-[13px] font-[650] text-fg">{work.title}</span>
+                  <span className="text-[12px] text-fg-muted">— {work.originalArtist}</span>
+                  {work.id === candidate.suggestedCanonicalWorkId ? (
+                    <Pill tone="info">Suggested by usage</Pill>
+                  ) : null}
+                </span>
+                <span className="mb-[5px] mt-[3px] block break-all font-mono text-meta text-fg-subtle">{work.id}</span>
+                <span className="flex flex-wrap gap-1">
+                  {work.streamerIds.map((streamerId) => (
+                    <span
+                      key={streamerId}
+                      className="whitespace-nowrap rounded-radius-pill border border-field-line bg-field px-[7px] py-0.5 text-meta font-medium text-fg-muted"
+                    >
+                      {streamerId}
+                    </span>
+                  ))}
+                </span>
+              </span>
+              <span className="whitespace-nowrap text-right text-[11px] leading-normal tabular-nums text-fg-muted">
+                <span className="block">
+                  <Counted count={work.songCount} one="song" many="songs" />
+                </span>
+                <span className="block">
+                  <Counted count={work.performanceCount} one="performance" many="performances" />
+                </span>
+                {work.pendingSongCount > 0 ? (
+                  <span className="block text-tone-warn-fg">{work.pendingSongCount} pending</span>
+                ) : null}
+              </span>
+            </label>
+          );
+        })}
       </fieldset>
 
-      {candidate.localDuplicates.length > 0 && (
-        <p className="mt-3 rounded-md bg-violet-50 p-2 text-sm text-violet-800">
+      {candidate.localDuplicates.length > 0 ? (
+        <Note tone="violet">
           Local follow-up required after a global merge:{' '}
-          {candidate.localDuplicates.map((item) => `${item.streamerId} (${item.songCount})`).join(', ')}.
-          This action will not merge those local song rows.
-        </p>
-      )}
+          <b className="font-[750]">
+            {candidate.localDuplicates.map((item) => `${item.streamerId} (${item.songCount})`).join(', ')}
+          </b>
+          . This action will not merge those local song rows.
+        </Note>
+      ) : null}
 
-      {deferredSourceCount > 0 && (
-        <p className="mt-3 rounded-md bg-amber-50 p-2 text-sm text-amber-800">
+      {deferredSourceCount > 0 ? (
+        <Note tone="warn">
           This reviewed batch will retire {sourceWorkIds.length} source work IDs;{' '}
           {deferredSourceCount} will remain and reappear for another confirmed batch.
-        </p>
-      )}
+        </Note>
+      ) : null}
 
-      <label className="mt-4 block text-sm font-medium text-slate-700">
-        Review note (optional — saved with the decision or merge)
-        <textarea
+      <label className="flex flex-col gap-1.5">
+        <span className={SECTION_LABEL}>
+          Review note{' '}
+          <span className="font-medium normal-case tracking-normal">(optional — saved with the decision or merge)</span>
+        </span>
+        <Textarea
           value={note}
           maxLength={2000}
-          disabled={queueBusy}
+          disabled={acting}
           onChange={(event) => onNoteChange(event.target.value)}
           rows={2}
-          className="mt-1 block w-full rounded-md border border-slate-300 px-3 py-2 text-sm focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500"
           placeholder="Source or reason for the review decision"
         />
       </label>
 
       {isConfirming ? (
-        <div className="mt-4 space-y-3">
+        <div className="flex flex-col gap-3">
           <MergeImpact
             candidate={candidate}
             canonicalWorkId={selectedCanonicalWorkId}
             sourceWorkIds={sourceWorkIds}
           />
-          <p className="break-all text-xs text-slate-500">
-            Canonical: <code>{selectedCanonicalWorkId}</code><br />
-            Retire: <code>{sourceWorkIds.join(', ')}</code>
+          <p className="break-all text-meta text-fg-muted">
+            Canonical: <code className="font-mono text-fg">{selectedCanonicalWorkId}</code><br />
+            Retire: <code className="font-mono text-fg">{sourceWorkIds.join(', ')}</code>
           </p>
-          <div className="flex flex-wrap gap-2">
-            <button
-              type="button"
+          <div className="flex flex-wrap items-center gap-2">
+            <Button
+              variant="danger"
+              size="sm"
               disabled={queueBusy}
               onClick={() => onConfirmMerge(selectedCanonicalWorkId, sourceWorkIds)}
-              className="rounded-md bg-red-700 px-3 py-1.5 text-sm font-semibold text-white hover:bg-red-800 disabled:opacity-50"
             >
               {acting ? 'Merging...' : 'Confirm global work merge'}
-            </button>
-            <button
-              type="button"
-              disabled={queueBusy}
-              onClick={onCancelMerge}
-              className="rounded-md border border-slate-300 px-3 py-1.5 text-sm text-slate-700 hover:bg-slate-50"
-            >
+            </Button>
+            <Button size="sm" disabled={queueBusy} onClick={onCancelMerge}>
               Cancel
-            </button>
+            </Button>
           </div>
         </div>
       ) : (
-        <div className="mt-4 flex flex-wrap gap-2">
-          <button
-            type="button"
-            disabled={queueBusy}
-            onClick={onReviewMergeImpact}
-            className="rounded-md bg-slate-800 px-3 py-1.5 text-sm font-medium text-white hover:bg-slate-900 disabled:opacity-50"
-          >
+        <div className="flex flex-wrap items-center gap-2">
+          <Button variant="primary" size="sm" icon="merge" disabled={queueBusy} onClick={onReviewMergeImpact}>
             Review merge impact
-          </button>
-          <button
-            type="button"
-            disabled={queueBusy}
-            onClick={() => onSaveDecision('needs_research')}
-            className="rounded-md border border-amber-400 bg-amber-50 px-3 py-1.5 text-sm font-medium text-amber-800 hover:bg-amber-100 disabled:opacity-50"
-          >
+          </Button>
+          <Button size="sm" disabled={queueBusy} onClick={() => onSaveDecision('needs_research')}>
+            <Icon name="flag" size={14} className="text-tone-warn-fg" />
             Needs research
-          </button>
-          <button
-            type="button"
-            disabled={queueBusy}
-            onClick={() => onSaveDecision('not_duplicate')}
-            className="rounded-md border border-slate-300 px-3 py-1.5 text-sm font-medium text-slate-700 hover:bg-slate-50 disabled:opacity-50"
-          >
+          </Button>
+          <Button size="sm" icon="x" disabled={queueBusy} onClick={() => onSaveDecision('not_duplicate')}>
             Not duplicate
-          </button>
+          </Button>
+          <span className="ml-auto text-meta text-fg-subtle">then jumps to the next candidate</span>
         </div>
       )}
-    </section>
+    </GlassCard>
   );
 }

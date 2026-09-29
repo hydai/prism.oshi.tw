@@ -19,8 +19,6 @@ export interface WorkReviewState {
   totalPages: number;
   loading: boolean;
   scanError: string | null;
-  actionError: string | null;
-  message: string | null;
   refreshVersion: number;
   confirmingCandidateKey: string | null;
   actionCandidateKey: string | null;
@@ -64,8 +62,6 @@ export const initialWorkReviewState: WorkReviewState = {
   totalPages: 0,
   loading: true,
   scanError: null,
-  actionError: null,
-  message: null,
   refreshVersion: 0,
   confirmingCandidateKey: null,
   actionCandidateKey: null,
@@ -85,6 +81,21 @@ export function isWorkReviewQueueBusy(state: WorkReviewState): boolean {
   return state.actionCandidateKey !== null || state.rereading || state.rereadError !== null;
 }
 
+/**
+ * The list count: the slice of the filter this page covers by the server's own numbers, "{start}–{end}
+ * of {total}". It counts neither the rows on screen nor how they came: a decided row kept on screen
+ * has usually left the filter (the re-read's `total` no longer counts it), and a row a re-read
+ * appended fills a place in the slice. So the rows on screen may outnumber the slice, while the count
+ * stays true to the server: the start never passes the end, the end never passes the total. Once the
+ * page lies past the filter's end (every row of the last page decided away, or an empty filter),
+ * the slice is empty: "0 of {total}".
+ */
+export function candidateRangeLabel(page: number, pageSize: number, total: number): string {
+  const start = (page - 1) * pageSize + 1;
+  const end = Math.min(page * pageSize, total);
+  return start > end ? `0 of ${total}` : `${start}–${end} of ${total}`;
+}
+
 export type WorkReviewAction =
   | { type: 'scanStarted' }
   | { type: 'scanPageCorrected'; page: number }
@@ -93,8 +104,6 @@ export type WorkReviewAction =
   | { type: 'scanFinished' }
   | { type: 'refreshRequested' }
   | { type: 'actionStarted'; candidateKey: string }
-  | { type: 'actionSucceeded'; message: string }
-  | { type: 'actionFailed'; error: string }
   | { type: 'actionFinished' }
   | { type: 'filterChanged'; filter: WorkMatchFilter }
   | { type: 'previousPageRequested' }
@@ -183,16 +192,7 @@ export function workReviewReducer(
         refreshVersion: state.refreshVersion + 1,
       };
     case 'actionStarted':
-      return {
-        ...state,
-        actionCandidateKey: action.candidateKey,
-        actionError: null,
-        message: null,
-      };
-    case 'actionSucceeded':
-      return { ...state, message: action.message };
-    case 'actionFailed':
-      return { ...state, actionError: action.error };
+      return { ...state, actionCandidateKey: action.candidateKey };
     case 'actionFinished':
       return { ...state, actionCandidateKey: null };
     case 'filterChanged':
@@ -200,8 +200,6 @@ export function workReviewReducer(
         ...state,
         filter: action.filter,
         page: 1,
-        actionError: null,
-        message: null,
         confirmingCandidateKey: null,
         // The active filter on page 1 changes nothing the page's scan is keyed on, so no scan
         // follows: the rows on screen stay, and so does which of them are decided.
@@ -211,8 +209,6 @@ export function workReviewReducer(
       return {
         ...state,
         page: Math.max(1, state.page - 1),
-        actionError: null,
-        message: null,
         confirmingCandidateKey: null,
         // At page 1 the page does not change, so no scan follows and the decided rows stay.
         decided: state.page > 1 ? {} : state.decided,
@@ -221,8 +217,6 @@ export function workReviewReducer(
       return {
         ...state,
         page: Math.min(state.totalPages, state.page + 1),
-        actionError: null,
-        message: null,
         confirmingCandidateKey: null,
         // The same at the last page.
         decided: state.page < state.totalPages ? {} : state.decided,

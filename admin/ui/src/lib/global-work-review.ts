@@ -1,8 +1,21 @@
 import { GLOBAL_WORK_MERGE_SOURCE_LIMIT } from '../../../shared/types';
-import type { WorkMatchCandidate } from '../../../shared/types';
+import type { WorkMatchCandidate, WorkMatchDecision } from '../../../shared/types';
+import type { Tone } from '../components/ui/pill-core';
 
 export function candidateReviewStateKey(candidate: WorkMatchCandidate): string {
   return `${candidate.candidateKey}:${candidate.fingerprint}`;
+}
+
+/**
+ * The pill a candidate's decision wears, in the review queue's list and in its detail: a decision
+ * saved on the server (`candidate.decision`) or made in this view (a merge included); with none yet
+ * it is pending review.
+ */
+export function decisionPill(decision: WorkMatchDecision | 'merged' | null): { label: string; tone: Tone } {
+  if (decision === 'not_duplicate') return { label: 'Not duplicate', tone: 'neutral' };
+  if (decision === 'needs_research') return { label: 'Needs research', tone: 'warn' };
+  if (decision === 'merged') return { label: 'Merged', tone: 'ok' };
+  return { label: 'Pending review', tone: 'neutral' };
 }
 
 /**
