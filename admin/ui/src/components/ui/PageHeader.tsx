@@ -21,10 +21,18 @@ import type { ReactNode } from 'react';
  * line simply wraps to the next, growing the bar instead of clipping or overlapping it. Below
  * 640px each of the title block, `children` and `actions` is additionally forced to its own full
  * width (`max-sm:w-full`), so they stack one per line even where two of them might otherwise have
- * technically fit side by side. Below 1280px, where the bar may wrap and a THead does not stick
- * (R31), `max-xl:py-1.5` gives its rows 6px above and below. From 1280px there is no vertical
- * padding at all: a one-row bar is then exactly its 62 / 76px minimum even when the title block
- * carries a meta row (~55px) — the height a sticky THead's `top-[62px]` counts on.
+ * technically fit side by side. `py-1.5` keeps its rows 6px from its edges at every width, so a bar
+ * that wraps — the Harmonizer's, even at 1440px — never has a row against its top or bottom edge,
+ * while a one-row bar is still exactly its 62 / 76px minimum: its tallest control (~39px) leaves
+ * the minimum room for the padding. That is the height a sticky THead's `top-[62px]` counts on. A
+ * title block with a meta row (~55px; Stream Detail's ~67px) leaves no such room, so a bar with
+ * `meta` keeps the padding below 1280px only (`max-xl:py-1.5`), where a THead does not stick (R31).
+ *
+ * `actions` never grows wider than the bar (`max-w-full`), and wraps what does not fit on its row
+ * (`flex-wrap`); a wrapping element in it (the Harmonizer's scan controls) can then fold down to its
+ * widest single control. Uncapped, it kept its one-line width wherever it landed, and a set of
+ * controls wider than the bar pushed `<main>` into a sideways scroll (between 640 and ~740px, just
+ * above the 640px `max-sm:w-full` that caps it below).
  */
 export function PageHeader({
   crumb,
@@ -60,9 +68,9 @@ export function PageHeader({
 
   return (
     <header
-      className={`glass-header-host relative z-20 flex flex-wrap items-center gap-3 px-5 before:border-x-0 before:border-t-0 max-xl:py-1.5 lg:sticky lg:top-0 ${
-        tall ? 'min-h-[76px]' : 'min-h-[62px]'
-      }`}
+      className={`glass-header-host relative z-20 flex flex-wrap items-center gap-3 px-5 before:border-x-0 before:border-t-0 ${
+        meta ? 'max-xl:py-1.5' : 'py-1.5'
+      } lg:sticky lg:top-0 ${tall ? 'min-h-[76px]' : 'min-h-[62px]'}`}
     >
       <div className={recordTitle ? 'min-w-0 flex-1 basis-[20rem] max-sm:w-full' : 'min-w-0 max-sm:w-full'}>
         <div className={crumbClasses}>{crumb}</div>
@@ -73,7 +81,9 @@ export function PageHeader({
       </div>
       {children ? <div className="flex min-w-0 items-center gap-2 max-sm:w-full">{children}</div> : null}
       {actions ? (
-        <div className="ml-auto flex shrink-0 items-center gap-2 max-sm:ml-0 max-sm:w-full">{actions}</div>
+        <div className="ml-auto flex max-w-full shrink-0 flex-wrap items-center gap-2 max-sm:ml-0 max-sm:w-full">
+          {actions}
+        </div>
       ) : null}
     </header>
   );
