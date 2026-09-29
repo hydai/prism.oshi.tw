@@ -265,7 +265,8 @@ export function DiscoverStep({ hidden, discover }: { hidden: boolean; discover: 
               title="Find new karaoke streams"
               body={`Scans ${streamerName}'s YouTube channel for karaoke streams.`}
               action={
-                <Button variant="primary" busy={loading} onClick={() => void discover.run()}>
+                // Like the header's: no scan starts while an import runs (which ends with its own).
+                <Button variant="primary" busy={loading} disabled={importing} onClick={() => void discover.run()}>
                   Discover streams
                 </Button>
               }
@@ -296,11 +297,13 @@ export function DiscoverStep({ hidden, discover }: { hidden: boolean; discover: 
 
       {!hidden && selected.size > 0 ? (
         <BulkBar countLabel={`已選 ${selected.size} 部新影片`}>
+          {/* A scan's answer replaces the rows and the selection: nothing imports until it is back. */}
           <Button
             variant="primary"
             size="sm"
             icon="download"
             busy={importing}
+            disabled={loading}
             onClick={() => void discover.importSelected()}
           >
             Import as pending streams
