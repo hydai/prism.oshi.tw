@@ -3,6 +3,8 @@ import {
   HARMONIZE_MERGE_SOURCE_LIMIT,
   type HarmonizeSongEntry,
 } from '../../shared/types';
+import { installDom } from './helpers/dom';
+import { NO_RAW_PALETTE } from './helpers/palette';
 
 function assert(condition: boolean, message: string): asserts condition {
   if (!condition) throw new Error(message);
@@ -50,9 +52,12 @@ function song(id: string, workId: string | null): HarmonizeSongEntry {
 
 async function main(): Promise<void> {
   installLocalStorage();
+  installDom();
   const { default: WorkIdBadge } = await import(
     '../src/components/harmonizer/WorkIdBadge'
   );
+  const { Pill } = await import('../src/components/ui/Pill');
+  const { TONE_BOX_CLASS } = await import('../src/components/ui/pill-core');
   const { default: WorkMergeNotice } = await import(
     '../src/components/harmonizer/WorkMergeNotice'
   );
@@ -141,6 +146,11 @@ async function main(): Promise<void> {
   assert(linkedBadge.includes('work-one'), 'Harmonizer renders linked workId values');
   const unlinkedBadge = renderToStaticMarkup(<WorkIdBadge workId={null} />);
   assert(unlinkedBadge.includes('UNLINKED'), 'Harmonizer renders an explicit missing-work warning');
+  assert(
+    unlinkedBadge === renderToStaticMarkup(<Pill tone="danger">UNLINKED</Pill>),
+    `a missing workId is the danger pill UNLINKED (got ${unlinkedBadge})`,
+  );
+  assert(!NO_RAW_PALETTE.test(linkedBadge + unlinkedBadge), 'the work ID badge uses no raw Tailwind palette class');
 
   const localNotice = renderToStaticMarkup(<WorkMergeNotice plan={sameWorkPlan} />);
   assert(localNotice.includes('Local duplicate merge only'), 'same-work impact is explicit');
@@ -149,6 +159,39 @@ async function main(): Promise<void> {
   assert(globalNotice.includes('across all VTubers'), 'cross-work warning states its site-wide scope');
   const blockedNotice = renderToStaticMarkup(<WorkMergeNotice plan={unlinkedPlan} />);
   assert(blockedNotice.includes('Merge blocked'), 'unlinked group visibly blocks merging');
+
+  // Each notice is the kit's tone Note: its box wears the tone's classes, the texts stay as they were.
+  const noticeText = (html: string): string => {
+    const box = document.createElement('div');
+    box.innerHTML = html;
+    return box.textContent ?? '';
+  };
+  const noteRoot = (html: string): string => /^<div class="([^"]*)"/.exec(html)?.[1] ?? '';
+  for (const [name, html, tone, text] of [
+    [
+      'the local notice',
+      localNotice,
+      TONE_BOX_CLASS.ok,
+      'Local duplicate merge only. Every selected song already uses workId work-one, so the global work identity will stay unchanged.',
+    ],
+    [
+      'the global notice',
+      globalNotice,
+      TONE_BOX_CLASS.warn,
+      'Global work merge required. The selected canonical workId is work-one. Merging will retire work-two and repoint every linked song across all VTubers.',
+    ],
+    [
+      'the blocked notice',
+      blockedNotice,
+      TONE_BOX_CLASS.danger,
+      'Merge blocked: 1 selected song record(s) do not have a workId. Link every song to a global work before merging.',
+    ],
+  ] as const) {
+    assert(noteRoot(html).includes(tone), `${name} is a Note in its tone (${tone})`);
+    assert(noteRoot(html).includes('rounded-radius-lg'), `${name} has the Note's box`);
+    assert(noticeText(html) === text, `${name} keeps its text (got ${noticeText(html)})`);
+    assert(!NO_RAW_PALETTE.test(html), `${name} uses no raw Tailwind palette class`);
+  }
 
   console.log('✓ Harmonizer exposes workId and requires explicit global-work merges');
 }

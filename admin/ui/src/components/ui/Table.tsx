@@ -53,8 +53,12 @@ export function Table({ children, className }: { children: ReactNode; className?
  * it, over the first rows. `bg-thead-bg` (glass-pop's colour at 97 %) paints a near-opaque surface
  * so scrolled rows don't read through it — deliberately no blur, since a sticky table head is not
  * on the spec §4.2 blur list (ruling R24).
+ *
+ * `sticky={false}`: a plain head for a table that does not sit right under the page header — one
+ * inside a review queue's detail, where a head stuck at 62 px would float over the detail above it.
  */
-export function THead({ children }: { children: ReactNode }) {
+export function THead({ children, sticky = true }: { children: ReactNode; sticky?: boolean }) {
+  if (!sticky) return <thead>{children}</thead>;
   return <thead className="z-10 bg-thead-bg xl:sticky xl:top-[62px]">{children}</thead>;
 }
 

@@ -1,7 +1,9 @@
 import { readFileSync } from 'node:fs';
+import { useState } from 'react';
 import { renderToStaticMarkup } from 'react-dom/server';
 import type { HarmonizeSongEntry } from '../../shared/types';
-import { useHarmonizeScan } from '../src/hooks/useHarmonizeScan';
+import { useHarmonizeScan, type HarmonizeScanResponse } from '../src/hooks/useHarmonizeScan';
+import { click, installDom, mount } from './helpers/dom';
 
 /**
  * Both harmonizer tabs opened with the same eight scan-state slots. They now
@@ -73,3 +75,80 @@ assert(songs.includes('if (applying.size > 0) return;'), 'merges stay serialized
 assert(songs.includes('SimilarSongGroupCard'), 'the songs tab still renders its own group card');
 
 console.log('✓ one scan-state shell for both harmonizer tabs');
+
+// --- scan() resolves with what it scanned, so a tab can act on the result in its own handler ---
+
+installDom();
+
+type ProbeStats = { groupCount: number };
+
+const FOUND: HarmonizeScanResponse<HarmonizeSongEntry, ProbeStats> = {
+  groups: [
+    {
+      normalizedKey: 'song',
+      matchType: 'exact',
+      items: [
+        { id: 'song-1', workId: 'work-1', title: 'Song', originalArtist: 'Artist', status: 'approved', createdAt: '2026-08-01', performanceCount: 2 },
+        { id: 'song-2', workId: 'work-1', title: 'song', originalArtist: 'Artist', status: 'approved', createdAt: '2026-08-02', performanceCount: 1 },
+      ],
+    },
+  ],
+  stats: { groupCount: 1 },
+};
+
+/** Scans on a click and writes what `scan()` resolved with into its `<output>`. */
+function ScanProbe({ fetchScan }: { fetchScan: () => Promise<HarmonizeScanResponse<HarmonizeSongEntry, ProbeStats>> }) {
+  const scan = useHarmonizeScan<HarmonizeSongEntry, ProbeStats>(fetchScan, (items) => items[0]?.id ?? '');
+  const [resolved, setResolved] = useState('nothing yet');
+  const runScan = async () => {
+    const result = await scan.scan();
+    setResolved(result === null ? 'null' : `groups=${result.groups.length} stats=${result.stats.groupCount}`);
+  };
+  return (
+    <div>
+      <button type="button" onClick={() => void runScan()}>
+        Scan
+      </button>
+      <button type="button" onClick={() => scan.setMode('fuzzy')}>
+        Fuzzy
+      </button>
+      <button type="button" onClick={() => scan.setThreshold(0.3)}>
+        Threshold 0.3
+      </button>
+      <output>{`${resolved} error=${String(scan.error)}`}</output>
+    </div>
+  );
+}
+
+let fetches = 0;
+/** Read through a call, so an assertion on one count does not narrow the next. */
+const fetchCount = () => fetches;
+const probe = await mount(
+  <ScanProbe
+    fetchScan={async () => {
+      fetches += 1;
+      if (fetches === 2) throw new Error('scan failed');
+      return FOUND;
+    }}
+  />,
+);
+const button = (label: string) =>
+  [...probe.container.querySelectorAll('button')].find((candidate) => candidate.textContent === label);
+const resolvedText = () => probe.container.querySelector('output')?.textContent ?? '';
+
+await click(button('Scan'), 'the Scan button');
+assert(fetchCount() === 1, 'the scan ran');
+assert(resolvedText() === 'groups=1 stats=1 error=null', `scan() resolves with the response it applied (got ${resolvedText()})`);
+
+await click(button('Scan'), 'the Scan button');
+assert(fetchCount() === 2, 'the second scan ran');
+assert(resolvedText() === 'null error=scan failed', `a failed scan resolves with null and shows its error (got ${resolvedText()})`);
+
+await click(button('Fuzzy'), 'the Fuzzy button');
+await click(button('Threshold 0.3'), 'the out-of-range threshold button');
+await click(button('Scan'), 'the Scan button');
+assert(fetchCount() === 2, 'a fuzzy scan with an out-of-range threshold does not run');
+assert(resolvedText().startsWith('null '), `a scan that did not run resolves with null (got ${resolvedText()})`);
+await probe.unmount();
+
+console.log('✓ scan() resolves with the scan response, or null when it did not run or failed');

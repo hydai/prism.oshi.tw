@@ -29,7 +29,12 @@ export interface HarmonizeScan<Entry, Stats> {
   setCanonical: (groupKey: string, canonical: string) => void;
   expanded: Set<string>;
   toggleExpanded: (groupKey: string) => void;
-  scan: () => Promise<void>;
+  /**
+   * Runs a scan and resolves with the response it applied, or `null` when it did not run (a fuzzy
+   * threshold out of range) or failed (`error` says why) — so a tab acts on the result in its own
+   * handler rather than in an effect.
+   */
+  scan: () => Promise<HarmonizeScanResponse<Entry, Stats> | null>;
   /** Drop one group once its merge has been applied. */
   dropGroup: (groupKey: string) => void;
   /** Drop every group (an "apply all" that succeeded). */
@@ -60,8 +65,8 @@ export function useHarmonizeScan<Entry, Stats>(
   const [expanded, setExpanded] = useState<Set<string>>(new Set());
   const thresholdIsValid = isNumberInRange(threshold, 0.5, 1);
 
-  const scan = async () => {
-    if (mode === 'fuzzy' && !thresholdIsValid) return;
+  const scan = async (): Promise<HarmonizeScanResponse<Entry, Stats> | null> => {
+    if (mode === 'fuzzy' && !thresholdIsValid) return null;
 
     setLoading(true);
     setError(null);
@@ -78,8 +83,10 @@ export function useHarmonizeScan<Entry, Stats>(
       }
       setCanonicals(nextCanonicals);
       setExpanded(nextExpanded);
+      return res;
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Failed to scan');
+      return null;
     } finally {
       setLoading(false);
     }

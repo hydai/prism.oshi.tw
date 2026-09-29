@@ -190,6 +190,46 @@ function TwoQueues() {
   );
 }
 
+const EIGHT: readonly Row[] = Array.from({ length: 8 }, (_, index) => ({ id: `q${index + 1}`, title: `Song ${index + 1}` }));
+
+/**
+ * A page that replaces its list under a selection that stays put, as a Work Review refresh or a new
+ * Harmonizer scan does. The rows sit in state, so `Queue` gets the very same array on every render
+ * until a button swaps it: "Render again" re-renders with the same `items`, "Drop the first two"
+ * removes the rows above the selected one, "Replace the list" swaps in an equal list, and "Load the
+ * rows" brings them in after the selection was set.
+ */
+function Refreshed({
+  label,
+  initialRows,
+  initialKey,
+}: {
+  label: string;
+  initialRows: readonly Row[];
+  initialKey: string;
+}) {
+  const [rows, setRows] = useState(initialRows);
+  const [renders, setRenders] = useState(0);
+  return (
+    <div>
+      <button type="button" onClick={() => setRenders((count) => count + 1)}>
+        Render again
+      </button>
+      <button type="button" onClick={() => setRows((current) => current.slice(2))}>
+        Drop the first two
+      </button>
+      <button type="button" onClick={() => setRows((current) => [...current])}>
+        Replace the list
+      </button>
+      <button type="button" onClick={() => setRows(EIGHT)}>
+        Load the rows
+      </button>
+      <output>{`renders: ${renders}`}</output>
+      <Queue label={label} rows={rows} initialKey={initialKey} emptyList={<p>No candidates yet</p>} />
+    </div>
+  );
+}
+
 function listNamed(label: string): HTMLUListElement {
   const list = document.querySelector<HTMLUListElement>(`ul[aria-label="${label}"]`);
   assert(list !== null, `a list is named "${label}"`);
@@ -669,6 +709,69 @@ try {
   assert(keydown.attached() === 0, 'unmounting both queues leaves no listener');
 
   console.log('✓ QueueLayout: two queues mounted, J moves only the enabled one; switching hands the listener over');
+
+  // --- A queue whose keyboard comes back scrolls its list to the selected row again ---
+
+  const returning = await mount(<TwoQueues />);
+  await press(document.body, 'j');
+  assert(selectedIn('Similar songs') === 'A Thousand Years', 'J selects the next row of the active queue');
+  assert(scrollOf('Similar songs') === 50, 'and its list scrolls to that row (120–180)');
+  await click(buttonNamed(returning.container, 'Switch tab'), 'the tab switch');
+  assert(scrollOf('Similar songs') === 50, 'losing the keyboard moves nothing while the row is in view');
+  // A list inside a `hidden` tab loses its scroll offset. happy-dom keeps it, so the test drops it.
+  listNamed('Similar songs').scrollTop = 0;
+  await click(buttonNamed(returning.container, 'Switch tab'), 'the tab switch back');
+  assert(selectedIn('Similar songs') === 'A Thousand Years', 'the selection survived the round trip');
+  assert(
+    scrollOf('Similar songs') === 50,
+    'with its keyboard back (keyboardEnabled false → true), the list scrolls to the selected row (120–180) again',
+  );
+  assert(scrollOf('Similar artists') === 0, 'the other queue list stays where it was (its row 60–120 is in view)');
+  assert(scrolls.count() === 0 && onlyTheListScrolled('Similar songs'), 'only the list scrolled: no scrollIntoView');
+  await returning.unmount();
+
+  console.log('✓ QueueLayout: a queue whose keyboard comes back (its tab shown again) scrolls its list to the selected row');
+
+  // --- A list replaced under a selection that stays: its row is checked again ---
+
+  // Eight rows (0–480) in a list showing 130 px of them, the selection on Song 6 (300–360).
+  const REFRESHED = 'Refreshed queue';
+  const refreshed = await mount(<Refreshed label={REFRESHED} initialRows={EIGHT} initialKey="q6" />);
+  assert(selectedIn(REFRESHED) === 'Song 6', 'the page preselects Song 6');
+  assert(scrollOf(REFRESHED) === 230, 'the preselected row below the visible window (300–360) is scrolled into it on the first render');
+
+  // A refresh drops the two rows above the selection, which moves up to 180–240; the list keeps the
+  // offset it had (230), so the selected row now sits above the window it shows (230–360).
+  await click(buttonNamed(refreshed.container, 'Drop the first two'), 'the Drop the first two button');
+  assert(selectedIn(REFRESHED) === 'Song 6', 'the selection stays on Song 6 when the rows above it go');
+  assert(scrollOf(REFRESHED) === 180, 'the list scrolls to the selected row (180–240), which its kept offset (230) had left above the window');
+
+  // A curator who scrolled away from the selected row is left there by a re-render with the same items.
+  listNamed(REFRESHED).scrollTop = 0;
+  await click(buttonNamed(refreshed.container, 'Render again'), 'the Render again button');
+  assert(refreshed.container.querySelector('output')?.textContent === 'renders: 1', 'the page rendered again');
+  assert(scrollOf(REFRESHED) === 0, 'a re-render with the same items leaves a list the curator scrolled away alone');
+
+  // Any replacement checks the row again, equal rows or not: Song 6 (180–240) is below the window (0–130).
+  await click(buttonNamed(refreshed.container, 'Replace the list'), 'the Replace the list button');
+  assert(selectedIn(REFRESHED) === 'Song 6', 'the selection stays on Song 6 through the replacement');
+  assert(scrollOf(REFRESHED) === 110, 'a replaced list scrolls to the selected row again: its bottom edge (240) at the end of the window');
+  assert(scrolls.count() === 0 && onlyTheListScrolled(REFRESHED), 'only the list scrolled: no scrollIntoView, nothing around it moved');
+  await refreshed.unmount();
+
+  // A key set before its rows arrive: the first check finds no list, so the rows' arrival is the next.
+  const ARRIVING = 'Arriving queue';
+  const arriving = await mount(<Refreshed label={ARRIVING} initialRows={[]} initialKey="q6" />);
+  assert(arriving.container.querySelector('ul') === null, 'without rows there is no list to scroll');
+  await click(buttonNamed(arriving.container, 'Load the rows'), 'the Load the rows button');
+  assert(selectedIn(ARRIVING) === 'Song 6', 'the key set before its rows is the selected row once they arrive');
+  assert(scrollOf(ARRIVING) === 230, 'and the list scrolls to it (300–360) as they do');
+  assert(scrolls.count() === 0 && onlyTheListScrolled(ARRIVING), 'only the list scrolled: no scrollIntoView, nothing around it moved');
+  await arriving.unmount();
+
+  console.log(
+    '✓ QueueLayout: a list replaced under an unchanged selection — rows dropped above it, an equal list, rows arriving after the key — scrolls to the selected row again; a re-render with the same items leaves the list alone',
+  );
 
   // --- No items: the empty-list slot in place of the list ---
 
