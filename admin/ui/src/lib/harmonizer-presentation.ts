@@ -10,6 +10,11 @@ export function matchTypeClasses(matchType: HarmonizeGroupMatchType): string {
   return 'bg-yellow-100 text-yellow-700';
 }
 
+/** A count with its noun: "1 group", "4 groups". */
+export function counted(count: number, one: string, many: string): string {
+  return `${count} ${count === 1 ? one : many}`;
+}
+
 /** How a group's match type reads as a pill: Exact (ok), Fuzzy (warn) or Work ID (info). */
 export function matchTypePill(matchType: HarmonizeGroupMatchType): { label: string; tone: Tone } {
   if (matchType === 'exact') return { label: 'Exact', tone: 'ok' };
