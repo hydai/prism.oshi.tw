@@ -1,16 +1,16 @@
 import type { StatusCounts } from '../../../../shared/types';
-import { CATALOG_STATUSES, catalogSegments } from '../../lib/dashboard-data';
-import type { Tone } from '../ui/Pill';
+import { CATALOG_STATUSES, catalogSegments, type CatalogTone } from '../../lib/dashboard-data';
 
-/** A status's fill: the tone's text colour, the strongest of its three (spec §4.1). */
-const FILL_CLASSES: Record<Tone, string> = {
-  ok: 'bg-tone-ok-fg',
-  warn: 'bg-tone-warn-fg',
-  danger: 'bg-tone-danger-fg',
-  info: 'bg-tone-info-fg',
-  neutral: 'bg-tone-neutral-fg',
-  violet: 'bg-tone-violet-fg',
-  teal: 'bg-tone-teal-fg',
+/**
+ * A status's fill: its tone's chart colour (`--chart-*`), lighter than the tone's text colour in the
+ * light theme and the same as it in the dark one.
+ */
+const FILL_CLASSES: Record<CatalogTone, string> = {
+  ok: 'bg-chart-ok',
+  warn: 'bg-chart-warn',
+  danger: 'bg-chart-danger',
+  neutral: 'bg-chart-neutral',
+  teal: 'bg-chart-teal',
 };
 
 /**

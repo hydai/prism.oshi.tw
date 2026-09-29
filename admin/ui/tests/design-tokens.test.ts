@@ -124,6 +124,14 @@ const TOKENS: Array<{ name: string; light: string; dark: string }> = [
   // The "hot" border (a slot recording, with no end timestamp yet) — pink, distinct from the
   // focus ring so a real :focus-visible stays visible on top of it.
   { name: 'hot-line', light: '#F9A8D4', dark: 'rgba(244,114,182,.55)' },
+  // The catalog bars' fills (not in the spec table): a bar is a fill, not text, so no contrast check
+  // holds it. Lighter than the tone's text colour in the light theme; the dark theme keeps each
+  // tone's text colour, which is what the bars were drawn in before these tokens.
+  { name: 'chart-ok', light: '#34D399', dark: '#6EE7B7' },
+  { name: 'chart-warn', light: '#FBBF24', dark: '#FBBF24' },
+  { name: 'chart-danger', light: '#F87171', dark: '#FCA5A5' },
+  { name: 'chart-neutral', light: '#CBD5E1', dark: '#A7A4BA' },
+  { name: 'chart-teal', light: '#2DD4BF', dark: '#5EEAD4' },
   // Tooltip surface (task 2 fix round 1, ruling R10): deliberately theme-invariant in
   // direction (always a dark chip in light mode, always a light chip in dark mode),
   // unlike every other token above.
@@ -405,6 +413,11 @@ async function main(): Promise<void> {
       const expected = `var(--tone-${t.name}-${key})`;
       assert(tone?.[t.name]?.[key] === expected, `colors.tone.${t.name}.${key} maps to ${expected}`);
     }
+  }
+
+  const chart = colors.chart as Record<string, unknown> | undefined;
+  for (const name of ['ok', 'warn', 'danger', 'neutral', 'teal']) {
+    assert(chart?.[name] === `var(--chart-${name})`, `colors.chart.${name} maps to var(--chart-${name})`);
   }
 
   const tooltip = colors.tooltip as Record<string, unknown> | undefined;
