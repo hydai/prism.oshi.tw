@@ -5,7 +5,7 @@ import { api } from '../api/client';
 import type { VodExportStatusResponse } from '../api/vodExportTypes';
 import { AttentionCard } from '../components/dashboard/AttentionCard';
 import { CatalogBars } from '../components/dashboard/CatalogBars';
-import { useInboxCounts } from '../components/shell/InboxCounts';
+import { useInboxCounts, type InboxCounts } from '../components/shell/InboxCounts';
 import { useCurrentStreamerName } from '../components/shell/Streamers';
 import { Button } from '../components/ui/Button';
 import { EmptyState, GlassCard, Skeleton } from '../components/ui/Display';
@@ -31,8 +31,15 @@ type LoadState = 'loading' | 'error' | 'ready';
 /** Where a card or a section stands: its load's own state, or a Retry of that failed load still running. */
 type ShownState = LoadState | 'retrying';
 
-/** The page's own loads, by name (the inbox counts are the shell's). */
-type LoadName = 'stats' | 'stampStats' | 'stampStreams' | 'pendingStreams' | 'workMatches' | 'vodStatus';
+/** The page's loads, by name: its own six, then the shell's three inbox lists. */
+type LoadName =
+  | 'stats'
+  | 'stampStats'
+  | 'stampStreams'
+  | 'pendingStreams'
+  | 'workMatches'
+  | 'vodStatus'
+  | keyof InboxCounts;
 
 /**
  * Where one load stands. An error wins over data: `useApiResource` keeps a failed reload's previous
@@ -52,6 +59,17 @@ function combined(first: ShownState, second: ShownState): ShownState {
   if (first === 'error' || second === 'error') return 'error';
   if (first === 'retrying' || second === 'retrying') return 'retrying';
   return first;
+}
+
+/**
+ * A card whose value needs every one of its loads (the Inbox card's total): a failure of any wins
+ * (its Retry reloads what failed), then a Retry still running, then a load still owed; ready once
+ * all are.
+ */
+function allOf(states: readonly ShownState[]): ShownState {
+  if (states.includes('error')) return 'error';
+  if (states.includes('retrying')) return 'retrying';
+  return states.includes('loading') ? 'loading' : 'ready';
 }
 
 // --- Needs attention ---
@@ -87,6 +105,31 @@ function InboxChip({ to, label, count }: { to: string; label: string; count: num
     >
       {label} <b className="ml-0.5 font-bold text-fg">{count === null ? '—' : count.toLocaleString()}</b>
     </Link>
+  );
+}
+
+/**
+ * The Inbox card over the shell's three inbox lists, in `state` like the other cards: its total once
+ * all three counts are known, and a chip linking to each inbox in every state, `—` while its count
+ * is unknown.
+ */
+function InboxCard({ state, counts, onRetry }: { state: ShownState; counts: InboxCounts; onRetry: () => void }) {
+  return (
+    <AttentionCard
+      icon="inbox"
+      tone="info"
+      title="Inbox"
+      state={state}
+      value={inboxTotal(counts)?.toLocaleString()}
+      unit="waiting"
+      onRetry={onRetry}
+    >
+      <div className="flex flex-wrap gap-[5px]">
+        <InboxChip to="/nova" label="Nova" count={counts.nova} />
+        <InboxChip to="/nova/vods" label="VODs" count={counts.vods} />
+        <InboxChip to="/crystal" label="Crystal" count={counts.crystal} />
+      </div>
+    </AttentionCard>
   );
 }
 
@@ -291,9 +334,9 @@ function UpdatedAgo({ at }: { at: number }) {
 /**
  * What needs attention today (spec §8.1): five cards — To stamp, Streams to review, Inbox, and for
  * a curator Duplicate candidates and VOD export — each loading and failing on its own; the catalog
- * as stacked bars; the streams to continue stamping; the newest submissions. Six loads, each with
- * its own Retry; Refresh reloads all six and the inbox counts. A contributor's page never asks for
- * the curator-only data.
+ * as stacked bars; the streams to continue stamping; the newest submissions. Six loads of its own
+ * and the shell's three inbox lists, each failure with its own Retry; Refresh reloads all nine. A
+ * contributor's page never asks for the curator-only data.
  */
 export default function Dashboard({ user }: { user: AuthUser }) {
   const isCurator = user.role === 'curator';
@@ -327,6 +370,10 @@ export default function Dashboard({ user }: { user: AuthUser }) {
     pendingStreams,
     workMatches,
     vodStatus,
+    // The shell's inbox lists: each count stands for its data, and a reload is that list's refresh.
+    nova: { ...inbox.loads.nova, data: inbox.nova, reload: () => inbox.refresh('nova') },
+    vods: { ...inbox.loads.vods, data: inbox.vods, reload: () => inbox.refresh('vods') },
+    crystal: { ...inbox.loads.crystal, data: inbox.crystal, reload: () => inbox.refresh('crystal') },
   };
 
   /**
@@ -352,7 +399,17 @@ export default function Dashboard({ user }: { user: AuthUser }) {
     // keeps today's stale-while-revalidate treatment. Read before `reload()` changes `loading`.
     // A plain loop, not `.filter()`: a callback here reads as impure-during-render to the compiler
     // once this function also calls `Date.now()` below.
-    const loadNames: LoadName[] = ['stats', 'stampStats', 'stampStreams', 'pendingStreams', 'workMatches', 'vodStatus'];
+    const loadNames: LoadName[] = [
+      'stats',
+      'stampStats',
+      'stampStreams',
+      'pendingStreams',
+      'workMatches',
+      'vodStatus',
+      'nova',
+      'vods',
+      'crystal',
+    ];
     const stillFailing: LoadName[] = [];
     for (const name of loadNames) {
       if (loads[name].error !== null || (retried.has(name) && loads[name].loading)) stillFailing.push(name);
@@ -390,7 +447,11 @@ export default function Dashboard({ user }: { user: AuthUser }) {
   let reviewSub: string | undefined;
   if (pendingList) reviewSub = oldestPending ? `Oldest from ${oldestPending}` : 'Nothing waiting';
 
-  const waiting = inboxTotal(inbox);
+  // The Inbox card, over the shell's three inbox lists. A list's count shows once that list is shown
+  // ready — on its chip, and in the total, which needs all three — never while a Retry of it runs.
+  const inboxCount = (name: keyof InboxCounts) => (shown(name) === 'ready' ? inbox[name] : null);
+  const inboxCounts: InboxCounts = { nova: inboxCount('nova'), vods: inboxCount('vods'), crystal: inboxCount('crystal') };
+  const inboxState = allOf([shown('nova'), shown('vods'), shown('crystal')]);
   const matchStats = workMatches.data;
   const vod = vodStatus.data;
   const vodState = vod ? vodExportState(vod) : null;
@@ -497,23 +558,7 @@ export default function Dashboard({ user }: { user: AuthUser }) {
               />
             </li>
             <li className="min-w-0">
-              {/* The inbox counts are the shell's, unknown (`null`) until loaded: never a failure of
-                  this page's own, so the card is always ready, with `—` while a count is unknown. */}
-              <AttentionCard
-                icon="inbox"
-                tone="info"
-                title="Inbox"
-                state="ready"
-                value={waiting === null ? '—' : waiting.toLocaleString()}
-                unit={waiting === null ? undefined : 'waiting'}
-                onRetry={() => inbox.refresh()}
-              >
-                <div className="flex flex-wrap gap-[5px]">
-                  <InboxChip to="/nova" label="Nova" count={inbox.nova} />
-                  <InboxChip to="/nova/vods" label="VODs" count={inbox.vods} />
-                  <InboxChip to="/crystal" label="Crystal" count={inbox.crystal} />
-                </div>
-              </AttentionCard>
+              <InboxCard state={inboxState} counts={inboxCounts} onRetry={() => retry(['nova', 'vods', 'crystal'])} />
             </li>
             {isCurator ? (
               <>

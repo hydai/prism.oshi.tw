@@ -24,15 +24,16 @@ const VALUE_CLASSES = 'min-h-[25px] text-[24px] font-[800] leading-[1.05] tracki
 
 /**
  * One "Needs attention" card (spec §8.1, mockup `.ac`): a toned icon tile and the title, then the
- * value with its unit, a sub-line and `children` (the Inbox card's chips). It loads and fails on its
- * own:
+ * value with its unit, a sub-line and `children` (the Inbox card's chips, which show in every state:
+ * they say what each of its loads knows so far). It loads and fails on its own:
  * - loading: a skeleton bar where the value goes;
  * - error: a plain card with `—` and, beside it, a Retry icon (`Retry {title}`) that calls
  *   `onRetry`. Beside the value rather than in the corner: the kit tooltip centres on its button,
  *   and from the right-most card's corner it would reach past the page's edge;
  * - retrying: the error card while its Retry's load runs. The Retry stays, busy (`aria-disabled`,
  *   spinning, a click does nothing), so the focus stays on it; if it still has the focus when the
- *   load lands, the card's link takes it;
+ *   load lands, the card's link takes it — on a card that is no link, its first link (the Inbox
+ *   card's first chip);
  * - ready: with `to`, the whole card is one router link, marked by an ↗ in its corner; without
  *   `to` it is a plain card (whatever links it holds are its own).
  * `shortTitle` replaces `title` below 640 px, where two cards share a phone's row. A title too long
@@ -68,14 +69,21 @@ export function AttentionCard({
   const link = state === 'ready' && to !== undefined;
   const retrying = state === 'retrying';
 
-  // The Retry leaves when its load lands. If it had the focus then, the link that replaces it takes
-  // it, rather than the focus falling to <body>. Both callbacks are stable: they run only as their
-  // element comes and goes, and the Retry's cleanup runs while it is still in the document.
+  // The Retry leaves when its load lands. If it had the focus then, a link takes it rather than the
+  // focus falling to <body>. A plain card keeps its links (the Inbox card's chips), so its first one
+  // takes it at once; a card that turns into a link loses its plain root first (React lets go of
+  // `plainCard` before the Retry's cleanup runs), so its new link takes it as it arrives. The
+  // callbacks are stable: they run only as their element comes and goes, and the Retry's cleanup
+  // runs while it is still in the document.
+  const plainCard = useRef<HTMLDivElement>(null);
   const retryHadFocus = useRef(false);
   const retryRef = useCallback((button: HTMLButtonElement | null) => {
     if (button === null) return undefined;
     return () => {
-      if (document.activeElement === button) retryHadFocus.current = true;
+      if (document.activeElement !== button) return;
+      const firstLink = plainCard.current?.querySelector<HTMLElement>('a[href]');
+      if (firstLink) firstLink.focus();
+      else retryHadFocus.current = true;
     };
   }, []);
   const linkRef = useCallback((anchor: HTMLAnchorElement | null) => {
@@ -157,11 +165,11 @@ export function AttentionCard({
                 ))}
           </div>
         ) : null}
-        {children}
       </>
     );
   }
 
+  // `children` follow the body in every state, in the same place, so they stay mounted through it.
   if (link) {
     return (
       <Link
@@ -171,13 +179,15 @@ export function AttentionCard({
       >
         {heading}
         {body}
+        {children}
       </Link>
     );
   }
   return (
-    <div className={CARD_CLASSES}>
+    <div ref={plainCard} className={CARD_CLASSES}>
       {heading}
       {body}
+      {children}
     </div>
   );
 }

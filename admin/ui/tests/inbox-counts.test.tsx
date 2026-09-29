@@ -148,6 +148,17 @@ function installFetchStub(): void {
 
 type Snapshot = ReturnType<typeof useInboxCounts>;
 
+/** Each list's load state, as `name:loading` (in flight), `name:failed` (its last load failed) or `name:done`. */
+function loadStates(snapshot: Snapshot): string {
+  return (['nova', 'vods', 'crystal'] as const)
+    .map((name) => {
+      const load = snapshot.loads[name];
+      if (load.loading) return `${name}:loading`;
+      return load.error !== null ? `${name}:failed` : `${name}:done`;
+    })
+    .join(',');
+}
+
 /** Calls `useInboxCounts()` and reports every render via an effect with no dependency array — the
  * caller counts its own `onRender` invocations, mirroring tests/ui-toast.test.tsx's ToastProbe. */
 function InboxProbe({ onRender }: { onRender: (snapshot: Snapshot) => void }) {
@@ -226,6 +237,10 @@ async function main(): Promise<void> {
     outsideCounts.nova === null && outsideCounts.vods === null && outsideCounts.crystal === null,
     'outside a provider every count reads null',
   );
+  assert(
+    loadStates(outsideValue) === 'nova:done,vods:done,crystal:done',
+    `outside a provider nothing is in flight and nothing failed (got ${loadStates(outsideValue)})`,
+  );
   await act(async () => { outsideValue.refresh(); });
   await settle();
   assert(outsideValue.nova === null, 'refresh outside a provider is a no-op, not a throw');
@@ -257,6 +272,10 @@ async function main(): Promise<void> {
   assert(
     firstCommitSnapshot.nova === null && firstCommitSnapshot.vods === null && firstCommitSnapshot.crystal === null,
     'immediately after the first commit, before any list has resolved, every count reads null',
+  );
+  assert(
+    loadStates(firstCommitSnapshot) === 'nova:loading,vods:loading,crystal:loading',
+    `and every list reads as loading (got ${loadStates(firstCommitSnapshot)})`,
   );
   await settle();
   await preResolution.unmount();
@@ -291,6 +310,10 @@ async function main(): Promise<void> {
   assert(partialValue.nova === 2, 'the list that succeeded still reports its pending count');
   assert(partialValue.vods === null, 'a 403 (a contributor on a curator-only list) reads as unknown, not a throw');
   assert(partialValue.crystal === null, 'a 500 reads as unknown, not a throw');
+  assert(
+    loadStates(partialValue) === 'nova:done,vods:failed,crystal:failed',
+    `each list reports whether its own load failed (got ${loadStates(partialValue)})`,
+  );
   console.log('✓ a partial inbox failure nulls only the failed lists and never throws');
 
   // --- Happy path, stable identity, refresh(), and the stale-data trap — threaded through one
@@ -324,6 +347,10 @@ async function main(): Promise<void> {
   assert(current().nova === 2, 'Nova: two pending out of three submissions');
   assert(current().vods === 1, 'VODs: the one pending submission');
   assert(current().crystal === 0, 'Crystal: no pending tickets');
+  assert(
+    loadStates(current()) === 'nova:done,vods:done,crystal:done',
+    `once loaded, no list is in flight or failed (got ${loadStates(current())})`,
+  );
   assert(callsTo(NOVA_URL) === 1 && callsTo(VODS_URL) === 1 && callsTo(CRYSTAL_URL) === 1, 'mount starts exactly one request per list');
   console.log('✓ InboxCountsProvider computes each pending count from a live mount');
 
