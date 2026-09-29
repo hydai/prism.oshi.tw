@@ -5,6 +5,7 @@ import { Pagination } from '../src/components/Pagination';
 import { SortHeader } from '../src/components/SortHeader';
 import { StatusFilterBar, type StatusFilterOption } from '../src/components/StatusFilterBar';
 import SimilarSongGroupCard from '../src/components/harmonizer/SimilarSongGroupCard';
+import { NO_RAW_PALETTE } from './helpers/palette';
 
 function assert(condition: boolean, message: string): asserts condition {
   if (!condition) {
@@ -129,17 +130,26 @@ const group: SimilarityGroup<HarmonizeSongEntry> = {
 const card = renderToStaticMarkup(
   <SimilarSongGroupCard
     group={group}
-    isExpanded
     canonicalId="song-1"
     isApplying={false}
     mergePending={false}
-    onToggle={() => undefined}
     onSelectCanonical={() => undefined}
     onMerge={() => undefined}
+    onSkip={() => undefined}
+    onPrevious={() => undefined}
+    onNext={() => undefined}
   />,
 );
-assert(card.includes('bg-teal-100'), 'the harmonizer paints extracted songs teal, like every other list');
-assert(!card.includes('bg-blue-100'), 'the harmonizer no longer has its own blue extracted chip');
-assert(card.includes('bg-green-100'), 'approved keeps the shared green');
+/** The `class` of the pill (a `<span>`) whose whole text is `text`. */
+const pillClass = (html: string, text: string): string =>
+  new RegExp(`<span class="([^"]*)">${text}</span>`).exec(html)?.[1] ?? '';
+assert(
+  pillClass(card, 'Extracted').split(' ').includes('bg-tone-teal-bg'),
+  'the harmonizer paints extracted songs in the teal tone, like every other list',
+);
+assert(pillClass(card, 'Exact').split(' ').includes('bg-tone-ok-bg'), 'an exact group wears the ok-toned Exact pill');
+assert(!NO_RAW_PALETTE.test(card), 'the harmonizer group card uses no raw Tailwind palette class');
+const cardHead = /<thead[^>]*>/.exec(card)?.[0] ?? '';
+assert(cardHead !== '' && !cardHead.includes('sticky'), 'the variants table head does not stick: it sits inside the queue detail');
 
 console.log('✓ shared sort headers, pagination footers, filter bars and one status badge');

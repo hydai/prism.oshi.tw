@@ -118,6 +118,7 @@ export const ADMIN_ROUTES: readonly AdminRoute[] = [
     curatorOnly: true,
     group: 'library',
     icon: 'merge',
+    frame: 'studio',
     render: () => <Harmonizer />,
   },
   { path: '/nova', label: 'Nova', group: 'inbox', icon: 'nova', render: (user) => <NovaSubmissions user={user} /> },

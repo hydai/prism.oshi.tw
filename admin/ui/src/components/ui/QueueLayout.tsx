@@ -19,7 +19,9 @@ import { GlassCard, Kbd } from './Display';
  *
  * J / K are this component's: it calls `useQueueNavigation` with `enabled: keyboardEnabled`, so of
  * two queues mounted at once only the active one listens. However the selection moves, the list
- * scrolls itself (never the page) to keep the selected row in sight.
+ * scrolls itself (never the page) to keep the selected row in sight — and so it does when the page
+ * replaces `items` under a selection that stays (a refresh, a new scan). `items` is compared by
+ * reference, so a page keeps it in state: a fresh array per render would re-check on every one.
  *
  * From 1024 px the list card sits in a 320–340 px column and sticks under the page header, whose
  * height the page publishes as `--page-header-h` (`usePageHeaderHeight`; 62 px without it); its
@@ -73,6 +75,14 @@ export function QueueLayout<T>({
   // a row above the visible window aligns its top, one below aligns its bottom, a fully visible one
   // stays put. Never `scrollIntoView`, which scrolls the page too: below 1024 px it would pull the
   // page from the detail up to the list. The list is `relative`, so the rows measure from it.
+  // `keyboardEnabled` is a dependency though the body never reads it: a queue in a `hidden` tab (the
+  // Harmonizer's) loses its list's scroll offset, and its keyboard comes back as its tab is shown
+  // again — the moment to bring the kept selection back into sight. So is `items`: a list the page
+  // replaces under a selection that stays (a refresh that drops the rows above it, a rescan that
+  // keeps the same first key) leaves the list's kept offset pointing away from the selected row,
+  // and rows that arrive after their key was set found no list at the first check. `items` is
+  // compared by reference and a page holds it in state, so a plain re-render never re-checks: a
+  // list the curator scrolled away from the selection stays where they left it.
   useLayoutEffect(() => {
     const list = listRef.current;
     if (!list || selectedKey === null) return;
@@ -84,7 +94,7 @@ export function QueueLayout<T>({
     const bottom = top + row.offsetHeight;
     if (top < list.scrollTop) list.scrollTop = top;
     else if (bottom > list.scrollTop + list.clientHeight) list.scrollTop = bottom - list.clientHeight;
-  }, [selectedKey]);
+  }, [selectedKey, keyboardEnabled, items]);
 
   return (
     <div className="grid grid-cols-1 gap-3.5 lg:grid-cols-[minmax(320px,340px)_minmax(0,1fr)]">
