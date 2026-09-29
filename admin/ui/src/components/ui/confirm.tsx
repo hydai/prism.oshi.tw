@@ -81,13 +81,14 @@ export function ConfirmProvider({ children }: { children: ReactNode }) {
           if (request) answer(request, false);
         }}
         icon={
-          // Mockup 2's `.dlg .ic`, for destructive confirms only. Decorative: the title and body say it.
+          // Mockup 2's `.dlg .ic`, for destructive confirms only: the trash can, or the option's `icon`.
+          // Decorative: the title and body say it.
           danger ? (
             <span
               aria-hidden="true"
               className="mb-2.5 flex h-9 w-9 items-center justify-center rounded-[11px] bg-danger-solid text-white"
             >
-              <Icon name="trash" />
+              <Icon name={request?.options.icon ?? 'trash'} />
             </span>
           ) : undefined
         }

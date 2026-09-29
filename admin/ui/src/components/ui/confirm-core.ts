@@ -1,4 +1,5 @@
 import type { ReactNode } from 'react';
+import type { IconName } from './Icon';
 
 export type ConfirmOptions = {
   title: string;
@@ -6,6 +7,8 @@ export type ConfirmOptions = {
   confirmLabel: string;
   cancelLabel?: string;
   tone?: 'default' | 'danger';
+  /** The glyph in a danger confirm's tile (the trash can when omitted); a default-tone confirm draws no tile either way. */
+  icon?: IconName;
 };
 
 export type ConfirmFn = (options: ConfirmOptions) => Promise<boolean>;
