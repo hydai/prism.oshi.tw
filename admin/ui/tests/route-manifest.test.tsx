@@ -73,7 +73,7 @@ const CURATOR_NAV = [
 ];
 
 /** Oracle: the curator-only entries — hidden from the sidebar and blocked at the route. */
-const CURATOR_ONLY_PATHS = ['/works', '/works/review', '/vod-export', '/vod-export/repair/:entity/:rowId'];
+const CURATOR_ONLY_PATHS = ['/works', '/works/review', '/harmonizer', '/vod-export', '/vod-export/repair/:entity/:rowId'];
 
 /** Oracle: the "+ New" menu — routes that can be created from it, in order. */
 const NEW_MENU = [
@@ -85,6 +85,7 @@ const NEW_MENU = [
 const CURATOR_ROUTE_PROBES = [
   { url: '/works', marker: 'Global Song Library' },
   { url: '/works/review', marker: 'Global Work Review' },
+  { url: '/harmonizer', marker: 'Harmonizer' },
   { url: '/vod-export', marker: 'Publication workflow' },
   { url: '/vod-export/repair/song/12', marker: 'VOD export source record' },
 ];

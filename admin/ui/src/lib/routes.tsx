@@ -112,7 +112,14 @@ export const ADMIN_ROUTES: readonly AdminRoute[] = [
     frame: 'studio',
     render: () => <GlobalWorkReview />,
   },
-  { path: '/harmonizer', label: 'Harmonizer', group: 'library', icon: 'merge', render: () => <Harmonizer /> },
+  {
+    path: '/harmonizer',
+    label: 'Harmonizer',
+    curatorOnly: true,
+    group: 'library',
+    icon: 'merge',
+    render: () => <Harmonizer />,
+  },
   { path: '/nova', label: 'Nova', group: 'inbox', icon: 'nova', render: (user) => <NovaSubmissions user={user} /> },
   {
     path: '/nova/vods',

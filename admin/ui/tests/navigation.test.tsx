@@ -65,18 +65,16 @@ async function main(): Promise<void> {
     'curators see the six nav groups, in order, each holding its routes in manifest order',
   );
 
-  // --- getNavGroups: a contributor drops the empty Publish group and curator-only items ---
+  // --- getNavGroups: a contributor drops the groups whose every route is curator-only ---
 
   const contributorGroups = getNavGroups(contributor);
   assert(
     !contributorGroups.some((group) => group.id === 'publish'),
     'contributors have no Publish group: its only route (VOD Export) is curator-only',
   );
-  const contributorLibrary = contributorGroups.find((group) => group.id === 'library');
-  assert(contributorLibrary !== undefined, 'contributors still see the Library group');
   assert(
-    JSON.stringify(contributorLibrary.items.map((item) => item.to)) === JSON.stringify(['/harmonizer']),
-    'contributors only see Harmonizer in Library: Global Library and Work Review are curator-only',
+    !contributorGroups.some((group) => group.id === 'library'),
+    'contributors have no Library group: Global Library, Work Review and Harmonizer are all curator-only',
   );
 
   // --- listRouteFor: detail/sub paths collapse to their list; other pages keep all but the streamer-bound params ---
