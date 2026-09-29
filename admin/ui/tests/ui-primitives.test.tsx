@@ -1187,15 +1187,17 @@ async function main(): Promise<void> {
   const tallHeaderMarkup = renderToStaticMarkup(<PageHeader crumb="TIMESTAMPS" title="Stream Detail" tall />);
   const tallHeaderTag = /<header[^>]*>/.exec(tallHeaderMarkup)?.[0];
   assert(tallHeaderTag !== undefined && tallHeaderTag.includes('min-h-[76px]'), 'PageHeader is at least 76px when tall');
-  // Below 1280px the rows get 6px above and below (the bar may wrap there, and THead only sticks
-  // from 1280px up). From 1280px there is no vertical padding at all, so a one-row bar — even a
-  // title block with a meta row, ~55px — is exactly its 62 / 76px minimum, the height THead's
-  // sticky `top-[62px]` counts on.
+  // The rows keep 6px from the bar's edges at every width, so a bar that wraps (the Harmonizer's, even
+  // at 1440px) never has a row against its edge, while a one-row bar still measures exactly its 62 /
+  // 76px minimum — the height THead's sticky `top-[62px]` counts on. A title block with a meta row
+  // (~55px) leaves no room for that padding in 62px: such a bar keeps it below 1280px only, where
+  // THead does not stick.
+  const verticalPaddingOf = (tag: string) => headerClasses(tag).filter((name) => /(^|:)(p|py|pt|pb)-/.test(name));
   for (const [variant, tag] of [['default', headerTag], ['tall', tallHeaderTag]] as const) {
-    const verticalPadding = headerClasses(tag).filter((name) => /(^|:)(p|py|pt|pb)-/.test(name));
+    const verticalPadding = verticalPaddingOf(tag);
     assert(
-      verticalPadding.join(' ') === 'max-xl:py-1.5',
-      `the ${variant} PageHeader pads its rows only below 1280px (found: ${verticalPadding.join(' ') || 'none'})`,
+      verticalPadding.join(' ') === 'py-1.5',
+      `the ${variant} PageHeader pads its rows at every width (found: ${verticalPadding.join(' ') || 'none'})`,
     );
   }
 
@@ -1203,6 +1205,11 @@ async function main(): Promise<void> {
     <PageHeader crumb="TIMESTAMPS" title="Stream Detail" meta={<span>2026-09-27</span>} />,
   );
   assert(metaMarkup.includes('2026-09-27'), 'PageHeader renders meta when given');
+  const metaHeaderTag = /<header[^>]*>/.exec(metaMarkup)?.[0] ?? '';
+  assert(
+    verticalPaddingOf(metaHeaderTag).join(' ') === 'max-xl:py-1.5',
+    `a PageHeader with a meta row pads its rows only below 1280px (found: ${verticalPaddingOf(metaHeaderTag).join(' ') || 'none'})`,
+  );
   assert(
     metaMarkup.includes('text-meta text-fg-muted'),
     'M3: the meta row is the spec §4.3 10.5px meta scale, not full-size text that could overflow the bar',
@@ -1219,6 +1226,15 @@ async function main(): Promise<void> {
     <PageHeader crumb="LIBRARY" title="Global Song Library" actions={<button type="button">Review duplicates</button>} />,
   );
   assert(actionsMarkup.includes('Review duplicates'), 'PageHeader renders actions');
+  // Capped at the bar's width and wrapping, the actions never push <main> into a sideways scroll: the
+  // Harmonizer's portalled scan controls are wider than the bar between 640 and ~740px.
+  const actionsClasses = (
+    /<div class="([^"]*)"><button type="button">Review duplicates<\/button><\/div>/.exec(actionsMarkup)?.[1] ?? ''
+  ).split(' ');
+  assert(
+    ['ml-auto', 'max-w-full', 'flex-wrap', 'max-sm:ml-0', 'max-sm:w-full'].every((name) => actionsClasses.includes(name)),
+    `the actions sit at the far end, never wider than the bar, wrapping what does not fit (got "${actionsClasses.join(' ')}")`,
+  );
 
   // --- PageHeader: crumb accepts a ReactNode, and recordTitle keeps it (and the <h1>) visible below lg ---
 
@@ -1266,7 +1282,7 @@ async function main(): Promise<void> {
   // so today's byte-for-byte output for every other page is unaffected by this change.
 
   console.log(
-    '✓ ui kit: PageHeader is a bottom-hairline-only glass header, sticky from lg up and padded only below 1280px, with a crumb, <h1> title, optional meta row, children and actions, wrapping to fit at any width (R30)',
+    '✓ ui kit: PageHeader is a bottom-hairline-only glass header, sticky from lg up and padded at every width (with a meta row, below 1280px only), with a crumb, <h1> title, optional meta row, children and actions, wrapping to fit at any width (R30)',
   );
 
   // --- no output anywhere above (Task 8) uses the raw Tailwind palette ---
