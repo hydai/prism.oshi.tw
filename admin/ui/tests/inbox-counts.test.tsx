@@ -177,7 +177,7 @@ function InboxHarness({ onRender }: { onRender: (snapshot: Snapshot) => void }) 
       <button type="button" id="rerender" onClick={() => setRenders((count) => count + 1)}>
         Re-render ({renders})
       </button>
-      <InboxCountsProvider>
+      <InboxCountsProvider isCurator>
         <InboxProbe onRender={onRender} />
       </InboxCountsProvider>
     </>
@@ -186,13 +186,13 @@ function InboxHarness({ onRender }: { onRender: (snapshot: Snapshot) => void }) 
 
 const CURATOR: AuthUser = { email: 'curator@example.com', role: 'curator' };
 
-/** Mounts an inbox page beside a probe, inside the provider — and a router, since the Nova page
- * keeps its filters in the URL — the way Layout wraps every page. */
+/** Mounts an inbox page beside a probe, inside a curator's provider — and a router, since the Nova
+ * page keeps its filters in the URL — the way Layout wraps every page. */
 async function mountPage(page: ReactNode): Promise<{ container: HTMLElement; unmount: () => Promise<void>; counts: () => Snapshot }> {
   let latestCounts: Snapshot | undefined;
   const mounted = await mount(
     <MemoryRouter>
-      <InboxCountsProvider>
+      <InboxCountsProvider isCurator>
         <InboxProbe onRender={(snapshot) => { latestCounts = snapshot; }} />
         {page}
       </InboxCountsProvider>
@@ -260,7 +260,7 @@ async function main(): Promise<void> {
 
   let firstCommitSnapshot: Snapshot | undefined;
   const preResolution = await mount(
-    <InboxCountsProvider>
+    <InboxCountsProvider isCurator>
       <InboxProbe
         onRender={(snapshot) => {
           if (firstCommitSnapshot === undefined) firstCommitSnapshot = snapshot;
@@ -295,7 +295,7 @@ async function main(): Promise<void> {
   let partialThrew = false;
   try {
     const partial = await mount(
-      <InboxCountsProvider>
+      <InboxCountsProvider isCurator>
         <InboxProbe onRender={(snapshot) => { partialSnapshot = snapshot; }} />
       </InboxCountsProvider>,
     );
@@ -308,13 +308,62 @@ async function main(): Promise<void> {
   assert(partialSnapshot !== undefined, 'the probe rendered despite two of three lists failing');
   const partialValue = partialSnapshot;
   assert(partialValue.nova === 2, 'the list that succeeded still reports its pending count');
-  assert(partialValue.vods === null, 'a 403 (a contributor on a curator-only list) reads as unknown, not a throw');
+  assert(partialValue.vods === null, 'a 403 reads as unknown, not a throw');
   assert(partialValue.crystal === null, 'a 500 reads as unknown, not a throw');
   assert(
     loadStates(partialValue) === 'nova:done,vods:failed,crystal:failed',
     `each list reports whether its own load failed (got ${loadStates(partialValue)})`,
   );
   console.log('✓ a partial inbox failure nulls only the failed lists and never throws');
+
+  // --- A contributor: the worker serves the three lists to curators alone, so the provider asks
+  // for none of them, on mount or on refresh(); every count stays null and no load reads as failed ---
+
+  requestLog = [];
+  setResponse(NOVA_URL, 200, { data: [novaSubmission({ id: 'n1', status: 'pending' })], total: 1 });
+  setResponse(VODS_URL, 200, { data: [novaVod({ id: 'v1', status: 'pending' })], total: 1 });
+  setResponse(CRYSTAL_URL, 200, { data: [crystalTicket({ id: 't1', status: 'pending' })], total: 1 });
+
+  const contributorSnapshots: Snapshot[] = [];
+  const contributorProvider = await mount(
+    <InboxCountsProvider isCurator={false}>
+      <InboxProbe onRender={(snapshot) => { contributorSnapshots.push(snapshot); }} />
+    </InboxCountsProvider>,
+  );
+  await settle();
+
+  function latestContributor(): Snapshot {
+    const snapshot = contributorSnapshots[contributorSnapshots.length - 1];
+    assert(snapshot !== undefined, "the probe rendered in a contributor's provider");
+    return snapshot;
+  }
+
+  assert(requestLog.length === 0, `a contributor's provider requests nothing on mount (got ${requestLog.join(', ')})`);
+  assert(
+    latestContributor().nova === null && latestContributor().vods === null && latestContributor().crystal === null,
+    "a contributor's counts stay null",
+  );
+  assert(
+    loadStates(latestContributor()) === 'nova:done,vods:done,crystal:done',
+    `and no list is in flight or failed (got ${loadStates(latestContributor())})`,
+  );
+
+  await act(async () => { latestContributor().refresh(); });
+  await act(async () => { latestContributor().refresh('vods'); });
+  await settle();
+  assert(requestLog.length === 0, `refresh() requests nothing for a contributor either (got ${requestLog.join(', ')})`);
+  assert(
+    loadStates(latestContributor()) === 'nova:done,vods:done,crystal:done' && latestContributor().vods === null,
+    `and every list still reads settled, its count null (got ${loadStates(latestContributor())})`,
+  );
+  assert(
+    contributorSnapshots.every((snapshot) =>
+      (['nova', 'vods', 'crystal'] as const).every((name) => snapshot.loads[name].error === null),
+    ),
+    'no list ever reads as failed, so nothing shows an error',
+  );
+  await contributorProvider.unmount();
+  console.log("✓ a contributor's provider requests none of the curator-only lists, on mount or on refresh()");
 
   // --- Happy path, stable identity, refresh(), and the stale-data trap — threaded through one
   // mount so the object-identity comparisons stay easy to follow ---
@@ -408,7 +457,7 @@ async function main(): Promise<void> {
   let emptyErrorRenders = 0;
   let emptyErrorLatest: Snapshot | undefined;
   const emptyErrorHarness = await mount(
-    <InboxCountsProvider>
+    <InboxCountsProvider isCurator>
       <InboxProbe
         onRender={(snapshot) => {
           emptyErrorRenders += 1;

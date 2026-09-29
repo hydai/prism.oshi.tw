@@ -1,5 +1,5 @@
 import { createContext, useCallback, useContext, useMemo, type ReactNode } from 'react';
-import type { ListResponse } from '../../../../shared/types';
+import type { CrystalTicket, ListResponse, NovaSubmission, NovaVodSubmission } from '../../../../shared/types';
 import { api } from '../../api/client';
 import { useApiResource, type ApiResource } from '../../lib/apiResource';
 import { countByStatus } from '../../lib/status-totals';
@@ -41,14 +41,15 @@ const OUTSIDE_PROVIDER_VALUE: InboxCountsValue = {
 };
 
 /**
- * A list's pending count, or `null` if it hasn't loaded yet or its last load failed. `error` is
- * checked before `data`: `useApiResource` keeps a failed reload's previous data on screen (so an
- * already-loaded page doesn't blank out), which would otherwise make a refresh that fails after an
- * earlier success keep reporting the stale count instead of falling back to unknown. The check is
- * `!== null`, not truthiness, because the error slot is `null` exactly when the last load
- * succeeded — that identity is what should decide the count, not whatever the message says.
+ * A list's pending count, or `null` if it hasn't loaded yet, its last load failed, or it is not
+ * requested at all (anyone but a curator). `error` is checked before `data`: `useApiResource` keeps
+ * a failed reload's previous data on screen (so an already-loaded page doesn't blank out), which
+ * would otherwise make a refresh that fails after an earlier success keep reporting the stale count
+ * instead of falling back to unknown. The check is `!== null`, not truthiness, because the error
+ * slot is `null` exactly when the last load succeeded — that identity is what should decide the
+ * count, not whatever the message says.
  */
-function pendingCount<T extends { status: string }>(resource: ApiResource<ListResponse<T>>): number | null {
+function pendingCount<T extends { status: string }>(resource: ApiResource<ListResponse<T> | null>): number | null {
   if (resource.error !== null) return null;
   if (!resource.data) return null;
   return countByStatus(resource.data.data, 'pending');
@@ -58,22 +59,36 @@ function pendingCount<T extends { status: string }>(resource: ApiResource<ListRe
  * Loads the three review inboxes — Nova streamer submissions, Nova VOD submissions, Crystal
  * tickets — once on mount and exposes each one's pending count, each one's load state (`loads`),
  * and `refresh` to `useInboxCounts()`. None of the three lists are scoped to the selected streamer,
- * so none take deps. A failed load is silent: it yields `null` for that count only, never a toast or
- * a thrown error — the sidebar badge is a convenience, not a page a curator is actively working
- * from, so a transient failure (or a 403 for a contributor on a curator-only list) should not
- * interrupt them. `loads` lets a page that shows the counts as its own, the Dashboard's Inbox card,
- * say which list is still loading or has failed, and retry that one. The returned value keeps a
- * stable identity while every count, every load state and `refresh` are unchanged, so a consumer
- * that only reads `useInboxCounts()` re-renders only when one of them actually changes.
+ * so none take the streamer as a dep. A failed load is silent: it yields `null` for that count
+ * only, never a toast or a thrown error — the sidebar badge is a convenience, not a page a curator
+ * is actively working from, so a transient failure should not interrupt them. `loads` lets a page
+ * that shows the counts as its own, the Dashboard's Inbox card, say which list is still loading or
+ * has failed, and retry that one. The returned value keeps a stable identity while every count,
+ * every load state and `refresh` are unchanged, so a consumer that only reads `useInboxCounts()`
+ * re-renders only when one of them actually changes.
+ *
+ * The worker serves the three lists to curators alone, so for anyone else (`isCurator` false) the
+ * provider requests nothing: each list's fetcher resolves `null` without a request, which keeps the
+ * hooks in one order for everyone; the counts stay `null`, no load fails, and `refresh` does
+ * nothing.
  *
  * The inbox pages load their own copy of these lists, so after every action that can change a
  * pending count — a review, a delete, a Crystal reply or status change — and on their own reload,
  * they call `refresh` with their inbox's name; nothing else reloads a count.
  */
-export function InboxCountsProvider({ children }: { children: ReactNode }) {
-  const novaResource = useApiResource(api.listNovaSubmissions, []);
-  const vodsResource = useApiResource(api.listNovaVods, []);
-  const crystalResource = useApiResource(api.listCrystalTickets, []);
+export function InboxCountsProvider({ isCurator, children }: { isCurator: boolean; children: ReactNode }) {
+  const novaResource = useApiResource<ListResponse<NovaSubmission> | null>(
+    () => (isCurator ? api.listNovaSubmissions() : Promise.resolve(null)),
+    [isCurator],
+  );
+  const vodsResource = useApiResource<ListResponse<NovaVodSubmission> | null>(
+    () => (isCurator ? api.listNovaVods() : Promise.resolve(null)),
+    [isCurator],
+  );
+  const crystalResource = useApiResource<ListResponse<CrystalTicket> | null>(
+    () => (isCurator ? api.listCrystalTickets() : Promise.resolve(null)),
+    [isCurator],
+  );
 
   const nova = pendingCount(novaResource);
   const vods = pendingCount(vodsResource);
@@ -88,11 +103,13 @@ export function InboxCountsProvider({ children }: { children: ReactNode }) {
   const { reload: reloadCrystal } = crystalResource;
   const refresh = useCallback<RefreshInboxCounts>(
     (inbox) => {
+      // No list is requested for anyone but a curator, so there is nothing to reload.
+      if (!isCurator) return;
       if (inbox === undefined || inbox === 'nova') reloadNova();
       if (inbox === undefined || inbox === 'vods') reloadVods();
       if (inbox === undefined || inbox === 'crystal') reloadCrystal();
     },
-    [reloadNova, reloadVods, reloadCrystal],
+    [isCurator, reloadNova, reloadVods, reloadCrystal],
   );
 
   // Each list's load state as plain values, so the memo below compares them one by one.

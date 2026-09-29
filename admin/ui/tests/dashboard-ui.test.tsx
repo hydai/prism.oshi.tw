@@ -257,7 +257,9 @@ type Endpoint =
   | 'crystal';
 
 const CURATOR_ENDPOINTS: Endpoint[] = ['stats', 'stampStats', 'stampStreams', 'pendingStreams', 'workMatches', 'vodStatus', 'nova', 'vods', 'crystal'];
-const CONTRIBUTOR_ENDPOINTS: Endpoint[] = ['stats', 'stampStats', 'stampStreams', 'pendingStreams', 'nova', 'vods', 'crystal'];
+// The worker serves the work matches, the VOD export status and the three inbox lists to curators
+// alone: a contributor's page and shell ask for none of them.
+const CONTRIBUTOR_ENDPOINTS: Endpoint[] = ['stats', 'stampStats', 'stampStreams', 'pendingStreams'];
 
 interface Reply {
   status: number;
@@ -489,7 +491,7 @@ async function main(): Promise<void> {
   const page = (user: AuthUser) => (
     <ToastProvider>
       <MemoryRouter initialEntries={['/']}>
-        <InboxCountsProvider>
+        <InboxCountsProvider isCurator={user.role === 'curator'}>
           <Routes>
             <Route path="/" element={<Dashboard user={user} />} />
             <Route path="*" element={<p>Elsewhere</p>} />
@@ -1253,10 +1255,10 @@ async function main(): Promise<void> {
   assert(unexpected.length === 0, `no unstubbed request (${unexpected.join(', ')})`);
   assert(
     calledEndpoints() === exactly(CONTRIBUTOR_ENDPOINTS),
-    `a contributor's page never asks for /api/work-matches or /api/vod-export/status (got ${calledEndpoints()})`,
+    `a contributor's page and shell never ask for /api/work-matches, /api/vod-export/status or the three inbox lists (got ${calledEndpoints()})`,
   );
-  // The worker serves the three inbox lists to curators alone: a contributor's Inbox card could only
-  // ever fail, so a contributor gets To stamp and Streams to review, and nothing else.
+  // The worker serves the three inbox lists to curators alone, and the shell loads them for curators
+  // only: a contributor gets To stamp and Streams to review, and nothing else.
   const contributorCards = attentionCards(contributor.container);
   assert(contributorCards.length === 2, `a contributor sees two cards (got ${contributorCards.length})`);
   assert(
@@ -1281,7 +1283,7 @@ async function main(): Promise<void> {
   await click(buttonNamed(pageHeader(contributor.container), 'Refresh'), 'Refresh');
   assert(
     calledEndpoints() === exactly(CONTRIBUTOR_ENDPOINTS),
-    `a contributor's Refresh still asks for neither (got ${calledEndpoints()})`,
+    `a contributor's Refresh still asks for none of them (got ${calledEndpoints()})`,
   );
   assert(!NO_RAW_PALETTE.test(contributor.container.innerHTML), "a contributor's page uses no raw palette classes");
   await contributor.unmount();

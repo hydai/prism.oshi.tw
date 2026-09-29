@@ -111,8 +111,8 @@ function InboxChip({ to, label, count }: { to: string; label: string; count: num
 /**
  * The Inbox card over the shell's three inbox lists, in `state` like the other cards: its total once
  * all three counts are known, and a chip linking to each inbox in every state, `—` while its count
- * is unknown. A curator's only: the worker serves the inbox lists to curators alone, so a
- * contributor's card could only ever fail.
+ * is unknown. A curator's only: the worker serves the inbox lists to curators alone, and the shell
+ * loads them for curators only.
  */
 function InboxCard({ state, counts, onRetry }: { state: ShownState; counts: InboxCounts; onRetry: () => void }) {
   return (
@@ -337,8 +337,8 @@ function UpdatedAgo({ at }: { at: number }) {
  * Inbox, Duplicate candidates and VOD export, each card loading and failing on its own; the catalog
  * as stacked bars; the streams to continue stamping; the newest submissions. Six loads of its own
  * and the shell's three inbox lists, each failure with its own Retry; Refresh reloads all nine. A
- * contributor gets no curator-only card, and the page never asks for its own curator-only data (the
- * inbox lists are the shell's).
+ * contributor gets no curator-only card, and nothing asks for curator-only data: the page's own
+ * curator-only loads resolve without a request, and so do the shell's inbox lists.
  */
 export default function Dashboard({ user }: { user: AuthUser }) {
   const isCurator = user.role === 'curator';

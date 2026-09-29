@@ -687,6 +687,27 @@ async function main(): Promise<void> {
 
   console.log('✓ live: inbox badges, one streamers load, and the switch keeps the page or falls back to its list');
 
+  // --- Live: the worker serves the three inbox lists to curators alone, so a contributor's shell
+  // asks for none of them, and its sidebar shows no pending badge ---
+
+  setCurrentStreamer('mizuki');
+  const contributorShell = await mountShell('/', contributor);
+  assert(
+    callsTo('/api/nova/submissions') === 0 && callsTo('/api/nova/vods') === 0 && callsTo('/api/crystal/tickets') === 0,
+    `a contributor's shell requests none of the three inbox lists (got ${requestLog.join(', ')})`,
+  );
+  assert(
+    textOf(contributorShell.container.querySelector('aside a[href="/nova"]')) === 'Nova'
+      && textOf(contributorShell.container.querySelector('aside a[href="/nova/vods"]')) === 'Nova VODs'
+      && textOf(contributorShell.container.querySelector('aside a[href="/crystal"]')) === 'Crystal',
+    "a contributor's inbox links show no pending badge",
+  );
+  assert(callsTo('/api/streamers') === 1, "a contributor's shell still loads the streamer list");
+  assert(unexpected.length === 0, `no unstubbed request (${unexpected.join(', ')})`);
+  await contributorShell.unmount();
+
+  console.log("✓ live: a contributor's shell requests none of the curator-only inbox lists");
+
   // --- Live: the auto-correction and a failed list load ---
 
   setCurrentStreamer('ghost');

@@ -54,7 +54,8 @@ export default function Layout({ user, children }: { user: AuthUser; children: R
   }, [drawerOpen]);
 
   return (
-    <InboxCountsProvider>
+    // The inbox lists are curators' only: for anyone else the provider requests none of them.
+    <InboxCountsProvider isCurator={user.role === 'curator'}>
       <StreamersProvider>
         {/* 100dvh where supported, so a phone's browser bars never cover the end of <main>. (A
             plain `h-screen h-dvh` would not do: Tailwind emits .h-dvh before .h-screen.) */}
