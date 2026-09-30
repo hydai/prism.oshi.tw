@@ -9,7 +9,7 @@ import {
   getWorkAwareMergeBatch,
   getWorkMergePlan,
 } from '../../lib/harmonizer-work-merge';
-import { counted, matchTypePill, mergeActionLabel, mergeConfirmationMessage } from '../../lib/harmonizer-presentation';
+import { counted, mergeActionLabel, mergeConfirmationMessage } from '../../lib/harmonizer-presentation';
 import { Button } from '../ui/Button';
 import { useConfirm } from '../ui/confirm';
 import { EmptyState, GlassCard } from '../ui/Display';
@@ -18,6 +18,7 @@ import { Pill } from '../ui/Pill';
 import { QueueLayout } from '../ui/QueueLayout';
 import { nextQueueKey } from '../ui/queue';
 import { useToast } from '../ui/toast';
+import GroupRow from './GroupRow';
 import ScanControls from './ScanControls';
 import SimilarSongGroupCard from './SimilarSongGroupCard';
 
@@ -31,21 +32,6 @@ function needsGlobalMerge(group: SongGroup, canonicalId: string | undefined): bo
   if (canonicalId === undefined) return false;
   const batch = getWorkAwareMergeBatch(group.items, canonicalId);
   return getWorkMergePlan(batch.items, canonicalId).requiresGlobalMerge;
-}
-
-/** A list row: the group key, then its variant count, its match type and whether it merges global works. */
-function GroupRow({ group, globalMerge }: { group: SongGroup; globalMerge: boolean }) {
-  const pill = matchTypePill(group.matchType);
-  return (
-    <>
-      <span className="truncate text-[12.5px] font-[650] text-fg">{group.normalizedKey}</span>
-      <span className="mt-0.5 flex flex-wrap gap-[5px]">
-        <Pill tone="neutral">{group.items.length} variants</Pill>
-        <Pill tone={pill.tone}>{pill.label}</Pill>
-        {globalMerge ? <Pill tone="warn">Global merge</Pill> : null}
-      </span>
-    </>
-  );
 }
 
 /**
@@ -207,7 +193,9 @@ export default function SimilarSongsTab({
           selectedKey={selectedKey}
           onSelect={setPicked}
           renderItem={(group) => (
-            <GroupRow group={group} globalMerge={needsGlobalMerge(group, canonicals.get(group.normalizedKey))} />
+            <GroupRow group={group}>
+              {needsGlobalMerge(group, canonicals.get(group.normalizedKey)) ? <Pill tone="warn">Global merge</Pill> : null}
+            </GroupRow>
           )}
           hint="next / previous group"
           emptyList={<p className="px-3.5 py-6 text-center text-token-sm text-fg-muted">No similar song titles found.</p>}

@@ -1,13 +1,13 @@
 import { HARMONIZE_MERGE_SOURCE_LIMIT } from '../../../../shared/types';
 import type { HarmonizeSongEntry, SimilarityGroup } from '../../../../shared/types';
-import { matchTypePill, mergeActionLabel } from '../../lib/harmonizer-presentation';
+import { mergeActionLabel } from '../../lib/harmonizer-presentation';
 import { getWorkAwareMergeBatch, getWorkMergePlan } from '../../lib/harmonizer-work-merge';
-import { Button, IconButton } from '../ui/Button';
-import { GlassCard } from '../ui/Display';
+import { Button } from '../ui/Button';
 import { Note } from '../ui/Note';
-import { Pill, StatusPill } from '../ui/Pill';
+import { StatusPill } from '../ui/Pill';
 import { HeadCell, Table, THead } from '../ui/Table';
 import { CELL_X, FIRST_CELL_X, LAST_CELL_X } from '../ui/table-cells';
+import GroupDetailCard from './GroupDetailCard';
 import Rewritten from './Rewritten';
 import WorkIdBadge from './WorkIdBadge';
 import WorkMergeNotice from './WorkMergeNotice';
@@ -28,9 +28,6 @@ interface SimilarSongGroupCardProps {
   /** Selects the group after this one; absent on the last group, which disables the button. */
   onNext?: () => void;
 }
-
-/** The detail header's previous / next buttons: the mockup's round, outlined `.ib`. */
-const OUTLINED_ICON_BUTTON = 'border border-field-line bg-field';
 
 /** One variant of the group: the USE radio, its title and artist against the canonical's, work ID, status, performances. */
 function VariantRow({
@@ -83,10 +80,10 @@ function VariantRow({
 }
 
 /**
- * The songs queue's detail for one group (spec §8.7, the mockup's `.det`): the group key with its
- * variant count and match type, previous / next group; the work merge notice; the variants, whose
- * USE radio picks the canonical record and whose titles and artists show what the merge rewrites;
- * then how many performances the merge keeps, Skip, and the merge itself.
+ * The songs queue's detail for one group (spec §8.7), in the shared `GroupDetailCard` frame (the
+ * group key with its variant count and match type, previous / next group): the work merge notice;
+ * the variants, whose USE radio picks the canonical record and whose titles and artists show what
+ * the merge rewrites; then how many performances the merge keeps, Skip, and the merge itself.
  */
 export default function SimilarSongGroupCard({
   group,
@@ -111,34 +108,9 @@ export default function SimilarSongGroupCard({
     || workPlan.canonicalWorkId === null
     || workPlan.missingSongIds.length > 0;
   const performanceCount = (mergeBatch?.items ?? group.items).reduce((sum, item) => sum + item.performanceCount, 0);
-  const matchPill = matchTypePill(group.matchType);
 
   return (
-    <GlassCard as="section" aria-label="Selected group" padding="none" className="flex flex-col gap-3 px-[18px] py-3.5">
-      <div className="flex flex-wrap items-center gap-1.5">
-        <h2 className="mr-1 min-w-0 break-words text-[15px] font-bold text-fg">{group.normalizedKey}</h2>
-        <Pill tone="neutral">{group.items.length} variants</Pill>
-        <Pill tone={matchPill.tone}>{matchPill.label}</Pill>
-        <span className="ml-auto flex items-center gap-1">
-          <IconButton
-            label="Previous group"
-            icon="chevronLeft"
-            size="sm"
-            className={OUTLINED_ICON_BUTTON}
-            disabled={onPrevious === undefined}
-            onClick={onPrevious}
-          />
-          <IconButton
-            label="Next group"
-            icon="chevronRight"
-            size="sm"
-            className={OUTLINED_ICON_BUTTON}
-            disabled={onNext === undefined}
-            onClick={onNext}
-          />
-        </span>
-      </div>
-
+    <GroupDetailCard group={group} onPrevious={onPrevious} onNext={onNext}>
       {workPlan ? <WorkMergeNotice plan={workPlan} /> : null}
       {deferredSourceCount > 0 ? (
         <Note tone="info">
@@ -205,6 +177,6 @@ export default function SimilarSongGroupCard({
           </Button>
         </span>
       </div>
-    </GlassCard>
+    </GroupDetailCard>
   );
 }
