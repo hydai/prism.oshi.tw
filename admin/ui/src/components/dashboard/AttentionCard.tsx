@@ -7,9 +7,10 @@ import { TONE_BOX_CLASS, type Tone } from '../ui/pill-core';
 
 /**
  * The accent tile: the primary button's gradient under a white icon, the same in either theme. The
- * border stays, transparent, so the tile keeps the size of the toned ones.
+ * border stays, transparent, so the tile keeps the size of the toned ones; the gradient spans the
+ * border box (`bg-origin-border`), or it would repeat its far edges into that border as hairlines.
  */
-const ACCENT_TILE_CLASSES = 'border-transparent bg-accent text-white';
+const ACCENT_TILE_CLASSES = 'border-transparent bg-accent bg-origin-border text-white';
 
 /** The glass card (the kit's `GlassCard` surface), laid out as the mockup's `.ac`. */
 const CARD_CLASSES = 'glass-card flex h-full min-w-0 flex-col gap-1.5 rounded-[18px] px-3.5 py-3 shadow-card';

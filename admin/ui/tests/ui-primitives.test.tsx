@@ -544,6 +544,10 @@ async function main(): Promise<void> {
   );
   assert(chipActive.includes('bg-accent'), 'an active Chip uses the accent gradient background');
   assert(chipActive.includes('text-white'), 'an active Chip uses white text on the gradient');
+  assert(
+    chipActive.includes('bg-origin-border'),
+    'the gradient spans the border box: under its transparent border it would repeat the far edge as a hairline',
+  );
 
   const chipInactive = renderToStaticMarkup(
     <Chip active={false} onClick={() => {}}>
