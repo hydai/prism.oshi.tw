@@ -15,6 +15,19 @@ const SIDE_CLASSES: Record<'top' | 'bottom', string> = {
   bottom: 'top-full mt-2',
 };
 
+export type TooltipAlign = 'center' | 'start' | 'end';
+
+/**
+ * Where the chip sits along its target: centred on it (`left-1/2` there, `-translate-x-1/2` later
+ * in the class list, as the chip has always had them), or lined up with its start or end edge — a
+ * target at the end of its container keeps its chip inside, growing away from that edge.
+ */
+const ALIGN_CLASSES: Record<TooltipAlign, { edge: string; shift: string }> = {
+  center: { edge: 'left-1/2', shift: ' -translate-x-1/2' },
+  start: { edge: 'left-0', shift: '' },
+  end: { edge: 'right-0', shift: '' },
+};
+
 /**
  * A transparent strip (the chip's `::before`) over the 8 px gap between the target and the chip,
  * so the pointer crosses from one to the other without ever leaving the hover group.
@@ -36,7 +49,14 @@ const SHOW_CLASSES =
  * `aria-describedby`. The wrapper uses the NAMED group `group/tip` (never the unnamed `group`) so
  * an IconButton nested in a row that relies on the unnamed `group` for hover actions never
  * collides with this one. It opens above its target; `side="bottom"` opens it below, for a target
- * at the top of the viewport.
+ * at the top of the viewport. It is centred on its target; `align="end"` (or `"start"`) lines it up
+ * with that edge instead, for a target at the end (or start) of its container: a centred chip would
+ * reach past that container's edge.
+ *
+ * While hidden the chip is not laid out at all (src/index.css: `display: none` until its group is
+ * hovered or holds focus, again once its fade has ended, and at once when Escape dismisses it — the
+ * rule that lays it out asks for the show utilities, which a dismissed chip drops), so an invisible
+ * chip never widens a scroll container either.
  *
  * WCAG 1.4.13: the chip is hoverable (the pointer can move onto it and it stays), persistent (it
  * stays until hover and focus leave) and dismissible — Escape hides it without moving focus or
@@ -53,13 +73,16 @@ const SHOW_CLASSES =
 export function Tooltip({
   label,
   side = 'top',
+  align = 'center',
   children,
 }: {
   label: string;
   side?: 'top' | 'bottom';
+  align?: TooltipAlign;
   children: ReactElement<{ 'aria-describedby'?: string; 'aria-label'?: string }>;
 }) {
   const id = useId();
+  const { edge, shift } = ALIGN_CLASSES[align];
   const tipRef = useRef<HTMLSpanElement>(null);
   const [hovered, setHovered] = useState(false);
   // Escape hid it; the next hover or focus clears this.
@@ -117,7 +140,7 @@ export function Tooltip({
         id={id}
         role="tooltip"
         aria-hidden={describes ? undefined : true}
-        className={`invisible absolute left-1/2 z-50 ${SIDE_CLASSES[side]} ${BRIDGE_CLASSES[side]} -translate-x-1/2 whitespace-nowrap rounded-radius-sm bg-tooltip-bg px-2 py-1 text-meta text-tooltip-fg opacity-0${dismissed ? '' : ` ${SHOW_CLASSES}`}`}
+        className={`invisible absolute ${edge} z-50 ${SIDE_CLASSES[side]} ${BRIDGE_CLASSES[side]}${shift} whitespace-nowrap rounded-radius-sm bg-tooltip-bg px-2 py-1 text-meta text-tooltip-fg opacity-0${dismissed ? '' : ` ${SHOW_CLASSES}`}`}
       >
         {label}
       </span>

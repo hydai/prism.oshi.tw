@@ -1,7 +1,7 @@
 import type { ButtonHTMLAttributes, Ref } from 'react';
 import { buttonClasses, type ButtonSize, type ButtonVariant } from './button-classes';
 import { Icon, type IconName } from './Icon';
-import { Tooltip } from './Tooltip';
+import { Tooltip, type TooltipAlign } from './Tooltip';
 
 export type { ButtonVariant, ButtonSize } from './button-classes';
 
@@ -67,7 +67,10 @@ const ICON_BUTTON_TONE_CLASSES: Record<IconButtonTone, string> = {
   danger: 'text-tone-danger-fg hover:bg-tone-danger-bg',
 };
 
-/** An icon-only button: `label` is its accessible name and its tooltip (`tooltipSide` = where that opens). */
+/**
+ * An icon-only button: `label` is its accessible name and its tooltip (`tooltipSide` = where that
+ * opens, `tooltipAlign` = which edge of the button it lines up with; see `Tooltip`).
+ */
 export function IconButton({
   ref,
   label,
@@ -75,6 +78,7 @@ export function IconButton({
   tone = 'default',
   size = 'md',
   tooltipSide,
+  tooltipAlign,
   type = 'button',
   className,
   ...rest
@@ -85,11 +89,12 @@ export function IconButton({
   tone?: IconButtonTone;
   size?: IconButtonSize;
   tooltipSide?: 'top' | 'bottom';
+  tooltipAlign?: TooltipAlign;
 }) {
   const classes = `inline-flex shrink-0 items-center justify-center rounded-radius-pill transition-colors disabled:cursor-not-allowed disabled:opacity-50 focus-visible:outline-none focus-visible:shadow-focus ${ICON_BUTTON_SIZE_CLASSES[size]} ${ICON_BUTTON_TONE_CLASSES[tone]}${className ? ` ${className}` : ''}`;
 
   return (
-    <Tooltip label={label} side={tooltipSide}>
+    <Tooltip label={label} side={tooltipSide} align={tooltipAlign}>
       <button {...rest} ref={ref} type={type} aria-label={label} className={classes}>
         <Icon name={icon} size={ICON_SIZES[size]} />
       </button>

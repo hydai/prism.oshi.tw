@@ -371,3 +371,33 @@ html.dark body {
   outline: none;
   box-shadow: var(--focus-ring);
 }
+
+/* ===== The kit Tooltip's chip (components/ui/Tooltip.tsx) =====
+   Not laid out while hidden: an invisible chip beside a scroll container's edge would still widen
+   what that container scrolls. It is laid out while its group is hovered or holds focus, and only
+   while it carries the utilities that show it then: a chip dismissed with Escape drops them, and
+   leaves the layout at once although its target keeps the hover or the focus. `display` changes
+   discretely with the chip's own opacity / visibility transition, so the chip still waits out its
+   delay and fades in, and on the way out stays laid out until its fade has ended. A chip that has
+   just been laid out starts transparent and hidden (@starting-style), as it always did. */
+.group\/tip > [role='tooltip'] {
+  display: none;
+  transition-property: opacity, visibility, display;
+  transition-behavior: allow-discrete;
+}
+
+.group\/tip:hover > [role='tooltip'].group-hover\/tip\:visible,
+.group\/tip:focus-within > [role='tooltip'].group-focus-within\/tip\:visible {
+  display: block;
+}
+
+/* `[id]` (every chip has one) outweighs the `group-hover/tip:` / `group-focus-within/tip:`
+   utilities, which Tailwind emits after this file at the same specificity: the starting style must
+   win over them, or the chip would start out shown. */
+@starting-style {
+  .group\/tip:hover > [role='tooltip'][id],
+  .group\/tip:focus-within > [role='tooltip'][id] {
+    opacity: 0;
+    visibility: hidden;
+  }
+}
