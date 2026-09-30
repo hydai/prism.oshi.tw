@@ -13,7 +13,7 @@ import {
 
 function test(name: string, fn: () => void): void {
   try {
-    fn();
+    withEnv('WRANGLER_VERSION', undefined, fn);
     console.log(`✓ ${name}`);
   } catch (err) {
     console.error(`✗ ${name}`);
@@ -146,6 +146,21 @@ test('executeD1FileArgs targets the admin database remotely by default', () => {
     assert.deepEqual(executeD1FileArgs('/tmp/x.sql'), ['wrangler@latest', 'd1', 'execute', 'oshi-prism-db', '--remote', '--file=/tmp/x.sql']);
   });
 });
+
+for (const version of ['4.137.0', '4.138.0-beta.1', '', undefined]) {
+  test(`write arguments honour WRANGLER_VERSION=${String(version)} in both D1 modes`, () => {
+    withEnv('WRANGLER_VERSION', version, () => {
+      for (const mode of [undefined, '1']) {
+        withEnv('PRISM_D1_LOCAL', mode, () => {
+          const args = executeD1FileArgs('/tmp/x.sql');
+          assert.equal(args[0], `wrangler@${version || 'latest'}`);
+          assert.ok(args.includes(mode === '1' ? '--local' : '--remote'));
+          assert.ok(args.includes('--file=/tmp/x.sql'));
+        });
+      }
+    });
+  });
+}
 
 test('writeSqlToPrivateTempFile creates an owner-only file that ends with a newline', () => {
   const { dir, file } = writeSqlToPrivateTempFile('SELECT 1;');

@@ -6,7 +6,7 @@ import { __setRunnerForTests, d1ModeFlag, parseWranglerResults, queryD1 } from '
 
 function test(name: string, fn: () => void): void {
   try {
-    fn();
+    withEnv('WRANGLER_VERSION', undefined, fn);
     console.log(`✓ ${name}`);
   } catch (err) {
     console.error(`✗ ${name}`);
@@ -222,6 +222,22 @@ test('queryD1 builds the crystal argument vector, cwd under repoRoot()/tools/cry
     assert.equal(calls[0].cwd, path.resolve(repoRoot(), 'tools/crystal'));
   });
 });
+
+// Resolve the version per call, not once at module import time.
+for (const version of ['4.137.0', '4.138.0-beta.1', '', undefined]) {
+  test(`queryD1 honours WRANGLER_VERSION=${String(version)} for every target`, () => {
+    withEnv('WRANGLER_VERSION', version, () => {
+      withStubbedRunner([], (calls) => {
+        for (const target of ['nova', 'admin', 'crystal'] as const) {
+          queryD1(target, 'SELECT 1', { remote: true });
+          queryD1(target, 'SELECT 1', { remote: false });
+        }
+        assert.equal(calls.length, 6);
+        for (const call of calls) assert.equal(call.args[0], `wrangler@${version || 'latest'}`);
+      });
+    });
+  });
+}
 
 // --- queryD1: --remote vs --local, option and PRISM_D1_LOCAL env ---
 

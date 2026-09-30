@@ -21,7 +21,7 @@ import { formatSubscriberCount } from '../../admin/shared/format.ts';
 import type { BulkFetchSubscribersResponse, BulkFetchSubscribersResult } from '../../admin/shared/types.ts';
 import { fetchChannelInfo } from '../../admin/src/youtube.ts';
 import { isMain, loadSecret, repoRoot } from '../shared/cli.ts';
-import { d1ModeFlag, queryD1 } from '../shared/d1.ts';
+import { d1ModeFlag, queryD1, wranglerPackage } from '../shared/d1.ts';
 
 // --- Paths ---
 
@@ -78,7 +78,7 @@ export function formatSummary(response: BulkFetchSubscribersResponse): string {
 // --- I/O ---
 
 export function executeD1FileArgs(filePath: string): string[] {
-  return ['wrangler@latest', 'd1', 'execute', NOVA_DB, d1ModeFlag(), `--file=${filePath}`];
+  return [wranglerPackage(), 'd1', 'execute', NOVA_DB, d1ModeFlag(), `--file=${filePath}`];
 }
 
 function executeD1File(filePath: string): void {
@@ -122,7 +122,7 @@ export async function main(): Promise<void> {
   try {
     rows = queryD1<ApprovedRow>('nova', APPROVED_WITH_CHANNEL_SQL);
   } catch (err) {
-    console.error('ERROR: failed to query Nova D1. Is wrangler authenticated? Run `npx wrangler@latest login`.');
+    console.error(`ERROR: failed to query Nova D1. Is wrangler authenticated? Run npx ${wranglerPackage()} login.`);
     console.error(err instanceof Error ? err.message : String(err));
     process.exit(1);
   }

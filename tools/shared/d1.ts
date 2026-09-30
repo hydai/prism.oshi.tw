@@ -50,6 +50,13 @@ import { repoRoot } from './cli.ts';
 
 export type D1Target = 'nova' | 'admin' | 'crystal';
 
+/** Resolve per invocation so queries and file writes honour the same override.
+ * Unset or empty WRANGLER_VERSION preserves the historical latest default.
+ * Child sync processes inherit this environment variable automatically. */
+export function wranglerPackage(): string {
+  return `wrangler@${process.env.WRANGLER_VERSION || 'latest'}`;
+}
+
 const TARGETS: Record<D1Target, { name: string; cwd: string }> = {
   nova: { name: 'oshi-prism-nova', cwd: path.resolve(repoRoot(), 'tools/nova') },
   admin: { name: 'oshi-prism-db', cwd: path.resolve(repoRoot(), 'admin') },
@@ -148,7 +155,7 @@ export function d1ModeFlag(remote?: boolean): '--remote' | '--local' {
 export function queryD1<T>(target: D1Target, sql: string, { remote }: { remote?: boolean } = {}): T[] {
   const { name, cwd } = TARGETS[target];
   const raw = runWrangler(
-    ['wrangler@latest', 'd1', 'execute', name, '--json', d1ModeFlag(remote), '--command', sql],
+    [wranglerPackage(), 'd1', 'execute', name, '--json', d1ModeFlag(remote), '--command', sql],
     cwd,
   );
   return parseWranglerResults<T>(raw);

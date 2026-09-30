@@ -17,7 +17,7 @@ import * as path from 'node:path';
 
 import { getTagLabel } from '../../lib/tags.ts';
 import { isMain, readJsonOr, repoRoot } from '../shared/cli.ts';
-import { d1ModeFlag, queryD1 } from '../shared/d1.ts';
+import { d1ModeFlag, queryD1, wranglerPackage } from '../shared/d1.ts';
 import { planTagFill, type FillPlan, type StreamerName, type WorkInput } from './rules.ts';
 
 const ADMIN_DB = 'oshi-prism-db';
@@ -110,7 +110,7 @@ export function formatReport(plan: FillPlan, totalWorks: number, apply: boolean)
 }
 
 export function executeD1FileArgs(filePath: string): string[] {
-  return ['wrangler@latest', 'd1', 'execute', ADMIN_DB, d1ModeFlag(), `--file=${filePath}`];
+  return [wranglerPackage(), 'd1', 'execute', ADMIN_DB, d1ModeFlag(), `--file=${filePath}`];
 }
 
 /** Owner-only temp dir + wx file, exactly like tools/fetch-channel-info (CWE-377/379). */

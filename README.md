@@ -70,6 +70,27 @@ Streamers are managed through the Nova admin backend, **not** by hand-editing fi
 3. `npm run sync:data -- <slug>` — exports that streamer's approved songs/streams to `data/<slug>/`
 4. Commit & push → GitHub Actions rebuilds and deploys
 
+## Wrangler Version for Data Tools
+
+The sync and data tools use `npx wrangler@latest` by default. To pin the version
+for a single run or a whole sequence, set the **environment variable**:
+
+```bash
+WRANGLER_VERSION=4.137.0 npm run sync:status
+
+# Inherit the same version in sync:stale's sync:data child processes.
+export WRANGLER_VERSION=4.137.0
+npm run sync:stale
+```
+
+Use a version you have approved for your environment; the number above is an
+example, not a permanent recommendation. Unset or empty `WRANGLER_VERSION` falls
+back to `latest`. It applies to shared D1 queries (`sync:registry`, `sync:data`,
+`sync:status`, `sync:stale`, `inbox:status`), both reads and writes in
+`fetch:channel-info`, and `tags:fill`. `PRISM_D1_LOCAL` still controls the database
+mode independently. This override does not change the separate Worker
+`dev`/`deploy`/migration npm scripts.
+
 ## Managing Song Tags
 
 Tags are curated per shared work in the Admin Global Library and exported by
