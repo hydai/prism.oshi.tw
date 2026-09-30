@@ -1551,6 +1551,15 @@ async function main(): Promise<void> {
         expectedPage: 3,
         clears: true,
       },
+      {
+        // The filter emptied (every row decided away): the server counts no page at all.
+        name: 'Next with no page left stays on page 1, never page 0',
+        action: 'nextPageRequested',
+        page: 1,
+        totalPages: 0,
+        expectedPage: 1,
+        clears: false,
+      },
     ];
     for (const { name, action, page, totalPages, expectedPage, clears } of PAGE_CASES) {
       const before = queueState({
