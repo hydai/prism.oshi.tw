@@ -76,7 +76,7 @@ export const ADMIN_ROUTES: readonly AdminRoute[] = [
     frame: 'studio',
     render: (user) => <SongsList user={user} />,
   },
-  { path: '/songs/:id', render: (user) => <SongDetail user={user} /> },
+  { path: '/songs/:id', frame: 'studio', render: (user) => <SongDetail user={user} /> },
   {
     path: '/streams',
     label: 'Streams',
