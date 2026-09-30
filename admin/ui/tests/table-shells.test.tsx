@@ -22,6 +22,21 @@ function isDisabled(button: string): boolean {
   return /\sdisabled=""/.test(button);
 }
 
+/**
+ * A step at the end of its range: `aria-disabled` and not `disabled`. The press that reaches the last (or
+ * first) page would otherwise disable the button that holds the keyboard focus, and a browser drops the
+ * focus from a button that turns disabled. The `aria-disabled:` variants in the class list do not count,
+ * so this matches the attribute.
+ */
+function isAtRangeEnd(button: string): boolean {
+  return /\saria-disabled="true"/.test(button) && !isDisabled(button);
+}
+
+/** A step that can be pressed: neither attribute, and the button was found. */
+function isAvailable(button: string): boolean {
+  return button !== '' && !isDisabled(button) && !/\saria-disabled=/.test(button);
+}
+
 // --- SortHeader: one column head for every sortable table ---
 
 const sortHeader = (activeField: 'title' | 'date', direction: 'asc' | 'desc') =>
@@ -65,13 +80,25 @@ const pagination = (page: number, totalPages: number, disabled?: boolean) =>
 const firstPage = pagination(1, 3);
 assert(firstPage.includes('Showing 1–50 of 120'), 'the footer names the visible range and the total');
 assert(firstPage.includes('Page 1 of 3'), 'the footer names the current page');
-assert(isDisabled(buttonFor(firstPage, 'Previous')), 'Previous is unavailable on the first page');
-assert(!isDisabled(buttonFor(firstPage, 'Next')), 'Next is available while pages remain');
+assert(
+  isAtRangeEnd(buttonFor(firstPage, 'Previous')),
+  'Previous is unavailable on the first page: aria-disabled, not disabled, so the press that got there keeps the focus',
+);
+assert(isAvailable(buttonFor(firstPage, 'Next')), 'Next is available while pages remain');
 
 const lastPage = pagination(3, 3);
-assert(!isDisabled(buttonFor(lastPage, 'Previous')), 'Previous is available past the first page');
-assert(isDisabled(buttonFor(lastPage, 'Next')), 'Next is unavailable on the last page');
+assert(isAvailable(buttonFor(lastPage, 'Previous')), 'Previous is available past the first page');
+assert(
+  isAtRangeEnd(buttonFor(lastPage, 'Next')),
+  'Next is unavailable on the last page: aria-disabled, not disabled, so the press that got there keeps the focus',
+);
 assert(lastPage.includes('Showing 101–120 of 120'), 'the last page shows the remainder');
+
+const onlyPage = pagination(1, 1);
+assert(
+  isAtRangeEnd(buttonFor(onlyPage, 'Previous')) && isAtRangeEnd(buttonFor(onlyPage, 'Next')),
+  'a single page has both steps at the end of the range',
+);
 
 const busy = pagination(2, 3, true);
 assert(isDisabled(buttonFor(busy, 'Previous')), 'a busy queue disables Previous');
