@@ -1,563 +1,255 @@
-import {
-  useCallback,
-  useEffect,
-  useReducer,
-  useRef,
-  useState,
-  type RefObject,
-} from 'react';
+import type { ReactNode } from 'react';
 import type { AuthUser } from '../../../shared/types';
-import { api, ApiError } from '../api/client';
-import type {
-  VodExportCandidate,
-  VodExportCapacityDiagnostic,
-  VodExportFindingApi,
-  VodExportStatusResponse,
-} from '../api/vodExportTypes';
 import { CandidatePanel, EmptyCandidatePanel } from '../components/vod-export/CandidatePanel';
 import { CapacityPanel } from '../components/vod-export/CapacityPanel';
 import { CurrentPublicationPanel } from '../components/vod-export/CurrentPublicationPanel';
 import { FindingsPanel } from '../components/vod-export/FindingsPanel';
 import { PublishConfirmationDialog } from '../components/vod-export/PublishConfirmationDialog';
-import { operationMessage } from '../lib/vod-export-format';
-import {
-  getPublishDisabledReason,
-  type CandidateLocalState,
-} from '../lib/vod-export-helpers';
-import { createVodExportPageState, vodExportPageReducer } from './vod-export-state';
+import { Button } from '../components/ui/Button';
+import { EmptyState, GlassCard, Skeleton } from '../components/ui/Display';
+import { Note } from '../components/ui/Note';
+import { PageHeader } from '../components/ui/PageHeader';
+import { Pill } from '../components/ui/Pill';
+import { Stepper } from '../components/ui/Stepper';
+import { candidateAlreadyPublished } from '../lib/vod-export-helpers';
+import { useVodExportPage, type VodExportPageModel } from './useVodExportPage';
+import { isPreviewPublished, publicationStatePill, publicationSteps } from './vod-export-state';
 
 export { CurrentPublicationPanel, CapacityPanel, FindingsPanel, CandidatePanel, PublishConfirmationDialog };
 
-function VodExportHeader({
-  status,
-  statusLoading,
-  statusError,
-  generating,
-  publishing,
-  onGenerate,
-}: {
-  status: VodExportStatusResponse;
-  statusLoading: boolean;
-  statusError: string | null;
-  generating: boolean;
-  publishing: boolean;
-  onGenerate: () => void;
-}) {
+/** PUBLISH › VOD Export, the state pill once the status is known, and Generate preview. */
+function VodExportHeader({ page }: { page: VodExportPageModel }) {
+  const { state, generateButtonRef, headingRef, generatePreview } = page;
+  const { status, statusLoading, statusError, generating, publishing, checkingCandidate } = state;
+  const pill = publicationStatePill(state);
+
   return (
-    <div className="flex flex-wrap items-start justify-between gap-4">
-      <div>
-        <div className="flex flex-wrap items-center gap-2">
-          <h2 className="text-xl font-semibold text-slate-800">VOD Export</h2>
-          {status.changesNotPublished && (
-            <span className="rounded-full bg-amber-100 px-2.5 py-1 text-xs font-semibold text-amber-800">
-              Changes not published
-            </span>
-          )}
-        </div>
-        <p className="mt-1 max-w-2xl text-sm text-slate-500">
-          Validate all approved streamer VOD and performance data, review the exact candidate, then explicitly publish it.
-        </p>
-      </div>
-      <button
-        type="button"
-        onClick={onGenerate}
-        disabled={
-          generating
-          || publishing
-          || statusLoading
-          || statusError !== null
-          || status.publicationInProgress
-          || status.generationInProgress
-        }
-        className="rounded-md bg-blue-600 px-4 py-2 text-sm font-medium text-white hover:bg-blue-700 disabled:cursor-not-allowed disabled:opacity-50"
-      >
-        {generating ? 'Generating preview...' : 'Generate preview'}
-      </button>
-    </div>
+    <PageHeader
+      crumb="PUBLISH"
+      title="VOD Export"
+      titleRef={headingRef}
+      actions={
+        <Button
+          ref={generateButtonRef}
+          variant="primary"
+          icon="refresh"
+          busy={generating}
+          disabled={
+            publishing
+            || checkingCandidate
+            || statusLoading
+            || statusError !== null
+            || status.publicationInProgress
+            || status.generationInProgress
+          }
+          onClick={generatePreview}
+        >
+          {generating ? 'Generating preview...' : 'Generate preview'}
+        </Button>
+      }
+    >
+      {pill ? <Pill tone={pill.tone}>{pill.label}</Pill> : null}
+    </PageHeader>
   );
 }
 
-function VodExportFeedback({
-  status,
-  statusLoading,
-  statusError,
-  operationError,
-  resultMessage,
-  postCommitWarnings,
-  copyMessage,
-  publishing,
-  onRetryStatus,
-  onRecoverPublication,
-}: {
-  status: VodExportStatusResponse;
-  statusLoading: boolean;
-  statusError: string | null;
-  operationError: string | null;
-  resultMessage: string | null;
-  postCommitWarnings: string[];
-  copyMessage: string | null;
-  publishing: boolean;
-  onRetryStatus: () => void;
-  onRecoverPublication: () => void;
-}) {
+/** A note's message with its one action at the far end, wrapping below it when the line is full. */
+function NoteWithAction({ message, action }: { message: string; action: ReactNode }) {
+  return (
+    <span className="flex flex-wrap items-center justify-between gap-x-3 gap-y-1.5">
+      <span>{message}</span>
+      {action}
+    </span>
+  );
+}
+
+/**
+ * What needs the curator before anything else, as notes above the findings: a status or operation
+ * failure, the control warning, a publication that still needs recovery or reconciliation, and an
+ * operation already running.
+ */
+function VodExportNotes({ page }: { page: VodExportPageModel }) {
+  const { state, retryStatusButtonRef, retryStatus, recoverPublication } = page;
+  const { status, statusLoading, statusError, operationError, postCommitWarnings, publishing } = state;
+  const recoverButton = (label: string) => (
+    <Button size="sm" busy={publishing} onClick={recoverPublication}>
+      {publishing ? 'Recovering...' : label}
+    </Button>
+  );
+
   return (
     <>
-      {copyMessage && (
-        <p className="mt-4 rounded-md bg-slate-800 px-3 py-2 text-sm text-white" role="status">
-          {copyMessage}
-        </p>
-      )}
-      {statusError && (
-        <div className="mt-4 flex flex-wrap items-center gap-3 rounded-md border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700" role="alert">
-          <span>{statusError}</span>
-          <button
-            type="button"
-            disabled={statusLoading}
-            onClick={onRetryStatus}
-            className="rounded bg-red-700 px-2.5 py-1 text-xs font-medium text-white disabled:opacity-50"
-          >
-            {statusLoading ? 'Retrying...' : 'Retry status'}
-          </button>
-        </div>
-      )}
-      {operationError && (
-        <div className="mt-4 rounded-md border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700" role="alert">
+      {statusError !== null ? (
+        <Note tone="danger" icon="alert" role="alert">
+          <NoteWithAction
+            message={statusError}
+            action={
+              <Button
+                ref={retryStatusButtonRef}
+                size="sm"
+                icon="refresh"
+                busy={statusLoading}
+                onClick={() => void retryStatus()}
+              >
+                {statusLoading ? 'Retrying...' : 'Retry status'}
+              </Button>
+            }
+          />
+        </Note>
+      ) : null}
+      {operationError !== null ? (
+        <Note tone="danger" icon="alert" role="alert">
           {operationError}
-        </div>
-      )}
-      {resultMessage && (
-        <div className="mt-4 rounded-md border border-emerald-200 bg-emerald-50 px-4 py-3 text-sm text-emerald-800" role="status">
-          {resultMessage}
-        </div>
-      )}
-      {status.controlWarning && (
-        <div className="mt-4 rounded-md border border-amber-200 bg-amber-50 px-4 py-3 text-sm text-amber-800" role="alert">
+        </Note>
+      ) : null}
+      {status.controlWarning ? (
+        <Note tone="warn" icon="alert" role="alert">
           {status.controlWarning}
-        </div>
-      )}
+        </Note>
+      ) : null}
       {postCommitWarnings.map((warning) => (
-        <div key={warning} className="mt-4 rounded-md border border-amber-200 bg-amber-50 px-4 py-3 text-sm text-amber-800" role="alert">
-          Publication committed, but follow-up recovery is required: {warning}
-          {status.recoveryAvailable && (
-            <button
-              type="button"
-              disabled={publishing}
-              onClick={onRecoverPublication}
-              className="ml-3 rounded bg-amber-800 px-2.5 py-1 text-xs font-medium text-white disabled:opacity-50"
-            >
-              {publishing ? 'Recovering...' : 'Retry recovery'}
-            </button>
-          )}
-        </div>
+        <Note key={warning} tone="warn" icon="alert" role="alert">
+          <NoteWithAction
+            message={`Publication committed, but follow-up recovery is required: ${warning}`}
+            action={status.recoveryAvailable ? recoverButton('Retry recovery') : null}
+          />
+        </Note>
       ))}
-      {status.recoveryAvailable && postCommitWarnings.length === 0 && (
-        <div className="mt-4 rounded-md border border-amber-200 bg-amber-50 px-4 py-3 text-sm text-amber-800" role="alert">
-          A prepared publication needs authoritative reconciliation before new publication actions can continue.
-          <button
-            type="button"
-            disabled={publishing}
-            onClick={onRecoverPublication}
-            className="ml-3 rounded bg-amber-800 px-2.5 py-1 text-xs font-medium text-white disabled:opacity-50"
-          >
-            {publishing ? 'Recovering...' : 'Reconcile publication'}
-          </button>
-        </div>
-      )}
+      {status.recoveryAvailable && postCommitWarnings.length === 0 ? (
+        <Note tone="warn" icon="alert" role="alert">
+          <NoteWithAction
+            message="A prepared publication needs authoritative reconciliation before new publication actions can continue."
+            action={recoverButton('Reconcile publication')}
+          />
+        </Note>
+      ) : null}
+      {status.publicationInProgress ? (
+        <Note tone="info" icon="clock">
+          A publication is currently in progress. New publication actions are disabled.
+        </Note>
+      ) : null}
+      {status.generationInProgress ? (
+        <Note tone="info" icon="clock">
+          A preview is currently being generated. New preview actions are disabled.
+        </Note>
+      ) : null}
     </>
   );
 }
 
-function PublicationOverview({
-  status,
-  statusLoading,
-  statusUnavailable,
-  onCopied,
-}: {
-  status: VodExportStatusResponse;
-  statusLoading: boolean;
-  statusUnavailable: boolean;
-  onCopied: () => void;
-}) {
+/** The findings of the preview on screen; before one, a placeholder (a skeleton while it generates). */
+function FindingsColumn({ page }: { page: VodExportPageModel }) {
+  const { generating, previewLoaded, findings } = page.state;
+  if (previewLoaded) return <FindingsPanel findings={findings} />;
+
   return (
-    <div className="mt-6 grid gap-6 xl:grid-cols-2">
+    <GlassCard as="section" aria-label="Validation findings">
+      {generating ? (
+        <Skeleton rows={5} label="Validating the approved data..." />
+      ) : (
+        <EmptyState
+          icon="shield"
+          title="No preview yet"
+          body="Validation findings appear here once a preview has run."
+        />
+      )}
+    </GlassCard>
+  );
+}
+
+/** The side column: what is public now, the candidate a preview stored, and the preview's capacity. */
+function PublicationSideCards({ page }: { page: VodExportPageModel }) {
+  const { state, now, errorCount, disabledReason, publishButtonRef, notifyCopied, download, confirmCurrentCandidate } = page;
+  const { status, statusLoading, statusError, candidate } = state;
+
+  return (
+    <div className="flex min-w-0 flex-col gap-3.5">
       <CurrentPublicationPanel
         publication={status.currentPublication}
         loading={statusLoading}
-        unavailable={statusUnavailable}
-        onCopied={onCopied}
+        unavailable={statusError !== null}
+        onCopied={notifyCopied}
       />
-
-      <section className="rounded-lg border border-slate-200 bg-white p-5 shadow-sm" aria-labelledby="workflow-heading">
-        <h3 id="workflow-heading" className="text-base font-semibold text-slate-800">
-          Publication workflow
-        </h3>
-        <ol className="mt-4 space-y-4 text-sm">
-          <li className="flex gap-3">
-            <span className="flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-blue-100 text-xs font-semibold text-blue-700">1</span>
-            <div>
-              <p className="font-medium text-slate-800">Generate preview</p>
-              <p className="mt-0.5 text-slate-500">Reads and validates the complete approved source only when requested.</p>
-            </div>
-          </li>
-          <li className="flex gap-3">
-            <span className="flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-blue-100 text-xs font-semibold text-blue-700">2</span>
-            <div>
-              <p className="font-medium text-slate-800">Review findings and identity</p>
-              <p className="mt-0.5 text-slate-500">Blocking errors create no candidate. Warnings remain visible but do not block publication.</p>
-            </div>
-          </li>
-          <li className="flex gap-3">
-            <span className="flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-blue-100 text-xs font-semibold text-blue-700">3</span>
-            <div>
-              <p className="font-medium text-slate-800">Confirm and publish</p>
-              <p className="mt-0.5 text-slate-500">A second explicit action advances the public manifest to the exact stored bytes.</p>
-            </div>
-          </li>
-        </ol>
-        {status.publicationInProgress && (
-          <p className="mt-4 rounded-md bg-amber-50 px-3 py-2 text-sm text-amber-800">
-            A publication is currently in progress. New publication actions are disabled.
-          </p>
-        )}
-        {status.generationInProgress && (
-          <p className="mt-4 rounded-md bg-amber-50 px-3 py-2 text-sm text-amber-800">
-            A preview is currently being generated. New preview actions are disabled.
-          </p>
-        )}
-      </section>
-    </div>
-  );
-}
-
-function PreviewReview({
-  capacity,
-  candidate,
-  candidateState,
-  canPublish,
-  disabledReason,
-  downloading,
-  checkingCandidate,
-  previewLoaded,
-  findings,
-  publishButtonRef,
-  now,
-  onDownload,
-  onPublish,
-  onCopied,
-}: {
-  capacity: VodExportCapacityDiagnostic[];
-  candidate: VodExportCandidate | null;
-  candidateState: CandidateLocalState;
-  canPublish: boolean;
-  disabledReason: string | null;
-  downloading: boolean;
-  checkingCandidate: boolean;
-  previewLoaded: boolean;
-  findings: VodExportFindingApi[];
-  publishButtonRef: RefObject<HTMLButtonElement | null>;
-  now: number;
-  onDownload: () => void;
-  onPublish: () => void;
-  onCopied: () => void;
-}) {
-  return (
-    <div className="mt-6 space-y-6">
-      <CapacityPanel diagnostics={capacity} />
-
-      {candidate && (
+      {candidate ? (
         <CandidatePanel
           candidate={candidate}
-          localState={candidateState}
-          canPublish={canPublish}
+          localState={state.candidateState}
+          canPublish={state.canPublish}
           disabledReason={disabledReason}
-          downloading={downloading}
-          checking={checkingCandidate}
-          onDownload={onDownload}
-          onPublish={onPublish}
-          onCopied={onCopied}
+          downloading={state.downloading}
+          checking={state.checkingCandidate}
+          onDownload={download}
+          onPublish={confirmCurrentCandidate}
+          onCopied={notifyCopied}
           publishButtonRef={publishButtonRef}
           now={now}
         />
-      )}
-
-      {!candidate && (
+      ) : (
         <EmptyCandidatePanel
           reason={disabledReason ?? 'Generate a fresh preview.'}
-          previewLoaded={previewLoaded}
+          previewLoaded={state.previewLoaded}
+          errorCount={errorCount}
+          published={isPreviewPublished(state, now)}
         />
       )}
-
-      {previewLoaded && <FindingsPanel findings={findings} />}
+      <CapacityPanel diagnostics={state.capacity} />
     </div>
   );
 }
 
+/**
+ * VOD Export (spec §8.8): the "Publication workflow" stepper, then the findings — with the notes that
+ * need the curator above them — beside the current publication, the preview candidate and its
+ * capacity; the two columns stack below 1024 px. Publish re-checks the candidate before its
+ * confirmation opens, and an open confirmation follows the page's reason for not publishing: once
+ * one turns up (the candidate expires, say), it says so and can only be cancelled — which then moves
+ * focus off the disabled Publish, as the end of a publication does.
+ */
+function VodExportPage() {
+  const page = useVodExportPage();
+  const { state, now, warningCount, disabledReason, publishButtonRef, publish, cancelConfirmation } = page;
+
+  return (
+    <div className="flex flex-col">
+      <VodExportHeader page={page} />
+
+      <div className="flex flex-col gap-3.5 p-4 lg:px-5 lg:pb-[18px]">
+        <Stepper label="Publication workflow" steps={publicationSteps(state, now)} />
+        <div className="grid grid-cols-1 items-start gap-3.5 lg:grid-cols-[minmax(0,1fr)_300px]">
+          <div className="flex min-w-0 flex-col gap-3.5">
+            <VodExportNotes page={page} />
+            <FindingsColumn page={page} />
+          </div>
+          <PublicationSideCards page={page} />
+        </div>
+      </div>
+
+      {state.confirming && state.candidate ? (
+        <PublishConfirmationDialog
+          candidate={state.candidate}
+          warningCount={warningCount}
+          publishing={state.publishing}
+          disabledReason={disabledReason}
+          unchanged={candidateAlreadyPublished(state.candidateState, state.candidate)}
+          returnFocusElement={publishButtonRef}
+          onCancel={cancelConfirmation}
+          onConfirm={publish}
+        />
+      ) : null}
+    </div>
+  );
+}
+
+/** Curators only: anyone else gets the guard, and the page — with every request it makes — never mounts. */
 export default function VodExport({ user }: { user: AuthUser }) {
-  const publishButtonRef = useRef<HTMLButtonElement>(null);
-  const [{
-    status,
-    statusLoading,
-    statusError,
-    candidate,
-    candidateState,
-    canPublish,
-    findings,
-    capacity,
-    previewLoaded,
-    generating,
-    publishing,
-    downloading,
-    checkingCandidate,
-    confirming,
-    operationError,
-    resultMessage,
-    postCommitWarnings,
-    copyMessage,
-  }, dispatch] = useReducer(vodExportPageReducer, undefined, createVodExportPageState);
-  const [now, setNow] = useState(() => Date.now());
-
-  const refreshStatus = useCallback(async (): Promise<boolean> => {
-    try {
-      const current = await api.vodExportStatus();
-      dispatch({ type: 'statusSucceeded', status: current });
-      return true;
-    } catch (error) {
-      dispatch({
-        type: 'statusFailed',
-        error: operationMessage(error, 'Failed to refresh publication status.'),
-      });
-      return false;
-    }
-  }, []);
-
-  useEffect(() => {
-    let active = true;
-    api
-      .vodExportStatus()
-      .then((response) => {
-        if (active) dispatch({ type: 'statusSucceeded', status: response });
-      })
-      .catch((error: unknown) => {
-        if (active) {
-          dispatch({
-            type: 'statusFailed',
-            error: operationMessage(error, 'Failed to load publication status.'),
-          });
-        }
-      })
-      .finally(() => {
-        if (active) dispatch({ type: 'statusLoadingFinished' });
-      });
-    return () => {
-      active = false;
-    };
-  }, []);
-
-  useEffect(() => {
-    if (
-      !status.generationInProgress
-      && !status.publicationInProgress
-      && !status.recoveryAvailable
-    ) return undefined;
-
-    const interval = window.setInterval(() => {
-      void refreshStatus();
-    }, 15_000);
-    return () => window.clearInterval(interval);
-  }, [
-    refreshStatus,
-    status.generationInProgress,
-    status.publicationInProgress,
-    status.recoveryAvailable,
-  ]);
-
-  useEffect(() => {
-    if (!candidate) return undefined;
-    const interval = window.setInterval(() => setNow(Date.now()), 30_000);
-    return () => window.clearInterval(interval);
-  }, [candidate]);
-
   if (user.role !== 'curator') {
     return (
-      <div className="rounded-lg border border-red-200 bg-red-50 p-5 text-sm text-red-800">
-        Curator access is required.
+      <div className="p-4 lg:px-5">
+        <Note tone="danger" icon="lock">
+          Curator access is required.
+        </Note>
       </div>
     );
   }
-
-  const disabledReason = statusLoading
-    ? 'Loading authoritative publication status.'
-    : statusError
-      ? 'Publication status is unavailable. Retry status before publishing.'
-    : getPublishDisabledReason({
-        candidate,
-        canPublish,
-        hasBlockingErrors: findings.some((finding) => finding.severity === 'error'),
-        localState: candidateState,
-        publishing,
-        publicationInProgress: status.publicationInProgress,
-        now,
-      });
-  const warningCount = findings.filter((finding) => finding.severity === 'warning').length;
-
-  const notifyCopied = () => {
-    dispatch({ type: 'copyMessageShown' });
-    window.setTimeout(() => dispatch({ type: 'copyMessageCleared' }), 2_000);
-  };
-
-  const generatePreview = async () => {
-    dispatch({ type: 'previewGenerationStarted' });
-
-    try {
-      const response = await api.generateVodExportPreview();
-      dispatch({ type: 'previewGenerationSucceeded', response });
-    } catch (error) {
-      dispatch({
-        type: 'previewGenerationFailed',
-        error: operationMessage(error, 'Failed to generate preview.'),
-        capacity: error instanceof ApiError ? error.diagnostics : undefined,
-      });
-    } finally {
-      dispatch({ type: 'previewGenerationFinished' });
-    }
-  };
-
-  const download = async () => {
-    if (!candidate) return;
-    dispatch({ type: 'downloadStarted' });
-    try {
-      const result = await api.downloadVodExportCandidate(candidate.candidateId, candidate.sha256);
-      const objectUrl = URL.createObjectURL(result.blob);
-      const anchor = document.createElement('a');
-      anchor.href = objectUrl;
-      anchor.download = result.filename;
-      anchor.click();
-      window.setTimeout(() => URL.revokeObjectURL(objectUrl), 0);
-    } catch (error) {
-      dispatch({
-        type: 'downloadFailed',
-        error: operationMessage(error, 'Failed to download candidate.'),
-      });
-    } finally {
-      dispatch({ type: 'downloadFinished' });
-    }
-  };
-
-  const confirmCurrentCandidate = async () => {
-    if (!candidate || disabledReason) return;
-    dispatch({ type: 'candidateCheckStarted' });
-    try {
-      const response = await api.getVodExportCandidate(candidate.candidateId);
-      dispatch({ type: 'candidateCheckSucceeded', response });
-    } catch (error) {
-      dispatch({
-        type: 'candidateCheckFailed',
-        error: operationMessage(error, 'Failed to recheck candidate.'),
-      });
-    } finally {
-      dispatch({ type: 'candidateCheckFinished' });
-    }
-  };
-
-  const publish = async () => {
-    if (!candidate || disabledReason) return;
-    dispatch({ type: 'publicationStarted' });
-    try {
-      const response = await api.publishVodExportCandidate(candidate.candidateId);
-      dispatch({ type: 'publicationSucceeded', response });
-      await refreshStatus();
-    } catch (error) {
-      dispatch({
-        type: 'publicationFailed',
-        error: operationMessage(error, 'Failed to publish candidate.'),
-        stale: error instanceof ApiError && error.code === 'CANDIDATE_STALE',
-      });
-      // The request may have committed remotely even if its HTTP response was
-      // lost. Always fetch authoritative status so prepared recovery appears.
-      await refreshStatus();
-    } finally {
-      dispatch({ type: 'publicationFinished' });
-    }
-  };
-
-  const recoverPublication = async () => {
-    dispatch({ type: 'recoveryStarted' });
-    try {
-      const response = await api.reconcileVodExportPublication();
-      dispatch({ type: 'recoverySucceeded', response });
-      await refreshStatus();
-    } catch (error) {
-      dispatch({
-        type: 'recoveryFailed',
-        error: operationMessage(error, 'Failed to recover publication state.'),
-      });
-    } finally {
-      dispatch({ type: 'recoveryFinished' });
-    }
-  };
-
-  const retryStatus = async () => {
-    dispatch({ type: 'statusLoadingStarted' });
-    await refreshStatus();
-    dispatch({ type: 'statusLoadingFinished' });
-  };
-
-  return (
-    <div className="mx-auto max-w-6xl">
-      <VodExportHeader
-        status={status}
-        statusLoading={statusLoading}
-        statusError={statusError}
-        generating={generating}
-        publishing={publishing}
-        onGenerate={generatePreview}
-      />
-      <VodExportFeedback
-        status={status}
-        statusLoading={statusLoading}
-        statusError={statusError}
-        operationError={operationError}
-        resultMessage={resultMessage}
-        postCommitWarnings={postCommitWarnings}
-        copyMessage={copyMessage}
-        publishing={publishing}
-        onRetryStatus={() => void retryStatus()}
-        onRecoverPublication={recoverPublication}
-      />
-      <PublicationOverview
-        status={status}
-        statusLoading={statusLoading}
-        statusUnavailable={statusError !== null}
-        onCopied={notifyCopied}
-      />
-      <PreviewReview
-        capacity={capacity}
-        candidate={candidate}
-        candidateState={candidateState}
-        canPublish={canPublish}
-        disabledReason={disabledReason}
-        downloading={downloading}
-        checkingCandidate={checkingCandidate}
-        previewLoaded={previewLoaded}
-        findings={findings}
-        publishButtonRef={publishButtonRef}
-        now={now}
-        onDownload={download}
-        onPublish={confirmCurrentCandidate}
-        onCopied={notifyCopied}
-      />
-
-      {confirming && candidate && (
-        <PublishConfirmationDialog
-          candidate={candidate}
-          warningCount={warningCount}
-          publishing={publishing}
-          unchanged={candidateState === 'already_published' || candidate.state === 'already_published'}
-          returnFocusElement={publishButtonRef}
-          onCancel={() => dispatch({ type: 'confirmationCancelled' })}
-          onConfirm={publish}
-        />
-      )}
-    </div>
-  );
+  return <VodExportPage />;
 }

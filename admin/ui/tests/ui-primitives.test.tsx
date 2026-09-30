@@ -1294,6 +1294,78 @@ async function main(): Promise<void> {
     '✓ ui kit: PageHeader is a bottom-hairline-only glass header, sticky from lg up and padded at every width (with a meta row, below 1280px only), with a crumb, <h1> title, optional meta row, children and actions, wrapping to fit at any width (R30)',
   );
 
+  // --- PageHeader: a title that takes focus (`titleRef`) shows itself below lg while it holds it ---
+
+  // VOD Export hands its <h1> the focus when nothing better can take it. Below 1024px the crumb, the
+  // <h1> and their block are visually hidden (`max-lg:sr-only`), and a focus ring on a 1px clipped box
+  // shows nothing (WCAG 2.4.7): so a header given `titleRef` shows its title block while focus is within
+  // it and its <h1> while it holds the focus, below lg only and with the crumb still hidden. A header
+  // given no `titleRef` keeps the markup it always had.
+  const classesIn = (markup: string, pattern: RegExp): string[] => (pattern.exec(markup)?.[1] ?? '').split(' ');
+  const focusTargetMarkup = renderToStaticMarkup(
+    <PageHeader crumb="PUBLISH" title="VOD Export" titleRef={{ current: null }} />,
+  );
+  const focusTargetBlock = titleBlockClasses(focusTargetMarkup);
+  const focusTargetH1 = classesIn(focusTargetMarkup, /<h1 [^>]*class="([^"]*)">VOD Export<\/h1>/);
+  const focusTargetCrumb = classesIn(focusTargetMarkup, /<div class="([^"]*)">PUBLISH<\/div>/);
+  assert(/<h1 tabindex="-1" /.test(focusTargetMarkup), 'a header given titleRef renders its <h1> as a programmatic focus target');
+  assert(
+    focusTargetBlock.includes('max-lg:sr-only') && focusTargetBlock.includes('max-lg:focus-within:not-sr-only'),
+    `below 1024px the title block is hidden, and shows while focus is within it (got "${focusTargetBlock.join(' ')}")`,
+  );
+  assert(
+    focusTargetH1.includes('max-lg:sr-only') && focusTargetH1.includes('max-lg:focus:not-sr-only'),
+    `below 1024px the <h1> is hidden, and shows while it holds the focus (got "${focusTargetH1.join(' ')}")`,
+  );
+  assert(
+    focusTargetCrumb.join(' ') !== '' && focusTargetCrumb.includes('max-lg:sr-only')
+      && !focusTargetCrumb.some((name) => name.includes('not-sr-only')),
+    `the crumb stays hidden while the <h1> is shown (got "${focusTargetCrumb.join(' ')}")`,
+  );
+  assert(
+    (focusTargetMarkup.match(/[\w:-]*not-sr-only/g) ?? []).sort().join(' ')
+      === 'max-lg:focus-within:not-sr-only max-lg:focus:not-sr-only',
+    'those two are the only show-on-focus classes, and both apply below 1024px only: from lg up nothing changes',
+  );
+
+  // A header given no titleRef is no focus target and shows nothing on focus: its markup is as before.
+  for (const [variant, markup] of [
+    ['default', pageHeaderMarkup],
+    ['tall', tallHeaderMarkup],
+    ['meta-row', metaMarkup],
+    ['record-title', recordTitleMarkup],
+  ] as const) {
+    assert(
+      !markup.includes('not-sr-only') && !markup.includes('tabindex'),
+      `the ${variant} header, given no titleRef, is no focus target and shows nothing on focus`,
+    );
+  }
+
+  // The classes go only where the title is hidden below lg. A record's title is never hidden, so it has
+  // nothing to show (and `not-sr-only` would drop its truncation while it is focused); a title block with
+  // a meta row is in the flow already (and `not-sr-only` would drop its full width below 640px), so there
+  // only the hidden <h1> shows.
+  const recordFocusMarkup = renderToStaticMarkup(
+    <PageHeader crumb="TIMESTAMPS" title="Stream Detail" recordTitle titleRef={{ current: null }} />,
+  );
+  assert(
+    /<h1 tabindex="-1" /.test(recordFocusMarkup) && !recordFocusMarkup.includes('not-sr-only'),
+    "a record's title is never hidden, so a titleRef makes it a focus target and adds no show-on-focus classes",
+  );
+  const metaFocusMarkup = renderToStaticMarkup(
+    <PageHeader crumb="TIMESTAMPS" title="Stream Detail" meta={<span>2026-09-27</span>} titleRef={{ current: null }} />,
+  );
+  const metaFocusBlock = titleBlockClasses(metaFocusMarkup).join(' ');
+  const metaFocusH1 = classesIn(metaFocusMarkup, /<h1 [^>]*class="([^"]*)">Stream Detail<\/h1>/);
+  assert(
+    metaFocusBlock === 'min-w-0 max-sm:w-full' && metaFocusH1.includes('max-lg:focus:not-sr-only'),
+    `with a meta row the title block is in the flow already, so only the hidden <h1> shows on focus (got block "${metaFocusBlock}", <h1> "${metaFocusH1.join(' ')}")`,
+  );
+
+  console.log(
+    '✓ ui kit: a PageHeader given titleRef shows its hidden title (and its block) below 1024px while the <h1> holds the focus, the crumb stays hidden, nothing changes from lg up, and a header without titleRef is as before',
+  );
+
   // --- no output anywhere above (Task 8) uses the raw Tailwind palette ---
 
   const allTask8Markup =

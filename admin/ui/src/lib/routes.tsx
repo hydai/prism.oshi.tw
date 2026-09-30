@@ -154,6 +154,7 @@ export const ADMIN_ROUTES: readonly AdminRoute[] = [
     curatorOnly: true,
     group: 'publish',
     icon: 'package',
+    frame: 'studio',
     render: (user) => <VodExport user={user} />,
   },
   {
