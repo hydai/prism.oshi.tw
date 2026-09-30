@@ -160,6 +160,7 @@ export const ADMIN_ROUTES: readonly AdminRoute[] = [
   {
     path: '/vod-export/repair/:entity/:rowId',
     curatorOnly: true,
+    frame: 'studio',
     render: (user) => <VodExportRepair user={user} />,
   },
 ];
