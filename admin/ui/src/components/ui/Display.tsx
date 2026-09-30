@@ -98,7 +98,9 @@ const PROGRESS_FILL_CLASSES: Record<ProgressTone, string> = {
 
 /**
  * A determinate progress meter (spec §5). `tone` colours the fill: the accent gradient by default,
- * or a solid warn / danger for a meter that is near or past a limit.
+ * or a solid warn / danger for a meter that is near or past a limit. A `value` outside 0–`max` (a
+ * resource over its limit) fills the bar to its end and reports `aria-valuenow` at that end, as ARIA
+ * requires; the exact amount belongs in `label` and in the page's own text.
  */
 export function ProgressBar({
   value,
@@ -115,7 +117,7 @@ export function ProgressBar({
   return (
     <div
       role="progressbar"
-      aria-valuenow={value}
+      aria-valuenow={Math.min(max, Math.max(0, value))}
       aria-valuemin={0}
       aria-valuemax={max}
       aria-label={label}
