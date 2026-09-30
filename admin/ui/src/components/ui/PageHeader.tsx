@@ -65,6 +65,12 @@ export function PageHeader({
   // the MobileTopBar does not show — there, both stay visible at every width instead.
   const crumbClasses = `text-2xs font-bold uppercase tracking-[0.12em] text-fg-subtle${recordTitle ? '' : ' max-lg:sr-only'}`;
   const titleClasses = `truncate text-[18px] font-[750] leading-[1.15] tracking-[-0.01em] text-fg${recordTitle ? '' : ' max-lg:sr-only'}`;
+  // With nothing visible in it below 1024px (no record title, no meta row), the title block leaves
+  // the bar's flow there too: as an empty flex slot, it and the bar's gap pushed the first visible
+  // item 12px past the bar's padding. Its <h1> stays in the accessibility tree.
+  let titleBlockClasses = 'min-w-0 max-lg:sr-only';
+  if (recordTitle) titleBlockClasses = 'min-w-0 flex-1 basis-[20rem] max-sm:w-full';
+  else if (meta) titleBlockClasses = 'min-w-0 max-sm:w-full';
 
   return (
     <header
@@ -72,7 +78,7 @@ export function PageHeader({
         meta ? 'max-xl:py-1.5' : 'py-1.5'
       } lg:sticky lg:top-0 ${tall ? 'min-h-[76px]' : 'min-h-[62px]'}`}
     >
-      <div className={recordTitle ? 'min-w-0 flex-1 basis-[20rem] max-sm:w-full' : 'min-w-0 max-sm:w-full'}>
+      <div className={titleBlockClasses}>
         <div className={crumbClasses}>{crumb}</div>
         <h1 className={titleClasses}>{title}</h1>
         {meta ? (
