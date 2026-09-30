@@ -136,6 +136,67 @@ async function main(): Promise<void> {
   const newButton = renderToStaticMarkup(<IconButton label="New" icon="plus" tooltipSide="bottom" />);
   assert(tooltipClasses(newButton).includes('top-full'), "IconButton's tooltipSide reaches its tooltip");
 
+  // --- Tooltip align: centred by default; `end` / `start` line the chip up with one of the target's edges ---
+
+  assert(
+    aboveTip.join(' ')
+      === 'invisible absolute left-1/2 z-50 bottom-full mb-2 before:absolute before:inset-x-0 before:top-full before:h-2 -translate-x-1/2 whitespace-nowrap rounded-radius-sm bg-tooltip-bg px-2 py-1 text-meta text-tooltip-fg opacity-0 transition-[opacity,visibility] delay-[400ms] duration-150 group-hover/tip:visible group-hover/tip:opacity-100 group-focus-within/tip:visible group-focus-within/tip:opacity-100',
+    `a tooltip is centred on its target by default, its classes exactly as before (got "${aboveTip.join(' ')}")`,
+  );
+  const alignedTip = (align: 'start' | 'end') =>
+    tooltipClasses(
+      renderToStaticMarkup(
+        <Tooltip label="Aligned" align={align}>
+          <button type="button">Target</button>
+        </Tooltip>,
+      ),
+    );
+  const endTip = alignedTip('end');
+  assert(
+    endTip.includes('right-0') && !endTip.includes('left-1/2') && !endTip.includes('-translate-x-1/2'),
+    'align="end" lines the chip up with the right edge of its target, so it grows leftwards, into the page',
+  );
+  const startTip = alignedTip('start');
+  assert(
+    startTip.includes('left-0') && !startTip.includes('left-1/2') && !startTip.includes('-translate-x-1/2'),
+    'align="start" lines the chip up with the left edge of its target',
+  );
+  assert(
+    endTip.includes('bottom-full') && endTip.includes('before:inset-x-0') && endTip.includes('group-hover/tip:visible'),
+    'an aligned chip keeps its side, its bridge and its show / hide classes',
+  );
+  const copyButton = renderToStaticMarkup(<IconButton label="Copy" icon="copy" tooltipAlign="end" />);
+  assert(tooltipClasses(copyButton).includes('right-0'), "IconButton's tooltipAlign reaches its tooltip");
+
+  // --- Tooltip: a hidden chip is not laid out, so it never widens a scroll container ---
+
+  {
+    const { readFileSync } = await import('node:fs');
+    const tipCss = readFileSync(new URL('../src/index.css', import.meta.url), 'utf8').replace(/\s+/g, ' ');
+    const chipRule = /\.group\\\/tip > \[role='tooltip'\] \{([^}]*)\}/.exec(tipCss)?.[1] ?? '';
+    for (const declaration of [
+      'display: none;',
+      'transition-property: opacity, visibility, display;',
+      'transition-behavior: allow-discrete;',
+    ]) {
+      assert(chipRule.includes(declaration), `index.css gives the tooltip chip ${declaration}`);
+    }
+    // Only while it also carries its show utilities: a chip dismissed with Escape drops them, and leaves
+    // the layout although its target keeps the hover or the focus.
+    const shown =
+      ".group\\/tip:hover > [role='tooltip'].group-hover\\/tip\\:visible, .group\\/tip:focus-within > [role='tooltip'].group-focus-within\\/tip\\:visible";
+    assert(
+      tipCss.includes(`${shown} { display: block; }`),
+      'the chip is laid out while its group is hovered or holds focus, and only while it carries its show utilities',
+    );
+    // One attribute more than the `group-hover/tip:` utilities, which come later at the same specificity.
+    const starting = ".group\\/tip:hover > [role='tooltip'][id], .group\\/tip:focus-within > [role='tooltip'][id]";
+    assert(
+      tipCss.includes(`@starting-style { ${starting} { opacity: 0; visibility: hidden; } }`),
+      'a chip that has just been laid out starts transparent and hidden, so it still fades in after its delay',
+    );
+  }
+
   // --- Tooltip, WCAG 1.4.13 hoverable: the pointer can move onto the chip without it closing ---
 
   assert(!aboveTip.includes('pointer-events-none'), 'the chip takes the pointer: no pointer-events-none');
@@ -169,6 +230,22 @@ async function main(): Promise<void> {
     /** Whether the chip may show: hidden only while its group is neither hovered nor focused, or once dismissed. */
     const mayShow = (tip: Element): boolean =>
       tip.classList.contains('group-hover/tip:visible') && tip.classList.contains('group-focus-within/tip:visible');
+    // index.css's rule that lays the chip out, read from the file and asked the way happy-dom can: it has
+    // no :focus-within, and `:has(:focus)` asks the same of a wrapper that never takes focus itself. It
+    // has no hover state either, so only the focus half is asked here; hover stays with `mayShow`.
+    const { readFileSync } = await import('node:fs');
+    const css = readFileSync(new URL('../src/index.css', import.meta.url), 'utf8')
+      .replace(/\/\*[\s\S]*?\*\//g, '')
+      .replace(/\s+/g, ' ');
+    const focusLayout = /([^{}]*\[role='tooltip'\][^{}]*)\{ display: block; \}/
+      .exec(css)?.[1]
+      ?.split(',')
+      .map((selector) => selector.trim())
+      .find((selector) => selector.includes(':focus-within'))
+      ?.replace(':focus-within', ':has(:focus)');
+    assert(focusLayout !== undefined, 'index.css lays the chip out while its group holds focus');
+    /** Whether the chip is laid out (`display: block` over its own `display: none`) with focus in its group. */
+    const laidOut = (tip: Element): boolean => tip.matches(focusLayout);
     const hover = (target: Element) =>
       act(async () => {
         target.dispatchEvent(new MouseEvent('mouseover', { bubbles: true, relatedTarget: null }));
@@ -198,11 +275,16 @@ async function main(): Promise<void> {
     // happy-dom has no :focus-within; focus inside the group/tip wrapper is what shows the chip.
     await act(async () => trigger.focus());
     assert(trigger.parentElement?.contains(document.activeElement) === true && mayShow(tip), 'focusing the trigger shows the tooltip');
+    assert(laidOut(tip), 'with focus in its group, the chip is laid out');
 
     const dismissing = await press(trigger, 'Escape');
     assert(dismissing.defaultPrevented, 'Escape on a showing tooltip is cancelled');
     assert(!mayShow(tip), 'Escape hides the tooltip');
     assert(document.activeElement === trigger, 'dismissing leaves focus on the trigger');
+    assert(
+      !laidOut(tip),
+      'a dismissed chip is no longer laid out (display: none) while focus stays on its trigger, so it cannot widen a scroll container',
+    );
     assert(outerKeys.length === 0, 'the dismissing Escape stops at the tooltip, so an enclosing popover or dialog stays open');
 
     const second = await press(trigger, 'Escape');
@@ -212,6 +294,7 @@ async function main(): Promise<void> {
     await act(async () => trigger.blur());
     await act(async () => trigger.focus());
     assert(mayShow(tip), 'blur and refocus show the tooltip again');
+    assert(laidOut(tip), 'blur and refocus lay the chip out again');
 
     for (const [what, init] of [
       ['isComposing', { isComposing: true }],
