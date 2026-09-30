@@ -1261,7 +1261,9 @@ async function main(): Promise<void> {
   // truncates beside the header's children and actions instead of pushing them onto a second row —
   // the mockup's `.titlecol`. Its 20rem basis is the floor it claims first: on a row too narrow for
   // that beside the actions, the actions wrap below the title rather than squeezing it. The default
-  // block keeps sizing to its content, class for class.
+  // block sizes to its content from 1024px up. Below that its crumb and <h1> are visually hidden,
+  // and so is the block itself (`max-lg:sr-only`): an empty flex slot plus the bar's gap would push
+  // the first visible item 12px past the bar's padding. The <h1> stays in the accessibility tree.
   const titleBlockClasses = (markup: string): string[] =>
     (/<header[^>]*><div class="([^"]*)">/.exec(markup)?.[1] ?? '').split(' ');
   const recordTitleBlock = titleBlockClasses(recordTitleMarkup);
@@ -1269,17 +1271,24 @@ async function main(): Promise<void> {
     recordTitleBlock.includes('flex-1') && recordTitleBlock.includes('basis-[20rem]') && recordTitleBlock.includes('min-w-0'),
     `recordTitle's title block claims 20rem, fills the rest of the row and may shrink below its content (got "${recordTitleBlock.join(' ')}")`,
   );
+  assert(!recordTitleBlock.includes('max-lg:sr-only'), "recordTitle's title block stays visible below 1024px");
   for (const [variant, markup] of [
     ['default', pageHeaderMarkup],
     ['tall', tallHeaderMarkup],
   ] as const) {
     const block = titleBlockClasses(markup).join(' ');
-    assert(block === 'min-w-0 max-sm:w-full', `the ${variant} title block is unchanged, sized to its content (got "${block}")`);
+    assert(
+      block === 'min-w-0 max-lg:sr-only',
+      `the ${variant} title block sizes to its content, and below 1024px leaves the bar's flow (got "${block}")`,
+    );
+    assert(/<h1[^>]*>/.test(markup), `the ${variant} title block keeps its <h1> for assistive tech`);
   }
+  // A meta row still shows below 1024px, so a title block that carries one keeps its place there.
+  const metaBlock = titleBlockClasses(metaMarkup).join(' ');
+  assert(metaBlock === 'min-w-0 max-sm:w-full', `a title block with a meta row stays in the bar's flow (got "${metaBlock}")`);
 
   // Without recordTitle (the default, tested above via `pageHeaderMarkup`), the crumb and <h1> keep
-  // max-lg:sr-only — proven by the untouched assertions on `crumbClasses` / `titleClasses` earlier,
-  // so today's byte-for-byte output for every other page is unaffected by this change.
+  // max-lg:sr-only — proven by the untouched assertions on `crumbClasses` / `titleClasses` earlier.
 
   console.log(
     '✓ ui kit: PageHeader is a bottom-hairline-only glass header, sticky from lg up and padded at every width (with a meta row, below 1280px only), with a crumb, <h1> title, optional meta row, children and actions, wrapping to fit at any width (R30)',
