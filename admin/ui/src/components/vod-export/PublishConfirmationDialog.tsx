@@ -1,11 +1,28 @@
-import { useEffect, useRef, type RefObject, type SyntheticEvent } from 'react';
+import { useState, type RefObject } from 'react';
 import type { VodExportCandidate } from '../../api/vodExportTypes';
+import { Button } from '../ui/Button';
+import { Dialog } from '../ui/Dialog';
+import { Note } from '../ui/Note';
 import { CountsGrid, MetadataRow } from './parts';
 
+/**
+ * The second, explicit step before a publication, on the kit `Dialog`: shown while mounted. Cancel
+ * and Escape close it here before `onCancel` tells the owner, so focus goes back to
+ * `returnFocusElement` (read as it closes) whether or not the owner unmounts it; neither works while
+ * `publishing`. A backdrop click does not cancel, as with the native dialog it replaces.
+ *
+ * `disabledReason` is the page's own reason the candidate cannot be published now (the one under its
+ * Publish), which can turn up while the dialog is open: the candidate's clock runs out, a status
+ * read fails, a publication starts elsewhere. The confirm button is then disabled and the reason is
+ * said above the candidate, as an alert; Cancel keeps working. The publication this dialog runs is
+ * no such reason (the page then reads "another publication is in progress", which the busy confirm
+ * button already says), so nothing is shown while `publishing`.
+ */
 export function PublishConfirmationDialog({
   candidate,
   warningCount,
   publishing,
+  disabledReason,
   unchanged = false,
   returnFocusElement,
   onCancel,
@@ -14,83 +31,59 @@ export function PublishConfirmationDialog({
   candidate: VodExportCandidate;
   warningCount: number;
   publishing: boolean;
+  disabledReason: string | null;
   unchanged?: boolean;
   returnFocusElement?: RefObject<HTMLElement | null>;
   onCancel: () => void;
   onConfirm: () => void;
 }) {
-  const dialogRef = useRef<HTMLDialogElement>(null);
-  const previouslyFocusedRef = useRef<HTMLElement | null>(null);
+  const [open, setOpen] = useState(true);
+  const reason = publishing ? null : disabledReason;
 
-  useEffect(() => {
-    const dialog = dialogRef.current;
-    if (!dialog) return undefined;
-
-    previouslyFocusedRef.current = returnFocusElement?.current
-      ?? (document.activeElement instanceof HTMLElement ? document.activeElement : null);
-    dialog.showModal();
-    return () => {
-      if (dialog.open) dialog.close();
-      if (previouslyFocusedRef.current?.isConnected) previouslyFocusedRef.current.focus();
-    };
-  }, [returnFocusElement]);
-
-  const closeDialog = () => {
-    dialogRef.current?.close();
-    if (previouslyFocusedRef.current?.isConnected) previouslyFocusedRef.current.focus();
+  const cancel = () => {
+    if (publishing) return;
+    setOpen(false);
     onCancel();
   };
 
-  const handleCancel = (event: SyntheticEvent<HTMLDialogElement>) => {
-    event.preventDefault();
-    if (!publishing) closeDialog();
-  };
-
   return (
-    <dialog
-      ref={dialogRef}
-      aria-labelledby="publish-dialog-heading"
-      onCancel={handleCancel}
-      className="m-auto w-[calc(100%_-_2rem)] max-w-lg rounded-lg border-0 bg-white p-6 shadow-xl backdrop:bg-slate-950/60"
-    >
-      <h2 id="publish-dialog-heading" className="text-lg font-semibold text-slate-900">
-        {unchanged ? 'Record this reviewed source state?' : 'Publish this snapshot?'}
-      </h2>
-      <p className="mt-2 text-sm text-slate-600">
-        {unchanged
+    <Dialog
+      open={open}
+      onClose={cancel}
+      dismissible={false}
+      returnFocus={returnFocusElement}
+      title={unchanged ? 'Record this reviewed source state?' : 'Publish this snapshot?'}
+      description={
+        unchanged
           ? 'The exact snapshot is already public. The server will repeat every eligibility check and advance only the source checkpoint.'
-          : 'The public manifest will advance to this exact candidate after the server repeats every eligibility check.'}
-      </p>
-
-      <dl className="mt-4 rounded-md border border-slate-200 px-4">
+          : 'The public manifest will advance to this exact candidate after the server repeats every eligibility check.'
+      }
+      footer={
+        <>
+          <Button onClick={cancel} disabled={publishing}>
+            Cancel
+          </Button>
+          <Button variant="primary" busy={publishing} disabled={reason !== null} onClick={onConfirm}>
+            {publishing ? 'Publishing...' : unchanged ? 'Record reviewed state' : 'Publish snapshot'}
+          </Button>
+        </>
+      }
+    >
+      {reason === null ? null : (
+        <Note tone="danger" icon="alert" role="alert" className="mb-3">
+          {reason}
+        </Note>
+      )}
+      <dl className="rounded-radius-lg border border-field-line px-3 py-1.5">
         <MetadataRow label="Schema version">{candidate.schemaVersion}</MetadataRow>
         <MetadataRow label="SHA-256">
-          <code className="break-all text-xs">{candidate.sha256}</code>
+          <code className="break-all font-mono text-[10.5px]">{candidate.sha256}</code>
         </MetadataRow>
         <MetadataRow label="Warnings">{warningCount.toLocaleString()}</MetadataRow>
       </dl>
-      <div className="mt-4">
+      <div className="mt-3">
         <CountsGrid counts={candidate.counts} />
       </div>
-
-      <div className="mt-6 flex justify-end gap-3">
-        <button
-          type="button"
-          onClick={closeDialog}
-          disabled={publishing}
-          className="rounded-md border border-slate-300 bg-white px-4 py-2 text-sm font-medium text-slate-700 hover:bg-slate-50 disabled:opacity-50"
-        >
-          Cancel
-        </button>
-        <button
-          type="button"
-          onClick={onConfirm}
-          disabled={publishing}
-          className="rounded-md bg-blue-600 px-4 py-2 text-sm font-medium text-white hover:bg-blue-700 disabled:opacity-50"
-        >
-          {publishing ? 'Publishing...' : unchanged ? 'Record reviewed state' : 'Publish snapshot'}
-        </button>
-      </div>
-    </dialog>
+    </Dialog>
   );
 }

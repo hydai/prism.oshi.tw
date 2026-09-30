@@ -1,8 +1,10 @@
 import type { RefObject } from 'react';
 import type { VodExportCandidate } from '../../api/vodExportTypes';
 import { formatBytes } from '../../lib/vod-export-format';
-import type { CandidateLocalState } from '../../lib/vod-export-helpers';
-import { CopyButton, CountsGrid, MetadataRow } from './parts';
+import { candidateAlreadyPublished, isCandidateExpired, type CandidateLocalState } from '../../lib/vod-export-helpers';
+import { Button } from '../ui/Button';
+import { Pill, type Tone } from '../ui/Pill';
+import { CopyButton, CountsGrid, LocalTime, MetadataRow, SideCard } from './parts';
 
 export function CandidatePanel({
   candidate,
@@ -29,107 +31,108 @@ export function CandidatePanel({
   publishButtonRef: RefObject<HTMLButtonElement | null>;
   now: number;
 }) {
-  const expiresAt = Date.parse(candidate.expiresAt);
-  const expired = candidate.state === 'expired' || !Number.isFinite(expiresAt) || expiresAt <= now;
-  const alreadyPublished = localState === 'already_published' || candidate.state === 'already_published';
+  const expired = isCandidateExpired(candidate, now);
+  const alreadyPublished = candidateAlreadyPublished(localState, candidate);
+  let badge: { label: string; tone: Tone } = { label: 'Ready', tone: 'info' };
+  if (expired) badge = { label: 'Expired', tone: 'danger' };
+  else if (localState === 'stale') badge = { label: 'Stale', tone: 'danger' };
+  else if (alreadyPublished) badge = { label: 'Already published', tone: 'neutral' };
 
   return (
-    <section className="rounded-lg border border-blue-200 bg-white p-5 shadow-sm" aria-labelledby="candidate-heading">
-      <div className="flex flex-wrap items-start justify-between gap-3">
-        <div>
-          <h3 id="candidate-heading" className="text-base font-semibold text-slate-800">
-            Preview candidate
-          </h3>
-          <p className="mt-1 text-sm text-slate-500">These exact stored bytes will be downloaded or published.</p>
-        </div>
-        <span
-          className={`rounded-full px-2.5 py-1 text-xs font-medium ${
-            expired || localState === 'stale'
-              ? 'bg-red-100 text-red-700'
-              : alreadyPublished
-                ? 'bg-slate-100 text-slate-700'
-                : 'bg-blue-100 text-blue-700'
-          }`}
-        >
-          {expired ? 'Expired' : localState === 'stale' ? 'Stale' : alreadyPublished ? 'Already published' : 'Ready'}
-        </span>
-      </div>
+    <SideCard title="Preview candidate" aside={<Pill tone={badge.tone}>{badge.label}</Pill>}>
+      <p className="text-[11.5px] leading-normal text-fg-muted">These exact stored bytes will be downloaded or published.</p>
 
-      <dl className="mt-3">
+      <dl>
         <MetadataRow label="Schema version">{candidate.schemaVersion}</MetadataRow>
         <MetadataRow label="Generated at">
-          <time dateTime={candidate.generatedAt} className="font-mono text-xs">
-            {candidate.generatedAt}
-          </time>
+          <LocalTime value={candidate.generatedAt} now={now} />
         </MetadataRow>
         <MetadataRow label="Expires at">
-          <time dateTime={candidate.expiresAt} className="font-mono text-xs">
-            {candidate.expiresAt}
-          </time>
+          <LocalTime value={candidate.expiresAt} now={now} />
         </MetadataRow>
         <MetadataRow label="SHA-256">
-          <div className="flex items-start gap-2">
-            <code className="min-w-0 flex-1 break-all text-xs">{candidate.sha256}</code>
-            <CopyButton value={candidate.sha256} onCopied={onCopied} />
+          <div className="flex items-start gap-1">
+            <code className="min-w-0 flex-1 break-all font-mono text-[10.5px]">{candidate.sha256}</code>
+            <CopyButton value={candidate.sha256} label="Copy SHA-256" onCopied={onCopied} />
           </div>
         </MetadataRow>
         <MetadataRow label="Uncompressed bytes">
-          {candidate.uncompressedBytes.toLocaleString()} ({formatBytes(candidate.uncompressedBytes)})
+          {`${candidate.uncompressedBytes.toLocaleString()} (${formatBytes(candidate.uncompressedBytes)})`}
         </MetadataRow>
       </dl>
 
       <CountsGrid counts={candidate.counts} />
 
-      <div className="mt-5 flex flex-wrap items-center gap-3 border-t border-slate-100 pt-4">
-        <button
-          type="button"
-          onClick={onDownload}
-          disabled={downloading || expired}
-          className="rounded-md border border-slate-300 bg-white px-4 py-2 text-sm font-medium text-slate-700 hover:bg-slate-50 disabled:cursor-not-allowed disabled:opacity-50"
-        >
+      <div className="flex flex-wrap items-center gap-2">
+        <Button size="sm" icon="download" busy={downloading} disabled={expired} onClick={onDownload}>
           {downloading ? 'Downloading...' : 'Download exact JSON'}
-        </button>
-        <button
+        </Button>
+        <Button
           ref={publishButtonRef}
-          type="button"
+          variant="primary"
+          size="sm"
           onClick={onPublish}
           disabled={disabledReason !== null || !canPublish || checking}
-          className="rounded-md bg-blue-600 px-4 py-2 text-sm font-medium text-white hover:bg-blue-700 disabled:cursor-not-allowed disabled:opacity-50"
         >
           {checking ? 'Checking...' : alreadyPublished ? 'Confirm unchanged snapshot' : 'Publish'}
-        </button>
-        {disabledReason && <p className="text-sm text-slate-500">{disabledReason}</p>}
+        </Button>
       </div>
-    </section>
+      {disabledReason && <p className="text-[11px] leading-normal text-fg-muted">{disabledReason}</p>}
+    </SideCard>
   );
 }
 
-export function EmptyCandidatePanel({ reason, previewLoaded }: { reason: string; previewLoaded: boolean }) {
+/**
+ * The candidate card with no candidate: before any preview, after a preview blocked by errors
+ * (Blocked, and how many to fix), once a publication or a recovery has handed the candidate over to
+ * the public snapshot (`published`), or once a preview's candidate is otherwise gone. Nothing here
+ * can be downloaded or published, so both actions stay disabled; a blocked or published card needs
+ * no reason under them, its text already says what comes next.
+ */
+export function EmptyCandidatePanel({
+  reason,
+  previewLoaded,
+  errorCount,
+  published = false,
+}: {
+  reason: string;
+  previewLoaded: boolean;
+  errorCount: number;
+  published?: boolean;
+}) {
+  const blocked = previewLoaded && errorCount > 0;
+  const errors = errorCount === 1 ? '1 error' : `${errorCount.toLocaleString()} errors`;
+  let title = 'No preview candidate';
+  let body = 'Generate a preview to validate the complete approved dataset.';
+  if (published) {
+    title = 'Candidate published';
+    body = 'This candidate is now the public snapshot. Generate a fresh preview to prepare the next one.';
+  } else if (previewLoaded) {
+    title = 'No publishable candidate was stored';
+    body = 'Review the validation result, repair blocking data, then generate a fresh preview.';
+  }
+
   return (
-    <section className="rounded-lg border border-slate-200 bg-white p-5 shadow-sm" aria-labelledby="candidate-heading">
-      <h3 id="candidate-heading" className="text-base font-semibold text-slate-800">
-        Preview candidate
-      </h3>
-      <div className="mt-4 rounded-md border border-dashed border-slate-300 px-4 py-6 text-center">
-        <p className="font-medium text-slate-700">
-          {previewLoaded ? 'No publishable candidate was stored' : 'No preview candidate'}
+    <SideCard title="Preview candidate" aside={blocked ? <Pill tone="danger">Blocked</Pill> : null}>
+      {blocked ? (
+        <p className="text-[11.5px] leading-normal text-fg-muted">
+          {`No publishable candidate was stored. Fix the ${errors}, then generate a fresh preview.`}
         </p>
-        <p className="mt-1 text-sm text-slate-500">
-          {previewLoaded
-            ? 'Review the validation result, repair blocking data, then generate a fresh preview.'
-            : 'Generate a preview to validate the complete approved dataset.'}
-        </p>
-      </div>
-      <div className="mt-4 flex flex-wrap items-center gap-3 border-t border-slate-100 pt-4">
-        <button
-          type="button"
-          disabled
-          className="rounded-md bg-blue-600 px-4 py-2 text-sm font-medium text-white opacity-50"
-        >
+      ) : (
+        <div className="rounded-radius-lg border border-dashed border-field-line px-3 py-4 text-center">
+          <p className="text-[12px] font-bold text-fg">{title}</p>
+          <p className="mt-0.5 text-[11px] leading-normal text-fg-muted">{body}</p>
+        </div>
+      )}
+      <div className="flex flex-wrap items-center gap-2">
+        <Button size="sm" icon="download" disabled>
+          Download exact JSON
+        </Button>
+        <Button variant="primary" size="sm" disabled>
           Publish
-        </button>
-        <p className="text-sm text-slate-500">{reason}</p>
+        </Button>
       </div>
-    </section>
+      {blocked || published ? null : <p className="text-[11px] leading-normal text-fg-muted">{reason}</p>}
+    </SideCard>
   );
 }

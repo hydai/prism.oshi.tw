@@ -1,39 +1,53 @@
 import type { VodExportCapacityDiagnostic } from '../../api/vodExportTypes';
 import { capacityLabel, formatPercent } from '../../lib/vod-export-format';
+import { ProgressBar } from '../ui/Display';
+import { SideCard } from './parts';
 
+/** The share of a confirmed limit from which a resource needs watching (the worker's warning ratio). */
+const WARNING_RATIO = 0.8;
+
+function nearLimit(item: VodExportCapacityDiagnostic): boolean {
+  return item.state !== 'ok' || item.ratio >= WARNING_RATIO;
+}
+
+/**
+ * How close a preview came to each confirmed v1 limit: every resource the preview measured, as a bar
+ * with its percentage — warn-toned from 80%, danger-toned once exceeded, where the exact numbers show
+ * too. Nothing before a preview has returned capacity data.
+ */
 export function CapacityPanel({ diagnostics }: { diagnostics: VodExportCapacityDiagnostic[] }) {
-  const visible = diagnostics.filter((item) => item.state !== 'ok' || item.ratio >= 0.8);
-  if (visible.length === 0) return null;
+  if (diagnostics.length === 0) return null;
+  const allWithinLimits = !diagnostics.some(nearLimit);
 
   return (
-    <section className="rounded-lg border border-amber-200 bg-amber-50 p-4" aria-labelledby="capacity-heading">
-      <h3 id="capacity-heading" className="text-sm font-semibold text-amber-900">
-        Export capacity
-      </h3>
-      <p className="mt-1 text-xs text-amber-800">
-        One or more resources have reached at least 80% of the confirmed v1 limit.
-      </p>
-      <div className="mt-3 space-y-3">
-        {visible.map((item) => {
-          const width = `${Math.min(100, Math.max(0, item.ratio * 100))}%`;
+    <SideCard
+      title="Capacity"
+      aside={allWithinLimits ? <span className="text-[11px] text-fg-subtle">all within limits</span> : null}
+    >
+      {allWithinLimits ? null : (
+        <p className="text-[11px] leading-normal text-fg-muted">
+          One or more resources have reached at least 80% of the confirmed v1 limit.
+        </p>
+      )}
+      <ul className="flex flex-col gap-2">
+        {diagnostics.map((item) => {
+          const label = capacityLabel(item.resource);
+          const numbers = `${item.actual.toLocaleString()} / ${item.limit.toLocaleString()}`;
+          const watched = nearLimit(item);
+          let tone: 'accent' | 'warn' | 'danger' = watched ? 'warn' : 'accent';
+          if (item.state === 'exceeded') tone = 'danger';
           return (
-            <div key={item.resource}>
-              <div className="flex items-center justify-between gap-3 text-xs">
-                <span className="font-medium text-amber-950">{capacityLabel(item.resource)}</span>
-                <span className="font-mono text-amber-900">
-                  {item.actual.toLocaleString()} / {item.limit.toLocaleString()} ({formatPercent(item.ratio)})
-                </span>
+            <li key={item.resource} className="flex flex-col gap-1">
+              <div className="flex items-baseline gap-2 text-[11px]">
+                <span className="min-w-0 flex-1 truncate text-fg-muted">{label}</span>
+                {watched ? <span className="shrink-0 font-mono text-[10.5px] text-fg-subtle">{numbers}</span> : null}
+                <span className="shrink-0 font-[650] text-fg">{formatPercent(item.ratio)}</span>
               </div>
-              <div className="mt-1.5 h-2 overflow-hidden rounded-full bg-amber-200">
-                <div
-                  className={`h-full rounded-full ${item.state === 'exceeded' ? 'bg-red-600' : 'bg-amber-500'}`}
-                  style={{ width }}
-                />
-              </div>
-            </div>
+              <ProgressBar value={item.actual} max={item.limit} label={`${label}: ${numbers}`} tone={tone} />
+            </li>
           );
         })}
-      </div>
-    </section>
+      </ul>
+    </SideCard>
   );
 }

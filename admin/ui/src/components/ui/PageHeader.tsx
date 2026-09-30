@@ -1,4 +1,4 @@
-import type { ReactNode } from 'react';
+import type { ReactNode, Ref } from 'react';
 
 /**
  * Glass bar at the top of `<main>` (spec §5, §8; mockup `.hdr`). From lg up it sticks there
@@ -42,6 +42,7 @@ export function PageHeader({
   children,
   tall = false,
   recordTitle = false,
+  titleRef,
 }: {
   crumb: ReactNode;
   title: ReactNode;
@@ -57,18 +58,30 @@ export function PageHeader({
    *  `flex-1`): where that and the actions don't fit on one row, the actions wrap below the title
    *  instead of squeezing it. */
   recordTitle?: boolean;
+  /** For a page that hands focus to its title when the control that had it goes away and nothing
+   *  better can take it (VOD Export): the <h1> then takes focus programmatically (`tabIndex={-1}`,
+   *  out of the tab order), and below 1024px, where it is visually hidden, it shows while it holds
+   *  the focus. Without it the <h1> renders exactly as before. */
+  titleRef?: Ref<HTMLHeadingElement>;
 }) {
   // Below 1024px the MobileTopBar already shows the page title, so this crumb + <h1> would repeat
   // it (mockup 3's phone Stamp Editor showed "Stamp Editor" twice) — `max-lg:sr-only`, not `hidden`:
   // the page must keep exactly one <h1>, just not a visible, duplicate one. `recordTitle` pages name
   // a specific record rather than the page itself, so that repeat is the record's own title, which
   // the MobileTopBar does not show — there, both stay visible at every width instead.
+  // The exception is a hidden <h1> that can take focus (`titleRef`): a focus ring on a 1px clipped box
+  // shows nothing (WCAG 2.4.7), so it shows itself while it holds the focus, and its block (below)
+  // while focus is within it. The crumb stays hidden. Only a hidden title gets these classes: on a
+  // visible one, `not-sr-only` would just drop its truncation (or its block's full width) on focus.
+  const takesFocus = !!titleRef;
   const crumbClasses = `text-2xs font-bold uppercase tracking-[0.12em] text-fg-subtle${recordTitle ? '' : ' max-lg:sr-only'}`;
-  const titleClasses = `truncate text-[18px] font-[750] leading-[1.15] tracking-[-0.01em] text-fg${recordTitle ? '' : ' max-lg:sr-only'}`;
+  const titleClasses = `truncate text-[18px] font-[750] leading-[1.15] tracking-[-0.01em] text-fg${recordTitle ? '' : ' max-lg:sr-only'}${
+    takesFocus && !recordTitle ? ' max-lg:focus:not-sr-only' : ''
+  }`;
   // With nothing visible in it below 1024px (no record title, no meta row), the title block leaves
   // the bar's flow there too: as an empty flex slot, it and the bar's gap pushed the first visible
   // item 12px past the bar's padding. Its <h1> stays in the accessibility tree.
-  let titleBlockClasses = 'min-w-0 max-lg:sr-only';
+  let titleBlockClasses = `min-w-0 max-lg:sr-only${takesFocus ? ' max-lg:focus-within:not-sr-only' : ''}`;
   if (recordTitle) titleBlockClasses = 'min-w-0 flex-1 basis-[20rem] max-sm:w-full';
   else if (meta) titleBlockClasses = 'min-w-0 max-sm:w-full';
 
@@ -80,7 +93,9 @@ export function PageHeader({
     >
       <div className={titleBlockClasses}>
         <div className={crumbClasses}>{crumb}</div>
-        <h1 className={titleClasses}>{title}</h1>
+        <h1 ref={titleRef} tabIndex={takesFocus ? -1 : undefined} className={titleClasses}>
+          {title}
+        </h1>
         {meta ? (
           <div className="mt-1 flex flex-wrap items-center gap-2 text-meta text-fg-muted">{meta}</div>
         ) : null}
