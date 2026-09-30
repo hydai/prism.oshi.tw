@@ -1,5 +1,5 @@
 import { renderToStaticMarkup } from 'react-dom/server';
-import { NO_RAW_PALETTE } from './helpers/palette';
+import { NO_ARBITRARY_HEX, NO_RAW_PALETTE } from './helpers/palette';
 
 function assert(condition: boolean, message: string): asserts condition {
   if (!condition) {
@@ -1520,6 +1520,444 @@ async function main(): Promise<void> {
     window.clearInterval = originalClearInterval;
 
     console.log('✓ useNow: one window.setInterval started on mount and cleared on unmount, ticking a lazily-initialized Date.now()');
+  }
+
+  // --- NO_ARBITRARY_HEX: every page suite leans on it, so it is checked once here ---
+
+  assert(
+    NO_ARBITRARY_HEX.test('bg-[#FF0000]') && NO_ARBITRARY_HEX.test('text-[#fff]') && NO_ARBITRARY_HEX.test('border-[#aabbccdd]'),
+    'NO_ARBITRARY_HEX flags a hex colour in an arbitrary value, 3 to 8 digits',
+  );
+  assert(
+    !NO_ARBITRARY_HEX.test('w-[10px]') &&
+      !NO_ARBITRARY_HEX.test('shadow-[0_1px_4px_var(--x)]') &&
+      !NO_ARBITRARY_HEX.test('bg-[#12]') &&
+      !NO_ARBITRARY_HEX.test('bg-[#123456789]'),
+    'NO_ARBITRARY_HEX leaves other arbitrary values alone',
+  );
+
+  console.log('✓ NO_ARBITRARY_HEX flags arbitrary hex colours and nothing else');
+
+  // --- Avatar: a photo, or an accent tile with a glyph when there is no photo or it will not load ---
+
+  {
+    const { act, useState } = await import('react');
+    const { click, mount } = await import('./helpers/dom');
+    const { Avatar } = await import('../src/components/ui/Avatar');
+
+    /** The markup without the preload `<link>`s React 19's server renderer puts before an `<img>`. */
+    const withoutPreloads = (markup: string): string => markup.replace(/^(?:<link[^>]*>)+/, '');
+    /** The classes on the root element of a markup string. */
+    const classesOf = (markup: string): string[] =>
+      (/^<[a-z]+[^>]*class="([^"]*)"/.exec(withoutPreloads(markup))?.[1] ?? '').split(/\s+/);
+    /** The opening tag of a markup string's root element. */
+    const rootTagOf = (markup: string): string => /^<[a-z]+[^>]*>/.exec(withoutPreloads(markup))?.[0] ?? '';
+    /** The icon's inner markup, so a tile can be checked for its glyph without depending on the glyph's size. */
+    const iconInner = (name: 'users'): string =>
+      /<svg[^>]*>(.*)<\/svg>/.exec(renderToStaticMarkup(<Icon name={name} />))?.[1] ?? '';
+
+    const photo = await mount(<Avatar src="https://img.example/mizuki.png" alt="Mizuki" size={48} />);
+    const photoImage = photo.container.querySelector('img');
+    assert(photoImage !== null, 'an Avatar with a src renders an <img>');
+    assert(
+      photoImage.getAttribute('src') === 'https://img.example/mizuki.png' && photoImage.getAttribute('alt') === 'Mizuki',
+      'the <img> carries the given src and alt',
+    );
+    assert(photoImage.classList.contains('h-12') && photoImage.classList.contains('w-12'), 'size 48 draws a 48 px image');
+    assert(photo.container.querySelector('[role="img"]') === null, 'no fallback tile shows while the photo does');
+    const photoMarkup = photo.container.innerHTML;
+
+    await act(async () => {
+      photoImage.dispatchEvent(new Event('error'));
+    });
+    assert(photo.container.querySelector('img') === null, 'after the photo fails to load no <img> remains');
+    const failedTile = photo.container.querySelector('[role="img"]');
+    assert(failedTile !== null, 'a photo that fails to load is replaced by the fallback tile');
+    assert(failedTile.getAttribute('aria-label') === 'Mizuki', 'the tile is an image named by the alt text');
+    assert(
+      failedTile.classList.contains('bg-accent') &&
+        failedTile.classList.contains('text-white') &&
+        failedTile.classList.contains('h-12') &&
+        failedTile.classList.contains('w-12'),
+      'the tile is a 48 px accent gradient with a white glyph',
+    );
+    const sparkle = failedTile.querySelector('svg');
+    assert(
+      sparkle !== null && sparkle.getAttribute('viewBox') === '0 0 12 12' && sparkle.getAttribute('width') === '19',
+      'the default glyph is the sparkle, 40% of the tile wide',
+    );
+    const failedMarkup = photo.container.innerHTML;
+    await photo.unmount();
+
+    function SwappingAvatar() {
+      const [src, setSrc] = useState('https://img.example/a.png');
+      return (
+        <>
+          <Avatar src={src} alt="A" size={40} />
+          <button type="button" onClick={() => setSrc('https://img.example/b.png')}>
+            Swap
+          </button>
+        </>
+      );
+    }
+    const swapping = await mount(<SwappingAvatar />);
+    await act(async () => {
+      swapping.container.querySelector('img')?.dispatchEvent(new Event('error'));
+    });
+    assert(swapping.container.querySelector('img') === null, 'the failed photo shows the tile');
+    await click(swapping.container.querySelector('button'), 'the swap button');
+    assert(
+      swapping.container.querySelector('img')?.getAttribute('src') === 'https://img.example/b.png',
+      'a new src is tried even after an earlier one failed',
+    );
+    await swapping.unmount();
+
+    const bareTile = renderToStaticMarkup(<Avatar src={null} alt="" size={40} />);
+    assert(!bareTile.includes('<img'), 'src={null} renders the tile directly, with no <img>');
+    assert(
+      rootTagOf(bareTile).includes('aria-hidden="true"') && !rootTagOf(bareTile).includes('role='),
+      'a tile with no alt text is decorative',
+    );
+    const namedTile = renderToStaticMarkup(<Avatar src={null} alt="Mizuki" size={40} />);
+    assert(
+      rootTagOf(namedTile).includes('role="img"') &&
+        rootTagOf(namedTile).includes('aria-label="Mizuki"') &&
+        !rootTagOf(namedTile).includes('aria-hidden'),
+      'a tile with alt text is an image named by it',
+    );
+    assert(
+      rootTagOf(bareTile).startsWith('<span') && rootTagOf(namedTile).startsWith('<span') && !bareTile.includes('<div'),
+      'the tile is a <span>: phrasing content, so it may sit inside a button',
+    );
+
+    const usersTile = renderToStaticMarkup(<Avatar src={null} alt="" size={64} icon="users" />);
+    assert(
+      usersTile.includes(iconInner('users')) && !usersTile.includes('viewBox="0 0 12 12"') && usersTile.includes('width="26"'),
+      'an icon prop draws that icon, 40% of the tile wide, instead of the sparkle',
+    );
+
+    for (const [size, height, width] of [
+      [40, 'h-10', 'w-10'],
+      [48, 'h-12', 'w-12'],
+      [64, 'h-16', 'w-16'],
+    ] as const) {
+      const sized = classesOf(renderToStaticMarkup(<Avatar src={null} alt="" size={size} />));
+      assert(sized.includes(height) && sized.includes(width), `size ${size} is ${height} ${width}`);
+    }
+
+    // Tailwind emits the rounded-radius-* utilities alphabetically, so a default `rounded-radius-md`
+    // would out-rank a caller's `rounded-radius-lg` or `rounded-full`. The defaults sit in `:where()`
+    // (specificity 0), which any class the caller passes beats.
+    const defaultTile = classesOf(renderToStaticMarkup(<Avatar src={null} alt="" size={48} />));
+    const defaultImage = classesOf(renderToStaticMarkup(<Avatar src="https://img.example/a.png" alt="A" size={48} />));
+    for (const [what, classes] of [['tile', defaultTile], ['image', defaultImage]] as const) {
+      assert(
+        classes.some((name) => name.includes('rounded-radius')),
+        `the ${what} is rounded by default`,
+      );
+      assert(
+        classes.every((name) => !name.startsWith('rounded')) &&
+          classes.some((name) => name.includes(':where(') && name.includes('rounded-radius')),
+        `the ${what}'s default radius is a zero-specificity :where() rule, so a caller's rounded-* class always wins`,
+      );
+    }
+    const roundedTile = classesOf(renderToStaticMarkup(<Avatar src={null} alt="" size={48} className="rounded-radius-xl" />));
+    const roundedImage = classesOf(
+      renderToStaticMarkup(<Avatar src="https://img.example/a.png" alt="A" size={48} className="rounded-radius-xl" />),
+    );
+    assert(roundedTile.includes('rounded-radius-xl') && roundedImage.includes('rounded-radius-xl'), 'className reaches the tile and the image');
+
+    const allAvatarMarkup = photoMarkup + failedMarkup + bareTile + namedTile + usersTile;
+    assert(!NO_RAW_PALETTE.test(allAvatarMarkup), 'Avatar markup uses no raw palette colours');
+    assert(!NO_ARBITRARY_HEX.test(allAvatarMarkup), 'Avatar markup uses no arbitrary hex colours');
+
+    console.log('✓ Avatar: a photo that falls back to an accent tile on error or with no src, in three sizes, rounded by a class the caller can override');
+  }
+
+  // --- DetailField and SectionLabel: the uppercase micro label, and a dt / dd pair in the page's <dl> ---
+
+  {
+    const { mount } = await import('./helpers/dom');
+    const { DetailField, SectionLabel } = await import('../src/components/ui/DetailField');
+
+    const MICRO_LABEL = 'text-2xs font-bold uppercase tracking-[0.12em] text-fg-subtle';
+
+    const details = await mount(
+      <dl>
+        <DetailField label="Brand name">Mizuki</DetailField>
+        <DetailField label="Channel" className="col-span-2">
+          <a href="https://youtube.example/c/mizuki">youtube.example/c/mizuki</a>
+        </DetailField>
+      </dl>,
+    );
+    const definitionList = details.container.querySelector('dl');
+    assert(definitionList !== null, 'the page supplies the <dl>');
+    const [brandGroup, channelGroup] = Array.from(definitionList.children);
+    assert(
+      definitionList.children.length === 2 && brandGroup !== undefined && channelGroup !== undefined,
+      'each DetailField is one group in the <dl>',
+    );
+    assert(
+      brandGroup.tagName === 'DIV' && brandGroup.children.length === 2,
+      'a group is a <div> holding only its term and its description',
+    );
+    assert(
+      brandGroup.children[0]?.tagName === 'DT' && brandGroup.children[0].textContent === 'Brand name',
+      'the label is the <dt>, first',
+    );
+    assert(
+      brandGroup.children[1]?.tagName === 'DD' && brandGroup.children[1].textContent === 'Mizuki',
+      'the value is the <dd>, second',
+    );
+    assert(brandGroup.children[0].className === MICRO_LABEL, 'the <dt> wears the uppercase micro label');
+    assert(channelGroup.children[1]?.querySelector('a') !== null, 'a value may be any node, such as a link');
+    assert(
+      channelGroup.classList.contains('col-span-2') && !brandGroup.classList.contains('col-span-2'),
+      "className lands on the DetailField's own group",
+    );
+
+    const sectionLabel = renderToStaticMarkup(<SectionLabel>Review</SectionLabel>);
+    assert(sectionLabel === `<p class="${MICRO_LABEL}">Review</p>`, 'SectionLabel is a <p> in the micro label look');
+    const sectionHeading = renderToStaticMarkup(<SectionLabel as="h3">Social links</SectionLabel>);
+    assert(sectionHeading === `<h3 class="${MICRO_LABEL}">Social links</h3>`, 'SectionLabel can be an <h3> instead');
+
+    const allDetailMarkup = details.container.innerHTML + sectionLabel + sectionHeading;
+    assert(!NO_RAW_PALETTE.test(allDetailMarkup), 'DetailField and SectionLabel markup uses no raw palette colours');
+    assert(!NO_ARBITRARY_HEX.test(allDetailMarkup), 'DetailField and SectionLabel markup uses no arbitrary hex colours');
+    await details.unmount();
+
+    console.log('✓ DetailField and SectionLabel: a dt / dd group for the page\'s <dl>, and the uppercase micro label as a <p> or <h3>');
+  }
+
+  // --- Field: a label, the page's control, a hint and an error, tied together by ids ---
+
+  {
+    const { mount } = await import('./helpers/dom');
+    const { Field } = await import('../src/components/ui/Field');
+    const { fieldDescription } = await import('../src/components/ui/field-core');
+
+    const full = await mount(
+      <Field id="title" label="Title" required hint="Shown in the list" error="Enter a title">
+        <TextInput
+          id="title"
+          aria-required="true"
+          aria-invalid
+          aria-describedby={fieldDescription('title', { hint: 'Shown in the list', error: 'Enter a title' })}
+        />
+      </Field>,
+    );
+    const fullRoot = full.container.firstElementChild;
+    assert(fullRoot !== null, 'Field renders a root element');
+    assert(
+      Array.from(fullRoot.children)
+        .map((child) => child.tagName)
+        .join() === 'LABEL,INPUT,P,P',
+      'a field is its label, the control, the hint, then the error',
+    );
+    const fieldLabel = fullRoot.querySelector('label');
+    const fieldControl = fullRoot.querySelector('input');
+    assert(fieldLabel !== null && fieldControl !== null, 'the field holds a label and the control');
+    assert(fieldLabel.getAttribute('for') === 'title' && fieldControl.id === 'title', "the label's for points at the control's id");
+    assert(fieldLabel.textContent === 'Title*', 'a required field shows an asterisk after its label');
+    const asterisk = fieldLabel.querySelector('span');
+    assert(
+      asterisk !== null && asterisk.textContent === '*' && asterisk.getAttribute('aria-hidden') === 'true',
+      'the asterisk is hidden from assistive technology (the control carries aria-required)',
+    );
+    const fieldHint = fullRoot.querySelector('#title-hint');
+    const fieldError = fullRoot.querySelector('#title-error');
+    assert(
+      fieldHint?.tagName === 'P' && fieldHint.textContent === 'Shown in the list',
+      'the hint is a <p> with the id <id>-hint',
+    );
+    assert(fieldError?.tagName === 'P' && fieldError.textContent === 'Enter a title', 'the error is a <p> with the id <id>-error');
+    assert(fieldError.classList.contains('text-tone-danger-fg'), 'the error is in the danger text tone');
+    assert(!fieldError.hasAttribute('role'), 'the error has no role: the page announces errors through its own summary');
+    assert(fieldControl.getAttribute('aria-describedby') === 'title-hint title-error', "fieldDescription is the control's aria-describedby");
+    const described = (fieldControl.getAttribute('aria-describedby') ?? '')
+      .split(' ')
+      .map((id) => fullRoot.querySelector(`#${id}`)?.textContent);
+    assert(
+      described.join('|') === 'Shown in the list|Enter a title',
+      'every id fieldDescription names is an element of the field, hint first',
+    );
+    const fullMarkup = full.container.innerHTML;
+    await full.unmount();
+
+    const bare = await mount(
+      <Field id="note" label="Note" hint="" error={null}>
+        <TextInput id="note" />
+      </Field>,
+    );
+    const bareRoot = bare.container.firstElementChild;
+    assert(bareRoot !== null, 'a bare Field renders a root element');
+    assert(
+      Array.from(bareRoot.children)
+        .map((child) => child.tagName)
+        .join() === 'LABEL,INPUT',
+      'an empty hint and a null error render no <p>',
+    );
+    assert(bareRoot.querySelector('label')?.textContent === 'Note', 'a field that is not required has no asterisk');
+    const bareMarkup = bare.container.innerHTML;
+    await bare.unmount();
+
+    const errorOnly = await mount(
+      <Field id="url" label="URL" error="Enter a link">
+        <TextInput id="url" />
+      </Field>,
+    );
+    assert(
+      errorOnly.container.querySelector('#url-error')?.textContent === 'Enter a link' && errorOnly.container.querySelector('#url-hint') === null,
+      'an error with no hint renders only the error',
+    );
+    await errorOnly.unmount();
+
+    assert(fieldDescription('x', { hint: 'h', error: 'e' }) === 'x-hint x-error', 'the description names the hint, then the error');
+    assert(fieldDescription('x', { hint: 'h' }) === 'x-hint', 'a hint alone is the whole description');
+    assert(fieldDescription('x', { error: 'e' }) === 'x-error', 'an error alone is the whole description');
+    assert(fieldDescription('x', {}) === undefined, 'no hint and no error leaves aria-describedby off');
+    assert(
+      fieldDescription('x', { hint: '', error: null }) === undefined,
+      'an empty hint and a null error are absent, as Field renders them',
+    );
+
+    assert(!NO_RAW_PALETTE.test(fullMarkup + bareMarkup), 'Field markup uses no raw palette colours');
+    assert(!NO_ARBITRARY_HEX.test(fullMarkup + bareMarkup), 'Field markup uses no arbitrary hex colours');
+
+    console.log('✓ Field: a label for the control, an aria-hidden asterisk, hint and error <p>s with <id>-hint / <id>-error, and fieldDescription naming them');
+  }
+
+  // --- VideoPoster: a thumbnail button that loads the player on demand, controlled by its page ---
+
+  {
+    const { act, useState } = await import('react');
+    const { click, mount } = await import('./helpers/dom');
+    const { VideoPoster } = await import('../src/components/ui/VideoPoster');
+    const { default: YouTubeEmbed } = await import('../src/components/YouTubeEmbed');
+    const { youtubeThumbnailUrl } = await import('../src/lib/youtube');
+
+    /** The `src` YouTubeEmbed itself draws for this video: the pinned contract the active poster must equal. */
+    const embedSrc = (videoId: string, startSeconds?: number): string =>
+      /src="([^"]*)"/.exec(
+        renderToStaticMarkup(<YouTubeEmbed videoId={videoId} title="T" startSeconds={startSeconds} />),
+      )?.[1] ?? '';
+
+    const activations: string[] = [];
+    const idle = await mount(
+      <VideoPoster videoId="abc123" title="T" startSeconds={30} active={false} onActivate={() => activations.push('T')} />,
+    );
+    const playButtons = idle.container.querySelectorAll<HTMLButtonElement>('button[aria-label="Play T"]');
+    const playButton = playButtons[0];
+    assert(
+      playButtons.length === 1 && idle.container.querySelectorAll('button').length === 1 && playButton !== undefined,
+      'an inactive poster is one button named "Play T"',
+    );
+    assert(idle.container.querySelector('iframe') === null, 'an inactive poster loads no iframe');
+    assert(playButton.getAttribute('type') === 'button', 'the poster button has an explicit type');
+    assert(playButton.classList.contains('aspect-video'), 'the poster fills a 16:9 box');
+    const thumbnail = playButton.querySelector('img');
+    assert(
+      thumbnail !== null &&
+        thumbnail.getAttribute('src') === youtubeThumbnailUrl('abc123') &&
+        thumbnail.getAttribute('alt') === '' &&
+        thumbnail.getAttribute('loading') === 'lazy',
+      "the thumbnail is the video's YouTube image, lazy-loaded, with an empty alt (the button's aria-label names it)",
+    );
+    const idleMarkup = renderToStaticMarkup(
+      <VideoPoster videoId="abc123" title="T" startSeconds={30} active={false} onActivate={() => undefined} />,
+    );
+    const playGlyph = /<svg[^>]*>(.*)<\/svg>/.exec(renderToStaticMarkup(<Icon name="play" />))?.[1];
+    assert(playGlyph !== undefined && idleMarkup.includes(playGlyph), 'the poster shows the play icon over the thumbnail');
+    await click(playButton, 'the poster button');
+    assert(activations.join() === 'T', 'clicking the poster calls onActivate once');
+    const inactiveMarkup = idle.container.innerHTML;
+    await idle.unmount();
+
+    const playing = await mount(
+      <VideoPoster videoId="abc123" title="T" startSeconds={30} active onActivate={() => undefined} />,
+    );
+    const frames = playing.container.querySelectorAll('iframe');
+    const frame = frames[0];
+    assert(frames.length === 1 && frame !== undefined, 'an active poster renders exactly one iframe');
+    assert(frame.getAttribute('src') === embedSrc('abc123', 30), "the iframe is YouTubeEmbed's, start time included");
+    assert(frame.getAttribute('title') === 'T', "the iframe keeps the poster's title");
+    assert(
+      playing.container.querySelector('button') === null && playing.container.querySelector('img') === null,
+      'the thumbnail and the play button are gone once the player loads',
+    );
+    assert(frame.parentElement?.classList.contains('aspect-video') === true, 'the player sits in a 16:9 box, as the poster did');
+    const activeMarkup = playing.container.innerHTML;
+    await playing.unmount();
+
+    // A page lets one poster play at a time by holding which one is active.
+    function PosterPair() {
+      const [playingKey, setPlayingKey] = useState<string | null>(null);
+      return (
+        <>
+          <VideoPoster videoId="one" title="One" active={playingKey === 'one'} onActivate={() => setPlayingKey('one')} />
+          <VideoPoster videoId="two" title="Two" active={playingKey === 'two'} onActivate={() => setPlayingKey('two')} />
+        </>
+      );
+    }
+    const pair = await mount(<PosterPair />);
+    const frameSrcs = () => Array.from(pair.container.querySelectorAll('iframe')).map((node) => node.getAttribute('src'));
+    const posterLabels = () =>
+      Array.from(pair.container.querySelectorAll('button')).map((node) => node.getAttribute('aria-label'));
+    assert(frameSrcs().length === 0 && posterLabels().join() === 'Play One,Play Two', 'two inactive posters show no player');
+
+    const playOne = pair.container.querySelector<HTMLButtonElement>('button[aria-label="Play One"]');
+    assert(playOne !== null, 'the first poster renders');
+    // A mouse click focuses the button in Chromium; `.click()` alone does not.
+    await act(async () => playOne.focus());
+    await click(playOne, 'the first poster');
+    assert(frameSrcs().join() === embedSrc('one') && posterLabels().join() === 'Play Two', 'activating one poster loads only its player');
+    const firstFrame = pair.container.querySelector('iframe');
+    assert(
+      firstFrame !== null && document.activeElement === firstFrame,
+      'the activated poster hands focus to its player, not to <body>',
+    );
+
+    await click(pair.container.querySelector<HTMLButtonElement>('button[aria-label="Play Two"]'), 'the second poster');
+    assert(
+      frameSrcs().join() === embedSrc('two') && posterLabels().join() === 'Play One',
+      'activating the second poster leaves exactly one player, the second, and the first is a poster again',
+    );
+    await pair.unmount();
+
+    // Focus follows only the poster's own button: an activation that came from elsewhere leaves it alone.
+    function RemotePoster() {
+      const [on, setOn] = useState(false);
+      return (
+        <>
+          <button type="button" onClick={() => setOn(true)}>
+            Remote
+          </button>
+          <VideoPoster videoId="remote" title="Remote video" active={on} onActivate={() => setOn(true)} />
+        </>
+      );
+    }
+    const remote = await mount(<RemotePoster />);
+    const remoteButton = remote.container.querySelector<HTMLButtonElement>('button:not([aria-label])');
+    assert(remoteButton !== null, 'the remote control renders');
+    await act(async () => remoteButton.focus());
+    await click(remoteButton, 'the remote control');
+    assert(remote.container.querySelector('iframe') !== null, 'the remote control loads the player');
+    assert(document.activeElement === remoteButton, 'a poster activated from elsewhere does not take focus');
+    await remote.unmount();
+
+    const lonely = document.createElement('button');
+    document.body.appendChild(lonely);
+    lonely.focus();
+    const alreadyActive = await mount(<VideoPoster videoId="abc123" title="T" active onActivate={() => undefined} />);
+    assert(document.activeElement === lonely, 'a poster that mounts already active leaves focus where it was');
+    await alreadyActive.unmount();
+    lonely.remove();
+
+    const allPosterMarkup = inactiveMarkup + activeMarkup + idleMarkup;
+    assert(!NO_RAW_PALETTE.test(allPosterMarkup), 'VideoPoster markup uses no raw palette colours');
+    assert(!NO_ARBITRARY_HEX.test(allPosterMarkup), 'VideoPoster markup uses no arbitrary hex colours');
+
+    console.log('✓ VideoPoster: a lazy thumbnail button until its page activates it, then YouTubeEmbed in a 16:9 box with focus handed over');
   }
 }
 

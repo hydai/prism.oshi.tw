@@ -55,3 +55,10 @@ const COLOUR_UTILITIES = [
 export const NO_RAW_PALETTE = new RegExp(
   String.raw`(?<![\w-])(?!text-white(?![\w/-]))(?:${COLOUR_UTILITIES})-(?:(?:${HUES})-\d|(?:black|white)(?![\w-]))`,
 );
+
+/**
+ * Spec §4.1: no hex in a page either, in Tailwind's arbitrary-value spelling (`bg-[#FF0000]`,
+ * `text-[#fff]`, `border-[#aabbccdd]`): the raw palette by another name, which `NO_RAW_PALETTE`
+ * cannot see. A colour comes from a token utility.
+ */
+export const NO_ARBITRARY_HEX = /\[#[0-9A-Fa-f]{3,8}\]/;
