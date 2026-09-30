@@ -362,8 +362,9 @@ export const api = {
       body: JSON.stringify(body),
     }),
 
+  // The worker answers with the id and the new status only, not the whole stream.
   updateStreamStatus: (id: string, body: StatusUpdateBody) =>
-    request<Stream>(`/api/streams/${id}/status`, {
+    request<Pick<Stream, 'id' | 'status'>>(`/api/streams/${id}/status`, {
       method: 'PATCH',
       body: JSON.stringify(body),
     }),

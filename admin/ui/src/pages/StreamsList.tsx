@@ -1,6 +1,6 @@
 import { useEffect, useState, useMemo } from 'react';
 import { Link } from 'react-router-dom';
-import type { AuthUser, Status } from '../../../shared/types';
+import type { AuthUser, Status, Stream } from '../../../shared/types';
 import { api, getCurrentStreamer, setCurrentStreamer } from '../api/client';
 import { useSearchParamState } from '../hooks/useSearchParamState';
 import { useApiResource } from '../lib/apiResource';
@@ -26,6 +26,14 @@ const STATUS_FILTER_LABEL_ID = 'streams-status-filter-label';
 
 function isStatusFilter(value: string): value is '' | Status {
   return STATUS_FILTERS.some((option) => option.value === value);
+}
+
+/**
+ * The rows with one stream's status changed. The worker answers a status change with `{ id, status }`
+ * and nothing else, so the row takes the new status and keeps every other field it shows.
+ */
+function withStatus(rows: Stream[], id: string, status: Status): Stream[] {
+  return rows.map((row) => (row.id === id ? { ...row, status } : row));
 }
 
 export default function StreamsList({ user }: { user: AuthUser }) {
@@ -114,8 +122,8 @@ export default function StreamsList({ user }: { user: AuthUser }) {
 
   const handleStatus = async (id: string, status: Status) => {
     try {
-      const updated = await api.updateStreamStatus(id, { status });
-      list.mutate((res) => ({ ...res, data: res.data.map((s) => (s.id === id ? updated : s)) }));
+      await api.updateStreamStatus(id, { status });
+      list.mutate((res) => ({ ...res, data: withStatus(res.data, id, status) }));
     } catch {
       // unchanged state is visible
     }
@@ -123,8 +131,8 @@ export default function StreamsList({ user }: { user: AuthUser }) {
 
   const handleApprove = async (id: string) => {
     try {
-      const updated = await api.updateStreamStatus(id, { status: 'approved' });
-      list.mutate((res) => ({ ...res, data: res.data.map((s) => (s.id === id ? updated : s)) }));
+      await api.updateStreamStatus(id, { status: 'approved' });
+      list.mutate((res) => ({ ...res, data: withStatus(res.data, id, 'approved') }));
       const { songs, performances } = await api.approveAllForStream(id);
       if (songs > 0 || performances > 0) {
         window.alert(`Approved stream + ${songs} song(s) and ${performances} performance(s)`);
