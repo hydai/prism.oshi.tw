@@ -1008,7 +1008,7 @@ async function main(): Promise<void> {
     </MemoryRouter>,
   );
   await settle();
-  assert(app.container.querySelector('[aria-label="Search streams by title"]') !== null, 'the Streams page is showing');
+  assert(app.container.querySelector('[aria-label="Search streams by title or video ID"]') !== null, 'the Streams page is showing');
   assert(getCurrentStreamer() === 'mizuki', 'the page starts on the streamer its URL names');
 
   await switchTo(desktopSwitcher(app.container), 'Aozora Ch.');

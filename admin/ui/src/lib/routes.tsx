@@ -82,6 +82,7 @@ export const ADMIN_ROUTES: readonly AdminRoute[] = [
     label: 'Streams',
     group: 'catalog',
     icon: 'radio',
+    frame: 'studio',
     render: (user) => <StreamsList user={user} />,
   },
   { path: '/streams/:id', frame: 'studio', render: (user) => <StreamDetailPage user={user} /> },
