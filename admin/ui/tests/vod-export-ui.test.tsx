@@ -1662,6 +1662,21 @@ async function main(): Promise<void> {
   assert(bindingCapacity.includes('D1 query payload'), 'the D1 binding limit reads as a human label');
   assert(!bindingCapacity.includes('d1JsonBindingBytes'), 'no capacity resource falls back to its raw key');
   assert(bindingCapacity.includes('bg-tone-danger-fg'), 'an exceeded resource draws a danger bar');
+  // Past its limit, a bar still reports a valid ARIA range (its value at its maximum), while the card
+  // shows the exact over-limit numbers and percentage, and the bar's name carries them too.
+  const exceededCapacity = renderToStaticMarkup(
+    <CapacityPanel
+      diagnostics={[{ resource: 'sourceRows', actual: 180_000, limit: 150_000, ratio: 1.2, state: 'exceeded' }]}
+    />,
+  );
+  assert(
+    /aria-valuenow="150000" aria-valuemin="0" aria-valuemax="150000" aria-label="Source rows: 180,000 \/ 150,000"/.test(exceededCapacity),
+    'an exceeded bar reports aria-valuenow at its aria-valuemax, and its name keeps the exact numbers',
+  );
+  assert(
+    exceededCapacity.includes('>180,000 / 150,000<') && exceededCapacity.includes('>120%<'),
+    'the exceeded card still shows the real over-limit numbers and percentage',
+  );
   assert(
     !NO_RAW_PALETTE.test(normalCapacity + warningCapacity + bindingCapacity),
     'the capacity card uses no raw Tailwind palette classes',

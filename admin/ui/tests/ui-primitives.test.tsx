@@ -696,6 +696,23 @@ async function main(): Promise<void> {
     'a tone changes only the fill colour: the meter, its values and its width are the same',
   );
   assert(!NO_RAW_PALETTE.test(progressAccent + progressWarn + progressDanger), 'a toned ProgressBar uses no raw palette colours');
+  // A value outside 0–max (a resource over its limit) keeps the ARIA range valid: the bar fills to
+  // its end and reports that end, while its label keeps the exact amount.
+  const attributeOf = (html: string, name: string) => new RegExp(`${name}="([^"]*)"`).exec(html)?.[1];
+  const overLimit = renderToStaticMarkup(
+    <ProgressBar value={180_000} max={150_000} label="Source rows: 180,000 / 150,000" tone="danger" />,
+  );
+  assert(
+    attributeOf(overLimit, 'aria-valuenow') === '150000' && attributeOf(overLimit, 'aria-valuemax') === '150000',
+    `an over-limit bar reports aria-valuenow equal to aria-valuemax (got ${String(attributeOf(overLimit, 'aria-valuenow'))} of ${String(attributeOf(overLimit, 'aria-valuemax'))})`,
+  );
+  assert(overLimit.includes('style="width:100%"'), 'and is full');
+  assert(attributeOf(overLimit, 'aria-label') === 'Source rows: 180,000 / 150,000', 'its label keeps the exact amount');
+  const belowZero = renderToStaticMarkup(<ProgressBar value={-3} max={16} label="Stamped" />);
+  assert(
+    attributeOf(belowZero, 'aria-valuenow') === '0' && belowZero.includes('style="width:0%"'),
+    'a value below zero reports aria-valuemin (0) on an empty bar',
+  );
 
   const emptyState = renderToStaticMarkup(
     <EmptyState icon="library" title="Find duplicate songs" body="Scan now" action={<span>Scan</span>} />,
