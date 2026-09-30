@@ -63,16 +63,16 @@ async function main(): Promise<void> {
   }
   assert(!html.includes('All statuses'), 'old status <select> is gone');
 
-  // The remembered status ("approved") comes back as the active, filled-green pill —
+  // The remembered status ("approved") comes back as the active chip, filled with the accent —
   // proves lazy-init reads localStorage through the real component.
   const approved = buttonFor(html, 'Approved');
   assert(approved.includes('aria-pressed="true"'), 'remembered status pill is pressed');
-  assert(approved.includes('bg-green-600'), 'remembered status pill is filled green');
+  assert(approved.includes('bg-accent'), 'remembered status chip is filled with the accent');
 
   // A non-selected status stays inactive.
   const pending = buttonFor(html, 'Pending');
   assert(pending.includes('aria-pressed="false"'), 'unselected status pill is not pressed');
-  assert(pending.includes('bg-white'), 'unselected status pill uses the inactive style');
+  assert(pending.includes('bg-field'), 'unselected status chip uses the inactive style');
 
   console.log('✓ StreamsList renders status pills and restores the saved filter');
 }

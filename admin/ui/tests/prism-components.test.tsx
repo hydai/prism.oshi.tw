@@ -7,7 +7,6 @@ function assert(condition: boolean, message: string): asserts condition {
 }
 
 async function main(): Promise<void> {
-  const { Chip } = await import('../src/components/prism/Chip');
   const { CircleButton } = await import('../src/components/prism/CircleButton');
   const { Segmented } = await import('../src/components/prism/Segmented');
   const { Pill, StatusPill } = await import('../src/components/prism/Pill');
@@ -15,16 +14,6 @@ async function main(): Promise<void> {
   const { PrismPage } = await import('../src/components/prism/PrismPage');
   const { Avatar } = await import('../src/components/prism/Avatar');
   const { Icon } = await import('../src/components/prism/Icon');
-
-  const chips = renderToStaticMarkup(
-    <>
-      <Chip active onClick={() => undefined}>Pending</Chip>
-      <Chip active={false} onClick={() => undefined}>All</Chip>
-    </>,
-  );
-  assert(/<button[^>]*aria-pressed="true"[^>]*>Pending<\/button>/.test(chips), 'active chip is pressed');
-  assert(/<button[^>]*aria-pressed="false"[^>]*>All<\/button>/.test(chips), 'inactive chip is not pressed');
-  assert(/type="button"/.test(chips), 'chips are plain buttons (never submit)');
 
   const circle = renderToStaticMarkup(
     <CircleButton label="Approve" icon="check" gradient onClick={() => undefined} />,

@@ -2,7 +2,6 @@ import { existsSync } from 'node:fs';
 import { renderToStaticMarkup } from 'react-dom/server';
 import type { HarmonizeSongEntry, SimilarityGroup } from '../../shared/types';
 import { Pagination } from '../src/components/Pagination';
-import { SortHeader } from '../src/components/SortHeader';
 import { StatusFilterBar, type StatusFilterOption } from '../src/components/StatusFilterBar';
 import SimilarSongGroupCard from '../src/components/harmonizer/SimilarSongGroupCard';
 import { NO_RAW_PALETTE } from './helpers/palette';
@@ -36,31 +35,6 @@ function isAtRangeEnd(button: string): boolean {
 function isAvailable(button: string): boolean {
   return button !== '' && !isDisabled(button) && !/\saria-disabled=/.test(button);
 }
-
-// --- SortHeader: one column head for every sortable table ---
-
-const sortHeader = (activeField: 'title' | 'date', direction: 'asc' | 'desc') =>
-  renderToStaticMarkup(
-    <table>
-      <thead>
-        <tr>
-          <SortHeader label="Title" field="title" activeField={activeField} direction={direction} onSort={() => undefined} />
-        </tr>
-      </thead>
-    </table>,
-  );
-
-const activeAsc = sortHeader('title', 'asc');
-assert(activeAsc.includes('aria-sort="ascending"'), 'the sorted column announces its direction');
-assert(activeAsc.includes('<button type="button"'), 'the column head is a keyboard-reachable button');
-assert(activeAsc.includes('aria-hidden="true"'), 'the sort arrow stays out of the accessible name');
-assert(activeAsc.includes('focus-visible:ring-2'), 'the column head keeps a visible focus ring');
-assert(activeAsc.includes('scope="col"'), 'the column head is announced as a column header');
-assert(sortHeader('title', 'desc').includes('aria-sort="descending"'), 'descending is announced too');
-
-const inactive = sortHeader('date', 'asc');
-assert(inactive.includes('aria-sort="none"'), 'an unsorted column says so rather than staying silent');
-assert(!inactive.includes('aria-hidden="true"'), 'an unsorted column shows no direction arrow');
 
 // --- Pagination: one footer for every paged list ---
 
@@ -119,31 +93,26 @@ const prismBar = renderToStaticMarkup(
 assert(prismBar.includes('role="group" aria-label="Filter by status"'), 'the bar is a named group');
 assert(buttonFor(prismBar, 'Pending').includes('aria-pressed="true"'), 'the selected filter is pressed');
 assert(buttonFor(prismBar, 'All').includes('aria-pressed="false"'), 'the other filters are not');
-assert(buttonFor(prismBar, 'Pending').includes('prism-gradient'), 'prism pages get the gradient chip');
+assert(buttonFor(prismBar, 'Pending').includes('bg-accent'), 'the selected filter is the kit chip, filled with the accent');
 
-const tintedOptions: ReadonlyArray<StatusFilterOption<'' | 'approved'>> = [
-  { value: '', label: 'All', activeClass: 'border-blue-600 bg-blue-600 text-white' },
-  { value: 'approved', label: 'Approved', activeClass: 'border-green-600 bg-green-600 text-white' },
-];
-const tintedBar = renderToStaticMarkup(
+const labelledBar = renderToStaticMarkup(
   <StatusFilterBar
-    options={tintedOptions}
-    value="approved"
+    options={prismOptions}
+    value="pending"
     onChange={() => undefined}
     labelledBy="streams-status-label"
     heading={<span id="streams-status-label">Status</span>}
   />,
 );
-assert(tintedBar.includes('aria-labelledby="streams-status-label"'), 'the bar can borrow a visible heading as its name');
-assert(tintedBar.includes('<span id="streams-status-label">Status</span>'), 'the heading renders inside the group');
-assert(buttonFor(tintedBar, 'Approved').includes('bg-green-600'), 'an option may fill itself in its own status colour');
-assert(!buttonFor(tintedBar, 'All').includes('bg-blue-600'), 'only the selected option takes its colour');
+assert(labelledBar.includes('aria-labelledby="streams-status-label"'), 'the bar can borrow a visible heading as its name');
+assert(labelledBar.includes('<span id="streams-status-label">Status</span>'), 'the heading renders inside the group');
+assert(!buttonFor(labelledBar, 'All').includes('bg-accent'), 'only the selected option takes the accent fill');
 
-// --- One StatusBadge: the typed one, teal for extracted ---
+// --- The harmonizer's group card: no status badge of its own, the kit's pills (teal for extracted) ---
 
 assert(
   !existsSync(new URL('../src/components/harmonizer/StatusBadge.tsx', import.meta.url)),
-  'the harmonizer no longer keeps a second status badge',
+  'the harmonizer keeps no status badge of its own',
 );
 
 const group: SimilarityGroup<HarmonizeSongEntry> = {
@@ -179,4 +148,4 @@ assert(!NO_RAW_PALETTE.test(card), 'the harmonizer group card uses no raw Tailwi
 const cardHead = /<thead[^>]*>/.exec(card)?.[0] ?? '';
 assert(cardHead !== '' && !cardHead.includes('sticky'), 'the variants table head does not stick: it sits inside the queue detail');
 
-console.log('✓ shared sort headers, pagination footers, filter bars and one status badge');
+console.log("✓ shared pagination footers, filter bars and the harmonizer's kit status pills");

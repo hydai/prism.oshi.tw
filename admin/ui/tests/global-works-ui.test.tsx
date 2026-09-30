@@ -68,7 +68,7 @@ async function main(): Promise<void> {
   const { api } = await import('../src/api/client');
   const { getNavGroups } = await import('../src/lib/navigation');
   const { default: GlobalWorks } = await import('../src/pages/GlobalWorks');
-  const { SortHeader } = await import('../src/components/SortHeader');
+  const { SortHeader } = await import('../src/components/ui/Table');
 
   await api.listGlobalWorks({ search: 'Shared', sharedOnly: true, page: 1 });
   assert(requestedUrl.startsWith('/api/works?'), 'global library uses the global works endpoint');
