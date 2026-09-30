@@ -544,6 +544,85 @@ async function queryFollowsTheControls(mountPage: MountPage): Promise<void> {
   console.log('✓ Songs: the search, the status filter, the sort and the footer each send their own query, and go back to page 1');
 }
 
+async function pagerKeepsFocusAtTheEnds(mountPage: MountPage): Promise<void> {
+  reset();
+  const { container, unmount } = await mountPage(curator);
+  const previous = need(buttonNamed(container, 'Previous'), 'Previous');
+  const next = need(buttonNamed(container, 'Next'), 'Next');
+
+  // The first page: Previous has nowhere to go. It is aria-disabled, never disabled: a browser drops the
+  // keyboard focus from a button that turns disabled, and the press that got here is what turns it.
+  assert(
+    previous.getAttribute('aria-disabled') === 'true' && !previous.hasAttribute('disabled'),
+    'on page 1 Previous is aria-disabled, not disabled',
+  );
+  assert(next.getAttribute('aria-disabled') === null && !next.hasAttribute('disabled'), 'and Next is available');
+  await act(async () => {
+    previous.focus();
+  });
+  await click(previous, 'Previous on page 1');
+  assert(listCalls().length === 1 && focused() === previous, 'a press on Previous at page 1 sends no request and keeps the focus');
+
+  // Up to the last page from the keyboard: the press that gets there keeps the focus, and Next then does nothing.
+  await act(async () => {
+    next.focus();
+  });
+  await click(next, 'Next');
+  assert(lastList().params.get('page') === '2', 'Next asks for page 2');
+  assert(next.getAttribute('aria-disabled') === null, 'Next is still available on page 2');
+  await click(next, 'Next');
+  assert(lastList().params.get('page') === '3' && pagerText(container).includes('Page 3 of 3'), 'Next reaches the last page');
+  assert(
+    next.getAttribute('aria-disabled') === 'true' && !next.hasAttribute('disabled'),
+    'on the last page Next is aria-disabled, not disabled',
+  );
+  assert(focused() === next, 'the focus stays on the Next that reached the last page');
+  // happy-dom keeps the focus of a button that turns disabled, where a browser drops it, and `focus()` does
+  // nothing on a disabled one: asking for the focus again is what tells the two apart.
+  await act(async () => {
+    previous.focus();
+  });
+  await act(async () => {
+    next.focus();
+  });
+  assert(focused() === next, 'and Next can take the focus again');
+  const asked = listCalls().length;
+  await click(next, 'Next on the last page');
+  assert(
+    listCalls().length === asked && pagerText(container).includes('Page 3 of 3'),
+    'a press on Next at the last page sends no request and stays on it',
+  );
+  assert(focused() === next, 'and keeps the focus');
+
+  // And back down to page 1 from the keyboard: Previous keeps the focus the same way.
+  await act(async () => {
+    previous.focus();
+  });
+  await click(previous, 'Previous');
+  assert(lastList().params.get('page') === '2', 'Previous asks for page 2');
+  await click(previous, 'Previous');
+  assert(lastList().params.get('page') === '1' && pagerText(container).includes('Page 1 of 3'), 'Previous reaches page 1');
+  assert(
+    previous.getAttribute('aria-disabled') === 'true' && !previous.hasAttribute('disabled') && focused() === previous,
+    'on page 1 Previous is aria-disabled again, and holds the focus',
+  );
+  await act(async () => {
+    next.focus();
+  });
+  await act(async () => {
+    previous.focus();
+  });
+  assert(focused() === previous, 'and can take it again');
+  const askedAgain = listCalls().length;
+  await click(previous, 'Previous on page 1');
+  assert(listCalls().length === askedAgain && focused() === previous, 'a press on Previous at page 1 sends no request, again');
+  assert(next.getAttribute('aria-disabled') === null, 'Next is available again');
+  assert(unexpected.length === 0, `nothing but the list is requested (${unexpected.join(', ')})`);
+
+  await unmount();
+  console.log('✓ Songs: the footer steps at the ends of the range are aria-disabled, so the press that got there keeps the focus and sends nothing');
+}
+
 async function laterLoadsKeepTheRows(mountPage: MountPage): Promise<void> {
   reset();
   const { container, unmount } = await mountPage(curator);
@@ -1011,6 +1090,7 @@ async function main(): Promise<void> {
 
   await firstLoadAndLayout(mountPage);
   await queryFollowsTheControls(mountPage);
+  await pagerKeepsFocusAtTheEnds(mountPage);
   await laterLoadsKeepTheRows(mountPage);
   await contributorView(mountPage);
   await approveAndFocus(mountPage);
