@@ -34,7 +34,7 @@ function Probe() {
         `loading=${String(scan.loading)}`,
         `error=${String(scan.error)}`,
         `canonicals=${scan.canonicals.size}`,
-        `expanded=${scan.expanded.size}`,
+        `openState=${String('expanded' in scan || 'toggleExpanded' in scan)}`,
       ].join(' ')}
     </output>
   );
@@ -48,7 +48,11 @@ assert(initial.includes('threshold=0.85'), 'the fuzzy threshold starts at 0.85')
 assert(initial.includes('thresholdIsValid=true'), 'the default threshold is inside 0.5–1');
 assert(initial.includes('loading=false'), 'nothing is in flight before the first scan');
 assert(initial.includes('error=null'), 'no error is shown before the first scan');
-assert(initial.includes('canonicals=0') && initial.includes('expanded=0'), 'no group is selected or open yet');
+assert(initial.includes('canonicals=0'), 'no group has a canonical pick yet');
+assert(
+  initial.includes('openState=false'),
+  'the queues select a group rather than expand it: the hook keeps no open / closed state',
+);
 
 // --- Both tabs read their scan state from the hook ---
 
@@ -59,7 +63,7 @@ function tabSource(name: string): string {
 for (const name of ['SimilarSongsTab.tsx', 'SimilarArtistsTab.tsx']) {
   const source = tabSource(name);
   assert(/= useHarmonizeScan[<(]/.test(source), `${name}: scan state comes from the shared hook`);
-  for (const slot of ['groups', 'stats', 'mode', 'threshold', 'loading', 'error', 'canonicals', 'expanded']) {
+  for (const slot of ['groups', 'stats', 'mode', 'threshold', 'loading', 'error', 'canonicals']) {
     assert(
       !new RegExp(`const \\[${slot}, set`).test(source),
       `${name}: ${slot} is no longer a private useState slot`,

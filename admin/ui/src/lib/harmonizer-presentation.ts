@@ -3,16 +3,19 @@ import type { HarmonizeGroupMatchType, HarmonizeSongEntry } from '../../../share
 import type { Tone } from '../components/ui/pill-core';
 import type { HarmonizeMergeBatch, HarmonizeWorkMergePlan } from './harmonizer-work-merge';
 
-/** The legacy Similar artists tab's match-type chip colours; the rebuilt tabs use `matchTypePill`. */
-export function matchTypeClasses(matchType: HarmonizeGroupMatchType): string {
-  if (matchType === 'work_id') return 'bg-blue-100 text-blue-700';
-  if (matchType === 'exact') return 'bg-green-100 text-green-700';
-  return 'bg-yellow-100 text-yellow-700';
-}
-
 /** A count with its noun: "1 group", "4 groups". */
 export function counted(count: number, one: string, many: string): string {
   return `${count} ${count === 1 ? one : many}`;
+}
+
+/**
+ * A scan's summary in the header, "9 songs in 4 groups": the entries (`one` / `many`) and the groups
+ * the queue still lists. Right after a scan that is the scan's own count (the worker sums the groups'
+ * items too); after a merge or an apply it is what is left, like the tab's count beside it.
+ */
+export function groupsSummary(groups: readonly { items: readonly unknown[] }[], one: string, many: string): string {
+  const entries = groups.reduce((sum, group) => sum + group.items.length, 0);
+  return `${counted(entries, one, many)} in ${counted(groups.length, 'group', 'groups')}`;
 }
 
 /** How a group's match type reads as a pill: Exact (ok), Fuzzy (warn) or Work ID (info). */

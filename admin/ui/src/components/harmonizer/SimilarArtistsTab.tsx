@@ -1,251 +1,244 @@
 import { useState } from 'react';
-import type {
-  HarmonizeArtistEntry,
-  HarmonizeMatchType,
-  SimilarityGroup,
-} from '../../../../shared/types';
+import { createPortal } from 'react-dom';
+import type { HarmonizeArtistEntry, SimilarityGroup } from '../../../../shared/types';
 import { api } from '../../api/client';
 import { useHarmonizeScan } from '../../hooks/useHarmonizeScan';
-import { matchTypeClasses } from '../../lib/harmonizer-presentation';
-import { finiteInputNumber } from '../../lib/numeric-input';
+import { errorMessage } from '../../lib/apiResource';
+import { counted, groupsSummary } from '../../lib/harmonizer-presentation';
+import { Button } from '../ui/Button';
+import { useConfirm } from '../ui/confirm';
+import { EmptyState, GlassCard } from '../ui/Display';
+import { Note } from '../ui/Note';
+import { QueueLayout } from '../ui/QueueLayout';
+import { nextQueueKey } from '../ui/queue';
+import { useToast } from '../ui/toast';
+import GroupRow from './GroupRow';
+import NoGroupsFound from './NoGroupsFound';
+import ScanControls from './ScanControls';
+import SimilarArtistGroupCard from './SimilarArtistGroupCard';
 
-export default function SimilarArtistsTab() {
-  const {
-    groups, stats, mode, setMode, threshold, setThreshold, thresholdIsValid,
-    loading, error, setError, canonicals, setCanonical, expanded, toggleExpanded,
-    scan: handleScan, dropGroup, clearGroups,
-  } = useHarmonizeScan<HarmonizeArtistEntry, { totalArtists: number; groupCount: number; affectedEntries: number }>(
+type ArtistScanStats = { totalArtists: number; groupCount: number; affectedEntries: number };
+type ArtistGroup = SimilarityGroup<HarmonizeArtistEntry>;
+type ArtistRename = { songId: string; originalArtist: string };
+
+const groupKeyOf = (group: ArtistGroup): string => group.normalizedKey;
+
+/** What the list, and the detail beside it, say while no group is listed. */
+const NO_GROUPS = 'No similar artist names found.';
+
+/**
+ * What applying the canonical name `typed` to `group` sends: every song of every other spelling,
+ * renamed to the name trimmed. The field keeps what is typed; the trimmed name is what is compared
+ * (a spelling equal to it is the canonical one) and sent, so stray spaces never reach a song.
+ * Nothing for a blank name, which the server refuses.
+ */
+function renamesFor(group: ArtistGroup, typed: string): ArtistRename[] {
+  const canonicalName = typed.trim();
+  if (canonicalName === '') return [];
+  return group.items.flatMap((item) =>
+    item.originalArtist === canonicalName
+      ? []
+      : item.songIds.map((songId) => ({ songId, originalArtist: canonicalName })),
+  );
+}
+
+/**
+ * Similar artists (spec §8.7): a scan for spellings of one artist's name, as a review queue — the
+ * groups in a list beside the selected group's `SimilarArtistGroupCard`, where the curator settles
+ * the canonical name. While `active` the tab portals its scan controls, with Apply All Reviewed,
+ * into the page header's `controlsSlot` and listens to J / K; hidden, it keeps its scan and its
+ * selection. Apply drops the group and selects the one after it; Apply All Reviewed asks first,
+ * then applies every group whose name is not blank. One request runs at a time — no scan during an
+ * apply, no apply during a scan — so a count or a selection never lands on the wrong list. A
+ * failure is an error toast that changes nothing. Its handlers — scan and apply, never an effect —
+ * report the group count through `onGroupCountChange`; the header's summary counts the groups
+ * still listed.
+ */
+export default function SimilarArtistsTab({
+  active,
+  controlsSlot,
+  onGroupCountChange,
+}: {
+  active: boolean;
+  controlsSlot: HTMLElement | null;
+  onGroupCountChange: (count: number | null) => void;
+}) {
+  const scanState = useHarmonizeScan<HarmonizeArtistEntry, ArtistScanStats>(
     (request) => api.harmonizeArtists(request),
-    // Pre-fill with most-used variant
+    // Pre-fill with the most-used spelling
     (items) => items.reduce((a, b) => (b.songCount > a.songCount ? b : a)).originalArtist,
   );
-  const [applying, setApplying] = useState<Set<string>>(new Set());
+  const { groups, stats, mode, thresholdIsValid, loading, error, canonicals, setCanonical, scan, dropGroup } = scanState;
+  /** The group whose Apply is in flight; `null` while none is. */
+  const [applyingKey, setApplyingKey] = useState<string | null>(null);
   const [applyingAll, setApplyingAll] = useState(false);
+  /** The group the curator moved to; `null` follows the list's first group. */
+  const [picked, setPicked] = useState<string | null>(null);
+  /** When the scan on screen landed; `null` until one has. */
+  const [scannedAt, setScannedAt] = useState<number | null>(null);
+  const confirm = useConfirm();
+  const toast = useToast();
 
-  const handleApplyGroup = async (group: SimilarityGroup<HarmonizeArtistEntry>) => {
-    const canonicalName = canonicals.get(group.normalizedKey);
-    if (!canonicalName) return;
+  const applyPending = applyingKey !== null || applyingAll;
+  const keys = groups.map(groupKeyOf);
+  // Derived as the rows render, so the selection never trails them: the first group is selected in
+  // the render its scan lands in, and a group no longer listed hands the selection to the first.
+  const selectedKey = picked !== null && keys.includes(picked) ? picked : (keys[0] ?? null);
+  const selectedIndex = selectedKey === null ? -1 : keys.indexOf(selectedKey);
+  const selected = groups[selectedIndex];
+  const previousKey = selectedIndex > 0 ? keys[selectedIndex - 1] : undefined;
+  const nextKey = selectedIndex === -1 ? undefined : keys[selectedIndex + 1];
+  const nameOf = (group: ArtistGroup): string => canonicals.get(group.normalizedKey) ?? '';
+  /** What Apply All Reviewed sends: every group with a name, with its renames. */
+  const reviewed = groups.flatMap((group) => {
+    const renames = renamesFor(group, nameOf(group));
+    return renames.length > 0 ? [{ key: group.normalizedKey, renames }] : [];
+  });
 
-    const updates: Array<{ songId: string; originalArtist: string }> = [];
-    for (const item of group.items) {
-      if (item.originalArtist !== canonicalName) {
-        for (const songId of item.songIds) {
-          updates.push({ songId, originalArtist: canonicalName });
-        }
-      }
-    }
+  const handleScan = async () => {
+    if (applyPending) return;
+    const res = await scan();
+    if (res === null) return;
+    // A fresh scan is a fresh queue: it starts at its first group.
+    setScannedAt(Date.now());
+    setPicked(null);
+    onGroupCountChange(res.groups.length);
+  };
 
-    if (updates.length === 0) return;
+  const handleApplyGroup = async (group: ArtistGroup) => {
+    const renames = renamesFor(group, nameOf(group));
+    if (renames.length === 0 || applyPending || loading) return;
 
-    setApplying((prev) => new Set(prev).add(group.normalizedKey));
+    setApplyingKey(group.normalizedKey);
     try {
-      await api.harmonizeApply({ updates });
+      const res = await api.harmonizeApply({ updates: renames });
+      // The group leaves the queue, and the one after it in the list as it stood before the drop
+      // takes the selection — unless the curator has moved to another group while the apply ran.
+      const following = nextQueueKey(keys, group.normalizedKey, () => false);
+      setPicked((current) => (current === null || current === group.normalizedKey ? following : current));
       dropGroup(group.normalizedKey);
+      onGroupCountChange(keys.length - 1);
+      toast.success(`Updated ${counted(res.updated, 'song', 'songs')}.`);
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Failed to apply');
+      // No Retry: an apply is not idempotent. The group and the selection stay as they were.
+      toast.error(errorMessage(err, 'Failed to apply'));
     } finally {
-      setApplying((prev) => {
-        const next = new Set(prev);
-        next.delete(group.normalizedKey);
-        return next;
-      });
+      setApplyingKey(null);
     }
   };
 
   const handleApplyAll = async () => {
+    if (reviewed.length === 0 || applyPending || loading) return;
+    const renames = reviewed.flatMap((entry) => entry.renames);
+    const confirmed = await confirm({
+      title: `Apply ${counted(reviewed.length, 'canonical artist name', 'canonical artist names')}?`,
+      body: `Renames the artist on ${counted(renames.length, 'song', 'songs')}.`,
+      confirmLabel: 'Apply All Reviewed',
+    });
+    if (!confirmed) return;
+
     setApplyingAll(true);
-    setError(null);
     try {
-      const allUpdates: Array<{ songId: string; originalArtist: string }> = [];
-      for (const group of groups) {
-        const canonicalName = canonicals.get(group.normalizedKey);
-        if (!canonicalName) continue;
-        for (const item of group.items) {
-          if (item.originalArtist !== canonicalName) {
-            for (const songId of item.songIds) {
-              allUpdates.push({ songId, originalArtist: canonicalName });
-            }
-          }
-        }
-      }
-      if (allUpdates.length > 0) {
-        await api.harmonizeApply({ updates: allUpdates });
-        clearGroups();
-      }
+      const res = await api.harmonizeApply({ updates: renames });
+      // Every applied group leaves; one left out for a blank name stays. A selection among the
+      // applied falls back to the first group left.
+      for (const entry of reviewed) dropGroup(entry.key);
+      onGroupCountChange(keys.length - reviewed.length);
+      toast.success(`Updated ${counted(res.updated, 'song', 'songs')}.`);
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Failed to apply all');
+      toast.error(errorMessage(err, 'Failed to apply all'));
     } finally {
       setApplyingAll(false);
     }
   };
 
+  const scanned = stats !== null;
+  const summary = scanned ? groupsSummary(groups, 'artist name', 'artist names') : null;
+
   return (
-    <div>
-      {/* Controls */}
-      <div className="mb-4 flex flex-wrap items-center gap-3">
-        <button
-          onClick={handleScan}
-          disabled={loading || (mode === 'fuzzy' && !thresholdIsValid)}
-          className="rounded-md bg-blue-600 px-4 py-2 text-sm font-medium text-white hover:bg-blue-700 disabled:opacity-50"
-        >
-          {loading ? 'Scanning...' : 'Scan'}
-        </button>
-        <div className="flex items-center gap-2">
-          <label htmlFor="artist-harmonizer-mode" className="text-sm font-medium text-slate-600">Mode:</label>
-          <select
-            id="artist-harmonizer-mode"
-            value={mode}
-            onChange={(e) => setMode(e.target.value as HarmonizeMatchType)}
-            className="rounded-md border border-slate-300 px-2 py-1.5 text-sm"
-          >
-            <option value="exact">Exact</option>
-            <option value="fuzzy">Fuzzy</option>
-          </select>
-        </div>
-        {mode === 'fuzzy' && (
-          <div className="flex items-center gap-2">
-            <label htmlFor="artist-harmonizer-threshold" className="text-sm font-medium text-slate-600">Threshold:</label>
-            <input
-              id="artist-harmonizer-threshold"
-              type="number"
-              min="0.5"
-              max="1"
-              step="0.05"
-              value={threshold ?? ''}
-              onChange={(event) => setThreshold(finiteInputNumber(event.currentTarget.valueAsNumber))}
-              aria-invalid={!thresholdIsValid}
-              aria-describedby={!thresholdIsValid ? 'artist-harmonizer-threshold-error' : undefined}
-              required
-              className="w-20 rounded-md border border-slate-300 px-2 py-1.5 text-sm"
-            />
-            {!thresholdIsValid && (
-              <span id="artist-harmonizer-threshold-error" className="text-xs text-red-600">
-                Enter 0.5–1
-              </span>
-            )}
-          </div>
-        )}
-        {stats && (
-          <span className="text-sm text-slate-500">
-            {stats.groupCount} group(s), {stats.affectedEntries} artist variant(s)
-          </span>
-        )}
-        {groups.length > 0 && (
-          <button
-            onClick={handleApplyAll}
-            disabled={applyingAll}
-            className="ml-auto rounded-md bg-green-600 px-4 py-2 text-sm font-medium text-white hover:bg-green-700 disabled:opacity-50"
-          >
-            {applyingAll ? 'Applying...' : 'Apply All Reviewed'}
-          </button>
-        )}
-      </div>
-
-      {error && (
-        <div className="mb-4 rounded-md bg-red-50 p-3 text-sm text-red-700">{error}</div>
-      )}
-
-      {/* Groups */}
-      <div className="space-y-3">
-        {groups.map((group) => {
-          const isExpanded = expanded.has(group.normalizedKey);
-          const canonicalName = canonicals.get(group.normalizedKey) ?? '';
-          const isApplying = applying.has(group.normalizedKey);
-          const canonicalNameId = `canonical-artist-${encodeURIComponent(group.normalizedKey)}`;
-
-          return (
-            <div key={group.normalizedKey} className="rounded-lg border border-slate-200 bg-white">
-              {/* Header */}
-              <button
-                onClick={() => toggleExpanded(group.normalizedKey)}
-                className="flex w-full items-center gap-3 px-4 py-3 text-left"
-              >
-                <span className="text-sm text-slate-400">{isExpanded ? '\u25BC' : '\u25B6'}</span>
-                <span className="font-medium text-slate-800">{group.normalizedKey}</span>
-                <span className="text-sm text-slate-500">{group.items.length} variants</span>
-                <span
-                  className={`rounded-full px-2 py-0.5 text-xs font-medium ${matchTypeClasses(group.matchType)}`}
+    <div className="flex flex-col gap-3.5">
+      {active && controlsSlot
+        ? createPortal(
+            <ScanControls
+              scan={scanState}
+              thresholdId="artist-harmonizer-threshold"
+              scanned={scanned}
+              summary={summary}
+              scannedAt={scannedAt}
+              onScan={() => void handleScan()}
+              disabled={applyPending}
+            >
+              {groups.length > 0 ? (
+                <Button
+                  icon="check"
+                  busy={applyingAll}
+                  disabled={reviewed.length === 0 || applyPending || loading}
+                  onClick={() => void handleApplyAll()}
                 >
-                  {group.matchType.toUpperCase()}
-                </span>
-              </button>
+                  {applyingAll ? 'Applying...' : 'Apply All Reviewed'}
+                </Button>
+              ) : null}
+            </ScanControls>,
+            controlsSlot,
+          )
+        : null}
 
-              {/* Body */}
-              {isExpanded && (
-                <div className="border-t border-slate-100 px-4 py-3">
-                  <div className="mb-3 flex items-center gap-2">
-                    <label htmlFor={canonicalNameId} className="text-sm font-medium text-slate-600">
-                      <span aria-hidden="true">Canonical name:</span>
-                      <span className="sr-only">Canonical name for {group.normalizedKey}</span>
-                    </label>
-                    <input
-                      id={canonicalNameId}
-                      type="text"
-                      value={canonicalName}
-                      onChange={(e) =>
-                        setCanonical(group.normalizedKey, e.target.value)
-                      }
-                      className="flex-1 rounded-md border border-slate-300 px-2 py-1.5 text-sm"
-                    />
-                  </div>
-                  <table className="w-full text-sm">
-                    <thead>
-                      <tr className="text-left text-xs font-medium uppercase text-slate-500">
-                        <th className="pb-2">Artist Name</th>
-                        <th className="pb-2 text-right">Songs</th>
-                        <th className="pb-2">Preview</th>
-                      </tr>
-                    </thead>
-                    <tbody>
-                      {group.items.map((item) => {
-                        const isMatch = item.originalArtist === canonicalName;
-                        return (
-                          <tr key={item.originalArtist} className={isMatch ? 'bg-blue-50' : ''}>
-                            <td className="py-1.5">
-                              <button
-                                onClick={() =>
-                                  setCanonical(group.normalizedKey, item.originalArtist)
-                                }
-                                className="text-left hover:text-blue-600"
-                                title="Use this as canonical"
-                              >
-                                {item.originalArtist}
-                              </button>
-                            </td>
-                            <td className="py-1.5 text-right text-slate-600">{item.songCount}</td>
-                            <td className="py-1.5">
-                              {isMatch ? (
-                                <span className="text-xs text-green-600">no change</span>
-                              ) : (
-                                <span>
-                                  <span className="text-slate-400 line-through">{item.originalArtist}</span>
-                                  <span className="ml-2 text-blue-600">{canonicalName}</span>
-                                </span>
-                              )}
-                            </td>
-                          </tr>
-                        );
-                      })}
-                    </tbody>
-                  </table>
-                  <div className="mt-3 flex justify-end">
-                    <button
-                      onClick={() => handleApplyGroup(group)}
-                      disabled={isApplying}
-                      className="rounded-md bg-blue-600 px-3 py-1.5 text-sm font-medium text-white hover:bg-blue-700 disabled:opacity-50"
-                    >
-                      {isApplying ? 'Applying...' : 'Apply'}
-                    </button>
-                  </div>
-                </div>
-              )}
-            </div>
-          );
-        })}
-      </div>
+      {error ? (
+        <Note tone="danger" icon="alert" role="alert">
+          {error}
+        </Note>
+      ) : null}
 
-      {!loading && groups.length === 0 && stats && (
-        <p className="text-center text-sm text-slate-500">No similar artist names found.</p>
+      {scanned ? (
+        <QueueLayout
+          listLabel="Similar artist groups"
+          listTitle="Groups"
+          listCount={groups.length}
+          items={groups}
+          getKey={groupKeyOf}
+          selectedKey={selectedKey}
+          onSelect={setPicked}
+          renderItem={(group) => <GroupRow group={group} />}
+          hint="next / previous group"
+          emptyList={<p className="px-3.5 py-6 text-center text-token-sm text-fg-muted">{NO_GROUPS}</p>}
+          detail={
+            // With a group listed one is always selected, so no selection means an empty list.
+            selected ? (
+              <SimilarArtistGroupCard
+                group={selected}
+                canonicalName={nameOf(selected)}
+                isApplying={applyingKey === selected.normalizedKey}
+                applyDisabled={renamesFor(selected, nameOf(selected)).length === 0 || applyPending || loading}
+                onCanonicalNameChange={(name) => setCanonical(selected.normalizedKey, name)}
+                onApply={() => void handleApplyGroup(selected)}
+                onPrevious={previousKey === undefined ? undefined : () => setPicked(previousKey)}
+                onNext={nextKey === undefined ? undefined : () => setPicked(nextKey)}
+              />
+            ) : (
+              <NoGroupsFound title={NO_GROUPS} />
+            )
+          }
+          keyboardEnabled={active}
+        />
+      ) : (
+        <GlassCard>
+          <EmptyState
+            icon="users"
+            title="Find artist name variants"
+            body="Give every spelling of an artist's name one canonical name."
+            action={
+              <Button
+                variant="primary"
+                icon="refresh"
+                busy={loading}
+                disabled={mode === 'fuzzy' && !thresholdIsValid}
+                onClick={() => void handleScan()}
+              >
+                Scan now
+              </Button>
+            }
+          />
+        </GlassCard>
       )}
     </div>
   );
