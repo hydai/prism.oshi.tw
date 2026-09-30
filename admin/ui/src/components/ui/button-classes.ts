@@ -17,11 +17,12 @@ const BUTTON_VARIANT_CLASSES: Record<ButtonVariant, string> = {
  * The class string `Button` renders with, exported so a router `Link` can look like a
  * button (R4). Lives here, outside `Button.tsx`, because a `.tsx` module that exports
  * React components must not also export a plain runtime value — react-doctor's
- * `only-export-components` (ruling R14).
+ * `only-export-components` (ruling R14). A `disabled` button and an `aria-disabled` one (a busy
+ * `Button`, which stays enabled to keep its keyboard focus) share the dimmed, not-allowed look.
  */
 export function buttonClasses({
   variant = 'secondary',
   size = 'md',
 }: { variant?: ButtonVariant; size?: ButtonSize } = {}): string {
-  return `inline-flex items-center justify-center whitespace-nowrap rounded-radius-pill font-semibold transition-[filter,background-color,box-shadow,border-color] disabled:cursor-not-allowed disabled:opacity-50 focus-visible:outline-none focus-visible:shadow-focus ${BUTTON_SIZE_CLASSES[size]} ${BUTTON_VARIANT_CLASSES[variant]}`;
+  return `inline-flex items-center justify-center whitespace-nowrap rounded-radius-pill font-semibold transition-[filter,background-color,box-shadow,border-color] disabled:cursor-not-allowed disabled:opacity-50 aria-disabled:cursor-not-allowed aria-disabled:opacity-50 focus-visible:outline-none focus-visible:shadow-focus ${BUTTON_SIZE_CLASSES[size]} ${BUTTON_VARIANT_CLASSES[variant]}`;
 }

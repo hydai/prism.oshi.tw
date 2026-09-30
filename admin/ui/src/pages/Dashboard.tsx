@@ -169,10 +169,10 @@ function SectionLink({ to, children }: { to: string; children: string }) {
 
 /**
  * A section whose load failed: what could not load, and a Retry of that load. While the Retry's load
- * runs (`busy`) the Retry stays, busy (`aria-disabled`, spinning, a click does nothing), so it keeps
- * the focus; if it still has it when the load lands, the section's first link — or its title, where
- * it has none — takes it. The Retry's cleanup runs while it is still in the document, before the
- * section's new content arrives, so the first link is the section head's own.
+ * runs (`busy`) the Retry stays, as the kit's busy Button (aria-busy and aria-disabled, spinning, a
+ * click does nothing), so it keeps the focus; if it still has it when the load lands, the section's
+ * first link — or its title, where it has none — takes it. The Retry's cleanup runs while it is still
+ * in the document, before the section's new content arrives, so the first link is the section head's own.
  */
 function SectionError({ what, title, busy, onRetry }: { what: string; title: string; busy: boolean; onRetry: () => void }) {
   const retryRef = useCallback((button: HTMLButtonElement | null) => {
@@ -194,10 +194,9 @@ function SectionError({ what, title, busy, onRetry }: { what: string; title: str
         ref={retryRef}
         size="sm"
         icon="refresh"
+        busy={busy}
         aria-label={busy ? `Retrying ${title}…` : `Retry ${title}`}
-        aria-disabled={busy ? 'true' : undefined}
-        className={busy ? 'cursor-progress [&>svg]:animate-spin' : undefined}
-        onClick={busy ? undefined : onRetry}
+        onClick={onRetry}
       >
         {busy ? 'Retrying…' : 'Retry'}
       </Button>

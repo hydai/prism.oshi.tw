@@ -1,10 +1,34 @@
-import type { ButtonHTMLAttributes, Ref } from 'react';
+import type { ButtonHTMLAttributes, MouseEvent, Ref } from 'react';
 import { buttonClasses, type ButtonSize, type ButtonVariant } from './button-classes';
 import { Icon, type IconName } from './Icon';
 import { Tooltip, type TooltipAlign } from './Tooltip';
 
 export type { ButtonVariant, ButtonSize } from './button-classes';
 
+/**
+ * The click of a button that is `aria-disabled`, busy or not. Enter and Space reach a button as a click,
+ * and so does implicit submission (Enter in a text field clicks the form's default button), so this one
+ * handler covers them all. `preventDefault` is what stops a submit button from submitting its form;
+ * `stopPropagation` keeps the click from any ancestor's handler, as the click of a `disabled` button
+ * never reached one.
+ */
+function ignoreClick(event: MouseEvent<HTMLButtonElement>): void {
+  event.preventDefault();
+  event.stopPropagation();
+}
+
+/**
+ * `aria-disabled` is how a button is unavailable without losing the keyboard focus: a browser drops the
+ * focus from a button that turns `disabled`, but leaves it on an `aria-disabled` one. So a Button that is
+ * `aria-disabled` ignores whatever would activate it (see `ignoreClick`), as a disabled one does, and dims
+ * like one. That is the button that is busy, whose click (or key) started the work, and equally one its
+ * caller gives `aria-disabled`: Pagination's step at the end of its range, which the press that got there
+ * has just made unavailable. Only a true `aria-disabled` counts; `false` leaves the button live.
+ *
+ * `busy` is `aria-disabled` plus `aria-busy` and a spinning icon, never the `disabled` attribute; `aria-busy`
+ * and the spinner are for `busy` alone. `busy` also wins over `disabled`: whatever else disables the
+ * button, the busy one keeps its focus until the work is done. `disabled` alone is still the attribute.
+ */
 export function Button({
   ref,
   variant = 'secondary',
@@ -14,6 +38,8 @@ export function Button({
   type = 'button',
   className,
   disabled,
+  'aria-disabled': ariaDisabled,
+  onClick,
   children,
   ...rest
 }: ButtonHTMLAttributes<HTMLButtonElement> & {
@@ -25,6 +51,8 @@ export function Button({
 }) {
   // busy always shows the spinning refresh icon, even if `icon` was also given.
   const displayIcon: IconName | undefined = busy ? 'refresh' : icon;
+  // aria-disabled as React takes it: `true` or `'true'`; busy is aria-disabled by definition.
+  const inert = busy || ariaDisabled === true || ariaDisabled === 'true';
   const classes = className
     ? `${buttonClasses({ variant, size })} ${className}`
     : buttonClasses({ variant, size });
@@ -35,8 +63,10 @@ export function Button({
       ref={ref}
       type={type}
       className={classes}
-      disabled={disabled || busy}
+      disabled={busy ? undefined : disabled}
+      aria-disabled={busy ? 'true' : ariaDisabled}
       aria-busy={busy ? 'true' : undefined}
+      onClick={inert ? ignoreClick : onClick}
     >
       {displayIcon ? <Icon name={displayIcon} size={14} className={busy ? 'animate-spin' : undefined} /> : null}
       {children}

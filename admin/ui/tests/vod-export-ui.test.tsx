@@ -1766,8 +1766,9 @@ async function main(): Promise<void> {
     !ownPublicationHtml.includes('role="alert"') && !ownPublicationHtml.includes('Another publication is in progress.'),
     "the dialog's own publication is not shown as another one",
   );
+  // Busy, so aria-disabled and not disabled: the confirm button holds the focus while it publishes.
   assert(
-    /<button[^>]*disabled=""[^>]*aria-busy="true"[^>]*>(?:(?!<\/button>)[\s\S])*Publishing\.\.\.<\/button>/.test(ownPublicationHtml),
+    /<button(?=[^>]*\saria-disabled="true")(?=[^>]*\saria-busy="true")(?![^>]*\sdisabled="")[^>]*>(?:(?!<\/button>)[\s\S])*Publishing\.\.\.<\/button>/.test(ownPublicationHtml),
     'it says Publishing... on its busy confirm button instead',
   );
 
@@ -2779,8 +2780,8 @@ async function livePage({
   await elsewhere.unmount();
 
   // Refused, with the status refresh still out: the candidate stays, and so does its dialog. Nothing
-  // reaches for the page behind that modal, so focus is where the dialog had it (happy-dom keeps it on the
-  // confirm button that is disabled while it publishes; a browser drops it to <body>, which is no move either).
+  // reaches for the page behind that modal, so focus is where the dialog had it (on the confirm button,
+  // which is busy rather than disabled while it publishes, so a browser keeps the focus on it too).
   handlers.set(STATUS, () => json(status()));
   handlers.set(PUBLISH, () => json({ error: 'Candidate is stale.', code: 'CANDIDATE_STALE' }, 409));
   const refusing = await mountPage(curator);
@@ -3102,9 +3103,13 @@ async function livePage({
     ),
     "while it runs, the card gives Publish's reason as another publication in progress",
   );
+  const publishingConfirm = buttonNamed(publishingDialog, 'Publishing...');
   assert(
-    buttonNamed(publishingDialog, 'Publishing...')?.disabled === true && publishingDialog.querySelector('[role="alert"]') === null,
-    'the dialog itself reads Publishing... and shows no reason: its own publication is not another one',
+    publishingConfirm?.getAttribute('aria-busy') === 'true'
+      && publishingConfirm.getAttribute('aria-disabled') === 'true'
+      && !publishingConfirm.disabled
+      && publishingDialog.querySelector('[role="alert"]') === null,
+    'the dialog itself reads Publishing... on a busy confirm button and shows no reason: its own publication is not another one',
   );
   await act(async () => {
     ownPublication.release(json({ outcome: 'published', currentPublication: publication, warnings: [] }));

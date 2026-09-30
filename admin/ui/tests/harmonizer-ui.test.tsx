@@ -777,7 +777,18 @@ async function main(): Promise<void> {
       `the next merge sends the revision the previous merge returned (got ${JSON.stringify(second)})`,
     );
     const merging = buttonNamed(detailOf(container), 'Merging...');
-    assert(merging !== undefined && merging.disabled, 'the running merge reads Merging... and waits');
+    assert(
+      merging !== undefined
+        && merging.getAttribute('aria-busy') === 'true'
+        && merging.getAttribute('aria-disabled') === 'true'
+        && !merging.disabled,
+      'the running merge reads Merging... and is busy (aria-disabled, not disabled, so it keeps its focus)',
+    );
+    await click(merging, 'the running merge');
+    assert(
+      openDialog(container) === null && callsTo('merge').length === 2,
+      'and waits: a click on it asks for no second merge',
+    );
     await click(rowFor(container, 'fly me to the moon'), 'the fly me to the moon row');
     const waiting = buttonNamed(detailOf(container), 'Merge Songs + Global Works');
     assert(waiting !== undefined && waiting.disabled, "another group's merge waits for the running one");
@@ -1263,7 +1274,15 @@ async function main(): Promise<void> {
       `Apply renames the songs of every other spelling (got ${JSON.stringify(callsTo('apply')[0]?.body)})`,
     );
     const applying = buttonNamed(artistDetail(container), 'Applying...');
-    assert(applying !== undefined && applying.disabled, 'the running apply reads Applying... and waits');
+    assert(
+      applying !== undefined
+        && applying.getAttribute('aria-busy') === 'true'
+        && applying.getAttribute('aria-disabled') === 'true'
+        && !applying.disabled,
+      'the running apply reads Applying... and is busy (aria-disabled, not disabled, so it keeps its focus)',
+    );
+    await click(applying, 'the running apply');
+    assert(callsTo('apply').length === 1, 'and waits: a click on it sends no second apply');
     assert(buttonNamed(header(), 'Scan again')?.disabled === true, 'no scan starts while an apply runs');
     assert(applyAll()?.disabled === true, 'nor Apply All Reviewed');
     await inFlight.release(applyReply(1));

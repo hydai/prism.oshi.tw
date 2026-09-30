@@ -492,6 +492,7 @@ async function main(): Promise<void> {
   const { default: Dashboard } = await import('../src/pages/Dashboard');
   const { InboxCountsProvider } = await import('../src/components/shell/InboxCounts');
   const { ToastProvider } = await import('../src/components/ui/toast');
+  const { buttonClasses } = await import('../src/components/ui/button-classes');
 
   const page = (user: AuthUser) => (
     <ToastProvider>
@@ -1071,6 +1072,14 @@ async function main(): Promise<void> {
   const sectionDown = await mount(page(CURATOR));
   const catalogRetry = retryButton(sectionOf(sectionDown.container, 'Catalog'), 'Retry Catalog');
   assert(catalogRetry !== null, 'the failed catalog offers Retry');
+  // A section's Retry is the kit's Button, in the kit's look with nothing of its own added: idle it is
+  // neither busy nor aria-disabled, and busy (below) it is the kit's busy button, not a hand-made one.
+  assert(
+    catalogRetry.className === buttonClasses({ size: 'sm' })
+      && catalogRetry.getAttribute('aria-busy') === null
+      && catalogRetry.getAttribute('aria-disabled') === null,
+    `the failed catalog's Retry is a plain kit Button while idle (got class "${catalogRetry.className}")`,
+  );
   replies.stats = ok(STATS);
   const releaseStats = holdNext('stats');
   await act(async () => {
@@ -1080,10 +1089,23 @@ async function main(): Promise<void> {
   const catalogHeld = sectionOf(sectionDown.container, 'Catalog');
   assert(catalogHeld.querySelectorAll('[role="img"]').length === 0, 'while the retried load runs, the catalog shows no bars');
   assert(
-    catalogRetry.isConnected && catalogHeld.contains(catalogRetry) && catalogRetry.getAttribute('aria-disabled') === 'true',
-    'its Retry stays, busy',
+    catalogRetry.isConnected
+      && catalogHeld.contains(catalogRetry)
+      && catalogRetry.getAttribute('aria-busy') === 'true'
+      && catalogRetry.getAttribute('aria-disabled') === 'true'
+      && !catalogRetry.hasAttribute('disabled'),
+    'its Retry stays, busy as the kit Button is: aria-busy and aria-disabled, never disabled',
+  );
+  assert(
+    catalogRetry.querySelector('svg')?.classList.contains('animate-spin') === true
+      && catalogRetry.className === buttonClasses({ size: 'sm' }),
+    `its icon spins, in the kit look with no cursor or spin class of its own (got class "${catalogRetry.className}")`,
   );
   assert(document.activeElement === catalogRetry, 'and keeps the focus');
+  calls = [];
+  await click(catalogRetry, 'the busy catalog Retry');
+  assert(calls.length === 0, `a click on the busy catalog Retry sends nothing (got ${calledEndpoints()})`);
+  assert(document.activeElement === catalogRetry, 'and leaves the focus on it');
   await act(async () => {
     releaseStats();
   });
