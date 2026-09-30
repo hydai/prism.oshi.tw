@@ -216,7 +216,8 @@ export function workReviewReducer(
     case 'nextPageRequested':
       return {
         ...state,
-        page: Math.min(state.totalPages, state.page + 1),
+        // Never below page 1, even when the filter counts no page at all (every row decided away).
+        page: Math.max(1, Math.min(state.totalPages, state.page + 1)),
         confirmingCandidateKey: null,
         // The same at the last page.
         decided: state.page < state.totalPages ? {} : state.decided,
