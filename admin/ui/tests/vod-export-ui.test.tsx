@@ -1,8 +1,8 @@
 import { Window } from 'happy-dom';
-import { act, createRef } from 'react';
+import { act, createRef, useState } from 'react';
 import { createRoot } from 'react-dom/client';
 import { renderToStaticMarkup } from 'react-dom/server';
-import { MemoryRouter } from 'react-router-dom';
+import { MemoryRouter, useLocation } from 'react-router-dom';
 import type { AuthUser } from '../../shared/types';
 import type {
   VodExportCandidate,
@@ -12,11 +12,229 @@ import type {
   VodExportStatusResponse,
 } from '../src/api/vodExportTypes';
 import type { StepperStep } from '../src/components/ui/Stepper';
+import type { FindingGroup } from '../src/lib/vod-export-helpers';
 import { click, installDom, mount, settle } from './helpers/dom';
 import { NO_RAW_PALETTE } from './helpers/palette';
 
 function assert(condition: boolean, message: string): asserts condition {
   if (!condition) throw new Error(message);
+}
+
+/** One finding; the defaults are the streamer error most groups in these tests are made of. */
+function makeFinding(overrides: Partial<VodExportFindingApi> = {}): VodExportFindingApi {
+  return {
+    code: 'MISSING_YOUTUBE_CHANNEL_ID',
+    severity: 'error',
+    message: 'Verified YouTube channel ID is required.',
+    entityType: 'streamer',
+    ...overrides,
+  };
+}
+
+/** A streamer finding for `slug`, pointing at Nova the way the worker does for a streamer without a submission. */
+function novaFinding(slug: string): VodExportFindingApi {
+  return makeFinding({ streamerSlug: slug, entityId: slug, repairPath: `/nova?status=approved&search=${slug}` });
+}
+
+/** A duplicate-VOD finding: the worker points it at the streamer's approved streams, searched by video ID. */
+function duplicateVodFinding(slug: string, videoId: string): VodExportFindingApi {
+  return makeFinding({
+    code: 'DUPLICATE_VOD_VIDEO_ID',
+    message: 'VOD video ID occurs more than once for this streamer.',
+    entityType: 'vod',
+    streamerSlug: slug,
+    entityId: videoId,
+    field: 'videoId',
+    details: { duplicateCount: 2 },
+    repairPath: `/streams?streamer=${slug}&status=approved&search=${videoId}`,
+  });
+}
+
+/** A performance finding: the worker points these at a single-record repair page. */
+function performanceFinding(rowId: number, overrides: Partial<VodExportFindingApi> = {}): VodExportFindingApi {
+  return makeFinding({
+    code: 'MISSING_END_SECONDS',
+    message: 'End time is required.',
+    entityType: 'performance',
+    streamerSlug: 'alpha',
+    entityId: `performance-${rowId}`,
+    field: 'endSeconds',
+    repairPath: `/vod-export/repair/performance/${rowId}`,
+    ...overrides,
+  });
+}
+
+/** Prints where the router is, so a test can tell a router `Link` (navigates in place) from a plain anchor. */
+function LocationProbe() {
+  const location = useLocation();
+  return <output>{`${location.pathname}${location.search}`}</output>;
+}
+
+/** A group as one line — `key · count noun · message` — so a table compares whole groups. */
+function groupLine(group: FindingGroup): string {
+  return `${group.key} · ${group.items.length} ${group.entityNoun} · ${group.message}`;
+}
+
+/** A group's fix link as `label → to`, or `none`, so a table compares them whole. */
+function fixLine(link: { label: string; to: string } | null): string {
+  return link === null ? 'none' : `${link.label} → ${link.to}`;
+}
+
+/** `groupFindings` (severity + code, errors first, the entity noun) and `groupFixLink` (the one "Fix in …" destination). */
+function findingGroupTables({
+  groupFindings,
+  groupFixLink,
+}: {
+  groupFindings: typeof import('../src/lib/vod-export-helpers').groupFindings;
+  groupFixLink: typeof import('../src/lib/vod-export-helpers').groupFixLink;
+}): void {
+  // --- groupFindings ---
+
+  assert(groupFindings([]).length === 0, 'no findings make no groups');
+
+  const server = [
+    makeFinding({ code: 'MISSING_ORIGINAL_ARTIST', severity: 'warning', message: 'Original artist is missing.', entityType: 'song', entityId: 'song-1' }),
+    makeFinding({ streamerSlug: 'a' }),
+    makeFinding({ code: 'MISSING_END_SECONDS', message: 'End time is required.', entityType: 'performance', entityId: 'p1' }),
+    makeFinding({ code: 'UNSAFE_AVATAR_URL', severity: 'warning', message: 'Unsafe avatar URL was replaced with null.', streamerSlug: 'a' }),
+    makeFinding({ code: 'MISSING_END_SECONDS', message: 'A later text from the server.', entityType: 'performance', entityId: 'p2' }),
+    makeFinding({ streamerSlug: 'b' }),
+    makeFinding({ code: 'DUPLICATE_VOD_VIDEO_ID', message: 'VOD video ID occurs more than once for this streamer.', entityType: 'vod', entityId: 'v1' }),
+    makeFinding({ code: 'MISSING_ORIGINAL_ARTIST', severity: 'warning', message: 'Original artist is missing.', entityType: 'song', entityId: 'song-2' }),
+    makeFinding({ code: 'MISSING_END_SECONDS', message: 'End time is required.', entityType: 'performance', entityId: 'p3' }),
+  ];
+  const serverOrder = server.slice();
+  const grouped = groupFindings(server);
+  assert(
+    grouped.map(groupLine).join('\n') === [
+      'error:DUPLICATE_VOD_VIDEO_ID · 1 VOD · VOD video ID occurs more than once for this streamer.',
+      'error:MISSING_END_SECONDS · 3 performances · End time is required.',
+      'error:MISSING_YOUTUBE_CHANNEL_ID · 2 streamers · Verified YouTube channel ID is required.',
+      'warning:MISSING_ORIGINAL_ARTIST · 2 songs · Original artist is missing.',
+      'warning:UNSAFE_AVATAR_URL · 1 streamer · Unsafe avatar URL was replaced with null.',
+    ].join('\n'),
+    `findings group by severity and code — errors first, then by code — with the noun of their entity (got\n${grouped.map(groupLine).join('\n')})`,
+  );
+  assert(
+    grouped.every((group) => group.key === `${group.severity}:${group.code}`),
+    'a group is keyed by its severity and code',
+  );
+  const endSeconds = grouped.find((group) => group.code === 'MISSING_END_SECONDS');
+  assert(
+    endSeconds?.items.map((item) => item.entityId).join() === 'p1,p2,p3',
+    'a group keeps its findings in the order the server sent them',
+  );
+  assert(
+    endSeconds.message === 'End time is required.',
+    "a group's message is its first finding's, not a later one's",
+  );
+  assert(
+    endSeconds.items.every((item) => server.includes(item)),
+    'a group holds the findings themselves, not copies',
+  );
+  assert(
+    server.every((finding, index) => finding === serverOrder[index]) && server.length === serverOrder.length,
+    'grouping leaves the findings it was given alone',
+  );
+
+  const bothSeverities = groupFindings([
+    makeFinding({ code: 'MISSING_ORIGINAL_ARTIST', severity: 'warning' }),
+    makeFinding({ code: 'MISSING_ORIGINAL_ARTIST', severity: 'error' }),
+  ]);
+  assert(
+    bothSeverities.map((group) => group.key).join() === 'error:MISSING_ORIGINAL_ARTIST,warning:MISSING_ORIGINAL_ARTIST',
+    'one code at both severities makes two groups, the error first',
+  );
+
+  const nounTable: Array<[string, VodExportFindingApi[], string]> = [
+    ['one streamer', [makeFinding()], 'streamer'],
+    ['two streamers', [makeFinding(), makeFinding()], 'streamers'],
+    ['one VOD', [makeFinding({ entityType: 'vod' })], 'VOD'],
+    ['two VODs', [makeFinding({ entityType: 'vod' }), makeFinding({ entityType: 'vod' })], 'VODs'],
+    ['one song', [makeFinding({ entityType: 'song' })], 'song'],
+    ['three songs', [1, 2, 3].map(() => makeFinding({ entityType: 'song' })), 'songs'],
+    ['one performance', [makeFinding({ entityType: 'performance' })], 'performance'],
+    ['two performances', [1, 2].map(() => makeFinding({ entityType: 'performance' })), 'performances'],
+    // INVALID_UNICODE_TEXT is raised for all four entity types, so one code can mix them.
+    ['a streamer and a song', [makeFinding({ entityType: 'streamer' }), makeFinding({ entityType: 'song' })], 'records'],
+  ];
+  for (const [when, findings, expected] of nounTable) {
+    const noun = groupFindings(findings)[0]?.entityNoun;
+    assert(noun === expected, `for ${when} the entity noun reads "${expected}" (got "${String(noun)}")`);
+  }
+
+  // --- groupFixLink ---
+
+  const streamerSlugs = Array.from({ length: 41 }, (_, index) => `streamer-${String(index + 1).padStart(2, '0')}`);
+  const fixTable: Array<[string, VodExportFindingApi[], string]> = [
+    ['41 streamer findings pointing at Nova', streamerSlugs.map(novaFinding), 'Fix in Nova → /nova?status=approved'],
+    [
+      'duplicate VODs of one streamer',
+      [duplicateVodFinding('a', 'aaaaaaaaaaa'), duplicateVodFinding('a', 'bbbbbbbbbbb'), duplicateVodFinding('a', 'ccccccccccc')],
+      'Fix in Streams → /streams?streamer=a&status=approved',
+    ],
+    [
+      'duplicate VODs of two streamers',
+      [duplicateVodFinding('a', 'aaaaaaaaaaa'), duplicateVodFinding('b', 'bbbbbbbbbbb')],
+      'Fix in Streams → /streams?status=approved',
+    ],
+    [
+      'the first finding sets the order of the shared parameters',
+      [
+        makeFinding({ repairPath: '/streams?status=approved&streamer=a&search=x' }),
+        makeFinding({ repairPath: '/streams?streamer=a&search=y&status=approved' }),
+      ],
+      'Fix in Streams → /streams?status=approved&streamer=a',
+    ],
+    [
+      'a parameter only some findings carry',
+      [
+        makeFinding({ repairPath: '/streams?streamer=a&status=approved&search=x' }),
+        makeFinding({ repairPath: '/streams?streamer=a&search=y' }),
+      ],
+      'Fix in Streams → /streams?streamer=a',
+    ],
+    [
+      'a parameter the findings share by name but not by value',
+      [makeFinding({ repairPath: '/streams?search=x' }), makeFinding({ repairPath: '/streams?search=y' })],
+      'Fix in Streams → /streams',
+    ],
+    [
+      'a shared value that needs escaping',
+      [
+        makeFinding({ repairPath: '/streams?streamer=x%26y&search=1' }),
+        makeFinding({ repairPath: '/streams?streamer=x%26y&search=2' }),
+      ],
+      'Fix in Streams → /streams?streamer=x%26y',
+    ],
+    ['a single finding keeps its whole query', [novaFinding('only')], 'Fix in Nova → /nova?status=approved&search=only'],
+    [
+      'a hash is not carried over',
+      [makeFinding({ repairPath: '/nova?status=approved#top' }), makeFinding({ repairPath: '/nova?status=approved#end' })],
+      'Fix in Nova → /nova?status=approved',
+    ],
+    [
+      'Stamp Editor',
+      [
+        makeFinding({ repairPath: '/stamp?stream=s1&performance=p1' }),
+        makeFinding({ repairPath: '/stamp?stream=s1&performance=p2' }),
+      ],
+      'Fix in Stamp Editor → /stamp?stream=s1',
+    ],
+    ['Songs', [makeFinding({ repairPath: '/songs?status=approved' }), makeFinding({ repairPath: '/songs?status=approved' })], 'Fix in Songs → /songs?status=approved'],
+    ['performance findings on repair pages', [1, 2].map((rowId) => performanceFinding(rowId)), 'none'],
+    ['findings on the same kind of repair page', [1, 2].map((rowId) => makeFinding({ repairPath: `/vod-export/repair/streamer/${rowId}` })), 'none'],
+    ['mixed pathnames', [novaFinding('a'), duplicateVodFinding('a', 'aaaaaaaaaaa')], 'none'],
+    ['a shared pathname outside the label map', [42, 43].map((id) => makeFinding({ repairPath: `/streams/${id}` })), 'none'],
+    ['one unsafe path among safe ones', [novaFinding('a'), makeFinding({ repairPath: 'https://evil.example/' }), novaFinding('c')], 'none'],
+    ['only unsafe paths', [makeFinding({ repairPath: '//evil.example/' }), makeFinding({ repairPath: '/api/private' })], 'none'],
+    ['one finding without a repair path', [novaFinding('a'), makeFinding({ streamerSlug: 'b' }), novaFinding('c')], 'none'],
+    ['no findings', [], 'none'],
+  ];
+  for (const [when, findings, expected] of fixTable) {
+    const actual = fixLine(groupFixLink(findings));
+    assert(actual === expected, `for ${when} the group link reads "${expected}" (got "${actual}")`);
+  }
 }
 
 /** A stepper's steps as one line each — `state title — detail` — so a table compares them whole. */
@@ -65,6 +283,449 @@ function installLocalStorage(): void {
   Object.defineProperty(globalThis, 'localStorage', { value: stub, configurable: true });
 }
 
+/**
+ * The findings card live: 41 identical findings as one group (both filters), a group opening and
+ * closing, "+N more" and back, warnings starting closed, and an unsafe repair path never rendered.
+ */
+async function groupedFindingsPanel({
+  FindingsPanel,
+}: {
+  FindingsPanel: typeof import('../src/pages/VodExport').FindingsPanel;
+}): Promise<void> {
+  const win = installDom();
+  const { buttonClasses } = await import('../src/components/ui/button-classes');
+
+  const mountPanel = (findings: VodExportFindingApi[]) =>
+    mount(
+      <MemoryRouter>
+        <FindingsPanel findings={findings} />
+        <LocationProbe />
+      </MemoryRouter>,
+    );
+  const locationOf = (root: ParentNode) => root.querySelector('output')?.textContent ?? '';
+  const linksNamed = (root: ParentNode, name: string) =>
+    [...root.querySelectorAll('a')].filter((link) => link.textContent.trim() === name);
+  const openRecords = (root: ParentNode) => linksNamed(root, 'Open record');
+  const buttonNamed = (root: ParentNode, name: string) =>
+    [...root.querySelectorAll('button')].find((button) => button.textContent.trim() === name) ?? null;
+  const toggles = (root: ParentNode) => [...root.querySelectorAll<HTMLButtonElement>('button[aria-expanded]')];
+  const expandedStates = (root: ParentNode) => toggles(root).map((toggle) => toggle.getAttribute('aria-expanded')).join();
+  const severitySelect = (root: ParentNode) =>
+    root.querySelector<HTMLSelectElement>('select[aria-label="Filter findings by severity"]');
+  const streamerSelect = (root: ParentNode) =>
+    root.querySelector<HTMLSelectElement>('select[aria-label="Filter findings by streamer"]');
+  const optionsOf = (select: HTMLSelectElement | null) =>
+    [...(select?.querySelectorAll('option') ?? [])].map((option) => `${option.value}=${option.textContent}`).join();
+  /** Picks `value` in a (React-controlled) select the way a user does: through the value setter, then a `change`. */
+  const selectOption = async (select: HTMLSelectElement | null, value: string) => {
+    assert(select !== null, 'the panel renders the select');
+    let setValue: ((next: string) => void) | undefined;
+    for (let proto: object | null = Object.getPrototypeOf(select); proto && !setValue; proto = Object.getPrototypeOf(proto)) {
+      setValue = Object.getOwnPropertyDescriptor(proto, 'value')?.set;
+    }
+    await act(async () => {
+      if (setValue) setValue.call(select, value);
+      else select.value = value;
+      select.dispatchEvent(new Event('change', { bubbles: true }));
+    });
+    await settle();
+  };
+
+  // --- Review focus: 41 identical findings form one group, under either filter ---
+
+  const slugs = Array.from({ length: 41 }, (_, index) => `streamer-${String(index + 1).padStart(2, '0')}`);
+  const forty1 = await mountPanel(slugs.map(novaFinding));
+  const panel = forty1.container;
+
+  assert(
+    panel.querySelector('section[aria-label="Validation findings"] h2')?.textContent === 'Validation findings',
+    'the card is a named section headed by an h2',
+  );
+  assert(panel.querySelector('h1, h3, h4, h5, h6') === null, 'the card holds no other heading level');
+  for (const text of ['41 errors', '0 warnings']) {
+    assert(panel.textContent.includes(text), `the header counts read "${text}"`);
+  }
+  // A count wears its severity's tone only when there is something to count: a zero stays neutral.
+  const countPill = (root: ParentNode, text: string) =>
+    [...root.querySelectorAll('section[aria-label="Validation findings"] > div:first-child > span')].find(
+      (pill) => pill.textContent === text,
+    );
+  assert(countPill(panel, '41 errors')?.getAttribute('class')?.includes('bg-tone-danger-bg') === true, '"41 errors" is danger-toned');
+  assert(countPill(panel, '0 warnings')?.getAttribute('class')?.includes('bg-tone-neutral-bg') === true, '"0 warnings" is neutral');
+  assert(toggles(panel).length === 1, `41 identical findings form one group (got ${toggles(panel).length})`);
+  assert(expandedStates(panel) === 'true', 'an error group starts expanded');
+
+  const toggle = toggles(panel)[0];
+  assert(toggle !== undefined, 'the group has its chevron button');
+  assert(toggle.getAttribute('type') === 'button', 'the group toggle is a real button that submits nothing');
+  for (const text of ['Error', 'MISSING_YOUTUBE_CHANNEL_ID', 'Verified YouTube channel ID is required.', '41 streamers']) {
+    assert(toggle.textContent.includes(text), `the group row shows "${text}"`);
+  }
+  assert(toggle.querySelector('code')?.getAttribute('class')?.includes('font-mono') === true, 'the code is set in mono');
+  assert(
+    toggle.querySelector('span')?.textContent === 'Error' && toggle.querySelector('span')?.getAttribute('class')?.includes('bg-tone-danger-bg') === true,
+    'an error group wears the danger-toned Error pill',
+  );
+  assert(toggle.querySelector('a') === null, 'the fix link is beside the toggle, never inside the button');
+  const groupRow = toggle.closest('li');
+  assert(groupRow !== null, 'the group is a list item');
+
+  const fixLinks = linksNamed(panel, 'Fix in Nova');
+  assert(fixLinks.length === 1, 'the group offers one "Fix in Nova" link');
+  const fix = fixLinks[0];
+  assert(fix !== undefined && fix.getAttribute('href') === '/nova?status=approved', 'it goes to Nova with the shared query only');
+  assert(groupRow.contains(fix), 'the link belongs to its group');
+  assert(
+    fix.getAttribute('class')?.includes(buttonClasses({ variant: 'secondary', size: 'sm' })) === true,
+    'the link wears the small secondary button classes',
+  );
+
+  const controlled = document.getElementById(toggle.getAttribute('aria-controls') ?? '');
+  assert(
+    controlled !== null && controlled.contains(openRecords(panel)[0] ?? null),
+    'an expanded toggle controls the list of findings',
+  );
+  assert(openRecords(panel).length === 3, `an expanded group shows three findings (got ${openRecords(panel).length})`);
+  assert(
+    openRecords(panel).map((link) => link.getAttribute('href')).join()
+      === slugs.slice(0, 3).map((slug) => `/nova?status=approved&search=${slug}`).join(),
+    'the three are the first three the server sent, each opening its own record',
+  );
+  const firstFinding = controlled.querySelector('li');
+  assert(
+    firstFinding !== null && firstFinding.textContent.startsWith('streamer-01') && firstFinding.textContent.includes('streamer streamer-01'),
+    'a finding names its streamer, then its entity type and ID',
+  );
+  const entityId = firstFinding.querySelector('code');
+  assert(
+    entityId?.textContent === 'streamer-01' && entityId.getAttribute('class')?.includes('font-mono') === true,
+    'the entity ID is set in mono',
+  );
+  const moreButton = buttonNamed(panel, '+38 more');
+  assert(moreButton !== null && moreButton.getAttribute('type') === 'button', 'the rest hides behind "+38 more"');
+  assert(!moreButton.hasAttribute('aria-expanded'), 'only group toggles carry aria-expanded');
+
+  await click(moreButton, '+38 more');
+  assert(openRecords(panel).length === 41, `"+38 more" reveals the rest (got ${openRecords(panel).length})`);
+  assert(buttonNamed(panel, '+38 more') === null, 'the "+38 more" label is gone once everything shows');
+  const fewer = buttonNamed(panel, 'Show fewer');
+  assert(fewer !== null, 'the same control now offers "Show fewer"');
+  await click(fewer, 'Show fewer');
+  assert(openRecords(panel).length === 3 && buttonNamed(panel, '+38 more') !== null, '"Show fewer" returns to three findings');
+
+  await click(toggle, 'the group toggle');
+  assert(expandedStates(panel) === 'false' && openRecords(panel).length === 0, 'the chevron collapses a group to its row');
+  assert(
+    toggle.textContent.includes('41 streamers') && linksNamed(panel, 'Fix in Nova').length === 1,
+    'a collapsed group keeps its count and its fix link',
+  );
+  await click(toggle, 'the group toggle');
+  assert(expandedStates(panel) === 'true' && openRecords(panel).length === 3, 'the chevron opens it again');
+
+  // Both kinds of link are router links: a click navigates in place instead of loading a page.
+  await click(openRecords(panel)[0], 'the first Open record');
+  assert(
+    locationOf(panel) === '/nova?status=approved&search=streamer-01',
+    `Open record navigates the router (got "${locationOf(panel)}")`,
+  );
+  await click(linksNamed(panel, 'Fix in Nova')[0], 'Fix in Nova');
+  assert(locationOf(panel) === '/nova?status=approved', `Fix in Nova navigates the router (got "${locationOf(panel)}")`);
+
+  assert(
+    optionsOf(severitySelect(panel)) === 'all=All severities,error=Errors,warning=Warnings',
+    `the severity select keeps its options (got ${optionsOf(severitySelect(panel))})`,
+  );
+  assert(
+    optionsOf(streamerSelect(panel)) === `=All streamers,${slugs.map((slug) => `${slug}=${slug}`).join()}`,
+    'the streamer select lists every streamer that has a finding',
+  );
+
+  await selectOption(severitySelect(panel), 'error');
+  assert(toggles(panel).length === 1 && openRecords(panel).length === 3, 'under the severity filter the 41 are still one group');
+  assert(
+    panel.textContent.includes('41 streamers') && buttonNamed(panel, '+38 more') !== null,
+    'with its plural and its "+38 more"',
+  );
+  await selectOption(streamerSelect(panel), 'streamer-07');
+  assert(
+    toggles(panel).length === 1 && panel.textContent.includes('1 streamer') && !panel.textContent.includes('41 streamers'),
+    'under both filters one streamer is one group of "1 streamer"',
+  );
+  assert(
+    panel.querySelectorAll('li li').length === 1 && buttonNamed(panel, '+0 more') === null && buttonNamed(panel, 'Show fewer') === null,
+    'a group of three or fewer has no "+N more" control',
+  );
+  assert(
+    openRecords(panel).length === 0,
+    "and its one finding, which points where the group's Fix in Nova does, has no Open record repeating it",
+  );
+  assert(
+    linksNamed(panel, 'Fix in Nova')[0]?.getAttribute('href') === '/nova?status=approved&search=streamer-07',
+    "one streamer's group link keeps that streamer's whole query",
+  );
+  assert(panel.textContent.includes('41 errors'), 'the header counts stay the totals, whatever the filters');
+  await selectOption(severitySelect(panel), 'warning');
+  assert(
+    panel.textContent.includes('No findings match these filters.') && toggles(panel).length === 0,
+    'filters that match nothing say so',
+  );
+  await selectOption(streamerSelect(panel), '');
+  await selectOption(severitySelect(panel), 'all');
+  assert(toggles(panel).length === 1 && panel.textContent.includes('41 streamers'), 'clearing the filters brings the group back');
+  assert(!NO_RAW_PALETTE.test(panel.innerHTML), 'the grouped card uses no raw palette classes');
+  await forty1.unmount();
+
+  // --- Errors open, warnings closed, and what an unsafe repair path never does ---
+
+  const warnings = [1, 2, 3, 4, 5].map((n) =>
+    makeFinding({
+      code: 'MISSING_ORIGINAL_ARTIST',
+      severity: 'warning',
+      message: 'Original artist is missing.',
+      entityType: 'song',
+      streamerSlug: n % 2 === 1 ? 'alpha' : 'beta',
+      entityId: `song-${n}`,
+      field: 'originalArtist',
+      details: { affectedPerformanceCount: n },
+      repairPath: n === 2 ? 'https://evil.example/song-2' : `/vod-export/repair/song/${n}`,
+    }),
+  );
+  const mixed = await mountPanel([performanceFinding(1), performanceFinding(2), ...warnings]);
+  const card = mixed.container;
+
+  for (const text of ['2 errors', '5 warnings']) {
+    assert(card.textContent.includes(text), `the header counts read "${text}"`);
+  }
+  assert(countPill(card, '5 warnings')?.getAttribute('class')?.includes('bg-tone-warn-bg') === true, '"5 warnings" is warn-toned');
+  assert(expandedStates(card) === 'true,false', `errors start expanded and warnings collapsed (got ${expandedStates(card)})`);
+  assert(
+    card.textContent.includes('5 songs') && !card.textContent.includes('song-1'),
+    'a collapsed group shows its count but none of its findings',
+  );
+  assert(openRecords(card).length === 2, 'only the expanded group lists findings');
+  assert(!card.textContent.includes('Fix in'), 'findings on single-record repair pages get no group link');
+  assert(
+    buttonNamed(card, 'Show fewer') === null
+      && ![...card.querySelectorAll('button')].some((button) => /more$/.test(button.textContent.trim())),
+    'two findings need no "+N more"',
+  );
+  const performanceRow = card.querySelector('li li');
+  assert(
+    performanceRow !== null
+      && ['alpha', 'performance', 'performance-1', 'endSeconds'].every((text) => performanceRow.textContent.includes(text)),
+    'a finding shows its streamer, entity type, entity ID and field',
+  );
+  assert(
+    performanceRow.querySelector('code')?.textContent === 'performance-1'
+      && /field:\s*endSeconds/.test(performanceRow.textContent),
+    'the entity ID is in its own mono element and the field is labelled',
+  );
+
+  const warningToggle = toggles(card)[1];
+  assert(warningToggle !== undefined, 'the warning group has its toggle');
+  assert(
+    warningToggle.querySelector('span')?.textContent === 'Warning'
+      && warningToggle.querySelector('span')?.getAttribute('class')?.includes('bg-tone-warn-bg') === true,
+    'a warning group wears the warn-toned Warning pill',
+  );
+  await click(warningToggle, 'the warning group toggle');
+  const warningRow = warningToggle.closest('li');
+  assert(warningRow !== null, 'the warning group is a list item');
+  assert(expandedStates(card) === 'true,true', 'a collapsed group opens on its chevron');
+  assert(
+    ['song-1', 'song-2', 'song-3'].every((id) => warningRow.textContent.includes(id)) && !warningRow.textContent.includes('song-4'),
+    'an opened warning group shows three findings too',
+  );
+  assert(
+    openRecords(warningRow).map((link) => link.getAttribute('href')).join() === '/vod-export/repair/song/1,/vod-export/repair/song/3',
+    'the finding with an unsafe repair path has no "Open record"',
+  );
+  assert(
+    /affectedPerformanceCount:\s*1/.test(warningRow.textContent) && /field:\s*originalArtist/.test(warningRow.textContent),
+    'a finding keeps the field and details it carried before grouping',
+  );
+  const moreWarnings = buttonNamed(card, '+2 more');
+  assert(moreWarnings !== null, 'the two others wait behind "+2 more"');
+  await click(moreWarnings, '+2 more');
+  assert(
+    ['song-4', 'song-5'].every((id) => warningRow.textContent.includes(id)) && openRecords(warningRow).length === 4,
+    'revealing the rest lists all five, four of them with a record to open',
+  );
+  assert(!card.innerHTML.includes('evil.example'), 'the unsafe repair URL is rendered nowhere, however far the group is opened');
+  await click(warningToggle, 'the warning group toggle');
+  assert(expandedStates(card) === 'true,false' && !card.textContent.includes('song-1'), 'a group collapses again');
+
+  await selectOption(streamerSelect(card), 'beta');
+  assert(
+    toggles(card).length === 1 && card.textContent.includes('2 songs') && card.textContent.includes('5 warnings'),
+    "the streamer filter keeps only that streamer's findings before grouping, the totals unchanged",
+  );
+  await selectOption(streamerSelect(card), '');
+  await selectOption(severitySelect(card), 'error');
+  assert(toggles(card).length === 1 && card.textContent.includes('2 performances'), 'the severity filter keeps only errors');
+  assert(!NO_RAW_PALETTE.test(card.innerHTML), 'the opened card uses no raw palette classes');
+  await mixed.unmount();
+
+  // --- A re-check replaces the findings under the mounted card: a streamer that left them stops filtering ---
+
+  // The publishability re-check swaps the findings inside the card that is already on screen, so the chosen
+  // streamer can be gone from the new ones. The select then reads All streamers, and the filter applied
+  // has to be that one — not the slug the select no longer shows, which would hide every new finding.
+  /** The card under a parent that swaps its findings a step at a time, as the re-check does on the page. */
+  function Rechecked({ steps }: { steps: readonly VodExportFindingApi[][] }) {
+    const [step, setStep] = useState(0);
+    return (
+      <MemoryRouter>
+        <button type="button" onClick={() => setStep((current) => current + 1)}>
+          Re-check
+        </button>
+        <FindingsPanel findings={steps[step] ?? []} />
+      </MemoryRouter>
+    );
+  }
+  const bothStreamers = [performanceFinding(1), performanceFinding(2, { streamerSlug: 'beta' })];
+  const alphaOnly = [performanceFinding(3)];
+  const rechecked = await mount(<Rechecked steps={[bothStreamers, alphaOnly, bothStreamers]} />);
+  const recheckedCard = rechecked.container;
+  const shownRecords = () => openRecords(recheckedCard).map((link) => link.getAttribute('href')).join();
+
+  await selectOption(streamerSelect(recheckedCard), 'beta');
+  assert(streamerSelect(recheckedCard)?.value === 'beta', 'the second streamer is chosen');
+  assert(shownRecords() === '/vod-export/repair/performance/2', `and only its finding shows (got ${shownRecords()})`);
+
+  await click(buttonNamed(recheckedCard, 'Re-check'), 'the Re-check button');
+  assert(
+    optionsOf(streamerSelect(recheckedCard)) === '=All streamers,alpha=alpha',
+    'the new findings list only the first streamer',
+  );
+  assert(
+    streamerSelect(recheckedCard)?.value === '',
+    `a streamer the new findings do not list leaves the select at All streamers (got "${streamerSelect(recheckedCard)?.value}")`,
+  );
+  assert(
+    shownRecords() === '/vod-export/repair/performance/3',
+    `and the filter applied is that one: the first streamer's findings show (got ${shownRecords()})`,
+  );
+  assert(!recheckedCard.textContent.includes('No findings match these filters.'), 'not "No findings match these filters."');
+
+  await click(buttonNamed(recheckedCard, 'Re-check'), 'the Re-check button');
+  assert(
+    streamerSelect(recheckedCard)?.value === 'beta',
+    'once the second streamer is among the findings again, the select reads it',
+  );
+  assert(
+    shownRecords() === '/vod-export/repair/performance/2',
+    `and only its findings show (got ${shownRecords()})`,
+  );
+  assert(!NO_RAW_PALETTE.test(recheckedCard.innerHTML), 'the re-checked card uses no raw palette classes');
+  await rechecked.unmount();
+
+  // --- A finding's "Open record" hides when its group's "Fix in …" goes to the same place ---
+
+  // The group row is the link that is still there while the group is collapsed (warnings start collapsed), so
+  // it stays; a finding that only repeats it drops its own. One that points somewhere more specific keeps it.
+  const { repairDestination } = await import('../src/lib/vod-export-helpers');
+  const hrefsOf = (links: Element[]) => links.map((link) => link.getAttribute('href')).join();
+  const listedFindings = (root: ParentNode) => root.querySelectorAll('li li').length;
+
+  const oneNova = await mountPanel([novaFinding('alpha')]);
+  assert(
+    hrefsOf(linksNamed(oneNova.container, 'Fix in Nova')) === '/nova?status=approved&search=alpha',
+    "a one-finding Nova group links to that streamer's Nova search from its row",
+  );
+  assert(
+    expandedStates(oneNova.container) === 'true' && listedFindings(oneNova.container) === 1 && oneNova.container.textContent.includes('alpha'),
+    'opened, it lists the finding',
+  );
+  assert(openRecords(oneNova.container).length === 0, "with no Open record repeating the row's link");
+  await oneNova.unmount();
+
+  const twoNova = await mountPanel([novaFinding('alpha'), novaFinding('beta')]);
+  assert(
+    hrefsOf(linksNamed(twoNova.container, 'Fix in Nova')) === '/nova?status=approved',
+    'a Nova group of two links to the query they share',
+  );
+  assert(
+    hrefsOf(openRecords(twoNova.container)) === '/nova?status=approved&search=alpha,/nova?status=approved&search=beta',
+    'and every finding keeps its own, more specific Open record',
+  );
+  await twoNova.unmount();
+
+  const repairPages = await mountPanel([performanceFinding(1), performanceFinding(2)]);
+  assert(!repairPages.container.textContent.includes('Fix in'), 'findings on single-record repair pages have no group link');
+  assert(openRecords(repairPages.container).length === 2, 'so each keeps its Open record');
+  await repairPages.unmount();
+
+  // The same place, encoded differently: the finding writes the space %20, the group's link (built with
+  // URLSearchParams) writes +.
+  const encoded = await mountPanel([
+    makeFinding({ streamerSlug: 'my slug', entityId: 'my slug', repairPath: '/nova?status=approved&search=my%20slug' }),
+  ]);
+  assert(
+    hrefsOf(linksNamed(encoded.container, 'Fix in Nova')) === '/nova?status=approved&search=my+slug',
+    'the group link writes the space as +',
+  );
+  assert(
+    openRecords(encoded.container).length === 0 && listedFindings(encoded.container) === 1,
+    'a finding that writes it %20 is the same place: its Open record hides too',
+  );
+  await encoded.unmount();
+
+  // Any finding equal to the group link hides, whatever the group's size.
+  const samePage = await mountPanel([
+    makeFinding({ entityId: 'a', repairPath: '/songs?status=approved' }),
+    makeFinding({ entityId: 'b', repairPath: '/songs?status=approved' }),
+  ]);
+  assert(
+    hrefsOf(linksNamed(samePage.container, 'Fix in Songs')) === '/songs?status=approved'
+      && openRecords(samePage.container).length === 0
+      && listedFindings(samePage.container) === 2,
+    'two findings pointing at the same page are two rows under one link',
+  );
+  await samePage.unmount();
+
+  // A fragment leads somewhere the group link, which never has one, does not: that finding keeps its link.
+  const fragment = await mountPanel([
+    makeFinding({ streamerSlug: 'alpha', entityId: 'alpha', repairPath: '/nova?status=approved&search=alpha#top' }),
+  ]);
+  assert(
+    hrefsOf(openRecords(fragment.container)) === '/nova?status=approved&search=alpha#top',
+    'a finding whose path carries a fragment keeps its Open record',
+  );
+  await fragment.unmount();
+
+  // The form the two are compared in: the one `groupFixLink` writes as `to`.
+  const destinationTable: Array<[string, string | undefined, string | null]> = [
+    ['a space written %20 reads as +', '/nova?status=approved&search=my%20slug', '/nova?status=approved&search=my+slug'],
+    ['a space written + stays +', '/nova?status=approved&search=my+slug', '/nova?status=approved&search=my+slug'],
+    ['a path with no query is its pathname', '/songs', '/songs'],
+    ['a fragment stays, so the group link (which has none) is never taken for it', '/stamp?stream=s1#top', '/stamp?stream=s1#top'],
+    ['a path off the Admin app has no destination', 'https://evil.example/x', null],
+    ['a missing path has none', undefined, null],
+  ];
+  for (const [when, path, expected] of destinationTable) {
+    assert(repairDestination(path) === expected, `${when} (got ${String(repairDestination(path))})`);
+  }
+
+  // --- Nothing to list ---
+
+  const clean = await mountPanel([]);
+  assert(clean.container.textContent.includes('No validation findings.'), 'a clean preview says so');
+  assert(clean.container.querySelectorAll('select').length === 0, 'a clean preview offers no filters');
+  for (const text of ['0 errors', '0 warnings']) {
+    assert(clean.container.textContent.includes(text), `a clean preview still counts "${text}"`);
+    assert(
+      countPill(clean.container, text)?.getAttribute('class')?.includes('bg-tone-neutral-bg') === true,
+      `and "${text}" is neutral, not a warning sign`,
+    );
+  }
+  assert(!NO_RAW_PALETTE.test(clean.container.innerHTML), 'the clean card uses no raw palette classes');
+  await clean.unmount();
+
+  await win.happyDOM.close();
+  console.log('✓ Findings card: groups by code with a fix link, errors open and warnings closed, "+N more", both filters (a streamer a re-check drops stops filtering, and filters again if it returns), a finding that repeats its group\'s "Fix in" has no Open record, unsafe paths never rendered');
+}
+
 async function main(): Promise<void> {
   installLocalStorage();
 
@@ -79,6 +740,8 @@ async function main(): Promise<void> {
   const {
     candidateAlreadyPublished,
     getPublishDisabledReason,
+    groupFindings,
+    groupFixLink,
     safeRepairPath,
   } = await import('../src/lib/vod-export-helpers');
   const {
@@ -276,6 +939,8 @@ async function main(): Promise<void> {
   assert(safeRepairPath('https://evil.example/') === null, 'absolute repair URL is rejected');
   assert(safeRepairPath('//evil.example/') === null, 'protocol-relative repair URL is rejected');
   assert(safeRepairPath('/api/private') === null, 'API paths cannot become repair navigation');
+
+  findingGroupTables({ groupFindings, groupFixLink });
 
   const neverPublishedHtml = renderToStaticMarkup(
     <CurrentPublicationPanel publication={null} loading={false} />,
@@ -918,16 +1583,37 @@ async function main(): Promise<void> {
       <FindingsPanel findings={findings} />
     </MemoryRouter>,
   );
-  assert(findingsHtml.includes('1 errors'), 'error count is derived from the single findings array');
-  assert(findingsHtml.includes('1 warnings'), 'warning count is derived from the single findings array');
+  assert(findingsHtml.includes('>1 error<'), 'error count is derived from the single findings array, and a count of one is singular');
+  assert(findingsHtml.includes('>1 warning<'), 'warning count is derived from the single findings array, and a count of one is singular');
+  assert(!findingsHtml.includes('1 errors') && !findingsHtml.includes('1 warnings'), 'no count of one is pluralised');
   assert(
     findingsHtml.indexOf('MISSING_END_SECONDS') < findingsHtml.indexOf('MISSING_ORIGINAL_ARTIST'),
     'errors render before warnings while preserving group order',
   );
   assert(findingsHtml.includes('All severities'), 'severity filter renders');
   assert(findingsHtml.includes('safe-streamer'), 'streamer filter renders a safe slug option');
-  assert((findingsHtml.match(/Open record/g) ?? []).length === 1, 'only a safe server repair path renders an action');
+  assert(
+    (findingsHtml.match(/Open record|Fix in /g) ?? []).length === 1,
+    "only a safe server repair path renders an action: the group's Fix in, with no Open record repeating it",
+  );
   assert(!findingsHtml.includes('evil.example'), 'unsafe repair URL is not rendered');
+
+  // The grouped card: an h2 like the side cards' (no level skipped), errors open, warnings closed.
+  assert(/<h2[^>]*>Validation findings<\/h2>/.test(findingsHtml), 'the findings card is headed by an h2');
+  assert(!/<h[13-6][\s>]/.test(findingsHtml), 'the findings card skips no heading level');
+  assert(
+    (findingsHtml.match(/aria-expanded="(?:true|false)"/g) ?? []).join() === 'aria-expanded="true",aria-expanded="false"',
+    'the error group starts expanded and the warning group collapsed',
+  );
+  assert(
+    findingsHtml.includes('performance-1') && !findingsHtml.includes('song-1'),
+    'an expanded group lists its findings and a collapsed one does not',
+  );
+  assert(
+    (findingsHtml.match(/Fix in /g) ?? []).length === 1 && /href="\/stamp\?performance=performance-1"[^>]*>Fix in Stamp Editor/.test(findingsHtml),
+    'a group whose findings share a repair destination links to it, and the group without a safe path has no link',
+  );
+  assert(!NO_RAW_PALETTE.test(findingsHtml), 'the findings card uses no raw Tailwind palette classes');
 
   // A preview's capacity data always shows: every resource a bar with its percentage.
   const normalCapacity = renderToStaticMarkup(
@@ -1281,6 +1967,7 @@ async function main(): Promise<void> {
 
   console.log('✓ PublishConfirmationDialog resolves its focus-return target inside an effect, not during render');
 
+  await groupedFindingsPanel({ FindingsPanel });
   await livePage({ VodExport, curator, contributor, candidate, publication, hash, findings: { errorFinding, warningFinding } });
 }
 
@@ -1775,12 +2462,11 @@ async function livePage({
     !(pageOf(flow.container)?.textContent ?? '').includes('Publication audit and cleanup recovery completed.'),
     'the recovery result is not a note',
   );
-  // The findings list keeps its own light card for now; everything the page draws around it is on tokens.
-  const pageAroundFindings = pageOf(flow.container)?.cloneNode(true) as HTMLElement | undefined;
-  pageAroundFindings?.querySelector('section[aria-labelledby="findings-heading"]')?.remove();
+  // The findings card is on tokens like everything else: the whole loaded page, findings included.
+  const loadedPage = pageOf(flow.container);
   assert(
-    pageAroundFindings !== undefined && !NO_RAW_PALETTE.test(pageAroundFindings.outerHTML),
-    'around the findings list, the loaded page uses no raw palette classes',
+    loadedPage !== null && !NO_RAW_PALETTE.test(loadedPage.outerHTML),
+    'the loaded page, findings card included, uses no raw palette classes',
   );
   await flow.unmount();
 

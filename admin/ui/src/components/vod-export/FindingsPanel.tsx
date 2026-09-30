@@ -1,77 +1,191 @@
-import { useMemo, useState } from 'react';
+import { useId, useMemo, useState, type ReactNode } from 'react';
 import { Link } from 'react-router-dom';
 import type { VodExportFindingApi, VodExportFindingSeverity } from '../../api/vodExportTypes';
 import { findingKey } from '../../lib/vod-export-format';
-import { safeRepairPath } from '../../lib/vod-export-helpers';
+import {
+  groupFindings,
+  groupFixLink,
+  repairDestination,
+  safeRepairPath,
+  type FindingGroup,
+} from '../../lib/vod-export-helpers';
+import { buttonClasses } from '../ui/button-classes';
+import { GlassCard } from '../ui/Display';
+import { Select } from '../ui/Fields';
+import { Icon } from '../ui/Icon';
+import { Note } from '../ui/Note';
+import { Pill } from '../ui/Pill';
 
 type SeverityFilter = 'all' | VodExportFindingSeverity;
 
-function FindingCard({ finding }: { finding: VodExportFindingApi }) {
+/** How many of a group's findings show before "+N more". */
+const PREVIEW_COUNT = 3;
+
+/** The focus ring of a control that spans the card edge to edge: inside it, since the card clips what falls outside. */
+const INSET_FOCUS = 'focus-visible:shadow-[inset_0_0_0_2px_var(--accent-fg)]';
+
+function countLabel(count: number, noun: string): string {
+  return `${count.toLocaleString()} ${count === 1 ? noun : `${noun}s`}`;
+}
+
+/** The findings the two filters let through (an empty streamer filter lets every streamer through). */
+function matchingFindings(
+  findings: readonly VodExportFindingApi[],
+  severity: SeverityFilter,
+  streamer: string,
+): VodExportFindingApi[] {
+  return findings.filter(
+    (finding) =>
+      (severity === 'all' || finding.severity === severity) && (!streamer || finding.streamerSlug === streamer),
+  );
+}
+
+/** A `label: value` pair of a finding row, the value in mono. */
+function FindingFact({ label, children }: { label: string; children: ReactNode }) {
+  return (
+    <span className="min-w-0 break-words">
+      <span className="text-fg-subtle">{`${label}: `}</span>
+      <span className="font-mono text-fg-muted">{children}</span>
+    </span>
+  );
+}
+
+/**
+ * One finding of an opened group: what it is about and, for a safe repair path only, a link to the
+ * record — unless that link goes where the group row's "Fix in …" (`groupFixTo`) already goes, which the
+ * row keeps reachable while the group is collapsed, so repeating it here would only be a second link.
+ */
+function FindingItem({ finding, groupFixTo }: { finding: VodExportFindingApi; groupFixTo: string | null }) {
   const repairPath = safeRepairPath(finding.repairPath);
+  const repeatsGroupLink = groupFixTo !== null && repairDestination(finding.repairPath) === groupFixTo;
   const details = finding.details ? Object.entries(finding.details) : [];
-  const isError = finding.severity === 'error';
 
   return (
-    <li className="rounded-md border border-slate-200 bg-white p-4">
-      <div className="flex flex-wrap items-start justify-between gap-2">
-        <div className="min-w-0">
-          <div className="flex flex-wrap items-center gap-2">
-            <span
-              className={`rounded-full px-2 py-0.5 text-xs font-semibold ${
-                isError ? 'bg-red-100 text-red-700' : 'bg-amber-100 text-amber-800'
-              }`}
-            >
-              {isError ? 'Error' : 'Warning'}
-            </span>
-            <code className="text-xs font-semibold text-slate-700">{finding.code}</code>
-          </div>
-          <p className="mt-2 text-sm text-slate-800">{finding.message}</p>
-        </div>
-        {repairPath && (
-          <Link
-            to={repairPath}
-            className="shrink-0 rounded-md border border-blue-200 bg-blue-50 px-3 py-1.5 text-xs font-medium text-blue-700 hover:bg-blue-100"
-          >
-            Open record
-          </Link>
-        )}
-      </div>
-
-      {/* Every finding names the entity it is about; the rest of the row is optional. */}
-      <dl className="mt-3 flex flex-wrap gap-x-5 gap-y-1 border-t border-slate-100 pt-3 text-xs">
-        {finding.streamerSlug && (
-          <div className="flex gap-1">
-            <dt className="text-slate-500">Streamer:</dt>
-            <dd className="font-mono text-slate-700">{finding.streamerSlug}</dd>
-          </div>
-        )}
-        <div className="flex gap-1">
-          <dt className="text-slate-500">Entity:</dt>
-          <dd className="text-slate-700">{finding.entityType}</dd>
-        </div>
-        {finding.entityId && (
-          <div className="flex min-w-0 gap-1">
-            <dt className="shrink-0 text-slate-500">ID:</dt>
-            <dd className="break-all font-mono text-slate-700">{finding.entityId}</dd>
-          </div>
-        )}
-        {finding.field && (
-          <div className="flex gap-1">
-            <dt className="text-slate-500">Field:</dt>
-            <dd className="font-mono text-slate-700">{finding.field}</dd>
-          </div>
-        )}
-        {details.map(([key, value]) => (
-          <div key={key} className="flex gap-1">
-            <dt className="text-slate-500">{key}:</dt>
-            <dd className="font-mono text-slate-700">{String(value)}</dd>
-          </div>
-        ))}
-      </dl>
+    <li className="flex flex-wrap items-center gap-x-3 gap-y-1 border-t border-line-soft py-1.5 pl-11 pr-3.5 text-[11.5px]">
+      {finding.streamerSlug ? <span className="text-meta font-bold text-fg-muted">{finding.streamerSlug}</span> : null}
+      <span className="min-w-0 text-fg-muted">
+        {finding.entityType}
+        {finding.entityId ? (
+          <>
+            {' '}
+            <code className="break-all font-mono text-fg">{finding.entityId}</code>
+          </>
+        ) : null}
+      </span>
+      {finding.field ? <FindingFact label="field">{finding.field}</FindingFact> : null}
+      {details.map(([key, value]) => (
+        <FindingFact key={key} label={key}>
+          {String(value)}
+        </FindingFact>
+      ))}
+      {repairPath && !repeatsGroupLink ? (
+        <Link
+          to={repairPath}
+          className="ml-auto inline-flex items-center gap-0.5 rounded-radius-xs text-[11px] font-[650] text-accent-fg hover:underline"
+        >
+          Open record
+          <Icon name="chevronRight" size={12} />
+        </Link>
+      ) : null}
     </li>
   );
 }
 
+/**
+ * One severity + code: a row (chevron, severity, code, the server's message, how many, and a "Fix in …"
+ * link when the group has one destination) over its findings. Errors start open, warnings closed; an
+ * open group lists its first three findings, and "+N more" shows the rest. A finding whose repair link
+ * is that same place shows no link of its own.
+ */
+function FindingGroupSection({ group }: { group: FindingGroup }) {
+  const [open, setOpen] = useState(group.severity === 'error');
+  const [showAll, setShowAll] = useState(false);
+  const listId = useId();
+  const fix = groupFixLink(group.items);
+  const hiddenCount = group.items.length - PREVIEW_COUNT;
+  const shown = showAll ? group.items : group.items.slice(0, PREVIEW_COUNT);
+
+  return (
+    <li className="border-b border-line-soft last:border-b-0">
+      <div className="flex flex-wrap items-center gap-x-2 transition-colors hover:bg-row-hover">
+        <button
+          type="button"
+          aria-expanded={open}
+          aria-controls={open ? listId : undefined}
+          onClick={() => setOpen((value) => !value)}
+          className={`flex min-w-0 flex-[1_1_16rem] flex-wrap items-center gap-x-2.5 gap-y-1 py-2.5 pl-3.5 pr-2 text-left ${INSET_FOCUS}`}
+        >
+          <Icon name={open ? 'chevronDown' : 'chevronRight'} size={14} className="text-fg-subtle" />
+          <Pill tone={group.severity === 'error' ? 'danger' : 'warn'}>
+            {group.severity === 'error' ? 'Error' : 'Warning'}
+          </Pill>
+          <code className="font-mono text-[11px] font-semibold text-fg">{group.code}</code>
+          <span className="min-w-0 text-[11.5px] text-fg-muted">{group.message}</span>
+          <span className="whitespace-nowrap rounded-radius-pill border border-field-line bg-field px-2 py-0.5 text-[11px] font-bold text-fg">
+            {`${group.items.length.toLocaleString()} ${group.entityNoun}`}
+          </span>
+        </button>
+        {fix ? (
+          <Link
+            to={fix.to}
+            className={`${buttonClasses({ variant: 'secondary', size: 'sm' })} mb-2 ml-11 mr-3.5 sm:mb-0 sm:ml-0`}
+          >
+            {fix.label}
+            <Icon name="chevronRight" size={12} />
+          </Link>
+        ) : null}
+      </div>
+      {open ? (
+        <ul id={listId}>
+          {shown.map((finding) => (
+            <FindingItem key={findingKey(finding)} finding={finding} groupFixTo={fix?.to ?? null} />
+          ))}
+          {hiddenCount > 0 ? (
+            <li className="border-t border-line-soft">
+              <button
+                type="button"
+                onClick={() => setShowAll((value) => !value)}
+                className={`w-full py-2 pl-11 pr-3.5 text-left text-[11px] font-[650] text-fg-subtle transition-colors hover:bg-row-hover hover:text-fg ${INSET_FOCUS}`}
+              >
+                {showAll ? 'Show fewer' : `+${hiddenCount.toLocaleString()} more`}
+              </button>
+            </li>
+          ) : null}
+        </ul>
+      ) : null}
+    </li>
+  );
+}
+
+/** The groups that got through the filters — or why there are none: a clean preview, or filters that match nothing. */
+function FindingsBody({ groups, clean }: { groups: FindingGroup[]; clean: boolean }) {
+  if (clean) {
+    return (
+      <div className="p-3.5">
+        <Note tone="ok" icon="checkCircle">
+          No validation findings.
+        </Note>
+      </div>
+    );
+  }
+  if (groups.length === 0) {
+    return <p className="px-3.5 py-6 text-center text-token-sm text-fg-muted">No findings match these filters.</p>;
+  }
+  return (
+    <ul>
+      {groups.map((group) => (
+        <FindingGroupSection key={group.key} group={group} />
+      ))}
+    </ul>
+  );
+}
+
+/**
+ * The validation findings of a preview, grouped by severity and code (spec §8.8): the totals as
+ * pills, the two filters (applied before grouping, so the totals stay whole), and the groups. The
+ * findings can be replaced under a mounted card (the re-check before the confirmation); a streamer
+ * filter whose streamer they no longer list stops applying, and reads All streamers meanwhile.
+ */
 export function FindingsPanel({ findings }: { findings: VodExportFindingApi[] }) {
   const [severityFilter, setSeverityFilter] = useState<SeverityFilter>('all');
   const [streamerFilter, setStreamerFilter] = useState('');
@@ -79,55 +193,37 @@ export function FindingsPanel({ findings }: { findings: VodExportFindingApi[] })
     () => [...new Set(findings.flatMap((finding) => (finding.streamerSlug ? [finding.streamerSlug] : [])))].sort(),
     [findings],
   );
-  const errors = findings.filter((finding) => finding.severity === 'error');
-  const warnings = findings.filter((finding) => finding.severity === 'warning');
-  const visible = findings.filter(
-    (finding) =>
-      (severityFilter === 'all' || finding.severity === severityFilter) &&
-      (!streamerFilter || finding.streamerSlug === streamerFilter),
-  );
-  const visibleErrors = visible.filter((finding) => finding.severity === 'error');
-  const visibleWarnings = visible.filter((finding) => finding.severity === 'warning');
+  // Derived: the chosen streamer while the findings list it, else All streamers — select and filter alike; it applies again if it returns.
+  const effectiveStreamer = streamers.includes(streamerFilter) ? streamerFilter : '';
+  const errorCount = findings.filter((finding) => finding.severity === 'error').length;
+  const warningCount = findings.filter((finding) => finding.severity === 'warning').length;
+  const groups = groupFindings(matchingFindings(findings, severityFilter, effectiveStreamer));
 
   return (
-    <section className="rounded-lg border border-slate-200 bg-white p-5 shadow-sm" aria-labelledby="findings-heading">
-      <div className="flex flex-wrap items-start justify-between gap-3">
-        <div>
-          <h3 id="findings-heading" className="text-base font-semibold text-slate-800">
-            Validation findings
-          </h3>
-          <div className="mt-2 flex gap-2 text-xs">
-            <span className="rounded bg-red-100 px-2 py-1 font-medium text-red-700">
-              {errors.length} errors
-            </span>
-            <span className="rounded bg-amber-100 px-2 py-1 font-medium text-amber-800">
-              {warnings.length} warnings
-            </span>
-          </div>
-        </div>
-
-        {findings.length > 0 && (
-          <div className="flex flex-wrap gap-2">
-            <label className="text-xs font-medium text-slate-600">
-              <span className="sr-only">Filter by severity</span>
-              <select
+    <GlassCard as="section" aria-label="Validation findings" padding="none" className="overflow-clip">
+      <div className="flex flex-wrap items-center gap-2 border-b border-line-soft px-3.5 py-2.5">
+        <h2 className="mr-1 text-[13.5px] font-bold text-fg">Validation findings</h2>
+        {/* A count wears its severity's tone only when there is something to count. */}
+        <Pill tone={errorCount > 0 ? 'danger' : 'neutral'}>{countLabel(errorCount, 'error')}</Pill>
+        <Pill tone={warningCount > 0 ? 'warn' : 'neutral'}>{countLabel(warningCount, 'warning')}</Pill>
+        {findings.length > 0 ? (
+          <div className="ml-auto flex flex-wrap items-center gap-2">
+            <div className="w-40">
+              <Select
+                aria-label="Filter findings by severity"
                 value={severityFilter}
                 onChange={(event) => setSeverityFilter(event.target.value as SeverityFilter)}
-                className="rounded-md border border-slate-300 bg-white px-2.5 py-1.5 text-sm font-normal text-slate-700"
-                aria-label="Filter findings by severity"
               >
                 <option value="all">All severities</option>
                 <option value="error">Errors</option>
                 <option value="warning">Warnings</option>
-              </select>
-            </label>
-            <label className="text-xs font-medium text-slate-600">
-              <span className="sr-only">Filter by streamer</span>
-              <select
-                value={streamerFilter}
-                onChange={(event) => setStreamerFilter(event.target.value)}
-                className="rounded-md border border-slate-300 bg-white px-2.5 py-1.5 text-sm font-normal text-slate-700"
+              </Select>
+            </div>
+            <div className="w-44">
+              <Select
                 aria-label="Filter findings by streamer"
+                value={effectiveStreamer}
+                onChange={(event) => setStreamerFilter(event.target.value)}
               >
                 <option value="">All streamers</option>
                 {streamers.map((slug) => (
@@ -135,42 +231,12 @@ export function FindingsPanel({ findings }: { findings: VodExportFindingApi[] })
                     {slug}
                   </option>
                 ))}
-              </select>
-            </label>
+              </Select>
+            </div>
           </div>
-        )}
+        ) : null}
       </div>
-
-      {findings.length === 0 ? (
-        <div className="mt-4 rounded-md bg-emerald-50 px-4 py-3 text-sm text-emerald-800">
-          No validation findings.
-        </div>
-      ) : visible.length === 0 ? (
-        <p className="mt-5 text-sm text-slate-500">No findings match these filters.</p>
-      ) : (
-        <div className="mt-5 space-y-6">
-          {visibleErrors.length > 0 && (
-            <div>
-              <h4 className="text-sm font-semibold text-red-700">Errors</h4>
-              <ul className="mt-2 space-y-2">
-                {visibleErrors.map((finding) => (
-                  <FindingCard key={findingKey(finding)} finding={finding} />
-                ))}
-              </ul>
-            </div>
-          )}
-          {visibleWarnings.length > 0 && (
-            <div>
-              <h4 className="text-sm font-semibold text-amber-800">Warnings</h4>
-              <ul className="mt-2 space-y-2">
-                {visibleWarnings.map((finding) => (
-                  <FindingCard key={findingKey(finding)} finding={finding} />
-                ))}
-              </ul>
-            </div>
-          )}
-        </div>
-      )}
-    </section>
+      <FindingsBody groups={groups} clean={findings.length === 0} />
+    </GlassCard>
   );
 }
