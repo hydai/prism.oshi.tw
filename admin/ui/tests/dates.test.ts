@@ -5,7 +5,7 @@ function assert(condition: boolean, message: string): asserts condition {
 }
 
 async function main(): Promise<void> {
-  const { parseStoredTime, formatWhen, formatFullTime, formatRelative } = await import('../src/lib/dates');
+  const { parseStoredTime, storedTimeIso, formatWhen, formatFullTime, formatRelative } = await import('../src/lib/dates');
 
   // --- parseStoredTime: D1's `YYYY-MM-DD HH:MM:SS` is read as UTC; anything else via Date.parse ---
 
@@ -16,6 +16,20 @@ async function main(): Promise<void> {
   assert(parseStoredTime('nope') === null, 'an unparseable value gives null, not an Invalid Date');
 
   console.log('✓ parseStoredTime reads a D1 stored time as UTC and gives null for anything unparseable');
+
+  // --- storedTimeIso: the exact instant a <time dateTime> carries ---
+
+  assert(
+    storedTimeIso('2026-09-25 18:48:09') === '2026-09-25T18:48:09.000Z',
+    "a D1-stored 'YYYY-MM-DD HH:MM:SS' value is UTC without a marker, so its ISO instant is the same clock time with a Z",
+  );
+  assert(
+    storedTimeIso('2026-09-25T20:48:09+02:00') === '2026-09-25T18:48:09.000Z',
+    'a value that carries an offset is normalised to its UTC instant',
+  );
+  assert(storedTimeIso('nope') === 'nope', 'an unparseable value comes back unchanged, as the format helpers leave it');
+
+  console.log('✓ storedTimeIso gives the ISO instant of a stored time and passes an unparseable value through');
 
   // --- formatWhen: local time, fixed month names, never toLocaleString ---
 

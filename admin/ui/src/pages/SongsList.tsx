@@ -17,7 +17,7 @@ import { CELL_X, FIRST_CELL_X, LAST_CELL_X } from '../components/ui/table-cells'
 import { Segmented } from '../components/ui/Toggles';
 import { useToast } from '../components/ui/toast';
 import { errorMessage, useApiResource } from '../lib/apiResource';
-import { formatFullTime, formatWhen, parseStoredTime } from '../lib/dates';
+import { formatFullTime, formatWhen, storedTimeIso } from '../lib/dates';
 
 type SortKey = 'title' | 'originalArtist' | 'status' | 'createdAt';
 
@@ -36,11 +36,6 @@ const STATUS_OPTIONS: { value: '' | Status; label: string }[] = [
 ];
 
 const NO_ACTIONS: ReadonlyMap<string, Decision> = new Map();
-
-/** The stored UTC time as the ISO instant a `<time>` wants; a value that is not a time passes through. */
-function isoOf(value: string): string {
-  return parseStoredTime(value)?.toISOString() ?? value;
-}
 
 /**
  * Ref for a row's Approve and Reject. They leave with the song's pending / extracted status, while the
@@ -94,7 +89,7 @@ function SongRow({ song, curator, today, acting, onDecide }: SongRowProps) {
       </td>
       <td className={curator ? CELL_X : LAST_CELL_X}>
         <time
-          dateTime={isoOf(song.createdAt)}
+          dateTime={storedTimeIso(song.createdAt)}
           title={formatFullTime(song.createdAt)}
           className="whitespace-nowrap text-[11.5px] text-fg-muted"
         >
