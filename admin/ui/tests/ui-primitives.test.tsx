@@ -78,10 +78,63 @@ async function main(): Promise<void> {
   const danger = renderToStaticMarkup(<Button variant="danger">Delete</Button>);
   assert(danger.includes('bg-danger-solid'), 'danger variant uses the danger-solid background');
 
+  // A bare `disabled` attribute: `aria-disabled="true"` and the `disabled:` utilities in a class do not match.
+  const hasDisabledAttribute = (markup: string): boolean => /\sdisabled=""/.test(markup);
+
+  // Busy is aria-disabled, never disabled: a browser drops the keyboard focus from a button that turns
+  // disabled, and the button that is busy is the one whose click started the work.
   const busy = renderToStaticMarkup(<Button busy>Saving</Button>);
-  assert(busy.includes('disabled=""'), 'a busy Button is disabled');
+  assert(busy.includes('aria-disabled="true"'), 'a busy Button is aria-disabled');
+  assert(!hasDisabledAttribute(busy), 'a busy Button has no disabled attribute, which would drop the keyboard focus it holds');
   assert(busy.includes('aria-busy="true"'), 'a busy Button announces aria-busy');
   assert(busy.includes('<svg'), 'a busy Button renders a spinning icon');
+
+  const onlyDisabled = renderToStaticMarkup(<Button disabled>Save</Button>);
+  assert(hasDisabledAttribute(onlyDisabled), 'a Button that is disabled and not busy still renders the disabled attribute');
+  // The attribute, not the `aria-disabled:` utilities every Button's class carries.
+  assert(
+    !/\saria-disabled=/.test(onlyDisabled) && !/\saria-busy=/.test(onlyDisabled),
+    'a disabled Button is not aria-disabled or busy: the attribute says it already',
+  );
+
+  // Busy wins: whatever else disables the button, a busy one never drops the focus it holds, and its
+  // click guard does what the attribute did.
+  const busyAndDisabled = renderToStaticMarkup(
+    <Button busy disabled>
+      Saving
+    </Button>,
+  );
+  assert(
+    busyAndDisabled.includes('aria-disabled="true"') &&
+      busyAndDisabled.includes('aria-busy="true"') &&
+      !hasDisabledAttribute(busyAndDisabled),
+    'a Button that is busy and disabled is busy: aria-disabled and aria-busy, no disabled attribute',
+  );
+
+  // A caller can make a Button aria-disabled itself (Pagination's step at the end of its range); the kit keeps it.
+  const ownAriaDisabled = renderToStaticMarkup(<Button aria-disabled="true">Retry</Button>);
+  assert(
+    ownAriaDisabled.includes('aria-disabled="true"') && !/\saria-busy=/.test(ownAriaDisabled),
+    'a Button keeps the aria-disabled its caller gives it, without becoming busy',
+  );
+  // aria-busy and the spinner are for `busy` alone, and the attribute stays off: the button keeps the focus it holds.
+  assert(
+    !hasDisabledAttribute(ownAriaDisabled) && !ownAriaDisabled.includes('<svg'),
+    'a Button that is aria-disabled and not busy has no disabled attribute and no spinner',
+  );
+  assert(
+    renderToStaticMarkup(<Button aria-disabled>Retry</Button>).includes('aria-disabled="true"'),
+    'aria-disabled given as a boolean renders the same attribute',
+  );
+
+  // The look is one: what `disabled:` paints, `aria-disabled:` paints too, so a busy button dims as before.
+  const lookClasses = buttonClasses().split(/\s+/);
+  for (const utility of ['cursor-not-allowed', 'opacity-50']) {
+    assert(
+      lookClasses.includes(`disabled:${utility}`) && lookClasses.includes(`aria-disabled:${utility}`),
+      `a disabled and a busy Button share ${utility}: one utility under :disabled, one under [aria-disabled]`,
+    );
+  }
 
   assert(
     buttonClasses({ variant: 'primary', size: 'sm' }).includes('bg-accent'),
@@ -448,6 +501,266 @@ async function main(): Promise<void> {
       assert(!panel.hasAttribute('data-overlay-open'), "the first Escape closes the popover: the trigger's hovered tooltip does not take it");
       await menu.unmount();
     }
+  }
+
+  // --- Button, live: a busy (or aria-disabled) Button keeps the keyboard focus and ignores every way to activate it ---
+  //
+  // Needs the DOM the Tooltip block above installed. happy-dom keeps the focus of a button that turns
+  // disabled, where a browser drops it to <body>, so the focus checks also read the attribute a browser
+  // decides by and ask the busy button to take the focus again (`focus()` does nothing on a disabled one).
+  // It has no keyboard activation and no implicit form submission either: `activateWithKey` and
+  // `pressEnterIn` make the click a browser makes of them, and what the button does with that click is
+  // what is under test.
+
+  {
+    const { act, useState } = await import('react');
+    const { click, mount, press } = await import('./helpers/dom');
+
+    /**
+     * What a browser does when a key activates a focused button: Enter clicks it on keydown, Space on
+     * keyup, unless the key event's default was cancelled (HTML, the button's activation behaviour).
+     */
+    const activateWithKey = async (button: HTMLButtonElement, key: 'Enter' | ' '): Promise<void> => {
+      let cancelled = (await press(button, key)).defaultPrevented;
+      if (key === ' ') {
+        const keyup = new KeyboardEvent('keyup', { key, bubbles: true, cancelable: true });
+        await act(async () => {
+          button.dispatchEvent(keyup);
+        });
+        cancelled = cancelled || keyup.defaultPrevented;
+      }
+      if (!cancelled) await click(button, `the button ${key === ' ' ? 'Space' : key} activates`);
+    };
+
+    /**
+     * Implicit submission: Enter in a text field makes the browser click the form's default button (its
+     * first submit button), unless that button is disabled, as a submit of the form.
+     */
+    const pressEnterIn = async (field: HTMLInputElement): Promise<void> => {
+      const keydown = await press(field, 'Enter');
+      const defaultButton = field.form?.querySelector<HTMLButtonElement>('button[type="submit"]');
+      if (!keydown.defaultPrevented && defaultButton && !defaultButton.disabled) {
+        await click(defaultButton, "the form's default button");
+      }
+    };
+
+    /** A click as a browser dispatches it, kept so a test can ask whether its default was cancelled. */
+    const clickEvent = () => new MouseEvent('click', { bubbles: true, cancelable: true });
+
+    const saves: string[] = [];
+    function SavePanel() {
+      const [working, setWorking] = useState(false);
+      return (
+        <>
+          <Button
+            busy={working}
+            onClick={() => {
+              saves.push('save');
+              setWorking(true);
+            }}
+          >
+            Save
+          </Button>
+          <button type="button" onClick={() => setWorking(false)}>
+            Finish
+          </button>
+        </>
+      );
+    }
+    const panel = await mount(<SavePanel />);
+    const [save, finish] = Array.from(panel.container.querySelectorAll<HTMLButtonElement>('button'));
+    assert(save !== undefined && finish !== undefined, 'the panel renders Save and Finish');
+
+    // A mouse click focuses the button in Chromium; `.click()` alone does not.
+    await act(async () => save.focus());
+    await click(save, 'Save');
+    assert(saves.join() === 'save', 'an idle Button calls its onClick');
+    assert(
+      save.getAttribute('aria-busy') === 'true' && save.getAttribute('aria-disabled') === 'true',
+      'the click starts the work: Save is busy, aria-busy and aria-disabled',
+    );
+    assert(!save.hasAttribute('disabled'), 'a busy Save has no disabled attribute');
+    assert(document.activeElement === save, 'the Save that turned busy keeps the focus it held');
+    await act(async () => finish.focus());
+    await act(async () => save.focus());
+    assert(document.activeElement === save, 'a busy Save can be tabbed back to: it takes the focus');
+
+    await click(save, 'the busy Save');
+    assert(saves.join() === 'save', 'a click on a busy Button calls no onClick');
+    await activateWithKey(save, 'Enter');
+    assert(saves.join() === 'save', 'nor does Enter');
+    await activateWithKey(save, ' ');
+    assert(saves.join() === 'save', 'nor does Space');
+    assert(document.activeElement === save, 'the focus stays on the busy Button through all three');
+
+    // Once the work is done the Button is itself again, and answers the keys it ignored. That an idle one
+    // does is what makes the ignored ones above mean something: the helper's click does reach onClick.
+    await click(finish, 'Finish');
+    assert(
+      !save.hasAttribute('aria-busy') && !save.hasAttribute('aria-disabled') && document.activeElement === save,
+      'once the work is done the Button is neither busy nor aria-disabled, and still holds the focus',
+    );
+    await activateWithKey(save, 'Enter');
+    assert(saves.join() === 'save,save', 'an idle Button answers Enter');
+    await click(finish, 'Finish');
+    await activateWithKey(save, ' ');
+    assert(saves.join() === 'save,save,save', 'and Space');
+    await panel.unmount();
+
+    // The click goes no further than the busy Button, as a click on a disabled one never did.
+    const rowClicks: string[] = [];
+    const row = await mount(
+      <div onClick={() => rowClicks.push('row')}>
+        <Button busy>Busy</Button>
+        <Button>Idle</Button>
+      </div>,
+    );
+    const [busyInRow, idleInRow] = Array.from(row.container.querySelectorAll<HTMLButtonElement>('button'));
+    assert(busyInRow !== undefined && idleInRow !== undefined, 'the row renders a busy and an idle Button');
+    await click(busyInRow, 'the busy Button in the row');
+    assert(rowClicks.length === 0, 'a click on a busy Button does not reach an ancestor');
+    await click(idleInRow, 'the idle Button in the row');
+    assert(rowClicks.join() === 'row', 'a click on an idle Button does');
+    await row.unmount();
+
+    // A submit button: its click is what submits the form, so a busy one cancels the click's default. The
+    // form's handler does the same, as a page's does, so happy-dom has nothing to navigate to.
+    const submits: string[] = [];
+    function TitleForm({ working }: { working: boolean }) {
+      return (
+        <form
+          onSubmit={(event) => {
+            event.preventDefault();
+            submits.push('submit');
+          }}
+        >
+          <input aria-label="Title" />
+          <Button type="submit" busy={working}>
+            Save
+          </Button>
+        </form>
+      );
+    }
+
+    // The same form idle, so the harness is known to submit: each route below submits there.
+    const idleForm = await mount(<TitleForm working={false} />);
+    const idleSubmit = idleForm.container.querySelector<HTMLButtonElement>('button');
+    const idleField = idleForm.container.querySelector<HTMLInputElement>('input');
+    assert(idleSubmit !== null && idleField !== null, 'the idle form renders its field and its submit button');
+    await click(idleSubmit, 'the idle submit button');
+    await pressEnterIn(idleField);
+    const idleClick = clickEvent();
+    await act(async () => {
+      idleSubmit.dispatchEvent(idleClick);
+    });
+    assert(
+      submits.join() === 'submit,submit,submit' && !idleClick.defaultPrevented,
+      'an idle submit button submits its form: from a click, from Enter in a field, and its click is not cancelled',
+    );
+    await idleForm.unmount();
+
+    submits.length = 0;
+    const busyForm = await mount(<TitleForm working />);
+    const busySubmit = busyForm.container.querySelector<HTMLButtonElement>('button');
+    const busyField = busyForm.container.querySelector<HTMLInputElement>('input');
+    assert(busySubmit !== null && busyField !== null, 'the busy form renders its field and its submit button');
+    assert(
+      busySubmit.getAttribute('type') === 'submit' && !busySubmit.hasAttribute('disabled'),
+      'the busy submit button is still a submit button, and enabled to a browser',
+    );
+    await click(busySubmit, 'the busy submit button');
+    await activateWithKey(busySubmit, 'Enter');
+    await activateWithKey(busySubmit, ' ');
+    await pressEnterIn(busyField);
+    const busyClick = clickEvent();
+    await act(async () => {
+      busySubmit.dispatchEvent(busyClick);
+    });
+    assert(submits.length === 0, 'a busy submit button submits nothing: not from a click, Enter, Space or Enter in a field');
+    assert(busyClick.defaultPrevented, "a busy submit button cancels its click's default, which is what would submit the form");
+    await busyForm.unmount();
+
+    console.log(
+      '✓ ui kit: a busy Button keeps the keyboard focus and ignores click, Enter, Space and implicit submission, without its click reaching an ancestor',
+    );
+
+    // An aria-disabled Button that is not busy: its caller made it unavailable (Pagination's Next on the
+    // last page) and it is as inert as a busy one, without being busy: no aria-busy, no spinner. The
+    // keyboard focus stays on it, which is why it is not `disabled`.
+    const steps: string[] = [];
+    function Stepper() {
+      const [atEnd, setAtEnd] = useState(false);
+      return (
+        <>
+          <Button
+            aria-disabled={atEnd}
+            onClick={() => {
+              steps.push('step');
+              setAtEnd(true);
+            }}
+          >
+            Next
+          </Button>
+          <button type="button" onClick={() => setAtEnd(false)}>
+            Back
+          </button>
+        </>
+      );
+    }
+    const stepper = await mount(<Stepper />);
+    const [next, back] = Array.from(stepper.container.querySelectorAll<HTMLButtonElement>('button'));
+    assert(next !== undefined && back !== undefined, 'the stepper renders Next and Back');
+
+    await act(async () => next.focus());
+    await click(next, 'Next');
+    assert(steps.join() === 'step', 'an available Button calls its onClick');
+    assert(
+      next.getAttribute('aria-disabled') === 'true' && !next.hasAttribute('disabled') && !next.hasAttribute('aria-busy'),
+      'the step that ends the range leaves Next aria-disabled, and neither disabled nor busy',
+    );
+    assert(next.querySelector('svg') === null, 'and it shows no spinner');
+    assert(document.activeElement === next, 'the Next that turned aria-disabled keeps the focus it held');
+    await act(async () => back.focus());
+    await act(async () => next.focus());
+    assert(document.activeElement === next, 'an aria-disabled Next can be tabbed back to: it takes the focus');
+
+    await click(next, 'the aria-disabled Next');
+    assert(steps.join() === 'step', 'a click on an aria-disabled Button calls no onClick');
+    await activateWithKey(next, 'Enter');
+    assert(steps.join() === 'step', 'nor does Enter');
+    await activateWithKey(next, ' ');
+    assert(steps.join() === 'step', 'nor does Space');
+    assert(document.activeElement === next, 'the focus stays on it through all three');
+
+    // Available again it answers the key it ignored: that is what makes the ignored ones above mean something.
+    await click(back, 'Back');
+    assert(next.getAttribute('aria-disabled') !== 'true', 'Back makes Next available again');
+    await activateWithKey(next, 'Enter');
+    assert(steps.join() === 'step,step', 'an available Button answers Enter');
+    await stepper.unmount();
+
+    // Only a true aria-disabled (the boolean or the string) holds the click back.
+    for (const [given, holdsBack] of [
+      [true, true],
+      ['true', true],
+      [false, false],
+      ['false', false],
+    ] as const) {
+      const clicks: string[] = [];
+      const one = await mount(
+        <Button aria-disabled={given} onClick={() => clicks.push('click')}>
+          Step
+        </Button>,
+      );
+      await click(one.container.querySelector('button'), 'the Button');
+      assert(
+        clicks.length === (holdsBack ? 0 : 1),
+        `a click on a Button with aria-disabled=${JSON.stringify(given)} ${holdsBack ? 'calls no onClick' : 'still calls onClick'}`,
+      );
+      await one.unmount();
+    }
+
+    console.log('✓ ui kit: a Button given aria-disabled ignores click, Enter and Space and keeps the focus, without being busy');
   }
 
   // --- IconButton size="xs": the 21 px chip of a compact toggle group, with a 12 px icon ---
