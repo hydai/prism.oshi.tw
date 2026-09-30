@@ -38,8 +38,10 @@ function keepTabInside(sheet: HTMLElement, event: KeyboardEvent): void {
  * sheet; while open Tab cycles inside it and the root carries `data-overlay-open`, so the editor
  * shortcut guard stays quiet behind it. Escape and a scrim click ask the owner to close
  * (`onClose`) — an Escape something inside already handled (an open popover), or one that belongs
- * to an IME composition, is left alone — and closing hands focus back to `returnFocusRef`. An open
- * popover panel inside the sheet is kept within its container, so it never spills over the scrim.
+ * to an IME composition, is left alone — and closing hands focus back to `returnFocusRef`. The sheet
+ * is its popovers' placement boundary (`data-popover-boundary`, read by `ui/popover-position.ts`): an
+ * open panel is placed inside it, 12 px from its edges like its cards, not over the scrim, as far as
+ * the panel's 240 px minimum width allows in a sheet narrowed below 264 px.
  * The sheet is `glass-pop`, not the sidebar's lighter glass: it lies over page content (the black
  * player, say) rather than the canvas, and its labels must stay legible there.
  */
@@ -108,7 +110,8 @@ export function Drawer({
         aria-modal="true"
         aria-label="Navigation"
         tabIndex={-1}
-        className="glass-pop fixed inset-y-0 left-0 z-50 flex w-[272px] max-w-[calc(100%_-_3rem)] flex-col border-y-0 border-l-0 shadow-pop focus:outline-none focus-visible:shadow-pop [&_[data-overlay-open]]:max-w-full"
+        data-popover-boundary=""
+        className="glass-pop fixed inset-y-0 left-0 z-50 flex w-[272px] max-w-[calc(100%_-_3rem)] flex-col border-y-0 border-l-0 shadow-pop focus:outline-none focus-visible:shadow-pop"
       >
         {open ? children : null}
       </div>
