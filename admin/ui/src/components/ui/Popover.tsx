@@ -13,6 +13,7 @@ import {
 } from 'react';
 import { Icon, type IconName } from './Icon';
 import { isImeKeyDown } from './keyboard';
+import { anchorElementFor, placePanel } from './popover-position';
 
 type PopoverKind = 'dialog' | 'menu' | 'listbox';
 
@@ -29,11 +30,14 @@ const FOCUSABLE_SELECTOR = [
   '[tabindex]:not([tabindex="-1"])',
 ].join(', ');
 
-// No display utility here: the `hidden` attribute has to win while the popover is closed.
+// No display utility here: the `hidden` attribute has to win while the popover is closed. `absolute`
+// and the side / align classes are the in-flow placement, kept where the Popover API is missing; a
+// panel shown in the top layer (`:popover-open`) is `fixed` at the coordinates and max width
+// `placePanel` writes, clear of the UA's centred inset and auto margins.
 const PANEL_CLASSES =
-  'glass-pop absolute z-50 max-h-[min(70vh,28rem)] min-w-[240px] max-w-[calc(100vw-2rem)] overflow-auto rounded-2xl p-1.5 text-fg shadow-pop focus:outline-none';
+  'glass-pop absolute z-50 max-h-[min(70vh,28rem)] min-w-[240px] max-w-[calc(100vw-2rem)] overflow-auto rounded-2xl p-1.5 text-fg shadow-pop focus:outline-none [&:popover-open]:fixed [&:popover-open]:inset-auto [&:popover-open]:m-0';
 
-/** Which side of its anchor the panel opens on. */
+/** Which side of its anchor the panel opens on, in flow. */
 const SIDE_CLASSES: Record<'top' | 'bottom', string> = {
   bottom: 'top-full mt-2',
   top: 'bottom-full mb-2',
@@ -41,6 +45,14 @@ const SIDE_CLASSES: Record<'top' | 'bottom', string> = {
 
 /** The label of the popover a Menu sits in, so the menu is named after it. */
 const PopoverLabelContext = createContext<string | undefined>(undefined);
+
+/**
+ * Whether `panel` can be shown in the top layer. Guarded as ui/toast.tsx guards it: happy-dom has no
+ * Popover API, and without one the panel stays in flow.
+ */
+function hasPopoverApi(panel: HTMLElement): boolean {
+  return typeof panel.showPopover === 'function' && typeof panel.hidePopover === 'function';
+}
 
 /**
  * Hands focus back to the trigger when closing would otherwise strand it — while it is inside the
@@ -65,6 +77,16 @@ function returnFocusToTrigger(panel: HTMLElement | null, trigger: HTMLElement | 
  * wrapper (`relative inline-flex`) — e.g. `w-full` for a trigger that spans its container. With
  * `anchor="container"` the wrapper is not positioned, so the panel opens from, and aligns to, the
  * nearest positioned ancestor instead of the trigger (a small button at the end of a wide row).
+ *
+ * The open panel is shown in the top layer (`popover="manual"`, `showPopover()`), so no card, scroll
+ * box or dialog around the trigger clips it, and it stacks above an open modal `<dialog>` (a toast
+ * raised later stacks above it in turn). It keeps its place in the DOM, inside the wrapper, so outside
+ * clicks, focus and Escape work as they do in flow. It sits at `position: fixed` coordinates beside
+ * its anchor (`popover-position.ts`), on the other side when its own lacks room in the viewport, and
+ * 12 px inside the viewport across, or inside its nearest ancestor marked `data-popover-boundary`
+ * (the Drawer's sheet). It follows the anchor while open: on a scroll of any ancestor, a resize, and
+ * a change in its own or the anchor's size. Without the Popover API it stays in flow, under its
+ * positioned wrapper or container.
  */
 export function Popover({
   kind,
@@ -154,6 +176,51 @@ export function Popover({
     };
   }, [isOpen]);
 
+  // Shown in the top layer while open, before the placement and focus effects below: a panel not yet
+  // shown is `display: none`, so it can neither be measured nor take focus. Keyed on `isOpen` alone:
+  // showing it again would lift it back above a toast raised since.
+  useLayoutEffect(() => {
+    const panel = panelRef.current;
+    if (!isOpen || !panel || !hasPopoverApi(panel)) return undefined;
+    panel.showPopover();
+    return () => {
+      panel.hidePopover();
+    };
+  }, [isOpen]);
+
+  // Placed beside its anchor while shown, and again whenever the anchor can have moved: a scroll of
+  // the document or an ancestor (captured, as scroll does not bubble; the panel's own list scrolling
+  // moves nothing), a resize, and a change in the panel's or the anchor's size. A new side, alignment
+  // or anchor places it again without hiding it.
+  useLayoutEffect(() => {
+    const panel = panelRef.current;
+    const wrapper = wrapperRef.current;
+    if (!isOpen || !panel || !wrapper || !hasPopoverApi(panel)) return undefined;
+    const anchorElement = anchorElementFor(wrapper, triggerRef.current, anchor);
+    const place = () => placePanel(panel, anchorElement, side, align);
+    place();
+
+    const doc = panel.ownerDocument;
+    const view = doc.defaultView;
+    const handleScroll = (event: Event) => {
+      if (event.target instanceof Node && !event.target.contains(anchorElement)) return;
+      place();
+    };
+    doc.addEventListener('scroll', handleScroll, true);
+    view?.addEventListener('resize', place);
+    let observer: ResizeObserver | undefined;
+    if (typeof ResizeObserver !== 'undefined') {
+      observer = new ResizeObserver(place);
+      observer.observe(panel);
+      observer.observe(anchorElement);
+    }
+    return () => {
+      observer?.disconnect();
+      view?.removeEventListener('resize', place);
+      doc.removeEventListener('scroll', handleScroll, true);
+    };
+  }, [isOpen, side, align, anchor]);
+
   // A layout effect, not a cleanup: right after the mutation phase React re-focuses whatever had
   // focus before the commit, so a focus move made during that phase would be undone.
   useLayoutEffect(() => {
@@ -191,6 +258,7 @@ export function Popover({
       <div
         ref={panelRef}
         id={panelId}
+        popover="manual"
         role={kind === 'dialog' ? 'dialog' : undefined}
         aria-label={kind === 'dialog' ? label : undefined}
         tabIndex={-1}

@@ -431,8 +431,8 @@ async function main(): Promise<void> {
     "the drawer sheet is the near-opaque glass-pop surface, so its labels stay legible over dark page content (the player), not the sidebar's 50 % glass",
   );
   assert(
-    classesOf(ssrSheet).includes('[&_[data-overlay-open]]:max-w-full'),
-    "the sheet keeps an open popover's panel within its container",
+    ssrSheet !== null && ssrSheet.getAttribute('data-popover-boundary') === '',
+    "the sheet keeps an open popover's panel within it: it is its popovers' placement boundary (data-popover-boundary)",
   );
 
   // Every group is named for assistive tech; only Overview (the Dashboard alone) hides its heading.
