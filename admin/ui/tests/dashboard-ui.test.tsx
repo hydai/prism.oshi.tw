@@ -612,6 +612,10 @@ async function main(): Promise<void> {
     `To stamp's icon tile is the accent gradient under a white icon (got "${stampTile.join(' ')}")`,
   );
   assert(
+    stampTile.includes('bg-origin-border'),
+    `and the gradient spans the tile's border box, so its transparent border shows no hairline (got "${stampTile.join(' ')}")`,
+  );
+  assert(
     !stampTile.some((name) => name.includes('tone-')),
     `and the accent replaces its warn tint (got "${stampTile.join(' ')}")`,
   );

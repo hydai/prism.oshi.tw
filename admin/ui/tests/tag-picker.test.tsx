@@ -15,6 +15,11 @@ async function main(): Promise<void> {
   assert(html.includes('語言') && html.includes('來源'), 'both categories render');
   assert((html.match(/aria-pressed="true"/g) ?? []).length === 1, 'exactly the selected chip is pressed');
   assert((html.match(/<button /g) ?? []).length === 8, 'all eight tags render as chips');
+  const pressedChip = /<button[^>]*aria-pressed="true"[^>]*class="([^"]*)"/.exec(html)?.[1] ?? '';
+  assert(
+    pressedChip.includes('bg-accent') && pressedChip.includes('bg-origin-border'),
+    `the selected chip's gradient spans its border box, so its transparent border shows no hairline (got "${pressedChip}")`,
+  );
 
   const win = new Window({
     url: 'http://localhost/',

@@ -42,7 +42,7 @@ export default function TagPicker({ value, onChange, disabled = false }: TagPick
                   data-testid={`tag-option-${tag.id.replace(':', '-')}`}
                   className={`whitespace-nowrap rounded-radius-pill border px-2.5 py-1 text-token-sm font-semibold transition-colors focus-visible:outline-none focus-visible:shadow-focus disabled:cursor-not-allowed disabled:opacity-50 ${
                     isSelected
-                      ? 'border-transparent bg-accent text-white'
+                      ? 'border-transparent bg-accent bg-origin-border text-white'
                       : 'border-field-line bg-field text-fg-muted enabled:hover:text-fg'
                   }`}
                 >

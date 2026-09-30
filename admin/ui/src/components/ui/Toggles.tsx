@@ -1,7 +1,10 @@
 import type { ReactNode } from 'react';
 import { Icon, type IconName } from './Icon';
 
-/** A pill-shaped toggle button (spec §5): filter and tag chips. */
+/**
+ * A pill-shaped toggle button (spec §5): filter and tag chips. Active, it is the accent gradient
+ * over its (transparent) border's box, `bg-origin-border`, so no far-edge hairline shows in that border.
+ */
 export function Chip({
   active,
   onClick,
@@ -14,7 +17,7 @@ export function Chip({
   children: ReactNode;
 }) {
   const classes = `inline-flex items-center gap-1.5 whitespace-nowrap rounded-radius-pill border px-3 py-1.5 text-token-sm font-semibold transition-colors focus-visible:outline-none focus-visible:shadow-focus ${
-    active ? 'border-transparent bg-accent text-white' : 'border-field-line bg-field text-fg-muted hover:text-fg'
+    active ? 'border-transparent bg-accent bg-origin-border text-white' : 'border-field-line bg-field text-fg-muted hover:text-fg'
   }`;
 
   return (
