@@ -1,3 +1,4 @@
+import type { ReactNode } from 'react';
 import type { HarmonizeMatchType } from '../../../../shared/types';
 import type { HarmonizeScan } from '../../hooks/useHarmonizeScan';
 import { useNow } from '../../hooks/useNow';
@@ -21,9 +22,12 @@ function ScannedAgo({ at }: { at: number }) {
 /**
  * What a Harmonizer tab puts in the page header while it is active: the last scan's summary and
  * how long ago it landed, the match mode, the fuzzy threshold (a number field, so J and K pressed
- * there stay keystrokes, never queue moves) and Scan. It reads only the scan settings of the tab's
+ * there stay keystrokes, never queue moves) and Scan, then `children`: the tab's own header actions
+ * (the artists tab's Apply All Reviewed). It reads only the scan settings of the tab's
  * `useHarmonizeScan`, whatever that tab scans for. `thresholdId` names the tab's threshold field;
- * its range error is `{thresholdId}-error`.
+ * its range error is `{thresholdId}-error`. `disabled` holds Scan back while the tab says it must
+ * wait (its own request in flight). While a scan runs, the mode and the threshold wait with Scan:
+ * what they show is always what the scan on its way asked for.
  */
 export default function ScanControls({
   scan,
@@ -32,6 +36,8 @@ export default function ScanControls({
   summary,
   scannedAt,
   onScan,
+  disabled = false,
+  children,
 }: {
   scan: Pick<
     HarmonizeScan<unknown, unknown>,
@@ -44,6 +50,8 @@ export default function ScanControls({
   /** When that scan landed; `null` until one has. */
   scannedAt: number | null;
   onScan: () => void;
+  disabled?: boolean;
+  children?: ReactNode;
 }) {
   const { mode, setMode, threshold, setThreshold, thresholdIsValid, loading } = scan;
   const errorId = `${thresholdId}-error`;
@@ -54,7 +62,7 @@ export default function ScanControls({
           {summary} · <ScannedAgo at={scannedAt} />
         </span>
       ) : null}
-      <Segmented label="Match mode" value={mode} onChange={setMode} options={MODES} />
+      <Segmented label="Match mode" value={mode} onChange={setMode} options={MODES} disabled={loading} />
       {mode === 'fuzzy' ? (
         <span className="flex items-center gap-1.5">
           <label htmlFor={thresholdId} className="text-token-sm font-semibold text-fg-muted">
@@ -72,6 +80,7 @@ export default function ScanControls({
               aria-invalid={!thresholdIsValid}
               aria-describedby={!thresholdIsValid ? errorId : undefined}
               required
+              disabled={loading}
             />
           </span>
           {!thresholdIsValid ? (
@@ -85,11 +94,12 @@ export default function ScanControls({
         variant="primary"
         icon="refresh"
         busy={loading}
-        disabled={mode === 'fuzzy' && !thresholdIsValid}
+        disabled={disabled || (mode === 'fuzzy' && !thresholdIsValid)}
         onClick={onScan}
       >
         {loading ? 'Scanning...' : scanned ? 'Scan again' : 'Scan'}
       </Button>
+      {children}
     </>
   );
 }

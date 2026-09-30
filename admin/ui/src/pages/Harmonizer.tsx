@@ -10,13 +10,14 @@ type Tab = 'songs' | 'artists';
 /**
  * The Harmonizer (spec §8.7): similar songs to merge and similar artist names to align, one tab each
  * behind the header's "Harmonizer view". Both tabs stay mounted — the inactive one is only `hidden` —
- * so a trip to the other tab keeps each one's scan and selection. The header's controls slot holds
- * the active tab's scan controls, which that tab portals there; a tab reports its group count, which
- * its view option shows once it has scanned.
+ * so a trip to the other tab keeps each one's scan and selection, and only the shown one hears J / K.
+ * The header's controls slot holds the active tab's scan controls, which that tab portals there;
+ * each tab reports its group count, which its view option shows once it has scanned.
  */
 export default function Harmonizer() {
   const [tab, setTab] = useState<Tab>('songs');
   const [songGroupCount, setSongGroupCount] = useState<number | null>(null);
+  const [artistGroupCount, setArtistGroupCount] = useState<number | null>(null);
   // The header element the active tab portals its controls into. Held in state through a callback
   // ref, so the tabs render again with it once it has mounted.
   const [controlsSlot, setControlsSlot] = useState<HTMLElement | null>(null);
@@ -38,7 +39,7 @@ export default function Harmonizer() {
           onChange={setTab}
           options={[
             { value: 'songs', label: 'Similar songs', count: songGroupCount ?? undefined },
-            { value: 'artists', label: 'Similar artists' },
+            { value: 'artists', label: 'Similar artists', count: artistGroupCount ?? undefined },
           ]}
         />
       </PageHeader>
@@ -52,7 +53,11 @@ export default function Harmonizer() {
         />
       </section>
       <section aria-label="Similar artists" hidden={tab !== 'artists'} className="p-4 lg:px-5 lg:pb-[18px]">
-        <SimilarArtistsTab />
+        <SimilarArtistsTab
+          active={tab === 'artists'}
+          controlsSlot={controlsSlot}
+          onGroupCountChange={setArtistGroupCount}
+        />
       </section>
     </div>
   );

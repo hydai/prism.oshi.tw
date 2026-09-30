@@ -9,7 +9,7 @@ import {
   getWorkAwareMergeBatch,
   getWorkMergePlan,
 } from '../../lib/harmonizer-work-merge';
-import { counted, mergeActionLabel, mergeConfirmationMessage } from '../../lib/harmonizer-presentation';
+import { counted, groupsSummary, mergeActionLabel, mergeConfirmationMessage } from '../../lib/harmonizer-presentation';
 import { Button } from '../ui/Button';
 import { useConfirm } from '../ui/confirm';
 import { EmptyState, GlassCard } from '../ui/Display';
@@ -19,6 +19,7 @@ import { QueueLayout } from '../ui/QueueLayout';
 import { nextQueueKey } from '../ui/queue';
 import { useToast } from '../ui/toast';
 import GroupRow from './GroupRow';
+import NoGroupsFound from './NoGroupsFound';
 import ScanControls from './ScanControls';
 import SimilarSongGroupCard from './SimilarSongGroupCard';
 
@@ -26,6 +27,9 @@ type SongScanStats = { totalSongs: number; groupCount: number; affectedSongs: nu
 type SongGroup = SimilarityGroup<HarmonizeSongEntry>;
 
 const groupKeyOf = (group: SongGroup): string => group.normalizedKey;
+
+/** What the list, and the detail beside it, say while no group is listed. */
+const NO_GROUPS = 'No similar song titles found.';
 
 /** Whether merging `group` into `canonicalId` merges global works too: the list row's "Global merge". */
 function needsGlobalMerge(group: SongGroup, canonicalId: string | undefined): boolean {
@@ -39,8 +43,11 @@ function needsGlobalMerge(group: SongGroup, canonicalId: string | undefined): bo
  * the groups in a list beside the selected group's `SimilarSongGroupCard`. While `active` the tab
  * portals its scan controls into the page header's `controlsSlot` and listens to J / K; hidden, it
  * keeps its scan and its selection. Skip moves on and keeps the group; a confirmed merge drops the
- * group and selects the one after it, and a failed one is an error toast that changes nothing. Its
- * handlers — scan and merge, never an effect — report the group count through `onGroupCountChange`.
+ * group and selects the one after it, and a failed one is an error toast that changes nothing. One
+ * request runs at a time, as on the artists tab — no scan during a merge, no merge during a scan — so
+ * a count or a selection never lands on the wrong list. Its handlers — scan and merge, never an
+ * effect — report the group count through `onGroupCountChange`; the header's summary counts the
+ * groups still listed.
  */
 export default function SimilarSongsTab({
   active,
@@ -82,6 +89,7 @@ export default function SimilarSongsTab({
   const nextKey = selectedIndex === -1 ? undefined : keys[selectedIndex + 1];
 
   const handleScan = async () => {
+    if (applying.size > 0) return;
     const res = await scan();
     if (res === null) return;
     // A fresh scan is a fresh queue: it starts at its first group.
@@ -97,7 +105,8 @@ export default function SimilarSongsTab({
     // Merges are serialized: each request must carry the revision the previous
     // merge returned, so a second group confirmed while one is in flight would
     // send a revision the server has already advanced past (a needless 409).
-    if (applying.size > 0) return;
+    // Nor does one start during a scan, whose list is about to replace this one.
+    if (applying.size > 0 || loading) return;
 
     const canonical = group.items.find((i) => i.id === canonicalId);
     if (!canonical) return;
@@ -135,6 +144,8 @@ export default function SimilarSongsTab({
       scannedRevision.current = merged.revision;
       // The group leaves the queue, and the one after it in the list as it stood before the drop
       // takes the selection — unless the curator has moved to another group while the merge ran.
+      // `keys` is that list as it stood at the click, still the one on screen: no scan can run
+      // while this merge does (handleScan and Scan wait for it), so none has replaced it.
       const following = nextQueueKey(keys, group.normalizedKey, () => false);
       setPicked((current) => (current === null || current === group.normalizedKey ? following : current));
       dropGroup(group.normalizedKey);
@@ -157,9 +168,7 @@ export default function SimilarSongsTab({
   };
 
   const scanned = stats !== null;
-  const summary = stats === null
-    ? null
-    : `${counted(stats.affectedSongs, 'song', 'songs')} in ${counted(stats.groupCount, 'group', 'groups')}`;
+  const summary = scanned ? groupsSummary(groups, 'song', 'songs') : null;
 
   return (
     <div className="flex flex-col gap-3.5">
@@ -172,6 +181,7 @@ export default function SimilarSongsTab({
               summary={summary}
               scannedAt={scannedAt}
               onScan={() => void handleScan()}
+              disabled={applying.size > 0}
             />,
             controlsSlot,
           )
@@ -198,21 +208,25 @@ export default function SimilarSongsTab({
             </GroupRow>
           )}
           hint="next / previous group"
-          emptyList={<p className="px-3.5 py-6 text-center text-token-sm text-fg-muted">No similar song titles found.</p>}
+          emptyList={<p className="px-3.5 py-6 text-center text-token-sm text-fg-muted">{NO_GROUPS}</p>}
           detail={
+            // With a group listed one is always selected, so no selection means an empty list.
             selected ? (
               <SimilarSongGroupCard
                 group={selected}
                 canonicalId={canonicals.get(selected.normalizedKey)}
                 isApplying={applying.has(selected.normalizedKey)}
                 mergePending={applying.size > 0}
+                scanPending={loading}
                 onSelectCanonical={(songId) => setCanonical(selected.normalizedKey, songId)}
                 onMerge={() => void handleApplyGroup(selected)}
                 onSkip={() => setPicked(nextQueueKey(keys, selectedKey, () => false))}
                 onPrevious={previousKey === undefined ? undefined : () => setPicked(previousKey)}
                 onNext={nextKey === undefined ? undefined : () => setPicked(nextKey)}
               />
-            ) : null
+            ) : (
+              <NoGroupsFound title={NO_GROUPS} />
+            )
           }
           keyboardEnabled={active}
         />

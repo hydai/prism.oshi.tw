@@ -19,6 +19,8 @@ interface SimilarSongGroupCardProps {
   isApplying: boolean;
   /** Any group's merge is in flight — every merge waits (see SimilarSongsTab). */
   mergePending: boolean;
+  /** A scan is running: its list is about to replace this one, so the merge waits for it too. */
+  scanPending?: boolean;
   onSelectCanonical: (songId: string) => void;
   onMerge: () => void;
   /** Leaves the group in the queue and selects the next one. */
@@ -90,6 +92,7 @@ export default function SimilarSongGroupCard({
   canonicalId,
   isApplying,
   mergePending,
+  scanPending = false,
   onSelectCanonical,
   onMerge,
   onSkip,
@@ -164,7 +167,7 @@ export default function SimilarSongGroupCard({
             icon="merge"
             busy={isApplying}
             onClick={onMerge}
-            disabled={mergePending || mergeBlocked}
+            disabled={mergePending || scanPending || mergeBlocked}
             title={mergeBlocked
               ? 'Link every selected song to a workId before merging'
               : mergePending && !isApplying

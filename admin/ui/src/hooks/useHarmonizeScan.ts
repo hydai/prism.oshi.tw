@@ -27,26 +27,22 @@ export interface HarmonizeScan<Entry, Stats> {
   /** Canonical entry per group, keyed by the group's normalizedKey. */
   canonicals: Map<string, string>;
   setCanonical: (groupKey: string, canonical: string) => void;
-  expanded: Set<string>;
-  toggleExpanded: (groupKey: string) => void;
   /**
    * Runs a scan and resolves with the response it applied, or `null` when it did not run (a fuzzy
    * threshold out of range) or failed (`error` says why) — so a tab acts on the result in its own
    * handler rather than in an effect.
    */
   scan: () => Promise<HarmonizeScanResponse<Entry, Stats> | null>;
-  /** Drop one group once its merge has been applied. */
+  /** Drop one group once its merge or apply has landed. */
   dropGroup: (groupKey: string) => void;
-  /** Drop every group (an "apply all" that succeeded). */
-  clearGroups: () => void;
 }
 
 /**
  * The scan half of a harmonizer tab: run a similarity scan, remember its
- * groups and stats, and track the canonical pick and open/closed state per
- * group. `fetchScan` is the tab's endpoint (and its chance to record anything
- * extra the response carries, e.g. the catalog revision a merge must echo);
- * `pickCanonical` names the entry pre-selected for each fresh group.
+ * groups and stats, and track the canonical pick per group. `fetchScan` is
+ * the tab's endpoint (and its chance to record anything extra the response
+ * carries, e.g. the catalog revision a merge must echo); `pickCanonical`
+ * names the entry pre-selected for each fresh group.
  *
  * Applying a merge is deliberately *not* here — the two tabs differ by design
  * (work-identity merges vs. a flat artist rename).
@@ -62,7 +58,6 @@ export function useHarmonizeScan<Entry, Stats>(
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [canonicals, setCanonicals] = useState<Map<string, string>>(new Map());
-  const [expanded, setExpanded] = useState<Set<string>>(new Set());
   const thresholdIsValid = isNumberInRange(threshold, 0.5, 1);
 
   const scan = async (): Promise<HarmonizeScanResponse<Entry, Stats> | null> => {
@@ -74,15 +69,12 @@ export function useHarmonizeScan<Entry, Stats>(
       const res = await fetchScan({ mode, threshold: mode === 'fuzzy' ? threshold : undefined });
       setGroups(res.groups);
       setStats(res.stats);
-      // A fresh scan pre-selects a canonical per group and opens every group.
+      // A fresh scan pre-selects a canonical per group.
       const nextCanonicals = new Map<string, string>();
-      const nextExpanded = new Set<string>();
       for (const group of res.groups) {
         nextCanonicals.set(group.normalizedKey, pickCanonical(group.items));
-        nextExpanded.add(group.normalizedKey);
       }
       setCanonicals(nextCanonicals);
-      setExpanded(nextExpanded);
       return res;
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Failed to scan');
@@ -94,15 +86,6 @@ export function useHarmonizeScan<Entry, Stats>(
 
   const setCanonical = (groupKey: string, canonical: string) => {
     setCanonicals((prev) => new Map(prev).set(groupKey, canonical));
-  };
-
-  const toggleExpanded = (groupKey: string) => {
-    setExpanded((prev) => {
-      const next = new Set(prev);
-      if (next.has(groupKey)) next.delete(groupKey);
-      else next.add(groupKey);
-      return next;
-    });
   };
 
   const dropGroup = (groupKey: string) => {
@@ -122,10 +105,7 @@ export function useHarmonizeScan<Entry, Stats>(
     setError,
     canonicals,
     setCanonical,
-    expanded,
-    toggleExpanded,
     scan,
     dropGroup,
-    clearGroups: () => setGroups([]),
   };
 }
