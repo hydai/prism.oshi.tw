@@ -29,6 +29,15 @@ export function parseStoredTime(value: string): Date | null {
   return Number.isNaN(ms) ? null : new Date(ms);
 }
 
+/**
+ * The ISO instant (`2026-09-25T18:48:09.000Z`) of a stored time, for a `<time dateTime>`: a stored
+ * `YYYY-MM-DD HH:MM:SS` is UTC without a marker, so the raw string would read as local time. `value`
+ * unchanged if unparseable.
+ */
+export function storedTimeIso(value: string): string {
+  return parseStoredTime(value)?.toISOString() ?? value;
+}
+
 /** `Jul 1, 16:43` within `now`'s year, `2025-12-06` once the year rolls over. `value` unchanged if unparseable. */
 export function formatWhen(value: string, now: Date): string {
   const parsed = parseStoredTime(value);
