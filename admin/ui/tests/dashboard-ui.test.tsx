@@ -1027,6 +1027,12 @@ async function main(): Promise<void> {
   );
   assert(vodRetry.isConnected && vodHeld.contains(vodRetry), 'Retry stays in the card');
   assert(vodRetry.getAttribute('aria-disabled') === 'true', 'busy');
+  assert(
+    vodRetry.getAttribute('aria-busy') === 'true' &&
+      !vodRetry.hasAttribute('disabled') &&
+      vodRetry.querySelector('svg')?.classList.contains('animate-spin') === true,
+    "busy as the kit's IconButton is: aria-busy and aria-disabled, never disabled, and its icon spins",
+  );
   assert(document.activeElement === vodRetry, 'and keeps the focus');
   calls = [];
   await click(vodRetry, 'the busy Retry');
@@ -1061,7 +1067,10 @@ async function main(): Promise<void> {
     'a retried load that fails leaves the card failed',
   );
   assert(
-    vodRetryAgain.isConnected && vodRetryAgain.getAttribute('aria-disabled') === null && document.activeElement === vodRetryAgain,
+    vodRetryAgain.isConnected &&
+      vodRetryAgain.getAttribute('aria-disabled') === null &&
+      vodRetryAgain.getAttribute('aria-busy') === null &&
+      document.activeElement === vodRetryAgain,
     'with its Retry ready again, and still focused',
   );
   await retrying.unmount();

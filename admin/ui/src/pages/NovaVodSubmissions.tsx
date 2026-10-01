@@ -667,9 +667,8 @@ export function VodRow({
 }
 
 /**
- * A row's quick action: an icon button named for what it does. `IconButton` has no busy state, so this one
- * gives itself the kit's: the button that sent the request is `aria-busy` and spins, every button of the row
- * is `aria-disabled` (never `disabled`, which would drop the keyboard focus) and takes no press.
+ * A row's quick action: an icon button named for what it does. The one that sent the request is busy (and
+ * keeps the focus); the row's others are `aria-disabled` while it is out, so none takes a press.
  */
 function QuickAction({
   spec,
@@ -680,17 +679,15 @@ function QuickAction({
   acting: VodAction | undefined;
   onPress: (action: VodAction) => void;
 }) {
-  const busy = acting === spec.action;
   return (
     <IconButton
       label={spec.label}
-      icon={busy ? 'refresh' : spec.icon}
+      icon={spec.icon}
       tone={spec.tone}
       size="sm"
-      aria-busy={busy ? true : undefined}
-      aria-disabled={acting !== undefined ? true : undefined}
-      onClick={acting !== undefined ? undefined : () => onPress(spec.action)}
-      className={`aria-disabled:cursor-not-allowed aria-disabled:opacity-50${busy ? ' [&>svg]:animate-spin' : ''}`}
+      busy={acting === spec.action}
+      aria-disabled={acting !== undefined && acting !== spec.action ? true : undefined}
+      onClick={() => onPress(spec.action)}
     />
   );
 }

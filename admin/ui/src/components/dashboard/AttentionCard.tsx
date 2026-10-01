@@ -27,10 +27,10 @@ const VALUE_CLASSES = 'min-h-[25px] text-[24px] font-[800] leading-[1.05] tracki
  * - error: a plain card with `—` and, beside it, a Retry icon (`Retry {title}`) that calls
  *   `onRetry`. Beside the value rather than in the corner: the kit tooltip centres on its button,
  *   and from the right-most card's corner it would reach past the page's edge;
- * - retrying: the error card while its Retry's load runs. The Retry stays, busy (`aria-disabled`,
- *   spinning, a click does nothing), so the focus stays on it; if it still has the focus when the
- *   load lands, the card's link takes it — on a card that is no link, its first link (the Inbox
- *   card's first chip);
+ * - retrying: the error card while its Retry's load runs. The Retry stays, as the kit's busy
+ *   `IconButton` (aria-busy and aria-disabled, spinning, a click does nothing), so the focus stays
+ *   on it; if it still has the focus when the load lands, the card's link takes it — on a card
+ *   that is no link, its first link (the Inbox card's first chip);
  * - ready: with `to`, the whole card is one router link, marked by an ↗ in its corner; without
  *   `to` it is a plain card (whatever links it holds are its own).
  * `shortTitle` replaces `title` below 640 px, where two cards share a phone's row. A title too long
@@ -131,9 +131,9 @@ export function AttentionCard({
           icon="refresh"
           size="sm"
           tooltipSide="bottom"
-          aria-disabled={retrying ? 'true' : undefined}
-          className={`-my-0.5 aria-disabled:cursor-progress${retrying ? ' [&>svg]:animate-spin' : ''}`}
-          onClick={retrying ? undefined : onRetry}
+          busy={retrying}
+          className="-my-0.5"
+          onClick={onRetry}
         />
       </div>
     );
