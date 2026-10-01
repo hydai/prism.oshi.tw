@@ -118,12 +118,18 @@ const TOKENS: Array<{ name: string; light: string; dark: string }> = [
     light: 'linear-gradient(135deg, #F472B6, #60A5FA)',
     dark: 'linear-gradient(135deg, #F472B6, #60A5FA)',
   },
-  { name: 'accent-fg', light: '#DB2777', dark: '#F9A8D4' },
+  // Not spec §4.1's #DB2777: the same hue (HSL 333°, saturation 71%), lightness 50.6% → 43.3%. That
+  // value reaches only 3.5:1 on a hovered open row and 3.6:1 on the page header, and it colours
+  // links, a toast's action and the sidebar badge, which are text. The contrast check below holds
+  // this one to 4.5:1 on every surface --accent-fg sits on.
+  { name: 'accent-fg', light: '#BD2066', dark: '#F9A8D4' },
   { name: 'selected-bg', light: 'rgba(252,231,243,.85)', dark: 'rgba(244,114,182,.12)' },
   // A row's hover on a glass card (not in the spec table): --field was white on white there.
   { name: 'row-hover', light: 'rgba(148,163,184,.15)', dark: 'rgba(255,255,255,.05)' },
   { name: 'nav-active-bg', light: 'rgba(255,255,255,.88)', dark: 'rgba(255,255,255,.08)' },
-  { name: 'nav-active-fg', light: '#DB2777', dark: '#FFFFFF' },
+  // Not spec §4.1's #DB2777: the light --accent-fg's value (see there), the text of the sidebar's current
+  // link. That value read 4.48:1 at worst, on the drawer's sheet over the player's black.
+  { name: 'nav-active-fg', light: '#BD2066', dark: '#FFFFFF' },
   { name: 'nav-active-icon', light: '#EC4899', dark: '#F9A8D4' },
   { name: 'nav-bar-glow', light: 'none', dark: '0 0 12px rgba(244,114,182,.75)' },
   { name: 'shadow-card', light: '0 10px 36px -14px rgba(99,102,241,.25)', dark: '0 14px 36px -16px rgba(0,0,0,.8)' },
@@ -231,6 +237,7 @@ type SurfaceToken =
   | 'field'
   | 'selected-bg'
   | 'row-hover'
+  | 'nav-active-bg'
   | 'thead-bg'
   | 'tone-neutral-bg'
   | 'scrim';
@@ -274,6 +281,31 @@ const OVER_PLAYER_STACKS: SurfaceToken[][] = [
 ];
 
 const PLAYER_BLACK: Rgb = { r: 0, g: 0, b: 0 };
+
+/**
+ * The stacks only `--accent-fg` reaches on a page, besides those every text sits on. A table link or
+ * seek time turns accent under the pointer, so the row's hover tint lies under it; an open row (Nova,
+ * Nova VODs, Crystal) wears the selected tint with its title in accent, and hovering it lays the
+ * hover tint over both.
+ */
+const ACCENT_STACKS: SurfaceToken[][] = [
+  ['glass-card', 'row-hover'],
+  ['glass-card', 'selected-bg', 'row-hover'],
+];
+
+/** Laid on the sidebar (see `sidebarBackings`): the current link's own surface, under `--nav-active-fg`. */
+const SIDEBAR_NAV_STACKS: SurfaceToken[][] = [['nav-active-bg']];
+
+/**
+ * Laid on the sidebar, what only `--accent-fg` sits on: the inbox badge's selected tint over an idle,
+ * a hovered or the current link, and the pressed theme chip on the active surface inside its field.
+ */
+const SIDEBAR_ACCENT_STACKS: SurfaceToken[][] = [
+  ['selected-bg'],
+  ['row-hover', 'selected-bg'],
+  ['nav-active-bg', 'selected-bg'],
+  ['field', 'nav-active-bg'],
+];
 
 type TailwindConfig = {
   darkMode?: unknown;
@@ -392,6 +424,8 @@ async function main(): Promise<void> {
   // --- --fg-muted and --fg-subtle reach WCAG AA (4.5:1) on every surface they sit on ---
 
   const lowest: string[] = [];
+  const accentLowest: string[] = [];
+  const navLowest: string[] = [];
   const toneLowest: string[] = [];
   const rowHoverLowest: string[] = [];
   for (const [theme, declarations] of [
@@ -428,6 +462,49 @@ async function main(): Promise<void> {
       assert(worst >= 4.5, `${theme} --${token} ${value} reaches 4.5:1 on every surface it sits on (lowest ${worst.toFixed(2)}:1)`);
       lowest.push(`${theme} --${token} ${worst.toFixed(2)}:1`);
     }
+
+    // What the sidebar's content sits on: its own glass, or, in the narrow-screen drawer, the sheet
+    // (glass-pop over the scrim) over the page or over the video player's black. The sidebar itself is
+    // never over the player.
+    const sidebarBackings = [
+      lay(backdrops, ['glass-sidebar']),
+      lay(backdrops, ['scrim', 'glass-pop']),
+      lay([PLAYER_BLACK], ['scrim', 'glass-pop']),
+    ];
+    const onSidebar = (content: SurfaceToken[][]): Rgb[] =>
+      sidebarBackings.flatMap((backing) => content.flatMap((stack) => lay(backing, stack)));
+
+    // --- --accent-fg reaches WCAG AA (4.5:1) on every surface it sits on ---
+
+    // It is text (links, an open row's title, the sidebar badge, a toast's action) and the icon, border
+    // and focus ring of a control. It sits on every surface other text does, on the bare canvas
+    // without the blobs (as --fg-subtle's: no accent is laid straight on it today, but a link on the
+    // page background is the plain case), and on the stacks only it reaches.
+    const accentValue = declared('accent-fg');
+    const accentText = parseColour(accentValue);
+    const accentSurfaces = [
+      ...canvas,
+      ...surfaces,
+      ...ACCENT_STACKS.flatMap((stack) => lay(backdrops, stack)),
+      ...onSidebar(SIDEBAR_ACCENT_STACKS),
+    ];
+    const accentWorst = Math.min(...accentSurfaces.map((surface) => contrastRatio(accentText, surface)));
+    assert(
+      accentWorst >= 4.5,
+      `${theme} --accent-fg ${accentValue} reaches 4.5:1 on every surface it sits on (lowest ${accentWorst.toFixed(2)}:1)`,
+    );
+    accentLowest.push(`${theme} ${accentWorst.toFixed(2)}:1`);
+
+    // --- --nav-active-fg reaches WCAG AA (4.5:1) on the sidebar's current link ---
+
+    const navValue = declared('nav-active-fg');
+    const navText = parseColour(navValue);
+    const navWorst = Math.min(...onSidebar(SIDEBAR_NAV_STACKS).map((surface) => contrastRatio(navText, surface)));
+    assert(
+      navWorst >= 4.5,
+      `${theme} --nav-active-fg ${navValue} reaches 4.5:1 on the sidebar's current link (lowest ${navWorst.toFixed(2)}:1)`,
+    );
+    navLowest.push(`${theme} ${navWorst.toFixed(2)}:1`);
 
     // The hierarchy holds: on the canvas, each of the three stands out less than the one before.
     const [fg, muted, subtle] = ['fg', 'fg-muted', 'fg-subtle'].map((token) =>
@@ -479,6 +556,14 @@ async function main(): Promise<void> {
 
   console.log(
     `✓ --fg-muted and --fg-subtle reach WCAG AA on the canvas and every surface on it, below --fg in that order (lowest: ${lowest.join(', ')})`,
+  );
+
+  console.log(
+    `✓ --accent-fg reaches WCAG AA on every surface it sits on: the canvas, glass, a hovered or selected row, a field, a toast and the sidebar (lowest: ${accentLowest.join(', ')})`,
+  );
+
+  console.log(
+    `✓ --nav-active-fg reaches WCAG AA on the sidebar's current link, on its glass and in the drawer (lowest: ${navLowest.join(', ')})`,
   );
 
   console.log(
