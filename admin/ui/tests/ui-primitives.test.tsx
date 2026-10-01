@@ -1379,9 +1379,60 @@ async function main(): Promise<void> {
   );
   assert(/<svg[^>]*aria-hidden="true"/.test(titledNote), "a Note's icon is decorative");
   assert((/^<div[^>]*class="([^"]*)"/.exec(titledNote)?.[1] ?? '').split(' ').includes('mb-3'), 'a Note appends its className');
+
+  // An optional `action`: one control at the far end of the message, on a row of its own under any title,
+  // wrapping below the message when the line is full. The row is what the pages spelled out by hand.
+  const ACTION_ROW = '<span class="flex flex-wrap items-center justify-between gap-x-3 gap-y-1.5">';
+  const innerOf = (markup: string) => /^<div[^>]*>(.*)<\/div>$/.exec(markup)?.[1] ?? '';
+  const actionNote = renderToStaticMarkup(
+    <Note tone="danger" role="alert" action={<button type="button">Retry</button>}>
+      Failed
+    </Note>,
+  );
+  allNoteMarkup += actionNote;
+  assert(
+    innerOf(actionNote) ===
+      `<div class="min-w-0 flex-1 break-words">${ACTION_ROW}<span>Failed</span><button type="button">Retry</button></span></div>`,
+    `an action follows the message on one flex row, at its far end (got ${innerOf(actionNote)})`,
+  );
+  const titledActionNote = renderToStaticMarkup(
+    <Note tone="danger" icon="alert" role="alert" title="Songs did not load." action={<button type="button">Retry</button>}>
+      The server is down.
+    </Note>,
+  );
+  allNoteMarkup += titledActionNote;
+  assert(
+    titledActionNote.includes(
+      `<b class="font-[750]">Songs did not load.</b> ${ACTION_ROW}<span>The server is down.</span><button type="button">Retry</button></span>`,
+    ),
+    'the title leads, and the message and the action share the row under it',
+  );
+  assert(
+    titledActionNote.indexOf('<svg') !== -1 && titledActionNote.indexOf('<svg') < titledActionNote.indexOf('<b '),
+    'the icon still leads a Note with an action',
+  );
+  const boxOf = (markup: string) => /^<div[^>]*class="([^"]*)"/.exec(markup)?.[1];
+  assert(
+    boxOf(actionNote) === boxOf(renderToStaticMarkup(<Note tone="danger" role="alert">Failed</Note>)),
+    "an action leaves the Note's own box classes as they were",
+  );
+  for (const none of [undefined, null, false] as const) {
+    assert(
+      renderToStaticMarkup(<Note tone="info" action={none}>Body</Note>) === plainNote,
+      `an action of ${String(none)} is no action: the Note is the plain one, with no row`,
+    );
+  }
+  assert(
+    renderToStaticMarkup(
+      <Note tone="warn" icon="alert" title="Global work merge required." className="mb-3" action={null}>
+        Keeps the canonical work.
+      </Note>,
+    ) === titledNote,
+    'a Note with an empty action keeps the title running into its message on one line',
+  );
   assert(!NO_RAW_PALETTE.test(allNoteMarkup), 'Note markup uses no raw palette colours');
 
-  console.log('✓ ui kit: Note wears its tone from TONE_BOX_CLASS, passes role, and leads with an optional icon and bold title');
+  console.log('✓ ui kit: Note wears its tone from TONE_BOX_CLASS, passes role, leads with an optional icon and bold title, and ends its message with an optional action');
 
   // --- Stepper: a labelled <ol> of steps in a glass card ---
 
