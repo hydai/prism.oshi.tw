@@ -2594,11 +2594,39 @@ async function main(): Promise<void> {
     const { initialExtractState } = await import('../src/pages/pipeline-extract-state');
     const noop = () => undefined;
 
-    // Inside the control, 2px, in the accent text colour: the card's clip cannot cut it.
+    // Inside the control, 2px, in the accent text colour: the card's clip cannot cut it. Forced-colors mode (Windows
+    // High Contrast) drops a shadow, so the control also keeps the outline that mode paints, the transparent one
+    // `outline-none` leaves, moved inside by a negative offset: an outline outside would be clipped with the shadow.
     assert(
-      INSET_FOCUS === 'focus-visible:shadow-[inset_0_0_0_2px_var(--accent-fg)]',
-      "the inset focus ring is a 2px inner shadow in the accent text colour, drawn on :focus-visible",
+      INSET_FOCUS ===
+        'focus-visible:shadow-[inset_0_0_0_2px_var(--accent-fg)] focus-visible:outline-none focus-visible:-outline-offset-2',
+      'the inset focus ring is a 2px inner shadow in the accent text colour and an outline-none outline pulled 2px inside, on :focus-visible',
     );
+
+    // In the CSS Tailwind generates for it, the negative offset follows outline-none's own `outline-offset: 2px` at
+    // the same specificity, so it wins: the outline paints inside the control, not outside, where the card clips it.
+    const { default: postcss } = await import('postcss');
+    const { default: tailwindcss } = await import('tailwindcss');
+    const { default: tailwindConfig } = await import('../tailwind.config');
+    const generated = await postcss([
+      tailwindcss({ ...tailwindConfig, content: [{ raw: `<div class="${INSET_FOCUS}"></div>`, extension: 'html' }] }),
+    ]).process('@tailwind utilities;', { from: undefined });
+    let outline = '';
+    let outlineOffset = '';
+    const selectors: string[] = [];
+    postcss.parse(generated.css).walkRules((rule) => {
+      selectors.push(rule.selector);
+      rule.walkDecls((declaration) => {
+        if (declaration.prop === 'outline') outline = declaration.value;
+        if (declaration.prop === 'outline-offset') outlineOffset = declaration.value;
+      });
+    });
+    assert(
+      selectors.length === 3 && selectors.every((selector) => selector.endsWith(':focus-visible')),
+      `the ring is three rules, all on :focus-visible, which add to one another at the same specificity (got ${selectors.join(' | ')})`,
+    );
+    assert(outline === '2px solid transparent', `the outline is the transparent one forced-colors mode paints (got "${outline}")`);
+    assert(outlineOffset === '-2px', `the last outline-offset, the one that wins, is -2px: the outline sits inside (got "${outlineOffset}")`);
 
     // Its classes are written in focus-classes.ts alone: every other site takes the constant.
     const src = new URL('../src/', import.meta.url);
