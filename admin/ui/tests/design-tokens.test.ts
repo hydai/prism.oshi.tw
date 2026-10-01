@@ -1,4 +1,5 @@
-import { readFileSync } from 'node:fs';
+import { readdirSync, readFileSync } from 'node:fs';
+import ts from 'typescript';
 
 function assert(condition: boolean, message: string): asserts condition {
   if (!condition) {
@@ -243,44 +244,54 @@ type SurfaceToken =
   | 'scrim';
 
 /**
- * The stacks `--fg-muted` and `--fg-subtle` text sits on, bottom layer first, each laid over the
- * canvas: a chip on the bare canvas; the sidebar, page header, cards and popovers; a field, chip
- * or key cap on each; a selected row or option, and a chip or inline edit in a selected row; a
- * chip in a card's expanded edit row; the sticky table head; the active option of a list popover;
- * and a dialog over its scrim, with a field in it.
+ * A stack of surface tokens, bottom layer first, and what it is. The label is what a failing check
+ * names when this stack is the one that binds, the lowest contrast of all. It says what is on the
+ * stack; the backdrop says what the stack lies on.
  */
-const TEXT_STACKS: SurfaceToken[][] = [
-  ['field'],
-  ['glass-sidebar'],
-  ['glass-header'],
-  ['glass-card'],
-  ['glass-pop'],
-  ['glass-sidebar', 'field'],
-  ['glass-header', 'field'],
-  ['glass-card', 'field'],
-  ['glass-pop', 'field'],
-  ['glass-card', 'selected-bg'],
-  ['glass-pop', 'selected-bg'],
-  ['glass-card', 'selected-bg', 'field'],
-  ['glass-card', 'field', 'field'],
-  ['glass-card', 'thead-bg'],
-  ['glass-pop', 'tone-neutral-bg'],
-  ['scrim', 'glass-pop'],
-  ['glass-card', 'scrim', 'glass-pop'],
-  ['glass-card', 'scrim', 'glass-pop', 'field'],
+type Stack = { label: string; layers: SurfaceToken[] };
+
+/** A colour some text sits on, and where, as a failing check names it: a stack's label, then what it lies on. */
+type Surface = { colour: Rgb; label: string };
+
+/**
+ * The stacks `--fg-muted` and `--fg-subtle` text sits on, each laid over the canvas: a chip on the
+ * bare canvas; the sidebar, page header, cards and popovers; a field, chip or key cap on each; a
+ * selected row or option, and a chip or inline edit in a selected row; a chip in a card's expanded
+ * edit row; the sticky table head; the active option of a list popover; and a dialog over its
+ * scrim, with a field in it.
+ */
+const TEXT_STACKS: Stack[] = [
+  { label: 'a chip or field', layers: ['field'] },
+  { label: 'the sidebar', layers: ['glass-sidebar'] },
+  { label: 'the page header', layers: ['glass-header'] },
+  { label: 'a card', layers: ['glass-card'] },
+  { label: 'a popover', layers: ['glass-pop'] },
+  { label: 'a chip or field in the sidebar', layers: ['glass-sidebar', 'field'] },
+  { label: 'a chip or field in the page header', layers: ['glass-header', 'field'] },
+  { label: 'a chip or field in a card', layers: ['glass-card', 'field'] },
+  { label: 'a chip or field in a popover', layers: ['glass-pop', 'field'] },
+  { label: 'a selected row in a card', layers: ['glass-card', 'selected-bg'] },
+  { label: 'a selected option of a popover', layers: ['glass-pop', 'selected-bg'] },
+  { label: 'a chip or inline edit in a selected row', layers: ['glass-card', 'selected-bg', 'field'] },
+  { label: "a chip in a card's expanded edit row", layers: ['glass-card', 'field', 'field'] },
+  { label: "a card's sticky table head", layers: ['glass-card', 'thead-bg'] },
+  { label: 'the active option of a list popover', layers: ['glass-pop', 'tone-neutral-bg'] },
+  { label: 'a dialog over its scrim', layers: ['scrim', 'glass-pop'] },
+  { label: 'a dialog over its scrim, over a card', layers: ['glass-card', 'scrim', 'glass-pop'] },
+  { label: 'a field in a dialog over its scrim, over a card', layers: ['glass-card', 'scrim', 'glass-pop', 'field'] },
 ];
 
 /** Popovers, toasts and dialogs also open over the video player's black letterbox. */
-const OVER_PLAYER_STACKS: SurfaceToken[][] = [
-  ['glass-pop'],
-  ['glass-pop', 'field'],
-  ['glass-pop', 'selected-bg'],
-  ['glass-pop', 'tone-neutral-bg'],
-  ['scrim', 'glass-pop'],
-  ['scrim', 'glass-pop', 'field'],
+const OVER_PLAYER_STACKS: Stack[] = [
+  { label: 'a popover', layers: ['glass-pop'] },
+  { label: 'a chip or field in a popover', layers: ['glass-pop', 'field'] },
+  { label: 'a selected option of a popover', layers: ['glass-pop', 'selected-bg'] },
+  { label: 'the active option of a list popover', layers: ['glass-pop', 'tone-neutral-bg'] },
+  { label: 'a dialog over its scrim', layers: ['scrim', 'glass-pop'] },
+  { label: 'a field in a dialog over its scrim', layers: ['scrim', 'glass-pop', 'field'] },
 ];
 
-const PLAYER_BLACK: Rgb = { r: 0, g: 0, b: 0 };
+const PLAYER_BLACK: Surface = { colour: { r: 0, g: 0, b: 0 }, label: "the video player's black" };
 
 /**
  * The stacks only `--accent-fg` reaches on a page, besides those every text sits on. A table link or
@@ -288,24 +299,93 @@ const PLAYER_BLACK: Rgb = { r: 0, g: 0, b: 0 };
  * Nova VODs, Crystal) wears the selected tint with its title in accent, and hovering it lays the
  * hover tint over both.
  */
-const ACCENT_STACKS: SurfaceToken[][] = [
-  ['glass-card', 'row-hover'],
-  ['glass-card', 'selected-bg', 'row-hover'],
+const ACCENT_STACKS: Stack[] = [
+  { label: 'a hovered row in a card', layers: ['glass-card', 'row-hover'] },
+  { label: 'a hovered open row in a card', layers: ['glass-card', 'selected-bg', 'row-hover'] },
 ];
 
 /** Laid on the sidebar (see `sidebarBackings`): the current link's own surface, under `--nav-active-fg`. */
-const SIDEBAR_NAV_STACKS: SurfaceToken[][] = [['nav-active-bg']];
+const SIDEBAR_NAV_STACKS: Stack[] = [{ label: "the sidebar's current link", layers: ['nav-active-bg'] }];
 
 /**
  * Laid on the sidebar, what only `--accent-fg` sits on: the inbox badge's selected tint over an idle,
  * a hovered or the current link, and the pressed theme chip on the active surface inside its field.
  */
-const SIDEBAR_ACCENT_STACKS: SurfaceToken[][] = [
-  ['selected-bg'],
-  ['row-hover', 'selected-bg'],
-  ['nav-active-bg', 'selected-bg'],
-  ['field', 'nav-active-bg'],
+const SIDEBAR_ACCENT_STACKS: Stack[] = [
+  { label: 'the inbox badge on an idle link', layers: ['selected-bg'] },
+  { label: 'the inbox badge on a hovered link', layers: ['row-hover', 'selected-bg'] },
+  { label: 'the inbox badge on the current link', layers: ['nav-active-bg', 'selected-bg'] },
+  { label: 'the pressed theme chip', layers: ['field', 'nav-active-bg'] },
 ];
+
+/**
+ * Every file under `src/` that uses `--accent-fg`, as a Tailwind utility (`text-accent-fg`,
+ * `hover:border-accent-fg`, `ring-accent-fg`, ...) or as the property (`var(--accent-fg)`), by path
+ * from `src/`. The stack lists above are written by hand, so a use on a surface no stack covers goes
+ * unseen unless it is looked for: this is the closed list of the files that use it. A use is a
+ * string, a template or a JSX attribute value that holds the token (see `usesAccentFg`): a comment
+ * that only names it counts for nothing, and index.css declares the property and counts only if it
+ * uses it. A file that starts or stops using it fails the check below until this list says so.
+ */
+const ACCENT_USERS = [
+  'components/WorkMatchCandidateCard.tsx',
+  'components/dashboard/AttentionCard.tsx',
+  'components/harmonizer/Rewritten.tsx',
+  'components/harmonizer/SimilarArtistGroupCard.tsx',
+  'components/harmonizer/SimilarSongGroupCard.tsx',
+  'components/shell/Sidebar.tsx',
+  'components/stamp/InlineEdit.tsx',
+  'components/stamp/StreamPicker.tsx',
+  'components/ui/Fields.tsx',
+  'components/ui/SearchableList.tsx',
+  'components/ui/ThemeToggle.tsx',
+  'components/ui/button-classes.ts',
+  'components/ui/focus-classes.ts',
+  'components/ui/toast.tsx',
+  'components/vod-export/CurrentPublicationPanel.tsx',
+  'components/vod-export/FindingsPanel.tsx',
+  'components/workbench/StampConsole.tsx',
+  'pages/CrystalTickets.tsx',
+  'pages/Dashboard.tsx',
+  'pages/NovaSubmissions.tsx',
+  'pages/NovaVodSubmissions.tsx',
+  'pages/SongDetail.tsx',
+  'pages/StreamDetail.tsx',
+  'pages/StreamsList.tsx',
+  'pages/VodExportRepair.tsx',
+  'pages/pipeline-discover-step.tsx',
+];
+
+/**
+ * Whether the file `path`, whose text is `text`, uses `--accent-fg`. A TypeScript file uses it in a string, a template
+ * or a JSX attribute value: a class name, a `var(--accent-fg)`. A comment that only names it is no use, so a docblock
+ * neither demands a list entry nor hides that a file stopped using it; and a `//` or a `/*` inside a string hides no
+ * use, which is why the file is parsed: a regex that strips comments cannot tell the two apart. A stylesheet declares
+ * the property and talks about it in comments: only a use of it counts.
+ */
+function usesAccentFg(path: string, text: string): boolean {
+  if (path.endsWith('.css')) {
+    return text.replace(/\/\*[\s\S]*?\*\//g, '').replace(/--accent-fg\s*:/g, '').includes('accent-fg');
+  }
+  const file = ts.createSourceFile(path, text, ts.ScriptTarget.Latest, false, path.endsWith('x') ? ts.ScriptKind.TSX : ts.ScriptKind.TS);
+  let found = false;
+  const visit = (node: ts.Node): void => {
+    if (found) return;
+    if ((ts.isStringLiteralLike(node) || ts.isTemplateLiteralToken(node)) && node.text.includes('accent-fg')) found = true;
+    else ts.forEachChild(node, visit);
+  };
+  visit(file);
+  return found;
+}
+
+/** The files under `src/` that use `--accent-fg` right now, in code-point order, as `ACCENT_USERS` is written. */
+function accentFgUsers(): string[] {
+  const src = new URL('../src/', import.meta.url);
+  return readdirSync(src, { recursive: true, encoding: 'utf8' })
+    .filter((entry) => /\.(tsx?|css)$/.test(entry))
+    .filter((entry) => usesAccentFg(entry, readFileSync(new URL(entry, src), 'utf8')))
+    .sort();
+}
 
 type TailwindConfig = {
   darkMode?: unknown;
@@ -421,6 +501,52 @@ async function main(): Promise<void> {
 
   console.log('✓ index.css declares the studio tokens and the two scales only, and defines no class beyond the glass, tooltip and dark ones');
 
+  // --- What counts as a use of --accent-fg ---
+
+  // A string, a template or a JSX attribute value that holds the token. A comment that only names it is no use, and a
+  // // or a /* inside a string hides none: the cases a regex that strips comments gets wrong.
+  for (const [snippet, uses, what] of [
+    ['// the link turns text-accent-fg on hover\nexport const a = 1;', false, 'a line comment naming a utility'],
+    ['/**\n * Draws the ring in var(--accent-fg).\n */\nexport const a = 1;', false, 'a docblock naming the property'],
+    ['/* border-accent-fg */ export const a = 1; // ring-accent-fg', false, 'a block and a line comment on one line'],
+    ['export const a = <p>text-accent-fg is how the link looks</p>;', false, 'JSX text'],
+    ["export const a = 'hover:text-accent-fg';", true, 'a string'],
+    ['export const a = `${b} border-accent-fg`;', true, 'a template literal'],
+    ['export const a = <a href="https://example.com/x" className="text-accent-fg" />;', true, 'a class after a URL, in a JSX attribute'],
+    ["export const url = 'https://example.com/x', a = 'text-accent-fg';", true, 'a // inside a string, before a real use on its line'],
+    ["export const open = '/*', a = 'ring-accent-fg', close = '*/';", true, 'a /* and a */ inside two strings, around a real use'],
+    ["export const a = 'text-accent-fg'; // the docblock names it too", true, 'a use that a comment names as well'],
+  ] as const) {
+    assert(usesAccentFg('snippet.tsx', snippet) === uses, `${what} ${uses ? 'is' : 'is not'} a use of --accent-fg`);
+  }
+  for (const [snippet, uses, what] of [
+    [':root { --accent-fg: #BD2066; }', false, 'a declaration'],
+    ['/* var(--accent-fg) */ a { color: red; }', false, 'a comment'],
+    ['a { color: var(--accent-fg); }', true, 'the property in use'],
+  ] as const) {
+    assert(usesAccentFg('snippet.css', snippet) === uses, `in a stylesheet, ${what} ${uses ? 'is' : 'is not'} a use of --accent-fg`);
+  }
+
+  console.log('✓ a use of --accent-fg is a string, a template or a JSX attribute that holds it: no comment, JSX text or declaration counts, and a // or /* inside a string hides none');
+
+  // --- Every file that uses --accent-fg is one the contrast check below knows about ---
+
+  // The stacks below are written by hand, so a new use of --accent-fg on a surface they do not cover
+  // would pass unseen. The closed list of the files that use it turns that into a failure to resolve.
+  const accentUsers = accentFgUsers();
+  const unseen = accentUsers.filter((file) => !ACCENT_USERS.includes(file));
+  assert(
+    unseen.length === 0,
+    `${unseen.join(', ')} ${unseen.length === 1 ? 'uses' : 'use'} --accent-fg and ${unseen.length === 1 ? 'is' : 'are'} not in ACCENT_USERS: check the surface ${unseen.length === 1 ? 'it sits' : 'they sit'} on against the stacks in this suite (TEXT_STACKS, ACCENT_STACKS, SIDEBAR_ACCENT_STACKS), add a stack for a surface none covers, then add the file to ACCENT_USERS`,
+  );
+  const stale = ACCENT_USERS.filter((file) => !accentUsers.includes(file));
+  assert(
+    stale.length === 0,
+    `${stale.join(', ')} no longer ${stale.length === 1 ? 'uses' : 'use'} --accent-fg: drop ${stale.length === 1 ? 'it' : 'them'} from ACCENT_USERS (and a stack that only ${stale.length === 1 ? 'it' : 'they'} needed)`,
+  );
+
+  console.log(`✓ the ${ACCENT_USERS.length} files that use --accent-fg are exactly those on the closed list its contrast check is held to`);
+
   // --- --fg-muted and --fg-subtle reach WCAG AA (4.5:1) on every surface they sit on ---
 
   const lowest: string[] = [];
@@ -438,13 +564,31 @@ async function main(): Promise<void> {
       assert(value !== undefined, `the ${theme} theme declares --${name}`);
       return value;
     };
-    const canvas = canvasColours(declared('canvas'));
+    const canvas: Surface[] = canvasColours(declared('canvas')).map((colour) => ({ colour, label: 'the bare canvas' }));
     // Every canvas colour alone and under each blob at full strength, wherever the blob sits.
-    const blobs = ['blob-1', 'blob-2', 'blob-3'].flatMap(colours);
-    const backdrops = [...canvas, ...canvas.flatMap((colour) => blobs.map((blob) => over(blob, colour)))];
+    const blobs = ['blob-1', 'blob-2', 'blob-3'].flatMap((name) => colours(name).map((colour) => ({ name, colour })));
+    const backdrops: Surface[] = [
+      ...canvas,
+      ...canvas.flatMap((base) =>
+        blobs.map((blob) => ({ colour: over(blob.colour, base.colour), label: `the canvas under --${blob.name}` })),
+      ),
+    ];
     // Every value a layer is declared with counts, the no-backdrop-filter fallback included.
-    const lay = (bases: Rgb[], stack: SurfaceToken[]): Rgb[] =>
-      stack.reduce((below, layer) => below.flatMap((base) => colours(layer).map((colour) => over(colour, base))), bases);
+    const lay = (bases: Surface[], stack: Stack): Surface[] =>
+      bases.flatMap((base) =>
+        stack.layers
+          .reduce<Rgb[]>((below, layer) => below.flatMap((under) => colours(layer).map((colour) => over(colour, under))), [base.colour])
+          .map((colour) => ({ colour, label: `${stack.label}, on ${base.label}` })),
+      );
+    // Where `text` reads lowest among `among`, and how low: a failing check names the stack that binds.
+    const lowestOn = (text: Rgb, among: Surface[]): { ratio: number; label: string } =>
+      among.reduce(
+        (worst, surface) => {
+          const ratio = contrastRatio(text, surface.colour);
+          return ratio < worst.ratio ? { ratio, label: surface.label } : worst;
+        },
+        { ratio: Infinity, label: 'no surface' },
+      );
     const surfaces = [
       ...TEXT_STACKS.flatMap((stack) => lay(backdrops, stack)),
       ...OVER_PLAYER_STACKS.flatMap((stack) => lay([PLAYER_BLACK], stack)),
@@ -458,20 +602,23 @@ async function main(): Promise<void> {
     ] as const) {
       const value = declared(token);
       const text = parseColour(value);
-      const worst = Math.min(...[...bare, ...surfaces].map((surface) => contrastRatio(text, surface)));
-      assert(worst >= 4.5, `${theme} --${token} ${value} reaches 4.5:1 on every surface it sits on (lowest ${worst.toFixed(2)}:1)`);
-      lowest.push(`${theme} --${token} ${worst.toFixed(2)}:1`);
+      const worst = lowestOn(text, [...bare, ...surfaces]);
+      assert(
+        worst.ratio >= 4.5,
+        `${theme} --${token} ${value} reaches 4.5:1 on every surface it sits on (lowest ${worst.ratio.toFixed(2)}:1, on ${worst.label})`,
+      );
+      lowest.push(`${theme} --${token} ${worst.ratio.toFixed(2)}:1`);
     }
 
     // What the sidebar's content sits on: its own glass, or, in the narrow-screen drawer, the sheet
     // (glass-pop over the scrim) over the page or over the video player's black. The sidebar itself is
     // never over the player.
-    const sidebarBackings = [
-      lay(backdrops, ['glass-sidebar']),
-      lay(backdrops, ['scrim', 'glass-pop']),
-      lay([PLAYER_BLACK], ['scrim', 'glass-pop']),
+    const sidebarBackings: Surface[][] = [
+      lay(backdrops, { label: "the sidebar's glass", layers: ['glass-sidebar'] }),
+      lay(backdrops, { label: "the drawer's sheet", layers: ['scrim', 'glass-pop'] }),
+      lay([PLAYER_BLACK], { label: "the drawer's sheet", layers: ['scrim', 'glass-pop'] }),
     ];
-    const onSidebar = (content: SurfaceToken[][]): Rgb[] =>
+    const onSidebar = (content: Stack[]): Surface[] =>
       sidebarBackings.flatMap((backing) => content.flatMap((stack) => lay(backing, stack)));
 
     // --- --accent-fg reaches WCAG AA (4.5:1) on every surface it sits on ---
@@ -488,27 +635,27 @@ async function main(): Promise<void> {
       ...ACCENT_STACKS.flatMap((stack) => lay(backdrops, stack)),
       ...onSidebar(SIDEBAR_ACCENT_STACKS),
     ];
-    const accentWorst = Math.min(...accentSurfaces.map((surface) => contrastRatio(accentText, surface)));
+    const accentWorst = lowestOn(accentText, accentSurfaces);
     assert(
-      accentWorst >= 4.5,
-      `${theme} --accent-fg ${accentValue} reaches 4.5:1 on every surface it sits on (lowest ${accentWorst.toFixed(2)}:1)`,
+      accentWorst.ratio >= 4.5,
+      `${theme} --accent-fg ${accentValue} reaches 4.5:1 on every surface it sits on (lowest ${accentWorst.ratio.toFixed(2)}:1, on ${accentWorst.label})`,
     );
-    accentLowest.push(`${theme} ${accentWorst.toFixed(2)}:1`);
+    accentLowest.push(`${theme} ${accentWorst.ratio.toFixed(2)}:1`);
 
     // --- --nav-active-fg reaches WCAG AA (4.5:1) on the sidebar's current link ---
 
     const navValue = declared('nav-active-fg');
     const navText = parseColour(navValue);
-    const navWorst = Math.min(...onSidebar(SIDEBAR_NAV_STACKS).map((surface) => contrastRatio(navText, surface)));
+    const navWorst = lowestOn(navText, onSidebar(SIDEBAR_NAV_STACKS));
     assert(
-      navWorst >= 4.5,
-      `${theme} --nav-active-fg ${navValue} reaches 4.5:1 on the sidebar's current link (lowest ${navWorst.toFixed(2)}:1)`,
+      navWorst.ratio >= 4.5,
+      `${theme} --nav-active-fg ${navValue} reaches 4.5:1 on the sidebar's current link (lowest ${navWorst.ratio.toFixed(2)}:1, on ${navWorst.label})`,
     );
-    navLowest.push(`${theme} ${navWorst.toFixed(2)}:1`);
+    navLowest.push(`${theme} ${navWorst.ratio.toFixed(2)}:1`);
 
     // The hierarchy holds: on the canvas, each of the three stands out less than the one before.
     const [fg, muted, subtle] = ['fg', 'fg-muted', 'fg-subtle'].map((token) =>
-      Math.min(...canvas.map((colour) => contrastRatio(parseColour(declared(token)), colour))),
+      Math.min(...canvas.map((surface) => contrastRatio(parseColour(declared(token)), surface.colour))),
     );
     assert(
       fg !== undefined && muted !== undefined && subtle !== undefined && fg > muted && muted > subtle,
@@ -517,9 +664,14 @@ async function main(): Promise<void> {
 
     // --- A hovered row on a glass card, and in the sidebar, is told from one at rest ---
 
-    const rowRests = [...lay(backdrops, ['glass-card']), ...lay(backdrops, ['glass-sidebar'])];
+    const rowRests = [
+      ...lay(backdrops, { label: 'a card', layers: ['glass-card'] }),
+      ...lay(backdrops, { label: 'the sidebar', layers: ['glass-sidebar'] }),
+    ];
     const rowHover = Math.min(
-      ...rowRests.flatMap((rest) => colours('row-hover').map((hover) => contrastRatio(rest, over(hover, rest)))),
+      ...rowRests.flatMap((rest) =>
+        colours('row-hover').map((hover) => contrastRatio(rest.colour, over(hover, rest.colour))),
+      ),
     );
     if (theme === 'light') {
       assert(rowHover >= 1.1, `light --row-hover changes a row on glass by at least 1.10:1 (lowest ${rowHover.toFixed(3)}:1)`);
@@ -535,7 +687,7 @@ async function main(): Promise<void> {
     const pillBackdrops = [
       backdrops,
       ...(['glass-sidebar', 'glass-header', 'glass-card', 'glass-pop'] as const).map((glass) =>
-        lay(backdrops, [glass]),
+        lay(backdrops, { label: glass, layers: [glass] }),
       ),
     ].flat();
     let worstTone = { name: '', ratio: Infinity };
@@ -543,7 +695,7 @@ async function main(): Promise<void> {
       const bgValue = colours(`tone-${tone.name}-bg`);
       const fgValue = declared(`tone-${tone.name}-fg`);
       const text = parseColour(fgValue);
-      const pillSurfaces = pillBackdrops.flatMap((base) => bgValue.map((bg) => over(bg, base)));
+      const pillSurfaces = pillBackdrops.flatMap((base) => bgValue.map((bg) => over(bg, base.colour)));
       const worst = Math.min(...pillSurfaces.map((surface) => contrastRatio(text, surface)));
       assert(
         worst >= 4.5,
