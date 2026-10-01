@@ -1,5 +1,6 @@
-import { readdirSync, readFileSync } from 'node:fs';
+import { readFileSync } from 'node:fs';
 import ts from 'typescript';
+import { sourceFiles } from './helpers/source';
 
 function assert(condition: boolean, message: string): asserts condition {
   if (!condition) {
@@ -380,11 +381,9 @@ function usesAccentFg(path: string, text: string): boolean {
 
 /** The files under `src/` that use `--accent-fg` right now, in code-point order, as `ACCENT_USERS` is written. */
 function accentFgUsers(): string[] {
-  const src = new URL('../src/', import.meta.url);
-  return readdirSync(src, { recursive: true, encoding: 'utf8' })
-    .filter((entry) => /\.(tsx?|css)$/.test(entry))
-    .filter((entry) => usesAccentFg(entry, readFileSync(new URL(entry, src), 'utf8')))
-    .sort();
+  return sourceFiles(['.ts', '.tsx', '.css'])
+    .filter(({ path, text }) => usesAccentFg(path, text))
+    .map(({ path }) => path);
 }
 
 type TailwindConfig = {
