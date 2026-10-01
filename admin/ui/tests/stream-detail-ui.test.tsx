@@ -20,6 +20,7 @@ import { Menu, Popover, type MenuItem } from '../src/components/ui/Popover';
 import { ToastProvider } from '../src/components/ui/toast';
 import { handleInlineEditKeyDown } from '../src/lib/inline-edit';
 import { installIntersectionObserverStub, typeInto } from './helpers/dom';
+import { isKitDangerNote } from './helpers/note';
 import { NO_RAW_PALETTE } from './helpers/palette';
 
 function assert(condition: boolean, message: string): asserts condition {
@@ -1364,7 +1365,7 @@ await act(async () => {
 });
 await settle();
 assert(reloadContainer.innerHTML.includes('Alpha Song Two'), 'the failing-reload mount loads Alpha');
-assert(reloadContainer.querySelector('p[role="alert"]') === null, 'a page that loaded shows no error note');
+assert(reloadContainer.querySelector('div[role="alert"]') === null, 'a page that loaded shows no error note');
 
 const timelineBeforeFailure = reloadContainer.querySelector('[aria-label="Stream timeline"]');
 failNextAlphaDetail = true;
@@ -1374,10 +1375,15 @@ assert(
   countRequests(`/api/streams/${streamAlpha.id}/detail`) === alphaLoadsBeforeFailure + 1,
   'approving the row asked for the reload that fails',
 );
-const failureNote = reloadContainer.querySelector('p[role="alert"]');
+const failureNote = reloadContainer.querySelector('div[role="alert"]');
 assert(
   failureNote !== null && failureNote.textContent.includes('Stream detail is unavailable'),
   'a failed reload shows its error text in a danger note above the body',
+);
+assert(isKitDangerNote(failureNote), 'the failed reload is shown in the kit danger Note');
+assert(
+  failureNote.parentElement?.className === 'mx-4 mt-4 lg:mx-5',
+  "the note keeps the page's gutter, on a wrapper of its own so that it stays the kit's Note",
 );
 assert(
   reloadContainer.querySelector('#performance-row-perf-nav-a1') !== null
@@ -1392,7 +1398,7 @@ assert(
 
 // The next load that succeeds answers for the page again, and the note goes.
 await clickSelector(reloadContainer, '#performance-row-perf-nav-a2 [aria-label="Approve performance"]', 'the row approve button');
-assert(reloadContainer.querySelector('p[role="alert"]') === null, 'a reload that succeeds clears the error note');
+assert(reloadContainer.querySelector('div[role="alert"]') === null, 'a reload that succeeds clears the error note');
 
 await act(async () => {
   reloadRoot.unmount();

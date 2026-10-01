@@ -16,6 +16,7 @@ import { EmptyState, GlassCard, Skeleton } from '../components/ui/Display';
 import { TextInput } from '../components/ui/Fields';
 import { Icon } from '../components/ui/Icon';
 import { isImeKeyDown } from '../components/ui/keyboard';
+import { Note } from '../components/ui/Note';
 import { PageHeader } from '../components/ui/PageHeader';
 import { Pill, StatusPill } from '../components/ui/Pill';
 import { Menu, Popover, type MenuItem } from '../components/ui/Popover';
@@ -773,14 +774,14 @@ export function StreamDetailView({ controller }: { controller: StreamDetailContr
     <div ref={pageRef} className="flex flex-col overflow-x-clip">
       <StreamHeader controller={controller} detail={detail} />
 
-      {/* A reload that failed: the rows below are the last ones that loaded. */}
+      {/* A reload that failed: the rows below are the last ones that loaded. The wrapper carries the page's
+          gutter, so the note stays the kit's. */}
       {error ? (
-        <p
-          role="alert"
-          className="mx-4 mt-4 rounded-radius-lg border border-tone-danger-line bg-tone-danger-bg px-3 py-2 text-token-sm text-tone-danger-fg lg:mx-5"
-        >
-          {error}
-        </p>
+        <div className="mx-4 mt-4 lg:mx-5">
+          <Note tone="danger" icon="alert" role="alert">
+            {error}
+          </Note>
+        </div>
       ) : null}
 
       {/* The Stamp Editor's workbench beside the performances, in the page gutter, split 1.2 : 1 as in
