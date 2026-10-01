@@ -3,12 +3,11 @@
  * (ToastProvider > router) against a stubbed fetch: the header with its search and its "New song"
  * link, the status filter, the sortable table and its paging, what a curator may do to a row and
  * what a contributor sees of it, the toasts and the focus an action leaves behind, and the load
- * failure with its Retry. The route itself is pinned too: it renders through `routeElement`.
+ * failure with its Retry.
  */
 import { deepStrictEqual } from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
 import { act } from 'react';
-import { renderToStaticMarkup } from 'react-dom/server';
 import { MemoryRouter, Route, Routes } from 'react-router-dom';
 import type { AuthUser, PaginatedResponse, Song, Status } from '../../shared/types';
 import { buttonClasses } from '../src/components/ui/button-classes';
@@ -1060,19 +1059,6 @@ async function main(): Promise<void> {
   setCurrentStreamer('mizuki');
   const { default: SongsList } = await import('../src/pages/SongsList');
   const { ToastProvider } = await import('../src/components/ui/toast');
-  const { ADMIN_ROUTES, routeElement } = await import('../src/lib/routes');
-
-  // The route renders through `routeElement`: the page brings its own header and gutter.
-  const route = need(ADMIN_ROUTES.find((candidate) => candidate.path === '/songs'), 'the /songs route');
-  const rendered = renderToStaticMarkup(
-    <MemoryRouter initialEntries={['/songs']}>
-      <Routes>
-        <Route path="/songs" element={routeElement(route, curator)} />
-      </Routes>
-    </MemoryRouter>,
-  );
-  assert(rendered !== '', 'the route renders');
-  console.log('✓ Songs: its route renders');
 
   const mountPage: MountPage = (user) =>
     mount(

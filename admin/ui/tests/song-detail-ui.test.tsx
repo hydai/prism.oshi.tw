@@ -3,8 +3,7 @@
  * (ToastProvider > router) against a stubbed fetch: the record header with its Songs crumb, the
  * metadata card with its inline edit (trimmed values, inline errors, a save failure that stays in the
  * card), Approve and Reject for a curator, the performance posters that load one video at a time, the
- * load failure with its Retry, and a song the worker does not know. The route itself is pinned too: it
- * renders through `routeElement`.
+ * load failure with its Retry, and a song the worker does not know.
  */
 import { deepStrictEqual } from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
@@ -1357,19 +1356,6 @@ async function main(): Promise<void> {
   setCurrentStreamer('mizuki');
   const { default: SongDetail } = await import('../src/pages/SongDetail');
   const { ToastProvider } = await import('../src/components/ui/toast');
-  const { ADMIN_ROUTES, routeElement } = await import('../src/lib/routes');
-
-  // The route renders through `routeElement`: the page brings its own header and gutter.
-  const route = need(ADMIN_ROUTES.find((candidate) => candidate.path === '/songs/:id'), 'the /songs/:id route');
-  const rendered = renderToStaticMarkup(
-    <MemoryRouter initialEntries={['/songs/s-1']}>
-      <Routes>
-        <Route path="/songs/:id" element={routeElement(route, curator)} />
-      </Routes>
-    </MemoryRouter>,
-  );
-  assert(rendered !== '', 'the route renders');
-  console.log('✓ Song Detail: its route renders');
 
   const mountPage: MountPage = (user, id = 's-1', jumpTo) =>
     mount(

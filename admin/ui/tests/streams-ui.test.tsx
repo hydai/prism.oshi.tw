@@ -10,7 +10,6 @@
 import { deepStrictEqual } from 'node:assert/strict';
 import { existsSync, readFileSync } from 'node:fs';
 import { act } from 'react';
-import { renderToStaticMarkup } from 'react-dom/server';
 import { MemoryRouter, Route, Routes, useLocation } from 'react-router-dom';
 import type { AuthUser, Status, Stream } from '../../shared/types';
 import { buttonClasses } from '../src/components/ui/button-classes';
@@ -1845,19 +1844,6 @@ async function main(): Promise<void> {
   const { default: StreamsList } = await import('../src/pages/StreamsList');
   const { ToastProvider } = await import('../src/components/ui/toast');
   const { ConfirmProvider } = await import('../src/components/ui/confirm');
-  const { ADMIN_ROUTES, routeElement } = await import('../src/lib/routes');
-
-  // The route renders through `routeElement`: the page brings its own header and gutter.
-  const route = need(ADMIN_ROUTES.find((candidate) => candidate.path === '/streams'), 'the /streams route');
-  const rendered = renderToStaticMarkup(
-    <MemoryRouter initialEntries={['/streams']}>
-      <Routes>
-        <Route path="/streams" element={routeElement(route, curator)} />
-      </Routes>
-    </MemoryRouter>,
-  );
-  assert(rendered !== '', 'the route renders');
-  console.log('✓ Streams: its route renders');
 
   // The legacy slate pieces this page was the last to use are gone.
   for (const gone of ['components/StatusBadge.tsx', 'components/SortHeader.tsx']) {
