@@ -8,6 +8,7 @@ import { DetailField, SectionLabel } from '../components/ui/DetailField';
 import { EmptyState, GlassCard, Skeleton } from '../components/ui/Display';
 import { Textarea } from '../components/ui/Fields';
 import { Icon, type IconName } from '../components/ui/Icon';
+import { MICRO_LABEL } from '../components/ui/micro-label';
 import { Note } from '../components/ui/Note';
 import { PageHeader } from '../components/ui/PageHeader';
 import { Pill, StatusPill } from '../components/ui/Pill';
@@ -51,8 +52,6 @@ const TYPE_FILTERS: ReadonlyArray<StatusFilterOption<'' | CrystalTicketType>> = 
 
 const STATUS_FILTER_LABEL_ID = 'crystal-ticket-status-filter-label';
 const TYPE_FILTER_LABEL_ID = 'crystal-ticket-type-filter-label';
-/** The uppercase micro label a filter group is named by (spec §4.3). */
-const GROUP_LABEL = 'text-2xs font-bold uppercase tracking-[0.12em] text-fg-subtle';
 
 /** The two statuses a curator moves a ticket between by hand; a reply moves it to replied itself. */
 type TicketStatusChange = Extract<CrystalTicketStatus, 'closed' | 'pending'>;
@@ -202,7 +201,7 @@ export default function CrystalTickets({ user }: { user: AuthUser }) {
             labelledBy={STATUS_FILTER_LABEL_ID}
             className="flex-wrap gap-2"
             heading={
-              <span id={STATUS_FILTER_LABEL_ID} className={GROUP_LABEL}>
+              <span id={STATUS_FILTER_LABEL_ID} className={MICRO_LABEL}>
                 Status
               </span>
             }
@@ -214,7 +213,7 @@ export default function CrystalTickets({ user }: { user: AuthUser }) {
             labelledBy={TYPE_FILTER_LABEL_ID}
             className="flex-wrap gap-2"
             heading={
-              <span id={TYPE_FILTER_LABEL_ID} className={GROUP_LABEL}>
+              <span id={TYPE_FILTER_LABEL_ID} className={MICRO_LABEL}>
                 Type
               </span>
             }

@@ -1,4 +1,5 @@
 import type { ReactNode, Ref } from 'react';
+import { MICRO_LABEL } from './micro-label';
 
 /**
  * Glass bar at the top of `<main>` (spec §5, §8; mockup `.hdr`). From lg up it sticks there
@@ -81,7 +82,7 @@ export function PageHeader({
   // while focus is within it. The crumb stays hidden. Only a hidden title gets these classes: on a
   // visible one, `not-sr-only` would just drop its truncation (or its block's full width) on focus.
   const takesFocus = !!titleRef;
-  const crumbClasses = `text-2xs font-bold uppercase tracking-[0.12em] text-fg-subtle${recordTitle ? '' : ' max-lg:sr-only'}`;
+  const crumbClasses = `${MICRO_LABEL}${recordTitle ? '' : ' max-lg:sr-only'}`;
   const titleClasses = `truncate text-[18px] font-[750] leading-[1.15] tracking-[-0.01em] text-fg${recordTitle ? '' : ' max-lg:sr-only'}${
     takesFocus && !recordTitle ? ' max-lg:focus:not-sr-only' : ''
   }`;

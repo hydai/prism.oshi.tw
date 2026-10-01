@@ -1,7 +1,5 @@
 import type { ReactNode } from 'react';
-
-/** The uppercase micro label (spec §4.3): the look PageHeader's crumb, StatTile and the table heads share. */
-const MICRO_LABEL = 'text-2xs font-bold uppercase tracking-[0.12em] text-fg-subtle';
+import { MICRO_LABEL } from './micro-label';
 
 /** An uppercase micro label for a block of a card: a `<p>` by default, an `<h3>` when it heads a section. */
 export function SectionLabel({ as: Component = 'p', children }: { as?: 'p' | 'h3'; children: ReactNode }) {

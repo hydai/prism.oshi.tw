@@ -9,6 +9,7 @@ import { buttonClasses } from '../components/ui/button-classes';
 import { GlassCard, Skeleton } from '../components/ui/Display';
 import { SearchInput } from '../components/ui/Fields';
 import { Icon } from '../components/ui/Icon';
+import { MICRO_LABEL } from '../components/ui/micro-label';
 import { Note } from '../components/ui/Note';
 import { PageHeader } from '../components/ui/PageHeader';
 import { StatusPill } from '../components/ui/Pill';
@@ -35,8 +36,6 @@ const STATUS_FILTERS: ReadonlyArray<StatusFilterOption<'' | Status>> = [
 
 const STATUS_FILTER_LABEL_ID = 'streams-status-filter-label';
 const YEAR_FILTER_LABEL_ID = 'streams-year-filter-label';
-/** The uppercase micro label a filter group is named by (spec §4.3). */
-const GROUP_LABEL = 'text-2xs font-bold uppercase tracking-[0.12em] text-fg-subtle';
 const OUTLINED_ICON_BUTTON = 'border border-field-line bg-field';
 
 /** The status each stream with a request out is heading for. */
@@ -545,7 +544,7 @@ export default function StreamsList({ user }: { user: AuthUser }) {
             labelledBy={STATUS_FILTER_LABEL_ID}
             className="flex-wrap gap-2"
             heading={
-              <span id={STATUS_FILTER_LABEL_ID} className={GROUP_LABEL}>
+              <span id={STATUS_FILTER_LABEL_ID} className={MICRO_LABEL}>
                 Status
               </span>
             }
@@ -558,7 +557,7 @@ export default function StreamsList({ user }: { user: AuthUser }) {
               labelledBy={YEAR_FILTER_LABEL_ID}
               className="flex-wrap gap-2"
               heading={
-                <span id={YEAR_FILTER_LABEL_ID} className={GROUP_LABEL}>
+                <span id={YEAR_FILTER_LABEL_ID} className={MICRO_LABEL}>
                   Year
                 </span>
               }
