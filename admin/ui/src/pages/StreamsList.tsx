@@ -13,12 +13,12 @@ import { Note } from '../components/ui/Note';
 import { PageHeader } from '../components/ui/PageHeader';
 import { StatusPill } from '../components/ui/Pill';
 import { Menu, Popover, type MenuItem } from '../components/ui/Popover';
+import { StoredTime } from '../components/ui/StoredTime';
 import { HeadCell, SortHeader, Table, TableEmptyRow, THead, type SortDirection } from '../components/ui/Table';
 import { CELL_X, FIRST_CELL_X, LAST_CELL_X } from '../components/ui/table-cells';
 import { useToast } from '../components/ui/toast';
 import { useSearchParamState } from '../hooks/useSearchParamState';
 import { errorMessage, useApiResource } from '../lib/apiResource';
-import { formatFullTime, formatWhen, storedTimeIso } from '../lib/dates';
 import { loadStreamsFilter, saveStreamsFilter, resolveYear } from '../lib/streamsFilter';
 import { streamStatusActions } from './stream-detail-actions';
 
@@ -207,13 +207,7 @@ function StreamRow({ stream, curator, today, acting, onChange }: StreamRowProps)
         </div>
       </td>
       <td className={curator ? CELL_X : LAST_CELL_X}>
-        <time
-          dateTime={storedTimeIso(stream.createdAt)}
-          title={formatFullTime(stream.createdAt)}
-          className="whitespace-nowrap text-[11.5px] text-fg-muted"
-        >
-          {formatWhen(stream.createdAt, today)}
-        </time>
+        <StoredTime value={stream.createdAt} today={today} className="whitespace-nowrap text-[11.5px] text-fg-muted" />
       </td>
       {curator ? (
         <td className={LAST_CELL_X}>

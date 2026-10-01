@@ -2123,6 +2123,76 @@ async function main(): Promise<void> {
     console.log('✓ DetailField and SectionLabel: a dt / dd group for the page\'s <dl>, and the uppercase micro label as a <p> or <h3>');
   }
 
+  // --- StoredTime: the studio pages' one <time> for a stored time ---
+
+  {
+    const { readFileSync } = await import('node:fs');
+    const { StoredTime } = await import('../src/components/ui/StoredTime');
+    const { formatFullTime, formatWhen, storedTimeIso } = await import('../src/lib/dates');
+
+    // The page opened in mid-June 2030 (local time), a year the real clock has not reached: a time from that
+    // year reads without its year, so an element that read the clock instead of `today` would be caught.
+    const today = new Date(2030, 5, 15, 12, 0, 0);
+    const CELL = 'whitespace-nowrap text-[11.5px] text-fg-muted';
+
+    // The markup the Songs and Streams cells wrote inline before the element existed, attribute for attribute:
+    // dateTime, title, then the class.
+    for (const value of ['2030-01-15 12:30:00', '2020-03-04 08:15:00', '2019-12-31 23:59:59', '2030-02-01T08:30:00Z']) {
+      const iso = storedTimeIso(value);
+      const full = formatFullTime(value);
+      const short = formatWhen(value, today);
+      assert(
+        renderToStaticMarkup(<StoredTime value={value} today={today} />) ===
+          `<time dateTime="${iso}" title="${full}">${short}</time>`,
+        `${value}: a <time> with the exact instant, the full time and the short form, and no class attribute`,
+      );
+      assert(
+        renderToStaticMarkup(<StoredTime value={value} today={today} className={CELL} />) ===
+          `<time dateTime="${iso}" title="${full}" class="${CELL}">${short}</time>`,
+        `${value}: className is the last attribute, as the cells' own <time> had it`,
+      );
+    }
+    assert(
+      /^[A-Z][a-z]{2} \d{1,2}, \d{2}:\d{2}$/.test(formatWhen('2030-01-15 12:30:00', today)) &&
+        /^\d{4}-\d{2}-\d{2}$/.test(formatWhen('2020-03-04 08:15:00', today)),
+      'a time from the page\'s year reads "Jan 15, 20:30" and one from another year "2020-03-04"',
+    );
+    assert(
+      renderToStaticMarkup(<StoredTime value="2030-01-15 12:30:00" today={today} />).includes(
+        `dateTime="${new Date(Date.UTC(2030, 0, 15, 12, 30, 0)).toISOString()}"`,
+      ),
+      'a stored time is UTC: its instant is that, not the reader\'s local reading of it',
+    );
+    assert(
+      renderToStaticMarkup(<StoredTime value="not a time" today={today} />) ===
+        '<time dateTime="not a time" title="not a time">not a time</time>',
+      'a value that is no time is shown as it is, in all three places',
+    );
+
+    // Songs, Song Detail, Streams and Crystal share it: none keeps its own <time> or its own copy.
+    for (const page of ['SongsList', 'SongDetail', 'StreamsList', 'CrystalTickets']) {
+      const source = readFileSync(new URL(`../src/pages/${page}.tsx`, import.meta.url), 'utf8');
+      assert(
+        source.includes("from '../components/ui/StoredTime'") && source.includes('<StoredTime '),
+        `${page} renders its stored times with the kit element`,
+      );
+      assert(
+        !source.includes('<time') && !source.includes('function StoredTime') && !source.includes('storedTimeIso'),
+        `${page} keeps no <time> and no private copy of its own`,
+      );
+    }
+    // The two table cells keep the look they gave their <time>, and show their own row's creation time.
+    for (const [page, cell] of [
+      ['SongsList', '<StoredTime value={song.createdAt} today={today} className'],
+      ['StreamsList', '<StoredTime value={stream.createdAt} today={today} className'],
+    ] as const) {
+      const source = readFileSync(new URL(`../src/pages/${page}.tsx`, import.meta.url), 'utf8');
+      assert(source.includes(`${cell}="${CELL}" />`), `${page}'s Created cell is the kit element in the cell look, for its row's createdAt`);
+    }
+
+    console.log('✓ StoredTime: a <time> with the exact instant, the full time and the short form, shared by Songs, Song Detail, Streams and Crystal');
+  }
+
   // --- Field: a label, the page's control, a hint and an error, tied together by ids ---
 
   {

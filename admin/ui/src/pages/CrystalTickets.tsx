@@ -12,10 +12,10 @@ import { Note } from '../components/ui/Note';
 import { PageHeader } from '../components/ui/PageHeader';
 import { Pill, StatusPill } from '../components/ui/Pill';
 import { statusTone, TONE_BOX_CLASS, TONE_TEXT_CLASS, type Tone } from '../components/ui/pill-core';
+import { StoredTime } from '../components/ui/StoredTime';
 import { useToast } from '../components/ui/toast';
 import { useRowDrafts, type RowDrafts } from '../hooks/useRowDrafts';
 import { errorMessage, useApiResource } from '../lib/apiResource';
-import { formatFullTime, formatWhen, storedTimeIso } from '../lib/dates';
 import { NO_RECENT_ACTIONS, visibleTickets } from '../lib/review-lists';
 import { countByStatus, replaceById } from '../lib/status-totals';
 
@@ -62,15 +62,6 @@ type TicketAction = 'reply' | TicketStatusChange;
 
 /** The tickets with a request out, each with what it is out for. */
 const NO_ACTIONS: ReadonlyMap<string, TicketAction> = new Map();
-
-/** A stored time: the short form in the row, the full time on hover and the exact instant for machines. */
-function StoredTime({ value, today }: { value: string; today: Date }) {
-  return (
-    <time dateTime={storedTimeIso(value)} title={formatFullTime(value)}>
-      {formatWhen(value, today)}
-    </time>
-  );
-}
 
 /** The header's count: how many tickets there are, whatever the filters keep. */
 function countText(total: number): string {

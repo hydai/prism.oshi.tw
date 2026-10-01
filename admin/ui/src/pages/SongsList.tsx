@@ -12,12 +12,12 @@ import { Icon } from '../components/ui/Icon';
 import { Note } from '../components/ui/Note';
 import { PageHeader } from '../components/ui/PageHeader';
 import { StatusPill } from '../components/ui/Pill';
+import { StoredTime } from '../components/ui/StoredTime';
 import { HeadCell, SortHeader, Table, TableEmptyRow, THead, type SortDirection } from '../components/ui/Table';
 import { CELL_X, FIRST_CELL_X, LAST_CELL_X } from '../components/ui/table-cells';
 import { Segmented } from '../components/ui/Toggles';
 import { useToast } from '../components/ui/toast';
 import { errorMessage, useApiResource } from '../lib/apiResource';
-import { formatFullTime, formatWhen, storedTimeIso } from '../lib/dates';
 
 type SortKey = 'title' | 'originalArtist' | 'status' | 'createdAt';
 
@@ -88,13 +88,7 @@ function SongRow({ song, curator, today, acting, onDecide }: SongRowProps) {
         <StatusPill status={song.status} />
       </td>
       <td className={curator ? CELL_X : LAST_CELL_X}>
-        <time
-          dateTime={storedTimeIso(song.createdAt)}
-          title={formatFullTime(song.createdAt)}
-          className="whitespace-nowrap text-[11.5px] text-fg-muted"
-        >
-          {formatWhen(song.createdAt, today)}
-        </time>
+        <StoredTime value={song.createdAt} today={today} className="whitespace-nowrap text-[11.5px] text-fg-muted" />
       </td>
       {curator ? (
         <td className={LAST_CELL_X}>
