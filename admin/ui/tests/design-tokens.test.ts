@@ -77,10 +77,10 @@ function contrastRatio(a: Rgb, b: Rgb): number {
   return ((lighter ?? 0) + 0.05) / ((darker ?? 0) + 0.05);
 }
 
-/** The colours of a `--canvas` value: a solid colour, or a gradient's stops and every 5% between them. */
-function canvasColours(value: string): Rgb[] {
+/** The colours of `--name`'s value: a solid colour, or a gradient's stops and every 5% between them. */
+function gradientColours(name: string, value: string): Rgb[] {
   const stops = (value.match(/#[0-9a-f]{6}/gi) ?? []).map(parseColour);
-  assert(stops.length > 0, `--canvas holds at least one #RRGGBB colour (found ${value})`);
+  assert(stops.length > 0, `--${name} holds at least one #RRGGBB colour (found ${value})`);
   return stops.flatMap((stop, index) => {
     const next = stops[index + 1];
     if (next === undefined) return [stop];
@@ -120,6 +120,10 @@ const TOKENS: Array<{ name: string; light: string; dark: string }> = [
     light: 'linear-gradient(135deg, #F472B6, #60A5FA)',
     dark: 'linear-gradient(135deg, #F472B6, #60A5FA)',
   },
+  // The primary button's label on --accent-gradient (not in the spec table): the mockups' white
+  // reaches only 2.54–2.83:1 on it. The palette's dark ink, the same in both themes since the
+  // gradient is; the contrast check below holds it to 4.5:1 on every colour of the gradient.
+  { name: 'accent-gradient-fg', light: '#1E1B2E', dark: '#1E1B2E' },
   // Not spec §4.1's #DB2777: the same hue (HSL 333°, saturation 71%), lightness 50.6% → 43.3%. That
   // value reaches only 3.5:1 on a hovered open row and 3.6:1 on the page header, and it colours
   // links, a toast's action and the sidebar badge, which are text. The contrast check below holds
@@ -551,6 +555,7 @@ async function main(): Promise<void> {
   const lowest: string[] = [];
   const accentLowest: string[] = [];
   const navLowest: string[] = [];
+  const gradientLowest: string[] = [];
   const toneLowest: string[] = [];
   const rowHoverLowest: string[] = [];
   for (const [theme, declarations] of [
@@ -563,7 +568,7 @@ async function main(): Promise<void> {
       assert(value !== undefined, `the ${theme} theme declares --${name}`);
       return value;
     };
-    const canvas: Surface[] = canvasColours(declared('canvas')).map((colour) => ({ colour, label: 'the bare canvas' }));
+    const canvas: Surface[] = gradientColours('canvas', declared('canvas')).map((colour) => ({ colour, label: 'the bare canvas' }));
     // Every canvas colour alone and under each blob at full strength, wherever the blob sits.
     const blobs = ['blob-1', 'blob-2', 'blob-3'].flatMap((name) => colours(name).map((colour) => ({ name, colour })));
     const backdrops: Surface[] = [
@@ -652,6 +657,23 @@ async function main(): Promise<void> {
     );
     navLowest.push(`${theme} ${navWorst.ratio.toFixed(2)}:1`);
 
+    // --- --accent-gradient-fg reaches WCAG AA (4.5:1) on every colour of --accent-gradient ---
+
+    // The primary button's label. The gradient runs corner to corner, so the label sits on its middle,
+    // where it is darkest (the pink and the blue mix to a dimmer violet); hover's brightness(1.05) only
+    // lightens it.
+    const gradientFgValue = declared('accent-gradient-fg');
+    const gradientWorst = Math.min(
+      ...gradientColours('accent-gradient', declared('accent-gradient')).map((colour) =>
+        contrastRatio(parseColour(gradientFgValue), colour),
+      ),
+    );
+    assert(
+      gradientWorst >= 4.5,
+      `${theme} --accent-gradient-fg ${gradientFgValue} reaches 4.5:1 on every colour of --accent-gradient (lowest ${gradientWorst.toFixed(2)}:1)`,
+    );
+    gradientLowest.push(`${theme} ${gradientWorst.toFixed(2)}:1`);
+
     // The hierarchy holds: on the canvas, each of the three stands out less than the one before.
     const [fg, muted, subtle] = ['fg', 'fg-muted', 'fg-subtle'].map((token) =>
       Math.min(...canvas.map((surface) => contrastRatio(parseColour(declared(token)), surface.colour))),
@@ -718,6 +740,10 @@ async function main(): Promise<void> {
   );
 
   console.log(
+    `✓ --accent-gradient-fg, the primary button's label, reaches WCAG AA on every colour of --accent-gradient (lowest: ${gradientLowest.join(', ')})`,
+  );
+
+  console.log(
     `✓ every tone's pill text reaches WCAG AA (4.5:1) on its own pill background (lowest: ${toneLowest.join(', ')})`,
   );
 
@@ -781,6 +807,10 @@ async function main(): Promise<void> {
   assert(colors['row-hover'] === 'var(--row-hover)', "colors['row-hover'] maps to var(--row-hover)");
   assert(colors['danger-solid'] === 'var(--danger-solid)', "colors['danger-solid'] maps to var(--danger-solid)");
   assert(colors['thead-bg'] === 'var(--thead-bg)', "colors['thead-bg'] maps to var(--thead-bg)");
+  assert(
+    colors['accent-gradient-fg'] === 'var(--accent-gradient-fg)',
+    "colors['accent-gradient-fg'] maps to var(--accent-gradient-fg)",
+  );
 
   const tone = colors.tone as Record<string, Record<string, unknown>> | undefined;
   for (const t of TONES) {
