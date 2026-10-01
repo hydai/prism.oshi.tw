@@ -4,6 +4,7 @@ import { parseTextToSongs, parsedSongKey } from '../../../../shared/parse';
 import { Button } from '../ui/Button';
 import { Dialog } from '../ui/Dialog';
 import { Checkbox, Textarea } from '../ui/Fields';
+import { MICRO_LABEL } from '../ui/micro-label';
 
 const DEFAULT_EXAMPLE = '0:00 Song Title / Artist Name\n3:45 Another Song - Another Artist\n7:20 Third Song';
 const DEFAULT_REPLACE_LABEL = 'Replace existing performances (delete current songs first)';
@@ -108,7 +109,7 @@ export function PasteImportModal({
             <div className="mt-2 max-h-48 overflow-y-auto rounded-radius-lg border border-field-line bg-field">
               <table className="w-full text-left text-token-sm">
                 <thead className="sticky top-0 border-b border-line-soft bg-field">
-                  <tr className="text-2xs font-bold uppercase tracking-[0.12em] text-fg-subtle">
+                  <tr className={MICRO_LABEL}>
                     <th className="px-3 py-2">#</th>
                     <th className="px-3 py-2">Start</th>
                     <th className="px-3 py-2">End</th>

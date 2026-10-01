@@ -1,5 +1,6 @@
 import type { ReactNode, Ref } from 'react';
 import { Icon, type IconName } from './Icon';
+import { MICRO_LABEL } from './micro-label';
 import type { Tone } from './Pill';
 
 const PADDING_CLASSES: Record<'none' | 'sm' | 'md', string> = {
@@ -65,7 +66,7 @@ export function StatTile({
   const valueToneClass = tone ? TONE_TEXT_CLASSES[tone] : 'text-fg';
   return (
     <div className="glass-card rounded-[14px] px-3.5 py-2.5 shadow-card">
-      <div className="text-2xs font-bold uppercase tracking-[0.12em] text-fg-subtle">{label}</div>
+      <div className={MICRO_LABEL}>{label}</div>
       <div className="mt-0.5 flex items-baseline gap-1.5">
         <span className={`text-token-xl font-[750] tracking-[-0.01em] ${valueToneClass}`}>{value}</span>
         {hint ? (

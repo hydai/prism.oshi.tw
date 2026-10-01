@@ -1,5 +1,6 @@
 import type { ReactNode } from 'react';
 import { Icon } from './Icon';
+import { MICRO_LABEL_TYPE } from './micro-label';
 
 export type SortDirection = 'asc' | 'desc';
 export type HeadAlign = 'start' | 'end';
@@ -8,10 +9,11 @@ export type HeadAlign = 'start' | 'end';
  * Shared 9.5px/700/uppercase/.12em "column head" look (spec §4.3), used by every head cell —
  * sortable (`SortHeader`'s button) or not (`HeadCell`) — so a page's non-sortable heads (a
  * select-all checkbox, "Tags", "Work ID", an sr-only "Actions" label) don't have to hand-copy it
- * (I2). Colour is deliberately not included: a plain head is `text-fg-subtle`, but `SortHeader`'s
- * active column is `text-fg`.
+ * (I2). It is the micro label's type (`micro-label.ts`) and its colour is deliberately not included:
+ * a plain head is `text-fg-subtle`, the colour of the whole micro label, but `SortHeader`'s active
+ * column is `text-fg`.
  */
-const HEAD_LABEL = 'text-2xs font-bold uppercase tracking-[0.12em]';
+const HEAD_LABEL = MICRO_LABEL_TYPE;
 
 /**
  * Shared structural look for every `<th>` in a `THead`: height, padding, vertical centring, and
