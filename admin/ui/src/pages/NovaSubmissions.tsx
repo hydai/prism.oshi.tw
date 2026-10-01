@@ -30,6 +30,7 @@ import { EmptyState, GlassCard, Skeleton } from '../components/ui/Display';
 import { Field } from '../components/ui/Field';
 import { fieldDescription, fieldErrorId } from '../components/ui/field-core';
 import { Checkbox, SearchInput, Textarea, TextInput } from '../components/ui/Fields';
+import { HorizontalScroll } from '../components/ui/HorizontalScroll';
 import { Icon, type IconName } from '../components/ui/Icon';
 import { MICRO_LABEL } from '../components/ui/micro-label';
 import { Note } from '../components/ui/Note';
@@ -531,7 +532,7 @@ function BulkFetchNote({ result }: { result: BulkFetchSubscribersResponse }) {
  */
 function SubmissionsTable({ children }: { children: ReactNode }) {
   return (
-    <div className="overflow-x-auto [container-type:inline-size]">
+    <HorizontalScroll className="overflow-x-auto [container-type:inline-size]">
       <table aria-label="VTuber submissions" className="block min-w-[880px]">
         <thead className="block">
           <tr className={`${ROW_GRID} grid items-center border-b border-line-soft px-3 py-2`}>
@@ -548,7 +549,7 @@ function SubmissionsTable({ children }: { children: ReactNode }) {
         </thead>
         {children}
       </table>
-    </div>
+    </HorizontalScroll>
   );
 }
 

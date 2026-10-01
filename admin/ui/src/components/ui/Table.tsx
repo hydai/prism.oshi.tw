@@ -1,5 +1,6 @@
 import type { ReactNode } from 'react';
 import { INSET_FOCUS } from './focus-classes';
+import { HorizontalScroll } from './HorizontalScroll';
 import { Icon } from './Icon';
 import { MICRO_LABEL_TYPE } from './micro-label';
 
@@ -36,15 +37,16 @@ const HEAD_CELL = 'h-[38px] whitespace-nowrap px-4 align-middle shadow-[inset_0_
  * `<main>` instead of being trapped in here (ruling R24). A `GlassCard` that wraps a `Table` must
  * clip its corners with `overflow-clip`, never `overflow-hidden` / `overflow-auto` — both of those
  * establish a scroll container too, which breaks the sticky head the same way this wrapper would
- * above 1280 px.
+ * above 1280 px. The wrapper is the kit's `HorizontalScroll`, so a control the keyboard reaches in a
+ * row the wrapper's edge cuts is scrolled wholly into view.
  */
 export function Table({ children, className }: { children: ReactNode; className?: string }) {
   return (
-    <div className="max-xl:overflow-x-auto">
+    <HorizontalScroll className="max-xl:overflow-x-auto">
       <table className={className ? `w-full border-collapse ${className}` : 'w-full border-collapse'}>
         {children}
       </table>
-    </div>
+    </HorizontalScroll>
   );
 }
 
