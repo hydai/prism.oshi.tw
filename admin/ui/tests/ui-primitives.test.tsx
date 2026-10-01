@@ -1750,6 +1750,108 @@ async function main(): Promise<void> {
 
   console.log('✓ ui kit: Table scrolls horizontally only below 1280px, THead sticks from 1280px up, opaque with no blur, TableEmptyRow renders a spanning row');
 
+  // --- HorizontalScroll: a sideways scroller that brings the control the keyboard focuses into view ---
+
+  {
+    const { act } = await import('react');
+    const { mount } = await import('./helpers/dom');
+    const { HorizontalScroll } = await import('../src/components/ui/HorizontalScroll');
+
+    // A browser scrolls a focused control in only when it is wholly out of view: one the scroller's edge half-hides
+    // stays half-hidden. The scroller asks for it in full, as little as that takes (`nearest` on both axes).
+    const asked: Array<{ control: Element; options: unknown }> = [];
+    // Read through a call: TypeScript keeps an asserted `asked.length` narrowed to its literal afterwards.
+    const askedCount = (): number => asked.length;
+    const original = Element.prototype.scrollIntoView;
+    Element.prototype.scrollIntoView = function record(this: Element, options?: boolean | ScrollIntoViewOptions) {
+      asked.push({ control: this, options });
+    };
+    try {
+      const box = await mount(
+        <>
+          <HorizontalScroll className="overflow-x-auto">
+            <button type="button">Inside</button>
+            <a href="#row">A link inside</a>
+          </HorizontalScroll>
+          <button type="button">Outside</button>
+        </>,
+      );
+      const [inside, outside] = [...box.container.querySelectorAll('button')];
+      const link = box.container.querySelector('a');
+      assert(inside !== undefined && outside !== undefined && link !== null, 'the scroller and its controls render');
+      await act(async () => inside.focus());
+      assert(
+        askedCount() === 1 && asked[0]?.control === inside,
+        `a control focused inside the scroller asks to be scrolled into view (asked ${askedCount()} times)`,
+      );
+      assert(
+        JSON.stringify(asked[0]?.options) === JSON.stringify({ block: 'nearest', inline: 'nearest' }),
+        `as little as that takes, on both axes: nearest, nearest (got ${JSON.stringify(asked[0]?.options)})`,
+      );
+      await act(async () => link.focus());
+      assert(askedCount() === 2 && asked[1]?.control === link, 'and so does the next one, a link');
+      await act(async () => outside.focus());
+      assert(askedCount() === 2, 'a control focused outside any scroller asks nothing');
+
+      // The scroller keeps room between a control it brings in and its edge, for the control's 3 px focus ring.
+      const scroller = inside.parentElement;
+      assert(scroller !== null, 'the scroller wraps its controls');
+      const padding = scroller.className.split(' ').filter((name) => name.startsWith('scroll-'));
+      assert(scroller.classList.contains('overflow-x-auto') && padding.length === 1, `the scroller keeps the overflow it was given and adds one scroll padding (got "${scroller.className}")`);
+      const { default: postcss } = await import('postcss');
+      const { default: tailwindcss } = await import('tailwindcss');
+      const { default: tailwindConfig } = await import('../tailwind.config');
+      const css = await postcss([
+        tailwindcss({ ...tailwindConfig, content: [{ raw: `<div class="${padding.join(' ')}"></div>`, extension: 'html' }] }),
+      ]).process('@tailwind utilities;', { from: undefined });
+      const sides: Record<string, string> = {};
+      postcss.parse(css.css).walkDecls((declaration) => {
+        sides[declaration.prop] = declaration.value;
+      });
+      const px = (value: string | undefined) => (value?.endsWith('rem') ? parseFloat(value) * 16 : parseFloat(value ?? ''));
+      assert(
+        px(sides['scroll-padding-left']) >= 6 && px(sides['scroll-padding-right']) >= 6,
+        `the scroll padding is at least 6 px on both sides, for the 3 px ring (got ${JSON.stringify(sides)})`,
+      );
+      await box.unmount();
+
+      // The kit Table's wrapper is one.
+      const table = await mount(
+        <Table>
+          <tbody>
+            <tr>
+              <td>
+                <button type="button">In a cell</button>
+              </td>
+            </tr>
+          </tbody>
+        </Table>,
+      );
+      const cellButton = table.container.querySelector('button');
+      assert(cellButton !== null, 'the cell button renders');
+      await act(async () => cellButton.focus());
+      assert(askedCount() === 3 && asked[2]?.control === cellButton, "a control focused in the kit Table's scroller asks to be scrolled into view");
+      const wrapper = table.container.querySelector('table')?.parentElement;
+      assert(
+        wrapper !== null && wrapper !== undefined && wrapper.className.split(' ').includes(padding[0] ?? ''),
+        "the kit Table's wrapper carries the scroll padding",
+      );
+      await table.unmount();
+    } finally {
+      Element.prototype.scrollIntoView = original;
+    }
+
+    // The pages' sideways scrollers are this one: Nova's, Nova VODs' and the Songs filter's, besides the kit Table.
+    const sources = sourceFiles();
+    for (const file of ['components/ui/Table.tsx', 'pages/NovaSubmissions.tsx', 'pages/NovaVodSubmissions.tsx', 'pages/SongsList.tsx']) {
+      const text = sources.find((source) => source.path === file)?.text ?? '';
+      assert(text.includes('<HorizontalScroll'), `src/${file} scrolls sideways through the kit's HorizontalScroll`);
+      assert(!/<div[^>]*overflow-x-auto/.test(text), `src/${file} keeps no sideways scroller of its own`);
+    }
+
+    console.log('✓ HorizontalScroll: a control focused inside it asks to be scrolled into view (nearest, nearest), with room for its ring, and the kit Table, Nova, Nova VODs and the Songs filter scroll through it');
+  }
+
   // --- table-cells: the shared column padding GlobalWorks (and later Pipeline/Dashboard) import ---
 
   const { CELL_X, FIRST_CELL_X, LAST_CELL_X } = await import('../src/components/ui/table-cells');

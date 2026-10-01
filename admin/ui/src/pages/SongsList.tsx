@@ -8,6 +8,7 @@ import { Button } from '../components/ui/Button';
 import { buttonClasses } from '../components/ui/button-classes';
 import { GlassCard, Skeleton } from '../components/ui/Display';
 import { SearchInput } from '../components/ui/Fields';
+import { HorizontalScroll } from '../components/ui/HorizontalScroll';
 import { Icon } from '../components/ui/Icon';
 import { Note } from '../components/ui/Note';
 import { PageHeader } from '../components/ui/PageHeader';
@@ -314,14 +315,14 @@ export default function SongsList({ user }: { user: AuthUser }) {
 
       <div className="flex flex-col gap-3 p-4 lg:px-5 lg:pb-[18px]">
         {/* Six options outgrow a phone: there the filter scrolls, not the page. */}
-        <div className="min-w-0 max-w-full overflow-x-auto">
+        <HorizontalScroll className="min-w-0 max-w-full overflow-x-auto">
           <Segmented
             label="Filter songs by status"
             value={statusFilter}
             onChange={handleStatusChange}
             options={STATUS_OPTIONS}
           />
-        </div>
+        </HorizontalScroll>
 
         {list.error !== null ? (
           <Note

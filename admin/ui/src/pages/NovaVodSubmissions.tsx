@@ -11,6 +11,7 @@ import { DetailField, SectionLabel } from '../components/ui/DetailField';
 import { EmptyState, GlassCard, Skeleton } from '../components/ui/Display';
 import { Select, Textarea } from '../components/ui/Fields';
 import { INSET_FOCUS } from '../components/ui/focus-classes';
+import { HorizontalScroll } from '../components/ui/HorizontalScroll';
 import { Icon, type IconName } from '../components/ui/Icon';
 import { MICRO_LABEL } from '../components/ui/micro-label';
 import { Note } from '../components/ui/Note';
@@ -484,7 +485,7 @@ function VodGroupCard({
  */
 function VodTable({ label, children }: { label: string; children: ReactNode }) {
   return (
-    <div className="overflow-x-auto [container-type:inline-size]">
+    <HorizontalScroll className="overflow-x-auto [container-type:inline-size]">
       <table aria-label={label} className="block min-w-[820px]">
         <thead className="block">
           <tr className={`${ROW_GRID} grid items-center border-b border-line-soft px-3 py-2`}>
@@ -501,7 +502,7 @@ function VodTable({ label, children }: { label: string; children: ReactNode }) {
         </thead>
         {children}
       </table>
-    </div>
+    </HorizontalScroll>
   );
 }
 
