@@ -33,6 +33,13 @@ import type { ReactNode, Ref } from 'react';
  * widest single control. Uncapped, it kept its one-line width wherever it landed, and a set of
  * controls wider than the bar pushed `<main>` into a sideways scroll (between 640 and ~740px, just
  * above the 640px `max-sm:w-full` that caps it below).
+ *
+ * A header with nothing to show below lg takes no room there. Below 1024px its crumb, <h1> and title
+ * block are visually hidden, so one with no `children`, `actions`, `meta` row, `recordTitle` or
+ * `titleRef` would still draw its `min-h-[62px]` glass bar, empty (the Submit pages have such a
+ * header). It carries `max-lg:sr-only` itself, never `hidden`, which would take its <h1> out of the
+ * accessibility tree: the bar leaves the flow and paints nothing (the clip takes the `::before` glass
+ * with it). From lg up it is the header it always was.
  */
 export function PageHeader({
   crumb,
@@ -85,11 +92,16 @@ export function PageHeader({
   if (recordTitle) titleBlockClasses = 'min-w-0 flex-1 basis-[20rem] max-sm:w-full';
   else if (meta) titleBlockClasses = 'min-w-0 max-sm:w-full';
 
+  // With nothing but its hidden title below 1024px (no children, actions, meta row, record title or
+  // focus target) the bar would be an empty glass band there. It leaves the flow like its title block
+  // does, `max-lg:sr-only`: nothing paints, and the <h1> stays in the accessibility tree.
+  const nothingBelowLg = !children && !actions && !meta && !recordTitle && !takesFocus;
+
   return (
     <header
       className={`glass-header-host relative z-20 flex flex-wrap items-center gap-3 px-5 before:border-x-0 before:border-t-0 ${
         meta ? 'max-xl:py-1.5' : 'py-1.5'
-      } lg:sticky lg:top-0 ${tall ? 'min-h-[76px]' : 'min-h-[62px]'}`}
+      } lg:sticky lg:top-0 ${tall ? 'min-h-[76px]' : 'min-h-[62px]'}${nothingBelowLg ? ' max-lg:sr-only' : ''}`}
     >
       <div className={titleBlockClasses}>
         <div className={crumbClasses}>{crumb}</div>
