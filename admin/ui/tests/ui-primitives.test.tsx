@@ -2703,6 +2703,8 @@ async function main(): Promise<void> {
     // tests/design-tokens.test.ts has no way to notice a new one. This list is where a new one is noticed.
     const CONSUMERS = [
       'components/ui/QueueLayout.tsx',
+      // Its sort headers, on a card's table head (glass-card under thead-bg): a stack the contrast check covers.
+      'components/ui/Table.tsx',
       'components/vod-export/FindingsPanel.tsx',
       'pages/NovaVodSubmissions.tsx',
       'pages/pipeline-extract-step.tsx',
@@ -2779,7 +2781,22 @@ async function main(): Promise<void> {
     );
     assert(wearing(readyList) === 2, `each ready-list row wears the inset ring (found ${wearing(readyList)})`);
 
-    console.log('✓ INSET_FOCUS: the inset focus ring is written once, and the review queue, findings panel, ready list and Nova VODs group header wear it');
+    // A sort header's button fills its head cell, whose top is the table card's top edge: the card clips what is
+    // outside it, the top of an outer ring included.
+    const sortHeads = renderToStaticMarkup(
+      <table>
+        <thead>
+          <tr>
+            <SortHeader label="Title" field="title" activeField="title" direction="asc" onSort={noop} />
+            <SortHeader label="Date" field="date" activeField="title" direction="asc" onSort={noop} align="end" />
+          </tr>
+        </thead>
+      </table>,
+    );
+    assert(wearing(sortHeads) === 2, `each sort header's button, active or not, wears the inset ring (found ${wearing(sortHeads)})`);
+    assert(!sortHeads.includes('shadow-focus'), 'and no outer ring beside it');
+
+    console.log('✓ INSET_FOCUS: the inset focus ring is written once, and the review queue, findings panel, ready list, Nova VODs group header and sort headers wear it');
   }
 
   // --- Field: a label, the page's control, a hint and an error, tied together by ids ---

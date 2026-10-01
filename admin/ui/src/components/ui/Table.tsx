@@ -1,4 +1,5 @@
 import type { ReactNode } from 'react';
+import { INSET_FOCUS } from './focus-classes';
 import { Icon } from './Icon';
 import { MICRO_LABEL_TYPE } from './micro-label';
 
@@ -95,6 +96,9 @@ export function HeadCell({
  * (`aria-hidden`, via `Icon`) — so an unsorted column stays silent and unmarked. `align="end"`
  * right-aligns both the `<th>` and the button's own flex content (`justify-end` — `text-right`
  * alone would not affect a `flex` button's content alignment) for a numeric sortable column (I2).
+ *
+ * The button fills its cell, and the head row is the top of the table's card, which clips: its focus
+ * ring is the inset one (`INSET_FOCUS`), since the card would cut an outer ring's top.
  */
 export function SortHeader<Field extends string>({
   label,
@@ -125,7 +129,7 @@ export function SortHeader<Field extends string>({
       <button
         type="button"
         onClick={() => onSort(field)}
-        className={`flex h-full w-full items-center gap-1 ${HEAD_LABEL} transition-colors focus-visible:outline-none focus-visible:shadow-focus ${
+        className={`flex h-full w-full items-center gap-1 ${HEAD_LABEL} transition-colors ${INSET_FOCUS} ${
           active ? 'text-fg' : 'text-fg-subtle hover:text-fg'
         } ${end ? 'justify-end' : ''}`}
       >
