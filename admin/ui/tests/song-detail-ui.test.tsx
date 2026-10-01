@@ -1343,7 +1343,9 @@ async function unknownSong(mountPage: MountPage): Promise<void> {
 
 async function main(): Promise<void> {
   const win = installDom();
-  // happy-dom fetches an iframe's src itself, from the real network: answer it here, and keep what it asked for.
+  // The test DOM loads no iframe page, and this suite counts the pages its players ask for: here an iframe navigates
+  // again, as in a browser. happy-dom would fetch its src from the real network: answer it here, and keep what it asked for.
+  win.happyDOM.settings.navigation.disableChildFrameNavigation = false;
   win.happyDOM.settings.fetch.interceptor = {
     beforeAsyncRequest: async ({ request, window }) => {
       frameRequests.push(request.url);

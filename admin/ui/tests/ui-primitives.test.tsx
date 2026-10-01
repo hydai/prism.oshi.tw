@@ -1,3 +1,4 @@
+import type { Window as HappyWindow } from 'happy-dom';
 import { renderToStaticMarkup } from 'react-dom/server';
 import type { Stream } from '../../shared/types';
 import type { VodExportFindingApi } from '../src/api/vodExportTypes';
@@ -3016,6 +3017,17 @@ async function main(): Promise<void> {
         renderToStaticMarkup(<YouTubeEmbed videoId={videoId} title="T" startSeconds={startSeconds} />),
       )?.[1] ?? '';
 
+    // happy-dom loads an iframe's page itself, from the real network, unless the test DOM says not to: this block
+    // mounts five players. Any page one of them asks for is recorded here, and answered here, so nothing leaves.
+    const { settings } = (window as unknown as HappyWindow).happyDOM;
+    const framePages: string[] = [];
+    settings.fetch.interceptor = {
+      beforeAsyncRequest: async ({ request, window: frame }) => {
+        framePages.push(request.url);
+        return new frame.Response('<!doctype html><title>player</title>', { headers: { 'Content-Type': 'text/html' } });
+      },
+    };
+
     const activations: string[] = [];
     const idle = await mount(
       <VideoPoster videoId="abc123" title="T" startSeconds={30} active={false} onActivate={() => activations.push('T')} />,
@@ -3131,7 +3143,15 @@ async function main(): Promise<void> {
     assert(!NO_RAW_PALETTE.test(allPosterMarkup), 'VideoPoster markup uses no raw palette colours');
     assert(!NO_ARBITRARY_HEX.test(allPosterMarkup), 'VideoPoster markup uses no arbitrary hex colours');
 
+    // An iframe's navigation runs a few ticks behind the render that connected it.
+    await act(async () => {
+      await new Promise((resolve) => setTimeout(resolve, 50));
+    });
+    assert(framePages.length === 0, `the test DOM loads no iframe page: the players asked for nothing (got ${framePages.join(', ')})`);
+    settings.fetch.interceptor = null;
+
     console.log('✓ VideoPoster: a lazy thumbnail button until its page activates it, then YouTubeEmbed in a 16:9 box with focus handed over');
+    console.log('✓ the test DOM loads no iframe page: the five players asked the network for nothing');
   }
 }
 
