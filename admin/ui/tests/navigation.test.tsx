@@ -76,6 +76,10 @@ async function main(): Promise<void> {
     !contributorGroups.some((group) => group.id === 'library'),
     'contributors have no Library group: Global Library, Work Review and Harmonizer are all curator-only',
   );
+  assert(
+    !contributorGroups.some((group) => group.id === 'inbox'),
+    'contributors have no Inbox group: Nova, Nova VODs and Crystal are all curator-only',
+  );
 
   // --- listRouteFor: detail/sub paths collapse to their list; other pages keep all but the streamer-bound params ---
 

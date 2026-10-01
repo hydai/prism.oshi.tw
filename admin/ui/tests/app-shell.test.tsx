@@ -366,6 +366,10 @@ async function main(): Promise<void> {
   assert(!contributorHomeHtml.includes('Global Library'), 'contributors see no Global Library link');
   assert(!contributorHomeHtml.includes('VOD Export'), 'contributors see no VOD Export link');
   assert(!contributorHomeHtml.includes('>Publish<'), 'contributors see no Publish group');
+  assert(!contributorHomeHtml.includes('>Inbox<'), 'contributors see no Inbox group');
+  for (const href of ['/nova', '/nova/vods', '/crystal']) {
+    assert(!contributorHomeHtml.includes(`href="${href}"`), `contributors see no link to ${href}`);
+  }
   const contributorHome = parse(contributorHomeHtml);
   const contributorCurrent = contributorHome.querySelectorAll('[aria-current="page"]');
   assert(
@@ -688,7 +692,7 @@ async function main(): Promise<void> {
   console.log('✓ live: inbox badges, one streamers load, and the switch keeps the page or falls back to its list');
 
   // --- Live: the worker serves the three inbox lists to curators alone, so a contributor's shell
-  // asks for none of them, and its sidebar shows no pending badge ---
+  // asks for none of them, and its sidebar has no Inbox group to hang a badge on ---
 
   setCurrentStreamer('mizuki');
   const contributorShell = await mountShell('/', contributor);
@@ -696,17 +700,45 @@ async function main(): Promise<void> {
     callsTo('/api/nova/submissions') === 0 && callsTo('/api/nova/vods') === 0 && callsTo('/api/crystal/tickets') === 0,
     `a contributor's shell requests none of the three inbox lists (got ${requestLog.join(', ')})`,
   );
+  for (const href of ['/nova', '/nova/vods', '/crystal']) {
+    assert(
+      contributorShell.container.querySelector(`aside a[href="${href}"]`) === null,
+      `a contributor's sidebar has no link to ${href}`,
+    );
+  }
   assert(
-    textOf(contributorShell.container.querySelector('aside a[href="/nova"]')) === 'Nova'
-      && textOf(contributorShell.container.querySelector('aside a[href="/nova/vods"]')) === 'Nova VODs'
-      && textOf(contributorShell.container.querySelector('aside a[href="/crystal"]')) === 'Crystal',
-    "a contributor's inbox links show no pending badge",
+    Array.from(contributorShell.container.querySelectorAll('aside nav p')).every((heading) => textOf(heading) !== 'Inbox'),
+    "a contributor's sidebar has no Inbox group heading",
   );
   assert(callsTo('/api/streamers') === 1, "a contributor's shell still loads the streamer list");
   assert(unexpected.length === 0, `no unstubbed request (${unexpected.join(', ')})`);
   await contributorShell.unmount();
 
-  console.log("✓ live: a contributor's shell requests none of the curator-only inbox lists");
+  console.log("✓ live: a contributor's shell requests none of the curator-only inbox lists and lists no inbox link");
+
+  // --- Live: a contributor who opens an inbox URL is sent to the dashboard, and the page never mounts ---
+
+  for (const path of ['/nova', '/nova/vods', '/crystal']) {
+    const route = ADMIN_ROUTES.find((entry) => entry.path === path);
+    assert(route !== undefined, `the manifest has ${path}`);
+    resetRequests();
+    const sentAway = await mount(
+      <MemoryRouter initialEntries={[path]}>
+        <LocationProbe />
+        <Routes>
+          <Route path={path} element={routeElement(route, contributor)} />
+          <Route path="/" element={<p id="dashboard-stand-in">the dashboard</p>} />
+        </Routes>
+      </MemoryRouter>,
+    );
+    await settle();
+    assert(locationNow() === '/', `a contributor opening ${path} lands on / (got ${locationNow()})`);
+    assert(document.getElementById('dashboard-stand-in') !== null, `the route at / renders for a contributor sent from ${path}`);
+    assert(requestLog.length === 0, `the ${path} page never mounts for a contributor (got ${requestLog.join(', ')})`);
+    await sentAway.unmount();
+  }
+
+  console.log('✓ live: a contributor opening /nova, /nova/vods or /crystal lands on the dashboard');
 
   // --- Live: the auto-correction and a failed list load ---
 

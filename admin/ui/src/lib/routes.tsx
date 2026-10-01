@@ -129,10 +129,18 @@ export const ADMIN_ROUTES: readonly AdminRoute[] = [
     frame: 'studio',
     render: () => <Harmonizer />,
   },
-  { path: '/nova', label: 'Nova', group: 'inbox', icon: 'nova', render: (user) => <NovaSubmissions user={user} /> },
+  {
+    path: '/nova',
+    label: 'Nova',
+    curatorOnly: true,
+    group: 'inbox',
+    icon: 'nova',
+    render: (user) => <NovaSubmissions user={user} />,
+  },
   {
     path: '/nova/vods',
     label: 'Nova VODs',
+    curatorOnly: true,
     group: 'inbox',
     icon: 'film',
     render: (user) => <NovaVodSubmissions user={user} />,
@@ -140,6 +148,7 @@ export const ADMIN_ROUTES: readonly AdminRoute[] = [
   {
     path: '/crystal',
     label: 'Crystal',
+    curatorOnly: true,
     group: 'inbox',
     icon: 'crystal',
     render: (user) => <CrystalTickets user={user} />,

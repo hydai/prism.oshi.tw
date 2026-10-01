@@ -73,7 +73,22 @@ const CURATOR_NAV = [
 ];
 
 /** Oracle: the curator-only entries — hidden from the sidebar and blocked at the route. */
-const CURATOR_ONLY_PATHS = ['/works', '/works/review', '/harmonizer', '/vod-export', '/vod-export/repair/:entity/:rowId'];
+const CURATOR_ONLY_PATHS = [
+  '/works',
+  '/works/review',
+  '/harmonizer',
+  '/nova',
+  '/nova/vods',
+  '/crystal',
+  '/vod-export',
+  '/vod-export/repair/:entity/:rowId',
+];
+
+/**
+ * Oracle: the groups a contributor's sidebar keeps. Library, Inbox and Publish are gone: every
+ * route in them is curator-only (the worker serves the inbox lists to curators alone).
+ */
+const CONTRIBUTOR_GROUPS = ['overview', 'catalog', 'timestamps'];
 
 /** Oracle: the "+ New" menu — routes that can be created from it, in order. */
 const NEW_MENU = [
@@ -86,6 +101,10 @@ const CURATOR_ROUTE_PROBES = [
   { url: '/works', marker: 'Global Song Library' },
   { url: '/works/review', marker: 'Global Work Review' },
   { url: '/harmonizer', marker: 'Harmonizer' },
+  { url: '/nova', marker: 'Fetch All Channel Info' },
+  { url: '/nova/vods', marker: 'Nova VODs' },
+  // The id of its status filter group, which crystal-tickets-ui pins.
+  { url: '/crystal', marker: 'crystal-ticket-status-filter-label' },
   { url: '/vod-export', marker: 'Publication workflow' },
   { url: '/vod-export/repair/song/12', marker: 'VOD export source record' },
 ];
@@ -131,6 +150,14 @@ async function main(): Promise<void> {
   assert(
     JSON.stringify(contributorNav.map((item) => [item.to, item.label])) === JSON.stringify(contributorExpected),
     'contributors see the same navigation minus the curator-only entries',
+  );
+  assert(
+    JSON.stringify(getNavGroups(contributor).map((group) => group.id)) === JSON.stringify(CONTRIBUTOR_GROUPS),
+    'contributors see no Library, Inbox or Publish group: every route in them is curator-only',
+  );
+  assert(
+    getNavGroups(curator).some((group) => group.id === 'inbox' && group.items.length === 3),
+    'curators still see the Inbox group with its three routes',
   );
 
   // --- The "+ New" menu lists what can be created, for both roles ---
