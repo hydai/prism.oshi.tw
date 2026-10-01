@@ -1,4 +1,3 @@
-import type { ReactNode } from 'react';
 import type { AuthUser } from '../../../shared/types';
 import { CandidatePanel, EmptyCandidatePanel } from '../components/vod-export/CandidatePanel';
 import { CapacityPanel } from '../components/vod-export/CapacityPanel';
@@ -53,16 +52,6 @@ function VodExportHeader({ page }: { page: VodExportPageModel }) {
   );
 }
 
-/** A note's message with its one action at the far end, wrapping below it when the line is full. */
-function NoteWithAction({ message, action }: { message: string; action: ReactNode }) {
-  return (
-    <span className="flex flex-wrap items-center justify-between gap-x-3 gap-y-1.5">
-      <span>{message}</span>
-      {action}
-    </span>
-  );
-}
-
 /**
  * What needs the curator before anything else, as notes above the findings: a status or operation
  * failure, the control warning, a publication that still needs recovery or reconciliation, and an
@@ -80,21 +69,23 @@ function VodExportNotes({ page }: { page: VodExportPageModel }) {
   return (
     <>
       {statusError !== null ? (
-        <Note tone="danger" icon="alert" role="alert">
-          <NoteWithAction
-            message={statusError}
-            action={
-              <Button
-                ref={retryStatusButtonRef}
-                size="sm"
-                icon="refresh"
-                busy={statusLoading}
-                onClick={() => void retryStatus()}
-              >
-                {statusLoading ? 'Retrying...' : 'Retry status'}
-              </Button>
-            }
-          />
+        <Note
+          tone="danger"
+          icon="alert"
+          role="alert"
+          action={
+            <Button
+              ref={retryStatusButtonRef}
+              size="sm"
+              icon="refresh"
+              busy={statusLoading}
+              onClick={() => void retryStatus()}
+            >
+              {statusLoading ? 'Retrying...' : 'Retry status'}
+            </Button>
+          }
+        >
+          {statusError}
         </Note>
       ) : null}
       {operationError !== null ? (
@@ -108,19 +99,19 @@ function VodExportNotes({ page }: { page: VodExportPageModel }) {
         </Note>
       ) : null}
       {postCommitWarnings.map((warning) => (
-        <Note key={warning} tone="warn" icon="alert" role="alert">
-          <NoteWithAction
-            message={`Publication committed, but follow-up recovery is required: ${warning}`}
-            action={status.recoveryAvailable ? recoverButton('Retry recovery') : null}
-          />
+        <Note
+          key={warning}
+          tone="warn"
+          icon="alert"
+          role="alert"
+          action={status.recoveryAvailable ? recoverButton('Retry recovery') : null}
+        >
+          {`Publication committed, but follow-up recovery is required: ${warning}`}
         </Note>
       ))}
       {status.recoveryAvailable && postCommitWarnings.length === 0 ? (
-        <Note tone="warn" icon="alert" role="alert">
-          <NoteWithAction
-            message="A prepared publication needs authoritative reconciliation before new publication actions can continue."
-            action={recoverButton('Reconcile publication')}
-          />
+        <Note tone="warn" icon="alert" role="alert" action={recoverButton('Reconcile publication')}>
+          A prepared publication needs authoritative reconciliation before new publication actions can continue.
         </Note>
       ) : null}
       {status.publicationInProgress ? (

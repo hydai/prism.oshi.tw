@@ -345,13 +345,14 @@ function NoSong({
   }
   if (error !== null) {
     return (
-      <Note tone="danger" icon="alert" role="alert" title="Couldn't load the song.">
-        <span className="flex flex-wrap items-center justify-between gap-x-3 gap-y-1.5">
-          <span>{error}</span>
-          <Button size="sm" icon="refresh" onClick={onRetry}>
-            Retry
-          </Button>
-        </span>
+      <Note
+        tone="danger"
+        icon="alert"
+        role="alert"
+        title="Couldn't load the song."
+        action={<Button size="sm" icon="refresh" onClick={onRetry}>Retry</Button>}
+      >
+        {error}
       </Note>
     );
   }

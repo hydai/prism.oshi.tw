@@ -1434,6 +1434,22 @@ async function main(): Promise<void> {
 
   console.log('✓ ui kit: Note wears its tone from TONE_BOX_CLASS, passes role, leads with an optional icon and bold title, and ends its message with an optional action');
 
+  // No page lays the row out by hand any more: every note whose message ends in a control passes it as `action`.
+  {
+    const { readdirSync, readFileSync } = await import('node:fs');
+    const src = new URL('../src/', import.meta.url);
+    const spellers: string[] = [];
+    for (const entry of readdirSync(src, { recursive: true, encoding: 'utf8' })) {
+      if (!entry.endsWith('.ts') && !entry.endsWith('.tsx')) continue;
+      if (readFileSync(new URL(entry, src), 'utf8').includes('justify-between gap-x-3 gap-y-1.5')) spellers.push(entry);
+    }
+    assert(
+      spellers.join() === 'components/ui/Note.tsx',
+      `the message-plus-action row is laid out in Note.tsx alone, every other note passes its control as action (also spelled in: ${spellers.filter((file) => file !== 'components/ui/Note.tsx').join(', ')})`,
+    );
+    console.log('✓ ui kit: the Note action row is written once; no page spells it by hand');
+  }
+
   // --- Stepper: a labelled <ol> of steps in a glass card ---
 
   const { Stepper } = await import('../src/components/ui/Stepper');

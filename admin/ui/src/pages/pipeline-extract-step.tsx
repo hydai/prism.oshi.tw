@@ -102,13 +102,14 @@ function ReadyList({ streams, loading, error, currentId, busy, onExtract, onRetr
   } else if (error !== null) {
     body = (
       <div className="p-3.5">
-        <Note tone="danger" icon="alert" role="alert" title="Couldn’t load streams.">
-          <span className="flex flex-wrap items-center justify-between gap-x-3 gap-y-1.5">
-            <span>{error}</span>
-            <Button size="sm" onClick={onRetry}>
-              Retry
-            </Button>
-          </span>
+        <Note
+          tone="danger"
+          icon="alert"
+          role="alert"
+          title="Couldn’t load streams."
+          action={<Button size="sm" onClick={onRetry}>Retry</Button>}
+        >
+          {error}
         </Note>
       </div>
     );
