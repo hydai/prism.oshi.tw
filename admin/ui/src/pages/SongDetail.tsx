@@ -7,13 +7,11 @@ import { Button } from '../components/ui/Button';
 import { buttonClasses } from '../components/ui/button-classes';
 import { DetailField } from '../components/ui/DetailField';
 import { EmptyState, GlassCard, Skeleton } from '../components/ui/Display';
-import { Field } from '../components/ui/Field';
-import { fieldDescription } from '../components/ui/field-core';
-import { TextInput } from '../components/ui/Fields';
 import { Icon } from '../components/ui/Icon';
 import { Note } from '../components/ui/Note';
 import { PageHeader } from '../components/ui/PageHeader';
 import { StatusPill } from '../components/ui/Pill';
+import { TextField } from '../components/ui/TextField';
 import { useToast } from '../components/ui/toast';
 import { VideoPoster } from '../components/ui/VideoPoster';
 import { errorMessage, useApiResource } from '../lib/apiResource';
@@ -200,34 +198,24 @@ function DetailsCard({ song, curator, onChange }: DetailsCardProps) {
 
       {form !== null ? (
         <form ref={formRef} noValidate onSubmit={(event) => void handleSave(event)} className="flex flex-col gap-3.5">
-          <Field id={titleId} label="Song title" required error={titleError}>
-            <TextInput
-              id={titleId}
-              ref={titleRef}
-              value={form.title}
-              aria-required="true"
-              aria-invalid={titleError ? true : undefined}
-              aria-describedby={fieldDescription(titleId, { error: titleError })}
-              onChange={(event) => {
-                const { value } = event.target;
-                setForm((current) => (current === null ? current : { ...current, title: value }));
-              }}
-            />
-          </Field>
-          <Field id={artistId} label="Original artist" required error={artistError}>
-            <TextInput
-              id={artistId}
-              ref={artistRef}
-              value={form.originalArtist}
-              aria-required="true"
-              aria-invalid={artistError ? true : undefined}
-              aria-describedby={fieldDescription(artistId, { error: artistError })}
-              onChange={(event) => {
-                const { value } = event.target;
-                setForm((current) => (current === null ? current : { ...current, originalArtist: value }));
-              }}
-            />
-          </Field>
+          <TextField
+            id={titleId}
+            ref={titleRef}
+            label="Song title"
+            required
+            value={form.title}
+            error={titleError}
+            onChange={(title) => setForm((current) => (current === null ? current : { ...current, title }))}
+          />
+          <TextField
+            id={artistId}
+            ref={artistRef}
+            label="Original artist"
+            required
+            value={form.originalArtist}
+            error={artistError}
+            onChange={(originalArtist) => setForm((current) => (current === null ? current : { ...current, originalArtist }))}
+          />
           {form.error !== null ? (
             <Note tone="danger" icon="alert" role="alert" title="Couldn't save the song.">
               {form.error}
