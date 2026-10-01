@@ -25,6 +25,20 @@ function declaredValues(declarations: string, name: string): string[] {
   return Array.from(declarations.matchAll(new RegExp(`(?<![\\w-])--${name}: ([^;]+);`, 'g')), (match) => match[1] ?? '');
 }
 
+/**
+ * Every class a rule of `css` selects, comments dropped. A rule's prelude is the text since the last
+ * `{`, `}` or `;`, up to its `{`. An at-rule head (`@media (min-width: 40.5rem)`) names no class,
+ * and a dot opens a class only before a name and outside a quoted string: `12.5%` and
+ * `a[href$=".pdf"]` hold none. No lookbehind for a digit or a word character, so `h1.leftover`
+ * still counts.
+ */
+function selectedClasses(css: string): string[] {
+  const preludes = css.replace(/\/\*[\s\S]*?\*\//g, '').match(/[^{};]+(?=\{)/g) ?? [];
+  return preludes
+    .filter((prelude) => !prelude.trim().startsWith('@'))
+    .flatMap((prelude) => Array.from(prelude.matchAll(/(?<!["'])\.(?!\d)((?:\\.|[\w-])+)/g), (match) => match[1] ?? ''));
+}
+
 type Rgb = { r: number; g: number; b: number };
 type Rgba = Rgb & { a: number };
 
@@ -167,6 +181,47 @@ const TONES: Tone[] = [
 
 const TONE_KEYS = ['bg', 'fg', 'line'] as const;
 
+/**
+ * The type-size scale behind `text-token-<step>` (`--font-size-<step>`) and the radius scale behind
+ * `rounded-radius-<step>` (`--radius-<step>`). Neither changes with the theme, so `:root` alone
+ * declares them; they were the one part of the old prism token block the studio kit kept.
+ */
+const FONT_SIZES: Record<string, string> = {
+  xs: '10px',
+  sm: '11px',
+  base: '13px',
+  md: '14px',
+  lg: '15px',
+  xl: '20px',
+  '2xl': '32px',
+  '3xl': '48px',
+  display: '64px',
+};
+const RADII: Record<string, string> = {
+  xs: '6px',
+  sm: '8px',
+  md: '10px',
+  lg: '12px',
+  xl: '16px',
+  '2xl': '20px',
+  '3xl': '24px',
+  pill: '28px',
+  circle: '9999px',
+};
+
+/** The classes `src/index.css` defines: the glass surfaces, the tooltip chip's group variants and `dark`. */
+const CSS_CLASSES = [
+  'dark',
+  'glass-card',
+  'glass-header-host',
+  'glass-pop',
+  'glass-pop-host',
+  'glass-sidebar-host',
+  'group\\/tip',
+  'group-focus-within\\/tip\\:visible',
+  'group-hover\\/tip\\:visible',
+];
+
 /** The surface tokens secondary text is laid on — a union, so a misspelt stack layer fails to compile. */
 type SurfaceToken =
   | 'glass-sidebar'
@@ -229,6 +284,10 @@ type TailwindConfig = {
       boxShadow?: Record<string, unknown>;
       fontFamily?: Record<string, unknown>;
       fontSize?: Record<string, unknown>;
+      borderRadius?: Record<string, unknown>;
+      spacing?: Record<string, unknown>;
+      width?: Record<string, unknown>;
+      height?: Record<string, unknown>;
     };
   };
 };
@@ -266,6 +325,69 @@ async function main(): Promise<void> {
   }
 
   console.log('✓ every spec §4.1 token is declared in :root and html.dark');
+
+  // --- The old prism token block is gone: the type-size and radius scales are all that is left of it ---
+
+  for (const [step, size] of Object.entries(FONT_SIZES)) {
+    assert(declaredValues(light, `font-size-${step}`).join() === size, `:root declares --font-size-${step}: ${size};`);
+  }
+  for (const [step, radius] of Object.entries(RADII)) {
+    assert(declaredValues(light, `radius-${step}`).join() === radius, `:root declares --radius-${step}: ${radius};`);
+  }
+
+  // A custom property or a class this suite does not pin is a leftover (or a new one to pin here).
+  const bareCss = css.replace(/\/\*[\s\S]*?\*\//g, '');
+  const declaredNames = Array.from(bareCss.matchAll(/(?<![\w-])--([\w-]+)\s*:/g), (match) => match[1] ?? '');
+  for (const name of [
+    'accent-pink',
+    'text-primary',
+    'bg-surface-glass',
+    'border-default',
+    'bg-page-start',
+    'space-1',
+    'icon-md',
+    'font-primary',
+  ]) {
+    assert(!declaredNames.includes(name), `index.css no longer declares --${name}`);
+  }
+  const pinnedNames = new Set([
+    ...TOKENS.map((token) => token.name),
+    ...TONES.flatMap((t) => TONE_KEYS.map((key) => `tone-${t.name}-${key}`)),
+    ...Object.keys(FONT_SIZES).map((step) => `font-size-${step}`),
+    ...Object.keys(RADII).map((step) => `radius-${step}`),
+  ]);
+  const strayNames = Array.from(new Set(declaredNames.filter((name) => !pinnedNames.has(name))));
+  assert(strayNames.length === 0, `index.css declares only custom properties this suite pins (also found: --${strayNames.join(', --')})`);
+
+  // The extractor behind the class list: it invents no class from a length in an at-rule head, a
+  // keyframe stop or an attribute value, and still finds a leftover class wherever it sits.
+  for (const [snippet, what] of [
+    ['@media (min-width: 40.5rem) { body { margin: 0; } }', 'a length in an at-rule head'],
+    ['@keyframes spin { 12.5% { opacity: 0; } }', 'a keyframe stop'],
+    ['a[href$=".pdf"] { color: red; }', 'an attribute value'],
+  ] as const) {
+    const found = selectedClasses(snippet);
+    assert(found.length === 0, `the extractor finds no class in ${what} (found: ${found.join(' ')})`);
+  }
+  for (const [snippet, expected, what] of [
+    ['h1.leftover { margin: 0; }', 'leftover', 'a class on an element'],
+    ['.old-main { margin: 0; }', 'old-main', 'a hyphenated class'],
+    ['@media (hover: hover) { .old-row:hover { margin: 0; } }', 'old-row', 'a class with a pseudo-class inside an at-rule'],
+    ['@tailwind utilities;\n.after-statement { margin: 0; }', 'after-statement', 'a class right after an at-statement'],
+  ] as const) {
+    const found = selectedClasses(snippet);
+    assert(found.join(' ') === expected, `the extractor finds ${expected} in ${what} (found: ${found.join(' ') || 'nothing'})`);
+  }
+
+  console.log('✓ the class extractor finds a leftover class and invents none from a length, a keyframe stop or an attribute value');
+
+  const definedClasses = Array.from(new Set(selectedClasses(css))).sort();
+  assert(
+    definedClasses.join(' ') === CSS_CLASSES.slice().sort().join(' '),
+    `index.css defines exactly the glass, tooltip and dark-mode classes (found: ${definedClasses.join(' ')})`,
+  );
+
+  console.log('✓ index.css declares the studio tokens and the two scales only, and defines no class beyond the glass, tooltip and dark ones');
 
   // --- --fg-muted and --fg-subtle reach WCAG AA (4.5:1) on every surface they sit on ---
 
@@ -452,6 +574,30 @@ async function main(): Promise<void> {
   assert(fontSize.meta === '10.5px', 'fontSize.meta is 10.5px');
 
   console.log('✓ tailwind.config maps every §4.1 token to a utility, darkMode is class-based');
+
+  // --- The old prism aliases are gone from the config; the scales and the accent the studio reads stay ---
+
+  assert(fontFamily.primary === undefined, 'fontFamily.primary (the old font stack) is gone');
+  for (const key of ['accent', 'surface', 'overlay', 'page-start', 'page-mid', 'page-end', 'accent-bg', 'token', 'border-token']) {
+    assert(!(key in colors), `colors['${key}'] (an old prism colour alias) is gone`);
+  }
+  const { spacing, width, height, borderRadius } = config.theme?.extend ?? {};
+  for (const [name, scale] of [['spacing', spacing], ['width', width], ['height', height]] as const) {
+    assert(
+      Object.keys(scale ?? {}).every((key) => !key.startsWith('token-') && !key.startsWith('icon-')),
+      `${name} has no token-N or icon-* key (the old spacing and icon scales) left`,
+    );
+  }
+  for (const step of Object.keys(FONT_SIZES)) {
+    assert(fontSize[`token-${step}`] === `var(--font-size-${step})`, `fontSize['token-${step}'] maps to var(--font-size-${step})`);
+  }
+  for (const step of Object.keys(RADII)) {
+    assert(borderRadius?.[`radius-${step}`] === `var(--radius-${step})`, `borderRadius['radius-${step}'] maps to var(--radius-${step})`);
+  }
+  assert(backgroundImage.accent === 'var(--accent-gradient)', 'bg-accent (backgroundImage.accent) stays the accent gradient');
+  assert(colors['accent-fg'] === 'var(--accent-fg)', "colors['accent-fg'] stays the themed accent text colour");
+
+  console.log('✓ tailwind.config drops the old prism aliases and keeps the type-size and radius scales, bg-accent and accent-fg');
 
   // --- index.html loads JetBrains Mono and carries the new title ---
 

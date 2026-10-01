@@ -7,9 +7,9 @@ import { axisTicks, timelineScale, timelineSegments } from './timeline';
 const KIND_COLOR: Record<'stamped' | 'open' | 'selected', string> = {
   stamped: 'bg-accent',
   open: 'bg-tone-warn-fg',
-  // bg-nav-active-icon, not the legacy --accent-pink alias (it has no html.dark value, so dark
-  // mode would show the light-mode pink). No decorative shadow either: the solid fill is already
-  // this kind's own distinct look, so a real :focus-visible ring stays visibly different from it.
+  // bg-nav-active-icon has a value for each theme, so dark mode shows the dark-mode pink. No
+  // decorative shadow either: the solid fill is already this kind's own distinct look, so a real
+  // :focus-visible ring stays visibly different from it.
   selected: 'bg-nav-active-icon',
 };
 

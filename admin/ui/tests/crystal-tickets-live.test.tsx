@@ -1253,9 +1253,8 @@ async function main(): Promise<void> {
   // The markup the suite cannot reach (a class behind a state it never enters) is checked in the source.
   const source = readFileSync(new URL('../src/pages/CrystalTickets.tsx', import.meta.url), 'utf8');
   assertNoRawColour(source, 'the page source');
-  assert(!source.includes('components/prism'), 'the page imports nothing from the prism kit');
-  assert(!source.includes('hover-row') && source.includes('hover:bg-row-hover'), 'a row takes its hover from the row-hover token');
-  console.log('✓ Crystal: no raw palette class and no arbitrary hex, in the markup or the source; nothing from the prism kit');
+  assert(source.includes('hover:bg-row-hover'), 'a row takes its hover from the row-hover token');
+  console.log('✓ Crystal: no raw palette class and no arbitrary hex, in the markup or the source; a row hovers with the row-hover token');
 }
 
 await main();

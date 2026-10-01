@@ -185,7 +185,6 @@ async function main(): Promise<void> {
     ['a row with a request out', midRequest],
   ] as const) {
     assertNoRawColour(html, what);
-    assert(!html.includes('hover-row') && !html.includes('prism-gradient'), `${what} keeps nothing of the prism kit's CSS`);
   }
 
   // An open row is one native row group in the selected-row tint; its detail is one column below 1280 px and

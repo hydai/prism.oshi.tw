@@ -126,7 +126,6 @@ async function main(): Promise<void> {
     ['a row with a request out', midRequest],
   ] as const) {
     assertNoRawColour(html, what);
-    assert(!html.includes('hover-row') && !html.includes('prism-gradient'), `${what} keeps nothing of the prism kit's CSS`);
   }
 
   // The detail panel is one column below 1024 px and has two from there up (its fields, its songs). A curator's

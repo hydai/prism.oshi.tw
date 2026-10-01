@@ -1860,7 +1860,7 @@ async function main(): Promise<void> {
   console.log('✓ Streams: its route renders');
 
   // The legacy slate pieces this page was the last to use are gone.
-  for (const gone of ['components/StatusBadge.tsx', 'components/SortHeader.tsx', 'components/prism/Chip.tsx']) {
+  for (const gone of ['components/StatusBadge.tsx', 'components/SortHeader.tsx']) {
     assert(!existsSync(new URL(`../src/${gone}`, import.meta.url)), `src/${gone} is deleted: nothing uses it any more`);
   }
 
