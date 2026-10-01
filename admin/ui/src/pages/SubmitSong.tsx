@@ -3,11 +3,9 @@ import { useNavigate } from 'react-router-dom';
 import { api } from '../api/client';
 import { Button, IconButton } from '../components/ui/Button';
 import { GlassCard } from '../components/ui/Display';
-import { Field } from '../components/ui/Field';
-import { fieldDescription } from '../components/ui/field-core';
-import { TextInput } from '../components/ui/Fields';
 import { Note } from '../components/ui/Note';
 import { PageHeader } from '../components/ui/PageHeader';
+import { TextField } from '../components/ui/TextField';
 import { useToast } from '../components/ui/toast';
 import { errorMessage } from '../lib/apiResource';
 import {
@@ -28,39 +26,6 @@ import {
  */
 type FocusRequest = 'invalid' | 'add' | { rowId: string };
 
-interface TextFieldProps {
-  id: string;
-  label: string;
-  value: string;
-  /** What is wrong with the field, once there is something to show. */
-  error?: string | null;
-  required?: boolean;
-  /** A count of whole seconds: brings up a numeric keypad, and stays a text input so what was typed is what is checked. */
-  numeric?: boolean;
-  /** Where the field sits in its grid. */
-  className?: string;
-  onChange: (value: string) => void;
-}
-
-/** One labelled text input with its inline error. */
-function TextField({ id, label, value, error, required = false, numeric = false, className, onChange }: TextFieldProps) {
-  return (
-    <div className={className}>
-      <Field id={id} label={label} required={required} error={error}>
-        <TextInput
-          id={id}
-          value={value}
-          inputMode={numeric ? 'numeric' : undefined}
-          aria-required={required ? 'true' : undefined}
-          aria-invalid={error ? true : undefined}
-          aria-describedby={fieldDescription(id, { error })}
-          onChange={(event) => onChange(event.target.value)}
-        />
-      </Field>
-    </div>
-  );
-}
-
 interface PerformanceRowProps {
   number: number;
   draft: PerformanceDraft;
@@ -74,7 +39,8 @@ interface PerformanceRowProps {
 /**
  * One performance: the stream it was sung in, where in it the song starts and (if known) ends, and a note.
  * It is a named group, so a screen reader says which performance a "Stream ID" belongs to. The fields are
- * one column below lg and two from lg (spec §9).
+ * one column below lg and two from lg (spec §9). The start and the end are counts of whole seconds: they
+ * bring up a numeric keypad, and stay text inputs so that what was typed is what is checked.
  */
 function PerformanceRow({ number, draft, errors, onChange, onRemove }: PerformanceRowProps) {
   const rowRef = useRef<HTMLDivElement>(null);
@@ -101,37 +67,43 @@ function PerformanceRow({ number, draft, errors, onChange, onRemove }: Performan
         />
       </div>
       <div className="grid grid-cols-1 gap-3 lg:grid-cols-2">
-        <TextField
-          id={rowFieldId(clientId, 'streamId')}
-          label="Stream ID"
-          value={draft.streamId}
-          error={errors?.streamId}
-          className="lg:col-span-2"
-          onChange={edit('streamId')}
-        />
-        <TextField
-          id={rowFieldId(clientId, 'timestamp')}
-          label="Start (seconds)"
-          value={draft.timestamp}
-          error={errors?.timestamp}
-          numeric
-          onChange={edit('timestamp')}
-        />
-        <TextField
-          id={rowFieldId(clientId, 'endTimestamp')}
-          label="End (seconds, optional)"
-          value={draft.endTimestamp}
-          error={errors?.endTimestamp}
-          numeric
-          onChange={edit('endTimestamp')}
-        />
-        <TextField
-          id={rowFieldId(clientId, 'note')}
-          label="Note (optional)"
-          value={draft.note}
-          className="lg:col-span-2"
-          onChange={edit('note')}
-        />
+        <div className="lg:col-span-2">
+          <TextField
+            id={rowFieldId(clientId, 'streamId')}
+            label="Stream ID"
+            value={draft.streamId}
+            error={errors?.streamId}
+            onChange={edit('streamId')}
+          />
+        </div>
+        <div>
+          <TextField
+            id={rowFieldId(clientId, 'timestamp')}
+            label="Start (seconds)"
+            inputMode="numeric"
+            value={draft.timestamp}
+            error={errors?.timestamp}
+            onChange={edit('timestamp')}
+          />
+        </div>
+        <div>
+          <TextField
+            id={rowFieldId(clientId, 'endTimestamp')}
+            label="End (seconds, optional)"
+            inputMode="numeric"
+            value={draft.endTimestamp}
+            error={errors?.endTimestamp}
+            onChange={edit('endTimestamp')}
+          />
+        </div>
+        <div className="lg:col-span-2">
+          <TextField
+            id={rowFieldId(clientId, 'note')}
+            label="Note (optional)"
+            value={draft.note}
+            onChange={edit('note')}
+          />
+        </div>
       </div>
     </div>
   );
@@ -246,22 +218,26 @@ export default function SubmitSong() {
       >
         <GlassCard as="section" aria-label="Song" className="flex flex-col gap-4">
           <h2 className="text-[14px] font-bold text-fg">Song</h2>
-          <TextField
-            id={titleId}
-            label="Title"
-            required
-            value={title}
-            error={showErrors ? check.titleError : null}
-            onChange={setTitle}
-          />
-          <TextField
-            id={artistId}
-            label="Original artist"
-            required
-            value={originalArtist}
-            error={showErrors ? check.artistError : null}
-            onChange={setOriginalArtist}
-          />
+          <div>
+            <TextField
+              id={titleId}
+              label="Title"
+              required
+              value={title}
+              error={showErrors ? check.titleError : null}
+              onChange={setTitle}
+            />
+          </div>
+          <div>
+            <TextField
+              id={artistId}
+              label="Original artist"
+              required
+              value={originalArtist}
+              error={showErrors ? check.artistError : null}
+              onChange={setOriginalArtist}
+            />
+          </div>
         </GlassCard>
 
         <GlassCard as="section" aria-label="Performances" className="flex flex-col gap-4">

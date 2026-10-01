@@ -2221,6 +2221,128 @@ async function main(): Promise<void> {
     console.log('✓ Field: a label for the control, an aria-hidden asterisk, hint and error <p>s with <id>-hint / <id>-error, and fieldDescription naming them');
   }
 
+  // --- TextField: a Field around a TextInput, with the control's ARIA wiring done once ---
+
+  {
+    const { createRef } = await import('react');
+    const { mount, typeInto } = await import('./helpers/dom');
+    const { Field } = await import('../src/components/ui/Field');
+    const { fieldDescription } = await import('../src/components/ui/field-core');
+    const { TextField } = await import('../src/components/ui/TextField');
+    const noop = (): void => undefined;
+
+    // It renders exactly what a page used to wire by hand (Song Detail's edit form, Submit Song), byte for
+    // byte: the Field's own markup with no wrapper around it, and the control carrying `aria-required`,
+    // `aria-invalid` and `aria-describedby` for what the Field shows.
+    const states: Array<{ what: string; required?: boolean; hint?: string; error?: string | null }> = [
+      { what: 'a plain field' },
+      { what: 'a required field', required: true },
+      { what: 'a field with an error', error: 'Enter a title.' },
+      { what: 'a required field with an error', required: true, error: 'Enter a title.' },
+      { what: 'a field with a hint', hint: 'Shown in the list.' },
+      { what: 'a field with a hint and an error', hint: 'Shown in the list.', error: 'Enter a title.' },
+      { what: 'a field with an empty error', required: true, error: '' },
+      { what: 'a field with a null error', error: null },
+    ];
+    for (const { what, required = false, hint, error } of states) {
+      const byHand = renderToStaticMarkup(
+        <Field id="f" label="Title" required={required} hint={hint} error={error}>
+          <TextInput
+            id="f"
+            value="Lemon"
+            aria-required={required ? 'true' : undefined}
+            aria-invalid={error ? true : undefined}
+            aria-describedby={fieldDescription('f', { hint, error })}
+            onChange={noop}
+          />
+        </Field>,
+      );
+      const field = renderToStaticMarkup(
+        <TextField id="f" label="Title" value="Lemon" required={required} hint={hint} error={error} onChange={noop} />,
+      );
+      assert(field === byHand, `${what}: TextField is the Field and the TextInput a page wired by hand, byte for byte`);
+    }
+
+    // The ARIA wiring, read back from a live field.
+    const errored = await mount(
+      <TextField id="t" label="Title" required hint="Shown in the list." error="Enter a title." value="" onChange={noop} />,
+    );
+    const root = errored.container.firstElementChild;
+    const control = errored.container.querySelector('input');
+    assert(root !== null && control !== null, 'TextField renders a field root and an input');
+    assert(
+      root.className === 'flex flex-col gap-1.5' && Array.from(root.children).map((child) => child.tagName).join() === 'LABEL,INPUT,P,P',
+      "the Field is the root, with no wrapper around it: its label, the input, the hint, then the error",
+    );
+    assert(
+      errored.container.querySelector('label')?.getAttribute('for') === 't' && control.id === 't',
+      "the label's for points at the input's id",
+    );
+    assert(control.getAttribute('aria-required') === 'true', 'a required field is aria-required');
+    assert(!control.hasAttribute('required'), 'and never carries the required attribute, whose validation bubble would pre-empt the inline error');
+    assert(control.getAttribute('aria-invalid') === 'true', 'a field with an error is aria-invalid');
+    assert(control.getAttribute('aria-describedby') === 't-hint t-error', 'and described by its hint, then its error');
+    await errored.unmount();
+
+    const quiet = await mount(<TextField id="q" label="Note" value="" onChange={noop} />);
+    const quietControl = quiet.container.querySelector('input');
+    assert(quietControl !== null, 'a quiet TextField renders an input');
+    assert(
+      !quietControl.hasAttribute('aria-required') && !quietControl.hasAttribute('aria-invalid') && !quietControl.hasAttribute('aria-describedby'),
+      'a field that is not required and has no hint or error carries none of the three',
+    );
+    assert(quiet.container.querySelector('label')?.textContent === 'Note', 'and shows no asterisk');
+    await quiet.unmount();
+
+    // The value goes in, the typed text comes out as a string, and the native input attributes and the ref reach the input.
+    const typed: unknown[] = [];
+    const ref = createRef<HTMLInputElement>();
+    const live = await mount(
+      <TextField
+        ref={ref}
+        id="d"
+        label="Date"
+        type="date"
+        placeholder="YYYY-MM-DD"
+        inputMode="numeric"
+        autoComplete="off"
+        readOnly
+        value="2026-03-01"
+        onChange={(value) => typed.push(value)}
+      />,
+    );
+    const liveControl = live.container.querySelector('input');
+    assert(liveControl !== null, 'the live TextField renders an input');
+    assert(liveControl.value === '2026-03-01', 'the value is the one it is given');
+    assert(
+      liveControl.type === 'date' &&
+        liveControl.getAttribute('placeholder') === 'YYYY-MM-DD' &&
+        liveControl.getAttribute('inputmode') === 'numeric' &&
+        liveControl.getAttribute('autocomplete') === 'off' &&
+        liveControl.hasAttribute('readonly'),
+      'type, placeholder, inputMode, autoComplete and readOnly reach the input',
+    );
+    assert(ref.current === liveControl, 'the ref is the input');
+    ref.current?.focus();
+    assert(document.activeElement === liveControl, 'so it can take the focus');
+    await live.unmount();
+
+    const edited = await mount(<TextField id="e" label="Title" value="" onChange={(value) => typed.push(value)} />);
+    const editedControl = edited.container.querySelector('input');
+    assert(editedControl !== null, 'the editable TextField renders an input');
+    await typeInto(editedControl, 'Lemon');
+    assert(typed.length === 1 && typed[0] === 'Lemon', `onChange gets the typed text, as a string (got ${JSON.stringify(typed)})`);
+    await edited.unmount();
+
+    const fieldMarkup = renderToStaticMarkup(
+      <TextField id="p" label="Title" required hint="Shown in the list." error="Enter a title." value="" onChange={noop} />,
+    );
+    assert(!NO_RAW_PALETTE.test(fieldMarkup), 'TextField markup uses no raw palette colours');
+    assert(!NO_ARBITRARY_HEX.test(fieldMarkup), 'TextField markup uses no arbitrary hex colours');
+
+    console.log('✓ TextField: the Field and TextInput a page wired by hand, byte for byte, with aria-required / aria-invalid / aria-describedby, the native input attributes and the ref passed through');
+  }
+
   // --- VideoPoster: a thumbnail button that loads the player on demand, controlled by its page ---
 
   {
