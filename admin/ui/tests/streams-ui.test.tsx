@@ -1685,6 +1685,44 @@ async function yearsSortAndRememberedFilter(mountPage: MountPage): Promise<void>
   console.log('✓ Streams: the year and the sort are client-side, the remembered filter is a fallback, the URL and VOD Export links win');
 }
 
+/**
+ * The link Submit Stream offers for a duplicate video is /streams?search=<video ID>&status=, and this is what it
+ * relies on. A link with no `status` falls back to the status chip remembered in storage, so a curator whose last
+ * chip was Pending would open the list on a duplicate that is Approved and find "No streams found." An explicit
+ * empty `status` is the All option, and it beats the remembered chip.
+ */
+async function aLinkWithAnEmptyStatusOpensEveryStatus(mountPage: MountPage): Promise<void> {
+  reset();
+  storage.set(STREAMS_FILTER_KEY, JSON.stringify({ status: 'pending', year: '' }));
+  // What the worker answers: the streams in the status asked for, if any, whose video matches the search.
+  listReply = (call) => {
+    const status = call.params.get('status');
+    const term = call.params.get('search');
+    return ok(listBody(STREAMS.filter((row) => (status === null || row.status === status) && (term === null || row.videoId.includes(term)))));
+  };
+  const { container, unmount } = await mountPage(curator, '/streams?search=vidApproved1&status=');
+
+  assert(listCalls().length === 1, 'the link makes one request');
+  assert(lastList().params.get('status') === null, `which carries no status filter, so it is for every status (got ${lastList().params.toString()})`);
+  assert(lastList().params.get('search') === 'vidApproved1', 'and the search for the video');
+  assert(
+    pressedOf(statusGroup(container)) === 'true|false|false|false|false|false',
+    `All is the chip in effect, not the Pending that storage remembers (got ${pressedOf(statusGroup(container))})`,
+  );
+  assert(
+    need(container.querySelector<HTMLInputElement>('input[type="search"]'), 'the search field').value === 'vidApproved1',
+    'the search box reads the video ID',
+  );
+  assert(rowTitles(container) === 'Approved Stream', `the list holds the duplicate, which is Approved (got ${rowTitles(container)})`);
+  assert(statusOf(rowFor(container, 'Approved Stream')) === 'Approved', 'in the status it has');
+  assert(!container.innerHTML.includes('No streams found.'), 'so the list is not the empty one');
+  assert(locationOf(container) === '/streams?search=vidApproved1&status=', `and the page leaves the URL as the link wrote it (got ${locationOf(container)})`);
+  assert(unexpected.length === 0, `nothing but the list is requested (${unexpected.join(', ')})`);
+
+  await unmount();
+  console.log('✓ Streams: a link with an empty status (the one Submit Stream offers for a duplicate) opens every status, whatever chip storage remembers');
+}
+
 async function laterLoadsKeepTheRows(mountPage: MountPage): Promise<void> {
   reset();
   const { container, unmount } = await mountPage(curator);
@@ -1883,6 +1921,7 @@ async function main(): Promise<void> {
   await queryFollowsTheControls(mountPage);
   await theSearchBoxFollowsTheUrl(mountPage);
   await yearsSortAndRememberedFilter(mountPage);
+  await aLinkWithAnEmptyStatusOpensEveryStatus(mountPage);
   await laterLoadsKeepTheRows(mountPage);
   await contributorView(mountPage);
   await loadFailure(mountPage);
