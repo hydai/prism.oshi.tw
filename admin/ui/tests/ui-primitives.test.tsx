@@ -2193,6 +2193,46 @@ async function main(): Promise<void> {
     console.log('✓ StoredTime: a <time> with the exact instant, the full time and the short form, shared by Songs, Song Detail, Streams and Crystal');
   }
 
+  // --- MICRO_LABEL: the one home of the uppercase micro label's class ---
+
+  {
+    const { readFileSync } = await import('node:fs');
+    const { MICRO_LABEL } = await import('../src/components/ui/micro-label');
+
+    // Spec §4.3: 9.5px, bold, uppercase, tracked wide, in the subtle colour.
+    assert(
+      MICRO_LABEL === 'text-2xs font-bold uppercase tracking-[0.12em] text-fg-subtle',
+      'the micro label is 9.5px bold uppercase text, tracked 0.12em, in the subtle colour',
+    );
+
+    // PageHeader's crumb wears it, and below 1024 px hides unless the page is a record's own.
+    const crumbOf = (html: string) => /<div class="([^"]*)">CATALOG<\/div>/.exec(html)?.[1];
+    assert(
+      crumbOf(renderToStaticMarkup(<PageHeader crumb="CATALOG" title="Songs" />)) === `${MICRO_LABEL} max-lg:sr-only`,
+      'the crumb is the micro label, and a phone has the top bar to name the page instead',
+    );
+    assert(
+      crumbOf(renderToStaticMarkup(<PageHeader crumb="CATALOG" title="Song" recordTitle />)) === MICRO_LABEL,
+      "a record's crumb is the micro label alone, visible at every width",
+    );
+
+    // The four places that spelled it out take it from here instead: none keeps a copy of its classes.
+    for (const file of ['pages/StreamsList.tsx', 'pages/CrystalTickets.tsx', 'components/ui/DetailField.tsx', 'components/ui/PageHeader.tsx']) {
+      const source = readFileSync(new URL(`../src/${file}`, import.meta.url), 'utf8');
+      assert(source.includes("/micro-label'") && source.includes('MICRO_LABEL'), `${file} takes the micro label from micro-label.ts`);
+      assert(!source.includes('text-2xs font-bold uppercase'), `${file} keeps no copy of the micro label's classes`);
+    }
+    for (const file of ['pages/StreamsList.tsx', 'pages/CrystalTickets.tsx']) {
+      const source = readFileSync(new URL(`../src/${file}`, import.meta.url), 'utf8');
+      assert(
+        source.split('className={MICRO_LABEL}').length - 1 === 2,
+        `${file} names each of its two filter groups with the micro label`,
+      );
+    }
+
+    console.log('✓ MICRO_LABEL: the uppercase micro label in one place, worn by the page header crumb, DetailField, SectionLabel and the Streams and Crystal filter-group labels');
+  }
+
   // --- Field: a label, the page's control, a hint and an error, tied together by ids ---
 
   {
