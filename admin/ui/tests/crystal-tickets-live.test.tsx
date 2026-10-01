@@ -402,9 +402,8 @@ async function firstLoadAndLayout(mountPage: MountPage): Promise<void> {
   const gutter = need(root.children[1], 'the page gutter');
   assert(
     gutter.classList.contains('p-4') && gutter.classList.contains('lg:px-5'),
-    'the studio frame gives a page no gutter of its own, so the page brings it',
+    '<main> gives a page no gutter of its own, so the page brings it',
   );
-  assert(!container.innerHTML.includes('legacy-frame'), 'the page renders in no legacy frame');
   assert(container.querySelectorAll('h1').length === 1, 'the page has exactly one <h1>');
   assert(textOf(header.querySelector('h1')) === 'Crystal', 'the <h1> is "Crystal"');
   assert(textOf(header) === 'INBOXCrystal', `an unloaded header holds the crumb and the title only (got ${textOf(header)})`);
@@ -1213,20 +1212,19 @@ async function main(): Promise<void> {
   const { ToastProvider } = await import('../src/components/ui/toast');
   const { ADMIN_ROUTES, routeElement } = await import('../src/lib/routes');
 
-  // The route sits in the studio frame, behind the curator gate: the page brings its own header and
-  // gutter, no legacy card wraps it, and a contributor never reaches it.
+  // The route renders through `routeElement`, behind the curator gate: the page brings its own header
+  // and gutter, and a contributor never reaches it.
   const route = need(ADMIN_ROUTES.find((candidate) => candidate.path === '/crystal'), 'the /crystal route');
-  assert(route.frame === 'studio', '/crystal is a studio route');
   assert(route.curatorOnly === true, '/crystal is curator-only');
-  const framed = renderToStaticMarkup(
+  const rendered = renderToStaticMarkup(
     <MemoryRouter initialEntries={['/crystal']}>
       <Routes>
         <Route path="/crystal" element={routeElement(route, curator)} />
       </Routes>
     </MemoryRouter>,
   );
-  assert(framed !== '' && !framed.includes('legacy-frame'), 'the route renders with no LegacyFrame around it');
-  console.log('✓ Crystal: its route is a studio route, curator-only');
+  assert(rendered !== '', 'the route renders');
+  console.log('✓ Crystal: its route renders, curator-only');
 
   const mountPage: MountPage = (user = curator) =>
     mount(

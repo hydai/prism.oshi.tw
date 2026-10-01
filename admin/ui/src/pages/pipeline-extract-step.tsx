@@ -833,7 +833,7 @@ export function ExtractStep({ hidden, extract }: { hidden: boolean; extract: Ext
 
   return (
     // Padding only, no display utility: one would outrank the `hidden` attribute's display: none.
-    // The studio frame gives the page no gutter, so the step brings its own.
+    // <main> gives the page no gutter, so the step brings its own.
     <section aria-label="Extract" hidden={hidden} className="p-4 lg:px-5 lg:pb-[18px]">
       <div className="grid grid-cols-1 items-start gap-3.5 lg:grid-cols-[minmax(280px,340px)_minmax(0,1fr)]">
         <ReadyList

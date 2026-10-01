@@ -248,7 +248,7 @@ function headerAndGuards(): void {
   assert(textOf(page.querySelector('[role="status"]')) === 'Loading source record…', 'the first render is the loading skeleton');
   assert(!NO_RAW_PALETTE.test(html), 'the page uses no raw palette classes while loading');
 
-  // The guards are danger notes in the page gutter: the studio frame gives a page none.
+  // The guards are danger notes in the page gutter: <main> gives a page none.
   for (const [what, guardHtml, message] of [
     ['a contributor', renderToStaticMarkup(pageAt('/vod-export/repair/song/1', contributor)), 'Curator access is required.'],
     ['a bad locator', renderToStaticMarkup(pageAt('/vod-export/repair/bogus/1', curator)), 'Invalid private source locator.'],
@@ -599,15 +599,6 @@ await missingValuesAreDangerPills();
 await parentCardsAreGlassWithDangerNotes();
 await failedLoadIsADangerAlert();
 await backLinkNavigatesInPlace();
-
-// --- The route sits in the studio frame: the page brings its own gutter, so no legacy card wraps it ---
-
-const { ADMIN_ROUTES } = await import('../src/lib/routes');
-assert(
-  ADMIN_ROUTES.find((route) => route.path === '/vod-export/repair/:entity/:rowId')?.frame === 'studio',
-  'the repair route renders in the studio frame',
-);
-console.log('✓ VOD export repair: its route is a studio route');
 
 await win.happyDOM.close();
 
