@@ -468,7 +468,7 @@ async function main(): Promise<void> {
 
   console.log('✓ SSR: top-bar switcher, z-order, group headings, New anchored to the brand row, slug-keyed avatar gradients');
 
-  // --- routeElement: each page sits in the frame its manifest entry names, inside the curator gate ---
+  // --- routeElement: every page fills <main> itself, inside the curator gate ---
 
   function renderRoute(path: string, element: ReactElement): string {
     return renderToStaticMarkup(
@@ -480,76 +480,41 @@ async function main(): Promise<void> {
     );
   }
 
+  // While its chunk loads a page shows the Suspense skeleton, and nothing wraps the page: the skeleton
+  // brings the page gutter itself.
+  const GUTTERED_SKELETON = '<div class="p-4 lg:px-5"><div role="status"';
+  // Order-dependent: it relies on no route's lazy chunk having resolved yet; the /probe check below is the order-independent pin.
   for (const route of ADMIN_ROUTES) {
-    const framed = renderRoute(route.path, routeElement(route, curator));
-    if (route.frame === 'studio') {
-      assert(framed !== '' && !framed.includes('legacy-frame'), `${route.path} (studio) fills <main> itself, with no LegacyFrame`);
-    } else {
-      assert(framed.startsWith('<div class="legacy-frame">'), `${route.path} renders inside LegacyFrame`);
-    }
+    const loading = renderRoute(route.path, routeElement(route, curator));
+    assert(
+      loading.startsWith(GUTTERED_SKELETON),
+      `${route.path} renders its loading skeleton in the page gutter, with no frame around it (got: ${loading.slice(0, 60)})`,
+    );
     if (route.curatorOnly) {
-      assert(renderRoute(route.path, routeElement(route, contributor)) === '', `${route.path}: a contributor gets '' — the frame sits inside the gate`);
+      assert(renderRoute(route.path, routeElement(route, contributor)) === '', `${route.path}: a contributor gets '' — the gate wraps the page`);
     }
   }
-  const worksRoute = ADMIN_ROUTES.find((route) => route.path === '/works');
-  assert(worksRoute !== undefined, 'the manifest has /works');
-  const studioHtml = renderRoute('/works', routeElement({ ...worksRoute, frame: 'studio' }, curator));
-  assert(!studioHtml.includes('legacy-frame'), "a frame: 'studio' route fills <main> itself, with no LegacyFrame");
-  assert(
-    renderRoute('/works', routeElement({ ...worksRoute, frame: 'studio' }, contributor)) === '',
-    'a studio route keeps the curator gate',
-  );
 
-  // While its chunk loads, a page shows the Suspense skeleton: a legacy page's inside the frame,
-  // which pads it; a studio page has no frame, so its skeleton brings the page gutter itself.
+  // A manifest entry needs no setting for that: a path and a page are all it takes.
   function StillLoading(): never {
     throw new Promise<void>(() => {});
   }
-  const loadingStudio = renderRoute('/works', routeElement({ ...worksRoute, frame: 'studio', render: () => <StillLoading /> }, curator));
+  const probe = renderRoute('/probe', routeElement({ path: '/probe', render: () => <StillLoading /> }, curator));
   assert(
-    loadingStudio.startsWith('<div class="p-4 lg:px-5"><div role="status"'),
-    `a studio page's loading skeleton sits in the page gutter, not flush with <main> (got: ${loadingStudio.slice(0, 60)})`,
-  );
-  const loadingLegacy = renderRoute('/works', routeElement({ ...worksRoute, frame: 'legacy', render: () => <StillLoading /> }, curator));
-  assert(
-    loadingLegacy.startsWith('<div class="legacy-frame"><div role="status"'),
-    `a legacy page's loading skeleton is padded by the frame alone (got: ${loadingLegacy.slice(0, 60)})`,
+    probe.startsWith(GUTTERED_SKELETON),
+    `a route with only a path and a page gets the same padded loading skeleton (got: ${probe.slice(0, 60)})`,
   );
 
-  // --- index.css: inside .legacy-frame every Studio token keeps its light value ---
+  // --- index.css: nothing is left of the frame the old pages rendered in ---
 
   const css = readFileSync(new URL('../src/index.css', import.meta.url), 'utf8');
-  const collapse = (text: string) => text.replace(/\s+/g, ' ').trim();
-  const lightStudioBlock = /\.legacy-frame,\s*:root\s*\{([^}]*)\}/.exec(css)?.[1];
-  assert(lightStudioBlock !== undefined, '.legacy-frame shares the light Studio token block with :root');
-  for (const declaration of [
-    '--canvas: linear-gradient(135deg, #FFF0F5 0%, #F0F8FF 50%, #E6E6FA 100%);',
-    '--fg: #1E293B;',
-    '--tone-teal-line: #99F6E4;',
-    '--tooltip-bg: #1E1B2E;',
-    '--tooltip-fg: #FFFFFF;',
-    '--scrim: rgba(30,27,46,.28);',
-  ]) {
-    assert(collapse(lightStudioBlock).includes(declaration), `.legacy-frame redeclares ${declaration}`);
-  }
+  assert(!/legacy/i.test(css), 'index.css has no rule, selector prefix or comment left from the old page frame');
   assert(
-    /@supports not \(backdrop-filter: blur\(1px\)\) \{\s*\.legacy-frame,\s*:root\s*\{/.test(css),
-    'the no-blur fallback raises the glass alpha inside .legacy-frame too',
+    /@supports not \(backdrop-filter: blur\(1px\)\) \{\s*:root\s*\{/.test(css),
+    'the no-blur fallback raises the glass alpha in :root',
   );
-  const frameRule = /\n\.legacy-frame\s*\{([^}]*)\}/.exec(css)?.[1];
-  assert(frameRule !== undefined, 'index.css has its own .legacy-frame rule');
-  for (const declaration of [
-    'color-scheme: light;',
-    'background: #F8FAFC;',
-    'color: #0F172A;',
-    'border-radius: 18px;',
-    'padding: 24px;',
-    'margin: 16px;',
-  ]) {
-    assert(collapse(frameRule).includes(declaration), `.legacy-frame sets ${declaration}`);
-  }
 
-  console.log('✓ routeElement wraps every legacy route in LegacyFrame and leaves studio routes unframed, inside the curator gate; .legacy-frame stays light');
+  console.log('✓ routeElement: every page fills <main> itself, its loading skeleton sits in the page gutter, inside the curator gate; index.css keeps no frame rule');
 
   // --- Live: inbox badges, one streamers request, the switcher's navigation rule ---
 

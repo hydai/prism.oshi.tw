@@ -1,7 +1,6 @@
 import { Navigate } from 'react-router-dom';
 import { lazy, Suspense, type ReactElement } from 'react';
 import { PageBoundary } from '../components/PageBoundary';
-import { LegacyFrame } from '../components/shell/LegacyFrame';
 import { Skeleton } from '../components/ui/Display';
 import type { IconName } from '../components/ui/Icon';
 import type { AuthUser } from '../../../shared/types';
@@ -50,8 +49,6 @@ export interface AdminRoute {
   icon?: IconName;
   /** Lists this route in the "+ New" menu. */
   newMenu?: { description: string; icon: IconName };
-  /** Which shell renders this page: the new prism studio frame or the legacy slate layout. Defaults to 'legacy'. */
-  frame?: 'studio' | 'legacy';
 }
 
 /**
@@ -65,7 +62,6 @@ export const ADMIN_ROUTES: readonly AdminRoute[] = [
     label: 'Dashboard',
     group: 'overview',
     icon: 'dashboard',
-    frame: 'studio',
     render: (user) => <Dashboard user={user} />,
   },
   {
@@ -73,25 +69,22 @@ export const ADMIN_ROUTES: readonly AdminRoute[] = [
     label: 'Songs',
     group: 'catalog',
     icon: 'music',
-    frame: 'studio',
     render: (user) => <SongsList user={user} />,
   },
-  { path: '/songs/:id', frame: 'studio', render: (user) => <SongDetail user={user} /> },
+  { path: '/songs/:id', render: (user) => <SongDetail user={user} /> },
   {
     path: '/streams',
     label: 'Streams',
     group: 'catalog',
     icon: 'radio',
-    frame: 'studio',
     render: (user) => <StreamsList user={user} />,
   },
-  { path: '/streams/:id', frame: 'studio', render: (user) => <StreamDetailPage user={user} /> },
+  { path: '/streams/:id', render: (user) => <StreamDetailPage user={user} /> },
   {
     path: '/stamp',
     label: 'Stamp Editor',
     group: 'timestamps',
     icon: 'timer',
-    frame: 'studio',
     render: (user) => <StampEditor user={user} />,
   },
   {
@@ -99,7 +92,6 @@ export const ADMIN_ROUTES: readonly AdminRoute[] = [
     label: 'Pipeline',
     group: 'timestamps',
     icon: 'workflow',
-    frame: 'studio',
     render: () => <Pipeline />,
   },
   {
@@ -108,7 +100,6 @@ export const ADMIN_ROUTES: readonly AdminRoute[] = [
     curatorOnly: true,
     group: 'library',
     icon: 'library',
-    frame: 'studio',
     render: () => <GlobalWorks />,
   },
   {
@@ -117,7 +108,6 @@ export const ADMIN_ROUTES: readonly AdminRoute[] = [
     curatorOnly: true,
     group: 'library',
     icon: 'gitCompare',
-    frame: 'studio',
     render: () => <GlobalWorkReview />,
   },
   {
@@ -126,7 +116,6 @@ export const ADMIN_ROUTES: readonly AdminRoute[] = [
     curatorOnly: true,
     group: 'library',
     icon: 'merge',
-    frame: 'studio',
     render: () => <Harmonizer />,
   },
   {
@@ -135,7 +124,6 @@ export const ADMIN_ROUTES: readonly AdminRoute[] = [
     curatorOnly: true,
     group: 'inbox',
     icon: 'nova',
-    frame: 'studio',
     render: (user) => <NovaSubmissions user={user} />,
   },
   {
@@ -144,7 +132,6 @@ export const ADMIN_ROUTES: readonly AdminRoute[] = [
     curatorOnly: true,
     group: 'inbox',
     icon: 'film',
-    frame: 'studio',
     render: (user) => <NovaVodSubmissions user={user} />,
   },
   {
@@ -153,21 +140,18 @@ export const ADMIN_ROUTES: readonly AdminRoute[] = [
     curatorOnly: true,
     group: 'inbox',
     icon: 'crystal',
-    frame: 'studio',
     render: (user) => <CrystalTickets user={user} />,
   },
   {
     path: '/submit/song',
     label: 'Submit Song',
     newMenu: { description: 'Title, artist and optional performances', icon: 'music' },
-    frame: 'studio',
     render: () => <SubmitSong />,
   },
   {
     path: '/submit/stream',
     label: 'Submit Stream',
     newMenu: { description: 'Paste a YouTube URL; the ID fills itself in', icon: 'radio' },
-    frame: 'studio',
     render: () => <SubmitStream />,
   },
   {
@@ -176,13 +160,11 @@ export const ADMIN_ROUTES: readonly AdminRoute[] = [
     curatorOnly: true,
     group: 'publish',
     icon: 'package',
-    frame: 'studio',
     render: (user) => <VodExport user={user} />,
   },
   {
     path: '/vod-export/repair/:entity/:rowId',
     curatorOnly: true,
-    frame: 'studio',
     render: (user) => <VodExportRepair user={user} />,
   },
 ];
@@ -193,21 +175,23 @@ function RequireCurator({ user, children }: { user: AuthUser; children: ReactEle
 }
 
 /**
- * The page element for one manifest entry, gated when the entry says so. A page not yet rebuilt
- * for the studio renders in `LegacyFrame`, inside the gate, so a redirected contributor gets
- * nothing at all; a `frame: 'studio'` page fills `<main>` itself — so while it loads, its skeleton
- * brings the page gutter the frame would otherwise give it.
+ * The page element for one manifest entry, gated when the entry says so. A page fills `<main>`
+ * itself, so while its chunk loads the Suspense skeleton brings the page gutter. The gate wraps the
+ * page, so a redirected contributor gets nothing at all.
  */
 export function routeElement(route: AdminRoute, user: AuthUser): ReactElement {
-  const studio = route.frame === 'studio';
-  const skeleton = <Skeleton rows={6} label="Loading page..." />;
-  const boundary = (
+  const page = (
     <PageBoundary key={route.path}>
-      <Suspense fallback={studio ? <div className="p-4 lg:px-5">{skeleton}</div> : skeleton}>
+      <Suspense
+        fallback={
+          <div className="p-4 lg:px-5">
+            <Skeleton rows={6} label="Loading page..." />
+          </div>
+        }
+      >
         {route.render(user)}
       </Suspense>
     </PageBoundary>
   );
-  const page = studio ? boundary : <LegacyFrame>{boundary}</LegacyFrame>;
   return route.curatorOnly ? <RequireCurator user={user}>{page}</RequireCurator> : page;
 }

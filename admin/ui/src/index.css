@@ -98,10 +98,7 @@ body {
 .prism-shell-shadow { box-shadow: 0 25px 50px -12px rgba(224, 231, 255, 0.5); }
 @media (hover: hover) { .hover-row:hover { background: var(--bg-accent-pink); } }
 
-/* ===== Prism Studio design tokens (spec §4.1) — light values =====
-   `.legacy-frame` (components/shell/LegacyFrame.tsx) takes every one of them too: a page not yet
-   rebuilt for the studio keeps its light look inside the frame while <html> is dark. */
-.legacy-frame,
+/* ===== Prism Studio design tokens (spec §4.1) — light values ===== */
 :root {
   --canvas: linear-gradient(135deg, #FFF0F5 0%, #F0F8FF 50%, #E6E6FA 100%);
   --blob-1: rgba(249,168,212,.55);
@@ -342,7 +339,6 @@ html.dark body {
 
 /* backdrop-filter has no effect in this browser: raise the glass alpha so text on it stays readable (spec §4.2). */
 @supports not (backdrop-filter: blur(1px)) {
-  .legacy-frame,
   :root {
     --glass-sidebar: rgba(255,255,255,.92);
     --glass-header: rgba(255,255,255,.92);
@@ -356,18 +352,6 @@ html.dark body {
     --glass-card: rgba(28,23,48,.9);
     --glass-pop: rgba(36,30,60,.9);
   }
-}
-
-/* ===== Legacy frame (components/shell/LegacyFrame.tsx) =====
-   The light card the not-yet-rebuilt pages render in, inside the studio shell: their slate classes
-   look exactly as they did on the old grey <main>, in either theme. */
-.legacy-frame {
-  color-scheme: light;
-  background: #F8FAFC;
-  color: #0F172A;
-  border-radius: 18px;
-  padding: 24px;
-  margin: 16px;
 }
 
 @media (prefers-reduced-motion: reduce) {

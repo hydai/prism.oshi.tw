@@ -735,8 +735,8 @@ export function StreamDetailView({ controller }: { controller: StreamDetailContr
 
   // Only a stream with nothing on screen yet shows the skeleton or the error card. A reload keeps
   // the last rows up, and with them the workbench and its player, so a row approve or a save never
-  // restarts the video; a reload that fails says so in a note above the body instead. The studio
-  // frame gives the page no card, so both bring the page gutter themselves.
+  // restarts the video; a reload that fails says so in a note above the body instead. <main> gives
+  // the page no gutter, so both bring it themselves.
   if (!detail) {
     return (
       <div className="p-4 lg:px-5">
@@ -766,7 +766,7 @@ export function StreamDetailView({ controller }: { controller: StreamDetailContr
   ];
 
   return (
-    // The page fills <main> itself (the studio frame). `overflow-x-clip`: the centred tooltip of a
+    // The page fills <main> itself. `overflow-x-clip`: the centred tooltip of a
     // header button at the far end reaches past <main>'s edge and would otherwise scroll the page
     // sideways; clip, unlike hidden, leaves the sticky header and the sticky column working. The
     // header is the root's first child: the controller measures it there (`--stream-header-h`).

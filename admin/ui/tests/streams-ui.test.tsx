@@ -509,9 +509,8 @@ async function firstLoadAndLayout(mountPage: MountPage): Promise<void> {
   const gutter = need(root.children[1], 'the page gutter');
   assert(
     gutter.classList.contains('p-4') && gutter.classList.contains('lg:px-5'),
-    'the studio frame gives a page no gutter of its own, so the page brings it',
+    '<main> gives a page no gutter of its own, so the page brings it',
   );
-  assert(!container.innerHTML.includes('legacy-frame'), 'the page renders in no legacy frame');
   assert(container.querySelectorAll('h1').length === 1, 'the page has exactly one <h1>');
   assert(textOf(header.querySelector('h1')) === 'Streams', 'the <h1> is "Streams"');
   assert(textOf(header).startsWith('CATALOG'), 'the crumb is CATALOG');
@@ -1848,18 +1847,17 @@ async function main(): Promise<void> {
   const { ConfirmProvider } = await import('../src/components/ui/confirm');
   const { ADMIN_ROUTES, routeElement } = await import('../src/lib/routes');
 
-  // The route sits in the studio frame: the page brings its own header and gutter, no legacy card wraps it.
+  // The route renders through `routeElement`: the page brings its own header and gutter.
   const route = need(ADMIN_ROUTES.find((candidate) => candidate.path === '/streams'), 'the /streams route');
-  assert(route.frame === 'studio', '/streams is a studio route');
-  const framed = renderToStaticMarkup(
+  const rendered = renderToStaticMarkup(
     <MemoryRouter initialEntries={['/streams']}>
       <Routes>
         <Route path="/streams" element={routeElement(route, curator)} />
       </Routes>
     </MemoryRouter>,
   );
-  assert(framed !== '' && !framed.includes('legacy-frame'), 'the route renders with no LegacyFrame around it');
-  console.log('✓ Streams: its route is a studio route');
+  assert(rendered !== '', 'the route renders');
+  console.log('✓ Streams: its route renders');
 
   // The legacy slate pieces this page was the last to use are gone.
   for (const gone of ['components/StatusBadge.tsx', 'components/SortHeader.tsx', 'components/prism/Chip.tsx']) {

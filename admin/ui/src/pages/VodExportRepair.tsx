@@ -191,7 +191,7 @@ export default function VodExportRepair({ user }: { user: AuthUser }) {
     };
   }, [entity, rowId, user.role]);
 
-  // The studio frame gives a page no gutter, so the guards bring their own.
+  // <main> gives a page no gutter, so the guards bring their own.
   if (user.role !== 'curator') {
     return (
       <div className="p-4 lg:px-5">

@@ -3,8 +3,8 @@
  * (ToastProvider > router) against a stubbed fetch: the record header with its Songs crumb, the
  * metadata card with its inline edit (trimmed values, inline errors, a save failure that stays in the
  * card), Approve and Reject for a curator, the performance posters that load one video at a time, the
- * load failure with its Retry, and a song the worker does not know. The route itself is pinned as a
- * studio route: no legacy frame around it.
+ * load failure with its Retry, and a song the worker does not know. The route itself is pinned too: it
+ * renders through `routeElement`.
  */
 import { deepStrictEqual } from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
@@ -396,9 +396,8 @@ async function firstLoadAndLayout(mountPage: MountPage): Promise<void> {
   const gutter = need(root.children[1], 'the page gutter');
   assert(
     gutter.classList.contains('p-4') && gutter.classList.contains('lg:px-5'),
-    'the studio frame gives a page no gutter of its own, so the page brings it',
+    '<main> gives a page no gutter of its own, so the page brings it',
   );
-  assert(!container.innerHTML.includes('legacy-frame'), 'the page renders in no legacy frame');
   assert(container.querySelectorAll('h1').length === 1, 'the page has exactly one <h1>');
   assert(textOf(crumbOf(container)) === 'Songs', 'the crumb is a link named "Songs"');
   assert(crumbOf(container).querySelector('svg') !== null, 'a back chevron leads the crumb');
@@ -1360,18 +1359,17 @@ async function main(): Promise<void> {
   const { ToastProvider } = await import('../src/components/ui/toast');
   const { ADMIN_ROUTES, routeElement } = await import('../src/lib/routes');
 
-  // The route sits in the studio frame: the page brings its own header and gutter, no legacy card wraps it.
+  // The route renders through `routeElement`: the page brings its own header and gutter.
   const route = need(ADMIN_ROUTES.find((candidate) => candidate.path === '/songs/:id'), 'the /songs/:id route');
-  assert(route.frame === 'studio', '/songs/:id is a studio route');
-  const framed = renderToStaticMarkup(
+  const rendered = renderToStaticMarkup(
     <MemoryRouter initialEntries={['/songs/s-1']}>
       <Routes>
         <Route path="/songs/:id" element={routeElement(route, curator)} />
       </Routes>
     </MemoryRouter>,
   );
-  assert(framed !== '' && !framed.includes('legacy-frame'), 'the route renders with no LegacyFrame around it');
-  console.log('✓ Song Detail: its route is a studio route');
+  assert(rendered !== '', 'the route renders');
+  console.log('✓ Song Detail: its route renders');
 
   const mountPage: MountPage = (user, id = 's-1', jumpTo) =>
     mount(

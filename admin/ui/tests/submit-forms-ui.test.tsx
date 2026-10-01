@@ -13,7 +13,7 @@
  * request it sends, a duplicate video that links to the stream it duplicates, a server error that keeps
  * the form, and the busy submit.
  *
- * Each route is pinned as a studio route: no legacy frame around it.
+ * Each route is pinned too: it renders through `routeElement`, open to contributors.
  */
 import { deepStrictEqual } from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
@@ -361,9 +361,8 @@ async function firstLoadAndLayout(mountPage: MountPage): Promise<void> {
   assert(root.children[1] === form, 'the form follows the header');
   assert(
     form.classList.contains('p-4') && form.classList.contains('lg:px-5'),
-    'the studio frame gives a page no gutter of its own, so the page brings it',
+    '<main> gives a page no gutter of its own, so the page brings it',
   );
-  assert(!container.innerHTML.includes('legacy-frame'), 'the page renders in no legacy frame');
   assert(container.querySelectorAll('h1').length === 1, 'the page has exactly one <h1>');
   assert(textOf(heading(container)) === 'Submit Song', 'the <h1> is "Submit Song"');
   assert(textOf(heading(container).previousElementSibling) === 'CATALOG', 'the crumb reads CATALOG');
@@ -1198,9 +1197,8 @@ async function streamFirstLoadAndLayout(mountPage: MountPage): Promise<void> {
   assert(root.children[1] === form, 'the form follows the header');
   assert(
     form.classList.contains('p-4') && form.classList.contains('lg:px-5'),
-    'the studio frame gives a page no gutter of its own, so the page brings it',
+    '<main> gives a page no gutter of its own, so the page brings it',
   );
-  assert(!container.innerHTML.includes('legacy-frame'), 'the page renders in no legacy frame');
   assert(container.querySelectorAll('h1').length === 1, 'the page has exactly one <h1>');
   assert(textOf(heading(container)) === 'Submit Stream', 'the <h1> is "Submit Stream"');
   assert(textOf(heading(container).previousElementSibling) === 'CATALOG', 'the crumb reads CATALOG');
@@ -2019,19 +2017,18 @@ async function main(): Promise<void> {
   const { ToastProvider } = await import('../src/components/ui/toast');
   const { ADMIN_ROUTES, routeElement } = await import('../src/lib/routes');
 
-  // The route sits in the studio frame: the page brings its own header and gutter, no legacy card wraps it.
+  // The route renders through `routeElement`: the page brings its own header and gutter.
   const route = need(ADMIN_ROUTES.find((candidate) => candidate.path === '/submit/song'), 'the /submit/song route');
-  assert(route.frame === 'studio', '/submit/song is a studio route');
-  assert(route.curatorOnly !== true, 'and it stays open to contributors, as POST /api/songs is');
-  const framed = renderToStaticMarkup(
+  assert(route.curatorOnly !== true, 'it stays open to contributors, as POST /api/songs is');
+  const rendered = renderToStaticMarkup(
     <MemoryRouter initialEntries={['/submit/song']}>
       <Routes>
         <Route path="/submit/song" element={routeElement(route, contributor)} />
       </Routes>
     </MemoryRouter>,
   );
-  assert(framed !== '' && !framed.includes('legacy-frame'), 'the route renders with no LegacyFrame around it');
-  console.log('✓ Submit Song: its route is a studio route, open to contributors');
+  assert(rendered !== '', 'the route renders');
+  console.log('✓ Submit Song: its route renders, open to contributors');
 
   const mountPage: MountPage = () =>
     mount(
@@ -2084,19 +2081,18 @@ async function main(): Promise<void> {
 
   const { default: SubmitStream } = await import('../src/pages/SubmitStream');
 
-  // The route sits in the studio frame too: the page brings its own header and gutter.
+  // The route renders through `routeElement` too: the page brings its own header and gutter.
   const streamRoute = need(ADMIN_ROUTES.find((candidate) => candidate.path === '/submit/stream'), 'the /submit/stream route');
-  assert(streamRoute.frame === 'studio', '/submit/stream is a studio route');
-  assert(streamRoute.curatorOnly !== true, 'and it stays open to contributors, as POST /api/streams is');
-  const streamFramed = renderToStaticMarkup(
+  assert(streamRoute.curatorOnly !== true, 'it stays open to contributors, as POST /api/streams is');
+  const streamRendered = renderToStaticMarkup(
     <MemoryRouter initialEntries={['/submit/stream']}>
       <Routes>
         <Route path="/submit/stream" element={routeElement(streamRoute, contributor)} />
       </Routes>
     </MemoryRouter>,
   );
-  assert(streamFramed !== '' && !streamFramed.includes('legacy-frame'), 'the route renders with no LegacyFrame around it');
-  console.log('✓ Submit Stream: its route is a studio route, open to contributors');
+  assert(streamRendered !== '', 'the route renders');
+  console.log('✓ Submit Stream: its route renders, open to contributors');
 
   const mountStream: MountPage = () =>
     mount(
