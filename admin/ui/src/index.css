@@ -31,14 +31,20 @@ body {
   --fg-muted: #475569;
   --fg-subtle: #56657B;
   --accent-gradient: linear-gradient(135deg, #F472B6, #60A5FA);
-  --accent-fg: #DB2777;
+  /* Darker than spec §4.1's #DB2777, same hue (HSL 333°, 71%; lightness 50.6% → 43.3%): that value
+     reaches only 3.5:1 on a hovered open row and 3.6:1 on the page header, and it colours links, a
+     toast's action and the sidebar badge, which are text. This reaches 4.52:1 on the lowest surface
+     it sits on: tests/design-tokens.test.ts computes it against every one. */
+  --accent-fg: #BD2066;
   --selected-bg: rgba(252,231,243,.85);
   /* A hovered row on glass (a card, the sidebar): not in the spec table. --field there is white on
      white, 1.03–1.05:1; this slate tint moves a row at rest by at least 1.10:1 on every backdrop
      (tests/design-tokens.test.ts), and stays grey beside the pink --selected-bg. */
   --row-hover: rgba(148,163,184,.15);
   --nav-active-bg: rgba(255,255,255,.88);
-  --nav-active-fg: #DB2777;
+  /* The sidebar's current link, in --accent-fg's darker pink: spec §4.1's #DB2777 read 4.48:1 at worst
+     there (tests/design-tokens.test.ts). */
+  --nav-active-fg: #BD2066;
   --nav-active-icon: #EC4899;
   --nav-bar-glow: none;
   --shadow-card: 0 10px 36px -14px rgba(99,102,241,.25);
