@@ -890,9 +890,8 @@ async function failedDecisionOffersRetry(mountPage: MountPage): Promise<void> {
 }
 
 /*
- * The worker refuses a change to the status a song already has (400), so a decision it made whose answer was lost on
- * the way would fail again on every Retry. A failed decision reads the song back before it says anything, the card
- * busy meanwhile: the three outcomes of that read.
+ * A decision the worker made whose answer was lost on the way would otherwise read as failed until a Retry. A failed
+ * decision reads the song back before it says anything, the card busy meanwhile: the three outcomes of that read.
  */
 
 async function aFailedDecisionTheWorkerMadeIsDone(mountPage: MountPage): Promise<void> {

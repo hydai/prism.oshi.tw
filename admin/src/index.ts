@@ -648,6 +648,9 @@ app.patch('/api/songs/:id/status', requireCurator, async (c) => {
   const existing = await getSongById(c.env.DB, id);
   if (!existing) return c.json({ error: 'Song not found' }, 404);
 
+  // The status it already has: a no-op, so a retried change whose answer was lost succeeds.
+  if (existing.status === body.status) return c.json(existing);
+
   if (!isValidTransition(existing.status, body.status)) {
     return c.json({ error: `Cannot transition from ${existing.status} to ${body.status}` }, 400);
   }
@@ -709,6 +712,9 @@ app.patch('/api/performances/:id/status', requireCurator, async (c) => {
   // Get current status for transition check
   const current = await db_getPerformanceStatus(c.env.DB, id);
   if (!current) return c.json({ error: 'Performance not found' }, 404);
+
+  // The status it already has: a no-op, so a retried change whose answer was lost succeeds.
+  if (current === body.status) return c.json({ id, status: current });
 
   if (!isValidTransition(current, body.status)) {
     return c.json({ error: `Cannot transition from ${current} to ${body.status}` }, 400);
@@ -781,6 +787,9 @@ app.patch('/api/streams/:id/status', requireCurator, async (c) => {
 
   const existing = await getStreamById(c.env.DB, id, streamerId);
   if (!existing) return c.json({ error: 'Stream not found' }, 404);
+
+  // The status it already has: a no-op, so a retried change whose answer was lost succeeds.
+  if (existing.status === body.status) return c.json({ id, status: existing.status });
 
   if (!isValidTransition(existing.status, body.status)) {
     return c.json({ error: `Cannot transition from ${existing.status} to ${body.status}` }, 400);

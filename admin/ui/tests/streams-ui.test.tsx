@@ -1372,9 +1372,9 @@ async function retryWhileTheRowIsBusySendsNothing(mountPage: MountPage): Promise
 }
 
 /*
- * The worker refuses a change to the status a stream already has (400), so a change it made whose answer was lost on
- * the way would fail again on every Retry, and an approval's cascade to its songs would never run. A failed change
- * reads the stream back before it says anything, the row busy meanwhile: the outcomes of that read.
+ * A change the worker made whose answer was lost on the way would otherwise read as failed, and an approval's cascade
+ * to its songs would wait for a Retry. A failed change reads the stream back before it says anything, the row busy
+ * meanwhile: the outcomes of that read.
  */
 
 async function aFailedApprovalTheWorkerMadeRunsTheCascade(mountPage: MountPage): Promise<void> {
