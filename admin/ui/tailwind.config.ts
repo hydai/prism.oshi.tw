@@ -29,6 +29,8 @@ export default {
           subtle: 'var(--fg-subtle)',
         },
         'accent-fg': 'var(--accent-fg)',
+        // The primary button's label, on `bg-accent` (the gradient).
+        'accent-gradient-fg': 'var(--accent-gradient-fg)',
         field: {
           DEFAULT: 'var(--field)',
           line: 'var(--field-line)',

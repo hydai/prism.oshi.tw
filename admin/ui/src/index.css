@@ -31,6 +31,11 @@ body {
   --fg-muted: #475569;
   --fg-subtle: #56657B;
   --accent-gradient: linear-gradient(135deg, #F472B6, #60A5FA);
+  /* The primary button's label on --accent-gradient: not in the spec table. The mockups' white
+     reaches only 2.54–2.83:1 across the gradient (2.34:1 at worst under hover's brightness); this
+     ink reaches 5.92:1 where the gradient is darkest, its middle, under the label
+     (tests/design-tokens.test.ts). The same in both themes, as the gradient is. */
+  --accent-gradient-fg: #1E1B2E;
   /* Darker than spec §4.1's #DB2777, same hue (HSL 333°, 71%; lightness 50.6% → 43.3%): that value
      reaches only 3.5:1 on a hovered open row and 3.6:1 on the page header, and it colours links, a
      toast's action and the sidebar badge, which are text. This reaches 4.52:1 on the lowest surface
@@ -154,6 +159,7 @@ html.dark {
   --fg-muted: #C2BFD3;
   --fg-subtle: #A7A4BA;
   --accent-gradient: linear-gradient(135deg, #F472B6, #60A5FA);
+  --accent-gradient-fg: #1E1B2E;
   --accent-fg: #F9A8D4;
   --selected-bg: rgba(244,114,182,.12);
   --row-hover: rgba(255,255,255,.05);
