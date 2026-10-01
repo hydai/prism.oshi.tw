@@ -1268,8 +1268,8 @@ function savedBody(index: number): Record<string, unknown> {
 }
 
 /**
- * What a save sent, apart from the theme. The editor sends its twelve colours whole whenever the stored theme is not
- * that exact string (Alpha's holds two), so the theme is read on its own, by `savedTheme`.
+ * What a save sent, apart from the theme. The editor sends its twelve colours whole when the curator changed one, so
+ * the theme is read on its own, by `savedTheme`.
  */
 function savedFields(index: number): Record<string, unknown> {
   return Object.fromEntries(Object.entries(savedBody(index)).filter(([key]) => key !== 'theme_json'));
@@ -1311,8 +1311,11 @@ async function aFetchLandsWhileEditing(mountPage: MountPage): Promise<void> {
   assert(buttonNamed(form, 'Save') !== null && isIdle(fetch) && focused() === fetch, 'the editor stays open, with the focus on Fetch');
 
   await submitForm(form);
-  deepStrictEqual(savedFields(0), { display_name: 'Alpha Prime', group: 'Curator group' });
-  assert(savedTheme(0).accentPrimary === '#FF00AA' && savedTheme(0).bgPageStart === '#112233', 'a save sends the colours as they were: the fetch left them alone');
+  deepStrictEqual(
+    savedBody(0),
+    { display_name: 'Alpha Prime', group: 'Curator group' },
+    'a save sends what the curator changed, and no theme: the fetch left the colours alone, and so did they',
+  );
   await unmount();
   console.log('✓ Nova: a fetch that lands while the editor is open keeps the unsaved edits and updates the fetched fields');
 }
@@ -1463,6 +1466,45 @@ async function aSaveShowsWhatWasStored(mountPage: MountPage): Promise<void> {
   assert(saveCalls().length === 1, 'and a save of it sends nothing: there is nothing to change');
   await unmount();
   console.log('✓ Nova: a save leaves the editor holding what the worker stored');
+}
+
+/**
+ * A save sends the theme only when the curator changed a colour: colour by colour against the theme the drafts started
+ * from, not against the stored string. The editor reads a submission with no theme as twelve blacks, and a stored theme
+ * of another shape (fewer keys, another order) as the colours it holds: neither is a change, and neither is written.
+ */
+async function anUntouchedThemeIsNotSent(mountPage: MountPage): Promise<void> {
+  reset();
+  const { container, unmount } = await mountPage();
+
+  // Beta has no theme. A name edit saves the name, and no twelve blacks with it.
+  const beta = await openEditor(container, 'n-beta', 'Beta');
+  await typeInto(fieldOf(beta, 'Display Name'), 'Beta Prime');
+  await submitForm(beta);
+  assert(saveCalls().length === 1 && messagesOf(container) === 'Submission saved', 'the save lands');
+  deepStrictEqual(savedBody(0), { display_name: 'Beta Prime' }, 'a themeless submission saved with a name edit sends the name alone');
+
+  // A colour the curator changes is a change: the theme goes whole, with the eleven they left black.
+  const edit = need(buttonNamed(beta, 'Edit'), 'Edit');
+  await focus(edit);
+  await click(edit, 'Edit');
+  await typeInto(colourOf(beta, 'bgPageStart'), '#123456');
+  await submitForm(beta);
+  assert(Object.keys(savedBody(1)).join() === 'theme_json', `a colour edit sends the theme alone (got ${Object.keys(savedBody(1)).join()})`);
+  const theme = savedTheme(1);
+  assert(
+    Object.keys(theme).length === 12 && theme.bgPageStart === '#123456' && theme.accentPrimary === '#000000',
+    'the theme goes whole: twelve colours, the one changed',
+  );
+
+  // Alpha's stored theme names two colours, not the editor's twelve. Saved untouched, it stays as it is stored.
+  const alpha = await openEditor(container, 'n-alpha', 'Alpha');
+  await typeInto(fieldOf(alpha, 'Display Name'), 'Alpha Prime');
+  await submitForm(alpha);
+  deepStrictEqual(savedBody(2), { display_name: 'Alpha Prime' }, 'a theme stored in another shape, saved untouched, is not sent');
+
+  await unmount();
+  console.log('✓ Nova: a save sends the theme only when a colour changed: no theme stored, or one stored in another shape, stays as it is');
 }
 
 async function aReloadLandsWhileEditing(mountPage: MountPage): Promise<void> {
@@ -2222,6 +2264,7 @@ async function main(): Promise<void> {
   await aFieldBothSidesChangedKeepsTheCurators(mountPage);
   await aReloadLandsWhileEditing(mountPage);
   await aSaveShowsWhatWasStored(mountPage);
+  await anUntouchedThemeIsNotSent(mountPage);
   await approvingFromTheRow(mountPage);
   await rejectingFromTheRow(mountPage);
   await reviewingFromTheCard(mountPage);
