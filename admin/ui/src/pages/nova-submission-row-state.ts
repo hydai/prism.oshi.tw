@@ -142,6 +142,18 @@ function resetDrafts(
   return { ...state, base: submission, ...editorValuesOf(submission) };
 }
 
+/**
+ * Whether the curator changed the theme: its colours against the theme the drafts started from (or were last merged
+ * with), colour by colour, over every key either holds. Not against the stored string: the editor reads a submission
+ * with no theme as twelve blacks, and a stored theme of another shape (fewer keys, another order) as the colours it
+ * holds, so a save that compared strings would write a theme nobody chose.
+ */
+export function themeEdited(state: Pick<SubmissionRowState, 'base' | 'themeDraft'>): boolean {
+  const started: Record<string, string> = parseThemeJson(state.base.theme_json);
+  const now: Record<string, string> = state.themeDraft;
+  return [...new Set([...Object.keys(started), ...Object.keys(now)])].some((key) => started[key] !== now[key]);
+}
+
 /** `draft`'s value where the curator changed it (it is not what `base` held), else the worker's (`incoming`). */
 function mergedValue<T>(draft: T, base: T, incoming: T): T {
   return draft === base ? incoming : draft;

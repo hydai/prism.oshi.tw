@@ -53,6 +53,7 @@ import {
   parseThemeJson,
   submissionRowReducer,
   THEME_KEYS,
+  themeEdited,
 } from './nova-submission-row-state';
 import type {
   SubmissionRowAction,
@@ -656,10 +657,9 @@ export function SubmissionRow({
           changes[key] = draft[key];
         }
       }
-      // Theme JSON
-      const newThemeJson = JSON.stringify(state.themeDraft);
-      if (newThemeJson !== (sub.theme_json || '')) {
-        changes.theme_json = newThemeJson;
+      // The theme, whole, when the curator changed a colour; one they left alone stays as it is stored.
+      if (themeEdited(state)) {
+        changes.theme_json = JSON.stringify(state.themeDraft);
       }
       // Enabled
       const newEnabled = state.enabledDraft ? 1 : 0;
