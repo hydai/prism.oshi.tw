@@ -112,6 +112,7 @@ async function main(): Promise<void> {
   ({ SubmissionRow } = await import('../src/pages/NovaSubmissions'));
   const {
     createSubmissionRowState,
+    EDITABLE_FIELDS,
     submissionRowReducer,
   } = await import('../src/pages/nova-submission-row-state');
 
@@ -296,15 +297,12 @@ async function main(): Promise<void> {
     avatar_url: 'https://yt3.ggpht.com/refreshed=s240',
   });
   rowState = submissionRowReducer(rowState, { type: 'subscribersFetchStarted' });
-  rowState = submissionRowReducer(rowState, {
-    type: 'subscribersFetchSucceeded',
-    submission: fetched,
-    updateDraft: true,
-  });
+  // What a fetch answers reaches the drafts as any changed submission does: the page hands it to the row.
+  rowState = submissionRowReducer(rowState, { type: 'submissionChanged', submission: fetched });
   rowState = submissionRowReducer(rowState, { type: 'subscribersFetchFinished' });
   assert(!rowState.fetchingSubscribers, 'subscriber refresh completion clears its loading state');
-  assert(rowState.draft.subscriber_count === '9,876', 'subscriber refresh updates the active draft count');
-  assert(rowState.draft.avatar_url === fetched.avatar_url, 'subscriber refresh updates the active draft avatar');
+  assert(rowState.draft.subscriber_count === '9,876', 'a subscriber refresh updates the draft count nobody has edited');
+  assert(rowState.draft.avatar_url === fetched.avatar_url, 'and the draft avatar nobody has edited');
 
   rowState = submissionRowReducer(
     { ...rowState, saveError: 'stale save error' },
@@ -323,6 +321,152 @@ async function main(): Promise<void> {
   rowState = submissionRowReducer(rowState, { type: 'verificationFinished' });
   assert(!rowState.verifyingChannel, 'verification completion clears its loading state');
   assert(rowState.verificationError === 'Channel verification failed', 'verification failure remains visible');
+
+  // --- A submission that changes under an open editor is merged into its drafts, field by field ---
+  //
+  // A fetch, a verification, a review and a list reload each hand the row a new submission while the curator may be
+  // part-way through an edit. What they changed stays, even where the worker changed it too (they are about to save);
+  // what they left alone takes the worker's value; and the submission the drafts started from moves on.
+  const startedFrom = makeSubmission({
+    theme_json: JSON.stringify({ accentPrimary: '#111111', accentSecondary: '#222222', custom: '#999999' }),
+  });
+  let open = submissionRowReducer(createSubmissionRowState(startedFrom, 'a note'), { type: 'editStarted' });
+  open = submissionRowReducer(open, { type: 'draftFieldChanged', key: 'display_name', value: 'Mine' });
+  open = submissionRowReducer(open, { type: 'draftFieldChanged', key: 'link_twitter', value: 'https://x.com/mine' });
+  open = submissionRowReducer(open, { type: 'orderChanged', order: 7 });
+  open = submissionRowReducer(open, { type: 'enabledChanged', enabled: false });
+  open = submissionRowReducer(open, { type: 'themeColorChanged', key: 'accentPrimary', value: '#AAAAAA' });
+  const answered = makeSubmission({
+    // The curator changed these too:
+    display_name: 'Theirs',
+    display_order: 3,
+    theme_json: JSON.stringify({ accentPrimary: '#CCCCCC', accentSecondary: '#DDDDDD', custom: '#999999' }),
+    // And not these:
+    group: 'Their group',
+    subscriber_count: '9,876',
+    avatar_url: 'https://yt3.ggpht.com/refreshed=s240',
+    status: 'approved' as NovaStatus,
+    reviewed_at: '2026-06-18T10:00:00.000Z',
+  });
+  const merged = submissionRowReducer(open, { type: 'submissionChanged', submission: answered });
+  assert(merged.editing && merged.rejectNote === 'a note', 'a changed submission leaves the editor open and the note being written alone');
+  assert(
+    merged.draft.display_name === 'Mine' && merged.orderDraft === 7 && merged.themeDraft.accentPrimary === '#AAAAAA',
+    'what the curator changed stays, where the worker changed it too: a text field, the order and a colour',
+  );
+  assert(
+    merged.draft.link_twitter === 'https://x.com/mine' && !merged.enabledDraft,
+    'and where it did not: a link and Enabled',
+  );
+  assert(
+    merged.draft.group === 'Their group' &&
+      merged.draft.subscriber_count === '9,876' &&
+      merged.draft.avatar_url === answered.avatar_url &&
+      merged.themeDraft.accentSecondary === '#DDDDDD',
+    'what the curator left alone takes the worker\'s value: text fields and a colour',
+  );
+  assert(
+    (merged.themeDraft as Record<string, string>).custom === '#999999',
+    'a theme key the editor has no input for survives, so a save sends it back',
+  );
+  assert(merged.base === answered, 'the submission the drafts started from moves on to the one just merged');
+
+  // The base having moved on is what tells the curator's changes from the ones the last merge took in.
+  const answeredAgain = makeSubmission({
+    display_name: 'Theirs again',
+    group: 'Newest group',
+    subscriber_count: '10,000',
+    display_order: 4,
+    // (The theme drops the key the editor has no input for, and gains another.)
+    theme_json: JSON.stringify({ accentPrimary: '#EEEEEE', accentSecondary: '#FFFFFF', extra: '#888888' }),
+  });
+  const mergedAgain = submissionRowReducer(merged, { type: 'submissionChanged', submission: answeredAgain });
+  assert(
+    mergedAgain.draft.display_name === 'Mine' && mergedAgain.orderDraft === 7 && mergedAgain.themeDraft.accentPrimary === '#AAAAAA',
+    "the curator's changes still stay",
+  );
+  assert(
+    mergedAgain.draft.group === 'Newest group' &&
+      mergedAgain.draft.subscriber_count === '10,000' &&
+      mergedAgain.themeDraft.accentSecondary === '#FFFFFF',
+    'and what the last merge took from the worker, which the curator did not touch, takes the newest value',
+  );
+  const mergedAgainTheme = mergedAgain.themeDraft as Record<string, string>;
+  assert(
+    mergedAgainTheme.extra === '#888888' && !('custom' in mergedAgainTheme),
+    'a theme key the worker added is taken and one it removed (that the curator did not touch) is dropped',
+  );
+
+  // The order the curator has emptied (not a number: `undefined`) is theirs too, to put right.
+  const emptiedOrder = submissionRowReducer(open, { type: 'orderChanged', order: undefined });
+  assert(
+    submissionRowReducer(emptiedOrder, { type: 'submissionChanged', submission: answered }).orderDraft === undefined,
+    'an order that is not a number stays the curator\'s',
+  );
+
+  // A text field the worker empties, or nulls (a column nobody filled reads NULL), and the curator left alone is the empty
+  // string in the draft and not a missing key: an input handed `undefined` stops being a controlled one.
+  const filled = submissionRowReducer(
+    createSubmissionRowState(
+      makeSubmission({ group: 'Had a group', link_instagram: 'https://instagram.com/had', description: 'Had a description' }),
+    ),
+    { type: 'editStarted' },
+  );
+  const emptiedByWorker = submissionRowReducer(filled, {
+    type: 'submissionChanged',
+    submission: makeSubmission({ group: '', link_instagram: null as unknown as string, description: '' }),
+  });
+  assert(
+    emptiedByWorker.draft.group === '' && emptiedByWorker.draft.link_instagram === '' && emptiedByWorker.draft.description === '',
+    'a text field the worker empties or nulls, which the curator left alone, is the empty string in the draft',
+  );
+  assert(
+    Object.keys(emptiedByWorker.draft).length === EDITABLE_FIELDS.length &&
+      EDITABLE_FIELDS.every(({ key }) => typeof emptiedByWorker.draft[key] === 'string'),
+    'and the draft keeps all of its keys, each a string, so every input stays a controlled one',
+  );
+
+  // An editor nobody has touched takes the worker's value for everything, Enabled included.
+  const untouched = submissionRowReducer(createSubmissionRowState(startedFrom), { type: 'editStarted' });
+  const hidden = makeSubmission({ ...answered, enabled: 0, display_order: 9 });
+  const taken = submissionRowReducer(untouched, { type: 'submissionChanged', submission: hidden });
+  assert(
+    taken.draft.display_name === 'Theirs' && taken.orderDraft === 9 && !taken.enabledDraft && taken.themeDraft.accentPrimary === '#CCCCCC',
+    'an editor the curator has not touched takes every value of the new submission',
+  );
+
+  // The submission a row is created with is handed back to it by its first effect: that changes nothing and renders nothing.
+  assert(
+    submissionRowReducer(open, { type: 'submissionChanged', submission: startedFrom }) === open,
+    'the submission the drafts started from is no change',
+  );
+
+  // Cancel throws the drafts away and rebases on the submission it is given: the next change is taken whole.
+  const cancelled = submissionRowReducer(open, { type: 'editCancelled', submission: answered });
+  assert(
+    !cancelled.editing && cancelled.base === answered && cancelled.draft.display_name === 'Theirs' && cancelled.orderDraft === 3,
+    'cancelling restores the drafts to the submission it is given, and that is the new base',
+  );
+  assert(
+    submissionRowReducer(cancelled, { type: 'submissionChanged', submission: answeredAgain }).draft.display_name === 'Theirs again',
+    'so after a cancel nothing of the abandoned edit holds back the next change',
+  );
+
+  // A save that landed leaves the drafts as the worker saved them (it stores a blank channel id as nothing), not as typed.
+  const typed = submissionRowReducer(
+    submissionRowReducer(createSubmissionRowState(startedFrom), { type: 'editStarted' }),
+    { type: 'draftFieldChanged', key: 'youtube_channel_id', value: '  ' },
+  );
+  const stored = makeSubmission({ ...startedFrom, youtube_channel_id: '' });
+  const saved = submissionRowReducer(typed, { type: 'saveSucceeded', submission: stored });
+  assert(
+    !saved.editing && saved.draft.youtube_channel_id === '' && saved.base === stored,
+    'a saved editor holds what the worker answered with, and that is the new base',
+  );
+  assert(
+    submissionRowReducer(saved, { type: 'submissionChanged', submission: stored }) === saved,
+    'and the effect that hands that same submission over after it changes nothing',
+  );
 
   console.log('✓ Nova submission links stay safe, rows use no raw colour, and row state transitions hold');
 }

@@ -64,6 +64,11 @@ export interface SubmissionRowState {
   editing: boolean;
   /** Rejection note being written for this row; only this row re-renders as it is typed. */
   rejectNote: string;
+  /**
+   * The submission the drafts below were started from, or last merged with. A draft that still equals what this
+   * held for its field is one the curator has not touched, and it follows the worker when the submission changes.
+   */
+  base: NovaSubmission;
   draft: Record<EditableKey, string>;
   themeDraft: ThemeColors;
   enabledDraft: boolean;
@@ -76,6 +81,18 @@ export interface SubmissionRowState {
   verificationError: string | null;
 }
 
+/** What the editor holds for a submission before anyone types: its fields, its theme, whether it is enabled, its order. */
+type EditorValues = Pick<SubmissionRowState, 'draft' | 'themeDraft' | 'enabledDraft' | 'orderDraft'>;
+
+function editorValuesOf(submission: NovaSubmission): EditorValues {
+  return {
+    draft: buildSubmissionDraft(submission),
+    themeDraft: parseThemeJson(submission.theme_json),
+    enabledDraft: submission.enabled === 1,
+    orderDraft: submission.display_order ?? 0,
+  };
+}
+
 export function createSubmissionRowState(
   submission: NovaSubmission,
   rejectNote = '',
@@ -83,10 +100,8 @@ export function createSubmissionRowState(
   return {
     editing: false,
     rejectNote,
-    draft: buildSubmissionDraft(submission),
-    themeDraft: parseThemeJson(submission.theme_json),
-    enabledDraft: submission.enabled === 1,
-    orderDraft: submission.display_order ?? 0,
+    base: submission,
+    ...editorValuesOf(submission),
     saving: false,
     saveError: null,
     fetchingSubscribers: false,
@@ -108,31 +123,63 @@ export type SubmissionRowAction =
   | { type: 'orderChanged'; order: number | undefined }
   | { type: 'saveValidationFailed'; error: string }
   | { type: 'saveStarted' }
-  | { type: 'saveSucceeded' }
+  /** `submission` is what the worker answered the save with: the drafts become it. Left out, they are as they were. */
+  | { type: 'saveSucceeded'; submission?: NovaSubmission }
   | { type: 'saveFailed'; error: string }
   | { type: 'saveFinished' }
   | { type: 'subscribersFetchStarted' }
-  | {
-      type: 'subscribersFetchSucceeded';
-      submission: NovaSubmission;
-      updateDraft: boolean;
-    }
   | { type: 'subscribersFetchFailed'; error: string }
   | { type: 'subscribersFetchFinished' }
   | { type: 'verificationStarted' }
   | { type: 'verificationFailed'; error: string }
   | { type: 'verificationFinished' };
 
+/** The drafts as `submission` has them, and `submission` as the one they were started from. */
 function resetDrafts(
   state: SubmissionRowState,
   submission: NovaSubmission,
 ): SubmissionRowState {
+  return { ...state, base: submission, ...editorValuesOf(submission) };
+}
+
+/** `draft`'s value where the curator changed it (it is not what `base` held), else the worker's (`incoming`). */
+function mergedValue<T>(draft: T, base: T, incoming: T): T {
+  return draft === base ? incoming : draft;
+}
+
+/** `mergedValue` for every key of a record of strings, the keys of any of the three (a theme can hold more than the editor edits). */
+function mergedRecord<T extends Record<string, string>>(draft: T, base: T, incoming: T): T {
+  const merged: Record<string, string> = {};
+  for (const key of new Set([...Object.keys(draft), ...Object.keys(base), ...Object.keys(incoming)])) {
+    const value = mergedValue<string | undefined>(draft[key], base[key], incoming[key]);
+    if (value !== undefined) merged[key] = value;
+  }
+  return merged as T;
+}
+
+/**
+ * The submission this row holds has changed while its drafts may be being edited: the editor's Fetch, a
+ * verification, a review or a list reload has answered. A three-way merge, field by field, with the submission
+ * the drafts started from (or were last merged with) as the base:
+ *
+ * - a field the curator changed keeps their value, including a field the worker changed too: they are about to
+ *   save, and what they typed is what they mean;
+ * - a field they left alone takes the worker's value;
+ * - the new submission becomes the base.
+ *
+ * It covers every field the editor has: the text fields, the order, Enabled, the social links and the colours. The
+ * editor's Fetch writes no draft of its own: the count and the avatar it fetched arrive here, as the rest do.
+ */
+function mergeSubmission(state: SubmissionRowState, incoming: NovaSubmission): SubmissionRowState {
+  const was = editorValuesOf(state.base);
+  const now = editorValuesOf(incoming);
   return {
     ...state,
-    draft: buildSubmissionDraft(submission),
-    themeDraft: parseThemeJson(submission.theme_json),
-    enabledDraft: submission.enabled === 1,
-    orderDraft: submission.display_order ?? 0,
+    base: incoming,
+    draft: mergedRecord(state.draft, was.draft, now.draft),
+    themeDraft: mergedRecord(state.themeDraft, was.themeDraft, now.themeDraft),
+    enabledDraft: mergedValue(state.enabledDraft, was.enabledDraft, now.enabledDraft),
+    orderDraft: mergedValue(state.orderDraft, was.orderDraft, now.orderDraft),
   };
 }
 
@@ -142,7 +189,8 @@ export function submissionRowReducer(
 ): SubmissionRowState {
   switch (action.type) {
     case 'submissionChanged':
-      return resetDrafts(state, action.submission);
+      // The row's first effect hands over the submission it was created with: nothing has changed.
+      return action.submission === state.base ? state : mergeSubmission(state, action.submission);
     case 'editStarted':
       return { ...state, editing: true };
     case 'rejectNoteChanged':
@@ -174,7 +222,10 @@ export function submissionRowReducer(
     case 'saveStarted':
       return { ...state, saving: true, saveError: null };
     case 'saveSucceeded':
-      return { ...state, editing: false };
+      // Saved: the drafts are what the worker stored, which can differ from what was typed (a blank channel id).
+      return action.submission === undefined
+        ? { ...state, editing: false }
+        : { ...resetDrafts(state, action.submission), editing: false };
     case 'saveFailed':
       return { ...state, saveError: action.error };
     case 'saveFinished':
@@ -185,17 +236,6 @@ export function submissionRowReducer(
         fetchingSubscribers: true,
         fetchSubscribersError: null,
       };
-    case 'subscribersFetchSucceeded':
-      return action.updateDraft
-        ? {
-            ...state,
-            draft: {
-              ...state.draft,
-              subscriber_count: action.submission.subscriber_count ?? '',
-              avatar_url: action.submission.avatar_url ?? '',
-            },
-          }
-        : state;
     case 'subscribersFetchFailed':
       return { ...state, fetchSubscribersError: action.error };
     case 'subscribersFetchFinished':
