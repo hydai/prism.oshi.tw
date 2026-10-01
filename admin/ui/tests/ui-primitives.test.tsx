@@ -2,6 +2,7 @@ import { renderToStaticMarkup } from 'react-dom/server';
 import type { Stream } from '../../shared/types';
 import type { VodExportFindingApi } from '../src/api/vodExportTypes';
 import { NO_ARBITRARY_HEX, NO_RAW_PALETTE } from './helpers/palette';
+import { sourceFiles } from './helpers/source';
 
 function assert(condition: boolean, message: string): asserts condition {
   if (!condition) {
@@ -1436,13 +1437,9 @@ async function main(): Promise<void> {
 
   // No page lays the row out by hand any more: every note whose message ends in a control passes it as `action`.
   {
-    const { readdirSync, readFileSync } = await import('node:fs');
-    const src = new URL('../src/', import.meta.url);
-    const spellers: string[] = [];
-    for (const entry of readdirSync(src, { recursive: true, encoding: 'utf8' })) {
-      if (!entry.endsWith('.ts') && !entry.endsWith('.tsx')) continue;
-      if (readFileSync(new URL(entry, src), 'utf8').includes('justify-between gap-x-3 gap-y-1.5')) spellers.push(entry);
-    }
+    const spellers = sourceFiles()
+      .filter(({ text }) => text.includes('justify-between gap-x-3 gap-y-1.5'))
+      .map(({ path }) => path);
     assert(
       spellers.join() === 'components/ui/Note.tsx',
       `the message-plus-action row is laid out in Note.tsx alone, every other note passes its control as action (also spelled in: ${spellers.filter((file) => file !== 'components/ui/Note.tsx').join(', ')})`,
@@ -2585,7 +2582,6 @@ async function main(): Promise<void> {
   // --- MICRO_LABEL everywhere: no site spells its classes by hand ---
 
   {
-    const { readdirSync, readFileSync } = await import('node:fs');
     const { MICRO_LABEL, MICRO_LABEL_TYPE } = await import('../src/components/ui/micro-label');
     const { default: TagPicker } = await import('../src/components/TagPicker');
     const { StampConsole } = await import('../src/components/workbench/StampConsole');
@@ -2597,13 +2593,9 @@ async function main(): Promise<void> {
     assert(MICRO_LABEL === `${MICRO_LABEL_TYPE} text-fg-subtle`, 'the micro label is that type in the subtle colour');
 
     // The classes (and the 0.1x em letter-spacing a near-copy spells) are written in micro-label.ts alone.
-    const src = new URL('../src/', import.meta.url);
-    const spellers: string[] = [];
-    for (const entry of readdirSync(src, { recursive: true, encoding: 'utf8' })) {
-      if (!entry.endsWith('.ts') && !entry.endsWith('.tsx')) continue;
-      const source = readFileSync(new URL(entry, src), 'utf8');
-      if (source.includes('text-2xs font-bold uppercase') || /tracking-\[0\.1\d*em\]/.test(source)) spellers.push(entry);
-    }
+    const spellers = sourceFiles()
+      .filter(({ text }) => text.includes('text-2xs font-bold uppercase') || /tracking-\[0\.1\d*em\]/.test(text))
+      .map(({ path }) => path);
     assert(
       spellers.join() === 'components/ui/micro-label.ts',
       `the micro label's classes are spelled in micro-label.ts alone, every other site takes MICRO_LABEL (also spelled in: ${spellers.filter((file) => file !== 'components/ui/micro-label.ts').join(', ')})`,
@@ -2652,7 +2644,6 @@ async function main(): Promise<void> {
   // --- INSET_FOCUS: the one focus ring of a control that spans a clipping card edge to edge ---
 
   {
-    const { readdirSync, readFileSync } = await import('node:fs');
     const { MemoryRouter } = await import('react-router-dom');
     const { INSET_FOCUS } = await import('../src/components/ui/focus-classes');
     const { QueueLayout } = await import('../src/components/ui/QueueLayout');
@@ -2696,15 +2687,11 @@ async function main(): Promise<void> {
     assert(outlineOffset === '-2px', `the last outline-offset, the one that wins, is -2px: the outline sits inside (got "${outlineOffset}")`);
 
     // Its classes are written in focus-classes.ts alone: every other site takes the constant.
-    const src = new URL('../src/', import.meta.url);
-    const spellers: string[] = [];
-    const users: string[] = [];
-    for (const entry of readdirSync(src, { recursive: true, encoding: 'utf8' })) {
-      if (!entry.endsWith('.ts') && !entry.endsWith('.tsx')) continue;
-      const source = readFileSync(new URL(entry, src), 'utf8');
-      if (source.includes('inset_0_0_0_2px')) spellers.push(entry);
-      if (source.includes('INSET_FOCUS') && source.includes("/focus-classes'")) users.push(entry);
-    }
+    const files = sourceFiles();
+    const spellers = files.filter(({ text }) => text.includes('inset_0_0_0_2px')).map(({ path }) => path);
+    const users = files
+      .filter(({ text }) => text.includes('INSET_FOCUS') && text.includes("/focus-classes'"))
+      .map(({ path }) => path);
     assert(
       spellers.join() === 'components/ui/focus-classes.ts',
       `the inset focus ring is spelled in focus-classes.ts alone, every other site takes INSET_FOCUS (also spelled in: ${spellers.filter((file) => file !== 'components/ui/focus-classes.ts').join(', ')})`,
