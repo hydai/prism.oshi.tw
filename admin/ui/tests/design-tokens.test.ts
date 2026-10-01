@@ -739,6 +739,23 @@ async function main(): Promise<void> {
 
   console.log('✓ under prefers-reduced-motion every animation and transition runs once and stops');
 
+  // --- The global focus ring: a shadow, and an outline forced-colors mode can paint ---
+
+  // Forced-colors mode (Windows High Contrast) drops every box-shadow. A control that keeps the global rule's
+  // outline then still shows its focus: a transparent outline is painted in a system colour there, and is
+  // invisible everywhere else. `outline: none` would leave such a control with no indicator at all.
+  const focusRule = /:where\(a, button, input, select, textarea, summary, \[tabindex\]\):focus-visible\s*\{([^}]*)\}/.exec(bareCss)?.[1];
+  assert(focusRule !== undefined, 'index.css has the global :focus-visible rule for every focusable, at zero specificity');
+  const focusDeclarations = collapse(focusRule);
+  assert(focusDeclarations.includes('box-shadow: var(--focus-ring);'), 'the global focus rule draws the focus ring as a shadow');
+  assert(
+    focusDeclarations.includes('outline: 2px solid transparent;') && focusDeclarations.includes('outline-offset: 2px;'),
+    `the global focus rule carries a transparent outline, 2px out, for forced-colors mode (got "${focusDeclarations}")`,
+  );
+  assert(!/outline:\s*none/.test(focusDeclarations), 'the global focus rule carries a transparent outline, not `none`');
+
+  console.log('✓ the global focus rule draws the ring as a shadow and keeps a transparent outline, which forced-colors mode paints');
+
   // --- Tailwind maps every token to a utility, and dark mode is class-based ---
 
   const configModule = await import('../tailwind.config');

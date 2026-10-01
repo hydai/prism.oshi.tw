@@ -292,8 +292,13 @@ html.dark body {
   }
 }
 
+/* Every focusable's ring is a shadow. Forced-colors mode (Windows High Contrast) drops shadows and paints
+   a transparent outline in a system colour instead, so the outline is transparent, not none: invisible
+   everywhere else, and the one indicator a control without an outline of its own keeps there. :where()
+   weighs nothing, so a control's own focus classes (Tailwind's outline-none is the same outline) win. */
 :where(a, button, input, select, textarea, summary, [tabindex]):focus-visible {
-  outline: none;
+  outline: 2px solid transparent;
+  outline-offset: 2px;
   box-shadow: var(--focus-ring);
 }
 
