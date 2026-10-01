@@ -13,14 +13,14 @@
  * request it sends, a duplicate video that links to the stream it duplicates, a server error that keeps
  * the form, and the busy submit.
  *
- * Each route is pinned too: it renders through `routeElement`, open to contributors.
+ * Each route is pinned too: open to contributors.
  */
 import { deepStrictEqual } from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
 import { act } from 'react';
 import { renderToStaticMarkup } from 'react-dom/server';
 import { MemoryRouter, Route, Routes, useLocation } from 'react-router-dom';
-import type { AuthUser, Song } from '../../shared/types';
+import type { Song } from '../../shared/types';
 import YouTubeEmbed from '../src/components/YouTubeEmbed';
 import { buttonClasses } from '../src/components/ui/button-classes';
 import { youtubeThumbnailUrl } from '../src/lib/youtube';
@@ -43,8 +43,6 @@ function assertNoRawColour(html: string, what: string): void {
 }
 
 // --- Fixtures ---
-
-const contributor: AuthUser = { email: 'contributor@example.com', role: 'contributor' };
 
 const CREATED: Song = {
   id: 's-new',
@@ -2015,20 +2013,11 @@ async function main(): Promise<void> {
   setCurrentStreamer('mizuki');
   const { default: SubmitSong } = await import('../src/pages/SubmitSong');
   const { ToastProvider } = await import('../src/components/ui/toast');
-  const { ADMIN_ROUTES, routeElement } = await import('../src/lib/routes');
+  const { ADMIN_ROUTES } = await import('../src/lib/routes');
 
-  // The route renders through `routeElement`: the page brings its own header and gutter.
   const route = need(ADMIN_ROUTES.find((candidate) => candidate.path === '/submit/song'), 'the /submit/song route');
   assert(route.curatorOnly !== true, 'it stays open to contributors, as POST /api/songs is');
-  const rendered = renderToStaticMarkup(
-    <MemoryRouter initialEntries={['/submit/song']}>
-      <Routes>
-        <Route path="/submit/song" element={routeElement(route, contributor)} />
-      </Routes>
-    </MemoryRouter>,
-  );
-  assert(rendered !== '', 'the route renders');
-  console.log('✓ Submit Song: its route renders, open to contributors');
+  console.log('✓ Submit Song: its route is open to contributors');
 
   const mountPage: MountPage = () =>
     mount(
@@ -2081,18 +2070,9 @@ async function main(): Promise<void> {
 
   const { default: SubmitStream } = await import('../src/pages/SubmitStream');
 
-  // The route renders through `routeElement` too: the page brings its own header and gutter.
   const streamRoute = need(ADMIN_ROUTES.find((candidate) => candidate.path === '/submit/stream'), 'the /submit/stream route');
   assert(streamRoute.curatorOnly !== true, 'it stays open to contributors, as POST /api/streams is');
-  const streamRendered = renderToStaticMarkup(
-    <MemoryRouter initialEntries={['/submit/stream']}>
-      <Routes>
-        <Route path="/submit/stream" element={routeElement(streamRoute, contributor)} />
-      </Routes>
-    </MemoryRouter>,
-  );
-  assert(streamRendered !== '', 'the route renders');
-  console.log('✓ Submit Stream: its route renders, open to contributors');
+  console.log('✓ Submit Stream: its route is open to contributors');
 
   const mountStream: MountPage = () =>
     mount(

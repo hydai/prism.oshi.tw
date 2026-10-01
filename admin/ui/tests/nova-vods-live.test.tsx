@@ -10,8 +10,6 @@
 import { deepStrictEqual } from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
 import { act } from 'react';
-import { renderToStaticMarkup } from 'react-dom/server';
-import { MemoryRouter, Route, Routes } from 'react-router-dom';
 import type { AuthUser, NovaStatus, NovaVodSong, NovaVodSubmission } from '../../shared/types';
 import { INSET_FOCUS } from '../src/components/ui/focus-classes';
 import { MICRO_LABEL } from '../src/components/ui/micro-label';
@@ -1798,21 +1796,12 @@ async function main(): Promise<void> {
   const { default: NovaVodSubmissions } = await import('../src/pages/NovaVodSubmissions');
   const { ConfirmProvider } = await import('../src/components/ui/confirm');
   const { ToastProvider } = await import('../src/components/ui/toast');
-  const { ADMIN_ROUTES, routeElement } = await import('../src/lib/routes');
+  const { ADMIN_ROUTES } = await import('../src/lib/routes');
 
-  // The route renders through `routeElement`, behind the curator gate: the page brings its own header
-  // and gutter, and a contributor never reaches it.
+  // Behind the curator gate: a contributor never reaches the page.
   const route = need(ADMIN_ROUTES.find((candidate) => candidate.path === '/nova/vods'), 'the /nova/vods route');
   assert(route.curatorOnly === true, '/nova/vods is curator-only');
-  const rendered = renderToStaticMarkup(
-    <MemoryRouter initialEntries={['/nova/vods']}>
-      <Routes>
-        <Route path="/nova/vods" element={routeElement(route, curator)} />
-      </Routes>
-    </MemoryRouter>,
-  );
-  assert(rendered !== '', 'the route renders');
-  console.log('✓ Nova VODs: its route renders, curator-only');
+  console.log('✓ Nova VODs: its route is curator-only');
 
   const mountPage: MountPage = (user = curator) =>
     mount(

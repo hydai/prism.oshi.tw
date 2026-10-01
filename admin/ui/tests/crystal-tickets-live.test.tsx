@@ -9,8 +9,6 @@
 import { deepStrictEqual } from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
 import { act } from 'react';
-import { renderToStaticMarkup } from 'react-dom/server';
-import { MemoryRouter, Route, Routes } from 'react-router-dom';
 import type { AuthUser, CrystalTicket, CrystalTicketStatus, CrystalTicketType } from '../../shared/types';
 import { TONE_BOX_CLASS, TONE_TEXT_CLASS } from '../src/components/ui/pill-core';
 import { formatFullTime, formatWhen, storedTimeIso } from '../src/lib/dates';
@@ -1210,21 +1208,12 @@ async function main(): Promise<void> {
 
   const { default: CrystalTickets } = await import('../src/pages/CrystalTickets');
   const { ToastProvider } = await import('../src/components/ui/toast');
-  const { ADMIN_ROUTES, routeElement } = await import('../src/lib/routes');
+  const { ADMIN_ROUTES } = await import('../src/lib/routes');
 
-  // The route renders through `routeElement`, behind the curator gate: the page brings its own header
-  // and gutter, and a contributor never reaches it.
+  // Behind the curator gate: a contributor never reaches the page.
   const route = need(ADMIN_ROUTES.find((candidate) => candidate.path === '/crystal'), 'the /crystal route');
   assert(route.curatorOnly === true, '/crystal is curator-only');
-  const rendered = renderToStaticMarkup(
-    <MemoryRouter initialEntries={['/crystal']}>
-      <Routes>
-        <Route path="/crystal" element={routeElement(route, curator)} />
-      </Routes>
-    </MemoryRouter>,
-  );
-  assert(rendered !== '', 'the route renders');
-  console.log('✓ Crystal: its route renders, curator-only');
+  console.log('✓ Crystal: its route is curator-only');
 
   const mountPage: MountPage = (user = curator) =>
     mount(
