@@ -395,6 +395,11 @@ async function firstLoadAndLayout(mountPage: MountPage): Promise<void> {
   const title = inputLabelled(container, 'Title');
   const artist = inputLabelled(container, 'Original artist');
   assert(cardOf(container, 'Song').contains(title) && cardOf(container, 'Song').contains(artist), 'both sit in the Song card');
+  // A field is one item of the card's column on its own: its root is the item, and nothing wraps it.
+  assert(
+    title.parentElement?.parentElement === cardOf(container, 'Song') && artist.parentElement?.parentElement === cardOf(container, 'Song'),
+    "the Title and Original artist fields are the Song card's own items, with no wrapper around them",
+  );
   assert(title.type === 'text' && artist.type === 'text', 'both are text inputs');
   assert(
     title.getAttribute('aria-required') === 'true' && artist.getAttribute('aria-required') === 'true',
@@ -507,6 +512,18 @@ async function performanceRowFields(mountPage: MountPage): Promise<void> {
   deepStrictEqual(
     grid.className.split(/\s+/).filter((name) => name.includes('grid-cols-')).sort(),
     ['grid-cols-1', 'lg:grid-cols-2'],
+  );
+  // Start and End are single grid items themselves; Stream ID and Note are wrapped only to span both columns from lg.
+  assert(grid.children.length === 4, `the grid holds four items (got ${grid.children.length})`);
+  assert(
+    [start, end].every((input) => input.parentElement?.parentElement === grid),
+    'Start and End are items of the grid, with no wrapper around their fields',
+  );
+  assert(
+    [stream, note].every(
+      (input) => input.parentElement?.parentElement?.parentElement === grid && input.parentElement.parentElement.className === 'lg:col-span-2',
+    ),
+    'Stream ID and Note are wrapped to span both columns from lg, and by nothing else',
   );
   assert(
     [...container.querySelectorAll('button')].every((button) => button.hasAttribute('type')),

@@ -76,26 +76,22 @@ function PerformanceRow({ number, draft, errors, onChange, onRemove }: Performan
             onChange={edit('streamId')}
           />
         </div>
-        <div>
-          <TextField
-            id={rowFieldId(clientId, 'timestamp')}
-            label="Start (seconds)"
-            inputMode="numeric"
-            value={draft.timestamp}
-            error={errors?.timestamp}
-            onChange={edit('timestamp')}
-          />
-        </div>
-        <div>
-          <TextField
-            id={rowFieldId(clientId, 'endTimestamp')}
-            label="End (seconds, optional)"
-            inputMode="numeric"
-            value={draft.endTimestamp}
-            error={errors?.endTimestamp}
-            onChange={edit('endTimestamp')}
-          />
-        </div>
+        <TextField
+          id={rowFieldId(clientId, 'timestamp')}
+          label="Start (seconds)"
+          inputMode="numeric"
+          value={draft.timestamp}
+          error={errors?.timestamp}
+          onChange={edit('timestamp')}
+        />
+        <TextField
+          id={rowFieldId(clientId, 'endTimestamp')}
+          label="End (seconds, optional)"
+          inputMode="numeric"
+          value={draft.endTimestamp}
+          error={errors?.endTimestamp}
+          onChange={edit('endTimestamp')}
+        />
         <div className="lg:col-span-2">
           <TextField
             id={rowFieldId(clientId, 'note')}
@@ -218,26 +214,22 @@ export default function SubmitSong() {
       >
         <GlassCard as="section" aria-label="Song" className="flex flex-col gap-4">
           <h2 className="text-[14px] font-bold text-fg">Song</h2>
-          <div>
-            <TextField
-              id={titleId}
-              label="Title"
-              required
-              value={title}
-              error={showErrors ? check.titleError : null}
-              onChange={setTitle}
-            />
-          </div>
-          <div>
-            <TextField
-              id={artistId}
-              label="Original artist"
-              required
-              value={originalArtist}
-              error={showErrors ? check.artistError : null}
-              onChange={setOriginalArtist}
-            />
-          </div>
+          <TextField
+            id={titleId}
+            label="Title"
+            required
+            value={title}
+            error={showErrors ? check.titleError : null}
+            onChange={setTitle}
+          />
+          <TextField
+            id={artistId}
+            label="Original artist"
+            required
+            value={originalArtist}
+            error={showErrors ? check.artistError : null}
+            onChange={setOriginalArtist}
+          />
         </GlassCard>
 
         <GlassCard as="section" aria-label="Performances" className="flex flex-col gap-4">
