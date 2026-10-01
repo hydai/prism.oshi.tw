@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useRef, useState, type FormEvent, type MouseEvent } from 'react';
+import { useEffect, useMemo, useRef, useState, type FormEvent, type MouseEvent, type RefObject } from 'react';
 import { Link } from 'react-router-dom';
 import type { AuthUser, Status, Stream } from '../../../shared/types';
 import { api, getCurrentStreamer, setCurrentStreamer } from '../api/client';
@@ -284,6 +284,36 @@ function StreamsTable({ streams, curator, today, sortKey, sortDir, acting, onSor
 }
 
 /**
+ * The list's load failure: why it failed, and a Retry that loads it again. The alert leaves as soon as the load
+ * restarts, and the Retry that held the focus with it: the page heading takes it, rather than <body>.
+ */
+function StreamsLoadFailure({
+  message,
+  headingRef,
+  onReload,
+}: {
+  message: string;
+  headingRef: RefObject<HTMLHeadingElement | null>;
+  onReload: () => void;
+}) {
+  const handleRetry = (event: MouseEvent<HTMLButtonElement>) => {
+    if (document.activeElement === event.currentTarget) headingRef.current?.focus();
+    onReload();
+  };
+  return (
+    <Note
+      tone="danger"
+      icon="alert"
+      role="alert"
+      title="Couldn't load streams."
+      action={<Button size="sm" icon="refresh" onClick={handleRetry}>Retry</Button>}
+    >
+      {message}
+    </Note>
+  );
+}
+
+/**
  * The stream list (spec §8.9): search, status and year chips, a table sorted in the browser, and for a
  * curator one status action per row. The rows stay while a later load is out (the skeleton is for the
  * first one only), so a control that started the load keeps its place.
@@ -497,13 +527,6 @@ export default function StreamsList({ user }: { user: AuthUser }) {
 
   const handleChange = (stream: Stream, status: Status) => void handleStatus(stream, status);
 
-  const handleRetry = (event: MouseEvent<HTMLButtonElement>) => {
-    // The alert leaves as soon as the load restarts, and the Retry that held the focus with it: the
-    // page heading takes it, rather than <body>.
-    if (document.activeElement === event.currentTarget) headingRef.current?.focus();
-    list.reload();
-  };
-
   const isCurator = user.role === 'curator';
 
   return (
@@ -566,15 +589,7 @@ export default function StreamsList({ user }: { user: AuthUser }) {
         </div>
 
         {list.error !== null ? (
-          <Note
-            tone="danger"
-            icon="alert"
-            role="alert"
-            title="Couldn't load streams."
-            action={<Button size="sm" icon="refresh" onClick={handleRetry}>Retry</Button>}
-          >
-            {list.error}
-          </Note>
+          <StreamsLoadFailure message={list.error} headingRef={headingRef} onReload={list.reload} />
         ) : null}
 
         {list.data === null ? (
