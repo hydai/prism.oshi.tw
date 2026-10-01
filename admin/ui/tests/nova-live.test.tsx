@@ -1264,6 +1264,228 @@ async function verifyingTheChannel(mountPage: MountPage): Promise<void> {
 
 const REVIEWED_AT = '2026-09-02T10:00:00.000Z';
 
+/** The body of the save an editor's submit sent, read as the fields it carries. */
+function savedBody(index: number): Record<string, unknown> {
+  return need(saveCalls()[index], `save request ${index + 1}`).body as Record<string, unknown>;
+}
+
+/**
+ * What a save sent, apart from the theme. The editor sends its twelve colours whole whenever the stored theme is not
+ * that exact string (Alpha's holds two), so the theme is read on its own, by `savedTheme`.
+ */
+function savedFields(index: number): Record<string, unknown> {
+  return Object.fromEntries(Object.entries(savedBody(index)).filter(([key]) => key !== 'theme_json'));
+}
+
+/** The colours a save sent, by name. */
+function savedTheme(index: number): Record<string, string> {
+  return JSON.parse(String(savedBody(index).theme_json ?? '{}')) as Record<string, string>;
+}
+
+/**
+ * A submission that changes under an open editor (here by the editor's own Fetch, a verification, a review, a list
+ * reload) is merged into the drafts: what the curator changed stays, even where the worker changed it too; what they
+ * left alone takes the worker's value. Each trigger has a scenario; a save afterwards sends only what the curator changed.
+ */
+async function aFetchLandsWhileEditing(mountPage: MountPage): Promise<void> {
+  reset();
+  const { container, unmount } = await mountPage();
+  const form = await openEditor(container, 'n-alpha', 'Alpha');
+  await typeInto(fieldOf(form, 'Display Name'), 'Alpha Prime');
+  await typeInto(fieldOf(form, 'Group'), 'Curator group');
+
+  const answer = held();
+  subscribersReply = () => answer.reply;
+  const fetch = need(buttonNamed(form, 'Fetch'), 'Fetch');
+  await focus(fetch);
+  await click(fetch, 'Fetch');
+  await respond(answer, defaultSubscribersReply(need(subscribersCalls()[0], 'the request'), 'n-alpha'));
+  assert(messagesOf(container) === 'Channel info updated', 'the fetch lands');
+
+  assert(
+    fieldOf(form, 'Display Name').value === 'Alpha Prime' && fieldOf(form, 'Group').value === 'Curator group',
+    "the curator's unsaved edits survive the fetch",
+  );
+  assert(
+    fieldOf(form, 'Subscriber Count').value === '99.9K' && fieldOf(form, 'Avatar URL').value === 'https://yt3.ggpht.com/refreshed=s240',
+    'and the fetched fields take the fetched values',
+  );
+  assert(buttonNamed(form, 'Save') !== null && isIdle(fetch) && focused() === fetch, 'the editor stays open, with the focus on Fetch');
+
+  await submitForm(form);
+  deepStrictEqual(savedFields(0), { display_name: 'Alpha Prime', group: 'Curator group' });
+  assert(savedTheme(0).accentPrimary === '#FF00AA' && savedTheme(0).bgPageStart === '#112233', 'a save sends the colours as they were: the fetch left them alone');
+  await unmount();
+  console.log('✓ Nova: a fetch that lands while the editor is open keeps the unsaved edits and updates the fetched fields');
+}
+
+/**
+ * The editor's own Fetch reaches the drafts as any changed submission does: a field the curator edits while it is out
+ * keeps what they typed, and one they leave alone takes the fetched value.
+ */
+async function aFieldEditedWhileTheFetchIsOutKeepsTheEdit(mountPage: MountPage): Promise<void> {
+  reset();
+  const { container, unmount } = await mountPage();
+  const form = await openEditor(container, 'n-alpha', 'Alpha');
+  const answer = held();
+  subscribersReply = () => answer.reply;
+  const fetch = need(buttonNamed(form, 'Fetch'), 'Fetch');
+  await focus(fetch);
+  await click(fetch, 'Fetch');
+
+  // While the fetch is out, the curator types the count themselves, and leaves the avatar alone.
+  await typeInto(fieldOf(form, 'Subscriber Count'), '13K');
+  await respond(answer, defaultSubscribersReply(need(subscribersCalls()[0], 'the request'), 'n-alpha'));
+  assert(messagesOf(container) === 'Channel info updated', 'the fetch lands');
+  assert(
+    fieldOf(form, 'Subscriber Count').value === '13K',
+    `the count typed while the fetch was out stays (got ${fieldOf(form, 'Subscriber Count').value})`,
+  );
+  assert(fieldOf(form, 'Avatar URL').value === 'https://yt3.ggpht.com/refreshed=s240', 'the avatar left alone takes the fetched value');
+
+  // A save then sends the typed count, and none of the fields the fetch already stored.
+  await submitForm(form);
+  deepStrictEqual(savedFields(0), { subscriber_count: '13K' }, 'a save sends the count the curator typed, and no fetched field');
+  await unmount();
+  console.log("✓ Nova: a field edited while the editor's Fetch is out keeps the edit; one left alone takes the fetched value");
+}
+
+async function aReviewLandsWhileEditing(mountPage: MountPage): Promise<void> {
+  reset();
+  const { container, unmount } = await mountPage();
+
+  // An approval is out for Alpha; while it is, the curator opens the row, presses Edit and changes some fields.
+  const answer = held();
+  statusReply = () => answer.reply;
+  const approve = quick(container, 'Alpha', 'Approve');
+  await focus(approve);
+  await click(approve, 'Approve');
+  const form = await openEditor(container, 'n-alpha', 'Alpha');
+  const typing = fieldOf(form, 'Display Name');
+  await typeInto(typing, 'Alpha Prime');
+  const enabled = need(form.querySelector<HTMLInputElement>('input[type="checkbox"]'), 'the Enabled checkbox');
+  await click(enabled, 'the Enabled checkbox');
+  await typeInto(fieldOf(form, 'Order'), '5');
+  await typeInto(colourOf(form, 'accentPrimary'), '#00ff00');
+  await focus(typing);
+
+  // The answer says Alpha is approved, and that the worker's group is another one.
+  await respond(answer, ok({ ...ALPHA, status: 'approved', reviewed_at: REVIEWED_AT, group: 'Worker group' }));
+  assert(messagesOf(container) === 'Submission approved', 'the approval lands');
+  assert(textOf([...summaryOf(container, 'Alpha').querySelectorAll(':scope > td')][4]).startsWith('Approved'), 'the row shows the new status');
+  assert(
+    fieldOf(form, 'Display Name').value === 'Alpha Prime' &&
+      !enabled.checked &&
+      fieldOf(form, 'Order').value === '5' &&
+      colourOf(form, 'accentPrimary').value.toUpperCase() === '#00FF00',
+    "the curator's unsaved edits survive the review: a field, Enabled, the order and a colour",
+  );
+  assert(fieldOf(form, 'Group').value === 'Worker group', 'a field they left alone takes the worker\'s value');
+  assert(focused() === typing, 'the focus is still where they were typing');
+
+  await submitForm(form);
+  deepStrictEqual(savedFields(0), { display_name: 'Alpha Prime', enabled: 0, display_order: 5 });
+  assert(savedTheme(0).accentPrimary === '#00FF00', "a save sends what the curator changed (and the colour they chose), and neither the worker's group nor the status");
+  await unmount();
+  console.log('✓ Nova: a review that lands while the editor is open keeps the unsaved edits and shows the new status');
+}
+
+async function aVerificationLandsWhileEditing(mountPage: MountPage): Promise<void> {
+  reset();
+  const { container, unmount } = await mountPage();
+  await expand(container, 'Alpha');
+  const form = formOf('n-alpha');
+
+  // A verification is out; while it is, the curator presses Edit (Verify channel gives way to Save and Cancel) and types.
+  const answer = held();
+  verifyReply = () => answer.reply;
+  const verify = need(buttonNamed(form, 'Verify channel'), 'Verify channel');
+  await focus(verify);
+  await click(verify, 'Verify channel');
+  assert(verifyCalls().length === 1, 'the verification is out');
+  await click(need(buttonNamed(form, 'Edit'), 'Edit'), 'Edit');
+  await typeInto(fieldOf(form, 'Display Name'), 'Alpha Prime');
+  await typeInto(fieldOf(form, 'Description'), 'What the curator wrote');
+
+  await respond(answer, defaultVerifyReply(need(verifyCalls()[0], 'the request'), 'n-alpha'));
+  assert(messagesOf(container) === 'Channel verified', 'the verification lands');
+  assert(
+    fieldOf(form, 'Display Name').value === 'Alpha Prime' && fieldOf(form, 'Description').value === 'What the curator wrote',
+    "the curator's unsaved edits survive the verification",
+  );
+  assert(need([...form.querySelectorAll('span')].find((span) => textOf(span) === 'Verified'), 'the Verified pill').className.includes(TONE_BOX_CLASS.ok), 'and the header shows the channel verified');
+
+  await submitForm(form);
+  deepStrictEqual(savedFields(0), { display_name: 'Alpha Prime', description: 'What the curator wrote' });
+  await unmount();
+  console.log('✓ Nova: a verification that lands while the editor is open keeps the unsaved edits');
+}
+
+async function aFieldBothSidesChangedKeepsTheCurators(mountPage: MountPage): Promise<void> {
+  reset();
+  const { container, unmount } = await mountPage();
+  const answer = held();
+  statusReply = () => answer.reply;
+  const reject = quick(container, 'Alpha', 'Reject');
+  await focus(reject);
+  await click(reject, 'Reject');
+  const form = await openEditor(container, 'n-alpha', 'Alpha');
+  await typeInto(fieldOf(form, 'Description'), 'What the curator wrote');
+
+  // The worker's answer changes the same description, and the group the curator did not touch.
+  await respond(answer, ok({ ...ALPHA, status: 'rejected', reviewed_at: REVIEWED_AT, description: 'What the worker has', group: 'Worker group' }));
+  assert(messagesOf(container) === 'Submission rejected', 'the rejection lands');
+  assert(fieldOf(form, 'Description').value === 'What the curator wrote', 'a field both sides changed keeps the curator\'s value: they are about to save it');
+  assert(fieldOf(form, 'Group').value === 'Worker group', 'and the one only the worker changed takes the worker\'s');
+
+  await submitForm(form);
+  deepStrictEqual(savedFields(0), { description: 'What the curator wrote' });
+  await unmount();
+  console.log("✓ Nova: a field both the curator and the worker changed keeps the curator's value");
+}
+
+/** A save leaves the editor holding what the worker stored, which can differ from what was typed. */
+async function aSaveShowsWhatWasStored(mountPage: MountPage): Promise<void> {
+  reset();
+  const { container, unmount } = await mountPage();
+  const form = await openEditor(container, 'n-alpha', 'Alpha');
+  await typeInto(fieldOf(form, 'Display Name'), 'Alpha Prime  ');
+
+  // The worker stores what it is sent, but trims the name.
+  saveReply = (call) => ok({ ...ALPHA, ...(call.body as object), display_name: 'Alpha Prime' });
+  await submitForm(form);
+  assert(saveCalls().length === 1 && messagesOf(container) === 'Submission saved', 'the save lands');
+  assert(nameOf(container, 'Alpha Prime') !== null, 'the row shows the stored name');
+
+  const edit = need(buttonNamed(form, 'Edit'), 'Edit');
+  await focus(edit);
+  await click(edit, 'Edit');
+  assert(fieldOf(form, 'Display Name').value === 'Alpha Prime', 'the next edit starts from what was stored, not from what was typed');
+  await submitForm(form);
+  assert(saveCalls().length === 1, 'and a save of it sends nothing: there is nothing to change');
+  await unmount();
+  console.log('✓ Nova: a save leaves the editor holding what the worker stored');
+}
+
+async function aReloadLandsWhileEditing(mountPage: MountPage): Promise<void> {
+  reset();
+  const { container, unmount } = await mountPage();
+  const form = await openEditor(container, 'n-alpha', 'Alpha');
+  await typeInto(fieldOf(form, 'Display Name'), 'Alpha Prime');
+
+  // "Fetch All Channel Info" reloads the whole list, so every row is handed a new submission; Alpha has a new count.
+  listReply = () => ok({ data: [{ ...ALPHA, subscriber_count: '1.5M' }, BETA, GAMMA, DELTA], total: SUBMISSIONS.length });
+  await click(need(buttonNamed(pageHeader(container), 'Fetch All Channel Info'), 'Fetch All Channel Info'), 'Fetch All Channel Info');
+  assert(listCalls().length === 2, 'the list is reloaded');
+  assert(fieldOf(form, 'Display Name').value === 'Alpha Prime', "the curator's unsaved edit survives the reload");
+  assert(fieldOf(form, 'Subscriber Count').value === '1.5M', 'and the field they left alone takes the reloaded value');
+
+  await submitForm(form);
+  deepStrictEqual(savedFields(0), { display_name: 'Alpha Prime' });
+  await unmount();
+  console.log('✓ Nova: a list reload while the editor is open keeps the unsaved edits');
+}
+
 async function approvingFromTheRow(mountPage: MountPage): Promise<void> {
   reset();
   const { container, unmount } = await mountPage();
@@ -2005,6 +2227,13 @@ async function main(): Promise<void> {
   await aSaveDoesNotStealFocus(mountPage);
   await fetchingSubscribers(mountPage);
   await verifyingTheChannel(mountPage);
+  await aFetchLandsWhileEditing(mountPage);
+  await aFieldEditedWhileTheFetchIsOutKeepsTheEdit(mountPage);
+  await aReviewLandsWhileEditing(mountPage);
+  await aVerificationLandsWhileEditing(mountPage);
+  await aFieldBothSidesChangedKeepsTheCurators(mountPage);
+  await aReloadLandsWhileEditing(mountPage);
+  await aSaveShowsWhatWasStored(mountPage);
   await approvingFromTheRow(mountPage);
   await rejectingFromTheRow(mountPage);
   await reviewingFromTheCard(mountPage);

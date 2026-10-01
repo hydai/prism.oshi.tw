@@ -606,7 +606,8 @@ export function SubmissionRow({
   const detailsId = `nova-submission-details-${sub.id}`;
   const label = submissionLabel(sub);
 
-  // Reset draft when submission changes (e.g. after save or status change)
+  // Whatever changes the submission this row holds (a fetch, a verification, a review, a reload) is merged into
+  // the drafts: what the curator has changed in the editor stays, and the rest follows the worker.
   useEffect(() => {
     dispatch({ type: 'submissionChanged', submission: sub });
   }, [sub]);
@@ -675,7 +676,7 @@ export function SubmissionRow({
       const updated = await api.updateNovaSubmission(sub.id, changes);
       onSave(updated);
       focusNext.current = 'edit';
-      dispatch({ type: 'saveSucceeded' });
+      dispatch({ type: 'saveSucceeded', submission: updated });
       toast.success('Submission saved', submissionLabel(updated));
     } catch (err) {
       dispatch({
@@ -698,12 +699,8 @@ export function SubmissionRow({
     dispatch({ type: 'subscribersFetchStarted' });
     try {
       const updated = await api.fetchNovaSubscribers(sub.id);
+      // Into the drafts through the merge, like any changed submission: a field typed meanwhile keeps the typing.
       onSave(updated);
-      dispatch({
-        type: 'subscribersFetchSucceeded',
-        submission: updated,
-        updateDraft: editing,
-      });
       toast.success('Channel info updated', submissionLabel(updated));
     } catch (err) {
       dispatch({
