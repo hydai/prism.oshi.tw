@@ -120,8 +120,12 @@ export default function CrystalTickets({ user }: { user: AuthUser }) {
       return next;
     });
 
-  /** Resolves true once the row may clear the draft it just sent. */
-  const handleReply = async (id: string, text: string): Promise<boolean> => {
+  /**
+   * Resolves true once the row may clear the draft it just sent. `sent` is what the reply box held as it went: text
+   * typed into it while the reply was out is a new draft, so the store drops the draft only if it still holds exactly
+   * that. The store holds what the box holds (the row writes every change through to it), the row gone or not.
+   */
+  const handleReply = async (id: string, text: string, sent: string): Promise<boolean> => {
     const updating = Boolean(allTickets.find((ticket) => ticket.id === id)?.admin_reply);
     markActing(id, 'reply');
     try {
@@ -129,7 +133,7 @@ export default function CrystalTickets({ user }: { user: AuthUser }) {
       list.mutate((rows) => replaceById(rows, updated));
       refreshInboxCounts('crystal');
       keepVisible(id);
-      replyDrafts.clear(id);
+      if (replyDrafts.read(id) === sent) replyDrafts.clear(id);
       toast.success(updating ? 'Reply updated' : 'Reply sent');
       return true;
     } catch (err) {
@@ -281,8 +285,8 @@ interface TicketRowProps {
   onToggle: () => void;
   /** The page's draft store: this row seeds from it and writes back to it. */
   drafts: RowDrafts;
-  /** Resolves true when the reply landed, so the row may clear its draft. */
-  onReply: (id: string, text: string) => Promise<boolean>;
+  /** Resolves true when the reply landed, so the row may clear its draft. `sent` is the box's text as it went. */
+  onReply: (id: string, text: string, sent: string) => Promise<boolean>;
   /** Resolves true when the status changed. */
   onStatusChange: (id: string, status: TicketStatusChange) => Promise<boolean>;
 }
@@ -331,8 +335,11 @@ export function TicketRow({
   const send = async () => {
     const text = replyText.trim();
     if (!text) return;
-    if (await onReply(ticket.id, text)) {
-      setReplyText('');
+    // What the box holds as the reply goes. Text typed into it while the reply is out is a new draft: once the reply
+    // lands, the box (and the page's draft) is cleared only if it still holds exactly this.
+    const sent = replyText;
+    if (await onReply(ticket.id, text, sent)) {
+      setReplyText((current) => (current === sent ? '' : current));
       handFocusToSummary(sendRef.current);
     }
   };

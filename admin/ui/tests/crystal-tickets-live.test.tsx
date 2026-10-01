@@ -1092,6 +1092,65 @@ async function theFilterChangesMidRequest(mountPage: MountPage): Promise<void> {
   console.log('✓ Crystal: a filter changed while a request is out lets the answer land, and the ticket stays until the next chip press');
 }
 
+async function textTypedWhileAReplyIsOutStays(mountPage: MountPage): Promise<void> {
+  reset();
+  const { container, unmount } = await mountPage();
+  // Every status, so the ticket stays listed once it is replied to; the type chips then take it out and back.
+  await click(chip(statusGroup(container), 'All'), 'the All chip');
+  const open = async () => {
+    if (detailsOf('t-broken') === null) await expand(container, 'Player stops');
+    return need(detailsOf('t-broken'), 'the detail');
+  };
+  const leaveAndComeBack = async (whileAway: () => Promise<void> = async () => undefined) => {
+    await click(chip(typeGroup(container), 'Feature'), 'the Feature chip');
+    assert(!titles(container).includes('Player stops'), 'the ticket leaves the list');
+    await whileAway();
+    await click(chip(typeGroup(container), 'All types'), 'the All types chip');
+  };
+
+  // A reply is out, and the curator goes on writing in the box: what they typed after it stays theirs.
+  await open();
+  await typeReply(container, 'Thanks!');
+  const answer = held();
+  replyReply = () => answer.reply;
+  await click(need(buttonNamed(await open(), 'Send Reply'), 'Send Reply'), 'Send Reply');
+  await focus(replyBox(container));
+  await typeReply(container, 'Thanks! One more thing:');
+  await respond(answer, ok({ ...BROKEN, status: 'replied', admin_reply: 'Thanks!', replied_at: '2026-09-02 10:00:00' }));
+  assert(messagesOf(container) === 'Reply sent', 'the reply lands');
+  assert(
+    replyBox(container).value === 'Thanks! One more thing:',
+    `the box keeps what was typed while the reply was out (got "${replyBox(container).value}")`,
+  );
+  assert(isIdle(need(buttonNamed(await open(), 'Update Reply'), 'Update Reply')), 'and the button can send it');
+
+  // It is the draft too: the ticket leaves the list and comes back with it.
+  await leaveAndComeBack();
+  assert(replyBox(container).value === 'Thanks! One more thing:', 'the ticket comes back with that text as its draft');
+
+  // A reply that lands with the box as it was sent clears the box and the draft, the ticket on show or not.
+  const again = held();
+  replyReply = () => again.reply;
+  await click(need(buttonNamed(await open(), 'Update Reply'), 'Update Reply'), 'Update Reply');
+  await leaveAndComeBack(() =>
+    respond(again, ok({ ...BROKEN, status: 'replied', admin_reply: 'Thanks! One more thing:', replied_at: '2026-09-02 10:05:00' })),
+  );
+  assert(messagesOf(container) === 'Reply sent|Reply updated', 'the second reply lands, its ticket out of the list');
+  assert(replyBox(container).value === '', 'and the ticket comes back with no draft: what was sent is gone');
+  await typeReply(container, 'Third');
+  const third = held();
+  replyReply = () => third.reply;
+  await click(need(buttonNamed(await open(), 'Update Reply'), 'Update Reply'), 'Update Reply');
+  await respond(third, ok({ ...BROKEN, status: 'replied', admin_reply: 'Third', replied_at: '2026-09-02 10:10:00' }));
+  assert(replyBox(container).value === '', 'a reply that lands with the box untouched clears it');
+  await leaveAndComeBack();
+  assert(replyBox(container).value === '', 'and its draft');
+  assert(replyCalls().length === 3 && listCalls().length === 1, 'three replies, and no reload');
+
+  await unmount();
+  console.log('✓ Crystal: text typed while a reply is out stays in the box and as the draft; a reply that lands on the text it sent clears both');
+}
+
 async function aTicketActedOnStaysUntilTheFilterChanges(mountPage: MountPage): Promise<void> {
   reset();
   const { container, unmount } = await mountPage();
@@ -1232,6 +1291,7 @@ async function main(): Promise<void> {
   await aCuratorWritingKeepsTheFocus(mountPage);
   await twoTicketsInFlight(mountPage);
   await theFilterChangesMidRequest(mountPage);
+  await textTypedWhileAReplyIsOutStays(mountPage);
   await aTicketActedOnStaysUntilTheFilterChanges(mountPage);
   await contributorView(mountPage);
   await loadFailure(mountPage);
