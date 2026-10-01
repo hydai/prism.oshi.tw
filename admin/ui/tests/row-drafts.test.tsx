@@ -214,11 +214,12 @@ const renderTicket = (expanded: boolean, drafts: RowDrafts) =>
       ticket={ticket}
       isCurator
       expanded={expanded}
-      actionLoading={false}
+      acting={undefined}
+      today={new Date('2026-09-15T00:00:00.000Z')}
       onToggle={() => undefined}
       drafts={drafts}
       onReply={async () => true}
-      onStatusChange={() => undefined}
+      onStatusChange={async () => true}
     />,
   );
 
