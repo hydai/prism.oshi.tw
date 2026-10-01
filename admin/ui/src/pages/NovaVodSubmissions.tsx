@@ -452,7 +452,7 @@ function VodGroupCard({
         aria-expanded={open}
         aria-controls={bodyId}
         onClick={onToggle}
-        className={`flex w-full items-center gap-4 px-5 py-3.5 text-left transition-colors hover:bg-row-hover focus-visible:outline-none ${INSET_FOCUS}`}
+        className={`flex w-full items-center gap-4 px-5 py-3.5 text-left transition-colors hover:bg-row-hover ${INSET_FOCUS}`}
       >
         <Avatar src={null} alt="" size={48} />
         <span className="min-w-0 flex-1 truncate text-[15px] font-bold leading-tight text-fg">{group.slug}</span>
