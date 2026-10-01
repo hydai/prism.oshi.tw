@@ -125,11 +125,12 @@ const renderSubmission = (drafts: RowDrafts) =>
         isCurator
         expanded
         onToggle={() => undefined}
+        acting={undefined}
+        today={new Date('2026-09-15T00:00:00.000Z')}
         drafts={drafts}
         onAction={async () => true}
         onDelete={() => undefined}
         onSave={() => undefined}
-        actionLoading={false}
       />
     </table>,
   );

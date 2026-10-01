@@ -1,6 +1,7 @@
 import { renderToStaticMarkup } from 'react-dom/server';
 import type { NovaSubmission, NovaStatus } from '../../shared/types';
 import { createRowDrafts } from '../src/hooks/useRowDrafts';
+import { NO_ARBITRARY_HEX, NO_RAW_PALETTE } from './helpers/palette';
 
 type SubmissionRowComponent = typeof import('../src/pages/NovaSubmissions').SubmissionRow;
 
@@ -10,6 +11,11 @@ function assert(condition: boolean, message: string): asserts condition {
   if (!condition) {
     throw new Error(message);
   }
+}
+
+function assertNoRawColour(html: string, what: string): void {
+  assert(!NO_RAW_PALETTE.test(html), `${what} uses no raw palette classes`);
+  assert(!NO_ARBITRARY_HEX.test(html), `${what} uses no arbitrary hex colours`);
 }
 
 function makeSubmission(overrides: Partial<NovaSubmission> = {}): NovaSubmission {
@@ -43,20 +49,30 @@ function makeSubmission(overrides: Partial<NovaSubmission> = {}): NovaSubmission
   };
 }
 
-function renderRow(sub: NovaSubmission): string {
+/** When the page "opened": the stored times only need it to leave out the current year. */
+const TODAY = new Date('2026-09-15T00:00:00.000Z');
+
+interface RenderOptions {
+  expanded?: boolean;
+  isCurator?: boolean;
+  acting?: NovaStatus | 'delete';
+}
+
+function renderRow(sub: NovaSubmission, opts: RenderOptions = {}): string {
   assert(SubmissionRow !== undefined, 'SubmissionRow is loaded');
   return renderToStaticMarkup(
     <table>
       <SubmissionRow
         sub={sub}
-        isCurator
-        expanded
+        isCurator={opts.isCurator ?? true}
+        expanded={opts.expanded ?? true}
+        acting={opts.acting}
+        today={TODAY}
         onToggle={() => undefined}
         drafts={createRowDrafts()}
         onAction={async () => true}
         onDelete={() => undefined}
         onSave={() => undefined}
-        actionLoading={false}
       />
     </table>,
   );
@@ -142,6 +158,105 @@ async function main(): Promise<void> {
     'pending curator details retain the rejection note editor',
   );
 
+  // Colours come from the tokens alone, in every state a row can be in: collapsed, open, a reviewed and
+  // verified one with no avatar and a missing link, a contributor's, and one with a request out.
+  const collapsed = renderRow(makeSubmission(), { expanded: false });
+  const reviewed = renderRow(
+    makeSubmission({
+      status: 'approved',
+      reviewed_at: '2026-06-18T10:00:00.000Z',
+      reviewer_note: 'Looks right\nthanks',
+      avatar_url: '',
+      link_twitter: '',
+      theme_json: JSON.stringify({ accentPrimary: '#FF00AA' }),
+      youtube_channel_verified_id: 'UC123',
+      youtube_channel_verified_at: '2026-06-17T01:02:03.000Z',
+    }),
+  );
+  const asContributor = renderRow(makeSubmission(), { isCurator: false });
+  const midRequest = renderRow(makeSubmission(), { acting: 'approved' });
+  for (const [what, html] of [
+    ['a collapsed row', collapsed],
+    ['an open row', valid],
+    ['an open row with hostile links', malicious],
+    ['a reviewed, verified row', reviewed],
+    ["a contributor's open row", asContributor],
+    ['a row with a request out', midRequest],
+  ] as const) {
+    assertNoRawColour(html, what);
+    assert(!html.includes('hover-row') && !html.includes('prism-gradient'), `${what} keeps nothing of the prism kit's CSS`);
+  }
+
+  // An open row is one native row group in the selected-row tint; its detail is one column below 1280 px and
+  // has the curator's review card as a second column from there, as wide as the scroller shows and pinned to
+  // its left edge at every width. A contributor's detail has no second column.
+  assert(/<tbody class="[^"]*\bbg-selected\b/.test(valid) && !/\bbg-selected\b/.test(collapsed), 'an open row wears the selected-row tint, a closed one none');
+  assert(
+    /<td colSpan="8"[^>]*class="[^"]*\bgrid-cols-1\b[^"]*\bxl:grid-cols-\[minmax\(0,1fr\)_360px\]"/.test(valid) &&
+      !/\blg:grid-cols-\[/.test(valid),
+    "a curator's detail is one column and has its review card beside it from 1280 px (1fr / 360px), not from 1024 px",
+  );
+  assert(
+    /<td colSpan="8"[^>]*class="(?:[^"]* )?sticky left-0 w-\[100cqw\] /.test(valid),
+    'the detail is as wide as the scroller shows and pinned to its left edge, at every width',
+  );
+  assert(
+    /<td colSpan="8"[^>]*class="[^"]*\bgrid-cols-1\b/.test(asContributor) && !asContributor.includes('xl:grid-cols') && !asContributor.includes('360px'),
+    "a contributor's detail stays one column, with no review card",
+  );
+
+  // The row: the YouTube mark is the danger tone's, the invalid and missing links are a warn pill and a struck neutral one.
+  assert(collapsed.includes('text-tone-danger-fg') && collapsed.includes('<svg'), 'the YouTube channel link carries its mark in the danger tone');
+  assert(
+    malicious.includes('title="https://youtube.com.evil.example/@unsafe"') && /bg-tone-warn-bg[^>]*>Invalid YouTube</.test(malicious),
+    'an unsafe social link is a warn pill that keeps the submitted URL in its title',
+  );
+  assert(/line-through[^>]*>Twitter</.test(reviewed), 'a missing social link is a struck neutral pill');
+  assert(/href="https:\/\/x\.com\/safe"[^>]*class="[^"]*bg-tone-info-bg/.test(valid), 'a safe social link is an info pill');
+  assert(reviewed.includes('>Verified<') && !valid.includes('>Verified<') && valid.includes('>Not verified<'), 'a verified channel says Verified, an unverified one Not verified');
+
+  // Times: the submitted time is a <time> (short form, the exact instant for machines), the reviewed one too.
+  assert(valid.includes('<time dateTime="2026-06-17T00:00:00.000Z"'), 'the submitted time carries the exact instant');
+  assert(reviewed.includes('<time dateTime="2026-06-18T10:00:00.000Z"'), 'a reviewed time is a <time> too');
+  assert(reviewed.includes('<time dateTime="2026-06-17T01:02:03.000Z"'), 'and so is the time a channel was verified at');
+  assert(reviewed.includes('Looks right') && reviewed.includes('thanks'), 'the reviewer note shows');
+
+  // A request out: the button that sent it is busy (aria-busy, never `disabled`), the others unavailable.
+  assert(
+    /<button[^>]*aria-busy="true"[^>]*>(?:<svg[^>]*>.*?<\/svg>)?Approve<\/button>/.test(midRequest) &&
+      !/<button[^>]*disabled=""[^>]*>(?:<svg[^>]*>.*?<\/svg>)?Approve<\/button>/.test(midRequest),
+    'Approve is busy while its request is out, and is not disabled',
+  );
+  assert(
+    /<button[^>]*aria-disabled="true"[^>]*>(?:<svg[^>]*>.*?<\/svg>)?Reject<\/button>/.test(midRequest),
+    'Reject is unavailable beside it',
+  );
+  // (As attributes: every kit Button's class list names the aria-disabled: variant.)
+  assert(
+    !/ aria-busy="/.test(valid) && !/ aria-disabled="/.test(valid),
+    'a row with no request out and an unverified channel has no busy or unavailable control',
+  );
+  const collapsedBusy = renderRow(makeSubmission(), { expanded: false, acting: 'delete' });
+  assert(
+    (collapsedBusy.match(/aria-disabled="true"/g) ?? []).length === 3 && (collapsedBusy.match(/aria-busy="true"/g) ?? []).length === 1,
+    'a collapsed row with a delete out: its three quick actions are unavailable, the Delete one busy',
+  );
+  assert(
+    /<button[^>]*aria-disabled="true"[^>]*>(?:<svg[^>]*>.*?<\/svg>)?Channel verified<\/button>/.test(reviewed),
+    'a verified channel offers no second verification: the control reads Channel verified and is unavailable',
+  );
+  assert(
+    /<button[^>]*disabled=""[^>]*>(?:<svg[^>]*>.*?<\/svg>)?Verify channel<\/button>/.test(renderRow(makeSubmission({ youtube_channel_id: '' }))),
+    'a submission with no channel id has nothing to verify: the control is disabled',
+  );
+  // A channel counts as verified only when the verification is of this channel id and its time is a canonical UTC instant.
+  const verifiedOnce = { youtube_channel_verified_id: 'UC123', youtube_channel_verified_at: '2026-06-17T01:02:03.000Z' };
+  assert(renderRow(makeSubmission(verifiedOnce)).includes('>Verified<'), 'the same channel id and a canonical time: verified');
+  const otherChannel = renderRow(makeSubmission({ ...verifiedOnce, youtube_channel_verified_id: 'UC999' }));
+  assert(!otherChannel.includes('>Verified<') && otherChannel.includes('>Verify channel<'), 'a verification of another channel id is no verification of this one');
+  const looseTime = renderRow(makeSubmission({ ...verifiedOnce, youtube_channel_verified_at: '2026-06-17 01:02:03' }));
+  assert(!looseTime.includes('>Verified<') && looseTime.includes('>Verify channel<'), 'and neither is one whose time is not a canonical UTC instant');
+
   const original = makeSubmission();
   let rowState = createSubmissionRowState(original);
   rowState = submissionRowReducer(rowState, { type: 'editStarted' });
@@ -209,7 +324,7 @@ async function main(): Promise<void> {
   assert(!rowState.verifyingChannel, 'verification completion clears its loading state');
   assert(rowState.verificationError === 'Channel verification failed', 'verification failure remains visible');
 
-  console.log('✓ Nova submission links and row state transitions remain safe');
+  console.log('✓ Nova submission links stay safe, rows use no raw colour, and row state transitions hold');
 }
 
 await main();

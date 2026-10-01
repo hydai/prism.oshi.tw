@@ -523,11 +523,10 @@ async function main(): Promise<void> {
   const { default: NovaSubmissions } = await import('../src/pages/NovaSubmissions');
   const { default: NovaVodSubmissions } = await import('../src/pages/NovaVodSubmissions');
   const { default: CrystalTickets } = await import('../src/pages/CrystalTickets');
-  // The Nova delete still asks through window.confirm; the VOD delete asks through the kit confirm.
-  window.confirm = () => true;
 
-  // Nova: approve one, delete the other, then "Fetch All Channel Info" reloads a list that has
-  // gained a new submission since.
+  // Nova: approve one (a toast names it), then delete the other through the kit confirm: Cancel sends
+  // nothing and keeps the row, Delete sends the request, says so in a toast and reloads the badge; then
+  // "Fetch All Channel Info" reloads a list that has gained a new submission since, and says how it went.
   requestLog = [];
   setResponse(NOVA_URL, 200, {
     data: [novaSubmission({ id: 'n1', display_name: 'Alpha' }), novaSubmission({ id: 'n2', display_name: 'Beta' })],
@@ -542,15 +541,50 @@ async function main(): Promise<void> {
   const alphaApproved = novaSubmission({ id: 'n1', display_name: 'Alpha', status: 'approved' });
   setMutationResponse('PATCH', '/api/nova/submissions/n1/status', alphaApproved);
   setResponse(NOVA_URL, 200, { data: [alphaApproved, novaSubmission({ id: 'n2', display_name: 'Beta' })], total: 2 });
+  const submissionRequests = (id: string) => requestLog.filter((entry) => entry.startsWith(`/api/nova/submissions/${id}`)).length;
   await click(buttonNamed(rowOf(novaPage.container, 'Alpha'), 'Approve'), "Alpha's Approve button");
   assert(callsTo(NOVA_URL) === 3, 'an approval reloads the Nova list for the badge, once');
   assert(novaPage.counts().nova === 1, 'Nova: the badge drops to one after an approval');
+  assert(
+    toastMessages(novaPage.container).join('|') === 'Submission approved' && toastDetails(novaPage.container).join('|') === 'Alpha',
+    `an approval toasts "Submission approved", naming the submission (got ${toastMessages(novaPage.container).join('|')})`,
+  );
 
   setMutationResponse('DELETE', '/api/nova/submissions/n2', { ok: true });
   setResponse(NOVA_URL, 200, { data: [alphaApproved], total: 1 });
-  await click(buttonNamed(rowOf(novaPage.container, 'Beta'), 'Delete'), "Beta's Delete button");
+  const deleteBeta = buttonNamed(rowOf(novaPage.container, 'Beta'), 'Delete');
+  assert(deleteBeta !== undefined, "Beta's row offers Delete");
+  await act(async () => { deleteBeta.focus(); });
+  await click(deleteBeta, "Beta's Delete button");
+  const novaConfirm = novaPage.container.querySelector<HTMLElement>('dialog[open]');
+  assert(novaConfirm !== null, 'Delete asks through the kit confirm, not window.confirm');
+  assert(
+    (novaConfirm.textContent ?? '').includes('n2') && (novaConfirm.textContent ?? '').includes('Beta') && novaConfirm.innerHTML.includes('bg-danger-solid'),
+    'the confirm names the submission, its id and its name, in the danger tone',
+  );
+  assert(submissionRequests('n2') === 0 && callsTo(NOVA_URL) === 3, 'asking sends nothing');
+
+  await click(buttonNamed(novaConfirm, 'Cancel'), "the confirm's Cancel button");
+  assert(novaPage.container.querySelector('dialog[open]') === null, 'Cancel closes the confirm');
+  assert(submissionRequests('n2') === 0, 'Cancel sends no request');
+  assert(callsTo(NOVA_URL) === 3 && novaPage.counts().nova === 1, 'Cancel reloads nothing and leaves the badge alone');
+  assert(novaPage.container.querySelector('button[aria-label="展開 Beta"]') !== null, 'Cancel keeps the row');
+  assert(document.activeElement === deleteBeta, "Cancel leaves the focus on the row's Delete control");
+  assert(toastMessages(novaPage.container).join('|') === 'Submission approved', 'Cancel toasts nothing');
+
+  await click(deleteBeta, "Beta's Delete button, again");
+  const novaConfirmAgain = novaPage.container.querySelector<HTMLElement>('dialog[open]');
+  assert(novaConfirmAgain !== null, 'Delete asks again');
+  await click(buttonNamed(novaConfirmAgain, 'Delete'), "the confirm's own Delete button");
+  assert(submissionRequests('n2') === 1, 'confirming sends exactly one DELETE');
   assert(callsTo(NOVA_URL) === 4, 'a delete reloads the Nova list for the badge, once');
   assert(novaPage.counts().nova === 0, 'Nova: the badge drops to zero after deleting the last pending one');
+  assert(novaPage.container.querySelector('button[aria-label="展開 Beta"]') === null, 'the deleted row is gone');
+  assert(
+    toastMessages(novaPage.container).join('|') === 'Submission approved|Submission deleted' &&
+      toastDetails(novaPage.container).join('|') === 'Alpha|Beta',
+    `a delete toasts "Submission deleted", naming the submission (got ${toastMessages(novaPage.container).join('|')})`,
+  );
 
   setMutationResponse('POST', '/api/nova/submissions/fetch-all-subscribers', { updated: 0, failed: 0, results: [] });
   setResponse(NOVA_URL, 200, { data: [alphaApproved, novaSubmission({ id: 'n3', display_name: 'Gamma' })], total: 2 });
@@ -558,8 +592,16 @@ async function main(): Promise<void> {
   assert(callsTo(NOVA_URL) === 6, "the page's own reload refetches both its list and the badge's");
   assert(novaPage.counts().nova === 1, 'Nova: the badge picks up the submission that reload brought in');
   assert(callsTo(VODS_URL) === 1 && callsTo(CRYSTAL_URL) === 1, 'no Nova action reloads another inbox');
+  assert(
+    toastMessages(novaPage.container).join('|') === 'Submission approved|Submission deleted|Updated 0, failed 0',
+    `Fetch All Channel Info toasts how many it updated and how many failed (got ${toastMessages(novaPage.container).join('|')})`,
+  );
+  assert(
+    (novaPage.container.querySelector('#nova-fetch-all-result')?.textContent ?? '').includes('Updated 0, failed 0'),
+    'and keeps the result in a note on the page',
+  );
   await novaPage.unmount();
-  console.log('✓ the Nova inbox reloads its badge after an approval, a delete and its own reload');
+  console.log('✓ the Nova inbox reloads its badge after an approval, a confirmed delete and its own reload; Cancel sends nothing');
 
   // Nova VODs: approve one (a toast names it), then delete the other through the kit confirm: Cancel sends
   // nothing and keeps the row, Delete sends the request, says so in a toast and reloads the badge.
