@@ -11,11 +11,11 @@ import { Icon } from '../components/ui/Icon';
 import { Note } from '../components/ui/Note';
 import { PageHeader } from '../components/ui/PageHeader';
 import { StatusPill } from '../components/ui/Pill';
+import { StoredTime } from '../components/ui/StoredTime';
 import { TextField } from '../components/ui/TextField';
 import { useToast } from '../components/ui/toast';
 import { VideoPoster } from '../components/ui/VideoPoster';
 import { errorMessage, useApiResource } from '../lib/apiResource';
-import { formatFullTime, formatWhen, storedTimeIso } from '../lib/dates';
 import { formatTimestamp } from '../lib/format-timestamp';
 
 /** What a curator decides about a song that is still waiting (pending) or queued by the extractor. */
@@ -52,15 +52,6 @@ async function loadSong(id: string): Promise<Song | null> {
 function performanceSpan(performance: Performance): string {
   const end = performance.endTimestamp != null ? ` – ${formatTimestamp(performance.endTimestamp)}` : '';
   return `${performance.date} · ${formatTimestamp(performance.timestamp)}${end}`;
-}
-
-/** A stored time: the short form in the cell, the full time and the exact instant beside it. */
-function StoredTime({ value, today }: { value: string; today: Date }) {
-  return (
-    <time dateTime={storedTimeIso(value)} title={formatFullTime(value)}>
-      {formatWhen(value, today)}
-    </time>
-  );
 }
 
 interface DetailsCardProps {
