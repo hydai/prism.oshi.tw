@@ -15,6 +15,7 @@ import { EmptyState, GlassCard, Skeleton } from '../components/ui/Display';
 import { Checkbox, SearchInput, TextInput } from '../components/ui/Fields';
 import { Icon } from '../components/ui/Icon';
 import { isImeKeyDown } from '../components/ui/keyboard';
+import { Note } from '../components/ui/Note';
 import { Pill } from '../components/ui/Pill';
 import { HeadCell, Table, THead } from '../components/ui/Table';
 import { CELL_X, FIRST_CELL_X, LAST_CELL_X } from '../components/ui/table-cells';
@@ -56,19 +57,6 @@ function useIdentifySongs() {
 const CARD_HEAD = 'flex min-h-12 flex-wrap items-center gap-x-2 gap-y-1 border-b border-line-soft py-2 pl-3.5 pr-3';
 const CARD_TITLE = 'text-[14px] font-bold text-fg';
 const CARD_COUNT = 'text-[11px] font-semibold text-fg-subtle';
-
-/** A failure, inline: what failed and why, and what to do about it when there is something to do. */
-function ErrorNote({ title, detail, action }: { title: string; detail: string; action?: ReactNode }) {
-  return (
-    <div className="rounded-radius-lg border border-tone-danger-line bg-tone-danger-bg px-3 py-2.5 text-token-sm text-tone-danger-fg">
-      <div role="alert">
-        <p className="font-semibold">{title}</p>
-        <p className="mt-0.5 break-words">{detail}</p>
-      </div>
-      {action ? <div className="mt-2.5">{action}</div> : null}
-    </div>
-  );
-}
 
 // --- Ready to extract ---
 
@@ -113,15 +101,14 @@ function ReadyList({ streams, loading, error, currentId, busy, onExtract, onRetr
   } else if (error !== null) {
     body = (
       <div className="p-3.5">
-        <ErrorNote
-          title="Couldn’t load streams"
-          detail={error}
-          action={
+        <Note tone="danger" icon="alert" role="alert" title="Couldn’t load streams.">
+          <span className="flex flex-wrap items-center justify-between gap-x-3 gap-y-1.5">
+            <span>{error}</span>
             <Button size="sm" onClick={onRetry}>
               Retry
             </Button>
-          }
-        />
+          </span>
+        </Note>
       </div>
     );
   } else if (streams.length === 0) {
@@ -823,7 +810,11 @@ export function ExtractStep({ hidden, extract }: { hidden: boolean; extract: Ext
   } else {
     results = (
       <>
-        {error ? <ErrorNote title="Couldn’t extract timestamps" detail={error} /> : null}
+        {error ? (
+          <Note tone="danger" icon="alert" role="alert" title="Couldn’t extract timestamps.">
+            {error}
+          </Note>
+        ) : null}
         <GlassCard>
           <EmptyState icon="workflow" title="Pick a stream to find its timestamps" />
         </GlassCard>

@@ -5,6 +5,7 @@ import { MemoryRouter } from 'react-router-dom';
 import { Window } from 'happy-dom';
 import type { HTMLElement as DomElement, HTMLSelectElement as DomSelectElement } from 'happy-dom';
 import type { AuthUser, GlobalWorkSummary, GlobalWorksResponse } from '../../shared/types';
+import { isKitDangerNote } from './helpers/note';
 import { NO_RAW_PALETTE } from './helpers/palette';
 
 function assert(condition: boolean, message: string): asserts condition {
@@ -474,6 +475,10 @@ async function globalWorksLoadsThroughTheHook(): Promise<void> {
   });
   await settle();
   assert(container.innerHTML.includes('剛被其他人修改'), 'a conflict is explained to the curator');
+  const conflictNote = [...container.querySelectorAll<DomElement>('[role="alert"]')].find((alert) =>
+    alert.textContent.includes('剛被其他人修改'),
+  );
+  assert(conflictNote !== undefined && isKitDangerNote(conflictNote), 'a conflict is shown in the kit danger Note');
   assert(pendingAt(3).url.includes('page=2'), 'a conflict reloads the current page');
   await act(async () => {
     pendingAt(3).respond(secondPage);
@@ -766,13 +771,22 @@ async function allWorksChipAndSortSummary(): Promise<void> {
     `with no results the summary names the sort with no separator or range (found: ${summary()})`,
   );
 
+  // A load that fails says why, above the table, in the kit danger Note.
+  await act(async () => { titleButton().click(); });
+  await act(async () => { pendingAt(8).respondWith(500, { error: 'Global works are unavailable' }); });
+  await settle();
+  const loadFailure = [...container.querySelectorAll<DomElement>('[role="alert"]')].find(
+    (alert) => alert.textContent === 'Global works are unavailable',
+  );
+  assert(loadFailure !== undefined && isKitDangerNote(loadFailure), 'a failed load says why, in the kit danger Note');
+
   await act(async () => {
     root.unmount();
   });
   container.remove();
   await win.happyDOM.close();
 
-  console.log('✓ Global Library names the active filter and sort next to the range');
+  console.log('✓ Global Library names the active filter and sort next to the range, and a failed load in the kit danger Note');
 }
 
 await main();

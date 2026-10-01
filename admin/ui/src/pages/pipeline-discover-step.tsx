@@ -1,4 +1,3 @@
-import type { ReactNode } from 'react';
 import { Link } from 'react-router-dom';
 import type { DiscoveredStream } from '../../../shared/types';
 import { useCurrentStreamerName } from '../components/shell/Streamers';
@@ -7,6 +6,7 @@ import { Button } from '../components/ui/Button';
 import { EmptyState, GlassCard } from '../components/ui/Display';
 import { Checkbox } from '../components/ui/Fields';
 import { Icon } from '../components/ui/Icon';
+import { Note } from '../components/ui/Note';
 import { Pill } from '../components/ui/Pill';
 import { HeadCell, Table, TableEmptyRow, THead } from '../components/ui/Table';
 import { CELL_X, FIRST_CELL_X, LAST_CELL_X } from '../components/ui/table-cells';
@@ -17,18 +17,6 @@ import { inPrismLabel, summarizeDiscovered, visibleDiscovered, type DiscoverFilt
 
 /** Select, thumbnail, video, date, status. */
 const DISCOVER_COLUMNS = 5;
-
-/** A failed scan, inline above the results. */
-function DangerNote({ children }: { children: ReactNode }) {
-  return (
-    <p
-      role="alert"
-      className="rounded-radius-lg border border-tone-danger-line bg-tone-danger-bg px-3 py-2 text-token-sm text-tone-danger-fg"
-    >
-      {children}
-    </p>
-  );
-}
 
 /**
  * The Discover step's state and handlers. The page holds them (`useDiscover` in `Pipeline.tsx`)
@@ -256,7 +244,12 @@ export function DiscoverStep({ hidden, discover }: { hidden: boolean; discover: 
     <section aria-label="Discover" hidden={hidden}>
       {/* While the bulk bar is up, the end of the step scrolls clear of it (BulkBar publishes its height). */}
       <div className="flex flex-col gap-3 p-4 lg:px-5 lg:pb-[18px] [html[data-bulk-bar]_&]:pb-[calc(var(--bulk-bar-h)_+_22px_+_16px)]">
-        {error ? <DangerNote>{error}</DangerNote> : null}
+        {/* A failed scan, inline above the results. */}
+        {error ? (
+          <Note tone="danger" icon="alert" role="alert">
+            {error}
+          </Note>
+        ) : null}
 
         {lastRunAt === null ? (
           <GlassCard>

@@ -22,6 +22,7 @@ import type {
 } from '../../shared/types';
 import { inPrismLabel, newStreamIds, summarizeDiscovered, visibleDiscovered } from '../src/pages/pipeline-discover';
 import { click, installDom, mount, press, settle, typeInto } from './helpers/dom';
+import { isKitDangerNote } from './helpers/note';
 import { NO_RAW_PALETTE } from './helpers/palette';
 
 function assert(condition: boolean, message: string): asserts condition {
@@ -1137,6 +1138,7 @@ async function main(): Promise<void> {
   await click(buttonNamed(stepSection(failing.container, 'Discover'), 'Discover streams'), 'Discover streams');
   const note = stepSection(failing.container, 'Discover').querySelector('[role="alert"]');
   assert(textOf(note) === 'YouTube quota exceeded', 'a failed scan says why, inline');
+  assert(isKitDangerNote(note), 'a failed scan is shown in the kit danger Note');
   assert(
     textOf(stepSection(failing.container, 'Discover')).includes('Find new karaoke streams'),
     'a failed first scan keeps the empty state',
@@ -1160,6 +1162,13 @@ async function main(): Promise<void> {
   const failedList = stepSection(failing.container, 'Extract');
   assert(textOf(failedList).includes('Couldn’t load streams'), 'a ready list that failed to load says so');
   assert(textOf(failedList).includes('Streams are unavailable'), 'and says why');
+  const listNote = failedList.querySelector('[role="alert"]');
+  assert(isKitDangerNote(listNote), 'a ready list that failed to load is shown in the kit danger Note');
+  assert(textOf(listNote?.querySelector('b')) === 'Couldn’t load streams.', 'its bold title names what failed');
+  assert(
+    textOf(listNote).includes('Streams are unavailable') && buttonNamed(listNote, 'Retry') !== undefined,
+    'and it holds the reason and the Retry',
+  );
   assert(readyItems(failing.container).length === 0, 'a list that failed to load lists no streams');
   assert(!textOf(failedList).includes('No streams ready'), 'nor claims there are none');
   readyReply = ok({ data: READY, total: READY.length } satisfies ListResponse<Stream>);
@@ -1458,6 +1467,9 @@ async function main(): Promise<void> {
   await click(readyItem(ex, 'Ready stream two'), 'Ready stream two');
   assert((extractRequests()[1]?.body as { streamId?: string } | null)?.streamId === 'ready-2', 'the second extract is stream two’s');
   assert(textOf(extractStep.querySelector('[role="alert"]')).includes('YouTube rejected the API key'), 'a failed extract says why');
+  const extractNote = extractStep.querySelector('[role="alert"]');
+  assert(isKitDangerNote(extractNote), 'a failed extract is shown in the kit danger Note');
+  assert(textOf(extractNote?.querySelector('b')) === 'Couldn’t extract timestamps.', 'its bold title names what failed');
   assert(readyItem(ex, 'Ready stream two')?.getAttribute('aria-current') === null, 'and leaves no stream current');
 
   extractReplies.push(ok(EXTRACT_TWO_NONE));

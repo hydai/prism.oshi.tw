@@ -10,6 +10,7 @@ import { buttonClasses } from '../components/ui/button-classes';
 import { GlassCard, Skeleton, StatTile } from '../components/ui/Display';
 import { Checkbox, SearchInput, Select } from '../components/ui/Fields';
 import { Icon } from '../components/ui/Icon';
+import { Note } from '../components/ui/Note';
 import { PageHeader } from '../components/ui/PageHeader';
 import { Pill, type Tone } from '../components/ui/Pill';
 import { Popover } from '../components/ui/Popover';
@@ -107,18 +108,6 @@ function MoreItems({ items, children }: { items: string[]; children: ReactNode }
         ))}
       </ul>
     </>
-  );
-}
-
-/** A failed load or save, inline above the table. */
-function DangerNote({ children }: { children: ReactNode }) {
-  return (
-    <p
-      role="alert"
-      className="rounded-radius-lg border border-tone-danger-line bg-tone-danger-bg px-3 py-2 text-token-sm text-tone-danger-fg"
-    >
-      {children}
-    </p>
   );
 }
 
@@ -687,8 +676,17 @@ export default function GlobalWorks() {
           total={total}
         />
 
-        {error && <DangerNote>{error}</DangerNote>}
-        {saveError && <DangerNote>{saveError}</DangerNote>}
+        {/* A failed load or save, inline above the table. */}
+        {error && (
+          <Note tone="danger" icon="alert" role="alert">
+            {error}
+          </Note>
+        )}
+        {saveError && (
+          <Note tone="danger" icon="alert" role="alert">
+            {saveError}
+          </Note>
+        )}
 
         {loading ? (
           <GlassCard>
