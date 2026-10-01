@@ -135,6 +135,7 @@ export const ADMIN_ROUTES: readonly AdminRoute[] = [
     curatorOnly: true,
     group: 'inbox',
     icon: 'nova',
+    frame: 'studio',
     render: (user) => <NovaSubmissions user={user} />,
   },
   {
