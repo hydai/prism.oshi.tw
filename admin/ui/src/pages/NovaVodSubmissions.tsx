@@ -1,41 +1,161 @@
-import { useId, useMemo, useState, type ReactNode } from 'react';
-import type { AuthUser, NovaVodSubmission, NovaVodSong, NovaStatus } from '../../../shared/types';
-import { api } from '../api/client';
+import { useId, useLayoutEffect, useMemo, useRef, useState, type MouseEvent, type ReactNode } from 'react';
+import type { AuthUser, NovaStatus, NovaVodSong, NovaVodSubmission } from '../../../shared/types';
 import { sanitizeNovaUrl } from '../../../shared/nova-url-safety';
-import { useRowDrafts, type RowDrafts } from '../hooks/useRowDrafts';
-import { useApiResource, errorMessage } from '../lib/apiResource';
-import { formatTimestamp } from '../lib/format-timestamp';
-import { NO_RECENT_ACTIONS, visibleVods } from '../lib/review-lists';
-import { countByStatus, removeById, replaceById } from '../lib/status-totals';
-import { Avatar } from '../components/prism/Avatar';
-import { GradientButton, OutlineButton } from '../components/prism/Buttons';
-import { CircleButton } from '../components/prism/CircleButton';
-import { ColumnHeader } from '../components/prism/ColumnHeader';
-import { DetailField } from '../components/prism/DetailField';
-import { PrismSelect, PrismTextarea } from '../components/prism/Fields';
-import { GlassCard } from '../components/prism/GlassCard';
-import { Icon } from '../components/prism/Icon';
-import { Pill, StatusPill } from '../components/prism/Pill';
-import { PrismPage } from '../components/prism/PrismPage';
-import { SectionLabel } from '../components/prism/SectionLabel';
-import { Segmented } from '../components/prism/Segmented';
+import { api } from '../api/client';
 import { useInboxCounts } from '../components/shell/InboxCounts';
 import { StatusFilterBar } from '../components/StatusFilterBar';
+import { Avatar } from '../components/ui/Avatar';
+import { Button, IconButton } from '../components/ui/Button';
+import { useConfirm } from '../components/ui/confirm';
+import { DetailField, SectionLabel } from '../components/ui/DetailField';
+import { EmptyState, GlassCard, Skeleton } from '../components/ui/Display';
+import { Select, Textarea } from '../components/ui/Fields';
+import { Icon, type IconName } from '../components/ui/Icon';
+import { MICRO_LABEL } from '../components/ui/micro-label';
+import { Note } from '../components/ui/Note';
+import { PageHeader } from '../components/ui/PageHeader';
+import { Pill, StatusPill } from '../components/ui/Pill';
+import { statusTone } from '../components/ui/pill-core';
+import { StoredTime } from '../components/ui/StoredTime';
+import { useToast } from '../components/ui/toast';
+import { Segmented } from '../components/ui/Toggles';
+import { useRowDrafts, type RowDrafts } from '../hooks/useRowDrafts';
+import { errorMessage, useApiResource } from '../lib/apiResource';
+import { formatTimestamp } from '../lib/format-timestamp';
 import { groupVodsByStreamer, type VodGroup, type VodViewMode } from '../lib/nova-vod-groups';
+import { NO_RECENT_ACTIONS, visibleVods } from '../lib/review-lists';
+import { countByStatus, removeById, replaceById } from '../lib/status-totals';
 import { NOVA_STATUS_FILTERS } from './nova-status-filters';
 
 const ROW_GRID = 'grid-cols-[64px_minmax(0,1fr)_100px_110px_120px_128px_28px]';
-const ROW_COLUMNS = [
-  { key: 'thumbnail', label: '' },
-  { key: 'vod', label: 'VOD', className: 'pl-3' },
-  { key: 'songs', label: 'Songs', className: 'pl-3' },
-  { key: 'status', label: 'Status', className: 'pl-3' },
-  { key: 'submitted', label: 'Submitted', className: 'pl-3' },
-  { key: 'actions', label: '' },
-  { key: 'toggle', label: '' },
+
+/** The seven columns of a row. The thumbnail, the actions and the chevron have no visible head, only a name for assistive technology. */
+const ROW_COLUMNS: ReadonlyArray<{ key: string; label: string; visible: boolean }> = [
+  { key: 'thumbnail', label: 'Thumbnail', visible: false },
+  { key: 'vod', label: 'VOD', visible: true },
+  { key: 'songs', label: 'Songs', visible: true },
+  { key: 'status', label: 'Status', visible: true },
+  { key: 'submitted', label: 'Submitted', visible: true },
+  { key: 'actions', label: 'Actions', visible: false },
+  { key: 'toggle', label: 'Details', visible: false },
 ];
 
+const VIEW_OPTIONS: { value: VodViewMode; label: string; icon: IconName }[] = [
+  { value: 'grouped', label: 'By VTuber', icon: 'users' },
+  { value: 'timeline', label: 'Timeline', icon: 'clock' },
+];
+
+const STATUS_FILTER_LABEL_ID = 'nova-vod-status-filter-label';
+
+/** The focus ring of a control that spans the card edge to edge: inside it, since the card clips what falls outside. */
+const INSET_FOCUS = 'focus-visible:shadow-[inset_0_0_0_2px_var(--accent-fg)]';
+
+/**
+ * An open row's detail is as wide as the scroller shows and pinned to its left edge. The table is 820 px
+ * wide at the least, so where the scroller is narrower (a phone, and 1024 to 1110 px beside the sidebar) a
+ * detail as wide as the table would run past the visible edge, to be read by scrolling the summary rows
+ * sideways with it. Where the scroller is as wide as the table the two are the same width.
+ */
+const DETAILS_PINNED = 'sticky left-0 w-[100cqw]';
+
+/** What a VOD's request is out for: the status it is heading for, or its deletion. */
+type VodAction = NovaStatus | 'delete';
+
+/** An open VOD's songs: those the worker sent (maybe none), or that the request for them is out, or that it failed. */
+type VodSongList = NovaVodSong[] | 'loading' | 'failed';
+
+/** The VODs with a request out, each with what it is out for. */
+const NO_ACTIONS: ReadonlyMap<string, VodAction> = new Map();
+
+const STATUS_TOASTS: Record<NovaStatus, string> = {
+  approved: 'VOD approved',
+  rejected: 'VOD rejected',
+  pending: 'VOD reverted to pending',
+};
+
+/** One action a curator can take on a VOD: how both its quick icon button and its review-card button read. */
+interface ActionSpec {
+  action: VodAction;
+  label: string;
+  icon: IconName;
+  tone: 'default' | 'ok' | 'danger';
+}
+
+/** The row's actions, in order. A control keeps its place across a review (Delete) or is replaced by another (Approve by Revert). */
+const PENDING_ACTIONS: readonly ActionSpec[] = [
+  { action: 'approved', label: 'Approve', icon: 'check', tone: 'ok' },
+  { action: 'rejected', label: 'Reject', icon: 'x', tone: 'default' },
+  { action: 'delete', label: 'Delete', icon: 'trash', tone: 'danger' },
+];
+const REVIEWED_ACTIONS: readonly ActionSpec[] = [
+  { action: 'pending', label: 'Revert to Pending', icon: 'undo', tone: 'default' },
+  { action: 'delete', label: 'Delete', icon: 'trash', tone: 'danger' },
+];
+
+/** The VOD as a row names it for assistive technology, a toast and a confirm: its title, or its video id when it has none. */
+function vodLabel(vod: NovaVodSubmission): string {
+  return vod.stream_title || vod.video_id;
+}
+
+/** The header's count: how many VODs there are and from how many streamers, whatever the filters keep. */
+function countText(total: number, streamers: number): string {
+  return `${total} ${total === 1 ? 'VOD' : 'VODs'} · ${streamers} ${streamers === 1 ? 'VTuber' : 'VTubers'}`;
+}
+
+/** Every row's name button on show, in the order the page shows them: the control that opens the row. */
+function nameButtonsIn(root: HTMLElement | null): HTMLElement[] {
+  return root ? [...root.querySelectorAll<HTMLElement>('button[aria-controls^="nova-vod-details-"]')] : [];
+}
+
+function nameButtonOf(root: HTMLElement | null, id: string): HTMLElement | null {
+  return nameButtonsIn(root).find((button) => button.getAttribute('aria-controls') === `nova-vod-details-${id}`) ?? null;
+}
+
+/** The name button of the row after the one for `id`, or null when it is the last. */
+function nextNameButton(root: HTMLElement | null, id: string): HTMLElement | null {
+  const names = nameButtonsIn(root);
+  const index = names.findIndex((button) => button.getAttribute('aria-controls') === `nova-vod-details-${id}`);
+  return index === -1 ? null : (names[index + 1] ?? null);
+}
+
+/** The header of the streamer card for `slug`: a card the curator has closed takes its rows' name buttons with it. */
+function groupHeaderOf(root: HTMLElement | null, slug: string): HTMLElement | null {
+  const headers = root ? [...root.querySelectorAll<HTMLElement>('button[aria-controls^="nova-vod-group-"]')] : [];
+  return headers.find((header) => header.getAttribute('aria-controls') === `nova-vod-group-${slug}`) ?? null;
+}
+
+/** The chip of the toolbar's status group that is in effect: where a delete that leaves no row to go to hands the focus. */
+function statusChipInEffect(toolbar: HTMLElement | null): HTMLElement | null {
+  return toolbar?.querySelector<HTMLElement>(`[aria-labelledby="${STATUS_FILTER_LABEL_ID}"] [aria-pressed="true"]`) ?? null;
+}
+
+/** Where the focus goes once a landed request's answer is on screen, if nothing else has it by then. */
+type Handoff = { kind: 'row'; id: string; slug: string } | { kind: 'next'; next: HTMLElement | null };
+
+/**
+ * The Nova VODs inbox (spec §8.9): the VODs fans submit from the public Nova form, by streamer or as one
+ * timeline, with their status as chips and, for a curator, a quick approve, reject or delete on each row
+ * and a review card in its detail. One unfiltered load feeds the rows, the header's counts and the streamer
+ * filter; the filters only choose which rows are shown. A VOD just reviewed stays in its list, and its
+ * streamer's card stays open around it, until a filter changes, so it does not vanish from the Pending list
+ * under the cursor.
+ *
+ * Every request says how it went in a toast, and the control that sent it is busy meanwhile (and keeps the
+ * focus; the row's other actions are unavailable, and other rows are untouched, so two can be out at once).
+ * What a request that has landed did to the controls decides where the focus goes. A review replaces the
+ * row's action controls (Approve by Revert), a delete removes the row: where the control that held the focus
+ * is gone, the focus goes to the row's name button (to its streamer card's header when the curator has closed
+ * the card under the request), or after a delete to the next row's name button, or to the status chip in
+ * effect when there is no next row. It moves from nowhere (<body>), never from a control the
+ * user has moved on to: another row's, a chip, a control the answer leaves in place.
+ */
 export default function NovaVodSubmissions({ user }: { user: AuthUser }) {
+  const toast = useToast();
+  const confirm = useConfirm();
+  const headingRef = useRef<HTMLHeadingElement>(null);
+  const toolbarRef = useRef<HTMLDivElement>(null);
+  const listRef = useRef<HTMLDivElement>(null);
+  const handoff = useRef<Handoff | null>(null);
   const [statusFilter, setStatusFilter] = useState<'' | NovaStatus>('pending');
   const [streamerFilter, setStreamerFilter] = useState('');
   const [justActed, setJustActed] = useState<ReadonlySet<string>>(NO_RECENT_ACTIONS);
@@ -43,17 +163,16 @@ export default function NovaVodSubmissions({ user }: { user: AuthUser }) {
   const [groupOpen, setGroupOpen] = useState<Record<string, boolean>>({});
   const [expandedId, setExpandedId] = useState<string | null>(null);
   // Keyed by VOD id so a slow detail response for A can never render under B.
-  const [expandedSongs, setExpandedSongs] = useState<Record<string, NovaVodSong[]>>({});
-  const [actionLoading, setActionLoading] = useState<string | null>(null);
-  // Load errors live in `list.error`; row actions get their own slot so one
-  // failed approval doesn't masquerade as a broken list.
-  const [actionError, setActionError] = useState<string | null>(null);
+  const [expandedSongs, setExpandedSongs] = useState<Record<string, VodSongList>>({});
+  const [acting, setActing] = useState(NO_ACTIONS);
   const streamerFilterId = useId();
   // Rejection notes outlive their rows, which unmount on group collapse, on the
   // view-mode toggle and on a filter change.
   const rejectNotes = useRowDrafts();
+  // When the page opened: the times only need it to leave out the current year.
+  const [today] = useState(() => new Date());
 
-  // One unfiltered load feeds the table, the hero totals and the streamer options;
+  // One unfiltered load feeds the table, the header's counts and the streamer options;
   // the two filters narrow it here instead of costing a second request.
   const list = useApiResource(async () => (await api.listNovaVods()).data, []);
   // The sidebar's pending badge loads this list separately: every change here reloads it too.
@@ -64,7 +183,29 @@ export default function NovaVodSubmissions({ user }: { user: AuthUser }) {
     () => visibleVods(allVods, { status: statusFilter, streamer: streamerFilter, justActed }),
     [allVods, statusFilter, streamerFilter, justActed],
   );
-  const loading = list.loading;
+
+  // Runs after every commit: a handler cannot know which commit its state change will land in, and a flag
+  // nobody has set costs nothing to read. Whoever holds the focus then is the user's, unless it is nobody:
+  // the control that sent the request has just left the page with its row or been replaced by another.
+  useLayoutEffect(() => {
+    const pending = handoff.current;
+    if (pending === null) return;
+    handoff.current = null;
+    const held = document.activeElement;
+    if (held !== null && held !== document.body) return;
+    const target =
+      pending.kind === 'row'
+        ? (nameButtonOf(listRef.current, pending.id) ?? groupHeaderOf(listRef.current, pending.slug))
+        : pending.next?.isConnected
+          ? pending.next
+          : statusChipInEffect(toolbarRef.current);
+    target?.focus();
+  });
+
+  // A streamer's card is open as the curator left it, else while it has a VOD to review or one just acted on:
+  // reviewing its last pending VOD must not close the card around the row it has kept on screen.
+  const isGroupOpen = (group: VodGroup, chosen: Record<string, boolean>) =>
+    chosen[group.slug] ?? (group.pendingCount > 0 || group.vods.some((row) => justActed.has(row.id)));
 
   // A new filter is a new question: the rows held over from the last action go.
   const changeStatusFilter = (status: '' | NovaStatus) => {
@@ -77,59 +218,90 @@ export default function NovaVodSubmissions({ user }: { user: AuthUser }) {
   };
   const keepVisible = (id: string) => setJustActed((prev) => new Set(prev).add(id));
 
-  const handleExpand = async (id: string) => {
-    setActionError(null);
-    if (expandedId === id) {
+  /** Records what a VOD's request is out for, or (null) that it is done. Kept here, not in the row, which can unmount meanwhile. */
+  const markActing = (id: string, action: VodAction | null) =>
+    setActing((current) => {
+      const next = new Map(current);
+      if (action === null) next.delete(id);
+      else next.set(id, action);
+      return next;
+    });
+
+  // `again`: the Retry of songs that did not load, in a row that stays open.
+  const handleExpand = async ({ id, streamer_slug: slug }: NovaVodSubmission, again = false) => {
+    if (!again && expandedId === id) {
       setExpandedId(null);
       return;
     }
     setExpandedId(id);
-    if (expandedSongs[id]) return; // already loaded
+    const known = expandedSongs[id];
+    if (known !== undefined && known !== 'failed') return; // loaded, or a request is out
+    // The Retry leaves with the line it sits on: the focus it held goes to the row's name button.
+    if (again) handoff.current = { kind: 'row', id, slug };
+    setExpandedSongs((prev) => ({ ...prev, [id]: 'loading' }));
     try {
       const detail = await api.getNovaVod(id);
       setExpandedSongs((prev) => ({ ...prev, [id]: detail.songs }));
     } catch (err) {
-      // Leave the id absent so re-expanding retries; tell the curator why it's empty.
-      setActionError(errorMessage(err, '無法載入歌曲清單'));
+      // The songs column says they did not load and offers a Retry; opening the row again asks again too.
+      setExpandedSongs((prev) => ({ ...prev, [id]: 'failed' }));
+      toast.error('無法載入歌曲清單', { detail: errorMessage(err, '') });
     }
   };
 
   /** Resolves true once the row may clear the note it just submitted. */
   const handleAction = async (id: string, status: NovaStatus, rejectNote: string): Promise<boolean> => {
-    setActionLoading(id);
-    setActionError(null);
+    markActing(id, status);
     try {
       const updated = await api.updateNovaVodStatus(id, {
         status,
         reviewer_note: status === 'rejected' ? rejectNote : undefined,
       });
-      list.mutate((vods) => replaceById(vods, updated));
+      // Before the state changes that will show it: the effect above reads the flag in the commit they land in.
+      handoff.current = { kind: 'row', id, slug: updated.streamer_slug };
+      list.mutate((rows) => replaceById(rows, updated));
       refreshInboxCounts('vods');
       keepVisible(id);
       rejectNotes.clear(id);
+      toast.success(STATUS_TOASTS[status], vodLabel(updated));
       return true;
     } catch (err) {
-      setActionError(errorMessage(err, 'Action failed'));
+      toast.error(errorMessage(err, 'Action failed'));
       return false;
     } finally {
-      setActionLoading(null);
+      markActing(id, null);
     }
   };
 
   const handleDelete = async (vod: NovaVodSubmission) => {
-    if (!window.confirm(`Permanently delete VOD submission "${vod.id}" (${vod.stream_title || vod.video_id})? This cannot be undone.`)) return;
-    setActionLoading(vod.id);
-    setActionError(null);
+    const confirmed = await confirm({
+      title: 'Delete this VOD submission?',
+      body: `Permanently delete VOD submission "${vod.id}" (${vodLabel(vod)}). This cannot be undone.`,
+      confirmLabel: 'Delete',
+      tone: 'danger',
+    });
+    if (!confirmed) return;
+    markActing(vod.id, 'delete');
     try {
       await api.deleteNovaVod(vod.id);
-      list.mutate((vods) => removeById(vods, vod.id));
+      // The next row is read while this one is still on screen: its button is the same element after the commit.
+      handoff.current = { kind: 'next', next: nextNameButton(listRef.current, vod.id) };
+      list.mutate((rows) => removeById(rows, vod.id));
       refreshInboxCounts('vods');
       rejectNotes.clear(vod.id);
+      toast.success('VOD deleted', vodLabel(vod));
     } catch (err) {
-      setActionError(errorMessage(err, 'Delete failed'));
+      toast.error(errorMessage(err, 'Delete failed'));
     } finally {
-      setActionLoading(null);
+      markActing(vod.id, null);
     }
+  };
+
+  const handleRetry = (event: MouseEvent<HTMLButtonElement>) => {
+    // The alert leaves as soon as the load restarts, and the Retry that held the focus with it: the
+    // page heading takes it, rather than <body>.
+    if (document.activeElement === event.currentTarget) headingRef.current?.focus();
+    list.reload();
   };
 
   const isCurator = user.role === 'curator';
@@ -139,108 +311,127 @@ export default function NovaVodSubmissions({ user }: { user: AuthUser }) {
   const groups = groupVodsByStreamer(vods);
   const countOf = (status: NovaStatus) => countByStatus(allVods, status);
 
-  const renderRow = (vod: NovaVodSubmission) => (
+  // The skeleton is for the first load only: a later one keeps the rows, so the control that started it keeps its place.
+  const showSkeleton = list.data === null && list.loading;
+  const showEmpty = list.data !== null && vods.length === 0;
+
+  const renderRow = (row: NovaVodSubmission) => (
     <VodRow
-      key={vod.id}
-      vod={vod}
+      key={row.id}
+      vod={row}
       isCurator={isCurator}
-      expanded={expandedId === vod.id}
+      expanded={expandedId === row.id}
       showStreamer={viewMode === 'timeline'}
-      songs={expandedId === vod.id ? (expandedSongs[vod.id] ?? []) : []}
-      onToggle={() => handleExpand(vod.id)}
+      songs={expandedId === row.id ? (expandedSongs[row.id] ?? 'loading') : []}
+      acting={acting.get(row.id)}
+      today={today}
+      onToggle={() => handleExpand(row)}
+      onRetrySongs={() => handleExpand(row, true)}
       drafts={rejectNotes}
       onAction={handleAction}
       onDelete={handleDelete}
-      actionLoading={actionLoading === vod.id}
     />
   );
 
   return (
-    <PrismPage
-      icon="nova"
-      badge="VOD submissions"
-      title="Nova VODs"
-      description={
-        viewMode === 'grouped'
-          ? 'Review karaoke VOD submissions from fans, grouped by VTuber.'
-          : 'Review VOD submissions from fans.'
-      }
-      count={`${allVods.length} VODs · ${uniqueStreamers.length} VTubers`}
-      stats={[
-        { value: countOf('pending'), label: 'Pending' },
-        { value: countOf('approved'), label: 'Approved' },
-        { value: countOf('rejected'), label: 'Rejected' },
-      ]}
-      toolbar={
-        <>
+    // No blur, transform or filter on this root or its wrappers, and no overflow either: the sticky
+    // header tracks <main>.
+    <div className="flex flex-col">
+      <PageHeader
+        crumb="INBOX"
+        title="Nova VODs"
+        titleRef={headingRef}
+        meta={
+          list.data === null ? undefined : (
+            <>
+              <span>{countText(allVods.length, uniqueStreamers.length)}</span>
+              <Pill tone={statusTone('pending')}>{countOf('pending')} Pending</Pill>
+              <Pill tone={statusTone('approved')}>{countOf('approved')} Approved</Pill>
+              <Pill tone={statusTone('rejected')}>{countOf('rejected')} Rejected</Pill>
+            </>
+          )
+        }
+      />
+
+      <div className="flex flex-col gap-3 p-4 lg:px-5 lg:pb-[18px]">
+        <div ref={toolbarRef} className="flex flex-wrap items-center gap-x-6 gap-y-2">
           <StatusFilterBar
             options={NOVA_STATUS_FILTERS}
             value={statusFilter}
             onChange={changeStatusFilter}
-            label="Filter VOD submissions by status"
+            labelledBy={STATUS_FILTER_LABEL_ID}
+            className="flex-wrap gap-2"
+            heading={
+              <span id={STATUS_FILTER_LABEL_ID} className={MICRO_LABEL}>
+                Status
+              </span>
+            }
           />
-          <div aria-hidden="true" className="h-5 w-px bg-border-token" />
-          <Segmented
-            label="View"
-            value={viewMode}
-            onChange={setViewMode}
-            options={[
-              { value: 'grouped', label: 'By VTuber', icon: 'users' },
-              { value: 'timeline', label: 'Timeline', icon: 'clock' },
-            ]}
-          />
-          <label htmlFor={streamerFilterId} className="sr-only">
-            Filter VOD submissions by streamer
-          </label>
-          <PrismSelect
-            id={streamerFilterId}
-            value={streamerFilter}
-            onChange={(e) => changeStreamerFilter(e.target.value)}
-          >
-            <option value="">All streamers</option>
-            {uniqueStreamers.map((s) => (
-              <option key={s} value={s}>{s}</option>
-            ))}
-          </PrismSelect>
-        </>
-      }
-    >
-      <div className="px-6 pb-6 pt-3">
-        {list.error && <p className="mb-4 text-sm text-red-600">{list.error}</p>}
-        {actionError && <p className="mb-4 text-sm text-red-600">{actionError}</p>}
+          <Segmented label="View" value={viewMode} onChange={setViewMode} options={VIEW_OPTIONS} />
+          <div className="w-44">
+            <label htmlFor={streamerFilterId} className="sr-only">
+              Filter VOD submissions by streamer
+            </label>
+            <Select
+              id={streamerFilterId}
+              value={streamerFilter}
+              onChange={(event) => changeStreamerFilter(event.target.value)}
+            >
+              <option value="">All streamers</option>
+              {uniqueStreamers.map((slug) => (
+                <option key={slug} value={slug}>
+                  {slug}
+                </option>
+              ))}
+            </Select>
+          </div>
+        </div>
 
-        {loading ? (
-          <p className="py-6 text-center text-sm text-token-secondary">Loading...</p>
-        ) : vods.length === 0 ? (
-          <p className="px-4 py-8 text-center text-sm text-token-tertiary">No VOD submissions found.</p>
-        ) : viewMode === 'grouped' ? (
-          <div className="flex flex-col gap-2.5">
-            {groups.map((group) => (
-              <VodGroupCard
-                key={group.slug}
-                group={group}
-                open={groupOpen[group.slug] ?? group.pendingCount > 0}
-                onToggle={() =>
-                  setGroupOpen((prev) => ({
-                    ...prev,
-                    [group.slug]: !(prev[group.slug] ?? group.pendingCount > 0),
-                  }))
-                }
-              >
-                {group.vods.map(renderRow)}
-              </VodGroupCard>
-            ))}
+        {list.error !== null ? (
+          <Note tone="danger" icon="alert" role="alert" title="Couldn't load VODs.">
+            <span className="flex flex-wrap items-center justify-between gap-x-3 gap-y-1.5">
+              <span>{list.error}</span>
+              <Button size="sm" icon="refresh" onClick={handleRetry}>
+                Retry
+              </Button>
+            </span>
+          </Note>
+        ) : null}
+
+        {showSkeleton ? (
+          <GlassCard>
+            <Skeleton rows={6} label="Loading VODs…" />
+          </GlassCard>
+        ) : null}
+
+        {showEmpty ? (
+          <GlassCard>
+            <EmptyState icon="inbox" title="No VOD submissions found." />
+          </GlassCard>
+        ) : null}
+
+        {vods.length > 0 ? (
+          <div ref={listRef} className="flex flex-col gap-2.5">
+            {viewMode === 'grouped' ? (
+              groups.map((group) => (
+                <VodGroupCard
+                  key={group.slug}
+                  group={group}
+                  open={isGroupOpen(group, groupOpen)}
+                  onToggle={() => setGroupOpen((prev) => ({ ...prev, [group.slug]: !isGroupOpen(group, prev) }))}
+                >
+                  {group.vods.map(renderRow)}
+                </VodGroupCard>
+              ))
+            ) : (
+              <GlassCard padding="sm" className="overflow-clip">
+                <VodTable label="VOD submissions">{vods.map(renderRow)}</VodTable>
+              </GlassCard>
+            )}
           </div>
-        ) : (
-          <div className="overflow-x-auto">
-            <table aria-label="VOD submissions" className="block min-w-[820px]">
-              <ColumnHeader gridClassName={ROW_GRID} columns={ROW_COLUMNS} sticky={false} />
-              {vods.map(renderRow)}
-            </table>
-          </div>
-        )}
+        ) : null}
       </div>
-    </PrismPage>
+    </div>
   );
 }
 
@@ -257,96 +448,133 @@ function VodGroupCard({
 }) {
   const bodyId = `nova-vod-group-${group.slug}`;
   return (
-    <GlassCard className="overflow-hidden">
+    <GlassCard padding="none" className="overflow-clip">
       <button
         type="button"
         aria-expanded={open}
         aria-controls={bodyId}
         onClick={onToggle}
-        className="hover-row flex w-full items-center gap-4 px-6 py-3.5 text-left"
+        className={`flex w-full items-center gap-4 px-5 py-3.5 text-left transition-colors hover:bg-row-hover focus-visible:outline-none ${INSET_FOCUS}`}
       >
-        <Avatar src={null} alt="" size={48} radius={12} />
-        <span className="flex min-w-0 flex-1 flex-col gap-0.5">
-          <span className="truncate text-[15px] font-bold leading-tight text-token-primary">{group.slug}</span>
-        </span>
+        <Avatar src={null} alt="" size={48} />
+        <span className="min-w-0 flex-1 truncate text-[15px] font-bold leading-tight text-fg">{group.slug}</span>
         <span className="flex shrink-0 items-center gap-2">
-          <Pill tone="pink">{group.vods.length === 1 ? '1 VOD' : `${group.vods.length} VODs`}</Pill>
+          <Pill tone="neutral">{group.vods.length === 1 ? '1 VOD' : `${group.vods.length} VODs`}</Pill>
           {group.pendingCount > 0 ? (
-            <Pill tone="pending">{group.pendingCount} pending</Pill>
+            <Pill tone="warn">{group.pendingCount} pending</Pill>
           ) : (
-            <Pill tone="approved">All reviewed</Pill>
+            <Pill tone="ok">All reviewed</Pill>
           )}
         </span>
-        <span className="ml-2 text-token-tertiary">
-          <Icon name={open ? 'chevronDown' : 'chevronRight'} size={20} />
-        </span>
+        <Icon name={open ? 'chevronDown' : 'chevronRight'} size={20} className="shrink-0 text-fg-subtle" />
       </button>
-      {open && (
-        <div id={bodyId} className="overflow-x-auto border-t border-border-token-table px-3 pb-3 pt-1">
-          <table aria-label={`VOD submissions for ${group.slug}`} className="block min-w-[820px]">
-            <ColumnHeader gridClassName={ROW_GRID} columns={ROW_COLUMNS} sticky={false} />
-            {children}
-          </table>
+      {open ? (
+        <div id={bodyId} className="border-t border-line-soft px-3 pb-3 pt-1">
+          <VodTable label={`VOD submissions for ${group.slug}`}>{children}</VodTable>
         </div>
-      )}
+      ) : null}
     </GlassCard>
   );
 }
 
+/**
+ * The rows' table: one `<tbody>` a row under a head row of the kit's head label. It keeps its width and
+ * scrolls inside its card. The head is a grid like the rows, so its columns line up with theirs. The
+ * scroller is a size container, so that an open row's detail can be as wide as what the scroller shows
+ * (`cqw`) while the table is wider: see `DETAILS_PINNED`.
+ */
+function VodTable({ label, children }: { label: string; children: ReactNode }) {
+  return (
+    <div className="overflow-x-auto [container-type:inline-size]">
+      <table aria-label={label} className="block min-w-[820px]">
+        <thead className="block">
+          <tr className={`${ROW_GRID} grid items-center border-b border-line-soft px-3 py-2`}>
+            {ROW_COLUMNS.map((column) => (
+              <th
+                key={column.key}
+                scope="col"
+                className={column.visible ? `p-0 pl-3 text-left ${MICRO_LABEL}` : 'p-0 text-left'}
+              >
+                {column.visible ? column.label : <span className="sr-only">{column.label}</span>}
+              </th>
+            ))}
+          </tr>
+        </thead>
+        {children}
+      </table>
+    </div>
+  );
+}
+
+interface VodRowProps {
+  vod: NovaVodSubmission;
+  isCurator: boolean;
+  expanded: boolean;
+  /** Timeline mode: rows are not under a streamer card, so carry the slug inline. */
+  showStreamer?: boolean;
+  songs: VodSongList;
+  /** What this VOD's request is out for, if one is. */
+  acting: VodAction | undefined;
+  /** When the page opened: the times only need it to leave out the current year. */
+  today: Date;
+  onToggle: () => void;
+  /** Asks for songs that did not load, again. */
+  onRetrySongs: () => void;
+  /** The page's note store: this row seeds from it and writes back to it. */
+  drafts: RowDrafts;
+  /** Resolves true when the review landed, so the row may drop its note. */
+  onAction: (id: string, status: NovaStatus, rejectNote: string) => Promise<boolean>;
+  onDelete: (vod: NovaVodSubmission) => void;
+}
+
+/**
+ * One VOD: its summary row and, while open, its detail. The reviewer note is local (typing re-renders this
+ * VOD, not the inbox) and is seeded from, and written through to, the page's store, so it survives the row
+ * unmounting. The request a button sends is the page's, not the row's: `acting` says what is out for this
+ * VOD, and the buttons follow it however often the row opens and closes.
+ */
 export function VodRow({
   vod,
   isCurator,
   expanded,
   showStreamer = false,
   songs,
+  acting,
+  today,
   onToggle,
+  onRetrySongs,
   drafts,
   onAction,
   onDelete,
-  actionLoading,
-}: {
-  vod: NovaVodSubmission;
-  isCurator: boolean;
-  expanded: boolean;
-  /** Timeline mode: rows are not under a streamer card, so carry the slug inline. */
-  showStreamer?: boolean;
-  songs: NovaVodSong[];
-  onToggle: () => void;
-  /** The page's note store: this row seeds from it and writes back to it. */
-  drafts: RowDrafts;
-  /** Resolves true when the review landed, so the row may drop its note. */
-  onAction: (id: string, status: NovaStatus, rejectNote: string) => Promise<boolean>;
-  onDelete: (vod: NovaVodSubmission) => void;
-  actionLoading: boolean;
-}) {
-  // The note being written belongs to this row: typing it re-renders one VOD, not the inbox.
+}: VodRowProps) {
   const [rejectNote, setRejectNote] = useState(() => drafts.read(vod.id));
-  const rejectNoteId = useId();
   const detailsId = `nova-vod-details-${vod.id}`;
-  const showReviewCard = isCurator;
-  const review = async (status: NovaStatus) => {
-    if (await onAction(vod.id, status, rejectNote)) setRejectNote('');
-  };
   // Submitter-supplied: only YouTube's image CDNs may load in the curator's browser.
   const thumbnailUrl = sanitizeNovaUrl(vod.thumbnail_url, 'thumbnail');
+  const label = vodLabel(vod);
+
+  // One press: a review sends the status (and the note a rejection carries), a delete asks first.
+  const press = async (action: VodAction) => {
+    if (action === 'delete') onDelete(vod);
+    else if (await onAction(vod.id, action, rejectNote)) setRejectNote('');
+  };
 
   return (
-    <tbody className={`mt-0.5 block rounded-radius-lg ${expanded ? 'bg-[#FCE7F320]' : ''}`}>
+    <tbody className={`mt-0.5 block rounded-radius-lg ${expanded ? 'bg-selected' : ''}`}>
       {/* The title is the accessible toggle control; the chevron is a mouse-only duplicate of it. */}
-      <tr className={`${ROW_GRID} hover-row grid items-center rounded-radius-lg px-3 py-2`}>
+      <tr className={`${ROW_GRID} grid items-center rounded-radius-lg px-3 py-2 transition-colors hover:bg-row-hover`}>
         <td className="flex items-center p-0">
           <VodThumbnail src={thumbnailUrl} />
         </td>
         <td className="flex min-w-0 flex-col gap-0.5 p-0 pl-3">
           <button
             type="button"
-            tabIndex={0}
             aria-expanded={expanded}
             aria-controls={detailsId}
-            aria-label={`${expanded ? '收合' : '展開'} ${vod.stream_title || vod.video_id}`}
+            aria-label={`${expanded ? '收合' : '展開'} ${label}`}
             onClick={onToggle}
-            className={`max-w-full truncate rounded-radius-sm text-left text-[15px] font-bold leading-tight focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent-pink ${
-              expanded ? 'text-accent-pink-dark' : 'text-token-primary'
+            className={`max-w-full truncate rounded-radius-sm text-left text-[15px] font-bold leading-tight focus-visible:outline-none focus-visible:shadow-focus ${
+              expanded ? 'text-accent-fg' : 'text-fg'
             }`}
           >
             {vod.stream_title || '—'}
@@ -354,51 +582,44 @@ export function VodRow({
           <span className="flex items-center gap-1.5 text-[11px]">
             {showStreamer && (
               <>
-                <span className="font-mono font-semibold text-token-secondary">{vod.streamer_slug}</span>
-                <span className="text-token-tertiary">·</span>
+                <span className="font-mono font-semibold text-fg-muted">{vod.streamer_slug}</span>
+                <span className="text-fg-subtle">·</span>
               </>
             )}
             <a
               href={vod.video_url}
               target="_blank"
               rel="noopener noreferrer"
-              className="inline-flex items-center gap-1 font-mono text-accent-blue hover:text-accent-pink"
+              className="inline-flex items-center gap-1 rounded-radius-xs font-mono text-fg-muted transition-colors hover:text-accent-fg focus-visible:outline-none focus-visible:shadow-focus"
             >
               {vod.video_id}
-              <Icon name="external" size={11} className="text-token-tertiary" />
+              <Icon name="external" size={11} className="text-fg-subtle" />
             </a>
-            <span className="text-token-tertiary">·</span>
-            <span className={vod.stream_date ? 'font-mono text-token-secondary' : 'font-medium text-amber-600'}>
+            <span className="text-fg-subtle">·</span>
+            <span className={vod.stream_date ? 'font-mono text-fg-muted' : 'font-medium text-tone-warn-fg'}>
               {vod.stream_date || 'No date'}
             </span>
           </span>
         </td>
         <td className="p-0 pl-3">
-          {expanded && songs.length > 0 ? (
-            <Pill tone="pink">{songs.length} songs</Pill>
+          {expanded && Array.isArray(songs) && songs.length > 0 ? (
+            <Pill tone="neutral">{songs.length} songs</Pill>
           ) : (
-            <span className="text-[13px] text-token-tertiary">—</span>
+            <span className="text-token-base text-fg-subtle">—</span>
           )}
         </td>
         <td className="p-0 pl-3">
           <StatusPill status={vod.status} />
         </td>
-        <td className="p-0 pl-3 font-mono text-[11px] text-token-secondary">{vod.submitted_at}</td>
+        <td className="p-0 pl-3">
+          <StoredTime value={vod.submitted_at} today={today} className="font-mono text-[11px] text-fg-muted" />
+        </td>
         <td className="flex items-center justify-end gap-1.5 p-0">
-          {isCurator && !expanded && (
-            vod.status === 'pending' ? (
-              <>
-                <CircleButton label="Approve" icon="check" gradient disabled={actionLoading} onClick={() => review('approved')} />
-                <CircleButton label="Reject" icon="x" disabled={actionLoading} onClick={() => review('rejected')} />
-                <CircleButton label="Delete" icon="trash" danger disabled={actionLoading} onClick={() => onDelete(vod)} />
-              </>
-            ) : (
-              <>
-                <CircleButton label="Revert to Pending" icon="undo" disabled={actionLoading} onClick={() => review('pending')} />
-                <CircleButton label="Delete" icon="trash" danger disabled={actionLoading} onClick={() => onDelete(vod)} />
-              </>
-            )
-          )}
+          {isCurator && !expanded
+            ? (vod.status === 'pending' ? PENDING_ACTIONS : REVIEWED_ACTIONS).map((spec) => (
+                <QuickAction key={spec.action} spec={spec} acting={acting} onPress={press} />
+              ))
+            : null}
         </td>
         <td className="flex justify-end p-0">
           <button
@@ -406,163 +627,248 @@ export function VodRow({
             tabIndex={-1}
             aria-hidden="true"
             onClick={onToggle}
-            className="flex justify-end text-token-tertiary hover:text-accent-pink"
+            className="flex justify-end text-fg-subtle transition-colors hover:text-accent-fg"
           >
             <Icon name={expanded ? 'chevronDown' : 'chevronRight'} size={20} />
           </button>
         </td>
       </tr>
 
+      {/* One column below 1024 px; from there the fields and the songs, with a curator's review card across both
+          below them until 1280 px, where it becomes the third column. */}
       {expanded && (
         <tr className="block">
-        <td
-          colSpan={ROW_COLUMNS.length}
-          id={detailsId}
-          className={`grid gap-6 border-t border-border-token-table px-3 pb-3 pt-4 ${
-            showReviewCard ? 'grid-cols-[240px_minmax(0,1fr)_320px]' : 'grid-cols-[240px_minmax(0,1fr)]'
-          }`}
-        >
-          {/* Left: details */}
-          <div className="flex flex-col gap-3.5">
-            {thumbnailUrl && (
-              <img
-                src={thumbnailUrl}
-                alt={vod.stream_title}
-                className="h-[135px] w-[240px] rounded-radius-lg border border-border-token-glass object-cover shadow-[0_8px_32px_rgba(0,0,0,0.1)]"
+          <td
+            colSpan={ROW_COLUMNS.length}
+            id={detailsId}
+            className={`grid grid-cols-1 gap-6 border-t border-line-soft px-3 pb-3 pt-4 ${DETAILS_PINNED} lg:grid-cols-[240px_minmax(0,1fr)]${
+              isCurator ? ' xl:grid-cols-[240px_minmax(0,1fr)_320px]' : ''
+            }`}
+          >
+            <VodFacts vod={vod} thumbnailUrl={thumbnailUrl} today={today} />
+            <VodSongs songs={songs} onRetry={onRetrySongs} />
+            {isCurator && (
+              <VodReviewCard
+                vod={vod}
+                acting={acting}
+                rejectNote={rejectNote}
+                onNoteChange={(value) => {
+                  drafts.write(vod.id, value);
+                  setRejectNote(value);
+                }}
+                onPress={press}
               />
             )}
-            <DetailField label="Video URL">
-              <a
-                href={vod.video_url}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="break-all text-[13px] leading-normal text-accent-blue hover:text-accent-pink"
-              >
-                {vod.video_url}
-              </a>
-            </DetailField>
-            <DetailField label="Stream Title" value={vod.stream_title} />
-            <DetailField label="Stream Date">
-              <p className={`text-[13px] leading-normal ${vod.stream_date ? 'text-token-primary' : 'font-medium text-amber-600'}`}>
-                {vod.stream_date || 'No date provided'}
-              </p>
-            </DetailField>
-            <DetailField label="Submitter Note" value={vod.submitter_note} />
-            <DetailField label="Reviewer Note" value={vod.reviewer_note} />
-            <DetailField label="Reviewed At" value={vod.reviewed_at ?? ''} />
-          </div>
-
-          {/* Middle: song timestamps */}
-          <div className="flex min-w-0 flex-col gap-0.5">
-            {songs.length > 0 ? (
-              <>
-                <div className="grid grid-cols-[24px_minmax(0,1fr)_64px_64px] border-b border-border-token-table px-2 pb-1.5">
-                  <SectionLabel>#</SectionLabel>
-                  <SectionLabel className="pl-2">Songs · {songs.length}</SectionLabel>
-                  <SectionLabel className="text-right">Start</SectionLabel>
-                  <SectionLabel className="text-right">End</SectionLabel>
-                </div>
-                {songs.map((song, i) => (
-                  <div
-                    key={song.id}
-                    className="hover-row grid grid-cols-[24px_minmax(0,1fr)_64px_64px] items-center rounded-radius-sm px-2 py-1.5"
-                  >
-                    <span className="font-mono text-[11px] text-token-tertiary">{i + 1}</span>
-                    <div className="min-w-0 pl-2">
-                      <p className="truncate text-[13px] font-bold text-token-primary">{song.song_title}</p>
-                      <p className="truncate text-[11px] text-token-secondary">{song.original_artist || '—'}</p>
-                    </div>
-                    <span className="text-right font-mono text-[11px] text-token-secondary">{formatTimestamp(song.start_timestamp)}</span>
-                    <span className="text-right font-mono text-[11px] text-token-tertiary">
-                      {song.end_timestamp !== null ? formatTimestamp(song.end_timestamp) : '—'}
-                    </span>
-                  </div>
-                ))}
-              </>
-            ) : (
-              <>
-                <SectionLabel>Songs</SectionLabel>
-                <p className="mt-1 text-xs text-token-tertiary">No song timestamps submitted.</p>
-              </>
-            )}
-          </div>
-
-          {/* Right: review actions */}
-          {showReviewCard && (
-            <GlassCard className="flex flex-col gap-2.5 self-start p-4">
-              {vod.status === 'pending' ? (
-                <div>
-                  <label
-                    htmlFor={rejectNoteId}
-                    className="block text-[10px] font-bold uppercase tracking-[0.1em] text-token-tertiary"
-                  >
-                    Reviewer Note (optional, shown on reject)
-                  </label>
-                  <PrismTextarea
-                    id={rejectNoteId}
-                    value={rejectNote}
-                    onChange={(e) => {
-                      drafts.write(vod.id, e.target.value);
-                      setRejectNote(e.target.value);
-                    }}
-                    placeholder="Reason for rejection..."
-                    rows={3}
-                    className="mt-2"
-                  />
-                </div>
-              ) : (
-                <SectionLabel>Review</SectionLabel>
-              )}
-              <div className="flex items-center gap-2">
-                {vod.status === 'pending' ? (
-                  <>
-                    <GradientButton icon="check" disabled={actionLoading} onClick={() => review('approved')}>
-                      Approve
-                    </GradientButton>
-                    <OutlineButton icon="x" tone="danger" disabled={actionLoading} onClick={() => review('rejected')}>
-                      Reject
-                    </OutlineButton>
-                  </>
-                ) : (
-                  <OutlineButton icon="undo" disabled={actionLoading} onClick={() => review('pending')}>
-                    Revert to Pending
-                  </OutlineButton>
-                )}
-                <div className="flex-1" />
-                <button
-                  type="button"
-                  disabled={actionLoading}
-                  onClick={() => onDelete(vod)}
-                  className="text-[11px] font-medium text-token-tertiary transition-colors hover:text-red-600 disabled:opacity-50"
-                >
-                  Delete
-                </button>
-              </div>
-            </GlassCard>
-          )}
-        </td>
+          </td>
         </tr>
       )}
     </tbody>
   );
 }
 
+/**
+ * A row's quick action: an icon button named for what it does. `IconButton` has no busy state, so this one
+ * gives itself the kit's: the button that sent the request is `aria-busy` and spins, every button of the row
+ * is `aria-disabled` (never `disabled`, which would drop the keyboard focus) and takes no press.
+ */
+function QuickAction({
+  spec,
+  acting,
+  onPress,
+}: {
+  spec: ActionSpec;
+  acting: VodAction | undefined;
+  onPress: (action: VodAction) => void;
+}) {
+  const busy = acting === spec.action;
+  return (
+    <IconButton
+      label={spec.label}
+      icon={busy ? 'refresh' : spec.icon}
+      tone={spec.tone}
+      size="sm"
+      aria-busy={busy ? true : undefined}
+      aria-disabled={acting !== undefined ? true : undefined}
+      onClick={acting !== undefined ? undefined : () => onPress(spec.action)}
+      className={`aria-disabled:cursor-not-allowed aria-disabled:opacity-50${busy ? ' [&>svg]:animate-spin' : ''}`}
+    />
+  );
+}
+
+/** The left column of a VOD's detail: its thumbnail and what was submitted with it. */
+function VodFacts({
+  vod,
+  thumbnailUrl,
+  today,
+}: {
+  vod: NovaVodSubmission;
+  thumbnailUrl: string | null;
+  today: Date;
+}) {
+  return (
+    <div className="flex min-w-0 flex-col gap-3.5">
+      {thumbnailUrl && (
+        <img
+          src={thumbnailUrl}
+          alt={vod.stream_title}
+          className="h-[135px] w-[240px] max-w-full rounded-radius-lg border border-field-line bg-track object-cover shadow-card"
+        />
+      )}
+      <dl className="flex flex-col gap-3.5">
+        <DetailField label="Video URL">
+          <a
+            href={vod.video_url}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="break-all text-accent-fg hover:underline"
+          >
+            {vod.video_url}
+          </a>
+        </DetailField>
+        <DetailField label="Stream Title">{vod.stream_title || '—'}</DetailField>
+        <DetailField label="Stream Date">
+          {vod.stream_date || <span className="font-medium text-tone-warn-fg">No date provided</span>}
+        </DetailField>
+        <DetailField label="Submitter Note">
+          <span className="whitespace-pre-line">{vod.submitter_note || '—'}</span>
+        </DetailField>
+        <DetailField label="Reviewer Note">
+          <span className="whitespace-pre-line">{vod.reviewer_note || '—'}</span>
+        </DetailField>
+        <DetailField label="Reviewed At">
+          {vod.reviewed_at ? <StoredTime value={vod.reviewed_at} today={today} /> : '—'}
+        </DetailField>
+      </dl>
+    </div>
+  );
+}
+
+/**
+ * The middle column of a VOD's detail: the song timestamps that came with it. Until they come it says they are
+ * loading, and if their request failed it says so beside a Retry: only songs that loaded and are none read "No
+ * song timestamps submitted."
+ */
+function VodSongs({ songs, onRetry }: { songs: VodSongList; onRetry: () => void }) {
+  if (songs === 'loading' || songs === 'failed' || songs.length === 0) {
+    return (
+      <div className="flex min-w-0 flex-col gap-1">
+        <SectionLabel>Songs</SectionLabel>
+        {songs === 'failed' ? (
+          <div className="flex flex-wrap items-center gap-2">
+            <p className="text-xs text-tone-danger-fg">Couldn&apos;t load the songs.</p>
+            <Button size="sm" icon="refresh" onClick={onRetry}>
+              Retry
+            </Button>
+          </div>
+        ) : (
+          <p className="text-xs text-fg-subtle">{songs === 'loading' ? 'Loading songs…' : 'No song timestamps submitted.'}</p>
+        )}
+      </div>
+    );
+  }
+  return (
+    <div className="flex min-w-0 flex-col gap-0.5">
+      <div className="grid grid-cols-[24px_minmax(0,1fr)_64px_64px] border-b border-line-soft px-2 pb-1.5">
+        <span className={MICRO_LABEL}>#</span>
+        <span className={`${MICRO_LABEL} pl-2`}>Songs · {songs.length}</span>
+        <span className={`${MICRO_LABEL} text-right`}>Start</span>
+        <span className={`${MICRO_LABEL} text-right`}>End</span>
+      </div>
+      {songs.map((song, i) => (
+        <div
+          key={song.id}
+          className="grid grid-cols-[24px_minmax(0,1fr)_64px_64px] items-center rounded-radius-sm px-2 py-1.5 transition-colors hover:bg-row-hover"
+        >
+          <span className="font-mono text-[11px] text-fg-subtle">{i + 1}</span>
+          <div className="min-w-0 pl-2">
+            <p className="truncate text-token-base font-bold text-fg">{song.song_title}</p>
+            <p className="truncate text-[11px] text-fg-muted">{song.original_artist || '—'}</p>
+          </div>
+          <span className="text-right font-mono text-[11px] text-fg-muted">{formatTimestamp(song.start_timestamp)}</span>
+          <span className="text-right font-mono text-[11px] text-fg-subtle">
+            {song.end_timestamp !== null ? formatTimestamp(song.end_timestamp) : '—'}
+          </span>
+        </div>
+      ))}
+    </div>
+  );
+}
+
+/**
+ * The right column of a curator's detail: the reviewer note (of a VOD still pending) and the review buttons.
+ * The button that sent a request is busy and keeps the focus; the others are unavailable beside it.
+ */
+function VodReviewCard({
+  vod,
+  acting,
+  rejectNote,
+  onNoteChange,
+  onPress,
+}: {
+  vod: NovaVodSubmission;
+  acting: VodAction | undefined;
+  rejectNote: string;
+  onNoteChange: (value: string) => void;
+  onPress: (action: VodAction) => void;
+}) {
+  const rejectNoteId = useId();
+  const pending = vod.status === 'pending';
+  return (
+    <GlassCard className="flex flex-col gap-2.5 self-start lg:col-span-2 xl:col-span-1">
+      {pending ? (
+        <div className="flex flex-col gap-2">
+          <label htmlFor={rejectNoteId} className={MICRO_LABEL}>
+            Reviewer Note (optional, shown on reject)
+          </label>
+          <Textarea
+            id={rejectNoteId}
+            value={rejectNote}
+            onChange={(event) => onNoteChange(event.target.value)}
+            placeholder="Reason for rejection..."
+            rows={3}
+            className="block resize-y"
+          />
+        </div>
+      ) : (
+        <SectionLabel>Review</SectionLabel>
+      )}
+      <div className="flex flex-wrap items-center gap-2">
+        {(pending ? PENDING_ACTIONS : REVIEWED_ACTIONS).map((spec) => (
+          <Button
+            key={spec.action}
+            variant={spec.action === 'approved' ? 'primary' : spec.action === 'delete' ? 'ghost' : 'secondary'}
+            size="sm"
+            icon={spec.icon}
+            busy={acting === spec.action}
+            aria-disabled={acting !== undefined && acting !== spec.action ? true : undefined}
+            className={spec.action === 'delete' ? 'ml-auto' : undefined}
+            onClick={() => onPress(spec.action)}
+          >
+            {spec.label}
+          </Button>
+        ))}
+      </div>
+    </GlassCard>
+  );
+}
+
 function VodThumbnail({ src }: { src: string | null }) {
-  const [failed, setFailed] = useState(false);
-  if (src && !failed) {
+  // The src that failed, not a flag: a new src is tried afresh.
+  const [failedSrc, setFailedSrc] = useState<string | null>(null);
+  if (src && src !== failedSrc) {
     return (
       <img
         src={src}
         alt=""
-        onError={() => setFailed(true)}
-        className="h-9 w-16 shrink-0 rounded-[6px] bg-surface-frosted object-cover shadow-[0_1px_4px_rgba(0,0,0,0.1)]"
+        onError={() => setFailedSrc(src)}
+        className="h-9 w-16 shrink-0 rounded-radius-xs border border-line-soft bg-track object-cover"
       />
     );
   }
   return (
     <div
       aria-hidden="true"
-      className="flex h-9 w-16 shrink-0 items-center justify-center rounded-[6px] prism-gradient text-white shadow-[0_1px_4px_rgba(0,0,0,0.1)]"
+      className="flex h-9 w-16 shrink-0 items-center justify-center rounded-radius-xs bg-accent text-white"
     >
       <Icon name="film" size={16} />
     </div>

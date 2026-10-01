@@ -102,7 +102,8 @@ const CURATOR_ROUTE_PROBES = [
   { url: '/works/review', marker: 'Global Work Review' },
   { url: '/harmonizer', marker: 'Harmonizer' },
   { url: '/nova', marker: 'Fetch All Channel Info' },
-  { url: '/nova/vods', marker: 'Nova VODs' },
+  // The id of its status filter group's label, which nova-vods-live pins: "Nova VODs" is also what its nav entry says.
+  { url: '/nova/vods', marker: 'nova-vod-status-filter-label' },
   // The id of its status filter group, which crystal-tickets-ui pins.
   { url: '/crystal', marker: 'crystal-ticket-status-filter-label' },
   { url: '/vod-export', marker: 'Publication workflow' },

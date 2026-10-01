@@ -170,11 +170,13 @@ const renderVod = (drafts: RowDrafts) =>
         isCurator
         expanded
         songs={[]}
+        acting={undefined}
+        today={new Date('2026-09-15T00:00:00.000Z')}
         onToggle={() => undefined}
+        onRetrySongs={() => undefined}
         drafts={drafts}
         onAction={async () => true}
         onDelete={() => undefined}
-        actionLoading={false}
       />
     </table>,
   );

@@ -143,6 +143,7 @@ export const ADMIN_ROUTES: readonly AdminRoute[] = [
     curatorOnly: true,
     group: 'inbox',
     icon: 'film',
+    frame: 'studio',
     render: (user) => <NovaVodSubmissions user={user} />,
   },
   {
