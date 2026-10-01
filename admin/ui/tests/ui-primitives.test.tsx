@@ -1700,6 +1700,87 @@ async function main(): Promise<void> {
     '✓ ui kit: a PageHeader given titleRef shows its hidden title (and its block) below 1024px while the <h1> holds the focus, the crumb stays hidden, nothing changes from lg up, and a header without titleRef is as before',
   );
 
+  // --- PageHeader: a header with nothing to show below lg takes no room there ---
+
+  // Below 1024px the crumb, the <h1> and their block are visually hidden (the MobileTopBar names the
+  // page). A header with no children, actions, meta row, record title or titleRef has nothing left to
+  // show there, and would still draw its min-h-[62px] glass bar, empty. It leaves the flow too:
+  // `max-lg:sr-only` on the <header> itself, the technique its title block uses. Never `hidden`,
+  // `invisible` or an unprefixed `sr-only`: the first two take the <h1> out of the accessibility tree,
+  // the last hides the bar from lg up as well.
+  const COLLAPSES = 'max-lg:sr-only';
+  const headerClassesIn = (markup: string): string[] => headerClasses(/<header[^>]*>/.exec(markup)?.[0] ?? '');
+  const utilityOf = (name: string): string => name.slice(name.lastIndexOf(':') + 1);
+  const tallWithActions = renderToStaticMarkup(
+    <PageHeader crumb="TIMESTAMPS" title="Stream Detail" tall actions={<span>Approve</span>} />,
+  );
+  const nothingToShow = [
+    ['default', pageHeaderMarkup, actionsMarkup],
+    ['tall', tallHeaderMarkup, tallWithActions],
+    ['ReactNode-crumb', crumbNodeMarkup, actionsMarkup],
+    [
+      'null-actions, null-children and no-meta',
+      renderToStaticMarkup(
+        <PageHeader crumb="CATALOG" title="Submit Song" actions={null} meta={false}>
+          {null}
+        </PageHeader>,
+      ),
+      actionsMarkup,
+    ],
+  ] as const;
+  for (const [variant, markup, comparable] of nothingToShow) {
+    const classes = headerClassesIn(markup);
+    assert(
+      classes.includes(COLLAPSES),
+      `the ${variant} header has nothing to show below 1024px, so it takes no room there (got "${classes.join(' ')}")`,
+    );
+    assert(
+      classes.filter((name) => name !== COLLAPSES).join(' ') === headerClassesIn(comparable).join(' '),
+      `the ${variant} header is the header it always was from lg up: ${COLLAPSES} is the only class it adds (got "${classes.join(' ')}")`,
+    );
+    // Nothing in the markup is display:none or visibility:hidden, so the <h1> stays in the accessibility tree.
+    const everyClass = [...markup.matchAll(/class="([^"]*)"/g)].flatMap((match) => (match[1] ?? '').split(' '));
+    const removers = everyClass.filter((name) => /^(hidden|invisible|collapse)$/.test(utilityOf(name)));
+    assert(removers.length === 0, `the ${variant} header takes nothing out of the accessibility tree (found: ${removers.join(' ')})`);
+    // And the one class that hides the <header> is the prefixed one: an unprefixed sr-only would hide it from lg up too.
+    const hidesHeader = classes.filter((name) => utilityOf(name) === 'sr-only');
+    assert(
+      hidesHeader.join(' ') === COLLAPSES,
+      `${COLLAPSES} is the only sr-only on the ${variant} <header>, so it hides below lg only (got "${hidesHeader.join(' ')}")`,
+    );
+    assert(/<h1[^>]*>/.test(markup) && !markup.includes('style='), `the ${variant} header still renders its <h1>, with no inline style`);
+  }
+
+  // Anything there is to show below lg keeps the bar: actions, children, a meta row, a record title, or
+  // a titleRef (a title that takes focus must have a bar to show it in). Their <header> is as before: the
+  // classes the bar wore before the collapse class existed, written out here. A header compared with a
+  // render of itself, or of another header changed in the same way, would prove nothing.
+  const BAR_BEFORE =
+    'glass-header-host relative z-20 flex flex-wrap items-center gap-3 px-5 before:border-x-0 before:border-t-0 py-1.5 lg:sticky lg:top-0 min-h-[62px]';
+  const BAR_WITH_META_BEFORE =
+    'glass-header-host relative z-20 flex flex-wrap items-center gap-3 px-5 before:border-x-0 before:border-t-0 max-xl:py-1.5 lg:sticky lg:top-0 min-h-[62px]';
+  const somethingToShow = [
+    ['actions', actionsMarkup, BAR_BEFORE],
+    ['children', childrenMarkup, BAR_BEFORE],
+    ['a meta row', metaMarkup, BAR_WITH_META_BEFORE],
+    ['a record title', recordTitleMarkup, BAR_BEFORE],
+    ['a titleRef', focusTargetMarkup, BAR_BEFORE],
+    ['a record title and a titleRef', recordFocusMarkup, BAR_BEFORE],
+    ['a meta row and a titleRef', metaFocusMarkup, BAR_WITH_META_BEFORE],
+  ] as const;
+  for (const [variant, markup, before] of somethingToShow) {
+    const classes = headerClassesIn(markup);
+    assert(!classes.includes(COLLAPSES), `a header with ${variant} keeps its bar below 1024px (got "${classes.join(' ')}")`);
+    assert(
+      classes.join(' ') === before,
+      `a header with ${variant} has the <header> classes it had before (got "${classes.join(' ')}")`,
+    );
+  }
+
+  console.log(
+    '✓ ui kit: a PageHeader with nothing to show below 1024px (no children, actions, meta row, record title or titleRef) takes no room there through max-lg:sr-only on the <header>, its <h1> stays in the accessibility tree, it is unchanged from lg up, and every other header is as before',
+  );
+
   // --- no output anywhere above (Task 8) uses the raw Tailwind palette ---
 
   const allTask8Markup =

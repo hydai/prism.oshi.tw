@@ -330,6 +330,18 @@ async function firstLoadAndLayout(mountPage: MountPage): Promise<void> {
   assert(textOf(heading(container)) === 'Submit Song', 'the <h1> is "Submit Song"');
   assert(textOf(heading(container).previousElementSibling) === 'CATALOG', 'the crumb reads CATALOG');
   assert(header.querySelector('button, a') === null, 'the header carries no actions: Submit and Cancel sit under the form');
+  // It is title-only (no actions, children or meta row), so below 1024 px there is nothing of it to show:
+  // it takes no room there, instead of an empty bar between the top bar and the form, and its <h1> stays
+  // in the accessibility tree (visually hidden the way its title block is, never display:none).
+  assert(header.classList.contains('max-lg:sr-only'), 'the header is title-only, so below 1024 px it takes no room');
+  assert(
+    header.children.length === 1 && header.firstElementChild === heading(container).parentElement,
+    'it holds nothing but its title block: no children, actions or meta row',
+  );
+  assert(
+    ![header, ...header.querySelectorAll('*')].some((node) => /(^|\s|:)(hidden|invisible|collapse)(\s|$)/.test(node.getAttribute('class') ?? '')),
+    'and nothing in it is display:none or visibility:hidden, so the <h1> stays in the accessibility tree',
+  );
 
   // Two glass cards: the song, then its performances.
   deepStrictEqual(
