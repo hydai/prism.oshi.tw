@@ -270,25 +270,30 @@ export default function GlobalWorkReview() {
 
           {/* The rows on screen may carry stale versions now: nothing is decided until a reload lands. */}
           {state.rereadError !== null && !state.loading && state.scanError === null ? (
-            <Note tone="danger" icon="alert" role="alert" title="Couldn't refresh this page.">
-              <span className="flex flex-wrap items-center justify-between gap-x-3 gap-y-1.5">
-                <span>Reload before the next decision.</span>
+            <Note
+              tone="danger"
+              icon="alert"
+              role="alert"
+              title="Couldn't refresh this page."
+              action={
                 <Button size="sm" icon="refresh" disabled={reloadBlocked} onClick={review.reload}>
                   Reload
                 </Button>
-              </span>
+              }
+            >
+              Reload before the next decision.
             </Note>
           ) : null}
         </div>
 
         {state.scanError !== null ? (
-          <Note tone="danger" icon="alert" role="alert">
-            <span className="flex flex-wrap items-center justify-between gap-x-3 gap-y-1.5">
-              <span>{state.scanError}</span>
-              <Button size="sm" icon="refresh" onClick={review.reload}>
-                Retry
-              </Button>
-            </span>
+          <Note
+            tone="danger"
+            icon="alert"
+            role="alert"
+            action={<Button size="sm" icon="refresh" onClick={review.reload}>Retry</Button>}
+          >
+            {state.scanError}
           </Note>
         ) : (
           <CandidateQueue review={review} />

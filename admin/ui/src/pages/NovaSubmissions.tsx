@@ -391,13 +391,14 @@ export default function NovaSubmissions({ user }: { user: AuthUser }) {
         {fetchAllResult ? <BulkFetchNote result={fetchAllResult} /> : null}
 
         {list.error !== null ? (
-          <Note tone="danger" icon="alert" role="alert" title="Couldn't load submissions.">
-            <span className="flex flex-wrap items-center justify-between gap-x-3 gap-y-1.5">
-              <span>{list.error}</span>
-              <Button size="sm" icon="refresh" onClick={handleRetry}>
-                Retry
-              </Button>
-            </span>
+          <Note
+            tone="danger"
+            icon="alert"
+            role="alert"
+            title="Couldn't load submissions."
+            action={<Button size="sm" icon="refresh" onClick={handleRetry}>Retry</Button>}
+          >
+            {list.error}
           </Note>
         ) : null}
 
