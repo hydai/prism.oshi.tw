@@ -1,5 +1,6 @@
 import { renderToStaticMarkup } from 'react-dom/server';
 import type { AuthUser } from '../../shared/types';
+import { NO_ARBITRARY_HEX, NO_RAW_PALETTE } from './helpers/palette';
 
 function assert(condition: boolean, message: string): asserts condition {
   if (!condition) {
@@ -29,11 +30,11 @@ async function main(): Promise<void> {
     'type filters expose a named button group',
   );
   assert(
-    hasLabelledSpan(html, 'crystal-ticket-status-filter-label', 'Status:'),
+    hasLabelledSpan(html, 'crystal-ticket-status-filter-label', 'Status'),
     'status group uses its visible heading as the accessible name',
   );
   assert(
-    hasLabelledSpan(html, 'crystal-ticket-type-filter-label', 'Type:'),
+    hasLabelledSpan(html, 'crystal-ticket-type-filter-label', 'Type'),
     'type group uses its visible heading as the accessible name',
   );
 
@@ -53,6 +54,10 @@ async function main(): Promise<void> {
     (html.match(/aria-pressed="true"/g) ?? []).length === 2,
     'exactly the default status and type filters are pressed',
   );
+
+  // Colours come from the tokens alone: no raw palette class, no hex in a class.
+  assert(!NO_RAW_PALETTE.test(html), 'the page uses no raw palette classes');
+  assert(!NO_ARBITRARY_HEX.test(html), 'the page uses no arbitrary hex colours');
 
   console.log('✓ Crystal ticket filters expose group names and selected states');
 }

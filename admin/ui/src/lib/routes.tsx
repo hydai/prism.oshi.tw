@@ -151,6 +151,7 @@ export const ADMIN_ROUTES: readonly AdminRoute[] = [
     curatorOnly: true,
     group: 'inbox',
     icon: 'crystal',
+    frame: 'studio',
     render: (user) => <CrystalTickets user={user} />,
   },
   {

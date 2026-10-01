@@ -2,6 +2,7 @@ import { act, useEffect, useState, type ReactNode } from 'react';
 import { MemoryRouter } from 'react-router-dom';
 import type { AuthUser, CrystalTicket, NovaSubmission, NovaVodSubmission } from '../../shared/types';
 import { InboxCountsProvider, useInboxCounts, type InboxCounts } from '../src/components/shell/InboxCounts';
+import { ToastProvider } from '../src/components/ui/toast';
 import { click, installDom, mount, settle, typeInto } from './helpers/dom';
 
 function assert(condition: boolean, message: string): asserts condition {
@@ -186,17 +187,34 @@ function InboxHarness({ onRender }: { onRender: (snapshot: Snapshot) => void }) 
 
 const CURATOR: AuthUser = { email: 'curator@example.com', role: 'curator' };
 
-/** Mounts an inbox page beside a probe, inside a curator's provider — and a router, since the Nova
- * page keeps its filters in the URL — the way Layout wraps every page. */
+// Toasts stay up until dismissed, so a scenario reads every one of them, and no real timer outlives it.
+const NO_TIMERS = { setTimeout: () => 0, clearTimeout: () => undefined };
+
+/**
+ * The messages of the toasts on screen, in alphabetical order: the kit lists success toasts and error
+ * toasts in two regions, so the order on screen is not the order they came in.
+ */
+function toastMessages(container: HTMLElement): string[] {
+  const items = container.querySelectorAll('section[aria-label="Notifications"] li');
+  return Array.from(items)
+    .map((item) => item.querySelector('p')?.textContent?.trim() ?? '')
+    .sort();
+}
+
+/** Mounts an inbox page beside a probe, inside a curator's provider — a router, since the Nova page
+ * keeps its filters in the URL, and the toast provider the inbox pages report through — the way App
+ * and Layout wrap every page. */
 async function mountPage(page: ReactNode): Promise<{ container: HTMLElement; unmount: () => Promise<void>; counts: () => Snapshot }> {
   let latestCounts: Snapshot | undefined;
   const mounted = await mount(
-    <MemoryRouter>
-      <InboxCountsProvider isCurator>
-        <InboxProbe onRender={(snapshot) => { latestCounts = snapshot; }} />
-        {page}
-      </InboxCountsProvider>
-    </MemoryRouter>,
+    <ToastProvider timers={NO_TIMERS}>
+      <MemoryRouter>
+        <InboxCountsProvider isCurator>
+          <InboxProbe onRender={(snapshot) => { latestCounts = snapshot; }} />
+          {page}
+        </InboxCountsProvider>
+      </MemoryRouter>
+    </ToastProvider>,
   );
   await settle();
   return {
@@ -559,6 +577,7 @@ async function main(): Promise<void> {
   console.log('✓ the Nova VOD inbox reloads its badge after an approval and a delete');
 
   // Crystal: a reply marks its ticket replied (the worker's replyToTicket); Close closes the other.
+  // Each of them says how it went in a toast, and a refused reply leaves the badge alone.
   requestLog = [];
   setResponse(NOVA_URL, 200, { data: [], total: 0 });
   setResponse(VODS_URL, 200, { data: [], total: 0 });
@@ -580,7 +599,23 @@ async function main(): Promise<void> {
   const replyBox = crystalPage.container.querySelector('textarea');
   assert(replyBox !== null, 'the expanded ticket has a reply box');
   await typeInto(replyBox, 'Thanks!');
+
+  responses.set('POST /api/crystal/tickets/t1/reply', { status: 500, body: { error: 'Reply store is down' } });
   await click(buttonNamed(crystalPage.container, 'Send Reply'), 'the Send Reply button');
+  assert(
+    toastMessages(crystalPage.container).join('|') === 'Reply store is down',
+    `a refused reply toasts the server's message (got ${toastMessages(crystalPage.container).join('|')})`,
+  );
+  assert(replyBox.value === 'Thanks!', 'a refused reply keeps the draft in the reply box');
+  assert(callsTo(CRYSTAL_URL) === 2, 'a refused reply does not reload the Crystal list for the badge');
+  assert(crystalPage.counts().crystal === 2, 'Crystal: a refused reply leaves the badge at two');
+
+  setMutationResponse('POST', '/api/crystal/tickets/t1/reply', ticketAReplied);
+  await click(buttonNamed(crystalPage.container, 'Send Reply'), 'the Send Reply button, again');
+  assert(
+    toastMessages(crystalPage.container).join('|') === 'Reply sent|Reply store is down',
+    `a reply that lands toasts "Reply sent" (got ${toastMessages(crystalPage.container).join('|')})`,
+  );
   assert(callsTo(CRYSTAL_URL) === 3, 'a reply reloads the Crystal list for the badge, once');
   assert(crystalPage.counts().crystal === 1, 'Crystal: the badge drops to one after a reply');
 
@@ -589,6 +624,10 @@ async function main(): Promise<void> {
   setResponse(CRYSTAL_URL, 200, { data: [ticketAReplied, ticketBClosed], total: 2 });
   await click(summaryOf('Ticket B'), "Ticket B's summary row");
   await click(buttonNamed(crystalPage.container, 'Close'), 'the Close button');
+  assert(
+    toastMessages(crystalPage.container).join('|') === 'Reply sent|Reply store is down|Ticket closed',
+    `closing a ticket toasts "Ticket closed" (got ${toastMessages(crystalPage.container).join('|')})`,
+  );
   assert(callsTo(CRYSTAL_URL) === 4, 'a status change reloads the Crystal list for the badge, once');
   assert(crystalPage.counts().crystal === 0, 'Crystal: the badge drops to zero after closing the last pending one');
   assert(callsTo(NOVA_URL) === 1 && callsTo(VODS_URL) === 1, 'no Crystal action reloads another inbox');
