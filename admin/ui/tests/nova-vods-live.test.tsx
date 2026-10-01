@@ -1015,7 +1015,10 @@ async function approvingFromTheRow(mountPage: MountPage): Promise<void> {
   assert(sent.path === '/api/nova/vods/v-karaoke/status', 'to the VOD');
   deepStrictEqual(sent.body, { status: 'approved' });
   assert(isBusy(approve), 'Approve is busy (aria-busy), not disabled');
-  assert(approve.className.includes('animate-spin') && !remove.className.includes('animate-spin'), 'and it alone spins');
+  assert(
+    approve.querySelector('svg')?.classList.contains('animate-spin') === true && remove.querySelector('svg')?.classList.contains('animate-spin') !== true,
+    'and it alone spins: its icon is the spinner',
+  );
   assert(approve.getAttribute('aria-label') === 'Approve' && approve.querySelector('svg') !== null, 'and still says what it does');
   assert(focused() === approve, 'it keeps the focus while the request is out');
   assert(isUnavailable(reject) && isUnavailable(remove), 'Reject and Delete are unavailable beside it');

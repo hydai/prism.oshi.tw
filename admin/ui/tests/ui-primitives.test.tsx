@@ -761,6 +761,292 @@ async function main(): Promise<void> {
     }
 
     console.log('✓ ui kit: a Button given aria-disabled ignores click, Enter and Space and keeps the focus, without being busy');
+
+    // --- IconButton, live: the Button's contract, for the icon-only button ---
+
+    const iconSaves: string[] = [];
+    function IconSavePanel() {
+      const [working, setWorking] = useState(false);
+      return (
+        <>
+          <IconButton
+            label="Approve"
+            icon="check"
+            busy={working}
+            onClick={() => {
+              iconSaves.push('approve');
+              setWorking(true);
+            }}
+          />
+          <button type="button" onClick={() => setWorking(false)}>
+            Finish
+          </button>
+        </>
+      );
+    }
+    const iconPanel = await mount(<IconSavePanel />);
+    const [approveIcon, finishIcon] = Array.from(iconPanel.container.querySelectorAll<HTMLButtonElement>('button'));
+    assert(approveIcon !== undefined && finishIcon !== undefined, 'the panel renders the IconButton and Finish');
+
+    await act(async () => approveIcon.focus());
+    await click(approveIcon, 'the IconButton');
+    assert(iconSaves.join() === 'approve', 'an idle IconButton calls its onClick');
+    assert(
+      approveIcon.getAttribute('aria-busy') === 'true' && approveIcon.getAttribute('aria-disabled') === 'true',
+      'the click starts the work: the IconButton is busy, aria-busy and aria-disabled',
+    );
+    assert(!approveIcon.hasAttribute('disabled'), 'a busy IconButton has no disabled attribute');
+    assert(
+      approveIcon.querySelector('svg')?.classList.contains('animate-spin') === true,
+      'its icon is the spinner',
+    );
+    assert(approveIcon.getAttribute('aria-label') === 'Approve', 'and its name is still its label');
+    assert(document.activeElement === approveIcon, 'the IconButton that turned busy keeps the focus it held');
+    await act(async () => finishIcon.focus());
+    await act(async () => approveIcon.focus());
+    assert(document.activeElement === approveIcon, 'a busy IconButton can be tabbed back to: it takes the focus');
+
+    await click(approveIcon, 'the busy IconButton');
+    assert(iconSaves.join() === 'approve', 'a click on a busy IconButton calls no onClick');
+    await activateWithKey(approveIcon, 'Enter');
+    assert(iconSaves.join() === 'approve', 'nor does Enter');
+    await activateWithKey(approveIcon, ' ');
+    assert(iconSaves.join() === 'approve', 'nor does Space');
+    assert(document.activeElement === approveIcon, 'the focus stays on the busy IconButton through all three');
+
+    // Once the work is done it is itself again, and answers the keys it ignored.
+    await click(finishIcon, 'Finish');
+    assert(
+      !approveIcon.hasAttribute('aria-busy') &&
+        !approveIcon.hasAttribute('aria-disabled') &&
+        approveIcon.querySelector('svg')?.classList.contains('animate-spin') !== true &&
+        document.activeElement === approveIcon,
+      'once the work is done the IconButton is neither busy nor aria-disabled, shows its icon, and still holds the focus',
+    );
+    await activateWithKey(approveIcon, 'Enter');
+    assert(iconSaves.join() === 'approve,approve', 'an idle IconButton answers Enter');
+    await click(finishIcon, 'Finish');
+    await activateWithKey(approveIcon, ' ');
+    assert(iconSaves.join() === 'approve,approve,approve', 'and Space');
+    await iconPanel.unmount();
+
+    // The click goes no further than the busy IconButton.
+    const iconRowClicks: string[] = [];
+    const iconRow = await mount(
+      <div onClick={() => iconRowClicks.push('row')}>
+        <IconButton label="Busy" icon="check" busy />
+        <IconButton label="Idle" icon="check" />
+      </div>,
+    );
+    const [busyIconInRow, idleIconInRow] = Array.from(iconRow.container.querySelectorAll<HTMLButtonElement>('button'));
+    assert(busyIconInRow !== undefined && idleIconInRow !== undefined, 'the row renders a busy and an idle IconButton');
+    await click(busyIconInRow, 'the busy IconButton in the row');
+    assert(iconRowClicks.length === 0, 'a click on a busy IconButton does not reach an ancestor');
+    await click(idleIconInRow, 'the idle IconButton in the row');
+    assert(iconRowClicks.join() === 'row', 'a click on an idle IconButton does');
+    await iconRow.unmount();
+
+    // A submit IconButton: a busy one cancels the click's default, which is what would submit the form.
+    const iconSubmits: string[] = [];
+    function IconTitleForm({ working }: { working: boolean }) {
+      return (
+        <form
+          onSubmit={(event) => {
+            event.preventDefault();
+            iconSubmits.push('submit');
+          }}
+        >
+          <input aria-label="Title" />
+          <IconButton type="submit" label="Save" icon="check" busy={working} />
+        </form>
+      );
+    }
+    const idleIconForm = await mount(<IconTitleForm working={false} />);
+    const idleIconSubmit = idleIconForm.container.querySelector<HTMLButtonElement>('button');
+    const idleIconField = idleIconForm.container.querySelector<HTMLInputElement>('input');
+    assert(idleIconSubmit !== null && idleIconField !== null, 'the idle form renders its field and its submit IconButton');
+    await click(idleIconSubmit, 'the idle submit IconButton');
+    await pressEnterIn(idleIconField);
+    const idleIconClick = clickEvent();
+    await act(async () => {
+      idleIconSubmit.dispatchEvent(idleIconClick);
+    });
+    assert(
+      iconSubmits.join() === 'submit,submit,submit' && !idleIconClick.defaultPrevented,
+      'an idle submit IconButton submits its form: from a click, from Enter in a field, and its click is not cancelled',
+    );
+    await idleIconForm.unmount();
+
+    iconSubmits.length = 0;
+    const busyIconForm = await mount(<IconTitleForm working />);
+    const busyIconSubmit = busyIconForm.container.querySelector<HTMLButtonElement>('button');
+    const busyIconField = busyIconForm.container.querySelector<HTMLInputElement>('input');
+    assert(busyIconSubmit !== null && busyIconField !== null, 'the busy form renders its field and its submit IconButton');
+    assert(
+      busyIconSubmit.getAttribute('type') === 'submit' && !busyIconSubmit.hasAttribute('disabled'),
+      'the busy submit IconButton is still a submit button, and enabled to a browser',
+    );
+    await click(busyIconSubmit, 'the busy submit IconButton');
+    await activateWithKey(busyIconSubmit, 'Enter');
+    await activateWithKey(busyIconSubmit, ' ');
+    await pressEnterIn(busyIconField);
+    const busyIconClick = clickEvent();
+    await act(async () => {
+      busyIconSubmit.dispatchEvent(busyIconClick);
+    });
+    assert(
+      iconSubmits.length === 0,
+      'a busy submit IconButton submits nothing: not from a click, Enter, Space or Enter in a field',
+    );
+    assert(busyIconClick.defaultPrevented, "a busy submit IconButton cancels its click's default");
+    await busyIconForm.unmount();
+
+    console.log(
+      '✓ ui kit: a busy IconButton spins, keeps the keyboard focus and ignores click, Enter, Space and implicit submission, without its click reaching an ancestor',
+    );
+
+    // An aria-disabled IconButton that is not busy (its caller made it unavailable) is as inert as a busy one,
+    // without being busy: no aria-busy, no spinner, and the keyboard focus stays on it.
+    const iconSteps: string[] = [];
+    function IconStepper() {
+      const [atEnd, setAtEnd] = useState(false);
+      return (
+        <>
+          <IconButton
+            label="Next"
+            icon="chevronRight"
+            aria-disabled={atEnd}
+            onClick={() => {
+              iconSteps.push('step');
+              setAtEnd(true);
+            }}
+          />
+          <button type="button" onClick={() => setAtEnd(false)}>
+            Back
+          </button>
+        </>
+      );
+    }
+    const iconStepper = await mount(<IconStepper />);
+    const [nextIcon, backIcon] = Array.from(iconStepper.container.querySelectorAll<HTMLButtonElement>('button'));
+    assert(nextIcon !== undefined && backIcon !== undefined, 'the stepper renders the IconButton and Back');
+
+    await act(async () => nextIcon.focus());
+    await click(nextIcon, 'the IconButton');
+    assert(iconSteps.join() === 'step', 'an available IconButton calls its onClick');
+    assert(
+      nextIcon.getAttribute('aria-disabled') === 'true' && !nextIcon.hasAttribute('disabled') && !nextIcon.hasAttribute('aria-busy'),
+      'the step leaves the IconButton aria-disabled, and neither disabled nor busy',
+    );
+    assert(nextIcon.querySelector('svg')?.classList.contains('animate-spin') !== true, 'and it does not spin');
+    assert(document.activeElement === nextIcon, 'the IconButton that turned aria-disabled keeps the focus it held');
+    await act(async () => backIcon.focus());
+    await act(async () => nextIcon.focus());
+    assert(document.activeElement === nextIcon, 'an aria-disabled IconButton can be tabbed back to: it takes the focus');
+
+    await click(nextIcon, 'the aria-disabled IconButton');
+    assert(iconSteps.join() === 'step', 'a click on an aria-disabled IconButton calls no onClick');
+    await activateWithKey(nextIcon, 'Enter');
+    assert(iconSteps.join() === 'step', 'nor does Enter');
+    await activateWithKey(nextIcon, ' ');
+    assert(iconSteps.join() === 'step', 'nor does Space');
+    assert(document.activeElement === nextIcon, 'the focus stays on it through all three');
+
+    await click(backIcon, 'Back');
+    assert(nextIcon.getAttribute('aria-disabled') !== 'true', 'Back makes the IconButton available again');
+    await activateWithKey(nextIcon, 'Enter');
+    assert(iconSteps.join() === 'step,step', 'an available IconButton answers Enter');
+    await iconStepper.unmount();
+
+    // Only a true aria-disabled (the boolean or the string) holds the click back.
+    for (const [given, holdsBack] of [
+      [true, true],
+      ['true', true],
+      [false, false],
+      ['false', false],
+    ] as const) {
+      const clicks: string[] = [];
+      const one = await mount(
+        <IconButton label="Step" icon="chevronRight" aria-disabled={given} onClick={() => clicks.push('click')} />,
+      );
+      await click(one.container.querySelector('button'), 'the IconButton');
+      assert(
+        clicks.length === (holdsBack ? 0 : 1),
+        `a click on an IconButton with aria-disabled=${JSON.stringify(given)} ${holdsBack ? 'calls no onClick' : 'still calls onClick'}`,
+      );
+      await one.unmount();
+    }
+
+    console.log('✓ ui kit: an IconButton given aria-disabled ignores click, Enter and Space and keeps the focus, without being busy');
+  }
+
+  // --- IconButton: busy and aria-disabled, with Button's contract ---
+
+  // The same pins as the Button's above: busy is aria-disabled and aria-busy, never disabled; a spinner takes
+  // the icon's place; whatever the caller says about aria-disabled holds activation back as busy does.
+  const busyIconButton = renderToStaticMarkup(<IconButton label="Approve" icon="check" busy />);
+  assert(
+    busyIconButton.includes('aria-busy="true"') && busyIconButton.includes('aria-disabled="true"'),
+    'a busy IconButton is aria-busy and aria-disabled',
+  );
+  assert(
+    !hasDisabledAttribute(busyIconButton),
+    'a busy IconButton has no disabled attribute, which would drop the keyboard focus it holds',
+  );
+  assert(
+    busyIconButton.includes(renderToStaticMarkup(<Icon name="refresh" size={16} className="animate-spin" />)) &&
+      !busyIconButton.includes('points="20 6 9 17 4 12"'),
+    'a busy IconButton shows a spinning refresh icon in place of its own',
+  );
+  assert(
+    busyIconButton.includes('aria-label="Approve"') && /<span[^>]*role="tooltip"[^>]*>Approve<\/span>/.test(busyIconButton),
+    'a busy IconButton keeps its label and its tooltip',
+  );
+
+  const idleIconButton = renderToStaticMarkup(<IconButton label="Approve" icon="check" />);
+  assert(
+    !/\saria-busy=/.test(idleIconButton) &&
+      !/\saria-disabled=/.test(idleIconButton) &&
+      !idleIconButton.includes('animate-spin') &&
+      idleIconButton.includes('points="20 6 9 17 4 12"'),
+    'an idle IconButton is neither busy nor aria-disabled, does not spin and shows its own icon',
+  );
+
+  const onlyDisabledIcon = renderToStaticMarkup(<IconButton label="Approve" icon="check" disabled />);
+  assert(
+    hasDisabledAttribute(onlyDisabledIcon) && !/\saria-disabled=/.test(onlyDisabledIcon) && !/\saria-busy=/.test(onlyDisabledIcon),
+    'a disabled IconButton that is not busy still renders the disabled attribute, and is not aria-disabled or busy',
+  );
+  const busyAndDisabledIcon = renderToStaticMarkup(<IconButton label="Approve" icon="check" busy disabled />);
+  assert(
+    busyAndDisabledIcon.includes('aria-disabled="true"') &&
+      busyAndDisabledIcon.includes('aria-busy="true"') &&
+      !hasDisabledAttribute(busyAndDisabledIcon),
+    'an IconButton that is busy and disabled is busy: aria-disabled and aria-busy, no disabled attribute',
+  );
+
+  const ownAriaDisabledIcon = renderToStaticMarkup(<IconButton label="Approve" icon="check" aria-disabled="true" />);
+  assert(
+    ownAriaDisabledIcon.includes('aria-disabled="true"') && !/\saria-busy=/.test(ownAriaDisabledIcon),
+    'an IconButton keeps the aria-disabled its caller gives it, without becoming busy',
+  );
+  assert(
+    !hasDisabledAttribute(ownAriaDisabledIcon) &&
+      !ownAriaDisabledIcon.includes('animate-spin') &&
+      ownAriaDisabledIcon.includes('points="20 6 9 17 4 12"'),
+    'an IconButton that is aria-disabled and not busy has no disabled attribute, no spinner and its own icon',
+  );
+  assert(
+    renderToStaticMarkup(<IconButton label="Approve" icon="check" aria-disabled />).includes('aria-disabled="true"'),
+    'aria-disabled given as a boolean renders the same attribute',
+  );
+
+  const iconLook = (/<button[^>]*class="([^"]*)"/.exec(idleIconButton)?.[1] ?? '').split(/\s+/);
+  for (const utility of ['cursor-not-allowed', 'opacity-50']) {
+    assert(
+      iconLook.includes(`disabled:${utility}`) && iconLook.includes(`aria-disabled:${utility}`),
+      `a disabled and a busy IconButton share ${utility}, as the Button's do`,
+    );
   }
 
   // --- IconButton size="xs": the 21 px chip of a compact toggle group, with a 12 px icon ---

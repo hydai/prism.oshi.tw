@@ -100,6 +100,12 @@ const ICON_BUTTON_TONE_CLASSES: Record<IconButtonTone, string> = {
 /**
  * An icon-only button: `label` is its accessible name and its tooltip (`tooltipSide` = where that
  * opens, `tooltipAlign` = which edge of the button it lines up with; see `Tooltip`).
+ *
+ * `busy` and `aria-disabled` are `Button`'s, whose comment says why: `busy` is `aria-disabled` plus
+ * `aria-busy` and a spinning refresh icon in place of `icon`, never the `disabled` attribute, so the
+ * button whose press started the work keeps the keyboard focus; a button that is busy, or given a true
+ * `aria-disabled`, ignores click, Enter, Space and implicit submission (see `ignoreClick`) and dims. Its
+ * label, and so its name and its tooltip, stay what they were.
  */
 export function IconButton({
   ref,
@@ -107,10 +113,14 @@ export function IconButton({
   icon,
   tone = 'default',
   size = 'md',
+  busy = false,
   tooltipSide,
   tooltipAlign,
   type = 'button',
   className,
+  disabled,
+  'aria-disabled': ariaDisabled,
+  onClick,
   ...rest
 }: Omit<ButtonHTMLAttributes<HTMLButtonElement>, 'children' | 'aria-label'> & {
   ref?: Ref<HTMLButtonElement>;
@@ -118,15 +128,28 @@ export function IconButton({
   icon: IconName;
   tone?: IconButtonTone;
   size?: IconButtonSize;
+  busy?: boolean;
   tooltipSide?: 'top' | 'bottom';
   tooltipAlign?: TooltipAlign;
 }) {
-  const classes = `inline-flex shrink-0 items-center justify-center rounded-radius-pill transition-colors disabled:cursor-not-allowed disabled:opacity-50 focus-visible:outline-none focus-visible:shadow-focus ${ICON_BUTTON_SIZE_CLASSES[size]} ${ICON_BUTTON_TONE_CLASSES[tone]}${className ? ` ${className}` : ''}`;
+  // aria-disabled as React takes it: `true` or `'true'`; busy is aria-disabled by definition.
+  const inert = busy || ariaDisabled === true || ariaDisabled === 'true';
+  const classes = `inline-flex shrink-0 items-center justify-center rounded-radius-pill transition-colors disabled:cursor-not-allowed disabled:opacity-50 aria-disabled:cursor-not-allowed aria-disabled:opacity-50 focus-visible:outline-none focus-visible:shadow-focus ${ICON_BUTTON_SIZE_CLASSES[size]} ${ICON_BUTTON_TONE_CLASSES[tone]}${className ? ` ${className}` : ''}`;
 
   return (
     <Tooltip label={label} side={tooltipSide} align={tooltipAlign}>
-      <button {...rest} ref={ref} type={type} aria-label={label} className={classes}>
-        <Icon name={icon} size={ICON_SIZES[size]} />
+      <button
+        {...rest}
+        ref={ref}
+        type={type}
+        aria-label={label}
+        className={classes}
+        disabled={busy ? undefined : disabled}
+        aria-disabled={busy ? 'true' : ariaDisabled}
+        aria-busy={busy ? 'true' : undefined}
+        onClick={inert ? ignoreClick : onClick}
+      >
+        <Icon name={busy ? 'refresh' : icon} size={ICON_SIZES[size]} className={busy ? 'animate-spin' : undefined} />
       </button>
     </Tooltip>
   );
