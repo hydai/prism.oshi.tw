@@ -1,4 +1,6 @@
 import { renderToStaticMarkup } from 'react-dom/server';
+import type { Stream } from '../../shared/types';
+import type { VodExportFindingApi } from '../src/api/vodExportTypes';
 import { NO_ARBITRARY_HEX, NO_RAW_PALETTE } from './helpers/palette';
 
 function assert(condition: boolean, message: string): asserts condition {
@@ -2578,6 +2580,123 @@ async function main(): Promise<void> {
     );
 
     console.log('✓ MICRO_LABEL everywhere: its classes are written once, and the stat tile, tag legends, stamp console and table heads wear it');
+  }
+
+  // --- INSET_FOCUS: the one focus ring of a control that spans a clipping card edge to edge ---
+
+  {
+    const { readdirSync, readFileSync } = await import('node:fs');
+    const { MemoryRouter } = await import('react-router-dom');
+    const { INSET_FOCUS } = await import('../src/components/ui/focus-classes');
+    const { QueueLayout } = await import('../src/components/ui/QueueLayout');
+    const { FindingsPanel } = await import('../src/components/vod-export/FindingsPanel');
+    const { ExtractStep } = await import('../src/pages/pipeline-extract-step');
+    const { initialExtractState } = await import('../src/pages/pipeline-extract-state');
+    const noop = () => undefined;
+
+    // Inside the control, 2px, in the accent text colour: the card's clip cannot cut it.
+    assert(
+      INSET_FOCUS === 'focus-visible:shadow-[inset_0_0_0_2px_var(--accent-fg)]',
+      "the inset focus ring is a 2px inner shadow in the accent text colour, drawn on :focus-visible",
+    );
+
+    // Its classes are written in focus-classes.ts alone: every other site takes the constant.
+    const src = new URL('../src/', import.meta.url);
+    const spellers: string[] = [];
+    const users: string[] = [];
+    for (const entry of readdirSync(src, { recursive: true, encoding: 'utf8' })) {
+      if (!entry.endsWith('.ts') && !entry.endsWith('.tsx')) continue;
+      const source = readFileSync(new URL(entry, src), 'utf8');
+      if (source.includes('inset_0_0_0_2px')) spellers.push(entry);
+      if (source.includes('INSET_FOCUS') && source.includes("/focus-classes'")) users.push(entry);
+    }
+    assert(
+      spellers.join() === 'components/ui/focus-classes.ts',
+      `the inset focus ring is spelled in focus-classes.ts alone, every other site takes INSET_FOCUS (also spelled in: ${spellers.filter((file) => file !== 'components/ui/focus-classes.ts').join(', ')})`,
+    );
+
+    // The files that take it are a closed list too, for a reason the contrast check cannot see: each draws --accent-fg
+    // on a surface of its own (a card, a selected row), and since a file takes the constant and does not spell the token,
+    // tests/design-tokens.test.ts has no way to notice a new one. This list is where a new one is noticed.
+    const CONSUMERS = [
+      'components/ui/QueueLayout.tsx',
+      'components/vod-export/FindingsPanel.tsx',
+      'pages/NovaVodSubmissions.tsx',
+      'pages/pipeline-extract-step.tsx',
+    ];
+    const unlisted = users.filter((file) => !CONSUMERS.includes(file));
+    assert(
+      unlisted.length === 0,
+      `files that take INSET_FOCUS and are not in CONSUMERS: ${unlisted.join(', ')}. Each draws --accent-fg on a surface of its own: check that surface against ACCENT_STACKS in tests/design-tokens.test.ts (add a stack when none covers it), then add the file to CONSUMERS`,
+    );
+    const dropped = CONSUMERS.filter((file) => !users.includes(file));
+    assert(
+      dropped.length === 0,
+      `files in CONSUMERS that no longer take INSET_FOCUS: ${dropped.join(', ')}. Drop them from CONSUMERS (and a stack that only they needed from ACCENT_STACKS)`,
+    );
+
+    // What each site renders: every control that is flush inside its card wears it.
+    const wearing = (html: string) => (html.match(new RegExp(INSET_FOCUS.replace(/[[\]()]/g, '\\$&'), 'g')) ?? []).length;
+    const queue = renderToStaticMarkup(
+      <QueueLayout
+        listLabel="Candidates"
+        listTitle="Queue"
+        items={['a', 'b', 'c']}
+        getKey={(item: string) => item}
+        selectedKey="b"
+        onSelect={noop}
+        renderItem={(item: string) => <span>{item}</span>}
+        hint="to move"
+        detail={<p>detail</p>}
+      />,
+    );
+    assert(wearing(queue) === 3, `each of the review queue's three rows wears the inset ring (found ${wearing(queue)})`);
+
+    const finding = (index: number): VodExportFindingApi => ({
+      code: 'MISSING_END_SECONDS',
+      severity: 'error',
+      message: 'End time is required.',
+      streamerSlug: 'alpha',
+      entityType: 'performance',
+      entityId: `performance-${index}`,
+      field: 'endSeconds',
+      repairPath: `/vod-export/repair/performance/${index}`,
+    });
+    const findings = renderToStaticMarkup(
+      <MemoryRouter>
+        <FindingsPanel findings={[1, 2, 3, 4, 5].map(finding)} />
+      </MemoryRouter>,
+    );
+    assert(wearing(findings) === 2, `the findings group's header and its "+2 more" button wear the inset ring (found ${wearing(findings)})`);
+
+    const stream = (id: string, title: string): Stream => ({
+      id,
+      streamerId: 'mizuki',
+      title,
+      date: '2026-09-01',
+      videoId: `video-${id}`,
+      youtubeUrl: `https://www.youtube.com/watch?v=video-${id}`,
+      credit: {},
+      status: 'pending',
+      submittedBy: null,
+      reviewedBy: null,
+      createdAt: '2026-09-01 12:00:00',
+    });
+    const readyList = renderToStaticMarkup(
+      <MemoryRouter>
+        <ExtractStep
+          hidden={false}
+          extract={{
+            state: { ...initialExtractState, loadingStreams: false, streams: [stream('st-1', 'Karaoke night'), stream('st-2', 'Birthday')] },
+            dispatch: noop,
+            retryStreams: noop,
+          }}
+        />
+      </MemoryRouter>,
+    );
+    assert(wearing(readyList) === 2, `each ready-list row wears the inset ring (found ${wearing(readyList)})`);
+
+    console.log('✓ INSET_FOCUS: the inset focus ring is written once, and the review queue, findings panel, ready list and Nova VODs group header wear it');
   }
 
   // --- Field: a label, the page's control, a hint and an error, tied together by ids ---

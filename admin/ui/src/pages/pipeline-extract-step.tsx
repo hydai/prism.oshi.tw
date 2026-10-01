@@ -13,6 +13,7 @@ import { Button, IconButton } from '../components/ui/Button';
 import { useConfirm } from '../components/ui/confirm';
 import { EmptyState, GlassCard, Skeleton } from '../components/ui/Display';
 import { Checkbox, SearchInput, TextInput } from '../components/ui/Fields';
+import { INSET_FOCUS } from '../components/ui/focus-classes';
 import { Icon } from '../components/ui/Icon';
 import { isImeKeyDown } from '../components/ui/keyboard';
 import { Note } from '../components/ui/Note';
@@ -129,7 +130,7 @@ function ReadyList({ streams, loading, error, currentId, busy, onExtract, onRetr
                 aria-current={current ? 'true' : undefined}
                 aria-disabled={busy ? 'true' : undefined}
                 onClick={() => onExtract(stream)}
-                className={`flex w-full items-start gap-2.5 px-3.5 py-2.5 text-left text-[12px] transition-colors focus-visible:shadow-[inset_0_0_0_2px_var(--accent-fg)] aria-disabled:cursor-progress ${
+                className={`flex w-full items-start gap-2.5 px-3.5 py-2.5 text-left text-[12px] transition-colors ${INSET_FOCUS} aria-disabled:cursor-progress ${
                   current ? 'bg-selected shadow-[inset_3px_0_0_var(--nav-active-icon)]' : 'hover:bg-row-hover'
                 }`}
               >

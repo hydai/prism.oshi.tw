@@ -10,6 +10,7 @@ import { useConfirm } from '../components/ui/confirm';
 import { DetailField, SectionLabel } from '../components/ui/DetailField';
 import { EmptyState, GlassCard, Skeleton } from '../components/ui/Display';
 import { Select, Textarea } from '../components/ui/Fields';
+import { INSET_FOCUS } from '../components/ui/focus-classes';
 import { Icon, type IconName } from '../components/ui/Icon';
 import { MICRO_LABEL } from '../components/ui/micro-label';
 import { Note } from '../components/ui/Note';
@@ -46,9 +47,6 @@ const VIEW_OPTIONS: { value: VodViewMode; label: string; icon: IconName }[] = [
 ];
 
 const STATUS_FILTER_LABEL_ID = 'nova-vod-status-filter-label';
-
-/** The focus ring of a control that spans the card edge to edge: inside it, since the card clips what falls outside. */
-const INSET_FOCUS = 'focus-visible:shadow-[inset_0_0_0_2px_var(--accent-fg)]';
 
 /**
  * An open row's detail is as wide as the scroller shows and pinned to its left edge. The table is 820 px

@@ -12,6 +12,7 @@ import {
 import { buttonClasses } from '../ui/button-classes';
 import { GlassCard } from '../ui/Display';
 import { Select } from '../ui/Fields';
+import { INSET_FOCUS } from '../ui/focus-classes';
 import { Icon } from '../ui/Icon';
 import { Note } from '../ui/Note';
 import { Pill } from '../ui/Pill';
@@ -20,9 +21,6 @@ type SeverityFilter = 'all' | VodExportFindingSeverity;
 
 /** How many of a group's findings show before "+N more". */
 const PREVIEW_COUNT = 3;
-
-/** The focus ring of a control that spans the card edge to edge: inside it, since the card clips what falls outside. */
-const INSET_FOCUS = 'focus-visible:shadow-[inset_0_0_0_2px_var(--accent-fg)]';
 
 function countLabel(count: number, noun: string): string {
   return `${count.toLocaleString()} ${count === 1 ? noun : `${noun}s`}`;
