@@ -3,18 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import type { CreateStreamBody } from '../../../shared/types';
 import { api } from '../api/client';
 import YouTubeEmbed from '../components/YouTubeEmbed';
-
-function extractVideoId(url: string): string {
-  try {
-    const u = new URL(url);
-    if (u.hostname === 'youtu.be') {
-      return u.pathname.slice(1);
-    }
-    return u.searchParams.get('v') ?? '';
-  } catch {
-    return '';
-  }
-}
+import { extractVideoId } from '../lib/youtube';
 
 export default function SubmitStream() {
   const navigate = useNavigate();
