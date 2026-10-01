@@ -11,8 +11,9 @@ import { TextInput } from './Fields';
  * the error that show. Every other native input attribute (`type`, `placeholder`, `inputMode`,
  * `autoComplete`, `readOnly`, ...) and the `ref` reach the input; `onChange` gets the typed text.
  *
- * The field is the root: a page that places it in a grid wraps it, and a page that needs a control the
- * wiring does not fit uses `Field` and the control itself.
+ * The field is the root, a single item of the grid or column that holds it: a page wraps it only to give
+ * that item a placement of its own (a column span), and a page that needs a control the wiring does not
+ * fit uses `Field` and the control itself.
  */
 export function TextField({
   ref,
