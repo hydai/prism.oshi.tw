@@ -148,6 +148,7 @@ export const ADMIN_ROUTES: readonly AdminRoute[] = [
     path: '/submit/song',
     label: 'Submit Song',
     newMenu: { description: 'Title, artist and optional performances', icon: 'music' },
+    frame: 'studio',
     render: () => <SubmitSong />,
   },
   {
