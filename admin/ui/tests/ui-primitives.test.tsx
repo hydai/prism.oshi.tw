@@ -7,7 +7,7 @@ function assert(condition: boolean, message: string): asserts condition {
   }
 }
 
-/** The icons Task 2 adds on top of the set `components/prism/Icon.tsx` already had. */
+/** The icons Task 2 added on top of the set the kit's Icon started with. */
 const NEW_ICON_NAMES = [
   'dashboard',
   'music',
@@ -56,7 +56,6 @@ async function main(): Promise<void> {
   const { Tooltip } = await import('../src/components/ui/Tooltip');
   const { buttonClasses } = await import('../src/components/ui/button-classes');
   const { Icon } = await import('../src/components/ui/Icon');
-  const { Icon: PrismIcon, Sparkle: PrismSparkle } = await import('../src/components/prism/Icon');
   const { Pill, StatusPill } = await import('../src/components/ui/Pill');
   const { Chip, Segmented } = await import('../src/components/ui/Toggles');
   const { TextInput, Textarea, Select, SearchInput, Checkbox, Radio } = await import('../src/components/ui/Fields');
@@ -1069,11 +1068,6 @@ async function main(): Promise<void> {
     assert(markup.includes('aria-hidden="true"'), `icon "${name}" is decorative`);
     assert(!NO_RAW_PALETTE.test(markup), `icon "${name}" uses no raw palette colours`);
   }
-
-  // --- components/prism/Icon.tsx re-exports the ui kit unchanged ---
-
-  assert(PrismIcon === Icon, 'components/prism/Icon re-exports the same Icon as the ui kit');
-  assert(typeof PrismSparkle === 'function', 'components/prism/Icon still exports Sparkle');
 
   console.log('✓ ui kit: Icon, Button, IconButton and Tooltip render accessible, token-only markup');
 

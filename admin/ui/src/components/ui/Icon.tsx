@@ -389,7 +389,7 @@ export function Icon({ name, size = 16, className }: { name: IconName; size?: nu
   );
 }
 
-/** The 4-point sparkle used by prism's badge pill and avatar fallback. */
+/** The 4-point sparkle: the sidebar's logo glyph and the default glyph of the kit `Avatar`'s fallback tile. */
 export function Sparkle({ size = 12 }: { size?: number }) {
   return (
     <svg width={size} height={size} viewBox="0 0 12 12" fill="currentColor" aria-hidden="true" className="shrink-0">

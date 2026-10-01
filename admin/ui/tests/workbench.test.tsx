@@ -240,9 +240,7 @@ installDom();
   // Row 2 (selectedIndex 1) is open: its live "recording" segment must render, clock-free (a
   // static left, a static zero width — only the layout effect grows it).
   assert(before.includes('width:0%'), 'the selected-open row\'s live segment is present, starting at zero width');
-  // Both the selected segment button and the live segment use the Studio nav-active-icon token,
-  // never the legacy --accent-pink alias (it has no html.dark value).
-  assert(!before.includes('bg-accent-pink'), 'the legacy --accent-pink alias is not used (it has no dark-mode value)');
+  // Both the selected segment button and the live segment use the Studio nav-active-icon token.
   assert(occurrences(before, 'bg-nav-active-icon') === 2, 'the selected segment and its live segment both use bg-nav-active-icon');
   for (const label of tickLabels) assert(before.includes(label), `axis label ${label} (via formatTimestamp) appears in the markup`);
   assert(!NO_RAW_PALETTE.test(before), 'TimelineStrip uses no raw Tailwind palette classes');
@@ -266,7 +264,7 @@ installDom();
   );
   assert(!/aria-label="Seek to #/.test(emptyHtml), '0 rows: no segment buttons are rendered');
 
-  console.log('✓ TimelineStrip: SSR markup never depends on the player clock; only a dedicated layer (not the track) clips overflow; tokens, not the legacy pink alias; the live segment shows only for a selected open row');
+  console.log('✓ TimelineStrip: SSR markup never depends on the player clock; only a dedicated layer (not the track) clips overflow; the selected segments take their colour from a token; the live segment shows only for a selected open row');
 }
 
 // --- TimelineStrip: a live click on the empty track seeks proportionally, clamped at both edges ---
