@@ -2,7 +2,7 @@
 
 > **Purpose of this doc.** A faithful description of Crystal's current public UI plus the goals driving its redesign, written for a designer who hasn't seen the code. Goals come first; the current-state documentation is context so the designer can see what to preserve, what to evolve, and what to let go of.
 >
-> Scope: **public pages only** — the submission form at `/` and the Q&A browser at `/qa`. The admin `CrystalTickets` page is already documented in [`admin-ui-spec.md`](./admin-ui-spec.md) (§16, Crystal Tickets) and is out of scope here.
+> Scope: **public pages only** — the submission form at `/` and the Q&A browser at `/qa`. The admin `CrystalTickets` page lives in [`admin/ui/src/pages/CrystalTickets.tsx`](./admin/ui/src/pages/CrystalTickets.tsx) and is out of scope here.
 >
 > Source of truth: `tools/crystal/src/` in this repository. Code citations reference the relevant source file so the designer (or next developer) can find it.
 
@@ -636,7 +636,7 @@ For the designer or next developer who wants to jump to the code.
 
 ### Related docs
 - `ARCHITECTURE.md:295-486` — system-wide context for Crystal + Nova + Aurora + admin
-- `admin-ui-spec.md:887-944` — admin CrystalTickets page (out of scope here)
+- `admin/ui/src/pages/CrystalTickets.tsx` — admin CrystalTickets page (out of scope here)
 - Commit `67d4eda` — "feat(crystal): add Q&A search and submission-form duplicate detection" (most recent feature)
 
 ---
