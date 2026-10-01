@@ -1,10 +1,19 @@
 /**
- * Submit Song on the studio kit (spec §8.9; plan Q5 and Q15), mounted live the way App.tsx mounts every
- * page (ToastProvider > router) against a stubbed fetch: the two form cards, inline validation that
- * matches what POST /api/songs accepts (a title and an artist, then for each performance row a stream
- * ID, a whole-second start and an end after it), rows left empty skipped and reported, a server error
- * that keeps the form, the busy submit, and where the focus goes when a row leaves. The route itself is
- * pinned as a studio route: no legacy frame around it.
+ * Submit Song and Submit Stream on the studio kit (spec §8.9; plan Q5, Q15 and Q16), mounted live the
+ * way App.tsx mounts every page (ToastProvider > router) against a stubbed fetch.
+ *
+ * Submit Song: the two form cards, inline validation that matches what POST /api/songs accepts (a title
+ * and an artist, then for each performance row a stream ID, a whole-second start and an end after it),
+ * rows left empty skipped and reported, a server error that keeps the form, the busy submit, and where
+ * the focus goes when a row leaves.
+ *
+ * Submit Stream: the Stream, Credit and Preview cards, a video ID read from every kind of YouTube link,
+ * a preview that is a poster until it is clicked, inline validation that matches what POST /api/streams
+ * accepts (a title, a date, a video ID, links that are links, a credit author for credit links), the
+ * request it sends, a duplicate video that links to the stream it duplicates, a server error that keeps
+ * the form, and the busy submit.
+ *
+ * Each route is pinned as a studio route: no legacy frame around it.
  */
 import { deepStrictEqual } from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
@@ -12,7 +21,9 @@ import { act } from 'react';
 import { renderToStaticMarkup } from 'react-dom/server';
 import { MemoryRouter, Route, Routes, useLocation } from 'react-router-dom';
 import type { AuthUser, Song } from '../../shared/types';
+import YouTubeEmbed from '../src/components/YouTubeEmbed';
 import { buttonClasses } from '../src/components/ui/button-classes';
+import { youtubeThumbnailUrl } from '../src/lib/youtube';
 import { click, installDom, mount, settle, typeInto } from './helpers/dom';
 import { NO_ARBITRARY_HEX, NO_RAW_PALETTE } from './helpers/palette';
 
@@ -60,6 +71,18 @@ const TEXT = {
   endOrder: 'End must be after the start.',
 } as const;
 
+/** Every text the Submit Stream form validates and answers with, as the page words it. */
+const STREAM_TEXT = {
+  title: 'Enter a title.',
+  dateEmpty: 'Enter the stream date.',
+  dateFormat: 'Enter the date as YYYY-MM-DD.',
+  videoId: 'Enter the video ID.',
+  link: 'Enter a full URL, starting with http:// or https://.',
+  author: 'Enter the credit author, or clear the links.',
+  urlHint: 'Video ID will be extracted automatically.',
+  exists: 'A stream with this video already exists.',
+} as const;
+
 // --- The stubbed API ---
 
 interface Call {
@@ -75,10 +98,16 @@ interface Reply {
 }
 
 const created = (body: unknown): Reply => ({ status: 201, body });
-const failure = (status: number, error: string): Reply => ({ status, body: { error } });
+const failure = (status: number, error: string, code?: string): Reply => ({
+  status,
+  body: code === undefined ? { error } : { error, code },
+});
 
 const calls: Call[] = [];
 const unexpected: string[] = [];
+
+/** What happy-dom asked YouTube for on behalf of an iframe: it fetches an iframe's src itself. */
+const frameRequests: string[] = [];
 
 /** What the worker answers a new song: the song it stored, with the title and artist it was sent. */
 const defaultPostReply = (call: Call): Reply => {
@@ -86,12 +115,18 @@ const defaultPostReply = (call: Call): Reply => {
   return created({ ...CREATED, title: sent.title, originalArtist: sent.originalArtist });
 };
 
-/** What POST /api/songs answers next; a scenario swaps it. A promise holds the answer until released. */
+/** What the worker answers a new stream: its id and its status, and nothing else. */
+const defaultStreamReply = (): Reply => created({ id: 'stream-2026-03-01', status: 'pending' });
+
+/** What POST /api/songs and POST /api/streams answer next; a scenario swaps them. A promise holds the answer until released. */
 let postReply: (call: Call) => Reply | Promise<Reply> = defaultPostReply;
+let streamReply: (call: Call) => Reply | Promise<Reply> = defaultStreamReply;
 
 function reset(): void {
   calls.length = 0;
+  frameRequests.length = 0;
   postReply = defaultPostReply;
+  streamReply = defaultStreamReply;
 }
 
 interface Held {
@@ -129,11 +164,14 @@ function installFetchStub(): void {
         body: typeof init?.body === 'string' ? JSON.parse(init.body) : null,
       };
       calls.push(call);
-      if (method !== 'POST' || url.pathname !== '/api/songs') {
+      let reply: Reply | Promise<Reply> | undefined;
+      if (method === 'POST' && url.pathname === '/api/songs') reply = postReply(call);
+      else if (method === 'POST' && url.pathname === '/api/streams') reply = streamReply(call);
+      if (reply === undefined) {
         unexpected.push(`${method} ${url.pathname}${url.search}`);
         return new Response(JSON.stringify({ error: 'not stubbed' }), { status: 404 });
       }
-      const settled = await postReply(call);
+      const settled = await reply;
       return new Response(JSON.stringify(settled.body), {
         status: settled.status,
         headers: { 'Content-Type': 'application/json' },
@@ -1052,8 +1090,927 @@ async function cancelGoesBack(mountPage: MountPage): Promise<void> {
   console.log('✓ Submit Song: Cancel goes back to the song list without a request or a toast');
 }
 
+// --- Submit Stream: lookups and fills ---
+
+function streamCalls(): Call[] {
+  return calls.filter((call) => call.method === 'POST' && call.path === '/api/streams');
+}
+
+/** The one stream request a scenario expects to have been sent. */
+function sentStream(): Call {
+  assert(streamCalls().length === 1, `exactly one stream was sent (got ${streamCalls().length})`);
+  return need(streamCalls()[0], 'the stream request');
+}
+
+function streamSubmitButton(container: HTMLElement): HTMLButtonElement {
+  return need(buttonNamed(container, 'Submit Stream'), 'the Submit Stream button');
+}
+
+/** Presses Submit Stream from the keyboard: the button holds the focus, then is pressed. */
+async function pressStreamSubmit(container: HTMLElement): Promise<void> {
+  const submit = streamSubmitButton(container);
+  await focusOn(submit);
+  await click(submit, 'Submit Stream');
+}
+
+interface StreamFill {
+  title?: string;
+  date?: string;
+  url?: string;
+  videoId?: string;
+  author?: string;
+  authorUrl?: string;
+  commentUrl?: string;
+}
+
+/** Types `fill` into the form, the URL before the video ID, so that an ID typed by hand is the one that stays. */
+async function fillStream(container: HTMLElement, fill: StreamFill): Promise<void> {
+  const fields: Array<[string, string | undefined]> = [
+    ['Title', fill.title],
+    ['Date', fill.date],
+    ['YouTube URL', fill.url],
+    ['Video ID', fill.videoId],
+    ['Credit author', fill.author],
+    ['Author URL', fill.authorUrl],
+    ['Comment URL', fill.commentUrl],
+  ];
+  for (const [label, text] of fields) {
+    if (text !== undefined) await typeInto(inputLabelled(container, label), text);
+  }
+}
+
+/** The three fields the worker requires, filled in. */
+const REQUIRED_STREAM: StreamFill = { title: 'Karaoke night', date: '2026-03-01', videoId: 'abc123' };
+
+/** What a stream sent with only `REQUIRED_STREAM` filled in looks like on the wire. */
+const REQUIRED_STREAM_BODY = {
+  title: 'Karaoke night',
+  date: '2026-03-01',
+  videoId: 'abc123',
+  youtubeUrl: 'https://www.youtube.com/watch?v=abc123',
+};
+
+function iframesOf(container: HTMLElement): HTMLIFrameElement[] {
+  return [...container.querySelectorAll<HTMLIFrameElement>('iframe')];
+}
+
+/** The poster button of the preview, or `null`. */
+function posterOf(container: HTMLElement): HTMLButtonElement | null {
+  return container.querySelector<HTMLButtonElement>('section[aria-label="Preview"] button');
+}
+
+/** Lets happy-dom's iframe navigation, which runs a few ticks behind the render, reach its request. */
+async function flushFrames(): Promise<void> {
+  await new Promise((resolve) => setTimeout(resolve, 25));
+  await settle();
+}
+
+/** The `src` YouTubeEmbed itself draws for this video: the pinned contract the preview's player must equal. */
+function embedSrc(videoId: string): string {
+  return /src="([^"]*)"/.exec(renderToStaticMarkup(<YouTubeEmbed videoId={videoId} title="T" />))?.[1] ?? '';
+}
+
+/** The seven inputs of the form, in document order. */
+const STREAM_FIELDS = [
+  { label: 'Title', type: 'text', required: true, placeholder: 'e.g. 歌枠 2024-12-25' },
+  { label: 'Date', type: 'date', required: true, placeholder: null },
+  { label: 'YouTube URL', type: 'url', required: false, placeholder: 'https://www.youtube.com/watch?v=...' },
+  { label: 'Video ID', type: 'text', required: true, placeholder: 'Auto-extracted or enter manually' },
+  { label: 'Credit author', type: 'text', required: false, placeholder: 'e.g. Timestamp contributor' },
+  { label: 'Author URL', type: 'url', required: false, placeholder: 'https://...' },
+  { label: 'Comment URL', type: 'url', required: false, placeholder: 'https://...' },
+] as const;
+
+// --- Submit Stream: scenarios ---
+
+async function streamFirstLoadAndLayout(mountPage: MountPage): Promise<void> {
+  reset();
+  const { container, unmount } = await mountPage();
+
+  assert(calls.length === 0, `mounting sends no request (got ${calls.map((call) => call.path).join(', ')})`);
+
+  // The header is the page's first child, so it sticks to <main>; the form brings the gutter.
+  const header = pageHeader(container);
+  const root = need(container.firstElementChild as HTMLElement | null, 'a page root');
+  assert(root.firstElementChild === header, 'the header is the page first child, so it sticks to <main>');
+  assert(!/overflow|blur|transform|filter/.test(root.className), 'the page root has no blur, transform or overflow');
+  const form = formOf(container);
+  assert(root.children[1] === form, 'the form follows the header');
+  assert(
+    form.classList.contains('p-4') && form.classList.contains('lg:px-5'),
+    'the studio frame gives a page no gutter of its own, so the page brings it',
+  );
+  assert(!container.innerHTML.includes('legacy-frame'), 'the page renders in no legacy frame');
+  assert(container.querySelectorAll('h1').length === 1, 'the page has exactly one <h1>');
+  assert(textOf(heading(container)) === 'Submit Stream', 'the <h1> is "Submit Stream"');
+  assert(textOf(heading(container).previousElementSibling) === 'CATALOG', 'the crumb reads CATALOG');
+  assert(header.querySelector('button, a') === null, 'the header carries no actions: Submit and Cancel sit under the form');
+  assert(header.classList.contains('max-lg:sr-only'), 'the header is title-only, so below 1024 px it takes no room');
+  assert(
+    header.children.length === 1 && header.firstElementChild === heading(container).parentElement,
+    'it holds nothing but its title block: no children, actions or meta row',
+  );
+
+  // Two glass cards while there is no video ID: the stream, then its credit. The preview comes with an ID.
+  deepStrictEqual(
+    [...form.querySelectorAll('h2')].map((item) => textOf(item)),
+    ['Stream', 'Credit (optional)'],
+  );
+  assert(
+    cardOf(container, 'Stream').classList.contains('glass-card') && cardOf(container, 'Credit (optional)').classList.contains('glass-card'),
+    'both sections are glass cards',
+  );
+  assert(
+    container.querySelector('section[aria-label="Preview"]') === null && container.querySelector('img, iframe') === null,
+    'there is no preview, no thumbnail and no player before there is a video ID',
+  );
+  deepStrictEqual(labelsIn(cardOf(container, 'Stream')), ['Title', 'Date', 'YouTube URL', 'Video ID']);
+  deepStrictEqual(labelsIn(cardOf(container, 'Credit (optional)')), ['Credit author', 'Author URL', 'Comment URL']);
+
+  // The form's contract: no browser validation bubble, the required fields marked for assistive technology.
+  assert(form.hasAttribute('novalidate'), 'the form carries noValidate, so the inline errors are the only ones');
+  assert(!/\srequired(=|\s|>)/.test(form.outerHTML), 'no field carries the required attribute');
+  assert(formOf(container).querySelectorAll('input').length === STREAM_FIELDS.length, 'seven inputs, and no other');
+  for (const field of STREAM_FIELDS) {
+    const input = inputLabelled(container, field.label);
+    assert(input.type === field.type, `${field.label} is a ${field.type} input (got ${input.type})`);
+    assert(
+      input.getAttribute('aria-required') === (field.required ? 'true' : null),
+      `${field.label} is ${field.required ? '' : 'not '}aria-required`,
+    );
+    const marked = textOf(labelFor(container, input)).endsWith('*');
+    assert(marked === field.required, `${field.label} ${field.required ? 'shows' : 'shows no'} asterisk`);
+    assert(
+      !marked || labelFor(container, input).querySelector('[aria-hidden="true"]') !== null,
+      `the asterisk of ${field.label} is decoration, hidden from assistive technology`,
+    );
+    assert(input.getAttribute('placeholder') === field.placeholder, `${field.label} keeps its placeholder (got ${input.getAttribute('placeholder')})`);
+    assert(input.value === '' && input.getAttribute('aria-invalid') === null, `${field.label} starts empty and unreported`);
+  }
+  assert(
+    describedBy(inputLabelled(container, 'YouTube URL')) === STREAM_TEXT.urlHint,
+    'the URL field says the ID is extracted automatically, as a hint it is described by',
+  );
+  for (const label of ['Title', 'Date', 'Video ID', 'Credit author', 'Author URL', 'Comment URL']) {
+    assert(describedBy(inputLabelled(container, label)) === '', `${label} has nothing to be described by yet`);
+  }
+
+  // The actions: Submit sends, Cancel goes back.
+  deepStrictEqual(
+    [...form.querySelectorAll('button')].map((button) => textOf(button)),
+    ['Submit Stream', 'Cancel'],
+  );
+  const submit = streamSubmitButton(container);
+  const cancel = need(buttonNamed(container, 'Cancel'), 'Cancel');
+  assert(submit.type === 'submit' && cancel.type === 'button', 'Submit submits the form; Cancel does not');
+  assert(submit.className === buttonClasses({ variant: 'primary' }), 'Submit is the primary button');
+  assert(
+    submit.getAttribute('aria-busy') === null && submit.getAttribute('aria-disabled') === null && !submit.hasAttribute('disabled'),
+    'Submit starts available',
+  );
+  assert(alertOf(container) === null && toastsOf(container).length === 0, 'there is no note and no toast before anything happens');
+  assert(
+    [...container.querySelectorAll('button')].every((button) => button.hasAttribute('type')),
+    'every button states its type',
+  );
+  assertNoRawColour(container.innerHTML, 'the empty form');
+
+  await unmount();
+  console.log('✓ Submit Stream: no request on mount, the header with its crumb, the Stream and Credit cards, noValidate and aria-required on the three required fields');
+}
+
+async function theUrlFillsTheVideoId(mountPage: MountPage): Promise<void> {
+  reset();
+  const { container, unmount } = await mountPage();
+  const url = inputLabelled(container, 'YouTube URL');
+  const videoId = inputLabelled(container, 'Video ID');
+  // Read through a call, so that an assertion on one value does not narrow the next one's type.
+  const idValue = (): string => videoId.value;
+
+  // Every kind of YouTube link fills the video ID, and the URL stays as it was typed.
+  const links: Array<[string, string]> = [
+    ['https://youtu.be/abc1', 'abc1'],
+    ['https://www.youtube.com/watch?v=abc2&t=1', 'abc2'],
+    ['https://www.youtube.com/live/abc3', 'abc3'],
+    ['https://www.youtube.com/shorts/abc4', 'abc4'],
+    ['https://www.youtube.com/embed/abc5', 'abc5'],
+  ];
+  for (const [link, id] of links) {
+    await typeInto(url, link);
+    assert(idValue() === id, `${link} fills the video ID with ${id} (got "${idValue()}")`);
+    assert(url.value === link, `and the URL stays as typed (got "${url.value}")`);
+  }
+
+  // A link that names no video leaves the ID alone, and so does clearing the URL.
+  await typeInto(url, 'https://example.com/x');
+  assert(idValue() === 'abc5', `a link that names no video leaves the ID as it was (got "${idValue()}")`);
+  await typeInto(url, 'not a url');
+  assert(idValue() === 'abc5', 'and so does text that is not a link');
+  await typeInto(url, '');
+  assert(idValue() === 'abc5', 'clearing the URL does not clear the ID');
+
+  // The ID stays editable by hand, and the next link that names a video fills it in again.
+  await typeInto(videoId, 'by-hand');
+  assert(idValue() === 'by-hand' && url.value === '', 'the video ID can be typed by hand');
+  await typeInto(url, 'https://youtu.be/xyz9');
+  assert(idValue() === 'xyz9', 'and the next link that names a video fills it in again');
+  assert(calls.length === 0, 'reading a link sends nothing');
+
+  await unmount();
+  console.log('✓ Submit Stream: a youtu.be, ?v=, /live/, /shorts/ or /embed/ link fills the video ID; other text leaves it alone; the ID stays editable');
+}
+
+async function thePreviewIsAPosterUntilItIsClicked(mountPage: MountPage): Promise<void> {
+  reset();
+  const { container, unmount } = await mountPage();
+  const title = inputLabelled(container, 'Title');
+  const videoId = inputLabelled(container, 'Video ID');
+  const form = formOf(container);
+
+  assert(container.querySelector('section[aria-label="Preview"]') === null, 'there is no preview card without a video ID');
+
+  // An ID typed by hand, a character at a time: a poster each time, and never a player.
+  for (const typed of ['a', 'ab', 'abc']) {
+    await typeInto(videoId, typed);
+    assert(posterOf(container) !== null && iframesOf(container).length === 0, `"${typed}" shows a poster and loads no player`);
+  }
+  await flushFrames();
+  assert(frameRequests.length === 0, `typing an ID requests nothing from YouTube (asked for ${frameRequests.join(', ')})`);
+  const card = cardOf(container, 'Preview');
+  assert(card.classList.contains('glass-card') && textOf(card.querySelector('h2')) === 'Preview', 'the preview is a glass card headed "Preview"');
+  deepStrictEqual(
+    [...form.querySelectorAll('h2')].map((item) => textOf(item)),
+    ['Stream', 'Credit (optional)', 'Preview'],
+  );
+  assert(cardOf(container, 'Credit (optional)').nextElementSibling === card, 'it follows the credit card');
+  const poster = need(posterOf(container), 'the poster');
+  assert(poster.type === 'button', 'the poster is a typed button');
+  assert(
+    poster.getAttribute('aria-label') === 'Play Stream preview',
+    `with no title the poster is named "Play Stream preview" (got "${poster.getAttribute('aria-label')}")`,
+  );
+  assert(poster.querySelector('img')?.getAttribute('src') === youtubeThumbnailUrl('abc'), "the thumbnail is the video's");
+  assert(poster.parentElement?.classList.contains('max-w-md') === true, 'the poster is not as wide as the card');
+
+  // The poster is named for the stream's title, trimmed; a title of spaces is no title.
+  await typeInto(title, '  Karaoke night  ');
+  assert(need(posterOf(container), 'the poster').getAttribute('aria-label') === 'Play Karaoke night', 'the poster is named for the title, trimmed');
+  await typeInto(title, '   ');
+  assert(need(posterOf(container), 'the poster').getAttribute('aria-label') === 'Play Stream preview', 'a title of spaces is no title');
+  await typeInto(title, 'Karaoke night');
+
+  // The ID is trimmed for the preview: spaces make no video, and are no part of one.
+  await typeInto(videoId, '   ');
+  assert(container.querySelector('section[aria-label="Preview"]') === null, 'an ID of spaces shows no preview');
+  await typeInto(videoId, '  abc  ');
+  assert(
+    posterOf(container)?.querySelector('img')?.getAttribute('src') === youtubeThumbnailUrl('abc'),
+    'a padded ID shows its trimmed thumbnail',
+  );
+
+  // Clicking loads the player: one iframe, the embed of the trimmed ID, named for the stream, holding the focus.
+  await focusOn(need(posterOf(container), 'the poster'));
+  await click(posterOf(container), 'the poster');
+  const frames = iframesOf(container);
+  assert(frames.length === 1, `exactly one iframe after the click (saw ${frames.length})`);
+  const player = need(frames[0], 'the player');
+  assert(player.getAttribute('src') === embedSrc('abc'), "it is the trimmed ID's embed");
+  assert(player.getAttribute('title') === 'Karaoke night', 'named for the stream');
+  assert(posterOf(container) === null, 'the poster is gone');
+  assert(focused() === player, `the poster hands its focus to its player, not to <body> (got ${focused()?.tagName})`);
+  await flushFrames();
+  deepStrictEqual(frameRequests, [embedSrc('abc')]);
+
+  // A new title renames the player and keeps it playing: only the video ID re-arms the poster.
+  await typeInto(title, 'Karaoke night 2');
+  assert(iframesOf(container)[0] === player && player.getAttribute('title') === 'Karaoke night 2', 'a new title renames the player and does not restart it');
+
+  // A different ID is a poster again, and so is the first one when it is typed back: no click, no player.
+  await typeInto(videoId, 'abcd');
+  assert(iframesOf(container).length === 0 && posterOf(container) !== null, 'a different video ID is a poster again, with no player');
+  assert(posterOf(container)?.querySelector('img')?.getAttribute('src') === youtubeThumbnailUrl('abcd'), 'with its own thumbnail');
+  await typeInto(videoId, 'abc');
+  assert(iframesOf(container).length === 0 && posterOf(container) !== null, 'the first video, typed back, is a poster too: a player never loads without a click');
+  await flushFrames();
+  deepStrictEqual(frameRequests, [embedSrc('abc')]);
+
+  // A link changes the ID, so it re-arms the poster the same way.
+  await click(posterOf(container), 'the poster again');
+  assert(iframesOf(container).length === 1, 'the poster plays again when it is clicked');
+  await typeInto(inputLabelled(container, 'YouTube URL'), 'https://www.youtube.com/live/xyz');
+  assert(iframesOf(container).length === 0, 'a link that names another video re-arms the poster');
+  assert(posterOf(container)?.querySelector('img')?.getAttribute('src') === youtubeThumbnailUrl('xyz'), 'with that video\'s thumbnail');
+
+  // Clearing the ID takes the preview away.
+  await typeInto(videoId, '');
+  assert(container.querySelector('section[aria-label="Preview"]') === null && iframesOf(container).length === 0, 'with no ID there is no preview again');
+  assert(calls.length === 0, 'the preview sends nothing to the worker');
+  assertNoRawColour(container.innerHTML, 'the form with a preview');
+
+  await unmount();
+  console.log('✓ Submit Stream: the preview is a poster named for the title until it is clicked, no player loads per keystroke, and a different video ID re-arms it');
+}
+
+async function titleDateAndVideoIdAreRequired(mountPage: MountPage): Promise<void> {
+  reset();
+  const { container, unmount } = await mountPage();
+  const title = inputLabelled(container, 'Title');
+  const date = inputLabelled(container, 'Date');
+  const videoId = inputLabelled(container, 'Video ID');
+  const submit = streamSubmitButton(container);
+
+  // Nothing is reported while the form is being filled in.
+  await typeInto(title, '   ');
+  await typeInto(videoId, '   ');
+  assert(describedBy(title) === '' && title.getAttribute('aria-invalid') === null, 'a field is not reported before Submit is pressed');
+
+  // A title of spaces and a video ID of spaces are empty, and so is a date nobody picked.
+  await pressStreamSubmit(container);
+  assert(streamCalls().length === 0, 'an empty form sends no request');
+  assert(describedBy(title) === STREAM_TEXT.title && title.getAttribute('aria-invalid') === 'true', `the title says "${STREAM_TEXT.title}" (got "${describedBy(title)}")`);
+  assert(describedBy(date) === STREAM_TEXT.dateEmpty && date.getAttribute('aria-invalid') === 'true', `the date says "${STREAM_TEXT.dateEmpty}" (got "${describedBy(date)}")`);
+  assert(describedBy(videoId) === STREAM_TEXT.videoId && videoId.getAttribute('aria-invalid') === 'true', `the video ID says "${STREAM_TEXT.videoId}" (got "${describedBy(videoId)}")`);
+  for (const label of ['YouTube URL', 'Credit author', 'Author URL', 'Comment URL']) {
+    assert(inputLabelled(container, label).getAttribute('aria-invalid') === null, `${label} is optional, and not reported`);
+  }
+  assert(describedBy(inputLabelled(container, 'YouTube URL')) === STREAM_TEXT.urlHint, 'the URL field keeps its hint, and nothing more');
+  assert(focused() === title, `the focus goes to the first field that needs fixing (got ${focused()?.tagName})`);
+  assert(toastsOf(container).length === 0 && alertOf(container) === null, 'no toast and no alert: the fields say it');
+  assert(
+    submit.getAttribute('aria-busy') === null && !submit.hasAttribute('disabled'),
+    'a refused submit leaves the button available',
+  );
+  assert(textOf(document.getElementById(`${title.id}-error`)) === STREAM_TEXT.title, 'the error is the paragraph the field points at');
+  assertNoRawColour(container.innerHTML, 'the form with its errors');
+
+  // Pressing again with the same errors still takes the focus to the first of them.
+  await focusOn(submit);
+  await click(submit, 'Submit Stream');
+  assert(focused() === title, 'a second refused submit moves the focus to the title again');
+  assert(streamCalls().length === 0, 'and sends nothing');
+
+  // Fixing a field clears its error at once, and the next press goes to the field that is left, in document order.
+  await typeInto(title, 'Karaoke night');
+  assert(describedBy(title) === '' && title.getAttribute('aria-invalid') === null, 'a title that is filled in is no longer reported');
+  assert(describedBy(date) === STREAM_TEXT.dateEmpty && describedBy(videoId) === STREAM_TEXT.videoId, 'the date and the video ID still are');
+  await pressStreamSubmit(container);
+  assert(streamCalls().length === 0 && focused() === date, `the focus goes to the date, the first field still wrong (got ${focused()?.tagName})`);
+  await typeInto(date, '2026-03-01');
+  assert(describedBy(date) === '' && date.getAttribute('aria-invalid') === null, 'a date that is filled in is no longer reported');
+  await pressStreamSubmit(container);
+  assert(streamCalls().length === 0 && focused() === videoId, 'the focus goes to the video ID, the last field still wrong');
+
+  // Filled in, with spaces around the text: the trimmed values are what is sent.
+  await typeInto(title, '  Karaoke night  ');
+  await typeInto(videoId, '  abc123  ');
+  await pressStreamSubmit(container);
+  deepStrictEqual(sentStream().body, REQUIRED_STREAM_BODY);
+
+  await unmount();
+  console.log('✓ Submit Stream: a missing title, date or video ID (spaces count as missing) blocks Submit with an inline error and the focus; fixing it clears it');
+}
+
+async function theDateFormatIsChecked(): Promise<void> {
+  // A date input of a browser takes a year of up to six digits, which the worker refuses: it wants four.
+  // happy-dom empties such a value itself, so the rule is read where the page reads it.
+  const { BLANK_STREAM, checkStream } = await import('../src/pages/submit-stream-form');
+  const dateError = (date: string): string | null => checkStream({ ...BLANK_STREAM, date }).dateError;
+
+  assert(dateError('') === STREAM_TEXT.dateEmpty, 'no date is asked for');
+  assert(dateError('   ') === STREAM_TEXT.dateEmpty, 'a date of spaces is no date');
+  for (const date of ['2026-03-01', '0001-01-01', '9999-12-31', ' 2026-03-01 ']) {
+    assert(dateError(date) === null, `${JSON.stringify(date)} is a date`);
+  }
+  for (const date of ['20260-03-01', '275760-09-13', '2026-3-1', '26-03-01', '2026/03/01', '03-01-2026', '2026-03-01T10:00', '2026-03', 'abc']) {
+    assert(dateError(date) === STREAM_TEXT.dateFormat, `${JSON.stringify(date)} is not YYYY-MM-DD (got ${JSON.stringify(dateError(date))})`);
+  }
+  assert(!checkStream({ ...BLANK_STREAM, date: '20260-03-01' }).valid, 'a date in the wrong form blocks the submit');
+  console.log('✓ Submit Stream: a date that is not YYYY-MM-DD (a five or six digit year) is refused with its own text');
+}
+
+async function theRulesReadWhatWasTyped(): Promise<void> {
+  // A url input of a browser trims its value itself and happy-dom's does too, so the page alone cannot show
+  // that the rules do not count on it: they read the form as typed, spaces and all.
+  const { BLANK_STREAM, checkStream, streamRequest } = await import('../src/pages/submit-stream-form');
+
+  deepStrictEqual(checkStream(BLANK_STREAM), {
+    titleError: STREAM_TEXT.title,
+    dateError: STREAM_TEXT.dateEmpty,
+    youtubeUrlError: null,
+    videoIdError: STREAM_TEXT.videoId,
+    creditAuthorError: null,
+    creditAuthorUrlError: null,
+    creditCommentUrlError: null,
+    valid: false,
+  });
+
+  const filled = { ...BLANK_STREAM, title: 'Karaoke night', date: '2026-03-01', videoId: 'abc123' };
+  assert(checkStream(filled).valid, 'a title, a date and a video ID are a form');
+  for (const field of ['youtubeUrl', 'creditAuthorUrl', 'creditCommentUrl'] as const) {
+    const withAuthor = { ...filled, creditAuthor: 'Mika' };
+    assert(checkStream({ ...withAuthor, [field]: '   ' }).valid, `${field} of spaces is empty, and a link may be empty`);
+    assert(checkStream({ ...withAuthor, [field]: '  https://example.com/x  ' }).valid, `${field} with spaces around a link is a link`);
+    assert(!checkStream({ ...withAuthor, [field]: '  not a link  ' }).valid, `${field} with spaces around text that is no link is not`);
+  }
+  assert(checkStream({ ...filled, creditAuthorUrl: '   ', creditAuthor: '   ' }).valid, 'a link and an author of spaces are no credit at all');
+  assert(checkStream({ ...filled, creditCommentUrl: '  https://example.com/c  ' }).creditAuthorError !== null, 'a link with spaces around it still needs an author');
+
+  // The request is trimmed all through, the date included; a link or an author of spaces is nothing.
+  deepStrictEqual(
+    streamRequest({
+      title: '  Karaoke night  ',
+      date: ' 2026-03-01 ',
+      youtubeUrl: '  https://example.com/x  ',
+      videoId: ' abc123 ',
+      creditAuthor: '  Mika  ',
+      creditAuthorUrl: ' https://example.com/mika ',
+      creditCommentUrl: '   ',
+    }),
+    {
+      title: 'Karaoke night',
+      date: '2026-03-01',
+      videoId: 'abc123',
+      youtubeUrl: 'https://example.com/x',
+      credit: { author: 'Mika', authorUrl: 'https://example.com/mika' },
+    },
+  );
+  deepStrictEqual(streamRequest({ ...filled, youtubeUrl: '   ', creditAuthor: '   ', creditAuthorUrl: '   ' }), REQUIRED_STREAM_BODY);
+  console.log('✓ Submit Stream: the rules read the form as typed: spaces around a link, a date or an author are not part of it, and a field of spaces is empty');
+}
+
+async function linksAreChecked(mountPage: MountPage): Promise<void> {
+  reset();
+  streamReply = () => failure(500, 'Database is locked');
+  const { container, unmount } = await mountPage();
+  await fillStream(container, REQUIRED_STREAM);
+  const url = inputLabelled(container, 'YouTube URL');
+  const author = inputLabelled(container, 'Credit author');
+  const authorUrl = inputLabelled(container, 'Author URL');
+  const commentUrl = inputLabelled(container, 'Comment URL');
+
+  // The browser's own check of a url input is off (noValidate), so the page makes it: a full http or https URL, or nothing.
+  const notLinks = ['not a url', 'youtu.be/abc', 'www.youtube.com/watch?v=abc', 'ftp://example.com/x', 'javascript:alert(1)', 'mailto:me@example.com', 'https://', 'http:/'];
+  for (const [index, bad] of notLinks.entries()) {
+    await typeInto(url, bad);
+    // Nothing is said while the form is being filled in; from the first press on, the errors follow what is typed.
+    assert(
+      describedBy(url) === (index === 0 ? STREAM_TEXT.urlHint : `${STREAM_TEXT.urlHint} ${STREAM_TEXT.link}`),
+      `"${bad}" is ${index === 0 ? 'not ' : ''}reported ${index === 0 ? 'before Submit is pressed' : 'as soon as it is typed once Submit has been pressed'}`,
+    );
+    await pressStreamSubmit(container);
+    assert(streamCalls().length === 0, `"${bad}" as the YouTube URL sends no request`);
+    assert(
+      describedBy(url) === `${STREAM_TEXT.urlHint} ${STREAM_TEXT.link}` && url.getAttribute('aria-invalid') === 'true',
+      `"${bad}" is described by the hint and then "${STREAM_TEXT.link}" (got "${describedBy(url)}")`,
+    );
+    assert(focused() === url, `and the focus goes to the URL for "${bad}" (got ${focused()?.tagName})`);
+    assert(alertOf(container) === null && toastsOf(container).length === 0, 'with no alert and no toast: the field says it');
+  }
+  assertNoRawColour(container.innerHTML, 'the form with a URL error');
+  // The URL field is optional, and a link of any kind is a link: a YouTube one, or another site's.
+  for (const good of ['', 'https://example.com/x', 'http://example.com/x', 'https://www.youtube.com/watch?v=abc123', 'HTTPS://EXAMPLE.COM']) {
+    await typeInto(url, good);
+    assert(describedBy(url) === STREAM_TEXT.urlHint && url.getAttribute('aria-invalid') === null, `"${good}" is fine: the error goes at once`);
+  }
+  await typeInto(url, '');
+
+  // The two credit links are checked the same way, each on its own field.
+  await typeInto(author, 'Mika');
+  for (const [field, label] of [[authorUrl, 'Author URL'], [commentUrl, 'Comment URL']] as const) {
+    await typeInto(field, 'not a url');
+    await pressStreamSubmit(container);
+    assert(streamCalls().length === 0, `a ${label} that is not a link sends no request`);
+    assert(describedBy(field) === STREAM_TEXT.link && field.getAttribute('aria-invalid') === 'true', `the ${label} says "${STREAM_TEXT.link}" (got "${describedBy(field)}")`);
+    assert(focused() === field, `and has the focus (got ${focused()?.tagName})`);
+    assert(describedBy(author) === '' && author.getAttribute('aria-invalid') === null, 'the author is not what is wrong');
+    await typeInto(field, 'ftp://example.com/c');
+    assert(describedBy(field) === STREAM_TEXT.link, `an ftp link is not a link for the ${label} either`);
+    await typeInto(field, 'https://example.com/c');
+    assert(describedBy(field) === '' && field.getAttribute('aria-invalid') === null, `a link clears the ${label} error at once`);
+    await typeInto(field, '');
+  }
+
+  // With no author, a link that is not a link is reported on its own field and on the author's.
+  await typeInto(author, '');
+  await typeInto(authorUrl, 'not a url');
+  await pressStreamSubmit(container);
+  assert(describedBy(author) === STREAM_TEXT.author && describedBy(authorUrl) === STREAM_TEXT.link, 'a bad link with no author is reported twice, each on its field');
+  assert(focused() === author, 'and the author comes first');
+  assert(streamCalls().length === 0, 'nothing was sent in all that');
+
+  await unmount();
+  console.log('✓ Submit Stream: a YouTube URL, an author URL and a comment URL that are filled in must be http(s) links, each reported on its own field');
+}
+
+async function creditLinksNeedAnAuthor(mountPage: MountPage): Promise<void> {
+  reset();
+  streamReply = () => failure(500, 'Database is locked');
+  const { container, unmount } = await mountPage();
+  await fillStream(container, REQUIRED_STREAM);
+  const title = inputLabelled(container, 'Title');
+  const author = inputLabelled(container, 'Credit author');
+  const authorUrl = inputLabelled(container, 'Author URL');
+  const commentUrl = inputLabelled(container, 'Comment URL');
+
+  // An author URL with no author used to be dropped without a word: now the author field says so, and nothing is sent.
+  await typeInto(authorUrl, 'https://example.com/mika');
+  assert(describedBy(author) === '', 'a credit link with no author is not reported before Submit is pressed');
+  await pressStreamSubmit(container);
+  assert(streamCalls().length === 0, 'a credit link with no author sends no request');
+  assert(describedBy(author) === STREAM_TEXT.author && author.getAttribute('aria-invalid') === 'true', `the author says "${STREAM_TEXT.author}" (got "${describedBy(author)}")`);
+  assert(describedBy(authorUrl) === '' && authorUrl.getAttribute('aria-invalid') === null, 'the link itself is not what is wrong');
+  assert(focused() === author, `the focus goes to the author (got ${focused()?.tagName})`);
+  assert(alertOf(container) === null && toastsOf(container).length === 0, 'no alert and no toast: the field says it');
+  assertNoRawColour(container.innerHTML, 'the form with an author error');
+
+  // Typing the author clears it at once; the form is then fine.
+  await typeInto(author, 'Mika');
+  assert(describedBy(author) === '' && author.getAttribute('aria-invalid') === null, 'an author that is filled in is no longer reported');
+
+  // A comment URL alone is the same, and so is an author of spaces.
+  await typeInto(author, '');
+  await typeInto(authorUrl, '');
+  await typeInto(commentUrl, 'https://example.com/c/1');
+  await pressStreamSubmit(container);
+  assert(streamCalls().length === 0 && describedBy(author) === STREAM_TEXT.author, 'a comment URL with no author is refused too');
+  await typeInto(author, '   ');
+  await pressStreamSubmit(container);
+  assert(streamCalls().length === 0 && describedBy(author) === STREAM_TEXT.author, 'an author of spaces is no author');
+  await typeInto(authorUrl, 'https://example.com/mika');
+  assert(describedBy(author) === STREAM_TEXT.author, 'both links with no author are one error on the author');
+  assert(textOf(document.getElementById(`${author.id}-error`)) === STREAM_TEXT.author, 'the error is the paragraph the author points at');
+
+  // With no link left, the author is not needed; the title still comes before it in the focus order.
+  await typeInto(authorUrl, '');
+  await typeInto(commentUrl, '');
+  assert(describedBy(author) === '' && author.getAttribute('aria-invalid') === null, 'with no link left the error goes at once');
+  await typeInto(commentUrl, 'https://example.com/c/1');
+  await typeInto(title, '');
+  await pressStreamSubmit(container);
+  assert(describedBy(title) === STREAM_TEXT.title && describedBy(author) === STREAM_TEXT.author, 'the title and the author are both reported');
+  assert(focused() === title, 'the focus goes to the first of them in the document, the title');
+  await typeInto(title, 'Karaoke night');
+  await typeInto(commentUrl, '');
+  await typeInto(author, '');
+
+  // An author alone is a credit, with the links it has: nothing else is sent in the credit.
+  const credits: Array<[Pick<StreamFill, 'author' | 'authorUrl' | 'commentUrl'>, unknown]> = [
+    [{ author: 'Mika' }, { author: 'Mika' }],
+    [{ author: '  Mika  ' }, { author: 'Mika' }],
+    [{ author: 'Mika', authorUrl: 'https://example.com/mika' }, { author: 'Mika', authorUrl: 'https://example.com/mika' }],
+    [{ author: 'Mika', commentUrl: 'https://example.com/c/1' }, { author: 'Mika', commentUrl: 'https://example.com/c/1' }],
+    [
+      { author: 'Mika', authorUrl: 'https://example.com/mika', commentUrl: 'https://example.com/c/1' },
+      { author: 'Mika', authorUrl: 'https://example.com/mika', commentUrl: 'https://example.com/c/1' },
+    ],
+  ];
+  for (const [fill, credit] of credits) {
+    calls.length = 0;
+    await typeInto(author, '');
+    await typeInto(authorUrl, '');
+    await typeInto(commentUrl, '');
+    await fillStream(container, fill);
+    await pressStreamSubmit(container);
+    deepStrictEqual(sentStream().body, { ...REQUIRED_STREAM_BODY, credit });
+  }
+
+  await unmount();
+  console.log('✓ Submit Stream: a credit link without an author is an error on the author field (nothing is dropped silently); credit carries the author and only the links that were typed');
+}
+
+async function aValidFormIsSent(mountPage: MountPage): Promise<void> {
+  // Everything typed, with spaces around it, and a link that fills the video ID: the trimmed values go, in the shape the worker reads.
+  reset();
+  let page = await mountPage();
+  let { container } = page;
+  await fillStream(container, {
+    title: '  Karaoke night  ',
+    date: '2026-03-01',
+    url: 'https://www.youtube.com/live/abc123?feature=share',
+    author: '  Mika  ',
+    authorUrl: ' https://example.com/mika ',
+    commentUrl: 'https://example.com/c/1',
+  });
+  assert(inputLabelled(container, 'Video ID').value === 'abc123', 'the link filled in the video ID');
+  await pressStreamSubmit(container);
+  const sent = sentStream();
+  assert(sent.path === '/api/streams', 'it creates a stream');
+  assert(sent.params.toString() === 'streamer=mizuki', `it carries the current streamer (got ${sent.params.toString()})`);
+  deepStrictEqual(sent.body, {
+    title: 'Karaoke night',
+    date: '2026-03-01',
+    videoId: 'abc123',
+    youtubeUrl: 'https://www.youtube.com/live/abc123?feature=share',
+    credit: { author: 'Mika', authorUrl: 'https://example.com/mika', commentUrl: 'https://example.com/c/1' },
+  });
+  deepStrictEqual(toastsOf(container), [{ message: 'Stream submitted', detail: '' }]);
+  assert(container.querySelector('form') === null && textOf(container).includes('Stream list'), 'the page goes on to the stream list');
+  assert(unexpected.length === 0, 'and nothing else was requested');
+  assertNoRawColour(container.innerHTML, 'the page after a submit');
+  await page.unmount();
+
+  // No link: the URL defaults from the ID, which is trimmed; with no author there is no credit at all.
+  reset();
+  page = await mountPage();
+  ({ container } = page);
+  await fillStream(container, { title: 'Karaoke night', date: '2026-03-01', videoId: ' abc123 ' });
+  await pressStreamSubmit(container);
+  const bare = sentStream().body as Record<string, unknown>;
+  deepStrictEqual(bare, REQUIRED_STREAM_BODY);
+  assert(!('credit' in bare), 'a stream with no author sends no credit key at all');
+  deepStrictEqual(toastsOf(container), [{ message: 'Stream submitted', detail: '' }]);
+  assert(textOf(container).includes('Stream list'), 'the page goes on to the stream list');
+  await page.unmount();
+
+  // The default URL keeps an unusual ID inside its parameter.
+  reset();
+  page = await mountPage();
+  ({ container } = page);
+  await fillStream(container, { title: 'Karaoke night', date: '2026-03-01', videoId: ' a b&c ' });
+  await pressStreamSubmit(container);
+  deepStrictEqual(sentStream().body, { ...REQUIRED_STREAM_BODY, videoId: 'a b&c', youtubeUrl: 'https://www.youtube.com/watch?v=a%20b%26c' });
+  await page.unmount();
+
+  // A link and then an ID of one's own: each goes as typed.
+  reset();
+  page = await mountPage();
+  ({ container } = page);
+  await fillStream(container, { title: 'Karaoke night', date: '2026-03-01', url: 'https://youtu.be/first1', videoId: 'second2' });
+  await pressStreamSubmit(container);
+  deepStrictEqual(sentStream().body, { ...REQUIRED_STREAM_BODY, videoId: 'second2', youtubeUrl: 'https://youtu.be/first1' });
+  await page.unmount();
+
+  // A link that is not YouTube's is kept as the stream's URL when the ID comes from the user.
+  reset();
+  page = await mountPage();
+  ({ container } = page);
+  await fillStream(container, { title: 'Karaoke night', date: '2026-03-01', url: 'https://example.com/x', videoId: 'abc123' });
+  await pressStreamSubmit(container);
+  deepStrictEqual(sentStream().body, { ...REQUIRED_STREAM_BODY, youtubeUrl: 'https://example.com/x' });
+  await page.unmount();
+
+  console.log('✓ Submit Stream: a valid form sends the trimmed {title, date, videoId, youtubeUrl} (the URL defaults from the ID) and a credit only with an author, toasts "Stream submitted" and goes to the list');
+}
+
+/** Link-aware list page of the harness: it says where the router has put it, search included. */
+function StreamList() {
+  const location = useLocation();
+  return <p data-list>{`Stream list${location.search}`}</p>;
+}
+
+async function aDuplicateVideoLinksToIt(mountPage: MountPage): Promise<void> {
+  reset();
+  streamReply = () => failure(409, 'A stream with this video already exists', 'STREAM_EXISTS');
+  const { container, unmount } = await mountPage();
+  await fillStream(container, { ...REQUIRED_STREAM, videoId: '  abc123  ' });
+  const submit = streamSubmitButton(container);
+  await pressStreamSubmit(container);
+
+  assert(streamCalls().length === 1, 'the form was sent once');
+  const note = need(alertOf(container), 'a danger note for the duplicate');
+  assert(formOf(container).contains(note), 'the note sits in the form');
+  assert(note.classList.contains('border-tone-danger-line'), 'and is a danger note');
+  assert(note.nextElementSibling === submit.parentElement, 'it sits directly above the actions');
+  assert(
+    textOf(note) === `Couldn't submit the stream. ${STREAM_TEXT.exists} Find it in Streams`,
+    `it says "${STREAM_TEXT.exists}", in the page's own words and with its full stop, then offers the link (got "${textOf(note)}")`,
+  );
+  assert(note.querySelector('svg') !== null, 'the note leads with its alert icon');
+  const link = need(note.querySelector('a'), 'a link in the note');
+  assert(textOf(link) === 'Find it in Streams', `the link reads "Find it in Streams" (got "${textOf(link)}")`);
+  assert(link.classList.contains('underline'), 'the link is underlined, so it does not rest on its colour alone');
+  // An explicit empty status is Streams' All: with no status in the link, Streams falls back to the status chip
+  // remembered in storage (say Pending), and a duplicate that is Approved would not be in the list it opens.
+  assert(
+    link.getAttribute('href') === '/streams?search=abc123&status=',
+    `it searches Streams for the submitted video ID, trimmed, in every status (got ${link.getAttribute('href')})`,
+  );
+  assert(note.querySelectorAll('a').length === 1 && buttonNamed(note, 'Retry') === null, 'it is the only link, and there is no Retry: Submit is still there to press again');
+  assert(toastsOf(container).length === 0, 'a failure raises no toast');
+  assert(describedBy(inputLabelled(container, 'Video ID')) === '' && inputLabelled(container, 'Video ID').getAttribute('aria-invalid') === null, 'the video ID field is not marked: the note says it');
+  assertNoRawColour(container.innerHTML, 'the form with a duplicate note');
+
+  // The form stays as typed, Submit is available again, and the focus never left it.
+  assert(container.querySelector('form') !== null && !textOf(container).includes('Stream list'), 'the page goes nowhere');
+  deepStrictEqual(
+    STREAM_FIELDS.map((field) => inputLabelled(container, field.label).value),
+    ['Karaoke night', '2026-03-01', '', '  abc123  ', '', '', ''],
+  );
+  assert(
+    submit.getAttribute('aria-busy') === null && submit.getAttribute('aria-disabled') === null && !submit.hasAttribute('disabled'),
+    'Submit is available again',
+  );
+  assert(focused() === submit, `the focus stays on Submit (got ${focused()?.tagName})`);
+
+  // The link names the ID that was sent: editing the field afterwards does not move it.
+  await typeInto(inputLabelled(container, 'Video ID'), 'another9');
+  assert(
+    note.isConnected && note.querySelector('a')?.getAttribute('href') === '/streams?search=abc123&status=',
+    'the note keeps pointing at the video that was sent',
+  );
+
+  // It is a router link: it opens the list in the app, with the search in the URL.
+  await click(link, 'the link in the note');
+  assert(container.querySelector('form') === null, 'the link leaves the form');
+  assert(
+    textOf(container.querySelector('[data-list]')) === 'Stream list?search=abc123&status=',
+    `and opens the stream list searched for the video, in every status (got "${textOf(container.querySelector('[data-list]'))}")`,
+  );
+  assert(streamCalls().length === 1 && toastsOf(container).length === 0, 'with nothing sent and nothing said');
+  await unmount();
+
+  // An ID that needs encoding stays one search term.
+  reset();
+  streamReply = () => failure(409, 'A stream with this video already exists', 'STREAM_EXISTS');
+  const odd = await mountPage();
+  await fillStream(odd.container, { ...REQUIRED_STREAM, videoId: 'a b&c' });
+  await pressStreamSubmit(odd.container);
+  assert(
+    odd.container.querySelector('[role="alert"] a')?.getAttribute('href') === '/streams?search=a%20b%26c&status=',
+    `an ID with a space and an ampersand is encoded (got ${odd.container.querySelector('[role="alert"] a')?.getAttribute('href')})`,
+  );
+  await odd.unmount();
+
+  console.log('✓ Submit Stream: a 409 STREAM_EXISTS reads "A stream with this video already exists." with a router link to /streams?search=<the video ID sent>&status= (every status); the form stays');
+}
+
+async function anyOtherFailureKeepsTheForm(mountPage: MountPage): Promise<void> {
+  reset();
+  const { container, unmount } = await mountPage();
+  await fillStream(container, { ...REQUIRED_STREAM, author: 'Mika', authorUrl: 'https://example.com/mika' });
+  const submit = streamSubmitButton(container);
+  streamReply = () => failure(500, 'Database is locked');
+  await pressStreamSubmit(container);
+
+  // The worker's message is a danger note above the actions, with no link.
+  assert(streamCalls().length === 1, 'the form was sent once');
+  const note = need(alertOf(container), 'a danger note for the failed submit');
+  assert(formOf(container).contains(note), 'the note sits in the form');
+  assert(textOf(note) === "Couldn't submit the stream. Database is locked", `it carries the worker's message (got "${textOf(note)}")`);
+  assert(note.querySelector('svg') !== null, 'the note leads with its alert icon');
+  assert(note.classList.contains('border-tone-danger-line'), 'and is a danger note');
+  assert(note.nextElementSibling === submit.parentElement, 'it sits directly above the actions');
+  assert(note.querySelector('a') === null && buttonNamed(note, 'Retry') === null, 'it has no link and no Retry');
+  assert(!textOf(note).includes(STREAM_TEXT.exists), 'and does not claim a duplicate');
+  assert(toastsOf(container).length === 0, 'a failure raises no toast');
+
+  // The form stays, as it was typed; Submit is available again with the focus on it.
+  assert(container.querySelector('form') !== null && !textOf(container).includes('Stream list'), 'the page goes nowhere');
+  deepStrictEqual(
+    STREAM_FIELDS.map((field) => inputLabelled(container, field.label).value),
+    ['Karaoke night', '2026-03-01', '', 'abc123', 'Mika', 'https://example.com/mika', ''],
+  );
+  assert(
+    submit.getAttribute('aria-busy') === null && submit.getAttribute('aria-disabled') === null && !submit.hasAttribute('disabled'),
+    'Submit is available again',
+  );
+  assert(focused() === submit, `the focus stays on Submit (got ${focused()?.tagName})`);
+  assert(
+    describedBy(inputLabelled(container, 'Title')) === '' && inputLabelled(container, 'Title').getAttribute('aria-invalid') === null,
+    'a server error marks no field',
+  );
+  assertNoRawColour(container.innerHTML, 'the form with a server error');
+
+  // A 409 that does not say STREAM_EXISTS is not a duplicate; neither is one with another code.
+  streamReply = () => failure(409, 'Conflict');
+  await click(submit, 'Submit Stream');
+  assert(textOf(alertOf(container)).includes('Conflict') && alertOf(container)?.querySelector('a') === null, 'a 409 with no code shows its message and no link');
+  streamReply = () => failure(409, 'Locked by another curator', 'STREAM_LOCKED');
+  await click(submit, 'Submit Stream');
+  assert(textOf(alertOf(container)).includes('Locked by another curator') && alertOf(container)?.querySelector('a') === null, 'a 409 with another code shows its message and no link');
+
+  // A request that never reached the worker shows what the browser said, or a plain text when it said nothing.
+  streamReply = () => {
+    throw new TypeError('Failed to fetch');
+  };
+  await click(submit, 'Submit Stream');
+  assert(textOf(alertOf(container)).includes('Failed to fetch'), 'a network failure shows its message');
+  streamReply = () => {
+    throw new Error('');
+  };
+  await click(submit, 'Submit Stream');
+  assert(textOf(alertOf(container)).includes('Submission failed'), `an error with no message reads "Submission failed" (got "${textOf(alertOf(container))}")`);
+  assert(focused() === submit && streamCalls().length === 5, 'and the focus is still on Submit after every one');
+
+  // A press the form refuses takes the old note down: it answers a press that no longer stands, and the fields speak now.
+  const title = inputLabelled(container, 'Title');
+  await typeInto(title, '');
+  await pressStreamSubmit(container);
+  assert(streamCalls().length === 5, 'the refused press sends nothing');
+  assert(alertOf(container) === null, 'and the old message is gone');
+  assert(describedBy(title) === STREAM_TEXT.title && focused() === title, 'the title says what is wrong, and has the focus');
+
+  // The next attempt clears the note as its request starts, and its answer takes over.
+  await typeInto(title, 'Karaoke night');
+  streamReply = () => failure(500, 'Database is locked');
+  await pressStreamSubmit(container);
+  assert(alertOf(container) !== null, 'the failure comes back');
+  const answer = held();
+  streamReply = () => answer.reply;
+  await click(submit, 'Submit Stream');
+  assert(streamCalls().length === 7 && alertOf(container) === null, 'the next attempt clears the note as it starts');
+  await respond(answer, created({ id: 'stream-2026-03-01', status: 'pending' }));
+  assert(container.querySelector('form') === null && textOf(container).includes('Stream list'), 'and its success goes to the stream list');
+  deepStrictEqual(toastsOf(container), [{ message: 'Stream submitted', detail: '' }]);
+
+  await unmount();
+  console.log('✓ Submit Stream: any other failure is a danger note with the worker\'s message and no link; every field stays, nothing navigates, the focus stays on Submit');
+}
+
+async function streamSubmitIsBusyWhileSending(mountPage: MountPage): Promise<void> {
+  reset();
+  const { container, unmount } = await mountPage();
+  await fillStream(container, REQUIRED_STREAM);
+  const submit = streamSubmitButton(container);
+  const cancel = need(buttonNamed(container, 'Cancel'), 'Cancel');
+  const answer = held();
+  streamReply = () => answer.reply;
+
+  await focusOn(submit);
+  await click(submit, 'Submit Stream');
+  assert(streamCalls().length === 1, 'Submit sends one request');
+  assert(
+    submit.getAttribute('aria-busy') === 'true' && submit.getAttribute('aria-disabled') === 'true' && !submit.hasAttribute('disabled'),
+    'Submit is busy, not disabled, while the request is out',
+  );
+  assert(submit.querySelector('svg') !== null, 'and shows a spinner');
+  assert(focused() === submit, 'it keeps the focus');
+  assert(cancel.hasAttribute('disabled'), 'Cancel is unavailable meanwhile: a request in flight cannot be taken back');
+
+  // Neither a second click nor the form's own submit event sends a second request.
+  await click(submit, 'the busy Submit');
+  assert(streamCalls().length === 1, 'a second click on the busy Submit sends nothing');
+  await act(async () => {
+    formOf(container).dispatchEvent(new Event('submit', { bubbles: true, cancelable: true }));
+  });
+  await settle();
+  assert(streamCalls().length === 1, 'a submit event while the request is out is ignored by the form itself');
+  assert(toastsOf(container).length === 0 && container.querySelector('form') !== null, 'nothing changes until the worker has answered');
+
+  // The answer is a success: the page leaves for the list, and was never available for a second press.
+  await respond(answer, created({ id: 'stream-2026-03-01', status: 'pending' }));
+  assert(streamCalls().length === 1, 'still one request');
+  assert(container.querySelector('form') === null && textOf(container).includes('Stream list'), 'the page goes to the stream list');
+
+  await unmount();
+  console.log('✓ Submit Stream: the busy Submit keeps its focus and ignores a second click and a second submit event; Cancel waits');
+}
+
+async function streamSubmitStaysBusyAfterSuccess(mountStaying: MountPage): Promise<void> {
+  // Here both routes render the page, so it is still mounted once the router has moved on: as a route
+  // change that is slow to show would leave it. The stream is stored, so the form must not be sendable again.
+  reset();
+  const { container, unmount } = await mountStaying();
+  const where = (): string => textOf(container.querySelector('[data-where]'));
+  assert(where() === '/submit/stream', 'the harness starts on the submit route');
+  await fillStream(container, REQUIRED_STREAM);
+  const submit = streamSubmitButton(container);
+  await pressStreamSubmit(container);
+
+  assert(streamCalls().length === 1, 'Submit sends one request');
+  assert(where() === '/streams', `the page asked the router for the stream list (got ${where()})`);
+  deepStrictEqual(toastsOf(container), [{ message: 'Stream submitted', detail: '' }]);
+  assert(submit.isConnected, 'the page is still mounted in this harness');
+  assert(
+    submit.getAttribute('aria-busy') === 'true' && submit.getAttribute('aria-disabled') === 'true' && !submit.hasAttribute('disabled'),
+    'Submit stays busy once the stream is stored',
+  );
+  assert(need(buttonNamed(container, 'Cancel'), 'Cancel').hasAttribute('disabled'), 'and Cancel stays unavailable');
+  await click(submit, 'the busy Submit');
+  await act(async () => {
+    formOf(container).dispatchEvent(new Event('submit', { bubbles: true, cancelable: true }));
+  });
+  await settle();
+  assert(streamCalls().length === 1, 'neither a click nor a submit event stores the stream a second time');
+  assert(toastsOf(container).length === 1, 'and nothing more is announced');
+
+  await unmount();
+  console.log('✓ Submit Stream: once the stream is stored the form stays busy until the route takes it away, so it cannot be stored twice');
+}
+
+async function streamCancelGoesBack(mountPage: MountPage): Promise<void> {
+  reset();
+  const { container, unmount } = await mountPage();
+  await fillStream(container, { ...REQUIRED_STREAM, author: 'Mika' });
+  const cancel = need(buttonNamed(container, 'Cancel'), 'Cancel');
+  assert(!cancel.hasAttribute('disabled'), 'Cancel is available when nothing is out');
+  await click(cancel, 'Cancel');
+  assert(container.querySelector('form') === null && textOf(container).includes('Stream list'), 'Cancel goes back to the stream list');
+  assert(calls.length === 0, 'and sends nothing');
+  assert(toastsOf(container).length === 0, 'and says nothing');
+  await unmount();
+  console.log('✓ Submit Stream: Cancel goes back to the stream list without a request or a toast');
+}
+
 async function main(): Promise<void> {
-  installDom();
+  const win = installDom();
+  // happy-dom fetches an iframe's src itself, from the real network: answer it here, and keep what it asked for.
+  win.happyDOM.settings.fetch.interceptor = {
+    beforeAsyncRequest: async ({ request, window }) => {
+      frameRequests.push(request.url);
+      return new window.Response('<!doctype html><title>player</title>', { headers: { 'Content-Type': 'text/html' } });
+    },
+  };
   installFetchStub();
 
   const { setCurrentStreamer } = await import('../src/api/client');
@@ -1122,6 +2079,73 @@ async function main(): Promise<void> {
   const source = readFileSync(new URL('../src/pages/SubmitSong.tsx', import.meta.url), 'utf8');
   assertNoRawColour(source, 'the page source');
   console.log('✓ Submit Song: no raw palette class and no arbitrary hex, in the markup or the source');
+
+  // --- Submit Stream ---
+
+  const { default: SubmitStream } = await import('../src/pages/SubmitStream');
+
+  // The route sits in the studio frame too: the page brings its own header and gutter.
+  const streamRoute = need(ADMIN_ROUTES.find((candidate) => candidate.path === '/submit/stream'), 'the /submit/stream route');
+  assert(streamRoute.frame === 'studio', '/submit/stream is a studio route');
+  assert(streamRoute.curatorOnly !== true, 'and it stays open to contributors, as POST /api/streams is');
+  const streamFramed = renderToStaticMarkup(
+    <MemoryRouter initialEntries={['/submit/stream']}>
+      <Routes>
+        <Route path="/submit/stream" element={routeElement(streamRoute, contributor)} />
+      </Routes>
+    </MemoryRouter>,
+  );
+  assert(streamFramed !== '' && !streamFramed.includes('legacy-frame'), 'the route renders with no LegacyFrame around it');
+  console.log('✓ Submit Stream: its route is a studio route, open to contributors');
+
+  const mountStream: MountPage = () =>
+    mount(
+      <ToastProvider timers={NO_TIMERS}>
+        <MemoryRouter initialEntries={['/submit/stream']}>
+          <Routes>
+            <Route path="/submit/stream" element={<SubmitStream />} />
+            <Route path="/streams" element={<StreamList />} />
+          </Routes>
+        </MemoryRouter>
+      </ToastProvider>,
+    );
+
+  // Both routes render the page, so it outlives the navigation (see streamSubmitStaysBusyAfterSuccess).
+  const mountStreamStaying: MountPage = () =>
+    mount(
+      <ToastProvider timers={NO_TIMERS}>
+        <MemoryRouter initialEntries={['/submit/stream']}>
+          <Routes>
+            <Route path="/submit/stream" element={<SubmitStream />} />
+            <Route path="/streams" element={<SubmitStream />} />
+          </Routes>
+          <Where />
+        </MemoryRouter>
+      </ToastProvider>,
+    );
+
+  await streamFirstLoadAndLayout(mountStream);
+  await theUrlFillsTheVideoId(mountStream);
+  await thePreviewIsAPosterUntilItIsClicked(mountStream);
+  await titleDateAndVideoIdAreRequired(mountStream);
+  await theDateFormatIsChecked();
+  await theRulesReadWhatWasTyped();
+  await linksAreChecked(mountStream);
+  await creditLinksNeedAnAuthor(mountStream);
+  await aValidFormIsSent(mountStream);
+  await aDuplicateVideoLinksToIt(mountStream);
+  await anyOtherFailureKeepsTheForm(mountStream);
+  await streamSubmitIsBusyWhileSending(mountStream);
+  await streamSubmitStaysBusyAfterSuccess(mountStreamStaying);
+  await streamCancelGoesBack(mountStream);
+
+  assert(unexpected.length === 0, `no unstubbed request (${unexpected.join(', ')})`);
+
+  const streamSource = readFileSync(new URL('../src/pages/SubmitStream.tsx', import.meta.url), 'utf8');
+  const streamRules = readFileSync(new URL('../src/pages/submit-stream-form.ts', import.meta.url), 'utf8');
+  assertNoRawColour(streamSource, 'the page source');
+  assertNoRawColour(streamRules, 'the rules source');
+  console.log('✓ Submit Stream: no raw palette class and no arbitrary hex, in the markup or the source');
 }
 
 await main();

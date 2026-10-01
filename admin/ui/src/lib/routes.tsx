@@ -155,6 +155,7 @@ export const ADMIN_ROUTES: readonly AdminRoute[] = [
     path: '/submit/stream',
     label: 'Submit Stream',
     newMenu: { description: 'Paste a YouTube URL; the ID fills itself in', icon: 'radio' },
+    frame: 'studio',
     render: () => <SubmitStream />,
   },
   {
