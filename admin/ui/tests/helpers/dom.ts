@@ -18,8 +18,15 @@ export function installDom(url: string = 'http://localhost/'): Window {
   const win = new Window({
     url,
     // No suite mounted through this helper needs a real script/stylesheet fetch; disabling both
-    // keeps a stray <script src> or <link> from reaching the network.
-    settings: { disableJavaScriptFileLoading: true, disableCSSFileLoading: true },
+    // keeps a stray <script src> or <link> from reaching the network. Nor does one need the page an
+    // iframe shows, which happy-dom would load from the real network too (a YouTube player's embed):
+    // with child-frame navigation off, an iframe only takes its URL. (`disableIframePageLoading`, the
+    // older switch, is deprecated in happy-dom 20 and logs an error for every iframe it stops.)
+    settings: {
+      disableJavaScriptFileLoading: true,
+      disableCSSFileLoading: true,
+      navigation: { disableChildFrameNavigation: true },
+    },
   });
 
   for (const [name, value] of Object.entries({
