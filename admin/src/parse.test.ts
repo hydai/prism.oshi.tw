@@ -49,12 +49,13 @@ function assertError(result: unknown, fieldHint: string, message: string): void 
   );
 }
 
-// --- parseCreateSongBody — mirrors ui/src/pages/SubmitSong.tsx's handleSubmit ---
+// --- parseCreateSongBody — what POST /api/songs reads of a new song ---
 
-function testParseCreateSongBodyAcceptsWhatSubmitSongSends(): void {
-  // SubmitSong.tsx always sends tags: string[] (possibly empty) and, when a
-  // performance row is filled in, extra fields (songId, date, streamTitle,
-  // videoId) that POST /api/songs itself ignores — the parser must too.
+function testParseCreateSongBodyDropsFieldsItDoesNotRead(): void {
+  // POST /api/songs reads a title, an artist and, for each inline performance, a streamId, a
+  // timestamp, an endTimestamp and a note; the stream's date, title and video come from the stream
+  // row. Older clients also sent tags: string[] (possibly empty) and, per performance, songId, date,
+  // streamTitle and videoId — the parser must accept such a body and drop what it does not read.
   const parsed = assertOk(parseCreateSongBody({
     title: 'My Song',
     originalArtist: 'Some Artist',
@@ -70,7 +71,7 @@ function testParseCreateSongBodyAcceptsWhatSubmitSongSends(): void {
         note: '',
       },
     ],
-  }), 'happy path matching SubmitSong.tsx');
+  }), 'happy path with the extra fields older clients sent');
   assertEqual(parsed.title, 'My Song', 'title carried through');
   assertEqual(parsed.performances?.length, 1, 'one inline performance');
   assertEqual(parsed.performances?.[0]?.streamId, 'stream-1', 'streamId kept');
@@ -365,7 +366,7 @@ function testParseCrystalReplyBodyRejectsMalformedShapes(): void {
 }
 
 function main(): void {
-  testParseCreateSongBodyAcceptsWhatSubmitSongSends();
+  testParseCreateSongBodyDropsFieldsItDoesNotRead();
   testParseCreateSongBodyRejectsMalformedShapes();
   testParseUpdateSongBodyAcceptsWhatSongDetailSends();
   testParseUpdateSongBodyRejectsMalformedShapes();

@@ -103,7 +103,8 @@ export interface Stream {
 export interface CreateSongBody {
   title: string;
   originalArtist: string;
-  performances?: CreatePerformanceBody[];
+  /** Performances of streams that already exist. The song they belong to has no id yet, so they carry no `songId`. */
+  performances?: Omit<CreatePerformanceBody, 'songId'>[];
 }
 
 export interface UpdateSongBody {
