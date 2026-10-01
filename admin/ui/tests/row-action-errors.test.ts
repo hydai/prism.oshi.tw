@@ -4,12 +4,13 @@ import { readFileSync } from 'node:fs';
  * Every review page keeps its load error in its own slot, `{list.error`. How a failed row action is
  * reported differs by page while the inbox pages move to the studio kit:
  *
- * - Nova and Nova VODs keep an `actionError` slot beside the load error. The reducer-driven page
+ * - Nova still keeps an `actionError` slot beside the load error. The reducer-driven page
  *   (work-review-state's `actionStarted`) clears the action slot the moment the next action starts,
- *   so a failed approval can never linger over an unrelated, successful one; these hand-written pages
+ *   so a failed approval can never linger over an unrelated, successful one; this hand-written page
  *   must say the same thing.
- * - Crystal has no such slot: a failed reply or status change is a toast raised in the handler's
- *   catch, where the curator is looking. Nothing lingers, so there is nothing to clear.
+ * - Crystal and Nova VODs have no such slot: a failed row action (and, on VODs, a failed song-list
+ *   load) is a toast raised in the handler's catch, where the curator is looking. Nothing lingers,
+ *   so there is nothing to clear.
  */
 
 function assert(condition: boolean, message: string): asserts condition {
@@ -35,8 +36,13 @@ function handlerBody(source: string, page: string, name: string): string {
 const pages: ReadonlyArray<{ page: string; handlers: readonly string[]; failures: 'slot' | 'toast' }> = [
   { page: 'CrystalTickets.tsx', handlers: ['handleReply', 'handleStatusChange'], failures: 'toast' },
   { page: 'NovaSubmissions.tsx', handlers: ['handleAction', 'handleDelete', 'handleFetchAll'], failures: 'slot' },
-  { page: 'NovaVodSubmissions.tsx', handlers: ['handleExpand', 'handleAction', 'handleDelete'], failures: 'slot' },
+  { page: 'NovaVodSubmissions.tsx', handlers: ['handleExpand', 'handleAction', 'handleDelete'], failures: 'toast' },
 ];
+
+/** A handler whose failure toast must carry a fixed text: Chinese chrome stays verbatim. */
+const FAILURE_TEXTS: Readonly<Record<string, string>> = {
+  'NovaVodSubmissions.tsx handleExpand': '無法載入歌曲清單',
+};
 
 for (const { page, handlers, failures } of pages) {
   const source = read(page);
@@ -70,12 +76,14 @@ for (const { page, handlers, failures } of pages) {
     } else {
       const failed = body.indexOf('catch (');
       assert(failed !== -1, `${page}: ${name} handles a failed request`);
-      assert(
-        body.indexOf('toast.error(', failed) !== -1,
-        `${page}: ${name} reports a failed request with toast.error(…) in its catch`,
-      );
+      const reported = body.indexOf('toast.error(', failed);
+      assert(reported !== -1, `${page}: ${name} reports a failed request with toast.error(…) in its catch`);
+      const text = FAILURE_TEXTS[`${page} ${name}`];
+      if (text !== undefined) {
+        assert(body.indexOf(text, reported) !== -1, `${page}: ${name}'s failure toast says ${text}`);
+      }
     }
   }
 }
 
-console.log('✓ a failed row action is reported where its page keeps it: the action-error slot, or a toast on Crystal');
+console.log('✓ a failed row action is reported where its page keeps it: the action-error slot on Nova, a toast on Crystal and Nova VODs');

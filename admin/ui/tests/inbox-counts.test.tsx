@@ -2,6 +2,7 @@ import { act, useEffect, useState, type ReactNode } from 'react';
 import { MemoryRouter } from 'react-router-dom';
 import type { AuthUser, CrystalTicket, NovaSubmission, NovaVodSubmission } from '../../shared/types';
 import { InboxCountsProvider, useInboxCounts, type InboxCounts } from '../src/components/shell/InboxCounts';
+import { ConfirmProvider } from '../src/components/ui/confirm';
 import { ToastProvider } from '../src/components/ui/toast';
 import { click, installDom, mount, settle, typeInto } from './helpers/dom';
 
@@ -201,19 +202,30 @@ function toastMessages(container: HTMLElement): string[] {
     .sort();
 }
 
+/** The detail line of each toast on screen (empty for a toast with none), in the order `toastMessages` lists them. */
+function toastDetails(container: HTMLElement): string[] {
+  const items = Array.from(container.querySelectorAll('section[aria-label="Notifications"] li'));
+  return items
+    .map((item) => ({ message: item.querySelector('p')?.textContent?.trim() ?? '', detail: item.querySelectorAll('p')[1]?.textContent?.trim() ?? '' }))
+    .sort((a, b) => (a.message < b.message ? -1 : a.message > b.message ? 1 : 0))
+    .map((toast) => toast.detail);
+}
+
 /** Mounts an inbox page beside a probe, inside a curator's provider — a router, since the Nova page
- * keeps its filters in the URL, and the toast provider the inbox pages report through — the way App
- * and Layout wrap every page. */
+ * keeps its filters in the URL, and the toast and confirm providers the inbox pages report and ask
+ * through — the way App and Layout wrap every page. */
 async function mountPage(page: ReactNode): Promise<{ container: HTMLElement; unmount: () => Promise<void>; counts: () => Snapshot }> {
   let latestCounts: Snapshot | undefined;
   const mounted = await mount(
     <ToastProvider timers={NO_TIMERS}>
-      <MemoryRouter>
-        <InboxCountsProvider isCurator>
-          <InboxProbe onRender={(snapshot) => { latestCounts = snapshot; }} />
-          {page}
-        </InboxCountsProvider>
-      </MemoryRouter>
+      <ConfirmProvider>
+        <MemoryRouter>
+          <InboxCountsProvider isCurator>
+            <InboxProbe onRender={(snapshot) => { latestCounts = snapshot; }} />
+            {page}
+          </InboxCountsProvider>
+        </MemoryRouter>
+      </ConfirmProvider>
     </ToastProvider>,
   );
   await settle();
@@ -511,7 +523,7 @@ async function main(): Promise<void> {
   const { default: NovaSubmissions } = await import('../src/pages/NovaSubmissions');
   const { default: NovaVodSubmissions } = await import('../src/pages/NovaVodSubmissions');
   const { default: CrystalTickets } = await import('../src/pages/CrystalTickets');
-  // The Nova and VOD deletes still ask through window.confirm.
+  // The Nova delete still asks through window.confirm; the VOD delete asks through the kit confirm.
   window.confirm = () => true;
 
   // Nova: approve one, delete the other, then "Fetch All Channel Info" reloads a list that has
@@ -549,7 +561,8 @@ async function main(): Promise<void> {
   await novaPage.unmount();
   console.log('✓ the Nova inbox reloads its badge after an approval, a delete and its own reload');
 
-  // Nova VODs: approve one, delete the other.
+  // Nova VODs: approve one (a toast names it), then delete the other through the kit confirm: Cancel sends
+  // nothing and keeps the row, Delete sends the request, says so in a toast and reloads the badge.
   requestLog = [];
   setResponse(NOVA_URL, 200, { data: [], total: 0 });
   setResponse(VODS_URL, 200, {
@@ -559,6 +572,7 @@ async function main(): Promise<void> {
   setResponse(CRYSTAL_URL, 200, { data: [], total: 0 });
   const vodPage = await mountPage(<NovaVodSubmissions user={CURATOR} />);
   assert(vodPage.counts().vods === 2, 'VODs: the badge starts at two pending');
+  const vodRequests = (id: string) => requestLog.filter((entry) => entry.startsWith(`/api/nova/vods/${id}`)).length;
 
   const streamAApproved = novaVod({ id: 'v1', stream_title: 'Stream A', status: 'approved' });
   setMutationResponse('PATCH', '/api/nova/vods/v1/status', streamAApproved);
@@ -566,15 +580,49 @@ async function main(): Promise<void> {
   await click(buttonNamed(rowOf(vodPage.container, 'Stream A'), 'Approve'), "Stream A's Approve button");
   assert(callsTo(VODS_URL) === 3, 'an approval reloads the VODs list for the badge, once');
   assert(vodPage.counts().vods === 1, 'VODs: the badge drops to one after an approval');
+  assert(
+    toastMessages(vodPage.container).join('|') === 'VOD approved' && toastDetails(vodPage.container).join('|') === 'Stream A',
+    `an approval toasts "VOD approved", naming the VOD (got ${toastMessages(vodPage.container).join('|')})`,
+  );
 
   setMutationResponse('DELETE', '/api/nova/vods/v2', { ok: true });
   setResponse(VODS_URL, 200, { data: [streamAApproved], total: 1 });
-  await click(buttonNamed(rowOf(vodPage.container, 'Stream B'), 'Delete'), "Stream B's Delete button");
+  const deleteB = buttonNamed(rowOf(vodPage.container, 'Stream B'), 'Delete');
+  assert(deleteB !== undefined, "Stream B's row offers Delete");
+  await act(async () => { deleteB.focus(); });
+  await click(deleteB, "Stream B's Delete button");
+  const confirmDialog = vodPage.container.querySelector<HTMLElement>('dialog[open]');
+  assert(confirmDialog !== null, 'Delete asks through the kit confirm, not window.confirm');
+  assert(
+    (confirmDialog.textContent ?? '').includes('v2') && (confirmDialog.textContent ?? '').includes('Stream B'),
+    'the confirm names the VOD: its id and its title',
+  );
+  assert(vodRequests('v2') === 0 && callsTo(VODS_URL) === 3, 'asking sends nothing');
+
+  await click(buttonNamed(confirmDialog, 'Cancel'), "the confirm's Cancel button");
+  assert(vodPage.container.querySelector('dialog[open]') === null, 'Cancel closes the confirm');
+  assert(vodRequests('v2') === 0, 'Cancel sends no request');
+  assert(callsTo(VODS_URL) === 3 && vodPage.counts().vods === 1, 'Cancel reloads nothing and leaves the badge alone');
+  assert(vodPage.container.querySelector('button[aria-label="展開 Stream B"]') !== null, 'Cancel keeps the row');
+  assert(document.activeElement === deleteB, "Cancel leaves the focus on the row's Delete control");
+  assert(toastMessages(vodPage.container).join('|') === 'VOD approved', 'Cancel toasts nothing');
+
+  await click(deleteB, "Stream B's Delete button, again");
+  const confirmAgain = vodPage.container.querySelector<HTMLElement>('dialog[open]');
+  assert(confirmAgain !== null, 'Delete asks again');
+  await click(buttonNamed(confirmAgain, 'Delete'), "the confirm's own Delete button");
+  assert(vodRequests('v2') === 1, 'confirming sends exactly one DELETE');
   assert(callsTo(VODS_URL) === 4, 'a delete reloads the VODs list for the badge, once');
   assert(vodPage.counts().vods === 0, 'VODs: the badge drops to zero after deleting the last pending one');
+  assert(vodPage.container.querySelector('button[aria-label="展開 Stream B"]') === null, 'the deleted row is gone');
+  assert(
+    toastMessages(vodPage.container).join('|') === 'VOD approved|VOD deleted' &&
+      toastDetails(vodPage.container).join('|') === 'Stream A|Stream B',
+    `a delete toasts "VOD deleted", naming the VOD (got ${toastMessages(vodPage.container).join('|')})`,
+  );
   assert(callsTo(NOVA_URL) === 1 && callsTo(CRYSTAL_URL) === 1, 'no VOD action reloads another inbox');
   await vodPage.unmount();
-  console.log('✓ the Nova VOD inbox reloads its badge after an approval and a delete');
+  console.log('✓ the Nova VOD inbox reloads its badge after an approval and a confirmed delete; Cancel sends nothing');
 
   // Crystal: a reply marks its ticket replied (the worker's replyToTicket); Close closes the other.
   // Each of them says how it went in a toast, and a refused reply leaves the badge alone.
