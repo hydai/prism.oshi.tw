@@ -1,4 +1,5 @@
 import { isKnownTagId, normalizeTags, tagsByCategory } from '../../../../lib/tags';
+import { MICRO_LABEL } from './ui/micro-label';
 
 interface TagPickerProps {
   value: string[];
@@ -26,7 +27,7 @@ export default function TagPicker({ value, onChange, disabled = false }: TagPick
     <div className="space-y-2.5" data-testid="tag-picker">
       {tagsByCategory().map(({ category, tags }) => (
         <fieldset key={category.id}>
-          <legend className="mb-1.5 text-2xs font-bold uppercase tracking-[0.12em] text-fg-subtle">
+          <legend className={`mb-1.5 ${MICRO_LABEL}`}>
             {category.label}
           </legend>
           <div className="flex flex-wrap gap-1.5">

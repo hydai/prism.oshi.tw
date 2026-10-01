@@ -3,10 +3,9 @@ import type { StampPerformance } from '../../../../shared/types';
 import { formatTimestamp } from '../../lib/format-timestamp';
 import { PlaybackTime } from '../PlaybackTime';
 import { Kbd } from '../ui/Display';
+import { MICRO_LABEL } from '../ui/micro-label';
 
 type ConsolePerformance = Pick<StampPerformance, 'title' | 'timestamp' | 'endTimestamp'>;
-
-const LABEL_CLASSES = 'text-2xs font-bold uppercase tracking-[0.1em] text-fg-subtle';
 
 function SlotAction({
   label,
@@ -49,7 +48,7 @@ function Slot({ label, hot = false, actions, children }: { label: string; hot?: 
         hot ? 'border-hot-line' : 'border-field-line'
       }`}
     >
-      <span className={LABEL_CLASSES}>{label}</span>
+      <span className={MICRO_LABEL}>{label}</span>
       <div className={`font-mono text-[16px] font-semibold ${hot ? 'text-accent-fg' : 'text-fg'}`}>{children}</div>
       {/* Wraps rather than spilling out of a narrow slot (a 1024 px workbench column); on a phone
           both slots stack their actions, so Start and End stay the same shape. */}
@@ -85,7 +84,7 @@ export function StampConsole({
     // Below lg (the stacked, phone layout) Now takes its own line and Start / End share the next.
     <div className="flex items-stretch gap-2.5 px-3.5 py-3 max-lg:flex-wrap">
       <div className="flex min-w-0 flex-[1.25] flex-col justify-center max-lg:basis-full">
-        <span className={LABEL_CLASSES}>Now</span>
+        <span className={MICRO_LABEL}>Now</span>
         <PlaybackTime className="mt-0.5 font-mono text-[28px] font-semibold leading-[1.05] tracking-[-0.02em] text-fg" />
         {performance ? (
           <div className="mt-1 truncate text-token-sm text-fg-muted">

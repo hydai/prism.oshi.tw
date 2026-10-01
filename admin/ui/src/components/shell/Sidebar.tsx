@@ -4,12 +4,13 @@ import type { AuthUser } from '../../../../shared/types';
 import { getNavGroups, type NavGroupItem } from '../../lib/navigation';
 import { IconButton } from '../ui/Button';
 import { Icon, Sparkle } from '../ui/Icon';
+import { MICRO_LABEL } from '../ui/micro-label';
 import { ThemeToggle } from '../ui/ThemeToggle';
 import { useInboxCounts, type InboxCounts } from './InboxCounts';
 import { NewMenu } from './NewMenu';
 import { StreamerSwitcher } from './StreamerSwitcher';
 
-const GROUP_LABEL_CLASSES = 'px-2.5 pb-1 pt-[11px] text-2xs font-bold uppercase tracking-[0.12em] text-fg-subtle';
+const GROUP_LABEL_CLASSES = `px-2.5 pb-1 pt-[11px] ${MICRO_LABEL}`;
 
 const LINK_CLASSES =
   'relative flex h-[29px] items-center gap-[9px] rounded-[10px] px-2.5 text-[12.5px] transition-colors focus-visible:outline-none focus-visible:shadow-focus';

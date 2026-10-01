@@ -10,6 +10,7 @@ import { useCurrentStreamerName } from '../components/shell/Streamers';
 import { Button } from '../components/ui/Button';
 import { EmptyState, GlassCard, Skeleton } from '../components/ui/Display';
 import { Icon } from '../components/ui/Icon';
+import { MICRO_LABEL } from '../components/ui/micro-label';
 import { PageHeader } from '../components/ui/PageHeader';
 import { Pill, StatusPill } from '../components/ui/Pill';
 import { HeadCell, Table, TableEmptyRow, THead } from '../components/ui/Table';
@@ -529,7 +530,7 @@ export default function Dashboard({ user }: { user: AuthUser }) {
 
       <div className="flex flex-col gap-3 p-4 lg:px-5 lg:pb-[18px]">
         <section className="flex flex-col gap-3">
-          <h2 className="text-2xs font-bold uppercase tracking-[0.12em] text-fg-subtle">Needs attention</h2>
+          <h2 className={MICRO_LABEL}>Needs attention</h2>
           {/* A curator's five cards: two to a row on a phone, three from lg, all five in one row from
               xl. A contributor's two share one row at every width, with no empty third column. */}
           <ul className={`grid grid-cols-2 gap-3${isCurator ? ' lg:grid-cols-3 xl:grid-cols-5' : ''}`}>

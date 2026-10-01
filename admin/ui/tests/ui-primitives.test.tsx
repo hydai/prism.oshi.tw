@@ -2513,6 +2513,73 @@ async function main(): Promise<void> {
     console.log('✓ MICRO_LABEL: the uppercase micro label in one place, worn by the page header crumb, DetailField, SectionLabel and the Streams and Crystal filter-group labels');
   }
 
+  // --- MICRO_LABEL everywhere: no site spells its classes by hand ---
+
+  {
+    const { readdirSync, readFileSync } = await import('node:fs');
+    const { MICRO_LABEL, MICRO_LABEL_TYPE } = await import('../src/components/ui/micro-label');
+    const { default: TagPicker } = await import('../src/components/TagPicker');
+    const { StampConsole } = await import('../src/components/workbench/StampConsole');
+    const noop = () => undefined;
+    const escapeRegExp = (text: string) => text.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+
+    // A table head wears the micro label's type and takes its colour from the head, so the type has a home of its own.
+    assert(MICRO_LABEL_TYPE === 'text-2xs font-bold uppercase tracking-[0.12em]', "the micro label's type is 9.5px bold uppercase text, tracked 0.12em");
+    assert(MICRO_LABEL === `${MICRO_LABEL_TYPE} text-fg-subtle`, 'the micro label is that type in the subtle colour');
+
+    // The classes (and the 0.1x em letter-spacing a near-copy spells) are written in micro-label.ts alone.
+    const src = new URL('../src/', import.meta.url);
+    const spellers: string[] = [];
+    for (const entry of readdirSync(src, { recursive: true, encoding: 'utf8' })) {
+      if (!entry.endsWith('.ts') && !entry.endsWith('.tsx')) continue;
+      const source = readFileSync(new URL(entry, src), 'utf8');
+      if (source.includes('text-2xs font-bold uppercase') || /tracking-\[0\.1\d*em\]/.test(source)) spellers.push(entry);
+    }
+    assert(
+      spellers.join() === 'components/ui/micro-label.ts',
+      `the micro label's classes are spelled in micro-label.ts alone, every other site takes MICRO_LABEL (also spelled in: ${spellers.filter((file) => file !== 'components/ui/micro-label.ts').join(', ')})`,
+    );
+
+    // What each site renders: the exact copies wear the label itself, the variants the label after their own classes.
+    const classOf = (html: string, text: string) => new RegExp(`class="([^"]*)"[^>]*>${text}<`).exec(html)?.[1];
+    assert(classOf(renderToStaticMarkup(<StatTile label="Global works" value="4,401" />), 'Global works') === MICRO_LABEL, "a stat tile's label is the micro label");
+    // One legend per tag group, however many groups lib/tags.ts has: each is the micro label after its own margin.
+    const tagPicker = renderToStaticMarkup(<TagPicker value={[]} onChange={noop} />);
+    const legendClasses = Array.from(tagPicker.matchAll(/<legend class="([^"]*)"/g), (match) => match[1]);
+    assert(
+      legendClasses.length > 0 &&
+        legendClasses.length === (tagPicker.match(/<fieldset/g) ?? []).length &&
+        legendClasses.every((classes) => classes === `mb-1.5 ${MICRO_LABEL}`),
+      `every tag group's legend is the micro label after its own margin (got: ${legendClasses.join(' | ')})`,
+    );
+    const stampConsole = renderToStaticMarkup(
+      <StampConsole performance={{ title: 'Lemon', timestamp: 65, endTimestamp: null }} index={0} onSetStart={noop} onMarkEnd={noop} onSeekStart={noop} onSeekEnd={noop} />,
+    );
+    assert(
+      ['Now', 'Start', 'End'].every((label) => classOf(stampConsole, label) === MICRO_LABEL),
+      "the stamp console's Now, Start and End labels are the micro label",
+    );
+    const heads = renderToStaticMarkup(
+      <Table>
+        <THead>
+          <tr>
+            <HeadCell>Tags</HeadCell>
+            <SortHeader label="Title" field="title" activeField="title" direction="asc" onSort={noop} />
+            <SortHeader label="Artist" field="artist" activeField="title" direction="asc" onSort={noop} />
+          </tr>
+        </THead>
+      </Table>,
+    );
+    assert((heads.match(/<th[^>]*scope="col"[^>]*class="[^"]*"/g) ?? []).length === 3, 'the table renders three heads');
+    assert(heads.includes(` ${MICRO_LABEL} text-left`), 'a plain head wears the micro label (type and subtle colour)');
+    assert(
+      (heads.match(new RegExp(`gap-1 ${escapeRegExp(MICRO_LABEL_TYPE)} transition-colors`, 'g')) ?? []).length === 2,
+      "a sortable head's button wears the micro label's type and chooses its colour by whether the column is active",
+    );
+
+    console.log('✓ MICRO_LABEL everywhere: its classes are written once, and the stat tile, tag legends, stamp console and table heads wear it');
+  }
+
   // --- Field: a label, the page's control, a hint and an error, tied together by ids ---
 
   {

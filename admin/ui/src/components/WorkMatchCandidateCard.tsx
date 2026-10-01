@@ -8,6 +8,7 @@ import { Button } from './ui/Button';
 import { GlassCard } from './ui/Display';
 import { Textarea } from './ui/Fields';
 import { Icon } from './ui/Icon';
+import { MICRO_LABEL } from './ui/micro-label';
 import { Note } from './ui/Note';
 import { Pill, type Tone } from './ui/Pill';
 
@@ -16,9 +17,6 @@ const REASON_LABELS: Record<WorkMatchReason, string> = {
   punctuation_spacing: 'Punctuation / spacing',
   diacritic_variant: 'Latin diacritic variant',
 };
-
-/** The mockup's `.dlabel`: a small uppercase section label. */
-const SECTION_LABEL = 'text-2xs font-bold uppercase tracking-[0.1em] text-fg-subtle';
 
 /** A bold count and its noun, singular for one. */
 function Counted({ count, one, many }: { count: number; one: string; many: string }) {
@@ -168,7 +166,7 @@ export default function WorkMatchCandidateCard({
       <fieldset className="flex min-w-0 flex-col gap-2">
         <legend className="sr-only">Choose the canonical global work</legend>
         {/* The legend names the group for assistive tech; this is its visible twin. */}
-        <p aria-hidden="true" className={SECTION_LABEL}>
+        <p aria-hidden="true" className={MICRO_LABEL}>
           Keep which work identity?
         </p>
         {candidate.works.map((work) => {
@@ -243,7 +241,7 @@ export default function WorkMatchCandidateCard({
       ) : null}
 
       <label className="flex flex-col gap-1.5">
-        <span className={SECTION_LABEL}>
+        <span className={MICRO_LABEL}>
           Review note{' '}
           <span className="font-medium normal-case tracking-normal">(optional — saved with the decision or merge)</span>
         </span>
