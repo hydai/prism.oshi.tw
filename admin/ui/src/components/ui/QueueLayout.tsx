@@ -1,6 +1,7 @@
 import { useLayoutEffect, useRef, type ReactNode } from 'react';
 import { useQueueNavigation } from '../../hooks/useQueueNavigation';
 import { GlassCard, Kbd } from './Display';
+import { INSET_FOCUS } from './focus-classes';
 
 /**
  * A review queue (spec §5, §8.6, §8.7; the mockup's master–detail): a list card of items beside the
@@ -127,7 +128,7 @@ export function QueueLayout<T>({
                     aria-current={selected ? 'true' : undefined}
                     data-decided={decided ? 'true' : undefined}
                     onClick={() => onSelect(key)}
-                    className={`flex w-full flex-col gap-[3px] px-3.5 py-[9px] text-left transition-colors focus-visible:shadow-[inset_0_0_0_2px_var(--accent-fg)] ${
+                    className={`flex w-full flex-col gap-[3px] px-3.5 py-[9px] text-left transition-colors ${INSET_FOCUS} ${
                       selected ? 'bg-selected shadow-[inset_3px_0_0_var(--nav-active-icon)]' : 'hover:bg-row-hover'
                     }`}
                   >

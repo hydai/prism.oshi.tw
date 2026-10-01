@@ -13,6 +13,7 @@ import { act } from 'react';
 import { renderToStaticMarkup } from 'react-dom/server';
 import { MemoryRouter, Route, Routes } from 'react-router-dom';
 import type { AuthUser, NovaStatus, NovaVodSong, NovaVodSubmission } from '../../shared/types';
+import { INSET_FOCUS } from '../src/components/ui/focus-classes';
 import { MICRO_LABEL } from '../src/components/ui/micro-label';
 import { TONE_BOX_CLASS } from '../src/components/ui/pill-core';
 import { formatFullTime, formatWhen, storedTimeIso } from '../src/lib/dates';
@@ -33,9 +34,6 @@ function assertNoRawColour(html: string, what: string): void {
   assert(!NO_RAW_PALETTE.test(html), `${what} uses no raw palette classes`);
   assert(!NO_ARBITRARY_HEX.test(html), `${what} uses no arbitrary hex colours`);
 }
-
-/** The kit's focus ring for a control that spans a clipping card edge to edge: inside it (FindingsPanel's INSET_FOCUS). */
-const INSET_FOCUS = 'focus-visible:shadow-[inset_0_0_0_2px_var(--accent-fg)]';
 
 // --- Fixtures ---
 
