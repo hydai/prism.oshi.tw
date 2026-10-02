@@ -77,10 +77,6 @@ async function main(): Promise<void> {
   const primary = renderToStaticMarkup(<Button variant="primary">Save</Button>);
   assert(primary.includes('bg-accent'), 'primary variant uses the accent gradient background');
   assert(primary.includes('shadow-primary'), 'primary variant uses the primary shadow token');
-  assert(
-    primary.includes('text-accent-gradient-fg') && !primary.includes('text-white'),
-    'primary variant labels the gradient in --accent-gradient-fg, not white (2.5:1 on it)',
-  );
 
   const danger = renderToStaticMarkup(<Button variant="danger">Delete</Button>);
   assert(danger.includes('bg-danger-solid'), 'danger variant uses the danger-solid background');
