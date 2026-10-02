@@ -16,6 +16,22 @@
     ]
   },
   {
+    "id": "song-330686d9-f7c5-472d-a890-ea0a891e7867",
+    "workId": "work-3bdea311-907d-4938-b146-e46c5fc9a790",
+    "title": "一拜天地",
+    "originalArtist": "不是Av的Ay君&暢暢醬",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-99815e22-9173-46c3-a212-e86757c5cb2c",
+        "streamId": "stream-2026-09-30",
+        "videoId": "y0X6aPrHk4g",
+        "timestamp": 194,
+        "endTimestamp": 523
+      }
+    ]
+  },
+  {
     "id": "song-796a90fb-7e52-40d0-ac6d-46079b0b8b02",
     "workId": "work-song-86d1488e",
     "title": "一個人想著一個人",
@@ -199,6 +215,13 @@
     "tags": [],
     "performances": [
       {
+        "id": "p-265805c0-7448-4dc5-8aa2-571b5a924c2c",
+        "streamId": "stream-2026-09-30",
+        "videoId": "y0X6aPrHk4g",
+        "timestamp": 1797,
+        "endTimestamp": 1971
+      },
+      {
         "id": "p-b28ba864-a3ee-40dd-9a58-2d9d13c188b5",
         "streamId": "stream-2026-06-10",
         "videoId": "cKzrbehaWUU",
@@ -214,6 +237,13 @@
     "originalArtist": "黃詩扶",
     "tags": [],
     "performances": [
+      {
+        "id": "p-e3f7d6d9-2bee-4133-a091-db21ea27b28c",
+        "streamId": "stream-2026-09-30",
+        "videoId": "y0X6aPrHk4g",
+        "timestamp": 4098,
+        "endTimestamp": 4291
+      },
       {
         "id": "p-e4ecd7de-ad3b-48f6-9e8b-7fb2a7a71cf4",
         "streamId": "stream-b791bdb9-7f5a-43fa-8602-77bfa9746e3a",
@@ -351,6 +381,13 @@
     "originalArtist": "倫桑",
     "tags": [],
     "performances": [
+      {
+        "id": "p-5a71424d-d39a-4af2-96cd-49649f1e1506",
+        "streamId": "stream-2026-09-30",
+        "videoId": "y0X6aPrHk4g",
+        "timestamp": 5442,
+        "endTimestamp": 5683
+      },
       {
         "id": "p-02b410fa-902f-41ba-ad4f-249675aacbfb",
         "streamId": "stream-2026-07-22",
@@ -696,6 +733,13 @@
     "tags": [],
     "performances": [
       {
+        "id": "p-ba859249-a3e2-491c-a92e-3f3589a5bed6",
+        "streamId": "stream-2026-09-30",
+        "videoId": "y0X6aPrHk4g",
+        "timestamp": 3269,
+        "endTimestamp": 3445
+      },
+      {
         "id": "p-83241ff8-1364-46ef-b5ab-4b7309558b23",
         "streamId": "stream-8e950518-f22d-49f9-b20e-67eff2af5210",
         "videoId": "f69M8rbw2Cc",
@@ -901,6 +945,13 @@
     "originalArtist": "Winky詩",
     "tags": [],
     "performances": [
+      {
+        "id": "p-a4d3a827-9a3a-4085-b5c1-9f92ccb30e80",
+        "streamId": "stream-2026-09-30",
+        "videoId": "y0X6aPrHk4g",
+        "timestamp": 6697,
+        "endTimestamp": 6938
+      },
       {
         "id": "p-69909718-5223-434f-a246-97fa06ec64d4",
         "streamId": "stream-2026-08-25",
@@ -1471,6 +1522,22 @@
     ]
   },
   {
+    "id": "song-4969ebee-3782-4ce7-8926-087b04238021",
+    "workId": "work-80da67e1-afb5-4bdc-a0ae-01c30daa83c7",
+    "title": "青玉案",
+    "originalArtist": "雲之泣",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-c9f6993b-14d8-4828-9a7e-adde42a50a4d",
+        "streamId": "stream-2026-09-30",
+        "videoId": "y0X6aPrHk4g",
+        "timestamp": 2730,
+        "endTimestamp": 3023
+      }
+    ]
+  },
+  {
     "id": "song-c378ec34-f93a-4281-a8f8-fd1e4cd8ccc0",
     "workId": "work-98c95c2b-dea0-4e5c-bd92-b0c5ef0ae210",
     "title": "青鸞",
@@ -1726,6 +1793,13 @@
     "originalArtist": "排骨教主",
     "tags": [],
     "performances": [
+      {
+        "id": "p-ee11ea54-6c2f-4f36-b4ef-5eddd0965671",
+        "streamId": "stream-2026-09-30",
+        "videoId": "y0X6aPrHk4g",
+        "timestamp": 1198,
+        "endTimestamp": 1427
+      },
       {
         "id": "p-2bc581ca-a525-4053-a8e1-480a4951bda6",
         "streamId": "stream-2026-08-19",
@@ -2196,6 +2270,13 @@
     "tags": [],
     "performances": [
       {
+        "id": "p-f9d16e1e-dc61-4bb8-913f-5247c74a76ad",
+        "streamId": "stream-2026-09-30",
+        "videoId": "y0X6aPrHk4g",
+        "timestamp": 3572,
+        "endTimestamp": 3786
+      },
+      {
         "id": "p-5ae48ee1-cace-449b-bf0f-8c95198c7cc2",
         "streamId": "stream-8e950518-f22d-49f9-b20e-67eff2af5210",
         "videoId": "f69M8rbw2Cc",
@@ -2356,6 +2437,22 @@
     ]
   },
   {
+    "id": "song-f3b83e68-12fa-4a1f-9f10-5055c977e790",
+    "workId": "work-9665c507-d7e4-4c64-b499-c69e8e1974d7",
+    "title": "莫問歸期",
+    "originalArtist": "蔣雪兒",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-7076135b-f595-446a-b3d1-155c684b5d97",
+        "streamId": "stream-2026-09-30",
+        "videoId": "y0X6aPrHk4g",
+        "timestamp": 5739,
+        "endTimestamp": 5955
+      }
+    ]
+  },
+  {
     "id": "song-9cbc5ce9-43bc-4727-81c5-867696cc5e52",
     "workId": "work-song-1295",
     "title": "酔いどれ知らず",
@@ -2475,6 +2572,22 @@
         "videoId": "cKzrbehaWUU",
         "timestamp": 4853,
         "endTimestamp": 5142
+      }
+    ]
+  },
+  {
+    "id": "song-ef6bce0b-917b-4b6d-91c6-da2c78aa9e8c",
+    "workId": "work-017c90f5-e337-41a0-b563-9d97fc87649f",
+    "title": "棲凰",
+    "originalArtist": "星塵",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-d40cf4db-fdc9-4bda-9e64-8b984d3cfe67",
+        "streamId": "stream-2026-09-30",
+        "videoId": "y0X6aPrHk4g",
+        "timestamp": 6119,
+        "endTimestamp": 6327
       }
     ]
   },
@@ -3130,6 +3243,22 @@
     ]
   },
   {
+    "id": "song-29a7cb61-f786-4916-98ae-6b03f869ba89",
+    "workId": "work-baad7f0e-358e-4166-b146-df3603e7ea53",
+    "title": "戲紅妝",
+    "originalArtist": "清水er",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-6cf946cb-d0ed-4fa8-a993-b61968cad437",
+        "streamId": "stream-2026-09-30",
+        "videoId": "y0X6aPrHk4g",
+        "timestamp": 2265,
+        "endTimestamp": 2507
+      }
+    ]
+  },
+  {
     "id": "song-0e3a5a90-07c4-4768-900d-3f14fb51e0d2",
     "workId": "work-6338c519-b295-460d-b075-0f9370472012",
     "title": "繁花",
@@ -3207,6 +3336,13 @@
     "originalArtist": "星塵",
     "tags": [],
     "performances": [
+      {
+        "id": "p-c355a149-2664-43f8-8f1a-b89d12394c0f",
+        "streamId": "stream-2026-09-30",
+        "videoId": "y0X6aPrHk4g",
+        "timestamp": 4528,
+        "endTimestamp": 4784
+      },
       {
         "id": "p-515fcbd1-0725-4d3d-97d3-b93d0a90fd0c",
         "streamId": "stream-2026-08-19",
