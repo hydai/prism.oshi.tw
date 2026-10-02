@@ -1513,6 +1513,13 @@
     ],
     "performances": [
       {
+        "id": "p-9b0596d5",
+        "streamId": "stream-2026-02-21",
+        "videoId": "NqWOS_B22T4",
+        "timestamp": 6382,
+        "endTimestamp": 6620
+      },
+      {
         "id": "p1065-1",
         "streamId": "stream-2022-12-20",
         "videoId": "LWF_qLl2Okc",
@@ -1525,24 +1532,6 @@
         "videoId": "YzdP6R1zXr0",
         "timestamp": 682,
         "endTimestamp": 916
-      }
-    ]
-  },
-  {
-    "id": "song-558e64d7",
-    "workId": "work-song-558e64d7",
-    "title": "上弦の月",
-    "originalArtist": "黒うさP",
-    "tags": [
-      "language:ja"
-    ],
-    "performances": [
-      {
-        "id": "p-9b0596d5",
-        "streamId": "stream-2026-02-21",
-        "videoId": "NqWOS_B22T4",
-        "timestamp": 6382,
-        "endTimestamp": 6620
       }
     ]
   },
@@ -1690,7 +1679,8 @@
     "title": "千本桜",
     "originalArtist": "黒うさP",
     "tags": [
-      "language:ja"
+      "language:ja",
+      "source:vocaloid"
     ],
     "performances": [
       {
@@ -1706,6 +1696,20 @@
         "videoId": "X3LiSXUiB9Y",
         "timestamp": 8197,
         "endTimestamp": 8551
+      },
+      {
+        "id": "p2565-2",
+        "streamId": "stream-2025-04-05",
+        "videoId": "DC9r_aGs0jY",
+        "timestamp": 1590,
+        "endTimestamp": 1831
+      },
+      {
+        "id": "p2565-1",
+        "streamId": "stream-2024-12-18",
+        "videoId": "wpMQnPLDkWo",
+        "timestamp": 2987,
+        "endTimestamp": 3228
       },
       {
         "id": "p107-4",
@@ -1734,32 +1738,6 @@
         "videoId": "YzdP6R1zXr0",
         "timestamp": 6030,
         "endTimestamp": 6272
-      }
-    ]
-  },
-  {
-    "id": "song-2565",
-    "workId": "work-song-2565",
-    "title": "千本桜",
-    "originalArtist": "初音ミク",
-    "tags": [
-      "language:ja",
-      "source:vocaloid"
-    ],
-    "performances": [
-      {
-        "id": "p2565-2",
-        "streamId": "stream-2025-04-05",
-        "videoId": "DC9r_aGs0jY",
-        "timestamp": 1590,
-        "endTimestamp": 1831
-      },
-      {
-        "id": "p2565-1",
-        "streamId": "stream-2024-12-18",
-        "videoId": "wpMQnPLDkWo",
-        "timestamp": 2987,
-        "endTimestamp": 3228
       }
     ]
   },
@@ -3064,45 +3042,25 @@
     ],
     "performances": [
       {
-        "id": "p1106-1",
-        "streamId": "stream-2022-01-04",
-        "videoId": "gWJoAoW8sIA",
-        "timestamp": 4156,
-        "endTimestamp": 4371
-      }
-    ]
-  },
-  {
-    "id": "song-207",
-    "workId": "work-song-207",
-    "title": "六兆年と一夜物語",
-    "originalArtist": "Ayasa",
-    "tags": [
-      "language:ja"
-    ],
-    "performances": [
+        "id": "p-9d2da33a-64f9-4e18-b91d-a51466b95219",
+        "streamId": "stream-809067fa-bf1a-4b48-891a-a26c9b8183c5",
+        "videoId": "KMUOeu6JgyY",
+        "timestamp": 3466,
+        "endTimestamp": 3679
+      },
       {
         "id": "p207-1",
         "streamId": "stream-2026-02-01",
         "videoId": "u3s--W56f8Q",
         "timestamp": 425,
         "endTimestamp": 638
-      }
-    ]
-  },
-  {
-    "id": "song-f61900e7-9c7e-4eea-978b-9121e268f4ec",
-    "workId": "work-f97f6179-0f22-4e80-b5fd-1ba3189f7896",
-    "title": "六兆年と一夜物語",
-    "originalArtist": "IA",
-    "tags": [],
-    "performances": [
+      },
       {
-        "id": "p-9d2da33a-64f9-4e18-b91d-a51466b95219",
-        "streamId": "stream-809067fa-bf1a-4b48-891a-a26c9b8183c5",
-        "videoId": "KMUOeu6JgyY",
-        "timestamp": 3466,
-        "endTimestamp": 3679
+        "id": "p1106-1",
+        "streamId": "stream-2022-01-04",
+        "videoId": "gWJoAoW8sIA",
+        "timestamp": 4156,
+        "endTimestamp": 4371
       }
     ]
   },
@@ -11258,27 +11216,18 @@
     "tags": [],
     "performances": [
       {
-        "id": "p161-1",
-        "streamId": "stream-2021-09-21",
-        "videoId": "YzdP6R1zXr0",
-        "timestamp": 5160,
-        "endTimestamp": 5386
-      }
-    ]
-  },
-  {
-    "id": "song-2918",
-    "workId": "work-song-2918",
-    "title": "私奔到月球",
-    "originalArtist": "五月天 & 陳綺貞",
-    "tags": [],
-    "performances": [
-      {
         "id": "p2918-1",
         "streamId": "stream-2025-05-18",
         "videoId": "989peXGhB7I",
         "timestamp": 3498,
         "endTimestamp": 3722
+      },
+      {
+        "id": "p161-1",
+        "streamId": "stream-2021-09-21",
+        "videoId": "YzdP6R1zXr0",
+        "timestamp": 5160,
+        "endTimestamp": 5386
       }
     ]
   },
@@ -11465,10 +11414,12 @@
   },
   {
     "id": "song-eb6d90cf-48d1-4e86-8947-cfb9456aeeff",
-    "workId": "work-998f888c-9997-40e8-97d5-d405cd893f63",
+    "workId": "work-song-2279",
     "title": "言って",
     "originalArtist": "ヨルシカ",
-    "tags": [],
+    "tags": [
+      "language:ja"
+    ],
     "performances": [
       {
         "id": "p-ebf4d6c6-825f-40fb-8b97-156b9dc8a2b0",
@@ -16444,29 +16395,18 @@
         "endTimestamp": 5358
       },
       {
-        "id": "p173-1",
-        "streamId": "stream-2021-09-25",
-        "videoId": "118QO6j68xM",
-        "timestamp": 5191,
-        "endTimestamp": 5497
-      }
-    ]
-  },
-  {
-    "id": "song-923",
-    "workId": "work-song-923",
-    "title": "紅蓮の弓矢",
-    "originalArtist": "Revo",
-    "tags": [
-      "language:ja"
-    ],
-    "performances": [
-      {
         "id": "p923-1",
         "streamId": "stream-2022-09-17",
         "videoId": "_HyTBObEVI4",
         "timestamp": 366,
         "endTimestamp": 676
+      },
+      {
+        "id": "p173-1",
+        "streamId": "stream-2021-09-25",
+        "videoId": "118QO6j68xM",
+        "timestamp": 5191,
+        "endTimestamp": 5497
       }
     ]
   },
@@ -17510,47 +17450,25 @@
     ],
     "performances": [
       {
-        "id": "p1641-1",
-        "streamId": "stream-2023-04-27",
-        "videoId": "yt902R2UbDg",
-        "timestamp": 3245,
-        "endTimestamp": 3566
-      }
-    ]
-  },
-  {
-    "id": "song-3083",
-    "workId": "work-song-2750",
-    "title": "恋におちて- Fall in love -",
-    "originalArtist": "小林明子",
-    "tags": [
-      "language:ja"
-    ],
-    "performances": [
-      {
         "id": "p3083-1",
         "streamId": "stream-2025-10-11",
         "videoId": "GECppfichf8",
         "timestamp": 9802,
         "endTimestamp": 10123
-      }
-    ]
-  },
-  {
-    "id": "song-2750",
-    "workId": "work-song-2750",
-    "title": "恋におちて-Fall in Love-",
-    "originalArtist": "小林明子",
-    "tags": [
-      "language:ja"
-    ],
-    "performances": [
+      },
       {
         "id": "p2750-1",
         "streamId": "stream-2025-03-13",
         "videoId": "NZ9Boq4dP3M",
         "timestamp": 6194,
         "endTimestamp": 6515
+      },
+      {
+        "id": "p1641-1",
+        "streamId": "stream-2023-04-27",
+        "videoId": "yt902R2UbDg",
+        "timestamp": 3245,
+        "endTimestamp": 3566
       }
     ]
   },
@@ -21105,22 +21023,6 @@
     ]
   },
   {
-    "id": "song-1301",
-    "workId": "work-song-1301",
-    "title": "牽絲戲",
-    "originalArtist": "Aki阿杰-銀臨",
-    "tags": [],
-    "performances": [
-      {
-        "id": "p1301-1",
-        "streamId": "stream-2022-08-22",
-        "videoId": "CA6Lg5JYs18",
-        "timestamp": 8411,
-        "endTimestamp": 8650
-      }
-    ]
-  },
-  {
     "id": "song-2882",
     "workId": "work-song-2882",
     "title": "牽絲戲",
@@ -21133,16 +21035,14 @@
         "videoId": "T-z1nWx6scU",
         "timestamp": 823,
         "endTimestamp": 1062
-      }
-    ]
-  },
-  {
-    "id": "song-710",
-    "workId": "work-song-710",
-    "title": "牽絲戲",
-    "originalArtist": "Vagary-銀臨",
-    "tags": [],
-    "performances": [
+      },
+      {
+        "id": "p1301-1",
+        "streamId": "stream-2022-08-22",
+        "videoId": "CA6Lg5JYs18",
+        "timestamp": 8411,
+        "endTimestamp": 8650
+      },
       {
         "id": "p710-1",
         "streamId": "stream-2022-03-19",
@@ -24236,32 +24136,7 @@
     ]
   },
   {
-    "id": "song-1077",
-    "workId": "work-song-1077",
-    "title": "新宝島",
-    "originalArtist": "サカナクション",
-    "tags": [
-      "language:ja"
-    ],
-    "performances": [
-      {
-        "id": "p1077-1",
-        "streamId": "stream-2022-12-20",
-        "videoId": "LWF_qLl2Okc",
-        "timestamp": 7866,
-        "endTimestamp": 8118
-      },
-      {
-        "id": "p1077-2",
-        "streamId": "stream-2022-07-31",
-        "videoId": "3vyvJLbaAEk",
-        "timestamp": 10236,
-        "endTimestamp": 10488
-      }
-    ]
-  },
-  {
-    "id": "song-2781",
+    "id": "song-731",
     "workId": "work-song-1077",
     "title": "新宝島",
     "originalArtist": "サカナクション",
@@ -24275,18 +24150,21 @@
         "videoId": "bTbqEJt-cE8",
         "timestamp": 20248,
         "endTimestamp": 20554
-      }
-    ]
-  },
-  {
-    "id": "song-731",
-    "workId": "work-song-1077",
-    "title": "新宝島",
-    "originalArtist": "サカナクション",
-    "tags": [
-      "language:ja"
-    ],
-    "performances": [
+      },
+      {
+        "id": "p1077-1",
+        "streamId": "stream-2022-12-20",
+        "videoId": "LWF_qLl2Okc",
+        "timestamp": 7866,
+        "endTimestamp": 8118
+      },
+      {
+        "id": "p1077-2",
+        "streamId": "stream-2022-07-31",
+        "videoId": "3vyvJLbaAEk",
+        "timestamp": 10236,
+        "endTimestamp": 10488
+      },
       {
         "id": "p731-2",
         "streamId": "stream-2022-03-25",
@@ -24428,14 +24306,28 @@
     ]
   },
   {
-    "id": "song-110",
-    "workId": "work-song-110",
+    "id": "song-1396",
+    "workId": "work-song-1396",
     "title": "極楽浄土",
-    "originalArtist": "メイリア(MARiA)-toku",
+    "originalArtist": "GARNiDELiA",
     "tags": [
       "language:ja"
     ],
     "performances": [
+      {
+        "id": "p-73865707",
+        "streamId": "stream-2026-02-21",
+        "videoId": "NqWOS_B22T4",
+        "timestamp": 9371,
+        "endTimestamp": 9587
+      },
+      {
+        "id": "p1396-1",
+        "streamId": "stream-2023-01-21",
+        "videoId": "DqjD1x642Iw",
+        "timestamp": 7419,
+        "endTimestamp": 7637
+      },
       {
         "id": "p110-4",
         "streamId": "stream-2022-12-31",
@@ -24463,42 +24355,6 @@
         "videoId": "qDJf6NMvvZM",
         "timestamp": 1094,
         "endTimestamp": 1311
-      }
-    ]
-  },
-  {
-    "id": "song-1396",
-    "workId": "work-song-1396",
-    "title": "極楽浄土",
-    "originalArtist": "GARNiDELiA",
-    "tags": [
-      "language:ja"
-    ],
-    "performances": [
-      {
-        "id": "p1396-1",
-        "streamId": "stream-2023-01-21",
-        "videoId": "DqjD1x642Iw",
-        "timestamp": 7419,
-        "endTimestamp": 7637
-      }
-    ]
-  },
-  {
-    "id": "song-3aaa70ce",
-    "workId": "work-song-1396",
-    "title": "極楽浄土",
-    "originalArtist": "GARNiDELiA",
-    "tags": [
-      "language:ja"
-    ],
-    "performances": [
-      {
-        "id": "p-73865707",
-        "streamId": "stream-2026-02-21",
-        "videoId": "NqWOS_B22T4",
-        "timestamp": 9371,
-        "endTimestamp": 9587
       }
     ]
   },
@@ -28914,31 +28770,6 @@
     ]
   },
   {
-    "id": "song-2034",
-    "workId": "work-song-06b388bd",
-    "title": "聽見下雨的聲音",
-    "originalArtist": "周杰倫",
-    "tags": [
-      "language:zh"
-    ],
-    "performances": [
-      {
-        "id": "p2034-2",
-        "streamId": "stream-2024-06-15",
-        "videoId": "vuz9DuTDayM",
-        "timestamp": 4872,
-        "endTimestamp": 5151
-      },
-      {
-        "id": "p2034-1",
-        "streamId": "stream-2024-02-15",
-        "videoId": "u_kHMeSZvmA",
-        "timestamp": 5526,
-        "endTimestamp": 5805
-      }
-    ]
-  },
-  {
     "id": "song-3046",
     "workId": "work-song-3046",
     "title": "聽見下雨的聲音",
@@ -28953,18 +28784,21 @@
         "videoId": "iBnuPWRIj44",
         "timestamp": 2398,
         "endTimestamp": 2680
-      }
-    ]
-  },
-  {
-    "id": "song-828",
-    "workId": "work-song-828",
-    "title": "聽見下雨的聲音",
-    "originalArtist": "周杰倫Jay Chou-方文山",
-    "tags": [
-      "language:zh"
-    ],
-    "performances": [
+      },
+      {
+        "id": "p2034-2",
+        "streamId": "stream-2024-06-15",
+        "videoId": "vuz9DuTDayM",
+        "timestamp": 4872,
+        "endTimestamp": 5151
+      },
+      {
+        "id": "p2034-1",
+        "streamId": "stream-2024-02-15",
+        "videoId": "u_kHMeSZvmA",
+        "timestamp": 5526,
+        "endTimestamp": 5805
+      },
       {
         "id": "p828-1",
         "streamId": "stream-2022-07-30",
@@ -31630,7 +31464,8 @@
     "title": "Calc.",
     "originalArtist": "ジミーサムP",
     "tags": [
-      "language:ja"
+      "language:ja",
+      "source:vocaloid"
     ],
     "performances": [
       {
@@ -31669,6 +31504,13 @@
         "endTimestamp": 1876
       },
       {
+        "id": "p2728-1",
+        "streamId": "stream-2025-02-21",
+        "videoId": "-QOqeIiWUJQ",
+        "timestamp": 5674,
+        "endTimestamp": 5897
+      },
+      {
         "id": "p1236-6",
         "streamId": "stream-2025-01-11",
         "videoId": "TCbhzdYmKpA",
@@ -31704,6 +31546,13 @@
         "endTimestamp": 1669
       },
       {
+        "id": "p2035-1",
+        "streamId": "stream-2024-02-15",
+        "videoId": "u_kHMeSZvmA",
+        "timestamp": 6209,
+        "endTimestamp": 6449
+      },
+      {
         "id": "p1671-1",
         "streamId": "stream-2023-05-01",
         "videoId": "4IxOSvqwds4",
@@ -31734,46 +31583,9 @@
     ]
   },
   {
-    "id": "song-2035",
-    "workId": "work-song-2035",
-    "title": "Calc.",
-    "originalArtist": "英：まど＠実写リロ；日：ジミーサムP",
-    "tags": [
-      "language:ja"
-    ],
-    "performances": [
-      {
-        "id": "p2035-1",
-        "streamId": "stream-2024-02-15",
-        "videoId": "u_kHMeSZvmA",
-        "timestamp": 6209,
-        "endTimestamp": 6449
-      }
-    ]
-  },
-  {
-    "id": "song-2728",
-    "workId": "work-song-2728",
-    "title": "Calc.",
-    "originalArtist": "初音ミク",
-    "tags": [
-      "language:ja",
-      "source:vocaloid"
-    ],
-    "performances": [
-      {
-        "id": "p2728-1",
-        "streamId": "stream-2025-02-21",
-        "videoId": "-QOqeIiWUJQ",
-        "timestamp": 5674,
-        "endTimestamp": 5897
-      }
-    ]
-  },
-  {
-    "id": "song-1b937276",
+    "id": "song-1c77d6fd",
     "workId": "work-3816dda7-96ba-42de-b7bf-16627a249818",
-    "title": "Call me by Your Name",
+    "title": "Call Me by Your Name",
     "originalArtist": "浠Mizuki",
     "tags": [
       "language:ja",
@@ -31786,19 +31598,7 @@
         "videoId": "T4ORfh2Iv8c",
         "timestamp": 5702,
         "endTimestamp": 5862
-      }
-    ]
-  },
-  {
-    "id": "song-1c77d6fd",
-    "workId": "work-3816dda7-96ba-42de-b7bf-16627a249818",
-    "title": "Call Me by Your Name",
-    "originalArtist": "浠Mizuki",
-    "tags": [
-      "language:ja",
-      "source:original"
-    ],
-    "performances": [
+      },
       {
         "id": "p-1c045f12",
         "streamId": "stream-2026-07-23",
@@ -36402,22 +36202,6 @@
         "endTimestamp": 3065
       },
       {
-        "id": "p2132-1",
-        "streamId": "stream-2024-04-16",
-        "videoId": "nFkKNeYiAmE",
-        "timestamp": 7469,
-        "endTimestamp": 7758
-      }
-    ]
-  },
-  {
-    "id": "song-2835",
-    "workId": "work-song-2835",
-    "title": "Harmony of One's Heart",
-    "originalArtist": "八木海莉",
-    "tags": [],
-    "performances": [
-      {
         "id": "p2835-2",
         "streamId": "stream-2025-05-10",
         "videoId": "_ptgmELzs80",
@@ -36430,16 +36214,14 @@
         "videoId": "DC9r_aGs0jY",
         "timestamp": 7867,
         "endTimestamp": 8083
-      }
-    ]
-  },
-  {
-    "id": "song-681",
-    "workId": "work-song-681",
-    "title": "HARMONY OF ONE'S HEART",
-    "originalArtist": "Diva (Vo.Kairi Yagi)",
-    "tags": [],
-    "performances": [
+      },
+      {
+        "id": "p2132-1",
+        "streamId": "stream-2024-04-16",
+        "videoId": "nFkKNeYiAmE",
+        "timestamp": 7469,
+        "endTimestamp": 7758
+      },
       {
         "id": "p681-1",
         "streamId": "stream-2022-02-03",
@@ -40264,7 +40046,10 @@
     "workId": "work-song-112",
     "title": "magnet",
     "originalArtist": "流星P",
-    "tags": [],
+    "tags": [
+      "language:ja",
+      "source:vocaloid"
+    ],
     "performances": [
       {
         "id": "p112-4",
@@ -40286,6 +40071,13 @@
         "videoId": "jO8OqFBfVaQ",
         "timestamp": 4904,
         "endTimestamp": 5151
+      },
+      {
+        "id": "p2093-1",
+        "streamId": "stream-2024-04-12",
+        "videoId": "4Eh0lBCxynM",
+        "timestamp": 2751,
+        "endTimestamp": 2995
       },
       {
         "id": "p112-3",
@@ -40314,25 +40106,6 @@
         "videoId": "qDJf6NMvvZM",
         "timestamp": 1724,
         "endTimestamp": 1965
-      }
-    ]
-  },
-  {
-    "id": "song-2093",
-    "workId": "work-song-2093",
-    "title": "magnet",
-    "originalArtist": "初音ミク・巡音ルカ",
-    "tags": [
-      "language:ja",
-      "source:vocaloid"
-    ],
-    "performances": [
-      {
-        "id": "p2093-1",
-        "streamId": "stream-2024-04-12",
-        "videoId": "4Eh0lBCxynM",
-        "timestamp": 2751,
-        "endTimestamp": 2995
       }
     ]
   },
@@ -41338,10 +41111,12 @@
   },
   {
     "id": "song-8a893a5f-9cc6-47cd-8732-c2c521e9aaaf",
-    "workId": "work-54bdf9ad-4b37-4367-b8b2-6abade0fe517",
+    "workId": "work-song-781",
     "title": "My Dearest",
     "originalArtist": "Supercell",
-    "tags": [],
+    "tags": [
+      "language:ja"
+    ],
     "performances": [
       {
         "id": "p-e421a4ff-aa92-4c19-a0da-aa571da406e4",
@@ -43915,49 +43690,22 @@
     ]
   },
   {
-    "id": "song-1323",
-    "workId": "work-song-1323",
+    "id": "song-1990",
+    "workId": "work-song-1990",
     "title": "rain stops, good-bye",
-    "originalArtist": "96猫",
-    "tags": [],
-    "performances": [
-      {
-        "id": "p1323-1",
-        "streamId": "stream-2022-10-28",
-        "videoId": "t0egtcshBIQ",
-        "timestamp": 6010,
-        "endTimestamp": 6341
-      }
-    ]
-  },
-  {
-    "id": "song-1682",
-    "workId": "work-song-1682",
-    "title": "rain stops, good-bye",
-    "originalArtist": "初音ミク (におP様)",
+    "originalArtist": "におP",
     "tags": [
       "language:ja",
       "source:vocaloid"
     ],
     "performances": [
       {
-        "id": "p1682-1",
-        "streamId": "stream-2023-05-16",
-        "videoId": "uBFnXEjF9PM",
-        "timestamp": 3795,
-        "endTimestamp": 4120
-      }
-    ]
-  },
-  {
-    "id": "song-1990",
-    "workId": "work-song-1990",
-    "title": "rain stops, good-bye",
-    "originalArtist": "におP",
-    "tags": [
-      "language:ja"
-    ],
-    "performances": [
+        "id": "p-7a615ca5-2bcb-4aa5-80b1-ebb12d883d78",
+        "streamId": "stream-809067fa-bf1a-4b48-891a-a26c9b8183c5",
+        "videoId": "KMUOeu6JgyY",
+        "timestamp": 7230,
+        "endTimestamp": 7554
+      },
       {
         "id": "p1990-2",
         "streamId": "stream-2025-09-16",
@@ -43980,6 +43728,20 @@
         "endTimestamp": 1127
       },
       {
+        "id": "p1682-1",
+        "streamId": "stream-2023-05-16",
+        "videoId": "uBFnXEjF9PM",
+        "timestamp": 3795,
+        "endTimestamp": 4120
+      },
+      {
+        "id": "p1323-1",
+        "streamId": "stream-2022-10-28",
+        "videoId": "t0egtcshBIQ",
+        "timestamp": 6010,
+        "endTimestamp": 6341
+      },
+      {
         "id": "p1269-1",
         "streamId": "stream-2022-06-18",
         "videoId": "hUvTYMCmllo",
@@ -43992,22 +43754,6 @@
         "videoId": "Z6zHZQ-48Xc",
         "timestamp": 1835,
         "endTimestamp": 2161
-      }
-    ]
-  },
-  {
-    "id": "song-3ddff148-5e3d-4418-a13b-abdf853126c6",
-    "workId": "work-75ed8b60-8699-49d5-b67c-a76afe9c49f5",
-    "title": "rain stops, good-bye",
-    "originalArtist": "におP　feat.初音ミク",
-    "tags": [],
-    "performances": [
-      {
-        "id": "p-7a615ca5-2bcb-4aa5-80b1-ebb12d883d78",
-        "streamId": "stream-809067fa-bf1a-4b48-891a-a26c9b8183c5",
-        "videoId": "KMUOeu6JgyY",
-        "timestamp": 7230,
-        "endTimestamp": 7554
       }
     ]
   },
@@ -44524,27 +44270,18 @@
     ],
     "performances": [
       {
-        "id": "p-ee52a8b6",
-        "streamId": "stream-2026-07-23",
-        "videoId": "_93tNOpT-40",
-        "timestamp": 7394,
-        "endTimestamp": 7663
-      }
-    ]
-  },
-  {
-    "id": "song-22ee0909-458e-4cfd-8065-4c7ef59db1b8",
-    "workId": "work-c3639845-1df7-4604-8687-2b00766105db",
-    "title": "Reply",
-    "originalArtist": "かぐや(夏吉ゆうこ)from 超かぐや姫！",
-    "tags": [],
-    "performances": [
-      {
         "id": "p-c7603afe-5d02-431d-bf66-5b83822190f1",
         "streamId": "stream-809067fa-bf1a-4b48-891a-a26c9b8183c5",
         "videoId": "KMUOeu6JgyY",
         "timestamp": 3830,
         "endTimestamp": 4100
+      },
+      {
+        "id": "p-ee52a8b6",
+        "streamId": "stream-2026-07-23",
+        "videoId": "_93tNOpT-40",
+        "timestamp": 7394,
+        "endTimestamp": 7663
       }
     ]
   },
@@ -49663,6 +49400,13 @@
     ],
     "performances": [
       {
+        "id": "p-fdd578a9",
+        "streamId": "stream-2026-03-04",
+        "videoId": "WSXBTT3RAXc",
+        "timestamp": 4667,
+        "endTimestamp": 4910
+      },
+      {
         "id": "p167-3",
         "streamId": "stream-2024-12-31-a",
         "videoId": "rjmBnedZCWE",
@@ -49696,24 +49440,6 @@
         "videoId": "118QO6j68xM",
         "timestamp": 1814,
         "endTimestamp": 2049
-      }
-    ]
-  },
-  {
-    "id": "song-cfe6e6cb",
-    "workId": "work-song-cfe6e6cb",
-    "title": "unravel",
-    "originalArtist": "TK凛として時雨",
-    "tags": [
-      "language:ja"
-    ],
-    "performances": [
-      {
-        "id": "p-fdd578a9",
-        "streamId": "stream-2026-03-04",
-        "videoId": "WSXBTT3RAXc",
-        "timestamp": 4667,
-        "endTimestamp": 4910
       }
     ]
   },
@@ -49844,9 +49570,9 @@
     ]
   },
   {
-    "id": "song-7019f51f",
+    "id": "song-1701",
     "workId": "work-song-1701",
-    "title": "Violet snow",
+    "title": "Violet Snow",
     "originalArtist": "結城アイラ",
     "tags": [
       "language:ja"
@@ -49858,18 +49584,7 @@
         "videoId": "PkvQX6tWUR0",
         "timestamp": 3011,
         "endTimestamp": 3216
-      }
-    ]
-  },
-  {
-    "id": "song-1701",
-    "workId": "work-song-1701",
-    "title": "Violet Snow",
-    "originalArtist": "結城アイラ",
-    "tags": [
-      "language:ja"
-    ],
-    "performances": [
+      },
       {
         "id": "p-d673d3c3",
         "streamId": "stream-2026-03-07",
@@ -49885,27 +49600,18 @@
         "endTimestamp": 5614
       },
       {
-        "id": "p1701-1",
-        "streamId": "stream-2023-05-18",
-        "videoId": "d7L8jv5edMc",
-        "timestamp": 5353,
-        "endTimestamp": 5626
-      }
-    ]
-  },
-  {
-    "id": "song-1858",
-    "workId": "work-song-1858",
-    "title": "Violet Snow",
-    "originalArtist": "結城愛良",
-    "tags": [],
-    "performances": [
-      {
         "id": "p1858-1",
         "streamId": "stream-2023-09-09",
         "videoId": "5hZaVmxNN1Q",
         "timestamp": 6805,
         "endTimestamp": 7005
+      },
+      {
+        "id": "p1701-1",
+        "streamId": "stream-2023-05-18",
+        "videoId": "d7L8jv5edMc",
+        "timestamp": 5353,
+        "endTimestamp": 5626
       }
     ]
   },
@@ -54331,10 +54037,10 @@
     ]
   },
   {
-    "id": "song-281",
-    "workId": "work-song-281",
+    "id": "song-542",
+    "workId": "work-song-542",
     "title": "きみだけは。",
-    "originalArtist": "天月-あまつき-",
+    "originalArtist": "夏代孝明",
     "tags": [
       "language:ja"
     ],
@@ -54345,18 +54051,7 @@
         "videoId": "X0aDZwv-Pw0",
         "timestamp": 6590,
         "endTimestamp": 6847
-      }
-    ]
-  },
-  {
-    "id": "song-542",
-    "workId": "work-song-542",
-    "title": "きみだけは。",
-    "originalArtist": "夏代孝明",
-    "tags": [
-      "language:ja"
-    ],
-    "performances": [
+      },
       {
         "id": "p1029-1",
         "streamId": "stream-2022-11-19",
@@ -54365,29 +54060,18 @@
         "endTimestamp": 8186
       },
       {
-        "id": "p542-1",
-        "streamId": "stream-2021-11-27",
-        "videoId": "MOtaGIoaOJw",
-        "timestamp": 10615,
-        "endTimestamp": 10872
-      }
-    ]
-  },
-  {
-    "id": "song-914",
-    "workId": "work-song-914",
-    "title": "きみだけは。",
-    "originalArtist": "夏代孝明x天月",
-    "tags": [
-      "language:ja"
-    ],
-    "performances": [
-      {
         "id": "p914-1",
         "streamId": "stream-2022-09-10",
         "videoId": "MvG1HMtHAIQ",
         "timestamp": 3801,
         "endTimestamp": 4061
+      },
+      {
+        "id": "p542-1",
+        "streamId": "stream-2021-11-27",
+        "videoId": "MOtaGIoaOJw",
+        "timestamp": 10615,
+        "endTimestamp": 10872
       }
     ]
   },
@@ -57845,45 +57529,25 @@
     ],
     "performances": [
       {
-        "id": "p1120-1",
-        "streamId": "stream-2022-01-22",
-        "videoId": "M1-ix92kABQ",
-        "timestamp": 5124,
-        "endTimestamp": 5322
-      }
-    ]
-  },
-  {
-    "id": "song-220",
-    "workId": "work-song-220",
-    "title": "ドレミファロンド",
-    "originalArtist": "40㍍P",
-    "tags": [
-      "language:ja"
-    ],
-    "performances": [
+        "id": "p-f54c11ca-ce7a-47e5-97b7-c49374a6aa43",
+        "streamId": "stream-809067fa-bf1a-4b48-891a-a26c9b8183c5",
+        "videoId": "KMUOeu6JgyY",
+        "timestamp": 2338,
+        "endTimestamp": 2536
+      },
       {
         "id": "p220-1",
         "streamId": "stream-2026-02-01",
         "videoId": "u3s--W56f8Q",
         "timestamp": 8216,
         "endTimestamp": 8414
-      }
-    ]
-  },
-  {
-    "id": "song-6055bbd4-4511-4f45-a620-a7c2f5425cda",
-    "workId": "work-6abf707d-14d9-4472-8f53-065185cb6697",
-    "title": "ドレミファロンド",
-    "originalArtist": "40㍍P feat.初音ミク",
-    "tags": [],
-    "performances": [
+      },
       {
-        "id": "p-f54c11ca-ce7a-47e5-97b7-c49374a6aa43",
-        "streamId": "stream-809067fa-bf1a-4b48-891a-a26c9b8183c5",
-        "videoId": "KMUOeu6JgyY",
-        "timestamp": 2338,
-        "endTimestamp": 2536
+        "id": "p1120-1",
+        "streamId": "stream-2022-01-22",
+        "videoId": "M1-ix92kABQ",
+        "timestamp": 5124,
+        "endTimestamp": 5322
       }
     ]
   },
