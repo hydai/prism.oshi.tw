@@ -1600,6 +1600,22 @@
     ]
   },
   {
+    "id": "song-d4d7354b-8e84-4d2f-9118-6c756b045358",
+    "workId": "work-360f6724-0801-4950-be6e-69d5c5d4d358",
+    "title": "下一站，與你",
+    "originalArtist": "小穹(KSP)",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-56092a58-eae8-46e2-8e61-ceb0f8ddfd9d",
+        "streamId": "stream-809067fa-bf1a-4b48-891a-a26c9b8183c5",
+        "videoId": "KMUOeu6JgyY",
+        "timestamp": 8405,
+        "endTimestamp": 8604
+      }
+    ]
+  },
+  {
     "id": "song-2247",
     "workId": "work-song-1e077864",
     "title": "下雨天",
@@ -2067,6 +2083,22 @@
         "videoId": "e7potMvk3MI",
         "timestamp": 5283,
         "endTimestamp": 5600
+      }
+    ]
+  },
+  {
+    "id": "song-029aec50-3a64-4d58-8280-cdc0a868a047",
+    "workId": "work-6e23a76f-ae47-4e9f-a063-b9f0a6b8c864",
+    "title": "大嫌いなはずだった",
+    "originalArtist": "HoneyWorks feat. 榎本虎太朗・瀬戸口雛（CV：花江夏樹・麻倉もも)",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-c1725a4a-a575-43ad-90f9-a3ebae4f2425",
+        "streamId": "stream-809067fa-bf1a-4b48-891a-a26c9b8183c5",
+        "videoId": "KMUOeu6JgyY",
+        "timestamp": 3153,
+        "endTimestamp": 3459
       }
     ]
   },
@@ -3059,6 +3091,22 @@
     ]
   },
   {
+    "id": "song-f61900e7-9c7e-4eea-978b-9121e268f4ec",
+    "workId": "work-f97f6179-0f22-4e80-b5fd-1ba3189f7896",
+    "title": "六兆年と一夜物語",
+    "originalArtist": "IA",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-9d2da33a-64f9-4e18-b91d-a51466b95219",
+        "streamId": "stream-809067fa-bf1a-4b48-891a-a26c9b8183c5",
+        "videoId": "KMUOeu6JgyY",
+        "timestamp": 3466,
+        "endTimestamp": 3679
+      }
+    ]
+  },
+  {
     "id": "song-540",
     "workId": "work-song-2bb8d010",
     "title": "六等星の夜",
@@ -3679,6 +3727,13 @@
     "originalArtist": "邱振哲",
     "tags": [],
     "performances": [
+      {
+        "id": "p-675e0818-be4f-4c50-883a-9a72d98b5f7a",
+        "streamId": "stream-809067fa-bf1a-4b48-891a-a26c9b8183c5",
+        "videoId": "KMUOeu6JgyY",
+        "timestamp": 1462,
+        "endTimestamp": 1717
+      },
       {
         "id": "p2569-1",
         "streamId": "stream-2024-12-21",
@@ -5162,6 +5217,22 @@
         "videoId": "4TVGbTca7e4",
         "timestamp": 573,
         "endTimestamp": 884
+      }
+    ]
+  },
+  {
+    "id": "song-c314bc74-7e49-461e-a908-2044806c169b",
+    "workId": "work-dcbadd9e-1853-47c6-b641-4e6097acc7cf",
+    "title": "可愛くなりたい",
+    "originalArtist": "HoneyWorks feat.成海聖奈（CV：雨宮天）",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-f0692fa3-bb7f-44a4-bff9-310026678754",
+        "streamId": "stream-809067fa-bf1a-4b48-891a-a26c9b8183c5",
+        "videoId": "KMUOeu6JgyY",
+        "timestamp": 4223,
+        "endTimestamp": 4475
       }
     ]
   },
@@ -8412,6 +8483,13 @@
     ],
     "performances": [
       {
+        "id": "p-f5bf0d18-520f-4412-964c-bb9871655feb",
+        "streamId": "stream-809067fa-bf1a-4b48-891a-a26c9b8183c5",
+        "videoId": "KMUOeu6JgyY",
+        "timestamp": 7563,
+        "endTimestamp": 7845
+      },
+      {
         "id": "p2097-2",
         "streamId": "stream-2024-06-01-a",
         "videoId": "u9VU8a1-Yfc",
@@ -11386,6 +11464,22 @@
     ]
   },
   {
+    "id": "song-eb6d90cf-48d1-4e86-8947-cfb9456aeeff",
+    "workId": "work-998f888c-9997-40e8-97d5-d405cd893f63",
+    "title": "言って",
+    "originalArtist": "ヨルシカ",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-ebf4d6c6-825f-40fb-8b97-156b9dc8a2b0",
+        "streamId": "stream-809067fa-bf1a-4b48-891a-a26c9b8183c5",
+        "videoId": "KMUOeu6JgyY",
+        "timestamp": 6267,
+        "endTimestamp": 6509
+      }
+    ]
+  },
+  {
     "id": "song-2279",
     "workId": "work-song-2279",
     "title": "言って。",
@@ -14033,6 +14127,13 @@
       "language:zh"
     ],
     "performances": [
+      {
+        "id": "p-4b1bddf5-0015-4255-bba1-cc4e298aa830",
+        "streamId": "stream-809067fa-bf1a-4b48-891a-a26c9b8183c5",
+        "videoId": "KMUOeu6JgyY",
+        "timestamp": 1195,
+        "endTimestamp": 1453
+      },
       {
         "id": "p1322-7",
         "streamId": "stream-2025-11-14",
@@ -19350,6 +19451,13 @@
     ],
     "performances": [
       {
+        "id": "p-5ab4e678-10fa-4aa7-85b2-300e362b4bac",
+        "streamId": "stream-809067fa-bf1a-4b48-891a-a26c9b8183c5",
+        "videoId": "KMUOeu6JgyY",
+        "timestamp": 2763,
+        "endTimestamp": 3002
+      },
+      {
         "id": "p994-2",
         "streamId": "stream-2024-06-27",
         "videoId": "TwQtDxdn5j8",
@@ -19657,6 +19765,13 @@
     "originalArtist": "SING女團",
     "tags": [],
     "performances": [
+      {
+        "id": "p-f31b8e12-42d0-411b-908a-c7be14cc4bfb",
+        "streamId": "stream-809067fa-bf1a-4b48-891a-a26c9b8183c5",
+        "videoId": "KMUOeu6JgyY",
+        "timestamp": 4483,
+        "endTimestamp": 4710
+      },
       {
         "id": "p-cb025089",
         "streamId": "stream-2026-02-21",
@@ -24388,6 +24503,24 @@
     ]
   },
   {
+    "id": "song-2d037747-f264-48a1-93fa-da79ba371f5a",
+    "workId": "work-song-3aaa70ce",
+    "title": "極樂淨土",
+    "originalArtist": "GARNiDELiA",
+    "tags": [
+      "language:ja"
+    ],
+    "performances": [
+      {
+        "id": "p-2b613ffa-a2fc-45a5-bce9-6e05ed401f21",
+        "streamId": "stream-809067fa-bf1a-4b48-891a-a26c9b8183c5",
+        "videoId": "KMUOeu6JgyY",
+        "timestamp": 2540,
+        "endTimestamp": 2756
+      }
+    ]
+  },
+  {
     "id": "song-1338",
     "workId": "work-song-1338",
     "title": "溫柔",
@@ -26868,6 +27001,13 @@
     ],
     "performances": [
       {
+        "id": "p-7fe9adc4-4d6b-4595-918e-18ed06722ea1",
+        "streamId": "stream-809067fa-bf1a-4b48-891a-a26c9b8183c5",
+        "videoId": "KMUOeu6JgyY",
+        "timestamp": 259,
+        "endTimestamp": 459
+      },
+      {
         "id": "p2339-3",
         "streamId": "stream-2025-06-30",
         "videoId": "Nlo7YSuhw9E",
@@ -28961,6 +29101,13 @@
       "language:zh"
     ],
     "performances": [
+      {
+        "id": "p-faefbf23-c523-42db-910e-675edb8ece73",
+        "streamId": "stream-809067fa-bf1a-4b48-891a-a26c9b8183c5",
+        "videoId": "KMUOeu6JgyY",
+        "timestamp": 4900,
+        "endTimestamp": 5130
+      },
       {
         "id": "p2867-1",
         "streamId": "stream-2025-04-23",
@@ -31178,6 +31325,13 @@
     ],
     "performances": [
       {
+        "id": "p-dfb297cc-1be1-4f0c-84f2-cec8a2b46cc4",
+        "streamId": "stream-809067fa-bf1a-4b48-891a-a26c9b8183c5",
+        "videoId": "KMUOeu6JgyY",
+        "timestamp": 9288,
+        "endTimestamp": 9513
+      },
+      {
         "id": "p-1a510771",
         "streamId": "stream-2026-03-14",
         "videoId": "INPkn_yTziI",
@@ -33058,6 +33212,13 @@
     ],
     "performances": [
       {
+        "id": "p-7ba94075-89b6-4982-8a68-eaad20d4d273",
+        "streamId": "stream-809067fa-bf1a-4b48-891a-a26c9b8183c5",
+        "videoId": "KMUOeu6JgyY",
+        "timestamp": 8613,
+        "endTimestamp": 8930
+      },
+      {
         "id": "p351-1",
         "streamId": "stream-2026-01-03",
         "videoId": "Fg6HDoB3OfQ",
@@ -33999,6 +34160,22 @@
         "videoId": "NJF-Ii5o7yc",
         "timestamp": 273,
         "endTimestamp": 575
+      }
+    ]
+  },
+  {
+    "id": "song-4d0f86db-329c-47ac-b5ad-04e268312958",
+    "workId": "work-3b935447-7fe9-4266-bb91-f0ae767c27e9",
+    "title": "drop dead",
+    "originalArtist": "Olivia Rodrigo",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-48ba25df-81a8-402e-a439-d584ab904f62",
+        "streamId": "stream-809067fa-bf1a-4b48-891a-a26c9b8183c5",
+        "videoId": "KMUOeu6JgyY",
+        "timestamp": 5588,
+        "endTimestamp": 5813
       }
     ]
   },
@@ -41160,6 +41337,22 @@
     ]
   },
   {
+    "id": "song-8a893a5f-9cc6-47cd-8732-c2c521e9aaaf",
+    "workId": "work-54bdf9ad-4b37-4367-b8b2-6abade0fe517",
+    "title": "My Dearest",
+    "originalArtist": "Supercell",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-e421a4ff-aa92-4c19-a0da-aa571da406e4",
+        "streamId": "stream-809067fa-bf1a-4b48-891a-a26c9b8183c5",
+        "videoId": "KMUOeu6JgyY",
+        "timestamp": 497,
+        "endTimestamp": 835
+      }
+    ]
+  },
+  {
     "id": "song-3168",
     "workId": "work-song-3168",
     "title": "My Favorite Things",
@@ -43803,6 +43996,22 @@
     ]
   },
   {
+    "id": "song-3ddff148-5e3d-4418-a13b-abdf853126c6",
+    "workId": "work-75ed8b60-8699-49d5-b67c-a76afe9c49f5",
+    "title": "rain stops, good-bye",
+    "originalArtist": "におP　feat.初音ミク",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-7a615ca5-2bcb-4aa5-80b1-ebb12d883d78",
+        "streamId": "stream-809067fa-bf1a-4b48-891a-a26c9b8183c5",
+        "videoId": "KMUOeu6JgyY",
+        "timestamp": 7230,
+        "endTimestamp": 7554
+      }
+    ]
+  },
+  {
     "id": "song-2251",
     "workId": "work-song-2251",
     "title": "Raindrops Keep Falling on my Head",
@@ -44320,6 +44529,22 @@
         "videoId": "_93tNOpT-40",
         "timestamp": 7394,
         "endTimestamp": 7663
+      }
+    ]
+  },
+  {
+    "id": "song-22ee0909-458e-4cfd-8065-4c7ef59db1b8",
+    "workId": "work-c3639845-1df7-4604-8687-2b00766105db",
+    "title": "Reply",
+    "originalArtist": "かぐや(夏吉ゆうこ)from 超かぐや姫！",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-c7603afe-5d02-431d-bf66-5b83822190f1",
+        "streamId": "stream-809067fa-bf1a-4b48-891a-a26c9b8183c5",
+        "videoId": "KMUOeu6JgyY",
+        "timestamp": 3830,
+        "endTimestamp": 4100
       }
     ]
   },
@@ -46456,6 +46681,13 @@
     ],
     "performances": [
       {
+        "id": "p-dba0c456-0dfe-47f5-bf7b-21cf0f8f9fdd",
+        "streamId": "stream-809067fa-bf1a-4b48-891a-a26c9b8183c5",
+        "videoId": "KMUOeu6JgyY",
+        "timestamp": 6860,
+        "endTimestamp": 7200
+      },
+      {
         "id": "p325-2",
         "streamId": "stream-2025-04-19",
         "videoId": "-P357WQa4II",
@@ -46884,6 +47116,13 @@
     "tags": [],
     "performances": [
       {
+        "id": "p-70755d38-1b1f-4747-9abe-d4817ac1dbbb",
+        "streamId": "stream-809067fa-bf1a-4b48-891a-a26c9b8183c5",
+        "videoId": "KMUOeu6JgyY",
+        "timestamp": 7865,
+        "endTimestamp": 8116
+      },
+      {
         "id": "p823-7",
         "streamId": "stream-2025-08-28",
         "videoId": "gEldkCwzlfs",
@@ -47063,6 +47302,13 @@
       "source:original"
     ],
     "performances": [
+      {
+        "id": "p-a40037d9-64ad-4312-9055-28bd64b0ec90",
+        "streamId": "stream-809067fa-bf1a-4b48-891a-a26c9b8183c5",
+        "videoId": "KMUOeu6JgyY",
+        "timestamp": 6520,
+        "endTimestamp": 6718
+      },
       {
         "id": "p-1d6d2bc0",
         "streamId": "stream-2026-03-14",
@@ -57622,6 +57868,22 @@
         "videoId": "u3s--W56f8Q",
         "timestamp": 8216,
         "endTimestamp": 8414
+      }
+    ]
+  },
+  {
+    "id": "song-6055bbd4-4511-4f45-a620-a7c2f5425cda",
+    "workId": "work-6abf707d-14d9-4472-8f53-065185cb6697",
+    "title": "ドレミファロンド",
+    "originalArtist": "40㍍P feat.初音ミク",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-f54c11ca-ce7a-47e5-97b7-c49374a6aa43",
+        "streamId": "stream-809067fa-bf1a-4b48-891a-a26c9b8183c5",
+        "videoId": "KMUOeu6JgyY",
+        "timestamp": 2338,
+        "endTimestamp": 2536
       }
     ]
   },
