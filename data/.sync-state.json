@@ -2,14 +2,14 @@
   "version": 1,
   "streamers": {
     "cesium": {
-      "exportRevision": 460,
-      "lastSyncedAt": "2026-09-24T04:55:58.913Z",
-      "maxSongUpdatedAt": "2026-09-24 04:54:23",
-      "maxPerfUpdatedAt": "2026-09-24 04:54:23",
-      "maxStreamUpdatedAt": "2026-09-24 04:54:22",
-      "songsCount": 201,
-      "performancesCount": 237,
-      "streamsCount": 20
+      "exportRevision": 479,
+      "lastSyncedAt": "2026-10-02T04:03:58.802Z",
+      "maxSongUpdatedAt": "2026-10-01 18:49:51",
+      "maxPerfUpdatedAt": "2026-10-01 18:49:51",
+      "maxStreamUpdatedAt": "2026-10-01 18:49:51",
+      "songsCount": 206,
+      "performancesCount": 250,
+      "streamsCount": 21
     },
     "earendel": {
       "exportRevision": 206,
@@ -219,14 +219,14 @@
       "streamsCount": 0
     },
     "mizuki": {
-      "exportRevision": 1410,
-      "lastSyncedAt": "2026-09-22T09:21:59.716Z",
-      "maxSongUpdatedAt": "2026-09-22 09:19:42.597",
-      "maxPerfUpdatedAt": "2026-09-02 09:31:36",
-      "maxStreamUpdatedAt": "2026-08-22 16:56:56",
-      "songsCount": 2380,
-      "performancesCount": 5456,
-      "streamsCount": 307
+      "exportRevision": 1445,
+      "lastSyncedAt": "2026-10-02T04:03:57.702Z",
+      "maxSongUpdatedAt": "2026-10-01 18:49:08",
+      "maxPerfUpdatedAt": "2026-10-01 18:49:08",
+      "maxStreamUpdatedAt": "2026-10-01 18:49:07",
+      "songsCount": 2391,
+      "performancesCount": 5479,
+      "streamsCount": 308
     },
     "mslin00": {
       "exportRevision": 1,
