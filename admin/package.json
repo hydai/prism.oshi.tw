@@ -55,11 +55,11 @@
     "check": "npm run typecheck && npm run test:helpers && npm run test:itunes && npm run test:discord && npm run test:nova-url-safety && npm run test:union-find && npm run test:fuzzy-grouping && npm run test:guard && npm run test:db && npm run test:work-tags && npm run test:nova-db && npm run test:crystal-db && npm run test:parse-bodies && npm run test:on-error && npm run test:work-review && npm run test:work-review-migration && npm run test:song-merge && npm run test:global-works && npm run test:alias-index-updated-at && npm run test:merge-guards && npm run test:auth && npm run test:authz && npm run test:streamer-scope && npm run test:status-routes && npm run test:nova-url-routes && npm run test:subscriber-refresh && npm run test:youtube-verification && npm run test:vod-export-schema && npm run test:vod-export-core && npm run test:vod-export-guards && npm run test:vod-export-routes && npm run test:vod-export-differential && npm run test:vod-export-source && npm run test:vod-export-json-stream && npm run test:vod-export-api && npm run test:vod-export-publication && npm run test:vod-export-maintenance && npm run test:vod-export-docs && npm run test:vod-export-stress"
   },
   "dependencies": {
-    "hono": "^4.13.9"
+    "hono": "^4.13.12"
   },
   "devDependencies": {
-    "@cloudflare/workers-types": "^5.20260925.2",
-    "@types/node": "^26.6.2",
+    "@cloudflare/workers-types": "^5.20261003.1",
+    "@types/node": "^26.6.4",
     "ajv": "^8.20.0",
     "ajv-formats": "^3.0.1",
     "tsx": "^4.23.15",

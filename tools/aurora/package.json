@@ -10,7 +10,7 @@
     "preview": "vite preview"
   },
   "dependencies": {
-    "lucide-react": "^1.48.0",
+    "lucide-react": "^1.51.0",
     "react": "^19.3.0",
     "react-dom": "^19.3.0"
   },
@@ -23,6 +23,6 @@
     "tailwindcss": "^4.3.0",
     "tsx": "4.23.15",
     "typescript": "^6.0.3",
-    "vite": "^8.3.1"
+    "vite": "^8.3.2"
   }
 }
