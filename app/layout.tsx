@@ -1,12 +1,17 @@
 import type { Metadata, Viewport } from "next";
-import { DM_Sans } from "next/font/google";
+import localFont from "next/font/local";
 import "./globals.css";
 import GlobalProviders from "./components/GlobalProviders";
 import { DARK_MODE_DETECT_SCRIPT } from "@/lib/theme-detect-script";
 
-const dmSans = DM_Sans({
-  subsets: ["latin"],
-  weight: ["400", "500", "600", "700", "900"],
+const dmSans = localFont({
+  src: [
+    { path: "./fonts/dm-sans/DMSans-Regular.woff2", weight: "400", style: "normal" },
+    { path: "./fonts/dm-sans/DMSans-Medium.woff2", weight: "500", style: "normal" },
+    { path: "./fonts/dm-sans/DMSans-SemiBold.woff2", weight: "600", style: "normal" },
+    { path: "./fonts/dm-sans/DMSans-Bold.woff2", weight: "700", style: "normal" },
+    { path: "./fonts/dm-sans/DMSans-Black.woff2", weight: "900", style: "normal" },
+  ],
   display: "swap",
   variable: "--font-dm-sans",
 });

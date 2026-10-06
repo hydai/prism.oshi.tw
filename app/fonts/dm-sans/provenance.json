@@ -1,0 +1,44 @@
+{
+  "upstreamCommit": "4412393b7d2de9fe7a92064c2dce9b5af5d7fd26",
+  "retrievedOn": "2026-10-06",
+  "license": "OFL-1.1",
+  "modifications": "None; font and license bytes are unchanged from upstream.",
+  "files": [
+    {
+      "path": "app/fonts/dm-sans/DMSans-Regular.woff2",
+      "source": "https://raw.githubusercontent.com/googlefonts/dm-fonts/4412393b7d2de9fe7a92064c2dce9b5af5d7fd26/Sans/fonts/webfonts/DMSans-Regular.woff2",
+      "bytes": 30448,
+      "sha256": "e66304eef6c3a7166c996a8dd9d62d8cd28b66dbd886b051cfcec5a9610e0bff"
+    },
+    {
+      "path": "app/fonts/dm-sans/DMSans-Medium.woff2",
+      "source": "https://raw.githubusercontent.com/googlefonts/dm-fonts/4412393b7d2de9fe7a92064c2dce9b5af5d7fd26/Sans/fonts/webfonts/DMSans-Medium.woff2",
+      "bytes": 30532,
+      "sha256": "40c1e37991217c956f27cc0737b3006534202ecf1005263af39c91247a31889b"
+    },
+    {
+      "path": "app/fonts/dm-sans/DMSans-SemiBold.woff2",
+      "source": "https://raw.githubusercontent.com/googlefonts/dm-fonts/4412393b7d2de9fe7a92064c2dce9b5af5d7fd26/Sans/fonts/webfonts/DMSans-SemiBold.woff2",
+      "bytes": 30060,
+      "sha256": "d19a46057aa770a728e0433a299875aa89a1a36e403f28bd640e9dc0fcc24e22"
+    },
+    {
+      "path": "app/fonts/dm-sans/DMSans-Bold.woff2",
+      "source": "https://raw.githubusercontent.com/googlefonts/dm-fonts/4412393b7d2de9fe7a92064c2dce9b5af5d7fd26/Sans/fonts/webfonts/DMSans-Bold.woff2",
+      "bytes": 30388,
+      "sha256": "ad9e6dd9919c72c902ce4abba3dd432c9d214e2e4ddbd772765161a0dd61f4e5"
+    },
+    {
+      "path": "app/fonts/dm-sans/DMSans-Black.woff2",
+      "source": "https://raw.githubusercontent.com/googlefonts/dm-fonts/4412393b7d2de9fe7a92064c2dce9b5af5d7fd26/Sans/fonts/webfonts/DMSans-Black.woff2",
+      "bytes": 30488,
+      "sha256": "921a062d67fae4f2f34cf06b0e4959fad9785765d5e49e6cd81024252b54aaa5"
+    },
+    {
+      "path": "public/licenses/dm-sans/OFL.txt",
+      "source": "https://raw.githubusercontent.com/googlefonts/dm-fonts/4412393b7d2de9fe7a92064c2dce9b5af5d7fd26/Sans/OFL.txt",
+      "bytes": 4482,
+      "sha256": "9af36190332437f5ecd09974de43c1f7c77a310a996cdd8ceb25628b458840e1"
+    }
+  ]
+}

@@ -100,4 +100,18 @@ artists and streamer identity without ever overwriting a curated value. See
 
 ## License
 
-[MIT](LICENSE)
+Application code: [MIT](LICENSE).
+
+The Next.js site loads vendored DM Sans WOFF2 files through `next/font/local`;
+building it does not download fonts from Google. The five normal weights
+(400, 500, 600, 700, 900) remain available via `--font-dm-sans`.
+
+DM Sans is separately licensed under [SIL OFL 1.1](public/licenses/dm-sans/OFL.txt),
+not MIT. See the [third-party notice](public/licenses/dm-sans/README.txt) and
+[pinned source URLs and SHA-256 hashes](app/fonts/dm-sans/provenance.json).
+The notice and unchanged upstream license are included in the static export at
+`/licenses/dm-sans/README.txt` and `/licenses/dm-sans/OFL.txt`.
+
+When updating fonts, preserve the upstream license and metadata, update the
+provenance manifest, and run `npm test` and `npm run build`. This does not change
+the separate Worker applications' font loading.
