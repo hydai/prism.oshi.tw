@@ -2,14 +2,14 @@
   "version": 1,
   "streamers": {
     "cesium": {
-      "exportRevision": 479,
-      "lastSyncedAt": "2026-10-02T13:04:12.270Z",
-      "maxSongUpdatedAt": "2026-10-02 05:40:42.849",
-      "maxPerfUpdatedAt": "2026-10-01 18:49:51",
-      "maxStreamUpdatedAt": "2026-10-01 18:49:51",
-      "songsCount": 206,
-      "performancesCount": 250,
-      "streamsCount": 21
+      "exportRevision": 497,
+      "lastSyncedAt": "2026-10-06T04:02:09.867Z",
+      "maxSongUpdatedAt": "2026-10-05 16:25:57",
+      "maxPerfUpdatedAt": "2026-10-05 16:25:57",
+      "maxStreamUpdatedAt": "2026-10-05 16:25:56",
+      "songsCount": 209,
+      "performancesCount": 264,
+      "streamsCount": 22
     },
     "earendel": {
       "exportRevision": 208,
@@ -219,9 +219,9 @@
       "streamsCount": 0
     },
     "mizuki": {
-      "exportRevision": 1545,
-      "lastSyncedAt": "2026-10-02T13:04:08.021Z",
-      "maxSongUpdatedAt": "2026-10-02 05:42:44.936",
+      "exportRevision": 1547,
+      "lastSyncedAt": "2026-10-06T04:02:08.591Z",
+      "maxSongUpdatedAt": "2026-10-05 16:29:02",
       "maxPerfUpdatedAt": "2026-10-02 05:42:44",
       "maxStreamUpdatedAt": "2026-10-01 18:49:07",
       "songsCount": 2358,
@@ -259,14 +259,14 @@
       "streamsCount": 1
     },
     "oboro": {
-      "exportRevision": 29,
-      "lastSyncedAt": "2026-10-02T13:04:17.070Z",
-      "maxSongUpdatedAt": "2026-10-02 05:41:23.009",
-      "maxPerfUpdatedAt": "2026-07-18 16:33:14",
-      "maxStreamUpdatedAt": "2026-05-01 16:52:16",
-      "songsCount": 46,
-      "performancesCount": 48,
-      "streamsCount": 3
+      "exportRevision": 73,
+      "lastSyncedAt": "2026-10-06T04:02:10.956Z",
+      "maxSongUpdatedAt": "2026-10-05 16:28:35",
+      "maxPerfUpdatedAt": "2026-10-05 16:28:35",
+      "maxStreamUpdatedAt": "2026-10-05 16:28:35",
+      "songsCount": 67,
+      "performancesCount": 70,
+      "streamsCount": 4
     },
     "otowamina": {
       "exportRevision": 1,
