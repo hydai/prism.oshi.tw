@@ -144,6 +144,22 @@
     ]
   },
   {
+    "id": "song-1163dd71-8d09-4fca-a2a0-a75559eb49fa",
+    "workId": "work-5bf6ba1f-a670-4649-b3e0-b0056f8f7b73",
+    "title": "人間驚鴻客",
+    "originalArtist": "葉裡",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-b544b753-117a-4b5d-b111-ae9c06bf0dc9",
+        "streamId": "stream-2026-10-03",
+        "videoId": "TxJCvkcZhO8",
+        "timestamp": 7679,
+        "endTimestamp": 7862
+      }
+    ]
+  },
+  {
     "id": "song-d9a76c3a-9acb-4cc5-83b1-7fa9553dfdcc",
     "workId": "work-4e757072-7edc-4d0d-8427-f828f8e94dd3",
     "title": "十二鎮魂歌",
@@ -182,6 +198,13 @@
     "originalArtist": "嚴藝丹",
     "tags": [],
     "performances": [
+      {
+        "id": "p-9a103681-9b4d-4bb6-a603-d06310f4fd73",
+        "streamId": "stream-2026-10-03",
+        "videoId": "TxJCvkcZhO8",
+        "timestamp": 2770,
+        "endTimestamp": 3054
+      },
       {
         "id": "p-800c24e6-6f68-40fe-a8f6-ba3e9d15e576",
         "streamId": "stream-513734c2-9b80-4ddb-a8b5-7076b1966370",
@@ -412,6 +435,13 @@
     "tags": [],
     "performances": [
       {
+        "id": "p-dd3c8088-bacd-44ed-96b3-c4b3cf0c7684",
+        "streamId": "stream-2026-10-03",
+        "videoId": "TxJCvkcZhO8",
+        "timestamp": 2278,
+        "endTimestamp": 2494
+      },
+      {
         "id": "p-bfa4b846-fe32-4221-9fe1-85f00a8a5d77",
         "streamId": "stream-f8223f85-ac1f-4e8e-8368-28ebf02db798",
         "videoId": "VFztLHJb_EU",
@@ -449,6 +479,22 @@
         "videoId": "VCrVYOabRXQ",
         "timestamp": 8963,
         "endTimestamp": 9215
+      }
+    ]
+  },
+  {
+    "id": "song-2b66d726-b48d-4e41-9c53-aa8604507fc9",
+    "workId": "work-064e6d66-f829-4e41-b450-8ca0922c7274",
+    "title": "不老夢 (升1Key)",
+    "originalArtist": "銀臨",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-c3d51693-b9d4-4a38-8e46-90ba9f69bcd2",
+        "streamId": "stream-2026-10-03",
+        "videoId": "TxJCvkcZhO8",
+        "timestamp": 4118,
+        "endTimestamp": 4371
       }
     ]
   },
@@ -523,6 +569,13 @@
     "originalArtist": "蕭憶情Alex",
     "tags": [],
     "performances": [
+      {
+        "id": "p-bb53ee20-18c2-4649-a0f1-8ead2e605308",
+        "streamId": "stream-2026-10-03",
+        "videoId": "TxJCvkcZhO8",
+        "timestamp": 3757,
+        "endTimestamp": 4020
+      },
       {
         "id": "p-7f4dd1f8-d718-47f0-8b8d-5478e53aebb1",
         "streamId": "stream-2026-09-16",
@@ -1090,6 +1143,13 @@
     "tags": [],
     "performances": [
       {
+        "id": "p-bba778e0-d37c-4fe1-8343-1c0b4e025e47",
+        "streamId": "stream-2026-10-03",
+        "videoId": "TxJCvkcZhO8",
+        "timestamp": 5243,
+        "endTimestamp": 5495
+      },
+      {
         "id": "p-838b44e4-b993-42f8-af46-15c0ea19460c",
         "streamId": "stream-acceb6ce-b95c-44d7-8642-ed95fab8c930",
         "videoId": "P0O4oAf4jso",
@@ -1393,6 +1453,13 @@
     "originalArtist": "樂正綾&洛天依",
     "tags": [],
     "performances": [
+      {
+        "id": "p-49e0f301-97d8-400f-9eae-815d2b08352b",
+        "streamId": "stream-2026-10-03",
+        "videoId": "TxJCvkcZhO8",
+        "timestamp": 6437,
+        "endTimestamp": 6716
+      },
       {
         "id": "p-c01a104e-088c-4d66-a505-ed761597b47a",
         "streamId": "stream-f8223f85-ac1f-4e8e-8368-28ebf02db798",
@@ -2048,6 +2115,13 @@
     "tags": [],
     "performances": [
       {
+        "id": "p-8dbffaae-afd3-4615-98d6-b1f5b1dfc3ba",
+        "streamId": "stream-2026-10-03",
+        "videoId": "TxJCvkcZhO8",
+        "timestamp": 431,
+        "endTimestamp": 737
+      },
+      {
         "id": "p-9824d736-cd09-4854-8533-9235583e82b1",
         "streamId": "stream-2026-08-05",
         "videoId": "VCrVYOabRXQ",
@@ -2308,6 +2382,13 @@
     "originalArtist": "鏡予歌&陳亦洺&喧笑",
     "tags": [],
     "performances": [
+      {
+        "id": "p-ff880532-b487-45cc-956d-8be1334beedf",
+        "streamId": "stream-2026-10-03",
+        "videoId": "TxJCvkcZhO8",
+        "timestamp": 4786,
+        "endTimestamp": 5067
+      },
       {
         "id": "p-fb6c4954-4f20-41e6-8346-0f498bdda2f7",
         "streamId": "stream-2026-09-09",
@@ -2677,6 +2758,13 @@
     "tags": [],
     "performances": [
       {
+        "id": "p-47a16bf1-cc48-4ed7-af21-4881ef7e7025",
+        "streamId": "stream-2026-10-03",
+        "videoId": "TxJCvkcZhO8",
+        "timestamp": 1010,
+        "endTimestamp": 1278
+      },
+      {
         "id": "p-7f2ad60d-3df5-4bf4-912a-4f41256d9979",
         "streamId": "stream-f9857413-9717-46ed-8bf5-abc9d9af362f",
         "videoId": "-iBV9Be21mA",
@@ -2790,6 +2878,13 @@
     "originalArtist": "黃詩扶",
     "tags": [],
     "performances": [
+      {
+        "id": "p-260b4962-dde0-4567-91ed-4dfecd65a888",
+        "streamId": "stream-2026-10-03",
+        "videoId": "TxJCvkcZhO8",
+        "timestamp": 6964,
+        "endTimestamp": 7256
+      },
       {
         "id": "p-f9c26ce6-d110-4750-a344-b1c25997d331",
         "streamId": "stream-2026-09-16",
@@ -3154,6 +3249,13 @@
     "tags": [],
     "performances": [
       {
+        "id": "p-f8f02470-2bcf-4426-a709-e744456ba478",
+        "streamId": "stream-2026-10-03",
+        "videoId": "TxJCvkcZhO8",
+        "timestamp": 7496,
+        "endTimestamp": 7593
+      },
+      {
         "id": "p-038a0615-96f3-4428-8780-b332b0dd2bad",
         "streamId": "stream-2026-08-05",
         "videoId": "VCrVYOabRXQ",
@@ -3481,6 +3583,22 @@
     ]
   },
   {
+    "id": "song-2c1da4bd-1fad-4b03-a863-7abc30b57cfc",
+    "workId": "work-f3ea8ed8-d309-473c-b1db-107a6f64d335",
+    "title": "驚鵲 (跟三年前的自己合唱Ver.)",
+    "originalArtist": "三無xHanser",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-3502bbfb-baf7-440a-a8f1-0bd75fed3f58",
+        "streamId": "stream-2026-10-03",
+        "videoId": "TxJCvkcZhO8",
+        "timestamp": 9644,
+        "endTimestamp": 9855
+      }
+    ]
+  },
+  {
     "id": "song-3bc7792e-1739-4624-b42c-b7d116813546",
     "workId": "work-f66aa9d2-4202-4e84-804d-6143b923ae55",
     "title": "靈秀",
@@ -3560,6 +3678,13 @@
     "originalArtist": "とあ feat.初音未來",
     "tags": [],
     "performances": [
+      {
+        "id": "p-4314a8ce-0d42-41ec-8cec-227b5fdda39e",
+        "streamId": "stream-2026-10-03",
+        "videoId": "TxJCvkcZhO8",
+        "timestamp": 5642,
+        "endTimestamp": 5885
+      },
       {
         "id": "p-f2d46849-693e-4391-b83d-1f7f429cd60b",
         "streamId": "stream-2026-09-23",
