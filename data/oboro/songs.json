@@ -44,6 +44,38 @@
     ]
   },
   {
+    "id": "song-d4cc4be6-6364-4141-9d73-bbf040a5bd6c",
+    "workId": "work-cc9d11f5-140b-4173-8174-3de6a5a88a65",
+    "title": "天使と悪魔",
+    "originalArtist": "SEKAI NO OWARI",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-597b85d7-c1dc-41a2-b37f-dbb9955cad7e",
+        "streamId": "stream-32c91922-c506-4786-9010-50a7f16e1cc2",
+        "videoId": "WiUuHOQ9KS4",
+        "timestamp": 6000,
+        "endTimestamp": 6271
+      }
+    ]
+  },
+  {
+    "id": "song-2ce52d18-aa30-4f0e-9633-03c72907239f",
+    "workId": "work-song-1611",
+    "title": "太陽",
+    "originalArtist": "邱振哲",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-00d36cd1-1043-44a8-8e82-b60730172397",
+        "streamId": "stream-32c91922-c506-4786-9010-50a7f16e1cc2",
+        "videoId": "WiUuHOQ9KS4",
+        "timestamp": 7335,
+        "endTimestamp": 7597
+      }
+    ]
+  },
+  {
     "id": "song-29176ab5",
     "workId": "work-song-29176ab5",
     "title": "水星記",
@@ -94,12 +126,35 @@
     ]
   },
   {
+    "id": "song-70b671ea-74dd-4fa1-b0e0-f6d1892d8226",
+    "workId": "work-song-1472",
+    "title": "永不失聯的愛",
+    "originalArtist": "周興哲",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-20d7f3aa-15ee-4276-af94-26380c5a6546",
+        "streamId": "stream-32c91922-c506-4786-9010-50a7f16e1cc2",
+        "videoId": "WiUuHOQ9KS4",
+        "timestamp": 9427,
+        "endTimestamp": 9680
+      }
+    ]
+  },
+  {
     "id": "song-14242dbb",
     "workId": "work-song-14242dbb",
     "title": "如果雨之後",
     "originalArtist": "周興哲",
     "tags": [],
     "performances": [
+      {
+        "id": "p-4a36fb98-5f55-4984-8cf1-9d60876685f0",
+        "streamId": "stream-32c91922-c506-4786-9010-50a7f16e1cc2",
+        "videoId": "WiUuHOQ9KS4",
+        "timestamp": 9723,
+        "endTimestamp": 10003
+      },
       {
         "id": "p-e92b5391",
         "streamId": "stream-2026-04-30",
@@ -161,6 +216,22 @@
         "videoId": "NjGAsumGDdQ",
         "timestamp": 6282,
         "endTimestamp": 6679
+      }
+    ]
+  },
+  {
+    "id": "song-ef592f96-abf3-4929-9d22-cb11e72db28f",
+    "workId": "work-38aecf7e-aa7e-477e-aa84-369db4bf3981",
+    "title": "我會等",
+    "originalArtist": "承桓",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-4bd63bf9-9a61-4b97-8f69-c51c6d22b347",
+        "streamId": "stream-32c91922-c506-4786-9010-50a7f16e1cc2",
+        "videoId": "WiUuHOQ9KS4",
+        "timestamp": 8383,
+        "endTimestamp": 8578
       }
     ]
   },
@@ -271,6 +342,22 @@
     ]
   },
   {
+    "id": "song-5c4d8c35-ee71-4ad9-a757-037baa9935e1",
+    "workId": "work-0933f6cc-ef6c-4b39-aa59-2828fa001463",
+    "title": "炎と森のカーニバル",
+    "originalArtist": "SEKAI NO OWARI",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-ea18bf14-6613-4c72-a3af-c8bfbab62906",
+        "streamId": "stream-32c91922-c506-4786-9010-50a7f16e1cc2",
+        "videoId": "WiUuHOQ9KS4",
+        "timestamp": 2905,
+        "endTimestamp": 3201
+      }
+    ]
+  },
+  {
     "id": "song-de9a3d6d",
     "workId": "work-song-1815",
     "title": "花に亡霊",
@@ -285,6 +372,24 @@
         "videoId": "zjFwAVFay8Y",
         "timestamp": 1634,
         "endTimestamp": 1873
+      }
+    ]
+  },
+  {
+    "id": "song-21aed0cc-daf0-446a-9033-be35db0d673d",
+    "workId": "work-song-1322",
+    "title": "雨愛",
+    "originalArtist": "楊丞琳",
+    "tags": [
+      "language:zh"
+    ],
+    "performances": [
+      {
+        "id": "p-8a4cb4bd-715b-4671-a94c-5a19f0a9ab16",
+        "streamId": "stream-32c91922-c506-4786-9010-50a7f16e1cc2",
+        "videoId": "WiUuHOQ9KS4",
+        "timestamp": 1302,
+        "endTimestamp": 1564
       }
     ]
   },
@@ -321,6 +426,54 @@
     ]
   },
   {
+    "id": "song-e91b14e4-2daa-4b94-9ba7-71e0a9c3d7c6",
+    "workId": "work-233e1862-2248-43c3-b305-ab4f25f03c22",
+    "title": "虹色の戦争",
+    "originalArtist": "SEKAI NO OWARI",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-7f0bfefa-0a00-41bd-98a3-af92887a6cac",
+        "streamId": "stream-32c91922-c506-4786-9010-50a7f16e1cc2",
+        "videoId": "WiUuHOQ9KS4",
+        "timestamp": 6355,
+        "endTimestamp": 6692
+      }
+    ]
+  },
+  {
+    "id": "song-ec9623b9-c2e7-4064-8ddc-7f5681e28d1c",
+    "workId": "work-c978ceea-1f52-4e4d-80ec-c677f5a25252",
+    "title": "重唱 (唱一段)",
+    "originalArtist": "Unknown",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-cf63197f-87e5-4fa9-b90c-8c2b64178df8",
+        "streamId": "stream-32c91922-c506-4786-9010-50a7f16e1cc2",
+        "videoId": "WiUuHOQ9KS4",
+        "timestamp": 7866,
+        "endTimestamp": 8100
+      }
+    ]
+  },
+  {
+    "id": "song-044ddbf3",
+    "workId": "work-song-044ddbf3",
+    "title": "浪子回頭",
+    "originalArtist": "茄子蛋",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-2dfff84c-422b-4fbd-8be2-2efef4847d65",
+        "streamId": "stream-32c91922-c506-4786-9010-50a7f16e1cc2",
+        "videoId": "WiUuHOQ9KS4",
+        "timestamp": 8606,
+        "endTimestamp": 8865
+      }
+    ]
+  },
+  {
     "id": "song-5ff734da",
     "workId": "work-song-5ff734da",
     "title": "真生活",
@@ -336,6 +489,22 @@
         "videoId": "NjGAsumGDdQ",
         "timestamp": 465,
         "endTimestamp": 709
+      }
+    ]
+  },
+  {
+    "id": "song-c38e6833-b6ea-4915-9b6b-300a07f3b380",
+    "workId": "work-7639e17e-f969-4ec0-86b8-a9b401739552",
+    "title": "眠り姫",
+    "originalArtist": "SEKAI NO OWARI (唱一段)",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-43d3a4a7-b858-492f-8a09-3d449e585355",
+        "streamId": "stream-32c91922-c506-4786-9010-50a7f16e1cc2",
+        "videoId": "WiUuHOQ9KS4",
+        "timestamp": 1680,
+        "endTimestamp": 2012
       }
     ]
   },
@@ -411,6 +580,56 @@
     ]
   },
   {
+    "id": "song-5720377e-e38a-4fa1-8835-7a53baaa9c19",
+    "workId": "work-0aefec15-67a5-425e-8170-c88133273fc7",
+    "title": "習慣不習慣",
+    "originalArtist": "理想混蛋 (唱一段)",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-87a34973-cc61-4deb-93a5-689ff9c9ea19",
+        "streamId": "stream-32c91922-c506-4786-9010-50a7f16e1cc2",
+        "videoId": "WiUuHOQ9KS4",
+        "timestamp": 7742,
+        "endTimestamp": 8006
+      }
+    ]
+  },
+  {
+    "id": "song-938a8c0e-d010-42eb-b7bb-e34f44100dc2",
+    "workId": "work-song-96471ecf",
+    "title": "陪你 Stay with you",
+    "originalArtist": "朔Sakuro",
+    "tags": [
+      "source:original"
+    ],
+    "performances": [
+      {
+        "id": "p-b4aeeb77-234b-4238-9998-ac89f4df4457",
+        "streamId": "stream-32c91922-c506-4786-9010-50a7f16e1cc2",
+        "videoId": "WiUuHOQ9KS4",
+        "timestamp": 7018,
+        "endTimestamp": 7229
+      }
+    ]
+  },
+  {
+    "id": "song-e23e2e3f-815f-42b5-95d7-749b4e0e64ac",
+    "workId": "work-65e3f22f-db01-4411-b83d-350972bb05b7",
+    "title": "雪の音",
+    "originalArtist": "Novelbright",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-7715c6e4-c7b6-42e5-99a8-7859362ba74c",
+        "streamId": "stream-32c91922-c506-4786-9010-50a7f16e1cc2",
+        "videoId": "WiUuHOQ9KS4",
+        "timestamp": 489,
+        "endTimestamp": 717
+      }
+    ]
+  },
+  {
     "id": "song-f5aed223",
     "workId": "work-song-0c2ee33c",
     "title": "幾分之幾",
@@ -423,6 +642,22 @@
         "videoId": "NjGAsumGDdQ",
         "timestamp": 4908,
         "endTimestamp": 5129
+      }
+    ]
+  },
+  {
+    "id": "song-5c28918b-6c56-4f2d-8700-59442408c6df",
+    "workId": "work-8992d35b-f37c-41a6-92c3-d3a0cad81f68",
+    "title": "間距",
+    "originalArtist": "en王翊恩",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-f5c0a23b-9822-472f-a6dc-237db58a0bd4",
+        "streamId": "stream-32c91922-c506-4786-9010-50a7f16e1cc2",
+        "videoId": "WiUuHOQ9KS4",
+        "timestamp": 7985,
+        "endTimestamp": 8227
       }
     ]
   },
@@ -530,6 +765,22 @@
     ]
   },
   {
+    "id": "song-42e45e79-4a6d-4542-884e-cbda7bcdd2c9",
+    "workId": "work-5e2b0f0d-9e50-4c6c-8079-c70ad6e3994c",
+    "title": "Dragon Night",
+    "originalArtist": "SEKAI NO OWARI",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-7479bc18-c4f5-4c68-a24e-d2ad39b47c11",
+        "streamId": "stream-32c91922-c506-4786-9010-50a7f16e1cc2",
+        "videoId": "WiUuHOQ9KS4",
+        "timestamp": 4967,
+        "endTimestamp": 5196
+      }
+    ]
+  },
+  {
     "id": "song-a1c1bc91",
     "workId": "work-song-a1c1bc91",
     "title": "fake face dance music",
@@ -633,6 +884,22 @@
     ]
   },
   {
+    "id": "song-2761f132-0a23-4ff7-87e4-7d3c1a493194",
+    "workId": "work-744c336c-189c-40fc-a112-a0752e5cc313",
+    "title": "Mr. Heartache",
+    "originalArtist": "SEKAI NO OWARI",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-4da0b4e8-1b94-4d7d-8eab-8c62751e9d11",
+        "streamId": "stream-32c91922-c506-4786-9010-50a7f16e1cc2",
+        "videoId": "WiUuHOQ9KS4",
+        "timestamp": 3219,
+        "endTimestamp": 3528
+      }
+    ]
+  },
+  {
     "id": "song-8d59c545",
     "workId": "work-song-781",
     "title": "My Dearest",
@@ -669,6 +936,22 @@
     ]
   },
   {
+    "id": "song-6298060c-640f-4587-9451-9007ec456661",
+    "workId": "work-song-1204",
+    "title": "RPG",
+    "originalArtist": "SEKAI NO OWARI",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-b3355c8b-b473-4b80-a487-bd2381f02db9",
+        "streamId": "stream-32c91922-c506-4786-9010-50a7f16e1cc2",
+        "videoId": "WiUuHOQ9KS4",
+        "timestamp": 5353,
+        "endTimestamp": 5640
+      }
+    ]
+  },
+  {
     "id": "song-dd2838de",
     "workId": "work-song-5dbfed7f",
     "title": "Someone You Loved",
@@ -681,6 +964,22 @@
         "videoId": "NjGAsumGDdQ",
         "timestamp": 6818,
         "endTimestamp": 6996
+      }
+    ]
+  },
+  {
+    "id": "song-52c4571e-9c44-41ee-a9a2-a7acd6c4b7de",
+    "workId": "work-3851ad41-28c2-43a7-81d1-7dc79fb35e5c",
+    "title": "SOS",
+    "originalArtist": "SEKAI NO OWARI",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-d658140a-b69d-4db6-9879-b5d7ba5937a6",
+        "streamId": "stream-32c91922-c506-4786-9010-50a7f16e1cc2",
+        "videoId": "WiUuHOQ9KS4",
+        "timestamp": 3821,
+        "endTimestamp": 4127
       }
     ]
   },
@@ -721,6 +1020,22 @@
     ]
   },
   {
+    "id": "song-979b7772-08a3-4442-9d66-54044e381e82",
+    "workId": "work-1c2ded53-ef21-4855-bddf-cb5228c3d73e",
+    "title": "サザンカ",
+    "originalArtist": "SEKAI NO OWARI",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-3890c2c0-074d-47e7-8da1-6863e59785cd",
+        "streamId": "stream-32c91922-c506-4786-9010-50a7f16e1cc2",
+        "videoId": "WiUuHOQ9KS4",
+        "timestamp": 4569,
+        "endTimestamp": 4840
+      }
+    ]
+  },
+  {
     "id": "song-f8de293b",
     "workId": "work-song-f8de293b",
     "title": "スイートマジック",
@@ -753,6 +1068,24 @@
         "videoId": "NjGAsumGDdQ",
         "timestamp": 3903,
         "endTimestamp": 4260
+      }
+    ]
+  },
+  {
+    "id": "song-815da3cb-d300-4fd2-a8ac-86e271bdfc7c",
+    "workId": "work-song-28534ae4",
+    "title": "ドライフラワー",
+    "originalArtist": "優里",
+    "tags": [
+      "language:ja"
+    ],
+    "performances": [
+      {
+        "id": "p-0df020f4-0641-4c51-83f8-67fa8bb0246f",
+        "streamId": "stream-32c91922-c506-4786-9010-50a7f16e1cc2",
+        "videoId": "WiUuHOQ9KS4",
+        "timestamp": 9008,
+        "endTimestamp": 9294
       }
     ]
   },
@@ -809,6 +1142,22 @@
         "videoId": "NjGAsumGDdQ",
         "timestamp": 264,
         "endTimestamp": 426
+      }
+    ]
+  },
+  {
+    "id": "song-4cd2f3ac-4533-4d66-a878-60ce82d9ba18",
+    "workId": "work-f5159030-a684-42d9-83cb-d709e5bff582",
+    "title": "マーメイドラプソディー",
+    "originalArtist": "SEKAI NO OWARI",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-716b5e25-dcc5-46e1-9c4b-a7ca9fa66ae7",
+        "streamId": "stream-32c91922-c506-4786-9010-50a7f16e1cc2",
+        "videoId": "WiUuHOQ9KS4",
+        "timestamp": 2241,
+        "endTimestamp": 2561
       }
     ]
   }
