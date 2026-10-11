@@ -49,7 +49,11 @@ export function filterStreamsByYears(
   return streams.filter((stream) => selectedYears.has(new Date(stream.date).getFullYear()));
 }
 
-export function flattenSongs(songs: ArchiveSong[]): FlattenedSong[] {
+export function flattenSongs(
+  songs: ArchiveSong[],
+  streams: StreamSummary[] = [],
+): FlattenedSong[] {
+  const streamOrder = new Map(streams.map((stream, index) => [stream.id, index]));
   const result: Array<FlattenedSong & { sortTime: number }> = [];
   songs.forEach((song) => {
     song.performances.forEach((performance) => {
@@ -75,7 +79,25 @@ export function flattenSongs(songs: ArchiveSong[]): FlattenedSong[] {
     });
   });
   return result
-    .sort((a, b) => b.sortTime - a.sortTime)
+    .sort((a, b) => {
+      const dateOrder = b.sortTime - a.sortTime;
+      if (dateOrder !== 0) return dateOrder;
+
+      // Keep same-day VODs as separate blocks in their published stream order,
+      // then follow the setlist from the beginning of each VOD to the end.
+      if (a.streamId !== b.streamId) {
+        const aStreamOrder = streamOrder.get(a.streamId);
+        const bStreamOrder = streamOrder.get(b.streamId);
+        if (aStreamOrder !== undefined && bStreamOrder !== undefined) {
+          return aStreamOrder - bStreamOrder;
+        }
+        if (aStreamOrder !== undefined) return -1;
+        if (bStreamOrder !== undefined) return 1;
+        return a.streamId.localeCompare(b.streamId);
+      }
+
+      return a.timestamp - b.timestamp;
+    })
     .map(({ sortTime: _sortTime, ...song }) => song);
 }
 

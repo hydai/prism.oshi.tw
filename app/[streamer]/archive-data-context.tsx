@@ -93,7 +93,7 @@ export function ArchiveDataProvider({ children }: { children: ReactNode }) {
   const allArtists = useMemo(() => getAllArtists(songs), [songs]);
   const availableYears = useMemo(() => getAvailableYears(streams), [streams]);
   const availableTags = useMemo(() => getAvailableTags(songs), [songs]);
-  const allFlattenedSongs = useMemo(() => flattenSongs(songs), [songs]);
+  const allFlattenedSongs = useMemo(() => flattenSongs(songs, streams), [songs, streams]);
   const allGroupedSongs = useMemo(() => sortGroupedSongs(groupSongsByWorkId(songs)), [songs]);
   const performanceIndex = useMemo(
     () => (loadState === 'ready' ? buildPerformanceIndex(songs) : null),
