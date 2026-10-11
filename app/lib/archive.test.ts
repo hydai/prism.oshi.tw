@@ -113,6 +113,49 @@ assert.equal(flattened[2]?.endTimestamp, null);
 assert.equal("performances" in flattened[0]!, false);
 assert.deepEqual(flattened[0]?.tags, ["language:ja"], "flattened rows carry the song tags");
 
+const sameDayStreams: StreamSummary[] = [
+  { id: "stream-evening", title: "Evening", date: "2025-02-01", videoId: "evening" },
+  { id: "stream-morning", title: "Morning", date: "2025-02-01", videoId: "morning" },
+];
+const sameDaySongs: ArchiveSong[] = [
+  {
+    id: "song-alpha",
+    title: "Alpha Song",
+    originalArtist: "Artist",
+    tags: [],
+    performances: [
+      { id: "evening-late", streamId: "stream-evening", date: "2025-02-01", streamTitle: "Evening", videoId: "evening", timestamp: 300, endTimestamp: null, note: "" },
+      { id: "morning-late", streamId: "stream-morning", date: "2025-02-01", streamTitle: "Morning", videoId: "morning", timestamp: 200, endTimestamp: null, note: "" },
+    ],
+  },
+  {
+    id: "song-beta",
+    title: "Beta Song",
+    originalArtist: "Artist",
+    tags: [],
+    performances: [
+      { id: "evening-early", streamId: "stream-evening", date: "2025-02-01", streamTitle: "Evening", videoId: "evening", timestamp: 100, endTimestamp: null, note: "" },
+      { id: "morning-early", streamId: "stream-morning", date: "2025-02-01", streamTitle: "Morning", videoId: "morning", timestamp: 50, endTimestamp: null, note: "" },
+    ],
+  },
+  {
+    id: "song-gamma",
+    title: "Gamma Song",
+    originalArtist: "Artist",
+    tags: [],
+    performances: [
+      { id: "evening-same-time", streamId: "stream-evening", date: "2025-02-01", streamTitle: "Evening", videoId: "evening", timestamp: 300, endTimestamp: null, note: "" },
+    ],
+  },
+];
+const sameDaySongsBeforeFlattening = structuredClone(sameDaySongs);
+assert.deepEqual(
+  flattenSongs(sameDaySongs, sameDayStreams).map((song) => song.performanceId),
+  ["evening-early", "evening-late", "evening-same-time", "morning-early", "morning-late"],
+  "timeline keeps each VOD together and orders its setlist by timestamp",
+);
+assert.deepEqual(sameDaySongs, sameDaySongsBeforeFlattening, "timeline sorting does not mutate catalog data");
+
 assert.deepEqual(
   filterFlattenedSongs(flattened, {
     search: "BETA",
