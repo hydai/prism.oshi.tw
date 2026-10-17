@@ -892,6 +892,13 @@
     "tags": [],
     "performances": [
       {
+        "id": "p-b7c80dd4-7b5c-49fa-af43-c52662595bcc",
+        "streamId": "stream-2026-10-14",
+        "videoId": "ukNBbq2azJ8",
+        "timestamp": 5992,
+        "endTimestamp": 6221
+      },
+      {
         "id": "p-50e27872-c7c3-4c58-b6e7-dead5f7f5a93",
         "streamId": "stream-2026-09-09",
         "videoId": "_4yrs9aGUA8",
@@ -1057,6 +1064,13 @@
     "tags": [],
     "performances": [
       {
+        "id": "p-b8aaa34f-d3a3-4e8a-ba0c-36b01a747d58",
+        "streamId": "stream-2026-10-14",
+        "videoId": "ukNBbq2azJ8",
+        "timestamp": 720,
+        "endTimestamp": 922
+      },
+      {
         "id": "p-99fe7aff-0aea-487f-9de7-7302a6796e05",
         "streamId": "stream-f8223f85-ac1f-4e8e-8368-28ebf02db798",
         "videoId": "VFztLHJb_EU",
@@ -1166,6 +1180,13 @@
     "originalArtist": "黃詩扶",
     "tags": [],
     "performances": [
+      {
+        "id": "p-4ecc7095-384b-4bfa-9e83-241b9b98b38d",
+        "streamId": "stream-2026-10-14",
+        "videoId": "ukNBbq2azJ8",
+        "timestamp": 4166,
+        "endTimestamp": 4406
+      },
       {
         "id": "p-59ef5862-dd85-4231-b625-422d57144d74",
         "streamId": "stream-5e5e42d5-9115-45c5-b00f-1b23652d0f8d",
@@ -1627,6 +1648,13 @@
     "tags": [],
     "performances": [
       {
+        "id": "p-6dbc4ac1-e9dc-47ae-97ff-00935e5d9387",
+        "streamId": "stream-2026-10-14",
+        "videoId": "ukNBbq2azJ8",
+        "timestamp": 5091,
+        "endTimestamp": 5356
+      },
+      {
         "id": "p-39a3747d-df9a-4dc8-a75e-628f20f4c3b1",
         "streamId": "stream-f9857413-9717-46ed-8bf5-abc9d9af362f",
         "videoId": "-iBV9Be21mA",
@@ -1810,6 +1838,13 @@
     "tags": [],
     "performances": [
       {
+        "id": "p-0b57f5be-d191-4a69-9e2d-46ec1f342442",
+        "streamId": "stream-2026-10-14",
+        "videoId": "ukNBbq2azJ8",
+        "timestamp": 2629,
+        "endTimestamp": 2850
+      },
+      {
         "id": "p-914e8180-3640-4c20-8e8f-7c53950e9376",
         "streamId": "stream-2026-08-25",
         "videoId": "w9XHL_J8_kc",
@@ -1954,6 +1989,13 @@
     "tags": [],
     "performances": [
       {
+        "id": "p-e9611893-acfa-4d14-a260-c1db3e818950",
+        "streamId": "stream-2026-10-14",
+        "videoId": "ukNBbq2azJ8",
+        "timestamp": 3818,
+        "endTimestamp": 4053
+      },
+      {
         "id": "p-ad0e5eb5-829c-44dd-88ab-1d11bd444932",
         "streamId": "stream-2026-08-19",
         "videoId": "WKEO0RdBBig",
@@ -2024,6 +2066,13 @@
     "originalArtist": "晴愔",
     "tags": [],
     "performances": [
+      {
+        "id": "p-e9ea4d93-90d0-4066-b4fb-3f501c02904e",
+        "streamId": "stream-2026-10-14",
+        "videoId": "ukNBbq2azJ8",
+        "timestamp": 2192,
+        "endTimestamp": 2448
+      },
       {
         "id": "p-10439e5b-672d-497c-b86c-cdf6b6eec383",
         "streamId": "stream-2026-06-10",
@@ -2600,6 +2649,13 @@
     ],
     "performances": [
       {
+        "id": "p-dd3dc50c-dc54-44bc-b00d-6659d957b863",
+        "streamId": "stream-2026-10-14",
+        "videoId": "ukNBbq2azJ8",
+        "timestamp": 5599,
+        "endTimestamp": 5814
+      },
+      {
         "id": "p-a33854d8-d78b-4fbe-8e18-02cb477eb6a6",
         "streamId": "stream-2026-08-05",
         "videoId": "VCrVYOabRXQ",
@@ -2684,6 +2740,13 @@
     "originalArtist": "河圖",
     "tags": [],
     "performances": [
+      {
+        "id": "p-a64bb07a-9b6d-49dc-a6c5-25a69e71ac25",
+        "streamId": "stream-2026-10-14",
+        "videoId": "ukNBbq2azJ8",
+        "timestamp": 4582,
+        "endTimestamp": 4836
+      },
       {
         "id": "p-f5e222ca-6c7a-42e9-a5e9-c6e4211fa8dd",
         "streamId": "stream-2026-06-10",
@@ -2912,6 +2975,22 @@
         "videoId": "Xwupr-SRT38",
         "timestamp": 4056,
         "endTimestamp": 4357
+      }
+    ]
+  },
+  {
+    "id": "song-11e7e67c-4301-40fa-8a4e-cc5a8d9e5300",
+    "workId": "work-4398968b-33b5-4346-b54f-e6c30601b45b",
+    "title": "琵琶曲",
+    "originalArtist": "鄭浩&冰潔",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-0432b403-dd80-4f7a-8150-dd26dcfcc15e",
+        "streamId": "stream-2026-10-14",
+        "videoId": "ukNBbq2azJ8",
+        "timestamp": 3323,
+        "endTimestamp": 3486
       }
     ]
   },
@@ -3282,6 +3361,13 @@
     "tags": [],
     "performances": [
       {
+        "id": "p-d7d33bc0-30f3-4f31-82f4-465efbf085ab",
+        "streamId": "stream-2026-10-14",
+        "videoId": "ukNBbq2azJ8",
+        "timestamp": 1485,
+        "endTimestamp": 1674
+      },
+      {
         "id": "p-b0debfea-311a-4259-af80-b8f2785f5607",
         "streamId": "stream-2026-09-09",
         "videoId": "_4yrs9aGUA8",
@@ -3450,6 +3536,13 @@
     "originalArtist": "銀臨&徐夢圓",
     "tags": [],
     "performances": [
+      {
+        "id": "p-39e373cd-3231-4955-89b4-6437aaeee758",
+        "streamId": "stream-2026-10-14",
+        "videoId": "ukNBbq2azJ8",
+        "timestamp": 189,
+        "endTimestamp": 422
+      },
       {
         "id": "p-7644a8e9-b774-44f5-99bc-c76e24ae0710",
         "streamId": "stream-8e950518-f22d-49f9-b20e-67eff2af5210",
