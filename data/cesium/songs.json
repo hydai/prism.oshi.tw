@@ -245,6 +245,22 @@
     ]
   },
   {
+    "id": "song-77212ba4-ff0e-4001-bd29-934bd222cbc3",
+    "workId": "work-519d9871-ff5b-4eae-99fd-62eef8a411e1",
+    "title": "三生緣",
+    "originalArtist": "程晌",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-c6da033a-6e95-4bb1-8e4f-7f7b07803b69",
+        "streamId": "stream-2026-10-21",
+        "videoId": "ZIP6T_tLIec",
+        "timestamp": 3113,
+        "endTimestamp": 3313
+      }
+    ]
+  },
+  {
     "id": "song-e7f583b8-674c-47ef-b4ac-30184fac65f9",
     "workId": "work-35fad6f0-7357-430d-8af0-c5b238620336",
     "title": "三拜紅塵涼",
@@ -1002,6 +1018,13 @@
     "tags": [],
     "performances": [
       {
+        "id": "p-d2169a2f-6c67-4e36-96ed-efeba75c2928",
+        "streamId": "stream-2026-10-21",
+        "videoId": "ZIP6T_tLIec",
+        "timestamp": 6005,
+        "endTimestamp": 6251
+      },
+      {
         "id": "p-746b8b46-5822-42b1-b327-4ca446174428",
         "streamId": "stream-2026-09-09",
         "videoId": "_4yrs9aGUA8",
@@ -1245,6 +1268,22 @@
     ]
   },
   {
+    "id": "song-d72fd5fe-d44a-4058-99cc-ee7b8f6ba8b0",
+    "workId": "work-f0532726-0db8-4c7c-9e60-8baf87e43555",
+    "title": "吹夢到西洲",
+    "originalArtist": "黃詩扶",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-dff43f70-0cc4-4242-a239-ed68a5c8f4fc",
+        "streamId": "stream-2026-10-21",
+        "videoId": "ZIP6T_tLIec",
+        "timestamp": 3912,
+        "endTimestamp": 4225
+      }
+    ]
+  },
+  {
     "id": "song-a5496101-a113-4f84-ac7e-74dc52702e79",
     "workId": "work-ce8aa5c3-a6d7-4f9e-a31d-f8aa1295feb6",
     "title": "志明與春嬌",
@@ -1414,6 +1453,22 @@
     ]
   },
   {
+    "id": "song-c4283c99-e0e4-41c5-8ab0-30f38b57c8fa",
+    "workId": "work-2b075f1e-142d-40d1-8052-864f98c48771",
+    "title": "求神吶",
+    "originalArtist": "柏鹿",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-76be5a8e-304e-46eb-abf6-cf4b77794b4d",
+        "streamId": "stream-2026-10-21",
+        "videoId": "ZIP6T_tLIec",
+        "timestamp": 4391,
+        "endTimestamp": 4540
+      }
+    ]
+  },
+  {
     "id": "song-cfafe97b-f8b2-4fc2-a00b-8ce07f9dfead",
     "workId": "work-377ab835-b0e8-4f61-b5df-d6cab87780ad",
     "title": "沈園外",
@@ -1546,6 +1601,13 @@
     "originalArtist": "五音Jw",
     "tags": [],
     "performances": [
+      {
+        "id": "p-eb212198-880e-4ee9-a7ff-6ffcec9fa5ef",
+        "streamId": "stream-2026-10-21",
+        "videoId": "ZIP6T_tLIec",
+        "timestamp": 4575,
+        "endTimestamp": 4810
+      },
       {
         "id": "p-c708737c-2417-4f4a-8d3e-ee905f16ef93",
         "streamId": "stream-2026-07-22",
@@ -1781,6 +1843,13 @@
     "tags": [],
     "performances": [
       {
+        "id": "p-2f0c0d61-4148-4867-9020-12029a75475e",
+        "streamId": "stream-2026-10-21",
+        "videoId": "ZIP6T_tLIec",
+        "timestamp": 2427,
+        "endTimestamp": 2700
+      },
+      {
         "id": "p-7f0eb8e8-c09f-4c8e-9f21-61568f410bba",
         "streamId": "stream-2026-07-22",
         "videoId": "jAQvF5wMGws",
@@ -1914,6 +1983,22 @@
         "videoId": "n7o5ukvaAiY",
         "timestamp": 1304,
         "endTimestamp": 1582
+      }
+    ]
+  },
+  {
+    "id": "song-7d83730b-7151-4be8-a0a0-9db9b6a7bbd1",
+    "workId": "work-452a74c5-1076-4e47-b2d4-38f3d53bad2a",
+    "title": "故夢（清唱）",
+    "originalArtist": "橙翼",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-0d54b46f-4437-4886-91ee-6964c8355682",
+        "streamId": "stream-2026-10-21",
+        "videoId": "ZIP6T_tLIec",
+        "timestamp": 5038,
+        "endTimestamp": 5246
       }
     ]
   },
@@ -3057,6 +3142,24 @@
     ]
   },
   {
+    "id": "song-df6150ce-5da4-42fa-8a4b-b2d8433a00a1",
+    "workId": "work-song-077e91b8",
+    "title": "買你",
+    "originalArtist": "魏如萱",
+    "tags": [
+      "language:zh"
+    ],
+    "performances": [
+      {
+        "id": "p-f4c1da6e-4185-4a28-94d8-18b2a5a79a07",
+        "streamId": "stream-2026-10-21",
+        "videoId": "ZIP6T_tLIec",
+        "timestamp": 6511,
+        "endTimestamp": 6715
+      }
+    ]
+  },
+  {
     "id": "song-24a72147-f3b6-4e95-86b8-93cec457336a",
     "workId": "work-cce90c70-ef83-43fc-8924-3f5f7b1e9c8d",
     "title": "雅俗共賞",
@@ -3190,6 +3293,22 @@
         "videoId": "wwif9y3U65I",
         "timestamp": 2618,
         "endTimestamp": 2809
+      }
+    ]
+  },
+  {
+    "id": "song-08105809-3c77-47ee-8cd0-0803ed40e493",
+    "workId": "work-c96c4d69-6995-40ba-b8d4-384589c7c4a8",
+    "title": "葬仙",
+    "originalArtist": "葉里",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-588f3d4c-49b9-408f-800e-29d0202e29a2",
+        "streamId": "stream-2026-10-21",
+        "videoId": "ZIP6T_tLIec",
+        "timestamp": 767,
+        "endTimestamp": 1044
       }
     ]
   },
@@ -3599,6 +3718,13 @@
     "tags": [],
     "performances": [
       {
+        "id": "p-4d31ee44-64db-424a-8758-dfc937d36322",
+        "streamId": "stream-2026-10-21",
+        "videoId": "ZIP6T_tLIec",
+        "timestamp": 207,
+        "endTimestamp": 450
+      },
+      {
         "id": "p-a90b4d54-ef00-4a96-b5a5-ac77d0e3129b",
         "streamId": "stream-2026-06-10",
         "videoId": "cKzrbehaWUU",
@@ -3630,6 +3756,13 @@
     "originalArtist": "黃齡",
     "tags": [],
     "performances": [
+      {
+        "id": "p-61f48a18-c1ee-4bcc-8c96-ea4219998a88",
+        "streamId": "stream-2026-10-21",
+        "videoId": "ZIP6T_tLIec",
+        "timestamp": 5523,
+        "endTimestamp": 5735
+      },
       {
         "id": "p-85d9386c-db7b-41cf-930b-e6badee53832",
         "streamId": "stream-2026-08-19",
@@ -3759,6 +3892,22 @@
     ]
   },
   {
+    "id": "song-a18437d5-139d-44ea-8ed9-93f646d8130a",
+    "workId": "work-e3a2fcee-21dc-4811-be9d-44d7f9741c79",
+    "title": "歸去來兮",
+    "originalArtist": "花粥",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-b7b980ae-98ca-4449-880c-870306d32f86",
+        "streamId": "stream-2026-10-21",
+        "videoId": "ZIP6T_tLIec",
+        "timestamp": 2007,
+        "endTimestamp": 2209
+      }
+    ]
+  },
+  {
     "id": "song-b97fbf78-9661-49ed-a393-20aefe4f863d",
     "workId": "work-song-1978",
     "title": "簪花人間",
@@ -3867,6 +4016,22 @@
         "videoId": "LIi33QOdVg8",
         "timestamp": 5151,
         "endTimestamp": 5353
+      }
+    ]
+  },
+  {
+    "id": "song-b5b65644-a8b7-46ae-a516-6b7c55f927ad",
+    "workId": "work-51953a15-3471-4707-86a8-281779c13ed9",
+    "title": "孽海記",
+    "originalArtist": "黃詩扶",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-7436d2b7-87ac-433c-96c3-0a0c86dd4984",
+        "streamId": "stream-2026-10-21",
+        "videoId": "ZIP6T_tLIec",
+        "timestamp": 1464,
+        "endTimestamp": 1693
       }
     ]
   },
