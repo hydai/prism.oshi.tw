@@ -135,6 +135,22 @@
     ]
   },
   {
+    "id": "song-c22662f4-a268-4e4b-9ab9-9efbcf03b3ae",
+    "workId": "work-df08f627-0d46-4142-b309-cc6f397deed0",
+    "title": "九萬字",
+    "originalArtist": "黃詩扶",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-7a975a4d-689c-44a8-b603-359a60d86c20",
+        "streamId": "stream-2026-10-28",
+        "videoId": "FdacPNs4u20",
+        "timestamp": 1696,
+        "endTimestamp": 1916
+      }
+    ]
+  },
+  {
     "id": "song-d4f9f5c9-cf7f-4c96-938e-c943ccaf35f6",
     "workId": "work-song-b4768f5e",
     "title": "人間不值得",
@@ -497,6 +513,22 @@
     ]
   },
   {
+    "id": "song-464175c2-85c0-476c-b757-357af02c0418",
+    "workId": "work-c5ab2781-9cf6-4c45-bdb8-510169c0fef3",
+    "title": "山鬼",
+    "originalArtist": "Winky詩",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-51781655-0e89-47fe-88b2-cc546112310e",
+        "streamId": "stream-2026-10-28",
+        "videoId": "FdacPNs4u20",
+        "timestamp": 3207,
+        "endTimestamp": 3487
+      }
+    ]
+  },
+  {
     "id": "song-94bb51ed-0d0a-45ce-9f5f-acd32dc1f8e1",
     "workId": "work-57a58c5d-3e51-4671-a1f5-ae3cdb735673",
     "title": "不成詩",
@@ -846,6 +878,22 @@
     ]
   },
   {
+    "id": "song-d3e6725e-1812-4748-834b-b482a846bdb2",
+    "workId": "work-92576b4c-7172-4855-92f8-0fab461a67a5",
+    "title": "出山",
+    "originalArtist": "花粥",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-7b519fa6-29b0-4d26-8ae7-2421e0c61186",
+        "streamId": "stream-2026-10-28",
+        "videoId": "FdacPNs4u20",
+        "timestamp": 2802,
+        "endTimestamp": 3001
+      }
+    ]
+  },
+  {
     "id": "song-6d531605-d733-4a46-b791-26c3a2992cad",
     "workId": "work-ba6dd44c-f12e-44fa-85f0-b716da7e47bd",
     "title": "出航",
@@ -891,6 +939,13 @@
     "originalArtist": "雙笙",
     "tags": [],
     "performances": [
+      {
+        "id": "p-d7ce6e09-a2d7-41aa-bb81-1f14567dc72a",
+        "streamId": "stream-2026-10-28",
+        "videoId": "FdacPNs4u20",
+        "timestamp": 4818,
+        "endTimestamp": 5066
+      },
       {
         "id": "p-2d6fec0d-7eea-4e56-93a8-1dc700b2872c",
         "streamId": "stream-2026-07-08",
@@ -1579,6 +1634,22 @@
     ]
   },
   {
+    "id": "song-2d874a1b-b3ae-48c2-b15c-19a8615cbe36",
+    "workId": "work-1abb0893-0130-4bb8-b2fb-c41138f57f6c",
+    "title": "典獄司",
+    "originalArtist": "音頻怪物",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-1cf9c911-5f48-414d-8e3b-f446a8f5049c",
+        "streamId": "stream-2026-10-28",
+        "videoId": "FdacPNs4u20",
+        "timestamp": 2124,
+        "endTimestamp": 2361
+      }
+    ]
+  },
+  {
     "id": "song-81a019ef-f00f-44a7-949e-9de74d84912c",
     "workId": "work-64a374e3-8ab1-48c7-9d8e-4f8c560935c3",
     "title": "夜色不語",
@@ -2047,6 +2118,22 @@
         "videoId": "nqksrdG76ww",
         "timestamp": 847,
         "endTimestamp": 1049
+      }
+    ]
+  },
+  {
+    "id": "song-89a03278-814a-465f-a0b7-eceacd755465",
+    "workId": "work-b56aa98c-1e57-433b-8f14-a89ea41f12c6",
+    "title": "是風動",
+    "originalArtist": "銀臨",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-7208b071-970c-4e4f-ac57-3fdfcea3873a",
+        "streamId": "stream-2026-10-28",
+        "videoId": "FdacPNs4u20",
+        "timestamp": 946,
+        "endTimestamp": 1231
       }
     ]
   },
@@ -2679,6 +2766,13 @@
     "tags": [],
     "performances": [
       {
+        "id": "p-bc5baf76-ad11-4c40-a469-fcf0e577258d",
+        "streamId": "stream-2026-10-28",
+        "videoId": "FdacPNs4u20",
+        "timestamp": 6453,
+        "endTimestamp": 6668
+      },
+      {
         "id": "p-f9d16e1e-dc61-4bb8-913f-5247c74a76ad",
         "streamId": "stream-2026-09-30",
         "videoId": "y0X6aPrHk4g",
@@ -2985,6 +3079,13 @@
     "originalArtist": "不才",
     "tags": [],
     "performances": [
+      {
+        "id": "p-e20dbdd8-062b-4481-818f-cc5866b4f48e",
+        "streamId": "stream-2026-10-28",
+        "videoId": "FdacPNs4u20",
+        "timestamp": 5845,
+        "endTimestamp": 6118
+      },
       {
         "id": "p-a60b7fb6-7d5e-44f1-937f-46ff11c41252",
         "streamId": "stream-2026-06-10",
@@ -3624,6 +3725,13 @@
     "tags": [],
     "performances": [
       {
+        "id": "p-4c54caf7-6f81-4fdd-ac3a-38a644a8673f",
+        "streamId": "stream-2026-10-28",
+        "videoId": "FdacPNs4u20",
+        "timestamp": 3855,
+        "endTimestamp": 4065
+      },
+      {
         "id": "p-dce63520-2bde-47ca-af44-7a5c2b953410",
         "streamId": "stream-2026-06-10",
         "videoId": "cKzrbehaWUU",
@@ -3950,6 +4058,22 @@
         "videoId": "dP12QYzbzMA",
         "timestamp": 7865,
         "endTimestamp": 8035
+      }
+    ]
+  },
+  {
+    "id": "song-a2298530-1fc7-4c34-8a2d-ebb67eef6cfa",
+    "workId": "work-d40a3bc9-00de-4737-938c-e093dc9934dd",
+    "title": "謫仙",
+    "originalArtist": "葉里",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-1d5d7814-1b71-4342-87e4-c061a38849f4",
+        "streamId": "stream-2026-10-28",
+        "videoId": "FdacPNs4u20",
+        "timestamp": 187,
+        "endTimestamp": 362
       }
     ]
   },
