@@ -476,7 +476,7 @@ const deepLinkWin = new Window({
   url: 'http://localhost/',
   // The editor mounts a YouTube player, which appends the IFrame API script tag; nothing here
   // needs that script, and fetching it would reach the network.
-  settings: { disableJavaScriptFileLoading: true, disableCSSFileLoading: true },
+  settings: { disableJavaScriptFileLoading: true, enableCSSFileLoading: false },
 });
 
 for (const [name, value] of Object.entries({

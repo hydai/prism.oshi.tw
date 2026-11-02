@@ -39,7 +39,7 @@ const win = new Window({
   url: 'http://localhost/',
   // The editors mount a YouTube player, which appends the IFrame API script tag; nothing in this
   // probe needs that script, and fetching it would reach the network.
-  settings: { disableJavaScriptFileLoading: true, disableCSSFileLoading: true },
+  settings: { disableJavaScriptFileLoading: true, enableCSSFileLoading: false },
 });
 
 for (const [name, value] of Object.entries({

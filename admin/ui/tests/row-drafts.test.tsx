@@ -257,7 +257,7 @@ console.log('✓ row drafts live in the row that owns them, and outlive its moun
 
 const win = new Window({
   url: 'http://localhost/',
-  settings: { disableJavaScriptFileLoading: true, disableCSSFileLoading: true },
+  settings: { disableJavaScriptFileLoading: true, enableCSSFileLoading: false },
 });
 
 for (const [name, value] of Object.entries({

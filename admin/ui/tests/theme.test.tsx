@@ -88,7 +88,7 @@ function runPreScript(
 ): Window {
   const scriptWin = new Window({
     url: 'http://localhost/',
-    settings: { disableJavaScriptFileLoading: true, disableCSSFileLoading: true },
+    settings: { disableJavaScriptFileLoading: true, enableCSSFileLoading: false },
   });
 
   options.setupStorage(scriptWin);
