@@ -551,7 +551,6 @@ export function VodRow({
   const detailsId = `nova-vod-details-${vod.id}`;
   // Submitter-supplied: only YouTube's image CDNs may load in the curator's browser.
   const thumbnailUrl = sanitizeNovaUrl(vod.thumbnail_url, 'thumbnail');
-  const label = vodLabel(vod);
 
   // One press: a review sends the status (and the note a rejection carries), a delete asks first.
   const press = async (action: VodAction) => {
@@ -562,77 +561,19 @@ export function VodRow({
   return (
     <tbody className={`mt-0.5 block rounded-radius-lg ${expanded ? 'bg-selected' : ''}`}>
       {/* The title is the accessible toggle control; the chevron is a mouse-only duplicate of it. */}
-      <tr className={`${ROW_GRID} grid items-center rounded-radius-lg px-3 py-2 transition-colors hover:bg-row-hover`}>
-        <td className="flex items-center p-0">
-          <VodThumbnail src={thumbnailUrl} />
-        </td>
-        <td className="flex min-w-0 flex-col gap-0.5 p-0 pl-3">
-          <button
-            type="button"
-            aria-expanded={expanded}
-            aria-controls={detailsId}
-            aria-label={`${expanded ? '收合' : '展開'} ${label}`}
-            onClick={onToggle}
-            className={`max-w-full truncate rounded-radius-sm text-left text-[15px] font-bold leading-tight focus-visible:outline-none focus-visible:shadow-focus ${
-              expanded ? 'text-accent-fg' : 'text-fg'
-            }`}
-          >
-            {vod.stream_title || '—'}
-          </button>
-          <span className="flex items-center gap-1.5 text-[11px]">
-            {showStreamer && (
-              <>
-                <span className="font-mono font-semibold text-fg-muted">{vod.streamer_slug}</span>
-                <span className="text-fg-subtle">·</span>
-              </>
-            )}
-            <a
-              href={vod.video_url}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="inline-flex items-center gap-1 rounded-radius-xs font-mono text-fg-muted transition-colors hover:text-accent-fg focus-visible:outline-none focus-visible:shadow-focus"
-            >
-              {vod.video_id}
-              <Icon name="external" size={11} className="text-fg-subtle" />
-            </a>
-            <span className="text-fg-subtle">·</span>
-            <span className={vod.stream_date ? 'font-mono text-fg-muted' : 'font-medium text-tone-warn-fg'}>
-              {vod.stream_date || 'No date'}
-            </span>
-          </span>
-        </td>
-        <td className="p-0 pl-3">
-          {expanded && Array.isArray(songs) && songs.length > 0 ? (
-            <Pill tone="neutral">{songs.length} songs</Pill>
-          ) : (
-            <span className="text-token-base text-fg-subtle">—</span>
-          )}
-        </td>
-        <td className="p-0 pl-3">
-          <StatusPill status={vod.status} />
-        </td>
-        <td className="p-0 pl-3">
-          <StoredTime value={vod.submitted_at} today={today} className="font-mono text-[11px] text-fg-muted" />
-        </td>
-        <td className="flex items-center justify-end gap-1.5 p-0">
-          {isCurator && !expanded
-            ? (vod.status === 'pending' ? PENDING_ACTIONS : REVIEWED_ACTIONS).map((spec) => (
-                <QuickAction key={spec.action} spec={spec} acting={acting} onPress={press} />
-              ))
-            : null}
-        </td>
-        <td className="flex justify-end p-0">
-          <button
-            type="button"
-            tabIndex={-1}
-            aria-hidden="true"
-            onClick={onToggle}
-            className="flex justify-end text-fg-subtle transition-colors hover:text-accent-fg"
-          >
-            <Icon name={expanded ? 'chevronDown' : 'chevronRight'} size={20} />
-          </button>
-        </td>
-      </tr>
+      <VodSummaryRow
+        vod={vod}
+        isCurator={isCurator}
+        expanded={expanded}
+        showStreamer={showStreamer}
+        songs={songs}
+        acting={acting}
+        today={today}
+        onToggle={onToggle}
+        thumbnailUrl={thumbnailUrl}
+        detailsId={detailsId}
+        onPress={press}
+      />
 
       {/* One column below 1024 px; from there the fields and the songs, with a curator's review card across both
           below them until 1280 px, where it becomes the third column. */}
@@ -869,5 +810,89 @@ function VodThumbnail({ src }: { src: string | null }) {
     >
       <Icon name="film" size={16} />
     </div>
+  );
+}
+
+/** The VOD's summary and quick actions stay separate from its expanded review form. */
+function VodSummaryRow({ vod, isCurator, expanded, showStreamer, songs, acting, today, onToggle, thumbnailUrl, detailsId, onPress }:
+  Pick<VodRowProps, 'vod' | 'isCurator' | 'expanded' | 'showStreamer' | 'songs' | 'acting' | 'today' | 'onToggle'> & {
+    thumbnailUrl: string | null;
+    detailsId: string;
+    onPress: (action: VodAction) => void;
+  }
+) {
+  const label = vodLabel(vod);
+  return (
+    <tr className={`${ROW_GRID} grid items-center rounded-radius-lg px-3 py-2 transition-colors hover:bg-row-hover`}>
+      <td className="flex items-center p-0">
+        <VodThumbnail src={thumbnailUrl} />
+      </td>
+      <td className="flex min-w-0 flex-col gap-0.5 p-0 pl-3">
+        <button
+          type="button"
+          aria-expanded={expanded}
+          aria-controls={detailsId}
+          aria-label={`${expanded ? '收合' : '展開'} ${label}`}
+          onClick={onToggle}
+          className={`max-w-full truncate rounded-radius-sm text-left text-[15px] font-bold leading-tight focus-visible:outline-none focus-visible:shadow-focus ${
+            expanded ? 'text-accent-fg' : 'text-fg'
+          }`}
+        >
+          {vod.stream_title || '—'}
+        </button>
+        <span className="flex items-center gap-1.5 text-[11px]">
+          {showStreamer && (
+            <>
+              <span className="font-mono font-semibold text-fg-muted">{vod.streamer_slug}</span>
+              <span className="text-fg-subtle">·</span>
+            </>
+          )}
+          <a
+            href={vod.video_url}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="inline-flex items-center gap-1 rounded-radius-xs font-mono text-fg-muted transition-colors hover:text-accent-fg focus-visible:outline-none focus-visible:shadow-focus"
+          >
+            {vod.video_id}
+            <Icon name="external" size={11} className="text-fg-subtle" />
+          </a>
+          <span className="text-fg-subtle">·</span>
+          <span className={vod.stream_date ? 'font-mono text-fg-muted' : 'font-medium text-tone-warn-fg'}>
+            {vod.stream_date || 'No date'}
+          </span>
+        </span>
+      </td>
+      <td className="p-0 pl-3">
+        {expanded && Array.isArray(songs) && songs.length > 0 ? (
+          <Pill tone="neutral">{songs.length} songs</Pill>
+        ) : (
+          <span className="text-token-base text-fg-subtle">—</span>
+        )}
+      </td>
+      <td className="p-0 pl-3">
+        <StatusPill status={vod.status} />
+      </td>
+      <td className="p-0 pl-3">
+        <StoredTime value={vod.submitted_at} today={today} className="font-mono text-[11px] text-fg-muted" />
+      </td>
+      <td className="flex items-center justify-end gap-1.5 p-0">
+        {isCurator && !expanded
+          ? (vod.status === 'pending' ? PENDING_ACTIONS : REVIEWED_ACTIONS).map((spec) => (
+              <QuickAction key={spec.action} spec={spec} acting={acting} onPress={onPress} />
+            ))
+          : null}
+      </td>
+      <td className="flex justify-end p-0">
+        <button
+          type="button"
+          tabIndex={-1}
+          aria-hidden="true"
+          onClick={onToggle}
+          className="flex justify-end text-fg-subtle transition-colors hover:text-accent-fg"
+        >
+          <Icon name={expanded ? 'chevronDown' : 'chevronRight'} size={20} />
+        </button>
+      </td>
+    </tr>
   );
 }

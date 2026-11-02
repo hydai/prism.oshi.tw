@@ -38,9 +38,13 @@ async function startPlayAll(page: Page) {
   await expect(page.getByTestId('total-performance-count')).not.toHaveText('0');
   await page.getByTestId('desktop-play-all-button').click();
   await expect(page.getByTestId('mini-player')).toBeVisible();
-  // Wait for the fake player to exist and finish its async onReady.
+  // Construction publishes __ytLast before the fake's macrotask runs onReady. The UI's Pause
+  // label is optimistic, so wait for the callback's playback request before inspecting calls.
   await expect
-    .poll(() => page.evaluate(() => (window as unknown as { __ytLast?: unknown }).__ytLast !== undefined))
+    .poll(() => page.evaluate(() => {
+      const last = (window as unknown as { __ytLast?: { calls: { name: string }[] } }).__ytLast;
+      return last?.calls.some((call) => call.name === 'playVideo') ?? false;
+    }))
     .toBe(true);
   await expect(page.getByTestId('mini-player-play-button')).toHaveAttribute('aria-label', 'Pause');
 }

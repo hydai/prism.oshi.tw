@@ -527,100 +527,32 @@ function ParsedSongsCard({
           </tr>
         </THead>
         <tbody>
-          {songs.map((song, index) => {
-            const n = index + 1;
-            const check = checks[index] ?? null;
-            const messageId = `${idPrefix}-check-${song.clientId}`;
-            // Whether the row's issue is about this field (the start, the title or the artist), and
-            // then whether the field is marked invalid (the issue blocks the import) or warned.
-            const about = (field: RowIssue['field']) => check?.field === field;
-            const invalid = (field: RowIssue['field']) => about(field) && check?.blocking === true;
-            const warned = (field: RowIssue['field']) => about(field) && check?.blocking === false;
-            return (
-              <tr key={song.clientId} className="border-b border-line-soft last:border-b-0">
-                <td className={`${FIRST_CELL_X} py-1.5 font-mono text-meta text-fg-subtle`}>{n}</td>
-                <td className={`${CELL_X} py-1.5`}>
-                  <StartInput
-                    label={`Song ${n} start`}
-                    seconds={song.startSeconds}
-                    draft={startDrafts[song.clientId]}
-                    invalid={invalid('start')}
-                    warned={warned('start')}
-                    describedBy={about('start') ? messageId : undefined}
-                    onDraftChange={(draft) => setStartDraft(song.clientId, draft)}
-                    onCommit={(seconds) => onUpdate(index, 'startSeconds', seconds)}
-                  />
-                </td>
-                {hasEnd ? (
-                  <td className={`${CELL_X} py-1.5 font-mono text-fg-muted`}>
-                    {song.endSeconds !== null ? formatTimestamp(song.endSeconds) : '—'}
-                  </td>
-                ) : null}
-                <td className={`${CELL_X} py-1.5`}>
-                  <TextInput
-                    aria-label={`Song ${n} title`}
-                    aria-invalid={invalid('title') ? 'true' : undefined}
-                    aria-describedby={about('title') ? messageId : undefined}
-                    placeholder="Title missing"
-                    value={song.songName}
-                    onChange={(event) => onUpdate(index, 'songName', event.target.value)}
-                    className={`${INVALID_FIELD}${warned('title') ? ` ${WARNED_FIELD}` : ''}`}
-                  />
-                </td>
-                <td className={`${CELL_X} py-1.5`}>
-                  <TextInput
-                    aria-label={`Song ${n} artist`}
-                    aria-describedby={about('artist') ? messageId : undefined}
-                    placeholder="Artist missing"
-                    value={song.artist}
-                    onChange={(event) => onUpdate(index, 'artist', event.target.value)}
-                    className={warned('artist') ? WARNED_FIELD : undefined}
-                  />
-                </td>
-                <td className={`${CELL_X} py-1.5`}>
-                  <CheckCell check={check} id={messageId} />
-                </td>
-                {/* At the start of its 76 px column: the tooltip centred on it (up to ~105 px, for
-                    "Remove song 100") then still ends inside the card, which clips. */}
-                <td className={`${LAST_CELL_X} py-1.5`}>
-                  <IconButton label={`Remove song ${n}`} icon="x" size="sm" onClick={() => removeRow(index)} />
-                </td>
-              </tr>
-            );
-          })}
+          {songs.map((song, index) => (
+            <ParsedSongRow
+              key={song.clientId}
+              song={song}
+              index={index}
+              check={checks[index] ?? null}
+              messageId={`${idPrefix}-check-${song.clientId}`}
+              hasEnd={hasEnd}
+              startDraft={startDrafts[song.clientId]}
+              onDraftChange={(draft) => setStartDraft(song.clientId, draft)}
+              onUpdate={(field, value) => onUpdate(index, field, value)}
+              onRemove={() => removeRow(index)}
+            />
+          ))}
         </tbody>
       </Table>
-      <div className="flex flex-wrap items-center gap-x-3 gap-y-2 border-t border-line-soft px-3.5 py-2.5">
-        <Checkbox
-          label="Open Stamp Editor after import"
-          visibleLabel
-          checked={openStampEditor}
-          onChange={onOpenStampEditorChange}
-        />
-        <div className="ml-auto flex flex-wrap items-center justify-end gap-x-3 gap-y-2">
-          {toCheck > 0 ? (
-            <span className="text-[12px] text-fg-muted">
-              {toCheck === 1 ? '1 row still needs a look' : `${toCheck} rows still need a look`}
-              {blocked ? null : ' — import anyway?'}
-            </span>
-          ) : null}
-          {blocked ? (
-            <span id={reasonId} className="text-[12px] font-semibold text-tone-danger-fg">
-              Fix the rows marked in red first
-            </span>
-          ) : null}
-          <Button
-            variant="primary"
-            icon="download"
-            busy={importing}
-            disabled={blocked}
-            aria-describedby={blocked ? reasonId : undefined}
-            onClick={onImport}
-          >
-            {songs.length === 1 ? 'Import 1 song' : `Import ${songs.length} songs`}
-          </Button>
-        </div>
-      </div>
+      <ParsedSongsImportBar
+        songCount={songs.length}
+        toCheck={toCheck}
+        blocked={blocked}
+        reasonId={reasonId}
+        importing={importing}
+        openStampEditor={openStampEditor}
+        onOpenStampEditorChange={onOpenStampEditorChange}
+        onImport={onImport}
+      />
     </GlassCard>
   );
 }
@@ -841,5 +773,120 @@ export function ExtractStep({ hidden, extract }: { hidden: boolean; extract: Ext
         <div className="flex min-w-0 flex-col gap-3">{results}</div>
       </div>
     </section>
+  );
+}
+
+/** One parsed row presents its field-specific issue without owning or resetting the card's drafts. */
+function ParsedSongRow({ song, index, check, messageId, hasEnd, startDraft, onDraftChange, onUpdate, onRemove }: {
+  song: EditableParsedSong;
+  index: number;
+  check: RowIssue | null;
+  messageId: string;
+  hasEnd: boolean;
+  startDraft: string | undefined;
+  onDraftChange: (draft: string | undefined) => void;
+  onUpdate: (field: 'startSeconds' | 'songName' | 'artist', value: number | string) => void;
+  onRemove: () => void;
+}) {
+  const n = index + 1;
+  // Whether the row's issue is about this field (the start, the title or the artist), and
+  // then whether the field is marked invalid (the issue blocks the import) or warned.
+  const about = (field: RowIssue['field']) => check?.field === field;
+  const invalid = (field: RowIssue['field']) => about(field) && check?.blocking === true;
+  const warned = (field: RowIssue['field']) => about(field) && check?.blocking === false;
+  return (
+    <tr className="border-b border-line-soft last:border-b-0">
+      <td className={`${FIRST_CELL_X} py-1.5 font-mono text-meta text-fg-subtle`}>{n}</td>
+      <td className={`${CELL_X} py-1.5`}>
+        <StartInput
+          label={`Song ${n} start`}
+          seconds={song.startSeconds}
+          draft={startDraft}
+          invalid={invalid('start')}
+          warned={warned('start')}
+          describedBy={about('start') ? messageId : undefined}
+          onDraftChange={onDraftChange}
+          onCommit={(seconds) => onUpdate('startSeconds', seconds)}
+        />
+      </td>
+      {hasEnd ? (
+        <td className={`${CELL_X} py-1.5 font-mono text-fg-muted`}>
+          {song.endSeconds !== null ? formatTimestamp(song.endSeconds) : '—'}
+        </td>
+      ) : null}
+      <td className={`${CELL_X} py-1.5`}>
+        <TextInput
+          aria-label={`Song ${n} title`}
+          aria-invalid={invalid('title') ? 'true' : undefined}
+          aria-describedby={about('title') ? messageId : undefined}
+          placeholder="Title missing"
+          value={song.songName}
+          onChange={(event) => onUpdate('songName', event.target.value)}
+          className={`${INVALID_FIELD}${warned('title') ? ` ${WARNED_FIELD}` : ''}`}
+        />
+      </td>
+      <td className={`${CELL_X} py-1.5`}>
+        <TextInput
+          aria-label={`Song ${n} artist`}
+          aria-describedby={about('artist') ? messageId : undefined}
+          placeholder="Artist missing"
+          value={song.artist}
+          onChange={(event) => onUpdate('artist', event.target.value)}
+          className={warned('artist') ? WARNED_FIELD : undefined}
+        />
+      </td>
+      <td className={`${CELL_X} py-1.5`}>
+        <CheckCell check={check} id={messageId} />
+      </td>
+      {/* At the start of its 76 px column: the tooltip centred on it (up to ~105 px, for
+          "Remove song 100") then still ends inside the card, which clips. */}
+      <td className={`${LAST_CELL_X} py-1.5`}>
+        <IconButton label={`Remove song ${n}`} icon="x" size="sm" onClick={onRemove} />
+      </td>
+    </tr>
+  );
+}
+
+/** Import availability and its explanation follow the currently checked rows, independently of their fields. */
+function ParsedSongsImportBar({ songCount, toCheck, blocked, reasonId, importing, openStampEditor, onOpenStampEditorChange, onImport }:
+  Pick<ParsedSongsCardProps, 'importing' | 'openStampEditor' | 'onOpenStampEditorChange' | 'onImport'> & {
+    songCount: number;
+    toCheck: number;
+    blocked: boolean;
+    reasonId: string;
+  }
+) {
+  return (
+    <div className="flex flex-wrap items-center gap-x-3 gap-y-2 border-t border-line-soft px-3.5 py-2.5">
+      <Checkbox
+        label="Open Stamp Editor after import"
+        visibleLabel
+        checked={openStampEditor}
+        onChange={onOpenStampEditorChange}
+      />
+      <div className="ml-auto flex flex-wrap items-center justify-end gap-x-3 gap-y-2">
+        {toCheck > 0 ? (
+          <span className="text-[12px] text-fg-muted">
+            {toCheck === 1 ? '1 row still needs a look' : `${toCheck} rows still need a look`}
+            {blocked ? null : ' — import anyway?'}
+          </span>
+        ) : null}
+        {blocked ? (
+          <span id={reasonId} className="text-[12px] font-semibold text-tone-danger-fg">
+            Fix the rows marked in red first
+          </span>
+        ) : null}
+        <Button
+          variant="primary"
+          icon="download"
+          busy={importing}
+          disabled={blocked}
+          aria-describedby={blocked ? reasonId : undefined}
+          onClick={onImport}
+        >
+          {songCount === 1 ? 'Import 1 song' : `Import ${songCount} songs`}
+        </Button>
+      </div>
+    </div>
   );
 }

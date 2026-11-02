@@ -438,16 +438,10 @@ export default function Dashboard({ user }: { user: AuthUser }) {
   const workStreams = shown('stampStreams') === 'ready' ? stampStreams.data : null;
   const withWork = workStreams ? streamsWithWork(workStreams) : null;
   // Each part stays on one line, so a phone never leaves "done" on a line of its own.
-  let stampSub: string[] | undefined;
-  if (stampCounts) {
-    const done = `${stampCounts.filled.toLocaleString()} / ${stampCounts.total.toLocaleString()} done`;
-    stampSub = withWork === null ? [done] : [`${withWork.toLocaleString()} ${withWork === 1 ? 'stream' : 'streams'}`, done];
-  }
+  const stampSub = stampSubline(stampCounts, withWork);
 
   const pendingList = shown('pendingStreams') === 'ready' ? pendingStreams.data : null;
-  const oldestPending = pendingList ? oldestPendingDate(pendingList) : null;
-  let reviewSub: string | undefined;
-  if (pendingList) reviewSub = oldestPending ? `Oldest from ${oldestPending}` : 'Nothing waiting';
+  const reviewSub = reviewSubline(pendingList);
 
   // The Inbox card, over the shell's three inbox lists. A list's count shows once that list is shown
   // ready — on its chip, and in the total, which needs all three — never while a Retry of it runs.
@@ -457,61 +451,10 @@ export default function Dashboard({ user }: { user: AuthUser }) {
   const matchStats = workMatches.data;
   const vod = vodStatus.data;
   const vodState = vod ? vodExportState(vod) : null;
-  let vodSub: string | undefined;
-  if (vod) {
-    vodSub = vod.currentPublication
-      ? `Last published ${formatWhen(vod.currentPublication.publishedAt, today)}`
-      : 'Never published';
-  }
+  const vodSub = vodPublicationSubline(vod, today);
 
   const statsState = shown('stats');
   const stampStreamsState = shown('stampStreams');
-
-  let catalogBody: ReactNode;
-  let recentBody: ReactNode;
-  if (statsState === 'ready' && stats.data) {
-    catalogBody = (
-      <CatalogBars
-        rows={[
-          { label: 'Songs', counts: stats.data.songs },
-          { label: 'Streams', counts: stats.data.streams },
-          { label: 'Performances', counts: stats.data.performances },
-        ]}
-      />
-    );
-    recentBody = <RecentSubmissions items={stats.data.recentSubmissions} now={refreshedAt} />;
-  } else if (statsState === 'error' || statsState === 'retrying') {
-    const busy = statsState === 'retrying';
-    catalogBody = <SectionError what="the catalog" title="Catalog" busy={busy} onRetry={() => retry(['stats'])} />;
-    recentBody = (
-      <div className="px-4 pb-2">
-        <SectionError what="recent submissions" title="Recent submissions" busy={busy} onRetry={() => retry(['stats'])} />
-      </div>
-    );
-  } else {
-    catalogBody = <Skeleton rows={3} label="Loading the catalog..." />;
-    recentBody = (
-      <div className="px-4 pb-3">
-        <Skeleton rows={5} label="Loading recent submissions..." />
-      </div>
-    );
-  }
-
-  let stampingBody: ReactNode;
-  if (stampStreamsState === 'ready' && stampStreams.data) {
-    stampingBody = <StampingList streams={continueStampingStreams(stampStreams.data)} />;
-  } else if (stampStreamsState === 'error' || stampStreamsState === 'retrying') {
-    stampingBody = (
-      <SectionError
-        what="the streams to stamp"
-        title="Continue stamping"
-        busy={stampStreamsState === 'retrying'}
-        onRetry={() => retry(['stampStreams'])}
-      />
-    );
-  } else {
-    stampingBody = <Skeleton rows={4} label="Loading the streams to stamp..." />;
-  }
 
   return (
     <div className="flex flex-col">
@@ -606,7 +549,7 @@ export default function Dashboard({ user }: { user: AuthUser }) {
                 <SectionLink to="/streams">Streams</SectionLink>
               </div>
             </SectionHead>
-            <div className="mt-1.5">{catalogBody}</div>
+            <div className="mt-1.5"><CatalogContent state={statsState} stats={stats.data} onRetry={() => retry(['stats'])} /></div>
           </GlassCard>
 
           <GlassCard as="section" padding="none" className="min-w-0 px-4 py-3">
@@ -615,7 +558,7 @@ export default function Dashboard({ user }: { user: AuthUser }) {
                 <SectionLink to="/stamp">Stamp Editor</SectionLink>
               </div>
             </SectionHead>
-            <div className="mt-1.5">{stampingBody}</div>
+            <div className="mt-1.5"><StampingContent state={stampStreamsState} streams={stampStreams.data} onRetry={() => retry(['stampStreams'])} /></div>
           </GlassCard>
         </div>
 
@@ -625,9 +568,74 @@ export default function Dashboard({ user }: { user: AuthUser }) {
               <span className="text-[11.5px] text-fg-muted">click a row to open it</span>
             </SectionHead>
           </div>
-          {recentBody}
+          <RecentContent state={statsState} stats={stats.data} now={refreshedAt} onRetry={() => retry(['stats'])} />
         </GlassCard>
       </div>
     </div>
   );
+}
+
+/** Stamp counts and the optional stream count use one consistent sub-line in every load state. */
+function stampSubline(counts: { filled: number; total: number } | null, withWork: number | null): string[] | undefined {
+  if (counts === null) return undefined;
+  const done = `${counts.filled.toLocaleString()} / ${counts.total.toLocaleString()} done`;
+  return withWork === null ? [done] : [`${withWork.toLocaleString()} ${withWork === 1 ? 'stream' : 'streams'}`, done];
+}
+
+type StatsContentProps = {
+  state: ShownState;
+  stats: Awaited<ReturnType<typeof api.stats>> | null;
+  onRetry: () => void;
+};
+
+/** Catalog and recent submissions share a load, but keep their own ready/error/loading markup. */
+function CatalogContent({ state, stats, onRetry }: StatsContentProps) {
+  if (state === 'ready' && stats) {
+    return <CatalogBars rows={[
+      { label: 'Songs', counts: stats.songs },
+      { label: 'Streams', counts: stats.streams },
+      { label: 'Performances', counts: stats.performances },
+    ]} />;
+  }
+  if (state === 'error' || state === 'retrying') {
+    return <SectionError what="the catalog" title="Catalog" busy={state === 'retrying'} onRetry={onRetry} />;
+  }
+  return <Skeleton rows={3} label="Loading the catalog..." />;
+}
+
+function RecentContent({ state, stats, now, onRetry }: StatsContentProps & { now: number }) {
+  if (state === 'ready' && stats) return <RecentSubmissions items={stats.recentSubmissions} now={now} />;
+  if (state === 'error' || state === 'retrying') {
+    return <div className="px-4 pb-2">
+      <SectionError what="recent submissions" title="Recent submissions" busy={state === 'retrying'} onRetry={onRetry} />
+    </div>;
+  }
+  return <div className="px-4 pb-3"><Skeleton rows={5} label="Loading recent submissions..." /></div>;
+}
+
+/** The stamping list has its own request and retry, independent of catalog availability. */
+function StampingContent({ state, streams, onRetry }: {
+  state: ShownState;
+  streams: Parameters<typeof continueStampingStreams>[0] | null;
+  onRetry: () => void;
+}) {
+  if (state === 'ready' && streams) return <StampingList streams={continueStampingStreams(streams)} />;
+  if (state === 'error' || state === 'retrying') {
+    return <SectionError what="the streams to stamp" title="Continue stamping" busy={state === 'retrying'} onRetry={onRetry} />;
+  }
+  return <Skeleton rows={4} label="Loading the streams to stamp..." />;
+}
+
+/** Missing data has no sub-line; a loaded empty review list explicitly says nothing is waiting. */
+function reviewSubline(streams: Stream[] | null): string | undefined {
+  if (streams === null) return undefined;
+  const oldest = oldestPendingDate(streams);
+  return oldest ? `Oldest from ${oldest}` : 'Nothing waiting';
+}
+
+function vodPublicationSubline(vod: VodExportStatusResponse | null, today: Date): string | undefined {
+  if (vod === null) return undefined;
+  return vod.currentPublication
+    ? `Last published ${formatWhen(vod.currentPublication.publishedAt, today)}`
+    : 'Never published';
 }

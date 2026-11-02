@@ -829,6 +829,19 @@ function elementsIn(node: React.ReactNode, found: React.ReactElement[] = []): Re
   return found;
 }
 
+/** Follow the header's hook-free view parts while leaving stateful shared controls unrendered.
+ * The callback assertions below inspect the same InlineEdit, Button and Popover props across
+ * component boundaries; their behavior must not depend on whether the header is one function. */
+function headerElementsIn(tree: React.ReactNode): React.ReactElement[] {
+  const viewParts = new Set(['StreamHeaderTitle', 'StreamHeaderMeta', 'StreamHeaderActions', 'StreamActionMenu']);
+  return elementsIn(tree).flatMap((element) => {
+    const component = componentOf(element.type);
+    return viewParts.has(component.name ?? '')
+      ? headerElementsIn(component(element.props))
+      : [element];
+  });
+}
+
 /** What the `componentName` element in `tree` renders — its props exactly as the page handed them. */
 function renderOf(tree: React.ReactNode, componentName: string): React.ReactNode {
   const host = elementsIn(tree).find((element) => componentOf(element.type).name === componentName);
@@ -840,7 +853,7 @@ function renderOf(tree: React.ReactNode, componentName: string): React.ReactNode
 // for the row editors, the stream header for the title editor (which reaches the page through
 // PageHeader's `title`).
 function inlineEditProps(tree: React.ReactNode, componentName: string): InlineEditCallProps[] {
-  return elementsIn(renderOf(tree, componentName))
+  return headerElementsIn(renderOf(tree, componentName))
     .filter((element) => element.type === InlineEdit)
     .map((element) => element.props as InlineEditCallProps);
 }
@@ -925,7 +938,7 @@ assert(artistEdits[0]?.allowEmpty === true, 'artist keeps its empty-save opt-in'
 
 /** The items the More stream actions menu is handed. */
 function streamMenuItemsIn(tree: React.ReactNode): MenuItem[] {
-  const popover = elementsIn(renderOf(tree, 'StreamHeader')).find(
+  const popover = headerElementsIn(renderOf(tree, 'StreamHeader')).find(
     (element) => element.type === Popover && (element.props as { label?: string }).label === 'More stream actions',
   );
   assert(popover !== undefined, 'the header renders the More stream actions popover');
@@ -935,7 +948,7 @@ function streamMenuItemsIn(tree: React.ReactNode): MenuItem[] {
 }
 
 function buttonNamed(tree: React.ReactNode, label: string): { onClick: () => void } {
-  const button = elementsIn(renderOf(tree, 'StreamHeader')).find(
+  const button = headerElementsIn(renderOf(tree, 'StreamHeader')).find(
     (element) => element.type === Button && (element.props as { children?: unknown }).children === label,
   );
   assert(button !== undefined, `the header renders a ${label} button`);
@@ -1615,6 +1628,43 @@ assert(
 await controlsHarness.unmount();
 
 console.log("✓ Clicks inside an open editor or on a row's controls never select the row or close the editor; Edit note opens the note editor");
+
+// Row activation is also available from the keyboard, independently of its nested editors/buttons.
+for (const key of ['Enter', ' ']) {
+  const harness = await mountRowHarness(null);
+  const row = harness.container.querySelector<DomElement>('#performance-row-performance-one');
+  assert(row !== null && row.getAttribute('tabindex') === '0', 'a performance row is reachable by Tab');
+  assert(row.getAttribute('aria-selected') === 'false', 'the unselected row exposes its selection state');
+  await act(async () => { row.focus(); });
+  const activation = new KeyboardEvent('keydown', { key, bubbles: true, cancelable: true });
+  await act(async () => { (row as unknown as HTMLElement).dispatchEvent(activation); });
+  assert(activation.defaultPrevented, `${JSON.stringify(key)} activates the row without its browser default`);
+  assert(rowCalls.join() === 'setSelectedIndex:0,setEditingField:null', `${JSON.stringify(key)} selects the row and closes the editor`);
+  assert(row.getAttribute('aria-selected') === 'true', 'the activated row exposes its new selection state');
+  await harness.unmount();
+}
+
+const keyboardHarness = await mountRowHarness({ type: 'perf', perfId: 'performance-one', field: 'note' });
+const keyboardRow = keyboardHarness.container.querySelector<DomElement>('#performance-row-performance-one');
+const keyboardEditor = keyboardHarness.container.querySelector<DomElement>('#performance-row-performance-one input');
+const keyboardControl = keyboardHarness.container.querySelector<DomElement>('#performance-row-performance-one [title="Seek to start"]');
+assert(keyboardRow !== null && keyboardEditor !== null && keyboardControl !== null, 'the keyboard harness has a row, editor and seek control');
+for (const init of [
+  { key: 'ArrowDown' },
+  { key: 'Escape' },
+  { key: 'Enter', isComposing: true },
+  { key: ' ', keyCode: 229 },
+]) {
+  await keyDown(keyboardRow, init);
+}
+await keyDown(keyboardEditor, { key: ' ' });
+await keyDown(keyboardControl, { key: 'Enter' });
+assert(rowCalls.length === 0, 'unrelated keys, IME input and keys on nested controls never activate the row');
+assert(keyboardRow.getAttribute('aria-selected') === 'false', 'nested controls keep the original row selection');
+assert(keyboardHarness.container.querySelector('#performance-row-performance-one input') !== null, 'nested keyboard input keeps the editor open');
+await keyboardHarness.unmount();
+
+console.log('✓ Performance rows support Enter and Space without intercepting nested controls, unrelated keys or IME composition');
 
 // --- The stream date field: Enter saves and Escape cancels — but never mid-composition ---
 //

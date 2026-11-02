@@ -158,21 +158,15 @@ export default function VodExportRepair({ user }: { user: AuthUser }) {
   const params = useParams<{ entity: string; rowId: string }>();
   const [record, setRecord] = useState<VodExportRepairRecord | null>(null);
   const [error, setError] = useState<string | null>(null);
-  const entity = params.entity === 'performance'
-    || params.entity === 'song'
-    || params.entity === 'vod'
-    || params.entity === 'streamer'
-    ? params.entity
-    : null;
-  const rowId = /^(?:[1-9][0-9]*)$/.test(params.rowId ?? '') ? Number(params.rowId) : null;
+  const { entity, rowId } = repairLocator(params);
   // Mirrors the effect's own guard below: a request that guard would reject never has
   // anything to load, so `loading` starts false for it instead of flipping there a
   // moment after mount.
-  const isValidRequest = user.role === 'curator' && entity !== null && rowId !== null && Number.isSafeInteger(rowId);
+  const isValidRequest = user.role === 'curator' && entity !== null && rowId !== null;
   const [loading, setLoading] = useState(() => isValidRequest);
 
   useEffect(() => {
-    if (user.role !== 'curator' || entity === null || rowId === null || !Number.isSafeInteger(rowId)) {
+    if (user.role !== 'curator' || entity === null || rowId === null) {
       return;
     }
     let active = true;
@@ -199,7 +193,7 @@ export default function VodExportRepair({ user }: { user: AuthUser }) {
       </div>
     );
   }
-  if (entity === null || rowId === null || !Number.isSafeInteger(rowId)) {
+  if (entity === null || rowId === null) {
     return (
       <div className="p-4 lg:px-5">
         <Note tone="danger" icon="alert">Invalid private source locator.</Note>
@@ -238,4 +232,20 @@ export default function VodExportRepair({ user }: { user: AuthUser }) {
       </div>
     </div>
   );
+}
+
+/** Parse and validate the private locator before either rendering or starting its request. */
+function repairLocator(params: { entity?: string; rowId?: string }): {
+  entity: VodExportRepairRecord['entity'] | null;
+  rowId: number | null;
+} {
+  const entity = params.entity === 'performance'
+    || params.entity === 'song'
+    || params.entity === 'vod'
+    || params.entity === 'streamer'
+    ? params.entity
+    : null;
+  const parsedRowId = /^(?:[1-9][0-9]*)$/.test(params.rowId ?? '') ? Number(params.rowId) : null;
+  const rowId = parsedRowId !== null && Number.isSafeInteger(parsedRowId) ? parsedRowId : null;
+  return { entity, rowId };
 }

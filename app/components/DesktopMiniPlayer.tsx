@@ -77,46 +77,12 @@ export default function DesktopMiniPlayer({
       {/* 3-column layout */}
       <div className="flex items-center h-full px-4 gap-4">
         {/* LEFT COLUMN: 280px — album art, track info */}
-        <button
-          type="button"
-          className="flex flex-shrink-0 items-center gap-3 text-left"
-          style={{ width: '280px' }}
-          onClick={onOpenPlayer}
-          aria-label={`開啟正在播放：${currentTrack.songTitle}`}
-          aria-describedby={playerError ? playerErrorId : undefined}
-        >
-          {/* Album cover thumbnail — 48×48 desktop */}
-          <AlbumArt
-            alt={`${currentTrack.songTitle} - ${currentTrack.originalArtist}`}
-            size={48}
-          />
-
-          {/* Track info */}
-          <div className="min-w-0 flex-1">
-            <div
-              className="font-bold truncate text-token-sm text-token-primary"
-              style={{ fontWeight: 500 }}
-            >
-              {currentTrack.songTitle}
-            </div>
-            {playerError ? (
-              <div
-                className="flex items-center gap-1 truncate text-red-500 text-token-xs"
-                data-testid="player-error-message"
-                aria-hidden="true"
-              >
-                <AlertCircle style={{ width: '12px', height: '12px', flexShrink: 0 }} />
-                <span>{playerError}</span>
-              </div>
-            ) : (
-              <div
-                className="truncate text-token-xs text-token-secondary"
-              >
-                {currentTrack.originalArtist}
-              </div>
-            )}
-          </div>
-        </button>
+        <DesktopTrackSummary
+          currentTrack={currentTrack}
+          playerError={playerError}
+          playerErrorId={playerErrorId}
+          onOpenPlayer={onOpenPlayer}
+        />
 
         {/* CENTER COLUMN: fill — transport controls + progress bar */}
         <div
@@ -276,5 +242,53 @@ export default function DesktopMiniPlayer({
         </div>
       </div>
     </div>
+  );
+}
+
+/** Track identity and playback error share one button that opens the full player. */
+function DesktopTrackSummary({ currentTrack, playerError, playerErrorId, onOpenPlayer }:
+  Pick<DesktopMiniPlayerProps, 'currentTrack' | 'playerError' | 'playerErrorId' | 'onOpenPlayer'>
+) {
+  return (
+    <button
+      type="button"
+      className="flex flex-shrink-0 items-center gap-3 text-left"
+      style={{ width: '280px' }}
+      onClick={onOpenPlayer}
+      aria-label={`開啟正在播放：${currentTrack.songTitle}`}
+      aria-describedby={playerError ? playerErrorId : undefined}
+    >
+      {/* Album cover thumbnail — 48×48 desktop */}
+      <AlbumArt
+        alt={`${currentTrack.songTitle} - ${currentTrack.originalArtist}`}
+        size={48}
+      />
+
+      {/* Track info */}
+      <div className="min-w-0 flex-1">
+        <div
+          className="font-bold truncate text-token-sm text-token-primary"
+          style={{ fontWeight: 500 }}
+        >
+          {currentTrack.songTitle}
+        </div>
+        {playerError ? (
+          <div
+            className="flex items-center gap-1 truncate text-red-500 text-token-xs"
+            data-testid="player-error-message"
+            aria-hidden="true"
+          >
+            <AlertCircle style={{ width: '12px', height: '12px', flexShrink: 0 }} />
+            <span>{playerError}</span>
+          </div>
+        ) : (
+          <div
+            className="truncate text-token-xs text-token-secondary"
+          >
+            {currentTrack.originalArtist}
+          </div>
+        )}
+      </div>
+    </button>
   );
 }

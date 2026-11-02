@@ -16,7 +16,7 @@ import { EmptyState, GlassCard } from '../ui/Display';
 import { Note } from '../ui/Note';
 import { Pill } from '../ui/Pill';
 import { QueueLayout } from '../ui/QueueLayout';
-import { nextQueueKey } from '../ui/queue';
+import { nextQueueKey, queueSelection } from '../ui/queue';
 import { useToast } from '../ui/toast';
 import GroupRow from './GroupRow';
 import NoGroupsFound from './NoGroupsFound';
@@ -82,11 +82,8 @@ export default function SimilarSongsTab({
   const keys = groups.map(groupKeyOf);
   // Derived as the rows render, so the selection never trails them: the first group is selected in
   // the render its scan lands in, and a group no longer listed hands the selection to the first.
-  const selectedKey = picked !== null && keys.includes(picked) ? picked : (keys[0] ?? null);
-  const selectedIndex = selectedKey === null ? -1 : keys.indexOf(selectedKey);
+  const { selectedKey, selectedIndex, previousKey, nextKey } = queueSelection(keys, picked);
   const selected = groups[selectedIndex];
-  const previousKey = selectedIndex > 0 ? keys[selectedIndex - 1] : undefined;
-  const nextKey = selectedIndex === -1 ? undefined : keys[selectedIndex + 1];
 
   const handleScan = async () => {
     if (applying.size > 0) return;
