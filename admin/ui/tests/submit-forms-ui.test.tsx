@@ -2020,6 +2020,7 @@ async function main(): Promise<void> {
   // The test DOM loads no iframe page, and this suite counts the pages its player asks for: here an iframe navigates
   // again, as in a browser. happy-dom would fetch its src from the real network: answer it here, and keep what it asked for.
   win.happyDOM.settings.navigation.disableChildFrameNavigation = false;
+  win.happyDOM.settings.enableIframePageLoading = true;
   win.happyDOM.settings.fetch.interceptor = {
     beforeAsyncRequest: async ({ request, window }) => {
       frameRequests.push(request.url);

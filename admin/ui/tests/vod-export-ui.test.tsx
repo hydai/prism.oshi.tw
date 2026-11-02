@@ -1904,7 +1904,7 @@ async function main(): Promise<void> {
   // render. A live DOM is required here because static markup cannot observe focus.
   const focusWin = new Window({
     url: 'http://localhost/',
-    settings: { disableJavaScriptFileLoading: true, disableCSSFileLoading: true },
+    settings: { disableJavaScriptFileLoading: true, enableCSSFileLoading: false },
   });
   for (const [name, value] of Object.entries({
     window: focusWin,

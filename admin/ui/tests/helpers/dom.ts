@@ -20,11 +20,11 @@ export function installDom(url: string = 'http://localhost/'): Window {
     // No suite mounted through this helper needs a real script/stylesheet fetch; disabling both
     // keeps a stray <script src> or <link> from reaching the network. Nor does one need the page an
     // iframe shows, which happy-dom would load from the real network too (a YouTube player's embed):
-    // with child-frame navigation off, an iframe only takes its URL. (`disableIframePageLoading`, the
-    // older switch, is deprecated in happy-dom 20 and logs an error for every iframe it stops.)
+    // with child-frame navigation off, an iframe only takes its URL. Suites that mock iframe requests
+    // explicitly enable both navigation and happy-dom 21's iframe page loading.
     settings: {
       disableJavaScriptFileLoading: true,
-      disableCSSFileLoading: true,
+      enableCSSFileLoading: false,
       navigation: { disableChildFrameNavigation: true },
     },
   });
