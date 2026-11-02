@@ -10,7 +10,7 @@ import { useConfirm } from '../ui/confirm';
 import { EmptyState, GlassCard } from '../ui/Display';
 import { Note } from '../ui/Note';
 import { QueueLayout } from '../ui/QueueLayout';
-import { nextQueueKey } from '../ui/queue';
+import { nextQueueKey, queueSelection } from '../ui/queue';
 import { useToast } from '../ui/toast';
 import GroupRow from './GroupRow';
 import NoGroupsFound from './NoGroupsFound';
@@ -80,14 +80,12 @@ export default function SimilarArtistsTab({
   const toast = useToast();
 
   const applyPending = applyingKey !== null || applyingAll;
+  const applyUnavailable = applyPending || loading;
   const keys = groups.map(groupKeyOf);
   // Derived as the rows render, so the selection never trails them: the first group is selected in
   // the render its scan lands in, and a group no longer listed hands the selection to the first.
-  const selectedKey = picked !== null && keys.includes(picked) ? picked : (keys[0] ?? null);
-  const selectedIndex = selectedKey === null ? -1 : keys.indexOf(selectedKey);
+  const { selectedKey, selectedIndex, previousKey, nextKey } = queueSelection(keys, picked);
   const selected = groups[selectedIndex];
-  const previousKey = selectedIndex > 0 ? keys[selectedIndex - 1] : undefined;
-  const nextKey = selectedIndex === -1 ? undefined : keys[selectedIndex + 1];
   const nameOf = (group: ArtistGroup): string => canonicals.get(group.normalizedKey) ?? '';
   /** What Apply All Reviewed sends: every group with a name, with its renames. */
   const reviewed = groups.flatMap((group) => {
@@ -107,7 +105,7 @@ export default function SimilarArtistsTab({
 
   const handleApplyGroup = async (group: ArtistGroup) => {
     const renames = renamesFor(group, nameOf(group));
-    if (renames.length === 0 || applyPending || loading) return;
+    if (renames.length === 0 || applyUnavailable) return;
 
     setApplyingKey(group.normalizedKey);
     try {
@@ -128,7 +126,7 @@ export default function SimilarArtistsTab({
   };
 
   const handleApplyAll = async () => {
-    if (reviewed.length === 0 || applyPending || loading) return;
+    if (reviewed.length === 0 || applyUnavailable) return;
     const renames = reviewed.flatMap((entry) => entry.renames);
     const confirmed = await confirm({
       title: `Apply ${counted(reviewed.length, 'canonical artist name', 'canonical artist names')}?`,
@@ -153,35 +151,20 @@ export default function SimilarArtistsTab({
   };
 
   const scanned = stats !== null;
-  const summary = scanned ? groupsSummary(groups, 'artist name', 'artist names') : null;
 
   return (
     <div className="flex flex-col gap-3.5">
-      {active && controlsSlot
-        ? createPortal(
-            <ScanControls
-              scan={scanState}
-              thresholdId="artist-harmonizer-threshold"
-              scanned={scanned}
-              summary={summary}
-              scannedAt={scannedAt}
-              onScan={() => void handleScan()}
-              disabled={applyPending}
-            >
-              {groups.length > 0 ? (
-                <Button
-                  icon="check"
-                  busy={applyingAll}
-                  disabled={reviewed.length === 0 || applyPending || loading}
-                  onClick={() => void handleApplyAll()}
-                >
-                  {applyingAll ? 'Applying...' : 'Apply All Reviewed'}
-                </Button>
-              ) : null}
-            </ScanControls>,
-            controlsSlot,
-          )
-        : null}
+      <ArtistScanControls
+        active={active}
+        controlsSlot={controlsSlot}
+        scan={scanState}
+        scannedAt={scannedAt}
+        applyPending={applyPending}
+        applyingAll={applyingAll}
+        reviewedCount={reviewed.length}
+        onScan={() => void handleScan()}
+        onApplyAll={() => void handleApplyAll()}
+      />
 
       {error ? (
         <Note tone="danger" icon="alert" role="alert">
@@ -208,7 +191,7 @@ export default function SimilarArtistsTab({
                 group={selected}
                 canonicalName={nameOf(selected)}
                 isApplying={applyingKey === selected.normalizedKey}
-                applyDisabled={renamesFor(selected, nameOf(selected)).length === 0 || applyPending || loading}
+                applyDisabled={renamesFor(selected, nameOf(selected)).length === 0 || applyUnavailable}
                 onCanonicalNameChange={(name) => setCanonical(selected.normalizedKey, name)}
                 onApply={() => void handleApplyGroup(selected)}
                 onPrevious={previousKey === undefined ? undefined : () => setPicked(previousKey)}
@@ -241,5 +224,45 @@ export default function SimilarArtistsTab({
         </GlassCard>
       )}
     </div>
+  );
+}
+
+/** Only the active artists tab owns the page header's scan and batch-apply controls. */
+function ArtistScanControls({ active, controlsSlot, scan, scannedAt, applyPending, applyingAll, reviewedCount, onScan, onApplyAll }: {
+  active: boolean;
+  controlsSlot: HTMLElement | null;
+  scan: ReturnType<typeof useHarmonizeScan<HarmonizeArtistEntry, ArtistScanStats>>;
+  scannedAt: number | null;
+  applyPending: boolean;
+  applyingAll: boolean;
+  reviewedCount: number;
+  onScan: () => void;
+  onApplyAll: () => void;
+}) {
+  if (!active || controlsSlot === null) return null;
+  const scanned = scan.stats !== null;
+  const summary = scanned ? groupsSummary(scan.groups, 'artist name', 'artist names') : null;
+  return createPortal(
+    <ScanControls
+      scan={scan}
+      thresholdId="artist-harmonizer-threshold"
+      scanned={scanned}
+      summary={summary}
+      scannedAt={scannedAt}
+      onScan={onScan}
+      disabled={applyPending}
+    >
+      {scan.groups.length > 0 ? (
+        <Button
+          icon="check"
+          busy={applyingAll}
+          disabled={reviewedCount === 0 || applyPending || scan.loading}
+          onClick={onApplyAll}
+        >
+          {applyingAll ? 'Applying...' : 'Apply All Reviewed'}
+        </Button>
+      ) : null}
+    </ScanControls>,
+    controlsSlot,
   );
 }

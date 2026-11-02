@@ -1,6 +1,22 @@
 import type { ReactNode, Ref } from 'react';
 import { MICRO_LABEL } from './micro-label';
 
+/** Title layout is shared by ordinary, record, and programmatically focusable page headers. */
+function titleLayout(recordTitle: boolean, takesFocus: boolean, hasMeta: boolean) {
+  const crumbClasses = `${MICRO_LABEL}${recordTitle ? '' : ' max-lg:sr-only'}`;
+  const titleClasses = `truncate text-[18px] font-[750] leading-[1.15] tracking-[-0.01em] text-fg${recordTitle ? '' : ' max-lg:sr-only'}${
+    takesFocus && !recordTitle ? ' max-lg:focus:not-sr-only' : ''
+  }`;
+  // With nothing visible in it below 1024px (no record title, no meta row), the title block leaves
+  // the bar's flow there too: as an empty flex slot, it and the bar's gap pushed the first visible
+  // item 12px past the bar's padding. Its <h1> stays in the accessibility tree.
+  let titleBlockClasses = `min-w-0 max-lg:sr-only${takesFocus ? ' max-lg:focus-within:not-sr-only' : ''}`;
+  if (recordTitle) titleBlockClasses = 'min-w-0 flex-1 basis-[20rem] max-sm:w-full';
+  else if (hasMeta) titleBlockClasses = 'min-w-0 max-sm:w-full';
+
+  return { crumbClasses, titleClasses, titleBlockClasses };
+}
+
 /**
  * Glass bar at the top of `<main>` (spec §5, §8; mockup `.hdr`). From lg up it sticks there
  * (`lg:sticky lg:top-0`). Below lg it scrolls away with the page: on a phone only the mobile top
@@ -82,16 +98,7 @@ export function PageHeader({
   // while focus is within it. The crumb stays hidden. Only a hidden title gets these classes: on a
   // visible one, `not-sr-only` would just drop its truncation (or its block's full width) on focus.
   const takesFocus = !!titleRef;
-  const crumbClasses = `${MICRO_LABEL}${recordTitle ? '' : ' max-lg:sr-only'}`;
-  const titleClasses = `truncate text-[18px] font-[750] leading-[1.15] tracking-[-0.01em] text-fg${recordTitle ? '' : ' max-lg:sr-only'}${
-    takesFocus && !recordTitle ? ' max-lg:focus:not-sr-only' : ''
-  }`;
-  // With nothing visible in it below 1024px (no record title, no meta row), the title block leaves
-  // the bar's flow there too: as an empty flex slot, it and the bar's gap pushed the first visible
-  // item 12px past the bar's padding. Its <h1> stays in the accessibility tree.
-  let titleBlockClasses = `min-w-0 max-lg:sr-only${takesFocus ? ' max-lg:focus-within:not-sr-only' : ''}`;
-  if (recordTitle) titleBlockClasses = 'min-w-0 flex-1 basis-[20rem] max-sm:w-full';
-  else if (meta) titleBlockClasses = 'min-w-0 max-sm:w-full';
+  const { crumbClasses, titleClasses, titleBlockClasses } = titleLayout(recordTitle, takesFocus, !!meta);
 
   // With nothing but its hidden title below 1024px (no children, actions, meta row, record title or
   // focus target) the bar would be an empty glass band there. It leaves the flow like its title block

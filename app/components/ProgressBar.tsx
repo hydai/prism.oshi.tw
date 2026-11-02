@@ -72,6 +72,14 @@ export default function ProgressBar({
     onSeek(Math.min(1, Math.max(0, next)));
   };
 
+  // Both visual variants enable or disable the same complete set of seek interactions.
+  const interactionProps = disabled ? {} : {
+    onKeyDown: handleKeyDown,
+    onClick: handleClick,
+    onTouchStart: handleTouchStart,
+    onTouchMove: handleTouchMove,
+  };
+
   if (variant === 'mini') {
     return (
       <div
@@ -83,7 +91,7 @@ export default function ProgressBar({
         aria-valuemax={100}
         aria-valuenow={Math.round(clamped)}
         aria-valuetext={disabled ? '歌曲時長不明，無法調整進度' : `${Math.round(clamped)}%`}
-        onKeyDown={disabled ? undefined : handleKeyDown}
+        {...interactionProps}
         ref={barRef}
         className="focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--accent-pink-light)] bg-surface-muted"
         style={{
@@ -92,9 +100,6 @@ export default function ProgressBar({
           overflow: 'hidden',
           touchAction: 'none',
         }}
-        onClick={disabled ? undefined : handleClick}
-        onTouchStart={disabled ? undefined : handleTouchStart}
-        onTouchMove={disabled ? undefined : handleTouchMove}
       >
         <div
           style={{
@@ -119,7 +124,7 @@ export default function ProgressBar({
       aria-valuemax={100}
       aria-valuenow={Math.round(clamped)}
       aria-valuetext={disabled ? '歌曲時長不明，無法調整進度' : `${Math.round(clamped)}%`}
-      onKeyDown={disabled ? undefined : handleKeyDown}
+      {...interactionProps}
       ref={barRef}
       className={`group relative flex-1 ${disabled ? 'cursor-default' : 'cursor-pointer'} focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--accent-pink-light)] bg-surface-muted`}
       style={{
@@ -127,9 +132,6 @@ export default function ProgressBar({
         borderRadius: `${height / 2}px`,
         touchAction: 'none',
       }}
-      onClick={disabled ? undefined : handleClick}
-      onTouchStart={disabled ? undefined : handleTouchStart}
-      onTouchMove={disabled ? undefined : handleTouchMove}
     >
       <div
         style={{

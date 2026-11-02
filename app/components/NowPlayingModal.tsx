@@ -166,43 +166,10 @@ export default function NowPlayingModal() {
           </div>
 
           {/* Next Up — queue preview */}
-          <div className="mt-8 pt-6 border-t border-t-border-token">
-            <div className="flex items-center justify-between mb-4">
-              <h4 className="text-sm font-semibold uppercase tracking-wider text-token-secondary">Next Up</h4>
-              {queue.length > 0 && (
-                <button
-                  onClick={() => {
-                    setShowQueue(true);
-                    setShowModal(false);
-                  }}
-                  className="text-xs font-medium transition-colors hover:brightness-110 text-accent-pink"
-                >
-                  查看完整佇列
-                </button>
-              )}
-            </div>
-            {queue.length === 0 ? (
-              <p className="text-sm text-center py-4 text-token-tertiary">佇列中沒有歌曲</p>
-            ) : (
-              <div className="flex flex-col">
-                {queue.slice(0, 5).map((track, index) => (
-                  <div
-                    key={track.queueEntryId}
-                    className={`flex items-center gap-3 py-2 ${index < Math.min(queue.length, 5) - 1 ? 'border-b border-b-border-token' : ''}`}
-                  >
-                    <AlbumArt
-                      alt={`${track.songTitle} - ${track.originalArtist}`}
-                      size={40}
-                    />
-                    <div className="min-w-0 flex-1">
-                      <div className="text-sm font-medium truncate text-token-primary">{track.songTitle}</div>
-                      <div className="text-xs truncate text-token-secondary">{track.originalArtist}</div>
-                    </div>
-                  </div>
-                ))}
-              </div>
-            )}
-          </div>
+          <ModalQueuePreview queue={queue} onOpenQueue={() => {
+            setShowQueue(true);
+            setShowModal(false);
+          }} />
 
         </div>
       </div>
@@ -210,4 +177,44 @@ export default function NowPlayingModal() {
   );
 
   return createPortal(modalContent, document.body);
+}
+
+/** The next five queue entries, with the action that hands the overlay to the full queue. */
+function ModalQueuePreview({ queue, onOpenQueue }: { queue: ReturnType<typeof useQueue>; onOpenQueue: () => void }) {
+  return (
+    <div className="mt-8 pt-6 border-t border-t-border-token">
+      <div className="flex items-center justify-between mb-4">
+        <h4 className="text-sm font-semibold uppercase tracking-wider text-token-secondary">Next Up</h4>
+        {queue.length > 0 && (
+          <button
+            onClick={onOpenQueue}
+            className="text-xs font-medium transition-colors hover:brightness-110 text-accent-pink"
+          >
+            查看完整佇列
+          </button>
+        )}
+      </div>
+      {queue.length === 0 ? (
+        <p className="text-sm text-center py-4 text-token-tertiary">佇列中沒有歌曲</p>
+      ) : (
+        <div className="flex flex-col">
+          {queue.slice(0, 5).map((track, index) => (
+            <div
+              key={track.queueEntryId}
+              className={`flex items-center gap-3 py-2 ${index < Math.min(queue.length, 5) - 1 ? 'border-b border-b-border-token' : ''}`}
+            >
+              <AlbumArt
+                alt={`${track.songTitle} - ${track.originalArtist}`}
+                size={40}
+              />
+              <div className="min-w-0 flex-1">
+                <div className="text-sm font-medium truncate text-token-primary">{track.songTitle}</div>
+                <div className="text-xs truncate text-token-secondary">{track.originalArtist}</div>
+              </div>
+            </div>
+          ))}
+        </div>
+      )}
+    </div>
+  );
 }

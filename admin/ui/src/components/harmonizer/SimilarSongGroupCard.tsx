@@ -99,18 +99,7 @@ export default function SimilarSongGroupCard({
   onPrevious,
   onNext,
 }: SimilarSongGroupCardProps) {
-  const canonical = group.items.find((i) => i.id === canonicalId);
-  const mergeBatch = canonicalId === undefined
-    ? null
-    : getWorkAwareMergeBatch(group.items, canonicalId);
-  const workPlan = canonicalId === undefined || mergeBatch === null
-    ? null
-    : getWorkMergePlan(mergeBatch.items, canonicalId);
-  const deferredSourceCount = mergeBatch?.deferredSourceCount ?? 0;
-  const mergeBlocked = workPlan === null
-    || workPlan.canonicalWorkId === null
-    || workPlan.missingSongIds.length > 0;
-  const performanceCount = (mergeBatch?.items ?? group.items).reduce((sum, item) => sum + item.performanceCount, 0);
+  const { canonical, workPlan, deferredSourceCount, mergeBlocked, performanceCount } = songMergeDetails(group, canonicalId);
 
   return (
     <GroupDetailCard group={group} onPrevious={onPrevious} onNext={onNext}>
@@ -182,4 +171,21 @@ export default function SimilarSongGroupCard({
       </div>
     </GroupDetailCard>
   );
+}
+
+/** Resolve the selected merge batch once before presenting its notices, counts, and action. */
+function songMergeDetails(group: SimilarityGroup<HarmonizeSongEntry>, canonicalId: string | undefined) {
+  const canonical = group.items.find((i) => i.id === canonicalId);
+  const mergeBatch = canonicalId === undefined
+    ? null
+    : getWorkAwareMergeBatch(group.items, canonicalId);
+  const workPlan = canonicalId === undefined || mergeBatch === null
+    ? null
+    : getWorkMergePlan(mergeBatch.items, canonicalId);
+  const deferredSourceCount = mergeBatch?.deferredSourceCount ?? 0;
+  const mergeBlocked = workPlan === null
+    || workPlan.canonicalWorkId === null
+    || workPlan.missingSongIds.length > 0;
+  const performanceCount = (mergeBatch?.items ?? group.items).reduce((sum, item) => sum + item.performanceCount, 0);
+  return { canonical, workPlan, deferredSourceCount, mergeBlocked, performanceCount };
 }

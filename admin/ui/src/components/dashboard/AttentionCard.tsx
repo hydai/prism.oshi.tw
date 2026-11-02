@@ -138,32 +138,7 @@ export function AttentionCard({
       </div>
     );
   } else {
-    const subParts = sub === undefined ? [] : typeof sub === 'string' ? [sub] : sub;
-    body = (
-      <>
-        <div className={`${VALUE_CLASSES} text-fg`}>
-          {value}
-          {unit ? (
-            <>
-              {' '}
-              <span className="text-[11px] font-semibold tracking-normal text-fg-subtle">{unit}</span>
-            </>
-          ) : null}
-        </div>
-        {subParts.length > 0 ? (
-          <div title={subParts.join(' · ')} className="text-[11px] text-fg-subtle sm:truncate">
-            {typeof sub === 'string'
-              ? sub
-              : subParts.map((part, index) => (
-                  <Fragment key={part}>
-                    {index > 0 ? ' · ' : null}
-                    <span className="whitespace-nowrap">{part}</span>
-                  </Fragment>
-                ))}
-          </div>
-        ) : null}
-      </>
-    );
+    body = <AttentionValue value={value} unit={unit} sub={sub} />;
   }
 
   // `children` follow the body in every state, in the same place, so they stay mounted through it.
@@ -186,5 +161,39 @@ export function AttentionCard({
       {body}
       {children}
     </div>
+  );
+}
+
+/** The ready value and its optional unit/sub-line, independent of loading and retry focus. */
+function AttentionValue({ value, unit, sub }: {
+  value?: ReactNode;
+  unit?: string;
+  sub?: string | readonly string[];
+}) {
+  const subParts = sub === undefined ? [] : typeof sub === 'string' ? [sub] : sub;
+  return (
+    <>
+      <div className={`${VALUE_CLASSES} text-fg`}>
+        {value}
+        {unit ? (
+          <>
+            {' '}
+            <span className="text-[11px] font-semibold tracking-normal text-fg-subtle">{unit}</span>
+          </>
+        ) : null}
+      </div>
+      {subParts.length > 0 ? (
+        <div title={subParts.join(' · ')} className="text-[11px] text-fg-subtle sm:truncate">
+          {typeof sub === 'string'
+            ? sub
+            : subParts.map((part, index) => (
+                <Fragment key={part}>
+                  {index > 0 ? ' · ' : null}
+                  <span className="whitespace-nowrap">{part}</span>
+                </Fragment>
+              ))}
+        </div>
+      ) : null}
+    </>
   );
 }

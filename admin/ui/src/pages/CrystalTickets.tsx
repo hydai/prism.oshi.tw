@@ -1,4 +1,4 @@
-import { useMemo, useRef, useState, type MouseEvent } from 'react';
+import { useMemo, useRef, useState, type MouseEvent, type RefObject } from 'react';
 import type { AuthUser, CrystalTicket, CrystalTicketStatus, CrystalTicketType } from '../../../shared/types';
 import { api } from '../api/client';
 import { useInboxCounts } from '../components/shell/InboxCounts';
@@ -321,8 +321,6 @@ export function TicketRow({
   const statusRef = useRef<HTMLButtonElement>(null);
   const type = TYPE_STYLES[ticket.type];
   const detailsId = `crystal-ticket-details-${ticket.id}`;
-  const replying = acting === 'reply';
-  const changingStatus = acting !== undefined && !replying;
 
   // Read once the request has landed, so `sender` is the button as it is by then. Only focus still on it,
   // or in no place at all, moves: an answer that lands after the user has gone elsewhere takes nothing.
@@ -395,103 +393,152 @@ export function TicketRow({
 
       {/* Expanded detail */}
       {expanded && (
-        <div
-          id={detailsId}
-          className={`grid gap-6 border-t border-line-soft px-3 pb-3 pt-4 ${
-            isCurator ? 'grid-cols-1 xl:grid-cols-[minmax(0,1fr)_360px]' : 'grid-cols-1'
-          }`}
-        >
-          <div className="flex min-w-0 flex-col gap-4">
-            <dl className="grid grid-cols-1 gap-x-4 gap-y-3 sm:grid-cols-3">
-              <DetailField label="ID">
-                <span className="font-mono text-xs">{ticket.id}</span>
-              </DetailField>
-              <DetailField label="Contact">{ticket.contact || '—'}</DetailField>
-              <DetailField label="Submitted">
-                <StoredTime value={ticket.submitted_at} today={today} />
-              </DetailField>
-              {ticket.context_url ? (
-                <DetailField label="Context URL" className="sm:col-span-3">
-                  <span className="break-all">{ticket.context_url}</span>
-                </DetailField>
-              ) : null}
-              <DetailField label="Description" className="sm:col-span-3">
-                <p className="whitespace-pre-wrap leading-relaxed">{ticket.body}</p>
-              </DetailField>
-            </dl>
-
-            {/* Existing reply */}
-            {ticket.admin_reply ? (
-              <div className="flex flex-col gap-2 rounded-radius-lg border border-field-line bg-field px-3.5 py-3">
-                <div className="flex items-center gap-2">
-                  <Pill tone="neutral">Reply</Pill>
-                  {ticket.replied_at ? (
-                    <span className="text-[11px] text-fg-muted">
-                      <StoredTime value={ticket.replied_at} today={today} />
-                    </span>
-                  ) : null}
-                </div>
-                <p className="whitespace-pre-wrap text-token-base leading-relaxed text-fg">{ticket.admin_reply}</p>
-              </div>
-            ) : null}
-          </div>
-
-          {/* Actions */}
-          {isCurator ? (
-            <GlassCard className="flex flex-col gap-2.5 self-start">
-              <SectionLabel>Reply</SectionLabel>
-              <Textarea
-                rows={4}
-                aria-label={ticket.admin_reply ? 'Update reply' : 'Reply'}
-                placeholder={ticket.admin_reply ? 'Update reply...' : 'Write a reply...'}
-                className="block resize-y"
-                value={replyText}
-                onChange={(e) => {
-                  drafts.write(ticket.id, e.target.value);
-                  setReplyText(e.target.value);
-                }}
-              />
-              <div className="flex flex-wrap items-center gap-2">
-                <Button
-                  ref={sendRef}
-                  variant="primary"
-                  size="sm"
-                  icon="send"
-                  busy={replying}
-                  disabled={!replyText.trim()}
-                  aria-disabled={changingStatus ? true : undefined}
-                  onClick={() => void send()}
-                >
-                  {ticket.admin_reply ? 'Update Reply' : 'Send Reply'}
-                </Button>
-                {ticket.status !== 'closed' ? (
-                  <Button
-                    ref={statusRef}
-                    size="sm"
-                    icon="check"
-                    busy={acting === 'closed'}
-                    aria-disabled={replying ? true : undefined}
-                    onClick={() => void changeStatus('closed')}
-                  >
-                    Close
-                  </Button>
-                ) : (
-                  <Button
-                    ref={statusRef}
-                    size="sm"
-                    icon="undo"
-                    busy={acting === 'pending'}
-                    aria-disabled={replying ? true : undefined}
-                    onClick={() => void changeStatus('pending')}
-                  >
-                    Reopen
-                  </Button>
-                )}
-              </div>
-            </GlassCard>
-          ) : null}
-        </div>
+        <TicketDetails
+          ticket={ticket}
+          isCurator={isCurator}
+          today={today}
+          detailsId={detailsId}
+          acting={acting}
+          replyText={replyText}
+          onReplyTextChange={(value) => {
+            drafts.write(ticket.id, value);
+            setReplyText(value);
+          }}
+          onSend={() => void send()}
+          onChangeStatus={(status) => void changeStatus(status)}
+          sendRef={sendRef}
+          statusRef={statusRef}
+        />
       )}
     </div>
+  );
+}
+
+type TicketReplyEditorProps = Pick<TicketRowProps, 'ticket' | 'acting'> & {
+  replyText: string;
+  onReplyTextChange: (value: string) => void;
+  onSend: () => void;
+  onChangeStatus: (status: TicketStatusChange) => void;
+  sendRef: RefObject<HTMLButtonElement | null>;
+  statusRef: RefObject<HTMLButtonElement | null>;
+};
+
+/** Expanded message fields and existing reply do not own the row's persistent reply draft. */
+function TicketDetails({ ticket, isCurator, today, detailsId, ...editor }: TicketReplyEditorProps &
+  Pick<TicketRowProps, 'isCurator' | 'today'> & { detailsId: string }
+) {
+  const { acting, replyText, onReplyTextChange, onSend, onChangeStatus, sendRef, statusRef } = editor;
+  return (
+    <div
+      id={detailsId}
+      className={`grid gap-6 border-t border-line-soft px-3 pb-3 pt-4 ${
+        isCurator ? 'grid-cols-1 xl:grid-cols-[minmax(0,1fr)_360px]' : 'grid-cols-1'
+      }`}
+    >
+      <div className="flex min-w-0 flex-col gap-4">
+        <dl className="grid grid-cols-1 gap-x-4 gap-y-3 sm:grid-cols-3">
+          <DetailField label="ID">
+            <span className="font-mono text-xs">{ticket.id}</span>
+          </DetailField>
+          <DetailField label="Contact">{ticket.contact || '—'}</DetailField>
+          <DetailField label="Submitted">
+            <StoredTime value={ticket.submitted_at} today={today} />
+          </DetailField>
+          {ticket.context_url ? (
+            <DetailField label="Context URL" className="sm:col-span-3">
+              <span className="break-all">{ticket.context_url}</span>
+            </DetailField>
+          ) : null}
+          <DetailField label="Description" className="sm:col-span-3">
+            <p className="whitespace-pre-wrap leading-relaxed">{ticket.body}</p>
+          </DetailField>
+        </dl>
+
+        {/* Existing reply */}
+        {ticket.admin_reply ? (
+          <div className="flex flex-col gap-2 rounded-radius-lg border border-field-line bg-field px-3.5 py-3">
+            <div className="flex items-center gap-2">
+              <Pill tone="neutral">Reply</Pill>
+              {ticket.replied_at ? (
+                <span className="text-[11px] text-fg-muted">
+                  <StoredTime value={ticket.replied_at} today={today} />
+                </span>
+              ) : null}
+            </div>
+            <p className="whitespace-pre-wrap text-token-base leading-relaxed text-fg">{ticket.admin_reply}</p>
+          </div>
+        ) : null}
+      </div>
+
+      {/* Actions */}
+      {isCurator ? (
+        <TicketReplyEditor
+          ticket={ticket}
+          acting={acting}
+          replyText={replyText}
+          onReplyTextChange={onReplyTextChange}
+          onSend={onSend}
+          onChangeStatus={onChangeStatus}
+          sendRef={sendRef}
+          statusRef={statusRef}
+        />
+      ) : null}
+    </div>
+  );
+}
+
+/** One stable reply/status editor preserves the originating buttons and their focus refs. */
+function TicketReplyEditor({ ticket, acting, replyText, onReplyTextChange, onSend, onChangeStatus, sendRef, statusRef }: TicketReplyEditorProps) {
+  const replying = acting === 'reply';
+  const changingStatus = acting !== undefined && !replying;
+  return (
+    <GlassCard className="flex flex-col gap-2.5 self-start">
+      <SectionLabel>Reply</SectionLabel>
+      <Textarea
+        rows={4}
+        aria-label={ticket.admin_reply ? 'Update reply' : 'Reply'}
+        placeholder={ticket.admin_reply ? 'Update reply...' : 'Write a reply...'}
+        className="block resize-y"
+        value={replyText}
+        onChange={(e) => onReplyTextChange(e.target.value)}
+      />
+      <div className="flex flex-wrap items-center gap-2">
+        <Button
+          ref={sendRef}
+          variant="primary"
+          size="sm"
+          icon="send"
+          busy={replying}
+          disabled={!replyText.trim()}
+          aria-disabled={changingStatus ? true : undefined}
+          onClick={onSend}
+        >
+          {ticket.admin_reply ? 'Update Reply' : 'Send Reply'}
+        </Button>
+        {ticket.status !== 'closed' ? (
+          <Button
+            ref={statusRef}
+            size="sm"
+            icon="check"
+            busy={acting === 'closed'}
+            aria-disabled={replying ? true : undefined}
+            onClick={() => onChangeStatus('closed')}
+          >
+            Close
+          </Button>
+        ) : (
+          <Button
+            ref={statusRef}
+            size="sm"
+            icon="undo"
+            busy={acting === 'pending'}
+            aria-disabled={replying ? true : undefined}
+            onClick={() => onChangeStatus('pending')}
+          >
+            Reopen
+          </Button>
+        )}
+      </div>
+    </GlassCard>
   );
 }

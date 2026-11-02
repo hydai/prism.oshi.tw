@@ -522,175 +522,155 @@ function NeighbourLink({ stream, direction }: { stream: Stream; direction: 'Newe
  * to the end of the prev / next row. A contributor gets the Open link alone, which below 640px moves
  * there too, as an icon link. Hook-free, like the view it is part of.
  */
-function StreamHeader({
-  controller,
-  detail,
-}: {
+type StreamHeaderPartProps = {
   controller: StreamDetailController;
   detail: NonNullable<StreamDetailController['detail']>;
-}) {
-  const {
-    streamId,
-    editingField,
-    setEditingField,
-    isCurator,
-    isNarrow,
-    navigate,
-    prevStream,
-    nextStream,
-    handleStreamStatus,
-    handleStreamSave,
-    handleDeleteStream,
-    copyVodUrl,
-  } = controller;
+};
 
+function StreamHeader({ controller, detail }: StreamHeaderPartProps) {
+  const { isNarrow, prevStream, nextStream } = controller;
+  const neighbours = prevStream || nextStream ? (
+    <>
+      {prevStream ? <NeighbourLink stream={prevStream} direction="Newer" /> : null}
+      {nextStream ? <NeighbourLink stream={nextStream} direction="Older" /> : null}
+    </>
+  ) : null;
+  const narrowAction = isNarrow ? <StreamHeaderActions controller={controller} detail={detail} compact /> : null;
+  return (
+    <PageHeader
+      tall
+      recordTitle
+      crumb={<Link to="/streams" className="rounded-radius-xs transition-colors hover:text-accent-fg">Catalog / Streams</Link>}
+      title={<StreamHeaderTitle controller={controller} detail={detail} />}
+      meta={<StreamHeaderMeta controller={controller} detail={detail} />}
+      actions={isNarrow ? null : <StreamHeaderActions controller={controller} detail={detail} />}
+    >
+      {neighbours || narrowAction ? <>{neighbours}{narrowAction}</> : null}
+    </PageHeader>
+  );
+}
+
+function StreamHeaderTitle({ controller, detail }: StreamHeaderPartProps) {
+  const { editingField, setEditingField, isCurator, handleStreamSave } = controller;
   const editingStream = editingField?.type === 'stream' ? editingField.field : null;
+  return (
+    editingStream === 'title' ? (
+      <InlineEdit value={detail.title} onSave={(v) => handleStreamSave('title', v)} onCancel={() => setEditingField(null)} />
+    ) : (
+      <span
+        title={detail.title}
+        className={isCurator ? 'cursor-text' : undefined}
+        onDoubleClick={isCurator ? () => setEditingField({ type: 'stream', field: 'title' }) : undefined}
+      >
+        {detail.title || detail.videoId}
+      </span>
+    )
+  );
+}
+
+function StreamHeaderMeta({ controller, detail }: StreamHeaderPartProps) {
+  const { editingField, setEditingField, isCurator, handleStreamSave, copyVodUrl } = controller;
+  const editingStream = editingField?.type === 'stream' ? editingField.field : null;
+  return (
+    <>
+      {editingStream === 'date' ? (
+        <InlineDateEdit value={detail.date} label="Stream date" onSave={(v) => handleStreamSave('date', v)} onCancel={() => setEditingField(null)} />
+      ) : (
+        <span
+          className={`inline-flex shrink-0${isCurator ? ' cursor-text' : ''}`}
+          onDoubleClick={isCurator ? () => setEditingField({ type: 'stream', field: 'date' }) : undefined}
+          title={isCurator ? 'Double-click to edit' : undefined}
+        >
+          <Pill tone="neutral" className="shrink-0">
+            {detail.date}
+          </Pill>
+        </span>
+      )}
+      <StatusPill status={detail.status} />
+      <a
+        href={`https://www.youtube.com/watch?v=${detail.videoId}`}
+        target="_blank"
+        rel="noopener noreferrer"
+        className="inline-flex items-center gap-1 rounded-radius-xs font-mono transition-colors hover:text-accent-fg"
+      >
+        {detail.videoId}
+        <Icon name="arrowUpRight" size={12} />
+      </a>
+      <Button variant="ghost" size="sm" icon="copy" onClick={copyVodUrl}>
+        Copy URL
+      </Button>
+      <span>{detail.credit.author ? `Credit — ${detail.credit.author}` : 'Credit —'}</span>
+      {isCurator ? (
+        <Button variant="ghost" size="sm" icon="pencil" onClick={() => setEditingField({ type: 'stream', field: 'title' })}>
+          Edit
+        </Button>
+      ) : null}
+    </>
+  );
+}
+
+function StreamActionMenu({ controller, detail }: StreamHeaderPartProps) {
+  const { isCurator, isNarrow, navigate, handleStreamStatus, handleDeleteStream, streamId } = controller;
   const stampEditorPath = `/stamp?stream=${encodeURIComponent(streamId)}`;
   const { primary, menu: statusMenu, canDelete } = streamStatusActions(detail.status);
-  // A curator's ⋯ menu. Below 640px it takes in the header's own two actions first, in the order
-  // they stood; then the status changes the primary action leaves; Delete stream always last.
   const streamMenuItems: MenuItem[] = [
     ...(isNarrow ? [{ label: 'Open in Stamp Editor', onSelect: () => navigate(stampEditorPath) }] : []),
     ...(isNarrow && primary ? [{ label: primary.label, onSelect: () => handleStreamStatus(primary.status) }] : []),
     ...statusMenu.map((action) => ({ label: action.label, onSelect: () => handleStreamStatus(action.status) })),
     ...(canDelete ? [{ label: 'Delete stream', tone: 'danger' as const, onSelect: handleDeleteStream }] : []),
   ];
-  const openInStampEditor = (
-    <Link to={stampEditorPath} className={buttonClasses({ variant: 'secondary', size: 'sm' })}>
-      <Icon name="timer" size={14} />
-      Open in Stamp Editor
-    </Link>
-  );
-  // Below 640px the header's one action joins the prev / next links' row, at its far end, rather
-  // than taking a row of its own: a curator's ⋯ (its menu opens towards the free space), or a
-  // contributor's Open in Stamp Editor as an icon link like those. With nothing to hold (an
-  // approved stream from 640px), there is no ⋯: never an empty menu.
-  const streamMenu =
-    isCurator && streamMenuItems.length > 0 ? (
-      <Popover
-        kind="menu"
-        label="More stream actions"
-        align="end"
-        className={isNarrow ? 'ml-auto' : undefined}
-        trigger={({ triggerProps }) => (
-          <IconButton
-            {...triggerProps}
-            label="More stream actions"
-            icon="more"
-            tooltipSide="bottom"
-            className={OUTLINED_ICON_BUTTON}
-          />
-        )}
-      >
-        {(close) => <Menu items={streamMenuItems} onDone={close} />}
-      </Popover>
-    ) : null;
-  const neighbours =
-    prevStream || nextStream ? (
-      <>
-        {prevStream ? <NeighbourLink stream={prevStream} direction="Newer" /> : null}
-        {nextStream ? <NeighbourLink stream={nextStream} direction="Older" /> : null}
-      </>
-    ) : null;
-  // A contributor's Open in Stamp Editor below 640px. The row's own child takes `ml-auto`: the
-  // tooltip wraps the link.
-  const stampEditorIconLink = (
-    <span className="ml-auto flex">
-      <Tooltip label="Open in Stamp Editor" side="bottom">
-        <Link to={stampEditorPath} aria-label="Open in Stamp Editor" className={ICON_LINK}>
-          <Icon name="timer" size={16} />
-        </Link>
-      </Tooltip>
-    </span>
-  );
-  const narrowAction = isNarrow ? (isCurator ? streamMenu : stampEditorIconLink) : null;
-
+  if (!isCurator || streamMenuItems.length === 0) return null;
   return (
-    <PageHeader
-      tall
-      recordTitle
-      crumb={
-        <Link to="/streams" className="rounded-radius-xs transition-colors hover:text-accent-fg">
-          Catalog / Streams
-        </Link>
-      }
-      title={
-        editingStream === 'title' ? (
-          <InlineEdit value={detail.title} onSave={(v) => handleStreamSave('title', v)} onCancel={() => setEditingField(null)} />
-        ) : (
-          <span
-            title={detail.title}
-            className={isCurator ? 'cursor-text' : undefined}
-            onDoubleClick={isCurator ? () => setEditingField({ type: 'stream', field: 'title' }) : undefined}
-          >
-            {detail.title || detail.videoId}
-          </span>
-        )
-      }
-      meta={
-        <>
-          {editingStream === 'date' ? (
-            <InlineDateEdit value={detail.date} label="Stream date" onSave={(v) => handleStreamSave('date', v)} onCancel={() => setEditingField(null)} />
-          ) : (
-            <span
-              className={`inline-flex shrink-0${isCurator ? ' cursor-text' : ''}`}
-              onDoubleClick={isCurator ? () => setEditingField({ type: 'stream', field: 'date' }) : undefined}
-              title={isCurator ? 'Double-click to edit' : undefined}
-            >
-              <Pill tone="neutral" className="shrink-0">
-                {detail.date}
-              </Pill>
-            </span>
-          )}
-          <StatusPill status={detail.status} />
-          <a
-            href={`https://www.youtube.com/watch?v=${detail.videoId}`}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="inline-flex items-center gap-1 rounded-radius-xs font-mono transition-colors hover:text-accent-fg"
-          >
-            {detail.videoId}
-            <Icon name="arrowUpRight" size={12} />
-          </a>
-          <Button variant="ghost" size="sm" icon="copy" onClick={copyVodUrl}>
-            Copy URL
-          </Button>
-          <span>{detail.credit.author ? `Credit — ${detail.credit.author}` : 'Credit —'}</span>
-          {isCurator ? (
-            <Button variant="ghost" size="sm" icon="pencil" onClick={() => setEditingField({ type: 'stream', field: 'title' })}>
-              Edit
-            </Button>
-          ) : null}
-        </>
-      }
-      actions={
-        isNarrow ? null : isCurator ? (
-          <>
-            {openInStampEditor}
-            {primary ? (
-              <Button
-                variant="primary"
-                size="sm"
-                icon={primary.status === 'approved' ? 'check' : 'undo'}
-                onClick={() => handleStreamStatus(primary.status)}
-              >
-                {primary.label}
-              </Button>
-            ) : null}
-            {streamMenu}
-          </>
-        ) : (
-          openInStampEditor
-        )
-      }
+    <Popover
+      kind="menu"
+      label="More stream actions"
+      align="end"
+      className={isNarrow ? 'ml-auto' : undefined}
+      trigger={({ triggerProps }) => (
+        <IconButton
+          {...triggerProps}
+          label="More stream actions"
+          icon="more"
+          tooltipSide="bottom"
+          className={OUTLINED_ICON_BUTTON}
+        />
+      )}
     >
-      {neighbours || narrowAction ? (
-        <>
-          {neighbours}
-          {narrowAction}
-        </>
+      {(close) => <Menu items={streamMenuItems} onDone={close} />}
+    </Popover>
+  );
+}
+
+/** Narrow headers move their action into the neighbours row; wide headers retain the toolbar. */
+function StreamHeaderActions({ controller, detail, compact = false }: StreamHeaderPartProps & { compact?: boolean }) {
+  const { streamId, isCurator, handleStreamStatus } = controller;
+  const stampEditorPath = `/stamp?stream=${encodeURIComponent(streamId)}`;
+  const { primary } = streamStatusActions(detail.status);
+  if (compact) {
+    if (isCurator) return <StreamActionMenu controller={controller} detail={detail} />;
+    return (
+      <span className="ml-auto flex">
+        <Tooltip label="Open in Stamp Editor" side="bottom">
+          <Link to={stampEditorPath} aria-label="Open in Stamp Editor" className={ICON_LINK}>
+            <Icon name="timer" size={16} />
+          </Link>
+        </Tooltip>
+      </span>
+    );
+  }
+  return (
+    <>
+      <Link to={stampEditorPath} className={buttonClasses({ variant: 'secondary', size: 'sm' })}>
+        <Icon name="timer" size={14} />
+        Open in Stamp Editor
+      </Link>
+      {isCurator && primary ? (
+        <Button variant="primary" size="sm" icon={primary.status === 'approved' ? 'check' : 'undo'} onClick={() => handleStreamStatus(primary.status)}>
+          {primary.label}
+        </Button>
       ) : null}
-    </PageHeader>
+      {isCurator ? <StreamActionMenu controller={controller} detail={detail} /> : null}
+    </>
   );
 }
 
@@ -715,16 +695,11 @@ export function StreamDetailView({ controller }: { controller: StreamDetailContr
     fetchLog,
     clearFetchLog,
     isCurator,
-    unstampedCount,
     handlePasteImportDone,
-    exportSongList,
     handleSave,
     handleDelete,
     handlePerformanceStatus,
-    handleApproveAll,
-    handleUnapproveAll,
     clearEndTimestamp,
-    clearAllEndTimestamps,
     handleAddSong,
     markStartTimestamp,
     markEndTimestamp,
@@ -753,18 +728,6 @@ export function StreamDetailView({ controller }: { controller: StreamDetailContr
   }
 
   const performances = detail.performances;
-  // What a curator can still act on: the pill counts every row performanceStatusAction would
-  // approve (pending and extracted — one source of truth with the row's own button, below).
-  // Approve All acts on pending rows alone, all bulkApproveStream (admin/src/db.ts) ever touches.
-  const toReviewCount = performances.filter((p) => performanceStatusAction(p.status)?.status === 'approved').length;
-  const pendingCount = performances.filter((p) => p.status === 'pending').length;
-  const performanceMenuItems: MenuItem[] = [
-    ...(isCurator && performances.some((p) => p.status === 'approved')
-      ? [{ label: 'Unapprove All', onSelect: handleUnapproveAll }]
-      : []),
-    { label: 'Clear All', tone: 'danger', onSelect: clearAllEndTimestamps },
-    { label: 'Export', disabled: performances.length === 0, onSelect: exportSongList },
-  ];
 
   return (
     // The page fills <main> itself. `overflow-x-clip`: the centred tooltip of a
@@ -825,58 +788,7 @@ export function StreamDetailView({ controller }: { controller: StreamDetailContr
               secondary, as in the mockup: the header's Approve stream is the page's one gradient
               action. Below xl it drops its icon: at 1024 px the card is 338 px, and the title, its
               count and the four actions need 326 px with the icon, 306 without. */}
-          <div className="flex min-h-12 flex-wrap items-start gap-x-2 gap-y-1 border-b border-line-soft py-2 pl-3.5 pr-3">
-            <div className="contents xl:flex xl:min-w-0 xl:flex-1 xl:basis-[7.5rem] xl:flex-wrap xl:items-center xl:gap-x-2 xl:gap-y-1">
-              <div className="flex min-h-[30px] items-center gap-2">
-                <h2 className="text-[14px] font-bold text-fg">Performances</h2>
-                <span className="text-[11px] font-semibold text-fg-subtle">{performances.length}</span>
-              </div>
-              {unstampedCount > 0 || toReviewCount > 0 ? (
-                <div className="order-last flex basis-full flex-wrap items-center gap-2 xl:order-none xl:basis-auto">
-                  {unstampedCount > 0 ? <Pill tone="warn">{unstampedCount} unstamped</Pill> : null}
-                  {toReviewCount > 0 ? <Pill tone="neutral">{toReviewCount} to review</Pill> : null}
-                </div>
-              ) : null}
-            </div>
-            <div className="ml-auto flex min-h-[30px] items-center gap-1">
-              {isCurator && pendingCount > 0 ? (
-                <Button size="sm" onClick={handleApproveAll}>
-                  <Icon name="check" size={14} className="max-xl:hidden" />
-                  Approve All
-                </Button>
-              ) : null}
-              <IconButton
-                label="Paste Import"
-                icon="clipboardPaste"
-                size="sm"
-                className={OUTLINED_ICON_BUTTON}
-                onClick={() => setShowPasteImport(true)}
-              />
-              <IconButton
-                label="Add Song"
-                icon="plus"
-                size="sm"
-                className={OUTLINED_ICON_BUTTON}
-                onClick={() => setShowAddModal(true)}
-              />
-              <Popover
-                kind="menu"
-                label="More performance actions"
-                align="end"
-                trigger={({ triggerProps }) => (
-                  <IconButton
-                    {...triggerProps}
-                    label="More performance actions"
-                    icon="more"
-                    size="sm"
-                    className={OUTLINED_ICON_BUTTON}
-                  />
-                )}
-              >
-                {(close) => <Menu items={performanceMenuItems} onDone={close} />}
-              </Popover>
-            </div>
-          </div>
+          <PerformanceCardHeader controller={controller} performances={performances} />
           <PerformanceTable
             performances={performances}
             editingField={editingField?.type === 'perf' ? editingField : null}
@@ -1052,6 +964,15 @@ const PerformanceTable = memo(function PerformanceTable({
               <tr
                 key={perf.id}
                 id={`performance-row-${perf.id}`}
+                tabIndex={0}
+                aria-selected={selected}
+                onKeyDown={(event) => {
+                  if (event.target !== event.currentTarget || isImeKeyDown(event)) return;
+                  if (event.key !== 'Enter' && event.key !== ' ') return;
+                  event.preventDefault();
+                  setSelectedIndex(i);
+                  setEditingField(null);
+                }}
                 onClick={(event) => {
                   // A click inside an open inline editor places the caret: it belongs to the editor,
                   // and must not select the row or close the edit (the row's controls stop theirs).
@@ -1059,7 +980,7 @@ const PerformanceTable = memo(function PerformanceTable({
                   setSelectedIndex(i);
                   setEditingField(null);
                 }}
-                className={`group h-11 cursor-pointer border-b border-line-soft transition-colors last:border-b-0 ${
+                className={`group h-11 cursor-pointer border-b border-line-soft transition-colors last:border-b-0 focus-visible:outline-none focus-visible:shadow-focus ${
                   selected ? 'bg-selected shadow-[inset_3px_0_0_var(--nav-active-icon)]' : 'hover:bg-row-hover'
                 }`}
               >
@@ -1318,5 +1239,79 @@ export default function StreamDetail({ user }: { user: AuthUser }) {
         />
       )}
     </>
+  );
+}
+
+/** Counts and bulk actions in the card header do not belong to the memoized performance rows. */
+function PerformanceCardHeader({ controller, performances }: {
+  controller: StreamDetailController;
+  performances: StampPerformance[];
+}) {
+  const { isCurator, unstampedCount, handleApproveAll, handleUnapproveAll, clearAllEndTimestamps, exportSongList, setShowPasteImport, setShowAddModal } = controller;
+  // What a curator can still act on: the pill counts every row performanceStatusAction would
+  // approve (pending and extracted — one source of truth with the row's own button, below).
+  // Approve All acts on pending rows alone, all bulkApproveStream (admin/src/db.ts) ever touches.
+  const toReviewCount = performances.filter((p) => performanceStatusAction(p.status)?.status === 'approved').length;
+  const pendingCount = performances.filter((p) => p.status === 'pending').length;
+  const performanceMenuItems: MenuItem[] = [
+    ...(isCurator && performances.some((p) => p.status === 'approved')
+      ? [{ label: 'Unapprove All', onSelect: handleUnapproveAll }]
+      : []),
+    { label: 'Clear All', tone: 'danger', onSelect: clearAllEndTimestamps },
+    { label: 'Export', disabled: performances.length === 0, onSelect: exportSongList },
+  ];
+  return (
+    <div className="flex min-h-12 flex-wrap items-start gap-x-2 gap-y-1 border-b border-line-soft py-2 pl-3.5 pr-3">
+      <div className="contents xl:flex xl:min-w-0 xl:flex-1 xl:basis-[7.5rem] xl:flex-wrap xl:items-center xl:gap-x-2 xl:gap-y-1">
+        <div className="flex min-h-[30px] items-center gap-2">
+          <h2 className="text-[14px] font-bold text-fg">Performances</h2>
+          <span className="text-[11px] font-semibold text-fg-subtle">{performances.length}</span>
+        </div>
+        {unstampedCount > 0 || toReviewCount > 0 ? (
+          <div className="order-last flex basis-full flex-wrap items-center gap-2 xl:order-none xl:basis-auto">
+            {unstampedCount > 0 ? <Pill tone="warn">{unstampedCount} unstamped</Pill> : null}
+            {toReviewCount > 0 ? <Pill tone="neutral">{toReviewCount} to review</Pill> : null}
+          </div>
+        ) : null}
+      </div>
+      <div className="ml-auto flex min-h-[30px] items-center gap-1">
+        {isCurator && pendingCount > 0 ? (
+          <Button size="sm" onClick={handleApproveAll}>
+            <Icon name="check" size={14} className="max-xl:hidden" />
+            Approve All
+          </Button>
+        ) : null}
+        <IconButton
+          label="Paste Import"
+          icon="clipboardPaste"
+          size="sm"
+          className={OUTLINED_ICON_BUTTON}
+          onClick={() => setShowPasteImport(true)}
+        />
+        <IconButton
+          label="Add Song"
+          icon="plus"
+          size="sm"
+          className={OUTLINED_ICON_BUTTON}
+          onClick={() => setShowAddModal(true)}
+        />
+        <Popover
+          kind="menu"
+          label="More performance actions"
+          align="end"
+          trigger={({ triggerProps }) => (
+            <IconButton
+              {...triggerProps}
+              label="More performance actions"
+              icon="more"
+              size="sm"
+              className={OUTLINED_ICON_BUTTON}
+            />
+          )}
+        >
+          {(close) => <Menu items={performanceMenuItems} onDone={close} />}
+        </Popover>
+      </div>
+    </div>
   );
 }

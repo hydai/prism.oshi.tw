@@ -25,3 +25,15 @@ export function nextQueueKey(
   const before = index === -1 ? [] : keys.slice(0, index);
   return after.find((key) => !isDone(key)) ?? before.find((key) => !isDone(key)) ?? null;
 }
+
+/** Resolve the visible selection and neighbours against the current queue, including a removed key. */
+export function queueSelection(keys: readonly string[], picked: string | null) {
+  const selectedKey = picked !== null && keys.includes(picked) ? picked : (keys[0] ?? null);
+  const selectedIndex = selectedKey === null ? -1 : keys.indexOf(selectedKey);
+  return {
+    selectedKey,
+    selectedIndex,
+    previousKey: selectedIndex > 0 ? keys[selectedIndex - 1] : undefined,
+    nextKey: selectedIndex === -1 ? undefined : keys[selectedIndex + 1],
+  };
+}
