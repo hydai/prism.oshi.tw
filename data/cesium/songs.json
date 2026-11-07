@@ -768,6 +768,13 @@
     "tags": [],
     "performances": [
       {
+        "id": "p-b7c40066-c510-42cb-9b92-0363600a06ff",
+        "streamId": "stream-2026-11-04",
+        "videoId": "gwzUP-52LYw",
+        "timestamp": 3406,
+        "endTimestamp": 3610
+      },
+      {
         "id": "p-6c3d74fd-459f-4aaf-a56f-b255e2535c58",
         "streamId": "stream-f8223f85-ac1f-4e8e-8368-28ebf02db798",
         "videoId": "VFztLHJb_EU",
@@ -783,6 +790,13 @@
     "originalArtist": "CRITTY",
     "tags": [],
     "performances": [
+      {
+        "id": "p-c468581c-45d7-4259-b965-5afed32eb332",
+        "streamId": "stream-2026-11-04",
+        "videoId": "gwzUP-52LYw",
+        "timestamp": 4740,
+        "endTimestamp": 4997
+      },
       {
         "id": "p-6eccbb39-31ca-4e86-8d9a-6beabb5314b6",
         "streamId": "stream-f9857413-9717-46ed-8bf5-abc9d9af362f",
@@ -1216,6 +1230,22 @@
         "videoId": "_4yrs9aGUA8",
         "timestamp": 755,
         "endTimestamp": 959
+      }
+    ]
+  },
+  {
+    "id": "song-e61754de-0793-48f7-9af8-baf721049262",
+    "workId": "work-efc8d042-65fe-43be-9900-d55e54272c8f",
+    "title": "此生不換",
+    "originalArtist": "青鳥飛魚",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-49fda598-03d4-4872-ae76-5080bc2654ca",
+        "streamId": "stream-2026-11-04",
+        "videoId": "gwzUP-52LYw",
+        "timestamp": 429,
+        "endTimestamp": 667
       }
     ]
   },
@@ -2363,6 +2393,13 @@
     "tags": [],
     "performances": [
       {
+        "id": "p-d74b6923-e5fe-4d1f-b210-fb0cbb74be07",
+        "streamId": "stream-2026-11-04",
+        "videoId": "gwzUP-52LYw",
+        "timestamp": 1019,
+        "endTimestamp": 1276
+      },
+      {
         "id": "p-5a14b009-465a-4ba9-b394-6b2f6bb98b4b",
         "streamId": "stream-2026-09-16",
         "videoId": "8YAimZj5Mrw",
@@ -2796,12 +2833,35 @@
     ]
   },
   {
+    "id": "song-764b1add-a958-4ad6-b5cb-12d5c9aa23e7",
+    "workId": "work-ee9485e5-c293-410b-8ef9-5b2ec4ac2f2e",
+    "title": "敘世",
+    "originalArtist": "Aki阿傑",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-4189ab82-6d34-4ccf-ae69-3268df4f7701",
+        "streamId": "stream-2026-11-04",
+        "videoId": "gwzUP-52LYw",
+        "timestamp": 6020,
+        "endTimestamp": 6292
+      }
+    ]
+  },
+  {
     "id": "song-e33af499-ccad-4f0b-abd5-820aa45b99d1",
     "workId": "work-85e78d28-13c1-48e3-9487-aa9e428a5331",
     "title": "晚夜微雨問海棠",
     "originalArtist": "鏡予歌&陳亦洺&喧笑",
     "tags": [],
     "performances": [
+      {
+        "id": "p-45ba6669-1be7-4598-bdd2-39852a1f80c3",
+        "streamId": "stream-2026-11-04",
+        "videoId": "gwzUP-52LYw",
+        "timestamp": 3866,
+        "endTimestamp": 4142
+      },
       {
         "id": "p-ff880532-b487-45cc-956d-8be1334beedf",
         "streamId": "stream-2026-10-03",
@@ -3103,6 +3163,13 @@
     "tags": [],
     "performances": [
       {
+        "id": "p-1685eee6-6023-4c85-a977-bf47484bb4d4",
+        "streamId": "stream-2026-11-04",
+        "videoId": "gwzUP-52LYw",
+        "timestamp": 2264,
+        "endTimestamp": 2469
+      },
+      {
         "id": "p-bb519e06-e29d-41a9-8ff0-ac2ff60d3f50",
         "streamId": "stream-4c43f31f-ba9b-488f-a6c6-21d55863e7ca",
         "videoId": "7PmVvOA8umE",
@@ -3138,6 +3205,22 @@
         "videoId": "Xwupr-SRT38",
         "timestamp": 1241,
         "endTimestamp": 1445
+      }
+    ]
+  },
+  {
+    "id": "song-26d7121f-f56a-41eb-bd7c-96ce5424a67a",
+    "workId": "work-da9cadbb-a652-4848-a602-83bac3c15794",
+    "title": "焚秋色",
+    "originalArtist": "封名冏菌",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-2c69e966-c686-4780-a451-aa2b6962b739",
+        "streamId": "stream-2026-11-04",
+        "videoId": "gwzUP-52LYw",
+        "timestamp": 6378,
+        "endTimestamp": 6631
       }
     ]
   },
@@ -3437,6 +3520,13 @@
     "tags": [],
     "performances": [
       {
+        "id": "p-443c06c5-b3e5-41e2-9ad5-6cbdd2456062",
+        "streamId": "stream-2026-11-04",
+        "videoId": "gwzUP-52LYw",
+        "timestamp": 1668,
+        "endTimestamp": 1869
+      },
+      {
         "id": "p-43b2e2f4-0898-4b20-8358-59f83e76817e",
         "streamId": "stream-97b2edd0-d63d-48e8-936c-c7c7624334ad",
         "videoId": "Mp1x5ZY-gd0",
@@ -3525,6 +3615,13 @@
     "originalArtist": "鞠婧禕",
     "tags": [],
     "performances": [
+      {
+        "id": "p-2d899de3-2009-4e42-b4e0-90ad882e2f22",
+        "streamId": "stream-2026-11-04",
+        "videoId": "gwzUP-52LYw",
+        "timestamp": 5360,
+        "endTimestamp": 5636
+      },
       {
         "id": "p-5f737a2b-be03-4a47-be43-c016d3297035",
         "streamId": "stream-2026-06-10",
@@ -4016,6 +4113,22 @@
     ]
   },
   {
+    "id": "song-e511baca-78a2-4e49-9678-2d6a5a8c25f9",
+    "workId": "work-39542a67-95b7-4ab3-aa1c-6613e0376d55",
+    "title": "歸尋",
+    "originalArtist": "等什麼君",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-1bb0f743-d107-4a7f-a44e-a9150f4cecf8",
+        "streamId": "stream-2026-11-04",
+        "videoId": "gwzUP-52LYw",
+        "timestamp": 2773,
+        "endTimestamp": 2962
+      }
+    ]
+  },
+  {
     "id": "song-b97fbf78-9661-49ed-a393-20aefe4f863d",
     "workId": "work-song-1978",
     "title": "簪花人間",
@@ -4200,9 +4313,9 @@
   },
   {
     "id": "song-2c1da4bd-1fad-4b03-a863-7abc30b57cfc",
-    "workId": "work-f3ea8ed8-d309-473c-b1db-107a6f64d335",
+    "workId": "work-3d4bd216-8e51-48b7-9e6f-7f35171bc581",
     "title": "驚鵲 (跟三年前的自己合唱Ver.)",
-    "originalArtist": "三無xHanser",
+    "originalArtist": "三無&Hanser",
     "tags": [],
     "performances": [
       {
