@@ -2,14 +2,14 @@
   "version": 1,
   "streamers": {
     "cesium": {
-      "exportRevision": 608,
-      "lastSyncedAt": "2026-11-01T09:50:56.079Z",
-      "maxSongUpdatedAt": "2026-10-30 14:51:38",
-      "maxPerfUpdatedAt": "2026-10-30 14:51:38",
-      "maxStreamUpdatedAt": "2026-10-30 14:51:38",
-      "songsCount": 229,
-      "performancesCount": 326,
-      "streamsCount": 27
+      "exportRevision": 626,
+      "lastSyncedAt": "2026-11-07T04:00:33.739Z",
+      "maxSongUpdatedAt": "2026-11-06 04:51:20",
+      "maxPerfUpdatedAt": "2026-11-06 04:50:30",
+      "maxStreamUpdatedAt": "2026-11-06 04:50:29",
+      "songsCount": 233,
+      "performancesCount": 337,
+      "streamsCount": 28
     },
     "earendel": {
       "exportRevision": 208,
