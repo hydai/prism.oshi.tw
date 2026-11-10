@@ -122,12 +122,41 @@
       "enabled": true
     },
     {
+      "slug": "abei",
+      "displayName": "阿北Abei",
+      "description": "",
+      "avatarUrl": "https://yt3.ggpht.com/lkAvx94XjZq6G_OI_PdSOFVwGvb18A9tpstO29Vc_6fLiM_tamiwaOYriiY1Pmfga70C_hRH=s240-c-k-c0x00ffffff-no-rj",
+      "brandName": "阿北Abei",
+      "subscriberCount": "2.39萬",
+      "group": "個人勢",
+      "socialLinks": {
+        "youtube": "https://youtube.com/channel/UCd1bKfF_ded-VJcxAQfNsBg?si=kgRX3zBTywapiXTa",
+        "twitter": "https://x.com/Abei0815",
+        "instagram": "https://www.instagram.com/abei_vtuber/"
+      },
+      "theme": {
+        "accentPrimary": "#EC4899",
+        "accentPrimaryDark": "#DB2777",
+        "accentPrimaryLight": "#F472B6",
+        "accentSecondary": "#3B82F6",
+        "accentSecondaryLight": "#60A5FA",
+        "bgPageStart": "#FFF0F5",
+        "bgPageMid": "#F0F8FF",
+        "bgPageEnd": "#E6E6FA",
+        "bgAccentPrimary": "#FDF2F8",
+        "bgAccentPrimaryMuted": "#FCE7F3",
+        "borderAccentPrimary": "#FBCFE8",
+        "borderAccentSecondary": "#BFDBFE"
+      },
+      "enabled": true
+    },
+    {
       "slug": "cesium",
       "displayName": "Cesium ch. 瑟思安",
       "description": "⚛︎ 𝘗𝘢𝘳𝘢≠𝘥𝘰𝘹 ∞ 𝘚𝘤𝘩𝘳ö𝘥𝘪𝘯𝘨𝘦𝘳'𝘴 𝘊𝘢𝘵 ∞ 𝘚𝘱𝘳𝘪𝘯𝘨𝘧𝘪𝘴𝘩 ⚛︎ \n\n在逃貓貓，你能觀察得到真實的我嗎/•᷅‎‎•᷄\\୭\n\n☆－:+:－:+:－:+:－:+:－:+:－:+:－☆ \n\n⏀ 企業合作、問題反應 ▿ Springfish@spring-fish.com\n⏀ 連動邀請、工商需求 ▿ bd@spring-fish.com\n⏀ 隸屬 ▿ 春魚創意股份有限公司 https://www.youtube.com/@Springfish\n　 　　  Para≠dox ∞ 五律悖反 https://www.youtube.com/@Paradox.2026\n\n☆－:+:－:+:－:+:－:+:－:+:－:+:－☆",
       "avatarUrl": "https://yt3.ggpht.com/CHagvIdGIibjvhMODhCf1jTfVOdaTHWAboktdNnBOV8Xv1gS36Cds4Ww0h681dDwceZJcebqlfU=s240-c-k-c0x00ffffff-no-rj",
       "brandName": "Cesium ch. 瑟思安",
-      "subscriberCount": "4.65萬",
+      "subscriberCount": "4.66萬",
       "group": "春魚創意",
       "socialLinks": {
         "youtube": "https://www.youtube.com/@Cesium.Paradox",
@@ -335,7 +364,7 @@
       "description": "馬來西亞多語言雜談系Vtuber\n頻道主要活動在於雜談和歌回",
       "avatarUrl": "https://yt3.ggpht.com/NPTjBjNcg0wGuUpSbrk8RuWIvHv5k9CYREArYf_vPxEiE46uOp4iqjfmqMHTB9vo_zZdkwtM=s240-c-k-c0x00ffffff-no-rj",
       "brandName": "Inori",
-      "subscriberCount": "6.61萬",
+      "subscriberCount": "6.62萬",
       "group": "個人勢",
       "socialLinks": {
         "youtube": "https://www.youtube.com/@AkitsukiInori",
@@ -525,6 +554,36 @@
         "facebook": "https://www.facebook.com/KoyukiTeRaz/",
         "instagram": "https://www.instagram.com/koyuki_teraz/",
         "twitch": "https://www.twitch.tv/koyuki_teraz"
+      },
+      "theme": {
+        "accentPrimary": "#EC4899",
+        "accentPrimaryDark": "#DB2777",
+        "accentPrimaryLight": "#F472B6",
+        "accentSecondary": "#3B82F6",
+        "accentSecondaryLight": "#60A5FA",
+        "bgPageStart": "#FFF0F5",
+        "bgPageMid": "#F0F8FF",
+        "bgPageEnd": "#E6E6FA",
+        "bgAccentPrimary": "#FDF2F8",
+        "bgAccentPrimaryMuted": "#FCE7F3",
+        "borderAccentPrimary": "#FBCFE8",
+        "borderAccentSecondary": "#BFDBFE"
+      },
+      "enabled": true
+    },
+    {
+      "slug": "lanyue",
+      "displayName": "藍玥 Lan Yue ch.",
+      "description": "🌙靜謐月色中，溫柔的海面 \n☁️一縷呢喃，輕吻你的囊魂 \n🦌藍玥💙掉落人間的月麒麟，就算夢裡是黑夜，我也會守護你",
+      "avatarUrl": "https://yt3.ggpht.com/y8LE2ElGmVAPnUiNJ8c4CMPJRi7FX1iTVDQYB9YpKnwlEmuNyk53EjRC61rLbl3XAZEMUWJz=s240-c-k-c0x00ffffff-no-rj",
+      "brandName": "藍玥 Lan Yue ch.",
+      "subscriberCount": "5,850",
+      "group": "晝夜徘徊",
+      "socialLinks": {
+        "youtube": "https://youtube.com/channel/UCCMewRU0D8tnmCtm0CH6TMA?si=eUIWuBaadrgvEOY4",
+        "twitter": "https://x.com/bluemoonu777",
+        "instagram": "https://www.instagram.com/bluemoonu777/",
+        "twitch": "https://twitch.tv/aozuki_777"
       },
       "theme": {
         "accentPrimary": "#EC4899",
@@ -838,6 +897,36 @@
       "enabled": true
     },
     {
+      "slug": "omaimaimaii",
+      "displayName": "鷗麥麥麥Maii Ch.",
+      "description": "鷗——阿——",
+      "avatarUrl": "https://yt3.ggpht.com/hu87zNYr-KH1CFjn2dFiDfQsQcd71wMTIKMinRDKtDjP0BS8QgqPZJkjrIepZnTDwFQJ7GM5ew=s240-c-k-c0x00ffffff-no-rj",
+      "brandName": "鷗麥麥麥",
+      "subscriberCount": "35.2萬",
+      "group": "個人勢",
+      "socialLinks": {
+        "youtube": "https://youtube.com/@omaimaimaii?si=5MIx9WsEioht-YvM",
+        "twitter": "https://x.com/omaimaimai_0401",
+        "instagram": "https://www.instagram.com/omaimaimai0401",
+        "twitch": "https://twitch.tv/omaimaimai"
+      },
+      "theme": {
+        "accentPrimary": "#EC4899",
+        "accentPrimaryDark": "#DB2777",
+        "accentPrimaryLight": "#F472B6",
+        "accentSecondary": "#3B82F6",
+        "accentSecondaryLight": "#60A5FA",
+        "bgPageStart": "#FFF0F5",
+        "bgPageMid": "#F0F8FF",
+        "bgPageEnd": "#E6E6FA",
+        "bgAccentPrimary": "#FDF2F8",
+        "bgAccentPrimaryMuted": "#FCE7F3",
+        "borderAccentPrimary": "#FBCFE8",
+        "borderAccentSecondary": "#BFDBFE"
+      },
+      "enabled": true
+    },
+    {
       "slug": "otowamina",
       "displayName": "音羽米奈 / OtowaMina",
       "description": "來自貓界的貓咪✨\n某天吃了人間美食而來的人間 為了觀察人類而開始當起了Vtuber💜\n平常會開繪圖/雜談/遊戲台唷😍",
@@ -984,12 +1073,41 @@
       "enabled": true
     },
     {
+      "slug": "resa1007",
+      "displayName": "蕾莎 Resa Ch.",
+      "description": "KIMINA所屬｜蕾沙Resa\n想把我的聲音，寫進你的記憶裡。",
+      "avatarUrl": "https://yt3.ggpht.com/VNDZejy4oqmER4epk4cD9wcfNt4j-v5FppH2siannStG_gBXGhPJwxYBZzJama-w0eetyEunuw=s240-c-k-c0x00ffffff-no-rj",
+      "brandName": "蕾莎 Resa Ch.",
+      "subscriberCount": "1.4萬",
+      "group": "KIMINA",
+      "socialLinks": {
+        "youtube": "https://youtube.com/@resa1007_kimina?si=Wh5ZFkfDdnAKs3j4",
+        "twitter": "https://x.com/resa1007_kimina",
+        "instagram": "https://www.instagram.com/resa1007_kimina"
+      },
+      "theme": {
+        "accentPrimary": "#EC4899",
+        "accentPrimaryDark": "#DB2777",
+        "accentPrimaryLight": "#F472B6",
+        "accentSecondary": "#3B82F6",
+        "accentSecondaryLight": "#60A5FA",
+        "bgPageStart": "#FFF0F5",
+        "bgPageMid": "#F0F8FF",
+        "bgPageEnd": "#E6E6FA",
+        "bgAccentPrimary": "#FDF2F8",
+        "bgAccentPrimaryMuted": "#FCE7F3",
+        "borderAccentPrimary": "#FBCFE8",
+        "borderAccentSecondary": "#BFDBFE"
+      },
+      "enabled": true
+    },
+    {
       "slug": "sachi",
       "displayName": "幸Sachi",
       "description": "精明能幹，其實私底下有著反差(溫柔、腹黑)的一面。\n\n對聲音方面的創作相當有興趣，喜歡配音與唱歌，琢磨不一樣的聲音，希望可以讓更多人聽見，擅長使用自己性感低沉的聲音來演唱與製作作品，讓你陶醉於她的聲音像是一杯陳年的紅酒一般。\n\n在因緣際會下而加入了子午學院，希望可以透過進修與學習讓更多的人知道他。\n\n「遇見了你，那些被遺忘的塵封過往，將不再需要執著。」「你，願意跟我一起寫下……屬於我們的歷史嗎？」",
       "avatarUrl": "https://yt3.ggpht.com/lM3qifraBkNAVqjFr6KVyT-z8S1Z7J1BV24JJ9d8AIWaSDREn4ucxMeIaYdmhtnOkNZvJe5Yvw=s240-c-k-c0x00ffffff-no-rj",
       "brandName": "Sachi",
-      "subscriberCount": "5.48萬",
+      "subscriberCount": "5.49萬",
       "group": "子午計畫",
       "socialLinks": {
         "youtube": "https://www.youtube.com/@SachiTeRaz",
@@ -1192,7 +1310,7 @@
       "description": "是鼯鼠不是老鼠\n高攻高防高海拔",
       "avatarUrl": "https://yt3.ggpht.com/mCQaVnGfbv9OxIYIv92s39xSTliYCai6S_P90hI8xRl9_GYD6tq4IgGv0OLVXviPU2VpLcQyKA=s240-c-k-c0x00ffffff-no-rj",
       "brandName": "Yuzumi",
-      "subscriberCount": "8.67萬",
+      "subscriberCount": "8.68萬",
       "group": "子午計畫",
       "socialLinks": {
         "youtube": "https://youtube.com/channel/UCxI5FyblWfEVBJDbSwRPzyw"
