@@ -220,4 +220,26 @@ test('rowToConfig rejects malformed theme colors', () => {
   assert.throws(() => rowToConfig(row({ theme_json: theme })), /invalid theme color accentPrimary/);
 });
 
+// --- Streamers whose curator chose no colours get the default theme ---
+
+const defaultTheme = { ...validThemeConfig, accentPrimary: '#EC4899' };
+const allBlackTheme = JSON.stringify(Object.fromEntries(Object.keys(validThemeConfig).map((key) => [key, '#000000'])));
+
+test('rowToConfig gives a streamer with an empty theme_json the default theme', () => {
+  assert.deepEqual(rowToConfig(row({ theme_json: '' }), defaultTheme).theme, defaultTheme);
+});
+
+test('rowToConfig gives a streamer with the all-#000000 placeholder theme the default theme', () => {
+  assert.deepEqual(rowToConfig(row({ theme_json: allBlackTheme }), defaultTheme).theme, defaultTheme);
+});
+
+test('rowToConfig keeps the colours a curator chose over the default theme', () => {
+  assert.deepEqual(rowToConfig(row(), defaultTheme).theme, validThemeConfig);
+});
+
+test('rowToConfig refuses a streamer with no colours when there is no default theme', () => {
+  assert.throws(() => rowToConfig(row({ theme_json: '' })), /Streamer "aiko" has no theme colors/);
+  assert.throws(() => rowToConfig(row({ theme_json: allBlackTheme })), /Streamer "aiko" has no theme colors/);
+});
+
 console.log('sync-registry.test: all passed');

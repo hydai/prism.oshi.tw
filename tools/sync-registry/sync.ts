@@ -139,10 +139,13 @@ function isAllBlackTheme(theme: StreamerTheme): boolean {
   return Object.values(theme).every((v) => v === '#000000');
 }
 
-function parseTheme(row: SubmissionRow): StreamerTheme {
-  if (!row.theme_json) {
-    throw new Error(`Streamer "${row.slug}" has empty theme_json — curator must set theme colors before sync.`);
-  }
+/**
+ * The colours the curator chose for a streamer, or null when they chose none: an empty theme_json (the schema
+ * default, which the admin UI keeps when a save leaves the colours untouched) or twelve #000000 (what the admin
+ * UI saved for an untouched theme until 2026-10).
+ */
+function parseTheme(row: SubmissionRow): StreamerTheme | null {
+  if (!row.theme_json) return null;
   let parsed: unknown;
   try {
     parsed = JSON.parse(row.theme_json);
@@ -164,10 +167,27 @@ function parseTheme(row: SubmissionRow): StreamerTheme {
     sanitized[key] = value;
   }
 
-  return sanitized as StreamerTheme;
+  const chosen = sanitized as StreamerTheme;
+  return isAllBlackTheme(chosen) ? null : chosen;
 }
 
-export function rowToConfig(row: SubmissionRow): StreamerConfig {
+function themeOrDefault(row: SubmissionRow, defaultTheme: StreamerTheme | undefined): StreamerTheme {
+  const theme = parseTheme(row);
+  if (theme) return theme;
+  if (!defaultTheme) {
+    throw new Error(
+      `Streamer "${row.slug}" has no theme colors and there is no ${DEFAULT_THEME_SLUG} theme to default to — curator must set theme colors before sync.`,
+    );
+  }
+  console.log(`  ⚠ ${row.slug} has no theme colors (empty or all #000000), using ${DEFAULT_THEME_SLUG} theme as default`);
+  return { ...defaultTheme };
+}
+
+/**
+ * `defaultTheme` is the theme for a streamer whose curator chose no colours (see parseTheme); main() passes the
+ * DEFAULT_THEME_SLUG streamer's. Without one, such a streamer cannot be synced.
+ */
+export function rowToConfig(row: SubmissionRow, defaultTheme?: StreamerTheme): StreamerConfig {
   assertValidSlug(row.slug, 'Nova submissions.slug');
 
   const config: StreamerConfig = {
@@ -179,7 +199,7 @@ export function rowToConfig(row: SubmissionRow): StreamerConfig {
     subscriberCount: requireStringField(row.subscriber_count, `${row.slug}.subscriber_count`),
     group: requireStringField(row.group, `${row.slug}.group`),
     socialLinks: buildSocialLinks(row),
-    theme: parseTheme(row),
+    theme: themeOrDefault(row, defaultTheme),
     enabled: true, // only enabled rows are queried
   };
   const externalUrl = safeExternalUrl(row.external_url, `${row.slug}.external_url`);
@@ -329,18 +349,10 @@ async function main(): Promise<void> {
 
   // Read the previously-published registry before writeRegistry overwrites it.
   const oldStreamers = readExistingStreamers();
-  const streamers = rows.map(rowToConfig);
-
-  // Fall back to the default theme donor's theme for streamers with all-#000000 placeholder themes
-  const themeDonor = streamers.find((s) => s.slug === DEFAULT_THEME_SLUG);
-  if (themeDonor) {
-    for (const s of streamers) {
-      if (s.slug !== DEFAULT_THEME_SLUG && isAllBlackTheme(s.theme)) {
-        console.log(`  ⚠ ${s.slug} has placeholder theme (all #000000), using ${DEFAULT_THEME_SLUG} theme as default`);
-        s.theme = { ...themeDonor.theme };
-      }
-    }
-  }
+  // A streamer whose curator chose no colours gets the DEFAULT_THEME_SLUG streamer's theme.
+  const donorRow = rows.find((r) => r.slug === DEFAULT_THEME_SLUG);
+  const defaultTheme = donorRow ? (parseTheme(donorRow) ?? undefined) : undefined;
+  const streamers = rows.map((row) => rowToConfig(row, defaultTheme));
 
   writeRegistry(streamers);
   writeSlugs(streamers);
