@@ -16,6 +16,22 @@
     ]
   },
   {
+    "id": "song-aefef119-0259-4245-84cb-68ce3b896426",
+    "workId": "work-ca379693-574d-4437-82ad-d9cd661c2c9c",
+    "title": "一串心",
+    "originalArtist": "沈雁",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-43c4d5c5-039a-46da-a927-d701c19e575b",
+        "streamId": "stream-2026-11-08",
+        "videoId": "OmmPnZhfBPQ",
+        "timestamp": 6199,
+        "endTimestamp": 6372
+      }
+    ]
+  },
+  {
     "id": "song-330686d9-f7c5-472d-a890-ea0a891e7867",
     "workId": "work-3bdea311-907d-4938-b146-e46c5fc9a790",
     "title": "一拜天地",
@@ -745,6 +761,13 @@
     ],
     "performances": [
       {
+        "id": "p-53efca14-12c6-4498-9224-a9c57f063ed9",
+        "streamId": "stream-2026-11-08",
+        "videoId": "OmmPnZhfBPQ",
+        "timestamp": 4959,
+        "endTimestamp": 5208
+      },
+      {
         "id": "p-8432fb4d-b7cf-4ba6-aa3d-f99c6237bd3a",
         "streamId": "stream-f8c42ed9-4ff2-41d5-8b10-715506bc2a91",
         "videoId": "iCGCoCtbdS0",
@@ -849,6 +872,24 @@
         "videoId": "8YAimZj5Mrw",
         "timestamp": 2516,
         "endTimestamp": 2749
+      }
+    ]
+  },
+  {
+    "id": "song-2f177d42-dbcd-492f-bf6b-db3ddf472b5a",
+    "workId": "work-song-162",
+    "title": "月亮代表我的心",
+    "originalArtist": "鄧麗君",
+    "tags": [
+      "language:ja"
+    ],
+    "performances": [
+      {
+        "id": "p-43782122-725a-4ff4-a135-ddb86ed9fa9d",
+        "streamId": "stream-2026-11-08",
+        "videoId": "OmmPnZhfBPQ",
+        "timestamp": 7095,
+        "endTimestamp": 7290
       }
     ]
   },
@@ -1337,6 +1378,13 @@
     ],
     "performances": [
       {
+        "id": "p-0028cc92-f940-470a-aab8-88ec300d0f10",
+        "streamId": "stream-2026-11-08",
+        "videoId": "OmmPnZhfBPQ",
+        "timestamp": 5842,
+        "endTimestamp": 6045
+      },
+      {
         "id": "p-29784779-2f11-48d9-90ae-64e71eedb7ba",
         "streamId": "stream-2026-07-22",
         "videoId": "jAQvF5wMGws",
@@ -1593,6 +1641,13 @@
     "tags": [],
     "performances": [
       {
+        "id": "p-0d9129ca-5aac-4521-96ca-e9535be3433a",
+        "streamId": "stream-2026-11-08",
+        "videoId": "OmmPnZhfBPQ",
+        "timestamp": 1558,
+        "endTimestamp": 1819
+      },
+      {
         "id": "p-c2ee869e-cc73-4bd1-83dd-1a04422a161c",
         "streamId": "stream-2026-09-23",
         "videoId": "LIi33QOdVg8",
@@ -1670,6 +1725,13 @@
     "originalArtist": "音頻怪物",
     "tags": [],
     "performances": [
+      {
+        "id": "p-b87f04d7-2939-446d-bc81-e9a013d6412f",
+        "streamId": "stream-2026-11-08",
+        "videoId": "OmmPnZhfBPQ",
+        "timestamp": 4386,
+        "endTimestamp": 4627
+      },
       {
         "id": "p-1cf9c911-5f48-414d-8e3b-f446a8f5049c",
         "streamId": "stream-2026-10-28",
@@ -1811,6 +1873,13 @@
     "tags": [],
     "performances": [
       {
+        "id": "p-8e6b9563-a683-4b81-bccf-688eb3aae579",
+        "streamId": "stream-2026-11-08",
+        "videoId": "OmmPnZhfBPQ",
+        "timestamp": 8072,
+        "endTimestamp": 8338
+      },
+      {
         "id": "p-6dbc4ac1-e9dc-47ae-97ff-00935e5d9387",
         "streamId": "stream-2026-10-14",
         "videoId": "ukNBbq2azJ8",
@@ -1944,6 +2013,13 @@
     "tags": [],
     "performances": [
       {
+        "id": "p-e5a28441-7e70-4e97-8de0-b6a66252b9f7",
+        "streamId": "stream-2026-11-08",
+        "videoId": "OmmPnZhfBPQ",
+        "timestamp": 10489,
+        "endTimestamp": 10760
+      },
+      {
         "id": "p-2f0c0d61-4148-4867-9020-12029a75475e",
         "streamId": "stream-2026-10-21",
         "videoId": "ZIP6T_tLIec",
@@ -2030,6 +2106,13 @@
     "originalArtist": "雲之泣",
     "tags": [],
     "performances": [
+      {
+        "id": "p-705556dd-1fab-4f28-ba46-d54f765a1e5d",
+        "streamId": "stream-2026-11-08",
+        "videoId": "OmmPnZhfBPQ",
+        "timestamp": 3917,
+        "endTimestamp": 4147
+      },
       {
         "id": "p-45c5f02d-c805-4bcf-b97d-2431708bc617",
         "streamId": "stream-97b2edd0-d63d-48e8-936c-c7c7624334ad",
@@ -2269,6 +2352,13 @@
     "tags": [],
     "performances": [
       {
+        "id": "p-de294950-bb5d-4e57-9f17-fbc0a2b40c51",
+        "streamId": "stream-2026-11-08",
+        "videoId": "OmmPnZhfBPQ",
+        "timestamp": 508,
+        "endTimestamp": 766
+      },
+      {
         "id": "p-e9ea4d93-90d0-4066-b4fb-3f501c02904e",
         "streamId": "stream-2026-10-14",
         "videoId": "ukNBbq2azJ8",
@@ -2314,6 +2404,13 @@
     "originalArtist": "音闕詩聽",
     "tags": [],
     "performances": [
+      {
+        "id": "p-26a5dba2-add5-45df-b256-ad8bf480b948",
+        "streamId": "stream-2026-11-08",
+        "videoId": "OmmPnZhfBPQ",
+        "timestamp": 2412,
+        "endTimestamp": 2582
+      },
       {
         "id": "p-a627ccfb-958b-475b-85de-a45da1e3e5ef",
         "streamId": "stream-2026-09-16",
@@ -2496,6 +2593,22 @@
     ]
   },
   {
+    "id": "song-91e40afa-8b38-47e1-ad2c-ae92e43fda96",
+    "workId": "work-38b2bb56-de03-4aa2-b8c8-dd454143012c",
+    "title": "捉泥鰍",
+    "originalArtist": "包美聖",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-193ccd2f-cd1d-42a9-bbc3-a1f8369658c5",
+        "streamId": "stream-2026-11-08",
+        "videoId": "OmmPnZhfBPQ",
+        "timestamp": 8926,
+        "endTimestamp": 9078
+      }
+    ]
+  },
+  {
     "id": "song-8c1f5fde-441d-4d43-8a6d-dea3d089921a",
     "workId": "work-song-e1a57fe7",
     "title": "桃花諾",
@@ -2645,6 +2758,13 @@
     "tags": [],
     "performances": [
       {
+        "id": "p-4d75e430-d1e5-4a67-9553-5cfc4f3b465c",
+        "streamId": "stream-2026-11-08",
+        "videoId": "OmmPnZhfBPQ",
+        "timestamp": 1988,
+        "endTimestamp": 2260
+      },
+      {
         "id": "p-daf80126-7619-4dec-bb00-490558a79baa",
         "streamId": "stream-2026-09-09",
         "videoId": "_4yrs9aGUA8",
@@ -2673,6 +2793,22 @@
         "videoId": "f69M8rbw2Cc",
         "timestamp": 2752,
         "endTimestamp": 3030
+      }
+    ]
+  },
+  {
+    "id": "song-518dee38-e28b-4ddc-9442-062d600114da",
+    "workId": "work-ca7898f7-3039-4976-8f63-080c23281277",
+    "title": "問",
+    "originalArtist": "李宗盛",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-87651262-ec1c-49b7-a335-9cc51ad0786b",
+        "streamId": "stream-2026-11-08",
+        "videoId": "OmmPnZhfBPQ",
+        "timestamp": 9388,
+        "endTimestamp": 9644
       }
     ]
   },
@@ -2875,6 +3011,22 @@
         "videoId": "_4yrs9aGUA8",
         "timestamp": 4572,
         "endTimestamp": 4849
+      }
+    ]
+  },
+  {
+    "id": "song-057e0efc-6eec-44d4-acc1-41d3d8b83dd5",
+    "workId": "work-1db8f0f7-2030-4d3f-8a2e-d9c5f5898a84",
+    "title": "晚夜微雨問海棠（速度+0.1）",
+    "originalArtist": "鏡予歌&陳亦洺&喧笑",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-dc4e0233-386b-4fb8-8818-6452c520c411",
+        "streamId": "stream-2026-11-08",
+        "videoId": "OmmPnZhfBPQ",
+        "timestamp": 980,
+        "endTimestamp": 1236
       }
     ]
   },
@@ -3287,6 +3439,22 @@
     ]
   },
   {
+    "id": "song-2b2040de-bd62-4d50-bdc9-8fa34c5df956",
+    "workId": "work-f995678d-1a5d-44d8-a5df-617946c96b0a",
+    "title": "畫地為牢（速度+0.2）",
+    "originalArtist": "葉裡&雲の泣",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-297db2b0-34c0-42fe-8d8d-b751c4213eb5",
+        "streamId": "stream-2026-11-08",
+        "videoId": "OmmPnZhfBPQ",
+        "timestamp": 8552,
+        "endTimestamp": 8851
+      }
+    ]
+  },
+  {
     "id": "song-b50f09ff-200c-4408-95e1-dee61ec404d7",
     "workId": "work-7e0763eb-d8bc-4f37-863b-7fdc195327ba",
     "title": "盜將行",
@@ -3299,6 +3467,22 @@
         "videoId": "n7o5ukvaAiY",
         "timestamp": 3301,
         "endTimestamp": 3494
+      }
+    ]
+  },
+  {
+    "id": "song-e4455c76-c12b-4b47-a520-edde4f9b6a16",
+    "workId": "work-75a563ba-75b0-4297-9c22-156d1dfd6ea4",
+    "title": "童年",
+    "originalArtist": "羅大佑",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-dcdb64f7-d47a-4e94-98af-1dea003069c1",
+        "streamId": "stream-2026-11-08",
+        "videoId": "OmmPnZhfBPQ",
+        "timestamp": 6441,
+        "endTimestamp": 6652
       }
     ]
   },
@@ -3382,6 +3566,13 @@
     "originalArtist": "陳小雲",
     "tags": [],
     "performances": [
+      {
+        "id": "p-cb0019d7-151f-4aeb-a8ba-2b87fbdd3dc6",
+        "streamId": "stream-2026-11-08",
+        "videoId": "OmmPnZhfBPQ",
+        "timestamp": 5397,
+        "endTimestamp": 5693
+      },
       {
         "id": "p-2121fd8c-de19-4bb1-b523-f6ead4fbb0f8",
         "streamId": "stream-acceb6ce-b95c-44d7-8642-ed95fab8c930",
@@ -3861,6 +4052,13 @@
     "tags": [],
     "performances": [
       {
+        "id": "p-a00f9862-3456-489a-b5e7-ec57ef0f36a8",
+        "streamId": "stream-2026-11-08",
+        "videoId": "OmmPnZhfBPQ",
+        "timestamp": 3104,
+        "endTimestamp": 3338
+      },
+      {
         "id": "p-39e373cd-3231-4955-89b4-6437aaeee758",
         "streamId": "stream-2026-10-14",
         "videoId": "ukNBbq2azJ8",
@@ -4048,6 +4246,13 @@
     "originalArtist": "張韶涵",
     "tags": [],
     "performances": [
+      {
+        "id": "p-1c376b62-6390-44f0-959b-f27d785406c6",
+        "streamId": "stream-2026-11-08",
+        "videoId": "OmmPnZhfBPQ",
+        "timestamp": 2735,
+        "endTimestamp": 2956
+      },
       {
         "id": "p-ebba5dc5-8e05-47a4-9a1b-968230d3f793",
         "streamId": "stream-2026-08-05",
