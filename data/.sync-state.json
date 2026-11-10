@@ -1,15 +1,24 @@
 {
   "version": 1,
   "streamers": {
+    "abei": {
+      "lastSyncedAt": null,
+      "maxSongUpdatedAt": null,
+      "maxPerfUpdatedAt": null,
+      "maxStreamUpdatedAt": null,
+      "songsCount": 0,
+      "performancesCount": 0,
+      "streamsCount": 0
+    },
     "cesium": {
-      "exportRevision": 626,
-      "lastSyncedAt": "2026-11-07T04:00:33.739Z",
-      "maxSongUpdatedAt": "2026-11-06 04:51:20",
-      "maxPerfUpdatedAt": "2026-11-06 04:50:30",
-      "maxStreamUpdatedAt": "2026-11-06 04:50:29",
-      "songsCount": 233,
-      "performancesCount": 337,
-      "streamsCount": 28
+      "exportRevision": 654,
+      "lastSyncedAt": "2026-11-10T04:18:31.990Z",
+      "maxSongUpdatedAt": "2026-11-09 20:28:10",
+      "maxPerfUpdatedAt": "2026-11-09 20:28:10",
+      "maxStreamUpdatedAt": "2026-11-09 20:28:10",
+      "songsCount": 240,
+      "performancesCount": 357,
+      "streamsCount": 29
     },
     "earendel": {
       "exportRevision": 208,
@@ -82,13 +91,14 @@
       "streamsCount": 6
     },
     "ichii": {
-      "lastSyncedAt": null,
-      "maxSongUpdatedAt": null,
-      "maxPerfUpdatedAt": null,
-      "maxStreamUpdatedAt": null,
-      "songsCount": 0,
-      "performancesCount": 0,
-      "streamsCount": 0
+      "exportRevision": 26,
+      "lastSyncedAt": "2026-11-10T04:18:33.159Z",
+      "maxSongUpdatedAt": "2026-11-10 04:08:21",
+      "maxPerfUpdatedAt": "2026-11-10 04:08:21",
+      "maxStreamUpdatedAt": "2026-11-10 04:08:20",
+      "songsCount": 12,
+      "performancesCount": 12,
+      "streamsCount": 2
     },
     "inori": {
       "exportRevision": 91,
@@ -158,6 +168,15 @@
       "songsCount": 17,
       "performancesCount": 17,
       "streamsCount": 2
+    },
+    "lanyue": {
+      "lastSyncedAt": null,
+      "maxSongUpdatedAt": null,
+      "maxPerfUpdatedAt": null,
+      "maxStreamUpdatedAt": null,
+      "songsCount": 0,
+      "performancesCount": 0,
+      "streamsCount": 0
     },
     "laphria": {
       "exportRevision": 10,
@@ -268,6 +287,15 @@
       "performancesCount": 70,
       "streamsCount": 4
     },
+    "omaimaimaii": {
+      "lastSyncedAt": null,
+      "maxSongUpdatedAt": null,
+      "maxPerfUpdatedAt": null,
+      "maxStreamUpdatedAt": null,
+      "songsCount": 0,
+      "performancesCount": 0,
+      "streamsCount": 0
+    },
     "otowamina": {
       "exportRevision": 1,
       "lastSyncedAt": "2026-09-05T04:05:18.804Z",
@@ -317,6 +345,15 @@
       "songsCount": 32,
       "performancesCount": 32,
       "streamsCount": 3
+    },
+    "resa1007": {
+      "lastSyncedAt": null,
+      "maxSongUpdatedAt": null,
+      "maxPerfUpdatedAt": null,
+      "maxStreamUpdatedAt": null,
+      "songsCount": 0,
+      "performancesCount": 0,
+      "streamsCount": 0
     },
     "sachi": {
       "exportRevision": 14,
