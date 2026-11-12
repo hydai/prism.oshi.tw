@@ -1,1 +1,116 @@
-[]
+[
+  {
+    "id": "song-989c2e74-3a21-4f36-bff8-8679652ac668",
+    "workId": "work-b1f5e13e-53cf-4fdf-a5d7-b7d7f5cf9475",
+    "title": "女孩",
+    "originalArtist": "問樂團",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-857205ab-1da8-45ab-9937-89d1f6e5542a",
+        "streamId": "stream-2025-10-18",
+        "videoId": "2hrKrFVYxP0",
+        "timestamp": 913,
+        "endTimestamp": 1105
+      }
+    ]
+  },
+  {
+    "id": "song-8a86e14f-8bec-46bc-8d03-e4fc6ccdc52b",
+    "workId": "work-b437609a-4b9e-4aee-acfc-24df7dbf1c54",
+    "title": "吉時已到",
+    "originalArtist": "糯米",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-ecb8bd0b-bdfa-4d7a-8deb-6c9941b7b5a4",
+        "streamId": "stream-2025-10-18",
+        "videoId": "2hrKrFVYxP0",
+        "timestamp": 1528,
+        "endTimestamp": 1747
+      }
+    ]
+  },
+  {
+    "id": "song-1d5c7495-1bcb-4590-940c-f3cffd89f370",
+    "workId": "work-8de599a1-ff67-4569-83aa-fb3cab5431e9",
+    "title": "第三人",
+    "originalArtist": "Fine樂團",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-d273c22c-2a51-4d2c-8bd7-fcccebe00d5e",
+        "streamId": "stream-2025-10-18",
+        "videoId": "2hrKrFVYxP0",
+        "timestamp": 2016,
+        "endTimestamp": 2301
+      }
+    ]
+  },
+  {
+    "id": "song-9eff1a52-490a-47c6-81b4-927532af34a7",
+    "workId": "work-f405e73d-80a2-4584-8766-dc4685bf3f09",
+    "title": "愛你說不出口",
+    "originalArtist": "林愷倫",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-e1da488b-f9c9-4f8f-8fa8-6a3afdecb24e",
+        "streamId": "stream-2025-10-18",
+        "videoId": "2hrKrFVYxP0",
+        "timestamp": 1805,
+        "endTimestamp": 1984
+      }
+    ]
+  },
+  {
+    "id": "song-2b08873f-4b2f-48e0-ad13-01013801a4a4",
+    "workId": "work-8d204fc5-e1b9-4022-8d38-f2bbecdc652a",
+    "title": "還原",
+    "originalArtist": "關詩敏",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-fc3bae23-0cb5-47d3-85c7-78f4b36ba048",
+        "streamId": "stream-df61b30a-9364-46f5-8503-0607b9a4f4f7",
+        "videoId": "RT7d7ypuomI",
+        "timestamp": 1,
+        "endTimestamp": 224
+      }
+    ]
+  },
+  {
+    "id": "song-89a5b94a-4993-4636-afaa-15f8b81ff867",
+    "workId": "work-1b004136-9d6c-4112-995a-cef756a1483f",
+    "title": "蘑菇濃湯",
+    "originalArtist": "Play BIG Kids",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-8289dc8c-eef2-49fc-9010-4c261a2b44fe",
+        "streamId": "stream-2025-10-18",
+        "videoId": "2hrKrFVYxP0",
+        "timestamp": 1257,
+        "endTimestamp": 1364
+      }
+    ]
+  },
+  {
+    "id": "song-f996f144-e867-41e2-bd52-728cf444d16b",
+    "workId": "work-song-c7ce03ea",
+    "title": "戀愛頻率",
+    "originalArtist": "許志安、許慧欣",
+    "tags": [
+      "language:zh"
+    ],
+    "performances": [
+      {
+        "id": "p-6c56de2a-5f13-4d96-a08b-d00c8699be44",
+        "streamId": "stream-2025-10-18",
+        "videoId": "2hrKrFVYxP0",
+        "timestamp": 603,
+        "endTimestamp": 870
+      }
+    ]
+  }
+]
