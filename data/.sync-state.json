@@ -10,6 +10,15 @@
       "performancesCount": 0,
       "streamsCount": 0
     },
+    "bluenight1022": {
+      "lastSyncedAt": null,
+      "maxSongUpdatedAt": null,
+      "maxPerfUpdatedAt": null,
+      "maxStreamUpdatedAt": null,
+      "songsCount": 0,
+      "performancesCount": 0,
+      "streamsCount": 0
+    },
     "cesium": {
       "exportRevision": 654,
       "lastSyncedAt": "2026-11-10T04:18:31.990Z",
@@ -102,8 +111,8 @@
     },
     "inori": {
       "exportRevision": 91,
-      "lastSyncedAt": "2026-10-11T04:01:16.260Z",
-      "maxSongUpdatedAt": "2026-10-10 17:39:22.209",
+      "lastSyncedAt": "2026-11-12T04:01:12.068Z",
+      "maxSongUpdatedAt": "2026-11-11 04:11:26.743",
       "maxPerfUpdatedAt": "2026-07-18 16:33:17",
       "maxStreamUpdatedAt": "2026-05-18 16:13:26",
       "songsCount": 133,
@@ -170,13 +179,14 @@
       "streamsCount": 2
     },
     "lanyue": {
-      "lastSyncedAt": null,
-      "maxSongUpdatedAt": null,
-      "maxPerfUpdatedAt": null,
-      "maxStreamUpdatedAt": null,
-      "songsCount": 0,
-      "performancesCount": 0,
-      "streamsCount": 0
+      "exportRevision": 16,
+      "lastSyncedAt": "2026-11-12T04:01:13.371Z",
+      "maxSongUpdatedAt": "2026-11-11 04:11:48",
+      "maxPerfUpdatedAt": "2026-11-11 04:11:48",
+      "maxStreamUpdatedAt": "2026-11-11 04:11:48",
+      "songsCount": 7,
+      "performancesCount": 7,
+      "streamsCount": 2
     },
     "laphria": {
       "exportRevision": 10,
