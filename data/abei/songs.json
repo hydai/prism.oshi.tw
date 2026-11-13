@@ -1,1 +1,136 @@
-[]
+[
+  {
+    "id": "song-77e81969-5f61-4dee-af1d-696071011c09",
+    "workId": "work-song-7d18e0cf",
+    "title": "少女變成了一隻甲蟲",
+    "originalArtist": "吾橋有水",
+    "tags": [
+      "language:zh"
+    ],
+    "performances": [
+      {
+        "id": "p-6aac4cef-852a-4e0a-8c71-7fc7f087ac2a",
+        "streamId": "stream-2026-09-27",
+        "videoId": "G_xhunghbho",
+        "timestamp": 2436,
+        "endTimestamp": 2730
+      }
+    ]
+  },
+  {
+    "id": "song-2e30f683-7e3e-44ee-9135-7e0729d82cec",
+    "workId": "work-ab3264b5-eeda-49a3-9eb3-59882c0920c6",
+    "title": "甲乙丙丁",
+    "originalArtist": "李佳薇",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-a90e55b4-538e-4d7f-b533-501f4ea0dc2f",
+        "streamId": "stream-2026-09-27",
+        "videoId": "G_xhunghbho",
+        "timestamp": 769,
+        "endTimestamp": 974
+      }
+    ]
+  },
+  {
+    "id": "song-f9e8e0d6-36c3-402f-a3ab-e592eb10d7dd",
+    "workId": "work-song-719",
+    "title": "年輪",
+    "originalArtist": "張碧晨",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-e5d66580-b1a9-4c72-b2bb-4ee317d33edc",
+        "streamId": "stream-2026-09-27",
+        "videoId": "G_xhunghbho",
+        "timestamp": 4358,
+        "endTimestamp": 4628
+      }
+    ]
+  },
+  {
+    "id": "song-f4f6af66-7ec3-40f0-9cb8-feb76e25a621",
+    "workId": "work-932eb71f-93c9-4eb5-a63b-bdcca395deb7",
+    "title": "我期待的不是雪",
+    "originalArtist": "張妙格",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-57360dad-3a96-42fe-abf9-5f458b5c66b0",
+        "streamId": "stream-2026-09-27",
+        "videoId": "G_xhunghbho",
+        "timestamp": 5122,
+        "endTimestamp": 5281
+      }
+    ]
+  },
+  {
+    "id": "song-0f0e54b7-7b15-4158-ba36-663144256b5f",
+    "workId": "work-2e9f1318-7097-4c46-974c-1e12dbcf8d6d",
+    "title": "拔錨",
+    "originalArtist": "ナナホシ管弦楽団",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-eb3b2b23-37e9-4563-a695-60bc3508a034",
+        "streamId": "stream-2dbf312a-0e5c-46a5-9294-94fb52bf2819",
+        "videoId": "y2Xp4ho8Z8E",
+        "timestamp": 0,
+        "endTimestamp": 200
+      }
+    ]
+  },
+  {
+    "id": "song-57a06520-148e-4600-8082-ddbef96c0feb",
+    "workId": "work-song-1322",
+    "title": "雨愛",
+    "originalArtist": "楊丞琳",
+    "tags": [
+      "language:zh"
+    ],
+    "performances": [
+      {
+        "id": "p-7656c38f-03a6-408e-915b-a554f383c8f2",
+        "streamId": "stream-2026-09-27",
+        "videoId": "G_xhunghbho",
+        "timestamp": 1345,
+        "endTimestamp": 1603
+      }
+    ]
+  },
+  {
+    "id": "song-1fffd29f-4a17-4f60-854c-32902249de02",
+    "workId": "work-song-646",
+    "title": "紅色高跟鞋",
+    "originalArtist": "蔡健雅",
+    "tags": [
+      "language:zh"
+    ],
+    "performances": [
+      {
+        "id": "p-79bde69b-c7ff-464b-809c-a1e9d1e06048",
+        "streamId": "stream-2026-09-27",
+        "videoId": "G_xhunghbho",
+        "timestamp": 3550,
+        "endTimestamp": 3752
+      }
+    ]
+  },
+  {
+    "id": "song-15029da8-cf33-4987-8138-d7fb07ba5b33",
+    "workId": "work-d9e1635e-19fd-4b87-a79f-c4ffec132cc2",
+    "title": "致珊珊來遲的你",
+    "originalArtist": "阿肆ft.林宥嘉",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-02c6cd04-f745-4223-b46c-c959039e57ce",
+        "streamId": "stream-2026-09-27",
+        "videoId": "G_xhunghbho",
+        "timestamp": 5883,
+        "endTimestamp": 6126
+      }
+    ]
+  }
+]
