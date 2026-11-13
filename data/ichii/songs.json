@@ -1,5 +1,37 @@
 [
   {
+    "id": "song-ae946237-2312-4594-8348-6d838df4af0e",
+    "workId": "work-song-33145ad2",
+    "title": "一起去跑步",
+    "originalArtist": "宇宙人",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-9ace39a6-2e53-4bcb-b7d7-9c0946994028",
+        "streamId": "stream-2026-11-10",
+        "videoId": "2McYAUOwFZI",
+        "timestamp": 8487,
+        "endTimestamp": 8798
+      }
+    ]
+  },
+  {
+    "id": "song-dea8cb43-f635-4260-84e6-708fcb73c3b7",
+    "workId": "work-song-50afc100",
+    "title": "五天幾年",
+    "originalArtist": "林凡",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-a0a5da67-5382-48be-8145-273abd9f1ced",
+        "streamId": "stream-2026-11-10",
+        "videoId": "2McYAUOwFZI",
+        "timestamp": 2627,
+        "endTimestamp": 2862
+      }
+    ]
+  },
+  {
     "id": "song-2ab91801-659e-475e-827c-50e6e77172c3",
     "workId": "work-ad8751bb-a159-4b68-a39b-24ba5b2f270a",
     "title": "太聰明",
@@ -16,6 +48,38 @@
     ]
   },
   {
+    "id": "song-8eccd5bb-e9da-4c46-a2da-21316ad19455",
+    "workId": "work-35fe1581-b6b6-4d8f-ad0d-f302433ccbf1",
+    "title": "心海",
+    "originalArtist": "eve",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-859ed1a8-c92f-4ec3-98e8-65de7324a1b6",
+        "streamId": "stream-2026-10-09",
+        "videoId": "NX4NSjtIFD4",
+        "timestamp": 9073,
+        "endTimestamp": 9336
+      }
+    ]
+  },
+  {
+    "id": "song-29dfd86f-5e3e-43b0-90ae-84efebeb440a",
+    "workId": "work-029f2009-fa1c-45af-a883-157acbba6ea2",
+    "title": "心願便利貼",
+    "originalArtist": "元若藍 吳忠明",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-705e2c22-5147-4a38-b592-c4be74ad107c",
+        "streamId": "stream-2026-11-10",
+        "videoId": "2McYAUOwFZI",
+        "timestamp": 2117,
+        "endTimestamp": 2288
+      }
+    ]
+  },
+  {
     "id": "song-fd29868a-bc78-40e9-91f0-83816f3b2854",
     "workId": "work-08201d87-a896-4367-96c6-0d881a361bb9",
     "title": "月の向こうの世界",
@@ -28,6 +92,74 @@
         "videoId": "VqAa6fUDZXI",
         "timestamp": 2714,
         "endTimestamp": 2933
+      }
+    ]
+  },
+  {
+    "id": "song-f5ee15e9-34b9-4c71-9674-ffb538867179",
+    "workId": "work-363c6354-0ced-4db7-99cc-57d05373e44d",
+    "title": "去剪海的日子(Sea-Saw Day)",
+    "originalArtist": "砂糖協會Sugar&Co.",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-e35cd794-b417-41ed-8da2-62b382dcf25c",
+        "streamId": "stream-2026-10-09",
+        "videoId": "NX4NSjtIFD4",
+        "timestamp": 8610,
+        "endTimestamp": 8796
+      }
+    ]
+  },
+  {
+    "id": "song-098ec3c5-afda-4188-95c8-99dd43fe376a",
+    "workId": "work-035f4afa-5347-4564-83ac-a0d56199dd37",
+    "title": "只對你有感覺",
+    "originalArtist": "飛輪海",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-8200f667-7d52-47ff-ac8b-2d2db92db098",
+        "streamId": "stream-2026-10-09",
+        "videoId": "NX4NSjtIFD4",
+        "timestamp": 7171,
+        "endTimestamp": 7420
+      }
+    ]
+  },
+  {
+    "id": "song-4817d597-2aa1-4892-8698-9c6a994ba3b1",
+    "workId": "work-song-743fe690",
+    "title": "好像掉進愛情海裡",
+    "originalArtist": "趙露思 谷嘉誠",
+    "tags": [
+      "language:zh"
+    ],
+    "performances": [
+      {
+        "id": "p-f71248a3-80ac-48ae-af3f-cfaa8340175e",
+        "streamId": "stream-2026-10-09",
+        "videoId": "NX4NSjtIFD4",
+        "timestamp": 8211,
+        "endTimestamp": 8390
+      }
+    ]
+  },
+  {
+    "id": "song-f3bdca4a-2324-4d6b-9c8f-5eef4c5b5049",
+    "workId": "work-song-1214f3f8",
+    "title": "你啊你啊",
+    "originalArtist": "魏如萱",
+    "tags": [
+      "language:zh"
+    ],
+    "performances": [
+      {
+        "id": "p-191e170b-b63a-4ea9-a828-a93837b6fe02",
+        "streamId": "stream-2026-11-10",
+        "videoId": "2McYAUOwFZI",
+        "timestamp": 7122,
+        "endTimestamp": 7447
       }
     ]
   },
@@ -64,6 +196,90 @@
     ]
   },
   {
+    "id": "song-7f72926d-1664-43e4-bd95-aecf856c8c1c",
+    "workId": "work-song-1322",
+    "title": "雨愛",
+    "originalArtist": "楊丞琳",
+    "tags": [
+      "language:zh"
+    ],
+    "performances": [
+      {
+        "id": "p-67750c10-5674-4df8-99be-c8219e39a07c",
+        "streamId": "stream-2026-11-10",
+        "videoId": "2McYAUOwFZI",
+        "timestamp": 6346,
+        "endTimestamp": 6627
+      }
+    ]
+  },
+  {
+    "id": "song-1dfa38ca-f117-4d7b-96da-2bd2c55512ba",
+    "workId": "work-c24d0bb4-e664-41eb-913c-79df0f3c113d",
+    "title": "美味的想念",
+    "originalArtist": "唐禹哲",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-9e0b0ddd-aa12-44a5-9299-52c733e52c54",
+        "streamId": "stream-2026-11-10",
+        "videoId": "2McYAUOwFZI",
+        "timestamp": 3316,
+        "endTimestamp": 3523
+      }
+    ]
+  },
+  {
+    "id": "song-a273df36-a372-446f-9f0d-77c99f9c0827",
+    "workId": "work-song-202",
+    "title": "海の幽霊",
+    "originalArtist": "米津玄師",
+    "tags": [
+      "language:ja"
+    ],
+    "performances": [
+      {
+        "id": "p-f21e567b-eb96-411a-a6a5-6ecd4fb886d3",
+        "streamId": "stream-2026-10-09",
+        "videoId": "NX4NSjtIFD4",
+        "timestamp": 1884,
+        "endTimestamp": 2122
+      }
+    ]
+  },
+  {
+    "id": "song-0f907a37-26d5-46b1-89b7-8c7546ec4310",
+    "workId": "work-e709f116-e084-4436-a26c-ea4032938b35",
+    "title": "深海のリトルクライ",
+    "originalArtist": "sasakure Uk feat.土岐麻子",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-bf1fd276-cbe4-40cb-a1cd-5a4e55ab0155",
+        "streamId": "stream-2026-10-09",
+        "videoId": "NX4NSjtIFD4",
+        "timestamp": 4812,
+        "endTimestamp": 5059
+      }
+    ]
+  },
+  {
+    "id": "song-a3d57107-e48a-46a1-8cce-0c25c0070993",
+    "workId": "work-song-2e43ea15",
+    "title": "惡作劇",
+    "originalArtist": "王藍茵",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-d9725ce9-fd42-493d-9337-e48d2af91be9",
+        "streamId": "stream-2026-11-10",
+        "videoId": "2McYAUOwFZI",
+        "timestamp": 5655,
+        "endTimestamp": 5888
+      }
+    ]
+  },
+  {
     "id": "song-6c9d28d6-ec7e-4b5e-9c2c-d0e3e51bb78e",
     "workId": "work-song-3b3c3b10",
     "title": "扉をあけて",
@@ -82,6 +298,40 @@
     ]
   },
   {
+    "id": "song-461133f5-b478-4d2d-ac3f-7f0d86a69c26",
+    "workId": "work-song-155c023b",
+    "title": "踮起腳尖愛",
+    "originalArtist": "洪佩瑜",
+    "tags": [
+      "language:zh"
+    ],
+    "performances": [
+      {
+        "id": "p-53451c52-f8b1-4d3e-8fae-fe31bb51856a",
+        "streamId": "stream-2026-11-10",
+        "videoId": "2McYAUOwFZI",
+        "timestamp": 9222,
+        "endTimestamp": 9503
+      }
+    ]
+  },
+  {
+    "id": "song-827d98dd-9edc-4137-b723-a4d39be8c8b0",
+    "workId": "work-156f57e9-8bc9-4604-9ef7-aa3e9cc63ae5",
+    "title": "黏黏黏黏",
+    "originalArtist": "王心凌",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-cc92f99c-4ff5-42b0-9c4f-2ba27ac863c5",
+        "streamId": "stream-2026-11-10",
+        "videoId": "2McYAUOwFZI",
+        "timestamp": 4290,
+        "endTimestamp": 4487
+      }
+    ]
+  },
+  {
     "id": "song-9ec9de8e-c2b7-466b-b0fb-9b5f28bc28b5",
     "workId": "work-a1b047fc-da60-49f1-b6b2-0ac45585f528",
     "title": "A Tender Moon Tempo",
@@ -94,6 +344,38 @@
         "videoId": "VqAa6fUDZXI",
         "timestamp": 1901,
         "endTimestamp": 2187
+      }
+    ]
+  },
+  {
+    "id": "song-277c1176-9fdb-4c8d-9090-fc0d4e7a96f3",
+    "workId": "work-d79d4b1c-601c-4ab1-949f-428e04162b13",
+    "title": "Cake By The Ocean",
+    "originalArtist": "DNCE",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-c33b006a-614e-468a-a38f-436ffeeed394",
+        "streamId": "stream-2026-10-09",
+        "videoId": "NX4NSjtIFD4",
+        "timestamp": 6095,
+        "endTimestamp": 6311
+      }
+    ]
+  },
+  {
+    "id": "song-1f2257c6-9524-43ce-91b2-2fb71ae039c2",
+    "workId": "work-song-1700",
+    "title": "ebb and flow",
+    "originalArtist": "Ray",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-d226fcd5-c1b7-40fc-8ac5-9350b476bb56",
+        "streamId": "stream-2026-10-09",
+        "videoId": "NX4NSjtIFD4",
+        "timestamp": 2519,
+        "endTimestamp": 2611
       }
     ]
   },
@@ -146,6 +428,22 @@
     ]
   },
   {
+    "id": "song-b53c3b71-c377-4b70-8dca-0d64e3f64604",
+    "workId": "work-e814f171-9602-4403-a3c2-a87cab4bdf7f",
+    "title": "lull~そして僕らは~",
+    "originalArtist": "Rav",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-95d62377-e78c-4133-9154-628c10806836",
+        "streamId": "stream-2026-10-09",
+        "videoId": "NX4NSjtIFD4",
+        "timestamp": 3333,
+        "endTimestamp": 3624
+      }
+    ]
+  },
+  {
     "id": "song-011332db-6945-4af1-aa5c-e898957dbcfc",
     "workId": "work-be65f59d-264f-4542-86fe-98f7a4ef668f",
     "title": "Moon Halo",
@@ -178,6 +476,22 @@
     ]
   },
   {
+    "id": "song-ce02780f-2835-4d38-9759-422a4ab7c14c",
+    "workId": "work-8cd77db2-022d-4480-b303-6dec53bccaf3",
+    "title": "ocean eves",
+    "originalArtist": "Billie Eilish",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-1874fef7-434e-4dd8-b439-a6c0440bd129",
+        "streamId": "stream-2026-10-09",
+        "videoId": "NX4NSjtIFD4",
+        "timestamp": 1187,
+        "endTimestamp": 1385
+      }
+    ]
+  },
+  {
     "id": "song-f3b60fce-32bf-4ac0-8944-071790399ff5",
     "workId": "work-song-42bf7137",
     "title": "OMG",
@@ -192,6 +506,22 @@
         "videoId": "MlzoZ6RHyqM",
         "timestamp": 1871,
         "endTimestamp": 2087
+      }
+    ]
+  },
+  {
+    "id": "song-d010ee92-ef92-4642-a98c-90f063d1f95f",
+    "workId": "work-b4262cf2-b904-472c-8520-c518eb36935f",
+    "title": "Someday or One Day",
+    "originalArtist": "孫盛希",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-5260782b-183a-4358-8758-2945e1049e36",
+        "streamId": "stream-2026-11-10",
+        "videoId": "2McYAUOwFZI",
+        "timestamp": 7792,
+        "endTimestamp": 8043
       }
     ]
   }
