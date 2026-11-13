@@ -2,13 +2,14 @@
   "version": 1,
   "streamers": {
     "abei": {
-      "lastSyncedAt": null,
-      "maxSongUpdatedAt": null,
-      "maxPerfUpdatedAt": null,
-      "maxStreamUpdatedAt": null,
-      "songsCount": 0,
-      "performancesCount": 0,
-      "streamsCount": 0
+      "exportRevision": 18,
+      "lastSyncedAt": "2026-11-13T04:00:33.773Z",
+      "maxSongUpdatedAt": "2026-11-12 14:21:59",
+      "maxPerfUpdatedAt": "2026-11-12 14:21:59",
+      "maxStreamUpdatedAt": "2026-11-12 14:21:58",
+      "songsCount": 8,
+      "performancesCount": 8,
+      "streamsCount": 2
     },
     "bluenight1022": {
       "lastSyncedAt": null,
@@ -20,14 +21,14 @@
       "streamsCount": 0
     },
     "cesium": {
-      "exportRevision": 654,
-      "lastSyncedAt": "2026-11-10T04:18:31.990Z",
-      "maxSongUpdatedAt": "2026-11-09 20:28:10",
-      "maxPerfUpdatedAt": "2026-11-09 20:28:10",
-      "maxStreamUpdatedAt": "2026-11-09 20:28:10",
-      "songsCount": 240,
-      "performancesCount": 357,
-      "streamsCount": 29
+      "exportRevision": 676,
+      "lastSyncedAt": "2026-11-13T04:00:35.069Z",
+      "maxSongUpdatedAt": "2026-11-12 14:21:26",
+      "maxPerfUpdatedAt": "2026-11-12 14:21:26",
+      "maxStreamUpdatedAt": "2026-11-12 14:21:25",
+      "songsCount": 250,
+      "performancesCount": 368,
+      "streamsCount": 30
     },
     "earendel": {
       "exportRevision": 208,
@@ -81,8 +82,8 @@
     },
     "hitomi": {
       "exportRevision": 51,
-      "lastSyncedAt": "2026-10-11T04:01:14.041Z",
-      "maxSongUpdatedAt": "2026-10-10 17:38:57.639",
+      "lastSyncedAt": "2026-11-13T04:00:36.439Z",
+      "maxSongUpdatedAt": "2026-11-12 14:22:53.550",
       "maxPerfUpdatedAt": "2026-08-04 13:42:27",
       "maxStreamUpdatedAt": "2026-08-04 13:42:26",
       "songsCount": 97,
@@ -100,14 +101,14 @@
       "streamsCount": 6
     },
     "ichii": {
-      "exportRevision": 26,
-      "lastSyncedAt": "2026-11-10T04:18:33.159Z",
-      "maxSongUpdatedAt": "2026-11-10 04:08:21",
-      "maxPerfUpdatedAt": "2026-11-10 04:08:21",
-      "maxStreamUpdatedAt": "2026-11-10 04:08:20",
-      "songsCount": 12,
-      "performancesCount": 12,
-      "streamsCount": 2
+      "exportRevision": 70,
+      "lastSyncedAt": "2026-11-13T04:00:37.638Z",
+      "maxSongUpdatedAt": "2026-11-12 14:22:53.550",
+      "maxPerfUpdatedAt": "2026-11-12 14:22:38",
+      "maxStreamUpdatedAt": "2026-11-12 14:22:38",
+      "songsCount": 32,
+      "performancesCount": 32,
+      "streamsCount": 4
     },
     "inori": {
       "exportRevision": 91,
@@ -387,8 +388,8 @@
     },
     "seki": {
       "exportRevision": 560,
-      "lastSyncedAt": "2026-10-11T04:01:11.809Z",
-      "maxSongUpdatedAt": "2026-10-10 17:42:49.846",
+      "lastSyncedAt": "2026-11-13T04:00:32.513Z",
+      "maxSongUpdatedAt": "2026-11-12 14:22:48.584",
       "maxPerfUpdatedAt": "2026-09-14 11:15:42",
       "maxStreamUpdatedAt": "2026-03-10 13:11:16",
       "songsCount": 1193,
