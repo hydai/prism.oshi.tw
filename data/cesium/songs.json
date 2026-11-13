@@ -7,6 +7,13 @@
     "tags": [],
     "performances": [
       {
+        "id": "p-c717464d-37bf-4a84-8092-342bcf49cd61",
+        "streamId": "stream-2026-11-11",
+        "videoId": "iF0BZHHw3eE",
+        "timestamp": 6729,
+        "endTimestamp": 6782
+      },
+      {
         "id": "p-81e2cef5-c2c8-40e3-b7ed-9bd2038cd0de",
         "streamId": "stream-2026-08-05",
         "videoId": "VCrVYOabRXQ",
@@ -618,6 +625,22 @@
     ]
   },
   {
+    "id": "song-5fa33ea4-1e58-4036-a5ec-8801807cb6e9",
+    "workId": "work-4faa48d3-bb17-4d66-979a-6add3d37e9b2",
+    "title": "不是因為天氣晴朗才愛你（清唱）",
+    "originalArtist": "理想混蛋",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-9ce37102-6066-4ab0-bfe3-cb2610ccaf05",
+        "streamId": "stream-2026-11-11",
+        "videoId": "iF0BZHHw3eE",
+        "timestamp": 718,
+        "endTimestamp": 908
+      }
+    ]
+  },
+  {
     "id": "song-f81526b9-34dc-4b43-ab81-7c24dfdcb82b",
     "workId": "work-fe00b9b6-420f-4766-a1f7-4eac3a75f058",
     "title": "不染",
@@ -653,6 +676,22 @@
         "videoId": "n7o5ukvaAiY",
         "timestamp": 4866,
         "endTimestamp": 5139
+      }
+    ]
+  },
+  {
+    "id": "song-2639bd50-aaa4-42c9-a0d8-1ad3fc4c66ba",
+    "workId": "work-a0f39011-914f-4c09-9a43-ca1dda49b1b2",
+    "title": "不羨明月知（清唱）",
+    "originalArtist": "樂正龍牙&言和",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-58fff3a7-f0c5-466e-b89e-2d613d9f9497",
+        "streamId": "stream-2026-11-11",
+        "videoId": "iF0BZHHw3eE",
+        "timestamp": 3134,
+        "endTimestamp": 3373
       }
     ]
   },
@@ -696,6 +735,22 @@
     ]
   },
   {
+    "id": "song-7c656229-9782-4145-b411-60a85097da6f",
+    "workId": "work-e350e3c3-bd29-430e-9a44-9a6e1fb43eeb",
+    "title": "予你成歌（清唱）",
+    "originalArtist": "葉洛洛",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-c9aa6c75-834d-4c03-837b-563c647fd780",
+        "streamId": "stream-2026-11-11",
+        "videoId": "iF0BZHHw3eE",
+        "timestamp": 5638,
+        "endTimestamp": 5921
+      }
+    ]
+  },
+  {
     "id": "song-9c7436c4-7126-4682-ba26-9c145ec768ee",
     "workId": "work-2613fe2e-e15a-41ee-9a04-569ec0fd696a",
     "title": "予君書",
@@ -708,6 +763,22 @@
         "videoId": "WKEO0RdBBig",
         "timestamp": 1615,
         "endTimestamp": 1816
+      }
+    ]
+  },
+  {
+    "id": "song-c06438a5-6dd7-4f3f-b1b8-56fda09eece2",
+    "workId": "work-5da889d6-bcd1-457f-885a-d80cee285770",
+    "title": "今天你要嫁給我",
+    "originalArtist": "陶喆＆蔡依林",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-c56c7851-f5dc-443d-a99a-9cb0da3f57db",
+        "streamId": "stream-2026-11-11",
+        "videoId": "iF0BZHHw3eE",
+        "timestamp": 6267,
+        "endTimestamp": 6519
       }
     ]
   },
@@ -849,6 +920,24 @@
         "videoId": "VCrVYOabRXQ",
         "timestamp": 6203,
         "endTimestamp": 6457
+      }
+    ]
+  },
+  {
+    "id": "song-28a36cb3-a2c4-4204-bcdb-8009c0664dd8",
+    "workId": "work-song-15",
+    "title": "日不落",
+    "originalArtist": "蔡依林",
+    "tags": [
+      "language:zh"
+    ],
+    "performances": [
+      {
+        "id": "p-62fe72c7-ac68-4d3f-b6ad-4ed89d77cd6d",
+        "streamId": "stream-2026-11-11",
+        "videoId": "iF0BZHHw3eE",
+        "timestamp": 6972,
+        "endTimestamp": 7180
       }
     ]
   },
@@ -1053,6 +1142,22 @@
         "videoId": "P0O4oAf4jso",
         "timestamp": 3659,
         "endTimestamp": 3919
+      }
+    ]
+  },
+  {
+    "id": "song-e1f24c6e-bdf1-43fb-a3fa-d7d469a10e41",
+    "workId": "work-40ab3b2a-883a-462c-a9b0-df482b8c1dcc",
+    "title": "必巡（清唱）",
+    "originalArtist": "曾瑋中",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-3ce4dfce-4ca4-4692-8f83-e80473e5020b",
+        "streamId": "stream-2026-11-11",
+        "videoId": "iF0BZHHw3eE",
+        "timestamp": 1742,
+        "endTimestamp": 1980
       }
     ]
   },
@@ -2479,6 +2584,22 @@
         "videoId": "Xwupr-SRT38",
         "timestamp": 2084,
         "endTimestamp": 2257
+      }
+    ]
+  },
+  {
+    "id": "song-60866b1e-40c9-4986-a735-4365d02ae920",
+    "workId": "work-f8662e4d-3721-4e5f-8129-22a268e6544f",
+    "title": "風催雨（清唱）",
+    "originalArtist": "灼夭",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-5f76c7e7-2f76-4e2b-9afe-3065b84fdd15",
+        "streamId": "stream-2026-11-11",
+        "videoId": "iF0BZHHw3eE",
+        "timestamp": 2229,
+        "endTimestamp": 2393
       }
     ]
   },
@@ -3967,6 +4088,22 @@
     ]
   },
   {
+    "id": "song-ebd8ebaf-2192-4f30-be62-108fd01670e2",
+    "workId": "work-c61a01ac-1b4f-4ead-bb5b-a53d9208219b",
+    "title": "蜜月アン・ドゥ・トロワ（清唱）",
+    "originalArtist": "DATEKEN",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-a1886f3b-30cf-4946-92bf-502887741958",
+        "streamId": "stream-2026-11-11",
+        "videoId": "iF0BZHHw3eE",
+        "timestamp": 1275,
+        "endTimestamp": 1450
+      }
+    ]
+  },
+  {
     "id": "song-f069c88e-85e6-488d-b252-b8792a81332f",
     "workId": "work-2d6b89ed-1075-4e04-ba0a-f8bee962f86a",
     "title": "遠方",
@@ -4286,6 +4423,22 @@
     ]
   },
   {
+    "id": "song-2b1f935d-61a6-459d-9f01-1da913af7662",
+    "workId": "work-6e716134-2eea-4d35-8ef5-f2508aef4d8e",
+    "title": "霜雪千年（清唱）",
+    "originalArtist": "洛天依&樂正綾",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-6e9b025f-7450-49c1-a7d5-43bd023ecbeb",
+        "streamId": "stream-2026-11-11",
+        "videoId": "iF0BZHHw3eE",
+        "timestamp": 2513,
+        "endTimestamp": 2790
+      }
+    ]
+  },
+  {
     "id": "song-5bc75602-7b98-417f-b346-6b81824d5d07",
     "workId": "work-53192736-33b0-48bc-aca9-809f7aff8bec",
     "title": "斷弦歌",
@@ -4568,6 +4721,22 @@
         "videoId": "aaM-FVAB4uk",
         "timestamp": 3165,
         "endTimestamp": 3374
+      }
+    ]
+  },
+  {
+    "id": "song-6226763c-f665-4bd3-9c94-e579e4df758d",
+    "workId": "work-0f201cf2-d792-473e-b485-cd15ceb43b87",
+    "title": "NIGHT DANCER（清唱）",
+    "originalArtist": "imase",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-44be8c1e-ea6a-455c-a345-7f71be8d84c5",
+        "streamId": "stream-2026-11-11",
+        "videoId": "iF0BZHHw3eE",
+        "timestamp": 4094,
+        "endTimestamp": 4283
       }
     ]
   },
