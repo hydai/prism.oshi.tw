@@ -48,8 +48,7 @@ CREATE TABLE IF NOT EXISTS vod_submissions (
   reviewer_note TEXT DEFAULT ''
 );
 
-CREATE UNIQUE INDEX IF NOT EXISTS idx_vod_streamer_video
-  ON vod_submissions(streamer_slug, video_id);
+CREATE INDEX IF NOT EXISTS idx_vod_streamer_video ON vod_submissions(streamer_slug, video_id);
 CREATE INDEX IF NOT EXISTS idx_vod_status ON vod_submissions(status);
 
 CREATE TABLE IF NOT EXISTS vod_songs (
