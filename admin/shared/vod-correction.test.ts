@@ -1,10 +1,12 @@
-import { matchCorrection, summarizeCorrection } from './vod-correction';
-import type { CorrectionMatch, CorrectionPair } from './vod-correction';
-import { matchCorrectionWithBase, untouchedBaseRows } from './vod-correction';
-import type { CorrectionBaseRow, CorrectionCurrentRow, CorrectionProposedRow, MatchableRow } from './vod-correction';
+import {
+  baseCounterparts, correctionChanges, matchCorrection, matchCorrectionWithBase, referenceStarts, repeatedRows,
+  summarizeCorrection, untouchedBaseRows, yieldedEnd,
+} from './vod-correction';
+import type {
+  CorrectionBaseRow, CorrectionCurrentRow, CorrectionMatch, CorrectionPair, CorrectionProposedRow, MatchableRow,
+} from './vod-correction';
 
 declare const process: { exitCode?: number };
-import { baseCounterparts } from './vod-correction';
 
 /** Key-sorted JSON, so two objects compare equal whatever order their keys were built in. */
 function canonicalJson(value: unknown): string {
@@ -192,8 +194,6 @@ function testAnOverlapTieGoesToTheRowOnTheSite(): void {
 
 // --- A repeat: an add that duplicates a row the stream keeps, or an earlier add ---
 
-import { repeatedRows } from './vod-correction';
-
 /** `repeatedRows` over the pairs `matchCorrection` makes. */
 const repeatsOf = (current: MatchableRow[], proposed: MatchableRow[]) =>
   repeatedRows(current, proposed, matchCorrection(current, proposed).pairs);
@@ -372,20 +372,19 @@ function testAChangedRowWhoseBaseRowIsGoneStaysAnAdd(): void {
   assert.deepEqual(pairIds(matchCorrectionWithBase(current, proposed, null), current, proposed), [['p9', 'v1']], 'with no base, by its title');
 }
 
-import { matchKeys, yieldedEnd } from './vod-correction';
-
 function testTheMovedPastItsEndTable(): void {
   // The Shared definitions' table: the end each submitted row keeps against the live row of its title, read with the
-  // live rows' keys. Rows are given in the order submitted (`submitted` fills endFilled and the next row from it).
+  // live rows' starts. Rows are given in the order submitted (`submitted` fills endFilled and the next row from it).
   const endOf = (liveRows: MatchableRow[], submittedRows: MatchableRow[], title: string): number | null => {
     const proposed = submitted(...submittedRows);
     const reference = liveRows.find((candidate) => candidate.title === title);
     if (!reference) throw new Error(`no live ${title}`);
-    return yieldedEnd(proposed, proposed.findIndex((candidate) => candidate.title === title), reference, matchKeys(liveRows));
+    return yieldedEnd(proposed, proposed.findIndex((candidate) => candidate.title === title), reference, referenceStarts(liveRows));
   };
   const ab = [row('A', 'X', 100, 200), row('B', 'X', 300, 400)];
   assert.equal(endOf(ab, [row('A', 'X', 105, 300), row('B', 'X', 300, null)], 'A'), 200, 'a start-only nudge: the live end');
-  assert.equal(endOf(ab, [row('A', 'X', 160, 360), row('B', 'X', 360, null)], 'A'), 200, 'a start-only shift of 60 s: the live end');
+  assert.equal(endOf(ab, [row('A', 'X', 160, 360), row('B', 'X', 360, null)], 'A'), 260,
+    'a start-only shift of 60 s leaves 40 s of its 100, under half: its 100 s from the new start');
   assert.equal(endOf(ab, [row('A', 'X', 250, 300), row('B', 'X', 300, null)], 'A'), 300,
     'moved past its end: its 100 s, capped at the next start');
   assert.equal(endOf(ab, [row('A', 'X', 250, 280), row('B', 'X', 300, null)], 'A'), 280, 'a typed end stays');
@@ -418,6 +417,31 @@ function testTheMovedPastItsEndTable(): void {
     'two rows swapped, the next one off any reference start: it moved too, so the end the parsers filled stands');
 }
 
+function testAStartOnlyMoveUnderHalfKeepsTheLength(): void {
+  // D2 a: a start-only move whose live end would leave the row under half its live length keeps that length from the
+  // new start instead, cut at the next submitted row's start. Live A is 100–340 (240 s), so under 120 s left is under
+  // half. The submitted ends are the parsers' fill: the next row's start, or none for the last row.
+  const live = row('A', 'X', 100, 340);
+  const endOf = (...submittedRows: MatchableRow[]): number | null => {
+    const proposed = submitted(...submittedRows);
+    return yieldedEnd(proposed, proposed.findIndex((candidate) => candidate.title === 'A'), live, referenceStarts([live]));
+  };
+  assert.equal(endOf(row('A', 'X', 250, 600), row('B', 'X', 600, null)), 490, 'moved to 250, 90 s of 240 left: its 240 s, short of the next start');
+  assert.equal(endOf(row('A', 'X', 250, 400), row('B', 'X', 400, null)), 400, 'its 240 s would pass the next start: cut there');
+  assert.equal(endOf(row('A', 'X', 250, null)), 490, 'the last row has no next start to cut at');
+  assert.equal(endOf(row('A', 'X', 180, 600), row('B', 'X', 600, null)), 340, 'moved to 180, 160 s left is not under 120: the live end');
+  assert.equal(endOf(row('A', 'X', 220, 600), row('B', 'X', 600, null)), 340, 'exactly half left (120 s) is not under half: the live end');
+  assert.equal(endOf(row('A', 'X', 221, 600), row('B', 'X', 600, null)), 461, 'one second less is under half: its 240 s');
+  assert.equal(endOf(row('A', 'X', 100, 600), row('B', 'X', 600, null)), 340, 'not moved: the live end');
+}
+
+function testANudgedStartKeepsItsEnd(): void {
+  // Live A is 100–340. A few seconds of nudge leaves nearly all of its length, so the live end stays.
+  const live = row('A', 'X', 100, 340);
+  const nudged = submitted(row('A', 'X', 105, 600), row('B', 'X', 600, null));
+  assert.equal(yieldedEnd(nudged, 0, live, referenceStarts([live])), 340, 'a start nudged by 5 s: 235 s of 240 left, the live end');
+}
+
 function testARenamedNextRowIsNoMove(): void {
   // Copilot r16: First 100–300 overlaps Snog B 200–400, and a start-only paste fixes only Snog B's title, so the
   // parsers end First at Song B's start. Song B starts where a reference row starts: a title or artist edit is no
@@ -426,10 +450,10 @@ function testARenamedNextRowIsNoMove(): void {
   const [first] = archived;
   if (!first) throw new Error('no First');
   const renamed = submitted(row('First', 'A', 100, 200), row('Song B', 'B', 200, null));
-  assert.equal(yieldedEnd(renamed, 0, first, matchKeys(archived)), 300, 'a next row renamed at its start: the reference end comes back');
+  assert.equal(yieldedEnd(renamed, 0, first, referenceStarts(archived)), 300, 'a next row renamed at its start: the reference end comes back');
   const reartisted = submitted(row('First', 'A', 100, 200), row('Snog B', 'B2', 200, null));
-  assert.equal(yieldedEnd(reartisted, 0, first, matchKeys(archived)), 300, 'so does one with another artist');
-  assert.equal(yieldedEnd(renamed, 0, first, matchKeys([first])), 200, 'the control: no reference row starts at 200, so Song B moved there');
+  assert.equal(yieldedEnd(reartisted, 0, first, referenceStarts(archived)), 300, 'so does one with another artist');
+  assert.equal(yieldedEnd(renamed, 0, first, referenceStarts([first])), 200, 'the control: no reference row starts at 200, so Song B moved there');
   const base = archived.map((fields, index) => baseRow(`p${index + 1}`, fields));
   assert.deepEqual(untouchedIds(renamed, base), ['p1', null], 'First repeats its base row; Song B changed its title');
 }
@@ -441,7 +465,7 @@ function testAMovedBackRowReadsARenamedNextRowAsUnmoved(): void {
   const c = typo[4];
   if (!c) throw new Error('no C');
   const fixed = submitted(row('A', 'X', 60, 280), row('C', 'X', 300, 560), row('B (Live)', 'X', 560, 800), row('E', 'X', 820, 1050), row('F', 'X', 1100, 1300));
-  assert.equal(yieldedEnd(fixed, fixed.findIndex((candidate) => candidate.title === 'C'), c, matchKeys(typo)), 540,
+  assert.equal(yieldedEnd(fixed, fixed.findIndex((candidate) => candidate.title === 'C'), c, referenceStarts(typo)), 540,
     'moved back before a row renamed at its start: its 240 s, short of that start');
 }
 
@@ -612,12 +636,49 @@ function testArtistFlagUsesUnknownOnBothSides(): void {
   assert.equal(artistChanged('', ''), false);
   assert.equal(artistChanged('X', 'Y'), true);
   assert.equal(artistChanged('Unknown', 'X'), true);
+  // A blank proposed artist names none, so the row keeps the one it has: never a change.
+  assert.equal(artistChanged('X', ''), false);
+  assert.equal(artistChanged('X', '   '), false);
+  assert.equal(artistChanged('', 'X'), true, 'a current artist of "" still differs from a named one');
 }
 
 function testSummarizeSkippedPartsInOrder(): void {
   assert.equal(
     summarizeCorrection([setTimes('a')], { time: 1, title: 1, add: 1, delete: 1 }),
     '套用 1 項（時間 1）；略過 4 項（時間 1、歌名 1、新增 1、刪除 1）',
+  );
+}
+
+function testCorrectionChangesAgreesWithTheMatcher(): void {
+  // The review page asks `correctionChanges` again for the pairs a curator makes by hand, so it
+  // must give every pair the matcher found exactly the flags the matcher put on it.
+  const m = matchCorrection(ICHII_CURRENT, ICHII_PROPOSED);
+  assert.equal(m.pairs.length, 6);
+  for (const pair of m.pairs) {
+    const current = ICHII_CURRENT[pair.currentIndex];
+    const proposed = ICHII_PROPOSED[pair.proposedIndex];
+    if (!current || !proposed) throw new Error(`pair ${pair.currentIndex}/${pair.proposedIndex} points at no row`);
+    assert.deepEqual(correctionChanges(current, proposed), pair.changes, `pair ${pair.currentIndex}/${pair.proposedIndex}`);
+  }
+}
+
+function testCorrectionChangesOnAnyTwoRows(): void {
+  const none = { start: false, end: false, title: false, artist: false };
+  assert.deepEqual(correctionChanges(row('A', 'X', 100, null), row('A', 'X', 100, null)), none, 'null against null is no change');
+  assert.deepEqual(
+    correctionChanges(row('A', 'X', 100, null), row('A', 'X', 90, 390)),
+    { start: true, end: true, title: false, artist: false },
+    'the times are compared as stored, null being a value',
+  );
+  assert.deepEqual(
+    correctionChanges(row('Moon River', '', 0, 100), row('moon  river', 'Unknown', 0, 100)),
+    none,
+    'the text is compared normalized, an empty artist reading as Unknown',
+  );
+  assert.deepEqual(
+    correctionChanges(row('Late Night Drive', 'X', 0, 100), row('Late Niqht Drive', 'Y', 0, 100)),
+    { start: false, end: false, title: true, artist: true },
+    'a real difference in the title or the artist is flagged',
   );
 }
 
@@ -641,6 +702,8 @@ function main(): void {
   testAChangedRowPairsWithThePerformanceItsBaseNames();
   testAChangedRowWhoseBaseRowIsGoneStaysAnAdd();
   testTheMovedPastItsEndTable();
+  testAStartOnlyMoveUnderHalfKeepsTheLength();
+  testANudgedStartKeepsItsEnd();
   testARenamedNextRowIsNoMove();
   testAMovedBackRowReadsARenamedNextRowAsUnmoved();
   testAnUntouchedRowPairsByIdFirst();
@@ -670,7 +733,9 @@ function main(): void {
   testNullEndsAreNotAChange();
   testArtistFlagUsesUnknownOnBothSides();
   testSummarizeSkippedPartsInOrder();
-  console.log('✓ the correction matcher pairs by time overlap, flags only real changes, and summarizes what was applied');
+  testCorrectionChangesAgreesWithTheMatcher();
+  testCorrectionChangesOnAnyTwoRows();
+  console.log('✓ the correction matcher pairs the rows the base names by id and the rest by title, then time overlap, keeps a moved row\'s length, flags only real changes, and summarizes what was applied');
 }
 
 try {
