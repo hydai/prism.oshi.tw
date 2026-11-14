@@ -1,9 +1,18 @@
 /**
  * The VOD correction contract: the wire shapes the admin worker and the review
- * page share, plus the two pure helpers both of them need. `matchCorrection`
- * suggests which proposed row corrects which current row, and
- * `summarizeCorrection` writes the one-line account of an apply that goes into
- * the reviewer note and the Discord embed. Nothing here touches D1 or the DOM.
+ * page share, plus the pure helpers both of them need. `matchCorrection`
+ * suggests which proposed row corrects which current row, by title first and
+ * then by time overlap, and `matchCorrectionWithBase` does so for a review that
+ * knows its base, the list the contributor compared against: `untouchedBaseRows`
+ * says which proposed rows repeat it, and `baseCounterparts` which base row each
+ * one stands for. `repeatedRows` says which add lists a song a second time: a
+ * row the stream keeps, or an earlier add. `yieldedEnd` reads an end the parsers
+ * filled in as the Shared definitions do, against the starts `referenceStarts`
+ * works out once for a list (for a row at its archived start, Nova's
+ * restoreArchivedEnds applies the same rule), `correctionChanges` says which
+ * fields of one pair differ, and `summarizeCorrection` writes the one-line
+ * account of an apply that goes into the reviewer note and the Discord embed.
+ * Nothing here touches D1 or the DOM.
  */
 import { normalizeForMatching, similarityScore } from './normalize';
 import type { NovaVodSubmission, Status } from './types';
@@ -174,12 +183,19 @@ function artistKey(originalArtist: string): string {
   return normalizeForMatching(originalArtist === '' ? UNKNOWN_ARTIST : originalArtist);
 }
 
-function changesBetween(current: PreparedRow, proposed: PreparedRow): CorrectionPair['changes'] {
+/**
+ * Which fields of a current row and a proposed row differ: the raw start and end (null is a value),
+ * and the `normalizeForMatching` forms of the title and the artist, an empty current artist reading
+ * as 'Unknown'. A blank proposed artist is the contributor not naming one, so it never differs: the
+ * row keeps the artist it has. `matchCorrection` flags every pair it finds with it, and the review
+ * page asks again for the pairs a curator makes by hand, so both read one rule.
+ */
+export function correctionChanges(current: MatchableRow, proposed: MatchableRow): CorrectionPair['changes'] {
   return {
     start: current.timestamp !== proposed.timestamp,
     end: current.endTimestamp !== proposed.endTimestamp,
-    title: current.titleKey !== proposed.titleKey,
-    artist: artistKey(current.originalArtist) !== artistKey(proposed.originalArtist),
+    title: normalizeForMatching(current.title) !== normalizeForMatching(proposed.title),
+    artist: proposed.originalArtist.trim() !== '' && artistKey(current.originalArtist) !== artistKey(proposed.originalArtist),
   };
 }
 
@@ -226,9 +242,7 @@ function indicesNotIn(count: number, taken: ReadonlySet<number>): number[] {
  * index, then the lower proposed index. A row whose interval is empty or
  * inverted pairs in neither pass.
  *
- * `changes` compares what is stored: the raw start and end (null is a value),
- * and the `normalizeForMatching` forms of the title and the artist, an empty
- * artist reading as 'Unknown'.
+ * Each pair's `changes` is `correctionChanges` of its two rows.
  */
 export function matchCorrection(
   current: readonly MatchableRow[],
@@ -326,7 +340,7 @@ function matchPrepared(
       currentIndex: candidate.currentIndex,
       proposedIndex: candidate.proposedIndex,
       score: candidate.score,
-      changes: changesBetween(candidate.current, candidate.proposed),
+      changes: correctionChanges(candidate.current, candidate.proposed),
     });
   }
   pairs.sort((left, right) => left.currentIndex - right.currentIndex);
@@ -413,12 +427,12 @@ function matchKey(row: MatchableRow): string {
 }
 
 /**
- * The keys of `rows` that `yieldedEnd` looks a submitted row's next row up in: their starts (rows that start together
- * share one). Unlike `matchKey`, which a row's own match reads, a key here is a start alone, since a next row that
- * starts where one of `rows` starts was not moved, whatever its title and artist: a title or artist edit is no move.
- * Work them out once for a list, whatever the number of submitted rows that are asked about it.
+ * The starts of `rows`, which `yieldedEnd` looks a submitted row's next row up in (rows that start together share
+ * one): a next row that starts where one of `rows` starts was not moved, whatever its title and artist, since a title
+ * or artist edit is no move. Work them out once for a list, whatever the number of submitted rows that are asked
+ * about it.
  */
-export function matchKeys(rows: readonly MatchableRow[]): ReadonlySet<number> {
+export function referenceStarts(rows: readonly MatchableRow[]): ReadonlySet<number> {
   return new Set(rows.map((row) => row.timestamp));
 }
 
@@ -432,7 +446,7 @@ function endAfterYield(
   row: CorrectionProposedRow,
   reference: { timestamp: number; endTimestamp: number | null },
   next: CorrectionProposedRow | undefined,
-  keys: ReadonlySet<number>,
+  starts: ReadonlySet<number>,
 ): number | null {
   if (row.endTimestamp !== null && !row.endFilled) return row.endTimestamp;
   const referenceEnd = reference.endTimestamp;
@@ -442,12 +456,21 @@ function endAfterYield(
     return next !== undefined && next.timestamp > row.timestamp ? Math.min(keptLength, next.timestamp) : keptLength;
   }
   // Moved back to before an unmoved row it used to follow: given back, the reference end would run across that row.
-  if (referenceEnd !== null && next !== undefined && keys.has(next.timestamp)
+  if (referenceEnd !== null && next !== undefined && starts.has(next.timestamp)
     && next.timestamp > row.timestamp && reference.timestamp >= next.timestamp && referenceEnd > reference.timestamp) {
     return Math.min(row.timestamp + (referenceEnd - reference.timestamp), next.timestamp);
   }
-  const overlapsAMovedRow = referenceEnd !== null && next !== undefined && !keys.has(next.timestamp) && referenceEnd > next.timestamp;
-  return overlapsAMovedRow ? row.endTimestamp : referenceEnd;
+  const overlapsAMovedRow = referenceEnd !== null && next !== undefined && !starts.has(next.timestamp) && referenceEnd > next.timestamp;
+  if (overlapsAMovedRow) return row.endTimestamp;
+  // Moved later by more than half the reference's length: given back, the reference end would leave the row under half
+  // that length. It keeps the length from its new start instead, cut at the start of the next submitted row when that
+  // row starts after it. A nudge of a few seconds leaves most of the length, so the reference end stays.
+  if (referenceEnd !== null && row.timestamp > reference.timestamp
+    && referenceEnd - row.timestamp < (referenceEnd - reference.timestamp) / 2) {
+    const keptLength = row.timestamp + (referenceEnd - reference.timestamp);
+    return next !== undefined && next.timestamp > row.timestamp ? Math.min(keptLength, next.timestamp) : keptLength;
+  }
+  return referenceEnd;
 }
 
 /**
@@ -456,22 +479,28 @@ function endAfterYield(
  * contributor gave stays. A derived one (none, or `endFilled`) reads as follows.
  *
  * While the reference end comes after the row's start, or the reference has none, the yield rule decides (save for a
- * row moved back, below), which Nova's restoreArchivedEnds applies against the archive to a row at its archived start.
- * The derived end gives way to the reference end, unless the next submitted row starts where none of the rows whose
- * keys are `referenceKeys` starts (it moved, or is new) and the reference end passes that row's start: put back, it
- * would overlap a row the contributor moved there, so the submitted end stands. A title or artist edit is no move, so
- * before a next row that starts where one of those rows does, the reference end comes back even where it overlaps,
- * since that overlap was there already, and a reference with no end always does.
+ * row moved back and a row moved far later, below), which Nova's restoreArchivedEnds applies against the archive to a
+ * row at its archived start. The derived end gives way to the reference end, unless the next submitted row starts at
+ * none of `starts` (it moved, or is new) and the reference end passes that row's start: put back, it would overlap a
+ * row the contributor moved there, so the submitted end stands. A title or artist edit is no move, so before a next
+ * row that starts at one of `starts`, the reference end comes back even where it overlaps, since that overlap was
+ * there already, and a reference with no end always does.
  *
  * A row moved past its own end, the reference end at or before its start, keeps the reference's length from its new
  * start instead, cut at the start of the next submitted row when that row starts after it: given back, the reference
  * end would leave the row ending before it starts. So does a row moved back to before a row it used to follow, the
- * next submitted row, when that row did not move (its start is in `referenceKeys`) and starts after it: given back,
- * the reference end would run across that row, which the reference did not. Its length is kept, cut at that row's
- * start. A next row that moved too, to where no reference row starts (two rows swapped off each other's starts, say),
- * leaves the yield rule to decide.
+ * next submitted row, when that row did not move (its start is in `starts`) and starts after it: given back, the
+ * reference end would run across that row, which the reference did not. Its length is kept, cut at that row's start.
+ * A next row that moved too, to where no reference row starts (two rows swapped off each other's starts, say), leaves
+ * the yield rule to decide.
  *
- * The keys (`matchKeys`: starts) serve the next row's match alone: those of the base, or of the live rows, with the
+ * Where the yield rule would give the reference end back, a row moved later by more than half the reference's length,
+ * short of its end, keeps that length from its new start instead, cut at the start of the next submitted row when that
+ * row starts after it: given back, the reference end would leave the row under half its length. A start nudged by a few
+ * seconds leaves most of the length, and the reference end stays. Nova's restoreArchivedEnds reaches only rows at their
+ * archived start, which are not moved later, so it needs no such rule.
+ *
+ * The starts (`referenceStarts`) serve the next row's match alone: those of the base, or of the live rows, with the
  * base rows' too when a review against the stream has a base, since a row at a base position was not moved by the
  * contributor, whatever changed since. The caller works them out once, not once for each row it asks about. A row the
  * list lacks keeps the reference end.
@@ -480,11 +509,11 @@ export function yieldedEnd(
   proposed: readonly CorrectionProposedRow[],
   proposedIndex: number,
   reference: { timestamp: number; endTimestamp: number | null },
-  referenceKeys: ReadonlySet<number>,
+  starts: ReadonlySet<number>,
 ): number | null {
   const row = proposed[proposedIndex];
   if (!row) return reference.endTimestamp;
-  return endAfterYield(row, reference, nextSubmitted(proposed, row), referenceKeys);
+  return endAfterYield(row, reference, nextSubmitted(proposed, row), starts);
 }
 
 /**
@@ -500,7 +529,7 @@ export function untouchedBaseRows(
   const found: Array<CorrectionBaseRow | null> = proposed.map(() => null);
   if (base === null) return found;
   const baseKeys = base.map(matchKey);
-  const keys = matchKeys(base);
+  const starts = referenceStarts(base);
   const claimed = new Set<number>();
   const claim = (endsAlike: (row: CorrectionProposedRow, baseRow: CorrectionBaseRow) => boolean) => {
     proposed.forEach((row, index) => {
@@ -515,7 +544,7 @@ export function untouchedBaseRows(
     });
   };
   claim((row, baseRow) => row.endTimestamp === baseRow.endTimestamp);
-  claim((row, baseRow) => endAfterYield(row, baseRow, nextSubmitted(proposed, row), keys) === baseRow.endTimestamp);
+  claim((row, baseRow) => endAfterYield(row, baseRow, nextSubmitted(proposed, row), starts) === baseRow.endTimestamp);
   return found;
 }
 
