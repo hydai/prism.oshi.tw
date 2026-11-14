@@ -256,13 +256,21 @@ export async function getVodById(db: D1Database, id: string): Promise<NovaVodSub
   return db.prepare('SELECT * FROM vod_submissions WHERE id = ?').bind(id).first<NovaVodSubmission>();
 }
 
-export interface NovaVodStatusRow {
-  id: string;
-  status: string;
-}
-
-export async function getVodStatus(db: D1Database, id: string): Promise<NovaVodStatusRow | null> {
-  return db.prepare('SELECT id, status FROM vod_submissions WHERE id = ?').bind(id).first<NovaVodStatusRow>();
+/** How many other submissions for this (streamer, video) still wait for review: the correction review's 「這場還有 N 份待審修正」. */
+export async function countOtherPendingVods(
+  db: D1Database,
+  streamerSlug: string,
+  videoId: string,
+  excludeId: string,
+): Promise<number> {
+  const row = await db
+    .prepare(`
+      SELECT COUNT(*) AS n FROM vod_submissions
+      WHERE streamer_slug = ? AND video_id = ? AND status = 'pending' AND id != ?
+    `)
+    .bind(streamerSlug, videoId, excludeId)
+    .first<{ n: number }>();
+  return row?.n ?? 0;
 }
 
 export async function vodExists(db: D1Database, id: string): Promise<boolean> {

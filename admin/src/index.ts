@@ -87,13 +87,23 @@ import {
   listApprovedSubmissionsWithChannel,
   listVods,
   getVodById,
-  getVodStatus,
+  countOtherPendingVods,
   vodExists,
   deleteVod,
   listVodSongs,
   updateVodStatus,
   updateVodFields,
 } from './nova-db';
+import {
+  applyCorrection,
+  correctionFingerprint,
+  findTargetStreams,
+  loadCorrectionTarget,
+  resolveExistingSongs,
+  streamKey,
+} from './vod-correction-db';
+import { matchCorrection, summarizeCorrection } from '../shared/vod-correction';
+import type { CorrectionApplyResult, CorrectionProposedRow, NovaVodCorrectionView } from '../shared/vod-correction';
 import {
   listTickets,
   getTicketById,
@@ -121,6 +131,7 @@ import {
   parseNovaSubmissionUpdateBody,
   type NovaSubmissionUpdateFields,
   parseNovaVodUpdateBody,
+  parseCorrectionApplyBody,
   parseCrystalReplyBody,
 } from './parse';
 import { isCanonicalTimestamp } from './vod-export/guards';
@@ -153,6 +164,8 @@ import type {
   HarmonizeMatchType,
   NovaSubmission,
   NovaStatus,
+  NovaVodListItem,
+  NovaVodSubmission,
   StreamerInfo,
   CrystalTicketStatus,
   BulkFetchSubscribersResponse,
@@ -1695,10 +1708,21 @@ app.post('/api/nova/submissions/:id/fetch-subscribers', requireCurator, async (c
 
 // --- Nova VOD submissions (NOVA_DB) ---
 
+// Each row carries the admin stream its (streamer, video) already has, of any status: a row with
+// one is reviewed as a correction of that stream (GET /:id/correction, POST /:id/apply), and the
+// plain approve below refuses it.
 app.get('/api/nova/vods', requireCurator, async (c) => {
   const status = c.req.query('status');
   const streamer = c.req.query('streamer');
-  const data = await listVods(c.env.NOVA_DB, { status, streamer });
+  const vods = await listVods(c.env.NOVA_DB, { status, streamer });
+  const targets = await findTargetStreams(
+    c.env.DB,
+    vods.map((vod) => ({ streamerId: vod.streamer_slug, videoId: vod.video_id })),
+  );
+  const data: NovaVodListItem[] = vods.map((vod) => ({
+    ...vod,
+    target_stream: targets.get(streamKey(vod.streamer_slug, vod.video_id)) ?? null,
+  }));
   return c.json({ data, total: data.length });
 });
 
@@ -1718,14 +1742,27 @@ app.patch('/api/nova/vods/:id/status', requireCurator, async (c) => {
   const body = parseStatusUpdateBody(await readJsonBody<unknown>(c), NOVA_STATUSES);
   if ('error' in body) return c.json({ error: body.error }, 400);
 
-  const existing = await getVodStatus(c.env.NOVA_DB, id);
+  const existing = await getVodById(c.env.NOVA_DB, id);
 
   if (!existing) return c.json({ error: 'VOD submission not found' }, 404);
 
+  // A VOD whose (streamer, video) already has a stream is a correction of it: approving it here
+  // would import nothing and drop its changes without a word, so its approval goes through the
+  // correction review (POST /:id/apply). `without_applying` is the curator's explicit "approve,
+  // apply nothing" (Revert → re-approve, or an apply that answered 502 appliedToCatalog), and
+  // it is only read on an approval. It needs that stream: with none, the approval would import
+  // the VOD as a new one, which is applying it.
+  const approvesWithoutApplying = body.status === 'approved' && body.withoutApplying === true;
+  if (body.status === 'approved') {
+    const hasStream = await videoIdExists(c.env.DB, existing.video_id, existing.streamer_slug);
+    if (approvesWithoutApplying && !hasStream) return c.json({ error: 'no_target_stream' }, 404);
+    if (!approvesWithoutApplying && hasStream) return c.json({ error: 'use_correction_review' }, 409);
+  }
+
   await updateVodStatus(c.env.NOVA_DB, id, body.status, body.reviewerNote);
 
-  // Fetch the full updated row once and reuse it for the import gate, the Discord embed,
-  // and the response — avoids a second identical SELECT * on vod_submissions.
+  // Read the row back once and reuse it for the import gate, the Discord embed, and the
+  // response, so all three see the review metadata the update just wrote.
   const updated = await getVodById(c.env.NOVA_DB, id);
 
   // Import VOD songs into the admin DB as pending records when approved. The gate is
@@ -1735,8 +1772,9 @@ app.patch('/api/nova/vods/:id/status', requireCurator, async (c) => {
   // delete/recreate its curated performances (present → skip). importVodToAdminDb writes
   // via an atomic db.batch(), so a failed import leaves no admin rows and the next retry
   // re-imports cleanly. vod_songs is fetched only once we know we're importing, so a
-  // re-approval (common under this existence gate) costs no extra NOVA_DB read.
-  if (body.status === 'approved' && updated) {
+  // re-approval (common under this existence gate) costs no extra NOVA_DB read. An approval
+  // without applying never imports, even when its stream vanished after the check above.
+  if (body.status === 'approved' && !approvesWithoutApplying && updated) {
     if (shouldImportVod(body.status, await videoIdExists(c.env.DB, updated.video_id, updated.streamer_slug))) {
       const vodSongs = await listVodSongs(c.env.NOVA_DB, id);
 
@@ -1747,10 +1785,100 @@ app.patch('/api/nova/vods/:id/status', requireCurator, async (c) => {
     }
   }
 
-  const feedbackEmbed = updated ? feedbackEmbedForVod(existing.status, body.status, updated) : null;
+  // An approval that applies nothing announces nothing, so a re-approval is never announced twice.
+  const feedbackEmbed = updated && !approvesWithoutApplying
+    ? feedbackEmbedForVod(existing.status, body.status, updated)
+    : null;
   notifyDiscordFeedback(c, feedbackEmbed);
 
   return c.json(updated);
+});
+
+// The correction review of a VOD whose (streamer, video) already has a stream: that stream's
+// current rows, the submission's rows sorted by time, the suggested pairing, and the
+// fingerprint an apply must send back unchanged.
+app.get('/api/nova/vods/:id/correction', requireCurator, async (c) => {
+  const id = getRouteParam(c, 'id');
+  const submission = await getVodById(c.env.NOVA_DB, id);
+  if (!submission) return c.json({ error: 'VOD submission not found' }, 404);
+
+  const target = await loadCorrectionTarget(c.env.DB, submission.streamer_slug, submission.video_id);
+  if (!target) return c.json({ error: 'no_target_stream' }, 404);
+
+  // One sorted list feeds both the song resolution and the matcher, so their indices agree.
+  const songs = (await listVodSongs(c.env.NOVA_DB, id))
+    .sort((left, right) => left.start_timestamp - right.start_timestamp);
+  const existingSongs = await resolveExistingSongs(
+    c.env.DB,
+    target.stream.streamerId,
+    songs.map((song) => ({ title: song.song_title, originalArtist: song.original_artist })),
+  );
+  const proposed: CorrectionProposedRow[] = songs.map((song, index) => ({
+    id: song.id,
+    title: song.song_title,
+    originalArtist: song.original_artist,
+    timestamp: song.start_timestamp,
+    endTimestamp: song.end_timestamp,
+    existingSong: existingSongs[index],
+  }));
+
+  const { stream } = target;
+  const view: NovaVodCorrectionView = {
+    submission,
+    stream: { id: stream.id, title: stream.title, date: stream.date, videoId: stream.videoId, status: stream.status },
+    current: target.current,
+    proposed,
+    match: matchCorrection(target.current, proposed),
+    fingerprint: await correctionFingerprint(target),
+    otherPendingCount: await countOtherPendingVods(c.env.NOVA_DB, submission.streamer_slug, submission.video_id, id),
+  };
+  return c.json(view);
+});
+
+// Apply the curator's reviewed operations to the target stream in one catalog batch, then mark
+// the submission approved with a note that ends in the summary of what was applied.
+app.post('/api/nova/vods/:id/apply', requireCurator, async (c) => {
+  const id = getRouteParam(c, 'id');
+  const submission = await getVodById(c.env.NOVA_DB, id);
+  if (!submission) return c.json({ error: 'VOD submission not found' }, 404);
+  if (submission.status !== 'pending') return c.json({ error: 'not_pending' }, 409);
+
+  const body = parseCorrectionApplyBody(await readJsonBody<unknown>(c));
+  if ('error' in body) return c.json({ error: body.error }, 400);
+
+  const target = await loadCorrectionTarget(c.env.DB, submission.streamer_slug, submission.video_id);
+  if (!target) return c.json({ error: 'no_target_stream' }, 404);
+  if (await correctionFingerprint(target) !== body.fingerprint) return c.json({ error: 'stale' }, 409);
+
+  const applied = await applyCorrection(c.env.DB, target, body.operations, c.get('user').email);
+  if (!applied.ok) {
+    if (applied.error === 'invalid_operations') {
+      return c.json({ error: applied.error, details: applied.details }, applied.status);
+    }
+    // The rows moved between the fingerprint check above and the batch: another apply or an edit won.
+    if (applied.error === 'stale') return c.json({ error: applied.error }, applied.status);
+    return c.json({ error: applied.error, performances: applied.performances }, applied.status);
+  }
+
+  const summary = summarizeCorrection(body.operations, body.skipped);
+  const reviewerNote = [body.reviewerNote?.trim(), summary].filter(Boolean).join('\n');
+  // The catalog batch has committed. From here a failure must say so, so the page can offer to
+  // approve the submission without applying anything again.
+  let approved: NovaVodSubmission | null = null;
+  try {
+    await updateVodStatus(c.env.NOVA_DB, id, 'approved', reviewerNote);
+    approved = await getVodById(c.env.NOVA_DB, id);
+  } catch (error) {
+    console.error('VOD correction applied, but its submission could not be marked reviewed', error);
+  }
+  if (!approved) {
+    return c.json({ error: 'Catalog updated but the submission could not be marked reviewed', appliedToCatalog: true }, 502);
+  }
+
+  notifyDiscordFeedback(c, feedbackEmbedForVod('pending', 'approved', approved, summary));
+
+  const result: CorrectionApplyResult = { submission: approved, summary };
+  return c.json(result);
 });
 
 app.put('/api/nova/vods/:id', requireCurator, async (c) => {
