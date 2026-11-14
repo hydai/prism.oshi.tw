@@ -106,7 +106,7 @@ export function generateStreamIdFallback(): string {
 
 type WorkLinkMethod = 'migration_exact' | 'import_exact' | 'manual';
 
-function prepareEnsureExactWork(
+export function prepareEnsureExactWork(
   db: D1Database,
   candidateWorkId: string,
   title: string,
@@ -128,7 +128,7 @@ function prepareEnsureExactWork(
   ).bind(candidateWorkId, title, originalArtist, tagsJson, title, originalArtist);
 }
 
-function prepareLinkSongToExactWork(
+export function prepareLinkSongToExactWork(
   db: D1Database,
   songId: string,
   title: string,
@@ -624,21 +624,36 @@ export async function getSongById(
   return song;
 }
 
+/**
+ * A curator's approval carried into a catalog write: the rows it creates are born
+ * `approved` instead of waiting in `pending`, and a song records who approved it.
+ * Performances have no reviewer column, so only songs carry `reviewedBy`.
+ */
+export interface CatalogReview {
+  readonly status: 'approved';
+  readonly reviewedBy: string;
+}
+
 // Standalone inserts keep their positional contract. Bulk catalog imports use
 // the set-based, transactional identity resolution in prepareCatalogWrites.
-function prepareSongInsert(
+// The status and reviewer are bound data, so the INSERT text never depends on `review`.
+export function prepareSongInsert(
   db: D1Database,
   streamerId: string,
   songId: string,
   title: string,
   originalArtist: string,
   submittedBy: string,
+  review?: CatalogReview,
 ): D1PreparedStatement {
   return db
     .prepare(
-      'INSERT INTO songs (id, streamer_id, title, original_artist, tags, status, submitted_by) VALUES (?, ?, ?, ?, ?, ?, ?)',
+      'INSERT INTO songs (id, streamer_id, title, original_artist, tags, status, submitted_by, reviewed_by) VALUES (?, ?, ?, ?, ?, ?, ?, ?)',
     )
-    .bind(songId, streamerId, title, originalArtist, '[]', 'pending', submittedBy);
+    .bind(
+      songId, streamerId, title, originalArtist, '[]',
+      review?.status ?? 'pending', submittedBy, review?.reviewedBy ?? null,
+    );
 }
 
 export async function insertSong(
@@ -657,12 +672,16 @@ export async function insertSong(
   ]);
 }
 
-export async function updateSong(
+// A title/artist edit changes the exact global identity. Create or reuse the
+// destination work, update the streamer-local song, then repoint its bridge:
+// three ordered statements the caller runs in one D1 batch, so the two catalog
+// layers cannot drift apart. Builds nothing when no field is given.
+export function prepareSongRename(
   db: D1Database,
-  id: string,
+  songId: string,
   fields: { title?: string; originalArtist?: string },
-  updatedBy = 'system:song-update',
-): Promise<void> {
+  updatedBy: string,
+): D1PreparedStatement[] {
   const sets: string[] = [];
   const values: (string | number)[] = [];
 
@@ -675,34 +694,33 @@ export async function updateSong(
     values.push(fields.originalArtist);
   }
 
-  if (sets.length === 0) return;
+  if (sets.length === 0) return [];
 
   sets.push("updated_at = datetime('now')");
-  values.push(id);
+  values.push(songId);
 
-  const updateStatement = db
-    .prepare(`UPDATE songs SET ${sets.join(', ')} WHERE id = ?`)
-    .bind(...values);
-
-  if (fields.title === undefined && fields.originalArtist === undefined) {
-    await updateStatement.run();
-    return;
-  }
-
-  // A title/artist edit changes the exact global identity. Create or reuse the
-  // destination work, update the streamer-local song, then repoint its bridge
-  // in one ordered D1 batch so the two catalog layers cannot drift apart.
-  await db.batch([
+  return [
     prepareEnsureWorkForSongUpdate(
       db,
       generateWorkId(),
-      id,
+      songId,
       fields.title,
       fields.originalArtist,
     ),
-    updateStatement,
-    prepareRelinkSongToExactWork(db, id, updatedBy),
-  ]);
+    db.prepare(`UPDATE songs SET ${sets.join(', ')} WHERE id = ?`).bind(...values),
+    prepareRelinkSongToExactWork(db, songId, updatedBy),
+  ];
+}
+
+export async function updateSong(
+  db: D1Database,
+  id: string,
+  fields: { title?: string; originalArtist?: string },
+  updatedBy = 'system:song-update',
+): Promise<void> {
+  const statements = prepareSongRename(db, id, fields, updatedBy);
+  if (statements.length === 0) return;
+  await db.batch(statements);
 }
 
 export async function updateSongStatus(
@@ -1113,6 +1131,7 @@ export interface CatalogWriteInput {
   readonly songs: readonly CatalogSongInput[];
   readonly submittedBy: string;
   readonly excludeSongsOnlyInStreamId?: string;
+  readonly review?: CatalogReview;
 }
 
 /**
@@ -1120,11 +1139,18 @@ export interface CatalogWriteInput {
  * set-based statements handle one song or a whole import; no pre-read IDs can
  * become stale between lookup and insert. Existing curated duplicates remain
  * legal, and approved/oldest/id still chooses the canonical local song.
+ *
+ * With `review`, new songs are inserted approved (recording the reviewer) and
+ * new performances approved; without it both are pending. A song that already
+ * exists is reused as it is. The status travels in the row payload, so the SQL
+ * is the same either way. `performanceIds` holds one id per input song, in order.
  */
-function prepareCatalogWrites(
+export function prepareCatalogWrites(
   db: D1Database,
   input: CatalogWriteInput,
-): { statements: D1PreparedStatement[] } {
+): { statements: D1PreparedStatement[]; performanceIds: string[] } {
+  const status = input.review?.status ?? 'pending';
+  const reviewedBy = input.review?.reviewedBy ?? null;
   const identities = new Map<string, { songId: string; workId: string }>();
   const rows = input.songs.map((song) => {
     const originalArtist = song.originalArtist || 'Unknown';
@@ -1139,17 +1165,18 @@ function prepareCatalogWrites(
       performanceId: generatePerformanceId(),
       streamerId: input.streamerId, streamId: input.streamId,
       date: input.date, streamTitle: input.streamTitle, videoId: input.videoId,
-      submittedBy: input.submittedBy,
+      submittedBy: input.submittedBy, status, reviewedBy,
       excludeStreamId: input.excludeSongsOnlyInStreamId ?? null,
     };
   });
-  if (rows.length === 0) return { statements: [] };
+  if (rows.length === 0) return { statements: [], performanceIds: [] };
   const payload = JSON.stringify(rows);
   const entries = `WITH entries AS (
     SELECT
       value ->> '$.songId' AS song_id, value ->> '$.workId' AS work_id,
       value ->> '$.title' AS title, value ->> '$.originalArtist' AS original_artist,
       value ->> '$.streamerId' AS streamer_id, value ->> '$.submittedBy' AS submitted_by,
+      value ->> '$.status' AS status, value ->> '$.reviewedBy' AS reviewed_by,
       value ->> '$.excludeStreamId' AS exclude_stream_id,
       value ->> '$.performanceId' AS performance_id, value ->> '$.streamId' AS stream_id,
       value ->> '$.date' AS date, value ->> '$.streamTitle' AS stream_title,
@@ -1157,7 +1184,7 @@ function prepareCatalogWrites(
       value ->> '$.endTimestamp' AS end_timestamp, value ->> '$.note' AS note
     FROM json_each(?)
   ), identities AS (
-    SELECT DISTINCT song_id, work_id, title, original_artist, streamer_id, submitted_by, exclude_stream_id
+    SELECT DISTINCT song_id, work_id, title, original_artist, streamer_id, submitted_by, status, reviewed_by, exclude_stream_id
     FROM entries
   )`;
   const matchingSong = `SELECT s.id FROM songs AS s
@@ -1183,8 +1210,8 @@ function prepareCatalogWrites(
       )
       ON CONFLICT(title, original_artist) DO NOTHING`).bind(payload),
     db.prepare(`${entries}
-      INSERT INTO songs (id, streamer_id, title, original_artist, tags, status, submitted_by)
-      SELECT song_id, streamer_id, title, original_artist, '[]', 'pending', submitted_by
+      INSERT INTO songs (id, streamer_id, title, original_artist, tags, status, submitted_by, reviewed_by)
+      SELECT song_id, streamer_id, title, original_artist, '[]', status, submitted_by, reviewed_by
       FROM identities AS item WHERE NOT EXISTS (${matchingSong})`).bind(payload),
     db.prepare(`${resolved}
       INSERT OR IGNORE INTO song_work_links (song_id, work_id, link_method, linked_by)
@@ -1205,11 +1232,11 @@ function prepareCatalogWrites(
         timestamp, end_timestamp, note, status, submitted_by, updated_at)
       SELECT entry.performance_id, entry.streamer_id, resolved.resolved_song_id, entry.stream_id,
         entry.date, entry.stream_title, entry.video_id, entry.timestamp, entry.end_timestamp,
-        entry.note, 'pending', entry.submitted_by, datetime('now')
+        entry.note, entry.status, entry.submitted_by, datetime('now')
       FROM entries AS entry JOIN resolved ON resolved.song_id = entry.song_id
       RETURNING id, song_id`).bind(payload),
   ];
-  return { statements };
+  return { statements, performanceIds: rows.map((row) => row.performanceId) };
 }
 
 export interface CreateSongAndPerformanceInput {
@@ -1254,23 +1281,22 @@ export async function createSongAndPerformance(
 // The end-after-start invariant is enforced INSIDE the UPDATE's WHERE, merging
 // each incoming field with the stored counterpart — two overlapping one-sided
 // edits can both pass a read-before-write check, so the write itself must be
-// the gate. Returns false when the row is missing OR the merged pair would be
-// inverted (callers that pre-read can tell the two apart with a re-read).
-export async function updatePerformanceTimestamps(
+// the gate. Builds nothing (null) when no field is given.
+export function prepareTimestampUpdate(
   db: D1Database,
   id: string,
   fields: { timestamp?: number; endTimestamp?: number | null },
-): Promise<boolean> {
+): D1PreparedStatement | null {
   const hasTimestamp = fields.timestamp !== undefined;
   const hasEnd = fields.endTimestamp !== undefined;
-  if (!hasTimestamp && !hasEnd) return false;
+  if (!hasTimestamp && !hasEnd) return null;
 
   const timestampFlag = hasTimestamp ? 1 : 0;
   const timestampValue = fields.timestamp ?? null;
   const endFlag = hasEnd ? 1 : 0;
   const endValue = fields.endTimestamp ?? null;
 
-  const result = await db
+  return db
     .prepare(
       `UPDATE performances SET
          timestamp = CASE WHEN ? THEN ? ELSE timestamp END,
@@ -1289,8 +1315,19 @@ export async function updatePerformanceTimestamps(
       endFlag, endValue,
       endFlag, endValue,
       timestampFlag, timestampValue,
-    )
-    .run();
+    );
+}
+
+// Returns false when the row is missing OR the merged pair would be inverted
+// (callers that pre-read can tell the two apart with a re-read).
+export async function updatePerformanceTimestamps(
+  db: D1Database,
+  id: string,
+  fields: { timestamp?: number; endTimestamp?: number | null },
+): Promise<boolean> {
+  const statement = prepareTimestampUpdate(db, id, fields);
+  if (!statement) return false;
+  const result = await statement.run();
   return result.meta.changes > 0;
 }
 
