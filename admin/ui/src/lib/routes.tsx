@@ -10,6 +10,7 @@ const GlobalWorkReview = lazy(() => import('../pages/GlobalWorkReview'));
 const GlobalWorks = lazy(() => import('../pages/GlobalWorks'));
 const Harmonizer = lazy(() => import('../pages/Harmonizer'));
 const NovaSubmissions = lazy(() => import('../pages/NovaSubmissions'));
+const NovaVodReview = lazy(() => import('../pages/NovaVodReview'));
 const NovaVodSubmissions = lazy(() => import('../pages/NovaVodSubmissions'));
 const Pipeline = lazy(() => import('../pages/Pipeline'));
 const SongDetail = lazy(() => import('../pages/SongDetail'));
@@ -133,6 +134,11 @@ export const ADMIN_ROUTES: readonly AdminRoute[] = [
     group: 'inbox',
     icon: 'film',
     render: (user) => <NovaVodSubmissions user={user} />,
+  },
+  {
+    path: '/nova/vods/:id/review',
+    curatorOnly: true,
+    render: (user) => <NovaVodReview user={user} />,
   },
   {
     path: '/crystal',
