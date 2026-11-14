@@ -31,6 +31,7 @@ import type {
   NovaSubmission,
   NovaSubmissionUpdateBody,
   NovaStatus,
+  NovaVodListItem,
   NovaVodSubmission,
   NovaVodSong,
   NovaVodUpdateBody,
@@ -56,6 +57,11 @@ import type {
   BulkUpdateWorkTagsResponse,
 } from '../../../shared/types';
 import { REQUEST_AUTHENTICITY_HEADER, REQUEST_AUTHENTICITY_VALUE } from '../../../shared/csrf';
+import type {
+  CorrectionApplyBody,
+  CorrectionApplyResult,
+  NovaVodCorrectionView,
+} from '../../../shared/vod-correction';
 import type {
   VodExportCandidateResponse,
   VodExportCapacityDiagnostic,
@@ -518,18 +524,54 @@ export const api = {
 
   // Nova VOD submissions
   listNovaVods: () =>
-    request<ListResponse<NovaVodSubmission>>('/api/nova/vods', undefined, {
+    request<ListResponse<NovaVodListItem>>('/api/nova/vods', undefined, {
       skipStreamer: true,
     }),
 
   getNovaVod: (id: string) =>
     request<NovaVodSubmission & { songs: NovaVodSong[] }>(`/api/nova/vods/${id}`),
 
-  updateNovaVodStatus: (id: string, body: { status: NovaStatus; reviewer_note?: string }) =>
+  // `without_applying` approves a VOD whose video already has a stream and applies nothing to it; the worker
+  // refuses any other approval of such a VOD (409 use_correction_review). `expected_status` is the status the page
+  // shows: once the VOD no longer has it (reviewed in another tab, or by another curator), the worker changes
+  // nothing and answers 409 status_changed with the status it has. One exception: a plain Approve sent with
+  // `pending` for a VOD that is approved with no stream retries the import that approval failed. The worker then
+  // imports, leaves the status and note as they are, and answers the submission.
+  updateNovaVodStatus: (
+    id: string,
+    body: { status: NovaStatus; expected_status?: NovaStatus; reviewer_note?: string; without_applying?: boolean },
+  ) =>
     request<NovaVodSubmission>(`/api/nova/vods/${id}/status`, {
       method: 'PATCH',
       body: JSON.stringify(body),
     }),
+
+  // The correction review: a VOD's own request (the VOD says whose it is), so no `?streamer=`.
+  getNovaVodCorrection: (id: string) =>
+    request<NovaVodCorrectionView>(`/api/nova/vods/${id}/correction`, undefined, {
+      skipStreamer: true,
+    }),
+
+  applyNovaVodCorrection: (id: string, body: CorrectionApplyBody) =>
+    request<CorrectionApplyResult>(
+      `/api/nova/vods/${id}/apply`,
+      { method: 'POST', body: JSON.stringify(body) },
+      { skipStreamer: true },
+    ),
+
+  // The approved songs of `streamer` matching `search`, then the pending ones, 20 at most: the only songs a relink
+  // can land on. Each status is asked for on its own, so rejected or excluded matches never take up the window. The
+  // streamer is the one the VOD belongs to, not the one picked in the sidebar, so it is named here.
+  searchStreamerSongs: async (streamer: string, search: string) => {
+    const pageOf = (status: 'approved' | 'pending') =>
+      request<PaginatedResponse<Song>>(
+        `/api/songs?${new URLSearchParams({ streamer, search, status, pageSize: '20' }).toString()}`,
+        undefined,
+        { skipStreamer: true },
+      );
+    const [approved, pending] = await Promise.all([pageOf('approved'), pageOf('pending')]);
+    return [...approved.data, ...pending.data].slice(0, 20);
+  },
 
   updateNovaVod: (id: string, body: NovaVodUpdateBody) =>
     request<NovaVodSubmission>(`/api/nova/vods/${id}`, {

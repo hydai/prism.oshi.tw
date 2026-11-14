@@ -1,8 +1,8 @@
 import type { NovaVodSubmission } from '../../../shared/types';
 
-export interface VodGroup {
+export interface VodGroup<T extends NovaVodSubmission = NovaVodSubmission> {
   slug: string;
-  vods: NovaVodSubmission[];
+  vods: T[];
   pendingCount: number;
 }
 
@@ -11,10 +11,11 @@ export type VodViewMode = 'grouped' | 'timeline';
 /**
  * Groups VOD submissions by streamer, preserving the incoming order inside each
  * group. Groups are ordered by the newest `submitted_at` they contain, so the
- * streamers with fresh submissions float to the top of the review queue.
+ * streamers with fresh submissions float to the top of the review queue. The
+ * rows come out as they went in, whatever more than a submission they carry.
  */
-export function groupVodsByStreamer(vods: NovaVodSubmission[]): VodGroup[] {
-  const groups = new Map<string, VodGroup & { newest: string }>();
+export function groupVodsByStreamer<T extends NovaVodSubmission>(vods: T[]): VodGroup<T>[] {
+  const groups = new Map<string, VodGroup<T> & { newest: string }>();
   for (const vod of vods) {
     const group = groups.get(vod.streamer_slug);
     if (group) {
