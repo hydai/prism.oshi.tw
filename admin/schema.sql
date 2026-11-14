@@ -631,3 +631,27 @@ BEGIN
   WHERE link.work_id = NEW.id AND song.status = 'approved'
   ON CONFLICT(streamer_id) DO UPDATE SET revision = revision + 1;
 END;
+
+-- One row per committed VOD correction apply, written in the apply's own catalog
+-- batch: a row exists exactly when its batch committed, so an apply whose D1 call
+-- rejected reads its row back by token, and the approval that recovers a 502
+-- appliedToCatalog reads the note and summary that apply never wrote to Nova or announced.
+-- Every feedback embed for the submission first closes its open rows (announced_at),
+-- so a row never announces after a later outcome; it is posted anyway if that claim
+-- fails. An apply refused because another review landed while it ran closes its own
+-- row only, posting nothing.
+-- Append-only. Apply before deploying the worker that writes it (from admin/):
+--   npx wrangler@latest d1 execute oshi-prism-db --remote --file=migrations/0011_vod_correction_applies.sql
+-- Additive/idempotent; no rows are changed.
+CREATE TABLE IF NOT EXISTS vod_correction_applies (
+  token TEXT PRIMARY KEY,
+  submission_id TEXT NOT NULL,
+  reviewer_note TEXT NOT NULL,
+  summary TEXT NOT NULL,
+  actor TEXT NOT NULL,
+  applied_at TEXT NOT NULL DEFAULT (datetime('now')),
+  announced_at TEXT
+);
+
+CREATE INDEX IF NOT EXISTS idx_vod_correction_applies_submission
+  ON vod_correction_applies(submission_id);

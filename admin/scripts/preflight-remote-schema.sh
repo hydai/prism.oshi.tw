@@ -13,7 +13,7 @@
 set -eu
 
 DB_NAME="${PRISM_ADMIN_DB_NAME:-oshi-prism-db}"
-REQUIRED="merge_guards"
+REQUIRED="merge_guards vod_correction_applies"
 
 names="$(npx wrangler@latest d1 execute "$DB_NAME" --remote --json \
   --command "SELECT name FROM sqlite_master WHERE type IN ('table', 'index')")"

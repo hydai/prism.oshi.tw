@@ -22,8 +22,12 @@ export class SQLiteD1 {
   readonly sqlite = new DatabaseSync(':memory:');
   readonly batches: Statement[][] = [];
   beforeBatch?: () => Promise<void>;
-  constructor() {
-    this.sqlite.exec(readFileSync(new URL('../schema.sql', import.meta.url), 'utf8'));
+  /** Runs once a batch has committed. A throw here is a D1 call that rejects although its batch landed. */
+  afterBatch?: () => Promise<void>;
+  /** Runs each schema file in the order given; with none, the admin worker's schema.sql. */
+  constructor(...schemas: URL[]) {
+    const files = schemas.length > 0 ? schemas : [new URL('../schema.sql', import.meta.url)];
+    for (const schema of files) this.sqlite.exec(readFileSync(schema, 'utf8'));
   }
   get binding(): D1Database { return this as unknown as D1Database; }
   prepare(sql: string) { return new Statement(this, sql); }
@@ -31,13 +35,15 @@ export class SQLiteD1 {
     await this.beforeBatch?.();
     this.batches.push(statements);
     this.sqlite.exec('BEGIN');
+    let result: ReturnType<Statement['execute']>[];
     try {
-      const result = statements.map(statement => statement.execute());
+      result = statements.map(statement => statement.execute());
       this.sqlite.exec('COMMIT');
-      return result;
     } catch (error) {
       this.sqlite.exec('ROLLBACK');
       throw error;
     }
+    await this.afterBatch?.();
+    return result;
   }
 }
