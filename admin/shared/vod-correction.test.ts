@@ -1,4 +1,4 @@
-import { matchCorrection, summarizeCorrection } from './vod-correction';
+import { correctionChanges, matchCorrection, summarizeCorrection } from './vod-correction';
 import type { CorrectionMatch, CorrectionPair } from './vod-correction';
 
 declare const process: { exitCode?: number };
@@ -207,6 +207,39 @@ function testSummarizeSkippedPartsInOrder(): void {
   );
 }
 
+function testCorrectionChangesAgreesWithTheMatcher(): void {
+  // The review page asks `correctionChanges` again for the pairs a curator makes by hand, so it
+  // must give every pair the matcher found exactly the flags the matcher put on it.
+  const m = matchCorrection(ICHII_CURRENT, ICHII_PROPOSED);
+  assert.equal(m.pairs.length, 6);
+  for (const pair of m.pairs) {
+    const current = ICHII_CURRENT[pair.currentIndex];
+    const proposed = ICHII_PROPOSED[pair.proposedIndex];
+    if (!current || !proposed) throw new Error(`pair ${pair.currentIndex}/${pair.proposedIndex} points at no row`);
+    assert.deepEqual(correctionChanges(current, proposed), pair.changes, `pair ${pair.currentIndex}/${pair.proposedIndex}`);
+  }
+}
+
+function testCorrectionChangesOnAnyTwoRows(): void {
+  const none = { start: false, end: false, title: false, artist: false };
+  assert.deepEqual(correctionChanges(row('A', 'X', 100, null), row('A', 'X', 100, null)), none, 'null against null is no change');
+  assert.deepEqual(
+    correctionChanges(row('A', 'X', 100, null), row('A', 'X', 90, 390)),
+    { start: true, end: true, title: false, artist: false },
+    'the times are compared as stored, null being a value',
+  );
+  assert.deepEqual(
+    correctionChanges(row('Moon River', '', 0, 100), row('moon  river', 'Unknown', 0, 100)),
+    none,
+    'the text is compared normalized, an empty artist reading as Unknown',
+  );
+  assert.deepEqual(
+    correctionChanges(row('Late Night Drive', 'X', 0, 100), row('Late Niqht Drive', 'Y', 0, 100)),
+    { start: false, end: false, title: true, artist: true },
+    'a real difference in the title or the artist is flagged',
+  );
+}
+
 function main(): void {
   testIchiiPairsSixAndDropsOne();
   testIchiiChangeFlags();
@@ -227,6 +260,8 @@ function main(): void {
   testNullEndsAreNotAChange();
   testArtistFlagUsesUnknownOnBothSides();
   testSummarizeSkippedPartsInOrder();
+  testCorrectionChangesAgreesWithTheMatcher();
+  testCorrectionChangesOnAnyTwoRows();
   console.log('✓ the correction matcher pairs by time overlap, flags only real changes, and summarizes what was applied');
 }
 

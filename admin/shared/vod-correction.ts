@@ -1,9 +1,10 @@
 /**
  * The VOD correction contract: the wire shapes the admin worker and the review
- * page share, plus the two pure helpers both of them need. `matchCorrection`
- * suggests which proposed row corrects which current row, and
- * `summarizeCorrection` writes the one-line account of an apply that goes into
- * the reviewer note and the Discord embed. Nothing here touches D1 or the DOM.
+ * page share, plus the pure helpers both of them need. `matchCorrection`
+ * suggests which proposed row corrects which current row, `correctionChanges`
+ * says which fields of one such pair differ, and `summarizeCorrection` writes
+ * the one-line account of an apply that goes into the reviewer note and the
+ * Discord embed. Nothing here touches D1 or the DOM.
  */
 import { normalizeForMatching, similarityScore } from './normalize';
 import type { NovaVodSubmission, Status } from './types';
@@ -117,11 +118,17 @@ function artistKey(originalArtist: string): string {
   return normalizeForMatching(originalArtist === '' ? UNKNOWN_ARTIST : originalArtist);
 }
 
-function changesBetween(current: PreparedRow, proposed: PreparedRow): CorrectionPair['changes'] {
+/**
+ * Which fields of a current row and a proposed row differ: the raw start and end (null is a value),
+ * and the `normalizeForMatching` forms of the title and the artist, an empty artist reading as
+ * 'Unknown'. `matchCorrection` flags every pair it finds with it, and the review page asks again for
+ * the pairs a curator makes by hand, so both read one rule.
+ */
+export function correctionChanges(current: MatchableRow, proposed: MatchableRow): CorrectionPair['changes'] {
   return {
     start: current.timestamp !== proposed.timestamp,
     end: current.endTimestamp !== proposed.endTimestamp,
-    title: current.titleKey !== proposed.titleKey,
+    title: normalizeForMatching(current.title) !== normalizeForMatching(proposed.title),
     artist: artistKey(current.originalArtist) !== artistKey(proposed.originalArtist),
   };
 }
@@ -157,9 +164,7 @@ function indicesNotIn(count: number, taken: ReadonlySet<number>): number[] {
  * lower current index, then the lower proposed index. A row whose interval is
  * empty or inverted scores 0, so it never pairs.
  *
- * `changes` compares what is stored: the raw start and end (null is a value),
- * and the `normalizeForMatching` forms of the title and the artist, an empty
- * artist reading as 'Unknown'.
+ * Each pair's `changes` is `correctionChanges` of its two rows.
  */
 export function matchCorrection(
   current: readonly MatchableRow[],
@@ -201,7 +206,7 @@ export function matchCorrection(
       currentIndex: candidate.currentIndex,
       proposedIndex: candidate.proposedIndex,
       score: candidate.score,
-      changes: changesBetween(candidate.current, candidate.proposed),
+      changes: correctionChanges(candidate.current, candidate.proposed),
     });
   }
   pairs.sort((left, right) => left.currentIndex - right.currentIndex);
