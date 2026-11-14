@@ -290,35 +290,37 @@ function makeNovaSqlite(): { db: D1Database; sqlite: DatabaseSync } {
   return { db: db as unknown as D1Database, sqlite };
 }
 
-/** The admin DB, holding a stream for ichii's VqAa6fUDZXI in `status`, or none. */
+/** The admin DB, holding a stream for ichii's VqAa6fUDZXI in `status`, or none. An archived one lists no public rows. */
 function makeAdminDb(status: string | null): D1Database {
   return {
     prepare: (sql: string) => ({
       bind: (...args: unknown[]) => ({
         first: async () =>
           (status !== null && sql.includes('FROM streams') && args[0] === 'ichii' && args[1] === 'VqAa6fUDZXI' ? { status } : null),
+        all: async () => ({ results: [] }),
       }),
     }),
   } as unknown as D1Database;
 }
 
 // ichii's VqAa6fUDZXI had an approved Nova submission with wrong data. A curator unapproved and deleted the stream it
-// had imported, and the corrected list was refused for good (2026-11-18). An approved submission blocks only while the
-// video still has a stream in admin, in any status: approving another would not import it, since the import skips a
-// video that has one. Once the stream is deleted the VOD takes a new submission, and approving that one imports it.
+// had imported, and the corrected list was refused for good (2026-11-18). An approved submission blocks nothing: with no
+// stream in admin the VOD takes a new submission, which approving imports again, and with a stream, in any status, it
+// takes a correction, which admin reviews against that stream. The answer calls it a correction only for an archived
+// VOD (publicVodKind).
 async function testADeletedStreamFreesItsVod(): Promise<void> {
   installMockFetch();
   try {
-    const cases: Array<{ admin: string | null; approved: boolean; status: number; inAdmin?: true }> = [
-      { admin: null, approved: true, status: 201 },
-      { admin: 'rejected', approved: true, status: 409 },
-      { admin: 'excluded', approved: true, status: 409 },
-      { admin: 'rejected', approved: false, status: 201 },
-      { admin: 'approved', approved: true, status: 409, inAdmin: true },
-      { admin: 'pending', approved: true, status: 409, inAdmin: true },
-      { admin: 'extracted', approved: true, status: 409, inAdmin: true },
+    const cases: Array<{ admin: string | null; approved: boolean; kind: 'new' | 'correction'; answered: 'new' | 'correction' }> = [
+      { admin: null, approved: true, kind: 'new', answered: 'new' },
+      { admin: 'rejected', approved: true, kind: 'correction', answered: 'new' },
+      { admin: 'excluded', approved: true, kind: 'correction', answered: 'new' },
+      { admin: 'rejected', approved: false, kind: 'correction', answered: 'new' },
+      { admin: 'pending', approved: true, kind: 'correction', answered: 'new' },
+      { admin: 'extracted', approved: true, kind: 'correction', answered: 'new' },
+      { admin: 'approved', approved: true, kind: 'correction', answered: 'correction' },
     ];
-    for (const { admin, approved, status, inAdmin } of cases) {
+    for (const { admin, approved, kind, answered } of cases) {
       const label = `admin stream ${admin ?? 'deleted'}, ${approved ? 'an' : 'no'} approved Nova submission`;
       const nova = makeNovaSqlite();
       nova.sqlite.exec(`INSERT INTO submissions (id, youtube_channel_url, slug, display_name, status)
@@ -342,30 +344,22 @@ async function testADeletedStreamFreesItsVod(): Promise<void> {
         },
         makeEnv({ DB: nova.db, ADMIN_DB: makeAdminDb(admin), TURNSTILE_SECRET_KEY: 'test-secret' }),
       );
-      assertEqual(res.status, status, label);
-      const body = (await res.json()) as { id?: string; inAdmin?: boolean; adminStatus?: string; submittedAt?: string };
+      assertEqual(res.status, 201, label);
+      const body = (await res.json()) as { id?: string; kind?: string };
+      assertEqual(body.kind, answered, `${label}: the answer's kind`);
       const rows = nova.sqlite
-        .prepare("SELECT id, status FROM vod_submissions WHERE streamer_slug = 'ichii' AND video_id = 'VqAa6fUDZXI'")
-        .all() as Array<{ id: string; status: string }>;
+        .prepare("SELECT id, status, kind FROM vod_submissions WHERE streamer_slug = 'ichii' AND video_id = 'VqAa6fUDZXI'")
+        .all() as Array<{ id: string; status: string; kind: string }>;
       const earlier = approved ? 1 : 0;
-      if (status === 201) {
-        assertEqual(rows.length, earlier + 1, `${label}: the submission is stored beside any earlier one`);
-        assertEqual(rows.find((row) => row.id === body.id)?.status, 'pending', `${label}: under the id the answer gives, pending`);
-      } else {
-        assertEqual(rows.length, earlier, `${label}: nothing is stored`);
-        if (inAdmin) {
-          assertEqual(body.inAdmin, true, `${label}: the admin stream blocks it`);
-          assertEqual(body.adminStatus, admin, `${label}: and the answer names its status`);
-        } else {
-          assertEqual(body.inAdmin, undefined, `${label}: the approved submission blocks it`);
-          assertEqual(body.submittedAt, '2026-11-08 17:11:50', `${label}: and the answer says when it came`);
-        }
-      }
+      assertEqual(rows.length, earlier + 1, `${label}: the submission is stored beside any earlier one`);
+      const stored = rows.find((row) => row.id === body.id);
+      assertEqual(stored?.status, 'pending', `${label}: under the id the answer gives, pending`);
+      assertEqual(stored?.kind, kind, `${label}: the stored kind`);
     }
   } finally {
     restoreFetch();
   }
-  console.log('✓ /vod/api/submit: a VOD whose admin stream was deleted takes a new submission; one with a stream does not');
+  console.log('✓ /vod/api/submit: an approved submission blocks nothing; a deleted stream\'s VOD takes a new submission, one with a stream a correction');
 }
 
 // === Security headers: Hono defaults plus the Content-Security-Policy, on a page

@@ -1,12 +1,13 @@
 import { Hono, type Context } from 'hono';
 import { cors } from 'hono/cors';
 import { NONCE, secureHeaders, type SecureHeadersVariables } from 'hono/secure-headers';
-import type { Bindings, SubmitBody, VodSubmitBody } from './types';
+import type { Bindings, PublicStreamSong, SubmitBody, VodSubmissionKind, VodSubmitBody } from './types';
 import {
   MAX_VOD_SONGS,
   SUBMISSION_FIELD_LIMITS,
   VOD_FIELD_LIMITS,
   VOD_SONG_FIELD_LIMITS,
+  isListRevision,
   normalizeYoutubeChannelUrl,
   parseTimestamp,
   parseYoutubeVideoUrl,
@@ -16,7 +17,8 @@ import {
 import { extractChannelMeta } from './channel-meta';
 import { verifyTurnstile } from './turnstile';
 import { generateId, findByChannelUrl, insertSubmission, resetRejectedSubmission, listAllSubmissions } from './db';
-import { generateVodId, generateVodSongId, listApprovedStreamers, findApprovedVodByVideoId, countVodsByVideoId, insertVodSubmission, listAllVodSubmissions, listAdminStreams, checkAdminStreamExists } from './vod-db';
+import { generateVodId, generateVodSongId, listApprovedStreamers, countVodsByVideoId, insertVodSubmission, listAllVodSubmissions, listAdminStreams, checkAdminStreamExists, listPublicStreamSongs, publicListRevision, publicVodKind } from './vod-db';
+import { formatSongsForPaste, isSameAsPublicList, restoreArchivedEnds, restoreArchivedIdentities, restoreBlankArtists } from './song-text';
 import { renderPage } from './page';
 import { renderVodPage } from './vod-page';
 import {
@@ -371,7 +373,10 @@ app.get('/vod/api/streamers', async (c) => {
   return c.json(streamers);
 });
 
-// GET /vod/api/check — Duplicate check by streamer slug + video URL
+// GET /vod/api/check — What is on file for a streamer + video URL.
+// `archived` is all this says about the admin DB, and only an approved stream is archived: a
+// stream in any other status (pending, extracted, rejected, excluded) is pipeline state the
+// public must not learn from this API, so it answers exactly as if there were no stream.
 app.get('/vod/api/check', async (c) => {
   const slug = c.req.query('streamer_slug');
   const rawUrl = c.req.query('url');
@@ -388,33 +393,41 @@ app.get('/vod/api/check', async (c) => {
     countVodsByVideoId(c.env.DB, slug, parsed.videoId),
     checkAdminStreamExists(c.env.ADMIN_DB, slug, parsed.videoId),
   ]);
+  const archived = adminStream?.status === 'approved';
+  return c.json({ exists: info.count > 0 || archived, archived, ...info });
+});
 
-  if (adminStream) {
-    return c.json({
-      exists: true,
-      inAdmin: true,
-      adminStatus: adminStream.status,
-      count: info.count,
-      hasApproved: info.hasApproved,
-      pendingCount: info.pendingCount,
-      rejectedCount: info.rejectedCount,
-      latestStatus: info.latestStatus,
-    });
+// GET /vod/api/current — The public song list of an archived VOD, as the text the forms paste, with its
+// revision (publicListRevision): a form that loads the list sends the revision back with its correction, and
+// POST /vod/api/submit refuses it if the list changed since. An archived VOD with no public rows has a revision
+// too, the empty list's.
+// Whatever is not an approved stream (no stream, or one in the pipeline or excluded) gets the same
+// 200 { archived: false, text: '' }, with no revision, so the status code and the body cannot be used to probe it.
+// Gated like /vod/api/video-info; the cors() above lets Aurora call it.
+app.get('/vod/api/current', async (c) => {
+  if (!isTrustedRequest(c.req.raw)) {
+    return c.json({ error: 'Forbidden' }, 403);
   }
 
-  if (info.count > 0) {
-    return c.json({
-      exists: true,
-      inAdmin: false,
-      count: info.count,
-      hasApproved: info.hasApproved,
-      pendingCount: info.pendingCount,
-      rejectedCount: info.rejectedCount,
-      latestStatus: info.latestStatus,
-    });
+  const slug = c.req.query('streamer_slug');
+  const rawUrl = c.req.query('url');
+  if (!slug || !rawUrl) {
+    return c.json({ error: 'streamer_slug and url query parameters are required' }, 400);
   }
 
-  return c.json({ exists: false, inAdmin: false });
+  const parsed = parseYoutubeVideoUrl(rawUrl);
+  if (!parsed) {
+    return c.json({ error: 'Invalid YouTube video URL' }, 400);
+  }
+
+  // Archived follows the stream's status, not its rows: an approved stream whose rows are all
+  // still pending is archived with an empty list.
+  const adminStream = await checkAdminStreamExists(c.env.ADMIN_DB, slug, parsed.videoId);
+  if (adminStream?.status !== 'approved') {
+    return c.json({ archived: false, text: '' });
+  }
+  const songs = await listPublicStreamSongs(c.env.ADMIN_DB, slug, parsed.videoId);
+  return c.json({ archived: true, text: formatSongsForPaste(songs), revision: await publicListRevision(slug, parsed.videoId, songs) });
 });
 
 // GET /vod/api/video-info — Public preview: returns video title + thumbnail only.
@@ -488,6 +501,12 @@ app.post('/vod/api/submit', async (c) => {
     }
   }
 
+  // A base_revision is checked against the public list below, after Turnstile; its shape is checked here, so a
+  // malformed one does not spend the token. Only a missing key means the form loaded no list.
+  if (body.base_revision !== undefined && !isListRevision(body.base_revision)) {
+    return c.json({ error: '無效的歌單版本' }, 400);
+  }
+
   // Verify Turnstile token
   if (!body.turnstile_token) {
     return c.json({ error: '請完成人機驗證' }, 400);
@@ -550,36 +569,49 @@ app.post('/vod/api/submit', async (c) => {
     }
   }
 
-  // Block if already in admin DB (approved/extracted/pending — not rejected/excluded)
-  const [approved, adminStream] = await Promise.all([
-    findApprovedVodByVideoId(c.env.DB, body.streamer_slug, parsed.videoId),
-    checkAdminStreamExists(c.env.ADMIN_DB, body.streamer_slug, parsed.videoId),
-  ]);
-
-  if (adminStream && adminStream.status !== 'rejected' && adminStream.status !== 'excluded') {
-    return c.json(
-      {
-        error: 'duplicate',
-        inAdmin: true,
-        adminStatus: adminStream.status,
-      },
-      409,
-    );
+  // A video that already has an approved stream is archived, and a list that repeats its public
+  // list changes nothing. Any other stream status is pipeline state, which the answer must not show:
+  // it answers as for a video with no stream, so a contributor cannot tell the two apart.
+  // This runs before the YouTube lookups below so a refused list spends none of their quota.
+  // The public list (current) is the approved stream's, and empty for a stream that is not approved
+  // and for no stream. A base_revision is what /vod/api/current gave with the list the form loaded.
+  // When it no longer matches current's (publicListRevision), that list changed since, and the
+  // submission is refused with list_changed, ahead of no_changes and whatever its rows say: compared
+  // with a list the contributor never saw, a row they left untouched would read as their change and
+  // undo the curator's. The contributor reloads and corrects again. Without a base_revision the
+  // submission is compared as it always was. The empty list has one revision for a stream in the
+  // pipeline and for none, so they answer alike.
+  // What the paste text could not carry comes back as the archived row it was loaded from: its
+  // title and artist, and an end the form parsers filled in, a title-only or start-only paste's
+  // included, unless it would overlap a next row that moved or is new. A blank artist names none,
+  // so it keeps the archived row's.
+  // The submission keeps the list it was compared against, its base, for the correction review:
+  // current, which a matching base_revision proves is the list the form loaded. A stream that is not
+  // approved shows nothing, so its base is empty, and no stream at all gives none. Whether a
+  // base_revision confirmed the base is kept with it (base_verified): without one, the base is only the
+  // list as it stood at submit time, which says nothing about what the contributor saw.
+  // A submission for a video with a stream, of any status, is stored as a correction, as admin
+  // reviews it, and answered with the kind the public may see (publicVodKind): a correction only
+  // of an archived VOD. Only three stored facts tell a stream in the pipeline from none, the kind, the
+  // base and whether a revision confirmed it, and nothing public reads them directly: the answer is the
+  // same, no list query reads the base or its confirmation, and the kind is only read through
+  // publicVodKind.
+  const adminStream = await checkAdminStreamExists(c.env.ADMIN_DB, body.streamer_slug, parsed.videoId);
+  const archived = adminStream?.status === 'approved';
+  const current: PublicStreamSong[] = archived ? await listPublicStreamSongs(c.env.ADMIN_DB, body.streamer_slug, parsed.videoId) : [];
+  if (body.base_revision !== undefined && body.base_revision !== await publicListRevision(body.streamer_slug, parsed.videoId, current)) {
+    return c.json({ error: 'list_changed' }, 409);
   }
-
-  // An approved Nova submission blocks only while the video still has a stream in admin, in any status:
-  // approving another would not import it, since the import skips a video that has one. Once a curator
-  // deletes that stream (wrong data), the VOD takes a new submission, and approving it imports it again.
-  if (approved && adminStream) {
-    return c.json(
-      {
-        error: 'duplicate',
-        status: approved.status,
-        submittedAt: approved.submitted_at,
-      },
-      409,
-    );
+  let storedSongs = parsedSongs;
+  let base: PublicStreamSong[] | null = adminStream ? [] : null;
+  if (archived) {
+    storedSongs = restoreArchivedEnds(restoreBlankArtists(restoreArchivedIdentities(parsedSongs, current), current), current);
+    if (isSameAsPublicList(storedSongs, current)) {
+      return c.json({ error: 'no_changes' }, 422);
+    }
+    base = current;
   }
+  const kind: VodSubmissionKind = adminStream ? 'correction' : 'new';
 
   // Auto-fill missing title/date/thumbnail from YouTube
   let streamTitle = body.stream_title?.trim() ?? '';
@@ -597,6 +629,10 @@ app.post('/vod/api/submit', async (c) => {
   // Thumbnails are auto-filled from YouTube; a submitter-supplied one outside YouTube's CDNs is dropped.
   thumbnailUrl = sanitizeNovaUrl(thumbnailUrl, 'thumbnail') ?? '';
 
+  // A base_revision that got this far matched current's: a mismatch answered list_changed above. It confirms a
+  // base only where one is recorded, so a video with no stream stays unverified, whatever revision it sent.
+  const baseVerified = body.base_revision !== undefined && base !== null;
+
   const id = generateVodId();
   await insertVodSubmission(c.env.DB, id, {
     streamer_slug: body.streamer_slug,
@@ -606,10 +642,12 @@ app.post('/vod/api/submit', async (c) => {
     stream_date: streamDate,
     thumbnail_url: thumbnailUrl,
     submitter_note: body.submitter_note?.trim() ?? '',
-    kind: 'new',
-  }, parsedSongs);
+    kind,
+    base_songs: base,
+    baseVerified,
+  }, storedSongs);
 
-  return c.json({ id }, 201);
+  return c.json({ id, kind: publicVodKind(kind, adminStream?.status ?? null) }, 201);
 });
 
 // Edge cache for GET /status (Workers Cache API). Each render performs three
