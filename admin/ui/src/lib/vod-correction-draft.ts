@@ -75,6 +75,16 @@ const titleText = (title: string): string => title.trim();
 /** An artist as it is compared and sent: trimmed, and 'Unknown' when nothing is left, as the catalog stores a blank one. */
 const artistText = (originalArtist: string): string => originalArtist.trim() || UNKNOWN_ARTIST;
 
+type SongText = { title: string; originalArtist: string };
+
+/**
+ * Whether two rows name the same song as typed (`titleText`, `artistText`), which a rename compares: unlike the
+ * matcher's `normalizeForMatching`, a difference of only the case or the character width counts.
+ */
+export function sameSongText(left: SongText, right: SongText): boolean {
+  return titleText(left.title) === titleText(right.title) && artistText(left.originalArtist) === artistText(right.originalArtist);
+}
+
 const present = <T>(value: T | null): T[] => (value === null ? [] : [value]);
 
 /**
