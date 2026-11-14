@@ -180,14 +180,14 @@
       "streamsCount": 2
     },
     "lanyue": {
-      "exportRevision": 16,
-      "lastSyncedAt": "2026-11-12T04:01:13.371Z",
-      "maxSongUpdatedAt": "2026-11-11 04:11:48",
-      "maxPerfUpdatedAt": "2026-11-11 04:11:48",
-      "maxStreamUpdatedAt": "2026-11-11 04:11:48",
-      "songsCount": 7,
-      "performancesCount": 7,
-      "streamsCount": 2
+      "exportRevision": 53,
+      "lastSyncedAt": "2026-11-14T04:00:53.446Z",
+      "maxSongUpdatedAt": "2026-11-13 15:49:12",
+      "maxPerfUpdatedAt": "2026-11-13 15:49:12",
+      "maxStreamUpdatedAt": "2026-11-13 15:49:12",
+      "songsCount": 10,
+      "performancesCount": 10,
+      "streamsCount": 1
     },
     "laphria": {
       "exportRevision": 10,
