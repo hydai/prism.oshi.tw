@@ -51,6 +51,7 @@ const ROUTED_PATHS = [
   '/harmonizer',
   '/nova',
   '/nova/vods',
+  '/nova/vods/:id/review',
   '/crystal',
   '/vod-export',
   '/vod-export/repair/:entity/:rowId',
@@ -79,6 +80,7 @@ const CURATOR_ONLY_PATHS = [
   '/harmonizer',
   '/nova',
   '/nova/vods',
+  '/nova/vods/:id/review',
   '/crystal',
   '/vod-export',
   '/vod-export/repair/:entity/:rowId',
@@ -104,6 +106,8 @@ const CURATOR_ROUTE_PROBES = [
   { url: '/nova', marker: 'Fetch All Channel Info' },
   // The id of its status filter group's label, which nova-vods-live pins: "Nova VODs" is also what its nav entry says.
   { url: '/nova/vods', marker: 'nova-vod-status-filter-label' },
+  // Its title, 修正審核 (the list's link to it reads 審核修正): the page is still loading the review when it renders.
+  { url: '/nova/vods/vod-1/review', marker: '修正審核' },
   // The id of its status filter group, which crystal-tickets-ui pins.
   { url: '/crystal', marker: 'crystal-ticket-status-filter-label' },
   { url: '/vod-export', marker: 'Publication workflow' },

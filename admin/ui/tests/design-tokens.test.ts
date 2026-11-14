@@ -258,8 +258,8 @@ type Surface = { colour: Rgb; label: string };
  * The stacks `--fg-muted` and `--fg-subtle` text sits on, each laid over the canvas: a chip on the
  * bare canvas; the sidebar, page header, cards and popovers; a field, chip or key cap on each; a
  * selected row or option, and a chip or inline edit in a selected row; a chip in a card's expanded
- * edit row; the sticky table head; the active option of a list popover; and a dialog over its
- * scrim, with a field in it.
+ * edit row; a selected or active option of a list inline in a card's field; the sticky table head;
+ * the active option of a list popover; and a dialog over its scrim, with a field in it.
  */
 const TEXT_STACKS: Stack[] = [
   { label: 'a chip or field', layers: ['field'] },
@@ -275,6 +275,9 @@ const TEXT_STACKS: Stack[] = [
   { label: 'a selected option of a popover', layers: ['glass-pop', 'selected-bg'] },
   { label: 'a chip or inline edit in a selected row', layers: ['glass-card', 'selected-bg', 'field'] },
   { label: "a chip in a card's expanded edit row", layers: ['glass-card', 'field', 'field'] },
+  // A list inline in a field on a card (the correction review's song picker, in a row's decision panel).
+  { label: "a selected option of a list in a card's field", layers: ['glass-card', 'field', 'selected-bg'] },
+  { label: "the active option of a list in a card's field", layers: ['glass-card', 'field', 'tone-neutral-bg'] },
   { label: "a card's sticky table head", layers: ['glass-card', 'thead-bg'] },
   { label: 'the active option of a list popover', layers: ['glass-pop', 'tone-neutral-bg'] },
   { label: 'a dialog over its scrim', layers: ['scrim', 'glass-pop'] },
@@ -343,12 +346,14 @@ const ACCENT_USERS = [
   'components/ui/button-classes.ts',
   'components/ui/focus-classes.ts',
   'components/ui/toast.tsx',
+  'components/vod-correction/review-rows.ts',
   'components/vod-export/CurrentPublicationPanel.tsx',
   'components/vod-export/FindingsPanel.tsx',
   'components/workbench/StampConsole.tsx',
   'pages/CrystalTickets.tsx',
   'pages/Dashboard.tsx',
   'pages/NovaSubmissions.tsx',
+  'pages/NovaVodReview.tsx',
   'pages/NovaVodSubmissions.tsx',
   'pages/SongDetail.tsx',
   'pages/StreamDetail.tsx',
