@@ -362,6 +362,19 @@ export interface NovaVodSubmission {
   kind: NovaVodKind;
 }
 
+/**
+ * A row of `GET /api/nova/vods`: the submission plus the admin stream its (streamer, video) already
+ * has, of any status. A row with a target stream is reviewed as a correction of that stream.
+ */
+export interface NovaVodListItem extends NovaVodSubmission {
+  target_stream: { id: string; status: Status } | null;
+  /**
+   * An apply of this pending submission reached the catalog and was never announced (502 `appliedToCatalog`): its
+   * changes are in, and only the approval that recovers that apply may follow. False for any other status.
+   */
+  open_apply: boolean;
+}
+
 export interface NovaVodSong {
   id: string;
   vod_submission_id: string;

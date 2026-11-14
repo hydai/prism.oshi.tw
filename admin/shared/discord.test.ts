@@ -6,6 +6,8 @@ import {
   newStreamEmbed,
   subscriberDigestEmbed,
   postDiscord,
+  vodCorrectionAppliedEmbed,
+  vodCorrectionRejectedEmbed,
 } from './discord';
 
 declare const process: { exitCode?: number };
@@ -43,16 +45,131 @@ check(subRejected?.fields?.[0]?.value === '頻道不符收錄範圍', 'rejected 
 const subRejectedNoNote = feedbackEmbedForSubmission('pending', 'rejected', { display_name: 'X', reviewer_note: '' });
 check(subRejectedNoNote?.fields?.[0]?.value === '（未填理由）', 'rejected submission embed falls back when no reason given');
 
-// feedbackEmbedForVod
-const vodApproved = feedbackEmbedForVod('pending', 'approved', { stream_title: '新年歌枠', streamer_slug: 'earendel', reviewer_note: '' });
+// feedbackEmbedForVod, for the usual new submission: its video has no stream yet.
+const vodApproved = feedbackEmbedForVod('pending', 'approved', { stream_title: '新年歌枠', streamer_slug: 'earendel', reviewer_note: '', kind: 'new' }, null);
 check(vodApproved?.color === COLOR.GREEN, 'approved VOD embed is green');
 check(vodApproved?.description?.includes('新年歌枠') === true, 'approved VOD embed names the stream');
 
-const vodRejected = feedbackEmbedForVod('pending', 'rejected', { stream_title: 'T', streamer_slug: 'earendel', reviewer_note: '時間軸重複' });
+const vodRejected = feedbackEmbedForVod('pending', 'rejected', { stream_title: 'T', streamer_slug: 'earendel', reviewer_note: '時間軸重複', kind: 'new' }, null);
 check(vodRejected?.fields?.[0]?.value === '時間軸重複', 'rejected VOD embed shows the reason');
 check(
-  feedbackEmbedForVod('approved', 'approved', { stream_title: 'T', streamer_slug: 's', reviewer_note: '' }) === null,
+  feedbackEmbedForVod('approved', 'approved', { stream_title: 'T', streamer_slug: 's', reviewer_note: '', kind: 'new' }, null) === null,
   'no VOD embed when status unchanged',
+);
+
+// feedbackEmbedForVod for a correction of an archived VOD (its stream approved): its own copy, and on approval only
+// the summary of what changed — the curator's free-text note is never posted, as for any approval.
+const correctionApplied = feedbackEmbedForVod(
+  'pending',
+  'approved',
+  { stream_title: '新年歌枠', streamer_slug: 'earendel', reviewer_note: 'secret', kind: 'correction' },
+  'approved',
+  'S',
+);
+check(correctionApplied?.title === '✅ VOD 修正已套用', 'applied correction embed has its own title');
+check(
+  correctionApplied?.description === '「新年歌枠」（earendel）的修正已套用，網站稍後更新。',
+  'applied correction embed says the site updates later',
+);
+check(correctionApplied?.color === COLOR.GREEN, 'applied correction embed is green');
+check(
+  JSON.stringify(correctionApplied?.fields) === JSON.stringify([{ name: '變更', value: 'S' }]),
+  'applied correction embed carries the summary as its only field',
+);
+check(!JSON.stringify(correctionApplied).includes('secret'), 'applied correction embed never posts the reviewer note');
+
+const correctionRejected = feedbackEmbedForVod(
+  'pending',
+  'rejected',
+  { stream_title: 'T', streamer_slug: 's', reviewer_note: 'R', kind: 'correction' },
+  'approved',
+);
+check(correctionRejected?.title === '❌ VOD 修正未採用', 'rejected correction embed has its own title');
+check(correctionRejected?.description === '「T」（s）的修正未採用。', 'rejected correction embed names the stream');
+check(correctionRejected?.color === COLOR.RED, 'rejected correction embed is red');
+check(
+  JSON.stringify(correctionRejected?.fields) === JSON.stringify([{ name: '理由', value: 'R' }]),
+  'rejected correction embed shows the reason',
+);
+const correctionRejectedNoNote = feedbackEmbedForVod(
+  'pending',
+  'rejected',
+  { stream_title: 'T', streamer_slug: 's', reviewer_note: '', kind: 'correction' },
+  'approved',
+);
+check(correctionRejectedNoNote?.fields?.[0]?.value === '（未填理由）', 'rejected correction embed falls back when no reason given');
+
+// A correction approved without a summary: Discord refuses an empty field value, so the embed leaves the field out.
+const correctionNoSummary = feedbackEmbedForVod(
+  'pending',
+  'approved',
+  { stream_title: 'T', streamer_slug: 's', reviewer_note: '', kind: 'correction' },
+  'approved',
+);
+check(correctionNoSummary?.title === '✅ VOD 修正已套用', 'a correction approved without a summary still reads as applied');
+check(correctionNoSummary !== null && !('fields' in correctionNoSummary), 'no summary means no 變更 field');
+check(
+  feedbackEmbedForVod('pending', 'pending', { stream_title: 'T', streamer_slug: 's', reviewer_note: '', kind: 'correction' }, 'approved', 'S') === null
+    && feedbackEmbedForVod('approved', 'pending', { stream_title: 'T', streamer_slug: 's', reviewer_note: '', kind: 'correction' }, 'approved', 'S') === null,
+  'no correction embed when status unchanged or reverted to pending',
+);
+
+// A 'new' submission keeps today's embeds, even when an apply passes a summary and its stream is approved.
+const newWithSummary = feedbackEmbedForVod(
+  'pending',
+  'approved',
+  { stream_title: '新年歌枠', streamer_slug: 'earendel', reviewer_note: 'secret', kind: 'new' },
+  'approved',
+  'S',
+);
+check(newWithSummary?.title === '✅ VOD 投稿已收錄', "a 'new' VOD approval keeps today's title");
+check(
+  JSON.stringify(newWithSummary) === JSON.stringify(vodApproved),
+  "a 'new' VOD approval with a summary is today's embed exactly (no fields, no note)",
+);
+check(
+  feedbackEmbedForVod('pending', 'rejected', { stream_title: 'T', streamer_slug: 'earendel', reviewer_note: '時間軸重複', kind: 'new' }, 'approved')?.title
+    === '❌ VOD 投稿未通過',
+  "a 'new' VOD rejection keeps today's title",
+);
+
+// The leak check (finding #8). Nova stores a submission as a correction whenever its video had a stream, of any
+// status, and only an approved stream is public. Until the stream is approved, or once it is gone, a correction's
+// embeds are exactly those of a submission for a video admin never had: the same title, wording and fields, so an
+// apply's summary is not posted either.
+const unknownVideo = { stream_title: '歌枠', streamer_slug: 'earendel', reviewer_note: '時間軸錯誤', kind: 'new' as const };
+const storedCorrection = { ...unknownVideo, kind: 'correction' as const };
+const transitions = [['pending', 'approved'], ['pending', 'rejected'], ['approved', 'rejected'], ['rejected', 'approved']] as const;
+for (const streamStatus of ['pending', 'extracted', 'rejected', 'excluded', null] as const) {
+  for (const [oldStatus, newStatus] of transitions) {
+    const asUnknown = feedbackEmbedForVod(oldStatus, newStatus, unknownVideo, null, '套用 1 項（時間 1）');
+    const asCorrection = feedbackEmbedForVod(oldStatus, newStatus, storedCorrection, streamStatus, '套用 1 項（時間 1）');
+    check(
+      asUnknown !== null && JSON.stringify(asCorrection) === JSON.stringify(asUnknown),
+      `a correction whose stream is ${streamStatus ?? 'gone'}, ${oldStatus} → ${newStatus}, is announced as a new VOD`,
+    );
+  }
+}
+check(
+  feedbackEmbedForVod('pending', 'approved', storedCorrection, 'pending', 'S')?.title === '✅ VOD 投稿已收錄'
+    && feedbackEmbedForVod('pending', 'rejected', storedCorrection, 'pending')?.title === '❌ VOD 投稿未通過',
+  "a pipeline stream's correction reads 投稿, never 修正",
+);
+check(
+  feedbackEmbedForVod('pending', 'approved', storedCorrection, 'approved', 'S')?.title === '✅ VOD 修正已套用'
+    && feedbackEmbedForVod('pending', 'rejected', storedCorrection, 'approved')?.title === '❌ VOD 修正未採用',
+  'the same correction reads 修正 once its stream is approved',
+);
+
+// The builders themselves, as the worker can call them directly.
+check(
+  JSON.stringify(vodCorrectionAppliedEmbed({ stream_title: 'T', streamer_slug: 's' }, 'x'.repeat(2000)).fields?.[0]?.value.length)
+    === '1024',
+  'a long summary is truncated to the field limit',
+);
+check(
+  vodCorrectionRejectedEmbed({ stream_title: 'T', streamer_slug: 's', reviewer_note: 'R' }).fields?.[0]?.name === '理由',
+  'vodCorrectionRejectedEmbed names its field 理由',
 );
 
 // newStreamerEmbed

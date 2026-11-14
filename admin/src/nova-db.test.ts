@@ -7,11 +7,11 @@ import {
   getSubmissionForUpdate,
   getSubmissionStatus,
   getVodById,
-  getVodStatus,
   listApprovedSubmissionsWithChannel,
   listSubmissions,
   listVodSongs,
   listVods,
+  parseVodBase,
   submissionExists,
   updateSubmissionFields,
   updateSubmissionStatus,
@@ -346,16 +346,23 @@ async function testUpdateSubmissionSubscriberInfoSuccessAndConflict(): Promise<v
 
 // --- VOD submissions ---
 
+// Every column of a VOD submission but base_songs and base_verified, which no list query may select (NULL against
+// '[]' tells a stream in the pipeline from none, and the confirmation of a base tells it too).
+const VOD_LIST_SELECT = 'SELECT id, streamer_slug, video_id, video_url, stream_title, stream_date, thumbnail_url, '
+  + 'submitter_note, status, submitted_at, reviewed_at, reviewer_note, kind FROM vod_submissions';
+
 async function testListVodsFilters(): Promise<void> {
   const none = new FakeD1Database();
   await listVods(asDb(none), {});
-  assertEqual(none.allCalls[0]!.sql, 'SELECT * FROM vod_submissions ORDER BY submitted_at DESC', 'no filters means no WHERE');
+  assertEqual(none.allCalls[0]!.sql, `${VOD_LIST_SELECT} ORDER BY submitted_at DESC`, 'no filters means no WHERE');
+  assert(!none.allCalls[0]!.sql.includes('base_songs') && !none.allCalls[0]!.sql.includes('*'), 'the list names its columns, base_songs not among them');
+  assert(!none.allCalls[0]!.sql.includes('base_verified'), 'nor base_verified');
 
   const both = new FakeD1Database();
   await listVods(asDb(both), { status: 'pending', streamer: 'alice' });
   assertEqual(
     both.allCalls[0]!.sql,
-    'SELECT * FROM vod_submissions WHERE status = ? AND streamer_slug = ? ORDER BY submitted_at DESC',
+    `${VOD_LIST_SELECT} WHERE status = ? AND streamer_slug = ? ORDER BY submitted_at DESC`,
     'status + streamer compose one WHERE with AND',
   );
   assertEqual(both.allCalls[0]!.params.join(','), 'pending,alice', 'binds in clause order');
@@ -363,17 +370,39 @@ async function testListVodsFilters(): Promise<void> {
 
 async function testGetVodByIdRoundTrips(): Promise<void> {
   const found = new FakeD1Database();
-  found.firstResponses.push(['SELECT * FROM vod_submissions WHERE id = ?', { id: 'vod-1' }]);
-  assertEqual((await getVodById(asDb(found), 'vod-1') as { id: string } | null)?.id, 'vod-1', 'full row returned');
+  found.firstResponses.push(['SELECT * FROM vod_submissions WHERE id = ?', { id: 'vod-1', base_songs: '[]', base_verified: 1 }]);
+  const vod = await getVodById(asDb(found), 'vod-1');
+  assertEqual(vod?.id, 'vod-1', 'full row returned');
+  assertEqual(vod?.base_songs, '[]', 'its base with it, for the correction review');
+  assertEqual(vod?.base_verified, 1, 'and whether a revision confirmed that base');
 
   const missing = new FakeD1Database();
   assertEqual(await getVodById(asDb(missing), 'vod-missing'), null, 'missing id returns null');
 }
 
-async function testGetVodStatusProjection(): Promise<void> {
-  const fake = new FakeD1Database();
-  await getVodStatus(asDb(fake), 'vod-1');
-  assertEqual(fake.firstCalls[0]!.sql, 'SELECT id, status FROM vod_submissions WHERE id = ?', 'narrow status projection');
+function testParseVodBase(): void {
+  const stored = JSON.stringify([
+    { performance_id: 'p1', song_title: 'Song A', original_artist: 'Artist', start_timestamp: 100, end_timestamp: 200 },
+    { performance_id: 'p2', song_title: 'Song B', original_artist: '', start_timestamp: 300, end_timestamp: null },
+  ]);
+  assertEqual(JSON.stringify(parseVodBase(stored)), JSON.stringify([
+    { performanceId: 'p1', title: 'Song A', originalArtist: 'Artist', timestamp: 100, endTimestamp: 200 },
+    { performanceId: 'p2', title: 'Song B', originalArtist: '', timestamp: 300, endTimestamp: null },
+  ]), 'each stored row, in its order, in the review\'s names');
+  assertEqual(JSON.stringify(parseVodBase('[]')), '[]', 'a stream that showed nothing');
+  assertEqual(parseVodBase(null), null, 'no base recorded');
+  const row = { performance_id: 'p1', song_title: 'Song A', original_artist: 'Artist', start_timestamp: 100, end_timestamp: 200 };
+  const malformed: Array<[string, string]> = [
+    ['not JSON', '[{'],
+    ['not a list', JSON.stringify({ rows: [row] })],
+    ['a row that is not an object', JSON.stringify([row, 'p2'])],
+    ['an id that is not text', JSON.stringify([{ ...row, performance_id: 1 }])],
+    ['a title missing', JSON.stringify([{ ...row, song_title: undefined }])],
+    ['a start that is not a number', JSON.stringify([{ ...row, start_timestamp: '100' }])],
+    ['an end that is not a number', JSON.stringify([{ ...row, end_timestamp: '200' }])],
+    ['one performance twice', JSON.stringify([row, { ...row, start_timestamp: 300 }])],
+  ];
+  for (const [what, json] of malformed) assertEqual(parseVodBase(json), null, `${what} reads as no base`);
 }
 
 async function testVodExists(): Promise<void> {
@@ -408,6 +437,28 @@ async function testUpdateVodStatusPendingVsApproved(): Promise<void> {
   await updateVodStatus(asDb(pendingFake), 'vod-1', 'pending', 'looks good');
   assertEqual(pendingFake.runCalls[0]!.params[1], null, 'reviewed_at nulled when reverting to pending');
   assertEqual(pendingFake.runCalls[0]!.params[2], null, 'reviewer_note nulled when reverting to pending');
+}
+
+async function testUpdateVodStatusGuardedByTheStatusExpected(): Promise<void> {
+  // With a status expected, the write is a compare-and-set: it lands only on a row that still has that status, and
+  // says whether it did.
+  const still = new FakeD1Database();
+  assertEqual(await updateVodStatus(asDb(still), 'vod-1', 'approved', 'note', 'pending'), true, 'a row that still has it is written');
+  const call = still.runCalls[0]!;
+  assertEqual(call.sql, 'UPDATE vod_submissions SET status = ?, reviewed_at = ?, reviewer_note = ? WHERE id = ? AND status = ?', 'one more condition');
+  assertEqual(call.params.length, 5, 'and one more bind');
+  assertEqual(call.params[0], 'approved', 'the new status first');
+  assertEqual(call.params[2], 'note', 'the reviewer note');
+  assertEqual(call.params[3], 'vod-1', 'the id');
+  assertEqual(call.params[4], 'pending', 'then the status expected');
+
+  const moved = new FakeD1Database();
+  moved.runResponses.push(['AND status = ?', []]);
+  assertEqual(await updateVodStatus(asDb(moved), 'vod-1', 'approved', 'note', 'pending'), false, 'a row that has another status now is not');
+
+  const plain = new FakeD1Database();
+  assertEqual(await updateVodStatus(asDb(plain), 'vod-1', 'rejected', 'n'), true, 'without one, the write says it landed too');
+  assertEqual(plain.runCalls[0]!.params.length, 4, 'and binds no status expected');
 }
 
 async function testUpdateVodStatusRejectsUnknownStatus(): Promise<void> {
@@ -468,11 +519,12 @@ async function main(): Promise<void> {
 
   await testListVodsFilters();
   await testGetVodByIdRoundTrips();
-  await testGetVodStatusProjection();
+  testParseVodBase();
   await testVodExists();
   await testDeleteVodIssuesDelete();
   await testListVodSongsOrdersAscending();
   await testUpdateVodStatusPendingVsApproved();
+  await testUpdateVodStatusGuardedByTheStatusExpected();
   await testUpdateVodStatusRejectsUnknownStatus();
   await testUpdateVodFieldsBuildsDynamicSetAndIgnoresUnknownKeys();
   await testUpdateVodFieldsNoOpWhenEmpty();

@@ -11,6 +11,7 @@ import {
 } from '../shared/types';
 import type { NovaStatus, NovaSubmission, NovaVodSubmission, NovaVodSong } from '../shared/types';
 import type { NovaEditableField, NovaVodEditableField } from '../shared/types';
+import type { CorrectionBaseRow } from '../shared/vod-correction';
 import type { SubscriberRefreshRow } from './subscriber-refresh';
 
 // The PUT /:id allow-lists live in shared/types.ts, next to the row types, so
@@ -240,29 +241,89 @@ export async function listApprovedSubmissionsWithChannel(db: D1Database): Promis
 
 // --- VOD submissions ---
 
+/**
+ * A VOD submission as Nova stores it, with its base (migration 0015): the public list it was compared against, as
+ * JSON, '[]' when the stream showed nothing, NULL when there was none; and whether a base_revision confirmed that
+ * list (base_verified, 1 or 0). Only the correction review reads them.
+ */
+export interface StoredVodSubmission extends NovaVodSubmission {
+  base_songs: string | null;
+  base_verified: number;
+}
+
+// Every column of a VOD submission but base_songs and base_verified: NULL against '[]' tells a stream in the pipeline
+// from none, and so does the confirmation of a base, so no list query selects either. A column missing here is
+// missing from each listed row's type, which the list route refuses.
+const VOD_LIST_COLUMNS = [
+  'id', 'streamer_slug', 'video_id', 'video_url', 'stream_title', 'stream_date', 'thumbnail_url', 'submitter_note',
+  'status', 'submitted_at', 'reviewed_at', 'reviewer_note', 'kind',
+] as const satisfies readonly (keyof NovaVodSubmission)[];
+
+type ListedVod = Pick<NovaVodSubmission, (typeof VOD_LIST_COLUMNS)[number]>;
+
 export async function listVods(
   db: D1Database,
   filter: { status?: string; streamer?: string },
-): Promise<NovaVodSubmission[]> {
-  const { sql, binds } = buildStatusFilterQuery('SELECT * FROM vod_submissions', 'submitted_at DESC', [
+): Promise<ListedVod[]> {
+  const { sql, binds } = buildStatusFilterQuery(`SELECT ${VOD_LIST_COLUMNS.join(', ')} FROM vod_submissions`, 'submitted_at DESC', [
     filter.status ? { column: 'status = ?', binds: [filter.status] } : null,
     filter.streamer ? { column: 'streamer_slug = ?', binds: [filter.streamer] } : null,
   ]);
-  const result = await db.prepare(sql).bind(...binds).all<NovaVodSubmission>();
+  const result = await db.prepare(sql).bind(...binds).all<ListedVod>();
   return result.results;
 }
 
-export async function getVodById(db: D1Database, id: string): Promise<NovaVodSubmission | null> {
-  return db.prepare('SELECT * FROM vod_submissions WHERE id = ?').bind(id).first<NovaVodSubmission>();
+/** One submission, its base and the confirmation of it included (StoredVodSubmission): the correction review is what reads those. */
+export async function getVodById(db: D1Database, id: string): Promise<StoredVodSubmission | null> {
+  return db.prepare('SELECT * FROM vod_submissions WHERE id = ?').bind(id).first<StoredVodSubmission>();
 }
 
-export interface NovaVodStatusRow {
-  id: string;
-  status: string;
+const isText = (value: unknown): value is string => typeof value === 'string';
+const isSeconds = (value: unknown): value is number => typeof value === 'number' && Number.isFinite(value);
+
+/**
+ * A submission's base_songs as the correction review reads it: each row Nova recorded, in its order, by the review's
+ * names. Null when Nova recorded none, and for a value that does not read as such a list: JSON that is not a list,
+ * a row missing a field or holding one of the wrong type, or a performance listed twice.
+ */
+export function parseVodBase(json: string | null): CorrectionBaseRow[] | null {
+  if (json === null) return null;
+  let stored: unknown;
+  try {
+    stored = JSON.parse(json);
+  } catch {
+    return null;
+  }
+  if (!Array.isArray(stored)) return null;
+  const rows: CorrectionBaseRow[] = [];
+  for (const item of stored as unknown[]) {
+    if (typeof item !== 'object' || item === null) return null;
+    const row = item as Record<string, unknown>;
+    const { performance_id: performanceId, song_title: title, original_artist: originalArtist } = row;
+    const { start_timestamp: timestamp, end_timestamp: endTimestamp } = row;
+    if (!isText(performanceId) || !isText(title) || !isText(originalArtist) || !isSeconds(timestamp)) return null;
+    if (endTimestamp !== null && !isSeconds(endTimestamp)) return null;
+    rows.push({ performanceId, title, originalArtist, timestamp, endTimestamp });
+  }
+  if (new Set(rows.map((row) => row.performanceId)).size !== rows.length) return null;
+  return rows;
 }
 
-export async function getVodStatus(db: D1Database, id: string): Promise<NovaVodStatusRow | null> {
-  return db.prepare('SELECT id, status FROM vod_submissions WHERE id = ?').bind(id).first<NovaVodStatusRow>();
+/** How many other submissions for this (streamer, video) still wait for review: the correction review's 「這場還有 N 份待審修正」. */
+export async function countOtherPendingVods(
+  db: D1Database,
+  streamerSlug: string,
+  videoId: string,
+  excludeId: string,
+): Promise<number> {
+  const row = await db
+    .prepare(`
+      SELECT COUNT(*) AS n FROM vod_submissions
+      WHERE streamer_slug = ? AND video_id = ? AND status = 'pending' AND id != ?
+    `)
+    .bind(streamerSlug, videoId, excludeId)
+    .first<{ n: number }>();
+  return row?.n ?? 0;
 }
 
 export async function vodExists(db: D1Database, id: string): Promise<boolean> {
@@ -286,19 +347,26 @@ export async function listVodSongs(db: D1Database, vodSubmissionId: string): Pro
   return result.results;
 }
 
+/**
+ * The status write; resolves whether it wrote the row. With `expectedStatus` it is a compare-and-set: it writes only
+ * a row that still has that status, so a write decided on an older read cannot overwrite a review made since.
+ */
 export async function updateVodStatus(
   db: D1Database,
   id: string,
   status: NovaStatus,
   reviewerNote: string | undefined,
-): Promise<void> {
+  expectedStatus?: NovaStatus,
+): Promise<boolean> {
   assertValidNovaStatus(status);
   const reviewedAt = status === 'pending' ? null : new Date().toISOString();
   const note = status === 'pending' ? null : (reviewerNote ?? '');
-  await db
-    .prepare('UPDATE vod_submissions SET status = ?, reviewed_at = ?, reviewer_note = ? WHERE id = ?')
-    .bind(status, reviewedAt, note, id)
-    .run();
+  const sql = 'UPDATE vod_submissions SET status = ?, reviewed_at = ?, reviewer_note = ? WHERE id = ?';
+  const statement = expectedStatus === undefined
+    ? db.prepare(sql).bind(status, reviewedAt, note, id)
+    : db.prepare(`${sql} AND status = ?`).bind(status, reviewedAt, note, id, expectedStatus);
+  const result = await statement.run();
+  return result.meta.changes > 0;
 }
 
 /** PUT /:id's dynamic UPDATE. Same "false means nothing to set" contract as updateSubmissionFields. */
