@@ -149,3 +149,13 @@ export interface AdminStreamSummary {
   created_at: string;
   song_count: number;
 }
+
+/** One row of a stream's public song list (stream, performance and song all approved). */
+export interface PublicStreamSong {
+  /** The admin performance the row is. A submission's base records it; the paste text leaves it out. */
+  performance_id: string;
+  song_title: string;
+  original_artist: string;
+  start_timestamp: number;
+  end_timestamp: number | null;
+}
