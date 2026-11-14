@@ -1,6 +1,6 @@
 import { act, useEffect, useState, type ReactNode } from 'react';
 import { MemoryRouter } from 'react-router-dom';
-import type { AuthUser, CrystalTicket, NovaSubmission, NovaVodSubmission } from '../../shared/types';
+import type { AuthUser, CrystalTicket, NovaSubmission, NovaVodListItem } from '../../shared/types';
 import { InboxCountsProvider, useInboxCounts, type InboxCounts } from '../src/components/shell/InboxCounts';
 import { ConfirmProvider } from '../src/components/ui/confirm';
 import { ToastProvider } from '../src/components/ui/toast';
@@ -47,7 +47,7 @@ function novaSubmission(overrides: Partial<NovaSubmission> = {}): NovaSubmission
   };
 }
 
-function novaVod(overrides: Partial<NovaVodSubmission> = {}): NovaVodSubmission {
+function novaVod(overrides: Partial<NovaVodListItem> = {}): NovaVodListItem {
   return {
     id: 'vod-1',
     streamer_slug: 'mizuki',
@@ -62,6 +62,7 @@ function novaVod(overrides: Partial<NovaVodSubmission> = {}): NovaVodSubmission 
     reviewed_at: null,
     reviewer_note: '',
     kind: 'new',
+    target_stream: null,
     ...overrides,
   };
 }

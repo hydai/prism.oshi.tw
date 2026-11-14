@@ -168,6 +168,7 @@ const renderVod = (drafts: RowDrafts) =>
           reviewed_at: null,
           reviewer_note: '',
           kind: 'new',
+          target_stream: null,
         }}
         isCurator
         expanded
@@ -178,6 +179,7 @@ const renderVod = (drafts: RowDrafts) =>
         onRetrySongs={() => undefined}
         drafts={drafts}
         onAction={async () => true}
+        onApproveWithoutApplying={async () => true}
         onDelete={() => undefined}
       />
     </table>,

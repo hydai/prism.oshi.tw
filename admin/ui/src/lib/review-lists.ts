@@ -60,7 +60,7 @@ export interface VodFilters extends RecentlyActedOn {
   streamer: string;
 }
 
-export function visibleVods(vods: NovaVodSubmission[], filters: VodFilters): NovaVodSubmission[] {
+export function visibleVods<T extends NovaVodSubmission>(vods: T[], filters: VodFilters): T[] {
   return vods.filter(
     (vod) => filters.justActed.has(vod.id)
       || (matchesFilter(vod.status, filters.status) && matchesFilter(vod.streamer_slug, filters.streamer)),

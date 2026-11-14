@@ -1,5 +1,5 @@
 import { renderToStaticMarkup } from 'react-dom/server';
-import type { NovaStatus, NovaVodSong, NovaVodSubmission } from '../../shared/types';
+import type { NovaStatus, NovaVodListItem, NovaVodSong } from '../../shared/types';
 import { createRowDrafts } from '../src/hooks/useRowDrafts';
 import { NO_ARBITRARY_HEX, NO_RAW_PALETTE } from './helpers/palette';
 
@@ -14,7 +14,7 @@ function assertNoRawColour(html: string, what: string): void {
   assert(!NO_ARBITRARY_HEX.test(html), `${what} uses no arbitrary hex colours`);
 }
 
-function makeVod(overrides: Partial<NovaVodSubmission> = {}): NovaVodSubmission {
+function makeVod(overrides: Partial<NovaVodListItem> = {}): NovaVodListItem {
   return {
     id: 'vod-test',
     streamer_slug: 'mizuki',
@@ -29,6 +29,7 @@ function makeVod(overrides: Partial<NovaVodSubmission> = {}): NovaVodSubmission 
     reviewed_at: null,
     reviewer_note: '',
     kind: 'new',
+    target_stream: null,
     ...overrides,
   };
 }
@@ -67,7 +68,7 @@ interface RenderOptions {
 
 async function main(): Promise<void> {
   const { VodRow } = await import('../src/pages/NovaVodSubmissions');
-  const render = (vod: NovaVodSubmission, opts: RenderOptions = {}) =>
+  const render = (vod: NovaVodListItem, opts: RenderOptions = {}) =>
     renderToStaticMarkup(
       <table>
         <VodRow
@@ -82,6 +83,7 @@ async function main(): Promise<void> {
           onRetrySongs={() => undefined}
           drafts={createRowDrafts()}
           onAction={async () => true}
+          onApproveWithoutApplying={async () => true}
           onDelete={() => undefined}
         />
       </table>,
