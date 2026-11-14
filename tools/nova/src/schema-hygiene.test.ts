@@ -36,4 +36,14 @@ assert(
   'schema.sql must not declare a UNIQUE index on vod_submissions(streamer_slug, video_id) (migration 0012 made it a plain index)',
 );
 
+assert(/kind TEXT NOT NULL DEFAULT 'new' CHECK\(kind IN \('new','correction'\)\)/.test(schema), 'schema.sql declares vod_submissions.kind');
+const migration0015 = readFileSync(resolve(here, '../migrations/0015_add_vod_submission_kind.sql'), 'utf8');
+assert(/ALTER TABLE vod_submissions ADD COLUMN kind TEXT NOT NULL DEFAULT 'new' CHECK\(kind IN \('new','correction'\)\)/.test(migration0015), 'migration 0015 adds vod_submissions.kind');
+// A submission's base: the public list it was compared against, NULL for a video with no admin stream.
+assert(/^\s*base_songs TEXT,\s*$/m.test(schema), 'schema.sql declares vod_submissions.base_songs as a nullable TEXT');
+assert(/^ALTER TABLE vod_submissions ADD COLUMN base_songs TEXT;$/m.test(migration0015), 'migration 0015 adds vod_submissions.base_songs');
+// Whether a base_revision confirmed that base: 0 unless it did, and the DEFAULT gives every row stored before the column.
+assert(/^\s*base_verified INTEGER NOT NULL DEFAULT 0\s*$/m.test(schema), 'schema.sql declares vod_submissions.base_verified as INTEGER NOT NULL DEFAULT 0');
+assert(/^ALTER TABLE vod_submissions ADD COLUMN base_verified INTEGER NOT NULL DEFAULT 0;$/m.test(migration0015), 'migration 0015 adds vod_submissions.base_verified');
+
 console.log('✓ schema.sql is DDL + state only; seed.sql holds the two demo streamers');

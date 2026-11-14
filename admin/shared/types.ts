@@ -344,6 +344,8 @@ export type NovaStatus = 'pending' | 'approved' | 'rejected';
 // read from this constant instead of hand-maintaining their own literal lists.
 export const NOVA_STATUSES = ['pending', 'approved', 'rejected'] as const satisfies readonly NovaStatus[];
 
+export type NovaVodKind = 'new' | 'correction';
+
 export interface NovaVodSubmission {
   id: string;
   streamer_slug: string;
@@ -357,6 +359,7 @@ export interface NovaVodSubmission {
   submitted_at: string;
   reviewed_at: string | null;
   reviewer_note: string;
+  kind: NovaVodKind;
 }
 
 export interface NovaVodSong {

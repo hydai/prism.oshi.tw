@@ -1,4 +1,4 @@
-import type { VodSubmissionRow, VodSubmissionSummary, ApprovedStreamer, AdminStreamSummary, AdminStreamStatus } from './types';
+import type { VodSubmissionRow, VodSubmissionSummary, VodSubmissionKind, ApprovedStreamer, AdminStreamSummary, AdminStreamStatus } from './types';
 
 /**
  * Generate a VOD submission ID: vod-XXXXXXXX (8 random hex chars).
@@ -42,7 +42,7 @@ export async function listAllVodSubmissions(db: D1Database): Promise<VodSubmissi
     .prepare(
       `SELECT
          v.id, v.streamer_slug, v.video_id, v.stream_title, v.stream_date,
-         v.status, v.submitted_at, v.reviewed_at, v.reviewer_note,
+         v.status, v.submitted_at, v.reviewed_at, v.reviewer_note, v.kind,
          COUNT(s.id) AS song_count
        FROM vod_submissions v
        LEFT JOIN vod_songs s ON s.vod_submission_id = v.id
@@ -115,6 +115,7 @@ export async function insertVodSubmission(
     stream_date: string;
     thumbnail_url: string;
     submitter_note: string;
+    kind: VodSubmissionKind;
   },
   songs: Array<{
     id: string;
@@ -130,10 +131,10 @@ export async function insertVodSubmission(
   stmts.push(
     db
       .prepare(
-        `INSERT INTO vod_submissions (id, streamer_slug, video_id, video_url, stream_title, stream_date, thumbnail_url, submitter_note)
-         VALUES (?, ?, ?, ?, ?, ?, ?, ?)`,
+        `INSERT INTO vod_submissions (id, streamer_slug, video_id, video_url, stream_title, stream_date, thumbnail_url, submitter_note, kind)
+         VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)`,
       )
-      .bind(id, data.streamer_slug, data.video_id, data.video_url, data.stream_title, data.stream_date, data.thumbnail_url, data.submitter_note),
+      .bind(id, data.streamer_slug, data.video_id, data.video_url, data.stream_title, data.stream_date, data.thumbnail_url, data.submitter_note, data.kind),
   );
 
   for (const song of songs) {

@@ -45,7 +45,12 @@ CREATE TABLE IF NOT EXISTS vod_submissions (
   status TEXT DEFAULT 'pending' CHECK(status IN ('pending','approved','rejected')),
   submitted_at TEXT DEFAULT (datetime('now')),
   reviewed_at TEXT,
-  reviewer_note TEXT DEFAULT ''
+  reviewer_note TEXT DEFAULT '',
+  kind TEXT NOT NULL DEFAULT 'new' CHECK(kind IN ('new','correction')),
+  -- The public list the submission was compared against (JSON), '[]' or NULL: see migrations/0015.
+  base_songs TEXT,
+  -- 1 when a base_revision confirmed that list as the one the contributor loaded, else 0: see migrations/0015.
+  base_verified INTEGER NOT NULL DEFAULT 0
 );
 
 -- Not unique: a video takes several submissions (migration 0012).
