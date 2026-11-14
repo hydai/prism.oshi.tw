@@ -1,0 +1,101 @@
+[
+  {
+    "name": "every row has its own end: none is derived, the last one included",
+    "rows": [
+      { "title": "Alpha", "artist": "Artist A", "start": 100, "end": 150 },
+      { "title": "Beta", "artist": "Artist B", "start": 200, "end": 260 },
+      { "title": "Gamma", "artist": "Artist C", "start": 300, "end": 420 }
+    ],
+    "derived": [false, false, false]
+  },
+  {
+    "name": "start-only rows as the parsers fill them: each end is the next row's start, and the last row has none",
+    "rows": [
+      { "title": "Alpha", "artist": "Artist A", "start": 100, "end": 200 },
+      { "title": "Beta", "artist": "Artist B", "start": 200, "end": 300 },
+      { "title": "Gamma", "artist": "Artist C", "start": 300, "end": null }
+    ],
+    "derived": [true, true, true]
+  },
+  {
+    "name": "a last row with a NULL end is derived",
+    "rows": [
+      { "title": "Alpha", "artist": "Artist A", "start": 100, "end": 150 },
+      { "title": "Beta", "artist": "Artist B", "start": 200, "end": null }
+    ],
+    "derived": [false, true]
+  },
+  {
+    "name": "a NULL end in the middle is derived too",
+    "rows": [
+      { "title": "Alpha", "artist": "Artist A", "start": 100, "end": null },
+      { "title": "Beta", "artist": "Artist B", "start": 200, "end": 260 },
+      { "title": "Gamma", "artist": "Artist C", "start": 300, "end": null }
+    ],
+    "derived": [true, false, true]
+  },
+  {
+    "name": "a contributor end shorter than the fill is the contributor's",
+    "rows": [
+      { "title": "Alpha", "artist": "Artist A", "start": 100, "end": 180 },
+      { "title": "Beta", "artist": "Artist B", "start": 200, "end": 300 },
+      { "title": "Gamma", "artist": "Artist C", "start": 300, "end": null }
+    ],
+    "derived": [false, true, true]
+  },
+  {
+    "name": "an end equal to a later row's start, but not the next row's, is the contributor's",
+    "rows": [
+      { "title": "Alpha", "artist": "Artist A", "start": 100, "end": 300 },
+      { "title": "Beta", "artist": "Artist B", "start": 200, "end": 250 },
+      { "title": "Gamma", "artist": "Artist C", "start": 300, "end": null }
+    ],
+    "derived": [false, false, true]
+  },
+  {
+    "name": "an out-of-order line: the next submitted row is the next line, not the row with the next start",
+    "rows": [
+      { "title": "Alpha", "artist": "Artist A", "start": 600, "end": 1200 },
+      { "title": "Beta", "artist": "Artist B", "start": 1200, "end": 1800 },
+      { "title": "Gamma", "artist": "Artist C", "start": 1800, "end": 900 },
+      { "title": "Delta", "artist": "Artist D", "start": 900, "end": null }
+    ],
+    "derived": [true, true, true, true]
+  },
+  {
+    "name": "a blank-title row is never stored, and the end the parsers filled from its start goes to the next kept row's start (Alpha is stored 100-300): the next submitted row is the next stored row (not sort_order + 1), and derived lists the stored rows only",
+    "rows": [
+      { "title": "Alpha", "artist": "Artist A", "start": 100, "end": 200 },
+      { "title": "   ", "artist": "Artist B", "start": 200, "end": 250 },
+      { "title": "Gamma", "artist": "Artist C", "start": 300, "end": null }
+    ],
+    "derived": [true, true]
+  },
+  {
+    "name": "a blank-title row that does not start where the row above ends leaves that end as it is: a typed end stays the contributor's",
+    "rows": [
+      { "title": "Alpha", "artist": "Artist A", "start": 100, "end": 230 },
+      { "title": "   ", "artist": "Artist B", "start": 200, "end": 250 },
+      { "title": "Gamma", "artist": "Artist C", "start": 300, "end": null }
+    ],
+    "derived": [false, true]
+  },
+  {
+    "name": "a blank-title row last: the end filled from its start has no kept row to take, so it is none (Alpha is stored 100-NULL)",
+    "rows": [
+      { "title": "Alpha", "artist": "Artist A", "start": 100, "end": 250 },
+      { "title": "   ", "artist": "Artist B", "start": 250, "end": null }
+    ],
+    "derived": [true]
+  },
+  {
+    "name": "only the blank-title row right below a kept row can have filled its end: an end that equals the start of the second one is the contributor's",
+    "rows": [
+      { "title": "Alpha", "artist": "Artist A", "start": 100, "end": 270 },
+      { "title": "   ", "artist": "Artist B", "start": 250, "end": 270 },
+      { "title": "   ", "artist": "Artist C", "start": 270, "end": 300 },
+      { "title": "Gamma", "artist": "Artist D", "start": 300, "end": null }
+    ],
+    "derived": [false, true]
+  }
+]

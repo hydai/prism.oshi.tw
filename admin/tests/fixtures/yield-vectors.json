@@ -1,0 +1,152 @@
+[
+  {
+    "name": "a boundary moved earlier keeps the end it was given: the next row moved, and the archived end passes its start",
+    "archived": [
+      { "title": "First", "artist": "A", "start": 100, "end": 200 },
+      { "title": "Second", "artist": "B", "start": 200, "end": 300 }
+    ],
+    "submitted": [
+      { "title": "First", "artist": "A", "start": 100, "end": 170 },
+      { "title": "Second", "artist": "B", "start": 170, "end": 300 }
+    ],
+    "ends": [170, 300]
+  },
+  {
+    "name": "a boundary moved later gives the archived end back, leaving a gap",
+    "archived": [
+      { "title": "First", "artist": "A", "start": 100, "end": 200 },
+      { "title": "Second", "artist": "B", "start": 200, "end": 300 }
+    ],
+    "submitted": [
+      { "title": "First", "artist": "A", "start": 100, "end": 230 },
+      { "title": "Second", "artist": "B", "start": 230, "end": 300 }
+    ],
+    "ends": [200, 300]
+  },
+  {
+    "name": "a start-only paste moving Second before First's archived end keeps the parser's end",
+    "archived": [
+      { "title": "First", "artist": "A", "start": 100, "end": 200 },
+      { "title": "Second", "artist": "B", "start": 300, "end": 400 }
+    ],
+    "submitted": [
+      { "title": "First", "artist": "A", "start": 100, "end": 150 },
+      { "title": "Second", "artist": "B", "start": 150, "end": null }
+    ],
+    "ends": [150, null]
+  },
+  {
+    "name": "a contiguous end typed alone reads as the fill: the archived end comes back",
+    "archived": [
+      { "title": "First", "artist": "A", "start": 100, "end": 150 },
+      { "title": "Second", "artist": "B", "start": 200, "end": 300 }
+    ],
+    "submitted": [
+      { "title": "First", "artist": "A", "start": 100, "end": 200 },
+      { "title": "Second", "artist": "B", "start": 200, "end": 300 }
+    ],
+    "ends": [150, 300]
+  },
+  {
+    "name": "an unchanged start-only paste of an overlapping archive: the next row starts where an archived row does, so the archived ends come back",
+    "archived": [
+      { "title": "First", "artist": "A", "start": 100, "end": 300 },
+      { "title": "Second", "artist": "B", "start": 200, "end": 400 }
+    ],
+    "submitted": [
+      { "title": "First", "artist": "A", "start": 100, "end": 200 },
+      { "title": "Second", "artist": "B", "start": 200, "end": null }
+    ],
+    "ends": [300, 400]
+  },
+  {
+    "name": "a next row renamed at its archived start is not moved: the archived end comes back",
+    "archived": [
+      { "title": "First", "artist": "A", "start": 100, "end": 300 },
+      { "title": "Snog B", "artist": "B", "start": 200, "end": 400 }
+    ],
+    "submitted": [
+      { "title": "First", "artist": "A", "start": 100, "end": 200 },
+      { "title": "Song B", "artist": "B", "start": 200, "end": null }
+    ],
+    "ends": [300, null]
+  },
+  {
+    "name": "a new row inserted into a gap keeps the fill before it, and the row after it takes back its end",
+    "archived": [
+      { "title": "First", "artist": "A", "start": 100, "end": 200 },
+      { "title": "Second", "artist": "B", "start": 300, "end": 400 }
+    ],
+    "submitted": [
+      { "title": "First", "artist": "A", "start": 100, "end": 180 },
+      { "title": "New", "artist": "N", "start": 180, "end": 300 },
+      { "title": "Second", "artist": "B", "start": 300, "end": null }
+    ],
+    "ends": [180, 300, 400]
+  },
+  {
+    "name": "a next row whose key two archived rows share with conflicting ends still matches; those rows themselves get no guess",
+    "archived": [
+      { "title": "First", "artist": "A", "start": 100, "end": 300 },
+      { "title": "Second", "artist": "B", "start": 200, "end": 400 },
+      { "title": "Second", "artist": "B", "start": 200, "end": 450 }
+    ],
+    "submitted": [
+      { "title": "First", "artist": "A", "start": 100, "end": null },
+      { "title": "Second", "artist": "B", "start": 200, "end": null },
+      { "title": "Second", "artist": "B", "start": 200, "end": null }
+    ],
+    "ends": [300, null, null]
+  },
+  {
+    "name": "nested: First's archived end spans New, two rows on; the yield reads only the next row (today's behaviour, recorded for the final review)",
+    "archived": [
+      { "title": "First", "artist": "A", "start": 100, "end": 500 },
+      { "title": "Second", "artist": "B", "start": 200, "end": 300 },
+      { "title": "Third", "artist": "C", "start": 600, "end": 700 }
+    ],
+    "submitted": [
+      { "title": "First", "artist": "A", "start": 100, "end": 200 },
+      { "title": "Second", "artist": "B", "start": 200, "end": 250 },
+      { "title": "New", "artist": "N", "start": 250, "end": 600 },
+      { "title": "Third", "artist": "C", "start": 600, "end": null }
+    ],
+    "ends": [500, 250, 600, 700]
+  },
+  {
+    "name": "no archived end overlaps nothing, so it comes back even before a moved row",
+    "archived": [
+      { "title": "First", "artist": "A", "start": 100, "end": null },
+      { "title": "Second", "artist": "B", "start": 300, "end": 400 }
+    ],
+    "submitted": [
+      { "title": "First", "artist": "A", "start": 100, "end": 150 },
+      { "title": "Second", "artist": "B", "start": 150, "end": null }
+    ],
+    "ends": [null, null]
+  },
+  {
+    "name": "an archived end exactly at a moved row's start comes back",
+    "archived": [
+      { "title": "First", "artist": "A", "start": 100, "end": 200 },
+      { "title": "Second", "artist": "B", "start": 300, "end": 400 }
+    ],
+    "submitted": [
+      { "title": "First", "artist": "A", "start": 100, "end": null },
+      { "title": "Second", "artist": "B", "start": 200, "end": null }
+    ],
+    "ends": [200, null]
+  },
+  {
+    "name": "an end short of the next row's start is not derived: the contributor's end stays",
+    "archived": [
+      { "title": "First", "artist": "A", "start": 100, "end": 200 },
+      { "title": "Second", "artist": "B", "start": 300, "end": 400 }
+    ],
+    "submitted": [
+      { "title": "First", "artist": "A", "start": 100, "end": 180 },
+      { "title": "Second", "artist": "B", "start": 300, "end": null }
+    ],
+    "ends": [180, 400]
+  }
+]
