@@ -6,11 +6,26 @@
  * the worker refuses, two rows with a request out at once, a failed load and an empty list. tests/nova-vod-row
  * renders one row with no providers at all, tests/inbox-counts pins the requests an action makes for the
  * sidebar's badge, and tests/row-drafts the notes that outlive a row.
+ *
+ * A VOD whose video already has a stream (the list says so: `target_stream`) is reviewed as a correction of it:
+ * Approve gives way to a link to the review page and to 「直接通過（不套用）」, which asks first and then approves
+ * with `without_applying`. The page lives in a router, for that link.
  */
 import { deepStrictEqual } from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
 import { act } from 'react';
-import type { AuthUser, NovaStatus, NovaVodSong, NovaVodSubmission } from '../../shared/types';
+import { MemoryRouter } from 'react-router-dom';
+import type {
+  AuthUser,
+  NovaStatus,
+  NovaVodKind,
+  NovaVodListItem,
+  NovaVodSong,
+  NovaVodSubmission,
+  Status,
+} from '../../shared/types';
+import type { CorrectionApplyBody, CorrectionApplyResult, NovaVodCorrectionView } from '../../shared/vod-correction';
+import { buttonClasses } from '../src/components/ui/button-classes';
 import { INSET_FOCUS } from '../src/components/ui/focus-classes';
 import { MICRO_LABEL } from '../src/components/ui/micro-label';
 import { TONE_BOX_CLASS } from '../src/components/ui/pill-core';
@@ -51,9 +66,16 @@ interface VodFields {
   note?: string;
   reviewerNote?: string;
   reviewedAt?: string | null;
+  /** A first submission unless it says it corrects one. */
+  kind?: NovaVodKind;
+  /** The stream the VOD's video already has, as the list reports it: none unless given. */
+  target?: { id: string; status: Status };
+  /** An apply of the VOD reached the catalog and was never announced, as the list reports it: none unless given. */
+  openApply?: boolean;
 }
 
-function vod(fields: VodFields): NovaVodSubmission {
+/** A row of the list: the submission, the stream its video already has and whether an apply of it is open. */
+function vod(fields: VodFields): NovaVodListItem {
   const videoId = `vid-${fields.id.slice(2)}`;
   return {
     id: fields.id,
@@ -68,8 +90,21 @@ function vod(fields: VodFields): NovaVodSubmission {
     submitted_at: fields.submittedAt,
     reviewed_at: fields.reviewedAt ?? null,
     reviewer_note: fields.reviewerNote ?? '',
-    kind: 'new',
+    kind: fields.kind ?? 'new',
+    target_stream: fields.target ?? null,
+    open_apply: fields.openApply ?? false,
   };
+}
+
+/**
+ * What the worker answers a status change with: the submission alone. Only the list says which stream a video has,
+ * and whether an apply of it is open.
+ */
+function submissionOf(row: NovaVodListItem): NovaVodSubmission {
+  const submission: Partial<NovaVodListItem> = { ...row };
+  delete submission.target_stream;
+  delete submission.open_apply;
+  return submission as NovaVodSubmission;
 }
 
 // Stored times are UTC ("YYYY-MM-DD HH:MM:SS"), as D1 writes them. The first is from this year, the rest are not.
@@ -116,6 +151,44 @@ const OLD = vod({
 });
 // As the worker lists them; the page groups them by streamer, newest submission first.
 const VODS = [KARAOKE, BIRTHDAY, LATE, MORNING, OLD];
+
+// Two VODs whose video already has a stream: one submitted as a correction of it, one a first submission that
+// the stream has since caught up with. The scenarios about them list them themselves, with Karaoke night (whose
+// video has no stream) among them: the default list stays as it was.
+const CORRECTION = vod({
+  id: 'v-fix',
+  slug: 'mizuki',
+  title: 'Anniversary songs',
+  status: 'pending',
+  submittedAt: `${THIS_YEAR}-03-05 09:30:00`,
+  kind: 'correction',
+  target: { id: 's-1', status: 'approved' },
+});
+const MAPPED = vod({
+  id: 'v-mapped',
+  slug: 'mizuki',
+  title: 'Late show',
+  status: 'pending',
+  submittedAt: `${THIS_YEAR}-03-03 09:30:00`,
+  target: { id: 's-2', status: 'pending' },
+});
+const WITH_STREAMS = [CORRECTION, MAPPED, KARAOKE];
+const WITH_STREAMS_REPLY = { data: WITH_STREAMS, total: WITH_STREAMS.length };
+// A correction whose apply reached the catalog while its submission was never marked reviewed (502 appliedToCatalog):
+// it is still pending, and the list knows an apply of it is open.
+const LANDED = vod({
+  id: 'v-landed',
+  slug: 'mizuki',
+  title: 'Landed fix',
+  status: 'pending',
+  submittedAt: `${THIS_YEAR}-03-06 09:30:00`,
+  kind: 'correction',
+  target: { id: 's-4', status: 'approved' },
+  openApply: true,
+});
+const WITH_LANDED_REPLY = { data: [LANDED, CORRECTION, KARAOKE], total: 3 };
+/** Every VOD the stub knows by id: the default list and the ones above. */
+const KNOWN_VODS = [...VODS, CORRECTION, MAPPED, LANDED];
 /** Pending first by streamer, as the default view shows them: mizuki's two, then aozora's one. */
 const PENDING_TITLES = 'Karaoke night|Birthday stream|Late night songs';
 
@@ -164,26 +237,32 @@ const defaultListReply = (): Reply => ok({ data: VODS, total: VODS.length });
 
 /** What the worker answers a detail request: the VOD with its songs (Karaoke night has two). */
 const defaultDetailReply = (_call: Call, id: string): Reply => {
-  const target = VODS.find((row) => row.id === id);
+  const target = KNOWN_VODS.find((row) => row.id === id);
   if (target === undefined) return failure(404, 'VOD not found');
-  return ok({ ...target, songs: id === 'v-karaoke' ? SONGS : [] });
+  return ok({ ...submissionOf(target), songs: id === 'v-karaoke' ? SONGS : [] });
 };
 
-/** What the worker answers a status change: the VOD, in the status that was asked for. */
+/** What the worker answers a status change: the submission, in the status that was asked for (and with no `target_stream`). */
 const defaultStatusReply = (call: Call, id: string): Reply => {
-  const target = VODS.find((row) => row.id === id);
+  const target = KNOWN_VODS.find((row) => row.id === id);
   if (target === undefined) return failure(404, 'VOD not found');
   const status = (call.body as { status: NovaStatus }).status;
-  return ok({ ...target, status, reviewed_at: status === 'pending' ? null : '2026-09-02T10:00:00.000Z' });
+  return ok({ ...submissionOf(target), status, reviewed_at: status === 'pending' ? null : '2026-09-02T10:00:00.000Z' });
 };
 
 const defaultDeleteReply = (): Reply => ok({ ok: true });
+
+/** The correction review, the apply and the song search are not the page's: only the scenario that calls the client sets them. */
+const notStubbed = (): Reply => failure(404, 'not stubbed');
 
 /** What each endpoint answers next; a scenario swaps them. A promise holds the answer until released. */
 let listReply: (call: Call) => Reply | Promise<Reply> = defaultListReply;
 let detailReply: (call: Call, id: string) => Reply | Promise<Reply> = defaultDetailReply;
 let statusReply: (call: Call, id: string) => Reply | Promise<Reply> = defaultStatusReply;
 let deleteReply: (call: Call, id: string) => Reply | Promise<Reply> = defaultDeleteReply;
+let correctionReply: (call: Call, id: string) => Reply | Promise<Reply> = notStubbed;
+let applyReply: (call: Call, id: string) => Reply | Promise<Reply> = notStubbed;
+let songSearchReply: (call: Call) => Reply | Promise<Reply> = notStubbed;
 
 function reset(): void {
   calls.length = 0;
@@ -191,6 +270,9 @@ function reset(): void {
   detailReply = defaultDetailReply;
   statusReply = defaultStatusReply;
   deleteReply = defaultDeleteReply;
+  correctionReply = notStubbed;
+  applyReply = notStubbed;
+  songSearchReply = notStubbed;
 }
 
 interface Held {
@@ -229,12 +311,17 @@ function installFetchStub(): void {
       };
       calls.push(call);
       const statusId = /^\/api\/nova\/vods\/([^/]+)\/status$/.exec(url.pathname)?.[1];
+      const correctionId = /^\/api\/nova\/vods\/([^/]+)\/correction$/.exec(url.pathname)?.[1];
+      const applyId = /^\/api\/nova\/vods\/([^/]+)\/apply$/.exec(url.pathname)?.[1];
       const oneId = /^\/api\/nova\/vods\/([^/]+)$/.exec(url.pathname)?.[1];
       let reply: Reply | Promise<Reply> | undefined;
       if (method === 'GET' && url.pathname === '/api/nova/vods') reply = listReply(call);
       else if (method === 'GET' && oneId !== undefined) reply = detailReply(call, decodeURIComponent(oneId));
       else if (method === 'PATCH' && statusId !== undefined) reply = statusReply(call, decodeURIComponent(statusId));
       else if (method === 'DELETE' && oneId !== undefined) reply = deleteReply(call, decodeURIComponent(oneId));
+      else if (method === 'GET' && correctionId !== undefined) reply = correctionReply(call, decodeURIComponent(correctionId));
+      else if (method === 'POST' && applyId !== undefined) reply = applyReply(call, decodeURIComponent(applyId));
+      else if (method === 'GET' && url.pathname === '/api/songs') reply = songSearchReply(call);
       if (reply === undefined) {
         unexpected.push(`${method} ${url.pathname}${url.search}`);
         return new Response(JSON.stringify({ error: 'not stubbed' }), { status: 404 });
@@ -289,6 +376,29 @@ function buttonNamed(root: ParentNode, name: string): HTMLButtonElement | null {
 
 function labelled(root: ParentNode, label: string): HTMLButtonElement | null {
   return root.querySelector<HTMLButtonElement>(`button[aria-label="${label}"]`);
+}
+
+/** A link by its accessible name: its text, or its label where it is an icon alone. */
+function linkNamed(root: ParentNode, name: string): HTMLAnchorElement | null {
+  return (
+    [...root.querySelectorAll<HTMLAnchorElement>('a')].find(
+      (anchor) => anchor.getAttribute('aria-label') === name || textOf(anchor) === name,
+    ) ?? null
+  );
+}
+
+/** A pill (the row's chips and status marks) by its text. */
+function pillNamed(root: ParentNode, name: string): HTMLElement | null {
+  return (
+    [...root.querySelectorAll<HTMLElement>('span')].find(
+      (span) => span.className.includes('rounded-radius-pill') && textOf(span) === name,
+    ) ?? null
+  );
+}
+
+/** What each control of a row's actions (links and buttons) is called, in order: its label, else its text. */
+function controlNames(root: ParentNode): string {
+  return [...root.querySelectorAll('a, button')].map((control) => control.getAttribute('aria-label') ?? textOf(control)).join('|');
 }
 
 function chip(group: HTMLElement, name: string): HTMLButtonElement {
@@ -1009,7 +1119,7 @@ async function approvingFromTheRow(mountPage: MountPage): Promise<void> {
   assert(statusCalls().length === 1, 'Approve sends one request');
   const sent = need(statusCalls()[0], 'the status request');
   assert(sent.path === '/api/nova/vods/v-karaoke/status', 'to the VOD');
-  deepStrictEqual(sent.body, { status: 'approved' });
+  deepStrictEqual(sent.body, { status: 'approved', expected_status: 'pending' }, 'with the status the row shows');
   assert(isBusy(approve), 'Approve is busy (aria-busy), not disabled');
   assert(
     approve.querySelector('svg')?.classList.contains('animate-spin') === true && remove.querySelector('svg')?.classList.contains('animate-spin') !== true,
@@ -1051,12 +1161,13 @@ async function approvingFromTheRow(mountPage: MountPage): Promise<void> {
   );
   assert(statusCalls().length === 1 && listCalls().length === 1 && unexpected.length === 0, 'one request, and the list is patched in place');
 
-  // Revert is the same call the other way, with its own toast; the focus hands off again.
+  // Revert is the same call the other way, with its own toast; the focus hands off again. The status it carries is the
+  // one the answer laid over the row.
   statusReply = defaultStatusReply;
   const revert = quick(container, 'Karaoke night', 'Revert to Pending');
   await focus(revert);
   await click(revert, 'Revert to Pending');
-  deepStrictEqual(need(statusCalls()[1], 'the second request').body, { status: 'pending' });
+  deepStrictEqual(need(statusCalls()[1], 'the second request').body, { status: 'pending', expected_status: 'approved' });
   assert(messagesOf(container) === 'VOD approved|VOD reverted to pending', `Revert toasts too (got ${messagesOf(container)})`);
   assert(textOf([...summaryOf(container, 'Karaoke night').querySelectorAll(':scope > td')][3]).startsWith('Pending'), 'the VOD reads Pending again');
   assert(focused() === name, 'and the focus is on the name button again');
@@ -1074,7 +1185,7 @@ async function rejectingFromTheRow(mountPage: MountPage): Promise<void> {
   // Reject sends the (empty) note; when it lands the same node turns into Delete, and the focus must not stay on it.
   await focus(reject);
   await click(reject, 'Reject');
-  deepStrictEqual(need(statusCalls()[0], 'the status request').body, { status: 'rejected', reviewer_note: '' });
+  deepStrictEqual(need(statusCalls()[0], 'the status request').body, { status: 'rejected', reviewer_note: '', expected_status: 'pending' });
   assert(messagesOf(container) === 'VOD rejected', `a rejection toasts "VOD rejected" (got ${messagesOf(container)})`);
   assert(need(toastsOf(container)[0], 'the toast').detail === 'Birthday stream', 'naming the VOD');
   const after = [...summaryOf(container, 'Birthday stream').querySelectorAll(':scope > td')];
@@ -1108,7 +1219,7 @@ async function reviewingFromTheCard(mountPage: MountPage): Promise<void> {
   statusReply = () => answer.reply;
   await focus(reject);
   await click(reject, 'Reject');
-  deepStrictEqual(need(statusCalls()[0], 'the status request').body, { status: 'rejected', reviewer_note: 'Wrong streamer' });
+  deepStrictEqual(need(statusCalls()[0], 'the status request').body, { status: 'rejected', reviewer_note: 'Wrong streamer', expected_status: 'pending' });
   assert(isBusy(reject) && textOf(reject) === 'Reject', 'Reject is busy, not disabled, and still says Reject');
   assert(focused() === reject, 'it keeps the focus');
   assert(isUnavailable(approve) && isUnavailable(remove), 'Approve and Delete are unavailable beside it');
@@ -1133,14 +1244,14 @@ async function reviewingFromTheCard(mountPage: MountPage): Promise<void> {
   const revert = need(buttonNamed(card, 'Revert to Pending'), 'Revert to Pending');
   await focus(revert);
   await click(revert, 'Revert to Pending');
-  deepStrictEqual(need(statusCalls()[1], 'the second request').body, { status: 'pending' });
+  deepStrictEqual(need(statusCalls()[1], 'the second request').body, { status: 'pending', expected_status: 'rejected' });
   assert(messagesOf(container) === 'VOD rejected|VOD reverted to pending', 'Revert toasts');
   assert(noteBox(container).value === '', "the note box is empty: the rejection used the note up");
   assert(focused() === name, 'and the focus is on the name button again');
 
   // Approve from the card sends no note.
   await click(need(buttonNamed(need(detailsOf('v-birthday'), 'the detail'), 'Approve'), 'Approve'), 'Approve');
-  deepStrictEqual(need(statusCalls()[2], 'the third request').body, { status: 'approved' });
+  deepStrictEqual(need(statusCalls()[2], 'the third request').body, { status: 'approved', expected_status: 'pending' });
   assertNoRawColour(container.innerHTML, 'the page after its reviews');
 
   await unmount();
@@ -1166,7 +1277,7 @@ async function aNoteOutlivesItsRow(mountPage: MountPage): Promise<void> {
 
   // A rejection that landed uses it up.
   await click(need(buttonNamed(need(detailsOf('v-birthday'), 'the detail'), 'Reject'), 'Reject'), 'Reject');
-  deepStrictEqual(need(statusCalls()[0], 'the request').body, { status: 'rejected', reviewer_note: 'Half-written reason' });
+  deepStrictEqual(need(statusCalls()[0], 'the request').body, { status: 'rejected', reviewer_note: 'Half-written reason', expected_status: 'pending' });
   await click(chip(viewGroup(container), 'By VTuber'), 'the By VTuber button');
   await click(chip(statusGroup(container), 'Pending'), 'the Pending chip');
   await click(chip(statusGroup(container), 'All'), 'the All chip');
@@ -1790,6 +1901,807 @@ async function emptyList(mountPage: MountPage): Promise<void> {
   console.log('✓ Nova VODs: an empty inbox is an empty state with counts of zero');
 }
 
+// --- A VOD whose video already has a stream ---
+
+/** The actions cell of a collapsed row: what its controls are called, in order. */
+function actionNames(row: HTMLTableRowElement): string {
+  return controlNames(need(row.querySelectorAll(':scope > td')[5], 'the actions cell'));
+}
+
+/** The status cell of a collapsed row. */
+function statusOf(row: HTMLTableRowElement): string {
+  return textOf(row.querySelectorAll(':scope > td')[3]);
+}
+
+/**
+ * A pending VOD whose video already has a stream is reviewed as a correction of it: Approve gives way, in the row
+ * and in its review card, to a link to the review page and to 「直接通過（不套用）」; Reject and Delete stay. A chip
+ * says why: 「修正」 for a correction, 「對應既有 stream」 for a first submission the stream has caught up with.
+ */
+async function aVodWithAStreamIsReviewedAsACorrection(mountPage: MountPage): Promise<void> {
+  reset();
+  listReply = () => ok(WITH_STREAMS_REPLY);
+  const { container, unmount } = await mountPage();
+
+  // The row: a link to the review page, then 「直接通過（不套用）」, Reject and Delete. No Approve.
+  const correction = summaryOf(container, 'Anniversary songs');
+  const review = need(linkNamed(correction, '審核修正'), 'a link named 審核修正 in the row of a correction');
+  assert(review.getAttribute('href') === '/nova/vods/v-fix/review', `the link goes to the VOD's review page (got ${review.getAttribute('href')})`);
+  assert(review.className.includes(buttonClasses({ variant: 'primary', size: 'sm' })), 'the link is dressed as the kit primary small button');
+  assert(labelled(correction, 'Approve') === null, 'a correction has no Approve button');
+  assert(actionNames(correction) === '審核修正|直接通過（不套用）|Reject|Delete', `the row's actions (got ${actionNames(correction)})`);
+  const correctionChip = need(pillNamed(correction, '修正'), 'the 修正 chip of a correction');
+  assert(correctionChip.className.includes(TONE_BOX_CLASS.violet), 'the 修正 chip is violet');
+  assert(pillNamed(correction, '對應既有 stream') === null, 'and a correction does not also say it maps to a stream');
+
+  // A first submission whose video the stream has since caught up with: the neutral chip, and the same review.
+  const mapped = summaryOf(container, 'Late show');
+  const mappedChip = need(pillNamed(mapped, '對應既有 stream'), 'the 對應既有 stream chip of a first submission with a stream');
+  assert(mappedChip.className.includes(TONE_BOX_CLASS.neutral), 'the 對應既有 stream chip is neutral');
+  assert(pillNamed(mapped, '修正') === null, 'and it is not called a correction');
+  assert(
+    linkNamed(mapped, '審核修正')?.getAttribute('href') === '/nova/vods/v-mapped/review' && labelled(mapped, 'Approve') === null,
+    'it is reviewed as a correction all the same',
+  );
+
+  // A VOD whose video has no stream is as it was: Approve, Reject, Delete, and no chip.
+  const karaoke = summaryOf(container, 'Karaoke night');
+  assert(actionNames(karaoke) === 'Approve|Reject|Delete', `a VOD with no stream still offers Approve (got ${actionNames(karaoke)})`);
+  assert(
+    linkNamed(karaoke, '審核修正') === null && pillNamed(karaoke, '修正') === null && pillNamed(karaoke, '對應既有 stream') === null,
+    'with no review link and no chip',
+  );
+
+  // The review card says the same in words, and the link there is the same kit button.
+  await expand(container, 'Anniversary songs');
+  const card = need(need(detailsOf('v-fix'), 'the detail').children[2], 'the review card');
+  const cardLink = need(linkNamed(card, '審核修正'), 'the 審核修正 link in the review card');
+  assert(
+    textOf(cardLink) === '審核修正' &&
+      cardLink.getAttribute('href') === '/nova/vods/v-fix/review' &&
+      cardLink.className.includes(buttonClasses({ variant: 'primary', size: 'sm' })),
+    'the card has the link, named by its text, to the review page, as the kit primary small button',
+  );
+  assert(buttonNamed(card, 'Approve') === null, 'and no Approve button');
+  assert(controlNames(card) === '審核修正|直接通過（不套用）|Reject|Delete', `the card's actions (got ${controlNames(card)})`);
+  const bypass = need(buttonNamed(card, '直接通過（不套用）'), '直接通過（不套用）');
+  assert(
+    bypass.className.includes('border-field-line') && !bypass.className.includes('bg-accent'),
+    '直接通過（不套用） is a secondary button: the review is the primary action',
+  );
+  assertNoRawColour(container.innerHTML, 'a page with VODs that have streams');
+
+  await unmount();
+  console.log('✓ Nova VODs: a pending VOD with a stream offers 審核修正 and 直接通過（不套用） in place of Approve, with its chip');
+}
+
+/** 「直接通過（不套用）」 from the row: it asks first, then approves with `without_applying`, and the row takes the answer. */
+async function approvingWithoutApplyingFromTheRow(mountPage: MountPage): Promise<void> {
+  reset();
+  listReply = () => ok(WITH_STREAMS_REPLY);
+  const { container, unmount } = await mountPage();
+  const bypass = quick(container, 'Anniversary songs', '直接通過（不套用）');
+  const reject = quick(container, 'Anniversary songs', 'Reject');
+  const remove = quick(container, 'Anniversary songs', 'Delete');
+  const name = nameOf(container, 'Anniversary songs');
+
+  // It asks first, in words that say nothing is applied. Cancel sends nothing and leaves the row and the focus alone.
+  await focus(bypass);
+  await click(bypass, '直接通過（不套用）');
+  const dialog = need(confirmDialog(container), 'the confirm');
+  assert(
+    textOf(dialog).includes('直接通過，不套用任何變更？') && textOf(dialog).includes('這支影片已有 stream，直接通過不會套用任何變更。'),
+    `the confirm says that nothing is applied (got "${textOf(dialog)}")`,
+  );
+  assert(buttonNamed(dialog, '直接通過') !== null && !dialog.innerHTML.includes('bg-danger-solid'), 'its button says 直接通過, and it is not a danger confirm');
+  assert(statusCalls().length === 0, 'asking sends nothing');
+  await click(buttonNamed(dialog, 'Cancel'), 'Cancel');
+  assert(confirmDialog(container) === null && statusCalls().length === 0, 'Cancel closes the confirm and sends nothing');
+  assert(toastsOf(container).length === 0, 'with nothing announced');
+  assert(isIdle(bypass) && isIdle(reject) && isIdle(remove), "the row's controls are available again");
+  assert(focused() === bypass, 'and the focus is on the control that asked');
+  assert(statusOf(summaryOf(container, 'Anniversary songs')).startsWith('Pending'), 'the VOD is as it was');
+
+  // Confirmed: one request, with the flag; the control is busy while the answer is out.
+  const answer = held();
+  statusReply = () => answer.reply;
+  await click(bypass, '直接通過（不套用）');
+  await click(buttonNamed(need(confirmDialog(container), 'the confirm'), '直接通過'), "the confirm's 直接通過");
+  assert(statusCalls().length === 1, 'confirming sends one request');
+  const sent = need(statusCalls()[0], 'the status request');
+  assert(sent.path === '/api/nova/vods/v-fix/status', 'to the VOD, as a status change');
+  deepStrictEqual(sent.body, { status: 'approved', without_applying: true, expected_status: 'pending' });
+  assert(isBusy(bypass), 'the control is busy (aria-busy), not disabled, while the request is out');
+  assert(focused() === bypass, 'and keeps the focus: the confirm handed it back');
+  assert(isUnavailable(reject) && isUnavailable(remove), 'Reject and Delete are unavailable beside it');
+  assert(toastsOf(container).length === 0, 'and nothing is announced yet');
+
+  // The answer: one toast of the page's own words (not the one for an Approve), the row approved, the focus on its name.
+  await respond(answer, ok(submissionOf({ ...CORRECTION, status: 'approved', reviewed_at: '2026-09-02T10:00:00.000Z' })));
+  deepStrictEqual(
+    toastsOf(container).map(({ message, detail }) => ({ message, detail })),
+    [{ message: '已通過（未套用變更）', detail: '' }],
+  );
+  assert(!need(toastsOf(container)[0], 'the toast').danger, 'a toast of success, not of failure');
+  const approved = summaryOf(container, 'Anniversary songs');
+  assert(statusOf(approved).startsWith('Approved'), 'the VOD now reads Approved');
+  assert(titles(container) === 'Anniversary songs|Late show|Karaoke night', 'and stays in the Pending view until a filter changes');
+  assert(actionNames(approved) === 'Revert to Pending|Delete', 'its quick actions are now Revert to Pending and Delete');
+  assert(pillNamed(approved, '修正') !== null, 'its chip stays: it says what the submission is, not where it is in review');
+  assert(countsOf(container) === '3 VODs · 1 VTuber2 Pending1 Approved0 Rejected', `the header counts follow (got ${countsOf(container)})`);
+  assert(focused() === name, `the focus the control held goes to the row's name button (got ${focused()?.tagName})`);
+  assert(statusCalls().length === 1 && listCalls().length === 1 && unexpected.length === 0, 'one request, and the list is patched in place');
+
+  // The worker answers a status change with the submission alone: the row keeps the stream it was listed with, so a
+  // Revert gives the review back, not Approve (which the worker would refuse).
+  statusReply = defaultStatusReply;
+  const revert = quick(container, 'Anniversary songs', 'Revert to Pending');
+  await focus(revert);
+  await click(revert, 'Revert to Pending');
+  deepStrictEqual(need(statusCalls()[1], 'the second request').body, { status: 'pending', expected_status: 'approved' });
+  const reverted = summaryOf(container, 'Anniversary songs');
+  assert(statusOf(reverted).startsWith('Pending'), 'the VOD reads Pending again');
+  assert(actionNames(reverted) === '審核修正|直接通過（不套用）|Reject|Delete', `and is offered the review, not Approve (got ${actionNames(reverted)})`);
+  assert(messagesOf(container) === 'VOD reverted to pending|已通過（未套用變更）', `both toasts (got ${messagesOf(container)})`);
+
+  await unmount();
+  console.log('✓ Nova VODs: 直接通過（不套用） asks first, sends without_applying, is busy while out, toasts once and hands the focus to the name button');
+}
+
+/** The same from the review card, which turns to a reviewed VOD's and hands the focus on. */
+async function approvingWithoutApplyingFromTheCard(mountPage: MountPage): Promise<void> {
+  reset();
+  listReply = () => ok(WITH_STREAMS_REPLY);
+  const { container, unmount } = await mountPage();
+  await expand(container, 'Anniversary songs');
+  const card = need(need(detailsOf('v-fix'), 'the detail').children[2], 'the review card');
+  const bypass = need(buttonNamed(card, '直接通過（不套用）'), '直接通過（不套用）');
+  const reject = need(buttonNamed(card, 'Reject'), 'Reject');
+  const name = nameOf(container, 'Anniversary songs');
+
+  const answer = held();
+  statusReply = () => answer.reply;
+  await focus(bypass);
+  await click(bypass, '直接通過（不套用）');
+  assert(statusCalls().length === 0 && confirmDialog(container) !== null, 'the card button asks through the same confirm');
+  await click(buttonNamed(need(confirmDialog(container), 'the confirm'), '直接通過'), "the confirm's 直接通過");
+  deepStrictEqual(need(statusCalls()[0], 'the status request').body, { status: 'approved', without_applying: true, expected_status: 'pending' });
+  assert(isBusy(bypass) && focused() === bypass, 'the card button is busy and keeps the focus');
+  assert(isUnavailable(reject), 'Reject is unavailable beside it');
+
+  await respond(answer, ok(submissionOf({ ...CORRECTION, status: 'approved', reviewed_at: '2026-09-02T10:00:00.000Z' })));
+  assert(messagesOf(container) === '已通過（未套用變更）', `the one toast (got ${messagesOf(container)})`);
+  const reviewed = need(need(detailsOf('v-fix'), 'the detail').children[2], 'the review card');
+  assert(
+    reviewed.querySelector('textarea') === null && controlNames(reviewed) === 'Revert to Pending|Delete',
+    `the card turns to a reviewed VOD's: Revert to Pending and Delete (got ${controlNames(reviewed)})`,
+  );
+  assert(!bypass.isConnected && focused() === name, `the focus the button held goes to the row's name button (got ${focused()?.tagName})`);
+
+  await unmount();
+  console.log('✓ Nova VODs: the review card offers 直接通過（不套用） the same way, and hands the focus to the name button');
+}
+
+/** A refusal of the worker's is an error toast like any row action's: the control and the row stay. */
+async function aRefusedApprovalWithoutApplying(mountPage: MountPage): Promise<void> {
+  reset();
+  listReply = () => ok(WITH_STREAMS_REPLY);
+  const { container, unmount } = await mountPage();
+  const bypass = quick(container, 'Anniversary songs', '直接通過（不套用）');
+
+  statusReply = () => failure(500, 'Review store is down');
+  await focus(bypass);
+  await click(bypass, '直接通過（不套用）');
+  await click(buttonNamed(need(confirmDialog(container), 'the confirm'), '直接通過'), "the confirm's 直接通過");
+  const toasts = toastsOf(container);
+  assert(toasts.length === 1, `a refused approval raises one toast (saw ${toasts.length})`);
+  const refused = need(toasts[0], 'the toast');
+  assert(refused.message === 'Review store is down' && refused.detail === '', "which is the worker's message");
+  assert(refused.danger && refused.retry === null, 'a failure toast with no Retry: the control is there to press again');
+  assert(alertOf(container) === null, 'and no line of its own on the page');
+  assert(bypass.isConnected && isIdle(bypass) && focused() === bypass, 'the control is available again, with the focus');
+  assert(statusOf(summaryOf(container, 'Anniversary songs')).startsWith('Pending'), 'the VOD is as it was');
+  assert(countsOf(container) === '3 VODs · 1 VTuber3 Pending0 Approved0 Rejected', 'and so are the counts');
+  assert(listCalls().length === 1, 'and nothing reloads');
+
+  // Pressed again, with the worker back, it goes through.
+  statusReply = defaultStatusReply;
+  await click(bypass, '直接通過（不套用）');
+  await click(buttonNamed(need(confirmDialog(container), 'the confirm'), '直接通過'), "the confirm's 直接通過");
+  assert(statusCalls().length === 2 && messagesOf(container) === 'Review store is down|已通過（未套用變更）', 'the same press, later, approves');
+
+  await unmount();
+  console.log('✓ Nova VODs: a refused approval without applying is an error toast with no Retry; the row and its control stay');
+}
+
+/**
+ * An apply that reached the catalog while its submission was never marked reviewed (502 appliedToCatalog) leaves the VOD
+ * pending, and the list knows it (`open_apply`): the row says 「已套用，等待收尾」, in the warn tone and beside the chip
+ * that says what the submission is. Its actions are the review's, as for any correction; no other row says it.
+ */
+async function aLandedApplyShowsOnTheListRow(mountPage: MountPage): Promise<void> {
+  reset();
+  listReply = () => ok(WITH_LANDED_REPLY);
+  const { container, unmount } = await mountPage();
+
+  const landed = summaryOf(container, 'Landed fix');
+  const note = need(pillNamed(landed, '已套用，等待收尾'), 'the 已套用，等待收尾 note in the row of a landed apply');
+  assert(note.className.includes(TONE_BOX_CLASS.warn), 'the note is in the warn tone: a step is left to take');
+  assert(pillNamed(landed, '修正') !== null, 'beside the chip that says the submission corrects a stream');
+  assert(statusOf(landed).startsWith('Pending'), 'and the VOD is still Pending');
+  assert(
+    actionNames(landed) === '審核修正|直接通過（不套用）|Reject|Delete',
+    `its actions are the review's, as for any correction (got ${actionNames(landed)})`,
+  );
+
+  // No other row says it: a correction with no open apply, and a VOD whose video has no stream.
+  assert(pillNamed(summaryOf(container, 'Anniversary songs'), '已套用，等待收尾') === null, 'a correction with no open apply says nothing of one');
+  assert(pillNamed(summaryOf(container, 'Karaoke night'), '已套用，等待收尾') === null, 'nor does a VOD with no stream');
+
+  // The note belongs to the row's summary, which stays on screen while the row is open.
+  await expand(container, 'Landed fix');
+  assert(pillNamed(summaryOf(container, 'Landed fix'), '已套用，等待收尾') !== null, 'the note stays while the row is open');
+  assertNoRawColour(container.innerHTML, 'a page with a landed apply');
+  assert(statusCalls().length === 0 && unexpected.length === 0, 'and nothing is sent');
+
+  await unmount();
+  console.log('✓ Nova VODs: a pending VOD whose apply reached the catalog says 已套用，等待收尾 in its row, and no other row does');
+}
+
+/**
+ * 「直接通過（不套用）」 of a VOD whose apply landed is the recovery of that apply: the worker writes the note recorded
+ * with it and announces it. So the list says that, in the words of the review page's recovery (the confirm, its button
+ * and the toast), not that nothing is applied. The request is the one any approval without applying sends.
+ */
+async function approvingWithoutApplyingAfterALandedApplySaysSo(mountPage: MountPage): Promise<void> {
+  reset();
+  listReply = () => ok(WITH_LANDED_REPLY);
+  const { container, unmount } = await mountPage();
+
+  // From the review card: the same words. Cancel sends nothing.
+  await expand(container, 'Landed fix');
+  const card = need(need(detailsOf('v-landed'), 'the detail').children[2], 'the review card');
+  await click(need(buttonNamed(card, '直接通過（不套用）'), '直接通過（不套用） in the card'), '直接通過（不套用）');
+  const fromCard = need(confirmDialog(container), "the card's confirm");
+  assert(textOf(fromCard).includes('把這份投稿標記為已通過？'), `the card asks in the recovery's words (got "${textOf(fromCard)}")`);
+  await click(buttonNamed(fromCard, 'Cancel'), 'Cancel');
+  assert(confirmDialog(container) === null && statusCalls().length === 0, 'Cancel closes the confirm and sends nothing');
+  await expand(container, 'Landed fix');
+
+  // From the row: it asks first, and says that the changes are in, not that nothing is applied.
+  const bypass = quick(container, 'Landed fix', '直接通過（不套用）');
+  const name = nameOf(container, 'Landed fix');
+  await focus(bypass);
+  await click(bypass, '直接通過（不套用）');
+  const dialog = need(confirmDialog(container), 'the confirm');
+  assert(
+    textOf(dialog).includes('把這份投稿標記為已通過？') &&
+      textOf(dialog).includes('變更已經寫入歌單。這一步只會把投稿標記為已通過並通知投稿者，不會再套用一次。'),
+    `the confirm says that the changes are in (got "${textOf(dialog)}")`,
+  );
+  assert(
+    !textOf(dialog).includes('直接通過，不套用任何變更？') && !textOf(dialog).includes('這支影片已有 stream，直接通過不會套用任何變更。'),
+    'and not that nothing is applied',
+  );
+  assert(
+    buttonNamed(dialog, '標記為已通過') !== null && buttonNamed(dialog, '直接通過') === null && !dialog.innerHTML.includes('bg-danger-solid'),
+    'its button marks the VOD approved, and it is not a danger confirm',
+  );
+  assert(statusCalls().length === 0, 'asking sends nothing');
+
+  // Confirmed: the request is the same, and the toast says the changes were applied before.
+  const answer = held();
+  statusReply = () => answer.reply;
+  await click(buttonNamed(dialog, '標記為已通過'), "the confirm's 標記為已通過");
+  assert(statusCalls().length === 1, 'confirming sends one request');
+  deepStrictEqual(need(statusCalls()[0], 'the status request').body, { status: 'approved', without_applying: true, expected_status: 'pending' });
+  assert(isBusy(bypass) && focused() === bypass, 'the control is busy while the answer is out, and keeps the focus');
+  assert(toastsOf(container).length === 0, 'and nothing is announced yet');
+
+  await respond(answer, ok(submissionOf({ ...LANDED, status: 'approved', reviewed_at: '2026-09-02T10:00:00.000Z' })));
+  deepStrictEqual(
+    toastsOf(container).map(({ message, detail }) => ({ message, detail })),
+    [{ message: '已通過（變更先前已套用）', detail: '' }],
+  );
+  assert(!need(toastsOf(container)[0], 'the toast').danger, 'a toast of success, not of failure');
+  const approved = summaryOf(container, 'Landed fix');
+  assert(statusOf(approved).startsWith('Approved'), 'the VOD now reads Approved');
+  assert(pillNamed(approved, '已套用，等待收尾') === null, 'with nothing left to wrap up, its row stops saying so');
+  assert(actionNames(approved) === 'Revert to Pending|Delete', `its quick actions are now Revert to Pending and Delete (got ${actionNames(approved)})`);
+  assert(focused() === name, `the focus goes to the row's name button (got ${focused()?.tagName})`);
+  assert(statusCalls().length === 1 && listCalls().length === 1 && unexpected.length === 0, 'one request, and the list is patched in place');
+
+  await unmount();
+  console.log('✓ Nova VODs: 直接通過（不套用） after a landed apply asks and toasts in the recovery\'s words, and sends the same request');
+}
+
+/**
+ * The worker answers a status change with the submission alone, so a row keeps what it was listed with (the stream),
+ * but not its open apply: the answer that lands has closed that apply's record (the approval that recovers it, or a
+ * Revert, which closes every record). A row that kept the flag would say 「已套用，等待收尾」 again once reverted, and
+ * word its next 直接通過（不套用） as the recovery of an apply that is no longer open.
+ */
+async function aRowForgetsItsLandedApplyOnceItIsReviewed(mountPage: MountPage): Promise<void> {
+  reset();
+  listReply = () => ok(WITH_LANDED_REPLY);
+  const { container, unmount } = await mountPage();
+
+  await click(quick(container, 'Landed fix', '直接通過（不套用）'), '直接通過（不套用）');
+  await click(buttonNamed(need(confirmDialog(container), 'the confirm'), '標記為已通過'), "the confirm's 標記為已通過");
+  assert(statusOf(summaryOf(container, 'Landed fix')).startsWith('Approved'), 'the recovery lands: the VOD reads Approved');
+
+  await click(quick(container, 'Landed fix', 'Revert to Pending'), 'Revert to Pending');
+  deepStrictEqual(need(statusCalls()[1], 'the Revert').body, { status: 'pending', expected_status: 'approved' });
+  const reverted = summaryOf(container, 'Landed fix');
+  assert(statusOf(reverted).startsWith('Pending'), 'the VOD reads Pending again');
+  assert(pillNamed(reverted, '已套用，等待收尾') === null, 'with no apply open, its row says nothing of one');
+  assert(
+    actionNames(reverted) === '審核修正|直接通過（不套用）|Reject|Delete',
+    `and is offered the review again (got ${actionNames(reverted)})`,
+  );
+
+  // Its next 直接通過（不套用） is the plain one: nothing has been applied by this submission since the Revert.
+  await click(quick(container, 'Landed fix', '直接通過（不套用）'), '直接通過（不套用）');
+  const dialog = need(confirmDialog(container), 'the confirm');
+  assert(
+    textOf(dialog).includes('直接通過，不套用任何變更？') && !textOf(dialog).includes('把這份投稿標記為已通過？'),
+    `it says that nothing is applied again (got "${textOf(dialog)}")`,
+  );
+  await click(buttonNamed(dialog, '直接通過'), "the confirm's 直接通過");
+  assert(
+    messagesOf(container) === ['VOD reverted to pending', '已通過（變更先前已套用）', '已通過（未套用變更）'].sort().join('|'),
+    `and toasts that nothing was applied (got ${messagesOf(container)})`,
+  );
+  assert(unexpected.length === 0 && listCalls().length === 1, 'none of it reloads the list');
+
+  await unmount();
+  console.log('✓ Nova VODs: a row forgets its landed apply once a review lands on it, so a Revert leaves the plain 直接通過（不套用）');
+}
+
+/** Reject and Revert answer with the submission alone, and the row that has a stream keeps it through both. */
+async function aRowKeepsItsStreamAcrossReviews(mountPage: MountPage): Promise<void> {
+  reset();
+  listReply = () => ok(WITH_STREAMS_REPLY);
+  const { container, unmount } = await mountPage();
+
+  await click(quick(container, 'Late show', 'Reject'), 'Reject');
+  deepStrictEqual(need(statusCalls()[0], 'the status request').body, { status: 'rejected', reviewer_note: '', expected_status: 'pending' });
+  const rejected = summaryOf(container, 'Late show');
+  assert(statusOf(rejected).startsWith('Rejected'), 'a VOD with a stream can be rejected from the row');
+  assert(actionNames(rejected) === 'Revert to Pending|Delete', 'and then offers Revert to Pending and Delete');
+  assert(pillNamed(rejected, '對應既有 stream') === null, 'and, reviewed, it no longer wears the 對應既有 stream chip');
+
+  await click(quick(container, 'Late show', 'Revert to Pending'), 'Revert to Pending');
+  deepStrictEqual(need(statusCalls()[1], 'the second request').body, { status: 'pending', expected_status: 'rejected' });
+  const reverted = summaryOf(container, 'Late show');
+  assert(
+    actionNames(reverted) === '審核修正|直接通過（不套用）|Reject|Delete' && labelled(reverted, 'Approve') === null,
+    `once reverted it is offered the review again, and still no Approve (got ${actionNames(reverted)})`,
+  );
+  assert(pillNamed(reverted, '對應既有 stream') !== null, 'with its chip again');
+  assert(unexpected.length === 0 && listCalls().length === 1, 'none of it reloads the list');
+
+  await unmount();
+  console.log('✓ Nova VODs: a row that has a stream keeps it through a rejection and a revert, so Approve never comes back');
+}
+
+/**
+ * A VOD whose video has a stream since the list was loaded (another submission of that video was approved, and its
+ * import created the stream) still offers Approve, and the worker refuses it: 409 use_correction_review. The curator
+ * reads why in words, not the worker's code; the list reloads, once, and the row then offers the review in place of
+ * Approve. Any other refusal stays as it was: its own message, and no reload.
+ */
+async function anApproveForAVideoThatHasAStreamNow(mountPage: MountPage): Promise<void> {
+  reset();
+  const { container, unmount } = await mountPage();
+  const approve = quick(container, 'Karaoke night', 'Approve');
+  assert(listCalls().length === 1, 'the list has been loaded once');
+
+  // The list as the worker has it now: Karaoke night's video has a stream.
+  const karaokeNow: NovaVodListItem = { ...KARAOKE, target_stream: { id: 's-9', status: 'pending' } };
+  listReply = () => ok({ data: [karaokeNow, ...VODS.slice(1)], total: VODS.length });
+  statusReply = () => failure(409, 'use_correction_review');
+  await focus(approve);
+  await click(approve, 'Approve');
+
+  deepStrictEqual(need(statusCalls()[0], 'the status request').body, { status: 'approved', expected_status: 'pending' });
+  const toasts = toastsOf(container);
+  assert(toasts.length === 1, `the refusal raises one toast (saw ${toasts.length})`);
+  const refused = need(toasts[0], 'the toast');
+  assert(
+    refused.message === '這支影片已有 stream，請改用「審核修正」；沒有要套用的變更就按「直接通過（不套用）」',
+    `the toast says in words that the video has a stream, not the worker's code (got "${refused.message}")`,
+  );
+  assert(refused.danger && refused.detail === '' && refused.retry === null, 'an error toast with no detail and no Retry');
+  assert(alertOf(container) === null, 'and no line of its own on the page');
+  assert(listCalls().length === 2, `the list reloads, once (asked ${listCalls().length} times)`);
+  const row = summaryOf(container, 'Karaoke night');
+  assert(statusOf(row).startsWith('Pending'), 'the VOD is still Pending');
+  assert(
+    actionNames(row) === '審核修正|直接通過（不套用）|Reject|Delete' && labelled(row, 'Approve') === null,
+    `the row now offers the review in place of Approve (got ${actionNames(row)})`,
+  );
+  assert(linkNamed(row, '審核修正')?.getAttribute('href') === '/nova/vods/v-karaoke/review', 'a link to its review page');
+  assert(pillNamed(row, '對應既有 stream') !== null, 'with the chip that says its video has a stream');
+  assert(countsOf(container) === '5 VODs · 3 VTubers3 Pending1 Approved1 Rejected', 'the counts are as they were');
+  assert(statusCalls().length === 1 && deleteCalls().length === 0, 'and nothing else was sent');
+
+  // Any other refusal is reported as it is, with no reload: another reason for a 409, or the same words on another status.
+  const listed = listCalls().length;
+  const birthday = quick(container, 'Birthday stream', 'Approve');
+  for (const [status, error] of [[409, 'not_pending'], [500, 'use_correction_review']] as const) {
+    statusReply = () => failure(status, error);
+    await click(birthday, 'Approve');
+    assert(
+      toastsOf(container).some((toast) => toast.message === error && toast.danger),
+      `a ${status} "${error}" is reported as the worker said it`,
+    );
+    assert(listCalls().length === listed, `and does not reload the list (asked ${listCalls().length} times)`);
+    assert(birthday.isConnected && isIdle(birthday), "and the row's Approve stays, available again");
+  }
+  assert(unexpected.length === 0, 'no stray request');
+
+  await unmount();
+  console.log('✓ Nova VODs: an Approve refused because the video has a stream now says so in words, reloads the list once and gives way to the review');
+}
+
+/**
+ * An Approve of a VOD whose video had no stream imports one (#15). The worker answers with the submission alone, so the
+ * row keeps the `target_stream: null` it was listed with, and nothing reloads. A Revert would then offer Approve, which
+ * the worker refuses for a video with a stream. So once the Revert of a VOD shown approved with no stream lands, the
+ * list is loaded again, and the reverted row offers what the worker takes: the review and 直接通過（不套用）.
+ */
+async function anApproveThatImportedAStreamThenARevertOffersTheStreamActions(mountPage: MountPage): Promise<void> {
+  reset();
+  const { container, unmount } = await mountPage();
+  await click(quick(container, 'Karaoke night', 'Approve'), 'Approve');
+  assert(statusOf(summaryOf(container, 'Karaoke night')).startsWith('Approved'), 'the VOD reads Approved');
+  assert(listCalls().length === 1, 'an Approve reloads nothing');
+
+  // The list as the worker has it now: the approval imported a stream for Karaoke night's video.
+  const karaokeNow: NovaVodListItem = { ...KARAOKE, target_stream: { id: 's-9', status: 'pending' } };
+  listReply = () => ok({ data: [karaokeNow, ...VODS.slice(1)], total: VODS.length });
+  const revert = quick(container, 'Karaoke night', 'Revert to Pending');
+  await focus(revert);
+  await click(revert, 'Revert to Pending');
+  deepStrictEqual(need(statusCalls()[1], 'the Revert').body, { status: 'pending', expected_status: 'approved' });
+  assert(listCalls().length === 2, `the Revert's answer reloads the list, once (asked ${listCalls().length} times)`);
+  const row = summaryOf(container, 'Karaoke night');
+  assert(statusOf(row).startsWith('Pending'), 'the VOD reads Pending again');
+  assert(
+    actionNames(row) === '審核修正|直接通過（不套用）|Reject|Delete' && labelled(row, 'Approve') === null,
+    `and offers the review, not Approve (got ${actionNames(row)})`,
+  );
+  assert(linkNamed(row, '審核修正')?.getAttribute('href') === '/nova/vods/v-karaoke/review', 'a link to its review page');
+  assert(focused() === nameOf(container, 'Karaoke night'), 'the focus the Revert held goes to the name button');
+  assert(messagesOf(container) === 'VOD approved|VOD reverted to pending', `the toasts (got ${messagesOf(container)})`);
+
+  // The Revert of a rejection reloads nothing: a rejection imports no stream.
+  const listed = listCalls().length;
+  await click(quick(container, 'Birthday stream', 'Reject'), 'Reject');
+  await click(quick(container, 'Birthday stream', 'Revert to Pending'), 'Revert to Pending');
+  assert(statusOf(summaryOf(container, 'Birthday stream')).startsWith('Pending'), 'Birthday stream reads Pending again');
+  assert(listCalls().length === listed, `the Revert of a rejection reloads nothing (asked ${listCalls().length} times)`);
+  assert(unexpected.length === 0, 'no stray request');
+  await unmount();
+
+  // Nor does the Revert of a VOD listed with a stream: its row offers what a stream needs already.
+  reset();
+  listReply = () => ok(WITH_STREAMS_REPLY);
+  const second = await mountPage();
+  await click(quick(second.container, 'Anniversary songs', '直接通過（不套用）'), '直接通過（不套用）');
+  await click(buttonNamed(need(confirmDialog(second.container), 'the confirm'), '直接通過'), "the confirm's 直接通過");
+  assert(statusOf(summaryOf(second.container, 'Anniversary songs')).startsWith('Approved'), 'the correction reads Approved');
+  await click(quick(second.container, 'Anniversary songs', 'Revert to Pending'), 'Revert to Pending');
+  assert(statusOf(summaryOf(second.container, 'Anniversary songs')).startsWith('Pending'), 'and Pending again');
+  assert(listCalls().length === 1, `the Revert of a VOD listed with a stream reloads nothing (asked ${listCalls().length} times)`);
+  await second.unmount();
+  console.log('✓ Nova VODs: the Revert of a VOD approved with no stream reloads the list, so the reverted row offers the review its imported stream needs, not Approve');
+}
+
+/**
+ * A Reject of a correction whose apply reached the catalog while its submission could not be marked reviewed: the
+ * worker refuses it (409 already_applied), since 未採用 would be posted while the changes are live. The curator reads
+ * in words where to finish it, the list reloads, once, and the row stays pending with its review.
+ */
+async function aListRejectAfterALandedApplyToastsAndReloads(mountPage: MountPage): Promise<void> {
+  reset();
+  listReply = () => ok(WITH_STREAMS_REPLY);
+  const { container, unmount } = await mountPage();
+  const reject = quick(container, 'Anniversary songs', 'Reject');
+  statusReply = () => ({ status: 409, body: { error: 'already_applied', appliedToCatalog: true } });
+  await focus(reject);
+  await click(reject, 'Reject');
+
+  deepStrictEqual(need(statusCalls()[0], 'the status request').body, { status: 'rejected', reviewer_note: '', expected_status: 'pending' });
+  const toasts = toastsOf(container);
+  assert(toasts.length === 1, `the refusal raises one toast (saw ${toasts.length})`);
+  const refused = need(toasts[0], 'the toast');
+  assert(
+    refused.message === '這份修正已套用到歌單，請到「審核修正」按「直接通過（不套用）」完成',
+    `the toast says where to finish it, not the worker's code (got "${refused.message}")`,
+  );
+  assert(refused.danger && refused.detail === '' && refused.retry === null, 'an error toast with no detail and no Retry');
+  assert(!textOf(container).includes('already_applied'), "the worker's code is not shown");
+  assert(listCalls().length === 2, `the list reloads, once (asked ${listCalls().length} times)`);
+  const row = summaryOf(container, 'Anniversary songs');
+  assert(statusOf(row).startsWith('Pending'), 'the VOD is still Pending');
+  assert(actionNames(row) === '審核修正|直接通過（不套用）|Reject|Delete', `with its review (got ${actionNames(row)})`);
+  assert(reject.isConnected && isIdle(reject) && focused() === reject, 'its Reject stays, available again, with the focus');
+  assert(statusCalls().length === 1 && unexpected.length === 0, 'and nothing else was sent');
+
+  await unmount();
+  console.log('✓ Nova VODs: a Reject refused as already_applied toasts 這份修正已套用到歌單，請到「審核修正」按「直接通過（不套用）」完成 and reloads the list once');
+}
+
+/**
+ * The other way round: 「直接通過（不套用）」 of a VOD whose video had a stream when the list was loaded and has none now
+ * (the stream was removed). The worker refuses it, 404 no_target_stream: with no stream the approval would import the
+ * VOD, which is applying it. The curator reads why in words; the list reloads, once, and the row then offers Approve.
+ */
+async function anApprovalWithoutApplyingForAVideoWithNoStreamNow(mountPage: MountPage): Promise<void> {
+  reset();
+  listReply = () => ok(WITH_STREAMS_REPLY);
+  const { container, unmount } = await mountPage();
+  const bypass = quick(container, 'Anniversary songs', '直接通過（不套用）');
+  assert(listCalls().length === 1, 'the list has been loaded once');
+
+  // The list as the worker has it now: Anniversary songs' video has no stream.
+  const correctionNow: NovaVodListItem = { ...CORRECTION, target_stream: null };
+  listReply = () => ok({ data: [correctionNow, MAPPED, KARAOKE], total: WITH_STREAMS.length });
+  statusReply = () => failure(404, 'no_target_stream');
+  await focus(bypass);
+  await click(bypass, '直接通過（不套用）');
+  await click(buttonNamed(need(confirmDialog(container), 'the confirm'), '直接通過'), "the confirm's 直接通過");
+
+  deepStrictEqual(need(statusCalls()[0], 'the status request').body, { status: 'approved', without_applying: true, expected_status: 'pending' });
+  const toasts = toastsOf(container);
+  assert(toasts.length === 1, `the refusal raises one toast (saw ${toasts.length})`);
+  const refused = need(toasts[0], 'the toast');
+  assert(
+    refused.message === '找不到對應的 stream，列表已重新載入',
+    `the toast says in words that the video has no stream and the list was reloaded, not the worker's code (got "${refused.message}")`,
+  );
+  assert(refused.danger && refused.detail === '' && refused.retry === null, 'an error toast with no detail and no Retry');
+  assert(alertOf(container) === null, 'and no line of its own on the page');
+  assert(listCalls().length === 2, `the list reloads, once (asked ${listCalls().length} times)`);
+  const row = summaryOf(container, 'Anniversary songs');
+  assert(statusOf(row).startsWith('Pending'), 'the VOD is still Pending');
+  assert(
+    actionNames(row) === 'Approve|Reject|Delete' && linkNamed(row, '審核修正') === null,
+    `the row now offers Approve, and no review (got ${actionNames(row)})`,
+  );
+  assert(statusCalls().length === 1 && deleteCalls().length === 0 && unexpected.length === 0, 'and nothing else was sent');
+
+  await unmount();
+  console.log('✓ Nova VODs: 直接通過（不套用） refused because the video has no stream now says so in words, reloads the list once and gives way to Approve');
+}
+
+/**
+ * A VOD reviewed elsewhere (another tab, another curator) since the list was loaded. A row's status change carries the
+ * status the row shows, so the worker refuses the stale one (409 status_changed) and changes nothing. The curator reads
+ * why in words; the list reloads, once, and the row then reads as the worker has it.
+ */
+async function aStatusChangeOfARowReviewedElsewhere(mountPage: MountPage): Promise<void> {
+  reset();
+  const { container, unmount } = await mountPage();
+  const reject = quick(container, 'Birthday stream', 'Reject');
+  assert(listCalls().length === 1, 'the list has been loaded once');
+
+  // The list as the worker has it now: Birthday stream was approved elsewhere.
+  const birthdayNow: NovaVodListItem = { ...BIRTHDAY, status: 'approved', reviewed_at: '2026-09-02T10:00:00.000Z' };
+  listReply = () => ok({ data: VODS.map((row) => (row.id === BIRTHDAY.id ? birthdayNow : row)), total: VODS.length });
+  statusReply = () => ({ status: 409, body: { error: 'status_changed', status: 'approved' } });
+  await focus(reject);
+  await click(reject, 'Reject');
+
+  deepStrictEqual(need(statusCalls()[0], 'the status request').body, { status: 'rejected', reviewer_note: '', expected_status: 'pending' });
+  const toasts = toastsOf(container);
+  assert(toasts.length === 1, `the refusal raises one toast (saw ${toasts.length})`);
+  const refused = need(toasts[0], 'the toast');
+  assert(
+    refused.message === '這份投稿的狀態已經變了，已重新載入',
+    `the toast says in words that the status changed and the list was reloaded, not the worker's code (got "${refused.message}")`,
+  );
+  assert(refused.danger && refused.detail === '' && refused.retry === null, 'an error toast with no detail and no Retry');
+  assert(alertOf(container) === null, 'and no line of its own on the page');
+  assert(listCalls().length === 2, `the list reloads, once (asked ${listCalls().length} times)`);
+  assert(titles(container) === 'Karaoke night|Late night songs', `the approved VOD has left the Pending view (got ${titles(container)})`);
+  assert(countsOf(container) === '5 VODs · 3 VTubers2 Pending2 Approved1 Rejected', `the counts are the worker's (got ${countsOf(container)})`);
+  await click(chip(statusGroup(container), 'All'), 'the All chip');
+  const row = summaryOf(container, 'Birthday stream');
+  assert(
+    statusOf(row).startsWith('Approved') && actionNames(row) === 'Revert to Pending|Delete',
+    `the row reads as the worker has it, and offers what the worker will take (got ${statusOf(row)}, ${actionNames(row)})`,
+  );
+  assert(statusCalls().length === 1 && deleteCalls().length === 0 && unexpected.length === 0, 'and nothing else was sent');
+
+  await unmount();
+  console.log('✓ Nova VODs: a status change of a row reviewed elsewhere carries the status the row shows, is refused, says so in words and reloads the list once');
+}
+
+/**
+ * An approval whose import failed: the worker writes Nova first, so the VOD is approved with no stream, and it answers
+ * 500. The list reloads nothing after a failure, so the row still reads Pending and offers Approve. Pressing it again
+ * sends the same request, with the pending the row shows, which the worker takes as the import still owed: it lands
+ * like any approval, with no word of a status that changed.
+ */
+async function aFailedImportIsRetriedByTheSameApprove(mountPage: MountPage): Promise<void> {
+  reset();
+  const { container, unmount } = await mountPage();
+  statusReply = () => ({ status: 500, body: { error: 'Internal server error', code: 'INTERNAL_ERROR' } });
+  await click(quick(container, 'Karaoke night', 'Approve'), 'Approve');
+  const failed = need(toastsOf(container)[0], 'the toast');
+  assert(failed.danger && failed.message === 'Internal server error', `the failure is an error toast (got "${failed.message}")`);
+  assert(listCalls().length === 1, `and nothing reloads (asked ${listCalls().length} times)`);
+  const pending = summaryOf(container, 'Karaoke night');
+  assert(statusOf(pending).startsWith('Pending') && labelled(pending, 'Approve') !== null, 'the row still reads Pending, with Approve');
+
+  statusReply = defaultStatusReply;
+  await click(quick(container, 'Karaoke night', 'Approve'), 'Approve, again');
+  deepStrictEqual(
+    need(statusCalls()[1], 'the second request').body,
+    { status: 'approved', expected_status: 'pending' },
+    'the same request again',
+  );
+  assert(messagesOf(container) === 'Internal server error|VOD approved', `it lands like any approval (got ${messagesOf(container)})`);
+  assert(
+    !toastsOf(container).some((toast) => toast.message === '這份投稿的狀態已經變了，已重新載入'),
+    'with no word of a status that changed',
+  );
+  assert(statusOf(summaryOf(container, 'Karaoke night')).startsWith('Approved'), 'and the row ends Approved');
+  assert(listCalls().length === 1 && unexpected.length === 0, 'with no reload and no stray request');
+
+  await unmount();
+  console.log('✓ Nova VODs: an approval whose import failed stays Pending, and the same Approve retries it and lands with no word of a changed status');
+}
+
+/**
+ * 「對應既有 stream」 marks a pending first submission, which is reviewed against the stream its video already has. A
+ * reviewed one wears no chip: an approved first submission's video has a stream mostly because its own approval
+ * imported it. 「修正」 says what a submission is, and stays on a correction whatever its status.
+ */
+async function onlyAPendingVodWearsTheStreamChip(mountPage: MountPage): Promise<void> {
+  reset();
+  const archived = vod({
+    id: 'v-archived',
+    slug: 'mizuki',
+    title: 'Archived show',
+    status: 'approved',
+    submittedAt: `${THIS_YEAR}-03-02 09:30:00`,
+    reviewedAt: '2026-09-02T10:00:00.000Z',
+    target: { id: 's-3', status: 'approved' },
+  });
+  const applied = vod({
+    id: 'v-applied',
+    slug: 'mizuki',
+    title: 'Applied fix',
+    status: 'approved',
+    submittedAt: `${THIS_YEAR}-03-01 09:30:00`,
+    reviewedAt: '2026-09-02T10:00:00.000Z',
+    kind: 'correction',
+    target: { id: 's-3', status: 'approved' },
+  });
+  listReply = () => ok({ data: [archived, applied, MAPPED], total: 3 });
+  const { container, unmount } = await mountPage();
+  await click(chip(statusGroup(container), 'All'), 'the All chip');
+
+  const archivedRow = summaryOf(container, 'Archived show');
+  assert(
+    pillNamed(archivedRow, '對應既有 stream') === null && pillNamed(archivedRow, '修正') === null,
+    'an approved first submission whose video has a stream wears no chip',
+  );
+  assert(pillNamed(summaryOf(container, 'Applied fix'), '修正') !== null, 'an approved correction still says it is one');
+  assert(pillNamed(summaryOf(container, 'Late show'), '對應既有 stream') !== null, 'a pending first submission with a stream still says so');
+  assert(unexpected.length === 0, 'no stray request');
+
+  await unmount();
+  console.log('✓ Nova VODs: 對應既有 stream marks only a pending VOD with a stream; 修正 marks a correction of any status');
+}
+
+/** The route keeps contributors out, but the page offers them no review either: a chip is information, a link is an action. */
+async function aContributorIsOfferedNoReview(mountPage: MountPage): Promise<void> {
+  reset();
+  listReply = () => ok(WITH_STREAMS_REPLY);
+  const { container, unmount } = await mountPage(contributor);
+
+  const row = summaryOf(container, 'Anniversary songs');
+  assert(actionNames(row) === '', `a contributor's row has no actions (got ${actionNames(row)})`);
+  assert(pillNamed(row, '修正') !== null, 'though its chip still says what the submission is');
+  await expand(container, 'Anniversary songs');
+  const details = need(detailsOf('v-fix'), 'the detail');
+  assert(
+    linkNamed(details, '審核修正') === null && controlNames(details) === CORRECTION.video_url,
+    "and its detail has no review card: only the video's own link",
+  );
+  assert(statusCalls().length === 0, 'and nothing is sent');
+
+  await unmount();
+  console.log("✓ Nova VODs: a contributor's page offers no review link and no 直接通過（不套用）");
+}
+
+/** The client of the correction review: what Task 8's page calls, and what the VODs list sends. */
+async function theCorrectionClient(): Promise<void> {
+  reset();
+  const { api } = await import('../src/api/client');
+
+  // The review: a VOD's own, not any streamer's.
+  const view: NovaVodCorrectionView = {
+    submission: submissionOf(CORRECTION),
+    stream: { id: 's-1', title: 'Anniversary songs', date: '2026-03-01', videoId: 'vid-fix', status: 'approved' },
+    base: null,
+    baseVerified: false,
+    current: [],
+    proposed: [],
+    match: { pairs: [], unpairedCurrent: [], unpairedProposed: [] },
+    fingerprint: 'f1',
+    otherPendingCount: 0,
+    openApply: null,
+  };
+  correctionReply = () => ok(view);
+  deepStrictEqual(await api.getNovaVodCorrection('v-fix'), view);
+  const read = need(calls.at(-1), 'the review request');
+  assert(read.method === 'GET' && read.path === '/api/nova/vods/v-fix/correction', `the review is read from the VOD (got ${read.method} ${read.path})`);
+  assert(read.params.getAll('streamer').length === 0, 'and names no streamer');
+
+  // The apply: the curator's body as it is, a POST to the VOD.
+  const body: CorrectionApplyBody = {
+    fingerprint: 'f1',
+    reviewerNote: 'Thanks',
+    operations: [{ op: 'deletePerformance', performanceId: 'p-1' }],
+    skipped: { time: 0, title: 0, add: 0, delete: 0 },
+  };
+  const result: CorrectionApplyResult = {
+    submission: submissionOf({ ...CORRECTION, status: 'approved' }),
+    summary: '套用 1 項（刪除 1）',
+  };
+  applyReply = () => ok(result);
+  deepStrictEqual(await api.applyNovaVodCorrection('v-fix', body), result);
+  const applied = need(calls.at(-1), 'the apply request');
+  assert(applied.method === 'POST' && applied.path === '/api/nova/vods/v-fix/apply', `the apply is posted to the VOD (got ${applied.method} ${applied.path})`);
+  assert(applied.params.getAll('streamer').length === 0, 'and names no streamer');
+  deepStrictEqual(applied.body, body);
+
+  // The song search: one page per status a relink can land on, each scoped to the streamer asked for (once), twenty
+  // matches at most, approved first. The stub answers like the worker: status filter first, then the page window.
+  const catalog = [
+    ...Array.from({ length: 20 }, (_, i) => ({ id: `song-r${i}`, title: `Secret ${i}`, originalArtist: 'ZONE', status: 'rejected' })),
+    { id: 'song-9', title: 'Secret Base', originalArtist: 'ZONE', status: 'approved' },
+    { id: 'song-8', title: 'Secret Garden', originalArtist: 'ZONE', status: 'pending' },
+  ];
+  songSearchReply = (call) => {
+    const status = call.params.get('status');
+    const data = catalog.filter((song) => !status || song.status === status).slice(0, Number(call.params.get('pageSize')));
+    return ok({ data, total: data.length, page: 1, pageSize: 20, totalPages: 1 });
+  };
+  const before = calls.length;
+  deepStrictEqual(
+    (await api.searchStreamerSongs('hoshi', 'Secret')).map((song) => song.id),
+    ['song-9', 'song-8'],
+    'twenty newer rejected matches cannot hide the songs a relink can land on',
+  );
+  const searches = calls.slice(before);
+  assert(searches.length === 2, `one request per status (got ${searches.length})`);
+  for (const search of searches) {
+    assert(search.method === 'GET' && search.path === '/api/songs', `the search reads the songs (got ${search.method} ${search.path})`);
+    assert(
+      search.params.getAll('streamer').join() === 'hoshi' && search.params.get('search') === 'Secret' && search.params.get('pageSize') === '20',
+      `scoped to the streamer asked for, once, 20 at most (got ${search.params.toString()})`,
+    );
+  }
+  deepStrictEqual(searches.map((search) => search.params.get('status')), ['approved', 'pending'], 'approved, then pending');
+
+  // The status change: the flag goes with the approval, and only when it is asked for.
+  statusReply = defaultStatusReply;
+  await api.updateNovaVodStatus('v-fix', { status: 'approved', without_applying: true });
+  deepStrictEqual(need(calls.at(-1), 'the status request').body, { status: 'approved', without_applying: true });
+  await api.updateNovaVodStatus('v-karaoke', { status: 'rejected', reviewer_note: 'No' });
+  deepStrictEqual(need(calls.at(-1), 'the second status request').body, { status: 'rejected', reviewer_note: 'No' });
+  assert(unexpected.length === 0, 'no stray request');
+
+  console.log("✓ Nova VODs: the client reads the correction review, applies it, searches a streamer's songs and sends the without_applying flag");
+}
+
 async function main(): Promise<void> {
   installDom();
   installFetchStub();
@@ -1804,13 +2716,16 @@ async function main(): Promise<void> {
   assert(route.curatorOnly === true, '/nova/vods is curator-only');
   console.log('✓ Nova VODs: its route is curator-only');
 
+  // In a router: a VOD with a stream links to its review page.
   const mountPage: MountPage = (user = curator) =>
     mount(
-      <ToastProvider timers={NO_TIMERS}>
-        <ConfirmProvider>
-          <NovaVodSubmissions user={user} />
-        </ConfirmProvider>
-      </ToastProvider>,
+      <MemoryRouter>
+        <ToastProvider timers={NO_TIMERS}>
+          <ConfirmProvider>
+            <NovaVodSubmissions user={user} />
+          </ConfirmProvider>
+        </ToastProvider>
+      </MemoryRouter>,
     );
 
   await firstLoadAndLayout(mountPage);
@@ -1840,6 +2755,23 @@ async function main(): Promise<void> {
   await contributorView(mountPage);
   await loadFailure(mountPage);
   await emptyList(mountPage);
+  await aVodWithAStreamIsReviewedAsACorrection(mountPage);
+  await approvingWithoutApplyingFromTheRow(mountPage);
+  await approvingWithoutApplyingFromTheCard(mountPage);
+  await aRefusedApprovalWithoutApplying(mountPage);
+  await aLandedApplyShowsOnTheListRow(mountPage);
+  await approvingWithoutApplyingAfterALandedApplySaysSo(mountPage);
+  await aRowForgetsItsLandedApplyOnceItIsReviewed(mountPage);
+  await aRowKeepsItsStreamAcrossReviews(mountPage);
+  await anApproveForAVideoThatHasAStreamNow(mountPage);
+  await anApproveThatImportedAStreamThenARevertOffersTheStreamActions(mountPage);
+  await aListRejectAfterALandedApplyToastsAndReloads(mountPage);
+  await anApprovalWithoutApplyingForAVideoWithNoStreamNow(mountPage);
+  await aStatusChangeOfARowReviewedElsewhere(mountPage);
+  await aFailedImportIsRetriedByTheSameApprove(mountPage);
+  await onlyAPendingVodWearsTheStreamChip(mountPage);
+  await aContributorIsOfferedNoReview(mountPage);
+  await theCorrectionClient();
 
   assert(unexpected.length === 0, `no unstubbed request (${unexpected.join(', ')})`);
 

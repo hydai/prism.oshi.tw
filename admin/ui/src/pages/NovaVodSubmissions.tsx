@@ -1,12 +1,12 @@
-import { useId, useLayoutEffect, useMemo, useRef, useState, type MouseEvent, type ReactNode } from 'react';
-import type { AuthUser, NovaStatus, NovaVodSong, NovaVodSubmission } from '../../../shared/types';
+import { useId, useLayoutEffect, useMemo, useRef, useState, type MouseEvent, type ReactNode, type Ref } from 'react';
+import { Link } from 'react-router-dom';
+import type { AuthUser, NovaStatus, NovaVodListItem, NovaVodSong, NovaVodSubmission } from '../../../shared/types';
 import { sanitizeNovaUrl } from '../../../shared/nova-url-safety';
 import { api } from '../api/client';
-import { useInboxCounts } from '../components/shell/InboxCounts';
 import { StatusFilterBar } from '../components/StatusFilterBar';
 import { Avatar } from '../components/ui/Avatar';
 import { Button, IconButton } from '../components/ui/Button';
-import { useConfirm } from '../components/ui/confirm';
+import { buttonClasses } from '../components/ui/button-classes';
 import { DetailField, SectionLabel } from '../components/ui/DetailField';
 import { EmptyState, GlassCard, Skeleton } from '../components/ui/Display';
 import { Select, Textarea } from '../components/ui/Fields';
@@ -21,15 +21,18 @@ import { statusTone } from '../components/ui/pill-core';
 import { StoredTime } from '../components/ui/StoredTime';
 import { useToast } from '../components/ui/toast';
 import { Segmented } from '../components/ui/Toggles';
+import { Tooltip } from '../components/ui/Tooltip';
+import { useNovaVodActions, vodLabel, type Handoff, type VodAction } from '../hooks/useNovaVodActions';
 import { useRowDrafts, type RowDrafts } from '../hooks/useRowDrafts';
 import { errorMessage, useApiResource } from '../lib/apiResource';
 import { formatTimestamp } from '../lib/format-timestamp';
 import { groupVodsByStreamer, type VodGroup, type VodViewMode } from '../lib/nova-vod-groups';
 import { NO_RECENT_ACTIONS, visibleVods } from '../lib/review-lists';
-import { countByStatus, removeById, replaceById } from '../lib/status-totals';
+import { countByStatus } from '../lib/status-totals';
 import { NOVA_STATUS_FILTERS } from './nova-status-filters';
 
-const ROW_GRID = 'grid-cols-[64px_minmax(0,1fr)_100px_110px_120px_128px_28px]';
+// The actions column holds a row's quick actions: four 28 px icon buttons and their 6 px gaps for a VOD whose video has a stream.
+const ROW_GRID = 'grid-cols-[64px_minmax(0,1fr)_100px_110px_120px_132px_28px]';
 
 /** The seven columns of a row. The thumbnail, the actions and the chevron have no visible head, only a name for assistive technology. */
 const ROW_COLUMNS: ReadonlyArray<{ key: string; label: string; visible: boolean }> = [
@@ -57,20 +60,8 @@ const STATUS_FILTER_LABEL_ID = 'nova-vod-status-filter-label';
  */
 const DETAILS_PINNED = 'sticky left-0 w-[100cqw]';
 
-/** What a VOD's request is out for: the status it is heading for, or its deletion. */
-type VodAction = NovaStatus | 'delete';
-
 /** An open VOD's songs: those the worker sent (maybe none), or that the request for them is out, or that it failed. */
 type VodSongList = NovaVodSong[] | 'loading' | 'failed';
-
-/** The VODs with a request out, each with what it is out for. */
-const NO_ACTIONS: ReadonlyMap<string, VodAction> = new Map();
-
-const STATUS_TOASTS: Record<NovaStatus, string> = {
-  approved: 'VOD approved',
-  rejected: 'VOD rejected',
-  pending: 'VOD reverted to pending',
-};
 
 /** One action a curator can take on a VOD: how both its quick icon button and its review-card button read. */
 interface ActionSpec {
@@ -90,10 +81,27 @@ const REVIEWED_ACTIONS: readonly ActionSpec[] = [
   { action: 'pending', label: 'Revert to Pending', icon: 'undo', tone: 'default' },
   { action: 'delete', label: 'Delete', icon: 'trash', tone: 'danger' },
 ];
+/**
+ * A pending VOD whose video already has a stream has no Approve: the worker refuses it (such a VOD is reviewed as a
+ * correction of that stream, by the link beside these, or approved with nothing applied, by the first of these).
+ */
+const STREAM_PENDING_ACTIONS: readonly ActionSpec[] = [
+  { action: 'approveWithoutApplying', label: '直接通過（不套用）', icon: 'checkCircle', tone: 'default' },
+  ...PENDING_ACTIONS.filter((spec) => spec.action !== 'approved'),
+];
 
-/** The VOD as a row names it for assistive technology, a toast and a confirm: its title, or its video id when it has none. */
-function vodLabel(vod: NovaVodSubmission): string {
-  return vod.stream_title || vod.video_id;
+/** The accessible name, and the words, of the link to a correction's review page. */
+const REVIEW_LABEL = '審核修正';
+
+/** A pending VOD whose video already has a stream is reviewed as a correction of it. */
+function isCorrectionReview(vod: NovaVodListItem): boolean {
+  return vod.status === 'pending' && vod.target_stream !== null;
+}
+
+/** The VOD's actions, in order: what a pending one offers depends on whether its video already has a stream. */
+function actionsFor(vod: NovaVodListItem): readonly ActionSpec[] {
+  if (vod.status !== 'pending') return REVIEWED_ACTIONS;
+  return isCorrectionReview(vod) ? STREAM_PENDING_ACTIONS : PENDING_ACTIONS;
 }
 
 /** The header's count: how many VODs there are and from how many streamers, whatever the filters keep. */
@@ -128,9 +136,6 @@ function statusChipInEffect(toolbar: HTMLElement | null): HTMLElement | null {
   return toolbar?.querySelector<HTMLElement>(`[aria-labelledby="${STATUS_FILTER_LABEL_ID}"] [aria-pressed="true"]`) ?? null;
 }
 
-/** Where the focus goes once a landed request's answer is on screen, if nothing else has it by then. */
-type Handoff = { kind: 'row'; id: string; slug: string } | { kind: 'next'; next: HTMLElement | null };
-
 /**
  * The Nova VODs inbox (spec §8.9): the VODs fans submit from the public Nova form, by streamer or as one
  * timeline, with their status as chips and, for a curator, a quick approve, reject or delete on each row
@@ -138,6 +143,12 @@ type Handoff = { kind: 'row'; id: string; slug: string } | { kind: 'next'; next:
  * filter; the filters only choose which rows are shown. A VOD just reviewed stays in its list, and its
  * streamer's card stays open around it, until a filter changes, so it does not vanish from the Pending list
  * under the cursor.
+ *
+ * A pending VOD whose video already has a stream (the list says so: `target_stream`) has no Approve, which the
+ * worker would refuse: it is reviewed as a correction of that stream, from a link to its review page, or it is
+ * approved with nothing applied (「直接通過（不套用）」, which asks first). A chip says it is one. When an apply of it
+ * reached the catalog without the submission being marked reviewed (the list says so: `open_apply`), a second chip says
+ * 已套用，等待收尾, and that approval is the recovery of the apply, which it says when it asks.
  *
  * Every request says how it went in a toast, and the control that sent it is busy meanwhile (and keeps the
  * focus; the row's other actions are unavailable, and other rows are untouched, so two can be out at once).
@@ -150,11 +161,10 @@ type Handoff = { kind: 'row'; id: string; slug: string } | { kind: 'next'; next:
  */
 export default function NovaVodSubmissions({ user }: { user: AuthUser }) {
   const toast = useToast();
-  const confirm = useConfirm();
   const headingRef = useRef<HTMLHeadingElement>(null);
   const toolbarRef = useRef<HTMLDivElement>(null);
   const listRef = useRef<HTMLDivElement>(null);
-  const handoff = useRef<Handoff | null>(null);
+  const handoffRef = useRef<Handoff | null>(null);
   const [statusFilter, setStatusFilter] = useState<'' | NovaStatus>('pending');
   const [streamerFilter, setStreamerFilter] = useState('');
   const [justActed, setJustActed] = useState<ReadonlySet<string>>(NO_RECENT_ACTIONS);
@@ -163,8 +173,6 @@ export default function NovaVodSubmissions({ user }: { user: AuthUser }) {
   const [expandedId, setExpandedId] = useState<string | null>(null);
   // Keyed by VOD id so a slow detail response for A can never render under B.
   const [expandedSongs, setExpandedSongs] = useState<Record<string, VodSongList>>({});
-  const [acting, setActing] = useState(NO_ACTIONS);
-  const streamerFilterId = useId();
   // Rejection notes outlive their rows, which unmount on group collapse, on the
   // view-mode toggle and on a filter change.
   const rejectNotes = useRowDrafts();
@@ -174,8 +182,6 @@ export default function NovaVodSubmissions({ user }: { user: AuthUser }) {
   // One unfiltered load feeds the table, the header's counts and the streamer options;
   // the two filters narrow it here instead of costing a second request.
   const list = useApiResource(async () => (await api.listNovaVods()).data, []);
-  // The sidebar's pending badge loads this list separately: every change here reloads it too.
-  const { refresh: refreshInboxCounts } = useInboxCounts();
   // Stable reference while loading, so the filter memo doesn't recompute every render.
   const allVods = useMemo(() => list.data ?? [], [list.data]);
   const vods = useMemo(
@@ -187,9 +193,9 @@ export default function NovaVodSubmissions({ user }: { user: AuthUser }) {
   // nobody has set costs nothing to read. Whoever holds the focus then is the user's, unless it is nobody:
   // the control that sent the request has just left the page with its row or been replaced by another.
   useLayoutEffect(() => {
-    const pending = handoff.current;
+    const pending = handoffRef.current;
     if (pending === null) return;
-    handoff.current = null;
+    handoffRef.current = null;
     const held = document.activeElement;
     if (held !== null && held !== document.body) return;
     const target =
@@ -217,14 +223,14 @@ export default function NovaVodSubmissions({ user }: { user: AuthUser }) {
   };
   const keepVisible = (id: string) => setJustActed((prev) => new Set(prev).add(id));
 
-  /** Records what a VOD's request is out for, or (null) that it is done. Kept here, not in the row, which can unmount meanwhile. */
-  const markActing = (id: string, action: VodAction | null) =>
-    setActing((current) => {
-      const next = new Map(current);
-      if (action === null) next.delete(id);
-      else next.set(id, action);
-      return next;
-    });
+  const { acting, handleAction, handleApproveWithoutApplying, handleDelete } = useNovaVodActions({
+    list,
+    handoffRef,
+    listRef,
+    rejectNotes,
+    keepVisible,
+    nextNameButton,
+  });
 
   // `again`: the Retry of songs that did not load, in a row that stays open.
   const handleExpand = async ({ id, streamer_slug: slug }: NovaVodSubmission, again = false) => {
@@ -236,7 +242,7 @@ export default function NovaVodSubmissions({ user }: { user: AuthUser }) {
     const known = expandedSongs[id];
     if (known !== undefined && known !== 'failed') return; // loaded, or a request is out
     // The Retry leaves with the line it sits on: the focus it held goes to the row's name button.
-    if (again) handoff.current = { kind: 'row', id, slug };
+    if (again) handoffRef.current = { kind: 'row', id, slug };
     setExpandedSongs((prev) => ({ ...prev, [id]: 'loading' }));
     try {
       const detail = await api.getNovaVod(id);
@@ -245,54 +251,6 @@ export default function NovaVodSubmissions({ user }: { user: AuthUser }) {
       // The songs column says they did not load and offers a Retry; opening the row again asks again too.
       setExpandedSongs((prev) => ({ ...prev, [id]: 'failed' }));
       toast.error('無法載入歌曲清單', { detail: errorMessage(err, '') });
-    }
-  };
-
-  /** Resolves true once the row may clear the note it just submitted. */
-  const handleAction = async (id: string, status: NovaStatus, rejectNote: string): Promise<boolean> => {
-    markActing(id, status);
-    try {
-      const updated = await api.updateNovaVodStatus(id, {
-        status,
-        reviewer_note: status === 'rejected' ? rejectNote : undefined,
-      });
-      // Before the state changes that will show it: the effect above reads the flag in the commit they land in.
-      handoff.current = { kind: 'row', id, slug: updated.streamer_slug };
-      list.mutate((rows) => replaceById(rows, updated));
-      refreshInboxCounts('vods');
-      keepVisible(id);
-      rejectNotes.clear(id);
-      toast.success(STATUS_TOASTS[status], vodLabel(updated));
-      return true;
-    } catch (err) {
-      toast.error(errorMessage(err, 'Action failed'));
-      return false;
-    } finally {
-      markActing(id, null);
-    }
-  };
-
-  const handleDelete = async (vod: NovaVodSubmission) => {
-    const confirmed = await confirm({
-      title: 'Delete this VOD submission?',
-      body: `Permanently delete VOD submission "${vod.id}" (${vodLabel(vod)}). This cannot be undone.`,
-      confirmLabel: 'Delete',
-      tone: 'danger',
-    });
-    if (!confirmed) return;
-    markActing(vod.id, 'delete');
-    try {
-      await api.deleteNovaVod(vod.id);
-      // The next row is read while this one is still on screen: its button is the same element after the commit.
-      handoff.current = { kind: 'next', next: nextNameButton(listRef.current, vod.id) };
-      list.mutate((rows) => removeById(rows, vod.id));
-      refreshInboxCounts('vods');
-      rejectNotes.clear(vod.id);
-      toast.success('VOD deleted', vodLabel(vod));
-    } catch (err) {
-      toast.error(errorMessage(err, 'Delete failed'));
-    } finally {
-      markActing(vod.id, null);
     }
   };
 
@@ -314,7 +272,7 @@ export default function NovaVodSubmissions({ user }: { user: AuthUser }) {
   const showSkeleton = list.data === null && list.loading;
   const showEmpty = list.data !== null && vods.length === 0;
 
-  const renderRow = (row: NovaVodSubmission) => (
+  const renderRow = (row: NovaVodListItem) => (
     <VodRow
       key={row.id}
       vod={row}
@@ -328,6 +286,7 @@ export default function NovaVodSubmissions({ user }: { user: AuthUser }) {
       onRetrySongs={() => handleExpand(row, true)}
       drafts={rejectNotes}
       onAction={handleAction}
+      onApproveWithoutApplying={handleApproveWithoutApplying}
       onDelete={handleDelete}
     />
   );
@@ -353,38 +312,16 @@ export default function NovaVodSubmissions({ user }: { user: AuthUser }) {
       />
 
       <div className="flex flex-col gap-3 p-4 lg:px-5 lg:pb-[18px]">
-        <div ref={toolbarRef} className="flex flex-wrap items-center gap-x-6 gap-y-2">
-          <StatusFilterBar
-            options={NOVA_STATUS_FILTERS}
-            value={statusFilter}
-            onChange={changeStatusFilter}
-            labelledBy={STATUS_FILTER_LABEL_ID}
-            className="flex-wrap gap-2"
-            heading={
-              <span id={STATUS_FILTER_LABEL_ID} className={MICRO_LABEL}>
-                Status
-              </span>
-            }
-          />
-          <Segmented label="View" value={viewMode} onChange={setViewMode} options={VIEW_OPTIONS} />
-          <div className="w-44">
-            <label htmlFor={streamerFilterId} className="sr-only">
-              Filter VOD submissions by streamer
-            </label>
-            <Select
-              id={streamerFilterId}
-              value={streamerFilter}
-              onChange={(event) => changeStreamerFilter(event.target.value)}
-            >
-              <option value="">All streamers</option>
-              {uniqueStreamers.map((slug) => (
-                <option key={slug} value={slug}>
-                  {slug}
-                </option>
-              ))}
-            </Select>
-          </div>
-        </div>
+        <VodToolbar
+          ref={toolbarRef}
+          status={statusFilter}
+          onStatusChange={changeStatusFilter}
+          viewMode={viewMode}
+          onViewModeChange={setViewMode}
+          streamer={streamerFilter}
+          streamers={uniqueStreamers}
+          onStreamerChange={changeStreamerFilter}
+        />
 
         {list.error !== null ? (
           <Note
@@ -430,6 +367,61 @@ export default function NovaVodSubmissions({ user }: { user: AuthUser }) {
             )}
           </div>
         ) : null}
+      </div>
+    </div>
+  );
+}
+
+/** The toolbar under the header: the status chips behind their label, the view toggle and the streamer filter. */
+function VodToolbar({
+  ref,
+  status,
+  onStatusChange,
+  viewMode,
+  onViewModeChange,
+  streamer,
+  streamers,
+  onStreamerChange,
+}: {
+  ref: Ref<HTMLDivElement>;
+  status: '' | NovaStatus;
+  onStatusChange: (status: '' | NovaStatus) => void;
+  viewMode: VodViewMode;
+  onViewModeChange: (mode: VodViewMode) => void;
+  /** The streamer the rows are narrowed to; '' for every one. */
+  streamer: string;
+  /** Every streamer with a VOD, in the order the filter lists them. */
+  streamers: string[];
+  onStreamerChange: (streamer: string) => void;
+}) {
+  const streamerFilterId = useId();
+  return (
+    <div ref={ref} className="flex flex-wrap items-center gap-x-6 gap-y-2">
+      <StatusFilterBar
+        options={NOVA_STATUS_FILTERS}
+        value={status}
+        onChange={onStatusChange}
+        labelledBy={STATUS_FILTER_LABEL_ID}
+        className="flex-wrap gap-2"
+        heading={
+          <span id={STATUS_FILTER_LABEL_ID} className={MICRO_LABEL}>
+            Status
+          </span>
+        }
+      />
+      <Segmented label="View" value={viewMode} onChange={onViewModeChange} options={VIEW_OPTIONS} />
+      <div className="w-44">
+        <label htmlFor={streamerFilterId} className="sr-only">
+          Filter VOD submissions by streamer
+        </label>
+        <Select id={streamerFilterId} value={streamer} onChange={(event) => onStreamerChange(event.target.value)}>
+          <option value="">All streamers</option>
+          {streamers.map((slug) => (
+            <option key={slug} value={slug}>
+              {slug}
+            </option>
+          ))}
+        </Select>
       </div>
     </div>
   );
@@ -507,7 +499,7 @@ function VodTable({ label, children }: { label: string; children: ReactNode }) {
 }
 
 interface VodRowProps {
-  vod: NovaVodSubmission;
+  vod: NovaVodListItem;
   isCurator: boolean;
   expanded: boolean;
   /** Timeline mode: rows are not under a streamer card, so carry the slug inline. */
@@ -522,8 +514,13 @@ interface VodRowProps {
   onRetrySongs: () => void;
   /** The page's note store: this row seeds from it and writes back to it. */
   drafts: RowDrafts;
-  /** Resolves true when the review landed, so the row may drop its note. */
-  onAction: (id: string, status: NovaStatus, rejectNote: string) => Promise<boolean>;
+  /** Resolves true when the review landed, so the row may drop its note. Sent with the row as it shows the VOD. */
+  onAction: (vod: NovaVodListItem, status: NovaStatus, rejectNote: string) => Promise<boolean>;
+  /**
+   * Approves a VOD whose video has a stream, applying nothing (it asks first); resolves true when that landed. Sent
+   * with the row as it shows the VOD.
+   */
+  onApproveWithoutApplying: (vod: NovaVodListItem) => Promise<boolean>;
   onDelete: (vod: NovaVodSubmission) => void;
 }
 
@@ -545,6 +542,7 @@ export function VodRow({
   onRetrySongs,
   drafts,
   onAction,
+  onApproveWithoutApplying,
   onDelete,
 }: VodRowProps) {
   const [rejectNote, setRejectNote] = useState(() => drafts.read(vod.id));
@@ -552,10 +550,18 @@ export function VodRow({
   // Submitter-supplied: only YouTube's image CDNs may load in the curator's browser.
   const thumbnailUrl = sanitizeNovaUrl(vod.thumbnail_url, 'thumbnail');
 
-  // One press: a review sends the status (and the note a rejection carries), a delete asks first.
+  // One press: a review sends the status (and the note a rejection carries), a delete asks first, and so does an
+  // approval that applies nothing. A review goes with the VOD as this row shows it, the status it was pressed on.
   const press = async (action: VodAction) => {
-    if (action === 'delete') onDelete(vod);
-    else if (await onAction(vod.id, action, rejectNote)) setRejectNote('');
+    if (action === 'delete') {
+      onDelete(vod);
+      return;
+    }
+    const landed =
+      action === 'approveWithoutApplying'
+        ? await onApproveWithoutApplying(vod)
+        : await onAction(vod, action, rejectNote);
+    if (landed) setRejectNote('');
   };
 
   return (
@@ -630,6 +636,68 @@ function QuickAction({
       aria-disabled={acting !== undefined && acting !== spec.action ? true : undefined}
       onClick={() => onPress(spec.action)}
     />
+  );
+}
+
+/**
+ * The link to a correction's review page, which is the primary action of a VOD whose video has a stream: the kit's
+ * small primary button, with its words in the review card and as a 28 px icon (named by its label, like the
+ * row's other quick actions) in the row. It only navigates, so it stays live while a request of the row's is out,
+ * when the row's other actions are unavailable.
+ */
+function ReviewLink({ id, compact = false }: { id: string; compact?: boolean }) {
+  const to = `/nova/vods/${id}/review`;
+  if (compact) {
+    return (
+      <Tooltip label={REVIEW_LABEL}>
+        <Link to={to} aria-label={REVIEW_LABEL} className={`${buttonClasses({ variant: 'primary', size: 'sm' })} h-7 w-7`}>
+          <Icon name="gitCompare" size={14} />
+        </Link>
+      </Tooltip>
+    );
+  }
+  return (
+    <Link to={to} className={buttonClasses({ variant: 'primary', size: 'sm' })}>
+      <Icon name="gitCompare" size={14} />
+      {REVIEW_LABEL}
+    </Link>
+  );
+}
+
+/**
+ * What a row says about its video's stream: that the VOD corrects it (whatever its status), or, while a first
+ * submission is reviewed against the stream its video already has, that it maps to one. A reviewed first submission
+ * says nothing: an approved one's video mostly has its stream because that approval imported it.
+ */
+function StreamChip({ vod }: { vod: NovaVodListItem }) {
+  if (vod.kind === 'correction') {
+    return (
+      <Pill tone="violet" className="shrink-0">
+        修正
+      </Pill>
+    );
+  }
+  if (vod.kind === 'new' && isCorrectionReview(vod)) {
+    return (
+      <Pill tone="neutral" className="shrink-0">
+        對應既有 stream
+      </Pill>
+    );
+  }
+  return null;
+}
+
+/**
+ * What a row says of an apply of it that reached the catalog while its submission was never marked reviewed (the list
+ * says so: `open_apply`): the changes are in, and only the approval that recovers that apply is left, which
+ * 直接通過（不套用） on the row is, and says so when it asks.
+ */
+function LandedApplyChip({ vod }: { vod: NovaVodListItem }) {
+  if (!vod.open_apply) return null;
+  return (
+    <Pill tone="warn" className="shrink-0">
+      已套用，等待收尾
+    </Pill>
   );
 }
 
@@ -743,7 +811,7 @@ function VodReviewCard({
   onNoteChange,
   onPress,
 }: {
-  vod: NovaVodSubmission;
+  vod: NovaVodListItem;
   acting: VodAction | undefined;
   rejectNote: string;
   onNoteChange: (value: string) => void;
@@ -771,7 +839,8 @@ function VodReviewCard({
         <SectionLabel>Review</SectionLabel>
       )}
       <div className="flex flex-wrap items-center gap-2">
-        {(pending ? PENDING_ACTIONS : REVIEWED_ACTIONS).map((spec) => (
+        {isCorrectionReview(vod) ? <ReviewLink id={vod.id} /> : null}
+        {actionsFor(vod).map((spec) => (
           <Button
             key={spec.action}
             variant={spec.action === 'approved' ? 'primary' : spec.action === 'delete' ? 'ghost' : 'secondary'}
@@ -828,18 +897,23 @@ function VodSummaryRow({ vod, isCurator, expanded, showStreamer, songs, acting, 
         <VodThumbnail src={thumbnailUrl} />
       </td>
       <td className="flex min-w-0 flex-col gap-0.5 p-0 pl-3">
-        <button
-          type="button"
-          aria-expanded={expanded}
-          aria-controls={detailsId}
-          aria-label={`${expanded ? '收合' : '展開'} ${label}`}
-          onClick={onToggle}
-          className={`max-w-full truncate rounded-radius-sm text-left text-[15px] font-bold leading-tight focus-visible:outline-none focus-visible:shadow-focus ${
-            expanded ? 'text-accent-fg' : 'text-fg'
-          }`}
-        >
-          {vod.stream_title || '—'}
-        </button>
+        {/* The chip is at the end of the title's line, where a long title is cut short for it. */}
+        <span className="flex min-w-0 items-center gap-2">
+          <button
+            type="button"
+            aria-expanded={expanded}
+            aria-controls={detailsId}
+            aria-label={`${expanded ? '收合' : '展開'} ${label}`}
+            onClick={onToggle}
+            className={`min-w-0 flex-1 truncate rounded-radius-sm text-left text-[15px] font-bold leading-tight focus-visible:outline-none focus-visible:shadow-focus ${
+              expanded ? 'text-accent-fg' : 'text-fg'
+            }`}
+          >
+            {vod.stream_title || '—'}
+          </button>
+          <StreamChip vod={vod} />
+          <LandedApplyChip vod={vod} />
+        </span>
         <span className="flex items-center gap-1.5 text-[11px]">
           {showStreamer && (
             <>
@@ -876,11 +950,14 @@ function VodSummaryRow({ vod, isCurator, expanded, showStreamer, songs, acting, 
         <StoredTime value={vod.submitted_at} today={today} className="font-mono text-[11px] text-fg-muted" />
       </td>
       <td className="flex items-center justify-end gap-1.5 p-0">
-        {isCurator && !expanded
-          ? (vod.status === 'pending' ? PENDING_ACTIONS : REVIEWED_ACTIONS).map((spec) => (
+        {isCurator && !expanded ? (
+          <>
+            {isCorrectionReview(vod) ? <ReviewLink id={vod.id} compact /> : null}
+            {actionsFor(vod).map((spec) => (
               <QuickAction key={spec.action} spec={spec} acting={acting} onPress={onPress} />
-            ))
-          : null}
+            ))}
+          </>
+        ) : null}
       </td>
       <td className="flex justify-end p-0">
         <button

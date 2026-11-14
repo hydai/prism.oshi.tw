@@ -40,13 +40,21 @@ assert(!matchesSearch([null, undefined], 'anything'), 'rows with no searchable f
 
 // --- The pages fetch once and filter in the browser ---
 
-const pages: ReadonlyArray<{ page: string; call: string; total: string; rows: string }> = [
+// `heldIn` is where a landed request holds its row in view when that is not the page: the Nova VODs page defines
+// `keepVisible` and hands it to its actions hook, which calls it as the answer lands.
+const pages: ReadonlyArray<{ page: string; call: string; total: string; rows: string; heldIn?: string }> = [
   { page: 'CrystalTickets.tsx', call: 'api.listCrystalTickets(', total: 'countByStatus(allTickets', rows: 'visibleTickets(allTickets' },
   { page: 'NovaSubmissions.tsx', call: 'api.listNovaSubmissions(', total: 'countByStatus(allSubmissions', rows: 'visibleSubmissions(allSubmissions' },
-  { page: 'NovaVodSubmissions.tsx', call: 'api.listNovaVods(', total: 'countByStatus(allVods', rows: 'visibleVods(allVods' },
+  {
+    page: 'NovaVodSubmissions.tsx',
+    call: 'api.listNovaVods(',
+    total: 'countByStatus(allVods',
+    rows: 'visibleVods(allVods',
+    heldIn: 'hooks/useNovaVodActions.ts',
+  },
 ];
 
-for (const { page, call, total, rows } of pages) {
+for (const { page, call, total, rows, heldIn } of pages) {
   const source = readFileSync(new URL(`../src/pages/${page}`, import.meta.url), 'utf8');
   assert(!source.includes('Promise.all('), `${page}: the list is not fetched twice to be counted twice`);
   assert(
@@ -56,9 +64,14 @@ for (const { page, call, total, rows } of pages) {
   assert(source.includes('useMemo('), `${page}: the visible rows are derived from the loaded list`);
   assert(source.includes(total), `${page}: hero totals still count the unfiltered list`);
   assert(source.includes(rows), `${page}: the table renders the rows this page's filter keeps`);
+  const holder = heldIn === undefined ? source : readFileSync(new URL(`../src/${heldIn}`, import.meta.url), 'utf8');
   assert(
-    source.includes('keepVisible(id)'),
-    `${page}: a row acted on is held in view instead of vanishing from the filtered table`,
+    holder.includes('keepVisible(id)'),
+    `${heldIn ?? page}: a row acted on is held in view instead of vanishing from the filtered table`,
+  );
+  assert(
+    heldIn === undefined || source.includes('keepVisible,'),
+    `${page}: the page hands the hold to the hook that calls it`,
   );
   assert(
     source.includes('setJustActed(NO_RECENT_ACTIONS)'),

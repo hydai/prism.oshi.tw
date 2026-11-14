@@ -88,7 +88,9 @@ assert(store.read('sub-1') === '', 'a consumed draft is dropped');
 
 // Every row's editor writes through to the store, and the page drops the id once
 // the action that consumed the draft succeeded (or the row was deleted).
-const wiring: ReadonlyArray<{ page: string; writes: string; clears: readonly string[] }> = [
+// `clearedIn` is where the clears are made when it is not the page: the Nova VODs page hands its store to its actions
+// hook, which uses a draft up when a review has landed or the row was deleted.
+const wiring: ReadonlyArray<{ page: string; writes: string; clears: readonly string[]; clearedIn?: string }> = [
   { page: 'CrystalTickets.tsx', writes: 'drafts.write(ticket.id', clears: ['replyDrafts.clear(id)'] },
   {
     page: 'NovaSubmissions.tsx',
@@ -99,15 +101,17 @@ const wiring: ReadonlyArray<{ page: string; writes: string; clears: readonly str
     page: 'NovaVodSubmissions.tsx',
     writes: 'drafts.write(vod.id',
     clears: ['rejectNotes.clear(id)', 'rejectNotes.clear(vod.id)'],
+    clearedIn: 'hooks/useNovaVodActions.ts',
   },
 ];
 
-for (const { page, writes, clears } of wiring) {
+for (const { page, writes, clears, clearedIn } of wiring) {
   const source = readFileSync(new URL(`../src/pages/${page}`, import.meta.url), 'utf8');
   assert(source.includes('useRowDrafts()'), `${page}: the page holds one draft store for its rows`);
   assert(source.includes(writes), `${page}: the row's editor writes its draft through to the store`);
+  const clearing = clearedIn === undefined ? source : readFileSync(new URL(`../src/${clearedIn}`, import.meta.url), 'utf8');
   for (const clear of clears) {
-    assert(source.includes(clear), `${page}: ${clear} runs when the draft has been consumed`);
+    assert(clearing.includes(clear), `${clearedIn ?? page}: ${clear} runs when the draft has been consumed`);
   }
 }
 
@@ -168,6 +172,8 @@ const renderVod = (drafts: RowDrafts) =>
           reviewed_at: null,
           reviewer_note: '',
           kind: 'new',
+          target_stream: null,
+          open_apply: false,
         }}
         isCurator
         expanded
@@ -178,6 +184,7 @@ const renderVod = (drafts: RowDrafts) =>
         onRetrySongs={() => undefined}
         drafts={drafts}
         onAction={async () => true}
+        onApproveWithoutApplying={async () => true}
         onDelete={() => undefined}
       />
     </table>,
