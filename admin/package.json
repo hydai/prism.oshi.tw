@@ -19,7 +19,7 @@
     "test:fuzzy-grouping": "npx tsx shared/fuzzy-grouping.test.ts",
     "test:vod-correction": "npx tsx shared/vod-correction.test.ts",
     "test:guard": "npx tsx src/guard.test.ts",
-    "test:db": "tsc -p tsconfig.sqlite-tests.json && npx tsx src/db.test.ts && node --import tsx tests/catalog-sqlite.test.ts && node --import tsx tests/export-revision.test.ts && node --import tsx tests/work-tags-sqlite.test.ts",
+    "test:db": "tsc -p tsconfig.sqlite-tests.json && npx tsx src/db.test.ts && node --import tsx tests/catalog-sqlite.test.ts && node --import tsx tests/export-revision.test.ts && node --import tsx tests/work-tags-sqlite.test.ts && node --import tsx tests/vod-correction-sqlite.test.ts",
     "test:work-tags": "npx tsx src/work-tags.test.ts",
     "test:nova-db": "npx tsx src/nova-db.test.ts",
     "test:crystal-db": "npx tsx src/crystal-db.test.ts",

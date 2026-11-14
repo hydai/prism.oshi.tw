@@ -22,8 +22,10 @@ export class SQLiteD1 {
   readonly sqlite = new DatabaseSync(':memory:');
   readonly batches: Statement[][] = [];
   beforeBatch?: () => Promise<void>;
-  constructor() {
-    this.sqlite.exec(readFileSync(new URL('../schema.sql', import.meta.url), 'utf8'));
+  /** Runs each schema file in the order given; with none, the admin worker's schema.sql. */
+  constructor(...schemas: URL[]) {
+    const files = schemas.length > 0 ? schemas : [new URL('../schema.sql', import.meta.url)];
+    for (const schema of files) this.sqlite.exec(readFileSync(schema, 'utf8'));
   }
   get binding(): D1Database { return this as unknown as D1Database; }
   prepare(sql: string) { return new Statement(this, sql); }
