@@ -32,9 +32,12 @@ const PAGE_CSS = `    /* video fields left, fetched-video card right (one DOM ca
     .song-row .cell { padding-left: 8px; }
     .song-title { font-size: 13px; font-weight: 700; color: var(--text-primary); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
     .song-artist { font-size: 11px; color: var(--text-secondary); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .song-title-missing { font-size: 12px; font-weight: 500; color: #B45309; white-space: normal; }
+    html.dark .song-title-missing { color: #FCD34D; }
     .right { text-align: right; }
     .form-hint code { font-family: var(--font-mono); font-size: 11px; }
     .link-pill svg, .btn-primary svg { flex-shrink: 0; }
+    #load-current-btn { margin-top: 8px; }
 
     /* 800px, not 640px: below that the fields column drops under the 300px Turnstile widget. */
     @media (max-width: 800px) {
@@ -57,6 +60,7 @@ const VOD_SCRIPT = String.raw`
       var dateInput = form.querySelector('[name="stream_date"]');
       var streamerSelect = form.querySelector('[name="streamer_slug"]');
       var urlCheck = document.getElementById('url-check');
+      var loadBtn = document.getElementById('load-current-btn');
       var submitBtn = document.getElementById('submit-btn');
       var submitLabel = document.getElementById('submit-label');
       var resultDiv = document.getElementById('result');
@@ -67,6 +71,12 @@ const VOD_SCRIPT = String.raw`
       var videoTitle = document.getElementById('video-preview-title');
       var videoDate = document.getElementById('video-preview-date');
       var thumbnailUrl = '';
+      // The revision /vod/api/current gave with the list 載入目前歌單 put in the textarea, kept with the VTuber and the
+      // video it was loaded for ({ slug, videoId, revision }), or null. The video is the id Nova reads from the URL, not
+      // the URL's text: the same video written another way (without its &t=, as youtu.be/…, without its ?si=) is still
+      // that list. A submission sends it back as base_revision while the VTuber and the video still match, so Nova can
+      // refuse the correction (list_changed) if that list changed since.
+      var loadedRevision = null;
 
       // --- Inline parser (ported from lib/parse.ts) ---
       var LINE_TS_RE = /^(?:(\d{1,2}):)?(\d{1,2}):(\d{2})/;
@@ -145,6 +155,48 @@ const VOD_SCRIPT = String.raw`
         return result;
       }
 
+      // --- Line order (not in lib/parse.ts) ---
+      // The parser ends a line where the next line starts, so a song missed and typed out of its place would end across
+      // the rows after it, and one appended below a start-only paste would end before its own start. The readable lines
+      // are put in time order first and then read, so each end is filled from the next row in time. A line sorts by the
+      // start parseSongLine reads and comes back as typed. Lines that start together keep their order: the index breaks
+      // the tie, whatever the engine's sort does. A line the parser cannot read is dropped, as parseTextToSongs drops it.
+      // Aurora's parseTextToSongsByStart (tools/aurora/src/lib/parse.ts) sorts the same way: the two must behave alike.
+      function sortSongLines(text) {
+        var lines = text.split('\n');
+        var readable = [];
+        for (var i = 0; i < lines.length; i++) {
+          var song = parseSongLine(lines[i]);
+          if (song) readable.push({ line: lines[i], start: song.startSeconds, index: i });
+        }
+        readable.sort(function(a, b) { return a.start - b.start || a.index - b.index; });
+        return readable.map(function(entry) { return entry.line; }).join('\n');
+      }
+      // --- end line order ---
+
+      // --- Inline URL parser (ported from validate.ts) ---
+      // Nova lists a video by the id its parseYoutubeVideoUrl (tools/nova/src/validate.ts) reads from a URL, so the form
+      // reads an id the same way, quirks included: the watch pattern is greedy, so it takes the last v= of the query
+      // (watch?v=AAA&rev=1 reads as video 1), and the patterns are tried in this order, watch, live, youtu.be. A URL it
+      // does not read gives null.
+      function parseYoutubeVideoUrl(raw) {
+        var trimmed = raw.trim();
+        var watchMatch = trimmed.match(/(?:https?:\/\/)?(?:www\.)?youtube\.com\/watch\?.*v=([a-zA-Z0-9_-]+)/);
+        if (watchMatch) return { videoId: watchMatch[1], canonical: 'https://www.youtube.com/watch?v=' + watchMatch[1] };
+        var liveMatch = trimmed.match(/(?:https?:\/\/)?(?:www\.)?youtube\.com\/live\/([a-zA-Z0-9_-]+)/);
+        if (liveMatch) return { videoId: liveMatch[1], canonical: 'https://www.youtube.com/watch?v=' + liveMatch[1] };
+        var shortMatch = trimmed.match(/(?:https?:\/\/)?youtu\.be\/([a-zA-Z0-9_-]+)/);
+        if (shortMatch) return { videoId: shortMatch[1], canonical: 'https://www.youtube.com/watch?v=' + shortMatch[1] };
+        return null;
+      }
+
+      // The id a loaded list's revision is kept under: the one Nova reads from the URL, or null for a URL it does not read.
+      function videoIdOf(url) {
+        var parsed = parseYoutubeVideoUrl(url);
+        return parsed ? parsed.videoId : null;
+      }
+      // --- end URL parser ---
+
       // Every node is built with createElement/textContent: song names and artists are user text.
       function el(tag, className, text) {
         var node = document.createElement(tag);
@@ -174,7 +226,12 @@ const VOD_SCRIPT = String.raw`
           var row = el('div', 'prism-row song-row');
           row.appendChild(el('span', 'mono mono-muted', String(i + 1)));
           var text = el('div', 'cell cell-stack');
-          text.appendChild(el('div', 'song-title', s.songName));
+          // A line with no title (such as "/ D / W") is dropped when the list is submitted.
+          if (s.songName.trim() === '') {
+            text.appendChild(el('div', 'song-title song-title-missing', '這行沒有歌名，送出時會略過'));
+          } else {
+            text.appendChild(el('div', 'song-title', s.songName));
+          }
           text.appendChild(el('div', 'song-artist', s.artist || '—'));
           row.appendChild(text);
           row.appendChild(el('span', 'mono right', s.startTimestamp));
@@ -185,7 +242,7 @@ const VOD_SCRIPT = String.raw`
       }
 
       songsTextarea.addEventListener('input', function() {
-        renderPreview(parseTextToSongs(this.value));
+        renderPreview(parseTextToSongs(sortSongLines(this.value)));
       });
 
       // Fetched video card: thumbnail only from YouTube image hosts, text via textContent.
@@ -210,52 +267,60 @@ const VOD_SCRIPT = String.raw`
         videoPreview.style.display = 'none';
       }
 
+      // Duplicate check, for the VTuber and URL the fields hold now. Only an archived VOD (approved
+      // stream) offers its current list; the button is not hidden while this runs, or a click that
+      // moved focus here would lose its target. An answer for fields that changed meanwhile is dropped.
+      function checkVod() {
+        var url = urlInput.value.trim();
+        var slug = streamerSelect.value;
+        if (!url || !slug) {
+          loadBtn.style.display = 'none';
+          return;
+        }
+        fetch('/vod/api/check?streamer_slug=' + encodeURIComponent(slug) + '&url=' + encodeURIComponent(url))
+          .then(function(r) { return r.json(); })
+          .then(function(data) {
+            if (slug !== streamerSelect.value || url !== urlInput.value.trim()) return;
+            urlCheck.style.display = '';
+            loadBtn.style.display = data.archived ? '' : 'none';
+            if (data.archived) {
+              urlCheck.className = 'check-line check-ok';
+              urlCheck.textContent = '此 VOD 已收錄。若發現錯誤，可以送出修正';
+            } else if (data.exists && data.hasApproved) {
+              // The check answers alike whether the stream is in the pipeline, rejected, excluded or deleted, so
+              // this reads true for each, and Nova takes a new submission in each.
+              urlCheck.className = 'check-line check-exists';
+              urlCheck.textContent = '此 VOD 已通過審核，尚未收錄。若發現錯誤，可以重新提交';
+            } else if (data.exists && data.pendingCount > 0) {
+              urlCheck.className = 'check-line check-resubmit';
+              urlCheck.textContent = '此 VOD 已有 ' + data.pendingCount + ' 筆提交（審核中），你仍可提交新版本';
+            } else if (data.exists && data.rejectedCount > 0) {
+              urlCheck.className = 'check-line check-exists';
+              urlCheck.textContent = '此 VOD 先前的提交已被拒絕，歡迎重新提交修正版本';
+            } else {
+              urlCheck.className = 'check-line check-ok';
+              urlCheck.textContent = '此 VOD 尚未被提交';
+            }
+          })
+          .catch(function() {
+            if (slug !== streamerSelect.value || url !== urlInput.value.trim()) return;
+            urlCheck.style.display = 'none';
+            loadBtn.style.display = 'none';
+          });
+      }
+
       // On URL blur: duplicate check + auto-fetch video info
       var lastFetchedUrl = '';
       urlInput.addEventListener('blur', function() {
         var url = this.value.trim();
-        var slug = streamerSelect.value;
         if (!url) {
           urlCheck.style.display = 'none';
+          loadBtn.style.display = 'none';
           return;
         }
 
         var encoded = encodeURIComponent(url);
-
-        // Duplicate check
-        if (slug) {
-          fetch('/vod/api/check?streamer_slug=' + encodeURIComponent(slug) + '&url=' + encoded)
-            .then(function(r) { return r.json(); })
-            .then(function(data) {
-              urlCheck.style.display = '';
-              if (data.inAdmin && data.adminStatus === 'approved') {
-                urlCheck.className = 'check-line check-ok';
-                urlCheck.textContent = '此 VOD 已收錄於歌單中，無需再提交';
-              } else if (data.exists && data.hasApproved && data.inAdmin) {
-                // Approved, and the video still has a stream in admin: Nova refuses a new submission.
-                urlCheck.className = 'check-line check-exists';
-                urlCheck.textContent = '此 VOD 已通過審核，無需重複提交';
-              } else if (data.exists && data.pendingCount > 0) {
-                urlCheck.className = 'check-line check-resubmit';
-                urlCheck.textContent = '此 VOD 已有 ' + data.pendingCount + ' 筆提交（審核中），你仍可提交新版本';
-              } else if (data.exists && data.rejectedCount > 0) {
-                urlCheck.className = 'check-line check-exists';
-                urlCheck.textContent = '此 VOD 先前的提交已被拒絕，歡迎重新提交修正版本';
-              } else if (data.exists && data.hasApproved) {
-                // Approved once, but its stream was deleted since: Nova takes a new submission.
-                urlCheck.className = 'check-line check-resubmit';
-                urlCheck.textContent = '此 VOD 目前未收錄於歌單中，歡迎重新提交';
-              } else if (data.inAdmin && (data.adminStatus === 'pending' || data.adminStatus === 'extracted')) {
-                // Pipeline state alone does not mean a Nova submission exists.
-                urlCheck.style.display = 'none';
-                urlCheck.textContent = '';
-              } else {
-                urlCheck.className = 'check-line check-ok';
-                urlCheck.textContent = '此 VOD 尚未被提交';
-              }
-            })
-            .catch(function() { urlCheck.style.display = 'none'; });
-        }
+        checkVod();
 
         // Auto-fetch video info (only once per URL)
         if (url === lastFetchedUrl) return;
@@ -285,9 +350,62 @@ const VOD_SCRIPT = String.raw`
           .catch(function() {});
       });
 
+      // The check reads the VTuber too: a URL entered before the VTuber was chosen, or a switch to a
+      // VTuber whose copy of this VOD is (or is not) archived, shows or hides 載入目前歌單 again.
+      streamerSelect.addEventListener('change', function() {
+        if (!urlInput.value.trim()) return;
+        if (!streamerSelect.value) urlCheck.style.display = 'none';
+        checkVod();
+      });
+
+      // A quiet note on the check line (the grey of check-loading: this is information, not an error).
+      function showCheckNote(text) {
+        urlCheck.style.display = '';
+        urlCheck.className = 'check-line check-loading';
+        urlCheck.textContent = text;
+      }
+
+      // 載入目前歌單: put the archived VOD's public list into the textarea, ready to be corrected.
+      // The streamer and URL are read again here, so the answer always matches what the fields say now.
+      // The list's revision is kept once the list is in the textarea, replacing the one kept before; a declined
+      // replace and a failed or stale load keep what was there, and a load that finds no list forgets the revision
+      // of this VTuber and video. One kept for another VTuber or video stays: it still describes the list in the
+      // textarea, and the fields may come back to the ones it was loaded for (a mistyped URL, put right).
+      loadBtn.addEventListener('click', async function() {
+        var slug = streamerSelect.value;
+        var url = urlInput.value.trim();
+        if (!slug || !url) return;
+        var videoId = videoIdOf(url);
+
+        loadBtn.disabled = true;
+        try {
+          var res = await fetch('/vod/api/current?streamer_slug=' + encodeURIComponent(slug) + '&url=' + encodeURIComponent(url));
+          if (!res.ok) throw new Error('current answered ' + res.status);
+          var data = await res.json();
+          // The streamer or the URL changed while this lookup was in flight: drop the stale answer.
+          if (slug !== streamerSelect.value || url !== urlInput.value.trim()) return;
+          if (!data.archived || !data.text) {
+            if (loadedRevision && loadedRevision.slug === slug && loadedRevision.videoId === videoId) loadedRevision = null;
+            showCheckNote('這支影片還沒有收錄的歌單');
+            return;
+          }
+          if (songsTextarea.value.trim() && !window.confirm('要用目前歌單取代欄位裡的內容嗎？')) return;
+          songsTextarea.value = data.text;
+          loadedRevision = typeof data.revision === 'string' && videoId !== null ? { slug: slug, videoId: videoId, revision: data.revision } : null;
+          // Programmatic changes fire no input event: dispatch it so the preview renders as it does for typing.
+          songsTextarea.dispatchEvent(new Event('input'));
+        } catch(err) {
+          // A failure for fields that changed meanwhile is stale too: the line now speaks for the new VOD.
+          if (slug !== streamerSelect.value || url !== urlInput.value.trim()) return;
+          showCheckNote('無法載入目前歌單，請稍後再試');
+        } finally {
+          loadBtn.disabled = false;
+        }
+      });
+
       // Collect songs from textarea
       function collectSongs() {
-        var parsed = parseTextToSongs(songsTextarea.value);
+        var parsed = parseTextToSongs(sortSongLines(songsTextarea.value));
         return parsed.map(function(s) {
           // Format as H:MM:SS for backend parseTimestamp()
           var fmtStart = secondsToHMS(s.startSeconds);
@@ -341,6 +459,13 @@ const VOD_SCRIPT = String.raw`
         if (thumbnailUrl) {
           body.thumbnail_url = thumbnailUrl;
         }
+        // When the list in the textarea was loaded for the VTuber and video being sent, its revision goes along, so Nova
+        // can refuse the correction if that list changed since. The video is compared by its id, so the URL may be written
+        // another way than when the list was loaded. For another VTuber or video it is not sent, but it is kept: the
+        // fields may come back to the ones it was loaded for.
+        if (loadedRevision && loadedRevision.slug === body.streamer_slug && loadedRevision.videoId === videoIdOf(body.video_url)) {
+          body.base_revision = loadedRevision.revision;
+        }
 
         try {
           var res = await fetch('/vod/api/submit', {
@@ -352,24 +477,29 @@ const VOD_SCRIPT = String.raw`
 
           if (res.ok) {
             resultDiv.className = 'result-msg result-success';
-            resultDiv.textContent = '提交成功！ID: ' + data.id + '。感謝你的幫助！';
+            resultDiv.textContent = (data.kind === 'correction' ? '修正已送出！ID: ' : '提交成功！ID: ') + data.id + '。感謝你的幫助！';
             form.reset();
             songsTextarea.value = '';
             songsPreview.textContent = '';
             thumbnailUrl = '';
+            loadedRevision = null;
+            loadBtn.style.display = 'none';
             hideVideoPreview();
             if (window.turnstile) turnstile.reset();
-          } else if (res.status === 409) {
-            if (data.inAdmin && (data.adminStatus === 'pending' || data.adminStatus === 'extracted')) {
-              // Keep pipeline-only conflicts silent until they can be distinguished from submissions.
-              resultDiv.style.display = 'none';
-              resultDiv.textContent = '';
-            } else {
-              resultDiv.className = 'result-msg result-warning';
-              resultDiv.textContent = data.inAdmin
-                ? '此 VOD 已收錄於歌單中，無需再提交'
-                : '此 VOD 已通過審核，無需重複提交';
-            }
+          } else if (res.status === 409 && data.error === 'list_changed') {
+            // The list changed after it was loaded. The revision stays: dropping it would let the same list through,
+            // compared against the changed list, which is what this refusal prevents. The copy says to press
+            // 載入目前歌單, so the button is shown, even where a check that answered "not archived" hid it: a press
+            // that finds no list for these fields then forgets the revision, and the next submit goes without it.
+            loadBtn.style.display = '';
+            resultDiv.className = 'result-msg result-error';
+            resultDiv.textContent = '目前歌單在你載入之後更新過了。請按「載入目前歌單」重新載入（會取代欄位裡的內容），再修正一次。';
+          } else if (res.status === 422 && data.error === 'no_changes') {
+            resultDiv.className = 'result-msg result-warning';
+            resultDiv.textContent = '與目前歌單相同，沒有需要修正的地方';
+            // The server verified this Turnstile token before it compared the lists, and a token works once:
+            // without a fresh one, the corrected list the contributor submits next would be refused.
+            if (window.turnstile) turnstile.reset();
           } else {
             resultDiv.className = 'result-msg result-error';
             resultDiv.textContent = data.error || '提交失敗，請稍後再試';
@@ -433,6 +563,7 @@ export function renderVodPage(siteKey: string, streamers: ApprovedStreamer[], no
                 placeholder="https://www.youtube.com/watch?v=..."
                 class="form-input" maxlength="${VOD_FIELD_LIMITS.video_url}" /></div>
               <div id="url-check" class="check-line" style="display: none;"></div>
+              <button type="button" id="load-current-btn" class="link-pill" style="display: none;">載入目前歌單</button>
             </div>
           </div>
 
