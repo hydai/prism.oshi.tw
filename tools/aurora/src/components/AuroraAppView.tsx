@@ -1,6 +1,7 @@
 import type { RefObject } from 'react';
 import {
   Clock,
+  CloudDownload,
   Download,
   ExternalLink,
   FileText,
@@ -12,6 +13,7 @@ import {
 } from 'lucide-react';
 import type { StreamerOption } from '../lib/nova';
 import type { AuroraSongEditorController } from '../hooks/useAuroraSongEditor';
+import type { CurrentListLoaderController } from '../hooks/useCurrentListLoader';
 import type { NovaSubmissionController } from '../hooks/useNovaSubmission';
 import AuroraPlayerControls from './AuroraPlayerControls';
 import AuroraStampControls from './AuroraStampControls';
@@ -66,6 +68,7 @@ export interface AuroraAppViewProps {
   shortcuts: ShortcutController;
   dialogs: DialogController;
   submission: NovaSubmissionController;
+  currentList: CurrentListLoaderController;
 }
 
 const SHORTCUTS = [
@@ -218,11 +221,90 @@ function AuroraVideoPanel({ videoId, vodUrl, player, shortcuts }: VideoPanelProp
   );
 }
 
+interface SubmitStatusBannerProps {
+  status: NovaSubmissionController['status'];
+  /** Whether the answer shows here; where it does not, the live region stays mounted, empty. */
+  shown: boolean;
+  className?: string;
+}
+
+// Each answer's colours. A notice (the list repeats the archived one, nothing to fix) is amber like Nova's own
+// warning for it, not an error's red, and it does not interrupt as an alert does.
+const STATUS_TONES = {
+  success: 'bg-emerald-50 text-emerald-700 dark:bg-emerald-500/10 dark:text-emerald-400',
+  notice: 'bg-amber-50 text-amber-800 dark:bg-amber-500/10 dark:text-amber-300',
+  error: 'bg-red-50 text-red-700 dark:bg-red-500/10 dark:text-red-400',
+} as const;
+
+// Nova's answer to a submission, shown where the curator is looking: in the modal while it is open (the
+// toolbar is behind its backdrop), under the toolbar once it is closed. A screen reader may not announce a
+// live region that mounts with its text already in it, so a success or a notice fills a polite region that is
+// mounted before the answer arrives: the modal's mounts with the modal, the toolbar's stays mounted while the
+// modal is open, so a success that closes the modal fills it. An error is an alert, announced as it appears.
+function SubmitStatusBanner({ status, shown, className = '' }: SubmitStatusBannerProps) {
+  const answer = shown ? status : null;
+  return (
+    <>
+      <div role="status">
+        {answer && answer.type !== 'error' && (
+          <div className={`text-[13px] px-3 py-2 rounded-lg ${STATUS_TONES[answer.type]} ${className}`}>
+            {answer.message}
+          </div>
+        )}
+      </div>
+      {answer?.type === 'error' && (
+        <div role="alert" className={`text-[13px] px-3 py-2 rounded-lg ${STATUS_TONES.error} ${className}`}>
+          {answer.message}
+        </div>
+      )}
+    </>
+  );
+}
+
+interface LoadCurrentListButtonProps {
+  selectedStreamer: string;
+  currentList: CurrentListLoaderController;
+}
+
+// The workspace only renders once a video is loaded, so a streamer is the one thing left to wait for.
+function LoadCurrentListButton({ selectedStreamer, currentList }: LoadCurrentListButtonProps) {
+  return (
+    <button
+      onClick={currentList.load}
+      disabled={!selectedStreamer || currentList.loading}
+      className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-white/60 dark:bg-white/[0.06] border border-[var(--border-default)] text-[var(--text-secondary)] text-[13px] font-medium hover:bg-white/80 dark:hover:bg-white/[0.10] disabled:opacity-40"
+      title={!selectedStreamer ? '請先選擇 VTuber' : '載入目前歌單'}
+      data-testid="load-current-button"
+    >
+      <CloudDownload size={14} className={currentList.loading ? 'animate-pulse' : ''} />
+      <span className="hidden sm:inline">載入目前歌單</span>
+    </button>
+  );
+}
+
+// Why nothing was loaded (not archived yet, or the request failed). It is information, so it is neutral, and
+// it fills a polite region that stays mounted, so a screen reader announces it as it arrives.
+function CurrentListNote({ message }: { message: string | null }) {
+  return (
+    <div role="status">
+      {message && (
+        <div
+          className="mt-3 text-[13px] px-3 py-2 rounded-lg border border-[var(--border-default)] bg-white/60 dark:bg-white/[0.06] text-[var(--text-secondary)]"
+          data-testid="load-current-message"
+        >
+          {message}
+        </div>
+      )}
+    </div>
+  );
+}
+
 interface SongEditorPanelProps {
   selectedStreamer: string;
   editor: AuroraSongEditorController;
   dialogs: DialogController;
   submission: NovaSubmissionController;
+  currentList: CurrentListLoaderController;
 }
 
 function AuroraSongEditorPanel({
@@ -230,6 +312,7 @@ function AuroraSongEditorPanel({
   editor,
   dialogs,
   submission,
+  currentList,
 }: SongEditorPanelProps) {
   const selectedSong = editor.selectedIndex === null
     ? null
@@ -254,6 +337,7 @@ function AuroraSongEditorPanel({
           <FileText size={14} />
           <span className="hidden sm:inline">匯入</span>
         </button>
+        <LoadCurrentListButton selectedStreamer={selectedStreamer} currentList={currentList} />
         <button
           onClick={() => dialogs.open('export')}
           disabled={editor.songs.length === 0}
@@ -294,17 +378,12 @@ function AuroraSongEditorPanel({
         )}
       </div>
 
-      {submission.status && (
-        <div
-          className={`text-[13px] px-3 py-2 rounded-lg ${
-            submission.status.type === 'success'
-              ? 'bg-emerald-50 text-emerald-700 dark:bg-emerald-500/10 dark:text-emerald-400'
-              : 'bg-red-50 text-red-700 dark:bg-red-500/10 dark:text-red-400'
-          }`}
-        >
-          {submission.status.message}
-        </div>
-      )}
+      {/* Both live regions stay mounted, empty until they have something to say. While empty they would add the
+          column's gap, which -mt-3 takes back; each message spaces itself with mt-3. */}
+      <div className="-mt-3">
+        <SubmitStatusBanner status={submission.status} shown={!submission.isOpen} className="mt-3" />
+        <CurrentListNote message={currentList.message} />
+      </div>
 
       <AuroraStampControls
         selectedIndex={editor.selectedIndex}
@@ -348,6 +427,7 @@ interface WorkspaceProps {
   shortcuts: ShortcutController;
   dialogs: DialogController;
   submission: NovaSubmissionController;
+  currentList: CurrentListLoaderController;
 }
 
 function AuroraWorkspace(props: WorkspaceProps) {
@@ -364,6 +444,7 @@ function AuroraWorkspace(props: WorkspaceProps) {
         editor={props.editor}
         dialogs={props.dialogs}
         submission={props.submission}
+        currentList={props.currentList}
       />
     </div>
   );
@@ -449,6 +530,8 @@ function NovaSubmitModal({ streamer, editor, submission }: SubmitModalProps) {
           <div ref={submission.turnstileContainerRef} />
         </div>
 
+        <SubmitStatusBanner status={submission.status} shown className="mb-4" />
+
         <div className="flex gap-2">
           <button
             onClick={submission.close}
@@ -477,6 +560,7 @@ export default function AuroraAppView({
   shortcuts,
   dialogs,
   submission,
+  currentList,
 }: AuroraAppViewProps) {
   return (
     <div className="min-h-screen flex flex-col">
@@ -492,6 +576,7 @@ export default function AuroraAppView({
             shortcuts={shortcuts}
             dialogs={dialogs}
             submission={submission}
+            currentList={currentList}
           />
         ) : (
           <AuroraLanding video={video} />
@@ -499,10 +584,13 @@ export default function AuroraAppView({
       </main>
       <AuroraFooter />
 
+      {/* A pasted list carries no revision, so a replacing import leaves the session without the loaded list's. An
+          append fills a missing end only from the rows the submission sends, which skips a row with no name. */}
       <PasteImportModal
         open={dialogs.active === 'import'}
         onClose={dialogs.close}
         onImport={editor.importSongs}
+        existingSongs={editor.songs.filter((song) => song.name.trim() !== '')}
       />
       <ExportModal
         open={dialogs.active === 'export'}

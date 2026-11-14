@@ -1,6 +1,6 @@
 import { useEffect, useId, useRef, useState } from 'react';
 import { X, FileText, Plus, Replace } from 'lucide-react';
-import { parseTextToSongs, parsedSongKey, type ParsedSong } from '../lib/parse';
+import { parseTextToSongsByStart, parsedSongKey, type ParsedSong } from '../lib/parse';
 
 function toHMS(seconds: number): string {
   const h = Math.floor(seconds / 3600);
@@ -13,9 +13,11 @@ interface Props {
   open: boolean;
   onClose: () => void;
   onImport: (songs: ParsedSong[], mode: 'replace' | 'append') => void;
+  /** The editor's rows the submission sends: an append fills a missing end from them too (parseTextToSongsByStart). */
+  existingSongs: ReadonlyArray<{ startSeconds: number }>;
 }
 
-export default function PasteImportModal({ open, onClose, onImport }: Props) {
+export default function PasteImportModal({ open, onClose, onImport, existingSongs }: Props) {
   const [text, setText] = useState('');
   const [mode, setMode] = useState<'replace' | 'append'>('replace');
   const dialogRef = useRef<HTMLDialogElement>(null);
@@ -43,7 +45,8 @@ export default function PasteImportModal({ open, onClose, onImport }: Props) {
 
   if (!open) return null;
 
-  const parsed = text.trim() ? parseTextToSongs(text) : [];
+  // What the preview shows is what the import carries: an append reads the missing ends against the editor's rows.
+  const parsed = text.trim() ? parseTextToSongsByStart(text, mode === 'append' ? existingSongs : undefined) : [];
 
   const handleImport = () => {
     if (parsed.length === 0) return;
@@ -149,7 +152,9 @@ export default function PasteImportModal({ open, onClose, onImport }: Props) {
                     {parsed.map((s, i) => (
                       <tr key={parsedSongKey(s)} className="border-b border-[var(--border-default)] last:border-0" data-testid="import-preview-row">
                         <td className="px-3 py-1 font-mono text-[var(--text-tertiary)]">{String(i + 1).padStart(2, '0')}</td>
-                        <td className="px-3 py-1 text-[var(--text-primary)]">{s.songName}</td>
+                        {s.songName.trim() === ''
+                          ? <td className="px-3 py-1 text-amber-700 dark:text-amber-300">這行沒有歌名，送出時會略過</td>
+                          : <td className="px-3 py-1 text-[var(--text-primary)]">{s.songName}</td>}
                         <td className="px-3 py-1 text-[var(--text-secondary)]">{s.artist || '—'}</td>
                         <td className="px-3 py-1 font-mono text-emerald-600 dark:text-emerald-400">{toHMS(s.startSeconds)}</td>
                         <td className="px-3 py-1 font-mono text-orange-500 dark:text-orange-400">{s.endSeconds !== null ? toHMS(s.endSeconds) : '--:--:--'}</td>
