@@ -59,6 +59,8 @@ export interface SubmitBody {
 
 // --- VOD Submission types ---
 
+export type VodSubmissionKind = 'new' | 'correction';
+
 export interface VodSubmissionRow {
   id: string;
   streamer_slug: string;
@@ -72,6 +74,7 @@ export interface VodSubmissionRow {
   submitted_at: string;
   reviewed_at: string | null;
   reviewer_note: string;
+  kind: VodSubmissionKind;
 }
 
 export interface VodSongRow {
@@ -128,6 +131,7 @@ export interface VodSubmissionSummary {
   submitted_at: string;
   reviewed_at: string | null;
   reviewer_note: string;
+  kind: VodSubmissionKind;
   song_count: number;
 }
 
