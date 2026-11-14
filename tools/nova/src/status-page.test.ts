@@ -45,6 +45,7 @@ const vods: VodSubmissionSummary[] = [
     submitted_at: '2026-08-22T23:10:00.000Z',
     reviewed_at: null,
     reviewer_note: '',
+    kind: 'new',
     song_count: 19,
   },
   {
@@ -57,6 +58,7 @@ const vods: VodSubmissionSummary[] = [
     submitted_at: '2026-07-26T10:05:00.000Z',
     reviewed_at: '2026-07-26T12:30:00.000Z',
     reviewer_note: '',
+    kind: 'new',
     song_count: 20,
   },
 ];
@@ -73,6 +75,7 @@ const vodsWithImportedPending: VodSubmissionSummary[] = [
     submitted_at: '2026-08-12T01:22:00.000Z',
     reviewed_at: null,
     reviewer_note: '',
+    kind: 'new',
     song_count: 13,
   },
 ];

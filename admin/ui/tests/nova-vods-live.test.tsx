@@ -68,6 +68,7 @@ function vod(fields: VodFields): NovaVodSubmission {
     submitted_at: fields.submittedAt,
     reviewed_at: fields.reviewedAt ?? null,
     reviewer_note: fields.reviewerNote ?? '',
+    kind: 'new',
   };
 }
 

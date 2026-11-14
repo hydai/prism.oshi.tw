@@ -61,6 +61,7 @@ function novaVod(overrides: Partial<NovaVodSubmission> = {}): NovaVodSubmission 
     submitted_at: '2026-08-22 23:10',
     reviewed_at: null,
     reviewer_note: '',
+    kind: 'new',
     ...overrides,
   };
 }

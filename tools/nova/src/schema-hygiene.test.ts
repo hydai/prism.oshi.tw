@@ -36,4 +36,8 @@ assert(
   'schema.sql must not declare a UNIQUE index on vod_submissions(streamer_slug, video_id) (migration 0012 made it a plain index)',
 );
 
+assert(/kind TEXT NOT NULL DEFAULT 'new' CHECK\(kind IN \('new','correction'\)\)/.test(schema), 'schema.sql declares vod_submissions.kind');
+const migration0015 = readFileSync(resolve(here, '../migrations/0015_add_vod_submission_kind.sql'), 'utf8');
+assert(/ALTER TABLE vod_submissions ADD COLUMN kind TEXT NOT NULL DEFAULT 'new' CHECK\(kind IN \('new','correction'\)\)/.test(migration0015), 'migration 0015 adds vod_submissions.kind');
+
 console.log('✓ schema.sql is DDL + state only; seed.sql holds the two demo streamers');

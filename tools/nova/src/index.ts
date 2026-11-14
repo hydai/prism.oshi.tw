@@ -603,6 +603,7 @@ app.post('/vod/api/submit', async (c) => {
     stream_date: streamDate,
     thumbnail_url: thumbnailUrl,
     submitter_note: body.submitter_note?.trim() ?? '',
+    kind: 'new',
   }, parsedSongs);
 
   return c.json({ id }, 201);
