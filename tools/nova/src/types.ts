@@ -120,6 +120,7 @@ export interface VodSubmissionSummary {
   submitted_at: string;
   reviewed_at: string | null;
   reviewer_note: string;
+  /** As stored (migration 0015). The page reads it through publicVodKind, never directly. */
   kind: VodSubmissionKind;
   song_count: number;
 }

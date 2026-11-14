@@ -1,5 +1,6 @@
 import { html, raw } from 'hono/html';
-import type { SubmissionSummary, VodSubmissionSummary, AdminStreamSummary } from './types';
+import type { SubmissionSummary, VodSubmissionKind, VodSubmissionSummary, AdminStreamSummary } from './types';
+import { publicVodKind } from './vod-db';
 import { DARK_MODE_CSS, SPARKLE_SVG, svgIcon, themeToggleHTML } from './theme';
 import { escapeHtml as esc } from '../../shared/web/html';
 import { pageShell } from '../../shared/web/page-shell';
@@ -27,10 +28,11 @@ const PAGE_CSS = `    .vt-row { grid-template-columns: 40px minmax(0, 1fr) 160px
     }
 `;
 
-function statusBadge(status: string): string {
-  const labels: Record<string, string> = { pending: '審核中', approved: '已通過', rejected: '已拒絕', admin_done: '已收錄' };
+/** `kind` is the kind the public may see (publicVodKind), never a submission's stored kind. */
+function statusBadge(status: string, kind: VodSubmissionKind = 'new'): string {
+  const labels = kind === 'correction' ? CORRECTION_LABELS : STATUS_LABELS;
   const s = labels[status] ? status : 'pending';
-  return `<span class="badge badge-${s}">${labels[s] ?? labels.pending}</span>`;
+  return `<span class="badge badge-${s}">${labels[s]}</span>`;
 }
 
 function formatDate(iso: string | null): string {
@@ -58,6 +60,16 @@ const STATUS_LABELS: Record<string, string> = {
   approved: '已通過',
   rejected: '已拒絕',
   admin_done: '已收錄',
+};
+
+// A correction's states read as the review of a change to an archived list. The
+// badge keeps the CSS class of its base status; there is no 已收錄 here, because a
+// correction is never promoted to it. An approval does not always change the list
+// (the curator can approve without applying), so it says 通過, not 套用.
+const CORRECTION_LABELS: Record<string, string> = {
+  pending: '修正審核中',
+  approved: '修正已通過',
+  rejected: '修正未採用',
 };
 
 const YOUTUBE_VIDEO_ID = /^[A-Za-z0-9_-]{11}$/;
@@ -193,12 +205,25 @@ export function renderStatusPage(
     adminMap.set(adminKey(a.streamer_id, a.video_id), a);
   }
 
-  // A VOD row's *effective* status merges admin_done: an approved admin match promotes
-  // the display to 已收錄 regardless of the nova submission's own status.
-  const effectiveStatusOfVod = (v: VodSubmissionSummary): string => {
+  // A submission's VOD is archived when its admin stream is approved; any other status
+  // is pipeline state, which this page never shows (listAdminStreams loads no other).
+  // Its kind is read through publicVodKind alone: a correction filed against a stream
+  // still in the pipeline reads as an ordinary submission, exactly like one for a video
+  // admin has never seen, and takes the correction labels once that stream is approved.
+  const archivedStreamOf = (v: VodSubmissionSummary): AdminStreamSummary | undefined => {
     const am = adminMap.get(adminKey(v.streamer_slug, v.video_id));
-    return am && am.status === 'approved' ? 'admin_done' : v.status;
+    return am?.status === 'approved' ? am : undefined;
   };
+  const publicKindOf = (v: VodSubmissionSummary): VodSubmissionKind =>
+    publicVodKind(v.kind, archivedStreamOf(v)?.status ?? null);
+
+  // A VOD row's *effective* status merges admin_done: a new submission that was itself
+  // approved, of a VOD now archived, stands for that VOD and reads 已收錄. Nothing else
+  // is promoted. A correction's own status says how the review of its change is going,
+  // and the archived VOD keeps its own 已收錄 row; a new submission still pending or
+  // rejected is a review still open or turned down, which 已收錄 would misreport.
+  const effectiveStatusOfVod = (v: VodSubmissionSummary): string =>
+    publicKindOf(v) === 'new' && v.status === 'approved' && archivedStreamOf(v) ? 'admin_done' : v.status;
   const matchesVodFilter = (eff: string): boolean =>
     filters.vod === 'all' || eff === filters.vod;
 
@@ -213,9 +238,11 @@ export function renderStatusPage(
   // Group remaining admin-only streams by streamer_id
   const adminOnlyGroups = new Map<string, AdminStreamSummary[]>();
   for (const a of adminStreams) {
-    // Check if any NOVA submission references this video
+    // Check if a NOVA submission takes over this stream's row: one that stands for the
+    // archived VOD (effective admin_done) does. Any other sits beside the archived VOD,
+    // which keeps its own 已收錄 row (and its place in the 已收錄 filter and count).
     const hasNovaMatch = vodSubmissions.some(
-      (v) => v.streamer_slug === a.streamer_id && v.video_id === a.video_id,
+      (v) => v.streamer_slug === a.streamer_id && v.video_id === a.video_id && effectiveStatusOfVod(v) === 'admin_done',
     );
     if (!hasNovaMatch) {
       const group = adminOnlyGroups.get(a.streamer_id) ?? [];
@@ -225,9 +252,19 @@ export function renderStatusPage(
   }
 
   // Count totals: NOVA submissions + admin-only streams
-  const totalVodCount = vodSubmissions.length + Array.from(adminOnlyGroups.values()).reduce((s, g) => s + g.length, 0);
-  const vodStats = countByStatus(vodSubmissions);
-  const adminDoneCount = Array.from(adminOnlyGroups.values()).reduce((s, g) => s + g.length, 0);
+  const adminOnlyCount = Array.from(adminOnlyGroups.values()).reduce((s, g) => s + g.length, 0);
+  const totalVodCount = vodSubmissions.length + adminOnlyCount;
+  // The hero counts VODs, not rows: a correction is another submission of a VOD already counted.
+  const distinctVodCount = new Set([
+    ...vodSubmissions.map((v) => adminKey(v.streamer_slug, v.video_id)),
+    ...Array.from(adminOnlyGroups.values()).flat().map((a) => adminKey(a.streamer_id, a.video_id)),
+  ]).size;
+  // The summary counts rows as they read, so each figure is what its filter lists: a
+  // submission by its effective status, and 已收錄 both the archived VODs' own rows and
+  // the submissions that stand for one.
+  const vodEffective = vodSubmissions.map((v) => ({ status: effectiveStatusOfVod(v) }));
+  const vodStats = countByStatus(vodEffective);
+  const adminDoneCount = vodEffective.filter((v) => v.status === 'admin_done').length + adminOnlyCount;
 
   // Helper to render a VOD row
   const vodRow = (videoId: string, title: string, date: string, songCount: number, badge: string, note: string, submittedAt: string, reviewedAt: string | null) => `
@@ -292,13 +329,16 @@ export function renderStatusPage(
 
     let rows = '';
     for (const v of visibleVods) {
-      const aKey = adminKey(v.streamer_slug, v.video_id);
-      const adminMatch = adminMap.get(aKey);
-      const badge = (adminMatch && adminMatch.status === 'approved') ? statusBadge('admin_done') : statusBadge(v.status);
+      const effective = effectiveStatusOfVod(v);
+      const badge = statusBadge(effective, publicKindOf(v));
       const rejectionNote = v.status === 'rejected' && v.reviewer_note
         ? `<div class="cell-note">原因：${esc(v.reviewer_note)}</div>`
         : '';
-      rows += vodRow(v.video_id, v.stream_title, v.stream_date, adminMatch ? adminMatch.song_count : v.song_count, badge, rejectionNote, v.submitted_at, v.reviewed_at);
+      // A submission that stands for the archived VOD reads the stream's count; any other
+      // row is a proposed list, so it reads its own.
+      const standsFor = effective === 'admin_done' ? archivedStreamOf(v) : undefined;
+      const songCount = standsFor ? standsFor.song_count : v.song_count;
+      rows += vodRow(v.video_id, v.stream_title, v.stream_date, songCount, badge, rejectionNote, v.submitted_at, v.reviewed_at);
     }
     for (const a of visibleAdmin) {
       const badge = a.status === 'approved' ? statusBadge('admin_done') : statusBadge(a.status);
@@ -342,7 +382,7 @@ export function renderStatusPage(
         <div class="prism-hero-stack">
           <div class="prism-badge">${raw(SPARKLE_SVG)}提交狀態</div>
           <h1 class="prism-title">Prism Nova</h1>
-          <p class="prism-desc">提交狀態總覽 <span class="dot">·</span> <strong>${submissions.length} 位 VTuber、${totalVodCount} 場 VOD</strong></p>
+          <p class="prism-desc">提交狀態總覽 <span class="dot">·</span> <strong>${submissions.length} 位 VTuber、${distinctVodCount} 場 VOD</strong></p>
         </div>
         <div class="prism-hero-actions">${raw(themeToggleHTML(nonce))}</div>
       </div>`);
