@@ -13,11 +13,14 @@ import {
   parseUpdateTimestampsBody,
   parseCreateStampPerformanceBody,
   parseStatusUpdateBody,
+  parseVodStatusUpdateBody,
   parseExtractImportBody,
   parsePasteImportBody,
   parseHarmonizeApplyBody,
   parsePipelineExtractBody,
+  parseCorrectionApplyBody,
 } from './parse';
+import { NOVA_STATUSES } from '../shared/types';
 
 declare const process: { exitCode?: number };
 
@@ -36,6 +39,22 @@ function assertOk<T>(result: T | { error: string }, message: string): T {
     throw new Error(`${message}: expected success, got error "${(result as { error: string }).error}"`);
   }
   return result as T;
+}
+
+/** Same JSON value: equal keys (in any order) and equal values, all the way down. */
+function assertSameJson(actual: unknown, expected: unknown, message: string): void {
+  const canonical = (value: unknown): unknown => {
+    if (Array.isArray(value)) return value.map(canonical);
+    if (value === null || typeof value !== 'object') return value;
+    const record = value as Record<string, unknown>;
+    return Object.fromEntries(Object.keys(record).sort().map((key) => [key, canonical(record[key])]));
+  };
+  assertEqual(JSON.stringify(canonical(actual)), JSON.stringify(canonical(expected)), message);
+}
+
+/** The exact `{ error }` a parser returns. */
+function assertErrorIs(result: unknown, expected: string, message: string): void {
+  assertSameJson(result, { error: expected }, message);
 }
 
 function assertError(result: unknown, fieldHint: string, message: string): void {
@@ -395,6 +414,12 @@ function main(): void {
   testParseCrystalReplyBodyAcceptsWhatTheUiSends();
   testParseCrystalReplyBodyRejectsMalformedShapes();
   testParseStatusUpdateBodyCoversEveryStatusRoute();
+  testParseStatusUpdateBodyReadsWithoutApplying();
+  testParseVodStatusUpdateBodyReadsExpectedStatus();
+  testParseCorrectionApplyBodyAcceptsEveryVariant();
+  testParseCorrectionApplyBodyRejectsMalformedBodies();
+  testParseCorrectionApplyBodyRejectsEveryOtherOperation();
+  testParseCorrectionApplyBodyReadsExpectedSongStatus();
   testParseExtractImportBodyGuardsTheReplacePath();
   testParseCreateStreamBodyEnforcesDateFormat();
   testParsePasteImportBodyGuardsTheReplaceFlag();
@@ -416,6 +441,230 @@ function testParseStatusUpdateBodyCoversEveryStatusRoute(): void {
   assertError(parseStatusUpdateBody({ status: 'approved', reviewer_note: 42 }, NOVA), 'reviewer_note', 'a numeric reviewer_note (previously coercible into the TEXT column)');
   // A ReadonlySet allow-list (the catalog routes' VALID_STATUSES) works too.
   assertOk(parseStatusUpdateBody({ status: 'approved' }, new Set(['approved'] as const)), 'Set-shaped allow-list');
+}
+
+// PATCH /api/nova/vods/:id/status reads without_applying: the curator's explicit "approve, apply
+// nothing" for a VOD that already has a stream. Only `true` shows up in the parsed body.
+function testParseStatusUpdateBodyReadsWithoutApplying(): void {
+  assertSameJson(
+    parseStatusUpdateBody({ status: 'approved', without_applying: true }, NOVA_STATUSES),
+    { status: 'approved', withoutApplying: true },
+    'without_applying: true is carried as withoutApplying',
+  );
+  for (const body of [{ status: 'approved', without_applying: false }, { status: 'approved' }]) {
+    const parsed = assertOk(parseStatusUpdateBody(body, NOVA_STATUSES), JSON.stringify(body));
+    assertEqual('withoutApplying' in parsed, false, `${JSON.stringify(body)} carries no withoutApplying key`);
+  }
+  assertSameJson(
+    parseStatusUpdateBody({ status: 'rejected', reviewer_note: 'n' }, NOVA_STATUSES),
+    { status: 'rejected', reviewerNote: 'n' },
+    'a body without the flag parses as before',
+  );
+  for (const flag of ['yes', 1, null, {}]) {
+    assertErrorIs(
+      parseStatusUpdateBody({ status: 'approved', without_applying: flag }, NOVA_STATUSES),
+      'Invalid without_applying: expected a boolean',
+      `without_applying ${JSON.stringify(flag)}`,
+    );
+  }
+}
+
+// PATCH /api/nova/vods/:id/status alone reads expected_status, the status the caller saw: the route refuses a change
+// once the submission no longer has it. It is optional, and the parsed body names it only when it was sent.
+function testParseVodStatusUpdateBodyReadsExpectedStatus(): void {
+  assertSameJson(
+    parseVodStatusUpdateBody({ status: 'rejected', reviewer_note: 'n', expected_status: 'pending' }),
+    { status: 'rejected', reviewerNote: 'n', expectedStatus: 'pending' },
+    'expected_status is carried as expectedStatus',
+  );
+  assertSameJson(
+    parseVodStatusUpdateBody({ status: 'approved', without_applying: true, expected_status: 'pending' }),
+    { status: 'approved', withoutApplying: true, expectedStatus: 'pending' },
+    'beside without_applying',
+  );
+  const omitted = assertOk(parseVodStatusUpdateBody({ status: 'pending' }), 'a body without expected_status');
+  assertEqual('expectedStatus' in omitted, false, 'a body without expected_status carries no expectedStatus key');
+  for (const expected of ['archived', 1, null, {}]) {
+    assertErrorIs(
+      parseVodStatusUpdateBody({ status: 'approved', expected_status: expected }),
+      'Invalid expected_status: must be one of pending, approved, rejected',
+      `expected_status ${JSON.stringify(expected)}`,
+    );
+  }
+  assertErrorIs(
+    parseVodStatusUpdateBody({ status: 'archived', expected_status: 'pending' }),
+    'Invalid status: must be one of pending, approved, rejected',
+    'the checks every status route makes come first',
+  );
+  // The other status routes read the shared body, which knows nothing of the field: they take it as before.
+  const shared = assertOk(parseStatusUpdateBody({ status: 'approved', expected_status: 42 }, NOVA_STATUSES), 'the shared body');
+  assertEqual('expectedStatus' in shared, false, 'the shared body ignores expected_status');
+}
+
+// POST /api/nova/vods/:id/apply — every operation must be exactly one variant of CorrectionOperation:
+// the engine binds what it receives, so a misspelled or stray field must be refused, never dropped.
+const ALL_SIX_VARIANTS = [
+  { op: 'setTimes', performanceId: 'p1', timestamp: 101 },
+  { op: 'setTimes', performanceId: 'p2', endTimestamp: null },
+  { op: 'setTimes', performanceId: 'p3', timestamp: 0, endTimestamp: 30 },
+  { op: 'renameSong', songId: 's1', title: 'Title' },
+  { op: 'renameSong', songId: 's2', originalArtist: '' },
+  { op: 'renameSong', songId: 's3', title: 'Title', originalArtist: 'Artist' },
+  { op: 'relinkToSong', performanceId: 'p4', songId: 's4' },
+  { op: 'relinkToNewSong', performanceId: 'p5', title: 'New', originalArtist: '' },
+  { op: 'addPerformance', title: 'Added', originalArtist: 'Artist', timestamp: 500, endTimestamp: null },
+  { op: 'addPerformance', title: 'Added', originalArtist: '', timestamp: 600, endTimestamp: 700 },
+  { op: 'deletePerformance', performanceId: 'p6' },
+];
+const APPLY_BODY = {
+  fingerprint: 'f'.repeat(64),
+  reviewerNote: 'note',
+  operations: ALL_SIX_VARIANTS,
+  skipped: { time: 1, title: 2, add: 0, delete: 3 },
+};
+
+function testParseCorrectionApplyBodyAcceptsEveryVariant(): void {
+  assertSameJson(parseCorrectionApplyBody(APPLY_BODY), APPLY_BODY, 'the six variants, a note and the skipped counts');
+  const { reviewerNote: _note, ...withoutNote } = APPLY_BODY;
+  const parsed = assertOk(parseCorrectionApplyBody(withoutNote), 'no reviewerNote');
+  assertEqual('reviewerNote' in parsed, false, 'an absent reviewerNote stays absent');
+  assertSameJson(
+    parseCorrectionApplyBody({ ...APPLY_BODY, skipped: { ...APPLY_BODY.skipped, extra: 1 }, extra: true }),
+    APPLY_BODY,
+    'the body and skipped are rebuilt from the fields read',
+  );
+}
+
+function testParseCorrectionApplyBodyRejectsMalformedBodies(): void {
+  const { fingerprint: _fingerprint, ...noFingerprint } = APPLY_BODY;
+  assertError(parseCorrectionApplyBody(null), 'object', 'a null body');
+  assertError(parseCorrectionApplyBody(noFingerprint), 'fingerprint', 'a missing fingerprint');
+  assertError(parseCorrectionApplyBody({ ...APPLY_BODY, fingerprint: '' }), 'fingerprint', 'an empty fingerprint');
+  assertError(parseCorrectionApplyBody({ ...APPLY_BODY, fingerprint: 7 }), 'fingerprint', 'a numeric fingerprint');
+  assertError(parseCorrectionApplyBody({ ...APPLY_BODY, reviewerNote: 7 }), 'reviewerNote', 'a numeric reviewerNote');
+  assertError(parseCorrectionApplyBody({ ...APPLY_BODY, operations: {} }), 'operations', 'operations: {}');
+  assertError(parseCorrectionApplyBody({ ...APPLY_BODY, operations: undefined }), 'operations', 'no operations');
+  assertErrorIs(
+    parseCorrectionApplyBody({ ...APPLY_BODY, operations: [] }),
+    'Invalid operations: expected at least one operation',
+    'an apply of nothing',
+  );
+  const { skipped: _skipped, ...noSkipped } = APPLY_BODY;
+  assertError(parseCorrectionApplyBody(noSkipped), 'skipped', 'no skipped');
+  assertError(parseCorrectionApplyBody({ ...APPLY_BODY, skipped: { ...APPLY_BODY.skipped, time: -1 } }), 'skipped', 'skipped.time: -1');
+  assertError(parseCorrectionApplyBody({ ...APPLY_BODY, skipped: { ...APPLY_BODY.skipped, add: 1.5 } }), 'skipped', 'skipped.add: 1.5');
+  assertError(parseCorrectionApplyBody({ ...APPLY_BODY, skipped: { time: 0, title: 0, add: 0 } }), 'skipped', 'skipped without delete');
+}
+
+function testParseCorrectionApplyBodyRejectsEveryOtherOperation(): void {
+  const invalid: unknown[] = [
+    null,
+    'setTimes',
+    { op: 'nope' },
+    { performanceId: 'p1', timestamp: 1 },
+    // setTimes: a non-negative integer start, an end that is also allowed to be null, at least one of them
+    { op: 'setTimes', performanceId: 'p1' },
+    { op: 'setTimes', performanceId: 'p1', timestamp: null },
+    { op: 'setTimes', performanceId: 'p1', timestamp: -1 },
+    { op: 'setTimes', performanceId: 'p1', timestamp: 1.5 },
+    { op: 'setTimes', performanceId: 'p1', timestamp: '101' },
+    { op: 'setTimes', performanceId: 'p1', endTimestamp: -5 },
+    { op: 'setTimes', performanceId: 7, timestamp: 1 },
+    { op: 'setTimes', timestamp: 1 },
+    // renameSong: at least one of title and originalArtist, both strings
+    { op: 'renameSong', songId: 's1' },
+    { op: 'renameSong', songId: 's1', title: 7 },
+    { op: 'renameSong', songId: 's1', originalArtist: null },
+    { op: 'renameSong', title: 'T' },
+    // relinks
+    { op: 'relinkToSong', performanceId: 'p1' },
+    { op: 'relinkToSong', performanceId: 'p1', songId: 5 },
+    { op: 'relinkToNewSong', performanceId: 'p1', title: 'T' },
+    { op: 'relinkToNewSong', performanceId: 'p1', title: 'T', originalArtist: 5 },
+    // addPerformance: endTimestamp is required, null or a non-negative integer
+    { op: 'addPerformance', title: 'T', originalArtist: 'A', timestamp: 1 },
+    { op: 'addPerformance', title: 'T', originalArtist: 'A', timestamp: -1, endTimestamp: null },
+    { op: 'addPerformance', title: 'T', originalArtist: 'A', timestamp: 1, endTimestamp: 2.5 },
+    { op: 'addPerformance', originalArtist: 'A', timestamp: 1, endTimestamp: null },
+    { op: 'deletePerformance' },
+    // a field of another variant, or a misspelled one, is never dropped silently
+    { op: 'setTimes', performanceId: 'p1', timestamp: 1, endTimeStamp: 2 },
+    { op: 'deletePerformance', performanceId: 'p1', songId: 's1' },
+    { op: 'renameSong', songId: 's1', title: 'T', performanceId: 'p1' },
+    { op: 'relinkToSong', performanceId: 'p1', songId: 's1', title: 'T' },
+    { op: 'relinkToNewSong', performanceId: 'p1', title: 'T', originalArtist: 'A', songId: 's1' },
+    { op: 'addPerformance', title: 'T', originalArtist: 'A', timestamp: 1, endTimestamp: null, performanceId: 'p1' },
+  ];
+  for (const entry of invalid) {
+    assertErrorIs(
+      parseCorrectionApplyBody({ ...APPLY_BODY, operations: [entry] }),
+      'Invalid operation 0',
+      `operation ${JSON.stringify(entry)}`,
+    );
+  }
+  assertErrorIs(
+    parseCorrectionApplyBody({ ...APPLY_BODY, operations: [ALL_SIX_VARIANTS[0], { op: 'nope' }] }),
+    'Invalid operation 1',
+    'the error names the position of the first bad operation',
+  );
+}
+
+// The two relinks may carry the status the review showed for the song they land on (`expectedSongStatus`): a song's
+// status for either, and for relinkToNewSong null too, the review expecting the apply to create the song. It is rebuilt
+// from the value read, kept when sent and absent when not, and refused when it is anything else.
+function testParseCorrectionApplyBodyReadsExpectedSongStatus(): void {
+  const statuses = ['pending', 'approved', 'rejected', 'excluded', 'extracted'];
+  const carried: unknown[] = [
+    ...statuses.map((expectedSongStatus, index) => ({ op: 'relinkToSong', performanceId: `p${index}`, songId: `s${index}`, expectedSongStatus })),
+    ...statuses.map((expectedSongStatus, index) => ({ op: 'relinkToNewSong', performanceId: `p${index}`, title: 'New', originalArtist: 'A', expectedSongStatus })),
+    { op: 'relinkToNewSong', performanceId: 'p9', title: 'New', originalArtist: '', expectedSongStatus: null },
+  ];
+  assertSameJson(
+    parseCorrectionApplyBody({ ...APPLY_BODY, operations: carried }),
+    { ...APPLY_BODY, operations: carried },
+    'each status on both relinks, and null on a new song, comes through as sent',
+  );
+
+  // Not sent, not carried: the operation is rebuilt without the key.
+  const sent = assertOk(parseCorrectionApplyBody({
+    ...APPLY_BODY,
+    operations: [
+      { op: 'relinkToSong', performanceId: 'p1', songId: 's1' },
+      { op: 'relinkToNewSong', performanceId: 'p2', title: 'New', originalArtist: 'A' },
+    ],
+  }), 'relinks without a status');
+  for (const operation of sent.operations) {
+    assertEqual('expectedSongStatus' in operation, false, `${operation.op} without a status carries no expectedSongStatus key`);
+  }
+
+  // A status is one of the five a song can have, a string. null is for a new song alone: a relink onto a song that
+  // exists has a status to expect.
+  const refused: unknown[] = [
+    { op: 'relinkToSong', performanceId: 'p1', songId: 's1', expectedSongStatus: null },
+    { op: 'relinkToSong', performanceId: 'p1', songId: 's1', expectedSongStatus: 'archived' },
+    { op: 'relinkToSong', performanceId: 'p1', songId: 's1', expectedSongStatus: 'Approved' },
+    { op: 'relinkToSong', performanceId: 'p1', songId: 's1', expectedSongStatus: '' },
+    { op: 'relinkToSong', performanceId: 'p1', songId: 's1', expectedSongStatus: 1 },
+    { op: 'relinkToSong', performanceId: 'p1', songId: 's1', expectedSongStatus: true },
+    { op: 'relinkToSong', performanceId: 'p1', songId: 's1', expectedSongStatus: ['approved'] },
+    { op: 'relinkToSong', performanceId: 'p1', songId: 's1', expectedSongStatus: { status: 'approved' } },
+    { op: 'relinkToNewSong', performanceId: 'p1', title: 'T', originalArtist: 'A', expectedSongStatus: 'archived' },
+    { op: 'relinkToNewSong', performanceId: 'p1', title: 'T', originalArtist: 'A', expectedSongStatus: 'null' },
+    { op: 'relinkToNewSong', performanceId: 'p1', title: 'T', originalArtist: 'A', expectedSongStatus: '' },
+    { op: 'relinkToNewSong', performanceId: 'p1', title: 'T', originalArtist: 'A', expectedSongStatus: 0 },
+    // no other variant has the field
+    { op: 'setTimes', performanceId: 'p1', timestamp: 1, expectedSongStatus: 'approved' },
+    { op: 'renameSong', songId: 's1', title: 'T', expectedSongStatus: 'approved' },
+    { op: 'addPerformance', title: 'T', originalArtist: 'A', timestamp: 1, endTimestamp: null, expectedSongStatus: 'approved' },
+    { op: 'deletePerformance', performanceId: 'p1', expectedSongStatus: null },
+  ];
+  for (const entry of refused) {
+    assertErrorIs(
+      parseCorrectionApplyBody({ ...APPLY_BODY, operations: [entry] }),
+      'Invalid operation 0',
+      `operation ${JSON.stringify(entry)}`,
+    );
+  }
 }
 
 function testParseExtractImportBodyGuardsTheReplacePath(): void {

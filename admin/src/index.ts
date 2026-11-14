@@ -87,13 +87,29 @@ import {
   listApprovedSubmissionsWithChannel,
   listVods,
   getVodById,
-  getVodStatus,
+  countOtherPendingVods,
   vodExists,
   deleteVod,
   listVodSongs,
+  parseVodBase,
   updateVodStatus,
   updateVodFields,
 } from './nova-db';
+import {
+  applyCorrection,
+  claimApply,
+  claimOpenApplies,
+  correctionFingerprint,
+  findOpenApplies,
+  findTargetStreams,
+  findUnannouncedApply,
+  loadCorrectionTarget,
+  resolveExistingSongs,
+  streamKey,
+} from './vod-correction-db';
+import type { CorrectionApplyRecord } from './vod-correction-db';
+import { matchCorrectionWithBase, summarizeCorrection } from '../shared/vod-correction';
+import type { CorrectionApplyResult, CorrectionProposedRow, NovaVodCorrectionView } from '../shared/vod-correction';
 import {
   listTickets,
   getTicketById,
@@ -113,6 +129,7 @@ import {
   parseUpdateStreamBody,
   parseImportStreamsBody,
   parseStatusUpdateBody,
+  parseVodStatusUpdateBody,
   parseExtractImportBody,
   parsePasteImportBody,
   parseHarmonizeApplyBody,
@@ -121,6 +138,7 @@ import {
   parseNovaSubmissionUpdateBody,
   type NovaSubmissionUpdateFields,
   parseNovaVodUpdateBody,
+  parseCorrectionApplyBody,
   parseCrystalReplyBody,
 } from './parse';
 import { isCanonicalTimestamp } from './vod-export/guards';
@@ -153,6 +171,9 @@ import type {
   HarmonizeMatchType,
   NovaSubmission,
   NovaStatus,
+  NovaVodListItem,
+  NovaVodSubmission,
+  Status,
   StreamerInfo,
   CrystalTicketStatus,
   BulkFetchSubscribersResponse,
@@ -351,6 +372,98 @@ function notifyDiscordFeedback(
       console.error('discord feedback notify failed', err),
     ),
   );
+}
+
+// Every VOD feedback embed claims the submission's open apply records before it is posted: once the contributor is
+// told an outcome, no record may announce or write its note back after it. Resolves with the tokens this request
+// closed, or null when the claim failed, which is logged; the embed is posted anyway, since a duplicate announcement
+// is better than a lost one.
+async function claimBeforePosting(c: Context<AppEnv>, submissionId: string): Promise<string[] | null> {
+  try {
+    return await claimOpenApplies(c.env.DB, submissionId);
+  } catch (error) {
+    console.error('Could not claim the open apply records of a VOD submission; posting its feedback anyway', error);
+    return null;
+  }
+}
+
+// An applied correction's announcement, posted by the apply once it marks the submission reviewed, or by the
+// approval that recovers an apply which could not (502 appliedToCatalog): one embed for both. It claims the open
+// records first and posts only when this request closed the apply's own record, or when the claim itself failed (a
+// duplicate announcement is better than a lost one). A record closed already was closed by a request that told the
+// contributor an outcome first, or by its own apply when another review landed while it ran; that apply closes its
+// own record only, so it never takes the one a recovery is about to announce. `streamStatus` is the status of the
+// stream the apply changed: the embed calls it a correction only while that stream is approved (feedbackEmbedForVod).
+async function announceAppliedCorrection(
+  c: Context<AppEnv>,
+  submission: NovaVodSubmission,
+  apply: Pick<CorrectionApplyRecord, 'token' | 'summary'>,
+  streamStatus: Status | null,
+): Promise<void> {
+  const claimed = await claimBeforePosting(c, submission.id);
+  if (claimed === null || claimed.includes(apply.token)) {
+    notifyDiscordFeedback(c, feedbackEmbedForVod('pending', 'approved', submission, streamStatus, apply.summary));
+  }
+}
+
+// The status of the stream a VOD submission's (streamer, video) has now, or null for none, read as its feedback embed
+// is built (feedbackEmbedForVod). The status route reads it once Nova has the new status, so a read that fails must
+// not lose the embed: it is logged and reads as no stream, the reading that never reveals one.
+async function feedbackStreamStatus(c: Context<AppEnv>, vod: NovaVodSubmission): Promise<Status | null> {
+  try {
+    const targets = await findTargetStreams(c.env.DB, [{ streamerId: vod.streamer_slug, videoId: vod.video_id }]);
+    return targets.get(streamKey(vod.streamer_slug, vod.video_id))?.status ?? null;
+  } catch (error) {
+    console.error('Could not read the stream of a VOD submission for its feedback; announcing it as a new submission', error);
+    return null;
+  }
+}
+
+/**
+ * What marking a corrected VOD reviewed came to: approved with its apply's note; another review there, with the
+ * status it left, which the mark did not overwrite; or unconfirmed.
+ */
+type CorrectedVodMark =
+  | { kind: 'approved'; submission: NovaVodSubmission }
+  | { kind: 'statusChanged'; status: NovaStatus }
+  | { kind: 'unconfirmed' };
+
+// Mark a corrected VOD approved with its apply's note, only while it is still pending (a compare-and-set), and read
+// it back. A write that threw, or that changed nothing, is followed by one more read: approved with exactly this
+// note, the mark is this apply's (D1 can commit a write and still reject the call, and a recovery racing the apply
+// can write the same note first). Otherwise a write that changed nothing found another review there, which it did
+// not overwrite, while one that threw leaves the mark unconfirmed, as does a read-back that fails.
+async function approveCorrectedVod(db: D1Database, id: string, reviewerNote: string): Promise<CorrectedVodMark> {
+  let wrote: boolean | undefined;
+  try {
+    wrote = await updateVodStatus(db, id, 'approved', reviewerNote, 'pending');
+    if (wrote) {
+      const approved = await getVodById(db, id);
+      if (approved) return { kind: 'approved', submission: approved };
+    }
+  } catch (error) {
+    console.error('VOD correction applied, but marking its submission reviewed failed', error);
+  }
+  try {
+    const row = await getVodById(db, id);
+    if (row?.status === 'approved' && row.reviewer_note === reviewerNote) return { kind: 'approved', submission: row };
+    return wrote === false && row ? { kind: 'statusChanged', status: row.status } : { kind: 'unconfirmed' };
+  } catch (error) {
+    console.error('VOD correction applied, but its submission could not be read back', error);
+    return { kind: 'unconfirmed' };
+  }
+}
+
+// Import an approved VOD's songs into the admin DB as pending records, unless its video already has a stream there.
+// The gate is that existence (videoIdExists), not the Nova status transition, because an approval writes Nova first:
+// a re-approval of an imported VOD won't delete/recreate its curated performances (present → skip), and an import that
+// failed stays owed (absent → import) for the next plain Approve, the list's included (see the status route).
+// importVodToAdminDb writes via an atomic db.batch(), so a failed import leaves no admin rows and the retry re-imports
+// cleanly. vod_songs is fetched only once we know we're importing.
+async function importApprovedVod(c: Context<AppEnv>, vod: NovaVodSubmission): Promise<void> {
+  if (!shouldImportVod('approved', await videoIdExists(c.env.DB, vod.video_id, vod.streamer_slug))) return;
+  const vodSongs = await listVodSongs(c.env.NOVA_DB, vod.id);
+  if (vodSongs.length > 0) await importVodToAdminDb(c.env.DB, vod, vodSongs, c.get('user').email);
 }
 
 const app = new Hono<AppEnv>();
@@ -1695,10 +1808,30 @@ app.post('/api/nova/submissions/:id/fetch-subscribers', requireCurator, async (c
 
 // --- Nova VOD submissions (NOVA_DB) ---
 
+// Each row carries the admin stream its (streamer, video) already has, of any status: a row with
+// one is reviewed as a correction of that stream (GET /:id/correction, POST /:id/apply), and the
+// plain approve below refuses it. A pending row also says whether an apply of it reached the
+// catalog without the submission being marked (open_apply, as its review's openApply does), so
+// the list can offer the approval that recovers it in words that say the changes are in.
 app.get('/api/nova/vods', requireCurator, async (c) => {
   const status = c.req.query('status');
   const streamer = c.req.query('streamer');
-  const data = await listVods(c.env.NOVA_DB, { status, streamer });
+  const vods = await listVods(c.env.NOVA_DB, { status, streamer });
+  const [targets, openApplies] = await Promise.all([
+    findTargetStreams(
+      c.env.DB,
+      vods.map((vod) => ({ streamerId: vod.streamer_slug, videoId: vod.video_id })),
+    ),
+    findOpenApplies(
+      c.env.DB,
+      vods.filter((vod) => vod.status === 'pending').map((vod) => vod.id),
+    ),
+  ]);
+  const data: NovaVodListItem[] = vods.map((vod) => ({
+    ...vod,
+    target_stream: targets.get(streamKey(vod.streamer_slug, vod.video_id)) ?? null,
+    open_apply: openApplies.has(vod.id),
+  }));
   return c.json({ data, total: data.length });
 });
 
@@ -1715,42 +1848,254 @@ app.get('/api/nova/vods/:id', requireCurator, async (c) => {
 
 app.patch('/api/nova/vods/:id/status', requireCurator, async (c) => {
   const id = getRouteParam(c, 'id');
-  const body = parseStatusUpdateBody(await readJsonBody<unknown>(c), NOVA_STATUSES);
+  const body = parseVodStatusUpdateBody(await readJsonBody<unknown>(c));
   if ('error' in body) return c.json({ error: body.error }, 400);
 
-  const existing = await getVodStatus(c.env.NOVA_DB, id);
+  const existing = await getVodById(c.env.NOVA_DB, id);
 
   if (!existing) return c.json({ error: 'VOD submission not found' }, 404);
 
-  await updateVodStatus(c.env.NOVA_DB, id, body.status, body.reviewerNote);
+  // The status the caller saw, when it says: a page that went stale (another tab or curator reviewed the submission
+  // meanwhile) must not overwrite that review. Checked first, so a stale request writes, imports and posts nothing, but
+  // for the one exception below. Nor does it read the catalog, unless it has that exception's shape (a plain Approve
+  // that expected pending, of an approved VOD): that reads once whether the video has a stream, then answers. The
+  // write below checks the status again. It cannot simply require pending: a Revert and the approval that re-approves
+  // after it are status changes too.
+  if (body.expectedStatus !== undefined && existing.status !== body.expectedStatus) {
+    // One such request is not a stale write but the import an approval still owes: a plain Approve on the pending the
+    // list still shows (it reloads nothing after a failure) of a VOD approved with no stream, the approval having
+    // written Nova and then failed to import. It imports as that approval would have, and writes and posts nothing,
+    // so Nova keeps the status and note it has.
+    const retriesImport = body.status === 'approved' && !body.withoutApplying && body.expectedStatus === 'pending'
+      && existing.status === 'approved' && !(await videoIdExists(c.env.DB, existing.video_id, existing.streamer_slug));
+    if (retriesImport) {
+      await importApprovedVod(c, existing);
+      return c.json(existing);
+    }
+    return c.json({ error: 'status_changed', status: existing.status }, 409);
+  }
 
-  // Fetch the full updated row once and reuse it for the import gate, the Discord embed,
-  // and the response — avoids a second identical SELECT * on vod_submissions.
-  const updated = await getVodById(c.env.NOVA_DB, id);
+  // An apply that answered 502 appliedToCatalog left its record open: its changes are in the catalog. A rejection of the
+  // pending submission would tell the contributor 未採用 while they are, and its embed would close the record, so that
+  // nothing could recover it: it is refused, and only the approval that recovers the apply may follow (see below).
+  if (body.status === 'rejected' && existing.status === 'pending' && await findUnannouncedApply(c.env.DB, id)) {
+    return c.json({ error: 'already_applied', appliedToCatalog: true }, 409);
+  }
 
-  // Import VOD songs into the admin DB as pending records when approved. The gate is
-  // shouldImportVod, keyed on whether the video already exists in the admin DB
-  // (videoIdExists) rather than the Nova status transition: that keeps a failed import
-  // retryable (absent → import) while a re-approve of an already-imported VOD won't
-  // delete/recreate its curated performances (present → skip). importVodToAdminDb writes
-  // via an atomic db.batch(), so a failed import leaves no admin rows and the next retry
-  // re-imports cleanly. vod_songs is fetched only once we know we're importing, so a
-  // re-approval (common under this existence gate) costs no extra NOVA_DB read.
-  if (body.status === 'approved' && updated) {
-    if (shouldImportVod(body.status, await videoIdExists(c.env.DB, updated.video_id, updated.streamer_slug))) {
-      const vodSongs = await listVodSongs(c.env.NOVA_DB, id);
+  // A VOD whose (streamer, video) already has a stream is a correction of it: approving it here
+  // would import nothing and drop its changes without a word, so its approval goes through the
+  // correction review (POST /:id/apply). `without_applying` is the curator's explicit "approve,
+  // apply nothing" (Revert → re-approve, or the recovery of an apply that answered 502
+  // appliedToCatalog), and it is only read on an approval. It needs that stream: with none, the
+  // approval would import the VOD as a new one, which is applying it.
+  const approvesWithoutApplying = body.status === 'approved' && body.withoutApplying === true;
+  if (body.status === 'approved') {
+    const hasStream = await videoIdExists(c.env.DB, existing.video_id, existing.streamer_slug);
+    if (approvesWithoutApplying && !hasStream) return c.json({ error: 'no_target_stream' }, 404);
+    if (!approvesWithoutApplying && hasStream) return c.json({ error: 'use_correction_review' }, 409);
+  }
 
-      if (vodSongs.length > 0) {
-        const user = c.get('user');
-        await importVodToAdminDb(c.env.DB, updated, vodSongs, user.email);
-      }
+  // An apply that answered 502 appliedToCatalog left its record unannounced. The approval without applying that
+  // follows recovers it: it writes the apply's note in place of the request's (the list sends none) and posts the
+  // apply's announcement.
+  const recovered = approvesWithoutApplying ? await findUnannouncedApply(c.env.DB, id) : null;
+
+  // With the status the caller saw, the write is a compare-and-set on it: a review that landed after the check above
+  // is not overwritten. Then this request changed nothing, so it imports, posts and closes nothing either.
+  const reviewerNote = recovered ? recovered.reviewerNote : body.reviewerNote;
+  const wrote = await updateVodStatus(c.env.NOVA_DB, id, body.status, reviewerNote, body.expectedStatus);
+  if (!wrote && body.expectedStatus !== undefined) {
+    const current = await getVodById(c.env.NOVA_DB, id);
+    if (!current) return c.json({ error: 'VOD submission not found' }, 404);
+    return c.json({ error: 'status_changed', status: current.status }, 409);
+  }
+
+  // A Revert puts the submission back in review, so the records of its earlier applies are spent: closed here, none of
+  // them refuses a re-apply or a rejection after it, or is recovered by a later approval. One may be an apply never
+  // announced (its mark landed but could not be confirmed, 502), which then never is: at the Revert it cannot be told
+  // from a record whose claim failed after its embed was posted. A write of pending on a pending submission is no
+  // Revert, and closes nothing. A close that fails is logged, and the Revert stands.
+  if (wrote && body.status === 'pending' && existing.status !== 'pending') {
+    try {
+      await claimOpenApplies(c.env.DB, id);
+    } catch (error) {
+      console.error('Could not close the open apply records of a reverted VOD submission', error);
     }
   }
 
-  const feedbackEmbed = updated ? feedbackEmbedForVod(existing.status, body.status, updated) : null;
-  notifyDiscordFeedback(c, feedbackEmbed);
+  // Read the row back once and reuse it for the import gate, the Discord embed, and the
+  // response, so all three see the review metadata the update just wrote.
+  const updated = await getVodById(c.env.NOVA_DB, id);
+
+  // A plain approval imports the VOD's songs unless its video has a stream (importApprovedVod, whose gate keeps a
+  // failed import retryable: a later plain Approve imports it, the list's stale-looking one included, see above). An
+  // approval without applying never imports, even when its stream vanished after the check above.
+  if (body.status === 'approved' && !approvesWithoutApplying && updated) await importApprovedVod(c, updated);
+
+  // Each embed reads the stream's status as it is built: it calls the submission a correction only while that stream
+  // is approved. A Revert, or a change to the status the submission already has, posts nothing, so it reads no stream.
+  if (recovered && updated) {
+    await announceAppliedCorrection(c, updated, recovered, await feedbackStreamStatus(c, updated));
+  } else if (updated && body.status !== 'pending' && existing.status !== body.status) {
+    const streamStatus = await feedbackStreamStatus(c, updated);
+    // An approval that applies nothing to an archived VOD (its stream approved) announces nothing, whatever the
+    // submission's kind, so a re-approval of one is never announced twice: the VOD is public, so silence tells nothing.
+    // One whose stream is not approved, or could not be read, is announced as an unknown video's approval is: silence
+    // there would tell a stream in the pipeline from none. An embed that is posted (a rejection, an approval) tells the
+    // contributor an outcome, so it closes the open records.
+    const silent = approvesWithoutApplying && streamStatus === 'approved';
+    const feedbackEmbed = silent ? null : feedbackEmbedForVod(existing.status, body.status, updated, streamStatus);
+    if (feedbackEmbed) await claimBeforePosting(c, id);
+    notifyDiscordFeedback(c, feedbackEmbed);
+  }
 
   return c.json(updated);
+});
+
+// The correction review of a VOD whose (streamer, video) already has a stream: the public list
+// the contributor compared against (its base, as Nova recorded it, and whether a revision confirmed
+// it: baseVerified), that stream's current rows, the submission's rows sorted by time, the suggested
+// pairing, and the fingerprint an apply must send back unchanged. This is the one route that reads a
+// submission's base; the submission it returns carries neither the base nor its confirmation, which
+// come once each, read. While the submission is pending, it also carries the summary of an apply of
+// it that reached the catalog but not the submission (openApply), so a review opened after that apply
+// offers only the approval recovering it.
+app.get('/api/nova/vods/:id/correction', requireCurator, async (c) => {
+  const id = getRouteParam(c, 'id');
+  const stored = await getVodById(c.env.NOVA_DB, id);
+  if (!stored) return c.json({ error: 'VOD submission not found' }, 404);
+  const { base_songs: baseSongs, base_verified: baseVerified, ...submission } = stored;
+
+  const target = await loadCorrectionTarget(c.env.DB, submission.streamer_slug, submission.video_id);
+  if (!target) return c.json({ error: 'no_target_stream' }, 404);
+
+  // Which ends the parsers filled is read in the order Nova stored the rows (sort order): they end a row where the
+  // next submitted row starts, whatever its start. Then one list sorted by time feeds both the song resolution and
+  // the matcher, so their indices agree.
+  const submitted = await listVodSongs(c.env.NOVA_DB, id);
+  const songs = submitted
+    .map((song, index) => {
+      const next = submitted[index + 1];
+      const endFilled = song.end_timestamp !== null && song.end_timestamp === next?.start_timestamp;
+      return { song, endFilled, nextSubmittedId: next?.id ?? null };
+    })
+    .sort((left, right) => left.song.start_timestamp - right.song.start_timestamp);
+  // A row submitted with no artist is offered for 改連到新的歌 under the artist of the live row it is paired
+  // with, and the curator may pair it with any live row: its title also resolves with each artist the stream has
+  // (trimmed, a blank one 'Unknown', as the review sends an artist). It is all one batch, so each identity resolves
+  // as the apply would resolve it.
+  const liveArtists = [...new Set(target.current.map((row) => row.originalArtist.trim() || 'Unknown'))];
+  const liveArtistsTried = songs.map(({ song }) => (song.original_artist.trim() === '' ? liveArtists : []));
+  const resolved = await resolveExistingSongs(
+    c.env.DB,
+    target.stream.streamerId,
+    songs.flatMap(({ song }, index) =>
+      [song.original_artist, ...liveArtistsTried[index]].map((originalArtist) => ({ title: song.song_title, originalArtist }))),
+  );
+  // The answers come in the order asked: each row's submitted artist, then the live artists it was tried with.
+  let next = 0;
+  const proposed: CorrectionProposedRow[] = songs.map(({ song, endFilled, nextSubmittedId }, index) => {
+    const existingSong = resolved[next++];
+    const existingSongsByLiveArtist = liveArtistsTried[index].map((originalArtist) => ({
+      originalArtist,
+      existingSong: resolved[next++],
+    }));
+    return {
+      id: song.id,
+      title: song.song_title,
+      originalArtist: song.original_artist,
+      timestamp: song.start_timestamp,
+      endTimestamp: song.end_timestamp,
+      endFilled,
+      nextSubmittedId,
+      existingSong,
+      ...(existingSongsByLiveArtist.length > 0 ? { existingSongsByLiveArtist } : {}),
+    };
+  });
+
+  const { stream } = target;
+  const base = parseVodBase(baseSongs);
+  // Its summary only, never its token or note. A submission that is not pending offers no review to act on.
+  const openApply = submission.status === 'pending' ? await findUnannouncedApply(c.env.DB, id) : null;
+  const view: NovaVodCorrectionView = {
+    submission,
+    stream: { id: stream.id, title: stream.title, date: stream.date, videoId: stream.videoId, status: stream.status },
+    base,
+    baseVerified: baseVerified === 1,
+    current: target.current,
+    proposed,
+    match: matchCorrectionWithBase(target.current, proposed, base),
+    fingerprint: await correctionFingerprint(target),
+    otherPendingCount: await countOtherPendingVods(c.env.NOVA_DB, submission.streamer_slug, submission.video_id, id),
+    openApply: openApply ? { summary: openApply.summary } : null,
+  };
+  return c.json(view);
+});
+
+// Apply the curator's reviewed operations to the target stream in one catalog batch, then mark
+// the submission approved with a note that ends in the summary of what was applied. The batch
+// records the apply with that note and summary, for the approval that recovers it when the
+// submission cannot be marked. The mark is made only while the submission is still pending: a
+// review that lands between the batch and the mark stands (409 status_changed, appliedToCatalog).
+// While such a record is open, the submission's changes are in the catalog already: another apply
+// is refused (409 already_applied), and only that approval may follow.
+app.post('/api/nova/vods/:id/apply', requireCurator, async (c) => {
+  const id = getRouteParam(c, 'id');
+  const submission = await getVodById(c.env.NOVA_DB, id);
+  if (!submission) return c.json({ error: 'VOD submission not found' }, 404);
+  if (submission.status !== 'pending') return c.json({ error: 'not_pending' }, 409);
+  if (await findUnannouncedApply(c.env.DB, id)) return c.json({ error: 'already_applied', appliedToCatalog: true }, 409);
+
+  const body = parseCorrectionApplyBody(await readJsonBody<unknown>(c));
+  if ('error' in body) return c.json({ error: body.error }, 400);
+
+  const target = await loadCorrectionTarget(c.env.DB, submission.streamer_slug, submission.video_id);
+  if (!target) return c.json({ error: 'no_target_stream' }, 404);
+  if (await correctionFingerprint(target) !== body.fingerprint) return c.json({ error: 'stale' }, 409);
+
+  const summary = summarizeCorrection(body.operations, body.skipped);
+  const reviewerNote = [body.reviewerNote?.trim(), summary].filter(Boolean).join('\n');
+  const record: CorrectionApplyRecord = { token: crypto.randomUUID(), submissionId: id, reviewerNote, summary };
+  const applied = await applyCorrection(c.env.DB, target, body.operations, c.get('user').email, record);
+  if (!applied.ok) {
+    if (applied.error === 'invalid_operations') {
+      return c.json({ error: applied.error, details: applied.details }, applied.status);
+    }
+    // The rows moved between the fingerprint check above and the batch: another apply or an edit won. Or a song a relink
+    // lands on has another status than the review showed (expectedSongStatus), or than the plan read once the batch began.
+    if (applied.error === 'stale') return c.json({ error: applied.error }, applied.status);
+    // A relink would take on-site rows of a stream that is not approved off the site.
+    if (applied.error === 'would_unpublish') {
+      return c.json({ error: applied.error, performanceIds: applied.performanceIds }, applied.status);
+    }
+    // The apply would publish rows it must not, which it lists: rows of a stream that is not approved
+    // (would_publish_hidden), or approved rows with no end, which stop the VOD export (would_publish_endless).
+    return c.json({ error: applied.error, performances: applied.performances }, applied.status);
+  }
+
+  // The catalog batch has committed. From here a failure must say so, so the page can offer to
+  // approve the submission without applying anything again; that approval announces the apply.
+  const marked = await approveCorrectedVod(c.env.NOVA_DB, id, reviewerNote);
+  // Another review landed meanwhile: its status and note stay, and this apply announces nothing. That review is the
+  // submission's outcome, so this apply's record must never announce after it: it is closed, unposted. Only this one
+  // (claimApply): a recovery racing this apply may be about to announce an older one.
+  if (marked.kind === 'statusChanged') {
+    try {
+      await claimApply(c.env.DB, record.token);
+    } catch (error) {
+      console.error('Could not close the apply record of a VOD correction another review reached first', error);
+    }
+    return c.json({ error: 'status_changed', status: marked.status, appliedToCatalog: true }, 409);
+  }
+  if (marked.kind === 'unconfirmed') {
+    return c.json({ error: 'Catalog updated but the submission could not be marked reviewed', appliedToCatalog: true }, 502);
+  }
+
+  // The stream as the apply found it: the fingerprint covers its status, so the batch changed it in that status.
+  await announceAppliedCorrection(c, marked.submission, record, target.stream.status);
+
+  const result: CorrectionApplyResult = { submission: marked.submission, summary };
+  return c.json(result);
 });
 
 app.put('/api/nova/vods/:id', requireCurator, async (c) => {

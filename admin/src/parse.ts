@@ -11,9 +11,12 @@
 // parser — and rejects everything else with a message naming the field that
 // failed. None of them throw; a bad shape is always a returned { error }.
 
-import type { NovaSubmission, NovaVodSubmission, StreamCredit } from '../shared/types';
+import { NOVA_STATUSES } from '../shared/types';
+import type { NovaStatus, NovaSubmission, NovaVodSubmission, Status, StreamCredit } from '../shared/types';
+import type { CorrectionApplyBody, CorrectionOperation, CorrectionSkipped } from '../shared/vod-correction';
 import { NOVA_SUBMISSION_EDITABLE_FIELDS, NOVA_VOD_EDITABLE_FIELDS } from './nova-db';
 import type { NovaEditableField, NovaVodEditableField } from './nova-db';
+import { isValidStatus } from './status';
 import { isValidStreamerSlug } from './vod-export/normalization';
 
 function isUnknownRecord(value: unknown): value is Record<string, unknown> {
@@ -495,15 +498,17 @@ export function parseCrystalReplyBody(value: unknown): { admin_reply: string } |
 // --- Status updates (catalog, nova submissions/vods, crystal tickets) ---
 
 /**
- * Every status route reads { status, reviewer_note? }. A syntactically valid
- * non-object body (null, a number) previously blew up on property access and
- * surfaced as a 500; a non-string reviewer_note could reach the TEXT column
- * or fail D1 binding. The allowed list is the caller's own status constant.
+ * Every status route reads { status, reviewer_note?, without_applying? }. A
+ * syntactically valid non-object body (null, a number) previously blew up on
+ * property access and surfaced as a 500; a non-string reviewer_note could
+ * reach the TEXT column or fail D1 binding. The allowed list is the caller's
+ * own status constant. Only the Nova VOD route acts on without_applying (an
+ * approval that applies nothing); the result carries it only when it is true.
  */
 export function parseStatusUpdateBody<T extends string>(
   value: unknown,
   allowed: ReadonlyArray<T> | ReadonlySet<T>,
-): { status: T; reviewerNote?: string } | { error: string } {
+): { status: T; reviewerNote?: string; withoutApplying?: true } | { error: string } {
   if (!isUnknownRecord(value)) return { error: 'Request body must be an object' };
   const allowedList = [...allowed];
   if (typeof value.status !== 'string' || !(allowedList as readonly string[]).includes(value.status)) {
@@ -512,9 +517,174 @@ export function parseStatusUpdateBody<T extends string>(
   if (value.reviewer_note !== undefined && typeof value.reviewer_note !== 'string') {
     return { error: 'Invalid reviewer_note: expected a string' };
   }
+  if (value.without_applying !== undefined && typeof value.without_applying !== 'boolean') {
+    return { error: 'Invalid without_applying: expected a boolean' };
+  }
   return {
     status: value.status as T,
     ...(value.reviewer_note === undefined ? {} : { reviewerNote: value.reviewer_note as string }),
+    ...(value.without_applying === true ? { withoutApplying: true as const } : {}),
+  };
+}
+
+/**
+ * The Nova VOD status route's body: the one every status route reads, plus an optional expected_status, the status
+ * the caller saw. The route refuses the change once the submission no longer has it, so a page that went stale
+ * cannot overwrite a review made meanwhile. No other status route reads it. The result carries it only when sent.
+ */
+export function parseVodStatusUpdateBody(
+  value: unknown,
+): { status: NovaStatus; reviewerNote?: string; withoutApplying?: true; expectedStatus?: NovaStatus } | { error: string } {
+  const body = parseStatusUpdateBody(value, NOVA_STATUSES);
+  if ('error' in body || !isUnknownRecord(value) || value.expected_status === undefined) return body;
+  const expected = value.expected_status;
+  if (typeof expected !== 'string' || !(NOVA_STATUSES as readonly string[]).includes(expected)) {
+    return { error: `Invalid expected_status: must be one of ${NOVA_STATUSES.join(', ')}` };
+  }
+  return { ...body, expectedStatus: expected as NovaStatus };
+}
+
+// --- Nova VOD corrections: apply ---
+
+function isNonNegativeInteger(value: unknown): value is number {
+  return typeof value === 'number' && Number.isSafeInteger(value) && value >= 0;
+}
+
+/** The fields each operation variant may carry, `op` included. */
+const OPERATION_FIELDS = {
+  setTimes: new Set(['op', 'performanceId', 'timestamp', 'endTimestamp']),
+  renameSong: new Set(['op', 'songId', 'title', 'originalArtist']),
+  relinkToSong: new Set(['op', 'performanceId', 'songId', 'expectedSongStatus']),
+  relinkToNewSong: new Set(['op', 'performanceId', 'title', 'originalArtist', 'expectedSongStatus']),
+  addPerformance: new Set(['op', 'title', 'originalArtist', 'timestamp', 'endTimestamp']),
+  deletePerformance: new Set(['op', 'performanceId']),
+} satisfies Record<CorrectionOperation['op'], ReadonlySet<string>>;
+
+/** Whether the entry carries no field beyond the ones its variant has. */
+function hasOnlyFields(entry: Record<string, unknown>, fields: ReadonlySet<string>): boolean {
+  return Object.keys(entry).every((key) => fields.has(key));
+}
+
+function isStatus(value: unknown): value is Status {
+  return typeof value === 'string' && isValidStatus(value);
+}
+
+/**
+ * One operation rebuilt from its variant's own fields, or null when the entry is anything else: an
+ * unknown op, a field its variant does not have, a missing field, a value of the wrong type, or an
+ * edit that sets nothing (it would write nothing, yet count in the summary). A field the variant
+ * does not have is refused, not dropped, so a misspelled end time cannot apply half a change. What
+ * the values mean (an end after its start, a non-blank title) is applyCorrection's to check: its
+ * refusals name the operation.
+ */
+function parseCorrectionOperation(entry: unknown): CorrectionOperation | null {
+  if (!isUnknownRecord(entry)) return null;
+  switch (entry.op) {
+    case 'setTimes': {
+      const { performanceId, timestamp, endTimestamp } = entry;
+      if (!hasOnlyFields(entry, OPERATION_FIELDS.setTimes) || typeof performanceId !== 'string') return null;
+      // An end may be sent null (applyCorrection refuses clearing one that is set); a start may not: the
+      // timestamp builder would bind the null.
+      if (timestamp !== undefined && !isNonNegativeInteger(timestamp)) return null;
+      if (endTimestamp !== undefined && endTimestamp !== null && !isNonNegativeInteger(endTimestamp)) return null;
+      if (timestamp === undefined && endTimestamp === undefined) return null;
+      return {
+        op: 'setTimes',
+        performanceId,
+        ...(timestamp === undefined ? {} : { timestamp }),
+        ...(endTimestamp === undefined ? {} : { endTimestamp }),
+      };
+    }
+    case 'renameSong': {
+      const { songId, title, originalArtist } = entry;
+      if (!hasOnlyFields(entry, OPERATION_FIELDS.renameSong) || typeof songId !== 'string') return null;
+      if (title !== undefined && typeof title !== 'string') return null;
+      if (originalArtist !== undefined && typeof originalArtist !== 'string') return null;
+      if (title === undefined && originalArtist === undefined) return null;
+      return {
+        op: 'renameSong',
+        songId,
+        ...(title === undefined ? {} : { title }),
+        ...(originalArtist === undefined ? {} : { originalArtist }),
+      };
+    }
+    case 'relinkToSong': {
+      const { performanceId, songId, expectedSongStatus } = entry;
+      if (!hasOnlyFields(entry, OPERATION_FIELDS.relinkToSong)) return null;
+      if (typeof performanceId !== 'string' || typeof songId !== 'string') return null;
+      // The status the review showed for the song: absent checks nothing. A song that exists has one, so null is no value.
+      if (expectedSongStatus !== undefined && !isStatus(expectedSongStatus)) return null;
+      return { op: 'relinkToSong', performanceId, songId, ...(expectedSongStatus === undefined ? {} : { expectedSongStatus }) };
+    }
+    case 'relinkToNewSong': {
+      const { performanceId, title, originalArtist, expectedSongStatus } = entry;
+      if (!hasOnlyFields(entry, OPERATION_FIELDS.relinkToNewSong)) return null;
+      if (typeof performanceId !== 'string' || typeof title !== 'string' || typeof originalArtist !== 'string') return null;
+      // As above, and null too: the review expected the apply to create the song.
+      if (expectedSongStatus !== undefined && expectedSongStatus !== null && !isStatus(expectedSongStatus)) return null;
+      return {
+        op: 'relinkToNewSong',
+        performanceId,
+        title,
+        originalArtist,
+        ...(expectedSongStatus === undefined ? {} : { expectedSongStatus }),
+      };
+    }
+    case 'addPerformance': {
+      const { title, originalArtist, timestamp, endTimestamp } = entry;
+      if (!hasOnlyFields(entry, OPERATION_FIELDS.addPerformance)) return null;
+      if (typeof title !== 'string' || typeof originalArtist !== 'string') return null;
+      if (!isNonNegativeInteger(timestamp) || (endTimestamp !== null && !isNonNegativeInteger(endTimestamp))) return null;
+      return { op: 'addPerformance', title, originalArtist, timestamp, endTimestamp };
+    }
+    case 'deletePerformance': {
+      const { performanceId } = entry;
+      if (!hasOnlyFields(entry, OPERATION_FIELDS.deletePerformance) || typeof performanceId !== 'string') return null;
+      return { op: 'deletePerformance', performanceId };
+    }
+    default:
+      return null;
+  }
+}
+
+const SKIPPED_KINDS = ['time', 'title', 'add', 'delete'] as const satisfies ReadonlyArray<keyof CorrectionSkipped>;
+
+/**
+ * POST /api/nova/vods/:id/apply reads { fingerprint, reviewerNote?, operations, skipped }. Every
+ * operation is rebuilt from its own variant's fields, so nothing the parser did not check reaches
+ * the catalog batch. An apply needs at least one operation.
+ */
+export function parseCorrectionApplyBody(value: unknown): CorrectionApplyBody | { error: string } {
+  if (!isUnknownRecord(value)) return { error: 'Request body must be an object' };
+  if (typeof value.fingerprint !== 'string' || value.fingerprint.trim().length === 0) {
+    return { error: 'Invalid fingerprint: expected a non-empty string' };
+  }
+  if (value.reviewerNote !== undefined && typeof value.reviewerNote !== 'string') {
+    return { error: 'Invalid reviewerNote: expected a string' };
+  }
+  if (!Array.isArray(value.operations)) return { error: 'Invalid operations: expected an array' };
+  if (value.operations.length === 0) return { error: 'Invalid operations: expected at least one operation' };
+  const operations: CorrectionOperation[] = [];
+  for (let i = 0; i < value.operations.length; i++) {
+    const operation = parseCorrectionOperation(value.operations[i]);
+    if (!operation) return { error: `Invalid operation ${i}` };
+    operations.push(operation);
+  }
+
+  const { skipped } = value;
+  if (!isUnknownRecord(skipped)) return { error: 'Invalid skipped: expected an object' };
+  const counts: CorrectionSkipped = { time: 0, title: 0, add: 0, delete: 0 };
+  for (const kind of SKIPPED_KINDS) {
+    const count = skipped[kind];
+    if (!isNonNegativeInteger(count)) return { error: `Invalid skipped.${kind}: expected a non-negative integer` };
+    counts[kind] = count;
+  }
+
+  return {
+    fingerprint: value.fingerprint,
+    ...(value.reviewerNote === undefined ? {} : { reviewerNote: value.reviewerNote }),
+    operations,
+    skipped: counts,
   };
 }
 
