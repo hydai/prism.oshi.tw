@@ -155,6 +155,15 @@ export const VOD_SONG_FIELD_LIMITS = {
 export const MAX_VOD_SONGS = 200;
 
 /**
+ * Whether a submission's base_revision has the shape of a list revision (publicListRevision): a SHA-256 digest in
+ * lowercase hex, 64 characters. Nothing is trimmed or lowercased: a form sends back exactly what
+ * /vod/api/current gave it.
+ */
+export function isListRevision(value: unknown): value is string {
+  return typeof value === 'string' && /^[0-9a-f]{64}$/.test(value);
+}
+
+/**
  * Length check on the trimmed value (= what gets stored). Missing (undefined/null)
  * fields pass — required-ness is validateRequired's job. Non-string values are
  * rejected so a JSON number never reaches .trim().

@@ -1,4 +1,4 @@
-import type { VodSubmissionRow, VodSubmissionSummary, VodSubmissionKind, ApprovedStreamer, AdminStreamSummary, AdminStreamStatus, PublicStreamSong } from './types';
+import type { VodSubmissionSummary, VodSubmissionKind, ApprovedStreamer, AdminStreamSummary, AdminStreamStatus, PublicStreamSong } from './types';
 
 /**
  * Generate a VOD submission ID: vod-XXXXXXXX (8 random hex chars).
@@ -57,22 +57,6 @@ export async function listAllVodSubmissions(db: D1Database): Promise<VodSubmissi
 }
 
 /**
- * Find an approved VOD submission by streamer slug + video ID.
- * Only returns a row when status = 'approved' (curator-verified data doesn't need re-submission).
- */
-export async function findApprovedVodByVideoId(
-  db: D1Database,
-  slug: string,
-  videoId: string,
-): Promise<Pick<VodSubmissionRow, 'id' | 'status' | 'submitted_at'> | null> {
-  const row = await db
-    .prepare("SELECT id, status, submitted_at FROM vod_submissions WHERE streamer_slug = ? AND video_id = ? AND status = 'approved'")
-    .bind(slug, videoId)
-    .first<Pick<VodSubmissionRow, 'id' | 'status' | 'submitted_at'>>();
-  return row ?? null;
-}
-
-/**
  * Count existing VOD submissions for a streamer + video ID, plus the latest status.
  * Used by the check endpoint to provide informational messages.
  */
@@ -101,8 +85,43 @@ export async function countVodsByVideoId(
   };
 }
 
+// A submission's base as the correction review reads it: these five fields of each row, in the list's order.
+function baseSongsJson(base: readonly PublicStreamSong[] | null): string | null {
+  if (base === null) return null;
+  return JSON.stringify(base.map((row) => ({
+    performance_id: row.performance_id,
+    song_title: row.song_title,
+    original_artist: row.original_artist,
+    start_timestamp: row.start_timestamp,
+    end_timestamp: row.end_timestamp,
+  })));
+}
+
 /**
- * Insert a new VOD submission with its songs in a single batch.
+ * The revision of a streamer's public song list for a video: a SHA-256 digest, in lowercase hex, of the streamer
+ * slug, the video id and exactly the rows a submission stores as its base (listPublicStreamSongs' result, in its
+ * order, every field baseSongsJson keeps). GET /vod/api/current gives it with an archived VOD's list, and POST
+ * /vod/api/submit refuses a submission whose base_revision no longer matches, so equal revisions mean the base it
+ * stores is the list the form loaded.
+ * The input is the JSON of [slug, videoId, rows], each row an array in this order: performance_id, song_title,
+ * original_artist, start_timestamp, end_timestamp. Arrays fix the order and JSON escapes every string, so two
+ * inputs serialize alike only when every field of every row matches.
+ */
+export async function publicListRevision(slug: string, videoId: string, rows: readonly PublicStreamSong[]): Promise<string> {
+  const input = JSON.stringify([
+    slug,
+    videoId,
+    rows.map((row) => [row.performance_id, row.song_title, row.original_artist, row.start_timestamp, row.end_timestamp]),
+  ]);
+  const digest = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(input));
+  return Array.from(new Uint8Array(digest), (byte) => byte.toString(16).padStart(2, '0')).join('');
+}
+
+/**
+ * Insert a new VOD submission with its songs in a single batch. `base_songs` is the public list the
+ * submission was compared against (migration 0015): empty when the admin stream shows nothing, null
+ * when there is no stream. `baseVerified` is whether a base_revision confirmed that list as the one the
+ * contributor loaded. No Nova query reads either back.
  */
 export async function insertVodSubmission(
   db: D1Database,
@@ -116,6 +135,8 @@ export async function insertVodSubmission(
     thumbnail_url: string;
     submitter_note: string;
     kind: VodSubmissionKind;
+    base_songs: readonly PublicStreamSong[] | null;
+    baseVerified: boolean;
   },
   songs: Array<{
     id: string;
@@ -131,10 +152,13 @@ export async function insertVodSubmission(
   stmts.push(
     db
       .prepare(
-        `INSERT INTO vod_submissions (id, streamer_slug, video_id, video_url, stream_title, stream_date, thumbnail_url, submitter_note, kind)
-         VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+        `INSERT INTO vod_submissions (id, streamer_slug, video_id, video_url, stream_title, stream_date, thumbnail_url, submitter_note, kind, base_songs, base_verified)
+         VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
       )
-      .bind(id, data.streamer_slug, data.video_id, data.video_url, data.stream_title, data.stream_date, data.thumbnail_url, data.submitter_note, data.kind),
+      .bind(
+        id, data.streamer_slug, data.video_id, data.video_url, data.stream_title, data.stream_date, data.thumbnail_url, data.submitter_note,
+        data.kind, baseSongsJson(data.base_songs), data.baseVerified ? 1 : 0,
+      ),
   );
 
   for (const song of songs) {
@@ -187,6 +211,17 @@ export async function checkAdminStreamExists(
     .bind(slug, videoId)
     .first<{ status: AdminStreamStatus }>();
   return row ?? null;
+}
+
+/**
+ * The kind the public may see of a submission, given its stored kind and the status of the admin stream for its
+ * (streamer, video) now, or null for none. A submission is stored as a correction whenever that stream existed at
+ * submit time, whatever its status, since admin reviews it as a correction of the stream; but only an approved stream
+ * is public. Until the stream is approved, a stored correction reads as new, exactly like a submission for a video
+ * admin has never seen. Every public reading of `kind` (the submit answer, /status) goes through here.
+ */
+export function publicVodKind(kind: VodSubmissionKind, streamStatus: AdminStreamStatus | null): VodSubmissionKind {
+  return kind === 'correction' && streamStatus === 'approved' ? 'correction' : 'new';
 }
 
 /**
