@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
 import type { AuroraSong } from '../components/SongListEditor';
-import { loadNovaVideoDate, NOVA_ORIGIN } from '../lib/nova';
+import { loadNovaVideoDate, NOVA_ORIGIN, submitResultMessage } from '../lib/nova';
 
 interface UseNovaSubmissionOptions {
   selectedStreamer: string;
@@ -18,8 +18,22 @@ type TurnstileWindow = Window & {
   turnstile?: {
     render: (element: HTMLElement, options: Record<string, unknown>) => string;
     remove: (widgetId: string) => void;
+    reset: (widgetId: string) => void;
   };
 };
+
+// A Turnstile token works once, and Nova verifies it before it looks at the video or compares the lists: after
+// a submission that did not succeed it is spent (or, for a request with no answer, forgotten), and the widget
+// issues no other until it is reset. A modal that closed has removed its widget, so there is nothing to reset.
+function resetTurnstileWidget(widgetId: string | null) {
+  const turnstile = (window as TurnstileWindow).turnstile;
+  if (!turnstile || !widgetId) return;
+  try {
+    turnstile.reset(widgetId);
+  } catch {
+    // The Turnstile script may have dropped the widget already.
+  }
+}
 
 export function useNovaSubmission({
   selectedStreamer,
@@ -86,7 +100,11 @@ export function useNovaSubmission({
     };
   }, [isOpen]);
 
-  const open = useCallback(() => setIsOpen(true), []);
+  // The modal shows the answer to its own attempt: opening it must not show the last one's.
+  const open = useCallback(() => {
+    setStatus(null);
+    setIsOpen(true);
+  }, []);
 
   const close = useCallback(() => {
     setIsOpen(false);
@@ -98,6 +116,7 @@ export function useNovaSubmission({
 
     setSubmitting(true);
     setStatus(null);
+    let succeeded = false;
 
     try {
       const videoUrl = vodUrl || `https://youtube.com/watch?v=${videoId}`;
@@ -117,6 +136,8 @@ export function useNovaSubmission({
         });
       }
 
+      // Nova's refusals explain themselves in the body, so it is read for every status; submitResultMessage sorts on the status.
+      // react-doctor-disable-next-line react-doctor/no-fetch-response-used-without-status-check
       const response = await fetch(`${NOVA_ORIGIN}/vod/api/submit`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -129,28 +150,15 @@ export function useNovaSubmission({
           submitter_note: note || undefined,
         }),
       });
-      const data = await response.json();
+      const data: unknown = await response.json();
 
-      if (response.ok) {
-        setStatus({
-          type: 'success',
-          message: data.resubmitted
-            ? `重新提交成功！ID: ${data.id}`
-            : `提交成功！ID: ${data.id}`,
-        });
+      const result = submitResultMessage(response.status, data);
+      setStatus(result);
+      if (result.type === 'success') {
+        succeeded = true;
         setIsOpen(false);
         setStreamDate('');
         setNote('');
-      } else if (response.status === 409) {
-        setStatus({
-          type: 'error',
-          message: `此 VOD 已於 ${data.submittedAt} 提交過（狀態：${data.status}）`,
-        });
-      } else {
-        setStatus({
-          type: 'error',
-          message: data.error || '提交失敗，請稍後再試',
-        });
       }
     } catch {
       setStatus({
@@ -160,6 +168,8 @@ export function useNovaSubmission({
     } finally {
       setSubmitting(false);
       setTurnstileToken('');
+      // The modal stays open on a refusal: ask Turnstile for another token so 確認提交 can come back.
+      if (!succeeded) resetTurnstileWidget(turnstileWidgetIdRef.current);
     }
   }, [note, selectedStreamer, songs, streamDate, turnstileToken, videoId, vodUrl]);
 

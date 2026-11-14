@@ -3,7 +3,7 @@
   "private": true,
   "type": "module",
   "scripts": {
-    "test": "node --import tsx tests/song-editor.test.ts",
+    "test": "node --import tsx tests/song-editor.test.ts && node --import tsx tests/current-list-loader.test.ts && node --import tsx tests/nova-submission.test.ts && node --import tsx tests/submit-status-view.test.ts",
     "check": "npm test && npm run build",
     "dev": "vite",
     "build": "tsc && vite build",

@@ -1,6 +1,7 @@
 import type { RefObject } from 'react';
 import {
   Clock,
+  CloudDownload,
   Download,
   ExternalLink,
   FileText,
@@ -12,6 +13,7 @@ import {
 } from 'lucide-react';
 import type { StreamerOption } from '../lib/nova';
 import type { AuroraSongEditorController } from '../hooks/useAuroraSongEditor';
+import type { CurrentListLoaderController } from '../hooks/useCurrentListLoader';
 import type { NovaSubmissionController } from '../hooks/useNovaSubmission';
 import AuroraPlayerControls from './AuroraPlayerControls';
 import AuroraStampControls from './AuroraStampControls';
@@ -66,6 +68,7 @@ export interface AuroraAppViewProps {
   shortcuts: ShortcutController;
   dialogs: DialogController;
   submission: NovaSubmissionController;
+  currentList: CurrentListLoaderController;
 }
 
 const SHORTCUTS = [
@@ -218,11 +221,70 @@ function AuroraVideoPanel({ videoId, vodUrl, player, shortcuts }: VideoPanelProp
   );
 }
 
+interface SubmitStatusBannerProps {
+  status: NovaSubmissionController['status'];
+  className?: string;
+}
+
+// Nova's answer to a submission, shown where the curator is looking: in the modal while it is open (the
+// toolbar is behind its backdrop), under the toolbar once it is closed.
+function SubmitStatusBanner({ status, className = '' }: SubmitStatusBannerProps) {
+  if (!status) return null;
+  return (
+    <div
+      role={status.type === 'error' ? 'alert' : 'status'}
+      className={`text-[13px] px-3 py-2 rounded-lg ${
+        status.type === 'success'
+          ? 'bg-emerald-50 text-emerald-700 dark:bg-emerald-500/10 dark:text-emerald-400'
+          : 'bg-red-50 text-red-700 dark:bg-red-500/10 dark:text-red-400'
+      } ${className}`}
+    >
+      {status.message}
+    </div>
+  );
+}
+
+interface LoadCurrentListButtonProps {
+  selectedStreamer: string;
+  currentList: CurrentListLoaderController;
+}
+
+// The workspace only renders once a video is loaded, so a streamer is the one thing left to wait for.
+function LoadCurrentListButton({ selectedStreamer, currentList }: LoadCurrentListButtonProps) {
+  return (
+    <button
+      onClick={currentList.load}
+      disabled={!selectedStreamer || currentList.loading}
+      className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-white/60 dark:bg-white/[0.06] border border-[var(--border-default)] text-[var(--text-secondary)] text-[13px] font-medium hover:bg-white/80 dark:hover:bg-white/[0.10] disabled:opacity-40"
+      title={!selectedStreamer ? '請先選擇 VTuber' : '載入目前歌單'}
+      data-testid="load-current-button"
+    >
+      <CloudDownload size={14} className={currentList.loading ? 'animate-pulse' : ''} />
+      <span className="hidden sm:inline">載入目前歌單</span>
+    </button>
+  );
+}
+
+// Why nothing was loaded (not archived yet, or the request failed). It is information, so it is neutral.
+function CurrentListNote({ message }: { message: string | null }) {
+  if (!message) return null;
+  return (
+    <div
+      role="status"
+      className="text-[13px] px-3 py-2 rounded-lg border border-[var(--border-default)] bg-white/60 dark:bg-white/[0.06] text-[var(--text-secondary)]"
+      data-testid="load-current-message"
+    >
+      {message}
+    </div>
+  );
+}
+
 interface SongEditorPanelProps {
   selectedStreamer: string;
   editor: AuroraSongEditorController;
   dialogs: DialogController;
   submission: NovaSubmissionController;
+  currentList: CurrentListLoaderController;
 }
 
 function AuroraSongEditorPanel({
@@ -230,6 +292,7 @@ function AuroraSongEditorPanel({
   editor,
   dialogs,
   submission,
+  currentList,
 }: SongEditorPanelProps) {
   const selectedSong = editor.selectedIndex === null
     ? null
@@ -254,6 +317,7 @@ function AuroraSongEditorPanel({
           <FileText size={14} />
           <span className="hidden sm:inline">匯入</span>
         </button>
+        <LoadCurrentListButton selectedStreamer={selectedStreamer} currentList={currentList} />
         <button
           onClick={() => dialogs.open('export')}
           disabled={editor.songs.length === 0}
@@ -294,17 +358,9 @@ function AuroraSongEditorPanel({
         )}
       </div>
 
-      {submission.status && (
-        <div
-          className={`text-[13px] px-3 py-2 rounded-lg ${
-            submission.status.type === 'success'
-              ? 'bg-emerald-50 text-emerald-700 dark:bg-emerald-500/10 dark:text-emerald-400'
-              : 'bg-red-50 text-red-700 dark:bg-red-500/10 dark:text-red-400'
-          }`}
-        >
-          {submission.status.message}
-        </div>
-      )}
+      {!submission.isOpen && <SubmitStatusBanner status={submission.status} />}
+
+      <CurrentListNote message={currentList.message} />
 
       <AuroraStampControls
         selectedIndex={editor.selectedIndex}
@@ -348,6 +404,7 @@ interface WorkspaceProps {
   shortcuts: ShortcutController;
   dialogs: DialogController;
   submission: NovaSubmissionController;
+  currentList: CurrentListLoaderController;
 }
 
 function AuroraWorkspace(props: WorkspaceProps) {
@@ -364,6 +421,7 @@ function AuroraWorkspace(props: WorkspaceProps) {
         editor={props.editor}
         dialogs={props.dialogs}
         submission={props.submission}
+        currentList={props.currentList}
       />
     </div>
   );
@@ -449,6 +507,8 @@ function NovaSubmitModal({ streamer, editor, submission }: SubmitModalProps) {
           <div ref={submission.turnstileContainerRef} />
         </div>
 
+        <SubmitStatusBanner status={submission.status} className="mb-4" />
+
         <div className="flex gap-2">
           <button
             onClick={submission.close}
@@ -477,6 +537,7 @@ export default function AuroraAppView({
   shortcuts,
   dialogs,
   submission,
+  currentList,
 }: AuroraAppViewProps) {
   return (
     <div className="min-h-screen flex flex-col">
@@ -492,6 +553,7 @@ export default function AuroraAppView({
             shortcuts={shortcuts}
             dialogs={dialogs}
             submission={submission}
+            currentList={currentList}
           />
         ) : (
           <AuroraLanding video={video} />
