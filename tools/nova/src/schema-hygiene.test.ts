@@ -29,4 +29,11 @@ assert(/'seed-mizuki'/.test(seed) && /'seed-gabu'/.test(seed), 'seed.sql names s
 assert(!/INSERT\s+OR\s+REPLACE/i.test(seed), 'seed.sql never replaces existing rows');
 assert(!/CREATE\s+TABLE/i.test(seed), 'seed.sql contains no DDL');
 
+// Migration 0012 replaced the UNIQUE (streamer_slug, video_id) index with a plain one so a
+// VOD can be submitted more than once. A fresh database built from schema.sql must agree.
+assert(
+  !/CREATE\s+UNIQUE\s+INDEX[^;]*\bON\s+vod_submissions\s*\(\s*streamer_slug\s*,\s*video_id\s*\)/i.test(schema),
+  'schema.sql must not declare a UNIQUE index on vod_submissions(streamer_slug, video_id) (migration 0012 made it a plain index)',
+);
+
 console.log('✓ schema.sql is DDL + state only; seed.sql holds the two demo streamers');
