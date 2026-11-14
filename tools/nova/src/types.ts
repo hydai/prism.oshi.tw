@@ -61,22 +61,6 @@ export interface SubmitBody {
 
 export type VodSubmissionKind = 'new' | 'correction';
 
-export interface VodSubmissionRow {
-  id: string;
-  streamer_slug: string;
-  video_id: string;
-  video_url: string;
-  stream_title: string;
-  stream_date: string;
-  thumbnail_url: string;
-  submitter_note: string;
-  status: SubmissionStatus;
-  submitted_at: string;
-  reviewed_at: string | null;
-  reviewer_note: string;
-  kind: VodSubmissionKind;
-}
-
 export interface VodSongRow {
   id: string;
   vod_submission_id: string;

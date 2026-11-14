@@ -16,7 +16,8 @@ import {
 import { extractChannelMeta } from './channel-meta';
 import { verifyTurnstile } from './turnstile';
 import { generateId, findByChannelUrl, insertSubmission, resetRejectedSubmission, listAllSubmissions } from './db';
-import { generateVodId, generateVodSongId, listApprovedStreamers, findApprovedVodByVideoId, countVodsByVideoId, insertVodSubmission, listAllVodSubmissions, listAdminStreams, checkAdminStreamExists } from './vod-db';
+import { generateVodId, generateVodSongId, listApprovedStreamers, countVodsByVideoId, insertVodSubmission, listAllVodSubmissions, listAdminStreams, checkAdminStreamExists, listPublicStreamSongs } from './vod-db';
+import { formatSongsForPaste, isSameAsPublicList, restoreArchivedEnds, restoreArchivedIdentities } from './song-text';
 import { renderPage } from './page';
 import { renderVodPage } from './vod-page';
 import {
@@ -371,7 +372,10 @@ app.get('/vod/api/streamers', async (c) => {
   return c.json(streamers);
 });
 
-// GET /vod/api/check — Duplicate check by streamer slug + video URL
+// GET /vod/api/check — What is on file for a streamer + video URL.
+// `archived` is all this says about the admin DB, and only an approved stream is archived: a
+// stream in any other status (pending, extracted, rejected, excluded) is pipeline state the
+// public must not learn from this API, so it answers exactly as if there were no stream.
 app.get('/vod/api/check', async (c) => {
   const slug = c.req.query('streamer_slug');
   const rawUrl = c.req.query('url');
@@ -388,33 +392,38 @@ app.get('/vod/api/check', async (c) => {
     countVodsByVideoId(c.env.DB, slug, parsed.videoId),
     checkAdminStreamExists(c.env.ADMIN_DB, slug, parsed.videoId),
   ]);
+  const archived = adminStream?.status === 'approved';
+  return c.json({ exists: info.count > 0 || archived, archived, ...info });
+});
 
-  if (adminStream) {
-    return c.json({
-      exists: true,
-      inAdmin: true,
-      adminStatus: adminStream.status,
-      count: info.count,
-      hasApproved: info.hasApproved,
-      pendingCount: info.pendingCount,
-      rejectedCount: info.rejectedCount,
-      latestStatus: info.latestStatus,
-    });
+// GET /vod/api/current — The public song list of an archived VOD, as the text the forms paste.
+// Whatever is not an approved stream (no stream, or one in the pipeline or excluded) gets the same
+// 200 { archived: false, text: '' }, so the status code and the body cannot be used to probe it.
+// Gated like /vod/api/video-info; the cors() above lets Aurora call it.
+app.get('/vod/api/current', async (c) => {
+  if (!isTrustedRequest(c.req.raw)) {
+    return c.json({ error: 'Forbidden' }, 403);
   }
 
-  if (info.count > 0) {
-    return c.json({
-      exists: true,
-      inAdmin: false,
-      count: info.count,
-      hasApproved: info.hasApproved,
-      pendingCount: info.pendingCount,
-      rejectedCount: info.rejectedCount,
-      latestStatus: info.latestStatus,
-    });
+  const slug = c.req.query('streamer_slug');
+  const rawUrl = c.req.query('url');
+  if (!slug || !rawUrl) {
+    return c.json({ error: 'streamer_slug and url query parameters are required' }, 400);
   }
 
-  return c.json({ exists: false, inAdmin: false });
+  const parsed = parseYoutubeVideoUrl(rawUrl);
+  if (!parsed) {
+    return c.json({ error: 'Invalid YouTube video URL' }, 400);
+  }
+
+  // Archived follows the stream's status, not its rows: an approved stream whose rows are all
+  // still pending is archived with an empty list.
+  const adminStream = await checkAdminStreamExists(c.env.ADMIN_DB, slug, parsed.videoId);
+  if (adminStream?.status !== 'approved') {
+    return c.json({ archived: false, text: '' });
+  }
+  const songs = await listPublicStreamSongs(c.env.ADMIN_DB, slug, parsed.videoId);
+  return c.json({ archived: true, text: formatSongsForPaste(songs) });
 });
 
 // GET /vod/api/video-info — Public preview: returns video title + thumbnail only.
@@ -550,33 +559,23 @@ app.post('/vod/api/submit', async (c) => {
     }
   }
 
-  // Block if already in admin DB (approved/extracted/pending — not rejected/excluded)
-  const [approved, adminStream] = await Promise.all([
-    findApprovedVodByVideoId(c.env.DB, body.streamer_slug, parsed.videoId),
-    checkAdminStreamExists(c.env.ADMIN_DB, body.streamer_slug, parsed.videoId),
-  ]);
-
-  if (adminStream && adminStream.status !== 'rejected' && adminStream.status !== 'excluded') {
-    return c.json(
-      {
-        error: 'duplicate',
-        inAdmin: true,
-        adminStatus: adminStream.status,
-      },
-      409,
-    );
+  // A video that already has an approved stream is archived: a submission for it is a correction,
+  // and one that repeats the public list changes nothing. Any other stream status is pipeline
+  // state and counts as no stream at all, so a contributor cannot tell it from a new video.
+  // This runs before the YouTube lookups below so a refused list spends none of their quota.
+  // What the paste text could not carry comes back as the archived row it was loaded from: its
+  // title and artist, and a missing end the form parsers filled in.
+  const adminStream = await checkAdminStreamExists(c.env.ADMIN_DB, body.streamer_slug, parsed.videoId);
+  const archived = adminStream?.status === 'approved';
+  let storedSongs = parsedSongs;
+  if (archived) {
+    const current = await listPublicStreamSongs(c.env.ADMIN_DB, body.streamer_slug, parsed.videoId);
+    storedSongs = restoreArchivedEnds(restoreArchivedIdentities(parsedSongs, current), current);
+    if (isSameAsPublicList(storedSongs, current)) {
+      return c.json({ error: 'no_changes' }, 422);
+    }
   }
-
-  if (approved) {
-    return c.json(
-      {
-        error: 'duplicate',
-        status: approved.status,
-        submittedAt: approved.submitted_at,
-      },
-      409,
-    );
-  }
+  const kind = archived ? 'correction' : 'new';
 
   // Auto-fill missing title/date/thumbnail from YouTube
   let streamTitle = body.stream_title?.trim() ?? '';
@@ -603,10 +602,10 @@ app.post('/vod/api/submit', async (c) => {
     stream_date: streamDate,
     thumbnail_url: thumbnailUrl,
     submitter_note: body.submitter_note?.trim() ?? '',
-    kind: 'new',
-  }, parsedSongs);
+    kind,
+  }, storedSongs);
 
-  return c.json({ id }, 201);
+  return c.json({ id, kind }, 201);
 });
 
 // Edge cache for GET /status (Workers Cache API). Each render performs three

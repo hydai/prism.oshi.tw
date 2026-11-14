@@ -1,4 +1,4 @@
-import type { VodSubmissionRow, VodSubmissionSummary, VodSubmissionKind, ApprovedStreamer, AdminStreamSummary, AdminStreamStatus, PublicStreamSong } from './types';
+import type { VodSubmissionSummary, VodSubmissionKind, ApprovedStreamer, AdminStreamSummary, AdminStreamStatus, PublicStreamSong } from './types';
 
 /**
  * Generate a VOD submission ID: vod-XXXXXXXX (8 random hex chars).
@@ -54,22 +54,6 @@ export async function listAllVodSubmissions(db: D1Database): Promise<VodSubmissi
     )
     .all<VodSubmissionSummary>();
   return results ?? [];
-}
-
-/**
- * Find an approved VOD submission by streamer slug + video ID.
- * Only returns a row when status = 'approved' (curator-verified data doesn't need re-submission).
- */
-export async function findApprovedVodByVideoId(
-  db: D1Database,
-  slug: string,
-  videoId: string,
-): Promise<Pick<VodSubmissionRow, 'id' | 'status' | 'submitted_at'> | null> {
-  const row = await db
-    .prepare("SELECT id, status, submitted_at FROM vod_submissions WHERE streamer_slug = ? AND video_id = ? AND status = 'approved'")
-    .bind(slug, videoId)
-    .first<Pick<VodSubmissionRow, 'id' | 'status' | 'submitted_at'>>();
-  return row ?? null;
 }
 
 /**
