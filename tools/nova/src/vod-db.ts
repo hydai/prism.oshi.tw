@@ -1,4 +1,4 @@
-import type { VodSubmissionRow, VodSubmissionSummary, VodSubmissionKind, ApprovedStreamer, AdminStreamSummary, AdminStreamStatus } from './types';
+import type { VodSubmissionRow, VodSubmissionSummary, VodSubmissionKind, ApprovedStreamer, AdminStreamSummary, AdminStreamStatus, PublicStreamSong } from './types';
 
 /**
  * Generate a VOD submission ID: vod-XXXXXXXX (8 random hex chars).
@@ -187,4 +187,30 @@ export async function checkAdminStreamExists(
     .bind(slug, videoId)
     .first<{ status: AdminStreamStatus }>();
   return row ?? null;
+}
+
+/**
+ * The public song list of a stream, in time order: what the site shows for an archived VOD,
+ * so the stream, the performance and the song must all be approved.
+ * Performances join on stream_id alone: adding streamer_id makes SQLite, without planner
+ * statistics, walk the streamer's whole approved catalog instead of idx_performances_stream_id.
+ */
+export async function listPublicStreamSongs(adminDb: D1Database, slug: string, videoId: string): Promise<PublicStreamSong[]> {
+  const { results } = await adminDb
+    .prepare(
+      `SELECT
+         song.title AS song_title,
+         song.original_artist AS original_artist,
+         p.timestamp AS start_timestamp,
+         p.end_timestamp AS end_timestamp
+       FROM streams s
+       JOIN performances p ON p.stream_id = s.id
+       JOIN songs song ON song.id = p.song_id
+       WHERE s.streamer_id = ? AND s.video_id = ?
+         AND s.status = 'approved' AND p.status = 'approved' AND song.status = 'approved'
+       ORDER BY p.timestamp, p.id`,
+    )
+    .bind(slug, videoId)
+    .all<PublicStreamSong>();
+  return results ?? [];
 }
