@@ -131,10 +131,21 @@ class ApiError extends Error {
     message: string,
     public code?: string,
     public diagnostics: VodExportCapacityDiagnostic[] = [],
+    /**
+     * The response body, parsed, when it is a JSON object: what an error carries beyond its message (an
+     * `invalid_operations` refusal's `details`, say). Undefined for any other body.
+     */
+    readonly payload?: Readonly<Record<string, unknown>>,
   ) {
     super(message);
     this.name = 'ApiError';
   }
+}
+
+function jsonObject(value: unknown): Readonly<Record<string, unknown>> | undefined {
+  return value !== null && typeof value === 'object' && !Array.isArray(value)
+    ? (value as Record<string, unknown>)
+    : undefined;
 }
 
 function isCapacityDiagnostic(value: unknown): value is VodExportCapacityDiagnostic {
@@ -154,9 +165,12 @@ async function responseError(res: Response): Promise<ApiError> {
   let message = body || res.statusText;
   let code: string | undefined;
   let diagnostics: VodExportCapacityDiagnostic[] = [];
+  let payload: Readonly<Record<string, unknown>> | undefined;
 
   try {
-    const json = JSON.parse(body) as Record<string, unknown>;
+    const parsed: unknown = JSON.parse(body);
+    payload = jsonObject(parsed);
+    const json = parsed as Record<string, unknown>;
     if (typeof json.error === 'string') message = json.error;
     if (typeof json.code === 'string') code = json.code;
     const rawDiagnostics = Array.isArray(json.diagnostics)
@@ -175,7 +189,7 @@ async function responseError(res: Response): Promise<ApiError> {
   // message is kept exactly as received.
   if (message.trim() === '') message = `Request failed (HTTP ${res.status})`;
 
-  return new ApiError(res.status, message, code, diagnostics);
+  return new ApiError(res.status, message, code, diagnostics, payload);
 }
 
 /** Inject ?streamer= into all /api/ paths */

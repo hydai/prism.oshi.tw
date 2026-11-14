@@ -2290,7 +2290,7 @@ async function aContributorIsOfferedNoReview(mountPage: MountPage): Promise<void
 /** The client of the correction review: what Task 8's page calls, and what the VODs list sends. */
 async function theCorrectionClient(): Promise<void> {
   reset();
-  const { api } = await import('../src/api/client');
+  const { api, ApiError } = await import('../src/api/client');
 
   // The review: a VOD's own, not any streamer's.
   const view: NovaVodCorrectionView = {
@@ -2343,9 +2343,29 @@ async function theCorrectionClient(): Promise<void> {
   deepStrictEqual(need(calls.at(-1), 'the status request').body, { status: 'approved', without_applying: true });
   await api.updateNovaVodStatus('v-karaoke', { status: 'rejected', reviewer_note: 'No' });
   deepStrictEqual(need(calls.at(-1), 'the second status request').body, { status: 'rejected', reviewer_note: 'No' });
+
+  // A refusal keeps its JSON body: the review page reads what an error carries beyond its message from it.
+  const refusal = { error: 'invalid_operations', details: ['operation 0: end must be greater than start'] };
+  applyReply = () => ({ status: 400, body: refusal });
+  const refused = await api.applyNovaVodCorrection('v-fix', body).then(
+    () => null,
+    (error: unknown) => error,
+  );
+  assert(refused instanceof ApiError, 'a refused apply rejects with an ApiError');
+  assert(refused.status === 400 && refused.message === 'invalid_operations', 'with the status and the error string as its message');
+  deepStrictEqual(refused.payload, refusal, 'and the parsed body as its payload');
+  for (const notAnObject of [['stale'], 'Bad gateway', null]) {
+    applyReply = () => ({ status: 502, body: notAnObject });
+    const other = await api.applyNovaVodCorrection('v-fix', body).then(
+      () => null,
+      (error: unknown) => error,
+    );
+    assert(other instanceof ApiError && other.status === 502, `a refusal whose body is ${JSON.stringify(notAnObject)} still rejects with an ApiError`);
+    assert(other.payload === undefined, `and carries no payload: its body is not an object (${JSON.stringify(notAnObject)})`);
+  }
   assert(unexpected.length === 0, 'no stray request');
 
-  console.log("✓ Nova VODs: the client reads the correction review, applies it, searches a streamer's songs and sends the without_applying flag");
+  console.log("✓ Nova VODs: the client reads the correction review, applies it, searches a streamer's songs, sends the without_applying flag and keeps a refusal's body");
 }
 
 async function main(): Promise<void> {
