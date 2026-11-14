@@ -10,6 +10,11 @@ interface VideoInfo {
   date?: unknown;
 }
 
+interface CurrentList {
+  archived: boolean;
+  text: string;
+}
+
 async function requestNovaJson<T>(
   path: string,
   signal: AbortSignal,
@@ -52,4 +57,57 @@ export async function loadNovaVideoDate(
     fetchImpl,
   );
   return typeof info.date === 'string' && info.date.length > 0 ? info.date : null;
+}
+
+function isCurrentList(value: unknown): value is CurrentList {
+  if (!value || typeof value !== 'object') return false;
+  const list = value as Record<string, unknown>;
+  return typeof list.archived === 'boolean' && typeof list.text === 'string';
+}
+
+/**
+ * The public song list of an archived VOD as paste text, which `parseTextToSongs` reads back.
+ * Anything that is not archived is a 200 `{ archived: false, text: '' }`, so a non-2xx answer
+ * (403 for an untrusted request, 400 for a bad URL) or a malformed body is a failure to load.
+ */
+export async function loadNovaCurrentList(
+  streamerSlug: string,
+  videoUrl: string,
+  signal: AbortSignal,
+  fetchImpl: typeof fetch = fetch,
+): Promise<{ archived: boolean; text: string }> {
+  const data = await requestNovaJson<unknown>(
+    `/vod/api/current?streamer_slug=${encodeURIComponent(streamerSlug)}&url=${encodeURIComponent(videoUrl)}`,
+    signal,
+    fetchImpl,
+  );
+  if (!isCurrentList(data)) {
+    throw new Error('Nova current list response has an invalid shape');
+  }
+  return { archived: data.archived, text: data.text };
+}
+
+/** What Aurora tells the curator after Nova answers a submission (201, 422 `no_changes`, or any error). */
+export function submitResultMessage(
+  status: number,
+  data: unknown,
+): { type: 'success' | 'error'; message: string } {
+  const answer: { id?: unknown; kind?: unknown; error?: unknown } =
+    data !== null && typeof data === 'object' ? data : {};
+
+  if (status === 201) {
+    return {
+      type: 'success',
+      message: answer.kind === 'correction'
+        ? `修正已送出！ID: ${answer.id}`
+        : `提交成功！ID: ${answer.id}`,
+    };
+  }
+  if (status === 422 && answer.error === 'no_changes') {
+    return { type: 'error', message: '與目前歌單相同，沒有需要修正的地方' };
+  }
+  return {
+    type: 'error',
+    message: typeof answer.error === 'string' && answer.error !== '' ? answer.error : '提交失敗，請稍後再試',
+  };
 }

@@ -344,6 +344,8 @@ export type NovaStatus = 'pending' | 'approved' | 'rejected';
 // read from this constant instead of hand-maintaining their own literal lists.
 export const NOVA_STATUSES = ['pending', 'approved', 'rejected'] as const satisfies readonly NovaStatus[];
 
+export type NovaVodKind = 'new' | 'correction';
+
 export interface NovaVodSubmission {
   id: string;
   streamer_slug: string;
@@ -357,6 +359,15 @@ export interface NovaVodSubmission {
   submitted_at: string;
   reviewed_at: string | null;
   reviewer_note: string;
+  kind: NovaVodKind;
+}
+
+/**
+ * A row of `GET /api/nova/vods`: the submission plus the admin stream its (streamer, video) already
+ * has, of any status. A row with a target stream is reviewed as a correction of that stream.
+ */
+export interface NovaVodListItem extends NovaVodSubmission {
+  target_stream: { id: string; status: Status } | null;
 }
 
 export interface NovaVodSong {

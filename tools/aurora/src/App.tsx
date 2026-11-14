@@ -2,6 +2,7 @@ import { useCallback, useEffect, useEffectEvent, useRef, useState } from 'react'
 import AuroraAppView from './components/AuroraAppView';
 import type { YouTubeEmbedHandle } from './components/YouTubeEmbed';
 import { useAuroraSongEditor } from './hooks/useAuroraSongEditor';
+import { useCurrentListLoader } from './hooks/useCurrentListLoader';
 import { useNovaSubmission } from './hooks/useNovaSubmission';
 import { loadNovaStreamers, type StreamerOption } from './lib/nova';
 import { pushRecentVideo } from './lib/recent';
@@ -32,6 +33,12 @@ export function App() {
     songs: editor.songs,
     videoId,
     vodUrl,
+  });
+  const currentList = useCurrentListLoader({
+    streamerSlug: selectedStreamer,
+    videoUrl: videoId ? vodUrl || `https://youtube.com/watch?v=${videoId}` : '',
+    hasSongs: editor.songs.length > 0,
+    importSongs: editor.importSongs,
   });
 
   useEffect(() => {
@@ -153,6 +160,7 @@ export function App() {
         close: () => setActiveDialog(null),
       }}
       submission={submission}
+      currentList={currentList}
     />
   );
 }

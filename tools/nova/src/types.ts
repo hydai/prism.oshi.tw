@@ -59,20 +59,7 @@ export interface SubmitBody {
 
 // --- VOD Submission types ---
 
-export interface VodSubmissionRow {
-  id: string;
-  streamer_slug: string;
-  video_id: string;
-  video_url: string;
-  stream_title: string;
-  stream_date: string;
-  thumbnail_url: string;
-  submitter_note: string;
-  status: SubmissionStatus;
-  submitted_at: string;
-  reviewed_at: string | null;
-  reviewer_note: string;
-}
+export type VodSubmissionKind = 'new' | 'correction';
 
 export interface VodSongRow {
   id: string;
@@ -128,6 +115,7 @@ export interface VodSubmissionSummary {
   submitted_at: string;
   reviewed_at: string | null;
   reviewer_note: string;
+  kind: VodSubmissionKind;
   song_count: number;
 }
 
@@ -144,4 +132,12 @@ export interface AdminStreamSummary {
   status: AdminStreamStatus;
   created_at: string;
   song_count: number;
+}
+
+/** One row of a stream's public song list (stream, performance and song all approved). */
+export interface PublicStreamSong {
+  song_title: string;
+  original_artist: string;
+  start_timestamp: number;
+  end_timestamp: number | null;
 }

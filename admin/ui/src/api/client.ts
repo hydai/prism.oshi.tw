@@ -31,6 +31,7 @@ import type {
   NovaSubmission,
   NovaSubmissionUpdateBody,
   NovaStatus,
+  NovaVodListItem,
   NovaVodSubmission,
   NovaVodSong,
   NovaVodUpdateBody,
@@ -56,6 +57,11 @@ import type {
   BulkUpdateWorkTagsResponse,
 } from '../../../shared/types';
 import { REQUEST_AUTHENTICITY_HEADER, REQUEST_AUTHENTICITY_VALUE } from '../../../shared/csrf';
+import type {
+  CorrectionApplyBody,
+  CorrectionApplyResult,
+  NovaVodCorrectionView,
+} from '../../../shared/vod-correction';
 import type {
   VodExportCandidateResponse,
   VodExportCapacityDiagnostic,
@@ -125,10 +131,21 @@ class ApiError extends Error {
     message: string,
     public code?: string,
     public diagnostics: VodExportCapacityDiagnostic[] = [],
+    /**
+     * The response body, parsed, when it is a JSON object: what an error carries beyond its message (an
+     * `invalid_operations` refusal's `details`, say). Undefined for any other body.
+     */
+    readonly payload?: Readonly<Record<string, unknown>>,
   ) {
     super(message);
     this.name = 'ApiError';
   }
+}
+
+function jsonObject(value: unknown): Readonly<Record<string, unknown>> | undefined {
+  return value !== null && typeof value === 'object' && !Array.isArray(value)
+    ? (value as Record<string, unknown>)
+    : undefined;
 }
 
 function isCapacityDiagnostic(value: unknown): value is VodExportCapacityDiagnostic {
@@ -148,9 +165,12 @@ async function responseError(res: Response): Promise<ApiError> {
   let message = body || res.statusText;
   let code: string | undefined;
   let diagnostics: VodExportCapacityDiagnostic[] = [];
+  let payload: Readonly<Record<string, unknown>> | undefined;
 
   try {
-    const json = JSON.parse(body) as Record<string, unknown>;
+    const parsed: unknown = JSON.parse(body);
+    payload = jsonObject(parsed);
+    const json = parsed as Record<string, unknown>;
     if (typeof json.error === 'string') message = json.error;
     if (typeof json.code === 'string') code = json.code;
     const rawDiagnostics = Array.isArray(json.diagnostics)
@@ -169,7 +189,7 @@ async function responseError(res: Response): Promise<ApiError> {
   // message is kept exactly as received.
   if (message.trim() === '') message = `Request failed (HTTP ${res.status})`;
 
-  return new ApiError(res.status, message, code, diagnostics);
+  return new ApiError(res.status, message, code, diagnostics, payload);
 }
 
 /** Inject ?streamer= into all /api/ paths */
@@ -518,18 +538,46 @@ export const api = {
 
   // Nova VOD submissions
   listNovaVods: () =>
-    request<ListResponse<NovaVodSubmission>>('/api/nova/vods', undefined, {
+    request<ListResponse<NovaVodListItem>>('/api/nova/vods', undefined, {
       skipStreamer: true,
     }),
 
   getNovaVod: (id: string) =>
     request<NovaVodSubmission & { songs: NovaVodSong[] }>(`/api/nova/vods/${id}`),
 
-  updateNovaVodStatus: (id: string, body: { status: NovaStatus; reviewer_note?: string }) =>
+  // `without_applying` approves a VOD whose video already has a stream and applies nothing to it; the worker
+  // refuses any other approval of such a VOD (409 use_correction_review).
+  updateNovaVodStatus: (
+    id: string,
+    body: { status: NovaStatus; reviewer_note?: string; without_applying?: boolean },
+  ) =>
     request<NovaVodSubmission>(`/api/nova/vods/${id}/status`, {
       method: 'PATCH',
       body: JSON.stringify(body),
     }),
+
+  // The correction review: a VOD's own request (the VOD says whose it is), so no `?streamer=`.
+  getNovaVodCorrection: (id: string) =>
+    request<NovaVodCorrectionView>(`/api/nova/vods/${id}/correction`, undefined, {
+      skipStreamer: true,
+    }),
+
+  applyNovaVodCorrection: (id: string, body: CorrectionApplyBody) =>
+    request<CorrectionApplyResult>(
+      `/api/nova/vods/${id}/apply`,
+      { method: 'POST', body: JSON.stringify(body) },
+      { skipStreamer: true },
+    ),
+
+  // The first 20 songs of `streamer` matching `search`, for relinking a performance to an existing song. The
+  // streamer is the one the VOD belongs to, not the one picked in the sidebar, so it is named here.
+  searchStreamerSongs: async (streamer: string, search: string) => {
+    const params = new URLSearchParams({ streamer, search, pageSize: '20' });
+    const page = await request<PaginatedResponse<Song>>(`/api/songs?${params.toString()}`, undefined, {
+      skipStreamer: true,
+    });
+    return page.data;
+  },
 
   updateNovaVod: (id: string, body: NovaVodUpdateBody) =>
     request<NovaVodSubmission>(`/api/nova/vods/${id}`, {

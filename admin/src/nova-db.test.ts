@@ -7,7 +7,6 @@ import {
   getSubmissionForUpdate,
   getSubmissionStatus,
   getVodById,
-  getVodStatus,
   listApprovedSubmissionsWithChannel,
   listSubmissions,
   listVodSongs,
@@ -370,12 +369,6 @@ async function testGetVodByIdRoundTrips(): Promise<void> {
   assertEqual(await getVodById(asDb(missing), 'vod-missing'), null, 'missing id returns null');
 }
 
-async function testGetVodStatusProjection(): Promise<void> {
-  const fake = new FakeD1Database();
-  await getVodStatus(asDb(fake), 'vod-1');
-  assertEqual(fake.firstCalls[0]!.sql, 'SELECT id, status FROM vod_submissions WHERE id = ?', 'narrow status projection');
-}
-
 async function testVodExists(): Promise<void> {
   const present = new FakeD1Database();
   present.firstResponses.push(['SELECT id FROM vod_submissions WHERE id = ?', { id: 'vod-1' }]);
@@ -468,7 +461,6 @@ async function main(): Promise<void> {
 
   await testListVodsFilters();
   await testGetVodByIdRoundTrips();
-  await testGetVodStatusProjection();
   await testVodExists();
   await testDeleteVodIssuesDelete();
   await testListVodSongsOrdersAscending();

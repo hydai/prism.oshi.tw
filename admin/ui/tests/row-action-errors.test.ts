@@ -30,7 +30,10 @@ function handlerBody(source: string, page: string, name: string): string {
 const pages: ReadonlyArray<{ page: string; handlers: readonly string[] }> = [
   { page: 'CrystalTickets.tsx', handlers: ['handleReply', 'handleStatusChange'] },
   { page: 'NovaSubmissions.tsx', handlers: ['handleAction', 'handleDelete', 'handleFetchAll'] },
-  { page: 'NovaVodSubmissions.tsx', handlers: ['handleExpand', 'handleAction', 'handleDelete'] },
+  {
+    page: 'NovaVodSubmissions.tsx',
+    handlers: ['handleExpand', 'handleAction', 'handleApproveWithoutApplying', 'handleDelete'],
+  },
 ];
 
 /** A handler whose failure toast must carry a fixed text: Chinese chrome stays verbatim. */

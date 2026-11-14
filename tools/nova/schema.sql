@@ -45,11 +45,11 @@ CREATE TABLE IF NOT EXISTS vod_submissions (
   status TEXT DEFAULT 'pending' CHECK(status IN ('pending','approved','rejected')),
   submitted_at TEXT DEFAULT (datetime('now')),
   reviewed_at TEXT,
-  reviewer_note TEXT DEFAULT ''
+  reviewer_note TEXT DEFAULT '',
+  kind TEXT NOT NULL DEFAULT 'new' CHECK(kind IN ('new','correction'))
 );
 
-CREATE UNIQUE INDEX IF NOT EXISTS idx_vod_streamer_video
-  ON vod_submissions(streamer_slug, video_id);
+CREATE INDEX IF NOT EXISTS idx_vod_streamer_video ON vod_submissions(streamer_slug, video_id);
 CREATE INDEX IF NOT EXISTS idx_vod_status ON vod_submissions(status);
 
 CREATE TABLE IF NOT EXISTS vod_songs (

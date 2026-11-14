@@ -1,4 +1,4 @@
-import type { VodSubmissionRow, VodSubmissionSummary, ApprovedStreamer, AdminStreamSummary, AdminStreamStatus } from './types';
+import type { VodSubmissionSummary, VodSubmissionKind, ApprovedStreamer, AdminStreamSummary, AdminStreamStatus, PublicStreamSong } from './types';
 
 /**
  * Generate a VOD submission ID: vod-XXXXXXXX (8 random hex chars).
@@ -42,7 +42,7 @@ export async function listAllVodSubmissions(db: D1Database): Promise<VodSubmissi
     .prepare(
       `SELECT
          v.id, v.streamer_slug, v.video_id, v.stream_title, v.stream_date,
-         v.status, v.submitted_at, v.reviewed_at, v.reviewer_note,
+         v.status, v.submitted_at, v.reviewed_at, v.reviewer_note, v.kind,
          COUNT(s.id) AS song_count
        FROM vod_submissions v
        LEFT JOIN vod_songs s ON s.vod_submission_id = v.id
@@ -54,22 +54,6 @@ export async function listAllVodSubmissions(db: D1Database): Promise<VodSubmissi
     )
     .all<VodSubmissionSummary>();
   return results ?? [];
-}
-
-/**
- * Find an approved VOD submission by streamer slug + video ID.
- * Only returns a row when status = 'approved' (curator-verified data doesn't need re-submission).
- */
-export async function findApprovedVodByVideoId(
-  db: D1Database,
-  slug: string,
-  videoId: string,
-): Promise<Pick<VodSubmissionRow, 'id' | 'status' | 'submitted_at'> | null> {
-  const row = await db
-    .prepare("SELECT id, status, submitted_at FROM vod_submissions WHERE streamer_slug = ? AND video_id = ? AND status = 'approved'")
-    .bind(slug, videoId)
-    .first<Pick<VodSubmissionRow, 'id' | 'status' | 'submitted_at'>>();
-  return row ?? null;
 }
 
 /**
@@ -115,6 +99,7 @@ export async function insertVodSubmission(
     stream_date: string;
     thumbnail_url: string;
     submitter_note: string;
+    kind: VodSubmissionKind;
   },
   songs: Array<{
     id: string;
@@ -130,10 +115,10 @@ export async function insertVodSubmission(
   stmts.push(
     db
       .prepare(
-        `INSERT INTO vod_submissions (id, streamer_slug, video_id, video_url, stream_title, stream_date, thumbnail_url, submitter_note)
-         VALUES (?, ?, ?, ?, ?, ?, ?, ?)`,
+        `INSERT INTO vod_submissions (id, streamer_slug, video_id, video_url, stream_title, stream_date, thumbnail_url, submitter_note, kind)
+         VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)`,
       )
-      .bind(id, data.streamer_slug, data.video_id, data.video_url, data.stream_title, data.stream_date, data.thumbnail_url, data.submitter_note),
+      .bind(id, data.streamer_slug, data.video_id, data.video_url, data.stream_title, data.stream_date, data.thumbnail_url, data.submitter_note, data.kind),
   );
 
   for (const song of songs) {
@@ -186,4 +171,30 @@ export async function checkAdminStreamExists(
     .bind(slug, videoId)
     .first<{ status: AdminStreamStatus }>();
   return row ?? null;
+}
+
+/**
+ * The public song list of a stream, in time order: what the site shows for an archived VOD,
+ * so the stream, the performance and the song must all be approved.
+ * Performances join on stream_id alone: adding streamer_id makes SQLite, without planner
+ * statistics, walk the streamer's whole approved catalog instead of idx_performances_stream_id.
+ */
+export async function listPublicStreamSongs(adminDb: D1Database, slug: string, videoId: string): Promise<PublicStreamSong[]> {
+  const { results } = await adminDb
+    .prepare(
+      `SELECT
+         song.title AS song_title,
+         song.original_artist AS original_artist,
+         p.timestamp AS start_timestamp,
+         p.end_timestamp AS end_timestamp
+       FROM streams s
+       JOIN performances p ON p.stream_id = s.id
+       JOIN songs song ON song.id = p.song_id
+       WHERE s.streamer_id = ? AND s.video_id = ?
+         AND s.status = 'approved' AND p.status = 'approved' AND song.status = 'approved'
+       ORDER BY p.timestamp, p.id`,
+    )
+    .bind(slug, videoId)
+    .all<PublicStreamSong>();
+  return results ?? [];
 }

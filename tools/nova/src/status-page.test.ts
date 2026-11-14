@@ -1,5 +1,5 @@
-import { renderStatusPage } from './status-page';
-import type { AdminStreamSummary, SubmissionSummary, VodSubmissionSummary } from './types';
+import { renderStatusPage, type VodFilter } from './status-page';
+import type { AdminStreamSummary, SubmissionSummary, VodSubmissionKind, VodSubmissionSummary } from './types';
 
 declare const process: { exitCode?: number };
 
@@ -7,6 +7,10 @@ function assert(condition: boolean, message: string): void {
   if (!condition) {
     throw new Error(message);
   }
+}
+
+function assertEqual<T>(actual: T, expected: T, message: string): void {
+  assert(actual === expected, `${message}: expected ${String(expected)}, got ${String(actual)}`);
 }
 
 const XSS = '<script>alert(document.domain)</script>';
@@ -45,6 +49,7 @@ const vods: VodSubmissionSummary[] = [
     submitted_at: '2026-08-22T23:10:00.000Z',
     reviewed_at: null,
     reviewer_note: '',
+    kind: 'new',
     song_count: 19,
   },
   {
@@ -57,6 +62,7 @@ const vods: VodSubmissionSummary[] = [
     submitted_at: '2026-07-26T10:05:00.000Z',
     reviewed_at: '2026-07-26T12:30:00.000Z',
     reviewer_note: '',
+    kind: 'new',
     song_count: 20,
   },
 ];
@@ -73,6 +79,7 @@ const vodsWithImportedPending: VodSubmissionSummary[] = [
     submitted_at: '2026-08-12T01:22:00.000Z',
     reviewed_at: null,
     reviewer_note: '',
+    kind: 'new',
     song_count: 13,
   },
 ];
@@ -200,6 +207,232 @@ function testEmptyState(): void {
   console.log('status page keeps its empty states');
 }
 
+// --- Corrections -----------------------------------------------------------
+// A correction resubmits the song list of a VOD the admin already archived. These
+// cases use a streamer and a video of their own, and give the admin stream and the
+// submission different titles, so a row is told apart by what it is rather than by
+// where it sits. The page prints every status label in its filter chips, so rows
+// are checked through their own markup — `includes('已收錄')` would always pass.
+
+const ARCHIVED_VIDEO = 'Archived_V1';
+const ARCHIVED_TITLE = '已收錄的歌枠';
+const SUBMITTED_TITLE = '歌枠（投稿版）';
+const SUMMARY_DOT = ' <span class="dot">·</span> ';
+
+const archivedStream: AdminStreamSummary = {
+  id: 'adm-archived',
+  streamer_id: 'demo-streamer',
+  video_id: ARCHIVED_VIDEO,
+  title: ARCHIVED_TITLE,
+  date: '2026-06-01',
+  status: 'approved',
+  created_at: '2026-06-02T09:00:00.000Z',
+  song_count: 7,
+};
+
+function submissionOnArchivedVod(
+  kind: VodSubmissionKind,
+  overrides: Partial<VodSubmissionSummary> = {},
+): VodSubmissionSummary {
+  return {
+    id: 'vod-on-archived',
+    streamer_slug: 'demo-streamer',
+    video_id: ARCHIVED_VIDEO,
+    stream_title: SUBMITTED_TITLE,
+    stream_date: '2026-06-01',
+    status: 'pending',
+    submitted_at: '2026-11-10T08:00:00.000Z',
+    reviewed_at: null,
+    reviewer_note: '',
+    kind,
+    song_count: 6,
+    ...overrides,
+  };
+}
+
+function renderVodSection(
+  vodSubmissions: VodSubmissionSummary[],
+  streams: AdminStreamSummary[],
+  vod: VodFilter = 'all',
+): string {
+  return String(renderStatusPage([], vodSubmissions, streams, { vtuber: 'all', vod }, NONCE));
+}
+
+/** Each VOD row's markup in page order; a row ends where the next begins, or at its group card. */
+function vodRows(html: string): string[] {
+  return html
+    .split('class="prism-row vod-row"')
+    .slice(1)
+    .map((chunk) => chunk.split('</details>')[0]);
+}
+
+function rowTitled(html: string, title: string): string {
+  const row = vodRows(html).find((candidate) => candidate.includes(`<div class="cell-title">${title}</div>`));
+  if (row === undefined) throw new Error(`no VOD row is titled ${title}`);
+  return row;
+}
+
+/** The row's status pill as "badge-class label". A row prints it twice (mobile and desktop), identically. */
+function statusPillOf(row: string): string {
+  const match = row.match(/<span class="badge (badge-(?:pending|approved|rejected|admin_done))">([^<]*)<\/span>/);
+  if (match === null) throw new Error('the row has no status pill');
+  return `${match[1]} ${match[2]}`;
+}
+
+/** The VOD section's own 筆 badge, read beside its title: each group card wears the same badge for its rows. */
+function vodSectionCount(html: string): number {
+  const match = html.match(/<span class="prism-section-title">VOD 提交<\/span>\s*<span class="badge badge-pink">(\d+) 筆<\/span>/);
+  if (match === null) throw new Error('the VOD section has no count badge');
+  return Number(match[1]);
+}
+
+/** The hero's 場 figure: how many VODs the page covers. */
+function heroVodCount(html: string): number {
+  const match = html.match(/<strong>\d+ 位 VTuber、(\d+) 場 VOD<\/strong>/);
+  if (match === null) throw new Error('the hero has no VOD count');
+  return Number(match[1]);
+}
+
+function songCountOf(row: string): number {
+  const match = row.match(/<span class="badge badge-pink">(\d+) 首<\/span>/);
+  if (match === null) throw new Error('the row has no song count');
+  return Number(match[1]);
+}
+
+function testNewSubmissionStillTakesTheArchivedRow(): void {
+  // Unchanged behaviour, pinned from both sides: a kind 'new' submission matched
+  // by an approved stream is promoted to 已收錄, reads the stream's song count and
+  // is the only row — the admin-only row is not listed a second time. The counts
+  // differ (3 vs 7) so a count taken from the wrong side would show.
+  const html = renderVodSection([submissionOnArchivedVod('new', { status: 'approved', song_count: 3 })], [archivedStream]);
+  const rows = vodRows(html);
+  assertEqual(rows.length, 1, 'the submission takes over the archived VOD row');
+  assertEqual(statusPillOf(rows[0]), 'badge-admin_done 已收錄', 'the new submission is promoted to 已收錄');
+  assertEqual(songCountOf(rows[0]), 7, "the new submission reads the admin stream's song count");
+  assert(rows[0].includes(`<div class="cell-title">${SUBMITTED_TITLE}</div>`), 'the surviving row is the submission, not the admin-only row');
+  console.log('status page keeps a new submission as the single 已收錄 row');
+}
+
+function testCorrectionKeepsTheArchivedRow(): void {
+  const html = renderVodSection([submissionOnArchivedVod('correction', { song_count: 6 })], [archivedStream]);
+  assertEqual(vodRows(html).length, 2, 'the archived VOD keeps its row beside the correction');
+
+  const archived = rowTitled(html, ARCHIVED_TITLE);
+  assertEqual(statusPillOf(archived), 'badge-admin_done 已收錄', 'the archived row stays 已收錄');
+  assertEqual(songCountOf(archived), 7, "the archived row reads the stream's song count");
+
+  const correction = rowTitled(html, SUBMITTED_TITLE);
+  assertEqual(statusPillOf(correction), 'badge-pending 修正審核中', 'a pending correction reads 修正審核中, never 已收錄');
+  assertEqual(songCountOf(correction), 6, "the correction reads its own song count, not the stream's");
+  console.log('status page keeps the archived row beside a pending correction');
+}
+
+function testCorrectionLabelsKeepTheirBaseBadgeClass(): void {
+  // Label per status, the CSS class of the base status, the reviewer note only on
+  // a rejected row (an approved correction's note is the auto summary), and the
+  // base-status filter that lists the row. admin_done must list the archived row.
+  const cases = [
+    { status: 'pending', pill: 'badge-pending 修正審核中', note: '', reviewedAt: null, showsNote: false },
+    { status: 'approved', pill: 'badge-approved 修正已通過', note: '套用 6 項（時間 6）', reviewedAt: '2026-11-11T08:00:00.000Z', showsNote: false },
+    { status: 'rejected', pill: 'badge-rejected 修正未採用', note: '歌單與影片不符', reviewedAt: '2026-11-11T08:00:00.000Z', showsNote: true },
+  ] as const;
+
+  for (const { status, pill, note, reviewedAt, showsNote } of cases) {
+    const correction = submissionOnArchivedVod('correction', { status, reviewer_note: note, reviewed_at: reviewedAt });
+    const html = renderVodSection([correction], [archivedStream]);
+    const row = rowTitled(html, SUBMITTED_TITLE);
+    assertEqual(statusPillOf(row), pill, `a ${status} correction`);
+    assertEqual(songCountOf(row), 6, `a ${status} correction reads its own song count`);
+    assertEqual(note !== '' && row.includes(note), showsNote, `a ${status} correction ${showsNote ? 'shows' : 'does not publish'} its reviewer note`);
+    if (showsNote) assert(row.includes(`原因：${note}`), 'a rejected correction labels its reviewer note 原因');
+
+    const underOwnFilter = vodRows(renderVodSection([correction], [archivedStream], status));
+    assertEqual(underOwnFilter.length, 1, `?vod=${status} lists only the ${status} correction`);
+    assertEqual(statusPillOf(underOwnFilter[0]), pill, `?vod=${status} lists the correction`);
+
+    const underArchived = vodRows(renderVodSection([correction], [archivedStream], 'admin_done'));
+    assertEqual(underArchived.length, 1, `?vod=admin_done lists one row beside a ${status} correction`);
+    assertEqual(statusPillOf(underArchived[0]), 'badge-admin_done 已收錄', `?vod=admin_done lists the archived row beside a ${status} correction`);
+  }
+  console.log('status page labels corrections by status and files them under the base filters');
+}
+
+function testVodFiltersPlaceCorrectionsByBaseStatus(): void {
+  const vodSubmissions = [submissionOnArchivedVod('correction')];
+
+  // Today the promoted correction shows up here as 已收錄 and the admin-only row is
+  // hidden, so a bare "an 已收錄 row exists" would pass; the title tells them apart.
+  const archivedRows = vodRows(renderVodSection(vodSubmissions, [archivedStream], 'admin_done'));
+  assertEqual(archivedRows.length, 1, '?vod=admin_done lists one row');
+  assert(archivedRows[0].includes(`<div class="cell-title">${ARCHIVED_TITLE}</div>`), '?vod=admin_done lists the archived VOD itself');
+  assertEqual(songCountOf(archivedRows[0]), 7, '?vod=admin_done reads the stream song count');
+
+  const pendingRows = vodRows(renderVodSection(vodSubmissions, [archivedStream], 'pending'));
+  assertEqual(pendingRows.length, 1, '?vod=pending lists one row');
+  assert(pendingRows[0].includes(`<div class="cell-title">${SUBMITTED_TITLE}</div>`), '?vod=pending lists the correction');
+  assertEqual(statusPillOf(pendingRows[0]), 'badge-pending 修正審核中', '?vod=pending shows the correction label');
+
+  const approvedHtml = renderVodSection(vodSubmissions, [archivedStream], 'approved');
+  assertEqual(vodRows(approvedHtml).length, 0, '?vod=approved lists neither the pending correction nor the archived row');
+  assert(approvedHtml.includes('沒有符合「已通過」的 VOD 提交'), '?vod=approved falls back to its empty state');
+  console.log('status page files corrections under the pending, approved and rejected filters');
+}
+
+function testCorrectionDoesNotDropTheArchivedVodFromTheCounts(): void {
+  // The first correction on an archived VOD with no earlier submission must not
+  // take it out of the 已收錄 count: both rows are counted.
+  const pending = renderVodSection([submissionOnArchivedVod('correction')], [archivedStream]);
+  assertEqual(vodSectionCount(pending), 2, 'the VOD section counts the correction and the archived VOD');
+  assertEqual(heroVodCount(pending), 1, 'the hero counts one VOD: a correction is not another VOD');
+  assert(
+    pending.includes(['1 審核中', '0 已通過', '0 已拒絕', '1 已收錄'].join(SUMMARY_DOT)),
+    'the summary counts a pending correction as 審核中 and still counts the archived VOD as 已收錄',
+  );
+  assert(pending.includes('<details class="prism-card vod-group" open>'), 'a pending correction opens its group');
+  assert(pending.includes('<span class="badge badge-pending">1 審核中</span>'), "the group's pill counts the pending correction");
+
+  const applied = renderVodSection([submissionOnArchivedVod('correction', { status: 'approved' })], [archivedStream]);
+  assert(
+    applied.includes(['0 審核中', '1 已通過', '0 已拒絕', '1 已收錄'].join(SUMMARY_DOT)),
+    'an applied correction is counted as 已通過 and the archived VOD still as 已收錄',
+  );
+  assert(applied.includes('<details class="prism-card vod-group">'), 'a group with no pending row stays collapsed');
+  console.log('status page counts the archived VOD and its correction together');
+}
+
+function testCorrectionSitsBesideAnEarlierNewSubmission(): void {
+  // Only a kind 'new' submission takes over the admin-only row. Here one already
+  // did, so the correction adds a row and the archived VOD is still listed once.
+  const earlier = submissionOnArchivedVod('new', {
+    id: 'vod-earlier',
+    stream_title: '歌枠（首次投稿）',
+    status: 'approved',
+    submitted_at: '2026-06-01T08:00:00.000Z',
+    reviewed_at: '2026-06-01T12:00:00.000Z',
+    song_count: 3,
+  });
+  const html = renderVodSection([earlier, submissionOnArchivedVod('correction')], [archivedStream]);
+  assertEqual(vodRows(html).length, 2, 'the earlier submission and the correction are the two rows');
+  assertEqual(vodSectionCount(html), 2, 'the VOD section counts both rows');
+  assertEqual(heroVodCount(html), 1, 'the hero still counts one VOD');
+  assert(!html.includes(`<div class="cell-title">${ARCHIVED_TITLE}</div>`), 'the admin-only row stays hidden while a new submission matches');
+
+  const earlierRow = rowTitled(html, '歌枠（首次投稿）');
+  assertEqual(statusPillOf(earlierRow), 'badge-admin_done 已收錄', 'the earlier submission is the 已收錄 row');
+  assertEqual(songCountOf(earlierRow), 7, "the earlier submission reads the stream's song count");
+  const correctionRow = rowTitled(html, SUBMITTED_TITLE);
+  assertEqual(statusPillOf(correctionRow), 'badge-pending 修正審核中', 'the correction is not promoted');
+  assertEqual(songCountOf(correctionRow), 6, 'the correction reads its own song count');
+
+  const archivedRows = vodRows(renderVodSection([earlier, submissionOnArchivedVod('correction')], [archivedStream], 'admin_done'));
+  assertEqual(archivedRows.length, 1, '?vod=admin_done lists the earlier submission only');
+  assert(archivedRows[0].includes('歌枠（首次投稿）'), '?vod=admin_done lists the row that stands for the archived VOD');
+  const pendingRows = vodRows(renderVodSection([earlier, submissionOnArchivedVod('correction')], [archivedStream], 'pending'));
+  assertEqual(pendingRows.length, 1, '?vod=pending lists the correction only');
+  assert(pendingRows[0].includes(`<div class="cell-title">${SUBMITTED_TITLE}</div>`), '?vod=pending lists the correction');
+  console.log('status page lists a correction beside the earlier submission of an archived VOD');
+}
+
 try {
   testEscapesUserContent();
   testFilterChips();
@@ -210,6 +443,12 @@ try {
   testCarriesTheNonce();
   testImageFallbacksAreScripted();
   testEmptyState();
+  testNewSubmissionStillTakesTheArchivedRow();
+  testCorrectionKeepsTheArchivedRow();
+  testCorrectionLabelsKeepTheirBaseBadgeClass();
+  testVodFiltersPlaceCorrectionsByBaseStatus();
+  testCorrectionDoesNotDropTheArchivedVodFromTheCounts();
+  testCorrectionSitsBesideAnEarlierNewSubmission();
   console.log('status-page.test: all passed');
 } catch (error) {
   console.error(error);

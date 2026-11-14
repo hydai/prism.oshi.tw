@@ -7,6 +7,7 @@
  *
  * Uses the global `fetch` (available in both Cloudflare Workers and Node 18+).
  */
+import type { NovaVodKind } from './types';
 
 export interface DiscordEmbedField {
   name: string;
@@ -90,6 +91,30 @@ export function vodRejectedEmbed(vod: { stream_title: string; streamer_slug: str
 }
 
 /**
+ * A correction changes a VOD that is already on the site, so 「稍後將上架」 would mislead. Its 變更
+ * field is the summary of what was applied and nothing else: the curator's note is never posted on
+ * an approval. Without a summary the field is left out, since Discord refuses an empty value.
+ */
+export function vodCorrectionAppliedEmbed(vod: { stream_title: string; streamer_slug: string }, summary: string): DiscordEmbed {
+  const embed: DiscordEmbed = {
+    title: '✅ VOD 修正已套用',
+    description: truncate(`「${vod.stream_title}」（${vod.streamer_slug}）的修正已套用，網站稍後更新。`, DESC_MAX),
+    color: COLOR.GREEN,
+  };
+  if (summary) embed.fields = [{ name: '變更', value: truncate(summary, FIELD_VALUE_MAX) }];
+  return embed;
+}
+
+export function vodCorrectionRejectedEmbed(vod: { stream_title: string; streamer_slug: string; reviewer_note: string }): DiscordEmbed {
+  return {
+    title: '❌ VOD 修正未採用',
+    description: truncate(`「${vod.stream_title}」（${vod.streamer_slug}）的修正未採用。`, DESC_MAX),
+    color: COLOR.RED,
+    fields: [{ name: '理由', value: truncate(vod.reviewer_note || '（未填理由）', FIELD_VALUE_MAX) }],
+  };
+}
+
+/**
  * Decide the feedback embed for a submission status transition. Returns null when
  * no notification should fire (no real transition, or new status not approved/rejected).
  */
@@ -104,14 +129,22 @@ export function feedbackEmbedForSubmission(
   return null;
 }
 
+/**
+ * Same rules as feedbackEmbedForSubmission. The copy follows the submission's `kind`: a correction
+ * gets the correction embeds, with `summary` (what an apply changed) on approval; a 'new'
+ * submission gets today's embeds whatever is passed, so a stream that only exists in the pipeline
+ * is never revealed.
+ */
 export function feedbackEmbedForVod(
   oldStatus: string,
   newStatus: string,
-  vod: { stream_title: string; streamer_slug: string; reviewer_note: string },
+  vod: { stream_title: string; streamer_slug: string; reviewer_note: string; kind: NovaVodKind },
+  summary?: string,
 ): DiscordEmbed | null {
   if (oldStatus === newStatus) return null;
-  if (newStatus === 'approved') return vodApprovedEmbed(vod);
-  if (newStatus === 'rejected') return vodRejectedEmbed(vod);
+  const correction = vod.kind === 'correction';
+  if (newStatus === 'approved') return correction ? vodCorrectionAppliedEmbed(vod, summary ?? '') : vodApprovedEmbed(vod);
+  if (newStatus === 'rejected') return correction ? vodCorrectionRejectedEmbed(vod) : vodRejectedEmbed(vod);
   return null;
 }
 

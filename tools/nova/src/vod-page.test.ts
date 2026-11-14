@@ -54,18 +54,72 @@ function testRejectsInvalidStreamerSlug(): void {
   console.log('invalid streamer slugs are excluded from dropdown options');
 }
 
-function testHidesAdminProcessingMessage(): void {
+// /vod/api/check no longer returns inAdmin/adminStatus and /vod/api/submit no longer answers 409:
+// whatever the admin DB holds for a video that is not archived must stay invisible to the form.
+function testFormReadsNoAdminState(): void {
   const html = render([]);
-  const pipelineCondition = "data.inAdmin && (data.adminStatus === 'pending' || data.adminStatus === 'extracted')";
 
-  assert(!html.includes('此 VOD 正在處理中，請耐心等候'), 'admin processing message is not rendered');
-  assert(
-    html.split(pipelineCondition).length - 1 === 2,
-    'pending and extracted pipeline entries are hidden during both checks and submission',
-  );
+  for (const gone of [
+    'inAdmin',
+    'adminStatus',
+    'res.status === 409',
+    '此 VOD 已收錄於歌單中，無需再提交',
+    '此 VOD 已通過審核，無需重複提交',
+    '此 VOD 正在處理中，請耐心等候',
+  ]) {
+    assert(!html.includes(gone), `the form no longer carries ${gone}`);
+  }
   assert(html.includes("resultDiv.style.display = resultDiv.textContent ? '' : 'none'"), 'empty result messages stay hidden');
   assert(html.includes('筆提交（審核中），你仍可提交新版本'), 'real pending Nova submissions still show their count');
-  console.log('admin processing message is hidden while pipeline blocking remains intact');
+  assert(html.includes('此 VOD 先前的提交已被拒絕，歡迎重新提交修正版本'), 'rejected Nova submissions still invite a new version');
+  assert(html.includes('此 VOD 尚未被提交'), 'a video with nothing on file still reads as new');
+  assert(html.includes('提交失敗，請稍後再試'), 'the generic error fallback stays');
+  console.log('form reads no admin pipeline state and has no 409 handling');
+}
+
+function testOffersTheCurrentList(): void {
+  const html = render([{ slug: 'mizuki', display_name: '浠Mizuki', avatar_url: '' }]);
+
+  assert(html.includes('id="load-current-btn"') && html.includes('載入目前歌單'), 'the form renders the 載入目前歌單 button');
+  assert(
+    html.includes('<button type="button" id="load-current-btn" class="link-pill" style="display: none;">載入目前歌單</button>'),
+    'the button is a plain pill that stays hidden until the check says the VOD is archived',
+  );
+  assert(
+    /id="url-check"[^>]*><\/div>\s*<button type="button" id="load-current-btn"/.test(html),
+    'the button sits right after the URL check line',
+  );
+  // CSP: no inline handler; the nonce'd script finds the button and wires it itself.
+  assert(html.includes("var loadBtn = document.getElementById('load-current-btn')"), 'the script looks the button up by id, as loadBtn');
+  // The button's own wiring: the page's other click listeners (the theme toggle) would satisfy a page-wide match.
+  assert(html.includes("loadBtn.addEventListener('click'"), 'the script wires the button itself with addEventListener');
+  assert(html.includes('/vod/api/current?streamer_slug='), 'the button loads /vod/api/current for the chosen streamer');
+  // The check that shows the button reads the VTuber as well as the URL, so changing either re-runs it.
+  assert(html.split('checkVod();').length - 1 === 2, 'the URL blur and the VTuber change both run the one duplicate check');
+  assert(html.includes("streamerSelect.addEventListener('change'"), 'a VTuber change re-runs the check');
+  // An answer for fields that changed meanwhile is dropped on every path: the check's answer and
+  // failure, and the load's answer and failure.
+  assert(
+    html.split('if (slug !== streamerSelect.value || url !== urlInput.value.trim()) return;').length - 1 === 4,
+    'every check and load outcome drops a stale answer',
+  );
+  assert(html.split('window.confirm(').length - 1 === 1, 'there is one confirm, guarding the replace');
+  assert(html.includes('要用目前歌單取代欄位裡的內容嗎？'), 'the replace confirm carries the Nova copy');
+  console.log('vod form offers the current song list of an archived VOD');
+}
+
+function testSpeaksOfCorrections(): void {
+  const html = render([]);
+
+  assert(html.includes('此 VOD 已收錄。若發現錯誤，可以送出修正'), 'an archived VOD gets the correction prompt');
+  assert(html.includes('此 VOD 已通過審核，正在整理中'), 'an approved submission that is not public yet reads as being organized');
+  assert(html.includes('與目前歌單相同，沒有需要修正的地方'), 'no_changes has its own copy');
+  assert(html.includes("data.error === 'no_changes'"), 'no_changes is told apart from other errors by the error code');
+  assert(html.includes("resultDiv.className = 'result-msg result-warning'"), 'no_changes is a warning, not an error');
+  assert(html.includes("data.kind === 'correction'"), 'the success copy follows the kind the API answers');
+  assert(html.includes('修正已送出！ID: '), 'a correction has its own success copy');
+  assert(html.includes('提交成功！ID: '), 'a new submission keeps its success copy');
+  console.log('vod form reports corrections and no_changes');
 }
 
 function testPrismFormStructure(): void {
@@ -118,7 +172,9 @@ try {
   testEscapesStreamerOptionFields();
   testRendersValidStreamerSlug();
   testRejectsInvalidStreamerSlug();
-  testHidesAdminProcessingMessage();
+  testFormReadsNoAdminState();
+  testOffersTheCurrentList();
+  testSpeaksOfCorrections();
   testPrismFormStructure();
   testCarriesTheNonce();
   testVodFieldLimitsReachTheForm();

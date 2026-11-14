@@ -35,6 +35,7 @@ const PAGE_CSS = `    /* video fields left, fetched-video card right (one DOM ca
     .right { text-align: right; }
     .form-hint code { font-family: var(--font-mono); font-size: 11px; }
     .link-pill svg, .btn-primary svg { flex-shrink: 0; }
+    #load-current-btn { margin-top: 8px; }
 
     /* 800px, not 640px: below that the fields column drops under the 300px Turnstile widget. */
     @media (max-width: 800px) {
@@ -57,6 +58,7 @@ const VOD_SCRIPT = String.raw`
       var dateInput = form.querySelector('[name="stream_date"]');
       var streamerSelect = form.querySelector('[name="streamer_slug"]');
       var urlCheck = document.getElementById('url-check');
+      var loadBtn = document.getElementById('load-current-btn');
       var submitBtn = document.getElementById('submit-btn');
       var submitLabel = document.getElementById('submit-label');
       var resultDiv = document.getElementById('result');
@@ -210,47 +212,58 @@ const VOD_SCRIPT = String.raw`
         videoPreview.style.display = 'none';
       }
 
+      // Duplicate check, for the VTuber and URL the fields hold now. Only an archived VOD (approved
+      // stream) offers its current list; the button is not hidden while this runs, or a click that
+      // moved focus here would lose its target. An answer for fields that changed meanwhile is dropped.
+      function checkVod() {
+        var url = urlInput.value.trim();
+        var slug = streamerSelect.value;
+        if (!url || !slug) {
+          loadBtn.style.display = 'none';
+          return;
+        }
+        fetch('/vod/api/check?streamer_slug=' + encodeURIComponent(slug) + '&url=' + encodeURIComponent(url))
+          .then(function(r) { return r.json(); })
+          .then(function(data) {
+            if (slug !== streamerSelect.value || url !== urlInput.value.trim()) return;
+            urlCheck.style.display = '';
+            loadBtn.style.display = data.archived ? '' : 'none';
+            if (data.archived) {
+              urlCheck.className = 'check-line check-ok';
+              urlCheck.textContent = '此 VOD 已收錄。若發現錯誤，可以送出修正';
+            } else if (data.exists && data.hasApproved) {
+              urlCheck.className = 'check-line check-exists';
+              urlCheck.textContent = '此 VOD 已通過審核，正在整理中';
+            } else if (data.exists && data.pendingCount > 0) {
+              urlCheck.className = 'check-line check-resubmit';
+              urlCheck.textContent = '此 VOD 已有 ' + data.pendingCount + ' 筆提交（審核中），你仍可提交新版本';
+            } else if (data.exists && data.rejectedCount > 0) {
+              urlCheck.className = 'check-line check-exists';
+              urlCheck.textContent = '此 VOD 先前的提交已被拒絕，歡迎重新提交修正版本';
+            } else {
+              urlCheck.className = 'check-line check-ok';
+              urlCheck.textContent = '此 VOD 尚未被提交';
+            }
+          })
+          .catch(function() {
+            if (slug !== streamerSelect.value || url !== urlInput.value.trim()) return;
+            urlCheck.style.display = 'none';
+            loadBtn.style.display = 'none';
+          });
+      }
+
       // On URL blur: duplicate check + auto-fetch video info
       var lastFetchedUrl = '';
       urlInput.addEventListener('blur', function() {
         var url = this.value.trim();
-        var slug = streamerSelect.value;
         if (!url) {
           urlCheck.style.display = 'none';
+          loadBtn.style.display = 'none';
           return;
         }
 
         var encoded = encodeURIComponent(url);
-
-        // Duplicate check
-        if (slug) {
-          fetch('/vod/api/check?streamer_slug=' + encodeURIComponent(slug) + '&url=' + encoded)
-            .then(function(r) { return r.json(); })
-            .then(function(data) {
-              urlCheck.style.display = '';
-              if (data.inAdmin && data.adminStatus === 'approved') {
-                urlCheck.className = 'check-line check-ok';
-                urlCheck.textContent = '此 VOD 已收錄於歌單中，無需再提交';
-              } else if (data.exists && data.hasApproved) {
-                urlCheck.className = 'check-line check-exists';
-                urlCheck.textContent = '此 VOD 已通過審核，無需重複提交';
-              } else if (data.exists && data.pendingCount > 0) {
-                urlCheck.className = 'check-line check-resubmit';
-                urlCheck.textContent = '此 VOD 已有 ' + data.pendingCount + ' 筆提交（審核中），你仍可提交新版本';
-              } else if (data.exists && data.rejectedCount > 0) {
-                urlCheck.className = 'check-line check-exists';
-                urlCheck.textContent = '此 VOD 先前的提交已被拒絕，歡迎重新提交修正版本';
-              } else if (data.inAdmin && (data.adminStatus === 'pending' || data.adminStatus === 'extracted')) {
-                // Pipeline state alone does not mean a Nova submission exists.
-                urlCheck.style.display = 'none';
-                urlCheck.textContent = '';
-              } else {
-                urlCheck.className = 'check-line check-ok';
-                urlCheck.textContent = '此 VOD 尚未被提交';
-              }
-            })
-            .catch(function() { urlCheck.style.display = 'none'; });
-        }
+        checkVod();
 
         // Auto-fetch video info (only once per URL)
         if (url === lastFetchedUrl) return;
@@ -278,6 +291,52 @@ const VOD_SCRIPT = String.raw`
             showVideoPreview(info);
           })
           .catch(function() {});
+      });
+
+      // The check reads the VTuber too: a URL entered before the VTuber was chosen, or a switch to a
+      // VTuber whose copy of this VOD is (or is not) archived, shows or hides 載入目前歌單 again.
+      streamerSelect.addEventListener('change', function() {
+        if (!urlInput.value.trim()) return;
+        if (!streamerSelect.value) urlCheck.style.display = 'none';
+        checkVod();
+      });
+
+      // A quiet note on the check line (the grey of check-loading: this is information, not an error).
+      function showCheckNote(text) {
+        urlCheck.style.display = '';
+        urlCheck.className = 'check-line check-loading';
+        urlCheck.textContent = text;
+      }
+
+      // 載入目前歌單: put the archived VOD's public list into the textarea, ready to be corrected.
+      // The streamer and URL are read again here, so the answer always matches what the fields say now.
+      loadBtn.addEventListener('click', async function() {
+        var slug = streamerSelect.value;
+        var url = urlInput.value.trim();
+        if (!slug || !url) return;
+
+        loadBtn.disabled = true;
+        try {
+          var res = await fetch('/vod/api/current?streamer_slug=' + encodeURIComponent(slug) + '&url=' + encodeURIComponent(url));
+          if (!res.ok) throw new Error('current answered ' + res.status);
+          var data = await res.json();
+          // The streamer or the URL changed while this lookup was in flight: drop the stale answer.
+          if (slug !== streamerSelect.value || url !== urlInput.value.trim()) return;
+          if (!data.archived || !data.text) {
+            showCheckNote('這支影片還沒有收錄的歌單');
+            return;
+          }
+          if (songsTextarea.value.trim() && !window.confirm('要用目前歌單取代欄位裡的內容嗎？')) return;
+          songsTextarea.value = data.text;
+          // Programmatic changes fire no input event: dispatch it so the preview renders as it does for typing.
+          songsTextarea.dispatchEvent(new Event('input'));
+        } catch(err) {
+          // A failure for fields that changed meanwhile is stale too: the line now speaks for the new VOD.
+          if (slug !== streamerSelect.value || url !== urlInput.value.trim()) return;
+          showCheckNote('無法載入目前歌單，請稍後再試');
+        } finally {
+          loadBtn.disabled = false;
+        }
       });
 
       // Collect songs from textarea
@@ -347,24 +406,20 @@ const VOD_SCRIPT = String.raw`
 
           if (res.ok) {
             resultDiv.className = 'result-msg result-success';
-            resultDiv.textContent = '提交成功！ID: ' + data.id + '。感謝你的幫助！';
+            resultDiv.textContent = (data.kind === 'correction' ? '修正已送出！ID: ' : '提交成功！ID: ') + data.id + '。感謝你的幫助！';
             form.reset();
             songsTextarea.value = '';
             songsPreview.textContent = '';
             thumbnailUrl = '';
+            loadBtn.style.display = 'none';
             hideVideoPreview();
             if (window.turnstile) turnstile.reset();
-          } else if (res.status === 409) {
-            if (data.inAdmin && (data.adminStatus === 'pending' || data.adminStatus === 'extracted')) {
-              // Keep pipeline-only conflicts silent until they can be distinguished from submissions.
-              resultDiv.style.display = 'none';
-              resultDiv.textContent = '';
-            } else {
-              resultDiv.className = 'result-msg result-warning';
-              resultDiv.textContent = data.inAdmin
-                ? '此 VOD 已收錄於歌單中，無需再提交'
-                : '此 VOD 已通過審核，無需重複提交';
-            }
+          } else if (res.status === 422 && data.error === 'no_changes') {
+            resultDiv.className = 'result-msg result-warning';
+            resultDiv.textContent = '與目前歌單相同，沒有需要修正的地方';
+            // The server verified this Turnstile token before it compared the lists, and a token works once:
+            // without a fresh one, the corrected list the contributor submits next would be refused.
+            if (window.turnstile) turnstile.reset();
           } else {
             resultDiv.className = 'result-msg result-error';
             resultDiv.textContent = data.error || '提交失敗，請稍後再試';
@@ -428,6 +483,7 @@ export function renderVodPage(siteKey: string, streamers: ApprovedStreamer[], no
                 placeholder="https://www.youtube.com/watch?v=..."
                 class="form-input" maxlength="${VOD_FIELD_LIMITS.video_url}" /></div>
               <div id="url-check" class="check-line" style="display: none;"></div>
+              <button type="button" id="load-current-btn" class="link-pill" style="display: none;">載入目前歌單</button>
             </div>
           </div>
 
