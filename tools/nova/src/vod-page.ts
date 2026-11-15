@@ -473,6 +473,10 @@ const VOD_SCRIPT = String.raw`
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify(body),
           });
+          // The server verifies this Turnstile token before anything that can refuse the list, and a token works once:
+          // without a fresh one, the corrected list the contributor submits next would be refused. Reset before the
+          // body is read, so a refusal whose body does not parse gets one too.
+          if (!res.ok && window.turnstile) turnstile.reset();
           var data = await res.json();
 
           if (res.ok) {
@@ -497,9 +501,6 @@ const VOD_SCRIPT = String.raw`
           } else if (res.status === 422 && data.error === 'no_changes') {
             resultDiv.className = 'result-msg result-warning';
             resultDiv.textContent = '與目前歌單相同，沒有需要修正的地方';
-            // The server verified this Turnstile token before it compared the lists, and a token works once:
-            // without a fresh one, the corrected list the contributor submits next would be refused.
-            if (window.turnstile) turnstile.reset();
           } else {
             resultDiv.className = 'result-msg result-error';
             resultDiv.textContent = data.error || '提交失敗，請稍後再試';

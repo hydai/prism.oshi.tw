@@ -51,8 +51,9 @@ const NOT_PUBLIC = [
 interface SongInput {
   song_title: string;
   original_artist: string;
-  start_timestamp: string;
-  end_timestamp?: string | null;
+  // The Nova form sends H:MM:SS text, Aurora seconds.
+  start_timestamp: string | number;
+  end_timestamp?: string | number | null;
 }
 
 /** Exactly what s-pub publishes. */
@@ -395,7 +396,9 @@ async function testStartOnlyPasteKeepsTheFillBeforeAMovedOrNewRow() {
 
 async function testBlankTitleRowIsNotTheNextRow() {
   // A start-only correction with a blank-title row in the middle, each end filled from the next titled
-  // row. The route drops the blank row, so the next submitted row is the next stored one: Song B.
+  // row. The route drops the blank row, so the next submitted row is the next stored one: Song B. The blank
+  // row starts at 0:02:30, not where Song A ends (0:05:00), so no end is taken from it: the route re-fills
+  // only an end that is the dropped row's start (testAnEndFilledFromABlankLineIsDerived).
   const f = fixture();
   f.adminDb.sqlite.exec(`
     INSERT INTO songs (id,streamer_id,title,original_artist,status) VALUES
@@ -452,6 +455,313 @@ async function testDashTitleOnlyPasteIsNoChange() {
   const pasted = fromPaste('0:01:40 ~ 0:03:20 Song A\n0:15:00 ~ 0:19:00 Title - Part');
   assert.deepEqual([pasted[1].song_title, pasted[1].original_artist], ['Title', 'Part'], 'the parsers split the title at its dash');
   assert.deepEqual(await submit(f, 'vidPUB00001', pasted), { status: 422, body: { error: 'no_changes' } }, 'the title-only paste repeats the archived list');
+  close(f);
+}
+
+const endNotAfterStart = (title: string) => ({ status: 400, body: { error: `歌曲 "${title}" 的結束時間必須晚於開始時間` } });
+const startsBeforeThePreviousRow = (title: string) => ({ status: 400, body: { error: `歌曲 "${title}" 的開始時間早於前一首，請依時間順序排列` } });
+
+/** Every video a submission can name: none, each stream that is not public, and the archived one. */
+const EVERY_VIDEO = ['vidNEW00001', ...NOT_PUBLIC.map(([, videoId]) => videoId), 'vidPUB00001'];
+
+async function testInvertedRowIsRefused() {
+  // An end must come after its start, for a new video and a correction alike. The check reads the rows
+  // Nova would store: an archived VOD's once the paste text's losses are restored, any other video's as
+  // they came. A stream that is not public restores nothing, so it answers as no stream does.
+  const f = fixture();
+  const before = [count(f.db, 'vod_submissions'), count(f.db, 'vod_songs')];
+  const early: SongInput = { song_title: '  Late Song  ', original_artist: 'Band', start_timestamp: '0:05:00', end_timestamp: '0:04:59' };
+  for (const videoId of EVERY_VIDEO) {
+    assert.deepEqual(await submit(f, videoId, [SONG_A, early]), endNotAfterStart('Late Song'), `an end before its start, ${videoId}`);
+    assert.deepEqual(await submit(f, videoId, [{ ...SONG_A, end_timestamp: SONG_A.start_timestamp }]), endNotAfterStart('Song A'), `an end at its start, ${videoId}`);
+  }
+  // Of several, the first in the order submitted is named.
+  assert.deepEqual(await submit(f, 'vidNEW00001', [{ ...SONG_A, end_timestamp: SONG_A.start_timestamp }, early]), endNotAfterStart('Song A'), 'the first of two');
+
+  // Finding #7: start-only lines with one appended out of order. The parsers end Gamma where Delta
+  // starts, and Gamma is no archived row, so nothing gives it another end. The forms sort their lines
+  // now (#9), so a list that still arrives like this is refused for its order before any end is read,
+  // naming Delta, the first row to start before the row above it.
+  const appended = fromPaste('0:10:00 Alpha / A\n0:20:00 Beta / B\n0:30:00 Gamma / C\n0:15:00 Delta / D');
+  assert.equal(appended[2].end_timestamp, '0:15:00');
+  assert.deepEqual(await submit(f, 'vidPUB00001', appended), startsBeforeThePreviousRow('Delta'));
+
+  assert.deepEqual([count(f.db, 'vod_submissions'), count(f.db, 'vod_songs')], before, 'nothing is stored');
+  assert.deepEqual(outbound.filter((url) => !url.includes(TURNSTILE)), [], 'nor is YouTube asked');
+
+  // A blank-title row is dropped before its times are read, so they refuse nothing.
+  created(await submit(f, 'vidNEW00001', [SONG_A, { ...early, song_title: '   ' }]), 'new');
+  close(f);
+}
+
+async function testAListOutOfTimeOrderIsRefused() {
+  // A row that starts before the row above it is refused, naming it, for a new video and a correction alike. The
+  // forms sort their lines before the parsers fill the ends; a client that does not would store a song typed out of
+  // its place with an end that spans the rows after it (#2). The rows are read as they would be stored, and a stream
+  // that is not public restores nothing, so it answers as no stream does.
+  const f = fixture();
+  const before = [count(f.db, 'vod_submissions'), count(f.db, 'vod_songs')];
+  const songB: SongInput = { song_title: 'Song B', original_artist: 'Artist', start_timestamp: '0:05:00', end_timestamp: '0:06:40' };
+  // Every end comes after its start: only the order is wrong.
+  const missed: SongInput = { song_title: 'Missed', original_artist: 'Artist', start_timestamp: '0:04:00', end_timestamp: '0:05:00' };
+  for (const videoId of EVERY_VIDEO) {
+    assert.deepEqual(await submit(f, videoId, [SONG_A, songB, missed]), startsBeforeThePreviousRow('Missed'), `a missed song typed below the next row, ${videoId}`);
+  }
+
+  // Of several rows that start before the row above them, the first in the order submitted is named.
+  const lateStart: SongInput = { song_title: 'Late', original_artist: 'Artist', start_timestamp: '0:03:20', end_timestamp: '0:04:00' };
+  assert.deepEqual(await submit(f, 'vidNEW00001', [SONG_A, songB, missed, lateStart]), startsBeforeThePreviousRow('Missed'), 'the first of two');
+
+  // The order is told before any end is: Late Song's end is inverted too.
+  const inverted: SongInput = { song_title: 'Late Song', original_artist: 'Band', start_timestamp: '0:05:00', end_timestamp: '0:04:59' };
+  assert.deepEqual(await submit(f, 'vidNEW00001', [SONG_A, inverted, missed]), startsBeforeThePreviousRow('Missed'), 'the order before the end');
+
+  assert.deepEqual([count(f.db, 'vod_submissions'), count(f.db, 'vod_songs')], before, 'nothing is stored');
+  assert.deepEqual(outbound.filter((url) => !url.includes(TURNSTILE)), [], 'nor is YouTube asked');
+
+  // A blank-title row is dropped before its time is read, so it never counts as out of order.
+  created(await submit(f, 'vidNEW00001', [SONG_A, { ...missed, song_title: '   ', start_timestamp: '0:00:10', end_timestamp: '0:00:20' }, songB]), 'new');
+  close(f);
+}
+
+async function testEqualStartsAreInOrder() {
+  // Rows that start together are in order: the forms' stable sort keeps them as typed. Their ends are given: a
+  // start-only line above an equal start is filled with that start, which is its own, and an end at its start is
+  // refused, unless the line repeats an archived row at its start, whose end the restore gives back
+  // (testANewSongAtAnArchivedStartIsAccepted).
+  const f = fixture();
+  const first: SongInput = { song_title: 'First', original_artist: 'Artist', start_timestamp: '0:01:40', end_timestamp: '0:02:00' };
+  const second: SongInput = { song_title: 'Second', original_artist: 'Artist', start_timestamp: '0:01:40', end_timestamp: null };
+  assert.deepEqual(storedTimes(f, created(await submit(f, 'vidNEW00001', [first, second]), 'new')), [[100, 120], [100, null]], 'a new video');
+  assert.deepEqual(storedTimes(f, created(await submit(f, 'vidPUB00001', [first, second]), 'correction')), [[100, 120], [100, null]], 'a correction');
+  close(f);
+}
+
+async function testANewSongAtAnArchivedStartIsAccepted() {
+  // A start-only paste with a new song typed at an archived row's start, below that row. The parsers end Song A at
+  // its own start, but New Song starts where an archived row starts, so it reads as no move: Song A's archived end
+  // comes back, nothing is inverted, and the list is stored. (Before r16 New Song counted as moved, Song A kept the
+  // end at its start, and the list was refused.)
+  const f = fixture();
+  const pasted = fromPaste('0:01:40 Song A / Artist\n0:01:40 New Song / Band');
+  assert.equal(pasted[0].end_timestamp, '0:01:40', 'the parsers end Song A at its own start');
+  const alone = created(await submit(f, 'vidPUB00001', pasted), 'correction');
+  assert.deepEqual(storedTimes(f, alone), [[100, 200], [100, null]], 'Song A keeps its archived end, and New Song has none');
+
+  f.adminDb.sqlite.exec(`
+    INSERT INTO songs (id,streamer_id,title,original_artist,status) VALUES ('song-b','mizuki','Song B','Artist','approved');
+    INSERT INTO performances (id,streamer_id,song_id,stream_id,date,stream_title,video_id,timestamp,end_timestamp,status) VALUES
+      ('p-pub-b','mizuki','song-b','s-pub','2026-09-01','Public','vidPUB00001',300,400,'approved');
+  `);
+  const between = created(await submit(f, 'vidPUB00001', fromPaste('0:01:40 Song A / Artist\n0:01:40 New Song / Band\n0:05:00 Song B / Artist')), 'correction');
+  assert.deepEqual(storedTimes(f, between), [[100, 200], [100, 300], [300, 400]], 'New Song ends where Song B starts, and Song B keeps its own end');
+  close(f);
+}
+
+async function testTheAppendedSongRestoresTheUntouchedRow() {
+  // Finding #9: Alpha, Beta and Gamma are archived, and Delta, which they all missed, is typed at the bottom of a
+  // start-only paste. Typed there, the parsers end Gamma where Delta starts, and Gamma's archived end gave way to
+  // that end (Delta is new): an untouched row was refused. The forms sort the lines first, so the paste reads in time
+  // order, with Delta between Alpha and Beta, and each untouched row gets its archived end back.
+  const f = fixture();
+  f.adminDb.sqlite.exec(`
+    DELETE FROM performances WHERE id = 'p-pub';
+    INSERT INTO songs (id,streamer_id,title,original_artist,status) VALUES
+      ('song-alpha','mizuki','Alpha','A','approved'),
+      ('song-beta','mizuki','Beta','B','approved'),
+      ('song-gamma','mizuki','Gamma','C','approved');
+    INSERT INTO performances (id,streamer_id,song_id,stream_id,date,stream_title,video_id,timestamp,end_timestamp,status) VALUES
+      ('p-alpha','mizuki','song-alpha','s-pub','2026-09-01','Public','vidPUB00001',600,840,'approved'),
+      ('p-beta','mizuki','song-beta','s-pub','2026-09-01','Public','vidPUB00001',1200,1440,'approved'),
+      ('p-gamma','mizuki','song-gamma','s-pub','2026-09-01','Public','vidPUB00001',1800,2040,'approved');
+  `);
+  // As the form submits it: the lines in time order, the ends filled from the next row in time.
+  const sorted = fromPaste('0:10:00 Alpha / A\n0:15:00 Delta / D\n0:20:00 Beta / B\n0:30:00 Gamma / C');
+  assert.deepEqual(sorted.map((song) => song.end_timestamp), ['0:15:00', '0:20:00', '0:30:00', null], 'the parsers fill each end from the next row in time');
+  const id = created(await submit(f, 'vidPUB00001', sorted), 'correction');
+  assert.deepEqual(storedTimes(f, id), [[600, 840], [900, 1200], [1200, 1440], [1800, 2040]], 'Gamma gets its archived end back, and Delta keeps the parser\'s');
+
+  // Typed at the bottom, as a client that does not sort would send it: refused for its order, naming Delta.
+  const unsorted = fromPaste('0:10:00 Alpha / A\n0:20:00 Beta / B\n0:30:00 Gamma / C\n0:15:00 Delta / D');
+  assert.deepEqual(await submit(f, 'vidPUB00001', unsorted), startsBeforeThePreviousRow('Delta'));
+  close(f);
+}
+
+async function testAnEndTheRestoreGivesBackIsNeverRefused() {
+  // Copilot r13: the end the order check reads is the one Nova would store. Song Z is archived at 0:01:40
+  // with no end, ahead of Song A at the same start (by performance id). The paste text gives Song Z no
+  // end, and the parsers end it where Song A starts: at its own start. The restore gives it back none.
+  const f = fixture();
+  f.adminDb.sqlite.exec(`
+    INSERT INTO songs (id,streamer_id,title,original_artist,status) VALUES ('song-z','mizuki','Song Z','Artist','approved');
+    INSERT INTO performances (id,streamer_id,song_id,stream_id,date,stream_title,video_id,timestamp,end_timestamp,status) VALUES
+      ('p-early','mizuki','song-z','s-pub','2026-09-01','Public','vidPUB00001',100,NULL,'approved');
+  `);
+  const loaded = fromPaste(((await current(f, 'mizuki', 'vidPUB00001')).body as { text: string }).text);
+  assert.deepEqual(loaded.map((row) => [row.song_title, row.start_timestamp, row.end_timestamp]), [
+    ['Song Z', '0:01:40', '0:01:40'],
+    ['Song A', '0:01:40', '0:03:20'],
+  ], 'the parsers end Song Z at its own start');
+  const revision = await revisionOf(f, 'mizuki', 'vidPUB00001');
+  const noChanges = { status: 422, body: { error: 'no_changes' } };
+  assert.deepEqual(await submit(f, 'vidPUB00001', loaded), noChanges, 'the loaded list, unchanged, changes nothing');
+  assert.deepEqual(await submit(f, 'vidPUB00001', loaded, 'mizuki', { base_revision: revision }), noChanges, 'with its revision too');
+
+  // A change elsewhere is stored, and Song Z keeps no end.
+  const id = created(await submit(f, 'vidPUB00001', [loaded[0], { ...loaded[1], end_timestamp: '0:03:30' }]), 'correction');
+  assert.deepEqual(storedTimes(f, id), [[100, null], [100, 210]]);
+
+  // Lines pasted out of order: the parsers end Song B where Song A starts, before Song B's own start.
+  // Both are archived rows and neither moved, so each gets its archived end back: the published list.
+  f.adminDb.sqlite.exec(`
+    INSERT INTO songs (id,streamer_id,title,original_artist,status) VALUES ('song-b','mizuki','Song B','Band B','approved');
+    INSERT INTO performances (id,streamer_id,song_id,stream_id,date,stream_title,video_id,timestamp,end_timestamp,status) VALUES
+      ('p-pub-b','mizuki','song-b','s-pub','2026-09-01','Public','vidPUB00001',300,420,'approved');
+    DELETE FROM performances WHERE id = 'p-early';
+  `);
+  const reversed = fromPaste('0:05:00 Song B / Band B\n0:01:40 Song A / Artist');
+  assert.equal(reversed[0].end_timestamp, '0:01:40');
+  assert.deepEqual(await submit(f, 'vidPUB00001', reversed), noChanges, 'the published list, pasted out of order');
+
+  // An archived row that is inverted itself reads back as it is. The list unchanged stores nothing, so it
+  // is no_changes; changed elsewhere, it would store that row too, so it is refused until the row is fixed.
+  f.adminDb.sqlite.exec("UPDATE performances SET end_timestamp = 250 WHERE id = 'p-pub-b'");
+  const asPublished = fromPaste(((await current(f, 'mizuki', 'vidPUB00001')).body as { text: string }).text);
+  assert.deepEqual(asPublished.map((row) => [row.song_title, row.end_timestamp]), [['Song A', '0:03:20'], ['Song B', '0:04:10']]);
+  assert.deepEqual(await submit(f, 'vidPUB00001', asPublished), noChanges, 'an archive with an inverted row, unchanged');
+  assert.deepEqual(await submit(f, 'vidPUB00001', [{ ...asPublished[0], end_timestamp: '0:03:30' }, asPublished[1]]), endNotAfterStart('Song B'), 'changed elsewhere');
+  close(f);
+}
+
+// --- A line with no title (r3 #8): the route drops it, and an end the parsers filled from its start goes with it ---
+
+/** Song A 100–200 (the seed's), Song B 300–400 and Song C 500–600: no end is the next row's start. */
+function addSongsBAndC(f: Fixture): void {
+  f.adminDb.sqlite.exec(`
+    INSERT INTO songs (id,streamer_id,title,original_artist,status) VALUES
+      ('song-b','mizuki','Song B','Band B','approved'),
+      ('song-c','mizuki','Song C','Band C','approved');
+    INSERT INTO performances (id,streamer_id,song_id,stream_id,date,stream_title,video_id,timestamp,end_timestamp,status) VALUES
+      ('p-pub-b','mizuki','song-b','s-pub','2026-09-01','Public','vidPUB00001',300,400,'approved'),
+      ('p-pub-c','mizuki','song-c','s-pub','2026-09-01','Public','vidPUB00001',500,600,'approved');
+  `);
+}
+
+/** A start-only paste of those three, with a line below Song A that has no title: the spaced slash of `/ D / W` leaves it empty. */
+const pasteWithABlankLine = (songCStart: string): string =>
+  `0:01:40 Song A / Artist\n0:04:10 / D / W\n0:05:00 Song B / Band B\n${songCStart} Song C / Band C`;
+
+async function testAnEndFilledFromABlankLineIsDerived() {
+  // The parsers end Song A where the next line starts, and that line, `/ D / W`, has no title, so the route drops it.
+  // Song A's end, 0:04:10, was then no stored row's start: it read as typed, and Song A was stored 100–250 (D lost).
+  // An end that is the dropped row's start now takes the next kept row's start, Song B's, so it reads as derived and
+  // the archive's end comes back. Nothing is left to change.
+  const f = fixture();
+  addSongsBAndC(f);
+  const pasted = fromPaste(pasteWithABlankLine('0:08:20'));
+  assert.deepEqual(pasted.map((song) => [song.song_title, song.start_timestamp, song.end_timestamp]), [
+    ['Song A', '0:01:40', '0:04:10'],
+    ['', '0:04:10', '0:05:00'],
+    ['Song B', '0:05:00', '0:08:20'],
+    ['Song C', '0:08:20', null],
+  ], 'the parsers end Song A where the untitled line starts');
+  const before = [count(f.db, 'vod_submissions'), count(f.db, 'vod_songs')];
+  assert.deepEqual(await submit(f, 'vidPUB00001', pasted), { status: 422, body: { error: 'no_changes' } }, 'the archive again, and a line nobody stores');
+  assert.deepEqual([count(f.db, 'vod_submissions'), count(f.db, 'vod_songs')], before, 'no submission is stored');
+  close(f);
+}
+
+async function testAnEndFilledFromABlankLineIsRestoredBesideARealChange() {
+  // The same paste with Song C moved to 0:08:40: that change is stored, and Song A still takes back the end it has
+  // in the archive, not 0:04:10.
+  const f = fixture();
+  addSongsBAndC(f);
+  const id = created(await submit(f, 'vidPUB00001', fromPaste(pasteWithABlankLine('0:08:40'))), 'correction');
+  assert.deepEqual(storedTimes(f, id), [[100, 200], [300, 400], [520, null]], 'Song A and Song B take back their ends; Song C is the change');
+  const sortOrders = f.db.sqlite.prepare('SELECT sort_order FROM vod_songs WHERE vod_submission_id = ? ORDER BY sort_order').all(id).map((row) => row.sort_order);
+  assert.deepEqual(sortOrders, [0, 2, 3], 'the untitled line is dropped and the others keep their index');
+  close(f);
+}
+
+async function testTheLoadedListPlusABlankLineIsUnchanged() {
+  // The list the form loads carries every end, Song A's among them (0:03:20), so a line typed in below Song A fills
+  // nothing: Song A's end is not that line's start. A pin: the re-fill leaves an end that is not the dropped row's start.
+  const f = fixture();
+  addSongsBAndC(f);
+  const loaded = ((await current(f, 'mizuki', 'vidPUB00001')).body as { text: string }).text.split('\n');
+  assert.equal(loaded.length, 3, 'the loaded list has the three rows');
+  const withBlank = [loaded[0], '0:04:10 / D / W', ...loaded.slice(1)].join('\n');
+  assert.equal(fromPaste(withBlank)[0].end_timestamp, '0:03:20', 'Song A keeps the end the list gave it');
+  assert.deepEqual(await submit(f, 'vidPUB00001', fromPaste(withBlank)), { status: 422, body: { error: 'no_changes' } });
+  close(f);
+}
+
+async function testABlankRowRefillsOnlyTheEndRightAboveIt() {
+  // The edges of the rule, on a video with no stream, where nothing is restored: what is stored is what the route read.
+  const f = fixture();
+  const row = (title: string, start: number, end: number | null): SongInput => ({ song_title: title, original_artist: 'X', start_timestamp: start, end_timestamp: end });
+  const blank = (start: number | string, end: number | null): SongInput => ({ ...row('   ', 0, end), start_timestamp: start });
+  const stored = async (songs: SongInput[]) => storedTimes(f, created(await submit(f, 'vidNEW00001', songs), 'new'));
+
+  assert.deepEqual(await stored([row('A', 100, 250), blank(250, 300), row('B', 300, null)]), [[100, 300], [300, null]],
+    'an end that is the dropped row\'s start takes the next kept row\'s start');
+  assert.deepEqual(await stored([row('A', 100, 250), blank(250, null)]), [[100, null]], 'and none when no kept row follows');
+  assert.deepEqual(await stored([row('A', 100, 250), blank(250, 270), blank(270, 300), row('B', 300, null)]), [[100, 300], [300, null]],
+    'across two dropped rows, the next kept row is the one that counts');
+  assert.deepEqual(await stored([row('A', 100, 230), blank(250, 300), row('B', 300, null)]), [[100, 230], [300, null]],
+    'an end that is not the dropped row\'s start is the contributor\'s');
+  assert.deepEqual(await stored([row('A', 100, 270), blank(250, 270), blank(270, 300), row('B', 300, null)]), [[100, 270], [300, null]],
+    'only the dropped row right below the kept row counts, not the second one');
+  assert.deepEqual(await stored([row('A', 100, null), blank('garbage', null), row('B', 300, null)]), [[100, null], [300, null]],
+    'a missing end is no end to match, and a dropped row\'s unreadable start is no start');
+  close(f);
+}
+
+async function testAnEndOfZeroIsAnEnd() {
+  // Copilot r13: Aurora sends seconds, so an end stamped or typed as 0:00 arrives as the number 0. It is
+  // an end, like the form's 0:00:00, and it comes at or before any start, so it is refused. Only a missing,
+  // null or empty end is none.
+  const f = fixture();
+  const zero: SongInput = { song_title: 'Zero', original_artist: 'X', start_timestamp: 300, end_timestamp: 0 };
+  for (const videoId of EVERY_VIDEO) {
+    assert.deepEqual(await submit(f, videoId, [SONG_A, zero]), endNotAfterStart('Zero'), `an end of 0, ${videoId}`);
+    // First, in time order: a row that starts at 0 below Song A would be refused for its order before its end is read.
+    assert.deepEqual(await submit(f, videoId, [{ ...zero, start_timestamp: 0 }, SONG_A]), endNotAfterStart('Zero'), `0 to 0, ${videoId}`);
+    assert.deepEqual(await submit(f, videoId, [SONG_A, { ...zero, end_timestamp: '0:00:00' }]), endNotAfterStart('Zero'), `the form's 0:00:00, ${videoId}`);
+  }
+
+  // Otherwise seconds read as they always did: a start of 0 is a start, and an end after it is kept.
+  const id = created(await submit(f, 'vidNEW00001', [
+    { song_title: 'Opening', original_artist: 'X', start_timestamp: 0, end_timestamp: 90 },
+    { song_title: 'No End', original_artist: 'X', start_timestamp: 120, end_timestamp: null },
+    { song_title: 'Empty End', original_artist: 'X', start_timestamp: 240, end_timestamp: '' },
+    { song_title: 'Left Out', original_artist: 'X', start_timestamp: 360 },
+  ]), 'new');
+  assert.deepEqual(storedTimes(f, id), [[0, 90], [120, null], [240, null], [360, null]]);
+  close(f);
+}
+
+async function testATimeThatIsNeitherTextNorANumberIsMalformed() {
+  // The body is JSON, so a time can arrive as any value. One that is neither text nor a number is the
+  // 400 for a malformed time, the same for every video, and never a crash.
+  const f = fixture();
+  const before = count(f.db, 'vod_submissions');
+  for (const value of [false, true, {}, [], ['0:01:40']]) {
+    for (const videoId of EVERY_VIDEO) {
+      const start = { ...SONG_A, song_title: 'Odd', start_timestamp: value } as unknown as SongInput;
+      const end = { ...SONG_A, song_title: 'Odd', end_timestamp: value } as unknown as SongInput;
+      assert.deepEqual(await submit(f, videoId, [start]), { status: 400, body: { error: '歌曲 "Odd" 的開始時間格式無效' } }, `a start of ${JSON.stringify(value)}, ${videoId}`);
+      assert.deepEqual(await submit(f, videoId, [end]), { status: 400, body: { error: '歌曲 "Odd" 的結束時間格式無效' } }, `an end of ${JSON.stringify(value)}, ${videoId}`);
+    }
+  }
+  // A start is required, so a missing or null one is malformed too, where such an end is none.
+  for (const videoId of EVERY_VIDEO) {
+    const missing = { song_title: 'Odd', original_artist: 'Artist', end_timestamp: '0:03:20' } as unknown as SongInput;
+    for (const row of [missing, { ...missing, start_timestamp: null } as unknown as SongInput]) {
+      assert.deepEqual(await submit(f, videoId, [row]), { status: 400, body: { error: '歌曲 "Odd" 的開始時間格式無效' } }, `a start of ${String(row.start_timestamp)}, ${videoId}`);
+    }
+  }
+  assert.equal(count(f.db, 'vod_submissions'), before, 'nothing is stored');
   close(f);
 }
 
@@ -1077,6 +1387,18 @@ const tests = [
   testBareSlashTitleOnlyPasteIsNoChange,
   testDashTitleOnlyPasteIsNoChange,
   testBlankArtistIsNoChange,
+  testInvertedRowIsRefused,
+  testAListOutOfTimeOrderIsRefused,
+  testEqualStartsAreInOrder,
+  testANewSongAtAnArchivedStartIsAccepted,
+  testTheAppendedSongRestoresTheUntouchedRow,
+  testAnEndTheRestoreGivesBackIsNeverRefused,
+  testAnEndFilledFromABlankLineIsDerived,
+  testAnEndFilledFromABlankLineIsRestoredBesideARealChange,
+  testTheLoadedListPlusABlankLineIsUnchanged,
+  testABlankRowRefillsOnlyTheEndRightAboveIt,
+  testAnEndOfZeroIsAnEnd,
+  testATimeThatIsNeitherTextNorANumberIsMalformed,
   testPipelineAndExcludedAreAccepted,
   testApprovedNovaRowNoLongerBlocks,
   testArchivedStreamWithoutPublicRows,
