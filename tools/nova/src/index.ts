@@ -541,17 +541,39 @@ app.post('/vod/api/submit', async (c) => {
   }> = [];
 
   if (body.songs && body.songs.length > 0) {
+    // The form parsers end each line where the next line starts, so a line with no title (`0:04:10 / D / W` reads as an
+    // empty title) gives the end above it its start. That line is dropped below and no stored row starts there, so the
+    // end read as one the contributor typed: restoreArchivedEnds left it, and a start-only paste of an unchanged list
+    // was stored as a change. A kept row whose end is the start of the dropped row right below it takes the
+    // next kept row's start instead, the end the parsers would have given it without that line, or none when no kept
+    // row follows. It then reads as derived, here and on admin's review. An end the contributor typed equal to a
+    // dropped row's start reads that way too, the ambiguity the derived-end rule already accepts. A dropped row's
+    // times are never read to refuse anything, so an unreadable start matches no end.
+    let refilled: (typeof parsedSongs)[number] | null = null;
     for (let i = 0; i < body.songs.length; i++) {
       const s = body.songs[i];
-      if (!s.song_title?.trim()) continue;
+      if (!s.song_title?.trim()) {
+        const above = parsedSongs[parsedSongs.length - 1];
+        const droppedStart = parseTimestamp(s.start_timestamp);
+        if (above !== undefined && above.sort_order === i - 1 && droppedStart !== null && above.end_timestamp === droppedStart) {
+          above.end_timestamp = null;
+          refilled = above;
+        }
+        continue;
+      }
 
       const startSec = parseTimestamp(s.start_timestamp);
       if (startSec === null) {
         return c.json({ error: `歌曲 "${s.song_title}" 的開始時間格式無效` }, 400);
       }
+      if (refilled !== null) {
+        refilled.end_timestamp = startSec;
+        refilled = null;
+      }
 
+      // Only a missing, null or empty end is none: Aurora sends seconds, so an end at 0:00 is the number 0.
       let endSec: number | null = null;
-      if (s.end_timestamp) {
+      if (s.end_timestamp !== undefined && s.end_timestamp !== null && s.end_timestamp !== '') {
         endSec = parseTimestamp(s.end_timestamp);
         if (endSec === null) {
           return c.json({ error: `歌曲 "${s.song_title}" 的結束時間格式無效` }, 400);
@@ -610,6 +632,25 @@ app.post('/vod/api/submit', async (c) => {
       return c.json({ error: 'no_changes' }, 422);
     }
     base = current;
+  }
+  // The rows must come in time order: the first one that starts before the row above it is refused, by name,
+  // and rows that start together are in order. The parsers end a line where the next line starts, so a song
+  // typed out of its place would be stored with an end that spans the rows after it, or one before its own
+  // start. The Nova form and Aurora both send their rows sorted by start, so only another client's unsorted list
+  // is refused here. The order is read from the rows as they would be stored and after no_changes, so a list that
+  // repeats the public list is no_changes in any order. It comes before the end check, so an out-of-order list is
+  // told so before any end is.
+  const outOfOrder = storedSongs.find((song, i) => i > 0 && song.start_timestamp < storedSongs[i - 1].start_timestamp);
+  if (outOfOrder) {
+    return c.json({ error: `歌曲 "${outOfOrder.song_title}" 的開始時間早於前一首，請依時間順序排列` }, 400);
+  }
+  // A row whose end does not come after its start would be stored inverted. Rows in order give one when the
+  // end was typed that way, or when a parser filled it for a row that starts where the next one does. The
+  // check reads the rows as they would be stored, so an end the parsers filled that the archived row gives
+  // back refuses nothing. A stream that is not public restores nothing, so it answers as no stream does.
+  const inverted = storedSongs.find((song) => song.end_timestamp !== null && song.end_timestamp <= song.start_timestamp);
+  if (inverted) {
+    return c.json({ error: `歌曲 "${inverted.song_title}" 的結束時間必須晚於開始時間` }, 400);
   }
   const kind: VodSubmissionKind = adminStream ? 'correction' : 'new';
 

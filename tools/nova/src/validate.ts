@@ -91,12 +91,14 @@ export function parseYoutubeVideoUrl(raw: string): { videoId: string; canonical:
 
 /**
  * Parse a timestamp string (H:MM:SS or MM:SS) to seconds.
- * Also accepts raw integer seconds. Returns null if invalid.
+ * Also accepts raw integer seconds. Returns null if invalid, including for a value that is neither
+ * text nor a number: it reads a JSON body, which can carry anything.
  */
-export function parseTimestamp(raw: string | number): number | null {
+export function parseTimestamp(raw: unknown): number | null {
   if (typeof raw === 'number') {
     return raw >= 0 ? Math.floor(raw) : null;
   }
+  if (typeof raw !== 'string') return null;
 
   const trimmed = raw.trim();
 

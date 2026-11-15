@@ -129,6 +129,20 @@ function testSpeaksOfCorrections(): void {
   console.log('vod form reports corrections and no_changes');
 }
 
+// The server verifies the Turnstile token before anything that can refuse the list (an inverted row, no_changes), and
+// a token works once: without a fresh one, the list the contributor sends next would be refused. So every answer that is
+// not ok resets the widget, before its body is read, which covers a refusal whose body does not parse as well.
+function testEveryRefusalGetsAFreshToken(): void {
+  const html = render([]);
+  const fetchAt = html.indexOf("var res = await fetch('/vod/api/submit'");
+  const bodyAt = html.indexOf('var data = await res.json();', fetchAt);
+  const resetAt = html.indexOf('if (!res.ok && window.turnstile) turnstile.reset();', fetchAt);
+  assert(fetchAt !== -1 && bodyAt !== -1, 'the form sends the submission and reads the answer');
+  assert(resetAt !== -1 && resetAt < bodyAt, 'an answer that is not ok resets Turnstile before its body is read');
+  assert(html.split('turnstile.reset()').length - 1 === 2, 'two resets in all: after a success, and after every answer that is not ok');
+  console.log('vod form asks Turnstile for a fresh token after every answer that is not ok');
+}
+
 function testPrismFormStructure(): void {
   const html = render([{ slug: 'mizuki', display_name: '浠Mizuki', avatar_url: '' }]);
 
@@ -423,6 +437,7 @@ try {
   testFormReadsNoAdminState();
   testOffersTheCurrentList();
   testSpeaksOfCorrections();
+  testEveryRefusalGetsAFreshToken();
   testPrismFormStructure();
   testCarriesTheNonce();
   testVodFieldLimitsReachTheForm();
