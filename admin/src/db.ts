@@ -272,9 +272,10 @@ export async function listSongsPaginated(
     binds.push(opts.status);
   }
   if (opts.search) {
-    conditions.push('(s.title LIKE ? OR s.original_artist LIKE ?)');
-    const like = `%${opts.search}%`;
-    binds.push(like, like);
+    // instr, not LIKE '%q%': D1 refuses a LIKE pattern over 50 bytes, so a search over 48 bytes (17 CJK characters)
+    // answered 500. It still ignores ASCII case; % and _ now mean themselves.
+    conditions.push('(instr(lower(s.title), lower(?)) > 0 OR instr(lower(s.original_artist), lower(?)) > 0)');
+    binds.push(opts.search, opts.search);
   }
 
   const where = conditions.join(' AND ');

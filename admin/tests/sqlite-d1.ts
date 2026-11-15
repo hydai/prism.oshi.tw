@@ -17,6 +17,9 @@ class Statement {
   async run() { return this.execute(); }
 }
 
+/** The longest LIKE or GLOB pattern, in UTF-8 bytes, that D1 takes. SQLite's own default is 50,000. */
+export const D1_LIKE_PATTERN_LIMIT = 50;
+
 /** Execute the production SQL, including triggers/FKs and atomic D1 batches. */
 export class SQLiteD1 {
   readonly sqlite = new DatabaseSync(':memory:');
@@ -30,6 +33,32 @@ export class SQLiteD1 {
     for (const schema of files) this.sqlite.exec(readFileSync(schema, 'utf8'));
   }
   get binding(): D1Database { return this as unknown as D1Database; }
+  /**
+   * Make LIKE refuse a pattern over D1's limit with D1's own error, `LIKE or GLOB pattern too complex`. Plain SQLite
+   * allows 50,000 bytes, so a query that D1 rejects passes in these suites; this is opt-in because no other suite has
+   * run against the limit. Matching stays SQLite's: the like() installed here checks the pattern's bytes, then hands
+   * the call to the built-in like() of a second connection, so `%`, `_`, ASCII-only case folding and ESCAPE read as
+   * ever. (The native `db.limits.likePatternLength` is missing from Node 22 and 24.)
+   */
+  enforceD1LikeLimit() {
+    const builtin = new DatabaseSync(':memory:');
+    const plain = builtin.prepare('SELECT like(?, ?) AS matched');
+    const escaped = builtin.prepare('SELECT like(?, ?, ?) AS matched');
+    const refuseLong = (pattern: unknown) => {
+      if (typeof pattern === 'string' && Buffer.byteLength(pattern) > D1_LIKE_PATTERN_LIMIT) {
+        throw new Error('LIKE or GLOB pattern too complex');
+      }
+    };
+    // `value LIKE pattern` calls like(pattern, value), and with ESCAPE like(pattern, value, escape): replace both.
+    this.sqlite.function('like', { deterministic: true }, (pattern, value) => {
+      refuseLong(pattern);
+      return plain.get(pattern, value)!.matched;
+    });
+    this.sqlite.function('like', { deterministic: true }, (pattern, value, escape) => {
+      refuseLong(pattern);
+      return escaped.get(pattern, value, escape)!.matched;
+    });
+  }
   prepare(sql: string) { return new Statement(this, sql); }
   async batch(statements: Statement[]) {
     await this.beforeBatch?.();
