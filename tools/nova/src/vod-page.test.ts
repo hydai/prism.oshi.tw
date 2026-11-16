@@ -1,3 +1,5 @@
+import { parseTextToSongs as sharedParseTextToSongs, splitArtist as sharedSplitArtist } from '../../../lib/parse';
+import { formatSongsForPaste } from './song-text';
 import { renderVodPage } from './vod-page';
 import type { ApprovedStreamer } from './types';
 import { VOD_FIELD_LIMITS, parseYoutubeVideoUrl } from './validate';
@@ -430,7 +432,255 @@ function testSendsTheRevisionOfTheLoadedList(): void {
   console.log('vod form sends the revision of the list it loaded and explains list_changed');
 }
 
-try {
+interface InlineParser {
+  splitArtist(info: string): [string, string];
+  parseTextToSongs(text: string): Array<{ songName: string; artist: string; startSeconds: number; endSeconds: number | null }>;
+  sortSongLines(text: string): string;
+  parseYoutubeVideoUrl(raw: string): { videoId: string; canonical: string } | null;
+  videoIdOf(url: string): string | null;
+}
+
+/**
+ * The form's inline parsers as the page ships them, run on their own: the block between the first marker and the comment
+ * that follows the last block, which holds the line-order block and the URL parser block after the ported functions.
+ */
+function inlineParser(): InlineParser {
+  const html = render([]);
+  const start = html.indexOf('// --- Inline parser (ported from lib/parse.ts) ---');
+  const end = html.indexOf('// Every node is built with createElement');
+  const urlParserAt = html.indexOf('// --- Inline URL parser (ported from validate.ts) ---');
+  assert(start !== -1 && end > start, 'the inline parser block sits between its two markers');
+  assert(urlParserAt > start && urlParserAt < end, 'and holds the URL parser block');
+  return new Function(`${html.slice(start, end)}\nreturn { splitArtist: splitArtist, parseTextToSongs: parseTextToSongs, sortSongLines: sortSongLines, parseYoutubeVideoUrl: parseYoutubeVideoUrl, videoIdOf: videoIdOf };`)() as InlineParser;
+}
+
+function testParsesAsTheSharedParserDoes(): void {
+  // The form's parser is a port of lib/parse.ts, which Aurora runs, so both must read a line alike.
+  const form = inlineParser();
+  for (const info of ['A / B / Artist', 'Song/Artist', 'POP/STARS', 'Song - Artist', 'Song']) {
+    const got = JSON.stringify(form.splitArtist(info));
+    const want = JSON.stringify(sharedSplitArtist(info));
+    assert(got === want, `the form splits ${JSON.stringify(info)} as lib/parse.ts does: ${got} vs ${want}`);
+  }
+  // A spaced slash with nothing before it separates an empty name from the rest, as it always has, so a title
+  // that starts with "/ " reads as no title. Pinned for both copies, so that they cannot drift together.
+  const leadingSlash: Array<[string, [string, string]]> = [
+    ['/ Song / Artist', ['', 'Song / Artist']],
+    ['/ / Artist', ['', '/ Artist']],
+    ['/ Song /', ['', 'Song /']],
+    ['/ Song', ['', 'Song']],
+  ];
+  for (const [info, split] of leadingSlash) {
+    const want = JSON.stringify(split);
+    const got = JSON.stringify(form.splitArtist(info));
+    assert(got === want, `the form splits ${JSON.stringify(info)} as ${want}: ${got}`);
+    const shared = JSON.stringify(sharedSplitArtist(info));
+    assert(shared === want, `lib/parse.ts splits ${JSON.stringify(info)} as ${want}: ${shared}`);
+  }
+  // And on every string of up to five of the characters a split turns on (two kinds of whitespace
+  // among them), so that an edit to one copy alone fails here.
+  let corpus = [''];
+  let compared = 0;
+  for (let length = 0; length <= 5; length++) {
+    for (const info of corpus) {
+      const got = JSON.stringify(form.splitArtist(info));
+      const want = JSON.stringify(sharedSplitArtist(info));
+      assert(got === want, `the form splits ${JSON.stringify(info)} as lib/parse.ts does: ${got} vs ${want}`);
+      compared++;
+    }
+    corpus = corpus.flatMap((prefix) => ['/', ' ', 'a', '-', '\t', '　'].map((character) => prefix + character));
+  }
+  assert(compared === 9331, `every string up to five characters is compared (${compared})`);
+  // The paste text Nova writes for a row reads back through both parsers alike: a row with no artist keeps its
+  // title and an empty artist.
+  const archived = [
+    { song_title: 'Song B', original_artist: '', start_timestamp: 500, end_timestamp: 620 },
+  ];
+  const text = formatSongsForPaste(archived);
+  const read = JSON.stringify(form.parseTextToSongs(text).map((song) => [song.songName, song.artist]));
+  assert(read === JSON.stringify(archived.map((song) => [song.song_title, song.original_artist])), `the form reads the paste text back as archived: ${read}`);
+  assert(read === JSON.stringify(sharedParseTextToSongs(text).map((song) => [song.songName, song.artist])), 'and as lib/parse.ts does');
+  console.log('vod form parses song lines as lib/parse.ts does');
+}
+
+// Nova lists a video by the id its parseYoutubeVideoUrl reads, and the form keeps a loaded list's revision under the id
+// its own port of that parser reads (#6), so the two must read every URL alike, quirks included: the watch pattern is
+// greedy, so it takes the last v= of the query. Each URL is compared on the whole result, canonical link and all, and on
+// the id the form keys by. The ids are pinned too, so that an edit to Nova's parser alone fails here as well.
+function testParsesUrlsAsNovaDoes(): void {
+  const form = inlineParser();
+  const ID = 'abc-DEF_123';
+  const read = (url: string): string | null => {
+    const nova = parseYoutubeVideoUrl(url);
+    const got = JSON.stringify(form.parseYoutubeVideoUrl(url));
+    assert(got === JSON.stringify(nova), `the form reads ${JSON.stringify(url)} as Nova does: ${got} vs ${JSON.stringify(nova)}`);
+    assert(form.videoIdOf(url) === (nova?.videoId ?? null), `and keys it by the id Nova reads from ${JSON.stringify(url)}`);
+    return nova?.videoId ?? null;
+  };
+  const vectors: Array<[string, string | null]> = [
+    [`https://www.youtube.com/watch?v=${ID}`, ID],
+    [`https://www.youtube.com/watch?v=${ID}&t=120s`, ID],
+    [`https://www.youtube.com/watch?si=x&v=${ID}`, ID],
+    [`https://m.youtube.com/watch?v=${ID}`, ID],
+    [`https://youtu.be/${ID}`, ID],
+    [`https://youtu.be/${ID}?si=x`, ID],
+    [`https://www.youtube.com/live/${ID}`, ID],
+    [`https://www.youtube.com/live/${ID}?feature=share`, ID],
+    [`youtube.com/watch?v=${ID}`, ID],
+    [`  https://youtu.be/${ID}  `, ID],
+    // The greedy match takes the last v= of the query, and the last one here ends the word "rev".
+    ['https://www.youtube.com/watch?v=AAA&rev=1', '1'],
+    ['https://www.youtube.com/watch?v=AAA&v=BBB', 'BBB'],
+    // Nothing to read: no id, a host it does not know, a pattern in the wrong case, and no URL at all.
+    ['https://www.youtube.com/watch?v=', null],
+    ['https://www.youtube.com/watch?feature=share', null],
+    ['https://youtu.be/', null],
+    [`https://example.com/watch?v=${ID}`, null],
+    [`https://YOUTU.BE/${ID}`, null],
+    ['not a video url', null],
+    ['', null],
+  ];
+  for (const [url, id] of vectors) {
+    assert(read(url) === id, `Nova reads ${JSON.stringify(url)} as ${id}`);
+  }
+  // And every combination of a scheme, a path and a tail, so that an edit to one copy alone fails here.
+  const schemes = ['', 'http://', 'https://', 'https://www.', 'www.', 'https://m.'];
+  const paths = ['youtube.com/watch?', 'youtube.com/live/', 'youtu.be/', 'youtube.com/embed/', 'youtube.com/shorts/', 'example.com/'];
+  const tails = ['', ID, `v=${ID}`, `v=${ID}&t=120s`, `si=x&v=${ID}`, 'v=AAA&v=BBB', 'v=AAA&rev=1', `${ID}?si=x`, 'v=', '?v='];
+  let compared = 0;
+  for (const scheme of schemes) {
+    for (const path of paths) {
+      for (const tail of tails) {
+        read(`${scheme}${path}${tail}`);
+        compared++;
+      }
+    }
+  }
+  assert(compared === 360, `every combination is compared (${compared})`);
+  console.log('vod form reads video URLs as Nova does');
+}
+
+// The parsers end a line where the next line starts, so a song missed and typed out of its place ends across the rows
+// after it (#2), and one appended below a start-only paste ends before its own start (#9). The form puts the lines in
+// time order before the ends are filled, in the preview and in the submission alike. The sort is its own block, outside
+// the ported parser, and the shared parser reads the sorted lines as it reads any text.
+function testSortsLinesBeforeFillingEnds(): void {
+  const html = render([]);
+  assert(
+    html.split('parseTextToSongs(sortSongLines(').length - 1 === 2,
+    'the preview and the submission both read the lines in time order',
+  );
+  assert(html.includes('renderPreview(parseTextToSongs(sortSongLines(this.value)));'), 'the preview shows the sorted rows');
+  assert(html.includes('var parsed = parseTextToSongs(sortSongLines(songsTextarea.value));'), 'the submission sends the sorted rows');
+
+  const form = inlineParser();
+  const rows = (songs: ReturnType<InlineParser['parseTextToSongs']>) => JSON.stringify(songs.map((song) => [song.songName, song.startSeconds, song.endSeconds]));
+  const readSorted = (text: string) => rows(form.parseTextToSongs(form.sortSongLines(text)));
+
+  // A song missed in the middle, typed after the rows around it.
+  const missed = '0:01:40 ~ 0:03:20 A / a\n0:05:00 ~ 0:06:40 B / b\n0:04:00 Missed / m\n0:08:20 ~ 0:10:00 C / c';
+  assert(
+    rows(form.parseTextToSongs(missed)) === JSON.stringify([['A', 100, 200], ['B', 300, 400], ['Missed', 240, 500], ['C', 500, 600]]),
+    'unsorted, Missed would end where the next line starts, across B',
+  );
+  assert(
+    readSorted(missed) === JSON.stringify([['A', 100, 200], ['Missed', 240, 300], ['B', 300, 400], ['C', 500, 600]]),
+    `sorted, Missed ends where B starts: ${readSorted(missed)}`,
+  );
+
+  // A start-only paste with a song appended at the bottom.
+  const appended = '0:10:00 Alpha / A\n0:20:00 Beta / B\n0:30:00 Gamma / C\n0:15:00 Delta / D';
+  assert(
+    readSorted(appended) === JSON.stringify([['Alpha', 600, 900], ['Delta', 900, 1200], ['Beta', 1200, 1800], ['Gamma', 1800, null]]),
+    `every end is the start of the next row in time, the last row's none: ${readSorted(appended)}`,
+  );
+
+  // Equal starts keep the order they were typed in.
+  const tied = '0:02:00 ~ 0:03:00 First / x\n0:01:00 ~ 0:01:30 Early / x\n0:02:00 ~ 0:04:00 Second / x\n0:02:00 ~ 0:05:00 Third / x';
+  assert(
+    readSorted(tied) === JSON.stringify([['Early', 60, 90], ['First', 120, 180], ['Second', 120, 240], ['Third', 120, 300]]),
+    `rows that start together stay as typed: ${readSorted(tied)}`,
+  );
+
+  // A line comes back as it was typed, numbering and bullets included; one the parser cannot read is dropped, as
+  // parseTextToSongs drops it, so the sort leaves no line for the parser to read differently.
+  assert(
+    form.sortSongLines('02. 0:10:00 B / b\n- 0:05:00 A / a') === '- 0:05:00 A / a\n02. 0:10:00 B / b',
+    'the lines are only reordered',
+  );
+  const noisy = 'Setlist 2026/09/01\n\n0:20:00 Late / l\nnot a line\n0:10:00\n0:05:00 Early / e';
+  assert(form.sortSongLines(noisy) === '0:05:00 Early / e\n0:20:00 Late / l', 'blank, untimed and title-less lines are dropped');
+  assert(form.sortSongLines('') === '' && form.sortSongLines('nothing to read') === '', 'no readable line sorts to no text');
+  assert(readSorted('') === '[]', 'and reads as no songs');
+
+  // The sorted lines read as the shared parser reads them, and a list already in order is left as it is.
+  const shared = (text: string) => JSON.stringify(sharedParseTextToSongs(text).map((song) => [song.songName, song.startSeconds, song.endSeconds]));
+  for (const text of [missed, appended, tied, noisy]) {
+    assert(readSorted(text) === shared(form.sortSongLines(text)), `the form and lib/parse.ts read the sorted lines alike: ${JSON.stringify(text)}`);
+  }
+  const ordered = '01. 0:00:30 ~ 0:05:30 歌名 / 原唱\n02. 0:05:30 ~ 0:10:00 另一首歌 / 歌手\n03. 0:10:00 Last';
+  assert(form.sortSongLines(ordered) === ordered, 'a list in time order comes back unchanged');
+  assert(readSorted(ordered) === shared(ordered), 'and reads as lib/parse.ts reads it');
+  console.log('vod form puts lines in time order before it fills ends, in the preview and the submission');
+}
+
+/** The little of a DOM node that el() and renderPreview use. */
+interface FakeNode {
+  className: string;
+  textContent: string;
+  children: FakeNode[];
+  appendChild(child: FakeNode): FakeNode;
+}
+
+function fakeNode(): FakeNode {
+  const node: FakeNode = {
+    className: '',
+    textContent: '',
+    children: [],
+    appendChild(child) {
+      node.children.push(child);
+      return child;
+    },
+  };
+  return node;
+}
+
+/** Every node under `node`, itself included, that has the class. */
+function withClass(node: FakeNode, className: string): FakeNode[] {
+  const own = node.className.split(' ').includes(className) ? [node] : [];
+  return own.concat(...node.children.map((child) => withClass(child, className)));
+}
+
+// A line like `0:04:10 / D / W` reads as an empty title and the artist `D / W` (the spaced slash with nothing before
+// it), and the submit route drops a row with no title (#8). The preview is where the contributor can see that: the
+// title cell of such a row says so. renderPreview is run as the page ships it, on a minimal DOM, so the cell checked
+// is the one the page builds.
+function testThePreviewWarnsAboutALineWithNoTitle(): void {
+  const warning = '這行沒有歌名，送出時會略過';
+  const html = render([]);
+  const start = html.indexOf('// Every node is built with createElement');
+  const end = html.indexOf("songsTextarea.addEventListener('input'", start);
+  assert(start !== -1 && end > start, 'el and renderPreview sit between their markers');
+  const block = html.slice(start, end);
+  assert(block.includes(warning), 'the warning is in renderPreview');
+  assert(html.includes('.song-title-missing {'), 'the page styles the cell that carries it');
+
+  const preview = fakeNode();
+  const renderPreview = new Function('document', 'songsPreview', `${block}\nreturn renderPreview;`)({ createElement: fakeNode }, preview) as (songs: unknown[]) => void;
+  const songs = inlineParser().parseTextToSongs('0:01:40 Song A / Artist\n0:04:10 / D / W\n0:05:00 Song B / Band B');
+  assert(songs.length === 3 && songs[1].songName === '' && songs[1].artist === 'D / W', 'the parser reads the middle line as no title and the artist D / W');
+  renderPreview(songs);
+
+  const titles = withClass(preview, 'song-title').map((cell) => cell.textContent);
+  assert(JSON.stringify(titles) === JSON.stringify(['Song A', warning, 'Song B']), `only the line with no title shows the warning: ${JSON.stringify(titles)}`);
+  const marked = withClass(preview, 'song-title-missing');
+  assert(marked.length === 1 && marked[0].textContent === warning && marked[0].className.split(' ').includes('song-title'), 'it is the title cell that carries the mark');
+  const artists = withClass(preview, 'song-artist').map((cell) => cell.textContent);
+  assert(JSON.stringify(artists) === JSON.stringify(['Artist', 'D / W', 'Band B']), `the artist cells read as ever: ${JSON.stringify(artists)}`);
+  console.log('vod form preview warns about a line with no title');
+}
+
+async function main(): Promise<void> {
   testEscapesStreamerOptionFields();
   testRendersValidStreamerSlug();
   testRejectsInvalidStreamerSlug();
@@ -441,17 +691,17 @@ try {
   testPrismFormStructure();
   testCarriesTheNonce();
   testVodFieldLimitsReachTheForm();
+  await testTheRevisionFollowsTheVideo();
+  await testTheUrlHintFollowsTheCheck();
   testSendsTheRevisionOfTheLoadedList();
+  testParsesAsTheSharedParserDoes();
+  testParsesUrlsAsNovaDoes();
+  testSortsLinesBeforeFillingEnds();
+  testThePreviewWarnsAboutALineWithNoTitle();
   console.log('vod-page.test: all passed');
-} catch (error) {
-  console.error(error);
-  process.exitCode = 1;
 }
 
-// The form's script waits on its fetches, so the tests that run it come after the rest.
-testTheRevisionFollowsTheVideo()
-  .then(testTheUrlHintFollowsTheCheck)
-  .catch((error: unknown) => {
-    console.error(error);
-    process.exitCode = 1;
-  });
+main().catch((error: unknown) => {
+  console.error(error);
+  process.exitCode = 1;
+});
