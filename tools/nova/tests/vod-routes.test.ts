@@ -765,6 +765,55 @@ async function testATimeThatIsNeitherTextNorANumberIsMalformed() {
   close(f);
 }
 
+async function testATitleThatIsNotTextIsMalformed() {
+  // The body is JSON, so a title can arrive as any value. One that is not text is the 400 the per-song shape check
+  // gives, 第 N 首：song_title 必須是文字, for the row that holds it: the first row included, and the same for every
+  // video. It is never a crash: the route read every title with .trim() to see whether the list holds a song at
+  // all, and that threw on a title that is not text whenever no titled row stood before it (after one, the read had
+  // already stopped, so [SONG_A, odd] always got this answer). It is refused with the other shape checks, before
+  // Turnstile is asked and before anything is stored.
+  const f = fixture();
+  const before = [count(f.db, 'vod_submissions'), count(f.db, 'vod_songs')];
+  const notText = (row: number) => ({ status: 400, body: { error: `第 ${row} 首：song_title 必須是文字` } });
+  const blank: SongInput = { ...SONG_A, song_title: '   ' };
+  for (const value of [7, 0, true, false, {}, [], ['Song A']]) {
+    const odd = { ...SONG_A, song_title: value } as unknown as SongInput;
+    const placements: Array<[string, SongInput[], number]> = [
+      ['alone', [odd], 1],
+      ['first', [odd, SONG_A], 1],
+      ['after a blank row', [blank, odd], 2],
+      ['after a titled row', [SONG_A, odd], 2],
+      ['on the third row', [SONG_A, SONG_A, odd], 3],
+    ];
+    for (const videoId of EVERY_VIDEO) {
+      for (const [place, songs, row] of placements) {
+        assert.deepEqual(await submit(f, videoId, songs), notText(row), `a title of ${JSON.stringify(value)}, ${place}, ${videoId}`);
+      }
+    }
+  }
+
+  // A title that is no title keeps the guard: a list whose titles are all blank, missing or null holds no song, so it
+  // is still 請至少提供一首歌曲的時間戳, as it was, and not an empty submission that spends the contributor's token.
+  const missing = { original_artist: 'X', start_timestamp: 300 } as unknown as SongInput;
+  const nulled = { song_title: null, original_artist: 'X', start_timestamp: 400 } as unknown as SongInput;
+  const noSong = { status: 400, body: { error: '請至少提供一首歌曲的時間戳' } };
+  const untitled: Array<[string, SongInput[]]> = [
+    ['blank', [blank]], ['missing', [missing]], ['null', [nulled]], ['blank, missing and null', [blank, missing, nulled]],
+  ];
+  for (const videoId of EVERY_VIDEO) {
+    for (const [what, songs] of untitled) {
+      assert.deepEqual(await submit(f, videoId, songs), noSong, `only a ${what} title, ${videoId}`);
+    }
+  }
+  assert.deepEqual(outbound, [], 'Turnstile is never asked');
+  assert.deepEqual([count(f.db, 'vod_submissions'), count(f.db, 'vod_songs')], before, 'nothing is stored');
+
+  // Beside a titled row they are skipped, as before, and the rest is stored.
+  const id = created(await submit(f, 'vidNEW00001', [SONG_A, missing, nulled]), 'new');
+  assert.deepEqual(storedTimes(f, id), [[100, 200]], 'only the titled row is stored');
+  close(f);
+}
+
 async function testPipelineAndExcludedAreAccepted() {
   const f = fixture();
   // The list a non-public stream's approved rows hold is accepted, with the same answer as for an
@@ -1399,6 +1448,7 @@ const tests = [
   testABlankRowRefillsOnlyTheEndRightAboveIt,
   testAnEndOfZeroIsAnEnd,
   testATimeThatIsNeitherTextNorANumberIsMalformed,
+  testATitleThatIsNotTextIsMalformed,
   testPipelineAndExcludedAreAccepted,
   testApprovedNovaRowNoLongerBlocks,
   testArchivedStreamWithoutPublicRows,
