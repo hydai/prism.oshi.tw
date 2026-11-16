@@ -476,8 +476,14 @@ app.post('/vod/api/submit', async (c) => {
     return c.json({ error: errors.join(', ') }, 400);
   }
 
-  // Block timeline-less submissions: require at least one titled song.
-  const hasSong = Array.isArray(body.songs) && body.songs.some((s) => s?.song_title?.trim());
+  // Block timeline-less submissions: require at least one titled song. The body is JSON, so a title can be any
+  // value. One that is not text counts as a title here, so that the shape check below refuses it by its row (before
+  // Turnstile, like the other shape checks) and nothing calls .trim() on it. A blank title is no title, and neither
+  // is a missing or null one: its row is skipped.
+  const hasSong = Array.isArray(body.songs) && body.songs.some((s) => {
+    const title: unknown = s?.song_title;
+    return typeof title === 'string' ? title.trim() !== '' : title !== undefined && title !== null;
+  });
   if (!hasSong) {
     return c.json({ error: '請至少提供一首歌曲的時間戳' }, 400);
   }
