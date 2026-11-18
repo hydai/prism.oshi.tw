@@ -114,7 +114,95 @@ function testVodFieldLimitsReachTheForm(): void {
   console.log('VOD form maxlength attributes match the server limits');
 }
 
-try {
+// The form's script as the page ships it, run on stand-ins for the elements it uses: each keeps what the script sets on it
+// and calls the listeners the script registers, and `nova` answers the script's requests as the worker would.
+class StubElement {
+  value = '';
+  textContent = '';
+  className = '';
+  readonly style: Record<string, string> = {};
+  private readonly listeners = new Map<string, Array<(event: unknown) => unknown>>();
+
+  addEventListener(type: string, listener: (event: unknown) => unknown): void {
+    this.listeners.set(type, [...(this.listeners.get(type) ?? []), listener]);
+  }
+
+  async fire(type: string, event: unknown = {}): Promise<void> {
+    for (const listener of this.listeners.get(type) ?? []) await listener.call(this, event);
+  }
+
+  removeAttribute(): void {}
+}
+
+class StubForm extends StubElement {
+  readonly fields: Record<string, StubElement> = {};
+
+  querySelector(selector: string): StubElement {
+    const name = /^\[name="([^"]+)"\]$/.exec(selector)?.[1];
+    if (name === undefined) throw new Error(`the form looks its fields up by name, not ${selector}`);
+    return (this.fields[name] ??= new StubElement());
+  }
+}
+
+function openForm(nova: (path: string) => { status: number; body: unknown }) {
+  const form = new StubForm();
+  const elements: Record<string, StubElement> = {};
+  const document = {
+    getElementById: (id: string) => (id === 'vod-form' ? form : (elements[id] ??= new StubElement())),
+  };
+  async function fetchStub(path: string) {
+    const { status, body } = nova(path);
+    return { ok: status < 400, status, json: async () => body };
+  }
+
+  const scripts = [...render([{ slug: 'ichii', display_name: 'ichii', avatar_url: '' }]).matchAll(/<script[^>]*>([\s\S]*?)<\/script>/g)];
+  const script = scripts.map((match) => match[1] ?? '').find((text) => text.includes("getElementById('vod-form')"));
+  if (script === undefined) throw new Error('the page ships no script for the form');
+  new Function('document', 'window', 'fetch', script)(document, {}, fetchStub);
+
+  return {
+    streamer: form.fields['streamer_slug']!,
+    url: form.fields['video_url']!,
+    check: elements['url-check']!,
+  };
+}
+
+/** Lets the requests the script started, and the handlers they run, finish. */
+function settle(): Promise<void> {
+  return new Promise((resolve) => setTimeout(resolve, 0));
+}
+
+const LOCKED_VIDEO_URL = 'https://www.youtube.com/live/VqAa6fUDZXI?si=V4VxLqR8Pwzjnuu5';
+
+// An approved Nova submission blocks a VOD while the video still has a stream in admin, and no longer once that stream
+// is deleted (index.ts). The hint the form shows when the URL is entered must say the same, so it invites a resubmission
+// exactly when Nova would take one. The first row is what /vod/api/check answered for ichii's VqAa6fUDZXI after its
+// stream was deleted.
+async function testCheckHintFollowsTheAdminStream(): Promise<void> {
+  const approvedOnce = { exists: true, count: 1, hasApproved: true, pendingCount: 0, rejectedCount: 0, latestStatus: 'approved' };
+  const cases: Array<[string, Record<string, unknown>, string]> = [
+    ['deleted', { ...approvedOnce, inAdmin: false }, '此 VOD 目前未收錄於歌單中，歡迎重新提交'],
+    ['rejected', { ...approvedOnce, inAdmin: true, adminStatus: 'rejected' }, '此 VOD 已通過審核，無需重複提交'],
+    ['excluded', { ...approvedOnce, inAdmin: true, adminStatus: 'excluded' }, '此 VOD 已通過審核，無需重複提交'],
+    ['pending', { ...approvedOnce, inAdmin: true, adminStatus: 'pending' }, '此 VOD 已通過審核，無需重複提交'],
+    ['extracted', { ...approvedOnce, inAdmin: true, adminStatus: 'extracted' }, '此 VOD 已通過審核，無需重複提交'],
+    ['approved', { ...approvedOnce, inAdmin: true, adminStatus: 'approved' }, '此 VOD 已收錄於歌單中，無需再提交'],
+  ];
+  for (const [state, check, hint] of cases) {
+    const page = openForm((path) => (path.startsWith('/vod/api/check?') ? { status: 200, body: check } : { status: 200, body: {} }));
+    page.streamer.value = 'ichii';
+    page.url.value = LOCKED_VIDEO_URL;
+    await page.url.fire('blur');
+    await settle();
+    assert(
+      page.check.textContent === hint,
+      `admin stream ${state}: the hint reads ${JSON.stringify(hint)}, not ${JSON.stringify(page.check.textContent)}`,
+    );
+  }
+  console.log('the URL hint invites a resubmission once an approved VOD has no admin stream, and only then');
+}
+
+async function main(): Promise<void> {
   testEscapesStreamerOptionFields();
   testRendersValidStreamerSlug();
   testRejectsInvalidStreamerSlug();
@@ -122,8 +210,11 @@ try {
   testPrismFormStructure();
   testCarriesTheNonce();
   testVodFieldLimitsReachTheForm();
+  await testCheckHintFollowsTheAdminStream();
   console.log('vod-page.test: all passed');
-} catch (error) {
+}
+
+main().catch((error: unknown) => {
   console.error(error);
   process.exitCode = 1;
-}
+});

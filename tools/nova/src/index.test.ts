@@ -2,6 +2,10 @@
 // finding. The security invariant: the public GET /vod/api/video-info route MUST
 // NOT spend the worker's shared YOUTUBE_API_KEY. Only Turnstile-protected flows
 // may call the YouTube Data API. Run with: npm run test:video-info
+import { readFileSync } from 'node:fs';
+import { dirname, resolve } from 'node:path';
+import { DatabaseSync, type SQLInputValue } from 'node:sqlite';
+import { fileURLToPath } from 'node:url';
 import app, { fetchYoutubeVideoInfo } from './index';
 import type { Bindings } from './types';
 
@@ -23,6 +27,7 @@ function assert(condition: boolean, message: string): void {
 // --- outbound fetch mock: records every URL, serves canned YouTube responses ---
 const OEMBED = 'youtube.com/oembed';
 const DATA_API = 'googleapis.com/youtube/v3/videos';
+const SITEVERIFY = 'challenges.cloudflare.com/turnstile/v0/siteverify';
 
 let fetchCalls: string[] = [];
 const realFetch = globalThis.fetch;
@@ -49,6 +54,9 @@ function installMockFetch(): void {
           liveStreamingDetails: { actualStartTime: '2024-01-01T12:00:00Z' },
         }],
       });
+    }
+    if (url.includes(SITEVERIFY)) {
+      return jsonResponse({ success: true });
     }
     return new Response('not found', { status: 404 });
   };
@@ -230,6 +238,134 @@ async function testSubmitRequiresTimeline(): Promise<void> {
     restoreFetch();
   }
   console.log('✓ /vod/api/submit requires at least one song timestamp');
+}
+
+// === VOD submit: a deleted admin stream frees its VOD =======================
+/** One prepared statement on the SQLite stand-in for D1, run when D1 would run it. */
+class SqliteStatement {
+  private params: SQLInputValue[] = [];
+
+  constructor(private readonly sqlite: DatabaseSync, private readonly sql: string) {}
+
+  bind(...params: SQLInputValue[]): this {
+    this.params = params;
+    return this;
+  }
+
+  execute(): { results: unknown[] } {
+    const statement = this.sqlite.prepare(this.sql);
+    if (statement.columns().length > 0) return { results: statement.all(...this.params) };
+    statement.run(...this.params);
+    return { results: [] };
+  }
+
+  async first(): Promise<unknown> {
+    return this.execute().results[0] ?? null;
+  }
+
+  async all(): Promise<{ results: unknown[] }> {
+    return this.execute();
+  }
+}
+
+/** Nova's D1 as SQLite bootstrapped from schema.sql, as a fresh database is, so the route's own SQL runs. */
+function makeNovaSqlite(): { db: D1Database; sqlite: DatabaseSync } {
+  const sqlite = new DatabaseSync(':memory:');
+  sqlite.exec(readFileSync(resolve(dirname(fileURLToPath(import.meta.url)), '../schema.sql'), 'utf8'));
+  const db = {
+    prepare: (sql: string) => new SqliteStatement(sqlite, sql),
+    // D1 runs a batch as one transaction.
+    batch: async (statements: SqliteStatement[]) => {
+      sqlite.exec('BEGIN');
+      try {
+        const results = statements.map((statement) => statement.execute());
+        sqlite.exec('COMMIT');
+        return results;
+      } catch (error) {
+        sqlite.exec('ROLLBACK');
+        throw error;
+      }
+    },
+  };
+  return { db: db as unknown as D1Database, sqlite };
+}
+
+/** The admin DB, holding a stream for ichii's VqAa6fUDZXI in `status`, or none. */
+function makeAdminDb(status: string | null): D1Database {
+  return {
+    prepare: (sql: string) => ({
+      bind: (...args: unknown[]) => ({
+        first: async () =>
+          (status !== null && sql.includes('FROM streams') && args[0] === 'ichii' && args[1] === 'VqAa6fUDZXI' ? { status } : null),
+      }),
+    }),
+  } as unknown as D1Database;
+}
+
+// ichii's VqAa6fUDZXI had an approved Nova submission with wrong data. A curator unapproved and deleted the stream it
+// had imported, and the corrected list was refused for good (2026-11-18). An approved submission blocks only while the
+// video still has a stream in admin, in any status: approving another would not import it, since the import skips a
+// video that has one. Once the stream is deleted the VOD takes a new submission, and approving that one imports it.
+async function testADeletedStreamFreesItsVod(): Promise<void> {
+  installMockFetch();
+  try {
+    const cases: Array<{ admin: string | null; approved: boolean; status: number; inAdmin?: true }> = [
+      { admin: null, approved: true, status: 201 },
+      { admin: 'rejected', approved: true, status: 409 },
+      { admin: 'excluded', approved: true, status: 409 },
+      { admin: 'rejected', approved: false, status: 201 },
+      { admin: 'approved', approved: true, status: 409, inAdmin: true },
+      { admin: 'pending', approved: true, status: 409, inAdmin: true },
+      { admin: 'extracted', approved: true, status: 409, inAdmin: true },
+    ];
+    for (const { admin, approved, status, inAdmin } of cases) {
+      const label = `admin stream ${admin ?? 'deleted'}, ${approved ? 'an' : 'no'} approved Nova submission`;
+      const nova = makeNovaSqlite();
+      nova.sqlite.exec(`INSERT INTO submissions (id, youtube_channel_url, slug, display_name, status)
+        VALUES ('sub-ichii', 'https://www.youtube.com/@ichii', 'ichii', 'ichii', 'approved')`);
+      if (approved) {
+        nova.sqlite.exec(`INSERT INTO vod_submissions (id, streamer_slug, video_id, video_url, status, submitted_at)
+          VALUES ('vod-6e8c5ec3', 'ichii', 'VqAa6fUDZXI', 'https://www.youtube.com/watch?v=VqAa6fUDZXI', 'approved', '2026-11-08 17:11:50')`);
+      }
+
+      const res = await app.request(
+        '/vod/api/submit',
+        {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            streamer_slug: 'ichii',
+            video_url: 'https://www.youtube.com/live/VqAa6fUDZXI?si=V4VxLqR8Pwzjnuu5',
+            songs: [{ song_title: 'Late Night Drive', original_artist: '', start_timestamp: '0:14:41', end_timestamp: '0:17:04' }],
+            turnstile_token: 'test-token',
+          }),
+        },
+        makeEnv({ DB: nova.db, ADMIN_DB: makeAdminDb(admin), TURNSTILE_SECRET_KEY: 'test-secret' }),
+      );
+      assertEqual(res.status, status, label);
+      const body = (await res.json()) as { id?: string; inAdmin?: boolean; adminStatus?: string; submittedAt?: string };
+      const rows = nova.sqlite
+        .prepare("SELECT id, status FROM vod_submissions WHERE streamer_slug = 'ichii' AND video_id = 'VqAa6fUDZXI'")
+        .all() as Array<{ id: string; status: string }>;
+      const earlier = approved ? 1 : 0;
+      if (status === 201) {
+        assertEqual(rows.length, earlier + 1, `${label}: the submission is stored beside any earlier one`);
+        assertEqual(rows.find((row) => row.id === body.id)?.status, 'pending', `${label}: under the id the answer gives, pending`);
+      } else {
+        assertEqual(rows.length, earlier, `${label}: nothing is stored`);
+        if (inAdmin) {
+          assertEqual(body.inAdmin, true, `${label}: the admin stream blocks it`);
+          assertEqual(body.adminStatus, admin, `${label}: and the answer names its status`);
+        } else {
+          assertEqual(body.inAdmin, undefined, `${label}: the approved submission blocks it`);
+          assertEqual(body.submittedAt, '2026-11-08 17:11:50', `${label}: and the answer says when it came`);
+        }
+      }
+    }
+  } finally {
+    restoreFetch();
+  }
+  console.log('✓ /vod/api/submit: a VOD whose admin stream was deleted takes a new submission; one with a stream does not');
 }
 
 // === Security headers: Hono defaults plus the Content-Security-Policy, on a page
@@ -578,6 +714,7 @@ async function main(): Promise<void> {
   await testChannelInfoGateAllowsSameOriginRequests();
   await testChannelInfoGateAcceptsRefererOnly();
   await testSubmitRequiresTimeline();
+  await testADeletedStreamFreesItsVod();
   await testSecurityHeadersOnPageRoute();
   await testSecurityHeadersOnApiRoute();
   await testSecurityHeadersOnCorsPreflight();

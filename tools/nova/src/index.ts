@@ -567,7 +567,10 @@ app.post('/vod/api/submit', async (c) => {
     );
   }
 
-  if (approved) {
+  // An approved Nova submission blocks only while the video still has a stream in admin, in any status:
+  // approving another would not import it, since the import skips a video that has one. Once a curator
+  // deletes that stream (wrong data), the VOD takes a new submission, and approving it imports it again.
+  if (approved && adminStream) {
     return c.json(
       {
         error: 'duplicate',
