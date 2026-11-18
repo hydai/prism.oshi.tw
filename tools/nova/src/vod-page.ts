@@ -231,7 +231,8 @@ const VOD_SCRIPT = String.raw`
               if (data.inAdmin && data.adminStatus === 'approved') {
                 urlCheck.className = 'check-line check-ok';
                 urlCheck.textContent = '此 VOD 已收錄於歌單中，無需再提交';
-              } else if (data.exists && data.hasApproved) {
+              } else if (data.exists && data.hasApproved && data.inAdmin) {
+                // Approved, and the video still has a stream in admin: Nova refuses a new submission.
                 urlCheck.className = 'check-line check-exists';
                 urlCheck.textContent = '此 VOD 已通過審核，無需重複提交';
               } else if (data.exists && data.pendingCount > 0) {
@@ -240,6 +241,10 @@ const VOD_SCRIPT = String.raw`
               } else if (data.exists && data.rejectedCount > 0) {
                 urlCheck.className = 'check-line check-exists';
                 urlCheck.textContent = '此 VOD 先前的提交已被拒絕，歡迎重新提交修正版本';
+              } else if (data.exists && data.hasApproved) {
+                // Approved once, but its stream was deleted since: Nova takes a new submission.
+                urlCheck.className = 'check-line check-resubmit';
+                urlCheck.textContent = '此 VOD 目前未收錄於歌單中，歡迎重新提交';
               } else if (data.inAdmin && (data.adminStatus === 'pending' || data.adminStatus === 'extracted')) {
                 // Pipeline state alone does not mean a Nova submission exists.
                 urlCheck.style.display = 'none';
