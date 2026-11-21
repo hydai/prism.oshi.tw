@@ -18,6 +18,22 @@
     ]
   },
   {
+    "id": "song-84b1465e-6a3a-4177-825b-eb463e1cd9cc",
+    "workId": "work-a2f0470e-c718-4a0f-8b45-ebfa3769a708",
+    "title": "天使審判Angel Judge",
+    "originalArtist": "祈Iruni",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-7b48fa3d-6e73-4566-b5e4-8e83c52d6736",
+        "streamId": "stream-2026-09-29",
+        "videoId": "NErgTH__s8M",
+        "timestamp": 0,
+        "endTimestamp": 225
+      }
+    ]
+  },
+  {
     "id": "song-4dedc7b0",
     "workId": "work-0711e4c9-7bc2-428c-a286-ec18b7405e97",
     "title": "你為什麼說謊",
@@ -32,6 +48,22 @@
         "videoId": "ag4HE35Jsig",
         "timestamp": 4476,
         "endTimestamp": 4749
+      }
+    ]
+  },
+  {
+    "id": "song-298d8db4-32c1-4b2e-83ae-f79d0328a228",
+    "workId": "work-song-cfff763c",
+    "title": "赤伶",
+    "originalArtist": "HITA",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-853a600d-c801-4ae8-ae1b-2e662768d86e",
+        "streamId": "stream-18d4bb6d-f66a-4c01-8554-3534ceffd30d",
+        "videoId": "exvzBI2jtMY",
+        "timestamp": 0,
+        "endTimestamp": 264
       }
     ]
   },
@@ -52,6 +84,22 @@
     ]
   },
   {
+    "id": "song-8baa6fa0-9f8e-48fd-8540-19b5ae3b4980",
+    "workId": "work-1a76adce-fa1b-4410-a654-c1fb72dfcff8",
+    "title": "炉心融解 (Meltdown)",
+    "originalArtist": "iroha(saski)",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-2a289d44-50e6-41c4-83c2-b27de65979b1",
+        "streamId": "stream-2025-04-16",
+        "videoId": "0skFNV1-olc",
+        "timestamp": 2,
+        "endTimestamp": 328
+      }
+    ]
+  },
+  {
     "id": "song-5c627f85",
     "workId": "work-song-1322",
     "title": "雨愛",
@@ -66,6 +114,38 @@
         "videoId": "ag4HE35Jsig",
         "timestamp": 4161,
         "endTimestamp": 4423
+      }
+    ]
+  },
+  {
+    "id": "song-d257b5fe-a225-43be-aa50-bb1889113c02",
+    "workId": "work-baa35c6d-24af-4dc5-9a73-07f5d81dca01",
+    "title": "倒數仙境 ♡ 君とのWonderland",
+    "originalArtist": "祈Iruni",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-75515277-1954-4a2e-9450-18986281c774",
+        "streamId": "stream-71a5fb89-bb81-43e3-af58-79ab60dd97bc",
+        "videoId": "sAQkVAEJaG0",
+        "timestamp": 5,
+        "endTimestamp": 231
+      }
+    ]
+  },
+  {
+    "id": "song-e746ec49-35fc-41a3-9e26-83f7bec236e4",
+    "workId": "work-4c4e8ae6-0bb1-407f-8370-14ca7bc4cd4c",
+    "title": "恋愛サーキュレーション(Renai Circulation)",
+    "originalArtist": "花澤香菜",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-7d621461-cdc1-4184-971a-693a5a2b2d4a",
+        "streamId": "stream-2024-09-24",
+        "videoId": "SGztP3X0V2A",
+        "timestamp": 0,
+        "endTimestamp": 252
       }
     ]
   },
@@ -102,6 +182,24 @@
         "videoId": "ag4HE35Jsig",
         "timestamp": 7223,
         "endTimestamp": 7466
+      }
+    ]
+  },
+  {
+    "id": "song-891dae1e-7911-45e5-948a-3aadafa1483b",
+    "workId": "work-song-156",
+    "title": "誇り高きアイドル",
+    "originalArtist": "HoneyWorks",
+    "tags": [
+      "language:ja"
+    ],
+    "performances": [
+      {
+        "id": "p-382ec979-91a2-4d7c-92c9-ad8efb203b40",
+        "streamId": "stream-2026-05-23",
+        "videoId": "u8Phbu2d59U",
+        "timestamp": 0,
+        "endTimestamp": 250
       }
     ]
   },
