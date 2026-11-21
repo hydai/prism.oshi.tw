@@ -1641,6 +1641,13 @@
     "tags": [],
     "performances": [
       {
+        "id": "p-7d79e8e2-b597-4a25-a84c-0fd8fe3c2c9a",
+        "streamId": "stream-2026-11-18",
+        "videoId": "lNszJC8w1nk",
+        "timestamp": 8565,
+        "endTimestamp": 8843
+      },
+      {
         "id": "p-1add7f8f-d8ce-4c9b-b99e-f15a5528e9d8",
         "streamId": "stream-2026-09-09",
         "videoId": "_4yrs9aGUA8",
@@ -1863,6 +1870,22 @@
     ]
   },
   {
+    "id": "song-556bee0c-c276-4776-ac02-2965332a6aa5",
+    "workId": "work-c87447ea-03c0-4032-8e72-3ed53496d89d",
+    "title": "夜宴風波",
+    "originalArtist": "音闕詩聽",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-4b976f28-5533-441b-bd66-55c13de68508",
+        "streamId": "stream-2026-11-18",
+        "videoId": "lNszJC8w1nk",
+        "timestamp": 7425,
+        "endTimestamp": 7625
+      }
+    ]
+  },
+  {
     "id": "song-41b28fc0-0cd7-4c4b-9650-499f2384f16c",
     "workId": "work-song-baaff013",
     "title": "明月天涯",
@@ -1961,6 +1984,13 @@
     "originalArtist": "HITA",
     "tags": [],
     "performances": [
+      {
+        "id": "p-6531baee-971d-492e-9cdf-0575d8d8cfcc",
+        "streamId": "stream-2026-11-18",
+        "videoId": "lNszJC8w1nk",
+        "timestamp": 1247,
+        "endTimestamp": 1561
+      },
       {
         "id": "p-cdaf1aff-7899-4c3c-9b86-93b79076013f",
         "streamId": "stream-2026-10-07",
@@ -2235,6 +2265,13 @@
     "tags": [],
     "performances": [
       {
+        "id": "p-0240421a-8d7a-4b6b-86a3-b980e228062b",
+        "streamId": "stream-2026-11-18",
+        "videoId": "lNszJC8w1nk",
+        "timestamp": 6611,
+        "endTimestamp": 6934
+      },
+      {
         "id": "p-5137db77-fb59-4b65-9a93-9915d5127068",
         "streamId": "stream-f9857413-9717-46ed-8bf5-abc9d9af362f",
         "videoId": "-iBV9Be21mA",
@@ -2456,6 +2493,13 @@
     "originalArtist": "晴愔",
     "tags": [],
     "performances": [
+      {
+        "id": "p-349ce15c-ed68-40d5-aade-96f4a7730c09",
+        "streamId": "stream-2026-11-18",
+        "videoId": "lNszJC8w1nk",
+        "timestamp": 750,
+        "endTimestamp": 1007
+      },
       {
         "id": "p-de294950-bb5d-4e57-9f17-fbc0a2b40c51",
         "streamId": "stream-2026-11-08",
@@ -3198,6 +3242,13 @@
     "tags": [],
     "performances": [
       {
+        "id": "p-85f3ac61-1989-4253-8b1e-612a6d959b8d",
+        "streamId": "stream-2026-11-18",
+        "videoId": "lNszJC8w1nk",
+        "timestamp": 4038,
+        "endTimestamp": 4274
+      },
+      {
         "id": "p-1eef1688-c85f-4bcf-8267-f4b5c0062010",
         "streamId": "stream-2026-08-05",
         "videoId": "VCrVYOabRXQ",
@@ -3505,6 +3556,13 @@
     "tags": [],
     "performances": [
       {
+        "id": "p-0827fda6-bcc2-4b30-a130-227ed40357aa",
+        "streamId": "stream-2026-11-18",
+        "videoId": "lNszJC8w1nk",
+        "timestamp": 7861,
+        "endTimestamp": 8156
+      },
+      {
         "id": "p-95788638-fdeb-455d-8e2e-c11da108b3c2",
         "streamId": "stream-2026-07-08",
         "videoId": "n7o5ukvaAiY",
@@ -3543,6 +3601,13 @@
     "originalArtist": "葉裡&雲の泣",
     "tags": [],
     "performances": [
+      {
+        "id": "p-7b6917cf-1233-4b3c-b65a-1b84b00b7241",
+        "streamId": "stream-2026-11-18",
+        "videoId": "lNszJC8w1nk",
+        "timestamp": 2250,
+        "endTimestamp": 2610
+      },
       {
         "id": "p-93461734-660f-441d-a75e-966854773278",
         "streamId": "stream-2026-10-07",
@@ -4029,6 +4094,13 @@
     "tags": [],
     "performances": [
       {
+        "id": "p-00bc1124-d0ae-4792-8016-9f44d575e869",
+        "streamId": "stream-2026-11-18",
+        "videoId": "lNszJC8w1nk",
+        "timestamp": 5067,
+        "endTimestamp": 5341
+      },
+      {
         "id": "p-62c50092-1de4-4907-abba-ac3c9f1945dc",
         "streamId": "stream-f9857413-9717-46ed-8bf5-abc9d9af362f",
         "videoId": "-iBV9Be21mA",
@@ -4257,6 +4329,13 @@
     "originalArtist": "銀臨",
     "tags": [],
     "performances": [
+      {
+        "id": "p-6dec3775-04ec-4c60-b015-f3f5ee438cd2",
+        "streamId": "stream-2026-11-18",
+        "videoId": "lNszJC8w1nk",
+        "timestamp": 5705,
+        "endTimestamp": 5945
+      },
       {
         "id": "p-4d31ee44-64db-424a-8758-dfc937d36322",
         "streamId": "stream-2026-10-21",
