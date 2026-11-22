@@ -4128,6 +4128,22 @@
     ]
   },
   {
+    "id": "song-f2ebb6aa-1a77-4c1d-9f67-56c3e5ddad67",
+    "workId": "work-5d10b5f9-4f6e-4d2c-bdeb-cc6ea5f3a889",
+    "title": "This Is Halloween",
+    "originalArtist": "Unknown",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-34ed693e-5e0b-4f53-a5a0-45184ad680ac",
+        "streamId": "stream-2026-10-31",
+        "videoId": "zmgE7eXb1Lk",
+        "timestamp": 0,
+        "endTimestamp": 194
+      }
+    ]
+  },
+  {
     "id": "song-f5268c7a",
     "workId": "work-song-f5268c7a",
     "title": "Voyaging Star's Farewell",
