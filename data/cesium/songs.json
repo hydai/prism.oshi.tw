@@ -170,6 +170,13 @@
         "videoId": "FdacPNs4u20",
         "timestamp": 1696,
         "endTimestamp": 1916
+      },
+      {
+        "id": "p-1063a865-a0a6-4203-8930-b53d66bf2259",
+        "streamId": "stream-00b4d26a-59f9-4afe-8fa2-d0ee9d9ac96d",
+        "videoId": "vZzcyYfPFj0",
+        "timestamp": 0,
+        "endTimestamp": 230
       }
     ]
   },
@@ -186,6 +193,13 @@
         "videoId": "7PmVvOA8umE",
         "timestamp": 477,
         "endTimestamp": 755
+      },
+      {
+        "id": "p-036056ad-c0d9-4667-8019-9653b53ffcab",
+        "streamId": "stream-5d44fcb0-ad1d-413b-a206-39cf6a586e4f",
+        "videoId": "UgJjdDl_pRY",
+        "timestamp": 0,
+        "endTimestamp": 286
       },
       {
         "id": "p-be083389-46a6-4aa4-9df6-cf273b09e745",
@@ -813,6 +827,13 @@
         "endTimestamp": 1734
       },
       {
+        "id": "p-f5d670a5-f3a3-4d8c-ae77-160a8a937637",
+        "streamId": "stream-35c5197e-2de3-482d-a501-92b9d919487a",
+        "videoId": "HQHyTWE-oT4",
+        "timestamp": 0,
+        "endTimestamp": 231
+      },
+      {
         "id": "p-8c92b8a1-bc5b-4736-84cb-a4babd9a3096",
         "streamId": "stream-2026-07-08",
         "videoId": "n7o5ukvaAiY",
@@ -1050,6 +1071,13 @@
         "videoId": "iCGCoCtbdS0",
         "timestamp": 1075,
         "endTimestamp": 1357
+      },
+      {
+        "id": "p-d5a80d5b-2600-4630-b9ee-2864b5df7a4d",
+        "streamId": "stream-2026-05-13",
+        "videoId": "PTkMzy_d2ao",
+        "timestamp": 0,
+        "endTimestamp": 288
       }
     ]
   },
@@ -1263,6 +1291,13 @@
     "tags": [],
     "performances": [
       {
+        "id": "p-aec7e5fc-d940-4d41-8421-06a5e5e595c2",
+        "streamId": "stream-eb4c1038-1b2c-479f-826e-ce82d807ee96",
+        "videoId": "ZVqT0bEJLXo",
+        "timestamp": 0,
+        "endTimestamp": 290
+      },
+      {
         "id": "p-2a177c4f-d526-4f91-8980-63af3a605fbd",
         "streamId": "stream-f8223f85-ac1f-4e8e-8368-28ebf02db798",
         "videoId": "VFztLHJb_EU",
@@ -1347,6 +1382,13 @@
     "originalArtist": "蕭憶情",
     "tags": [],
     "performances": [
+      {
+        "id": "p-2b166a97-3e4c-44ca-9461-1e1e3e55a0b5",
+        "streamId": "stream-5c98e533-65ae-4c5f-9ad2-35fc3ea4df62",
+        "videoId": "xfCVJw536Z8",
+        "timestamp": 0,
+        "endTimestamp": 285
+      },
       {
         "id": "p-d2086846-c4aa-41cb-a6b0-a8ce9011a5d7",
         "streamId": "stream-2026-07-22",
@@ -1730,6 +1772,22 @@
     ]
   },
   {
+    "id": "song-d5135c34-c67e-43ae-b872-4c0f55223418",
+    "workId": "work-ba27f721-cd45-4ac9-8413-4fc25f303847",
+    "title": "男子漢",
+    "originalArtist": "花木蘭",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-07d22f47-a638-45bb-abb9-8aba17883d89",
+        "streamId": "stream-77ee1382-56af-47d9-8a09-240a0acec1f4",
+        "videoId": "is8WmiJzHlU",
+        "timestamp": 82,
+        "endTimestamp": 298
+      }
+    ]
+  },
+  {
     "id": "song-005f7e12-29b4-4a15-b391-6c473e33f47d",
     "workId": "work-b77430b8-393b-4d60-bf3d-0763b8161831",
     "title": "芊芊",
@@ -1974,6 +2032,13 @@
         "videoId": "VFztLHJb_EU",
         "timestamp": 2885,
         "endTimestamp": 3115
+      },
+      {
+        "id": "p-0e2ef170-1659-43b4-8d8f-9e0dc2f2fda1",
+        "streamId": "stream-c8c12859-a20c-486e-853e-13f1e5da0645",
+        "videoId": "3cKhv_7Hjn4",
+        "timestamp": 0,
+        "endTimestamp": 239
       }
     ]
   },
@@ -2231,6 +2296,13 @@
         "videoId": "w9XHL_J8_kc",
         "timestamp": 6474,
         "endTimestamp": 6681
+      },
+      {
+        "id": "p-4c84e243-fa21-4656-b694-feceed8c9747",
+        "streamId": "stream-cc0631a3-c392-4ab5-a1fd-19dbef365bc1",
+        "videoId": "fUSXrvXy4YQ",
+        "timestamp": 0,
+        "endTimestamp": 229
       }
     ]
   },
@@ -4392,12 +4464,19 @@
     ]
   },
   {
-    "id": "song-c985ae43-fb45-466b-acf8-5390cdda53e3",
-    "workId": "work-adaf6bf6-d082-4af2-9229-f0ffdb7b6e19",
+    "id": "song-9cb0966c-638a-406d-9548-3e3ad170a31b",
+    "workId": "work-991a2413-8989-4baf-b7d3-f06852fdd949",
     "title": "戲文說",
-    "originalArtist": "祥嘞嘞&叫寶寶",
+    "originalArtist": "祥嘞嘞＆叫寶寶",
     "tags": [],
     "performances": [
+      {
+        "id": "p-f5f56d9e-49db-4826-8f2f-8494bd378c41",
+        "streamId": "stream-3a74ba98-287c-402d-ba23-85f028df8169",
+        "videoId": "ugfEzc8ZfCk",
+        "timestamp": 0,
+        "endTimestamp": 171
+      },
       {
         "id": "p-9c44d204-61c9-43cb-a996-2a02f0b1cc2a",
         "streamId": "stream-2026-06-10",
@@ -4624,6 +4703,13 @@
         "videoId": "FdacPNs4u20",
         "timestamp": 187,
         "endTimestamp": 362
+      },
+      {
+        "id": "p-fd4ecbb8-4440-4d79-9112-503fc034b979",
+        "streamId": "stream-8ea1e7b9-6660-40a4-b52d-21d9ab040044",
+        "videoId": "VkiOgAzdp3s",
+        "timestamp": 0,
+        "endTimestamp": 185
       }
     ]
   },
@@ -4781,6 +4867,54 @@
     ]
   },
   {
+    "id": "song-cab5b46b-d9f1-4219-b01c-f20fbc6b5b8c",
+    "workId": "work-fa334495-77e6-471d-a9b6-b0f76ceac025",
+    "title": "ACTOR",
+    "originalArtist": "友成空",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-2c523ab9-69db-4579-8e53-854da95e71b1",
+        "streamId": "stream-6b638176-c8fe-4d77-92ba-99eee4623389",
+        "videoId": "chR6tQZbqMA",
+        "timestamp": 0,
+        "endTimestamp": 184
+      }
+    ]
+  },
+  {
+    "id": "song-5b98d54f-b6bf-46a9-8794-421c00a20207",
+    "workId": "work-d996d234-2a59-4def-bdc4-7afc71660b84",
+    "title": "Beyond the Sky",
+    "originalArtist": "極深空計畫",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-5ca5f1bd-d71b-4178-a35c-da77d1eab030",
+        "streamId": "stream-2026-08-07",
+        "videoId": "wtj6w82Jx1I",
+        "timestamp": 0,
+        "endTimestamp": 166
+      }
+    ]
+  },
+  {
+    "id": "song-2006b4d9-3d43-4b70-a57b-b032cbcf81cb",
+    "workId": "work-song-1587",
+    "title": "Gimme×Gimme",
+    "originalArtist": "八王子P×Giga",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-817e4331-cce5-495c-9bae-e1b61cbee4c7",
+        "streamId": "stream-2026-10-05",
+        "videoId": "jIqb5uCl_bE",
+        "timestamp": 0,
+        "endTimestamp": 235
+      }
+    ]
+  },
+  {
     "id": "song-f68d34f6-4e30-4c20-b33d-f1fb17c974a4",
     "workId": "work-song-8ef9c4cb",
     "title": "NIGHT DANCER",
@@ -4820,6 +4954,22 @@
     ]
   },
   {
+    "id": "song-e9657c88-e2e5-478b-89c4-82b0e79befc8",
+    "workId": "work-5d10b5f9-4f6e-4d2c-bdeb-cc6ea5f3a889",
+    "title": "This Is Halloween",
+    "originalArtist": "Unknown",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-fddb65b0-9f6d-4b6c-8148-727d02332cfa",
+        "streamId": "stream-74f51bbe-48bf-49b6-aff2-ff5cab2ffa4f",
+        "videoId": "zmgE7eXb1Lk",
+        "timestamp": 0,
+        "endTimestamp": 194
+      }
+    ]
+  },
+  {
     "id": "song-abe2ab26-a272-4f09-8c59-6a9014c3ef8f",
     "workId": "work-9372c3ea-c74f-49d9-9535-889947a97f35",
     "title": "Time Machine",
@@ -4850,6 +5000,22 @@
         "videoId": "UaUF0j7Pmy4",
         "timestamp": 2645,
         "endTimestamp": 2780
+      }
+    ]
+  },
+  {
+    "id": "song-fc09269c-9858-4475-9688-4c7cb0cf028b",
+    "workId": "work-f6cda87d-142a-4a6c-9cb8-874b53da1080",
+    "title": "キャットラビング",
+    "originalArtist": "香椎モイミ",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-a6cc7da2-3655-4d9e-9813-b4e5e59fad39",
+        "streamId": "stream-6f55ba7f-9923-4e8c-a4d0-e93968ac68e4",
+        "videoId": "SxIkExmff64",
+        "timestamp": 0,
+        "endTimestamp": 121
       }
     ]
   },
@@ -4946,6 +5112,24 @@
         "videoId": "UaUF0j7Pmy4",
         "timestamp": 1317,
         "endTimestamp": 1460
+      }
+    ]
+  },
+  {
+    "id": "song-2441ebc4-2eb7-4ad4-b877-8c02a96637bf",
+    "workId": "work-song-2003",
+    "title": "レクイエム",
+    "originalArtist": "Kanaria",
+    "tags": [
+      "language:ja"
+    ],
+    "performances": [
+      {
+        "id": "p-7ed17b57-8334-4d6b-af3e-31c37b6959bd",
+        "streamId": "stream-7d1a4e15-0390-4feb-9993-1c9f028b9dbf",
+        "videoId": "hLaHAh2X--M",
+        "timestamp": 0,
+        "endTimestamp": 163
       }
     ]
   }
