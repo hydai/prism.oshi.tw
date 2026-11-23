@@ -27,13 +27,13 @@
     "test:song-text": "npx tsx src/song-text.test.ts"
   },
   "dependencies": {
-    "hono": "^4.13.18"
+    "hono": "^4.13.19"
   },
   "devDependencies": {
-    "@cloudflare/workers-types": "^5.20261115.1",
+    "@cloudflare/workers-types": "^5.20261120.1",
     "@types/node": "^26.6.6",
     "tsx": "^4.23.15",
     "typescript": "^6.0.3",
-    "wrangler": "^4.162.0"
+    "wrangler": "^4.165.0"
   }
 }
