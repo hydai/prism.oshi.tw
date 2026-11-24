@@ -255,6 +255,22 @@
     ]
   },
   {
+    "id": "song-858b2948-f18d-40d7-adde-02775dd9c208",
+    "workId": "work-9ec18506-7974-4dfb-9b09-2089c69667fd",
+    "title": "不用怕",
+    "originalArtist": "厄倫蒂兒",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-f8f1ad3a-6dbf-4a34-8f0c-20093308c0d6",
+        "streamId": "stream-2026-11-24",
+        "videoId": "eMUKSOFFOW4",
+        "timestamp": 0,
+        "endTimestamp": 235
+      }
+    ]
+  },
+  {
     "id": "song-2b6730ad",
     "workId": "work-song-2323",
     "title": "不是因為天氣晴朗才愛你",
