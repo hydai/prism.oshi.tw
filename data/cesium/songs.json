@@ -218,6 +218,13 @@
     "tags": [],
     "performances": [
       {
+        "id": "p-98b979e8-d252-47f6-8929-238de8bd7733",
+        "streamId": "stream-cb6452c6-e824-4c46-9b10-de771826c474",
+        "videoId": "VJL0PjzYFwo",
+        "timestamp": 3398,
+        "endTimestamp": 3575
+      },
+      {
         "id": "p-b544b753-117a-4b5d-b111-ae9c06bf0dc9",
         "streamId": "stream-2026-10-03",
         "videoId": "TxJCvkcZhO8",
@@ -265,6 +272,13 @@
     "originalArtist": "嚴藝丹",
     "tags": [],
     "performances": [
+      {
+        "id": "p-ecea9868-6e0d-420f-a525-b057a7feb043",
+        "streamId": "stream-cb6452c6-e824-4c46-9b10-de771826c474",
+        "videoId": "VJL0PjzYFwo",
+        "timestamp": 690,
+        "endTimestamp": 973
+      },
       {
         "id": "p-9a103681-9b4d-4bb6-a603-d06310f4fd73",
         "streamId": "stream-2026-10-03",
@@ -356,6 +370,22 @@
         "videoId": "Xwupr-SRT38",
         "timestamp": 3021,
         "endTimestamp": 3212
+      }
+    ]
+  },
+  {
+    "id": "song-efc9224d-3832-4d35-833e-5aa6007f7771",
+    "workId": "work-3e5520a4-948c-4496-a1b4-49fae427d50b",
+    "title": "下山",
+    "originalArtist": "麥小兜",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-688c5dd3-33a3-4a2e-a5a6-9f25163f2e33",
+        "streamId": "stream-cb6452c6-e824-4c46-9b10-de771826c474",
+        "videoId": "VJL0PjzYFwo",
+        "timestamp": 4946,
+        "endTimestamp": 5116
       }
     ]
   },
@@ -1206,6 +1236,24 @@
     ]
   },
   {
+    "id": "song-8b4bb688-d116-4e1f-a07d-c27e756330b1",
+    "workId": "work-59a55fc8-066c-4c76-8d60-e635b882ff33",
+    "title": "本色",
+    "originalArtist": "洛天依",
+    "tags": [
+      "source:vocaloid"
+    ],
+    "performances": [
+      {
+        "id": "p-6140f86c-a67f-4f32-9e60-e5ec77941cb2",
+        "streamId": "stream-cb6452c6-e824-4c46-9b10-de771826c474",
+        "videoId": "VJL0PjzYFwo",
+        "timestamp": 2076,
+        "endTimestamp": 2387
+      }
+    ]
+  },
+  {
     "id": "song-03702155-51c6-4e8f-814f-9bba4634f928",
     "workId": "work-31e79794-66e5-4711-b92e-f3959d686d2c",
     "title": "生日快樂歌",
@@ -1428,6 +1476,13 @@
     "originalArtist": "青鳥飛魚",
     "tags": [],
     "performances": [
+      {
+        "id": "p-676bc501-d821-408b-9637-b811f0cde8c4",
+        "streamId": "stream-cb6452c6-e824-4c46-9b10-de771826c474",
+        "videoId": "VJL0PjzYFwo",
+        "timestamp": 1680,
+        "endTimestamp": 1917
+      },
       {
         "id": "p-49fda598-03d4-4872-ae76-5080bc2654ca",
         "streamId": "stream-2026-11-04",
@@ -1794,6 +1849,13 @@
     "originalArtist": "回音哥",
     "tags": [],
     "performances": [
+      {
+        "id": "p-1cf4b247-4313-4c2a-b95e-42282015b7d7",
+        "streamId": "stream-cb6452c6-e824-4c46-9b10-de771826c474",
+        "videoId": "VJL0PjzYFwo",
+        "timestamp": 2972,
+        "endTimestamp": 3209
+      },
       {
         "id": "p-7539b8fb-64d0-4062-86d4-129d0e3dee79",
         "streamId": "stream-f9857413-9717-46ed-8bf5-abc9d9af362f",
@@ -2267,6 +2329,13 @@
     "originalArtist": "封茗囧菌&雙笙",
     "tags": [],
     "performances": [
+      {
+        "id": "p-9c40146f-5a09-404f-958d-7d69be76164f",
+        "streamId": "stream-cb6452c6-e824-4c46-9b10-de771826c474",
+        "videoId": "VJL0PjzYFwo",
+        "timestamp": 1208,
+        "endTimestamp": 1489
+      },
       {
         "id": "p-161a279a-3b97-406d-b9f9-f13ec7466208",
         "streamId": "stream-2026-10-07",
@@ -3307,12 +3376,35 @@
     ]
   },
   {
+    "id": "song-62b0a626-6a94-45f1-8f00-f9ea291c17ab",
+    "workId": "work-a56ba7bc-7c04-4ea9-b2e1-dac38ca10f21",
+    "title": "清明上河圖",
+    "originalArtist": "李玉剛",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-edeade7a-64b8-43fc-b0e7-75a8988c92b2",
+        "streamId": "stream-cb6452c6-e824-4c46-9b10-de771826c474",
+        "videoId": "VJL0PjzYFwo",
+        "timestamp": 3759,
+        "endTimestamp": 4028
+      }
+    ]
+  },
+  {
     "id": "song-aa6c1632-c5d3-4c17-a39a-d2d507b07af3",
     "workId": "work-song-2882",
     "title": "牽絲戲",
     "originalArtist": "銀臨&Aki阿杰",
     "tags": [],
     "performances": [
+      {
+        "id": "p-b009582d-9322-4941-8adc-a58620445902",
+        "streamId": "stream-cb6452c6-e824-4c46-9b10-de771826c474",
+        "videoId": "VJL0PjzYFwo",
+        "timestamp": 5220,
+        "endTimestamp": 5456
+      },
       {
         "id": "p-85f3ac61-1989-4253-8b1e-612a6d959b8d",
         "streamId": "stream-2026-11-18",
@@ -3663,6 +3755,22 @@
         "videoId": "ukNBbq2azJ8",
         "timestamp": 3323,
         "endTimestamp": 3486
+      }
+    ]
+  },
+  {
+    "id": "song-730805bc-8327-4140-a9be-d037c3fb3028",
+    "workId": "work-song-d3c9bf7c",
+    "title": "畫心",
+    "originalArtist": "張靚穎",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-2064e853-0797-47ea-8614-9c37341f6e59",
+        "streamId": "stream-cb6452c6-e824-4c46-9b10-de771826c474",
+        "videoId": "VJL0PjzYFwo",
+        "timestamp": 4579,
+        "endTimestamp": 4845
       }
     ]
   },
@@ -4796,6 +4904,22 @@
     ]
   },
   {
+    "id": "song-1834e740-d5e1-433e-8b60-975720fabad5",
+    "workId": "work-c563032f-db19-463d-a663-641dba6c2642",
+    "title": "飄洋過海來看你",
+    "originalArtist": "李宗盛",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-30501ca7-2a5f-4359-8222-5f90898d3e0b",
+        "streamId": "stream-cb6452c6-e824-4c46-9b10-de771826c474",
+        "videoId": "VJL0PjzYFwo",
+        "timestamp": 6518,
+        "endTimestamp": 6782
+      }
+    ]
+  },
+  {
     "id": "song-b641a9ce-4660-4160-9870-ef4c8e8aea82",
     "workId": "work-08e1d9d2-0840-4ace-aa48-d1c5ce97540a",
     "title": "魑魅魍魎",
@@ -5074,6 +5198,13 @@
       "language:ja"
     ],
     "performances": [
+      {
+        "id": "p-c64c6f5a-a2ab-4ea9-8c5d-7e85eb2b8520",
+        "streamId": "stream-cb6452c6-e824-4c46-9b10-de771826c474",
+        "videoId": "VJL0PjzYFwo",
+        "timestamp": 6215,
+        "endTimestamp": 6358
+      },
       {
         "id": "p-97730c62-9ca0-4721-9be2-976d80ae1c97",
         "streamId": "stream-5e5e42d5-9115-45c5-b00f-1b23652d0f8d",
