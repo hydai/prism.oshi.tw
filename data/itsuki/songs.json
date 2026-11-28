@@ -261,6 +261,22 @@
     ]
   },
   {
+    "id": "song-65dd548e-7ac9-41a4-a5e6-a4a9a2fa8882",
+    "workId": "work-d2fbff8f-3131-41af-bc0f-5ad522cd479e",
+    "title": "心動頻率Be your Harmony",
+    "originalArtist": "扉暮IANVS",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-f63cb846-d782-4a13-bb3d-8e8308ea7b6c",
+        "streamId": "stream-08adcc8f-1022-4aae-91ca-8a1b6d0a5104",
+        "videoId": "krW06Iksk20",
+        "timestamp": 0,
+        "endTimestamp": 196
+      }
+    ]
+  },
+  {
     "id": "song-fcd9ed82",
     "workId": "work-song-fcd9ed82",
     "title": "月牙灣",
@@ -979,6 +995,22 @@
     ]
   },
   {
+    "id": "song-bd239c48-c75e-47f3-9d92-83502dc49b01",
+    "workId": "work-36b9fdf0-d059-4502-8dc9-de0aa8144b41",
+    "title": "重啟Re:start",
+    "originalArtist": "扉暮IANVS",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-d92706af-478e-4daf-9b24-3c1b49b79f60",
+        "streamId": "stream-8059d972-b558-412e-86ad-84a21ac9f0d7",
+        "videoId": "T7cEknKe1ZQ",
+        "timestamp": 0,
+        "endTimestamp": 260
+      }
+    ]
+  },
+  {
     "id": "song-cc63372b",
     "workId": "work-song-2ca5447e",
     "title": "革命道中",
@@ -1058,6 +1090,22 @@
     ]
   },
   {
+    "id": "song-b1bf3349-1646-4b8a-abd6-f9573e06bee2",
+    "workId": "work-87e2fae1-671a-417f-820b-d51aeb60fce7",
+    "title": "海岸線coastline",
+    "originalArtist": "玥Itsuki",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-f018c295-6dbe-4387-9943-e51695a2377c",
+        "streamId": "stream-934792a8-712a-4412-8bfd-39803c7504c6",
+        "videoId": "_Kkm937yKUE",
+        "timestamp": 0,
+        "endTimestamp": 238
+      }
+    ]
+  },
+  {
     "id": "song-e797e639",
     "workId": "work-song-e797e639",
     "title": "純妹妹",
@@ -1113,6 +1161,22 @@
         "videoId": "wRZSj5cHzqI",
         "timestamp": 1511,
         "endTimestamp": 1697
+      }
+    ]
+  },
+  {
+    "id": "song-c43c4d94-6cd8-4ff3-b318-0c3e62d1031a",
+    "workId": "work-4d4b65e5-e792-4d7d-99be-49d17698b841",
+    "title": "情緒廢物 Emotional Waste",
+    "originalArtist": "玥Itsuki",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-fc2e182c-8691-420c-b3cd-5de637691ca1",
+        "streamId": "stream-35fcc2ff-aab6-4b45-9b15-66edf6953cd2",
+        "videoId": "NVoahlJdJ_o",
+        "timestamp": 6,
+        "endTimestamp": 192
       }
     ]
   },
@@ -1173,6 +1237,13 @@
         "videoId": "A8SFiRFftsA",
         "timestamp": 982,
         "endTimestamp": 1141
+      },
+      {
+        "id": "p-ec8ed80b-bdc6-4523-a54f-8dd97c9738d7",
+        "streamId": "stream-1f29d8f4-aae3-4473-9e08-94e9874aea26",
+        "videoId": "Gea8lWJ6rDs",
+        "timestamp": 0,
+        "endTimestamp": 164
       }
     ]
   },
@@ -1577,6 +1648,22 @@
         "videoId": "wRZSj5cHzqI",
         "timestamp": 6276,
         "endTimestamp": 6493
+      }
+    ]
+  },
+  {
+    "id": "song-23b2eb46-4ea8-4ce2-b3df-8051604208e6",
+    "workId": "work-song-2663",
+    "title": "暮光Gloaming Light",
+    "originalArtist": "扉暮IANVS",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-beeb8318-3ab9-4af7-a937-5809e51d8a9c",
+        "streamId": "stream-eaa2447f-9bf2-4373-bfa6-df5181abb534",
+        "videoId": "ngugUrxnrug",
+        "timestamp": 6,
+        "endTimestamp": 225
       }
     ]
   },
@@ -2812,6 +2899,22 @@
         "videoId": "A8SFiRFftsA",
         "timestamp": 8550,
         "endTimestamp": 8697
+      }
+    ]
+  },
+  {
+    "id": "song-9782c996-efd4-483a-b668-70c6b9c29f2a",
+    "workId": "work-a8ab1cb8-0a5e-443b-a56c-897d6b3ce0ba",
+    "title": "IRIS OUT",
+    "originalArtist": "米津玄師 Kenshi Yonezu",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-acc3015d-59c0-4b0a-94e2-d602355a7682",
+        "streamId": "stream-6fb0da48-d46b-4115-8e18-7b9178b2ad05",
+        "videoId": "VX9VfuNOjDI",
+        "timestamp": 0,
+        "endTimestamp": 147
       }
     ]
   },
