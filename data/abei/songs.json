@@ -132,5 +132,37 @@
         "endTimestamp": 6126
       }
     ]
+  },
+  {
+    "id": "song-cb98ab78-15ac-4ca5-84f3-1efaf2951e9d",
+    "workId": "work-f71cdd76-2854-475d-8b7a-1471e00ab1b0",
+    "title": "崴夢三百天禮物",
+    "originalArtist": "崴崴夢夢",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-a5b10dd6-6162-4618-ab1c-a616a20c698c",
+        "streamId": "stream-2026-08-28",
+        "videoId": "0VPW-wB6ffI",
+        "timestamp": 0,
+        "endTimestamp": 217
+      }
+    ]
+  },
+  {
+    "id": "song-6332ec95-134c-4d3e-acf1-2de5c289b1c9",
+    "workId": "work-54237791-716e-4861-a5e5-c0f6b4a9b3ba",
+    "title": "おこちゃま戦争",
+    "originalArtist": "Reol",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-100e5166-68b7-45f3-94e2-5b650e5bd8e6",
+        "streamId": "stream-8bff69a9-3b50-4918-ae56-cd32abcb6672",
+        "videoId": "HhiG_3cjn-4",
+        "timestamp": 0,
+        "endTimestamp": 211
+      }
+    ]
   }
 ]
