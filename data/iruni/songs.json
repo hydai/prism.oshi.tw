@@ -134,6 +134,22 @@
     ]
   },
   {
+    "id": "song-596faf27-3956-4ca5-a42c-bfb2fff3517c",
+    "workId": "work-36b9fdf0-d059-4502-8dc9-de0aa8144b41",
+    "title": "重啟Re:Start",
+    "originalArtist": "扉暮IANVS",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-3c2f842e-3ebd-4417-8464-464e9d9d0a6e",
+        "streamId": "stream-2026-10-23",
+        "videoId": "T7cEknKe1ZQ",
+        "timestamp": 1,
+        "endTimestamp": 260
+      }
+    ]
+  },
+  {
     "id": "song-d257b5fe-a225-43be-aa50-bb1889113c02",
     "workId": "work-baa35c6d-24af-4dc5-9a73-07f5d81dca01",
     "title": "倒數仙境 ♡ 君とのWonderland",
@@ -216,6 +232,22 @@
         "videoId": "u8Phbu2d59U",
         "timestamp": 0,
         "endTimestamp": 250
+      }
+    ]
+  },
+  {
+    "id": "song-80d8298d-6397-4105-a01d-201e43c578c6",
+    "workId": "work-song-2663",
+    "title": "暮光Gloaming Light",
+    "originalArtist": "扉暮IANVS",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-2bd15833-ebeb-4677-9b11-354b573b41fd",
+        "streamId": "stream-2024-11-08",
+        "videoId": "ngugUrxnrug",
+        "timestamp": 6,
+        "endTimestamp": 226
       }
     ]
   },
@@ -309,6 +341,38 @@
         "videoId": "ag4HE35Jsig",
         "timestamp": 8431,
         "endTimestamp": 8645
+      }
+    ]
+  },
+  {
+    "id": "song-132d963f-0cd9-4b95-8578-5c186d22aa03",
+    "workId": "work-8681b856-3756-4f38-82c1-e6bc4a2f433a",
+    "title": "I’m Your Treasure Box ＊あなたは マリンせんちょうを たからばこからみつけた。",
+    "originalArtist": "宝鐘マリン",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-ab7963f4-115c-4e75-ae00-5b44664aad67",
+        "streamId": "stream-4d98f57b-3bf1-46fb-8d70-72a26a5ec14c",
+        "videoId": "JG5wK37ulko",
+        "timestamp": 0,
+        "endTimestamp": 253
+      }
+    ]
+  },
+  {
+    "id": "song-0892031a-c615-4930-80bd-3f9bf5fc8092",
+    "workId": "work-aa62fc46-e7ea-4d5b-b368-e9e8ed6b0e00",
+    "title": "SOS",
+    "originalArtist": "黛冬優子",
+    "tags": [],
+    "performances": [
+      {
+        "id": "p-14c531f6-2465-4f11-9930-5b457fe2d6c8",
+        "streamId": "stream-2024-10-11",
+        "videoId": "nkTwcztoCcM",
+        "timestamp": 1,
+        "endTimestamp": 239
       }
     ]
   }
